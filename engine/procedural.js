@@ -5,10 +5,7 @@ export function generateProceduralPlane(size, subs) {
     for (let x = 0; x < nbSubdivisions; x++) {
         for (let y = 0; y < nbSubdivisions; y++) {
             let vertex = [(x - subs / 2) * size / subs, (y - subs / 2) * size / subs, 0];
-            //BABYLON.Vector3.Normalize(BABYLON.Vector3.FromArray(vertex)).scale(3).toArray(vertex)
             vertices.push(vertex);
-            //let s = new BABYLON.Mesh.CreateSphere("s", 1, 0.1, scene);
-            //s.position = new BABYLON.Vector3.FromArray(vertex);
         }
     }
     for (let x = 0; x < nbSubdivisions - 1; x++) {
