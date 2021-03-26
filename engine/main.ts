@@ -1,0 +1,20 @@
+import { Planet } from "./planet.js";
+
+let canvas = document.getElementById("renderer") as HTMLCanvasElement;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let engine = new BABYLON.Engine(canvas);
+
+let scene = new BABYLON.Scene(engine);
+
+let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 3, BABYLON.Vector3.Zero(), scene);
+camera.setPosition(new BABYLON.Vector3(0, 0, -15));
+camera.attachControl(canvas);
+
+let s = BABYLON.Mesh.CreateSphere("s", 1, 1, scene);
+s.position = BABYLON.Vector3.Zero()
+
+let planet = new Planet(5, 10, scene);
+
+engine.runRenderLoop(() => scene.render());
