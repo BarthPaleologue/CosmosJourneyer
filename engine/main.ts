@@ -15,6 +15,6 @@ camera.attachControl(canvas);
 let s = BABYLON.Mesh.CreateSphere("s", 1, 1, scene);
 s.position = BABYLON.Vector3.Zero()
 
-let planet = new Planet(5, 10, scene);
+let planet = new Planet(5, 3, scene);
 
 engine.runRenderLoop(() => scene.render());
