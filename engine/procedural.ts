@@ -17,8 +17,8 @@ export function generateProceduralPlane(size: number, subs: number) {
         for(let y = 0; y < nbSubdivisions - 1 ; y++) {
             faces.push([
                 x * nbSubdivisions + y, 
+                x * nbSubdivisions + y + 1,   
                 (x+1) * nbSubdivisions + y, 
-                x * nbSubdivisions + y + 1
             ]);
             faces.push([
                 (x+1) * nbSubdivisions + y,
