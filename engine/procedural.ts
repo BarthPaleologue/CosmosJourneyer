@@ -64,7 +64,7 @@ export function createPolyhedron (vertices: Array<Array<number>>, faces: Array<A
     vertexData.uvs = uvs;
 
     let polygon = new BABYLON.Mesh("mesh", scene);
-    vertexData.applyToMesh(polygon);
+    vertexData.applyToMesh(polygon, true);
 
     return polygon;
 };

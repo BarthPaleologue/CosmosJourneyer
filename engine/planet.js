@@ -5,9 +5,9 @@ export class Planet {
         this.subdivisions = _subdivisions;
         this.mesh = new BABYLON.Mesh("planet", _scene);
         this.scene = _scene;
-        this.generateMesh();
+        this.generateCubeMesh();
     }
-    generateMesh() {
+    generateCubeMesh() {
         let mat = new BABYLON.StandardMaterial("mat1", this.scene);
         mat.wireframe = true;
         let sides = [];
@@ -17,24 +17,38 @@ export class Planet {
             plane.material = mat;
             sides.push(plane);
         }
-        sides[0].position.z = this.diameter;
-        sides[1].position.z = -this.diameter;
+        sides[0].position.z = this.diameter / 2;
+        sides[1].position.z = -this.diameter / 2;
         sides[2].rotation.x = Math.PI / 2;
-        sides[2].position.y = this.diameter;
+        sides[2].position.y = this.diameter / 2;
         sides[3].rotation.x = Math.PI / 2;
-        sides[3].position.y = -this.diameter;
+        sides[3].position.y = -this.diameter / 2;
         sides[4].rotation.y = Math.PI / 2;
-        sides[4].position.x = this.diameter;
+        sides[4].position.x = this.diameter / 2;
         sides[5].rotation.y = Math.PI / 2;
-        sides[5].position.x = -this.diameter;
-        /*let [vertices1, faces1] = generateProceduralPlane(this.diameter, this.subdivisions);
-        let plane1 = createPolyhedron(vertices1, faces1, this.diameter, this.scene);
-        plane1.material = mat;
-        plane1.position.z = this.diameter*2;
-
-        let [vertices2, faces2] = generateProceduralPlane(this.diameter, this.subdivisions);
-        let plane2 = createPolyhedron(vertices2, faces2, this.diameter, this.scene);
-        plane2.material = mat;
-        plane2.position.z = -this.diameter*2;*/
+        sides[5].position.x = -this.diameter / 2;
+        this.mesh = BABYLON.Mesh.MergeMeshes(sides);
+        this.morphToSphere(10);
+    }
+    morphToSphere(steps) {
+        let vertices = this.mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+        let indices = this.mesh.getIndices();
+        let normals = this.mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind);
+        let newVertices = [];
+        console.log(vertices);
+        for (let i = 0; i < vertices.length; i += 3) {
+            let position = new BABYLON.Vector3(vertices[i], vertices[i + 1], vertices[i + 2]);
+            position.normalize().scaleInPlace(20);
+            newVertices.push(position.x, position.y, position.z);
+        }
+        console.log(newVertices);
+        BABYLON.VertexData.ComputeNormals(newVertices, indices, normals);
+        //this.mesh.updateVerticesData(BABYLON.VertexBuffer.NormalKind, normals, false, false);
+        let vertexData = new BABYLON.VertexData();
+        vertexData.positions = newVertices;
+        vertexData.normals = normals;
+        vertexData.indices = indices;
+        vertexData.applyToMesh(this.mesh, true);
+        //this.mesh.updateVerticesData(BABYLON.VertexBuffer.PositionKind, newVertices);
     }
 }
