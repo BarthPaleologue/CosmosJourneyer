@@ -61,31 +61,30 @@ export class Planet {
         let indices = this.mesh.getIndices();
         let normals = this.mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind)!;
 
-        let newVertices: number[] = [];
-
         for(let i = 0; i < vertices.length; i += 3) {
             let position = new BABYLON.Vector3(vertices[i], vertices[i+1], vertices[i+2]);
 
             position.normalize().scaleInPlace(this.diameter/2);
             
-            newVertices.push(position.x, position.y, position.z);
+            vertices[i] = position.x;
+            vertices[i + 1] = position.y;
+            vertices[i + 2] = position.z;
         }
 
-        BABYLON.VertexData.ComputeNormals(newVertices, indices, normals);
+        BABYLON.VertexData.ComputeNormals(vertices, indices, normals);
 
         let vertexData = new BABYLON.VertexData()
-        vertexData.positions = newVertices;
+        vertexData.positions = vertices;
         vertexData.normals = normals;
         vertexData.indices = indices;
 
         vertexData.applyToMesh(this.mesh, true);
     }
+
     morphToWiggles(freq: number, amp: number) {
         let vertices = this.mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind)!;
         let indices = this.mesh.getIndices();
         let normals = this.mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind)!;
-
-        let newVertices: number[] = [];
 
         for(let i = 0; i < vertices.length; i += 3) {
             let position = new BABYLON.Vector3(vertices[i], vertices[i+1], vertices[i+2]);
@@ -93,13 +92,15 @@ export class Planet {
 
             position = position.scale(1 + amp * Math.sin(freq * position.y));
             
-            newVertices.push(position.x, position.y, position.z);
+            vertices[i] = position.x;
+            vertices[i + 1] = position.y;
+            vertices[i + 2] = position.z;
         }
 
-        BABYLON.VertexData.ComputeNormals(newVertices, indices, normals);
+        BABYLON.VertexData.ComputeNormals(vertices, indices, normals);
 
         let vertexData = new BABYLON.VertexData()
-        vertexData.positions = newVertices;
+        vertexData.positions = vertices;
         vertexData.normals = normals;
         vertexData.indices = indices;
 
@@ -112,7 +113,7 @@ export class Planet {
         let normals = this.mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind)!;
 
         let faceStart = faceIndex * vertices.length / 6; // index du premier inclus
-        let faceEnd = ((faceIndex+1) * vertices.length / 6); // index du dernier inclus
+        //let faceEnd = ((faceIndex+1) * vertices.length / 6); // index du dernier inclus
 
         //console.log((faceEnd - faceStart)/3, (this.subdivisions+1)**2);
 
@@ -121,7 +122,6 @@ export class Planet {
         let xCrater = Math.random() * (this.subdivisions - radius);
         let yCrater = Math.random() * (this.subdivisions - radius);
 
-
         // le +1 viens du fait que y a pour n+1 vertices pour n carrés de subdivisions
         for(let x = 0; x < this.subdivisions + 1; x++) {
             for(let y = 0; y < this.subdivisions + 1; y++) {
@@ -129,9 +129,16 @@ export class Planet {
                 
                 let position = new BABYLON.Vector3(vertices[indexOffset], vertices[indexOffset + 1], vertices[indexOffset + 2]);
                 
-                if(x > xCrater && x < xCrater + radius && y > yCrater && y < yCrater + radius) {
-                    position = position.scale(1 + 0.1 * Math.sin(10 * position.y));
+                let squaredDistanceToCrater = (x - xCrater) ** 2 + (y - yCrater) ** 2;
+
+                if(squaredDistanceToCrater <= radius ** 2) {
+                    position = position.scale(0.95 + (squaredDistanceToCrater/100)**2)
+                    //position = position.scale(1 + 0.1 * Math.sin(10 * position.y));
                 }
+
+                /*if(x > xCrater && x < xCrater + radius && y > yCrater && y < yCrater + radius) {
+                    position = position.scale(1 + 0.1 * Math.sin(10 * position.y));
+                }*/
                 
                 vertices[indexOffset] = position.x;
                 vertices[indexOffset + 1] = position.y;

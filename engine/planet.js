@@ -39,15 +39,16 @@ export class Planet {
         let vertices = this.mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
         let indices = this.mesh.getIndices();
         let normals = this.mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind);
-        let newVertices = [];
         for (let i = 0; i < vertices.length; i += 3) {
             let position = new BABYLON.Vector3(vertices[i], vertices[i + 1], vertices[i + 2]);
             position.normalize().scaleInPlace(this.diameter / 2);
-            newVertices.push(position.x, position.y, position.z);
+            vertices[i] = position.x;
+            vertices[i + 1] = position.y;
+            vertices[i + 2] = position.z;
         }
-        BABYLON.VertexData.ComputeNormals(newVertices, indices, normals);
+        BABYLON.VertexData.ComputeNormals(vertices, indices, normals);
         let vertexData = new BABYLON.VertexData();
-        vertexData.positions = newVertices;
+        vertexData.positions = vertices;
         vertexData.normals = normals;
         vertexData.indices = indices;
         vertexData.applyToMesh(this.mesh, true);
@@ -56,15 +57,16 @@ export class Planet {
         let vertices = this.mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
         let indices = this.mesh.getIndices();
         let normals = this.mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind);
-        let newVertices = [];
         for (let i = 0; i < vertices.length; i += 3) {
             let position = new BABYLON.Vector3(vertices[i], vertices[i + 1], vertices[i + 2]);
             position = position.scale(1 + amp * Math.sin(freq * position.y));
-            newVertices.push(position.x, position.y, position.z);
+            vertices[i] = position.x;
+            vertices[i + 1] = position.y;
+            vertices[i + 2] = position.z;
         }
-        BABYLON.VertexData.ComputeNormals(newVertices, indices, normals);
+        BABYLON.VertexData.ComputeNormals(vertices, indices, normals);
         let vertexData = new BABYLON.VertexData();
-        vertexData.positions = newVertices;
+        vertexData.positions = vertices;
         vertexData.normals = normals;
         vertexData.indices = indices;
         vertexData.applyToMesh(this.mesh, true);
@@ -74,7 +76,7 @@ export class Planet {
         let indices = this.mesh.getIndices();
         let normals = this.mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind);
         let faceStart = faceIndex * vertices.length / 6; // index du premier inclus
-        let faceEnd = ((faceIndex + 1) * vertices.length / 6); // index du dernier inclus
+        //let faceEnd = ((faceIndex+1) * vertices.length / 6); // index du dernier inclus
         //console.log((faceEnd - faceStart)/3, (this.subdivisions+1)**2);
         let radius = Math.random() * this.subdivisions / 8;
         let xCrater = Math.random() * (this.subdivisions - radius);
@@ -84,9 +86,14 @@ export class Planet {
             for (let y = 0; y < this.subdivisions + 1; y++) {
                 let indexOffset = faceStart + 3 * (x * (this.subdivisions + 1) + y); // on commence au début de la face, et on ajoute le triple de case visitées (tableau déplié)
                 let position = new BABYLON.Vector3(vertices[indexOffset], vertices[indexOffset + 1], vertices[indexOffset + 2]);
-                if (x > xCrater && x < xCrater + radius && y > yCrater && y < yCrater + radius) {
-                    position = position.scale(1 + 0.1 * Math.sin(10 * position.y));
+                let squaredDistanceToCrater = Math.pow((x - xCrater), 2) + Math.pow((y - yCrater), 2);
+                if (squaredDistanceToCrater <= Math.pow(radius, 2)) {
+                    position = position.scale(0.95 + Math.pow((squaredDistanceToCrater / 100), 2));
+                    //position = position.scale(1 + 0.1 * Math.sin(10 * position.y));
                 }
+                /*if(x > xCrater && x < xCrater + radius && y > yCrater && y < yCrater + radius) {
+                    position = position.scale(1 + 0.1 * Math.sin(10 * position.y));
+                }*/
                 vertices[indexOffset] = position.x;
                 vertices[indexOffset + 1] = position.y;
                 vertices[indexOffset + 2] = position.z;
