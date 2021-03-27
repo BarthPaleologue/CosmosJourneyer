@@ -25,7 +25,9 @@ export class Planet extends proceduralMesh {
         this.applyTerrain();
 
         this.craters = [];
-        this.generateCraters(50);
+        this.generateCraters(200);
+
+        //this.material.diffuseTexture = new BABYLON.Texture("../trump.jpg", this.scene);
     }
 
     generateCraters(n: number) {
@@ -36,7 +38,7 @@ export class Planet extends proceduralMesh {
     addCraters(n: number) {
         for (let i = 0; i < n; i++) {
             let faceId = Math.floor(Math.random() * 6);
-            let r = Math.random() * this.subdivisions / 8;
+            let r = (Math.random() ** 2) * this.subdivisions / 8;
             let x = Math.random() * (this.subdivisions - 4 * r) + 2 * r;
             let y = Math.random() * (this.subdivisions - 4 * r) + 2 * r;
             this.craters.push({ faceId: faceId, radius: r, x: x, y: y });
@@ -52,7 +54,8 @@ export class Planet extends proceduralMesh {
                     let squaredDistanceToCrater = (x - crater.x) ** 2 + (y - crater.y) ** 2;
 
                     if (squaredDistanceToCrater <= crater.radius ** 2) {
-                        newPosition = newPosition.scale(0.95 + (squaredDistanceToCrater / 100) ** 2);
+                        let height = Math.min(0.96 + (squaredDistanceToCrater / 100) ** 3, 1.01);
+                        newPosition = newPosition.scale(height);
                     }
                 }
             }
@@ -64,7 +67,7 @@ export class Planet extends proceduralMesh {
         this.noiseEngine.seed(0.42);
         this.morphBySides((faceId: number, x: number, y: number, position: BABYLON.Vector3) => {
             if (x > 1 && x < this.subdivisions && y > 1 && y < this.subdivisions) {
-                return position.scale(1 + 0.01 * this.noiseEngine.simplex2(x, y));
+                return position.scale(0.999 + .007 * this.noiseEngine.simplex2(x / 3, y / 3));
             } else return position;
         });
     }

@@ -8,7 +8,7 @@ let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 3, BABYLON.Vector3.Zero
 camera.setPosition(new BABYLON.Vector3(0, 0, -15));
 camera.attachControl(canvas);
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-10, 10, -10), scene);
-let planet = new Planet("planet", 5, 40, new BABYLON.Vector3(0, 0, 0), scene);
+let planet = new Planet("planet", 10, 30, new BABYLON.Vector3(0, 0, 0), scene);
 let interval = 0;
 let c = 0;
 document.addEventListener("keydown", e => {
