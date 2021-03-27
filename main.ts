@@ -1,5 +1,4 @@
-import { Planet } from "./planet.js";
-import { createPolyhedron, generateProceduralPlane } from "./procedural.js";
+import { Planet } from "./components/planet.js";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -15,8 +14,7 @@ camera.attachControl(canvas);
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-10, 10, -10), scene);
 
-let planet = new Planet(5, 40, new BABYLON.Vector3(0, 0, 0), scene);
-planet.generateCubeMesh();
+let planet = new Planet("planet", 5, 40, new BABYLON.Vector3(0, 0, 0), scene);
 
 let interval = 0;
 let c = 0;
@@ -24,21 +22,21 @@ let c = 0;
 document.addEventListener("keydown", e => {
     if(e.key == "s") {
         if(interval != 0) clearInterval(interval);
-        planet.morphToSphere();
+        planet.normalize(planet.radius);
     }
     if(e.key == "v") planet.morphToWiggles(5, 0.1);
     if(e.key == "a") {
         if(interval != 0) clearInterval(interval);
         c = 0;
         interval = setInterval(() => {
-            planet.morphToSphere();
+            planet.normalize(planet.radius);
             planet.morphToWiggles(100*Math.sin(c/1000), 0.1);
             c++; // L O L
         }, 10);
     }
     if(e.key == "w") planet.toggleWireframe();
     if(e.key == "p") planet.togglePointsCloud();
-    if(e.key == "c") planet.addCrater(Math.floor(Math.random()*6));
+    if(e.key == "c") planet.addCraters(1);
 });
 
 
