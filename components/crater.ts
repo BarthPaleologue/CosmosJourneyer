@@ -3,4 +3,6 @@ export interface Crater {
     x: number;
     y: number;
     radius: number;
+    maxDepth: number;
+    steepness: number;
 }
