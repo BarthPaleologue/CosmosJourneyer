@@ -1,0 +1,75 @@
+/****SLIDER EXPERIMENT***/
+.range-slider {
+  width: 90%;
+  margin: 0 5%;
+}
+
+.rs-range {
+  width: 100%;
+  -webkit-appearance: none;
+}
+
+.rs-range:focus {
+  outline: none;
+}
+
+.rs-range::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 15px;
+  cursor: pointer;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  background: #c8c8c8;
+  border-radius: 0px;
+  border: 0px solid #010101;
+}
+
+.rs-range::-moz-range-track {
+  width: 100%;
+  height: 15px;
+  cursor: pointer;
+  box-shadow: none;
+  background: #c8c8c8;
+  border-radius: 0px;
+  border: 0px solid #010101;
+}
+
+.rs-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: gainsboro;
+  border: 1px solid grey !important;
+  border-radius: 5px;
+  height: 30px;
+  width: 50px;
+  cursor: pointer;
+  margin-top: -8px;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.rs-range::-moz-range-thumb {
+  -webkit-appearance: none;
+  background: gainsboro;
+  border: 1px solid grey !important;
+  border-radius: 5px;
+  height: 30px;
+  width: 50px;
+  cursor: pointer;
+  margin-top: -8px;
+  -webkit-transition: .5s;
+  transition: .5s;
+}
+
+.rs-range::-moz-focus-outer {
+  border: 0;
+}
+
+.rs-label {
+  position: relative;
+  top: 24px;
+  left: 25px;
+  pointer-events: none;
+  line-height: 30px;
+  color: black;
+}
+/*# sourceMappingURL=style1.css.map */

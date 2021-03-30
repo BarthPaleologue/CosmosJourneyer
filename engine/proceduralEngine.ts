@@ -70,10 +70,13 @@ export class ProceduralEngine {
         let normals: number[] = [];
         let uvs: number[] = [];
         let face_uvs = [[0, 0], [1, 0], [1, 1], [0, 1]];
+        //let colors: number[] = [];
 
         // positions
         for (let vertex of vertices) {
             positions.push(vertex[0] * size, vertex[1] * size, vertex[2] * size);
+            //let color = new BABYLON.Color4(Math.random(), Math.random(), Math.random(), 1);
+            //colors.push(color.r, color.g, color.b, color.a);
         }
 
         // indices from faces
@@ -98,6 +101,7 @@ export class ProceduralEngine {
         vertexData.indices = indices;
         vertexData.normals = normals;
         vertexData.uvs = uvs;
+        //vertexData.colors = colors;
 
         let polygon = new BABYLON.Mesh("mesh", scene);
         vertexData.applyToMesh(polygon, true);

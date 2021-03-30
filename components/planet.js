@@ -4,6 +4,11 @@ import { proceduralMesh } from "../engine/proceduralMesh.js";
 export class Planet extends proceduralMesh {
     constructor(_id, _size, _subdivisions, _position, _updatable, _scene) {
         super(_id, _position, _scene);
+        this.craters = [];
+        this.nbCraters = 200;
+        this.craterRadiusFactor = 1;
+        this.noiseOffsetX = 0;
+        this.noiseOffsetY = 0;
         this.radius = _size / 2;
         this.subdivisions = _subdivisions;
         this.updatable = _updatable;
@@ -15,9 +20,9 @@ export class Planet extends proceduralMesh {
         this.material.diffuseColor = new BABYLON.Color3(0.5, 0.3, 0.08);
         this.normalize(this.radius);
         this.noiseEngine = new NoiseEngine();
+        this.noiseEngine.seed(0);
         this.applyTerrain();
-        this.craters = [];
-        this.generateCraters(200);
+        this.generateCraters(this.nbCraters);
         //this.applyTerrain();
         if (!this.updatable) {
             this.mesh.forceSharedVertices();
@@ -36,14 +41,16 @@ export class Planet extends proceduralMesh {
     }
     generateCraters(n) {
         this.craters = [];
+        this.nbCraters = 0;
         this.addCraters(n);
     }
     addCraters(n) {
+        this.nbCraters += n;
         for (let i = 0; i < n; i++) {
             let faceId = Math.floor(Math.random() * 6);
-            let r = (Math.pow(Math.random(), 2)) * this.subdivisions / 8;
-            let x = Math.random() * (this.subdivisions - 4 * r) + 2 * r;
-            let y = Math.random() * (this.subdivisions - 4 * r) + 2 * r;
+            let r = this.craterRadiusFactor * (Math.pow(Math.random(), 2)) * this.subdivisions / 8;
+            let x = Math.random() * (this.subdivisions - 2 * r) + r;
+            let y = Math.random() * (this.subdivisions - 2 * r) + r;
             let maxDepth = 0.96 + (Math.random() - 0.5) / 10;
             let steepness = 0.5 + (Math.random() - 0.5) / 10;
             this.craters.push({ faceId: faceId, radius: r, x: x, y: y, maxDepth: maxDepth, steepness: steepness });
@@ -67,15 +74,24 @@ export class Planet extends proceduralMesh {
         });
     }
     applyTerrain() {
-        this.noiseEngine.seed(0.42);
         this.morphBySides((faceId, x, y, position) => {
-            if (x > 1 && x < this.subdivisions && y > 1 && y < this.subdivisions) {
-                return position.scale(0.999 + .007 * this.noiseEngine.simplex2(x / 3, y / 3));
+            if (x > 1 && x < this.subdivisions - 1 && y > 1 && y < this.subdivisions - 1) {
+                return position.scale(0.999 + .007 * this.noiseEngine.simplex2((x + this.noiseOffsetX) / 3, (y + this.noiseOffsetY) / 3));
                 //return position.scale(0.999 + .01 * this.noiseEngine.perlin3(position.x, position.y, position.z));
             }
             else
                 return position;
         });
+    }
+    regenerate(n = this.nbCraters) {
+        this.normalize(this.radius);
+        this.applyTerrain();
+        this.generateCraters(n);
+    }
+    regenerateTerrain() {
+        this.normalize(this.radius);
+        this.applyTerrain();
+        this.applyCraterData();
     }
     morphBySides(morphFunction) {
         let vertices = this.mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);

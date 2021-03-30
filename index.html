@@ -7,12 +7,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planet Engine</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="./SliderJS-main/styles/style1.min.css">
     <!--<script defer src="./babylon/babylon4.js"></script>-->
     <script defer src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script defer type="module" src="./SliderJS-main/slider.js"></script>
     <script defer type="module" src="./main.js"></script>
 </head>
 
 <body>
+    <div id="ui">
+        <p>Noise Offset X : </p>
+        <div id="noiseOffsetX"></div>
+
+        <p>Noise Offset Y : </p>
+        <div id="noiseOffsetY"></div>
+
+        <p>Amount of Craters : </p>
+        <div id="nbCraters"></div>
+
+        <p>Crater radius : </p>
+        <div id="craterRadius"></div>
+
+        <div id="randomCraters" class="button">Random Craters</div>
+        <div id="random" class="button">Generate Randomly</div>
+    </div>
     <canvas id="renderer"></canvas>
 </body>
 

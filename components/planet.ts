@@ -7,8 +7,14 @@ export class Planet extends proceduralMesh {
     radius: number;
     subdivisions: number;
     updatable: boolean;
-    craters: Crater[];
+
+    craters: Crater[] = [];
+    nbCraters = 200;
+    craterRadiusFactor = 1;
+
     noiseEngine: NoiseEngine;
+    noiseOffsetX = 0;
+    noiseOffsetY = 0;
 
     constructor(_id: string, _size: number, _subdivisions: number, _position: BABYLON.Vector3, _updatable: boolean, _scene: BABYLON.Scene) {
         super(_id, _position, _scene);
@@ -28,10 +34,10 @@ export class Planet extends proceduralMesh {
         this.normalize(this.radius);
 
         this.noiseEngine = new NoiseEngine();
+        this.noiseEngine.seed(0);
         this.applyTerrain();
 
-        this.craters = [];
-        this.generateCraters(200);
+        this.generateCraters(this.nbCraters);
 
         //this.applyTerrain();
 
@@ -54,15 +60,17 @@ export class Planet extends proceduralMesh {
 
     generateCraters(n: number) {
         this.craters = [];
+        this.nbCraters = 0;
         this.addCraters(n);
     }
 
     addCraters(n: number) {
+        this.nbCraters += n;
         for (let i = 0; i < n; i++) {
             let faceId = Math.floor(Math.random() * 6);
-            let r = (Math.random() ** 2) * this.subdivisions / 8;
-            let x = Math.random() * (this.subdivisions - 4 * r) + 2 * r;
-            let y = Math.random() * (this.subdivisions - 4 * r) + 2 * r;
+            let r = this.craterRadiusFactor * (Math.random() ** 2) * this.subdivisions / 8;
+            let x = Math.random() * (this.subdivisions - 2 * r) + r;
+            let y = Math.random() * (this.subdivisions - 2 * r) + r;
             let maxDepth = 0.96 + (Math.random() - 0.5) / 10;
             let steepness = 0.5 + (Math.random() - 0.5) / 10;
             this.craters.push({ faceId: faceId, radius: r, x: x, y: y, maxDepth: maxDepth, steepness: steepness });
@@ -89,13 +97,24 @@ export class Planet extends proceduralMesh {
     }
 
     applyTerrain() {
-        this.noiseEngine.seed(0.42);
         this.morphBySides((faceId: number, x: number, y: number, position: BABYLON.Vector3) => {
-            if (x > 1 && x < this.subdivisions && y > 1 && y < this.subdivisions) {
-                return position.scale(0.999 + .007 * this.noiseEngine.simplex2(x / 3, y / 3));
+            if (x > 1 && x < this.subdivisions - 1 && y > 1 && y < this.subdivisions - 1) {
+                return position.scale(0.999 + .007 * this.noiseEngine.simplex2((x + this.noiseOffsetX) / 3, (y + this.noiseOffsetY) / 3));
                 //return position.scale(0.999 + .01 * this.noiseEngine.perlin3(position.x, position.y, position.z));
             } else return position;
         });
+    }
+
+    regenerate(n: number = this.nbCraters) {
+        this.normalize(this.radius);
+        this.applyTerrain();
+        this.generateCraters(n);
+    }
+
+    regenerateTerrain() {
+        this.normalize(this.radius);
+        this.applyTerrain();
+        this.applyCraterData();
     }
 
     morphBySides(morphFunction: (faceId: number, x: number, y: number, position: BABYLON.Vector3) => BABYLON.Vector3) {
