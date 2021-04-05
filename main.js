@@ -25,26 +25,30 @@ let acc = BABYLON.Vector3.Zero();
 let speed = BABYLON.Vector3.Zero();*/
 scene.activeCamera = camera;
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-10, 10, -10), scene);
-let planet = new Planet("planet", 10, 70, new BABYLON.Vector3(0, 0, 0), true, scene);
+let planet = new Planet("planet", 10, 100, new BABYLON.Vector3(0, 0, 0), true, scene);
 let interval = 0;
 let c = 0;
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX"), 0, 30, 0, (val) => {
-    planet.noiseOffsetX = val;
-    planet.regenerateTerrain();
+    planet.regenerateTerrain(undefined, undefined, val);
 });
 new Slider("noiseOffsetY", document.getElementById("noiseOffsetY"), 0, 30, 0, (val) => {
-    planet.noiseOffsetY = val;
-    planet.regenerateTerrain();
+    planet.regenerateTerrain(undefined, undefined, undefined, val);
 });
-new Slider("nbCraters", document.getElementById("nbCraters"), 0, 500, 200, (val) => {
-    planet.regenerate(val);
+new Slider("noiseStrength", document.getElementById("noiseStrength"), 1, 20, 10, (val) => {
+    planet.regenerateTerrain(val / 100);
 });
-new Slider("craterRadius", document.getElementById("craterRadius"), 1, 20, 10, (val) => {
-    planet.craterRadiusFactor = val / 10;
-    planet.regenerate();
+new Slider("noiseFrequency", document.getElementById("noiseFrequency"), 1, 50, 30, (val) => {
+    planet.regenerateTerrain(undefined, val / 100);
+});
+new Slider("nbCraters", document.getElementById("nbCraters"), 0, 500, 200, (nbCraters) => {
+    planet.generateCraters(nbCraters);
+});
+new Slider("craterRadius", document.getElementById("craterRadius"), 1, 20, 10, (radiusFactor) => {
+    planet.craterRadiusFactor = radiusFactor / 10;
+    planet.generateCraters();
 });
 (_a = document.getElementById("randomCraters")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
-    planet.regenerate();
+    planet.generateCraters();
 });
 let keyboard = {};
 document.addEventListener("keydown", e => {
@@ -70,8 +74,7 @@ document.addEventListener("keydown", e => {
         planet.toggleWireframe();
     if (e.key == "p")
         planet.togglePointsCloud();
-    if (e.key == "g")
-        planet.regenerate(200);
+    //if (e.key == "g") planet.regenerate(200);
 });
 document.addEventListener("keyup", e => {
     keyboard[e.key] = false;

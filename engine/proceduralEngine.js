@@ -7,28 +7,36 @@ export class ProceduralEngine {
             for (let y = 0; y < nbSubdivisions; y++) {
                 let vertex = [(x - subs / 2) / subs, (y - subs / 2) / subs, 0];
                 vertices.push(vertex);
+                if (x < nbSubdivisions - 1 && y < nbSubdivisions - 1) {
+                    faces.push([
+                        x * nbSubdivisions + y,
+                        x * nbSubdivisions + y + 1,
+                        (x + 1) * nbSubdivisions + y + 1,
+                        (x + 1) * nbSubdivisions + y,
+                    ]);
+                }
             }
         }
-        for (let x = 0; x < nbSubdivisions - 1; x++) {
-            for (let y = 0; y < nbSubdivisions - 1; y++) {
-                /*faces.push([
-                    x * nbSubdivisions + y,
-                    x * nbSubdivisions + y + 1,
-                    (x + 1) * nbSubdivisions + y,
-                ]);*/
-                /*faces.push([
-                    (x + 1) * nbSubdivisions + y,
-                    x * nbSubdivisions + y + 1,
-                    (x + 1) * nbSubdivisions + y + 1
-                ]);*/
-                faces.push([
-                    x * nbSubdivisions + y,
-                    x * nbSubdivisions + y + 1,
-                    (x + 1) * nbSubdivisions + y + 1,
-                    (x + 1) * nbSubdivisions + y,
-                ]);
-            }
-        }
+        /*for (let x = 0; x < nbSubdivisions - 1; x++) {
+            for (let y = 0; y < nbSubdivisions - 1; y++) {*/
+        /*faces.push([
+            x * nbSubdivisions + y,
+            x * nbSubdivisions + y + 1,
+            (x + 1) * nbSubdivisions + y,
+        ]);*/
+        /*faces.push([
+            (x + 1) * nbSubdivisions + y,
+            x * nbSubdivisions + y + 1,
+            (x + 1) * nbSubdivisions + y + 1
+        ]);*/
+        /*faces.push([
+            x * nbSubdivisions + y,
+            x * nbSubdivisions + y + 1,
+            (x + 1) * nbSubdivisions + y + 1,
+            (x + 1) * nbSubdivisions + y,
+        ]);
+    }
+}*/
         return this.createPolyhedron(vertices, faces, size, scene);
     }
     static createCube(size, subdivisions, scene) {
@@ -68,15 +76,14 @@ export class ProceduralEngine {
         for (let face of faces) {
             k++;
             for (let j = 0; j < face.length; j++) {
-                //uvs = uvs.concat(face_uvs[j]);
-                uvs = uvs.concat([k / faces.length, j / faces.length]);
+                uvs = uvs.concat(face_uvs[j]);
+                //uvs = uvs.concat([k / faces.length, j / faces.length]);
             }
             for (let i = 0; i < face.length - 2; i++) {
                 indices.push(face[0], face[i + 2], face[i + 1]);
             }
         }
         BABYLON.VertexData.ComputeNormals(positions, indices, normals);
-        //@ts-ignore
         BABYLON.VertexData._ComputeSides(BABYLON.Mesh.FRONTSIDE, positions, indices, normals, uvs);
         let vertexData = new BABYLON.VertexData();
         vertexData.positions = positions;

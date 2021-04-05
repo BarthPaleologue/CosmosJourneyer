@@ -15,6 +15,7 @@ body #ui {
   width: 300px;
   height: 100%;
   z-index: 2;
+  overflow-y: auto;
 }
 
 body #ui p {
