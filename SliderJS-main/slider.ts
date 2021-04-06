@@ -7,7 +7,7 @@ export class Slider {
     min: number;
     max: number;
     baseValue: number;
-    slide: Function;
+    slide: (val: number) => void;
     constructor(_id: string, _parent: HTMLElement, _min: number, _max: number, _baseValue: number, _slide = (val: number) => { }) {
         this.min = _min;
         this.max = _max;
@@ -67,7 +67,7 @@ export class Slider {
         this.handle.innerHTML = this.slider.value;
         let handlePosition = ((this.getValue() - this.min) / (this.max - this.min));
         this.handle.style.marginLeft = handlePosition * (this.slider.offsetWidth - 50) - this.handle.offsetWidth / 2 + "px";
-        this.slide(this.slider.value);
+        this.slide(parseInt(this.slider.value));
     }
     remove() {
         this.container.remove();

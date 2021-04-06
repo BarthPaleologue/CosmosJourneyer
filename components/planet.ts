@@ -33,7 +33,7 @@ export class Planet extends proceduralMesh {
         this.mesh.position = this.position;
         this.mesh.material = this.material;
         //this.material.roughness = 10;
-        //this.material.specularColor = new BABYLON.Color3(.05, .05, .05);
+        this.material.specularColor = new BABYLON.Color3(.0, .0, .0);
         //this.material.diffuseColor = new BABYLON.Color3(0.5, 0.3, 0.08);
 
         this.normalize(this.radius);
@@ -124,14 +124,19 @@ export class Planet extends proceduralMesh {
         this.noiseOffsetY = noiseOffsetY;
         this.morph((i, position) => {
             let coords = position.normalizeToNew();
-            let baseTerrain = this.noiseStrength * 2 * this.noiseEngine.normalizedSimplex3FromVector(coords.scale(noiseFrequency * 5));
-            let continents = Math.max(this.noiseEngine.simplex3FromVector(coords.scale(noiseFrequency * 5)), 0.1);
-            continents = Math.min(0.2, continents);
-            continents *= 30 * noiseStrength;
+            let baseTerrain = this.noiseStrength * 2 * this.noiseEngine.normalizedSimplex3FromVector(coords.scale(noiseFrequency * 5).add(new BABYLON.Vector3(noiseOffsetX, noiseOffsetY, 0)));
 
-            let ripples = this.noiseStrength * this.noiseEngine.normalizedSimplex3FromVector(coords.scale(noiseFrequency * 50));
+            let continents = Math.max(this.noiseEngine.simplex3FromVector(coords.scale(noiseFrequency * 5).add(new BABYLON.Vector3(noiseOffsetX, noiseOffsetY, 0))), 0.1) - 0.1;
+            let seuil = 0.3;
+            continents = Math.min(seuil, continents); // décapitation du relief
+            continents *= 10 * noiseStrength;
 
-            let elevation = baseTerrain + continents + ripples;
+            let moutains = continents <= 9 * seuil ? 0 : 1 * noiseStrength * this.noiseEngine.normalizedSimplex3FromVector(coords.scale(noiseFrequency * 5).add(new BABYLON.Vector3(noiseOffsetX, noiseOffsetY)));
+            moutains = 0;
+
+            let ripples = this.noiseStrength * this.noiseEngine.normalizedSimplex3FromVector(coords.scale(noiseFrequency * 50).add(new BABYLON.Vector3(noiseOffsetX, noiseOffsetY, 0)));
+
+            let elevation = baseTerrain + continents + moutains + ripples;
 
             let newPosition = position.add(coords.scale(elevation));
             return newPosition;
@@ -141,10 +146,11 @@ export class Planet extends proceduralMesh {
 
     refreshColors() {
         this.color((index, position) => {
-            if (position.lengthSquared() > this.radius ** 2 + 60 * this.noiseStrength) {
+            if (position.lengthSquared() > this.radius ** 2 + 20 * this.noiseStrength) {
                 return new BABYLON.Color4(0, 0.5, 0, 1);
             } else {
-                return new BABYLON.Color4(0, 0, 0.5, 1);
+                //return new BABYLON.Color4(0, 0, 0.5, 1);
+                return new BABYLON.Color4(0.5, 0.3, 0.08, 1);
             }
         });
     }

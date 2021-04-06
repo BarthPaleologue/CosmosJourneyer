@@ -25,14 +25,19 @@ let acc = BABYLON.Vector3.Zero();
 let speed = BABYLON.Vector3.Zero();*/
 scene.activeCamera = camera;
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
-let planet = new Planet("planet", 10, 100, new BABYLON.Vector3(0, 0, 0), true, scene);
+let planet = new Planet("planet", 10, parseInt(prompt("nb subdivisions : ") || "60"), new BABYLON.Vector3(0, 0, 0), true, scene);
+let watersphere = BABYLON.Mesh.CreateSphere("water", 32, 10.6, scene);
+let mat = new BABYLON.StandardMaterial("mat", scene);
+mat.diffuseColor = new BABYLON.Color3(0, 0, 0.7);
+watersphere.material = mat;
+watersphere.visibility = 0.5;
 let interval = 0;
 let c = 0;
-new Slider("noiseOffsetX", document.getElementById("noiseOffsetX"), 0, 30, 0, (val) => {
-    planet.refreshNoise(undefined, undefined, val);
+new Slider("noiseOffsetX", document.getElementById("noiseOffsetX"), 0, 50, 0, (val) => {
+    planet.refreshNoise(undefined, undefined, val / 10);
 });
-new Slider("noiseOffsetY", document.getElementById("noiseOffsetY"), 0, 30, 0, (val) => {
-    planet.refreshNoise(undefined, undefined, undefined, val);
+new Slider("noiseOffsetY", document.getElementById("noiseOffsetY"), 0, 50, 0, (val) => {
+    planet.refreshNoise(undefined, undefined, undefined, val / 10);
 });
 new Slider("noiseStrength", document.getElementById("noiseStrength"), 0, 20, 10, (val) => {
     planet.refreshNoise(val / 100);
