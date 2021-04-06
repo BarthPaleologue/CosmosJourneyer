@@ -24,28 +24,33 @@ freeCamera.attachControl(canvas);
 let acc = BABYLON.Vector3.Zero();
 let speed = BABYLON.Vector3.Zero();*/
 scene.activeCamera = camera;
-let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-10, 10, -10), scene);
+let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
 let planet = new Planet("planet", 10, 100, new BABYLON.Vector3(0, 0, 0), true, scene);
 let interval = 0;
 let c = 0;
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX"), 0, 30, 0, (val) => {
-    planet.regenerateTerrain(undefined, undefined, val);
+    planet.refreshNoise(undefined, undefined, val);
 });
 new Slider("noiseOffsetY", document.getElementById("noiseOffsetY"), 0, 30, 0, (val) => {
-    planet.regenerateTerrain(undefined, undefined, undefined, val);
+    planet.refreshNoise(undefined, undefined, undefined, val);
 });
-new Slider("noiseStrength", document.getElementById("noiseStrength"), 1, 20, 10, (val) => {
-    planet.regenerateTerrain(val / 100);
+new Slider("noiseStrength", document.getElementById("noiseStrength"), 0, 20, 10, (val) => {
+    planet.refreshNoise(val / 100);
 });
-new Slider("noiseFrequency", document.getElementById("noiseFrequency"), 1, 50, 30, (val) => {
-    planet.regenerateTerrain(undefined, val / 100);
+new Slider("noiseFrequency", document.getElementById("noiseFrequency"), 0, 50, 30, (val) => {
+    planet.refreshNoise(undefined, val / 100);
 });
 new Slider("nbCraters", document.getElementById("nbCraters"), 0, 500, 200, (nbCraters) => {
     planet.generateCraters(nbCraters);
 });
 new Slider("craterRadius", document.getElementById("craterRadius"), 1, 20, 10, (radiusFactor) => {
-    planet.craterRadiusFactor = radiusFactor / 10;
-    planet.generateCraters();
+    planet.refreshCraters(radiusFactor / 10);
+});
+new Slider("craterSteepness", document.getElementById("craterSteepness"), 1, 20, 15, (steepnessFactor) => {
+    planet.refreshCraters(undefined, steepnessFactor / 10);
+});
+new Slider("craterDepth", document.getElementById("craterDepth"), 1, 20, 10, (depthFactor) => {
+    planet.refreshCraters(undefined, undefined, depthFactor / 10);
 });
 (_a = document.getElementById("randomCraters")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
     planet.generateCraters();
@@ -74,7 +79,6 @@ document.addEventListener("keydown", e => {
         planet.toggleWireframe();
     if (e.key == "p")
         planet.togglePointsCloud();
-    //if (e.key == "g") planet.regenerate(200);
 });
 document.addEventListener("keyup", e => {
     keyboard[e.key] = false;

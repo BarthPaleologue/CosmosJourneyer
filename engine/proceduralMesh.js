@@ -38,6 +38,24 @@ export class proceduralMesh {
         vertexData.indices = indices;
         vertexData.applyToMesh(this.mesh, true);
     }
+    color(colorFunction) {
+        let vertices = this.mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+        let indices = this.mesh.getIndices();
+        let normals = this.mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind);
+        let colors = this.mesh.getVerticesData(BABYLON.VertexBuffer.ColorKind);
+        let newColors = [];
+        for (let i = 0; i < vertices.length; i += 3) {
+            let position = new BABYLON.Vector3(vertices[i], vertices[i + 1], vertices[i + 2]);
+            let color = colorFunction(i / 3, position);
+            newColors.push(color.r, color.g, color.b, color.a);
+        }
+        let vertexData = new BABYLON.VertexData();
+        vertexData.positions = vertices;
+        vertexData.normals = normals;
+        vertexData.indices = indices;
+        vertexData.colors = newColors;
+        vertexData.applyToMesh(this.mesh, true);
+    }
     toggleWireframe() {
         var _a;
         this.material.wireframe = !((_a = this.material) === null || _a === void 0 ? void 0 : _a.wireframe);

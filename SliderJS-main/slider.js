@@ -40,6 +40,10 @@ export class Slider {
     getValue() {
         return parseInt(this.slider.value);
     }
+    randomValue() {
+        let value = Math.floor(Math.random() * (this.max - this.min + 1)) + this.min;
+        this.setValue(value);
+    }
     setValue(value) {
         this.slider.value = String(value);
         this.update();

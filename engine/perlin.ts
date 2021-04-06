@@ -405,6 +405,14 @@ export class NoiseEngine {
 		return 70 * (n0 + n1 + n2);
 	}
 
+	normalizedSimplex3FromVector(vector: BABYLON.Vector3) {
+		return (1 + this.simplex3(vector.x, vector.y, vector.z)) / 2;
+	}
+
+	simplex3FromVector(vector: BABYLON.Vector3) {
+		return this.simplex3(vector.x, vector.y, vector.z);
+	}
+
 	simplex3(xin: number, yin: number, zin: number) {
 		let n0, n1, n2, n3; // Noise contributions from the four corners
 

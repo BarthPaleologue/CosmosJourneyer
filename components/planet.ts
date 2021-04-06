@@ -11,9 +11,11 @@ export class Planet extends proceduralMesh {
     craters: Crater[] = [];
     nbCraters = 200;
     craterRadiusFactor = 1;
+    craterSteepnessFactor = 1;
+    craterMaxDepthFactor = 1;
 
     noiseEngine: NoiseEngine;
-    noiseStrength = .1;
+    noiseStrength = 1;
     noiseFrequency = .3;
     noiseOffsetX = 0;
     noiseOffsetY = 0;
@@ -27,24 +29,28 @@ export class Planet extends proceduralMesh {
         this.updatable = _updatable;
 
         this.mesh = ProceduralEngine.createCube(_size, this.subdivisions, this.scene);
+        this.mesh.forceSharedVertices();
         this.mesh.position = this.position;
         this.mesh.material = this.material;
         //this.material.roughness = 10;
-        this.material.specularColor = new BABYLON.Color3(.05, .05, .05);
-        this.material.diffuseColor = new BABYLON.Color3(0.5, 0.3, 0.08);
+        //this.material.specularColor = new BABYLON.Color3(.05, .05, .05);
+        //this.material.diffuseColor = new BABYLON.Color3(0.5, 0.3, 0.08);
 
         this.normalize(this.radius);
 
         this.noiseEngine = new NoiseEngine();
         this.noiseEngine.seed(0);
-        this.applyTerrain();
+        this.applyNoise();
 
         this.generateCraters(this.nbCraters);
 
-        //this.applyTerrain();
+        this.refreshColors();
+
+        //this.mesh.updateFacetData();
+        //this.mesh.increaseVertices(1);
 
         if (!this.updatable) {
-            this.mesh.forceSharedVertices();
+            //this.mesh.forceSharedVertices();
             this.mesh.simplify([
                 { quality: 0.9, distance: 60, optimizeMesh: true },
                 { quality: 0.8, distance: 80, optimizeMesh: true },
@@ -70,64 +76,88 @@ export class Planet extends proceduralMesh {
     addCraters(n: number) {
         this.nbCraters += n;
         for (let i = 0; i < n; i++) {
-            let faceId = Math.floor(Math.random() * 6);
-            let r = this.craterRadiusFactor * (Math.random() ** 10) * this.subdivisions / 8;
-            let x = Math.random() * (this.subdivisions - 2 * r) + r;
-            let y = Math.random() * (this.subdivisions - 2 * r) + r;
+            let r = this.craterRadiusFactor * (Math.random() ** 10) * 6;
+            // random spherical coordinates
+            let phi = Math.random() * Math.PI * 2;
+            let theta = Math.random() * Math.PI;
+            let position = new BABYLON.Vector3(Math.cos(theta) * Math.sin(phi), Math.sin(theta) * Math.sin(phi), Math.cos(phi));
+
             let maxDepth = 0.2 + (Math.random()) / 10;
-            let steepness = 0.5 + (Math.random() - 0.5) / 10;
-            this.craters.push({ faceId: faceId, radius: r, x: x, y: y, maxDepth: maxDepth, steepness: steepness });
+            let steepness = this.craterSteepnessFactor * (1 + (Math.random()) / 10);
+            this.craters.push({ radius: r, position: position, maxDepth: maxDepth, steepness: steepness });
         }
         this.applyCraterData();
     }
 
     applyCraterData(scaleFactor = 1) {
-        this.morphBySides((faceId: number, x: number, y: number, position: BABYLON.Vector3) => {
+        this.morph((i, position) => {
             let newPosition = position;
+            let normalizedPosition = position.normalizeToNew();
             for (let crater of this.craters) {
-                if (crater.faceId == faceId) {
-                    let squaredDistanceToCrater = (x - crater.x) ** 2 + (y - crater.y) ** 2;
+                let squaredDistanceToCrater = BABYLON.Vector3.DistanceSquared(normalizedPosition, crater.position);
+                let radius = crater.radius * this.craterRadiusFactor / (this.radius ** 2);
+                let steepness = crater.steepness * this.craterSteepnessFactor;
 
-                    if (squaredDistanceToCrater <= crater.radius ** 2) {
-                        let height = Math.min((squaredDistanceToCrater / (crater.radius ** 2)) * crater.steepness - 0.4, 0.5);
-                        height = Math.max(height, -crater.maxDepth) * scaleFactor;
-                        newPosition = position.add(position.normalizeToNew().scale(height));
-                    }
+                if (squaredDistanceToCrater <= radius ** 2) {
+                    let height = Math.min((squaredDistanceToCrater / (radius ** (2) * steepness)) - 0.4, 0.05);
+                    height = Math.max(height, -crater.maxDepth * this.craterMaxDepthFactor) * scaleFactor;
+                    newPosition = position.add(normalizedPosition.scale(height));
                 }
             }
             return newPosition;
         });
+        this.refreshColors();
     }
 
-    applyTerrain(noiseStrength = this.noiseStrength, noiseFrequency = this.noiseFrequency, noiseOffsetX = this.noiseOffsetX, noiseOffsetY = this.noiseOffsetY) {
+    refreshCraters(_radiusFactor = this.craterRadiusFactor, _steepnessFactor = this.craterSteepnessFactor, _depthFactor = this.craterMaxDepthFactor) {
+        this.applyCraterData(-1);
+        this.craterRadiusFactor = _radiusFactor;
+        this.craterSteepnessFactor = _steepnessFactor;
+        this.craterMaxDepthFactor = _depthFactor;
+        this.applyCraterData();
+    }
+
+    applyNoise(noiseStrength = this.noiseStrength, noiseFrequency = this.noiseFrequency, noiseOffsetX = this.noiseOffsetX, noiseOffsetY = this.noiseOffsetY) {
         this.noiseStrength = noiseStrength;
         this.noiseFrequency = noiseFrequency;
         this.noiseOffsetX = noiseOffsetX;
         this.noiseOffsetY = noiseOffsetY;
-        this.morphBySides((faceId: number, x: number, y: number, position: BABYLON.Vector3) => {
-            if (x > 1 && x < this.subdivisions - 1 && y > 1 && y < this.subdivisions - 1) {
-                return position.add(position.normalizeToNew().scale(noiseStrength * this.noiseEngine.simplex2((x + noiseOffsetX) * noiseFrequency, (y + noiseOffsetY) * noiseFrequency)));
-            } else return position;
+        this.morph((i, position) => {
+            let coords = position.normalizeToNew();
+            let baseTerrain = this.noiseStrength * 2 * this.noiseEngine.normalizedSimplex3FromVector(coords.scale(noiseFrequency * 5));
+            let continents = Math.max(this.noiseEngine.simplex3FromVector(coords.scale(noiseFrequency * 5)), 0.1);
+            continents = Math.min(0.2, continents);
+            continents *= 30 * noiseStrength;
+
+            let ripples = this.noiseStrength * this.noiseEngine.normalizedSimplex3FromVector(coords.scale(noiseFrequency * 50));
+
+            let elevation = baseTerrain + continents + ripples;
+
+            let newPosition = position.add(coords.scale(elevation));
+            return newPosition;
+        });
+        this.refreshColors();
+    }
+
+    refreshColors() {
+        this.color((index, position) => {
+            if (position.lengthSquared() > this.radius ** 2 + 60 * this.noiseStrength) {
+                return new BABYLON.Color4(0, 0.5, 0, 1);
+            } else {
+                return new BABYLON.Color4(0, 0, 0.5, 1);
+            }
         });
     }
 
-    removeNoise() {
-        this.morphBySides((faceId: number, x: number, y: number, position: BABYLON.Vector3) => {
-            if (x > 1 && x < this.subdivisions - 1 && y > 1 && y < this.subdivisions - 1) {
-                return position.add(position.normalizeToNew().scale(-this.noiseStrength * this.noiseEngine.simplex2((x + this.noiseOffsetX) * this.noiseFrequency, (y + this.noiseOffsetY) * this.noiseFrequency)));
-            } else return position;
-        });
+    refreshNoise(noiseStrength = this.noiseStrength, noiseFrequency = this.noiseFrequency, noiseOffsetX = this.noiseOffsetX, noiseOffsetY = this.noiseOffsetY) {
+        this.applyNoise(-this.noiseStrength);
+        this.applyNoise(noiseStrength, noiseFrequency, noiseOffsetX, noiseOffsetY);
     }
 
     regenerate(n = this.nbCraters, noiseStrength = this.noiseStrength, noiseFrequency = this.noiseFrequency, noiseOffsetX = this.noiseOffsetX, noiseOffsetY = this.noiseOffsetY) {
-        this.removeNoise();
-        this.applyTerrain(noiseStrength, noiseFrequency, noiseOffsetX, noiseOffsetY);
+        this.applyNoise(-this.noiseStrength);
+        this.applyNoise(noiseStrength, noiseFrequency, noiseOffsetX, noiseOffsetY);
         this.generateCraters(n);
-    }
-
-    regenerateTerrain(noiseStrength = this.noiseStrength, noiseFrequency = this.noiseFrequency, noiseOffsetX = this.noiseOffsetX, noiseOffsetY = this.noiseOffsetY) {
-        this.removeNoise();
-        this.applyTerrain(noiseStrength, noiseFrequency, noiseOffsetX, noiseOffsetY);
     }
 
     morphBySides(morphFunction: (faceId: number, x: number, y: number, position: BABYLON.Vector3) => BABYLON.Vector3) {

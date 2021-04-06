@@ -28,16 +28,16 @@ export class proceduralMesh {
         });
     }
 
-    morph(morphFunction: Function) {
+    morph(morphFunction: (index: number, position: BABYLON.Vector3) => BABYLON.Vector3) {
         let vertices = this.mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind)!;
         let indices = this.mesh.getIndices();
         let normals = this.mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind)!;
 
-        for(let i = 0; i < vertices.length; i += 3) {
-            let position = new BABYLON.Vector3(vertices[i], vertices[i+1], vertices[i+2]);
+        for (let i = 0; i < vertices.length; i += 3) {
+            let position = new BABYLON.Vector3(vertices[i], vertices[i + 1], vertices[i + 2]);
 
-            position = morphFunction(i/3, position);
-            
+            position = morphFunction(i / 3, position);
+
             vertices[i] = position.x;
             vertices[i + 1] = position.y;
             vertices[i + 2] = position.z;
@@ -45,10 +45,34 @@ export class proceduralMesh {
 
         BABYLON.VertexData.ComputeNormals(vertices, indices, normals);
 
-        let vertexData = new BABYLON.VertexData()
+        let vertexData = new BABYLON.VertexData();
         vertexData.positions = vertices;
         vertexData.normals = normals;
         vertexData.indices = indices;
+
+        vertexData.applyToMesh(this.mesh, true);
+    }
+
+    color(colorFunction: (index: number, position: BABYLON.Vector3) => BABYLON.Color4) {
+        let vertices = this.mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind)!;
+        let indices = this.mesh.getIndices();
+        let normals = this.mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind)!;
+        let colors = this.mesh.getVerticesData(BABYLON.VertexBuffer.ColorKind)!;
+
+        let newColors = [];
+
+        for (let i = 0; i < vertices.length; i += 3) {
+            let position = new BABYLON.Vector3(vertices[i], vertices[i + 1], vertices[i + 2]);
+            let color = colorFunction(i / 3, position);
+
+            newColors.push(color.r, color.g, color.b, color.a);
+        }
+
+        let vertexData = new BABYLON.VertexData();
+        vertexData.positions = vertices;
+        vertexData.normals = normals;
+        vertexData.indices = indices;
+        vertexData.colors = newColors;
 
         vertexData.applyToMesh(this.mesh, true);
     }

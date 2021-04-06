@@ -31,7 +31,7 @@ let speed = BABYLON.Vector3.Zero();*/
 
 scene.activeCamera = camera;
 
-let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-10, 10, -10), scene);
+let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
 
 let planet = new Planet("planet", 10, 100, new BABYLON.Vector3(0, 0, 0), true, scene);
 
@@ -39,19 +39,19 @@ let interval = 0;
 let c = 0;
 
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX")!, 0, 30, 0, (val: number) => {
-    planet.regenerateTerrain(undefined, undefined, val);
+    planet.refreshNoise(undefined, undefined, val);
 });
 
 new Slider("noiseOffsetY", document.getElementById("noiseOffsetY")!, 0, 30, 0, (val: number) => {
-    planet.regenerateTerrain(undefined, undefined, undefined, val);
+    planet.refreshNoise(undefined, undefined, undefined, val);
 });
 
-new Slider("noiseStrength", document.getElementById("noiseStrength")!, 1, 20, 10, (val: number) => {
-    planet.regenerateTerrain(val / 100);
+new Slider("noiseStrength", document.getElementById("noiseStrength")!, 0, 20, 10, (val: number) => {
+    planet.refreshNoise(val / 100);
 });
 
-new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 1, 50, 30, (val: number) => {
-    planet.regenerateTerrain(undefined, val / 100);
+new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 50, 30, (val: number) => {
+    planet.refreshNoise(undefined, val / 100);
 });
 
 new Slider("nbCraters", document.getElementById("nbCraters")!, 0, 500, 200, (nbCraters: number) => {
@@ -59,8 +59,15 @@ new Slider("nbCraters", document.getElementById("nbCraters")!, 0, 500, 200, (nbC
 });
 
 new Slider("craterRadius", document.getElementById("craterRadius")!, 1, 20, 10, (radiusFactor: number) => {
-    planet.craterRadiusFactor = radiusFactor / 10;
-    planet.generateCraters();
+    planet.refreshCraters(radiusFactor / 10);
+});
+
+new Slider("craterSteepness", document.getElementById("craterSteepness")!, 1, 20, 15, (steepnessFactor: number) => {
+    planet.refreshCraters(undefined, steepnessFactor / 10);
+});
+
+new Slider("craterDepth", document.getElementById("craterDepth")!, 1, 20, 10, (depthFactor: number) => {
+    planet.refreshCraters(undefined, undefined, depthFactor / 10);
 });
 
 document.getElementById("randomCraters")?.addEventListener("click", () => {
@@ -87,7 +94,6 @@ document.addEventListener("keydown", e => {
     }
     if (e.key == "w") planet.toggleWireframe();
     if (e.key == "p") planet.togglePointsCloud();
-    //if (e.key == "g") planet.regenerate(200);
 });
 
 document.addEventListener("keyup", e => {

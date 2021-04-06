@@ -394,6 +394,12 @@ export class NoiseEngine {
         // The result is scaled to return values in the interval [-1,1].
         return 70 * (n0 + n1 + n2);
     }
+    normalizedSimplex3FromVector(vector) {
+        return (1 + this.simplex3(vector.x, vector.y, vector.z)) / 2;
+    }
+    simplex3FromVector(vector) {
+        return this.simplex3(vector.x, vector.y, vector.z);
+    }
     simplex3(xin, yin, zin) {
         let n0, n1, n2, n3; // Noise contributions from the four corners
         // Skew the input space to determine which simplex cell we're in

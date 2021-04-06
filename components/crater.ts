@@ -1,7 +1,5 @@
 export interface Crater {
-    faceId: number;
-    x: number;
-    y: number;
+    position: BABYLON.Vector3;
     radius: number;
     maxDepth: number;
     steepness: number;
