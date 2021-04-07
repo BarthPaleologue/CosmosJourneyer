@@ -1,4 +1,4 @@
-import { Chunk } from "./components/chunk.js";
+import { QuadTree } from "./components/quadtree.js";
 let canvas = document.getElementById("renderer");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -11,52 +11,22 @@ camera.setPosition(new BABYLON.Vector3(0, 0, -15));
 camera.attachControl(canvas);
 scene.activeCamera = camera;
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
-let exemple = [
-    new Chunk([0], scene),
-    new Chunk([1], scene),
-    new Chunk([2], scene),
-    [
-        new Chunk([3, 0], scene),
-        [
-            new Chunk([3, 1, 0], scene),
-            new Chunk([3, 1, 1], scene),
-            new Chunk([3, 1, 2], scene),
-            new Chunk([3, 1, 3], scene)
-        ],
-        new Chunk([3, 2], scene),
-        new Chunk([3, 3], scene),
-    ],
-];
-function getChunkFromPath(tree, path) {
-    if (tree instanceof Chunk) {
-        return tree;
-    }
-    else {
-        let fst = path.shift();
-        //console.log(tree[fst], path);
-        return getChunkFromPath(tree[fst], path);
-    }
-}
+let exempleTree = new QuadTree(3, 10, BABYLON.Vector3.Zero(), scene);
+/*exempleTree.addBranch([]);
+exempleTree.addBranch([1]);
+exempleTree.addBranch([1, 3]);
+exempleTree.deleteBranch([1, 3]);
+exempleTree.deleteBranch([1]);*/
+//exempleTree.addBranch([0, 2, 2, 1, 1]);
+let exemple = exempleTree.tree;
 const baseLength = 10;
 const maxDepth = 4;
 let activeMat = new BABYLON.StandardMaterial("mat", scene);
 activeMat.wireframe = true;
 activeMat.diffuseColor = BABYLON.Color3.Red();
-let inactiveMat = new BABYLON.StandardMaterial("mat2", scene);
+let inactiveMat = new BABYLON.StandardMaterial("inactiveMat", scene);
 inactiveMat.wireframe = true;
 inactiveMat.diffuseColor = BABYLON.Color3.White();
-function generateChunks(tree) {
-    if (tree instanceof Chunk) {
-        console.log(`generating chunk ${tree.path}`);
-        tree.mesh.material = inactiveMat;
-    }
-    else {
-        for (let subTree of tree) {
-            generateChunks(subTree);
-        }
-    }
-}
-generateChunks(exemple);
 let sphere = BABYLON.Mesh.CreateSphere("tester", 32, 0.3, scene);
 let keyboard = {};
 document.addEventListener("keydown", e => {
@@ -109,50 +79,17 @@ scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     let t = 0;
     let currentChunck;
-    //sphere.position = new BABYLON.Vector3(8 * Math.cos(t) + baseLength, 8 * Math.sin(t) + baseLength, -2);
-    //console.log(getPathToNearestChunk(new BABYLON.Vector2(sphere.position.x, sphere.position.y), 1));
     engine.runRenderLoop(() => {
+        //console.log(scene.materials.length, Math.round(engine.getFps()));
         t += engine.getDeltaTime() / 1000;
         sphere.position = new BABYLON.Vector3(7 * Math.cos(3 * t) * Math.cos(t) + baseLength, 7 * Math.cos(3 * t) * Math.sin(t) + baseLength, -2);
-        let positionPath = [];
-        for (let i = 0; i < maxDepth; i++) {
-            /*
-                3   2
-                0   1
-            */
-            let offsetX = 0;
-            let offsetY = 0;
-            for (let index of positionPath) {
-                if (index == 1) {
-                    offsetX += baseLength / (Math.pow(2, i));
-                }
-                else if (index == 2) {
-                    offsetX += baseLength / (Math.pow(2, i));
-                    offsetY += baseLength / (Math.pow(2, i));
-                }
-                else if (index == 3) {
-                    offsetY += baseLength / (Math.pow(2, i));
-                }
-            }
-            let relativePosition = new BABYLON.Vector2(sphere.position.x - offsetX, sphere.position.y - offsetY);
-            if (relativePosition.x < baseLength / (Math.pow(2, i)) && relativePosition.y < baseLength / (Math.pow(2, i))) {
-                positionPath.push(0);
-            }
-            else if (relativePosition.x > baseLength / (Math.pow(2, i)) && relativePosition.y < baseLength / (Math.pow(2, i))) {
-                positionPath.push(1);
-            }
-            else if (relativePosition.x > baseLength / (Math.pow(2, i)) && relativePosition.y > baseLength / (Math.pow(2, i))) {
-                positionPath.push(2);
-            }
-            else if (relativePosition.x < baseLength / (Math.pow(2, i)) && relativePosition.y > baseLength / (Math.pow(2, i))) {
-                positionPath.push(3);
-            }
-        }
-        //console.log(`survole ${positionPath}`);
-        //console.log(getChunckCoordinates(new BABYLON.Vector2(sphere.position.x, sphere.position.y), 0));
-        positionPath = getPathToNearestChunk(new BABYLON.Vector2(sphere.position.x, sphere.position.y), 0);
-        //console.log(sphere.position);
-        let newChunk = getChunkFromPath(exemple, positionPath);
+        let positionPath = getPathToNearestChunk(new BABYLON.Vector2(sphere.position.x, sphere.position.y), 0);
+        //positionPath.shift();
+        exempleTree.addBranch(positionPath.slice(0, 2));
+        //exempleTree.setPosition(new BABYLON.Vector3(0, -2, 0));
+        //exempleTree.addBranch([0, 2]);
+        //console.log(positionPath);
+        let newChunk = exempleTree.getChunkFromPath(positionPath);
         if (currentChunck != newChunk) {
             if (currentChunck != undefined)
                 currentChunck.mesh.material = inactiveMat;

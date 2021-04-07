@@ -8,6 +8,7 @@ export class Chunk {
         this.path = _path;
         this.depth = this.path.length;
         this.mesh = ProceduralEngine.createCorneredPlane(baseLength / (Math.pow(2, (this.depth - 1))), baseSubdivisions, scene);
+        this.mesh.material = scene.getMaterialByID("inactiveMat");
         for (let i = 0; i < this.depth; i++) {
             /*
                 3   2
