@@ -43,6 +43,29 @@ export class ProceduralEngine {
         return this.createPolyhedron(vertices, faces, size, scene);
     }
 
+    static createCorneredPlane(size: number, subs: number, scene: BABYLON.Scene) {
+        let vertices = [];
+        let faces: number[][] = [];
+        let nbSubdivisions = subs + 1;
+
+        for (let x = 0; x < nbSubdivisions; x++) {
+            for (let y = 0; y < nbSubdivisions; y++) {
+                let vertex = [x / subs, y / subs, 0];
+                vertices.push(vertex);
+                if (x < nbSubdivisions - 1 && y < nbSubdivisions - 1) {
+                    faces.push([
+                        x * nbSubdivisions + y,
+                        x * nbSubdivisions + y + 1,
+                        (x + 1) * nbSubdivisions + y + 1,
+                        (x + 1) * nbSubdivisions + y,
+                    ]);
+                }
+            }
+        }
+
+        return this.createPolyhedron(vertices, faces, size, scene);
+    }
+
     static createCube(size: number, subdivisions: number, scene: BABYLON.Scene) {
 
         let sides: BABYLON.Mesh[] = [];
