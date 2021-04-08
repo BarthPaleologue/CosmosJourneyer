@@ -1,19 +1,20 @@
 import { Chunk } from "./chunk.js";
 const baseLength = 10;
 const baseSubdivisions = 20;
-export class QuadTree {
-    constructor(_maxDepth, _baseLength, _position, _scene) {
+export class PlaneLOD {
+    constructor(_maxDepth, _baseLength, _position, _rotation, _scene) {
         this.maxDepth = _maxDepth;
         this.baseLength = _baseLength;
         this.position = _position;
+        this.rotation = _rotation;
         this.scene = _scene;
-        this.tree = new Chunk([], baseLength, baseSubdivisions, this.scene);
+        this.tree = this.createChunk([]);
     }
     addBranch(path) {
-        this.tree = addRecursivelyBranch(this.tree, path, [], this.scene);
+        this.tree = addRecursivelyBranch(this, this.tree, path, [], this.scene);
     }
     deleteBranch(path) {
-        this.tree = deleteRecursivelyBranch(this.tree, path, [], this.scene);
+        this.tree = deleteRecursivelyBranch(this, this.tree, path, [], this.scene);
     }
     getChunkFromPath(path) {
         return getChunkRecursively(this.tree, path);
@@ -30,44 +31,49 @@ export class QuadTree {
         moveRecursively(this.tree, displacement);
     }
     updateLOD(position) {
-        //console.log("!!!");
         updateLODRecursively(this, this.tree, position);
     }
+    createChunk(path) {
+        return new Chunk(path, this.baseLength, baseSubdivisions, this.position, this.rotation, this.scene);
+    }
+    rotate(rotation) {
+        rotateRecursively(this.tree, rotation);
+    }
 }
-function addRecursivelyBranch(tree, path, walked, scene) {
+function addRecursivelyBranch(plane, tree, path, walked, scene) {
     if (path.length == 0 && tree instanceof Chunk) {
         deleteBranch(tree);
         return [
-            new Chunk(walked.concat([0]), baseLength, baseSubdivisions, scene),
-            new Chunk(walked.concat([1]), baseLength, baseSubdivisions, scene),
-            new Chunk(walked.concat([2]), baseLength, baseSubdivisions, scene),
-            new Chunk(walked.concat([3]), baseLength, baseSubdivisions, scene)
+            plane.createChunk(walked.concat([0])),
+            plane.createChunk(walked.concat([1])),
+            plane.createChunk(walked.concat([2])),
+            plane.createChunk(walked.concat([3]))
         ];
     }
     else {
         if (tree instanceof Chunk) {
             deleteBranch(tree);
             let newTree = [
-                new Chunk(walked.concat([0]), baseLength, baseSubdivisions, scene),
-                new Chunk(walked.concat([1]), baseLength, baseSubdivisions, scene),
-                new Chunk(walked.concat([2]), baseLength, baseSubdivisions, scene),
-                new Chunk(walked.concat([3]), baseLength, baseSubdivisions, scene)
+                plane.createChunk(walked.concat([0])),
+                plane.createChunk(walked.concat([1])),
+                plane.createChunk(walked.concat([2])),
+                plane.createChunk(walked.concat([3]))
             ];
             let next = path.shift();
-            newTree[next] = addRecursivelyBranch(newTree[next], path, walked.concat([next]), scene);
+            newTree[next] = addRecursivelyBranch(plane, newTree[next], path, walked.concat([next]), scene);
             return newTree;
         }
         else {
             let next = path.shift();
-            tree[next] = addRecursivelyBranch(tree[next], path, walked.concat([next]), scene);
+            tree[next] = addRecursivelyBranch(plane, tree[next], path, walked.concat([next]), scene);
             return tree;
         }
     }
 }
-function deleteRecursivelyBranch(tree, path, walked, scene) {
+function deleteRecursivelyBranch(plane, tree, path, walked, scene) {
     if (path.length == 0 && !(tree instanceof Chunk)) {
         deleteBranch(tree);
-        return new Chunk(walked, baseLength, baseSubdivisions, scene);
+        return plane.createChunk(walked);
     }
     else {
         if (tree instanceof Chunk) {
@@ -75,7 +81,7 @@ function deleteRecursivelyBranch(tree, path, walked, scene) {
         }
         else {
             let next = path.shift();
-            tree[next] = deleteRecursivelyBranch(tree[next], path, walked.concat([next]), scene);
+            tree[next] = deleteRecursivelyBranch(plane, tree[next], path, walked.concat([next]), scene);
             return tree;
         }
     }
@@ -113,9 +119,18 @@ function moveRecursively(tree, displacement) {
             moveRecursively(stem, displacement);
     }
 }
+function rotateRecursively(tree, rotation) {
+    if (tree instanceof Chunk) {
+        tree.mesh.rotation = rotation;
+    }
+    else {
+        for (let stem of tree)
+            rotateRecursively(stem, rotation);
+    }
+}
 function updateLODRecursively(ogTree, tree, position) {
     if (tree instanceof Chunk) {
-        let d = Math.pow((tree.x - position.x), 2) + Math.pow((tree.y - position.y), 2) + Math.pow(position.z, 2);
+        let d = Math.pow((tree.position.x - position.x), 2) + Math.pow((tree.position.y - position.y), 2) + Math.pow((tree.position.z - position.z), 2);
         if (d < 3 * baseLength / (Math.pow(2, tree.depth)) && tree.depth < ogTree.maxDepth) {
             ogTree.addBranch(tree.path);
         }

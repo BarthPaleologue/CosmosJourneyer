@@ -1,5 +1,5 @@
 export class ProceduralEngine {
-    static createPlane(size: number, subs: number, scene: BABYLON.Scene) {
+    static createPlane(size: number, subs: number, position: BABYLON.Vector3, scene: BABYLON.Scene) {
         let vertices = [];
         let faces: number[][] = [];
         let nbSubdivisions = subs + 1;
@@ -40,10 +40,10 @@ export class ProceduralEngine {
     }
 }*/
 
-        return this.createPolyhedron(vertices, faces, size, scene);
+        return this.createPolyhedron(vertices, faces, size, position, scene);
     }
 
-    static createCorneredPlane(size: number, subs: number, scene: BABYLON.Scene) {
+    static createCorneredPlane(size: number, subs: number, position: BABYLON.Vector3, scene: BABYLON.Scene) {
         let vertices = [];
         let faces: number[][] = [];
         let nbSubdivisions = subs + 1;
@@ -63,7 +63,7 @@ export class ProceduralEngine {
             }
         }
 
-        return this.createPolyhedron(vertices, faces, size, scene);
+        return this.createPolyhedron(vertices, faces, size, position, scene);
     }
 
     static createCube(size: number, subdivisions: number, scene: BABYLON.Scene) {
@@ -71,7 +71,7 @@ export class ProceduralEngine {
         let sides: BABYLON.Mesh[] = [];
 
         for (let i = 0; i < 6; i++) {
-            let plane = ProceduralEngine.createPlane(size, subdivisions, scene);
+            let plane = ProceduralEngine.createPlane(size, subdivisions, BABYLON.Vector3.Zero(), scene);
             sides.push(plane);
         }
 
@@ -95,7 +95,7 @@ export class ProceduralEngine {
         return BABYLON.Mesh.MergeMeshes(sides)!;
     }
 
-    static createPolyhedron(vertices: Array<Array<number>>, faces: Array<Array<number>>, size: number, scene: BABYLON.Scene) {
+    static createPolyhedron(vertices: Array<Array<number>>, faces: Array<Array<number>>, size: number, position: BABYLON.Vector3, scene: BABYLON.Scene) {
         let positions = [];
         let indices = [];
         let normals: number[] = [];
@@ -105,7 +105,7 @@ export class ProceduralEngine {
 
         // positions
         for (let vertex of vertices) {
-            positions.push(vertex[0] * size, vertex[1] * size, vertex[2] * size);
+            positions.push(vertex[0] * size + position.x, vertex[1] * size + position.y, vertex[2] * size + position.z);
             //let color = new BABYLON.Color4(Math.random(), Math.random(), Math.random(), 1);
             //colors.push(color.r, color.g, color.b, color.a);
         }

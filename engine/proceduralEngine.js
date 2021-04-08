@@ -1,5 +1,5 @@
 export class ProceduralEngine {
-    static createPlane(size, subs, scene) {
+    static createPlane(size, subs, position, scene) {
         let vertices = [];
         let faces = [];
         let nbSubdivisions = subs + 1;
@@ -37,9 +37,9 @@ export class ProceduralEngine {
         ]);
     }
 }*/
-        return this.createPolyhedron(vertices, faces, size, scene);
+        return this.createPolyhedron(vertices, faces, size, position, scene);
     }
-    static createCorneredPlane(size, subs, scene) {
+    static createCorneredPlane(size, subs, position, scene) {
         let vertices = [];
         let faces = [];
         let nbSubdivisions = subs + 1;
@@ -57,12 +57,12 @@ export class ProceduralEngine {
                 }
             }
         }
-        return this.createPolyhedron(vertices, faces, size, scene);
+        return this.createPolyhedron(vertices, faces, size, position, scene);
     }
     static createCube(size, subdivisions, scene) {
         let sides = [];
         for (let i = 0; i < 6; i++) {
-            let plane = ProceduralEngine.createPlane(size, subdivisions, scene);
+            let plane = ProceduralEngine.createPlane(size, subdivisions, BABYLON.Vector3.Zero(), scene);
             sides.push(plane);
         }
         sides[0].rotation.y = Math.PI;
@@ -78,7 +78,7 @@ export class ProceduralEngine {
         sides[5].position.x = -size / 2;
         return BABYLON.Mesh.MergeMeshes(sides);
     }
-    static createPolyhedron(vertices, faces, size, scene) {
+    static createPolyhedron(vertices, faces, size, position, scene) {
         let positions = [];
         let indices = [];
         let normals = [];
@@ -87,7 +87,7 @@ export class ProceduralEngine {
         //let colors: number[] = [];
         // positions
         for (let vertex of vertices) {
-            positions.push(vertex[0] * size, vertex[1] * size, vertex[2] * size);
+            positions.push(vertex[0] * size + position.x, vertex[1] * size + position.y, vertex[2] * size + position.z);
             //let color = new BABYLON.Color4(Math.random(), Math.random(), Math.random(), 1);
             //colors.push(color.r, color.g, color.b, color.a);
         }

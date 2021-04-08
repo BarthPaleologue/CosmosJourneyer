@@ -1,6 +1,4 @@
-import { Chunk } from "./components/chunk.js";
-import { QuadTree } from "./components/quadtree.js";
-import { ProceduralEngine } from "./engine/proceduralEngine.js";
+import { PlaneLOD } from "./components/planeLOD.js";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -20,28 +18,10 @@ scene.activeCamera = camera;
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
 
-type quadTree = quadTree[] | Chunk;
+let terrain = new PlaneLOD(4, 10, BABYLON.Vector3.Zero(), BABYLON.Vector3.Zero(), scene);
+terrain.rotate(new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, 0));
 
-let exempleTree = new QuadTree(3, 10, BABYLON.Vector3.Zero(), scene);
-/*exempleTree.addBranch([]);
-exempleTree.addBranch([1]);
-exempleTree.addBranch([1, 3]);
-exempleTree.deleteBranch([1, 3]);
-exempleTree.deleteBranch([1]);*/
-//exempleTree.addBranch([0, 2, 2, 1, 1]);
-let exemple = exempleTree.tree;
-
-const baseLength = 10;
-
-const maxDepth = 4;
-
-let activeMat = new BABYLON.StandardMaterial("mat", scene);
-activeMat.wireframe = true;
-activeMat.diffuseColor = BABYLON.Color3.Red();
-
-let inactiveMat = new BABYLON.StandardMaterial("inactiveMat", scene);
-inactiveMat.wireframe = true;
-inactiveMat.diffuseColor = BABYLON.Color3.White();
+let terrain2 = new PlaneLOD(4, 10, new BABYLON.Vector3(0, 0, -10), BABYLON.Vector3.Zero(), scene);
 
 let sphere = BABYLON.Mesh.CreateSphere("tester", 32, 0.3, scene);
 
@@ -61,61 +41,23 @@ window.addEventListener("resize", () => {
     engine.resize();
 });
 
-function getPathToNearestChunk(position: BABYLON.Vector2, depth: number): number[] {
-    // récupère le chemin dans le quadtree pour atteindre le chunk le plus proche de la position
-    if (position.x <= baseLength / (2 ** depth) && position.y <= baseLength / (2 ** depth)) {
-        // coin bas gauche
-        if (depth == maxDepth) return [0];
-        else return [0].concat(getPathToNearestChunk(position, depth + 1));
-    } else if (position.x >= baseLength / (2 ** depth) && position.y <= baseLength / (2 ** depth)) {
-        // coin bas droit
-        if (depth == maxDepth) return [1];
-        else return [1].concat(getPathToNearestChunk(new BABYLON.Vector2(position.x - baseLength / (2 ** depth), position.y), depth + 1));
-    } else if (position.x >= baseLength / (2 ** depth) && position.y >= baseLength / (2 ** depth)) {
-        // coin haut droit
-        if (depth == maxDepth) return [2];
-        else return [2].concat(getPathToNearestChunk(new BABYLON.Vector2(position.x - (baseLength / (2 ** depth)), position.y - (baseLength / (2 ** depth))), depth + 1));
-    } else if (position.x <= baseLength / (2 ** depth) && position.y >= baseLength / (2 ** depth)) {
-        // coin haut gauche
-        if (depth == maxDepth) return [3];
-        else return [3].concat(getPathToNearestChunk(new BABYLON.Vector2(position.x, position.y - (baseLength / (2 ** depth))), depth + 1));
-    } else {
-        console.error(position, baseLength, depth);
-        return [];
-    }
-}
-
-
-
-
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
     let t = 0;
 
-    let currentChunck: Chunk;
-
     engine.runRenderLoop(() => {
-        //console.log(scene.materials.length, Math.round(engine.getFps()));
         t += engine.getDeltaTime() / 1000;
-        sphere.position = new BABYLON.Vector3(7 * Math.cos(3 * t) * Math.cos(t) + baseLength, 7 * Math.cos(3 * t) * Math.sin(t) + baseLength, -2);
 
-        let positionPath = getPathToNearestChunk(new BABYLON.Vector2(sphere.position.x, sphere.position.y), 0);
-        //positionPath.shift();
+        if (keyboard["z"]) sphere.position.z += 0.01 * engine.getDeltaTime();
+        if (keyboard["s"]) sphere.position.z -= 0.01 * engine.getDeltaTime();
+        if (keyboard["q"]) sphere.position.x -= 0.01 * engine.getDeltaTime();
+        if (keyboard["d"]) sphere.position.x += 0.01 * engine.getDeltaTime();
+        if (keyboard[" "]) sphere.position.y += 0.01 * engine.getDeltaTime();
+        if (keyboard["Shift"]) sphere.position.y -= 0.01 * engine.getDeltaTime();
 
-        exempleTree.addBranch(positionPath.slice(0, 2));
-
-        //exempleTree.setPosition(new BABYLON.Vector3(0, -2, 0));
-        //exempleTree.addBranch([0, 2]);
-
-        //console.log(positionPath);
-
-        let newChunk = exempleTree.getChunkFromPath(positionPath);
-        if (currentChunck != newChunk) {
-            if (currentChunck != undefined) currentChunck.mesh.material = inactiveMat;
-            currentChunck = newChunk;
-            currentChunck.mesh.material = activeMat;
-        }
+        terrain.updateLOD(sphere.position);
+        terrain2.updateLOD(sphere.position);
 
         scene.render();
     });

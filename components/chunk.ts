@@ -1,35 +1,54 @@
 import { ProceduralEngine } from "../engine/proceduralEngine.js";
 
-const baseLength = 10;
-const baseSubdivisions = 20;
-
 export class Chunk {
     path: number[];
+    baseLength = 10;
+    baseSubdivisions = 20;
     depth: number;
-    offsetX = 0;
-    offsetY = 0;
+    x = 0;
+    y = 0;
+    parentPosition: BABYLON.Vector3;
+    parentRotation: BABYLON.Vector3;
+    position: BABYLON.Vector3;
     mesh: BABYLON.Mesh;
 
-    constructor(_path: number[], scene: BABYLON.Scene) {
+    constructor(_path: number[], _baseLength: number, _baseSubdivisions: number, _parentPosition: BABYLON.Vector3, _parentRotation: BABYLON.Vector3, scene: BABYLON.Scene) {
         this.path = _path;
+        this.baseLength = _baseLength;
+        this.baseSubdivisions = _baseSubdivisions;
         this.depth = this.path.length;
-        this.mesh = ProceduralEngine.createCorneredPlane(baseLength / (2 ** (this.depth - 1)), baseSubdivisions, scene);
-        this.mesh.material = scene.getMaterialByID("inactiveMat");
+        this.parentPosition = _parentPosition;
+        this.parentRotation = _parentRotation;
+
         for (let i = 0; i < this.depth; i++) {
             /*
                 3   2
+                  +
                 0   1
             */
-            if (this.path[i] == 1) {
-                this.offsetX += baseLength / 2 ** i;
+            if (this.path[i] == 0) {
+                this.x -= this.baseLength / 4 / (2 ** i);
+                this.y -= this.baseLength / 4 / (2 ** i);
+            } else if (this.path[i] == 1) {
+                this.x += this.baseLength / 4 / (2 ** i);
+                this.y -= this.baseLength / 4 / (2 ** i);
             } else if (this.path[i] == 2) {
-                this.offsetX += baseLength / 2 ** i;
-                this.offsetY += baseLength / 2 ** i;
+                this.x += this.baseLength / 4 / (2 ** i);
+                this.y += this.baseLength / 4 / (2 ** i);
             } else if (this.path[i] == 3) {
-                this.offsetY += baseLength / 2 ** i;
+                this.x -= this.baseLength / 4 / (2 ** i);
+                this.y += this.baseLength / 4 / (2 ** i);
             }
         }
-        this.mesh.position.x = this.offsetX;
-        this.mesh.position.y = this.offsetY;
+
+        this.position = new BABYLON.Vector3(this.x, this.y, 0).add(this.parentPosition);
+
+        this.mesh = ProceduralEngine.createPlane(this.baseLength / (2 ** this.depth), this.baseSubdivisions, this.position, scene);
+        this.mesh.rotation = this.parentRotation;
+
+        let mat = new BABYLON.StandardMaterial(`mat${this.path}`, scene);
+        mat.wireframe = true;
+        mat.diffuseColor = BABYLON.Color3.Random();
+        this.mesh.material = mat;
     }
 }
