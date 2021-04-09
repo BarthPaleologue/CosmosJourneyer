@@ -1,13 +1,53 @@
+import { Direction } from "../components/direction.js";
+
+let worker = new Worker("../components/worker.js");
+
 export class ProceduralEngine {
-    static createPlane(size: number, subs: number, position: BABYLON.Vector3, scene: BABYLON.Scene) {
+    static createSphereChunk(radius: number, size: number, subs: number, position: BABYLON.Vector3, offset: BABYLON.Vector3, direction: Direction, scene: BABYLON.Scene, terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3): [BABYLON.Mesh, BABYLON.Vector3] {
         let vertices = [];
         let faces: number[][] = [];
         let nbSubdivisions = subs + 1;
 
+        let rotation = BABYLON.Matrix.Identity();
+
+        switch (direction) {
+            case Direction.Up:
+                rotation = BABYLON.Matrix.RotationX(Math.PI / 2);
+                break;
+            case Direction.Down:
+                rotation = BABYLON.Matrix.RotationX(-Math.PI / 2);
+                break;
+            case Direction.Forward:
+                rotation = BABYLON.Matrix.Identity();
+                break;
+            case Direction.Backward:
+                rotation = BABYLON.Matrix.RotationY(Math.PI);
+                break;
+            case Direction.Left:
+                rotation = BABYLON.Matrix.RotationY(-Math.PI / 2);
+                break;
+            case Direction.Right:
+                rotation = BABYLON.Matrix.RotationY(Math.PI / 2);
+                break;
+        }
+
+        let positionVector = BABYLON.Vector3.Zero();
+        positionVector = positionVector.add(offset);
+        positionVector = BABYLON.Vector3.TransformCoordinates(positionVector, rotation);
+        positionVector = positionVector.normalizeToNew().scale(radius);
+
+
         for (let x = 0; x < nbSubdivisions; x++) {
             for (let y = 0; y < nbSubdivisions; y++) {
-                let vertex = [(x - subs / 2) / subs, (y - subs / 2) / subs, 0];
-                vertices.push(vertex);
+                let vertex = new BABYLON.Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
+                vertex = vertex.scale(size);
+                vertex = vertex.add(offset);
+                vertex = BABYLON.Vector3.TransformCoordinates(vertex, rotation);
+                vertex = vertex.normalizeToNew().scale(radius);
+
+                vertex = terrainFunction(vertex);
+
+                vertices.push([vertex.x, vertex.y, vertex.z]);
                 if (x < nbSubdivisions - 1 && y < nbSubdivisions - 1) {
                     faces.push([
                         x * nbSubdivisions + y,
@@ -40,21 +80,18 @@ export class ProceduralEngine {
     }
 }*/
 
-        return this.createPolyhedron(vertices, faces, size, position, scene);
+        return [this.createPolyhedron(vertices, faces, 1, position, scene), positionVector];
     }
 
-    static createPlaneWithOffset(size: number, subs: number, offset: BABYLON.Vector3, scene: BABYLON.Scene) {
+    static createPlaneLegacy(size: number, subs: number, position: BABYLON.Vector3, scene: BABYLON.Scene) {
         let vertices = [];
         let faces: number[][] = [];
         let nbSubdivisions = subs + 1;
 
         for (let x = 0; x < nbSubdivisions; x++) {
             for (let y = 0; y < nbSubdivisions; y++) {
-                let vertex = [(x - subs / 2) / subs, (y - subs / 2) / subs, 0];
-                vertex[0] += offset.x;
-                vertex[1] += offset.y;
-                vertex[2] += offset.z;
-                vertices.push(vertex);
+                let vertex = new BABYLON.Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
+                vertices.push([vertex.x, vertex.y, vertex.z]);
                 if (x < nbSubdivisions - 1 && y < nbSubdivisions - 1) {
                     faces.push([
                         x * nbSubdivisions + y,
@@ -66,7 +103,7 @@ export class ProceduralEngine {
             }
         }
 
-        return this.createPolyhedron(vertices, faces, size, BABYLON.Vector3.Zero(), scene);
+        return this.createPolyhedron(vertices, faces, size, position, scene);
     }
 
     static createCube(size: number, subdivisions: number, scene: BABYLON.Scene) {
@@ -74,7 +111,7 @@ export class ProceduralEngine {
         let sides: BABYLON.Mesh[] = [];
 
         for (let i = 0; i < 6; i++) {
-            let plane = ProceduralEngine.createPlane(size, subdivisions, BABYLON.Vector3.Zero(), scene);
+            let plane = ProceduralEngine.createPlaneLegacy(size, subdivisions, BABYLON.Vector3.Zero(), scene);
             sides.push(plane);
         }
 
@@ -99,8 +136,8 @@ export class ProceduralEngine {
     }
 
     static createPolyhedron(vertices: Array<Array<number>>, faces: Array<Array<number>>, size: number, position: BABYLON.Vector3, scene: BABYLON.Scene) {
-        let positions = [];
-        let indices = [];
+        let positions: number[] = [];
+        let indices: number[] = [];
         let normals: number[] = [];
         let uvs: number[] = [];
         let face_uvs = [[0, 0], [1, 0], [1, 1], [0, 1]];
@@ -123,9 +160,11 @@ export class ProceduralEngine {
             }
         }
 
+        let polygon = new BABYLON.Mesh("mesh", scene);
+
         BABYLON.VertexData.ComputeNormals(positions, indices, normals);
 
-        //BABYLON.VertexData._ComputeSides(BABYLON.Mesh.FRONTSIDE, positions, indices, normals, uvs);
+        BABYLON.VertexData._ComputeSides(BABYLON.Mesh.FRONTSIDE, positions, indices, normals, uvs);
 
         let vertexData = new BABYLON.VertexData();
         vertexData.positions = positions;
@@ -133,7 +172,7 @@ export class ProceduralEngine {
         vertexData.normals = normals;
         vertexData.uvs = uvs;
 
-        let polygon = new BABYLON.Mesh("mesh", scene);
+
         vertexData.applyToMesh(polygon, false);
         polygon.position = position;
 

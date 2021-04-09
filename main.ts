@@ -37,9 +37,9 @@ let planet = new Planet("planet", 10, parseInt(prompt("nb subdivisions : ") || "
 
 let watersphere = BABYLON.Mesh.CreateSphere("water", 32, 10.6, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);
-mat.diffuseColor = new BABYLON.Color3(0, 0, 0.7);
+mat.diffuseColor = new BABYLON.Color3(0, 0, 1);
 watersphere.material = mat;
-watersphere.visibility = 0.5;
+watersphere.visibility = 0.8;
 
 let interval = 0;
 let c = 0;

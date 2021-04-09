@@ -1,4 +1,4 @@
-import { Chunk } from "./chunk.js";
+import { PlanetChunk } from "./planetChunk.js";
 export class PlanetSide {
     constructor(_id, _maxDepth, _baseLength, _baseSubdivisions, _direction, _parentNode, _scene, _terrainFunction) {
         this.id = _id;
@@ -21,14 +21,14 @@ export class PlanetSide {
         return checkExistenceRecursively(this.tree, path);
     }
     updateLOD(position) {
-        executeRecursivelyGlobaly(this.tree, (tree) => {
-            let chunkPosition = tree.position.add(this.node.position);
+        executeRecursivelyGlobaly(this.tree, (chunk) => {
+            let chunkPosition = chunk.position.add(this.node.position);
             let d = Math.pow((chunkPosition.x - position.x), 2) + Math.pow((chunkPosition.y - position.y), 2) + Math.pow((chunkPosition.z - position.z), 2);
-            if (d < 20 * (Math.pow(this.baseLength, 2)) / (Math.pow(2, tree.depth)) && tree.depth < this.maxDepth) {
-                this.addBranch(tree.path);
+            if (d < 5 * (Math.pow(this.baseLength, 2)) / (Math.pow(2, chunk.depth)) && chunk.depth < this.maxDepth) {
+                this.addBranch(chunk.path);
             }
-            else if (d > 20 * (Math.pow(this.baseLength, 2)) / (Math.pow(2, (tree.depth - 3)))) {
-                let path = tree.path;
+            else if (d > 5 * (Math.pow(this.baseLength, 2)) / (Math.pow(2, (chunk.depth - 2)))) {
+                let path = chunk.path;
                 if (path.length > 0) {
                     path.pop();
                     this.deleteBranch(path);
@@ -37,7 +37,7 @@ export class PlanetSide {
         });
     }
     createChunk(path) {
-        return new Chunk(path, this.baseLength, this.baseSubdivisions, this.direction, this.node, this.scene, this.terrainFunction);
+        return new PlanetChunk(path, this.baseLength, this.baseSubdivisions, this.direction, this.node, this.scene, this.terrainFunction);
     }
     setParent(parent) {
         this.node.parent = parent;
@@ -48,14 +48,9 @@ export class PlanetSide {
     setPosition(position) {
         this.node.position = position;
     }
-    morph(morphFunction) {
-        executeRecursivelyGlobaly(this.tree, (chunk) => {
-            chunk.morph(morphFunction);
-        });
-    }
 }
 function addRecursivelyBranch(plane, tree, path, walked, scene) {
-    if (path.length == 0 && tree instanceof Chunk) {
+    if (path.length == 0 && tree instanceof PlanetChunk) {
         deleteBranch(tree);
         return [
             plane.createChunk(walked.concat([0])),
@@ -65,7 +60,7 @@ function addRecursivelyBranch(plane, tree, path, walked, scene) {
         ];
     }
     else {
-        if (tree instanceof Chunk) {
+        if (tree instanceof PlanetChunk) {
             deleteBranch(tree);
             let newTree = [
                 plane.createChunk(walked.concat([0])),
@@ -89,12 +84,12 @@ function addRecursivelyBranch(plane, tree, path, walked, scene) {
     }
 }
 function deleteRecursivelyBranch(plane, tree, path, walked, scene) {
-    if (path.length == 0 && !(tree instanceof Chunk)) {
+    if (path.length == 0 && !(tree instanceof PlanetChunk)) {
         deleteBranch(tree);
         return plane.createChunk(walked);
     }
     else {
-        if (tree instanceof Chunk) {
+        if (tree instanceof PlanetChunk) {
             return tree;
         }
         else {
@@ -112,10 +107,10 @@ function deleteBranch(tree) {
     });
 }
 function checkExistenceRecursively(tree, path) {
-    return (path.length == 0 && tree instanceof Chunk) || (!(tree instanceof Chunk) && checkExistenceRecursively(tree[path.shift()], path));
+    return (path.length == 0 && tree instanceof PlanetChunk) || (!(tree instanceof PlanetChunk) && checkExistenceRecursively(tree[path.shift()], path));
 }
 function executeRecursivelyGlobaly(tree, f) {
-    if (tree instanceof Chunk) {
+    if (tree instanceof PlanetChunk) {
         f(tree);
     }
     else {

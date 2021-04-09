@@ -1,7 +1,7 @@
-import { Chunk } from "./chunk.js";
+import { PlanetChunk } from "./planetChunk.js";
 import { Direction } from "./direction.js";
 
-type quadTree = quadTree[] | Chunk;
+type quadTree = quadTree[] | PlanetChunk;
 
 export class PlanetSide {
     id: string;
@@ -37,14 +37,14 @@ export class PlanetSide {
     }
 
     updateLOD(position: BABYLON.Vector3) {
-        executeRecursivelyGlobaly(this.tree, (tree: Chunk) => {
-            let chunkPosition = tree.position.add(this.node.position);
+        executeRecursivelyGlobaly(this.tree, (chunk: PlanetChunk) => {
+            let chunkPosition = chunk.position.add(this.node.position);
             let d = (chunkPosition.x - position.x) ** 2 + (chunkPosition.y - position.y) ** 2 + (chunkPosition.z - position.z) ** 2;
 
-            if (d < 20 * (this.baseLength ** 2) / (2 ** tree.depth) && tree.depth < this.maxDepth) {
-                this.addBranch(tree.path);
-            } else if (d > 20 * (this.baseLength ** 2) / (2 ** (tree.depth - 3))) {
-                let path = tree.path;
+            if (d < 5 * (this.baseLength ** 2) / (2 ** chunk.depth) && chunk.depth < this.maxDepth) {
+                this.addBranch(chunk.path);
+            } else if (d > 5 * (this.baseLength ** 2) / (2 ** (chunk.depth - 2))) {
+                let path = chunk.path;
                 if (path.length > 0) {
                     path.pop();
                     this.deleteBranch(path);
@@ -52,8 +52,8 @@ export class PlanetSide {
             }
         });
     }
-    createChunk(path: number[]): Chunk {
-        return new Chunk(path, this.baseLength, this.baseSubdivisions, this.direction, this.node, this.scene, this.terrainFunction);
+    createChunk(path: number[]): PlanetChunk {
+        return new PlanetChunk(path, this.baseLength, this.baseSubdivisions, this.direction, this.node, this.scene, this.terrainFunction);
     }
     setParent(parent: BABYLON.Mesh) {
         this.node.parent = parent;
@@ -64,15 +64,15 @@ export class PlanetSide {
     setPosition(position: BABYLON.Vector3) {
         this.node.position = position;
     }
-    morph(morphFunction: (position: BABYLON.Vector3) => BABYLON.Vector3) {
+    /*morph(morphFunction: (position: BABYLON.Vector3) => BABYLON.Vector3) {
         executeRecursivelyGlobaly(this.tree, (chunk: Chunk) => {
             chunk.morph(morphFunction);
         });
-    }
+    }*/
 }
 
 function addRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[], walked: number[], scene: BABYLON.Scene): quadTree {
-    if (path.length == 0 && tree instanceof Chunk) {
+    if (path.length == 0 && tree instanceof PlanetChunk) {
         deleteBranch(tree);
         return [
             plane.createChunk(walked.concat([0])),
@@ -81,7 +81,7 @@ function addRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[],
             plane.createChunk(walked.concat([3]))
         ];
     } else {
-        if (tree instanceof Chunk) {
+        if (tree instanceof PlanetChunk) {
             deleteBranch(tree);
             let newTree: quadTree = [
                 plane.createChunk(walked.concat([0])),
@@ -106,11 +106,11 @@ function addRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[],
 }
 
 function deleteRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[], walked: number[], scene: BABYLON.Scene): quadTree {
-    if (path.length == 0 && !(tree instanceof Chunk)) {
+    if (path.length == 0 && !(tree instanceof PlanetChunk)) {
         deleteBranch(tree);
         return plane.createChunk(walked);
     } else {
-        if (tree instanceof Chunk) {
+        if (tree instanceof PlanetChunk) {
             return tree;
         } else {
             let next = path.shift()!;
@@ -121,18 +121,18 @@ function deleteRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number
 }
 
 function deleteBranch(tree: quadTree): void {
-    executeRecursivelyGlobaly(tree, (tree: Chunk) => {
+    executeRecursivelyGlobaly(tree, (tree: PlanetChunk) => {
         tree.mesh.material?.dispose();
         tree.mesh.dispose();
     });
 }
 
 function checkExistenceRecursively(tree: quadTree, path: number[]): boolean {
-    return (path.length == 0 && tree instanceof Chunk) || (!(tree instanceof Chunk) && checkExistenceRecursively(tree[path.shift()!], path));
+    return (path.length == 0 && tree instanceof PlanetChunk) || (!(tree instanceof PlanetChunk) && checkExistenceRecursively(tree[path.shift()!], path));
 }
 
-function executeRecursivelyGlobaly(tree: quadTree, f: (tree: Chunk) => void) {
-    if (tree instanceof Chunk) {
+function executeRecursivelyGlobaly(tree: quadTree, f: (chunk: PlanetChunk) => void) {
+    if (tree instanceof PlanetChunk) {
         f(tree);
     } else {
         for (let stem of tree) executeRecursivelyGlobaly(stem, f);
