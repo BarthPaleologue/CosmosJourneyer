@@ -104,14 +104,14 @@ export class ProceduralEngine {
             }
         }
         BABYLON.VertexData.ComputeNormals(positions, indices, normals);
-        BABYLON.VertexData._ComputeSides(BABYLON.Mesh.FRONTSIDE, positions, indices, normals, uvs);
+        //BABYLON.VertexData._ComputeSides(BABYLON.Mesh.FRONTSIDE, positions, indices, normals, uvs);
         let vertexData = new BABYLON.VertexData();
         vertexData.positions = positions;
         vertexData.indices = indices;
         vertexData.normals = normals;
         vertexData.uvs = uvs;
         let polygon = new BABYLON.Mesh("mesh", scene);
-        vertexData.applyToMesh(polygon, true);
+        vertexData.applyToMesh(polygon, false);
         polygon.position = position;
         return polygon;
     }

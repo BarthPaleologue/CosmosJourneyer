@@ -22,11 +22,12 @@ export class PlanetSide {
     }
     updateLOD(position) {
         executeRecursivelyGlobaly(this.tree, (tree) => {
-            let d = Math.pow((tree.position.x - position.x), 2) + Math.pow((tree.position.y - position.y), 2) + Math.pow((tree.position.z - position.z), 2);
-            if (d < 10 * this.baseLength / (Math.pow(2, tree.depth)) && tree.depth < this.maxDepth) {
+            let chunkPosition = tree.position.add(this.node.position);
+            let d = Math.pow((chunkPosition.x - position.x), 2) + Math.pow((chunkPosition.y - position.y), 2) + Math.pow((chunkPosition.z - position.z), 2);
+            if (d < 20 * (Math.pow(this.baseLength, 2)) / (Math.pow(2, tree.depth)) && tree.depth < this.maxDepth) {
                 this.addBranch(tree.path);
             }
-            else if (d > 10 * this.baseLength / (Math.pow(2, (tree.depth - 3)))) {
+            else if (d > 20 * (Math.pow(this.baseLength, 2)) / (Math.pow(2, (tree.depth - 3)))) {
                 let path = tree.path;
                 if (path.length > 0) {
                     path.pop();
@@ -110,11 +111,6 @@ function deleteBranch(tree) {
         tree.mesh.dispose();
     });
 }
-/*function getChunkRecursively(tree: quadTree, path: number[]): Chunk {
-    let res = executeOnChunk(tree, path, [], (tree: quadTree) => { return tree; });
-    if (res instanceof Chunk) return res;
-    else throw console.error(`Chunk demandé n'existe pas : ${path}`);
-}*/
 function checkExistenceRecursively(tree, path) {
     return (path.length == 0 && tree instanceof Chunk) || (!(tree instanceof Chunk) && checkExistenceRecursively(tree[path.shift()], path));
 }
@@ -127,15 +123,3 @@ function executeRecursivelyGlobaly(tree, f) {
             executeRecursivelyGlobaly(stem, f);
     }
 }
-/*function executeOnChunk(tree: quadTree, path: number[], walked: number[], f: (tree: quadTree) => quadTree): quadTree {
-    if (path.length == 0) {
-        return f(tree);
-    } else {
-        if (tree instanceof Chunk) {
-            throw console.error(`Le chunk demandé n'existe pas : exploré : [${walked}] ; restant : [${path}]`);
-        } else {
-            let next = path.shift()!;
-            return executeOnChunk(tree[next], path, walked.concat([next]), f);
-        }
-    }
-}*/ 

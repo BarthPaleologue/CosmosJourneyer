@@ -38,11 +38,12 @@ export class PlanetSide {
 
     updateLOD(position: BABYLON.Vector3) {
         executeRecursivelyGlobaly(this.tree, (tree: Chunk) => {
-            let d = (tree.position.x - position.x) ** 2 + (tree.position.y - position.y) ** 2 + (tree.position.z - position.z) ** 2;
+            let chunkPosition = tree.position.add(this.node.position);
+            let d = (chunkPosition.x - position.x) ** 2 + (chunkPosition.y - position.y) ** 2 + (chunkPosition.z - position.z) ** 2;
 
-            if (d < 10 * this.baseLength / (2 ** tree.depth) && tree.depth < this.maxDepth) {
+            if (d < 20 * (this.baseLength ** 2) / (2 ** tree.depth) && tree.depth < this.maxDepth) {
                 this.addBranch(tree.path);
-            } else if (d > 10 * this.baseLength / (2 ** (tree.depth - 3))) {
+            } else if (d > 20 * (this.baseLength ** 2) / (2 ** (tree.depth - 3))) {
                 let path = tree.path;
                 if (path.length > 0) {
                     path.pop();
@@ -126,12 +127,6 @@ function deleteBranch(tree: quadTree): void {
     });
 }
 
-/*function getChunkRecursively(tree: quadTree, path: number[]): Chunk {
-    let res = executeOnChunk(tree, path, [], (tree: quadTree) => { return tree; });
-    if (res instanceof Chunk) return res;
-    else throw console.error(`Chunk demandé n'existe pas : ${path}`);
-}*/
-
 function checkExistenceRecursively(tree: quadTree, path: number[]): boolean {
     return (path.length == 0 && tree instanceof Chunk) || (!(tree instanceof Chunk) && checkExistenceRecursively(tree[path.shift()!], path));
 }
@@ -143,16 +138,3 @@ function executeRecursivelyGlobaly(tree: quadTree, f: (tree: Chunk) => void) {
         for (let stem of tree) executeRecursivelyGlobaly(stem, f);
     }
 }
-
-/*function executeOnChunk(tree: quadTree, path: number[], walked: number[], f: (tree: quadTree) => quadTree): quadTree {
-    if (path.length == 0) {
-        return f(tree);
-    } else {
-        if (tree instanceof Chunk) {
-            throw console.error(`Le chunk demandé n'existe pas : exploré : [${walked}] ; restant : [${path}]`);
-        } else {
-            let next = path.shift()!;
-            return executeOnChunk(tree[next], path, walked.concat([next]), f);
-        }
-    }
-}*/

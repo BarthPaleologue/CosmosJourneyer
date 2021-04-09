@@ -49,17 +49,19 @@ export class Chunk {
         this.position = new BABYLON.Vector3(this.x, this.y, 0).add(new BABYLON.Vector3(0, 0, -this.baseLength / 2));
         //this.position = new BABYLON.Vector3(this.x, this.y, -5).normalizeToNew().scale(10);
 
+
+
         this.mesh = ProceduralEngine.createPlane(this.baseLength / (2 ** this.depth), this.baseSubdivisions, BABYLON.Vector3.Zero(), scene);
+
+        //this.mesh = ProceduralEngine.createPlane(this.baseLength / (2 ** this.depth), this.baseSubdivisions, BABYLON.Vector3.Zero(), scene);
         this.mesh.parent = this.parentNode;
         this.offsetPosition(this.position);
 
         // TIME TO BEND
-        this.normalize(10);
-        this.position = this.position.normalizeToNew().scale(10);
+        this.normalize(this.baseLength);
+        this.position = this.position.normalizeToNew().scale(this.baseLength);
 
         let rotation = BABYLON.Matrix.Identity();
-
-
 
         switch (this.direction) {
             case Direction.Up:
@@ -90,15 +92,12 @@ export class Chunk {
 
         // terrain generation
         this.morph(this.terrainFunction);
-        /*this.morph((p: BABYLON.Vector3) => {
-            let elevation = Math.sin(p.y) ** 2;
-            return p.add(p.normalizeToNew().scale(elevation));
-        });*/
 
         let mat = new BABYLON.StandardMaterial(`mat${this.path}`, scene);
-        mat.wireframe = true;
-        mat.diffuseColor = BABYLON.Color3.Random();
+        //mat.wireframe = true;
+        mat.diffuseColor = new BABYLON.Color3(0.5, 0.3, 0.08);
         this.mesh.material = mat;
+
     }
 
 
