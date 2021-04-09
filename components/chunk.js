@@ -1,7 +1,7 @@
 import { ProceduralEngine } from "../engine/proceduralEngine.js";
 import { Direction } from "./direction.js";
 export class Chunk {
-    constructor(_path, _baseLength, _baseSubdivisions, _direction, _parentNode, scene) {
+    constructor(_path, _baseLength, _baseSubdivisions, _direction, _parentNode, scene, _terrainFunction) {
         this.x = 0;
         this.y = 0;
         this.path = _path;
@@ -10,6 +10,7 @@ export class Chunk {
         this.depth = this.path.length;
         this.direction = _direction;
         this.parentNode = _parentNode;
+        this.terrainFunction = _terrainFunction;
         for (let i = 0; i < this.depth; i++) {
             /*
                 3   2
@@ -52,7 +53,7 @@ export class Chunk {
             case Direction.Forward:
                 rotation = BABYLON.Matrix.Identity();
                 break;
-            case Direction.BackWard:
+            case Direction.Backward:
                 rotation = BABYLON.Matrix.RotationY(Math.PI);
                 break;
             case Direction.Left:
@@ -68,10 +69,11 @@ export class Chunk {
             return BABYLON.Vector3.TransformCoordinates(p, rotation);
         });
         // terrain generation
-        this.morph((p) => {
-            let elevation = Math.pow(Math.sin(p.y), 2);
+        this.morph(this.terrainFunction);
+        /*this.morph((p: BABYLON.Vector3) => {
+            let elevation = Math.sin(p.y) ** 2;
             return p.add(p.normalizeToNew().scale(elevation));
-        });
+        });*/
         let mat = new BABYLON.StandardMaterial(`mat${this.path}`, scene);
         mat.wireframe = true;
         mat.diffuseColor = BABYLON.Color3.Random();

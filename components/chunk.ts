@@ -14,14 +14,16 @@ export class Chunk {
     parentNode: BABYLON.Mesh;
     position: BABYLON.Vector3;
     mesh: BABYLON.Mesh;
-
-    constructor(_path: number[], _baseLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene) {
+    terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3;
+    constructor(_path: number[], _baseLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, _terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3) {
         this.path = _path;
         this.baseLength = _baseLength;
         this.baseSubdivisions = _baseSubdivisions;
         this.depth = this.path.length;
         this.direction = _direction;
         this.parentNode = _parentNode;
+
+        this.terrainFunction = _terrainFunction;
 
         for (let i = 0; i < this.depth; i++) {
             /*
@@ -69,7 +71,7 @@ export class Chunk {
             case Direction.Forward:
                 rotation = BABYLON.Matrix.Identity();
                 break;
-            case Direction.BackWard:
+            case Direction.Backward:
                 rotation = BABYLON.Matrix.RotationY(Math.PI);
                 break;
             case Direction.Left:
@@ -87,10 +89,11 @@ export class Chunk {
         });
 
         // terrain generation
-        this.morph((p: BABYLON.Vector3) => {
+        this.morph(this.terrainFunction);
+        /*this.morph((p: BABYLON.Vector3) => {
             let elevation = Math.sin(p.y) ** 2;
             return p.add(p.normalizeToNew().scale(elevation));
-        });
+        });*/
 
         let mat = new BABYLON.StandardMaterial(`mat${this.path}`, scene);
         mat.wireframe = true;

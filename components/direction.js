@@ -5,5 +5,5 @@ export var Direction;
     Direction[Direction["Left"] = 2] = "Left";
     Direction[Direction["Right"] = 3] = "Right";
     Direction[Direction["Forward"] = 4] = "Forward";
-    Direction[Direction["BackWard"] = 5] = "BackWard";
+    Direction[Direction["Backward"] = 5] = "Backward";
 })(Direction || (Direction = {}));

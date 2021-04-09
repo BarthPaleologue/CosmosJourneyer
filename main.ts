@@ -1,4 +1,4 @@
-import { Planet } from "./components/planet.js";
+import { Planet } from "./components/planet.old.js";
 import { Slider } from "./SliderJS-main/slider.js";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;

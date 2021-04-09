@@ -3,7 +3,7 @@ import { Direction } from "./direction.js";
 
 type quadTree = quadTree[] | Chunk;
 
-export class PlaneLOD {
+export class PlanetSide {
     id: string;
     maxDepth: number;
     tree: quadTree;
@@ -12,17 +12,17 @@ export class PlaneLOD {
     direction: Direction;
     node: BABYLON.Mesh;
     scene: BABYLON.Scene;
-    constructor(_id: string, _maxDepth: number, _baseLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, _scene: BABYLON.Scene) {
+    terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3;
+    constructor(_id: string, _maxDepth: number, _baseLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, _scene: BABYLON.Scene, _terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3) {
         this.id = _id;
         this.maxDepth = _maxDepth;
         this.baseLength = _baseLength;
         this.baseSubdivisions = _baseSubdivisions;
         this.direction = _direction;
         this.scene = _scene;
+        this.terrainFunction = _terrainFunction;
+
         this.node = _parentNode;
-        //this.node.position = this.position;
-        //this.node.rotation = this.rotation;
-        this.node;
         this.tree = this.createChunk([]);
     }
     addBranch(path: number[]) {
@@ -52,7 +52,7 @@ export class PlaneLOD {
         });
     }
     createChunk(path: number[]): Chunk {
-        return new Chunk(path, this.baseLength, this.baseSubdivisions, this.direction, this.node, this.scene);
+        return new Chunk(path, this.baseLength, this.baseSubdivisions, this.direction, this.node, this.scene, this.terrainFunction);
     }
     setParent(parent: BABYLON.Mesh) {
         this.node.parent = parent;
@@ -70,7 +70,7 @@ export class PlaneLOD {
     }
 }
 
-function addRecursivelyBranch(plane: PlaneLOD, tree: quadTree, path: number[], walked: number[], scene: BABYLON.Scene): quadTree {
+function addRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[], walked: number[], scene: BABYLON.Scene): quadTree {
     if (path.length == 0 && tree instanceof Chunk) {
         deleteBranch(tree);
         return [
@@ -104,7 +104,7 @@ function addRecursivelyBranch(plane: PlaneLOD, tree: quadTree, path: number[], w
     }
 }
 
-function deleteRecursivelyBranch(plane: PlaneLOD, tree: quadTree, path: number[], walked: number[], scene: BABYLON.Scene): quadTree {
+function deleteRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[], walked: number[], scene: BABYLON.Scene): quadTree {
     if (path.length == 0 && !(tree instanceof Chunk)) {
         deleteBranch(tree);
         return plane.createChunk(walked);

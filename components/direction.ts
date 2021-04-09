@@ -4,5 +4,5 @@ export enum Direction {
     Left,
     Right,
     Forward,
-    BackWard
+    Backward
 }

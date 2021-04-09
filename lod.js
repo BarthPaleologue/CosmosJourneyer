@@ -1,5 +1,4 @@
-import { Direction } from "./components/direction.js";
-import { PlaneLOD } from "./components/planetSide.js";
+import { Planet } from "./components/planet.js";
 let canvas = document.getElementById("renderer");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -12,14 +11,15 @@ camera.setPosition(new BABYLON.Vector3(0, 0, -15));
 camera.attachControl(canvas);
 scene.activeCamera = camera;
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
-let planet = BABYLON.Mesh.CreateSphere("planet", 32, 1, scene);
+/*let node = BABYLON.Mesh.CreateSphere("planet", 32, 1, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);
 mat.emissiveColor = BABYLON.Color3.Red();
-planet.material = mat;
-const size = 10;
-const baseSubdivisions = 20;
-let terrain = new PlaneLOD("t1", 4, size, baseSubdivisions, Direction.Up, planet, scene);
-let terrain2 = new PlaneLOD("t1", 4, size, baseSubdivisions, Direction.Forward, planet, scene);
+node.material = mat;
+let terrain = new PlanetSide("t1", 4, size, baseSubdivisions, Direction.Up, node, scene);*/
+let planet = new Planet("Arès", 10, BABYLON.Vector3.Zero(), 20, 4, scene, (p) => {
+    let elevation = Math.pow(Math.sin(p.y), 2);
+    return p.add(p.normalizeToNew().scale(elevation));
+});
 let sphere = BABYLON.Mesh.CreateSphere("tester", 32, 0.3, scene);
 let keyboard = {};
 document.addEventListener("keydown", e => {
@@ -50,14 +50,7 @@ scene.executeWhenReady(() => {
             sphere.position.y += 0.01 * engine.getDeltaTime();
         if (keyboard["Shift"])
             sphere.position.y -= 0.01 * engine.getDeltaTime();
-        //terrain.offsetPosition(new BABYLON.Vector3(0, 0, -size / 2));
-        terrain.updateLOD(sphere.position);
-        terrain2.updateLOD(sphere.position);
-        /*terrain2.updateLOD(sphere.position);
-        terrain3.updateLOD(sphere.position);
-        terrain4.updateLOD(sphere.position);
-        terrain5.updateLOD(sphere.position);
-        terrain6.updateLOD(sphere.position);*/
+        planet.updateLOD(sphere.position);
         scene.render();
     });
 });

@@ -1,16 +1,14 @@
 import { Chunk } from "./chunk.js";
-export class PlaneLOD {
-    constructor(_id, _maxDepth, _baseLength, _baseSubdivisions, _direction, _parentNode, _scene) {
+export class PlanetSide {
+    constructor(_id, _maxDepth, _baseLength, _baseSubdivisions, _direction, _parentNode, _scene, _terrainFunction) {
         this.id = _id;
         this.maxDepth = _maxDepth;
         this.baseLength = _baseLength;
         this.baseSubdivisions = _baseSubdivisions;
         this.direction = _direction;
         this.scene = _scene;
+        this.terrainFunction = _terrainFunction;
         this.node = _parentNode;
-        //this.node.position = this.position;
-        //this.node.rotation = this.rotation;
-        this.node;
         this.tree = this.createChunk([]);
     }
     addBranch(path) {
@@ -38,7 +36,7 @@ export class PlaneLOD {
         });
     }
     createChunk(path) {
-        return new Chunk(path, this.baseLength, this.baseSubdivisions, this.direction, this.node, this.scene);
+        return new Chunk(path, this.baseLength, this.baseSubdivisions, this.direction, this.node, this.scene, this.terrainFunction);
     }
     setParent(parent) {
         this.node.parent = parent;
