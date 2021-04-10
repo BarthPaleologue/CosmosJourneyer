@@ -394,6 +394,11 @@ export class NoiseEngine {
         // The result is scaled to return values in the interval [-1,1].
         return 70 * (n0 + n1 + n2);
     }
+    /**
+     *
+     * @param vector
+     * @returns simplex between 0 and 1
+     */
     normalizedSimplex3FromVector(vector) {
         return (1 + this.simplex3(vector.x, vector.y, vector.z)) / 2;
     }

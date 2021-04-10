@@ -112,6 +112,7 @@ export class ProceduralEngine {
 
         for (let i = 0; i < 6; i++) {
             let plane = ProceduralEngine.createPlaneLegacy(size, subdivisions, BABYLON.Vector3.Zero(), scene);
+
             sides.push(plane);
         }
 

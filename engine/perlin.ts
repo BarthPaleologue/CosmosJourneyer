@@ -405,6 +405,11 @@ export class NoiseEngine {
 		return 70 * (n0 + n1 + n2);
 	}
 
+	/**
+	 * 
+	 * @param vector 
+	 * @returns simplex between 0 and 1
+	 */
 	normalizedSimplex3FromVector(vector: BABYLON.Vector3) {
 		return (1 + this.simplex3(vector.x, vector.y, vector.z)) / 2;
 	}

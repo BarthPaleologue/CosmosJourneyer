@@ -1,6 +1,7 @@
 import { NoiseEngine } from "../engine/perlin.js";
 import { ProceduralEngine } from "../engine/proceduralEngine.js";
 import { proceduralMesh } from "../engine/proceduralMesh.js";
+import { NoiseLayer } from "./layers/noiseLayer.js";
 export class Planet extends proceduralMesh {
     constructor(_id, _size, _subdivisions, _position, _updatable, _scene) {
         super(_id, _position, _scene);
@@ -13,6 +14,7 @@ export class Planet extends proceduralMesh {
         this.noiseFrequency = .3;
         this.noiseOffsetX = 0;
         this.noiseOffsetY = 0;
+        this.noiseLayers = [];
         this.radius = _size / 2;
         this.subdivisions = _subdivisions;
         this.updatable = _updatable;
@@ -20,17 +22,56 @@ export class Planet extends proceduralMesh {
         this.mesh.forceSharedVertices();
         this.mesh.position = this.position;
         this.mesh.material = this.material;
-        //this.material.roughness = 10;
         this.material.specularColor = new BABYLON.Color3(.0, .0, .0);
         //this.material.diffuseColor = new BABYLON.Color3(0.5, 0.3, 0.08);
+        //@ts-ignore
+        /*let triPlanarMaterial = new BABYLON.TriPlanarMaterial("triplanar", this.scene);
+        triPlanarMaterial.diffuseTextureX = new BABYLON.Texture("../textures/rock.png", this.scene);
+        triPlanarMaterial.diffuseTextureY = new BABYLON.Texture("../textures/grass.jpg", this.scene);
+        triPlanarMaterial.diffuseTextureZ = new BABYLON.Texture("../textures/floor.jpg", this.scene);
+        triPlanarMaterial.normalTextureX = new BABYLON.Texture("../textures/rockn.png", this.scene);
+        triPlanarMaterial.normalTextureY = new BABYLON.Texture("../textures/grassn.png", this.scene);
+        triPlanarMaterial.normalTextureZ = new BABYLON.Texture("../textures/rockn.png", this.scene);
+        triPlanarMaterial.specularPower = 32;
+        triPlanarMaterial.tileSize = 1.5;
+
+        this.material = triPlanarMaterial;
+        console.log(this.material);*/
         this.normalize(this.radius);
         this.noiseEngine = new NoiseEngine();
         this.noiseEngine.seed(0);
+        let barrenBumpyLayer = new NoiseLayer(this.noiseEngine, {
+            noiseStrength: this.noiseStrength,
+            octaves: 5,
+            baseAmplitude: 1,
+            baseFrequency: 1,
+            decay: 2,
+            minValue: 0,
+            offset: BABYLON.Vector3.Zero()
+        });
+        let continentsLayer = new NoiseLayer(this.noiseEngine, {
+            noiseStrength: this.noiseStrength,
+            octaves: 5,
+            baseAmplitude: 1,
+            baseFrequency: 1,
+            decay: 2,
+            minValue: 0.2,
+            offset: BABYLON.Vector3.Zero()
+        });
+        let moutainsLayer = new NoiseLayer(this.noiseEngine, {
+            noiseStrength: this.noiseStrength,
+            octaves: 6,
+            baseAmplitude: 0.1,
+            baseFrequency: 1,
+            decay: 2,
+            minValue: 0,
+            offset: BABYLON.Vector3.Zero()
+        }, [0]);
+        this.noiseLayers.push(continentsLayer);
+        this.noiseLayers.push(moutainsLayer);
         this.applyNoise();
         this.generateCraters(this.nbCraters);
         this.refreshColors();
-        //this.mesh.updateFacetData();
-        //this.mesh.increaseVertices(1);
         if (!this.updatable) {
             //this.mesh.forceSharedVertices();
             this.mesh.simplify([
@@ -44,7 +85,6 @@ export class Planet extends proceduralMesh {
             ], true, BABYLON.SimplificationType.QUADRATIC);
         }
         //this.mesh.checkCollisions = true;
-        //this.material.diffuseTexture = new BABYLON.Texture("../trump.jpg", this.scene);
     }
     generateCraters(n = this.nbCraters) {
         this.applyCraterData(-1);
@@ -98,15 +138,14 @@ export class Planet extends proceduralMesh {
         this.noiseOffsetY = noiseOffsetY;
         this.morph((i, position) => {
             let coords = position.normalizeToNew();
-            let baseTerrain = this.noiseStrength * 2 * this.noiseEngine.normalizedSimplex3FromVector(coords.scale(noiseFrequency * 5).add(new BABYLON.Vector3(noiseOffsetX, noiseOffsetY, 0)));
-            let continents = Math.max(this.noiseEngine.simplex3FromVector(coords.scale(noiseFrequency * 5).add(new BABYLON.Vector3(noiseOffsetX, noiseOffsetY, 0))), 0.1) - 0.1;
-            let seuil = 0.3;
-            continents = Math.min(seuil, continents); // décapitation du relief
-            continents *= 10 * noiseStrength;
-            let moutains = continents <= 9 * seuil ? 0 : 1 * noiseStrength * this.noiseEngine.normalizedSimplex3FromVector(coords.scale(noiseFrequency * 5).add(new BABYLON.Vector3(noiseOffsetX, noiseOffsetY)));
-            moutains = 0;
-            let ripples = this.noiseStrength * this.noiseEngine.normalizedSimplex3FromVector(coords.scale(noiseFrequency * 50).add(new BABYLON.Vector3(noiseOffsetX, noiseOffsetY, 0)));
-            let elevation = baseTerrain + continents + moutains + ripples;
+            let elevation = 0;
+            for (let layer of this.noiseLayers) {
+                let maskFactor = 1;
+                for (let i = 0; i < layer.masks.length; i++) {
+                    maskFactor *= this.noiseLayers[i].evaluate(coords, noiseStrength);
+                }
+                elevation += layer.evaluate(coords, noiseStrength) * maskFactor;
+            }
             let newPosition = position.add(coords.scale(elevation));
             return newPosition;
         });
@@ -114,11 +153,13 @@ export class Planet extends proceduralMesh {
     }
     refreshColors() {
         this.color((index, position) => {
-            if (position.lengthSquared() > Math.pow(this.radius, 2) + 20 * this.noiseStrength) {
+            if (position.lengthSquared() > Math.pow(this.radius, 2) + 10 * this.noiseStrength) {
+                return new BABYLON.Color4(1, 1, 1, 1);
+            }
+            else if (position.lengthSquared() > Math.pow(this.radius, 2) + 1 * this.noiseStrength) {
                 return new BABYLON.Color4(0, 0.5, 0, 1);
             }
             else {
-                //return new BABYLON.Color4(0, 0, 0.5, 1);
                 return new BABYLON.Color4(0.5, 0.3, 0.08, 1);
             }
         });
