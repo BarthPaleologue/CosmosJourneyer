@@ -83,7 +83,25 @@ export class ProceduralEngine {
         return [this.createPolyhedron(vertices, faces, 1, position, scene), positionVector];
     }
 
-    static createPlaneLegacy(size: number, subs: number, position: BABYLON.Vector3, scene: BABYLON.Scene) {
+    static createPlanetSideLegacy(radius: number, subs: number, direction: Direction, scene: BABYLON.Scene) {
+        return this.createSphereChunk(radius, radius * 2, subs, BABYLON.Vector3.Zero(), new BABYLON.Vector3(0, 0, -radius), direction, scene, (p: BABYLON.Vector3) => p)[0];
+    }
+
+    static createPlanet(radius: number, subdivisions: number, scene: BABYLON.Scene) {
+
+        let sides: BABYLON.Mesh[] = [
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Up, scene),
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Down, scene),
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Right, scene),
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Left, scene),
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Forward, scene),
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Backward, scene),
+        ];
+
+        return BABYLON.Mesh.MergeMeshes(sides)!;
+    }
+
+    static createPlaneLegacy(size: number, subs: number, scene: BABYLON.Scene) {
         let vertices = [];
         let faces: number[][] = [];
         let nbSubdivisions = subs + 1;
@@ -103,7 +121,7 @@ export class ProceduralEngine {
             }
         }
 
-        return this.createPolyhedron(vertices, faces, size, position, scene);
+        return this.createPolyhedron(vertices, faces, size, BABYLON.Vector3.Zero(), scene);
     }
 
     static createCube(size: number, subdivisions: number, scene: BABYLON.Scene) {
@@ -111,8 +129,7 @@ export class ProceduralEngine {
         let sides: BABYLON.Mesh[] = [];
 
         for (let i = 0; i < 6; i++) {
-            let plane = ProceduralEngine.createPlaneLegacy(size, subdivisions, BABYLON.Vector3.Zero(), scene);
-
+            let plane = ProceduralEngine.createPlaneLegacy(size, subdivisions, scene);
             sides.push(plane);
         }
 

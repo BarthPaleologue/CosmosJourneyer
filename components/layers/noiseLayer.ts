@@ -20,13 +20,13 @@ export class NoiseLayer extends Layer {
                 offset: settings.offset,
             }));
         }
-        super(filters, (p: BABYLON.Vector3, f: Filter[], s: number) => {
+        super(filters, (p: BABYLON.Vector3, f: Filter[], s: NoiseModifiers) => {
             let elevation = 0;
             for (let filter of f) {
-                elevation += filter.evaluate(p);
+                elevation += filter.evaluate(p, s);
             }
-            elevation = Math.max(0, elevation - settings.minValue * f.length);
-            return elevation * s;
+            elevation = Math.max(0, elevation - settings.minValue * s.minValueModifier * f.length);
+            return elevation * s.strengthModifier;
         });
         this.masks = _masks;
         this.filters = filters;

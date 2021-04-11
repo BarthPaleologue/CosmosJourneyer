@@ -7,8 +7,8 @@ export class NoiseFilter extends Filter {
     settings: NoiseSettings;
 
     constructor(noiseEngine: NoiseEngine, settings: NoiseSettings) {
-        super((p: BABYLON.Vector3) => {
-            return settings.baseAmplitude * noiseEngine.normalizedSimplex3FromVector(p.scale(settings.baseFrequency).add(settings.offset));
+        super((p: BABYLON.Vector3, s: NoiseModifiers) => {
+            return settings.baseAmplitude * s.amplitudeModifier * noiseEngine.normalizedSimplex3FromVector(p.scale(settings.baseFrequency * s.frequencyModifier).add(settings.offset).add(s.offsetModifier));
         });
         this.noiseEngine = noiseEngine;
         this.settings = settings;

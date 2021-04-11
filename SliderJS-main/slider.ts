@@ -42,7 +42,11 @@ export class Slider {
 
         slider.addEventListener("input", () => this.update());
 
-        this.update();
+        this.handle.innerHTML = this.slider.value;
+        let handlePosition = ((this.getValue() - this.min) / (this.max - this.min));
+        this.handle.style.marginLeft = handlePosition * (this.slider.offsetWidth - 50) - this.handle.offsetWidth / 2 + "px";
+
+        //this.update();
     }
     increment() {
         this.slider.value = String(this.getValue() + 1);

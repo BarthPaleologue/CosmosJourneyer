@@ -1,3 +1,4 @@
+import { NoiseModifiers } from "./components/layers/noiseSettings.js";
 import { Planet } from "./components/planet.old.js";
 import { Slider } from "./SliderJS-main/slider.js";
 
@@ -20,12 +21,11 @@ scene.activeCamera = camera;
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
 
-let planet = new Planet("planet", 10, 100, new BABYLON.Vector3(0, 0, 0), true, scene);
+let planet = new Planet("planet", 10, 100, new BABYLON.Vector3(0, 0, 0), scene);
 
 let watersphere = BABYLON.Mesh.CreateSphere("water", 32, 10.05, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);
-mat.diffuseColor = new BABYLON.Color3(0, 0, 1);
-//mat.diffuseTexture = new BABYLON.Texture("./textures/water.jpg", scene);
+mat.diffuseColor = new BABYLON.Color3(15, 50, 200).scale(1 / 255);
 
 mat.bumpTexture = new BABYLON.Texture("./textures/waterbump.png", scene);
 //@ts-ignore
@@ -33,29 +33,21 @@ mat.bumpTexture.uScale = 10;
 //@ts-ignore
 mat.bumpTexture.vScale = 10;
 watersphere.material = mat;
-watersphere.visibility = 0.6;
-
-let interval = 0;
-let c = 0;
+watersphere.visibility = 0.8;
 
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX")!, 0, 50, 0, (val: number) => {
-    planet.refreshNoise(undefined, undefined, val / 10);
+    planet.noiseModifiers.offsetModifier.x = val / 10;
+    planet.applyTerrain();
 });
 
 new Slider("noiseOffsetY", document.getElementById("noiseOffsetY")!, 0, 50, 0, (val: number) => {
-    planet.refreshNoise(undefined, undefined, undefined, val / 10);
+    planet.noiseModifiers.offsetModifier.y = val / 10;
+    planet.applyTerrain();
 });
 
 new Slider("minValue", document.getElementById("minValue")!, 0, 20, 10, (val: number) => {
-    for (let layer of planet.noiseLayers) {
-        layer.setModifiers({
-            strengthModifier: 1,
-            amplitudeModifier: 1,
-            frequencyModifier: 1,
-            offsetModifier: BABYLON.Vector3.Zero(),
-            minValueModifier: val / 10,
-        });
-    }
+    planet.noiseModifiers.minValueModifier = val / 10;
+    planet.applyTerrain();
 });
 
 new Slider("oceanLevel", document.getElementById("oceanLevel")!, 0, 10, 5, (val: number) => {
@@ -63,61 +55,51 @@ new Slider("oceanLevel", document.getElementById("oceanLevel")!, 0, 10, 5, (val:
 });
 
 new Slider("noiseStrength", document.getElementById("noiseStrength")!, 0, 20, 10, (val: number) => {
-    planet.refreshNoise(val / 30);
+    planet.noiseModifiers.strengthModifier = val / 10;
+    planet.applyTerrain();
 });
 
-new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 50, 20, (val: number) => {
-    planet.refreshNoise(undefined, val / 100);
+new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 50, 10, (val: number) => {
+    planet.noiseModifiers.frequencyModifier = val / 10;
+    planet.applyTerrain();
 });
 
 new Slider("nbCraters", document.getElementById("nbCraters")!, 0, 500, 200, (nbCraters: number) => {
-    planet.generateCraters(nbCraters);
+    planet.regenerateCraters(nbCraters);
+    planet.applyTerrain();
 });
 
 new Slider("craterRadius", document.getElementById("craterRadius")!, 1, 20, 10, (radiusFactor: number) => {
-    planet.refreshCraters(radiusFactor / 10);
+    planet.craterModifiers.radiusModifier = radiusFactor / 10;
+    planet.applyTerrain();
 });
 
-new Slider("craterSteepness", document.getElementById("craterSteepness")!, 1, 20, 15, (steepnessFactor: number) => {
-    planet.refreshCraters(undefined, steepnessFactor / 10);
+new Slider("craterSteepness", document.getElementById("craterSteepness")!, 1, 20, 10, (steepnessFactor: number) => {
+    planet.craterModifiers.steepnessModifier = steepnessFactor / 10;
+    planet.applyTerrain();
 });
 
 new Slider("craterDepth", document.getElementById("craterDepth")!, 1, 20, 10, (depthFactor: number) => {
-    planet.refreshCraters(undefined, undefined, depthFactor / 10);
+    planet.craterModifiers.maxDepthModifier = depthFactor / 10;
+    planet.applyTerrain();
 });
 
 document.getElementById("randomCraters")?.addEventListener("click", () => {
-    planet.generateCraters();
+    planet.regenerateCraters();
+    planet.applyTerrain();
 });
 
 let keyboard: { [key: string]: boolean; } = {};
 
 document.addEventListener("keydown", e => {
     keyboard[e.key] = true;
-    if (e.key == "r") {
-        if (interval != 0) clearInterval(interval);
-        planet.normalize(planet.radius);
-    }
-    if (e.key == "v") planet.morphToWiggles(5, 0.1);
-    if (e.key == "a") {
-        if (interval != 0) clearInterval(interval);
-        c = 0;
-        interval = setInterval(() => {
-            planet.normalize(planet.radius);
-            planet.morphToWiggles(100 * Math.sin(c / 1000), 0.1);
-            c++; // L O L
-        }, 10);
-    }
+    if (e.key == "r") planet.normalize(planet.radius);
     if (e.key == "w") planet.toggleWireframe();
     if (e.key == "p") planet.togglePointsCloud();
 });
 
 document.addEventListener("keyup", e => {
     keyboard[e.key] = false;
-});
-
-document.getElementById("random")?.addEventListener("click", () => {
-    planet.regenerate(200);
 });
 
 window.addEventListener("resize", () => {

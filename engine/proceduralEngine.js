@@ -71,7 +71,21 @@ export class ProceduralEngine {
 }*/
         return [this.createPolyhedron(vertices, faces, 1, position, scene), positionVector];
     }
-    static createPlaneLegacy(size, subs, position, scene) {
+    static createPlanetSideLegacy(radius, subs, direction, scene) {
+        return this.createSphereChunk(radius, radius * 2, subs, BABYLON.Vector3.Zero(), new BABYLON.Vector3(0, 0, -radius), direction, scene, (p) => p)[0];
+    }
+    static createPlanet(radius, subdivisions, scene) {
+        let sides = [
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Up, scene),
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Down, scene),
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Right, scene),
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Left, scene),
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Forward, scene),
+            this.createPlanetSideLegacy(radius, subdivisions, Direction.Backward, scene),
+        ];
+        return BABYLON.Mesh.MergeMeshes(sides);
+    }
+    static createPlaneLegacy(size, subs, scene) {
         let vertices = [];
         let faces = [];
         let nbSubdivisions = subs + 1;
@@ -89,12 +103,12 @@ export class ProceduralEngine {
                 }
             }
         }
-        return this.createPolyhedron(vertices, faces, size, position, scene);
+        return this.createPolyhedron(vertices, faces, size, BABYLON.Vector3.Zero(), scene);
     }
     static createCube(size, subdivisions, scene) {
         let sides = [];
         for (let i = 0; i < 6; i++) {
-            let plane = ProceduralEngine.createPlaneLegacy(size, subdivisions, BABYLON.Vector3.Zero(), scene);
+            let plane = ProceduralEngine.createPlaneLegacy(size, subdivisions, scene);
             sides.push(plane);
         }
         sides[0].rotation.y = Math.PI;
