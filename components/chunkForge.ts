@@ -19,16 +19,20 @@ export class ChunkForge {
     baseLength: number;
     subdivisions: number;
     terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3;
-    tasks: ChunkTask[];
-    cadence: number = 5;
-    maxTasksPerUpdate: number = 20;
-    taskCounter: number = 0;
+    tasks: ChunkTask[] = [];
+    cadence = 5;
+    maxTasksPerUpdate = 50;
+    taskCounter = 0;
+    esclavesDispo: Worker[] = [];
+    esclavesBusy: Worker[] = [];
     scene: BABYLON.Scene;
     constructor(_baseLength: number, _subdivisions: number, _terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3, _scene: BABYLON.Scene) {
         this.baseLength = _baseLength;
         this.subdivisions = _subdivisions;
         this.terrainFunction = _terrainFunction;
-        this.tasks = [];
+        for (let i = 0; i < this.cadence; i++) {
+            this.esclavesDispo.push(new Worker("./components/worker.js"));
+        }
         this.scene = _scene;
     }
     addTask(task: ChunkTask) {
@@ -39,10 +43,36 @@ export class ChunkForge {
         if (mesh != null) {
             switch (task.taskType) {
                 case TaskType.Creation:
-                    let vertexData = ProceduralEngine.createSphereChunk2(this.baseLength, this.baseLength / (2 ** task.depth), this.subdivisions, BABYLON.Vector3.Zero(), task.position, task.direction, this.scene, this.terrainFunction);
+                    /*let isToBeDeleted = false;
+                    for (let t of this.tasks) { // on ajoute pas le chunk si sa supression est programmée (combattre le retard du chargement sur les déplacements du joueur)
+                        if (t.id == task.id && t.taskType == TaskType.Deletion) {
+                            isToBeDeleted = true;
+                            break;
+                        }
+                    }*/
+                    //if (!isToBeDeleted) {
+                    /*let esclave = this.esclavesDispo.shift();
+                    esclave?.postMessage(JSON.stringify({
+                        baseLength: this.baseLength,
+                        depth: task.depth,
+                        subdivisions: this.subdivisions,
+                        offset: task.position,
+                        direction: task.direction,
+                        //@ts-ignore
+                        terrainFunction: JSONfn.stringify(this.terrainFunction),
+                    }));*/
+                    //esclave!.onmessage = e => {
+                    let vertexData = /*e.data;*/ProceduralEngine.createSphereChunk2(this.baseLength, this.baseLength / (2 ** task.depth), this.subdivisions, task.position, task.direction, this.terrainFunction);
                     //@ts-ignore
                     vertexData.applyToMesh(mesh);
-                    mesh.parent = task.parentNode;
+                    mesh!.parent = task.parentNode;
+
+                    //this.esclavesDispo.push(esclave!);
+                    //};
+
+                    /*} else {
+                        this.executeNextTask();
+                    }*/
                     break;
                 case TaskType.Deletion:
                     mesh.material?.dispose();
@@ -51,7 +81,7 @@ export class ChunkForge {
                     break;
                 default:
                     console.log("Tache illegale");
-                //this.executeNextTask();
+                    this.executeNextTask();
             }
         } else {
             console.log("le chunk n'existe pas :/");

@@ -1,7 +1,7 @@
 import { Direction } from "../components/direction.js";
 let worker = new Worker("../components/worker.js");
 export class ProceduralEngine {
-    static createSphereChunk2(radius, size, subs, position, offset, direction, scene, terrainFunction) {
+    static createSphereChunk2(radius, size, subs, offset, direction, terrainFunction) {
         let vertices = [];
         let faces = [];
         let nbSubdivisions = subs + 1;

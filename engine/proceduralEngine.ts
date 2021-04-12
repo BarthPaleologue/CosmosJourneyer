@@ -3,7 +3,7 @@ import { Direction } from "../components/direction.js";
 let worker = new Worker("../components/worker.js");
 
 export class ProceduralEngine {
-    static createSphereChunk2(radius: number, size: number, subs: number, position: BABYLON.Vector3, offset: BABYLON.Vector3, direction: Direction, scene: BABYLON.Scene, terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3): BABYLON.VertexData {
+    static createSphereChunk2(radius: number, size: number, subs: number, offset: BABYLON.Vector3, direction: Direction, terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3): BABYLON.VertexData {
         let vertices = [];
         let faces: number[][] = [];
         let nbSubdivisions = subs + 1;

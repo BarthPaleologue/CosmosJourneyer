@@ -1,6 +1,67 @@
-import { ProceduralEngine } from "../engine/proceduralEngine.js";
 import { ChunkForge, TaskType } from "./chunkForge.js";
 import { Direction } from "./direction.js";
+
+export function getChunkPlaneSpacePositionFromPath(baseLength: number, path: number[]): BABYLON.Vector3 {
+    let [x, y] = [0, 0];
+    for (let i = 0; i < path.length; i++) {
+        /*
+            3   2
+              +
+            0   1
+        */
+        switch (path[i]) {
+            case 0:
+                x -= baseLength / 4 / (2 ** i);
+                y -= baseLength / 4 / (2 ** i);
+                break;
+            case 1:
+                x += baseLength / 4 / (2 ** i);
+                y -= baseLength / 4 / (2 ** i);
+                break;
+            case 2:
+                x += baseLength / 4 / (2 ** i);
+                y += baseLength / 4 / (2 ** i);
+                break;
+            case 3:
+                x -= baseLength / 4 / (2 ** i);
+                y += baseLength / 4 / (2 ** i);
+                break;
+        }
+    }
+    return new BABYLON.Vector3(x, y, 0);
+}
+
+export function getChunkSphereSpacePositionFromPath(baseLength: number, path: number[], direction: Direction) {
+    let position = getChunkPlaneSpacePositionFromPath(baseLength, path);
+    position.addInPlace(new BABYLON.Vector3(0, 0, -baseLength / 2));
+
+    position = position.normalizeToNew().scale(baseLength);
+
+    let rotation = BABYLON.Matrix.Identity();
+    switch (direction) {
+        case Direction.Up:
+            rotation = BABYLON.Matrix.RotationX(Math.PI / 2);
+            break;
+        case Direction.Down:
+            rotation = BABYLON.Matrix.RotationX(-Math.PI / 2);
+            break;
+        case Direction.Forward:
+            rotation = BABYLON.Matrix.Identity();
+            break;
+        case Direction.Backward:
+            rotation = BABYLON.Matrix.RotationY(Math.PI);
+            break;
+        case Direction.Left:
+            rotation = BABYLON.Matrix.RotationY(-Math.PI / 2);
+            break;
+        case Direction.Right:
+            rotation = BABYLON.Matrix.RotationY(Math.PI / 2);
+            break;
+    }
+
+    return BABYLON.Vector3.TransformCoordinates(position, rotation);
+
+}
 
 export class PlanetChunk {
     id: string;
@@ -27,32 +88,10 @@ export class PlanetChunk {
 
         this.chunkForge = _chunkForge;
 
-        for (let i = 0; i < this.depth; i++) {
-            /*
-                3   2
-                  +
-                0   1
-            */
-            if (this.path[i] == 0) {
-                this.x -= this.baseLength / 4 / (2 ** i);
-                this.y -= this.baseLength / 4 / (2 ** i);
-            } else if (this.path[i] == 1) {
-                this.x += this.baseLength / 4 / (2 ** i);
-                this.y -= this.baseLength / 4 / (2 ** i);
-            } else if (this.path[i] == 2) {
-                this.x += this.baseLength / 4 / (2 ** i);
-                this.y += this.baseLength / 4 / (2 ** i);
-            } else if (this.path[i] == 3) {
-                this.x -= this.baseLength / 4 / (2 ** i);
-                this.y += this.baseLength / 4 / (2 ** i);
-            }
-        }
-
-        this.position = new BABYLON.Vector3(this.x, this.y, -this.baseLength / 2);
+        this.position = getChunkPlaneSpacePositionFromPath(this.baseLength, this.path);
+        this.position.addInPlace(new BABYLON.Vector3(0, 0, -this.baseLength / 2));
 
         this.mesh = new BABYLON.Mesh(`Chunk${this.id}`, scene);
-
-        //console.log(`Chunk${this.id}`);
 
         this.chunkForge.addTask({
             taskType: TaskType.Creation,
@@ -62,6 +101,8 @@ export class PlanetChunk {
             depth: this.depth,
             direction: this.direction
         });
+
+        this.position = this.position.normalizeToNew().scale(this.baseLength);
 
         let rotation = BABYLON.Matrix.Identity();
         switch (this.direction) {
@@ -85,12 +126,7 @@ export class PlanetChunk {
                 break;
         }
 
-        let positionVector = BABYLON.Vector3.Zero();
-        positionVector = positionVector.add(this.position);
-        positionVector = BABYLON.Vector3.TransformCoordinates(positionVector, rotation);
-        positionVector = positionVector.normalizeToNew().scale(this.baseLength);
-
-        this.position = positionVector; //this.position.add(positionVector);
+        this.position = BABYLON.Vector3.TransformCoordinates(this.position, rotation);
 
         let mat = new BABYLON.StandardMaterial(`mat${this.path}`, scene);
         //mat.wireframe = true;
