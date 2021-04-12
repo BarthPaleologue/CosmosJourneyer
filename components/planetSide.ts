@@ -1,5 +1,6 @@
 import { PlanetChunk } from "./planetChunk.js";
 import { Direction } from "./direction.js";
+import { ChunkForge, TaskType } from "./chunkForge.js";
 
 type quadTree = quadTree[] | PlanetChunk;
 
@@ -12,24 +13,26 @@ export class PlanetSide {
     direction: Direction;
     node: BABYLON.Mesh;
     scene: BABYLON.Scene;
+    chunkForge: ChunkForge;
     terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3;
-    constructor(_id: string, _maxDepth: number, _baseLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, _scene: BABYLON.Scene, _terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3) {
+    constructor(_id: string, _maxDepth: number, _baseLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, _scene: BABYLON.Scene, _chunkForge: ChunkForge) {
         this.id = _id;
         this.maxDepth = _maxDepth;
         this.baseLength = _baseLength;
         this.baseSubdivisions = _baseSubdivisions;
         this.direction = _direction;
         this.scene = _scene;
-        this.terrainFunction = _terrainFunction;
+        this.chunkForge = _chunkForge;
+        this.terrainFunction = this.chunkForge.terrainFunction;
 
         this.node = _parentNode;
         this.tree = this.createChunk([]);
     }
     addBranch(path: number[]) {
-        this.tree = addRecursivelyBranch(this, this.tree, path, [], this.scene);
+        this.tree = addRecursivelyBranch(this, this.tree, path, [], this.chunkForge, this.scene);
     }
     deleteBranch(path: number[]) {
-        this.tree = deleteRecursivelyBranch(this, this.tree, path, [], this.scene);
+        this.tree = deleteRecursivelyBranch(this, this.tree, path, [], this.chunkForge, this.scene);
     }
 
     checkExistenceFromPath(path: number[]) {
@@ -39,11 +42,12 @@ export class PlanetSide {
     updateLOD(position: BABYLON.Vector3) {
         executeRecursivelyGlobaly(this.tree, (chunk: PlanetChunk) => {
             let chunkPosition = chunk.position.add(this.node.position);
+            let visible = this.scene.activeCamera?.isInFrustum(chunk.mesh);
             let d = (chunkPosition.x - position.x) ** 2 + (chunkPosition.y - position.y) ** 2 + (chunkPosition.z - position.z) ** 2;
 
-            if (d < 8 * (this.baseLength ** 2) / (2 ** chunk.depth) && chunk.depth < this.maxDepth) {
+            if (d < 10 * (this.baseLength ** 2) / (2 ** chunk.depth) && chunk.depth < this.maxDepth && visible) {
                 this.addBranch(chunk.path);
-            } else if (d > 8 * (this.baseLength ** 2) / (2 ** (chunk.depth - 2))) {
+            } else if (d > 10 * (this.baseLength ** 2) / (2 ** (chunk.depth - 2))) {
                 let path = chunk.path;
                 if (path.length > 0) {
                     path.pop();
@@ -53,7 +57,7 @@ export class PlanetSide {
         });
     }
     createChunk(path: number[]): PlanetChunk {
-        return new PlanetChunk(path, this.baseLength, this.baseSubdivisions, this.direction, this.node, this.scene, this.terrainFunction);
+        return new PlanetChunk(path, this.baseLength, this.baseSubdivisions, this.direction, this.node, this.scene, this.chunkForge);
     }
     setParent(parent: BABYLON.Mesh) {
         this.node.parent = parent;
@@ -66,18 +70,18 @@ export class PlanetSide {
     }
 }
 
-function addRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[], walked: number[], scene: BABYLON.Scene): quadTree {
+function addRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[], walked: number[], chunkForge: ChunkForge, scene: BABYLON.Scene): quadTree {
     if (path.length == 0 && tree instanceof PlanetChunk) {
-        deleteBranch(tree);
-        return [
+        let newBranch = [
             plane.createChunk(walked.concat([0])),
             plane.createChunk(walked.concat([1])),
             plane.createChunk(walked.concat([2])),
             plane.createChunk(walked.concat([3]))
         ];
+        deleteBranch(tree, chunkForge);
+        return newBranch;
     } else {
         if (tree instanceof PlanetChunk) {
-            deleteBranch(tree);
             let newTree: quadTree = [
                 plane.createChunk(walked.concat([0])),
                 plane.createChunk(walked.concat([1])),
@@ -85,13 +89,14 @@ function addRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[],
                 plane.createChunk(walked.concat([3]))
             ];
             let next = path.shift()!;
-            newTree[next] = addRecursivelyBranch(plane, newTree[next], path, walked.concat([next]), scene);
+            newTree[next] = addRecursivelyBranch(plane, newTree[next], path, walked.concat([next]), chunkForge, scene);
+            deleteBranch(tree, chunkForge);
             return newTree;
         } else {
             if (path.length == 0) return tree;
             else {
                 let next = path.shift()!;
-                tree[next] = addRecursivelyBranch(plane, tree[next], path, walked.concat([next]), scene);
+                tree[next] = addRecursivelyBranch(plane, tree[next], path, walked.concat([next]), chunkForge, scene);
 
                 return tree;
             }
@@ -100,25 +105,32 @@ function addRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[],
     }
 }
 
-function deleteRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[], walked: number[], scene: BABYLON.Scene): quadTree {
+function deleteRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[], walked: number[], chunkForge: ChunkForge, scene: BABYLON.Scene): quadTree {
     if (path.length == 0 && !(tree instanceof PlanetChunk)) {
-        deleteBranch(tree);
-        return plane.createChunk(walked);
+        let replacement = plane.createChunk(walked);
+        deleteBranch(tree, chunkForge);
+        return replacement;
     } else {
         if (tree instanceof PlanetChunk) {
             return tree;
         } else {
             let next = path.shift()!;
-            tree[next] = deleteRecursivelyBranch(plane, tree[next], path, walked.concat([next]), scene);
+            tree[next] = deleteRecursivelyBranch(plane, tree[next], path, walked.concat([next]), chunkForge, scene);
             return tree;
         }
     }
 }
 
-function deleteBranch(tree: quadTree): void {
+function deleteBranch(tree: quadTree, chunkForge: ChunkForge): void {
     executeRecursivelyGlobaly(tree, (tree: PlanetChunk) => {
-        tree.mesh.material?.dispose();
-        tree.mesh.dispose();
+        chunkForge.addTask({
+            taskType: TaskType.Deletion,
+            id: tree.id,
+            parentNode: tree.parentNode,
+            position: tree.position,
+            depth: tree.depth,
+            direction: tree.direction
+        });
     });
 }
 

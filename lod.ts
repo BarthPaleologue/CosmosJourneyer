@@ -24,7 +24,7 @@ let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100)
 const radius = 20;
 freeCamera.maxZ = Math.max(2 * radius, 1000);
 
-let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 2 * radius), 16, 5, scene);
+let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 2 * radius), 16, 6, scene);
 
 let sphere = BABYLON.Mesh.CreateSphere("tester", 32, 0.3, scene);
 sphere.position.z = -30;
@@ -75,6 +75,8 @@ scene.executeWhenReady(() => {
         if (keyboard["d"]) planet.attachNode.position.subtractInPlace(right.scale(speed * engine.getDeltaTime()));
         if (keyboard[" "]) planet.attachNode.position.subtractInPlace(upward.scale(speed * engine.getDeltaTime()));
         if (keyboard["Shift"]) planet.attachNode.position.addInPlace(upward.scale(speed * engine.getDeltaTime()));
+
+        planet.chunkForge.update();
 
         planet.updateLOD(freeCamera.position);
 

@@ -1,7 +1,9 @@
 import { ProceduralEngine } from "../engine/proceduralEngine.js";
+import { ChunkForge, TaskType } from "./chunkForge.js";
 import { Direction } from "./direction.js";
 
 export class PlanetChunk {
+    id: string;
     path: number[];
     baseLength;
     baseSubdivisions;
@@ -12,8 +14,10 @@ export class PlanetChunk {
     parentNode: BABYLON.Mesh;
     position: BABYLON.Vector3;
     mesh: BABYLON.Mesh;
-    terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3;
-    constructor(_path: number[], _baseLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, _terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3) {
+    chunkForge: ChunkForge;
+
+    constructor(_path: number[], _baseLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, _chunkForge: ChunkForge) {
+        this.id = `[D:${_direction}][P:${_path}]`;
         this.path = _path;
         this.baseLength = _baseLength;
         this.baseSubdivisions = _baseSubdivisions;
@@ -21,7 +25,7 @@ export class PlanetChunk {
         this.direction = _direction;
         this.parentNode = _parentNode;
 
-        this.terrainFunction = _terrainFunction;
+        this.chunkForge = _chunkForge;
 
         for (let i = 0; i < this.depth; i++) {
             /*
@@ -46,14 +50,47 @@ export class PlanetChunk {
 
         this.position = new BABYLON.Vector3(this.x, this.y, -this.baseLength / 2);
 
-        let [mesh, position] = ProceduralEngine.createSphereChunk(this.baseLength, this.baseLength / (2 ** this.depth), this.baseSubdivisions, BABYLON.Vector3.Zero(), this.position, this.direction, scene, this.terrainFunction);
-        this.mesh = mesh;
-        this.mesh.parent = this.parentNode;
+        this.mesh = new BABYLON.Mesh(`Chunk${this.id}`, scene);
 
-        this.position = this.position.add(position);
+        //console.log(`Chunk${this.id}`);
 
-        //let test = BABYLON.Mesh.CreateBox(this.path.toString(), 1 / this.depth, scene);
-        //test.position = position;
+        this.chunkForge.addTask({
+            taskType: TaskType.Creation,
+            id: this.id,
+            parentNode: this.parentNode,
+            position: this.position,
+            depth: this.depth,
+            direction: this.direction
+        });
+
+        let rotation = BABYLON.Matrix.Identity();
+        switch (this.direction) {
+            case Direction.Up:
+                rotation = BABYLON.Matrix.RotationX(Math.PI / 2);
+                break;
+            case Direction.Down:
+                rotation = BABYLON.Matrix.RotationX(-Math.PI / 2);
+                break;
+            case Direction.Forward:
+                rotation = BABYLON.Matrix.Identity();
+                break;
+            case Direction.Backward:
+                rotation = BABYLON.Matrix.RotationY(Math.PI);
+                break;
+            case Direction.Left:
+                rotation = BABYLON.Matrix.RotationY(-Math.PI / 2);
+                break;
+            case Direction.Right:
+                rotation = BABYLON.Matrix.RotationY(Math.PI / 2);
+                break;
+        }
+
+        let positionVector = BABYLON.Vector3.Zero();
+        positionVector = positionVector.add(this.position);
+        positionVector = BABYLON.Vector3.TransformCoordinates(positionVector, rotation);
+        positionVector = positionVector.normalizeToNew().scale(this.baseLength);
+
+        this.position = positionVector; //this.position.add(positionVector);
 
         let mat = new BABYLON.StandardMaterial(`mat${this.path}`, scene);
         //mat.wireframe = true;

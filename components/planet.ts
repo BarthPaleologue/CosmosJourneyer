@@ -11,12 +11,12 @@ export class Planet extends ProceduralSphere {
     constructor(_id: string, _radius: number, _position: BABYLON.Vector3, _nbSubdivisions: number, _maxDepth: number, _scene: BABYLON.Scene) {
 
         let noiseEngine = new NoiseEngine();
-        noiseEngine.seed(42);
+        noiseEngine.seed(69);
 
         let noiseStrength = 1 * _radius;
         let noiseFrequency = 1 / _radius;
 
-        let nbCraters = 1000;
+        let nbCraters = 500;
         let craterRadiusFactor = 0.5;
         let craterSteepnessFactor = 1;
         let craterMaxDepthFactor = 1;
@@ -80,7 +80,7 @@ function generateCraters(n: number, craterRadiusFactor: number, craterSteepnessF
         let position = new BABYLON.Vector3(Math.cos(theta) * Math.sin(phi), Math.sin(theta) * Math.sin(phi), Math.cos(phi));
 
         let maxDepth = 0.2 + (Math.random()) / 10;
-        let steepness = craterSteepnessFactor * (1 + (Math.random()) / 10);
+        let steepness = craterSteepnessFactor * (1 + (Math.random()) / 10) / (r / 2);
         craters.push({ radius: r, position: position, maxDepth: maxDepth, steepness: steepness });
     }
     return craters;

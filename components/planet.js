@@ -5,10 +5,10 @@ import { NoiseLayer } from "./layers/noiseLayer.js";
 export class Planet extends ProceduralSphere {
     constructor(_id, _radius, _position, _nbSubdivisions, _maxDepth, _scene) {
         let noiseEngine = new NoiseEngine();
-        noiseEngine.seed(42);
+        noiseEngine.seed(69);
         let noiseStrength = 1 * _radius;
         let noiseFrequency = 1 / _radius;
-        let nbCraters = 1000;
+        let nbCraters = 500;
         let craterRadiusFactor = 0.5;
         let craterSteepnessFactor = 1;
         let craterMaxDepthFactor = 1;
@@ -59,7 +59,7 @@ function generateCraters(n, craterRadiusFactor, craterSteepnessFactor) {
         let theta = Math.random() * Math.PI;
         let position = new BABYLON.Vector3(Math.cos(theta) * Math.sin(phi), Math.sin(theta) * Math.sin(phi), Math.cos(phi));
         let maxDepth = 0.2 + (Math.random()) / 10;
-        let steepness = craterSteepnessFactor * (1 + (Math.random()) / 10);
+        let steepness = craterSteepnessFactor * (1 + (Math.random()) / 10) / (r / 2);
         craters.push({ radius: r, position: position, maxDepth: maxDepth, steepness: steepness });
     }
     return craters;
