@@ -41,9 +41,9 @@ export class PlanetSide {
             let chunkPosition = chunk.position.add(this.node.position);
             let d = (chunkPosition.x - position.x) ** 2 + (chunkPosition.y - position.y) ** 2 + (chunkPosition.z - position.z) ** 2;
 
-            if (d < 5 * (this.baseLength ** 2) / (2 ** chunk.depth) && chunk.depth < this.maxDepth) {
+            if (d < 8 * (this.baseLength ** 2) / (2 ** chunk.depth) && chunk.depth < this.maxDepth) {
                 this.addBranch(chunk.path);
-            } else if (d > 5 * (this.baseLength ** 2) / (2 ** (chunk.depth - 2))) {
+            } else if (d > 8 * (this.baseLength ** 2) / (2 ** (chunk.depth - 2))) {
                 let path = chunk.path;
                 if (path.length > 0) {
                     path.pop();
@@ -64,11 +64,6 @@ export class PlanetSide {
     setPosition(position: BABYLON.Vector3) {
         this.node.position = position;
     }
-    /*morph(morphFunction: (position: BABYLON.Vector3) => BABYLON.Vector3) {
-        executeRecursivelyGlobaly(this.tree, (chunk: Chunk) => {
-            chunk.morph(morphFunction);
-        });
-    }*/
 }
 
 function addRecursivelyBranch(plane: PlanetSide, tree: quadTree, path: number[], walked: number[], scene: BABYLON.Scene): quadTree {

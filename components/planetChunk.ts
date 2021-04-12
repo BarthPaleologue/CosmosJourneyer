@@ -59,32 +59,8 @@ export class PlanetChunk {
         //mat.wireframe = true;
         //mat.emissiveColor = BABYLON.Color3.Random();
         mat.diffuseColor = new BABYLON.Color3(0.5, 0.3, 0.08);
+        mat.specularColor = new BABYLON.Color3(1, 1, 1).scale(0.1);
         this.mesh.material = mat;
 
     }
-
-    /*morph(morphFunction: (p: BABYLON.Vector3) => BABYLON.Vector3) {
-        let vertices = this.mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind)!;
-        let indices = this.mesh.getIndices();
-        let normals = this.mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind)!;
-
-        for (let i = 0; i < vertices.length; i += 3) {
-            let position = new BABYLON.Vector3(vertices[i], vertices[i + 1], vertices[i + 2]);
-
-            position = morphFunction(position);
-
-            vertices[i] = position.x;
-            vertices[i + 1] = position.y;
-            vertices[i + 2] = position.z;
-        }
-
-        BABYLON.VertexData.ComputeNormals(vertices, indices, normals);
-
-        let vertexData = new BABYLON.VertexData();
-        vertexData.positions = vertices;
-        vertexData.normals = normals;
-        vertexData.indices = indices;
-
-        vertexData.applyToMesh(this.mesh, true);
-    }*/
 }

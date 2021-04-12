@@ -21,7 +21,7 @@ scene.activeCamera = camera;
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
 
-let planet = new Planet("planet", 10, 100, new BABYLON.Vector3(0, 0, 0), scene);
+let planet = new Planet("planet", 10, 60, new BABYLON.Vector3(0, 0, 0), scene);
 
 let watersphere = BABYLON.Mesh.CreateSphere("water", 32, 10.05, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);

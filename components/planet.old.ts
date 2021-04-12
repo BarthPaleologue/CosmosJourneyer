@@ -2,10 +2,8 @@ import { NoiseEngine } from "../engine/perlin.js";
 import { ProceduralEngine } from "../engine/proceduralEngine.js";
 import { proceduralMesh } from "../engine/proceduralMesh.js";
 import { Crater } from "./crater.js";
-import { Direction } from "./direction.js";
 import { CraterLayer } from "./layers/craterLayer.js";
 import { CraterModifiers } from "./layers/craterModifiers.js";
-import { Layer } from "./layers/layer.js";
 import { NoiseLayer } from "./layers/noiseLayer.js";
 import { NoiseModifiers } from "./layers/noiseSettings.js";
 

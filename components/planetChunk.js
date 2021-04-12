@@ -44,6 +44,7 @@ export class PlanetChunk {
         //mat.wireframe = true;
         //mat.emissiveColor = BABYLON.Color3.Random();
         mat.diffuseColor = new BABYLON.Color3(0.5, 0.3, 0.08);
+        mat.specularColor = new BABYLON.Color3(1, 1, 1).scale(0.1);
         this.mesh.material = mat;
     }
 }

@@ -1,6 +1,4 @@
 import { Planet } from "./components/planet.js";
-import { ProceduralSphere } from "./components/proceduralCube.js";
-import { NoiseEngine } from "./engine/perlin.js";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -23,8 +21,8 @@ scene.activeCamera = freeCamera;
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
 
-const radius = 10000;
-freeCamera.maxZ = 2 * radius;
+const radius = 20;
+freeCamera.maxZ = Math.max(2 * radius, 1000);
 
 let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 2 * radius), 16, 5, scene);
 

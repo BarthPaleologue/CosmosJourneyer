@@ -24,10 +24,10 @@ export class PlanetSide {
         executeRecursivelyGlobaly(this.tree, (chunk) => {
             let chunkPosition = chunk.position.add(this.node.position);
             let d = Math.pow((chunkPosition.x - position.x), 2) + Math.pow((chunkPosition.y - position.y), 2) + Math.pow((chunkPosition.z - position.z), 2);
-            if (d < 5 * (Math.pow(this.baseLength, 2)) / (Math.pow(2, chunk.depth)) && chunk.depth < this.maxDepth) {
+            if (d < 8 * (Math.pow(this.baseLength, 2)) / (Math.pow(2, chunk.depth)) && chunk.depth < this.maxDepth) {
                 this.addBranch(chunk.path);
             }
-            else if (d > 5 * (Math.pow(this.baseLength, 2)) / (Math.pow(2, (chunk.depth - 2)))) {
+            else if (d > 8 * (Math.pow(this.baseLength, 2)) / (Math.pow(2, (chunk.depth - 2)))) {
                 let path = chunk.path;
                 if (path.length > 0) {
                     path.pop();
