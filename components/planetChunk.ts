@@ -64,21 +64,27 @@ export function getChunkSphereSpacePositionFromPath(baseLength: number, path: nu
 }
 
 export class PlanetChunk {
-    id: string;
-    path: number[];
+    id: string; // identifiant unique du chunk
+    path: number[]; // chemin menant au chunk dans son quadtree
+
+    // données géométriques du chunk
     baseLength;
     baseSubdivisions;
     depth: number;
+    direction: Direction;
+    mesh: BABYLON.Mesh;
+
+    // coordonnées sur le plan
     x = 0;
     y = 0;
-    direction: Direction;
-    parentNode: BABYLON.Mesh;
-    position: BABYLON.Vector3;
-    mesh: BABYLON.Mesh;
+
+    parentNode: BABYLON.Mesh; // point d'attache planétaire
+    position: BABYLON.Vector3; // position dans l'espace de la sphère (rotation non prise en compte)
+
     chunkForge: ChunkForge;
 
     constructor(_path: number[], _baseLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, _chunkForge: ChunkForge) {
-        this.id = `[D:${_direction}][P:${_path}]`;
+        this.id = `[D${_direction}][P${_path.join("")}]`;
         this.path = _path;
         this.baseLength = _baseLength;
         this.baseSubdivisions = _baseSubdivisions;
@@ -92,6 +98,7 @@ export class PlanetChunk {
         this.position.addInPlace(new BABYLON.Vector3(0, 0, -this.baseLength / 2));
 
         this.mesh = new BABYLON.Mesh(`Chunk${this.id}`, scene);
+        this.mesh.setEnabled(false);
 
         this.chunkForge.addTask({
             taskType: TaskType.Creation,

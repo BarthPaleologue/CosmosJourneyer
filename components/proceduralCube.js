@@ -2,17 +2,16 @@ import { ChunkForge } from "./chunkForge.js";
 import { Direction } from "./direction.js";
 import { PlanetSide } from "./planetSide.js";
 export class ProceduralSphere {
-    constructor(_id, _radius, _position, _nbSubdivisions, _maxDepth, _scene, _terrainFunction) {
+    constructor(_id, _radius, _position, _nbSubdivisions, _maxDepth, _scene) {
         this.id = _id;
         this.radius = _radius;
         this.position = _position;
         this.nbSubdivisions = _nbSubdivisions;
         this.maxDepth = _maxDepth;
-        this.terrainFunction = _terrainFunction;
         this.scene = _scene;
         this.attachNode = BABYLON.Mesh.CreatePlane(`${this.id}AttachNode`, 1, this.scene);
         this.attachNode.position = this.position;
-        this.chunkForge = new ChunkForge(this.radius, this.nbSubdivisions, this.terrainFunction, this.scene);
+        this.chunkForge = new ChunkForge(this.radius, this.nbSubdivisions, this.scene);
         this.sides = [
             new PlanetSide("upSide", this.maxDepth, this.radius, this.nbSubdivisions, Direction.Up, this.attachNode, this.scene, this.chunkForge),
             new PlanetSide("downSide", this.maxDepth, this.radius, this.nbSubdivisions, Direction.Down, this.attachNode, this.scene, this.chunkForge),

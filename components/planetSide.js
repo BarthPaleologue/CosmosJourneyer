@@ -34,10 +34,10 @@ export class PlanetSide {
      * Send deletion request to chunkforge regarding the chunks of a branch
      * @param tree The tree to delete
      */
-    requestDeletion(tree) {
+    requestDeletion(tree, type) {
         this.executeOnEveryChunk((chunk) => {
             this.chunkForge.addTask({
-                taskType: TaskType.Deletion,
+                taskType: type,
                 id: chunk.id,
                 parentNode: chunk.parentNode,
                 position: chunk.position,
@@ -63,6 +63,9 @@ export class PlanetSide {
     updateLODRecursively(observerPosition, tree = this.tree, walked = []) {
         // position par rapport à la sphère du noeud du quadtree
         let relativePosition = getChunkSphereSpacePositionFromPath(this.baseLength, walked, this.direction);
+        relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationX(this.parent.rotation.x));
+        relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationY(this.parent.rotation.y));
+        relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationZ(this.parent.rotation.z));
         // position par rapport à la caméra
         let absolutePosition = relativePosition.add(this.parent.position);
         // distance carré entre caméra et noeud du quadtree
@@ -77,7 +80,7 @@ export class PlanetSide {
                     this.createChunk(walked.concat([2])),
                     this.createChunk(walked.concat([3])),
                 ];
-                this.requestDeletion(tree);
+                this.requestDeletion(tree, TaskType.DeletionSubdivision);
                 return newTree;
             }
             else {
@@ -98,7 +101,7 @@ export class PlanetSide {
             else {
                 // si c'est un noeud, on supprime tous les enfants, on remplace par un nouveau chunk
                 let newChunk = this.createChunk(walked);
-                this.requestDeletion(tree);
+                this.requestDeletion(tree, TaskType.DeletionDeletion);
                 return newChunk;
             }
         }

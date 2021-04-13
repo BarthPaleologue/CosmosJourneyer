@@ -1,13 +1,10 @@
-import { ProceduralEngine } from "../engine/proceduralEngine.js";
+import { Crater } from "./crater.js";
 import { Direction } from "./direction.js";
-import { CraterLayer } from "./layers/craterLayer.js";
-import { CraterModifiers } from "./layers/craterModifiers.js";
-import { NoiseLayer } from "./layers/noiseLayer.js";
-import { NoiseModifiers } from "./layers/noiseSettings.js";
 
 export enum TaskType {
     Creation,
-    Deletion
+    DeletionSubdivision,
+    DeletionDeletion
 }
 
 export interface ChunkTask {
@@ -23,36 +20,20 @@ export class ChunkForge {
     baseLength: number;
     subdivisions: number;
 
-    // What you need to generate a beautiful terrain
-    terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3;
-    noiseLayers: NoiseLayer[] = [];
-    noiseModifiers: NoiseModifiers = {
-        strengthModifier: 1,
-        amplitudeModifier: 1,
-        frequencyModifier: 1,
-        offsetModifier: BABYLON.Vector3.Zero(),
-        minValueModifier: 1,
-    };
-    craterLayers: CraterLayer[] = [];
-    craterModifiers: CraterModifiers = {
-        radiusModifier: 1,
-        steepnessModifier: 1,
-        maxDepthModifier: 1,
-        scaleFactor: 1,
-    };
+    // What you need to generate a beautiful terrain (à étendre pour ne pas tout hardcode dans le worker)
+    craters: Crater[] = [];
 
     tasks: ChunkTask[] = [];
-    cadence = 5;
-    maxTasksPerUpdate = 10;
+    cadence = 10;
+    maxTasksPerUpdate = 15;
     taskCounter = 0;
     esclavesDispo: Worker[] = [];
 
     scene: BABYLON.Scene;
 
-    constructor(_baseLength: number, _subdivisions: number, _terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3, _scene: BABYLON.Scene) {
+    constructor(_baseLength: number, _subdivisions: number, _scene: BABYLON.Scene) {
         this.baseLength = _baseLength;
         this.subdivisions = _subdivisions;
-        this.terrainFunction = _terrainFunction;
         for (let i = 0; i < this.cadence; i++) {
             this.esclavesDispo.push(new Worker("./components/worker.js", { type: "module" }));
         }
@@ -67,26 +48,16 @@ export class ChunkForge {
             switch (task.taskType) {
                 case TaskType.Creation:
                     let esclave = this.esclavesDispo.shift();
-                    //let [positions, indices, uvs] = ProceduralEngine.createSphereChunk3(this.baseLength, this.baseLength / (2 ** task.depth), this.subdivisions, task.position, task.direction, this.terrainFunction);
 
-                    esclave?.postMessage(JSON.stringify({
-                        noiseLayers: this.noiseLayers,
-                        noiseModifiers: this.noiseModifiers,
-                        craterLayers: this.craterLayers,
-                        craterModifiers: this.craterModifiers,
+                    esclave?.postMessage([
+                        this.baseLength,
+                        this.subdivisions,
+                        task.depth,
+                        task.direction,
+                        [task.position.x, task.position.y, task.position.z],
 
-                        baseLength: this.baseLength,
-                        subdivisions: this.subdivisions,
-                        depth: task.depth,
-                        direction: task.direction,
-                        offsetX: task.position.x,
-                        offsetY: task.position.y,
-                        offsetZ: task.position.z,
-
-                        //positions: positions,
-                        //indices: indices,
-                        //uvs: uvs
-                    }));
+                        this.craters,
+                    ]);
 
                     esclave!.onmessage = e => {
                         let vertexData = new BABYLON.VertexData();
@@ -97,12 +68,36 @@ export class ChunkForge {
                         //@ts-ignore
                         vertexData.applyToMesh(mesh);
                         mesh!.parent = task.parentNode;
+                        mesh?.setEnabled(true);
                         this.esclavesDispo.push(esclave!);
                     };
                     break;
-                case TaskType.Deletion:
-                    mesh.material?.dispose();
-                    mesh.dispose();
+                case TaskType.DeletionSubdivision:
+                    // on vérifie que les enfants existent pour supprimer :
+                    let canBeDeleted = true;
+                    let prefix = task.id.slice(0, task.id.length - 1);
+                    //if (!this.scene.getMeshByID(`Chunk${prefix}0]`)?.isEnabled()) canBeDeleted = false;
+                    //if (!this.scene.getMeshByID(`Chunk${prefix}1]`)?.isEnabled()) canBeDeleted = false;
+                    //if (!this.scene.getMeshByID(`Chunk${prefix}2]`)?.isEnabled()) canBeDeleted = false;
+                    //if (!this.scene.getMeshByID(`Chunk${prefix}3]`)?.isEnabled()) canBeDeleted = false;
+                    if (canBeDeleted) {
+                        mesh.material?.dispose();
+                        mesh.dispose();
+                    } else {
+                        this.tasks.push(task);
+                    }
+                    this.executeNextTask();
+                    break;
+                case TaskType.DeletionDeletion:
+                    let canBeDeleted2 = true;
+                    let prefix2 = task.id.slice(0, task.id.length - 2);
+                    //if (!this.scene.getMeshByID(`Chunk${prefix2}]`)?.isEnabled()) canBeDeleted2 = false;
+                    if (canBeDeleted2) {
+                        mesh.material?.dispose();
+                        mesh.dispose();
+                    } else {
+                        this.tasks.push(task);
+                    }
                     this.executeNextTask();
                     break;
                 default:
@@ -127,8 +122,5 @@ export class ChunkForge {
         for (let i = 0; i < this.esclavesDispo.length; i++) {
             this.executeNextTask();
         }
-    }
-    setTerrainFunction(f: (p: BABYLON.Vector3) => BABYLON.Vector3) {
-        this.terrainFunction = f;
     }
 }

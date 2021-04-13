@@ -15,6 +15,7 @@ camera.setPosition(new BABYLON.Vector3(0, 0, -15));
 camera.attachControl(canvas);
 
 let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, 0), scene);
+freeCamera.minZ = 0.001;
 freeCamera.attachControl(canvas);
 
 scene.activeCamera = freeCamera;
@@ -22,7 +23,7 @@ scene.activeCamera = freeCamera;
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
 
 const radius = 10;
-freeCamera.maxZ = Math.max(2 * radius, 1000);
+freeCamera.maxZ = Math.max(2000 * radius, 1000);
 
 let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 2 * radius), 32, 5, scene);
 
@@ -34,7 +35,7 @@ sphere.material = mat;
 
 let keyboard: { [key: string]: boolean; } = {};
 
-document.addEventListener("keydown", e => {
+document.addEventListener("keypress", e => {
     keyboard[e.key] = true;
 });
 
@@ -79,6 +80,7 @@ scene.executeWhenReady(() => {
         planet.chunkForge.update();
 
         planet.updateLOD(freeCamera.position);
+        //planet.attachNode.rotation.y += 0.001;
 
         scene.render();
     });

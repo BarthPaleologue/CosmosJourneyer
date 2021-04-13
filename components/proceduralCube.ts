@@ -8,7 +8,6 @@ export class ProceduralSphere {
     position: BABYLON.Vector3;
     nbSubdivisions: number;
     maxDepth: number;
-    terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3;
     scene: BABYLON.Scene;
 
     attachNode: BABYLON.Mesh;
@@ -16,19 +15,18 @@ export class ProceduralSphere {
 
     chunkForge: ChunkForge;
 
-    constructor(_id: string, _radius: number, _position: BABYLON.Vector3, _nbSubdivisions: number, _maxDepth: number, _scene: BABYLON.Scene, _terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3) {
+    constructor(_id: string, _radius: number, _position: BABYLON.Vector3, _nbSubdivisions: number, _maxDepth: number, _scene: BABYLON.Scene) {
         this.id = _id;
         this.radius = _radius;
         this.position = _position;
         this.nbSubdivisions = _nbSubdivisions;
         this.maxDepth = _maxDepth;
-        this.terrainFunction = _terrainFunction;
         this.scene = _scene;
 
         this.attachNode = BABYLON.Mesh.CreatePlane(`${this.id}AttachNode`, 1, this.scene);
         this.attachNode.position = this.position;
 
-        this.chunkForge = new ChunkForge(this.radius, this.nbSubdivisions, this.terrainFunction, this.scene);
+        this.chunkForge = new ChunkForge(this.radius, this.nbSubdivisions, this.scene);
 
         this.sides = [
             new PlanetSide("upSide", this.maxDepth, this.radius, this.nbSubdivisions, Direction.Up, this.attachNode, this.scene, this.chunkForge),

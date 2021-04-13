@@ -1,33 +1,20 @@
 export var TaskType;
 (function (TaskType) {
     TaskType[TaskType["Creation"] = 0] = "Creation";
-    TaskType[TaskType["Deletion"] = 1] = "Deletion";
+    TaskType[TaskType["DeletionSubdivision"] = 1] = "DeletionSubdivision";
+    TaskType[TaskType["DeletionDeletion"] = 2] = "DeletionDeletion";
 })(TaskType || (TaskType = {}));
 export class ChunkForge {
-    constructor(_baseLength, _subdivisions, _terrainFunction, _scene) {
-        this.noiseLayers = [];
-        this.noiseModifiers = {
-            strengthModifier: 1,
-            amplitudeModifier: 1,
-            frequencyModifier: 1,
-            offsetModifier: BABYLON.Vector3.Zero(),
-            minValueModifier: 1,
-        };
-        this.craterLayers = [];
-        this.craterModifiers = {
-            radiusModifier: 1,
-            steepnessModifier: 1,
-            maxDepthModifier: 1,
-            scaleFactor: 1,
-        };
+    constructor(_baseLength, _subdivisions, _scene) {
+        // What you need to generate a beautiful terrain (à étendre pour ne pas tout hardcode dans le worker)
+        this.craters = [];
         this.tasks = [];
-        this.cadence = 5;
-        this.maxTasksPerUpdate = 10;
+        this.cadence = 10;
+        this.maxTasksPerUpdate = 15;
         this.taskCounter = 0;
         this.esclavesDispo = [];
         this.baseLength = _baseLength;
         this.subdivisions = _subdivisions;
-        this.terrainFunction = _terrainFunction;
         for (let i = 0; i < this.cadence; i++) {
             this.esclavesDispo.push(new Worker("./components/worker.js", { type: "module" }));
         }
@@ -37,26 +24,20 @@ export class ChunkForge {
         this.tasks.push(task);
     }
     executeTask(task) {
-        var _a;
+        var _a, _b;
         let mesh = this.scene.getMeshByID(`Chunk${task.id}`);
         if (mesh != null) {
             switch (task.taskType) {
                 case TaskType.Creation:
                     let esclave = this.esclavesDispo.shift();
-                    //let [positions, indices, uvs] = ProceduralEngine.createSphereChunk3(this.baseLength, this.baseLength / (2 ** task.depth), this.subdivisions, task.position, task.direction, this.terrainFunction);
-                    esclave === null || esclave === void 0 ? void 0 : esclave.postMessage(JSON.stringify({
-                        noiseLayers: this.noiseLayers,
-                        noiseModifiers: this.noiseModifiers,
-                        craterLayers: this.craterLayers,
-                        craterModifiers: this.craterModifiers,
-                        baseLength: this.baseLength,
-                        subdivisions: this.subdivisions,
-                        depth: task.depth,
-                        direction: task.direction,
-                        offsetX: task.position.x,
-                        offsetY: task.position.y,
-                        offsetZ: task.position.z,
-                    }));
+                    esclave === null || esclave === void 0 ? void 0 : esclave.postMessage([
+                        this.baseLength,
+                        this.subdivisions,
+                        task.depth,
+                        task.direction,
+                        [task.position.x, task.position.y, task.position.z],
+                        this.craters,
+                    ]);
                     esclave.onmessage = e => {
                         let vertexData = new BABYLON.VertexData();
                         vertexData.positions = e.data.positions;
@@ -66,12 +47,38 @@ export class ChunkForge {
                         //@ts-ignore
                         vertexData.applyToMesh(mesh);
                         mesh.parent = task.parentNode;
+                        mesh === null || mesh === void 0 ? void 0 : mesh.setEnabled(true);
                         this.esclavesDispo.push(esclave);
                     };
                     break;
-                case TaskType.Deletion:
-                    (_a = mesh.material) === null || _a === void 0 ? void 0 : _a.dispose();
-                    mesh.dispose();
+                case TaskType.DeletionSubdivision:
+                    // on vérifie que les enfants existent pour supprimer :
+                    let canBeDeleted = true;
+                    let prefix = task.id.slice(0, task.id.length - 1);
+                    //if (!this.scene.getMeshByID(`Chunk${prefix}0]`)?.isEnabled()) canBeDeleted = false;
+                    //if (!this.scene.getMeshByID(`Chunk${prefix}1]`)?.isEnabled()) canBeDeleted = false;
+                    //if (!this.scene.getMeshByID(`Chunk${prefix}2]`)?.isEnabled()) canBeDeleted = false;
+                    //if (!this.scene.getMeshByID(`Chunk${prefix}3]`)?.isEnabled()) canBeDeleted = false;
+                    if (canBeDeleted) {
+                        (_a = mesh.material) === null || _a === void 0 ? void 0 : _a.dispose();
+                        mesh.dispose();
+                    }
+                    else {
+                        this.tasks.push(task);
+                    }
+                    this.executeNextTask();
+                    break;
+                case TaskType.DeletionDeletion:
+                    let canBeDeleted2 = true;
+                    let prefix2 = task.id.slice(0, task.id.length - 2);
+                    //if (!this.scene.getMeshByID(`Chunk${prefix2}]`)?.isEnabled()) canBeDeleted2 = false;
+                    if (canBeDeleted2) {
+                        (_b = mesh.material) === null || _b === void 0 ? void 0 : _b.dispose();
+                        mesh.dispose();
+                    }
+                    else {
+                        this.tasks.push(task);
+                    }
                     this.executeNextTask();
                     break;
                 default:
@@ -99,8 +106,5 @@ export class ChunkForge {
         for (let i = 0; i < this.esclavesDispo.length; i++) {
             this.executeNextTask();
         }
-    }
-    setTerrainFunction(f) {
-        this.terrainFunction = f;
     }
 }

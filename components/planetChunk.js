@@ -58,9 +58,10 @@ export function getChunkSphereSpacePositionFromPath(baseLength, path, direction)
 }
 export class PlanetChunk {
     constructor(_path, _baseLength, _baseSubdivisions, _direction, _parentNode, scene, _chunkForge) {
+        // coordonnées sur le plan
         this.x = 0;
         this.y = 0;
-        this.id = `[D:${_direction}][P:${_path}]`;
+        this.id = `[D${_direction}][P${_path.join("")}]`;
         this.path = _path;
         this.baseLength = _baseLength;
         this.baseSubdivisions = _baseSubdivisions;
@@ -71,6 +72,7 @@ export class PlanetChunk {
         this.position = getChunkPlaneSpacePositionFromPath(this.baseLength, this.path);
         this.position.addInPlace(new BABYLON.Vector3(0, 0, -this.baseLength / 2));
         this.mesh = new BABYLON.Mesh(`Chunk${this.id}`, scene);
+        this.mesh.setEnabled(false);
         this.chunkForge.addTask({
             taskType: TaskType.Creation,
             id: this.id,

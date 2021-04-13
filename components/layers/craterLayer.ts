@@ -17,12 +17,5 @@ export class CraterLayer extends Layer {
     regenerate(craters: Crater[]) {
         let craterFilter = new CraterFilter(craters);
         this.filters = [craterFilter];
-        /*this.layerFunction = ([craterFilter], (p: BABYLON.Vector3, f: Filter[], s: number) => {
-            let elevation = 0;
-            for (let filter of f) {
-                elevation += filter.evaluate(p, s);
-            }
-            return elevation;
-        });*/
     }
 }

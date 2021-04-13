@@ -4,11 +4,12 @@ export class CraterFilter extends Filter {
         super((p, s) => {
             let elevation = 0;
             for (let crater of craters) {
-                let squaredDistanceToCrater = BABYLON.Vector3.DistanceSquared(p, crater.position);
-                let radius = crater.radius / 20 * s.radiusModifier;
-                let steepness = crater.steepness * 2 * s.steepnessModifier;
-                if (squaredDistanceToCrater <= Math.pow(radius, 2)) {
-                    let height = Math.min((squaredDistanceToCrater / (Math.pow(radius, (2)) * steepness)) - 0.4, 0.05);
+                let d = BABYLON.Vector3.DistanceSquared(p, BABYLON.Vector3.FromArray(crater.position));
+                let radius = crater.radius * s.radiusModifier;
+                let steepness = crater.steepness * s.steepnessModifier;
+                //console.log(crater.position);
+                if (d <= Math.pow(radius, 2)) {
+                    let height = Math.min((d / (Math.pow((radius * steepness), 2))) - 0.4, 0.05);
                     height = Math.max(height, -crater.maxDepth * s.maxDepthModifier) * s.scaleFactor;
                     elevation += height;
                 }

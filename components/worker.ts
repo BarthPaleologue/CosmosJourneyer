@@ -1,119 +1,114 @@
 import "../babylon/babylon4.js";
 import { Direction } from "./direction.js";
 import { CraterLayer } from "./layers/craterLayer.js";
-import { CraterModifiers } from "./layers/craterModifiers.js";
 import { NoiseLayer } from "./layers/noiseLayer.js";
-import { NoiseModifiers } from "./layers/noiseSettings.js";
 import { NoiseEngine } from "../engine/perlin.js";
 
 onerror = e => console.log(e);
 
-onmessage = e => {
-    let d = JSON.parse(e.data);
+let noiseEngine = new NoiseEngine();
+noiseEngine.seed(69);
 
-    //console.log(d);
+let radius = 10; // the planet radius
 
-    let noiseEngine = new NoiseEngine();
-    noiseEngine.seed(69);
+let noiseStrength = 0.1;
+let noiseFrequency = 0.1;
 
-    let noiseLayers: NoiseLayer[] = [];
-    /*for (let data of d.noiseLayers) {
-        noiseLayers.push(new NoiseLayer(noiseEngine, data.settings, data.masks));
-    }*/
+let noiseLayers: NoiseLayer[] = [];
 
-    let barrenBumpyLayer = new NoiseLayer(noiseEngine, {
-        noiseStrength: 1,
-        octaves: 10,
-        baseAmplitude: 0.5,
-        baseFrequency: 1,
-        decay: 1.9,
-        minValue: 0,
-        offset: BABYLON.Vector3.Zero()
-    });
+let barrenBumpyLayer = new NoiseLayer(noiseEngine, {
+    noiseStrength: noiseStrength,
+    octaves: 10,
+    baseAmplitude: 5,
+    baseFrequency: noiseFrequency,
+    decay: 1.7,
+    minValue: 0,
+    offset: BABYLON.Vector3.Zero()
+});
 
-    let continentsLayer = new NoiseLayer(noiseEngine, {
-        noiseStrength: 1,
-        octaves: 10,
-        baseAmplitude: 1,
-        baseFrequency: 1,
-        decay: 2,
-        minValue: 0.1,
-        offset: BABYLON.Vector3.Zero()
-    });
+let continentsLayer = new NoiseLayer(noiseEngine, {
+    noiseStrength: noiseStrength,
+    octaves: 10,
+    baseAmplitude: 1,
+    baseFrequency: noiseFrequency,
+    decay: 2,
+    minValue: 0.1,
+    offset: BABYLON.Vector3.Zero()
+});
 
-    let moutainsLayer = new NoiseLayer(noiseEngine, {
-        noiseStrength: 1,
-        octaves: 7,
-        baseAmplitude: 0.5,
-        baseFrequency: 1,
-        decay: 2,
-        minValue: 0,
-        offset: BABYLON.Vector3.Zero()
-    }, [0]);
+let moutainsLayer = new NoiseLayer(noiseEngine, {
+    noiseStrength: noiseStrength,
+    octaves: 7,
+    baseAmplitude: 5,
+    baseFrequency: noiseFrequency,
+    decay: 2,
+    minValue: 0,
+    offset: BABYLON.Vector3.Zero()
+}, [0]);
 
-    noiseLayers.push(continentsLayer, moutainsLayer);
+noiseLayers.push(continentsLayer, moutainsLayer, barrenBumpyLayer);
 
+let craterLayer = new CraterLayer([]);
+let craterLayers = [craterLayer];
 
-    //let noiseModifiers: NoiseModifiers = d.noiseModifiers;
+let craterModifiers = {
+    radiusModifier: 1,
+    steepnessModifier: 0.05,
+    maxDepthModifier: 1,
+    scaleFactor: 10,
+};
 
-    /*console.log(noiseLayers[0].filters[0].filterFunction(BABYLON.Vector3.Up(), {
-        strengthModifier: 1,
-        amplitudeModifier: 1,
-        frequencyModifier: 1,
-        offsetModifier: BABYLON.Vector3.Zero(),
-        minValueModifier: 1,
-    }));*/
-
-    let craterLayers: CraterLayer[] = d.craterLayers;
-    let craterModifiers: CraterModifiers = d.craterModifiers;
-
-    let terrainFunction = (p: BABYLON.Vector3) => {
-        let coords = p.normalizeToNew().scale(d.baseLength);
+let terrainFunction = (p: BABYLON.Vector3, noiseLayers: NoiseLayer[], craterLayers: CraterLayer[]) => {
+    let coords = p.normalizeToNew().scale(radius);
 
 
-        let elevation = 0;
-        for (let layer of noiseLayers) {
-            let maskFactor = 1;
-            for (let i = 0; i < layer.masks.length; i++) {
-                maskFactor *= noiseLayers[i].evaluate(coords, {
-                    strengthModifier: 1,
-                    amplitudeModifier: 1,
-                    frequencyModifier: 1,
-                    offsetModifier: BABYLON.Vector3.Zero(),
-                    minValueModifier: 1,
-                });
-            }
-            elevation += layer.evaluate(coords, {
+    let elevation = 0;
+    for (let layer of noiseLayers) {
+        let maskFactor = 1;
+        for (let i = 0; i < layer.masks.length; i++) {
+            maskFactor *= noiseLayers[i].evaluate(coords, {
                 strengthModifier: 1,
                 amplitudeModifier: 1,
                 frequencyModifier: 1,
                 offsetModifier: BABYLON.Vector3.Zero(),
                 minValueModifier: 1,
-            }) * maskFactor;
+            });
         }
-        for (let craterLayer of craterLayers) {
-            //elevation += craterLayer.evaluate(coords.normalizeToNew(), craterModifiers);
-        }
+        elevation += layer.evaluate(coords, {
+            strengthModifier: 1,
+            amplitudeModifier: 1,
+            frequencyModifier: 1,
+            offsetModifier: BABYLON.Vector3.Zero(),
+            minValueModifier: 1,
+        }) * maskFactor;
+    }
+    for (let craterLayer of craterLayers) {
+        elevation += craterLayer.evaluate(coords.normalizeToNew(), craterModifiers);
+    }
 
-        //elevation = Math.max(0, elevation);
+    let newPosition = p.add(coords.normalizeToNew().scale(elevation * noiseStrength));
+    return newPosition;
+};
 
+onmessage = e => {
+    let [
+        radius,
+        subs,
+        depth,
+        direction,
+        offset,
 
+        craters,
+    ] = e.data;
 
-        let newPosition = p.add(coords.normalizeToNew().scale(elevation * 1 / 10));
-        return newPosition;
-    };
+    craterLayers[0].regenerate(craters);
 
-    let radius = d.baseLength;
-    let subs = d.subdivisions;
-    let depth = d.depth;
     let size = radius / (2 ** depth);
-    let direction = d.direction;
-    let offset = new BABYLON.Vector3(d.offsetX, d.offsetY, d.offsetZ);
 
     let vertices: number[] = [];
     let faces: number[][] = [];
     let uvs: number[] = [];
-    let nbSubdivisions = subs + 1;
+    let vertexPerLine = subs + 1;
 
     let rotation = BABYLON.Matrix.Identity();
 
@@ -138,27 +133,26 @@ onmessage = e => {
             break;
     }
 
-    for (let x = 0; x < nbSubdivisions; x++) {
-        for (let y = 0; y < nbSubdivisions; y++) {
+    for (let x = 0; x < vertexPerLine; x++) {
+        for (let y = 0; y < vertexPerLine; y++) {
             let vertex = new BABYLON.Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
             vertex = vertex.scale(size);
-            vertex = vertex.add(offset);
+            vertex = vertex.add(BABYLON.Vector3.FromArray(offset));
             vertex = BABYLON.Vector3.TransformCoordinates(vertex, rotation);
             vertex = vertex.normalizeToNew().scale(radius);
 
-
-            vertex = terrainFunction(vertex);
+            vertex = terrainFunction(vertex, noiseLayers, craterLayers);
 
             vertices.push(vertex.x, vertex.y, vertex.z);
 
-            uvs.push(x / nbSubdivisions, y / nbSubdivisions);
+            uvs.push(x / vertexPerLine, y / vertexPerLine);
 
-            if (x < nbSubdivisions - 1 && y < nbSubdivisions - 1) {
+            if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
                 faces.push([
-                    x * nbSubdivisions + y,
-                    x * nbSubdivisions + y + 1,
-                    (x + 1) * nbSubdivisions + y + 1,
-                    (x + 1) * nbSubdivisions + y,
+                    x * vertexPerLine + y,
+                    x * vertexPerLine + y + 1,
+                    (x + 1) * vertexPerLine + y + 1,
+                    (x + 1) * vertexPerLine + y,
                 ]);
             }
         }
