@@ -1,4 +1,3 @@
-import { ProceduralEngine } from "../engine/proceduralEngine.js";
 export var TaskType;
 (function (TaskType) {
     TaskType[TaskType["Creation"] = 0] = "Creation";
@@ -6,17 +5,31 @@ export var TaskType;
 })(TaskType || (TaskType = {}));
 export class ChunkForge {
     constructor(_baseLength, _subdivisions, _terrainFunction, _scene) {
+        this.noiseLayers = [];
+        this.noiseModifiers = {
+            strengthModifier: 1,
+            amplitudeModifier: 1,
+            frequencyModifier: 1,
+            offsetModifier: BABYLON.Vector3.Zero(),
+            minValueModifier: 1,
+        };
+        this.craterLayers = [];
+        this.craterModifiers = {
+            radiusModifier: 1,
+            steepnessModifier: 1,
+            maxDepthModifier: 1,
+            scaleFactor: 1,
+        };
         this.tasks = [];
         this.cadence = 5;
-        this.maxTasksPerUpdate = 50;
+        this.maxTasksPerUpdate = 10;
         this.taskCounter = 0;
         this.esclavesDispo = [];
-        this.esclavesBusy = [];
         this.baseLength = _baseLength;
         this.subdivisions = _subdivisions;
         this.terrainFunction = _terrainFunction;
         for (let i = 0; i < this.cadence; i++) {
-            this.esclavesDispo.push(new Worker("./components/worker.js"));
+            this.esclavesDispo.push(new Worker("./components/worker.js", { type: "module" }));
         }
         this.scene = _scene;
     }
@@ -29,34 +42,32 @@ export class ChunkForge {
         if (mesh != null) {
             switch (task.taskType) {
                 case TaskType.Creation:
-                    /*let isToBeDeleted = false;
-                    for (let t of this.tasks) { // on ajoute pas le chunk si sa supression est programmée (combattre le retard du chargement sur les déplacements du joueur)
-                        if (t.id == task.id && t.taskType == TaskType.Deletion) {
-                            isToBeDeleted = true;
-                            break;
-                        }
-                    }*/
-                    //if (!isToBeDeleted) {
-                    /*let esclave = this.esclavesDispo.shift();
-                    esclave?.postMessage(JSON.stringify({
+                    let esclave = this.esclavesDispo.shift();
+                    //let [positions, indices, uvs] = ProceduralEngine.createSphereChunk3(this.baseLength, this.baseLength / (2 ** task.depth), this.subdivisions, task.position, task.direction, this.terrainFunction);
+                    esclave === null || esclave === void 0 ? void 0 : esclave.postMessage(JSON.stringify({
+                        noiseLayers: this.noiseLayers,
+                        noiseModifiers: this.noiseModifiers,
+                        craterLayers: this.craterLayers,
+                        craterModifiers: this.craterModifiers,
                         baseLength: this.baseLength,
-                        depth: task.depth,
                         subdivisions: this.subdivisions,
-                        offset: task.position,
+                        depth: task.depth,
                         direction: task.direction,
+                        offsetX: task.position.x,
+                        offsetY: task.position.y,
+                        offsetZ: task.position.z,
+                    }));
+                    esclave.onmessage = e => {
+                        let vertexData = new BABYLON.VertexData();
+                        vertexData.positions = e.data.positions;
+                        vertexData.indices = e.data.indices;
+                        vertexData.normals = e.data.normals;
+                        vertexData.uvs = e.data.uvs;
                         //@ts-ignore
-                        terrainFunction: JSONfn.stringify(this.terrainFunction),
-                    }));*/
-                    //esclave!.onmessage = e => {
-                    let vertexData = /*e.data;*/ ProceduralEngine.createSphereChunk2(this.baseLength, this.baseLength / (Math.pow(2, task.depth)), this.subdivisions, task.position, task.direction, this.terrainFunction);
-                    //@ts-ignore
-                    vertexData.applyToMesh(mesh);
-                    mesh.parent = task.parentNode;
-                    //this.esclavesDispo.push(esclave!);
-                    //};
-                    /*} else {
-                        this.executeNextTask();
-                    }*/
+                        vertexData.applyToMesh(mesh);
+                        mesh.parent = task.parentNode;
+                        this.esclavesDispo.push(esclave);
+                    };
                     break;
                 case TaskType.Deletion:
                     (_a = mesh.material) === null || _a === void 0 ? void 0 : _a.dispose();
@@ -85,8 +96,11 @@ export class ChunkForge {
         }
     }
     update() {
-        for (let i = 0; i < this.cadence; i++) {
+        for (let i = 0; i < this.esclavesDispo.length; i++) {
             this.executeNextTask();
         }
+    }
+    setTerrainFunction(f) {
+        this.terrainFunction = f;
     }
 }

@@ -2,6 +2,7 @@ import { Layer } from "./layer.js";
 import { NoiseFilter } from "./noiseFilter.js";
 export class NoiseLayer extends Layer {
     constructor(noiseEngine, settings, _masks = []) {
+        super([], (p, f, s) => 0);
         let filters = [];
         for (let i = 0; i < settings.octaves; i++) {
             filters.push(new NoiseFilter(noiseEngine, {
@@ -14,16 +15,17 @@ export class NoiseLayer extends Layer {
                 offset: settings.offset,
             }));
         }
-        super(filters, (p, f, s) => {
+        this.layerFunction = (p, f, s) => {
             let elevation = 0;
             for (let filter of f) {
                 elevation += filter.evaluate(p, s);
             }
             elevation = Math.max(0, elevation - settings.minValue * s.minValueModifier * f.length);
             return elevation * s.strengthModifier;
-        });
+        };
         this.masks = _masks;
         this.filters = filters;
+        this.settings = settings;
     }
     setModifiers(modifiers) {
         for (let filter of this.filters) {

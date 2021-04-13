@@ -1,6 +1,62 @@
 import { Direction } from "../components/direction.js";
-let worker = new Worker("../components/worker.js");
 export class ProceduralEngine {
+    static createSphereChunk3(radius, size, subs, offset, direction, terrainFunction) {
+        let vertices = [];
+        let faces = [];
+        let uvs = [];
+        let nbSubdivisions = subs + 1;
+        let rotation = BABYLON.Matrix.Identity();
+        switch (direction) {
+            case Direction.Up:
+                rotation = BABYLON.Matrix.RotationX(Math.PI / 2);
+                break;
+            case Direction.Down:
+                rotation = BABYLON.Matrix.RotationX(-Math.PI / 2);
+                break;
+            case Direction.Forward:
+                rotation = BABYLON.Matrix.Identity();
+                break;
+            case Direction.Backward:
+                rotation = BABYLON.Matrix.RotationY(Math.PI);
+                break;
+            case Direction.Left:
+                rotation = BABYLON.Matrix.RotationY(-Math.PI / 2);
+                break;
+            case Direction.Right:
+                rotation = BABYLON.Matrix.RotationY(Math.PI / 2);
+                break;
+        }
+        for (let x = 0; x < nbSubdivisions; x++) {
+            for (let y = 0; y < nbSubdivisions; y++) {
+                let vertex = new BABYLON.Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
+                vertex = vertex.scale(size);
+                vertex = vertex.add(offset);
+                vertex = BABYLON.Vector3.TransformCoordinates(vertex, rotation);
+                vertex = vertex.normalizeToNew().scale(radius);
+                vertex = terrainFunction(vertex);
+                vertices.push(vertex.x, vertex.y, vertex.z);
+                uvs.push(x / nbSubdivisions, y / nbSubdivisions);
+                if (x < nbSubdivisions - 1 && y < nbSubdivisions - 1) {
+                    faces.push([
+                        x * nbSubdivisions + y,
+                        x * nbSubdivisions + y + 1,
+                        (x + 1) * nbSubdivisions + y + 1,
+                        (x + 1) * nbSubdivisions + y,
+                    ]);
+                }
+            }
+        }
+        let positions = vertices;
+        let indices = [];
+        let normals = [];
+        // indices from faces
+        for (let face of faces) {
+            for (let i = 0; i < face.length - 2; i++) {
+                indices.push(face[0], face[i + 2], face[i + 1]);
+            }
+        }
+        return [positions, indices, uvs];
+    }
     static createSphereChunk2(radius, size, subs, offset, direction, terrainFunction) {
         let vertices = [];
         let faces = [];

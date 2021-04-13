@@ -8,7 +8,14 @@ import { NoiseModifiers } from "./layers/noiseSettings.js";
 
 export class Planet extends ProceduralSphere {
 
+    noiseLayers: NoiseLayer[];
+    noiseModifiers: NoiseModifiers;
+
+    craterLayer: CraterLayer;
+    craterModifiers: CraterModifiers;
+
     constructor(_id: string, _radius: number, _position: BABYLON.Vector3, _nbSubdivisions: number, _maxDepth: number, _scene: BABYLON.Scene) {
+        super(_id, _radius, _position, _nbSubdivisions, _maxDepth, _scene, (p: BABYLON.Vector3) => p);
 
         let noiseEngine = new NoiseEngine();
         noiseEngine.seed(69);
@@ -16,14 +23,15 @@ export class Planet extends ProceduralSphere {
         let noiseStrength = 1 * _radius;
         let noiseFrequency = 1 / _radius;
 
-        let nbCraters = 500;
+        let nbCraters = 200;
         let craterRadiusFactor = 0.5;
         let craterSteepnessFactor = 1;
         let craterMaxDepthFactor = 1;
         let craters = generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor);
-        let craterLayer = new CraterLayer(craters);
 
-        let noiseModifiers: NoiseModifiers = {
+        this.craterLayer = new CraterLayer(craters);
+
+        this.noiseModifiers = {
             strengthModifier: 1,
             amplitudeModifier: 1,
             frequencyModifier: 1,
@@ -31,7 +39,7 @@ export class Planet extends ProceduralSphere {
             minValueModifier: 1,
         };
 
-        let craterModifiers: CraterModifiers = {
+        this.craterModifiers = {
             radiusModifier: 1,
             steepnessModifier: 1,
             maxDepthModifier: 1,
@@ -41,31 +49,59 @@ export class Planet extends ProceduralSphere {
         let barrenBumpyLayer = new NoiseLayer(noiseEngine, {
             noiseStrength: noiseStrength,
             octaves: 10,
-            baseAmplitude: 1,
+            baseAmplitude: 0.5,
             baseFrequency: noiseFrequency,
             decay: 1.9,
             minValue: 0,
             offset: BABYLON.Vector3.Zero()
         });
 
-        let terrainFunction = function (p: BABYLON.Vector3) {
+        let continentsLayer = new NoiseLayer(noiseEngine, {
+            noiseStrength: noiseStrength,
+            octaves: 10,
+            baseAmplitude: 1,
+            baseFrequency: noiseFrequency,
+            decay: 2,
+            minValue: 0.1,
+            offset: BABYLON.Vector3.Zero()
+        });
+
+        let moutainsLayer = new NoiseLayer(noiseEngine, {
+            noiseStrength: noiseStrength,
+            octaves: 7,
+            baseAmplitude: 0.5,
+            baseFrequency: noiseFrequency,
+            decay: 2,
+            minValue: 0,
+            offset: BABYLON.Vector3.Zero()
+        }, [0]);
+
+        this.noiseLayers = [];
+        this.noiseLayers.push(continentsLayer, moutainsLayer, barrenBumpyLayer);
+
+        let terrainFunction = (p: BABYLON.Vector3) => {
             let coords = p.normalizeToNew().scale(_radius);
 
-            let elevation = barrenBumpyLayer.evaluate(coords, noiseModifiers);
+            let elevation = 0;
+            for (let layer of this.noiseLayers) {
+                let maskFactor = 1;
+                for (let i = 0; i < layer.masks.length; i++) {
+                    maskFactor *= this.noiseLayers[i].evaluate(coords, this.noiseModifiers);
+                }
+                elevation += layer.evaluate(coords, this.noiseModifiers) * maskFactor;
+            }
 
-            elevation += craterLayer.evaluate(coords.normalizeToNew(), craterModifiers) * 1;
+            elevation += this.craterLayer.evaluate(coords.normalizeToNew(), this.craterModifiers);
 
-            elevation = Math.max(0, elevation);
+            //elevation = Math.max(0, elevation);
 
             let newPosition = p.add(coords.normalizeToNew().scale(elevation * noiseStrength / 10));
             return newPosition;
         };
 
-        super(_id, _radius, _position, _nbSubdivisions, _maxDepth, _scene, terrainFunction);
-
-        //this.noiseEngine = noiseEngine;
-        //this.noiseStrength = noiseStrength;
-        //this.noiseFrequency = noiseFrequency;
+        this.chunkForge.setTerrainFunction(terrainFunction);
+        this.chunkForge.noiseLayers = this.noiseLayers;
+        this.chunkForge.craterLayers = [this.craterLayer];
     }
 
 }

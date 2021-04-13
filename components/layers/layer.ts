@@ -1,5 +1,4 @@
 import { Filter } from "./filter.js";
-import { NoiseSettings } from "./noiseSettings.js";
 
 export class Layer {
     filters: Filter[];
