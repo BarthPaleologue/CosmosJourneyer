@@ -20,18 +20,22 @@ freeCamera.attachControl(canvas);
 
 scene.activeCamera = freeCamera;
 
-let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
+let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
 
 const radius = 10;
 freeCamera.maxZ = Math.max(2000 * radius, 1000);
 
-let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 2 * radius), 64, 5, scene);
+let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 5, scene);
 
-let sphere = BABYLON.Mesh.CreateSphere("tester", 32, 0.3, scene);
-sphere.position.z = -30;
+let sun = BABYLON.Mesh.CreateSphere("tester", 32, 2, scene);
+sun.position.z = radius;
+sun.position.x = radius * 5;
 let mat = new BABYLON.StandardMaterial("mat", scene);
-mat.emissiveColor = BABYLON.Color3.Red();
-sphere.material = mat;
+mat.emissiveTexture = new BABYLON.Texture("./textures/sun.jpg", scene);
+sun.material = mat;
+light.parent = sun;
+
+let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
 
 let keyboard: { [key: string]: boolean; } = {};
 
@@ -57,29 +61,27 @@ scene.executeWhenReady(() => {
     engine.runRenderLoop(() => {
         t += engine.getDeltaTime() / 1000;
 
-        /*if (keyboard["z"]) sphere.position.z += 0.01 * engine.getDeltaTime();
-        if (keyboard["s"]) sphere.position.z -= 0.01 * engine.getDeltaTime();
-        if (keyboard["q"]) sphere.position.x -= 0.01 * engine.getDeltaTime();
-        if (keyboard["d"]) sphere.position.x += 0.01 * engine.getDeltaTime();
-        if (keyboard[" "]) sphere.position.y += 0.01 * engine.getDeltaTime();
-        if (keyboard["Shift"]) sphere.position.y -= 0.01 * engine.getDeltaTime();*/
-
         let forward = freeCamera.getDirection(BABYLON.Axis.Z);
         let upward = freeCamera.getDirection(BABYLON.Axis.Y);
         let right = freeCamera.getDirection(BABYLON.Axis.X);
 
         let speed = 0.0002 * radius;
 
-        if (keyboard["z"]) planet.attachNode.position.subtractInPlace(forward.scale(speed * engine.getDeltaTime()));
-        if (keyboard["s"]) planet.attachNode.position.addInPlace(forward.scale(speed * engine.getDeltaTime()));
-        if (keyboard["q"]) planet.attachNode.position.addInPlace(right.scale(speed * engine.getDeltaTime()));
-        if (keyboard["d"]) planet.attachNode.position.subtractInPlace(right.scale(speed * engine.getDeltaTime()));
-        if (keyboard[" "]) planet.attachNode.position.subtractInPlace(upward.scale(speed * engine.getDeltaTime()));
-        if (keyboard["Shift"]) planet.attachNode.position.addInPlace(upward.scale(speed * engine.getDeltaTime()));
+        let deplacement = BABYLON.Vector3.Zero();
+
+        if (keyboard["z"]) deplacement.subtractInPlace(forward.scale(speed * engine.getDeltaTime()));
+        if (keyboard["s"]) deplacement.addInPlace(forward.scale(speed * engine.getDeltaTime()));
+        if (keyboard["q"]) deplacement.addInPlace(right.scale(speed * engine.getDeltaTime()));
+        if (keyboard["d"]) deplacement.subtractInPlace(right.scale(speed * engine.getDeltaTime()));
+        if (keyboard[" "]) deplacement.subtractInPlace(upward.scale(speed * engine.getDeltaTime()));
+        if (keyboard["Shift"]) deplacement.addInPlace(upward.scale(speed * engine.getDeltaTime()));
+
+        planet.attachNode.position.addInPlace(deplacement);
+        sun.position.addInPlace(deplacement);
 
         planet.chunkForge.update();
 
-        planet.updateLOD(freeCamera.position);
+        planet.updateLOD(freeCamera.position, forward);
         planet.attachNode.rotation.y += 0.0002;
 
         scene.render();

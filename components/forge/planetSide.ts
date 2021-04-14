@@ -16,7 +16,7 @@ export class PlanetSide {
     tree: quadTree; // le quadtree en question
 
     // les chunks
-    baseLength: number; // taille du côté de base
+    chunkLength: number; // taille du côté de base
     baseSubdivisions: number; // nombre de subdivisions
     direction: Direction; // direction de la normale au plan
     parent: BABYLON.Mesh; // objet parent des chunks
@@ -25,12 +25,12 @@ export class PlanetSide {
     // Le CEO des chunks
     chunkForge: ChunkForge;
 
-    constructor(_id: string, _maxDepth: number, _baseLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, _scene: BABYLON.Scene, _chunkForge: ChunkForge) {
+    constructor(_id: string, _maxDepth: number, _chunkLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, _scene: BABYLON.Scene, _chunkForge: ChunkForge) {
         this.id = _id;
 
         this.maxDepth = _maxDepth;
 
-        this.baseLength = _baseLength;
+        this.chunkLength = _chunkLength;
         this.baseSubdivisions = _baseSubdivisions;
         this.direction = _direction;
         this.parent = _parentNode;
@@ -64,10 +64,7 @@ export class PlanetSide {
             this.chunkForge.addTask({
                 taskType: TaskType.Deletion,
                 id: chunk.id,
-                parentNode: chunk.parentNode,
-                position: chunk.position,
-                depth: chunk.depth,
-                direction: chunk.direction
+                mesh: chunk.mesh,
             });
         }, tree);
     }
@@ -76,8 +73,8 @@ export class PlanetSide {
      * Update LOD of terrain relative to the observerPosition
      * @param observerPosition The observer position
      */
-    public updateLOD(observerPosition: BABYLON.Vector3) {
-        this.tree = this.updateLODRecursively(observerPosition);
+    public updateLOD(observerPosition: BABYLON.Vector3, facingDirection: BABYLON.Vector3) {
+        this.tree = this.updateLODRecursively(observerPosition, facingDirection);
     }
 
     /**
@@ -87,18 +84,21 @@ export class PlanetSide {
      * @param walked The position of the current root relative to the absolute root
      * @returns The updated tree
      */
-    private updateLODRecursively(observerPosition: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
+    private updateLODRecursively(observerPosition: BABYLON.Vector3, facingDirection: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position par rapport à la sphère du noeud du quadtree
-        let relativePosition = getChunkSphereSpacePositionFromPath(this.baseLength, walked, this.direction);
+        let relativePosition = getChunkSphereSpacePositionFromPath(this.chunkLength, walked, this.direction);
         relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationX(this.parent.rotation.x));
         relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationY(this.parent.rotation.y));
         relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationZ(this.parent.rotation.z));
         // position par rapport à la caméra
         let absolutePosition = relativePosition.add(this.parent.position);
+        let direction = absolutePosition.subtract(observerPosition);
+        let dot = BABYLON.Vector3.Dot(direction, facingDirection);
         // distance carré entre caméra et noeud du quadtree
-        let d = BABYLON.Vector3.DistanceSquared(absolutePosition, observerPosition);
+        let d = direction.lengthSquared();
+        let limit = 3 * (this.chunkLength / (2 ** walked.length));
 
-        if (d < 50 * this.baseLength / (2 ** walked.length) && walked.length < this.maxDepth) {
+        if (d < limit ** 2 && walked.length < this.maxDepth) {
             // si on est proche de la caméra
             if (tree instanceof PlanetChunk) {
                 // si c'est un chunk, on le subdivise
@@ -113,10 +113,10 @@ export class PlanetSide {
             } else {
                 // si c'en est pas un, on continue
                 return [
-                    this.updateLODRecursively(observerPosition, tree[0], walked.concat([0])),
-                    this.updateLODRecursively(observerPosition, tree[1], walked.concat([1])),
-                    this.updateLODRecursively(observerPosition, tree[2], walked.concat([2])),
-                    this.updateLODRecursively(observerPosition, tree[3], walked.concat([3])),
+                    this.updateLODRecursively(observerPosition, facingDirection, tree[0], walked.concat([0])),
+                    this.updateLODRecursively(observerPosition, facingDirection, tree[1], walked.concat([1])),
+                    this.updateLODRecursively(observerPosition, facingDirection, tree[2], walked.concat([2])),
+                    this.updateLODRecursively(observerPosition, facingDirection, tree[3], walked.concat([3])),
                 ];
             }
         } else {
@@ -138,7 +138,7 @@ export class PlanetSide {
      * @returns The new Chunk
      */
     createChunk(path: number[]): PlanetChunk {
-        return new PlanetChunk(path, this.baseLength, this.baseSubdivisions, this.direction, this.parent, this.scene, this.chunkForge);
+        return new PlanetChunk(path, this.chunkLength, this.baseSubdivisions, this.direction, this.parent, this.scene, this.chunkForge);
     }
 }
 

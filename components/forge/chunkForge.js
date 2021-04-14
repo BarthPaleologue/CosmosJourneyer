@@ -1,18 +1,19 @@
 export var TaskType;
 (function (TaskType) {
-    TaskType[TaskType["Creation"] = 0] = "Creation";
-    TaskType[TaskType["Deletion"] = 1] = "Deletion";
+    TaskType[TaskType["Deletion"] = 0] = "Deletion";
+    TaskType[TaskType["Build"] = 1] = "Build";
+    TaskType[TaskType["Apply"] = 2] = "Apply";
 })(TaskType || (TaskType = {}));
 export class ChunkForge {
-    constructor(_baseLength, _subdivisions, _scene) {
+    constructor(_chunkLength, _subdivisions, _scene) {
         // What you need to generate a beautiful terrain (à étendre pour ne pas tout hardcode dans le worker)
         this.craters = [];
-        this.tasks = [];
-        this.cadence = 8;
-        this.maxTasksPerUpdate = 15;
-        this.taskCounter = 0;
+        this.incomingTasks = [];
+        this.trashCan = [];
+        this.applyTasks = [];
+        this.cadence = 16;
         this.esclavesDispo = [];
-        this.baseLength = _baseLength;
+        this.chunkLength = _chunkLength;
         this.subdivisions = _subdivisions;
         for (let i = 0; i < this.cadence; i++) {
             this.esclavesDispo.push(new Worker("./components/forge/builder.js", { type: "module" }));
@@ -20,24 +21,24 @@ export class ChunkForge {
         this.scene = _scene;
     }
     addTask(task) {
-        this.tasks.push(task);
+        this.incomingTasks.push(task);
     }
     executeTask(task) {
-        var _a;
-        let mesh = this.scene.getMeshByID(`Chunk${task.id}`);
+        let mesh = task.mesh;
         if (mesh != null) {
             switch (task.taskType) {
-                case TaskType.Creation:
+                case TaskType.Build:
                     let esclave = this.esclavesDispo.shift();
                     // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
                     // tâches de supressions associées : on les stock et on les execute après les créations
                     let callbackTasks = [];
-                    while (this.tasks.length > 0 && this.tasks[0].taskType != TaskType.Creation) {
-                        callbackTasks.push(this.tasks.shift());
+                    while (this.incomingTasks.length > 0 && this.incomingTasks[0].taskType == TaskType.Deletion) {
+                        //@ts-ignore typescript pige rien à list.shift()
+                        callbackTasks.push(this.incomingTasks.shift());
                     }
                     esclave === null || esclave === void 0 ? void 0 : esclave.postMessage([
                         "buildTask",
-                        this.baseLength,
+                        this.chunkLength,
                         this.subdivisions,
                         task.depth,
                         task.direction,
@@ -49,19 +50,22 @@ export class ChunkForge {
                         vertexData.positions = e.data.positions;
                         vertexData.indices = e.data.indices;
                         vertexData.normals = e.data.normals;
-                        vertexData.uvs = e.data.uvs;
+                        //vertexData.uvs = e.data.uvs;
                         vertexData.colors = e.data.colors;
-                        //@ts-ignore
-                        vertexData.applyToMesh(mesh);
+                        this.applyTasks.push({
+                            id: task.id,
+                            taskType: TaskType.Apply,
+                            mesh: mesh,
+                            vertexData: vertexData,
+                            callbackTasks: callbackTasks,
+                        });
                         this.esclavesDispo.push(esclave);
-                        for (let callbackTask of callbackTasks) {
-                            this.executeTask(callbackTask);
-                        }
                     };
                     break;
                 case TaskType.Deletion:
-                    (_a = mesh.material) === null || _a === void 0 ? void 0 : _a.dispose();
-                    mesh.dispose();
+                    // une tâche de suppression solitaire ne devrait pas exister
+                    console.log("Tâche de supression solitaire détectée");
+                    this.trashCan.push(task);
                     break;
                 default:
                     console.log("Tache illegale");
@@ -74,19 +78,33 @@ export class ChunkForge {
         }
     }
     executeNextTask() {
-        if (this.tasks.length > 0) {
-            this.taskCounter += 1;
-            if (this.taskCounter < this.maxTasksPerUpdate) {
-                let nextTask = this.tasks.shift();
-                this.executeTask(nextTask);
+        if (this.incomingTasks.length > 0) {
+            let nextTask = this.incomingTasks.shift();
+            this.executeTask(nextTask);
+        }
+    }
+    emptyTrashCan(n) {
+        var _a;
+        for (let i = 0; i < n; i++) {
+            if (this.trashCan.length > 0) {
+                let task = this.trashCan.shift();
+                (_a = task.mesh.material) === null || _a === void 0 ? void 0 : _a.dispose();
+                task.mesh.dispose();
             }
-            else
-                this.taskCounter = 0;
+        }
+    }
+    executeNextApplyTask() {
+        if (this.applyTasks.length > 0) {
+            let task = this.applyTasks.shift();
+            task.vertexData.applyToMesh(task.mesh);
+            this.trashCan = this.trashCan.concat(task.callbackTasks);
         }
     }
     update() {
         for (let i = 0; i < this.esclavesDispo.length; i++) {
             this.executeNextTask();
         }
+        this.executeNextApplyTask();
+        this.emptyTrashCan(32);
     }
 }

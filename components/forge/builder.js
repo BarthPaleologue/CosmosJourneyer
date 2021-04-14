@@ -79,9 +79,9 @@ let colorSettings = {
     steepColor: new BABYLON.Color4(0.2, 0.2, 0.2, 1),
     plainColor: new BABYLON.Color4(0.5, 0.3, 0.08, 1),
     //plainColor: new BABYLON.Color4(0.2, 0.6, 0, 1),
-    plainSteepDotLimit: 0.96,
+    plainSteepDotLimit: 0.95,
     snowSteepDotLimit: 0.94,
-    iceCapThreshold: 6,
+    iceCapThreshold: 9,
 };
 function colorFunction(p, n) {
     let position = BABYLON.Vector3.FromArray(p);
@@ -89,7 +89,7 @@ function colorFunction(p, n) {
     let normal = BABYLON.Vector3.FromArray(n);
     let dot = BABYLON.Vector3.Dot(positionN, normal);
     let color;
-    if (position.lengthSquared() > Math.pow((radius * (1 + colorSettings.iceCapThreshold / 100 - Math.pow(positionN.y, 8))), 2)) {
+    if (position.lengthSquared() > Math.pow((radius * (1 + colorSettings.iceCapThreshold / 100 - Math.pow(positionN.y, 20))), 2)) {
         // if mountains region (you need to be higher at the equator)
         if (dot > colorSettings.snowSteepDotLimit)
             color = colorSettings.snowColor;
@@ -106,9 +106,10 @@ function colorFunction(p, n) {
     return color;
 }
 onmessage = e => {
-    let [taskType, radius, subs, depth, direction, offset, craters,] = e.data;
+    let [taskType, chunkLength, subs, depth, direction, offset, craters,] = e.data;
     craterLayers[0].regenerate(craters);
-    let size = radius / (Math.pow(2, depth));
+    let size = chunkLength / (Math.pow(2, depth));
+    let planetRadius = chunkLength / 2;
     let vertices = [];
     let faces = [];
     let uvs = [];
@@ -140,7 +141,7 @@ onmessage = e => {
             vertex = vertex.scale(size);
             vertex = vertex.add(BABYLON.Vector3.FromArray(offset));
             vertex = BABYLON.Vector3.TransformCoordinates(vertex, rotation);
-            vertex = vertex.normalizeToNew().scale(radius);
+            vertex = vertex.normalizeToNew().scale(planetRadius);
             vertex = terrainFunction(vertex, noiseLayers, craterLayers);
             vertices.push(vertex.x, vertex.y, vertex.z);
             uvs.push(x / vertexPerLine, y / vertexPerLine);
@@ -173,7 +174,7 @@ onmessage = e => {
     vertexData.positions = positions;
     vertexData.indices = indices;
     vertexData.normals = normals;
-    vertexData.uvs = uvs;
+    //vertexData.uvs = uvs;
     vertexData.colors = colors;
     //@ts-ignore
     postMessage(vertexData);

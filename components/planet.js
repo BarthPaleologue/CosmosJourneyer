@@ -1,4 +1,4 @@
-import { ProceduralSphere } from "./forge/proceduralCube.js";
+import { ProceduralSphere } from "./forge/proceduralSphere.js";
 import { NoiseEngine } from "../engine/perlin.js";
 import { CraterLayer } from "./forge/layers/craterLayer.js";
 import { NoiseLayer } from "./forge/layers/noiseLayer.js";
