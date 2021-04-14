@@ -1,7 +1,7 @@
-import { NoiseEngine } from "../../engine/perlin.js";
-import { Filter } from "./filter.js";
+import { NoiseEngine } from "../../../engine/perlin.js";
+import { Filter } from "./filters/filter.js";
 import { Layer } from "./layer.js";
-import { NoiseFilter } from "./noiseFilter.js";
+import { NoiseFilter } from "./filters/noiseFilter.js";
 import { NoiseModifiers, NoiseSettings } from "./noiseSettings.js";
 
 export class NoiseLayer extends Layer {

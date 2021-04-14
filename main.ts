@@ -1,4 +1,4 @@
-import { NoiseModifiers } from "./components/layers/noiseSettings.js";
+import { NoiseModifiers } from "./components/forge/layers/noiseSettings.js";
 import { Planet } from "./components/planet.old.js";
 import { Slider } from "./SliderJS-main/slider.js";
 

@@ -1,5 +1,5 @@
 import { Layer } from "./layer.js";
-import { NoiseFilter } from "./noiseFilter.js";
+import { NoiseFilter } from "./filters/noiseFilter.js";
 export class NoiseLayer extends Layer {
     constructor(noiseEngine, settings, _masks = []) {
         super([], (p, f, s) => 0);

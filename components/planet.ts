@@ -1,10 +1,10 @@
-import { ProceduralSphere } from "./proceduralCube.js";
+import { ProceduralSphere } from "./forge/proceduralCube.js";
 import { NoiseEngine } from "../engine/perlin.js";
-import { Crater } from "./crater.js";
-import { CraterLayer } from "./layers/craterLayer.js";
-import { CraterModifiers } from "./layers/craterModifiers.js";
-import { NoiseLayer } from "./layers/noiseLayer.js";
-import { NoiseModifiers } from "./layers/noiseSettings.js";
+import { Crater } from "./forge/crater.js";
+import { CraterLayer } from "./forge/layers/craterLayer.js";
+import { CraterModifiers } from "./forge/layers/craterModifiers.js";
+import { NoiseLayer } from "./forge/layers/noiseLayer.js";
+import { NoiseModifiers } from "./forge/layers/noiseSettings.js";
 
 export class Planet extends ProceduralSphere {
 

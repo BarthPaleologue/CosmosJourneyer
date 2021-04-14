@@ -1,11 +1,11 @@
 import { NoiseEngine } from "../engine/perlin.js";
 import { ProceduralEngine } from "../engine/proceduralEngine.js";
 import { proceduralMesh } from "../engine/proceduralMesh.js";
-import { Crater } from "./crater.js";
-import { CraterLayer } from "./layers/craterLayer.js";
-import { CraterModifiers } from "./layers/craterModifiers.js";
-import { NoiseLayer } from "./layers/noiseLayer.js";
-import { NoiseModifiers } from "./layers/noiseSettings.js";
+import { Crater } from "./forge/crater.js";
+import { CraterLayer } from "./forge/layers/craterLayer.js";
+import { CraterModifiers } from "./forge/layers/craterModifiers.js";
+import { NoiseLayer } from "./forge/layers/noiseLayer.js";
+import { NoiseModifiers } from "./forge/layers/noiseSettings.js";
 
 export class Planet extends proceduralMesh {
     radius: number;
@@ -103,11 +103,12 @@ export class Planet extends proceduralMesh {
             // random spherical coordinates
             let phi = Math.random() * Math.PI * 2;
             let theta = Math.random() * Math.PI;
-            let position = new BABYLON.Vector3(Math.cos(theta) * Math.sin(phi), Math.sin(theta) * Math.sin(phi), Math.cos(phi));
+            let position = [Math.cos(theta) * Math.sin(phi), Math.sin(theta) * Math.sin(phi), Math.cos(phi)];
 
             let maxDepth = 0.2 + (Math.random()) / 10;
             let steepness = this.craterSteepnessFactor * (1 + (Math.random()) / 10);
-            craters.push({ radius: r, position: position, maxDepth: maxDepth, steepness: steepness });
+            let crater: Crater = { radius: r, position: position, maxDepth: maxDepth, steepness: steepness };
+            craters.push(crater);
         }
         return craters;
     }

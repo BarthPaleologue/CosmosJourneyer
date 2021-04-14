@@ -1,6 +1,6 @@
-import { NoiseEngine } from "../../engine/perlin.js";
+import { NoiseEngine } from "../../../../engine/perlin";
 import { Filter } from "./filter.js";
-import { NoiseModifiers, NoiseSettings } from "./noiseSettings.js";
+import { NoiseModifiers, NoiseSettings } from "../noiseSettings.js";
 
 export class NoiseFilter extends Filter {
     noiseEngine: NoiseEngine;

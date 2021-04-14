@@ -1,4 +1,4 @@
-import { Filter } from "./filter.js";
+import { Filter } from "./filters/filter.js";
 
 export class Layer {
     filters: Filter[];

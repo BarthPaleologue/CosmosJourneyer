@@ -1,8 +1,8 @@
-import "../babylon/babylon4.js";
+import "../../babylon/babylon4.js";
 import { Direction } from "./direction.js";
 import { CraterLayer } from "./layers/craterLayer.js";
 import { NoiseLayer } from "./layers/noiseLayer.js";
-import { NoiseEngine } from "../engine/perlin.js";
+import { NoiseEngine } from "../../engine/perlin.js";
 
 onerror = e => console.log(e);
 
@@ -11,8 +11,8 @@ noiseEngine.seed(69);
 
 let radius = 10; // the planet radius
 
-let noiseStrength = 0.1;
-let noiseFrequency = 0.1;
+let noiseStrength = radius / 100;
+let noiseFrequency = 1 / radius;
 
 let noiseLayers: NoiseLayer[] = [];
 
@@ -90,8 +90,39 @@ let terrainFunction = (p: BABYLON.Vector3, noiseLayers: NoiseLayer[], craterLaye
     return newPosition;
 };
 
+let colorSettings = {
+    snowColor: new BABYLON.Color4(1, 1, 1, 1),
+    steepColor: new BABYLON.Color4(0.2, 0.2, 0.2, 1),
+    plainColor: new BABYLON.Color4(0.5, 0.3, 0.08, 1),
+    //plainColor: new BABYLON.Color4(0.2, 0.6, 0, 1),
+    plainSteepDotLimit: 0.96,
+    snowSteepDotLimit: 0.94,
+    iceCapThreshold: 6,
+};
+
+function colorFunction(p: number[], n: number[]) {
+    let position = BABYLON.Vector3.FromArray(p);
+    let positionN = position.normalizeToNew();
+    let normal = BABYLON.Vector3.FromArray(n);
+    let dot = BABYLON.Vector3.Dot(positionN, normal);
+    let color;
+
+    if (position.lengthSquared() > (radius * (1 + colorSettings.iceCapThreshold / 100 - positionN.y ** 8)) ** 2) {
+        // if mountains region (you need to be higher at the equator)
+        if (dot > colorSettings.snowSteepDotLimit) color = colorSettings.snowColor;
+        else color = colorSettings.steepColor;
+    } else {
+        // if lower region
+        if (dot < colorSettings.plainSteepDotLimit) color = colorSettings.steepColor;
+        else color = colorSettings.plainColor;
+    }
+
+    return color;
+}
+
 onmessage = e => {
     let [
+        taskType,
         radius,
         subs,
         depth,
@@ -171,11 +202,18 @@ onmessage = e => {
 
     BABYLON.VertexData.ComputeNormals(positions, indices, normals);
 
+    let colors: number[] = [];
+    for (let i = 0; i < positions.length; i += 3) {
+        let color = colorFunction([positions[i], positions[i + 1], positions[i + 2]], [normals[i], normals[i + 1], normals[i + 2]]);
+        colors.push(color.r, color.g, color.b, color.a);
+    }
+
     let vertexData = new BABYLON.VertexData();
     vertexData.positions = positions;
     vertexData.indices = indices;
     vertexData.normals = normals;
     vertexData.uvs = uvs;
+    vertexData.colors = colors;
 
     //@ts-ignore
     postMessage(vertexData);

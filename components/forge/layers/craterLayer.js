@@ -1,4 +1,4 @@
-import { CraterFilter } from "./craterFilter.js";
+import { CraterFilter } from "./filters/craterFilter.js";
 import { Layer } from "./layer.js";
 export class CraterLayer extends Layer {
     constructor(craters) {

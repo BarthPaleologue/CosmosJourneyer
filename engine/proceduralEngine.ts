@@ -1,4 +1,4 @@
-import { Direction } from "../components/direction.js";
+import { Direction } from "../components/forge/direction.js";
 
 export class ProceduralEngine {
     static createSphereChunk3(radius: number, size: number, subs: number, offset: BABYLON.Vector3, direction: Direction, terrainFunction: (p: BABYLON.Vector3) => BABYLON.Vector3): number[][] {

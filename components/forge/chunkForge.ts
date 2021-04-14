@@ -3,8 +3,7 @@ import { Direction } from "./direction.js";
 
 export enum TaskType {
     Creation,
-    DeletionSubdivision,
-    DeletionDeletion
+    Deletion,
 }
 
 export interface ChunkTask {
@@ -24,7 +23,7 @@ export class ChunkForge {
     craters: Crater[] = [];
 
     tasks: ChunkTask[] = [];
-    cadence = 10;
+    cadence = 8;
     maxTasksPerUpdate = 15;
     taskCounter = 0;
     esclavesDispo: Worker[] = [];
@@ -35,7 +34,7 @@ export class ChunkForge {
         this.baseLength = _baseLength;
         this.subdivisions = _subdivisions;
         for (let i = 0; i < this.cadence; i++) {
-            this.esclavesDispo.push(new Worker("./components/worker.js", { type: "module" }));
+            this.esclavesDispo.push(new Worker("./components/forge/builder.js", { type: "module" }));
         }
         this.scene = _scene;
     }
@@ -49,7 +48,15 @@ export class ChunkForge {
                 case TaskType.Creation:
                     let esclave = this.esclavesDispo.shift();
 
+                    // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
+                    // tâches de supressions associées : on les stock et on les execute après les créations
+                    let callbackTasks: ChunkTask[] = [];
+                    while (this.tasks.length > 0 && this.tasks[0].taskType != TaskType.Creation) {
+                        callbackTasks.push(this.tasks.shift()!);
+                    }
+
                     esclave?.postMessage([
+                        "buildTask",
                         this.baseLength,
                         this.subdivisions,
                         task.depth,
@@ -65,40 +72,20 @@ export class ChunkForge {
                         vertexData.indices = e.data.indices;
                         vertexData.normals = e.data.normals;
                         vertexData.uvs = e.data.uvs;
+                        vertexData.colors = e.data.colors;
                         //@ts-ignore
                         vertexData.applyToMesh(mesh);
-                        mesh!.parent = task.parentNode;
-                        mesh?.setEnabled(true);
+
                         this.esclavesDispo.push(esclave!);
+
+                        for (let callbackTask of callbackTasks) {
+                            this.executeTask(callbackTask);
+                        }
                     };
                     break;
-                case TaskType.DeletionSubdivision:
-                    // on vérifie que les enfants existent pour supprimer :
-                    let canBeDeleted = true;
-                    let prefix = task.id.slice(0, task.id.length - 1);
-                    //if (!this.scene.getMeshByID(`Chunk${prefix}0]`)?.isEnabled()) canBeDeleted = false;
-                    //if (!this.scene.getMeshByID(`Chunk${prefix}1]`)?.isEnabled()) canBeDeleted = false;
-                    //if (!this.scene.getMeshByID(`Chunk${prefix}2]`)?.isEnabled()) canBeDeleted = false;
-                    //if (!this.scene.getMeshByID(`Chunk${prefix}3]`)?.isEnabled()) canBeDeleted = false;
-                    if (canBeDeleted) {
-                        mesh.material?.dispose();
-                        mesh.dispose();
-                    } else {
-                        this.tasks.push(task);
-                    }
-                    this.executeNextTask();
-                    break;
-                case TaskType.DeletionDeletion:
-                    let canBeDeleted2 = true;
-                    let prefix2 = task.id.slice(0, task.id.length - 2);
-                    //if (!this.scene.getMeshByID(`Chunk${prefix2}]`)?.isEnabled()) canBeDeleted2 = false;
-                    if (canBeDeleted2) {
-                        mesh.material?.dispose();
-                        mesh.dispose();
-                    } else {
-                        this.tasks.push(task);
-                    }
-                    this.executeNextTask();
+                case TaskType.Deletion:
+                    mesh.material?.dispose();
+                    mesh.dispose();
                     break;
                 default:
                     console.log("Tache illegale");

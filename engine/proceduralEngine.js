@@ -1,4 +1,4 @@
-import { Direction } from "../components/direction.js";
+import { Direction } from "../components/forge/direction.js";
 export class ProceduralEngine {
     static createSphereChunk3(radius, size, subs, offset, direction, terrainFunction) {
         let vertices = [];

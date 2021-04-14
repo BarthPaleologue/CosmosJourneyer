@@ -1,7 +1,7 @@
-import { ProceduralSphere } from "./proceduralCube.js";
+import { ProceduralSphere } from "./forge/proceduralCube.js";
 import { NoiseEngine } from "../engine/perlin.js";
-import { CraterLayer } from "./layers/craterLayer.js";
-import { NoiseLayer } from "./layers/noiseLayer.js";
+import { CraterLayer } from "./forge/layers/craterLayer.js";
+import { NoiseLayer } from "./forge/layers/noiseLayer.js";
 export class Planet extends ProceduralSphere {
     constructor(_id, _radius, _position, _nbSubdivisions, _maxDepth, _scene) {
         super(_id, _radius, _position, _nbSubdivisions, _maxDepth, _scene);
