@@ -3,6 +3,7 @@ export var TaskType;
     TaskType[TaskType["Deletion"] = 0] = "Deletion";
     TaskType[TaskType["Build"] = 1] = "Build";
     TaskType[TaskType["Apply"] = 2] = "Apply";
+    TaskType[TaskType["Init"] = 3] = "Init";
 })(TaskType || (TaskType = {}));
 export class ChunkForge {
     constructor(_chunkLength, _subdivisions, _scene) {
@@ -12,69 +13,76 @@ export class ChunkForge {
         this.trashCan = [];
         this.applyTasks = [];
         this.cadence = 16;
+        this.builders = [];
         this.esclavesDispo = [];
         this.chunkLength = _chunkLength;
         this.subdivisions = _subdivisions;
         for (let i = 0; i < this.cadence; i++) {
-            this.esclavesDispo.push(new Worker("./components/forge/builder.js", { type: "module" }));
+            let builder = new Worker("./components/forge/builder.js", { type: "module" });
+            this.builders.push(builder);
+            this.esclavesDispo.push(builder);
         }
         this.scene = _scene;
+    }
+    setPlanet(radius, craters, noiseModifiers, craterModifiers, colorSettings) {
+        for (let builder of this.builders) {
+            builder.postMessage({
+                taskType: "init",
+                radius: radius,
+                craters: craters,
+                noiseModifiers: noiseModifiers,
+                craterModifiers: craterModifiers,
+                colorSettings: colorSettings,
+            });
+        }
     }
     addTask(task) {
         this.incomingTasks.push(task);
     }
     executeTask(task) {
-        let mesh = task.mesh;
-        if (mesh != null) {
-            switch (task.taskType) {
-                case TaskType.Build:
-                    let esclave = this.esclavesDispo.shift();
-                    // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
-                    // tâches de supressions associées : on les stock et on les execute après les créations
-                    let callbackTasks = [];
-                    while (this.incomingTasks.length > 0 && this.incomingTasks[0].taskType == TaskType.Deletion) {
-                        //@ts-ignore typescript pige rien à list.shift()
-                        callbackTasks.push(this.incomingTasks.shift());
-                    }
-                    esclave === null || esclave === void 0 ? void 0 : esclave.postMessage([
-                        "buildTask",
-                        this.chunkLength,
-                        this.subdivisions,
-                        task.depth,
-                        task.direction,
-                        [task.position.x, task.position.y, task.position.z],
-                        this.craters,
-                    ]);
-                    esclave.onmessage = e => {
-                        let vertexData = new BABYLON.VertexData();
-                        vertexData.positions = e.data.positions;
-                        vertexData.indices = e.data.indices;
-                        vertexData.normals = e.data.normals;
-                        //vertexData.uvs = e.data.uvs;
-                        vertexData.colors = e.data.colors;
-                        this.applyTasks.push({
-                            id: task.id,
-                            taskType: TaskType.Apply,
-                            mesh: mesh,
-                            vertexData: vertexData,
-                            callbackTasks: callbackTasks,
-                        });
-                        this.esclavesDispo.push(esclave);
-                    };
-                    break;
-                case TaskType.Deletion:
-                    // une tâche de suppression solitaire ne devrait pas exister
-                    console.log("Tâche de supression solitaire détectée");
-                    this.trashCan.push(task);
-                    break;
-                default:
-                    console.log("Tache illegale");
-                    this.executeNextTask();
-            }
-        }
-        else {
-            console.log("le chunk n'existe pas :/");
-            this.update();
+        switch (task.taskType) {
+            case TaskType.Build:
+                let mesh = task.mesh;
+                let esclave = this.esclavesDispo.shift();
+                // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
+                // tâches de supressions associées : on les stock et on les execute après les créations
+                let callbackTasks = [];
+                while (this.incomingTasks.length > 0 && this.incomingTasks[0].taskType == TaskType.Deletion) {
+                    //@ts-ignore typescript pige rien à list.shift()
+                    callbackTasks.push(this.incomingTasks.shift());
+                }
+                esclave === null || esclave === void 0 ? void 0 : esclave.postMessage({
+                    taskType: "buildTask",
+                    chunkLength: this.chunkLength,
+                    subdivisions: this.subdivisions,
+                    depth: task.depth,
+                    direction: task.direction,
+                    position: [task.position.x, task.position.y, task.position.z],
+                });
+                esclave.onmessage = e => {
+                    let vertexData = new BABYLON.VertexData();
+                    vertexData.positions = Array.from(e.data.p);
+                    vertexData.indices = Array.from(e.data.i);
+                    vertexData.normals = Array.from(e.data.n);
+                    vertexData.colors = Array.from(e.data.c);
+                    this.applyTasks.push({
+                        id: task.id,
+                        taskType: TaskType.Apply,
+                        mesh: mesh,
+                        vertexData: vertexData,
+                        callbackTasks: callbackTasks,
+                    });
+                    this.esclavesDispo.push(esclave);
+                };
+                break;
+            case TaskType.Deletion:
+                // une tâche de suppression solitaire ne devrait pas exister
+                console.log("Tâche de supression solitaire détectée");
+                this.trashCan.push(task);
+                break;
+            default:
+                console.log("Tache illegale");
+                this.executeNextTask();
         }
     }
     executeNextTask() {
@@ -101,7 +109,7 @@ export class ChunkForge {
         }
     }
     update() {
-        for (let i = 0; i < this.esclavesDispo.length; i++) {
+        for (let esclave of this.esclavesDispo) {
             this.executeNextTask();
         }
         this.executeNextApplyTask();

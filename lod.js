@@ -17,6 +17,8 @@ let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
 const radius = 10;
 freeCamera.maxZ = Math.max(2000 * radius, 1000);
 let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 5, scene);
+planet.colorSettings.sandColor = planet.colorSettings.steepColor;
+planet.updateSettings();
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 2, scene);
 sun.position.z = radius;
 sun.position.x = radius * 5;
@@ -28,6 +30,11 @@ let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene
 let keyboard = {};
 document.addEventListener("keydown", e => {
     keyboard[e.key] = true;
+    if (e.key == "r") {
+        planet.noiseModifiers.strengthModifier = Math.random() * 3;
+        planet.updateSettings();
+        planet.reset();
+    }
 });
 document.addEventListener("keyup", e => {
     keyboard[e.key] = false;
@@ -40,6 +47,12 @@ window.addEventListener("resize", () => {
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     let t = 0;
+    scene.beforeRender = () => {
+        let forward = freeCamera.getDirection(BABYLON.Axis.Z);
+        planet.chunkForge.update();
+        planet.updateLOD(freeCamera.position, forward);
+        planet.attachNode.rotation.y += 0.0002;
+    };
     engine.runRenderLoop(() => {
         t += engine.getDeltaTime() / 1000;
         let forward = freeCamera.getDirection(BABYLON.Axis.Z);
@@ -61,9 +74,6 @@ scene.executeWhenReady(() => {
             deplacement.addInPlace(upward.scale(speed * engine.getDeltaTime()));
         planet.attachNode.position.addInPlace(deplacement);
         sun.position.addInPlace(deplacement);
-        planet.chunkForge.update();
-        planet.updateLOD(freeCamera.position, forward);
-        planet.attachNode.rotation.y += 0.0002;
         scene.render();
     });
 });

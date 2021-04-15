@@ -140,6 +140,12 @@ export class PlanetSide {
     createChunk(path: number[]): PlanetChunk {
         return new PlanetChunk(path, this.chunkLength, this.baseSubdivisions, this.direction, this.parent, this.scene, this.chunkForge);
     }
+
+    reset() {
+        let newTree = this.createChunk([]);
+        this.requestDeletion(this.tree);
+        this.tree = newTree;
+    }
 }
 
 

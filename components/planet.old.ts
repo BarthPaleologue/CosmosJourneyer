@@ -43,7 +43,7 @@ export class Planet extends proceduralMesh {
             baseFrequency: 1,
             decay: 2,
             minValue: 0,
-            offset: BABYLON.Vector3.Zero()
+            offset: [0, 0, 0]
         });
 
         let continentsLayer = new NoiseLayer(this.noiseEngine, {
@@ -53,7 +53,7 @@ export class Planet extends proceduralMesh {
             baseFrequency: 1,
             decay: 2,
             minValue: 0.2,
-            offset: BABYLON.Vector3.Zero()
+            offset: [0, 0, 0]
         });
 
         let moutainsLayer = new NoiseLayer(this.noiseEngine, {
@@ -63,14 +63,14 @@ export class Planet extends proceduralMesh {
             baseFrequency: 1,
             decay: 2,
             minValue: 0,
-            offset: BABYLON.Vector3.Zero()
+            offset: [0, 0, 0]
         }, [0]);
 
         this.noiseModifiers = {
             strengthModifier: 1,
             amplitudeModifier: 1,
             frequencyModifier: 1,
-            offsetModifier: BABYLON.Vector3.Zero(),
+            offsetModifier: [0, 0, 0],
             minValueModifier: 1,
         };
 

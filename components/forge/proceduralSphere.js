@@ -28,4 +28,12 @@ export class ProceduralSphere {
             side.updateLOD(position, facingDirection);
         }
     }
+    /**
+     * Regenerates the chunks
+     */
+    reset() {
+        for (let side of this.sides) {
+            side.reset();
+        }
+    }
 }

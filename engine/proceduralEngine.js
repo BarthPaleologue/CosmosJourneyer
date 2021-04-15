@@ -79,8 +79,15 @@ export class ProceduralEngine {
         return this.createPolyhedron(vertices, faces, uvs, scene);
     }
     static createPlanetSideLegacy(radius, subs, direction, scene) {
-        return this.createSphereChunk(radius, radius * 2, subs, new BABYLON.Vector3(0, 0, -radius), direction, scene, (p) => p);
+        return this.createSphereChunk(radius, radius * 2, subs, new BABYLON.Vector3(0, 0, radius), direction, scene, (p) => p);
     }
+    /**
+     * Creates planet with single chunks as faces (you won't be able to do lod with it)
+     * @param radius radius of the planet
+     * @param subdivisions subdivisions of the faces
+     * @param scene the babylon scene to attach it to
+     * @returns The combined meshes of the 6 faces (merged)
+     */
     static createPlanet(radius, subdivisions, scene) {
         let sides = [
             this.createPlanetSideLegacy(radius, subdivisions, Direction.Up, scene),

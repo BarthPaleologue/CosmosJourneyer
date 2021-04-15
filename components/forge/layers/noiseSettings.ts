@@ -3,7 +3,7 @@ export interface NoiseSettings {
     baseAmplitude: number,
     baseFrequency: number,
     minValue: number,
-    offset: BABYLON.Vector3,
+    offset: number[],
     octaves: number,
     decay: number,
 }
@@ -13,5 +13,5 @@ export interface NoiseModifiers {
     amplitudeModifier: number,
     frequencyModifier: number,
     minValueModifier: number,
-    offsetModifier: BABYLON.Vector3;
+    offsetModifier: number[];
 }

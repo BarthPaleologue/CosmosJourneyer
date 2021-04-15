@@ -26,6 +26,8 @@ const radius = 10;
 freeCamera.maxZ = Math.max(2000 * radius, 1000);
 
 let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 5, scene);
+planet.colorSettings.sandColor = planet.colorSettings.steepColor;
+planet.updateSettings();
 
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 2, scene);
 sun.position.z = radius;
@@ -41,6 +43,11 @@ let keyboard: { [key: string]: boolean; } = {};
 
 document.addEventListener("keydown", e => {
     keyboard[e.key] = true;
+    if (e.key == "r") {
+        planet.noiseModifiers.strengthModifier = Math.random() * 3;
+        planet.updateSettings();
+        planet.reset();
+    }
 });
 
 document.addEventListener("keyup", e => {
@@ -57,6 +64,15 @@ scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
     let t = 0;
+
+    scene.beforeRender = () => {
+        let forward = freeCamera.getDirection(BABYLON.Axis.Z);
+
+        planet.chunkForge.update();
+
+        planet.updateLOD(freeCamera.position, forward);
+        planet.attachNode.rotation.y += 0.0002;
+    };
 
     engine.runRenderLoop(() => {
         t += engine.getDeltaTime() / 1000;
@@ -78,11 +94,6 @@ scene.executeWhenReady(() => {
 
         planet.attachNode.position.addInPlace(deplacement);
         sun.position.addInPlace(deplacement);
-
-        planet.chunkForge.update();
-
-        planet.updateLOD(freeCamera.position, forward);
-        planet.attachNode.rotation.y += 0.0002;
 
         scene.render();
     });

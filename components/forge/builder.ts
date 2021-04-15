@@ -3,15 +3,14 @@ import { Direction } from "./direction.js";
 import { CraterLayer } from "./layers/craterLayer.js";
 import { NoiseLayer } from "./layers/noiseLayer.js";
 import { NoiseEngine } from "../../engine/perlin.js";
-
-onerror = e => console.log(e);
+import { ColorSettings } from "../planet.js";
 
 let noiseEngine = new NoiseEngine();
 noiseEngine.seed(69);
 
 let radius = 10; // the planet radius
 
-let noiseStrength = radius / 100;
+let noiseStrength = 0.7 * radius / 100;
 let noiseFrequency = 1 / radius;
 
 let noiseLayers: NoiseLayer[] = [];
@@ -23,7 +22,7 @@ let barrenBumpyLayer = new NoiseLayer(noiseEngine, {
     baseFrequency: noiseFrequency,
     decay: 1.7,
     minValue: 0,
-    offset: BABYLON.Vector3.Zero()
+    offset: [0, 0, 0]
 });
 
 let continentsLayer = new NoiseLayer(noiseEngine, {
@@ -33,7 +32,7 @@ let continentsLayer = new NoiseLayer(noiseEngine, {
     baseFrequency: noiseFrequency,
     decay: 2,
     minValue: 0.1,
-    offset: BABYLON.Vector3.Zero()
+    offset: [0, 0, 0]
 });
 
 let moutainsLayer = new NoiseLayer(noiseEngine, {
@@ -43,7 +42,7 @@ let moutainsLayer = new NoiseLayer(noiseEngine, {
     baseFrequency: noiseFrequency,
     decay: 2,
     minValue: 0,
-    offset: BABYLON.Vector3.Zero()
+    offset: [0, 0, 0]
 }, [0]);
 
 noiseLayers.push(continentsLayer, moutainsLayer, barrenBumpyLayer);
@@ -58,6 +57,14 @@ let craterModifiers = {
     scaleFactor: 10,
 };
 
+let noiseModifiers = {
+    strengthModifier: 1,
+    amplitudeModifier: 1,
+    frequencyModifier: 1,
+    offsetModifier: BABYLON.Vector3.Zero(),
+    minValueModifier: 1,
+};
+
 let terrainFunction = (p: BABYLON.Vector3, noiseLayers: NoiseLayer[], craterLayers: CraterLayer[]) => {
     let coords = p.normalizeToNew().scale(radius);
 
@@ -65,21 +72,9 @@ let terrainFunction = (p: BABYLON.Vector3, noiseLayers: NoiseLayer[], craterLaye
     for (let layer of noiseLayers) {
         let maskFactor = 1;
         for (let i = 0; i < layer.masks.length; i++) {
-            maskFactor *= noiseLayers[i].evaluate(coords, {
-                strengthModifier: 1,
-                amplitudeModifier: 1,
-                frequencyModifier: 1,
-                offsetModifier: BABYLON.Vector3.Zero(),
-                minValueModifier: 1,
-            });
+            maskFactor *= noiseLayers[i].evaluate(coords, noiseModifiers);
         }
-        elevation += layer.evaluate(coords, {
-            strengthModifier: 1,
-            amplitudeModifier: 1,
-            frequencyModifier: 1,
-            offsetModifier: BABYLON.Vector3.Zero(),
-            minValueModifier: 1,
-        }) * maskFactor;
+        elevation += layer.evaluate(coords, noiseModifiers) * maskFactor;
     }
     for (let craterLayer of craterLayers) {
         elevation += craterLayer.evaluate(coords.normalizeToNew(), craterModifiers);
@@ -89,14 +84,15 @@ let terrainFunction = (p: BABYLON.Vector3, noiseLayers: NoiseLayer[], craterLaye
     return newPosition;
 };
 
-let colorSettings = {
-    snowColor: new BABYLON.Color4(1, 1, 1, 1),
-    steepColor: new BABYLON.Color4(0.2, 0.2, 0.2, 1),
-    plainColor: new BABYLON.Color4(0.5, 0.3, 0.08, 1),
-    //plainColor: new BABYLON.Color4(0.2, 0.6, 0, 1),
+let colorSettings: ColorSettings = {
+    snowColor: [1, 1, 1, 1],
+    steepColor: [0.2, 0.2, 0.2, 1],
+    plainColor: [0.5, 0.3, 0.08, 1],
+    sandColor: [0.5, 0.5, 0, 1],
     plainSteepDotLimit: 0.95,
     snowSteepDotLimit: 0.94,
     iceCapThreshold: 9,
+    waterLevel: 0.32,
 };
 
 function colorFunction(p: number[], n: number[]) {
@@ -113,108 +109,137 @@ function colorFunction(p: number[], n: number[]) {
     } else {
         // if lower region
         if (dot < colorSettings.plainSteepDotLimit) color = colorSettings.steepColor;
-        else color = colorSettings.plainColor;
+        else {
+            if (position.lengthSquared() > (colorSettings.waterLevel / 2 + radius) ** 2) color = colorSettings.plainColor;
+            else if (position.lengthSquared() > ((colorSettings.waterLevel / 2 + radius) * 0.99) ** 2) color = colorSettings.sandColor;
+            else color = colorSettings.steepColor;
+        }
     }
 
     return color;
 }
 
 onmessage = e => {
-    let [
-        taskType,
-        chunkLength,
-        subs,
-        depth,
-        direction,
-        offset,
+    if (e.data.taskType == "buildTask") {
 
-        craters,
-    ] = e.data;
+        let chunkLength = e.data.chunkLength;
+        let subs = e.data.subdivisions;
+        let depth = e.data.depth;
+        let direction = e.data.direction;
+        let offset = e.data.position;
 
-    craterLayers[0].regenerate(craters);
+        //craterLayers[0].regenerate(craters);
 
-    let size = chunkLength / (2 ** depth);
-    let planetRadius = chunkLength / 2;
+        let size = chunkLength / (2 ** depth);
+        let planetRadius = chunkLength / 2;
 
-    let vertices: number[] = [];
-    let faces: number[][] = [];
-    let uvs: number[] = [];
-    let vertexPerLine = subs + 1;
+        let vertices: number[] = [];
+        let faces: number[][] = [];
+        let uvs: number[] = [];
+        let vertexPerLine = subs + 1;
 
-    let rotation = BABYLON.Matrix.Identity();
+        let rotation = BABYLON.Matrix.Identity();
 
-    switch (direction) {
-        case Direction.Up:
-            rotation = BABYLON.Matrix.RotationX(Math.PI / 2);
-            break;
-        case Direction.Down:
-            rotation = BABYLON.Matrix.RotationX(-Math.PI / 2);
-            break;
-        case Direction.Forward:
-            rotation = BABYLON.Matrix.Identity();
-            break;
-        case Direction.Backward:
-            rotation = BABYLON.Matrix.RotationY(Math.PI);
-            break;
-        case Direction.Left:
-            rotation = BABYLON.Matrix.RotationY(-Math.PI / 2);
-            break;
-        case Direction.Right:
-            rotation = BABYLON.Matrix.RotationY(Math.PI / 2);
-            break;
-    }
+        switch (direction) {
+            case Direction.Up:
+                rotation = BABYLON.Matrix.RotationX(Math.PI / 2);
+                break;
+            case Direction.Down:
+                rotation = BABYLON.Matrix.RotationX(-Math.PI / 2);
+                break;
+            case Direction.Forward:
+                rotation = BABYLON.Matrix.Identity();
+                break;
+            case Direction.Backward:
+                rotation = BABYLON.Matrix.RotationY(Math.PI);
+                break;
+            case Direction.Left:
+                rotation = BABYLON.Matrix.RotationY(-Math.PI / 2);
+                break;
+            case Direction.Right:
+                rotation = BABYLON.Matrix.RotationY(Math.PI / 2);
+                break;
+        }
 
-    for (let x = 0; x < vertexPerLine; x++) {
-        for (let y = 0; y < vertexPerLine; y++) {
-            let vertex = new BABYLON.Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
-            vertex = vertex.scale(size);
-            vertex = vertex.add(BABYLON.Vector3.FromArray(offset));
-            vertex = BABYLON.Vector3.TransformCoordinates(vertex, rotation);
-            vertex = vertex.normalizeToNew().scale(planetRadius);
+        for (let x = 0; x < vertexPerLine; x++) {
+            for (let y = 0; y < vertexPerLine; y++) {
+                let vertex = new BABYLON.Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
+                vertex = vertex.scale(size);
+                vertex = vertex.add(BABYLON.Vector3.FromArray(offset));
+                vertex = BABYLON.Vector3.TransformCoordinates(vertex, rotation);
+                vertex = vertex.normalizeToNew().scale(planetRadius);
 
-            vertex = terrainFunction(vertex, noiseLayers, craterLayers);
+                vertex = terrainFunction(vertex, noiseLayers, craterLayers);
 
-            vertices.push(vertex.x, vertex.y, vertex.z);
+                vertices.push(vertex.x, vertex.y, vertex.z);
 
-            uvs.push(x / vertexPerLine, y / vertexPerLine);
+                uvs.push(x / vertexPerLine, y / vertexPerLine);
 
-            if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
-                faces.push([
-                    x * vertexPerLine + y,
-                    x * vertexPerLine + y + 1,
-                    (x + 1) * vertexPerLine + y + 1,
-                    (x + 1) * vertexPerLine + y,
-                ]);
+                if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
+                    faces.push([
+                        x * vertexPerLine + y,
+                        x * vertexPerLine + y + 1,
+                        (x + 1) * vertexPerLine + y + 1,
+                        (x + 1) * vertexPerLine + y,
+                    ]);
+                }
             }
         }
-    }
 
-    let positions = vertices;
-    let indices: number[] = [];
-    let normals: number[] = [];
+        let positions = vertices;
+        let indices: number[] = [];
+        let normals: number[] = [];
 
-    // indices from faces
-    for (let face of faces) {
-        for (let i = 0; i < face.length - 2; i++) {
-            indices.push(face[0], face[i + 2], face[i + 1]);
+        // indices from faces
+        for (let face of faces) {
+            for (let i = 0; i < face.length - 2; i++) {
+                indices.push(face[0], face[i + 2], face[i + 1]);
+            }
         }
+
+        BABYLON.VertexData.ComputeNormals(positions, indices, normals);
+
+        let colors: number[] = [];
+        for (let i = 0; i < positions.length; i += 3) {
+            let color = colorFunction([positions[i], positions[i + 1], positions[i + 2]], [normals[i], normals[i + 1], normals[i + 2]]);
+            //@ts-ignore
+            colors.push(color[0], color[1], color[2], color[3]);
+        }
+
+        let tPositions = new Float64Array(positions.length);
+        tPositions.set(positions);
+
+        let tIndices = new Float64Array(indices.length);
+        tIndices.set(indices);
+
+        let tNormals = new Float64Array(normals.length);
+        tNormals.set(normals);
+
+        let tColors = new Float64Array(colors.length);
+        tColors.set(colors);
+
+        //@ts-ignore
+        postMessage({
+            p: tPositions,
+            i: tIndices,
+            n: tNormals,
+            c: tColors
+            //@ts-ignore
+        }, [tPositions.buffer, tIndices.buffer, tNormals.buffer, tColors.buffer]);
+    } else if (e.data.taskType == "init") {
+        init(e.data);
     }
-
-    BABYLON.VertexData.ComputeNormals(positions, indices, normals);
-
-    let colors: number[] = [];
-    for (let i = 0; i < positions.length; i += 3) {
-        let color = colorFunction([positions[i], positions[i + 1], positions[i + 2]], [normals[i], normals[i + 1], normals[i + 2]]);
-        colors.push(color.r, color.g, color.b, color.a);
-    }
-
-    let vertexData = new BABYLON.VertexData();
-    vertexData.positions = positions;
-    vertexData.indices = indices;
-    vertexData.normals = normals;
-    //vertexData.uvs = uvs;
-    vertexData.colors = colors;
-
-    //@ts-ignore
-    postMessage(vertexData);
 };
+
+function init(data: any) {
+    radius = data.radius;
+
+    craterLayers[0].regenerate(data.craters);
+
+    noiseModifiers = data.noiseModifiers;
+
+    craterModifiers = data.craterModifiers;
+
+    colorSettings = data.colorSettings;
+
+}

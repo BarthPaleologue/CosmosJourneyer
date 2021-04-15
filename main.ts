@@ -1,5 +1,4 @@
-import { NoiseModifiers } from "./components/forge/layers/noiseSettings.js";
-import { Planet } from "./components/planet.old.js";
+import { Planet } from "./components/planet.js";
 import { Slider } from "./SliderJS-main/slider.js";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -10,7 +9,6 @@ let engine = new BABYLON.Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 
 let scene = new BABYLON.Scene(engine);
-scene.collisionsEnabled = true;
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
 
 let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 3, BABYLON.Vector3.Zero(), scene);
@@ -21,10 +19,22 @@ scene.activeCamera = camera;
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
 
-let planet = new Planet("planet", 10, 60, new BABYLON.Vector3(0, 0, 0), scene);
+let planet = new Planet("Gaia", 5, new BABYLON.Vector3(0, 0, 0), 64, 1, scene);
+let waterLevel = 0.85;
+planet.colorSettings = {
+    snowColor: [1, 1, 1, 1],
+    steepColor: [0.2, 0.2, 0.2, 1],
+    plainColor: [0.1, 0.4, 0, 1],
+    sandColor: [0.5, 0.5, 0, 1],
+    plainSteepDotLimit: 0.95,
+    snowSteepDotLimit: 0.94,
+    iceCapThreshold: 15,
+    waterLevel: waterLevel
+};
+planet.updateSettings();
 
-let watersphere = BABYLON.Mesh.CreateSphere("water", 32, 10.05, scene);
-let mat = new BABYLON.StandardMaterial("mat", scene);
+let watersphere = BABYLON.Mesh.CreateSphere("water", 32, 10 + planet.colorSettings.waterLevel, scene);
+let mat = new BABYLON.StandardMaterial("mat2", scene);
 mat.diffuseColor = new BABYLON.Color3(15, 50, 200).scale(1 / 255);
 
 mat.bumpTexture = new BABYLON.Texture("./textures/waterbump.png", scene);
@@ -36,67 +46,71 @@ watersphere.material = mat;
 watersphere.visibility = 0.8;
 
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX")!, 0, 50, 0, (val: number) => {
-    planet.noiseModifiers.offsetModifier.x = val / 10;
-    planet.applyTerrain();
+    planet.noiseModifiers.offsetModifier[0] = val / 10;
+    planet.updateSettings();
+    planet.reset();
 });
 
 new Slider("noiseOffsetY", document.getElementById("noiseOffsetY")!, 0, 50, 0, (val: number) => {
-    planet.noiseModifiers.offsetModifier.y = val / 10;
-    planet.applyTerrain();
+    planet.noiseModifiers.offsetModifier[1] = val / 10;
+    planet.updateSettings();
+    planet.reset();
 });
 
 new Slider("minValue", document.getElementById("minValue")!, 0, 20, 10, (val: number) => {
     planet.noiseModifiers.minValueModifier = val / 10;
-    planet.applyTerrain();
+    planet.updateSettings();
+    planet.reset();
 });
 
 new Slider("oceanLevel", document.getElementById("oceanLevel")!, 0, 10, 5, (val: number) => {
     watersphere.scaling = new BABYLON.Vector3(1, 1, 1).scale(1 + (val - 5) / 100);
+    planet.colorSettings.waterLevel = waterLevel * (1 + (val - 5) / 8);
+    planet.updateSettings();
+    planet.reset();
 });
 
 new Slider("noiseStrength", document.getElementById("noiseStrength")!, 0, 20, 10, (val: number) => {
     planet.noiseModifiers.strengthModifier = val / 10;
-    planet.applyTerrain();
+    planet.updateSettings();
+    planet.reset();
 });
 
 new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 50, 10, (val: number) => {
     planet.noiseModifiers.frequencyModifier = val / 10;
-    planet.applyTerrain();
+    planet.updateSettings();
+    planet.reset();
 });
 
 new Slider("nbCraters", document.getElementById("nbCraters")!, 0, 500, 200, (nbCraters: number) => {
-    planet.regenerateCraters(nbCraters);
-    planet.applyTerrain();
+    //planet.regenerateCraters(nbCraters);
+    planet.updateSettings();
 });
 
 new Slider("craterRadius", document.getElementById("craterRadius")!, 1, 20, 10, (radiusFactor: number) => {
     planet.craterModifiers.radiusModifier = radiusFactor / 10;
-    planet.applyTerrain();
+    planet.updateSettings();
+    planet.reset();
 });
 
 new Slider("craterSteepness", document.getElementById("craterSteepness")!, 1, 20, 10, (steepnessFactor: number) => {
     planet.craterModifiers.steepnessModifier = steepnessFactor / 10;
-    planet.applyTerrain();
+    planet.updateSettings();
+    planet.reset();
 });
 
 new Slider("craterDepth", document.getElementById("craterDepth")!, 1, 20, 10, (depthFactor: number) => {
     planet.craterModifiers.maxDepthModifier = depthFactor / 10;
-    planet.applyTerrain();
+    planet.updateSettings();
+    planet.reset();
 });
 
 document.getElementById("randomCraters")?.addEventListener("click", () => {
-    planet.regenerateCraters();
-    planet.applyTerrain();
+    //planet.regenerateCraters();
+    planet.updateSettings();
 });
 
 let keyboard: { [key: string]: boolean; } = {};
-
-document.addEventListener("keydown", e => {
-    keyboard[e.key] = true;
-    if (e.key == "r") planet.normalize(planet.radius);
-    if (e.key == "w") planet.toggleWireframe();
-    if (e.key == "p") planet.togglePointsCloud();
-});
 
 document.addEventListener("keyup", e => {
     keyboard[e.key] = false;
@@ -110,10 +124,11 @@ window.addEventListener("resize", () => {
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
-
     engine.runRenderLoop(() => {
-        planet.mesh.rotation.y += .002;
-        watersphere.rotation.y += .002;
+        planet.attachNode.rotation.y += .001;
+        watersphere.rotation.y += .001;
+        planet.chunkForge.update();
+        planet.updateLOD(new BABYLON.Vector3(0, 1, 0), camera.getDirection(BABYLON.Axis.Z));
         scene.render();
     });
 });
