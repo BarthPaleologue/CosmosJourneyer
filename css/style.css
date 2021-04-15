@@ -21,6 +21,12 @@ body #ui {
 body #ui p {
   font-family: sans-serif;
   color: white;
+  -webkit-margin-after: 0;
+          margin-block-end: 0;
+}
+
+body #ui .range-slider {
+  margin-top: -5%;
 }
 
 body #ui .button {

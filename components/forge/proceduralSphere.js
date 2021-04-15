@@ -28,6 +28,20 @@ export class ProceduralSphere {
             side.updateLOD(position, facingDirection);
         }
     }
+    setRenderDistanceFactor(renderDistanceFactor) {
+        for (let side of this.sides) {
+            side.renderDistanceFactor = renderDistanceFactor;
+        }
+    }
+    /**
+     * Changes the maximum depth of the quadtrees
+     * @param maxDepth the new maximum depth of the quadtrees
+     */
+    setMaxDepth(maxDepth) {
+        for (let side of this.sides) {
+            side.maxDepth = maxDepth;
+        }
+    }
     /**
      * Regenerates the chunks
      */

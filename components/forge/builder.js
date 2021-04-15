@@ -20,7 +20,7 @@ let barrenBumpyLayer = new NoiseLayer(noiseEngine, {
 });
 let continentsLayer = new NoiseLayer(noiseEngine, {
     noiseStrength: noiseStrength,
-    octaves: 10,
+    octaves: 4,
     baseAmplitude: 1,
     baseFrequency: noiseFrequency,
     decay: 2,

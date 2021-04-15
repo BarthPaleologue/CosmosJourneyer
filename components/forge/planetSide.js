@@ -5,6 +5,7 @@ import { TaskType } from "./chunkForge.js";
  */
 export class PlanetSide {
     constructor(_id, _maxDepth, _chunkLength, _baseSubdivisions, _direction, _parentNode, _scene, _chunkForge) {
+        this.renderDistanceFactor = 3;
         this.id = _id;
         this.maxDepth = _maxDepth;
         this.chunkLength = _chunkLength;
@@ -69,7 +70,7 @@ export class PlanetSide {
         let dot = BABYLON.Vector3.Dot(direction, facingDirection);
         // distance carré entre caméra et noeud du quadtree
         let d = direction.lengthSquared();
-        let limit = 3 * (this.chunkLength / (Math.pow(2, walked.length)));
+        let limit = this.renderDistanceFactor * (this.chunkLength / (Math.pow(2, walked.length)));
         if (d < Math.pow(limit, 2) && walked.length < this.maxDepth) {
             // si on est proche de la caméra
             if (tree instanceof PlanetChunk) {

@@ -10,10 +10,14 @@ let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
 let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 3, BABYLON.Vector3.Zero(), scene);
 camera.setPosition(new BABYLON.Vector3(0, 0, -15));
+camera.wheelPrecision = 10;
 camera.attachControl(canvas);
 scene.activeCamera = camera;
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
 let planet = new Planet("Gaia", 5, new BABYLON.Vector3(0, 0, 0), 64, 1, scene);
+planet.setRenderDistanceFactor(10);
+planet.noiseModifiers.strengthModifier = 0.7;
+planet.noiseModifiers.offsetModifier = [23, 10, 0];
 let waterLevel = 0.85;
 planet.colorSettings = {
     snowColor: [1, 1, 1, 1],
@@ -36,6 +40,13 @@ mat.bumpTexture.uScale = 10;
 mat.bumpTexture.vScale = 10;
 watersphere.material = mat;
 watersphere.visibility = 0.8;
+let rotationSpeedFactor = 1;
+new Slider("rotationSpeed", document.getElementById("rotationSpeed"), 0, 10, 1, (val) => {
+    rotationSpeedFactor = Math.pow(val, 2);
+});
+new Slider("maxDepth", document.getElementById("maxDepth"), 0, 5, 1, (val) => {
+    planet.setMaxDepth(val);
+});
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX"), 0, 50, 0, (val) => {
     planet.noiseModifiers.offsetModifier[0] = val / 10;
     planet.updateSettings();
@@ -43,6 +54,11 @@ new Slider("noiseOffsetX", document.getElementById("noiseOffsetX"), 0, 50, 0, (v
 });
 new Slider("noiseOffsetY", document.getElementById("noiseOffsetY"), 0, 50, 0, (val) => {
     planet.noiseModifiers.offsetModifier[1] = val / 10;
+    planet.updateSettings();
+    planet.reset();
+});
+new Slider("noiseOffsetZ", document.getElementById("noiseOffsetZ"), 0, 50, 0, (val) => {
+    planet.noiseModifiers.offsetModifier[2] = val / 10;
     planet.updateSettings();
     planet.reset();
 });
@@ -57,7 +73,7 @@ new Slider("oceanLevel", document.getElementById("oceanLevel"), 0, 10, 5, (val) 
     planet.updateSettings();
     planet.reset();
 });
-new Slider("noiseStrength", document.getElementById("noiseStrength"), 0, 20, 10, (val) => {
+new Slider("noiseStrength", document.getElementById("noiseStrength"), 0, 20, planet.noiseModifiers.strengthModifier * 10, (val) => {
     planet.noiseModifiers.strengthModifier = val / 10;
     planet.updateSettings();
     planet.reset();
@@ -102,10 +118,10 @@ window.addEventListener("resize", () => {
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
-        planet.attachNode.rotation.y += .001;
-        watersphere.rotation.y += .001;
+        planet.attachNode.rotation.y += .001 * rotationSpeedFactor;
+        watersphere.rotation.y += .001 * rotationSpeedFactor;
         planet.chunkForge.update();
-        planet.updateLOD(new BABYLON.Vector3(0, 1, 0), camera.getDirection(BABYLON.Axis.Z));
+        planet.updateLOD(BABYLON.Vector3.Zero(), camera.getDirection(BABYLON.Axis.Z));
         scene.render();
     });
 });

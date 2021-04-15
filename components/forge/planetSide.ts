@@ -14,11 +14,13 @@ export class PlanetSide {
     // le quadtree
     maxDepth: number; // profondeur maximale du quadtree envisagé
     tree: quadTree; // le quadtree en question
+    renderDistanceFactor = 3;
 
     // les chunks
     chunkLength: number; // taille du côté de base
     baseSubdivisions: number; // nombre de subdivisions
     direction: Direction; // direction de la normale au plan
+
     parent: BABYLON.Mesh; // objet parent des chunks
     scene: BABYLON.Scene; // scène dans laquelle instancier les chunks
 
@@ -96,7 +98,7 @@ export class PlanetSide {
         let dot = BABYLON.Vector3.Dot(direction, facingDirection);
         // distance carré entre caméra et noeud du quadtree
         let d = direction.lengthSquared();
-        let limit = 3 * (this.chunkLength / (2 ** walked.length));
+        let limit = this.renderDistanceFactor * (this.chunkLength / (2 ** walked.length));
 
         if (d < limit ** 2 && walked.length < this.maxDepth) {
             // si on est proche de la caméra
