@@ -12,6 +12,8 @@ export class ProceduralSphere {
 
     chunkForge: ChunkForge; // le CEO du terrain, tout simplement
 
+    surfaceMaterial: BABYLON.ShaderMaterial;
+
     constructor(_id: string, _radius: number, position: BABYLON.Vector3, nbSubdivisions: number, maxDepth: number, scene: BABYLON.Scene) {
         this.id = _id;
         this.radius = _radius;
@@ -20,16 +22,29 @@ export class ProceduralSphere {
         this.attachNode = BABYLON.Mesh.CreatePlane(`${this.id}AttachNode`, 1, scene);
         this.attachNode.position = position;
 
+        this.surfaceMaterial = new BABYLON.ShaderMaterial(`${this.id}BaseMaterial`, scene, "");
+
         this.chunkForge = new ChunkForge(this.chunkLength, nbSubdivisions, scene);
 
         this.sides = [
-            new PlanetSide(`${this.id}UpSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Up, this.attachNode, scene, this.chunkForge),
-            new PlanetSide(`${this.id}DownSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Down, this.attachNode, scene, this.chunkForge),
-            new PlanetSide(`${this.id}ForwardSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Forward, this.attachNode, scene, this.chunkForge),
-            new PlanetSide(`${this.id}BackwardSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Backward, this.attachNode, scene, this.chunkForge),
-            new PlanetSide(`${this.id}RightSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Right, this.attachNode, scene, this.chunkForge),
-            new PlanetSide(`${this.id}LeftSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Left, this.attachNode, scene, this.chunkForge),
+            new PlanetSide(`${this.id}UpSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Up, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
+            new PlanetSide(`${this.id}DownSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Down, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
+            new PlanetSide(`${this.id}ForwardSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Forward, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
+            new PlanetSide(`${this.id}BackwardSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Backward, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
+            new PlanetSide(`${this.id}RightSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Right, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
+            new PlanetSide(`${this.id}LeftSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Left, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
         ];
+    }
+
+    /**
+     * Sets the material used on the chunks
+     * @param material 
+     */
+    setChunkMaterial(material: BABYLON.ShaderMaterial) {
+        this.surfaceMaterial = material;
+        for (let side of this.sides) {
+            side.setChunkMaterial(material);
+        }
     }
 
     /**

@@ -3,7 +3,6 @@ import { Direction } from "./direction.js";
 import { CraterLayer } from "./layers/craterLayer.js";
 import { NoiseLayer } from "./layers/noiseLayer.js";
 import { NoiseEngine } from "../../engine/perlin.js";
-import { ColorSettings } from "../planet.js";
 
 let noiseEngine = new NoiseEngine();
 noiseEngine.seed(69);
@@ -83,41 +82,6 @@ let terrainFunction = (p: BABYLON.Vector3, noiseLayers: NoiseLayer[], craterLaye
     let newPosition = p.add(coords.normalizeToNew().scale(elevation * noiseStrength));
     return newPosition;
 };
-
-let colorSettings: ColorSettings = {
-    snowColor: [1, 1, 1, 1],
-    steepColor: [0.2, 0.2, 0.2, 1],
-    plainColor: [0.5, 0.3, 0.08, 1],
-    sandColor: [0.5, 0.5, 0, 1],
-    plainSteepDotLimit: 0.95,
-    snowSteepDotLimit: 0.94,
-    iceCapThreshold: 9,
-    waterLevel: 0.32,
-};
-
-function colorFunction(p: number[], n: number[]) {
-    let position = BABYLON.Vector3.FromArray(p);
-    let positionN = position.normalizeToNew();
-    let normal = BABYLON.Vector3.FromArray(n);
-    let dot = BABYLON.Vector3.Dot(positionN, normal);
-    let color;
-
-    if (position.lengthSquared() > (radius * (1 + colorSettings.iceCapThreshold / 100 - positionN.y ** 20)) ** 2) {
-        // if mountains region (you need to be higher at the equator)
-        if (dot > colorSettings.snowSteepDotLimit) color = colorSettings.snowColor;
-        else color = colorSettings.steepColor;
-    } else {
-        // if lower region
-        if (dot < colorSettings.plainSteepDotLimit) color = colorSettings.steepColor;
-        else {
-            if (position.lengthSquared() > (colorSettings.waterLevel / 2 + radius) ** 2) color = colorSettings.plainColor;
-            else if (position.lengthSquared() > ((colorSettings.waterLevel / 2 + radius) * 0.99) ** 2) color = colorSettings.sandColor;
-            else color = colorSettings.steepColor;
-        }
-    }
-
-    return color;
-}
 
 onmessage = e => {
     if (e.data.taskType == "buildTask") {
@@ -199,13 +163,6 @@ onmessage = e => {
 
         BABYLON.VertexData.ComputeNormals(positions, indices, normals);
 
-        let colors: number[] = [];
-        for (let i = 0; i < positions.length; i += 3) {
-            let color = colorFunction([positions[i], positions[i + 1], positions[i + 2]], [normals[i], normals[i + 1], normals[i + 2]]);
-            //@ts-ignore
-            colors.push(color[0], color[1], color[2], color[3]);
-        }
-
         let tPositions = new Float64Array(positions.length);
         tPositions.set(positions);
 
@@ -215,17 +172,13 @@ onmessage = e => {
         let tNormals = new Float64Array(normals.length);
         tNormals.set(normals);
 
-        let tColors = new Float64Array(colors.length);
-        tColors.set(colors);
-
         //@ts-ignore
         postMessage({
             p: tPositions,
             i: tIndices,
             n: tNormals,
-            c: tColors
             //@ts-ignore
-        }, [tPositions.buffer, tIndices.buffer, tNormals.buffer, tColors.buffer]);
+        }, [tPositions.buffer, tIndices.buffer, tNormals.buffer]);
     } else if (e.data.taskType == "init") {
         init(e.data);
     }
@@ -239,7 +192,4 @@ function init(data: any) {
     noiseModifiers = data.noiseModifiers;
 
     craterModifiers = data.craterModifiers;
-
-    colorSettings = data.colorSettings;
-
 }

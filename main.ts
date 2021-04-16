@@ -26,16 +26,16 @@ planet.noiseModifiers.strengthModifier = 0.7;
 planet.noiseModifiers.offsetModifier = [23, 10, 0];
 let waterLevel = 0.85;
 planet.colorSettings = {
-    snowColor: [1, 1, 1, 1],
-    steepColor: [0.2, 0.2, 0.2, 1],
-    plainColor: [0.1, 0.4, 0, 1],
-    sandColor: [0.5, 0.5, 0, 1],
+    snowColor: new BABYLON.Vector4(1, 1, 1, 1),
+    steepColor: new BABYLON.Vector4(0.2, 0.2, 0.2, 1),
+    plainColor: new BABYLON.Vector4(0.1, 0.4, 0, 1),
+    sandColor: new BABYLON.Vector4(0.5, 0.5, 0, 1),
     plainSteepDotLimit: 0.95,
     snowSteepDotLimit: 0.94,
-    iceCapThreshold: 15,
+    iceCapThreshold: 20,
     waterLevel: waterLevel
 };
-planet.updateSettings();
+planet.updateColors();
 
 let watersphere = BABYLON.Mesh.CreateSphere("water", 32, 10 + planet.colorSettings.waterLevel, scene);
 let mat = new BABYLON.StandardMaterial("mat2", scene);
@@ -86,8 +86,12 @@ new Slider("minValue", document.getElementById("minValue")!, 0, 20, 10, (val: nu
 new Slider("oceanLevel", document.getElementById("oceanLevel")!, 0, 10, 5, (val: number) => {
     watersphere.scaling = new BABYLON.Vector3(1, 1, 1).scale(1 + (val - 5) / 100);
     planet.colorSettings.waterLevel = waterLevel * (1 + (val - 5) / 8);
-    planet.updateSettings();
-    planet.reset();
+    planet.updateColors();
+});
+
+new Slider("snowThreshold", document.getElementById("snowThreshold")!, 0, 40, planet.colorSettings.iceCapThreshold, (val: number) => {
+    planet.colorSettings.iceCapThreshold = val;
+    planet.updateColors();
 });
 
 new Slider("noiseStrength", document.getElementById("noiseStrength")!, 0, 20, planet.noiseModifiers.strengthModifier * 10, (val: number) => {
@@ -149,7 +153,7 @@ scene.executeWhenReady(() => {
         watersphere.rotation.y += .001 * rotationSpeedFactor;
 
         planet.chunkForge.update();
-        planet.updateLOD(BABYLON.Vector3.Zero(), camera.getDirection(BABYLON.Axis.Z));
+        planet.update(BABYLON.Vector3.Zero(), camera.getDirection(BABYLON.Axis.Z), light.position);
 
         scene.render();
     });

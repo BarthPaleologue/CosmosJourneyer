@@ -67,7 +67,7 @@ export class ChunkForge {
         }
         this.scene = _scene;
     }
-    setPlanet(radius: number, craters: Crater[], noiseModifiers: NoiseModifiers, craterModifiers: CraterModifiers, colorSettings: ColorSettings) {
+    setPlanet(radius: number, craters: Crater[], noiseModifiers: NoiseModifiers, craterModifiers: CraterModifiers) {
         for (let builder of this.builders) {
             builder.postMessage({
                 taskType: "init",
@@ -75,7 +75,6 @@ export class ChunkForge {
                 craters: craters,
                 noiseModifiers: noiseModifiers,
                 craterModifiers: craterModifiers,
-                colorSettings: colorSettings,
             });
         }
     }
@@ -112,7 +111,6 @@ export class ChunkForge {
                     vertexData.positions = Array.from(e.data.p);
                     vertexData.indices = Array.from(e.data.i);
                     vertexData.normals = Array.from(e.data.n);
-                    vertexData.colors = Array.from(e.data.c);
 
                     this.applyTasks.push({
                         id: task.id,
@@ -147,7 +145,6 @@ export class ChunkForge {
         for (let i = 0; i < n; i++) {
             if (this.trashCan.length > 0) {
                 let task = this.trashCan.shift()!;
-                task.mesh.material?.dispose();
                 task.mesh.dispose();
             }
         }

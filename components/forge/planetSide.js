@@ -4,7 +4,7 @@ import { TaskType } from "./chunkForge.js";
  * Un PlanetSide est un plan généré procéduralement qui peut être morph à volonté
  */
 export class PlanetSide {
-    constructor(_id, _maxDepth, _chunkLength, _baseSubdivisions, _direction, _parentNode, _scene, _chunkForge) {
+    constructor(_id, _maxDepth, _chunkLength, _baseSubdivisions, _direction, _parentNode, _scene, _chunkForge, _surfaceMaterial) {
         this.renderDistanceFactor = 3;
         this.id = _id;
         this.maxDepth = _maxDepth;
@@ -14,6 +14,7 @@ export class PlanetSide {
         this.parent = _parentNode;
         this.scene = _scene;
         this.chunkForge = _chunkForge;
+        this.surfaceMaterial = _surfaceMaterial;
         // on initialise le plan avec un unique chunk
         this.tree = this.createChunk([]);
     }
@@ -113,7 +114,10 @@ export class PlanetSide {
      * @returns The new Chunk
      */
     createChunk(path) {
-        return new PlanetChunk(path, this.chunkLength, this.baseSubdivisions, this.direction, this.parent, this.scene, this.chunkForge);
+        return new PlanetChunk(path, this.chunkLength, this.baseSubdivisions, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial);
+    }
+    setChunkMaterial(material) {
+        this.surfaceMaterial = material;
     }
     reset() {
         let newTree = this.createChunk([]);

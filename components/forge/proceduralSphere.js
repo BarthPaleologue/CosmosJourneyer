@@ -9,15 +9,26 @@ export class ProceduralSphere {
         this.chunkLength = this.radius * 2;
         this.attachNode = BABYLON.Mesh.CreatePlane(`${this.id}AttachNode`, 1, scene);
         this.attachNode.position = position;
+        this.surfaceMaterial = new BABYLON.ShaderMaterial(`${this.id}BaseMaterial`, scene, "");
         this.chunkForge = new ChunkForge(this.chunkLength, nbSubdivisions, scene);
         this.sides = [
-            new PlanetSide(`${this.id}UpSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Up, this.attachNode, scene, this.chunkForge),
-            new PlanetSide(`${this.id}DownSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Down, this.attachNode, scene, this.chunkForge),
-            new PlanetSide(`${this.id}ForwardSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Forward, this.attachNode, scene, this.chunkForge),
-            new PlanetSide(`${this.id}BackwardSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Backward, this.attachNode, scene, this.chunkForge),
-            new PlanetSide(`${this.id}RightSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Right, this.attachNode, scene, this.chunkForge),
-            new PlanetSide(`${this.id}LeftSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Left, this.attachNode, scene, this.chunkForge),
+            new PlanetSide(`${this.id}UpSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Up, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
+            new PlanetSide(`${this.id}DownSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Down, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
+            new PlanetSide(`${this.id}ForwardSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Forward, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
+            new PlanetSide(`${this.id}BackwardSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Backward, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
+            new PlanetSide(`${this.id}RightSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Right, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
+            new PlanetSide(`${this.id}LeftSide`, maxDepth, this.chunkLength, nbSubdivisions, Direction.Left, this.attachNode, scene, this.chunkForge, this.surfaceMaterial),
         ];
+    }
+    /**
+     * Sets the material used on the chunks
+     * @param material
+     */
+    setChunkMaterial(material) {
+        this.surfaceMaterial = material;
+        for (let side of this.sides) {
+            side.setChunkMaterial(material);
+        }
     }
     /**
      * Update terrain of the sphere relative to the observer position

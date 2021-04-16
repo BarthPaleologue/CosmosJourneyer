@@ -27,7 +27,9 @@ export class PlanetSide {
     // Le CEO des chunks
     chunkForge: ChunkForge;
 
-    constructor(_id: string, _maxDepth: number, _chunkLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, _scene: BABYLON.Scene, _chunkForge: ChunkForge) {
+    surfaceMaterial: BABYLON.Material;
+
+    constructor(_id: string, _maxDepth: number, _chunkLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, _scene: BABYLON.Scene, _chunkForge: ChunkForge, _surfaceMaterial: BABYLON.Material) {
         this.id = _id;
 
         this.maxDepth = _maxDepth;
@@ -39,6 +41,8 @@ export class PlanetSide {
         this.scene = _scene;
 
         this.chunkForge = _chunkForge;
+
+        this.surfaceMaterial = _surfaceMaterial;
 
         // on initialise le plan avec un unique chunk
         this.tree = this.createChunk([]);
@@ -140,7 +144,11 @@ export class PlanetSide {
      * @returns The new Chunk
      */
     createChunk(path: number[]): PlanetChunk {
-        return new PlanetChunk(path, this.chunkLength, this.baseSubdivisions, this.direction, this.parent, this.scene, this.chunkForge);
+        return new PlanetChunk(path, this.chunkLength, this.baseSubdivisions, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial);
+    }
+
+    setChunkMaterial(material: BABYLON.Material) {
+        this.surfaceMaterial = material;
     }
 
     reset() {

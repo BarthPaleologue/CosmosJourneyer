@@ -5,10 +5,10 @@ import { CraterModifiers } from "./forge/layers/craterModifiers.js";
 import { NoiseModifiers } from "./forge/layers/noiseSettings.js";
 
 export interface ColorSettings {
-    snowColor: number[],
-    steepColor: number[],
-    plainColor: number[],
-    sandColor: number[],
+    snowColor: BABYLON.Vector4,
+    steepColor: BABYLON.Vector4,
+    plainColor: BABYLON.Vector4,
+    sandColor: BABYLON.Vector4,
     plainSteepDotLimit: number,
     snowSteepDotLimit: number,
     iceCapThreshold: number,
@@ -51,10 +51,10 @@ export class Planet extends ProceduralSphere {
         };
 
         this.colorSettings = {
-            snowColor: [1, 1, 1, 1],
-            steepColor: [0.2, 0.2, 0.2, 1],
-            plainColor: [0.5, 0.3, 0.08, 1],
-            sandColor: [0.5, 0.5, 0, 1],
+            snowColor: new BABYLON.Vector4(1, 1, 1, 1),
+            steepColor: new BABYLON.Vector4(0.2, 0.2, 0.2, 1),
+            plainColor: new BABYLON.Vector4(0.5, 0.3, 0.08, 1),
+            sandColor: new BABYLON.Vector4(0.5, 0.5, 0, 1),
             plainSteepDotLimit: 0.95,
             snowSteepDotLimit: 0.94,
             iceCapThreshold: 9,
@@ -64,10 +64,40 @@ export class Planet extends ProceduralSphere {
         this.craters = this.generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
 
         this.updateSettings();
+
+        let surfaceMaterial = new BABYLON.ShaderMaterial("surfaceColor", _scene, "./shaders/surfaceColor",
+            {
+                attributes: ["position", "normal"],
+                uniforms: ["world", "worldViewProjection"]
+            });
+
+        surfaceMaterial.setVector3("v3CameraPos", BABYLON.Vector3.Zero());
+        surfaceMaterial.setVector3("v3LightPos", BABYLON.Vector3.Zero());
+
+        this.setChunkMaterial(surfaceMaterial);
+
+        this.updateColors();
+    }
+
+    updateColors() {
+        this.surfaceMaterial.setFloat("planetRadius", this.radius);
+        this.surfaceMaterial.setFloat("iceCapThreshold", this.colorSettings.iceCapThreshold);
+        this.surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.snowSteepDotLimit);
+        this.surfaceMaterial.setFloat("waterLevel", this.colorSettings.waterLevel);
+        this.surfaceMaterial.setVector4("snowColor", this.colorSettings.snowColor);
+        this.surfaceMaterial.setVector4("steepColor", this.colorSettings.steepColor);
+        this.surfaceMaterial.setVector4("plainColor", this.colorSettings.plainColor);
+        this.surfaceMaterial.setVector4("sandColor", this.colorSettings.sandColor);
+    }
+
+    update(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3) {
+        this.surfaceMaterial.setVector3("v3CameraPos", position);
+        this.surfaceMaterial.setVector3("v3LightPos", lightPosition);
+        this.updateLOD(position, facingDirection);
     }
 
     updateSettings() {
-        this.chunkForge.setPlanet(this.radius, this.craters, this.noiseModifiers, this.craterModifiers, this.colorSettings);
+        this.chunkForge.setPlanet(this.radius, this.craters, this.noiseModifiers, this.craterModifiers);
     }
 
     generateCraters(n: number, _radius: number, _steepness: number, _maxDepth: number) {

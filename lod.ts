@@ -25,10 +25,6 @@ let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
 const radius = 10;
 freeCamera.maxZ = Math.max(2000 * radius, 1000);
 
-let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 5, scene);
-planet.colorSettings.sandColor = planet.colorSettings.steepColor;
-planet.updateSettings();
-
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 2, scene);
 sun.position.z = radius;
 sun.position.x = radius * 5;
@@ -36,6 +32,11 @@ let mat = new BABYLON.StandardMaterial("mat", scene);
 mat.emissiveTexture = new BABYLON.Texture("./textures/sun.jpg", scene);
 sun.material = mat;
 light.parent = sun;
+
+
+let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 5, scene);
+planet.colorSettings.sandColor = planet.colorSettings.steepColor;
+planet.updateColors();
 
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
 
@@ -68,9 +69,12 @@ scene.executeWhenReady(() => {
     scene.beforeRender = () => {
         let forward = freeCamera.getDirection(BABYLON.Axis.Z);
 
+        //surfaceMaterial.setVector3("v3CameraPos", freeCamera.position);
+        //surfaceMaterial.setVector3("v3LightPos", sun.position);
+
         planet.chunkForge.update();
 
-        planet.updateLOD(freeCamera.position, forward);
+        planet.update(freeCamera.position, forward, sun.position);
         planet.attachNode.rotation.y += 0.0002;
     };
 

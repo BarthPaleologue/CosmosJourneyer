@@ -93,7 +93,7 @@ export class PlanetChunk {
     parentNode: BABYLON.Mesh; // point d'attache planétaire
     position: BABYLON.Vector3; // position dans l'espace de la sphère (rotation non prise en compte)
 
-    constructor(_path: number[], _chunkLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge) {
+    constructor(_path: number[], _chunkLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material) {
         this.id = `[D${_direction}][P${_path.join("")}]`;
         this.path = _path;
         this.chunkLength = _chunkLength;
@@ -106,6 +106,7 @@ export class PlanetChunk {
         this.position.addInPlace(new BABYLON.Vector3(0, 0, -this.chunkLength / 2));
 
         this.mesh = new BABYLON.Mesh(`Chunk${this.id}`, scene);
+        this.mesh.material = surfaceMaterial;
         this.mesh.parent = this.parentNode;
 
         chunkForge.addTask({
@@ -143,12 +144,9 @@ export class PlanetChunk {
 
         this.position = BABYLON.Vector3.TransformCoordinates(this.position, rotation);
 
-        let mat = new BABYLON.StandardMaterial(`mat${this.path}`, scene);
-        //mat.wireframe = true;
-        //mat.emissiveColor = BABYLON.Color3.Random();
-        //mat.diffuseColor = new BABYLON.Color3(0.5, 0.3, 0.08);
-        mat.specularColor = new BABYLON.Color3(1, 1, 1).scale(0.1);
-        this.mesh.material = mat;
+        //console.log(surfaceMaterial);
+
+        //this.mesh.material = surfaceMaterial;
 
     }
 }

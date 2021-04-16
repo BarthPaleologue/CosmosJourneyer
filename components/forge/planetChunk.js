@@ -71,7 +71,7 @@ export function getChunkSphereSpacePositionFromPath(chunkLength, path, direction
     return BABYLON.Vector3.TransformCoordinates(position, rotation);
 }
 export class PlanetChunk {
-    constructor(_path, _chunkLength, _baseSubdivisions, _direction, _parentNode, scene, chunkForge) {
+    constructor(_path, _chunkLength, _baseSubdivisions, _direction, _parentNode, scene, chunkForge, surfaceMaterial) {
         // coordonnées sur le plan
         this.x = 0;
         this.y = 0;
@@ -85,6 +85,7 @@ export class PlanetChunk {
         this.position = getChunkPlaneSpacePositionFromPath(this.chunkLength, this.path);
         this.position.addInPlace(new BABYLON.Vector3(0, 0, -this.chunkLength / 2));
         this.mesh = new BABYLON.Mesh(`Chunk${this.id}`, scene);
+        this.mesh.material = surfaceMaterial;
         this.mesh.parent = this.parentNode;
         chunkForge.addTask({
             taskType: TaskType.Build,
@@ -117,11 +118,7 @@ export class PlanetChunk {
                 break;
         }
         this.position = BABYLON.Vector3.TransformCoordinates(this.position, rotation);
-        let mat = new BABYLON.StandardMaterial(`mat${this.path}`, scene);
-        //mat.wireframe = true;
-        //mat.emissiveColor = BABYLON.Color3.Random();
-        //mat.diffuseColor = new BABYLON.Color3(0.5, 0.3, 0.08);
-        mat.specularColor = new BABYLON.Color3(1, 1, 1).scale(0.1);
-        this.mesh.material = mat;
+        //console.log(surfaceMaterial);
+        //this.mesh.material = surfaceMaterial;
     }
 }
