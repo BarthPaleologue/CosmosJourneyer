@@ -27,7 +27,8 @@ planet.colorSettings = {
     plainSteepDotLimit: 0.95,
     snowSteepDotLimit: 0.94,
     iceCapThreshold: 20,
-    waterLevel: waterLevel
+    waterLevel: waterLevel,
+    sandSize: 1,
 };
 planet.updateColors();
 let watersphere = BABYLON.Mesh.CreateSphere("water", 32, 10 + planet.colorSettings.waterLevel, scene);
@@ -67,9 +68,13 @@ new Slider("minValue", document.getElementById("minValue"), 0, 20, 10, (val) => 
     planet.updateSettings();
     planet.reset();
 });
-new Slider("oceanLevel", document.getElementById("oceanLevel"), 0, 10, 5, (val) => {
+new Slider("oceanLevel", document.getElementById("oceanLevel"), 0, 15, 5, (val) => {
     watersphere.scaling = new BABYLON.Vector3(1, 1, 1).scale(1 + (val - 5) / 100);
     planet.colorSettings.waterLevel = waterLevel * (1 + (val - 5) / 8);
+    planet.updateColors();
+});
+new Slider("sandSize", document.getElementById("sandSize"), 0, 40, planet.colorSettings.sandSize, (val) => {
+    planet.colorSettings.sandSize = val;
     planet.updateColors();
 });
 new Slider("snowThreshold", document.getElementById("snowThreshold"), 0, 40, planet.colorSettings.iceCapThreshold, (val) => {

@@ -13,6 +13,7 @@ export interface ColorSettings {
     snowSteepDotLimit: number,
     iceCapThreshold: number,
     waterLevel: number,
+    sandSize: number,
 }
 
 export class Planet extends ProceduralSphere {
@@ -58,7 +59,8 @@ export class Planet extends ProceduralSphere {
             plainSteepDotLimit: 0.95,
             snowSteepDotLimit: 0.94,
             iceCapThreshold: 9,
-            waterLevel: 0.32
+            waterLevel: 0.32,
+            sandSize: 1,
         };
 
         this.craters = this.generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
@@ -84,6 +86,8 @@ export class Planet extends ProceduralSphere {
         this.surfaceMaterial.setFloat("iceCapThreshold", this.colorSettings.iceCapThreshold);
         this.surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.snowSteepDotLimit);
         this.surfaceMaterial.setFloat("waterLevel", this.colorSettings.waterLevel);
+        this.surfaceMaterial.setFloat("sandSize", this.colorSettings.sandSize);
+
         this.surfaceMaterial.setVector4("snowColor", this.colorSettings.snowColor);
         this.surfaceMaterial.setVector4("steepColor", this.colorSettings.steepColor);
         this.surfaceMaterial.setVector4("plainColor", this.colorSettings.plainColor);

@@ -61,6 +61,36 @@ scene.executeWhenReady(() => {
         let upward = freeCamera.getDirection(BABYLON.Axis.Y);
         let right = freeCamera.getDirection(BABYLON.Axis.X);
         let speed = 0.0002 * radius;
+        if (keyboard["a"]) { // rotation autour de l'axe de déplacement
+            let rotation = BABYLON.Matrix.RotationAxis(forward, 0.005);
+            upward = BABYLON.Vector3.TransformCoordinates(upward, rotation);
+            freeCamera.upVector = upward;
+        }
+        else if (keyboard["e"]) {
+            let rotation = BABYLON.Matrix.RotationAxis(forward, -0.005);
+            upward = BABYLON.Vector3.TransformCoordinates(upward, rotation);
+            freeCamera.upVector = upward;
+        }
+        if (keyboard["j"]) { // rotation autour du up vector
+            let rotation = BABYLON.Matrix.RotationAxis(upward, -0.005);
+            forward = BABYLON.Vector3.TransformCoordinates(forward, rotation);
+            freeCamera.setTarget(forward);
+        }
+        else if (keyboard["l"]) {
+            let rotation = BABYLON.Matrix.RotationAxis(upward, 0.005);
+            forward = BABYLON.Vector3.TransformCoordinates(forward, rotation);
+            freeCamera.setTarget(forward);
+        }
+        if (keyboard["i"]) { // rotation autour du vecteur de droite
+            let rotation = BABYLON.Matrix.RotationAxis(right, -0.005);
+            forward = BABYLON.Vector3.TransformCoordinates(forward, rotation);
+            freeCamera.setTarget(forward);
+        }
+        else if (keyboard["k"]) {
+            let rotation = BABYLON.Matrix.RotationAxis(right, 0.005);
+            forward = BABYLON.Vector3.TransformCoordinates(forward, rotation);
+            freeCamera.setTarget(forward);
+        }
         let deplacement = BABYLON.Vector3.Zero();
         if (keyboard["z"])
             deplacement.subtractInPlace(forward.scale(speed * engine.getDeltaTime()));

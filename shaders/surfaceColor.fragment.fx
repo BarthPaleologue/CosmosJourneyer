@@ -15,6 +15,7 @@ uniform float planetRadius; // planet radius
 uniform float iceCapThreshold; // controls snow minimum spawn altitude
 uniform float steepSnowDotLimit; // controls snow maximum spawn steepness
 uniform float waterLevel; // controls sand layer
+uniform float sandSize;
 
 uniform vec4 snowColor; // the color of the snow layer
 uniform vec4 steepColor; // the color of steep slopes
@@ -65,6 +66,13 @@ void main(void) {
 
 	float ndl = max(0., dot(vNormalW, lightRay)); // dimming factor due to light inclination relative to vertex normal in world space
 
+	// specular
+	vec3 angleW = normalize(viewDirectionW + lightRay);
+    float specComp = max(0., dot(vNormalW, angleW));
+    specComp = pow(specComp, max(1., 64.)) * 2.;
+
+
+
 	float d = dot(normVPos, normVNorm); // represents the steepness of the slope at a given vertex
 
 	if (length(vPosition) > (planetRadius*(1. + (iceCapThreshold / 100.) - pow(pow(normVPos.y, 8.), 2.)))) {
@@ -75,10 +83,10 @@ void main(void) {
         // if lower region
         if (d < 0.94) color = steepColor; // apply steep color
         else {
-			if(length(vPosition) > planetRadius + waterLevel / 2.) {
+			if(length(vPosition) > (1. + sandSize/1000.) * (planetRadius + waterLevel / 2.)) {
 				// if above water level
 				color = plainColor; // it's a plain
-			} else if(length (vPosition) > 0.98 * (planetRadius + waterLevel / 2.)) {
+			} else if(length (vPosition) > (1. - sandSize/1000.) * (planetRadius + waterLevel / 2.)) {
 				// if it's just above water level
 				color = sandColor;
 			} else {
@@ -87,5 +95,5 @@ void main(void) {
 			}
         }
     }
-	gl_FragColor = vec4(color.rgb * ndl,1.0); // apply color and lighting
+	gl_FragColor = vec4(color.rgb * ndl + vec3(specComp) * 0.1,1.0); // apply color and lighting
 }
