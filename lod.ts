@@ -1,3 +1,4 @@
+import { AtmosphericScatteringPostProcess } from "./atmosphericScattering.js";
 import { Planet } from "./components/planet.js";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -39,6 +40,8 @@ planet.colorSettings.sandColor = planet.colorSettings.steepColor;
 planet.updateColors();
 
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
+
+let postProcess = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius, radius * 1.5, sun, freeCamera);
 
 let keyboard: { [key: string]: boolean; } = {};
 

@@ -109,6 +109,6 @@ export class ChunkForge {
             this.executeNextTask();
         }
         this.executeNextApplyTask();
-        this.emptyTrashCan(32);
+        this.emptyTrashCan(1);
     }
 }
