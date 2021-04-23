@@ -7,7 +7,8 @@ let engine = new BABYLON.Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
-let freeCamera = new BABYLON.ArcRotateCamera("freeCamera", Math.PI / 2, Math.PI / 3, 200, new BABYLON.Vector3(0, 0, 0), scene);
+//let freeCamera = new BABYLON.ArcRotateCamera("freeCamera", Math.PI / 2, Math.PI / 3, 200, new BABYLON.Vector3(0, 0, 0), scene);
+let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, -200), scene);
 freeCamera.attachControl(canvas);
 scene.activeCamera = freeCamera;
 let depth_renderer = scene.enableDepthRenderer();
@@ -28,7 +29,7 @@ mat.emissiveTexture = new BABYLON.Texture("./textures/night2.jpg", scene);
 cube.material = mat;
 cube.position.y = 0;
 cube.rotation.x = Math.PI;
-freeCamera.setTarget(cube);
+//freeCamera.setTarget(cube);
 let postProcess = new AtmosphericScatteringPostProcess("atmosphere", cube, diameter / 2, atmDiameter / 2, sun, freeCamera);
 new Slider("intensity", document.getElementById("intensity"), 0, 40, 10, (val) => {
     postProcess.modifiers.intensityModifier = val / 10;

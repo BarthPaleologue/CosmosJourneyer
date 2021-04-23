@@ -12,17 +12,22 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
 
     modifiers: AtmosphereModifiers;
 
-    constructor(name: string, mesh: BABYLON.Mesh, meshRadius: number, atmosphereRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera) {
-        super(name, "./shaders/atmosphericScattering", [
+    constructor(name: string, mesh: BABYLON.Mesh, meshRadius: number, atmosphereRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.TargetCamera) {
+        super(name, "./shaders/simplifiedScattering", [
             "sunPosition",
 
             "cameraPosition",
 
             "camTransform",
+            "projection",
+            "view",
+            "camDir",
 
             "planetPosition",
             "planetRadius",
             "atmosphereRadius",
+
+            "depthData",
 
             "intensityModifier",
             "betaRayleighModifier",
@@ -31,6 +36,9 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
             "rayleighScaleModifier",
             "mieScaleModifier"
         ], null, 1, camera);
+
+        let scene = camera.getScene();
+        let depth = scene.enableDepthRenderer();
 
         this.modifiers = {
             intensityModifier: 1,
@@ -48,6 +56,11 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
             effect.setVector3("cameraPosition", camera.position);
 
             effect.setMatrix("camTransform", camera.getTransformationMatrix());
+            effect.setMatrix("projection", camera.getProjectionMatrix());
+            effect.setMatrix("view", camera.getViewMatrix());
+            effect.setVector3("camDir", camera.getTarget());
+
+            effect.setTexture("depthData", depth.getDepthMap());
 
             effect.setVector3("planetPosition", mesh.position);
             effect.setFloat("planetRadius", meshRadius);
@@ -62,13 +75,18 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
         };
 
         this.onBeforeRender = (effect: BABYLON.Effect) => {
-            effect.setVector3("sunPosition", sun.position);
+            effect.setVector3("sunPosition", sun.getAbsolutePosition());
 
             effect.setVector3("planetPosition", mesh.position);
 
             effect.setVector3("cameraPosition", camera.position);
 
             effect.setMatrix("camTransform", camera.getTransformationMatrix());
+            effect.setMatrix("projection", camera.getProjectionMatrix());
+            effect.setMatrix("view", camera.getViewMatrix());
+            effect.setVector3("camDir", camera.getTarget());
+
+            effect.setTexture("depthData", depth.getDepthMap());
 
             effect.setFloat("atmosphereRadius", atmosphereRadius * this.modifiers.atmosphereRadiusModifier);
 

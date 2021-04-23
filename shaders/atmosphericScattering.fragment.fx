@@ -1,8 +1,8 @@
 precision highp float;
 
 #define PI 3.1415926535897932
-#define PRIMARY_STEP_COUNT 16
-#define LIGHT_STEP_COUNT 16
+#define PRIMARY_STEP_COUNT 10
+#define LIGHT_STEP_COUNT 10
 
 // Samplers
 varying vec2 vUV;
@@ -26,19 +26,19 @@ uniform float rayleighScaleModifier;
 uniform float mieScaleModifier;
 
 vec3 getWorldPositionFromScreenPosition(vec2 pos) {                
-    vec4 ndc = vec4(pos.x*2.0 - 1.0, pos.y*2.0 - 1.0, 1.0, 1.0);	
+    vec4 ndc = vec4((pos.x - 0.5)*2.0, (pos.y - 0.5) * 2.0, 1.0, 1.0);	
     mat4 invMat =  inverse(camTransform);
     vec4 clip = invMat * ndc;
-    return (clip / clip.w).xyz;	
+    return (clip / clip.w).xyz;
 }
 
 bool rayIntersectSphere(vec3 rayStart, vec3 rayDir, vec3 spherePosition, float sphereRadius, out float t0, out float t1) {
     vec3 oc = rayStart - spherePosition;
 
-    // c'est du second degré mdr
-    float a = dot(rayDir, rayDir);
+    float a = 1.0; // rayDir doit être unitaire sinon on s'y retrouve pas
     float b = 2.0 * dot(oc, rayDir);
     float c = dot(oc, oc) - sphereRadius*sphereRadius;
+    
     float d = b*b - 4.0*a*c;
 
     // Also skip single point of contact
