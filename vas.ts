@@ -11,78 +11,123 @@ engine.loadingScreen.displayLoadingUI();
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
 
-//let freeCamera = new BABYLON.ArcRotateCamera("freeCamera", Math.PI / 2, Math.PI / 3, 200, new BABYLON.Vector3(0, 0, 0), scene);
+let orbitalCamera = new BABYLON.ArcRotateCamera("orbitalCamera", Math.PI / 2, Math.PI / 3, 200, BABYLON.Vector3.Zero(), scene);
 let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, -200), scene);
-freeCamera.attachControl(canvas);
-
-scene.activeCamera = freeCamera;
-
-let depth_renderer = scene.enableDepthRenderer();
+freeCamera.keysUp.push(90, 87); // z,w
+freeCamera.keysLeft.push(81, 65); // q,a
+freeCamera.keysDown.push(83); // s
+freeCamera.keysRight.push(68); // d
+freeCamera.keysUpward.push(32); // space
+freeCamera.keysDownward.push(16); // shift
 
 let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
 
-let sun = BABYLON.Mesh.CreateSphere("tester", 32, 10, scene);
-let mat2 = new BABYLON.StandardMaterial("mat", scene);
-mat2.emissiveTexture = new BABYLON.Texture("./textures/sun.jpg", scene);
-sun.material = mat2;
+let sun = BABYLON.Mesh.CreateSphere("Sun", 32, 10, scene);
+let vls1 = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, freeCamera, sun, 100);
+let vls2 = new BABYLON.VolumetricLightScatteringPostProcess("trueLight2", 1, orbitalCamera, sun, 100);
+
+let sunMaterial = new BABYLON.StandardMaterial("sunMaterial", scene);
+sunMaterial.emissiveTexture = new BABYLON.Texture("./textures/sun.jpg", scene);
+
+sun.material = sunMaterial;
+
 light.parent = sun;
 
-sun.position = new BABYLON.Vector3(-100, 50, 0);
-let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
+const planetRadius = 50;
+const atmosphereRadius = 55;
+
+let earth = BABYLON.Mesh.CreateSphere("Earth", 32, planetRadius * 2, scene);
+
+let earthMaterial = new BABYLON.StandardMaterial("earthMaterial", scene);
+earthMaterial.diffuseTexture = new BABYLON.Texture("./textures/earth.jpg", scene);
+earthMaterial.emissiveTexture = new BABYLON.Texture("./textures/night2.jpg", scene);
+earthMaterial.specularTexture = new BABYLON.Texture("./textures/specular2.jpg", scene);
+
+earth.material = earthMaterial;
+
+// The important line
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", earth, planetRadius, atmosphereRadius, sun, freeCamera);
+
+function switchCamera(newCamera: BABYLON.Camera) {
+    scene.activeCamera?.detachControl(canvas);
+    scene.activeCamera = newCamera;
+    newCamera.attachControl(canvas);
+
+    //Call this function to use one atmosphere for all cameras
+    atmosphere.setCamera(newCamera);
+}
+switchCamera(orbitalCamera);
+
+// cloud layer just above ground level
+let epsilon = 1e-1;
+let cloudLayer = BABYLON.Mesh.CreateSphere("clouds", 32, (planetRadius + epsilon) * 2, scene);
+let cloudMaterial = new BABYLON.StandardMaterial("cloudMaterial", scene);
+cloudMaterial.opacityTexture = new BABYLON.Texture("./textures/clouds4.jpg", scene);
+cloudMaterial.opacityTexture.getAlphaFromRGB = true;
+
+cloudLayer.material = cloudMaterial;
+cloudLayer.parent = earth;
+
+earth.rotation.x = Math.PI; // textures are always upside down on sphere for some reason...
+
+orbitalCamera.setTarget(earth);
 
 
-const diameter = 100;
-const atmDiameter = 150;
-
-let cube = BABYLON.Mesh.CreateSphere("tester", 32, diameter, scene);
-let mat = new BABYLON.StandardMaterial("mat", scene);
-mat.diffuseTexture = new BABYLON.Texture("./textures/earth.jpg", scene);
-mat.emissiveTexture = new BABYLON.Texture("./textures/night2.jpg", scene);
-cube.material = mat;
-cube.position.y = 0;
-cube.rotation.x = Math.PI;
-
-//freeCamera.setTarget(cube);
-
-let postProcess = new AtmosphericScatteringPostProcess("atmosphere", cube, diameter / 2, atmDiameter / 2, sun, freeCamera);
-
-new Slider("intensity", document.getElementById("intensity")!, 0, 40, 10, (val: number) => {
-    postProcess.modifiers.intensityModifier = val / 10;
+//#region Sliders
+new Slider("intensity", document.getElementById("intensity")!, 0, 40, atmosphere.settings.intensity, (val: number) => {
+    atmosphere.settings.intensity = val;
 });
 
-new Slider("atmosphereRadius", document.getElementById("atmosphereRadius")!, 0, 40, 10, (val: number) => {
-    postProcess.modifiers.atmosphereRadiusModifier = val / 10;
+new Slider("atmosphereRadius", document.getElementById("atmosphereRadius")!, planetRadius + 1, 100, atmosphereRadius, (val: number) => {
+    atmosphere.settings.atmosphereRadius = val;
 });
 
 
-new Slider("betaRayleigh", document.getElementById("betaRayleigh")!, 0, 40, 10, (val: number) => {
-    postProcess.modifiers.intensityModifier = val / 10;
+new Slider("scatteringStrength", document.getElementById("scatteringStrength")!, 0, 40, atmosphere.settings.scatteringStrength * 10, (val: number) => {
+    atmosphere.settings.scatteringStrength = val / 10;
 });
 
-new Slider("falloff", document.getElementById("falloff")!, 0, 30, 10, (val: number) => {
-    postProcess.modifiers.falloffModifier = val ** 5.4 / 10;
+new Slider("falloff", document.getElementById("falloff")!, 0, 30, atmosphere.settings.falloffFactor, (val: number) => {
+    atmosphere.settings.falloffFactor = val;
 });
 
-new Slider("maxHeight", document.getElementById("maxHeight")!, 0, 30, 10, (val: number) => {
-    postProcess.modifiers.maxHeightModifier = val ** 1000 / 10;
+new Slider("redWaveLength", document.getElementById("redWaveLength")!, 0, 1000, atmosphere.settings.redWaveLength, (val: number) => {
+    atmosphere.settings.redWaveLength = val;
 });
 
-new Slider("rayleighScale", document.getElementById("rayleighScale")!, 0, 30, 10, (val: number) => {
-    postProcess.modifiers.rayleighScaleModifier = val / 10;
+new Slider("greenWaveLength", document.getElementById("greenWaveLength")!, 0, 1000, atmosphere.settings.greenWaveLength, (val: number) => {
+    atmosphere.settings.greenWaveLength = val;
 });
 
-new Slider("mieScale", document.getElementById("mieScale")!, 0, 30, 10, (val: number) => {
-    postProcess.modifiers.mieScaleModifier = val ** 1.5 / 10;
+new Slider("blueWaveLength", document.getElementById("blueWaveLength")!, 0, 1000, atmosphere.settings.blueWaveLength, (val: number) => {
+    atmosphere.settings.blueWaveLength = val;
 });
 
-let keyboard: { [key: string]: boolean; } = {};
+let sunOrientation = 180;
+new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
+    sunOrientation = val;
+});
+
+let rotationSpeed = 1;
+new Slider("planetRotation", document.getElementById("planetRotation")!, 0, 20, rotationSpeed * 10, (val: number) => {
+    rotationSpeed = (val / 10) ** 5;
+});
+//#endregion
+
+document.getElementById("switchView")?.addEventListener("click", () => {
+    if (scene.activeCamera == freeCamera) switchCamera(orbitalCamera);
+    else switchCamera(freeCamera);
+});
 
 document.addEventListener("keydown", e => {
-    keyboard[e.key] = true;
-});
-
-document.addEventListener("keyup", e => {
-    keyboard[e.key] = false;
+    if (e.key == "p") { // take screenshots
+        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, freeCamera, { precision: 4 });
+    } else if (e.key == "f") {
+        console.log(Math.round(engine.getFps()));
+    } else if (e.key == "c") {
+        if (scene.activeCamera == freeCamera) switchCamera(orbitalCamera);
+        else switchCamera(freeCamera);
+    }
 });
 
 window.addEventListener("resize", () => {
@@ -94,15 +139,14 @@ window.addEventListener("resize", () => {
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
-    let t = 0;
-
     engine.runRenderLoop(() => {
 
-        if (keyboard["t"]) {
-            t += engine.getDeltaTime() / 1000;
-            sun.position = new BABYLON.Vector3(100 * Math.cos(t), 50, 100 * Math.sin(t));
-            cube.position = new BABYLON.Vector3(30 * Math.cos(t), 0, 30 * Math.sin(t));
-        }
+        let sunRadians = (sunOrientation / 360) * 2 * Math.PI;
+
+        sun.position = new BABYLON.Vector3(100 * Math.cos(sunRadians), 50, 100 * Math.sin(sunRadians));
+
+        earth.rotation.y += -engine.getDeltaTime() * rotationSpeed / 100000;
+        cloudLayer.rotation.y = engine.getDeltaTime() * rotationSpeed / 500000;
 
         scene.render();
     });

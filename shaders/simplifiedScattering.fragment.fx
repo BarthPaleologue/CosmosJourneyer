@@ -1,34 +1,39 @@
 precision highp float;
 
 #define PI 3.1415926535897932
-#define PRIMARY_STEP_COUNT 10
-#define LIGHT_STEP_COUNT 10
+#define VIEW_POINTS 10
+#define OPTICAL_DEPTH_POINTS 10
 
-// Samplers
-varying vec2 vUV;
-uniform sampler2D textureSampler;
-uniform sampler2D depthData;
+varying vec2 vUV; // screen coordinates
 
-uniform vec3 sunPosition;
+// uniforms
+uniform sampler2D textureSampler; // the original screen texture
 
-uniform vec3 cameraPosition;
-uniform vec3 camDir;
+uniform vec3 sunPosition; // position of the sun in world space
+uniform vec3 cameraPosition; // position of the camera in world space
 
-uniform mat4 camTransform;
-uniform mat4 projection;
-uniform mat4 view;
+uniform mat4 projection; // camera's projection matrix
+uniform mat4 view; // camera's view matrix
 
-uniform vec3 planetPosition;
+uniform vec3 planetPosition; // planet position in world space
 uniform float planetRadius;
 uniform float atmosphereRadius;
 
-vec3 getWorldPositionFromScreenPosition() {	
-    // taken from https://playground.babylonjs.com/#63NSAD
+uniform float falloffFactor; // controls exponential opacity falloff
+uniform float sunIntensity; // controls atmosphere overall brightness
+uniform float scatteringStrength; // controls color dispersion
 
+uniform float redWaveLength;
+uniform float greenWaveLength;
+uniform float blueWaveLength;
+
+vec3 getWorldPositionFromScreenPosition() {	
+    //taken from https://playground.babylonjs.com/#63NSAD
+    //and https://github.com/simondevyoutube/ProceduralTerrain_Part6/blob/master/src/scattering-shader.js
 	vec4 ndc = vec4(
 			(vUV.x - 0.5) * 2.0,
 			(vUV.y - 0.5) * 2.0,
-			texture2D(depthData, vUV).r,
+			1.0,
 			1.0
 		);
 
@@ -38,16 +43,15 @@ vec3 getWorldPositionFromScreenPosition() {
     return posWS.xyz;
 }
 
-bool rayIntersectSphere(vec3 rayStart, vec3 rayDir, vec3 spherePosition, float sphereRadius, out float t0, out float t1) {
-    vec3 oc = rayStart - spherePosition;
+bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float sphereRadius, out float t0, out float t1) {
+    vec3 oc = rayOrigin - spherePosition; // rayOrigin in sphere space
 
-    float a = 1.0; // rayDir doit être unitaire sinon on s'y retrouve pas
+    float a = 1.0;
     float b = 2.0 * dot(oc, rayDir);
     float c = dot(oc, oc) - sphereRadius*sphereRadius;
     
     float d = b*b - 4.0*a*c;
 
-    // Also skip single point of contact
     if(d <= 0.0) {
         return false;
     }
@@ -61,20 +65,21 @@ bool rayIntersectSphere(vec3 rayStart, vec3 rayDir, vec3 spherePosition, float s
     return (t1 >= 0.0);
 }
 
+// based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
 float densityAtPoint(vec3 densitySamplePoint) {
     float heightAboveSurface = length(densitySamplePoint - planetPosition) - planetRadius;
     float height01 = heightAboveSurface / (atmosphereRadius - planetRadius);
-    float localDensity = exp(-height01 * 3.0) * (1.0 - height01);
+    float localDensity = exp(-height01 * falloffFactor) * (1.0 - height01);
 
     return localDensity;
 }
 
 float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     vec3 densitySamplePoint = rayOrigin;
-    float stepSize = rayLength / (float(LIGHT_STEP_COUNT) - 1.0);
+    float stepSize = rayLength / (float(OPTICAL_DEPTH_POINTS) - 1.0);
     float accumulatedOpticalDepth = 0.0;
 
-    for(int i = 0 ; i < LIGHT_STEP_COUNT ; i++) {
+    for(int i = 0 ; i < OPTICAL_DEPTH_POINTS ; i++) {
         float localDensity = densityAtPoint(densitySamplePoint);
 
         accumulatedOpticalDepth += localDensity * stepSize;
@@ -85,25 +90,39 @@ float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     return accumulatedOpticalDepth;
 }
 
-float calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
+vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     vec3 inScatterPoint = rayOrigin;
     vec3 sunDir = normalize(sunPosition - inScatterPoint);
+    
+    vec3 wavelength = vec3(redWaveLength, greenWaveLength, blueWaveLength);
+    vec3 scatteringCoeffs = pow(400.0 / wavelength.xyz, vec3(4.0)) * scatteringStrength;
 
-    float stepSize = rayLength / (float(LIGHT_STEP_COUNT) - 1.0);
-    float inScatteredLight = 0.0;
+    float stepSize = rayLength / (float(VIEW_POINTS) - 1.0);
 
-    for (int i = 0 ; i < PRIMARY_STEP_COUNT ; i++) {
+    vec3 inScatteredLight = vec3(0.0);
+
+    for (int i = 0 ; i < VIEW_POINTS ; i++) {
 
         float sunRayLength = atmosphereRadius - length(inScatterPoint - planetPosition);
         
         float sunRayOpticalDepth = opticalDepth(inScatterPoint, sunDir, sunRayLength); // scattered from the sun to the point
-        float viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * float(i));
-        float transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth));
+        float viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * float(i)); // scattered from the point to the camera
+        
+        vec3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * scatteringCoeffs);
+        
         float localDensity = densityAtPoint(inScatterPoint);
 
-        inScatteredLight += localDensity * transmittance * stepSize;
+        inScatteredLight += localDensity * transmittance * scatteringCoeffs * stepSize;
+        
         inScatterPoint += rayDir * stepSize;
     }
+
+    //https://glossary.ametsoc.org/wiki/Rayleigh_phase_function
+    float mu = dot(rayDir, sunDir);
+    float phaseRayleigh = 3.0 / (16.0 * PI) * (1.0 + mu * mu);
+    
+    inScatteredLight *= phaseRayleigh;
+    inScatteredLight *= sunIntensity;
 
     return inScatteredLight;
 }
@@ -111,30 +130,31 @@ float calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
 vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir) {
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(cameraPosition, rayDir, planetPosition, atmosphereRadius, impactPoint, escapePoint))) {
-        return originalColor;
+        return originalColor; // if not intersecting with atmosphere, return original color
     }
 
-    float distanceThroughAtmosphere = escapePoint - impactPoint;
+    float impactPointPlanet, escapePointPlanet;
+    if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, impactPointPlanet, escapePointPlanet)) {
+        escapePoint = impactPointPlanet; // if going through planet, shorten path
+    }
 
-    vec3 pointInAtmosphere = rayOrigin + rayDir * (distanceThroughAtmosphere);
+    impactPoint = max(0.0, impactPoint); // can't be behind the camera
 
-    float light = calculateLight(pointInAtmosphere, rayDir, distanceThroughAtmosphere);
+    float rayLength = escapePoint - impactPoint;
+    
+    vec3 pointInAtmosphere = rayOrigin + rayDir * impactPoint;
 
+    vec3 light = calculateLight(pointInAtmosphere, rayDir, rayLength);
+    
     return originalColor * (1.0 - light) + light;
 }
 
 void main() {
-    vec4 baseColor = texture2D(textureSampler, vUV);
+    vec3 originalColor = texture2D(textureSampler, vUV).rgb;
 
     vec3 pixelWorldPosition = getWorldPositionFromScreenPosition();
+    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);
 
-    vec3 cameraDirection = normalize(pixelWorldPosition - cameraPosition);
-
-    vec3 diffuse = texture2D(textureSampler, vUV).rgb;
-    vec3 rayDir = normalize(sunPosition - planetPosition);
-
-    vec3 color = scatter(diffuse, cameraPosition, cameraDirection);
-
+    vec3 color = scatter(originalColor, cameraPosition, rayDir);
     gl_FragColor = vec4(color, 1.0);
-
 }

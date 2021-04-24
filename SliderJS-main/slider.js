@@ -27,7 +27,7 @@ export class Slider {
         container.appendChild(slider);
         this.parent.appendChild(container);
         slider.addEventListener("input", () => this.update());
-        this.handle.innerHTML = this.slider.value;
+        this.slider.value = this.handle.innerHTML;
         let handlePosition = ((this.getValue() - this.min) / (this.max - this.min));
         this.handle.style.marginLeft = handlePosition * (this.slider.offsetWidth - 50) - this.handle.offsetWidth / 2 + "px";
         //this.update();

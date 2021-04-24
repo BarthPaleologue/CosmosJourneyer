@@ -163,13 +163,13 @@ onmessage = e => {
 
         BABYLON.VertexData.ComputeNormals(positions, indices, normals);
 
-        let tPositions = new Float64Array(positions.length);
+        let tPositions = new Float32Array(positions.length);
         tPositions.set(positions);
 
-        let tIndices = new Float64Array(indices.length);
+        let tIndices = new Int16Array(indices.length);
         tIndices.set(indices);
 
-        let tNormals = new Float64Array(normals.length);
+        let tNormals = new Float32Array(normals.length);
         tNormals.set(normals);
 
         //@ts-ignore

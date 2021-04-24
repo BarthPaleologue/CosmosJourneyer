@@ -1,68 +1,67 @@
 export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
-    constructor(name, mesh, meshRadius, atmosphereRadius, sun, camera) {
+    constructor(name, planet, planetRadius, atmosphereRadius, sun, camera) {
         super(name, "./shaders/simplifiedScattering", [
             "sunPosition",
             "cameraPosition",
-            "camTransform",
             "projection",
             "view",
-            "camDir",
             "planetPosition",
             "planetRadius",
             "atmosphereRadius",
-            "depthData",
-            "intensityModifier",
-            "betaRayleighModifier",
-            "falloffModifier",
-            "maxHeightModifier",
-            "rayleighScaleModifier",
-            "mieScaleModifier"
-        ], null, 1, camera);
-        let scene = camera.getScene();
-        let depth = scene.enableDepthRenderer();
-        this.modifiers = {
-            intensityModifier: 1,
-            betaRayleighModifier: 1,
-            atmosphereRadiusModifier: 1,
-            falloffModifier: 1,
-            maxHeightModifier: 1,
-            rayleighScaleModifier: 1,
-            mieScaleModifier: 1,
+            "falloffFactor",
+            "sunIntensity",
+            "scatteringStrength",
+            "redWaveLength",
+            "greenWaveLength",
+            "blueWaveLength"
+        ], null, 1, camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, camera.getEngine(), true);
+        this.settings = {
+            planetRadius: planetRadius,
+            atmosphereRadius: atmosphereRadius,
+            falloffFactor: 15,
+            intensity: 25,
+            scatteringStrength: 1,
+            redWaveLength: 700,
+            greenWaveLength: 530,
+            blueWaveLength: 440,
         };
+        this.camera = camera;
+        this.sun = sun;
+        this.planet = planet;
+        this.setCamera(this.camera);
         this.onApply = (effect) => {
-            effect.setVector3("sunPosition", sun.position);
-            effect.setVector3("cameraPosition", camera.position);
-            effect.setMatrix("camTransform", camera.getTransformationMatrix());
-            effect.setMatrix("projection", camera.getProjectionMatrix());
-            effect.setMatrix("view", camera.getViewMatrix());
-            effect.setVector3("camDir", camera.getTarget());
-            effect.setTexture("depthData", depth.getDepthMap());
-            effect.setVector3("planetPosition", mesh.position);
-            effect.setFloat("planetRadius", meshRadius);
-            effect.setFloat("atmosphereRadius", atmosphereRadius * this.modifiers.atmosphereRadiusModifier);
-            effect.setFloat("intensityModifier", this.modifiers.intensityModifier);
-            effect.setFloat("betaRayleighModifier", this.modifiers.betaRayleighModifier);
-            effect.setFloat("falloffModifier", this.modifiers.falloffModifier);
-            effect.setFloat("maxHeightModifier", this.modifiers.maxHeightModifier);
-            effect.setFloat("rayleighScaleModifier", this.modifiers.rayleighScaleModifier);
-            effect.setFloat("mieScaleModifier", this.modifiers.mieScaleModifier);
+            effect.setVector3("sunPosition", this.sun.position);
+            effect.setVector3("cameraPosition", this.camera.position);
+            effect.setMatrix("projection", this.camera.getProjectionMatrix());
+            effect.setMatrix("view", this.camera.getViewMatrix());
+            effect.setVector3("planetPosition", this.planet.position);
+            effect.setFloat("planetRadius", this.settings.planetRadius);
+            effect.setFloat("atmosphereRadius", this.settings.atmosphereRadius);
+            effect.setFloat("falloffFactor", this.settings.falloffFactor);
+            effect.setFloat("intensity", this.settings.intensity);
+            effect.setFloat("scatteringStrength", this.settings.scatteringStrength);
+            effect.setFloat("redWaveLength", this.settings.redWaveLength);
+            effect.setFloat("greenWaveLength", this.settings.greenWaveLength);
+            effect.setFloat("blueWaveLength", this.settings.blueWaveLength);
         };
         this.onBeforeRender = (effect) => {
-            effect.setVector3("sunPosition", sun.getAbsolutePosition());
-            effect.setVector3("planetPosition", mesh.position);
-            effect.setVector3("cameraPosition", camera.position);
-            effect.setMatrix("camTransform", camera.getTransformationMatrix());
-            effect.setMatrix("projection", camera.getProjectionMatrix());
-            effect.setMatrix("view", camera.getViewMatrix());
-            effect.setVector3("camDir", camera.getTarget());
-            effect.setTexture("depthData", depth.getDepthMap());
-            effect.setFloat("atmosphereRadius", atmosphereRadius * this.modifiers.atmosphereRadiusModifier);
-            effect.setFloat("intensityModifier", this.modifiers.intensityModifier);
-            effect.setFloat("betaRayleighModifier", this.modifiers.betaRayleighModifier);
-            effect.setFloat("falloffModifier", this.modifiers.falloffModifier);
-            effect.setFloat("maxHeightModifier", this.modifiers.maxHeightModifier);
-            effect.setFloat("rayleighScaleModifier", this.modifiers.rayleighScaleModifier);
-            effect.setFloat("mieScaleModifier", this.modifiers.mieScaleModifier);
+            effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
+            effect.setVector3("cameraPosition", this.camera.position);
+            effect.setVector3("planetPosition", this.planet.position);
+            effect.setMatrix("projection", this.camera.getProjectionMatrix());
+            effect.setMatrix("view", this.camera.getViewMatrix());
+            effect.setFloat("planetRadius", this.settings.planetRadius);
+            effect.setFloat("atmosphereRadius", this.settings.atmosphereRadius);
+            effect.setFloat("falloffFactor", this.settings.falloffFactor);
+            effect.setFloat("sunIntensity", this.settings.intensity);
+            effect.setFloat("scatteringStrength", this.settings.scatteringStrength);
+            effect.setFloat("redWaveLength", this.settings.redWaveLength);
+            effect.setFloat("greenWaveLength", this.settings.greenWaveLength);
+            effect.setFloat("blueWaveLength", this.settings.blueWaveLength);
         };
+    }
+    setCamera(camera) {
+        this.camera = camera;
+        camera.attachPostProcess(this);
     }
 }

@@ -1,101 +1,107 @@
-interface AtmosphereModifiers {
-    intensityModifier: number,
-    betaRayleighModifier: number,
-    atmosphereRadiusModifier: number,
-    falloffModifier: number,
-    maxHeightModifier: number,
-    rayleighScaleModifier: number,
-    mieScaleModifier: number,
+interface AtmosphereSettings {
+    planetRadius: number,
+    atmosphereRadius: number,
+    falloffFactor: number,
+    intensity: number,
+    scatteringStrength: number,
+    redWaveLength: number,
+    greenWaveLength: number,
+    blueWaveLength: number,
 }
 
 export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
 
-    modifiers: AtmosphereModifiers;
+    settings: AtmosphereSettings;
+    camera: BABYLON.Camera;
+    sun: BABYLON.Mesh | BABYLON.PointLight;
+    planet: BABYLON.Mesh;
 
-    constructor(name: string, mesh: BABYLON.Mesh, meshRadius: number, atmosphereRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.TargetCamera) {
+    constructor(name: string, planet: BABYLON.Mesh, planetRadius: number, atmosphereRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera) {
         super(name, "./shaders/simplifiedScattering", [
             "sunPosition",
-
             "cameraPosition",
 
-            "camTransform",
             "projection",
             "view",
-            "camDir",
 
             "planetPosition",
             "planetRadius",
             "atmosphereRadius",
 
-            "depthData",
+            "falloffFactor",
+            "sunIntensity",
+            "scatteringStrength",
 
-            "intensityModifier",
-            "betaRayleighModifier",
-            "falloffModifier",
-            "maxHeightModifier",
-            "rayleighScaleModifier",
-            "mieScaleModifier"
-        ], null, 1, camera);
+            "redWaveLength",
+            "greenWaveLength",
+            "blueWaveLength"
+        ], null, 1, camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, camera.getEngine(), true);
 
-        let scene = camera.getScene();
-        let depth = scene.enableDepthRenderer();
-
-        this.modifiers = {
-            intensityModifier: 1,
-            betaRayleighModifier: 1,
-            atmosphereRadiusModifier: 1,
-            falloffModifier: 1,
-            maxHeightModifier: 1,
-            rayleighScaleModifier: 1,
-            mieScaleModifier: 1,
+        this.settings = {
+            planetRadius: planetRadius,
+            atmosphereRadius: atmosphereRadius,
+            falloffFactor: 15,
+            intensity: 25,
+            scatteringStrength: 1,
+            redWaveLength: 700,
+            greenWaveLength: 530,
+            blueWaveLength: 440,
         };
 
+        this.camera = camera;
+        this.sun = sun;
+        this.planet = planet;
+
+        this.setCamera(this.camera);
+
         this.onApply = (effect: BABYLON.Effect) => {
-            effect.setVector3("sunPosition", sun.position);
+            effect.setVector3("sunPosition", this.sun.position);
+            effect.setVector3("cameraPosition", this.camera.position);
 
-            effect.setVector3("cameraPosition", camera.position);
+            effect.setMatrix("projection", this.camera.getProjectionMatrix());
+            effect.setMatrix("view", this.camera.getViewMatrix());
 
-            effect.setMatrix("camTransform", camera.getTransformationMatrix());
-            effect.setMatrix("projection", camera.getProjectionMatrix());
-            effect.setMatrix("view", camera.getViewMatrix());
-            effect.setVector3("camDir", camera.getTarget());
+            effect.setVector3("planetPosition", this.planet.position);
+            effect.setFloat("planetRadius", this.settings.planetRadius);
+            effect.setFloat("atmosphereRadius", this.settings.atmosphereRadius);
 
-            effect.setTexture("depthData", depth.getDepthMap());
+            effect.setFloat("falloffFactor", this.settings.falloffFactor);
+            effect.setFloat("intensity", this.settings.intensity);
+            effect.setFloat("scatteringStrength", this.settings.scatteringStrength);
 
-            effect.setVector3("planetPosition", mesh.position);
-            effect.setFloat("planetRadius", meshRadius);
-            effect.setFloat("atmosphereRadius", atmosphereRadius * this.modifiers.atmosphereRadiusModifier);
-
-            effect.setFloat("intensityModifier", this.modifiers.intensityModifier);
-            effect.setFloat("betaRayleighModifier", this.modifiers.betaRayleighModifier);
-            effect.setFloat("falloffModifier", this.modifiers.falloffModifier);
-            effect.setFloat("maxHeightModifier", this.modifiers.maxHeightModifier);
-            effect.setFloat("rayleighScaleModifier", this.modifiers.rayleighScaleModifier);
-            effect.setFloat("mieScaleModifier", this.modifiers.mieScaleModifier);
+            effect.setFloat("redWaveLength", this.settings.redWaveLength);
+            effect.setFloat("greenWaveLength", this.settings.greenWaveLength);
+            effect.setFloat("blueWaveLength", this.settings.blueWaveLength);
         };
 
         this.onBeforeRender = (effect: BABYLON.Effect) => {
-            effect.setVector3("sunPosition", sun.getAbsolutePosition());
+            effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
+            effect.setVector3("cameraPosition", this.camera.position);
 
-            effect.setVector3("planetPosition", mesh.position);
+            effect.setVector3("planetPosition", this.planet.position);
 
-            effect.setVector3("cameraPosition", camera.position);
+            effect.setMatrix("projection", this.camera.getProjectionMatrix());
+            effect.setMatrix("view", this.camera.getViewMatrix());
 
-            effect.setMatrix("camTransform", camera.getTransformationMatrix());
-            effect.setMatrix("projection", camera.getProjectionMatrix());
-            effect.setMatrix("view", camera.getViewMatrix());
-            effect.setVector3("camDir", camera.getTarget());
+            effect.setFloat("planetRadius", this.settings.planetRadius);
+            effect.setFloat("atmosphereRadius", this.settings.atmosphereRadius);
 
-            effect.setTexture("depthData", depth.getDepthMap());
+            effect.setFloat("falloffFactor", this.settings.falloffFactor);
+            effect.setFloat("sunIntensity", this.settings.intensity);
+            effect.setFloat("scatteringStrength", this.settings.scatteringStrength);
 
-            effect.setFloat("atmosphereRadius", atmosphereRadius * this.modifiers.atmosphereRadiusModifier);
-
-            effect.setFloat("intensityModifier", this.modifiers.intensityModifier);
-            effect.setFloat("betaRayleighModifier", this.modifiers.betaRayleighModifier);
-            effect.setFloat("falloffModifier", this.modifiers.falloffModifier);
-            effect.setFloat("maxHeightModifier", this.modifiers.maxHeightModifier);
-            effect.setFloat("rayleighScaleModifier", this.modifiers.rayleighScaleModifier);
-            effect.setFloat("mieScaleModifier", this.modifiers.mieScaleModifier);
+            effect.setFloat("redWaveLength", this.settings.redWaveLength);
+            effect.setFloat("greenWaveLength", this.settings.greenWaveLength);
+            effect.setFloat("blueWaveLength", this.settings.blueWaveLength);
         };
+
+
+    }
+
+    setCamera(camera: BABYLON.Camera) {
+        this.camera = camera;
+        camera.attachPostProcess(this);
+
+
     }
 }
