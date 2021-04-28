@@ -4,10 +4,11 @@ import { TaskType } from "./chunkForge.js";
  * Un PlanetSide est un plan généré procéduralement qui peut être morph à volonté
  */
 export class PlanetSide {
-    constructor(_id, _maxDepth, _chunkLength, _baseSubdivisions, _direction, _parentNode, _scene, _chunkForge, _surfaceMaterial) {
+    constructor(_id, _minDepth, _maxDepth, _chunkLength, _baseSubdivisions, _direction, _parentNode, _scene, _chunkForge, _surfaceMaterial) {
         this.renderDistanceFactor = 3;
         this.id = _id;
         this.maxDepth = _maxDepth;
+        this.minDepth = _minDepth;
         this.chunkLength = _chunkLength;
         this.baseSubdivisions = _baseSubdivisions;
         this.direction = _direction;
@@ -72,8 +73,8 @@ export class PlanetSide {
         // distance carré entre caméra et noeud du quadtree
         let d = direction.lengthSquared();
         let limit = this.renderDistanceFactor * (this.chunkLength / (Math.pow(2, walked.length)));
-        if (d < Math.pow(limit, 2) && walked.length < this.maxDepth) {
-            // si on est proche de la caméra
+        if ((d < Math.pow(limit, 2) && walked.length < this.maxDepth) || walked.length < this.minDepth) {
+            // si on est proche de la caméra ou si on doit le générer car LOD minimal
             if (tree instanceof PlanetChunk) {
                 // si c'est un chunk, on le subdivise
                 let newTree = [
@@ -98,13 +99,23 @@ export class PlanetSide {
         else {
             // si on est loin
             if (tree instanceof PlanetChunk) {
+                //let camera = this.scene.activeCamera?.position;
+                let distanceToCenter = BABYLON.Vector3.DistanceSquared(observerPosition, this.parent.absolutePosition);
+                // c'est pythagore
+                let behindHorizon = (d > distanceToCenter + Math.pow((this.chunkLength / 2), 2));
+                //tree.mesh.setEnabled(!behindHorizon);
                 return tree;
             }
             else {
                 // si c'est un noeud, on supprime tous les enfants, on remplace par un nouveau chunk
-                let newChunk = this.createChunk(walked);
-                this.requestDeletion(tree);
-                return newChunk;
+                if (walked.length < this.minDepth) {
+                    let newChunk = this.createChunk(walked);
+                    this.requestDeletion(tree);
+                    return newChunk;
+                }
+                else {
+                    return tree;
+                }
             }
         }
     }

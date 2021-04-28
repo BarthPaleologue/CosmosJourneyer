@@ -1,4 +1,5 @@
 import { AtmosphericScatteringPostProcess } from "./atmosphericScattering.js";
+import { DepthPostProcess } from "./depthPostprocess.js";
 import { Slider } from "./SliderJS-main/slider.js";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -46,7 +47,7 @@ earthMaterial.specularTexture = new BABYLON.Texture("./textures/specular2.jpg", 
 earth.material = earthMaterial;
 
 // The important line
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", earth, planetRadius, atmosphereRadius, sun, freeCamera);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", earth, planetRadius, atmosphereRadius, sun, freeCamera, scene);
 
 function switchCamera(newCamera: BABYLON.Camera) {
     scene.activeCamera?.detachControl(canvas);

@@ -1,4 +1,3 @@
-import { ColorSettings } from "../planet.js";
 import { Crater } from "./crater.js";
 import { Direction } from "./direction.js";
 import { CraterModifiers } from "./layers/craterModifiers.js";
@@ -50,7 +49,7 @@ export class ChunkForge {
     incomingTasks: (BuildTask | ApplyTask | DeleteTask | InitTask)[] = [];
     trashCan: DeleteTask[] = [];
     applyTasks: ApplyTask[] = [];
-    cadence = 16;
+    cadence = 8;
 
     builders: Worker[] = [];
     esclavesDispo: Worker[] = [];
@@ -82,6 +81,7 @@ export class ChunkForge {
         this.incomingTasks.push(task);
     }
     executeTask(task: ApplyTask | DeleteTask | BuildTask | InitTask) {
+
         switch (task.taskType) {
             case TaskType.Build:
                 let mesh = task.mesh;
@@ -89,9 +89,10 @@ export class ChunkForge {
 
                 // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
                 // tâches de supressions associées : on les stock et on les execute après les créations
+
                 let callbackTasks: DeleteTask[] = [];
                 while (this.incomingTasks.length > 0 && this.incomingTasks[0].taskType == TaskType.Deletion) {
-                    //@ts-ignore typescript pige rien à list.shift()
+                    //@ts-ignore
                     callbackTasks.push(this.incomingTasks.shift()!);
                 }
 
@@ -102,8 +103,6 @@ export class ChunkForge {
                     depth: task.depth,
                     direction: task.direction,
                     position: [task.position.x, task.position.y, task.position.z],
-
-                    //this.craters,
                 });
 
                 esclave!.onmessage = e => {
@@ -137,8 +136,7 @@ export class ChunkForge {
     }
     executeNextTask() {
         if (this.incomingTasks.length > 0) {
-            let nextTask = this.incomingTasks.shift();
-            this.executeTask(nextTask!);
+            this.executeTask(this.incomingTasks.shift()!);
         }
     }
     emptyTrashCan(n: number) {
@@ -153,7 +151,9 @@ export class ChunkForge {
         if (this.applyTasks.length > 0) {
             let task = this.applyTasks.shift()!;
             task.vertexData.applyToMesh(task.mesh);
-            this.trashCan = this.trashCan.concat(task.callbackTasks);
+            setTimeout(() => {
+                this.trashCan = this.trashCan.concat(task.callbackTasks);
+            }, 100);
         }
     }
     update() {
@@ -161,6 +161,6 @@ export class ChunkForge {
             this.executeNextTask();
         }
         this.executeNextApplyTask();
-        this.emptyTrashCan(1);
+        this.emptyTrashCan(10);
     }
 }

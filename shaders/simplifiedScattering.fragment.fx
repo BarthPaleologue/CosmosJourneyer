@@ -4,16 +4,19 @@ precision highp float;
 #define VIEW_POINTS 10
 #define OPTICAL_DEPTH_POINTS 10
 
-varying vec2 vUV; // screen coordinates
-
 // uniforms
 uniform sampler2D textureSampler; // the original screen texture
+uniform sampler2D depthSampler;
 
 uniform vec3 sunPosition; // position of the sun in world space
 uniform vec3 cameraPosition; // position of the camera in world space
 
 uniform mat4 projection; // camera's projection matrix
 uniform mat4 view; // camera's view matrix
+uniform mat4 transform;
+
+uniform float cameraNear; // camera minZ
+uniform float cameraFar; // camera maxZ
 
 uniform vec3 planetPosition; // planet position in world space
 uniform float planetRadius;
@@ -27,20 +30,35 @@ uniform float redWaveLength;
 uniform float greenWaveLength;
 uniform float blueWaveLength;
 
-vec3 getWorldPositionFromScreenPosition() {	
+varying vec2 vUV; // screen coordinates
+
+vec3 getWorldPositionFromScreenPosition(float depth) {	
     //taken from https://playground.babylonjs.com/#63NSAD
     //and https://github.com/simondevyoutube/ProceduralTerrain_Part6/blob/master/src/scattering-shader.js
 	vec4 ndc = vec4(
 			(vUV.x - 0.5) * 2.0,
 			(vUV.y - 0.5) * 2.0,
-			1.0,
-			1.0
+			(depth - 0.5) * 2.0,
+			0.0
 		);
 
     vec4 posVS = inverse(projection) * ndc;
     vec4 posWS = inverse(view) * vec4((posVS.xyz / posVS.w), 1.0);
 
     return posWS.xyz;
+}
+
+vec3 ssToPos(float depth){                
+    vec4 ndc = vec4(
+            (vUV.x - 0.5) * 2.0,
+            (vUV.y - 0.5) * 2.0,
+            (depth - 0.5) * 2.0,
+            1.0
+    );	
+        
+    mat4 invMat =  inverse(projection*view);
+    vec4 clip = invMat * ndc;
+    return (clip / clip.w).xyz;	
 }
 
 bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float sphereRadius, out float t0, out float t1) {
@@ -127,34 +145,63 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     return inScatteredLight;
 }
 
-vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir) {
+vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float sceneDepth) {
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(cameraPosition, rayDir, planetPosition, atmosphereRadius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, atmosphereRadius, impactPoint, escapePoint))) {
         return originalColor; // if not intersecting with atmosphere, return original color
     }
 
     float impactPointPlanet, escapePointPlanet;
-    if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, impactPointPlanet, escapePointPlanet)) {
+    if(rayIntersectSphere(rayOrigin, rayDir, planetPosition, planetRadius, impactPointPlanet, escapePointPlanet)) {
         escapePoint = impactPointPlanet; // if going through planet, shorten path
     }
 
     impactPoint = max(0.0, impactPoint); // can't be behind the camera
 
-    float rayLength = escapePoint - impactPoint;
+    escapePoint = min(sceneDepth, escapePoint);
+
+    float distanceThroughAtmosphere = escapePoint - impactPoint;
+
+    // work in progress, it works quite well *1.35
+    // le problème c'est sceneDepth
+    // le problème c'est surtout ndc on va pas se mentir
+    /*if(impactPoint > sceneDepth)*/ //return vec3(sceneDepth*sceneDepth)/100000.0;
+    if(impactPoint > sceneDepth) return originalColor;
     
     vec3 pointInAtmosphere = rayOrigin + rayDir * impactPoint;
 
-    vec3 light = calculateLight(pointInAtmosphere, rayDir, rayLength);
+    vec3 light = calculateLight(pointInAtmosphere, rayDir, distanceThroughAtmosphere);
     
     return originalColor * (1.0 - light) + light;
 }
 
+float remap(float value, float low1, float high1, float low2, float high2) {
+    return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
+}
+
+float linearizeDepth(sampler2D depthSampler, vec2 uv) {
+  float n = 1.0; // camera z near
+  float f = 10000.0; // camera z far
+  float z = texture2D(depthSampler, uv).x;
+  return (2.0 * n) / (f + n - z * (f - n));
+}
+
 void main() {
-    vec3 originalColor = texture2D(textureSampler, vUV).rgb;
+    vec4 colorSample = texture2D(textureSampler, vUV);
+    vec4 depthSample = texture2D(depthSampler, vUV);
 
-    vec3 pixelWorldPosition = getWorldPositionFromScreenPosition();
+    vec3 originalColor = colorSample.rgb;
+    
+    float depth = depthSample.r;
+
+    float sceneDepth = remap(depth, 0.0, 1.0, cameraNear, cameraFar);
+    
+    vec3 pixelWorldPosition = ssToPos(depth);
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);
+    
+    float offset = length(pixelWorldPosition - cameraPosition);
 
-    vec3 color = scatter(originalColor, cameraPosition, rayDir);
+    vec3 color = scatter(originalColor, cameraPosition, rayDir, sceneDepth);
+
     gl_FragColor = vec4(color, 1.0);
 }

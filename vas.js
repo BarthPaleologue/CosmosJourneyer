@@ -33,7 +33,7 @@ earthMaterial.emissiveTexture = new BABYLON.Texture("./textures/night2.jpg", sce
 earthMaterial.specularTexture = new BABYLON.Texture("./textures/specular2.jpg", scene);
 earth.material = earthMaterial;
 // The important line
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", earth, planetRadius, atmosphereRadius, sun, freeCamera);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", earth, planetRadius, atmosphereRadius, sun, freeCamera, scene);
 function switchCamera(newCamera) {
     var _a;
     (_a = scene.activeCamera) === null || _a === void 0 ? void 0 : _a.detachControl(canvas);

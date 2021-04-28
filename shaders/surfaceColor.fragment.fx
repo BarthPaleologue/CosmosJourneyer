@@ -9,7 +9,14 @@ varying vec3 vNormalW;
 uniform mat4 world;
 
 uniform vec3 v3CameraPos; // camera position in world space
+uniform float cameraNear;
+uniform float cameraFar;
 uniform vec3 v3LightPos; // light position in world space
+uniform mat4 view;
+uniform mat4 projection;
+
+uniform sampler2D textureSampler;
+uniform sampler2D depthSampler; // evaluate sceneDepth
 
 uniform float planetRadius; // planet radius
 uniform float iceCapThreshold; // controls snow minimum spawn altitude
@@ -24,6 +31,7 @@ uniform vec4 sandColor; // the color of the sand
 
 varying vec3 vPosition; // position of the vertex in sphere space
 varying vec3 vNormal; // normal of the vertex in sphere space
+varying vec2 vUV; // 
 
 // Noise functions to spice things up a little bit
 #define M_PI 3.14159265358979323846
@@ -53,7 +61,11 @@ float perlin(vec2 p, float dim, float time) {
 	return center * 2.0 - 1.0;
 }
 
-void main(void) {
+float remap(float value, float low1, float high1, float low2, float high2) {
+    return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
+}
+
+void main() {
 
 	vec3 viewDirectionW = normalize(v3CameraPos - vPositionW); // view direction in world space
 
@@ -95,5 +107,16 @@ void main(void) {
 			}
         }
     }
-	gl_FragColor = vec4(color.rgb * ndl + vec3(specComp) * 0.1,1.0); // apply color and lighting
+
+	vec3 screenColor = color.rgb * ndl + vec3(specComp) * 0.1;
+
+	vec2 screenPosition = (view * projection * vec4(vPositionW, 1.0)).xy;
+
+	float depth = texture2D(depthSampler, screenPosition).r;
+
+	float sceneDepth = remap(depth, 0.0, 1.0, cameraNear, cameraFar);
+	
+	float distance = length(v3CameraPos - vPositionW);
+
+	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
 }

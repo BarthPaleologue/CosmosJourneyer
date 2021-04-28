@@ -25,8 +25,10 @@ export class Planet extends ProceduralSphere {
 
     colorSettings: ColorSettings;
 
-    constructor(_id: string, _radius: number, _position: BABYLON.Vector3, _nbSubdivisions: number, _maxDepth: number, _scene: BABYLON.Scene) {
-        super(_id, _radius, _position, _nbSubdivisions, _maxDepth, _scene);
+    renderer: BABYLON.DepthRenderer;
+
+    constructor(_id: string, _radius: number, _position: BABYLON.Vector3, _nbSubdivisions: number, _minDepth: number, _maxDepth: number, _scene: BABYLON.Scene) {
+        super(_id, _radius, _position, _nbSubdivisions, _minDepth, _maxDepth, _scene);
 
         let noiseEngine = new NoiseEngine();
         noiseEngine.seed(69);
@@ -69,12 +71,15 @@ export class Planet extends ProceduralSphere {
 
         let surfaceMaterial = new BABYLON.ShaderMaterial("surfaceColor", _scene, "./shaders/surfaceColor",
             {
-                attributes: ["position", "normal"],
-                uniforms: ["world", "worldViewProjection"]
+                attributes: ["position", "normal", "uv"],
+                uniforms: ["world", "worldViewProjection", "textureSampler", "depthSampler", "cameraNear", "cameraFar", "projection", "view"]
             });
-
         surfaceMaterial.setVector3("v3CameraPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("v3LightPos", BABYLON.Vector3.Zero());
+
+        this.renderer = new BABYLON.DepthRenderer(_scene);
+
+        _scene.customRenderTargets.push(this.renderer.getDepthMap());
 
         this.setChunkMaterial(surfaceMaterial);
 
@@ -94,9 +99,14 @@ export class Planet extends ProceduralSphere {
         this.surfaceMaterial.setVector4("sandColor", this.colorSettings.sandColor);
     }
 
-    update(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3) {
+    update(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3, camera: BABYLON.Camera) {
         this.surfaceMaterial.setVector3("v3CameraPos", position);
+        this.surfaceMaterial.setFloat("cameraNear", camera.minZ);
+        this.surfaceMaterial.setFloat("cameraFar", camera.maxZ);
         this.surfaceMaterial.setVector3("v3LightPos", lightPosition);
+        this.surfaceMaterial.setTexture("depthSampler", this.renderer.getDepthMap());
+        this.surfaceMaterial.setMatrix("projection", camera.getProjectionMatrix());
+        this.surfaceMaterial.setMatrix("view", camera.getViewMatrix());
         this.updateLOD(position, facingDirection);
     }
 

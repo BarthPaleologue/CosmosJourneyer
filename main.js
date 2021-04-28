@@ -1,4 +1,5 @@
 var _a;
+import { AtmosphericScatteringPostProcess } from "./atmosphericScattering.js";
 import { Planet } from "./components/planet.js";
 import { Slider } from "./SliderJS-main/slider.js";
 let canvas = document.getElementById("renderer");
@@ -13,8 +14,10 @@ camera.setPosition(new BABYLON.Vector3(0, 0, -15));
 camera.wheelPrecision = 10;
 camera.attachControl(canvas);
 scene.activeCamera = camera;
+const planetRadius = 5;
+const atmosphereRadius = 12;
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
-let planet = new Planet("Gaia", 5, new BABYLON.Vector3(0, 0, 0), 64, 1, scene);
+let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 64, 0, 1, scene);
 planet.setRenderDistanceFactor(10);
 planet.noiseModifiers.strengthModifier = 0.7;
 planet.noiseModifiers.offsetModifier = [23, 10, 0];
@@ -31,6 +34,7 @@ planet.colorSettings = {
     sandSize: 1,
 };
 planet.updateColors();
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, planetRadius, atmosphereRadius, light, camera, scene);
 let watersphere = BABYLON.Mesh.CreateSphere("water", 32, 10 + planet.colorSettings.waterLevel, scene);
 let mat = new BABYLON.StandardMaterial("mat2", scene);
 mat.diffuseColor = new BABYLON.Color3(15, 50, 200).scale(1 / 255);
@@ -41,10 +45,7 @@ mat.bumpTexture.uScale = 10;
 mat.bumpTexture.vScale = 10;
 watersphere.material = mat;
 watersphere.visibility = 0.8;
-let rotationSpeedFactor = 1;
-new Slider("rotationSpeed", document.getElementById("rotationSpeed"), 0, 10, 1, (val) => {
-    rotationSpeedFactor = Math.pow(val, 2);
-});
+//#region Sliders
 new Slider("maxDepth", document.getElementById("maxDepth"), 0, 5, 1, (val) => {
     planet.setMaxDepth(val);
 });
@@ -110,6 +111,36 @@ new Slider("craterDepth", document.getElementById("craterDepth"), 1, 20, 10, (de
     planet.updateSettings();
     planet.reset();
 });
+new Slider("intensity", document.getElementById("intensity"), 0, 40, atmosphere.settings.intensity, (val) => {
+    atmosphere.settings.intensity = val;
+});
+new Slider("atmosphereRadius", document.getElementById("atmosphereRadius"), planetRadius + 1, 100, atmosphereRadius, (val) => {
+    atmosphere.settings.atmosphereRadius = val;
+});
+new Slider("scatteringStrength", document.getElementById("scatteringStrength"), 0, 40, atmosphere.settings.scatteringStrength * 10, (val) => {
+    atmosphere.settings.scatteringStrength = val / 10;
+});
+new Slider("falloff", document.getElementById("falloff"), 0, 30, atmosphere.settings.falloffFactor, (val) => {
+    atmosphere.settings.falloffFactor = val;
+});
+new Slider("redWaveLength", document.getElementById("redWaveLength"), 0, 1000, atmosphere.settings.redWaveLength, (val) => {
+    atmosphere.settings.redWaveLength = val;
+});
+new Slider("greenWaveLength", document.getElementById("greenWaveLength"), 0, 1000, atmosphere.settings.greenWaveLength, (val) => {
+    atmosphere.settings.greenWaveLength = val;
+});
+new Slider("blueWaveLength", document.getElementById("blueWaveLength"), 0, 1000, atmosphere.settings.blueWaveLength, (val) => {
+    atmosphere.settings.blueWaveLength = val;
+});
+let sunOrientation = 180;
+new Slider("sunOrientation", document.getElementById("sunOrientation"), 1, 360, sunOrientation, (val) => {
+    sunOrientation = val;
+});
+let rotationSpeed = 1;
+new Slider("planetRotation", document.getElementById("planetRotation"), 0, 20, rotationSpeed * 10, (val) => {
+    rotationSpeed = Math.pow((val / 10), 5);
+});
+//#endregion
 (_a = document.getElementById("randomCraters")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
     //planet.regenerateCraters();
     planet.updateSettings();
@@ -126,10 +157,10 @@ window.addEventListener("resize", () => {
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
-        planet.attachNode.rotation.y += .001 * rotationSpeedFactor;
-        watersphere.rotation.y += .001 * rotationSpeedFactor;
+        planet.attachNode.rotation.y += .001 * rotationSpeed;
+        watersphere.rotation.y += .001 * rotationSpeed;
         planet.chunkForge.update();
-        planet.update(BABYLON.Vector3.Zero(), camera.getDirection(BABYLON.Axis.Z), light.position);
+        planet.update(BABYLON.Vector3.Zero(), camera.getDirection(BABYLON.Axis.Z), light.position, camera);
         scene.render();
     });
 });

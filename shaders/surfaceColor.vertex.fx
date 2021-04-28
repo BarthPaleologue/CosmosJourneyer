@@ -4,6 +4,7 @@ precision highp float;
 attribute vec3 vertex;
 attribute vec3 position;
 attribute vec3 normal;
+attribute vec2 uv;
 
 // Uniforms
 uniform mat4 world;
@@ -18,7 +19,7 @@ varying vec3 vNormalW;
 varying vec3 vNormal;
 varying vec3 vPosition;
 
-
+varying vec2 vUV;
 
 void main(void) {
 
@@ -30,5 +31,5 @@ void main(void) {
 	
 	vPosition = position;
 	vNormal = normal;
+    vUV = uv;
 }
-    

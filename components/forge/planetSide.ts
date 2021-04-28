@@ -12,6 +12,7 @@ export class PlanetSide {
     id: string; // un id unique
 
     // le quadtree
+    minDepth: number;
     maxDepth: number; // profondeur maximale du quadtree envisagé
     tree: quadTree; // le quadtree en question
     renderDistanceFactor = 3;
@@ -29,10 +30,11 @@ export class PlanetSide {
 
     surfaceMaterial: BABYLON.Material;
 
-    constructor(_id: string, _maxDepth: number, _chunkLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, _scene: BABYLON.Scene, _chunkForge: ChunkForge, _surfaceMaterial: BABYLON.Material) {
+    constructor(_id: string, _minDepth: number, _maxDepth: number, _chunkLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, _scene: BABYLON.Scene, _chunkForge: ChunkForge, _surfaceMaterial: BABYLON.Material) {
         this.id = _id;
 
         this.maxDepth = _maxDepth;
+        this.minDepth = _minDepth;
 
         this.chunkLength = _chunkLength;
         this.baseSubdivisions = _baseSubdivisions;
@@ -104,8 +106,8 @@ export class PlanetSide {
         let d = direction.lengthSquared();
         let limit = this.renderDistanceFactor * (this.chunkLength / (2 ** walked.length));
 
-        if (d < limit ** 2 && walked.length < this.maxDepth) {
-            // si on est proche de la caméra
+        if ((d < limit ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
+            // si on est proche de la caméra ou si on doit le générer car LOD minimal
             if (tree instanceof PlanetChunk) {
                 // si c'est un chunk, on le subdivise
                 let newTree = [
@@ -128,12 +130,23 @@ export class PlanetSide {
         } else {
             // si on est loin
             if (tree instanceof PlanetChunk) {
+                //let camera = this.scene.activeCamera?.position;
+                let distanceToCenter = BABYLON.Vector3.DistanceSquared(observerPosition, this.parent.absolutePosition);
+                // c'est pythagore
+                let behindHorizon = (d > distanceToCenter + (this.chunkLength / 2) ** 2);
+
+                //tree.mesh.setEnabled(!behindHorizon);
+
                 return tree;
             } else {
                 // si c'est un noeud, on supprime tous les enfants, on remplace par un nouveau chunk
-                let newChunk = this.createChunk(walked);
-                this.requestDeletion(tree);
-                return newChunk;
+                if (walked.length < this.minDepth) {
+                    let newChunk = this.createChunk(walked);
+                    this.requestDeletion(tree);
+                    return newChunk;
+                } else {
+                    return tree;
+                }
             }
         }
     }
