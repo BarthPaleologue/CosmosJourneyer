@@ -35,19 +35,37 @@ uniform float blueWaveLength;
 
 varying vec2 vUV; // screen coordinates
 
-float remap(float value, float low1, float high1, float low2, float high2) {
-    return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
+vec3 getWorldPositionFromScreenPosition(float depth) {	
+    //taken from https://playground.babylonjs.com/#63NSAD
+    //and https://github.com/simondevyoutube/ProceduralTerrain_Part6/blob/master/src/scattering-shader.js
+	vec4 ndc = vec4(
+			(vUV.x - 0.5) * 2.0,
+			(vUV.y - 0.5) * 2.0,
+			(depth - 0.5) * 2.0,
+			1.0
+		);
+
+    vec4 posVS = inverse(projection) * ndc;
+    vec4 posWS = inverse(view) * vec4((posVS.xyz / posVS.w), 1.0);
+
+    return posWS.xyz;
+}
+
+vec3 ssToPos(){                
+    vec4 ndc = vec4(
+            (vUV.x - 0.5) * 2.0,
+            (vUV.y - 0.5) * 2.0,
+            1.0,
+            1.0
+    );	
+        
+    mat4 invMat =  inverse(projection*view);
+    vec4 clip = invMat * ndc;
+    return (clip / clip.w).xyz;	
 }
 
 vec3 _ScreenToWorld(vec3 pos) {
     vec4 posP = vec4(pos.xyz * 2.0 - 1.0, 1.0);
-    vec4 posVS = inverse(projection) * posP;
-    vec4 posWS = inverse(view) * vec4((posVS.xyz / posVS.w), 1.0);
-    return posWS.xyz;
-}
-
-vec3 sspos(vec2 pos) {
-    vec4 posP = vec4(pos.xy * 2.0 - 1.0, 1.0, 1.0);
     vec4 posVS = inverse(projection) * posP;
     vec4 posWS = inverse(view) * vec4((posVS.xyz / posVS.w), 1.0);
     return posWS.xyz;
@@ -137,10 +155,7 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     return inScatteredLight;
 }
 
-
-
-
-vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
+vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float sceneDepth) {
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, atmosphereRadius, impactPoint, escapePoint))) {
         return originalColor; // if not intersecting with atmosphere, return original color
@@ -151,38 +166,46 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
         escapePoint = impactPointPlanet; // if going through planet, shorten path
     }
 
-    impactPoint = max(0.0, impactPoint);
-    escapePoint = min(maximumDistance, escapePoint);
+    return vec3(escapePoint - sceneDepth) / 1000.0;
+
+    impactPoint = max(0.0, impactPoint); // can't be behind the camera
+
+    escapePoint = min(sceneDepth, escapePoint);
 
     float distanceThroughAtmosphere = escapePoint - impactPoint;
+
+    //if(impactPoint > sceneDepth) return originalColor;
     
     vec3 pointInAtmosphere = rayOrigin + rayDir * impactPoint;
-
-    vec3 projo = (transform * vec4(pointInAtmosphere, 1.0)).xyz;
-    float z = (projo.z + cameraNear) / (cameraFar + cameraNear);
 
     vec3 light = calculateLight(pointInAtmosphere, rayDir, distanceThroughAtmosphere);
     
     return originalColor * (1.0 - light) + light;
 }
 
+float remap(float value, float low1, float high1, float low2, float high2) {
+    return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
+}
 
 void main() {
     vec4 colorSample = texture2D(textureSampler, vUV);
+    vec4 depthSample = texture2D(depthSampler, vUV);
 
     vec3 originalColor = colorSample.rgb;
+    
+    float depth = depthSample.r;
 
+    float sceneDepth = remap(depth, 0.0, 1.0, cameraNear, cameraFar);
+    
+    vec3 pixelWorldPosition = getWorldPositionFromScreenPosition(depth);
 
     float z = texture2D(depthSampler, vUV).r;
     vec3 posWS = _ScreenToWorld(vec3(vUV, z));
-
-    //float Z = projection[3].z / (gl_FragCoord.z * -2.0 + 1.0 - projection[2].z);
+    float dist = length(posWS - cameraPosition);
 
     vec3 rayDir = normalize(posWS - cameraPosition);
 
-    float maximumDistance = length(posWS - cameraPosition);
-
-    vec3 color = scatter(originalColor, cameraPosition, rayDir, maximumDistance);
+    vec3 color = scatter(originalColor, cameraPosition, rayDir, dist);
 
     gl_FragColor = vec4(color, 1.0);
 }
