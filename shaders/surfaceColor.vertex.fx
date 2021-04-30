@@ -10,7 +10,20 @@ attribute vec2 uv;
 uniform mat4 world;
 uniform mat4 worldViewProjection;
 
-uniform vec3 v3CameraPos;		// The camera's current position	
+uniform vec3 v3CameraPos; // camera position in world space
+uniform vec3 v3LightPos; // light position in world space
+
+uniform float planetRadius; // planet radius
+uniform float iceCapThreshold; // controls snow minimum spawn altitude
+uniform float steepSnowDotLimit; // controls snow maximum spawn steepness
+uniform float waterLevel; // controls sand layer
+uniform float sandSize;
+
+uniform vec4 snowColor; // the color of the snow layer
+uniform vec4 steepColor; // the color of steep slopes
+uniform vec4 plainColor; // the color of plains at the bottom of moutains
+uniform vec4 sandColor; // the color of the sand
+
 
 // Varying
 varying vec3 vPositionW;

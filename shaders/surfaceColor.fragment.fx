@@ -89,7 +89,7 @@ void main() {
 
 	if (length(vPosition) > (planetRadius*(1. + (iceCapThreshold / 100.) - pow(pow(normVPos.y, 8.), 2.)))) {
         // if mountains region (you need to be higher at the equator)
-        if (d > steepSnowDotLimit) color = snowColor + vec4(perlin(vPosition.xy, 2., 0.0))/10.; // apply snow color
+        if (d > steepSnowDotLimit) color = snowColor; // apply snow color
         else color = color = steepColor; // apply steep color
     } else {
         // if lower region
@@ -109,14 +109,6 @@ void main() {
     }
 
 	vec3 screenColor = color.rgb * ndl + vec3(specComp) * 0.1;
-
-	vec2 screenPosition = (view * projection * vec4(vPositionW, 1.0)).xy;
-
-	float depth = texture2D(depthSampler, screenPosition).r;
-
-	float sceneDepth = remap(depth, 0.0, 1.0, cameraNear, cameraFar);
-	
-	float distance = length(v3CameraPos - vPositionW);
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
 }

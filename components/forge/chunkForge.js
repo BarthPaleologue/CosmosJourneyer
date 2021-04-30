@@ -89,10 +89,12 @@ export class ChunkForge {
         }
     }
     emptyTrashCan(n) {
+        this.scene.disableDepthRenderer(this.scene.activeCamera);
         for (let i = 0; i < n; i++) {
             if (this.trashCan.length > 0) {
                 let task = this.trashCan.shift();
-                task.mesh.dispose();
+                task.mesh.setEnabled(false);
+                //task.mesh.dispose(); causes atmospheric shimmering for now
             }
         }
     }

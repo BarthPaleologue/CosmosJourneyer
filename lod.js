@@ -1,3 +1,4 @@
+import { AtmosphericScatteringPostProcess } from "./atmosphericScattering.js";
 import { Planet } from "./components/planet.js";
 let canvas = document.getElementById("renderer");
 canvas.width = window.innerWidth;
@@ -16,8 +17,8 @@ freeCamera.attachControl(canvas);
 //freeCamera.angularSensibility = 500;
 scene.activeCamera = freeCamera;
 let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
-const radius = 1000 * 1e3; // diamètre en km
-freeCamera.maxZ = 1e8;
+const radius = 1 * 1e3; // diamètre en km
+freeCamera.maxZ = radius * 10;
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.2 * radius, scene);
 sun.position.z = radius;
 sun.position.x = radius * 5;
@@ -27,12 +28,13 @@ sun.material = mat;
 light.parent = sun;
 let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 2, 5, scene);
 planet.colorSettings.sandColor = planet.colorSettings.steepColor;
-planet.noiseModifiers.amplitudeModifier = 300;
-planet.noiseModifiers.frequencyModifier = 0.00003;
+planet.noiseModifiers.amplitudeModifier = 17;
+planet.noiseModifiers.frequencyModifier = 0.005;
 planet.updateSettings();
 planet.updateColors();
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
-//let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius, radius * 2, sun, freeCamera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius, radius * 1.5, sun, freeCamera, scene);
+//atmosphere.settings.intensity = 10;
 //let depth = new DepthPostProcess("depth", freeCamera, scene);
 let keyboard = {};
 document.addEventListener("keydown", e => {
@@ -56,16 +58,11 @@ scene.executeWhenReady(() => {
     let t = 0;
     scene.beforeRender = () => {
         let forward = freeCamera.getDirection(BABYLON.Axis.Z);
+        let upward = freeCamera.getDirection(BABYLON.Axis.Y);
+        let right = freeCamera.getDirection(BABYLON.Axis.X);
         planet.chunkForge.update();
         planet.update(freeCamera.position, forward, sun.position, camera);
         planet.attachNode.rotation.y += 0.0002;
-    };
-    let speed = 0.0002 * radius;
-    engine.runRenderLoop(() => {
-        t += engine.getDeltaTime() / 1000;
-        let forward = freeCamera.getDirection(BABYLON.Axis.Z);
-        let upward = freeCamera.getDirection(BABYLON.Axis.Y);
-        let right = freeCamera.getDirection(BABYLON.Axis.X);
         if (keyboard["a"]) { // rotation autour de l'axe de déplacement
             let rotation = BABYLON.Matrix.RotationAxis(forward, 0.005);
             upward = BABYLON.Vector3.TransformCoordinates(upward, rotation);
@@ -117,6 +114,9 @@ scene.executeWhenReady(() => {
             speed = 1;
         planet.attachNode.position.addInPlace(deplacement);
         sun.position.addInPlace(deplacement);
+    };
+    let speed = 0.0002 * radius;
+    engine.runRenderLoop(() => {
         scene.render();
     });
 });

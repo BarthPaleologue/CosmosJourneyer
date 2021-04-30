@@ -8,6 +8,8 @@ precision highp float;
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler;
 
+uniform mat4 world;
+
 uniform vec3 sunPosition; // position of the sun in world space
 uniform vec3 cameraPosition; // position of the camera in world space
 
@@ -17,6 +19,7 @@ uniform mat4 transform;
 
 uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
+uniform vec3 cameraDirection;
 
 uniform vec3 planetPosition; // planet position in world space
 uniform float planetRadius;
@@ -39,7 +42,7 @@ vec3 getWorldPositionFromScreenPosition(float depth) {
 			(vUV.x - 0.5) * 2.0,
 			(vUV.y - 0.5) * 2.0,
 			(depth - 0.5) * 2.0,
-			0.0
+			1.0
 		);
 
     vec4 posVS = inverse(projection) * ndc;
@@ -48,11 +51,11 @@ vec3 getWorldPositionFromScreenPosition(float depth) {
     return posWS.xyz;
 }
 
-vec3 ssToPos(float depth){                
+vec3 ssToPos(){                
     vec4 ndc = vec4(
             (vUV.x - 0.5) * 2.0,
             (vUV.y - 0.5) * 2.0,
-            (depth - 0.5) * 2.0,
+            1.0,
             1.0
     );	
         
@@ -151,22 +154,24 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float sceneDepth) 
         return originalColor; // if not intersecting with atmosphere, return original color
     }
 
-    float impactPointPlanet, escapePointPlanet;
+    /*float impactPointPlanet, escapePointPlanet;
     if(rayIntersectSphere(rayOrigin, rayDir, planetPosition, planetRadius, impactPointPlanet, escapePointPlanet)) {
         escapePoint = impactPointPlanet; // if going through planet, shorten path
-    }
+    }*/
+
+    //return vec3(impactPoint - escapePointPlanet)*1000.0;
 
     impactPoint = max(0.0, impactPoint); // can't be behind the camera
 
-    escapePoint = min(sceneDepth, escapePoint);
+    //escapePoint = min(sceneDepth, escapePoint);
 
     float distanceThroughAtmosphere = escapePoint - impactPoint;
 
-    // work in progress, it works quite well *1.35
-    // le problème c'est sceneDepth
-    // le problème c'est surtout ndc on va pas se mentir
-    /*if(impactPoint > sceneDepth)*/ //return vec3(sceneDepth*sceneDepth)/100000.0;
-    if(impactPoint > sceneDepth) return originalColor;
+    //return vec3(sceneDepth/10.0);
+
+    //return vec3((escapePoint - impactPoint) / 100.0);
+
+    //if(impactPoint > sceneDepth) return originalColor;
     
     vec3 pointInAtmosphere = rayOrigin + rayDir * impactPoint;
 
@@ -175,15 +180,17 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float sceneDepth) 
     return originalColor * (1.0 - light) + light;
 }
 
-float remap(float value, float low1, float high1, float low2, float high2) {
-    return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
+float DepthToZ( in float depth )
+{
+    float near  = cameraNear; // distance to near plane (absolute value)
+    float far   = cameraFar; // distance to far plane (absolute value)
+    float z_ndc = 2.0 * depth - 1.0;
+    float z_eye = 2.0 * near * far / (far + near - z_ndc * (far - near));
+    return -z_eye;
 }
 
-float linearizeDepth(sampler2D depthSampler, vec2 uv) {
-  float n = 1.0; // camera z near
-  float f = 10000.0; // camera z far
-  float z = texture2D(depthSampler, uv).x;
-  return (2.0 * n) / (f + n - z * (f - n));
+float remap(float value, float low1, float high1, float low2, float high2) {
+    return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
 }
 
 void main() {
@@ -196,12 +203,16 @@ void main() {
 
     float sceneDepth = remap(depth, 0.0, 1.0, cameraNear, cameraFar);
     
-    vec3 pixelWorldPosition = ssToPos(depth);
-    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);
-    
-    float offset = length(pixelWorldPosition - cameraPosition);
+    vec3 pixelWorldPosition = getWorldPositionFromScreenPosition(depth);
 
-    vec3 color = scatter(originalColor, cameraPosition, rayDir, sceneDepth);
+    float vz = DepthToZ(depth);
+    float vx = vUV.x * 2.0 - 1.0;
+    float vy = vUV.y * 2.0 - 1.0;
+    float dist = length(vec3(vx, vy, vz));
+
+    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);
+
+    vec3 color = scatter(originalColor, cameraPosition, rayDir, dist);
 
     gl_FragColor = vec4(color, 1.0);
 }
