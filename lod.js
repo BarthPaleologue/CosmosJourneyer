@@ -17,7 +17,7 @@ freeCamera.attachControl(canvas);
 //freeCamera.angularSensibility = 500;
 scene.activeCamera = freeCamera;
 let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
-const radius = 1 * 1e3; // diamètre en km
+const radius = 100 * 1e3; // diamètre en km
 freeCamera.maxZ = Math.max(radius * 10, 10000);
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.2 * radius, scene);
 sun.position.z = radius;
@@ -28,12 +28,14 @@ sun.material = mat;
 light.parent = sun;
 let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 2, 5, scene);
 planet.colorSettings.sandColor = planet.colorSettings.steepColor;
-planet.noiseModifiers.amplitudeModifier = 17;
-planet.noiseModifiers.frequencyModifier = 0.005;
+planet.noiseModifiers.amplitudeModifier = 50;
+planet.noiseModifiers.frequencyModifier = 0.0005;
 planet.updateSettings();
 planet.updateColors();
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius, radius * 1.5, sun, freeCamera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius + 1e3, radius + 5e3, sun, freeCamera, scene);
+atmosphere.settings.intensity;
+atmosphere.settings.falloffFactor = 17;
 //let depth = new DepthPostProcess("depth", freeCamera, scene);
 let keyboard = {};
 document.addEventListener("keydown", e => {

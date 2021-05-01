@@ -66,7 +66,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
         scene.customRenderTargets.push(depthRenderer.getDepthMap());
         let depthMap = scene.customRenderTargets[0];
 
-        this.onBeforeRender = (effect: BABYLON.Effect) => {
+        this.onApply = (effect: BABYLON.Effect) => {
 
             effect.setTexture("depthSampler", depthMap);
 

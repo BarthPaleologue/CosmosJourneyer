@@ -9,8 +9,6 @@ engine.loadingScreen.displayLoadingUI();
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
 let orbitalCamera = new BABYLON.ArcRotateCamera("orbitalCamera", Math.PI / 2, Math.PI / 3, 200, BABYLON.Vector3.Zero(), scene);
-orbitalCamera.inertia = 0;
-orbitalCamera.wheelPrecision = 0.1;
 let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, -200), scene);
 freeCamera.keysUp.push(90, 87); // z,w
 freeCamera.keysLeft.push(81, 65); // q,a
@@ -94,7 +92,7 @@ new Slider("planetRotation", document.getElementById("planetRotation"), 0, 20, r
 });
 document.addEventListener("keydown", e => {
     if (e.key == "p") { // take screenshots
-        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, freeCamera, { precision: 4 });
+        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera, { precision: 4 });
     }
     else if (e.key == "f") {
         console.log(Math.round(engine.getFps()));

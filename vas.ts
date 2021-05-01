@@ -1,5 +1,4 @@
 import { AtmosphericScatteringPostProcess } from "./atmosphericScattering.js";
-import { DepthPostProcess } from "./depthPostprocess.js";
 import { Slider } from "./SliderJS-main/slider.js";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -13,8 +12,6 @@ let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
 
 let orbitalCamera = new BABYLON.ArcRotateCamera("orbitalCamera", Math.PI / 2, Math.PI / 3, 200, BABYLON.Vector3.Zero(), scene);
-orbitalCamera.inertia = 0;
-orbitalCamera.wheelPrecision = 0.1;
 
 let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, -200), scene);
 freeCamera.keysUp.push(90, 87); // z,w
@@ -32,7 +29,6 @@ let vls2 = new BABYLON.VolumetricLightScatteringPostProcess("trueLight2", 1, orb
 
 let sunMaterial = new BABYLON.StandardMaterial("sunMaterial", scene);
 sunMaterial.emissiveTexture = new BABYLON.Texture("./textures/sun.jpg", scene);
-
 sun.material = sunMaterial;
 
 light.parent = sun;
@@ -125,7 +121,7 @@ document.getElementById("switchView")?.addEventListener("click", () => {
 
 document.addEventListener("keydown", e => {
     if (e.key == "p") { // take screenshots
-        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, freeCamera, { precision: 4 });
+        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
     } else if (e.key == "f") {
         console.log(Math.round(engine.getFps()));
     } else if (e.key == "c") {
