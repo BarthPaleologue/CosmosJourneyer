@@ -11,14 +11,14 @@ let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 3, BABYLON.Vector3.Zero
 camera.setPosition(new BABYLON.Vector3(0, 0, -15));
 camera.attachControl(canvas);
 let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, 0), scene);
-freeCamera.minZ = 0.001;
+freeCamera.minZ = 1;
 freeCamera.attachControl(canvas);
 //freeCamera.inertia = 0;
 //freeCamera.angularSensibility = 500;
 scene.activeCamera = freeCamera;
 let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
 const radius = 1 * 1e3; // diamètre en km
-freeCamera.maxZ = radius * 10;
+freeCamera.maxZ = Math.max(radius * 10, 10000);
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.2 * radius, scene);
 sun.position.z = radius;
 sun.position.x = radius * 5;
@@ -34,7 +34,6 @@ planet.updateSettings();
 planet.updateColors();
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius, radius * 1.5, sun, freeCamera, scene);
-//atmosphere.settings.intensity = 10;
 //let depth = new DepthPostProcess("depth", freeCamera, scene);
 let keyboard = {};
 document.addEventListener("keydown", e => {

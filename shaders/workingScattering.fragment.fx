@@ -146,12 +146,20 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
         return originalColor; // if not intersecting with atmosphere, return original color
     }
 
+    /*float impactPointPlanet, escapePointPlanet;
+    if(rayIntersectSphere(rayOrigin, rayDir, planetPosition, planetRadius, impactPointPlanet, escapePointPlanet)) {
+        escapePoint = impactPointPlanet; // if going through planet, shorten path
+    }*/
+
     //return vec3(maximumDistance / escapePoint) / 10.0;
 
     impactPoint = max(0.0, impactPoint);
+
+    //if(escapePoint*2.0 > maximumDistance) return originalColor;
+
     escapePoint = min(maximumDistance, escapePoint);
 
-    float distanceThroughAtmosphere = max(0.0, escapePoint - impactPoint);
+    float distanceThroughAtmosphere = escapePoint - impactPoint;
     
     vec3 pointInAtmosphere = rayOrigin + rayDir * impactPoint;
 
