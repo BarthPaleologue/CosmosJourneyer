@@ -9,7 +9,7 @@ varying vec2 vUV; // screen coordinates
 
 // uniforms
 uniform sampler2D textureSampler; // the original screen texture
-uniform sampler2D depthSampler;
+uniform sampler2D depthSampler; // the depth map of the camera
 
 uniform vec3 sunPosition; // position of the sun in world space
 uniform vec3 cameraPosition; // position of the camera in world space
@@ -27,6 +27,7 @@ uniform float atmosphereRadius; // atmosphere radius (calculate from planet cent
 uniform float falloffFactor; // controls exponential opacity falloff
 uniform float sunIntensity; // controls atmosphere overall brightness
 uniform float scatteringStrength; // controls color dispersion
+uniform float densityModifier; // density of the atmosphere
 
 uniform float redWaveLength; // the wave length for the red part of the scattering
 uniform float greenWaveLength; // same with green
@@ -71,7 +72,7 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
 float densityAtPoint(vec3 densitySamplePoint) {
     float heightAboveSurface = length(densitySamplePoint - planetPosition) - planetRadius; // actual height above surface
     float height01 = heightAboveSurface / (atmosphereRadius - planetRadius); // normalized height between 0 and 1
-    float localDensity = exp(-height01 * falloffFactor); // density with exponential falloff
+    float localDensity = densityModifier * exp(-height01 * falloffFactor); // density with exponential falloff
     localDensity *= (1.0 - height01); // make it 0 at maximum height
 
     return localDensity;
@@ -126,12 +127,13 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
         samplePoint += rayDir * stepSize; // move sample point along view ray
     }
 
-    //https://glossary.ametsoc.org/wiki/Rayleigh_phase_function
+    // scattering depends on the direction of the light ray and the view ray : it's the rayleigh phase function
+    // https://glossary.ametsoc.org/wiki/Rayleigh_phase_function
     float mu = dot(rayDir, sunDir);
     float phaseRayleigh = 3.0 / (16.0 * PI) * (1.0 + mu * mu);
     
-    inScatteredLight *= phaseRayleigh;
-    inScatteredLight *= sunIntensity;
+    inScatteredLight *= phaseRayleigh; // apply rayleigh pahse
+    inScatteredLight *= sunIntensity; // multiply by the intensity of the sun
 
     return inScatteredLight;
 }

@@ -4,6 +4,7 @@ interface AtmosphereSettings {
     falloffFactor: number,
     intensity: number,
     scatteringStrength: number,
+    densityModifier: number,
     redWaveLength: number,
     greenWaveLength: number,
     blueWaveLength: number,
@@ -36,6 +37,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
             "falloffFactor",
             "sunIntensity",
             "scatteringStrength",
+            "densityModifier",
 
             "redWaveLength",
             "greenWaveLength",
@@ -51,6 +53,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
             falloffFactor: 15,
             intensity: 15,
             scatteringStrength: 1,
+            densityModifier: 1,
             redWaveLength: 700,
             greenWaveLength: 530,
             blueWaveLength: 440,
@@ -89,6 +92,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
             effect.setFloat("falloffFactor", this.settings.falloffFactor);
             effect.setFloat("sunIntensity", this.settings.intensity);
             effect.setFloat("scatteringStrength", this.settings.scatteringStrength);
+            effect.setFloat("densityModifier", this.settings.densityModifier);
 
             effect.setFloat("redWaveLength", this.settings.redWaveLength);
             effect.setFloat("greenWaveLength", this.settings.greenWaveLength);

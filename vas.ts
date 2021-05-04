@@ -91,6 +91,10 @@ new Slider("falloff", document.getElementById("falloff")!, 0, 30, atmosphere.set
     atmosphere.settings.falloffFactor = val;
 });
 
+new Slider("density", document.getElementById("density")!, 0, 30, atmosphere.settings.densityModifier * 10, (val: number) => {
+    atmosphere.settings.densityModifier = val / 10;
+});
+
 new Slider("redWaveLength", document.getElementById("redWaveLength")!, 0, 1000, atmosphere.settings.redWaveLength, (val: number) => {
     atmosphere.settings.redWaveLength = val;
 });

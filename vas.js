@@ -66,6 +66,9 @@ new Slider("scatteringStrength", document.getElementById("scatteringStrength"), 
 new Slider("falloff", document.getElementById("falloff"), 0, 30, atmosphere.settings.falloffFactor, (val) => {
     atmosphere.settings.falloffFactor = val;
 });
+new Slider("density", document.getElementById("density"), 0, 30, atmosphere.settings.densityModifier * 10, (val) => {
+    atmosphere.settings.densityModifier = val / 10;
+});
 new Slider("redWaveLength", document.getElementById("redWaveLength"), 0, 1000, atmosphere.settings.redWaveLength, (val) => {
     atmosphere.settings.redWaveLength = val;
 });
