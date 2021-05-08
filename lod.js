@@ -7,16 +7,19 @@ let engine = new BABYLON.Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+scene.collisionsEnabled = true;
 let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 3, BABYLON.Vector3.Zero(), scene);
 camera.setPosition(new BABYLON.Vector3(0, 0, -15));
 camera.attachControl(canvas);
 let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, 0), scene);
 freeCamera.minZ = 1;
 freeCamera.attachControl(canvas);
+freeCamera.checkCollisions = true;
 //freeCamera.inertia = 0;
 //freeCamera.angularSensibility = 500;
 let box = BABYLON.Mesh.CreateBox("boate", 1, scene);
 freeCamera.parent = box;
+box.checkCollisions = true;
 scene.activeCamera = freeCamera;
 let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
 const radius = 200 * 1e3; // diamètre en km
@@ -34,6 +37,7 @@ planet.noiseModifiers.amplitudeModifier = 50;
 planet.noiseModifiers.frequencyModifier = 0.0005;
 planet.updateSettings();
 planet.updateColors();
+planet.attachNode.checkCollisions = true;
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 20e3, radius + 25e3, sun, freeCamera, scene);
 atmosphere.settings.intensity = 10;
@@ -109,7 +113,7 @@ scene.executeWhenReady(() => {
             speed -= 1;
         if (keyboard["8"])
             speed = 1;
-        planet.attachNode.position.addInPlace(deplacement);
+        planet.attachNode.moveWithCollisions(deplacement);
         sun.position.addInPlace(deplacement);
     };
     let speed = 0.0002 * radius;

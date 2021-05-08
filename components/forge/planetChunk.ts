@@ -109,6 +109,10 @@ export class PlanetChunk {
         this.mesh.material = surfaceMaterial;
         this.mesh.parent = this.parentNode;
 
+        if (this.depth > 1) {
+            this.mesh.checkCollisions = true;
+        }
+
         chunkForge.addTask({
             taskType: TaskType.Build,
             id: this.id,
