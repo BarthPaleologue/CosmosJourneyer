@@ -94,7 +94,7 @@ export class ChunkForge {
             if (this.trashCan.length > 0) {
                 let task = this.trashCan.shift();
                 task.mesh.setEnabled(false);
-                //task.mesh.dispose(); causes atmospheric shimmering for now
+                //task.mesh.dispose(); //causes atmospheric shimmering for now
             }
         }
     }

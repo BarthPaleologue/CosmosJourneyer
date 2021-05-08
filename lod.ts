@@ -22,11 +22,14 @@ freeCamera.attachControl(canvas);
 //freeCamera.inertia = 0;
 //freeCamera.angularSensibility = 500;
 
+let box = BABYLON.Mesh.CreateBox("boate", 1, scene);
+freeCamera.parent = box;
+
 scene.activeCamera = freeCamera;
 
 let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
 
-const radius = 100 * 1e3; // diamètre en km
+const radius = 200 * 1e3; // diamètre en km
 freeCamera.maxZ = Math.max(radius * 10, 10000);
 
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.2 * radius, scene);
@@ -56,6 +59,9 @@ let keyboard: { [key: string]: boolean; } = {};
 
 document.addEventListener("keydown", e => {
     keyboard[e.key] = true;
+    if (e.key == "p") { // take screenshots
+        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
+    }
     if (e.key == "r") {
         planet.noiseModifiers.strengthModifier = Math.random() * 3;
         planet.updateSettings();
@@ -91,33 +97,23 @@ scene.executeWhenReady(() => {
 
 
         if (keyboard["a"]) { // rotation autour de l'axe de déplacement
-            let rotation = BABYLON.Matrix.RotationAxis(forward, 0.005);
-            upward = BABYLON.Vector3.TransformCoordinates(upward, rotation);
-            freeCamera.upVector = upward;
+            box.rotate(forward, 0.02, BABYLON.Space.WORLD);
         } else if (keyboard["e"]) {
-            let rotation = BABYLON.Matrix.RotationAxis(forward, -0.005);
-            upward = BABYLON.Vector3.TransformCoordinates(upward, rotation);
-            freeCamera.upVector = upward;
+            box.rotate(forward, -0.02, BABYLON.Space.WORLD);
         }
-
-        if (keyboard["j"]) { // rotation autour du up vector
-            let rotation = BABYLON.Matrix.RotationAxis(upward, -0.005);
-            forward = BABYLON.Vector3.TransformCoordinates(forward, rotation);
-            freeCamera.setTarget(forward);
-        } else if (keyboard["l"]) {
-            let rotation = BABYLON.Matrix.RotationAxis(upward, 0.005);
-            forward = BABYLON.Vector3.TransformCoordinates(forward, rotation);
-            freeCamera.setTarget(forward);
-        }
-
-        if (keyboard["i"]) { // rotation autour du vecteur de droite
-            let rotation = BABYLON.Matrix.RotationAxis(right, -0.005);
-            forward = BABYLON.Vector3.TransformCoordinates(forward, rotation);
-            freeCamera.setTarget(forward);
+        if (keyboard["i"]) {
+            box.rotate(right, -0.02, BABYLON.Space.WORLD);
         } else if (keyboard["k"]) {
-            let rotation = BABYLON.Matrix.RotationAxis(right, 0.005);
-            forward = BABYLON.Vector3.TransformCoordinates(forward, rotation);
-            freeCamera.setTarget(forward);
+            box.rotate(right, 0.02, BABYLON.Space.WORLD);
+        }
+        if (keyboard["j"]) {
+            box.rotate(upward, -0.02, BABYLON.Space.WORLD);
+        } else if (keyboard["l"]) {
+            box.rotate(upward, 0.02, BABYLON.Space.WORLD);
+        }
+
+        if (keyboard["c"]) {
+            box.setDirection(BABYLON.Axis.Y, -Math.PI / 2);
         }
 
 
