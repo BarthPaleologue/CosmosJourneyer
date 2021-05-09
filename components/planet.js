@@ -9,8 +9,11 @@ export class Planet {
         this.id = _id;
         this.radius = _radius;
         this.chunkLength = this.radius * 2;
-        this.attachNode = BABYLON.Mesh.CreatePlane(`${this.id}AttachNode`, 1, _scene);
+        this.attachNode = BABYLON.Mesh.CreateBox(`${this.id}AttachNode`, 1, _scene);
         this.attachNode.position = _position;
+        this.attachNode.physicsImpostor = new BABYLON.PhysicsImpostor(this.attachNode, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1 });
+        this.attachNode.showBoundingBox = true;
+        this.attachNode.collisionMask = 1;
         this.surfaceMaterial = new BABYLON.ShaderMaterial(`${this.id}BaseMaterial`, _scene, "");
         this.chunkForge = new ChunkForge(this.chunkLength, _nbSubdivisions, _scene);
         this.sides = [

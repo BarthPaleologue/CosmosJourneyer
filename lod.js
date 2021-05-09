@@ -7,10 +7,7 @@ let engine = new BABYLON.Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
-scene.collisionsEnabled = true;
-let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 3, BABYLON.Vector3.Zero(), scene);
-camera.setPosition(new BABYLON.Vector3(0, 0, -15));
-camera.attachControl(canvas);
+scene.enablePhysics(new BABYLON.Vector3(0, 0, 0), new BABYLON.CannonJSPlugin());
 let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, 0), scene);
 freeCamera.minZ = 1;
 freeCamera.attachControl(canvas);
@@ -19,7 +16,11 @@ freeCamera.checkCollisions = true;
 //freeCamera.angularSensibility = 500;
 let box = BABYLON.Mesh.CreateBox("boate", 1, scene);
 freeCamera.parent = box;
-box.checkCollisions = true;
+box.physicsImpostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1 });
+box.showBoundingBox = true;
+box.physicsImpostor.onCollide = e => {
+    console.log("collision camera", e);
+};
 scene.activeCamera = freeCamera;
 let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
 const radius = 200 * 1e3; // diamètre en km
@@ -67,12 +68,13 @@ scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     let t = 0;
     scene.beforeRender = () => {
+        var _a;
         let forward = freeCamera.getDirection(BABYLON.Axis.Z);
         let upward = freeCamera.getDirection(BABYLON.Axis.Y);
         let right = freeCamera.getDirection(BABYLON.Axis.X);
         planet.chunkForge.update();
-        planet.update(freeCamera.position, forward, sun.position, camera);
-        planet.attachNode.rotation.y += 0.0002;
+        planet.update(freeCamera.position, forward, sun.position, freeCamera);
+        planet.attachNode.rotation.y += 0.0001;
         if (keyboard["a"]) { // rotation autour de l'axe de déplacement
             box.rotate(forward, 0.02, BABYLON.Space.WORLD);
         }
@@ -113,7 +115,8 @@ scene.executeWhenReady(() => {
             speed -= 1;
         if (keyboard["8"])
             speed = 1;
-        planet.attachNode.moveWithCollisions(deplacement);
+        //planet.attachNode.moveWithCollisions(deplacement);
+        (_a = planet.attachNode.physicsImpostor) === null || _a === void 0 ? void 0 : _a.applyImpulse(deplacement, planet.attachNode.position);
         sun.position.addInPlace(deplacement);
     };
     let speed = 0.0002 * radius;

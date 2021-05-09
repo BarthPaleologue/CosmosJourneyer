@@ -108,7 +108,7 @@ export class PlanetSide {
             }
             else {
                 // si c'est un noeud, on supprime tous les enfants, on remplace par un nouveau chunk
-                if (walked.length < this.minDepth) {
+                if (walked.length > this.minDepth) {
                     let newChunk = this.createChunk(walked);
                     this.requestDeletion(tree);
                     return newChunk;

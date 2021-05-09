@@ -1,6 +1,5 @@
 import { AtmosphericScatteringPostProcess } from "./atmosphericScattering.js";
 import { Planet } from "./components/planet.js";
-import { DepthPostProcess } from "./depthPostprocess.js";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -11,11 +10,8 @@ engine.loadingScreen.displayLoadingUI();
 
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
-scene.collisionsEnabled = true;
 
-let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 3, BABYLON.Vector3.Zero(), scene);
-camera.setPosition(new BABYLON.Vector3(0, 0, -15));
-camera.attachControl(canvas);
+scene.enablePhysics(new BABYLON.Vector3(0, 0, 0), new BABYLON.CannonJSPlugin());
 
 let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, 0), scene);
 freeCamera.minZ = 1;
@@ -26,7 +22,11 @@ freeCamera.checkCollisions = true;
 
 let box = BABYLON.Mesh.CreateBox("boate", 1, scene);
 freeCamera.parent = box;
-box.checkCollisions = true;
+box.physicsImpostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1 });
+box.showBoundingBox = true;
+box.physicsImpostor.onCollide = e => {
+    console.log("collision camera", e);
+};
 
 scene.activeCamera = freeCamera;
 
@@ -96,10 +96,8 @@ scene.executeWhenReady(() => {
 
         planet.chunkForge.update();
 
-        planet.update(freeCamera.position, forward, sun.position, camera);
-        planet.attachNode.rotation.y += 0.0002;
-
-
+        planet.update(freeCamera.position, forward, sun.position, freeCamera);
+        planet.attachNode.rotation.y += 0.0001;
 
         if (keyboard["a"]) { // rotation autour de l'axe de déplacement
             box.rotate(forward, 0.02, BABYLON.Space.WORLD);
@@ -134,7 +132,8 @@ scene.executeWhenReady(() => {
         if (keyboard["-"]) speed -= 1;
         if (keyboard["8"]) speed = 1;
 
-        planet.attachNode.moveWithCollisions(deplacement);
+        //planet.attachNode.moveWithCollisions(deplacement);
+        planet.attachNode.physicsImpostor?.applyImpulse(deplacement, planet.attachNode.position);
         sun.position.addInPlace(deplacement);
     };
 
