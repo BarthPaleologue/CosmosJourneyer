@@ -18,6 +18,8 @@ uniform mat4 projection;
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler; // evaluate sceneDepth
 
+uniform sampler2D normalMap;
+
 uniform float planetRadius; // planet radius
 uniform float iceCapThreshold; // controls snow minimum spawn altitude
 uniform float steepSnowDotLimit; // controls snow maximum spawn steepness
@@ -65,36 +67,62 @@ float remap(float value, float low1, float high1, float low2, float high2) {
     return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
 }
 
+vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
+    vec3 tNormalX = texture2D(normalMap, position.zy * scale).rgb;
+    vec3 tNormalY = texture2D(normalMap, position.xz * scale).rgb;
+    vec3 tNormalZ = texture2D(normalMap, position.xy * scale).rgb;
+
+    tNormalX = vec3(normalStrength * tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
+    tNormalY = vec3(normalStrength * tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
+    tNormalZ = vec3(normalStrength * tNormalZ.xy + surfaceNormal.xy, tNormalZ.z * surfaceNormal.z);
+
+    vec3 blendWeight = pow(abs(vNormal), vec3(sharpness));
+    blendWeight /= dot(blendWeight, vec3(1.0));
+
+    return normalize(tNormalX.zyx * blendWeight.x + tNormalY.xzy * blendWeight.y + tNormalZ.xyz * blendWeight.z);
+}
+
+
 void main() {
 
 	vec3 viewDirectionW = normalize(v3CameraPos - vPositionW); // view direction in world space
 
-	vec3 normVPos = normalize(vPosition); // normalized vertex normal in sphere space
-	vec3 normVNorm = normalize(vNormal); // normalized vertex position in sphere space
+	vec3 normal = triplanarNormal(vPosition, vNormal, normalMap, 0.05, 1.0, 0.2);
+	normal = triplanarNormal(vPosition, normal, normalMap, 0.001, 1.0, 0.2);
+	normal = triplanarNormal(vPosition, normal, normalMap, 0.0001, 1.0, 0.2);
+
+
+	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
 	vec3 lightRay = normalize(v3LightPos - vPositionW); // light ray direction in world space
 	
-	vec4 color = vec4(viewDirectionW, 1.); // color of the pixel (default doesn't matter)
+	vec4 color = vec4(vec3(0.0), 1.); // color of the pixel (default doesn't matter)
 
-	float ndl = max(0., dot(vNormalW, lightRay)); // dimming factor due to light inclination relative to vertex normal in world space
+	float ndl = pow(max(0., dot(normalW, lightRay)), 1.0); // dimming factor due to light inclination relative to vertex normal in world space
 
 	// specular
 	vec3 angleW = normalize(viewDirectionW + lightRay);
-    float specComp = max(0., dot(vNormalW, angleW));
-    specComp = pow(specComp, max(1., 64.)) * 2.;
+    float specComp = max(0., dot(normalW, angleW));
+    specComp = pow(specComp, 64.0);
 
+	//float d = dot(normalize(vPosition), vNormal); // represents the steepness of the slope at a given vertex
 
-
-	float d = dot(normVPos, normVNorm); // represents the steepness of the slope at a given vertex
-
-	if (length(vPosition) > (planetRadius*(1. + (iceCapThreshold / 100.) - pow(pow(normVPos.y, 8.), 2.)))) {
+	if (length(vPosition) > (planetRadius * (1. + (iceCapThreshold / 100.) - pow(normal.y, 6.)))) {
         // if mountains region (you need to be higher at the equator)
-        if (d > steepSnowDotLimit) color = snowColor; // apply snow color
-        else color = color = steepColor; // apply steep color
+        //if (d > steepSnowDotLimit) color += snowColor; // apply snow color
+        //else color += steepColor; // apply steep color
+		float d = dot(normalize(vPosition), normal);
+		float sharpness = 128.0;
+		float d2 = clamp(pow(d + 0.15, sharpness), 0.0, 1.0);
+		color = (d2 * snowColor + (1.0 - d2) * steepColor);
     } else {
         // if lower region
-        if (d < 0.94) color = steepColor; // apply steep color
-        else {
+        //if (d < 0.99) { // apply steep color
+			float d = dot(normalize(vPosition), vNormal);
+			float sharpness = 128.0;
+			float d2 = clamp(pow(d + 0.015, sharpness), 0.0, 1.0);
+			color = (d2 * plainColor + (1.0 - d2) * steepColor);
+		/*} else {
 			if(length(vPosition) > (1. + sandSize/1000.) * (planetRadius + waterLevel / 2.)) {
 				// if above water level
 				color = plainColor; // it's a plain
@@ -103,12 +131,12 @@ void main() {
 				color = sandColor;
 			} else {
 				// if it's SOOOUS L'OCEAAAAAAN
-				color = steepColor; // placeholder for sea bottom color eventually
+				color = sandColor; // placeholder for sea bottom color eventually
 			}
-        }
+        }*/
     }
 
-	vec3 screenColor = color.rgb * ndl + vec3(specComp) * 0.1;
+	vec3 screenColor = color.rgb * ndl + vec3(specComp) * 0.01;
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
 }

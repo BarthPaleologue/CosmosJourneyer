@@ -11,9 +11,9 @@ export class Planet {
         this.chunkLength = this.radius * 2;
         this.attachNode = BABYLON.Mesh.CreateBox(`${this.id}AttachNode`, 1, _scene);
         this.attachNode.position = _position;
-        this.attachNode.physicsImpostor = new BABYLON.PhysicsImpostor(this.attachNode, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1 });
-        this.attachNode.showBoundingBox = true;
-        this.attachNode.collisionMask = 1;
+        //this.attachNode.physicsImpostor = new BABYLON.PhysicsImpostor(this.attachNode, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1 });
+        //this.attachNode.showBoundingBox = true;
+        //this.attachNode.collisionMask = 1;
         this.surfaceMaterial = new BABYLON.ShaderMaterial(`${this.id}BaseMaterial`, _scene, "");
         this.chunkForge = new ChunkForge(this.chunkLength, _nbSubdivisions, _scene);
         this.sides = [
@@ -27,9 +27,9 @@ export class Planet {
         let noiseEngine = new NoiseEngine();
         noiseEngine.seed(69);
         let nbCraters = 500;
-        let craterRadiusFactor = 0.1;
-        let craterSteepnessFactor = 1;
-        let craterMaxDepthFactor = 1;
+        let craterRadiusFactor = .1 * this.radius;
+        let craterSteepnessFactor = 1 * this.radius;
+        let craterMaxDepthFactor = 1 * this.radius;
         this.noiseModifiers = {
             strengthModifier: 1,
             amplitudeModifier: 1,
@@ -38,10 +38,10 @@ export class Planet {
             minValueModifier: 1,
         };
         this.craterModifiers = {
-            radiusModifier: 1,
-            steepnessModifier: 1,
-            maxDepthModifier: 1,
-            scaleFactor: 1,
+            radiusModifier: this.radius / 5,
+            steepnessModifier: this.radius / 5,
+            maxDepthModifier: this.radius / 5,
+            scaleFactor: this.radius / 5,
         };
         this.colorSettings = {
             snowColor: new BABYLON.Vector4(1, 1, 1, 1),
@@ -58,10 +58,15 @@ export class Planet {
         this.updateSettings();
         let surfaceMaterial = new BABYLON.ShaderMaterial("surfaceColor", _scene, "./shaders/surfaceColor", {
             attributes: ["position", "normal", "uv"],
-            uniforms: ["world", "worldViewProjection", "textureSampler", "depthSampler", "cameraNear", "cameraFar", "projection", "view"]
+            uniforms: [
+                "world", "worldViewProjection", "projection", "view",
+                "textureSampler", "depthSampler", "normalMap",
+                "cameraNear", "cameraFar"
+            ]
         });
         //@ts-ignore
         surfaceMaterial.useLogarithmicDepth = true;
+        surfaceMaterial.setTexture("normalMap", new BABYLON.Texture("./textures/crackednormal.jpg", _scene));
         surfaceMaterial.setVector3("v3CameraPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("v3LightPos", BABYLON.Vector3.Zero());
         this.setChunkMaterial(surfaceMaterial);

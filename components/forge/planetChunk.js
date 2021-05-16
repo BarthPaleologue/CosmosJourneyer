@@ -86,25 +86,28 @@ export class PlanetChunk {
         this.position.addInPlace(new BABYLON.Vector3(0, 0, -this.chunkLength / 2));
         this.mesh = new BABYLON.Mesh(`Chunk${this.id}`, scene);
         this.mesh.material = surfaceMaterial;
+        //this.mesh.material.wireframe = true;
         this.mesh.parent = this.parentNode;
-        if (this.depth > 3) {
+        /*if (this.depth > 3) {
             this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.BoxImpostor, {
                 mass: 0,
             });
+
             //this.mesh.physicsImpostor.
             this.mesh.showBoundingBox = true;
             this.mesh.collisionMask = 1;
             this.mesh.physicsImpostor.onCollide = e => {
                 console.log(this.mesh.id, e);
             };
-            /*let joint = new BABYLON.DistanceJoint({
+
+            let joint = new BABYLON.DistanceJoint({
                 connectedAxis: this.mesh.position,
                 mainAxis: this.mesh.position,
                 maxDistance: this.mesh.position.length()
             });
-            this.parentNode.physicsImpostor?.addJoint(this.mesh.physicsImpostor, joint);*/
+            this.parentNode.physicsImpostor?.addJoint(this.mesh.physicsImpostor, joint);
             //this.parentNode.physicsImpostor?.forceUpdate();
-        }
+        }*/
         chunkForge.addTask({
             taskType: TaskType.Build,
             id: this.id,

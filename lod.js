@@ -7,7 +7,7 @@ let engine = new BABYLON.Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
-scene.enablePhysics(new BABYLON.Vector3(0, 0, 0), new BABYLON.CannonJSPlugin());
+//scene.enablePhysics(new BABYLON.Vector3(0, 0, 0), new BABYLON.CannonJSPlugin());
 let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, 0), scene);
 freeCamera.minZ = 1;
 freeCamera.attachControl(canvas);
@@ -32,7 +32,7 @@ let mat = new BABYLON.StandardMaterial("mat", scene);
 mat.emissiveTexture = new BABYLON.Texture("./textures/sun.jpg", scene);
 sun.material = mat;
 light.parent = sun;
-let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 2, 5, scene);
+let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 2, 6, scene);
 planet.colorSettings.sandColor = planet.colorSettings.steepColor;
 planet.noiseModifiers.amplitudeModifier = 50;
 planet.noiseModifiers.frequencyModifier = 0.0005;
@@ -68,13 +68,12 @@ scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     let t = 0;
     scene.beforeRender = () => {
-        var _a;
         let forward = freeCamera.getDirection(BABYLON.Axis.Z);
         let upward = freeCamera.getDirection(BABYLON.Axis.Y);
         let right = freeCamera.getDirection(BABYLON.Axis.X);
         planet.chunkForge.update();
         planet.update(freeCamera.position, forward, sun.position, freeCamera);
-        planet.attachNode.rotation.y += 0.0001;
+        //planet.attachNode.rotation.y += 0.0001;
         if (keyboard["a"]) { // rotation autour de l'axe de déplacement
             box.rotate(forward, 0.02, BABYLON.Space.WORLD);
         }
@@ -114,10 +113,9 @@ scene.executeWhenReady(() => {
         if (keyboard["-"])
             speed -= 1;
         if (keyboard["8"])
-            speed = 1;
-        //planet.attachNode.moveWithCollisions(deplacement);
-        (_a = planet.attachNode.physicsImpostor) === null || _a === void 0 ? void 0 : _a.applyImpulse(deplacement, planet.attachNode.position);
-        sun.position.addInPlace(deplacement);
+            speed = 0.03;
+        planet.attachNode.moveWithCollisions(deplacement);
+        //planet.attachNode.physicsImpostor?.applyImpulse(deplacement, planet.attachNode.position);
     };
     let speed = 0.0002 * radius;
     engine.runRenderLoop(() => {

@@ -11,7 +11,7 @@ engine.loadingScreen.displayLoadingUI();
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
 
-scene.enablePhysics(new BABYLON.Vector3(0, 0, 0), new BABYLON.CannonJSPlugin());
+//scene.enablePhysics(new BABYLON.Vector3(0, 0, 0), new BABYLON.CannonJSPlugin());
 
 let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, 0), scene);
 freeCamera.minZ = 1;
@@ -44,7 +44,7 @@ sun.material = mat;
 light.parent = sun;
 
 
-let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 2, 5, scene);
+let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 2, 6, scene);
 planet.colorSettings.sandColor = planet.colorSettings.steepColor;
 planet.noiseModifiers.amplitudeModifier = 50;
 planet.noiseModifiers.frequencyModifier = 0.0005;
@@ -97,7 +97,7 @@ scene.executeWhenReady(() => {
         planet.chunkForge.update();
 
         planet.update(freeCamera.position, forward, sun.position, freeCamera);
-        planet.attachNode.rotation.y += 0.0001;
+        //planet.attachNode.rotation.y += 0.0001;
 
         if (keyboard["a"]) { // rotation autour de l'axe de déplacement
             box.rotate(forward, 0.02, BABYLON.Space.WORLD);
@@ -130,11 +130,10 @@ scene.executeWhenReady(() => {
         if (keyboard["Shift"]) deplacement.addInPlace(upward.scale(speed * engine.getDeltaTime()));
         if (keyboard["+"]) speed += 1;
         if (keyboard["-"]) speed -= 1;
-        if (keyboard["8"]) speed = 1;
+        if (keyboard["8"]) speed = 0.03;
 
-        //planet.attachNode.moveWithCollisions(deplacement);
-        planet.attachNode.physicsImpostor?.applyImpulse(deplacement, planet.attachNode.position);
-        sun.position.addInPlace(deplacement);
+        planet.attachNode.moveWithCollisions(deplacement);
+        //planet.attachNode.physicsImpostor?.applyImpulse(deplacement, planet.attachNode.position);
     };
 
     let speed = 0.0002 * radius;
