@@ -87,9 +87,20 @@ void main() {
 
 	vec3 viewDirectionW = normalize(v3CameraPos - vPositionW); // view direction in world space
 
-	vec3 normal = triplanarNormal(vPosition, vNormal, normalMap, 0.05, 1.0, 0.2);
+	float distance = length(v3CameraPos - vPositionW);
+
+	vec3 normal = vNormal;
+
+	//if(distance < 10000.0) {
+	normal = triplanarNormal(vPosition, vNormal, normalMap, 0.05, 1.0, 0.2);
 	normal = triplanarNormal(vPosition, normal, normalMap, 0.001, 1.0, 0.2);
 	normal = triplanarNormal(vPosition, normal, normalMap, 0.0001, 1.0, 0.2);
+	//}
+
+	vec3 sphereNormal = triplanarNormal(vPosition, normalize(vPosition), normalMap, 0.05, 1.0, 0.2);
+	sphereNormal = triplanarNormal(vPosition, sphereNormal, normalMap, 0.001, 1.0, 0.2);
+	sphereNormal = triplanarNormal(vPosition, sphereNormal, normalMap, 0.0001, 1.0, 0.2);
+	sphereNormal = triplanarNormal(vPosition, sphereNormal, normalMap, 0.00001, 1.0, 0.2);
 
 
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
@@ -98,7 +109,7 @@ void main() {
 	
 	vec4 color = vec4(vec3(0.0), 1.); // color of the pixel (default doesn't matter)
 
-	float ndl = pow(max(0., dot(normalW, lightRay)), 1.0); // dimming factor due to light inclination relative to vertex normal in world space
+	float ndl = max(0., dot(normalW, lightRay)); // dimming factor due to light inclination relative to vertex normal in world space
 
 	// specular
 	vec3 angleW = normalize(viewDirectionW + lightRay);
@@ -107,7 +118,7 @@ void main() {
 
 	//float d = dot(normalize(vPosition), vNormal); // represents the steepness of the slope at a given vertex
 
-	if (length(vPosition) > (planetRadius * (1. + (iceCapThreshold / 100.) - pow(normal.y, 6.)))) {
+	if (length(vPosition) > (planetRadius * (1.0 + (iceCapThreshold / 100.) - pow(sphereNormal.y, 8.)))) {
         // if mountains region (you need to be higher at the equator)
         //if (d > steepSnowDotLimit) color += snowColor; // apply snow color
         //else color += steepColor; // apply steep color

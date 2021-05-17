@@ -54,7 +54,7 @@ export class Planet {
             waterLevel: 0.32,
             sandSize: 1,
         };
-        this.craters = this.generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
+        this.craters = this.generateCraters(nbCraters, this.radius, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
         this.updateSettings();
         let surfaceMaterial = new BABYLON.ShaderMaterial("surfaceColor", _scene, "./shaders/surfaceColor", {
             attributes: ["position", "normal", "uv"],
@@ -132,10 +132,10 @@ export class Planet {
     updateSettings() {
         this.chunkForge.setPlanet(this.radius, this.craters, this.noiseModifiers, this.craterModifiers);
     }
-    generateCraters(n, _radius, _steepness, _maxDepth) {
+    generateCraters(n, radius, radiusModifier, _steepness, _maxDepth) {
         let craters = [];
         for (let i = 0; i < n; i++) {
-            let r = _radius * (Math.pow(Math.random(), 10));
+            let r = radiusModifier * (Math.pow(Math.random(), 10));
             // random spherical coordinates
             let phi = Math.random() * Math.PI * 2;
             let theta = Math.random() * Math.PI;

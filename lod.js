@@ -34,8 +34,8 @@ sun.material = mat;
 light.parent = sun;
 let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 2, 6, scene);
 planet.colorSettings.sandColor = planet.colorSettings.steepColor;
-planet.noiseModifiers.amplitudeModifier = 50;
-planet.noiseModifiers.frequencyModifier = 0.0005;
+planet.noiseModifiers.amplitudeModifier = 70;
+planet.noiseModifiers.frequencyModifier = 0.0004;
 planet.updateSettings();
 planet.updateColors();
 planet.attachNode.checkCollisions = true;
@@ -115,6 +115,9 @@ scene.executeWhenReady(() => {
         if (keyboard["8"])
             speed = 0.03;
         planet.attachNode.moveWithCollisions(deplacement);
+        t += 0.00002;
+        sun.position = planet.attachNode.position.add(new BABYLON.Vector3(Math.cos(t), 0, Math.sin(t)).scale(4 * radius));
+        planet.surfaceMaterial.setVector3("v3LightPos", sun.absolutePosition);
         //planet.attachNode.physicsImpostor?.applyImpulse(deplacement, planet.attachNode.position);
     };
     let speed = 0.0002 * radius;

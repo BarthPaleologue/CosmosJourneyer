@@ -101,7 +101,7 @@ export class Planet {
             sandSize: 1,
         };
 
-        this.craters = this.generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
+        this.craters = this.generateCraters(nbCraters, this.radius, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
 
         this.updateSettings();
 
@@ -194,10 +194,10 @@ export class Planet {
         this.chunkForge.setPlanet(this.radius, this.craters, this.noiseModifiers, this.craterModifiers);
     }
 
-    generateCraters(n: number, _radius: number, _steepness: number, _maxDepth: number) {
+    generateCraters(n: number, radius: number, radiusModifier: number, _steepness: number, _maxDepth: number) {
         let craters: Crater[] = [];
         for (let i = 0; i < n; i++) {
-            let r = _radius * (Math.random() ** 10);
+            let r = radiusModifier * (Math.random() ** 10);
             // random spherical coordinates
             let phi = Math.random() * Math.PI * 2;
             let theta = Math.random() * Math.PI;
