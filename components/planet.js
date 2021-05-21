@@ -27,9 +27,9 @@ export class Planet {
         let noiseEngine = new NoiseEngine();
         noiseEngine.seed(69);
         let nbCraters = 500;
-        let craterRadiusFactor = .1 * this.radius;
-        let craterSteepnessFactor = 1 * this.radius;
-        let craterMaxDepthFactor = 1 * this.radius;
+        let craterRadiusFactor = 1;
+        let craterSteepnessFactor = 1;
+        let craterMaxDepthFactor = 1;
         this.noiseModifiers = {
             strengthModifier: 1,
             amplitudeModifier: 1,
@@ -38,10 +38,10 @@ export class Planet {
             minValueModifier: 1,
         };
         this.craterModifiers = {
-            radiusModifier: this.radius / 5,
-            steepnessModifier: this.radius / 5,
-            maxDepthModifier: this.radius / 5,
-            scaleFactor: this.radius / 5,
+            radiusModifier: 1,
+            steepnessModifier: 1,
+            maxDepthModifier: 1,
+            scaleFactor: 1,
         };
         this.colorSettings = {
             snowColor: new BABYLON.Vector4(1, 1, 1, 1),
@@ -54,7 +54,7 @@ export class Planet {
             waterLevel: 0.32,
             sandSize: 1,
         };
-        this.craters = this.generateCraters(nbCraters, this.radius, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
+        this.craters = this.generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
         this.updateSettings();
         let surfaceMaterial = new BABYLON.ShaderMaterial("surfaceColor", _scene, "./shaders/surfaceColor", {
             attributes: ["position", "normal", "uv"],
@@ -132,10 +132,10 @@ export class Planet {
     updateSettings() {
         this.chunkForge.setPlanet(this.radius, this.craters, this.noiseModifiers, this.craterModifiers);
     }
-    generateCraters(n, radius, radiusModifier, _steepness, _maxDepth) {
+    generateCraters(n, radiusModifier, _steepness, _maxDepth) {
         let craters = [];
         for (let i = 0; i < n; i++) {
-            let r = radiusModifier * (Math.pow(Math.random(), 10));
+            let r = radiusModifier * 0.1 * (Math.pow(Math.random(), 16));
             // random spherical coordinates
             let phi = Math.random() * Math.PI * 2;
             let theta = Math.random() * Math.PI;

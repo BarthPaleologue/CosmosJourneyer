@@ -1,8 +1,8 @@
 import "../../babylon/babylon4.js";
 import { Direction } from "./direction.js";
-import { CraterLayer } from "./layers/craterLayer.js";
 import { NoiseLayer } from "./layers/noiseLayer.js";
 import { NoiseEngine } from "../../engine/perlin.js";
+import { CraterFilter } from "./layers/filters/craterFilter.js";
 let noiseEngine = new NoiseEngine();
 noiseEngine.seed(69);
 let radius = 10; // the planet radius
@@ -12,38 +12,41 @@ let noiseLayers = [];
 let barrenBumpyLayer = new NoiseLayer(noiseEngine, {
     noiseStrength: noiseStrength,
     octaves: 10,
-    baseAmplitude: 5,
+    baseAmplitude: 1000,
     baseFrequency: noiseFrequency,
     decay: 1.7,
     minValue: 0,
-    offset: [0, 0, 0]
+    offset: [0, 0, 0],
+    useCraterMask: false,
 });
 let continentsLayer = new NoiseLayer(noiseEngine, {
     noiseStrength: noiseStrength,
-    octaves: 4,
-    baseAmplitude: 1,
-    baseFrequency: noiseFrequency,
+    octaves: 2,
+    baseAmplitude: 50 * 1e3,
+    baseFrequency: noiseFrequency / 10,
     decay: 2,
-    minValue: 0.1,
-    offset: [0, 0, 0]
+    minValue: 0,
+    offset: [0, 0, 0],
+    useCraterMask: false,
 });
 let moutainsLayer = new NoiseLayer(noiseEngine, {
     noiseStrength: noiseStrength,
     octaves: 7,
-    baseAmplitude: 5,
+    baseAmplitude: 10,
     baseFrequency: noiseFrequency,
     decay: 2,
     minValue: 0,
-    offset: [0, 0, 0]
+    offset: [0, 0, 0],
+    useCraterMask: false,
 }, [0]);
-noiseLayers.push(continentsLayer, moutainsLayer, barrenBumpyLayer);
-let craterLayer = new CraterLayer([]);
-let craterLayers = [craterLayer];
+//noiseLayers.push(continentsLayer, moutainsLayer, barrenBumpyLayer);
+noiseLayers.push(continentsLayer, moutainsLayer);
+let craterFilter = new CraterFilter([]);
 let craterModifiers = {
     radiusModifier: 1,
-    steepnessModifier: 0.05,
+    steepnessModifier: 1,
     maxDepthModifier: 1,
-    scaleFactor: 10,
+    scaleFactor: 1,
 };
 let noiseModifiers = {
     strengthModifier: 1,
@@ -52,18 +55,19 @@ let noiseModifiers = {
     offsetModifier: BABYLON.Vector3.Zero(),
     minValueModifier: 1,
 };
-let terrainFunction = (p, noiseLayers, craterLayers) => {
+let terrainFunction = (p, noiseLayers, craterFilter) => {
     let coords = p.normalizeToNew().scale(radius);
     let elevation = 0;
+    let craterMask = craterFilter.evaluate(coords.normalizeToNew(), craterModifiers);
+    elevation += craterMask;
     for (let layer of noiseLayers) {
         let maskFactor = 1;
         for (let i = 0; i < layer.masks.length; i++) {
             maskFactor *= noiseLayers[i].evaluate(coords, noiseModifiers);
         }
+        if (layer.settings.useCraterMask && craterMask != 0)
+            maskFactor = 0;
         elevation += layer.evaluate(coords, noiseModifiers) * maskFactor;
-    }
-    for (let craterLayer of craterLayers) {
-        elevation += craterLayer.evaluate(coords.normalizeToNew(), craterModifiers);
     }
     let newPosition = p.add(coords.normalizeToNew().scale(elevation * noiseStrength));
     return newPosition;
@@ -110,7 +114,7 @@ onmessage = e => {
                 vertex = vertex.add(BABYLON.Vector3.FromArray(offset));
                 vertex = BABYLON.Vector3.TransformCoordinates(vertex, rotation);
                 vertex = vertex.normalizeToNew().scale(planetRadius);
-                vertex = terrainFunction(vertex, noiseLayers, craterLayers);
+                vertex = terrainFunction(vertex, noiseLayers, craterFilter);
                 vertices.push(vertex.x, vertex.y, vertex.z);
                 uvs.push(x / vertexPerLine, y / vertexPerLine);
                 if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
@@ -152,7 +156,7 @@ onmessage = e => {
 };
 function init(data) {
     radius = data.radius;
-    craterLayers[0].regenerate(data.craters);
+    craterFilter.setCraters(data.craters);
     noiseModifiers = data.noiseModifiers;
     craterModifiers = data.craterModifiers;
 }

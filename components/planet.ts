@@ -70,9 +70,9 @@ export class Planet {
         noiseEngine.seed(69);
 
         let nbCraters = 500;
-        let craterRadiusFactor = .1 * this.radius;
-        let craterSteepnessFactor = 1 * this.radius;
-        let craterMaxDepthFactor = 1 * this.radius;
+        let craterRadiusFactor = 1;
+        let craterSteepnessFactor = 1;
+        let craterMaxDepthFactor = 1;
 
         this.noiseModifiers = {
             strengthModifier: 1,
@@ -83,10 +83,10 @@ export class Planet {
         };
 
         this.craterModifiers = {
-            radiusModifier: this.radius / 5,
-            steepnessModifier: this.radius / 5,
-            maxDepthModifier: this.radius / 5,
-            scaleFactor: this.radius / 5,
+            radiusModifier: 1,
+            steepnessModifier: 1,
+            maxDepthModifier: 1,
+            scaleFactor: 1,
         };
 
         this.colorSettings = {
@@ -101,7 +101,7 @@ export class Planet {
             sandSize: 1,
         };
 
-        this.craters = this.generateCraters(nbCraters, this.radius, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
+        this.craters = this.generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
 
         this.updateSettings();
 
@@ -194,10 +194,10 @@ export class Planet {
         this.chunkForge.setPlanet(this.radius, this.craters, this.noiseModifiers, this.craterModifiers);
     }
 
-    generateCraters(n: number, radius: number, radiusModifier: number, _steepness: number, _maxDepth: number) {
+    generateCraters(n: number, radiusModifier: number, _steepness: number, _maxDepth: number) {
         let craters: Crater[] = [];
         for (let i = 0; i < n; i++) {
-            let r = radiusModifier * (Math.random() ** 10);
+            let r = radiusModifier * 0.1 * (Math.random() ** 16);
             // random spherical coordinates
             let phi = Math.random() * Math.PI * 2;
             let theta = Math.random() * Math.PI;

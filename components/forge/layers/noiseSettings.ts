@@ -6,6 +6,7 @@ export interface NoiseSettings {
     offset: number[],
     octaves: number,
     decay: number,
+    useCraterMask: boolean,
 }
 
 export interface NoiseModifiers {

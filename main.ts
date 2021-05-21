@@ -20,14 +20,17 @@ camera.attachControl(canvas);
 scene.activeCamera = camera;
 
 const planetRadius = 5;
-const atmosphereRadius = 12;
+const atmosphereRadius = 9;
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
 
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 64, 0, 1, scene);
 planet.setRenderDistanceFactor(10);
-planet.noiseModifiers.strengthModifier = 0.7;
+planet.craterModifiers.maxDepthModifier = 0.00005;
+planet.noiseModifiers.strengthModifier = 0.0001;
+planet.noiseModifiers.frequencyModifier = 50;
 planet.noiseModifiers.offsetModifier = [23, 10, 0];
+planet.updateSettings();
 let waterLevel = 0.85;
 planet.colorSettings = {
     snowColor: new BABYLON.Vector4(1, 1, 1, 1),
@@ -55,7 +58,7 @@ mat.bumpTexture.uScale = 10;
 //@ts-ignore
 mat.bumpTexture.vScale = 10;
 watersphere.material = mat;
-watersphere.visibility = 0.8;
+watersphere.visibility = 0;
 
 //#region Sliders
 
@@ -103,14 +106,14 @@ new Slider("snowThreshold", document.getElementById("snowThreshold")!, 0, 40, pl
     planet.updateColors();
 });
 
-new Slider("noiseStrength", document.getElementById("noiseStrength")!, 0, 20, planet.noiseModifiers.strengthModifier * 10, (val: number) => {
-    planet.noiseModifiers.strengthModifier = val / 10;
+new Slider("noiseStrength", document.getElementById("noiseStrength")!, 0, 20, planet.noiseModifiers.strengthModifier * 10000, (val: number) => {
+    planet.noiseModifiers.strengthModifier = val / 10000;
     planet.updateSettings();
     planet.reset();
 });
 
-new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 50, 10, (val: number) => {
-    planet.noiseModifiers.frequencyModifier = val / 10;
+new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 20, planet.noiseModifiers.frequencyModifier / 10, (val: number) => {
+    planet.noiseModifiers.frequencyModifier = val * 10;
     planet.updateSettings();
     planet.reset();
 });

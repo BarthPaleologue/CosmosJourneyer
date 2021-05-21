@@ -146,7 +146,6 @@ export class ChunkForge {
                 let task = this.trashCan.shift()!;
                 task.mesh.setEnabled(false);
                 //console.log("!");
-                task.mesh.physicsImpostor?.dispose();
                 //task.mesh.dispose(); //causes atmospheric shimmering for now
             }
         }

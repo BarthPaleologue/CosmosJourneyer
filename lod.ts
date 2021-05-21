@@ -22,17 +22,12 @@ freeCamera.checkCollisions = true;
 
 let box = BABYLON.Mesh.CreateBox("boate", 1, scene);
 freeCamera.parent = box;
-box.physicsImpostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1 });
-box.showBoundingBox = true;
-box.physicsImpostor.onCollide = e => {
-    console.log("collision camera", e);
-};
 
 scene.activeCamera = freeCamera;
 
 let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
 
-const radius = 200 * 1e3; // diamètre en km
+const radius = 200 * 1e3; // diamètre en m
 freeCamera.maxZ = Math.max(radius * 10, 10000);
 
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.2 * radius, scene);
