@@ -1,5 +1,6 @@
 import { AtmosphericScatteringPostProcess } from "./atmosphericScattering.js";
 import { Planet } from "./components/planet.js";
+import { OceanPostProcess } from "./oceanPostprocess.js";
 import { Slider } from "./SliderJS-main/slider.js";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -12,23 +13,23 @@ engine.loadingScreen.displayLoadingUI();
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
 
-let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 3, BABYLON.Vector3.Zero(), scene);
-camera.setPosition(new BABYLON.Vector3(0, 0, -15));
-camera.wheelPrecision = 10;
+let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 200, BABYLON.Vector3.Zero(), scene);
+camera.setPosition(new BABYLON.Vector3(0, 0, -200));
+camera.wheelPrecision = 1;
 camera.attachControl(canvas);
 
 scene.activeCamera = camera;
 
-const planetRadius = 5;
-const atmosphereRadius = 9;
+const planetRadius = 100;
+const atmosphereRadius = 120;
 
-let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
+let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(200), scene);
 
-let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 64, 0, 1, scene);
+let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 64, 0, 2, scene);
 planet.setRenderDistanceFactor(10);
 planet.craterModifiers.maxDepthModifier = 0.00005;
-planet.noiseModifiers.strengthModifier = 0.0001;
-planet.noiseModifiers.frequencyModifier = 50;
+planet.noiseModifiers.strengthModifier = 0.002;
+planet.noiseModifiers.frequencyModifier = 2;
 planet.noiseModifiers.offsetModifier = [23, 10, 0];
 planet.updateSettings();
 let waterLevel = 0.85;
@@ -47,6 +48,7 @@ planet.updateColors();
 
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, planetRadius, atmosphereRadius, light, camera, scene);
+let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + 2, light, camera, scene);
 
 let watersphere = BABYLON.Mesh.CreateSphere("water", 32, 10 + planet.colorSettings.waterLevel, scene);
 let mat = new BABYLON.StandardMaterial("mat2", scene);
@@ -206,6 +208,8 @@ scene.executeWhenReady(() => {
 
         planet.chunkForge.update();
         planet.update(BABYLON.Vector3.Zero(), camera.getDirection(BABYLON.Axis.Z), light.position, camera);
+
+        //planet.attachNode.position.subtractInPlace(camera.posi);
 
         scene.render();
     });

@@ -1,9 +1,11 @@
 import { AtmosphericScatteringPostProcess } from "./atmosphericScattering.js";
 import { Planet } from "./components/planet.js";
+import { OceanPostProcess } from "./oceanPostprocess.js";
 let canvas = document.getElementById("renderer");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let engine = new BABYLON.Engine(canvas);
+//engine.setHardwareScalingLevel(0.5);
 engine.loadingScreen.displayLoadingUI();
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
@@ -14,6 +16,11 @@ freeCamera.attachControl(canvas);
 freeCamera.checkCollisions = true;
 //freeCamera.inertia = 0;
 //freeCamera.angularSensibility = 500;
+/*
+new BABYLON.PassPostProcess("scale_pass", 4.0, freeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+new BABYLON.PassPostProcess("scale_pass", 2.0, freeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+new BABYLON.PassPostProcess("scale_pass", 1.0, freeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+*/
 let box = BABYLON.Mesh.CreateBox("boate", 1, scene);
 freeCamera.parent = box;
 scene.activeCamera = freeCamera;
@@ -29,6 +36,8 @@ sun.material = mat;
 light.parent = sun;
 let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 2, 6, scene);
 planet.colorSettings.sandColor = planet.colorSettings.steepColor;
+//planet.colorSettings.plainColor = new BABYLON.Vector4(0.4, 0.4, 0.4, 1);
+planet.colorSettings.plainColor = new BABYLON.Vector4(0.0, 0.4, 0.0, 1.0);
 planet.noiseModifiers.amplitudeModifier = 70;
 planet.noiseModifiers.frequencyModifier = 0.0004;
 planet.updateSettings();
@@ -39,6 +48,9 @@ let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attac
 atmosphere.settings.intensity = 10;
 atmosphere.settings.falloffFactor = 17;
 //let depth = new DepthPostProcess("depth", freeCamera, scene);
+let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 2.5e3, sun, freeCamera, scene);
+ocean.settings.alphaModifier = 0.00005;
+//ocean.settings.depthModifier = 10.01;
 let keyboard = {};
 document.addEventListener("keydown", e => {
     keyboard[e.key] = true;
