@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planet Engine</title>
+    <link rel="stylesheet" href="./styles/style.min.css">
+    <link rel="stylesheet" href="../include/sliderjs/style2.min.css">
+    <script defer src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script defer src="./babylon/triplanar.js"></script>
+    <script defer src="../include/sliderjs/slider.min.js"></script>
+    <script defer type="module" src="./experimental.js"></script>
+</head>
+
+<body>
+    <div id="ui">
+
+        <p>Level of Detail : </p>
+        <div id="maxDepth"></div>
+
+        <p>Ocean Level : </p>
+        <div id="oceanLevel"></div>
+
+        <p>Alpha Modifier : </p>
+        <div id="alphaModifier"></div>
+
+        <p>Depth Modifier : </p>
+        <div id="depthModifier"></div>
+
+        <p>Sand Size : </p>
+        <div id="sandSize"></div>
+
+        <p>Snow Threshold : </p>
+        <div id="snowThreshold"></div>
+
+        <p>Noise Min Value : </p>
+        <div id="minValue"></div>
+
+        <p>Noise Strength : </p>
+        <div id="noiseStrength"></div>
+
+        <p>Noise Frequency : </p>
+        <div id="noiseFrequency"></div>
+
+        <p>Noise Offset X : </p>
+        <div id="noiseOffsetX"></div>
+
+        <p>Noise Offset Y : </p>
+        <div id="noiseOffsetY"></div>
+
+        <p>Noise Offset Z : </p>
+        <div id="noiseOffsetZ"></div>
+
+        <p>Amount of Craters : </p>
+        <div id="nbCraters"></div>
+
+        <p>Crater radius : </p>
+        <div id="craterRadius"></div>
+
+        <p>Crater steepness : </p>
+        <div id="craterSteepness"></div>
+
+        <p>Crater depth : </p>
+        <div id="craterDepth"></div>
+
+        <p>Intensity : </p>
+        <div id="intensity"></div>
+
+        <p>Scattering Strength : </p>
+        <div id="scatteringStrength"></div>
+
+        <p>Atmosphere Radius : </p>
+        <div id="atmosphereRadius"></div>
+
+        <p>Falloff : </p>
+        <div id="falloff"></div>
+
+        <p>"Red" Wavelength : </p>
+        <div id="redWaveLength"></div>
+
+        <p>"Green" Wavelength : </p>
+        <div id="greenWaveLength"></div>
+
+        <p>"Blue" Wavelength : </p>
+        <div id="blueWaveLength"></div>
+
+        <p>Sun Orientation : </p>
+        <div id="sunOrientation"></div>
+
+        <p>Planet Rotation : </p>
+        <div id="planetRotation"></div>
+
+        <div id="randomCraters" class="button">Random Craters</div>
+    </div>
+    <canvas id="renderer"></canvas>
+</body>
+
+</html>
