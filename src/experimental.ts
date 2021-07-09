@@ -1,6 +1,7 @@
 import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess.js";
 import { Planet } from "./components/planet.js";
 import { OceanPostProcess } from "./postProcesses/oceanPostProcess.js";
+import { ChunkForge } from "./components/forge/chunkForge.js";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -11,6 +12,11 @@ engine.loadingScreen.displayLoadingUI();
 
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+
+let depthRenderer = new BABYLON.DepthRenderer(scene);
+scene.renderTargetsEnabled = true;
+scene.customRenderTargets.push(depthRenderer.getDepthMap());
+depthRenderer.getDepthMap().renderList = [];
 
 let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 200, BABYLON.Vector3.Zero(), scene);
 camera.setPosition(new BABYLON.Vector3(0, 0, -200));
@@ -24,13 +30,15 @@ const atmosphereRadius = 120;
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(200), scene);
 
-let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 64, 0, 2, scene);
+let forge = new ChunkForge(64, depthRenderer, scene);
+
+let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 64, 0, 2, forge, scene);
 planet.setRenderDistanceFactor(10);
 planet.craterModifiers.maxDepthModifier = 0.00005;
 planet.noiseModifiers.strengthModifier = 0.002;
 planet.noiseModifiers.frequencyModifier = 2;
 planet.noiseModifiers.offsetModifier = [23, 10, 0];
-planet.updateSettings();
+
 let waterLevel = 0.85;
 planet.colorSettings = {
     snowColor: new BABYLON.Vector4(1, 1, 1, 1),
@@ -57,25 +65,21 @@ new Slider("maxDepth", document.getElementById("maxDepth")!, 0, 5, 1, (val: numb
 
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX")!, 0, 50, 0, (val: number) => {
     planet.noiseModifiers.offsetModifier[0] = val / 10;
-    planet.updateSettings();
     planet.reset();
 });
 
 new Slider("noiseOffsetY", document.getElementById("noiseOffsetY")!, 0, 50, 0, (val: number) => {
     planet.noiseModifiers.offsetModifier[1] = val / 10;
-    planet.updateSettings();
     planet.reset();
 });
 
 new Slider("noiseOffsetZ", document.getElementById("noiseOffsetZ")!, 0, 50, 0, (val: number) => {
     planet.noiseModifiers.offsetModifier[2] = val / 10;
-    planet.updateSettings();
     planet.reset();
 });
 
 new Slider("minValue", document.getElementById("minValue")!, 0, 20, 10, (val: number) => {
     planet.noiseModifiers.minValueModifier = val / 10;
-    planet.updateSettings();
     planet.reset();
 });
 
@@ -106,36 +110,30 @@ new Slider("snowThreshold", document.getElementById("snowThreshold")!, 0, 40, pl
 
 new Slider("noiseStrength", document.getElementById("noiseStrength")!, 0, 100, planet.noiseModifiers.strengthModifier * 10000, (val: number) => {
     planet.noiseModifiers.strengthModifier = val / 10000;
-    planet.updateSettings();
     planet.reset();
 });
 
 new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 20, planet.noiseModifiers.frequencyModifier / 10, (val: number) => {
     planet.noiseModifiers.frequencyModifier = val * 10;
-    planet.updateSettings();
     planet.reset();
 });
 
 new Slider("nbCraters", document.getElementById("nbCraters")!, 0, 500, 200, (nbCraters: number) => {
     //planet.regenerateCraters(nbCraters);
-    planet.updateSettings();
 });
 
 new Slider("craterRadius", document.getElementById("craterRadius")!, 1, 20, 10, (radiusFactor: number) => {
     planet.craterModifiers.radiusModifier = radiusFactor / 10;
-    planet.updateSettings();
     planet.reset();
 });
 
 new Slider("craterSteepness", document.getElementById("craterSteepness")!, 1, 20, 10, (steepnessFactor: number) => {
     planet.craterModifiers.steepnessModifier = steepnessFactor / 10;
-    planet.updateSettings();
     planet.reset();
 });
 
 new Slider("craterDepth", document.getElementById("craterDepth")!, 1, 20, 10, (depthFactor: number) => {
     planet.craterModifiers.maxDepthModifier = depthFactor / 10;
-    planet.updateSettings();
     planet.reset();
 });
 
@@ -181,7 +179,6 @@ new Slider("planetRotation", document.getElementById("planetRotation")!, 0, 20, 
 
 document.getElementById("randomCraters")?.addEventListener("click", () => {
     //planet.regenerateCraters();
-    planet.updateSettings();
 });
 
 let keyboard: { [key: string]: boolean; } = {};

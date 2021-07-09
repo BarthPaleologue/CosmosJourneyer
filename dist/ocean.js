@@ -1,6 +1,7 @@
 import { OceanPostProcess } from "./postProcesses/oceanPostProcess.js";
 import { Planet } from "./components/planet.js";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess.js";
+import { ChunkForge } from "./components/forge/chunkForge.js";
 let canvas = document.getElementById("renderer");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -8,6 +9,10 @@ let engine = new BABYLON.Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+let depthRenderer = new BABYLON.DepthRenderer(scene);
+scene.renderTargetsEnabled = true;
+scene.customRenderTargets.push(depthRenderer.getDepthMap());
+depthRenderer.getDepthMap().renderList = [];
 let camera = new BABYLON.FreeCamera("camera", BABYLON.Vector3.Zero(), scene);
 camera.position = (new BABYLON.Vector3(0, 0, -15));
 //camera.wheelPrecision = 10;
@@ -17,13 +22,13 @@ const planetRadius = 10;
 const oceanRadius = 11;
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100), scene);
 let center = BABYLON.Mesh.CreateBox("boate", 1, scene);
-let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 64, 0, 1, scene);
+let forge = new ChunkForge(64, depthRenderer, scene);
+let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 64, 0, 1, forge, scene);
 planet.setRenderDistanceFactor(10);
 planet.craterModifiers.maxDepthModifier = 0.00005;
 planet.noiseModifiers.strengthModifier = 0.001;
 planet.noiseModifiers.frequencyModifier = 20;
 planet.noiseModifiers.offsetModifier = [23, 10, 0];
-planet.updateSettings();
 let waterLevel = 0.85;
 planet.colorSettings = {
     snowColor: new BABYLON.Vector4(1, 1, 1, 1),

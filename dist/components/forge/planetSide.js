@@ -4,13 +4,26 @@ import { TaskType } from "./chunkForge.js";
  * Un PlanetSide est un plan généré procéduralement qui peut être morph à volonté
  */
 export class PlanetSide {
-    constructor(_id, _minDepth, _maxDepth, _chunkLength, _baseSubdivisions, _direction, _parentNode, _scene, _chunkForge, _surfaceMaterial, _planet) {
+    /**
+     *
+     * @param _id
+     * @param _minDepth
+     * @param _maxDepth
+     * @param _chunkLength
+     * @param _direction
+     * @param _parentNode
+     * @param _scene
+     * @param _chunkForge
+     * @param _surfaceMaterial
+     * @param _planet
+     */
+    constructor(_id, _minDepth, _maxDepth, _chunkLength, _direction, _parentNode, _scene, _chunkForge, _surfaceMaterial, _planet) {
         this.renderDistanceFactor = 3;
         this.id = _id;
         this.maxDepth = _maxDepth;
         this.minDepth = _minDepth;
         this.chunkLength = _chunkLength;
-        this.baseSubdivisions = _baseSubdivisions;
+        this.baseSubdivisions = _chunkForge.subdivisions;
         this.direction = _direction;
         this.parent = _parentNode;
         this.scene = _scene;
@@ -126,84 +139,17 @@ export class PlanetSide {
      * @returns The new Chunk
      */
     createChunk(path) {
-        return new PlanetChunk(path, this.chunkLength, this.baseSubdivisions, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial, this.planet);
+        return new PlanetChunk(path, this.chunkLength, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial, this.planet);
     }
     setChunkMaterial(material) {
         this.surfaceMaterial = material;
     }
+    /**
+     * Regenerate planet chunks
+     */
     reset() {
         let newTree = this.createChunk([]);
         this.requestDeletion(this.tree);
         this.tree = newTree;
     }
 }
-/**
- * The function used to add a subdivision at the specified path
- * @param tree The tree to explore
- * @param path The path leading to the new subdivision
- * @param walked The location of the current root relative to the absolute root
- * @returns The updated tree
- */
-/*public addBranch(path: number[], tree: quadTree = this.tree, walked: number[] = []): quadTree {
-    if (tree instanceof PlanetChunk) {
-        // si c'est un chunk
-        if (path.length == 0) {
-            // si on est au bon endroit dans l'arbre on ajoute la branche
-            let newBranch = [
-                this.createChunk(walked.concat([0])),
-                this.createChunk(walked.concat([1])),
-                this.createChunk(walked.concat([2])),
-                this.createChunk(walked.concat([3]))
-            ];
-            this.requestDeletion(tree);
-            return newBranch;
-        } else {
-            // si on est pas encore arrivé, on crée une branche intermédiaire et on continue
-            let newTree: quadTree = [
-                this.createChunk(walked.concat([0])),
-                this.createChunk(walked.concat([1])),
-                this.createChunk(walked.concat([2])),
-                this.createChunk(walked.concat([3]))
-            ];
-            let next = path.shift()!;
-            newTree[next] = this.addBranch(path, newTree[next], walked.concat([next]));
-            this.requestDeletion(tree);
-            return newTree;
-        }
-    } else {
-        // si c'est pas un chunk
-        if (path.length == 0) {
-            // si on est arrivé : il y a déjà une subdivision donc on fait rien
-            return tree;
-        } else {
-            // sinon on ajoute une branche pour continuer le chemin et on continue
-            let next = path.shift()!;
-            tree[next] = this.addBranch(path, tree[next], walked.concat([next]));
-
-            return tree;
-        }
-    }
-}*/
-/**
- * The function used to remove a subdivision at the specified path
- * @param tree The tree to explore
- * @param path The path leading to the subdivision to remove
- * @param walked The location of the current root relative to the absolute root
- * @returns The updated tree
- */
-/*public deleteBranch(path: number[], tree: quadTree = this.tree, walked: number[] = []): quadTree {
-    if (tree instanceof PlanetChunk) {
-        return tree;
-    } else {
-        if (path.length == 0) {
-            // si on est arrivé et que il y a une branche d'attachée au noeud : on coupe la branche et on remplace par un chunk
-            let replacement = this.createChunk(walked);
-            this.requestDeletion(tree);
-            return replacement;
-        } else {
-            let next = path.shift()!;
-            tree[next] = this.deleteBranch(path, tree[next], walked.concat([next]));
-            return tree;
-        }
-    }
-}*/ 

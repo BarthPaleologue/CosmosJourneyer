@@ -94,11 +94,11 @@ export class PlanetChunk {
     parentNode: BABYLON.Mesh; // point d'attache planétaire
     position: BABYLON.Vector3; // position dans l'espace de la sphère (rotation non prise en compte)
 
-    constructor(_path: number[], _chunkLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: Planet) {
+    constructor(_path: number[], _chunkLength: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: Planet) {
         this.id = `[D${_direction}][P${_path.join("")}]`;
         this.path = _path;
         this.chunkLength = _chunkLength;
-        this.baseSubdivisions = _baseSubdivisions;
+        this.baseSubdivisions = chunkForge.subdivisions;
         this.depth = this.path.length;
         this.direction = _direction;
         this.parentNode = _parentNode;

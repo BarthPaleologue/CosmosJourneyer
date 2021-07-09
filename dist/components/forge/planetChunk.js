@@ -71,14 +71,14 @@ export function getChunkSphereSpacePositionFromPath(chunkLength, path, direction
     return BABYLON.Vector3.TransformCoordinates(position, rotation);
 }
 export class PlanetChunk {
-    constructor(_path, _chunkLength, _baseSubdivisions, _direction, _parentNode, scene, chunkForge, surfaceMaterial, planet) {
+    constructor(_path, _chunkLength, _direction, _parentNode, scene, chunkForge, surfaceMaterial, planet) {
         // coordonnées sur le plan
         this.x = 0;
         this.y = 0;
         this.id = `[D${_direction}][P${_path.join("")}]`;
         this.path = _path;
         this.chunkLength = _chunkLength;
-        this.baseSubdivisions = _baseSubdivisions;
+        this.baseSubdivisions = chunkForge.subdivisions;
         this.depth = this.path.length;
         this.direction = _direction;
         this.parentNode = _parentNode;

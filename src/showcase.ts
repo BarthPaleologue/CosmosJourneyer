@@ -53,6 +53,7 @@ planet.colorSettings.sandColor = planet.colorSettings.steepColor;
 planet.noiseModifiers.amplitudeModifier = 70;
 planet.noiseModifiers.frequencyModifier = 0.0004;
 planet.updateColors();
+//planet.attachNode.parent = sun;
 
 let moon = new Planet("Manaleth", radius / 8, new BABYLON.Vector3(Math.cos(-1.3), 0, Math.sin(-1.3)).scale(3 * radius), 64, 1, 6, forge, scene);
 moon.colorSettings.sandColor = planet.colorSettings.steepColor;
@@ -68,12 +69,12 @@ moon.attachNode.parent = planet.attachNode;
 
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 20e3, radius + 30e3, sun, freeCamera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 70e3, radius + 70e3, sun, freeCamera, scene);
 atmosphere.settings.intensity = 15;
 atmosphere.settings.falloffFactor = 20;
 //let depth = new DepthPostProcess("depth", freeCamera, scene);
 
-let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 2e3, sun, freeCamera, scene);
+let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 2.5e3, sun, freeCamera, scene);
 ocean.settings.alphaModifier = 0.00005;
 ocean.settings.depthModifier = 0.002;
 //ocean.settings.oceanRadius = 0;

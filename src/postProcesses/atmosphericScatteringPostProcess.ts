@@ -76,7 +76,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
             effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
             effect.setVector3("cameraPosition", this.camera.position);
 
-            effect.setVector3("planetPosition", this.planet.position);
+            effect.setVector3("planetPosition", this.planet.getAbsolutePosition());
 
             effect.setMatrix("projection", this.camera.getProjectionMatrix());
             effect.setMatrix("view", this.camera.getViewMatrix());

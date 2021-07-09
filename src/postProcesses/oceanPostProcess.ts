@@ -66,11 +66,10 @@ export class OceanPostProcess extends BABYLON.PostProcess {
             effect.setTexture("depthSampler", depthMap);
             effect.setTexture("normalMap", new BABYLON.Texture("./textures/waterbump.png", scene));
 
-
             effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
             effect.setVector3("cameraPosition", this.camera.position);
 
-            effect.setVector3("planetPosition", this.planet.position);
+            effect.setVector3("planetPosition", this.planet.absolutePosition);
 
             effect.setMatrix("projection", this.camera.getProjectionMatrix());
             effect.setMatrix("view", this.camera.getViewMatrix());

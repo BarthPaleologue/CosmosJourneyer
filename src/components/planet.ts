@@ -40,7 +40,6 @@ export class Planet {
     surfaceMaterial: BABYLON.ShaderMaterial;
 
     constructor(_id: string, _radius: number, _position: BABYLON.Vector3, _nbSubdivisions: number, _minDepth: number, _maxDepth: number, _forge: ChunkForge, _scene: BABYLON.Scene) {
-        //super(_id, _radius, _position, _nbSubdivisions, _minDepth, _maxDepth, _scene);
 
         this.id = _id;
         this.radius = _radius;
@@ -54,12 +53,12 @@ export class Planet {
         this.chunkForge = _forge;
 
         this.sides = [
-            new PlanetSide(`${this.id}UpSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Up, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}DownSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Down, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}ForwardSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Forward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}BackwardSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Backward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}RightSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Right, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}LeftSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Left, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}UpSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Up, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}DownSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Down, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}ForwardSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Forward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}BackwardSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Backward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}RightSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Right, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}LeftSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Left, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
         ];
 
         let noiseEngine = new NoiseEngine();
