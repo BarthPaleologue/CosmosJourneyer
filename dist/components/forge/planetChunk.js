@@ -71,7 +71,7 @@ export function getChunkSphereSpacePositionFromPath(chunkLength, path, direction
     return BABYLON.Vector3.TransformCoordinates(position, rotation);
 }
 export class PlanetChunk {
-    constructor(_path, _chunkLength, _baseSubdivisions, _direction, _parentNode, scene, chunkForge, surfaceMaterial) {
+    constructor(_path, _chunkLength, _baseSubdivisions, _direction, _parentNode, scene, chunkForge, surfaceMaterial, planet) {
         // coordonnées sur le plan
         this.x = 0;
         this.y = 0;
@@ -88,30 +88,12 @@ export class PlanetChunk {
         this.mesh.material = surfaceMaterial;
         //this.mesh.material.wireframe = true;
         this.mesh.parent = this.parentNode;
-        /*if (this.depth > 3) {
-            this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.BoxImpostor, {
-                mass: 0,
-            });
-
-            //this.mesh.physicsImpostor.
-            this.mesh.showBoundingBox = true;
-            this.mesh.collisionMask = 1;
-            this.mesh.physicsImpostor.onCollide = e => {
-                console.log(this.mesh.id, e);
-            };
-
-            let joint = new BABYLON.DistanceJoint({
-                connectedAxis: this.mesh.position,
-                mainAxis: this.mesh.position,
-                maxDistance: this.mesh.position.length()
-            });
-            this.parentNode.physicsImpostor?.addJoint(this.mesh.physicsImpostor, joint);
-            //this.parentNode.physicsImpostor?.forceUpdate();
-        }*/
         chunkForge.addTask({
             taskType: TaskType.Build,
             id: this.id,
+            planet: planet,
             position: this.position,
+            chunkLength: this.chunkLength,
             depth: this.depth,
             direction: this.direction,
             mesh: this.mesh,

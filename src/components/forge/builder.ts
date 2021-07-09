@@ -68,8 +68,8 @@ let noiseModifiers = {
     minValueModifier: 1,
 };
 
-let terrainFunction = (p: BABYLON.Vector3, noiseLayers: NoiseLayer[], craterFilter: CraterFilter) => {
-    let coords = p.normalizeToNew().scale(radius);
+let terrainFunction = (p: BABYLON.Vector3, noiseLayers: NoiseLayer[], craterFilter: CraterFilter, planetRadius: number) => {
+    let coords = p.normalizeToNew().scale(planetRadius);
 
     let elevation = 0;
 
@@ -102,7 +102,11 @@ onmessage = e => {
         let direction = e.data.direction;
         let offset = e.data.position;
 
-        //craterLayers[0].regenerate(craters);
+        craterFilter.setCraters(e.data.craters);
+
+        noiseModifiers = e.data.noiseModifiers;
+
+        craterModifiers = e.data.craterModifiers;
 
         let size = chunkLength / (2 ** depth);
         let planetRadius = chunkLength / 2;
@@ -143,7 +147,7 @@ onmessage = e => {
                 vertex = BABYLON.Vector3.TransformCoordinates(vertex, rotation);
                 vertex = vertex.normalizeToNew().scale(planetRadius);
 
-                vertex = terrainFunction(vertex, noiseLayers, craterFilter);
+                vertex = terrainFunction(vertex, noiseLayers, craterFilter, planetRadius);
 
                 vertices.push(vertex.x, vertex.y, vertex.z);
 
@@ -189,17 +193,7 @@ onmessage = e => {
             n: tNormals,
             //@ts-ignore
         }, [tPositions.buffer, tIndices.buffer, tNormals.buffer]);
-    } else if (e.data.taskType == "init") {
-        init(e.data);
+    } else {
+        console.log(`Tâche reçue : ${e.data.taskType}`);
     }
 };
-
-function init(data: any) {
-    radius = data.radius;
-
-    craterFilter.setCraters(data.craters);
-
-    noiseModifiers = data.noiseModifiers;
-
-    craterModifiers = data.craterModifiers;
-}

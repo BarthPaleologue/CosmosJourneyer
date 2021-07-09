@@ -1,9 +1,8 @@
 import { NoiseEngine } from "../engine/perlin.js";
-import { ChunkForge } from "./forge/chunkForge.js";
 import { PlanetSide } from "./forge/planetSide.js";
 import { Direction } from "./forge/direction.js";
 export class Planet {
-    constructor(_id, _radius, _position, _nbSubdivisions, _minDepth, _maxDepth, _scene) {
+    constructor(_id, _radius, _position, _nbSubdivisions, _minDepth, _maxDepth, _forge, _scene) {
         //super(_id, _radius, _position, _nbSubdivisions, _minDepth, _maxDepth, _scene);
         this.sides = new Array(6); // stores the 6 sides of the sphere
         this.id = _id;
@@ -12,14 +11,14 @@ export class Planet {
         this.attachNode = BABYLON.Mesh.CreateBox(`${this.id}AttachNode`, 1, _scene);
         this.attachNode.position = _position;
         this.surfaceMaterial = new BABYLON.ShaderMaterial(`${this.id}BaseMaterial`, _scene, "");
-        this.chunkForge = new ChunkForge(this.chunkLength, _nbSubdivisions, _scene);
+        this.chunkForge = _forge;
         this.sides = [
-            new PlanetSide(`${this.id}UpSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Up, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial),
-            new PlanetSide(`${this.id}DownSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Down, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial),
-            new PlanetSide(`${this.id}ForwardSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Forward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial),
-            new PlanetSide(`${this.id}BackwardSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Backward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial),
-            new PlanetSide(`${this.id}RightSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Right, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial),
-            new PlanetSide(`${this.id}LeftSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Left, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial),
+            new PlanetSide(`${this.id}UpSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Up, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}DownSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Down, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}ForwardSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Forward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}BackwardSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Backward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}RightSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Right, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}LeftSide`, _minDepth, _maxDepth, this.chunkLength, _nbSubdivisions, Direction.Left, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
         ];
         let noiseEngine = new NoiseEngine();
         noiseEngine.seed(69);
@@ -52,7 +51,6 @@ export class Planet {
             sandSize: 1,
         };
         this.craters = this.generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
-        this.updateSettings();
         let surfaceMaterial = new BABYLON.ShaderMaterial("surfaceColor", _scene, "./shaders/surfaceColor", {
             attributes: ["position", "normal", "uv"],
             uniforms: [
@@ -125,9 +123,6 @@ export class Planet {
         this.surfaceMaterial.setVector3("v3CameraPos", position);
         this.surfaceMaterial.setVector3("v3LightPos", lightPosition);
         this.updateLOD(position, facingDirection);
-    }
-    updateSettings() {
-        this.chunkForge.setPlanet(this.radius, this.craters, this.noiseModifiers, this.craterModifiers);
     }
     generateCraters(n, radiusModifier, _steepness, _maxDepth) {
         let craters = [];

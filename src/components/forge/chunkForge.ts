@@ -1,3 +1,4 @@
+import { Planet } from "../planet.js";
 import { Crater } from "./crater.js";
 import { Direction } from "./direction.js";
 import { CraterModifiers } from "./layers/craterModifiers.js";
@@ -21,6 +22,8 @@ export interface InitTask extends Task {
 
 export interface BuildTask extends Task {
     taskType: TaskType.Build,
+    planet: Planet,
+    chunkLength: number,
     depth: number,
     direction: Direction,
     position: BABYLON.Vector3,
@@ -40,7 +43,6 @@ export interface DeleteTask extends Task {
 }
 
 export class ChunkForge {
-    chunkLength: number;
     subdivisions: number;
 
     // What you need to generate a beautiful terrain (à étendre pour ne pas tout hardcode dans le worker)
@@ -49,34 +51,26 @@ export class ChunkForge {
     incomingTasks: (BuildTask | ApplyTask | DeleteTask | InitTask)[] = [];
     trashCan: DeleteTask[] = [];
     applyTasks: ApplyTask[] = [];
-    cadence = 8;
+    cadence = 6;
 
     builders: Worker[] = [];
     esclavesDispo: Worker[] = [];
 
+    depthRenderer: BABYLON.DepthRenderer;
+
     scene: BABYLON.Scene;
 
-    constructor(_chunkLength: number, _subdivisions: number, _scene: BABYLON.Scene) {
-        this.chunkLength = _chunkLength;
+    constructor(_subdivisions: number, _depthRenderer: BABYLON.DepthRenderer, _scene: BABYLON.Scene) {
         this.subdivisions = _subdivisions;
         for (let i = 0; i < this.cadence; i++) {
             let builder = new Worker("./components/forge/builder.js", { type: "module" });
             this.builders.push(builder);
             this.esclavesDispo.push(builder);
         }
+        this.depthRenderer = _depthRenderer;
         this.scene = _scene;
     }
-    setPlanet(radius: number, craters: Crater[], noiseModifiers: NoiseModifiers, craterModifiers: CraterModifiers) {
-        for (let builder of this.builders) {
-            builder.postMessage({
-                taskType: "init",
-                radius: radius,
-                craters: craters,
-                noiseModifiers: noiseModifiers,
-                craterModifiers: craterModifiers,
-            });
-        }
-    }
+
     addTask(task: ApplyTask | DeleteTask | BuildTask | InitTask) {
         this.incomingTasks.push(task);
     }
@@ -98,11 +92,14 @@ export class ChunkForge {
 
                 esclave?.postMessage({
                     taskType: "buildTask",
-                    chunkLength: this.chunkLength,
+                    chunkLength: task.chunkLength,
                     subdivisions: this.subdivisions,
                     depth: task.depth,
                     direction: task.direction,
                     position: [task.position.x, task.position.y, task.position.z],
+                    craters: task.planet.craters,
+                    noiseModifiers: task.planet.noiseModifiers,
+                    craterModifiers: task.planet.craterModifiers,
                 });
 
                 esclave!.onmessage = e => {
@@ -146,7 +143,7 @@ export class ChunkForge {
                 let task = this.trashCan.shift()!;
                 task.mesh.setEnabled(false);
                 //console.log("!");
-                //task.mesh.dispose(); //causes atmospheric shimmering for now
+                task.mesh.dispose(); //causes atmospheric shimmering for now
             }
         }
     }
@@ -154,6 +151,7 @@ export class ChunkForge {
         if (this.applyTasks.length > 0) {
             let task = this.applyTasks.shift()!;
             task.vertexData.applyToMesh(task.mesh);
+            this.depthRenderer.getDepthMap().renderList?.push(task.mesh);
             setTimeout(() => {
                 this.trashCan = this.trashCan.concat(task.callbackTasks);
             }, 100);

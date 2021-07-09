@@ -4,7 +4,7 @@ import { TaskType } from "./chunkForge.js";
  * Un PlanetSide est un plan généré procéduralement qui peut être morph à volonté
  */
 export class PlanetSide {
-    constructor(_id, _minDepth, _maxDepth, _chunkLength, _baseSubdivisions, _direction, _parentNode, _scene, _chunkForge, _surfaceMaterial) {
+    constructor(_id, _minDepth, _maxDepth, _chunkLength, _baseSubdivisions, _direction, _parentNode, _scene, _chunkForge, _surfaceMaterial, _planet) {
         this.renderDistanceFactor = 3;
         this.id = _id;
         this.maxDepth = _maxDepth;
@@ -16,6 +16,7 @@ export class PlanetSide {
         this.scene = _scene;
         this.chunkForge = _chunkForge;
         this.surfaceMaterial = _surfaceMaterial;
+        this.planet = _planet;
         // on initialise le plan avec un unique chunk
         this.tree = this.createChunk([]);
     }
@@ -61,13 +62,13 @@ export class PlanetSide {
      * @returns The updated tree
      */
     updateLODRecursively(observerPosition, facingDirection, tree = this.tree, walked = []) {
-        // position par rapport à la sphère du noeud du quadtree
+        // position du noeud du quadtree par rapport à la sphère 
         let relativePosition = getChunkSphereSpacePositionFromPath(this.chunkLength, walked, this.direction);
         relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationX(this.parent.rotation.x));
         relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationY(this.parent.rotation.y));
         relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationZ(this.parent.rotation.z));
         // position par rapport à la caméra
-        let absolutePosition = relativePosition.add(this.parent.position);
+        let absolutePosition = relativePosition.add(this.parent.absolutePosition);
         let direction = absolutePosition.subtract(observerPosition);
         let dot = BABYLON.Vector3.Dot(direction, facingDirection);
         // distance carré entre caméra et noeud du quadtree
@@ -125,7 +126,7 @@ export class PlanetSide {
      * @returns The new Chunk
      */
     createChunk(path) {
-        return new PlanetChunk(path, this.chunkLength, this.baseSubdivisions, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial);
+        return new PlanetChunk(path, this.chunkLength, this.baseSubdivisions, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial, this.planet);
     }
     setChunkMaterial(material) {
         this.surfaceMaterial = material;

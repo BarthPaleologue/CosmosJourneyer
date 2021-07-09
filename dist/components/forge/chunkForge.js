@@ -6,34 +6,23 @@ export var TaskType;
     TaskType[TaskType["Init"] = 3] = "Init";
 })(TaskType || (TaskType = {}));
 export class ChunkForge {
-    constructor(_chunkLength, _subdivisions, _scene) {
+    constructor(_subdivisions, _depthRenderer, _scene) {
         // What you need to generate a beautiful terrain (à étendre pour ne pas tout hardcode dans le worker)
         this.craters = [];
         this.incomingTasks = [];
         this.trashCan = [];
         this.applyTasks = [];
-        this.cadence = 8;
+        this.cadence = 6;
         this.builders = [];
         this.esclavesDispo = [];
-        this.chunkLength = _chunkLength;
         this.subdivisions = _subdivisions;
         for (let i = 0; i < this.cadence; i++) {
             let builder = new Worker("./components/forge/builder.js", { type: "module" });
             this.builders.push(builder);
             this.esclavesDispo.push(builder);
         }
+        this.depthRenderer = _depthRenderer;
         this.scene = _scene;
-    }
-    setPlanet(radius, craters, noiseModifiers, craterModifiers) {
-        for (let builder of this.builders) {
-            builder.postMessage({
-                taskType: "init",
-                radius: radius,
-                craters: craters,
-                noiseModifiers: noiseModifiers,
-                craterModifiers: craterModifiers,
-            });
-        }
     }
     addTask(task) {
         this.incomingTasks.push(task);
@@ -52,11 +41,14 @@ export class ChunkForge {
                 }
                 esclave === null || esclave === void 0 ? void 0 : esclave.postMessage({
                     taskType: "buildTask",
-                    chunkLength: this.chunkLength,
+                    chunkLength: task.chunkLength,
                     subdivisions: this.subdivisions,
                     depth: task.depth,
                     direction: task.direction,
                     position: [task.position.x, task.position.y, task.position.z],
+                    craters: task.planet.craters,
+                    noiseModifiers: task.planet.noiseModifiers,
+                    craterModifiers: task.planet.craterModifiers,
                 });
                 esclave.onmessage = e => {
                     let vertexData = new BABYLON.VertexData();
@@ -95,14 +87,16 @@ export class ChunkForge {
                 let task = this.trashCan.shift();
                 task.mesh.setEnabled(false);
                 //console.log("!");
-                //task.mesh.dispose(); //causes atmospheric shimmering for now
+                task.mesh.dispose(); //causes atmospheric shimmering for now
             }
         }
     }
     executeNextApplyTask() {
+        var _a;
         if (this.applyTasks.length > 0) {
             let task = this.applyTasks.shift();
             task.vertexData.applyToMesh(task.mesh);
+            (_a = this.depthRenderer.getDepthMap().renderList) === null || _a === void 0 ? void 0 : _a.push(task.mesh);
             setTimeout(() => {
                 this.trashCan = this.trashCan.concat(task.callbackTasks);
             }, 100);

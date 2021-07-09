@@ -1,3 +1,4 @@
+import { Planet } from "../planet.js";
 import { ChunkForge, TaskType } from "./chunkForge.js";
 import { Direction } from "./direction.js";
 
@@ -93,7 +94,7 @@ export class PlanetChunk {
     parentNode: BABYLON.Mesh; // point d'attache planétaire
     position: BABYLON.Vector3; // position dans l'espace de la sphère (rotation non prise en compte)
 
-    constructor(_path: number[], _chunkLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material) {
+    constructor(_path: number[], _chunkLength: number, _baseSubdivisions: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: Planet) {
         this.id = `[D${_direction}][P${_path.join("")}]`;
         this.path = _path;
         this.chunkLength = _chunkLength;
@@ -110,31 +111,12 @@ export class PlanetChunk {
         //this.mesh.material.wireframe = true;
         this.mesh.parent = this.parentNode;
 
-        /*if (this.depth > 3) {
-            this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(this.mesh, BABYLON.PhysicsImpostor.BoxImpostor, {
-                mass: 0,
-            });
-
-            //this.mesh.physicsImpostor.
-            this.mesh.showBoundingBox = true;
-            this.mesh.collisionMask = 1;
-            this.mesh.physicsImpostor.onCollide = e => {
-                console.log(this.mesh.id, e);
-            };
-
-            let joint = new BABYLON.DistanceJoint({
-                connectedAxis: this.mesh.position,
-                mainAxis: this.mesh.position,
-                maxDistance: this.mesh.position.length()
-            });
-            this.parentNode.physicsImpostor?.addJoint(this.mesh.physicsImpostor, joint);
-            //this.parentNode.physicsImpostor?.forceUpdate();
-        }*/
-
         chunkForge.addTask({
             taskType: TaskType.Build,
             id: this.id,
+            planet: planet,
             position: this.position,
+            chunkLength: this.chunkLength,
             depth: this.depth,
             direction: this.direction,
             mesh: this.mesh,

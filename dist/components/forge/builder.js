@@ -55,8 +55,8 @@ let noiseModifiers = {
     offsetModifier: BABYLON.Vector3.Zero(),
     minValueModifier: 1,
 };
-let terrainFunction = (p, noiseLayers, craterFilter) => {
-    let coords = p.normalizeToNew().scale(radius);
+let terrainFunction = (p, noiseLayers, craterFilter, planetRadius) => {
+    let coords = p.normalizeToNew().scale(planetRadius);
     let elevation = 0;
     let craterMask = craterFilter.evaluate(coords.normalizeToNew(), craterModifiers);
     elevation += craterMask;
@@ -79,7 +79,9 @@ onmessage = e => {
         let depth = e.data.depth;
         let direction = e.data.direction;
         let offset = e.data.position;
-        //craterLayers[0].regenerate(craters);
+        craterFilter.setCraters(e.data.craters);
+        noiseModifiers = e.data.noiseModifiers;
+        craterModifiers = e.data.craterModifiers;
         let size = chunkLength / (Math.pow(2, depth));
         let planetRadius = chunkLength / 2;
         let vertices = [];
@@ -114,7 +116,7 @@ onmessage = e => {
                 vertex = vertex.add(BABYLON.Vector3.FromArray(offset));
                 vertex = BABYLON.Vector3.TransformCoordinates(vertex, rotation);
                 vertex = vertex.normalizeToNew().scale(planetRadius);
-                vertex = terrainFunction(vertex, noiseLayers, craterFilter);
+                vertex = terrainFunction(vertex, noiseLayers, craterFilter, planetRadius);
                 vertices.push(vertex.x, vertex.y, vertex.z);
                 uvs.push(x / vertexPerLine, y / vertexPerLine);
                 if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
@@ -150,13 +152,7 @@ onmessage = e => {
             n: tNormals,
         }, [tPositions.buffer, tIndices.buffer, tNormals.buffer]);
     }
-    else if (e.data.taskType == "init") {
-        init(e.data);
+    else {
+        console.log(`Tâche reçue : ${e.data.taskType}`);
     }
 };
-function init(data) {
-    radius = data.radius;
-    craterFilter.setCraters(data.craters);
-    noiseModifiers = data.noiseModifiers;
-    craterModifiers = data.craterModifiers;
-}

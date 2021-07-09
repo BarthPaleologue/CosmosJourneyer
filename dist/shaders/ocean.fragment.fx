@@ -56,11 +56,15 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
 
     if(d < 0.0) return false; // no intersection
 
+
     float r0 = (-b - sqrt(d)) / (2.0*a);
     float r1 = (-b + sqrt(d)) / (2.0*a);
 
     t0 = min(r0, r1);
     t1 = max(r0, r1);
+
+    // implémenter moins d'océan au nord
+    //if(abs((relativeOrigin + rayDir * t0).y) > 100000.0) return false;
 
     return (t1 >= 0.0);
 }
@@ -107,15 +111,18 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
     float ndl = dot(planetNormal, sunDir); // dimming factor due to light inclination relative to vertex normal in world space
 
     // specular based on https://learnopengl.com/Lighting/Basic-Lighting
-    vec3 reflectDir = reflect(-rayDir, -planetNormal);
+    vec3 reflectDir = reflect(-rayDir, planetNormal);
     float spec = pow(max(dot(rayDir, reflectDir), 0.0), 32.0);
 
     if(distanceThroughOcean > 0.0) {
         float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * depthModifier);
 
-        float alpha = exp(-distanceThroughOcean * alphaModifier);
+        float alpha = 1.0 - exp(-distanceThroughOcean * alphaModifier);
         
-        vec3 oceanColor = lerp(vec3(10.0, 100.0, 249.0)/255.0, vec3(15.0,94.0,156.0)/255.0, opticalDepth01);
+        //vec3 oceanColor = lerp(vec3(10.0, 100.0, 249.0)/255.0, vec3(15.0,94.0,156.0)/255.0, opticalDepth01);
+        vec3 deepColor = vec3(10.0, 100.0, 249.0)/255.0;
+        vec3 shallowColor = vec3(68.0,85.0,90.0)/255.0;
+        vec3 oceanColor = lerp(deepColor, shallowColor, opticalDepth01);
         
         return lerp(originalColor, oceanColor, alpha) * (ndl + spec);
     } else {
