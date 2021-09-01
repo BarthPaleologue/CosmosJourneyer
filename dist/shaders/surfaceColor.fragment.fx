@@ -12,6 +12,7 @@ uniform vec3 v3CameraPos; // camera position in world space
 uniform float cameraNear;
 uniform float cameraFar;
 uniform vec3 v3LightPos; // light position in world space
+uniform vec3 planetPosition;
 uniform mat4 view;
 uniform mat4 projection;
 
@@ -106,10 +107,11 @@ void main() {
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
 	vec3 lightRay = normalize(v3LightPos - vPositionW); // light ray direction in world space
+	vec3 parallelLightRay = normalize(v3LightPos - planetPosition); // light ray direction in world space
 	
 	vec4 color = vec4(vec3(0.0), 1.); // color of the pixel (default doesn't matter)
 
-	float ndl = max(0., dot(normalW, lightRay)); // dimming factor due to light inclination relative to vertex normal in world space
+	float ndl = max(0., dot(normalW, parallelLightRay)); // dimming factor due to light inclination relative to vertex normal in world space
 
 	// specular
 	vec3 angleW = normalize(viewDirectionW + lightRay);
@@ -118,8 +120,11 @@ void main() {
 
 	//float d = dot(normalize(vPosition), vNormal); // represents the steepness of the slope at a given vertex
 
-	if (length(vPosition) > (planetRadius * (1.0 + (iceCapThreshold / 100.) - pow(sphereNormal.y, 8.)))) {
-        // if mountains region (you need to be higher at the equator)
+	float northFactor = pow(1.0 - abs(normalize(vPosition).y * sphereNormal.y), 1.0);
+
+	//if (length(vPosition) > (planetRadius * (1.0 + (iceCapThreshold / 100.) - pow(normalize(vPosition).y, 8.)))) {
+    if (length(vPosition) > (planetRadius * (1.0 + iceCapThreshold * northFactor / 100.0))) { 
+	    // if mountains region (you need to be higher at the equator)
         //if (d > steepSnowDotLimit) color += snowColor; // apply snow color
         //else color += steepColor; // apply steep color
 		float d = dot(normalize(vPosition), normal);
@@ -148,6 +153,8 @@ void main() {
     }
 
 	vec3 screenColor = color.rgb * ndl + vec3(specComp) * 0.01;
+
+	//screenColor = vec3(abs(normalize(vPosition).y * sphereNormal.y));
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
 }

@@ -1,4 +1,3 @@
-import { NoiseEngine } from "../../../engine/perlin.js";
 import { Filter } from "./filters/filter.js";
 import { Layer } from "./layer.js";
 import { NoiseFilter } from "./filters/noiseFilter.js";
@@ -8,12 +7,12 @@ export class NoiseLayer extends Layer {
     masks: number[];
     filters: NoiseFilter[];
     settings: NoiseSettings;
-    constructor(noiseEngine: NoiseEngine, settings: NoiseSettings, _masks: number[] = []) {
+    constructor(settings: NoiseSettings, _masks: number[] = []) {
         super([], (p: BABYLON.Vector3, f: Filter[], s: NoiseModifiers) => 0);
 
         let filters = [];
         for (let i = 0; i < settings.octaves; i++) {
-            filters.push(new NoiseFilter(noiseEngine, {
+            filters.push(new NoiseFilter({
                 noiseStrength: 1,
                 octaves: settings.octaves,
                 minValue: settings.minValue,

@@ -1,4 +1,3 @@
-import { NoiseEngine } from "../engine/perlin.js";
 import { PlanetSide } from "./forge/planetSide.js";
 import { Direction } from "./forge/direction.js";
 export class Planet {
@@ -19,8 +18,6 @@ export class Planet {
             new PlanetSide(`${this.id}RightSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Right, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
             new PlanetSide(`${this.id}LeftSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Left, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
         ];
-        let noiseEngine = new NoiseEngine();
-        noiseEngine.seed(69);
         let nbCraters = 500;
         let craterRadiusFactor = 1;
         let craterSteepnessFactor = 1;
@@ -55,7 +52,7 @@ export class Planet {
             uniforms: [
                 "world", "worldViewProjection", "projection", "view",
                 "textureSampler", "depthSampler", "normalMap",
-                "cameraNear", "cameraFar"
+                "cameraNear", "cameraFar", "planetPosition"
             ]
         });
         //@ts-ignore
@@ -63,6 +60,7 @@ export class Planet {
         surfaceMaterial.setTexture("normalMap", new BABYLON.Texture("./textures/crackednormal.jpg", _scene));
         surfaceMaterial.setVector3("v3CameraPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("v3LightPos", BABYLON.Vector3.Zero());
+        surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
         this.setChunkMaterial(surfaceMaterial);
         this.updateColors();
     }

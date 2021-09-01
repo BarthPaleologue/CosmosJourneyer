@@ -1,21 +1,19 @@
-import "../../../include/babylon/babylon4.js";
-import { Direction } from "./direction.js";
-import { NoiseLayer } from "../../components/forge/layers/noiseLayer.js";
-import { NoiseEngine } from "../../engine/perlin.js";
-import { CraterFilter } from "./layers/filters/craterFilter.js";
+import "../../../../include/babylon/babylon4.js";
 
-let noiseEngine = new NoiseEngine();
-noiseEngine.seed(69);
+import { Direction } from "./direction.js";
+import { NoiseLayer } from "./layers/noiseLayer.js";
+import { CraterFilter } from "./layers/filters/craterFilter.js";
+import { ComputeNormals } from "./computeNormals.js";
+import { Vector3 } from "./lightWeightVector3.js";
 
 let radius = 10; // the planet radius
 
-let noiseStrength = 0.7 * radius / 100;
 let noiseFrequency = 1 / radius;
 
 let noiseLayers: NoiseLayer[] = [];
 
-let barrenBumpyLayer = new NoiseLayer(noiseEngine, {
-    noiseStrength: noiseStrength,
+let barrenBumpyLayer = new NoiseLayer({
+    noiseStrength: 0.1,
     octaves: 10,
     baseAmplitude: 1000,
     baseFrequency: noiseFrequency,
@@ -25,10 +23,10 @@ let barrenBumpyLayer = new NoiseLayer(noiseEngine, {
     useCraterMask: false,
 });
 
-let continentsLayer = new NoiseLayer(noiseEngine, {
-    noiseStrength: noiseStrength,
+let continentsLayer = new NoiseLayer({
+    noiseStrength: 0.01,
     octaves: 2,
-    baseAmplitude: 50 * 1e3,
+    baseAmplitude: 10 * 1e3,
     baseFrequency: noiseFrequency / 10,
     decay: 2,
     minValue: 0,
@@ -36,10 +34,10 @@ let continentsLayer = new NoiseLayer(noiseEngine, {
     useCraterMask: false,
 });
 
-let moutainsLayer = new NoiseLayer(noiseEngine, {
-    noiseStrength: noiseStrength,
+let moutainsLayer = new NoiseLayer({
+    noiseStrength: 0.01,
     octaves: 7,
-    baseAmplitude: 10,
+    baseAmplitude: 3,
     baseFrequency: noiseFrequency,
     decay: 2,
     minValue: 0,
@@ -68,12 +66,20 @@ let noiseModifiers = {
     minValueModifier: 1,
 };
 
-let terrainFunction = (p: BABYLON.Vector3, noiseLayers: NoiseLayer[], craterFilter: CraterFilter, planetRadius: number) => {
-    let coords = p.normalizeToNew().scale(planetRadius);
+function terrainFunction(p: BABYLON.Vector3, noiseLayers: NoiseLayer[], craterFilter: CraterFilter, planetRadius: number): Vector3 {
+
+    let initialPosition = [p.x, p.y, p.z];
+    let initialMagnitude = Math.sqrt(initialPosition[0] ** 2 + initialPosition[1] ** 2 + initialPosition[2] ** 2);
+
+    // on se ramène à la position à la surface du globe (sans relief)
+    initialPosition = initialPosition.map((value: number) => value * planetRadius / initialMagnitude);
+
+    let coords = BABYLON.Vector3.FromArray(initialPosition); // p.normalizeToNew().scale(planetRadius);
+    let unitCoords = coords.normalizeToNew();
 
     let elevation = 0;
 
-    let craterMask = craterFilter.evaluate(coords.normalizeToNew(), craterModifiers);
+    let craterMask = craterFilter.evaluate(unitCoords, craterModifiers) / 20;
 
     elevation += craterMask;
 
@@ -86,11 +92,9 @@ let terrainFunction = (p: BABYLON.Vector3, noiseLayers: NoiseLayer[], craterFilt
         elevation += layer.evaluate(coords, noiseModifiers) * maskFactor;
     }
 
+    let newPosition = p.add(unitCoords.scale(elevation));
 
-
-
-    let newPosition = p.add(coords.normalizeToNew().scale(elevation * noiseStrength));
-    return newPosition;
+    return new Vector3(newPosition.x, newPosition.y, newPosition.z);
 };
 
 onmessage = e => {
@@ -100,7 +104,7 @@ onmessage = e => {
         let subs = e.data.subdivisions;
         let depth = e.data.depth;
         let direction = e.data.direction;
-        let offset = e.data.position;
+        let offset: number[] = e.data.position;
 
         craterFilter.setCraters(e.data.craters);
 
@@ -113,7 +117,7 @@ onmessage = e => {
 
         let vertices: number[] = [];
         let faces: number[][] = [];
-        let uvs: number[] = [];
+        //let uvs: number[] = [];
         let vertexPerLine = subs + 1;
 
         let rotation = BABYLON.Matrix.Identity();
@@ -141,17 +145,40 @@ onmessage = e => {
 
         for (let x = 0; x < vertexPerLine; x++) {
             for (let y = 0; y < vertexPerLine; y++) {
-                let vertex = new BABYLON.Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
-                vertex = vertex.scale(size);
-                vertex = vertex.add(BABYLON.Vector3.FromArray(offset));
-                vertex = BABYLON.Vector3.TransformCoordinates(vertex, rotation);
-                vertex = vertex.normalizeToNew().scale(planetRadius);
+                let vertexPosition = new Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
 
-                vertex = terrainFunction(vertex, noiseLayers, craterFilter, planetRadius);
+                vertexPosition = vertexPosition.scaleToNew(size);
 
-                vertices.push(vertex.x, vertex.y, vertex.z);
+                //vertexPosition = vertexPosition.map((value: number) => value * size);
+                //vertexPosition = vertexPosition.scale(size);
 
-                uvs.push(x / vertexPerLine, y / vertexPerLine);
+                let vecOffset = Vector3.FromArray(offset);
+
+                //vertexPosition[0] += offset[0];
+                //vertexPosition[1] += offset[1];
+                //vertexPosition[2] += offset[2];
+                vertexPosition = vertexPosition.addToNew(vecOffset);
+                //vertexPosition = vertexPosition.add(BABYLON.Vector3.FromArray(offset));
+                let vertPosVec = BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(vertexPosition._x, vertexPosition._y, vertexPosition._z), rotation);
+
+                vertexPosition = new Vector3(vertPosVec.x, vertPosVec.y, vertPosVec.z);
+
+                vertexPosition = vertexPosition.normalizeToNew().scaleToNew(planetRadius);
+
+                //vertexPosition = vertexPosition.map((value: number) => value * planetRadius / magnitude);
+
+                vertPosVec = new BABYLON.Vector3(vertexPosition._x, vertexPosition._y, vertexPosition._z);//vertPosVec.normalizeToNew().scale(planetRadius);
+
+                //let offset2 = BABYLON.Vector3.TransformCoordinates(BABYLON.Vector3.FromArray(offset), rotation);
+
+                vertexPosition = terrainFunction(vertPosVec, noiseLayers, craterFilter, planetRadius);
+
+                // solving floating point precision
+                //vertexPosition = vertexPosition.subtract(offset2);
+
+                vertices.push(vertexPosition._x, vertexPosition._y, vertexPosition._z);
+
+                //uvs.push(x / vertexPerLine, y / vertexPerLine);
 
                 if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
                     faces.push([
@@ -175,7 +202,7 @@ onmessage = e => {
             }
         }
 
-        BABYLON.VertexData.ComputeNormals(positions, indices, normals);
+        ComputeNormals(positions, indices, normals);
 
         let tPositions = new Float32Array(positions.length);
         tPositions.set(positions);

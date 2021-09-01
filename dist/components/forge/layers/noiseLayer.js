@@ -1,11 +1,11 @@
 import { Layer } from "./layer.js";
 import { NoiseFilter } from "./filters/noiseFilter.js";
 export class NoiseLayer extends Layer {
-    constructor(noiseEngine, settings, _masks = []) {
+    constructor(settings, _masks = []) {
         super([], (p, f, s) => 0);
         let filters = [];
         for (let i = 0; i < settings.octaves; i++) {
-            filters.push(new NoiseFilter(noiseEngine, {
+            filters.push(new NoiseFilter({
                 noiseStrength: 1,
                 octaves: settings.octaves,
                 minValue: settings.minValue,

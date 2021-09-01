@@ -74,6 +74,7 @@ export class ChunkForge {
     addTask(task: ApplyTask | DeleteTask | BuildTask | InitTask) {
         this.incomingTasks.push(task);
     }
+
     executeTask(task: ApplyTask | DeleteTask | BuildTask | InitTask) {
 
         switch (task.taskType) {
@@ -117,16 +118,15 @@ export class ChunkForge {
                     });
 
                     this.esclavesDispo.push(esclave!);
-
                 };
                 break;
             case TaskType.Deletion:
                 // une tâche de suppression solitaire ne devrait pas exister
-                console.log("Tâche de supression solitaire détectée");
+                console.warn("Tâche de supression solitaire détectée");
                 this.trashCan.push(task);
                 break;
             default:
-                console.log("Tache illegale");
+                console.warn("Tache illegale");
                 this.executeNextTask();
         }
 
@@ -137,13 +137,10 @@ export class ChunkForge {
         }
     }
     emptyTrashCan(n: number) {
-        this.scene.disableDepthRenderer(this.scene.activeCamera);
         for (let i = 0; i < n; i++) {
             if (this.trashCan.length > 0) {
                 let task = this.trashCan.shift()!;
-                task.mesh.setEnabled(false);
-                //console.log("!");
-                task.mesh.dispose(); //causes atmospheric shimmering for now
+                task.mesh.dispose();
             }
         }
     }

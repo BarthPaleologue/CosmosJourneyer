@@ -1,4 +1,3 @@
-import { NoiseEngine } from "../engine/perlin.js";
 import { ProceduralEngine } from "../engine/proceduralEngine.js";
 import { proceduralMesh } from "../engine/proceduralMesh.js";
 import { CraterLayer } from "./forge/layers/craterLayer.js";
@@ -18,9 +17,7 @@ export class Planet extends proceduralMesh {
         this.noiseLayers = [];
         this.radius = _size / 2;
         this.subdivisions = _subdivisions;
-        this.noiseEngine = new NoiseEngine();
-        this.noiseEngine.seed(0);
-        let barrenBumpyLayer = new NoiseLayer(this.noiseEngine, {
+        let barrenBumpyLayer = new NoiseLayer({
             noiseStrength: this.noiseStrength,
             octaves: 5,
             baseAmplitude: 1,
@@ -30,7 +27,7 @@ export class Planet extends proceduralMesh {
             offset: [0, 0, 0],
             useCraterMask: false,
         });
-        let continentsLayer = new NoiseLayer(this.noiseEngine, {
+        let continentsLayer = new NoiseLayer({
             noiseStrength: this.noiseStrength,
             octaves: 5,
             baseAmplitude: 1,
@@ -40,7 +37,7 @@ export class Planet extends proceduralMesh {
             offset: [0, 0, 0],
             useCraterMask: false,
         });
-        let moutainsLayer = new NoiseLayer(this.noiseEngine, {
+        let moutainsLayer = new NoiseLayer({
             noiseStrength: this.noiseStrength,
             octaves: 6,
             baseAmplitude: 0.1,
