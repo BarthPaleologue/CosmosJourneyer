@@ -14,6 +14,8 @@
  *
  */
 
+import { Vector3 } from "../components/forge/algebra";
+
 class Grad {
 	x: number;
 	y: number;
@@ -406,8 +408,8 @@ function simplex2(xin: number, yin: number) {
  * @param vector 
  * @returns simplex between 0 and 1
  */
-export function normalizedSimplex3FromVector(vector: BABYLON.Vector3) {
-	return (1 + simplex3(vector.x, vector.y, vector.z)) / 2;
+export function normalizedSimplex3FromVector(vector: Vector3) {
+	return (1 + simplex3(vector._x, vector._y, vector._z)) / 2;
 }
 
 function simplex3FromVector(vector: BABYLON.Vector3) {

@@ -1,10 +1,11 @@
+import { Vector3 } from "../../algebra.js";
 import { Filter } from "./filter.js";
 export class CraterFilter extends Filter {
     constructor(craters) {
         super((p, s) => {
             let elevation = 0;
             for (let crater of craters) {
-                let d = BABYLON.Vector3.DistanceSquared(p, BABYLON.Vector3.FromArray(crater.position));
+                let d = Vector3.DistanceSquared(p, Vector3.FromArray(crater.position));
                 let radius = crater.radius * s.radiusModifier;
                 let steepness = crater.steepness * s.steepnessModifier;
                 //console.log(crater.position);
@@ -31,7 +32,7 @@ export class CraterFilter extends Filter {
         this.filterFunction = (p, s) => {
             let elevation = 0;
             for (let crater of craters) {
-                let d = BABYLON.Vector3.Distance(p, BABYLON.Vector3.FromArray(crater.position));
+                let d = Vector3.Distance(p, Vector3.FromArray(crater.position));
                 let radius = crater.radius * s.radiusModifier;
                 let steepness = crater.steepness * s.steepnessModifier;
                 if (d <= radius) {

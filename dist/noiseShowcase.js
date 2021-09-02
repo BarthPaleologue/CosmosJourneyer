@@ -1,3 +1,4 @@
+import { Vector3 } from "./components/forge/algebra.js";
 import { NoiseLayer } from "./components/forge/layers/noiseLayer.js";
 let renderer = document.getElementById("renderer");
 renderer.width = window.innerWidth;
@@ -25,7 +26,7 @@ let barrenBumpyLayer = new NoiseLayer({
 });
 for (let x = 0; x < renderer.width; x++) {
     for (let y = 0; y < renderer.height; y++) {
-        let noiseValue = barrenBumpyLayer.evaluate(new BABYLON.Vector3(x, y, 0), noiseModifiers);
+        let noiseValue = barrenBumpyLayer.evaluate(new Vector3(x, y, 0), noiseModifiers);
         ctx.fillStyle = `rgba(${noiseValue}, ${noiseValue}, ${noiseValue}, 1.0)`;
         ctx.fillRect(x, y, 1, 1);
         ctx.fill();

@@ -14,21 +14,21 @@ let depthRenderer = new BABYLON.DepthRenderer(scene);
 scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
-let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 200, BABYLON.Vector3.Zero(), scene);
-camera.setPosition(new BABYLON.Vector3(0, 0, -200));
-camera.wheelPrecision = 1;
-camera.attachControl(canvas);
+//let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 200, BABYLON.Vector3.Zero(), scene);
+//camera.setPosition(new BABYLON.Vector3(0, 0, -200));
+//camera.wheelPrecision = 1;
+let camera = new BABYLON.FreeCamera("camera", BABYLON.Vector3.Zero(), scene);
+//camera.attachControl(canvas);
 scene.activeCamera = camera;
-const planetRadius = 100;
-const atmosphereRadius = 120;
-let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(200), scene);
+const planetRadius = 200e3;
+const atmosphereRadius = planetRadius + 10e3;
+camera.maxZ = planetRadius * 5;
+//camera.position.z = -planetRadius * 3;
+let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(planetRadius * 2), scene);
 let forge = new ChunkForge(64, depthRenderer, scene);
-let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 64, 0, 2, forge, scene);
+let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 64, 0, 2, forge, scene);
 planet.setRenderDistanceFactor(10);
-planet.craterModifiers.maxDepthModifier = 0.00005;
-planet.noiseModifiers.strengthModifier = 0.002;
-planet.noiseModifiers.frequencyModifier = 2;
-planet.noiseModifiers.offsetModifier = [23, 10, 0];
+//planet.craterModifiers.maxDepthModifier = 0.01;
 let waterLevel = 0.85;
 planet.colorSettings = {
     snowColor: new BABYLON.Vector4(1, 1, 1, 1),
@@ -37,13 +37,16 @@ planet.colorSettings = {
     sandColor: new BABYLON.Vector4(0.5, 0.5, 0, 1),
     plainSteepDotLimit: 0.95,
     snowSteepDotLimit: 0.94,
-    iceCapThreshold: 20,
+    iceCapThreshold: 2,
     waterLevel: waterLevel,
     sandSize: 1,
 };
 planet.updateColors();
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, planetRadius, atmosphereRadius, light, camera, scene);
-let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + 2, light, camera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, planetRadius - 15e3, planetRadius + 30e3, light, camera, scene);
+atmosphere.settings.intensity = 15;
+atmosphere.settings.falloffFactor = 20;
+let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + 10e2, light, camera, scene);
+ocean.settings.alphaModifier = 0.001;
 //#region Sliders
 new Slider("maxDepth", document.getElementById("maxDepth"), 0, 5, 1, (val) => {
     planet.setMaxDepth(val);
@@ -64,13 +67,15 @@ new Slider("minValue", document.getElementById("minValue"), 0, 20, 10, (val) => 
     planet.noiseModifiers.minValueModifier = val / 10;
     planet.reset();
 });
-new Slider("oceanLevel", document.getElementById("oceanLevel"), 0, 50, 20, (val) => {
-    ocean.settings.oceanRadius = planetRadius + val / 10;
+new Slider("oceanLevel", document.getElementById("oceanLevel"), 0, 50, (ocean.settings.oceanRadius - planetRadius) / 100, (val) => {
+    ocean.settings.oceanRadius = planetRadius + val * 100;
+    if (val == 0)
+        ocean.settings.oceanRadius = 0;
     planet.colorSettings.waterLevel = waterLevel * (1 + (val - 5) / 8);
     planet.updateColors();
 });
-new Slider("alphaModifier", document.getElementById("alphaModifier"), 0, 40, ocean.settings.alphaModifier * 10, (val) => {
-    ocean.settings.alphaModifier = val / 10;
+new Slider("alphaModifier", document.getElementById("alphaModifier"), 0, 40, ocean.settings.alphaModifier * 10000, (val) => {
+    ocean.settings.alphaModifier = val / 10000;
 });
 new Slider("depthModifier", document.getElementById("depthModifier"), 0, 40, ocean.settings.depthModifier * 10, (val) => {
     ocean.settings.depthModifier = val / 10;
@@ -79,8 +84,8 @@ new Slider("sandSize", document.getElementById("sandSize"), 0, 40, planet.colorS
     planet.colorSettings.sandSize = val;
     planet.updateColors();
 });
-new Slider("snowThreshold", document.getElementById("snowThreshold"), 0, 40, planet.colorSettings.iceCapThreshold, (val) => {
-    planet.colorSettings.iceCapThreshold = val;
+new Slider("snowThreshold", document.getElementById("snowThreshold"), 0, 40, planet.colorSettings.iceCapThreshold * 10, (val) => {
+    planet.colorSettings.iceCapThreshold = val / 10;
     planet.updateColors();
 });
 new Slider("noiseStrength", document.getElementById("noiseStrength"), 0, 100, planet.noiseModifiers.strengthModifier * 10000, (val) => {
@@ -109,8 +114,8 @@ new Slider("craterDepth", document.getElementById("craterDepth"), 1, 20, 10, (de
 new Slider("intensity", document.getElementById("intensity"), 0, 40, atmosphere.settings.intensity, (val) => {
     atmosphere.settings.intensity = val;
 });
-new Slider("atmosphereRadius", document.getElementById("atmosphereRadius"), planetRadius + 1, 300, atmosphereRadius, (val) => {
-    atmosphere.settings.atmosphereRadius = val;
+new Slider("atmosphereRadius", document.getElementById("atmosphereRadius"), 0, 100, (atmosphere.settings.atmosphereRadius - planetRadius) / 1000, (val) => {
+    atmosphere.settings.atmosphereRadius = planetRadius + val * 1000;
 });
 new Slider("scatteringStrength", document.getElementById("scatteringStrength"), 0, 40, atmosphere.settings.scatteringStrength * 10, (val) => {
     atmosphere.settings.scatteringStrength = val / 10;
@@ -155,6 +160,7 @@ scene.executeWhenReady(() => {
         planet.chunkForge.update();
         planet.update(BABYLON.Vector3.Zero(), camera.getDirection(BABYLON.Axis.Z), light.position, camera);
         //planet.attachNode.position.subtractInPlace(camera.posi);
+        light.position = new BABYLON.Vector3(Math.cos(sunOrientation * Math.PI / 180), 0, Math.sin(sunOrientation * Math.PI / 180)).scale(planetRadius * 5);
         scene.render();
     });
 });

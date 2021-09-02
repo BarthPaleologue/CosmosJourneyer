@@ -1,13 +1,14 @@
+import { Vector3 } from "../../algebra.js";
 import { Crater } from "../../crater.js";
 import { CraterModifiers } from "../craterModifiers.js";
 import { Filter } from "./filter.js";
 
 export class CraterFilter extends Filter {
     constructor(craters: Crater[]) {
-        super((p: BABYLON.Vector3, s: CraterModifiers) => {
+        super((p: Vector3, s: CraterModifiers) => {
             let elevation = 0;
             for (let crater of craters) {
-                let d = BABYLON.Vector3.DistanceSquared(p, BABYLON.Vector3.FromArray(crater.position));
+                let d = Vector3.DistanceSquared(p, Vector3.FromArray(crater.position));
                 let radius = crater.radius * s.radiusModifier;
                 let steepness = crater.steepness * s.steepnessModifier;
 
@@ -33,10 +34,10 @@ export class CraterFilter extends Filter {
         });
     }
     setCraters(craters: Crater[]) {
-        this.filterFunction = (p: BABYLON.Vector3, s: CraterModifiers) => {
+        this.filterFunction = (p: Vector3, s: CraterModifiers) => {
             let elevation = 0;
             for (let crater of craters) {
-                let d = BABYLON.Vector3.Distance(p, BABYLON.Vector3.FromArray(crater.position));
+                let d = Vector3.Distance(p, Vector3.FromArray(crater.position));
 
                 let radius = crater.radius * s.radiusModifier;
                 let steepness = crater.steepness * s.steepnessModifier;

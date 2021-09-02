@@ -396,7 +396,7 @@ function simplex2(xin, yin) {
  * @returns simplex between 0 and 1
  */
 export function normalizedSimplex3FromVector(vector) {
-    return (1 + simplex3(vector.x, vector.y, vector.z)) / 2;
+    return (1 + simplex3(vector._x, vector._y, vector._z)) / 2;
 }
 function simplex3FromVector(vector) {
     return simplex3(vector.x, vector.y, vector.z);
