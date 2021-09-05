@@ -41,17 +41,18 @@ let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRa
 planet.setRenderDistanceFactor(10);
 //planet.craterModifiers.maxDepthModifier = 0.01;
 
-let waterLevel = 0.85;
+let waterElevation = 1e3;
+
 planet.colorSettings = {
-    snowColor: new BABYLON.Vector4(1, 1, 1, 1),
-    steepColor: new BABYLON.Vector4(0.2, 0.2, 0.2, 1),
-    plainColor: new BABYLON.Vector4(0.1, 0.4, 0, 1),
-    sandColor: new BABYLON.Vector4(0.5, 0.5, 0, 1),
+    snowColor: new BABYLON.Vector3(1, 1, 1),
+    steepColor: new BABYLON.Vector3(0.2, 0.2, 0.2),
+    plainColor: new BABYLON.Vector3(0.1, 0.4, 0),
+    sandColor: new BABYLON.Vector3(0.5, 0.5, 0),
     plainSteepDotLimit: 0.95,
     snowSteepDotLimit: 0.94,
     iceCapThreshold: 2,
-    waterLevel: waterLevel,
-    sandSize: 1,
+    waterLevel: waterElevation,
+    sandSize: 300,
 };
 planet.updateColors();
 
@@ -60,7 +61,7 @@ let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attac
 atmosphere.settings.intensity = 15;
 atmosphere.settings.falloffFactor = 20;
 
-let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + 10e2, light, camera, scene);
+let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + waterElevation, light, camera, scene);
 ocean.settings.alphaModifier = 0.001;
 
 //#region Sliders
@@ -92,7 +93,7 @@ new Slider("minValue", document.getElementById("minValue")!, 0, 20, 10, (val: nu
 new Slider("oceanLevel", document.getElementById("oceanLevel")!, 0, 50, (ocean.settings.oceanRadius - planetRadius) / 100, (val: number) => {
     ocean.settings.oceanRadius = planetRadius + val * 100;
     if (val == 0) ocean.settings.oceanRadius = 0;
-    planet.colorSettings.waterLevel = waterLevel * (1 + (val - 5) / 8);
+    planet.colorSettings.waterLevel = val * 100;
     planet.updateColors();
 });
 
@@ -105,7 +106,7 @@ new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 40, oc
     ocean.settings.depthModifier = val / 10;
 });
 
-new Slider("sandSize", document.getElementById("sandSize")!, 0, 40, planet.colorSettings.sandSize, (val: number) => {
+new Slider("sandSize", document.getElementById("sandSize")!, 0, 1000, planet.colorSettings.sandSize, (val: number) => {
     planet.colorSettings.sandSize = val;
     planet.updateColors();
 });
@@ -115,13 +116,13 @@ new Slider("snowThreshold", document.getElementById("snowThreshold")!, 0, 40, pl
     planet.updateColors();
 });
 
-new Slider("noiseStrength", document.getElementById("noiseStrength")!, 0, 100, planet.noiseModifiers.strengthModifier * 10000, (val: number) => {
-    planet.noiseModifiers.strengthModifier = val / 10000;
+new Slider("noiseStrength", document.getElementById("noiseStrength")!, 0, 100, planet.noiseModifiers.strengthModifier * 10, (val: number) => {
+    planet.noiseModifiers.strengthModifier = val / 10;
     planet.reset();
 });
 
-new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 20, planet.noiseModifiers.frequencyModifier / 10, (val: number) => {
-    planet.noiseModifiers.frequencyModifier = val * 10;
+new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 20, planet.noiseModifiers.frequencyModifier * 10, (val: number) => {
+    planet.noiseModifiers.frequencyModifier = val / 10;
     planet.reset();
 });
 

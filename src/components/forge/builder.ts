@@ -3,6 +3,8 @@ import { NoiseLayer } from "./layers/noiseLayer.js";
 import { CraterFilter } from "./layers/filters/craterFilter.js";
 import { ComputeNormals } from "./computeNormals.js";
 import { Matrix3, Vector3 } from "./algebra.js";
+import { NoiseModifiers } from "./layers/noiseSettings.js";
+import { CraterModifiers } from "./layers/craterModifiers.js";
 
 let bumpyLayer = new NoiseLayer(1e-4, 5, 2, 2, 0.0);
 let continentsLayer2 = new NoiseLayer(5e-6, 2, 2, 2, 0.2);
@@ -10,11 +12,19 @@ let mountainsLayer2 = new NoiseLayer(5e-5, 5, 2, 2, 0.0);
 
 let craterFilter = new CraterFilter([]);
 
-let craterModifiers = {
+let craterModifiers: CraterModifiers = {
     radiusModifier: 1,
     steepnessModifier: 1,
     maxDepthModifier: 1,
     scaleFactor: 1,
+};
+
+let noiseModifiers: NoiseModifiers = {
+    amplitudeModifier: 1,
+    offsetModifier: [0, 0, 0],
+    strengthModifier: 1,
+    frequencyModifier: 1,
+    minValueModifier: 1
 };
 
 function terrainFunction(p: Vector3, craterFilter: CraterFilter, planetRadius: number): Vector3 {
@@ -26,7 +36,7 @@ function terrainFunction(p: Vector3, craterFilter: CraterFilter, planetRadius: n
     initialPosition = initialPosition.map((value: number) => value * planetRadius / initialMagnitude);
 
     let coords = Vector3.FromArray(initialPosition); // p.normalizeToNew().scale(planetRadius);
-    let unitCoords = coords.normalizeToNew();
+    let unitCoords = coords.normalizeToNew().scaleToNew(noiseModifiers.frequencyModifier);
 
     let elevation = 0;
 
@@ -34,15 +44,7 @@ function terrainFunction(p: Vector3, craterFilter: CraterFilter, planetRadius: n
 
     elevation += craterMask;
 
-    /*for (let layer of noiseLayers) {
-        let maskFactor = 1;
-        for (let i = 0; i < layer.masks.length; i++) {
-            maskFactor *= noiseLayers[i].evaluate(coords, noiseModifiers);
-        }
-        if (layer.settings.useCraterMask && craterMask != 0) maskFactor = 0;
-        elevation += layer.evaluate(coords, noiseModifiers) * maskFactor;
-    }*/
-    elevation += continentsLayer2.evaluate(coords) * mountainsLayer2.evaluate(coords) * 7000;
+    elevation += continentsLayer2.evaluate(coords) * mountainsLayer2.evaluate(coords) * 7000 * noiseModifiers.strengthModifier;
 
     elevation += bumpyLayer.evaluate(coords) * 500;
 
@@ -62,7 +64,7 @@ onmessage = e => {
 
         craterFilter.setCraters(e.data.craters);
 
-        //noiseModifiers = e.data.noiseModifiers;
+        noiseModifiers = e.data.noiseModifiers;
 
         craterModifiers = e.data.craterModifiers;
 

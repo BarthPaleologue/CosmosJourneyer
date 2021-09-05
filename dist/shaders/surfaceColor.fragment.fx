@@ -27,10 +27,11 @@ uniform float steepSnowDotLimit; // controls snow maximum spawn steepness
 uniform float waterLevel; // controls sand layer
 uniform float sandSize;
 
-uniform vec4 snowColor; // the color of the snow layer
-uniform vec4 steepColor; // the color of steep slopes
-uniform vec4 plainColor; // the color of plains at the bottom of moutains
-uniform vec4 sandColor; // the color of the sand
+uniform vec3 snowColor; // the color of the snow layer
+uniform vec3 steepColor; // the color of steep slopes
+uniform vec3 plainColor; // the color of plains at the bottom of moutains
+uniform vec3 sandColor; // the color of the sand
+vec3 toundraColor = vec3(182.0, 169.0, 160.0) / 255.0;
 
 varying vec3 vPosition; // position of the vertex in sphere space
 varying vec3 vNormal; // normal of the vertex in sphere space
@@ -68,6 +69,10 @@ float remap(float value, float low1, float high1, float low2, float high2) {
     return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
 }
 
+vec3 lerp(vec3 vector1, vec3 vector2, float x) {
+	return x * vector1 + (1.0 - x) * vector2;
+}
+
 vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
     vec3 tNormalX = texture2D(normalMap, position.zy * scale).rgb;
     vec3 tNormalY = texture2D(normalMap, position.xz * scale).rgb;
@@ -83,6 +88,14 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, flo
     return normalize(tNormalX.zyx * blendWeight.x + tNormalY.xzy * blendWeight.y + tNormalZ.xyz * blendWeight.z);
 }
 
+bool near(float value, float reference, float range) {
+	return abs(reference - value) < range; 
+}
+
+vec3 lnear(vec3 value1, vec3 value2, float x, float summitX, float slope) {
+	if(x >= summitX) return lerp(value1, value2, max(-slope*x + 1.0 + slope*summitX, 0.0));
+	else return lerp(value1, value2, max(slope*x + 1.0 - slope*summitX, 0.0));
+}
 
 void main() {
 
@@ -109,7 +122,7 @@ void main() {
 	vec3 lightRay = normalize(v3LightPos - vPositionW); // light ray direction in world space
 	vec3 parallelLightRay = normalize(v3LightPos - planetPosition); // light ray direction in world space
 	
-	vec4 color = vec4(vec3(0.0), 1.); // color of the pixel (default doesn't matter)
+	vec3 color = vec3(0.0); // color of the pixel (default doesn't matter)
 
 	float ndl = max(0., dot(normalW, parallelLightRay)); // dimming factor due to light inclination relative to vertex normal in world space
 
@@ -120,41 +133,33 @@ void main() {
 
 	//float d = dot(normalize(vPosition), vNormal); // represents the steepness of the slope at a given vertex
 
+	vec3 unitPosition = normalize(vPosition);
+	float elevation = length(vPosition) - planetRadius;
+
 	float northFactor = pow(1.0 - abs(normalize(vPosition).y * sphereNormal.y), 1.0);
 
-	//if (length(vPosition) > (planetRadius * (1.0 + (iceCapThreshold / 100.) - pow(normalize(vPosition).y, 8.)))) {
-    if (length(vPosition) > (planetRadius * (1.0 + iceCapThreshold * northFactor / 100.0))) { 
+	if (length(vPosition) > (planetRadius * (1.0 + iceCapThreshold * northFactor / 100.0))) { 
 	    // if mountains region (you need to be higher at the equator)
-        //if (d > steepSnowDotLimit) color += snowColor; // apply snow color
-        //else color += steepColor; // apply steep color
-		float d = dot(normalize(vPosition), normal);
+		float d = dot(unitPosition, normal);
 		float sharpness = 128.0;
 		float d2 = clamp(pow(d + 0.15, sharpness), 0.0, 1.0);
-		color = (d2 * snowColor + (1.0 - d2) * steepColor);
+		color = lerp(snowColor, steepColor, d2);
     } else {
         // if lower region
-        //if (d < 0.99) { // apply steep color
-			float d = dot(normalize(vPosition), vNormal);
-			float sharpness = 128.0;
-			float d2 = clamp(pow(d + 0.015, sharpness), 0.0, 1.0);
-			color = (d2 * plainColor + (1.0 - d2) * steepColor);
-		/*} else {
-			if(length(vPosition) > (1. + sandSize/1000.) * (planetRadius + waterLevel / 2.)) {
-				// if above water level
-				color = plainColor; // it's a plain
-			} else if(length (vPosition) > (1. - sandSize/1000.) * (planetRadius + waterLevel / 2.)) {
-				// if it's just above water level
-				color = sandColor;
-			} else {
-				// if it's SOOOUS L'OCEAAAAAAN
-				color = sandColor; // placeholder for sea bottom color eventually
-			}
-        }*/
+
+		float d = dot(unitPosition, vNormal);
+		float sharpness = 128.0;
+		float d2 = clamp(pow(d + 0.015, sharpness), 0.0, 1.0);
+
+		vec3 flatColor = lerp(toundraColor, plainColor, pow(unitPosition.y, 2.0) * 3.0);
+
+		color = lerp(flatColor, steepColor, d2);
     }
+
+	// le sable est déposé autour de la ligne océanique avec un decay linéaire autour de cette ligne
+	color = lnear(sandColor, color, elevation, waterLevel, 1.0 / sandSize);
 
 	vec3 screenColor = color.rgb * ndl + vec3(specComp) * 0.01;
 
-	//screenColor = vec3(abs(normalize(vPosition).y * sphereNormal.y));
-
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
-}
+} 

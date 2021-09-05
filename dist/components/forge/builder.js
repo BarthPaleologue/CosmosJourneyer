@@ -13,25 +13,24 @@ let craterModifiers = {
     maxDepthModifier: 1,
     scaleFactor: 1,
 };
+let noiseModifiers = {
+    amplitudeModifier: 1,
+    offsetModifier: [0, 0, 0],
+    strengthModifier: 1,
+    frequencyModifier: 1,
+    minValueModifier: 1
+};
 function terrainFunction(p, craterFilter, planetRadius) {
     let initialPosition = [p._x, p._y, p._z];
     let initialMagnitude = Math.sqrt(Math.pow(initialPosition[0], 2) + Math.pow(initialPosition[1], 2) + Math.pow(initialPosition[2], 2));
     // on se ramène à la position à la surface du globe (sans relief)
     initialPosition = initialPosition.map((value) => value * planetRadius / initialMagnitude);
     let coords = Vector3.FromArray(initialPosition); // p.normalizeToNew().scale(planetRadius);
-    let unitCoords = coords.normalizeToNew();
+    let unitCoords = coords.normalizeToNew().scaleToNew(noiseModifiers.frequencyModifier);
     let elevation = 0;
     let craterMask = craterFilter.evaluate(unitCoords, craterModifiers) / 20;
     elevation += craterMask;
-    /*for (let layer of noiseLayers) {
-        let maskFactor = 1;
-        for (let i = 0; i < layer.masks.length; i++) {
-            maskFactor *= noiseLayers[i].evaluate(coords, noiseModifiers);
-        }
-        if (layer.settings.useCraterMask && craterMask != 0) maskFactor = 0;
-        elevation += layer.evaluate(coords, noiseModifiers) * maskFactor;
-    }*/
-    elevation += continentsLayer2.evaluate(coords) * mountainsLayer2.evaluate(coords) * 7000;
+    elevation += continentsLayer2.evaluate(coords) * mountainsLayer2.evaluate(coords) * 7000 * noiseModifiers.strengthModifier;
     elevation += bumpyLayer.evaluate(coords) * 500;
     let newPosition = p.addToNew(unitCoords.scaleToNew(elevation));
     return new Vector3(newPosition._x, newPosition._y, newPosition._z);
@@ -45,7 +44,7 @@ onmessage = e => {
         let direction = e.data.direction;
         let offset = e.data.position;
         craterFilter.setCraters(e.data.craters);
-        //noiseModifiers = e.data.noiseModifiers;
+        noiseModifiers = e.data.noiseModifiers;
         craterModifiers = e.data.craterModifiers;
         let size = chunkLength / (Math.pow(2, depth));
         let planetRadius = chunkLength / 2;

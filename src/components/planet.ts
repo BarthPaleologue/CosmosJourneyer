@@ -6,10 +6,10 @@ import { PlanetSide } from "./forge/planetSide.js";
 import { Direction } from "./forge/direction.js";
 
 export interface ColorSettings {
-    snowColor: BABYLON.Vector4,
-    steepColor: BABYLON.Vector4,
-    plainColor: BABYLON.Vector4,
-    sandColor: BABYLON.Vector4,
+    snowColor: BABYLON.Vector3,
+    steepColor: BABYLON.Vector3,
+    plainColor: BABYLON.Vector3,
+    sandColor: BABYLON.Vector3,
     plainSteepDotLimit: number,
     snowSteepDotLimit: number,
     iceCapThreshold: number,
@@ -60,7 +60,7 @@ export class Planet {
             new PlanetSide(`${this.id}LeftSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Left, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
         ];
 
-        let nbCraters = 500;
+        let nbCraters = 800;
         let craterRadiusFactor = 1;
         let craterSteepnessFactor = 1;
         let craterMaxDepthFactor = 1;
@@ -81,10 +81,10 @@ export class Planet {
         };
 
         this.colorSettings = {
-            snowColor: new BABYLON.Vector4(1, 1, 1, 1),
-            steepColor: new BABYLON.Vector4(0.2, 0.2, 0.2, 1),
-            plainColor: new BABYLON.Vector4(0.5, 0.3, 0.08, 1),
-            sandColor: new BABYLON.Vector4(0.5, 0.5, 0, 1),
+            snowColor: new BABYLON.Vector3(1, 1, 1),
+            steepColor: new BABYLON.Vector3(0.2, 0.2, 0.2),
+            plainColor: new BABYLON.Vector3(0.5, 0.3, 0.08),
+            sandColor: new BABYLON.Vector3(0.5, 0.5, 0),
             plainSteepDotLimit: 0.95,
             snowSteepDotLimit: 0.94,
             iceCapThreshold: 9,
@@ -100,7 +100,7 @@ export class Planet {
                 uniforms: [
                     "world", "worldViewProjection", "projection", "view",
                     "textureSampler", "depthSampler", "normalMap",
-                    "cameraNear", "cameraFar", "planetPosition"
+                    "cameraNear", "cameraFar", "planetPosition", "planetRadius"
                 ]
             });
         //@ts-ignore
@@ -109,6 +109,7 @@ export class Planet {
         surfaceMaterial.setVector3("v3CameraPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("v3LightPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
+        surfaceMaterial.setFloat("planetRadius", this.radius);
 
         this.setChunkMaterial(surfaceMaterial);
 
@@ -168,10 +169,10 @@ export class Planet {
         this.surfaceMaterial.setFloat("waterLevel", this.colorSettings.waterLevel);
         this.surfaceMaterial.setFloat("sandSize", this.colorSettings.sandSize);
 
-        this.surfaceMaterial.setVector4("snowColor", this.colorSettings.snowColor);
-        this.surfaceMaterial.setVector4("steepColor", this.colorSettings.steepColor);
-        this.surfaceMaterial.setVector4("plainColor", this.colorSettings.plainColor);
-        this.surfaceMaterial.setVector4("sandColor", this.colorSettings.sandColor);
+        this.surfaceMaterial.setVector3("snowColor", this.colorSettings.snowColor);
+        this.surfaceMaterial.setVector3("steepColor", this.colorSettings.steepColor);
+        this.surfaceMaterial.setVector3("plainColor", this.colorSettings.plainColor);
+        this.surfaceMaterial.setVector3("sandColor", this.colorSettings.sandColor);
     }
 
     update(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3, camera: BABYLON.Camera) {

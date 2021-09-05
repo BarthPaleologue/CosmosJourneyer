@@ -19,10 +19,10 @@ uniform float steepSnowDotLimit; // controls snow maximum spawn steepness
 uniform float waterLevel; // controls sand layer
 uniform float sandSize;
 
-uniform vec4 snowColor; // the color of the snow layer
-uniform vec4 steepColor; // the color of steep slopes
-uniform vec4 plainColor; // the color of plains at the bottom of moutains
-uniform vec4 sandColor; // the color of the sand
+//uniform vec4 snowColor; // the color of the snow layer
+//uniform vec4 steepColor; // the color of steep slopes
+//uniform vec4 plainColor; // the color of plains at the bottom of moutains
+//uniform vec4 sandColor; // the color of the sand
 
 
 // Varying
