@@ -93,8 +93,14 @@ bool near(float value, float reference, float range) {
 }
 
 vec3 lnear(vec3 value1, vec3 value2, float x, float summitX, float slope) {
-	if(x >= summitX) return lerp(value1, value2, max(-slope*x + 1.0 + slope*summitX, 0.0));
-	else return lerp(value1, value2, max(slope*x + 1.0 - slope*summitX, 0.0));
+	float lnearFactor = 0.0;
+	if(x >= summitX) lnearFactor = max(-slope*x + 1.0 + slope*summitX, 0.0);
+	else lnearFactor = max(slope*x + 1.0 - slope*summitX, 0.0);
+	
+	float blendingSharpness = 1.0;
+	lnearFactor = pow(lnearFactor, blendingSharpness);
+	
+	return lerp(value1, value2, lnearFactor);
 }
 
 void main() {
@@ -146,9 +152,8 @@ void main() {
 		color = lerp(snowColor, steepColor, d2);
     } else {
         // if lower region
-
 		float d = dot(unitPosition, vNormal);
-		float sharpness = 128.0;
+		float sharpness = 64.0;
 		float d2 = clamp(pow(d + 0.015, sharpness), 0.0, 1.0);
 
 		vec3 flatColor = lerp(toundraColor, plainColor, pow(unitPosition.y, 2.0) * 3.0);
