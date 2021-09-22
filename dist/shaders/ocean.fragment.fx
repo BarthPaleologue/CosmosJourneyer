@@ -104,7 +104,10 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
     
     vec3 planetNormal = normalize(samplePoint - planetPosition);
     
-    vec3 normalWave = triplanarNormal(samplePoint, planetNormal, normalMap, 0.01, 0.1, 2.0);
+    vec3 normalWave = triplanarNormal(samplePoint, planetNormal, normalMap, 0.00001, 10.0, 1.0);
+    //normalWave = triplanarNormal(samplePoint, normalWave, normalMap, 0.001, 10.0, 1.0);
+
+    //return vec3(normalWave.r);
     
     vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
 

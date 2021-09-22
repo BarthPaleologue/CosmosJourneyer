@@ -59,10 +59,12 @@ planet.updateColors();
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, planetRadius - 15e3, planetRadius + 30e3, light, camera, scene);
 atmosphere.settings.intensity = 15;
+atmosphere.settings.scatteringStrength = 0.5;
 atmosphere.settings.falloffFactor = 20;
 
 let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + waterElevation, light, camera, scene);
-ocean.settings.alphaModifier = 0.001;
+ocean.settings.alphaModifier = 0.0002;
+ocean.settings.depthModifier = 0.01;
 
 //#region Sliders
 
@@ -102,8 +104,8 @@ new Slider("alphaModifier", document.getElementById("alphaModifier")!, 0, 40, oc
     ocean.settings.alphaModifier = val / 10000;
 });
 
-new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 40, ocean.settings.depthModifier * 10, (val: number) => {
-    ocean.settings.depthModifier = val / 10;
+new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 40, ocean.settings.depthModifier * 1000, (val: number) => {
+    ocean.settings.depthModifier = val / 1000;
 });
 
 new Slider("sandSize", document.getElementById("sandSize")!, 0, 1000, planet.colorSettings.sandSize, (val: number) => {
@@ -189,10 +191,13 @@ document.getElementById("randomCraters")?.addEventListener("click", () => {
     //planet.regenerateCraters();
 });
 
-let keyboard: { [key: string]: boolean; } = { };
+let keyboard: { [key: string]: boolean; } = {};
 
 document.addEventListener("keyup", e => {
     keyboard[e.key] = false;
+    if (e.key == "p") { // take screenshots
+        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
+    }
 });
 
 window.addEventListener("resize", () => {
