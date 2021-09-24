@@ -22,16 +22,16 @@ uniform sampler2D depthSampler; // evaluate sceneDepth
 uniform sampler2D normalMap;
 
 uniform float planetRadius; // planet radius
-uniform float iceCapThreshold; // controls snow minimum spawn altitude
-uniform float steepSnowDotLimit; // controls snow maximum spawn steepness
 uniform float waterLevel; // controls sand layer
 uniform float sandSize;
+
+uniform float steepSharpness; // sharpness of demaracation between steepColor and normal colors
 
 uniform vec3 snowColor; // the color of the snow layer
 uniform vec3 steepColor; // the color of steep slopes
 uniform vec3 plainColor; // the color of plains at the bottom of moutains
 uniform vec3 sandColor; // the color of the sand
-vec3 toundraColor = vec3(182.0, 169.0, 160.0) / 255.0;
+vec3 toundraColor = vec3(40.0, 40.0, 40.0) / 255.0;
 
 varying vec3 vPosition; // position of the vertex in sphere space
 varying vec3 vNormal; // normal of the vertex in sphere space
@@ -92,15 +92,60 @@ bool near(float value, float reference, float range) {
 	return abs(reference - value) < range; 
 }
 
-vec3 lnear(vec3 value1, vec3 value2, float x, float summitX, float slope) {
+/*
+ * Get lerp factor around summit with certain slope (triangle function)
+ */
+float getLnearFactor(float x, float summitX, float range) {
 	float lnearFactor = 0.0;
-	if(x >= summitX) lnearFactor = max(-slope*x + 1.0 + slope*summitX, 0.0);
-	else lnearFactor = max(slope*x + 1.0 - slope*summitX, 0.0);
+	if(x >= summitX) lnearFactor = max(-x/range + 1.0 + summitX/range, 0.0);
+	else lnearFactor = max(x/range + 1.0 - summitX/range, 0.0);
 	
 	float blendingSharpness = 1.0;
 	lnearFactor = pow(lnearFactor, blendingSharpness);
+
+	return lnearFactor;
+}
+
+/*
+ * Get lerp value around summit with certain slope (triangle function)
+ */
+vec3 lnear(vec3 value1, vec3 value2, float x, float summitX, float range) {
+	float lnearFactor = getLnearFactor(x, summitX, range);
 	
 	return lerp(value1, value2, lnearFactor);
+}
+
+
+
+vec3 hardSurfaceGradient(float relativeElevation) {
+
+	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
+	
+	float relativeWaterLevel = waterLevel/maxElevation;
+
+
+	vec3 color = float(near(relativeElevation, relativeWaterLevel, 0.01)) * sandColor;
+	color += float(near(relativeElevation, 0.1, 0.2)) * plainColor;
+	color += float(near(relativeElevation, 0.5, 0.2)) * snowColor;
+	return color;
+}
+
+vec3 softGradient(float relativeElevation, float latitude) {
+	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
+	float relativeWaterLevel = waterLevel/maxElevation;
+
+	float sandFactor = getLnearFactor(relativeElevation, relativeWaterLevel, sandSize / maxElevation)* (1.0 - pow(latitude, 2.0));
+	
+	float plainFactor = getLnearFactor(relativeElevation, 0.2, 0.2) * (1.0 - pow(latitude, 2.0));
+	
+	float snowFactor = getLnearFactor(relativeElevation, 0.3, 0.4) * pow(latitude, 2.0);
+
+	float totalAmplitude = sandFactor + plainFactor + snowFactor;
+
+	vec3 color = sandFactor * sandColor + plainFactor * plainColor + snowFactor * snowColor;
+	color /= totalAmplitude;
+
+	return color;
 }
 
 void main() {
@@ -137,32 +182,24 @@ void main() {
     float specComp = max(0., dot(normalW, angleW));
     specComp = pow(specComp, 64.0);
 
-	//float d = dot(normalize(vPosition), vNormal); // represents the steepness of the slope at a given vertex
 
 	vec3 unitPosition = normalize(vPosition);
+	
 	float elevation = length(vPosition) - planetRadius;
+	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
 
-	float northFactor = pow(1.0 - abs(normalize(vPosition).y * sphereNormal.y), 1.0);
+	float relativeElevation = elevation/maxElevation;
+	relativeElevation = max(0.0, relativeElevation);
 
-	if (length(vPosition) > (planetRadius * (1.0 + iceCapThreshold * northFactor / 100.0))) { 
-	    // if mountains region (you need to be higher at the equator)
-		float d = dot(unitPosition, normal);
-		float sharpness = 128.0;
-		float d2 = clamp(pow(d + 0.15, sharpness), 0.0, 1.0);
-		color = lerp(snowColor, steepColor, d2);
-    } else {
-        // if lower region
-		float d = dot(unitPosition, vNormal);
-		float sharpness = 64.0;
-		float d2 = clamp(pow(d + 0.015, sharpness), 0.0, 1.0);
+	float latitude = unitPosition.y;
 
-		vec3 flatColor = lerp(toundraColor, plainColor, pow(unitPosition.y, 2.0) * 3.0);
+	color = softGradient(relativeElevation, latitude);
 
-		color = lerp(flatColor, steepColor, d2);
-    }
+	float d = dot(unitPosition, vNormal);
+	float d2 = pow(d, steepSharpness);
+	color = lerp(color, steepColor, d2);
 
-	// le sable est déposé autour de la ligne océanique avec un decay linéaire autour de cette ligne
-	color = lnear(sandColor, color, elevation, waterLevel, 1.0 / sandSize);
+	//color = vec3(relativeElevation);
 
 	vec3 screenColor = color.rgb * ndl + vec3(specComp) * 0.01;
 

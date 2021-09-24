@@ -28,6 +28,7 @@ export class Planet {
             frequencyModifier: 1,
             offsetModifier: [0, 0, 0],
             minValueModifier: 1,
+            archipelagoFactor: 0.5,
         };
         this.craterModifiers = {
             radiusModifier: 1,
@@ -40,11 +41,9 @@ export class Planet {
             steepColor: new BABYLON.Vector3(0.2, 0.2, 0.2),
             plainColor: new BABYLON.Vector3(0.5, 0.3, 0.08),
             sandColor: new BABYLON.Vector3(0.5, 0.5, 0),
-            plainSteepDotLimit: 0.95,
-            snowSteepDotLimit: 0.94,
-            iceCapThreshold: 9,
             waterLevel: 0.32,
             sandSize: 1,
+            steepSharpness: 1
         };
         this.craters = this.generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
         let surfaceMaterial = new BABYLON.ShaderMaterial("surfaceColor", _scene, "./shaders/surfaceColor", {
@@ -52,7 +51,9 @@ export class Planet {
             uniforms: [
                 "world", "worldViewProjection", "projection", "view",
                 "textureSampler", "depthSampler", "normalMap",
-                "cameraNear", "cameraFar", "planetPosition", "planetRadius"
+                "cameraNear", "cameraFar", "planetPosition", "planetRadius",
+                "waterLevel", "sandSize", "steepSharpness",
+                "snowColor", "steepColor", "plainColor", "sandColor"
             ]
         });
         //@ts-ignore
@@ -108,10 +109,9 @@ export class Planet {
     }
     updateColors() {
         this.surfaceMaterial.setFloat("planetRadius", this.radius);
-        this.surfaceMaterial.setFloat("iceCapThreshold", this.colorSettings.iceCapThreshold);
-        this.surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.snowSteepDotLimit);
         this.surfaceMaterial.setFloat("waterLevel", this.colorSettings.waterLevel);
         this.surfaceMaterial.setFloat("sandSize", this.colorSettings.sandSize);
+        this.surfaceMaterial.setFloat("steepSharpness", this.colorSettings.steepSharpness);
         this.surfaceMaterial.setVector3("snowColor", this.colorSettings.snowColor);
         this.surfaceMaterial.setVector3("steepColor", this.colorSettings.steepColor);
         this.surfaceMaterial.setVector3("plainColor", this.colorSettings.plainColor);

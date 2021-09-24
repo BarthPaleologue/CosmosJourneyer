@@ -18,20 +18,11 @@ scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
-//let camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 200, BABYLON.Vector3.Zero(), scene);
-//camera.setPosition(new BABYLON.Vector3(0, 0, -200));
-//camera.wheelPrecision = 1;
-let camera = new BABYLON.FreeCamera("camera", BABYLON.Vector3.Zero(), scene);
-//camera.attachControl(canvas);
-
-
-scene.activeCamera = camera;
-
 const planetRadius = 200e3;
-const atmosphereRadius = planetRadius + 10e3;
 
+let camera = new BABYLON.FreeCamera("camera", BABYLON.Vector3.Zero(), scene);
 camera.maxZ = planetRadius * 5;
-//camera.position.z = -planetRadius * 3;
+scene.activeCamera = camera;
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(planetRadius * 2), scene);
 
@@ -39,20 +30,18 @@ let forge = new ChunkForge(64, depthRenderer, scene);
 
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 64, 0, 2, forge, scene);
 planet.setRenderDistanceFactor(10);
-//planet.craterModifiers.maxDepthModifier = 0.01;
 
-let waterElevation = 1e3;
+let waterElevation = 3e2;
 
 planet.colorSettings = {
     snowColor: new BABYLON.Vector3(1, 1, 1),
     steepColor: new BABYLON.Vector3(0.2, 0.2, 0.2),
     plainColor: new BABYLON.Vector3(0.1, 0.4, 0),
     sandColor: new BABYLON.Vector3(0.5, 0.5, 0),
-    plainSteepDotLimit: 0.95,
-    snowSteepDotLimit: 0.94,
-    iceCapThreshold: 2,
+
     waterLevel: waterElevation,
-    sandSize: 300,
+    sandSize: 100,
+    steepSharpness: 1
 };
 planet.updateColors();
 
@@ -113,8 +102,8 @@ new Slider("sandSize", document.getElementById("sandSize")!, 0, 1000, planet.col
     planet.updateColors();
 });
 
-new Slider("snowThreshold", document.getElementById("snowThreshold")!, 0, 40, planet.colorSettings.iceCapThreshold * 10, (val: number) => {
-    planet.colorSettings.iceCapThreshold = val / 10;
+new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 256, planet.colorSettings.steepSharpness, (val: number) => {
+    planet.colorSettings.steepSharpness = val;
     planet.updateColors();
 });
 
@@ -214,7 +203,6 @@ scene.executeWhenReady(() => {
         planet.chunkForge.update();
         planet.update(BABYLON.Vector3.Zero(), camera.getDirection(BABYLON.Axis.Z), light.position, camera);
 
-        //planet.attachNode.position.subtractInPlace(camera.posi);
         light.position = new BABYLON.Vector3(Math.cos(sunOrientation * Math.PI / 180), 0, Math.sin(sunOrientation * Math.PI / 180)).scale(planetRadius * 5);
 
         scene.render();

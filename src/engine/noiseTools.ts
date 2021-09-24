@@ -412,12 +412,17 @@ export function normalizedSimplex3FromVector(vector: Vector3) {
 	return (1 + simplex3(vector._x, vector._y, vector._z)) / 2;
 }
 
-function simplex3FromVector(vector: BABYLON.Vector3) {
-	return simplex3(vector.x, vector.y, vector.z);
+/**
+ * 
+ * @param vector 
+ * @returns simplex between -1 and 1
+ */
+export function simplex3FromVector(vector: Vector3) {
+	return simplex3(vector._x, vector._y, vector._z);
 }
 
 function simplex3(xin: number, yin: number, zin: number) {
-	seed(69);
+	seed(42);
 
 	let n0, n1, n2, n3; // Noise contributions from the four corners
 

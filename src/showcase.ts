@@ -22,8 +22,6 @@ depthRenderer.getDepthMap().renderList = [];
 let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, 0), scene);
 freeCamera.minZ = 1;
 freeCamera.attachControl(canvas);
-freeCamera.checkCollisions = true;
-
 
 let box = BABYLON.Mesh.CreateBox("boate", 1, scene);
 freeCamera.parent = box;
@@ -49,28 +47,18 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 let forge = new ChunkForge(64, depthRenderer, scene);
 
 let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 1, 6, forge, scene);
-//planet.colorSettings.sandColor = planet.colorSettings.steepColor;
-planet.colorSettings.iceCapThreshold = 5;
-//planet.colorSettings.sandColor = new BABYLON.Vector3(1.0, 0.0, 0.0);
+planet.noiseModifiers.archipelagoFactor = 0.2;
+planet.colorSettings.sandColor = planet.colorSettings.plainColor;
 planet.colorSettings.sandSize = 1000;
-//planet.colorSettings.plainColor = new BABYLON.Vector4(0.4, 0.4, 0.4, 1);
-//planet.colorSettings.plainColor = new BABYLON.Vector4(0.0, 154 / 255, 23 / 255, 1.0);
-//planet.colorSettings.plainColor = new BABYLON.Vector4(0.0, 154 / 255, 23 / 255, 1.0);
-//planet.noiseModifiers.amplitudeModifier = 5000; // sert à rien
-//planet.noiseModifiers.frequencyModifier = 0.001;
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
-//planet.attachNode.parent = sun;
+
+planet.attachNode.parent = sun;
 
 let moon = new Planet("Manaleth", radius / 8, new BABYLON.Vector3(Math.cos(-0.7), 0, Math.sin(-0.7)).scale(3 * radius), 64, 1, 6, forge, scene);
-moon.colorSettings.sandColor = planet.colorSettings.steepColor;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.4, 0.4, 0.4);
-//planet.colorSettings.plainColor = new BABYLON.Vector4(0.0, 154 / 255, 23 / 255, 1.0);
-//planet.colorSettings.plainColor = new BABYLON.Vector4(0.0, 154 / 255, 23 / 255, 1.0);
-//moon.colorSettings.iceCapThreshold = radius / 2;
-//moon.noiseModifiers.amplitudeModifier = 10;
-//moon.noiseModifiers.frequencyModifier = 0.0004;
-//moon.craterModifiers.maxDepthModifier = 1 / 8;
+moon.colorSettings.sandColor = planet.colorSettings.steepColor;
+moon.craterModifiers.maxDepthModifier = 1 / 8;
 moon.updateColors();
 
 moon.attachNode.parent = planet.attachNode;
@@ -81,16 +69,17 @@ let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 15e3, radius + 30e3, sun, freeCamera, scene);
 atmosphere.settings.intensity = 11;
 atmosphere.settings.falloffFactor = 20;
+atmosphere.settings.scatteringStrength = 0.4;
 //let depth = new DepthPostProcess("depth", freeCamera, scene);
 
-let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 0.5e3, sun, freeCamera, scene);
+let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 2e2, sun, freeCamera, scene);
 ocean.settings.alphaModifier = 0.00005;
 ocean.settings.depthModifier = 0.002;
-//ocean.settings.oceanRadius = 0;
+ocean.settings.oceanRadius = 0;
 
 //let clouds = new CloudPostProcess("clouds", planet.attachNode, radius + 5e3, radius + 10e3, sun, freeCamera, scene);
 
-let keyboard: { [key: string]: boolean; } = { };
+let keyboard: { [key: string]: boolean; } = {};
 
 document.addEventListener("keydown", e => {
     keyboard[e.key] = true;
@@ -117,6 +106,7 @@ scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
     let t = 0;
+    let speed = 0.0002 * radius;
 
     scene.beforeRender = () => {
         let forward = freeCamera.getDirection(BABYLON.Axis.Z);
@@ -127,7 +117,6 @@ scene.executeWhenReady(() => {
 
         planet.update(freeCamera.position, forward, sun.position, freeCamera);
         moon.update(freeCamera.position, forward, sun.position, freeCamera);
-        //planet.attachNode.rotation.y += 0.0001;
 
         if (keyboard["a"]) { // rotation autour de l'axe de déplacement
             box.rotate(forward, 0.02, BABYLON.Space.WORLD);
@@ -158,18 +147,18 @@ scene.executeWhenReady(() => {
         if (keyboard["8"]) speed = 0.03;
 
         sun.position.addInPlace(deplacement);
-        //moon.attachNode.position.addInPlace(deplacement);
 
         t += 0.00002;
-        //sun.position = planet.attachNode.position.add(new BABYLON.Vector3(Math.cos(t), 0, Math.sin(t)).scale(4 * radius));
+        /*
+        sun.rotation.y = -t;
+        planet.attachNode.rotation.y = -2 * t;
+        */
 
         planet.surfaceMaterial.setVector3("v3LightPos", sun.absolutePosition);
         planet.surfaceMaterial.setVector3("planetPosition", planet.attachNode.absolutePosition);
         moon.surfaceMaterial.setVector3("v3LightPos", sun.absolutePosition);
         moon.surfaceMaterial.setVector3("planetPosition", moon.attachNode.absolutePosition);
     };
-
-    let speed = 0.0002 * radius;
 
     engine.runRenderLoop(() => {
         scene.render();

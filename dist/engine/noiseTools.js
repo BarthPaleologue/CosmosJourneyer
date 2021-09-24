@@ -398,11 +398,16 @@ function simplex2(xin, yin) {
 export function normalizedSimplex3FromVector(vector) {
     return (1 + simplex3(vector._x, vector._y, vector._z)) / 2;
 }
-function simplex3FromVector(vector) {
-    return simplex3(vector.x, vector.y, vector.z);
+/**
+ *
+ * @param vector
+ * @returns simplex between -1 and 1
+ */
+export function simplex3FromVector(vector) {
+    return simplex3(vector._x, vector._y, vector._z);
 }
 function simplex3(xin, yin, zin) {
-    seed(69);
+    seed(42);
     let n0, n1, n2, n3; // Noise contributions from the four corners
     // Skew the input space to determine which simplex cell we're in
     let s = (xin + yin + zin) * F3; // Hairy factor for 2D

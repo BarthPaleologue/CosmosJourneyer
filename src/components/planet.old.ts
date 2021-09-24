@@ -3,8 +3,9 @@ import { proceduralMesh } from "../engine/proceduralMesh.js";
 import { Crater } from "./forge/crater.js";
 import { CraterLayer } from "./forge/layers/craterLayer.js";
 import { CraterModifiers } from "./forge/layers/craterModifiers.js";
-import { NoiseLayer } from "./forge/layers/noiseLayer.js";
+import { SimplexNoiseLayer } from "./forge/layers/simplexNoiseLayer.js";
 import { NoiseModifiers } from "./forge/layers/noiseSettings.js";
+import { Vector3 } from "./forge/algebra.js";
 
 export class Planet extends proceduralMesh {
     radius: number;
@@ -22,7 +23,7 @@ export class Planet extends proceduralMesh {
     noiseFrequency = .3;
     noiseOffsetX = 0;
     noiseOffsetY = 0;
-    noiseLayers: NoiseLayer[] = [];
+    noiseLayers: SimplexNoiseLayer[] = [];
     noiseModifiers: NoiseModifiers;
 
     constructor(_id: string, _size: number, _subdivisions: number, _position: BABYLON.Vector3, _scene: BABYLON.Scene) {
@@ -31,38 +32,11 @@ export class Planet extends proceduralMesh {
         this.radius = _size / 2;
         this.subdivisions = _subdivisions;
 
-        let barrenBumpyLayer = new NoiseLayer({
-            noiseStrength: this.noiseStrength,
-            octaves: 5,
-            baseAmplitude: 1,
-            baseFrequency: 1,
-            decay: 2,
-            minValue: 0,
-            offset: [0, 0, 0],
-            useCraterMask: false,
-        });
+        let barrenBumpyLayer = new SimplexNoiseLayer(1, 5, 2, 2, 0);
 
-        let continentsLayer = new NoiseLayer({
-            noiseStrength: this.noiseStrength,
-            octaves: 5,
-            baseAmplitude: 1,
-            baseFrequency: 1,
-            decay: 2,
-            minValue: 0.2,
-            offset: [0, 0, 0],
-            useCraterMask: false,
-        });
+        let continentsLayer = new SimplexNoiseLayer(1, 5, 2, 2, 0.2);
 
-        let moutainsLayer = new NoiseLayer({
-            noiseStrength: this.noiseStrength,
-            octaves: 6,
-            baseAmplitude: 0.1,
-            baseFrequency: 1,
-            decay: 2,
-            minValue: 0,
-            offset: [0, 0, 0],
-            useCraterMask: false,
-        }, [0]);
+        let moutainsLayer = new SimplexNoiseLayer(0.1, 6, 2, 2, 0);
 
         this.noiseModifiers = {
             strengthModifier: 1,
@@ -70,6 +44,7 @@ export class Planet extends proceduralMesh {
             frequencyModifier: 1,
             offsetModifier: [0, 0, 0],
             minValueModifier: 1,
+            archipelagoFactor: 0.5
         };
 
         this.craterModifiers = {
@@ -128,17 +103,16 @@ export class Planet extends proceduralMesh {
 
     terrainFunction(p: BABYLON.Vector3) {
         let coords = p.normalizeToNew();
+        let coords2 = new Vector3(coords.x, coords.y, coords.z);
 
         let elevation = 0;
         for (let layer of this.noiseLayers) {
             let maskFactor = 1;
-            for (let i = 0; i < layer.masks.length; i++) {
-                maskFactor *= this.noiseLayers[i].evaluate(coords, this.noiseModifiers);
-            }
-            elevation += layer.evaluate(coords, this.noiseModifiers) * maskFactor;
+
+            elevation += layer.evaluate(coords2);
         }
 
-        elevation += this.craterLayer.evaluate(coords, this.craterModifiers);
+        elevation += this.craterLayer.evaluate(coords2, this.craterModifiers);
 
         return elevation;
     }

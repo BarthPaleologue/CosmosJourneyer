@@ -42,15 +42,13 @@ planet.noiseModifiers.frequencyModifier = 20;
 planet.noiseModifiers.offsetModifier = [23, 10, 0];
 let waterLevel = 0.85;
 planet.colorSettings = {
-    snowColor: new BABYLON.Vector4(1, 1, 1, 1),
-    steepColor: new BABYLON.Vector4(0.2, 0.2, 0.2, 1),
-    plainColor: new BABYLON.Vector4(0.1, 0.4, 0, 1),
-    sandColor: new BABYLON.Vector4(0.5, 0.5, 0, 1),
-    plainSteepDotLimit: 0.95,
-    snowSteepDotLimit: 0.94,
-    iceCapThreshold: 20,
+    snowColor: new BABYLON.Vector3(1, 1, 1),
+    steepColor: new BABYLON.Vector3(0.2, 0.2, 0.2),
+    plainColor: new BABYLON.Vector3(0.1, 0.4, 0),
+    sandColor: new BABYLON.Vector3(0.5, 0.5, 0),
     waterLevel: waterLevel,
     sandSize: 1,
+    steepSharpness: 1
 };
 planet.updateColors();
 

@@ -1,7 +1,7 @@
 import { Vector3 } from "../algebra.js";
 import { normalizedSimplex3FromVector } from "../../../engine/noiseTools.js";
 
-export class NoiseLayer {
+export class SimplexNoiseLayer {
     _frequency: number;
     _nbOctaves: number;
     _decay: number;
@@ -27,8 +27,11 @@ export class NoiseLayer {
         }
         noiseValue /= totalAmplitude;
 
-        noiseValue = Math.max(this._minValue, noiseValue) - this._minValue;
-        noiseValue /= 1.0 - this._minValue;
+        if (this._minValue != 1) {
+            noiseValue = Math.max(this._minValue, noiseValue) - this._minValue;
+            noiseValue /= 1.0 - this._minValue;
+            //noiseValue += this._minValue;
+        }
 
         return noiseValue;
     }
