@@ -31,7 +31,7 @@ let forge = new ChunkForge(64, depthRenderer, scene);
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 64, 0, 2, forge, scene);
 planet.setRenderDistanceFactor(10);
 
-let waterElevation = 3e2;
+let waterElevation = 10e2;
 
 planet.colorSettings = {
     snowColor: new BABYLON.Vector3(1, 1, 1),
@@ -52,13 +52,13 @@ atmosphere.settings.scatteringStrength = 0.5;
 atmosphere.settings.falloffFactor = 20;
 
 let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + waterElevation, light, camera, scene);
-ocean.settings.alphaModifier = 0.0002;
-ocean.settings.depthModifier = 0.01;
+ocean.settings.alphaModifier = 0.00005;
+ocean.settings.depthModifier = 0.004;
 
 //#region Sliders
 
 new Slider("maxDepth", document.getElementById("maxDepth")!, 0, 5, 1, (val: number) => {
-    planet.setMaxDepth(val);
+    planet.setMinDepth(val);
 });
 
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX")!, 0, 50, 0, (val: number) => {
@@ -89,12 +89,12 @@ new Slider("oceanLevel", document.getElementById("oceanLevel")!, 0, 50, (ocean.s
 });
 
 
-new Slider("alphaModifier", document.getElementById("alphaModifier")!, 0, 40, ocean.settings.alphaModifier * 10000, (val: number) => {
-    ocean.settings.alphaModifier = val / 10000;
+new Slider("alphaModifier", document.getElementById("alphaModifier")!, 0, 40, ocean.settings.alphaModifier * 100000, (val: number) => {
+    ocean.settings.alphaModifier = val / 100000;
 });
 
-new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 40, ocean.settings.depthModifier * 1000, (val: number) => {
-    ocean.settings.depthModifier = val / 1000;
+new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 70, ocean.settings.depthModifier * 10000, (val: number) => {
+    ocean.settings.depthModifier = val / 10000;
 });
 
 new Slider("sandSize", document.getElementById("sandSize")!, 0, 1000, planet.colorSettings.sandSize, (val: number) => {

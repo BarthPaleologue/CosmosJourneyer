@@ -1,5 +1,5 @@
 import { Vector3 } from "../algebra.js";
-import { normalizedSimplex3FromVector, simplex3FromVector } from "../../../engine/noiseTools.js";
+import { simplex3FromVector } from "../../../engine/noiseTools.js";
 
 export class MountainNoiseLayer {
     _frequency: number;
@@ -26,20 +26,12 @@ export class MountainNoiseLayer {
             totalAmplitude += 1.0 / Math.pow(this._decay, i);
         }
         noiseValue /= totalAmplitude;
-        noiseValue = Math.abs(noiseValue);
+        noiseValue = 1 - Math.abs(noiseValue);
 
         if (this._minValue < 1) {
             noiseValue = Math.max(this._minValue, noiseValue) - this._minValue;
             noiseValue /= 1.0 - this._minValue;
         }
-
-        //let sharpness = 0.1;
-        //noiseValue = Math.pow(noiseValue, sharpness);
-
-        let riverFactor = 0.95;
-
-        noiseValue *= riverFactor;
-        noiseValue += 1 - riverFactor;
 
         return noiseValue;
     }

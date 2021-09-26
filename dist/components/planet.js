@@ -50,15 +50,14 @@ export class Planet {
             attributes: ["position", "normal", "uv"],
             uniforms: [
                 "world", "worldViewProjection", "projection", "view",
-                "textureSampler", "depthSampler", "normalMap",
+                "textureSampler", "depthSampler", "normalMap1", "normalMap2",
                 "cameraNear", "cameraFar", "planetPosition", "planetRadius",
                 "waterLevel", "sandSize", "steepSharpness",
                 "snowColor", "steepColor", "plainColor", "sandColor"
             ]
         });
-        //@ts-ignore
-        surfaceMaterial.useLogarithmicDepth = true;
-        surfaceMaterial.setTexture("normalMap", new BABYLON.Texture("./textures/crackednormal.jpg", _scene));
+        surfaceMaterial.setTexture("normalMap1", new BABYLON.Texture("./textures/crackednormal.jpg", _scene));
+        surfaceMaterial.setTexture("normalMap2", new BABYLON.Texture("./textures/rockn.png", _scene));
         surfaceMaterial.setVector3("v3CameraPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("v3LightPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
@@ -97,6 +96,15 @@ export class Planet {
     setMaxDepth(maxDepth) {
         for (let side of this.sides) {
             side.maxDepth = maxDepth;
+        }
+    }
+    /**
+     * Changes the minimum depth of the quadtrees
+     * @param minDepth the new minimum depth of the quadtrees
+     */
+    setMinDepth(minDepth) {
+        for (let side of this.sides) {
+            side.minDepth = minDepth;
         }
     }
     /**

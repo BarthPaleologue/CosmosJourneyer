@@ -19,7 +19,8 @@ uniform mat4 projection;
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler; // evaluate sceneDepth
 
-uniform sampler2D normalMap;
+uniform sampler2D normalMap1;
+uniform sampler2D normalMap2;
 
 uniform float planetRadius; // planet radius
 uniform float waterLevel; // controls sand layer
@@ -130,19 +131,23 @@ vec3 hardSurfaceGradient(float relativeElevation) {
 	return color;
 }
 
-vec3 softGradient(float relativeElevation, float latitude) {
+vec3 softGradient(float relativeElevation, float latitude, vec3 normal) {
 	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
 	float relativeWaterLevel = waterLevel/maxElevation;
 
-	float sandFactor = getLnearFactor(relativeElevation, relativeWaterLevel, sandSize / maxElevation)* (1.0 - pow(latitude, 2.0));
-	
-	float plainFactor = getLnearFactor(relativeElevation, 0.2, 0.2) * (1.0 - pow(latitude, 2.0));
-	
-	float snowFactor = getLnearFactor(relativeElevation, 0.3, 0.4) * pow(latitude, 2.0);
+	float bottomFactor = getLnearFactor(relativeElevation, 0.0, 0.05);
 
-	float totalAmplitude = sandFactor + plainFactor + snowFactor;
+	float sandFactor = getLnearFactor(relativeElevation, relativeWaterLevel, sandSize / maxElevation);
+	
+	float plainFactor = getLnearFactor(relativeElevation, 0.2, 0.3);
+	
+	float snowFactor = getLnearFactor(relativeElevation, 0.6, 0.3) * abs(latitude);
 
-	vec3 color = sandFactor * sandColor + plainFactor * plainColor + snowFactor * snowColor;
+	float totalAmplitude = bottomFactor + sandFactor + plainFactor + snowFactor;
+
+	vec3 bottomColor = vec3(0.5);
+
+	vec3 color = bottomFactor * bottomColor + sandFactor * sandColor + plainFactor * plainColor + snowFactor * snowColor;
 	color /= totalAmplitude;
 
 	return color;
@@ -156,17 +161,9 @@ void main() {
 
 	vec3 normal = vNormal;
 
-	//if(distance < 10000.0) {
-	normal = triplanarNormal(vPosition, vNormal, normalMap, 0.05, 1.0, 0.2);
-	normal = triplanarNormal(vPosition, normal, normalMap, 0.001, 1.0, 0.2);
-	normal = triplanarNormal(vPosition, normal, normalMap, 0.0001, 1.0, 0.2);
-	//}
-
-	vec3 sphereNormal = triplanarNormal(vPosition, normalize(vPosition), normalMap, 0.05, 1.0, 0.2);
-	sphereNormal = triplanarNormal(vPosition, sphereNormal, normalMap, 0.001, 1.0, 0.2);
-	sphereNormal = triplanarNormal(vPosition, sphereNormal, normalMap, 0.0001, 1.0, 0.2);
-	sphereNormal = triplanarNormal(vPosition, sphereNormal, normalMap, 0.00001, 1.0, 0.2);
-
+	normal = triplanarNormal(vPosition, normal, normalMap2, 0.04, 1.0, 0.2); // plus petit
+	normal = triplanarNormal(vPosition, normal, normalMap2, 0.0015, 1.0, 0.2);
+	normal = triplanarNormal(vPosition, normal, normalMap1, 0.00015, 1.0, 0.02); // plus grand
 
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
@@ -193,7 +190,7 @@ void main() {
 
 	float latitude = unitPosition.y;
 
-	color = softGradient(relativeElevation, latitude);
+	color = softGradient(relativeElevation, latitude, normal);
 
 	float d = dot(unitPosition, vNormal);
 	float d2 = pow(d, steepSharpness);
@@ -201,7 +198,7 @@ void main() {
 
 	//color = vec3(relativeElevation);
 
-	vec3 screenColor = color.rgb * ndl + vec3(specComp) * 0.01;
+	vec3 screenColor = color.rgb * ndl * (1.0+ vec3(specComp)/10.0);
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
 } 

@@ -47,9 +47,12 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 let forge = new ChunkForge(64, depthRenderer, scene);
 
 let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 1, 6, forge, scene);
-planet.noiseModifiers.archipelagoFactor = 0.2;
-planet.colorSettings.sandColor = planet.colorSettings.plainColor;
-planet.colorSettings.sandSize = 1000;
+planet.noiseModifiers.archipelagoFactor = 0.5;
+planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
+//planet.colorSettings.sandColor = planet.colorSettings.plainColor;
+planet.colorSettings.sandSize = 100;
+planet.colorSettings.steepSharpness = 4;
+planet.colorSettings.waterLevel = 10e2;
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
 
@@ -72,10 +75,10 @@ atmosphere.settings.falloffFactor = 20;
 atmosphere.settings.scatteringStrength = 0.4;
 //let depth = new DepthPostProcess("depth", freeCamera, scene);
 
-let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 2e2, sun, freeCamera, scene);
+let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 10e2, sun, freeCamera, scene);
 ocean.settings.alphaModifier = 0.00005;
 ocean.settings.depthModifier = 0.002;
-ocean.settings.oceanRadius = 0;
+//ocean.settings.oceanRadius = 0;
 
 //let clouds = new CloudPostProcess("clouds", planet.attachNode, radius + 5e3, radius + 10e3, sun, freeCamera, scene);
 
@@ -142,8 +145,8 @@ scene.executeWhenReady(() => {
         if (keyboard["d"]) deplacement.subtractInPlace(right.scale(speed * engine.getDeltaTime()));
         if (keyboard[" "]) deplacement.subtractInPlace(upward.scale(speed * engine.getDeltaTime()));
         if (keyboard["Shift"]) deplacement.addInPlace(upward.scale(speed * engine.getDeltaTime()));
-        if (keyboard["+"]) speed += 1;
-        if (keyboard["-"]) speed -= 1;
+        if (keyboard["+"]) speed *= 1.1;
+        if (keyboard["-"]) speed /= 1.1;
         if (keyboard["8"]) speed = 0.03;
 
         sun.position.addInPlace(deplacement);

@@ -6,6 +6,7 @@ import { Matrix3, Vector3 } from "./algebra.js";
 import { NoiseModifiers } from "./layers/noiseSettings.js";
 import { CraterModifiers } from "./layers/craterModifiers.js";
 import { MountainNoiseLayer } from "./layers/moutainNoiseLayer.js";
+import { ContinentNoiseLayer } from "./layers/continentNoiseLayer.js";
 
 let craterModifiers: CraterModifiers = {
     radiusModifier: 1,
@@ -26,12 +27,14 @@ let noiseModifiers: NoiseModifiers = {
 
 let bumpyLayer: SimplexNoiseLayer;
 let continentsLayer2: SimplexNoiseLayer;
+let continentsLayer3: ContinentNoiseLayer;
 let mountainsLayer2: MountainNoiseLayer;
 
 function initLayers() {
     bumpyLayer = new SimplexNoiseLayer(1e-4, 5, 2, 2, 0.0);
-    continentsLayer2 = new SimplexNoiseLayer(5e-6, 4, 2, 2, noiseModifiers.archipelagoFactor);
-    mountainsLayer2 = new MountainNoiseLayer(2e-5, 5, 2, 2, 0.0);
+    continentsLayer2 = new SimplexNoiseLayer(5e-6, 6, 1.8, 2, noiseModifiers.archipelagoFactor);
+    continentsLayer3 = new ContinentNoiseLayer(2e-5, 3, 2, 2, 0.0);
+    mountainsLayer2 = new MountainNoiseLayer(2e-5, 6, 2, 2, 0.0);
 }
 
 initLayers();

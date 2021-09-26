@@ -1,5 +1,5 @@
 import { simplex3FromVector } from "../../../engine/noiseTools.js";
-export class MountainNoiseLayer {
+export class ContinentNoiseLayer {
     constructor(frequency, nbOctaves, decay, lacunarity, minValue) {
         this._frequency = frequency;
         this._nbOctaves = nbOctaves;
@@ -17,11 +17,14 @@ export class MountainNoiseLayer {
             totalAmplitude += 1.0 / Math.pow(this._decay, i);
         }
         noiseValue /= totalAmplitude;
-        noiseValue = 1 - Math.abs(noiseValue);
+        noiseValue = Math.abs(noiseValue);
         if (this._minValue < 1) {
             noiseValue = Math.max(this._minValue, noiseValue) - this._minValue;
             noiseValue /= 1.0 - this._minValue;
         }
+        let riverFactor = 0.95;
+        noiseValue *= riverFactor;
+        noiseValue += 1 - riverFactor;
         return noiseValue;
     }
 }

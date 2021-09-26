@@ -123,8 +123,8 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         float alpha = 1.0 - exp(-distanceThroughOcean * alphaModifier);
         
         //vec3 oceanColor = lerp(vec3(10.0, 100.0, 249.0)/255.0, vec3(15.0,94.0,156.0)/255.0, opticalDepth01);
-        vec3 deepColor = vec3(10.0, 100.0, 249.0)/255.0;
-        vec3 shallowColor = vec3(68.0,85.0,90.0)/255.0;
+        vec3 deepColor = vec3(0.0, 22.0, 82.0)/255.0;
+        vec3 shallowColor = vec3(32.0,193.0,180.0)/255.0;
         vec3 oceanColor = lerp(deepColor, shallowColor, opticalDepth01);
         
         return lerp(originalColor, oceanColor, alpha) * (ndl + spec);

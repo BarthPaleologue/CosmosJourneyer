@@ -4,6 +4,7 @@ import { CraterFilter } from "./layers/filters/craterFilter.js";
 import { ComputeNormals } from "./computeNormals.js";
 import { Matrix3, Vector3 } from "./algebra.js";
 import { MountainNoiseLayer } from "./layers/moutainNoiseLayer.js";
+import { ContinentNoiseLayer } from "./layers/continentNoiseLayer.js";
 let craterModifiers = {
     radiusModifier: 1,
     steepnessModifier: 1,
@@ -20,11 +21,13 @@ let noiseModifiers = {
 };
 let bumpyLayer;
 let continentsLayer2;
+let continentsLayer3;
 let mountainsLayer2;
 function initLayers() {
     bumpyLayer = new SimplexNoiseLayer(1e-4, 5, 2, 2, 0.0);
-    continentsLayer2 = new SimplexNoiseLayer(5e-6, 4, 2, 2, noiseModifiers.archipelagoFactor);
-    mountainsLayer2 = new MountainNoiseLayer(2e-5, 5, 2, 2, 0.0);
+    continentsLayer2 = new SimplexNoiseLayer(5e-6, 6, 1.8, 2, noiseModifiers.archipelagoFactor);
+    continentsLayer3 = new ContinentNoiseLayer(2e-5, 3, 2, 2, 0.0);
+    mountainsLayer2 = new MountainNoiseLayer(2e-5, 6, 2, 2, 0.0);
 }
 initLayers();
 let craterFilter = new CraterFilter([]);
