@@ -19,8 +19,11 @@ uniform mat4 projection;
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler; // evaluate sceneDepth
 
-uniform sampler2D normalMap1;
-uniform sampler2D normalMap2;
+uniform sampler2D bottomNormalMap;
+uniform sampler2D plainNormalMap;
+uniform sampler2D sandNormalMap;
+uniform sampler2D snowNormalMap;
+uniform sampler2D steepNormalMap;
 
 uniform float planetRadius; // planet radius
 uniform float waterLevel; // controls sand layer
@@ -74,10 +77,51 @@ vec3 lerp(vec3 vector1, vec3 vector2, float x) {
 	return x * vector1 + (1.0 - x) * vector2;
 }
 
-vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
-    vec3 tNormalX = texture2D(normalMap, position.zy * scale).rgb;
-    vec3 tNormalY = texture2D(normalMap, position.xz * scale).rgb;
-    vec3 tNormalZ = texture2D(normalMap, position.xy * scale).rgb;
+vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, float bottomFactor, float sandFactor, float plainFactor, float snowFactor, float steepFactor, float scale, float sharpness, float normalStrength) {
+
+	vec3 tBottomNormalX = texture2D(bottomNormalMap, position.zy * scale).rgb;
+    vec3 tBottomNormalY = texture2D(bottomNormalMap, position.xz * scale).rgb;
+    vec3 tBottomNormalZ = texture2D(bottomNormalMap, position.xy * scale).rgb;
+
+	vec3 tSandNormalX = texture2D(sandNormalMap, position.zy * scale).rgb;
+    vec3 tSandNormalY = texture2D(sandNormalMap, position.xz * scale).rgb;
+    vec3 tSandNormalZ = texture2D(sandNormalMap, position.xy * scale).rgb;
+
+	vec3 tPlainNormalX = texture2D(plainNormalMap, position.zy * scale).rgb;
+    vec3 tPlainNormalY = texture2D(plainNormalMap, position.xz * scale).rgb;
+    vec3 tPlainNormalZ = texture2D(plainNormalMap, position.xy * scale).rgb;
+
+	vec3 tSnowNormalX = texture2D(snowNormalMap, position.zy * scale).rgb;
+    vec3 tSnowNormalY = texture2D(snowNormalMap, position.xz * scale).rgb;
+    vec3 tSnowNormalZ = texture2D(snowNormalMap, position.xy * scale).rgb;
+
+	vec3 tSteepNormalX = texture2D(steepNormalMap, position.zy * scale).rgb;
+    vec3 tSteepNormalY = texture2D(steepNormalMap, position.xz * scale).rgb;
+    vec3 tSteepNormalZ = texture2D(steepNormalMap, position.xy * scale).rgb;
+
+	float totalAmplitude = bottomFactor + sandFactor + plainFactor + snowFactor;
+
+	vec3 tNormalX = bottomFactor * tBottomNormalX;
+	tNormalX += sandFactor * tSandNormalX;
+	tNormalX += plainFactor * tPlainNormalX;
+	tNormalX += snowFactor * tSnowNormalX;
+	tNormalX /= totalAmplitude;
+
+	vec3 tNormalY = bottomFactor * tBottomNormalY;
+	tNormalY += sandFactor * tSandNormalY;
+	tNormalY += plainFactor * tPlainNormalY;
+	tNormalY += snowFactor * tSnowNormalY;
+	tNormalY /= totalAmplitude;
+
+	vec3 tNormalZ = bottomFactor * tBottomNormalZ;
+	tNormalZ += sandFactor * tSandNormalZ;
+	tNormalZ += plainFactor * tPlainNormalZ;
+	tNormalZ += snowFactor * tSnowNormalZ;
+	tNormalZ /= totalAmplitude;
+
+	tNormalX = lerp(tNormalX, tSteepNormalX, steepFactor);
+	tNormalY = lerp(tNormalY, tSteepNormalY, steepFactor);
+	tNormalZ = lerp(tNormalZ, tSteepNormalZ, steepFactor);
 
     tNormalX = vec3(normalStrength * tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
     tNormalY = vec3(normalStrength * tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
@@ -131,6 +175,20 @@ vec3 hardSurfaceGradient(float relativeElevation) {
 	return color;
 }
 
+void getGradientFactors(float relativeElevation, float latitude, out float bottomFactor, out float sandFactor,
+out float plainFactor, out float snowFactor) {
+	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
+	float relativeWaterLevel = waterLevel/maxElevation;
+
+	bottomFactor = getLnearFactor(relativeElevation, 0.0, 0.05);
+
+	sandFactor = getLnearFactor(relativeElevation, relativeWaterLevel, sandSize / maxElevation);
+	
+	plainFactor = getLnearFactor(relativeElevation, 0.3, 0.3);
+	
+	snowFactor = getLnearFactor(relativeElevation, 0.6, 0.3) * abs(latitude);
+}
+
 vec3 softGradient(float relativeElevation, float latitude, vec3 normal) {
 	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
 	float relativeWaterLevel = waterLevel/maxElevation;
@@ -159,25 +217,7 @@ void main() {
 
 	float distance = length(v3CameraPos - vPositionW);
 
-	vec3 normal = vNormal;
 
-	normal = triplanarNormal(vPosition, normal, normalMap2, 0.04, 1.0, 0.2); // plus petit
-	normal = triplanarNormal(vPosition, normal, normalMap2, 0.0015, 1.0, 0.2);
-	normal = triplanarNormal(vPosition, normal, normalMap1, 0.00015, 1.0, 0.02); // plus grand
-
-	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
-
-	vec3 lightRay = normalize(v3LightPos - vPositionW); // light ray direction in world space
-	vec3 parallelLightRay = normalize(v3LightPos - planetPosition); // light ray direction in world space
-	
-	vec3 color = vec3(0.0); // color of the pixel (default doesn't matter)
-
-	float ndl = max(0., dot(normalW, parallelLightRay)); // dimming factor due to light inclination relative to vertex normal in world space
-
-	// specular
-	vec3 angleW = normalize(viewDirectionW + lightRay);
-    float specComp = max(0., dot(normalW, angleW));
-    specComp = pow(specComp, 64.0);
 
 
 	vec3 unitPosition = normalize(vPosition);
@@ -190,11 +230,44 @@ void main() {
 
 	float latitude = unitPosition.y;
 
-	color = softGradient(relativeElevation, latitude, normal);
+	float bottomFactor, sandFactor, plainFactor, snowFactor;
+	getGradientFactors(relativeElevation, latitude, bottomFactor, sandFactor, plainFactor, snowFactor);
+
+	float totalAmplitude = bottomFactor + sandFactor + plainFactor + snowFactor;
+
+	vec3 bottomColor = vec3(0.5);
+	
+	vec3 color = vec3(0.0);
+	color += bottomFactor * bottomColor;
+	color += sandFactor * sandColor;
+	color += plainFactor * plainColor;
+	color += snowFactor * snowColor;
+
+	color /= totalAmplitude;
+
 
 	float d = dot(unitPosition, vNormal);
 	float d2 = pow(d, steepSharpness);
 	color = lerp(color, steepColor, d2);
+
+	vec3 normal = vNormal;
+
+	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, d2, 0.001, 1.0, 0.2);
+	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, d2, 0.0003, 1.0, 0.6); // plus grand
+
+	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
+
+	vec3 lightRay = normalize(v3LightPos - vPositionW); // light ray direction in world space
+	vec3 parallelLightRay = normalize(v3LightPos - planetPosition); // light ray direction in world space
+	
+	
+
+	float ndl = max(0., dot(normalW, parallelLightRay)); // dimming factor due to light inclination relative to vertex normal in world space
+
+	// specular
+	vec3 angleW = normalize(viewDirectionW + lightRay);
+    float specComp = max(0., dot(normalW, angleW));
+    specComp = pow(specComp, 64.0);
 
 	//color = vec3(relativeElevation);
 

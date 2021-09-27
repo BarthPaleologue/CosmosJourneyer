@@ -18,6 +18,9 @@ const planetRadius = 200e3;
 let camera = new BABYLON.FreeCamera("camera", BABYLON.Vector3.Zero(), scene);
 camera.maxZ = planetRadius * 5;
 scene.activeCamera = camera;
+//let rpp = new BABYLON.DefaultRenderingPipeline("rpp", true, scene, [camera]);
+//rpp.fxaaEnabled = true;
+//rpp.fxaa = new BABYLON.FxaaPostProcess("fxaa", 4, camera);
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(planetRadius * 2), scene);
 let forge = new ChunkForge(64, depthRenderer, scene);
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 64, 0, 2, forge, scene);
@@ -34,11 +37,11 @@ planet.colorSettings = {
 };
 planet.updateColors();
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, planetRadius - 15e3, planetRadius + 30e3, light, camera, scene);
-atmosphere.settings.intensity = 15;
+atmosphere.settings.intensity = 10;
 atmosphere.settings.scatteringStrength = 0.5;
 atmosphere.settings.falloffFactor = 20;
 let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + waterElevation, light, camera, scene);
-ocean.settings.alphaModifier = 0.00005;
+ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 //#region Sliders
 new Slider("maxDepth", document.getElementById("maxDepth"), 0, 5, 1, (val) => {
@@ -80,10 +83,6 @@ new Slider("sandSize", document.getElementById("sandSize"), 0, 1000, planet.colo
 new Slider("steepSharpness", document.getElementById("steepSharpness"), 0, 256, planet.colorSettings.steepSharpness, (val) => {
     planet.colorSettings.steepSharpness = val;
     planet.updateColors();
-});
-new Slider("noiseStrength", document.getElementById("noiseStrength"), 0, 100, planet.noiseModifiers.strengthModifier * 10, (val) => {
-    planet.noiseModifiers.strengthModifier = val / 10;
-    planet.reset();
 });
 new Slider("noiseFrequency", document.getElementById("noiseFrequency"), 0, 20, planet.noiseModifiers.frequencyModifier * 10, (val) => {
     planet.noiseModifiers.frequencyModifier = val / 10;

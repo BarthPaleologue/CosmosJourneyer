@@ -14,7 +14,6 @@ let craterModifiers = {
 let noiseModifiers = {
     amplitudeModifier: 1,
     offsetModifier: [0, 0, 0],
-    strengthModifier: 1,
     frequencyModifier: 1,
     minValueModifier: 1,
     archipelagoFactor: 0.5,
@@ -25,8 +24,8 @@ let continentsLayer3;
 let mountainsLayer2;
 function initLayers() {
     bumpyLayer = new SimplexNoiseLayer(1e-4, 5, 2, 2, 0.0);
-    continentsLayer2 = new SimplexNoiseLayer(5e-6, 6, 1.8, 2, noiseModifiers.archipelagoFactor);
-    continentsLayer3 = new ContinentNoiseLayer(2e-5, 3, 2, 2, 0.0);
+    continentsLayer2 = new SimplexNoiseLayer(5e-6, 5, 1.8, 2, noiseModifiers.archipelagoFactor);
+    continentsLayer3 = new ContinentNoiseLayer(2e-5, 5, 1.5, 2, 0.0);
     mountainsLayer2 = new MountainNoiseLayer(2e-5, 6, 2, 2, 0.0);
 }
 initLayers();
@@ -45,7 +44,7 @@ function terrainFunction(p, craterFilter, planetRadius) {
     elevation += craterMask;
     let continentMask = continentsLayer2.evaluate(coords);
     //if (continentMask < 0.1) continentMask = 0;
-    elevation += continentMask * mountainsLayer2.evaluate(coords) * moutainHeight * noiseModifiers.strengthModifier;
+    elevation += continentMask * mountainsLayer2.evaluate(coords) * moutainHeight;
     elevation += bumpyLayer.evaluate(coords) * bumpyHeight;
     let newPosition = p.addToNew(unitCoords.scaleToNew(elevation));
     return new Vector3(newPosition._x, newPosition._y, newPosition._z);

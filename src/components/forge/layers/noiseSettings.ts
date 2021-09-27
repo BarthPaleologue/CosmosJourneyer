@@ -10,7 +10,6 @@ export interface NoiseSettings {
 }
 
 export interface NoiseModifiers {
-    strengthModifier: number,
     amplitudeModifier: number,
     frequencyModifier: number,
     minValueModifier: number,

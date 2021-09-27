@@ -50,8 +50,8 @@ let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 
 planet.noiseModifiers.archipelagoFactor = 0.5;
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 //planet.colorSettings.sandColor = planet.colorSettings.plainColor;
-planet.colorSettings.sandSize = 100;
-planet.colorSettings.steepSharpness = 4;
+planet.colorSettings.sandSize = 200;
+planet.colorSettings.steepSharpness = 6;
 planet.colorSettings.waterLevel = 10e2;
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
@@ -59,7 +59,8 @@ planet.attachNode.position.x = radius * 5;
 planet.attachNode.parent = sun;
 
 let moon = new Planet("Manaleth", radius / 8, new BABYLON.Vector3(Math.cos(-0.7), 0, Math.sin(-0.7)).scale(3 * radius), 64, 1, 6, forge, scene);
-moon.colorSettings.plainColor = new BABYLON.Vector3(0.4, 0.4, 0.4);
+moon.noiseModifiers.archipelagoFactor = 1;
+moon.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.1, 0.1);
 moon.colorSettings.sandColor = planet.colorSettings.steepColor;
 moon.craterModifiers.maxDepthModifier = 1 / 8;
 moon.updateColors();
@@ -70,14 +71,14 @@ planet.attachNode.parent = sun;
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 15e3, radius + 30e3, sun, freeCamera, scene);
-atmosphere.settings.intensity = 11;
+atmosphere.settings.intensity = 10;
 atmosphere.settings.falloffFactor = 20;
 atmosphere.settings.scatteringStrength = 0.4;
 //let depth = new DepthPostProcess("depth", freeCamera, scene);
 
 let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 10e2, sun, freeCamera, scene);
-ocean.settings.alphaModifier = 0.00005;
-ocean.settings.depthModifier = 0.002;
+ocean.settings.alphaModifier = 0.00002;
+ocean.settings.depthModifier = 0.004;
 //ocean.settings.oceanRadius = 0;
 
 //let clouds = new CloudPostProcess("clouds", planet.attachNode, radius + 5e3, radius + 10e3, sun, freeCamera, scene);
@@ -88,10 +89,6 @@ document.addEventListener("keydown", e => {
     keyboard[e.key] = true;
     if (e.key == "p") { // take screenshots
         BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
-    }
-    if (e.key == "r") {
-        planet.noiseModifiers.strengthModifier = Math.random() * 3;
-        planet.reset();
     }
     if (e.key == "m")
         console.log(sun.absolutePosition, freeCamera.rotation);

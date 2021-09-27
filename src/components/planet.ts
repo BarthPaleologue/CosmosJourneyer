@@ -65,7 +65,6 @@ export class Planet {
         let craterMaxDepthFactor = 1;
 
         this.noiseModifiers = {
-            strengthModifier: 1,
             amplitudeModifier: 1,
             frequencyModifier: 1,
             offsetModifier: [0, 0, 0],
@@ -84,7 +83,7 @@ export class Planet {
             snowColor: new BABYLON.Vector3(1, 1, 1),
             steepColor: new BABYLON.Vector3(0.2, 0.2, 0.2),
             plainColor: new BABYLON.Vector3(0.5, 0.3, 0.08),
-            sandColor: new BABYLON.Vector3(0.5, 0.5, 0),
+            sandColor: new BABYLON.Vector3(0.7, 0.7, 0),
 
             waterLevel: 0.32,
             sandSize: 1,
@@ -98,7 +97,8 @@ export class Planet {
                 attributes: ["position", "normal", "uv"],
                 uniforms: [
                     "world", "worldViewProjection", "projection", "view",
-                    "textureSampler", "depthSampler", "normalMap1", "normalMap2",
+                    "textureSampler", "depthSampler",
+                    "bottomNormalMap", "plainNormalMap", "sandNormalMap", "snowNormalMap", "steepNormalMap",
                     "cameraNear", "cameraFar", "planetPosition", "planetRadius",
 
                     "waterLevel", "sandSize", "steepSharpness",
@@ -106,8 +106,13 @@ export class Planet {
                     "snowColor", "steepColor", "plainColor", "sandColor"
                 ]
             });
-        surfaceMaterial.setTexture("normalMap1", new BABYLON.Texture("./textures/crackednormal.jpg", _scene));
-        surfaceMaterial.setTexture("normalMap2", new BABYLON.Texture("./textures/rockn.png", _scene));
+
+        surfaceMaterial.setTexture("bottomNormalMap", new BABYLON.Texture("./textures/crackednormal.jpg", _scene));
+        surfaceMaterial.setTexture("steepNormalMap", new BABYLON.Texture("./textures/rockn.png", _scene));
+        surfaceMaterial.setTexture("plainNormalMap", new BABYLON.Texture("./textures/grassn.png", _scene));
+        surfaceMaterial.setTexture("snowNormalMap", new BABYLON.Texture("./textures/snowNormalMap.jpg", _scene));
+        surfaceMaterial.setTexture("sandNormalMap", new BABYLON.Texture("./textures/sandNormalMap.png", _scene));
+
         surfaceMaterial.setVector3("v3CameraPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("v3LightPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);

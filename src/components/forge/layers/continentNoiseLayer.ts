@@ -26,7 +26,7 @@ export class ContinentNoiseLayer {
             totalAmplitude += 1.0 / Math.pow(this._decay, i);
         }
         noiseValue /= totalAmplitude;
-        noiseValue = Math.abs(noiseValue);
+        noiseValue = Math.pow(noiseValue, 2);
 
         if (this._minValue < 1) {
             noiseValue = Math.max(this._minValue, noiseValue) - this._minValue;
