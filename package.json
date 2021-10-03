@@ -1,0 +1,23 @@
+{
+  "name": "planetengine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "dependencies": {
+    "webpack-cli": "^4.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BarthPaleologue/planetEngine.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BarthPaleologue/planetEngine/issues"
+  },
+  "homepage": "https://github.com/BarthPaleologue/planetEngine#readme"
+}
