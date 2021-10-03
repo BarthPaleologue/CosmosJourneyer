@@ -1,4 +1,4 @@
-import { Vector3 } from "../algebra";
+import { Vector3 } from "../../toolbox/algebra";
 import { Filter } from "./filters/filter";
 
 export class Layer {

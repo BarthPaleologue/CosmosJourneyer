@@ -1,15 +1,13 @@
 import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
-import { Planet } from "./components/planet";
+import { Planet } from "./components/planet/planet";
 import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
 import { ChunkForge } from "./components/forge/chunkForge";
 
 
 import * as style from "../styles/style.scss";
-import * as style1 from "../sliderjs/style1.min.css";
 import * as style2 from "../sliderjs/style2.min.css";
 
 style.default;
-style1.default;
 style2.default;
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -49,7 +47,7 @@ let waterElevation = 10e2;
 
 planet.colorSettings = {
     snowColor: new BABYLON.Vector3(1, 1, 1),
-    steepColor: new BABYLON.Vector3(0.2, 0.2, 0.2),
+    steepColor: new BABYLON.Vector3(165, 42, 42).scale(1 / 255),
     plainColor: new BABYLON.Vector3(0.1, 0.4, 0),
     sandColor: new BABYLON.Vector3(0.5, 0.5, 0),
 

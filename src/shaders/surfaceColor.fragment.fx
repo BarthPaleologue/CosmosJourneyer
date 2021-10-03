@@ -186,7 +186,8 @@ out float plainFactor, out float snowFactor) {
 	
 	plainFactor = getLnearFactor(relativeElevation, 0.3, 0.3);
 	
-	snowFactor = getLnearFactor(relativeElevation, 0.6, 0.3) * abs(latitude);
+	snowFactor = getLnearFactor(relativeElevation, 0.6, 0.4) * abs(latitude);
+	//pow(1.0 - abs(normalize(vPosition).y * sphereNormal.y), 1.0);
 }
 
 vec3 softGradient(float relativeElevation, float latitude, vec3 normal) {

@@ -1,6 +1,6 @@
-import { Planet } from "../planet";
-import { ChunkForge, TaskType } from "./chunkForge";
-import { Direction } from "./direction";
+import { Planet } from "./planet";
+import { ChunkForge, TaskType } from "../forge/chunkForge";
+import { Direction } from "../toolbox/direction";
 
 /**
  * Returns the chunk position in plane space

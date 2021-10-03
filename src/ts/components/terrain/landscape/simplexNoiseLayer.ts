@@ -1,7 +1,7 @@
-import { Vector3 } from "../algebra";
-import { simplex3FromVector } from "../../../engine/noiseTools";
+import { Vector3 } from "../../toolbox/algebra";
+import { normalizedSimplex3FromVector } from "../../../engine/noiseTools";
 
-export class ContinentNoiseLayer {
+export class SimplexNoiseLayer {
     _frequency: number;
     _nbOctaves: number;
     _decay: number;
@@ -21,22 +21,17 @@ export class ContinentNoiseLayer {
             let samplePoint = coords.scaleToNew(this._frequency);
             samplePoint = samplePoint.scaleToNew(Math.pow(this._lacunarity, i));
 
-            noiseValue += simplex3FromVector(samplePoint) / Math.pow(this._decay, i);
+            noiseValue += normalizedSimplex3FromVector(samplePoint) / Math.pow(this._decay, i);
 
             totalAmplitude += 1.0 / Math.pow(this._decay, i);
         }
         noiseValue /= totalAmplitude;
-        noiseValue = Math.pow(noiseValue, 2);
 
-        if (this._minValue < 1) {
+        if (this._minValue != 1) {
             noiseValue = Math.max(this._minValue, noiseValue) - this._minValue;
             noiseValue /= 1.0 - this._minValue;
+            //noiseValue += this._minValue;
         }
-
-        let riverFactor = 0.95;
-
-        noiseValue *= riverFactor;
-        noiseValue += 1 - riverFactor;
 
         return noiseValue;
     }

@@ -1,10 +1,6 @@
-import { Planet } from "../planet";
-import { Crater } from "./crater";
-import { Direction } from "./direction";
-import { CraterModifiers } from "./layers/craterModifiers";
-import { NoiseModifiers } from "./layers/noiseSettings";
-
-
+import { Planet } from "../planet/planet";
+import { Crater } from "../terrain/crater/crater";
+import { Direction } from "../toolbox/direction";
 
 export enum TaskType {
     Deletion,

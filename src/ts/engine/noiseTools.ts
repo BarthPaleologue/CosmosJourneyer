@@ -14,7 +14,7 @@
  *
  */
 
-import { Vector3 } from "../components/forge/algebra";
+import { Vector3 } from "../components/toolbox/algebra";
 
 class Grad {
 	x: number;
@@ -545,12 +545,4 @@ function simplex3(xin: number, yin: number, zin: number) {
 	// Add contributions from each corner to get the final noise value.
 	// The result is scaled to return values in the interval [-1,1].
 	return 32 * (n0 + n1 + n2 + n3);
-}
-
-function fade(t: number) {
-	return t * t * t * (t * (t * 6 - 15) + 10);
-}
-
-function lerp(a: number, b: number, t: number) {
-	return (1 - t) * a + t * b;
 }

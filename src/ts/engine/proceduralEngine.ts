@@ -1,4 +1,4 @@
-import { Direction } from "../components/forge/direction.js";
+import { Direction } from "../components/toolbox/direction.js";
 
 export class ProceduralEngine {
 

@@ -1,16 +1,16 @@
-import { Crater } from "./forge/crater";
-import { CraterModifiers } from "./forge/layers/craterModifiers";
-import { NoiseModifiers } from "./forge/layers/noiseSettings";
-import { ChunkForge } from "./forge/chunkForge";
-import { PlanetSide } from "./forge/planetSide";
-import { Direction } from "./forge/direction";
+import { Crater } from "../terrain/crater/crater";
+import { CraterModifiers } from "../forge/layers/craterModifiers";
+import { NoiseModifiers } from "../forge/layers/noiseSettings";
+import { ChunkForge } from "../forge/chunkForge";
+import { PlanetSide } from "./planetSide";
+import { Direction } from "../toolbox/direction";
 
 //texture import
-import crackednormal from "../../asset/textures/crackednormal.jpg";
-import rockn from "../../asset/textures/rockn.png";
-import grassn from "../../asset/textures/grassn.png";
-import snowNormalMap from "../../asset/textures/snowNormalMap.jpg"; 
-import sandNormalMap from "../../asset/textures/sandNormalMap.jpg"; 
+import crackednormal from "../../../asset/textures/crackednormal.jpg";
+import rockn from "../../../asset/textures/rockn.png";
+import grassn from "../../../asset/textures/grassn.png";
+import snowNormalMap from "../../../asset/textures/snowNormalMap.jpg";
+import sandNormalMap from "../../../asset/textures/sandNormalMap.jpg";
 
 export interface ColorSettings {
     snowColor: BABYLON.Vector3,
@@ -89,7 +89,7 @@ export class Planet {
 
         this.colorSettings = {
             snowColor: new BABYLON.Vector3(1, 1, 1),
-            steepColor: new BABYLON.Vector3(0.2, 0.2, 0.2),
+            steepColor: new BABYLON.Vector3(165, 42, 42).scale(1 / 255),
             plainColor: new BABYLON.Vector3(0.5, 0.3, 0.08),
             sandColor: new BABYLON.Vector3(0.7, 0.7, 0),
 

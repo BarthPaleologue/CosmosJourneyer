@@ -1,4 +1,4 @@
-import { Vector3 } from "../../algebra";
+import { Vector3 } from "../../../toolbox/algebra";
 
 export class Filter {
     filterFunction: (p: Vector3, s: any) => number;

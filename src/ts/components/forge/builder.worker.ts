@@ -1,12 +1,12 @@
-import { Direction } from "./direction";
-import { SimplexNoiseLayer } from "./layers/simplexNoiseLayer";
-import { CraterFilter } from "./layers/filters/craterFilter";
-import { ComputeNormals } from "./computeNormals";
-import { Matrix3, Vector3 } from "./algebra";
+import { Direction } from "../toolbox/direction";
+import { SimplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
+import { CraterFilter } from "../terrain/crater/craterFilter";
+import { ComputeNormals } from "../toolbox/computeNormals";
+import { Matrix3, Vector3 } from "../toolbox/algebra";
 import { NoiseModifiers } from "./layers/noiseSettings";
 import { CraterModifiers } from "./layers/craterModifiers";
-import { MountainNoiseLayer } from "./layers/moutainNoiseLayer";
-import { ContinentNoiseLayer } from "./layers/continentNoiseLayer";
+import { MountainNoiseLayer } from "../terrain/landscape/moutainNoiseLayer";
+import { ContinentNoiseLayer } from "../terrain/landscape/continentNoiseLayer";
 
 
 let craterModifiers: CraterModifiers = {

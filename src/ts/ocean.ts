@@ -1,5 +1,5 @@
 import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
-import { Planet } from "./components/planet";
+import { Planet } from "./components/planet/planet";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
 import { ChunkForge } from "./components/forge/chunkForge";
 

@@ -1,7 +1,7 @@
-import { Vector3 } from "../algebra";
+import { Vector3 } from "../../toolbox/algebra";
 import { simplex3FromVector } from "../../../engine/noiseTools";
 
-export class MountainNoiseLayer {
+export class ContinentNoiseLayer {
     _frequency: number;
     _nbOctaves: number;
     _decay: number;
@@ -26,12 +26,17 @@ export class MountainNoiseLayer {
             totalAmplitude += 1.0 / Math.pow(this._decay, i);
         }
         noiseValue /= totalAmplitude;
-        noiseValue = 1 - Math.abs(noiseValue);
+        noiseValue = Math.pow(noiseValue, 2);
 
         if (this._minValue < 1) {
             noiseValue = Math.max(this._minValue, noiseValue) - this._minValue;
             noiseValue /= 1.0 - this._minValue;
         }
+
+        let riverFactor = 0.95;
+
+        noiseValue *= riverFactor;
+        noiseValue += 1 - riverFactor;
 
         return noiseValue;
     }

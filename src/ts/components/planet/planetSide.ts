@@ -1,7 +1,7 @@
 import { getChunkSphereSpacePositionFromPath, PlanetChunk } from "./planetChunk";
-import { Direction } from "./direction";
-import { ChunkForge, TaskType } from "./chunkForge";
-import { Planet } from "../planet";
+import { Direction } from "../toolbox/direction";
+import { ChunkForge, TaskType } from "../forge/chunkForge";
+import { Planet } from "./planet";
 
 type quadTree = quadTree[] | PlanetChunk;
 

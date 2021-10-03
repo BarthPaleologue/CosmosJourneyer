@@ -1,12 +1,12 @@
 import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
-import { Planet } from "./components/planet";
+import { Planet } from "./components/planet/planet";
 import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
 import { CloudPostProcess } from "./postProcesses/cloudPostProcess";
 import { ChunkForge } from "./components/forge/chunkForge";
 
-import sunTexture from "../asset/textures/sun.jpg"
+import sunTexture from "../asset/textures/sun.jpg";
 
-import * as style from  "../styles/style.scss";
+import * as style from "../styles/style.scss";
 
 style.default;
 
