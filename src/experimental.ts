@@ -1,7 +1,23 @@
+<<<<<<< Updated upstream:src/experimental.ts
 import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess.js";
 import { Planet } from "./components/planet.js";
 import { OceanPostProcess } from "./postProcesses/oceanPostProcess.js";
 import { ChunkForge } from "./components/forge/chunkForge.js";
+=======
+import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
+import { Planet } from "./components/planet";
+import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
+import { ChunkForge } from "./components/forge/chunkForge";
+
+
+import * as style from "../styles/style.scss";
+import * as style1 from "../sliderjs/style1.min.css";
+import * as style2 from "../sliderjs/style2.min.css";
+
+style.default;
+style1.default;
+style2.default;
+>>>>>>> Stashed changes:src/ts/experimental.ts
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
