@@ -3,7 +3,6 @@ import { Planet } from "./components/planet/planet";
 import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
 import { ChunkForge } from "./components/forge/chunkForge";
 
-
 import * as style from "../styles/style.scss";
 import * as style2 from "../sliderjs/style2.min.css";
 
@@ -11,7 +10,7 @@ style.default;
 style2.default;
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
-canvas.width = window.innerWidth;
+canvas.width = window.innerWidth - 300;
 canvas.height = window.innerHeight;
 
 let engine = new BABYLON.Engine(canvas);
@@ -41,7 +40,7 @@ let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale
 let forge = new ChunkForge(64, depthRenderer, scene);
 
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 64, 0, 2, forge, scene);
-planet.setRenderDistanceFactor(10);
+//planet.setRenderDistanceFactor(3);
 
 let waterElevation = 10e2;
 

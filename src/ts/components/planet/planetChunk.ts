@@ -108,7 +108,7 @@ export class PlanetChunk {
 
         this.mesh = new BABYLON.Mesh(`Chunk${this.id}`, scene);
         this.mesh.material = surfaceMaterial;
-        //this.mesh.material.wireframe = true;
+
         this.mesh.parent = this.parentNode;
 
         chunkForge.addTask({

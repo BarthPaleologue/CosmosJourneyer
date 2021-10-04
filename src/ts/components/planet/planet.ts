@@ -53,19 +53,7 @@ export class Planet {
         this.attachNode = BABYLON.Mesh.CreateBox(`${this.id}AttachNode`, 1, _scene);
         this.attachNode.position = _position;
 
-        this.surfaceMaterial = new BABYLON.ShaderMaterial(`${this.id}BaseMaterial`, _scene, "");
-
         this.chunkForge = _forge;
-
-
-        this.sides = [
-            new PlanetSide(`${this.id}UpSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Up, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}DownSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Down, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}ForwardSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Forward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}BackwardSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Backward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}RightSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Right, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}LeftSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Left, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-        ];
 
         let nbCraters = 800;
         let craterRadiusFactor = 1;
@@ -113,9 +101,8 @@ export class Planet {
 
                     "snowColor", "steepColor", "plainColor", "sandColor"
                 ]
-            });
-
-
+            }
+        );
 
         surfaceMaterial.setTexture("bottomNormalMap", new BABYLON.Texture(crackednormal, _scene));
         surfaceMaterial.setTexture("steepNormalMap", new BABYLON.Texture(rockn, _scene));
@@ -128,20 +115,18 @@ export class Planet {
         surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
         surfaceMaterial.setFloat("planetRadius", this.radius);
 
-        this.setChunkMaterial(surfaceMaterial);
+        this.surfaceMaterial = surfaceMaterial;
+
+        this.sides = [
+            new PlanetSide(`${this.id}UpSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Up, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}DownSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Down, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}ForwardSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Forward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}BackwardSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Backward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}RightSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Right, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}LeftSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Left, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+        ];
 
         this.updateColors();
-    }
-
-    /**
-     * Sets the material used on the chunks
-     * @param material 
-     */
-    setChunkMaterial(material: BABYLON.ShaderMaterial) {
-        this.surfaceMaterial = material;
-        for (let side of this.sides) {
-            side.setChunkMaterial(material);
-        }
     }
 
     /**
