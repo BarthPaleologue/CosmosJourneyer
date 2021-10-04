@@ -77,7 +77,7 @@ export class Planet {
 
         this.colorSettings = {
             snowColor: new BABYLON.Vector3(1, 1, 1),
-            steepColor: new BABYLON.Vector3(42, 42, 42).scale(1 / 255),
+            steepColor: new BABYLON.Vector3(70, 42, 42).scale(1 / 255),
             plainColor: new BABYLON.Vector3(0.5, 0.3, 0.08),
             sandColor: new BABYLON.Vector3(0.7, 0.7, 0.5),
 

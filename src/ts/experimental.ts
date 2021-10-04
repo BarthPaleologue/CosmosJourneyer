@@ -44,16 +44,8 @@ let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRa
 
 let waterElevation = 10e2;
 
-planet.colorSettings = {
-    snowColor: new BABYLON.Vector3(1, 1, 1),
-    steepColor: new BABYLON.Vector3(42, 42, 42).scale(1 / 255),
-    plainColor: new BABYLON.Vector3(0.1, 0.4, 0),
-    sandColor: new BABYLON.Vector3(0.5, 0.5, 0.3),
+planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 
-    waterLevel: waterElevation,
-    sandSize: 100,
-    steepSharpness: 1
-};
 planet.updateColors();
 
 
