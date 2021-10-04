@@ -46,9 +46,9 @@ let waterElevation = 10e2;
 
 planet.colorSettings = {
     snowColor: new BABYLON.Vector3(1, 1, 1),
-    steepColor: new BABYLON.Vector3(165, 42, 42).scale(1 / 255),
+    steepColor: new BABYLON.Vector3(42, 42, 42).scale(1 / 255),
     plainColor: new BABYLON.Vector3(0.1, 0.4, 0),
-    sandColor: new BABYLON.Vector3(0.5, 0.5, 0),
+    sandColor: new BABYLON.Vector3(0.5, 0.5, 0.3),
 
     waterLevel: waterElevation,
     sandSize: 100,

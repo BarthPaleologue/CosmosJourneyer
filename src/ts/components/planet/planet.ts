@@ -77,9 +77,9 @@ export class Planet {
 
         this.colorSettings = {
             snowColor: new BABYLON.Vector3(1, 1, 1),
-            steepColor: new BABYLON.Vector3(165, 42, 42).scale(1 / 255),
+            steepColor: new BABYLON.Vector3(42, 42, 42).scale(1 / 255),
             plainColor: new BABYLON.Vector3(0.5, 0.3, 0.08),
-            sandColor: new BABYLON.Vector3(0.7, 0.7, 0),
+            sandColor: new BABYLON.Vector3(0.7, 0.7, 0.5),
 
             waterLevel: 0.32,
             sandSize: 1,
@@ -174,6 +174,9 @@ export class Planet {
         }
     }
 
+    /**
+     * Updates surfaceMaterial with its new values
+     */
     updateColors() {
         this.surfaceMaterial.setFloat("planetRadius", this.radius);
         this.surfaceMaterial.setFloat("waterLevel", this.colorSettings.waterLevel);
