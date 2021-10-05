@@ -1,7 +1,7 @@
 import { Vector3 } from "../../toolbox/algebra";
 import { Crater } from "./crater";
-import { CraterModifiers } from "../../forge/layers/craterModifiers";
-import { Filter } from "../../forge/layers/filters/filter";
+import { CraterModifiers } from "./craterModifiers";
+import { Filter } from "./filters/filter";
 
 export class CraterFilter extends Filter {
     constructor(craters: Crater[]) {

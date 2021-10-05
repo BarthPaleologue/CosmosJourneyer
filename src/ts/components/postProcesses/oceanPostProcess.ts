@@ -6,7 +6,7 @@ interface OceanSettings {
     alphaModifier: number,
 }
 
-import waterbump from "../../asset/textures/waterbump.png";
+import waterbump from "../../../asset/textures/waterbump.png";
 
 export class OceanPostProcess extends BABYLON.PostProcess {
 
@@ -14,6 +14,8 @@ export class OceanPostProcess extends BABYLON.PostProcess {
     camera: BABYLON.Camera;
     sun: BABYLON.Mesh | BABYLON.PointLight;
     planet: BABYLON.Mesh;
+
+    internalTime = 0;
 
     constructor(name: string, planet: BABYLON.Mesh, oceanRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
         super(name, "./shaders/ocean", [
@@ -35,7 +37,9 @@ export class OceanPostProcess extends BABYLON.PostProcess {
             "smoothness",
             "specularPower",
             "alphaModifier",
-            "depthModifier"
+            "depthModifier",
+
+            "time"
         ], [
             "textureSampler",
             "depthSampler",
@@ -63,9 +67,10 @@ export class OceanPostProcess extends BABYLON.PostProcess {
 
         //this.getEffect().setTexture("normalMap", new BABYLON.Texture("./textures/waternormal.jpg", scene));
 
-        
+
 
         this.onApply = (effect: BABYLON.Effect) => {
+            this.internalTime += this.getEngine().getDeltaTime();
 
             effect.setTexture("depthSampler", depthMap);
             effect.setTexture("normalMap", new BABYLON.Texture(waterbump, scene));
@@ -89,6 +94,8 @@ export class OceanPostProcess extends BABYLON.PostProcess {
             effect.setFloat("specularPower", this.settings.specularPower);
             effect.setFloat("alphaModifier", this.settings.alphaModifier);
             effect.setFloat("depthModifier", this.settings.depthModifier);
+
+            effect.setFloat("time", this.internalTime);
         };
     }
 

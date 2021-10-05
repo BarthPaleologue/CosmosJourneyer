@@ -1,4 +1,4 @@
-import { Direction } from "../components/toolbox/direction.js";
+import { Direction } from "./direction";
 
 export class ProceduralEngine {
 

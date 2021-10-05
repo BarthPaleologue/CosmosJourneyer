@@ -14,7 +14,7 @@
  *
  */
 
-import { Vector3 } from "../components/toolbox/algebra";
+import { Vector3 } from "./algebra";
 
 class Grad {
 	x: number;

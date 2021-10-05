@@ -1,4 +1,4 @@
-import { CloudPostProcess } from "./postProcesses/cloudPostProcess";
+import { CloudPostProcess } from "./components/postProcesses/cloudPostProcess";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;

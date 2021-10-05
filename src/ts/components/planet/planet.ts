@@ -1,6 +1,6 @@
 import { Crater } from "../terrain/crater/crater";
-import { CraterModifiers } from "../forge/layers/craterModifiers";
-import { NoiseModifiers } from "../forge/layers/noiseSettings";
+import { CraterModifiers } from "../terrain/crater/craterModifiers";
+import { NoiseModifiers } from "../terrain/landscape/noiseSettings";
 import { ChunkForge } from "../forge/chunkForge";
 import { PlanetSide } from "./planetSide";
 import { Direction } from "../toolbox/direction";

@@ -1,5 +1,5 @@
 import { Vector3 } from "../../toolbox/algebra";
-import { simplex3FromVector } from "../../../engine/noiseTools";
+import { simplex3FromVector } from "../../toolbox/noiseTools";
 
 export class MountainNoiseLayer {
     _frequency: number;

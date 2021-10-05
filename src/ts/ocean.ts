@@ -1,6 +1,6 @@
-import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
+import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
 import { Planet } from "./components/planet/planet";
-import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
+import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
 import { ChunkForge } from "./components/forge/chunkForge";
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;

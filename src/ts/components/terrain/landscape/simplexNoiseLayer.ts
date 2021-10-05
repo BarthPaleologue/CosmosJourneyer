@@ -1,5 +1,5 @@
 import { Vector3 } from "../../toolbox/algebra";
-import { normalizedSimplex3FromVector } from "../../../engine/noiseTools";
+import { normalizedSimplex3FromVector } from "../../toolbox/noiseTools";
 
 export class SimplexNoiseLayer {
     _frequency: number;

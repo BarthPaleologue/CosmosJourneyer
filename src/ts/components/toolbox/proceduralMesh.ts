@@ -1,3 +1,5 @@
+/* Cette classe n'est plus utilisée mais elle garde un intérêt pour un projet annexe (si jamais)*/
+
 export class proceduralMesh {
     id: string;
     position: BABYLON.Vector3;

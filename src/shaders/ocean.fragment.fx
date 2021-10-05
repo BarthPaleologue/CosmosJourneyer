@@ -30,6 +30,8 @@ uniform float specularPower;
 uniform float alphaModifier;
 uniform float depthModifier;
 
+uniform float time;
+
 // remap a value comprised between low1 and high1 to a value between low2 and high2
 float remap(float value, float low1, float high1, float low2, float high2) {
     return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
@@ -91,7 +93,14 @@ vec3 lerp(vec3 v1, vec3 v2, float s) {
 
 vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, oceanRadius, impactPoint, escapePoint))) {
+
+    float waveAmplitude = 7.0;
+
+    float waveOmega = 1.0/3000.0;
+
+    float actualRadius = oceanRadius + waveAmplitude * sin(time * waveOmega);
+
+    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, actualRadius, impactPoint, escapePoint))) {
         return originalColor; // if not intersecting with atmosphere, return original color
     }
 

@@ -3,8 +3,8 @@ import { SimplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
 import { CraterFilter } from "../terrain/crater/craterFilter";
 import { ComputeNormals } from "../toolbox/computeNormals";
 import { Matrix3, Vector3 } from "../toolbox/algebra";
-import { NoiseModifiers } from "./layers/noiseSettings";
-import { CraterModifiers } from "./layers/craterModifiers";
+import { NoiseModifiers } from "../terrain/landscape/noiseSettings";
+import { CraterModifiers } from "../terrain/crater/craterModifiers";
 import { MountainNoiseLayer } from "../terrain/landscape/moutainNoiseLayer";
 import { ContinentNoiseLayer } from "../terrain/landscape/continentNoiseLayer";
 
