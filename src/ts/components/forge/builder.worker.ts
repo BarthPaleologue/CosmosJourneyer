@@ -75,6 +75,7 @@ function terrainFunction(p: Vector3, craterFilter: CraterFilter, planetRadius: n
 
 onmessage = e => {
     if (e.data.taskType == "buildTask") {
+        let clock = Date.now();
 
         let chunkLength = e.data.chunkLength;
         let subs = e.data.subdivisions;
@@ -156,36 +157,40 @@ onmessage = e => {
             }
         }
 
-        let positions = vertices;
+        let positions = vertices;;
         let indices: number[] = [];
         let normals: number[] = [];
 
         // indices from faces
         for (let face of faces) {
             for (let i = 0; i < face.length - 2; i++) {
+                // PB : je ne sais plus ce que ce 0 fait là mais il semble être important
                 indices.push(face[0], face[i + 2], face[i + 1]);
             }
         }
 
         ComputeNormals(positions, indices, normals);
 
-        let tPositions = new Float32Array(positions.length);
-        tPositions.set(positions);
+        // information utilse sur les Float32Array : imprécision inhérente au bout d'une dizaine de chiffres (c'est un float32 quoi)
+        // solution envisagée : float64 mais c'est dangereux
 
-        let tIndices = new Int16Array(indices.length);
-        tIndices.set(indices);
+        let tPositions = Float32Array.from(positions);
 
-        let tNormals = new Float32Array(normals.length);
-        tNormals.set(normals);
+        let tIndices = Int16Array.from(indices);
 
-        //@ts-ignore
+        let tNormals = Float32Array.from(normals);
+
         postMessage({
             p: tPositions,
             i: tIndices,
             n: tNormals,
             //@ts-ignore
         }, [tPositions.buffer, tIndices.buffer, tNormals.buffer]);
+
+        // benchmark fait le 5/10/2021 (normal non analytique) : ~2s/chunk
+        //console.log("Time for creation : " + (Date.now() - clock));
+
     } else {
-        console.log(`Tâche reçue : ${e.data.taskType}`);
+        console.error(`Type de tâche reçue invalide : ${e.data.taskType}`);
     }
 };

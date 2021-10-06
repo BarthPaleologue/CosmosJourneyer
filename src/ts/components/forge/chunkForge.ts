@@ -49,10 +49,10 @@ export class ChunkForge {
     incomingTasks: (BuildTask | ApplyTask | DeleteTask | InitTask)[] = [];
     trashCan: DeleteTask[] = [];
     applyTasks: ApplyTask[] = [];
-    cadence = 6;
+    cadence = navigator.hardwareConcurrency; // nombre de workers que le proco peut faire tourner en parallèle
 
     builders: Worker[] = [];
-    esclavesDispo: Worker[] = [];
+    availableWorkers: Worker[] = [];
 
     depthRenderer: BABYLON.DepthRenderer;
 
@@ -63,7 +63,7 @@ export class ChunkForge {
         for (let i = 0; i < this.cadence; i++) {
             let builder = new Worker(new URL('./builder.worker.ts', import.meta.url));
             this.builders.push(builder);
-            this.esclavesDispo.push(builder);
+            this.availableWorkers.push(builder);
         }
         this.depthRenderer = _depthRenderer;
         this.scene = _scene;
@@ -73,12 +73,12 @@ export class ChunkForge {
         this.incomingTasks.push(task);
     }
 
-    executeTask(task: ApplyTask | DeleteTask | BuildTask | InitTask) {
+    executeTask(task: ApplyTask | DeleteTask | BuildTask | InitTask, worker: Worker) {
 
         switch (task.taskType) {
             case TaskType.Build:
                 let mesh = task.mesh;
-                let esclave = this.esclavesDispo.shift();
+                let esclave = this.availableWorkers.shift();
 
                 // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
                 // tâches de supressions associées : on les stock et on les execute après les créations
@@ -101,13 +101,11 @@ export class ChunkForge {
                     craterModifiers: task.planet.craterModifiers,
                 });
 
-                const worker = new Worker(new URL('./builder.worker.ts', import.meta.url));
-
                 esclave!.onmessage = e => {
                     let vertexData = new BABYLON.VertexData();
-                    vertexData.positions = Array.from(e.data.p);
-                    vertexData.indices = Array.from(e.data.i);
-                    vertexData.normals = Array.from(e.data.n);
+                    vertexData.positions = e.data.p as Float32Array;
+                    vertexData.indices = e.data.i as Uint16Array;
+                    vertexData.normals = e.data.n as Float32Array;
 
                     this.applyTasks.push({
                         id: task.id,
@@ -117,7 +115,7 @@ export class ChunkForge {
                         callbackTasks: callbackTasks,
                     });
 
-                    this.esclavesDispo.push(esclave!);
+                    this.availableWorkers.push(esclave!);
                 };
                 break;
             case TaskType.Deletion:
@@ -127,13 +125,13 @@ export class ChunkForge {
                 break;
             default:
                 console.warn("Tache illegale");
-                this.executeNextTask();
+                this.executeNextTask(worker);
         }
 
     }
-    executeNextTask() {
+    executeNextTask(worker: Worker) {
         if (this.incomingTasks.length > 0) {
-            this.executeTask(this.incomingTasks.shift()!);
+            this.executeTask(this.incomingTasks.shift()!, worker);
         }
     }
     emptyTrashCan(n: number) {
@@ -155,8 +153,8 @@ export class ChunkForge {
         }
     }
     update() {
-        for (let esclave of this.esclavesDispo) {
-            this.executeNextTask();
+        for (let esclave of this.availableWorkers) {
+            this.executeNextTask(esclave);
         }
         this.executeNextApplyTask();
         this.emptyTrashCan(10);
