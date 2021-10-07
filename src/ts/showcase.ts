@@ -50,7 +50,7 @@ sun.position.x = -1718573.25;
 sun.position.z = -65566.6171875;
 depthRenderer.getDepthMap().renderList?.push(sun);
 
-let forge = new ChunkForge(64, depthRenderer, scene);
+let forge = new ChunkForge(64);
 
 let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 1, 6, forge, scene);
 planet.noiseModifiers.archipelagoFactor = 0.5;
@@ -118,7 +118,7 @@ scene.executeWhenReady(() => {
         let upward = freeCamera.getDirection(BABYLON.Axis.Y);
         let right = freeCamera.getDirection(BABYLON.Axis.X);
 
-        forge.update();
+        forge.update(depthRenderer);
 
         planet.update(freeCamera.position, forward, sun.position, freeCamera);
         moon.update(freeCamera.position, forward, sun.position, freeCamera);

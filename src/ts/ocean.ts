@@ -32,7 +32,7 @@ let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-100, 100, -100)
 
 let center = BABYLON.Mesh.CreateBox("boate", 1, scene);
 
-let forge = new ChunkForge(64, depthRenderer, scene);
+let forge = new ChunkForge(64);
 
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 64, 0, 1, forge, scene);
 planet.setRenderDistanceFactor(10);
@@ -86,7 +86,7 @@ window.addEventListener("resize", () => {
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
-        planet.chunkForge.update();
+        planet.chunkForge.update(depthRenderer);
 
         planet.update(camera.position, camera.getDirection(BABYLON.Axis.Z), light.position, camera);
 

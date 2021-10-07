@@ -37,7 +37,7 @@ scene.activeCamera = camera;
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(planetRadius * 2), scene);
 
-let forge = new ChunkForge(64, depthRenderer, scene);
+let forge = new ChunkForge(64);
 
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 64, 0, 2, forge, scene);
 //planet.setRenderDistanceFactor(3);
@@ -198,7 +198,7 @@ scene.executeWhenReady(() => {
     engine.runRenderLoop(() => {
         planet.attachNode.rotation.y += .001 * rotationSpeed;
 
-        planet.chunkForge.update();
+        planet.chunkForge.update(depthRenderer);
         planet.update(BABYLON.Vector3.Zero(), camera.getDirection(BABYLON.Axis.Z), light.position, camera);
 
         light.position = new BABYLON.Vector3(Math.cos(sunOrientation * Math.PI / 180), 0, Math.sin(sunOrientation * Math.PI / 180)).scale(planetRadius * 5);

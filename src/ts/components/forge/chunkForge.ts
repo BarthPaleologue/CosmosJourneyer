@@ -1,21 +1,15 @@
 import { Planet } from "../planet/planet";
-import { Crater } from "../terrain/crater/crater";
 import { Direction } from "../toolbox/direction";
 
 export enum TaskType {
     Deletion,
     Build,
-    Apply,
-    Init,
+    Apply
 }
 
 export interface Task {
     id: string;
-}
-
-export interface InitTask extends Task {
-    taskType: TaskType.Init,
-    craters: Crater[],
+    taskType: TaskType;
 }
 
 export interface BuildTask extends Task {
@@ -43,53 +37,54 @@ export interface DeleteTask extends Task {
 export class ChunkForge {
     subdivisions: number;
 
-    // What you need to generate a beautiful terrain (à étendre pour ne pas tout hardcode dans le worker)
-    craters: Crater[] = [];
-
-    incomingTasks: (BuildTask | ApplyTask | DeleteTask | InitTask)[] = [];
+    incomingTasks: (BuildTask | DeleteTask)[] = [];
     trashCan: DeleteTask[] = [];
     applyTasks: ApplyTask[] = [];
-    cadence = navigator.hardwareConcurrency; // nombre de workers que le proco peut faire tourner en parallèle
 
-    builders: Worker[] = [];
-    availableWorkers: Worker[] = [];
+    maxNbWorkers = navigator.hardwareConcurrency; // nombre de workers que le proco peut faire tourner en parallèle
 
-    depthRenderer: BABYLON.DepthRenderer;
+    availableWorkers: Worker[] = []; // liste des workers disponibles pour exécuter des tâches
+    finishedWorkers: Worker[] = []; // liste des workers ayant terminé leur tâche (prêts à être réintégré dans la liste des workers disponibles)
 
-    scene: BABYLON.Scene;
-
-    constructor(_subdivisions: number, _depthRenderer: BABYLON.DepthRenderer, _scene: BABYLON.Scene) {
-        this.subdivisions = _subdivisions;
-        for (let i = 0; i < this.cadence; i++) {
-            let builder = new Worker(new URL('./builder.worker.ts', import.meta.url));
-            this.builders.push(builder);
-            this.availableWorkers.push(builder);
+    constructor(subdivisions: number) {
+        this.subdivisions = subdivisions;
+        for (let i = 0; i < this.maxNbWorkers; ++i) {
+            let worker = new Worker(new URL('./builder.worker.ts', import.meta.url));
+            this.availableWorkers.push(worker);
         }
-        this.depthRenderer = _depthRenderer;
-        this.scene = _scene;
     }
 
-    addTask(task: ApplyTask | DeleteTask | BuildTask | InitTask) {
+    addTask(task: DeleteTask | BuildTask) {
         this.incomingTasks.push(task);
     }
 
-    executeTask(task: ApplyTask | DeleteTask | BuildTask | InitTask, worker: Worker) {
+    /**
+     * Executes the next task using an available worker
+     * @param worker the web worker assigned to the next task
+     */
+    executeNextTask(worker: Worker) {
+        if (this.incomingTasks.length > 0) {
+            this.executeTask(this.incomingTasks.shift()!, worker);
+        } else {
+            this.finishedWorkers.push(worker);
+        }
+    }
+
+    executeTask(task: DeleteTask | BuildTask, worker: Worker) {
 
         switch (task.taskType) {
             case TaskType.Build:
-                let mesh = task.mesh;
-                let esclave = this.availableWorkers.shift();
 
                 // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
                 // tâches de supressions associées : on les stock et on les execute après les créations
 
                 let callbackTasks: DeleteTask[] = [];
                 while (this.incomingTasks.length > 0 && this.incomingTasks[0].taskType == TaskType.Deletion) {
-                    //@ts-ignore
-                    callbackTasks.push(this.incomingTasks.shift()!);
+                    callbackTasks.push(this.incomingTasks[0]);
+                    this.incomingTasks.shift();
                 }
 
-                esclave?.postMessage({
+                worker.postMessage({
                     taskType: "buildTask",
                     chunkLength: task.chunkLength,
                     subdivisions: this.subdivisions,
@@ -101,7 +96,7 @@ export class ChunkForge {
                     craterModifiers: task.planet.craterModifiers,
                 });
 
-                esclave!.onmessage = e => {
+                worker.onmessage = e => {
                     let vertexData = new BABYLON.VertexData();
                     vertexData.positions = e.data.p as Float32Array;
                     vertexData.indices = e.data.i as Uint16Array;
@@ -110,53 +105,61 @@ export class ChunkForge {
                     this.applyTasks.push({
                         id: task.id,
                         taskType: TaskType.Apply,
-                        mesh: mesh,
+                        mesh: task.mesh,
                         vertexData: vertexData,
                         callbackTasks: callbackTasks,
                     });
 
-                    this.availableWorkers.push(esclave!);
+                    this.finishedWorkers.push(worker);
                 };
                 break;
             case TaskType.Deletion:
                 // une tâche de suppression solitaire ne devrait pas exister
-                console.warn("Tâche de supression solitaire détectée");
-                this.trashCan.push(task);
+                console.error("Tâche de supression solitaire détectée");
+                this.finishedWorkers.push(worker);
                 break;
             default:
-                console.warn("Tache illegale");
-                this.executeNextTask(worker);
+                console.error("Tache illegale");
+                this.finishedWorkers.push(worker);
+                break;
         }
+    }
 
-    }
-    executeNextTask(worker: Worker) {
-        if (this.incomingTasks.length > 0) {
-            this.executeTask(this.incomingTasks.shift()!, worker);
+    /**
+     * Supprime n chunks inutiles
+     * @param n nombre de chunk à supprimer
+     */
+    emptyTrashCan(n = this.trashCan.length) {
+        for (let i = 0; i < Math.min(n, this.trashCan.length); ++i) {
+            this.trashCan.shift()!.mesh.dispose();
         }
     }
-    emptyTrashCan(n: number) {
-        for (let i = 0; i < n; i++) {
-            if (this.trashCan.length > 0) {
-                let task = this.trashCan.shift()!;
-                task.mesh.dispose();
-            }
-        }
-    }
-    executeNextApplyTask() {
+
+    /**
+     * Apply generated vertexData to waiting chunks
+     */
+    executeNextApplyTask(depthRenderer: BABYLON.DepthRenderer) {
         if (this.applyTasks.length > 0) {
             let task = this.applyTasks.shift()!;
-            task.vertexData.applyToMesh(task.mesh);
-            this.depthRenderer.getDepthMap().renderList?.push(task.mesh);
-            setTimeout(() => {
-                this.trashCan = this.trashCan.concat(task.callbackTasks);
-            }, 100);
+            task.vertexData.applyToMesh(task.mesh, true);
+            depthRenderer.getDepthMap().renderList!.push(task.mesh);
+            this.trashCan = this.trashCan.concat(task.callbackTasks);
         }
     }
-    update() {
-        for (let esclave of this.availableWorkers) {
-            this.executeNextTask(esclave);
+
+    /**
+     * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
+     */
+    update(depthRenderer: BABYLON.DepthRenderer) {
+        for (let i = 0; i < this.availableWorkers.length; i++) {
+            let worker = this.availableWorkers.shift()!;
+            this.executeNextTask(worker);
         }
-        this.executeNextApplyTask();
-        this.emptyTrashCan(10);
+
+        this.availableWorkers = this.finishedWorkers;
+        this.finishedWorkers = [];
+
+        this.emptyTrashCan();
+        this.executeNextApplyTask(depthRenderer);
     }
 }
