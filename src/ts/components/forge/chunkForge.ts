@@ -41,14 +41,12 @@ export class ChunkForge {
     trashCan: DeleteTask[] = [];
     applyTasks: ApplyTask[] = [];
 
-    maxNbWorkers = navigator.hardwareConcurrency; // nombre de workers que le proco peut faire tourner en parallèle
-
     availableWorkers: Worker[] = []; // liste des workers disponibles pour exécuter des tâches
     finishedWorkers: Worker[] = []; // liste des workers ayant terminé leur tâche (prêts à être réintégré dans la liste des workers disponibles)
 
     constructor(subdivisions: number) {
         this.subdivisions = subdivisions;
-        for (let i = 0; i < this.maxNbWorkers; ++i) {
+        for (let i = 0; i < navigator.hardwareConcurrency; ++i) {
             let worker = new Worker(new URL('./builder.worker.ts', import.meta.url));
             this.availableWorkers.push(worker);
         }
@@ -156,7 +154,7 @@ export class ChunkForge {
             this.executeNextTask(worker);
         }
 
-        this.availableWorkers = this.finishedWorkers;
+        this.availableWorkers = this.availableWorkers.concat(this.finishedWorkers);
         this.finishedWorkers = [];
 
         this.emptyTrashCan();

@@ -1,5 +1,5 @@
 //https://github.com/BabylonJS/Babylon.js/blob/master/src/Meshes/mesh.vertexData.ts
-export function ComputeNormals(positions: number[], indices: number[], normals: number[]): void {
+export function ComputeNormals(positions: Float32Array, indices: Uint16Array, normals: Float32Array): void {
 
     // temporary scalar variables
     var index = 0;                      // facet index

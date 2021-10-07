@@ -27,13 +27,13 @@ let noiseModifiers: NoiseModifiers = {
 
 let bumpyLayer: SimplexNoiseLayer;
 let continentsLayer2: SimplexNoiseLayer;
-let continentsLayer3: ContinentNoiseLayer;
+//let continentsLayer3: ContinentNoiseLayer;
 let mountainsLayer2: MountainNoiseLayer;
 
 function initLayers() {
     bumpyLayer = new SimplexNoiseLayer(1e-4, 5, 2, 2, 0.0);
     continentsLayer2 = new SimplexNoiseLayer(5e-6, 5, 1.8, 2, noiseModifiers.archipelagoFactor);
-    continentsLayer3 = new ContinentNoiseLayer(2e-5, 5, 1.5, 2, 0.0);
+    //continentsLayer3 = new ContinentNoiseLayer(2e-5, 5, 1.5, 2, 0.0);
     mountainsLayer2 = new MountainNoiseLayer(2e-5, 6, 2, 2, 0.0);
 }
 
@@ -75,7 +75,7 @@ function terrainFunction(p: Vector3, craterFilter: CraterFilter, planetRadius: n
 
 onmessage = e => {
     if (e.data.taskType == "buildTask") {
-        let clock = Date.now();
+        //let clock = Date.now();
 
         let chunkLength = e.data.chunkLength;
         let subs = e.data.subdivisions;
@@ -94,9 +94,6 @@ onmessage = e => {
         let size = chunkLength / (2 ** depth);
         let planetRadius = chunkLength / 2;
 
-        let vertices: number[] = [];
-        let faces: number[][] = [];
-        //let uvs: number[] = [];
         let vertexPerLine = subs + 1;
 
         let rotation = Matrix3.Identity();
@@ -122,6 +119,9 @@ onmessage = e => {
                 break;
         }
 
+        let verticesPositions = new Float32Array(vertexPerLine * vertexPerLine * 3);
+        let faces: number[][] = [];
+
         for (let x = 0; x < vertexPerLine; x++) {
             for (let y = 0; y < vertexPerLine; y++) {
                 let vertexPosition = new Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
@@ -135,16 +135,11 @@ onmessage = e => {
 
                 vertexPosition = vertexPosition.normalizeToNew().scaleToNew(planetRadius);
 
-                //let offset2 = BABYLON.Vector3.TransformCoordinates(BABYLON.Vector3.FromArray(offset), rotation);
-
                 vertexPosition = terrainFunction(vertexPosition, craterFilter, planetRadius);
 
-                // solving floating point precision
-                //vertexPosition = vertexPosition.subtract(offset2);
-
-                vertices.push(vertexPosition._x, vertexPosition._y, vertexPosition._z);
-
-                //uvs.push(x / vertexPerLine, y / vertexPerLine);
+                verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition._x;
+                verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition._y;
+                verticesPositions[(x * vertexPerLine + y) * 3 + 2] = vertexPosition._z;
 
                 if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
                     faces.push([
@@ -157,35 +152,31 @@ onmessage = e => {
             }
         }
 
-        let positions = vertices;;
-        let indices: number[] = [];
-        let normals: number[] = [];
+
+        let indices = new Uint16Array(faces.length * (faces[0].length - 2) * 3);
 
         // indices from faces
-        for (let face of faces) {
-            for (let i = 0; i < face.length - 2; i++) {
-                // PB : je ne sais plus ce que ce 0 fait là mais il semble être important
-                indices.push(face[0], face[i + 2], face[i + 1]);
+        for (let i = 0; i < faces.length; ++i) {
+            for (let j = 0; j < faces[i].length - 2; ++j) {
+                indices[(i * (faces[i].length - 2) + j) * 3] = faces[i][0];
+                indices[(i * (faces[i].length - 2) + j) * 3 + 1] = faces[i][j + 2];
+                indices[(i * (faces[i].length - 2) + j) * 3 + 2] = faces[i][j + 1];
             }
         }
 
-        ComputeNormals(positions, indices, normals);
+        let normals = new Float32Array(verticesPositions.length);
+
+        ComputeNormals(verticesPositions, indices, normals);
 
         // information utilse sur les Float32Array : imprécision inhérente au bout d'une dizaine de chiffres (c'est un float32 quoi)
         // solution envisagée : float64 mais c'est dangereux
 
-        let tPositions = Float32Array.from(positions);
-
-        let tIndices = Int16Array.from(indices);
-
-        let tNormals = Float32Array.from(normals);
-
         postMessage({
-            p: tPositions,
-            i: tIndices,
-            n: tNormals,
+            p: verticesPositions,
+            i: indices,
+            n: normals,
             //@ts-ignore
-        }, [tPositions.buffer, tIndices.buffer, tNormals.buffer]);
+        }, [verticesPositions.buffer, indices.buffer, normals.buffer]);
 
         // benchmark fait le 5/10/2021 (normal non analytique) : ~2s/chunk
         //console.log("Time for creation : " + (Date.now() - clock));
