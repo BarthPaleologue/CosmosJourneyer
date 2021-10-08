@@ -1,6 +1,7 @@
 import { Planet } from "./planet";
 import { ChunkForge, TaskType } from "../forge/chunkForge";
-import { Direction } from "../toolbox/direction";
+import { Direction, getRotationMatrixFromDirection } from "../toolbox/direction";
+import { Matrix3, Vector3 } from "../toolbox/algebra";
 
 /**
  * Returns the chunk position in plane space
@@ -8,7 +9,7 @@ import { Direction } from "../toolbox/direction";
  * @param path the path of the chunk
  * @returns the plane coordinates of the chunk
  */
-export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: number[]): BABYLON.Vector3 {
+export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: number[]): Vector3 {
     let [x, y] = [0, 0];
     for (let i = 0; i < path.length; i++) {
         /*
@@ -36,7 +37,7 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
                 break;
         }
     }
-    return new BABYLON.Vector3(x, y, 0);
+    return new Vector3(x, y, 0);
 }
 
 /**
@@ -48,32 +49,14 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
  */
 export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: number[], direction: Direction) {
     let position = getChunkPlaneSpacePositionFromPath(chunkLength, path);
-    position.addInPlace(new BABYLON.Vector3(0, 0, -chunkLength / 2));
 
-    position = position.normalizeToNew().scale(chunkLength / 2);
+    position.addInPlace(new Vector3(0, 0, -chunkLength / 2));
 
-    let rotation = BABYLON.Matrix.Identity();
-    switch (direction) {
-        case Direction.Up:
-            rotation = BABYLON.Matrix.RotationX(Math.PI / 2);
-            break;
-        case Direction.Down:
-            rotation = BABYLON.Matrix.RotationX(-Math.PI / 2);
-            break;
-        case Direction.Forward:
-            rotation = BABYLON.Matrix.Identity();
-            break;
-        case Direction.Backward:
-            rotation = BABYLON.Matrix.RotationY(Math.PI);
-            break;
-        case Direction.Left:
-            rotation = BABYLON.Matrix.RotationY(-Math.PI / 2);
-            break;
-        case Direction.Right:
-            rotation = BABYLON.Matrix.RotationY(Math.PI / 2);
-            break;
-    }
-    return BABYLON.Vector3.TransformCoordinates(position, rotation);
+    position = position.normalizeToNew().scaleToNew(chunkLength / 2);
+
+    let rotationMatrix = getRotationMatrixFromDirection(direction);
+
+    return position.applyMatrixToNew(rotationMatrix);
 }
 
 export class PlanetChunk {
@@ -103,11 +86,23 @@ export class PlanetChunk {
         this.direction = _direction;
         this.parentNode = _parentNode;
 
-        this.position = getChunkPlaneSpacePositionFromPath(this.chunkLength, this.path);
+        let position = getChunkPlaneSpacePositionFromPath(this.chunkLength, this.path);
+
+        this.position = new BABYLON.Vector3(position.x, position.y, position.z);
+
         this.position.addInPlace(new BABYLON.Vector3(0, 0, -this.chunkLength / 2));
 
         this.mesh = new BABYLON.Mesh(`Chunk${this.id}`, scene);
         this.mesh.material = surfaceMaterial;
+
+        /*let debugMaterial = new BABYLON.StandardMaterial("debug", scene);
+        debugMaterial.emissiveColor = BABYLON.Color3.Random();
+        debugMaterial.specularColor = BABYLON.Color3.Black();
+        debugMaterial.diffuseColor = BABYLON.Color3.Black();
+        debugMaterial.backFaceCulling = false;*/
+        //debugMaterial.wireframe = true;
+
+        //this.mesh.material = debugMaterial;
 
         this.mesh.parent = this.parentNode;
 
@@ -122,6 +117,7 @@ export class PlanetChunk {
             mesh: this.mesh,
         });
 
+        // prise en compte de la rotation de la planète notamment
         this.position = this.position.normalizeToNew().scale(this.chunkLength / 2);
 
         let rotation = BABYLON.Matrix.Identity();
@@ -147,10 +143,6 @@ export class PlanetChunk {
         }
 
         this.position = BABYLON.Vector3.TransformCoordinates(this.position, rotation);
-
-        //console.log(surfaceMaterial);
-
-        //this.mesh.material = surfaceMaterial;
 
     }
 }

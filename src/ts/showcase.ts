@@ -61,8 +61,6 @@ planet.colorSettings.waterLevel = 10e2;
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
 
-planet.attachNode.parent = sun;
-
 let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(-0.7), 0, Math.sin(-0.7)).scale(3 * radius), 64, 1, 6, forge, scene);
 moon.noiseModifiers.archipelagoFactor = 1;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.1, 0.1);

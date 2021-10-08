@@ -2,6 +2,7 @@ import { getChunkSphereSpacePositionFromPath, PlanetChunk } from "./planetChunk"
 import { Direction } from "../toolbox/direction";
 import { ChunkForge, TaskType } from "../forge/chunkForge";
 import { Planet } from "./planet";
+import { Matrix3, Vector3 } from "../toolbox/algebra";
 
 type quadTree = quadTree[] | PlanetChunk;
 
@@ -113,16 +114,17 @@ export class PlanetSide {
     private updateLODRecursively(observerPosition: BABYLON.Vector3, facingDirection: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
         let relativePosition = getChunkSphereSpacePositionFromPath(this.chunkLength, walked, this.direction);
-        relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationX(this.parent.rotation.x));
-        relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationY(this.parent.rotation.y));
-        relativePosition = BABYLON.Vector3.TransformCoordinates(relativePosition, BABYLON.Matrix.RotationZ(this.parent.rotation.z));
+        relativePosition = relativePosition.applyMatrixToNew(Matrix3.RotationX(this.parent.rotation.x));
+        relativePosition = relativePosition.applyMatrixToNew(Matrix3.RotationY(this.parent.rotation.y));
+        relativePosition = relativePosition.applyMatrixToNew(Matrix3.RotationZ(this.parent.rotation.z));
         // position par rapport à la caméra
-        let absolutePosition = relativePosition.add(this.parent.absolutePosition);
-        let direction = absolutePosition.subtract(observerPosition);
-        let dot = BABYLON.Vector3.Dot(direction, facingDirection);
+        let parentPosition = new Vector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
+        let absolutePosition = relativePosition.addToNew(parentPosition);
+        let direction = absolutePosition.subtractToNew(Vector3.FromBABYLON(observerPosition));
+        let dot = Vector3.Dot(direction, Vector3.FromBABYLON(facingDirection));
         // distance carré entre caméra et noeud du quadtree
-        let d = direction.lengthSquared();
-        let limit = this.renderDistanceFactor * (this.chunkLength / (2 ** walked.length));
+        let d = direction.getSquaredMagnitude();
+        let limit = this.renderDistanceFactor * this.chunkLength / (2 ** walked.length);
 
         if ((d < limit ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
             // si on est proche de la caméra ou si on doit le générer car LOD minimal
@@ -152,13 +154,13 @@ export class PlanetSide {
                 let distanceToCenter = BABYLON.Vector3.DistanceSquared(observerPosition, this.parent.absolutePosition);
                 // c'est pythagore
                 let behindHorizon = (d > distanceToCenter + (this.chunkLength / 2) ** 2);
-
+                // un jour peut être de l'occlusion
                 //tree.mesh.setEnabled(!behindHorizon);
 
                 return tree;
             } else {
                 // si c'est un noeud, on supprime tous les enfants, on remplace par un nouveau chunk
-                if (walked.length > this.minDepth) {
+                if (walked.length >= this.minDepth) {
                     let newChunk = this.createChunk(walked);
                     this.requestDeletion(tree);
                     return newChunk;

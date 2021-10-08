@@ -1,4 +1,4 @@
-import { Direction } from "../toolbox/direction";
+import { Direction, getRotationMatrixFromDirection } from "../toolbox/direction";
 import { SimplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
 import { CraterFilter } from "../terrain/crater/craterFilter";
 import { ComputeNormals } from "../toolbox/computeNormals";
@@ -46,7 +46,7 @@ let bumpyHeight = 300;
 
 function terrainFunction(p: Vector3, craterFilter: CraterFilter, planetRadius: number): Vector3 {
 
-    let initialPosition = [p._x, p._y, p._z];
+    let initialPosition = [p.x, p.y, p.z];
     let initialMagnitude = Math.sqrt(initialPosition[0] ** 2 + initialPosition[1] ** 2 + initialPosition[2] ** 2);
 
     // on se ramène à la position à la surface du globe (sans relief)
@@ -70,7 +70,7 @@ function terrainFunction(p: Vector3, craterFilter: CraterFilter, planetRadius: n
 
     let newPosition = p.addToNew(unitCoords.scaleToNew(elevation));
 
-    return new Vector3(newPosition._x, newPosition._y, newPosition._z);
+    return new Vector3(newPosition.x, newPosition.y, newPosition.z);
 };
 
 onmessage = e => {
@@ -96,28 +96,7 @@ onmessage = e => {
 
         let vertexPerLine = subs + 1;
 
-        let rotation = Matrix3.Identity();
-
-        switch (direction) {
-            case Direction.Up:
-                rotation = Matrix3.RotationX(-Math.PI / 2);
-                break;
-            case Direction.Down:
-                rotation = Matrix3.RotationX(Math.PI / 2);
-                break;
-            case Direction.Forward:
-                rotation = Matrix3.Identity();
-                break;
-            case Direction.Backward:
-                rotation = Matrix3.RotationY(-Math.PI);
-                break;
-            case Direction.Left:
-                rotation = Matrix3.RotationY(Math.PI / 2);
-                break;
-            case Direction.Right:
-                rotation = Matrix3.RotationY(-Math.PI / 2);
-                break;
-        }
+        let rotationMatrix = getRotationMatrixFromDirection(direction);
 
         let verticesPositions = new Float32Array(vertexPerLine * vertexPerLine * 3);
         let faces: number[][] = [];
@@ -131,15 +110,17 @@ onmessage = e => {
                 let vecOffset = Vector3.FromArray(offset);
                 vertexPosition = vertexPosition.addToNew(vecOffset);
 
-                vertexPosition = vertexPosition.applyMatrixToNew(rotation);
-
                 vertexPosition = vertexPosition.normalizeToNew().scaleToNew(planetRadius);
+
+                //vertexPosition = vertexPosition.addToNew(vecOffset.scaleToNew(-1));
+
+                vertexPosition = vertexPosition.applyMatrixToNew(rotationMatrix);
 
                 vertexPosition = terrainFunction(vertexPosition, craterFilter, planetRadius);
 
-                verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition._x;
-                verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition._y;
-                verticesPositions[(x * vertexPerLine + y) * 3 + 2] = vertexPosition._z;
+                verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition.x;
+                verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition.y;
+                verticesPositions[(x * vertexPerLine + y) * 3 + 2] = vertexPosition.z;
 
                 if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
                     faces.push([

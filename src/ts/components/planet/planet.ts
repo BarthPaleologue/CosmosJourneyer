@@ -115,6 +115,8 @@ export class Planet {
         surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
         surfaceMaterial.setFloat("planetRadius", this.radius);
 
+        //surfaceMaterial.wireframe = true;
+
         this.surfaceMaterial = surfaceMaterial;
 
         this.sides = [
