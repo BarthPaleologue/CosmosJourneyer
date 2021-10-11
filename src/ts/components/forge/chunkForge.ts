@@ -46,7 +46,8 @@ export class ChunkForge {
 
     constructor(subdivisions: number) {
         this.subdivisions = subdivisions;
-        for (let i = 0; i < navigator.hardwareConcurrency; ++i) {
+        const nbMaxWorkers = navigator.hardwareConcurrency - 1; // le -1 c'est parce que faut compter le main thread aussi mdr
+        for (let i = 0; i < nbMaxWorkers; ++i) {
             let worker = new Worker(new URL('./builder.worker.ts', import.meta.url));
             this.availableWorkers.push(worker);
         }
