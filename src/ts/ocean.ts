@@ -34,7 +34,7 @@ let center = BABYLON.Mesh.CreateBox("boate", 1, scene);
 
 let forge = new ChunkForge(64);
 
-let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 64, 0, 1, forge, scene);
+let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 0, 1, forge, scene);
 planet.setRenderDistanceFactor(10);
 planet.craterModifiers.maxDepthModifier = 0.00005;
 planet.noiseModifiers.frequencyModifier = 20;
@@ -86,7 +86,7 @@ window.addEventListener("resize", () => {
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
-        planet.chunkForge.update(depthRenderer);
+        forge.update(depthRenderer);
 
         planet.update(camera.position, camera.getDirection(BABYLON.Axis.Z), light.position, camera);
 

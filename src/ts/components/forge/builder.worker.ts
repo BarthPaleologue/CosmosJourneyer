@@ -1,20 +1,13 @@
 import { Direction, getRotationMatrixFromDirection } from "../toolbox/direction";
 import { SimplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
-import { CraterFilter } from "../terrain/crater/craterFilter";
 import { ComputeNormals } from "../toolbox/computeNormals";
-import { Matrix3, Vector3 } from "../toolbox/algebra";
+import { Vector3 } from "../toolbox/algebra";
 import { NoiseModifiers } from "../terrain/landscape/noiseSettings";
 import { CraterModifiers } from "../terrain/crater/craterModifiers";
 import { MountainNoiseLayer } from "../terrain/landscape/moutainNoiseLayer";
 import { ContinentNoiseLayer } from "../terrain/landscape/continentNoiseLayer";
-
-
-let craterModifiers: CraterModifiers = {
-    radiusModifier: 1,
-    steepnessModifier: 1,
-    maxDepthModifier: 1,
-    scaleFactor: 1,
-};
+import { CraterLayer } from "../terrain/crater/craterLayer";
+import { Crater } from "../terrain/crater/crater";
 
 let noiseModifiers: NoiseModifiers = {
     amplitudeModifier: 1,
@@ -39,70 +32,81 @@ function initLayers() {
 
 initLayers();
 
-let craterFilter = new CraterFilter([]);
+const craterLayer = new CraterLayer([]);
 
-let moutainHeight = 10000;
-let bumpyHeight = 300;
+// à paramétrer
+const moutainHeight = 10000;
+const bumpyHeight = 300;
 
-function terrainFunction(p: Vector3, craterFilter: CraterFilter, planetRadius: number): Vector3 {
+function terrainFunction(p: Vector3, planetRadius: number): Vector3 {
 
-    let initialPosition = [p.x, p.y, p.z];
-    let initialMagnitude = Math.sqrt(initialPosition[0] ** 2 + initialPosition[1] ** 2 + initialPosition[2] ** 2);
+    const initialMagnitude = p.getMagnitude();
 
     // on se ramène à la position à la surface du globe (sans relief)
-    initialPosition = initialPosition.map((value: number) => value * planetRadius / initialMagnitude);
+    const planetSpherePosition: Vector3 = p.scaleToNew(planetRadius / initialMagnitude);
 
-    let coords = Vector3.FromArray(initialPosition); // p.normalizeToNew().scale(planetRadius);
-    let unitCoords = coords.normalizeToNew().scaleToNew(noiseModifiers.frequencyModifier);
+    const unitCoords = planetSpherePosition.normalizeToNew().scaleToNew(noiseModifiers.frequencyModifier);
 
     let elevation = 0;
 
-    let craterMask = craterFilter.evaluate(unitCoords, craterModifiers) / 20;
+    const craterMask = craterLayer.evaluate(unitCoords);
 
     elevation += craterMask;
 
-    let continentMask = continentsLayer2.evaluate(coords);
-    //if (continentMask < 0.1) continentMask = 0;
+    const continentMask = continentsLayer2.evaluate(planetSpherePosition);
 
-    elevation += continentMask * mountainsLayer2.evaluate(coords) * moutainHeight;
+    elevation += continentMask * mountainsLayer2.evaluate(planetSpherePosition) * moutainHeight;
 
-    elevation += bumpyLayer.evaluate(coords) * bumpyHeight;
+    elevation += bumpyLayer.evaluate(planetSpherePosition) * bumpyHeight;
 
-    let newPosition = p.addToNew(unitCoords.scaleToNew(elevation));
+    const newPosition = p.addToNew(unitCoords.scaleToNew(elevation));
 
-    return new Vector3(newPosition.x, newPosition.y, newPosition.z);
+    return newPosition;
 };
 
-onmessage = e => {
+interface buildData {
+    chunkLength: number;
+    subdivisions: number;
+    depth: number;
+    direction: Direction;
+    position: number[];
+    craters: Crater[];
+    noiseModifiers: NoiseModifiers;
+    craterModifiers: CraterModifiers;
+}
+
+self.onmessage = e => {
     if (e.data.taskType == "buildTask") {
         //let clock = Date.now();
 
-        let chunkLength = e.data.chunkLength;
-        let subs = e.data.subdivisions;
-        let depth = e.data.depth;
-        let direction = e.data.direction;
-        let offset: number[] = e.data.position;
+        const data = e.data as buildData;
 
-        craterFilter.setCraters(e.data.craters);
+        const chunkLength = data.chunkLength;
+        const subs = data.subdivisions;
+        const depth = data.depth;
+        const direction = data.direction;
+        const offset: number[] = data.position;
 
-        noiseModifiers = e.data.noiseModifiers;
+        craterLayer.craters = data.craters;
 
-        craterModifiers = e.data.craterModifiers;
+        noiseModifiers = data.noiseModifiers;
+
+        craterLayer.craterModifiers = data.craterModifiers;
 
         initLayers();
 
-        let size = chunkLength / (2 ** depth);
-        let planetRadius = chunkLength / 2;
+        const size = chunkLength / (2 ** depth);
+        const planetRadius = chunkLength / 2;
 
-        let vertexPerLine = subs + 1;
+        const vertexPerLine = subs + 1;
 
-        let rotationMatrix = getRotationMatrixFromDirection(direction);
+        const rotationMatrix = getRotationMatrixFromDirection(direction);
 
-        let verticesPositions = new Float32Array(vertexPerLine * vertexPerLine * 3);
+        const verticesPositions = new Float32Array(vertexPerLine * vertexPerLine * 3);
         let faces: number[][] = [];
 
-        for (let x = 0; x < vertexPerLine; x++) {
-            for (let y = 0; y < vertexPerLine; y++) {
+        for (let x = 0; x < vertexPerLine; ++x) {
+            for (let y = 0; y < vertexPerLine; ++y) {
                 let vertexPosition = new Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
 
                 vertexPosition = vertexPosition.scaleToNew(size);
@@ -116,7 +120,7 @@ onmessage = e => {
 
                 vertexPosition = vertexPosition.applyMatrixToNew(rotationMatrix);
 
-                vertexPosition = terrainFunction(vertexPosition, craterFilter, planetRadius);
+                vertexPosition = terrainFunction(vertexPosition, planetRadius);
 
                 verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition.x;
                 verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition.y;
@@ -134,7 +138,7 @@ onmessage = e => {
         }
 
 
-        let indices = new Uint16Array(faces.length * (faces[0].length - 2) * 3);
+        const indices = new Uint16Array(faces.length * (faces[0].length - 2) * 3);
 
         // indices from faces
         for (let i = 0; i < faces.length; ++i) {
@@ -145,14 +149,14 @@ onmessage = e => {
             }
         }
 
-        let normals = new Float32Array(verticesPositions.length);
+        const normals = new Float32Array(verticesPositions.length);
 
         ComputeNormals(verticesPositions, indices, normals);
 
         // information utilse sur les Float32Array : imprécision inhérente au bout d'une dizaine de chiffres (c'est un float32 quoi)
         // solution envisagée : float64 mais c'est dangereux
 
-        postMessage({
+        self.postMessage({
             p: verticesPositions,
             i: indices,
             n: normals,

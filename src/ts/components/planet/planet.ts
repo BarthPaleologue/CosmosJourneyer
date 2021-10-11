@@ -1,4 +1,4 @@
-import { Crater } from "../terrain/crater/crater";
+import { Crater, generateCraters } from "../terrain/crater/crater";
 import { CraterModifiers } from "../terrain/crater/craterModifiers";
 import { NoiseModifiers } from "../terrain/landscape/noiseSettings";
 import { ChunkForge } from "../forge/chunkForge";
@@ -40,20 +40,16 @@ export class Planet {
     attachNode: BABYLON.Mesh; // reprensents the center of the sphere
     sides: PlanetSide[] = new Array(6); // stores the 6 sides of the sphere
 
-    chunkForge: ChunkForge; // le CEO du terrain, tout simplement
-
     surfaceMaterial: BABYLON.ShaderMaterial;
 
-    constructor(_id: string, _radius: number, _position: BABYLON.Vector3, _nbSubdivisions: number, _minDepth: number, _maxDepth: number, _forge: ChunkForge, _scene: BABYLON.Scene) {
+    constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, maxDepth: number, chunkForge: ChunkForge, scene: BABYLON.Scene) {
 
-        this.id = _id;
-        this.radius = _radius;
+        this.id = id;
+        this.radius = radius;
         this.chunkLength = this.radius * 2;
 
-        this.attachNode = BABYLON.Mesh.CreateBox(`${this.id}AttachNode`, 1, _scene);
-        this.attachNode.position = _position;
-
-        this.chunkForge = _forge;
+        this.attachNode = BABYLON.Mesh.CreateBox(`${this.id}AttachNode`, 1, scene);
+        this.attachNode.position = position;
 
         let nbCraters = 800;
         let craterRadiusFactor = 1;
@@ -86,9 +82,9 @@ export class Planet {
             steepSharpness: 1
         };
 
-        this.craters = this.generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
+        this.craters = generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
 
-        let surfaceMaterial = new BABYLON.ShaderMaterial("surfaceColor", _scene, "./shaders/surfaceColor",
+        let surfaceMaterial = new BABYLON.ShaderMaterial("surfaceColor", scene, "./shaders/surfaceColor",
             {
                 attributes: ["position", "normal", "uv"],
                 uniforms: [
@@ -104,11 +100,11 @@ export class Planet {
             }
         );
 
-        surfaceMaterial.setTexture("bottomNormalMap", new BABYLON.Texture(crackednormal, _scene));
-        surfaceMaterial.setTexture("steepNormalMap", new BABYLON.Texture(rockn, _scene));
-        surfaceMaterial.setTexture("plainNormalMap", new BABYLON.Texture(grassn, _scene));
-        surfaceMaterial.setTexture("snowNormalMap", new BABYLON.Texture(snowNormalMap, _scene));
-        surfaceMaterial.setTexture("sandNormalMap", new BABYLON.Texture(sandNormalMap, _scene));
+        surfaceMaterial.setTexture("bottomNormalMap", new BABYLON.Texture(crackednormal, scene));
+        surfaceMaterial.setTexture("steepNormalMap", new BABYLON.Texture(rockn, scene));
+        surfaceMaterial.setTexture("plainNormalMap", new BABYLON.Texture(grassn, scene));
+        surfaceMaterial.setTexture("snowNormalMap", new BABYLON.Texture(snowNormalMap, scene));
+        surfaceMaterial.setTexture("sandNormalMap", new BABYLON.Texture(sandNormalMap, scene));
 
         surfaceMaterial.setVector3("v3CameraPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("v3LightPos", BABYLON.Vector3.Zero());
@@ -120,12 +116,12 @@ export class Planet {
         this.surfaceMaterial = surfaceMaterial;
 
         this.sides = [
-            new PlanetSide(`${this.id}UpSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Up, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}DownSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Down, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}ForwardSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Forward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}BackwardSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Backward, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}RightSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Right, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}LeftSide`, _minDepth, _maxDepth, this.chunkLength, Direction.Left, this.attachNode, _scene, this.chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}UpSide`, minDepth, maxDepth, this.chunkLength, Direction.Up, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}DownSide`, minDepth, maxDepth, this.chunkLength, Direction.Down, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}ForwardSide`, minDepth, maxDepth, this.chunkLength, Direction.Forward, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}BackwardSide`, minDepth, maxDepth, this.chunkLength, Direction.Backward, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}RightSide`, minDepth, maxDepth, this.chunkLength, Direction.Right, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}LeftSide`, minDepth, maxDepth, this.chunkLength, Direction.Left, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
         ];
 
         this.updateColors();
@@ -135,13 +131,13 @@ export class Planet {
      * Update terrain of the sphere relative to the observer position
      * @param position the observer position
      */
-    updateLOD(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3) {
+    private updateLOD(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3) {
         for (let side of this.sides) {
             side.updateLOD(position, facingDirection);
         }
     }
 
-    setRenderDistanceFactor(renderDistanceFactor: number) {
+    public setRenderDistanceFactor(renderDistanceFactor: number) {
         for (let side of this.sides) {
             side.renderDistanceFactor = renderDistanceFactor;
         }
@@ -151,7 +147,7 @@ export class Planet {
      * Changes the maximum depth of the quadtrees
      * @param maxDepth the new maximum depth of the quadtrees
      */
-    setMaxDepth(maxDepth: number) {
+    public setMaxDepth(maxDepth: number) {
         for (let side of this.sides) {
             side.maxDepth = maxDepth;
         }
@@ -161,7 +157,7 @@ export class Planet {
      * Changes the minimum depth of the quadtrees
      * @param minDepth the new minimum depth of the quadtrees
      */
-    setMinDepth(minDepth: number) {
+    public setMinDepth(minDepth: number) {
         for (let side of this.sides) {
             side.minDepth = minDepth;
         }
@@ -170,7 +166,7 @@ export class Planet {
     /**
      * Regenerates the chunks
      */
-    reset() {
+    public reset() {
         for (let side of this.sides) {
             side.reset();
         }
@@ -179,7 +175,7 @@ export class Planet {
     /**
      * Updates surfaceMaterial with its new values
      */
-    updateColors() {
+    public updateColors() {
         this.surfaceMaterial.setFloat("planetRadius", this.radius);
         this.surfaceMaterial.setFloat("waterLevel", this.colorSettings.waterLevel);
         this.surfaceMaterial.setFloat("sandSize", this.colorSettings.sandSize);
@@ -191,26 +187,9 @@ export class Planet {
         this.surfaceMaterial.setVector3("sandColor", this.colorSettings.sandColor);
     }
 
-    update(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3, camera: BABYLON.Camera) {
+    public update(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3, camera: BABYLON.Camera) {
         this.surfaceMaterial.setVector3("v3CameraPos", position);
         this.surfaceMaterial.setVector3("v3LightPos", lightPosition);
         this.updateLOD(position, facingDirection);
     }
-
-    generateCraters(n: number, radiusModifier: number, _steepness: number, _maxDepth: number) {
-        let craters: Crater[] = [];
-        for (let i = 0; i < n; i++) {
-            let r = radiusModifier * 0.1 * (Math.random() ** 16);
-            // random spherical coordinates
-            let phi = Math.random() * Math.PI * 2;
-            let theta = Math.random() * Math.PI;
-            let position = [Math.cos(theta) * Math.sin(phi), Math.sin(theta) * Math.sin(phi), Math.cos(phi)];
-
-            let maxDepth = _maxDepth * (0.2 + (Math.random()) / 10);
-            let steepness = _steepness * (1 + (Math.random()) / 10) / (r / 2);
-            craters.push({ radius: r, position: position, maxDepth: maxDepth, steepness: steepness });
-        }
-        return craters;
-    }
-
 }

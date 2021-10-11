@@ -36,34 +36,34 @@ export class PlanetSide {
 
     /**
      * 
-     * @param _id 
-     * @param _minDepth 
-     * @param _maxDepth 
-     * @param _chunkLength 
-     * @param _direction 
-     * @param _parentNode 
-     * @param _scene 
-     * @param _chunkForge 
-     * @param _surfaceMaterial 
-     * @param _planet 
+     * @param id 
+     * @param minDepth 
+     * @param maxDepth 
+     * @param chunkLength 
+     * @param direction 
+     * @param parentNode 
+     * @param scene 
+     * @param chunkForge 
+     * @param surfaceMaterial 
+     * @param planet 
      */
-    constructor(_id: string, _minDepth: number, _maxDepth: number, _chunkLength: number, _direction: Direction, _parentNode: BABYLON.Mesh, _scene: BABYLON.Scene, _chunkForge: ChunkForge, _surfaceMaterial: BABYLON.Material, _planet: Planet) {
-        this.id = _id;
+    constructor(id: string, minDepth: number, maxDepth: number, chunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: Planet) {
+        this.id = id;
 
-        this.maxDepth = _maxDepth;
-        this.minDepth = _minDepth;
+        this.maxDepth = maxDepth;
+        this.minDepth = minDepth;
 
-        this.chunkLength = _chunkLength;
-        this.baseSubdivisions = _chunkForge.subdivisions;
-        this.direction = _direction;
-        this.parent = _parentNode;
-        this.scene = _scene;
+        this.chunkLength = chunkLength;
+        this.baseSubdivisions = chunkForge.subdivisions;
+        this.direction = direction;
+        this.parent = parentNode;
+        this.scene = scene;
 
-        this.chunkForge = _chunkForge;
+        this.chunkForge = chunkForge;
 
-        this.surfaceMaterial = _surfaceMaterial;
+        this.surfaceMaterial = surfaceMaterial;
 
-        this.planet = _planet;
+        this.planet = planet;
 
         // on initialise le plan avec un unique chunk
         this.tree = this.createChunk([]);
@@ -74,7 +74,7 @@ export class PlanetSide {
      * @param tree the tree to explore
      * @param f the function to apply on every chunk
      */
-    public executeOnEveryChunk(f: (chunk: PlanetChunk) => void, tree: quadTree = this.tree) {
+    public executeOnEveryChunk(f: (chunk: PlanetChunk) => void, tree: quadTree = this.tree): void {
         if (tree instanceof PlanetChunk) {
             f(tree);
         } else {
@@ -100,7 +100,7 @@ export class PlanetSide {
      * Update LOD of terrain relative to the observerPosition
      * @param observerPosition The observer position
      */
-    public updateLOD(observerPosition: BABYLON.Vector3, facingDirection: BABYLON.Vector3) {
+    public updateLOD(observerPosition: BABYLON.Vector3, facingDirection: BABYLON.Vector3): void {
         this.tree = this.updateLODRecursively(observerPosition, facingDirection);
     }
 
@@ -155,7 +155,7 @@ export class PlanetSide {
                 // c'est pythagore
                 let behindHorizon = (d > distanceToCenter + (this.chunkLength / 2) ** 2);
                 // un jour peut être de l'occlusion
-                //tree.mesh.setEnabled(!behindHorizon);
+                tree.mesh.setEnabled(!behindHorizon);
 
                 return tree;
             } else {
@@ -180,14 +180,18 @@ export class PlanetSide {
         return new PlanetChunk(path, this.chunkLength, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial, this.planet);
     }
 
-    setChunkMaterial(material: BABYLON.Material) {
+    /**
+     * Sets the material for new chunks to the new material
+     * @param material The new material to apply on new chunks
+     */
+    setChunkMaterial(material: BABYLON.Material): void {
         this.surfaceMaterial = material;
     }
 
     /**
      * Regenerate planet chunks
      */
-    reset() {
+    reset(): void {
         let newTree = this.createChunk([]);
         this.requestDeletion(this.tree);
         this.tree = newTree;

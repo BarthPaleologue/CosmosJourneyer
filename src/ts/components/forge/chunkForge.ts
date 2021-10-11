@@ -140,7 +140,7 @@ export class ChunkForge {
     executeNextApplyTask(depthRenderer: BABYLON.DepthRenderer) {
         if (this.applyTasks.length > 0) {
             let task = this.applyTasks.shift()!;
-            task.vertexData.applyToMesh(task.mesh, true);
+            task.vertexData.applyToMesh(task.mesh, false);
             depthRenderer.getDepthMap().renderList!.push(task.mesh);
             this.trashCan = this.trashCan.concat(task.callbackTasks);
         }

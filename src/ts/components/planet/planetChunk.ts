@@ -1,7 +1,7 @@
 import { Planet } from "./planet";
 import { ChunkForge, TaskType } from "../forge/chunkForge";
 import { Direction, getRotationMatrixFromDirection } from "../toolbox/direction";
-import { Matrix3, Vector3 } from "../toolbox/algebra";
+import { Vector3 } from "../toolbox/algebra";
 
 /**
  * Returns the chunk position in plane space

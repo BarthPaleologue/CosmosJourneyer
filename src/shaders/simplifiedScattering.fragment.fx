@@ -172,5 +172,9 @@ void main() {
 
     vec3 finalColor = scatter(screenColor, cameraPosition, rayDir, maximumDistance); // the color to be displayed on the screen
 
+    // exposure
+    //finalColor = 1.0 - exp(-1.0 * finalColor);
+
+
     gl_FragColor = vec4(finalColor, 1.0); // displaying the final color
 }

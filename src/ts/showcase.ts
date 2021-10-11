@@ -17,6 +17,8 @@ canvas.height = window.innerHeight;
 let engine = new BABYLON.Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 
+console.log("GPU utilisé : " + engine.getGlInfo().renderer);
+
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
 
@@ -52,7 +54,7 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 
 let forge = new ChunkForge(64);
 
-let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 64, 1, 6, forge, scene);
+let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, 6, forge, scene);
 planet.noiseModifiers.archipelagoFactor = 0.5;
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 200;
@@ -61,7 +63,7 @@ planet.colorSettings.waterLevel = 10e2;
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
 
-let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(-0.7), 0, Math.sin(-0.7)).scale(3 * radius), 64, 1, 6, forge, scene);
+let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(-0.7), 0, Math.sin(-0.7)).scale(3 * radius), 1, 6, forge, scene);
 moon.noiseModifiers.archipelagoFactor = 1;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.1, 0.1);
 moon.colorSettings.sandColor = planet.colorSettings.steepColor;
