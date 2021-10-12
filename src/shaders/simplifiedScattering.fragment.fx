@@ -103,13 +103,13 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 originalC
     vec3 sunDir = normalize(sunPosition - samplePoint); // direction to the light source
     
     vec3 wavelength = vec3(redWaveLength, greenWaveLength, blueWaveLength); // the wavelength that will be scattered (rgb so we get everything)
-    vec3 scatteringCoeffs = pow(400.0 / wavelength.xyz, vec3(4.0)) * scatteringStrength; // the scattering is inversely proportional to the fourth power of the wave length
+    vec3 rayleighScatteringCoeffs = pow(400.0 / wavelength.xyz, vec3(4.0)) * scatteringStrength; // the scattering is inversely proportional to the fourth power of the wave length
 
     float stepSize = rayLength / (float(POINTS_FROM_CAMERA) - 1.0); // the ray length between sample points
 
     vec3 inScatteredLight = vec3(0.0); // amount of light scattered for each channel
 
-    for (int i = 0 ; i < POINTS_FROM_CAMERA ; i++) {
+    for (int i = 0 ; i < POINTS_FROM_CAMERA ; ++i) {
 
         float sunRayLengthInAtm = atmosphereRadius - length(samplePoint - planetPosition); // distance traveled by light through atmosphere from light source
         float viewRayLengthInAtm = stepSize * float(i); // distance traveled by light through atmosphere from sample point to cameraPosition
@@ -118,19 +118,19 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 originalC
         
         float viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
         
-        vec3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * scatteringCoeffs); // exponential scattering with coefficients
+        vec3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * rayleighScatteringCoeffs); // exponential scattering with coefficients
         
         float localDensity = densityAtPoint(samplePoint); // density at sample point
 
-        inScatteredLight += localDensity * transmittance * scatteringCoeffs * stepSize; // add the resulting amount of light scattered toward the camera
+        inScatteredLight += localDensity * transmittance * rayleighScatteringCoeffs * stepSize; // add the resulting amount of light scattered toward the camera
         
         samplePoint += rayDir * stepSize; // move sample point along view ray
     }
 
     // scattering depends on the direction of the light ray and the view ray : it's the rayleigh phase function
     // https://glossary.ametsoc.org/wiki/Rayleigh_phase_function
-    float mu = dot(rayDir, sunDir);
-    float phaseRayleigh = 3.0 / (16.0 * PI) * (1.0 + mu * mu);
+    float costheta2 = pow(dot(rayDir, sunDir), 2.0);
+    float phaseRayleigh = (3.0 / (16.0 * PI)) * (1.0 + costheta2);
     
     inScatteredLight *= phaseRayleigh; // apply rayleigh pahse
     inScatteredLight *= sunIntensity; // multiply by the intensity of the sun

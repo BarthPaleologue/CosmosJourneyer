@@ -91,7 +91,7 @@ export class Planet {
                     "world", "worldViewProjection", "projection", "view",
                     "textureSampler", "depthSampler",
                     "bottomNormalMap", "plainNormalMap", "sandNormalMap", "snowNormalMap", "steepNormalMap",
-                    "cameraNear", "cameraFar", "planetPosition", "planetRadius",
+                    "cameraNear", "cameraFar", "planetPosition", "planetRadius", "planetWorldMatrix",
 
                     "waterLevel", "sandSize", "steepSharpness",
 
@@ -110,6 +110,10 @@ export class Planet {
         surfaceMaterial.setVector3("v3LightPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
         surfaceMaterial.setFloat("planetRadius", this.radius);
+
+        //surfaceMaterial.wireframe = true;
+
+        surfaceMaterial.depthFunction = 1;
 
         //surfaceMaterial.wireframe = true;
 
@@ -190,6 +194,9 @@ export class Planet {
     public update(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3, camera: BABYLON.Camera) {
         this.surfaceMaterial.setVector3("v3CameraPos", position);
         this.surfaceMaterial.setVector3("v3LightPos", lightPosition);
+        this.surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
+
+        this.surfaceMaterial.setMatrix("planetWorldMatrix", this.attachNode.getWorldMatrix());
         this.updateLOD(position, facingDirection);
     }
 }

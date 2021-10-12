@@ -13,17 +13,8 @@ uniform mat4 worldViewProjection;
 uniform vec3 v3CameraPos; // camera position in world space
 uniform vec3 v3LightPos; // light position in world space
 
-uniform float planetRadius; // planet radius
-uniform float iceCapThreshold; // controls snow minimum spawn altitude
-uniform float steepSnowDotLimit; // controls snow maximum spawn steepness
-uniform float waterLevel; // controls sand layer
-uniform float sandSize;
-
-//uniform vec4 snowColor; // the color of the snow layer
-//uniform vec4 steepColor; // the color of steep slopes
-//uniform vec4 plainColor; // the color of plains at the bottom of moutains
-//uniform vec4 sandColor; // the color of the sand
-
+uniform vec3 planetPosition; // nécessaire temporairement le temps de régler le problème des floats
+uniform mat4 planetWorldMatrix;
 
 // Varying
 varying vec3 vPositionW;
@@ -34,7 +25,7 @@ varying vec3 vPosition;
 
 varying vec2 vUV;
 
-void main(void) {
+void main() {
 
     vec4 outPosition = worldViewProjection * vec4(position, 1.0);
     gl_Position = outPosition;
@@ -42,7 +33,7 @@ void main(void) {
     vPositionW = vec3(world * vec4(position, 1.0));
     vNormalW = normalize(vec3(world * vec4(normal, 0.0)));
 	
-	vPosition = position;
+	vPosition = vec3(inverse(planetWorldMatrix) * vec4(vPositionW, 1.0));
 	vNormal = normal;
     vUV = uv;
 }

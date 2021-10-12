@@ -54,7 +54,7 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 
 let forge = new ChunkForge(64);
 
-let planet = new Planet("Arès", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, 6, forge, scene);
+let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, 6, forge, scene);
 planet.noiseModifiers.archipelagoFactor = 0.5;
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 200;
@@ -75,7 +75,7 @@ planet.attachNode.parent = sun;
 
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 15e3, radius + 30e3, sun, freeCamera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 20e3, radius + 40e3, sun, freeCamera, scene);
 atmosphere.settings.intensity = 10;
 atmosphere.settings.falloffFactor = 20;
 atmosphere.settings.scatteringStrength = 0.4;
@@ -155,9 +155,11 @@ scene.executeWhenReady(() => {
 
         t += 0.00002;
         /*
-        sun.rotation.y = -t;
-        planet.attachNode.rotation.y = -2 * t;
-        */
+        sun.rotation.y = -t;*/
+        //planet.attachNode.rotation.x = -40 * t;
+        //planet.attachNode.rotation.y = -50 * t;
+        //moon.attachNode.rotation.y = -20 * t;
+
 
         planet.surfaceMaterial.setVector3("v3LightPos", sun.absolutePosition);
         planet.surfaceMaterial.setVector3("planetPosition", planet.attachNode.absolutePosition);

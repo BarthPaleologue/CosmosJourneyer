@@ -64,6 +64,10 @@ function terrainFunction(p: Vector3, planetRadius: number): Vector3 {
     return newPosition;
 };
 
+function setVerticesPositionsAndFaces(positions: Float32Array, faces: number[][]) {
+
+}
+
 interface buildData {
     chunkLength: number;
     subdivisions: number;
@@ -107,20 +111,28 @@ self.onmessage = e => {
 
         for (let x = 0; x < vertexPerLine; ++x) {
             for (let y = 0; y < vertexPerLine; ++y) {
+
+                // on crée un plan dans le plan Oxy
                 let vertexPosition = new Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
 
+                // on le met à la bonne taille
                 vertexPosition = vertexPosition.scaleToNew(size);
 
+                // on le met au bon endroit de la face par défaut (Oxy devant)
                 let vecOffset = Vector3.FromArray(offset);
                 vertexPosition = vertexPosition.addToNew(vecOffset);
 
-                vertexPosition = vertexPosition.normalizeToNew().scaleToNew(planetRadius);
-
-                //vertexPosition = vertexPosition.addToNew(vecOffset.scaleToNew(-1));
-
+                // on le met sur la bonne face
                 vertexPosition = vertexPosition.applyMatrixToNew(rotationMatrix);
 
-                vertexPosition = terrainFunction(vertexPosition, planetRadius);
+                // on l'arrondi pour en faire un chunk de sphère
+                let planetCoords = vertexPosition.normalizeToNew().scaleToNew(planetRadius);
+
+                // on applique la fonction de terrain
+                vertexPosition = terrainFunction(planetCoords, planetRadius);
+
+                // on le ramène à l'origine
+                vertexPosition = vertexPosition.addToNew(vecOffset.normalizeToNew().scaleToNew(-planetRadius));
 
                 verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition.x;
                 verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition.y;

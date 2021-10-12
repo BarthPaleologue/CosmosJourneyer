@@ -11,7 +11,7 @@ import { Vector3 } from "../toolbox/algebra";
  */
 export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: number[]): Vector3 {
     let [x, y] = [0, 0];
-    for (let i = 0; i < path.length; i++) {
+    for (let i = 0; i < path.length; ++i) {
         /*
             3   2
               +
@@ -99,7 +99,8 @@ export class PlanetChunk {
         debugMaterial.emissiveColor = BABYLON.Color3.Random();
         debugMaterial.specularColor = BABYLON.Color3.Black();
         debugMaterial.diffuseColor = BABYLON.Color3.Black();
-        debugMaterial.backFaceCulling = false;*/
+        debugMaterial.backFaceCulling = false;
+        debugMaterial.useLogarithmicDepth = true;*/
         //debugMaterial.wireframe = true;
 
         //this.mesh.material = debugMaterial;
@@ -120,29 +121,7 @@ export class PlanetChunk {
         // prise en compte de la rotation de la planète notamment
         this.position = this.position.normalizeToNew().scale(this.chunkLength / 2);
 
-        let rotation = BABYLON.Matrix.Identity();
-        switch (this.direction) {
-            case Direction.Up:
-                rotation = BABYLON.Matrix.RotationX(Math.PI / 2);
-                break;
-            case Direction.Down:
-                rotation = BABYLON.Matrix.RotationX(-Math.PI / 2);
-                break;
-            case Direction.Forward:
-                rotation = BABYLON.Matrix.Identity();
-                break;
-            case Direction.Backward:
-                rotation = BABYLON.Matrix.RotationY(Math.PI);
-                break;
-            case Direction.Left:
-                rotation = BABYLON.Matrix.RotationY(-Math.PI / 2);
-                break;
-            case Direction.Right:
-                rotation = BABYLON.Matrix.RotationY(Math.PI / 2);
-                break;
-        }
-
-        this.position = BABYLON.Vector3.TransformCoordinates(this.position, rotation);
+        this.mesh.position = this.position;
 
     }
 }

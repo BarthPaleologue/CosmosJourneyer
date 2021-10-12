@@ -155,7 +155,7 @@ export class PlanetSide {
                 // c'est pythagore
                 let behindHorizon = (d > distanceToCenter + (this.chunkLength / 2) ** 2);
                 // un jour peut être de l'occlusion
-                tree.mesh.setEnabled(!behindHorizon);
+                //tree.mesh.setEnabled(!behindHorizon);
 
                 return tree;
             } else {
