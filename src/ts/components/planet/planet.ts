@@ -21,6 +21,13 @@ export interface ColorSettings {
     waterLevel: number,
     sandSize: number,
     steepSharpness: number;
+    normalSharpness: number;
+
+    snowElevation01: number;
+    snowOffsetAmplitude: number;
+    snowLacunarity: number;
+    snowLatitudePersistence: number;
+    steepSnowDotLimit: number;
 }
 
 export class Planet {
@@ -79,7 +86,14 @@ export class Planet {
 
             waterLevel: 0.32,
             sandSize: 1,
-            steepSharpness: 1
+            steepSharpness: 1,
+            normalSharpness: 1,
+
+            snowElevation01: 0.6,
+            snowOffsetAmplitude: 0.05,
+            snowLacunarity: 7.7,
+            snowLatitudePersistence: 1.0,
+            steepSnowDotLimit: 0.8,
         };
 
         this.craters = generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
@@ -93,9 +107,12 @@ export class Planet {
                     "bottomNormalMap", "plainNormalMap", "sandNormalMap", "snowNormalMap", "steepNormalMap",
                     "cameraNear", "cameraFar", "planetPosition", "planetRadius", "planetWorldMatrix",
 
-                    "waterLevel", "sandSize", "steepSharpness",
+                    "waterLevel", "sandSize", "steepSharpness", "normalSharpness",
 
-                    "snowColor", "steepColor", "plainColor", "sandColor"
+                    "snowColor", "steepColor", "plainColor", "sandColor",
+
+                    "snowElevation01", "snowOffsetAmplitude", "snowLacunarity",
+                    "snowLatitudePersistence", "steepSnowDotLimit"
                 ]
             }
         );
@@ -110,6 +127,14 @@ export class Planet {
         surfaceMaterial.setVector3("v3LightPos", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
         surfaceMaterial.setFloat("planetRadius", this.radius);
+
+        surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
+
+        surfaceMaterial.setFloat("snowElevation01", this.colorSettings.snowElevation01);
+        surfaceMaterial.setFloat("snowOffsetAmplitude", this.colorSettings.snowOffsetAmplitude);
+        surfaceMaterial.setFloat("snowLacunarity", this.colorSettings.snowLacunarity);
+        surfaceMaterial.setFloat("snowLatitudePersistence", this.colorSettings.snowLatitudePersistence);
+        surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.steepSnowDotLimit);
 
         //surfaceMaterial.wireframe = true;
 
@@ -189,6 +214,15 @@ export class Planet {
         this.surfaceMaterial.setVector3("steepColor", this.colorSettings.steepColor);
         this.surfaceMaterial.setVector3("plainColor", this.colorSettings.plainColor);
         this.surfaceMaterial.setVector3("sandColor", this.colorSettings.sandColor);
+
+        this.surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
+
+        this.surfaceMaterial.setFloat("snowElevation01", this.colorSettings.snowElevation01);
+        this.surfaceMaterial.setFloat("snowOffsetAmplitude", this.colorSettings.snowOffsetAmplitude);
+        this.surfaceMaterial.setFloat("snowLacunarity", this.colorSettings.snowLacunarity);
+        this.surfaceMaterial.setFloat("snowLatitudePersistence", this.colorSettings.snowLatitudePersistence);
+        this.surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.steepSnowDotLimit);
+
     }
 
     public update(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3, camera: BABYLON.Camera) {

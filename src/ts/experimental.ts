@@ -45,6 +45,8 @@ let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRa
 let waterElevation = 10e2;
 
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
+planet.colorSettings.sandSize = 300;
+planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
 
@@ -100,13 +102,43 @@ new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 70, oc
     ocean.settings.depthModifier = val / 10000;
 });
 
-new Slider("sandSize", document.getElementById("sandSize")!, 0, 1000, planet.colorSettings.sandSize, (val: number) => {
-    planet.colorSettings.sandSize = val;
+new Slider("sandSize", document.getElementById("sandSize")!, 0, 300, planet.colorSettings.sandSize / 10, (val: number) => {
+    planet.colorSettings.sandSize = val * 10;
+    planet.updateColors();
+});
+
+new Slider("snowElevation", document.getElementById("snowElevation")!, 0, 100, planet.colorSettings.snowElevation01 * 100, (val: number) => {
+    planet.colorSettings.snowElevation01 = val / 100;
+    planet.updateColors();
+});
+
+new Slider("snowOffsetAmplitude", document.getElementById("snowOffsetAmplitude")!, 0, 100, planet.colorSettings.snowOffsetAmplitude * 100, (val: number) => {
+    planet.colorSettings.snowOffsetAmplitude = val / 100;
+    planet.updateColors();
+});
+
+new Slider("snowLacunarity", document.getElementById("snowLacunarity")!, 0, 100, planet.colorSettings.snowLacunarity * 10, (val: number) => {
+    planet.colorSettings.snowLacunarity = val / 10;
+    planet.updateColors();
+});
+
+new Slider("snowLatitudePersistence", document.getElementById("snowLatitudePersistence")!, 0, 100, planet.colorSettings.snowLatitudePersistence * 10, (val: number) => {
+    planet.colorSettings.snowLatitudePersistence = val / 10;
+    planet.updateColors();
+});
+
+new Slider("steepSnowDotLimit", document.getElementById("steepSnowDotLimit")!, 0, 10, planet.colorSettings.steepSnowDotLimit * 10, (val: number) => {
+    planet.colorSettings.steepSnowDotLimit = val / 10;
     planet.updateColors();
 });
 
 new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 256, planet.colorSettings.steepSharpness, (val: number) => {
     planet.colorSettings.steepSharpness = val;
+    planet.updateColors();
+});
+
+new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 256, planet.colorSettings.normalSharpness, (val: number) => {
+    planet.colorSettings.normalSharpness = val;
     planet.updateColors();
 });
 
@@ -172,6 +204,11 @@ let rotationSpeed = 1;
 new Slider("planetRotation", document.getElementById("planetRotation")!, 0, 20, rotationSpeed * 10, (val: number) => {
     rotationSpeed = (val / 10) ** 5;
 });
+
+new Slider("cameraFOV", document.getElementById("cameraFOV")!, 0, 360, camera.fov * 360 / Math.PI, (val: number) => {
+    camera.fov = val * Math.PI / 360;
+});
+
 //#endregion
 
 document.getElementById("randomCraters")?.addEventListener("click", () => {
@@ -184,6 +221,9 @@ document.addEventListener("keyup", e => {
     keyboard[e.key] = false;
     if (e.key == "p") { // take screenshots
         BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
+    }
+    if (e.key == "w") {
+        planet.surfaceMaterial.wireframe = !planet.surfaceMaterial.wireframe;
     }
 });
 

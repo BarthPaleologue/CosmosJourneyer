@@ -100,8 +100,8 @@ export class PlanetChunk {
         debugMaterial.specularColor = BABYLON.Color3.Black();
         debugMaterial.diffuseColor = BABYLON.Color3.Black();
         debugMaterial.backFaceCulling = false;
-        debugMaterial.useLogarithmicDepth = true;*/
-        //debugMaterial.wireframe = true;
+        debugMaterial.useLogarithmicDepth = true;
+        debugMaterial.wireframe = true;*/
 
         //this.mesh.material = debugMaterial;
 

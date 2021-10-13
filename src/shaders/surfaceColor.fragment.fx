@@ -30,6 +30,13 @@ uniform float waterLevel; // controls sand layer
 uniform float sandSize;
 
 uniform float steepSharpness; // sharpness of demaracation between steepColor and normal colors
+uniform float normalSharpness;
+
+uniform float snowElevation01;
+uniform float snowOffsetAmplitude;
+uniform float snowLacunarity;
+uniform float snowLatitudePersistence;
+uniform float steepSnowDotLimit;
 
 uniform vec3 snowColor; // the color of the snow layer
 uniform vec3 steepColor; // the color of steep slopes
@@ -44,29 +51,41 @@ varying vec2 vUV; //
 // Noise functions to spice things up a little bit
 #define M_PI 3.14159265358979323846
 
-float rand(vec2 co){return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);}
-float rand (vec2 co, float l) {return rand(vec2(rand(co), l));}
-float rand (vec2 co, float l, float t) {return rand(vec2(rand(co, l), t));}
+float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
 
-float perlin(vec2 p, float dim, float time) {
-	vec2 pos = floor(p * dim);
-	vec2 posx = pos + vec2(1.0, 0.0);
-	vec2 posy = pos + vec2(0.0, 1.0);
-	vec2 posxy = pos + vec2(1.0);
-	
-	float c = rand(pos, dim, time);
-	float cx = rand(posx, dim, time);
-	float cy = rand(posy, dim, time);
-	float cxy = rand(posxy, dim, time);
-	
-	vec2 d = fract(p * dim);
-	d = -0.5 * cos(d * M_PI) + 0.5;
-	
-	float ccx = mix(c, cx, d.x);
-	float cycxy = mix(cy, cxy, d.x);
-	float center = mix(ccx, cycxy, d.y);
-	
-	return center * 2.0 - 1.0;
+float noise(vec3 p){
+    vec3 a = floor(p);
+    vec3 d = p - a;
+    d = d * d * (3.0 - 2.0 * d);
+
+    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);
+    vec4 k1 = perm(b.xyxy);
+    vec4 k2 = perm(k1.xyxy + b.zzww);
+
+    vec4 c = k2 + a.zzzz;
+    vec4 k3 = perm(c);
+    vec4 k4 = perm(c + 1.0);
+
+    vec4 o1 = fract(k3 * (1.0 / 41.0));
+    vec4 o2 = fract(k4 * (1.0 / 41.0));
+
+    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
+    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
+
+    return o4.y * d.y + o4.x * (1.0 - d.y);
+}
+
+float completeNoise(vec3 p, int nbOctaves, float decay, float lacunarity) {
+	float totalAmplitude = 0.0;
+	float value = 0.0;
+	for(int i = 0; i < nbOctaves; ++i) {
+		totalAmplitude += 1.0 / pow(decay, float(i));
+		vec3 samplePoint = p * pow(lacunarity, float(i)); 
+		value += noise(samplePoint) / pow(decay, float(i));
+	}
+	return value / totalAmplitude;
 }
 
 float remap(float value, float low1, float high1, float low2, float high2) {
@@ -74,6 +93,10 @@ float remap(float value, float low1, float high1, float low2, float high2) {
 }
 
 vec3 lerp(vec3 vector1, vec3 vector2, float x) {
+	return x * vector1 + (1.0 - x) * vector2;
+}
+
+vec2 lerp(vec2 vector1, vec2 vector2, float x) {
 	return x * vector1 + (1.0 - x) * vector2;
 }
 
@@ -127,7 +150,7 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, float bottomFactor, floa
     tNormalY = vec3(normalStrength * tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
     tNormalZ = vec3(normalStrength * tNormalZ.xy + surfaceNormal.xy, tNormalZ.z * surfaceNormal.z);
 
-    vec3 blendWeight = pow(abs(vNormal), vec3(sharpness));
+    vec3 blendWeight = pow(abs(surfaceNormal), vec3(sharpness));
     blendWeight /= dot(blendWeight, vec3(1.0));
 
     return normalize(tNormalX.zyx * blendWeight.x + tNormalY.xzy * blendWeight.y + tNormalZ.xyz * blendWeight.z);
@@ -135,6 +158,14 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, float bottomFactor, floa
 
 bool near(float value, float reference, float range) {
 	return abs(reference - value) < range; 
+}
+
+float nearFloat(float value, float reference, float range) {
+	if(near(value, reference, range)) {
+		return 1.0;
+	} else {
+		return 0.0;
+	}
 }
 
 /*
@@ -160,56 +191,72 @@ vec3 lnear(vec3 value1, vec3 value2, float x, float summitX, float range) {
 	return lerp(value1, value2, lnearFactor);
 }
 
+vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude, float slope, vec3 unitPosition, out vec3 normal) {
+	normal = vNormal;
 
+	float snowOffset = (completeNoise(unitPosition * 200.0, 3, 2.0, snowLacunarity) - 0.5) * 2.0;
 
-vec3 hardSurfaceGradient(float relativeElevation) {
+	if(elevation01 > snowElevation01 * exp(-abs(latitude) * snowLatitudePersistence) + snowOffsetAmplitude * snowOffset) {
+		// il fait froid !!!!!!!!
+		if(pow(slope, 64.0) > steepSnowDotLimit) {
+			// neige à plat bien blanche
 
-	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
-	
-	float relativeWaterLevel = waterLevel/maxElevation;
+			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.001, normalSharpness, 0.3);
+			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0003, normalSharpness, 0.3); // plus grand
 
+			return snowColor;
+		} else {
+			// neige en pente un peu assombrie
+			vec3 flatColor = lnear(sandColor, snowColor, elevation01, waterLevel01, sandSize / 10300.0);
 
-	vec3 color = float(near(relativeElevation, relativeWaterLevel, 0.01)) * sandColor;
-	color += float(near(relativeElevation, 0.1, 0.2)) * plainColor;
-	color += float(near(relativeElevation, 0.5, 0.2)) * snowColor;
-	return color;
-}
+			float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / 10300.0);
+			float snowFactor = 1.0 - sandFactor;
 
-void getGradientFactors(float relativeElevation, float latitude, out float bottomFactor, out float sandFactor,
-out float plainFactor, out float snowFactor) {
-	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
-	float relativeWaterLevel = waterLevel/maxElevation;
+			float steepFactor = pow(slope, steepSharpness);
 
-	bottomFactor = getLnearFactor(relativeElevation, 0.0, 0.05);
+			sandFactor *= (1.0 - steepFactor);
+			snowFactor *= (1.0 - steepFactor);
 
-	sandFactor = getLnearFactor(relativeElevation, relativeWaterLevel, sandSize / maxElevation);
-	
-	plainFactor = getLnearFactor(relativeElevation, 0.3, 0.3);
-	
-	snowFactor = getLnearFactor(relativeElevation, 0.6, 0.4) * abs(latitude);
-	//pow(1.0 - abs(normalize(vPosition).y * sphereNormal.y), 1.0);
-}
+			normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, 0.0, snowFactor, steepFactor, 0.001, normalSharpness, 0.3);
+			normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, 0.0, snowFactor, steepFactor, 0.0003, normalSharpness, 0.3); // plus grand
 
-vec3 softGradient(float relativeElevation, float latitude, vec3 normal) {
-	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
-	float relativeWaterLevel = waterLevel/maxElevation;
+			return lerp(flatColor, steepColor, pow(slope, steepSharpness));
+		}
+	} else if(elevation01 > waterLevel01) {
+		// entre mer et ciel
+		vec3 flatColor = lnear(sandColor, lerp(snowColor, plainColor, pow(elevation01, 8.0)), elevation01, waterLevel01, sandSize / 10300.0);
 
-	float bottomFactor = getLnearFactor(relativeElevation, 0.0, 0.05);
+		float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / 10300.0);
+		float plainFactor = 1.0 - sandFactor;
 
-	float sandFactor = getLnearFactor(relativeElevation, relativeWaterLevel, sandSize / maxElevation);
-	
-	float plainFactor = getLnearFactor(relativeElevation, 0.2, 0.3);
-	
-	float snowFactor = getLnearFactor(relativeElevation, 0.6, 0.3) * abs(latitude);
+		float steepFactor = pow(slope, steepSharpness);
 
-	float totalAmplitude = bottomFactor + sandFactor + plainFactor + snowFactor;
+		sandFactor *= steepFactor;
+		plainFactor *= steepFactor;
 
-	vec3 bottomColor = vec3(0.5);
+		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.001, normalSharpness, 0.3);
+		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0003, normalSharpness, 0.3); // plus grand
 
-	vec3 color = bottomFactor * bottomColor + sandFactor * sandColor + plainFactor * plainColor + snowFactor * snowColor;
-	color /= totalAmplitude;
+		return lerp(flatColor, steepColor, pow(slope, steepSharpness));
+	} else {
+		// entre abysse et surface
+		vec3 flatColor = lnear(sandColor, vec3(0.5), elevation01, waterLevel01, sandSize / 10300.0);
 
-	return color;
+		float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / 10300.0);
+		float plainFactor = 1.0 - sandFactor;
+
+		float steepFactor = pow(slope, steepSharpness);
+
+		sandFactor *= steepFactor;
+		plainFactor *= steepFactor;
+
+		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.001, normalSharpness, 0.3);
+		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0003, normalSharpness, 0.3); // plus grand
+
+		
+		return lerp(flatColor, steepColor, pow(slope, steepSharpness));
+	}
+
 }
 
 void main() {
@@ -218,51 +265,40 @@ void main() {
 
 	float distance = length(v3CameraPos - vPositionW);
 
-
-
+	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
 
 	vec3 unitPosition = normalize(vPosition);
 	
 	float elevation = length(vPosition) - planetRadius;
-	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
 
-	float relativeElevation = elevation/maxElevation;
-	relativeElevation = max(0.0, relativeElevation);
+	float elevation01 = elevation / maxElevation;
+	elevation01 = max(0.0, elevation01);
+
+	float waterLevel01 = waterLevel / maxElevation;
 
 	float latitude = unitPosition.y;
+	float absLatitude = abs(latitude);
 
-	float bottomFactor, sandFactor, plainFactor, snowFactor;
-	getGradientFactors(relativeElevation, latitude, bottomFactor, sandFactor, plainFactor, snowFactor);
+	float temperatureHeightFalloff = 1.0;
+	float temperatureLatitudeSharpness = 0.1;
+	float temperature = pow(1.0 - absLatitude, temperatureLatitudeSharpness); 
+	temperature *= exp(-elevation01 * temperatureHeightFalloff);
 
-	float totalAmplitude = bottomFactor + sandFactor + plainFactor + snowFactor;
+	float elevationFromWaterLevel = abs(elevation01 - waterLevel01);
 
-	vec3 bottomColor = vec3(0.5);
-	
-	vec3 color = vec3(0.0);
-	color += bottomFactor * bottomColor;
-	color += sandFactor * sandColor;
-	color += plainFactor * plainColor;
-	color += snowFactor * snowColor;
+	float moisture01 = completeNoise(unitPosition * 5.0, 3, 2.0, 2.0);
 
-	color /= totalAmplitude;
-
-
-	float d = dot(unitPosition, vNormal);
-	float d2 = pow(d, steepSharpness);
-	color = lerp(color, steepColor, d2);
+	float slope = dot(unitPosition, vNormal);
 
 	vec3 normal = vNormal;
 
-	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, d2, 0.001, 1.0, 0.2);
-	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, d2, 0.0003, 1.0, 0.6); // plus grand
+	vec3 color = computeColorAndNormal(elevation01, waterLevel01, latitude, slope, unitPosition, normal);
 
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
 	vec3 lightRay = normalize(v3LightPos - vPositionW); // light ray direction in world space
 	vec3 parallelLightRay = normalize(v3LightPos - planetPosition); // light ray direction in world space
 	
-	
-
 	float ndl = max(0., dot(normalW, parallelLightRay)); // dimming factor due to light inclination relative to vertex normal in world space
 
 	// specular
@@ -270,9 +306,7 @@ void main() {
     float specComp = max(0., dot(normalW, angleW));
     specComp = pow(specComp, 64.0);
 
-	//color = vec3(relativeElevation);
-
-	vec3 screenColor = color.rgb * ndl * (1.0+ vec3(specComp)/10.0);
+	vec3 screenColor = color.rgb * ndl * (1.0 + vec3(specComp) / 10.0);
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
 } 

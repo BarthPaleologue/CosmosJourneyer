@@ -25,7 +25,7 @@ let mountainsLayer2: MountainNoiseLayer;
 
 function initLayers() {
     bumpyLayer = new SimplexNoiseLayer(1e-4, 5, 2, 2, 0.0);
-    continentsLayer2 = new SimplexNoiseLayer(5e-6, 5, 1.8, 2, noiseModifiers.archipelagoFactor);
+    continentsLayer2 = new SimplexNoiseLayer(5e-6, 5, 2, 2, noiseModifiers.archipelagoFactor);
     //continentsLayer3 = new ContinentNoiseLayer(2e-5, 5, 1.5, 2, 0.0);
     mountainsLayer2 = new MountainNoiseLayer(2e-5, 6, 2, 2, 0.0);
 }
