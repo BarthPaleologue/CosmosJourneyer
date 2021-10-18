@@ -44,16 +44,20 @@ export class Planet {
     radius: number; // radius of sphere
     chunkLength: number; // length of eachChunk
 
+    maxDepth: number;
+
     attachNode: BABYLON.Mesh; // reprensents the center of the sphere
     sides: PlanetSide[] = new Array(6); // stores the 6 sides of the sphere
 
     surfaceMaterial: BABYLON.ShaderMaterial;
 
-    constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, maxDepth: number, chunkForge: ChunkForge, scene: BABYLON.Scene) {
+    constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, chunkForge: ChunkForge, scene: BABYLON.Scene) {
 
         this.id = id;
         this.radius = radius;
         this.chunkLength = this.radius * 2;
+
+        this.maxDepth = Math.round(Math.log2(radius) - 12);
 
         this.attachNode = BABYLON.Mesh.CreateBox(`${this.id}AttachNode`, 1, scene);
         this.attachNode.position = position;
@@ -145,12 +149,12 @@ export class Planet {
         this.surfaceMaterial = surfaceMaterial;
 
         this.sides = [
-            new PlanetSide(`${this.id}UpSide`, minDepth, maxDepth, this.chunkLength, Direction.Up, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}DownSide`, minDepth, maxDepth, this.chunkLength, Direction.Down, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}ForwardSide`, minDepth, maxDepth, this.chunkLength, Direction.Forward, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}BackwardSide`, minDepth, maxDepth, this.chunkLength, Direction.Backward, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}RightSide`, minDepth, maxDepth, this.chunkLength, Direction.Right, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}LeftSide`, minDepth, maxDepth, this.chunkLength, Direction.Left, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}UpSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Up, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}DownSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Down, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}ForwardSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Forward, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}BackwardSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Backward, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}RightSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Right, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}LeftSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Left, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
         ];
 
         this.updateColors();
@@ -177,6 +181,7 @@ export class Planet {
      * @param maxDepth the new maximum depth of the quadtrees
      */
     public setMaxDepth(maxDepth: number) {
+        this.maxDepth = maxDepth;
         for (let side of this.sides) {
             side.maxDepth = maxDepth;
         }

@@ -39,7 +39,7 @@ let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale
 
 let forge = new ChunkForge(64);
 
-let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 0, 2, forge, scene);
+let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 0, forge, scene);
 //planet.setRenderDistanceFactor(3);
 
 let waterElevation = 10e2;

@@ -49,8 +49,6 @@ varying vec3 vNormal; // normal of the vertex in sphere space
 varying vec2 vUV; // 
 
 // Noise functions to spice things up a little bit
-#define M_PI 3.14159265358979323846
-
 float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
@@ -223,8 +221,11 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 			return lerp(flatColor, steepColor, pow(slope, steepSharpness));
 		}
 	} else if(elevation01 > waterLevel01) {
+
+		vec3 openColor = lerp(plainColor, sandColor, pow(completeNoise(unitPosition, 1, 2.0, 2.0), 1.0));
+
 		// entre mer et ciel
-		vec3 flatColor = lnear(sandColor, lerp(snowColor, plainColor, pow(elevation01, 8.0)), elevation01, waterLevel01, sandSize / 10300.0);
+		vec3 flatColor = lnear(sandColor, lerp(snowColor, openColor, pow(elevation01, 8.0)), elevation01, waterLevel01, sandSize / 10300.0);
 
 		float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / 10300.0);
 		float plainFactor = 1.0 - sandFactor;

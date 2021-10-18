@@ -1,7 +1,7 @@
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
 import { Planet } from "./components/planet/planet";
 import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
-import { CloudPostProcess } from "./components/postProcesses/cloudPostProcess";
+import { VolumetricCloudsPostProcess } from "./components/postProcesses/volumetricCloudsPostProcess";
 import { ChunkForge } from "./components/forge/chunkForge";
 
 import sunTexture from "../asset/textures/sun.jpg";
@@ -38,10 +38,10 @@ box.rotate(freeCamera.getDirection(BABYLON.Axis.Y), -1, BABYLON.Space.WORLD);
 
 scene.activeCamera = freeCamera;
 
-let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
-
 const radius = 200 * 1e3; // diamètre en m
 freeCamera.maxZ = Math.max(radius * 50, 10000);
+
+let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
 
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.2 * radius, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);
@@ -55,10 +55,10 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 let forge = new ChunkForge(64);
 
 function getMaxDepthFromRadius(r: number): number {
-    return Math.round(Math.log2(radius) - 12);
+    return Math.round(Math.log2(r) - 12);
 }
 
-let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, getMaxDepthFromRadius(radius), forge, scene);
+let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, forge, scene);
 planet.noiseModifiers.archipelagoFactor = 0.5;
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 300;
@@ -67,7 +67,7 @@ planet.colorSettings.waterLevel = 10e2;
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
 
-let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(-0.7), 0, Math.sin(-0.7)).scale(3 * radius), 1, getMaxDepthFromRadius(radius / 4), forge, scene);
+let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(-0.7), 0, Math.sin(-0.7)).scale(3 * radius), 1, forge, scene);
 moon.noiseModifiers.archipelagoFactor = 1;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.5, 0.5, 0.5);
 moon.colorSettings.sandColor = planet.colorSettings.steepColor;
@@ -88,6 +88,8 @@ atmosphere.settings.intensity = 10;
 atmosphere.settings.falloffFactor = 20;
 atmosphere.settings.scatteringStrength = 0.4;
 //let depth = new DepthPostProcess("depth", freeCamera, scene);
+
+//let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 60e3, radius + 80e3, sun, freeCamera, scene);
 
 let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 10e2, sun, freeCamera, scene);
 ocean.settings.alphaModifier = 0.00002;
