@@ -7,6 +7,7 @@ import { ChunkForge } from "./components/forge/chunkForge";
 import sunTexture from "../asset/textures/sun.jpg";
 
 import * as style from "../styles/style.scss";
+import { Player } from "./components/player/player";
 
 style.default;
 
@@ -27,36 +28,25 @@ scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
-let freeCamera = new BABYLON.FreeCamera("freeCamera", new BABYLON.Vector3(0, 0, 0), scene);
-freeCamera.minZ = 1;
-freeCamera.attachControl(canvas);
-
-let box = BABYLON.Mesh.CreateBox("boate", 1, scene);
-freeCamera.parent = box;
-
-box.rotate(freeCamera.getDirection(BABYLON.Axis.Y), -1, BABYLON.Space.WORLD);
-
-scene.activeCamera = freeCamera;
-
 const radius = 200 * 1e3; // diamètre en m
-freeCamera.maxZ = Math.max(radius * 50, 10000);
 
-let light = new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene);
+let player = new Player(scene);
+player.speed = 0.2 * radius;
+player.mesh.rotate(player.firstPersonCamera.getDirection(BABYLON.Axis.Y), -1, BABYLON.Space.WORLD);
+
+player.activeCamera.maxZ = Math.max(radius * 50, 10000);
+scene.activeCamera = player.activeCamera;
+
 
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.2 * radius, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);
 mat.emissiveTexture = new BABYLON.Texture(sunTexture, scene);
 sun.material = mat;
-light.parent = sun;
 sun.position.x = -1718573.25;
 sun.position.z = -65566.6171875;
 depthRenderer.getDepthMap().renderList?.push(sun);
 
 let forge = new ChunkForge(64);
-
-function getMaxDepthFromRadius(r: number): number {
-    return Math.round(Math.log2(r) - 12);
-}
 
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, forge, scene);
 planet.noiseModifiers.archipelagoFactor = 0.5;
@@ -83,20 +73,16 @@ planet.attachNode.parent = sun;
 
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 20e3, radius + 40e3, sun, freeCamera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 20e3, radius + 40e3, sun, player.firstPersonCamera, scene);
 atmosphere.settings.intensity = 10;
 atmosphere.settings.falloffFactor = 20;
 atmosphere.settings.scatteringStrength = 0.4;
-//let depth = new DepthPostProcess("depth", freeCamera, scene);
-
 //let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 60e3, radius + 80e3, sun, freeCamera, scene);
 
-let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 10e2, sun, freeCamera, scene);
+let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 10e2, sun, scene.activeCamera, scene);
 ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 //ocean.settings.oceanRadius = 0;
-
-//let clouds = new CloudPostProcess("clouds", planet.attachNode, radius + 5e3, radius + 10e3, sun, freeCamera, scene);
 
 let keyboard: { [key: string]: boolean; } = {};
 
@@ -106,7 +92,7 @@ document.addEventListener("keydown", e => {
         BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
     }
     if (e.key == "m")
-        console.log(sun.absolutePosition, freeCamera.rotation);
+        console.log(sun.absolutePosition, player.mesh.rotation);
 });
 
 document.addEventListener("keyup", e => keyboard[e.key] = false);
@@ -120,65 +106,24 @@ window.addEventListener("resize", () => {
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
-    let t = 0;
-    let speed = 0.0002 * radius;
-
     scene.beforeRender = () => {
-        let forward = freeCamera.getDirection(BABYLON.Axis.Z);
-        let upward = freeCamera.getDirection(BABYLON.Axis.Y);
-        let right = freeCamera.getDirection(BABYLON.Axis.X);
+        let forward = player.getForwardDirection();
 
         forge.update(depthRenderer);
 
-        planet.update(freeCamera.position, forward, sun.position, freeCamera);
-        moon.update(freeCamera.position, forward, sun.position, freeCamera);
+        planet.update(player.mesh.position, forward, sun.position, scene.activeCamera!);
+        moon.update(player.mesh.position, forward, sun.position, scene.activeCamera!);
 
-        if (keyboard["a"]) { // rotation autour de l'axe de déplacement
-            box.rotate(forward, 0.02, BABYLON.Space.WORLD);
-        } else if (keyboard["e"]) {
-            box.rotate(forward, -0.02, BABYLON.Space.WORLD);
-        }
-        if (keyboard["i"]) {
-            box.rotate(right, -0.02, BABYLON.Space.WORLD);
-        } else if (keyboard["k"]) {
-            box.rotate(right, 0.02, BABYLON.Space.WORLD);
-        }
-        if (keyboard["j"]) {
-            box.rotate(upward, -0.02, BABYLON.Space.WORLD);
-        } else if (keyboard["l"]) {
-            box.rotate(upward, 0.02, BABYLON.Space.WORLD);
-        }
-
-        let deplacement = BABYLON.Vector3.Zero();
-
-        if (keyboard["z"]) deplacement.subtractInPlace(forward.scale(speed * engine.getDeltaTime()));
-        if (keyboard["s"]) deplacement.addInPlace(forward.scale(speed * engine.getDeltaTime()));
-        if (keyboard["q"]) deplacement.addInPlace(right.scale(speed * engine.getDeltaTime()));
-        if (keyboard["d"]) deplacement.subtractInPlace(right.scale(speed * engine.getDeltaTime()));
-        if (keyboard[" "]) deplacement.subtractInPlace(upward.scale(speed * engine.getDeltaTime()));
-        if (keyboard["Shift"]) deplacement.addInPlace(upward.scale(speed * engine.getDeltaTime()));
-        if (keyboard["+"]) speed *= 1.1;
-        if (keyboard["-"]) speed /= 1.1;
-        if (keyboard["8"]) speed = 0.03;
-
+        let deplacement = player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000);
         sun.position.addInPlace(deplacement);
-
-        t += 0.00002;
-        /*
-        sun.rotation.y = -t;*/
-        //planet.attachNode.rotation.x = -40 * t;
-        //planet.attachNode.rotation.y = -50 * t;
-        //moon.attachNode.rotation.y = -20 * t;
-
 
         planet.surfaceMaterial.setVector3("v3LightPos", sun.absolutePosition);
         planet.surfaceMaterial.setVector3("planetPosition", planet.attachNode.absolutePosition);
+
         moon.surfaceMaterial.setVector3("v3LightPos", sun.absolutePosition);
         moon.surfaceMaterial.setVector3("planetPosition", moon.attachNode.absolutePosition);
     };
 
-    engine.runRenderLoop(() => {
-        scene.render();
-    });
+    engine.runRenderLoop(() => scene.render());
 });
 
