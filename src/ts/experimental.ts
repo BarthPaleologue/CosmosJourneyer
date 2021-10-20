@@ -30,17 +30,11 @@ let camera = new BABYLON.FreeCamera("camera", BABYLON.Vector3.Zero(), scene);
 camera.maxZ = planetRadius * 5;
 scene.activeCamera = camera;
 
-
-//let rpp = new BABYLON.DefaultRenderingPipeline("rpp", true, scene, [camera]);
-//rpp.fxaaEnabled = true;
-//rpp.fxaa = new BABYLON.FxaaPostProcess("fxaa", 4, camera);
-
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(planetRadius * 2), scene);
 
 let forge = new ChunkForge(64);
 
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 0, forge, scene);
-//planet.setRenderDistanceFactor(3);
 
 let waterElevation = 10e2;
 
@@ -67,22 +61,22 @@ new Slider("maxDepth", document.getElementById("maxDepth")!, 0, 5, 1, (val: numb
 });
 
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX")!, 0, 50, 0, (val: number) => {
-    planet.noiseModifiers.offsetModifier[0] = val / 10;
+
     planet.reset();
 });
 
 new Slider("noiseOffsetY", document.getElementById("noiseOffsetY")!, 0, 50, 0, (val: number) => {
-    planet.noiseModifiers.offsetModifier[1] = val / 10;
+
     planet.reset();
 });
 
 new Slider("noiseOffsetZ", document.getElementById("noiseOffsetZ")!, 0, 50, 0, (val: number) => {
-    planet.noiseModifiers.offsetModifier[2] = val / 10;
+
     planet.reset();
 });
 
 new Slider("minValue", document.getElementById("minValue")!, 0, 20, 10, (val: number) => {
-    planet.noiseModifiers.minValueModifier = val / 10;
+
     planet.reset();
 });
 
@@ -142,8 +136,8 @@ new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 25
     planet.updateColors();
 });
 
-new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 20, planet.noiseModifiers.frequencyModifier * 10, (val: number) => {
-    planet.noiseModifiers.frequencyModifier = val / 10;
+new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 20, 1, (val: number) => {
+
     planet.reset();
 });
 
@@ -152,17 +146,17 @@ new Slider("nbCraters", document.getElementById("nbCraters")!, 0, 500, 200, (nbC
 });
 
 new Slider("craterRadius", document.getElementById("craterRadius")!, 1, 20, 10, (radiusFactor: number) => {
-    planet.craterModifiers.radiusModifier = radiusFactor / 10;
+
     planet.reset();
 });
 
 new Slider("craterSteepness", document.getElementById("craterSteepness")!, 1, 20, 10, (steepnessFactor: number) => {
-    planet.craterModifiers.steepnessModifier = steepnessFactor / 10;
+
     planet.reset();
 });
 
 new Slider("craterDepth", document.getElementById("craterDepth")!, 1, 20, 10, (depthFactor: number) => {
-    planet.craterModifiers.maxDepthModifier = depthFactor / 10;
+
     planet.reset();
 });
 

@@ -35,11 +35,6 @@ let center = BABYLON.Mesh.CreateBox("boate", 1, scene);
 let forge = new ChunkForge(64);
 
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, 0), 0, forge, scene);
-planet.setRenderDistanceFactor(10);
-planet.craterModifiers.maxDepthModifier = 0.00005;
-planet.noiseModifiers.frequencyModifier = 20;
-planet.noiseModifiers.offsetModifier = [23, 10, 0];
-planet.updateColors();
 
 
 let ocean = new OceanPostProcess("ocean", center, oceanRadius, light, camera, scene);

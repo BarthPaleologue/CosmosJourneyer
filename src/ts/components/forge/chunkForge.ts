@@ -1,5 +1,6 @@
 import { Planet } from "../planet/planet";
 import { Direction } from "../toolbox/direction";
+import { buildData } from "./buildData";
 
 export enum TaskType {
     Deletion,
@@ -91,9 +92,8 @@ export class ChunkForge {
                     direction: task.direction,
                     position: [task.position.x, task.position.y, task.position.z],
                     craters: task.planet.craters,
-                    noiseModifiers: task.planet.noiseModifiers,
-                    craterModifiers: task.planet.craterModifiers,
-                });
+                    terrainSettings: task.planet.terrainSettings,
+                } as buildData);
 
                 worker.onmessage = e => {
                     let vertexData = new BABYLON.VertexData();

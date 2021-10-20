@@ -1,42 +1,40 @@
-import { Direction, getRotationMatrixFromDirection } from "../toolbox/direction";
+import { getRotationMatrixFromDirection } from "../toolbox/direction";
 import { SimplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
 import { ComputeNormals } from "../toolbox/computeNormals";
 import { Vector3 } from "../toolbox/algebra";
-import { NoiseModifiers } from "../terrain/landscape/noiseSettings";
-import { CraterModifiers } from "../terrain/crater/craterModifiers";
 import { MountainNoiseLayer } from "../terrain/landscape/moutainNoiseLayer";
 import { ContinentNoiseLayer } from "../terrain/landscape/continentNoiseLayer";
 import { CraterLayer } from "../terrain/crater/craterLayer";
-import { Crater } from "../terrain/crater/crater";
-
-let noiseModifiers: NoiseModifiers = {
-    amplitudeModifier: 1,
-    offsetModifier: [0, 0, 0],
-    frequencyModifier: 1,
-    minValueModifier: 1,
-
-    archipelagoFactor: 0.5,
-};
+import { buildData } from "./buildData";
+import { TerrainSettings } from "../terrain/terrainSettings";
 
 let bumpyLayer: SimplexNoiseLayer;
 let continentsLayer2: SimplexNoiseLayer;
 //let continentsLayer3: ContinentNoiseLayer;
-let mountainsLayer2: MountainNoiseLayer;
+let mountainsLayer: MountainNoiseLayer;
+
+let terrainSettings: TerrainSettings = {
+    continentsFragmentation: 0.5,
+
+    maxBumpHeight: 0,
+    bumpsFrequency: 1,
+
+    maxMountainHeight: 0,
+    mountainsFrequency: 1,
+};
+
 
 function initLayers() {
     bumpyLayer = new SimplexNoiseLayer(1e-4, 5, 2, 2, 0.0);
-    continentsLayer2 = new SimplexNoiseLayer(5e-6, 5, 2, 2, noiseModifiers.archipelagoFactor);
+    continentsLayer2 = new SimplexNoiseLayer(5e-6, 5, 2, 2, 1 - terrainSettings.continentsFragmentation);
     //continentsLayer3 = new ContinentNoiseLayer(2e-5, 5, 1.5, 2, 0.0);
-    mountainsLayer2 = new MountainNoiseLayer(2e-5, 6, 2, 2, 0.0);
+    mountainsLayer = new MountainNoiseLayer(2e-5, 6, 2, 2, 0.0);
 }
 
 initLayers();
 
 const craterLayer = new CraterLayer([]);
 
-// à paramétrer
-const moutainHeight = 10000;
-const bumpyHeight = 300;
 
 function terrainFunction(p: Vector3, planetRadius: number): Vector3 {
 
@@ -45,7 +43,7 @@ function terrainFunction(p: Vector3, planetRadius: number): Vector3 {
     // on se ramène à la position à la surface du globe (sans relief)
     const planetSpherePosition: Vector3 = p.scaleToNew(planetRadius / initialMagnitude);
 
-    const unitCoords = planetSpherePosition.normalizeToNew().scaleToNew(noiseModifiers.frequencyModifier);
+    const unitCoords = planetSpherePosition.normalizeToNew();
 
     let elevation = 0;
 
@@ -55,9 +53,9 @@ function terrainFunction(p: Vector3, planetRadius: number): Vector3 {
 
     const continentMask = continentsLayer2.evaluate(planetSpherePosition);
 
-    elevation += continentMask * mountainsLayer2.evaluate(planetSpherePosition) * moutainHeight;
+    elevation += continentMask * mountainsLayer.evaluate(planetSpherePosition.scaleToNew(terrainSettings.mountainsFrequency)) * terrainSettings.maxMountainHeight;
 
-    elevation += bumpyLayer.evaluate(planetSpherePosition) * bumpyHeight;
+    elevation += bumpyLayer.evaluate(planetSpherePosition.scaleToNew(terrainSettings.bumpsFrequency)) * terrainSettings.maxBumpHeight;
 
     const newPosition = p.addToNew(unitCoords.scaleToNew(elevation));
 
@@ -68,16 +66,7 @@ function setVerticesPositionsAndFaces(positions: Float32Array, faces: number[][]
 
 }
 
-interface buildData {
-    chunkLength: number;
-    subdivisions: number;
-    depth: number;
-    direction: Direction;
-    position: number[];
-    craters: Crater[];
-    noiseModifiers: NoiseModifiers;
-    craterModifiers: CraterModifiers;
-}
+
 
 self.onmessage = e => {
     if (e.data.taskType == "buildTask") {
@@ -93,9 +82,7 @@ self.onmessage = e => {
 
         craterLayer.craters = data.craters;
 
-        noiseModifiers = data.noiseModifiers;
-
-        craterLayer.craterModifiers = data.craterModifiers;
+        terrainSettings = data.terrainSettings;
 
         initLayers();
 

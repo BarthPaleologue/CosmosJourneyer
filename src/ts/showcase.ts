@@ -49,7 +49,6 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 let forge = new ChunkForge(64);
 
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, forge, scene);
-planet.noiseModifiers.archipelagoFactor = 0.5;
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.steepSharpness = 8;
@@ -58,14 +57,13 @@ planet.updateColors();
 planet.attachNode.position.x = radius * 5;
 
 let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(-0.7), 0, Math.sin(-0.7)).scale(3 * radius), 1, forge, scene);
-moon.noiseModifiers.archipelagoFactor = 1;
+moon.terrainSettings.continentsFragmentation = 0;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.5, 0.5, 0.5);
 moon.colorSettings.sandColor = planet.colorSettings.steepColor;
 moon.colorSettings.steepColor = new BABYLON.Vector3(0.1, 0.1, 0.1);
 moon.colorSettings.snowLatitudePersistence = 2;
 moon.colorSettings.snowElevation01 = 0.99;
 moon.colorSettings.steepSharpness = 10;
-moon.craterModifiers.maxDepthModifier = 1 / 8;
 moon.updateColors();
 
 moon.attachNode.parent = planet.attachNode;

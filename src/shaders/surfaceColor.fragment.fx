@@ -32,6 +32,8 @@ uniform float sandSize;
 uniform float steepSharpness; // sharpness of demaracation between steepColor and normal colors
 uniform float normalSharpness;
 
+uniform float maxElevation;
+
 uniform float snowElevation01;
 uniform float snowOffsetAmplitude;
 uniform float snowLacunarity;
@@ -205,9 +207,9 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 			return snowColor;
 		} else {
 			// neige en pente un peu assombrie
-			vec3 flatColor = lnear(sandColor, snowColor, elevation01, waterLevel01, sandSize / 10300.0);
+			vec3 flatColor = lnear(sandColor, snowColor, elevation01, waterLevel01, sandSize / maxElevation);
 
-			float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / 10300.0);
+			float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation);
 			float snowFactor = 1.0 - sandFactor;
 
 			float steepFactor = pow(slope, steepSharpness);
@@ -225,9 +227,9 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 		vec3 openColor = lerp(plainColor, sandColor, pow(completeNoise(unitPosition, 1, 2.0, 2.0), 1.0));
 
 		// entre mer et ciel
-		vec3 flatColor = lnear(sandColor, lerp(snowColor, openColor, pow(elevation01, 8.0)), elevation01, waterLevel01, sandSize / 10300.0);
+		vec3 flatColor = lnear(sandColor, lerp(snowColor, openColor, pow(elevation01, 8.0)), elevation01, waterLevel01, sandSize / maxElevation);
 
-		float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / 10300.0);
+		float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation);
 		float plainFactor = 1.0 - sandFactor;
 
 		float steepFactor = pow(slope, steepSharpness);
@@ -241,9 +243,9 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 		return lerp(flatColor, steepColor, pow(slope, steepSharpness));
 	} else {
 		// entre abysse et surface
-		vec3 flatColor = lnear(sandColor, vec3(0.5), elevation01, waterLevel01, sandSize / 10300.0);
+		vec3 flatColor = lnear(sandColor, vec3(0.5), elevation01, waterLevel01, sandSize / maxElevation);
 
-		float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / 10300.0);
+		float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation);
 		float plainFactor = 1.0 - sandFactor;
 
 		float steepFactor = pow(slope, steepSharpness);
@@ -266,7 +268,7 @@ void main() {
 
 	float distance = length(v3CameraPos - vPositionW);
 
-	float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
+	//float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
 
 	vec3 unitPosition = normalize(vPosition);
 	

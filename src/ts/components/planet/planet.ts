@@ -1,6 +1,4 @@
 import { Crater, generateCraters } from "../terrain/crater/crater";
-import { CraterModifiers } from "../terrain/crater/craterModifiers";
-import { NoiseModifiers } from "../terrain/landscape/noiseSettings";
 import { ChunkForge } from "../forge/chunkForge";
 import { PlanetSide } from "./planetSide";
 import { Direction } from "../toolbox/direction";
@@ -11,6 +9,7 @@ import rockn from "../../../asset/textures/rockn.png";
 import grassn from "../../../asset/textures/grassn.png";
 import snowNormalMap from "../../../asset/textures/snowNormalMap.jpg";
 import sandNormalMap from "../../../asset/textures/sandNormalMap.jpg";
+import { TerrainSettings } from "../terrain/terrainSettings";
 
 export interface ColorSettings {
     snowColor: BABYLON.Vector3,
@@ -34,12 +33,11 @@ export class Planet {
 
     id: string;
 
-    noiseModifiers: NoiseModifiers;
-
     craters: Crater[];
-    craterModifiers: CraterModifiers;
 
     colorSettings: ColorSettings;
+
+    terrainSettings: TerrainSettings;
 
     radius: number; // radius of sphere
     chunkLength: number; // length of eachChunk
@@ -67,19 +65,14 @@ export class Planet {
         let craterSteepnessFactor = 1;
         let craterMaxDepthFactor = 1;
 
-        this.noiseModifiers = {
-            amplitudeModifier: 1,
-            frequencyModifier: 1,
-            offsetModifier: [0, 0, 0],
-            minValueModifier: 1,
-            archipelagoFactor: 0.5,
-        };
+        this.terrainSettings = {
+            continentsFragmentation: 0.5,
 
-        this.craterModifiers = {
-            radiusModifier: 1,
-            steepnessModifier: 1,
-            maxDepthModifier: 1,
-            scaleFactor: 1,
+            maxBumpHeight: 20,
+            bumpsFrequency: 100,
+
+            maxMountainHeight: 10e3,
+            mountainsFrequency: 1
         };
 
         this.colorSettings = {
@@ -115,6 +108,8 @@ export class Planet {
 
                     "snowColor", "steepColor", "plainColor", "sandColor",
 
+                    "maxElevation",
+
                     "snowElevation01", "snowOffsetAmplitude", "snowLacunarity",
                     "snowLatitudePersistence", "steepSnowDotLimit"
                 ]
@@ -133,6 +128,8 @@ export class Planet {
         surfaceMaterial.setFloat("planetRadius", this.radius);
 
         surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
+
+        surfaceMaterial.setFloat("maxElevation", this.terrainSettings.maxBumpHeight + this.terrainSettings.maxMountainHeight);
 
         surfaceMaterial.setFloat("snowElevation01", this.colorSettings.snowElevation01);
         surfaceMaterial.setFloat("snowOffsetAmplitude", this.colorSettings.snowOffsetAmplitude);
