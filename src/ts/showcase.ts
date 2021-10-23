@@ -58,6 +58,7 @@ planet.attachNode.position.x = radius * 5;
 
 let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(-0.7), 0, Math.sin(-0.7)).scale(3 * radius), 1, forge, scene);
 moon.terrainSettings.continentsFragmentation = 0;
+moon.terrainSettings.maxMountainHeight = 7e3;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.5, 0.5, 0.5);
 moon.colorSettings.sandColor = planet.colorSettings.steepColor;
 moon.colorSettings.steepColor = new BABYLON.Vector3(0.1, 0.1, 0.1);

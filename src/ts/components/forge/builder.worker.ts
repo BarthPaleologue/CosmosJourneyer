@@ -28,7 +28,7 @@ function initLayers() {
     bumpyLayer = new SimplexNoiseLayer(1e-4, 5, 2, 2, 0.0);
     continentsLayer2 = new SimplexNoiseLayer(5e-6, 5, 2, 2, 1 - terrainSettings.continentsFragmentation);
     //continentsLayer3 = new ContinentNoiseLayer(2e-5, 5, 1.5, 2, 0.0);
-    mountainsLayer = new MountainNoiseLayer(2e-5, 6, 2, 2, 0.0);
+    mountainsLayer = new MountainNoiseLayer(2e-5, 5, 2.2, 2, 0.0);
 }
 
 initLayers();

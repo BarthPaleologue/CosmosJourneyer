@@ -34,7 +34,7 @@ let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale
 
 let forge = new ChunkForge(64);
 
-let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 0, forge, scene);
+let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 1, forge, scene);
 
 let waterElevation = 10e2;
 
@@ -56,7 +56,7 @@ ocean.settings.depthModifier = 0.004;
 
 //#region Sliders
 
-new Slider("maxDepth", document.getElementById("maxDepth")!, 0, 5, 1, (val: number) => {
+new Slider("maxDepth", document.getElementById("maxDepth")!, 0, 5, planet.sides[0].minDepth, (val: number) => {
     planet.setMinDepth(val);
 });
 

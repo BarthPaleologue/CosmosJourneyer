@@ -1,4 +1,4 @@
-precision highp float;
+precision mediump float;
 
 #define PI 3.1415926535897932
 #define POINTS_FROM_CAMERA 10 // number sample points along camera ray
@@ -124,7 +124,7 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
 
     // specular based on https://learnopengl.com/Lighting/Basic-Lighting
     vec3 reflectDir = reflect(-rayDir, planetNormal);
-    float spec = pow(max(dot(rayDir, reflectDir), 0.0), 32.0);
+    float spec = pow(max(dot(rayDir, reflectDir), 0.0), 64.0);
 
     if(distanceThroughOcean > 0.0) {
         float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * depthModifier);
@@ -136,7 +136,7 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         vec3 shallowColor = vec3(32.0,193.0,180.0)/255.0;
         vec3 oceanColor = lerp(deepColor, shallowColor, opticalDepth01);
         
-        return lerp(originalColor, oceanColor, alpha) * (ndl + spec);
+        return lerp(originalColor, oceanColor, alpha) * (ndl * (1.0+spec*10.0));
     } else {
         return originalColor;
     }

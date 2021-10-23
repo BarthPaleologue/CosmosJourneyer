@@ -7,7 +7,7 @@ import { Direction } from "../toolbox/direction";
 import crackednormal from "../../../asset/textures/crackednormal.jpg";
 import rockn from "../../../asset/textures/rockn.png";
 import grassn from "../../../asset/textures/grassn.png";
-import snowNormalMap from "../../../asset/textures/snowNormalMap.jpg";
+import snowNormalMap from "../../../asset/textures/snowNormalMap.png";
 import sandNormalMap from "../../../asset/textures/sandNormalMap.jpg";
 import { TerrainSettings } from "../terrain/terrainSettings";
 
@@ -71,13 +71,13 @@ export class Planet {
             maxBumpHeight: 20,
             bumpsFrequency: 100,
 
-            maxMountainHeight: 10e3,
+            maxMountainHeight: 20e3,
             mountainsFrequency: 1
         };
 
         this.colorSettings = {
             snowColor: new BABYLON.Vector3(1, 1, 1),
-            steepColor: new BABYLON.Vector3(70, 42, 42).scale(1 / 255),
+            steepColor: new BABYLON.Vector3(55, 42, 42).scale(1 / 255),
             plainColor: new BABYLON.Vector3(0.5, 0.3, 0.08),
             sandColor: new BABYLON.Vector3(0.7, 0.7, 0.5),
 
@@ -86,7 +86,7 @@ export class Planet {
             steepSharpness: 1,
             normalSharpness: 1,
 
-            snowElevation01: 0.6,
+            snowElevation01: 0.5,
             snowOffsetAmplitude: 0.05,
             snowLacunarity: 7.7,
             snowLatitudePersistence: 1.0,

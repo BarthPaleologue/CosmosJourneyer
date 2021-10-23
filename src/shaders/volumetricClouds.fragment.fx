@@ -1,4 +1,4 @@
-precision highp float;
+precision mediump float;
 
 #define PI 3.1415926535897932
 #define POINTS_FROM_CAMERA 4 // number sample points along camera ray
