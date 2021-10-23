@@ -51,8 +51,9 @@ let forge = new ChunkForge(64);
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, forge, scene);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 300;
-planet.colorSettings.steepSharpness = 8;
+planet.colorSettings.steepSharpness = 10;
 planet.colorSettings.waterLevel = 10e2;
+
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
 
@@ -105,6 +106,31 @@ window.addEventListener("resize", () => {
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
+    let mouseX = 0;
+    let mouseY = 0;
+    let mouseDX = 0;
+    let mouseDY = 0;
+
+    let mouseDX2 = 0;
+    let mouseDY2 = 0;
+
+    let deadAreaRadius = 0.05;
+
+    window.addEventListener("mousemove", e => {
+        mouseDX = (e.x - mouseX) / window.innerWidth;
+        mouseDY = (e.y - mouseY) / window.innerHeight;
+        mouseX = e.x;
+        mouseY = e.y;
+
+        mouseDX2 = (e.x - window.innerWidth / 2) / window.innerWidth;
+        mouseDY2 = (e.y - window.innerHeight / 2) / window.innerHeight;
+
+        if (mouseDX2 ** 2 + mouseDY2 ** 2 < deadAreaRadius ** 2) {
+            mouseDX2 = 0;
+            mouseDY2 = 0;
+        }
+    });
+
     scene.beforeRender = () => {
         let forward = player.getForwardDirection();
 
@@ -112,6 +138,10 @@ scene.executeWhenReady(() => {
 
         planet.update(player.mesh.position, forward, sun.position, scene.activeCamera!);
         moon.update(player.mesh.position, forward, sun.position, scene.activeCamera!);
+
+        player.listenToMouse(mouseDX2, mouseDY2);
+        mouseDX = 0;
+        mouseDY = 0;
 
         let deplacement = player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000);
         sun.position.addInPlace(deplacement);

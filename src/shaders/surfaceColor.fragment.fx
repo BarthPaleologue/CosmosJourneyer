@@ -198,7 +198,7 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 
 	if(elevation01 > snowElevation01 * exp(-abs(latitude) * snowLatitudePersistence) + snowOffsetAmplitude * snowOffset) {
 		// il fait froid !!!!!!!!
-		if(pow(1.0 - slope, 1.0) > steepSnowDotLimit + (completeNoise(unitPosition * 200.0, 3, 2.0, 7.0)-0.5) / 2.0) {
+		if(pow(1.0 - slope, 1.0) > steepSnowDotLimit + (completeNoise(unitPosition * 200.0, 3, 2.0, 7.0)-0.5) * 0.5) {
 			// neige à plat bien blanche
 
 			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.001, normalSharpness, 0.3);

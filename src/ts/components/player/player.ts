@@ -105,5 +105,13 @@ export class Player {
         return deplacement;
     }
 
+    public listenToMouse(mouseDX: number, mouseDY: number) {
+        // Update Rotation state
+
+        this.mesh.rotate(this.getRightDirection(), 0.1 * this.rotationSpeed * mouseDY, BABYLON.Space.WORLD);
+        this.mesh.rotate(this.getUpwardDirection(), 0.1 * this.rotationSpeed * mouseDX, BABYLON.Space.WORLD);
+
+    }
+
 
 }
