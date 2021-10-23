@@ -110,17 +110,16 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
     float distanceThroughOcean = max(0.0, escapePoint - impactPoint); // probably doesn't need the max but for the sake of coherence the distance cannot be negative
     
     vec3 samplePoint = rayOrigin + impactPoint * rayDir;
-    
-    vec3 planetNormal = normalize(samplePoint - planetPosition);
-    
-    vec3 normalWave = triplanarNormal(samplePoint, planetNormal, normalMap, 0.00001, 10.0, 1.0);
-    //normalWave = triplanarNormal(samplePoint, normalWave, normalMap, 0.001, 10.0, 1.0);
 
-    //return vec3(normalWave.r);
+    vec3 samplePointPlanetSpace = samplePoint - planetPosition;
+    
+    vec3 planetNormal = normalize(samplePointPlanetSpace);
+    
+    vec3 normalWave = triplanarNormal(samplePointPlanetSpace, planetNormal, normalMap, 0.00001, 1.0, 0.2);
     
     vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
 
-    float ndl = dot(planetNormal, sunDir); // dimming factor due to light inclination relative to vertex normal in world space
+    float ndl = dot(normalWave, sunDir); // dimming factor due to light inclination relative to vertex normal in world space
 
     // specular based on https://learnopengl.com/Lighting/Basic-Lighting
     vec3 reflectDir = reflect(-rayDir, planetNormal);

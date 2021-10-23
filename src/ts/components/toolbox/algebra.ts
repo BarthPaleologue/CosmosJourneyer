@@ -25,15 +25,36 @@ export class Vector3 {
     public set z(value: number) {
         this._z = value;
     }
+    /**
+     * 
+     * @returns the euclidean squared magnitude of the current vector
+     */
     getSquaredMagnitude(): number {
         return this._x ** 2 + this._y ** 2 + this._z ** 2;
     }
+
+    /**
+     * 
+     * @returns the euclidean magnitude of the current vector
+     */
     getMagnitude(): number {
         return Math.sqrt(this.getSquaredMagnitude());
     }
+
+    /**
+     * 
+     * @param scaleFactor the factor you want your new vector scaled to
+     * @returns a new Vector3, copy of the current one scaled by the scaleFactor
+     */
     scaleToNew(scaleFactor: number): Vector3 {
         return new Vector3(this._x * scaleFactor, this._y * scaleFactor, this._z * scaleFactor);
     }
+
+    /**
+     * 
+     * @param otherVector The other Vector3 you want to add
+     * @returns returns the sum of the current Vector3 and the other Vector3 as a new Vector3
+     */
     addToNew(otherVector: Vector3): Vector3 {
         return new Vector3(this._x + otherVector._x, this._y + otherVector._y, this._z + otherVector._z);
     }

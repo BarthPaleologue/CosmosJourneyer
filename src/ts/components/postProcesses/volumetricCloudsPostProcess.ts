@@ -24,6 +24,7 @@ export class VolumetricCloudsPostProcess extends BABYLON.PostProcess {
 
             "projection",
             "view",
+            "world",
             "transform",
 
             "cameraNear",
