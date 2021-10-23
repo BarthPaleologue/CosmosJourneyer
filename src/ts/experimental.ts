@@ -54,6 +54,9 @@ let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + wate
 ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 
+let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+
+
 //#region Sliders
 
 new Slider("maxDepth", document.getElementById("maxDepth")!, 0, 5, planet.sides[0].minDepth, (val: number) => {

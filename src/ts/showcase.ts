@@ -8,6 +8,7 @@ import sunTexture from "../asset/textures/sun.jpg";
 
 import * as style from "../styles/style.scss";
 import { Player } from "./components/player/player";
+import { InvertPostProcess } from "./components/postProcesses/invertPostProcess";
 
 style.default;
 
@@ -83,6 +84,11 @@ let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 10e2, sun,
 ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 //ocean.settings.oceanRadius = 0;
+
+//let invert = new InvertPostProcess("invert", scene.activeCamera, scene);
+
+let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+
 
 let keyboard: { [key: string]: boolean; } = {};
 
