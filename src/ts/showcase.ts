@@ -86,13 +86,15 @@ ocean.settings.depthModifier = 0.004;
 
 let keyboard: { [key: string]: boolean; } = {};
 
+let isMouseEnabled = true;
+
 document.addEventListener("keydown", e => {
     keyboard[e.key] = true;
     if (e.key == "p") { // take screenshots
         BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
     }
-    if (e.key == "m")
-        console.log(sun.absolutePosition, player.mesh.rotation);
+    if (e.key == "o") console.log(sun.absolutePosition, player.mesh.rotation);
+    if (e.key == "m") isMouseEnabled = !isMouseEnabled;
 });
 
 document.addEventListener("keyup", e => keyboard[e.key] = false);
@@ -139,7 +141,9 @@ scene.executeWhenReady(() => {
         planet.update(player.mesh.position, forward, sun.position, scene.activeCamera!);
         moon.update(player.mesh.position, forward, sun.position, scene.activeCamera!);
 
-        player.listenToMouse(mouseDX2, mouseDY2);
+        if (isMouseEnabled) {
+            player.listenToMouse(mouseDX2, mouseDY2);
+        }
         mouseDX = 0;
         mouseDY = 0;
 
