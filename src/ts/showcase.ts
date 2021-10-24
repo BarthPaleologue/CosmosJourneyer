@@ -79,12 +79,14 @@ atmosphere.settings.intensity = 10;
 atmosphere.settings.falloffFactor = 20;
 atmosphere.settings.scatteringStrength = 0.4;
 
-let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 60e3, radius + 80e3, sun, player.firstPersonCamera, scene);
 
 let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 10e2, sun, scene.activeCamera, scene);
 ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 //ocean.settings.oceanRadius = 0;
+
+let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius, radius + 7e3, sun, player.firstPersonCamera, scene);
+
 
 //let invert = new InvertPostProcess("invert", scene.activeCamera, scene);
 

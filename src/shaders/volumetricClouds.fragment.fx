@@ -1,7 +1,7 @@
 precision mediump float;
 
 #define PI 3.1415926535897932
-#define POINTS_FROM_CAMERA 5 // number sample points along camera ray
+#define POINTS_FROM_CAMERA 7 // number sample points along camera ray
 #define OPTICAL_DEPTH_POINTS 5 // number sample points along light ray
 
 // varying
@@ -41,11 +41,11 @@ vec3 permute(vec3 x) {
   return mod((34.0 * x + 1.0) * x, 289.0);
 }
 
-vec3 dist(vec3 x, vec3 y, vec3 z,  bool manhattanDistance) {
-    return manhattanDistance ?  abs(x) + abs(y) + abs(z) :  (x * x + y * y + z * z);
+vec3 dist(vec3 x, vec3 y, vec3 z) {
+    return x * x + y * y + z * z;
 }
 
-vec2 worley(vec3 P, float jitter, bool manhattanDistance) {
+vec2 worley(vec3 P, float jitter) {
     float K = 0.142857142857; // 1/7
     float Ko = 0.428571428571; // 1/2-K/2
     float  K2 = 0.020408163265306; // 1/(7*7)
@@ -148,15 +148,15 @@ vec2 worley(vec3 P, float jitter, bool manhattanDistance) {
 	vec3 dy33 = Pfy.z + jitter*oy33;
 	vec3 dz33 = Pfz.z + jitter*oz33;
 
-	vec3 d11 = dist(dx11, dy11, dz11, manhattanDistance);
-	vec3 d12 =dist(dx12, dy12, dz12, manhattanDistance);
-	vec3 d13 = dist(dx13, dy13, dz13, manhattanDistance);
-	vec3 d21 = dist(dx21, dy21, dz21, manhattanDistance);
-	vec3 d22 = dist(dx22, dy22, dz22, manhattanDistance);
-	vec3 d23 = dist(dx23, dy23, dz23, manhattanDistance);
-	vec3 d31 = dist(dx31, dy31, dz31, manhattanDistance);
-	vec3 d32 = dist(dx32, dy32, dz32, manhattanDistance);
-	vec3 d33 = dist(dx33, dy33, dz33, manhattanDistance);
+	vec3 d11 = dist(dx11, dy11, dz11);
+	vec3 d12 = dist(dx12, dy12, dz12);
+	vec3 d13 = dist(dx13, dy13, dz13);
+	vec3 d21 = dist(dx21, dy21, dz21);
+	vec3 d22 = dist(dx22, dy22, dz22);
+	vec3 d23 = dist(dx23, dy23, dz23);
+	vec3 d31 = dist(dx31, dy31, dz31);
+	vec3 d32 = dist(dx32, dy32, dz32);
+	vec3 d33 = dist(dx33, dy33, dz33);
 
 	vec3 d1a = min(d11, d12);
 	d12 = max(d11, d12);
@@ -269,13 +269,24 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
 }
 
 // based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
-float densityAtPoint(vec3 densitySamplePoint) {
-    float heightAboveSurface = length(densitySamplePoint - planetPosition) - planetRadius; // actual height above surface
+float densityAtPoint(vec3 densitySamplePoint, vec3 initialPoint) {
+    float heightAboveSurface = length(densitySamplePoint) - planetRadius; // actual height above surface
     float height01 = heightAboveSurface / (atmosphereRadius - planetRadius); // normalized height between 0 and 1
     float localDensity = densityModifier * exp(-height01 * falloffFactor); // density with exponential falloff
-    localDensity *= (1.0 - height01); // make it 0 at maximum height
+    //localDensity *= (1.0 - height01); // make it 0 at maximum height
 
-    localDensity = (1.0 - worley(densitySamplePoint/200000.0, 1.0, false).x) * completeNoise(densitySamplePoint/200000.0, 3, 2.0, 2.0) / 300000.0;
+	vec3 unitSphereCoord = normalize(initialPoint);
+	vec3 unitSphereCoord2 = normalize(densitySamplePoint);
+
+    localDensity = (1.0 - worley(unitSphereCoord2, 1.0).x);
+	localDensity *= pow(completeNoise(densitySamplePoint/20000.0, 3, 2.0, 2.0), 2.0);
+
+	//localDensity = pow(localDensity, 2.0);
+
+	//localDensity = 1.0 - exp(-localDensity/1000000.0);
+
+	// est lié au bug visuel
+	localDensity *= exp(-height01*11.0);
 
     return localDensity;
 }
@@ -291,7 +302,7 @@ float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     float accumulatedOpticalDepth = 0.0;
 
     for(int i = 0 ; i < OPTICAL_DEPTH_POINTS ; i++) {
-        float localDensity = densityAtPoint(densitySamplePoint); // we get the density at the sample point
+        float localDensity = densityAtPoint(densitySamplePoint, rayOrigin - planetPosition); // we get the density at the sample point
 
         accumulatedOpticalDepth += localDensity * stepSize; // linear approximation : density is constant between sample points
 
@@ -301,7 +312,7 @@ float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     return accumulatedOpticalDepth;
 }
 
-vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 originalColor) {
+float calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 originalColor) {
 
     vec3 samplePoint = rayOrigin; // first sampling point coming from camera ray
 
@@ -309,12 +320,9 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 originalC
 
     vec3 sunDir = normalize(sunPosition); // direction to the light source
     
-    vec3 wavelength = vec3(redWaveLength, greenWaveLength, blueWaveLength); // the wavelength that will be scattered (rgb so we get everything)
-    vec3 rayleighScatteringCoeffs = pow(400.0 / wavelength.xyz, vec3(4.0)) * scatteringStrength; // the scattering is inversely proportional to the fourth power of the wave length
-
     float stepSize = rayLength / (float(POINTS_FROM_CAMERA) - 1.0); // the ray length between sample points
 
-    vec3 inScatteredLight = vec3(0.0); // amount of light scattered for each channel
+    float inScatteredLight = 0.0; // amount of light scattered for each channel
 
     for (int i = 0 ; i < POINTS_FROM_CAMERA ; ++i) {
 
@@ -325,22 +333,15 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 originalC
         
         float viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
         
-        vec3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * rayleighScatteringCoeffs); // exponential scattering with coefficients
+        float transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth)); // exponential scattering with coefficients
         
-        
-        float localDensity = densityAtPoint(samplePointPlanetSpace); // density at sample point
+        float localDensity = densityAtPoint(samplePointPlanetSpace, rayOrigin - planetPosition); // density at sample point
 
-        inScatteredLight += localDensity * transmittance * rayleighScatteringCoeffs * stepSize; // add the resulting amount of light scattered toward the camera
+        inScatteredLight += localDensity * transmittance * stepSize; // add the resulting amount of light scattered toward the camera
         
         samplePoint += rayDir * stepSize; // move sample point along view ray
     }
 
-    // scattering depends on the direction of the light ray and the view ray : it's the rayleigh phase function
-    // https://glossary.ametsoc.org/wiki/Rayleigh_phase_function
-    float costheta2 = pow(dot(rayDir, sunDir), 2.0);
-    float phaseRayleigh = (3.0 / (16.0 * PI)) * (1.0 + costheta2);
-    
-    //inScatteredLight *= phaseRayleigh; // apply rayleigh pahse
     inScatteredLight *= sunIntensity; // multiply by the intensity of the sun
 
     return inScatteredLight;
@@ -361,10 +362,14 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     vec3 firstPointPlanetSpace = firstPointInAtmosphere - planetPosition;
 
-    return vec3(1.0 - worley(firstPointPlanetSpace/100000.0, 1.0, false).x) * completeNoise(firstPointPlanetSpace/100000.0, 3, 2.0, 2.0);
+    //return vec3(1.0 - worley(firstPointPlanetSpace/100000.0, 1.0, false).x) * completeNoise(firstPointPlanetSpace/100000.0, 3, 2.0, 2.0);
 
-    vec3 light = calculateLight(firstPointInAtmosphere, rayDir, distanceThroughAtmosphere, originalColor); // calculate scattering
+    vec3 light = vec3(calculateLight(firstPointInAtmosphere, rayDir, distanceThroughAtmosphere, originalColor)); // calculate scattering
     
+	float ndl = -dot(normalize(rayOrigin + rayDir * impactPoint - planetPosition), normalize(rayOrigin + rayDir * impactPoint - sunPosition));
+
+	light *= max(ndl, 0.0);
+
     return originalColor * (1.0 - light) + light; // blending scattered color with original color
 }
 
