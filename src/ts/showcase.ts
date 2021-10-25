@@ -85,7 +85,7 @@ ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 //ocean.settings.oceanRadius = 0;
 
-let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 10e3, radius + 20e3, sun, player.firstPersonCamera, scene);
+let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 18e2, radius + 22e3, sun, player.firstPersonCamera, scene);
 
 
 //let invert = new InvertPostProcess("invert", scene.activeCamera, scene);

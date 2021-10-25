@@ -1,7 +1,7 @@
 precision mediump float;
 
 #define PI 3.1415926535897932
-#define POINTS_FROM_CAMERA 4 // number sample points along camera ray
+#define POINTS_FROM_CAMERA 7 // number sample points along camera ray
 #define OPTICAL_DEPTH_POINTS 4 // number sample points along light ray
 
 // varying
@@ -238,6 +238,17 @@ float completeNoise(vec3 p, int nbOctaves, float decay, float lacunarity) {
 	return value / totalAmplitude;
 }
 
+float completeWorley(vec3 p, int nbOctaves, float decay, float lacunarity) {
+	float totalAmplitude = 0.0;
+	float value = 0.0;
+	for(int i = 0; i < nbOctaves; ++i) {
+		totalAmplitude += 1.0 / pow(decay, float(i));
+		vec3 samplePoint = p * pow(lacunarity, float(i)); 
+		value += worley(samplePoint, 1.0).x / pow(decay, float(i));
+	}
+	return value / totalAmplitude;
+}
+
 // compute the world position of a pixel from its uv coordinates
 vec3 worldFromUV(vec2 pos) {
     vec4 ndc = vec4(pos.xy * 2.0 - 1.0, -1.0, 1.0); // get ndc position -1 because i want every point in the near camera plane
@@ -278,15 +289,27 @@ float densityAtPoint(vec3 densitySamplePoint) {
 
 	vec3 unitSphereCoord = normalize(densitySamplePointPlanetSpace);
 
-    localDensity = (1.0 - worley(unitSphereCoord*20.0, 1.0).x);
-	localDensity *= pow(completeNoise(densitySamplePointPlanetSpace/5000.0, 3, 2.0, 2.0), 2.0);
+
+    localDensity = 1.0 - completeWorley(unitSphereCoord*10.0, 2, 2.0, 2.0);
+	localDensity *= completeNoise(unitSphereCoord*10.0, 5, 2.0, 2.0);
+	//localDensity *= completeNoise(densitySamplePointPlanetSpace/10000.0, 5, 2.0, 2.0);
+
+
+	float roundBottom = saturate(remap(height01, 0.0, 0.07, 0.0, 1.0));
+	float roundTop = saturate(remap(height01, localDensity*0.2, localDensity, 1.0, 0.0));
+	float reduceDensityBottom = localDensity * saturate(remap(localDensity, 0.0, 0.15, 0.0, 1.0));
+	float softerTransitionTowardTop = saturate(remap(localDensity, 0.9, 1.0, 1.0, 0.0));
+
+	//localDensity *= localDensity;
+	localDensity *= roundBottom * roundTop * reduceDensityBottom * softerTransitionTowardTop;
+	localDensity /= 10000.0;
 
 	//localDensity = pow(localDensity, 2.0);
 
 	//localDensity = 1.0 - exp(-localDensity/1000000.0);
 
 	// est lié au bug visuel
-	localDensity *= exp(-height01*11.0);
+	//localDensity *= exp(-height01*14.0);
 
     return localDensity;
 }
