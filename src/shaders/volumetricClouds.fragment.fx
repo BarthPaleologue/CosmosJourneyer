@@ -1,8 +1,8 @@
 precision mediump float;
 
 #define PI 3.1415926535897932
-#define POINTS_FROM_CAMERA 7 // number sample points along camera ray
-#define OPTICAL_DEPTH_POINTS 5 // number sample points along light ray
+#define POINTS_FROM_CAMERA 4 // number sample points along camera ray
+#define OPTICAL_DEPTH_POINTS 4 // number sample points along light ray
 
 // varying
 varying vec2 vUV; // screen coordinates
@@ -269,17 +269,17 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
 }
 
 // based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
-float densityAtPoint(vec3 densitySamplePoint, vec3 initialPoint) {
-    float heightAboveSurface = length(densitySamplePoint) - planetRadius; // actual height above surface
+float densityAtPoint(vec3 densitySamplePoint) {
+    float heightAboveSurface = length(densitySamplePoint - planetPosition) - planetRadius; // actual height above surface
     float height01 = heightAboveSurface / (atmosphereRadius - planetRadius); // normalized height between 0 and 1
     float localDensity = densityModifier * exp(-height01 * falloffFactor); // density with exponential falloff
-    //localDensity *= (1.0 - height01); // make it 0 at maximum height
 
-	vec3 unitSphereCoord = normalize(initialPoint);
-	vec3 unitSphereCoord2 = normalize(densitySamplePoint);
+	vec3 densitySamplePointPlanetSpace = densitySamplePoint - planetPosition;
 
-    localDensity = (1.0 - worley(unitSphereCoord2, 1.0).x);
-	localDensity *= pow(completeNoise(densitySamplePoint/20000.0, 3, 2.0, 2.0), 2.0);
+	vec3 unitSphereCoord = normalize(densitySamplePointPlanetSpace);
+
+    localDensity = (1.0 - worley(unitSphereCoord*20.0, 1.0).x);
+	localDensity *= pow(completeNoise(densitySamplePointPlanetSpace/5000.0, 3, 2.0, 2.0), 2.0);
 
 	//localDensity = pow(localDensity, 2.0);
 
@@ -302,7 +302,7 @@ float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     float accumulatedOpticalDepth = 0.0;
 
     for(int i = 0 ; i < OPTICAL_DEPTH_POINTS ; i++) {
-        float localDensity = densityAtPoint(densitySamplePoint, rayOrigin - planetPosition); // we get the density at the sample point
+        float localDensity = densityAtPoint(densitySamplePoint); // we get the density at the sample point
 
         accumulatedOpticalDepth += localDensity * stepSize; // linear approximation : density is constant between sample points
 
@@ -331,11 +331,11 @@ float calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 original
         
         float sunRayOpticalDepth = opticalDepth(samplePoint, sunDir, sunRayLengthInAtm); // scattered from the sun to the point
         
-        float viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
+        float viewRayOpticalDepth = 0.0;//opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
         
         float transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth)); // exponential scattering with coefficients
         
-        float localDensity = densityAtPoint(samplePointPlanetSpace, rayOrigin - planetPosition); // density at sample point
+        float localDensity = densityAtPoint(samplePoint); // density at sample point
 
         inScatteredLight += localDensity * transmittance * stepSize; // add the resulting amount of light scattered toward the camera
         
@@ -368,7 +368,7 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
     
 	float ndl = -dot(normalize(rayOrigin + rayDir * impactPoint - planetPosition), normalize(rayOrigin + rayDir * impactPoint - sunPosition));
 
-	light *= max(ndl, 0.0);
+	//light *= max(ndl, 0.0);
 
     return originalColor * (1.0 - light) + light; // blending scattered color with original color
 }
