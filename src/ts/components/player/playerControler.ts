@@ -1,7 +1,8 @@
+import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
 
-export class Player {
+export class PlayerControler {
 
     firstPersonCamera: BABYLON.FreeCamera;
     thirdPersonCamera: BABYLON.ArcRotateCamera;
@@ -9,7 +10,7 @@ export class Player {
     activeCamera: BABYLON.Camera;
 
     private speed: number = 1;
-    private rotationSpeed: number = Math.PI / 6;
+    private rotationSpeed: number = Math.PI / 4;
 
     private controls = {
         upKeys: [" "],
@@ -110,7 +111,7 @@ export class Player {
      * Listens to keyboard, rotate the player accordingly and computes equivalent displacement (the player is fixed at the origin)
      * @param keyboard the keyboard to listen to
      * @param deltaTime the time between 2 frames
-     * @returns the displacement of the player to apply to every other mesh
+     * @returns the negative displacement of the player to apply to every other mesh given the inputs
      */
     public listenToKeyboard(keyboard: Keyboard, deltaTime: number): BABYLON.Vector3 {
         // Update Rotation state
@@ -139,29 +140,64 @@ export class Player {
         let upwardDeplacement = this.getUpwardDirection().scale(this.speed * deltaTime);
         let rightDeplacement = this.getRightDirection().scale(this.speed * deltaTime);
 
-        if (keyboard.isAnyPressed(this.controls.forwardKeys)) deplacement.subtractInPlace(forwardDeplacement);
-        if (keyboard.isAnyPressed(this.controls.backwardKeys)) deplacement.addInPlace(forwardDeplacement);
-        if (keyboard.isAnyPressed(this.controls.leftKeys)) deplacement.addInPlace(rightDeplacement);
-        if (keyboard.isAnyPressed(this.controls.rightKeys)) deplacement.subtractInPlace(rightDeplacement);
-        if (keyboard.isAnyPressed(this.controls.upKeys)) deplacement.subtractInPlace(upwardDeplacement);
-        if (keyboard.isAnyPressed(this.controls.downKeys)) deplacement.addInPlace(upwardDeplacement);
+        if (keyboard.isAnyPressed(this.controls.forwardKeys)) deplacement.addInPlace(forwardDeplacement);
+        if (keyboard.isAnyPressed(this.controls.backwardKeys)) deplacement.subtractInPlace(forwardDeplacement);
+        if (keyboard.isAnyPressed(this.controls.leftKeys)) deplacement.subtractInPlace(rightDeplacement);
+        if (keyboard.isAnyPressed(this.controls.rightKeys)) deplacement.addInPlace(rightDeplacement);
+        if (keyboard.isAnyPressed(this.controls.upKeys)) deplacement.addInPlace(upwardDeplacement);
+        if (keyboard.isAnyPressed(this.controls.downKeys)) deplacement.subtractInPlace(upwardDeplacement);
 
         if (keyboard.isPressed("+")) this.speed *= 1.1;
         if (keyboard.isPressed("-")) this.speed /= 1.1;
         if (keyboard.isPressed("8")) this.speed = 30;
 
-        return deplacement;
+        return deplacement.scale(-1);
     }
 
     /**
      * Listens to mouse and rotate player accordingly
      * @param mouse the mouse to listen to
+     * @param deltaTime the time between 2 frames
      */
-    public listenToMouse(mouse: Mouse): void {
+    public listenToMouse(mouse: Mouse, deltaTime: number): void {
         // Update Rotation state
-        // TODO : use deltaTime here too
-        this.mesh.rotate(this.getRightDirection(), 0.1 * this.rotationSpeed * mouse.getDYToCenter() / Math.max(window.innerWidth, window.innerHeight), BABYLON.Space.WORLD);
-        this.mesh.rotate(this.getUpwardDirection(), 0.1 * this.rotationSpeed * mouse.getDXToCenter() / Math.max(window.innerWidth, window.innerHeight), BABYLON.Space.WORLD);
+        this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * mouse.getDYToCenter() / (Math.max(window.innerWidth, window.innerHeight) / 2), BABYLON.Space.WORLD);
+        this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * mouse.getDXToCenter() / (Math.max(window.innerWidth, window.innerHeight) / 2), BABYLON.Space.WORLD);
+    }
+
+    /**
+     * Listens to gamepad and rotate player accordingly and computes equivalent displacement (the player is fixed at the origin)
+     * @param gamepad the gamepad to listen to
+     * @param deltaTime the time between 2 frames
+     * @returns the negative displacement of the playerControler given the inputs
+     */
+    public listenToGamepad(gamepad: Gamepad, deltaTime: number): BABYLON.Vector3 {
+
+        let deplacement = BABYLON.Vector3.Zero();
+
+        let forwardDeplacement = this.getForwardDirection().scale(this.speed * deltaTime);
+        let upwardDeplacement = this.getUpwardDirection().scale(this.speed * deltaTime);
+        let rightDeplacement = this.getRightDirection().scale(this.speed * deltaTime);
+
+        deplacement.addInPlace(forwardDeplacement.scale(-gamepad.getAxisValue(GamepadAxis.LY)));
+        deplacement.addInPlace(rightDeplacement.scale(gamepad.getAxisValue(GamepadAxis.LX)));
+
+        deplacement.addInPlace(upwardDeplacement.scale(gamepad.getPressedValue(GamepadButton.ZR)));
+        deplacement.subtractInPlace(upwardDeplacement.scale(gamepad.getPressedValue(GamepadButton.ZL)));
+
+        if (gamepad.isPressed(GamepadButton.Start)) this.speed *= 1.1;
+        if (gamepad.isPressed(GamepadButton.Select)) this.speed /= 1.1;
+
+        // Update Rotation state
+        // pitch and yaw control
+        this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RY), BABYLON.Space.WORLD);
+        this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RX), BABYLON.Space.WORLD);
+
+        // roll control
+        this.mesh.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.L), BABYLON.Space.WORLD);
+        this.mesh.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.R), BABYLON.Space.WORLD);
+
+        return deplacement.scale(-1);
     }
 
 

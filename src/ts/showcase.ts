@@ -7,9 +7,10 @@ import { ChunkForge } from "./components/forge/chunkForge";
 import sunTexture from "../asset/textures/sun.jpg";
 
 import * as style from "../styles/style.scss";
-import { Player } from "./components/player/player";
+import { PlayerControler } from "./components/player/playerControler";
 import { Keyboard } from "./components/inputs/keyboard";
 import { Mouse } from "./components/inputs/mouse";
+import { GamepadButton, Gamepad } from "./components/inputs/gamepad";
 
 style.default;
 
@@ -36,7 +37,9 @@ let keyboard = new Keyboard();
 
 let mouse = new Mouse();
 
-let player = new Player(scene);
+let gamepad = new Gamepad();
+
+let player = new PlayerControler(scene);
 player.setSpeed(0.2 * radius);
 player.mesh.rotate(player.firstPersonCamera.getDirection(BABYLON.Axis.Y), -1, BABYLON.Space.WORLD);
 
@@ -97,8 +100,6 @@ ocean.settings.depthModifier = 0.004;
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
 
-console.log(BABYLON.Matrix.Identity());
-
 let isMouseEnabled = false;
 
 document.addEventListener("keydown", e => {
@@ -127,12 +128,16 @@ scene.executeWhenReady(() => {
         moon.update(player.mesh.position, forward, sun.position, scene.activeCamera!);
 
         if (isMouseEnabled) {
-            player.listenToMouse(mouse);
+            player.listenToMouse(mouse, engine.getDeltaTime() / 1000);
         }
+
+        gamepad.update();
+
+        let deplacement = player.listenToGamepad(gamepad, engine.getDeltaTime() / 1000);
 
         //planet.attachNode.rotation.y += 0.0002;
 
-        let deplacement = player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000);
+        deplacement.addInPlace(player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000));
         sun.position.addInPlace(deplacement);
 
         planet.surfaceMaterial.setVector3("v3LightPos", sun.absolutePosition);

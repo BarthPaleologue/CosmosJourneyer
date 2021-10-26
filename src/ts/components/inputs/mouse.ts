@@ -8,9 +8,9 @@ export class Mouse {
     private mouseDXToCenter = 0;
     private mouseDYToCenter = 0;
 
-    private deadAreaRadius = 100;
+    private _deadAreaRadius = 100;
 
-    constructor() {
+    constructor(deadAreaRadius = 100) {
         window.addEventListener("mousemove", e => {
             this.mouseDX = (e.x - this.mouseX) / window.innerWidth;
             this.mouseDY = (e.y - this.mouseY) / window.innerHeight;
@@ -21,13 +21,21 @@ export class Mouse {
             this.mouseDXToCenter = e.x - window.innerWidth / 2;
             this.mouseDYToCenter = e.y - window.innerHeight / 2;
 
-            if (this.mouseDXToCenter ** 2 + this.mouseDYToCenter ** 2 < this.deadAreaRadius ** 2) {
+            if (this.mouseDXToCenter ** 2 + this.mouseDYToCenter ** 2 < this._deadAreaRadius ** 2) {
                 this.mouseDXToCenter = 0;
                 this.mouseDYToCenter = 0;
             }
+
+            this._deadAreaRadius = deadAreaRadius;
         });
     }
 
+    public getX(): number {
+        return this.mouseX;
+    }
+    public getY(): number {
+        return this.mouseY;
+    }
     public getDX(): number {
         return this.mouseDX;
     }
@@ -39,5 +47,11 @@ export class Mouse {
     }
     public getDYToCenter(): number {
         return this.mouseDYToCenter;
+    }
+    public getDeadAreaRadius() {
+        return this._deadAreaRadius;
+    }
+    public setDeadAreaRadius(newDeadAreaRadius: number) {
+        this._deadAreaRadius = newDeadAreaRadius;
     }
 }
