@@ -1,13 +1,13 @@
 import { Planet } from "./planet";
 import { ChunkForge, TaskType } from "../forge/chunkForge";
 import { Direction, getRotationMatrixFromDirection } from "../toolbox/direction";
-import { Vector3 } from "../toolbox/algebra";
+import { Matrix3, Vector3 } from "../toolbox/algebra";
 
 /**
- * Returns the chunk position in plane space
+ * Returns the node position in plane space
  * @param chunkLength the length of a chunk
- * @param path the path of the chunk
- * @returns the plane coordinates of the chunk
+ * @param path the path of the node
+ * @returns the plane space coordinates of the chunk
  */
 export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: number[]): Vector3 {
     let [x, y] = [0, 0];
@@ -17,46 +17,61 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
               +
             0   1
         */
-        // i have no idea why i divide by four but it works heh
+        // offset to get to the center of the children from the center of the current chunk
+        // (chunkLength / 2) / (2 ** (i + 1)) est la moitié de la taille d'un chunk enfant (offset) donc on simplifie pas : c'est plus clair ainsi
         switch (path[i]) {
             case 0:
-                x -= chunkLength / 4 / (2 ** i);
-                y -= chunkLength / 4 / (2 ** i);
+                x -= (chunkLength / 2) / (2 ** (i + 1));
+                y -= (chunkLength / 2) / (2 ** (i + 1));
                 break;
             case 1:
-                x += chunkLength / 4 / (2 ** i);
-                y -= chunkLength / 4 / (2 ** i);
+                x += (chunkLength / 2) / (2 ** (i + 1));
+                y -= (chunkLength / 2) / (2 ** (i + 1));
                 break;
             case 2:
-                x += chunkLength / 4 / (2 ** i);
-                y += chunkLength / 4 / (2 ** i);
+                x += (chunkLength / 2) / (2 ** (i + 1));
+                y += (chunkLength / 2) / (2 ** (i + 1));
                 break;
             case 3:
-                x -= chunkLength / 4 / (2 ** i);
-                y += chunkLength / 4 / (2 ** i);
+                x -= (chunkLength / 2) / (2 ** (i + 1));
+                y += (chunkLength / 2) / (2 ** (i + 1));
                 break;
+            default:
+                throw new Error(`${path[i]} is not a valid index for a child of a quadtree node !`);
         }
     }
     return new Vector3(x, y, 0);
 }
 
 /**
- * Returns chunk position in sphere space (doesn't account for rotation of the planet yet tho)
+ * Returns chunk position in planet space
  * @param chunkLength the length of the chunk
  * @param path the path to the chunk in the quadtree
  * @param direction direction of the parent plane
- * @returns the position in sphere space (no planet rotation)
+ * @returns the position in planet space
  */
-export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: number[], direction: Direction) {
+export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: number[], direction: Direction, parentRotation: BABYLON.Vector3): Vector3 {
+
+    // on récupère la position dans le plan
     let position = getChunkPlaneSpacePositionFromPath(chunkLength, path);
 
+    // on l'offset pour préparer à récupérer la position dans le cube
     position.addInPlace(new Vector3(0, 0, -chunkLength / 2));
 
+    // on récupère la position dans le cube
+    let rotationMatrix = getRotationMatrixFromDirection(direction);
+    position = position.applyMatrixToNew(rotationMatrix);
+
+    // on projette cette position sur la sphère
     position = position.normalizeToNew().scaleToNew(chunkLength / 2);
 
-    let rotationMatrix = getRotationMatrixFromDirection(direction);
+    // on match cette position avec la rotation de la planète
+    position = position.applyMatrixToNew(Matrix3.RotationX(parentRotation.x));
+    position = position.applyMatrixToNew(Matrix3.RotationY(parentRotation.y));
+    position = position.applyMatrixToNew(Matrix3.RotationZ(parentRotation.z));
 
-    return position.applyMatrixToNew(rotationMatrix);
+    // c'est prêt !
+    return position;
 }
 
 export class PlanetChunk {

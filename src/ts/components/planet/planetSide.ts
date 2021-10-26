@@ -113,10 +113,8 @@ export class PlanetSide {
      */
     private updateLODRecursively(observerPosition: BABYLON.Vector3, facingDirection: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
-        let relativePosition = getChunkSphereSpacePositionFromPath(this.chunkLength, walked, this.direction);
-        relativePosition = relativePosition.applyMatrixToNew(Matrix3.RotationX(this.parent.rotation.x));
-        relativePosition = relativePosition.applyMatrixToNew(Matrix3.RotationY(this.parent.rotation.y));
-        relativePosition = relativePosition.applyMatrixToNew(Matrix3.RotationZ(this.parent.rotation.z));
+        let relativePosition = getChunkSphereSpacePositionFromPath(this.chunkLength, walked, this.direction, this.parent.rotation);
+
         // position par rapport à la caméra
         let parentPosition = new Vector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
         let absolutePosition = relativePosition.addToNew(parentPosition);

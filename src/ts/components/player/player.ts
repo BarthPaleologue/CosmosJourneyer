@@ -1,3 +1,6 @@
+import { Keyboard } from "../inputs/keyboard";
+import { Mouse } from "../inputs/mouse";
+
 export class Player {
 
     firstPersonCamera: BABYLON.FreeCamera;
@@ -5,10 +8,10 @@ export class Player {
 
     activeCamera: BABYLON.Camera;
 
-    speed: number = 1;
-    rotationSpeed: number = Math.PI / 6;
+    private speed: number = 1;
+    private rotationSpeed: number = Math.PI / 6;
 
-    readonly controls = {
+    private controls = {
         upKeys: [" "],
         downKeys: ["Shift"],
         forwardKeys: ["z", "Z"],
@@ -44,73 +47,121 @@ export class Player {
         this.activeCamera = this.firstPersonCamera;
     }
 
+    /* #region directions */
+
+    /**
+     * 
+     * @returns the unit vector pointing forward the player controler in world space
+     */
     public getForwardDirection(): BABYLON.Vector3 {
         return this.mesh.getDirection(BABYLON.Axis.Z);
     }
 
+    /**
+     * 
+     * @returns the unit vector pointing backward the player controler in world space
+     */
+    public getBackwardDirection(): BABYLON.Vector3 {
+        return this.getForwardDirection().scale(-1);
+    }
+
+    /**
+     * 
+     * @returns the unit vector pointing upward the player controler in world space
+     */
     public getUpwardDirection(): BABYLON.Vector3 {
         return this.mesh.getDirection(BABYLON.Axis.Y);
     }
 
+    /**
+     * 
+     * @returns the unit vector pointing downward the player controler in world space
+     */
+    public getDownwardDirection(): BABYLON.Vector3 {
+        return this.getUpwardDirection().scale(-1);
+    }
+
+    /**
+     * 
+     * @returns the unit vector pointing to the right of the player controler in world space
+     */
     public getRightDirection(): BABYLON.Vector3 {
         return this.mesh.getDirection(BABYLON.Axis.X);
     }
 
-    private isAnyOfKeysPressed(keys: string[], keyboard: { [key: string]: boolean; }): boolean {
-        for (const key of keys) {
-            if (keyboard[key]) return true;
-        }
-        return false;
+    /**
+     * 
+     * @returns the unit vector pointing to the left of the player controler in world space
+     */
+    public getLeftDirection(): BABYLON.Vector3 {
+        return this.getRightDirection().scale(-1);
+    }
+    /* #endregion directions */
+
+    /**
+     * Set new speed for player controler
+     * @param newSpeed the new speed value
+     */
+    public setSpeed(newSpeed: number) {
+        this.speed = newSpeed;
     }
 
-    public listenToKeyboard(keyboard: { [key: string]: boolean; }, deltaTime: number): BABYLON.Vector3 {
+    /**
+     * Listens to keyboard, rotate the player accordingly and computes equivalent displacement (the player is fixed at the origin)
+     * @param keyboard the keyboard to listen to
+     * @param deltaTime the time between 2 frames
+     * @returns the displacement of the player to apply to every other mesh
+     */
+    public listenToKeyboard(keyboard: Keyboard, deltaTime: number): BABYLON.Vector3 {
         // Update Rotation state
-        if (keyboard[this.controls.rollLeftKey]) { // rotation autour de l'axe de déplacement
+        if (keyboard.isPressed(this.controls.rollLeftKey)) { // rotation autour de l'axe de déplacement
             this.mesh.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
-        } else if (keyboard[this.controls.rollRightKey]) {
+        } else if (keyboard.isPressed(this.controls.rollRightKey)) {
             this.mesh.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
         }
 
-        if (keyboard[this.controls.pitchUpKey]) {
+        if (keyboard.isPressed(this.controls.pitchUpKey)) {
             this.mesh.rotate(this.getRightDirection(), -this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
-        } else if (keyboard[this.controls.picthDownKey]) {
+        } else if (keyboard.isPressed(this.controls.picthDownKey)) {
             this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
         }
 
-        if (keyboard[this.controls.yawLeftKey]) {
+        if (keyboard.isPressed(this.controls.yawLeftKey)) {
             this.mesh.rotate(this.getUpwardDirection(), -this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
-        } else if (keyboard[this.controls.yawRightKey]) {
+        } else if (keyboard.isPressed(this.controls.yawRightKey)) {
             this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
         }
 
         // Update displacement state
-
         let deplacement = BABYLON.Vector3.Zero();
 
         let forwardDeplacement = this.getForwardDirection().scale(this.speed * deltaTime);
         let upwardDeplacement = this.getUpwardDirection().scale(this.speed * deltaTime);
         let rightDeplacement = this.getRightDirection().scale(this.speed * deltaTime);
 
-        if (this.isAnyOfKeysPressed(this.controls.forwardKeys, keyboard)) deplacement.subtractInPlace(forwardDeplacement);
-        if (this.isAnyOfKeysPressed(this.controls.backwardKeys, keyboard)) deplacement.addInPlace(forwardDeplacement);
-        if (this.isAnyOfKeysPressed(this.controls.leftKeys, keyboard)) deplacement.addInPlace(rightDeplacement);
-        if (this.isAnyOfKeysPressed(this.controls.rightKeys, keyboard)) deplacement.subtractInPlace(rightDeplacement);
-        if (this.isAnyOfKeysPressed(this.controls.upKeys, keyboard)) deplacement.subtractInPlace(upwardDeplacement);
-        if (this.isAnyOfKeysPressed(this.controls.downKeys, keyboard)) deplacement.addInPlace(upwardDeplacement);
+        if (keyboard.isAnyPressed(this.controls.forwardKeys)) deplacement.subtractInPlace(forwardDeplacement);
+        if (keyboard.isAnyPressed(this.controls.backwardKeys)) deplacement.addInPlace(forwardDeplacement);
+        if (keyboard.isAnyPressed(this.controls.leftKeys)) deplacement.addInPlace(rightDeplacement);
+        if (keyboard.isAnyPressed(this.controls.rightKeys)) deplacement.subtractInPlace(rightDeplacement);
+        if (keyboard.isAnyPressed(this.controls.upKeys)) deplacement.subtractInPlace(upwardDeplacement);
+        if (keyboard.isAnyPressed(this.controls.downKeys)) deplacement.addInPlace(upwardDeplacement);
 
-        if (keyboard["+"]) this.speed *= 1.1;
-        if (keyboard["-"]) this.speed /= 1.1;
-        if (keyboard["8"]) this.speed = 30;
+        if (keyboard.isPressed("+")) this.speed *= 1.1;
+        if (keyboard.isPressed("-")) this.speed /= 1.1;
+        if (keyboard.isPressed("8")) this.speed = 30;
 
         return deplacement;
     }
 
-    public listenToMouse(mouseDX: number, mouseDY: number) {
+    /**
+     * Listens to mouse and rotate player accordingly
+     * @param mouse the mouse to listen to
+     */
+    public listenToMouse(mouse: Mouse): void {
         // Update Rotation state
-
-        this.mesh.rotate(this.getRightDirection(), 0.1 * this.rotationSpeed * mouseDY, BABYLON.Space.WORLD);
-        this.mesh.rotate(this.getUpwardDirection(), 0.1 * this.rotationSpeed * mouseDX, BABYLON.Space.WORLD);
-
+        // TODO : use deltaTime here too
+        this.mesh.rotate(this.getRightDirection(), 0.1 * this.rotationSpeed * mouse.getDYToCenter() / Math.max(window.innerWidth, window.innerHeight), BABYLON.Space.WORLD);
+        this.mesh.rotate(this.getUpwardDirection(), 0.1 * this.rotationSpeed * mouse.getDXToCenter() / Math.max(window.innerWidth, window.innerHeight), BABYLON.Space.WORLD);
     }
 
 

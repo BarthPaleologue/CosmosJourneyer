@@ -8,7 +8,8 @@ import sunTexture from "../asset/textures/sun.jpg";
 
 import * as style from "../styles/style.scss";
 import { Player } from "./components/player/player";
-import { InvertPostProcess } from "./components/postProcesses/invertPostProcess";
+import { Keyboard } from "./components/inputs/keyboard";
+import { Mouse } from "./components/inputs/mouse";
 
 style.default;
 
@@ -31,15 +32,19 @@ depthRenderer.getDepthMap().renderList = [];
 
 const radius = 200 * 1e3; // diamètre en m
 
+let keyboard = new Keyboard();
+
+let mouse = new Mouse();
+
 let player = new Player(scene);
-player.speed = 0.2 * radius;
+player.setSpeed(0.2 * radius);
 player.mesh.rotate(player.firstPersonCamera.getDirection(BABYLON.Axis.Y), -1, BABYLON.Space.WORLD);
 
 player.activeCamera.maxZ = Math.max(radius * 50, 10000);
 scene.activeCamera = player.activeCamera;
 
 
-let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.2 * radius, scene);
+let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);
 mat.emissiveTexture = new BABYLON.Texture(sunTexture, scene);
 sun.material = mat;
@@ -85,28 +90,24 @@ ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 //ocean.settings.oceanRadius = 0;
 
-let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 18e2, radius + 22e3, sun, player.firstPersonCamera, scene);
+//let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 35e2, radius + 36e3, sun, player.firstPersonCamera, scene);
 
 
 //let invert = new InvertPostProcess("invert", scene.activeCamera, scene);
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
 
+console.log(BABYLON.Matrix.Identity());
 
-let keyboard: { [key: string]: boolean; } = {};
-
-let isMouseEnabled = true;
+let isMouseEnabled = false;
 
 document.addEventListener("keydown", e => {
-    keyboard[e.key] = true;
     if (e.key == "p") { // take screenshots
         BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
     }
     if (e.key == "o") console.log(sun.absolutePosition, player.mesh.rotation);
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
 });
-
-document.addEventListener("keyup", e => keyboard[e.key] = false);
 
 window.addEventListener("resize", () => {
     canvas.width = window.innerWidth;
@@ -117,31 +118,6 @@ window.addEventListener("resize", () => {
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
-    let mouseX = 0;
-    let mouseY = 0;
-    let mouseDX = 0;
-    let mouseDY = 0;
-
-    let mouseDX2 = 0;
-    let mouseDY2 = 0;
-
-    let deadAreaRadius = 0.05;
-
-    window.addEventListener("mousemove", e => {
-        mouseDX = (e.x - mouseX) / window.innerWidth;
-        mouseDY = (e.y - mouseY) / window.innerHeight;
-        mouseX = e.x;
-        mouseY = e.y;
-
-        mouseDX2 = (e.x - window.innerWidth / 2) / window.innerWidth;
-        mouseDY2 = (e.y - window.innerHeight / 2) / window.innerHeight;
-
-        if (mouseDX2 ** 2 + mouseDY2 ** 2 < deadAreaRadius ** 2) {
-            mouseDX2 = 0;
-            mouseDY2 = 0;
-        }
-    });
-
     scene.beforeRender = () => {
         let forward = player.getForwardDirection();
 
@@ -151,10 +127,10 @@ scene.executeWhenReady(() => {
         moon.update(player.mesh.position, forward, sun.position, scene.activeCamera!);
 
         if (isMouseEnabled) {
-            player.listenToMouse(mouseDX2, mouseDY2);
+            player.listenToMouse(mouse);
         }
-        mouseDX = 0;
-        mouseDY = 0;
+
+        //planet.attachNode.rotation.y += 0.0002;
 
         let deplacement = player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000);
         sun.position.addInPlace(deplacement);

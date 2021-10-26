@@ -281,28 +281,48 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
 
 // based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
 float densityAtPoint(vec3 densitySamplePoint) {
-    float heightAboveSurface = length(densitySamplePoint - planetPosition) - planetRadius; // actual height above surface
+    
+	float heightAboveSurface = length(densitySamplePoint - planetPosition) - planetRadius; // actual height above surface
     float height01 = heightAboveSurface / (atmosphereRadius - planetRadius); // normalized height between 0 and 1
-    float localDensity = densityModifier * exp(-height01 * falloffFactor); // density with exponential falloff
-
+    
 	vec3 densitySamplePointPlanetSpace = densitySamplePoint - planetPosition;
 
 	vec3 unitSphereCoord = normalize(densitySamplePointPlanetSpace);
 
+	float weatherMap = 1.0 - completeWorley(unitSphereCoord*5.0, 1, 2.0, 2.0);
+	
+	float minValue = 0.2;
+	weatherMap = max(weatherMap - minValue, 0.0);
+	weatherMap /= 1.0 - minValue;
+    
+	weatherMap *= completeNoise(unitSphereCoord*10.0, 5, 2.0, 2.0);
+	
+	float detailNoise = completeNoise(densitySamplePointPlanetSpace/10000.0, 3, 2.0, 2.0);
+	float detailNoise2 = completeNoise(densitySamplePointPlanetSpace/3000.0, 3, 2.0, 2.0);
 
-    localDensity = 1.0 - completeWorley(unitSphereCoord*10.0, 2, 2.0, 2.0);
-	localDensity *= completeNoise(unitSphereCoord*10.0, 5, 2.0, 2.0);
-	//localDensity *= completeNoise(densitySamplePointPlanetSpace/10000.0, 5, 2.0, 2.0);
-
+	//localDensity = weatherMap * detailNoise * detailNoise2;
+	
+	float SNsample = remap(weatherMap, (weatherMap * 0.625 + detailNoise * 0.25 + detailNoise2 * 0.125)-1.0, 1.0, 0.0, 1.0);
 
 	float roundBottom = saturate(remap(height01, 0.0, 0.07, 0.0, 1.0));
-	float roundTop = saturate(remap(height01, localDensity*0.2, localDensity, 1.0, 0.0));
-	float reduceDensityBottom = localDensity * saturate(remap(localDensity, 0.0, 0.15, 0.0, 1.0));
-	float softerTransitionTowardTop = saturate(remap(localDensity, 0.9, 1.0, 1.0, 0.0));
+	float roundTop = saturate(remap(height01, weatherMap * 0.2, weatherMap, 1.0, 0.0));
+	
+	float roundCorrection = roundBottom * roundTop;
+
+	float reduceDensityBottom = weatherMap * saturate(remap(weatherMap, 0.0, 0.15, 0.0, 1.0));
+	float softerTransitionTowardTop = saturate(remap(weatherMap, 0.9, 1.0, 1.0, 0.0));
+
+	float densityCorrection = reduceDensityBottom * softerTransitionTowardTop * weatherMap;
+
+	//float WMc = max(wc0, SAT(gc −0.5) * wc1 * 2);
+
+	float localDensity = saturate(remap(SNsample * roundCorrection, 1.0 - 0.5 * 1.0, 1.0, 0.0, 1.0)) * densityCorrection;
 
 	//localDensity *= localDensity;
-	localDensity *= roundBottom * roundTop * reduceDensityBottom * softerTransitionTowardTop;
-	localDensity /= 10000.0;
+	//localDensity *= roundBottom * roundTop * reduceDensityBottom * softerTransitionTowardTop;
+
+
+	localDensity /= 1000.0;
 
 	//localDensity = pow(localDensity, 2.0);
 
@@ -324,7 +344,7 @@ float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
 
     float accumulatedOpticalDepth = 0.0;
 
-    for(int i = 0 ; i < OPTICAL_DEPTH_POINTS ; i++) {
+    for(int i = 0 ; i < OPTICAL_DEPTH_POINTS ; ++i) {
         float localDensity = densityAtPoint(densitySamplePoint); // we get the density at the sample point
 
         accumulatedOpticalDepth += localDensity * stepSize; // linear approximation : density is constant between sample points
@@ -354,7 +374,7 @@ float calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 original
         
         float sunRayOpticalDepth = opticalDepth(samplePoint, sunDir, sunRayLengthInAtm); // scattered from the sun to the point
         
-        float viewRayOpticalDepth = 0.0;//opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
+        float viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
         
         float transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth)); // exponential scattering with coefficients
         
@@ -365,7 +385,8 @@ float calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 original
         samplePoint += rayDir * stepSize; // move sample point along view ray
     }
 
-    inScatteredLight *= sunIntensity; // multiply by the intensity of the sun
+	// faudra revoir ça c'est fishy
+    inScatteredLight *= 10.0; // multiply by the intensity of the sun
 
     return inScatteredLight;
 }
@@ -385,13 +406,14 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     vec3 firstPointPlanetSpace = firstPointInAtmosphere - planetPosition;
 
-    //return vec3(1.0 - worley(firstPointPlanetSpace/100000.0, 1.0, false).x) * completeNoise(firstPointPlanetSpace/100000.0, 3, 2.0, 2.0);
-
     vec3 light = vec3(calculateLight(firstPointInAtmosphere, rayDir, distanceThroughAtmosphere, originalColor)); // calculate scattering
     
 	float ndl = -dot(normalize(rayOrigin + rayDir * impactPoint - planetPosition), normalize(rayOrigin + rayDir * impactPoint - sunPosition));
 
-	//light *= max(ndl, 0.0);
+	ndl = saturate(ndl + 0.2);
+
+	light *= ndl;
+	//light *= saturate(max(1.0 - pow(1.0 - ndl, 4.0), 0.0));
 
     return originalColor * (1.0 - light) + light; // blending scattered color with original color
 }

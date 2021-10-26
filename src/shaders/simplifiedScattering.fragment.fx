@@ -135,6 +135,9 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 originalC
     inScatteredLight *= phaseRayleigh; // apply rayleigh pahse
     inScatteredLight *= sunIntensity; // multiply by the intensity of the sun
 
+    // test illumination soleil
+    //inScatteredLight *= 1.0 + pow(dot(rayDir, sunDir), 12.0);
+    
     return inScatteredLight;
 }
 

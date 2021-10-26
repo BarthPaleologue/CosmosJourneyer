@@ -136,4 +136,12 @@ export class Matrix3 {
             [0, 0, 1]
         ]);
     }
+    static FromBABYLON(M: BABYLON.Matrix) {
+        let m = M.m;
+        return new Matrix3([
+            [m[0], m[4], m[8]],
+            [m[1], m[5], m[9]],
+            [m[2], m[6], m[10]]
+        ]);
+    }
 }
