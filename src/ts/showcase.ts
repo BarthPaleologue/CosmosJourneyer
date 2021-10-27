@@ -12,7 +12,7 @@ import * as style from "../styles/style.scss";
 import { PlayerControler } from "./components/player/playerControler";
 import { Keyboard } from "./components/inputs/keyboard";
 import { Mouse } from "./components/inputs/mouse";
-import { GamepadButton, Gamepad } from "./components/inputs/gamepad";
+import { Gamepad } from "./components/inputs/gamepad";
 import { CollisionData } from "./components/forge/CollisionData";
 
 style.default;
@@ -39,17 +39,15 @@ depthRenderer.getDepthMap().renderList = [];
 const radius = 200 * 1e3; // diamètre en m
 
 let keyboard = new Keyboard();
-
 let mouse = new Mouse();
-
 let gamepad = new Gamepad();
 
 let player = new PlayerControler(scene);
 player.setSpeed(0.2 * radius);
-player.mesh.rotate(player.firstPersonCamera.getDirection(BABYLON.Axis.Y), -1, BABYLON.Space.WORLD);
+player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), -1, BABYLON.Space.WORLD);
 
-player.activeCamera.maxZ = Math.max(radius * 50, 10000);
-scene.activeCamera = player.activeCamera;
+player.camera.maxZ = Math.max(radius * 50, 10000);
+scene.activeCamera = player.camera;
 
 
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
@@ -62,6 +60,8 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 
 let forge = new ChunkForge(64);
 
+let planets: Planet[] = [];
+
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, forge, scene);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 300;
@@ -70,6 +70,7 @@ planet.colorSettings.waterLevel = 10e2;
 
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
+planets.push(planet);
 
 let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(-0.7), 0, Math.sin(-0.7)).scale(3 * radius), 1, forge, scene);
 moon.terrainSettings.continentsFragmentation = 0;
@@ -84,10 +85,11 @@ moon.updateColors();
 
 moon.attachNode.parent = planet.attachNode;
 planet.attachNode.parent = sun;
+planets.push(moon);
 
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 20e3, radius + 40e3, sun, player.firstPersonCamera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 20e3, radius + 40e3, sun, player.camera, scene);
 atmosphere.settings.intensity = 10;
 atmosphere.settings.falloffFactor = 20;
 atmosphere.settings.scatteringStrength = 0.4;
@@ -121,28 +123,26 @@ window.addEventListener("resize", () => {
     engine.resize();
 });
 
-let collisionWorker = new Worker(new URL('./components/forge/builder.worker.ts', import.meta.url), { type: "module" });
+let collisionWorker = new Worker(new URL('./components/workers/workerScript.ts', import.meta.url), { type: "module" });
 let collisionWorkerAvailable = true;
 
 collisionWorker.onmessage = e => {
-    let direction = planet.attachNode.absolutePosition.normalizeToNew();
-    let currentHeight = planet.attachNode.absolutePosition.length(); // ellipsoid
-    let terrainHeight = e.data.h;
+    if (player.nearestPlanet == null) return;
 
-    //console.log(currentHeight, terrainHeight);
+    let direction = player.nearestPlanet.getAbsolutePosition().normalizeToNew();
+    let currentHeight = planet.getAbsolutePosition().length(); // ellipsoid
+    let terrainHeight = e.data.h;
 
     let currentPosition = planet.attachNode.absolutePosition;
     let newPosition = currentPosition;
 
-    let offset = 1000;
-
-    if (currentHeight - offset < terrainHeight) {
-        newPosition = direction.scale(terrainHeight + offset);
+    if (currentHeight - player.collisionRadius < terrainHeight) {
+        newPosition = direction.scale(terrainHeight + player.collisionRadius);
     }
 
     let deviation = newPosition.subtract(currentPosition);
 
-    sun.position.addInPlace(deviation.scale(1));
+    sun.position.addInPlace(deviation);
 
     collisionWorkerAvailable = true;
 };
@@ -151,6 +151,16 @@ scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
     scene.beforeRender = () => {
+        for (const planet of planets) {
+            if (player.nearestPlanet == null) player.nearestPlanet = planet;
+            else {
+                if (planet.attachNode.absolutePosition.lengthSquared() < player.nearestPlanet.attachNode.absolutePosition.lengthSquared()) {
+                    player.nearestPlanet = planet;
+                }
+            }
+        }
+
+
         let forward = player.getForwardDirection();
 
         forge.update(depthRenderer);
@@ -173,13 +183,17 @@ scene.executeWhenReady(() => {
         deplacement.addInPlace(player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000));
         sun.position.addInPlace(deplacement);
 
-        if (collisionWorkerAvailable) {
+        if (collisionWorkerAvailable && player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() < player.nearestPlanet.radius * 2) {
             collisionWorker.postMessage({
                 taskType: "collisionTask",
-                terrainSettings: planet.terrainSettings,
-                position: [-planet.attachNode.absolutePosition.x, -planet.attachNode.absolutePosition.y, -planet.attachNode.absolutePosition.z],
-                chunkLength: planet.chunkLength,
-                craters: planet.craters
+                terrainSettings: player.nearestPlanet.terrainSettings,
+                position: [
+                    -player.nearestPlanet.getAbsolutePosition().x,
+                    -player.nearestPlanet.getAbsolutePosition().y,
+                    -player.nearestPlanet.getAbsolutePosition().z
+                ],
+                chunkLength: player.nearestPlanet.chunkLength,
+                craters: player.nearestPlanet.craters
             } as CollisionData);
             collisionWorkerAvailable = false;
         }

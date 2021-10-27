@@ -235,4 +235,10 @@ export class Planet {
         this.surfaceMaterial.setMatrix("planetWorldMatrix", this.attachNode.getWorldMatrix());
         this.updateLOD(position, facingDirection);
     }
+    public getRelativePosition() {
+        return this.attachNode.position;
+    }
+    public getAbsolutePosition() {
+        return this.attachNode.absolutePosition;
+    }
 }

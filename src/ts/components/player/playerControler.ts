@@ -1,16 +1,17 @@
 import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
+import { Planet } from "../planet/planet";
 
 export class PlayerControler {
 
-    firstPersonCamera: BABYLON.FreeCamera;
-    thirdPersonCamera: BABYLON.ArcRotateCamera;
+    nearestPlanet: Planet | null;
+    collisionRadius = 200;
 
-    activeCamera: BABYLON.Camera;
+    camera: BABYLON.FreeCamera;
 
-    private speed: number = 1;
-    private rotationSpeed: number = Math.PI / 4;
+    private speed = 1;
+    private rotationSpeed = Math.PI / 4;
 
     private controls = {
         upKeys: [" "],
@@ -38,14 +39,10 @@ export class PlayerControler {
         mat.emissiveColor = BABYLON.Color3.White();
         this.mesh.material = mat;
 
-        this.firstPersonCamera = new BABYLON.FreeCamera("firstPersonCamera", BABYLON.Vector3.Zero(), scene);
-        this.firstPersonCamera.parent = this.mesh;
+        this.camera = new BABYLON.FreeCamera("firstPersonCamera", BABYLON.Vector3.Zero(), scene);
+        this.camera.parent = this.mesh;
 
-        this.thirdPersonCamera = new BABYLON.ArcRotateCamera("thirdPersonCamera", 0, 0, 5, this.mesh.position, scene);
-        this.thirdPersonCamera.parent = this.mesh;
-        this.thirdPersonCamera.attachControl(scene.getEngine().getRenderingCanvas());
-
-        this.activeCamera = this.firstPersonCamera;
+        this.nearestPlanet = null;
     }
 
     /* #region directions */

@@ -5,10 +5,10 @@ import { Vector3 } from "../toolbox/algebra";
 import { MountainNoiseLayer } from "../terrain/landscape/moutainNoiseLayer";
 import { ContinentNoiseLayer } from "../terrain/landscape/continentNoiseLayer";
 import { CraterLayer } from "../terrain/crater/craterLayer";
-import { buildData } from "./buildData";
+import { buildData } from "../forge/buildData";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { _MeshCollisionData } from "babylonjs/Collisions/meshCollisionData";
-import { CollisionData } from "./CollisionData";
+import { CollisionData } from "../forge/CollisionData";
 
 let bumpyLayer: SimplexNoiseLayer;
 let continentsLayer2: SimplexNoiseLayer;

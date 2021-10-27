@@ -1,5 +1,6 @@
 import { Planet } from "../planet/planet";
 import { Direction } from "../toolbox/direction";
+import { BuilderWorker } from "../workers/builderWorker";
 import { buildData } from "./buildData";
 
 export enum TaskType {
@@ -42,14 +43,15 @@ export class ChunkForge {
     trashCan: DeleteTask[] = [];
     applyTasks: ApplyTask[] = [];
 
-    availableWorkers: Worker[] = []; // liste des workers disponibles pour exécuter des tâches
-    finishedWorkers: Worker[] = []; // liste des workers ayant terminé leur tâche (prêts à être réintégré dans la liste des workers disponibles)
+    availableWorkers: BuilderWorker[] = []; // liste des workers disponibles pour exécuter des tâches
+    finishedWorkers: BuilderWorker[] = []; // liste des workers ayant terminé leur tâche (prêts à être réintégré dans la liste des workers disponibles)
 
     constructor(subdivisions: number) {
         this.subdivisions = subdivisions;
         const nbMaxWorkers = navigator.hardwareConcurrency - 2; // le -2 c'est parce que faut compter le main thread et le collision worker
         for (let i = 0; i < nbMaxWorkers; ++i) {
-            let worker = new Worker(new URL('./builder.worker.ts', import.meta.url));
+            let worker = new BuilderWorker();
+            //let worker = new Worker(new URL('../workers/workerScript.ts', import.meta.url));
             this.availableWorkers.push(worker);
         }
     }
@@ -62,7 +64,7 @@ export class ChunkForge {
      * Executes the next task using an available worker
      * @param worker the web worker assigned to the next task
      */
-    executeNextTask(worker: Worker) {
+    executeNextTask(worker: BuilderWorker) {
         if (this.incomingTasks.length > 0) {
             this.executeTask(this.incomingTasks.shift()!, worker);
         } else {
@@ -70,7 +72,7 @@ export class ChunkForge {
         }
     }
 
-    executeTask(task: DeleteTask | BuildTask, worker: Worker) {
+    executeTask(task: DeleteTask | BuildTask, worker: BuilderWorker) {
 
         switch (task.taskType) {
             case TaskType.Build:
@@ -84,7 +86,7 @@ export class ChunkForge {
                     this.incomingTasks.shift();
                 }
 
-                worker.postMessage({
+                worker.send({
                     taskType: "buildTask",
                     chunkLength: task.chunkLength,
                     subdivisions: this.subdivisions,
@@ -95,7 +97,7 @@ export class ChunkForge {
                     terrainSettings: task.planet.terrainSettings,
                 } as buildData);
 
-                worker.onmessage = e => {
+                worker.getWorker().onmessage = e => {
                     let vertexData = new BABYLON.VertexData();
                     vertexData.positions = e.data.p as Float32Array;
                     vertexData.indices = e.data.i as Uint16Array;
