@@ -4,6 +4,8 @@ import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
 import { VolumetricCloudsPostProcess } from "./components/postProcesses/volumetricCloudsPostProcess";
 import { ChunkForge } from "./components/forge/chunkForge";
 
+//import * as BABYLON from "babylonjs";
+
 import sunTexture from "../asset/textures/sun.jpg";
 
 import * as style from "../styles/style.scss";
@@ -11,6 +13,7 @@ import { PlayerControler } from "./components/player/playerControler";
 import { Keyboard } from "./components/inputs/keyboard";
 import { Mouse } from "./components/inputs/mouse";
 import { GamepadButton, Gamepad } from "./components/inputs/gamepad";
+import { CollisionData } from "./components/forge/CollisionData";
 
 style.default;
 
@@ -25,6 +28,8 @@ console.log("GPU utilisé : " + engine.getGlInfo().renderer);
 
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+
+scene.enablePhysics(new BABYLON.Vector3(0, 0, 0), new BABYLON.OimoJSPlugin());
 
 let depthRenderer = new BABYLON.DepthRenderer(scene);
 scene.renderTargetsEnabled = true;
@@ -116,6 +121,32 @@ window.addEventListener("resize", () => {
     engine.resize();
 });
 
+let collisionWorker = new Worker(new URL('./components/forge/builder.worker.ts', import.meta.url), { type: "module" });
+let collisionWorkerAvailable = true;
+
+collisionWorker.onmessage = e => {
+    let direction = planet.attachNode.absolutePosition.normalizeToNew();
+    let currentHeight = planet.attachNode.absolutePosition.length(); // ellipsoid
+    let terrainHeight = e.data.h;
+
+    //console.log(currentHeight, terrainHeight);
+
+    let currentPosition = planet.attachNode.absolutePosition;
+    let newPosition = currentPosition;
+
+    let offset = 1000;
+
+    if (currentHeight - offset < terrainHeight) {
+        newPosition = direction.scale(terrainHeight + offset);
+    }
+
+    let deviation = newPosition.subtract(currentPosition);
+
+    sun.position.addInPlace(deviation.scale(1));
+
+    collisionWorkerAvailable = true;
+};
+
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
@@ -133,12 +164,26 @@ scene.executeWhenReady(() => {
 
         gamepad.update();
 
+        gamepad.list();
+
         let deplacement = player.listenToGamepad(gamepad, engine.getDeltaTime() / 1000);
 
         //planet.attachNode.rotation.y += 0.0002;
 
         deplacement.addInPlace(player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000));
         sun.position.addInPlace(deplacement);
+
+        if (collisionWorkerAvailable) {
+            collisionWorker.postMessage({
+                taskType: "collisionTask",
+                terrainSettings: planet.terrainSettings,
+                position: [-planet.attachNode.absolutePosition.x, -planet.attachNode.absolutePosition.y, -planet.attachNode.absolutePosition.z],
+                chunkLength: planet.chunkLength,
+                craters: planet.craters
+            } as CollisionData);
+            collisionWorkerAvailable = false;
+        }
+
 
         planet.surfaceMaterial.setVector3("v3LightPos", sun.absolutePosition);
         planet.surfaceMaterial.setVector3("planetPosition", planet.attachNode.absolutePosition);

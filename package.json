@@ -28,5 +28,9 @@
     "build:prod": "webpack --mode=production --node-env=production",
     "watch": "webpack --watch",
     "serve": "webpack serve"
+  },
+  "dependencies": {
+    "@types/babylonjs": "^2.4.1",
+    "babylonjs": "^4.2.0"
   }
 }

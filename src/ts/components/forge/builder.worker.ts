@@ -7,6 +7,8 @@ import { ContinentNoiseLayer } from "../terrain/landscape/continentNoiseLayer";
 import { CraterLayer } from "../terrain/crater/craterLayer";
 import { buildData } from "./buildData";
 import { TerrainSettings } from "../terrain/terrainSettings";
+import { _MeshCollisionData } from "babylonjs/Collisions/meshCollisionData";
+import { CollisionData } from "./CollisionData";
 
 let bumpyLayer: SimplexNoiseLayer;
 let continentsLayer2: SimplexNoiseLayer;
@@ -61,12 +63,6 @@ function terrainFunction(p: Vector3, planetRadius: number): Vector3 {
 
     return newPosition;
 };
-
-function setVerticesPositionsAndFaces(positions: Float32Array, faces: number[][]) {
-
-}
-
-
 
 self.onmessage = e => {
     if (e.data.taskType == "buildTask") {
@@ -164,6 +160,18 @@ self.onmessage = e => {
 
         // benchmark fait le 5/10/2021 (normal non analytique) : ~2s/chunk
         //console.log("Time for creation : " + (Date.now() - clock));
+
+    } else if (e.data.taskType == "collisionTask") {
+        let data = e.data as CollisionData;
+
+        craterLayer.craters = data.craters;
+        terrainSettings = data.terrainSettings;
+
+        let samplePosition = Vector3.FromArray(data.position).normalizeToNew().scaleToNew(data.chunkLength / 2);
+
+        self.postMessage({
+            h: terrainFunction(samplePosition, data.chunkLength / 2).getMagnitude(),
+        });
 
     } else {
         console.error(`Type de tâche reçue invalide : ${e.data.taskType}`);

@@ -96,6 +96,16 @@ export class Gamepad {
     public isPressed(button: GamepadButton): boolean {
         return this.gamepad?.buttons[this.buttonMapping[button]].pressed || false;
     }
+
+
+    public list() {
+        let r = [];
+        for (let i = 0; i < (this.gamepad?.buttons || 0); ++i) {
+            if (this.gamepad?.buttons[i].pressed) r.push(i);
+        }
+        if (r.length > 0) console.log(r);
+    }
+
     /**
      * Retourne la valeur de pression du bouton (voir gachettes analogiques)
      * @param button le bouton à écouter

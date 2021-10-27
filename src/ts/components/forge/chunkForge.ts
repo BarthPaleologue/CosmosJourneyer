@@ -47,7 +47,7 @@ export class ChunkForge {
 
     constructor(subdivisions: number) {
         this.subdivisions = subdivisions;
-        const nbMaxWorkers = navigator.hardwareConcurrency - 1; // le -1 c'est parce que faut compter le main thread aussi mdr
+        const nbMaxWorkers = navigator.hardwareConcurrency - 2; // le -2 c'est parce que faut compter le main thread et le collision worker
         for (let i = 0; i < nbMaxWorkers; ++i) {
             let worker = new Worker(new URL('./builder.worker.ts', import.meta.url));
             this.availableWorkers.push(worker);
@@ -142,6 +142,7 @@ export class ChunkForge {
             let task = this.applyTasks.shift()!;
             task.vertexData.applyToMesh(task.mesh, false);
             depthRenderer.getDepthMap().renderList!.push(task.mesh);
+
             this.trashCan = this.trashCan.concat(task.callbackTasks);
         }
     }
