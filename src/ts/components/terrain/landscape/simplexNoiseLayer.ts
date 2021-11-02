@@ -1,4 +1,4 @@
-import { Vector3 } from "../../toolbox/algebra";
+import { Vector } from "../../toolbox/algebra";
 import { normalizedSimplex3FromVector } from "../../toolbox/noiseTools";
 
 export class SimplexNoiseLayer {
@@ -14,7 +14,7 @@ export class SimplexNoiseLayer {
         this._lacunarity = lacunarity;
         this._minValue = minValue;
     }
-    evaluate(coords: Vector3) {
+    evaluate(coords: Vector) {
         let noiseValue = 0.0;
         let totalAmplitude = 0.0;
         for (let i = 0; i < this._nbOctaves; i++) {

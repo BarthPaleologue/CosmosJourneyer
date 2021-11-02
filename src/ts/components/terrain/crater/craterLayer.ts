@@ -1,4 +1,4 @@
-import { Vector3 } from "../../toolbox/algebra";
+import { Vector } from "../../toolbox/algebra";
 import { Crater } from "./crater";
 
 export class CraterLayer {
@@ -6,11 +6,11 @@ export class CraterLayer {
     constructor(craters: Crater[]) {
         this._craters = craters;
     }
-    evaluate(p: Vector3) {
+    evaluate(p: Vector) {
         let elevation = 0;
 
         for (let crater of this._craters) {
-            let d = Vector3.Distance(p, Vector3.FromArray(crater.position));
+            let d = Vector.Distance(p, new Vector(...crater.position));
 
             let radius = crater.radius;
             let steepness = crater.steepness;

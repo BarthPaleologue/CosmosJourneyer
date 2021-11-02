@@ -45,14 +45,15 @@ planet.colorSettings.waterLevel = waterElevation;
 planet.updateColors();
 
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, planetRadius - 15e3, planetRadius + 30e3, light, camera, scene);
-atmosphere.settings.intensity = 10;
-atmosphere.settings.scatteringStrength = 0.5;
-atmosphere.settings.falloffFactor = 20;
-
 let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + waterElevation, light, camera, scene);
 ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
+
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius, planetRadius + 30e3, light, camera, scene);
+//atmosphere.settings.intensity = 10;
+atmosphere.settings.scatteringStrength = 0.4;
+atmosphere.settings.falloffFactor = 20;
+
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
 

@@ -1,13 +1,12 @@
 import { getRotationMatrixFromDirection } from "../toolbox/direction";
 import { SimplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
 import { ComputeNormals } from "../toolbox/computeNormals";
-import { Vector3 } from "../toolbox/algebra";
+import { Vector } from "../toolbox/algebra";
 import { MountainNoiseLayer } from "../terrain/landscape/moutainNoiseLayer";
 import { ContinentNoiseLayer } from "../terrain/landscape/continentNoiseLayer";
 import { CraterLayer } from "../terrain/crater/craterLayer";
 import { buildData } from "../forge/buildData";
 import { TerrainSettings } from "../terrain/terrainSettings";
-import { _MeshCollisionData } from "babylonjs/Collisions/meshCollisionData";
 import { CollisionData } from "../forge/CollisionData";
 
 let bumpyLayer: SimplexNoiseLayer;
@@ -38,12 +37,12 @@ initLayers();
 const craterLayer = new CraterLayer([]);
 
 
-function terrainFunction(p: Vector3, planetRadius: number): Vector3 {
+function terrainFunction(p: Vector, planetRadius: number): Vector {
 
     const initialMagnitude = p.getMagnitude();
 
     // on se ramène à la position à la surface du globe (sans relief)
-    const planetSpherePosition: Vector3 = p.scaleToNew(planetRadius / initialMagnitude);
+    const planetSpherePosition: Vector = p.scaleToNew(planetRadius / initialMagnitude);
 
     const unitCoords = planetSpherePosition.normalizeToNew();
 
@@ -96,17 +95,17 @@ self.onmessage = e => {
             for (let y = 0; y < vertexPerLine; ++y) {
 
                 // on crée un plan dans le plan Oxy
-                let vertexPosition = new Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
+                let vertexPosition = new Vector((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
 
                 // on le met à la bonne taille
                 vertexPosition = vertexPosition.scaleToNew(size);
 
                 // on le met au bon endroit de la face par défaut (Oxy devant)
-                let vecOffset = Vector3.FromArray(offset);
+                let vecOffset = new Vector(...offset);
                 vertexPosition = vertexPosition.addToNew(vecOffset);
 
                 // on le met sur la bonne face
-                vertexPosition = vertexPosition.applyMatrixToNew(rotationMatrix);
+                vertexPosition = vertexPosition.applySquaredMatrixToNew(rotationMatrix);
 
                 // on l'arrondi pour en faire un chunk de sphère
                 let planetCoords = vertexPosition.normalizeToNew().scaleToNew(planetRadius);
@@ -117,9 +116,9 @@ self.onmessage = e => {
                 // on le ramène à l'origine
                 vertexPosition = vertexPosition.addToNew(vecOffset.normalizeToNew().scaleToNew(-planetRadius));
 
-                verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition.x;
-                verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition.y;
-                verticesPositions[(x * vertexPerLine + y) * 3 + 2] = vertexPosition.z;
+                verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition.g(0);
+                verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition.g(1);
+                verticesPositions[(x * vertexPerLine + y) * 3 + 2] = vertexPosition.g(2);
 
                 if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
                     faces.push([
@@ -167,7 +166,7 @@ self.onmessage = e => {
         craterLayer.craters = data.craters;
         terrainSettings = data.terrainSettings;
 
-        let samplePosition = Vector3.FromArray(data.position).normalizeToNew().scaleToNew(data.chunkLength / 2);
+        let samplePosition = new Vector(...data.position).normalizeToNew().scaleToNew(data.chunkLength / 2);
 
         self.postMessage({
             h: terrainFunction(samplePosition, data.chunkLength / 2).getMagnitude(),

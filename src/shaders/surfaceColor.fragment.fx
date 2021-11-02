@@ -142,13 +142,13 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, float bottomFactor, floa
 	tNormalZ += snowFactor * tSnowNormalZ;
 	if(totalAmplitude > 0.0) tNormalZ /= totalAmplitude;
 
-	tNormalX = lerp(tNormalX, tSteepNormalX, 1.0 - steepFactor);
-	tNormalY = lerp(tNormalY, tSteepNormalY, 1.0 - steepFactor);
-	tNormalZ = lerp(tNormalZ, tSteepNormalZ, 1.0 - steepFactor);
+	tNormalX = lerp(tNormalX, tSteepNormalX, 1.0 - steepFactor) * normalStrength;
+	tNormalY = lerp(tNormalY, tSteepNormalY, 1.0 - steepFactor) * normalStrength;
+	tNormalZ = lerp(tNormalZ, tSteepNormalZ, 1.0 - steepFactor) * normalStrength;
 
-    tNormalX = vec3(normalStrength * tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
-    tNormalY = vec3(normalStrength * tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
-    tNormalZ = vec3(normalStrength * tNormalZ.xy + surfaceNormal.xy, tNormalZ.z * surfaceNormal.z);
+    tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
+    tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
+    tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, tNormalZ.z * surfaceNormal.z);
 
     vec3 blendWeight = pow(abs(surfaceNormal), vec3(sharpness));
     blendWeight /= dot(blendWeight, vec3(1.0));
@@ -194,22 +194,24 @@ vec3 lnear(vec3 value1, vec3 value2, float x, float summitX, float range) {
 vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude, float slope, vec3 unitPosition, out vec3 normal) {
 	normal = vNormal;
 
-	float snowOffset = (completeNoise(unitPosition * 200.0, 3, 2.0, snowLacunarity) - 0.5) * 2.0;
+	float snowOffset = (completeNoise(unitPosition * 200.0, 5, 2.0, snowLacunarity) - 0.5) * 2.0;
+
+	float normalStrength = 0.2;
 
 	if(elevation01 > snowElevation01 * exp(-abs(latitude) * snowLatitudePersistence) + snowOffsetAmplitude * snowOffset) {
 		// il fait froid !!!!!!!!
-		if(pow(1.0 - slope, 1.0) > steepSnowDotLimit + (completeNoise(unitPosition * 200.0, 3, 2.0, 7.0)-0.5) * 0.5) {
+		if(pow(1.0 - slope, 1.0) > steepSnowDotLimit + (completeNoise(unitPosition * 200.0, 5, 5.1, 7.0)-0.5) * 0.5) {
 			// neige à plat bien blanche
 
-			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.001, normalSharpness, 0.3);
-			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0003, normalSharpness, 0.3); // plus grand
+			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.001, normalSharpness, normalStrength);
+			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0003, normalSharpness, normalStrength); // plus grand
 
 			return snowColor;
 		} else {
 			// neige en pente un peu assombrie
 
-			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, normalSharpness, 0.3);
-			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0003, normalSharpness, 0.3); // plus grand
+			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, normalSharpness, normalStrength);
+			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0003, normalSharpness, normalStrength); // plus grand
 
 			return steepColor;
 		}
@@ -228,8 +230,8 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 		sandFactor *= steepFactor;
 		plainFactor *= steepFactor;
 
-		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.001, normalSharpness, 0.3);
-		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0003, normalSharpness, 0.3); // plus grand
+		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.001, normalSharpness, normalStrength);
+		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0003, normalSharpness, normalStrength); // plus grand
 
 		return lerp(flatColor, steepColor, pow(1.0 - slope, steepSharpness));
 	} else {
@@ -244,8 +246,8 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 		sandFactor *= steepFactor;
 		plainFactor *= steepFactor;
 
-		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.001, normalSharpness, 0.3);
-		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0003, normalSharpness, 0.3); // plus grand
+		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.001, normalSharpness, normalStrength);
+		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0003, normalSharpness, normalStrength); // plus grand
 
 		
 		return lerp(flatColor, steepColor, pow(slope, steepSharpness));
@@ -298,9 +300,9 @@ void main() {
 	// specular
 	vec3 angleW = normalize(viewDirectionW + lightRay);
     float specComp = max(0., dot(normalW, angleW));
-    specComp = pow(specComp, 64.0);
+    specComp = pow(specComp, 32.0);
 
-	vec3 screenColor = color.rgb * ndl * (1.0 + vec3(specComp) / 10.0);
+	vec3 screenColor = color.rgb * (ndl + specComp/10.0);
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
 } 

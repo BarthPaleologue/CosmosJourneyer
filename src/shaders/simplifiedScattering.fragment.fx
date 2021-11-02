@@ -1,8 +1,8 @@
-precision mediump float;
+precision highp float;
 
 #define PI 3.1415926535897932
-#define POINTS_FROM_CAMERA 10 // number sample points along camera ray
-#define OPTICAL_DEPTH_POINTS 10 // number sample points along light ray
+#define POINTS_FROM_CAMERA 12 // number sample points along camera ray
+#define OPTICAL_DEPTH_POINTS 4 // number sample points along light ray
 
 // varying
 varying vec2 vUV; // screen coordinates
@@ -23,6 +23,7 @@ uniform float cameraFar; // camera maxZ
 uniform vec3 planetPosition; // planet position in world space
 uniform float planetRadius; // planet radius for height calculations
 uniform float atmosphereRadius; // atmosphere radius (calculate from planet center)
+uniform float waterLevel;
 
 uniform float falloffFactor; // controls exponential opacity falloff
 uniform float sunIntensity; // controls atmosphere overall brightness
@@ -69,23 +70,31 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
 }
 
 // based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
-float densityAtPoint(vec3 densitySamplePoint) {
-    float heightAboveSurface = length(densitySamplePoint - planetPosition) - planetRadius; // actual height above surface
-    float height01 = heightAboveSurface / (atmosphereRadius - planetRadius); // normalized height between 0 and 1
+float densityAtPoint(vec3 samplePoint) {
+    float heightAboveSurface = length(samplePoint - planetPosition) - (planetRadius+waterLevel); // actual height above surface
+    
+    float height01 = heightAboveSurface / (atmosphereRadius - (planetRadius+waterLevel)); // normalized height between 0 and 1
+    
+    // le fix le plus au pif du monde
+    height01 = remap(height01, 0.0, 1.0, 0.35, 1.0);
+
     float localDensity = densityModifier * exp(-height01 * falloffFactor); // density with exponential falloff
-    localDensity *= (1.0 - height01); // make it 0 at maximum height
+
+    //localDensity *= (1.0 - height01);
 
     return localDensity;
 }
 
 float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
 
-    float stepSize = rayLength / (float(OPTICAL_DEPTH_POINTS) - 1.0); // ray length between sample points
-    
     vec3 densitySamplePoint = rayOrigin; // that's where we start
+
+    float stepSize = rayLength / float(OPTICAL_DEPTH_POINTS - 1); // ray length between sample points
+    
+
     float accumulatedOpticalDepth = 0.0;
 
-    for(int i = 0 ; i < OPTICAL_DEPTH_POINTS ; i++) {
+    for(int i = 0 ; i < OPTICAL_DEPTH_POINTS ; ++i) {
         float localDensity = densityAtPoint(densitySamplePoint); // we get the density at the sample point
 
         accumulatedOpticalDepth += localDensity * stepSize; // linear approximation : density is constant between sample points
@@ -105,18 +114,28 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 originalC
     vec3 wavelength = vec3(redWaveLength, greenWaveLength, blueWaveLength); // the wavelength that will be scattered (rgb so we get everything)
     vec3 rayleighScatteringCoeffs = pow(400.0 / wavelength.xyz, vec3(4.0)) * scatteringStrength; // the scattering is inversely proportional to the fourth power of the wave length
 
-    float stepSize = rayLength / (float(POINTS_FROM_CAMERA) - 1.0); // the ray length between sample points
+    //rayleighScatteringCoeffs = vec3(5.5e-6, 13.0e-6, 22.4e-6);
+
+    float stepSize = rayLength / float(POINTS_FROM_CAMERA - 1); // the ray length between sample points
+
+    float viewRayOpticalDepth = 0.0;
 
     vec3 inScatteredLight = vec3(0.0); // amount of light scattered for each channel
 
     for (int i = 0 ; i < POINTS_FROM_CAMERA ; ++i) {
 
+        // ceci est une approximation trop forte car cela suppose que le rayon est dirigé vers le centre de la planète
         float sunRayLengthInAtm = atmosphereRadius - length(samplePoint - planetPosition); // distance traveled by light through atmosphere from light source
+        float trash;
+        rayIntersectSphere(samplePoint, rayDir, planetPosition, planetRadius + waterLevel, trash, sunRayLengthInAtm);
+
+        sunRayLengthInAtm = max(sunRayLengthInAtm, 0.0);
+
         float viewRayLengthInAtm = stepSize * float(i); // distance traveled by light through atmosphere from sample point to cameraPosition
         
         float sunRayOpticalDepth = opticalDepth(samplePoint, sunDir, sunRayLengthInAtm); // scattered from the sun to the point
         
-        float viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
+        viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
         
         vec3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * rayleighScatteringCoeffs); // exponential scattering with coefficients
         
@@ -126,6 +145,10 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 originalC
         
         samplePoint += rayDir * stepSize; // move sample point along view ray
     }
+
+    float originalColorTransmittance = exp(-viewRayOpticalDepth*0.00001);
+
+    //inScatteredLight += originalColor * originalColorTransmittance;
 
     // scattering depends on the direction of the light ray and the view ray : it's the rayleigh phase function
     // https://glossary.ametsoc.org/wiki/Rayleigh_phase_function
@@ -150,13 +173,19 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
     impactPoint = max(0.0, impactPoint); // cannot be negative (the ray starts where the camera is in such a case)
     escapePoint = min(maximumDistance, escapePoint); // occlusion with other scene objects
 
+    float waterImpact, waterEscape;
+    if(rayIntersectSphere(rayOrigin, rayDir, planetPosition, planetRadius + waterLevel, waterImpact, waterEscape)) {
+        escapePoint = min(escapePoint, waterImpact);
+    }
+
     float distanceThroughAtmosphere = max(0.0, escapePoint - impactPoint); // probably doesn't need the max but for the sake of coherence the distance cannot be negative
-    
+
     vec3 firstPointInAtmosphere = rayOrigin + rayDir * impactPoint; // the first atmosphere point to be hit by the ray
 
     vec3 light = calculateLight(firstPointInAtmosphere, rayDir, distanceThroughAtmosphere, originalColor); // calculate scattering
     
-    return originalColor * (1.0 - light) + light; // blending scattered color with original color
+    return light + (1.0 - light) * originalColor; // blending scattered color with original color
+
 }
 
 
@@ -174,10 +203,6 @@ void main() {
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
     vec3 finalColor = scatter(screenColor, cameraPosition, rayDir, maximumDistance); // the color to be displayed on the screen
-
-    // exposure
-    //finalColor = 1.0 - exp(-1.0 * finalColor);
-
 
     gl_FragColor = vec4(finalColor, 1.0); // displaying the final color
 }

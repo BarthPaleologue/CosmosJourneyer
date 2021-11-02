@@ -1,3 +1,135 @@
+export class Vector {
+    private components: number[] = [];
+    readonly dim: number;
+    constructor(...components: number[]) {
+        this.components = components;
+        this.dim = components.length;
+    }
+    public static fromBABYLON(vector: BABYLON.Vector2 | BABYLON.Vector3 | BABYLON.Vector4) {
+        let components: number[] = [vector.x, vector.y];
+        if (vector instanceof BABYLON.Vector3) components.push(vector.z);
+        if (vector instanceof BABYLON.Vector4) components.push(vector.w);
+        return new Vector(...components);
+    }
+    public static Ns(n: number, dim: number) {
+        return new Vector(...(new Array(dim)).fill(n));
+    }
+    public static Zeros(dim: number) {
+        return Vector.Ns(0, dim);
+    }
+    public static Ones(dim: number) {
+        return Vector.Ns(1, dim);
+    }
+    public get(component: number): number {
+        if (component >= this.components.length) throw Error("Undefined Component");
+        return this.components[component];
+    }
+    public g(component: number) {
+        return this.get(component);
+    }
+    public getSquaredMagnitude(): number {
+        return this.components.reduce(
+            (previousValue: number, currentValue: number) => {
+                return previousValue + currentValue ** 2;
+            }, 0);
+    }
+    public getMagnitude(): number {
+        return Math.sqrt(this.getSquaredMagnitude());
+    }
+    public scaleToNew(scaleFactor: number): Vector {
+        return new Vector(...this.components.map((value: number) => { return value * scaleFactor; }));
+    }
+    public scaleInPlace(scaleFactor: number): void {
+        this.components.forEach((value: number) => value * scaleFactor);
+    }
+    public divideToNew(divideFactor: number): Vector {
+        if (divideFactor == 0) throw Error("Division par 0");
+        return this.scaleToNew(1 / divideFactor);
+    }
+    public divideInPlace(divideFactor: number): void {
+        if (divideFactor == 0) throw Error("Division par 0");
+        this.scaleInPlace(1 / divideFactor);
+    }
+    public normalizeToNew(): Vector {
+        return this.divideToNew(this.getMagnitude());
+    }
+    public normalizeInPlace(): void {
+        this.divideInPlace(this.getMagnitude());
+    }
+    public addToNew(otherVector: Vector) {
+        if (this.dim != otherVector.dim) new Error("Dimension error while adding");
+        let components: number[] = this.components.map((value: number, i: number) => {
+            return value + otherVector.g(i);
+        });
+        return new Vector(...components);
+    }
+    public addInPlace(otherVector: Vector) {
+        if (this.dim != otherVector.dim) new Error("Dimension error while adding");
+        this.components.forEach((value: number, i: number) => value + otherVector.g(i));
+    }
+    public subtractToNew(otherVector: Vector) {
+        if (this.dim != otherVector.dim) new Error("Dimension error while subtracting");
+        let components: number[] = this.components.map((value: number, i: number) => {
+            return value - otherVector.g(i);
+        });
+        return new Vector(...components);
+    }
+    public subtractInPlace(otherVector: Vector) {
+        if (this.dim != otherVector.dim) new Error("Dimension error while subtracting");
+        this.components.forEach((value: number, i: number) => value - otherVector.g(i));
+    }
+    public toBABYLON() {
+        if (this.dim == 2) {
+            return new BABYLON.Vector2(this.g(0), this.g(1));
+        } else if (this.dim == 3) {
+            return new BABYLON.Vector3(this.g(0), this.g(1), this.g(2));
+        } else if (this.dim == 4) {
+            return new BABYLON.Vector4(this.g(0), this.g(1), this.g(2), this.g(3));
+        } else {
+            throw Error("Vector of too many dimensions : cannot be casted as a BABYLON Vector 2 3 or 4");
+        }
+    }
+    public static DistanceSquared(vector1: Vector, vector2: Vector): number {
+        if (vector1.dim != vector2.dim) throw Error("Distance between two vectors of different dimensions !");
+        let squaredDistance = 0;
+        for (let i = 0; i < vector1.dim; i++) {
+            squaredDistance += (vector1.g(i) - vector2.g(i)) ** 2;
+        }
+        return squaredDistance;
+    }
+    public static Distance(vector1: Vector, vector2: Vector): number {
+        return Math.sqrt(Vector.DistanceSquared(vector1, vector2));
+    }
+    public static Dot(vector1: Vector, vector2: Vector): number {
+        if (vector1.dim != vector2.dim) throw Error("Distance between two vectors of different dimensions !");
+        return vector1.components.reduce((previousValue: number, value: number, i: number) => {
+            return previousValue + value * vector2.g(i);
+        });
+    }
+
+    public floorToNew(): Vector {
+        return new Vector(...this.components.map((value: number) => { return Math.floor(value); }));
+    }
+
+    public floorInPlace(): void {
+        this.components.forEach((value: number) => Math.floor(value));
+    }
+
+    public applySquaredMatrixToNew(matrix: Matrix): Vector {
+        if (matrix.dimX != matrix.dimY) throw Error("Dimension error : the matrix is not squared !");
+        if (matrix.dimX != this.dim) throw Error("Dimension error while doing Matrix Vector Multiplication !");
+        let components: number[] = [];
+        for (let i = 0; i < this.dim; i++) {
+            let value = 0;
+            for (let j = 0; j < matrix.dimX; j++) {
+                value += matrix.m[i][j] * this.g(j);
+            }
+            components.push(value);
+        }
+        return new Vector(...components);
+    }
+}
+
 export class Vector3 {
     private _x: number;
     private _y: number;
@@ -72,73 +204,87 @@ export class Vector3 {
     static Zero(): Vector3 {
         return new Vector3(0, 0, 0);
     }
-    static FromArray(array: number[]): Vector3 {
+    static FromArray3(array: number[]): Vector3 {
         return new Vector3(array[0], array[1], array[2]);
     }
-    static FromBABYLON(vector: BABYLON.Vector3): Vector3 {
+    static FromBABYLON3(vector: BABYLON.Vector3): Vector3 {
         return new Vector3(vector.x, vector.y, vector.z);
     }
-    static ToBABYLON(vector: Vector3): BABYLON.Vector3 {
-        return new BABYLON.Vector3(vector._x, vector._y, vector._z);
+    static ToBABYLON3(vector: Vector3): BABYLON.Vector3 {
+        return new BABYLON.Vector3(vector.x, vector.y, vector.z);
     }
-    applyMatrixToNew(matrix: Matrix3): Vector3 {
+    applyMatrixToNew(matrix: Matrix): Vector3 {
         let newVector = Vector3.Zero();
 
         let m = matrix.m;
 
-        newVector._x = m[0][0] * this._x + m[0][1] * this._y + m[0][2] * this._z;
-        newVector._y = m[1][0] * this._x + m[1][1] * this._y + m[1][2] * this._z;
-        newVector._z = m[2][0] * this._x + m[2][1] * this._y + m[2][2] * this._z;
+        newVector.x = m[0][0] * this.x + m[0][1] * this.y + m[0][2] * this.z;
+        newVector.y = m[1][0] * this.x + m[1][1] * this.y + m[1][2] * this.z;
+        newVector.z = m[2][0] * this.x + m[2][1] * this.y + m[2][2] * this.z;
 
         return newVector;
     }
     static DistanceSquared(vector1: Vector3, vector2: Vector3) {
-        return (vector1._x - vector2._x) ** 2 + (vector1._y - vector2._y) ** 2 + (vector1._z - vector2._z) ** 2;
+        return (vector1.x - vector2.x) ** 2 + (vector1.y - vector2.y) ** 2 + (vector1.z - vector2.z) ** 2;
     }
     static Distance(vector1: Vector3, vector2: Vector3) {
         return Math.sqrt(Vector3.DistanceSquared(vector1, vector2));
     }
     static Dot(vector1: Vector3, vector2: Vector3) {
-        return vector1._x * vector2._x + vector1._y * vector2._y + vector1._z * vector2._z;
+        return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
+    }
+
+    static FloorToNew(vector: Vector3) {
+        return new Vector3(Math.floor(vector.x), Math.floor(vector.y), Math.floor(vector.z));
     }
 }
 
-export class Matrix3 {
+export class Matrix {
     m: number[][];
+    dimX: number;
+    dimY: number;
     constructor(values: number[][]) {
         this.m = values;
+        this.dimX = values[0].length || 0;
+        this.dimY = values.length;
     }
-    static RotationX(theta: number) {
-        return new Matrix3([
+    public static Rotation3DX(theta: number): Matrix {
+        return new Matrix([
             [1, 0, 0],
             [0, Math.cos(theta), -Math.sin(theta)],
             [0, Math.sin(theta), Math.cos(theta)]
         ]);
     }
-    static RotationY(theta: number) {
-        return new Matrix3([
+    public static Rotation3DY(theta: number): Matrix {
+        return new Matrix([
             [Math.cos(theta), 0, Math.sin(theta)],
             [0, 1, 0],
             [-Math.sin(theta), 0, Math.cos(theta)]
         ]);
     }
-    static RotationZ(theta: number) {
-        return new Matrix3([
+    public static Rotation3DZ(theta: number): Matrix {
+        return new Matrix([
             [Math.cos(theta), -Math.sin(theta), 0],
             [Math.sin(theta), Math.cos(theta), 0],
             [0, 0, 1]
         ]);
     }
-    static Identity() {
-        return new Matrix3([
-            [1, 0, 0],
-            [0, 1, 0],
-            [0, 0, 1]
-        ]);
+    public static Identity(n: number): Matrix {
+        let m: number[][] = [];
+        for (let i = 0; i < n; i++) {
+            m.push([]);
+            for (let j = 0; j < n; j++) {
+                m[i][j] = (i == j) ? 1 : 0;
+            }
+        }
+        return new Matrix(m);
+    }
+    public static Identity3D(): Matrix {
+        return this.Identity(3);
     }
     static FromBABYLON(M: BABYLON.Matrix) {
         let m = M.m;
-        return new Matrix3([
+        return new Matrix([
             [m[0], m[4], m[8]],
             [m[1], m[5], m[9]],
             [m[2], m[6], m[10]]

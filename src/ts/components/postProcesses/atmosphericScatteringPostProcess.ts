@@ -1,3 +1,5 @@
+import { Planet } from "../planet/planet";
+
 interface AtmosphereSettings {
     planetRadius: number,
     atmosphereRadius: number,
@@ -15,9 +17,9 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
     settings: AtmosphereSettings;
     camera: BABYLON.Camera;
     sun: BABYLON.Mesh | BABYLON.PointLight;
-    planet: BABYLON.Mesh;
+    planetMesh: BABYLON.Mesh;
 
-    constructor(name: string, planet: BABYLON.Mesh, planetRadius: number, atmosphereRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+    constructor(name: string, planet: Planet, planetRadius: number, atmosphereRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
         super(name, "./shaders/simplifiedScattering", [
             "sunPosition",
             "cameraPosition",
@@ -33,6 +35,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
             "planetPosition",
             "planetRadius",
             "atmosphereRadius",
+            "waterLevel",
 
             "falloffFactor",
             "sunIntensity",
@@ -61,7 +64,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
 
         this.camera = camera;
         this.sun = sun;
-        this.planet = planet;
+        this.planetMesh = planet.attachNode;
 
         this.setCamera(this.camera);
 
@@ -74,9 +77,9 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
             effect.setTexture("depthSampler", scene.customRenderTargets[0]);
 
             effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
-            effect.setVector3("cameraPosition", this.camera.position);
+            effect.setVector3("cameraPosition", BABYLON.Vector3.Zero());
 
-            effect.setVector3("planetPosition", this.planet.getAbsolutePosition());
+            effect.setVector3("planetPosition", this.planetMesh.getAbsolutePosition());
 
             effect.setMatrix("projection", this.camera.getProjectionMatrix());
             effect.setMatrix("view", this.camera.getViewMatrix());
@@ -88,6 +91,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
 
             effect.setFloat("planetRadius", this.settings.planetRadius);
             effect.setFloat("atmosphereRadius", this.settings.atmosphereRadius);
+            effect.setFloat("waterLevel", planet.colorSettings.waterLevel);
 
             effect.setFloat("falloffFactor", this.settings.falloffFactor);
             effect.setFloat("sunIntensity", this.settings.intensity);

@@ -14,7 +14,7 @@
  *
  */
 
-import { Vector3 } from "./algebra";
+import { Vector } from "./algebra";
 
 class Grad {
 	x: number;
@@ -408,8 +408,8 @@ function simplex2(xin: number, yin: number) {
  * @param vector 
  * @returns simplex between 0 and 1
  */
-export function normalizedSimplex3FromVector(vector: Vector3) {
-	return (1 + simplex3(vector.x, vector.y, vector.z)) / 2;
+export function normalizedSimplex3FromVector(vector: Vector) {
+	return (1 + simplex3(vector.get(0), vector.get(1), vector.get(2))) / 2;
 }
 
 /**
@@ -417,8 +417,8 @@ export function normalizedSimplex3FromVector(vector: Vector3) {
  * @param vector 
  * @returns simplex between -1 and 1
  */
-export function simplex3FromVector(vector: Vector3) {
-	return simplex3(vector.x, vector.y, vector.z);
+export function simplex3FromVector(vector: Vector) {
+	return simplex3(vector.g(0), vector.g(1), vector.g(2));
 }
 
 function simplex3(xin: number, yin: number, zin: number) {

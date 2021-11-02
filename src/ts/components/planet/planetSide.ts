@@ -2,7 +2,7 @@ import { getChunkSphereSpacePositionFromPath, PlanetChunk } from "./planetChunk"
 import { Direction } from "../toolbox/direction";
 import { ChunkForge, TaskType } from "../forge/chunkForge";
 import { Planet } from "./planet";
-import { Matrix3, Vector3 } from "../toolbox/algebra";
+import { Vector3 } from "../toolbox/algebra";
 
 type quadTree = quadTree[] | PlanetChunk;
 
@@ -118,8 +118,8 @@ export class PlanetSide {
         // position par rapport à la caméra
         let parentPosition = new Vector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
         let absolutePosition = relativePosition.addToNew(parentPosition);
-        let direction = absolutePosition.subtractToNew(Vector3.FromBABYLON(observerPosition));
-        let dot = Vector3.Dot(direction, Vector3.FromBABYLON(facingDirection));
+        let direction = absolutePosition.subtractToNew(Vector3.FromBABYLON3(observerPosition));
+        let dot = Vector3.Dot(direction, Vector3.FromBABYLON3(facingDirection));
         // distance carré entre caméra et noeud du quadtree
         let d = direction.getSquaredMagnitude();
         let limit = this.renderDistanceFactor * this.chunkLength / (2 ** walked.length);

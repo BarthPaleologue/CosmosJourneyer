@@ -1,4 +1,4 @@
-import { Matrix3 } from "./algebra";
+import { Matrix } from "./algebra";
 
 export enum Direction {
     Up,
@@ -9,19 +9,19 @@ export enum Direction {
     Backward
 }
 
-export function getRotationMatrixFromDirection(direction: Direction): Matrix3 {
+export function getRotationMatrixFromDirection(direction: Direction): Matrix {
     switch (direction) {
         case Direction.Up:
-            return Matrix3.RotationX(-Math.PI / 2);
+            return Matrix.Rotation3DX(-Math.PI / 2);
         case Direction.Down:
-            return Matrix3.RotationX(Math.PI / 2);
+            return Matrix.Rotation3DX(Math.PI / 2);
         case Direction.Forward:
-            return Matrix3.Identity();
+            return Matrix.Identity3D();
         case Direction.Backward:
-            return Matrix3.RotationY(-Math.PI);
+            return Matrix.Rotation3DY(-Math.PI);
         case Direction.Left:
-            return Matrix3.RotationY(Math.PI / 2);
+            return Matrix.Rotation3DY(Math.PI / 2);
         case Direction.Right:
-            return Matrix3.RotationY(-Math.PI / 2);
+            return Matrix.Rotation3DY(-Math.PI / 2);
     }
 }

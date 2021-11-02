@@ -1,7 +1,7 @@
 import { Planet } from "./planet";
 import { ChunkForge, TaskType } from "../forge/chunkForge";
 import { Direction, getRotationMatrixFromDirection } from "../toolbox/direction";
-import { Matrix3, Vector3 } from "../toolbox/algebra";
+import { Matrix, Vector3 } from "../toolbox/algebra";
 
 /**
  * Returns the node position in plane space
@@ -66,9 +66,9 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
     position = position.normalizeToNew().scaleToNew(chunkLength / 2);
 
     // on match cette position avec la rotation de la planète
-    position = position.applyMatrixToNew(Matrix3.RotationX(parentRotation.x));
-    position = position.applyMatrixToNew(Matrix3.RotationY(parentRotation.y));
-    position = position.applyMatrixToNew(Matrix3.RotationZ(parentRotation.z));
+    position = position.applyMatrixToNew(Matrix.Rotation3DX(parentRotation.x));
+    position = position.applyMatrixToNew(Matrix.Rotation3DY(parentRotation.y));
+    position = position.applyMatrixToNew(Matrix.Rotation3DZ(parentRotation.z));
 
     // c'est prêt !
     return position;
@@ -115,8 +115,8 @@ export class PlanetChunk {
         debugMaterial.specularColor = BABYLON.Color3.Black();
         debugMaterial.diffuseColor = BABYLON.Color3.Black();
         debugMaterial.backFaceCulling = false;
-        debugMaterial.useLogarithmicDepth = true;
-        debugMaterial.wireframe = true;*/
+        debugMaterial.useLogarithmicDepth = true;*/
+        //debugMaterial.wireframe = true;
 
         //this.mesh.material = debugMaterial;
 

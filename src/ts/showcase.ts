@@ -14,6 +14,7 @@ import { Keyboard } from "./components/inputs/keyboard";
 import { Mouse } from "./components/inputs/mouse";
 import { Gamepad } from "./components/inputs/gamepad";
 import { CollisionData } from "./components/forge/CollisionData";
+import { Matrix, Vector } from "./components/toolbox/algebra";
 
 style.default;
 
@@ -89,16 +90,15 @@ planets.push(moon);
 
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet.attachNode, radius - 20e3, radius + 40e3, sun, player.camera, scene);
-atmosphere.settings.intensity = 10;
-atmosphere.settings.falloffFactor = 20;
-atmosphere.settings.scatteringStrength = 0.4;
-
-
 let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 10e2, sun, scene.activeCamera, scene);
 ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 //ocean.settings.oceanRadius = 0;
+
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 30e3, sun, player.camera, scene);
+//atmosphere.settings.intensity = 10;
+atmosphere.settings.falloffFactor = 20;
+atmosphere.settings.scatteringStrength = 0.4;
 
 //let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 35e2, radius + 36e3, sun, player.firstPersonCamera, scene);
 

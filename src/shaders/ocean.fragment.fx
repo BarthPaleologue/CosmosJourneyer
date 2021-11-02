@@ -72,13 +72,13 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
 }
 
 vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
-    vec3 tNormalX = texture2D(normalMap, position.zy * scale).rgb;
-    vec3 tNormalY = texture2D(normalMap, position.xz * scale).rgb;
-    vec3 tNormalZ = texture2D(normalMap, position.xy * scale).rgb;
+    vec3 tNormalX = texture2D(normalMap, position.zy * scale).rgb * normalStrength;
+    vec3 tNormalY = texture2D(normalMap, position.xz * scale).rgb * normalStrength;
+    vec3 tNormalZ = texture2D(normalMap, position.xy * scale).rgb * normalStrength;
 
-    tNormalX = vec3(normalStrength * tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
-    tNormalY = vec3(normalStrength * tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
-    tNormalZ = vec3(normalStrength * tNormalZ.xy + surfaceNormal.xy, tNormalZ.z * surfaceNormal.z);
+    tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
+    tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
+    tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, tNormalZ.z * surfaceNormal.z);
 
     vec3 blendWeight = pow(abs(surfaceNormal), vec3(sharpness));
     blendWeight /= dot(blendWeight, vec3(1.0));
@@ -115,15 +115,16 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
     
     vec3 planetNormal = normalize(samplePointPlanetSpace);
     
-    vec3 normalWave = triplanarNormal(samplePointPlanetSpace, planetNormal, normalMap, 0.00001, 1.0, 0.2);
+    vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time*planetNormal.x, -time*planetNormal.y, 0.0), planetNormal, normalMap, 0.00002, 0.7, 0.5);
     
     vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
 
-    float ndl = dot(normalWave, sunDir); // dimming factor due to light inclination relative to vertex normal in world space
+    float ndl = max(dot(normalWave, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
 
     // specular based on https://learnopengl.com/Lighting/Basic-Lighting
     vec3 reflectDir = reflect(-rayDir, planetNormal);
-    float spec = pow(max(dot(rayDir, reflectDir), 0.0), 64.0);
+    
+    float spec = pow(max(dot(rayDir, reflectDir), 0.0), 4.0);
 
     if(distanceThroughOcean > 0.0) {
         float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * depthModifier);
@@ -135,7 +136,11 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         vec3 shallowColor = vec3(32.0,193.0,180.0)/255.0;
         vec3 oceanColor = lerp(deepColor, shallowColor, opticalDepth01);
         
-        return lerp(originalColor, oceanColor, alpha) * (ndl * (1.0+spec*10.0));
+        vec3 ambiant = lerp(originalColor, oceanColor, alpha);
+        //vec3 diffuse = ndl * ambiant;
+        //vec3 specular = spec * vec3(1.0) * ndl;
+
+        return ambiant * (ndl + spec);
     } else {
         return originalColor;
     }
