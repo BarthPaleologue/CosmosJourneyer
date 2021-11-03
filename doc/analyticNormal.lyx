@@ -1,0 +1,439 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Synthèse du calcul de la normale à un objet paramétrique sphérique
+\end_layout
+
+\begin_layout Author
+par Barthélemy Paléologue
+\end_layout
+
+\begin_layout Date
+3 Novembre 2021
+\end_layout
+
+\begin_layout Section
+Description du problème
+\end_layout
+
+\begin_layout Verse
+Cette étude est conduite dans le cadre de l'élaboration d'un programme de
+ génération de planètes procédurales.
+\end_layout
+
+\begin_layout Verse
+La position d'un point sur la surface de la planète est entièrement définie
+ par ses coordonnées normalisées 
+\begin_inset Formula $\hat{p}$
+\end_inset
+
+ sur la sphère unité.
+ En effet on peut passer des coordonnées au point réel grâce à la fonction
+ d'élévation E que l'on considérera continue :
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula 
+\[
+\overrightarrow{P}=E(\hat{p})\hat{p}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+Et on peut retrouver 
+\begin_inset Formula $\hat{p}$
+\end_inset
+
+ à partir de 
+\begin_inset Formula $\overrightarrow{P}$
+\end_inset
+
+ de cette façon :
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula 
+\[
+\hat{p}=\frac{\overrightarrow{P}}{\Vert\overrightarrow{P}\Vert}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+Si la position est très bien définie, on ne peut en dire autant pour la
+ normale.
+ En effet un des défis de la génération planétaire est le calcul du vecteur
+ normal à la surface 
+\begin_inset Formula $\hat{N}$
+\end_inset
+
+ au point 
+\begin_inset Formula $\overrightarrow{P}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Verse
+Nous étudierons ici 3 approches différentes pour ce problème que nous compareron
+s suivant des critères de fidélité du rendu, vitesse de calcul.
+ 
+\end_layout
+
+\begin_layout Section
+Normale à partir d'une grille de sommets
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename verticegrid3.png
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Grille de sommets
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+Les différentes formes géométriques qui composent le terrain d'une planète
+ sont représentées par des grilles de sommets, 
+\emph on
+vertices
+\emph default
+ en anglais.
+ Puisque les positions de tous les sommets sont connues, il est possible
+ d'utiliser la grille pour calculer la normale 
+\begin_inset Formula $\hat{N}$
+\end_inset
+
+ à un sommet donné.
+\end_layout
+
+\begin_layout Verse
+Pour calculer la normale au point T de la sphère, il faut calculer E pour
+ 4 points autour de T : Nord, Sud, Est, Ouest.
+\end_layout
+
+\begin_layout Verse
+A partir de ces 4 points, on peut déduire deux tangentes longitudinale 
+\begin_inset Formula $\overrightarrow{t_{1}}$
+\end_inset
+
+ et latérale 
+\begin_inset Formula $\overrightarrow{t_{2}}$
+\end_inset
+
+ dont on peut prendre le produit vectoriel, nous donnant le vecteur normal
+ 
+\begin_inset Formula $\overrightarrow{n}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Verse
+Il faut donc d'abord trouver ces 4 points, connaissant (x,y,z) sur la sphère
+ unité.
+\end_layout
+
+\begin_layout Verse
+Les points Nord et Sud s'obtiennent par décalage de 
+\begin_inset Formula $d\theta$
+\end_inset
+
+ en coordonnées sphériques.
+\end_layout
+
+\begin_layout Verse
+Les points Est et Ouest s'obtiennent par décalage de 
+\begin_inset Formula $d\phi$
+\end_inset
+
+ en coordonnées sphériques.
+\end_layout
+
+\begin_layout Verse
+Le déplacement élémentaire longitudinal s'écrit en coordonnées sphériques
+ : 
+\begin_inset Formula $\overrightarrow{l_{1}}=d\theta\hat{u_{\theta}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Verse
+Le déplacement élémentaire latéral s'écrit en coordonnées sphériques :
+\begin_inset Formula $\overrightarrow{l_{2}}=rsin(\theta)d\phi\hat{u_{\phi}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Verse
+Projetons ces vecteurs dans la base cartésienne de travail.
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula $\begin{cases}
+x=rsin(\theta)cos(\phi)\\
+y=rsin(\theta)sin(\phi)\\
+z=rcos(\theta)
+\end{cases}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+Variation de 
+\begin_inset Formula $\theta$
+\end_inset
+
+ différentiation :
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula $\begin{cases}
+dx=rd\theta cos(\theta)cos(\phi)\\
+dy=rd\theta cos(\theta)sin(\phi)\\
+dz=-rd\theta sin(\theta)
+\end{cases}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+Variation de 
+\begin_inset Formula $\phi$
+\end_inset
+
+ différentiation :
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula $\begin{cases}
+dx=-rd\phi sin(\theta)sin(\phi)\\
+dy=rd\phi sin(\theta)cos(\phi)\\
+dz=0
+\end{cases}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+Formules utiles :
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula $\frac{y}{x}=tan(\phi)$
+\end_inset
+
+ et 
+\begin_inset Formula $\frac{z}{r}=cos(\theta)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+On ne peut éviter les fonctions trigonométriques réciproques...
+\end_layout
+
+\begin_layout Verse
+Deuxième approche :
+\end_layout
+
+\begin_layout Verse
+On connaît le vecteur normal à la sphère unité : 
+\begin_inset Formula $\hat{n}=(a,b,c)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+On cherche simplement deux vecteurs du plan dont une équation cartésienne
+ est 
+\begin_inset Formula $ax+by+cz=0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+On remarque que 
+\begin_inset Formula $\overrightarrow{t}_{1}=(b,-a,0)$
+\end_inset
+
+ satisfait l'équation.
+\end_layout
+
+\begin_layout Verse
+On peut trouver un vecteur normal à 
+\begin_inset Formula $\hat{n}$
+\end_inset
+
+ et à 
+\begin_inset Formula $\overrightarrow{t}_{1}$
+\end_inset
+
+ à l'aide du produit vectoriel 
+\begin_inset Formula $\hat{n}\land\overrightarrow{t}_{1}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Verse
+https://www.mathsisfun.com/algebra/vectors-cross-product.html
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula $(a,b,c)\land(b,-a,0)=(ac,cb,-(a^{2}+b^{2}))$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+On obtient alors deux vecteurs élémentaires orthogonaux pour se déplacer
+ à la surface de la sphère :
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula 
+\[
+\hat{u}=\frac{1}{\sqrt{a^{2}+b^{2}}}\begin{pmatrix}b\\
+-a\\
+0
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+\hat{v}=\frac{1}{\sqrt{(ac)^{2}+(bc)^{2}+(a^{2}+b^{2})^{2}}}\begin{pmatrix}ac\\
+cb\\
+-(a^{2}+b^{2})
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
