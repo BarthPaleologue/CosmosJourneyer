@@ -177,7 +177,7 @@ new Slider("scatteringStrength", document.getElementById("scatteringStrength")!,
     atmosphere.settings.scatteringStrength = val / 10;
 });
 
-new Slider("falloff", document.getElementById("falloff")!, -10, 30, atmosphere.settings.falloffFactor, (val: number) => {
+new Slider("falloff", document.getElementById("falloff")!, -10, 200, atmosphere.settings.falloffFactor, (val: number) => {
     atmosphere.settings.falloffFactor = val;
 });
 

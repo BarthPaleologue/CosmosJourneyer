@@ -58,17 +58,18 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
 
     if(d < 0.0) return false; // no intersection
 
+    float s = sqrt(d);
 
-    float r0 = (-b - sqrt(d)) / (2.0*a);
-    float r1 = (-b + sqrt(d)) / (2.0*a);
+    float r0 = (-b - s) / (2.0*a);
+    float r1 = (-b + s) / (2.0*a);
 
     t0 = min(r0, r1);
     t1 = max(r0, r1);
 
-    // implémenter moins d'océan au nord
-    //if(abs((relativeOrigin + rayDir * t0).y) > 100000.0) return false;
+    t0 = max(min(r0, r1), 0.0);
+    t1 = max(max(r0, r1), 0.0);
 
-    return (t1 >= 0.0);
+    return (t1 > 0.0);
 }
 
 vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
