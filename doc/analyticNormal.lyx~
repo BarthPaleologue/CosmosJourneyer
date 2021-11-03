@@ -168,14 +168,16 @@ Normale à partir d'une grille de sommets
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
 
 \begin_layout Plain Layout
+\noindent
 \align center
 \begin_inset Graphics
-	filename verticegrid2.png
+	filename verticegrid3.png
 
 \end_inset
 
@@ -198,6 +200,21 @@ Grille de sommets
 \end_inset
 
 
+\end_layout
+
+\begin_layout Verse
+Les différentes formes géométriques qui composent le terrain d'une planète
+ sont représentées par des grilles de sommets, 
+\emph on
+vertices
+\emph default
+ en anglais.
+ Puisque les positions de tous les sommets sont connues, il est possible
+ d'utiliser la grille pour calculer la normale 
+\begin_inset Formula $\hat{N}$
+\end_inset
+
+ à un sommet donné.
 \end_layout
 
 \begin_layout Verse
