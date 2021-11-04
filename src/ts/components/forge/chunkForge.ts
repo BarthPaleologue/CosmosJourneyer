@@ -88,6 +88,7 @@ export class ChunkForge {
 
                 worker.send({
                     taskType: "buildTask",
+                    planetID: task.planet.id,
                     chunkLength: task.chunkLength,
                     subdivisions: this.subdivisions,
                     depth: task.depth,

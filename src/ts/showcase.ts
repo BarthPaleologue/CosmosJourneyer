@@ -90,17 +90,19 @@ planets.push(moon);
 
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
 
+
 let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 10e2, sun, scene.activeCamera, scene);
 ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 //ocean.settings.oceanRadius = 0;
 
+//let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 10e3, radius + 20e3, sun, player.camera, scene);
+
+
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 30e3, sun, player.camera, scene);
 //atmosphere.settings.intensity = 10;
 atmosphere.settings.falloffFactor = 20;
 atmosphere.settings.scatteringStrength = 0.4;
-
-//let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 35e2, radius + 36e3, sun, player.firstPersonCamera, scene);
 
 
 //let invert = new InvertPostProcess("invert", scene.activeCamera, scene);
@@ -130,10 +132,10 @@ collisionWorker.onmessage = e => {
     if (player.nearestPlanet == null) return;
 
     let direction = player.nearestPlanet.getAbsolutePosition().normalizeToNew();
-    let currentHeight = planet.getAbsolutePosition().length(); // ellipsoid
+    let currentHeight = player.nearestPlanet.getAbsolutePosition().length();
     let terrainHeight = e.data.h;
 
-    let currentPosition = planet.attachNode.absolutePosition;
+    let currentPosition = player.nearestPlanet.attachNode.absolutePosition;
     let newPosition = currentPosition;
 
     if (currentHeight - player.collisionRadius < terrainHeight) {
@@ -186,6 +188,7 @@ scene.executeWhenReady(() => {
         if (collisionWorkerAvailable && player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() < player.nearestPlanet.radius * 2) {
             collisionWorker.postMessage({
                 taskType: "collisionTask",
+                planetID: player.nearestPlanet.id,
                 terrainSettings: player.nearestPlanet.terrainSettings,
                 position: [
                     -player.nearestPlanet.getAbsolutePosition().x,

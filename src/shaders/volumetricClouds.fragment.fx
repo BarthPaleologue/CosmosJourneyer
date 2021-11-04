@@ -270,13 +270,18 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
 
     if(d < 0.0) return false; // no intersection
 
-    float r0 = (-b - sqrt(d)) / (2.0*a);
-    float r1 = (-b + sqrt(d)) / (2.0*a);
+    float s = sqrt(d);
+
+    float r0 = (-b - s) / (2.0*a);
+    float r1 = (-b + s) / (2.0*a);
 
     t0 = min(r0, r1);
     t1 = max(r0, r1);
 
-    return (t1 >= 0.0);
+    t0 = max(min(r0, r1), 0.0);
+    t1 = max(max(r0, r1), 0.0);
+
+    return (t1 > 0.0);
 }
 
 // based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
@@ -322,21 +327,23 @@ float densityAtPoint(vec3 densitySamplePoint) {
 	//localDensity *= roundBottom * roundTop * reduceDensityBottom * softerTransitionTowardTop;
 
 
-	localDensity /= 1000.0;
+	//localDensity /= 1000.0;
 
 	//localDensity = pow(localDensity, 2.0);
 
 	//localDensity = 1.0 - exp(-localDensity/1000000.0);
 
+	localDensity = weatherMap / 300000.0;
+
 	// est lié au bug visuel
-	//localDensity *= exp(-height01*14.0);
+	//localDensity *= exp(-height01*1000.0);
 
     return localDensity;
 }
 
 float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
 
-    float stepSize = rayLength / (float(OPTICAL_DEPTH_POINTS) - 1.0); // ray length between sample points
+    float stepSize = rayLength / float(OPTICAL_DEPTH_POINTS - 1); // ray length between sample points
     
     vec3 densitySamplePoint = rayOrigin; // that's where we start
 
@@ -363,7 +370,7 @@ float calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 original
 
     vec3 sunDir = normalize(sunPosition); // direction to the light source
     
-    float stepSize = rayLength / (float(POINTS_FROM_CAMERA) - 1.0); // the ray length between sample points
+    float stepSize = rayLength / float(POINTS_FROM_CAMERA - 1); // the ray length between sample points
 
     float inScatteredLight = 0.0; // amount of light scattered for each channel
 
@@ -408,11 +415,11 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     vec3 light = vec3(calculateLight(firstPointInAtmosphere, rayDir, distanceThroughAtmosphere, originalColor)); // calculate scattering
     
-	float ndl = -dot(normalize(rayOrigin + rayDir * impactPoint - planetPosition), normalize(rayOrigin + rayDir * impactPoint - sunPosition));
+	/*float ndl = -dot(normalize(rayOrigin + rayDir * impactPoint - planetPosition), normalize(rayOrigin + rayDir * impactPoint - sunPosition));
 
 	ndl = saturate(ndl + 0.2);
 
-	light *= ndl;
+	light *= ndl;*/
 	//light *= saturate(max(1.0 - pow(1.0 - ndl, 4.0), 0.0));
 
     return originalColor * (1.0 - light) + light; // blending scattered color with original color

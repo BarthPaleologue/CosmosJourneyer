@@ -1,18 +1,21 @@
 import { getRotationMatrixFromDirection } from "../toolbox/direction";
-import { SimplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
+import { simplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
 import { ComputeNormals } from "../toolbox/computeNormals";
 import { Vector } from "../toolbox/algebra";
-import { MountainNoiseLayer } from "../terrain/landscape/moutainNoiseLayer";
-import { ContinentNoiseLayer } from "../terrain/landscape/continentNoiseLayer";
+import { mountainNoiseLayer } from "../terrain/landscape/moutainNoiseLayer";
+import { continentNoiseLayer } from "../terrain/landscape/continentNoiseLayer";
 import { CraterLayer } from "../terrain/crater/craterLayer";
 import { buildData } from "../forge/buildData";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { CollisionData } from "../forge/CollisionData";
+import { elevationFunction } from "../terrain/landscape/elevationFunction";
 
-let bumpyLayer: SimplexNoiseLayer;
-let continentsLayer2: SimplexNoiseLayer;
+let currentPlanetID = "";
+
+let bumpyLayer: elevationFunction;
+let continentsLayer2: elevationFunction;
 //let continentsLayer3: ContinentNoiseLayer;
-let mountainsLayer: MountainNoiseLayer;
+let mountainsLayer: elevationFunction;
 
 let terrainSettings: TerrainSettings = {
     continentsFragmentation: 0.5,
@@ -26,10 +29,10 @@ let terrainSettings: TerrainSettings = {
 
 
 function initLayers() {
-    bumpyLayer = new SimplexNoiseLayer(1e-4, 5, 2, 2, 0.0);
-    continentsLayer2 = new SimplexNoiseLayer(5e-6, 5, 2, 2, 1 - terrainSettings.continentsFragmentation);
+    bumpyLayer = simplexNoiseLayer(1e-4, 5, 2, 2, 0.0);
+    continentsLayer2 = simplexNoiseLayer(5e-6, 5, 2, 2, 1 - terrainSettings.continentsFragmentation);
     //continentsLayer3 = new ContinentNoiseLayer(2e-5, 5, 1.5, 2, 0.0);
-    mountainsLayer = new MountainNoiseLayer(2e-5, 5, 2.2, 2, 0.0);
+    mountainsLayer = mountainNoiseLayer(2e-5, 5, 2.2, 2, 0.0);
 }
 
 initLayers();
@@ -52,11 +55,11 @@ function terrainFunction(p: Vector, planetRadius: number): Vector {
 
     elevation += craterMask;
 
-    const continentMask = continentsLayer2.evaluate(planetSpherePosition);
+    const continentMask = continentsLayer2(planetSpherePosition);
 
-    elevation += continentMask * mountainsLayer.evaluate(planetSpherePosition.scaleToNew(terrainSettings.mountainsFrequency)) * terrainSettings.maxMountainHeight;
+    elevation += continentMask * mountainsLayer(planetSpherePosition.scaleToNew(terrainSettings.mountainsFrequency)) * terrainSettings.maxMountainHeight;
 
-    elevation += bumpyLayer.evaluate(planetSpherePosition.scaleToNew(terrainSettings.bumpsFrequency)) * terrainSettings.maxBumpHeight;
+    elevation += bumpyLayer(planetSpherePosition.scaleToNew(terrainSettings.bumpsFrequency)) * terrainSettings.maxBumpHeight;
 
     const newPosition = p.addToNew(unitCoords.scaleToNew(elevation));
 
@@ -67,6 +70,7 @@ self.onmessage = e => {
     if (e.data.taskType == "buildTask") {
         //let clock = Date.now();
 
+
         const data = e.data as buildData;
 
         const chunkLength = data.chunkLength;
@@ -75,11 +79,13 @@ self.onmessage = e => {
         const direction = data.direction;
         const offset: number[] = data.position;
 
-        craterLayer.craters = data.craters;
+        if (data.planetID != currentPlanetID) {
+            currentPlanetID = data.planetID;
 
-        terrainSettings = data.terrainSettings;
-
-        initLayers();
+            craterLayer.craters = data.craters;
+            terrainSettings = data.terrainSettings;
+            initLayers();
+        }
 
         const size = chunkLength / (2 ** depth);
         const planetRadius = chunkLength / 2;
@@ -163,8 +169,13 @@ self.onmessage = e => {
     } else if (e.data.taskType == "collisionTask") {
         let data = e.data as CollisionData;
 
-        craterLayer.craters = data.craters;
-        terrainSettings = data.terrainSettings;
+        if (data.planetID != currentPlanetID) {
+            currentPlanetID = data.planetID;
+
+            craterLayer.craters = data.craters;
+            terrainSettings = data.terrainSettings;
+            initLayers();
+        }
 
         let samplePosition = new Vector(...data.position).normalizeToNew().scaleToNew(data.chunkLength / 2);
 
