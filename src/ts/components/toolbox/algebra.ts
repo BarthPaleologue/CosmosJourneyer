@@ -1,9 +1,103 @@
 export class Vector {
-    private components: number[] = [];
-    readonly dim: number;
+    private components: number[];
     constructor(...components: number[]) {
         this.components = components;
-        this.dim = components.length;
+        //Object.seal(this.components); performance issues ? weird
+    }
+    public get dim(): number {
+        return this.components.length;
+    }
+    public get x(): number {
+        if (this.dim == 0) throw Error("The vector has no x component !");
+        return this.components[0];
+    }
+    public get y(): number {
+        if (this.dim <= 1) throw Error("The vector has no y component !");
+        return this.components[1];
+    }
+    public get z(): number {
+        if (this.dim <= 2) throw Error("The vector has no z component !");
+        return this.components[2];
+    }
+    public get w(): number {
+        if (this.dim <= 3) throw Error("The vector has no w component !");
+        return this.components[3];
+    }
+    public get r(): number {
+        if (this.dim == 0) throw Error("The vector has no r component !");
+        return this.components[0];
+    }
+    public get g(): number {
+        if (this.dim <= 1) throw Error("The vector has no g component !");
+        return this.components[1];
+    }
+    public get b(): number {
+        if (this.dim <= 2) throw Error("The vector has no b component !");
+        return this.components[2];
+    }
+    public get a(): number {
+        if (this.dim <= 3) throw Error("The vector has no a component !");
+        return this.components[3];
+    }
+    public get xy(): Vector {
+        return new Vector(this.x, this.y);
+    }
+    public get zw(): Vector {
+        return new Vector(this.z, this.w);
+    }
+    public get xxx(): Vector {
+        return Vector.Ns(this.x, 3);
+    }
+    public get yyy(): Vector {
+        return Vector.Ns(this.y, 3);
+    }
+    public get zzz(): Vector {
+        return Vector.Ns(this.z, 3);
+    }
+    public get xyz(): Vector {
+        return new Vector(this.x, this.y, this.z);
+    }
+    public get yzx(): Vector {
+        return new Vector(this.y, this.z, this.x);
+    }
+    public get zxy(): Vector {
+        return new Vector(this.z, this.x, this.y);
+    }
+    public get wyz(): Vector {
+        return new Vector(this.w, this.y, this.z);
+    }
+    public get xzx(): Vector {
+        return new Vector(this.x, this.z, this.x);
+    }
+    public get yyyy(): Vector {
+        return Vector.Ns(this.y, 4);
+    }
+    public get xzyw(): Vector {
+        return new Vector(this.x, this.z, this.y, this.w);
+    }
+    public get xxyy(): Vector {
+        return new Vector(this.x, this.x, this.y, this.y);
+    }
+    public get zzww(): Vector {
+        return new Vector(this.z, this.z, this.w, this.w);
+    }
+    public static FromVectors(...vectors: Vector[]): Vector {
+        let components: number[] = [];
+        for (let vector of vectors) {
+            components = components.concat(vector.components);
+        }
+        return new Vector(...components);
+    }
+    public static FromVectorsAndNumbers(...array: (Vector | number)[]): Vector {
+        let components: number[] = [];
+        for (let element of array) {
+            if (element instanceof Vector) {
+                components = components.concat(element.components);
+            } else {
+                components.push(element);
+            }
+        }
+        return new Vector(...components);
     }
     public static fromBABYLON(vector: BABYLON.Vector2 | BABYLON.Vector3 | BABYLON.Vector4) {
         let components: number[] = [vector.x, vector.y];
@@ -23,9 +117,6 @@ export class Vector {
     public get(component: number): number {
         if (component >= this.components.length) throw Error("Undefined Component");
         return this.components[component];
-    }
-    public g(component: number) {
-        return this.get(component);
     }
     public getSquaredMagnitude(): number {
         return this.components.reduce(
@@ -59,32 +150,32 @@ export class Vector {
     public addToNew(otherVector: Vector) {
         if (this.dim != otherVector.dim) new Error("Dimension error while adding");
         let components: number[] = this.components.map((value: number, i: number) => {
-            return value + otherVector.g(i);
+            return value + otherVector.get(i);
         });
         return new Vector(...components);
     }
     public addInPlace(otherVector: Vector) {
         if (this.dim != otherVector.dim) new Error("Dimension error while adding");
-        this.components.forEach((value: number, i: number) => value + otherVector.g(i));
+        this.components.forEach((value: number, i: number) => value + otherVector.get(i));
     }
     public subtractToNew(otherVector: Vector) {
         if (this.dim != otherVector.dim) new Error("Dimension error while subtracting");
         let components: number[] = this.components.map((value: number, i: number) => {
-            return value - otherVector.g(i);
+            return value - otherVector.get(i);
         });
         return new Vector(...components);
     }
     public subtractInPlace(otherVector: Vector) {
         if (this.dim != otherVector.dim) new Error("Dimension error while subtracting");
-        this.components.forEach((value: number, i: number) => value - otherVector.g(i));
+        this.components.forEach((value: number, i: number) => value - otherVector.get(i));
     }
     public toBABYLON() {
         if (this.dim == 2) {
-            return new BABYLON.Vector2(this.g(0), this.g(1));
+            return new BABYLON.Vector2(this.x, this.y);
         } else if (this.dim == 3) {
-            return new BABYLON.Vector3(this.g(0), this.g(1), this.g(2));
+            return new BABYLON.Vector3(this.x, this.y, this.z);
         } else if (this.dim == 4) {
-            return new BABYLON.Vector4(this.g(0), this.g(1), this.g(2), this.g(3));
+            return new BABYLON.Vector4(this.x, this.y, this.z, this.w);
         } else {
             throw Error("Vector of too many dimensions : cannot be casted as a BABYLON Vector 2 3 or 4");
         }
@@ -93,7 +184,7 @@ export class Vector {
         if (vector1.dim != vector2.dim) throw Error("Distance between two vectors of different dimensions !");
         let squaredDistance = 0;
         for (let i = 0; i < vector1.dim; i++) {
-            squaredDistance += (vector1.g(i) - vector2.g(i)) ** 2;
+            squaredDistance += (vector1.get(i) - vector2.get(i)) ** 2;
         }
         return squaredDistance;
     }
@@ -103,16 +194,59 @@ export class Vector {
     public static Dot(vector1: Vector, vector2: Vector): number {
         if (vector1.dim != vector2.dim) throw Error("Distance between two vectors of different dimensions !");
         return vector1.components.reduce((previousValue: number, value: number, i: number) => {
-            return previousValue + value * vector2.g(i);
+            return previousValue + value * vector2.get(i);
         });
     }
 
+    public static Step(edge: Vector, x: Vector): Vector {
+        return Vector.PerComponentOperation(edge, x, (edgei: number, xi: number) => {
+            return (xi < edgei) ? 0.0 : 1.0;
+        });
+    }
+
+    public static Min(vector1: Vector, vector2: Vector) {
+        return Vector.PerComponentOperation(vector1, vector2, Math.min);
+    }
+
+    public static Max(vector1: Vector, vector2: Vector) {
+        return Vector.PerComponentOperation(vector1, vector2, Math.max);
+    }
+
+    public static PerComponentOperation(vector1: Vector, vector2: Vector, f: (v1i: number, v2i: number) => number) {
+        if (vector1.dim != vector2.dim) throw Error("Vectors does not have the same dimension !");
+        return new Vector(...vector1.components.map((vector1i: number, i: number) => {
+            return f(vector1i, vector2.get(i));
+        }));
+    }
+
     public floorToNew(): Vector {
-        return new Vector(...this.components.map((value: number) => { return Math.floor(value); }));
+        return new Vector(...this.components.map((value: number) => {
+            return Math.floor(value);
+        }));
     }
 
     public floorInPlace(): void {
         this.components.forEach((value: number) => Math.floor(value));
+    }
+
+    public absToNew(): Vector {
+        return new Vector(...this.components.map((value: number) => {
+            return Math.abs(value);
+        }));
+    }
+
+    public absInPlace(): void {
+        this.components.forEach((value: number) => Math.abs(value));
+    }
+
+    public multiplyToNew(otherVector: Vector): Vector {
+        return new Vector(...this.components.map((value: number, i: number) => {
+            return value * otherVector.get(i);
+        }));
+    }
+
+    public addNumberToNew(x: number): Vector {
+        return new Vector(...this.components.map((value: number) => { return value + x; }));
     }
 
     public applySquaredMatrixToNew(matrix: Matrix): Vector {
@@ -122,7 +256,7 @@ export class Vector {
         for (let i = 0; i < this.dim; i++) {
             let value = 0;
             for (let j = 0; j < matrix.dimX; j++) {
-                value += matrix.m[i][j] * this.g(j);
+                value += matrix.m[i][j] * this.get(j);
             }
             components.push(value);
         }

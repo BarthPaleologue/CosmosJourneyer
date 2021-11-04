@@ -342,6 +342,20 @@ function seed(seed: number) {
 	}
 }
 
+const SEED = 42;
+
+for (let i = 0; i < 256; i++) {
+	let v;
+	if (i & 1) {
+		v = p[i] ^ (SEED & 255);
+	} else {
+		v = p[i] ^ ((SEED >> 8) & 255);
+	}
+
+	perm[i] = perm[i + 256] = v;
+	gradP[i] = gradP[i + 256] = grad3[v % 12];
+}
+
 function simplex2(xin: number, yin: number) {
 	let n0, n1, n2; // Noise contributions from the three corners
 	// Skew the input space to determine which simplex cell we're in
@@ -409,7 +423,7 @@ function simplex2(xin: number, yin: number) {
  * @returns simplex between 0 and 1
  */
 export function normalizedSimplex3FromVector(vector: Vector) {
-	return (1 + simplex3(vector.get(0), vector.get(1), vector.get(2))) / 2;
+	return (1 + simplex3(vector.x, vector.y, vector.z)) / 2;
 }
 
 /**
@@ -418,11 +432,10 @@ export function normalizedSimplex3FromVector(vector: Vector) {
  * @returns simplex between -1 and 1
  */
 export function simplex3FromVector(vector: Vector) {
-	return simplex3(vector.g(0), vector.g(1), vector.g(2));
+	return simplex3(vector.x, vector.y, vector.z);
 }
 
 function simplex3(xin: number, yin: number, zin: number) {
-	seed(42);
 
 	let n0, n1, n2, n3; // Noise contributions from the four corners
 

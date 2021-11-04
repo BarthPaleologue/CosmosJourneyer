@@ -122,9 +122,9 @@ self.onmessage = e => {
                 // on le ramène à l'origine
                 vertexPosition = vertexPosition.addToNew(vecOffset.normalizeToNew().scaleToNew(-planetRadius));
 
-                verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition.g(0);
-                verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition.g(1);
-                verticesPositions[(x * vertexPerLine + y) * 3 + 2] = vertexPosition.g(2);
+                verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition.x;
+                verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition.y;
+                verticesPositions[(x * vertexPerLine + y) * 3 + 2] = vertexPosition.z;
 
                 if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
                     faces.push([
