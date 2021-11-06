@@ -30,6 +30,8 @@ uniform float specularPower;
 uniform float alphaModifier;
 uniform float depthModifier;
 
+uniform mat4 planetWorldMatrix;
+
 uniform float time;
 
 // remap a value comprised between low1 and high1 to a value between low2 and high2
@@ -112,20 +114,22 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
     
     vec3 samplePoint = rayOrigin + impactPoint * rayDir;
 
-    vec3 samplePointPlanetSpace = samplePoint - planetPosition;
+    vec3 samplePointPlanetSpace = vec3(inverse(planetWorldMatrix) * vec4(samplePoint, 1.0));//samplePoint - planetPosition;
     
-    vec3 planetNormal = normalize(samplePointPlanetSpace);
+    vec3 planetNormal = normalize(samplePoint - planetPosition);
     
-    vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time*planetNormal.x, -time*planetNormal.y, 0.0), planetNormal, normalMap, 0.00002, 0.7, 0.5);
+    vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time, -time, time), planetNormal, normalMap, 0.00002, 1.0, 0.3);
+    normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time), planetNormal, normalMap, 0.00002, 1.0, 0.3);
     
     vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
 
-    float ndl = max(dot(normalWave, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
+    float ndl = max(dot(planetNormal, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
 
-    // specular based on https://learnopengl.com/Lighting/Basic-Lighting
-    vec3 reflectDir = reflect(-rayDir, planetNormal);
-    
-    float spec = pow(max(dot(rayDir, reflectDir), 0.0), 4.0);
+    //TODO : en faire un uniform
+    float smoothness = 0.7;
+    float specularAngle = acos(dot(normalize(sunDir - rayDir), normalWave));
+    float specularExponent = specularAngle / (1.0 - smoothness);
+    float specularHighlight = exp(-specularExponent * specularExponent);
 
     if(distanceThroughOcean > 0.0) {
         float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * depthModifier);
@@ -138,10 +142,8 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         vec3 oceanColor = lerp(deepColor, shallowColor, opticalDepth01);
         
         vec3 ambiant = lerp(originalColor, oceanColor, alpha);
-        //vec3 diffuse = ndl * ambiant;
-        //vec3 specular = spec * vec3(1.0) * ndl;
-
-        return ambiant * (ndl + spec);
+ 
+        return ambiant * ndl + specularHighlight;
     } else {
         return originalColor;
     }

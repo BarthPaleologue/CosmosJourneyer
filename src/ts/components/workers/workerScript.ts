@@ -29,10 +29,10 @@ let terrainSettings: TerrainSettings = {
 
 
 function initLayers() {
-    bumpyLayer = simplexNoiseLayer(1e-4, 5, 2, 2, 0.0);
-    continentsLayer2 = simplexNoiseLayer(5e-6, 5, 2, 2, 1 - terrainSettings.continentsFragmentation);
+    bumpyLayer = simplexNoiseLayer(2e-5, 2, 2, 2, 0.0);
+    continentsLayer2 = simplexNoiseLayer(5e-6, 5, 2.3, 2.5, 1 - terrainSettings.continentsFragmentation);
     //continentsLayer3 = new ContinentNoiseLayer(2e-5, 5, 1.5, 2, 0.0);
-    mountainsLayer = mountainNoiseLayer(2e-5, 5, 2.2, 2, 0.0);
+    mountainsLayer = mountainNoiseLayer(1e-5, 3, 2, 2, 0.7);
 }
 
 initLayers();
@@ -57,7 +57,7 @@ function terrainFunction(p: Vector, planetRadius: number): Vector {
 
     const continentMask = continentsLayer2(planetSpherePosition);
 
-    elevation += continentMask * mountainsLayer(planetSpherePosition.scaleToNew(terrainSettings.mountainsFrequency)) * terrainSettings.maxMountainHeight;
+    elevation += continentMask * (1 + mountainsLayer(planetSpherePosition.scaleToNew(terrainSettings.mountainsFrequency))) * terrainSettings.maxMountainHeight / 2;
 
     elevation += bumpyLayer(planetSpherePosition.scaleToNew(terrainSettings.bumpsFrequency)) * terrainSettings.maxBumpHeight;
 

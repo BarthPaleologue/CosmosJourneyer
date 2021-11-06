@@ -142,9 +142,9 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, float bottomFactor, floa
 	tNormalZ += snowFactor * tSnowNormalZ;
 	if(totalAmplitude > 0.0) tNormalZ /= totalAmplitude;
 
-	tNormalX = lerp(tNormalX, tSteepNormalX, 1.0 - steepFactor) * normalStrength;
-	tNormalY = lerp(tNormalY, tSteepNormalY, 1.0 - steepFactor) * normalStrength;
-	tNormalZ = lerp(tNormalZ, tSteepNormalZ, 1.0 - steepFactor) * normalStrength;
+	tNormalX = lerp(tNormalX, tSteepNormalX, 1.0-steepFactor) * normalStrength;
+	tNormalY = lerp(tNormalY, tSteepNormalY, 1.0-steepFactor) * normalStrength;
+	tNormalZ = lerp(tNormalZ, tSteepNormalZ, 1.0-steepFactor) * normalStrength;
 
     tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
     tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
@@ -205,6 +205,10 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 
 			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.001, normalSharpness, normalStrength);
 			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0003, normalSharpness, normalStrength); // plus grand
+			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.000007, normalSharpness, normalStrength); // plus grand
+			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0000001, normalSharpness, normalStrength); // plus grand
+			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.00000004, normalSharpness, normalStrength); // plus grand
+
 
 			return snowColor;
 		} else {
@@ -212,6 +216,10 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 
 			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, normalSharpness, normalStrength);
 			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0003, normalSharpness, normalStrength); // plus grand
+			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.000007, normalSharpness, normalStrength); // plus grand
+			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0000001, normalSharpness, normalStrength); // plus grand
+			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.00000004, normalSharpness, normalStrength); // plus grand
+
 
 			return steepColor;
 		}
@@ -232,6 +240,9 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 
 		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.001, normalSharpness, normalStrength);
 		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0003, normalSharpness, normalStrength); // plus grand
+		//normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.000007, normalSharpness, normalStrength); // plus grand
+		//normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0000001, normalSharpness, normalStrength); // plus grand
+		//normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.00000004, normalSharpness, normalStrength); // plus grand
 
 		return lerp(flatColor, steepColor, pow(1.0 - slope, steepSharpness));
 	} else {
@@ -250,7 +261,7 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0003, normalSharpness, normalStrength); // plus grand
 
 		
-		return lerp(flatColor, steepColor, pow(slope, steepSharpness));
+		return lerp(flatColor, steepColor, pow(1.0 - slope, steepSharpness));
 	}
 
 }

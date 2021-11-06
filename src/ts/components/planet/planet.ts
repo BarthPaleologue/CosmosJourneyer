@@ -86,10 +86,10 @@ export class Planet {
             steepSharpness: 1,
             normalSharpness: 0.7,
 
-            snowElevation01: 0.5,
+            snowElevation01: 0.7,
             snowOffsetAmplitude: 0.05,
             snowLacunarity: 4.9,
-            snowLatitudePersistence: 1.0,
+            snowLatitudePersistence: 2.5,
             steepSnowDotLimit: 0.8,
         };
 

@@ -39,6 +39,8 @@ export class OceanPostProcess extends BABYLON.PostProcess {
             "alphaModifier",
             "depthModifier",
 
+            "planetWorldMatrix",
+
             "time"
         ], [
             "textureSampler",
@@ -94,6 +96,8 @@ export class OceanPostProcess extends BABYLON.PostProcess {
             effect.setFloat("specularPower", this.settings.specularPower);
             effect.setFloat("alphaModifier", this.settings.alphaModifier);
             effect.setFloat("depthModifier", this.settings.depthModifier);
+
+            effect.setMatrix("planetWorldMatrix", this.planet.getWorldMatrix());
 
             effect.setFloat("time", this.internalTime);
         };

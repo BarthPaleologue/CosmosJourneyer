@@ -32,7 +32,7 @@ scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
-const radius = 200 * 1e3; // diamètre en m
+const radius = 300 * 1e3; // diamètre en m
 
 let keyboard = new Keyboard();
 let mouse = new Mouse();
@@ -40,7 +40,7 @@ let gamepad = new Gamepad();
 
 let player = new PlayerControler(scene);
 player.setSpeed(0.2 * radius);
-player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), -1, BABYLON.Space.WORLD);
+player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), -5, BABYLON.Space.WORLD);
 
 player.camera.maxZ = Math.max(radius * 50, 10000);
 scene.activeCamera = player.camera;
@@ -50,8 +50,8 @@ let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);
 mat.emissiveTexture = new BABYLON.Texture(sunTexture, scene);
 sun.material = mat;
-sun.position.x = -1718573.25;
-sun.position.z = -65566.6171875;
+sun.position.x = -913038.375;
+sun.position.z = -1649636.25;
 depthRenderer.getDepthMap().renderList?.push(sun);
 
 let forge = new ChunkForge(64);
@@ -79,8 +79,6 @@ moon.colorSettings.snowElevation01 = 0.99;
 moon.colorSettings.steepSharpness = 10;
 moon.updateColors();
 
-moon.attachNode.parent = planet.attachNode;
-planet.attachNode.parent = sun;
 planets.push(moon);
 
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, scene.activeCamera, sun, 100);
@@ -108,8 +106,10 @@ document.addEventListener("keydown", e => {
     if (e.key == "p") { // take screenshots
         BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
     }
-    if (e.key == "o") console.log(sun.absolutePosition, player.mesh.rotation);
+    if (e.key == "u") atmosphere.settings.intensity = (atmosphere.settings.intensity == 0) ? 15 : 0;
+    if (e.key == "o") ocean.settings.oceanRadius = (ocean.settings.oceanRadius == 0) ? radius + 10e2 : 0;
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
+    if (e.key == "w") planet.surfaceMaterial.wireframe = !planet.surfaceMaterial.wireframe;
 });
 
 window.addEventListener("resize", () => {
@@ -137,6 +137,9 @@ collisionWorker.onmessage = e => {
 
     let deviation = newPosition.subtract(currentPosition);
 
+    for (const planet of planets) {
+        planet.attachNode.position.addInPlace(deviation);
+    }
     sun.position.addInPlace(deviation);
 
     collisionWorkerAvailable = true;
@@ -180,6 +183,7 @@ scene.executeWhenReady(() => {
         for (const planet of planets) {
             planet.attachNode.position.addInPlace(deplacement);
         }
+        sun.position.addInPlace(deplacement);
 
         if (collisionWorkerAvailable && player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() < player.nearestPlanet.radius * 2) {
             collisionWorker.postMessage({
