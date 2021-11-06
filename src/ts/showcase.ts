@@ -4,8 +4,6 @@ import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
 import { VolumetricCloudsPostProcess } from "./components/postProcesses/volumetricCloudsPostProcess";
 import { ChunkForge } from "./components/forge/chunkForge";
 
-//import * as BABYLON from "babylonjs";
-
 import sunTexture from "../asset/textures/sun.jpg";
 
 import * as style from "../styles/style.scss";
@@ -14,7 +12,6 @@ import { Keyboard } from "./components/inputs/keyboard";
 import { Mouse } from "./components/inputs/mouse";
 import { Gamepad } from "./components/inputs/gamepad";
 import { CollisionData } from "./components/forge/CollisionData";
-import { Matrix, Vector } from "./components/toolbox/algebra";
 
 style.default;
 
@@ -29,8 +26,6 @@ console.log("GPU utilisé : " + engine.getGlInfo().renderer);
 
 let scene = new BABYLON.Scene(engine);
 scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
-
-scene.enablePhysics(new BABYLON.Vector3(0, 0, 0), new BABYLON.OimoJSPlugin());
 
 let depthRenderer = new BABYLON.DepthRenderer(scene);
 scene.renderTargetsEnabled = true;
@@ -104,8 +99,6 @@ let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radi
 atmosphere.settings.falloffFactor = 20;
 atmosphere.settings.scatteringStrength = 0.4;
 
-
-//let invert = new InvertPostProcess("invert", scene.activeCamera, scene);
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
 
@@ -183,7 +176,10 @@ scene.executeWhenReady(() => {
         //planet.attachNode.rotation.y += 0.0002;
 
         deplacement.addInPlace(player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000));
-        sun.position.addInPlace(deplacement);
+
+        for (const planet of planets) {
+            planet.attachNode.position.addInPlace(deplacement);
+        }
 
         if (collisionWorkerAvailable && player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() < player.nearestPlanet.radius * 2) {
             collisionWorker.postMessage({
