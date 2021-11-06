@@ -8,7 +8,7 @@ A demo is available at https://barth.paleologue.fr/planetEngine/
 
 ![A little bit closer](https://github.com/BarthPaleologue/planetEngine/blob/history/screenshot_21-5-21_18-45.png)
 
-![On the surface](https://github.com/BarthPaleologue/planetEngine/blob/history/screenshot_21-10-4_13-10.png)
+![On the surface](https://github.com/BarthPaleologue/planetEngine/blob/history/screenshot_21-10-23_14-57.png)
 
 This project has been created using **webpack-cli**, you can now run
 
