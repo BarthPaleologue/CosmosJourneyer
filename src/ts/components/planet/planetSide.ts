@@ -121,10 +121,10 @@ export class PlanetSide {
         let direction = absolutePosition.subtractToNew(Vector3.FromBABYLON3(observerPosition));
         let dot = Vector3.Dot(direction, Vector3.FromBABYLON3(facingDirection));
         // distance carré entre caméra et noeud du quadtree
-        let d = direction.getSquaredMagnitude();
+        let d2 = direction.getSquaredMagnitude();
         let limit = this.renderDistanceFactor * this.chunkLength / (2 ** walked.length);
 
-        if ((d < limit ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
+        if ((d2 < limit ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
             // si on est proche de la caméra ou si on doit le générer car LOD minimal
             if (tree instanceof PlanetChunk) {
                 // si c'est un chunk, on le subdivise
@@ -149,11 +149,18 @@ export class PlanetSide {
             // si on est loin
             if (tree instanceof PlanetChunk) {
                 //let camera = this.scene.activeCamera?.position;
-                let distanceToCenter = BABYLON.Vector3.DistanceSquared(observerPosition, this.parent.absolutePosition);
+                //let distanceToCenter = BABYLON.Vector3.DistanceSquared(observerPosition, this.parent.absolutePosition);
                 // c'est pythagore
-                let behindHorizon = (d > distanceToCenter + (this.chunkLength / 2) ** 2);
+                //let behindHorizon = (d2 > distanceToCenter + (this.chunkLength / 2) ** 2);
                 // un jour peut être de l'occlusion
                 //tree.mesh.setEnabled(tree.mesh.isInFrustum(camera));
+
+                let planetSpacePosition = Vector3.FromBABYLON3(observerPosition).subtractToNew(parentPosition);
+                let dot = Vector3.Dot(planetSpacePosition.normalizeToNew(), relativePosition.normalizeToNew());
+
+                tree.mesh.setEnabled(dot > -0.1); // on affiche que les chunk du côté du joueur
+                // babylon fait déjà du frustrum culling apparemment.
+
 
                 return tree;
             } else {

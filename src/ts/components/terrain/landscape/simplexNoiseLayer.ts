@@ -1,6 +1,6 @@
 import { Vector } from "../../toolbox/algebra";
 import { normalizedSimplex3FromVector } from "../../toolbox/noiseTools";
-import { snoise } from "../../toolbox/simplex";
+import { simplex3 } from "../../toolbox/simplex";
 
 export function simplexNoiseLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, minValue: number): (coords: Vector) => number {
     return function (coords: Vector) {

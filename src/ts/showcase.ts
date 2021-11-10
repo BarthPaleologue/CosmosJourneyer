@@ -12,6 +12,7 @@ import { Keyboard } from "./components/inputs/keyboard";
 import { Mouse } from "./components/inputs/mouse";
 import { Gamepad } from "./components/inputs/gamepad";
 import { CollisionData } from "./components/forge/CollisionData";
+import { CollisionWorker } from "./components/workers/collisionWorker";
 
 style.default;
 
@@ -40,7 +41,7 @@ let gamepad = new Gamepad();
 
 let player = new PlayerControler(scene);
 player.setSpeed(0.2 * radius);
-player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), -5, BABYLON.Space.WORLD);
+player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), 0.6, BABYLON.Space.WORLD);
 
 player.camera.maxZ = Math.max(radius * 50, 10000);
 scene.activeCamera = player.camera;
@@ -59,6 +60,7 @@ let forge = new ChunkForge(64);
 let planets: Planet[] = [];
 
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, forge, scene);
+planet.terrainSettings.maxBumpHeight = 1e2;
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.steepSharpness = 10;
@@ -68,9 +70,10 @@ planet.updateColors();
 planet.attachNode.position.x = radius * 5;
 planets.push(planet);
 
-let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(-0.7), 0, Math.sin(-0.7)).scale(3 * radius), 1, forge, scene);
+let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, forge, scene);
 moon.terrainSettings.continentsFragmentation = 0;
-moon.terrainSettings.maxMountainHeight = 7e3;
+moon.terrainSettings.maxMountainHeight = 15e3;
+moon.terrainSettings.maxBumpHeight = 1e2;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.5, 0.5, 0.5);
 moon.colorSettings.sandColor = planet.colorSettings.steepColor;
 moon.colorSettings.steepColor = new BABYLON.Vector3(0.1, 0.1, 0.1);
@@ -78,6 +81,7 @@ moon.colorSettings.snowLatitudePersistence = 2;
 moon.colorSettings.snowElevation01 = 0.99;
 moon.colorSettings.steepSharpness = 10;
 moon.updateColors();
+moon.attachNode.position.addInPlace(planet.attachNode.getAbsolutePosition());
 
 planets.push(moon);
 
@@ -118,10 +122,10 @@ window.addEventListener("resize", () => {
     engine.resize();
 });
 
-let collisionWorker = new Worker(new URL('./components/workers/workerScript.ts', import.meta.url), { type: "module" });
+let collisionWorker = new CollisionWorker(player);
 let collisionWorkerAvailable = true;
 
-collisionWorker.onmessage = e => {
+collisionWorker.getWorker().onmessage = e => {
     if (player.nearestPlanet == null) return;
 
     let direction = player.nearestPlanet.getAbsolutePosition().normalizeToNew();
@@ -186,7 +190,7 @@ scene.executeWhenReady(() => {
         sun.position.addInPlace(deplacement);
 
         if (collisionWorkerAvailable && player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() < player.nearestPlanet.radius * 2) {
-            collisionWorker.postMessage({
+            collisionWorker.send({
                 taskType: "collisionTask",
                 planetID: player.nearestPlanet.id,
                 terrainSettings: player.nearestPlanet.terrainSettings,

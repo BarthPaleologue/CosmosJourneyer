@@ -239,6 +239,6 @@ export class Planet {
         return this.attachNode.position;
     }
     public getAbsolutePosition() {
-        return this.attachNode.absolutePosition;
+        return this.attachNode.getAbsolutePosition();
     }
 }

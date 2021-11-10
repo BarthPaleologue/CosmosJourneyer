@@ -81,6 +81,9 @@ export class Vector {
     public get zzww(): Vector {
         return new Vector(this.z, this.z, this.w, this.w);
     }
+    public get sum(): number {
+        return this.components.reduce((previous: number, value: number) => previous + value, 0);
+    }
     public static FromVectors(...vectors: Vector[]): Vector {
         let components: number[] = [];
         for (let vector of vectors) {
