@@ -49,7 +49,7 @@ export class Planet {
 
     surfaceMaterial: BABYLON.ShaderMaterial;
 
-    constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, chunkForge: ChunkForge, scene: BABYLON.Scene) {
+    constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, scene: BABYLON.Scene) {
 
         this.id = id;
         this.radius = radius;
@@ -146,24 +146,29 @@ export class Planet {
         this.surfaceMaterial = surfaceMaterial;
 
         this.sides = [
-            new PlanetSide(`${this.id}UpSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Up, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}DownSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Down, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}ForwardSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Forward, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}BackwardSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Backward, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}RightSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Right, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
-            new PlanetSide(`${this.id}LeftSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Left, this.attachNode, scene, chunkForge, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}UpSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Up, this.attachNode, scene, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}DownSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Down, this.attachNode, scene, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}ForwardSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Forward, this.attachNode, scene, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}BackwardSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Backward, this.attachNode, scene, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}RightSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Right, this.attachNode, scene, this.surfaceMaterial, this),
+            new PlanetSide(`${this.id}LeftSide`, minDepth, this.maxDepth, this.chunkLength, Direction.Left, this.attachNode, scene, this.surfaceMaterial, this),
         ];
 
         this.updateColors();
+    }
+    public setChunkForge(chunkForge: ChunkForge) {
+        for (const planetSide of this.sides) {
+            planetSide.setChunkForge(chunkForge);
+        }
     }
 
     /**
      * Update terrain of the sphere relative to the observer position
      * @param position the observer position
      */
-    private updateLOD(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3) {
+    private updateLOD(position: BABYLON.Vector3) {
         for (let side of this.sides) {
-            side.updateLOD(position, facingDirection);
+            side.updateLOD(position);
         }
     }
 
@@ -227,13 +232,13 @@ export class Planet {
 
     }
 
-    public update(position: BABYLON.Vector3, facingDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3, camera: BABYLON.Camera) {
+    public update(position: BABYLON.Vector3, lightPosition: BABYLON.Vector3, camera: BABYLON.Camera) {
         this.surfaceMaterial.setVector3("v3CameraPos", position);
         this.surfaceMaterial.setVector3("v3LightPos", lightPosition);
         this.surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
 
         this.surfaceMaterial.setMatrix("planetWorldMatrix", this.attachNode.getWorldMatrix());
-        this.updateLOD(position, facingDirection);
+        this.updateLOD(position);
     }
     public getRelativePosition() {
         return this.attachNode.position;

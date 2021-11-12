@@ -16,19 +16,19 @@ export class PlanetSide {
     // le quadtree
     minDepth: number;
     maxDepth: number; // profondeur maximale du quadtree envisagé
-    tree: quadTree; // le quadtree en question
+    tree: quadTree = []; // le quadtree en question
     renderDistanceFactor = 1;
 
     // les chunks
     chunkLength: number; // taille du côté de base
-    baseSubdivisions: number; // nombre de subdivisions
+    baseSubdivisions: number = 16; // nombre de subdivisions
     direction: Direction; // direction de la normale au plan
 
     parent: BABYLON.Mesh; // objet parent des chunks
     scene: BABYLON.Scene; // scène dans laquelle instancier les chunks
 
     // Le CEO des chunks
-    chunkForge: ChunkForge;
+    chunkForge: ChunkForge | undefined;
 
     surfaceMaterial: BABYLON.Material;
 
@@ -47,25 +47,31 @@ export class PlanetSide {
      * @param surfaceMaterial 
      * @param planet 
      */
-    constructor(id: string, minDepth: number, maxDepth: number, chunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: Planet) {
+    constructor(id: string, minDepth: number, maxDepth: number, chunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, surfaceMaterial: BABYLON.Material, planet: Planet) {
         this.id = id;
 
         this.maxDepth = maxDepth;
         this.minDepth = minDepth;
 
         this.chunkLength = chunkLength;
-        this.baseSubdivisions = chunkForge.subdivisions;
+        //this.baseSubdivisions = chunkForge.subdivisions;
         this.direction = direction;
         this.parent = parentNode;
         this.scene = scene;
 
-        this.chunkForge = chunkForge;
+        //this.chunkForge = chunkForge;
 
         this.surfaceMaterial = surfaceMaterial;
 
         this.planet = planet;
 
         // on initialise le plan avec un unique chunk
+        //this.tree = this.createChunk([]);
+    }
+
+    public setChunkForge(chunkForge: ChunkForge): void {
+        this.chunkForge = chunkForge;
+        this.baseSubdivisions = chunkForge.subdivisions;
         this.tree = this.createChunk([]);
     }
 
@@ -88,7 +94,7 @@ export class PlanetSide {
      */
     private requestDeletion(tree: quadTree): void {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
-            this.chunkForge.addTask({
+            this.chunkForge?.addTask({
                 taskType: TaskType.Deletion,
                 id: chunk.id,
                 mesh: chunk.mesh,
@@ -100,8 +106,8 @@ export class PlanetSide {
      * Update LOD of terrain relative to the observerPosition
      * @param observerPosition The observer position
      */
-    public updateLOD(observerPosition: BABYLON.Vector3, facingDirection: BABYLON.Vector3): void {
-        this.tree = this.updateLODRecursively(observerPosition, facingDirection);
+    public updateLOD(observerPosition: BABYLON.Vector3): void {
+        this.tree = this.updateLODRecursively(observerPosition);
     }
 
     /**
@@ -111,7 +117,7 @@ export class PlanetSide {
      * @param walked The position of the current root relative to the absolute root
      * @returns The updated tree
      */
-    private updateLODRecursively(observerPosition: BABYLON.Vector3, facingDirection: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
+    private updateLODRecursively(observerPosition: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
         let relativePosition = getChunkSphereSpacePositionFromPath(this.chunkLength, walked, this.direction, this.parent.rotation);
 
@@ -119,7 +125,6 @@ export class PlanetSide {
         let parentPosition = new Vector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
         let absolutePosition = relativePosition.addToNew(parentPosition);
         let direction = absolutePosition.subtractToNew(Vector3.FromBABYLON3(observerPosition));
-        let dot = Vector3.Dot(direction, Vector3.FromBABYLON3(facingDirection));
         // distance carré entre caméra et noeud du quadtree
         let d2 = direction.getSquaredMagnitude();
         let limit = this.renderDistanceFactor * this.chunkLength / (2 ** walked.length);
@@ -139,10 +144,10 @@ export class PlanetSide {
             } else {
                 // si c'en est pas un, on continue
                 return [
-                    this.updateLODRecursively(observerPosition, facingDirection, tree[0], walked.concat([0])),
-                    this.updateLODRecursively(observerPosition, facingDirection, tree[1], walked.concat([1])),
-                    this.updateLODRecursively(observerPosition, facingDirection, tree[2], walked.concat([2])),
-                    this.updateLODRecursively(observerPosition, facingDirection, tree[3], walked.concat([3])),
+                    this.updateLODRecursively(observerPosition, tree[0], walked.concat([0])),
+                    this.updateLODRecursively(observerPosition, tree[1], walked.concat([1])),
+                    this.updateLODRecursively(observerPosition, tree[2], walked.concat([2])),
+                    this.updateLODRecursively(observerPosition, tree[3], walked.concat([3])),
                 ];
             }
         } else {
@@ -158,7 +163,11 @@ export class PlanetSide {
                 let planetSpacePosition = Vector3.FromBABYLON3(observerPosition).subtractToNew(parentPosition);
                 let dot = Vector3.Dot(planetSpacePosition.normalizeToNew(), relativePosition.normalizeToNew());
 
-                tree.mesh.setEnabled(dot > -0.1); // on affiche que les chunk du côté du joueur
+                let height01 = (planetSpacePosition.getMagnitude() - relativePosition.getMagnitude()) / relativePosition.getMagnitude();
+                height01 = Math.min(height01, 1);
+                //console.log(height01);
+                tree.mesh.setEnabled(dot > -0.2);
+                //tree.mesh.setEnabled(dot > 0.7 - height01); // on affiche que les chunk du côté du joueur
                 // babylon fait déjà du frustrum culling apparemment.
 
 
@@ -182,7 +191,11 @@ export class PlanetSide {
      * @returns The new Chunk
      */
     createChunk(path: number[]): PlanetChunk {
-        return new PlanetChunk(path, this.chunkLength, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial, this.planet);
+        if (this.chunkForge != undefined) {
+            return new PlanetChunk(path, this.chunkLength, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial, this.planet);
+        } else {
+            throw Error("Cannot create chunk when no ChunkForge is attached to the planet");
+        }
     }
 
     /**

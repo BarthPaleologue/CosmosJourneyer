@@ -5,6 +5,8 @@ import { ChunkForge } from "./components/forge/chunkForge";
 
 import * as style from "../styles/style.scss";
 import * as style2 from "../sliderjs/style2.min.css";
+import { PlanetManager } from "./components/planet/planetManager";
+import { PlayerControler } from "./components/player/playerControler";
 
 style.default;
 style2.default;
@@ -26,15 +28,18 @@ depthRenderer.getDepthMap().renderList = [];
 
 const planetRadius = 200e3;
 
-let camera = new BABYLON.FreeCamera("camera", BABYLON.Vector3.Zero(), scene);
+/*let camera = new BABYLON.FreeCamera("camera", BABYLON.Vector3.Zero(), scene);
 camera.maxZ = planetRadius * 5;
-scene.activeCamera = camera;
+scene.activeCamera = camera;*/
+
+let player = new PlayerControler(scene);
+player.camera.maxZ = planetRadius * 5;
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(planetRadius * 2), scene);
 
-let forge = new ChunkForge(64);
+let planetManager = new PlanetManager();
 
-let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 1, forge, scene);
+let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 1, scene);
 
 let waterElevation = 10e2;
 
@@ -44,12 +49,14 @@ planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
 
+planetManager.add(planet);
 
-let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + waterElevation, light, camera, scene);
+
+let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + waterElevation, light, player.camera, scene);
 ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius, planetRadius + 30e3, light, camera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius, planetRadius + 30e3, light, player.camera, scene);
 //atmosphere.settings.intensity = 10;
 atmosphere.settings.scatteringStrength = 0.4;
 atmosphere.settings.falloffFactor = 20;
@@ -203,8 +210,8 @@ new Slider("planetRotation", document.getElementById("planetRotation")!, 0, 20, 
     rotationSpeed = (val / 10) ** 5;
 });
 
-new Slider("cameraFOV", document.getElementById("cameraFOV")!, 0, 360, camera.fov * 360 / Math.PI, (val: number) => {
-    camera.fov = val * Math.PI / 360;
+new Slider("cameraFOV", document.getElementById("cameraFOV")!, 0, 360, player.camera.fov * 360 / Math.PI, (val: number) => {
+    player.camera.fov = val * Math.PI / 360;
 });
 
 //#endregion
@@ -226,7 +233,7 @@ document.addEventListener("keyup", e => {
 });
 
 window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth;
+    canvas.width = window.innerWidth - (document.getElementById("ui")?.clientWidth || 0); // on compte le panneau
     canvas.height = window.innerHeight;
     engine.resize();
 });
@@ -236,8 +243,7 @@ scene.executeWhenReady(() => {
     engine.runRenderLoop(() => {
         planet.attachNode.rotation.y += .001 * rotationSpeed;
 
-        forge.update(depthRenderer);
-        planet.update(BABYLON.Vector3.Zero(), camera.getDirection(BABYLON.Axis.Z), light.position, camera);
+        planetManager.update(player, light.position, depthRenderer);
 
         light.position = new BABYLON.Vector3(Math.cos(sunOrientation * Math.PI / 180), 0, Math.sin(sunOrientation * Math.PI / 180)).scale(planetRadius * 5);
 

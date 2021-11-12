@@ -1,13 +1,17 @@
+import { CollisionData } from "../forge/CollisionData";
+import { Planet } from "../planet/planet";
+import { PlanetManager } from "../planet/planetManager";
 import { PlayerControler } from "../player/playerControler";
 import { PlanetWorker } from "./planetWorker";
 
 export class CollisionWorker extends PlanetWorker {
     _player: PlayerControler;
     _busy = false;
-    constructor(player: PlayerControler) {
+    // TODO : suppr la light lors de la création du nouveau soleil
+    constructor(player: PlayerControler, planetManager: PlanetManager, light: BABYLON.Mesh) {
         super();
         this._player = player;
-        /*this._worker.onmessage = e => {
+        this._worker.onmessage = e => {
             if (player.nearestPlanet == null) return;
 
             let direction = player.nearestPlanet.getAbsolutePosition().normalizeToNew();
@@ -23,13 +27,31 @@ export class CollisionWorker extends PlanetWorker {
 
             let deviation = newPosition.subtract(currentPosition);
 
-            for (const planet of planets) {
-                planet.attachNode.position.addInPlace(deviation);
-            }
-            sun.position.addInPlace(deviation);
-        };*/
+            planetManager.moveEverything(deviation);
+            light.position.addInPlace(deviation);
+
+            this._busy = false;
+        };
     }
     public isBusy(): boolean {
         return this._busy;
+    }
+    public override send(data: CollisionData): void {
+        super.send(data);
+        this._busy = true;
+    }
+    public checkCollision(planet: Planet): void {
+        this.send({
+            taskType: "collisionTask",
+            planetID: planet.id,
+            terrainSettings: planet.terrainSettings,
+            position: [
+                -planet.getAbsolutePosition().x,
+                -planet.getAbsolutePosition().y,
+                -planet.getAbsolutePosition().z
+            ],
+            chunkLength: planet.chunkLength,
+            craters: planet.craters
+        });
     }
 }

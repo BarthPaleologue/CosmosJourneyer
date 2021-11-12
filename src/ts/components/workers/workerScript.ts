@@ -153,9 +153,6 @@ self.onmessage = e => {
 
         ComputeNormals(verticesPositions, indices, normals);
 
-        // information utilse sur les Float32Array : imprécision inhérente au bout d'une dizaine de chiffres (c'est un float32 quoi)
-        // solution envisagée : float64 mais c'est dangereux
-
         self.postMessage({
             p: verticesPositions,
             i: indices,
@@ -164,6 +161,7 @@ self.onmessage = e => {
         }, [verticesPositions.buffer, indices.buffer, normals.buffer]);
 
         // benchmark fait le 5/10/2021 (normal non analytique) : ~2s/chunk
+        // benchmark fait le 12/11/2021 (normal non analyique) : ~0.5s/chunk
         //console.log("Time for creation : " + (Date.now() - clock));
 
     } else if (e.data.taskType == "collisionTask") {

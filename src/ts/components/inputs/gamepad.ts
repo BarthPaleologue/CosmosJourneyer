@@ -97,7 +97,9 @@ export class Gamepad {
         return this.gamepad?.buttons[this.buttonMapping[button]].pressed || false;
     }
 
-
+    /**
+     * Renvoie la liste des bouttons pressés (debug)
+     */
     public list() {
         let r = [];
         for (let i = 0; i < (this.gamepad?.buttons || 0); ++i) {
