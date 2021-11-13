@@ -11,17 +11,29 @@ export class Vector {
         if (this.dim == 0) throw Error("The vector has no x component !");
         return this.components[0];
     }
+    public set x(v: number) {
+        this.components[0] = v;
+    }
     public get y(): number {
         if (this.dim <= 1) throw Error("The vector has no y component !");
         return this.components[1];
+    }
+    public set y(v: number) {
+        this.components[1] = v;
     }
     public get z(): number {
         if (this.dim <= 2) throw Error("The vector has no z component !");
         return this.components[2];
     }
+    public set z(v: number) {
+        this.components[2] = v;
+    }
     public get w(): number {
         if (this.dim <= 3) throw Error("The vector has no w component !");
         return this.components[3];
+    }
+    public set w(v: number) {
+        this.components[3] = v;
     }
     public get r(): number {
         if (this.dim == 0) throw Error("The vector has no r component !");
@@ -41,6 +53,43 @@ export class Vector {
     }
     public get xy(): Vector {
         return new Vector(this.x, this.y);
+    }
+    public set xy(vector: Vector) {
+        if (vector.dim != 2) throw Error("Setting 2D Vector with ND Vector where N != 2 : Dimension mismatch");
+        this.x = vector.x;
+        this.y = vector.y;
+    }
+    public get xz(): Vector {
+        return new Vector(this.x, this.z);
+    }
+    public set xz(vector: Vector) {
+        if (vector.dim != 2) throw Error("Setting 2D Vector with ND Vector where N != 2 : Dimension mismatch");
+        this.x = vector.x;
+        this.z = vector.y;
+    }
+    public get yx(): Vector {
+        return new Vector(this.y, this.x);
+    }
+    public set yx(vector: Vector) {
+        if (vector.dim != 2) throw Error("Setting 2D Vector with ND Vector where N != 2 : Dimension mismatch");
+        this.y = vector.x;
+        this.x = vector.y;
+    }
+    public get yz(): Vector {
+        return new Vector(this.y, this.z);
+    }
+    public set yz(vector: Vector) {
+        if (vector.dim != 2) throw Error("Setting 2D Vector with ND Vector where N != 2 : Dimension mismatch");
+        this.y = vector.x;
+        this.z = vector.y;
+    }
+    public get zx(): Vector {
+        return new Vector(this.z, this.x);
+    }
+    public set zx(vector: Vector) {
+        if (vector.dim != 2) throw Error("Setting 2D Vector with ND Vector where N != 2 : Dimension mismatch");
+        this.z = vector.x;
+        this.x = vector.y;
     }
     public get zw(): Vector {
         return new Vector(this.z, this.w);
@@ -130,27 +179,27 @@ export class Vector {
     public getMagnitude(): number {
         return Math.sqrt(this.getSquaredMagnitude());
     }
-    public scaleToNew(scaleFactor: number): Vector {
+    public scale(scaleFactor: number): Vector {
         return new Vector(...this.components.map((value: number) => { return value * scaleFactor; }));
     }
     public scaleInPlace(scaleFactor: number): void {
-        this.components.forEach((value: number) => value * scaleFactor);
+        this.components.forEach((v: number, i: number) => this.components[i] *= scaleFactor);
     }
-    public divideToNew(divideFactor: number): Vector {
+    public divide(divideFactor: number): Vector {
         if (divideFactor == 0) throw Error("Division par 0");
-        return this.scaleToNew(1 / divideFactor);
+        return this.scale(1 / divideFactor);
     }
     public divideInPlace(divideFactor: number): void {
         if (divideFactor == 0) throw Error("Division par 0");
         this.scaleInPlace(1 / divideFactor);
     }
-    public normalizeToNew(): Vector {
-        return this.divideToNew(this.getMagnitude());
+    public normalize(): Vector {
+        return this.divide(this.getMagnitude());
     }
     public normalizeInPlace(): void {
         this.divideInPlace(this.getMagnitude());
     }
-    public addToNew(otherVector: Vector) {
+    public add(otherVector: Vector) {
         if (this.dim != otherVector.dim) new Error("Dimension error while adding");
         let components: number[] = this.components.map((value: number, i: number) => {
             return value + otherVector.get(i);
@@ -159,9 +208,9 @@ export class Vector {
     }
     public addInPlace(otherVector: Vector) {
         if (this.dim != otherVector.dim) new Error("Dimension error while adding");
-        this.components.forEach((value: number, i: number) => value + otherVector.get(i));
+        this.components.forEach((v: number, i: number) => this.components[i] += otherVector.get(i));
     }
-    public subtractToNew(otherVector: Vector) {
+    public subtract(otherVector: Vector) {
         if (this.dim != otherVector.dim) new Error("Dimension error while subtracting");
         let components: number[] = this.components.map((value: number, i: number) => {
             return value - otherVector.get(i);
@@ -170,7 +219,7 @@ export class Vector {
     }
     public subtractInPlace(otherVector: Vector) {
         if (this.dim != otherVector.dim) new Error("Dimension error while subtracting");
-        this.components.forEach((value: number, i: number) => value - otherVector.get(i));
+        this.addInPlace(otherVector.scale(-1));
     }
     public toBABYLON() {
         if (this.dim == 2) {
@@ -200,6 +249,9 @@ export class Vector {
             return previousValue + value * vector2.get(i);
         });
     }
+    public static Mod(vector1: Vector, vector2: Vector): Vector {
+        return new Vector(...vector1.components.map((val: number, i: number) => { return val % vector2.get(i); }));
+    }
 
     public static Step(edge: Vector, x: Vector): Vector {
         return Vector.PerComponentOperation(edge, x, (edgei: number, xi: number) => {
@@ -222,7 +274,17 @@ export class Vector {
         }));
     }
 
-    public floorToNew(): Vector {
+    public applyFunction(f: (v: number) => number): Vector {
+        return new Vector(...this.components.map((value: number) => { return f(value); }));
+    }
+
+    public fract(): Vector {
+        return new Vector(...this.components.map((value: number) => {
+            return value % 1;
+        }));
+    }
+
+    public floor(): Vector {
         return new Vector(...this.components.map((value: number) => {
             return Math.floor(value);
         }));
@@ -232,7 +294,7 @@ export class Vector {
         this.components.forEach((value: number) => Math.floor(value));
     }
 
-    public absToNew(): Vector {
+    public abs(): Vector {
         return new Vector(...this.components.map((value: number) => {
             return Math.abs(value);
         }));
@@ -242,17 +304,17 @@ export class Vector {
         this.components.forEach((value: number) => Math.abs(value));
     }
 
-    public multiplyToNew(otherVector: Vector): Vector {
+    public multiply(otherVector: Vector): Vector {
         return new Vector(...this.components.map((value: number, i: number) => {
             return value * otherVector.get(i);
         }));
     }
 
-    public addNumberToNew(x: number): Vector {
+    public addNumber(x: number): Vector {
         return new Vector(...this.components.map((value: number) => { return value + x; }));
     }
 
-    public applySquaredMatrixToNew(matrix: Matrix): Vector {
+    public applySquaredMatrix(matrix: Matrix): Vector {
         if (matrix.dimX != matrix.dimY) throw Error("Dimension error : the matrix is not squared !");
         if (matrix.dimX != this.dim) throw Error("Dimension error while doing Matrix Vector Multiplication !");
         let components: number[] = [];
@@ -264,6 +326,19 @@ export class Vector {
             components.push(value);
         }
         return new Vector(...components);
+    }
+    public applySquaredMatrixInPlace(matrix: Matrix): void {
+        if (matrix.dimX != matrix.dimY) throw Error("Dimension error : the matrix is not squared !");
+        if (matrix.dimX != this.dim) throw Error("Dimension error while doing Matrix Vector Multiplication !");
+        let components: number[] = [];
+        for (let i = 0; i < this.dim; i++) {
+            let value = 0;
+            for (let j = 0; j < matrix.dimX; j++) {
+                value += matrix.m[i][j] * this.get(j);
+            }
+            components.push(value);
+        }
+        this.components = components;
     }
 }
 

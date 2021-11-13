@@ -29,10 +29,10 @@ let terrainSettings: TerrainSettings = {
 
 
 function initLayers() {
-    bumpyLayer = simplexNoiseLayer(2e-5, 2, 2, 2, 0.0);
-    continentsLayer2 = simplexNoiseLayer(5e-6, 5, 2.3, 2.5, 1 - terrainSettings.continentsFragmentation);
+    bumpyLayer = simplexNoiseLayer(7e-6, 2, 2, 2, 0.0);
+    continentsLayer2 = simplexNoiseLayer(5e-6, 3, 2.3, 2.5, 1 - terrainSettings.continentsFragmentation);
     //continentsLayer3 = new ContinentNoiseLayer(2e-5, 5, 1.5, 2, 0.0);
-    mountainsLayer = mountainNoiseLayer(1e-5, 3, 2, 2, 0.7);
+    mountainsLayer = mountainNoiseLayer(1e-5, 5, 2, 2, 0.7);
 }
 
 initLayers();
@@ -40,31 +40,75 @@ initLayers();
 const craterLayer = new CraterLayer([]);
 
 
-function terrainFunction(p: Vector, planetRadius: number): Vector {
+function terrainFunction(p: Vector): Vector {
 
     const initialMagnitude = p.getMagnitude();
 
     // on se ramène à la position à la surface du globe (sans relief)
-    const planetSpherePosition: Vector = p.scaleToNew(planetRadius / initialMagnitude);
+    const planetSpherePosition = p;
 
-    const unitCoords = planetSpherePosition.normalizeToNew();
+    const unitCoords = p.normalize();
 
     let elevation = 0;
 
-    const craterMask = craterLayer.evaluate(unitCoords);
+    //const craterMask = craterLayer.evaluate(unitCoords);
 
-    elevation += craterMask;
+    //elevation += craterMask;
 
     const continentMask = continentsLayer2(planetSpherePosition);
 
-    elevation += continentMask * (1 + mountainsLayer(planetSpherePosition.scaleToNew(terrainSettings.mountainsFrequency))) * terrainSettings.maxMountainHeight / 2;
+    elevation += continentMask * (1 + mountainsLayer(planetSpherePosition.scale(terrainSettings.mountainsFrequency))) * terrainSettings.maxMountainHeight / 2;
 
-    elevation += bumpyLayer(planetSpherePosition.scaleToNew(terrainSettings.bumpsFrequency)) * terrainSettings.maxBumpHeight;
+    elevation += bumpyLayer(planetSpherePosition.scale(terrainSettings.bumpsFrequency)) * terrainSettings.maxBumpHeight;
 
-    const newPosition = p.addToNew(unitCoords.scaleToNew(elevation));
+    const newPosition = p.add(unitCoords.scale(elevation));
 
     return newPosition;
 };
+
+// check pdf file in ./doc
+function normalAtSpherePoint(p: Vector): Vector {
+    if (p.dim != 3) throw Error("normalAtSphere expects 3d position vector !");
+
+    let sphereNormal = p.normalize();
+    let a = sphereNormal.x;
+    let b = sphereNormal.y;
+    let c = sphereNormal.z;
+
+    let dir1 = new Vector(
+        c * c + b * b - a * b - c * a,
+        -b * a + a * a - c * b + c * c,
+        -c * a + a * a - b * c,
+    ).normalize();
+    let dir2 = crossProduct(p, dir1);
+
+    const epsilon = 0.01;
+    dir1.scaleInPlace(epsilon);
+    dir2.scaleInPlace(epsilon);
+
+    let p1 = terrainFunction(p.add(dir1));
+    let p2 = terrainFunction(p.subtract(dir1));
+
+    let p3 = terrainFunction(p.add(dir2));
+    let p4 = terrainFunction(p.subtract(dir2));
+
+    let t1 = p1.subtract(p2).normalize();
+    let t2 = p3.subtract(p4).normalize();
+
+    let res = crossProduct(t1, t2);
+    if (res.getMagnitude() == 0) console.log("!");
+    return res;
+}
+
+function crossProduct(v1: Vector, v2: Vector): Vector {
+    if (v1.dim != v2.dim || v1.dim != 3 || v2.dim != 3) throw Error("Cross Product for 3D vectors only");
+
+    let x = v1.y * v2.z - v1.z * v2.y;
+    let y = v1.z * v2.x - v1.x * v2.z;
+    let z = v1.x * v2.y - v1.y * v2.x;
+
+    return new Vector(x, y, z);
+}
 
 self.onmessage = e => {
     if (e.data.taskType == "buildTask") {
@@ -97,6 +141,9 @@ self.onmessage = e => {
         const verticesPositions = new Float32Array(vertexPerLine * vertexPerLine * 3);
         let faces: number[][] = [];
 
+        const normals = new Float32Array(verticesPositions.length);
+
+
         for (let x = 0; x < vertexPerLine; ++x) {
             for (let y = 0; y < vertexPerLine; ++y) {
 
@@ -104,34 +151,50 @@ self.onmessage = e => {
                 let vertexPosition = new Vector((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
 
                 // on le met à la bonne taille
-                vertexPosition = vertexPosition.scaleToNew(size);
+                vertexPosition.scaleInPlace(size);
 
                 // on le met au bon endroit de la face par défaut (Oxy devant)
                 let vecOffset = new Vector(...offset);
-                vertexPosition = vertexPosition.addToNew(vecOffset);
+                vertexPosition.addInPlace(vecOffset);
 
                 // on le met sur la bonne face
-                vertexPosition = vertexPosition.applySquaredMatrixToNew(rotationMatrix);
+                vertexPosition.applySquaredMatrixInPlace(rotationMatrix);
 
                 // on l'arrondi pour en faire un chunk de sphère
-                let planetCoords = vertexPosition.normalizeToNew().scaleToNew(planetRadius);
+                let planetCoords = vertexPosition.normalize().scale(planetRadius);
 
                 // on applique la fonction de terrain
-                vertexPosition = terrainFunction(planetCoords, planetRadius);
+                vertexPosition = terrainFunction(planetCoords);
+
+                let vertexNormal = normalAtSpherePoint(planetCoords);
 
                 // on le ramène à l'origine
-                vertexPosition = vertexPosition.addToNew(vecOffset.normalizeToNew().scaleToNew(-planetRadius));
+                vertexPosition.addInPlace(vecOffset.normalize().scale(-planetRadius));
 
                 verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition.x;
                 verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition.y;
                 verticesPositions[(x * vertexPerLine + y) * 3 + 2] = vertexPosition.z;
 
+                normals[(x * vertexPerLine + y) * 3] = vertexNormal.x;
+                normals[(x * vertexPerLine + y) * 3 + 1] = vertexNormal.y;
+                normals[(x * vertexPerLine + y) * 3 + 2] = vertexNormal.z;
+
                 if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
-                    faces.push([
+                    /*faces.push([
                         x * vertexPerLine + y,
                         x * vertexPerLine + y + 1,
                         (x + 1) * vertexPerLine + y + 1,
                         (x + 1) * vertexPerLine + y,
+                    ]);*/
+                    faces.push([
+                        x * vertexPerLine + y,
+                        x * vertexPerLine + y + 1,
+                        (x + 1) * vertexPerLine + y,
+                    ]);
+                    faces.push([
+                        (x + 1) * vertexPerLine + y,
+                        x * vertexPerLine + y + 1,
+                        (x + 1) * vertexPerLine + y + 1
                     ]);
                 }
             }
@@ -149,9 +212,13 @@ self.onmessage = e => {
             }
         }
 
-        const normals = new Float32Array(verticesPositions.length);
 
-        ComputeNormals(verticesPositions, indices, normals);
+        //let clock = Date.now();
+        //const normals = new Float32Array(verticesPositions.length);
+
+        //ComputeNormals(verticesPositions, indices, normals);
+
+        //console.log(Date.now() - clock);
 
         self.postMessage({
             p: verticesPositions,
@@ -175,10 +242,10 @@ self.onmessage = e => {
             initLayers();
         }
 
-        let samplePosition = new Vector(...data.position).normalizeToNew().scaleToNew(data.chunkLength / 2);
+        let samplePosition = new Vector(...data.position).normalize().scale(data.chunkLength / 2);
 
         self.postMessage({
-            h: terrainFunction(samplePosition, data.chunkLength / 2).getMagnitude(),
+            h: terrainFunction(samplePosition).getMagnitude(),
         });
 
     } else {

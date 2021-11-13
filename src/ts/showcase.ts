@@ -55,7 +55,7 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 let planetManager = new PlanetManager();
 
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
-planet.terrainSettings.maxBumpHeight = 1e2;
+planet.terrainSettings.maxBumpHeight = 30;
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.steepSharpness = 10;
@@ -137,6 +137,8 @@ scene.executeWhenReady(() => {
         }
 
         gamepad.update();
+
+        //planet.attachNode.rotation.y += 0.0002;
 
         let deplacement = player.listenToGamepad(gamepad, engine.getDeltaTime() / 1000);
 

@@ -7,8 +7,8 @@ export function simplexNoiseLayer(frequency: number, nbOctaves: number, decay: n
         let noiseValue = 0.0;
         let totalAmplitude = 0.0;
         for (let i = 0; i < nbOctaves; i++) {
-            let samplePoint = coords.scaleToNew(frequency);
-            samplePoint = samplePoint.scaleToNew(Math.pow(lacunarity, i));
+            let samplePoint = coords.scale(frequency);
+            samplePoint = samplePoint.scale(Math.pow(lacunarity, i));
 
             noiseValue += normalizedSimplex3FromVector(samplePoint) / Math.pow(decay, i);
 

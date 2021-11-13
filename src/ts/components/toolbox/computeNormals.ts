@@ -23,8 +23,6 @@ export function ComputeNormals(positions: Float64Array | Float32Array, indices: 
     var v3y = 0;                        // vector3 y index in the positions array
     var v3z = 0;                        // vector3 z index in the positions array
 
-    var faceNormalSign = 1;
-
     // reset the normals
     for (index = 0; index < positions.length; index++) {
         normals[index] = 0.0;
@@ -54,9 +52,9 @@ export function ComputeNormals(positions: Float64Array | Float32Array, indices: 
         p3p2z = positions[v3z] - positions[v2z];
 
         // compute the face normal with the cross product
-        faceNormalx = faceNormalSign * (p1p2y * p3p2z - p1p2z * p3p2y);
-        faceNormaly = faceNormalSign * (p1p2z * p3p2x - p1p2x * p3p2z);
-        faceNormalz = faceNormalSign * (p1p2x * p3p2y - p1p2y * p3p2x);
+        faceNormalx = p1p2y * p3p2z - p1p2z * p3p2y;
+        faceNormaly = p1p2z * p3p2x - p1p2x * p3p2z;
+        faceNormalz = p1p2x * p3p2y - p1p2y * p3p2x;
         // normalize this normal and store it in the array facetData
         length = Math.sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly + faceNormalz * faceNormalz);
         length = (length === 0) ? 1.0 : length;

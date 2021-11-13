@@ -315,5 +315,7 @@ void main() {
 
 	vec3 screenColor = color.rgb * (ndl + specComp/10.0);
 
+	//screenColor = vNormal;
+
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
 } 

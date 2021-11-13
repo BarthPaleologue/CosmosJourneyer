@@ -6,8 +6,8 @@ export function continentNoiseLayer(frequency: number, nbOctaves: number, decay:
         let noiseValue = 0.0;
         let totalAmplitude = 0.0;
         for (let i = 0; i < nbOctaves; i++) {
-            let samplePoint = coords.scaleToNew(frequency);
-            samplePoint = samplePoint.scaleToNew(Math.pow(lacunarity, i));
+            let samplePoint = coords.scale(frequency);
+            samplePoint = samplePoint.scale(Math.pow(lacunarity, i));
 
             noiseValue += simplex3FromVector(samplePoint) / Math.pow(decay, i);
 
