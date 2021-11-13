@@ -315,7 +315,12 @@ void main() {
 
 	vec3 screenColor = color.rgb * (ndl + specComp/10.0);
 
-	//screenColor = vNormal;
+	/*if(dot(vNormal, unitPosition) < 0.9) {
+
+		screenColor = vec3(1.0, 0.0, 0.0);
+	} else {
+
+	}*/
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
 } 

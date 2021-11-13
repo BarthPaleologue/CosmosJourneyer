@@ -567,8 +567,11 @@ Pour un point donnée, on connaît ses coordonnées sur la sphère unité :
 \end_layout
 
 \begin_layout Verse
-On cherche simplement deux vecteurs du plan dont une équation cartésienne
- est 
+On cherche simplement deux vecteurs du plan tangent 
+\begin_inset Formula $T$
+\end_inset
+
+ dont une équation cartésienne est 
 \begin_inset Formula $ax+by+cz=0$
 \end_inset
 
@@ -577,10 +580,30 @@ On cherche simplement deux vecteurs du plan dont une équation cartésienne
 
 \begin_layout Verse
 On remarque que 
-\begin_inset Formula $\overrightarrow{t}_{1}=(b,-a,0)$
+\begin_inset Formula $(b,-a,0)$
 \end_inset
 
  satisfait l'équation.
+ Mais le vecteur peut être nul dans certains cas limites où on aurait 
+\begin_inset Formula $b=a=0$
+\end_inset
+
+.
+ Ce sera le cas pour toutes les combinaisons linéaires de vecteurs de 
+\begin_inset Formula $T$
+\end_inset
+
+ car leur annulation constitue un système de Cramer de trois inconnues et
+ possède donc toujours une solution.
+ Il faut donc chercher dans les combinaisons non linéaires.
+\begin_inset Formula 
+\[
+\overrightarrow{t_{1}}=(b+bc,ac-a,-2ab)
+\]
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Verse
@@ -604,7 +627,7 @@ https://www.mathsisfun.com/algebra/vectors-cross-product.html
 \end_layout
 
 \begin_layout Verse
-\begin_inset Formula $(a,b,c)\land(b,-a,0)=(ac,cb,-(a^{2}+b^{2}))$
+\begin_inset Formula $\overrightarrow{t_{2}}=(a,b,c)\land(b,-a,0)=(ac,cb,-(a^{2}+b^{2}))$
 \end_inset
 
 

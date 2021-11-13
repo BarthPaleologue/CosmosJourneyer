@@ -64,15 +64,11 @@ export class PlanetSide {
         this.surfaceMaterial = surfaceMaterial;
 
         this.planet = planet;
-
-        // on initialise le plan avec un unique chunk
-        //this.tree = this.createChunk([]);
     }
 
     public setChunkForge(chunkForge: ChunkForge): void {
         this.chunkForge = chunkForge;
         this.baseSubdivisions = chunkForge.subdivisions;
-        this.tree = this.createChunk([]);
     }
 
     /**

@@ -54,12 +54,13 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 
 let planetManager = new PlanetManager();
 
+let waterElevation = 15e2;
+
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
-planet.terrainSettings.maxBumpHeight = 30;
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.steepSharpness = 10;
-planet.colorSettings.waterLevel = 10e2;
+planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
@@ -69,7 +70,6 @@ planetManager.add(planet);
 let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene);
 moon.terrainSettings.continentsFragmentation = 0;
 moon.terrainSettings.maxMountainHeight = 15e3;
-moon.terrainSettings.maxBumpHeight = 1e2;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.5, 0.5, 0.5);
 moon.colorSettings.sandColor = planet.colorSettings.steepColor;
 moon.colorSettings.steepColor = new BABYLON.Vector3(0.1, 0.1, 0.1);
@@ -84,7 +84,7 @@ planetManager.add(moon);
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun, 100);
 
 
-let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + 10e2, sun, player.camera, scene);
+let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun, player.camera, scene);
 ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 //ocean.settings.oceanRadius = 0;
@@ -107,7 +107,7 @@ document.addEventListener("keydown", e => {
         BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
     }
     if (e.key == "u") atmosphere.settings.intensity = (atmosphere.settings.intensity == 0) ? 15 : 0;
-    if (e.key == "o") ocean.settings.oceanRadius = (ocean.settings.oceanRadius == 0) ? radius + 10e2 : 0;
+    if (e.key == "o") ocean.settings.oceanRadius = (ocean.settings.oceanRadius == 0) ? radius + waterElevation : 0;
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
     if (e.key == "w" && player.nearestPlanet != null) player.nearestPlanet.surfaceMaterial.wireframe = !player.nearestPlanet.surfaceMaterial.wireframe;
 });

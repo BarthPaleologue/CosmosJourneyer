@@ -245,9 +245,11 @@ export class Vector {
     }
     public static Dot(vector1: Vector, vector2: Vector): number {
         if (vector1.dim != vector2.dim) throw Error("Distance between two vectors of different dimensions !");
-        return vector1.components.reduce((previousValue: number, value: number, i: number) => {
-            return previousValue + value * vector2.get(i);
-        });
+        let acc = 0;
+        for (let i = 0; i < vector1.dim; i++) {
+            acc += vector1.get(i) * vector2.get(i);
+        }
+        return acc;
     }
     public static Mod(vector1: Vector, vector2: Vector): Vector {
         return new Vector(...vector1.components.map((val: number, i: number) => { return val % vector2.get(i); }));
@@ -339,6 +341,13 @@ export class Vector {
             components.push(value);
         }
         this.components = components;
+    }
+
+    public isZero(): boolean {
+        for (const component of this.components) {
+            if (component != 0) return false;
+        }
+        return true;
     }
 }
 

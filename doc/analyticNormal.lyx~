@@ -218,6 +218,211 @@ vertices
 \end_layout
 
 \begin_layout Verse
+On se place dans un plan infini.
+ Soit 
+\begin_inset Formula $S_{i,j}$
+\end_inset
+
+ le sommet de coordonnées 
+\begin_inset Formula $(i,j)$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Verse
+Soit 
+\begin_inset Formula $\overrightarrow{\Pi}(S)$
+\end_inset
+
+ la fonction qui à tout sommet de la grille associe son vecteur position
+ dans l'espace.
+\end_layout
+
+\begin_layout Verse
+On peut calculer deux vecteurs tangents 
+\begin_inset Formula $\overrightarrow{U}$
+\end_inset
+
+ et 
+\begin_inset Formula $\overrightarrow{V}$
+\end_inset
+
+ à la grille au point 
+\begin_inset Formula $S_{i,j}$
+\end_inset
+
+ de cette façon :
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula 
+\[
+\overrightarrow{U}=\overrightarrow{\Pi}(S_{i+1,j})-\overrightarrow{\Pi}(S_{i-1,j})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula 
+\[
+\overrightarrow{V}=\overrightarrow{\Pi}(S_{i,j+1})-\overrightarrow{\Pi}(S_{i,j-1})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+On en déduit deux vecteurs unitaires 
+\begin_inset Formula $\hat{u}$
+\end_inset
+
+ et 
+\begin_inset Formula $\hat{v}$
+\end_inset
+
+ :
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula 
+\[
+\hat{u}=\frac{\overrightarrow{U}}{\Vert\overrightarrow{U}\Vert}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula 
+\[
+\hat{v}=\frac{\overrightarrow{V}}{\Vert\overrightarrow{V}\Vert}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+Ces deux vecteurs 
+\begin_inset Formula $\hat{u}$
+\end_inset
+
+ et 
+\begin_inset Formula $\hat{v}$
+\end_inset
+
+ définissent un plan tangent au terrain au Sommet 
+\begin_inset Formula $S_{i,j}$
+\end_inset
+
+.
+ Calculer la normale 
+\begin_inset Formula $\hat{N}$
+\end_inset
+
+ du terrain au point 
+\begin_inset Formula $S_{i,j}$
+\end_inset
+
+ revient donc à trouver le vecteur normal unitaire à ce plan tangent.
+ On trouve donc :
+\end_layout
+
+\begin_layout Verse
+\begin_inset Formula 
+\[
+\boxed{\hat{N}=\hat{u}\land\hat{v}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+L'avantage de cette méthode est sa rapidité, en effet nous ne faisons appel
+ qu'à des données déjà connues comme la position de chaque sommet.
+ Il est également possible de paralléliser le processus pour chaque sommet
+ pour une performance maximale.
+ Cette méthode possède cependant deux désavantages de taille.
+ En effet, il n'y a pas plus de normales que de sommets, ce qui limite la
+ qualité du terrain proportionnellement au nombre de sommets.
+ Dans le cadre de planètes générées procéduralement découpées en sections
+ planes de résolution variable, la différence de résolution sera visible
+ à l'oeil comme un manque de fidélité visuelle pour les plans de moindre
+ résolution.
+ De plus cet algorithme n'assure pas la continuité des normales aux frontières
+ des plans, ce qui peut mener à des artéfacts de discontinuité d'éclairage.
+ 
+\end_layout
+
+\begin_layout Verse
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename normalDiscontinuity.png
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename normalDiscontinuity2.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Discontinuité de résolution et d'éclairage
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Verse
+Pour palier ces deux problèmes, il faut une solution qui soit indépendante
+ de la grille des sommets et de sa contrainte de résolution.
+\end_layout
+
+\begin_layout Section
+Echantillonage local avec déplacement élémentaire sphérique
+\end_layout
+
+\begin_layout Verse
 Pour calculer la normale au point T de la sphère, il faut calculer E pour
  4 points autour de T : Nord, Sud, Est, Ouest.
 \end_layout
@@ -349,13 +554,13 @@ Formules utiles :
 On ne peut éviter les fonctions trigonométriques réciproques...
 \end_layout
 
-\begin_layout Verse
-Deuxième approche :
+\begin_layout Section
+Echantillonage local avec déplacement élémentaire déduit du vecteur position
 \end_layout
 
 \begin_layout Verse
-On connaît le vecteur normal à la sphère unité : 
-\begin_inset Formula $\hat{n}=(a,b,c)$
+Pour un point donnée, on connaît ses coordonnées sur la sphère unité : 
+\begin_inset Formula $\hat{p}=(a,b,c)$
 \end_inset
 
 
@@ -380,7 +585,7 @@ On remarque que
 
 \begin_layout Verse
 On peut trouver un vecteur normal à 
-\begin_inset Formula $\hat{n}$
+\begin_inset Formula $\hat{p}$
 \end_inset
 
  et à 
@@ -388,7 +593,7 @@ On peut trouver un vecteur normal à
 \end_inset
 
  à l'aide du produit vectoriel 
-\begin_inset Formula $\hat{n}\land\overrightarrow{t}_{1}$
+\begin_inset Formula $\hat{p}\land\overrightarrow{t}_{1}$
 \end_inset
 
 .

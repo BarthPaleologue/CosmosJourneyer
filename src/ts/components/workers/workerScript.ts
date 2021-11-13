@@ -1,6 +1,5 @@
 import { getRotationMatrixFromDirection } from "../toolbox/direction";
 import { simplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
-import { ComputeNormals } from "../toolbox/computeNormals";
 import { Vector } from "../toolbox/algebra";
 import { mountainNoiseLayer } from "../terrain/landscape/moutainNoiseLayer";
 import { continentNoiseLayer } from "../terrain/landscape/continentNoiseLayer";
@@ -29,20 +28,17 @@ let terrainSettings: TerrainSettings = {
 
 
 function initLayers() {
-    bumpyLayer = simplexNoiseLayer(7e-6, 2, 2, 2, 0.0);
-    continentsLayer2 = simplexNoiseLayer(5e-6, 3, 2.3, 2.5, 1 - terrainSettings.continentsFragmentation);
+    bumpyLayer = simplexNoiseLayer(7e-5, 2, 2, 2, 0.0);
+    continentsLayer2 = simplexNoiseLayer(5e-6, 3, 1.7, 2.5, 1 - terrainSettings.continentsFragmentation);
     //continentsLayer3 = new ContinentNoiseLayer(2e-5, 5, 1.5, 2, 0.0);
-    mountainsLayer = mountainNoiseLayer(1e-5, 5, 2, 2, 0.7);
+    mountainsLayer = mountainNoiseLayer(1e-4, 5, 2, 2, 0.4);
 }
 
 initLayers();
 
 const craterLayer = new CraterLayer([]);
 
-
 function terrainFunction(p: Vector): Vector {
-
-    const initialMagnitude = p.getMagnitude();
 
     // on se ramène à la position à la surface du globe (sans relief)
     const planetSpherePosition = p;
@@ -61,6 +57,8 @@ function terrainFunction(p: Vector): Vector {
 
     elevation += bumpyLayer(planetSpherePosition.scale(terrainSettings.bumpsFrequency)) * terrainSettings.maxBumpHeight;
 
+    //elevation += openSimplex301(planetSpherePosition.scale(0.00003)) * 10000;
+
     const newPosition = p.add(unitCoords.scale(elevation));
 
     return newPosition;
@@ -75,14 +73,13 @@ function normalAtSpherePoint(p: Vector): Vector {
     let b = sphereNormal.y;
     let c = sphereNormal.z;
 
-    let dir1 = new Vector(
-        c * c + b * b - a * b - c * a,
-        -b * a + a * a - c * b + c * c,
-        -c * a + a * a - b * c,
-    ).normalize();
+    let dir1 = new Vector(b, -a, 0);
+    if (dir1.isZero()) dir1 = new Vector(c, 0, -a);
+    if (dir1.isZero()) dir1 = new Vector(0, c, -b);
+    dir1.normalizeInPlace();
     let dir2 = crossProduct(p, dir1);
 
-    const epsilon = 0.01;
+    const epsilon = 1;
     dir1.scaleInPlace(epsilon);
     dir2.scaleInPlace(epsilon);
 
@@ -92,12 +89,12 @@ function normalAtSpherePoint(p: Vector): Vector {
     let p3 = terrainFunction(p.add(dir2));
     let p4 = terrainFunction(p.subtract(dir2));
 
-    let t1 = p1.subtract(p2).normalize();
-    let t2 = p3.subtract(p4).normalize();
+    let t1 = p1.subtract(p2).divide(2 * epsilon);
+    let t2 = p3.subtract(p4).divide(2 * epsilon);
 
-    let res = crossProduct(t1, t2);
-    if (res.getMagnitude() == 0) console.log("!");
-    return res;
+    let normal = crossProduct(t1, t2).normalize();
+
+    return normal;
 }
 
 function crossProduct(v1: Vector, v2: Vector): Vector {
@@ -180,13 +177,13 @@ self.onmessage = e => {
                 normals[(x * vertexPerLine + y) * 3 + 2] = vertexNormal.z;
 
                 if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
-                    /*faces.push([
+                    faces.push([
                         x * vertexPerLine + y,
                         x * vertexPerLine + y + 1,
                         (x + 1) * vertexPerLine + y + 1,
                         (x + 1) * vertexPerLine + y,
-                    ]);*/
-                    faces.push([
+                    ]);
+                    /*faces.push([
                         x * vertexPerLine + y,
                         x * vertexPerLine + y + 1,
                         (x + 1) * vertexPerLine + y,
@@ -195,7 +192,7 @@ self.onmessage = e => {
                         (x + 1) * vertexPerLine + y,
                         x * vertexPerLine + y + 1,
                         (x + 1) * vertexPerLine + y + 1
-                    ]);
+                    ]);*/
                 }
             }
         }
@@ -211,14 +208,6 @@ self.onmessage = e => {
                 indices[(i * (faces[i].length - 2) + j) * 3 + 2] = faces[i][j + 1];
             }
         }
-
-
-        //let clock = Date.now();
-        //const normals = new Float32Array(verticesPositions.length);
-
-        //ComputeNormals(verticesPositions, indices, normals);
-
-        //console.log(Date.now() - clock);
 
         self.postMessage({
             p: verticesPositions,
