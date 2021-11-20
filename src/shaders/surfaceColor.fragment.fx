@@ -250,15 +250,15 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 		vec3 flatColor = lnear(sandColor, vec3(0.5), elevation01, waterLevel01, sandSize / maxElevation);
 
 		float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation);
-		float plainFactor = 1.0 - sandFactor;
+		float bottomFactor = 1.0 - sandFactor;
 
 		float steepFactor = 1.0 - pow(1.0 - slope, steepSharpness);
 
 		sandFactor *= steepFactor;
-		plainFactor *= steepFactor;
+		bottomFactor *= steepFactor;
 
-		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.001, normalSharpness, normalStrength);
-		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0003, normalSharpness, normalStrength); // plus grand
+		normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, 0.0, 0.0, steepFactor, 0.001, normalSharpness, normalStrength);
+		normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, 0.0, 0.0, steepFactor, 0.0003, normalSharpness, normalStrength); // plus grand
 
 		
 		return lerp(flatColor, steepColor, pow(1.0 - slope, steepSharpness));
