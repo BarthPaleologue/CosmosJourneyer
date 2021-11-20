@@ -69,7 +69,7 @@ function terrainFunction(position: Vector3, normal: Vector3): void {
 
 self.onmessage = e => {
     if (e.data.taskType == "buildTask") {
-        let clock = Date.now();
+        //let clock = Date.now();
 
         const data = e.data as buildData;
 
@@ -169,7 +169,7 @@ self.onmessage = e => {
         // benchmark fait le 12/11/2021 (normal non analyique) : ~0.5s/chunk
         // benchmark fait le 20/11/2021 20h30 (normal analytique v2) : ~0.8s/chunk
         // benchmark fait le 20/11/2021 21h20 (normal analytique v2.1) : ~0.06s/chunk (30ms/chunk)
-        console.log("Time for creation : " + (Date.now() - clock));
+        //console.log("Time for creation : " + (Date.now() - clock));
 
     } else if (e.data.taskType == "collisionTask") {
         let data = e.data as CollisionData;
