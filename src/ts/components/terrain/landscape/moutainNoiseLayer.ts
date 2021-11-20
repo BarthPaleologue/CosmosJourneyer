@@ -1,6 +1,5 @@
 import { Vector } from "../../toolbox/algebra";
-import { openSimplex301 } from "../../toolbox/openSimplex";
-import { simplex401 } from "../../toolbox/simplex3";
+import { simplex401 } from "../../toolbox/simplex";
 import { elevationFunction } from "./elevationFunction";
 
 export function mountainNoiseLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, minValue: number): elevationFunction {

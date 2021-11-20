@@ -183,7 +183,9 @@ export class Vector {
         return new Vector(...this.components.map((value: number) => { return value * scaleFactor; }));
     }
     public scaleInPlace(scaleFactor: number): void {
-        this.components.forEach((v: number, i: number) => this.components[i] *= scaleFactor);
+        for (let i = 0; i < this.components.length; i++) {
+            this.components[i] *= scaleFactor;
+        }
     }
     public divide(divideFactor: number): Vector {
         if (divideFactor == 0) throw Error("Division par 0");
@@ -208,7 +210,9 @@ export class Vector {
     }
     public addInPlace(otherVector: Vector) {
         if (this.dim != otherVector.dim) new Error("Dimension error while adding");
-        this.components.forEach((v: number, i: number) => this.components[i] += otherVector.get(i));
+        for (let i = 0; i < this.components.length; i++) {
+            this.components[i] += otherVector.get(i);
+        }
     }
     public subtract(otherVector: Vector) {
         if (this.dim != otherVector.dim) new Error("Dimension error while subtracting");

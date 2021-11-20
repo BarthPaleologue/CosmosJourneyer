@@ -1,5 +1,5 @@
 import { Vector } from "../../toolbox/algebra";
-import { openSimplex301 } from "../../toolbox/openSimplex";
+import { simplex401 } from "../../toolbox/simplex";
 
 export function craterNoiseLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, minValue: number): (coords: Vector) => number {
     return function (coords: Vector) {
@@ -9,7 +9,7 @@ export function craterNoiseLayer(frequency: number, nbOctaves: number, decay: nu
             let samplePoint = coords.scale(frequency);
             samplePoint = samplePoint.scale(Math.pow(lacunarity, i));
 
-            noiseValue += openSimplex301(samplePoint) / Math.pow(decay, i);
+            noiseValue += simplex401(samplePoint)[0] / Math.pow(decay, i);
 
             totalAmplitude += 1.0 / Math.pow(decay, i);
         }

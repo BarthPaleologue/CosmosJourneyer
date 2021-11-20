@@ -8,7 +8,7 @@ import { buildData } from "../forge/buildData";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { CollisionData } from "../forge/CollisionData";
 import { elevationFunction } from "../terrain/landscape/elevationFunction";
-import { sdnoise4, simplex401 } from "../toolbox/simplex3";
+import { sdnoise4, simplex401 } from "../toolbox/simplex";
 
 let currentPlanetID = "";
 
@@ -41,40 +41,25 @@ const craterLayer = new CraterLayer([]);
 
 function terrainFunction(p: Vector): [Vector, Vector] {
 
-    // on se ramène à la position à la surface du globe (sans relief)
-    const planetSpherePosition = p;
-
     const unitCoords = p.normalize();
 
     let elevation = 0;
 
     let normal = new Vector(0, 0, 0);
 
-    //const craterMask = craterLayer.evaluate(unitCoords);
-
-    //elevation += craterMask;
-
-    //const continentMask = continentsLayer2(planetSpherePosition);
-
-    //elevation += continentMask * (1 + mountainsLayer(planetSpherePosition.scale(terrainSettings.mountainsFrequency))) * terrainSettings.maxMountainHeight / 2;
-
-    //elevation += bumpyLayer(planetSpherePosition.scale(terrainSettings.bumpsFrequency)) * terrainSettings.maxBumpHeight;
-
-    //elevation += openSimplex301(planetSpherePosition.scale(0.00003)) * 10000;
-
-
-
     let continentMask = continentsLayer2(p.add(new Vector(-100000, 0, 50000)).scale(0.5))[0];
 
-    let [mountainElevation, mountainNormal] = mountainsLayer(planetSpherePosition.scale(terrainSettings.mountainsFrequency));
+    let [mountainElevation, mountainNormal] = mountainsLayer(p.scale(terrainSettings.mountainsFrequency));
 
     elevation += continentMask * mountainElevation * terrainSettings.maxMountainHeight;
-    normal.addInPlace(mountainNormal.scale(terrainSettings.maxMountainHeight * continentMask));
+    mountainNormal.scaleInPlace(terrainSettings.maxMountainHeight * continentMask);
+    normal.addInPlace(mountainNormal);
 
-    let [bumpyElevation, bumpyNormal] = bumpyLayer(planetSpherePosition.scale(terrainSettings.bumpsFrequency));
+    let [bumpyElevation, bumpyNormal] = bumpyLayer(p.scale(terrainSettings.bumpsFrequency));
 
     elevation += bumpyElevation * terrainSettings.maxBumpHeight;
-    normal.addInPlace(bumpyNormal.scale(terrainSettings.maxBumpHeight));
+    bumpyNormal.scaleInPlace(terrainSettings.maxBumpHeight);
+    normal.addInPlace(bumpyNormal);
 
     const newPosition = p.add(unitCoords.scale(elevation));
 
@@ -83,52 +68,9 @@ function terrainFunction(p: Vector): [Vector, Vector] {
     return [newPosition, normal];
 };
 
-// check pdf file in ./doc
-/*function normalAtSpherePoint(p: Vector): Vector {
-    if (p.dim != 3) throw Error("normalAtSphere expects 3d position vector !");
-
-    let sphereNormal = p.normalize();
-    let a = sphereNormal.x;
-    let b = sphereNormal.y;
-    let c = sphereNormal.z;
-
-    let dir1 = new Vector(b, -a, 0);
-    if (dir1.isZero()) dir1 = new Vector(c, 0, -a);
-    if (dir1.isZero()) dir1 = new Vector(0, c, -b);
-    dir1.normalizeInPlace();
-    let dir2 = crossProduct(p, dir1);
-
-    const epsilon = 10;
-    dir1.scaleInPlace(epsilon);
-    dir2.scaleInPlace(epsilon);
-
-    let p1 = terrainFunction(p.add(dir1));
-    let p2 = terrainFunction(p.subtract(dir1));
-
-    let p3 = terrainFunction(p.add(dir2));
-    let p4 = terrainFunction(p.subtract(dir2));
-
-    let t1 = p1.subtract(p2).divide(2 * epsilon);
-    let t2 = p3.subtract(p4).divide(2 * epsilon);
-
-    let normal = crossProduct(t1, t2).normalize();
-
-    return normal;
-}*/
-
-/*function crossProduct(v1: Vector, v2: Vector): Vector {
-    if (v1.dim != v2.dim || v1.dim != 3 || v2.dim != 3) throw Error("Cross Product for 3D vectors only");
-
-    let x = v1.y * v2.z - v1.z * v2.y;
-    let y = v1.z * v2.x - v1.x * v2.z;
-    let z = v1.x * v2.y - v1.y * v2.x;
-
-    return new Vector(x, y, z);
-}*/
-
 self.onmessage = e => {
     if (e.data.taskType == "buildTask") {
-        //let clock = Date.now();
+        let clock = Date.now();
 
 
         const data = e.data as buildData;
@@ -239,7 +181,7 @@ self.onmessage = e => {
 
         // benchmark fait le 5/10/2021 (normal non analytique) : ~2s/chunk
         // benchmark fait le 12/11/2021 (normal non analyique) : ~0.5s/chunk
-        //console.log("Time for creation : " + (Date.now() - clock));
+        console.log("Time for creation : " + (Date.now() - clock));
 
     } else if (e.data.taskType == "collisionTask") {
         let data = e.data as CollisionData;
