@@ -119,8 +119,8 @@ export class PlanetSide {
 
         // position par rapport à la caméra
         let parentPosition = new Vector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
-        let absolutePosition = relativePosition.addToNew(parentPosition);
-        let direction = absolutePosition.subtractToNew(Vector3.FromBABYLON3(observerPosition));
+        let absolutePosition = relativePosition.add(parentPosition);
+        let direction = absolutePosition.subtract(Vector3.FromBABYLON3(observerPosition));
         // distance carré entre caméra et noeud du quadtree
         let d2 = direction.getSquaredMagnitude();
         let limit = this.renderDistanceFactor * this.chunkLength / (2 ** walked.length);
@@ -156,8 +156,8 @@ export class PlanetSide {
                 // un jour peut être de l'occlusion
                 //tree.mesh.setEnabled(tree.mesh.isInFrustum(camera));
 
-                let planetSpacePosition = Vector3.FromBABYLON3(observerPosition).subtractToNew(parentPosition);
-                let dot = Vector3.Dot(planetSpacePosition.normalizeToNew(), relativePosition.normalizeToNew());
+                let planetSpacePosition = Vector3.FromBABYLON3(observerPosition).subtract(parentPosition);
+                let dot = Vector3.Dot(planetSpacePosition.normalize(), relativePosition.normalize());
 
                 let height01 = (planetSpacePosition.getMagnitude() - relativePosition.getMagnitude()) / relativePosition.getMagnitude();
                 height01 = Math.min(height01, 1);

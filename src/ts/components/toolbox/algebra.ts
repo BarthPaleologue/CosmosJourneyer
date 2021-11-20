@@ -407,8 +407,24 @@ export class Vector3 {
      * @param scaleFactor the factor you want your new vector scaled to
      * @returns a new Vector3, copy of the current one scaled by the scaleFactor
      */
-    scaleToNew(scaleFactor: number): Vector3 {
+    scale(scaleFactor: number): Vector3 {
         return new Vector3(this._x * scaleFactor, this._y * scaleFactor, this._z * scaleFactor);
+    }
+
+    scaleInPlace(scaleFactor: number): void {
+        this._x *= scaleFactor;
+        this._y *= scaleFactor;
+        this._z *= scaleFactor;
+    }
+
+    divide(divisor: number): Vector3 {
+        return new Vector3(this._x / divisor, this._y / divisor, this._z / divisor);
+    }
+
+    divideInPlace(divisor: number): void {
+        this._x /= divisor;
+        this._y /= divisor;
+        this._z /= divisor;
     }
 
     /**
@@ -416,7 +432,7 @@ export class Vector3 {
      * @param otherVector The other Vector3 you want to add
      * @returns returns the sum of the current Vector3 and the other Vector3 as a new Vector3
      */
-    addToNew(otherVector: Vector3): Vector3 {
+    add(otherVector: Vector3): Vector3 {
         return new Vector3(this._x + otherVector._x, this._y + otherVector._y, this._z + otherVector._z);
     }
     addInPlace(otherVector: Vector3): void {
@@ -424,11 +440,11 @@ export class Vector3 {
         this._y += otherVector._y;
         this._z += otherVector._z;
     }
-    subtractToNew(otherVector: Vector3): Vector3 {
+    subtract(otherVector: Vector3): Vector3 {
         return new Vector3(this._x - otherVector._x, this._y - otherVector._y, this._z - otherVector._z);
     }
-    normalizeToNew(): Vector3 {
-        return this.scaleToNew(1 / this.getMagnitude());
+    normalize(): Vector3 {
+        return this.scale(1 / this.getMagnitude());
     }
     static Zero(): Vector3 {
         return new Vector3(0, 0, 0);
@@ -442,7 +458,7 @@ export class Vector3 {
     static ToBABYLON3(vector: Vector3): BABYLON.Vector3 {
         return new BABYLON.Vector3(vector.x, vector.y, vector.z);
     }
-    applyMatrixToNew(matrix: Matrix): Vector3 {
+    applyMatrix(matrix: Matrix): Vector3 {
         let newVector = Vector3.Zero();
 
         let m = matrix.m;
@@ -452,6 +468,17 @@ export class Vector3 {
         newVector.z = m[2][0] * this.x + m[2][1] * this.y + m[2][2] * this.z;
 
         return newVector;
+    }
+    applyMatrixInPlace(matrix: Matrix): void {
+        let m = matrix.m;
+
+        let nx = m[0][0] * this.x + m[0][1] * this.y + m[0][2] * this.z;
+        let ny = m[1][0] * this.x + m[1][1] * this.y + m[1][2] * this.z;
+        let nz = m[2][0] * this.x + m[2][1] * this.y + m[2][2] * this.z;
+
+        this.x = nx;
+        this.y = ny;
+        this.z = nz;
     }
     static DistanceSquared(vector1: Vector3, vector2: Vector3) {
         return (vector1.x - vector2.x) ** 2 + (vector1.y - vector2.y) ** 2 + (vector1.z - vector2.z) ** 2;

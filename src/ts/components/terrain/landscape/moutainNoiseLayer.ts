@@ -1,18 +1,19 @@
-import { Vector } from "../../toolbox/algebra";
+import { Vector3 } from "../../toolbox/algebra";
 import { simplex401 } from "../../toolbox/simplex";
 import { elevationFunction } from "./elevationFunction";
 
 export function mountainNoiseLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, minValue: number): elevationFunction {
-    return function (coords: Vector): [number, Vector] {
+    return function (coords: Vector3): number[] {
         let noiseValue = 0.0;
-        let noiseNormal = Vector.Zeros(3);
+        let noiseNormal = Vector3.Zero();
         let totalAmplitude = 0.0;
         for (let i = 0; i < nbOctaves; ++i) {
             let samplePoint = coords.scale(frequency);
             samplePoint = samplePoint.scale(lacunarity ** i);
 
-            let [localElevation, localNormal] = simplex401(samplePoint);
-
+            let terrainData = simplex401(samplePoint);
+            let localElevation = terrainData[0];
+            let localNormal = new Vector3(terrainData[1], terrainData[2], terrainData[3]);
             noiseValue += localElevation / decay ** i;
             noiseNormal.addInPlace(localNormal.divide(decay ** i));
 
@@ -29,6 +30,6 @@ export function mountainNoiseLayer(frequency: number, nbOctaves: number, decay: 
             noiseNormal.divideInPlace(1.0 - minValue);
         }
 
-        return [noiseValue, noiseNormal];
+        return [noiseValue, noiseNormal.x, noiseNormal.y, noiseNormal.z];
     };
 }

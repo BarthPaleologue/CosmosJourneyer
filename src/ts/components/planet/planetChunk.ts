@@ -60,15 +60,15 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
 
     // on récupère la position dans le cube
     let rotationMatrix = getRotationMatrixFromDirection(direction);
-    position = position.applyMatrixToNew(rotationMatrix);
+    position = position.applyMatrix(rotationMatrix);
 
     // on projette cette position sur la sphère
-    position = position.normalizeToNew().scaleToNew(chunkLength / 2);
+    position = position.normalize().scale(chunkLength / 2);
 
     // on match cette position avec la rotation de la planète
-    position = position.applyMatrixToNew(Matrix.Rotation3DX(parentRotation.x));
-    position = position.applyMatrixToNew(Matrix.Rotation3DY(parentRotation.y));
-    position = position.applyMatrixToNew(Matrix.Rotation3DZ(parentRotation.z));
+    position = position.applyMatrix(Matrix.Rotation3DX(parentRotation.x));
+    position = position.applyMatrix(Matrix.Rotation3DY(parentRotation.y));
+    position = position.applyMatrix(Matrix.Rotation3DZ(parentRotation.z));
 
     // c'est prêt !
     return position;

@@ -1,8 +1,8 @@
-import { Vector } from "../../toolbox/algebra";
+import { Vector3 } from "../../toolbox/algebra";
 import { simplex401 } from "../../toolbox/simplex";
 
-export function craterNoiseLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, minValue: number): (coords: Vector) => number {
-    return function (coords: Vector) {
+export function craterNoiseLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, minValue: number): (coords: Vector3) => number {
+    return function (coords: Vector3) {
         let noiseValue = 0.0;
         let totalAmplitude = 0.0;
         for (let i = 0; i < nbOctaves; i++) {
