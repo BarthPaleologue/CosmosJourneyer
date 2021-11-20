@@ -41,7 +41,7 @@ let planetManager = new PlanetManager();
 
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 1, scene);
 
-let waterElevation = 10e2;
+let waterElevation = 25e2;
 
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 300;
@@ -59,7 +59,7 @@ ocean.settings.depthModifier = 0.004;
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius, planetRadius + 30e3, light, player.camera, scene);
 //atmosphere.settings.intensity = 10;
 atmosphere.settings.scatteringStrength = 0.4;
-atmosphere.settings.falloffFactor = 20;
+atmosphere.settings.falloffFactor = 19;
 
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);

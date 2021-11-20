@@ -8,6 +8,7 @@ import { buildData } from "../forge/buildData";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { CollisionData } from "../forge/CollisionData";
 import { elevationFunction } from "../terrain/landscape/elevationFunction";
+import { sdnoise4, simplex401 } from "../toolbox/simplex3";
 
 let currentPlanetID = "";
 
@@ -38,7 +39,7 @@ initLayers();
 
 const craterLayer = new CraterLayer([]);
 
-function terrainFunction(p: Vector): Vector {
+function terrainFunction(p: Vector): [Vector, Vector] {
 
     // on se ramène à la position à la surface du globe (sans relief)
     const planetSpherePosition = p;
@@ -47,25 +48,43 @@ function terrainFunction(p: Vector): Vector {
 
     let elevation = 0;
 
+    let normal = new Vector(0, 0, 0);
+
     //const craterMask = craterLayer.evaluate(unitCoords);
 
     //elevation += craterMask;
 
-    const continentMask = continentsLayer2(planetSpherePosition);
+    //const continentMask = continentsLayer2(planetSpherePosition);
 
-    elevation += continentMask * (1 + mountainsLayer(planetSpherePosition.scale(terrainSettings.mountainsFrequency))) * terrainSettings.maxMountainHeight / 2;
+    //elevation += continentMask * (1 + mountainsLayer(planetSpherePosition.scale(terrainSettings.mountainsFrequency))) * terrainSettings.maxMountainHeight / 2;
 
-    elevation += bumpyLayer(planetSpherePosition.scale(terrainSettings.bumpsFrequency)) * terrainSettings.maxBumpHeight;
+    //elevation += bumpyLayer(planetSpherePosition.scale(terrainSettings.bumpsFrequency)) * terrainSettings.maxBumpHeight;
 
     //elevation += openSimplex301(planetSpherePosition.scale(0.00003)) * 10000;
 
+
+
+    let continentMask = continentsLayer2(p.add(new Vector(-100000, 0, 50000)).scale(0.5))[0];
+
+    let [mountainElevation, mountainNormal] = mountainsLayer(planetSpherePosition.scale(terrainSettings.mountainsFrequency));
+
+    elevation += continentMask * mountainElevation * terrainSettings.maxMountainHeight;
+    normal.addInPlace(mountainNormal.scale(terrainSettings.maxMountainHeight * continentMask));
+
+    let [bumpyElevation, bumpyNormal] = bumpyLayer(planetSpherePosition.scale(terrainSettings.bumpsFrequency));
+
+    elevation += bumpyElevation * terrainSettings.maxBumpHeight;
+    normal.addInPlace(bumpyNormal.scale(terrainSettings.maxBumpHeight));
+
     const newPosition = p.add(unitCoords.scale(elevation));
 
-    return newPosition;
+    normal.divideInPlace(terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
+
+    return [newPosition, normal];
 };
 
 // check pdf file in ./doc
-function normalAtSpherePoint(p: Vector): Vector {
+/*function normalAtSpherePoint(p: Vector): Vector {
     if (p.dim != 3) throw Error("normalAtSphere expects 3d position vector !");
 
     let sphereNormal = p.normalize();
@@ -79,7 +98,7 @@ function normalAtSpherePoint(p: Vector): Vector {
     dir1.normalizeInPlace();
     let dir2 = crossProduct(p, dir1);
 
-    const epsilon = 1;
+    const epsilon = 10;
     dir1.scaleInPlace(epsilon);
     dir2.scaleInPlace(epsilon);
 
@@ -95,9 +114,9 @@ function normalAtSpherePoint(p: Vector): Vector {
     let normal = crossProduct(t1, t2).normalize();
 
     return normal;
-}
+}*/
 
-function crossProduct(v1: Vector, v2: Vector): Vector {
+/*function crossProduct(v1: Vector, v2: Vector): Vector {
     if (v1.dim != v2.dim || v1.dim != 3 || v2.dim != 3) throw Error("Cross Product for 3D vectors only");
 
     let x = v1.y * v2.z - v1.z * v2.y;
@@ -105,7 +124,7 @@ function crossProduct(v1: Vector, v2: Vector): Vector {
     let z = v1.x * v2.y - v1.y * v2.x;
 
     return new Vector(x, y, z);
-}
+}*/
 
 self.onmessage = e => {
     if (e.data.taskType == "buildTask") {
@@ -158,12 +177,14 @@ self.onmessage = e => {
                 vertexPosition.applySquaredMatrixInPlace(rotationMatrix);
 
                 // on l'arrondi pour en faire un chunk de sphère
-                let planetCoords = vertexPosition.normalize().scale(planetRadius);
-
+                let unitSphereCoords = vertexPosition.normalize();
+                let planetCoords = unitSphereCoords.scale(planetRadius);
                 // on applique la fonction de terrain
-                vertexPosition = terrainFunction(planetCoords);
+                let vertexNormal;
+                [vertexPosition, vertexNormal] = terrainFunction(planetCoords);
+                //console.log(vertexNormal.toArray());
 
-                let vertexNormal = normalAtSpherePoint(planetCoords);
+                vertexNormal = unitSphereCoords.subtract(vertexNormal).normalize();
 
                 // on le ramène à l'origine
                 vertexPosition.addInPlace(vecOffset.normalize().scale(-planetRadius));
@@ -234,7 +255,7 @@ self.onmessage = e => {
         let samplePosition = new Vector(...data.position).normalize().scale(data.chunkLength / 2);
 
         self.postMessage({
-            h: terrainFunction(samplePosition).getMagnitude(),
+            h: terrainFunction(samplePosition)[0].getMagnitude(),
         });
 
     } else {

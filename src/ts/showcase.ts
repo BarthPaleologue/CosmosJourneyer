@@ -54,7 +54,7 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 
 let planetManager = new PlanetManager();
 
-let waterElevation = 15e2;
+let waterElevation = 25e2;
 
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
@@ -94,7 +94,7 @@ ocean.settings.depthModifier = 0.004;
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 30e3, sun, player.camera, scene);
 //atmosphere.settings.intensity = 10;
-atmosphere.settings.falloffFactor = 20;
+atmosphere.settings.falloffFactor = 19;
 atmosphere.settings.scatteringStrength = 0.4;
 
 

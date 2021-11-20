@@ -349,6 +349,10 @@ export class Vector {
         }
         return true;
     }
+
+    public toArray(): number[] {
+        return this.components;
+    }
 }
 
 export class Vector3 {

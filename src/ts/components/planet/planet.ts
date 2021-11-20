@@ -66,13 +66,13 @@ export class Planet {
         let craterMaxDepthFactor = 1;
 
         this.terrainSettings = {
-            continentsFragmentation: 0.5,
+            continentsFragmentation: 0.9,
 
-            maxBumpHeight: 20,
-            bumpsFrequency: 100,
+            maxBumpHeight: 2e3,
+            bumpsFrequency: 1,
 
-            maxMountainHeight: 20e3,
-            mountainsFrequency: 1
+            maxMountainHeight: 15e3,
+            mountainsFrequency: 0.05
         };
 
         this.colorSettings = {
