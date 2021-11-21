@@ -78,6 +78,7 @@ function terrainFunction(position: Vector3, normal: Vector3): void {
     position.addInPlace(unitCoords.scale(elevation));
 
     normal.divideInPlace(continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
+    //normal.divideInPlace(elevation);
 }
 
 self.onmessage = e => {
@@ -129,14 +130,18 @@ self.onmessage = e => {
                 // on le met sur la bonne face
                 vertexPosition.applyMatrixInPlace(rotationMatrix);
 
+                // Théorie : https://math.stackexchange.com/questions/1071662/surface-normal-to-point-on-displaced-sphere
+
                 // on l'arrondi pour en faire un chunk de sphère
                 let unitSphereCoords = vertexPosition.normalize();
                 vertexPosition = unitSphereCoords.scale(planetRadius);
                 // on applique la fonction de terrain
-                let vertexNormal = Vector3.Zero();
-                terrainFunction(vertexPosition, vertexNormal);
+                let vertexGradient = Vector3.Zero();
+                terrainFunction(vertexPosition, vertexGradient);
 
-                vertexNormal = unitSphereCoords.subtract(vertexNormal).normalize();
+                let h = vertexGradient.subtract(unitSphereCoords.scale(Vector3.Dot(vertexGradient, unitSphereCoords)));
+
+                let vertexNormal = unitSphereCoords.subtract(h).normalize();
 
                 // on le ramène à l'origine
                 vertexPosition.addInPlace(vecOffset.normalize().scale(-planetRadius));

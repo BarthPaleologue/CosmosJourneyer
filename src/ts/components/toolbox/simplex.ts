@@ -16,7 +16,7 @@
  * General Public License for more details.
  */
 
-import { Vector3, Vector } from "./algebra";
+import { Vector3 } from "./algebra";
 
 /*
  * This is an implementation of Perlin "simplex noise" over one
@@ -224,7 +224,7 @@ const G2 = .211324865;
  * If the last two arguments are not null, the analytic derivative
  * (the 2D gradient of the scalar noise field) is also calculated.
  */
-export function sdnoise2(x: number, y: number): [number, Vector] {
+export function sdnoise2(x: number, y: number): number[] {
   let n0, n1, n2; /* Noise contributions from the three simplex corners */
   let gx0, gy0, gx1, gy1, gx2, gy2; /* Gradients at simplex corners */
   let t0, t1, t2, x1, x2, y1, y2;
@@ -321,7 +321,7 @@ export function sdnoise2(x: number, y: number): [number, Vector] {
   dnoise_dx *= 40.0; /* Scale derivative to match the noise scaling */
   dnoise_dy *= 40.0;
   //}
-  return [noise, new Vector(dnoise_dx, dnoise_dy)];
+  return [noise, dnoise_dx, dnoise_dy];
 }
 
 /* Skewing factors for 3D simplex grid:
@@ -494,7 +494,7 @@ const G4 = .138196601; // G4 = (5.0-Math.sqrt(5.0))/20.0
  * If the last four arguments are not null, the analytic derivative
  * (the 4D gradient of the scalar noise field) is also calculated.
  */
-export function sdnoise4(x: number, y: number, z: number, w: number): [number, Vector] {
+export function sdnoise4(x: number, y: number, z: number, w: number): number[] {
 
   let n0, n1, n2, n3, n4; // Noise contributions from the five corners
   let noise; // Return value
@@ -705,29 +705,16 @@ export function sdnoise4(x: number, y: number, z: number, w: number): [number, V
   dnoise_dw *= 28.0;
   //}
 
-  return [noise, new Vector(dnoise_dx, dnoise_dy, dnoise_dz, dnoise_dw)];
+  return [noise, dnoise_dx, dnoise_dy, dnoise_dz, dnoise_dw];
 }
 
 export function simplex401(vector: Vector3, seed = 0): number[] {
-  let [noiseValue, noiseNormal] = sdnoise4(vector.x, vector.y, vector.z, seed);
-  // on divise le vecteur normal par 2 pour cause que [0,1] deux fois plus petit que [-1,1]
-  noiseNormal.divideInPlace(2);
-  return [(noiseValue + 1) / 2, noiseNormal.x, noiseNormal.y, noiseNormal.z];
+  let [noiseValue, noiseGradientX, noiseGradientY, noiseGradientZ] = sdnoise4(vector.x, vector.y, vector.z, seed);
+
+  // on divise le vecteur gradient par 2 pour cause que [0,1] deux fois plus petit que [-1,1]
+  return [(noiseValue + 1) / 2, noiseGradientX / 2, noiseGradientY / 2, noiseGradientZ / 2];
 }
 
 export function simplex411(vector: Vector3, seed = 0): number[] {
-
-  let [noiseValue, noiseNormal] = sdnoise4(vector.x, vector.y, vector.z, seed);
-
-  return [noiseValue, noiseNormal.x, noiseNormal.y, noiseNormal.z];
-
-}
-
-export function ridgedSimplex401(vector: Vector, seed = 0): number[] {
-  if (vector.dim != 3) throw new Error("Dimension of vector must be 3");
-  let [noiseValue, noiseNormal] = sdnoise4(vector.x, vector.y, vector.z, seed);
-  noiseValue = Math.abs(noiseValue);
-  noiseNormal.subtractInPlace(vector.scale(Vector.Dot(noiseNormal, vector)));
-
-  return [noiseValue, noiseNormal.x, noiseNormal.y, noiseNormal.z];
+  return sdnoise4(vector.x, vector.y, vector.z, seed);
 }

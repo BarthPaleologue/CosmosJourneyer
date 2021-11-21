@@ -5,7 +5,7 @@ import { elevationFunction } from "./elevationFunction";
 export function simplexNoiseLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, minValue: number): elevationFunction {
     return function (coords: Vector3): number[] {
         let noiseValue = 0.0;
-        let noiseNormal = Vector3.Zero();
+        let noiseGradient = Vector3.Zero();
         let totalAmplitude = 0.0;
         for (let i = 0; i < nbOctaves; i++) {
             let samplePoint = coords.scale(frequency);
@@ -13,30 +13,30 @@ export function simplexNoiseLayer(frequency: number, nbOctaves: number, decay: n
 
             let terrainData = simplex401(samplePoint);
             let localElevation = terrainData[0];
-            let localNormal = new Vector3(terrainData[1], terrainData[2], terrainData[3]);
+            let localGradient = new Vector3(terrainData[1], terrainData[2], terrainData[3]);
             noiseValue += localElevation / Math.pow(decay, i);
-            noiseNormal.addInPlace(localNormal.divide(Math.pow(decay, i)));
+            noiseGradient.addInPlace(localGradient.divide(Math.pow(decay, i)));
 
             totalAmplitude += 1.0 / Math.pow(decay, i);
         }
         noiseValue /= totalAmplitude;
-        noiseNormal.divideInPlace(totalAmplitude);
+        noiseGradient.divideInPlace(totalAmplitude);
 
         if (minValue > 0) {
             if (minValue != 1) {
                 if (noiseValue <= minValue) {
                     noiseValue = 0;
-                    noiseNormal = coords.normalize();
+                    noiseGradient = coords.normalize();
                 } else {
                     noiseValue -= minValue;
                     noiseValue /= 1 - minValue;
-                    noiseNormal.divideInPlace(1 - minValue);
+                    noiseGradient.divideInPlace(1 - minValue);
                 }
             } else {
                 throw new Error("minValue must be != 1");
             }
         }
 
-        return [noiseValue, noiseNormal.x, noiseNormal.y, noiseNormal.z];
+        return [noiseValue, noiseGradient.x, noiseGradient.y, noiseGradient.z];
     };
 }
