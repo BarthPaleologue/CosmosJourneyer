@@ -41,7 +41,7 @@ let planetManager = new PlanetManager();
 
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 1, scene);
 
-let waterElevation = 25e2;
+let waterElevation = 10e2;
 
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 300;

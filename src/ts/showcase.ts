@@ -54,7 +54,7 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 
 let planetManager = new PlanetManager();
 
-let waterElevation = 25e2;
+let waterElevation = 10e2;
 
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
@@ -68,8 +68,8 @@ planet.attachNode.position.x = radius * 5;
 planetManager.add(planet);
 
 let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene);
-moon.terrainSettings.continentsFragmentation = 0;
-moon.terrainSettings.maxMountainHeight = 15e3;
+moon.terrainSettings.continentsFragmentation = 1;
+moon.terrainSettings.maxMountainHeight = 10e3;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.5, 0.5, 0.5);
 moon.colorSettings.sandColor = planet.colorSettings.steepColor;
 moon.colorSettings.steepColor = new BABYLON.Vector3(0.1, 0.1, 0.1);

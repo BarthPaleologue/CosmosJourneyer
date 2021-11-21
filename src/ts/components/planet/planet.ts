@@ -66,12 +66,12 @@ export class Planet {
         let craterMaxDepthFactor = 1;
 
         this.terrainSettings = {
-            continentsFragmentation: 0.9,
+            continentsFragmentation: 0.47,
 
-            maxBumpHeight: 2e3,
+            maxBumpHeight: 100,
             bumpsFrequency: 1,
 
-            maxMountainHeight: 15e3,
+            maxMountainHeight: 20e3,
             mountainsFrequency: 0.05
         };
 
@@ -88,8 +88,8 @@ export class Planet {
 
             snowElevation01: 0.7,
             snowOffsetAmplitude: 0.05,
-            snowLacunarity: 4.9,
-            snowLatitudePersistence: 2.5,
+            snowLacunarity: 4,
+            snowLatitudePersistence: 3,
             steepSnowDotLimit: 0.8,
         };
 
@@ -129,7 +129,7 @@ export class Planet {
 
         surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
 
-        surfaceMaterial.setFloat("maxElevation", this.terrainSettings.maxBumpHeight + this.terrainSettings.maxMountainHeight);
+        surfaceMaterial.setFloat("maxElevation", 5e3 + this.terrainSettings.maxMountainHeight + this.terrainSettings.maxBumpHeight);
 
         surfaceMaterial.setFloat("snowElevation01", this.colorSettings.snowElevation01);
         surfaceMaterial.setFloat("snowOffsetAmplitude", this.colorSettings.snowOffsetAmplitude);

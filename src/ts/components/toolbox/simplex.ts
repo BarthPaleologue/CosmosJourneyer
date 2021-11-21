@@ -715,6 +715,14 @@ export function simplex401(vector: Vector3, seed = 0): number[] {
   return [(noiseValue + 1) / 2, noiseNormal.x, noiseNormal.y, noiseNormal.z];
 }
 
+export function simplex411(vector: Vector3, seed = 0): number[] {
+
+  let [noiseValue, noiseNormal] = sdnoise4(vector.x, vector.y, vector.z, seed);
+
+  return [noiseValue, noiseNormal.x, noiseNormal.y, noiseNormal.z];
+
+}
+
 export function ridgedSimplex401(vector: Vector, seed = 0): number[] {
   if (vector.dim != 3) throw new Error("Dimension of vector must be 3");
   let [noiseValue, noiseNormal] = sdnoise4(vector.x, vector.y, vector.z, seed);

@@ -443,8 +443,16 @@ export class Vector3 {
     subtract(otherVector: Vector3): Vector3 {
         return new Vector3(this._x - otherVector._x, this._y - otherVector._y, this._z - otherVector._z);
     }
+    subtractInPlace(otherVector: Vector3): void {
+        this._x -= otherVector._x;
+        this._y -= otherVector._y;
+        this._z -= otherVector._z;
+    }
     normalize(): Vector3 {
         return this.scale(1 / this.getMagnitude());
+    }
+    normalizeInPlace(): void {
+        this.scaleInPlace(1 / this.getMagnitude());
     }
     static Zero(): Vector3 {
         return new Vector3(0, 0, 0);

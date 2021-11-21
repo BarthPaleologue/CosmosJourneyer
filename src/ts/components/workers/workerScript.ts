@@ -1,8 +1,7 @@
 import { getRotationMatrixFromDirection } from "../toolbox/direction";
 import { simplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
 import { Vector3 } from "../toolbox/algebra";
-import { mountainNoiseLayer } from "../terrain/landscape/moutainNoiseLayer";
-import { continentNoiseLayer } from "../terrain/landscape/continentNoiseLayer";
+import { ridgedNoiseLayer } from "../terrain/landscape/ridgedNoiseLayer";
 import { CraterLayer } from "../terrain/crater/craterLayer";
 import { buildData } from "../forge/buildData";
 import { TerrainSettings } from "../terrain/terrainSettings";
@@ -12,7 +11,7 @@ import { elevationFunction } from "../terrain/landscape/elevationFunction";
 let currentPlanetID = "";
 
 let bumpyLayer: elevationFunction;
-let continentsLayer2: elevationFunction;
+let continentsLayer: elevationFunction;
 //let continentsLayer3: ContinentNoiseLayer;
 let mountainsLayer: elevationFunction;
 
@@ -28,10 +27,11 @@ let terrainSettings: TerrainSettings = {
 
 
 function initLayers() {
-    bumpyLayer = simplexNoiseLayer(7e-5, 2, 2, 2, 0.0);
-    continentsLayer2 = simplexNoiseLayer(5e-6, 3, 1.7, 2.5, 1 - terrainSettings.continentsFragmentation);
-    //continentsLayer3 = new ContinentNoiseLayer(2e-5, 5, 1.5, 2, 0.0);
-    mountainsLayer = mountainNoiseLayer(1e-4, 5, 2, 2, 0.4);
+    continentsLayer = simplexNoiseLayer(3e-6, 6, 1.8, 2.1, 1 - terrainSettings.continentsFragmentation);
+
+    bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 0.0);
+
+    mountainsLayer = ridgedNoiseLayer(3e-4, 6, 1.5, 2, 0.0);
 }
 
 initLayers();
@@ -44,10 +44,23 @@ function terrainFunction(position: Vector3, normal: Vector3): void {
 
     let elevation = 0;
 
-    let continentMask = continentsLayer2(position.scale(0.5))[0];
+    let continentBaseHeight = 5e3;
+
+    let continentData = continentsLayer(position);
+    let continentMask = continentData[0];
+
+    let continentNormal = new Vector3(continentData[1], continentData[2], continentData[3]);
+
+    // la racine permet l'effet de "plateau" continental
+    continentMask = Math.sqrt(continentMask);
+
+    let continentElevation = continentMask * continentBaseHeight;
+
+    elevation += continentElevation;
+    normal.addInPlace(continentNormal.scale(continentBaseHeight));
 
     let mountainData = mountainsLayer(position.scale(terrainSettings.mountainsFrequency));
-    let mountainElevation = mountainData[0];
+    let mountainElevation = continentMask * mountainData[0];
     let mountainNormal = new Vector3(mountainData[1], mountainData[2], mountainData[3]);
 
     elevation += continentMask * mountainElevation * terrainSettings.maxMountainHeight;
@@ -64,7 +77,7 @@ function terrainFunction(position: Vector3, normal: Vector3): void {
 
     position.addInPlace(unitCoords.scale(elevation));
 
-    normal.divideInPlace(terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
+    normal.divideInPlace(continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
 }
 
 self.onmessage = e => {

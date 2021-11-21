@@ -22,11 +22,19 @@ export function simplexNoiseLayer(frequency: number, nbOctaves: number, decay: n
         noiseValue /= totalAmplitude;
         noiseNormal.divideInPlace(totalAmplitude);
 
-        if (minValue != 1) {
-            noiseValue = Math.max(minValue, noiseValue) - minValue;
-            noiseValue /= 1.0 - minValue;
-            noiseNormal.divideInPlace(1.0 - minValue);
-            //noiseValue += this._minValue;
+        if (minValue > 0) {
+            if (minValue != 1) {
+                if (noiseValue <= minValue) {
+                    noiseValue = 0;
+                    noiseNormal = coords.normalize();
+                } else {
+                    noiseValue -= minValue;
+                    noiseValue /= 1 - minValue;
+                    noiseNormal.divideInPlace(1 - minValue);
+                }
+            } else {
+                throw new Error("minValue must be != 1");
+            }
         }
 
         return [noiseValue, noiseNormal.x, noiseNormal.y, noiseNormal.z];

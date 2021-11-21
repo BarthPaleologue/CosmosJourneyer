@@ -17,7 +17,7 @@ export class PlanetSide {
     minDepth: number;
     maxDepth: number; // profondeur maximale du quadtree envisagé
     tree: quadTree = []; // le quadtree en question
-    renderDistanceFactor = 1;
+    renderDistanceFactor = 2;
 
     // les chunks
     chunkLength: number; // taille du côté de base
