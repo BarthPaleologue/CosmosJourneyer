@@ -41,8 +41,9 @@ let planetManager = new PlanetManager();
 
 let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 1, scene);
 
-let waterElevation = 10e2;
+let waterElevation = 20e2;
 
+planet.colorSettings.steepSharpness = 5;
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.waterLevel = waterElevation;
@@ -72,22 +73,18 @@ new Slider("maxDepth", document.getElementById("maxDepth")!, 0, 5, planet.sides[
 });
 
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX")!, 0, 50, 0, (val: number) => {
-
     planet.reset();
 });
 
 new Slider("noiseOffsetY", document.getElementById("noiseOffsetY")!, 0, 50, 0, (val: number) => {
-
     planet.reset();
 });
 
 new Slider("noiseOffsetZ", document.getElementById("noiseOffsetZ")!, 0, 50, 0, (val: number) => {
-
     planet.reset();
 });
 
 new Slider("minValue", document.getElementById("minValue")!, 0, 20, 10, (val: number) => {
-
     planet.reset();
 });
 

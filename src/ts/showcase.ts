@@ -54,12 +54,12 @@ depthRenderer.getDepthMap().renderList?.push(sun);
 
 let planetManager = new PlanetManager();
 
-let waterElevation = 10e2;
+let waterElevation = 20e2;
 
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
 planet.colorSettings.sandSize = 300;
-planet.colorSettings.steepSharpness = 10;
+planet.colorSettings.steepSharpness = 5;
 planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();

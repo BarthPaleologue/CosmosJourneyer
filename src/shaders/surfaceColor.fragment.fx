@@ -323,6 +323,7 @@ void main() {
 	}*/
 	//screenColor = vNormal*0.5 + 0.5;
 	//screenColor = vec3(elevation01);
+	//screenColor = vec3(1.0 - dot(normal, normalize(vPosition)));
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
 } 

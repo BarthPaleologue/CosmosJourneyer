@@ -71,7 +71,7 @@ export class Planet {
             maxBumpHeight: 100,
             bumpsFrequency: 1,
 
-            maxMountainHeight: 20e3,
+            maxMountainHeight: 10e3,
             mountainsFrequency: 0.05
         };
 

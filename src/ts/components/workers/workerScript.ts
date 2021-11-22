@@ -31,14 +31,14 @@ function initLayers() {
 
     bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 0.0);
 
-    mountainsLayer = ridgedNoiseLayer(3e-4, 6, 1.5, 2, 0.0);
+    mountainsLayer = ridgedNoiseLayer(3e-4, 6, 1.5, 2, 0.6);
 }
 
 initLayers();
 
 const craterLayer = new CraterLayer([]);
 
-function terrainFunction(position: Vector3, normal: Vector3): void {
+function terrainFunction(position: Vector3, gradient: Vector3): void {
 
     const unitCoords = position.normalize();
 
@@ -49,36 +49,40 @@ function terrainFunction(position: Vector3, normal: Vector3): void {
     let continentData = continentsLayer(position);
     let continentMask = continentData[0];
 
-    let continentNormal = new Vector3(continentData[1], continentData[2], continentData[3]);
+    let continentGradient = new Vector3(continentData[1], continentData[2], continentData[3]);
 
     // la racine permet l'effet de "plateau" continental
+    // https://www.wikiwand.com/en/Gradient
+    // pour que cela marche : appliquer la fonction suivant la composante normale à la sphère
     continentMask = Math.sqrt(continentMask);
+    continentGradient.divideInPlace(2 * continentMask);
 
     let continentElevation = continentMask * continentBaseHeight;
 
     elevation += continentElevation;
-    normal.addInPlace(continentNormal.scale(continentBaseHeight));
+    continentGradient.scaleInPlace(continentBaseHeight);
+    gradient.addInPlace(continentGradient);
 
     let mountainData = mountainsLayer(position.scale(terrainSettings.mountainsFrequency));
     let mountainElevation = continentMask * mountainData[0];
-    let mountainNormal = new Vector3(mountainData[1], mountainData[2], mountainData[3]);
+    let mountainGradient = new Vector3(mountainData[1], mountainData[2], mountainData[3]);
 
     elevation += continentMask * mountainElevation * terrainSettings.maxMountainHeight;
-    mountainNormal.scaleInPlace(terrainSettings.maxMountainHeight * continentMask);
-    normal.addInPlace(mountainNormal);
+    mountainGradient.scaleInPlace(terrainSettings.maxMountainHeight * continentMask);
+    gradient.addInPlace(mountainGradient);
 
     let bumpyData = bumpyLayer(position.scale(terrainSettings.bumpsFrequency));
     let bumpyElevation = bumpyData[0];
-    let bumpyNormal = new Vector3(bumpyData[1], bumpyData[2], bumpyData[3]);
+    let bumpyGradient = new Vector3(bumpyData[1], bumpyData[2], bumpyData[3]);
 
     elevation += bumpyElevation * terrainSettings.maxBumpHeight;
-    bumpyNormal.scaleInPlace(terrainSettings.maxBumpHeight);
-    normal.addInPlace(bumpyNormal);
+    bumpyGradient.scaleInPlace(terrainSettings.maxBumpHeight);
+    gradient.addInPlace(bumpyGradient);
 
     position.addInPlace(unitCoords.scale(elevation));
 
-    normal.divideInPlace(continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
-    //normal.divideInPlace(elevation);
+    gradient.divideInPlace(continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
+    //gradient.divideInPlace(elevation);
 }
 
 self.onmessage = e => {
@@ -113,6 +117,7 @@ self.onmessage = e => {
 
         const normals = new Float32Array(verticesPositions.length);
 
+        let vecOffset = new Vector3(offset[0], offset[1], offset[2]);
 
         for (let x = 0; x < vertexPerLine; ++x) {
             for (let y = 0; y < vertexPerLine; ++y) {
@@ -124,7 +129,6 @@ self.onmessage = e => {
                 vertexPosition.scaleInPlace(size);
 
                 // on le met au bon endroit de la face par défaut (Oxy devant)
-                let vecOffset = new Vector3(offset[0], offset[1], offset[2]);
                 vertexPosition.addInPlace(vecOffset);
 
                 // on le met sur la bonne face
@@ -167,9 +171,10 @@ self.onmessage = e => {
 
         const indices = new Uint16Array(faces.length * (faces[0].length - 2) * 3);
 
-        // indices from faces
+        // indices from faces (magie noire)
         for (let i = 0; i < faces.length; ++i) {
             for (let j = 0; j < faces[i].length - 2; ++j) {
+                // on à noter que le 0 m'intrigue
                 indices[(i * (faces[i].length - 2) + j) * 3] = faces[i][0];
                 indices[(i * (faces[i].length - 2) + j) * 3 + 1] = faces[i][j + 2];
                 indices[(i * (faces[i].length - 2) + j) * 3 + 2] = faces[i][j + 1];
@@ -186,7 +191,7 @@ self.onmessage = e => {
         // benchmark fait le 5/10/2021 (normal non analytique) : ~2s/chunk
         // benchmark fait le 12/11/2021 (normal non analyique) : ~0.5s/chunk
         // benchmark fait le 20/11/2021 20h30 (normal analytique v2) : ~0.8s/chunk
-        // benchmark fait le 20/11/2021 21h20 (normal analytique v2.1) : ~0.06s/chunk (30ms/chunk)
+        // benchmark fait le 20/11/2021 21h20 (normal analytique v2.1) : ~0.03s/chunk (30ms/chunk)
         //console.log("Time for creation : " + (Date.now() - clock));
 
     } else if (e.data.taskType == "collisionTask") {
@@ -200,7 +205,9 @@ self.onmessage = e => {
             initLayers();
         }
 
-        let samplePosition = new Vector3(data.position[0], data.position[1], data.position[2]).normalize().scale(data.chunkLength / 2);
+        let samplePosition = new Vector3(data.position[0], data.position[1], data.position[2]);
+        samplePosition.normalizeInPlace();
+        samplePosition.scaleInPlace(data.chunkLength / 2);
 
         terrainFunction(samplePosition, Vector3.Zero());
 
