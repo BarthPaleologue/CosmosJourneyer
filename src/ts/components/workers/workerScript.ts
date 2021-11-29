@@ -31,7 +31,7 @@ function initLayers() {
 
     bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 0.0);
 
-    mountainsLayer = ridgedNoiseLayer(3e-4, 6, 1.5, 2, 0.6);
+    mountainsLayer = simplexNoiseLayer(3e-4, 6, 1.5, 2, 0.3);
 }
 
 initLayers();

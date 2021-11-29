@@ -84,7 +84,7 @@ export class Planet {
             waterLevel: 0.32,
             sandSize: 1,
             steepSharpness: 1,
-            normalSharpness: 0.7,
+            normalSharpness: 0.6,
 
             snowElevation01: 0.7,
             snowOffsetAmplitude: 0.05,
@@ -129,6 +129,7 @@ export class Planet {
 
         surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
 
+        // déharcoder le bouzin
         surfaceMaterial.setFloat("maxElevation", 5e3 + this.terrainSettings.maxMountainHeight + this.terrainSettings.maxBumpHeight);
 
         surfaceMaterial.setFloat("snowElevation01", this.colorSettings.snowElevation01);

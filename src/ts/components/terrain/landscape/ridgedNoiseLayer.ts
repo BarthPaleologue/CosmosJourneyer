@@ -31,10 +31,12 @@ export function ridgedNoiseLayer(frequency: number, nbOctaves: number, decay: nu
             let sphereNormal = coords.normalize();
             let normalComp = Vector3.Dot(noiseGradient, sphereNormal);
 
+            // cela ne sert à rien on projette sur le plan tangent à la surface
             // symétrie par rapport au plan tangent à la sphère
             // cela revient à faire -1 suivant la composante normale à la sphère
-            noiseGradient.subtractInPlace(sphereNormal.scale(2 * normalComp));
+            //noiseGradient.subtractInPlace(sphereNormal.scale(2 * normalComp));
             // sym(v) = v - 2*(n.v)n
+            //noiseGradient.scaleInPlace(-0.5 * (1 - noiseValue));
         }
 
         // on passe d'une range de [-1,1] à [0,1]

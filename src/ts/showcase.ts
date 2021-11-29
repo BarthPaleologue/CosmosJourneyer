@@ -77,6 +77,13 @@ moon.colorSettings.snowLatitudePersistence = 2;
 moon.colorSettings.snowElevation01 = 0.99;
 moon.colorSettings.steepSharpness = 10;
 moon.updateColors();
+
+import rockn from "../asset/textures/rockn.png";
+import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
+moon.surfaceMaterial.setTexture("plainNormalMap", new BABYLON.Texture(rockn, scene));
+moon.surfaceMaterial.setTexture("bottomNormalMap", new BABYLON.Texture(rockn, scene));
+moon.surfaceMaterial.setTexture("sandNormalMap", new BABYLON.Texture(rockn, scene));
+
 moon.attachNode.position.addInPlace(planet.attachNode.getAbsolutePosition());
 
 planetManager.add(moon);
@@ -90,7 +97,7 @@ ocean.settings.depthModifier = 0.004;
 //ocean.settings.oceanRadius = 0;
 
 //let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 10e3, radius + 20e3, sun, player.camera, scene);
-
+let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius + 8e3, sun, player.camera, scene);
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 30e3, sun, player.camera, scene);
 //atmosphere.settings.intensity = 10;

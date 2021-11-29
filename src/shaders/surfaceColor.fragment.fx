@@ -192,36 +192,33 @@ vec3 lnear(vec3 value1, vec3 value2, float x, float summitX, float range) {
 }
 
 vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude, float slope, vec3 unitPosition, out vec3 normal) {
+	
 	normal = vNormal;
 
-	float snowOffset = (completeNoise(unitPosition * 200.0, 5, 2.0, snowLacunarity) - 0.5) * 2.0;
+	float snowOffset = (completeNoise(unitPosition * 10.0, 5, 1.5, snowLacunarity) - 0.5) * 2.0;
 
-	float normalStrength = 0.2;
+	float plainFactor = 0.0, 
+	sandFactor = 0.0, 
+	bottomFactor = 0.0, 
+	snowFactor = 0.0, 
+	steepFactor = 0.0;
+
+	vec3 outColor;
 
 	if(elevation01 > snowElevation01 * exp(-abs(latitude) * snowLatitudePersistence) + snowOffsetAmplitude * snowOffset) {
 		// il fait froid !!!!!!!!
-		if(pow(1.0 - slope, 1.0) > steepSnowDotLimit + (completeNoise(unitPosition * 200.0, 5, 5.1, 7.0)-0.5) * 0.5) {
+		if(pow(1.0 - slope, 1.0) > steepSnowDotLimit + (completeNoise(unitPosition * 10.0, 5, 2.0, 3.0)-0.5) * 0.5) {
 			// neige à plat bien blanche
 
-			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.001, normalSharpness, normalStrength);
-			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0003, normalSharpness, normalStrength); // plus grand
-			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.000007, normalSharpness, normalStrength); // plus grand
-			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0000001, normalSharpness, normalStrength); // plus grand
-			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 1.0, 0.0, 0.00000004, normalSharpness, normalStrength); // plus grand
+			snowFactor = 1.0;
 
-
-			return snowColor;
+			outColor = snowColor;
 		} else {
 			// neige en pente un peu assombrie
 
-			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, normalSharpness, normalStrength);
-			normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0003, normalSharpness, normalStrength); // plus grand
-			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.000007, normalSharpness, normalStrength); // plus grand
-			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0000001, normalSharpness, normalStrength); // plus grand
-			//normal = triplanarNormal(vPosition, normal, 0.0, 0.0, 0.0, 0.0, 1.0, 0.00000004, normalSharpness, normalStrength); // plus grand
+			steepFactor = 1.0;
 
-
-			return steepColor;
+			outColor = steepColor;
 		}
 	} else if(elevation01 > waterLevel01) {
 
@@ -230,39 +227,35 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 		// entre mer et ciel
 		vec3 flatColor = lnear(sandColor, lerp(snowColor, openColor, pow(elevation01, 8.0)), elevation01, waterLevel01, sandSize / maxElevation);
 
-		float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation);
-		float plainFactor = 1.0 - sandFactor;
+		sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation);
+		plainFactor = 1.0 - sandFactor;
 
-		float steepFactor = 1.0 - pow(1.0 - slope, steepSharpness); // tricks pour éviter un calcul couteux d'exposant décimal
+		steepFactor = 1.0 - pow(1.0 - slope, steepSharpness); // tricks pour éviter un calcul couteux d'exposant décimal
 
 		sandFactor *= steepFactor;
 		plainFactor *= steepFactor;
 
-		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.001, normalSharpness, normalStrength);
-		normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0003, normalSharpness, normalStrength); // plus grand
-		//normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.000007, normalSharpness, normalStrength); // plus grand
-		//normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.0000001, normalSharpness, normalStrength); // plus grand
-		//normal = triplanarNormal(vPosition, normal, 0.0, sandFactor, plainFactor, 0.0, steepFactor, 0.00000004, normalSharpness, normalStrength); // plus grand
-
-		return lerp(flatColor, steepColor, pow(1.0 - slope, steepSharpness));
+		outColor = lerp(flatColor, steepColor, pow(1.0 - slope, steepSharpness));
 	} else {
 		// entre abysse et surface
 		vec3 flatColor = lnear(sandColor, vec3(0.5), elevation01, waterLevel01, sandSize / maxElevation);
 
-		float sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation);
-		float bottomFactor = 1.0 - sandFactor;
+		sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation);
+		bottomFactor = 1.0 - sandFactor;
 
-		float steepFactor = 1.0 - pow(1.0 - slope, steepSharpness);
+		steepFactor = 1.0 - pow(1.0 - slope, steepSharpness);
 
 		sandFactor *= steepFactor;
 		bottomFactor *= steepFactor;
-
-		normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, 0.0, 0.0, steepFactor, 0.001, normalSharpness, normalStrength);
-		normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, 0.0, 0.0, steepFactor, 0.0003, normalSharpness, normalStrength); // plus grand
-
 		
-		return lerp(flatColor, steepColor, pow(1.0 - slope, steepSharpness));
+		outColor = lerp(flatColor, steepColor, pow(1.0 - slope, steepSharpness));
 	}
+
+	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.001, normalSharpness, 0.1);
+	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.0003, normalSharpness, 0.2); // plus grand
+	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.00001, normalSharpness, 0.4); // plus grand
+
+	return outColor;
 
 }
 
@@ -271,8 +264,6 @@ void main() {
 	vec3 viewDirectionW = normalize(v3CameraPos - vPositionW); // view direction in world space
 
 	float distance = length(v3CameraPos - vPositionW);
-
-	//float maxElevation = 10300.0; // voir dans builder avec les différents layer pour adapter
 
 	vec3 unitPosition = normalize(vPosition);
 	
