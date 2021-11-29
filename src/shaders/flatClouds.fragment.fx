@@ -317,7 +317,7 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     density = saturate(density * 2.0);
 
-    density = pow(density, 1.7);
+    //density = pow(density, 1.7);
 
     return density;
 }
@@ -342,6 +342,7 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
             return originalColor;
         }
     }
+    if(impactPoint > maximumDistance) return originalColor;
 
     bool twoPoints = impactPoint > 0.0 && escapePoint > 0.0 && escapePoint < maximumDistance;
 
@@ -381,6 +382,7 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
     }
 
     cloudDensity = max(0.0, cloudDensity - 0.2);
+    cloudDensity /= 1.0 - 0.2;
 
     vec3 ambiant = lerp(originalColor, vec3(1.0), 1.0 - cloudDensity);
 
