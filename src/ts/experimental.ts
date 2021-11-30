@@ -7,6 +7,7 @@ import * as style from "../styles/style.scss";
 import * as style2 from "../sliderjs/style2.min.css";
 import { PlanetManager } from "./components/planet/planetManager";
 import { PlayerControler } from "./components/player/playerControler";
+import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
 
 style.default;
 style2.default;
@@ -26,11 +27,7 @@ scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
-const planetRadius = 200e3;
-
-/*let camera = new BABYLON.FreeCamera("camera", BABYLON.Vector3.Zero(), scene);
-camera.maxZ = planetRadius * 5;
-scene.activeCamera = camera;*/
+const planetRadius = 1000e3;
 
 let player = new PlayerControler(scene);
 player.camera.maxZ = planetRadius * 5;
@@ -57,10 +54,12 @@ let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + wate
 ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius, planetRadius + 30e3, light, player.camera, scene);
-//atmosphere.settings.intensity = 10;
-atmosphere.settings.scatteringStrength = 0.4;
-atmosphere.settings.falloffFactor = 19;
+let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, planetRadius, waterElevation, planetRadius + 15e3, light, player.camera, scene);
+
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius, planetRadius + 100e3, light, player.camera, scene);
+atmosphere.settings.intensity = 20;
+atmosphere.settings.scatteringStrength = 1.0;
+atmosphere.settings.falloffFactor = 24;
 
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
@@ -71,7 +70,7 @@ let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Te
 new Slider("maxDepth", document.getElementById("maxDepth")!, 0, 5, planet.sides[0].minDepth, (val: number) => {
     planet.setMinDepth(val);
 });
-
+/*
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX")!, 0, 50, 0, (val: number) => {
     planet.reset();
 });
@@ -87,7 +86,7 @@ new Slider("noiseOffsetZ", document.getElementById("noiseOffsetZ")!, 0, 50, 0, (
 new Slider("minValue", document.getElementById("minValue")!, 0, 20, 10, (val: number) => {
     planet.reset();
 });
-
+*/
 new Slider("oceanLevel", document.getElementById("oceanLevel")!, 0, 50, (ocean.settings.oceanRadius - planetRadius) / 100, (val: number) => {
     ocean.settings.oceanRadius = planetRadius + val * 100;
     if (val == 0) ocean.settings.oceanRadius = 0;
@@ -143,16 +142,17 @@ new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 25
     planet.colorSettings.normalSharpness = val;
     planet.updateColors();
 });
-
+/*
 new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 20, 1, (val: number) => {
 
     planet.reset();
-});
-
+});*/
+/*
 new Slider("nbCraters", document.getElementById("nbCraters")!, 0, 500, 200, (nbCraters: number) => {
     //planet.regenerateCraters(nbCraters);
 });
-
+*/
+/*
 new Slider("craterRadius", document.getElementById("craterRadius")!, 1, 20, 10, (radiusFactor: number) => {
 
     planet.reset();
@@ -167,13 +167,26 @@ new Slider("craterDepth", document.getElementById("craterDepth")!, 1, 20, 10, (d
 
     planet.reset();
 });
+*/
+
+new Slider("cloudFrequency", document.getElementById("cloudFrequency")!, 0, 20, flatClouds.settings.cloudFrequency, (val: number) => {
+    flatClouds.settings.cloudFrequency = val;
+});
+
+new Slider("cloudDetailFrequency", document.getElementById("cloudDetailFrequency")!, 0, 20, flatClouds.settings.cloudDetailFrequency, (val: number) => {
+    flatClouds.settings.cloudDetailFrequency = val;
+});
+
+new Slider("cloudPower", document.getElementById("cloudPower")!, 0, 100, flatClouds.settings.cloudPower * 10, (val: number) => {
+    flatClouds.settings.cloudPower = val / 10;
+});
 
 new Slider("intensity", document.getElementById("intensity")!, 0, 40, atmosphere.settings.intensity, (val: number) => {
     atmosphere.settings.intensity = val;
 });
 
-new Slider("atmosphereRadius", document.getElementById("atmosphereRadius")!, 0, 100, (atmosphere.settings.atmosphereRadius - planetRadius) / 1000, (val: number) => {
-    atmosphere.settings.atmosphereRadius = planetRadius + val * 1000;
+new Slider("atmosphereRadius", document.getElementById("atmosphereRadius")!, 0, 100, (atmosphere.settings.atmosphereRadius - planetRadius) / 10000, (val: number) => {
+    atmosphere.settings.atmosphereRadius = planetRadius + val * 10000;
 });
 
 

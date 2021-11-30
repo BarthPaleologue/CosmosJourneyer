@@ -27,11 +27,11 @@ let terrainSettings: TerrainSettings = {
 
 
 function initLayers() {
-    continentsLayer = simplexNoiseLayer(3e-6, 6, 1.8, 2.1, 1 - terrainSettings.continentsFragmentation);
+    continentsLayer = simplexNoiseLayer(1e-6, 6, 1.8, 2.1, 1 - terrainSettings.continentsFragmentation);
 
     bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 0.0);
 
-    mountainsLayer = simplexNoiseLayer(3e-4, 6, 1.5, 2, 0.3);
+    mountainsLayer = simplexNoiseLayer(1e-4, 6, 1.7, 2, 0.3);
 }
 
 initLayers();

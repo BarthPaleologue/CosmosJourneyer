@@ -15,7 +15,7 @@ export class PlayerControler {
 
     private controls = {
         upKeys: [" "],
-        downKeys: ["Shift"],
+        downKeys: ["Shift", "ShiftLeft", "c", "C"],
         forwardKeys: ["z", "Z"],
         leftKeys: ["q", "Q"],
         backwardKeys: ["s", "S"],

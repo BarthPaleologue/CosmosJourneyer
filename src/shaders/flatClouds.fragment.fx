@@ -23,7 +23,13 @@ uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
 
 uniform vec3 planetPosition; // planet position in world space
-uniform float oceanRadius; // atmosphere radius (calculate from planet center)
+uniform float cloudLayerRadius; // atmosphere radius (calculate from planet center)
+uniform float planetRadius; // planet radius
+uniform float waterLevel; // water level
+
+uniform float cloudFrequency; // cloud frequency
+uniform float cloudDetailFrequency; // cloud detail frequency
+uniform float cloudPower; // cloud power
 
 uniform float smoothness;
 uniform float specularPower;
@@ -276,9 +282,6 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
     t0 = min(r0, r1);
     t1 = max(r0, r1);
 
-    //t0 = max(min(r0, r1), 0.0);
-    //t1 = max(max(r0, r1), 0.0);
-
     return (t1 > 0.0);
 }
 
@@ -303,7 +306,8 @@ vec3 lerp(vec3 v1, vec3 v2, float s) {
 }
 
 float cloudDensityAtPoint(vec3 samplePoint) {
-    float density = worley(normalize(samplePoint)*4.0, 1.0).x;
+
+    float density = worley(normalize(samplePoint) * cloudFrequency + vec3(time*1e-5), 1.0).x;
 
     density = 1.0 - density;
 
@@ -313,28 +317,26 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     density /= 1.0 - minValue;
 
-    density *= completeNoise(normalize(samplePoint)*20.0, 5, 2.0, 2.0);
+    density *= completeNoise(normalize(samplePoint) * cloudDetailFrequency + vec3(time*1e-5), 5, 2.0, 2.0);
 
     density = saturate(density * 2.0);
 
-    //density = pow(density, 1.7);
+    density = pow(density, cloudPower);
 
     return density;
 }
 
-vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
+vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
 
-    float waveAmplitude = 7.0;
-
-    float waveOmega = 1.0/3000.0;
-
-    float actualRadius = oceanRadius + waveAmplitude * sin(time * waveOmega);
-
-    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, actualRadius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint))) {
         return originalColor; // if not intersecting with atmosphere, return original color
     }
 
+	float waterImpact, waterEscape;
+    if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius + waterLevel, waterImpact, waterEscape)) {
+        maximumDistance = min(maximumDistance, waterImpact);
+    }
 
     if(impactPoint < 0.0) {
         impactPoint = escapePoint;
@@ -356,20 +358,6 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
     vec3 samplePointPlanetSpace2 = vec3(inverse(planetWorldMatrix) * vec4(samplePoint2, 1.0));//samplePoint - planetPosition;
 
     vec3 planetNormal = normalize(samplePoint1 - planetPosition);
-    
-    //vec3 normalWave = triplanarNormal(samplePointPlanetSpace, planetNormal, normalMap, 0.00002, 1.0, 0.3);
-    //normalWave = triplanarNormal(samplePointPlanetSpace, planetNormal, normalMap, 0.00002, 1.0, 0.3);
-    vec3 normalWave = planetNormal;
-
-    vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
-
-    float ndl = max(dot(planetNormal, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
-
-    //TODO : en faire un uniform
-    float smoothness = 0.7;
-    float specularAngle = acos(dot(normalize(sunDir - rayDir), normalWave));
-    float specularExponent = specularAngle / (1.0 - smoothness);
-    float specularHighlight = exp(-specularExponent * specularExponent);
 
     /// Cloud point 1
     float cloudDensity = cloudDensityAtPoint(samplePointPlanetSpace1);
@@ -384,10 +372,22 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
     cloudDensity = max(0.0, cloudDensity - 0.2);
     cloudDensity /= 1.0 - 0.2;
 
-    vec3 ambiant = lerp(originalColor, vec3(1.0), 1.0 - cloudDensity);
+	//vec3 normal = triplanarNormal(samplePointPlanetSpace1, planetNormal, normalMap, 0.000002, 1.0, cloudDensity);
+	vec3 normal = planetNormal;
 
+    vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
 
-    return ambiant * ndl + specularHighlight * cloudDensity;
+    float ndl = max(dot(planetNormal, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
+
+    //TODO : en faire un uniform
+    float smoothness = 0.7;
+    float specularAngle = acos(dot(normalize(sunDir - rayDir), normal));
+    float specularExponent = specularAngle / (1.0 - smoothness);
+    float specularHighlight = exp(-specularExponent * specularExponent);
+
+	vec3 ambiant = lerp(originalColor, vec3(ndl), 1.0 - cloudDensity);
+
+    return ambiant + specularHighlight * cloudDensity;
 }
 
 
@@ -407,7 +407,7 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
-    vec3 finalColor = ocean(screenColor, cameraPosition, rayDir, maximumDistance);
+    vec3 finalColor = computeCloudCoverage(screenColor, cameraPosition, rayDir, maximumDistance);
 
     gl_FragColor = vec4(finalColor, 1.0); // displaying the final color
 }

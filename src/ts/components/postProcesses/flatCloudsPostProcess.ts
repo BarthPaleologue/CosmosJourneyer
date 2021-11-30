@@ -1,23 +1,24 @@
-interface OceanSettings {
-    oceanRadius: number,
+interface CloudSettings {
+    cloudLayerRadius: number,
     smoothness: number,
     specularPower: number,
-    depthModifier: number,
-    alphaModifier: number,
+    cloudFrequency: number,
+    cloudDetailFrequency: number,
+    cloudPower: number,
 }
 
-import waterbump from "../../../asset/textures/waterbump.png";
+import waterbump from "../../../asset/textures/cloudNormalMap.jpg";
 
 export class FlatCloudsPostProcess extends BABYLON.PostProcess {
 
-    settings: OceanSettings;
+    settings: CloudSettings;
     camera: BABYLON.Camera;
     sun: BABYLON.Mesh | BABYLON.PointLight;
     planet: BABYLON.Mesh;
 
     internalTime = 0;
 
-    constructor(name: string, planet: BABYLON.Mesh, oceanRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+    constructor(name: string, planet: BABYLON.Mesh, planetRadius: number, waterLevel: number, cloudLayerRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
         super(name, "./shaders/flatClouds", [
             "sunPosition",
             "cameraPosition",
@@ -32,12 +33,15 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
 
             "planetPosition",
             "planetRadius",
-            "oceanRadius",
+            "cloudLayerRadius",
+            "waterLevel",
+
+            "cloudFrequency",
+            "cloudDetailFrequency",
+            "cloudPower",
 
             "smoothness",
             "specularPower",
-            "alphaModifier",
-            "depthModifier",
 
             "planetWorldMatrix",
 
@@ -50,11 +54,12 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
 
 
         this.settings = {
-            oceanRadius: oceanRadius,
-            depthModifier: 1.0,
-            alphaModifier: 0.1,
+            cloudLayerRadius: cloudLayerRadius,
             specularPower: 2,
             smoothness: 0.9,
+            cloudFrequency: 3,
+            cloudDetailFrequency: 17.0,
+            cloudPower: 2.5,
         };
 
         this.camera = camera;
@@ -67,9 +72,6 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
         scene.customRenderTargets.push(depthRenderer.getDepthMap());
         let depthMap = scene.customRenderTargets[0];
 
-        //this.getEffect().setTexture("normalMap", new BABYLON.Texture("./textures/waternormal.jpg", scene));
-
-
 
         this.onApply = (effect: BABYLON.Effect) => {
             this.internalTime += this.getEngine().getDeltaTime();
@@ -81,6 +83,8 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
             effect.setVector3("cameraPosition", this.camera.position);
 
             effect.setVector3("planetPosition", this.planet.absolutePosition);
+            effect.setFloat("planetRadius", planetRadius);
+            effect.setFloat("waterLevel", waterLevel);
 
             effect.setMatrix("projection", this.camera.getProjectionMatrix());
             effect.setMatrix("view", this.camera.getViewMatrix());
@@ -90,12 +94,14 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
             effect.setFloat("cameraFar", camera.maxZ);
             effect.setVector3("cameraDirection", camera.getDirection(BABYLON.Axis.Z));
 
-            effect.setFloat("oceanRadius", this.settings.oceanRadius);
+            effect.setFloat("cloudLayerRadius", this.settings.cloudLayerRadius);
+
+            effect.setFloat("cloudFrequency", this.settings.cloudFrequency);
+            effect.setFloat("cloudDetailFrequency", this.settings.cloudDetailFrequency);
+            effect.setFloat("cloudPower", this.settings.cloudPower);
 
             effect.setFloat("smoothness", this.settings.smoothness);
             effect.setFloat("specularPower", this.settings.specularPower);
-            effect.setFloat("alphaModifier", this.settings.alphaModifier);
-            effect.setFloat("depthModifier", this.settings.depthModifier);
 
             effect.setMatrix("planetWorldMatrix", this.planet.getWorldMatrix());
 

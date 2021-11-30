@@ -71,8 +71,8 @@ export class Planet {
             maxBumpHeight: 100,
             bumpsFrequency: 1,
 
-            maxMountainHeight: 10e3,
-            mountainsFrequency: 0.05
+            maxMountainHeight: 40e3,
+            mountainsFrequency: 0.07
         };
 
         this.colorSettings = {
@@ -86,7 +86,7 @@ export class Planet {
             steepSharpness: 1,
             normalSharpness: 0.6,
 
-            snowElevation01: 0.7,
+            snowElevation01: 0.45,
             snowOffsetAmplitude: 0.05,
             snowLacunarity: 4,
             snowLatitudePersistence: 3,

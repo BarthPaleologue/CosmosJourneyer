@@ -32,7 +32,7 @@ scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
-const radius = 300 * 1e3; // diamètre en m
+const radius = 1000 * 1e3; // diamètre en m
 
 let keyboard = new Keyboard();
 let mouse = new Mouse();
@@ -97,12 +97,12 @@ ocean.settings.depthModifier = 0.004;
 //ocean.settings.oceanRadius = 0;
 
 //let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 10e3, radius + 20e3, sun, player.camera, scene);
-let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius + 8e3, sun, player.camera, scene);
+let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius, waterElevation, radius + 15e3, sun, player.camera, scene);
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 30e3, sun, player.camera, scene);
-//atmosphere.settings.intensity = 10;
-atmosphere.settings.falloffFactor = 19;
-atmosphere.settings.scatteringStrength = 0.4;
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun, player.camera, scene);
+atmosphere.settings.intensity = 20;
+atmosphere.settings.falloffFactor = 24;
+atmosphere.settings.scatteringStrength = 1.0;
 
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, player.camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
