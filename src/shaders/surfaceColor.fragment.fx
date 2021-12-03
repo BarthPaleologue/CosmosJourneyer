@@ -191,6 +191,21 @@ vec3 lnear(vec3 value1, vec3 value2, float x, float summitX, float range) {
 	return lerp(value1, value2, lnearFactor);
 }
 
+//https://www.desmos.com/calculator/8etk6vdfzi
+
+float tanherpFactor(float x, float s) {
+	float sampleValue = (x - 0.5) * s;
+	return (tanh(sampleValue) + 1.0) / 2.0;
+}
+
+vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
+	float alpha = tanherpFactor(x, s);
+
+	return lerp(value1, value2, alpha);
+}
+
+
+
 vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude, float slope, vec3 unitPosition, out vec3 normal) {
 	
 	normal = vNormal;
@@ -205,37 +220,39 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 
 	vec3 outColor;
 
-	if(elevation01 > snowElevation01 * exp(-abs(latitude) * snowLatitudePersistence) + snowOffsetAmplitude * snowOffset) {
-		// il fait froid !!!!!!!!
-		if(pow(1.0 - slope, 1.0) > steepSnowDotLimit + (completeNoise(unitPosition * 10.0, 5, 2.0, 3.0)-0.5) * 0.5) {
-			// neige à plat bien blanche
+	if(elevation01 > waterLevel01) {
 
-			snowFactor = 1.0;
+		// séparation biome désert biome plaine
+		float sandDominance = 1.0;
+		float delimiter = pow(completeNoise(unitPosition*2.0, 5, 1.7, 2.3), sandDominance);
+		float openFactor = tanherpFactor(delimiter, 32.0);
+		vec3 flatColor = lerp(plainColor, sandColor, openFactor);
 
-			outColor = snowColor;
-		} else {
-			// neige en pente un peu assombrie
+		// séparation biome sélectionné avec biome neige
+		float snowDominance = 1.0;
+		float snowDelimiter = 3.0 * (elevation01+(completeNoise(unitPosition*1000.0, 5, 1.7, 2.3)-0.5)/10.0) - snowElevation01 * exp(-abs(latitude) * snowLatitudePersistence);
+		float snowColorFactor = tanherpFactor(snowDelimiter, 64.0);
+		flatColor = lerp(flatColor, snowColor, 1.0 - snowColorFactor);
+		snowFactor = snowColorFactor;
 
-			steepFactor = 1.0;
+		// séparation biome sélectionné avec biome plage
+		flatColor = lnear(sandColor, flatColor, elevation01, waterLevel01, sandSize / maxElevation);
 
-			outColor = steepColor;
-		}
-	} else if(elevation01 > waterLevel01) {
-
-		vec3 openColor = lerp(plainColor, sandColor, pow(completeNoise(unitPosition, 1, 2.0, 2.0), 1.0));
-
-		// entre mer et ciel
-		vec3 flatColor = lnear(sandColor, lerp(snowColor, openColor, pow(elevation01, 8.0)), elevation01, waterLevel01, sandSize / maxElevation);
-
-		sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation);
+		sandFactor = max(getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation), 1.0 - openFactor);
 		plainFactor = 1.0 - sandFactor;
+		plainFactor *= 1.0 - snowFactor;
 
-		steepFactor = 1.0 - pow(1.0 - slope, steepSharpness); // tricks pour éviter un calcul couteux d'exposant décimal
+		// détermination de la couleur due à la pente
+		float steepDominance = 6.0;
+		steepFactor = tanherpFactor(1.0 - pow(1.0-slope, steepDominance), steepSharpness); // tricks pour éviter un calcul couteux d'exposant décimal
+		steepFactor *= 1.0 - snowFactor;
 
-		sandFactor *= steepFactor;
-		plainFactor *= steepFactor;
+		sandFactor *= 1.0 - steepFactor;
+		plainFactor *= 1.0 - steepFactor;
 
-		outColor = lerp(flatColor, steepColor, pow(1.0 - slope, steepSharpness));
+		steepFactor *= steepFactor;
+
+		outColor = lerp(flatColor, steepColor, 1.0 - steepFactor);
 	} else {
 		// entre abysse et surface
 		vec3 flatColor = lnear(sandColor, vec3(0.5), elevation01, waterLevel01, sandSize / maxElevation);
@@ -243,12 +260,15 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 		sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation);
 		bottomFactor = 1.0 - sandFactor;
 
-		steepFactor = 1.0 - pow(1.0 - slope, steepSharpness);
+		float steepDominance = 6.0;
+		steepFactor = tanherpFactor(1.0 - pow(1.0-slope, steepDominance), steepSharpness); // tricks pour éviter un calcul couteux d'exposant décimal
 
-		sandFactor *= steepFactor;
-		bottomFactor *= steepFactor;
-		
-		outColor = lerp(flatColor, steepColor, pow(1.0 - slope, steepSharpness));
+		sandFactor *= 1.0 - steepFactor;
+		bottomFactor *= 1.0 - steepFactor;
+
+		steepFactor *= steepFactor;
+
+		outColor = lerp(flatColor, steepColor, 1.0 - steepFactor);
 	}
 
 	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.001, normalSharpness, 0.1);

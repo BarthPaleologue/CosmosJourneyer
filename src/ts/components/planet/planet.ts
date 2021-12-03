@@ -68,7 +68,7 @@ export class Planet {
         this.terrainSettings = {
             continentsFragmentation: 0.47,
 
-            maxBumpHeight: 300,
+            maxBumpHeight: 100,
             bumpsFrequency: 1,
 
             maxMountainHeight: 40e3,
@@ -79,14 +79,14 @@ export class Planet {
             snowColor: new BABYLON.Vector3(1, 1, 1),
             steepColor: new BABYLON.Vector3(55, 42, 42).scale(1 / 255),
             plainColor: new BABYLON.Vector3(0.5, 0.3, 0.08),
-            sandColor: new BABYLON.Vector3(0.7, 0.7, 0.5),
+            sandColor: new BABYLON.Vector3(0.7, 0.7, 0.2),
 
             waterLevel: 0.32,
             sandSize: 1,
             steepSharpness: 1,
             normalSharpness: 0.6,
 
-            snowElevation01: 0.45,
+            snowElevation01: 0.7,
             snowOffsetAmplitude: 0.05,
             snowLacunarity: 4,
             snowLatitudePersistence: 3,

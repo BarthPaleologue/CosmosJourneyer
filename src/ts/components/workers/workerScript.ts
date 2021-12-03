@@ -32,8 +32,8 @@ function initLayers() {
 
     bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 1.0, 0.0);
 
-    mountainsLayer = simplexNoiseLayer(1e-4, 6, 1.7, 2, 1.5, 0.4);
-    mountainsLayer2 = simplexNoiseLayer(2e-4, 6, 2, 2, 1.0, 0.2);
+    mountainsLayer = simplexNoiseLayer(1e-4, 6, 1.9, 2, 2, 0.1);
+    mountainsLayer2 = simplexNoiseLayer(2e-4, 6, 2, 2, 1.0, 0.1);
 }
 
 initLayers();
@@ -69,8 +69,8 @@ function terrainFunction(position: Vector3, gradient: Vector3): void {
     let mountainElevation = continentMask * mountainData[0];
     let mountainGradient = new Vector3(mountainData[1], mountainData[2], mountainData[3]);
 
-    elevation += continentMask * mountainElevation * terrainSettings.maxMountainHeight;
-    mountainGradient.scaleInPlace(terrainSettings.maxMountainHeight * continentMask);
+    elevation += 2 * continentMask * mountainElevation * terrainSettings.maxMountainHeight;
+    mountainGradient.scaleInPlace(2 * terrainSettings.maxMountainHeight * continentMask);
     gradient.addInPlace(mountainGradient);
 
     let mountainData2 = mountainsLayer2(position.scale(terrainSettings.mountainsFrequency));

@@ -23,8 +23,8 @@ export function simplexNoiseLayer(frequency: number, nbOctaves: number, decay: n
         noiseValue /= totalAmplitude;
         noiseGradient.divideInPlace(totalAmplitude);
 
+        noiseGradient.scaleInPlace(power * Math.pow(noiseValue, power - 1));
         noiseValue = Math.pow(noiseValue, power);
-        noiseGradient.scaleInPlace(power);
 
         if (minValue > 0) {
             if (minValue != 1) {

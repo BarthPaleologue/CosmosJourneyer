@@ -133,13 +133,13 @@ new Slider("steepSnowDotLimit", document.getElementById("steepSnowDotLimit")!, 0
     planet.updateColors();
 });
 
-new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 256, planet.colorSettings.steepSharpness, (val: number) => {
+new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 40, planet.colorSettings.steepSharpness, (val: number) => {
     planet.colorSettings.steepSharpness = val;
     planet.updateColors();
 });
 
-new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 256, planet.colorSettings.normalSharpness, (val: number) => {
-    planet.colorSettings.normalSharpness = val;
+new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 30, planet.colorSettings.normalSharpness * 10, (val: number) => {
+    planet.colorSettings.normalSharpness = val / 10;
     planet.updateColors();
 });
 /*

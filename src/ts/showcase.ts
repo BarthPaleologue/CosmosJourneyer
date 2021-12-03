@@ -57,7 +57,7 @@ let planetManager = new PlanetManager();
 let waterElevation = 20e2;
 
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
-planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
+planet.colorSettings.plainColor = new BABYLON.Vector3(97, 179, 43).scale(1 / 255);
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.steepSharpness = 5;
 planet.colorSettings.waterLevel = waterElevation;
@@ -71,7 +71,7 @@ let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(2.5),
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 10e3;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.5, 0.5, 0.5);
-moon.colorSettings.sandColor = planet.colorSettings.steepColor;
+moon.colorSettings.sandColor = moon.colorSettings.plainColor.scale(0.5);
 moon.colorSettings.steepColor = new BABYLON.Vector3(0.1, 0.1, 0.1);
 moon.colorSettings.snowLatitudePersistence = 2;
 moon.colorSettings.snowElevation01 = 0.99;
