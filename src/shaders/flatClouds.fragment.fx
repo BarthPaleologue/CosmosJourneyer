@@ -311,7 +311,7 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     density = 1.0 - density;
 
-    float minValue = 0.2;
+    float minValue = 0.0;
     
     density = max(0.0, density - minValue);
 
@@ -332,6 +332,8 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint))) {
         return originalColor; // if not intersecting with atmosphere, return original color
     }
+
+	//impactPoint += 10000.0 * completeNoise(normalize(rayOrigin + impactPoint * rayDir), 5, 2.0, 2.0);
 
 	float waterImpact, waterEscape;
     if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius + waterLevel, waterImpact, waterEscape)) {

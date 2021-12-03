@@ -68,7 +68,7 @@ export class Planet {
         this.terrainSettings = {
             continentsFragmentation: 0.47,
 
-            maxBumpHeight: 100,
+            maxBumpHeight: 300,
             bumpsFrequency: 1,
 
             maxMountainHeight: 40e3,

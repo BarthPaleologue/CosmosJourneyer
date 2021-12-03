@@ -14,6 +14,7 @@ let bumpyLayer: elevationFunction;
 let continentsLayer: elevationFunction;
 //let continentsLayer3: ContinentNoiseLayer;
 let mountainsLayer: elevationFunction;
+let mountainsLayer2: elevationFunction;
 
 let terrainSettings: TerrainSettings = {
     continentsFragmentation: 0.5,
@@ -27,11 +28,12 @@ let terrainSettings: TerrainSettings = {
 
 
 function initLayers() {
-    continentsLayer = simplexNoiseLayer(1e-6, 6, 1.8, 2.1, 1 - terrainSettings.continentsFragmentation);
+    continentsLayer = simplexNoiseLayer(1e-6, 6, 1.8, 2.1, 1.0, 1 - terrainSettings.continentsFragmentation);
 
-    bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 0.0);
+    bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 1.0, 0.0);
 
-    mountainsLayer = simplexNoiseLayer(1e-4, 6, 1.7, 2, 0.3);
+    mountainsLayer = simplexNoiseLayer(1e-4, 6, 1.7, 2, 1.5, 0.4);
+    mountainsLayer2 = simplexNoiseLayer(2e-4, 6, 2, 2, 1.0, 0.2);
 }
 
 initLayers();
@@ -70,6 +72,14 @@ function terrainFunction(position: Vector3, gradient: Vector3): void {
     elevation += continentMask * mountainElevation * terrainSettings.maxMountainHeight;
     mountainGradient.scaleInPlace(terrainSettings.maxMountainHeight * continentMask);
     gradient.addInPlace(mountainGradient);
+
+    let mountainData2 = mountainsLayer2(position.scale(terrainSettings.mountainsFrequency));
+    let mountainElevation2 = continentMask * mountainData2[0];
+    let mountainGradient2 = new Vector3(mountainData2[1], mountainData2[2], mountainData2[3]);
+
+    elevation += continentMask * mountainElevation2 * terrainSettings.maxMountainHeight / 2;
+    mountainGradient2.scaleInPlace(terrainSettings.maxMountainHeight * continentMask / 2);
+    gradient.addInPlace(mountainGradient2);
 
     let bumpyData = bumpyLayer(position.scale(terrainSettings.bumpsFrequency));
     let bumpyElevation = bumpyData[0];
