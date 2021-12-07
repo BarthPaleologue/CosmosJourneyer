@@ -123,8 +123,8 @@ new Slider("snowLacunarity", document.getElementById("snowLacunarity")!, 0, 100,
     planet.updateColors();
 });
 
-new Slider("snowLatitudePersistence", document.getElementById("snowLatitudePersistence")!, 0, 100, planet.colorSettings.snowLatitudePersistence * 10, (val: number) => {
-    planet.colorSettings.snowLatitudePersistence = val / 10;
+new Slider("snowLatitudePersistence", document.getElementById("snowLatitudePersistence")!, 0, 100, planet.colorSettings.snowLatitudePersistence, (val: number) => {
+    planet.colorSettings.snowLatitudePersistence = val;
     planet.updateColors();
 });
 

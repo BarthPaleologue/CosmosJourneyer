@@ -230,7 +230,7 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 
 		// séparation biome sélectionné avec biome neige
 		float snowDominance = 1.0;
-		float snowDelimiter = 3.0 * (elevation01+(completeNoise(unitPosition*1000.0, 5, 1.7, 2.3)-0.5)/10.0) - snowElevation01 * exp(-abs(latitude) * snowLatitudePersistence);
+		float snowDelimiter = 3.0 * (elevation01+(completeNoise(unitPosition*1000.0, 5, 1.7, 2.3)-0.5)/10.0) * (1.0 - exp(-abs(latitude) * snowLatitudePersistence));
 		float snowColorFactor = tanherpFactor(snowDelimiter, 64.0);
 		flatColor = lerp(flatColor, snowColor, 1.0 - snowColorFactor);
 		snowFactor = snowColorFactor;

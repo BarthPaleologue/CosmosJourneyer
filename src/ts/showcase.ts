@@ -57,7 +57,7 @@ let planetManager = new PlanetManager();
 let waterElevation = 20e2;
 
 let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
-planet.colorSettings.plainColor = new BABYLON.Vector3(97, 179, 43).scale(1 / 255);
+planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0).scale(0.7).add(new BABYLON.Vector3(0.5, 0.3, 0.08).scale(0.3));
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.steepSharpness = 5;
 planet.colorSettings.waterLevel = waterElevation;
