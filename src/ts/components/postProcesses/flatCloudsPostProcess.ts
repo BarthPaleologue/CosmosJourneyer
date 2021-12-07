@@ -5,6 +5,8 @@ interface CloudSettings {
     cloudFrequency: number,
     cloudDetailFrequency: number,
     cloudPower: number,
+    worleySpeed: number,
+    detailSpeed: number,
 }
 
 import waterbump from "../../../asset/textures/cloudNormalMap.jpg";
@@ -40,6 +42,9 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
             "cloudDetailFrequency",
             "cloudPower",
 
+            "worleySpeed",
+            "detailSpeed",
+
             "smoothness",
             "specularPower",
 
@@ -58,8 +63,10 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
             specularPower: 2,
             smoothness: 0.9,
             cloudFrequency: 3,
-            cloudDetailFrequency: 17.0,
-            cloudPower: 2.5,
+            cloudDetailFrequency: 15.0,
+            cloudPower: 5,
+            worleySpeed: 0.5,
+            detailSpeed: 1.0,
         };
 
         this.camera = camera;
@@ -99,6 +106,9 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
             effect.setFloat("cloudFrequency", this.settings.cloudFrequency);
             effect.setFloat("cloudDetailFrequency", this.settings.cloudDetailFrequency);
             effect.setFloat("cloudPower", this.settings.cloudPower);
+
+            effect.setFloat("worleySpeed", this.settings.worleySpeed);
+            effect.setFloat("detailSpeed", this.settings.detailSpeed);
 
             effect.setFloat("smoothness", this.settings.smoothness);
             effect.setFloat("specularPower", this.settings.specularPower);

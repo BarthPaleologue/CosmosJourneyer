@@ -31,6 +31,9 @@ uniform float cloudFrequency; // cloud frequency
 uniform float cloudDetailFrequency; // cloud detail frequency
 uniform float cloudPower; // cloud power
 
+uniform float worleySpeed; // worley noise speed
+uniform float detailSpeed; // detail noise speed
+
 uniform float smoothness;
 uniform float specularPower;
 uniform float alphaModifier;
@@ -307,7 +310,7 @@ vec3 lerp(vec3 v1, vec3 v2, float s) {
 
 float cloudDensityAtPoint(vec3 samplePoint) {
 
-    float density = worley(normalize(samplePoint) * cloudFrequency + vec3(time*1e-5), 1.0).x;
+    float density = worley(normalize(samplePoint) * cloudFrequency + vec3(time*1e-5*worleySpeed), 1.0).x;
 
     density = 1.0 - density;
 
@@ -317,7 +320,7 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     density /= 1.0 - minValue;
 
-    density *= completeNoise(normalize(samplePoint) * cloudDetailFrequency + vec3(time*1e-5), 5, 2.0, 2.0);
+    density *= completeNoise(normalize(samplePoint) * cloudDetailFrequency + vec3(time*1e-5*detailSpeed), 5, 2.0, 2.0);
 
     density = saturate(density * 2.0);
 
@@ -340,6 +343,8 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
         maximumDistance = min(maximumDistance, waterImpact);
     }
 
+	bool twoPoints = impactPoint > 0.0 && escapePoint > 0.0 && escapePoint < maximumDistance;
+
     if(impactPoint < 0.0) {
         impactPoint = escapePoint;
         if(impactPoint > maximumDistance) {
@@ -347,8 +352,6 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
         }
     }
     if(impactPoint > maximumDistance) return originalColor;
-
-    bool twoPoints = impactPoint > 0.0 && escapePoint > 0.0 && escapePoint < maximumDistance;
 
 
     // traiter le cas où les deux points sont acceptables.
@@ -368,11 +371,17 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     /// Cloud point 2
     if(twoPoints) {
         cloudDensity += cloudDensityAtPoint(samplePointPlanetSpace2);
-        cloudDensity = saturate(cloudDensity);
-    }
+		//return vec3(1.0,0.0,0.0);
+    } else {
+		//return vec3(0.0, 1.0, 0.0);
+	}
 
-    cloudDensity = max(0.0, cloudDensity - 0.2);
-    cloudDensity /= 1.0 - 0.2;
+
+
+	cloudDensity = saturate(cloudDensity);
+
+	cloudDensity *= saturate((maximumDistance - impactPoint)/10000.0);
+
 
 	//vec3 normal = triplanarNormal(samplePointPlanetSpace1, planetNormal, normalMap, 0.000002, 1.0, cloudDensity);
 	vec3 normal = planetNormal;

@@ -181,6 +181,14 @@ new Slider("cloudPower", document.getElementById("cloudPower")!, 0, 100, flatClo
     flatClouds.settings.cloudPower = val / 10;
 });
 
+new Slider("worleySpeed", document.getElementById("worleySpeed")!, 0.0, 200.0, flatClouds.settings.worleySpeed * 10, (val: number) => {
+    flatClouds.settings.worleySpeed = val / 10;
+});
+
+new Slider("detailSpeed", document.getElementById("detailSpeed")!, 0, 200, flatClouds.settings.detailSpeed * 10, (val: number) => {
+    flatClouds.settings.detailSpeed = val / 10;
+});
+
 new Slider("intensity", document.getElementById("intensity")!, 0, 40, atmosphere.settings.intensity, (val: number) => {
     atmosphere.settings.intensity = val;
 });
