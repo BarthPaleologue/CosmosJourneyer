@@ -6,7 +6,7 @@ export class PlanetWorker {
     public send(message: any): void {
         this._worker.postMessage(message);
     }
-    public getWorker() {
+    public getWorker(): Worker {
         return this._worker;
     }
     async listen() {

@@ -1,4 +1,4 @@
-import { Planet } from "../planet/planet";
+import { SolidPlanet } from "../planet/solid/planet";
 import { Direction } from "../toolbox/direction";
 import { BuilderWorker } from "../workers/builderWorker";
 import { buildData } from "./buildData";
@@ -16,7 +16,7 @@ export interface Task {
 
 export interface BuildTask extends Task {
     taskType: TaskType.Build,
-    planet: Planet,
+    planet: SolidPlanet,
     chunkLength: number,
     depth: number,
     direction: Direction,
@@ -88,7 +88,7 @@ export class ChunkForge {
 
                 worker.send({
                     taskType: "buildTask",
-                    planetID: task.planet.id,
+                    planetID: task.planet._name,
                     chunkLength: task.chunkLength,
                     subdivisions: this.subdivisions,
                     depth: task.depth,

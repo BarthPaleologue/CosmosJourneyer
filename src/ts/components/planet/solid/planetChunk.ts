@@ -1,7 +1,7 @@
-import { Planet } from "./planet";
-import { ChunkForge, TaskType } from "../forge/chunkForge";
-import { Direction, getRotationMatrixFromDirection } from "../toolbox/direction";
-import { Matrix, Vector3 } from "../toolbox/algebra";
+import { SolidPlanet } from "./planet";
+import { ChunkForge, TaskType } from "../../forge/chunkForge";
+import { Direction, getRotationMatrixFromDirection } from "../../toolbox/direction";
+import { Matrix, Vector3 } from "../../toolbox/algebra";
 
 /**
  * Returns the node position in plane space
@@ -10,7 +10,8 @@ import { Matrix, Vector3 } from "../toolbox/algebra";
  * @returns the plane space coordinates of the chunk
  */
 export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: number[]): Vector3 {
-    let [x, y] = [0, 0];
+    let x = 0;
+    let y = 0;
     for (let i = 0; i < path.length; ++i) {
         /*
             3   2
@@ -74,40 +75,19 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
     return position;
 }
 
+// ne pas supprimer la classe pour cause de peut être des arbres et de l'herbe
 export class PlanetChunk {
-    id: string; // identifiant unique du chunk
-    path: number[]; // chemin menant au chunk dans son quadtree
 
-    // données géométriques du chunk
-    chunkLength;
-    baseSubdivisions;
-    depth: number;
-    direction: Direction;
-    mesh: BABYLON.Mesh;
+    public readonly mesh: BABYLON.Mesh;
 
-    // coordonnées sur le plan
-    x = 0;
-    y = 0;
+    constructor(_path: number[], rootChunkLength: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: SolidPlanet) {
+        let id = `[D${_direction}][P${_path.join("")}]`;
 
-    parentNode: BABYLON.Mesh; // point d'attache planétaire
-    position: BABYLON.Vector3; // position dans l'espace de la sphère (rotation non prise en compte)
+        let position = getChunkPlaneSpacePositionFromPath(rootChunkLength, _path);
 
-    constructor(_path: number[], _chunkLength: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: Planet) {
-        this.id = `[D${_direction}][P${_path.join("")}]`;
-        this.path = _path;
-        this.chunkLength = _chunkLength;
-        this.baseSubdivisions = chunkForge.subdivisions;
-        this.depth = this.path.length;
-        this.direction = _direction;
-        this.parentNode = _parentNode;
+        position.addInPlace(new Vector3(0, 0, -rootChunkLength / 2));
 
-        let position = getChunkPlaneSpacePositionFromPath(this.chunkLength, this.path);
-
-        this.position = new BABYLON.Vector3(position.x, position.y, position.z);
-
-        this.position.addInPlace(new BABYLON.Vector3(0, 0, -this.chunkLength / 2));
-
-        this.mesh = new BABYLON.Mesh(`Chunk${this.id}`, scene);
+        this.mesh = new BABYLON.Mesh(`Chunk${id}`, scene);
         this.mesh.material = surfaceMaterial;
 
         /*let debugMaterial = new BABYLON.StandardMaterial("debug", scene);
@@ -120,23 +100,23 @@ export class PlanetChunk {
 
         //this.mesh.material = debugMaterial;
 
-        this.mesh.parent = this.parentNode;
+        this.mesh.parent = _parentNode;
 
         chunkForge.addTask({
             taskType: TaskType.Build,
-            id: this.id,
+            id: id,
             planet: planet,
-            position: this.position,
-            chunkLength: this.chunkLength,
-            depth: this.depth,
-            direction: this.direction,
+            position: position.toBabylon(),
+            chunkLength: rootChunkLength,
+            depth: _path.length,
+            direction: _direction,
             mesh: this.mesh,
         });
 
         // prise en compte de la rotation de la planète notamment
-        this.position = this.position.normalizeToNew().scale(this.chunkLength / 2);
+        position = position.normalize().scale(rootChunkLength / 2);
 
-        this.mesh.position = this.position;
+        this.mesh.position = position.toBabylon();
 
     }
 }

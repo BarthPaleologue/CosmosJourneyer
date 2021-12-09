@@ -1,5 +1,5 @@
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
-import { Planet } from "./components/planet/planet";
+import { SolidPlanet } from "./components/planet/solid/planet";
 import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
 import { VolumetricCloudsPostProcess } from "./components/postProcesses/volumetricCloudsPostProcess";
 
@@ -56,7 +56,7 @@ let planetManager = new PlanetManager();
 
 let waterElevation = 20e2;
 
-let planet = new Planet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
+let planet = new SolidPlanet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0).scale(0.7).add(new BABYLON.Vector3(0.5, 0.3, 0.08).scale(0.3));
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.steepSharpness = 5;
@@ -67,7 +67,7 @@ planet.attachNode.position.x = radius * 5;
 
 planetManager.add(planet);
 
-let moon = new Planet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene);
+let moon = new SolidPlanet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene);
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 10e3;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.5, 0.5, 0.5);
@@ -131,9 +131,9 @@ scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
     scene.beforeRender = () => {
-        player.nearestPlanet = planetManager.getNearestPlanet(player.mesh.position);
+        player.nearestPlanet = planetManager.getNearestPlanet();
         // si trop loin on osef
-        if (player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() > player.nearestPlanet.radius * 2) {
+        if (player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() > player.nearestPlanet._radius * 2) {
             player.nearestPlanet = null;
         }
 

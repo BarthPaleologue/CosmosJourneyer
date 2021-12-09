@@ -1,12 +1,12 @@
 import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
-import { Planet } from "../planet/planet";
+import { SolidPlanet } from "../planet/solid/planet";
 
 export class PlayerControler {
 
-    nearestPlanet: Planet | null;
-    collisionRadius = 200;
+    nearestPlanet: SolidPlanet | null;
+    collisionRadius = 100;
 
     camera: BABYLON.FreeCamera;
 

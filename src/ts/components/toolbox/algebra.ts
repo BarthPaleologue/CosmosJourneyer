@@ -466,6 +466,9 @@ export class Vector3 {
     static ToBABYLON3(vector: Vector3): BABYLON.Vector3 {
         return new BABYLON.Vector3(vector.x, vector.y, vector.z);
     }
+    public toBabylon(): BABYLON.Vector3 {
+        return Vector3.ToBABYLON3(this);
+    }
     applyMatrix(matrix: Matrix): Vector3 {
         let newVector = Vector3.Zero();
 

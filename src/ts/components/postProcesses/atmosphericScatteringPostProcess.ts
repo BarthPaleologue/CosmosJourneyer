@@ -1,4 +1,4 @@
-import { Planet } from "../planet/planet";
+import { SolidPlanet } from "../planet/solid/planet";
 
 interface AtmosphereSettings {
     planetRadius: number,
@@ -19,7 +19,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
     sun: BABYLON.Mesh | BABYLON.PointLight;
     planetMesh: BABYLON.Mesh;
 
-    constructor(name: string, planet: Planet, planetRadius: number, atmosphereRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+    constructor(name: string, planet: SolidPlanet, planetRadius: number, atmosphereRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
         super(name, "./shaders/simplifiedScattering", [
             "sunPosition",
             "cameraPosition",

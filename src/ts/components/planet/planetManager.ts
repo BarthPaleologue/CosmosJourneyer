@@ -1,14 +1,14 @@
 import { ChunkForge } from "../forge/chunkForge";
 import { PlayerControler } from "../player/playerControler";
-import { Planet } from "./planet";
+import { SolidPlanet } from "./solid/planet";
 
 export class PlanetManager {
-    private _chunkForge: ChunkForge;
-    private _planets: Planet[] = [];
+    private readonly _chunkForge: ChunkForge;
+    private readonly _planets: SolidPlanet[] = [];
     constructor(nbVertices = 64) {
         this._chunkForge = new ChunkForge(nbVertices);
     }
-    public add(planet: Planet): void {
+    public add(planet: SolidPlanet): void {
         planet.setChunkForge(this._chunkForge);
         this._planets.push(planet);
     }
@@ -17,10 +17,10 @@ export class PlanetManager {
             planet.attachNode.setAbsolutePosition(planet.getAbsolutePosition().add(deplacement));
         }
     }
-    public getPlanets(): Planet[] {
+    public getPlanets(): SolidPlanet[] {
         return this._planets;
     }
-    public getNearestPlanet(position: BABYLON.Vector3): Planet | null {
+    public getNearestPlanet(): SolidPlanet | null {
         let nearest = null;
         for (const planet of this._planets) {
             if (nearest == null) nearest = planet;
@@ -34,7 +34,7 @@ export class PlanetManager {
         this._chunkForge.update(depthRenderer);
         // TODO : il faudra update les planètes des plus lointaines au plus proches quand il y aura les postprocess
         for (const planet of this._planets) {
-            planet.update(player.mesh.position, lightOrigin, player.camera);
+            planet.update(player.mesh.position, lightOrigin);
         }
     }
 }

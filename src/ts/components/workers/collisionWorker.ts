@@ -1,5 +1,5 @@
 import { CollisionData } from "../forge/CollisionData";
-import { Planet } from "../planet/planet";
+import { SolidPlanet } from "../planet/solid/planet";
 import { PlanetManager } from "../planet/planetManager";
 import { PlayerControler } from "../player/playerControler";
 import { PlanetWorker } from "./planetWorker";
@@ -40,17 +40,17 @@ export class CollisionWorker extends PlanetWorker {
         super.send(data);
         this._busy = true;
     }
-    public checkCollision(planet: Planet): void {
+    public checkCollision(planet: SolidPlanet): void {
         this.send({
             taskType: "collisionTask",
-            planetID: planet.id,
+            planetID: planet._name,
             terrainSettings: planet.terrainSettings,
             position: [
                 -planet.getAbsolutePosition().x,
                 -planet.getAbsolutePosition().y,
                 -planet.getAbsolutePosition().z
             ],
-            chunkLength: planet.chunkLength,
+            chunkLength: planet.rootChunkLength,
             craters: planet.craters
         });
     }

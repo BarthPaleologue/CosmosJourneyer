@@ -1,8 +1,8 @@
 import { getChunkSphereSpacePositionFromPath, PlanetChunk } from "./planetChunk";
-import { Direction } from "../toolbox/direction";
-import { ChunkForge, TaskType } from "../forge/chunkForge";
-import { Planet } from "./planet";
-import { Vector3 } from "../toolbox/algebra";
+import { Direction } from "../../toolbox/direction";
+import { ChunkForge, TaskType } from "../../forge/chunkForge";
+import { SolidPlanet } from "./planet";
+import { Vector3 } from "../../toolbox/algebra";
 
 type quadTree = quadTree[] | PlanetChunk;
 
@@ -11,35 +11,39 @@ type quadTree = quadTree[] | PlanetChunk;
  */
 export class PlanetSide {
     // l'objet en lui même
-    id: string; // un id unique
+    private readonly id: string; // un id unique
 
     // le quadtree
-    minDepth: number;
-    maxDepth: number; // profondeur maximale du quadtree envisagé
-    tree: quadTree = []; // le quadtree en question
+    private readonly minDepth: number;
+    private readonly maxDepth: number; // profondeur maximale du quadtree envisagé
+
+    private tree: quadTree = []; // le quadtree en question
+
+    // paramètre de debug
     renderDistanceFactor = 2;
 
     // les chunks
-    chunkLength: number; // taille du côté de base
-    baseSubdivisions: number = 16; // nombre de subdivisions
-    direction: Direction; // direction de la normale au plan
+    private readonly rootChunkLength: number; // taille du côté de base
 
-    parent: BABYLON.Mesh; // objet parent des chunks
-    scene: BABYLON.Scene; // scène dans laquelle instancier les chunks
+    private readonly direction: Direction; // direction de la normale au plan
+
+    private readonly parent: BABYLON.Mesh; // objet parent des chunks
+
+    private readonly scene: BABYLON.Scene; // scène dans laquelle instancier les chunks
 
     // Le CEO des chunks
-    chunkForge: ChunkForge | undefined;
+    private chunkForge: ChunkForge | undefined;
 
-    surfaceMaterial: BABYLON.Material;
+    private readonly surfaceMaterial: BABYLON.Material;
 
-    planet: Planet;
+    private readonly planet: SolidPlanet;
 
     /**
      * 
      * @param id 
      * @param minDepth 
      * @param maxDepth 
-     * @param chunkLength 
+     * @param rootChunkLength 
      * @param direction 
      * @param parentNode 
      * @param scene 
@@ -47,19 +51,17 @@ export class PlanetSide {
      * @param surfaceMaterial 
      * @param planet 
      */
-    constructor(id: string, minDepth: number, maxDepth: number, chunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, surfaceMaterial: BABYLON.Material, planet: Planet) {
+    constructor(id: string, minDepth: number, maxDepth: number, rootChunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, surfaceMaterial: BABYLON.Material, planet: SolidPlanet) {
         this.id = id;
 
         this.maxDepth = maxDepth;
         this.minDepth = minDepth;
 
-        this.chunkLength = chunkLength;
-        //this.baseSubdivisions = chunkForge.subdivisions;
+        this.rootChunkLength = rootChunkLength;
+
         this.direction = direction;
         this.parent = parentNode;
         this.scene = scene;
-
-        //this.chunkForge = chunkForge;
 
         this.surfaceMaterial = surfaceMaterial;
 
@@ -68,7 +70,6 @@ export class PlanetSide {
 
     public setChunkForge(chunkForge: ChunkForge): void {
         this.chunkForge = chunkForge;
-        this.baseSubdivisions = chunkForge.subdivisions;
     }
 
     /**
@@ -92,7 +93,7 @@ export class PlanetSide {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             this.chunkForge?.addTask({
                 taskType: TaskType.Deletion,
-                id: chunk.id,
+                id: chunk.mesh.id,
                 mesh: chunk.mesh,
             });
         }, tree);
@@ -115,7 +116,7 @@ export class PlanetSide {
      */
     private updateLODRecursively(observerPosition: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
-        let relativePosition = getChunkSphereSpacePositionFromPath(this.chunkLength, walked, this.direction, this.parent.rotation);
+        let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.parent.rotation);
 
         // position par rapport à la caméra
         let parentPosition = new Vector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
@@ -123,7 +124,7 @@ export class PlanetSide {
         let direction = absolutePosition.subtract(Vector3.FromBABYLON3(observerPosition));
         // distance carré entre caméra et noeud du quadtree
         let d2 = direction.getSquaredMagnitude();
-        let limit = this.renderDistanceFactor * this.chunkLength / (2 ** walked.length);
+        let limit = this.renderDistanceFactor * this.rootChunkLength / (2 ** walked.length);
 
         if ((d2 < limit ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
             // si on est proche de la caméra ou si on doit le générer car LOD minimal
@@ -186,26 +187,18 @@ export class PlanetSide {
      * @param path The path leading to the location where to add the new chunk
      * @returns The new Chunk
      */
-    createChunk(path: number[]): PlanetChunk {
+    private createChunk(path: number[]): PlanetChunk {
         if (this.chunkForge != undefined) {
-            return new PlanetChunk(path, this.chunkLength, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial, this.planet);
+            return new PlanetChunk(path, this.rootChunkLength, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial, this.planet);
         } else {
             throw Error("Cannot create chunk when no ChunkForge is attached to the planet");
         }
     }
 
     /**
-     * Sets the material for new chunks to the new material
-     * @param material The new material to apply on new chunks
-     */
-    setChunkMaterial(material: BABYLON.Material): void {
-        this.surfaceMaterial = material;
-    }
-
-    /**
      * Regenerate planet chunks
      */
-    reset(): void {
+    public reset(): void {
         let newTree = this.createChunk([]);
         this.requestDeletion(this.tree);
         this.tree = newTree;

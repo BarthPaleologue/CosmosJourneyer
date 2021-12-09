@@ -1,7 +1,6 @@
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
-import { Planet } from "./components/planet/planet";
+import { SolidPlanet } from "./components/planet/solid/planet";
 import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
-import { ChunkForge } from "./components/forge/chunkForge";
 
 import * as style from "../styles/style.scss";
 import * as style2 from "../sliderjs/style2.min.css";
@@ -36,7 +35,7 @@ let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale
 
 let planetManager = new PlanetManager();
 
-let planet = new Planet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 1, scene);
+let planet = new SolidPlanet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 2, scene);
 
 let waterElevation = 20e2;
 
@@ -67,9 +66,6 @@ let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Te
 
 //#region Sliders
 
-new Slider("maxDepth", document.getElementById("maxDepth")!, 0, 5, planet.sides[0].minDepth, (val: number) => {
-    planet.setMinDepth(val);
-});
 /*
 new Slider("noiseOffsetX", document.getElementById("noiseOffsetX")!, 0, 50, 0, (val: number) => {
     planet.reset();

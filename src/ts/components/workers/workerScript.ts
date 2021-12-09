@@ -18,6 +18,7 @@ let mountainsLayer2: elevationFunction;
 
 let terrainSettings: TerrainSettings = {
     continentsFragmentation: 0.5,
+    continentBaseHeight: 0,
 
     maxBumpHeight: 0,
     bumpsFrequency: 1,
@@ -46,8 +47,6 @@ function terrainFunction(position: Vector3, gradient: Vector3): void {
 
     let elevation = 0;
 
-    let continentBaseHeight = 5e3;
-
     let continentData = continentsLayer(position);
     let continentMask = continentData[0];
 
@@ -59,10 +58,10 @@ function terrainFunction(position: Vector3, gradient: Vector3): void {
     continentMask = Math.sqrt(continentMask);
     continentGradient.divideInPlace(2 * continentMask);
 
-    let continentElevation = continentMask * continentBaseHeight;
+    let continentElevation = continentMask * terrainSettings.continentBaseHeight;
 
     elevation += continentElevation;
-    continentGradient.scaleInPlace(continentBaseHeight);
+    continentGradient.scaleInPlace(terrainSettings.continentBaseHeight);
     gradient.addInPlace(continentGradient);
 
     let mountainData = mountainsLayer(position.scale(terrainSettings.mountainsFrequency));
@@ -91,7 +90,7 @@ function terrainFunction(position: Vector3, gradient: Vector3): void {
 
     position.addInPlace(unitCoords.scale(elevation));
 
-    gradient.divideInPlace(continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
+    gradient.divideInPlace(terrainSettings.continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
     //gradient.divideInPlace(elevation);
 }
 

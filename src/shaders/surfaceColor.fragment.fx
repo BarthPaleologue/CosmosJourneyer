@@ -8,7 +8,7 @@ varying vec3 vNormalW;
 
 uniform mat4 world;
 
-uniform vec3 v3CameraPos; // camera position in world space
+uniform vec3 playerPosition; // camera position in world space
 uniform float cameraNear;
 uniform float cameraFar;
 uniform vec3 v3LightPos; // light position in world space
@@ -281,9 +281,9 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 
 void main() {
 
-	vec3 viewDirectionW = normalize(v3CameraPos - vPositionW); // view direction in world space
+	vec3 viewDirectionW = normalize(playerPosition - vPositionW); // view direction in world space
 
-	float distance = length(v3CameraPos - vPositionW);
+	float distance = length(playerPosition - vPositionW);
 
 	vec3 unitPosition = normalize(vPosition);
 	

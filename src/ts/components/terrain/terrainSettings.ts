@@ -2,6 +2,7 @@
 
 export interface TerrainSettings {
     continentsFragmentation: number; // entre 0 et 1 : 0=pangée 1=ilots
+    continentBaseHeight: number; // élévation du plateau continental
 
     maxMountainHeight: number;
     mountainsFrequency: number;
