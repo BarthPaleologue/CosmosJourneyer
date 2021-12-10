@@ -59,7 +59,7 @@ let waterElevation = 20e2;
 let planet = new SolidPlanet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0).scale(0.7).add(new BABYLON.Vector3(0.5, 0.3, 0.08).scale(0.3));
 planet.colorSettings.sandSize = 300;
-planet.colorSettings.steepSharpness = 5;
+planet.colorSettings.steepSharpness = 2;
 planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
@@ -69,13 +69,14 @@ planetManager.add(planet);
 
 let moon = new SolidPlanet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene);
 moon.terrainSettings.continentsFragmentation = 1;
-moon.terrainSettings.maxMountainHeight = 10e3;
+moon.terrainSettings.maxMountainHeight = 5e3;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.5, 0.5, 0.5);
 moon.colorSettings.sandColor = moon.colorSettings.plainColor.scale(0.5);
 moon.colorSettings.steepColor = new BABYLON.Vector3(0.1, 0.1, 0.1);
 moon.colorSettings.snowLatitudePersistence = 2;
-moon.colorSettings.snowElevation01 = 0.99;
-moon.colorSettings.steepSharpness = 10;
+moon.colorSettings.snowElevation01 = 0.6;
+moon.colorSettings.snowOffsetAmplitude = 0.02;
+moon.colorSettings.steepSharpness = 3;
 moon.updateColors();
 
 import rockn from "../asset/textures/rockn.png";

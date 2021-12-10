@@ -12,9 +12,9 @@ let currentPlanetID = "";
 
 let bumpyLayer: elevationFunction;
 let continentsLayer: elevationFunction;
-//let continentsLayer3: ContinentNoiseLayer;
+
 let mountainsLayer: elevationFunction;
-let mountainsLayer2: elevationFunction;
+
 
 let terrainSettings: TerrainSettings = {
     continentsFragmentation: 0.5,
@@ -29,12 +29,11 @@ let terrainSettings: TerrainSettings = {
 
 
 function initLayers() {
-    continentsLayer = simplexNoiseLayer(1e-6, 6, 1.8, 2.1, 1.0, 1 - terrainSettings.continentsFragmentation);
+    continentsLayer = simplexNoiseLayer(1e-6, 6, 1.8, 2.1, 0.5, 1 - terrainSettings.continentsFragmentation);
 
     bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 1.0, 0.0);
 
-    mountainsLayer = simplexNoiseLayer(1e-4, 6, 1.9, 2, 2, 0.1);
-    mountainsLayer2 = simplexNoiseLayer(2e-4, 6, 2, 2, 1.0, 0.1);
+    mountainsLayer = ridgedNoiseLayer(5e-5, 6, 1.9, 2.0, 2.0, 0.5);
 }
 
 initLayers();
@@ -52,12 +51,6 @@ function terrainFunction(position: Vector3, gradient: Vector3): void {
 
     let continentGradient = new Vector3(continentData[1], continentData[2], continentData[3]);
 
-    // la racine permet l'effet de "plateau" continental
-    // https://www.wikiwand.com/en/Gradient
-    // pour que cela marche : appliquer la fonction suivant la composante normale à la sphère
-    continentMask = Math.sqrt(continentMask);
-    continentGradient.divideInPlace(2 * continentMask);
-
     let continentElevation = continentMask * terrainSettings.continentBaseHeight;
 
     elevation += continentElevation;
@@ -71,14 +64,6 @@ function terrainFunction(position: Vector3, gradient: Vector3): void {
     elevation += 2 * continentMask * mountainElevation * terrainSettings.maxMountainHeight;
     mountainGradient.scaleInPlace(2 * terrainSettings.maxMountainHeight * continentMask);
     gradient.addInPlace(mountainGradient);
-
-    let mountainData2 = mountainsLayer2(position.scale(terrainSettings.mountainsFrequency));
-    let mountainElevation2 = continentMask * mountainData2[0];
-    let mountainGradient2 = new Vector3(mountainData2[1], mountainData2[2], mountainData2[3]);
-
-    elevation += continentMask * mountainElevation2 * terrainSettings.maxMountainHeight / 2;
-    mountainGradient2.scaleInPlace(terrainSettings.maxMountainHeight * continentMask / 2);
-    gradient.addInPlace(mountainGradient2);
 
     let bumpyData = bumpyLayer(position.scale(terrainSettings.bumpsFrequency));
     let bumpyElevation = bumpyData[0];
@@ -197,10 +182,11 @@ self.onmessage = e => {
             //@ts-ignore
         }, [verticesPositions.buffer, indices.buffer, normals.buffer]);
 
-        // benchmark fait le 5/10/2021 (normal non analytique) : ~2s/chunk
-        // benchmark fait le 12/11/2021 (normal non analyique) : ~0.5s/chunk
-        // benchmark fait le 20/11/2021 20h30 (normal analytique v2) : ~0.8s/chunk
-        // benchmark fait le 20/11/2021 21h20 (normal analytique v2.1) : ~0.03s/chunk (30ms/chunk)
+        // benchmark fait le 5/10/2021 (normale non analytique) : ~2s/chunk
+        // benchmark fait le 12/11/2021 (normale non analyique) : ~0.5s/chunk
+        // benchmark fait le 20/11/2021 20h30 (normale analytique v2) : ~0.8s/chunk
+        // benchmark fait le 20/11/2021 21h20 (normale analytique v2.1) : ~0.03s/chunk (30ms/chunk)
+        // benchmark fait le 10/12/2021 (normale analytique v2.5) : ~ 50ms/chunk
         //console.log("Time for creation : " + (Date.now() - clock));
 
     } else if (e.data.taskType == "collisionTask") {

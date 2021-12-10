@@ -1,5 +1,5 @@
 import { Vector3 } from "../../toolbox/algebra";
-import { smin2 } from "../../toolbox/math";
+import { sFloor, sFloorGradient } from "../../toolbox/math";
 import { simplex401 } from "../../toolbox/simplex";
 import { elevationFunction } from "./elevationFunction";
 
@@ -23,27 +23,20 @@ export function simplexNoiseLayer(frequency: number, nbOctaves: number, decay: n
         noiseValue /= totalAmplitude;
         noiseGradient.divideInPlace(totalAmplitude);
 
-        noiseGradient.scaleInPlace(power * Math.pow(noiseValue, power - 1));
-        noiseValue = Math.pow(noiseValue, power);
-
         if (minValue > 0) {
             if (minValue != 1) {
-                if (noiseValue <= minValue) {
-                    noiseValue = 0;
-                    noiseGradient = Vector3.Zero();
-                } else {
-                    noiseGradient.divideInPlace((1 - minValue));
-                    noiseGradient.scaleInPlace(Math.pow(noiseValue - minValue, 0.2)); // continuité à l'arrache
-                    noiseValue -= minValue;
-                    noiseValue /= 1 - minValue;
-                }
+                noiseGradient.scaleInPlace(sFloorGradient(noiseValue, minValue, 100.0));
+                noiseValue = sFloor(noiseValue, minValue, 100.0);
+                noiseValue -= minValue;
+                noiseValue /= 1 - minValue;
+                noiseGradient.divideInPlace(1 - minValue);
             } else {
                 throw new Error("minValue must be != 1");
             }
         }
 
-
-
+        noiseGradient.scaleInPlace(power * Math.pow(noiseValue, power - 1));
+        noiseValue = Math.pow(noiseValue, power);
 
         return [noiseValue, noiseGradient.x, noiseGradient.y, noiseGradient.z];
     };

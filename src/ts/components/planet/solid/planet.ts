@@ -69,7 +69,7 @@ export class SolidPlanet extends Planet {
             maxBumpHeight: 100,
             bumpsFrequency: 1,
 
-            maxMountainHeight: 40e3,
+            maxMountainHeight: 25e3,
             mountainsFrequency: 0.07
         };
 
@@ -84,7 +84,7 @@ export class SolidPlanet extends Planet {
             steepSharpness: 1,
             normalSharpness: 0.6,
 
-            snowElevation01: 0.7,
+            snowElevation01: 0.8,
             snowOffsetAmplitude: 0.05,
             snowLacunarity: 4,
             snowLatitudePersistence: 3,

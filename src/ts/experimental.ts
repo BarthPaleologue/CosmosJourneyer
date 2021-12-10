@@ -39,8 +39,9 @@ let planet = new SolidPlanet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, pla
 
 let waterElevation = 20e2;
 
-planet.colorSettings.steepSharpness = 5;
-planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0);
+planet.colorSettings.steepSharpness = 2;
+planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0).scale(0.7).add(new BABYLON.Vector3(0.5, 0.3, 0.08).scale(0.3));
+
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.waterLevel = waterElevation;
 
