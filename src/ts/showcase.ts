@@ -40,7 +40,7 @@ let gamepad = new Gamepad();
 
 let player = new PlayerControler(scene);
 player.setSpeed(0.2 * radius);
-player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), 0.6, BABYLON.Space.WORLD);
+player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), 0.8, BABYLON.Space.WORLD);
 
 player.camera.maxZ = Math.max(radius * 50, 10000);
 
@@ -81,6 +81,7 @@ moon.updateColors();
 
 import rockn from "../asset/textures/rockn.png";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
+import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
 moon.surfaceMaterial.setTexture("plainNormalMap", new BABYLON.Texture(rockn, scene));
 moon.surfaceMaterial.setTexture("bottomNormalMap", new BABYLON.Texture(rockn, scene));
 moon.surfaceMaterial.setTexture("sandNormalMap", new BABYLON.Texture(rockn, scene));
@@ -105,6 +106,7 @@ atmosphere.settings.intensity = 20;
 atmosphere.settings.falloffFactor = 24;
 atmosphere.settings.scatteringStrength = 1.0;
 
+let rings = new RingsPostProcess("rings", planet.attachNode, radius, radius, radius + 100e3, sun, player.camera, scene);
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, player.camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
 
