@@ -33,7 +33,7 @@ function initLayers() {
 
     bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 1.0, 0.0);
 
-    mountainsLayer = ridgedNoiseLayer(5e-5, 6, 1.9, 2.0, 2.0, 0.5);
+    mountainsLayer = ridgedNoiseLayer(5e-5, 6, 1.7, 2.0, 2.0, 0.5);
 }
 
 initLayers();
@@ -77,6 +77,8 @@ function terrainFunction(position: Vector3, gradient: Vector3): void {
 
     gradient.divideInPlace(terrainSettings.continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
     //gradient.divideInPlace(elevation);
+
+    gradient.divideInPlace(1.1);
 }
 
 self.onmessage = e => {

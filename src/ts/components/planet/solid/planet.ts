@@ -69,7 +69,7 @@ export class SolidPlanet extends Planet {
             maxBumpHeight: 100,
             bumpsFrequency: 1,
 
-            maxMountainHeight: 25e3,
+            maxMountainHeight: 40e3,
             mountainsFrequency: 0.07
         };
 

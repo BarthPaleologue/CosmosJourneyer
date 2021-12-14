@@ -15,6 +15,12 @@ export function ridgedNoiseLayer(frequency: number, nbOctaves: number, decay: nu
             let terrainData = simplex411(samplePoint);
             let localElevation = terrainData[0];
             let localGradient = new Vector3(terrainData[1], terrainData[2], terrainData[3]);
+
+            localGradient.scaleInPlace(sAbsGradient(localElevation, 10.0));
+            localElevation = 1.0 - sAbs(localElevation, 10.0);
+
+            localGradient.divideInPlace(-2);
+
             noiseValue += localElevation / decay ** i;
             noiseGradient.addInPlace(localGradient.divide(decay ** i));
 
@@ -24,10 +30,7 @@ export function ridgedNoiseLayer(frequency: number, nbOctaves: number, decay: nu
         noiseValue /= totalAmplitude;
         noiseGradient.divideInPlace(totalAmplitude);
 
-        noiseGradient.scaleInPlace(sAbsGradient(noiseValue, 10.0));
-        noiseValue = 1.0 - sAbs(noiseValue, 10.0);
 
-        noiseGradient.divideInPlace(-2);
 
         if (minValue > 0) {
             if (minValue != 1) {
