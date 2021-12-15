@@ -67,6 +67,7 @@ planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
+planet.attachNode.rotation.x = 0.2;
 
 planetManager.add(planet);
 
