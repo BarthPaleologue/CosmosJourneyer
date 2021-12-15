@@ -1,4 +1,4 @@
-precision highp float;
+precision lowp float;
 
 // Lights
 varying vec3 vPositionW;

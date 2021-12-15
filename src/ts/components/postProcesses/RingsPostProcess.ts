@@ -1,5 +1,7 @@
 interface RingsSettings {
-
+    ringStart: number;
+    ringEnd: number;
+    ringFrequency: number;
 }
 
 export class RingsPostProcess extends BABYLON.PostProcess {
@@ -11,7 +13,7 @@ export class RingsPostProcess extends BABYLON.PostProcess {
 
     internalTime = 0;
 
-    constructor(name: string, planet: BABYLON.Mesh, planetRadius: number, waterLevel: number, cloudLayerRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+    constructor(name: string, planet: BABYLON.Mesh, planetRadius: number, waterLevel: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
         super(name, "./shaders/rings", [
             "sunPosition",
             "cameraPosition",
@@ -22,12 +24,15 @@ export class RingsPostProcess extends BABYLON.PostProcess {
 
             "cameraNear",
             "cameraFar",
-            "cameraDirection",
 
             "planetPosition",
             "planetRadius",
             "cloudLayerRadius",
             "waterLevel",
+
+            "ringStart",
+            "ringEnd",
+            "ringFrequency",
 
             "planetWorldMatrix",
 
@@ -39,7 +44,9 @@ export class RingsPostProcess extends BABYLON.PostProcess {
 
 
         this.settings = {
-
+            ringStart: 1.5,
+            ringEnd: 2.5,
+            ringFrequency: 30.0
         };
 
         this.camera = camera;
@@ -65,13 +72,15 @@ export class RingsPostProcess extends BABYLON.PostProcess {
             effect.setFloat("planetRadius", planetRadius);
             effect.setFloat("waterLevel", waterLevel);
 
+            effect.setFloat("ringStart", this.settings.ringStart);
+            effect.setFloat("ringEnd", this.settings.ringEnd);
+            effect.setFloat("ringFrequency", this.settings.ringFrequency);
+
             effect.setMatrix("projection", this.camera.getProjectionMatrix());
             effect.setMatrix("view", this.camera.getViewMatrix());
-            effect.setMatrix("transform", this.camera.getTransformationMatrix());
 
             effect.setFloat("cameraNear", camera.minZ);
             effect.setFloat("cameraFar", camera.maxZ);
-            effect.setVector3("cameraDirection", camera.getDirection(BABYLON.Axis.Z));
 
             effect.setMatrix("planetWorldMatrix", this.planet.getWorldMatrix());
 

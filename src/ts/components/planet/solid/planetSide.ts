@@ -116,7 +116,7 @@ export class PlanetSide {
      */
     private updateLODRecursively(observerPosition: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
-        let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.parent.rotation);
+        let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.parent.getWorldMatrix(), this.parent.rotation);
 
         // position par rapport à la caméra
         let parentPosition = new Vector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
@@ -157,13 +157,17 @@ export class PlanetSide {
                 // un jour peut être de l'occlusion
                 //tree.mesh.setEnabled(tree.mesh.isInFrustum(camera));
 
-                let planetSpacePosition = Vector3.FromBABYLON3(observerPosition).subtract(parentPosition);
-                let dot = Vector3.Dot(planetSpacePosition.normalize(), relativePosition.normalize());
+                //let planetSpacePosition = Vector3.FromBABYLON3(observerPosition).subtract(parentPosition);
+
+                let planetSpacePosition = Vector3.FromBABYLON3(tree.mesh.getAbsolutePosition().subtract(parentPosition.toBabylon()));
+                let observerPlanetSpacePosition = Vector3.FromBABYLON3(observerPosition).subtract(parentPosition);
+
+                let dot = Vector3.Dot(planetSpacePosition.normalize(), observerPlanetSpacePosition.normalize());
 
                 let height01 = (planetSpacePosition.getMagnitude() - relativePosition.getMagnitude()) / relativePosition.getMagnitude();
                 height01 = Math.min(height01, 1);
                 //console.log(height01);
-                tree.mesh.setEnabled(dot > -0.2);
+                //tree.mesh.setEnabled(dot > -0.2);
                 //tree.mesh.setEnabled(dot > 0.7 - height01); // on affiche que les chunk du côté du joueur
                 // babylon fait déjà du frustrum culling apparemment.
 

@@ -1,7 +1,6 @@
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
 import { SolidPlanet } from "./components/planet/solid/planet";
 import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
-import { VolumetricCloudsPostProcess } from "./components/postProcesses/volumetricCloudsPostProcess";
 
 import sunTexture from "../asset/textures/sun.jpg";
 
@@ -12,6 +11,10 @@ import { Mouse } from "./components/inputs/mouse";
 import { Gamepad } from "./components/inputs/gamepad";
 import { CollisionWorker } from "./components/workers/collisionWorker";
 import { PlanetManager } from "./components/planet/planetManager";
+
+import rockn from "../asset/textures/rockn.png";
+import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
+import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
 
 style.default;
 
@@ -79,9 +82,6 @@ moon.colorSettings.snowOffsetAmplitude = 0.02;
 moon.colorSettings.steepSharpness = 3;
 moon.updateColors();
 
-import rockn from "../asset/textures/rockn.png";
-import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
 moon.surfaceMaterial.setTexture("plainNormalMap", new BABYLON.Texture(rockn, scene));
 moon.surfaceMaterial.setTexture("bottomNormalMap", new BABYLON.Texture(rockn, scene));
 moon.surfaceMaterial.setTexture("sandNormalMap", new BABYLON.Texture(rockn, scene));
@@ -92,13 +92,10 @@ planetManager.add(moon);
 
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun, 100);
 
-
 let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun, player.camera, scene);
 ocean.settings.alphaModifier = 0.00002;
 ocean.settings.depthModifier = 0.004;
-//ocean.settings.oceanRadius = 0;
 
-//let volumetricClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + 10e3, radius + 20e3, sun, player.camera, scene);
 let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius, waterElevation, radius + 15e3, sun, player.camera, scene);
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun, player.camera, scene);
@@ -106,7 +103,7 @@ atmosphere.settings.intensity = 20;
 atmosphere.settings.falloffFactor = 24;
 atmosphere.settings.scatteringStrength = 1.0;
 
-let rings = new RingsPostProcess("rings", planet.attachNode, radius, radius, radius + 100e3, sun, player.camera, scene);
+let rings = new RingsPostProcess("rings", planet.attachNode, radius, waterElevation, sun, player.camera, scene);
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, player.camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
 

@@ -51,7 +51,7 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
  * @param direction direction of the parent plane
  * @returns the position in planet space
  */
-export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: number[], direction: Direction, parentRotation: BABYLON.Vector3): Vector3 {
+export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: number[], direction: Direction, worldMatrix: BABYLON.Matrix, parentRotation: BABYLON.Vector3): Vector3 {
 
     // on récupère la position dans le plan
     let position = getChunkPlaneSpacePositionFromPath(chunkLength, path);
@@ -67,6 +67,7 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
     position = position.normalize().scale(chunkLength / 2);
 
     // on match cette position avec la rotation de la planète
+    //position = Vector3.FromBABYLON3(BABYLON.Vector3.TransformCoordinates(position.toBabylon(), worldMatrix));
     position = position.applyMatrix(Matrix.Rotation3DX(parentRotation.x));
     position = position.applyMatrix(Matrix.Rotation3DY(parentRotation.y));
     position = position.applyMatrix(Matrix.Rotation3DZ(parentRotation.z));

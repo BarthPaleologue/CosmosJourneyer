@@ -1,8 +1,4 @@
-precision mediump float;
-
-#define PI 3.1415926535897932
-#define POINTS_FROM_CAMERA 10 // number sample points along camera ray
-#define OPTICAL_DEPTH_POINTS 10 // number sample points along light ray
+precision lowp float;
 
 // varying
 varying vec2 vUV; // screen coordinates
@@ -10,7 +6,6 @@ varying vec2 vUV; // screen coordinates
 // uniforms
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
-uniform sampler2D normalMap;
 
 uniform vec3 sunPosition; // position of the sun in world space
 uniform vec3 cameraPosition; // position of the camera in world space
@@ -26,6 +21,10 @@ uniform vec3 planetPosition; // planet position in world space
 uniform float cloudLayerRadius; // atmosphere radius (calculate from planet center)
 uniform float planetRadius; // planet radius
 uniform float waterLevel; // water level
+
+uniform float ringStart; // ring start
+uniform float ringEnd; // ring end
+uniform float ringFrequency; // ring frequency
 
 uniform mat4 planetWorldMatrix;
 
@@ -68,12 +67,6 @@ float completeNoise(vec3 p, int nbOctaves, float decay, float lacunarity) {
 		value += noise(samplePoint) / pow(decay, float(i));
 	}
 	return value / totalAmplitude;
-}
-
-float saturate(float value) {
-    if(value < 0.0) return 0.0;
-    if(value > 1.0) return 1.0;
-    return value;
 }
 
 // remap a value comprised between low1 and high1 to a value between low2 and high2
@@ -128,82 +121,16 @@ float ringDensityAtPoint(vec3 samplePoint) {
 	vec3 samplePointPlanetSpace = samplePoint - planetPosition;
 
 	float distanceToPlanet = length(samplePointPlanetSpace);
+    float normalizedDistance = distanceToPlanet / planetRadius;
 
-	if(distanceToPlanet < planetRadius * 1.5) return 0.0;
-	if(distanceToPlanet > planetRadius * 2.5) return 0.0;
-	
-	// hypothèse des rayons parallèles
-	vec3 rayToSun = normalize(sunPosition - planetPosition);
-	float t0, t1;
-	if(rayIntersectSphere(samplePoint, rayToSun, planetPosition, planetRadius, t0,t1)) {
-		return 0.0;
-	}
+    // out if not intersecting with rings
+	if(normalizedDistance < ringStart || normalizedDistance > ringEnd) return 0.0;
 
-	//float detailNoiseValue = completeNoise(samplePointPlanetSpace * 0.01, 1, 0.5, 2.0);
-	float detailNoiseValue = 1.0;
+    // compute the actual density of the rings at the sample point
+	float ringDensity = completeNoise(vec3(normalizedDistance) * ringFrequency, 4, 2.0, 2.0);
 
-	float densityValue = completeNoise(vec3(distanceToPlanet) * 0.0001, 1, 0.5, 2.0);
-
-    return densityValue * detailNoiseValue;
+    return ringDensity;
 }
-
-vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
-    float impactPoint, escapePoint;
-
-    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint))) {
-        return originalColor; // if not intersecting with atmosphere, return original color
-    }
-
-	//impactPoint += 10000.0 * completeNoise(normalize(rayOrigin + impactPoint * rayDir), 5, 2.0, 2.0);
-
-	float waterImpact, waterEscape;
-    if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius + waterLevel, waterImpact, waterEscape)) {
-        maximumDistance = min(maximumDistance, waterImpact);
-    }
-
-	bool twoPoints = impactPoint > 0.0 && escapePoint > 0.0 && escapePoint < maximumDistance;
-
-    if(impactPoint < 0.0) {
-        impactPoint = escapePoint;
-        if(impactPoint > maximumDistance) {
-            return originalColor;
-        }
-    }
-    if(impactPoint > maximumDistance) return originalColor;
-
-
-    // traiter le cas où les deux points sont acceptables.
-
-    vec3 samplePoint1 = rayOrigin + impactPoint * rayDir;
-    vec3 samplePoint2 = rayOrigin + escapePoint * rayDir;
-
-    vec3 samplePointPlanetSpace1 = vec3(inverse(planetWorldMatrix) * vec4(samplePoint1, 1.0));//samplePoint - planetPosition;
-    vec3 samplePointPlanetSpace2 = vec3(inverse(planetWorldMatrix) * vec4(samplePoint2, 1.0));//samplePoint - planetPosition;
-
-    vec3 planetNormal = normalize(samplePoint1 - planetPosition);
-
-
-	//vec3 normal = triplanarNormal(samplePointPlanetSpace1, planetNormal, normalMap, 0.000002, 1.0, cloudDensity);
-	vec3 normal = planetNormal;
-
-    vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
-
-    float ndl = max(dot(planetNormal, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
-
-    //TODO : en faire un uniform
-    float smoothness = 0.7;
-    float specularAngle = acos(dot(normalize(sunDir - rayDir), normal));
-    float specularExponent = specularAngle / (1.0 - smoothness);
-    float specularHighlight = exp(-specularExponent * specularExponent);
-
-	vec3 ambiant = lerp(originalColor, vec3(ndl), 1.0);
-
-    return ambiant + specularHighlight;
-}
-
-
-
-
 
 void main() {
     vec3 screenColor = texture2D(textureSampler, vUV).rgb; // the current screen color
@@ -220,14 +147,30 @@ void main() {
 
     vec3 finalColor;
 
+    vec3 planetUpVector = vec3(0.0, 1.0, 0.0);
+    planetUpVector = vec3(planetWorldMatrix * vec4(planetUpVector, 0.0)); // planet up vector in world space
+    planetUpVector = normalize(planetUpVector); // normalize the planet up vector
+
 	float impactPoint;
-	if(rayIntersectPlane(cameraPosition, rayDir, planetPosition, normalize(vec3(-0.2, 1.0, 0.0)), impactPoint)) {
+	if(rayIntersectPlane(cameraPosition, rayDir, planetPosition, planetUpVector, impactPoint)) {
 		if(impactPoint < maximumDistance) {
-			finalColor = vec3(1.0, 0.0, 0.0);
-			vec3 samplePoint = cameraPosition + impactPoint * rayDir;
-			float ringDensity = ringDensityAtPoint(samplePoint);
-			vec3 ringColor = lerp(vec3(ringDensity), screenColor, 0.5);
-			finalColor = lerp(ringColor, screenColor, ringDensity);
+            float t0, t1;
+            if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius+waterLevel, t0, t1) && t0 < impactPoint) {
+                finalColor = screenColor;
+            } else {
+                vec3 samplePoint = cameraPosition + impactPoint * rayDir;
+                float ringDensity = ringDensityAtPoint(samplePoint);
+                vec3 ringColor = lerp(vec3(ringDensity), screenColor, 0.4);
+
+                // hypothèse des rayons parallèles
+                vec3 rayToSun = normalize(sunPosition - planetPosition);
+                float t2, t3;
+                if(rayIntersectSphere(samplePoint, rayToSun, planetPosition, planetRadius, t2,t3)) {
+                    ringColor *= 0.1;
+                }
+
+                finalColor = lerp(ringColor, screenColor, ringDensity);
+            }
 		} else {
 			finalColor = screenColor;
 		}

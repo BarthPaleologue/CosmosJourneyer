@@ -7,6 +7,8 @@ import * as style2 from "../sliderjs/style2.min.css";
 import { PlanetManager } from "./components/planet/planetManager";
 import { PlayerControler } from "./components/player/playerControler";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
+import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
+import { Keyboard } from "./components/inputs/keyboard";
 
 style.default;
 style2.default;
@@ -28,14 +30,20 @@ depthRenderer.getDepthMap().renderList = [];
 
 const planetRadius = 1000e3;
 
-let player = new PlayerControler(scene);
-player.camera.maxZ = planetRadius * 5;
 
-let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(planetRadius * 2), scene);
+let player = new PlayerControler(scene);
+player.setSpeed(0.2 * planetRadius);
+player.camera.maxZ = planetRadius * 20;
+
+let keyboard = new Keyboard();
+
+let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(planetRadius * 10), scene);
 
 let planetManager = new PlanetManager();
 
-let planet = new SolidPlanet("Gaia", planetRadius, new BABYLON.Vector3(0, 0, planetRadius * 3), 2, scene);
+let planet = new SolidPlanet("Gaia", planetRadius, BABYLON.Vector3.Zero(), 2, scene);
+planet.attachNode.position.z = planetRadius * 3;
+planet.attachNode.rotation.x = -0.2;
 
 let waterElevation = 20e2;
 
@@ -61,30 +69,25 @@ atmosphere.settings.intensity = 20;
 atmosphere.settings.scatteringStrength = 1.0;
 atmosphere.settings.falloffFactor = 24;
 
+let rings = new RingsPostProcess("rings", planet.attachNode, planetRadius, waterElevation, light, player.camera, scene);
+
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
 
-
 //#region Sliders
 
-/*
-new Slider("noiseOffsetX", document.getElementById("noiseOffsetX")!, 0, 50, 0, (val: number) => {
-    planet.reset();
+new Slider("zoom", document.getElementById("zoom")!, 0, 100, 100 * planet._radius / planet.attachNode.position.z, (value: number) => {
+    planet.attachNode.position.z = 100 * planet._radius / (value);
 });
 
-new Slider("noiseOffsetY", document.getElementById("noiseOffsetY")!, 0, 50, 0, (val: number) => {
-    planet.reset();
+
+document.getElementById("oceanToggler")?.addEventListener("click", () => {
+    let checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
+    checkbox.checked = !checkbox.checked;
+    ocean.settings.oceanRadius = checkbox.checked ? planetRadius + waterElevation : 0;
 });
 
-new Slider("noiseOffsetZ", document.getElementById("noiseOffsetZ")!, 0, 50, 0, (val: number) => {
-    planet.reset();
-});
-
-new Slider("minValue", document.getElementById("minValue")!, 0, 20, 10, (val: number) => {
-    planet.reset();
-});
-*/
-new Slider("oceanLevel", document.getElementById("oceanLevel")!, 0, 50, (ocean.settings.oceanRadius - planetRadius) / 100, (val: number) => {
+new Slider("oceanLevel", document.getElementById("oceanLevel")!, 0, 100, (ocean.settings.oceanRadius - planetRadius) / 100, (val: number) => {
     ocean.settings.oceanRadius = planetRadius + val * 100;
     if (val == 0) ocean.settings.oceanRadius = 0;
     planet.colorSettings.waterLevel = val * 100;
@@ -139,38 +142,18 @@ new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 30
     planet.colorSettings.normalSharpness = val / 10;
     planet.updateColors();
 });
-/*
-new Slider("noiseFrequency", document.getElementById("noiseFrequency")!, 0, 20, 1, (val: number) => {
 
-    planet.reset();
-});*/
-/*
-new Slider("nbCraters", document.getElementById("nbCraters")!, 0, 500, 200, (nbCraters: number) => {
-    //planet.regenerateCraters(nbCraters);
+document.getElementById("cloudsToggler")?.addEventListener("click", () => {
+    let checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
+    checkbox.checked = !checkbox.checked;
+    flatClouds.settings.cloudLayerRadius = checkbox.checked ? planetRadius + 15e3 : 0;
 });
-*/
-/*
-new Slider("craterRadius", document.getElementById("craterRadius")!, 1, 20, 10, (radiusFactor: number) => {
-
-    planet.reset();
-});
-
-new Slider("craterSteepness", document.getElementById("craterSteepness")!, 1, 20, 10, (steepnessFactor: number) => {
-
-    planet.reset();
-});
-
-new Slider("craterDepth", document.getElementById("craterDepth")!, 1, 20, 10, (depthFactor: number) => {
-
-    planet.reset();
-});
-*/
 
 new Slider("cloudFrequency", document.getElementById("cloudFrequency")!, 0, 20, flatClouds.settings.cloudFrequency, (val: number) => {
     flatClouds.settings.cloudFrequency = val;
 });
 
-new Slider("cloudDetailFrequency", document.getElementById("cloudDetailFrequency")!, 0, 20, flatClouds.settings.cloudDetailFrequency, (val: number) => {
+new Slider("cloudDetailFrequency", document.getElementById("cloudDetailFrequency")!, 0, 50, flatClouds.settings.cloudDetailFrequency, (val: number) => {
     flatClouds.settings.cloudDetailFrequency = val;
 });
 
@@ -184,6 +167,12 @@ new Slider("worleySpeed", document.getElementById("worleySpeed")!, 0.0, 200.0, f
 
 new Slider("detailSpeed", document.getElementById("detailSpeed")!, 0, 200, flatClouds.settings.detailSpeed * 10, (val: number) => {
     flatClouds.settings.detailSpeed = val / 10;
+});
+
+document.getElementById("atmosphereToggler")?.addEventListener("click", () => {
+    let checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
+    checkbox.checked = !checkbox.checked;
+    atmosphere.settings.atmosphereRadius = checkbox.checked ? planetRadius + 100e3 : 0;
 });
 
 new Slider("intensity", document.getElementById("intensity")!, 0, 40, atmosphere.settings.intensity, (val: number) => {
@@ -215,6 +204,24 @@ new Slider("blueWaveLength", document.getElementById("blueWaveLength")!, 0, 1000
     atmosphere.settings.blueWaveLength = val;
 });
 
+document.getElementById("ringsToggler")?.addEventListener("click", () => {
+    let checkbox = document.querySelectorAll("input[type='checkbox']")[3] as HTMLInputElement;
+    checkbox.checked = !checkbox.checked;
+    rings.settings.ringFrequency = checkbox.checked ? 30 : 0;
+});
+
+new Slider("ringsMinRadius", document.getElementById("ringsMinRadius")!, 100, 200, rings.settings.ringStart * 100, (val: number) => {
+    rings.settings.ringStart = val / 100;
+});
+
+new Slider("ringsMaxRadius", document.getElementById("ringsMaxRadius")!, 150, 400, rings.settings.ringEnd * 100, (val: number) => {
+    rings.settings.ringEnd = val / 100;
+});
+
+new Slider("ringsFrequency", document.getElementById("ringsFrequency")!, 10, 100, rings.settings.ringFrequency, (val: number) => {
+    rings.settings.ringFrequency = val;
+});
+
 let sunOrientation = 180;
 new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
     sunOrientation = val;
@@ -235,10 +242,7 @@ document.getElementById("randomCraters")?.addEventListener("click", () => {
     //planet.regenerateCraters();
 });
 
-let keyboard: { [key: string]: boolean; } = {};
-
 document.addEventListener("keyup", e => {
-    keyboard[e.key] = false;
     if (e.key == "p") { // take screenshots
         BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
     }
@@ -256,11 +260,17 @@ window.addEventListener("resize", () => {
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
-        planet.attachNode.rotation.y += .001 * rotationSpeed;
 
-        planetManager.update(player, light.position, depthRenderer);
+        let deplacement = player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000);
 
-        light.position = new BABYLON.Vector3(Math.cos(sunOrientation * Math.PI / 180), 0, Math.sin(sunOrientation * Math.PI / 180)).scale(planetRadius * 5);
+        planetManager.moveEverything(deplacement);
+
+        planet.attachNode.rotate(BABYLON.Axis.Y, .001 * rotationSpeed, BABYLON.Space.LOCAL);
+
+        light.position = new BABYLON.Vector3(Math.cos(sunOrientation * Math.PI / 180), 0, Math.sin(sunOrientation * Math.PI / 180)).scale(planetRadius * 10);
+        light.position.addInPlace(planet.attachNode.getAbsolutePosition());
+
+        planetManager.update(player, light.getAbsolutePosition(), depthRenderer);
 
         scene.render();
     });
