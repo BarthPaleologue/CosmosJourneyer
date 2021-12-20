@@ -49,9 +49,22 @@ player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), 0.8, BABYLON.Spac
 
 player.camera.maxZ = Math.max(radius * 50, 10000);
 
+//https://github.com/BabylonJS/Babylon.js/issues/7133 messing around with depth buffer
+/*engine.setDepthFunctionToGreaterOrEqual();
+scene.autoClear = false;
+scene.autoClearDepthAndStencil = false;
+scene.setRenderingAutoClearDepthStencil(0, false, false, false);
+scene.setRenderingAutoClearDepthStencil(1, false, false, false);
+scene.onBeforeDrawPhaseObservable.add((scene, state) => {
+    const gl = scene.getEngine()._gl;
+    gl.clearDepth(0.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+});*/
+
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);
 mat.emissiveTexture = new BABYLON.Texture(sunTexture, scene);
+//mat.useLogarithmicDepth = true;
 sun.material = mat;
 sun.position.x = -913038.375;
 sun.position.z = -1649636.25;
@@ -77,7 +90,22 @@ planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
-planet.attachNode.rotation.x = 0.2;
+planet.attachNode.rotate(BABYLON.Axis.X, 0.2, BABYLON.Space.WORLD);
+//planet.attachNode.rotation.x = 0.2;
+
+let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun, player.camera, scene);
+ocean.settings.alphaModifier = 0.00002;
+ocean.settings.depthModifier = 0.004;
+
+let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius, waterElevation, radius + 15e3, sun, player.camera, scene);
+
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun, player.camera, scene);
+atmosphere.settings.intensity = 20;
+atmosphere.settings.falloffFactor = 24;
+atmosphere.settings.scatteringStrength = 1.0;
+
+let rings = new RingsPostProcess("rings", planet.attachNode, radius, waterElevation, sun, player.camera, scene);
+
 
 planetManager.add(planet);
 
@@ -101,20 +129,28 @@ moon.attachNode.position.addInPlace(planet.attachNode.getAbsolutePosition());
 
 planetManager.add(moon);
 
+let Ares = new SolidPlanet("Ares", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
+Ares.terrainSettings.continentsFragmentation = 1;
+Ares.terrainSettings.maxMountainHeight = 10e3;
+Ares.terrainSettings.mountainsFrequency /= 1.1;
+Ares.terrainSettings.mountainsMinValue = 0.4;
+Ares.colorSettings.sandColor = Ares.colorSettings.plainColor;
+Ares.colorSettings.steepSharpness = 2;
+Ares.colorSettings.waterLevel = 0;
+
+Ares.updateColors();
+Ares.attachNode.position.x = -radius * 4;
+
+let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius, radius + 100e3, sun, player.camera, scene);
+atmosphere2.settings.intensity = 11;
+atmosphere2.settings.greenWaveLength = 680;
+atmosphere2.settings.falloffFactor = 24;
+atmosphere2.settings.scatteringStrength = 1.0;
+
+planetManager.add(Ares);
+
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun, 100);
 
-let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun, player.camera, scene);
-ocean.settings.alphaModifier = 0.00002;
-ocean.settings.depthModifier = 0.004;
-
-let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius, waterElevation, radius + 15e3, sun, player.camera, scene);
-
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun, player.camera, scene);
-atmosphere.settings.intensity = 20;
-atmosphere.settings.falloffFactor = 24;
-atmosphere.settings.scatteringStrength = 1.0;
-
-let rings = new RingsPostProcess("rings", planet.attachNode, radius, waterElevation, sun, player.camera, scene);
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, player.camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
 
@@ -157,7 +193,7 @@ scene.executeWhenReady(() => {
 
         gamepad.update();
 
-        //planet.attachNode.rotation.y += 0.0002;
+        //planet.attachNode.rotate(BABYLON.Axis.Y, .0002, BABYLON.Space.LOCAL);
 
         let deplacement = player.listenToGamepad(gamepad, engine.getDeltaTime() / 1000);
 

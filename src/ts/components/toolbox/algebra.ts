@@ -491,6 +491,25 @@ export class Vector3 {
         this.y = ny;
         this.z = nz;
     }
+    //https://www.wikiwand.com/en/Quaternions_and_spatial_rotation
+    applyQuaternionInPlace(quaternion: BABYLON.Quaternion) {
+        let qx = quaternion.x;
+        let qy = quaternion.y;
+        let qz = quaternion.z;
+        let qw = quaternion.w;
+        let x = this.x;
+        let y = this.y;
+        let z = this.z;
+        // apply quaternion to vector
+        let ix = qw * x + qy * z - qz * y;
+        let iy = qw * y + qz * x - qx * z;
+        let iz = qw * z + qx * y - qy * x;
+        let iw = -qx * x - qy * y - qz * z;
+        // calculate result * inverse quat
+        this.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+        this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+        this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+    }
     static DistanceSquared(vector1: Vector3, vector2: Vector3) {
         return (vector1.x - vector2.x) ** 2 + (vector1.y - vector2.y) ** 2 + (vector1.z - vector2.z) ** 2;
     }

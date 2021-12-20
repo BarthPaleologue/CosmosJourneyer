@@ -70,7 +70,8 @@ export class SolidPlanet extends Planet {
             bumpsFrequency: 1,
 
             maxMountainHeight: 40e3,
-            mountainsFrequency: 0.07
+            mountainsFrequency: 2e-3,
+            mountainsMinValue: 0.5
         };
 
         this.colorSettings = {
@@ -138,8 +139,6 @@ export class SolidPlanet extends Planet {
         surfaceMaterial.setFloat("snowLatitudePersistence", this.colorSettings.snowLatitudePersistence);
         surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.steepSnowDotLimit);
 
-        surfaceMaterial.depthFunction = 1;
-
         this.surfaceMaterial = surfaceMaterial;
 
         this.sides = [
@@ -163,9 +162,9 @@ export class SolidPlanet extends Planet {
      * Update terrain of the sphere relative to the observer position
      * @param position the observer position
      */
-    private updateLOD(position: BABYLON.Vector3): void {
+    private updateLOD(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3): void {
         for (let side of this.sides) {
-            side.updateLOD(position);
+            side.updateLOD(observerPosition, observerDirection);
         }
     }
 
@@ -208,13 +207,13 @@ export class SolidPlanet extends Planet {
 
     }
 
-    public update(playerPosition: BABYLON.Vector3, lightPosition: BABYLON.Vector3) {
-        this.surfaceMaterial.setVector3("playerPosition", playerPosition);
+    public update(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3) {
+        this.surfaceMaterial.setVector3("playerPosition", observerPosition);
         this.surfaceMaterial.setVector3("v3LightPos", lightPosition);
         this.surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
 
         this.surfaceMaterial.setMatrix("planetWorldMatrix", this.attachNode.getWorldMatrix());
-        this.updateLOD(playerPosition);
+        this.updateLOD(observerPosition, observerDirection);
     }
     public getRelativePosition() {
         return this.attachNode.position;
