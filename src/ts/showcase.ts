@@ -13,6 +13,8 @@ import { CollisionWorker } from "./components/workers/collisionWorker";
 import { PlanetManager } from "./components/planet/planetManager";
 
 import rockn from "../asset/textures/rockn.png";
+import lensflare from "../asset/textures/lensflare3.png";
+import lensflare2 from "../asset/textures/lensflare4.png";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
 import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
 
@@ -54,6 +56,14 @@ sun.material = mat;
 sun.position.x = -913038.375;
 sun.position.z = -1649636.25;
 depthRenderer.getDepthMap().renderList?.push(sun);
+
+/*let lensFlareSystem = new BABYLON.LensFlareSystem("lensFlare", sun, scene);
+let flare0 = new BABYLON.LensFlare(0.2, 1, new BABYLON.Color3(0.5, 0.5, 0.5), lensflare2, lensFlareSystem);
+flare0.alphaMode = 1;
+let flare1 = new BABYLON.LensFlare(0.1, 0.4, new BABYLON.Color3(0.5, 0.2, 0.2), lensflare2, lensFlareSystem);
+flare1.alphaMode = 1;
+let flare2 = new BABYLON.LensFlare(0.05, 0.2, new BABYLON.Color3(0.2, 0.5, 0.2), lensflare2, lensFlareSystem);
+flare2.alphaMode = 1;*/
 
 let planetManager = new PlanetManager();
 

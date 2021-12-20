@@ -81,8 +81,8 @@ export class PlanetChunk {
 
     public readonly mesh: BABYLON.Mesh;
 
-    constructor(_path: number[], rootChunkLength: number, _direction: Direction, _parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: SolidPlanet) {
-        let id = `[D${_direction}][P${_path.join("")}]`;
+    constructor(_path: number[], rootChunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: SolidPlanet) {
+        let id = `[D${direction}][P${_path.join("")}]`;
 
         let position = getChunkPlaneSpacePositionFromPath(rootChunkLength, _path);
 
@@ -101,7 +101,8 @@ export class PlanetChunk {
 
         //this.mesh.material = debugMaterial;
 
-        this.mesh.parent = _parentNode;
+        this.mesh.parent = parentNode;
+        this.mesh.isBlocker = true;
 
         chunkForge.addTask({
             taskType: TaskType.Build,
@@ -110,7 +111,7 @@ export class PlanetChunk {
             position: position.toBabylon(),
             chunkLength: rootChunkLength,
             depth: _path.length,
-            direction: _direction,
+            direction: direction,
             mesh: this.mesh,
         });
 
