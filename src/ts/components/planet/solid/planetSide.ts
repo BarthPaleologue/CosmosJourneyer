@@ -103,8 +103,8 @@ export class PlanetSide {
      * Update LOD of terrain relative to the observerPosition
      * @param observerPosition The observer position
      */
-    public updateLOD(observerPosition: BABYLON.Vector3): void {
-        this.tree = this.updateLODRecursively(observerPosition);
+    public updateLOD(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3): void {
+        this.tree = this.updateLODRecursively(observerPosition, observerDirection);
     }
 
     /**
@@ -114,9 +114,9 @@ export class PlanetSide {
      * @param walked The position of the current root relative to the absolute root
      * @returns The updated tree
      */
-    private updateLODRecursively(observerPosition: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
+    private updateLODRecursively(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
-        let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.parent.getWorldMatrix(), this.parent.rotation);
+        let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.parent.getWorldMatrix(), this.parent.rotationQuaternion!);
 
         // position par rapport à la caméra
         let parentPosition = new Vector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
@@ -141,36 +141,24 @@ export class PlanetSide {
             } else {
                 // si c'en est pas un, on continue
                 return [
-                    this.updateLODRecursively(observerPosition, tree[0], walked.concat([0])),
-                    this.updateLODRecursively(observerPosition, tree[1], walked.concat([1])),
-                    this.updateLODRecursively(observerPosition, tree[2], walked.concat([2])),
-                    this.updateLODRecursively(observerPosition, tree[3], walked.concat([3])),
+                    this.updateLODRecursively(observerPosition, observerDirection, tree[0], walked.concat([0])),
+                    this.updateLODRecursively(observerPosition, observerDirection, tree[1], walked.concat([1])),
+                    this.updateLODRecursively(observerPosition, observerDirection, tree[2], walked.concat([2])),
+                    this.updateLODRecursively(observerPosition, observerDirection, tree[3], walked.concat([3])),
                 ];
             }
         } else {
             // si on est loin
             if (tree instanceof PlanetChunk) {
-                //let camera = this.scene.activeCamera?.position;
-                //let distanceToCenter = BABYLON.Vector3.DistanceSquared(observerPosition, this.parent.absolutePosition);
-                // c'est pythagore
-                //let behindHorizon = (d2 > distanceToCenter + (this.chunkLength / 2) ** 2);
-                // un jour peut être de l'occlusion
-                //tree.mesh.setEnabled(tree.mesh.isInFrustum(camera));
+                let dn = direction.normalize();
+                let dot = Vector3.Dot(relativePosition.normalize(), dn);
 
-                //let planetSpacePosition = Vector3.FromBABYLON3(observerPosition).subtract(parentPosition);
+                // sera d'occludé les chunks derrière la caméra
+                //let dot2 = Vector3.Dot(absolutePosition.normalize(), Vector3.FromBABYLON3(observerDirection));
+                // mais si un chunk est très proche, il sera toujours visible (on est proche donc le dot2 peut être négatif alors que le chunk est visible)
+                //let c2 = dot2 > - 0.5 && absolutePosition.getMagnitude() > this.rootChunkLength / (2 ** (walked.length + 3));
 
-                let planetSpacePosition = Vector3.FromBABYLON3(tree.mesh.getAbsolutePosition().subtract(parentPosition.toBabylon()));
-                let observerPlanetSpacePosition = Vector3.FromBABYLON3(observerPosition).subtract(parentPosition);
-
-                let dot = Vector3.Dot(planetSpacePosition.normalize(), observerPlanetSpacePosition.normalize());
-
-                let height01 = (planetSpacePosition.getMagnitude() - relativePosition.getMagnitude()) / relativePosition.getMagnitude();
-                height01 = Math.min(height01, 1);
-                //console.log(height01);
-                //tree.mesh.setEnabled(dot > -0.2);
-                //tree.mesh.setEnabled(dot > 0.7 - height01); // on affiche que les chunk du côté du joueur
-                // babylon fait déjà du frustrum culling apparemment.
-
+                tree.mesh.setEnabled(dot < 0.2);
 
                 return tree;
             } else {

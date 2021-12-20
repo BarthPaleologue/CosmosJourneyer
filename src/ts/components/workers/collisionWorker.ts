@@ -3,6 +3,7 @@ import { SolidPlanet } from "../planet/solid/planet";
 import { PlanetManager } from "../planet/planetManager";
 import { PlayerControler } from "../player/playerControler";
 import { PlanetWorker } from "./planetWorker";
+import { Vector3 } from "../toolbox/algebra";
 
 export class CollisionWorker extends PlanetWorker {
     _player: PlayerControler;
@@ -41,14 +42,20 @@ export class CollisionWorker extends PlanetWorker {
         this._busy = true;
     }
     public checkCollision(planet: SolidPlanet): void {
+        let position = Vector3.FromBABYLON3(planet.getAbsolutePosition()); // position de la planète / au joueur
+        position.scaleInPlace(-1); // position du joueur / au centre de la planète
+
+        // on applique le quaternion inverse pour obtenir le sample point correspondant à la planète rotatée (fais un dessin si c'est pas clair)
+        position.applyQuaternionInPlace(BABYLON.Quaternion.Inverse(planet.attachNode.rotationQuaternion!));
+
         this.send({
             taskType: "collisionTask",
             planetID: planet._name,
             terrainSettings: planet.terrainSettings,
             position: [
-                -planet.getAbsolutePosition().x,
-                -planet.getAbsolutePosition().y,
-                -planet.getAbsolutePosition().z
+                position.x,
+                position.y,
+                position.z
             ],
             chunkLength: planet.rootChunkLength,
             craters: planet.craters

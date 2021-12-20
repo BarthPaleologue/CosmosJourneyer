@@ -265,7 +265,7 @@ scene.executeWhenReady(() => {
 
         planetManager.moveEverything(deplacement);
 
-        planet.attachNode.rotate(BABYLON.Axis.Y, .001 * rotationSpeed, BABYLON.Space.LOCAL);
+        //planet.attachNode.rotate(BABYLON.Axis.Y, .001 * rotationSpeed, BABYLON.Space.LOCAL);
 
         light.position = new BABYLON.Vector3(Math.cos(sunOrientation * Math.PI / 180), 0, Math.sin(sunOrientation * Math.PI / 180)).scale(planetRadius * 10);
         light.position.addInPlace(planet.attachNode.getAbsolutePosition());

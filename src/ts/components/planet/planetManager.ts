@@ -9,6 +9,7 @@ export class PlanetManager {
         this._chunkForge = new ChunkForge(nbVertices);
     }
     public add(planet: SolidPlanet): void {
+        planet.attachNode.rotate(BABYLON.Axis.Y, 0, BABYLON.Space.WORLD); // on s'assure que le rotationQuaternion est défini
         planet.setChunkForge(this._chunkForge);
         this._planets.push(planet);
     }
@@ -34,7 +35,7 @@ export class PlanetManager {
         this._chunkForge.update(depthRenderer);
         // TODO : il faudra update les planètes des plus lointaines au plus proches quand il y aura les postprocess
         for (const planet of this._planets) {
-            planet.update(player.mesh.position, lightOrigin);
+            planet.update(player.mesh.position, player.getForwardDirection(), lightOrigin);
         }
     }
 }

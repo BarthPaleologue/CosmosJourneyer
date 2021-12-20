@@ -25,6 +25,7 @@ let terrainSettings: TerrainSettings = {
 
     maxMountainHeight: 0,
     mountainsFrequency: 1,
+    mountainsMinValue: 0.5,
 };
 
 
@@ -33,7 +34,7 @@ function initLayers() {
 
     bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 1.0, 0.0);
 
-    mountainsLayer = ridgedNoiseLayer(5e-5, 6, 1.9, 2.0, 2.0, 0.5);
+    mountainsLayer = ridgedNoiseLayer(terrainSettings.mountainsFrequency, 6, 1.9, 2.0, 2.0, terrainSettings.mountainsMinValue);
 }
 
 initLayers();
