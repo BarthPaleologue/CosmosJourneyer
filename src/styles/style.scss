@@ -21,11 +21,32 @@ body {
         h1 {
             font-family: sans-serif;
             color: white;
+            margin: 5px;
         }
         p {
             font-family: sans-serif;
             color: white;
             margin-block-end: 0;
+            margin-left: 5px;
+        }
+        .colorPickerContainer {
+            p {
+                display: inline;
+                padding-top: -10px;
+            }
+            input {
+                -webkit-appearance: none;
+                border: none;
+                width: 32px;
+                height: 16px;
+                &::-webkit-color-swatch-wrapper {
+                    padding: 0;
+                }
+                &::-webkit-color-swatch {
+                    border: none;
+                }
+            }
+            display: block;
         }
         .range-slider {
             margin-top: -5%;
@@ -49,6 +70,7 @@ body {
 
         /* Customize the label (the container) */
         .container {
+            margin-left: 5px;
             display: block;
             position: relative;
             padding-left: 35px;

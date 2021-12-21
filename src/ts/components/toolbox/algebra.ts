@@ -320,33 +320,6 @@ export class Vector {
         return new Vector(...this.components.map((value: number) => { return value + x; }));
     }
 
-    public applySquaredMatrix(matrix: Matrix): Vector {
-        if (matrix.dimX != matrix.dimY) throw Error("Dimension error : the matrix is not squared !");
-        if (matrix.dimX != this.dim) throw Error("Dimension error while doing Matrix Vector Multiplication !");
-        let components: number[] = [];
-        for (let i = 0; i < this.dim; i++) {
-            let value = 0;
-            for (let j = 0; j < matrix.dimX; j++) {
-                value += matrix.m[i][j] * this.get(j);
-            }
-            components.push(value);
-        }
-        return new Vector(...components);
-    }
-    public applySquaredMatrixInPlace(matrix: Matrix): void {
-        if (matrix.dimX != matrix.dimY) throw Error("Dimension error : the matrix is not squared !");
-        if (matrix.dimX != this.dim) throw Error("Dimension error while doing Matrix Vector Multiplication !");
-        let components: number[] = [];
-        for (let i = 0; i < this.dim; i++) {
-            let value = 0;
-            for (let j = 0; j < matrix.dimX; j++) {
-                value += matrix.m[i][j] * this.get(j);
-            }
-            components.push(value);
-        }
-        this.components = components;
-    }
-
     public isZero(): boolean {
         for (const component of this.components) {
             if (component != 0) return false;
@@ -469,30 +442,8 @@ export class Vector3 {
     public toBabylon(): BABYLON.Vector3 {
         return Vector3.ToBABYLON3(this);
     }
-    applyMatrix(matrix: Matrix): Vector3 {
-        let newVector = Vector3.Zero();
-
-        let m = matrix.m;
-
-        newVector.x = m[0][0] * this.x + m[0][1] * this.y + m[0][2] * this.z;
-        newVector.y = m[1][0] * this.x + m[1][1] * this.y + m[1][2] * this.z;
-        newVector.z = m[2][0] * this.x + m[2][1] * this.y + m[2][2] * this.z;
-
-        return newVector;
-    }
-    applyMatrixInPlace(matrix: Matrix): void {
-        let m = matrix.m;
-
-        let nx = m[0][0] * this.x + m[0][1] * this.y + m[0][2] * this.z;
-        let ny = m[1][0] * this.x + m[1][1] * this.y + m[1][2] * this.z;
-        let nz = m[2][0] * this.x + m[2][1] * this.y + m[2][2] * this.z;
-
-        this.x = nx;
-        this.y = ny;
-        this.z = nz;
-    }
     //https://www.wikiwand.com/en/Quaternions_and_spatial_rotation
-    applyQuaternionInPlace(quaternion: BABYLON.Quaternion) {
+    applyQuaternionInPlace(quaternion: Quaternion | BABYLON.Quaternion): void {
         let qx = quaternion.x;
         let qy = quaternion.y;
         let qz = quaternion.z;
@@ -525,55 +476,64 @@ export class Vector3 {
     }
 }
 
-export class Matrix {
-    m: number[][];
-    dimX: number;
-    dimY: number;
-    constructor(values: number[][]) {
-        this.m = values;
-        this.dimX = values[0].length || 0;
-        this.dimY = values.length;
+export class Quaternion {
+    private _x: number;
+    private _y: number;
+    private _z: number;
+    private _w: number;
+
+    constructor(x: number, y: number, z: number, w: number) {
+        this._x = x;
+        this._y = y;
+        this._z = z;
+        this._w = w;
     }
-    public static Rotation3DX(theta: number): Matrix {
-        return new Matrix([
-            [1, 0, 0],
-            [0, Math.cos(theta), -Math.sin(theta)],
-            [0, Math.sin(theta), Math.cos(theta)]
-        ]);
+
+    get x(): number {
+        return this._x;
     }
-    public static Rotation3DY(theta: number): Matrix {
-        return new Matrix([
-            [Math.cos(theta), 0, Math.sin(theta)],
-            [0, 1, 0],
-            [-Math.sin(theta), 0, Math.cos(theta)]
-        ]);
+    get y(): number {
+        return this._y;
     }
-    public static Rotation3DZ(theta: number): Matrix {
-        return new Matrix([
-            [Math.cos(theta), -Math.sin(theta), 0],
-            [Math.sin(theta), Math.cos(theta), 0],
-            [0, 0, 1]
-        ]);
+    get z(): number {
+        return this._z;
     }
-    public static Identity(n: number): Matrix {
-        let m: number[][] = [];
-        for (let i = 0; i < n; i++) {
-            m.push([]);
-            for (let j = 0; j < n; j++) {
-                m[i][j] = (i == j) ? 1 : 0;
-            }
-        }
-        return new Matrix(m);
+    get w(): number {
+        return this._w;
     }
-    public static Identity3D(): Matrix {
-        return this.Identity(3);
+
+    set x(value: number) {
+        this._x = value;
     }
-    static FromBABYLON(M: BABYLON.Matrix) {
-        let m = M.m;
-        return new Matrix([
-            [m[0], m[4], m[8]],
-            [m[1], m[5], m[9]],
-            [m[2], m[6], m[10]]
-        ]);
+    set y(value: number) {
+        this._y = value;
+    }
+    set z(value: number) {
+        this._z = value;
+    }
+    set w(value: number) {
+        this._w = value;
+    }
+
+    static Zero(): Quaternion {
+        return new Quaternion(0, 0, 0, 0);
+    }
+    static Identity(): Quaternion {
+        return new Quaternion(0, 0, 0, 1);
+    }
+    static FromArray(array: number[]): Quaternion {
+        return new Quaternion(array[0], array[1], array[2], array[3]);
+    }
+    static FromBABYLON(quaternion: BABYLON.Quaternion): Quaternion {
+        return new Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+    }
+    static RotationX(angle: number): Quaternion {
+        return new Quaternion(Math.sin(angle / 2), 0, 0, Math.cos(angle / 2));
+    }
+    static RotationY(angle: number): Quaternion {
+        return new Quaternion(0, Math.sin(angle / 2), 0, Math.cos(angle / 2));
+    }
+    static RotationZ(angle: number): Quaternion {
+        return new Quaternion(0, 0, Math.sin(angle / 2), Math.cos(angle / 2));
     }
 }

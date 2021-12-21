@@ -116,7 +116,7 @@ export class PlanetSide {
      */
     private updateLODRecursively(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
-        let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.parent.getWorldMatrix(), this.parent.rotationQuaternion!);
+        let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.parent.rotationQuaternion!);
 
         // position par rapport à la caméra
         let parentPosition = new Vector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
@@ -158,7 +158,8 @@ export class PlanetSide {
                 // mais si un chunk est très proche, il sera toujours visible (on est proche donc le dot2 peut être négatif alors que le chunk est visible)
                 //let c2 = dot2 > - 0.5 && absolutePosition.getMagnitude() > this.rootChunkLength / (2 ** (walked.length + 3));
 
-                tree.mesh.setEnabled(dot < 0.2);
+                // unstable
+                //tree.mesh.setEnabled(dot < 0.5);
 
                 return tree;
             } else {

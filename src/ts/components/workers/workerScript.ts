@@ -1,4 +1,4 @@
-import { getRotationMatrixFromDirection } from "../toolbox/direction";
+import { getQuaternionFromDirection } from "../toolbox/direction";
 import { simplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
 import { Vector3 } from "../toolbox/algebra";
 import { ridgedNoiseLayer } from "../terrain/landscape/ridgedNoiseLayer";
@@ -107,7 +107,7 @@ self.onmessage = e => {
 
         const vertexPerLine = subs + 1;
 
-        const rotationMatrix = getRotationMatrixFromDirection(direction);
+        const rotationQuaternion = getQuaternionFromDirection(direction);
 
         const verticesPositions = new Float32Array(vertexPerLine * vertexPerLine * 3);
         let faces: number[][] = [];
@@ -129,7 +129,7 @@ self.onmessage = e => {
                 vertexPosition.addInPlace(vecOffset);
 
                 // on le met sur la bonne face
-                vertexPosition.applyMatrixInPlace(rotationMatrix);
+                vertexPosition.applyQuaternionInPlace(rotationQuaternion);
 
                 // Théorie : https://math.stackexchange.com/questions/1071662/surface-normal-to-point-on-displaced-sphere
 

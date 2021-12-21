@@ -103,6 +103,52 @@ new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 70, oc
     ocean.settings.depthModifier = val / 10000;
 });
 
+function babylonToHex(color: BABYLON.Vector3): string {
+    let c2 = new BABYLON.Color3(color.x, color.y, color.z);
+    console.log(c2.toHexString());
+    return c2.toHexString();
+}
+
+let snowColorPicker = document.getElementById("snowColor") as HTMLInputElement;
+snowColorPicker.value = babylonToHex(planet.colorSettings.snowColor);
+snowColorPicker.addEventListener("input", () => {
+    let color = BABYLON.Color3.FromHexString(snowColorPicker.value);
+    planet.colorSettings.snowColor = new BABYLON.Vector3(color.r, color.g, color.b);
+    planet.updateColors();
+});
+
+let plainColorPicker = document.getElementById("plainColor") as HTMLInputElement;
+plainColorPicker.value = babylonToHex(planet.colorSettings.plainColor);
+plainColorPicker.addEventListener("input", () => {
+    let color = BABYLON.Color3.FromHexString(plainColorPicker.value);
+    planet.colorSettings.plainColor = new BABYLON.Vector3(color.r, color.g, color.b);
+    planet.updateColors();
+});
+
+let steepColorPicker = document.getElementById("steepColor") as HTMLInputElement;
+steepColorPicker.value = babylonToHex(planet.colorSettings.steepColor);
+steepColorPicker.addEventListener("input", () => {
+    let color = BABYLON.Color3.FromHexString(steepColorPicker.value);
+    planet.colorSettings.steepColor = new BABYLON.Vector3(color.r, color.g, color.b);
+    planet.updateColors();
+});
+
+let sandColorPicker = document.getElementById("sandColor") as HTMLInputElement;
+sandColorPicker.value = babylonToHex(planet.colorSettings.sandColor);
+sandColorPicker.addEventListener("input", () => {
+    let color = BABYLON.Color3.FromHexString(sandColorPicker.value);
+    planet.colorSettings.sandColor = new BABYLON.Vector3(color.r, color.g, color.b);
+    planet.updateColors();
+});
+
+/*let floorColorPicker = document.getElementById("sandColor") as HTMLInputElement;
+floorColorPicker.value = babylonToHex(planet.colorSettings.sandColor);
+floorColorPicker.addEventListener("input", () => {
+    let color = BABYLON.Color3.FromHexString(sandColorPicker.value);
+    planet.colorSettings.floorColor = new BABYLON.Vector3(color.r, color.g, color.b);
+    planet.updateColors();
+});*/
+
 new Slider("sandSize", document.getElementById("sandSize")!, 0, 300, planet.colorSettings.sandSize / 10, (val: number) => {
     planet.colorSettings.sandSize = val * 10;
     planet.updateColors();
@@ -222,12 +268,12 @@ new Slider("ringsFrequency", document.getElementById("ringsFrequency")!, 10, 100
     rings.settings.ringFrequency = val;
 });
 
-let sunOrientation = 180;
+let sunOrientation = 220;
 new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
     sunOrientation = val;
 });
 
-let rotationSpeed = 1;
+let rotationSpeed = 0.5;
 new Slider("planetRotation", document.getElementById("planetRotation")!, 0, 20, rotationSpeed * 10, (val: number) => {
     rotationSpeed = (val / 10) ** 5;
 });

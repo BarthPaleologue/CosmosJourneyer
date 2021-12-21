@@ -83,7 +83,7 @@ export class SolidPlanet extends Planet {
             waterLevel: 0.32,
             sandSize: 1,
             steepSharpness: 1,
-            normalSharpness: 0.6,
+            normalSharpness: 0.8,
 
             snowElevation01: 0.8,
             snowOffsetAmplitude: 0.05,

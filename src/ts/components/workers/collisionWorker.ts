@@ -3,7 +3,7 @@ import { SolidPlanet } from "../planet/solid/planet";
 import { PlanetManager } from "../planet/planetManager";
 import { PlayerControler } from "../player/playerControler";
 import { PlanetWorker } from "./planetWorker";
-import { Vector3 } from "../toolbox/algebra";
+import { Quaternion, Vector3 } from "../toolbox/algebra";
 
 export class CollisionWorker extends PlanetWorker {
     _player: PlayerControler;

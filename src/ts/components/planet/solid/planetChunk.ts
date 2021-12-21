@@ -1,7 +1,7 @@
 import { SolidPlanet } from "./planet";
 import { ChunkForge, TaskType } from "../../forge/chunkForge";
-import { Direction, getRotationMatrixFromDirection } from "../../toolbox/direction";
-import { Matrix, Vector, Vector3 } from "../../toolbox/algebra";
+import { Direction, getQuaternionFromDirection } from "../../toolbox/direction";
+import { Quaternion, Vector3 } from "../../toolbox/algebra";
 
 /**
  * Returns the node position in plane space
@@ -51,7 +51,7 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
  * @param direction direction of the parent plane
  * @returns the position in planet space
  */
-export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: number[], direction: Direction, worldMatrix: BABYLON.Matrix, planetRotationQuaternion: BABYLON.Quaternion): Vector3 {
+export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: number[], direction: Direction, planetRotationQuaternion: BABYLON.Quaternion): Vector3 {
 
     // on récupère la position dans le plan
     let position = getChunkPlaneSpacePositionFromPath(chunkLength, path);
@@ -59,15 +59,15 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
     // on l'offset pour préparer à récupérer la position dans le cube
     position.addInPlace(new Vector3(0, 0, -chunkLength / 2));
 
-    // on récupère la position dans le cube
-    let rotationMatrix = getRotationMatrixFromDirection(direction);
-    position = position.applyMatrix(rotationMatrix);
+    let rotationQuaternion = getQuaternionFromDirection(direction);
+    position.applyQuaternionInPlace(rotationQuaternion);
 
     // on projette cette position sur la sphère
-    position = position.normalize().scale(chunkLength / 2);
+    position.normalizeInPlace();
+    position.scaleInPlace(chunkLength / 2);
 
     // on match cette position avec la rotation de la planète
-    position.applyQuaternionInPlace(planetRotationQuaternion);
+    position.applyQuaternionInPlace(Quaternion.FromBABYLON(planetRotationQuaternion));
 
     // c'est prêt !
     return position;

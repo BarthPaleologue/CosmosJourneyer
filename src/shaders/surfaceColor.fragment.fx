@@ -226,7 +226,8 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 		float sandDominance = 1.0;
 		float delimiter = pow(completeNoise(unitPosition*2.0, 5, 1.7, 2.3), sandDominance);
 		float openFactor = tanherpFactor(delimiter, 32.0);
-		vec3 flatColor = lerp(plainColor, sandColor, openFactor);
+		vec3 vPlainColor = tanherp(plainColor,0.7*plainColor, noise(unitPosition*10.0), 10.0);
+		vec3 flatColor = lerp(vPlainColor, sandColor, openFactor);
 
 		// séparation biome sélectionné avec biome neige
 		float snowDominance = 1.0;
@@ -314,18 +315,20 @@ void main() {
 	vec3 color = computeColorAndNormal(elevation01, waterLevel01, latitude, slope, unitPosition, normal);
 
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
+	vec3 sphereNormalW = normalize(vec3(world * vec4(normalize(vPosition), 0.0)));
 
 	vec3 lightRay = normalize(v3LightPos - vPositionW); // light ray direction in world space
 	vec3 parallelLightRay = normalize(v3LightPos - planetPosition); // light ray direction in world space
 	
-	float ndl = max(0., dot(normalW, parallelLightRay)); // dimming factor due to light inclination relative to vertex normal in world space
+	float ndl2 = max(0.0, dot(sphereNormalW, parallelLightRay));
+	float ndl = max(0.0, dot(normalW, parallelLightRay)); // dimming factor due to light inclination relative to vertex normal in world space
 
 	// specular
 	vec3 angleW = normalize(viewDirectionW + lightRay);
     float specComp = max(0., dot(normalW, angleW));
     specComp = pow(specComp, 32.0);
 
-	vec3 screenColor = color.rgb * (ndl + specComp/10.0);
+	vec3 screenColor = color.rgb * (ndl2*ndl + specComp/10.0);
 
 	/*if(dot(vNormal, unitPosition) < 0.9) {
 
