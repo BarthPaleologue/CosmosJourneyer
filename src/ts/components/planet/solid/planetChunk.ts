@@ -73,20 +73,43 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
     return position;
 }
 
+import grass from "../../../../asset/textures/grass.png";
+
 // ne pas supprimer la classe pour cause de peut être des arbres et de l'herbe
 export class PlanetChunk {
 
     public readonly mesh: BABYLON.Mesh;
 
-    constructor(_path: number[], rootChunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: SolidPlanet) {
-        let id = `[D${direction}][P${_path.join("")}]`;
+    public grassParticleSystem: BABYLON.ParticleSystem | null = null;
+    public grassPositions: BABYLON.Vector3[] = [];
 
-        let position = getChunkPlaneSpacePositionFromPath(rootChunkLength, _path);
+    constructor(path: number[], rootChunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: SolidPlanet) {
+        let id = `[D${direction}][P${path.join("")}]`;
+
+        let position = getChunkPlaneSpacePositionFromPath(rootChunkLength, path);
 
         position.addInPlace(new Vector3(0, 0, -rootChunkLength / 2));
 
         this.mesh = new BABYLON.Mesh(`Chunk${id}`, scene);
         this.mesh.material = surfaceMaterial;
+
+        if (planet.maxDepth - path.length < 2) {
+            let gps = new BABYLON.ParticleSystem(`GrassParticles${id}`, 100, scene);
+            gps.emitter = this.mesh;
+            gps.particleTexture = new BABYLON.Texture(grass, scene);
+            gps.minSize = 100.0;
+            gps.maxSize = 100.0;
+            gps.color1 = new BABYLON.Color4(0.5, 0.5, 0.5, 1.0);
+            gps.color2 = new BABYLON.Color4(0.5, 0.5, 0.5, 1.0);
+
+            gps.minLifeTime = 10;
+            gps.maxLifeTime = 10;
+            gps.updateSpeed = 2.0;
+            gps.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
+            //gps.emitRate = 1000;
+
+            this.grassParticleSystem = gps;
+        }
 
         /*let debugMaterial = new BABYLON.StandardMaterial("debug", scene);
         debugMaterial.emissiveColor = BABYLON.Color3.Random();
@@ -107,9 +130,10 @@ export class PlanetChunk {
             planet: planet,
             position: position.toBabylon(),
             chunkLength: rootChunkLength,
-            depth: _path.length,
+            depth: path.length,
             direction: direction,
             mesh: this.mesh,
+            chunk: this,
         });
 
         // prise en compte de la rotation de la planète notamment

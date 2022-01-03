@@ -47,7 +47,7 @@ planet.attachNode.rotation.x = -0.2;
 
 let waterElevation = 20e2;
 
-planet.colorSettings.steepSharpness = 2;
+planet.colorSettings.steepSharpness = 1;
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0).scale(0.7).add(new BABYLON.Vector3(0.5, 0.3, 0.08).scale(0.3));
 
 planet.colorSettings.sandSize = 300;
@@ -179,8 +179,8 @@ new Slider("steepSnowDotLimit", document.getElementById("steepSnowDotLimit")!, 0
     planet.updateColors();
 });
 
-new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 40, planet.colorSettings.steepSharpness, (val: number) => {
-    planet.colorSettings.steepSharpness = val;
+new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 50, planet.colorSettings.steepSharpness * 10, (val: number) => {
+    planet.colorSettings.steepSharpness = val / 10;
     planet.updateColors();
 });
 

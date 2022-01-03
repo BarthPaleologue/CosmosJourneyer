@@ -15,8 +15,10 @@ export function simplexNoiseLayer(frequency: number, nbOctaves: number, decay: n
             let terrainData = simplex401(samplePoint);
             let localElevation = terrainData[0];
             let localGradient = new Vector3(terrainData[1], terrainData[2], terrainData[3]);
+            localGradient.divideInPlace(decay ** i);
+
             noiseValue += localElevation / Math.pow(decay, i);
-            noiseGradient.addInPlace(localGradient.divide(Math.pow(decay, i)));
+            noiseGradient.addInPlace(localGradient);
 
             totalAmplitude += 1.0 / Math.pow(decay, i);
         }

@@ -34,7 +34,7 @@ function initLayers() {
 
     bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 1.0, 0.0);
 
-    mountainsLayer = ridgedNoiseLayer(terrainSettings.mountainsFrequency, 6, 1.9, 2.0, 2.0, terrainSettings.mountainsMinValue);
+    mountainsLayer = ridgedNoiseLayer(terrainSettings.mountainsFrequency, 6, 1.9, 2.0, 3.0, terrainSettings.mountainsMinValue);
 }
 
 initLayers();
@@ -79,7 +79,7 @@ function terrainFunction(position: Vector3, gradient: Vector3): void {
     gradient.divideInPlace(terrainSettings.continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
     //gradient.divideInPlace(elevation);
 
-    gradient.divideInPlace(1.1);
+    gradient.divideInPlace(2);
 }
 
 self.onmessage = e => {
@@ -92,7 +92,7 @@ self.onmessage = e => {
         const subs = data.subdivisions;
         const depth = data.depth;
         const direction = data.direction;
-        const offset: number[] = data.position;
+        const chunkPosition: number[] = data.position;
 
         if (data.planetID != currentPlanetID) {
             currentPlanetID = data.planetID;
@@ -114,7 +114,10 @@ self.onmessage = e => {
 
         const normals = new Float32Array(verticesPositions.length);
 
-        let vecOffset = new Vector3(offset[0], offset[1], offset[2]);
+        let vecchunkPosition = new Vector3(chunkPosition[0], chunkPosition[1], chunkPosition[2]);
+
+        //vecchunkPosition.applyQuaternionInPlace(rotationQuaternion);
+
 
         for (let x = 0; x < vertexPerLine; ++x) {
             for (let y = 0; y < vertexPerLine; ++y) {
@@ -126,7 +129,7 @@ self.onmessage = e => {
                 vertexPosition.scaleInPlace(size);
 
                 // on le met au bon endroit de la face par défaut (Oxy devant)
-                vertexPosition.addInPlace(vecOffset);
+                vertexPosition.addInPlace(vecchunkPosition);
 
                 // on le met sur la bonne face
                 vertexPosition.applyQuaternionInPlace(rotationQuaternion);
@@ -145,7 +148,7 @@ self.onmessage = e => {
                 let vertexNormal = unitSphereCoords.subtract(h).normalize();
 
                 // on le ramène à l'origine
-                vertexPosition.addInPlace(vecOffset.normalize().scale(-planetRadius));
+                vertexPosition.addInPlace(vecchunkPosition.normalize().scale(-planetRadius));
 
                 verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition.x;
                 verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition.y;
@@ -178,12 +181,37 @@ self.onmessage = e => {
             }
         }
 
+        const grassPositions = new Float32Array(100 * 3);
+
+        vecchunkPosition.applyQuaternionInPlace(rotationQuaternion);
+
+        for (let i = 0; i < 100; ++i) {
+            let x = vecchunkPosition.x + Math.random() * size - size / 2;
+            let y = vecchunkPosition.y + Math.random() * size - size / 2;
+            let z = vecchunkPosition.z + Math.random() * size - size / 2;
+            let mag = Math.sqrt(x * x + y * y + z * z);
+            let gp = new Vector3(x, y, z);
+            gp.divideInPlace(mag);
+            gp.scaleInPlace(planetRadius);
+
+            terrainFunction(gp, new Vector3(1, 1, 1));
+
+            gp.addInPlace(gp.normalize().scale(100 / 2));
+
+            //gp = gp.normalize().scale(planetRadius * 1.01);
+
+            grassPositions[i * 3] = gp.x;
+            grassPositions[i * 3 + 1] = gp.y;
+            grassPositions[i * 3 + 2] = gp.z;
+        }
+
         self.postMessage({
             p: verticesPositions,
             i: indices,
             n: normals,
+            g: grassPositions
             //@ts-ignore
-        }, [verticesPositions.buffer, indices.buffer, normals.buffer]);
+        }, [verticesPositions.buffer, indices.buffer, normals.buffer, grassPositions.buffer]);
 
         // benchmark fait le 5/10/2021 (normale non analytique) : ~2s/chunk
         // benchmark fait le 12/11/2021 (normale non analyique) : ~0.5s/chunk

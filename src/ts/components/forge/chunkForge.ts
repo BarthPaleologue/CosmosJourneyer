@@ -1,4 +1,6 @@
 import { SolidPlanet } from "../planet/solid/planet";
+import { PlanetChunk } from "../planet/solid/planetChunk";
+import { Quaternion, Vector3 } from "../toolbox/algebra";
 import { Direction } from "../toolbox/direction";
 import { BuilderWorker } from "../workers/builderWorker";
 import { buildData } from "./buildData";
@@ -22,12 +24,16 @@ export interface BuildTask extends Task {
     direction: Direction,
     position: BABYLON.Vector3,
     mesh: BABYLON.Mesh;
+    chunk: PlanetChunk;
 }
 
 export interface ApplyTask extends Task {
     taskType: TaskType.Apply,
     mesh: BABYLON.Mesh,
     vertexData: BABYLON.VertexData,
+    grassData: Float32Array,
+    chunk: PlanetChunk;
+    planet: SolidPlanet;
     callbackTasks: DeleteTask[];
 }
 
@@ -104,12 +110,17 @@ export class ChunkForge {
                     vertexData.indices = e.data.i as Uint16Array;
                     vertexData.normals = e.data.n as Float32Array;
 
+                    let grassData = e.data.g as Float32Array;
+
                     this.applyTasks.push({
                         id: task.id,
                         taskType: TaskType.Apply,
                         mesh: task.mesh,
                         vertexData: vertexData,
+                        grassData: grassData,
+                        chunk: task.chunk,
                         callbackTasks: callbackTasks,
+                        planet: task.planet,
                     });
 
                     this.finishedWorkers.push(worker);
@@ -145,6 +156,28 @@ export class ChunkForge {
             let task = this.applyTasks.shift()!;
             task.vertexData.applyToMesh(task.mesh, false);
             depthRenderer.getDepthMap().renderList!.push(task.mesh);
+
+            task.chunk.grassPositions = [];
+            if (task.chunk.grassParticleSystem) {
+                for (let i = 0; i < task.grassData.length; i += 3) {
+                    task.chunk.grassPositions.push(new BABYLON.Vector3(task.grassData[i], task.grassData[i + 1], task.grassData[i + 2]));
+                }
+                task.chunk.grassParticleSystem.updateFunction = (particles: BABYLON.Particle[]) => {
+                    for (let i = 0; i < particles.length; ++i) {
+                        let particle = particles[i];
+
+                        let quat = task.planet.attachNode.rotationQuaternion!.clone();
+                        let quat2 = Quaternion.FromBABYLON(quat);
+                        let gp = Vector3.FromBABYLON3(task.chunk.grassPositions[i]);
+                        gp.applyQuaternionInPlace(quat2);
+
+                        particle.position.x = task.planet.getAbsolutePosition().x + gp.x;
+                        particle.position.z = task.planet.getAbsolutePosition().z + gp.z;
+                        particle.position.y = task.planet.getAbsolutePosition().y + gp.y;
+                    }
+                };
+                task.chunk.grassParticleSystem.start();
+            }
 
             this.trashCan = this.trashCan.concat(task.callbackTasks);
         }
