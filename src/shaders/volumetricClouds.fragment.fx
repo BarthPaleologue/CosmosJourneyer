@@ -1,7 +1,7 @@
-precision mediump float;
+precision lowp float;
 
 #define PI 3.1415926535897932
-#define POINTS_FROM_CAMERA 7 // number sample points along camera ray
+#define POINTS_FROM_CAMERA 4 // number sample points along camera ray
 #define OPTICAL_DEPTH_POINTS 4 // number sample points along light ray
 
 // varying
@@ -405,7 +405,8 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
     }
 
     impactPoint = max(0.0, impactPoint); // cannot be negative (the ray starts where the camera is in such a case)
-    escapePoint = min(maximumDistance, escapePoint); // occlusion with other scene objects
+    //impactPoint = min(maximumDistance, impactPoint); // cannot be longer than the maximum distance
+	escapePoint = min(maximumDistance, escapePoint); // occlusion with other scene objects
 
     float distanceThroughAtmosphere = max(0.0, escapePoint - impactPoint); // probably doesn't need the max but for the sake of coherence the distance cannot be negative
     
@@ -415,11 +416,11 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     vec3 light = vec3(calculateLight(firstPointInAtmosphere, rayDir, distanceThroughAtmosphere, originalColor)); // calculate scattering
     
-	/*float ndl = -dot(normalize(rayOrigin + rayDir * impactPoint - planetPosition), normalize(rayOrigin + rayDir * impactPoint - sunPosition));
+	float ndl = -dot(normalize(rayOrigin + rayDir * impactPoint - planetPosition), normalize(rayOrigin + rayDir * impactPoint - sunPosition));
 
-	ndl = saturate(ndl + 0.2);
+	//ndl = saturate(ndl + 0.2);
 
-	light *= ndl;*/
+	light = max(light * ndl, 0.0);
 	//light *= saturate(max(1.0 - pow(1.0 - ndl, 4.0), 0.0));
 
     return originalColor * (1.0 - light) + light; // blending scattered color with original color

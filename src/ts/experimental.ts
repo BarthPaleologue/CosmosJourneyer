@@ -59,8 +59,6 @@ planetManager.add(planet);
 
 
 let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + waterElevation, light, player.camera, scene);
-ocean.settings.alphaModifier = 0.00002;
-ocean.settings.depthModifier = 0.004;
 
 let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, planetRadius, waterElevation, planetRadius + 15e3, light, player.camera, scene);
 
@@ -95,8 +93,8 @@ new Slider("oceanLevel", document.getElementById("oceanLevel")!, 0, 100, (ocean.
 });
 
 
-new Slider("alphaModifier", document.getElementById("alphaModifier")!, 0, 40, ocean.settings.alphaModifier * 100000, (val: number) => {
-    ocean.settings.alphaModifier = val / 100000;
+new Slider("alphaModifier", document.getElementById("alphaModifier")!, 0, 200, ocean.settings.alphaModifier * 10000, (val: number) => {
+    ocean.settings.alphaModifier = val / 10000;
 });
 
 new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 70, ocean.settings.depthModifier * 10000, (val: number) => {

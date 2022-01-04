@@ -73,43 +73,44 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
     return position;
 }
 
-import grass from "../../../../asset/textures/grass.png";
+//import grass from "../../../../asset/textures/grass.png";
 
 // ne pas supprimer la classe pour cause de peut être des arbres et de l'herbe
 export class PlanetChunk {
 
     public readonly mesh: BABYLON.Mesh;
 
-    public grassParticleSystem: BABYLON.ParticleSystem | null = null;
+    public grassParticleSystem: BABYLON.SolidParticleSystem | null = null;
     public grassPositions: BABYLON.Vector3[] = [];
 
     constructor(path: number[], rootChunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: SolidPlanet) {
         let id = `[D${direction}][P${path.join("")}]`;
 
+        // computing the position of the chunk on the side of the planet
         let position = getChunkPlaneSpacePositionFromPath(rootChunkLength, path);
 
-        position.addInPlace(new Vector3(0, 0, -rootChunkLength / 2));
+        // offseting from planet center to position on the side (default side then rotation for all sides)
+        position.z -= rootChunkLength / 2;
 
         this.mesh = new BABYLON.Mesh(`Chunk${id}`, scene);
         this.mesh.material = surfaceMaterial;
 
-        if (planet.maxDepth - path.length < 2) {
-            let gps = new BABYLON.ParticleSystem(`GrassParticles${id}`, 100, scene);
-            gps.emitter = this.mesh;
-            gps.particleTexture = new BABYLON.Texture(grass, scene);
-            gps.minSize = 100.0;
-            gps.maxSize = 100.0;
-            gps.color1 = new BABYLON.Color4(0.5, 0.5, 0.5, 1.0);
-            gps.color2 = new BABYLON.Color4(0.5, 0.5, 0.5, 1.0);
+        // Grass implementation with SPS
+        /*if (planet.maxDepth - path.length < 2) {
+            let particle = BABYLON.Mesh.CreateBox(`Particle${id}`, 100, scene);
+            let mat = new BABYLON.StandardMaterial(`Particle${id}`, scene);
+            mat.emissiveColor = BABYLON.Color3.Red();
+            mat.backFaceCulling = false;
+            mat.wireframe = true;
+            particle.material = mat;
 
-            gps.minLifeTime = 10;
-            gps.maxLifeTime = 10;
-            gps.updateSpeed = 2.0;
-            gps.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
-            //gps.emitRate = 1000;
+            let gps = new BABYLON.SolidParticleSystem(`GrassParticles${id}`, scene);
+            gps.addShape(particle, 100);
+            gps.buildMesh();
+            gps.mesh.parent = this.mesh;
 
             this.grassParticleSystem = gps;
-        }
+        }*/
 
         /*let debugMaterial = new BABYLON.StandardMaterial("debug", scene);
         debugMaterial.emissiveColor = BABYLON.Color3.Random();
@@ -122,8 +123,11 @@ export class PlanetChunk {
         //this.mesh.material = debugMaterial;
 
         this.mesh.parent = parentNode;
-        this.mesh.isBlocker = true;
 
+        //needed for potential lens flares
+        //this.mesh.isBlocker = true;
+
+        // revoir les paramètres passés dans la taches => trouver les dénos communs
         chunkForge.addTask({
             taskType: TaskType.Build,
             id: id,
@@ -136,10 +140,13 @@ export class PlanetChunk {
             chunk: this,
         });
 
-        // prise en compte de la rotation de la planète notamment
-        position = position.normalize().scale(rootChunkLength / 2);
+        // sphérisation du cube
+        // note : on sphérise après car le worker script calcule les positions à partir du cube
+        position.normalizeInPlace();
+        position.scaleInPlace(rootChunkLength / 2);
 
-        this.mesh.position = position.toBabylon();
-
+        this.mesh.position.x = position.x;
+        this.mesh.position.y = position.y;
+        this.mesh.position.z = position.z;
     }
 }

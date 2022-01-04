@@ -51,8 +51,8 @@ export class OceanPostProcess extends BABYLON.PostProcess {
 
         this.settings = {
             oceanRadius: oceanRadius,
-            depthModifier: 1.0,
-            alphaModifier: 0.1,
+            depthModifier: 0.002,
+            alphaModifier: 0.007,
             specularPower: 2,
             smoothness: 0.9,
         };

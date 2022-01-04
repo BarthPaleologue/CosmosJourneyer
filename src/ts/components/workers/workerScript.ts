@@ -197,6 +197,7 @@ self.onmessage = e => {
             terrainFunction(gp, new Vector3(1, 1, 1));
 
             gp.addInPlace(gp.normalize().scale(100 / 2));
+            gp.subtractInPlace(vecchunkPosition);
 
             //gp = gp.normalize().scale(planetRadius * 1.01);
 

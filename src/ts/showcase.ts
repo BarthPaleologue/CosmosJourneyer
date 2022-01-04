@@ -17,6 +17,7 @@ import lensflare from "../asset/textures/lensflare3.png";
 import lensflare2 from "../asset/textures/lensflare4.png";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
 import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
+import { VolumetricCloudsPostProcess } from "./components/postProcesses/volumetricCloudsPostProcess";
 
 style.default;
 
@@ -94,10 +95,11 @@ planet.attachNode.rotate(BABYLON.Axis.X, 0.2, BABYLON.Space.WORLD);
 //planet.attachNode.rotation.x = 0.2;
 
 let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun, player.camera, scene);
-ocean.settings.alphaModifier = 0.00002;
-ocean.settings.depthModifier = 0.004;
+//ocean.settings.alphaModifier = 0.00002;
+//ocean.settings.depthModifier = 0.004;
 
 let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius, waterElevation, radius + 15e3, sun, player.camera, scene);
+//let volClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + waterElevation + 10e3, radius + waterElevation + 30e3, sun, player.camera, scene);
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun, player.camera, scene);
 atmosphere.settings.intensity = 20;
@@ -162,7 +164,7 @@ document.addEventListener("keydown", e => {
     }
     if (e.key == "u") atmosphere.settings.intensity = (atmosphere.settings.intensity == 0) ? 15 : 0;
     if (e.key == "o") ocean.settings.oceanRadius = (ocean.settings.oceanRadius == 0) ? radius + waterElevation : 0;
-    if (e.key == "y") flatClouds.settings.cloudLayerRadius = (flatClouds.settings.cloudLayerRadius == 0) ? radius + 15e3 : 0;
+    //if (e.key == "y") flatClouds.settings.cloudLayerRadius = (flatClouds.settings.cloudLayerRadius == 0) ? radius + 15e3 : 0;
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
     if (e.key == "w" && player.nearestPlanet != null) player.nearestPlanet.surfaceMaterial.wireframe = !player.nearestPlanet.surfaceMaterial.wireframe;
 });
@@ -201,6 +203,10 @@ scene.executeWhenReady(() => {
 
         planetManager.moveEverything(deplacement);
         sun.position.addInPlace(deplacement);
+
+        /*for (const mesh of scene.meshes) {
+            mesh.position.addInPlace(deplacement);
+        }*/
 
         if (!collisionWorker.isBusy() && player.nearestPlanet != null) {
             collisionWorker.checkCollision(player.nearestPlanet);

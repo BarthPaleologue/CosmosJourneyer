@@ -160,12 +160,14 @@ void main() {
             } else {
                 vec3 samplePoint = cameraPosition + impactPoint * rayDir;
                 float ringDensity = ringDensityAtPoint(samplePoint);
-                vec3 ringColor = lerp(vec3(ringDensity), screenColor, 0.4);
+                float ringOpacity = 0.4;
+                vec3 ringColor = lerp(vec3(ringDensity), screenColor, ringOpacity);
 
                 // hypothèse des rayons parallèles
                 vec3 rayToSun = normalize(sunPosition - planetPosition);
                 float t2, t3;
                 if(rayIntersectSphere(samplePoint, rayToSun, planetPosition, planetRadius, t2,t3)) {
+                    //si intersection avec la planète, ombre
                     ringColor *= 0.1;
                 }
 

@@ -157,27 +157,34 @@ export class ChunkForge {
             task.vertexData.applyToMesh(task.mesh, false);
             depthRenderer.getDepthMap().renderList!.push(task.mesh);
 
-            task.chunk.grassPositions = [];
+            //let chunkMesh = task.chunk.mesh;
+            //let grassSPS = task.chunk.grassParticleSystem;
+
+            /*task.chunk.grassPositions = [];
             if (task.chunk.grassParticleSystem) {
                 for (let i = 0; i < task.grassData.length; i += 3) {
                     task.chunk.grassPositions.push(new BABYLON.Vector3(task.grassData[i], task.grassData[i + 1], task.grassData[i + 2]));
                 }
-                task.chunk.grassParticleSystem.updateFunction = (particles: BABYLON.Particle[]) => {
-                    for (let i = 0; i < particles.length; ++i) {
-                        let particle = particles[i];
+                task.chunk.grassParticleSystem.initParticles = () => {
+                    for (let i = 0; i < task.chunk.grassParticleSystem!.particles.length; ++i) {
+                        let particle = task.chunk.grassParticleSystem!.particles[i];
 
                         let quat = task.planet.attachNode.rotationQuaternion!.clone();
                         let quat2 = Quaternion.FromBABYLON(quat);
                         let gp = Vector3.FromBABYLON3(task.chunk.grassPositions[i]);
                         gp.applyQuaternionInPlace(quat2);
 
-                        particle.position.x = task.planet.getAbsolutePosition().x + gp.x;
-                        particle.position.z = task.planet.getAbsolutePosition().z + gp.z;
-                        particle.position.y = task.planet.getAbsolutePosition().y + gp.y;
+                        particle.position.x = task.planet.attachNode.getAbsolutePosition().x + gp.x;
+                        particle.position.z = task.planet.attachNode.getAbsolutePosition().z + gp.z;
+                        particle.position.y = task.planet.attachNode.getAbsolutePosition().y + gp.y;
                     }
                 };
-                task.chunk.grassParticleSystem.start();
-            }
+                task.chunk.grassParticleSystem.buildMesh();
+                task.chunk.grassParticleSystem.initParticles();
+                task.chunk.grassParticleSystem.setParticles();
+                task.chunk.grassParticleSystem.buildMesh();
+                task.chunk.grassParticleSystem.mesh.parent = task.chunk.mesh;
+            }*/
 
             this.trashCan = this.trashCan.concat(task.callbackTasks);
         }
