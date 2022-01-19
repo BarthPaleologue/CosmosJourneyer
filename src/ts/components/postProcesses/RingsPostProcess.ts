@@ -2,6 +2,7 @@ interface RingsSettings {
     ringStart: number;
     ringEnd: number;
     ringFrequency: number;
+    ringOpacity: number;
 }
 
 export class RingsPostProcess extends BABYLON.PostProcess {
@@ -33,6 +34,7 @@ export class RingsPostProcess extends BABYLON.PostProcess {
             "ringStart",
             "ringEnd",
             "ringFrequency",
+            "ringOpacity",
 
             "planetWorldMatrix",
 
@@ -46,7 +48,8 @@ export class RingsPostProcess extends BABYLON.PostProcess {
         this.settings = {
             ringStart: 1.5,
             ringEnd: 2.5,
-            ringFrequency: 30.0
+            ringFrequency: 30.0,
+            ringOpacity: 0.3
         };
 
         this.camera = camera;
@@ -75,6 +78,7 @@ export class RingsPostProcess extends BABYLON.PostProcess {
             effect.setFloat("ringStart", this.settings.ringStart);
             effect.setFloat("ringEnd", this.settings.ringEnd);
             effect.setFloat("ringFrequency", this.settings.ringFrequency);
+            effect.setFloat("ringOpacity", this.settings.ringOpacity);
 
             effect.setMatrix("projection", this.camera.getProjectionMatrix());
             effect.setMatrix("view", this.camera.getViewMatrix());

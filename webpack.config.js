@@ -13,7 +13,8 @@ const config = {
 
   entry: {
     showcase: ["./src/ts/showcase.ts"],
-    experimental: ["./src/ts/experimental.ts"]
+    experimental: ["./src/ts/experimental.ts"],
+    random: ["./src/ts/random.ts"]
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -45,7 +46,12 @@ const config = {
       filename: "controler.html",
       template: path.join(htmlPath, "controler.html"),
       chunks: ["experimental"]
-    })
+    }),
+    new HtmlWebpackPlugin({
+      filename: "random.html",
+      template: path.join(htmlPath, "random.html"),
+      chunks: ["random"]
+    }),
 
   ],
 

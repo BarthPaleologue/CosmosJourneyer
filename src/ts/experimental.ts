@@ -266,6 +266,10 @@ new Slider("ringsFrequency", document.getElementById("ringsFrequency")!, 10, 100
     rings.settings.ringFrequency = val;
 });
 
+new Slider("ringsOpacity", document.getElementById("ringsOpacity")!, 0, 100, rings.settings.ringOpacity * 100, (val: number) => {
+    rings.settings.ringOpacity = val / 100;
+});
+
 let sunOrientation = 220;
 new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
     sunOrientation = val;

@@ -25,6 +25,7 @@ uniform float waterLevel; // water level
 uniform float ringStart; // ring start
 uniform float ringEnd; // ring end
 uniform float ringFrequency; // ring frequency
+uniform float ringOpacity; // ring opacity
 
 uniform mat4 planetWorldMatrix;
 
@@ -160,7 +161,6 @@ void main() {
             } else {
                 vec3 samplePoint = cameraPosition + impactPoint * rayDir;
                 float ringDensity = ringDensityAtPoint(samplePoint);
-                float ringOpacity = 0.4;
                 vec3 ringColor = lerp(vec3(ringDensity), screenColor, ringOpacity);
 
                 // hypothèse des rayons parallèles

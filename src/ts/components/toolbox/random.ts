@@ -13,3 +13,7 @@ export function uniformRandomSphere(): number[] {
 
     return [x, y, z];
 }
+
+export function centeredRandom(): number {
+    return (Math.random() - 0.5) * 2;
+}
