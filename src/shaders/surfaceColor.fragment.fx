@@ -100,6 +100,10 @@ vec2 lerp(vec2 vector1, vec2 vector2, float x) {
 	return x * vector1 + (1.0 - x) * vector2;
 }
 
+float lerp(float value1, float value2, float x) {
+	return x * value1 + (1.0 - x) * value2;
+}
+
 vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, float bottomFactor, float sandFactor, float plainFactor, float snowFactor, float steepFactor, float scale, float sharpness, float normalStrength) {
 
 	vec3 tBottomNormalX = texture2D(bottomNormalMap, position.zy * scale).rgb;
@@ -206,7 +210,7 @@ vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
 
 
 
-vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude, float slope, vec3 unitPosition, out vec3 normal) {
+vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude, float slope, vec3 unitPosition, out vec3 normal, float temperature, float temperature01, float moisture01) {
 	
 	normal = vNormal;
 
@@ -281,6 +285,19 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 
 }
 
+// https://www.omnicalculator.com/chemistry/boiling-point
+// https://www.wikiwand.com/en/Boiling_point#/Saturation_temperature_and_pressure
+// https://www.desmos.com/calculator/ctxerbh48s
+float waterBoilingTemperatureCelsius(float pressure) {
+	float P1 = 1.0;
+	float P2 = pressure;
+	float T1 = 100.0 + 273.15;
+	float DH = 40660.0;
+	float R = 8.314;
+
+	return (1.0 / ((1.0 / T1) + log(P1 / P2) * (R / DH))) - 273.15;
+}
+
 void main() {
 
 	vec3 viewDirectionW = normalize(playerPosition - vPositionW); // view direction in world space
@@ -297,22 +314,37 @@ void main() {
 	float waterLevel01 = waterLevel / maxElevation;
 
 	float latitude = unitPosition.y;
-	float absLatitude = abs(latitude);
+	float absLatitude01 = abs(latitude);
 
-	float temperatureHeightFalloff = 1.0;
-	float temperatureLatitudeSharpness = 0.1;
-	float temperature = pow(1.0 - absLatitude, temperatureLatitudeSharpness); 
-	temperature *= exp(-elevation01 * temperatureHeightFalloff);
+	float pressure = 1.0;
+	float waterMeltingPointTemperature = 0.0; // fairly good approximation
+	float waterSublimationPression = 0.006;
 
-	float elevationFromWaterLevel = abs(elevation01 - waterLevel01);
+	float minTemperature = -50.0;
+	float maxTemperature = 50.0;
 
-	float moisture01 = completeNoise(unitPosition * 5.0, 3, 2.0, 2.0);
+	float temperatureHeightFalloff = 3.0;
+	float temperatureLatitudeFalloff = 1.0;
+	// https://www.researchgate.net/profile/Anders-Levermann/publication/274494740/figure/fig3/AS:391827732615174@1470430419170/a-Surface-air-temperature-as-a-function-of-latitude-for-data-averaged-over-1961-90-for.png
+	// https://www.desmos.com/calculator/apezlfvwic
+	float temperature01 = -pow(temperatureLatitudeFalloff * absLatitude01, 3.0) + 1.0; // la température diminue vers les pôles
+	temperature01 *= exp(-elevation01 * temperatureHeightFalloff); // la température diminue exponentiellement avec l'altitude
+	temperature01 += (completeNoise(unitPosition * 20.0, 3, 2.0, 2.0) - 0.5)/ 4.0; // on ajoute des fluctuations locales
+	temperature01 = clamp(temperature01, 0.0, 1.0);
+
+	float temperature = lerp(maxTemperature, minTemperature, temperature01);//minTemperature * (1.0 - temperature01) + temperature01 * maxTemperature;
+	
+	float moisture01 = 0.0;
+	if(maxTemperature > 0.0 && minTemperature < waterBoilingTemperatureCelsius(pressure)) {
+		// if there is liquid water on the surface
+		moisture01 += completeNoise(unitPosition * 2.0, 5, 2.0, 2.0);
+	}
 
 	float slope = 1.0 - dot(unitPosition, vNormal);
 
 	vec3 normal = vNormal;
 
-	vec3 color = computeColorAndNormal(elevation01, waterLevel01, latitude, slope, unitPosition, normal);
+	vec3 color = computeColorAndNormal(elevation01, waterLevel01, latitude, slope, unitPosition, normal, temperature, temperature01, moisture01);
 
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 	vec3 sphereNormalW = normalize(vec3(world * vec4(normalize(vPosition), 0.0)));
@@ -329,6 +361,11 @@ void main() {
     specComp = pow(specComp, 32.0);
 
 	vec3 screenColor = color.rgb * (ndl2*ndl + specComp/10.0);
+
+	//screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), moisture01);
+	screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0), temperature01);
+
+	if(temperature < 0.0) screenColor = vec3(1.0, 1.0, 1.0);
 
 	/*if(dot(vNormal, unitPosition) < 0.9) {
 
