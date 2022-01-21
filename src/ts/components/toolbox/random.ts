@@ -17,3 +17,17 @@ export function uniformRandomSphere(): number[] {
 export function centeredRandom(): number {
     return (Math.random() - 0.5) * 2;
 }
+
+export function randInt(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export function rand(min = 0, max = 1): number {
+    return Math.random() * (max - min) + min;
+}
+
+export function nrand(mean: number, std: number): number {
+    // Box-Muller transform
+    //https://www.baeldung.com/cs/uniform-to-normal-distribution
+    return mean + std * Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random());
+}

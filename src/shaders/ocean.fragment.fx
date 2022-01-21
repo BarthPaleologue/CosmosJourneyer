@@ -168,8 +168,8 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
     float ndl = max(dot(planetNormal, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
 
     //TODO : en faire un uniform
-    float smoothness = 0.5;
-    float specularAngle = acos(dot(normalize(sunDir - rayDir), normalWave));
+    float smoothness = 0.8;
+    float specularAngle = acos(dot(normalize(sunDir - rayDir), planetNormal));
     float specularExponent = specularAngle / (1.0 - smoothness);
     float specularHighlight = exp(-specularExponent * specularExponent);
 

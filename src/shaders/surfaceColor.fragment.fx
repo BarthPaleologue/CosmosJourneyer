@@ -11,7 +11,7 @@ uniform mat4 world;
 uniform vec3 playerPosition; // camera position in world space
 uniform float cameraNear;
 uniform float cameraFar;
-uniform vec3 v3LightPos; // light position in world space
+uniform vec3 sunPosition; // light position in world space
 uniform vec3 planetPosition;
 uniform mat4 view;
 uniform mat4 projection;
@@ -45,6 +45,9 @@ uniform vec3 steepColor; // the color of steep slopes
 uniform vec3 plainColor; // the color of plains at the bottom of moutains
 uniform vec3 sandColor; // the color of the sand
 vec3 toundraColor = vec3(40.0, 40.0, 40.0) / 255.0;
+
+uniform float minTemperature;
+uniform float maxTemperature;
 
 varying vec3 vPosition; // position of the vertex in sphere space
 varying vec3 vNormal; // normal of the vertex in sphere space
@@ -197,9 +200,13 @@ vec3 lnear(vec3 value1, vec3 value2, float x, float summitX, float range) {
 
 //https://www.desmos.com/calculator/8etk6vdfzi
 
+float tanh01(float x) {
+	return (tanh(x) + 1.0) / 2.0;
+} 
+
 float tanherpFactor(float x, float s) {
 	float sampleValue = (x - 0.5) * s;
-	return (tanh(sampleValue) + 1.0) / 2.0;
+	return tanh01(sampleValue);
 }
 
 vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
@@ -210,15 +217,13 @@ vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
 
 
 
-vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude, float slope, vec3 unitPosition, out vec3 normal, float temperature, float temperature01, float moisture01, float waterMeltingPoint01) {
+vec3 computeColorAndNormal(float elevation01, float waterLevel01, float slope, out vec3 normal, float temperature01, float moisture01, float waterMeltingPoint01) {
 	
 	normal = vNormal;
 
-	float snowOffset = (completeNoise(unitPosition * 10.0, 5, 1.5, snowLacunarity) - 0.5) * 2.0;
-
-	float plainFactor = 0.0, 
-	sandFactor = 0.0, 
-	bottomFactor = 0.0, 
+	float plainFactor = 0.0,
+	sandFactor = 0.0,
+	bottomFactor = 0.0,
 	snowFactor = 0.0, 
 	steepFactor = 0.0;
 
@@ -227,16 +232,11 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 	if(elevation01 > waterLevel01) {
 
 		// séparation biome désert biome plaine
-		float sandDominance = 1.0;
-		float delimiter = pow(completeNoise(unitPosition*2.0, 5, 1.7, 2.3), sandDominance);
-		float openFactor = tanherpFactor(delimiter, 32.0);
-		vec3 vPlainColor = tanherp(plainColor,0.7*plainColor, noise(unitPosition*10.0), 10.0);
+		float openFactor = tanherpFactor(moisture01, 32.0);
+		vec3 vPlainColor = tanherp(plainColor, 0.7 * plainColor, noise(vPosition/10000.0), 3.0);
 		vec3 flatColor = lerp(vPlainColor, sandColor, openFactor);
 
 		// séparation biome sélectionné avec biome neige
-		float snowDominance = 1.0;
-		// ceci doit être mieux conçu
-		//float snowDelimiter = 2.2 * (elevation01 / snowElevation01 + (completeNoise(unitPosition*1000.0, 6, 1.7, 2.3)-0.5)/10.0) * (1.0 - exp(-abs(latitude) * snowLatitudePersistence));
 		float snowColorFactor = tanherpFactor(temperature01 + (0.5 - waterMeltingPoint01), 64.0);
 		flatColor = lerp(flatColor, snowColor, snowColorFactor);
 		snowFactor = 1.0 - snowColorFactor;
@@ -282,7 +282,6 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.00001, normalSharpness, 0.4); // plus grand
 
 	return outColor;
-
 }
 
 // https://www.omnicalculator.com/chemistry/boiling-point
@@ -299,88 +298,77 @@ float waterBoilingPointCelsius(float pressure) {
 }
 
 void main() {
+	vec3 viewRayW = normalize(playerPosition - vPositionW); // view direction in world space
+	vec3 parallelLightRayW = normalize(sunPosition - planetPosition); // light ray direction in world space
+	vec3 lightRayW = normalize(sunPosition - vPositionW); // light ray direction in world space
 
-	vec3 viewDirectionW = normalize(playerPosition - vPositionW); // view direction in world space
+	vec3 sphereNormalW = normalize(vec3(world * vec4(normalize(vPosition), 0.0)));
+	float ndl = max(0.0, dot(sphereNormalW, parallelLightRayW));
 
-	float distance = length(playerPosition - vPositionW);
-
+	// la unitPosition ne prend pas en compte la rotation de la planète
 	vec3 unitPosition = normalize(vPosition);
+	
+	float latitude = unitPosition.y;
+	float absLatitude01 = abs(latitude);
 	
 	float elevation = length(vPosition) - planetRadius;
 
 	float elevation01 = elevation / maxElevation;
-	elevation01 = max(0.0, elevation01);
-
 	float waterLevel01 = waterLevel / maxElevation;
 
-	float latitude = unitPosition.y;
-	float absLatitude01 = abs(latitude);
+	float slope = 1.0 - dot(unitPosition, vNormal);
 
-	float minTemperature = -50.0;
-	float maxTemperature = 50.0;
+	/// Analyse Physique de la planète
 
-
+	float dayDuration = 1.0;
+	
+	// pressions
 	float pressure = 1.0;
+	float waterSublimationPression = 0.006; //https://www.wikiwand.com/en/Sublimation_(phase_transition)#/Water
+	
+	// Températures
+	
 	float waterMeltingPoint = 0.0; // fairly good approximation
 	float waterMeltingPoint01 = -minTemperature / (maxTemperature - minTemperature);
-	float waterSublimationPression = 0.006;
-
+	float waterBoilingPoint01 = (waterBoilingPointCelsius(pressure) - minTemperature) / (maxTemperature - minTemperature);
 
 	float temperatureHeightFalloff = 3.0;
 	float temperatureLatitudeFalloff = 1.0;
+	float temperatureRotationFactor = tanh(dayDuration * 0.2);
 	// https://www.researchgate.net/profile/Anders-Levermann/publication/274494740/figure/fig3/AS:391827732615174@1470430419170/a-Surface-air-temperature-as-a-function-of-latitude-for-data-averaged-over-1961-90-for.png
 	// https://www.desmos.com/calculator/apezlfvwic
 	float temperature01 = -pow(temperatureLatitudeFalloff * absLatitude01, 3.0) + 1.0; // la température diminue vers les pôles
 	temperature01 *= exp(-elevation01 * temperatureHeightFalloff); // la température diminue exponentiellement avec l'altitude
 	temperature01 += (completeNoise(unitPosition * 300.0, 6, 1.7, 2.3) - 0.5) / 4.0; // on ajoute des fluctuations locales
-	temperature01 = clamp(temperature01, 0.0, 1.0);
+	temperature01 *= (ndl * temperatureRotationFactor) + 1.0 - temperatureRotationFactor; // la température diminue la nuit
+	temperature01 = clamp(temperature01, 0.0, 1.0); // on reste dans la range [0, 1]
 
-	float temperature = lerp(maxTemperature, minTemperature, temperature01);//minTemperature * (1.0 - temperature01) + temperature01 * maxTemperature;
-	
-	float moisture01 = 0.0;
-	if(waterMeltingPoint01 > 0.0 && waterMeltingPoint01 < 1.0 && minTemperature < waterBoilingPointCelsius(pressure)) {
+	float temperature = lerp(maxTemperature, minTemperature, temperature01);
+
+	// moisture
+	float moisture01 = 0.0; // 0.0 = sec, 1.0 = humid : sec par défaut
+	if(waterMeltingPoint01 < 1.0) {
 		// if there is liquid water on the surface
-		moisture01 += completeNoise(unitPosition * 2.0, 5, 2.0, 2.0);
+		moisture01 += completeNoise(unitPosition * 2.0, 5, 2.0, 2.0) * sqrt(1.0-waterMeltingPoint01) * waterBoilingPoint01;
 	}
+	moisture01 = clamp(moisture01, 0.0, 1.0);
 
-	float slope = 1.0 - dot(unitPosition, vNormal);
-
+	// calcul de la couleur et de la normale
 	vec3 normal = vNormal;
-
-	vec3 color = computeColorAndNormal(elevation01, waterLevel01, latitude, slope, unitPosition, normal, temperature, temperature01, moisture01, waterMeltingPoint01);
-
-	// snow scattering de qualité
-	//color = tanherp(plainColor, vec3(1.0), temperature01 + (0.5 - waterMeltingPoint01), 64.0);
-
-
+	vec3 color = computeColorAndNormal(elevation01, waterLevel01, slope, normal, temperature01, moisture01, waterMeltingPoint01);
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
-	vec3 sphereNormalW = normalize(vec3(world * vec4(normalize(vPosition), 0.0)));
 
-	vec3 lightRay = normalize(v3LightPos - vPositionW); // light ray direction in world space
-	vec3 parallelLightRay = normalize(v3LightPos - planetPosition); // light ray direction in world space
-	
-	float ndl2 = max(0.0, dot(sphereNormalW, parallelLightRay));
-	float ndl = max(0.0, dot(normalW, parallelLightRay)); // dimming factor due to light inclination relative to vertex normal in world space
+	float ndl2 = max(0.0, dot(normalW, parallelLightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
 
 	// specular
-	vec3 angleW = normalize(viewDirectionW + lightRay);
+	vec3 angleW = normalize(viewRayW + lightRayW);
     float specComp = max(0., dot(normalW, angleW));
     specComp = pow(specComp, 32.0);
 
 	vec3 screenColor = color.rgb * (ndl2*ndl + specComp/10.0);
 
-	//screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), moisture01);
-	//screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0), temperature01);
-
-	//if(temperature < 0.0) screenColor = vec3(1.0, 1.0, 1.0);
-
-	
-	/*if(dot(vNormal, unitPosition) < 0.9) {
-
-		screenColor = vec3(1.0, 0.0, 0.0);
-	} else {
-
-	}*/
+	//screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
+	//screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.7, 0.7, 1.0), temperature01);
 	//screenColor = vNormal*0.5 + 0.5;
 	//screenColor = vec3(elevation01);
 	//screenColor = vec3(1.0 - dot(normal, normalize(vPosition)));

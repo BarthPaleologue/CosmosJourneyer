@@ -15,7 +15,7 @@ import { PlanetManager } from "./components/planet/planetManager";
 import rockn from "../asset/textures/rockn.png";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
 import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
-import { centeredRandom } from "./components/toolbox/random";
+import { centeredRandom, nrand, rand, randInt } from "./components/toolbox/random";
 style.default;
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -60,7 +60,12 @@ let planetManager = new PlanetManager();
 
 let waterElevation = 5e2 + 15e2 * Math.random();
 
-let planet = new SolidPlanet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
+let planet = new SolidPlanet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene, {
+    minTemperature: randInt(-50, 5),
+    maxTemperature: randInt(10, 50),
+    pressure: Math.max(nrand(1, 0.5), 0)
+});
+console.table(planet._physicalProperties);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.22, 0.37, 0.024).add(new BABYLON.Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
 planet.colorSettings.sandSize = 250 + 100 * centeredRandom();
 planet.colorSettings.steepSharpness = 1;
@@ -76,9 +81,9 @@ let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius, 
 flatClouds.settings.cloudPower = 10 * Math.exp(- 1.7 * Math.random());
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun, player.camera, scene);
-atmosphere.settings.intensity = 17 + 5 * centeredRandom();
-atmosphere.settings.falloffFactor = 22 + 5 * centeredRandom();
-atmosphere.settings.scatteringStrength = 1.0 + centeredRandom() / 5;
+atmosphere.settings.intensity = 15 * planet._physicalProperties.pressure;
+atmosphere.settings.falloffFactor = 24;
+atmosphere.settings.scatteringStrength = 1.0;
 
 let rings = new RingsPostProcess("rings", planet.attachNode, radius, waterElevation, sun, player.camera, scene);
 rings.settings.ringStart = 1.8 + 0.4 * centeredRandom();

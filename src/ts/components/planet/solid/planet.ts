@@ -10,7 +10,7 @@ import grassn from "../../../../asset/textures/grassn.png";
 import snowNormalMap from "../../../../asset/textures/snowNormalMap.png";
 import sandNormalMap from "../../../../asset/textures/sandNormalMap.jpg";
 import { TerrainSettings } from "../../terrain/terrainSettings";
-import { Planet } from "../planet";
+import { PhysicalProperties, Planet } from "../planet";
 
 export interface ColorSettings {
     snowColor: BABYLON.Vector3,
@@ -47,8 +47,12 @@ export class SolidPlanet extends Planet {
 
     surfaceMaterial: BABYLON.ShaderMaterial;
 
-    constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, scene: BABYLON.Scene) {
-        super(id, radius);
+    constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, scene: BABYLON.Scene, physicalProperties: PhysicalProperties = {
+        minTemperature: -50,
+        maxTemperature: 50,
+        pressure: 1
+    }) {
+        super(id, radius, physicalProperties);
 
         this.rootChunkLength = this._radius * 2;
 
@@ -112,7 +116,9 @@ export class SolidPlanet extends Planet {
                     "maxElevation",
 
                     "snowElevation01", "snowOffsetAmplitude", "snowLacunarity",
-                    "snowLatitudePersistence", "steepSnowDotLimit"
+                    "snowLatitudePersistence", "steepSnowDotLimit",
+
+                    "minTemperature", "maxTemperature"
                 ]
             }
         );
@@ -124,7 +130,7 @@ export class SolidPlanet extends Planet {
         surfaceMaterial.setTexture("sandNormalMap", new BABYLON.Texture(sandNormalMap, scene));
 
         surfaceMaterial.setVector3("playerPosition", BABYLON.Vector3.Zero());
-        surfaceMaterial.setVector3("v3LightPos", BABYLON.Vector3.Zero());
+        surfaceMaterial.setVector3("sunPosition", BABYLON.Vector3.Zero());
         surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
         surfaceMaterial.setFloat("planetRadius", this._radius);
 
@@ -138,6 +144,9 @@ export class SolidPlanet extends Planet {
         surfaceMaterial.setFloat("snowLacunarity", this.colorSettings.snowLacunarity);
         surfaceMaterial.setFloat("snowLatitudePersistence", this.colorSettings.snowLatitudePersistence);
         surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.steepSnowDotLimit);
+
+        surfaceMaterial.setFloat("minTemperature", this._physicalProperties.minTemperature);
+        surfaceMaterial.setFloat("maxTemperature", this._physicalProperties.maxTemperature);
 
         this.surfaceMaterial = surfaceMaterial;
 
@@ -209,7 +218,7 @@ export class SolidPlanet extends Planet {
 
     public update(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3) {
         this.surfaceMaterial.setVector3("playerPosition", observerPosition);
-        this.surfaceMaterial.setVector3("v3LightPos", lightPosition);
+        this.surfaceMaterial.setVector3("sunPosition", lightPosition);
         this.surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
 
         this.surfaceMaterial.setMatrix("planetWorldMatrix", this.attachNode.getWorldMatrix());
