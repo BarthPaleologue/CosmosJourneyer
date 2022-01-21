@@ -210,7 +210,7 @@ vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
 
 
 
-vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude, float slope, vec3 unitPosition, out vec3 normal, float temperature, float temperature01, float moisture01) {
+vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude, float slope, vec3 unitPosition, out vec3 normal, float temperature, float temperature01, float moisture01, float waterMeltingPoint01) {
 	
 	normal = vNormal;
 
@@ -236,10 +236,10 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 		// séparation biome sélectionné avec biome neige
 		float snowDominance = 1.0;
 		// ceci doit être mieux conçu
-		float snowDelimiter = 2.2 * (elevation01 / snowElevation01 + (completeNoise(unitPosition*1000.0, 6, 1.7, 2.3)-0.5)/10.0) * (1.0 - exp(-abs(latitude) * snowLatitudePersistence));
-		float snowColorFactor = tanherpFactor(snowDelimiter, 64.0);
-		flatColor = lerp(flatColor, snowColor, 1.0 - snowColorFactor);
-		snowFactor = snowColorFactor;
+		//float snowDelimiter = 2.2 * (elevation01 / snowElevation01 + (completeNoise(unitPosition*1000.0, 6, 1.7, 2.3)-0.5)/10.0) * (1.0 - exp(-abs(latitude) * snowLatitudePersistence));
+		float snowColorFactor = tanherpFactor(temperature01 + (0.5 - waterMeltingPoint01), 64.0);
+		flatColor = lerp(flatColor, snowColor, snowColorFactor);
+		snowFactor = 1.0 - snowColorFactor;
 
 		// séparation biome sélectionné avec biome plage
 		flatColor = lnear(sandColor, flatColor, elevation01, waterLevel01, sandSize / maxElevation);
@@ -288,7 +288,7 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float latitude
 // https://www.omnicalculator.com/chemistry/boiling-point
 // https://www.wikiwand.com/en/Boiling_point#/Saturation_temperature_and_pressure
 // https://www.desmos.com/calculator/ctxerbh48s
-float waterBoilingTemperatureCelsius(float pressure) {
+float waterBoilingPointCelsius(float pressure) {
 	float P1 = 1.0;
 	float P2 = pressure;
 	float T1 = 100.0 + 273.15;
@@ -316,12 +316,15 @@ void main() {
 	float latitude = unitPosition.y;
 	float absLatitude01 = abs(latitude);
 
-	float pressure = 1.0;
-	float waterMeltingPointTemperature = 0.0; // fairly good approximation
-	float waterSublimationPression = 0.006;
-
 	float minTemperature = -50.0;
 	float maxTemperature = 50.0;
+
+
+	float pressure = 1.0;
+	float waterMeltingPoint = 0.0; // fairly good approximation
+	float waterMeltingPoint01 = -minTemperature / (maxTemperature - minTemperature);
+	float waterSublimationPression = 0.006;
+
 
 	float temperatureHeightFalloff = 3.0;
 	float temperatureLatitudeFalloff = 1.0;
@@ -329,13 +332,13 @@ void main() {
 	// https://www.desmos.com/calculator/apezlfvwic
 	float temperature01 = -pow(temperatureLatitudeFalloff * absLatitude01, 3.0) + 1.0; // la température diminue vers les pôles
 	temperature01 *= exp(-elevation01 * temperatureHeightFalloff); // la température diminue exponentiellement avec l'altitude
-	temperature01 += (completeNoise(unitPosition * 20.0, 3, 2.0, 2.0) - 0.5)/ 4.0; // on ajoute des fluctuations locales
+	temperature01 += (completeNoise(unitPosition * 300.0, 6, 1.7, 2.3) - 0.5) / 4.0; // on ajoute des fluctuations locales
 	temperature01 = clamp(temperature01, 0.0, 1.0);
 
 	float temperature = lerp(maxTemperature, minTemperature, temperature01);//minTemperature * (1.0 - temperature01) + temperature01 * maxTemperature;
 	
 	float moisture01 = 0.0;
-	if(maxTemperature > 0.0 && minTemperature < waterBoilingTemperatureCelsius(pressure)) {
+	if(waterMeltingPoint01 > 0.0 && waterMeltingPoint01 < 1.0 && minTemperature < waterBoilingPointCelsius(pressure)) {
 		// if there is liquid water on the surface
 		moisture01 += completeNoise(unitPosition * 2.0, 5, 2.0, 2.0);
 	}
@@ -344,7 +347,11 @@ void main() {
 
 	vec3 normal = vNormal;
 
-	vec3 color = computeColorAndNormal(elevation01, waterLevel01, latitude, slope, unitPosition, normal, temperature, temperature01, moisture01);
+	vec3 color = computeColorAndNormal(elevation01, waterLevel01, latitude, slope, unitPosition, normal, temperature, temperature01, moisture01, waterMeltingPoint01);
+
+	// snow scattering de qualité
+	//color = tanherp(plainColor, vec3(1.0), temperature01 + (0.5 - waterMeltingPoint01), 64.0);
+
 
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 	vec3 sphereNormalW = normalize(vec3(world * vec4(normalize(vPosition), 0.0)));
@@ -363,10 +370,11 @@ void main() {
 	vec3 screenColor = color.rgb * (ndl2*ndl + specComp/10.0);
 
 	//screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), moisture01);
-	screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0), temperature01);
+	//screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0), temperature01);
 
-	if(temperature < 0.0) screenColor = vec3(1.0, 1.0, 1.0);
+	//if(temperature < 0.0) screenColor = vec3(1.0, 1.0, 1.0);
 
+	
 	/*if(dot(vNormal, unitPosition) < 0.9) {
 
 		screenColor = vec3(1.0, 0.0, 0.0);
