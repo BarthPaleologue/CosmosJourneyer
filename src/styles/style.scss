@@ -140,4 +140,14 @@ body {
     #renderer {
         z-index: 1;
     }
+    #planetName {
+        position: absolute;
+        color: white;
+        bottom: 0;
+        margin: 0;
+        font-size: 200%;
+        padding: 10px 20px;
+        font-family: sans-serif;
+        background: rgba(0,0,0,.7);
+    }
 }

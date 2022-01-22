@@ -197,6 +197,8 @@ scene.executeWhenReady(() => {
             player.nearestPlanet = null;
         }
 
+        document.getElementById("planetName")!.innerText = player.nearestPlanet?._name ?? "";
+
         planetManager.update(player, sun.position, depthRenderer);
 
         if (isMouseEnabled) {
