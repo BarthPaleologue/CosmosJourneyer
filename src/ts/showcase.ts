@@ -111,7 +111,12 @@ let rings = new RingsPostProcess("rings", planet.attachNode, radius, waterElevat
 
 planetManager.add(planet);
 
-let moon = new SolidPlanet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene);
+let moon = new SolidPlanet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene, {
+    minTemperature: -180,
+    maxTemperature: 200,
+    pressure: 0,
+    waterAmount: 0.5
+});
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
 moon.colorSettings.plainColor = new BABYLON.Vector3(0.5, 0.5, 0.5);
@@ -131,7 +136,12 @@ moon.attachNode.position.addInPlace(planet.attachNode.getAbsolutePosition());
 
 planetManager.add(moon);
 
-let Ares = new SolidPlanet("Ares", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
+let Ares = new SolidPlanet("Ares", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene, {
+    minTemperature: -80,
+    maxTemperature: 20,
+    pressure: 0.5,
+    waterAmount: 0.3
+});
 Ares.terrainSettings.continentsFragmentation = 1;
 Ares.terrainSettings.maxMountainHeight = 10e3;
 Ares.terrainSettings.mountainsFrequency /= 1.1;
@@ -144,7 +154,7 @@ Ares.updateColors();
 Ares.attachNode.position.x = -radius * 4;
 
 let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius, radius + 100e3, sun, player.camera, scene);
-atmosphere2.settings.intensity = 11;
+atmosphere2.settings.intensity = 20 * Ares._physicalProperties.pressure;
 atmosphere2.settings.greenWaveLength = 680;
 atmosphere2.settings.falloffFactor = 24;
 atmosphere2.settings.scatteringStrength = 1.0;

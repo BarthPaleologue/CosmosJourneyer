@@ -49,6 +49,8 @@ vec3 toundraColor = vec3(40.0, 40.0, 40.0) / 255.0;
 uniform float minTemperature;
 uniform float maxTemperature;
 
+uniform float waterAmount;
+
 varying vec3 vPosition; // position of the vertex in sphere space
 varying vec3 vNormal; // normal of the vertex in sphere space
 varying vec2 vUV; // 
@@ -217,7 +219,10 @@ vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
 
 
 
-vec3 computeColorAndNormal(float elevation01, float waterLevel01, float slope, out vec3 normal, float temperature01, float moisture01, float waterMeltingPoint01) {
+vec3 computeColorAndNormal(
+	float elevation01, float waterLevel01, float slope, 
+	out vec3 normal, float temperature01, float moisture01, 
+	float waterMeltingPoint01, float absLatitude01) {
 	
 	normal = vNormal;
 
@@ -237,9 +242,10 @@ vec3 computeColorAndNormal(float elevation01, float waterLevel01, float slope, o
 		vec3 flatColor = lerp(vPlainColor, sandColor, openFactor);
 
 		// séparation biome sélectionné avec biome neige
-		float snowColorFactor = tanherpFactor(temperature01 + (0.5 - waterMeltingPoint01), 64.0);
-		flatColor = lerp(flatColor, snowColor, snowColorFactor);
-		snowFactor = 1.0 - snowColorFactor;
+		// waterMeltingPoint01 * waterAmount : il est plus difficile de former de la neige quand y a moins d'eau
+		float snowColorFactor = tanh01((waterMeltingPoint01 * min(waterAmount, 1.0) - temperature01) * 64.0);
+		flatColor = lerp(snowColor, flatColor, snowColorFactor);
+		snowFactor = snowColorFactor;
 
 		// séparation biome sélectionné avec biome plage
 		flatColor = lnear(sandColor, flatColor, elevation01, waterLevel01, sandSize / maxElevation);
@@ -293,8 +299,11 @@ float waterBoilingPointCelsius(float pressure) {
 	float T1 = 100.0 + 273.15;
 	float DH = 40660.0;
 	float R = 8.314;
-
-	return (1.0 / ((1.0 / T1) + log(P1 / P2) * (R / DH))) - 273.15;
+	if(P2 > 0.0) {
+		return (1.0 / ((1.0 / T1) + log(P1 / P2) * (R / DH))) - 273.15;
+	} else {
+		return -273.15;
+	}
 }
 
 void main() {
@@ -329,8 +338,13 @@ void main() {
 	// Températures
 	
 	float waterMeltingPoint = 0.0; // fairly good approximation
-	float waterMeltingPoint01 = -minTemperature / (maxTemperature - minTemperature);
+	float waterMeltingPoint01 = (waterMeltingPoint - minTemperature) / (maxTemperature - minTemperature);
 	float waterBoilingPoint01 = (waterBoilingPointCelsius(pressure) - minTemperature) / (maxTemperature - minTemperature);
+
+	//https://qph.fs.quoracdn.net/main-qimg-6a0fa3c05fb4db3d7d081680aec4b541
+	float co2SublimationTemperature = 0.0; // https://www.wikiwand.com/en/Sublimation_(phase_transition)#/CO2
+	// todo trouver l'équation de ses morts
+	float co2SublimationTemperature01 = (co2SublimationTemperature - minTemperature) / (maxTemperature - minTemperature);
 
 	float temperatureHeightFalloff = 3.0;
 	float temperatureLatitudeFalloff = 1.0;
@@ -355,7 +369,7 @@ void main() {
 
 	// calcul de la couleur et de la normale
 	vec3 normal = vNormal;
-	vec3 color = computeColorAndNormal(elevation01, waterLevel01, slope, normal, temperature01, moisture01, waterMeltingPoint01);
+	vec3 color = computeColorAndNormal(elevation01, waterLevel01, slope, normal, temperature01, moisture01, waterMeltingPoint01, absLatitude01);
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
 	float ndl2 = max(0.0, dot(normalW, parallelLightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
@@ -365,7 +379,11 @@ void main() {
     float specComp = max(0., dot(normalW, angleW));
     specComp = pow(specComp, 32.0);
 
-	vec3 screenColor = color.rgb * (ndl2*ndl + specComp/10.0);
+	// suppresion du reflet partout hors la neige
+	if(color.r < 0.8 && color.g < 0.8 && color.b < 0.8) specComp /= 10.0;
+	else specComp /= 2.0;
+
+	vec3 screenColor = color.rgb * (ndl2*ndl + specComp);
 
 	//screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
 	//screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.7, 0.7, 1.0), temperature01);

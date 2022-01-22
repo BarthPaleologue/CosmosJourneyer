@@ -7,10 +7,8 @@ export interface PhysicalProperties {
 export abstract class Planet {
     readonly _name: string;
     readonly _radius: number;
-    readonly _physicalProperties: PhysicalProperties;
-    constructor(name: string, radius: number, physicalProperties: PhysicalProperties) {
+    constructor(name: string, radius: number) {
         this._name = name;
         this._radius = radius;
-        this._physicalProperties = physicalProperties;
     }
 }

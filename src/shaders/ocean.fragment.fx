@@ -155,9 +155,15 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
 
     vec3 planetNormal = normalize(samplePoint - planetPosition);
     
-    vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, -time, time)/10.0, planetNormal, normalMap, 0.0004, 1.0, 0.5);
-    normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time)/10.0, normalWave, normalMap, 0.0004, 1.0, 0.5);
-    normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time, -time, -time)/10.0, normalWave, normalMap, 0.0004, 1.0, 0.5);
+    //vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, -time, time)/10.0, planetNormal, normalMap, 0.0004, 1.0, 0.5);
+    //normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time)/10.0, normalWave, normalMap, 0.0004, 1.0, 0.5);
+    //normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time, -time, -time)/10.0, normalWave, normalMap, 0.0004, 1.0, 0.5);
+
+    /*vec3 normalWave = planetNormal;
+    normalWave += vec3(sin(samplePointPlanetSpace.y/200.0 + time/1000.0), sin(-samplePointPlanetSpace.z/200.0 + time/1000.0), sin(samplePointPlanetSpace.y/200.0 - time/1000.0)) / 20.0;
+    normalWave += vec3(sin(samplePointPlanetSpace.x/170.0 - time/800.0), sin(samplePointPlanetSpace.x/170.0 - time/800.0), sin(-samplePointPlanetSpace.y/170.0 + time/800.0)) / 20.0;
+    normalWave += vec3(sin(samplePointPlanetSpace.z/220.0 + time/1100.0), sin(samplePointPlanetSpace.y/210.0 - time/900.0), sin(-samplePointPlanetSpace.x/150.0 + time/950.0)) / 20.0;
+    normalWave = normalize(normalWave);*/
 
     //normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time), planetNormal, normalMap, 0.00002, 1.0, 0.5);
     

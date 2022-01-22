@@ -30,11 +30,16 @@ export interface ColorSettings {
     steepSnowDotLimit: number;
 }
 
+export interface SolidPhysicalProperties extends PhysicalProperties {
+    waterAmount: number;
+}
+
 export class SolidPlanet extends Planet {
 
     craters: Crater[];
 
     public colorSettings: ColorSettings;
+    readonly _physicalProperties: SolidPhysicalProperties;
 
     public terrainSettings: TerrainSettings;
 
@@ -47,12 +52,15 @@ export class SolidPlanet extends Planet {
 
     surfaceMaterial: BABYLON.ShaderMaterial;
 
-    constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, scene: BABYLON.Scene, physicalProperties: PhysicalProperties = {
+    constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, scene: BABYLON.Scene, physicalProperties: SolidPhysicalProperties = {
         minTemperature: -50,
         maxTemperature: 50,
-        pressure: 1
+        pressure: 1,
+        waterAmount: 1
     }) {
-        super(id, radius, physicalProperties);
+        super(id, radius);
+
+        this._physicalProperties = physicalProperties;
 
         this.rootChunkLength = this._radius * 2;
 
@@ -118,7 +126,9 @@ export class SolidPlanet extends Planet {
                     "snowElevation01", "snowOffsetAmplitude", "snowLacunarity",
                     "snowLatitudePersistence", "steepSnowDotLimit",
 
-                    "minTemperature", "maxTemperature"
+                    "minTemperature", "maxTemperature",
+
+                    "waterAmount"
                 ]
             }
         );
@@ -147,6 +157,8 @@ export class SolidPlanet extends Planet {
 
         surfaceMaterial.setFloat("minTemperature", this._physicalProperties.minTemperature);
         surfaceMaterial.setFloat("maxTemperature", this._physicalProperties.maxTemperature);
+
+        surfaceMaterial.setFloat("waterAmount", this._physicalProperties.waterAmount);
 
         this.surfaceMaterial = surfaceMaterial;
 
@@ -213,6 +225,11 @@ export class SolidPlanet extends Planet {
         this.surfaceMaterial.setFloat("snowLacunarity", this.colorSettings.snowLacunarity);
         this.surfaceMaterial.setFloat("snowLatitudePersistence", this.colorSettings.snowLatitudePersistence);
         this.surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.steepSnowDotLimit);
+
+        this.surfaceMaterial.setFloat("minTemperature", this._physicalProperties.minTemperature);
+        this.surfaceMaterial.setFloat("maxTemperature", this._physicalProperties.maxTemperature);
+
+        this.surfaceMaterial.setFloat("waterAmount", this._physicalProperties.waterAmount);
 
     }
 
