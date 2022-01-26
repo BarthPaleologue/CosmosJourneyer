@@ -41,13 +41,15 @@ initLayers();
 
 const craterLayer = new CraterLayer([]);
 
-function terrainFunction(position: Vector3, gradient: Vector3): void {
+function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Zero()): void {
 
     const unitCoords = position.normalize();
 
+    let samplePoint = position.add(seed);
+
     let elevation = 0;
 
-    let continentData = continentsLayer(position);
+    let continentData = continentsLayer(samplePoint);
     let continentMask = continentData[0];
 
     let continentGradient = new Vector3(continentData[1], continentData[2], continentData[3]);
@@ -58,7 +60,7 @@ function terrainFunction(position: Vector3, gradient: Vector3): void {
     continentGradient.scaleInPlace(terrainSettings.continentBaseHeight);
     gradient.addInPlace(continentGradient);
 
-    let mountainData = mountainsLayer(position.scale(terrainSettings.mountainsFrequency));
+    let mountainData = mountainsLayer(samplePoint.scale(terrainSettings.mountainsFrequency));
     let mountainElevation = continentMask * mountainData[0];
     let mountainGradient = new Vector3(mountainData[1], mountainData[2], mountainData[3]);
 
@@ -66,7 +68,7 @@ function terrainFunction(position: Vector3, gradient: Vector3): void {
     mountainGradient.scaleInPlace(2 * terrainSettings.maxMountainHeight * continentMask);
     gradient.addInPlace(mountainGradient);
 
-    let bumpyData = bumpyLayer(position.scale(terrainSettings.bumpsFrequency));
+    let bumpyData = bumpyLayer(samplePoint.scale(terrainSettings.bumpsFrequency));
     let bumpyElevation = bumpyData[0];
     let bumpyGradient = new Vector3(bumpyData[1], bumpyData[2], bumpyData[3]);
 
@@ -93,6 +95,7 @@ self.onmessage = e => {
         const depth = data.depth;
         const direction = data.direction;
         const chunkPosition: number[] = data.position;
+        const seed = Vector3.FromArray3(data.seed);
 
         if (data.planetID != currentPlanetID) {
             currentPlanetID = data.planetID;
@@ -141,7 +144,7 @@ self.onmessage = e => {
                 vertexPosition = unitSphereCoords.scale(planetRadius);
                 // on applique la fonction de terrain
                 let vertexGradient = Vector3.Zero();
-                terrainFunction(vertexPosition, vertexGradient);
+                terrainFunction(vertexPosition, vertexGradient, seed);
 
                 let h = vertexGradient.subtract(unitSphereCoords.scale(Vector3.Dot(vertexGradient, unitSphereCoords)));
 
@@ -181,11 +184,11 @@ self.onmessage = e => {
             }
         }
 
-        const grassPositions = new Float32Array(100 * 3);
+        const grassPositions = new Float32Array(100 * 3 * 0);
 
         vecchunkPosition.applyQuaternionInPlace(rotationQuaternion);
 
-        for (let i = 0; i < 100; ++i) {
+        /*for (let i = 0; i < 100; ++i) {
             let x = vecchunkPosition.x + Math.random() * size - size / 2;
             let y = vecchunkPosition.y + Math.random() * size - size / 2;
             let z = vecchunkPosition.z + Math.random() * size - size / 2;
@@ -204,7 +207,7 @@ self.onmessage = e => {
             grassPositions[i * 3] = gp.x;
             grassPositions[i * 3 + 1] = gp.y;
             grassPositions[i * 3 + 2] = gp.z;
-        }
+        }*/
 
         self.postMessage({
             p: verticesPositions,

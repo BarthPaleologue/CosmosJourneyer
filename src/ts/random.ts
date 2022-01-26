@@ -15,6 +15,7 @@ import { PlanetManager } from "./components/planet/planetManager";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
 import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
 import { centeredRandom, nrand, randInt } from "./components/toolbox/random";
+import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
 style.default;
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -46,6 +47,8 @@ player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), 0.45, BABYLON.Spa
 
 player.camera.maxZ = Math.max(radius * 50, 10000);
 
+let starfield = new StarfieldPostProcess("starfield", player.camera, scene);
+
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);
 mat.emissiveTexture = new BABYLON.Texture(sunTexture, scene);
@@ -63,7 +66,12 @@ let planet = new SolidPlanet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * ra
     maxTemperature: randInt(10, 50),
     pressure: Math.max(nrand(1, 0.5), 0),
     waterAmount: Math.max(nrand(1, 0.6), 0),
-});
+}, [
+    Math.round(centeredRandom() * 1000000),
+    Math.round(centeredRandom() * 1000000),
+    Math.round(centeredRandom() * 1000000)
+]);
+console.log("seed : ", planet._seed.toString());
 console.table(planet._physicalProperties);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.22, 0.37, 0.024).add(new BABYLON.Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
 planet.colorSettings.sandSize = 250 + 100 * centeredRandom();

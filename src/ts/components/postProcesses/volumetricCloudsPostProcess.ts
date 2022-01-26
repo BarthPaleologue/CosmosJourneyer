@@ -66,10 +66,6 @@ export class VolumetricCloudsPostProcess extends BABYLON.PostProcess {
 
         this.setCamera(this.camera);
 
-
-
-        //let depthMap = depthRenderer.getDepthMap();
-
         this.onApply = (effect: BABYLON.Effect) => {
 
             effect.setTexture("depthSampler", scene.customRenderTargets[0]);

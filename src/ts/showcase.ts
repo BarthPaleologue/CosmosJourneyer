@@ -18,6 +18,7 @@ import lensflare2 from "../asset/textures/lensflare4.png";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
 import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
 import { VolumetricCloudsPostProcess } from "./components/postProcesses/volumetricCloudsPostProcess";
+import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
 
 style.default;
 
@@ -61,6 +62,8 @@ scene.onBeforeDrawPhaseObservable.add((scene, state) => {
     gl.clearDepth(0.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 });*/
+
+let starfield = new StarfieldPostProcess("starfield", player.camera, scene);
 
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);

@@ -19,7 +19,6 @@ export interface Task {
 export interface BuildTask extends Task {
     taskType: TaskType.Build,
     planet: SolidPlanet,
-    chunkLength: number,
     depth: number,
     direction: Direction,
     position: BABYLON.Vector3,
@@ -95,13 +94,14 @@ export class ChunkForge {
                 worker.send({
                     taskType: "buildTask",
                     planetID: task.planet._name,
-                    chunkLength: task.chunkLength,
+                    chunkLength: task.planet.rootChunkLength,
                     subdivisions: this.subdivisions,
                     depth: task.depth,
                     direction: task.direction,
                     position: [task.position.x, task.position.y, task.position.z],
                     craters: task.planet.craters,
                     terrainSettings: task.planet.terrainSettings,
+                    seed: task.planet._seed,
                 } as buildData);
 
                 worker.getWorker().onmessage = e => {

@@ -12,4 +12,5 @@ export interface buildData {
     position: number[];
     craters: Crater[];
     terrainSettings: TerrainSettings;
+    seed: number[];
 }

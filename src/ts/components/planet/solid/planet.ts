@@ -57,8 +57,8 @@ export class SolidPlanet extends Planet {
         maxTemperature: 50,
         pressure: 1,
         waterAmount: 1
-    }) {
-        super(id, radius);
+    }, seed = [0, 0, 0]) {
+        super(id, radius, seed);
 
         this._physicalProperties = physicalProperties;
 
@@ -104,7 +104,8 @@ export class SolidPlanet extends Planet {
             steepSnowDotLimit: 0.8,
         };
 
-        this.craters = generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
+        //this.craters = generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
+        this.craters = [];
 
         let surfaceMaterial = new BABYLON.ShaderMaterial("surfaceColor", scene, "./shaders/surfaceColor",
             {

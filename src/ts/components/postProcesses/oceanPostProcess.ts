@@ -63,13 +63,9 @@ export class OceanPostProcess extends BABYLON.PostProcess {
 
         this.setCamera(this.camera);
 
-        let depthRenderer = new BABYLON.DepthRenderer(scene);
-        scene.customRenderTargets.push(depthRenderer.getDepthMap());
         let depthMap = scene.customRenderTargets[0];
 
         //this.getEffect().setTexture("normalMap", new BABYLON.Texture("./textures/waternormal.jpg", scene));
-
-
 
         this.onApply = (effect: BABYLON.Effect) => {
             this.internalTime += this.getEngine().getDeltaTime();

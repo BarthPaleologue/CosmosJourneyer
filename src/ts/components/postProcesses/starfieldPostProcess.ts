@@ -1,21 +1,19 @@
-interface RingsSettings {
+interface StarfieldSettings {
     ringStart: number;
     ringEnd: number;
     ringFrequency: number;
     ringOpacity: number;
 }
 
-export class RingsPostProcess extends BABYLON.PostProcess {
+export class StarfieldPostProcess extends BABYLON.PostProcess {
 
-    settings: RingsSettings;
+    settings: StarfieldSettings;
     camera: BABYLON.Camera;
-    sun: BABYLON.Mesh | BABYLON.PointLight;
-    planet: BABYLON.Mesh;
 
     internalTime = 0;
 
-    constructor(name: string, planet: BABYLON.Mesh, planetRadius: number, waterLevel: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
-        super(name, "./shaders/rings", [
+    constructor(name: string, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+        super(name, "./shaders/starfield", [
             "sunPosition",
             "cameraPosition",
 
@@ -53,8 +51,6 @@ export class RingsPostProcess extends BABYLON.PostProcess {
         };
 
         this.camera = camera;
-        this.sun = sun;
-        this.planet = planet;
 
         this.setCamera(this.camera);
 
@@ -65,12 +61,7 @@ export class RingsPostProcess extends BABYLON.PostProcess {
 
             effect.setTexture("depthSampler", depthMap);
 
-            effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
             effect.setVector3("cameraPosition", this.camera.position);
-
-            effect.setVector3("planetPosition", this.planet.getAbsolutePosition());
-            effect.setFloat("planetRadius", planetRadius);
-            effect.setFloat("waterLevel", waterLevel);
 
             effect.setFloat("ringStart", this.settings.ringStart);
             effect.setFloat("ringEnd", this.settings.ringEnd);
@@ -82,8 +73,6 @@ export class RingsPostProcess extends BABYLON.PostProcess {
 
             effect.setFloat("cameraNear", camera.minZ);
             effect.setFloat("cameraFar", camera.maxZ);
-
-            effect.setMatrix("planetWorldMatrix", this.planet.getWorldMatrix());
 
             effect.setFloat("time", this.internalTime);
         };

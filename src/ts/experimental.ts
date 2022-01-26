@@ -9,6 +9,7 @@ import { PlayerControler } from "./components/player/playerControler";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
 import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
 import { Keyboard } from "./components/inputs/keyboard";
+import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
 
 style.default;
 style2.default;
@@ -36,6 +37,8 @@ player.setSpeed(0.2 * planetRadius);
 player.camera.maxZ = planetRadius * 20;
 
 let keyboard = new Keyboard();
+
+let starfield = new StarfieldPostProcess("starfield", player.camera, scene);
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(planetRadius * 10), scene);
 

@@ -312,7 +312,7 @@ void main() {
 	vec3 lightRayW = normalize(sunPosition - vPositionW); // light ray direction in world space
 
 	vec3 sphereNormalW = normalize(vec3(world * vec4(normalize(vPosition), 0.0)));
-	float ndl = max(0.0, dot(sphereNormalW, parallelLightRayW));
+	float ndl = max(0.07, dot(sphereNormalW, parallelLightRayW));
 
 	// la unitPosition ne prend pas en compte la rotation de la planète
 	vec3 unitPosition = normalize(vPosition);
@@ -372,7 +372,7 @@ void main() {
 	vec3 color = computeColorAndNormal(elevation01, waterLevel01, slope, normal, temperature01, moisture01, waterMeltingPoint01, absLatitude01);
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
-	float ndl2 = max(0.0, dot(normalW, parallelLightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
+	float ndl2 = max(0.1, dot(normalW, parallelLightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
 
 	// specular
 	vec3 angleW = normalize(viewRayW + lightRayW);

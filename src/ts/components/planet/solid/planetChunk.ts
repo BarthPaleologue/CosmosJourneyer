@@ -133,7 +133,6 @@ export class PlanetChunk {
             id: id,
             planet: planet,
             position: position.toBabylon(),
-            chunkLength: rootChunkLength,
             depth: path.length,
             direction: direction,
             mesh: this.mesh,
