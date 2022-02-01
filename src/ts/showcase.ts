@@ -77,12 +77,7 @@ let starMaterial = new BABYLON.ShaderMaterial("starColor", scene, "./shaders/sta
     {
         attributes: ["position"],
         uniforms: [
-            "world", "worldViewProjection", "projection", "view",
-            "textureSampler", "depthSampler",
-            "bottomNormalMap", "plainNormalMap", "sandNormalMap", "snowNormalMap", "steepNormalMap",
-            "cameraNear", "cameraFar", "planetPosition", "planetRadius", "planetWorldMatrix",
-
-            "playerPosition",
+            "world", "worldViewProjection", "planetWorldMatrix",
         ]
     }
 );

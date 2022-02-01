@@ -50,10 +50,16 @@ player.camera.maxZ = Math.max(radius * 50, 10000);
 
 
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
-let mat = new BABYLON.StandardMaterial("mat", scene);
-mat.emissiveTexture = new BABYLON.Texture(sunTexture, scene);
-//mat.useLogarithmicDepth = true;
-sun.material = mat;
+let starMaterial = new BABYLON.ShaderMaterial("starColor", scene, "./shaders/starMaterial",
+    {
+        attributes: ["position"],
+        uniforms: [
+            "world", "worldViewProjection", "planetWorldMatrix",
+        ]
+    }
+);
+starMaterial.setMatrix("planetWorldMatrix", sun.getWorldMatrix());
+sun.material = starMaterial;
 sun.position.x = -913038.375;
 sun.position.z = -1649636.25;
 depthRenderer.getDepthMap().renderList?.push(sun);
