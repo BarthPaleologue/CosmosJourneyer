@@ -73,12 +73,30 @@ scene.onBeforeDrawPhaseObservable.add((scene, state) => {
 
 
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
-let mat = new BABYLON.StandardMaterial("mat", scene);
-mat.emissiveTexture = new BABYLON.Texture(sunTexture, scene);
+let starMaterial = new BABYLON.ShaderMaterial("starColor", scene, "./shaders/starMaterial",
+    {
+        attributes: ["position"],
+        uniforms: [
+            "world", "worldViewProjection", "projection", "view",
+            "textureSampler", "depthSampler",
+            "bottomNormalMap", "plainNormalMap", "sandNormalMap", "snowNormalMap", "steepNormalMap",
+            "cameraNear", "cameraFar", "planetPosition", "planetRadius", "planetWorldMatrix",
+
+            "playerPosition",
+        ]
+    }
+);
+starMaterial.setMatrix("planetWorldMatrix", sun.getWorldMatrix());
+
+sun.material = starMaterial;
+
+//let mat = new BABYLON.StandardMaterial("mat", scene);
+//mat.emissiveTexture = new BABYLON.Texture(sunTexture, scene);
 //mat.useLogarithmicDepth = true;
-sun.material = mat;
+//sun.material = mat;
 sun.position.x = -913038.375;
 sun.position.z = -1649636.25;
+
 depthRenderer.getDepthMap().renderList?.push(sun);
 
 let starfield = new StarfieldPostProcess("starfield", player, sun, scene);
@@ -175,7 +193,9 @@ atmosphere2.settings.scatteringStrength = 1.0;
 planetManager.add(Ares);
 
 let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun, 100);
-
+vls.exposure = 1.0;
+vls.decay = 0.95;
+//vls.weight = 2.0;
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, player.camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
 
