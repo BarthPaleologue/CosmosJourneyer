@@ -48,6 +48,7 @@ export class StarfieldPostProcess extends BABYLON.PostProcess {
             effect.setVector3("cameraPosition", this.camera.position);
 
             let vis = 1.0 - BABYLON.Vector3.Dot(sun.getAbsolutePosition().normalizeToNew(), this.camera.getDirection(BABYLON.Axis.Z));
+            vis /= 2;
 
             effect.setFloat("visibility", vis);
 
