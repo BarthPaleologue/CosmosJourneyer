@@ -63,7 +63,14 @@ scene.onBeforeDrawPhaseObservable.add((scene, state) => {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 });*/
 
-let starfield = new StarfieldPostProcess("starfield", player.camera, scene);
+/*let defaultPipeline = new BABYLON.DefaultRenderingPipeline(
+    "DefaultRenderingPipeline",
+    true, // is HDR?
+    scene,
+    [player.camera]
+);*/
+
+
 
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);
@@ -73,6 +80,9 @@ sun.material = mat;
 sun.position.x = -913038.375;
 sun.position.z = -1649636.25;
 depthRenderer.getDepthMap().renderList?.push(sun);
+
+let starfield = new StarfieldPostProcess("starfield", player, sun, scene);
+
 
 /*let lensFlareSystem = new BABYLON.LensFlareSystem("lensFlare", sun, scene);
 let flare0 = new BABYLON.LensFlare(0.2, 1, new BABYLON.Color3(0.5, 0.5, 0.5), lensflare2, lensFlareSystem);
@@ -195,12 +205,12 @@ scene.executeWhenReady(() => {
 
     scene.beforeRender = () => {
         player.nearestPlanet = planetManager.getNearestPlanet();
-        // si trop loin on osef
-        if (player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() > player.nearestPlanet._radius * 2) {
-            player.nearestPlanet = null;
-        }
 
-        document.getElementById("planetName")!.innerText = player.nearestPlanet?._name ?? "";
+        if (player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() < player.nearestPlanet._radius * 2) {
+            document.getElementById("planetName")!.innerText = player.nearestPlanet._name;
+        } else {
+            document.getElementById("planetName")!.innerText = "Outer Space";
+        }
 
         planetManager.update(player, sun.position, depthRenderer);
 
@@ -219,11 +229,7 @@ scene.executeWhenReady(() => {
         planetManager.moveEverything(deplacement);
         sun.position.addInPlace(deplacement);
 
-        /*for (const mesh of scene.meshes) {
-            mesh.position.addInPlace(deplacement);
-        }*/
-
-        if (!collisionWorker.isBusy() && player.nearestPlanet != null) {
+        if (!collisionWorker.isBusy() && player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() < player.nearestPlanet._radius * 2) {
             collisionWorker.checkCollision(player.nearestPlanet);
         }
     };

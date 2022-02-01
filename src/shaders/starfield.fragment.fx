@@ -22,10 +22,7 @@ uniform float cloudLayerRadius; // atmosphere radius (calculate from planet cent
 uniform float planetRadius; // planet radius
 uniform float waterLevel; // water level
 
-uniform float ringStart; // ring start
-uniform float ringEnd; // ring end
-uniform float ringFrequency; // ring frequency
-uniform float ringOpacity; // ring opacity
+uniform float visibility; // visibility of the starfield
 
 uniform mat4 planetWorldMatrix;
 
@@ -193,11 +190,17 @@ void main() {
         vec3 samplePoint = normalize(closestPoint);
         //float offset = vec3(cnoise(samplePoint.xyz * 431.0), -cnoise(samplePoint.zxy * 73.0), cnoise(samplePoint.yzx * 47.0)).x;
         float noiseValue = noise(samplePoint*500.0);
+        float noiseValue2 = clamp(noise(samplePoint), 0.5, 1.0);
+        float noiseValue3 = noise(samplePoint*200.0);
 
         float starLight = 0.0;
-        if(noiseValue > 0.9) starLight = 1.0;
+        if(noiseValue > 0.87) starLight = 1.0;
 
-        finalColor = vec3(starLight);
+        vec3 color1 = vec3(1.0);
+        vec3 color2 = vec3(0.4, 0.4, 2.0);
+
+
+        finalColor = starLight * lerp(color1, color2, noiseValue3) * visibility;
     }
 
     gl_FragColor = vec4(finalColor, 1.0); // displaying the final color

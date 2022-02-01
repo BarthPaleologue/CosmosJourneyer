@@ -38,9 +38,11 @@ player.camera.maxZ = planetRadius * 20;
 
 let keyboard = new Keyboard();
 
-let starfield = new StarfieldPostProcess("starfield", player.camera, scene);
 
 let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(planetRadius * 10), scene);
+
+let starfield = new StarfieldPostProcess("starfield", player, light, scene);
+
 
 let planetManager = new PlanetManager();
 

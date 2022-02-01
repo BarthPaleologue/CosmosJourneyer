@@ -47,7 +47,7 @@ player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), 0.45, BABYLON.Spa
 
 player.camera.maxZ = Math.max(radius * 50, 10000);
 
-let starfield = new StarfieldPostProcess("starfield", player.camera, scene);
+
 
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
 let mat = new BABYLON.StandardMaterial("mat", scene);
@@ -57,6 +57,8 @@ sun.material = mat;
 sun.position.x = -913038.375;
 sun.position.z = -1649636.25;
 depthRenderer.getDepthMap().renderList?.push(sun);
+
+let starfield = new StarfieldPostProcess("starfield", player, sun, scene);
 
 let planetManager = new PlanetManager();
 
