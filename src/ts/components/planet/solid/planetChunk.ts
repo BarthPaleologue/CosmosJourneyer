@@ -73,7 +73,7 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
     return position;
 }
 
-//import grass from "../../../../asset/textures/grass.png";
+import grass from "../../../../asset/textures/grass.png";
 
 // ne pas supprimer la classe pour cause de peut être des arbres et de l'herbe
 export class PlanetChunk {
@@ -82,6 +82,8 @@ export class PlanetChunk {
 
     public grassParticleSystem: BABYLON.SolidParticleSystem | null = null;
     public grassPositions: BABYLON.Vector3[] = [];
+
+    //public testBox: BABYLON.Mesh;
 
     constructor(path: number[], rootChunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: SolidPlanet) {
         let id = `[D${direction}][P${path.join("")}]`;
@@ -95,32 +97,36 @@ export class PlanetChunk {
         this.mesh = new BABYLON.Mesh(`Chunk${id}`, scene);
         this.mesh.material = surfaceMaterial;
 
-        // Grass implementation with SPS
-        /*if (planet.maxDepth - path.length < 2) {
-            let particle = BABYLON.Mesh.CreateBox(`Particle${id}`, 100, scene);
-            let mat = new BABYLON.StandardMaterial(`Particle${id}`, scene);
-            mat.emissiveColor = BABYLON.Color3.Red();
-            mat.backFaceCulling = false;
-            mat.wireframe = true;
-            particle.material = mat;
+        // TODO: ajouter transparence, orienter et tout le bazar tmtc
+        // bientôt des arbres
+        /*let testBox = BABYLON.Mesh.CreatePlane(`TestBox${id}`, 5000, scene);
+        let TestBoxMaterial = new BABYLON.StandardMaterial("TestBoxMaterial", scene);
+        TestBoxMaterial.emissiveTexture = new BABYLON.Texture(grass, scene);
+        TestBoxMaterial.emissiveTexture.hasAlpha = true;
+        TestBoxMaterial.emissiveTexture.getAlphaFromRGB = true;
+        TestBoxMaterial.backFaceCulling = false;
+        testBox.material = TestBoxMaterial;
 
-            let gps = new BABYLON.SolidParticleSystem(`GrassParticles${id}`, scene);
-            gps.addShape(particle, 100);
-            gps.buildMesh();
-            gps.mesh.parent = this.mesh;
+        this.testBox = testBox;
+        this.testBox.isVisible = false;
 
-            this.grassParticleSystem = gps;
-        }*/
+        let gps = new BABYLON.SolidParticleSystem(`GrassParticles${id}`, scene);
+        gps.addShape(this.testBox, 1);
+        this.grassParticleSystem = gps;
+        this.grassParticleSystem.setParticles();
+        this.grassParticleSystem.buildMesh();
+        this.grassParticleSystem.mesh.material = TestBoxMaterial;
+        this.grassParticleSystem.mesh.parent = this.mesh;*/
 
         /*let debugMaterial = new BABYLON.StandardMaterial("debug", scene);
         debugMaterial.emissiveColor = BABYLON.Color3.Random();
         debugMaterial.specularColor = BABYLON.Color3.Black();
         debugMaterial.diffuseColor = BABYLON.Color3.Black();
         debugMaterial.backFaceCulling = false;
-        debugMaterial.useLogarithmicDepth = true;*/
-        //debugMaterial.wireframe = true;
+        debugMaterial.useLogarithmicDepth = true;
+        debugMaterial.wireframe = true;
 
-        //this.mesh.material = debugMaterial;
+        this.mesh.material = debugMaterial;*/
 
         this.mesh.parent = parentNode;
 

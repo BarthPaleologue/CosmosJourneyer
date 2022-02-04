@@ -158,8 +158,9 @@ export class PlanetSide {
                 // mais si un chunk est très proche, il sera toujours visible (on est proche donc le dot2 peut être négatif alors que le chunk est visible)
                 //let c2 = dot2 > - 0.5 && absolutePosition.getMagnitude() > this.rootChunkLength / (2 ** (walked.length + 3));
 
-                // unstable
+                //TODO: faire un vrai truc qui marche => là je perd la main sur certains chunks...
                 //tree.mesh.setEnabled(dot < 0.5);
+                //tree.mesh.setEnabled(!tree.mesh.isOccluded);
 
                 return tree;
             } else {

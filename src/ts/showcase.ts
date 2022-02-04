@@ -70,8 +70,6 @@ scene.onBeforeDrawPhaseObservable.add((scene, state) => {
     [player.camera]
 );*/
 
-
-
 let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
 let starMaterial = new BABYLON.ShaderMaterial("starColor", scene, "./shaders/starMaterial",
     {

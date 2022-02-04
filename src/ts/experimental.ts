@@ -14,6 +14,8 @@ import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostPr
 style.default;
 style2.default;
 
+// TODO: euh oui alors si on prend en compte la physique tout doit changer par ici mdr
+
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth - 300;
 canvas.height = window.innerHeight;

@@ -353,7 +353,7 @@ void main() {
 	// https://www.desmos.com/calculator/apezlfvwic
 	float temperature01 = -pow(temperatureLatitudeFalloff * absLatitude01, 3.0) + 1.0; // la température diminue vers les pôles
 	temperature01 *= exp(-elevation01 * temperatureHeightFalloff); // la température diminue exponentiellement avec l'altitude
-	temperature01 += (completeNoise(unitPosition * 300.0, 6, 1.7, 2.3) - 0.5) / 4.0; // on ajoute des fluctuations locales
+	temperature01 += (completeNoise(unitPosition * 300.0, 5, 1.7, 2.5) - 0.5) / 4.0; // on ajoute des fluctuations locales
 	temperature01 *= (ndl * temperatureRotationFactor) + 1.0 - temperatureRotationFactor; // la température diminue la nuit
 	temperature01 = clamp(temperature01, 0.0, 1.0); // on reste dans la range [0, 1]
 

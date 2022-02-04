@@ -157,8 +157,16 @@ export class ChunkForge {
             task.vertexData.applyToMesh(task.mesh, false);
             depthRenderer.getDepthMap().renderList!.push(task.mesh);
 
-            //let chunkMesh = task.chunk.mesh;
-            //let grassSPS = task.chunk.grassParticleSystem;
+            /* WORKING VERSION
+            let planetSpacePosition = task.mesh.absolutePosition.subtract(task.planet.getAbsolutePosition());
+
+            task.chunk.grassParticleSystem?.mesh.setAbsolutePosition(task.planet.getAbsolutePosition().add(planetSpacePosition.scale(1.1)));
+            depthRenderer.getDepthMap().renderList!.push(task.chunk.grassParticleSystem!.mesh);
+            */
+
+
+
+            //task.mesh.occlusionType = BABYLON.AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
 
             /*task.chunk.grassPositions = [];
             if (task.chunk.grassParticleSystem) {

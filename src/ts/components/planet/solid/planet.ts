@@ -66,6 +66,9 @@ export class SolidPlanet extends Planet {
 
         this.maxDepth = Math.round(Math.log2(radius) - 12);
 
+        let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
+        console.log(spaceBetweenVertex);
+
         this.attachNode = BABYLON.Mesh.CreateBox(`${this._name}AttachNode`, 1, scene);
         this.attachNode.position = position;
 
