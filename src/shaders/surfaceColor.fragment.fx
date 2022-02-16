@@ -22,7 +22,10 @@ uniform sampler2D depthSampler; // evaluate sceneDepth
 uniform sampler2D bottomNormalMap;
 uniform sampler2D plainNormalMap;
 uniform sampler2D sandNormalMap;
+
 uniform sampler2D snowNormalMap;
+uniform sampler2D snowNormalMap2;
+
 uniform sampler2D steepNormalMap;
 
 uniform float planetRadius; // planet radius
@@ -123,7 +126,11 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, float bottomFactor, floa
     vec3 tPlainNormalY = texture2D(plainNormalMap, position.xz * scale).rgb;
     vec3 tPlainNormalZ = texture2D(plainNormalMap, position.xy * scale).rgb;
 
-	vec3 tSnowNormalX = texture2D(snowNormalMap, position.zy * scale).rgb;
+	vec3 tSnowNormalX = lerp(
+		texture2D(snowNormalMap, position.zy * scale).rgb,
+		texture2D(snowNormalMap2, position.zy * scale).rgb,
+		completeNoise(position/1.0, 3, 2.0, 2.0)
+	);
     vec3 tSnowNormalY = texture2D(snowNormalMap, position.xz * scale).rgb;
     vec3 tSnowNormalZ = texture2D(snowNormalMap, position.xy * scale).rgb;
 
@@ -283,9 +290,10 @@ vec3 computeColorAndNormal(
 		outColor = lerp(flatColor, steepColor, 1.0 - steepFactor);
 	}
 
-	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.001, normalSharpness, 0.1);
-	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.0003, normalSharpness, 0.2); // plus grand
-	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.00001, normalSharpness, 0.4); // plus grand
+	// TODO: briser la répétition avec du simplex
+	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.001, normalSharpness, 0.5);
+	//normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.0003, normalSharpness, 0.2); // plus grand
+	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.00001, normalSharpness, 0.15); // plus grand
 
 	return outColor;
 }
@@ -380,8 +388,8 @@ void main() {
     specComp = pow(specComp, 32.0);
 
 	// suppresion du reflet partout hors la neige
-	if(color.r < 0.8 && color.g < 0.8 && color.b < 0.8) specComp /= 10.0;
-	else specComp /= 2.0;
+	specComp *= (color.r + color.g + color.b) / 3.0;
+	specComp /= 2.0;
 
 	vec3 screenColor = color.rgb * (ndl2*ndl + specComp);
 

@@ -7,7 +7,10 @@ import { Direction } from "../../toolbox/direction";
 import crackednormal from "../../../../asset/textures/crackednormal.jpg";
 import rockn from "../../../../asset/textures/rockn.png";
 import grassn from "../../../../asset/textures/grassn.png";
-import snowNormalMap from "../../../../asset/textures/snowNormalMap.png";
+
+import snowNormalMap from "../../../../asset/textures/snowNormalMap3.jpg";
+import snowNormalMap2 from "../../../../asset/textures/snowNormalMap2.png";
+
 import sandNormalMap from "../../../../asset/textures/sandNormalMap.jpg";
 import { TerrainSettings } from "../../terrain/terrainSettings";
 import { PhysicalProperties, Planet } from "../planet";
@@ -116,7 +119,10 @@ export class SolidPlanet extends Planet {
                 uniforms: [
                     "world", "worldViewProjection", "projection", "view",
                     "textureSampler", "depthSampler",
-                    "bottomNormalMap", "plainNormalMap", "sandNormalMap", "snowNormalMap", "steepNormalMap",
+                    "bottomNormalMap", "plainNormalMap", "sandNormalMap",
+                    "snowNormalMap", "snowNormalMap2",
+                    "steepNormalMap",
+
                     "cameraNear", "cameraFar", "planetPosition", "planetRadius", "planetWorldMatrix",
 
                     "playerPosition",
@@ -140,7 +146,10 @@ export class SolidPlanet extends Planet {
         surfaceMaterial.setTexture("bottomNormalMap", new BABYLON.Texture(crackednormal, scene));
         surfaceMaterial.setTexture("steepNormalMap", new BABYLON.Texture(rockn, scene));
         surfaceMaterial.setTexture("plainNormalMap", new BABYLON.Texture(grassn, scene));
+
         surfaceMaterial.setTexture("snowNormalMap", new BABYLON.Texture(snowNormalMap, scene));
+        surfaceMaterial.setTexture("snowNormalMap2", new BABYLON.Texture(snowNormalMap2, scene));
+
         surfaceMaterial.setTexture("sandNormalMap", new BABYLON.Texture(sandNormalMap, scene));
 
         surfaceMaterial.setVector3("playerPosition", BABYLON.Vector3.Zero());
