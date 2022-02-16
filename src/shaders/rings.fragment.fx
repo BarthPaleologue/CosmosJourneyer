@@ -161,7 +161,8 @@ void main() {
             } else {
                 vec3 samplePoint = cameraPosition + impactPoint * rayDir;
                 float ringDensity = ringDensityAtPoint(samplePoint);
-                vec3 ringColor = lerp(vec3(ringDensity), screenColor, ringOpacity);
+                vec3 ringColor = vec3(0.5) * ringDensity;
+                ringColor = lerp(ringColor, screenColor, ringOpacity);
 
                 // hypothèse des rayons parallèles
                 vec3 rayToSun = normalize(sunPosition - planetPosition);

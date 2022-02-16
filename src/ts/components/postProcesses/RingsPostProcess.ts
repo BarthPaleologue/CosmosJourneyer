@@ -49,7 +49,7 @@ export class RingsPostProcess extends BABYLON.PostProcess {
             ringStart: 1.5,
             ringEnd: 2.5,
             ringFrequency: 30.0,
-            ringOpacity: 0.3
+            ringOpacity: 0.4
         };
 
         this.camera = camera;
