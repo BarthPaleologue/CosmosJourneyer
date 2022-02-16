@@ -103,14 +103,14 @@ export class PlanetChunk {
         let TestBoxMaterial = new BABYLON.StandardMaterial("TestBoxMaterial", scene);
         TestBoxMaterial.emissiveTexture = new BABYLON.Texture(grass, scene);
         TestBoxMaterial.emissiveTexture.hasAlpha = true;
-        TestBoxMaterial.emissiveTexture.getAlphaFromRGB = true;
         TestBoxMaterial.backFaceCulling = false;
         testBox.material = TestBoxMaterial;
 
         this.testBox = testBox;
-        this.testBox.isVisible = false;
+        this.testBox.isVisible = false;*/
 
-        let gps = new BABYLON.SolidParticleSystem(`GrassParticles${id}`, scene);
+        /* WORK IN PROGRESS */
+        /*let gps = new BABYLON.SolidParticleSystem(`GrassParticles${id}`, scene);
         gps.addShape(this.testBox, 1);
         this.grassParticleSystem = gps;
         this.grassParticleSystem.setParticles();
