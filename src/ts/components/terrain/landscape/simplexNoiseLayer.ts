@@ -1,5 +1,5 @@
 import { Vector3 } from "../../toolbox/algebra";
-import { sFloor, sFloorGradient } from "../../toolbox/math";
+import { sFloor } from "../../toolbox/math";
 import { simplex401 } from "../../toolbox/simplex";
 import { elevationFunction } from "./elevationFunction";
 
@@ -27,8 +27,8 @@ export function simplexNoiseLayer(frequency: number, nbOctaves: number, decay: n
 
         if (minValue > 0) {
             if (minValue != 1) {
-                noiseGradient.scaleInPlace(sFloorGradient(noiseValue, minValue, 100.0));
-                noiseValue = sFloor(noiseValue, minValue, 100.0);
+                // TODO: ne pas hardcoder
+                noiseValue = sFloor(noiseValue, minValue, 100.0, noiseGradient);
                 noiseValue -= minValue;
                 noiseValue /= 1 - minValue;
                 noiseGradient.divideInPlace(1 - minValue);

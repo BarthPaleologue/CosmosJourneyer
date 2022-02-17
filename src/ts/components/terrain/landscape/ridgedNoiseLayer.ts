@@ -1,5 +1,5 @@
 import { Vector3 } from "../../toolbox/algebra";
-import { sAbs, sAbsGradient, sFloor, sFloorGradient } from "../../toolbox/math";
+import { sAbs, sFloor } from "../../toolbox/math";
 import { simplex411 } from "../../toolbox/simplex";
 import { elevationFunction } from "./elevationFunction";
 
@@ -16,9 +16,9 @@ export function ridgedNoiseLayer(frequency: number, nbOctaves: number, decay: nu
             let localElevation = terrainData[0];
             let localGradient = new Vector3(terrainData[1], terrainData[2], terrainData[3]);
 
+            // TODO: ne pas hardcoder
             let sharpness = 15.0;
-            localGradient.scaleInPlace(sAbsGradient(localElevation, sharpness));
-            localElevation = 1.0 - sAbs(localElevation, sharpness);
+            localElevation = 1.0 - sAbs(localElevation, sharpness, localGradient);
 
             localGradient.divideInPlace(-1);
             localGradient.divideInPlace(decay ** i);
@@ -36,8 +36,8 @@ export function ridgedNoiseLayer(frequency: number, nbOctaves: number, decay: nu
 
         if (minValue > 0) {
             if (minValue != 1) {
-                noiseGradient.scaleInPlace(sFloorGradient(noiseValue, minValue, 100.0));
-                noiseValue = sFloor(noiseValue, minValue, 100.0);
+                //noiseGradient.scaleInPlace(sFloorGradient(noiseValue, minValue, 100.0));
+                noiseValue = sFloor(noiseValue, minValue, 100.0, noiseGradient);
                 noiseValue -= minValue;
                 noiseValue /= 1 - minValue;
                 noiseGradient.divideInPlace(1 - minValue);
