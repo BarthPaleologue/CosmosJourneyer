@@ -56,8 +56,8 @@ export class SolidPlanet extends Planet {
     surfaceMaterial: BABYLON.ShaderMaterial;
 
     constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, scene: BABYLON.Scene, physicalProperties: SolidPhysicalProperties = {
-        minTemperature: -50,
-        maxTemperature: 50,
+        minTemperature: -40,
+        maxTemperature: 60,
         pressure: 1,
         waterAmount: 1
     }, seed = [0, 0, 0]) {
@@ -87,8 +87,8 @@ export class SolidPlanet extends Planet {
             maxBumpHeight: 100,
             bumpsFrequency: 1,
 
-            maxMountainHeight: 30e3,
-            mountainsFrequency: 2e-3,
+            maxMountainHeight: 15e3,
+            mountainsFrequency: 3e-3,
             mountainsMinValue: 0.5
         };
 

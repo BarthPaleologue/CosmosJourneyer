@@ -61,7 +61,7 @@ function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Ze
     gradient.addInPlace(continentGradient);
 
     let mountainData = mountainsLayer(samplePoint.scale(terrainSettings.mountainsFrequency));
-    let mountainElevation = continentMask * mountainData[0];
+    let mountainElevation = mountainData[0];
     let mountainGradient = new Vector3(mountainData[1], mountainData[2], mountainData[3]);
 
     elevation += 2 * continentMask * mountainElevation * terrainSettings.maxMountainHeight;
@@ -79,8 +79,6 @@ function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Ze
     position.addInPlace(unitCoords.scale(elevation));
 
     gradient.divideInPlace(terrainSettings.continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
-    //gradient.divideInPlace(elevation);
-
     gradient.divideInPlace(2);
 }
 
