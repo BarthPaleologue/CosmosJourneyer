@@ -57,7 +57,7 @@ export class SolidPlanet extends Planet {
 
     constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, scene: BABYLON.Scene, physicalProperties: SolidPhysicalProperties = {
         minTemperature: -40,
-        maxTemperature: 60,
+        maxTemperature: 50,
         pressure: 1,
         waterAmount: 1
     }, seed = [0, 0, 0]) {
@@ -84,12 +84,12 @@ export class SolidPlanet extends Planet {
             continentsFragmentation: 0.47,
             continentBaseHeight: 5e3,
 
-            maxBumpHeight: 100,
-            bumpsFrequency: 1,
+            maxBumpHeight: 1.5e3,
+            bumpsFrequency: 3e-5,
 
             maxMountainHeight: 15e3,
-            mountainsFrequency: 3e-3,
-            mountainsMinValue: 0.5
+            mountainsFrequency: 9e-6,
+            mountainsMinValue: 0.6
         };
 
         this.colorSettings = {

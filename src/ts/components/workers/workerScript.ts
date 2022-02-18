@@ -32,9 +32,9 @@ let terrainSettings: TerrainSettings = {
 function initLayers() {
     continentsLayer = simplexNoiseLayer(1e-6, 6, 1.8, 2.1, 0.5, 1 - terrainSettings.continentsFragmentation);
 
-    bumpyLayer = simplexNoiseLayer(1e-3, 3, 2, 2, 1.0, 0.0);
+    bumpyLayer = simplexNoiseLayer(terrainSettings.bumpsFrequency, 3, 2, 2, 1.0, 0.2);
 
-    mountainsLayer = ridgedNoiseLayer(terrainSettings.mountainsFrequency, 6, 1.9, 2.0, 3.0, terrainSettings.mountainsMinValue);
+    mountainsLayer = ridgedNoiseLayer(terrainSettings.mountainsFrequency, 6, 1.9, 2.0, 2.5, terrainSettings.mountainsMinValue);
 }
 
 initLayers();
@@ -60,15 +60,15 @@ function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Ze
     continentGradient.scaleInPlace(terrainSettings.continentBaseHeight);
     gradient.addInPlace(continentGradient);
 
-    let mountainData = mountainsLayer(samplePoint.scale(terrainSettings.mountainsFrequency));
+    let mountainData = mountainsLayer(samplePoint);
     let mountainElevation = mountainData[0];
     let mountainGradient = new Vector3(mountainData[1], mountainData[2], mountainData[3]);
 
-    elevation += 2 * continentMask * mountainElevation * terrainSettings.maxMountainHeight;
-    mountainGradient.scaleInPlace(2 * terrainSettings.maxMountainHeight * continentMask);
+    elevation += continentMask * mountainElevation * terrainSettings.maxMountainHeight;
+    mountainGradient.scaleInPlace(terrainSettings.maxMountainHeight * continentMask);
     gradient.addInPlace(mountainGradient);
 
-    let bumpyData = bumpyLayer(samplePoint.scale(terrainSettings.bumpsFrequency));
+    let bumpyData = bumpyLayer(samplePoint);
     let bumpyElevation = bumpyData[0];
     let bumpyGradient = new Vector3(bumpyData[1], bumpyData[2], bumpyData[3]);
 
@@ -79,7 +79,7 @@ function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Ze
     position.addInPlace(unitCoords.scale(elevation));
 
     gradient.divideInPlace(terrainSettings.continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
-    gradient.divideInPlace(2);
+    //gradient.divideInPlace(2);
 }
 
 self.onmessage = e => {

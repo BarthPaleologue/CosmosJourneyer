@@ -23,6 +23,9 @@ export function ridgedNoiseLayer(frequency: number, nbOctaves: number, decay: nu
             localGradient.divideInPlace(-1);
             localGradient.divideInPlace(decay ** i);
 
+            //localGradient.scaleInPlace(power * Math.pow(localElevation, power - 1));
+            //localElevation = Math.pow(localElevation, power);
+
             noiseValue += localElevation / decay ** i;
             noiseGradient.addInPlace(localGradient);
 
