@@ -494,7 +494,7 @@ const G4 = .138196601; // G4 = (5.0-Math.sqrt(5.0))/20.0
  * If the last four arguments are not null, the analytic derivative
  * (the 4D gradient of the scalar noise field) is also calculated.
  */
-export function sdnoise4(x: number, y: number, z: number, w: number): number[] {
+export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: Vector3): number {
 
   let n0, n1, n2, n3, n4; // Noise contributions from the five corners
   let noise; // Return value
@@ -643,78 +643,84 @@ export function sdnoise4(x: number, y: number, z: number, w: number): number[] {
 
   /* Compute derivative, if requested by supplying non-null pointers
    * for the last four arguments */
-  //if ((NULL != dnoise_dx) && (NULL != dnoise_dy) && (NULL != dnoise_dz) && (NULL != dnoise_dw)) {
-  /*  A straight, unoptimised calculation would be like:
-   *     *dnoise_dx = -8.0f * t20 * t0 * x0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gx0;
-   *    *dnoise_dy = -8.0f * t20 * t0 * y0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gy0;
-   *    *dnoise_dz = -8.0f * t20 * t0 * z0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gz0;
-   *    *dnoise_dw = -8.0f * t20 * t0 * w0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gw0;
-   *    *dnoise_dx += -8.0f * t21 * t1 * x1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gx1;
-   *    *dnoise_dy += -8.0f * t21 * t1 * y1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gy1;
-   *    *dnoise_dz += -8.0f * t21 * t1 * z1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gz1;
-   *    *dnoise_dw = -8.0f * t21 * t1 * w1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gw1;
-   *    *dnoise_dx += -8.0f * t22 * t2 * x2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gx2;
-   *    *dnoise_dy += -8.0f * t22 * t2 * y2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gy2;
-   *    *dnoise_dz += -8.0f * t22 * t2 * z2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gz2;
-   *    *dnoise_dw += -8.0f * t22 * t2 * w2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gw2;
-   *    *dnoise_dx += -8.0f * t23 * t3 * x3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gx3;
-   *    *dnoise_dy += -8.0f * t23 * t3 * y3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gy3;
-   *    *dnoise_dz += -8.0f * t23 * t3 * z3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gz3;
-   *    *dnoise_dw += -8.0f * t23 * t3 * w3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gw3;
-   *    *dnoise_dx += -8.0f * t24 * t4 * x4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gx4;
-   *    *dnoise_dy += -8.0f * t24 * t4 * y4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gy4;
-   *    *dnoise_dz += -8.0f * t24 * t4 * z4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gz4;
-   *    *dnoise_dw += -8.0f * t24 * t4 * w4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gw4;
-   */
-  temp0 = t20 * t0 * (gx0 * x0 + gy0 * y0 + gz0 * z0 + gw0 * w0);
-  let dnoise_dx = temp0 * x0;
-  let dnoise_dy = temp0 * y0;
-  let dnoise_dz = temp0 * z0;
-  let dnoise_dw = temp0 * w0;
-  temp1 = t21 * t1 * (gx1 * x1 + gy1 * y1 + gz1 * z1 + gw1 * w1);
-  dnoise_dx += temp1 * x1;
-  dnoise_dy += temp1 * y1;
-  dnoise_dz += temp1 * z1;
-  dnoise_dw += temp1 * w1;
-  temp2 = t22 * t2 * (gx2 * x2 + gy2 * y2 + gz2 * z2 + gw2 * w2);
-  dnoise_dx += temp2 * x2;
-  dnoise_dy += temp2 * y2;
-  dnoise_dz += temp2 * z2;
-  dnoise_dw += temp2 * w2;
-  temp3 = t23 * t3 * (gx3 * x3 + gy3 * y3 + gz3 * z3 + gw3 * w3);
-  dnoise_dx += temp3 * x3;
-  dnoise_dy += temp3 * y3;
-  dnoise_dz += temp3 * z3;
-  dnoise_dw += temp3 * w3;
-  temp4 = t24 * t4 * (gx4 * x4 + gy4 * y4 + gz4 * z4 + gw4 * w4);
-  dnoise_dx += temp4 * x4;
-  dnoise_dy += temp4 * y4;
-  dnoise_dz += temp4 * z4;
-  dnoise_dw += temp4 * w4;
-  dnoise_dx *= -8.0;
-  dnoise_dy *= -8.0;
-  dnoise_dz *= -8.0;
-  dnoise_dw *= -8.0;
-  dnoise_dx += t40 * gx0 + t41 * gx1 + t42 * gx2 + t43 * gx3 + t44 * gx4;
-  dnoise_dy += t40 * gy0 + t41 * gy1 + t42 * gy2 + t43 * gy3 + t44 * gy4;
-  dnoise_dz += t40 * gz0 + t41 * gz1 + t42 * gz2 + t43 * gz3 + t44 * gz4;
-  dnoise_dw += t40 * gw0 + t41 * gw1 + t42 * gw2 + t43 * gw3 + t44 * gw4;
-  dnoise_dx *= 28.0; /* Scale derivative to match the noise scaling */
-  dnoise_dy *= 28.0;
-  dnoise_dz *= 28.0;
-  dnoise_dw *= 28.0;
-  //}
+  if (gradient) {
+    /*  A straight, unoptimised calculation would be like:
+     *     *dnoise_dx = -8.0f * t20 * t0 * x0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gx0;
+     *    *dnoise_dy = -8.0f * t20 * t0 * y0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gy0;
+     *    *dnoise_dz = -8.0f * t20 * t0 * z0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gz0;
+     *    *dnoise_dw = -8.0f * t20 * t0 * w0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gw0;
+     *    *dnoise_dx += -8.0f * t21 * t1 * x1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gx1;
+     *    *dnoise_dy += -8.0f * t21 * t1 * y1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gy1;
+     *    *dnoise_dz += -8.0f * t21 * t1 * z1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gz1;
+     *    *dnoise_dw = -8.0f * t21 * t1 * w1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gw1;
+     *    *dnoise_dx += -8.0f * t22 * t2 * x2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gx2;
+     *    *dnoise_dy += -8.0f * t22 * t2 * y2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gy2;
+     *    *dnoise_dz += -8.0f * t22 * t2 * z2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gz2;
+     *    *dnoise_dw += -8.0f * t22 * t2 * w2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gw2;
+     *    *dnoise_dx += -8.0f * t23 * t3 * x3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gx3;
+     *    *dnoise_dy += -8.0f * t23 * t3 * y3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gy3;
+     *    *dnoise_dz += -8.0f * t23 * t3 * z3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gz3;
+     *    *dnoise_dw += -8.0f * t23 * t3 * w3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gw3;
+     *    *dnoise_dx += -8.0f * t24 * t4 * x4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gx4;
+     *    *dnoise_dy += -8.0f * t24 * t4 * y4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gy4;
+     *    *dnoise_dz += -8.0f * t24 * t4 * z4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gz4;
+     *    *dnoise_dw += -8.0f * t24 * t4 * w4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gw4;
+     */
+    temp0 = t20 * t0 * (gx0 * x0 + gy0 * y0 + gz0 * z0 + gw0 * w0);
+    let dnoise_dx = temp0 * x0;
+    let dnoise_dy = temp0 * y0;
+    let dnoise_dz = temp0 * z0;
+    let dnoise_dw = temp0 * w0;
+    temp1 = t21 * t1 * (gx1 * x1 + gy1 * y1 + gz1 * z1 + gw1 * w1);
+    dnoise_dx += temp1 * x1;
+    dnoise_dy += temp1 * y1;
+    dnoise_dz += temp1 * z1;
+    dnoise_dw += temp1 * w1;
+    temp2 = t22 * t2 * (gx2 * x2 + gy2 * y2 + gz2 * z2 + gw2 * w2);
+    dnoise_dx += temp2 * x2;
+    dnoise_dy += temp2 * y2;
+    dnoise_dz += temp2 * z2;
+    dnoise_dw += temp2 * w2;
+    temp3 = t23 * t3 * (gx3 * x3 + gy3 * y3 + gz3 * z3 + gw3 * w3);
+    dnoise_dx += temp3 * x3;
+    dnoise_dy += temp3 * y3;
+    dnoise_dz += temp3 * z3;
+    dnoise_dw += temp3 * w3;
+    temp4 = t24 * t4 * (gx4 * x4 + gy4 * y4 + gz4 * z4 + gw4 * w4);
+    dnoise_dx += temp4 * x4;
+    dnoise_dy += temp4 * y4;
+    dnoise_dz += temp4 * z4;
+    dnoise_dw += temp4 * w4;
+    dnoise_dx *= -8.0;
+    dnoise_dy *= -8.0;
+    dnoise_dz *= -8.0;
+    dnoise_dw *= -8.0;
+    dnoise_dx += t40 * gx0 + t41 * gx1 + t42 * gx2 + t43 * gx3 + t44 * gx4;
+    dnoise_dy += t40 * gy0 + t41 * gy1 + t42 * gy2 + t43 * gy3 + t44 * gy4;
+    dnoise_dz += t40 * gz0 + t41 * gz1 + t42 * gz2 + t43 * gz3 + t44 * gz4;
+    dnoise_dw += t40 * gw0 + t41 * gw1 + t42 * gw2 + t43 * gw3 + t44 * gw4;
+    dnoise_dx *= 28.0; /* Scale derivative to match the noise scaling */
+    dnoise_dy *= 28.0;
+    dnoise_dz *= 28.0;
+    dnoise_dw *= 28.0;
 
-  return [noise, dnoise_dx, dnoise_dy, dnoise_dz, dnoise_dw];
+    gradient.x = dnoise_dx;
+    gradient.y = dnoise_dy;
+    gradient.z = dnoise_dz;
+  }
+
+  return noise;
 }
 
-export function simplex401(vector: Vector3, seed = 0): number[] {
-  let [noiseValue, noiseGradientX, noiseGradientY, noiseGradientZ] = sdnoise4(vector.x, vector.y, vector.z, seed);
+export function simplex401(vector: Vector3, gradient?: Vector3, seed = 0): number {
+  let noiseValue = sdnoise4(vector.x, vector.y, vector.z, seed, gradient);
 
   // on divise le vecteur gradient par 2 pour cause que [0,1] deux fois plus petit que [-1,1]
-  return [(noiseValue + 1) / 2, noiseGradientX / 2, noiseGradientY / 2, noiseGradientZ / 2];
+  if (gradient) gradient.divideInPlace(2);
+
+  return (noiseValue + 1) / 2;
 }
 
-export function simplex411(vector: Vector3, seed = 0): number[] {
-  return sdnoise4(vector.x, vector.y, vector.z, seed);
+export function simplex411(vector: Vector3, gradient?: Vector3, seed = 0): number {
+  return sdnoise4(vector.x, vector.y, vector.z, seed, gradient);
 }

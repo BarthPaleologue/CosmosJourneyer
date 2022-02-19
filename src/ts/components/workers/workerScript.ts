@@ -12,7 +12,6 @@ let currentPlanetID = "";
 
 let bumpyLayer: elevationFunction;
 let continentsLayer: elevationFunction;
-
 let mountainsLayer: elevationFunction;
 
 
@@ -30,6 +29,7 @@ let terrainSettings: TerrainSettings = {
 
 
 function initLayers() {
+    // TODO: ne pas hardcoder
     continentsLayer = simplexNoiseLayer(1e-6, 6, 1.8, 2.1, 0.5, 1 - terrainSettings.continentsFragmentation);
 
     bumpyLayer = simplexNoiseLayer(terrainSettings.bumpsFrequency, 3, 2, 2, 1.0, 0.2);
@@ -39,7 +39,7 @@ function initLayers() {
 
 initLayers();
 
-const craterLayer = new CraterLayer([]);
+//const craterLayer = new CraterLayer([]);
 
 function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Zero()): void {
 
@@ -49,10 +49,8 @@ function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Ze
 
     let elevation = 0;
 
-    let continentData = continentsLayer(samplePoint);
-    let continentMask = continentData[0];
-
-    let continentGradient = new Vector3(continentData[1], continentData[2], continentData[3]);
+    let continentGradient = Vector3.Zero();
+    let continentMask = continentsLayer(samplePoint, continentGradient);
 
     let continentElevation = continentMask * terrainSettings.continentBaseHeight;
 
@@ -60,17 +58,16 @@ function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Ze
     continentGradient.scaleInPlace(terrainSettings.continentBaseHeight);
     gradient.addInPlace(continentGradient);
 
-    let mountainData = mountainsLayer(samplePoint);
-    let mountainElevation = mountainData[0];
-    let mountainGradient = new Vector3(mountainData[1], mountainData[2], mountainData[3]);
+    let mountainGradient = Vector3.Zero();
+    let mountainElevation = mountainsLayer(samplePoint, mountainGradient);
+
 
     elevation += continentMask * mountainElevation * terrainSettings.maxMountainHeight;
     mountainGradient.scaleInPlace(terrainSettings.maxMountainHeight * continentMask);
     gradient.addInPlace(mountainGradient);
 
-    let bumpyData = bumpyLayer(samplePoint);
-    let bumpyElevation = bumpyData[0];
-    let bumpyGradient = new Vector3(bumpyData[1], bumpyData[2], bumpyData[3]);
+    let bumpyGradient = Vector3.Zero();
+    let bumpyElevation = bumpyLayer(samplePoint, bumpyGradient);
 
     elevation += bumpyElevation * terrainSettings.maxBumpHeight;
     bumpyGradient.scaleInPlace(terrainSettings.maxBumpHeight);
@@ -79,7 +76,6 @@ function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Ze
     position.addInPlace(unitCoords.scale(elevation));
 
     gradient.divideInPlace(terrainSettings.continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
-    //gradient.divideInPlace(2);
 }
 
 self.onmessage = e => {
@@ -98,7 +94,7 @@ self.onmessage = e => {
         if (data.planetID != currentPlanetID) {
             currentPlanetID = data.planetID;
 
-            craterLayer.craters = data.craters;
+            //craterLayer.craters = data.craters;
             terrainSettings = data.terrainSettings;
             initLayers();
         }
@@ -220,6 +216,7 @@ self.onmessage = e => {
         // benchmark fait le 20/11/2021 20h30 (normale analytique v2) : ~0.8s/chunk
         // benchmark fait le 20/11/2021 21h20 (normale analytique v2.1) : ~0.03s/chunk (30ms/chunk)
         // benchmark fait le 10/12/2021 (normale analytique v2.5) : ~ 50ms/chunk
+        // benchmark fait le 19/02/2022 (normale analytique v2.6) : ~ 40ms/chunk
         //console.log("Time for creation : " + (Date.now() - clock));
 
     } else if (e.data.taskType == "collisionTask") {
@@ -228,7 +225,7 @@ self.onmessage = e => {
         if (data.planetID != currentPlanetID) {
             currentPlanetID = data.planetID;
 
-            craterLayer.craters = data.craters;
+            //craterLayer.craters = data.craters;
             terrainSettings = data.terrainSettings;
             initLayers();
         }

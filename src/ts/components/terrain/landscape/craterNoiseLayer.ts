@@ -9,7 +9,7 @@ export function craterNoiseLayer(frequency: number, nbOctaves: number, decay: nu
             let samplePoint = coords.scale(frequency);
             samplePoint = samplePoint.scale(Math.pow(lacunarity, i));
 
-            noiseValue += simplex401(samplePoint)[0] / Math.pow(decay, i);
+            noiseValue += simplex401(samplePoint) / Math.pow(decay, i);
 
             totalAmplitude += 1.0 / Math.pow(decay, i);
         }
