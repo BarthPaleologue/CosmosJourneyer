@@ -84,6 +84,7 @@ console.table(planet._physicalProperties);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.22, 0.37, 0.024).add(new BABYLON.Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
 planet.colorSettings.sandSize = 250 + 100 * centeredRandom();
 planet.colorSettings.steepSharpness = 1;
+planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
 
 let waterElevation = 20e2 * planet._physicalProperties.waterAmount;
 planet.colorSettings.waterLevel = waterElevation;
