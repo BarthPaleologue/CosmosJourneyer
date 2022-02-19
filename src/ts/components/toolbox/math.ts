@@ -1,30 +1,46 @@
 import { Vector3 } from "./algebra";
 
-export function clamp(value: number, min: number, max: number): number {
-    return Math.min(Math.max(value, min), max);
-}
-
-export function mix(a: number, b: number, t: number): number {
-    return a * (1 - t) + b * t;
-}
-
-// garantie fonctionnelle 
 // https://www.desmos.com/calculator/968c7smugx
+/**
+ * Smooth minimum between a and b
+ * @param a the first value
+ * @param b the second value
+ * @param k the smoothness factor
+ * @returns the smooth minimum between a and b
+ */
 export function smin(a: number, b: number, k: number): number {
     let res = Math.exp(-k * a) + Math.exp(-k * b);
     return -Math.log(res) / k;
 }
 
+/**
+ * Smooth maximum between a and b
+ * @param a the first value
+ * @param b the second value
+ * @param k the smoothness factor
+ * @returns the smooth maximum between a and b
+ */
 export function smax(a: number, b: number, k: number): number {
     let res = Math.exp(k * a) + Math.exp(k * b);
     return Math.log(res) / k;
 }
 
 // based on research folder
+/**
+ * The smooth minimum between u and v and computes the gradient
+ * @param u the first value
+ * @param v the second value
+ * @param k the smoothness factor
+ * @param gradU the gradient of u
+ * @param gradV the gradient of v
+ * @returns the smooth minimum between u and v
+ */
 export function sMinGradient(u: number, v: number, k: number, gradU: Vector3, gradV: Vector3): number {
     let eku = Math.exp(k * u);
     let ekv = Math.exp(k * v);
     let ekuv = eku + ekv;
+
+    // TODO: terminer cela et aussi comment retourner le gradient ?
 
     let gX = (eku * gradV.x + ekv * gradU.x) / (ekuv);
     let gY = (eku * gradV.y + ekv * gradU.y) / (ekuv);
