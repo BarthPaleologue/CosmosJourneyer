@@ -28,6 +28,8 @@ uniform sampler2D snowNormalMap2;
 
 uniform sampler2D steepNormalMap;
 
+uniform vec3 seed;
+
 uniform float planetRadius; // planet radius
 uniform float waterLevel; // controls sand layer
 uniform float sandSize;
@@ -129,7 +131,7 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, float bottomFactor, floa
 	vec3 tSnowNormalX = lerp(
 		texture2D(snowNormalMap, position.zy * scale).rgb,
 		texture2D(snowNormalMap2, position.zy * scale).rgb,
-		completeNoise(position/1.0, 3, 2.0, 2.0)
+		completeNoise(position, 3, 2.0, 2.0)
 	);
     vec3 tSnowNormalY = texture2D(snowNormalMap, position.xz * scale).rgb;
     vec3 tSnowNormalZ = texture2D(snowNormalMap, position.xy * scale).rgb;
@@ -324,6 +326,7 @@ void main() {
 
 	// la unitPosition ne prend pas en compte la rotation de la planète
 	vec3 unitPosition = normalize(vPosition);
+	vec3 seededSamplePoint = normalize(unitPosition + normalize(seed));
 	
 	float latitude = unitPosition.y;
 	float absLatitude01 = abs(latitude);
@@ -371,7 +374,7 @@ void main() {
 	float moisture01 = 0.0; // 0.0 = sec, 1.0 = humid : sec par défaut
 	if(waterMeltingPoint01 < 1.0) {
 		// if there is liquid water on the surface
-		moisture01 += completeNoise(unitPosition * 2.0, 5, 2.0, 2.0) * sqrt(1.0-waterMeltingPoint01) * waterBoilingPoint01;
+		moisture01 += completeNoise(seededSamplePoint * 2.0, 5, 2.0, 2.0) * sqrt(1.0-waterMeltingPoint01) * waterBoilingPoint01;
 	}
 	moisture01 = clamp(moisture01, 0.0, 1.0);
 
@@ -393,11 +396,12 @@ void main() {
 
 	vec3 screenColor = color.rgb * (ndl2*ndl + specComp);
 
-	//screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
-	//screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.7, 0.7, 1.0), temperature01);
-	//screenColor = vNormal*0.5 + 0.5;
-	//screenColor = vec3(elevation01);
-	//screenColor = vec3(1.0 - dot(normal, normalize(vPosition)));
+	int colorMode = 3;
+	if(colorMode == 1) screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
+	if(colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.7, 0.7, 1.0), temperature01);
+	if(colorMode == 3) screenColor = normal*0.5 + 0.5;
+	if(colorMode == 4) screenColor = vec3(elevation01);
+	if(colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vPosition)));
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
 } 

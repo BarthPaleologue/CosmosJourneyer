@@ -101,7 +101,7 @@ export class ChunkForge {
                     position: [task.position.x, task.position.y, task.position.z],
                     craters: task.planet.craters,
                     terrainSettings: task.planet.terrainSettings,
-                    seed: task.planet._seed,
+                    seed: task.planet.getSeed(),
                 } as buildData);
 
                 worker.getWorker().onmessage = e => {

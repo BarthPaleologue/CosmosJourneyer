@@ -2,8 +2,6 @@ import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atm
 import { SolidPlanet } from "./components/planet/solid/planet";
 import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
 
-import sunTexture from "../asset/textures/sun.jpg";
-
 import * as style from "../styles/style.scss";
 import { PlayerControler } from "./components/player/playerControler";
 import { Keyboard } from "./components/inputs/keyboard";
@@ -75,15 +73,15 @@ let planet = new SolidPlanet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * ra
     pressure: Math.max(nrand(1, 0.5), 0),
     waterAmount: Math.max(nrand(1, 0.6), 0),
 }, [
-    Math.round(centeredRandom() * 1000000),
-    Math.round(centeredRandom() * 1000000),
-    Math.round(centeredRandom() * 1000000)
+    Math.round(centeredRandom() * 1000),
+    Math.round(centeredRandom() * 1000),
+    Math.round(centeredRandom() * 1000)
 ]);
-console.log("seed : ", planet._seed.toString());
+console.log("seed : ", planet.getSeed().toString());
 console.table(planet._physicalProperties);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.22, 0.37, 0.024).add(new BABYLON.Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
 planet.colorSettings.sandSize = 250 + 100 * centeredRandom();
-planet.colorSettings.steepSharpness = 1;
+planet.colorSettings.steepSharpness = 3;
 planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
 
 let waterElevation = 20e2 * planet._physicalProperties.waterAmount;

@@ -75,10 +75,10 @@ export class SolidPlanet extends Planet {
         this.attachNode = BABYLON.Mesh.CreateBox(`${this._name}AttachNode`, 1, scene);
         this.attachNode.position = position;
 
-        let nbCraters = 800;
+        /*let nbCraters = 800;
         let craterRadiusFactor = 1;
         let craterSteepnessFactor = 1;
-        let craterMaxDepthFactor = 1;
+        let craterMaxDepthFactor = 1;*/
 
         this.terrainSettings = {
             continentsFragmentation: 0.47,
@@ -118,10 +118,14 @@ export class SolidPlanet extends Planet {
                 attributes: ["position", "normal", "uv"],
                 uniforms: [
                     "world", "worldViewProjection", "projection", "view",
+
                     "textureSampler", "depthSampler",
+
                     "bottomNormalMap", "plainNormalMap", "sandNormalMap",
                     "snowNormalMap", "snowNormalMap2",
                     "steepNormalMap",
+
+                    "seed",
 
                     "cameraNear", "cameraFar", "planetPosition", "planetRadius", "planetWorldMatrix",
 
@@ -142,6 +146,8 @@ export class SolidPlanet extends Planet {
                 ]
             }
         );
+
+        surfaceMaterial.setVector3("seed", new BABYLON.Vector3(this._seed[0], this._seed[1], this._seed[2]));
 
         surfaceMaterial.setTexture("bottomNormalMap", new BABYLON.Texture(crackednormal, scene));
         surfaceMaterial.setTexture("steepNormalMap", new BABYLON.Texture(rockn, scene));
