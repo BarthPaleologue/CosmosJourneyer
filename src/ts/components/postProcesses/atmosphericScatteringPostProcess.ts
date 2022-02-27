@@ -1,4 +1,4 @@
-import { SolidPlanet } from "../planet/solid/planet";
+import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
 
 interface AtmosphereSettings {
     planetRadius: number,

@@ -1,7 +1,7 @@
-import { SolidPlanet } from "./planet";
-import { ChunkForge, TaskType } from "../../forge/chunkForge";
-import { Direction, getQuaternionFromDirection } from "../../toolbox/direction";
-import { Quaternion, Vector3 } from "../../toolbox/algebra";
+import { SolidPlanet } from "./solidPlanet";
+import { ChunkForge, TaskType } from "../../../forge/chunkForge";
+import { Direction, getQuaternionFromDirection } from "../../../toolbox/direction";
+import { Quaternion, Vector3 } from "../../../toolbox/algebra";
 
 /**
  * Returns the node position in plane space

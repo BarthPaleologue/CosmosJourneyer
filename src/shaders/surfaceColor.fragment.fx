@@ -326,7 +326,7 @@ void main() {
 
 	// la unitPosition ne prend pas en compte la rotation de la planète
 	vec3 unitPosition = normalize(vPosition);
-	vec3 seededSamplePoint = normalize(unitPosition + normalize(seed));
+	vec3 seededSamplePoint = normalize(normalize(unitPosition) + seed);//normalize(unitPosition + normalize(seed));
 	
 	float latitude = unitPosition.y;
 	float absLatitude01 = abs(latitude);
@@ -396,7 +396,7 @@ void main() {
 
 	vec3 screenColor = color.rgb * (ndl2*ndl + specComp);
 
-	int colorMode = 3;
+	int colorMode = 0;
 	if(colorMode == 1) screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
 	if(colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.7, 0.7, 1.0), temperature01);
 	if(colorMode == 3) screenColor = normal*0.5 + 0.5;

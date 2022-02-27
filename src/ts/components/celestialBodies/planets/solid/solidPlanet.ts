@@ -1,19 +1,20 @@
-import { Crater, generateCraters } from "../../terrain/crater/crater";
-import { ChunkForge } from "../../forge/chunkForge";
+import { Crater, generateCraters } from "../../../terrain/crater/crater";
+import { ChunkForge } from "../../../forge/chunkForge";
 import { PlanetSide } from "./planetSide";
-import { Direction } from "../../toolbox/direction";
+import { Direction } from "../../../toolbox/direction";
 
 //texture import
-import crackednormal from "../../../../asset/textures/crackednormal.jpg";
-import rockn from "../../../../asset/textures/rockn.png";
-import grassn from "../../../../asset/textures/grassn.png";
+import crackednormal from "../../../../../asset/textures/crackednormal.jpg";
+import rockn from "../../../../../asset/textures/rockn.png";
+import grassn from "../../../../../asset/textures/grassn.png";
 
-import snowNormalMap from "../../../../asset/textures/snowNormalMap3.jpg";
-import snowNormalMap2 from "../../../../asset/textures/snowNormalMap2.png";
+import snowNormalMap from "../../../../../asset/textures/snowNormalMap3.jpg";
+import snowNormalMap2 from "../../../../../asset/textures/snowNormalMap2.png";
 
-import sandNormalMap from "../../../../asset/textures/sandNormalMap.jpg";
-import { TerrainSettings } from "../../terrain/terrainSettings";
-import { PhysicalProperties, Planet } from "../planet";
+import sandNormalMap from "../../../../../asset/textures/sandNormalMap.jpg";
+import { TerrainSettings } from "../../../terrain/terrainSettings";
+import { PhysicalProperties, AbstractPlanet } from "../abstractPlanet";
+import {CelestialBodyType} from "../../celestialBody";
 
 export interface ColorSettings {
     snowColor: BABYLON.Vector3,
@@ -37,12 +38,14 @@ export interface SolidPhysicalProperties extends PhysicalProperties {
     waterAmount: number;
 }
 
-export class SolidPlanet extends Planet {
+export class SolidPlanet extends AbstractPlanet {
 
     craters: Crater[];
 
     public colorSettings: ColorSettings;
     readonly _physicalProperties: SolidPhysicalProperties;
+
+    protected bodyType = CelestialBodyType.SOLID;
 
     public terrainSettings: TerrainSettings;
 
@@ -73,6 +76,7 @@ export class SolidPlanet extends Planet {
         console.log(spaceBetweenVertex);
 
         this.attachNode = BABYLON.Mesh.CreateBox(`${this._name}AttachNode`, 1, scene);
+        this.attachNode.rotate(BABYLON.Axis.Y, 0, BABYLON.Space.WORLD); // init rotation quaternion
         this.attachNode.position = position;
 
         /*let nbCraters = 800;
@@ -265,5 +269,13 @@ export class SolidPlanet extends Planet {
     }
     public getAbsolutePosition() {
         return this.attachNode.getAbsolutePosition();
+    }
+
+    setAbsolutePosition(newPosition: BABYLON.Vector3): void {
+        this.attachNode.setAbsolutePosition(newPosition);
+    }
+
+    getRotationQuaternion(): BABYLON.Quaternion {
+        return this.attachNode.rotationQuaternion!;
     }
 }

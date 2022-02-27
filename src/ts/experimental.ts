@@ -1,10 +1,10 @@
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
-import { SolidPlanet } from "./components/planet/solid/planet";
+import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
 import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
 
 import * as style from "../styles/style.scss";
 import * as style2 from "../sliderjs/style2.min.css";
-import { PlanetManager } from "./components/planet/planetManager";
+import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
 import { PlayerControler } from "./components/player/playerControler";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
 import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
@@ -46,7 +46,7 @@ let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale
 let starfield = new StarfieldPostProcess("starfield", player, light, scene);
 
 
-let planetManager = new PlanetManager();
+let planetManager = new StarSystemManager();
 
 let planet = new SolidPlanet("Gaia", planetRadius, BABYLON.Vector3.Zero(), 2, scene);
 planet.attachNode.position.z = planetRadius * 3;
@@ -62,7 +62,7 @@ planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
 
-planetManager.add(planet);
+planetManager.addSolidPlanet(planet);
 
 
 let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + waterElevation, light, player.camera, scene);

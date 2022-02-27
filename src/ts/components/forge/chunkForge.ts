@@ -1,5 +1,5 @@
-import { SolidPlanet } from "../planet/solid/planet";
-import { PlanetChunk } from "../planet/solid/planetChunk";
+import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
+import { PlanetChunk } from "../celestialBodies/planets/solid/planetChunk";
 import { Quaternion, Vector3 } from "../toolbox/algebra";
 import { Direction } from "../toolbox/direction";
 import { BuilderWorker } from "../workers/builderWorker";

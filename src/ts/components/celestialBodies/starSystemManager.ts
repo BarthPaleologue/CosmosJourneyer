@@ -1,31 +1,35 @@
 import { ChunkForge } from "../forge/chunkForge";
 import { PlayerControler } from "../player/playerControler";
-import { SolidPlanet } from "./solid/planet";
+import { SolidPlanet } from "./planets/solid/solidPlanet";
+import {CelestialBody} from "./celestialBody";
+import {Star} from "./stars/star";
 
-export class PlanetManager {
+export class StarSystemManager {
     private readonly _chunkForge: ChunkForge;
-    private readonly _planets: SolidPlanet[] = [];
+    private readonly _celestialBodies: CelestialBody[] = [];
     constructor(nbVertices = 64) {
         this._chunkForge = new ChunkForge(nbVertices);
     }
-    public add(planet: SolidPlanet): void {
-        planet.attachNode.rotate(BABYLON.Axis.Y, 0, BABYLON.Space.WORLD); // on s'assure que le rotationQuaternion est défini
+    public addStar(star: Star): void {
+        this._celestialBodies.push(star);
+    }
+    public addSolidPlanet(planet: SolidPlanet): void {
         planet.setChunkForge(this._chunkForge);
-        this._planets.push(planet);
+        this._celestialBodies.push(planet);
     }
     public moveEverything(deplacement: BABYLON.Vector3): void {
-        for (const planet of this._planets) {
-            planet.attachNode.setAbsolutePosition(planet.getAbsolutePosition().add(deplacement));
+        for (const planet of this._celestialBodies) {
+            planet.setAbsolutePosition(planet.getAbsolutePosition().add(deplacement));
         }
     }
-    public getPlanets(): SolidPlanet[] {
-        return this._planets;
+    public getPlanets(): CelestialBody[] {
+        return this._celestialBodies;
     }
-    public getNearestPlanet(): SolidPlanet | null {
+    public getNearestPlanet(): CelestialBody | null {
         let nearest = null;
-        for (const planet of this._planets) {
+        for (const planet of this._celestialBodies) {
             if (nearest == null) nearest = planet;
-            else if (planet.attachNode.absolutePosition.lengthSquared() < nearest.getAbsolutePosition().lengthSquared()) {
+            else if (planet.getAbsolutePosition().lengthSquared() < nearest.getAbsolutePosition().lengthSquared()) {
                 nearest = planet;
             }
         }
@@ -34,7 +38,7 @@ export class PlanetManager {
     public update(player: PlayerControler, lightOrigin: BABYLON.Vector3, depthRenderer: BABYLON.DepthRenderer): void {
         this._chunkForge.update(depthRenderer);
         // TODO : il faudra update les planètes des plus lointaines au plus proches quand il y aura les postprocess
-        for (const planet of this._planets) {
+        for (const planet of this._celestialBodies) {
             planet.update(player.mesh.position, player.getForwardDirection(), lightOrigin);
         }
     }

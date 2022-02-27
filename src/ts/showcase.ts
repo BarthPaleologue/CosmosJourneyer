@@ -1,8 +1,6 @@
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
-import { SolidPlanet } from "./components/planet/solid/planet";
+import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
 import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
-
-import sunTexture from "../asset/textures/sun.jpg";
 
 import * as style from "../styles/style.scss";
 import { PlayerControler } from "./components/player/playerControler";
@@ -10,7 +8,7 @@ import { Keyboard } from "./components/inputs/keyboard";
 import { Mouse } from "./components/inputs/mouse";
 import { Gamepad } from "./components/inputs/gamepad";
 import { CollisionWorker } from "./components/workers/collisionWorker";
-import { PlanetManager } from "./components/planet/planetManager";
+import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
 
 import rockn from "../asset/textures/rockn.png";
 import lensflare from "../asset/textures/lensflare3.png";
@@ -19,6 +17,7 @@ import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPost
 import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
 import { VolumetricCloudsPostProcess } from "./components/postProcesses/volumetricCloudsPostProcess";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
+import { Star } from "./components/celestialBodies/stars/star";
 
 style.default;
 
@@ -70,29 +69,17 @@ scene.onBeforeDrawPhaseObservable.add((scene, state) => {
     [player.camera]
 );*/
 
-let sun = BABYLON.Mesh.CreateSphere("tester", 32, 0.4 * radius, scene);
-let starMaterial = new BABYLON.ShaderMaterial("starColor", scene, "./shaders/starMaterial",
-    {
-        attributes: ["position"],
-        uniforms: [
-            "world", "worldViewProjection", "planetWorldMatrix",
-        ]
-    }
-);
-starMaterial.setMatrix("planetWorldMatrix", sun.getWorldMatrix());
+let starSystemManager = new StarSystemManager();
 
-sun.material = starMaterial;
+let sun = new Star("Weierstrass", 0.4 * radius, scene);
 
-//let mat = new BABYLON.StandardMaterial("mat", scene);
-//mat.emissiveTexture = new BABYLON.Texture(sunTexture, scene);
-//mat.useLogarithmicDepth = true;
-//sun.material = mat;
-sun.position.x = -913038.375;
-sun.position.z = -1649636.25;
+sun.mesh.position.x = -913038.375;
+sun.mesh.position.z = -1649636.25;
+starSystemManager.addStar(sun);
 
-depthRenderer.getDepthMap().renderList?.push(sun);
+depthRenderer.getDepthMap().renderList?.push(sun.mesh);
 
-let starfield = new StarfieldPostProcess("starfield", player, sun, scene);
+let starfield = new StarfieldPostProcess("starfield", player, sun.mesh, scene);
 
 
 /*let lensFlareSystem = new BABYLON.LensFlareSystem("lensFlare", sun, scene);
@@ -103,7 +90,7 @@ flare1.alphaMode = 1;
 let flare2 = new BABYLON.LensFlare(0.05, 0.2, new BABYLON.Color3(0.2, 0.5, 0.2), lensflare2, lensFlareSystem);
 flare2.alphaMode = 1;*/
 
-let planetManager = new PlanetManager();
+
 
 let waterElevation = 20e2;
 
@@ -116,24 +103,21 @@ planet.colorSettings.waterLevel = waterElevation;
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
 planet.attachNode.rotate(BABYLON.Axis.X, 0.2, BABYLON.Space.WORLD);
-//planet.attachNode.rotation.x = 0.2;
 
-let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun, player.camera, scene);
-//ocean.settings.alphaModifier = 0.00002;
-//ocean.settings.depthModifier = 0.004;
+let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun.mesh, player.camera, scene);
 
-let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius, waterElevation, radius + 15e3, sun, player.camera, scene);
+let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius, waterElevation, radius + 15e3, sun.mesh, player.camera, scene);
 //let volClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + waterElevation + 10e3, radius + waterElevation + 30e3, sun, player.camera, scene);
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun, player.camera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun.mesh, player.camera, scene);
 atmosphere.settings.intensity = 20;
 atmosphere.settings.falloffFactor = 24;
 atmosphere.settings.scatteringStrength = 1.0;
 
-let rings = new RingsPostProcess("rings", planet.attachNode, radius, waterElevation, sun, player.camera, scene);
+let rings = new RingsPostProcess("rings", planet.attachNode, radius, waterElevation, sun.mesh, player.camera, scene);
 
 
-planetManager.add(planet);
+starSystemManager.addSolidPlanet(planet);
 
 let moon = new SolidPlanet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene, {
     minTemperature: -180,
@@ -158,7 +142,7 @@ moon.surfaceMaterial.setTexture("sandNormalMap", new BABYLON.Texture(rockn, scen
 
 moon.attachNode.position.addInPlace(planet.attachNode.getAbsolutePosition());
 
-planetManager.add(moon);
+starSystemManager.addSolidPlanet(moon);
 
 let Ares = new SolidPlanet("Ares", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene, {
     minTemperature: -80,
@@ -177,22 +161,53 @@ Ares.colorSettings.waterLevel = 0;
 Ares.updateColors();
 Ares.attachNode.position.x = -radius * 4;
 
-let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius, radius + 100e3, sun, player.camera, scene);
+let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius, radius + 100e3, sun.mesh, player.camera, scene);
 atmosphere2.settings.intensity = 20 * Ares._physicalProperties.pressure;
 atmosphere2.settings.greenWaveLength = 680;
 atmosphere2.settings.falloffFactor = 24;
 atmosphere2.settings.scatteringStrength = 1.0;
 
-planetManager.add(Ares);
+starSystemManager.addSolidPlanet(Ares);
 
-let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun, 100);
+// TODO: mettre le VLS dans Star => par extension créer un système de gestion des post process généralisé
+let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
 vls.exposure = 1.0;
 vls.decay = 0.95;
-//vls.weight = 2.0;
 
 let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, player.camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
 
 let isMouseEnabled = false;
+
+let collisionWorker = new CollisionWorker(player, starSystemManager);
+
+function updateScene() {
+    player.nearestBody = starSystemManager.getNearestPlanet();
+
+    if (player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() < player.nearestBody.getRadius() * 2) {
+        document.getElementById("planetName")!.innerText = player.nearestBody.getName();
+    } else {
+        document.getElementById("planetName")!.innerText = "Outer Space";
+    }
+
+    starSystemManager.update(player, sun.mesh.position, depthRenderer);
+
+    if (isMouseEnabled) {
+        player.listenToMouse(mouse, engine.getDeltaTime() / 1000);
+    }
+
+    gamepad.update();
+
+    let deplacement = player.listenToGamepad(gamepad, engine.getDeltaTime() / 1000);
+
+    deplacement.addInPlace(player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000));
+
+    starSystemManager.moveEverything(deplacement);
+    //sun.mesh.position.addInPlace(deplacement);
+
+    if (!collisionWorker.isBusy() && player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() < player.nearestBody.getRadius() * 2) {
+        collisionWorker.checkCollision(player.nearestBody);
+    }
+}
 
 document.addEventListener("keydown", e => {
     if (e.key == "p") { // take screenshots
@@ -202,7 +217,7 @@ document.addEventListener("keydown", e => {
     if (e.key == "o") ocean.settings.oceanRadius = (ocean.settings.oceanRadius == 0) ? radius + waterElevation : 0;
     if (e.key == "y") flatClouds.settings.cloudLayerRadius = (flatClouds.settings.cloudLayerRadius == 0) ? radius + 15e3 : 0;
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
-    if (e.key == "w" && player.nearestPlanet != null) player.nearestPlanet.surfaceMaterial.wireframe = !player.nearestPlanet.surfaceMaterial.wireframe;
+    if (e.key == "w" && player.nearestBody != null) (<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe = !(<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe;
 });
 
 window.addEventListener("resize", () => {
@@ -211,42 +226,9 @@ window.addEventListener("resize", () => {
     engine.resize();
 });
 
-let collisionWorker = new CollisionWorker(player, planetManager, sun);
-
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
-
-    scene.beforeRender = () => {
-        player.nearestPlanet = planetManager.getNearestPlanet();
-
-        if (player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() < player.nearestPlanet._radius * 2) {
-            document.getElementById("planetName")!.innerText = player.nearestPlanet._name;
-        } else {
-            document.getElementById("planetName")!.innerText = "Outer Space";
-        }
-
-        planetManager.update(player, sun.position, depthRenderer);
-
-        if (isMouseEnabled) {
-            player.listenToMouse(mouse, engine.getDeltaTime() / 1000);
-        }
-
-        gamepad.update();
-
-        //planet.attachNode.rotate(BABYLON.Axis.Y, .0002, BABYLON.Space.LOCAL);
-
-        let deplacement = player.listenToGamepad(gamepad, engine.getDeltaTime() / 1000);
-
-        deplacement.addInPlace(player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000));
-
-        planetManager.moveEverything(deplacement);
-        sun.position.addInPlace(deplacement);
-
-        if (!collisionWorker.isBusy() && player.nearestPlanet != null && player.nearestPlanet.getAbsolutePosition().length() < player.nearestPlanet._radius * 2) {
-            collisionWorker.checkCollision(player.nearestPlanet);
-        }
-    };
-
+    scene.beforeRender = updateScene;
     engine.runRenderLoop(() => scene.render());
 });
 

@@ -1,25 +1,25 @@
-import { CollisionData } from "../forge/CollisionData";
-import { SolidPlanet } from "../planet/solid/planet";
-import { PlanetManager } from "../planet/planetManager";
-import { PlayerControler } from "../player/playerControler";
-import { PlanetWorker } from "./planetWorker";
-import { Quaternion, Vector3 } from "../toolbox/algebra";
+import {CollisionData} from "../forge/CollisionData";
+import {StarSystemManager} from "../celestialBodies/starSystemManager";
+import {PlayerControler} from "../player/playerControler";
+import {PlanetWorker} from "./planetWorker";
+import {Vector3} from "../toolbox/algebra";
+import {CelestialBody, CelestialBodyType} from "../celestialBodies/celestialBody";
+import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
 
 export class CollisionWorker extends PlanetWorker {
     _player: PlayerControler;
     _busy = false;
-    // TODO : suppr la light lors de la création du nouveau soleil
-    constructor(player: PlayerControler, planetManager: PlanetManager, light: BABYLON.Mesh) {
+    constructor(player: PlayerControler, planetManager: StarSystemManager) {
         super();
         this._player = player;
         this._worker.onmessage = e => {
-            if (player.nearestPlanet == null) return;
+            if (player.nearestBody == null) return;
 
-            let direction = player.nearestPlanet.getAbsolutePosition().normalizeToNew();
-            let currentHeight = player.nearestPlanet.getAbsolutePosition().length();
+            let direction = player.nearestBody.getAbsolutePosition().normalizeToNew();
+            let currentHeight = player.nearestBody.getAbsolutePosition().length();
             let terrainHeight = e.data.h;
 
-            let currentPosition = player.nearestPlanet.attachNode.absolutePosition;
+            let currentPosition = player.nearestBody.getAbsolutePosition();
             let newPosition = currentPosition;
 
             if (currentHeight - player.collisionRadius < terrainHeight) {
@@ -29,7 +29,6 @@ export class CollisionWorker extends PlanetWorker {
             let deviation = newPosition.subtract(currentPosition);
 
             planetManager.moveEverything(deviation);
-            light.position.addInPlace(deviation);
 
             this._busy = false;
         };
@@ -41,24 +40,27 @@ export class CollisionWorker extends PlanetWorker {
         super.send(data);
         this._busy = true;
     }
-    public checkCollision(planet: SolidPlanet): void {
+    public checkCollision(planet: CelestialBody): void {
         let position = Vector3.FromBABYLON3(planet.getAbsolutePosition()); // position de la planète / au joueur
         position.scaleInPlace(-1); // position du joueur / au centre de la planète
 
         // on applique le quaternion inverse pour obtenir le sample point correspondant à la planète rotatée (fais un dessin si c'est pas clair)
-        position.applyQuaternionInPlace(BABYLON.Quaternion.Inverse(planet.attachNode.rotationQuaternion!));
+        position.applyQuaternionInPlace(BABYLON.Quaternion.Inverse(planet.getRotationQuaternion()));
 
-        this.send({
-            taskType: "collisionTask",
-            planetID: planet._name,
-            terrainSettings: planet.terrainSettings,
-            position: [
-                position.x,
-                position.y,
-                position.z
-            ],
-            chunkLength: planet.rootChunkLength,
-            craters: planet.craters
-        });
+        if(planet.getBodyType() == CelestialBodyType.SOLID) {
+            //TODO: improve cast system
+            this.send({
+                taskType: "collisionTask",
+                planetID: planet.getName(),
+                terrainSettings: (<SolidPlanet><unknown>planet).terrainSettings,
+                position: [
+                    position.x,
+                    position.y,
+                    position.z
+                ],
+                chunkLength: (<SolidPlanet><unknown>planet).rootChunkLength,
+                craters: (<SolidPlanet><unknown>planet).craters
+            });
+        }
     }
 }

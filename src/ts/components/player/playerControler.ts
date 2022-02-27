@@ -1,11 +1,12 @@
 import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
-import { SolidPlanet } from "../planet/solid/planet";
+import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
+import {CelestialBody} from "../celestialBodies/celestialBody";
 
 export class PlayerControler {
 
-    nearestPlanet: SolidPlanet | null;
+    nearestBody: CelestialBody | null;
     collisionRadius = 100;
 
     camera: BABYLON.FreeCamera;
@@ -42,7 +43,7 @@ export class PlayerControler {
         this.camera = new BABYLON.FreeCamera("firstPersonCamera", BABYLON.Vector3.Zero(), scene);
         this.camera.parent = this.mesh;
 
-        this.nearestPlanet = null;
+        this.nearestBody = null;
     }
 
     /* #region directions */
