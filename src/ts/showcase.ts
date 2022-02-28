@@ -150,10 +150,10 @@ let Ares = new SolidPlanet("Ares", radius, new BABYLON.Vector3(0, 0, 4 * radius)
     pressure: 0.5,
     waterAmount: 0.3
 });
-Ares.terrainSettings.continentsFragmentation = 1;
-Ares.terrainSettings.maxMountainHeight = 10e3;
-Ares.terrainSettings.mountainsFrequency /= 1.1;
-Ares.terrainSettings.mountainsMinValue = 0.4;
+Ares.terrainSettings.continentsFragmentation = 0.7;
+Ares.terrainSettings.continentBaseHeight = 4e3;
+Ares.terrainSettings.maxMountainHeight = 15e3;
+Ares.terrainSettings.mountainsMinValue = 0.7;
 Ares.colorSettings.sandColor = Ares.colorSettings.plainColor;
 Ares.colorSettings.steepSharpness = 2;
 Ares.colorSettings.waterLevel = 0;
@@ -162,7 +162,7 @@ Ares.updateColors();
 Ares.attachNode.position.x = -radius * 4;
 
 let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius, radius + 100e3, sun.mesh, player.camera, scene);
-atmosphere2.settings.intensity = 20 * Ares._physicalProperties.pressure;
+atmosphere2.settings.intensity = 20 * Ares.physicalProperties.pressure;
 atmosphere2.settings.greenWaveLength = 680;
 atmosphere2.settings.falloffFactor = 24;
 atmosphere2.settings.scatteringStrength = 1.0;

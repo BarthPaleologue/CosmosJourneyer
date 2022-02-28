@@ -2,6 +2,9 @@ import { Crater, generateCraters } from "../../../terrain/crater/crater";
 import { ChunkForge } from "../../../forge/chunkForge";
 import { PlanetSide } from "./planetSide";
 import { Direction } from "../../../toolbox/direction";
+import { TerrainSettings } from "../../../terrain/terrainSettings";
+import { PlanetPhysicalProperties, AbstractPlanet } from "../abstractPlanet";
+import {CelestialBodyType} from "../../celestialBody";
 
 //texture import
 import crackednormal from "../../../../../asset/textures/crackednormal.jpg";
@@ -12,9 +15,7 @@ import snowNormalMap from "../../../../../asset/textures/snowNormalMap3.jpg";
 import snowNormalMap2 from "../../../../../asset/textures/snowNormalMap2.png";
 
 import sandNormalMap from "../../../../../asset/textures/sandNormalMap.jpg";
-import { TerrainSettings } from "../../../terrain/terrainSettings";
-import { PhysicalProperties, AbstractPlanet } from "../abstractPlanet";
-import {CelestialBodyType} from "../../celestialBody";
+
 
 export interface ColorSettings {
     snowColor: BABYLON.Vector3,
@@ -34,7 +35,7 @@ export interface ColorSettings {
     steepSnowDotLimit: number;
 }
 
-export interface SolidPhysicalProperties extends PhysicalProperties {
+export interface SolidPhysicalProperties extends PlanetPhysicalProperties {
     waterAmount: number;
 }
 
@@ -43,7 +44,7 @@ export class SolidPlanet extends AbstractPlanet {
     craters: Crater[];
 
     public colorSettings: ColorSettings;
-    readonly _physicalProperties: SolidPhysicalProperties;
+    readonly physicalProperties: SolidPhysicalProperties;
 
     protected bodyType = CelestialBodyType.SOLID;
 
@@ -66,7 +67,7 @@ export class SolidPlanet extends AbstractPlanet {
     }, seed = [0, 0, 0]) {
         super(id, radius, seed);
 
-        this._physicalProperties = physicalProperties;
+        this.physicalProperties = physicalProperties;
 
         this.rootChunkLength = this._radius * 2;
 
@@ -178,10 +179,10 @@ export class SolidPlanet extends AbstractPlanet {
         surfaceMaterial.setFloat("snowLatitudePersistence", this.colorSettings.snowLatitudePersistence);
         surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.steepSnowDotLimit);
 
-        surfaceMaterial.setFloat("minTemperature", this._physicalProperties.minTemperature);
-        surfaceMaterial.setFloat("maxTemperature", this._physicalProperties.maxTemperature);
+        surfaceMaterial.setFloat("minTemperature", this.physicalProperties.minTemperature);
+        surfaceMaterial.setFloat("maxTemperature", this.physicalProperties.maxTemperature);
 
-        surfaceMaterial.setFloat("waterAmount", this._physicalProperties.waterAmount);
+        surfaceMaterial.setFloat("waterAmount", this.physicalProperties.waterAmount);
 
         this.surfaceMaterial = surfaceMaterial;
 
@@ -249,10 +250,10 @@ export class SolidPlanet extends AbstractPlanet {
         this.surfaceMaterial.setFloat("snowLatitudePersistence", this.colorSettings.snowLatitudePersistence);
         this.surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.steepSnowDotLimit);
 
-        this.surfaceMaterial.setFloat("minTemperature", this._physicalProperties.minTemperature);
-        this.surfaceMaterial.setFloat("maxTemperature", this._physicalProperties.maxTemperature);
+        this.surfaceMaterial.setFloat("minTemperature", this.physicalProperties.minTemperature);
+        this.surfaceMaterial.setFloat("maxTemperature", this.physicalProperties.maxTemperature);
 
-        this.surfaceMaterial.setFloat("waterAmount", this._physicalProperties.waterAmount);
+        this.surfaceMaterial.setFloat("waterAmount", this.physicalProperties.waterAmount);
 
     }
 

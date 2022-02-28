@@ -4,6 +4,10 @@ export enum CelestialBodyType {
     GAZ
 }
 
+export interface BodyPhysicalProperties {
+
+}
+
 export abstract class CelestialBody {
     protected abstract bodyType: CelestialBodyType;
     protected constructor() {

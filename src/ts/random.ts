@@ -70,13 +70,13 @@ let planet = new SolidPlanet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * ra
     centeredRandom()
 ]);
 console.log("seed : ", planet.getSeed().toString());
-console.table(planet._physicalProperties);
+console.table(planet.physicalProperties);
 planet.colorSettings.plainColor = new BABYLON.Vector3(0.22, 0.37, 0.024).add(new BABYLON.Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
 planet.colorSettings.sandSize = 250 + 100 * centeredRandom();
 planet.colorSettings.steepSharpness = 3;
 planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
 
-let waterElevation = 20e2 * planet._physicalProperties.waterAmount;
+let waterElevation = 20e2 * planet.physicalProperties.waterAmount;
 planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
@@ -85,14 +85,14 @@ planet.attachNode.rotate(BABYLON.Axis.X, centeredRandom(), BABYLON.Space.WORLD);
 
 let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun.mesh, player.camera, scene);
 
-if (planet._physicalProperties.waterAmount > 0 && planet._physicalProperties.pressure > 0) {
+if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0) {
     let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius, waterElevation, radius + 15e3, sun.mesh, player.camera, scene);
-    flatClouds.settings.cloudPower = 10 * Math.exp(-planet._physicalProperties.waterAmount * planet._physicalProperties.pressure);
+    flatClouds.settings.cloudPower = 10 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure);
 }
 
-if (planet._physicalProperties.pressure > 0) {
+if (planet.physicalProperties.pressure > 0) {
     let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun.mesh, player.camera, scene);
-    atmosphere.settings.intensity = 15 * planet._physicalProperties.pressure;
+    atmosphere.settings.intensity = 15 * planet.physicalProperties.pressure;
     atmosphere.settings.falloffFactor = 24;
     atmosphere.settings.scatteringStrength = 1.0;
 }

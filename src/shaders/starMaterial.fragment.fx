@@ -48,7 +48,7 @@ void main() {
 	// la unitPosition ne prend pas en compte la rotation de la planète
 	vec3 unitPosition = normalize(vPosition);
 	
-	float noiseValue = completeNoise(unitPosition * 3.0, 5, 2.0, 2.0);
+	float noiseValue = completeNoise(unitPosition * 10.0, 5, 2.0, 2.0);
 
 	vec3 finalColor = lerp(vec3(1.0, 0.0, 0.0), vec3(1.0, 0.5, 0.0), noiseValue) * 1.7;
 

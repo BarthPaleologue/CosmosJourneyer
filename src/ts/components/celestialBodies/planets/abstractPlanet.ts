@@ -1,6 +1,6 @@
-import { CelestialBody } from "../celestialBody";
+import {BodyPhysicalProperties, CelestialBody} from "../celestialBody";
 
-export interface PhysicalProperties {
+export interface PlanetPhysicalProperties extends BodyPhysicalProperties {
     minTemperature: number;
     maxTemperature: number;
     pressure: number;
@@ -10,7 +10,7 @@ export abstract class AbstractPlanet extends CelestialBody {
     readonly _name: string;
     readonly _radius: number;
     protected _seed: number[];
-    constructor(name: string, radius: number, seed = [0, 0, 0]) {
+    protected constructor(name: string, radius: number, seed = [0, 0, 0]) {
         super();
         this._name = name;
         this._radius = radius;

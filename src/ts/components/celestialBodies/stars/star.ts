@@ -1,9 +1,16 @@
-import {CelestialBody, CelestialBodyType} from "../celestialBody";
+import {BodyPhysicalProperties, CelestialBody, CelestialBodyType} from "../celestialBody";
+
+export interface StarPhysicalProperties extends BodyPhysicalProperties {
+    temperature: number
+}
 
 export class Star extends CelestialBody {
     public mesh: BABYLON.Mesh;
     private radius: number
     protected bodyType = CelestialBodyType.STAR;
+    physicalProperties: StarPhysicalProperties = {
+        temperature: 5772
+    }
     constructor(name: string, radius: number, scene: BABYLON.Scene) {
         super();
         this.mesh = BABYLON.Mesh.CreateSphere(name, 32, radius, scene);
