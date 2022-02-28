@@ -1,16 +1,19 @@
-import {BodyPhysicalProperties, CelestialBody, CelestialBodyType} from "../celestialBody";
+import { getRgbFromTemperature } from "../../toolbox/specrend";
+import { BodyPhysicalProperties, CelestialBody, CelestialBodyType } from "../celestialBody";
 
 export interface StarPhysicalProperties extends BodyPhysicalProperties {
-    temperature: number
+    temperature: number;
 }
 
 export class Star extends CelestialBody {
     public mesh: BABYLON.Mesh;
-    private radius: number
+    private radius: number;
+    private starMaterial: BABYLON.ShaderMaterial;
+    private internalTime = 0;
     protected bodyType = CelestialBodyType.STAR;
     physicalProperties: StarPhysicalProperties = {
-        temperature: 5772
-    }
+        temperature: 5778
+    };
     constructor(name: string, radius: number, scene: BABYLON.Scene) {
         super();
         this.mesh = BABYLON.Mesh.CreateSphere(name, 32, radius, scene);
@@ -21,12 +24,16 @@ export class Star extends CelestialBody {
                 attributes: ["position"],
                 uniforms: [
                     "world", "worldViewProjection", "planetWorldMatrix",
+                    "starColor", "time"
                 ]
             }
         );
         starMaterial.setMatrix("planetWorldMatrix", this.mesh.getWorldMatrix());
+        starMaterial.setVector3("starColor", getRgbFromTemperature(this.physicalProperties.temperature));
 
-        this.mesh.material = starMaterial;
+        this.starMaterial = starMaterial;
+
+        this.mesh.material = this.starMaterial;
     }
 
     setAbsolutePosition(newPosition: BABYLON.Vector3): void {
@@ -39,6 +46,8 @@ export class Star extends CelestialBody {
 
     update(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3): void {
         //TODO: update star
+        this.starMaterial.setFloat("time", this.internalTime);
+        this.internalTime += this.mesh.getEngine().getDeltaTime() / 1000;
     }
 
     getName(): string {

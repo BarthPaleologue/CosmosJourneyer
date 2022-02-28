@@ -69,7 +69,7 @@ scene.onBeforeDrawPhaseObservable.add((scene, state) => {
     [player.camera]
 );*/
 
-let starSystemManager = new StarSystemManager();
+let starSystemManager = new StarSystemManager(128);
 
 let sun = new Star("Weierstrass", 0.4 * radius, scene);
 
@@ -107,7 +107,7 @@ planet.attachNode.rotate(BABYLON.Axis.X, 0.2, BABYLON.Space.WORLD);
 let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun.mesh, player.camera, scene);
 
 let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius, waterElevation, radius + 15e3, sun.mesh, player.camera, scene);
-//let volClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + waterElevation + 10e3, radius + waterElevation + 30e3, sun, player.camera, scene);
+//let volClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + waterElevation + 10e3, radius + waterElevation + 30e3, sun.mesh, player.camera, scene);
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun.mesh, player.camera, scene);
 atmosphere.settings.intensity = 20;

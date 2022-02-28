@@ -2,6 +2,9 @@ precision lowp float;
 
 varying vec3 vPosition; // position of the vertex in sphere space
 
+uniform vec3 starColor;
+uniform float time;
+
 // Noise functions to spice things up a little bit
 float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
@@ -47,12 +50,14 @@ vec3 lerp(vec3 a, vec3 b, float t) {
 void main() {
 	// la unitPosition ne prend pas en compte la rotation de la planète
 	vec3 unitPosition = normalize(vPosition);
+
+	unitPosition += vec3(time, -time, time) / 100.0;
 	
-	float noiseValue = completeNoise(unitPosition * 10.0, 5, 2.0, 2.0);
+	float noiseValue = completeNoise(unitPosition * 20.0, 10, 2.0, 2.0);
 
-	vec3 finalColor = lerp(vec3(1.0, 0.0, 0.0), vec3(1.0, 0.5, 0.0), noiseValue) * 1.7;
+	vec3 finalColor = starColor;
 
-	finalColor += vec3(pow(completeNoise(unitPosition * 1.5, 3, 2.0, 2.0), 4.0));
+	finalColor -= vec3(pow(noiseValue, 0.8) / 1.2);
 
 	gl_FragColor = vec4(finalColor, 1.0); // apply color and lighting	
 } 

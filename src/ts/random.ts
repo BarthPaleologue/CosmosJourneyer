@@ -14,7 +14,7 @@ import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPost
 import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
 import { centeredRandom, nrand, randInt } from "./components/toolbox/random";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
-import {Star} from "./components/celestialBodies/stars/star";
+import { Star } from "./components/celestialBodies/stars/star";
 style.default;
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -48,7 +48,7 @@ player.camera.maxZ = Math.max(radius * 50, 10000);
 
 
 
-let starSystemManager = new StarSystemManager();
+let starSystemManager = new StarSystemManager(128);
 
 let sun = new Star("Weierstrass", 0.4 * radius, scene);
 
