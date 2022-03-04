@@ -1,3 +1,5 @@
+import { Engine, Scene, Color3, Color4, Texture, DepthRenderer, Axis, Space, Vector3, PointLight, Tools, FxaaPostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
 import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
 import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
@@ -5,7 +7,7 @@ import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
 import * as style from "../styles/style.scss";
 import * as style2 from "../sliderjs/style2.min.css";
 import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
-import { PlayerControler } from "./components/player/playerControler";
+import { PlayerController } from "./components/player/playerController";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
 import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
 import { Keyboard } from "./components/inputs/keyboard";
@@ -20,13 +22,13 @@ let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth - 300;
 canvas.height = window.innerHeight;
 
-let engine = new BABYLON.Engine(canvas);
+let engine = new Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 
-let scene = new BABYLON.Scene(engine);
-scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+let scene = new Scene(engine);
+scene.clearColor = new Color4(0, 0, 0, 1);
 
-let depthRenderer = new BABYLON.DepthRenderer(scene);
+let depthRenderer = new DepthRenderer(scene);
 scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
@@ -34,28 +36,28 @@ depthRenderer.getDepthMap().renderList = [];
 const planetRadius = 1000e3;
 
 
-let player = new PlayerControler(scene);
+let player = new PlayerController(scene);
 player.setSpeed(0.2 * planetRadius);
 player.camera.maxZ = planetRadius * 20;
 
 let keyboard = new Keyboard();
 
 
-let light = new BABYLON.PointLight("light", new BABYLON.Vector3(-1, 1, -1).scale(planetRadius * 10), scene);
+let light = new PointLight("light", new Vector3(-1, 1, -1).scale(planetRadius * 10), scene);
 
 let starfield = new StarfieldPostProcess("starfield", player, light, scene);
 
 
 let planetManager = new StarSystemManager();
 
-let planet = new SolidPlanet("Gaia", planetRadius, BABYLON.Vector3.Zero(), 2, scene);
+let planet = new SolidPlanet("Gaia", planetRadius, Vector3.Zero(), 2, scene);
 planet.attachNode.position.z = planetRadius * 3;
 planet.attachNode.rotation.x = -0.2;
 
 let waterElevation = 20e2;
 
 planet.colorSettings.steepSharpness = 3;
-planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0).scale(0.7).add(new BABYLON.Vector3(0.5, 0.3, 0.08).scale(0.3));
+planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
 
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.waterLevel = waterElevation;
@@ -77,7 +79,7 @@ atmosphere.settings.falloffFactor = 24;
 let rings = new RingsPostProcess("rings", planet.attachNode, planetRadius, waterElevation, light, player.camera, scene);
 
 
-let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+let fxaa = new FxaaPostProcess("fxaa", 1, scene.activeCamera, Texture.BILINEAR_SAMPLINGMODE);
 
 //#region Sliders
 
@@ -108,8 +110,8 @@ new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 70, oc
     ocean.settings.depthModifier = val / 10000;
 });
 
-function babylonToHex(color: BABYLON.Vector3): string {
-    let c2 = new BABYLON.Color3(color.x, color.y, color.z);
+function babylonToHex(color: Vector3): string {
+    let c2 = new Color3(color.x, color.y, color.z);
     console.log(c2.toHexString());
     return c2.toHexString();
 }
@@ -117,42 +119,34 @@ function babylonToHex(color: BABYLON.Vector3): string {
 let snowColorPicker = document.getElementById("snowColor") as HTMLInputElement;
 snowColorPicker.value = babylonToHex(planet.colorSettings.snowColor);
 snowColorPicker.addEventListener("input", () => {
-    let color = BABYLON.Color3.FromHexString(snowColorPicker.value);
-    planet.colorSettings.snowColor = new BABYLON.Vector3(color.r, color.g, color.b);
+    let color = Color3.FromHexString(snowColorPicker.value);
+    planet.colorSettings.snowColor = new Vector3(color.r, color.g, color.b);
     planet.updateColors();
 });
 
 let plainColorPicker = document.getElementById("plainColor") as HTMLInputElement;
 plainColorPicker.value = babylonToHex(planet.colorSettings.plainColor);
 plainColorPicker.addEventListener("input", () => {
-    let color = BABYLON.Color3.FromHexString(plainColorPicker.value);
-    planet.colorSettings.plainColor = new BABYLON.Vector3(color.r, color.g, color.b);
+    let color = Color3.FromHexString(plainColorPicker.value);
+    planet.colorSettings.plainColor = new Vector3(color.r, color.g, color.b);
     planet.updateColors();
 });
 
 let steepColorPicker = document.getElementById("steepColor") as HTMLInputElement;
 steepColorPicker.value = babylonToHex(planet.colorSettings.steepColor);
 steepColorPicker.addEventListener("input", () => {
-    let color = BABYLON.Color3.FromHexString(steepColorPicker.value);
-    planet.colorSettings.steepColor = new BABYLON.Vector3(color.r, color.g, color.b);
+    let color = Color3.FromHexString(steepColorPicker.value);
+    planet.colorSettings.steepColor = new Vector3(color.r, color.g, color.b);
     planet.updateColors();
 });
 
 let sandColorPicker = document.getElementById("sandColor") as HTMLInputElement;
 sandColorPicker.value = babylonToHex(planet.colorSettings.sandColor);
 sandColorPicker.addEventListener("input", () => {
-    let color = BABYLON.Color3.FromHexString(sandColorPicker.value);
-    planet.colorSettings.sandColor = new BABYLON.Vector3(color.r, color.g, color.b);
+    let color = Color3.FromHexString(sandColorPicker.value);
+    planet.colorSettings.sandColor = new Vector3(color.r, color.g, color.b);
     planet.updateColors();
 });
-
-/*let floorColorPicker = document.getElementById("sandColor") as HTMLInputElement;
-floorColorPicker.value = babylonToHex(planet.colorSettings.sandColor);
-floorColorPicker.addEventListener("input", () => {
-    let color = BABYLON.Color3.FromHexString(sandColorPicker.value);
-    planet.colorSettings.floorColor = new BABYLON.Vector3(color.r, color.g, color.b);
-    planet.updateColors();
-});*/
 
 new Slider("sandSize", document.getElementById("sandSize")!, 0, 300, planet.colorSettings.sandSize / 10, (val: number) => {
     planet.colorSettings.sandSize = val * 10;
@@ -299,7 +293,7 @@ document.getElementById("randomCraters")?.addEventListener("click", () => {
 
 document.addEventListener("keyup", e => {
     if (e.key == "p") { // take screenshots
-        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
+        Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
     }
     if (e.key == "w") {
         planet.surfaceMaterial.wireframe = !planet.surfaceMaterial.wireframe;
@@ -320,9 +314,9 @@ scene.executeWhenReady(() => {
 
         planetManager.moveEverything(deplacement);
 
-        planet.attachNode.rotate(BABYLON.Axis.Y, .001 * rotationSpeed, BABYLON.Space.LOCAL);
+        planet.attachNode.rotate(Axis.Y, .001 * rotationSpeed, Space.LOCAL);
 
-        light.position = new BABYLON.Vector3(Math.cos(sunOrientation * Math.PI / 180), 0, Math.sin(sunOrientation * Math.PI / 180)).scale(planetRadius * 10);
+        light.position = new Vector3(Math.cos(sunOrientation * Math.PI / 180), 0, Math.sin(sunOrientation * Math.PI / 180)).scale(planetRadius * 10);
         light.position.addInPlace(planet.attachNode.getAbsolutePosition());
 
         planetManager.update(player, light.getAbsolutePosition(), depthRenderer);

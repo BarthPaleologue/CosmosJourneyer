@@ -1,5 +1,7 @@
+import {Vector3, DepthRenderer} from "@babylonjs/core";
+
 import { ChunkForge } from "../forge/chunkForge";
-import { PlayerControler } from "../player/playerControler";
+import { PlayerController } from "../player/playerController";
 import { SolidPlanet } from "./planets/solid/solidPlanet";
 import {CelestialBody} from "./celestialBody";
 import {Star} from "./stars/star";
@@ -17,7 +19,7 @@ export class StarSystemManager {
         planet.setChunkForge(this._chunkForge);
         this._celestialBodies.push(planet);
     }
-    public moveEverything(deplacement: BABYLON.Vector3): void {
+    public moveEverything(deplacement: Vector3): void {
         for (const planet of this._celestialBodies) {
             planet.setAbsolutePosition(planet.getAbsolutePosition().add(deplacement));
         }
@@ -35,7 +37,7 @@ export class StarSystemManager {
         }
         return nearest;
     }
-    public update(player: PlayerControler, lightOrigin: BABYLON.Vector3, depthRenderer: BABYLON.DepthRenderer): void {
+    public update(player: PlayerController, lightOrigin: Vector3, depthRenderer: DepthRenderer): void {
         this._chunkForge.update(depthRenderer);
         // TODO : il faudra update les planètes des plus lointaines au plus proches quand il y aura les postprocess
         for (const planet of this._celestialBodies) {

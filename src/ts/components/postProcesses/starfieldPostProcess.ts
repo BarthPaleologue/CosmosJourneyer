@@ -1,18 +1,19 @@
-import { PlayerControler } from "../player/playerControler";
-import { CraterLayer } from "../terrain/crater/craterLayer";
+import {PostProcess, Mesh, Light, Scene, Camera, Effect, Axis, Vector3, Texture} from "@babylonjs/core";
+
+import { PlayerController } from "../player/playerController";
 
 interface StarfieldSettings {
 
 }
 
-export class StarfieldPostProcess extends BABYLON.PostProcess {
+export class StarfieldPostProcess extends PostProcess {
 
     settings: StarfieldSettings;
-    camera: BABYLON.Camera;
+    camera: Camera;
 
     internalTime = 0;
 
-    constructor(name: string, player: PlayerControler, sun: BABYLON.Mesh | BABYLON.Light, scene: BABYLON.Scene) {
+    constructor(name: string, player: PlayerController, sun: Mesh | Light, scene: Scene) {
         super(name, "./shaders/starfield", [
             "sunPosition",
             "cameraPosition",
@@ -30,7 +31,7 @@ export class StarfieldPostProcess extends BABYLON.PostProcess {
         ], [
             "textureSampler",
             "depthSampler",
-        ], 1, player.camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        ], 1, player.camera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
 
         this.camera = player.camera;
 
@@ -40,14 +41,14 @@ export class StarfieldPostProcess extends BABYLON.PostProcess {
 
         let depthMap = scene.customRenderTargets[0];
 
-        this.onApply = (effect: BABYLON.Effect) => {
+        this.onApply = (effect: Effect) => {
             this.internalTime += this.getEngine().getDeltaTime();
 
             effect.setTexture("depthSampler", depthMap);
 
             effect.setVector3("cameraPosition", this.camera.position);
 
-            let vis = 1.0 - BABYLON.Vector3.Dot(sun.getAbsolutePosition().normalizeToNew(), this.camera.getDirection(BABYLON.Axis.Z));
+            let vis = 1.0 - Vector3.Dot(sun.getAbsolutePosition().normalizeToNew(), this.camera.getDirection(Axis.Z));
             vis /= 2;
 
             effect.setFloat("visibility", vis);
@@ -62,7 +63,7 @@ export class StarfieldPostProcess extends BABYLON.PostProcess {
         };
     }
 
-    setCamera(camera: BABYLON.Camera) {
+    setCamera(camera: Camera) {
         this.camera.detachPostProcess(this);
         this.camera = camera;
         camera.attachPostProcess(this);

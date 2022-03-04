@@ -1,9 +1,11 @@
+import { Engine, Texture, Scene, Color4, DepthRenderer, Axis, Space, Vector3, Tools, FxaaPostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
 import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
 import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
 
 import * as style from "../styles/style.scss";
-import { PlayerControler } from "./components/player/playerControler";
+import { PlayerController } from "./components/player/playerController";
 import { Keyboard } from "./components/inputs/keyboard";
 import { Mouse } from "./components/inputs/mouse";
 import { Gamepad } from "./components/inputs/gamepad";
@@ -21,15 +23,15 @@ let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let engine = new BABYLON.Engine(canvas);
+let engine = new Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 
 console.log("GPU utilisé : " + engine.getGlInfo().renderer);
 
-let scene = new BABYLON.Scene(engine);
-scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+let scene = new Scene(engine);
+scene.clearColor = new Color4(0, 0, 0, 1);
 
-let depthRenderer = new BABYLON.DepthRenderer(scene);
+let depthRenderer = new DepthRenderer(scene);
 scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
@@ -40,9 +42,9 @@ let keyboard = new Keyboard();
 let mouse = new Mouse();
 let gamepad = new Gamepad();
 
-let player = new PlayerControler(scene);
+let player = new PlayerController(scene);
 player.setSpeed(0.2 * radius);
-player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), 0.45, BABYLON.Space.WORLD);
+player.mesh.rotate(player.camera.getDirection(Axis.Y), 0.45, Space.WORLD);
 
 player.camera.maxZ = Math.max(radius * 50, 10000);
 
@@ -59,7 +61,7 @@ starSystemManager.addStar(sun);
 let starfield = new StarfieldPostProcess("starfield", player, sun.mesh, scene);
 
 
-let planet = new SolidPlanet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene, {
+let planet = new SolidPlanet("Hécate", radius, new Vector3(0, 0, 4 * radius), 1, scene, {
     minTemperature: randInt(-50, 5),
     maxTemperature: randInt(10, 50),
     pressure: Math.max(nrand(1, 0.5), 0),
@@ -71,7 +73,7 @@ let planet = new SolidPlanet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * ra
 ]);
 console.log("seed : ", planet.getSeed().toString());
 console.table(planet.physicalProperties);
-planet.colorSettings.plainColor = new BABYLON.Vector3(0.22, 0.37, 0.024).add(new BABYLON.Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
+planet.colorSettings.plainColor = new Vector3(0.22, 0.37, 0.024).add(new Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
 planet.colorSettings.sandSize = 250 + 100 * centeredRandom();
 planet.colorSettings.steepSharpness = 3;
 planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
@@ -81,7 +83,7 @@ planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
 planet.attachNode.position.x = radius * 2;
-planet.attachNode.rotate(BABYLON.Axis.X, centeredRandom(), BABYLON.Space.WORLD);
+planet.attachNode.rotate(Axis.X, centeredRandom(), Space.WORLD);
 
 let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun.mesh, player.camera, scene);
 
@@ -103,15 +105,15 @@ rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom();
 
 starSystemManager.addSolidPlanet(planet);
 
-let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
+let vls = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
 
-let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, player.camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+let fxaa = new FxaaPostProcess("fxaa", 1, player.camera, Texture.BILINEAR_SAMPLINGMODE);
 
 let isMouseEnabled = false;
 
 document.addEventListener("keydown", e => {
     if (e.key == "p") { // take screenshots
-        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
+        Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
     }
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
     if (e.key == "w" && player.nearestBody != null) (<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe = !(<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe;

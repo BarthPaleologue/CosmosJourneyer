@@ -1,4 +1,4 @@
-import { Quaternion } from "./algebra";
+import { LQuaternion } from "./algebra";
 
 export enum Direction {
     Up,
@@ -9,19 +9,19 @@ export enum Direction {
     Backward
 }
 
-export function getQuaternionFromDirection(direction: Direction): Quaternion {
+export function getQuaternionFromDirection(direction: Direction): LQuaternion {
     switch (direction) {
         case Direction.Up:
-            return Quaternion.RotationX(Math.PI / 2);
+            return LQuaternion.RotationX(Math.PI / 2);
         case Direction.Down:
-            return Quaternion.RotationX(-Math.PI / 2);
+            return LQuaternion.RotationX(-Math.PI / 2);
         case Direction.Forward:
-            return Quaternion.Identity();
+            return LQuaternion.Identity();
         case Direction.Backward:
-            return Quaternion.RotationY(Math.PI);
+            return LQuaternion.RotationY(Math.PI);
         case Direction.Left:
-            return Quaternion.RotationY(Math.PI / 2);
+            return LQuaternion.RotationY(Math.PI / 2);
         case Direction.Right:
-            return Quaternion.RotationY(-Math.PI / 2);
+            return LQuaternion.RotationY(-Math.PI / 2);
     }
 }

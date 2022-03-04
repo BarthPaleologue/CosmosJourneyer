@@ -1,3 +1,5 @@
+import {Vector2, Vector3, Vector4, Quaternion} from "@babylonjs/core";
+
 export class Vector {
     private components: number[];
     constructor(...components: number[]) {
@@ -151,10 +153,10 @@ export class Vector {
         }
         return new Vector(...components);
     }
-    public static fromBABYLON(vector: BABYLON.Vector2 | BABYLON.Vector3 | BABYLON.Vector4) {
+    public static fromBABYLON(vector: Vector2 | Vector3 | Vector4) {
         let components: number[] = [vector.x, vector.y];
-        if (vector instanceof BABYLON.Vector3) components.push(vector.z);
-        if (vector instanceof BABYLON.Vector4) components.push(vector.w);
+        if (vector instanceof Vector3) components.push(vector.z);
+        if (vector instanceof Vector4) components.push(vector.w);
         return new Vector(...components);
     }
     public static Ns(n: number, dim: number) {
@@ -227,11 +229,11 @@ export class Vector {
     }
     public toBABYLON() {
         if (this.dim == 2) {
-            return new BABYLON.Vector2(this.x, this.y);
+            return new Vector2(this.x, this.y);
         } else if (this.dim == 3) {
-            return new BABYLON.Vector3(this.x, this.y, this.z);
+            return new Vector3(this.x, this.y, this.z);
         } else if (this.dim == 4) {
-            return new BABYLON.Vector4(this.x, this.y, this.z, this.w);
+            return new Vector4(this.x, this.y, this.z, this.w);
         } else {
             throw Error("Vector of too many dimensions : cannot be casted as a BABYLON Vector 2 3 or 4");
         }
@@ -332,7 +334,7 @@ export class Vector {
     }
 }
 
-export class Vector3 {
+export class LVector3 {
     private _x: number;
     private _y: number;
     private _z: number;
@@ -380,8 +382,8 @@ export class Vector3 {
      * @param scaleFactor the factor you want your new vector scaled to
      * @returns a new Vector3, copy of the current one scaled by the scaleFactor
      */
-    scale(scaleFactor: number): Vector3 {
-        return new Vector3(this._x * scaleFactor, this._y * scaleFactor, this._z * scaleFactor);
+    scale(scaleFactor: number): LVector3 {
+        return new LVector3(this._x * scaleFactor, this._y * scaleFactor, this._z * scaleFactor);
     }
 
     scaleInPlace(scaleFactor: number): void {
@@ -390,8 +392,8 @@ export class Vector3 {
         this._z *= scaleFactor;
     }
 
-    divide(divisor: number): Vector3 {
-        return new Vector3(this._x / divisor, this._y / divisor, this._z / divisor);
+    divide(divisor: number): LVector3 {
+        return new LVector3(this._x / divisor, this._y / divisor, this._z / divisor);
     }
 
     divideInPlace(divisor: number): void {
@@ -405,45 +407,45 @@ export class Vector3 {
      * @param otherVector The other Vector3 you want to add
      * @returns returns the sum of the current Vector3 and the other Vector3 as a new Vector3
      */
-    add(otherVector: Vector3): Vector3 {
-        return new Vector3(this._x + otherVector._x, this._y + otherVector._y, this._z + otherVector._z);
+    add(otherVector: LVector3): LVector3 {
+        return new LVector3(this._x + otherVector._x, this._y + otherVector._y, this._z + otherVector._z);
     }
-    addInPlace(otherVector: Vector3): void {
+    addInPlace(otherVector: LVector3): void {
         this._x += otherVector._x;
         this._y += otherVector._y;
         this._z += otherVector._z;
     }
-    subtract(otherVector: Vector3): Vector3 {
-        return new Vector3(this._x - otherVector._x, this._y - otherVector._y, this._z - otherVector._z);
+    subtract(otherVector: LVector3): LVector3 {
+        return new LVector3(this._x - otherVector._x, this._y - otherVector._y, this._z - otherVector._z);
     }
-    subtractInPlace(otherVector: Vector3): void {
+    subtractInPlace(otherVector: LVector3): void {
         this._x -= otherVector._x;
         this._y -= otherVector._y;
         this._z -= otherVector._z;
     }
-    normalize(): Vector3 {
+    normalize(): LVector3 {
         return this.scale(1 / this.getMagnitude());
     }
     normalizeInPlace(): void {
         this.scaleInPlace(1 / this.getMagnitude());
     }
-    static Zero(): Vector3 {
-        return new Vector3(0, 0, 0);
+    static Zero(): LVector3 {
+        return new LVector3(0, 0, 0);
     }
-    static FromArray3(array: number[]): Vector3 {
-        return new Vector3(array[0], array[1], array[2]);
+    static FromArray3(array: number[]): LVector3 {
+        return new LVector3(array[0], array[1], array[2]);
     }
-    static FromBABYLON3(vector: BABYLON.Vector3): Vector3 {
+    static FromBABYLON3(vector: Vector3): LVector3 {
+        return new LVector3(vector.x, vector.y, vector.z);
+    }
+    static ToBABYLON3(vector: LVector3): Vector3 {
         return new Vector3(vector.x, vector.y, vector.z);
     }
-    static ToBABYLON3(vector: Vector3): BABYLON.Vector3 {
-        return new BABYLON.Vector3(vector.x, vector.y, vector.z);
-    }
-    public toBabylon(): BABYLON.Vector3 {
-        return Vector3.ToBABYLON3(this);
+    public toBabylon(): Vector3 {
+        return LVector3.ToBABYLON3(this);
     }
     //https://www.wikiwand.com/en/Quaternions_and_spatial_rotation
-    applyQuaternionInPlace(quaternion: Quaternion | BABYLON.Quaternion): void {
+    applyQuaternionInPlace(quaternion: LQuaternion | Quaternion): void {
         let qx = quaternion.x;
         let qy = quaternion.y;
         let qz = quaternion.z;
@@ -461,22 +463,22 @@ export class Vector3 {
         this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
         this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
     }
-    static DistanceSquared(vector1: Vector3, vector2: Vector3) {
+    static DistanceSquared(vector1: LVector3, vector2: LVector3) {
         return (vector1.x - vector2.x) ** 2 + (vector1.y - vector2.y) ** 2 + (vector1.z - vector2.z) ** 2;
     }
-    static Distance(vector1: Vector3, vector2: Vector3) {
-        return Math.sqrt(Vector3.DistanceSquared(vector1, vector2));
+    static Distance(vector1: LVector3, vector2: LVector3) {
+        return Math.sqrt(LVector3.DistanceSquared(vector1, vector2));
     }
-    static Dot(vector1: Vector3, vector2: Vector3) {
+    static Dot(vector1: LVector3, vector2: LVector3) {
         return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
     }
 
-    static FloorToNew(vector: Vector3) {
-        return new Vector3(Math.floor(vector.x), Math.floor(vector.y), Math.floor(vector.z));
+    static FloorToNew(vector: LVector3) {
+        return new LVector3(Math.floor(vector.x), Math.floor(vector.y), Math.floor(vector.z));
     }
 }
 
-export class Quaternion {
+export class LQuaternion {
     private _x: number;
     private _y: number;
     private _z: number;
@@ -515,25 +517,25 @@ export class Quaternion {
         this._w = value;
     }
 
-    static Zero(): Quaternion {
-        return new Quaternion(0, 0, 0, 0);
+    static Zero(): LQuaternion {
+        return new LQuaternion(0, 0, 0, 0);
     }
-    static Identity(): Quaternion {
-        return new Quaternion(0, 0, 0, 1);
+    static Identity(): LQuaternion {
+        return new LQuaternion(0, 0, 0, 1);
     }
-    static FromArray(array: number[]): Quaternion {
-        return new Quaternion(array[0], array[1], array[2], array[3]);
+    static FromArray(array: number[]): LQuaternion {
+        return new LQuaternion(array[0], array[1], array[2], array[3]);
     }
-    static FromBABYLON(quaternion: BABYLON.Quaternion): Quaternion {
-        return new Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+    static FromBABYLON(quaternion: Quaternion): LQuaternion {
+        return new LQuaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
     }
-    static RotationX(angle: number): Quaternion {
-        return new Quaternion(Math.sin(angle / 2), 0, 0, Math.cos(angle / 2));
+    static RotationX(angle: number): LQuaternion {
+        return new LQuaternion(Math.sin(angle / 2), 0, 0, Math.cos(angle / 2));
     }
-    static RotationY(angle: number): Quaternion {
-        return new Quaternion(0, Math.sin(angle / 2), 0, Math.cos(angle / 2));
+    static RotationY(angle: number): LQuaternion {
+        return new LQuaternion(0, Math.sin(angle / 2), 0, Math.cos(angle / 2));
     }
-    static RotationZ(angle: number): Quaternion {
-        return new Quaternion(0, 0, Math.sin(angle / 2), Math.cos(angle / 2));
+    static RotationZ(angle: number): LQuaternion {
+        return new LQuaternion(0, 0, Math.sin(angle / 2), Math.cos(angle / 2));
     }
 }

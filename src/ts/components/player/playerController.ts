@@ -1,15 +1,16 @@
+import {Vector3, FreeCamera, Mesh, StandardMaterial, Color3, Axis, Space, Scene} from "@babylonjs/core";
+
 import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
-import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
 import {CelestialBody} from "../celestialBodies/celestialBody";
 
-export class PlayerControler {
+export class PlayerController {
 
     nearestBody: CelestialBody | null;
     collisionRadius = 100;
 
-    camera: BABYLON.FreeCamera;
+    camera: FreeCamera;
 
     private speed = 1;
     private rotationSpeed = Math.PI / 4;
@@ -32,15 +33,15 @@ export class PlayerControler {
         yawRightKey: "l",
     };
 
-    readonly mesh: BABYLON.Mesh;
+    readonly mesh: Mesh;
 
-    constructor(scene: BABYLON.Scene) {
-        this.mesh = BABYLON.Mesh.CreateBox("player", 1, scene);
-        let mat = new BABYLON.StandardMaterial("mat", scene);
-        mat.emissiveColor = BABYLON.Color3.White();
+    constructor(scene: Scene) {
+        this.mesh = Mesh.CreateBox("player", 1, scene);
+        let mat = new StandardMaterial("mat", scene);
+        mat.emissiveColor = Color3.White();
         this.mesh.material = mat;
 
-        this.camera = new BABYLON.FreeCamera("firstPersonCamera", BABYLON.Vector3.Zero(), scene);
+        this.camera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.mesh;
 
         this.nearestBody = null;
@@ -52,15 +53,15 @@ export class PlayerControler {
      * 
      * @returns the unit vector pointing forward the player controler in world space
      */
-    public getForwardDirection(): BABYLON.Vector3 {
-        return this.mesh.getDirection(BABYLON.Axis.Z);
+    public getForwardDirection(): Vector3 {
+        return this.mesh.getDirection(Axis.Z);
     }
 
     /**
      * 
      * @returns the unit vector pointing backward the player controler in world space
      */
-    public getBackwardDirection(): BABYLON.Vector3 {
+    public getBackwardDirection(): Vector3 {
         return this.getForwardDirection().scale(-1);
     }
 
@@ -68,15 +69,15 @@ export class PlayerControler {
      * 
      * @returns the unit vector pointing upward the player controler in world space
      */
-    public getUpwardDirection(): BABYLON.Vector3 {
-        return this.mesh.getDirection(BABYLON.Axis.Y);
+    public getUpwardDirection(): Vector3 {
+        return this.mesh.getDirection(Axis.Y);
     }
 
     /**
      * 
      * @returns the unit vector pointing downward the player controler in world space
      */
-    public getDownwardDirection(): BABYLON.Vector3 {
+    public getDownwardDirection(): Vector3 {
         return this.getUpwardDirection().scale(-1);
     }
 
@@ -84,15 +85,15 @@ export class PlayerControler {
      * 
      * @returns the unit vector pointing to the right of the player controler in world space
      */
-    public getRightDirection(): BABYLON.Vector3 {
-        return this.mesh.getDirection(BABYLON.Axis.X);
+    public getRightDirection(): Vector3 {
+        return this.mesh.getDirection(Axis.X);
     }
 
     /**
      * 
      * @returns the unit vector pointing to the left of the player controler in world space
      */
-    public getLeftDirection(): BABYLON.Vector3 {
+    public getLeftDirection(): Vector3 {
         return this.getRightDirection().scale(-1);
     }
     /* #endregion directions */
@@ -111,28 +112,28 @@ export class PlayerControler {
      * @param deltaTime the time between 2 frames
      * @returns the negative displacement of the player to apply to every other mesh given the inputs
      */
-    public listenToKeyboard(keyboard: Keyboard, deltaTime: number): BABYLON.Vector3 {
+    public listenToKeyboard(keyboard: Keyboard, deltaTime: number): Vector3 {
         // Update Rotation state
         if (keyboard.isPressed(this.controls.rollLeftKey)) { // rotation autour de l'axe de déplacement
-            this.mesh.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
+            this.mesh.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
         } else if (keyboard.isPressed(this.controls.rollRightKey)) {
-            this.mesh.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
+            this.mesh.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
         }
 
         if (keyboard.isPressed(this.controls.pitchUpKey)) {
-            this.mesh.rotate(this.getRightDirection(), -this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
+            this.mesh.rotate(this.getRightDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
         } else if (keyboard.isPressed(this.controls.picthDownKey)) {
-            this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
+            this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
         }
 
         if (keyboard.isPressed(this.controls.yawLeftKey)) {
-            this.mesh.rotate(this.getUpwardDirection(), -this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
+            this.mesh.rotate(this.getUpwardDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
         } else if (keyboard.isPressed(this.controls.yawRightKey)) {
-            this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime, BABYLON.Space.WORLD);
+            this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
         }
 
         // Update displacement state
-        let deplacement = BABYLON.Vector3.Zero();
+        let deplacement = Vector3.Zero();
 
         let forwardDeplacement = this.getForwardDirection().scale(this.speed * deltaTime);
         let upwardDeplacement = this.getUpwardDirection().scale(this.speed * deltaTime);
@@ -159,8 +160,8 @@ export class PlayerControler {
      */
     public listenToMouse(mouse: Mouse, deltaTime: number): void {
         // Update Rotation state
-        this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * mouse.getDYToCenter() / (Math.max(window.innerWidth, window.innerHeight) / 2), BABYLON.Space.WORLD);
-        this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * mouse.getDXToCenter() / (Math.max(window.innerWidth, window.innerHeight) / 2), BABYLON.Space.WORLD);
+        this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * mouse.getDYToCenter() / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
+        this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * mouse.getDXToCenter() / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
     }
 
     /**
@@ -169,9 +170,9 @@ export class PlayerControler {
      * @param deltaTime the time between 2 frames
      * @returns the negative displacement of the playerControler given the inputs
      */
-    public listenToGamepad(gamepad: Gamepad, deltaTime: number): BABYLON.Vector3 {
+    public listenToGamepad(gamepad: Gamepad, deltaTime: number): Vector3 {
 
-        let deplacement = BABYLON.Vector3.Zero();
+        let deplacement = Vector3.Zero();
 
         let forwardDeplacement = this.getForwardDirection().scale(this.speed * deltaTime);
         let upwardDeplacement = this.getUpwardDirection().scale(this.speed * deltaTime);
@@ -188,12 +189,12 @@ export class PlayerControler {
 
         // Update Rotation state
         // pitch and yaw control
-        this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RY), BABYLON.Space.WORLD);
-        this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RX), BABYLON.Space.WORLD);
+        this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RY), Space.WORLD);
+        this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RX), Space.WORLD);
 
         // roll control
-        this.mesh.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.L), BABYLON.Space.WORLD);
-        this.mesh.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.R), BABYLON.Space.WORLD);
+        this.mesh.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.L), Space.WORLD);
+        this.mesh.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.R), Space.WORLD);
 
         return deplacement.scale(-1);
     }

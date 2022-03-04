@@ -1,6 +1,6 @@
 import { getQuaternionFromDirection } from "../toolbox/direction";
 import { simplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
-import { Vector3 } from "../toolbox/algebra";
+import { LVector3 } from "../toolbox/algebra";
 import { ridgedNoiseLayer } from "../terrain/landscape/ridgedNoiseLayer";
 import { CraterLayer } from "../terrain/crater/craterLayer";
 import { buildData } from "../forge/buildData";
@@ -41,7 +41,7 @@ initLayers();
 
 //const craterLayer = new CraterLayer([]);
 
-function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Zero()): void {
+function terrainFunction(position: LVector3, gradient: LVector3, seed = LVector3.Zero()): void {
 
     const unitCoords = position.normalize();
 
@@ -49,7 +49,7 @@ function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Ze
 
     let elevation = 0;
 
-    let continentGradient = Vector3.Zero();
+    let continentGradient = LVector3.Zero();
     let continentMask = continentsLayer(samplePoint, continentGradient);
 
     let continentElevation = continentMask * terrainSettings.continentBaseHeight;
@@ -58,7 +58,7 @@ function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Ze
     continentGradient.scaleInPlace(terrainSettings.continentBaseHeight);
     gradient.addInPlace(continentGradient);
 
-    let mountainGradient = Vector3.Zero();
+    let mountainGradient = LVector3.Zero();
     let mountainElevation = mountainsLayer(samplePoint, mountainGradient);
 
 
@@ -66,7 +66,7 @@ function terrainFunction(position: Vector3, gradient: Vector3, seed = Vector3.Ze
     mountainGradient.scaleInPlace(terrainSettings.maxMountainHeight * continentMask);
     gradient.addInPlace(mountainGradient);
 
-    let bumpyGradient = Vector3.Zero();
+    let bumpyGradient = LVector3.Zero();
     let bumpyElevation = bumpyLayer(samplePoint, bumpyGradient);
 
     elevation += bumpyElevation * terrainSettings.maxBumpHeight;
@@ -89,7 +89,7 @@ self.onmessage = e => {
         const depth = data.depth;
         const direction = data.direction;
         const chunkPosition: number[] = data.position;
-        const seed = Vector3.FromArray3(data.seed);
+        const seed = LVector3.FromArray3(data.seed);
 
         if (data.planetID != currentPlanetID) {
             currentPlanetID = data.planetID;
@@ -111,7 +111,7 @@ self.onmessage = e => {
 
         const normals = new Float32Array(verticesPositions.length);
 
-        let vecchunkPosition = new Vector3(chunkPosition[0], chunkPosition[1], chunkPosition[2]);
+        let vecchunkPosition = new LVector3(chunkPosition[0], chunkPosition[1], chunkPosition[2]);
 
         //vecchunkPosition.applyQuaternionInPlace(rotationQuaternion);
 
@@ -120,7 +120,7 @@ self.onmessage = e => {
             for (let y = 0; y < vertexPerLine; ++y) {
 
                 // on crée un plan dans le plan Oxy
-                let vertexPosition = new Vector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
+                let vertexPosition = new LVector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
 
                 // on le met à la bonne taille
                 vertexPosition.scaleInPlace(size);
@@ -137,10 +137,10 @@ self.onmessage = e => {
                 let unitSphereCoords = vertexPosition.normalize();
                 vertexPosition = unitSphereCoords.scale(planetRadius);
                 // on applique la fonction de terrain
-                let vertexGradient = Vector3.Zero();
+                let vertexGradient = LVector3.Zero();
                 terrainFunction(vertexPosition, vertexGradient, seed);
 
-                let h = vertexGradient.subtract(unitSphereCoords.scale(Vector3.Dot(vertexGradient, unitSphereCoords)));
+                let h = vertexGradient.subtract(unitSphereCoords.scale(LVector3.Dot(vertexGradient, unitSphereCoords)));
 
                 let vertexNormal = unitSphereCoords.subtract(h).normalize();
 
@@ -230,11 +230,11 @@ self.onmessage = e => {
             initLayers();
         }
 
-        let samplePosition = new Vector3(data.position[0], data.position[1], data.position[2]);
+        let samplePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
         samplePosition.normalizeInPlace();
         samplePosition.scaleInPlace(data.chunkLength / 2);
 
-        terrainFunction(samplePosition, Vector3.Zero());
+        terrainFunction(samplePosition, LVector3.Zero());
 
         self.postMessage({
             h: samplePosition.getMagnitude(),

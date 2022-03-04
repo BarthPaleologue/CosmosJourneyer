@@ -1,3 +1,5 @@
+import {PostProcess, Mesh, PointLight, Scene, Effect, Texture, Camera, Axis} from "@babylonjs/core";
+
 interface CloudSettings {
     planetRadius: number,
     atmosphereRadius: number,
@@ -10,14 +12,14 @@ interface CloudSettings {
     blueWaveLength: number,
 }
 
-export class VolumetricCloudsPostProcess extends BABYLON.PostProcess {
+export class VolumetricCloudsPostProcess extends PostProcess {
 
     settings: CloudSettings;
-    camera: BABYLON.Camera;
-    sun: BABYLON.Mesh | BABYLON.PointLight;
-    planet: BABYLON.Mesh;
+    camera: Camera;
+    sun: Mesh | PointLight;
+    planet: Mesh;
 
-    constructor(name: string, planet: BABYLON.Mesh, planetRadius: number, atmosphereRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+    constructor(name: string, planet: Mesh, planetRadius: number, atmosphereRadius: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
         super(name, "./shaders/volumetricClouds", [
             "sunPosition",
             "cameraPosition",
@@ -46,7 +48,7 @@ export class VolumetricCloudsPostProcess extends BABYLON.PostProcess {
         ], [
             "textureSampler",
             "depthSampler",
-        ], 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        ], 1, scene.activeCamera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
 
         this.settings = {
             planetRadius: planetRadius,
@@ -66,7 +68,7 @@ export class VolumetricCloudsPostProcess extends BABYLON.PostProcess {
 
         this.setCamera(this.camera);
 
-        this.onApply = (effect: BABYLON.Effect) => {
+        this.onApply = (effect: Effect) => {
 
             effect.setTexture("depthSampler", scene.customRenderTargets[0]);
 
@@ -81,7 +83,7 @@ export class VolumetricCloudsPostProcess extends BABYLON.PostProcess {
 
             effect.setFloat("cameraNear", camera.minZ);
             effect.setFloat("cameraFar", camera.maxZ);
-            effect.setVector3("cameraDirection", camera.getDirection(BABYLON.Axis.Z));
+            effect.setVector3("cameraDirection", camera.getDirection(Axis.Z));
 
             effect.setFloat("planetRadius", this.settings.planetRadius);
             effect.setFloat("atmosphereRadius", this.settings.atmosphereRadius);
@@ -97,7 +99,7 @@ export class VolumetricCloudsPostProcess extends BABYLON.PostProcess {
         };
     }
 
-    setCamera(camera: BABYLON.Camera) {
+    setCamera(camera: Camera) {
         this.camera.detachPostProcess(this);
         this.camera = camera;
         camera.attachPostProcess(this);

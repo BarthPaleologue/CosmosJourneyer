@@ -1,4 +1,4 @@
-import { Vector3 } from "./algebra";
+import { LVector3 } from "./algebra";
 
 // https://www.desmos.com/calculator/968c7smugx
 /**
@@ -35,7 +35,7 @@ export function smax(a: number, b: number, k: number): number {
  * @param gradV the gradient of v
  * @returns the smooth minimum between u and v
  */
-export function sMinGradient(u: number, v: number, k: number, gradU: Vector3, gradV: Vector3): number {
+export function sMinGradient(u: number, v: number, k: number, gradU: LVector3, gradV: LVector3): number {
     let eku = Math.exp(k * u);
     let ekv = Math.exp(k * v);
     let ekuv = eku + ekv;
@@ -57,7 +57,7 @@ export function sMinGradient(u: number, v: number, k: number, gradU: Vector3, gr
  * @param grad the optional gradient to be modified
  * @returns the result of the smooth min
  */
-export function sCeil(x: number, ceil: number, k: number, grad?: Vector3): number {
+export function sCeil(x: number, ceil: number, k: number, grad?: LVector3): number {
     let emkx = Math.exp(-k * x);
     let emkceil = Math.exp(-k * ceil);
 
@@ -74,7 +74,7 @@ export function sCeil(x: number, ceil: number, k: number, grad?: Vector3): numbe
  * @param grad the optional gradient to be modified
  * @returns the smooth max value between floor and x 
  */
-export function sFloor(x: number, floor: number, k: number, grad?: Vector3): number {
+export function sFloor(x: number, floor: number, k: number, grad?: LVector3): number {
     let ekx = Math.exp(k * x);
     let ekfloor = Math.exp(k * floor);
 
@@ -90,7 +90,7 @@ export function sFloor(x: number, floor: number, k: number, grad?: Vector3): num
  * @param grad the optional gradient to be modified
  * @returns the smooth absolute value of x
  */
-export function sAbs(x: number, k: number, grad?: Vector3): number {
+export function sAbs(x: number, k: number, grad?: LVector3): number {
     let ekx = Math.exp(k * x);
     let emkx = Math.exp(-k * x);
 

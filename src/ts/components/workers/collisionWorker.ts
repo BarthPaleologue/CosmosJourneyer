@@ -1,15 +1,17 @@
+import {Quaternion} from "@babylonjs/core";
+
 import {CollisionData} from "../forge/CollisionData";
 import {StarSystemManager} from "../celestialBodies/starSystemManager";
-import {PlayerControler} from "../player/playerControler";
+import {PlayerController} from "../player/playerController";
 import {PlanetWorker} from "./planetWorker";
-import {Vector3} from "../toolbox/algebra";
+import {LVector3} from "../toolbox/algebra";
 import {CelestialBody, CelestialBodyType} from "../celestialBodies/celestialBody";
 import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
 
 export class CollisionWorker extends PlanetWorker {
-    _player: PlayerControler;
+    _player: PlayerController;
     _busy = false;
-    constructor(player: PlayerControler, planetManager: StarSystemManager) {
+    constructor(player: PlayerController, planetManager: StarSystemManager) {
         super();
         this._player = player;
         this._worker.onmessage = e => {
@@ -41,11 +43,11 @@ export class CollisionWorker extends PlanetWorker {
         this._busy = true;
     }
     public checkCollision(planet: CelestialBody): void {
-        let position = Vector3.FromBABYLON3(planet.getAbsolutePosition()); // position de la planète / au joueur
+        let position = LVector3.FromBABYLON3(planet.getAbsolutePosition()); // position de la planète / au joueur
         position.scaleInPlace(-1); // position du joueur / au centre de la planète
 
         // on applique le quaternion inverse pour obtenir le sample point correspondant à la planète rotatée (fais un dessin si c'est pas clair)
-        position.applyQuaternionInPlace(BABYLON.Quaternion.Inverse(planet.getRotationQuaternion()));
+        position.applyQuaternionInPlace(Quaternion.Inverse(planet.getRotationQuaternion()));
 
         if(planet.getBodyType() == CelestialBodyType.SOLID) {
             //TODO: improve cast system

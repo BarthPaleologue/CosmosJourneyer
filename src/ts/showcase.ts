@@ -1,9 +1,11 @@
+import { Engine, Scene, Color4, DepthRenderer, Axis, Space, Vector3, Texture, Tools, FxaaPostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
 import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
 import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
 
 import * as style from "../styles/style.scss";
-import { PlayerControler } from "./components/player/playerControler";
+import { PlayerController } from "./components/player/playerController";
 import { Keyboard } from "./components/inputs/keyboard";
 import { Mouse } from "./components/inputs/mouse";
 import { Gamepad } from "./components/inputs/gamepad";
@@ -11,8 +13,6 @@ import { CollisionWorker } from "./components/workers/collisionWorker";
 import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
 
 import rockn from "../asset/textures/rockn.png";
-import lensflare from "../asset/textures/lensflare3.png";
-import lensflare2 from "../asset/textures/lensflare4.png";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
 import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
 import { VolumetricCloudsPostProcess } from "./components/postProcesses/volumetricCloudsPostProcess";
@@ -25,15 +25,15 @@ let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let engine = new BABYLON.Engine(canvas);
+let engine = new Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 
 console.log("GPU utilisé : " + engine.getGlInfo().renderer);
 
-let scene = new BABYLON.Scene(engine);
-scene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+let scene = new Scene(engine);
+scene.clearColor = new Color4(0, 0, 0, 1);
 
-let depthRenderer = new BABYLON.DepthRenderer(scene);
+let depthRenderer = new DepthRenderer(scene);
 scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
@@ -44,9 +44,9 @@ let keyboard = new Keyboard();
 let mouse = new Mouse();
 let gamepad = new Gamepad();
 
-let player = new PlayerControler(scene);
+let player = new PlayerController(scene);
 player.setSpeed(0.2 * radius);
-player.mesh.rotate(player.camera.getDirection(BABYLON.Axis.Y), 0.8, BABYLON.Space.WORLD);
+player.mesh.rotate(player.camera.getDirection(Axis.Y), 0.8, Space.WORLD);
 
 player.camera.maxZ = Math.max(radius * 50, 10000);
 
@@ -62,14 +62,7 @@ scene.onBeforeDrawPhaseObservable.add((scene, state) => {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 });*/
 
-/*let defaultPipeline = new BABYLON.DefaultRenderingPipeline(
-    "DefaultRenderingPipeline",
-    true, // is HDR?
-    scene,
-    [player.camera]
-);*/
-
-let starSystemManager = new StarSystemManager(128);
+let starSystemManager = new StarSystemManager(64);
 
 let sun = new Star("Weierstrass", 0.4 * radius, scene);
 
@@ -81,28 +74,17 @@ depthRenderer.getDepthMap().renderList?.push(sun.mesh);
 
 let starfield = new StarfieldPostProcess("starfield", player, sun.mesh, scene);
 
-
-/*let lensFlareSystem = new BABYLON.LensFlareSystem("lensFlare", sun, scene);
-let flare0 = new BABYLON.LensFlare(0.2, 1, new BABYLON.Color3(0.5, 0.5, 0.5), lensflare2, lensFlareSystem);
-flare0.alphaMode = 1;
-let flare1 = new BABYLON.LensFlare(0.1, 0.4, new BABYLON.Color3(0.5, 0.2, 0.2), lensflare2, lensFlareSystem);
-flare1.alphaMode = 1;
-let flare2 = new BABYLON.LensFlare(0.05, 0.2, new BABYLON.Color3(0.2, 0.5, 0.2), lensflare2, lensFlareSystem);
-flare2.alphaMode = 1;*/
-
-
-
 let waterElevation = 20e2;
 
-let planet = new SolidPlanet("Hécate", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene);
-planet.colorSettings.plainColor = new BABYLON.Vector3(0.1, 0.4, 0).scale(0.7).add(new BABYLON.Vector3(0.5, 0.3, 0.08).scale(0.3));
+let planet = new SolidPlanet("Hécate", radius, new Vector3(0, 0, 4 * radius), 1, scene);
+planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.steepSharpness = 3;
 planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
-planet.attachNode.rotate(BABYLON.Axis.X, 0.2, BABYLON.Space.WORLD);
+planet.attachNode.rotate(Axis.X, 0.2, Space.WORLD);
 
 let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun.mesh, player.camera, scene);
 
@@ -119,7 +101,7 @@ let rings = new RingsPostProcess("rings", planet.attachNode, radius, waterElevat
 
 starSystemManager.addSolidPlanet(planet);
 
-let moon = new SolidPlanet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene, {
+let moon = new SolidPlanet("Manaleth", radius / 4, new Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene, {
     minTemperature: -180,
     maxTemperature: 200,
     pressure: 0,
@@ -127,24 +109,24 @@ let moon = new SolidPlanet("Manaleth", radius / 4, new BABYLON.Vector3(Math.cos(
 });
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
-moon.colorSettings.plainColor = new BABYLON.Vector3(0.5, 0.5, 0.5);
+moon.colorSettings.plainColor = new Vector3(0.5, 0.5, 0.5);
 moon.colorSettings.sandColor = moon.colorSettings.plainColor.scale(0.5);
-moon.colorSettings.steepColor = new BABYLON.Vector3(0.1, 0.1, 0.1);
+moon.colorSettings.steepColor = new Vector3(0.1, 0.1, 0.1);
 moon.colorSettings.snowLatitudePersistence = 2;
 moon.colorSettings.snowElevation01 = 0.6;
 moon.colorSettings.snowOffsetAmplitude = 0.02;
 moon.colorSettings.steepSharpness = 3;
 moon.updateColors();
 
-moon.surfaceMaterial.setTexture("plainNormalMap", new BABYLON.Texture(rockn, scene));
-moon.surfaceMaterial.setTexture("bottomNormalMap", new BABYLON.Texture(rockn, scene));
-moon.surfaceMaterial.setTexture("sandNormalMap", new BABYLON.Texture(rockn, scene));
+moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockn, scene));
+moon.surfaceMaterial.setTexture("bottomNormalMap", new Texture(rockn, scene));
+moon.surfaceMaterial.setTexture("sandNormalMap", new Texture(rockn, scene));
 
 moon.attachNode.position.addInPlace(planet.attachNode.getAbsolutePosition());
 
 starSystemManager.addSolidPlanet(moon);
 
-let Ares = new SolidPlanet("Ares", radius, new BABYLON.Vector3(0, 0, 4 * radius), 1, scene, {
+let Ares = new SolidPlanet("Ares", radius, new Vector3(0, 0, 4 * radius), 1, scene, {
     minTemperature: -80,
     maxTemperature: 20,
     pressure: 0.5,
@@ -170,11 +152,11 @@ atmosphere2.settings.scatteringStrength = 1.0;
 starSystemManager.addSolidPlanet(Ares);
 
 // TODO: mettre le VLS dans Star => par extension créer un système de gestion des post process généralisé
-let vls = new BABYLON.VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
+let vls = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
 vls.exposure = 1.0;
 vls.decay = 0.95;
 
-let fxaa = new BABYLON.FxaaPostProcess("fxaa", 1, player.camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE);
+let fxaa = new FxaaPostProcess("fxaa", 1, player.camera, Texture.BILINEAR_SAMPLINGMODE);
 
 let isMouseEnabled = false;
 
@@ -211,7 +193,7 @@ function updateScene() {
 
 document.addEventListener("keydown", e => {
     if (e.key == "p") { // take screenshots
-        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
+        Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
     }
     if (e.key == "u") atmosphere.settings.intensity = (atmosphere.settings.intensity == 0) ? 15 : 0;
     if (e.key == "o") ocean.settings.oceanRadius = (ocean.settings.oceanRadius == 0) ? radius + waterElevation : 0;

@@ -405,7 +405,9 @@ export function demonstrate() {
     }
 }
 
-export function getRgbFromTemperature(temperature: number): BABYLON.Vector3 {
+import {Vector3} from "@babylonjs/core";
+
+export function getRgbFromTemperature(temperature: number): Vector3 {
     let [x, y, z]: number[] = [0, 0, 0];
     let [r, g, b]: number[] = [0, 0, 0];
     let cs = SMPTEsystem;
@@ -415,5 +417,5 @@ export function getRgbFromTemperature(temperature: number): BABYLON.Vector3 {
     [r, g, b] = xyz_to_rgb(cs, x, y, z);
     [r, g, b] = constrain_rgb(r, g, b);
     [r, g, b] = norm_rgb(r, g, b);
-    return new BABYLON.Vector3(r, g, b);
+    return new Vector3(r, g, b);
 }

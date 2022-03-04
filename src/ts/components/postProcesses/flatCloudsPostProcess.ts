@@ -1,3 +1,5 @@
+import {PostProcess, Camera, Mesh, PointLight, Scene, Texture, Effect, Axis} from "@babylonjs/core";
+
 interface CloudSettings {
     cloudLayerRadius: number,
     smoothness: number,
@@ -9,18 +11,20 @@ interface CloudSettings {
     detailSpeed: number,
 }
 
+// TODO: faire une super classe pour tous ces post processes
+
 import waterbump from "../../../asset/textures/cloudNormalMap.jpg";
 
-export class FlatCloudsPostProcess extends BABYLON.PostProcess {
+export class FlatCloudsPostProcess extends PostProcess {
 
     settings: CloudSettings;
-    camera: BABYLON.Camera;
-    sun: BABYLON.Mesh | BABYLON.PointLight;
-    planet: BABYLON.Mesh;
+    camera: Camera;
+    sun: Mesh | PointLight;
+    planet: Mesh;
 
     internalTime = 0;
 
-    constructor(name: string, planet: BABYLON.Mesh, planetRadius: number, waterLevel: number, cloudLayerRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+    constructor(name: string, planet: Mesh, planetRadius: number, waterLevel: number, cloudLayerRadius: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
         super(name, "./shaders/flatClouds", [
             "sunPosition",
             "cameraPosition",
@@ -55,7 +59,7 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
             "textureSampler",
             "depthSampler",
             "normalMap"
-        ], 1, camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        ], 1, camera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
 
 
         this.settings = {
@@ -77,11 +81,11 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
 
         let depthMap = scene.customRenderTargets[0];
 
-        this.onApply = (effect: BABYLON.Effect) => {
+        this.onApply = (effect: Effect) => {
             this.internalTime += this.getEngine().getDeltaTime();
 
             effect.setTexture("depthSampler", depthMap);
-            effect.setTexture("normalMap", new BABYLON.Texture(waterbump, scene));
+            effect.setTexture("normalMap", new Texture(waterbump, scene));
 
             effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
             effect.setVector3("cameraPosition", this.camera.position);
@@ -96,7 +100,7 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
 
             effect.setFloat("cameraNear", camera.minZ);
             effect.setFloat("cameraFar", camera.maxZ);
-            effect.setVector3("cameraDirection", camera.getDirection(BABYLON.Axis.Z));
+            effect.setVector3("cameraDirection", camera.getDirection(Axis.Z));
 
             effect.setFloat("cloudLayerRadius", this.settings.cloudLayerRadius);
 
@@ -116,7 +120,7 @@ export class FlatCloudsPostProcess extends BABYLON.PostProcess {
         };
     }
 
-    setCamera(camera: BABYLON.Camera) {
+    setCamera(camera: Camera) {
         this.camera.detachPostProcess(this);
         this.camera = camera;
         camera.attachPostProcess(this);

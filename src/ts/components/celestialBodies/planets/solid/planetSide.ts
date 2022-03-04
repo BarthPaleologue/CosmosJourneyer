@@ -1,8 +1,10 @@
+import {Mesh, Scene, Material, Vector3} from "@babylonjs/core";
+
 import { getChunkSphereSpacePositionFromPath, PlanetChunk } from "./planetChunk";
 import { Direction } from "../../../toolbox/direction";
 import { ChunkForge, TaskType } from "../../../forge/chunkForge";
 import { SolidPlanet } from "./solidPlanet";
-import { Vector3 } from "../../../toolbox/algebra";
+import { LVector3 } from "../../../toolbox/algebra";
 
 type quadTree = quadTree[] | PlanetChunk;
 
@@ -27,14 +29,14 @@ export class PlanetSide {
 
     private readonly direction: Direction; // direction de la normale au plan
 
-    private readonly parent: BABYLON.Mesh; // objet parent des chunks
+    private readonly parent: Mesh; // objet parent des chunks
 
-    private readonly scene: BABYLON.Scene; // scène dans laquelle instancier les chunks
+    private readonly scene: Scene; // scène dans laquelle instancier les chunks
 
     // Le CEO des chunks
     private chunkForge: ChunkForge | undefined;
 
-    private readonly surfaceMaterial: BABYLON.Material;
+    private readonly surfaceMaterial: Material;
 
     private readonly planet: SolidPlanet;
 
@@ -51,7 +53,7 @@ export class PlanetSide {
      * @param surfaceMaterial 
      * @param planet 
      */
-    constructor(id: string, minDepth: number, maxDepth: number, rootChunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, surfaceMaterial: BABYLON.Material, planet: SolidPlanet) {
+    constructor(id: string, minDepth: number, maxDepth: number, rootChunkLength: number, direction: Direction, parentNode: Mesh, scene: Scene, surfaceMaterial: Material, planet: SolidPlanet) {
         this.id = id;
 
         this.maxDepth = maxDepth;
@@ -102,26 +104,28 @@ export class PlanetSide {
     /**
      * Update LOD of terrain relative to the observerPosition
      * @param observerPosition The observer position
+     * @param observerDirection
      */
-    public updateLOD(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3): void {
+    public updateLOD(observerPosition: Vector3, observerDirection: Vector3): void {
         this.tree = this.updateLODRecursively(observerPosition, observerDirection);
     }
 
     /**
      * Recursive function used internaly to update LOD
      * @param observerPosition The observer position
+     * @param observerDirection
      * @param tree The tree to update recursively
      * @param walked The position of the current root relative to the absolute root
      * @returns The updated tree
      */
-    private updateLODRecursively(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
+    private updateLODRecursively(observerPosition: Vector3, observerDirection: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
         let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.parent.rotationQuaternion!);
 
         // position par rapport à la caméra
-        let parentPosition = new Vector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
+        let parentPosition = new LVector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
         let absolutePosition = relativePosition.add(parentPosition);
-        let direction = absolutePosition.subtract(Vector3.FromBABYLON3(observerPosition));
+        let direction = absolutePosition.subtract(LVector3.FromBABYLON3(observerPosition));
         // distance carré entre caméra et noeud du quadtree
         let d2 = direction.getSquaredMagnitude();
         let limit = this.renderDistanceFactor * this.rootChunkLength / (2 ** walked.length);
@@ -151,7 +155,7 @@ export class PlanetSide {
             // si on est loin
             if (tree instanceof PlanetChunk) {
                 let dn = direction.normalize();
-                let dot = Vector3.Dot(relativePosition.normalize(), dn);
+                let dot = LVector3.Dot(relativePosition.normalize(), dn);
 
                 // sera d'occludé les chunks derrière la caméra
                 //let dot2 = Vector3.Dot(absolutePosition.normalize(), Vector3.FromBABYLON3(observerDirection));

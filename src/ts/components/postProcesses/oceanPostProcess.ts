@@ -1,3 +1,7 @@
+import {PostProcess, Camera, Mesh, PointLight, Scene, Texture, Effect, Axis} from "@babylonjs/core";
+
+import waterbump from "../../../asset/textures/waterbump.png";
+
 interface OceanSettings {
     oceanRadius: number,
     smoothness: number,
@@ -6,18 +10,16 @@ interface OceanSettings {
     alphaModifier: number,
 }
 
-import waterbump from "../../../asset/textures/waterbump.png";
-
-export class OceanPostProcess extends BABYLON.PostProcess {
+export class OceanPostProcess extends PostProcess {
 
     settings: OceanSettings;
-    camera: BABYLON.Camera;
-    sun: BABYLON.Mesh | BABYLON.PointLight;
-    planet: BABYLON.Mesh;
+    camera: Camera;
+    sun: Mesh | PointLight;
+    planet: Mesh;
 
     internalTime = 0;
 
-    constructor(name: string, planet: BABYLON.Mesh, oceanRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+    constructor(name: string, planet: Mesh, oceanRadius: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
         super(name, "./shaders/ocean", [
             "sunPosition",
             "cameraPosition",
@@ -46,7 +48,7 @@ export class OceanPostProcess extends BABYLON.PostProcess {
             "textureSampler",
             "depthSampler",
             "normalMap"
-        ], 1, camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        ], 1, camera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
 
 
         this.settings = {
@@ -65,13 +67,13 @@ export class OceanPostProcess extends BABYLON.PostProcess {
 
         let depthMap = scene.customRenderTargets[0];
 
-        //this.getEffect().setTexture("normalMap", new BABYLON.Texture("./textures/waternormal.jpg", scene));
+        //this.getEffect().setTexture("normalMap", new Texture("./textures/waternormal.jpg", scene));
 
-        this.onApply = (effect: BABYLON.Effect) => {
+        this.onApply = (effect: Effect) => {
             this.internalTime += this.getEngine().getDeltaTime();
 
             effect.setTexture("depthSampler", depthMap);
-            effect.setTexture("normalMap", new BABYLON.Texture(waterbump, scene));
+            effect.setTexture("normalMap", new Texture(waterbump, scene));
 
             effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
             effect.setVector3("cameraPosition", this.camera.position);
@@ -84,7 +86,7 @@ export class OceanPostProcess extends BABYLON.PostProcess {
 
             effect.setFloat("cameraNear", camera.minZ);
             effect.setFloat("cameraFar", camera.maxZ);
-            effect.setVector3("cameraDirection", camera.getDirection(BABYLON.Axis.Z));
+            effect.setVector3("cameraDirection", camera.getDirection(Axis.Z));
 
             effect.setFloat("oceanRadius", this.settings.oceanRadius);
 
@@ -99,7 +101,7 @@ export class OceanPostProcess extends BABYLON.PostProcess {
         };
     }
 
-    setCamera(camera: BABYLON.Camera) {
+    setCamera(camera: Camera) {
         this.camera.detachPostProcess(this);
         this.camera = camera;
         camera.attachPostProcess(this);

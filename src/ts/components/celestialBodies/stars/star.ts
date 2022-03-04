@@ -1,25 +1,27 @@
 import { getRgbFromTemperature } from "../../toolbox/specrend";
 import { BodyPhysicalProperties, CelestialBody, CelestialBodyType } from "../celestialBody";
 
+import { Mesh, Vector3, ShaderMaterial, Space, Axis, Scene, Quaternion } from "@babylonjs/core";
+
 export interface StarPhysicalProperties extends BodyPhysicalProperties {
     temperature: number;
 }
 
 export class Star extends CelestialBody {
-    public mesh: BABYLON.Mesh;
+    public mesh: Mesh;
     private radius: number;
-    private starMaterial: BABYLON.ShaderMaterial;
+    private starMaterial: ShaderMaterial;
     private internalTime = 0;
     protected bodyType = CelestialBodyType.STAR;
     physicalProperties: StarPhysicalProperties = {
         temperature: 5778
     };
-    constructor(name: string, radius: number, scene: BABYLON.Scene) {
+    constructor(name: string, radius: number, scene: Scene) {
         super();
-        this.mesh = BABYLON.Mesh.CreateSphere(name, 32, radius, scene);
+        this.mesh = Mesh.CreateSphere(name, 32, radius, scene);
         this.radius = radius;
-        this.mesh.rotate(BABYLON.Axis.Y, 0, BABYLON.Space.WORLD); // init rotation quaternion
-        let starMaterial = new BABYLON.ShaderMaterial("starColor", scene, "./shaders/starMaterial",
+        this.mesh.rotate(Axis.Y, 0, Space.WORLD); // init rotation quaternion
+        let starMaterial = new ShaderMaterial("starColor", scene, "./shaders/starMaterial",
             {
                 attributes: ["position"],
                 uniforms: [
@@ -36,15 +38,15 @@ export class Star extends CelestialBody {
         this.mesh.material = this.starMaterial;
     }
 
-    setAbsolutePosition(newPosition: BABYLON.Vector3): void {
+    setAbsolutePosition(newPosition: Vector3): void {
         this.mesh.setAbsolutePosition(newPosition);
     }
 
-    getAbsolutePosition(): BABYLON.Vector3 {
+    getAbsolutePosition(): Vector3 {
         return this.mesh.getAbsolutePosition();
     }
 
-    update(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3): void {
+    update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3): void {
         //TODO: update star
         this.starMaterial.setFloat("time", this.internalTime);
         this.internalTime += this.mesh.getEngine().getDeltaTime() / 1000;
@@ -58,7 +60,7 @@ export class Star extends CelestialBody {
         return this.radius;
     }
 
-    getRotationQuaternion(): BABYLON.Quaternion {
+    getRotationQuaternion(): Quaternion {
         return this.mesh.rotationQuaternion!;
     }
 }

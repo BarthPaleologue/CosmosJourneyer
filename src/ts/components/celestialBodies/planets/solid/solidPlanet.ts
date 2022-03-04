@@ -6,6 +6,8 @@ import { TerrainSettings } from "../../../terrain/terrainSettings";
 import { PlanetPhysicalProperties, AbstractPlanet } from "../abstractPlanet";
 import {CelestialBodyType} from "../../celestialBody";
 
+import {Vector3, Mesh, Scene, ShaderMaterial, Axis, Space, Texture, Quaternion} from "@babylonjs/core";
+
 //texture import
 import crackednormal from "../../../../../asset/textures/crackednormal.jpg";
 import rockn from "../../../../../asset/textures/rockn.png";
@@ -18,10 +20,10 @@ import sandNormalMap from "../../../../../asset/textures/sandNormalMap.jpg";
 
 
 export interface ColorSettings {
-    snowColor: BABYLON.Vector3,
-    steepColor: BABYLON.Vector3,
-    plainColor: BABYLON.Vector3,
-    sandColor: BABYLON.Vector3,
+    snowColor: Vector3,
+    steepColor: Vector3,
+    plainColor: Vector3,
+    sandColor: Vector3,
 
     waterLevel: number,
     sandSize: number,
@@ -54,12 +56,12 @@ export class SolidPlanet extends AbstractPlanet {
 
     readonly maxDepth: number;
 
-    readonly attachNode: BABYLON.Mesh; // reprensents the center of the sphere
+    readonly attachNode: Mesh; // reprensents the center of the sphere
     readonly sides: PlanetSide[] = new Array(6); // stores the 6 sides of the sphere
 
-    surfaceMaterial: BABYLON.ShaderMaterial;
+    surfaceMaterial: ShaderMaterial;
 
-    constructor(id: string, radius: number, position: BABYLON.Vector3, minDepth: number, scene: BABYLON.Scene, physicalProperties: SolidPhysicalProperties = {
+    constructor(id: string, radius: number, position: Vector3, minDepth: number, scene: Scene, physicalProperties: SolidPhysicalProperties = {
         minTemperature: -40,
         maxTemperature: 50,
         pressure: 1,
@@ -76,8 +78,8 @@ export class SolidPlanet extends AbstractPlanet {
         let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
         console.log(spaceBetweenVertex);
 
-        this.attachNode = BABYLON.Mesh.CreateBox(`${this._name}AttachNode`, 1, scene);
-        this.attachNode.rotate(BABYLON.Axis.Y, 0, BABYLON.Space.WORLD); // init rotation quaternion
+        this.attachNode = Mesh.CreateBox(`${this._name}AttachNode`, 1, scene);
+        this.attachNode.rotate(Axis.Y, 0, Space.WORLD); // init rotation quaternion
         this.attachNode.position = position;
 
         /*let nbCraters = 800;
@@ -98,10 +100,10 @@ export class SolidPlanet extends AbstractPlanet {
         };
 
         this.colorSettings = {
-            snowColor: new BABYLON.Vector3(1, 1, 1),
-            steepColor: new BABYLON.Vector3(55, 42, 42).scale(1 / 255),
-            plainColor: new BABYLON.Vector3(0.5, 0.3, 0.08),
-            sandColor: new BABYLON.Vector3(0.7, 0.7, 0.2),
+            snowColor: new Vector3(1, 1, 1),
+            steepColor: new Vector3(55, 42, 42).scale(1 / 255),
+            plainColor: new Vector3(0.5, 0.3, 0.08),
+            sandColor: new Vector3(0.7, 0.7, 0.2),
 
             waterLevel: 0.32,
             sandSize: 1,
@@ -118,7 +120,7 @@ export class SolidPlanet extends AbstractPlanet {
         //this.craters = generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
         this.craters = [];
 
-        let surfaceMaterial = new BABYLON.ShaderMaterial("surfaceColor", scene, "./shaders/surfaceColor",
+        let surfaceMaterial = new ShaderMaterial("surfaceColor", scene, "./shaders/surfaceColor",
             {
                 attributes: ["position", "normal", "uv"],
                 uniforms: [
@@ -152,19 +154,19 @@ export class SolidPlanet extends AbstractPlanet {
             }
         );
 
-        surfaceMaterial.setVector3("seed", new BABYLON.Vector3(this._seed[0], this._seed[1], this._seed[2]));
+        surfaceMaterial.setVector3("seed", new Vector3(this._seed[0], this._seed[1], this._seed[2]));
 
-        surfaceMaterial.setTexture("bottomNormalMap", new BABYLON.Texture(crackednormal, scene));
-        surfaceMaterial.setTexture("steepNormalMap", new BABYLON.Texture(rockn, scene));
-        surfaceMaterial.setTexture("plainNormalMap", new BABYLON.Texture(grassn, scene));
+        surfaceMaterial.setTexture("bottomNormalMap", new Texture(crackednormal, scene));
+        surfaceMaterial.setTexture("steepNormalMap", new Texture(rockn, scene));
+        surfaceMaterial.setTexture("plainNormalMap", new Texture(grassn, scene));
 
-        surfaceMaterial.setTexture("snowNormalMap", new BABYLON.Texture(snowNormalMap, scene));
-        surfaceMaterial.setTexture("snowNormalMap2", new BABYLON.Texture(snowNormalMap2, scene));
+        surfaceMaterial.setTexture("snowNormalMap", new Texture(snowNormalMap, scene));
+        surfaceMaterial.setTexture("snowNormalMap2", new Texture(snowNormalMap2, scene));
 
-        surfaceMaterial.setTexture("sandNormalMap", new BABYLON.Texture(sandNormalMap, scene));
+        surfaceMaterial.setTexture("sandNormalMap", new Texture(sandNormalMap, scene));
 
-        surfaceMaterial.setVector3("playerPosition", BABYLON.Vector3.Zero());
-        surfaceMaterial.setVector3("sunPosition", BABYLON.Vector3.Zero());
+        surfaceMaterial.setVector3("playerPosition", Vector3.Zero());
+        surfaceMaterial.setVector3("sunPosition", Vector3.Zero());
         surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
         surfaceMaterial.setFloat("planetRadius", this._radius);
 
@@ -205,9 +207,10 @@ export class SolidPlanet extends AbstractPlanet {
 
     /**
      * Update terrain of the sphere relative to the observer position
-     * @param position the observer position
+     * @param observerPosition
+     * @param observerDirection
      */
-    private updateLOD(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3): void {
+    private updateLOD(observerPosition: Vector3, observerDirection: Vector3): void {
         for (let side of this.sides) {
             side.updateLOD(observerPosition, observerDirection);
         }
@@ -257,7 +260,7 @@ export class SolidPlanet extends AbstractPlanet {
 
     }
 
-    public update(observerPosition: BABYLON.Vector3, observerDirection: BABYLON.Vector3, lightPosition: BABYLON.Vector3) {
+    public update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3) {
         this.surfaceMaterial.setVector3("playerPosition", observerPosition);
         this.surfaceMaterial.setVector3("sunPosition", lightPosition);
         this.surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
@@ -272,11 +275,11 @@ export class SolidPlanet extends AbstractPlanet {
         return this.attachNode.getAbsolutePosition();
     }
 
-    setAbsolutePosition(newPosition: BABYLON.Vector3): void {
+    setAbsolutePosition(newPosition: Vector3): void {
         this.attachNode.setAbsolutePosition(newPosition);
     }
 
-    getRotationQuaternion(): BABYLON.Quaternion {
+    getRotationQuaternion(): Quaternion {
         return this.attachNode.rotationQuaternion!;
     }
 }

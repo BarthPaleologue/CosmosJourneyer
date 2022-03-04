@@ -1,7 +1,9 @@
+import {Quaternion, Vector3, Mesh, SolidParticleSystem, Scene, Material} from "@babylonjs/core";
+
 import { SolidPlanet } from "./solidPlanet";
 import { ChunkForge, TaskType } from "../../../forge/chunkForge";
 import { Direction, getQuaternionFromDirection } from "../../../toolbox/direction";
-import { Quaternion, Vector3 } from "../../../toolbox/algebra";
+import { LQuaternion, LVector3 } from "../../../toolbox/algebra";
 
 /**
  * Returns the node position in plane space
@@ -9,7 +11,7 @@ import { Quaternion, Vector3 } from "../../../toolbox/algebra";
  * @param path the path of the node
  * @returns the plane space coordinates of the chunk
  */
-export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: number[]): Vector3 {
+export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: number[]): LVector3 {
     let x = 0;
     let y = 0;
     for (let i = 0; i < path.length; ++i) {
@@ -41,7 +43,7 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
                 throw new Error(`${path[i]} is not a valid index for a child of a quadtree node !`);
         }
     }
-    return new Vector3(x, y, 0);
+    return new LVector3(x, y, 0);
 }
 
 /**
@@ -49,15 +51,16 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
  * @param chunkLength the length of the chunk
  * @param path the path to the chunk in the quadtree
  * @param direction direction of the parent plane
+ * @param planetRotationQuaternion
  * @returns the position in planet space
  */
-export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: number[], direction: Direction, planetRotationQuaternion: BABYLON.Quaternion): Vector3 {
+export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: number[], direction: Direction, planetRotationQuaternion: Quaternion): LVector3 {
 
     // on récupère la position dans le plan
     let position = getChunkPlaneSpacePositionFromPath(chunkLength, path);
 
     // on l'offset pour préparer à récupérer la position dans le cube
-    position.addInPlace(new Vector3(0, 0, -chunkLength / 2));
+    position.addInPlace(new LVector3(0, 0, -chunkLength / 2));
 
     let rotationQuaternion = getQuaternionFromDirection(direction);
     position.applyQuaternionInPlace(rotationQuaternion);
@@ -67,7 +70,7 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
     position.scaleInPlace(chunkLength / 2);
 
     // on match cette position avec la rotation de la planète
-    position.applyQuaternionInPlace(Quaternion.FromBABYLON(planetRotationQuaternion));
+    position.applyQuaternionInPlace(LQuaternion.FromBABYLON(planetRotationQuaternion));
 
     // c'est prêt !
     return position;
@@ -78,14 +81,14 @@ import grass from "../../../../asset/textures/grass.png";
 // ne pas supprimer la classe pour cause de peut être des arbres et de l'herbe
 export class PlanetChunk {
 
-    public readonly mesh: BABYLON.Mesh;
+    public readonly mesh: Mesh;
 
-    public grassParticleSystem: BABYLON.SolidParticleSystem | null = null;
-    public grassPositions: BABYLON.Vector3[] = [];
+    public grassParticleSystem: SolidParticleSystem | null = null;
+    public grassPositions: Vector3[] = [];
 
-    //public testBox: BABYLON.Mesh;
+    //public testBox: Mesh;
 
-    constructor(path: number[], rootChunkLength: number, direction: Direction, parentNode: BABYLON.Mesh, scene: BABYLON.Scene, chunkForge: ChunkForge, surfaceMaterial: BABYLON.Material, planet: SolidPlanet) {
+    constructor(path: number[], rootChunkLength: number, direction: Direction, parentNode: Mesh, scene: Scene, chunkForge: ChunkForge, surfaceMaterial: Material, planet: SolidPlanet) {
         let id = `[D${direction}][P${path.join("")}]`;
 
         // computing the position of the chunk on the side of the planet
@@ -94,14 +97,14 @@ export class PlanetChunk {
         // offseting from planet center to position on the side (default side then rotation for all sides)
         position.z -= rootChunkLength / 2;
 
-        this.mesh = new BABYLON.Mesh(`Chunk${id}`, scene);
+        this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.material = surfaceMaterial;
 
         // TODO: ajouter transparence, orienter et tout le bazar tmtc
         // bientôt des arbres
-        /*let testBox = BABYLON.Mesh.CreatePlane(`TestBox${id}`, 5000, scene);
-        let TestBoxMaterial = new BABYLON.StandardMaterial("TestBoxMaterial", scene);
-        TestBoxMaterial.emissiveTexture = new BABYLON.Texture(grass, scene);
+        /*let testBox = Mesh.CreatePlane(`TestBox${id}`, 5000, scene);
+        let TestBoxMaterial = new StandardMaterial("TestBoxMaterial", scene);
+        TestBoxMaterial.emissiveTexture = new Texture(grass, scene);
         TestBoxMaterial.emissiveTexture.hasAlpha = true;
         TestBoxMaterial.backFaceCulling = false;
         testBox.material = TestBoxMaterial;
@@ -110,7 +113,7 @@ export class PlanetChunk {
         this.testBox.isVisible = false;*/
 
         /* WORK IN PROGRESS */
-        /*let gps = new BABYLON.SolidParticleSystem(`GrassParticles${id}`, scene);
+        /*let gps = new SolidParticleSystem(`GrassParticles${id}`, scene);
         gps.addShape(this.testBox, 1);
         this.grassParticleSystem = gps;
         this.grassParticleSystem.setParticles();
@@ -118,10 +121,10 @@ export class PlanetChunk {
         this.grassParticleSystem.mesh.material = TestBoxMaterial;
         this.grassParticleSystem.mesh.parent = this.mesh;*/
 
-        /*let debugMaterial = new BABYLON.StandardMaterial("debug", scene);
-        debugMaterial.emissiveColor = BABYLON.Color3.Random();
-        debugMaterial.specularColor = BABYLON.Color3.Black();
-        debugMaterial.diffuseColor = BABYLON.Color3.Black();
+        /*let debugMaterial = new StandardMaterial("debug", scene);
+        debugMaterial.emissiveColor = Color3.Random();
+        debugMaterial.specularColor = Color3.Black();
+        debugMaterial.diffuseColor = Color3.Black();
         debugMaterial.backFaceCulling = false;
         debugMaterial.useLogarithmicDepth = true;
         debugMaterial.wireframe = true;

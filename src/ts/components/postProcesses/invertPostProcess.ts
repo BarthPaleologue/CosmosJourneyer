@@ -1,8 +1,8 @@
+import {PostProcess, Camera, Scene} from "@babylonjs/core";
 
+export class InvertPostProcess extends PostProcess {
 
-export class InvertPostProcess extends BABYLON.PostProcess {
-
-    constructor(name: string, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+    constructor(name: string, camera: Camera, scene: Scene) {
         super(name, "./shaders/invert", [
 
         ], [

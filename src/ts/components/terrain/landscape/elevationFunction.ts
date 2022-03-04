@@ -1,3 +1,3 @@
-import { Vector3 } from "../../toolbox/algebra";
+import { LVector3 } from "../../toolbox/algebra";
 
-export type elevationFunction = (coords: Vector3, gradient: Vector3) => number;
+export type elevationFunction = (coords: LVector3, gradient: LVector3) => number;

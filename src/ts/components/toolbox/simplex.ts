@@ -16,7 +16,7 @@
  * General Public License for more details.
  */
 
-import { Vector3 } from "./algebra";
+import { LVector3 } from "./algebra";
 
 /*
  * This is an implementation of Perlin "simplex noise" over one
@@ -335,7 +335,7 @@ const G3 = .166666667;
  * If the last tthree arguments are not null, the analytic derivative
  * (the 3D gradient of the scalar noise field) is also calculated.
  */
-export function sdnoise3(x: number, y: number, z: number): [number, Vector3] {
+export function sdnoise3(x: number, y: number, z: number): [number, LVector3] {
 
   let n0, n1, n2, n3; /* Noise contributions from the four simplex corners */
   let noise;          /* Return value */
@@ -483,7 +483,7 @@ export function sdnoise3(x: number, y: number, z: number): [number, Vector3] {
   dnoise_dy *= 28.0;
   dnoise_dz *= 28.0;
   //}
-  return [noise, new Vector3(dnoise_dx, dnoise_dy, dnoise_dz)];
+  return [noise, new LVector3(dnoise_dx, dnoise_dy, dnoise_dz)];
 }
 
 // The skewing and unskewing factors are hairy again for the 4D case
@@ -494,7 +494,7 @@ const G4 = .138196601; // G4 = (5.0-Math.sqrt(5.0))/20.0
  * If the last four arguments are not null, the analytic derivative
  * (the 4D gradient of the scalar noise field) is also calculated.
  */
-export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: Vector3): number {
+export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: LVector3): number {
 
   let n0, n1, n2, n3, n4; // Noise contributions from the five corners
   let noise; // Return value
@@ -712,7 +712,7 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
   return noise;
 }
 
-export function simplex401(vector: Vector3, gradient?: Vector3, seed = 0): number {
+export function simplex401(vector: LVector3, gradient?: LVector3, seed = 0): number {
   let noiseValue = sdnoise4(vector.x, vector.y, vector.z, seed, gradient);
 
   // on divise le vecteur gradient par 2 pour cause que [0,1] deux fois plus petit que [-1,1]
@@ -721,6 +721,6 @@ export function simplex401(vector: Vector3, gradient?: Vector3, seed = 0): numbe
   return (noiseValue + 1) / 2;
 }
 
-export function simplex411(vector: Vector3, gradient?: Vector3, seed = 0): number {
+export function simplex411(vector: LVector3, gradient?: LVector3, seed = 0): number {
   return sdnoise4(vector.x, vector.y, vector.z, seed, gradient);
 }

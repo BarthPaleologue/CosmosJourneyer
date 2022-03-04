@@ -1,3 +1,5 @@
+import {PostProcess, Camera, Scene, Mesh, PointLight, Effect, Texture} from "@babylonjs/core";
+
 interface RingsSettings {
     ringStart: number;
     ringEnd: number;
@@ -5,16 +7,16 @@ interface RingsSettings {
     ringOpacity: number;
 }
 
-export class RingsPostProcess extends BABYLON.PostProcess {
+export class RingsPostProcess extends PostProcess {
 
     settings: RingsSettings;
-    camera: BABYLON.Camera;
-    sun: BABYLON.Mesh | BABYLON.PointLight;
-    planet: BABYLON.Mesh;
+    camera: Camera;
+    sun: Mesh | PointLight;
+    planet: Mesh;
 
     internalTime = 0;
 
-    constructor(name: string, planet: BABYLON.Mesh, planetRadius: number, waterLevel: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+    constructor(name: string, planet: Mesh, planetRadius: number, waterLevel: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
         super(name, "./shaders/rings", [
             "sunPosition",
             "cameraPosition",
@@ -42,7 +44,7 @@ export class RingsPostProcess extends BABYLON.PostProcess {
         ], [
             "textureSampler",
             "depthSampler",
-        ], 1, camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        ], 1, camera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
 
 
         this.settings = {
@@ -60,7 +62,7 @@ export class RingsPostProcess extends BABYLON.PostProcess {
 
         let depthMap = scene.customRenderTargets[0];
 
-        this.onApply = (effect: BABYLON.Effect) => {
+        this.onApply = (effect: Effect) => {
             this.internalTime += this.getEngine().getDeltaTime();
 
             effect.setTexture("depthSampler", depthMap);
@@ -89,7 +91,7 @@ export class RingsPostProcess extends BABYLON.PostProcess {
         };
     }
 
-    setCamera(camera: BABYLON.Camera) {
+    setCamera(camera: Camera) {
         this.camera.detachPostProcess(this);
         this.camera = camera;
         camera.attachPostProcess(this);

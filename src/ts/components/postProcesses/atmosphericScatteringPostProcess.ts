@@ -1,3 +1,5 @@
+import {PostProcess, Camera, Mesh, PointLight, Scene, Texture, Effect, Axis, Vector3} from "@babylonjs/core";
+
 import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
 
 interface AtmosphereSettings {
@@ -12,14 +14,14 @@ interface AtmosphereSettings {
     blueWaveLength: number,
 }
 
-export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
+export class AtmosphericScatteringPostProcess extends PostProcess {
 
     settings: AtmosphereSettings;
-    camera: BABYLON.Camera;
-    sun: BABYLON.Mesh | BABYLON.PointLight;
-    planetMesh: BABYLON.Mesh;
+    camera: Camera;
+    sun: Mesh | PointLight;
+    planetMesh: Mesh;
 
-    constructor(name: string, planet: SolidPlanet, planetRadius: number, atmosphereRadius: number, sun: BABYLON.Mesh | BABYLON.PointLight, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+    constructor(name: string, planet: SolidPlanet, planetRadius: number, atmosphereRadius: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
         super(name, "./shaders/simplifiedScattering", [
             "sunPosition",
             "cameraPosition",
@@ -48,7 +50,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
         ], [
             "textureSampler",
             "depthSampler",
-        ], 1, scene.activeCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        ], 1, scene.activeCamera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
 
         this.settings = {
             planetRadius: planetRadius,
@@ -68,12 +70,12 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
 
         this.setCamera(this.camera);
 
-        this.onApply = (effect: BABYLON.Effect) => {
+        this.onApply = (effect: Effect) => {
 
             effect.setTexture("depthSampler", scene.customRenderTargets[0]);
 
             effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
-            effect.setVector3("cameraPosition", BABYLON.Vector3.Zero());
+            effect.setVector3("cameraPosition", Vector3.Zero());
 
             effect.setVector3("planetPosition", this.planetMesh.getAbsolutePosition());
 
@@ -83,7 +85,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
 
             effect.setFloat("cameraNear", camera.minZ);
             effect.setFloat("cameraFar", camera.maxZ);
-            effect.setVector3("cameraDirection", camera.getDirection(BABYLON.Axis.Z));
+            effect.setVector3("cameraDirection", camera.getDirection(Axis.Z));
 
             effect.setFloat("planetRadius", this.settings.planetRadius);
             effect.setFloat("atmosphereRadius", this.settings.atmosphereRadius);
@@ -100,7 +102,7 @@ export class AtmosphericScatteringPostProcess extends BABYLON.PostProcess {
         };
     }
 
-    setCamera(camera: BABYLON.Camera) {
+    setCamera(camera: Camera) {
         this.camera.detachPostProcess(this);
         this.camera = camera;
         camera.attachPostProcess(this);

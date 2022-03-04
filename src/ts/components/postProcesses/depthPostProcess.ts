@@ -1,8 +1,8 @@
+import {PostProcess, Camera, Scene, DepthRenderer} from "@babylonjs/core";
 
+export class DepthPostProcess extends PostProcess {
 
-export class DepthPostProcess extends BABYLON.PostProcess {
-
-    constructor(name: string, camera: BABYLON.Camera, scene: BABYLON.Scene) {
+    constructor(name: string, camera: Camera, scene: Scene) {
         super(name, "./shaders/depth", [
             "cameraNear",
             "cameraFar"
@@ -10,7 +10,7 @@ export class DepthPostProcess extends BABYLON.PostProcess {
             "depthSampler",
         ], 1.0, camera);
 
-        let depthRenderer = new BABYLON.DepthRenderer(scene, 1, camera, false);
+        let depthRenderer = new DepthRenderer(scene, 1, camera, false);
         scene.customRenderTargets.push(depthRenderer.getDepthMap());
 
         this.onBeforeRender = (effect) => {

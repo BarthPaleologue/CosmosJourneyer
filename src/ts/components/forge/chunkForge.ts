@@ -1,6 +1,7 @@
+import {Vector3, Mesh, VertexData, DepthRenderer} from "@babylonjs/core";
+
 import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
 import { PlanetChunk } from "../celestialBodies/planets/solid/planetChunk";
-import { Quaternion, Vector3 } from "../toolbox/algebra";
 import { Direction } from "../toolbox/direction";
 import { BuilderWorker } from "../workers/builderWorker";
 import { buildData } from "./buildData";
@@ -21,15 +22,15 @@ export interface BuildTask extends Task {
     planet: SolidPlanet,
     depth: number,
     direction: Direction,
-    position: BABYLON.Vector3,
-    mesh: BABYLON.Mesh;
+    position: Vector3,
+    mesh: Mesh;
     chunk: PlanetChunk;
 }
 
 export interface ApplyTask extends Task {
     taskType: TaskType.Apply,
-    mesh: BABYLON.Mesh,
-    vertexData: BABYLON.VertexData,
+    mesh: Mesh,
+    vertexData: VertexData,
     grassData: Float32Array,
     chunk: PlanetChunk;
     planet: SolidPlanet;
@@ -38,7 +39,7 @@ export interface ApplyTask extends Task {
 
 export interface DeleteTask extends Task {
     taskType: TaskType.Deletion,
-    mesh: BABYLON.Mesh,
+    mesh: Mesh,
 }
 
 export class ChunkForge {
@@ -105,7 +106,7 @@ export class ChunkForge {
                 } as buildData);
 
                 worker.getWorker().onmessage = e => {
-                    let vertexData = new BABYLON.VertexData();
+                    let vertexData = new VertexData();
                     vertexData.positions = e.data.p as Float32Array;
                     vertexData.indices = e.data.i as Uint16Array;
                     vertexData.normals = e.data.n as Float32Array;
@@ -151,7 +152,7 @@ export class ChunkForge {
     /**
      * Apply generated vertexData to waiting chunks
      */
-    executeNextApplyTask(depthRenderer: BABYLON.DepthRenderer) {
+    executeNextApplyTask(depthRenderer: DepthRenderer) {
         if (this.applyTasks.length > 0) {
             let task = this.applyTasks.shift()!;
             task.vertexData.applyToMesh(task.mesh, false);
@@ -169,7 +170,7 @@ export class ChunkForge {
     /**
      * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
      */
-    update(depthRenderer: BABYLON.DepthRenderer) {
+    update(depthRenderer: DepthRenderer) {
         for (let i = 0; i < this.availableWorkers.length; i++) {
             let worker = this.availableWorkers.shift()!;
             this.executeNextTask(worker);
