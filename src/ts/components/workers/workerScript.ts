@@ -1,6 +1,6 @@
 import { getQuaternionFromDirection } from "../toolbox/direction";
 import { simplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
-import { LVector3 } from "../toolbox/algebra";
+import {Algebra, LVector3} from "../toolbox/algebra";
 import { ridgedNoiseLayer } from "../terrain/landscape/ridgedNoiseLayer";
 import { CraterLayer } from "../terrain/crater/craterLayer";
 import { buildData } from "../forge/buildData";
@@ -89,7 +89,7 @@ self.onmessage = e => {
         const depth = data.depth;
         const direction = data.direction;
         const chunkPosition: number[] = data.position;
-        const seed = LVector3.FromArray3(data.seed);
+        const seed = new LVector3(data.seed[0], data.seed[1], data.seed[2]);
 
         if (data.planetID != currentPlanetID) {
             currentPlanetID = data.planetID;
@@ -113,17 +113,14 @@ self.onmessage = e => {
 
         let vecchunkPosition = new LVector3(chunkPosition[0], chunkPosition[1], chunkPosition[2]);
 
-        //vecchunkPosition.applyQuaternionInPlace(rotationQuaternion);
-
-
-        for (let x = 0; x < vertexPerLine; ++x) {
-            for (let y = 0; y < vertexPerLine; ++y) {
+        for (let x = 0; x < vertexPerLine; x++) {
+            for (let y = 0; y < vertexPerLine; y++) {
 
                 // on crée un plan dans le plan Oxy
-                let vertexPosition = new LVector3((x - subs / 2) / subs, (y - subs / 2) / subs, 0);
+                let vertexPosition = new LVector3(x - subs / 2, y - subs / 2, 0);
 
                 // on le met à la bonne taille
-                vertexPosition.scaleInPlace(size);
+                vertexPosition.scaleInPlace(size / subs);
 
                 // on le met au bon endroit de la face par défaut (Oxy devant)
                 vertexPosition.addInPlace(vecchunkPosition);
@@ -135,17 +132,23 @@ self.onmessage = e => {
 
                 // on l'arrondi pour en faire un chunk de sphère
                 let unitSphereCoords = vertexPosition.normalize();
-                vertexPosition = unitSphereCoords.scale(planetRadius);
+
+                vertexPosition.setMagnitudeInPlace(planetRadius);
+
                 // on applique la fonction de terrain
                 let vertexGradient = LVector3.Zero();
                 terrainFunction(vertexPosition, vertexGradient, seed);
 
-                let h = vertexGradient.subtract(unitSphereCoords.scale(LVector3.Dot(vertexGradient, unitSphereCoords)));
+                let h = vertexGradient;
+                h.subtractInPlace(unitSphereCoords.scale(Algebra.Dot(vertexGradient, unitSphereCoords)));
 
-                let vertexNormal = unitSphereCoords.subtract(h).normalize();
+                let vertexNormal = unitSphereCoords.subtract(h);
+                vertexNormal.normalizeInPlace();
 
                 // on le ramène à l'origine
-                vertexPosition.addInPlace(vecchunkPosition.normalize().scale(-planetRadius));
+                let offset = vecchunkPosition.clone();
+                offset.setMagnitudeInPlace(planetRadius);
+                vertexPosition.subtractInPlace(offset);
 
                 verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition.x;
                 verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition.y;
@@ -180,7 +183,7 @@ self.onmessage = e => {
 
         const grassPositions = new Float32Array(100 * 3 * 0);
 
-        vecchunkPosition.applyQuaternionInPlace(rotationQuaternion);
+        //vecchunkPosition.applyQuaternionInPlace(rotationQuaternion);
 
         /*for (let i = 0; i < 100; ++i) {
             let x = vecchunkPosition.x + Math.random() * size - size / 2;

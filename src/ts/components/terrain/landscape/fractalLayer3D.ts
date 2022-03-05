@@ -26,7 +26,7 @@ export function fractalLayer3D(frequency: number, nbOctaves: number, decay: numb
 
         if (minValue > 0) {
             if (minValue != 1) {
-                // TODO: ne pas hardcoder
+                // TODO: ne pas hardcoder k
                 noiseValue = sFloor(noiseValue - minValue, 0, 100.0, gradient);
                 noiseValue /= 1 - minValue;
                 gradient.divideInPlace(1 - minValue);

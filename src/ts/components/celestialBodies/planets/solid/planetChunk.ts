@@ -3,7 +3,7 @@ import {Quaternion, Vector3, Mesh, SolidParticleSystem, Scene, Material} from "@
 import { SolidPlanet } from "./solidPlanet";
 import { ChunkForge, TaskType } from "../../../forge/chunkForge";
 import { Direction, getQuaternionFromDirection } from "../../../toolbox/direction";
-import { LQuaternion, LVector3 } from "../../../toolbox/algebra";
+import {Algebra} from "../../../toolbox/algebra";
 
 /**
  * Returns the node position in plane space
@@ -11,7 +11,7 @@ import { LQuaternion, LVector3 } from "../../../toolbox/algebra";
  * @param path the path of the node
  * @returns the plane space coordinates of the chunk
  */
-export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: number[]): LVector3 {
+export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: number[]): Vector3 {
     let x = 0;
     let y = 0;
     for (let i = 0; i < path.length; ++i) {
@@ -43,7 +43,7 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
                 throw new Error(`${path[i]} is not a valid index for a child of a quadtree node !`);
         }
     }
-    return new LVector3(x, y, 0);
+    return new Vector3(x, y, 0);
 }
 
 /**
@@ -54,23 +54,23 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
  * @param planetRotationQuaternion
  * @returns the position in planet space
  */
-export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: number[], direction: Direction, planetRotationQuaternion: Quaternion): LVector3 {
+export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: number[], direction: Direction, planetRotationQuaternion: Quaternion): Vector3 {
 
     // on récupère la position dans le plan
     let position = getChunkPlaneSpacePositionFromPath(chunkLength, path);
 
     // on l'offset pour préparer à récupérer la position dans le cube
-    position.addInPlace(new LVector3(0, 0, -chunkLength / 2));
+    position.addInPlace(new Vector3(0, 0, -chunkLength / 2));
 
     let rotationQuaternion = getQuaternionFromDirection(direction);
-    position.applyQuaternionInPlace(rotationQuaternion);
+    Algebra.applyQuaternionInPlace(rotationQuaternion, position);
 
     // on projette cette position sur la sphère
-    position.normalizeInPlace();
+    Algebra.normalizeInPlace(position);
     position.scaleInPlace(chunkLength / 2);
 
     // on match cette position avec la rotation de la planète
-    position.applyQuaternionInPlace(LQuaternion.FromBABYLON(planetRotationQuaternion));
+    Algebra.applyQuaternionInPlace(planetRotationQuaternion, position);
 
     // c'est prêt !
     return position;
@@ -141,7 +141,7 @@ export class PlanetChunk {
             taskType: TaskType.Build,
             id: id,
             planet: planet,
-            position: position.toBabylon(),
+            position: position,
             depth: path.length,
             direction: direction,
             mesh: this.mesh,
@@ -150,7 +150,7 @@ export class PlanetChunk {
 
         // sphérisation du cube
         // note : on sphérise après car le worker script calcule les positions à partir du cube
-        position.normalizeInPlace();
+        Algebra.normalizeInPlace(position);
         position.scaleInPlace(rootChunkLength / 2);
 
         this.mesh.position.x = position.x;

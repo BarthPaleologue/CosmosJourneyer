@@ -1,5 +1,7 @@
 import { LQuaternion } from "./algebra";
 
+import {Quaternion} from "@babylonjs/core";
+
 export enum Direction {
     Up,
     Down,
@@ -9,7 +11,7 @@ export enum Direction {
     Backward
 }
 
-export function getQuaternionFromDirection(direction: Direction): LQuaternion {
+export function getQuaternionFromDirection(direction: Direction): Quaternion {
     switch (direction) {
         case Direction.Up:
             return LQuaternion.RotationX(Math.PI / 2);

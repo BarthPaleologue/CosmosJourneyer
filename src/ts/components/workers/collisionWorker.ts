@@ -4,7 +4,7 @@ import {CollisionData} from "../forge/CollisionData";
 import {StarSystemManager} from "../celestialBodies/starSystemManager";
 import {PlayerController} from "../player/playerController";
 import {PlanetWorker} from "./planetWorker";
-import {LVector3} from "../toolbox/algebra";
+import {Algebra} from "../toolbox/algebra";
 import {CelestialBody, CelestialBodyType} from "../celestialBodies/celestialBody";
 import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
 
@@ -43,11 +43,11 @@ export class CollisionWorker extends PlanetWorker {
         this._busy = true;
     }
     public checkCollision(planet: CelestialBody): void {
-        let position = LVector3.FromBABYLON3(planet.getAbsolutePosition()); // position de la planète / au joueur
+        let position = planet.getAbsolutePosition().clone(); // position de la planète / au joueur
         position.scaleInPlace(-1); // position du joueur / au centre de la planète
 
         // on applique le quaternion inverse pour obtenir le sample point correspondant à la planète rotatée (fais un dessin si c'est pas clair)
-        position.applyQuaternionInPlace(Quaternion.Inverse(planet.getRotationQuaternion()));
+        Algebra.applyQuaternionInPlace(Quaternion.Inverse(planet.getRotationQuaternion()), position);
 
         if(planet.getBodyType() == CelestialBodyType.SOLID) {
             //TODO: improve cast system

@@ -1,10 +1,9 @@
 import {Vector2, Vector3, Vector4, Quaternion} from "@babylonjs/core";
 
 export class Vector {
-    private components: number[];
+    private readonly components: number[];
     constructor(...components: number[]) {
         this.components = components;
-        //Object.seal(this.components); performance issues ? weird
     }
     public get dim(): number {
         return this.components.length;
@@ -334,6 +333,9 @@ export class Vector {
     }
 }
 
+/**
+ * Lightweight vector3 for fast algebra computation
+ */
 export class LVector3 {
     private _x: number;
     private _y: number;
@@ -408,134 +410,91 @@ export class LVector3 {
      * @returns returns the sum of the current Vector3 and the other Vector3 as a new Vector3
      */
     add(otherVector: LVector3): LVector3 {
-        return new LVector3(this._x + otherVector._x, this._y + otherVector._y, this._z + otherVector._z);
+        return new LVector3(this._x + otherVector.x, this._y + otherVector.y, this._z + otherVector.z);
     }
+
     addInPlace(otherVector: LVector3): void {
-        this._x += otherVector._x;
-        this._y += otherVector._y;
-        this._z += otherVector._z;
+        this._x += otherVector.x;
+        this._y += otherVector.y;
+        this._z += otherVector.z;
     }
+
     subtract(otherVector: LVector3): LVector3 {
-        return new LVector3(this._x - otherVector._x, this._y - otherVector._y, this._z - otherVector._z);
+        return new LVector3(this._x - otherVector.x, this._y - otherVector.y, this._z - otherVector.z);
     }
+
     subtractInPlace(otherVector: LVector3): void {
-        this._x -= otherVector._x;
-        this._y -= otherVector._y;
-        this._z -= otherVector._z;
+        this._x -= otherVector.x;
+        this._y -= otherVector.y;
+        this._z -= otherVector.z;
     }
+
     normalize(): LVector3 {
         return this.scale(1 / this.getMagnitude());
     }
     normalizeInPlace(): void {
         this.scaleInPlace(1 / this.getMagnitude());
     }
+
+    public setMagnitudeInPlace(newMagnitude: number): void {
+        this.normalizeInPlace();
+        this.scaleInPlace(newMagnitude);
+    }
+
+    public clone(): LVector3 {
+        return new LVector3(this._x, this._y, this._z);
+    }
+
     static Zero(): LVector3 {
         return new LVector3(0, 0, 0);
     }
-    static FromArray3(array: number[]): LVector3 {
-        return new LVector3(array[0], array[1], array[2]);
-    }
-    static FromBABYLON3(vector: Vector3): LVector3 {
-        return new LVector3(vector.x, vector.y, vector.z);
-    }
-    static ToBABYLON3(vector: LVector3): Vector3 {
-        return new Vector3(vector.x, vector.y, vector.z);
-    }
-    public toBabylon(): Vector3 {
-        return LVector3.ToBABYLON3(this);
-    }
     //https://www.wikiwand.com/en/Quaternions_and_spatial_rotation
-    applyQuaternionInPlace(quaternion: LQuaternion | Quaternion): void {
+    applyQuaternionInPlace(quaternion: Quaternion): void {
+        Algebra.applyQuaternionInPlace(quaternion, this);
+    }
+}
+
+export type Vec3 = Vector3 | LVector3;
+
+export class Algebra {
+    public static applyQuaternionInPlace(quaternion: Quaternion, vector: Vec3) {
         let qx = quaternion.x;
         let qy = quaternion.y;
         let qz = quaternion.z;
         let qw = quaternion.w;
-        let x = this.x;
-        let y = this.y;
-        let z = this.z;
+        let x = vector.x;
+        let y = vector.y;
+        let z = vector.z;
         // apply quaternion to vector
         let ix = qw * x + qy * z - qz * y;
         let iy = qw * y + qz * x - qx * z;
         let iz = qw * z + qx * y - qy * x;
         let iw = -qx * x - qy * y - qz * z;
         // calculate result * inverse quat
-        this.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
-        this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
-        this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+        vector.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+        vector.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+        vector.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
     }
-    static DistanceSquared(vector1: LVector3, vector2: LVector3) {
-        return (vector1.x - vector2.x) ** 2 + (vector1.y - vector2.y) ** 2 + (vector1.z - vector2.z) ** 2;
+    public static normalizeInPlace(vector: Vector3): void {
+        let mag = vector.length();
+        vector.scaleInPlace(1 / mag);
     }
-    static Distance(vector1: LVector3, vector2: LVector3) {
-        return Math.sqrt(LVector3.DistanceSquared(vector1, vector2));
-    }
-    static Dot(vector1: LVector3, vector2: LVector3) {
+    public static Dot(vector1: Vec3, vector2: Vec3): number {
         return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
-    }
-
-    static FloorToNew(vector: LVector3) {
-        return new LVector3(Math.floor(vector.x), Math.floor(vector.y), Math.floor(vector.z));
     }
 }
 
-export class LQuaternion {
-    private _x: number;
-    private _y: number;
-    private _z: number;
-    private _w: number;
-
+export class LQuaternion extends Quaternion {
     constructor(x: number, y: number, z: number, w: number) {
-        this._x = x;
-        this._y = y;
-        this._z = z;
-        this._w = w;
+        super(x, y, z, w);
     }
-
-    get x(): number {
-        return this._x;
+    static RotationX(angle: number): Quaternion {
+        return new Quaternion(Math.sin(angle / 2), 0, 0, Math.cos(angle / 2));
     }
-    get y(): number {
-        return this._y;
+    static RotationY(angle: number): Quaternion {
+        return new Quaternion(0, Math.sin(angle / 2), 0, Math.cos(angle / 2));
     }
-    get z(): number {
-        return this._z;
-    }
-    get w(): number {
-        return this._w;
-    }
-
-    set x(value: number) {
-        this._x = value;
-    }
-    set y(value: number) {
-        this._y = value;
-    }
-    set z(value: number) {
-        this._z = value;
-    }
-    set w(value: number) {
-        this._w = value;
-    }
-
-    static Zero(): LQuaternion {
-        return new LQuaternion(0, 0, 0, 0);
-    }
-    static Identity(): LQuaternion {
-        return new LQuaternion(0, 0, 0, 1);
-    }
-    static FromArray(array: number[]): LQuaternion {
-        return new LQuaternion(array[0], array[1], array[2], array[3]);
-    }
-    static FromBABYLON(quaternion: Quaternion): LQuaternion {
-        return new LQuaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-    }
-    static RotationX(angle: number): LQuaternion {
-        return new LQuaternion(Math.sin(angle / 2), 0, 0, Math.cos(angle / 2));
-    }
-    static RotationY(angle: number): LQuaternion {
-        return new LQuaternion(0, Math.sin(angle / 2), 0, Math.cos(angle / 2));
-    }
-    static RotationZ(angle: number): LQuaternion {
-        return new LQuaternion(0, 0, Math.sin(angle / 2), Math.cos(angle / 2));
+    static RotationZ(angle: number): Quaternion {
+        return new Quaternion(0, 0, Math.sin(angle / 2), Math.cos(angle / 2));
     }
 }

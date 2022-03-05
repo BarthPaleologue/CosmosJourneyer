@@ -293,9 +293,13 @@ vec3 computeColorAndNormal(
 	}
 
 	// TODO: briser la répétition avec du simplex
+	// TODO: interpoler entre les distances
+	// genre celui là on l'appelle farNormal
 	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.001, normalSharpness, 0.5);
 	//normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.0003, normalSharpness, 0.2); // plus grand
+	// et celui là on l'appelle nearNormal
 	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.00001, normalSharpness, 0.15); // plus grand
+    // et avec la distance à la planète / surface on fait une interpolation entre les deux ! (on peut même clamp un peu)
 
 	return outColor;
 }

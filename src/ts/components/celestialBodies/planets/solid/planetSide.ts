@@ -4,7 +4,6 @@ import { getChunkSphereSpacePositionFromPath, PlanetChunk } from "./planetChunk"
 import { Direction } from "../../../toolbox/direction";
 import { ChunkForge, TaskType } from "../../../forge/chunkForge";
 import { SolidPlanet } from "./solidPlanet";
-import { LVector3 } from "../../../toolbox/algebra";
 
 type quadTree = quadTree[] | PlanetChunk;
 
@@ -123,11 +122,11 @@ export class PlanetSide {
         let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.parent.rotationQuaternion!);
 
         // position par rapport à la caméra
-        let parentPosition = new LVector3(this.parent.absolutePosition.x, this.parent.absolutePosition.y, this.parent.absolutePosition.z);
+        let parentPosition = this.parent.absolutePosition.clone();
         let absolutePosition = relativePosition.add(parentPosition);
-        let direction = absolutePosition.subtract(LVector3.FromBABYLON3(observerPosition));
+        let direction = absolutePosition.subtract(observerPosition);
         // distance carré entre caméra et noeud du quadtree
-        let d2 = direction.getSquaredMagnitude();
+        let d2 = direction.lengthSquared();
         let limit = this.renderDistanceFactor * this.rootChunkLength / (2 ** walked.length);
 
         if ((d2 < limit ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
@@ -155,10 +154,10 @@ export class PlanetSide {
             // si on est loin
             if (tree instanceof PlanetChunk) {
                 let dn = direction.normalize();
-                let dot = LVector3.Dot(relativePosition.normalize(), dn);
+                let dot = Vector3.Dot(relativePosition.normalizeToNew(), dn);
 
                 // sera d'occludé les chunks derrière la caméra
-                //let dot2 = Vector3.Dot(absolutePosition.normalize(), Vector3.FromBABYLON3(observerDirection));
+                //let dot2 = Algebra.Dot(absolutePosition.normalize(), observerDirection);
                 // mais si un chunk est très proche, il sera toujours visible (on est proche donc le dot2 peut être négatif alors que le chunk est visible)
                 //let c2 = dot2 > - 0.5 && absolutePosition.getMagnitude() > this.rootChunkLength / (2 ** (walked.length + 3));
 
