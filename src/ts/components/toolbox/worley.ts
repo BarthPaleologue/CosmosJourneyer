@@ -1,12 +1,11 @@
-import { Vector } from "./algebra";
 
-function permute(x: Vector): Vector {
-    return Vector.Mod(x.multiply(x.scale(34).addNumber(1)), Vector.Ns(289.0, x.dim));
+/*function permute(x: Vector3): Vector3 {
+    return Vector3.Mod(x.multiply(x.scale(34).addNumber(1)), Vector.Ns(289.0, x.dim));
 }
 
 function dist(x: Vector, y: Vector, z: Vector) {
     return (x.multiply(x).add(y.multiply(y)).add(z.multiply(z)));
-}
+}*/
 /*
 // tentative de résolution du bottleneck des cratères
 export function worley(P: Vector, jitter = 1): number {

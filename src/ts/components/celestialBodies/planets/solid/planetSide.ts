@@ -47,8 +47,7 @@ export class PlanetSide {
      * @param rootChunkLength 
      * @param direction 
      * @param parentNode 
-     * @param scene 
-     * @param chunkForge 
+     * @param scene
      * @param surfaceMaterial 
      * @param planet 
      */

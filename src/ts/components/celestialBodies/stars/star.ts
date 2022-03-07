@@ -9,8 +9,8 @@ export interface StarPhysicalProperties extends BodyPhysicalProperties {
 
 export class Star extends CelestialBody {
     public mesh: Mesh;
-    private radius: number;
-    private starMaterial: ShaderMaterial;
+    private readonly radius: number;
+    private readonly starMaterial: ShaderMaterial;
     private internalTime = 0;
     protected bodyType = CelestialBodyType.STAR;
     physicalProperties: StarPhysicalProperties = {

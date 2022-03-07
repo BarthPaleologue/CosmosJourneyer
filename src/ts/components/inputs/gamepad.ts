@@ -20,7 +20,7 @@ export enum GamepadButton {
     DPadRight,
     Home,
     Screenshot
-};
+}
 
 /**
  * All directions on a gamepad

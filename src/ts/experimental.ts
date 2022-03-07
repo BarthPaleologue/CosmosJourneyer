@@ -1,4 +1,4 @@
-import { Engine, Scene, Color3, Color4, Texture, DepthRenderer, Axis, Space, Vector3, PointLight, Tools, FxaaPostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import { Engine, Scene, Color3, Color4, Texture, DepthRenderer, Axis, Space, Vector3, PointLight, Tools, FxaaPostProcess} from "@babylonjs/core";
 
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
 import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";

@@ -76,7 +76,7 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
     return position;
 }
 
-import grass from "../../../../asset/textures/grass.png";
+//import grass from "../../../../asset/textures/grass.png";
 
 // ne pas supprimer la classe pour cause de peut être des arbres et de l'herbe
 export class PlanetChunk {
