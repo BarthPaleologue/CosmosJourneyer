@@ -34,72 +34,74 @@ export class ChunkForge {
      */
     executeNextTask(worker: BuilderWorker) {
         if (this.incomingTasks.length > 0) {
-            this.executeTask(this.incomingTasks.shift()!, worker);
+            this.DispatchTask(this.incomingTasks.shift()!, worker);
         } else {
             this.finishedWorkers.push(worker);
         }
     }
 
-    executeTask(task: DeleteTask | BuildTask, worker: BuilderWorker) {
+    DispatchTask(task: DeleteTask | BuildTask, worker: BuilderWorker) {
+
+        this.incomingTasks.shift();
 
         switch (task.taskType) {
             case TaskType.Build:
                 let castedTask = task as BuildTask;
 
-                // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
-                // tâches de supressions associées : on les stock et on les execute après les créations
-
-                let callbackTasks: DeleteTask[] = [];
-                while (this.incomingTasks.length > 0 && this.incomingTasks[0].taskType == TaskType.Deletion) {
-                    callbackTasks.push(this.incomingTasks[0]);
-                    this.incomingTasks.shift();
-                }
-
-                worker.send({
-                    taskType: "buildTask",
-                    planetID: castedTask.planet._name,
-                    chunkLength: castedTask.planet.rootChunkLength,
-                    subdivisions: this.subdivisions,
-                    depth: castedTask.depth,
-                    direction: castedTask.direction,
-                    position: [castedTask.position.x, castedTask.position.y, castedTask.position.z],
-                    craters: castedTask.planet.craters,
-                    terrainSettings: castedTask.planet.terrainSettings,
-                    seed: castedTask.planet.getSeed(),
-                } as buildData);
-
-                worker.getWorker().onmessage = e => {
-                    let vertexData = new VertexData();
-                    vertexData.positions = e.data.p as Float32Array;
-                    vertexData.indices = e.data.i as Uint16Array;
-                    vertexData.normals = e.data.n as Float32Array;
-
-                    let grassData = e.data.g as Float32Array;
-
-                    this.applyTasks.push({
-                        id: castedTask.id,
-                        taskType: TaskType.Apply,
-                        mesh: task.mesh,
-                        vertexData: vertexData,
-                        grassData: grassData,
-                        chunk: castedTask.chunk,
-                        callbackTasks: callbackTasks,
-                        planet: castedTask.planet,
-                    } as ApplyTask);
-
-                    this.finishedWorkers.push(worker);
-                };
+                this.ExecuteBuildTask(worker, castedTask, task);
                 break;
             case TaskType.Deletion:
                 // une tâche de suppression solitaire ne devrait pas exister
-                console.error("Tâche de supression solitaire détectée");
-                this.finishedWorkers.push(worker);
-                break;
+                throw new Error("Tâche de supression solitaire détectée");
             default:
-                console.error("Tache illegale");
-                this.finishedWorkers.push(worker);
-                break;
+                throw new Error("Tache illegale");
         }
+        this.finishedWorkers.push(worker);
+    }
+
+    private ExecuteBuildTask(worker: BuilderWorker, castedTask: BuildTask, task: DeleteTask | BuildTask) {
+        // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
+        // tâches de supressions associées : on les stock et on les execute après les créations
+
+        let callbackTasks: DeleteTask[] = [];
+        while (this.incomingTasks.length > 0 && this.incomingTasks[0].taskType == TaskType.Deletion) {
+            callbackTasks.push(this.incomingTasks[0]);
+
+        }
+
+        worker.send({
+            taskType: "buildTask",
+            planetID: castedTask.planet._name,
+            chunkLength: castedTask.planet.rootChunkLength,
+            subdivisions: this.subdivisions,
+            depth: castedTask.depth,
+            direction: castedTask.direction,
+            position: [castedTask.position.x, castedTask.position.y, castedTask.position.z],
+            craters: castedTask.planet.craters,
+            terrainSettings: castedTask.planet.terrainSettings,
+            seed: castedTask.planet.getSeed(),
+        } as buildData);
+
+        worker.getWorker().onmessage = e => {
+            let vertexData = new VertexData();
+            vertexData.positions = e.data.p as Float32Array;
+            vertexData.indices = e.data.i as Uint16Array;
+            vertexData.normals = e.data.n as Float32Array;
+
+            let grassData = e.data.g as Float32Array;
+
+            this.applyTasks.push({
+                id: castedTask.id,
+                taskType: TaskType.Apply,
+                mesh: task.mesh,
+                vertexData: vertexData,
+                grassData: grassData,
+                chunk: castedTask.chunk,
+                callbackTasks: callbackTasks,
+                planet: castedTask.planet,
+            } as ApplyTask);
+
+        };
     }
 
     /**
