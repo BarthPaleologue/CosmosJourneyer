@@ -1,7 +1,8 @@
 import {Quaternion, Vector3, Mesh, SolidParticleSystem, Scene, Material} from "@babylonjs/core";
 
 import { SolidPlanet } from "./solidPlanet";
-import { ChunkForge, TaskType } from "../../../forge/chunkForge";
+import { ChunkForge } from "../../../forge/chunkForge";
+import {TaskType} from "../../../forge/taskInterfaces";
 import { Direction, getQuaternionFromDirection } from "../../../toolbox/direction";
 import {Algebra} from "../../../toolbox/algebra";
 

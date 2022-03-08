@@ -2,7 +2,8 @@ import {Mesh, Scene, Material, Vector3} from "@babylonjs/core";
 
 import { getChunkSphereSpacePositionFromPath, PlanetChunk } from "./planetChunk";
 import { Direction } from "../../../toolbox/direction";
-import { ChunkForge, TaskType } from "../../../forge/chunkForge";
+import { ChunkForge } from "../../../forge/chunkForge";
+import {TaskType} from "../../../forge/taskInterfaces";
 import { SolidPlanet } from "./solidPlanet";
 
 type quadTree = quadTree[] | PlanetChunk;

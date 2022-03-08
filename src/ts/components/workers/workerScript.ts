@@ -3,9 +3,9 @@ import { simplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
 import {Algebra, LVector3} from "../toolbox/algebra";
 import { ridgedNoiseLayer } from "../terrain/landscape/ridgedNoiseLayer";
 import { CraterLayer } from "../terrain/crater/craterLayer";
-import { buildData } from "../forge/buildData";
+import { buildData } from "../forge/workerData";
 import { TerrainSettings } from "../terrain/terrainSettings";
-import { CollisionData } from "../forge/CollisionData";
+import { CollisionData } from "../forge/workerData";
 import { elevationFunction } from "../terrain/landscape/elevationFunction";
 
 let currentPlanetID = "";

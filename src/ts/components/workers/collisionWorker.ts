@@ -1,6 +1,6 @@
 import {Quaternion} from "@babylonjs/core";
 
-import {CollisionData} from "../forge/CollisionData";
+import {CollisionData} from "../forge/workerData";
 import {StarSystemManager} from "../celestialBodies/starSystemManager";
 import {PlayerController} from "../player/playerController";
 import {PlanetWorker} from "./planetWorker";

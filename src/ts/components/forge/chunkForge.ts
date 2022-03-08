@@ -1,46 +1,8 @@
-import {Vector3, Mesh, VertexData, DepthRenderer} from "@babylonjs/core";
+import {VertexData, DepthRenderer} from "@babylonjs/core";
 
-import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
-import { PlanetChunk } from "../celestialBodies/planets/solid/planetChunk";
-import { Direction } from "../toolbox/direction";
 import { BuilderWorker } from "../workers/builderWorker";
-import { buildData } from "./buildData";
-
-export enum TaskType {
-    Deletion,
-    Build,
-    Apply
-}
-
-export interface Task {
-    id: string;
-    taskType: TaskType;
-}
-
-export interface BuildTask extends Task {
-    taskType: TaskType.Build,
-    planet: SolidPlanet,
-    depth: number,
-    direction: Direction,
-    position: Vector3,
-    mesh: Mesh;
-    chunk: PlanetChunk;
-}
-
-export interface ApplyTask extends Task {
-    taskType: TaskType.Apply,
-    mesh: Mesh,
-    vertexData: VertexData,
-    grassData: Float32Array,
-    chunk: PlanetChunk;
-    planet: SolidPlanet;
-    callbackTasks: DeleteTask[];
-}
-
-export interface DeleteTask extends Task {
-    taskType: TaskType.Deletion,
-    mesh: Mesh,
-}
+import { buildData } from "./workerData";
+import {ApplyTask, BuildTask, DeleteTask, TaskType} from "./taskInterfaces";
 
 export class ChunkForge {
     subdivisions: number;
@@ -82,6 +44,7 @@ export class ChunkForge {
 
         switch (task.taskType) {
             case TaskType.Build:
+                let castedTask = task as BuildTask;
 
                 // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
                 // tâches de supressions associées : on les stock et on les execute après les créations
@@ -94,15 +57,15 @@ export class ChunkForge {
 
                 worker.send({
                     taskType: "buildTask",
-                    planetID: task.planet._name,
-                    chunkLength: task.planet.rootChunkLength,
+                    planetID: castedTask.planet._name,
+                    chunkLength: castedTask.planet.rootChunkLength,
                     subdivisions: this.subdivisions,
-                    depth: task.depth,
-                    direction: task.direction,
-                    position: [task.position.x, task.position.y, task.position.z],
-                    craters: task.planet.craters,
-                    terrainSettings: task.planet.terrainSettings,
-                    seed: task.planet.getSeed(),
+                    depth: castedTask.depth,
+                    direction: castedTask.direction,
+                    position: [castedTask.position.x, castedTask.position.y, castedTask.position.z],
+                    craters: castedTask.planet.craters,
+                    terrainSettings: castedTask.planet.terrainSettings,
+                    seed: castedTask.planet.getSeed(),
                 } as buildData);
 
                 worker.getWorker().onmessage = e => {
@@ -114,15 +77,15 @@ export class ChunkForge {
                     let grassData = e.data.g as Float32Array;
 
                     this.applyTasks.push({
-                        id: task.id,
+                        id: castedTask.id,
                         taskType: TaskType.Apply,
                         mesh: task.mesh,
                         vertexData: vertexData,
                         grassData: grassData,
-                        chunk: task.chunk,
+                        chunk: castedTask.chunk,
                         callbackTasks: callbackTasks,
-                        planet: task.planet,
-                    });
+                        planet: castedTask.planet,
+                    } as ApplyTask);
 
                     this.finishedWorkers.push(worker);
                 };
