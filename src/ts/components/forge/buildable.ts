@@ -2,7 +2,7 @@ import { Crater } from "../terrain/crater/crater";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { Direction } from "../toolbox/direction";
 
-export interface Buildable {
+export interface buildData {
     taskType: string;
     planetID: string;
     chunkLength: number;

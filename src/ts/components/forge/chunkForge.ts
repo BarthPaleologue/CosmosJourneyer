@@ -1,46 +1,8 @@
-import {Vector3, Mesh, VertexData, DepthRenderer} from "@babylonjs/core";
+import {VertexData, DepthRenderer} from "@babylonjs/core";
 
-import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
-import { PlanetChunk } from "../celestialBodies/planets/solid/planetChunk";
-import { Direction } from "../toolbox/direction";
 import { BuilderWorker } from "../workers/builderWorker";
-import { Buildable } from "./buildable";
-
-export enum TaskType {
-    Deletion,
-    Build,
-    Apply
-}
-
-export interface Task {
-    id: string;
-    taskType: TaskType;
-}
-
-export interface BuildTask extends Task {
-    taskType: TaskType.Build,
-    planet: SolidPlanet,
-    depth: number,
-    direction: Direction,
-    position: Vector3,
-    mesh: Mesh;
-    chunk: PlanetChunk;
-}
-
-export interface ApplyTask extends Task {
-    taskType: TaskType.Apply,
-    mesh: Mesh,
-    vertexData: VertexData,
-    grassData: Float32Array,
-    chunk: PlanetChunk;
-    planet: SolidPlanet;
-    callbackTasks: DeleteTask[]; //TODO: Unifier les parametres
-}
-
-export interface DeleteTask extends Task {
-    taskType: TaskType.Deletion,
-    mesh: Mesh,
-}
+import { buildData } from "./workerData";
+import {ApplyTask, BuildTask, DeleteTask, TaskType} from "./taskInterfaces";
 
 export class ChunkForge {
     subdivisions: number;
@@ -72,70 +34,72 @@ export class ChunkForge {
      */
     executeNextTask(worker: BuilderWorker) {
         if (this.incomingTasks.length > 0) {
-            this.dispatchTask(this.incomingTasks.shift()!, worker);
+            this.executeTask(this.incomingTasks.shift()!, worker);
         } else {
             this.finishedWorkers.push(worker);
         }
     }
 
-    dispatchTask(task: DeleteTask | BuildTask, worker: BuilderWorker) {
+    executeTask(task: DeleteTask | BuildTask, worker: BuilderWorker) {
 
         switch (task.taskType) {
             case TaskType.Build:
-                this.buildTask(worker, task);
+                let castedTask = task as BuildTask;
+
+                // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
+                // tâches de supressions associées : on les stock et on les execute après les créations
+
+                let callbackTasks: DeleteTask[] = [];
+                while (this.incomingTasks.length > 0 && this.incomingTasks[0].taskType == TaskType.Deletion) {
+                    callbackTasks.push(this.incomingTasks[0]);
+                    this.incomingTasks.shift();
+                }
+
+                worker.send({
+                    taskType: "buildTask",
+                    planetID: castedTask.planet._name,
+                    chunkLength: castedTask.planet.rootChunkLength,
+                    subdivisions: this.subdivisions,
+                    depth: castedTask.depth,
+                    direction: castedTask.direction,
+                    position: [castedTask.position.x, castedTask.position.y, castedTask.position.z],
+                    craters: castedTask.planet.craters,
+                    terrainSettings: castedTask.planet.terrainSettings,
+                    seed: castedTask.planet.getSeed(),
+                } as buildData);
+
+                worker.getWorker().onmessage = e => {
+                    let vertexData = new VertexData();
+                    vertexData.positions = e.data.p as Float32Array;
+                    vertexData.indices = e.data.i as Uint16Array;
+                    vertexData.normals = e.data.n as Float32Array;
+
+                    let grassData = e.data.g as Float32Array;
+
+                    this.applyTasks.push({
+                        id: castedTask.id,
+                        taskType: TaskType.Apply,
+                        mesh: task.mesh,
+                        vertexData: vertexData,
+                        grassData: grassData,
+                        chunk: castedTask.chunk,
+                        callbackTasks: callbackTasks,
+                        planet: castedTask.planet,
+                    } as ApplyTask);
+
+                    this.finishedWorkers.push(worker);
+                };
                 break;
             case TaskType.Deletion:
                 // une tâche de suppression solitaire ne devrait pas exister
-                throw new Error("Tâche de supression solitaire détectée");
+                console.error("Tâche de supression solitaire détectée");
+                this.finishedWorkers.push(worker);
+                break;
             default:
-                throw new Error(`Illegal task ${task}`) ;
+                console.error("Tache illegale");
+                this.finishedWorkers.push(worker);
+                break;
         }
-        this.finishedWorkers.push(worker);
-    }
-
-    private buildTask(worker: BuilderWorker, task: BuildTask) {
-        // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
-        // tâches de supressions associées : on les stock et on les execute après les créations
-
-        let callbackTasks: DeleteTask[] = [];
-        while (this.incomingTasks.length > 0 && this.incomingTasks[0].taskType == TaskType.Deletion) {
-            callbackTasks.push(this.incomingTasks[0]);
-            this.incomingTasks.shift();
-        }
-
-        worker.send({
-            taskType: "buildTask",
-            planetID: task.planet._name,
-            chunkLength: task.planet.rootChunkLength,
-            subdivisions: this.subdivisions,
-            depth: task.depth,
-            direction: task.direction,
-            position: [task.position.x, task.position.y, task.position.z],
-            craters: task.planet.craters,
-            terrainSettings: task.planet.terrainSettings,
-            seed: task.planet.getSeed(),
-        } as Buildable);
-
-        worker.getWorker().onmessage = e => {
-            let vertexData = new VertexData();
-            vertexData.positions = e.data.p as Float32Array;
-            vertexData.indices = e.data.i as Uint16Array;
-            vertexData.normals = e.data.n as Float32Array;
-
-            let grassData = e.data.g as Float32Array;
-
-            this.applyTasks.push({
-                id: task.id,
-                taskType: TaskType.Apply,
-                mesh: task.mesh,
-                vertexData: vertexData,
-                grassData: grassData,
-                chunk: task.chunk,
-                callbackTasks: callbackTasks,
-                planet: task.planet,
-            });
-
-        };
     }
 
     /**

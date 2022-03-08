@@ -4,9 +4,8 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
-const fs = require('fs');
 
-const isProduction = process.env.NODE_ENV == "production";
+const isProduction = process.env.NODE_ENV === "production";
 const htmlPath = path.join(__dirname, "/src/html/");
 
 const config = {
@@ -22,12 +21,9 @@ const config = {
   devServer: {
     open: true,
     host: "localhost",
-  },
-
-
-  devServer: {
     historyApiFallback: false
   },
+
   plugins: [
     new CopyPlugin({
       patterns: [

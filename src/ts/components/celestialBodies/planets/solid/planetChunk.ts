@@ -1,7 +1,8 @@
 import {Quaternion, Vector3, Mesh, SolidParticleSystem, Scene, Material} from "@babylonjs/core";
 
 import { SolidPlanet } from "./solidPlanet";
-import { ChunkForge, TaskType } from "../../../forge/chunkForge";
+import { ChunkForge } from "../../../forge/chunkForge";
+import {TaskType} from "../../../forge/taskInterfaces";
 import { Direction, getQuaternionFromDirection } from "../../../toolbox/direction";
 import {Algebra} from "../../../toolbox/algebra";
 
@@ -76,7 +77,7 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
     return position;
 }
 
-import grass from "../../../../asset/textures/grass.png";
+//import grass from "../../../../asset/textures/grass.png";
 
 // ne pas supprimer la classe pour cause de peut être des arbres et de l'herbe
 export class PlanetChunk {

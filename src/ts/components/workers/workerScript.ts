@@ -3,9 +3,9 @@ import { simplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
 import {Algebra, LVector3} from "../toolbox/algebra";
 import { ridgedNoiseLayer } from "../terrain/landscape/ridgedNoiseLayer";
 import { CraterLayer } from "../terrain/crater/craterLayer";
-import { Buildable } from "../forge/buildable";
+import { buildData } from "../forge/workerData";
 import { TerrainSettings } from "../terrain/terrainSettings";
-import { CollisionData } from "../forge/CollisionData";
+import { CollisionData } from "../forge/workerData";
 import { elevationFunction } from "../terrain/landscape/elevationFunction";
 
 let currentPlanetID = "";
@@ -82,7 +82,7 @@ self.onmessage = e => {
     if (e.data.taskType == "buildTask") {
         //let clock = Date.now();
 
-        const data = e.data as Buildable;
+        const data = e.data as buildData;
 
         const chunkLength = data.chunkLength;
         const subs = data.subdivisions;
@@ -244,6 +244,6 @@ self.onmessage = e => {
         });
 
     } else {
-       throw new Error(`Type de tâche reçue invalide : ${e.data.taskType}`);
+        console.error(`Type de tâche reçue invalide : ${e.data.taskType}`);
     }
 };

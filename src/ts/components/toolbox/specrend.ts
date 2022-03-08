@@ -61,7 +61,7 @@ class ColourSystem {
         this.yWhite = yWhite;
         this.gamma = gamma;
     }
-};
+}
 
 /* White point chromaticities. */
 
@@ -247,7 +247,7 @@ function gamma_correct(cs: ColourSystem, c: number): number {
     }
 
     return c;
-};
+}
 
 function gamma_correct_rgb(cs: ColourSystem, r: number, g: number, b: number): number[] {
     return [gamma_correct(cs, r),

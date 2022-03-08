@@ -1,16 +1,16 @@
-import { Vector } from "../../toolbox/algebra";
 import { Crater } from "./crater";
+import {Vector3} from "@babylonjs/core";
 
 export class CraterLayer {
     private _craters: Crater[];
     constructor(craters: Crater[]) {
         this._craters = craters;
     }
-    evaluate(p: Vector) {
+    evaluate(p: Vector3) {
         let elevation = 0;
 
         for (let crater of this._craters) {
-            let d = Vector.Distance(p, new Vector(...crater.position));
+            let d = Vector3.Distance(p, new Vector3(crater.position[0], crater.position[1], crater.position[2]));
 
             let radius = crater.radius;
             let steepness = crater.steepness;
