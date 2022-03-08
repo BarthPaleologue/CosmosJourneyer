@@ -183,7 +183,7 @@ function updateScene() {
 
     deplacement.addInPlace(player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000));
 
-    starSystemManager.moveEverything(deplacement);
+    starSystemManager.translateAllCelestialBody(deplacement);
     //sun.mesh.position.addInPlace(deplacement);
 
     if (!collisionWorker.isBusy() && player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() < player.nearestBody.getRadius() * 2) {

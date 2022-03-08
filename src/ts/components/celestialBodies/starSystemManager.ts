@@ -19,7 +19,7 @@ export class StarSystemManager {
         planet.setChunkForge(this._chunkForge);
         this._celestialBodies.push(planet);
     }
-    public moveEverything(deplacement: Vector3): void {
+    public translateAllCelestialBody(deplacement: Vector3): void {
         for (const planet of this._celestialBodies) {
             planet.setAbsolutePosition(planet.getAbsolutePosition().add(deplacement));
         }

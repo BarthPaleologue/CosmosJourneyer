@@ -30,7 +30,7 @@ export class CollisionWorker extends PlanetWorker {
 
             let deviation = newPosition.subtract(currentPosition);
 
-            planetManager.moveEverything(deviation);
+            planetManager.translateAllCelestialBody(deviation);
 
             this._busy = false;
         };
