@@ -312,7 +312,7 @@ scene.executeWhenReady(() => {
 
         let deplacement = player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000);
 
-        planetManager.moveEverything(deplacement);
+        planetManager.translateAllCelestialBody(deplacement);
 
         planet.attachNode.rotate(Axis.Y, .001 * rotationSpeed, Space.LOCAL);
 

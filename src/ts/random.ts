@@ -153,7 +153,7 @@ scene.executeWhenReady(() => {
 
         deplacement.addInPlace(player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000));
 
-        starSystemManager.moveEverything(deplacement);
+        starSystemManager.translateAllCelestialBody(deplacement);
 
         if (!collisionWorker.isBusy() && player.nearestBody != null) {
             if(player.nearestBody instanceof SolidPlanet) {

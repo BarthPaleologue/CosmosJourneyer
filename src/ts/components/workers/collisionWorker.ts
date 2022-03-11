@@ -26,7 +26,7 @@ export class CollisionWorker {
 
             let deviation = newPosition.subtract(currentPosition);
 
-            planetManager.moveEverything(deviation);
+            planetManager.translateAllCelestialBody(deviation);
 
             this._busy = false;
         };

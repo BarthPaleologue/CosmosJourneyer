@@ -30,65 +30,20 @@ export class ChunkForge {
      */
     executeNextTask(worker: Worker) {
         if (this.workerPool.taskQueue.length > 0) {
-            this.executeTask(this.workerPool.taskQueue.shift()!, worker);
+            this.dispatchTask(this.workerPool.taskQueue.shift()!, worker);
         } else {
             this.workerPool.finishedWorkers.push(worker);
         }
     }
 
-    executeTask(task: DeleteTask | BuildTask, worker: Worker) {
+    dispatchTask(task: DeleteTask | BuildTask, worker: Worker) {
 
         switch (task.taskType) {
             case TaskType.Build:
                 let castedTask = task as BuildTask;
 
-                // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
-                // tâches de supressions associées : on les stock et on les execute après les créations
+                this.executeBuildTask(worker, castedTask);
 
-                let callbackTasks: DeleteTask[] = [];
-                while (this.workerPool.taskQueue.length > 0 && this.workerPool.taskQueue[0].taskType == TaskType.Deletion) {
-                    callbackTasks.push(this.workerPool.taskQueue[0]);
-                    this.workerPool.taskQueue.shift();
-                }
-
-                let buildData: BuildData = {
-                    taskType: TaskType.Build,
-                    planetID: castedTask.planet._name,
-                    chunkLength: castedTask.planet.rootChunkLength,
-                    subdivisions: this.subdivisions,
-                    depth: castedTask.depth,
-                    direction: castedTask.direction,
-                    position: [castedTask.position.x, castedTask.position.y, castedTask.position.z],
-                    craters: castedTask.planet.craters,
-                    terrainSettings: castedTask.planet.terrainSettings,
-                    seed: castedTask.planet.getSeed(),
-                }
-
-                worker.postMessage(buildData);
-
-                worker.onmessage = e => {
-                    let vertexData = new VertexData();
-                    vertexData.positions = e.data.p as Float32Array;
-                    vertexData.indices = e.data.i as Uint16Array;
-                    vertexData.normals = e.data.n as Float32Array;
-
-                    let grassData = e.data.g as Float32Array;
-
-                    let applyTask: ApplyTask = {
-                        id: castedTask.id,
-                        taskType: TaskType.Apply,
-                        mesh: task.mesh,
-                        vertexData: vertexData,
-                        grassData: grassData,
-                        chunk: castedTask.chunk,
-                        callbackTasks: callbackTasks,
-                        planet: castedTask.planet
-                    }
-
-                    this.applyTasks.push(applyTask);
-
-                    this.workerPool.finishedWorkers.push(worker);
-                };
                 break;
             case TaskType.Deletion:
                 // une tâche de suppression solitaire ne devrait pas exister
@@ -100,6 +55,55 @@ export class ChunkForge {
                 this.workerPool.finishedWorkers.push(worker);
                 break;
         }
+        this.workerPool.finishedWorkers.push(worker);
+    }
+
+    private executeBuildTask(worker: Worker, task: BuildTask) {
+        // les tâches sont ajoutées de sorte que les tâches de créations sont suivies de leurs
+        // tâches de supressions associées : on les stock et on les execute après les créations
+
+        let callbackTasks: DeleteTask[] = [];
+        while (this.workerPool.taskQueue.length > 0 && this.workerPool.taskQueue[0].taskType == TaskType.Deletion) {
+            callbackTasks.push(this.workerPool.taskQueue[0]);
+        }
+
+        let buildData: BuildData = {
+            taskType: TaskType.Build,
+            planetID: task.planet.getName(),
+            chunkLength: task.planet.rootChunkLength,
+            subdivisions: this.subdivisions,
+            depth: task.depth,
+            direction: task.direction,
+            position: [task.position.x, task.position.y, task.position.z],
+            craters: task.planet.craters,
+            terrainSettings: task.planet.terrainSettings,
+            seed: task.planet.getSeed(),
+        }
+
+        worker.postMessage(buildData);
+
+        worker.onmessage = e => {
+            let vertexData = new VertexData();
+            vertexData.positions = e.data.p as Float32Array;
+            vertexData.indices = e.data.i as Uint16Array;
+            vertexData.normals = e.data.n as Float32Array;
+
+            let grassData = e.data.g as Float32Array;
+
+            let applyTask: ApplyTask = {
+                id: task.id,
+                taskType: TaskType.Apply,
+                mesh: task.mesh,
+                vertexData: vertexData,
+                grassData: grassData,
+                chunk: task.chunk,
+                callbackTasks: callbackTasks,
+                planet: task.planet,
+            }
+
+            this.applyTasks.push(applyTask);
+
+        };
     }
 
     /**
