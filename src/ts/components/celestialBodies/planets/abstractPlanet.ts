@@ -1,12 +1,7 @@
-import {BodyPhysicalProperties, CelestialBody} from "../celestialBody";
+import {CelestialBody} from "../celestialBody";
+import {Seedable} from "../interfaces";
 
-export interface PlanetPhysicalProperties extends BodyPhysicalProperties {
-    minTemperature: number;
-    maxTemperature: number;
-    pressure: number;
-}
-
-export abstract class AbstractPlanet extends CelestialBody {
+export abstract class AbstractPlanet extends CelestialBody implements Seedable {
     readonly _name: string;
     readonly _radius: number;
     protected _seed: number[];

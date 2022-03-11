@@ -1,46 +1,42 @@
-import {VertexData, DepthRenderer} from "@babylonjs/core";
+import {DepthRenderer, VertexData} from "@babylonjs/core";
 
-import { BuilderWorker } from "../workers/builderWorker";
-import { buildData } from "./workerData";
-import {ApplyTask, BuildTask, DeleteTask, TaskType} from "./taskInterfaces";
+import {BuildData} from "./workerDataInterfaces";
+import {ApplyTask, BuildTask, DeleteTask, Task, TaskType} from "./taskInterfaces";
+import {WorkerPool} from "./workerPool";
 
 export class ChunkForge {
     subdivisions: number;
 
-    incomingTasks: (BuildTask | DeleteTask)[] = [];
-    trashCan: DeleteTask[] = [];
+    workerPool: WorkerPool;
+
     applyTasks: ApplyTask[] = [];
 
-    availableWorkers: BuilderWorker[] = []; // liste des workers disponibles pour exécuter des tâches
-    finishedWorkers: BuilderWorker[] = []; // liste des workers ayant terminé leur tâche (prêts à être réintégré dans la liste des workers disponibles)
+    trashCan: DeleteTask[] = [];
 
     constructor(subdivisions: number) {
         this.subdivisions = subdivisions;
         const nbMaxWorkers = navigator.hardwareConcurrency - 2; // le -2 c'est parce que faut compter le main thread et le collision worker
-        for (let i = 0; i < nbMaxWorkers; ++i) {
-            let worker = new BuilderWorker();
-            //let worker = new Worker(new URL('../workers/workerScript.ts', import.meta.url));
-            this.availableWorkers.push(worker);
-        }
+
+        this.workerPool = new WorkerPool(nbMaxWorkers);
     }
 
-    addTask(task: DeleteTask | BuildTask) {
-        this.incomingTasks.push(task);
+    addTask(task: Task) {
+        this.workerPool.submitTask(task);
     }
 
     /**
      * Executes the next task using an available worker
      * @param worker the web worker assigned to the next task
      */
-    executeNextTask(worker: BuilderWorker) {
-        if (this.incomingTasks.length > 0) {
-            this.executeTask(this.incomingTasks.shift()!, worker);
+    executeNextTask(worker: Worker) {
+        if (this.workerPool.taskQueue.length > 0) {
+            this.executeTask(this.workerPool.taskQueue.shift()!, worker);
         } else {
-            this.finishedWorkers.push(worker);
+            this.workerPool.finishedWorkers.push(worker);
         }
     }
 
-    executeTask(task: DeleteTask | BuildTask, worker: BuilderWorker) {
+    executeTask(task: DeleteTask | BuildTask, worker: Worker) {
 
         switch (task.taskType) {
             case TaskType.Build:
@@ -50,13 +46,13 @@ export class ChunkForge {
                 // tâches de supressions associées : on les stock et on les execute après les créations
 
                 let callbackTasks: DeleteTask[] = [];
-                while (this.incomingTasks.length > 0 && this.incomingTasks[0].taskType == TaskType.Deletion) {
-                    callbackTasks.push(this.incomingTasks[0]);
-                    this.incomingTasks.shift();
+                while (this.workerPool.taskQueue.length > 0 && this.workerPool.taskQueue[0].taskType == TaskType.Deletion) {
+                    callbackTasks.push(this.workerPool.taskQueue[0]);
+                    this.workerPool.taskQueue.shift();
                 }
 
-                worker.send({
-                    taskType: "buildTask",
+                let buildData: BuildData = {
+                    taskType: TaskType.Build,
                     planetID: castedTask.planet._name,
                     chunkLength: castedTask.planet.rootChunkLength,
                     subdivisions: this.subdivisions,
@@ -66,9 +62,11 @@ export class ChunkForge {
                     craters: castedTask.planet.craters,
                     terrainSettings: castedTask.planet.terrainSettings,
                     seed: castedTask.planet.getSeed(),
-                } as buildData);
+                }
 
-                worker.getWorker().onmessage = e => {
+                worker.postMessage(buildData);
+
+                worker.onmessage = e => {
                     let vertexData = new VertexData();
                     vertexData.positions = e.data.p as Float32Array;
                     vertexData.indices = e.data.i as Uint16Array;
@@ -76,7 +74,7 @@ export class ChunkForge {
 
                     let grassData = e.data.g as Float32Array;
 
-                    this.applyTasks.push({
+                    let applyTask: ApplyTask = {
                         id: castedTask.id,
                         taskType: TaskType.Apply,
                         mesh: task.mesh,
@@ -84,20 +82,22 @@ export class ChunkForge {
                         grassData: grassData,
                         chunk: castedTask.chunk,
                         callbackTasks: callbackTasks,
-                        planet: castedTask.planet,
-                    } as ApplyTask);
+                        planet: castedTask.planet
+                    }
 
-                    this.finishedWorkers.push(worker);
+                    this.applyTasks.push(applyTask);
+
+                    this.workerPool.finishedWorkers.push(worker);
                 };
                 break;
             case TaskType.Deletion:
                 // une tâche de suppression solitaire ne devrait pas exister
                 console.error("Tâche de supression solitaire détectée");
-                this.finishedWorkers.push(worker);
+                this.workerPool.finishedWorkers.push(worker);
                 break;
             default:
                 console.error("Tache illegale");
-                this.finishedWorkers.push(worker);
+                this.workerPool.finishedWorkers.push(worker);
                 break;
         }
     }
@@ -134,13 +134,13 @@ export class ChunkForge {
      * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
      */
     update(depthRenderer: DepthRenderer) {
-        for (let i = 0; i < this.availableWorkers.length; i++) {
-            let worker = this.availableWorkers.shift()!;
+        for (let i = 0; i < this.workerPool.availableWorkers.length; i++) {
+            let worker = this.workerPool.availableWorkers.shift()!;
             this.executeNextTask(worker);
         }
 
-        this.availableWorkers = this.availableWorkers.concat(this.finishedWorkers);
-        this.finishedWorkers = [];
+        this.workerPool.availableWorkers = this.workerPool.availableWorkers.concat(this.workerPool.finishedWorkers);
+        this.workerPool.finishedWorkers = [];
 
         this.emptyTrashCan();
         this.executeNextApplyTask(depthRenderer);

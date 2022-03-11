@@ -187,7 +187,10 @@ function updateScene() {
     //sun.mesh.position.addInPlace(deplacement);
 
     if (!collisionWorker.isBusy() && player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() < player.nearestBody.getRadius() * 2) {
-        collisionWorker.checkCollision(player.nearestBody);
+        if(player.nearestBody instanceof SolidPlanet) {
+            //FIXME: se passer de instanceof
+            collisionWorker.checkCollision(player.nearestBody);
+        }
     }
 }
 

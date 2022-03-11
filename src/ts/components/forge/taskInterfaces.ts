@@ -6,7 +6,8 @@ import {PlanetChunk} from "../celestialBodies/planets/solid/planetChunk";
 export enum TaskType {
     Deletion,
     Build,
-    Apply
+    Apply,
+    Collision
 }
 
 export interface Task {

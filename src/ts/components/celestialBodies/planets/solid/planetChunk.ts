@@ -2,7 +2,7 @@ import {Quaternion, Vector3, Mesh, SolidParticleSystem, Scene, Material} from "@
 
 import { SolidPlanet } from "./solidPlanet";
 import { ChunkForge } from "../../../forge/chunkForge";
-import {TaskType} from "../../../forge/taskInterfaces";
+import {BuildTask, TaskType} from "../../../forge/taskInterfaces";
 import { Direction, getQuaternionFromDirection } from "../../../toolbox/direction";
 import {Algebra} from "../../../toolbox/algebra";
 
@@ -138,7 +138,8 @@ export class PlanetChunk {
         //this.mesh.isBlocker = true;
 
         // revoir les paramètres passés dans la taches => trouver les dénos communs
-        chunkForge.addTask({
+
+        let buildTask: BuildTask = {
             taskType: TaskType.Build,
             id: id,
             planet: planet,
@@ -146,8 +147,10 @@ export class PlanetChunk {
             depth: path.length,
             direction: direction,
             mesh: this.mesh,
-            chunk: this,
-        });
+            chunk: this
+        }
+
+        chunkForge.addTask(buildTask);
 
         // sphérisation du cube
         // note : on sphérise après car le worker script calcule les positions à partir du cube

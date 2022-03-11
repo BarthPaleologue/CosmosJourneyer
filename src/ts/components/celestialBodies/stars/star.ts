@@ -1,12 +1,10 @@
 import { getRgbFromTemperature } from "../../toolbox/specrend";
-import { BodyPhysicalProperties, CelestialBody, CelestialBodyType } from "../celestialBody";
+import { CelestialBody } from "../celestialBody";
 
 import { Mesh, Vector3, ShaderMaterial, Space, Axis, Scene, Quaternion } from "@babylonjs/core";
+import {CelestialBodyType, StarPhysicalProperties} from "../interfaces";
 
-export interface StarPhysicalProperties extends BodyPhysicalProperties {
-    temperature: number;
-}
-
+// TODO: implement RigidBody for star
 export class Star extends CelestialBody {
     public mesh: Mesh;
     private readonly radius: number;
@@ -14,6 +12,7 @@ export class Star extends CelestialBody {
     private internalTime = 0;
     protected bodyType = CelestialBodyType.STAR;
     physicalProperties: StarPhysicalProperties = {
+        //TODO: ne pas hardcoder
         temperature: 5778
     };
     constructor(name: string, radius: number, scene: Scene) {

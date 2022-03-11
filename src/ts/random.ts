@@ -156,7 +156,10 @@ scene.executeWhenReady(() => {
         starSystemManager.moveEverything(deplacement);
 
         if (!collisionWorker.isBusy() && player.nearestBody != null) {
-            collisionWorker.checkCollision(player.nearestBody);
+            if(player.nearestBody instanceof SolidPlanet) {
+                //FIXME: se passer de instanceof
+                collisionWorker.checkCollision(player.nearestBody);
+            }
         }
     };
 

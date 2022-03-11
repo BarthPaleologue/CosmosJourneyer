@@ -11,9 +11,9 @@ const htmlPath = path.join(__dirname, "/src/html/");
 const config = {
 
   entry: {
-    showcase: ["./src/ts/showcase.ts"],
-    experimental: ["./src/ts/experimental.ts"],
-    random: ["./src/ts/random.ts"]
+    showcase: "./src/ts/showcase.ts",
+    experimental: "./src/ts/experimental.ts",
+    random: "./src/ts/random.ts"
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -21,7 +21,11 @@ const config = {
   devServer: {
     open: true,
     host: "localhost",
-    historyApiFallback: false
+    historyApiFallback: false,
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp"
+    }
   },
 
   plugins: [
@@ -92,13 +96,6 @@ const config = {
 
 
 module.exports = () => {
-
-  //add every html file as chunk
-  /*for (const file of fs.readdirSync(htmlPath)) {
-    config.plugins.push(new HtmlWebpackPlugin({ filename: file, template: path.join(htmlPath, file) }));
-  }*/
-
-
 
   if (isProduction) {
     config.mode = "production";

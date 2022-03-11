@@ -1,7 +1,7 @@
 import {Vector3, Quaternion} from "@babylonjs/core";
 
 import { AbstractPlanet } from "../abstractPlanet";
-import {CelestialBodyType} from "../../celestialBody";
+import {CelestialBodyType} from "../../interfaces";
 
 export class GazPlanet extends AbstractPlanet {
     protected bodyType = CelestialBodyType.GAZ;
@@ -12,11 +12,12 @@ export class GazPlanet extends AbstractPlanet {
 
     setAbsolutePosition(newPosition: Vector3): void {
         //TODO: set absolute position of gaz giant
+        throw new Error("Method not implemented.");
     }
 
     getAbsolutePosition(): Vector3 {
         //TODO: return the true value
-        return Vector3.Zero();
+        throw new Error("Method not implemented.");
     }
     public getRotationQuaternion(): Quaternion {
         throw new Error("Method not implemented.");
@@ -24,5 +25,6 @@ export class GazPlanet extends AbstractPlanet {
 
     update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3): void {
         // TODO: update planet
+        throw new Error("Method not implemented.");
     }
 }

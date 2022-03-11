@@ -1,18 +1,14 @@
-import {Quaternion} from "@babylonjs/core";
-
-import {CollisionData} from "../forge/workerData";
+import {CollisionData} from "../forge/workerDataInterfaces";
 import {StarSystemManager} from "../celestialBodies/starSystemManager";
 import {PlayerController} from "../player/playerController";
-import {PlanetWorker} from "./planetWorker";
-import {Algebra} from "../toolbox/algebra";
-import {CelestialBody, CelestialBodyType} from "../celestialBodies/celestialBody";
-import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
+import {RigidBody, Transformable} from "../celestialBodies/interfaces";
 
-export class CollisionWorker extends PlanetWorker {
+export class CollisionWorker {
     _player: PlayerController;
     _busy = false;
+    _worker: Worker;
     constructor(player: PlayerController, planetManager: StarSystemManager) {
-        super();
+        this._worker = new Worker(new URL('workerScript', import.meta.url), { type: "module" });
         this._player = player;
         this._worker.onmessage = e => {
             if (player.nearestBody == null) return;
@@ -38,31 +34,16 @@ export class CollisionWorker extends PlanetWorker {
     public isBusy(): boolean {
         return this._busy;
     }
-    public override send(data: CollisionData): void {
-        super.send(data);
+    public postMessage(data: CollisionData): void {
+        this._worker.postMessage(data);
         this._busy = true;
     }
-    public checkCollision(planet: CelestialBody): void {
-        let position = planet.getAbsolutePosition().clone(); // position de la planète / au joueur
-        position.scaleInPlace(-1); // position du joueur / au centre de la planète
+    public checkCollision(planet: RigidBody & Transformable): void {
 
-        // on applique le quaternion inverse pour obtenir le sample point correspondant à la planète rotatée (fais un dessin si c'est pas clair)
-        Algebra.applyQuaternionInPlace(Quaternion.Inverse(planet.getRotationQuaternion()), position);
+        let playerSamplePosition = planet.getOriginBodySpaceSamplePosition();
 
-        if(planet.getBodyType() == CelestialBodyType.SOLID) {
-            //TODO: improve cast system
-            this.send({
-                taskType: "collisionTask",
-                planetID: planet.getName(),
-                terrainSettings: (<SolidPlanet><unknown>planet).terrainSettings,
-                position: [
-                    position.x,
-                    position.y,
-                    position.z
-                ],
-                chunkLength: (<SolidPlanet><unknown>planet).rootChunkLength,
-                craters: (<SolidPlanet><unknown>planet).craters
-            });
-        }
+        let collisionData = planet.generateCollisionTask(playerSamplePosition);
+        this.postMessage(collisionData);
+
     }
 }

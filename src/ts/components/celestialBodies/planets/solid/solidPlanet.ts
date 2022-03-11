@@ -3,8 +3,7 @@ import { ChunkForge } from "../../../forge/chunkForge";
 import { PlanetSide } from "./planetSide";
 import { Direction } from "../../../toolbox/direction";
 import { TerrainSettings } from "../../../terrain/terrainSettings";
-import { PlanetPhysicalProperties, AbstractPlanet } from "../abstractPlanet";
-import {CelestialBodyType} from "../../celestialBody";
+import { AbstractPlanet } from "../abstractPlanet";
 
 import {Vector3, Mesh, Scene, ShaderMaterial, Axis, Space, Texture, Quaternion} from "@babylonjs/core";
 
@@ -17,6 +16,9 @@ import snowNormalMap from "../../../../../asset/textures/snowNormalMap3.jpg";
 import snowNormalMap2 from "../../../../../asset/textures/snowNormalMap2.png";
 
 import sandNormalMap from "../../../../../asset/textures/sandNormalMap.jpg";
+import {CelestialBodyType, RigidBody, SolidPhysicalProperties} from "../../interfaces";
+import { CollisionData } from "../../../forge/workerDataInterfaces";
+import {TaskType} from "../../../forge/taskInterfaces";
 
 
 export interface ColorSettings {
@@ -37,11 +39,8 @@ export interface ColorSettings {
     steepSnowDotLimit: number;
 }
 
-export interface SolidPhysicalProperties extends PlanetPhysicalProperties {
-    waterAmount: number;
-}
 
-export class SolidPlanet extends AbstractPlanet {
+export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     craters: Crater[];
 
@@ -199,6 +198,23 @@ export class SolidPlanet extends AbstractPlanet {
 
         this.updateColors();
     }
+
+    public generateCollisionTask(relativePosition: Vector3): CollisionData {
+        let collisionData: CollisionData = {
+            taskType: TaskType.Collision,
+            planetID: this._name,
+            terrainSettings: this.terrainSettings,
+            position: [
+                relativePosition.x,
+                relativePosition.y,
+                relativePosition.z
+            ],
+            chunkLength: this.rootChunkLength,
+            craters: this.craters
+        }
+        return collisionData;
+    }
+
     public setChunkForge(chunkForge: ChunkForge): void {
         for (const planetSide of this.sides) {
             planetSide.setChunkForge(chunkForge);
