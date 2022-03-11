@@ -9,7 +9,7 @@ import * as style2 from "../sliderjs/style2.min.css";
 import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
 import { PlayerController } from "./components/player/playerController";
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
+import { RingsPostProcess } from "./components/postProcesses/ringsPostProcess";
 import { Keyboard } from "./components/inputs/keyboard";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
 

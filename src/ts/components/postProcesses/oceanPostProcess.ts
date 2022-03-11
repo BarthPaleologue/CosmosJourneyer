@@ -1,6 +1,7 @@
-import {PostProcess, Camera, Mesh, PointLight, Scene, Texture, Effect, Axis} from "@babylonjs/core";
+import {Camera, Mesh, PointLight, Scene, Texture, Effect, Axis} from "@babylonjs/core";
 
 import waterbump from "../../../asset/textures/waterbump.png";
+import {ExtendedPostProcess} from "./extendedPostProcess";
 
 interface OceanSettings {
     oceanRadius: number,
@@ -10,7 +11,7 @@ interface OceanSettings {
     alphaModifier: number,
 }
 
-export class OceanPostProcess extends PostProcess {
+export class OceanPostProcess extends ExtendedPostProcess {
 
     settings: OceanSettings;
     camera: Camera;
@@ -48,7 +49,7 @@ export class OceanPostProcess extends PostProcess {
             "textureSampler",
             "depthSampler",
             "normalMap"
-        ], 1, camera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        ], camera);
 
 
         this.settings = {
@@ -66,8 +67,6 @@ export class OceanPostProcess extends PostProcess {
         this.setCamera(this.camera);
 
         let depthMap = scene.customRenderTargets[0];
-
-        //this.getEffect().setTexture("normalMap", new Texture("./textures/waternormal.jpg", scene));
 
         this.onApply = (effect: Effect) => {
             this.internalTime += this.getEngine().getDeltaTime();
@@ -99,11 +98,5 @@ export class OceanPostProcess extends PostProcess {
 
             effect.setFloat("time", this.internalTime);
         };
-    }
-
-    setCamera(camera: Camera) {
-        this.camera.detachPostProcess(this);
-        this.camera = camera;
-        camera.attachPostProcess(this);
     }
 }

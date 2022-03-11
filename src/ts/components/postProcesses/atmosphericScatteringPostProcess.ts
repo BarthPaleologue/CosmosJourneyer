@@ -1,6 +1,7 @@
-import {PostProcess, Camera, Mesh, PointLight, Scene, Texture, Effect, Axis, Vector3} from "@babylonjs/core";
+import {Camera, Mesh, PointLight, Scene, Effect, Axis, Vector3} from "@babylonjs/core";
 
 import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
+import {ExtendedPostProcess} from "./extendedPostProcess";
 
 interface AtmosphereSettings {
     planetRadius: number,
@@ -14,7 +15,7 @@ interface AtmosphereSettings {
     blueWaveLength: number,
 }
 
-export class AtmosphericScatteringPostProcess extends PostProcess {
+export class AtmosphericScatteringPostProcess extends ExtendedPostProcess {
 
     settings: AtmosphereSettings;
     camera: Camera;
@@ -50,7 +51,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
         ], [
             "textureSampler",
             "depthSampler",
-        ], 1, scene.activeCamera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        ], camera);
 
         this.settings = {
             planetRadius: planetRadius,
@@ -100,11 +101,5 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
             effect.setFloat("greenWaveLength", this.settings.greenWaveLength);
             effect.setFloat("blueWaveLength", this.settings.blueWaveLength);
         };
-    }
-
-    setCamera(camera: Camera) {
-        this.camera.detachPostProcess(this);
-        this.camera = camera;
-        camera.attachPostProcess(this);
     }
 }

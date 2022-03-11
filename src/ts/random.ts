@@ -13,7 +13,7 @@ import { CollisionWorker } from "./components/workers/collisionWorker";
 import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
 
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
+import { RingsPostProcess } from "./components/postProcesses/ringsPostProcess";
 import { centeredRandom, nrand, randInt } from "./components/toolbox/random";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
 import { Star } from "./components/celestialBodies/stars/star";

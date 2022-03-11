@@ -1,4 +1,4 @@
-import {PostProcess, Camera, Mesh, PointLight, Scene, Texture, Effect, Axis} from "@babylonjs/core";
+import {Camera, Mesh, PointLight, Scene, Texture, Effect, Axis} from "@babylonjs/core";
 
 interface CloudSettings {
     cloudLayerRadius: number,
@@ -14,8 +14,9 @@ interface CloudSettings {
 // TODO: faire une super classe pour tous ces post processes
 
 import waterbump from "../../../asset/textures/cloudNormalMap.jpg";
+import {ExtendedPostProcess} from "./extendedPostProcess";
 
-export class FlatCloudsPostProcess extends PostProcess {
+export class FlatCloudsPostProcess extends ExtendedPostProcess {
 
     settings: CloudSettings;
     camera: Camera;
@@ -59,7 +60,7 @@ export class FlatCloudsPostProcess extends PostProcess {
             "textureSampler",
             "depthSampler",
             "normalMap"
-        ], 1, camera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        ], camera);
 
 
         this.settings = {
@@ -118,11 +119,5 @@ export class FlatCloudsPostProcess extends PostProcess {
 
             effect.setFloat("time", this.internalTime);
         };
-    }
-
-    setCamera(camera: Camera) {
-        this.camera.detachPostProcess(this);
-        this.camera = camera;
-        camera.attachPostProcess(this);
     }
 }

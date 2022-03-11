@@ -1,12 +1,13 @@
-import {PostProcess, Mesh, Light, Scene, Camera, Effect, Axis, Vector3, Texture} from "@babylonjs/core";
+import {Mesh, Light, Scene, Camera, Effect, Axis, Vector3} from "@babylonjs/core";
 
 import { PlayerController } from "../player/playerController";
+import {ExtendedPostProcess} from "./extendedPostProcess";
 
 interface StarfieldSettings {
 
 }
 
-export class StarfieldPostProcess extends PostProcess {
+export class StarfieldPostProcess extends ExtendedPostProcess {
 
     settings: StarfieldSettings;
     camera: Camera;
@@ -31,7 +32,7 @@ export class StarfieldPostProcess extends PostProcess {
         ], [
             "textureSampler",
             "depthSampler",
-        ], 1, player.camera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        ], player.camera);
 
         this.camera = player.camera;
 
@@ -61,11 +62,5 @@ export class StarfieldPostProcess extends PostProcess {
 
             effect.setFloat("time", this.internalTime);
         };
-    }
-
-    setCamera(camera: Camera) {
-        this.camera.detachPostProcess(this);
-        this.camera = camera;
-        camera.attachPostProcess(this);
     }
 }

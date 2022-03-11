@@ -1,4 +1,5 @@
-import {PostProcess, Mesh, PointLight, Scene, Effect, Texture, Camera, Axis} from "@babylonjs/core";
+import {Mesh, PointLight, Scene, Effect, Camera, Axis} from "@babylonjs/core";
+import {ExtendedPostProcess} from "./extendedPostProcess";
 
 interface CloudSettings {
     planetRadius: number,
@@ -12,7 +13,7 @@ interface CloudSettings {
     blueWaveLength: number,
 }
 
-export class VolumetricCloudsPostProcess extends PostProcess {
+export class VolumetricCloudsPostProcess extends ExtendedPostProcess {
 
     settings: CloudSettings;
     camera: Camera;
@@ -48,7 +49,7 @@ export class VolumetricCloudsPostProcess extends PostProcess {
         ], [
             "textureSampler",
             "depthSampler",
-        ], 1, scene.activeCamera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        ], camera);
 
         this.settings = {
             planetRadius: planetRadius,
@@ -97,11 +98,5 @@ export class VolumetricCloudsPostProcess extends PostProcess {
             effect.setFloat("greenWaveLength", this.settings.greenWaveLength);
             effect.setFloat("blueWaveLength", this.settings.blueWaveLength);
         };
-    }
-
-    setCamera(camera: Camera) {
-        this.camera.detachPostProcess(this);
-        this.camera = camera;
-        camera.attachPostProcess(this);
     }
 }

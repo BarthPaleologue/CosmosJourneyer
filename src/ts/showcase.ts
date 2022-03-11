@@ -1,24 +1,28 @@
 import { Engine, Scene, Color4, DepthRenderer, Axis, Space, Vector3, Texture, Tools, FxaaPostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 
-import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
 import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
-import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
+import { Star } from "./components/celestialBodies/stars/star";
 
-import * as style from "../styles/style.scss";
 import { PlayerController } from "./components/player/playerController";
+
 import { Keyboard } from "./components/inputs/keyboard";
 import { Mouse } from "./components/inputs/mouse";
 import { Gamepad } from "./components/inputs/gamepad";
+
 import { CollisionWorker } from "./components/workers/collisionWorker";
 import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
 
 import rockn from "../asset/textures/rockn.png";
+
 import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "./components/postProcesses/RingsPostProcess";
+import { RingsPostProcess } from "./components/postProcesses/ringsPostProcess";
 import { VolumetricCloudsPostProcess } from "./components/postProcesses/volumetricCloudsPostProcess";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
-import { Star } from "./components/celestialBodies/stars/star";
+import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
+import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
 
+
+import * as style from "../styles/style.scss";
 style.default;
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;

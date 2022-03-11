@@ -200,13 +200,13 @@ export function sdnoise1(x: number): [number, number] {
    */
 
   let dnoise_dx = 0;
-  if (null != dnoise_dx) {
-    dnoise_dx = t20 * t0 * gx0 * x20;
-    dnoise_dx += t21 * t1 * gx1 * x21;
-    dnoise_dx *= -8.0;
-    dnoise_dx += t40 * gx0 + t41 * gx1;
-    dnoise_dx *= 0.25; /* Scale derivative to match the noise scaling */
-  }
+
+  dnoise_dx = t20 * t0 * gx0 * x20;
+  dnoise_dx += t21 * t1 * gx1 * x21;
+  dnoise_dx *= -8.0;
+  dnoise_dx += t40 * gx0 + t41 * gx1;
+  dnoise_dx *= 0.25; /* Scale derivative to match the noise scaling */
+
   // The maximum value of this noise is 8*(3/4)^4 = 2.53125
   // A factor of 0.395 would scale to fit exactly within [-1,1], but
   // to better match classic Perlin noise, we scale it down some more.
