@@ -35,3 +35,10 @@ export interface ApplyTask extends Task {
 export interface DeleteTask extends Task {
 
 }
+
+export interface ReturnedChunkData {
+    p: Float32Array;
+    n: Float32Array;
+    i: Uint16Array;
+    g: Float32Array;
+}
