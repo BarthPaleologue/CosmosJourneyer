@@ -23,7 +23,6 @@ uniform float cameraFar; // camera maxZ
 uniform vec3 planetPosition; // planet position in world space
 uniform float planetRadius; // planet radius for height calculations
 uniform float atmosphereRadius; // atmosphere radius (calculate from planet center)
-uniform float waterLevel;
 
 uniform float falloffFactor; // controls exponential opacity falloff
 uniform float sunIntensity; // controls atmosphere overall brightness
@@ -126,7 +125,7 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
 
         float sunRayLengthInAtm = atmosphereRadius - length(samplePoint - planetPosition); // distance traveled by light through atmosphere from light source
         
-        sunRayLengthInAtm = min(sunRayLengthInAtm, atmosphereRadius - (planetRadius + waterLevel));
+        sunRayLengthInAtm = min(sunRayLengthInAtm, atmosphereRadius - planetRadius);
 
         float viewRayLengthInAtm = stepSize * float(i); // distance traveled by light through atmosphere from sample point to cameraPosition
         
@@ -194,7 +193,7 @@ void main() {
 
     // Cohabitation avec le shader d'océan (un jour je merge)
     float waterImpact, waterEscape;
-    if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius + waterLevel, waterImpact, waterEscape)) {
+    if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, waterImpact, waterEscape)) {
         maximumDistance = min(maximumDistance, waterImpact);
     }
 

@@ -76,7 +76,7 @@ starSystemManager.addStar(sun);
 
 depthRenderer.getDepthMap().renderList?.push(sun.mesh);
 
-let starfield = new StarfieldPostProcess("starfield", sun.mesh, scene);
+let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
 let waterElevation = 20e2;
 
@@ -90,17 +90,15 @@ planet.updateColors();
 planet.attachNode.position.x = radius * 5;
 planet.attachNode.rotate(Axis.X, 0.2, Space.WORLD);
 
-let ocean = new OceanPostProcess("ocean", planet, radius + waterElevation, sun.mesh, player.camera, scene);
+let ocean = new OceanPostProcess("ocean", planet, radius + waterElevation, sun, player.camera, scene);
 
-let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius, waterElevation, radius + 15e3, sun.mesh, player.camera, scene);
-//let volClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + waterElevation + 10e3, radius + waterElevation + 30e3, sun.mesh, player.camera, scene);
+let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius + 15e3, sun, player.camera, scene);
+//let volClouds = new VolumetricCloudsPostProcess("clouds", planet, radius + waterElevation + 100e3, sun, player.camera, scene);
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun.mesh, player.camera, scene);
-/*atmosphere.settings.intensity = 20;
-atmosphere.settings.falloffFactor = 24;
-atmosphere.settings.scatteringStrength = 1.0;*/
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius + 100e3, sun, player.camera, scene);
 
-let rings = new RingsPostProcess("rings", planet, radius, waterElevation, sun.mesh, player.camera, scene);
+
+let rings = new RingsPostProcess("rings", planet, sun, player.camera, scene);
 
 
 starSystemManager.addSolidPlanet(planet);
@@ -142,12 +140,11 @@ Ares.terrainSettings.maxMountainHeight = 15e3;
 Ares.terrainSettings.mountainsMinValue = 0.7;
 Ares.colorSettings.sandColor = Ares.colorSettings.plainColor;
 Ares.colorSettings.steepSharpness = 2;
-Ares.colorSettings.waterLevel = 0;
 
 Ares.updateColors();
 Ares.attachNode.position.x = -radius * 4;
 
-let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius, radius + 100e3, sun.mesh, player.camera, scene);
+let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, player.camera, scene);
 atmosphere2.settings.intensity = 20 * Ares.physicalProperties.pressure;
 atmosphere2.settings.greenWaveLength = 680;
 atmosphere2.settings.falloffFactor = 24;

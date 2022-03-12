@@ -104,7 +104,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             plainColor: new Vector3(0.5, 0.3, 0.08),
             sandColor: new Vector3(0.7, 0.7, 0.2),
 
-            waterLevel: 0.32,
+            waterLevel: 0,
             sandSize: 1,
             steepSharpness: 1,
             normalSharpness: 0.8,
@@ -293,6 +293,10 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     }
     public getAbsolutePosition() {
         return this.attachNode.getAbsolutePosition();
+    }
+
+    public override getRadius(): number {
+        return super.getRadius() + this.colorSettings.waterLevel;
     }
 
     setAbsolutePosition(newPosition: Vector3): void {

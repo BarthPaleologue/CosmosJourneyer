@@ -1,9 +1,10 @@
-import {Axis, Camera, Mesh, PointLight, Scene, Texture} from "@babylonjs/core";
+import {Axis, Camera, Scene, Texture} from "@babylonjs/core";
 
 import waterbump from "../../../asset/textures/waterbump.png";
 import {ExtendedPostProcess} from "./extendedPostProcess";
 import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
 import {OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
+import {CelestialBody} from "../celestialBodies/celestialBody";
 
 export class OceanPostProcess extends ExtendedPostProcess {
 
@@ -11,7 +12,7 @@ export class OceanPostProcess extends ExtendedPostProcess {
 
     internalTime: number;
 
-    constructor(name: string, planet: SolidPlanet, oceanRadius: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
+    constructor(name: string, planet: SolidPlanet, oceanRadius: number, sun: CelestialBody, camera: Camera, scene: Scene) {
 
         let settings = {
             oceanRadius: oceanRadius,

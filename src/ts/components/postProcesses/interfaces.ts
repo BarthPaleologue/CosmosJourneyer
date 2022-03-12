@@ -21,7 +21,6 @@ export interface CloudSettings {
 }
 
 export interface VolumetricCloudSettings {
-    planetRadius: number;
     atmosphereRadius: number;
 }
 

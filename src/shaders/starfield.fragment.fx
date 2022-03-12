@@ -17,11 +17,6 @@ uniform mat4 world;
 uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
 
-uniform vec3 planetPosition; // planet position in world space
-uniform float cloudLayerRadius; // atmosphere radius (calculate from planet center)
-uniform float planetRadius; // planet radius
-uniform float waterLevel; // water level
-
 uniform float visibility; // visibility of the starfield
 
 

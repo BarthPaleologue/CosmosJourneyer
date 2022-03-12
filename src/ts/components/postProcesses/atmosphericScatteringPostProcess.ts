@@ -1,15 +1,16 @@
-import {Camera, Mesh, PointLight, Scene, Axis} from "@babylonjs/core";
+import {Camera, Scene, Axis} from "@babylonjs/core";
 
 import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
 import {ExtendedPostProcess} from "./extendedPostProcess";
 
 import {AtmosphereSettings, ShaderUniformData, ShaderSamplerData, ShaderDataType} from "./interfaces";
+import {CelestialBody} from "../celestialBodies/celestialBody";
 
 export class AtmosphericScatteringPostProcess extends ExtendedPostProcess {
 
     settings: AtmosphereSettings;
 
-    constructor(name: string, planet: SolidPlanet, planetRadius: number, atmosphereRadius: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
+    constructor(name: string, planet: SolidPlanet, atmosphereRadius: number, sun: CelestialBody, camera: Camera, scene: Scene) {
 
         let settings: AtmosphereSettings = {
             atmosphereRadius: atmosphereRadius,
@@ -43,10 +44,6 @@ export class AtmosphericScatteringPostProcess extends ExtendedPostProcess {
             "atmosphereRadius": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.atmosphereRadius}
-            },
-            "waterLevel": {
-                type: ShaderDataType.Float,
-                get: () => {return planet.colorSettings.waterLevel}
             },
 
             "falloffFactor": {

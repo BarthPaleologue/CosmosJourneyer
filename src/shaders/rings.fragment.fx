@@ -19,7 +19,6 @@ uniform float cameraFar; // camera maxZ
 
 uniform vec3 planetPosition; // planet position in world space
 uniform float planetRadius; // planet radius
-uniform float waterLevel; // water level
 
 uniform float ringStart; // ring start
 uniform float ringEnd; // ring end
@@ -152,7 +151,7 @@ void main() {
 	if(rayIntersectPlane(cameraPosition, rayDir, planetPosition, planetUpVector, impactPoint)) {
 		if(impactPoint < maximumDistance) {
             float t0, t1;
-            if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius+waterLevel, t0, t1) && t0 < impactPoint) {
+            if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, t0, t1) && t0 < impactPoint) {
                 finalColor = screenColor;
             } else {
                 vec3 samplePoint = cameraPosition + impactPoint * rayDir;

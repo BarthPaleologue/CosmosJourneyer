@@ -58,7 +58,7 @@ sun.mesh.position.x = -913038.375;
 sun.mesh.position.z = -1649636.25;
 starSystemManager.addStar(sun);
 
-let starfield = new StarfieldPostProcess("starfield", sun.mesh, scene);
+let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
 
 let planet = new SolidPlanet("Hécate", radius, new Vector3(0, 0, 4 * radius), 1, scene, {
@@ -85,21 +85,21 @@ planet.updateColors();
 planet.attachNode.position.x = radius * 2;
 planet.attachNode.rotate(Axis.X, centeredRandom(), Space.WORLD);
 
-let ocean = new OceanPostProcess("ocean", planet, radius + waterElevation, sun.mesh, player.camera, scene);
+let ocean = new OceanPostProcess("ocean", planet, radius + waterElevation, sun, player.camera, scene);
 
 if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0) {
-    let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius, waterElevation, radius + 15e3, sun.mesh, player.camera, scene);
+    let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius + 15e3, sun, player.camera, scene);
     flatClouds.settings.cloudPower = 10 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure);
 }
 
 if (planet.physicalProperties.pressure > 0) {
-    let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun.mesh, player.camera, scene);
+    let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius + 100e3 * planet.physicalProperties.pressure, sun, player.camera, scene);
     atmosphere.settings.intensity = 15 * planet.physicalProperties.pressure;
     atmosphere.settings.falloffFactor = 24;
     atmosphere.settings.scatteringStrength = 1.0;
 }
 
-let rings = new RingsPostProcess("rings", planet, radius, waterElevation, sun.mesh, player.camera, scene);
+let rings = new RingsPostProcess("rings", planet, sun, player.camera, scene);
 rings.settings.ringStart = 1.8 + 0.4 * centeredRandom();
 rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom();
 

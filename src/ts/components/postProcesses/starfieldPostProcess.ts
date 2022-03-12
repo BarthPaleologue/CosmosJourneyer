@@ -1,13 +1,14 @@
-import {Axis, Light, Mesh, Scene, Vector3} from "@babylonjs/core";
+import {Axis, Scene, Vector3} from "@babylonjs/core";
 
 import {ExtendedPostProcess} from "./extendedPostProcess";
 import {ShaderDataType, ShaderSamplerData, ShaderUniformData, StarfieldSettings} from "./interfaces";
+import {CelestialBody} from "../celestialBodies/celestialBody";
 
 export class StarfieldPostProcess extends ExtendedPostProcess {
 
     settings: StarfieldSettings;
 
-    constructor(name: string, sun: Mesh | Light, scene: Scene) {
+    constructor(name: string, sun: CelestialBody, scene: Scene) {
 
         let settings = {};
 

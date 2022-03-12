@@ -1,13 +1,14 @@
-import {Axis, Camera, Mesh, PointLight, Scene} from "@babylonjs/core";
+import {Axis, Camera, Scene} from "@babylonjs/core";
 import {ExtendedPostProcess} from "./extendedPostProcess";
 import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
 import {RingsSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
+import {CelestialBody} from "../celestialBodies/celestialBody";
 
 export class RingsPostProcess extends ExtendedPostProcess {
 
     settings: RingsSettings;
 
-    constructor(name: string, planet: SolidPlanet, planetRadius: number, waterLevel: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
+    constructor(name: string, planet: SolidPlanet, sun: CelestialBody, camera: Camera, scene: Scene) {
 
         let settings = {
             ringStart: 1.5,
@@ -34,11 +35,6 @@ export class RingsPostProcess extends ExtendedPostProcess {
             "planetRadius": {
                 type: ShaderDataType.Float,
                 get: () => {return planet.getRadius()}
-            },
-
-            "waterLevel": {
-                type: ShaderDataType.Float,
-                get: () => {return planet.colorSettings.waterLevel}
             },
 
             "ringStart": {

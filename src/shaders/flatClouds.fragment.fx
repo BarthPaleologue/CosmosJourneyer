@@ -21,7 +21,6 @@ uniform float cameraFar; // camera maxZ
 uniform vec3 planetPosition; // planet position in world space
 uniform float cloudLayerRadius; // atmosphere radius (calculate from planet center)
 uniform float planetRadius; // planet radius
-uniform float waterLevel; // water level
 
 uniform float cloudFrequency; // cloud frequency
 uniform float cloudDetailFrequency; // cloud detail frequency
@@ -335,7 +334,7 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
 	//impactPoint += 10000.0 * completeNoise(normalize(rayOrigin + impactPoint * rayDir), 5, 2.0, 2.0);
 
 	float waterImpact, waterEscape;
-    if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius + waterLevel, waterImpact, waterEscape)) {
+    if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, waterImpact, waterEscape)) {
         maximumDistance = min(maximumDistance, waterImpact);
     }
 

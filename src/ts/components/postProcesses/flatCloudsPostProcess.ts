@@ -1,8 +1,9 @@
-import {Axis, Camera, Mesh, PointLight, Scene, Texture} from "@babylonjs/core";
+import {Axis, Camera, Scene, Texture} from "@babylonjs/core";
 import {ExtendedPostProcess} from "./extendedPostProcess";
 import {CloudSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
 import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
 import waterbump from "../../../asset/textures/cloudNormalMap.jpg";
+import {CelestialBody} from "../celestialBodies/celestialBody";
 
 export class FlatCloudsPostProcess extends ExtendedPostProcess {
 
@@ -10,7 +11,7 @@ export class FlatCloudsPostProcess extends ExtendedPostProcess {
 
     internalTime: number;
 
-    constructor(name: string, planet: SolidPlanet, planetRadius: number, waterLevel: number, cloudLayerRadius: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
+    constructor(name: string, planet: SolidPlanet, cloudLayerRadius: number, sun: CelestialBody, camera: Camera, scene: Scene) {
 
         let settings = {
             cloudLayerRadius: cloudLayerRadius,
@@ -45,10 +46,6 @@ export class FlatCloudsPostProcess extends ExtendedPostProcess {
             "cloudLayerRadius": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.cloudLayerRadius}
-            },
-            "waterLevel": {
-                type: ShaderDataType.Float,
-                get: () => {return planet.colorSettings.waterLevel}
             },
 
             "cloudFrequency": {

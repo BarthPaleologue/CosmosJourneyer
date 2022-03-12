@@ -1,4 +1,18 @@
-import { Engine, Scene, Color3, Color4, Texture, DepthRenderer, Axis, Space, Vector3, PointLight, Tools, FxaaPostProcess} from "@babylonjs/core";
+import {
+    Engine,
+    Scene,
+    Color3,
+    Color4,
+    Texture,
+    DepthRenderer,
+    Axis,
+    Space,
+    Vector3,
+    PointLight,
+    Tools,
+    FxaaPostProcess,
+    VolumetricLightScatteringPostProcess
+} from "@babylonjs/core";
 
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
 import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
@@ -12,6 +26,7 @@ import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPost
 import { RingsPostProcess } from "./components/postProcesses/ringsPostProcess";
 import { Keyboard } from "./components/inputs/keyboard";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
+import {Star} from "./components/celestialBodies/stars/star";
 
 style.default;
 style2.default;
@@ -43,12 +58,15 @@ player.camera.maxZ = planetRadius * 20;
 let keyboard = new Keyboard();
 
 
-let light = new PointLight("light", new Vector3(-1, 1, -1).scale(planetRadius * 10), scene);
+let starSystemManager = new StarSystemManager();
 
-let starfield = new StarfieldPostProcess("starfield", light, scene);
+let sun = new Star("Weierstrass", 0.4 * planetRadius, scene);
 
+sun.mesh.position = new Vector3(-1, 0.5, -1).scale(planetRadius * 5);
+starSystemManager.addStar(sun);
 
-let planetManager = new StarSystemManager();
+let starfield = new StarfieldPostProcess("starfield", sun, scene);
+
 
 let planet = new SolidPlanet("Gaia", planetRadius, Vector3.Zero(), 2, scene);
 planet.attachNode.position.z = planetRadius * 3;
@@ -64,22 +82,26 @@ planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
 
-planetManager.addSolidPlanet(planet);
+starSystemManager.addSolidPlanet(planet);
 
 
-let ocean = new OceanPostProcess("ocean", planet, planetRadius + waterElevation, light, player.camera, scene);
+let ocean = new OceanPostProcess("ocean", planet, planetRadius + waterElevation, sun, player.camera, scene);
 
-let flatClouds = new FlatCloudsPostProcess("clouds", planet, planetRadius, waterElevation, planetRadius + 15e3, light, player.camera, scene);
+let flatClouds = new FlatCloudsPostProcess("clouds", planet, planetRadius + 15e3, sun, player.camera, scene);
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius, planetRadius + 100e3, light, player.camera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius + 100e3, sun, player.camera, scene);
 atmosphere.settings.intensity = 20;
 atmosphere.settings.scatteringStrength = 1.0;
 atmosphere.settings.falloffFactor = 24;
 
-let rings = new RingsPostProcess("rings", planet, planetRadius, waterElevation, light, player.camera, scene);
+let rings = new RingsPostProcess("rings", planet, sun, player.camera, scene);
 
 
 let fxaa = new FxaaPostProcess("fxaa", 1, scene.activeCamera, Texture.BILINEAR_SAMPLINGMODE);
+
+let vls = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
+vls.exposure = 1.0;
+vls.decay = 0.95;
 
 //#region Sliders
 
@@ -112,7 +134,6 @@ new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 70, oc
 
 function babylonToHex(color: Vector3): string {
     let c2 = new Color3(color.x, color.y, color.z);
-    console.log(c2.toHexString());
     return c2.toHexString();
 }
 
@@ -273,6 +294,7 @@ new Slider("ringsOpacity", document.getElementById("ringsOpacity")!, 0, 100, rin
 
 let sunOrientation = 220;
 new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
+    sun.mesh.rotateAround(planet.getAbsolutePosition(), new Vector3(0,1,0), -2*Math.PI*(val - sunOrientation)/360);
     sunOrientation = val;
 });
 
@@ -312,14 +334,11 @@ scene.executeWhenReady(() => {
 
         let deplacement = player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000);
 
-        planetManager.translateAllCelestialBody(deplacement);
+        starSystemManager.translateAllCelestialBody(deplacement);
 
         planet.attachNode.rotate(Axis.Y, .001 * rotationSpeed, Space.LOCAL);
 
-        light.position = new Vector3(Math.cos(sunOrientation * Math.PI / 180), 0, Math.sin(sunOrientation * Math.PI / 180)).scale(planetRadius * 10);
-        light.position.addInPlace(planet.attachNode.getAbsolutePosition());
-
-        planetManager.update(player, light.getAbsolutePosition(), depthRenderer);
+        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer);
 
         scene.render();
     });

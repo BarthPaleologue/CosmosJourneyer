@@ -19,7 +19,6 @@ export class WorkerPool {
     constructor(nbWorkers: number) {
         //this.sharedMemoryBuffer = new SharedArrayBuffer(0);
         //this.sharedTaskQueue = new BuildTaskQueue(this.sharedMemoryBuffer);
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!");
         for (let i = 0; i < nbWorkers; i++) {
             let worker = new Worker(new URL('../workers/workerScript', import.meta.url), { type: "module" });
             this.availableWorkers.push(worker);
