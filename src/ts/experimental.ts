@@ -45,7 +45,7 @@ let keyboard = new Keyboard();
 
 let light = new PointLight("light", new Vector3(-1, 1, -1).scale(planetRadius * 10), scene);
 
-let starfield = new StarfieldPostProcess("starfield", player, light, scene);
+let starfield = new StarfieldPostProcess("starfield", light, scene);
 
 
 let planetManager = new StarSystemManager();
@@ -67,16 +67,16 @@ planet.updateColors();
 planetManager.addSolidPlanet(planet);
 
 
-let ocean = new OceanPostProcess("ocean", planet.attachNode, planetRadius + waterElevation, light, player.camera, scene);
+let ocean = new OceanPostProcess("ocean", planet, planetRadius + waterElevation, light, player.camera, scene);
 
-let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, planetRadius, waterElevation, planetRadius + 15e3, light, player.camera, scene);
+let flatClouds = new FlatCloudsPostProcess("clouds", planet, planetRadius, waterElevation, planetRadius + 15e3, light, player.camera, scene);
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius, planetRadius + 100e3, light, player.camera, scene);
 atmosphere.settings.intensity = 20;
 atmosphere.settings.scatteringStrength = 1.0;
 atmosphere.settings.falloffFactor = 24;
 
-let rings = new RingsPostProcess("rings", planet.attachNode, planetRadius, waterElevation, light, player.camera, scene);
+let rings = new RingsPostProcess("rings", planet, planetRadius, waterElevation, light, player.camera, scene);
 
 
 let fxaa = new FxaaPostProcess("fxaa", 1, scene.activeCamera, Texture.BILINEAR_SAMPLINGMODE);

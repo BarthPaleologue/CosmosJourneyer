@@ -43,6 +43,7 @@ export class PlayerController {
 
         this.camera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.mesh;
+        scene.activeCamera = this.camera;
 
         this.nearestBody = null;
     }

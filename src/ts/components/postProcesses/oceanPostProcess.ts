@@ -1,58 +1,19 @@
-import {Camera, Mesh, PointLight, Scene, Texture, Effect, Axis} from "@babylonjs/core";
+import {Axis, Camera, Mesh, PointLight, Scene, Texture} from "@babylonjs/core";
 
 import waterbump from "../../../asset/textures/waterbump.png";
 import {ExtendedPostProcess} from "./extendedPostProcess";
-
-interface OceanSettings {
-    oceanRadius: number,
-    smoothness: number,
-    specularPower: number,
-    depthModifier: number,
-    alphaModifier: number,
-}
+import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
+import {OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
 
 export class OceanPostProcess extends ExtendedPostProcess {
 
     settings: OceanSettings;
-    camera: Camera;
-    sun: Mesh | PointLight;
-    planet: Mesh;
 
-    internalTime = 0;
+    internalTime: number;
 
-    constructor(name: string, planet: Mesh, oceanRadius: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
-        super(name, "./shaders/ocean", [
-            "sunPosition",
-            "cameraPosition",
+    constructor(name: string, planet: SolidPlanet, oceanRadius: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
 
-            "projection",
-            "view",
-            "transform",
-
-            "cameraNear",
-            "cameraFar",
-            "cameraDirection",
-
-            "planetPosition",
-            "planetRadius",
-            "oceanRadius",
-
-            "smoothness",
-            "specularPower",
-            "alphaModifier",
-            "depthModifier",
-
-            "planetWorldMatrix",
-
-            "time"
-        ], [
-            "textureSampler",
-            "depthSampler",
-            "normalMap"
-        ], camera);
-
-
-        this.settings = {
+        let settings = {
             oceanRadius: oceanRadius,
             depthModifier: 0.002,
             alphaModifier: 0.007,
@@ -60,43 +21,70 @@ export class OceanPostProcess extends ExtendedPostProcess {
             smoothness: 0.9,
         };
 
-        this.camera = camera;
-        this.sun = sun;
-        this.planet = planet;
+        let uniforms: ShaderUniformData = {
+            "sunPosition": {
+                type: ShaderDataType.Vector3,
+                get: () => {return sun.getAbsolutePosition()}
+            },
+            "planetPosition": {
+                type: ShaderDataType.Vector3,
+                get: () => {return planet.getAbsolutePosition()}
+            },
+            "cameraDirection": {
+                type: ShaderDataType.Vector3,
+                get: () => {return scene.activeCamera!.getDirection(Axis.Z)}
+            },
+            "planetRadius": {
+                type: ShaderDataType.Float,
+                get: () => {return planet.getRadius()}
+            },
+            "oceanRadius": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.oceanRadius}
+            },
 
-        this.setCamera(this.camera);
+            "smoothness": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.smoothness}
+            },
+            "specularPower": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.specularPower}
+            },
+            "alphaModifier": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.alphaModifier}
+            },
+            "depthModifier": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.depthModifier}
+            },
 
-        let depthMap = scene.customRenderTargets[0];
+            "planetWorldMatrix": {
+                type: ShaderDataType.Matrix,
+                get: () => {return planet.getWorldMatrix()}
+            },
 
-        this.onApply = (effect: Effect) => {
-            this.internalTime += this.getEngine().getDeltaTime();
-
-            effect.setTexture("depthSampler", depthMap);
-            effect.setTexture("normalMap", new Texture(waterbump, scene));
-
-            effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
-            effect.setVector3("cameraPosition", this.camera.position);
-
-            effect.setVector3("planetPosition", this.planet.absolutePosition);
-
-            effect.setMatrix("projection", this.camera.getProjectionMatrix());
-            effect.setMatrix("view", this.camera.getViewMatrix());
-            effect.setMatrix("transform", this.camera.getTransformationMatrix());
-
-            effect.setFloat("cameraNear", camera.minZ);
-            effect.setFloat("cameraFar", camera.maxZ);
-            effect.setVector3("cameraDirection", camera.getDirection(Axis.Z));
-
-            effect.setFloat("oceanRadius", this.settings.oceanRadius);
-
-            effect.setFloat("smoothness", this.settings.smoothness);
-            effect.setFloat("specularPower", this.settings.specularPower);
-            effect.setFloat("alphaModifier", this.settings.alphaModifier);
-            effect.setFloat("depthModifier", this.settings.depthModifier);
-
-            effect.setMatrix("planetWorldMatrix", this.planet.getWorldMatrix());
-
-            effect.setFloat("time", this.internalTime);
+            "time": {
+                type: ShaderDataType.Float,
+                get: () => {
+                    this.internalTime += scene.getEngine().getDeltaTime() / 1000;
+                    return this.internalTime;
+                }
+            }
         };
+
+        let samplers: ShaderSamplerData = {
+            "normalMap": {
+                type: ShaderDataType.Texture,
+                get: () => {return new Texture(waterbump, scene)}
+            }
+        }
+
+        super(name, "./shaders/ocean", uniforms, samplers, camera, scene);
+
+        this.internalTime = 0;
+
+        this.settings = settings;
     }
 }

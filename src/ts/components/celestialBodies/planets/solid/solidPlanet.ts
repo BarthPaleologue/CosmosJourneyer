@@ -5,7 +5,7 @@ import { Direction } from "../../../toolbox/direction";
 import { TerrainSettings } from "../../../terrain/terrainSettings";
 import { AbstractPlanet } from "../abstractPlanet";
 
-import {Vector3, Mesh, Scene, ShaderMaterial, Axis, Space, Texture, Quaternion} from "@babylonjs/core";
+import {Vector3, Mesh, Scene, ShaderMaterial, Axis, Space, Texture, Quaternion, Matrix} from "@babylonjs/core";
 
 //texture import
 import crackednormal from "../../../../../asset/textures/crackednormal.jpg";
@@ -213,6 +213,10 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             craters: this.craters
         }
         return collisionData;
+    }
+
+    public getWorldMatrix(): Matrix {
+        return this.attachNode.getWorldMatrix();
     }
 
     public setChunkForge(chunkForge: ChunkForge): void {

@@ -76,7 +76,7 @@ starSystemManager.addStar(sun);
 
 depthRenderer.getDepthMap().renderList?.push(sun.mesh);
 
-let starfield = new StarfieldPostProcess("starfield", player, sun.mesh, scene);
+let starfield = new StarfieldPostProcess("starfield", sun.mesh, scene);
 
 let waterElevation = 20e2;
 
@@ -90,17 +90,17 @@ planet.updateColors();
 planet.attachNode.position.x = radius * 5;
 planet.attachNode.rotate(Axis.X, 0.2, Space.WORLD);
 
-let ocean = new OceanPostProcess("ocean", planet.attachNode, radius + waterElevation, sun.mesh, player.camera, scene);
+let ocean = new OceanPostProcess("ocean", planet, radius + waterElevation, sun.mesh, player.camera, scene);
 
-let flatClouds = new FlatCloudsPostProcess("clouds", planet.attachNode, radius, waterElevation, radius + 15e3, sun.mesh, player.camera, scene);
+let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius, waterElevation, radius + 15e3, sun.mesh, player.camera, scene);
 //let volClouds = new VolumetricCloudsPostProcess("clouds", planet.attachNode, radius + waterElevation + 10e3, radius + waterElevation + 30e3, sun.mesh, player.camera, scene);
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius, radius + 100e3, sun.mesh, player.camera, scene);
-atmosphere.settings.intensity = 20;
+/*atmosphere.settings.intensity = 20;
 atmosphere.settings.falloffFactor = 24;
-atmosphere.settings.scatteringStrength = 1.0;
+atmosphere.settings.scatteringStrength = 1.0;*/
 
-let rings = new RingsPostProcess("rings", planet.attachNode, radius, waterElevation, sun.mesh, player.camera, scene);
+let rings = new RingsPostProcess("rings", planet, radius, waterElevation, sun.mesh, player.camera, scene);
 
 
 starSystemManager.addSolidPlanet(planet);
@@ -201,7 +201,7 @@ document.addEventListener("keydown", e => {
     if (e.key == "p") { // take screenshots
         Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
     }
-    if (e.key == "u") atmosphere.settings.intensity = (atmosphere.settings.intensity == 0) ? 15 : 0;
+    //if (e.key == "u") atmosphere.settings.intensity = (atmosphere.settings.intensity == 0) ? 15 : 0;
     if (e.key == "o") ocean.settings.oceanRadius = (ocean.settings.oceanRadius == 0) ? radius + waterElevation : 0;
     if (e.key == "y") flatClouds.settings.cloudLayerRadius = (flatClouds.settings.cloudLayerRadius == 0) ? radius + 15e3 : 0;
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;

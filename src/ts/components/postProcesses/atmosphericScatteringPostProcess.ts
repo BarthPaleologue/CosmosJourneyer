@@ -1,63 +1,20 @@
-import {Camera, Mesh, PointLight, Scene, Effect, Axis, Vector3} from "@babylonjs/core";
+import {Camera, Mesh, PointLight, Scene, Axis} from "@babylonjs/core";
 
 import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
 import {ExtendedPostProcess} from "./extendedPostProcess";
 
-interface AtmosphereSettings {
-    planetRadius: number,
-    atmosphereRadius: number,
-    falloffFactor: number,
-    intensity: number,
-    scatteringStrength: number,
-    densityModifier: number,
-    redWaveLength: number,
-    greenWaveLength: number,
-    blueWaveLength: number,
-}
+import {AtmosphereSettings, ShaderUniformData, ShaderSamplerData, ShaderDataType} from "./interfaces";
 
 export class AtmosphericScatteringPostProcess extends ExtendedPostProcess {
 
     settings: AtmosphereSettings;
-    camera: Camera;
-    sun: Mesh | PointLight;
-    planetMesh: Mesh;
 
     constructor(name: string, planet: SolidPlanet, planetRadius: number, atmosphereRadius: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
-        super(name, "./shaders/simplifiedScattering", [
-            "sunPosition",
-            "cameraPosition",
 
-            "projection",
-            "view",
-            "transform",
-
-            "cameraNear",
-            "cameraFar",
-            "cameraDirection",
-
-            "planetPosition",
-            "planetRadius",
-            "atmosphereRadius",
-            "waterLevel",
-
-            "falloffFactor",
-            "sunIntensity",
-            "scatteringStrength",
-            "densityModifier",
-
-            "redWaveLength",
-            "greenWaveLength",
-            "blueWaveLength"
-        ], [
-            "textureSampler",
-            "depthSampler",
-        ], camera);
-
-        this.settings = {
-            planetRadius: planetRadius,
+        let settings: AtmosphereSettings = {
             atmosphereRadius: atmosphereRadius,
-            falloffFactor: 15,
-            intensity: 15,
+            falloffFactor: 24,
+            intensity: 20,
             scatteringStrength: 1,
             densityModifier: 1,
             redWaveLength: 700,
@@ -65,41 +22,67 @@ export class AtmosphericScatteringPostProcess extends ExtendedPostProcess {
             blueWaveLength: 440,
         };
 
-        this.camera = camera;
-        this.sun = sun;
-        this.planetMesh = planet.attachNode;
+        let uniforms: ShaderUniformData = {
+            "sunPosition": {
+                type: ShaderDataType.Vector3,
+                get: () => {return sun.getAbsolutePosition()}
+            },
+            "planetPosition": {
+                type: ShaderDataType.Vector3,
+                get: () => {return planet.getAbsolutePosition()}
+            },
+            "cameraDirection": {
+                type: ShaderDataType.Vector3,
+                get: () => {return scene.activeCamera!.getDirection(Axis.Z)}
+            },
 
-        this.setCamera(this.camera);
+            "planetRadius": {
+                type: ShaderDataType.Float,
+                get: () => {return planet.getRadius()}
+            },
+            "atmosphereRadius": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.atmosphereRadius}
+            },
+            "waterLevel": {
+                type: ShaderDataType.Float,
+                get: () => {return planet.colorSettings.waterLevel}
+            },
 
-        this.onApply = (effect: Effect) => {
-
-            effect.setTexture("depthSampler", scene.customRenderTargets[0]);
-
-            effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
-            effect.setVector3("cameraPosition", Vector3.Zero());
-
-            effect.setVector3("planetPosition", this.planetMesh.getAbsolutePosition());
-
-            effect.setMatrix("projection", this.camera.getProjectionMatrix());
-            effect.setMatrix("view", this.camera.getViewMatrix());
-            effect.setMatrix("transform", this.camera.getTransformationMatrix());
-
-            effect.setFloat("cameraNear", camera.minZ);
-            effect.setFloat("cameraFar", camera.maxZ);
-            effect.setVector3("cameraDirection", camera.getDirection(Axis.Z));
-
-            effect.setFloat("planetRadius", this.settings.planetRadius);
-            effect.setFloat("atmosphereRadius", this.settings.atmosphereRadius);
-            effect.setFloat("waterLevel", planet.colorSettings.waterLevel);
-
-            effect.setFloat("falloffFactor", this.settings.falloffFactor);
-            effect.setFloat("sunIntensity", this.settings.intensity);
-            effect.setFloat("scatteringStrength", this.settings.scatteringStrength);
-            effect.setFloat("densityModifier", this.settings.densityModifier);
-
-            effect.setFloat("redWaveLength", this.settings.redWaveLength);
-            effect.setFloat("greenWaveLength", this.settings.greenWaveLength);
-            effect.setFloat("blueWaveLength", this.settings.blueWaveLength);
+            "falloffFactor": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.falloffFactor}
+            },
+            "sunIntensity": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.intensity}
+            },
+            "scatteringStrength": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.scatteringStrength}
+            },
+            "densityModifier": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.densityModifier}
+            },
+            "redWaveLength": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.redWaveLength}
+            },
+            "greenWaveLength": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.greenWaveLength}
+            },
+            "blueWaveLength": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.blueWaveLength}
+            }
         };
+
+        let samplers: ShaderSamplerData = {}
+
+        super(name, "./shaders/simplifiedScattering", uniforms, samplers, camera, scene);
+
+        this.settings = settings;
     }
 }

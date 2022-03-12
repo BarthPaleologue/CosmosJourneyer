@@ -18,7 +18,6 @@ uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
 
 uniform vec3 planetPosition; // planet position in world space
-uniform float cloudLayerRadius; // atmosphere radius (calculate from planet center)
 uniform float planetRadius; // planet radius
 uniform float waterLevel; // water level
 
@@ -28,9 +27,6 @@ uniform float ringFrequency; // ring frequency
 uniform float ringOpacity; // ring opacity
 
 uniform mat4 planetWorldMatrix;
-
-uniform float time;
-
 
 float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}

@@ -1,99 +1,73 @@
-import {PostProcess, Camera, Scene, Mesh, PointLight, Effect, Texture} from "@babylonjs/core";
+import {Axis, Camera, Mesh, PointLight, Scene} from "@babylonjs/core";
+import {ExtendedPostProcess} from "./extendedPostProcess";
+import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
+import {RingsSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
 
-interface RingsSettings {
-    ringStart: number;
-    ringEnd: number;
-    ringFrequency: number;
-    ringOpacity: number;
-}
-
-export class RingsPostProcess extends PostProcess {
+export class RingsPostProcess extends ExtendedPostProcess {
 
     settings: RingsSettings;
-    camera: Camera;
-    sun: Mesh | PointLight;
-    planet: Mesh;
 
-    internalTime = 0;
+    constructor(name: string, planet: SolidPlanet, planetRadius: number, waterLevel: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
 
-    constructor(name: string, planet: Mesh, planetRadius: number, waterLevel: number, sun: Mesh | PointLight, camera: Camera, scene: Scene) {
-        super(name, "./shaders/rings", [
-            "sunPosition",
-            "cameraPosition",
-
-            "projection",
-            "view",
-            "transform",
-
-            "cameraNear",
-            "cameraFar",
-
-            "planetPosition",
-            "planetRadius",
-            "cloudLayerRadius",
-            "waterLevel",
-
-            "ringStart",
-            "ringEnd",
-            "ringFrequency",
-            "ringOpacity",
-
-            "planetWorldMatrix",
-
-            "time"
-        ], [
-            "textureSampler",
-            "depthSampler",
-        ], 1, camera, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
-
-
-        this.settings = {
+        let settings = {
             ringStart: 1.5,
             ringEnd: 2.5,
             ringFrequency: 30.0,
             ringOpacity: 0.4
         };
 
-        this.camera = camera;
-        this.sun = sun;
-        this.planet = planet;
+        let uniforms: ShaderUniformData = {
+            "sunPosition": {
+                type: ShaderDataType.Vector3,
+                get: () => {return sun.getAbsolutePosition()}
+            },
+            "planetPosition": {
+                type: ShaderDataType.Vector3,
+                get: () => {return planet.getAbsolutePosition()}
+            },
 
-        this.setCamera(this.camera);
+            "cameraDirection": {
+                type: ShaderDataType.Vector3,
+                get: () => {return scene.activeCamera!.getDirection(Axis.Z)}
+            },
 
-        let depthMap = scene.customRenderTargets[0];
+            "planetRadius": {
+                type: ShaderDataType.Float,
+                get: () => {return planet.getRadius()}
+            },
 
-        this.onApply = (effect: Effect) => {
-            this.internalTime += this.getEngine().getDeltaTime();
+            "waterLevel": {
+                type: ShaderDataType.Float,
+                get: () => {return planet.colorSettings.waterLevel}
+            },
 
-            effect.setTexture("depthSampler", depthMap);
+            "ringStart": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.ringStart}
+            },
+            "ringEnd": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.ringEnd}
+            },
+            "ringFrequency": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.ringFrequency}
+            },
+            "ringOpacity": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.ringOpacity}
+            },
 
-            effect.setVector3("sunPosition", this.sun.getAbsolutePosition());
-            effect.setVector3("cameraPosition", this.camera.position);
-
-            effect.setVector3("planetPosition", this.planet.getAbsolutePosition());
-            effect.setFloat("planetRadius", planetRadius);
-            effect.setFloat("waterLevel", waterLevel);
-
-            effect.setFloat("ringStart", this.settings.ringStart);
-            effect.setFloat("ringEnd", this.settings.ringEnd);
-            effect.setFloat("ringFrequency", this.settings.ringFrequency);
-            effect.setFloat("ringOpacity", this.settings.ringOpacity);
-
-            effect.setMatrix("projection", this.camera.getProjectionMatrix());
-            effect.setMatrix("view", this.camera.getViewMatrix());
-
-            effect.setFloat("cameraNear", camera.minZ);
-            effect.setFloat("cameraFar", camera.maxZ);
-
-            effect.setMatrix("planetWorldMatrix", this.planet.getWorldMatrix());
-
-            effect.setFloat("time", this.internalTime);
+            "planetWorldMatrix": {
+                type: ShaderDataType.Matrix,
+                get: () => {return planet.getWorldMatrix()}
+            }
         };
-    }
 
-    setCamera(camera: Camera) {
-        this.camera.detachPostProcess(this);
-        this.camera = camera;
-        camera.attachPostProcess(this);
+        let samplers: ShaderSamplerData = {}
+
+        super(name, "./shaders/rings", uniforms, samplers, camera, scene);
+
+        this.settings = settings;
     }
 }

@@ -25,17 +25,6 @@ uniform vec3 planetPosition; // planet position in world space
 uniform float planetRadius; // planet radius for height calculations
 uniform float atmosphereRadius; // atmosphere radius (calculate from planet center)
 
-uniform float falloffFactor; // controls exponential opacity falloff
-uniform float sunIntensity; // controls atmosphere overall brightness
-uniform float scatteringStrength; // controls color dispersion
-uniform float densityModifier; // density of the atmosphere
-
-uniform float redWaveLength; // the wave length for the red part of the scattering
-uniform float greenWaveLength; // same with green
-uniform float blueWaveLength; // same with blue
-
-
-
 // Permutation polynomial: (34x^2 + x) mod 289
 vec3 permute(vec3 x) {
   return mod((34.0 * x + 1.0) * x, 289.0);

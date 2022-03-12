@@ -24,10 +24,6 @@ uniform float waterLevel; // water level
 
 uniform float visibility; // visibility of the starfield
 
-uniform mat4 planetWorldMatrix;
-
-uniform float time;
-
 
 vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
 vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
@@ -198,7 +194,6 @@ void main() {
 
         vec3 color1 = vec3(1.0);
         vec3 color2 = vec3(0.4, 0.4, 2.0);
-
 
         finalColor = starLight * lerp(color1, color2, noiseValue3) * visibility;
     }

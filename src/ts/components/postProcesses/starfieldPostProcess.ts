@@ -1,66 +1,36 @@
-import {Mesh, Light, Scene, Camera, Effect, Axis, Vector3} from "@babylonjs/core";
+import {Axis, Light, Mesh, Scene, Vector3} from "@babylonjs/core";
 
-import { PlayerController } from "../player/playerController";
 import {ExtendedPostProcess} from "./extendedPostProcess";
-
-interface StarfieldSettings {
-
-}
+import {ShaderDataType, ShaderSamplerData, ShaderUniformData, StarfieldSettings} from "./interfaces";
 
 export class StarfieldPostProcess extends ExtendedPostProcess {
 
     settings: StarfieldSettings;
-    camera: Camera;
 
-    internalTime = 0;
+    constructor(name: string, sun: Mesh | Light, scene: Scene) {
 
-    constructor(name: string, player: PlayerController, sun: Mesh | Light, scene: Scene) {
-        super(name, "./shaders/starfield", [
-            "sunPosition",
-            "cameraPosition",
+        let settings = {};
 
-            "projection",
-            "view",
-            "transform",
+        let uniforms: ShaderUniformData = {
+            "sunPosition": {
+                type: ShaderDataType.Vector3,
+                get: () => {return sun.getAbsolutePosition()}
+            },
 
-            "cameraNear",
-            "cameraFar",
-
-            "visibility",
-
-            "time"
-        ], [
-            "textureSampler",
-            "depthSampler",
-        ], player.camera);
-
-        this.camera = player.camera;
-
-        this.setCamera(this.camera);
-
-        this.settings = {};
-
-        let depthMap = scene.customRenderTargets[0];
-
-        this.onApply = (effect: Effect) => {
-            this.internalTime += this.getEngine().getDeltaTime();
-
-            effect.setTexture("depthSampler", depthMap);
-
-            effect.setVector3("cameraPosition", this.camera.position);
-
-            let vis = 1.0 - Vector3.Dot(sun.getAbsolutePosition().normalizeToNew(), this.camera.getDirection(Axis.Z));
-            vis /= 2;
-
-            effect.setFloat("visibility", vis);
-
-            effect.setMatrix("projection", this.camera.getProjectionMatrix());
-            effect.setMatrix("view", this.camera.getViewMatrix());
-
-            effect.setFloat("cameraNear", this.camera.minZ);
-            effect.setFloat("cameraFar", this.camera.maxZ);
-
-            effect.setFloat("time", this.internalTime);
+            "visibility": {
+                type: ShaderDataType.Float,
+                get: () => {
+                    let vis = 1.0 - Vector3.Dot(sun.getAbsolutePosition().normalizeToNew(), scene.activeCamera!.getDirection(Axis.Z));
+                    vis /= 2;
+                    return vis;
+                }
+            }
         };
+
+        let samplers: ShaderSamplerData = {}
+
+        super(name, "./shaders/starfield", uniforms, samplers, scene.activeCamera!, scene);
+
+        this.settings = settings;
     }
 }
