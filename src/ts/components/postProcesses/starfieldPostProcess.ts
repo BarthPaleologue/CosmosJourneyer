@@ -1,10 +1,10 @@
 import {Axis, Scene, Vector3} from "@babylonjs/core";
 
-import {ExtendedPostProcess} from "./extendedPostProcess";
+import {SpacePostProcess} from "./spacePostProcess";
 import {ShaderDataType, ShaderSamplerData, ShaderUniformData, StarfieldSettings} from "./interfaces";
 import {CelestialBody} from "../celestialBodies/celestialBody";
 
-export class StarfieldPostProcess extends ExtendedPostProcess {
+export class StarfieldPostProcess extends SpacePostProcess {
 
     settings: StarfieldSettings;
 
@@ -30,7 +30,7 @@ export class StarfieldPostProcess extends ExtendedPostProcess {
 
         let samplers: ShaderSamplerData = {}
 
-        super(name, "./shaders/starfield", uniforms, samplers, scene.activeCamera!, scene);
+        super(name, "./shaders/starfield", uniforms, samplers, scene);
 
         this.settings = settings;
     }

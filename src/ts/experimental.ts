@@ -14,16 +14,16 @@ import {
     VolumetricLightScatteringPostProcess
 } from "@babylonjs/core";
 
-import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
+import { AtmosphericScatteringPostProcess } from "./components/postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
-import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
+import { OceanPostProcess } from "./components/postProcesses/planetPostProcesses/oceanPostProcess";
 
 import * as style from "../styles/style.scss";
 import * as style2 from "../sliderjs/style2.min.css";
 import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
 import { PlayerController } from "./components/player/playerController";
-import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "./components/postProcesses/ringsPostProcess";
+import { FlatCloudsPostProcess } from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import { RingsPostProcess } from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
 import { Keyboard } from "./components/inputs/keyboard";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
 import {Star} from "./components/celestialBodies/stars/star";
@@ -85,16 +85,16 @@ planet.updateColors();
 starSystemManager.addSolidPlanet(planet);
 
 
-let ocean = new OceanPostProcess("ocean", planet, planetRadius + waterElevation, sun, player.camera, scene);
+let ocean = new OceanPostProcess("ocean", planet, planetRadius + waterElevation, sun, scene);
 
-let flatClouds = new FlatCloudsPostProcess("clouds", planet, planetRadius + 15e3, sun, player.camera, scene);
+let flatClouds = new FlatCloudsPostProcess("clouds", planet, planetRadius + 15e3, sun, scene);
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius + 100e3, sun, player.camera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius + 100e3, sun, scene);
 atmosphere.settings.intensity = 20;
 atmosphere.settings.scatteringStrength = 1.0;
 atmosphere.settings.falloffFactor = 24;
 
-let rings = new RingsPostProcess("rings", planet, sun, player.camera, scene);
+let rings = new RingsPostProcess("rings", planet, sun, scene);
 
 
 let fxaa = new FxaaPostProcess("fxaa", 1, scene.activeCamera, Texture.BILINEAR_SAMPLINGMODE);

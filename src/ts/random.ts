@@ -1,8 +1,8 @@
 import { Engine, Texture, Scene, Color4, DepthRenderer, Axis, Space, Vector3, Tools, FxaaPostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 
-import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
+import { AtmosphericScatteringPostProcess } from "./components/postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
-import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
+import { OceanPostProcess } from "./components/postProcesses/planetPostProcesses/oceanPostProcess";
 
 import * as style from "../styles/style.scss";
 import { PlayerController } from "./components/player/playerController";
@@ -12,8 +12,8 @@ import { Gamepad } from "./components/inputs/gamepad";
 import { CollisionWorker } from "./components/workers/collisionWorker";
 import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
 
-import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "./components/postProcesses/ringsPostProcess";
+import { FlatCloudsPostProcess } from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import { RingsPostProcess } from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
 import { centeredRandom, nrand, randInt } from "./components/toolbox/random";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
 import { Star } from "./components/celestialBodies/stars/star";
@@ -85,21 +85,21 @@ planet.updateColors();
 planet.attachNode.position.x = radius * 2;
 planet.attachNode.rotate(Axis.X, centeredRandom(), Space.WORLD);
 
-let ocean = new OceanPostProcess("ocean", planet, radius + waterElevation, sun, player.camera, scene);
+let ocean = new OceanPostProcess("ocean", planet, radius + waterElevation, sun, scene);
 
 if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0) {
-    let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius + 15e3, sun, player.camera, scene);
+    let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius + 15e3, sun, scene);
     flatClouds.settings.cloudPower = 10 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure);
 }
 
 if (planet.physicalProperties.pressure > 0) {
-    let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius + 100e3 * planet.physicalProperties.pressure, sun, player.camera, scene);
+    let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius + 100e3 * planet.physicalProperties.pressure, sun, scene);
     atmosphere.settings.intensity = 15 * planet.physicalProperties.pressure;
     atmosphere.settings.falloffFactor = 24;
     atmosphere.settings.scatteringStrength = 1.0;
 }
 
-let rings = new RingsPostProcess("rings", planet, sun, player.camera, scene);
+let rings = new RingsPostProcess("rings", planet, sun, scene);
 rings.settings.ringStart = 1.8 + 0.4 * centeredRandom();
 rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom();
 

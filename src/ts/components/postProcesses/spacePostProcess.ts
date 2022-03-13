@@ -1,9 +1,10 @@
 import {Camera, Effect, Matrix, PostProcess, Scene, Texture, Vector3} from "@babylonjs/core";
 import {CShaderData, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
 
-export abstract class ExtendedPostProcess extends PostProcess {
+export abstract class SpacePostProcess extends PostProcess {
     camera: Camera;
-    protected constructor(name: string, fragmentURL: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, camera: Camera, scene: Scene) {
+
+    protected constructor(name: string, fragmentURL: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, scene: Scene) {
 
         let commonUniforms: ShaderUniformData = {
             "cameraPosition": {
@@ -43,7 +44,7 @@ export abstract class ExtendedPostProcess extends PostProcess {
         Object.assign(commonUniforms, commonUniforms, uniforms);
         Object.assign(commonSamplers, commonSamplers, samplers);
 
-        super(name, fragmentURL, Object.keys(commonUniforms), Object.keys(commonSamplers), 1, scene.activeCamera!, Texture.BILINEAR_SAMPLINGMODE, camera.getEngine(), false);
+        super(name, fragmentURL, Object.keys(commonUniforms), Object.keys(commonSamplers), 1, scene.activeCamera!, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
 
         this.camera = scene.activeCamera!;
         this.setCamera(this.camera);

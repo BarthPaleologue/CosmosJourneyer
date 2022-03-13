@@ -1,17 +1,18 @@
-import {Axis, Camera, Scene, Texture} from "@babylonjs/core";
-import {ExtendedPostProcess} from "./extendedPostProcess";
-import {CloudSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
-import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
-import waterbump from "../../../asset/textures/cloudNormalMap.jpg";
-import {CelestialBody} from "../celestialBodies/celestialBody";
+import {Scene, Texture} from "@babylonjs/core";
 
-export class FlatCloudsPostProcess extends ExtendedPostProcess {
+import {CloudSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
+import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
+import waterbump from "../../../../asset/textures/cloudNormalMap.jpg";
+import {PlanetPostProcess} from "../planetPostProcess";
+import {Star} from "../../celestialBodies/stars/star";
+
+export class FlatCloudsPostProcess extends PlanetPostProcess {
 
     settings: CloudSettings;
 
     internalTime: number;
 
-    constructor(name: string, planet: SolidPlanet, cloudLayerRadius: number, sun: CelestialBody, camera: Camera, scene: Scene) {
+    constructor(name: string, planet: SolidPlanet, cloudLayerRadius: number, sun: Star, scene: Scene) {
 
         let settings = {
             cloudLayerRadius: cloudLayerRadius,
@@ -25,29 +26,10 @@ export class FlatCloudsPostProcess extends ExtendedPostProcess {
         };
 
         let uniforms: ShaderUniformData = {
-            "sunPosition": {
-                type: ShaderDataType.Vector3,
-                get: () => {return sun.getAbsolutePosition()}
-            },
-            "planetPosition": {
-                type: ShaderDataType.Vector3,
-                get: () => {return planet.getAbsolutePosition()}
-            },
-
-            "cameraDirection": {
-                type: ShaderDataType.Vector3,
-                get: () => {return scene.activeCamera!.getDirection(Axis.Z)}
-            },
-
-            "planetRadius": {
-                type: ShaderDataType.Float,
-                get: () => {return planet.getRadius()}
-            },
             "cloudLayerRadius": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.cloudLayerRadius}
             },
-
             "cloudFrequency": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.cloudFrequency}
@@ -60,7 +42,6 @@ export class FlatCloudsPostProcess extends ExtendedPostProcess {
                 type: ShaderDataType.Float,
                 get: () => {return settings.cloudPower}
             },
-
             "worleySpeed": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.worleySpeed}
@@ -69,7 +50,6 @@ export class FlatCloudsPostProcess extends ExtendedPostProcess {
                 type: ShaderDataType.Float,
                 get: () => {return settings.detailSpeed}
             },
-
             "smoothness": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.smoothness}
@@ -78,12 +58,10 @@ export class FlatCloudsPostProcess extends ExtendedPostProcess {
                 type: ShaderDataType.Float,
                 get: () => {return settings.specularPower}
             },
-
             "planetWorldMatrix": {
                 type: ShaderDataType.Matrix,
                 get: () => {return planet.getWorldMatrix()}
             },
-
             "time": {
                 type: ShaderDataType.Float,
                 get: () => {
@@ -100,7 +78,7 @@ export class FlatCloudsPostProcess extends ExtendedPostProcess {
             }
         }
 
-        super(name, "./shaders/flatClouds", uniforms, samplers, camera, scene);
+        super(name, "./shaders/flatClouds", planet, sun, uniforms, samplers, scene);
 
         this.internalTime = 0;
 

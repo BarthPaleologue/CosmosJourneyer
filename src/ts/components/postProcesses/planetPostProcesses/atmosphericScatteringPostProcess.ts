@@ -1,16 +1,16 @@
-import {Camera, Scene, Axis} from "@babylonjs/core";
+import {Scene} from "@babylonjs/core";
 
-import { SolidPlanet } from "../celestialBodies/planets/solid/solidPlanet";
-import {ExtendedPostProcess} from "./extendedPostProcess";
+import { SolidPlanet } from "../../celestialBodies/planets/solid/solidPlanet";
 
-import {AtmosphereSettings, ShaderUniformData, ShaderSamplerData, ShaderDataType} from "./interfaces";
-import {CelestialBody} from "../celestialBodies/celestialBody";
+import {AtmosphereSettings, ShaderUniformData, ShaderSamplerData, ShaderDataType} from "../interfaces";
+import {PlanetPostProcess} from "../planetPostProcess";
+import {Star} from "../../celestialBodies/stars/star";
 
-export class AtmosphericScatteringPostProcess extends ExtendedPostProcess {
+export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
 
     settings: AtmosphereSettings;
 
-    constructor(name: string, planet: SolidPlanet, atmosphereRadius: number, sun: CelestialBody, camera: Camera, scene: Scene) {
+    constructor(name: string, planet: SolidPlanet, atmosphereRadius: number, sun: Star, scene: Scene) {
 
         let settings: AtmosphereSettings = {
             atmosphereRadius: atmosphereRadius,
@@ -24,28 +24,10 @@ export class AtmosphericScatteringPostProcess extends ExtendedPostProcess {
         };
 
         let uniforms: ShaderUniformData = {
-            "sunPosition": {
-                type: ShaderDataType.Vector3,
-                get: () => {return sun.getAbsolutePosition()}
-            },
-            "planetPosition": {
-                type: ShaderDataType.Vector3,
-                get: () => {return planet.getAbsolutePosition()}
-            },
-            "cameraDirection": {
-                type: ShaderDataType.Vector3,
-                get: () => {return scene.activeCamera!.getDirection(Axis.Z)}
-            },
-
-            "planetRadius": {
-                type: ShaderDataType.Float,
-                get: () => {return planet.getRadius()}
-            },
             "atmosphereRadius": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.atmosphereRadius}
             },
-
             "falloffFactor": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.falloffFactor}
@@ -78,7 +60,7 @@ export class AtmosphericScatteringPostProcess extends ExtendedPostProcess {
 
         let samplers: ShaderSamplerData = {}
 
-        super(name, "./shaders/simplifiedScattering", uniforms, samplers, camera, scene);
+        super(name, "./shaders/simplifiedScattering", planet, sun, uniforms, samplers, scene);
 
         this.settings = settings;
     }

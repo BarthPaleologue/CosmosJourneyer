@@ -1,18 +1,18 @@
-import {Axis, Camera, Scene, Texture} from "@babylonjs/core";
+import {Scene, Texture} from "@babylonjs/core";
 
-import waterbump from "../../../asset/textures/waterbump.png";
-import {ExtendedPostProcess} from "./extendedPostProcess";
-import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
-import {OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
-import {CelestialBody} from "../celestialBodies/celestialBody";
+import waterbump from "../../../../asset/textures/waterbump.png";
+import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
+import {OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
+import {PlanetPostProcess} from "../planetPostProcess";
+import {Star} from "../../celestialBodies/stars/star";
 
-export class OceanPostProcess extends ExtendedPostProcess {
+export class OceanPostProcess extends PlanetPostProcess {
 
     settings: OceanSettings;
 
     internalTime: number;
 
-    constructor(name: string, planet: SolidPlanet, oceanRadius: number, sun: CelestialBody, camera: Camera, scene: Scene) {
+    constructor(name: string, planet: SolidPlanet, oceanRadius: number, sun: Star, scene: Scene) {
 
         let settings = {
             oceanRadius: oceanRadius,
@@ -23,22 +23,6 @@ export class OceanPostProcess extends ExtendedPostProcess {
         };
 
         let uniforms: ShaderUniformData = {
-            "sunPosition": {
-                type: ShaderDataType.Vector3,
-                get: () => {return sun.getAbsolutePosition()}
-            },
-            "planetPosition": {
-                type: ShaderDataType.Vector3,
-                get: () => {return planet.getAbsolutePosition()}
-            },
-            "cameraDirection": {
-                type: ShaderDataType.Vector3,
-                get: () => {return scene.activeCamera!.getDirection(Axis.Z)}
-            },
-            "planetRadius": {
-                type: ShaderDataType.Float,
-                get: () => {return planet.getRadius()}
-            },
             "oceanRadius": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.oceanRadius}
@@ -82,7 +66,7 @@ export class OceanPostProcess extends ExtendedPostProcess {
             }
         }
 
-        super(name, "./shaders/ocean", uniforms, samplers, camera, scene);
+        super(name, "./shaders/ocean", planet, sun, uniforms, samplers, scene);
 
         this.internalTime = 0;
 

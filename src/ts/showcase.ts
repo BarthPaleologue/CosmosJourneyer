@@ -14,12 +14,12 @@ import { StarSystemManager } from "./components/celestialBodies/starSystemManage
 
 import rockn from "../asset/textures/rockn.png";
 
-import { FlatCloudsPostProcess } from "./components/postProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "./components/postProcesses/ringsPostProcess";
-import { VolumetricCloudsPostProcess } from "./components/postProcesses/volumetricCloudsPostProcess";
+import { FlatCloudsPostProcess } from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import { RingsPostProcess } from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
+import { VolumetricCloudsPostProcess } from "./components/postProcesses/planetPostProcesses/volumetricCloudsPostProcess";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
-import { OceanPostProcess } from "./components/postProcesses/oceanPostProcess";
-import { AtmosphericScatteringPostProcess } from "./components/postProcesses/atmosphericScatteringPostProcess";
+import { OceanPostProcess } from "./components/postProcesses/planetPostProcesses/oceanPostProcess";
+import { AtmosphericScatteringPostProcess } from "./components/postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 
 
 import * as style from "../styles/style.scss";
@@ -90,15 +90,15 @@ planet.updateColors();
 planet.attachNode.position.x = radius * 5;
 planet.attachNode.rotate(Axis.X, 0.2, Space.WORLD);
 
-let ocean = new OceanPostProcess("ocean", planet, radius + waterElevation, sun, player.camera, scene);
+let ocean = new OceanPostProcess("ocean", planet, radius + waterElevation, sun, scene);
 
-let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius + 15e3, sun, player.camera, scene);
+let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius + 15e3, sun, scene);
 //let volClouds = new VolumetricCloudsPostProcess("clouds", planet, radius + waterElevation + 100e3, sun, player.camera, scene);
 
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius + 100e3, sun, player.camera, scene);
+let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius + 100e3, sun, scene);
 
 
-let rings = new RingsPostProcess("rings", planet, sun, player.camera, scene);
+let rings = new RingsPostProcess("rings", planet, sun, scene);
 
 
 starSystemManager.addSolidPlanet(planet);
@@ -144,7 +144,7 @@ Ares.colorSettings.steepSharpness = 2;
 Ares.updateColors();
 Ares.attachNode.position.x = -radius * 4;
 
-let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, player.camera, scene);
+let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, scene);
 atmosphere2.settings.intensity = 20 * Ares.physicalProperties.pressure;
 atmosphere2.settings.greenWaveLength = 680;
 atmosphere2.settings.falloffFactor = 24;
