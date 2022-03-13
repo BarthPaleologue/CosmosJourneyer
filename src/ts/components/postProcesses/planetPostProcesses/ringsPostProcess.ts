@@ -10,7 +10,7 @@ export class RingsPostProcess extends PlanetPostProcess {
 
     constructor(name: string, planet: SolidPlanet, sun: Star, scene: Scene) {
 
-        let settings = {
+        let settings: RingsSettings = {
             ringStart: 1.5,
             ringEnd: 2.5,
             ringFrequency: 30.0,

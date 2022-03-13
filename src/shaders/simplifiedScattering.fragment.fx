@@ -1,8 +1,8 @@
 precision lowp float;
 
 #define PI 3.1415926535897932
-#define POINTS_FROM_CAMERA 12 // number sample points along camera ray
-#define OPTICAL_DEPTH_POINTS 4 // number sample points along light ray
+#define POINTS_FROM_CAMERA 10 // number sample points along camera ray
+#define OPTICAL_DEPTH_POINTS 10 // number sample points along light ray
 
 // varying
 varying vec2 vUV; // screen coordinates

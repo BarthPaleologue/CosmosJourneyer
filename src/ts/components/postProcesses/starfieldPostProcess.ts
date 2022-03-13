@@ -10,7 +10,7 @@ export class StarfieldPostProcess extends SpacePostProcess {
 
     constructor(name: string, sun: CelestialBody, scene: Scene) {
 
-        let settings = {};
+        let settings: StarfieldSettings = {};
 
         let uniforms: ShaderUniformData = {
             "sunPosition": {

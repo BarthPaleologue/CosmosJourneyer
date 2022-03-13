@@ -52,7 +52,10 @@ player.camera.maxZ = Math.max(radius * 50, 10000);
 
 let starSystemManager = new StarSystemManager(128);
 
-let sun = new Star("Weierstrass", 0.4 * radius, scene);
+let sun = new Star("Weierstrass", Math.max(nrand(0.5, 0.2),0) * radius, scene, {
+    temperature: Math.max(nrand(5778, 2000), 0)
+});
+console.table(sun.physicalProperties);
 
 sun.mesh.position.x = -913038.375;
 sun.mesh.position.z = -1649636.25;
@@ -91,9 +94,7 @@ if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.press
 
 if (planet.physicalProperties.pressure > 0) {
     let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius + 100e3 * planet.physicalProperties.pressure, sun, scene);
-    atmosphere.settings.intensity = 15 * planet.physicalProperties.pressure;
-    atmosphere.settings.falloffFactor = 24;
-    atmosphere.settings.scatteringStrength = 1.0;
+    atmosphere.settings.intensity = 12 * planet.physicalProperties.pressure;
 }
 
 let rings = new RingsPostProcess("rings", planet, sun, scene);

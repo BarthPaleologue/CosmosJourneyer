@@ -14,8 +14,8 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
 
         let settings: AtmosphereSettings = {
             atmosphereRadius: atmosphereRadius,
-            falloffFactor: 24,
-            intensity: 20,
+            falloffFactor: 23,
+            intensity: 12,
             scatteringStrength: 1,
             densityModifier: 1,
             redWaveLength: 700,

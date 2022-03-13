@@ -11,12 +11,13 @@ export class Star extends CelestialBody {
     private readonly starMaterial: ShaderMaterial;
     private internalTime = 0;
     protected bodyType = CelestialBodyType.STAR;
-    physicalProperties: StarPhysicalProperties = {
+    physicalProperties: StarPhysicalProperties;
+    constructor(name: string, radius: number, scene: Scene, physicalProperties: StarPhysicalProperties = {
         //TODO: ne pas hardcoder
         temperature: 5778
-    };
-    constructor(name: string, radius: number, scene: Scene) {
+    }) {
         super();
+        this.physicalProperties = physicalProperties;
         this.mesh = Mesh.CreateSphere(name, 32, radius, scene);
         this.radius = radius;
         this.mesh.rotate(Axis.Y, 0, Space.WORLD); // init rotation quaternion
@@ -29,8 +30,6 @@ export class Star extends CelestialBody {
                 ]
             }
         );
-        starMaterial.setMatrix("planetWorldMatrix", this.mesh.getWorldMatrix());
-        starMaterial.setVector3("starColor", getRgbFromTemperature(this.physicalProperties.temperature));
 
         this.starMaterial = starMaterial;
 
@@ -50,8 +49,10 @@ export class Star extends CelestialBody {
     }
 
     public update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3): void {
-        //TODO: update star
         this.starMaterial.setFloat("time", this.internalTime);
+        this.starMaterial.setVector3("starColor", getRgbFromTemperature(this.physicalProperties.temperature));
+        this.starMaterial.setMatrix("planetWorldMatrix", this.mesh.getWorldMatrix());
+
         this.internalTime += this.mesh.getEngine().getDeltaTime() / 1000;
     }
 

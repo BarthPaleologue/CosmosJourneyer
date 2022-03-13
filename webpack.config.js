@@ -11,9 +11,10 @@ const htmlPath = path.join(__dirname, "/src/html/");
 const config = {
 
   entry: {
-    showcase: "./src/ts/showcase.ts",
-    experimental: "./src/ts/experimental.ts",
-    random: "./src/ts/random.ts"
+    showcase: "./src/ts/index.ts",
+    experimental: "./src/ts/planetDemo.ts",
+    random: "./src/ts/random.ts",
+    starDemo: "./src/ts/starDemo.ts"
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -43,14 +44,19 @@ const config = {
       chunks: ["showcase"]
     }),
     new HtmlWebpackPlugin({
-      filename: "controler.html",
-      template: path.join(htmlPath, "controler.html"),
+      filename: "planetDemo.html",
+      template: path.join(htmlPath, "planetDemo.html"),
       chunks: ["experimental"]
     }),
     new HtmlWebpackPlugin({
       filename: "random.html",
       template: path.join(htmlPath, "random.html"),
       chunks: ["random"]
+    }),
+    new HtmlWebpackPlugin({
+      filename: "starDemo.html",
+      template: path.join(htmlPath, "starDemo.html"),
+      chunks: ["starDemo"]
     }),
 
   ],

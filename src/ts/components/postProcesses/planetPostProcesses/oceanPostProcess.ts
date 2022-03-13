@@ -14,7 +14,7 @@ export class OceanPostProcess extends PlanetPostProcess {
 
     constructor(name: string, planet: SolidPlanet, sun: Star, scene: Scene) {
 
-        let settings = {
+        let settings: OceanSettings = {
             oceanRadius: planet.getRadius(),
             depthModifier: 0.002,
             alphaModifier: 0.007,

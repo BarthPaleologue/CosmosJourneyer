@@ -86,12 +86,8 @@ let ocean = new OceanPostProcess("ocean", planet, sun, scene);
 let flatClouds = new FlatCloudsPostProcess("clouds", planet, planetRadius + 15e3, sun, scene);
 
 let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius + 100e3, sun, scene);
-atmosphere.settings.intensity = 20;
-atmosphere.settings.scatteringStrength = 1.0;
-atmosphere.settings.falloffFactor = 24;
 
 let rings = new RingsPostProcess("rings", planet, sun, scene);
-
 
 let fxaa = new FxaaPostProcess("fxaa", 1, scene.activeCamera, Texture.BILINEAR_SAMPLINGMODE);
 

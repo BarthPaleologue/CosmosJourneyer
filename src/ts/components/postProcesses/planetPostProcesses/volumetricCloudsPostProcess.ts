@@ -10,7 +10,7 @@ export class VolumetricCloudsPostProcess extends PlanetPostProcess {
 
     constructor(name: string, planet: SolidPlanet, atmosphereRadius: number, sun: Star, scene: Scene) {
 
-        let settings = {
+        let settings: VolumetricCloudSettings = {
             atmosphereRadius: atmosphereRadius
         }
 

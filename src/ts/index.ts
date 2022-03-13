@@ -137,10 +137,8 @@ Ares.updateColors();
 Ares.attachNode.position.x = -radius * 4;
 
 let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, scene);
-atmosphere2.settings.intensity = 20 * Ares.physicalProperties.pressure;
+atmosphere2.settings.intensity = 15 * Ares.physicalProperties.pressure;
 atmosphere2.settings.greenWaveLength = 680;
-atmosphere2.settings.falloffFactor = 24;
-atmosphere2.settings.scatteringStrength = 1.0;
 
 starSystemManager.addSolidPlanet(Ares);
 
