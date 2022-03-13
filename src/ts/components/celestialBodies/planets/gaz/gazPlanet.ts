@@ -27,4 +27,9 @@ export class GazPlanet extends AbstractPlanet {
         // TODO: update planet
         throw new Error("Method not implemented.");
     }
+
+    translate(displacement: Vector3): void {
+        //TODO: implement
+        throw new Error("Method not implemented.");
+    }
 }

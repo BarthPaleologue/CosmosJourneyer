@@ -1,4 +1,3 @@
-import { Crater, generateCraters } from "../../../terrain/crater/crater";
 import { ChunkForge } from "../../../forge/chunkForge";
 import { PlanetSide } from "./planetSide";
 import { Direction } from "../../../toolbox/direction";
@@ -27,25 +26,18 @@ export interface ColorSettings {
     plainColor: Vector3,
     sandColor: Vector3,
 
-    waterLevel: number,
     sandSize: number,
     steepSharpness: number;
     normalSharpness: number;
-
-    snowElevation01: number;
-    snowOffsetAmplitude: number;
-    snowLacunarity: number;
-    snowLatitudePersistence: number;
-    steepSnowDotLimit: number;
 }
 
 
 export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
-    craters: Crater[];
-
     public colorSettings: ColorSettings;
     readonly physicalProperties: SolidPhysicalProperties;
+
+    readonly waterLevel: number;
 
     protected bodyType = CelestialBodyType.SOLID;
 
@@ -70,14 +62,17 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         this.physicalProperties = physicalProperties;
 
+        // TODO: faire quelque chose de réaliste
+        this.waterLevel = 20e2 * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
+
         this.rootChunkLength = this._radius * 2;
 
         this.maxDepth = Math.round(Math.log2(radius) - 12);
 
         let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
-        console.log(spaceBetweenVertex);
+        //console.log(spaceBetweenVertex);
 
-        this.attachNode = Mesh.CreateBox(`${this._name}AttachNode`, 1, scene);
+        this.attachNode = new Mesh(`${this._name}AttachNode`, scene);
         this.attachNode.rotate(Axis.Y, 0, Space.WORLD); // init rotation quaternion
         this.attachNode.position = position;
 
@@ -104,20 +99,10 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             plainColor: new Vector3(0.5, 0.3, 0.08),
             sandColor: new Vector3(0.7, 0.7, 0.2),
 
-            waterLevel: 0,
             sandSize: 1,
             steepSharpness: 1,
             normalSharpness: 0.8,
-
-            snowElevation01: 0.8,
-            snowOffsetAmplitude: 0.05,
-            snowLacunarity: 4,
-            snowLatitudePersistence: 3,
-            steepSnowDotLimit: 0.8,
         };
-
-        //this.craters = generateCraters(nbCraters, craterRadiusFactor, craterSteepnessFactor, craterMaxDepthFactor);
-        this.craters = [];
 
         let surfaceMaterial = new ShaderMaterial("surfaceColor", scene, "./shaders/surfaceColor",
             {
@@ -142,9 +127,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
                     "snowColor", "steepColor", "plainColor", "sandColor",
 
                     "maxElevation",
-
-                    "snowElevation01", "snowOffsetAmplitude", "snowLacunarity",
-                    "snowLatitudePersistence", "steepSnowDotLimit",
 
                     "minTemperature", "maxTemperature",
 
@@ -171,14 +153,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
 
-        // déharcoder le bouzin
+        // TODO: déharcoder le bouzin
         surfaceMaterial.setFloat("maxElevation", this.terrainSettings.continentBaseHeight + this.terrainSettings.maxMountainHeight + this.terrainSettings.maxBumpHeight);
-
-        surfaceMaterial.setFloat("snowElevation01", this.colorSettings.snowElevation01);
-        surfaceMaterial.setFloat("snowOffsetAmplitude", this.colorSettings.snowOffsetAmplitude);
-        surfaceMaterial.setFloat("snowLacunarity", this.colorSettings.snowLacunarity);
-        surfaceMaterial.setFloat("snowLatitudePersistence", this.colorSettings.snowLatitudePersistence);
-        surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.steepSnowDotLimit);
 
         surfaceMaterial.setFloat("minTemperature", this.physicalProperties.minTemperature);
         surfaceMaterial.setFloat("maxTemperature", this.physicalProperties.maxTemperature);
@@ -209,8 +185,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
                 relativePosition.y,
                 relativePosition.z
             ],
-            chunkLength: this.rootChunkLength,
-            craters: this.craters
+            chunkLength: this.rootChunkLength
         }
         return collisionData;
     }
@@ -256,7 +231,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
      */
     public updateColors(): void {
         this.surfaceMaterial.setFloat("planetRadius", this._radius);
-        this.surfaceMaterial.setFloat("waterLevel", this.colorSettings.waterLevel);
+        this.surfaceMaterial.setFloat("waterLevel", this.waterLevel);
         this.surfaceMaterial.setFloat("sandSize", this.colorSettings.sandSize);
         this.surfaceMaterial.setFloat("steepSharpness", this.colorSettings.steepSharpness);
 
@@ -267,17 +242,10 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         this.surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
 
-        this.surfaceMaterial.setFloat("snowElevation01", this.colorSettings.snowElevation01);
-        this.surfaceMaterial.setFloat("snowOffsetAmplitude", this.colorSettings.snowOffsetAmplitude);
-        this.surfaceMaterial.setFloat("snowLacunarity", this.colorSettings.snowLacunarity);
-        this.surfaceMaterial.setFloat("snowLatitudePersistence", this.colorSettings.snowLatitudePersistence);
-        this.surfaceMaterial.setFloat("steepSnowDotLimit", this.colorSettings.steepSnowDotLimit);
-
         this.surfaceMaterial.setFloat("minTemperature", this.physicalProperties.minTemperature);
         this.surfaceMaterial.setFloat("maxTemperature", this.physicalProperties.maxTemperature);
 
         this.surfaceMaterial.setFloat("waterAmount", this.physicalProperties.waterAmount);
-
     }
 
     public update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3) {
@@ -296,7 +264,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     }
 
     public override getRadius(): number {
-        return super.getRadius() + this.colorSettings.waterLevel;
+        return super.getRadius() + this.waterLevel;
     }
 
     setAbsolutePosition(newPosition: Vector3): void {
@@ -305,5 +273,9 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     getRotationQuaternion(): Quaternion {
         return this.attachNode.rotationQuaternion!;
+    }
+
+    translate(displacement: Vector3): void {
+        this.attachNode.position.addInPlace(displacement);
     }
 }

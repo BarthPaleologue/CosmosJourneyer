@@ -39,12 +39,6 @@ uniform float normalSharpness;
 
 uniform float maxElevation;
 
-uniform float snowElevation01;
-uniform float snowOffsetAmplitude;
-uniform float snowLacunarity;
-uniform float snowLatitudePersistence;
-uniform float steepSnowDotLimit;
-
 uniform vec3 snowColor; // the color of the snow layer
 uniform vec3 steepColor; // the color of steep slopes
 uniform vec3 plainColor; // the color of plains at the bottom of moutains

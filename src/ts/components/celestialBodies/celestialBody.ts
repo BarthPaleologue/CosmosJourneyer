@@ -7,6 +7,7 @@ export abstract class CelestialBody implements Transformable {
     protected constructor() {
         //TODO: réunir les attributs fondamentaux de tous les celestialBodies
     }
+
     public abstract getName(): string;
     public abstract setAbsolutePosition(newPosition: Vector3): void;
     public abstract getAbsolutePosition(): Vector3;
@@ -26,4 +27,6 @@ export abstract class CelestialBody implements Transformable {
 
         return position;
     }
+
+    public abstract translate(displacement: Vector3): void;
 }

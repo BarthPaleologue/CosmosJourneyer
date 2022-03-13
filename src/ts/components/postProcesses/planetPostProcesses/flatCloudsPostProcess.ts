@@ -66,7 +66,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
                 type: ShaderDataType.Float,
                 get: () => {
                     this.internalTime += scene.getEngine().getDeltaTime() / 1000;
-                    return this.internalTime
+                    return this.internalTime;
                 }
             }
         };

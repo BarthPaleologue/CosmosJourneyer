@@ -1,5 +1,4 @@
 import {Direction} from "../toolbox/direction";
-import {Crater} from "../terrain/crater/crater";
 import {TerrainSettings} from "../terrain/terrainSettings";
 import {TaskType} from "./taskInterfaces";
 
@@ -8,7 +7,6 @@ export interface WorkerData {
     planetID: string;
     chunkLength: number;
     terrainSettings: TerrainSettings;
-    craters: Crater[];
     position: number[];
 }
 

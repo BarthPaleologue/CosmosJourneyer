@@ -38,8 +38,6 @@ function initLayers() {
 
 initLayers();
 
-//const craterLayer = new CraterLayer([]);
-
 function terrainFunction(position: LVector3, gradient: LVector3, seed = LVector3.Zero()): void {
 
     const unitCoords = position.normalize();
@@ -89,7 +87,6 @@ function buildChunkVertexData(data: BuildData): void {
     if (data.planetID != currentPlanetID) {
         currentPlanetID = data.planetID;
 
-        //craterLayer.craters = data.craters;
         terrainSettings = data.terrainSettings;
         initLayers();
     }
@@ -241,7 +238,6 @@ self.onmessage = e => {
             if (data.planetID != currentPlanetID) {
                 currentPlanetID = data.planetID;
 
-                //craterLayer.craters = data.craters;
                 terrainSettings = data.terrainSettings;
                 initLayers();
             }

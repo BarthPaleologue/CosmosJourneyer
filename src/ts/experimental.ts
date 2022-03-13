@@ -8,7 +8,6 @@ import {
     Axis,
     Space,
     Vector3,
-    PointLight,
     Tools,
     FxaaPostProcess,
     VolumetricLightScatteringPostProcess
@@ -72,20 +71,17 @@ let planet = new SolidPlanet("Gaia", planetRadius, Vector3.Zero(), 2, scene);
 planet.attachNode.position.z = planetRadius * 3;
 planet.attachNode.rotation.x = -0.2;
 
-let waterElevation = 20e2;
-
 planet.colorSettings.steepSharpness = 3;
 planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
 
 planet.colorSettings.sandSize = 300;
-planet.colorSettings.waterLevel = waterElevation;
 
 planet.updateColors();
 
 starSystemManager.addSolidPlanet(planet);
 
 
-let ocean = new OceanPostProcess("ocean", planet, planetRadius + waterElevation, sun, scene);
+let ocean = new OceanPostProcess("ocean", planet, sun, scene);
 
 let flatClouds = new FlatCloudsPostProcess("clouds", planet, planetRadius + 15e3, sun, scene);
 
@@ -113,16 +109,8 @@ new Slider("zoom", document.getElementById("zoom")!, 0, 100, 100 * planet._radiu
 document.getElementById("oceanToggler")?.addEventListener("click", () => {
     let checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
     checkbox.checked = !checkbox.checked;
-    ocean.settings.oceanRadius = checkbox.checked ? planetRadius + waterElevation : 0;
+    ocean.settings.oceanRadius = checkbox.checked ? planet.getRadius() : 0;
 });
-
-new Slider("oceanLevel", document.getElementById("oceanLevel")!, 0, 100, (ocean.settings.oceanRadius - planetRadius) / 100, (val: number) => {
-    ocean.settings.oceanRadius = planetRadius + val * 100;
-    if (val == 0) ocean.settings.oceanRadius = 0;
-    planet.colorSettings.waterLevel = val * 100;
-    planet.updateColors();
-});
-
 
 new Slider("alphaModifier", document.getElementById("alphaModifier")!, 0, 200, ocean.settings.alphaModifier * 10000, (val: number) => {
     ocean.settings.alphaModifier = val / 10000;
@@ -171,31 +159,6 @@ sandColorPicker.addEventListener("input", () => {
 
 new Slider("sandSize", document.getElementById("sandSize")!, 0, 300, planet.colorSettings.sandSize / 10, (val: number) => {
     planet.colorSettings.sandSize = val * 10;
-    planet.updateColors();
-});
-
-new Slider("snowElevation", document.getElementById("snowElevation")!, 0, 100, planet.colorSettings.snowElevation01 * 100, (val: number) => {
-    planet.colorSettings.snowElevation01 = val / 100;
-    planet.updateColors();
-});
-
-new Slider("snowOffsetAmplitude", document.getElementById("snowOffsetAmplitude")!, 0, 100, planet.colorSettings.snowOffsetAmplitude * 100, (val: number) => {
-    planet.colorSettings.snowOffsetAmplitude = val / 100;
-    planet.updateColors();
-});
-
-new Slider("snowLacunarity", document.getElementById("snowLacunarity")!, 0, 100, planet.colorSettings.snowLacunarity * 10, (val: number) => {
-    planet.colorSettings.snowLacunarity = val / 10;
-    planet.updateColors();
-});
-
-new Slider("snowLatitudePersistence", document.getElementById("snowLatitudePersistence")!, 0, 100, planet.colorSettings.snowLatitudePersistence, (val: number) => {
-    planet.colorSettings.snowLatitudePersistence = val;
-    planet.updateColors();
-});
-
-new Slider("steepSnowDotLimit", document.getElementById("steepSnowDotLimit")!, 0, 10, planet.colorSettings.steepSnowDotLimit * 10, (val: number) => {
-    planet.colorSettings.steepSnowDotLimit = val / 10;
     planet.updateColors();
 });
 

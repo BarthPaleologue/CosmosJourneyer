@@ -78,14 +78,11 @@ planet.colorSettings.sandSize = 250 + 100 * centeredRandom();
 planet.colorSettings.steepSharpness = 3;
 planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
 
-let waterElevation = 20e2 * planet.physicalProperties.waterAmount;
-planet.colorSettings.waterLevel = waterElevation;
-
 planet.updateColors();
 planet.attachNode.position.x = radius * 2;
 planet.attachNode.rotate(Axis.X, centeredRandom(), Space.WORLD);
 
-let ocean = new OceanPostProcess("ocean", planet, radius + waterElevation, sun, scene);
+let ocean = new OceanPostProcess("ocean", planet, sun, scene);
 
 if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0) {
     let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius + 15e3, sun, scene);

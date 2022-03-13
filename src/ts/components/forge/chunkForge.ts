@@ -43,7 +43,6 @@ export class ChunkForge {
             planetID: task.planet.getName(),
             chunkLength: task.planet.rootChunkLength,
             subdivisions: this.subdivisions,
-            craters: task.planet.craters,
             depth: task.depth,
             direction: task.direction,
             position: [task.position.x,task.position.y,task.position.z],

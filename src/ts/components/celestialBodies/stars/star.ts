@@ -37,21 +37,25 @@ export class Star extends CelestialBody {
         this.mesh.material = this.starMaterial;
     }
 
-    setAbsolutePosition(newPosition: Vector3): void {
+    public setAbsolutePosition(newPosition: Vector3): void {
         this.mesh.setAbsolutePosition(newPosition);
     }
 
-    getAbsolutePosition(): Vector3 {
+    public getAbsolutePosition(): Vector3 {
         return this.mesh.getAbsolutePosition();
     }
 
-    update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3): void {
+    public translate(displacement: Vector3): void {
+        this.mesh.position.addInPlace(displacement);
+    }
+
+    public update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3): void {
         //TODO: update star
         this.starMaterial.setFloat("time", this.internalTime);
         this.internalTime += this.mesh.getEngine().getDeltaTime() / 1000;
     }
 
-    getName(): string {
+    public getName(): string {
         return this.mesh.id;
     }
 
@@ -59,7 +63,7 @@ export class Star extends CelestialBody {
         return this.radius;
     }
 
-    getRotationQuaternion(): Quaternion {
+    public getRotationQuaternion(): Quaternion {
         return this.mesh.rotationQuaternion!;
     }
 }
