@@ -88,6 +88,14 @@ const config = {
         test: /\.html$/i,
         loader: "html-loader",
       },
+      {
+        test: /\.(glsl|vs|fs|vert|frag|fx)$/,
+        exclude: /node_modules/,
+        use: [
+          'raw-loader',
+          'glslify-loader'
+        ]
+      }
 
 
       // Add your rules for custom modules here
