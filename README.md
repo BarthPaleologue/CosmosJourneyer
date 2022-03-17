@@ -1,5 +1,8 @@
 # Planet Engine : Procedural Planets with WebGL
 
+[![NodeJS with Webpack](https://github.com/BarthPaleologue/planetEngine/actions/workflows/webpack.yml/badge.svg)](https://github.com/BarthPaleologue/planetEngine/actions/workflows/webpack.yml)
+[![License](https://img.shields.io/github/license/BarthPaleologue/planetEngine)](./LICENSE)
+
 From space to the surface, explore various procedural worlds in your browser !
 
 A demo is available at https://barth.paleologue.fr/planetEngine/
