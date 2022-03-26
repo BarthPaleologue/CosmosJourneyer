@@ -4,3 +4,4 @@ package-lock.json
 dist
 .ipynb_checkpoints
 .idea
+coverage

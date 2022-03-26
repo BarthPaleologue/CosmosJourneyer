@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@babylonjs/core": "^4.2.1",
+    "@types/jest": "^27.4.1",
     "@webpack-cli/generators": "^1.1.0",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.3.0",
@@ -13,6 +14,7 @@
     "sass-loader": "^12.1.0",
     "style-loader": "^3.3.0",
     "ts-loader": "^9.2.6",
+    "ts-node": "^10.7.0",
     "typescript": "^4.4.3",
     "typescript-plugin-css-modules": "^3.4.0",
     "url-loader": "^4.1.1",
@@ -28,6 +30,7 @@
     "build:dev": "webpack --mode=development",
     "build:prod": "webpack --mode=production --node-env=production",
     "watch": "webpack --watch",
-    "serve": "webpack serve"
+    "serve": "webpack serve",
+    "test": "jest"
   }
 }
