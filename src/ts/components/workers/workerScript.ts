@@ -1,6 +1,6 @@
-import {getQuaternionFromDirection} from "../toolbox/direction";
+import {getQuaternionFromDirection} from "../utils/direction";
 import {simplexNoiseLayer} from "../terrain/landscape/simplexNoiseLayer";
-import {Algebra, LVector3} from "../toolbox/algebra";
+import {Algebra, LVector3} from "../utils/algebra";
 import {ridgedNoiseLayer} from "../terrain/landscape/ridgedNoiseLayer";
 import {BuildData, CollisionData, WorkerData} from "../forge/workerDataInterfaces";
 import {TerrainSettings} from "../terrain/terrainSettings";

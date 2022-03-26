@@ -78,7 +78,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             }
         }
 
-        super(name, "./shaders/flatClouds", planet, sun, uniforms, samplers, scene);
+        super(name, "./shaders/flatClouds", uniforms, samplers, planet, sun, scene);
 
         this.internalTime = 0;
 

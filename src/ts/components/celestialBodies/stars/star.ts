@@ -1,8 +1,9 @@
-import { getRgbFromTemperature } from "../../toolbox/specrend";
-import { CelestialBody } from "../celestialBody";
+import {getRgbFromTemperature} from "../../utils/specrend";
+import {CelestialBody} from "../celestialBody";
 
-import { Mesh, Vector3, ShaderMaterial, Space, Axis, Scene, Quaternion } from "@babylonjs/core";
+import {Axis, Mesh, Quaternion, Scene, ShaderMaterial, Space, Vector3} from "@babylonjs/core";
 import {CelestialBodyType, StarPhysicalProperties} from "../interfaces";
+import {initMeshTransform} from "../../utils/mesh";
 
 // TODO: implement RigidBody for star
 export class Star extends CelestialBody {
@@ -12,15 +13,21 @@ export class Star extends CelestialBody {
     private internalTime = 0;
     protected bodyType = CelestialBodyType.STAR;
     physicalProperties: StarPhysicalProperties;
-    constructor(name: string, radius: number, scene: Scene, physicalProperties: StarPhysicalProperties = {
+    constructor(name: string, radius: number, position: Vector3, scene: Scene, physicalProperties: StarPhysicalProperties = {
         //TODO: ne pas hardcoder
+        rotationPeriod: 60 * 60,
+        rotationAxis: Axis.Y,
+
         temperature: 5778
     }) {
         super();
         this.physicalProperties = physicalProperties;
-        this.mesh = Mesh.CreateSphere(name, 32, radius, scene);
         this.radius = radius;
-        this.mesh.rotate(Axis.Y, 0, Space.WORLD); // init rotation quaternion
+
+        this.mesh = Mesh.CreateSphere(name, 32, this.radius, scene);
+        this.mesh.setAbsolutePosition(position);
+        initMeshTransform(this.mesh);
+
         let starMaterial = new ShaderMaterial("starColor", scene, "./shaders/starMaterial",
             {
                 attributes: ["position"],
@@ -47,8 +54,17 @@ export class Star extends CelestialBody {
     public translate(displacement: Vector3): void {
         this.mesh.position.addInPlace(displacement);
     }
+    public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
+        this.mesh.rotateAround(pivot, axis, amount);
+    }
+    public rotate(axis: Vector3, amount: number) {
+        this.mesh.rotate(axis, amount, Space.WORLD);
+        this.physicalProperties.rotationAxis = this.mesh.up;
+    }
 
     public update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3): void {
+        this.mesh.rotate(this.physicalProperties.rotationAxis, this.mesh.getEngine().getDeltaTime() / (1000 * this.physicalProperties.rotationPeriod));
+
         this.starMaterial.setFloat("time", this.internalTime);
         this.starMaterial.setVector3("starColor", getRgbFromTemperature(this.physicalProperties.temperature));
         this.starMaterial.setMatrix("planetWorldMatrix", this.mesh.getWorldMatrix());

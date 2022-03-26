@@ -5,7 +5,7 @@ import {ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces
 import {Star} from "../celestialBodies/stars/star";
 
 export abstract class PlanetPostProcess extends SpacePostProcess {
-    protected constructor(name: string, fragmentURL: string, planet: SolidPlanet, sun: Star, uniforms: ShaderUniformData, samplers: ShaderSamplerData, scene: Scene) {
+    protected constructor(name: string, fragmentURL: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, planet: SolidPlanet, sun: Star, scene: Scene) {
 
         let commonUniforms = {
             "sunPosition": {
@@ -26,7 +26,7 @@ export abstract class PlanetPostProcess extends SpacePostProcess {
             }
         }
 
-        Object.assign(commonUniforms, commonUniforms, uniforms)
+        Object.assign(commonUniforms, commonUniforms, uniforms);
 
         super(name, fragmentURL, commonUniforms, samplers, scene);
     }

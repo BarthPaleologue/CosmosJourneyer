@@ -1,28 +1,43 @@
-import { Engine, Scene, Color4, DepthRenderer, Axis, Space, Vector3, Texture, Tools, FxaaPostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import {
+    Engine,
+    Scene,
+    Color4,
+    DepthRenderer,
+    Axis,
+    Space,
+    Vector3,
+    Texture,
+    Tools,
+    FxaaPostProcess,
+    VolumetricLightScatteringPostProcess
+} from "@babylonjs/core";
 
-import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
-import { Star } from "./components/celestialBodies/stars/star";
+import {SolidPlanet} from "./components/celestialBodies/planets/solid/solidPlanet";
+import {Star} from "./components/celestialBodies/stars/star";
 
-import { PlayerController } from "./components/player/playerController";
+import {PlayerController} from "./components/player/playerController";
 
-import { Keyboard } from "./components/inputs/keyboard";
-import { Mouse } from "./components/inputs/mouse";
-import { Gamepad } from "./components/inputs/gamepad";
+import {Keyboard} from "./components/inputs/keyboard";
+import {Mouse} from "./components/inputs/mouse";
+import {Gamepad} from "./components/inputs/gamepad";
 
-import { CollisionWorker } from "./components/workers/collisionWorker";
-import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
+import {CollisionWorker} from "./components/workers/collisionWorker";
+import {StarSystemManager} from "./components/celestialBodies/starSystemManager";
 
 import rockn from "../asset/textures/rockn.png";
 
-import { FlatCloudsPostProcess } from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
-import { VolumetricCloudsPostProcess } from "./components/postProcesses/planetPostProcesses/volumetricCloudsPostProcess";
-import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
-import { OceanPostProcess } from "./components/postProcesses/planetPostProcesses/oceanPostProcess";
-import { AtmosphericScatteringPostProcess } from "./components/postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import {FlatCloudsPostProcess} from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import {RingsPostProcess} from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
+import {VolumetricCloudsPostProcess} from "./components/postProcesses/planetPostProcesses/volumetricCloudsPostProcess";
+import {StarfieldPostProcess} from "./components/postProcesses/starfieldPostProcess";
+import {OceanPostProcess} from "./components/postProcesses/planetPostProcesses/oceanPostProcess";
+import {
+    AtmosphericScatteringPostProcess
+} from "./components/postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 
 
 import * as style from "../styles/style.scss";
+
 style.default;
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -68,10 +83,8 @@ scene.onBeforeDrawPhaseObservable.add((scene, state) => {
 
 let starSystemManager = new StarSystemManager(64);
 
-let sun = new Star("Weierstrass", 0.4 * radius, scene);
+let sun = new Star("Weierstrass", 0.4 * radius, new Vector3(-910000, 0, -1700000), scene);
 
-sun.mesh.position.x = -913038.375;
-sun.mesh.position.z = -1649636.25;
 starSystemManager.addStar(sun);
 
 depthRenderer.getDepthMap().renderList?.push(sun.mesh);
@@ -79,13 +92,15 @@ depthRenderer.getDepthMap().renderList?.push(sun.mesh);
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
 let planet = new SolidPlanet("Hécate", radius, new Vector3(0, 0, 4 * radius), 1, scene);
+planet.physicalProperties.rotationPeriod = 20;
 planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.steepSharpness = 3;
 
 planet.updateColors();
 planet.attachNode.position.x = radius * 5;
-planet.attachNode.rotate(Axis.X, 0.2, Space.WORLD);
+
+planet.rotate(Axis.X, 0.2);
 
 let ocean = new OceanPostProcess("ocean", planet, sun, scene);
 
@@ -99,6 +114,9 @@ let rings = new RingsPostProcess("rings", planet, sun, scene);
 starSystemManager.addSolidPlanet(planet);
 
 let moon = new SolidPlanet("Manaleth", radius / 4, new Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene, {
+    rotationPeriod: 60 * 60,
+    rotationAxis: Axis.Y,
+
     minTemperature: -180,
     maxTemperature: 200,
     pressure: 0,
@@ -121,6 +139,9 @@ moon.translate(planet.attachNode.getAbsolutePosition());
 starSystemManager.addSolidPlanet(moon);
 
 let Ares = new SolidPlanet("Ares", radius, new Vector3(0, 0, 4 * radius), 1, scene, {
+    rotationPeriod: 60 * 60,
+    rotationAxis: Axis.Y,
+
     minTemperature: -80,
     maxTemperature: 20,
     pressure: 0.5,
@@ -176,8 +197,10 @@ function updateScene() {
 
     starSystemManager.translateAllCelestialBody(deplacement);
 
+    //starSystemManager.rotateAllAround(Vector3.Zero(), Axis.Y, 0.1 * engine.getDeltaTime() / 1000);
+
     if (!collisionWorker.isBusy() && player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() < player.nearestBody.getRadius() * 2) {
-        if(player.nearestBody instanceof SolidPlanet) {
+        if (player.nearestBody instanceof SolidPlanet) {
             //FIXME: se passer de instanceof
             collisionWorker.checkCollision(player.nearestBody);
         }
@@ -186,7 +209,7 @@ function updateScene() {
 
 document.addEventListener("keydown", e => {
     if (e.key == "p") { // take screenshots
-        Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
+        Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, {precision: 4});
     }
     //if (e.key == "u") atmosphere.settings.intensity = (atmosphere.settings.intensity == 0) ? 15 : 0;
     if (e.key == "o") ocean.settings.oceanRadius = (ocean.settings.oceanRadius == 0) ? planet.getRadius() : 0;

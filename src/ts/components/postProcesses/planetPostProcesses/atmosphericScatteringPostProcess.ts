@@ -60,7 +60,7 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
 
         let samplers: ShaderSamplerData = {}
 
-        super(name, "./shaders/simplifiedScattering", planet, sun, uniforms, samplers, scene);
+        super(name, "./shaders/simplifiedScattering", uniforms, samplers, planet, sun, scene);
 
         this.settings = settings;
     }

@@ -24,6 +24,12 @@ export class StarSystemManager {
             planet.setAbsolutePosition(planet.getAbsolutePosition().add(deplacement));
         }
     }
+    public rotateAllAround(pivot: Vector3, axis: Vector3, amount: number) {
+        for(const planet of this._celestialBodies) {
+            planet.rotateAround(pivot, axis, amount);
+        }
+    }
+
     public getPlanets(): CelestialBody[] {
         return this._celestialBodies;
     }

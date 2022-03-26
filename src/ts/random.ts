@@ -14,9 +14,10 @@ import { StarSystemManager } from "./components/celestialBodies/starSystemManage
 
 import { FlatCloudsPostProcess } from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import { RingsPostProcess } from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
-import { centeredRandom, nrand, randInt } from "./components/toolbox/random";
+import { centeredRandom, nrand, randInt } from "./components/utils/random";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
 import { Star } from "./components/celestialBodies/stars/star";
+import {Algebra, LQuaternion} from "./components/utils/algebra";
 style.default;
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -52,19 +53,27 @@ player.camera.maxZ = Math.max(radius * 50, 10000);
 
 let starSystemManager = new StarSystemManager(128);
 
-let sun = new Star("Weierstrass", Math.max(nrand(0.5, 0.2),0) * radius, scene, {
+let sun = new Star("Weierstrass", Math.max(nrand(0.5, 0.2),0) * radius, new Vector3(
+    -900000,
+    0,
+    -1700000
+), scene, {
+    rotationPeriod: 60 * 60,
+    rotationAxis: Axis.Y,
+
     temperature: Math.max(nrand(5778, 2000), 0)
 });
 console.table(sun.physicalProperties);
 
-sun.mesh.position.x = -913038.375;
-sun.mesh.position.z = -1649636.25;
 starSystemManager.addStar(sun);
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
 
 let planet = new SolidPlanet("Hécate", radius, new Vector3(0, 0, 4 * radius), 1, scene, {
+    rotationPeriod: 60 * 60,
+    rotationAxis: Axis.Y,
+
     minTemperature: randInt(-50, 5),
     maxTemperature: randInt(10, 50),
     pressure: Math.max(nrand(1, 0.5), 0),
@@ -83,7 +92,8 @@ planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
 
 planet.updateColors();
 planet.attachNode.position.x = radius * 2;
-planet.attachNode.rotate(Axis.X, centeredRandom(), Space.WORLD);
+
+planet.rotate(Axis.X, centeredRandom());
 
 let ocean = new OceanPostProcess("ocean", planet, sun, scene);
 

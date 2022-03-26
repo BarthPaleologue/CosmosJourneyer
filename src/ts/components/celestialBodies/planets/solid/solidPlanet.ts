@@ -1,8 +1,8 @@
-import { ChunkForge } from "../../../forge/chunkForge";
-import { PlanetSide } from "./planetSide";
-import { Direction } from "../../../toolbox/direction";
-import { TerrainSettings } from "../../../terrain/terrainSettings";
-import { AbstractPlanet } from "../abstractPlanet";
+import {ChunkForge} from "../../../forge/chunkForge";
+import {PlanetSide} from "./planetSide";
+import {Direction} from "../../../utils/direction";
+import {TerrainSettings} from "../../../terrain/terrainSettings";
+import {AbstractPlanet} from "../abstractPlanet";
 
 import {Vector3, Mesh, Scene, ShaderMaterial, Axis, Space, Texture, Quaternion, Matrix} from "@babylonjs/core";
 
@@ -16,8 +16,9 @@ import snowNormalMap2 from "../../../../../asset/textures/snowNormalMap2.png";
 
 import sandNormalMap from "../../../../../asset/textures/sandNormalMap.jpg";
 import {CelestialBodyType, RigidBody, SolidPhysicalProperties} from "../../interfaces";
-import { CollisionData } from "../../../forge/workerDataInterfaces";
+import {CollisionData} from "../../../forge/workerDataInterfaces";
 import {TaskType} from "../../../forge/taskInterfaces";
+import {initMeshTransform} from "../../../utils/mesh";
 
 
 export interface ColorSettings {
@@ -35,9 +36,10 @@ export interface ColorSettings {
 export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     public colorSettings: ColorSettings;
-    readonly physicalProperties: SolidPhysicalProperties;
 
     readonly waterLevel: number;
+
+    readonly physicalProperties: SolidPhysicalProperties;
 
     protected bodyType = CelestialBodyType.SOLID;
 
@@ -53,6 +55,9 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     surfaceMaterial: ShaderMaterial;
 
     constructor(id: string, radius: number, position: Vector3, minDepth: number, scene: Scene, physicalProperties: SolidPhysicalProperties = {
+        rotationPeriod: 60 * 60,
+        rotationAxis: Axis.Y,
+
         minTemperature: -40,
         maxTemperature: 50,
         pressure: 1,
@@ -73,13 +78,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         //console.log(spaceBetweenVertex);
 
         this.attachNode = new Mesh(`${this._name}AttachNode`, scene);
-        this.attachNode.rotate(Axis.Y, 0, Space.WORLD); // init rotation quaternion
-        this.attachNode.position = position;
-
-        /*let nbCraters = 800;
-        let craterRadiusFactor = 1;
-        let craterSteepnessFactor = 1;
-        let craterMaxDepthFactor = 1;*/
+        this.attachNode.setAbsolutePosition(position);
+        initMeshTransform(this.attachNode);
 
         this.terrainSettings = {
             continentsFragmentation: 0.47,
@@ -156,11 +156,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         // TODO: déharcoder le bouzin
         surfaceMaterial.setFloat("maxElevation", this.terrainSettings.continentBaseHeight + this.terrainSettings.maxMountainHeight + this.terrainSettings.maxBumpHeight);
 
-        surfaceMaterial.setFloat("minTemperature", this.physicalProperties.minTemperature);
-        surfaceMaterial.setFloat("maxTemperature", this.physicalProperties.maxTemperature);
-
-        surfaceMaterial.setFloat("waterAmount", this.physicalProperties.waterAmount);
-
         this.surfaceMaterial = surfaceMaterial;
 
         this.sides = [
@@ -230,7 +225,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
      * Updates surfaceMaterial with its new values
      */
     public updateColors(): void {
-        this.surfaceMaterial.setFloat("planetRadius", this._radius);
         this.surfaceMaterial.setFloat("waterLevel", this.waterLevel);
         this.surfaceMaterial.setFloat("sandSize", this.colorSettings.sandSize);
         this.surfaceMaterial.setFloat("steepSharpness", this.colorSettings.steepSharpness);
@@ -241,24 +235,29 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.surfaceMaterial.setVector3("sandColor", this.colorSettings.sandColor);
 
         this.surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
+    }
+
+    public update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3) {
+
+        this.attachNode.rotate(this.physicalProperties.rotationAxis, this.attachNode.getEngine().getDeltaTime() / (1000 * this.physicalProperties.rotationPeriod));
+
+        this.surfaceMaterial.setVector3("playerPosition", observerPosition);
+        this.surfaceMaterial.setVector3("sunPosition", lightPosition);
+        this.surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
 
         this.surfaceMaterial.setFloat("minTemperature", this.physicalProperties.minTemperature);
         this.surfaceMaterial.setFloat("maxTemperature", this.physicalProperties.maxTemperature);
 
         this.surfaceMaterial.setFloat("waterAmount", this.physicalProperties.waterAmount);
-    }
-
-    public update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3) {
-        this.surfaceMaterial.setVector3("playerPosition", observerPosition);
-        this.surfaceMaterial.setVector3("sunPosition", lightPosition);
-        this.surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
 
         this.surfaceMaterial.setMatrix("planetWorldMatrix", this.attachNode.getWorldMatrix());
         this.updateLOD(observerPosition, observerDirection);
     }
+
     public getRelativePosition() {
         return this.attachNode.position;
     }
+
     public getAbsolutePosition() {
         return this.attachNode.getAbsolutePosition();
     }
@@ -275,7 +274,16 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         return this.attachNode.rotationQuaternion!;
     }
 
-    translate(displacement: Vector3): void {
+    public translate(displacement: Vector3): void {
         this.attachNode.position.addInPlace(displacement);
+    }
+
+    public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
+        this.attachNode.rotateAround(pivot, axis, amount);
+    }
+
+    public rotate(axis: Vector3, amount: number) {
+        this.attachNode.rotate(axis, amount, Space.WORLD);
+        this.physicalProperties.rotationAxis = this.attachNode.up;
     }
 }

@@ -43,7 +43,7 @@ export class RingsPostProcess extends PlanetPostProcess {
 
         let samplers: ShaderSamplerData = {}
 
-        super(name, "./shaders/rings", planet, sun, uniforms, samplers, scene);
+        super(name, "./shaders/rings", uniforms, samplers, planet, sun, scene);
 
         this.settings = settings;
     }

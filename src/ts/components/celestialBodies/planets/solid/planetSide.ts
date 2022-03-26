@@ -1,7 +1,7 @@
 import {Mesh, Scene, Material, Vector3} from "@babylonjs/core";
 
 import { getChunkSphereSpacePositionFromPath, PlanetChunk } from "./planetChunk";
-import { Direction } from "../../../toolbox/direction";
+import { Direction } from "../../../utils/direction";
 import { ChunkForge } from "../../../forge/chunkForge";
 import {TaskType} from "../../../forge/taskInterfaces";
 import { SolidPlanet } from "./solidPlanet";
@@ -162,7 +162,7 @@ export class PlanetSide {
                 //let c2 = dot2 > - 0.5 && absolutePosition.getMagnitude() > this.rootChunkLength / (2 ** (walked.length + 3));
 
                 //TODO: faire un vrai truc qui marche => là je perd la main sur certains chunks...
-                //tree.mesh.setEnabled(dot < 0.5);
+                tree.mesh.setEnabled(dot < 0.5);
                 //tree.mesh.setEnabled(!tree.mesh.isOccluded);
 
                 return tree;

@@ -4,6 +4,9 @@ import {CShaderData, ShaderDataType, ShaderSamplerData, ShaderUniformData} from 
 export abstract class SpacePostProcess extends PostProcess {
     camera: Camera;
 
+    uniforms: ShaderUniformData;
+    samplers: ShaderSamplerData;
+
     protected constructor(name: string, fragmentURL: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, scene: Scene) {
 
         let commonUniforms: ShaderUniformData = {
@@ -49,25 +52,28 @@ export abstract class SpacePostProcess extends PostProcess {
         this.camera = scene.activeCamera!;
         this.setCamera(this.camera);
 
+        this.uniforms = commonUniforms;
+        this.samplers = commonSamplers;
+
         this.onApply = (effect: Effect) => {
-            for(const uniformName in commonUniforms) {
-                switch (commonUniforms[uniformName].type) {
+            for(const uniformName in this.uniforms) {
+                switch (this.uniforms[uniformName].type) {
                     case ShaderDataType.Float:
-                        effect.setFloat(uniformName, (commonUniforms[uniformName] as CShaderData<number>).get());
+                        effect.setFloat(uniformName, (this.uniforms[uniformName] as CShaderData<number>).get());
                         break;
                     case ShaderDataType.Vector3:
-                        effect.setVector3(uniformName, (commonUniforms[uniformName] as CShaderData<Vector3>).get());
+                        effect.setVector3(uniformName, (this.uniforms[uniformName] as CShaderData<Vector3>).get());
                         break;
                     case ShaderDataType.Matrix:
-                        effect.setMatrix(uniformName, (commonUniforms[uniformName] as CShaderData<Matrix>).get());
+                        effect.setMatrix(uniformName, (this.uniforms[uniformName] as CShaderData<Matrix>).get());
                         break;
                 }
             }
 
-            for(const samplerName in commonSamplers) {
-                switch (commonSamplers[samplerName].type) {
+            for(const samplerName in this.samplers) {
+                switch (this.samplers[samplerName].type) {
                     case ShaderDataType.Texture:
-                        effect.setTexture(samplerName, (commonSamplers[samplerName] as CShaderData<Texture>).get());
+                        effect.setTexture(samplerName, (this.samplers[samplerName] as CShaderData<Texture>).get());
                         break;
                 }
             }

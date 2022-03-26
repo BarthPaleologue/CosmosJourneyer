@@ -23,7 +23,7 @@ export class VolumetricCloudsPostProcess extends PlanetPostProcess {
 
         let samplers: ShaderSamplerData = {}
 
-        super(name, "./shaders/volumetricClouds", planet, sun, uniforms, samplers, scene);
+        super(name, "./shaders/volumetricClouds", uniforms, samplers, planet, sun, scene);
 
         this.settings = settings;
     }

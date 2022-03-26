@@ -1,5 +1,5 @@
 import {CelestialBody} from "../celestialBody";
-import {Seedable} from "../interfaces";
+import {PlanetPhysicalProperties, Seedable} from "../interfaces";
 
 export abstract class AbstractPlanet extends CelestialBody implements Seedable {
     readonly _name: string;

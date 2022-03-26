@@ -1,4 +1,4 @@
-import { simplex401 } from "../../toolbox/simplex";
+import { simplex401 } from "../../utils/simplex";
 import { elevationFunction } from "./elevationFunction";
 import { fractalLayer3D } from "./fractalLayer3D";
 

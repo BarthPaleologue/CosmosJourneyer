@@ -66,7 +66,7 @@ export class OceanPostProcess extends PlanetPostProcess {
             }
         }
 
-        super(name, "./shaders/ocean", planet, sun, uniforms, samplers, scene);
+        super(name, "./shaders/ocean", uniforms, samplers, planet, sun, scene);
 
         this.internalTime = 0;
 

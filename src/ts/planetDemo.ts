@@ -59,9 +59,8 @@ let keyboard = new Keyboard();
 
 let starSystemManager = new StarSystemManager();
 
-let sun = new Star("Weierstrass", 0.4 * planetRadius, scene);
+let sun = new Star("Weierstrass", 0.4 * planetRadius, new Vector3(-1, 0.5, -1).scale(planetRadius * 5), scene);
 
-sun.mesh.position = new Vector3(-1, 0.5, -1).scale(planetRadius * 5);
 starSystemManager.addStar(sun);
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);

@@ -37,6 +37,22 @@ export interface Transformable {
      * @param displacement The displacement vector
      */
     translate(displacement: Vector3): void;
+
+    /**
+     * Rotates the object around a given pivot point by a given amount
+     * @param pivot The pivot point for the rotation
+     * @param axis The axis of rotation
+     * @param amount The angle of rotation in radians
+     */
+    rotateAround(pivot: Vector3, axis: Vector3, amount: number): void;
+
+    /**
+     * Rotates the object in world space by a given amount around a given axis
+     * @param axis The given axis to rotate around
+     * @param amount The amount of rotation in radians
+     */
+    rotate(axis: Vector3, amount: number): void;
+
 }
 
 export interface Seedable {
@@ -51,7 +67,8 @@ export interface RigidBody {
 }
 
 export interface BodyPhysicalProperties {
-
+    rotationPeriod: number;
+    rotationAxis: Vector3;
 }
 
 export interface StarPhysicalProperties extends BodyPhysicalProperties {

@@ -6,15 +6,15 @@ import {
     DepthRenderer,
     Tools,
     FxaaPostProcess,
-    VolumetricLightScatteringPostProcess
+    VolumetricLightScatteringPostProcess, Vector3
 } from "@babylonjs/core";
 
 import * as style from "../styles/style.scss";
 import * as style2 from "../sliderjs/style2.min.css";
-import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
-import { PlayerController } from "./components/player/playerController";
-import { Keyboard } from "./components/inputs/keyboard";
-import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
+import {StarSystemManager} from "./components/celestialBodies/starSystemManager";
+import {PlayerController} from "./components/player/playerController";
+import {Keyboard} from "./components/inputs/keyboard";
+import {StarfieldPostProcess} from "./components/postProcesses/starfieldPostProcess";
 import {Star} from "./components/celestialBodies/stars/star";
 
 style.default;
@@ -47,9 +47,8 @@ let keyboard = new Keyboard();
 
 let starSystemManager = new StarSystemManager();
 
-let sun = new Star("Weierstrass", starRadius, scene);
+let sun = new Star("Weierstrass", starRadius, new Vector3(0, 0, starRadius * 3), scene);
 
-sun.mesh.position.z = starRadius * 3;
 starSystemManager.addStar(sun);
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
@@ -70,7 +69,7 @@ new Slider("temperature", document.getElementById("temperature")!, 3000, 15000, 
 
 document.addEventListener("keyup", e => {
     if (e.key == "p") { // take screenshots
-        Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
+        Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, {precision: 4});
     }
 });
 

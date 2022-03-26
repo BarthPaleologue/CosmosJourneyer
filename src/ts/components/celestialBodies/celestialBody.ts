@@ -1,11 +1,12 @@
 import { Vector3, Quaternion } from "@babylonjs/core";
-import {Algebra} from "../toolbox/algebra";
+import {Algebra} from "../utils/algebra";
 import {CelestialBodyType, Transformable} from "./interfaces";
 
+//TODO: en faire une interface ici la classe abstraite n'apporte rien
 export abstract class CelestialBody implements Transformable {
     protected abstract bodyType: CelestialBodyType;
     protected constructor() {
-        //TODO: réunir les attributs fondamentaux de tous les celestialBodies
+
     }
 
     public abstract getName(): string;
@@ -29,4 +30,8 @@ export abstract class CelestialBody implements Transformable {
     }
 
     public abstract translate(displacement: Vector3): void;
+
+    public abstract rotateAround(pivot: Vector3, axis: Vector3, amount: number): void;
+
+    public abstract rotate(axis: Vector3, amount: number): void;
 }
