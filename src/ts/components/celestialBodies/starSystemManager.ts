@@ -47,7 +47,9 @@ export class StarSystemManager {
         this._chunkForge.update(depthRenderer);
         // TODO : il faudra update les planètes des plus lointaines au plus proches quand il y aura les postprocess
         for (const planet of this._celestialBodies) {
-            planet.update(player.mesh.position, player.getForwardDirection(), lightOrigin);
+            planet.update(player, lightOrigin);
         }
+        this.translateAllCelestialBody(player.getAbsolutePosition().scale(-1));
+        player.translate(player.getAbsolutePosition().scale(-1));
     }
 }

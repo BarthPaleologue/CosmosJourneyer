@@ -179,8 +179,10 @@ function updateScene() {
 
     if (player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() < player.nearestBody.getRadius() * 2) {
         document.getElementById("planetName")!.innerText = player.nearestBody.getName();
+        player.isOrbiting = true;
     } else {
         document.getElementById("planetName")!.innerText = "Outer Space";
+        player.isOrbiting = false;
     }
 
     starSystemManager.update(player, sun.mesh.position, depthRenderer);

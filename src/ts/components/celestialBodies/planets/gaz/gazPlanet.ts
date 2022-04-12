@@ -2,6 +2,7 @@ import {Vector3, Quaternion} from "@babylonjs/core";
 
 import {AbstractPlanet} from "../abstractPlanet";
 import {CelestialBodyType} from "../../interfaces";
+import {PlayerController} from "../../../player/playerController";
 
 export class GazPlanet extends AbstractPlanet {
     protected bodyType = CelestialBodyType.GAZ;
@@ -24,7 +25,7 @@ export class GazPlanet extends AbstractPlanet {
         throw new Error("Method not implemented.");
     }
 
-    update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3): void {
+    update(player: PlayerController, lightPosition: Vector3): void {
         // TODO: update planet
         throw new Error("Method not implemented.");
     }

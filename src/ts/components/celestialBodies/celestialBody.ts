@@ -1,6 +1,7 @@
 import { Vector3, Quaternion } from "@babylonjs/core";
 import {Algebra} from "../utils/algebra";
 import {CelestialBodyType, Transformable} from "./interfaces";
+import {PlayerController} from "../player/playerController";
 
 //TODO: en faire une interface ici la classe abstraite n'apporte rien
 export abstract class CelestialBody implements Transformable {
@@ -17,7 +18,7 @@ export abstract class CelestialBody implements Transformable {
         return this.bodyType;
     }
     public abstract getRadius(): number;
-    public abstract update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3): void;
+    public abstract update(player: PlayerController, lightPosition: Vector3): void;
 
     public getOriginBodySpaceSamplePosition(): Vector3 {
         let position = this.getAbsolutePosition().clone(); // position de la planète / au joueur

@@ -19,6 +19,7 @@ import {CelestialBodyType, RigidBody, SolidPhysicalProperties} from "../../inter
 import {CollisionData} from "../../../forge/workerDataInterfaces";
 import {TaskType} from "../../../forge/taskInterfaces";
 import {initMeshTransform} from "../../../utils/mesh";
+import {PlayerController} from "../../../player/playerController";
 
 
 export interface ColorSettings {
@@ -55,7 +56,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     surfaceMaterial: ShaderMaterial;
 
     constructor(id: string, radius: number, position: Vector3, minDepth: number, scene: Scene, physicalProperties: SolidPhysicalProperties = {
-        rotationPeriod: 60 * 60,
+        rotationPeriod: 60 * 60 * 3600 * 24,
         rotationAxis: Axis.Y,
 
         minTemperature: -40,
@@ -237,11 +238,21 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
     }
 
-    public update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3) {
+    public update(player: PlayerController, lightPosition: Vector3) {
 
-        this.attachNode.rotate(this.physicalProperties.rotationAxis, this.attachNode.getEngine().getDeltaTime() / (1000 * this.physicalProperties.rotationPeriod));
+        let dtheta = this.attachNode.getEngine().getDeltaTime() / (1000 * this.physicalProperties.rotationPeriod)
+        this.attachNode.rotate(this.physicalProperties.rotationAxis, dtheta);
 
-        this.surfaceMaterial.setVector3("playerPosition", observerPosition);
+        //TODO: check scheme to make the player rotate with the planet
+        if(player.isOrbiting && player.nearestBody?.getName() == this.getName()) {
+            let relativePosition = player.getAbsolutePosition().subtract(this.getAbsolutePosition());
+            let y = Vector3.Dot(relativePosition, this.physicalProperties.rotationAxis);
+            let pivot = this.getAbsolutePosition().add(this.physicalProperties.rotationAxis.scale(y));
+            let upVector = new Vector3(0,1,0);
+            player.rotateAround(this.getAbsolutePosition(), this.attachNode.up, dtheta);
+        }
+
+        this.surfaceMaterial.setVector3("playerPosition", player.getAbsolutePosition());
         this.surfaceMaterial.setVector3("sunPosition", lightPosition);
         this.surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
 
@@ -251,7 +262,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.surfaceMaterial.setFloat("waterAmount", this.physicalProperties.waterAmount);
 
         this.surfaceMaterial.setMatrix("planetWorldMatrix", this.attachNode.getWorldMatrix());
-        this.updateLOD(observerPosition, observerDirection);
+        this.updateLOD(player.getAbsolutePosition(), player.getForwardDirection());
     }
 
     public getRelativePosition() {
@@ -259,7 +270,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     }
 
     public getAbsolutePosition() {
-        return this.attachNode.getAbsolutePosition();
+        return this.attachNode.getAbsolutePosition().clone();
     }
 
     public override getRadius(): number {

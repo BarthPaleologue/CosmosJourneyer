@@ -4,6 +4,7 @@ import {CelestialBody} from "../celestialBody";
 import {Axis, Mesh, Quaternion, Scene, ShaderMaterial, Space, Vector3} from "@babylonjs/core";
 import {CelestialBodyType, StarPhysicalProperties} from "../interfaces";
 import {initMeshTransform} from "../../utils/mesh";
+import {PlayerController} from "../../player/playerController";
 
 // TODO: implement RigidBody for star
 export class Star extends CelestialBody {
@@ -62,7 +63,7 @@ export class Star extends CelestialBody {
         this.physicalProperties.rotationAxis = this.mesh.up;
     }
 
-    public update(observerPosition: Vector3, observerDirection: Vector3, lightPosition: Vector3): void {
+    public update(player: PlayerController, lightPosition: Vector3): void {
         this.mesh.rotate(this.physicalProperties.rotationAxis, this.mesh.getEngine().getDeltaTime() / (1000 * this.physicalProperties.rotationPeriod));
 
         this.starMaterial.setFloat("time", this.internalTime);

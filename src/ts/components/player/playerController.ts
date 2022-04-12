@@ -1,13 +1,17 @@
-import {Vector3, FreeCamera, Mesh, StandardMaterial, Color3, Axis, Space, Scene} from "@babylonjs/core";
+import {Vector3, FreeCamera, Mesh, StandardMaterial, Color3, Axis, Space, Scene, Quaternion} from "@babylonjs/core";
 
-import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
-import { Keyboard } from "../inputs/keyboard";
-import { Mouse } from "../inputs/mouse";
+import {Gamepad, GamepadAxis, GamepadButton} from "../inputs/gamepad";
+import {Keyboard} from "../inputs/keyboard";
+import {Mouse} from "../inputs/mouse";
 import {CelestialBody} from "../celestialBodies/celestialBody";
+import {Transformable} from "../celestialBodies/interfaces";
+import {Algebra} from "../utils/algebra";
 
-export class PlayerController {
+export class PlayerController implements Transformable {
 
     nearestBody: CelestialBody | null;
+    isOrbiting: boolean = false;
+
     collisionRadius = 100;
 
     camera: FreeCamera;
@@ -200,5 +204,32 @@ export class PlayerController {
         return deplacement.scale(-1);
     }
 
+    public getAbsolutePosition(): Vector3 {
+        return this.mesh.getAbsolutePosition();
+    }
 
+    setAbsolutePosition(newPosition: Vector3): void {
+        this.mesh.setAbsolutePosition(newPosition);
+    }
+    getRotationQuaternion(): Quaternion {
+        return this.mesh.rotationQuaternion!;
+    }
+    getOriginBodySpaceSamplePosition(): Vector3 {
+        let position = this.getAbsolutePosition().clone(); // position de la planète / au joueur
+        position.scaleInPlace(-1); // position du joueur / au centre de la planète
+
+        // on applique le quaternion inverse pour obtenir le sample point correspondant à la planète rotatée (fais un dessin si c'est pas clair)
+        Algebra.applyQuaternionInPlace(Quaternion.Inverse(this.getRotationQuaternion()), position);
+
+        return position;
+    }
+    translate(displacement: Vector3): void {
+        this.mesh.position.addInPlace(displacement);
+    }
+    rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
+        this.mesh.rotateAround(pivot, axis, amount);
+    }
+    rotate(axis: Vector3, amount: number): void {
+        this.mesh.rotate(axis, amount, Space.WORLD);
+    }
 }
