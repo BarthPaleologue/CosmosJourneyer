@@ -51,14 +51,14 @@ player.camera.maxZ = Math.max(radius * 50, 10000);
 
 
 
-let starSystemManager = new StarSystemManager(128);
+let starSystemManager = new StarSystemManager(64);
 
 let sun = new Star("Weierstrass", Math.max(nrand(0.5, 0.2),0) * radius, new Vector3(
     -900000,
     0,
     -1700000
 ), scene, {
-    rotationPeriod: 60 * 60,
+    rotationPeriod: 60 * 60 * 24,
     rotationAxis: Axis.Y,
 
     temperature: Math.max(nrand(5778, 2000), 0)
