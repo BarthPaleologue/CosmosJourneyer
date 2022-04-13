@@ -241,15 +241,11 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     public update(player: PlayerController, lightPosition: Vector3) {
 
         let dtheta = this.attachNode.getEngine().getDeltaTime() / (1000 * this.physicalProperties.rotationPeriod)
-        this.attachNode.rotate(this.physicalProperties.rotationAxis, dtheta);
+        this.attachNode.rotate(this.physicalProperties.rotationAxis, dtheta, Space.WORLD);
 
-        //TODO: check scheme to make the player rotate with the planet
+        //TODO: put this in the abstract super class i believe it can be done
         if(player.isOrbiting && player.nearestBody?.getName() == this.getName()) {
-            let relativePosition = player.getAbsolutePosition().subtract(this.getAbsolutePosition());
-            let y = Vector3.Dot(relativePosition, this.physicalProperties.rotationAxis);
-            let pivot = this.getAbsolutePosition().add(this.physicalProperties.rotationAxis.scale(y));
-            let upVector = new Vector3(0,1,0);
-            player.rotateAround(this.getAbsolutePosition(), this.attachNode.up, dtheta);
+            player.rotateAround(this.getAbsolutePosition(), this.physicalProperties.rotationAxis, dtheta);
         }
 
         this.surfaceMaterial.setVector3("playerPosition", player.getAbsolutePosition());
@@ -295,6 +291,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     public rotate(axis: Vector3, amount: number) {
         this.attachNode.rotate(axis, amount, Space.WORLD);
-        this.physicalProperties.rotationAxis = this.attachNode.up;
+        this.physicalProperties.rotationAxis = Vector3.TransformCoordinates(this.physicalProperties.rotationAxis, Matrix.RotationAxis(axis, amount));
     }
 }
