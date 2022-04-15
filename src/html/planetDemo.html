@@ -11,13 +11,31 @@
 </head>
 
 <body>
-    <div id="ui">
-
+    <nav>
+        <div id="generalLink">General</div>
+        <div id="oceanLink">Ocean</div>
+        <div id="surfaceLink">Surface</div>
+        <div id="cloudsLink">Clouds</div>
+        <div id="atmosphereLink">Atmosphere</div>
+        <div id="ringsLink">Rings</div>
+    </nav>
+    <div class="ui" id="generalUI">
         <h1>General</h1>
 
         <p>Zoom : </p>
         <div id="zoom"></div>
 
+        <p>Sun Orientation : </p>
+        <div id="sunOrientation"></div>
+
+        <p>Time speed : </p>
+        <div id="timeModifier"></div>
+
+        <p>Camera FOV : </p>
+        <div id="cameraFOV"></div>
+    </div>
+
+    <div hidden class="ui" id="oceanUI">
         <h1>Ocean</h1>
 
         <div id="oceanToggler" class="container">
@@ -31,6 +49,9 @@
 
         <p>Depth Modifier : </p>
         <div id="depthModifier"></div>
+
+    </div>
+    <div hidden class="ui" id="surfaceUI">
 
         <h1>Surface Color</h1>
 
@@ -64,6 +85,9 @@
         <p>Normal Sharpness : </p>
         <div id="normalSharpness"></div>
 
+    </div>
+    <div hidden class="ui" id="cloudsUI">
+
         <h1>Clouds</h1>
 
         <div id="cloudsToggler" class="container">
@@ -87,6 +111,9 @@
         <p>Detail speed : </p>
         <div id="detailSpeed"></div>
 
+    </div>
+
+    <div hidden class="ui" id="atmosphereUI">
         <h1>Atmosphere</h1>
 
         <div id="atmosphereToggler" class="container">
@@ -116,6 +143,9 @@
         <p>"Blue" Wavelength : </p>
         <div id="blueWaveLength"></div>
 
+    </div>
+    <div hidden class="ui" id="ringsUI">
+
         <h1>Rings</h1>
 
         <div id="ringsToggler" class="container">
@@ -135,18 +165,9 @@
 
         <p>Rings Opacity : </p>
         <div id="ringsOpacity"></div>
-
-        <h1>View</h1>
-
-        <p>Sun Orientation : </p>
-        <div id="sunOrientation"></div>
-
-        <p>Planet Rotation : </p>
-        <div id="planetRotation"></div>
-
-        <p>Camera FOV : </p>
-        <div id="cameraFOV"></div>
     </div>
+
+
     <canvas id="renderer"></canvas>
 </body>
 

@@ -47,8 +47,8 @@ scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
+let timeMultiplicator = 500;
 const planetRadius = 1000e3;
-
 
 let player = new PlayerController(scene);
 player.setSpeed(0.2 * planetRadius);
@@ -56,29 +56,22 @@ player.camera.maxZ = planetRadius * 20;
 
 let keyboard = new Keyboard();
 
-
 let starSystemManager = new StarSystemManager();
 
 let sun = new Star("Weierstrass", 0.4 * planetRadius, new Vector3(-1, 0.5, -1).scale(planetRadius * 5), scene);
-
 starSystemManager.addStar(sun);
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
-
-let planet = new SolidPlanet("Gaia", planetRadius, Vector3.Zero(), 2, scene);
-planet.attachNode.position.z = planetRadius * 3;
-planet.attachNode.rotation.x = -0.2;
+let planet = new SolidPlanet("Gaia", planetRadius, new Vector3(0, 0, planetRadius*3), 2, scene);
+planet.rotate(Axis.X, 0.2);
 
 planet.colorSettings.steepSharpness = 3;
 planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
-
 planet.colorSettings.sandSize = 300;
-
 planet.updateColors();
 
 starSystemManager.addSolidPlanet(planet);
-
 
 let ocean = new OceanPostProcess("ocean", planet, sun, scene);
 
@@ -96,9 +89,11 @@ vls.decay = 0.95;
 
 //#region Sliders
 
-new Slider("zoom", document.getElementById("zoom")!, 0, 100, 100 * planet._radius / planet.attachNode.position.z, (value: number) => {
+let sliders: Slider[] = [];
+
+sliders.push(new Slider("zoom", document.getElementById("zoom")!, 0, 100, 100 * planet._radius / planet.attachNode.position.z, (value: number) => {
     planet.attachNode.position.z = 100 * planet._radius / (value);
-});
+}));
 
 
 document.getElementById("oceanToggler")?.addEventListener("click", () => {
@@ -107,13 +102,13 @@ document.getElementById("oceanToggler")?.addEventListener("click", () => {
     ocean.settings.oceanRadius = checkbox.checked ? planet.getRadius() : 0;
 });
 
-new Slider("alphaModifier", document.getElementById("alphaModifier")!, 0, 200, ocean.settings.alphaModifier * 10000, (val: number) => {
+sliders.push(new Slider("alphaModifier", document.getElementById("alphaModifier")!, 0, 200, ocean.settings.alphaModifier * 10000, (val: number) => {
     ocean.settings.alphaModifier = val / 10000;
-});
+}));
 
-new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 70, ocean.settings.depthModifier * 10000, (val: number) => {
+sliders.push(new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 70, ocean.settings.depthModifier * 10000, (val: number) => {
     ocean.settings.depthModifier = val / 10000;
-});
+}));
 
 function babylonToHex(color: Vector3): string {
     let c2 = new Color3(color.x, color.y, color.z);
@@ -152,20 +147,20 @@ sandColorPicker.addEventListener("input", () => {
     planet.updateColors();
 });
 
-new Slider("sandSize", document.getElementById("sandSize")!, 0, 300, planet.colorSettings.sandSize / 10, (val: number) => {
+sliders.push(new Slider("sandSize", document.getElementById("sandSize")!, 0, 300, planet.colorSettings.sandSize / 10, (val: number) => {
     planet.colorSettings.sandSize = val * 10;
     planet.updateColors();
-});
+}));
 
-new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 50, planet.colorSettings.steepSharpness * 10, (val: number) => {
+sliders.push(new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 50, planet.colorSettings.steepSharpness * 10, (val: number) => {
     planet.colorSettings.steepSharpness = val / 10;
     planet.updateColors();
-});
+}));
 
-new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 30, planet.colorSettings.normalSharpness * 10, (val: number) => {
+sliders.push(new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 30, planet.colorSettings.normalSharpness * 10, (val: number) => {
     planet.colorSettings.normalSharpness = val / 10;
     planet.updateColors();
-});
+}));
 
 document.getElementById("cloudsToggler")?.addEventListener("click", () => {
     let checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
@@ -173,25 +168,25 @@ document.getElementById("cloudsToggler")?.addEventListener("click", () => {
     flatClouds.settings.cloudLayerRadius = checkbox.checked ? planetRadius + 15e3 : 0;
 });
 
-new Slider("cloudFrequency", document.getElementById("cloudFrequency")!, 0, 20, flatClouds.settings.cloudFrequency, (val: number) => {
+sliders.push(new Slider("cloudFrequency", document.getElementById("cloudFrequency")!, 0, 20, flatClouds.settings.cloudFrequency, (val: number) => {
     flatClouds.settings.cloudFrequency = val;
-});
+}));
 
-new Slider("cloudDetailFrequency", document.getElementById("cloudDetailFrequency")!, 0, 50, flatClouds.settings.cloudDetailFrequency, (val: number) => {
+sliders.push(new Slider("cloudDetailFrequency", document.getElementById("cloudDetailFrequency")!, 0, 50, flatClouds.settings.cloudDetailFrequency, (val: number) => {
     flatClouds.settings.cloudDetailFrequency = val;
-});
+}));
 
-new Slider("cloudPower", document.getElementById("cloudPower")!, 0, 100, flatClouds.settings.cloudPower * 10, (val: number) => {
+sliders.push(new Slider("cloudPower", document.getElementById("cloudPower")!, 0, 100, flatClouds.settings.cloudPower * 10, (val: number) => {
     flatClouds.settings.cloudPower = val / 10;
-});
+}));
 
-new Slider("worleySpeed", document.getElementById("worleySpeed")!, 0.0, 200.0, flatClouds.settings.worleySpeed * 10, (val: number) => {
+sliders.push(new Slider("worleySpeed", document.getElementById("worleySpeed")!, 0.0, 200.0, flatClouds.settings.worleySpeed * 10, (val: number) => {
     flatClouds.settings.worleySpeed = val / 10;
-});
+}));
 
-new Slider("detailSpeed", document.getElementById("detailSpeed")!, 0, 200, flatClouds.settings.detailSpeed * 10, (val: number) => {
+sliders.push(new Slider("detailSpeed", document.getElementById("detailSpeed")!, 0, 200, flatClouds.settings.detailSpeed * 10, (val: number) => {
     flatClouds.settings.detailSpeed = val / 10;
-});
+}));
 
 document.getElementById("atmosphereToggler")?.addEventListener("click", () => {
     let checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
@@ -199,34 +194,33 @@ document.getElementById("atmosphereToggler")?.addEventListener("click", () => {
     atmosphere.settings.atmosphereRadius = checkbox.checked ? planetRadius + 100e3 : 0;
 });
 
-new Slider("intensity", document.getElementById("intensity")!, 0, 40, atmosphere.settings.intensity, (val: number) => {
+sliders.push(new Slider("intensity", document.getElementById("intensity")!, 0, 40, atmosphere.settings.intensity, (val: number) => {
     atmosphere.settings.intensity = val;
-});
+}));
 
-new Slider("atmosphereRadius", document.getElementById("atmosphereRadius")!, 0, 100, (atmosphere.settings.atmosphereRadius - planetRadius) / 10000, (val: number) => {
+sliders.push(new Slider("atmosphereRadius", document.getElementById("atmosphereRadius")!, 0, 100, (atmosphere.settings.atmosphereRadius - planetRadius) / 10000, (val: number) => {
     atmosphere.settings.atmosphereRadius = planetRadius + val * 10000;
-});
+}));
 
-
-new Slider("scatteringStrength", document.getElementById("scatteringStrength")!, 0, 40, atmosphere.settings.scatteringStrength * 10, (val: number) => {
+sliders.push(new Slider("scatteringStrength", document.getElementById("scatteringStrength")!, 0, 40, atmosphere.settings.scatteringStrength * 10, (val: number) => {
     atmosphere.settings.scatteringStrength = val / 10;
-});
+}));
 
-new Slider("falloff", document.getElementById("falloff")!, -10, 200, atmosphere.settings.falloffFactor, (val: number) => {
+sliders.push(new Slider("falloff", document.getElementById("falloff")!, -10, 200, atmosphere.settings.falloffFactor, (val: number) => {
     atmosphere.settings.falloffFactor = val;
-});
+}));
 
-new Slider("redWaveLength", document.getElementById("redWaveLength")!, 0, 1000, atmosphere.settings.redWaveLength, (val: number) => {
+sliders.push(new Slider("redWaveLength", document.getElementById("redWaveLength")!, 0, 1000, atmosphere.settings.redWaveLength, (val: number) => {
     atmosphere.settings.redWaveLength = val;
-});
+}));
 
-new Slider("greenWaveLength", document.getElementById("greenWaveLength")!, 0, 1000, atmosphere.settings.greenWaveLength, (val: number) => {
+sliders.push(new Slider("greenWaveLength", document.getElementById("greenWaveLength")!, 0, 1000, atmosphere.settings.greenWaveLength, (val: number) => {
     atmosphere.settings.greenWaveLength = val;
-});
+}));
 
-new Slider("blueWaveLength", document.getElementById("blueWaveLength")!, 0, 1000, atmosphere.settings.blueWaveLength, (val: number) => {
+sliders.push(new Slider("blueWaveLength", document.getElementById("blueWaveLength")!, 0, 1000, atmosphere.settings.blueWaveLength, (val: number) => {
     atmosphere.settings.blueWaveLength = val;
-});
+}));
 
 document.getElementById("ringsToggler")?.addEventListener("click", () => {
     let checkbox = document.querySelectorAll("input[type='checkbox']")[3] as HTMLInputElement;
@@ -234,42 +228,37 @@ document.getElementById("ringsToggler")?.addEventListener("click", () => {
     rings.settings.ringFrequency = checkbox.checked ? 30 : 0;
 });
 
-new Slider("ringsMinRadius", document.getElementById("ringsMinRadius")!, 100, 200, rings.settings.ringStart * 100, (val: number) => {
+sliders.push(new Slider("ringsMinRadius", document.getElementById("ringsMinRadius")!, 100, 200, rings.settings.ringStart * 100, (val: number) => {
     rings.settings.ringStart = val / 100;
-});
+}));
 
-new Slider("ringsMaxRadius", document.getElementById("ringsMaxRadius")!, 150, 400, rings.settings.ringEnd * 100, (val: number) => {
+sliders.push(new Slider("ringsMaxRadius", document.getElementById("ringsMaxRadius")!, 150, 400, rings.settings.ringEnd * 100, (val: number) => {
     rings.settings.ringEnd = val / 100;
-});
+}));
 
-new Slider("ringsFrequency", document.getElementById("ringsFrequency")!, 10, 100, rings.settings.ringFrequency, (val: number) => {
+sliders.push(new Slider("ringsFrequency", document.getElementById("ringsFrequency")!, 10, 100, rings.settings.ringFrequency, (val: number) => {
     rings.settings.ringFrequency = val;
-});
+}));
 
-new Slider("ringsOpacity", document.getElementById("ringsOpacity")!, 0, 100, rings.settings.ringOpacity * 100, (val: number) => {
+sliders.push(new Slider("ringsOpacity", document.getElementById("ringsOpacity")!, 0, 100, rings.settings.ringOpacity * 100, (val: number) => {
     rings.settings.ringOpacity = val / 100;
-});
+}));
 
 let sunOrientation = 220;
-new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
+sliders.push(new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
     sun.mesh.rotateAround(planet.getAbsolutePosition(), new Vector3(0,1,0), -2*Math.PI*(val - sunOrientation)/360);
     sunOrientation = val;
-});
+}));
 
-let rotationSpeed = 0.5;
-new Slider("planetRotation", document.getElementById("planetRotation")!, 0, 20, rotationSpeed * 10, (val: number) => {
-    rotationSpeed = (val / 10) ** 5;
-});
+sliders.push(new Slider("timeModifier", document.getElementById("timeModifier")!, 0, 1000, Number(Math.sqrt(timeMultiplicator).toFixed(0)), (val: number) => {
+    timeMultiplicator = val ** 2;
+}));
 
-new Slider("cameraFOV", document.getElementById("cameraFOV")!, 0, 360, player.camera.fov * 360 / Math.PI, (val: number) => {
+sliders.push(new Slider("cameraFOV", document.getElementById("cameraFOV")!, 0, 360, player.camera.fov * 360 / Math.PI, (val: number) => {
     player.camera.fov = val * Math.PI / 360;
-});
+}));
 
 //#endregion
-
-document.getElementById("randomCraters")?.addEventListener("click", () => {
-    //planet.regenerateCraters();
-});
 
 document.addEventListener("keyup", e => {
     if (e.key == "p") { // take screenshots
@@ -280,8 +269,21 @@ document.addEventListener("keyup", e => {
     }
 });
 
+let currentUI: HTMLElement | null = null;
+for(const link of document.querySelector("nav")!.children) {
+    link.addEventListener("click", e => {
+       let id = link.id.substring(0, link.id.length-4) + "UI";
+       if(currentUI != null) currentUI.hidden = true;
+       currentUI = document.getElementById(id)!;
+       currentUI.hidden = false;
+       for(const slider of sliders) {
+           slider.update();
+       }
+    });
+}
+
 window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth - (document.getElementById("ui")?.clientWidth || 0); // on compte le panneau
+    canvas.width = window.innerWidth - (currentUI?.clientWidth || 0); // on compte le panneau
     canvas.height = window.innerHeight;
     engine.resize();
 });
@@ -290,13 +292,14 @@ scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
 
-        let deplacement = player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000);
+        let deltaTime = engine.getDeltaTime() / 1000;
 
+        player.nearestBody = starSystemManager.getNearestBody();
+
+        let deplacement = player.listenToKeyboard(keyboard, deltaTime);
         starSystemManager.translateAllCelestialBody(deplacement);
 
-        planet.attachNode.rotate(Axis.Y, .001 * rotationSpeed, Space.LOCAL);
-
-        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, engine.getDeltaTime() / 1000);
+        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime * timeMultiplicator);
 
         scene.render();
     });
