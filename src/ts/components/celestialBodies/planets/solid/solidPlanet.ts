@@ -56,7 +56,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     surfaceMaterial: ShaderMaterial;
 
     constructor(id: string, radius: number, position: Vector3, minDepth: number, scene: Scene, physicalProperties: SolidPhysicalProperties = {
-        rotationPeriod: 60 * 60 * 3600 * 24,
+        rotationPeriod: 60 * 60 * 24,
         rotationAxis: Axis.Y,
 
         minTemperature: -40,

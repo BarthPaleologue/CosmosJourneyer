@@ -16,7 +16,7 @@ export class Star extends CelestialBody {
     physicalProperties: StarPhysicalProperties;
     constructor(name: string, radius: number, position: Vector3, scene: Scene, physicalProperties: StarPhysicalProperties = {
         //TODO: ne pas hardcoder
-        rotationPeriod: 60 * 60,
+        rotationPeriod: 24 * 60 * 60,
         rotationAxis: Axis.Y,
 
         temperature: 5778
