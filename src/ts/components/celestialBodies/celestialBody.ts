@@ -46,7 +46,7 @@ export abstract class CelestialBody implements Transformable {
     public update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
         let dtheta = deltaTime / this.physicalProperties.rotationPeriod;
 
-        if(player.isOrbiting && player.nearestBody?.getName() == this.getName()) {
+        if(player.isOrbiting() && player.nearestBody?.getName() == this.getName()) {
             player.rotateAround(this.getAbsolutePosition(), this.physicalProperties.rotationAxis, dtheta);
         }
     }

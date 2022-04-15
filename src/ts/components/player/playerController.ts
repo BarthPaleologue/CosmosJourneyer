@@ -10,7 +10,6 @@ import {Algebra} from "../utils/algebra";
 export class PlayerController implements Transformable {
 
     nearestBody: CelestialBody | null;
-    isOrbiting: boolean = false;
 
     collisionRadius = 100;
 
@@ -55,7 +54,7 @@ export class PlayerController implements Transformable {
     /* #region directions */
 
     /**
-     * 
+     *
      * @returns the unit vector pointing forward the player controler in world space
      */
     public getForwardDirection(): Vector3 {
@@ -63,7 +62,7 @@ export class PlayerController implements Transformable {
     }
 
     /**
-     * 
+     *
      * @returns the unit vector pointing backward the player controler in world space
      */
     public getBackwardDirection(): Vector3 {
@@ -71,7 +70,7 @@ export class PlayerController implements Transformable {
     }
 
     /**
-     * 
+     *
      * @returns the unit vector pointing upward the player controler in world space
      */
     public getUpwardDirection(): Vector3 {
@@ -79,7 +78,7 @@ export class PlayerController implements Transformable {
     }
 
     /**
-     * 
+     *
      * @returns the unit vector pointing downward the player controler in world space
      */
     public getDownwardDirection(): Vector3 {
@@ -87,7 +86,7 @@ export class PlayerController implements Transformable {
     }
 
     /**
-     * 
+     *
      * @returns the unit vector pointing to the right of the player controler in world space
      */
     public getRightDirection(): Vector3 {
@@ -95,12 +94,13 @@ export class PlayerController implements Transformable {
     }
 
     /**
-     * 
+     *
      * @returns the unit vector pointing to the left of the player controler in world space
      */
     public getLeftDirection(): Vector3 {
         return this.getRightDirection().scale(-1);
     }
+
     /* #endregion directions */
 
     /**
@@ -211,9 +211,11 @@ export class PlayerController implements Transformable {
     setAbsolutePosition(newPosition: Vector3): void {
         this.mesh.setAbsolutePosition(newPosition);
     }
+
     getRotationQuaternion(): Quaternion {
         return this.mesh.rotationQuaternion!;
     }
+
     getOriginBodySpaceSamplePosition(): Vector3 {
         let position = this.getAbsolutePosition().clone(); // position de la planète / au joueur
         position.scaleInPlace(-1); // position du joueur / au centre de la planète
@@ -223,13 +225,22 @@ export class PlayerController implements Transformable {
 
         return position;
     }
+
     translate(displacement: Vector3): void {
         this.mesh.position.addInPlace(displacement);
     }
+
     rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
         this.mesh.rotateAround(pivot, axis, amount);
     }
+
     rotate(axis: Vector3, amount: number): void {
         this.mesh.rotate(axis, amount, Space.WORLD);
+    }
+
+    public isOrbiting(): boolean {
+        const orbitLimitFactor = 2.5;
+        if (this.nearestBody == null) return false;
+        else return this.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * this.nearestBody.getRadius()) ** 2;
     }
 }

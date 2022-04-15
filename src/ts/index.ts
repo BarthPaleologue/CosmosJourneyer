@@ -87,21 +87,19 @@ scene.onBeforeDrawPhaseObservable.add((scene, state) => {
 let starSystemManager = new StarSystemManager(64);
 
 let sun = new Star("Weierstrass", 0.4 * radius, new Vector3(-910000, 0, -1700000), scene);
-
 starSystemManager.addStar(sun);
 
 depthRenderer.getDepthMap().renderList?.push(sun.mesh);
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
-let planet = new SolidPlanet("Hécate", radius, new Vector3(0, 0, 4 * radius), 1, scene);
+let planet = new SolidPlanet("Hécate", radius, new Vector3(radius * 5, 0, 4 * radius), 1, scene);
 planet.physicalProperties.rotationPeriod = 24 * 60 * 60;
+
 planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.steepSharpness = 3;
-
 planet.updateColors();
-planet.attachNode.position.x = radius * 5;
 
 planet.rotate(Axis.X, 0.2);
 
@@ -142,7 +140,7 @@ moon.translate(planet.attachNode.getAbsolutePosition());
 starSystemManager.addSolidPlanet(moon);
 
 let Ares = new SolidPlanet("Ares", radius, new Vector3(0, 0, 4 * radius), 1, scene, {
-    rotationPeriod: 60 * 60,
+    rotationPeriod: 24 * 60 * 60,
     rotationAxis: Axis.Y,
 
     minTemperature: -80,
@@ -150,15 +148,17 @@ let Ares = new SolidPlanet("Ares", radius, new Vector3(0, 0, 4 * radius), 1, sce
     pressure: 0.5,
     waterAmount: 0.3
 });
+
 Ares.terrainSettings.continentsFragmentation = 0.7;
 Ares.terrainSettings.continentBaseHeight = 4e3;
 Ares.terrainSettings.maxMountainHeight = 15e3;
 Ares.terrainSettings.mountainsMinValue = 0.7;
+
 Ares.colorSettings.sandColor = Ares.colorSettings.plainColor;
 Ares.colorSettings.steepSharpness = 2;
-
 Ares.updateColors();
-Ares.attachNode.position.x = -radius * 4;
+
+Ares.translate(new Vector3(-radius * 4, 0, 0));
 
 let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, scene);
 atmosphere2.settings.intensity = 15 * Ares.physicalProperties.pressure;
@@ -185,13 +185,11 @@ function updateScene() {
 
     if (player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() < player.nearestBody.getRadius() * 2) {
         document.getElementById("planetName")!.innerText = player.nearestBody.getName();
-        player.isOrbiting = true;
     } else {
         document.getElementById("planetName")!.innerText = "Outer Space";
-        player.isOrbiting = false;
     }
 
-    starSystemManager.update(player, sun.mesh.position, depthRenderer, timeMultiplicator * deltaTime);
+    starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, timeMultiplicator * deltaTime);
 
     if (isMouseEnabled) {
         player.listenToMouse(mouse, deltaTime);
