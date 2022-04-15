@@ -1,14 +1,24 @@
 import {Vector3, Quaternion} from "@babylonjs/core";
 
 import {AbstractPlanet} from "../abstractPlanet";
-import {CelestialBodyType} from "../../interfaces";
+import {CelestialBodyType, PlanetPhysicalProperties} from "../../interfaces";
 import {PlayerController} from "../../../player/playerController";
 
 export class GazPlanet extends AbstractPlanet {
     protected bodyType = CelestialBodyType.GAZ;
 
+    override readonly physicalProperties: PlanetPhysicalProperties;
+
     constructor(name: string, radius: number) {
         super(name, radius);
+        this.physicalProperties = {
+            // FIXME: choose physically accurates values
+            rotationPeriod: 1 * 24 * 60 * 60,
+            rotationAxis: new Vector3(0, 1, 0),
+            minTemperature: 100,
+            maxTemperature: 110,
+            pressure: 1
+        }
     }
 
     setAbsolutePosition(newPosition: Vector3): void {

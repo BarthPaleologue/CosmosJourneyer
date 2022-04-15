@@ -57,6 +57,9 @@ scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
+const timeMultiplicator = 100;
+console.log(`Time is going ${timeMultiplicator} times faster than in reality`);
+
 const radius = 1000 * 1e3; // diamètre en m
 
 let keyboard = new Keyboard();
@@ -92,7 +95,7 @@ depthRenderer.getDepthMap().renderList?.push(sun.mesh);
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
 let planet = new SolidPlanet("Hécate", radius, new Vector3(0, 0, 4 * radius), 1, scene);
-planet.physicalProperties.rotationPeriod = 20;
+planet.physicalProperties.rotationPeriod = 24 * 60 * 60;
 planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
 planet.colorSettings.sandSize = 300;
 planet.colorSettings.steepSharpness = 3;
@@ -175,7 +178,10 @@ let isMouseEnabled = false;
 let collisionWorker = new CollisionWorker(player, starSystemManager);
 
 function updateScene() {
-    player.nearestBody = starSystemManager.getNearestPlanet();
+
+    let deltaTime = engine.getDeltaTime() / 1000;
+
+    player.nearestBody = starSystemManager.getNearestBody();
 
     if (player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() < player.nearestBody.getRadius() * 2) {
         document.getElementById("planetName")!.innerText = player.nearestBody.getName();
@@ -185,21 +191,17 @@ function updateScene() {
         player.isOrbiting = false;
     }
 
-    starSystemManager.update(player, sun.mesh.position, depthRenderer);
+    starSystemManager.update(player, sun.mesh.position, depthRenderer, timeMultiplicator * deltaTime);
 
     if (isMouseEnabled) {
-        player.listenToMouse(mouse, engine.getDeltaTime() / 1000);
+        player.listenToMouse(mouse, deltaTime);
     }
 
     gamepad.update();
 
-    let deplacement = player.listenToGamepad(gamepad, engine.getDeltaTime() / 1000);
-
-    deplacement.addInPlace(player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000));
-
+    let deplacement = player.listenToGamepad(gamepad, deltaTime);
+    deplacement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
     starSystemManager.translateAllCelestialBody(deplacement);
-
-    //starSystemManager.rotateAllAround(Vector3.Zero(), Axis.Y, 0.1 * engine.getDeltaTime() / 1000);
 
     if (!collisionWorker.isBusy() && player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() < player.nearestBody.getRadius() * 2) {
         if (player.nearestBody instanceof SolidPlanet) {

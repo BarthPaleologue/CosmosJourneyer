@@ -87,7 +87,7 @@ scene.executeWhenReady(() => {
 
         starSystemManager.translateAllCelestialBody(deplacement);
 
-        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer);
+        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, engine.getDeltaTime() / 1000);
 
         scene.render();
     });

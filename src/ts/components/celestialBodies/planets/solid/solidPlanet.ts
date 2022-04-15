@@ -40,7 +40,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     readonly waterLevel: number;
 
-    readonly physicalProperties: SolidPhysicalProperties;
+    override readonly physicalProperties: SolidPhysicalProperties;
 
     protected bodyType = CelestialBodyType.SOLID;
 
@@ -186,10 +186,17 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         return collisionData;
     }
 
+    /**
+     * Returns the world matrix of the planet (see babylonjs world matrix for reference)
+     */
     public getWorldMatrix(): Matrix {
         return this.attachNode.getWorldMatrix();
     }
 
+    /**
+     * Sets the chunkforge of the planet
+     * @param chunkForge The chunkforge the planet will use to generate its terrain
+     */
     public setChunkForge(chunkForge: ChunkForge): void {
         for (const planetSide of this.sides) {
             planetSide.setChunkForge(chunkForge);
@@ -207,6 +214,10 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         }
     }
 
+    /**
+     * Sets the treshold distance for changing the LOD
+     * @param renderDistanceFactor the scaling factor of the default change of LOD distance
+     */
     public setRenderDistanceFactor(renderDistanceFactor: number): void {
         for (let side of this.sides) {
             side.renderDistanceFactor = renderDistanceFactor;
@@ -226,6 +237,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
      * Updates surfaceMaterial with its new values
      */
     public updateColors(): void {
+        //TODO: when the code is robust enough, get rid of this method
         this.surfaceMaterial.setFloat("waterLevel", this.waterLevel);
         this.surfaceMaterial.setFloat("sandSize", this.colorSettings.sandSize);
         this.surfaceMaterial.setFloat("steepSharpness", this.colorSettings.steepSharpness);
@@ -238,15 +250,11 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
     }
 
-    public update(player: PlayerController, lightPosition: Vector3) {
+    public update(player: PlayerController, lightPosition: Vector3, deltaTime: number) {
+        super.update(player, lightPosition, deltaTime);
 
-        let dtheta = this.attachNode.getEngine().getDeltaTime() / (1000 * this.physicalProperties.rotationPeriod)
+        let dtheta = deltaTime / this.physicalProperties.rotationPeriod;
         this.attachNode.rotate(this.physicalProperties.rotationAxis, dtheta, Space.WORLD);
-
-        //TODO: put this in the abstract super class i believe it can be done
-        if(player.isOrbiting && player.nearestBody?.getName() == this.getName()) {
-            player.rotateAround(this.getAbsolutePosition(), this.physicalProperties.rotationAxis, dtheta);
-        }
 
         this.surfaceMaterial.setVector3("playerPosition", player.getAbsolutePosition());
         this.surfaceMaterial.setVector3("sunPosition", lightPosition);
@@ -258,6 +266,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.surfaceMaterial.setFloat("waterAmount", this.physicalProperties.waterAmount);
 
         this.surfaceMaterial.setMatrix("planetWorldMatrix", this.attachNode.getWorldMatrix());
+
         this.updateLOD(player.getAbsolutePosition(), player.getForwardDirection());
     }
 

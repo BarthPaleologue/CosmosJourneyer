@@ -21,7 +21,7 @@ export class Star extends CelestialBody {
 
         temperature: 5778
     }) {
-        super();
+        super(name);
         this.physicalProperties = physicalProperties;
         this.radius = radius;
 
@@ -63,18 +63,14 @@ export class Star extends CelestialBody {
         this.physicalProperties.rotationAxis = this.mesh.up;
     }
 
-    public update(player: PlayerController, lightPosition: Vector3): void {
+    public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
         this.mesh.rotate(this.physicalProperties.rotationAxis, this.mesh.getEngine().getDeltaTime() / (1000 * this.physicalProperties.rotationPeriod));
 
         this.starMaterial.setFloat("time", this.internalTime);
         this.starMaterial.setVector3("starColor", getRgbFromTemperature(this.physicalProperties.temperature));
         this.starMaterial.setMatrix("planetWorldMatrix", this.mesh.getWorldMatrix());
 
-        this.internalTime += this.mesh.getEngine().getDeltaTime() / 1000;
-    }
-
-    public getName(): string {
-        return this.mesh.id;
+        this.internalTime += deltaTime;
     }
 
     public getRadius(): number {

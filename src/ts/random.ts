@@ -143,13 +143,13 @@ scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
     scene.beforeRender = () => {
-        player.nearestBody = starSystemManager.getNearestPlanet();
+        player.nearestBody = starSystemManager.getNearestBody();
         // si trop loin on osef
         if (player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() > player.nearestBody.getRadius() * 2) {
             player.nearestBody = null;
         }
 
-        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer);
+        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, engine.getDeltaTime() / 1000);
 
         if (isMouseEnabled) {
             player.listenToMouse(mouse, engine.getDeltaTime() / 1000);

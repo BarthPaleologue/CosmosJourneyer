@@ -296,7 +296,7 @@ scene.executeWhenReady(() => {
 
         planet.attachNode.rotate(Axis.Y, .001 * rotationSpeed, Space.LOCAL);
 
-        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer);
+        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, engine.getDeltaTime() / 1000);
 
         scene.render();
     });

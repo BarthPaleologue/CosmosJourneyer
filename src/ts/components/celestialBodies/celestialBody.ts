@@ -1,30 +1,60 @@
 import { Vector3, Quaternion } from "@babylonjs/core";
 import {Algebra} from "../utils/algebra";
-import {CelestialBodyType, Transformable} from "./interfaces";
+import {BodyPhysicalProperties, CelestialBodyType, Transformable} from "./interfaces";
 import {PlayerController} from "../player/playerController";
 
-//TODO: en faire une interface ici la classe abstraite n'apporte rien
 export abstract class CelestialBody implements Transformable {
     protected abstract bodyType: CelestialBodyType;
-    protected constructor() {
 
+    abstract physicalProperties: BodyPhysicalProperties;
+
+    readonly _name: string;
+
+    protected constructor(name: string) {
+        this._name = name;
     }
 
-    public abstract getName(): string;
+    /**
+     * Returns the name of the body
+     */
+    public getName(): string {
+        return this._name;
+    }
+
     public abstract setAbsolutePosition(newPosition: Vector3): void;
     public abstract getAbsolutePosition(): Vector3;
     public abstract getRotationQuaternion(): Quaternion;
+
+    /**
+     * Returns the body type of the body (useful for casts)
+     */
     public getBodyType(): CelestialBodyType {
         return this.bodyType;
     }
+
+    /**
+     * Returns the radius of the celestial body
+     */
     public abstract getRadius(): number;
-    public abstract update(player: PlayerController, lightPosition: Vector3): void;
+
+    /**
+     * Updates the state of the celestial body for a given time step of deltaTime
+     * @param player the player in the simulation
+     * @param lightPosition the position of the main light source
+     * @param deltaTime the time step to update for
+     */
+    public update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
+        let dtheta = deltaTime / this.physicalProperties.rotationPeriod;
+
+        if(player.isOrbiting && player.nearestBody?.getName() == this.getName()) {
+            player.rotateAround(this.getAbsolutePosition(), this.physicalProperties.rotationAxis, dtheta);
+        }
+    }
 
     public getOriginBodySpaceSamplePosition(): Vector3 {
-        let position = this.getAbsolutePosition().clone(); // position de la planète / au joueur
-        position.scaleInPlace(-1); // position du joueur / au centre de la planète
+        let position = this.getAbsolutePosition().scale(-1); // position du joueur / au centre de la planète
 
-        // on applique le quaternion inverse pour obtenir le sample point correspondant à la planète rotatée (fais un dessin si c'est pas clair)
+        // negates planet rotation using inverse quaternion to go back to original sample point
         Algebra.applyQuaternionInPlace(Quaternion.Inverse(this.getRotationQuaternion()), position);
 
         return position;

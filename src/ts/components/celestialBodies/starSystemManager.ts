@@ -12,12 +12,15 @@ export class StarSystemManager {
     constructor(nbVertices = 64) {
         this._chunkForge = new ChunkForge(nbVertices);
     }
+    private addBody(body: CelestialBody) {
+        this._celestialBodies.push(body);
+    }
     public addStar(star: Star): void {
-        this._celestialBodies.push(star);
+        this.addBody(star);
     }
     public addSolidPlanet(planet: SolidPlanet): void {
         planet.setChunkForge(this._chunkForge);
-        this._celestialBodies.push(planet);
+        this.addBody(planet);
     }
     public translateAllCelestialBody(deplacement: Vector3): void {
         for (const planet of this._celestialBodies) {
@@ -30,24 +33,31 @@ export class StarSystemManager {
         }
     }
 
-    public getPlanets(): CelestialBody[] {
+    /**
+     * Returns the list of all celestial bodies managed by the star system manager
+     */
+    public getBodies(): CelestialBody[] {
         return this._celestialBodies;
     }
-    public getNearestPlanet(): CelestialBody | null {
+
+    /**
+     * Returns the nearest body to the origin
+     */
+    public getNearestBody(): CelestialBody | null {
         let nearest = null;
-        for (const planet of this._celestialBodies) {
-            if (nearest == null) nearest = planet;
-            else if (planet.getAbsolutePosition().lengthSquared() < nearest.getAbsolutePosition().lengthSquared()) {
-                nearest = planet;
+        for (const body of this._celestialBodies) {
+            if (nearest == null) nearest = body;
+            else if (body.getAbsolutePosition().lengthSquared() < nearest.getAbsolutePosition().lengthSquared()) {
+                nearest = body;
             }
         }
         return nearest;
     }
-    public update(player: PlayerController, lightOrigin: Vector3, depthRenderer: DepthRenderer): void {
+    public update(player: PlayerController, lightOrigin: Vector3, depthRenderer: DepthRenderer, deltaTime: number): void {
         this._chunkForge.update(depthRenderer);
         // TODO : il faudra update les planètes des plus lointaines au plus proches quand il y aura les postprocess
-        for (const planet of this._celestialBodies) {
-            planet.update(player, lightOrigin);
+        for (const body of this._celestialBodies) {
+            body.update(player, lightOrigin, deltaTime);
         }
         this.translateAllCelestialBody(player.getAbsolutePosition().scale(-1));
         player.translate(player.getAbsolutePosition().scale(-1));
