@@ -277,13 +277,13 @@ for(const link of document.querySelector("nav")!.children) {
        currentUI = document.getElementById(id)!;
        currentUI.hidden = false;
        for(const slider of sliders) {
-           slider.update();
+           slider.updateWithoutCallback();
        }
     });
 }
 
 window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth - (currentUI?.clientWidth || 0); // on compte le panneau
+    canvas.width = window.innerWidth - 300; // on compte le panneau
     canvas.height = window.innerHeight;
     engine.resize();
 });
