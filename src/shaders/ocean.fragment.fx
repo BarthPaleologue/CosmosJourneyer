@@ -6,7 +6,8 @@ varying vec2 vUV; // screen coordinates
 // uniforms
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
-uniform sampler2D normalMap;
+uniform sampler2D normalMap1;
+uniform sampler2D normalMap2;
 
 uniform vec3 sunPosition; // position of the sun in world space
 uniform vec3 cameraPosition; // position of the camera in world space
@@ -70,10 +71,19 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
     return (t1 > 0.0);
 }
 
+// https://bgolus.medium.com/normal-mapping-for-a-triplanar-shader-10bf39dca05a
 vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
-    vec3 tNormalX = texture2D(normalMap, position.zy * scale).rgb * normalStrength;
-    vec3 tNormalY = texture2D(normalMap, position.xz * scale).rgb * normalStrength;
-    vec3 tNormalZ = texture2D(normalMap, position.xy * scale).rgb * normalStrength;
+    vec2 uvX = position.zy * scale;
+    vec2 uvY = position.xz * scale;
+    vec2 uvZ = position.xy * scale;
+
+    vec3 tNormalX = texture2D(normalMap, uvX).rgb;
+    vec3 tNormalY = texture2D(normalMap, uvY).rgb;
+    vec3 tNormalZ = texture2D(normalMap, uvZ).rgb;
+
+    tNormalX = normalize(tNormalX * 2.0 - 1.0) * normalStrength;
+    tNormalY = normalize(tNormalY * 2.0 - 1.0) * normalStrength;
+    tNormalZ = normalize(tNormalZ * 2.0 - 1.0) * normalStrength;
 
     tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
     tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
@@ -155,27 +165,19 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
 
     vec3 planetNormal = normalize(samplePoint - planetPosition);
     
-    //vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, -time, time)/10.0, planetNormal, normalMap, 0.0004, 1.0, 0.5);
-    //normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time)/10.0, normalWave, normalMap, 0.0004, 1.0, 0.5);
-    //normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time, -time, -time)/10.0, normalWave, normalMap, 0.0004, 1.0, 0.5);
+    vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time) * 100.0, planetNormal, normalMap1, 0.0001, 1.0, 0.5);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 100.0, normalWave, normalMap2, 0.0001, 1.0, 1.0);
 
-    /*vec3 normalWave = planetNormal;
-    normalWave += vec3(sin(samplePointPlanetSpace.y/200.0 + time/1000.0), sin(-samplePointPlanetSpace.z/200.0 + time/1000.0), sin(samplePointPlanetSpace.y/200.0 - time/1000.0)) / 20.0;
-    normalWave += vec3(sin(samplePointPlanetSpace.x/170.0 - time/800.0), sin(samplePointPlanetSpace.x/170.0 - time/800.0), sin(-samplePointPlanetSpace.y/170.0 + time/800.0)) / 20.0;
-    normalWave += vec3(sin(samplePointPlanetSpace.z/220.0 + time/1100.0), sin(samplePointPlanetSpace.y/210.0 - time/900.0), sin(-samplePointPlanetSpace.x/150.0 + time/950.0)) / 20.0;
-    normalWave = normalize(normalWave);*/
-
-    //normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time), planetNormal, normalMap, 0.00002, 1.0, 0.5);
-    
-    //return normalWave;
+    normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time, -time, -time) * 300.0, normalWave, normalMap2, 0.00002, 1.0, 1.0);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 300.0, normalWave, normalMap2, 0.00002, 1.0, 1.0);
 
     vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
 
-    float ndl = max(dot(planetNormal, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
+    float ndl = max(dot(normalWave, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
 
     //TODO : en faire un uniform
-    float smoothness = 0.8;
-    float specularAngle = acos(dot(normalize(sunDir - rayDir), planetNormal));
+    float smoothness = 1.2;
+    float specularAngle = acos(dot(normalize(sunDir - rayDir), normalWave));
     float specularExponent = specularAngle / (1.0 - smoothness);
     float specularHighlight = exp(-specularExponent * specularExponent);
 
@@ -190,7 +192,7 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         vec3 oceanColor = lerp(deepColor, shallowColor, opticalDepth01);
         
         vec3 ambiant = lerp(originalColor, oceanColor, alpha);
- 
+
         return ambiant * ndl + specularHighlight;
     } else {
         return originalColor;

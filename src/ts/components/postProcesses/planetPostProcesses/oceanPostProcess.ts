@@ -1,6 +1,7 @@
 import {Scene, Texture} from "@babylonjs/core";
 
-import waterbump from "../../../../asset/textures/waterbump.png";
+import waterNormal1 from "../../../../asset/textures/waterbump.png";
+import waterNormal2 from "../../../../asset/textures/waterNormal2.png";
 import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
 import {OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import {PlanetPostProcess} from "../planetPostProcess";
@@ -53,6 +54,7 @@ export class OceanPostProcess extends PlanetPostProcess {
             "time": {
                 type: ShaderDataType.Float,
                 get: () => {
+                    //TODO: this won't speed up with artificial time dilation : it should
                     this.internalTime += scene.getEngine().getDeltaTime() / 1000;
                     return this.internalTime;
                 }
@@ -60,9 +62,13 @@ export class OceanPostProcess extends PlanetPostProcess {
         };
 
         let samplers: ShaderSamplerData = {
-            "normalMap": {
+            "normalMap1": {
                 type: ShaderDataType.Texture,
-                get: () => {return new Texture(waterbump, scene)}
+                get: () => {return new Texture(waterNormal1, scene)}
+            },
+            "normalMap2": {
+                type: ShaderDataType.Texture,
+                get: () => {return new Texture(waterNormal2, scene)}
             }
         }
 

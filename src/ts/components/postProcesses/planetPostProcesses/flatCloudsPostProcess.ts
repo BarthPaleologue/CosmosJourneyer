@@ -2,7 +2,7 @@ import {Scene, Texture} from "@babylonjs/core";
 
 import {CloudSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
-import waterbump from "../../../../asset/textures/cloudNormalMap.jpg";
+import normalMap from "../../../../asset/textures/cloudNormalMap2.jpg";
 import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
 
@@ -74,7 +74,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
         let samplers: ShaderSamplerData = {
             "normalMap": {
                 type: ShaderDataType.Texture,
-                get: () => {return new Texture(waterbump, scene)}
+                get: () => {return new Texture(normalMap, scene)}
             }
         }
 

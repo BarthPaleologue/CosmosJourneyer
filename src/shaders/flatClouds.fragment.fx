@@ -283,10 +283,19 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
     return (t1 > 0.0);
 }
 
+// https://bgolus.medium.com/normal-mapping-for-a-triplanar-shader-10bf39dca05a
 vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
-    vec3 tNormalX = texture2D(normalMap, position.zy * scale).rgb * normalStrength;
-    vec3 tNormalY = texture2D(normalMap, position.xz * scale).rgb * normalStrength;
-    vec3 tNormalZ = texture2D(normalMap, position.xy * scale).rgb * normalStrength;
+    vec2 uvX = position.zy * scale;
+    vec2 uvY = position.xz * scale;
+    vec2 uvZ = position.xy * scale;
+
+    vec3 tNormalX = texture2D(normalMap, uvX).rgb;
+    vec3 tNormalY = texture2D(normalMap, uvY).rgb;
+    vec3 tNormalZ = texture2D(normalMap, uvZ).rgb;
+
+    tNormalX = normalize(tNormalX * 2.0 - 1.0) * normalStrength;
+    tNormalY = normalize(tNormalY * 2.0 - 1.0) * normalStrength;
+    tNormalZ = normalize(tNormalZ * 2.0 - 1.0) * normalStrength;
 
     tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
     tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
@@ -305,7 +314,7 @@ vec3 lerp(vec3 v1, vec3 v2, float s) {
 
 float cloudDensityAtPoint(vec3 samplePoint) {
 
-    float density = worley(normalize(samplePoint) * cloudFrequency + vec3(time*1e-5*worleySpeed), 1.0).x;
+    float density = worley(normalize(samplePoint) * cloudFrequency + vec3(time * 0.01 * worleySpeed), 1.0).x;
 
     density = 1.0 - density;
 
@@ -315,7 +324,7 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     density /= 1.0 - minValue;
 
-    density *= completeNoise(normalize(samplePoint) * cloudDetailFrequency + vec3(time*1e-5*detailSpeed), 5, 2.0, 2.0);
+    density *= completeNoise(normalize(samplePoint) * cloudDetailFrequency + vec3(time * 0.01 * detailSpeed), 5, 2.0, 2.0);
 
     density = saturate(density * 2.0);
 
@@ -378,8 +387,8 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
 	cloudDensity *= saturate((maximumDistance - impactPoint)/10000.0);
 
 
-	//vec3 normal = triplanarNormal(samplePointPlanetSpace1, planetNormal, normalMap, 0.000002, 1.0, cloudDensity);
-	vec3 normal = planetNormal;
+	vec3 normal = triplanarNormal(samplePointPlanetSpace1, planetNormal, normalMap, 0.00002, 1.0, cloudDensity);
+	//vec3 normal = planetNormal;
 
     vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
 
