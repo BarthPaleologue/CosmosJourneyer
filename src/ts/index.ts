@@ -115,7 +115,7 @@ let rings = new RingsPostProcess("rings", planet, sun, scene);
 starSystemManager.addSolidPlanet(planet);
 
 let moon = new SolidPlanet("Manaleth", radius / 4, new Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene, {
-    rotationPeriod: 60 * 60,
+    rotationPeriod: 28 * 24 * 60 * 60,
     rotationAxis: Axis.Y,
 
     minTemperature: -180,
@@ -183,8 +183,8 @@ function updateScene() {
 
     player.nearestBody = starSystemManager.getNearestBody();
 
-    if (player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() < player.nearestBody.getRadius() * 2) {
-        document.getElementById("planetName")!.innerText = player.nearestBody.getName();
+    if (player.isOrbiting()) {
+        document.getElementById("planetName")!.innerText = player.nearestBody!.getName();
     } else {
         document.getElementById("planetName")!.innerText = "Outer Space";
     }
