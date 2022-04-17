@@ -1,6 +1,6 @@
 import {ChunkForge} from "../../../forge/chunkForge";
 import {PlanetSide} from "./planetSide";
-import {Direction} from "../../../utils/direction";
+import {Direction} from "../../../../utils/direction";
 import {TerrainSettings} from "../../../terrain/terrainSettings";
 import {AbstractPlanet} from "../abstractPlanet";
 
@@ -18,7 +18,7 @@ import sandNormalMap from "../../../../../asset/textures/sandNormalMap.jpg";
 import {CelestialBodyType, RigidBody, SolidPhysicalProperties} from "../../interfaces";
 import {CollisionData} from "../../../forge/workerDataInterfaces";
 import {TaskType} from "../../../forge/taskInterfaces";
-import {initMeshTransform} from "../../../utils/mesh";
+import {initMeshTransform} from "../../../../utils/mesh";
 import {PlayerController} from "../../../player/playerController";
 
 

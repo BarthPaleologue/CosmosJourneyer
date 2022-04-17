@@ -1,5 +1,5 @@
 import { Vector3, Quaternion } from "@babylonjs/core";
-import {Algebra} from "../utils/algebra";
+import {Algebra} from "../../utils/algebra";
 import {BodyPhysicalProperties, CelestialBodyType, Transformable} from "./interfaces";
 import {PlayerController} from "../player/playerController";
 

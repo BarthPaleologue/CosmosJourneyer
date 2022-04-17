@@ -1,5 +1,5 @@
 import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
-import {Direction} from "../utils/direction";
+import {Direction} from "../../utils/direction";
 import {Mesh, Vector3, VertexData} from "@babylonjs/core";
 import {PlanetChunk} from "../celestialBodies/planets/solid/planetChunk";
 

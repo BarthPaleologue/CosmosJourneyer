@@ -14,10 +14,10 @@ import { StarSystemManager } from "./components/celestialBodies/starSystemManage
 
 import { FlatCloudsPostProcess } from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import { RingsPostProcess } from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
-import { centeredRandom, nrand, randInt } from "./components/utils/random";
+import { centeredRandom, nrand, randInt } from "./utils/random";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
 import { Star } from "./components/celestialBodies/stars/star";
-import {Algebra, LQuaternion} from "./components/utils/algebra";
+import {Algebra, LQuaternion} from "./utils/algebra";
 style.default;
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;

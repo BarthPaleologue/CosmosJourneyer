@@ -1,7 +1,7 @@
 import {Mesh, Scene, Material, Vector3} from "@babylonjs/core";
 
 import { getChunkSphereSpacePositionFromPath, PlanetChunk } from "./planetChunk";
-import { Direction } from "../../../utils/direction";
+import { Direction } from "../../../../utils/direction";
 import { ChunkForge } from "../../../forge/chunkForge";
 import {TaskType} from "../../../forge/taskInterfaces";
 import { SolidPlanet } from "./solidPlanet";
