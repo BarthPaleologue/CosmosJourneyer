@@ -14,7 +14,7 @@ import grassn from "../../../../../asset/textures/grassn.png";
 import snowNormalMap from "../../../../../asset/textures/snowNormalMap3.jpg";
 import snowNormalMap2 from "../../../../../asset/textures/snowNormalMap2.png";
 
-import sandNormalMap from "../../../../../asset/textures/sandNormalMap.jpg";
+import sandNormalMap from "../../../../../asset/textures/sandNormalMap2.png";
 import {CelestialBodyType, RigidBody, SolidPhysicalProperties} from "../../interfaces";
 import {CollisionData} from "../../../forge/workerDataInterfaces";
 import {TaskType} from "../../../forge/taskInterfaces";

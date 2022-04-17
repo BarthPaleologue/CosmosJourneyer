@@ -1,8 +1,8 @@
 import {Scene} from "@babylonjs/core";
 
-import { SolidPlanet } from "../../celestialBodies/planets/solid/solidPlanet";
+import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
 
-import {AtmosphereSettings, ShaderUniformData, ShaderSamplerData, ShaderDataType} from "../interfaces";
+import {AtmosphereSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
 
@@ -16,11 +16,13 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
             atmosphereRadius: atmosphereRadius,
             falloffFactor: 23,
             intensity: 12,
-            scatteringStrength: 1,
+            rayleighStrength: 1,
+            mieStrength: 1,
             densityModifier: 1,
             redWaveLength: 700,
             greenWaveLength: 530,
             blueWaveLength: 440,
+            mieHaloRadius: 0.75
         };
 
         let uniforms: ShaderUniformData = {
@@ -36,9 +38,13 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
                 type: ShaderDataType.Float,
                 get: () => {return settings.intensity}
             },
-            "scatteringStrength": {
+            "rayleighStrength": {
                 type: ShaderDataType.Float,
-                get: () => {return settings.scatteringStrength}
+                get: () => {return settings.rayleighStrength}
+            },
+            "mieStrength": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.mieStrength}
             },
             "densityModifier": {
                 type: ShaderDataType.Float,
@@ -55,12 +61,16 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
             "blueWaveLength": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.blueWaveLength}
+            },
+            "mieHaloRadius": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.mieHaloRadius}
             }
         };
 
         let samplers: ShaderSamplerData = {}
 
-        super(name, "./shaders/simplifiedScattering", uniforms, samplers, planet, sun, scene);
+        super(name, "./shaders/atmosphericScattering", uniforms, samplers, planet, sun, scene);
 
         this.settings = settings;
     }
