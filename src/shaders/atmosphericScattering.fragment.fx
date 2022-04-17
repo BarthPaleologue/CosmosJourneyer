@@ -91,9 +91,9 @@ float densityAtPoint(vec3 samplePoint) {
 // Absorption coeffs
 // FIXME: put those somewhere else
 
-float absorptionFalloff = 4e3;
-float heightOfMaxAbsorption = 30e3;
-vec3 absorptionCoeffs = vec3(2.04e-5, 4.97e-5, 1.95e-6);
+float absorptionFalloff = 40e3; // 4e3
+float heightOfMaxAbsorption = 10e3; // 30e3
+vec3 absorptionCoeffs = vec3(2.04e-5, 4.97e-5, 1.95e-6) * 100000.0;
 
 vec3 opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
 
@@ -160,6 +160,9 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     vec3 inScatteredRayleigh = vec3(0.0); // amount of light scattered for each channel
     vec3 inScatteredMie = vec3(0.0);
 
+    vec3 sunRayOpticalDepth = vec3(0.0);
+    vec3 viewRayOpticalDepth = vec3(0.0);
+
     for (int i = 0 ; i < POINTS_FROM_CAMERA ; ++i) {
 
         float sunRayLengthInAtm = atmosphereRadius - length(samplePoint - planetPosition); // distance traveled by light through atmosphere from light source
@@ -170,9 +173,9 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
 
         float viewRayLengthInAtm = stepSize * float(i); // distance traveled by light through atmosphere from sample point to cameraPosition
         
-        vec3 sunRayOpticalDepth = opticalDepth(samplePoint, sunDir, sunRayLengthInAtm); // scattered from the sun to the point
+        sunRayOpticalDepth = opticalDepth(samplePoint, sunDir, sunRayLengthInAtm); // scattered from the sun to the point
         
-        vec3 viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
+        viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
         
         vec3 transmittance = exp(- (sunRayOpticalDepth.x + viewRayOpticalDepth.x) * rayleighCoeffs - (sunRayOpticalDepth.y + viewRayOpticalDepth.y) * mieCoeffs - (sunRayOpticalDepth.z + viewRayOpticalDepth.z) * absorptionCoeffs); // exponential scattering with coefficients
         
@@ -193,6 +196,9 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     
     inScatteredRayleigh *= phaseRayleigh; // apply rayleigh pahse
     inScatteredMie *= phaseMie;
+
+    vec3 opacity = exp(-(mieCoeffs * sunRayOpticalDepth.y + rayleighCoeffs * sunRayOpticalDepth.x + absorptionCoeffs * sunRayOpticalDepth.z));
+        
     
     return (inScatteredRayleigh + inScatteredMie) * sunIntensity;
 }

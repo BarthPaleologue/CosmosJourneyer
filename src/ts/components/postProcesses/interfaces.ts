@@ -1,12 +1,14 @@
 export interface AtmosphereSettings {
-    atmosphereRadius: number,
-    falloffFactor: number,
-    intensity: number,
-    scatteringStrength: number,
-    densityModifier: number,
-    redWaveLength: number,
-    greenWaveLength: number,
-    blueWaveLength: number,
+    atmosphereRadius: number;
+    falloffFactor: number;
+    intensity: number;
+    rayleighStrength: number;
+    mieStrength: number;
+    densityModifier: number;
+    redWaveLength: number;
+    greenWaveLength: number;
+    blueWaveLength: number;
+    mieHaloRadius: number;
 }
 
 export interface CloudSettings {

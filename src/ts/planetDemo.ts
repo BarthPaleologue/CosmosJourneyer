@@ -198,12 +198,20 @@ sliders.push(new Slider("intensity", document.getElementById("intensity")!, 0, 4
     atmosphere.settings.intensity = val;
 }));
 
+sliders.push(new Slider("density", document.getElementById("density")!, 0, 40, atmosphere.settings.densityModifier * 10, (val: number) => {
+    atmosphere.settings.densityModifier = val / 10;
+}));
+
 sliders.push(new Slider("atmosphereRadius", document.getElementById("atmosphereRadius")!, 0, 100, (atmosphere.settings.atmosphereRadius - planetRadius) / 10000, (val: number) => {
     atmosphere.settings.atmosphereRadius = planetRadius + val * 10000;
 }));
 
-sliders.push(new Slider("scatteringStrength", document.getElementById("scatteringStrength")!, 0, 40, atmosphere.settings.scatteringStrength * 10, (val: number) => {
-    atmosphere.settings.scatteringStrength = val / 10;
+sliders.push(new Slider("rayleighStrength", document.getElementById("rayleighStrength")!, 0, 40, atmosphere.settings.rayleighStrength * 10, (val: number) => {
+    atmosphere.settings.rayleighStrength = val / 10;
+}));
+
+sliders.push(new Slider("mieStrength", document.getElementById("mieStrength")!, 0, 40, atmosphere.settings.mieStrength * 10, (val: number) => {
+    atmosphere.settings.mieStrength = val / 10;
 }));
 
 sliders.push(new Slider("falloff", document.getElementById("falloff")!, -10, 200, atmosphere.settings.falloffFactor, (val: number) => {
@@ -220,6 +228,10 @@ sliders.push(new Slider("greenWaveLength", document.getElementById("greenWaveLen
 
 sliders.push(new Slider("blueWaveLength", document.getElementById("blueWaveLength")!, 0, 1000, atmosphere.settings.blueWaveLength, (val: number) => {
     atmosphere.settings.blueWaveLength = val;
+}));
+
+sliders.push(new Slider("mieHaloRadius", document.getElementById("mieHaloRadius")!, 0, 200, atmosphere.settings.mieHaloRadius * 100, (val: number) => {
+    atmosphere.settings.mieHaloRadius = val / 100;
 }));
 
 document.getElementById("ringsToggler")?.addEventListener("click", () => {
