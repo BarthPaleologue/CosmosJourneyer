@@ -198,7 +198,7 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     inScatteredMie *= phaseMie;
 
     vec3 opacity = exp(-(mieCoeffs * sunRayOpticalDepth.y + rayleighCoeffs * sunRayOpticalDepth.x + absorptionCoeffs * sunRayOpticalDepth.z));
-        
+
     
     return (inScatteredRayleigh + inScatteredMie) * sunIntensity;
 }

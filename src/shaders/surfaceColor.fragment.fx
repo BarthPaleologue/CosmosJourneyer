@@ -108,74 +108,19 @@ float lerp(float value1, float value2, float x) {
 	return x * value1 + (1.0 - x) * value2;
 }
 
-vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, float bottomFactor, float sandFactor, float plainFactor, float snowFactor, float steepFactor, float scale, float sharpness, float normalStrength) {
-
+// https://bgolus.medium.com/normal-mapping-for-a-triplanar-shader-10bf39dca05a
+vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
     vec2 uvX = position.zy * scale;
     vec2 uvY = position.xz * scale;
     vec2 uvZ = position.xy * scale;
 
-	vec3 tBottomNormalX = texture2D(bottomNormalMap, uvX).rgb;
-    vec3 tBottomNormalY = texture2D(bottomNormalMap, uvY).rgb;
-    vec3 tBottomNormalZ = texture2D(bottomNormalMap, uvZ).rgb;
-    tBottomNormalX = normalize(tBottomNormalX * 2.0 - 1.0);
-    tBottomNormalY = normalize(tBottomNormalY * 2.0 - 1.0);
-    tBottomNormalZ = normalize(tBottomNormalZ * 2.0 - 1.0);
+    vec3 tNormalX = texture2D(normalMap, uvX).rgb;
+    vec3 tNormalY = texture2D(normalMap, uvY).rgb;
+    vec3 tNormalZ = texture2D(normalMap, uvZ).rgb;
 
-	vec3 tSandNormalX = texture2D(sandNormalMap, uvX).rgb;
-    vec3 tSandNormalY = texture2D(sandNormalMap, uvY).rgb;
-    vec3 tSandNormalZ = texture2D(sandNormalMap, uvZ).rgb;
-    tSandNormalX = normalize(tSandNormalX * 2.0 - 1.0);
-    tSandNormalY = normalize(tSandNormalY * 2.0 - 1.0);
-    tSandNormalZ = normalize(tSandNormalZ * 2.0 - 1.0);
-
-	vec3 tPlainNormalX = texture2D(plainNormalMap, uvX).rgb;
-    vec3 tPlainNormalY = texture2D(plainNormalMap, uvY).rgb;
-    vec3 tPlainNormalZ = texture2D(plainNormalMap, uvZ).rgb;
-    tPlainNormalX = normalize(tPlainNormalX * 2.0 - 1.0);
-    tPlainNormalY = normalize(tPlainNormalY * 2.0 - 1.0);
-    tPlainNormalZ = normalize(tPlainNormalZ * 2.0 - 1.0);
-
-	vec3 tSnowNormalX = lerp(
-		texture2D(snowNormalMap, uvX).rgb,
-		texture2D(snowNormalMap2, uvX).rgb,
-		completeNoise(position, 3, 2.0, 2.0)
-	);
-    vec3 tSnowNormalY = texture2D(snowNormalMap, uvY).rgb;
-    vec3 tSnowNormalZ = texture2D(snowNormalMap, uvY).rgb;
-    tSnowNormalX = normalize(tSnowNormalX * 2.0 - 1.0);
-    tSnowNormalY = normalize(tSnowNormalY * 2.0 - 1.0);
-    tSnowNormalZ = normalize(tSnowNormalZ * 2.0 - 1.0);
-
-	vec3 tSteepNormalX = texture2D(steepNormalMap, uvX).rgb;
-    vec3 tSteepNormalY = texture2D(steepNormalMap, uvY).rgb;
-    vec3 tSteepNormalZ = texture2D(steepNormalMap, uvZ).rgb;
-    tSteepNormalX = normalize(tSteepNormalX * 2.0 - 1.0);
-    tSteepNormalY = normalize(tSteepNormalY * 2.0 - 1.0);
-    tSteepNormalZ = normalize(tSteepNormalZ * 2.0 - 1.0);
-
-	float totalAmplitude = bottomFactor + sandFactor + plainFactor + snowFactor;
-
-	vec3 tNormalX = bottomFactor * tBottomNormalX;
-	tNormalX += sandFactor * tSandNormalX;
-	tNormalX += plainFactor * tPlainNormalX;
-	tNormalX += snowFactor * tSnowNormalX;
-	if(totalAmplitude > 0.0) tNormalX /= totalAmplitude;
-
-	vec3 tNormalY = bottomFactor * tBottomNormalY;
-	tNormalY += sandFactor * tSandNormalY;
-	tNormalY += plainFactor * tPlainNormalY;
-	tNormalY += snowFactor * tSnowNormalY;
-	if(totalAmplitude > 0.0) tNormalY /= totalAmplitude;
-
-	vec3 tNormalZ = bottomFactor * tBottomNormalZ;
-	tNormalZ += sandFactor * tSandNormalZ;
-	tNormalZ += plainFactor * tPlainNormalZ;
-	tNormalZ += snowFactor * tSnowNormalZ;
-	if(totalAmplitude > 0.0) tNormalZ /= totalAmplitude;
-
-	tNormalX = lerp(tNormalX, tSteepNormalX, 1.0-steepFactor) * normalStrength;
-	tNormalY = lerp(tNormalY, tSteepNormalY, 1.0-steepFactor) * normalStrength;
-	tNormalZ = lerp(tNormalZ, tSteepNormalZ, 1.0-steepFactor) * normalStrength;
+    tNormalX = normalize(tNormalX * 2.0 - 1.0) * normalStrength;
+    tNormalY = normalize(tNormalY * 2.0 - 1.0) * normalStrength;
+    tNormalZ = normalize(tNormalZ * 2.0 - 1.0) * normalStrength;
 
     tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
     tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
@@ -306,8 +251,20 @@ vec3 computeColorAndNormal(
 	}
 
 	// TODO: briser la répétition avec du simplex
-	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.001, normalSharpness, 1.0);
-	normal = triplanarNormal(vPosition, normal, bottomFactor, sandFactor, plainFactor, snowFactor, steepFactor, 0.00001, normalSharpness, 1.0); // plus grand
+	normal = triplanarNormal(vPosition, normal, bottomNormalMap, 0.001, normalSharpness, bottomFactor);
+	normal = triplanarNormal(vPosition, normal, bottomNormalMap, 0.00001, normalSharpness, bottomFactor);
+
+    normal = triplanarNormal(vPosition, normal, sandNormalMap, 0.001, normalSharpness, sandFactor);
+   	normal = triplanarNormal(vPosition, normal, sandNormalMap, 0.00001, normalSharpness, sandFactor);
+
+    normal = triplanarNormal(vPosition, normal, plainNormalMap, 0.001, normalSharpness, plainFactor);
+	normal = triplanarNormal(vPosition, normal, plainNormalMap, 0.00001, normalSharpness, plainFactor);
+
+    normal = triplanarNormal(vPosition, normal, snowNormalMap, 0.001, normalSharpness, snowFactor);
+	normal = triplanarNormal(vPosition, normal, snowNormalMap, 0.00001, normalSharpness, snowFactor);
+
+    normal = triplanarNormal(vPosition, normal, steepNormalMap, 0.001, normalSharpness, steepFactor);
+	normal = triplanarNormal(vPosition, normal, steepNormalMap, 0.00001, normalSharpness, steepFactor);
 
 	return outColor;
 }

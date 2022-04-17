@@ -101,8 +101,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             sandColor: new Vector3(0.7, 0.7, 0.2),
 
             sandSize: 1,
-            steepSharpness: 1,
-            normalSharpness: 0.8,
+            steepSharpness: 5,
+            normalSharpness: 0,
         };
 
         let surfaceMaterial = new ShaderMaterial("surfaceColor", scene, "./shaders/surfaceColor",

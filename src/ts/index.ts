@@ -98,7 +98,6 @@ planet.physicalProperties.rotationPeriod = 24 * 60 * 60;
 
 planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
 planet.colorSettings.sandSize = 300;
-planet.colorSettings.steepSharpness = 3;
 planet.updateColors();
 
 planet.rotate(Axis.X, 0.2);
@@ -128,7 +127,6 @@ moon.terrainSettings.maxMountainHeight = 5e3;
 moon.colorSettings.plainColor = new Vector3(0.5, 0.5, 0.5);
 moon.colorSettings.sandColor = moon.colorSettings.plainColor.scale(0.5);
 moon.colorSettings.steepColor = new Vector3(0.1, 0.1, 0.1);
-moon.colorSettings.steepSharpness = 3;
 moon.updateColors();
 
 moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockn, scene));
@@ -155,7 +153,6 @@ Ares.terrainSettings.maxMountainHeight = 15e3;
 Ares.terrainSettings.mountainsMinValue = 0.7;
 
 Ares.colorSettings.sandColor = Ares.colorSettings.plainColor;
-Ares.colorSettings.steepSharpness = 2;
 Ares.updateColors();
 
 Ares.translate(new Vector3(-radius * 4, 0, 0));

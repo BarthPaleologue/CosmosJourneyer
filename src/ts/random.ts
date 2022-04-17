@@ -87,7 +87,6 @@ console.log("seed : ", planet.getSeed().toString());
 console.table(planet.physicalProperties);
 planet.colorSettings.plainColor = new Vector3(0.22, 0.37, 0.024).add(new Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
 planet.colorSettings.sandSize = 250 + 100 * centeredRandom();
-planet.colorSettings.steepSharpness = 3;
 planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
 
 planet.updateColors();

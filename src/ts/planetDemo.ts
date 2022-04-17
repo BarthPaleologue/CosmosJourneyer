@@ -66,7 +66,6 @@ let starfield = new StarfieldPostProcess("starfield", sun, scene);
 let planet = new SolidPlanet("Gaia", planetRadius, new Vector3(0, 0, planetRadius*3), 2, scene);
 planet.rotate(Axis.X, 0.2);
 
-planet.colorSettings.steepSharpness = 3;
 planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
 planet.colorSettings.sandSize = 300;
 planet.updateColors();
@@ -152,7 +151,7 @@ sliders.push(new Slider("sandSize", document.getElementById("sandSize")!, 0, 300
     planet.updateColors();
 }));
 
-sliders.push(new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 50, planet.colorSettings.steepSharpness * 10, (val: number) => {
+sliders.push(new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 100, planet.colorSettings.steepSharpness * 10, (val: number) => {
     planet.colorSettings.steepSharpness = val / 10;
     planet.updateColors();
 }));
