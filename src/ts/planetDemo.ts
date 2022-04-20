@@ -164,8 +164,8 @@ sliders.push(new Slider("steepSharpness", document.getElementById("steepSharpnes
     planet.updateColors();
 }));
 
-sliders.push(new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 30, planet.colorSettings.normalSharpness * 10, (val: number) => {
-    planet.colorSettings.normalSharpness = val / 10;
+sliders.push(new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 100, planet.colorSettings.normalSharpness * 100, (val: number) => {
+    planet.colorSettings.normalSharpness = val / 100;
     planet.updateColors();
 }));
 

@@ -125,6 +125,9 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, flo
     tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
     tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
     tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, tNormalZ.z * surfaceNormal.z);
+    tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, surfaceNormal.x);
+    tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, surfaceNormal.y);
+    tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, surfaceNormal.z);
 
     vec3 blendWeight = pow(abs(surfaceNormal), vec3(sharpness));
     blendWeight /= dot(blendWeight, vec3(1.0));
