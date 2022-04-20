@@ -67,7 +67,7 @@ let planet = new SolidPlanet("Gaia", planetRadius, new Vector3(0, 0, planetRadiu
 planet.rotate(Axis.X, 0.2);
 
 planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
-planet.colorSettings.sandSize = 300;
+planet.colorSettings.beachSize = 300;
 planet.updateColors();
 
 starSystemManager.addSolidPlanet(planet);
@@ -151,15 +151,24 @@ steepColorPicker.addEventListener("input", () => {
 });
 
 let sandColorPicker = document.getElementById("sandColor") as HTMLInputElement;
-sandColorPicker.value = babylonToHex(planet.colorSettings.sandColor);
+sandColorPicker.value = babylonToHex(planet.colorSettings.beachColor);
 sandColorPicker.addEventListener("input", () => {
     let color = Color3.FromHexString(sandColorPicker.value);
-    planet.colorSettings.sandColor = new Vector3(color.r, color.g, color.b);
+    planet.colorSettings.beachColor = new Vector3(color.r, color.g, color.b);
     planet.updateColors();
 });
 
-sliders.push(new Slider("sandSize", document.getElementById("sandSize")!, 0, 300, planet.colorSettings.sandSize / 10, (val: number) => {
-    planet.colorSettings.sandSize = val * 10;
+let desertColorPicker = document.getElementById("desertColor") as HTMLInputElement;
+desertColorPicker.value = babylonToHex(planet.colorSettings.desertColor);
+desertColorPicker.addEventListener("input", () => {
+    let color = Color3.FromHexString(desertColorPicker.value);
+    planet.colorSettings.desertColor = new Vector3(color.r, color.g, color.b);
+    planet.updateColors();
+});
+
+
+sliders.push(new Slider("sandSize", document.getElementById("sandSize")!, 0, 300, planet.colorSettings.beachSize / 10, (val: number) => {
+    planet.colorSettings.beachSize = val * 10;
     planet.updateColors();
 }));
 

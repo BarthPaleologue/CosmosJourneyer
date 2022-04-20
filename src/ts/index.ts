@@ -70,7 +70,6 @@ let player = new PlayerController(scene);
 player.setSpeed(0.2 * radius);
 player.mesh.rotate(player.camera.getDirection(Axis.Y), 0.8, Space.WORLD);
 
-player.camera.maxZ = Math.max(radius * 50, 10000);
 player.camera.maxZ = Math.max(radius * 100, 10000);
 
 //https://github.com/BabylonJS/Babylon.js/issues/7133 messing around with depth buffer
@@ -98,7 +97,7 @@ let planet = new SolidPlanet("Hécate", radius, new Vector3(radius * 5, 0, 4 * r
 planet.physicalProperties.rotationPeriod = 24 * 60 * 60;
 
 planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
-planet.colorSettings.sandSize = 300;
+planet.colorSettings.beachSize = 300;
 planet.updateColors();
 
 planet.rotate(Axis.X, 0.2);
@@ -126,7 +125,7 @@ let moon = new SolidPlanet("Manaleth", radius / 4, new Vector3(Math.cos(2.5), 0,
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
 moon.colorSettings.plainColor = new Vector3(0.5, 0.5, 0.5);
-moon.colorSettings.sandColor = moon.colorSettings.plainColor.scale(0.5);
+moon.colorSettings.desertColor = moon.colorSettings.plainColor.scale(0.5);
 moon.colorSettings.steepColor = new Vector3(0.1, 0.1, 0.1);
 moon.updateColors();
 
@@ -153,7 +152,7 @@ Ares.terrainSettings.continentBaseHeight = 4e3;
 Ares.terrainSettings.maxMountainHeight = 15e3;
 Ares.terrainSettings.mountainsMinValue = 0.7;
 
-Ares.colorSettings.sandColor = Ares.colorSettings.plainColor;
+Ares.colorSettings.beachColor = Ares.colorSettings.plainColor;
 Ares.updateColors();
 
 Ares.translate(new Vector3(-radius * 4, 0, 0));
@@ -174,6 +173,9 @@ let fxaa = new FxaaPostProcess("fxaa", 1, player.camera, Texture.BILINEAR_SAMPLI
 let isMouseEnabled = false;
 
 let collisionWorker = new CollisionWorker(player, starSystemManager);
+
+// update to current date
+starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
 
 function updateScene() {
 

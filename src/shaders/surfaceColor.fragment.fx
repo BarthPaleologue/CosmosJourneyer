@@ -26,7 +26,9 @@ uniform sampler2D depthSampler; // evaluate sceneDepth
 
 uniform sampler2D bottomNormalMap;
 uniform sampler2D plainNormalMap;
-uniform sampler2D sandNormalMap;
+
+uniform sampler2D beachNormalMap;
+uniform sampler2D desertNormalMap;
 
 uniform sampler2D snowNormalMap;
 uniform sampler2D snowNormalMap2;
@@ -37,7 +39,7 @@ uniform vec3 seed;
 
 uniform float planetRadius; // planet radius
 uniform float waterLevel; // controls sand layer
-uniform float sandSize;
+uniform float beachSize;
 
 uniform float steepSharpness; // sharpness of demaracation between steepColor and normal colors
 uniform float normalSharpness;
@@ -47,7 +49,8 @@ uniform float maxElevation;
 uniform vec3 snowColor; // the color of the snow layer
 uniform vec3 steepColor; // the color of steep slopes
 uniform vec3 plainColor; // the color of plains at the bottom of moutains
-uniform vec3 sandColor; // the color of the sand
+uniform vec3 beachColor; // the color of the sand
+uniform vec3 desertColor;
 vec3 toundraColor = vec3(40.0, 40.0, 40.0) / 255.0;
 
 uniform float minTemperature;
@@ -199,7 +202,8 @@ vec3 computeColorAndNormal(
 	normal = vNormal;
 
 	float plainFactor = 0.0,
-	sandFactor = 0.0,
+	beachFactor = 0.0,
+	desertFactor = 0.0,
 	bottomFactor = 0.0,
 	snowFactor = 0.0, 
 	steepFactor = 0.0;
@@ -209,9 +213,10 @@ vec3 computeColorAndNormal(
 	if(elevation01 > waterLevel01) {
 
 		// séparation biome désert biome plaine
-		float openFactor = tanherpFactor(moisture01, 32.0);
-		vec3 vPlainColor = tanherp(plainColor, 0.7 * plainColor, noise(vPosition/10000.0), 3.0);
-		vec3 flatColor = lerp(vPlainColor, sandColor, openFactor);
+		float moistureFactor = tanherpFactor(moisture01, 32.0);
+		vec3 plainColor = tanherp(plainColor, 0.7 * plainColor, noise(vPosition/10000.0), 3.0);
+
+		vec3 flatColor = lerp(plainColor, desertColor, moistureFactor);
 
 		// séparation biome sélectionné avec biome neige
 		// waterMeltingPoint01 * waterAmount : il est plus difficile de former de la neige quand y a moins d'eau
@@ -220,10 +225,11 @@ vec3 computeColorAndNormal(
 		snowFactor = snowColorFactor;
 
 		// séparation biome sélectionné avec biome plage
-		flatColor = lnear(sandColor, flatColor, elevation01, waterLevel01, sandSize / maxElevation);
+		flatColor = lnear(beachColor, flatColor, elevation01, waterLevel01, beachSize / maxElevation);
 
-		sandFactor = max(getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation), 1.0 - openFactor);
-		plainFactor = 1.0 - sandFactor;
+		beachFactor = getLnearFactor(elevation01, waterLevel01, beachSize / maxElevation);
+		desertFactor = 1.0 - moistureFactor;
+		plainFactor = 1.0 - desertFactor;
 		plainFactor *= 1.0 - snowFactor;
 
 		// détermination de la couleur due à la pente
@@ -231,7 +237,7 @@ vec3 computeColorAndNormal(
 		steepFactor = tanherpFactor(1.0 - pow(1.0-slope, steepDominance), steepSharpness); // tricks pour éviter un calcul couteux d'exposant décimal
 		steepFactor *= 1.0 - snowFactor;
 
-		sandFactor *= 1.0 - steepFactor;
+		beachFactor *= 1.0 - steepFactor;
 		plainFactor *= 1.0 - steepFactor;
 
 		steepFactor *= steepFactor;
@@ -239,15 +245,15 @@ vec3 computeColorAndNormal(
 		outColor = lerp(flatColor, steepColor, 1.0 - steepFactor);
 	} else {
 		// entre abysse et surface
-		vec3 flatColor = lnear(sandColor, vec3(0.5), elevation01, waterLevel01, sandSize / maxElevation);
+		vec3 flatColor = lnear(beachColor, vec3(0.5), elevation01, waterLevel01, beachSize / maxElevation);
 
-		sandFactor = getLnearFactor(elevation01, waterLevel01, sandSize / maxElevation);
-		bottomFactor = 1.0 - sandFactor;
+		beachFactor = getLnearFactor(elevation01, waterLevel01, beachSize / maxElevation);
+		bottomFactor = 1.0 - beachFactor;
 
 		float steepDominance = 6.0;
 		steepFactor = tanherpFactor(1.0 - pow(1.0-slope, steepDominance), steepSharpness); // tricks pour éviter un calcul couteux d'exposant décimal
 
-		sandFactor *= 1.0 - steepFactor;
+		beachFactor *= 1.0 - steepFactor;
 		bottomFactor *= 1.0 - steepFactor;
 
 		steepFactor *= steepFactor;
@@ -259,11 +265,14 @@ vec3 computeColorAndNormal(
 	normal = triplanarNormal(vPosition, normal, bottomNormalMap, 0.001, normalSharpness, bottomFactor);
 	normal = triplanarNormal(vPosition, normal, bottomNormalMap, 0.00001, normalSharpness, bottomFactor);
 
-    normal = triplanarNormal(vPosition, normal, sandNormalMap, 0.001, normalSharpness, sandFactor);
-   	normal = triplanarNormal(vPosition, normal, sandNormalMap, 0.00001, normalSharpness, sandFactor);
+    normal = triplanarNormal(vPosition, normal, beachNormalMap, 0.001, normalSharpness, beachFactor);
+   	normal = triplanarNormal(vPosition, normal, beachNormalMap, 0.00001, normalSharpness, beachFactor);
 
     normal = triplanarNormal(vPosition, normal, plainNormalMap, 0.001, normalSharpness, plainFactor);
 	normal = triplanarNormal(vPosition, normal, plainNormalMap, 0.00001, normalSharpness, plainFactor);
+
+	normal = triplanarNormal(vPosition, normal, desertNormalMap, 0.001, normalSharpness, desertFactor);
+    normal = triplanarNormal(vPosition, normal, desertNormalMap, 0.00001, normalSharpness, desertFactor);
 
     normal = triplanarNormal(vPosition, normal, snowNormalMap, 0.001, normalSharpness, snowFactor);
 	normal = triplanarNormal(vPosition, normal, snowNormalMap, 0.00001, normalSharpness, snowFactor);
@@ -327,7 +336,7 @@ void main() {
 
 	//https://qph.fs.quoracdn.net/main-qimg-6a0fa3c05fb4db3d7d081680aec4b541
 	float co2SublimationTemperature = 0.0; // https://www.wikiwand.com/en/Sublimation_(phase_transition)#/CO2
-	// todo trouver l'équation de ses morts
+	// TODO: trouver l'équation de ses morts
 	float co2SublimationTemperature01 = (co2SublimationTemperature - minTemperature) / (maxTemperature - minTemperature);
 
 	float temperatureHeightFalloff = 3.0;
@@ -362,6 +371,10 @@ void main() {
 	vec3 angleW = normalize(viewRayW + lightRayW);
     float specComp = max(0., dot(normalW, angleW));
     specComp = pow(specComp, 32.0);
+
+    //float specularAngle = fastAcos(dot(normalize(sunDir - rayDir), normalWave));
+    //float specularExponent = specularAngle / (1.0 - smoothness);
+    //float specularHighlight = exp(-specularExponent * specularExponent) * specularPower;
 
 	// suppresion du reflet partout hors la neige
 	specComp *= (color.r + color.g + color.b) / 3.0;

@@ -86,7 +86,7 @@ let planet = new SolidPlanet("Hécate", radius, new Vector3(0, 0, 4 * radius), 1
 console.log("seed : ", planet.getSeed().toString());
 console.table(planet.physicalProperties);
 planet.colorSettings.plainColor = new Vector3(0.22, 0.37, 0.024).add(new Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
-planet.colorSettings.sandSize = 250 + 100 * centeredRandom();
+planet.colorSettings.beachSize = 250 + 100 * centeredRandom();
 planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
 
 planet.updateColors();

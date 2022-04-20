@@ -4,17 +4,29 @@ import {Direction} from "../../../../utils/direction";
 import {TerrainSettings} from "../../../terrain/terrainSettings";
 import {AbstractPlanet} from "../abstractPlanet";
 
-import {Vector3, Mesh, Scene, ShaderMaterial, Axis, Space, Texture, Quaternion, Matrix} from "@babylonjs/core";
+import {
+    Vector3,
+    Mesh,
+    Scene,
+    ShaderMaterial,
+    Axis,
+    Space,
+    Texture,
+    Quaternion,
+    Matrix,
+    MaterialHelper
+} from "@babylonjs/core";
 
-//texture import
-import crackednormal from "../../../../../asset/textures/crackednormal.jpg";
-import rockn from "../../../../../asset/textures/rockn.png";
-import grassn from "../../../../../asset/textures/grassn.png";
+import bottomNormalMap from "../../../../../asset/textures/crackednormal.jpg";
+import steepNormalMap from "../../../../../asset/textures/rockn.png";
+import grassNormalMap from "../../../../../asset/textures/grassNormalMap.jpg";
 
-import snowNormalMap from "../../../../../asset/textures/snowNormalMap3.jpg";
+import snowNormalMap from "../../../../../asset/textures/snowNormalMap.png";
 import snowNormalMap2 from "../../../../../asset/textures/snowNormalMap2.png";
 
-import sandNormalMap from "../../../../../asset/textures/sandNormalMap2.png";
+import beachNormalMap from "../../../../../asset/textures/sandNormalMap2.png";
+import desertNormalMap from "../../../../../asset/textures/sandNormalMap2.jpg";
+
 import {CelestialBodyType, RigidBody, SolidPhysicalProperties} from "../../interfaces";
 import {CollisionData} from "../../../forge/workerDataInterfaces";
 import {TaskType} from "../../../forge/taskInterfaces";
@@ -23,12 +35,13 @@ import {PlayerController} from "../../../player/playerController";
 
 
 export interface ColorSettings {
-    snowColor: Vector3,
-    steepColor: Vector3,
-    plainColor: Vector3,
-    sandColor: Vector3,
+    snowColor: Vector3;
+    steepColor: Vector3;
+    plainColor: Vector3;
+    beachColor: Vector3;
+    desertColor: Vector3;
 
-    sandSize: number,
+    beachSize: number;
     steepSharpness: number;
     normalSharpness: number;
 }
@@ -98,12 +111,12 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             snowColor: new Vector3(1, 1, 1),
             steepColor: new Vector3(55, 42, 42).scale(1 / 255),
             plainColor: new Vector3(0.5, 0.3, 0.08),
-            sandColor: new Vector3(0.7, 0.7, 0.2),
+            beachColor: new Vector3(0.7, 0.7, 0.2),
+            desertColor: new Vector3(178, 107, 42).scale(1 / 255),
 
-            sandSize: 1,
+            beachSize: 1,
             steepSharpness: 5,
-            normalSharpness: 0,
-            normalSharpness: 0.8,
+            normalSharpness: 0.5,
         };
 
         let surfaceMaterial = new ShaderMaterial("surfaceColor", scene, "./shaders/surfaceColor",
@@ -114,7 +127,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
                     "textureSampler", "depthSampler",
 
-                    "bottomNormalMap", "plainNormalMap", "sandNormalMap",
+                    "bottomNormalMap",
+                    "plainNormalMap", "beachNormalMap", "desertNormalMap",
                     "snowNormalMap", "snowNormalMap2",
                     "steepNormalMap",
 
@@ -124,9 +138,9 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
                     "playerPosition",
 
-                    "waterLevel", "sandSize", "steepSharpness", "normalSharpness",
+                    "waterLevel", "beachSize", "steepSharpness", "normalSharpness",
 
-                    "snowColor", "steepColor", "plainColor", "sandColor",
+                    "snowColor", "steepColor", "plainColor", "beachColor", "desertColor",
 
                     "maxElevation",
 
@@ -147,14 +161,15 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         surfaceMaterial.setVector3("seed", new Vector3(this._seed[0], this._seed[1], this._seed[2]));
 
-        surfaceMaterial.setTexture("bottomNormalMap", new Texture(crackednormal, scene));
-        surfaceMaterial.setTexture("steepNormalMap", new Texture(rockn, scene));
-        surfaceMaterial.setTexture("plainNormalMap", new Texture(grassn, scene));
+        surfaceMaterial.setTexture("bottomNormalMap", new Texture(bottomNormalMap, scene));
+        surfaceMaterial.setTexture("steepNormalMap", new Texture(steepNormalMap, scene));
+        surfaceMaterial.setTexture("plainNormalMap", new Texture(grassNormalMap, scene));
 
         surfaceMaterial.setTexture("snowNormalMap", new Texture(snowNormalMap, scene));
         surfaceMaterial.setTexture("snowNormalMap2", new Texture(snowNormalMap2, scene));
 
-        surfaceMaterial.setTexture("sandNormalMap", new Texture(sandNormalMap, scene));
+        surfaceMaterial.setTexture("beachNormalMap", new Texture(beachNormalMap, scene));
+        surfaceMaterial.setTexture("desertNormalMap", new Texture(desertNormalMap, scene));
 
         surfaceMaterial.setVector3("playerPosition", Vector3.Zero());
         surfaceMaterial.setVector3("sunPosition", Vector3.Zero());
@@ -248,13 +263,14 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     public updateColors(): void {
         //TODO: when the code is robust enough, get rid of this method
         this.surfaceMaterial.setFloat("waterLevel", this.waterLevel);
-        this.surfaceMaterial.setFloat("sandSize", this.colorSettings.sandSize);
+        this.surfaceMaterial.setFloat("beachSize", this.colorSettings.beachSize);
         this.surfaceMaterial.setFloat("steepSharpness", this.colorSettings.steepSharpness);
 
         this.surfaceMaterial.setVector3("snowColor", this.colorSettings.snowColor);
         this.surfaceMaterial.setVector3("steepColor", this.colorSettings.steepColor);
         this.surfaceMaterial.setVector3("plainColor", this.colorSettings.plainColor);
-        this.surfaceMaterial.setVector3("sandColor", this.colorSettings.sandColor);
+        this.surfaceMaterial.setVector3("beachColor", this.colorSettings.beachColor);
+        this.surfaceMaterial.setVector3("desertColor", this.colorSettings.desertColor);
 
         this.surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
     }
