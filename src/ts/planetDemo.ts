@@ -109,6 +109,14 @@ sliders.push(new Slider("depthModifier", document.getElementById("depthModifier"
     ocean.settings.depthModifier = val / 10000;
 }));
 
+sliders.push(new Slider("specularPower", document.getElementById("specularPower")!, 0, 100, ocean.settings.specularPower * 10, (val: number) => {
+    ocean.settings.specularPower = val / 10;
+}));
+
+sliders.push(new Slider("smoothness", document.getElementById("smoothness")!, 0, 100, ocean.settings.smoothness * 100, (val: number) => {
+    ocean.settings.smoothness = val / 100;
+}));
+
 function babylonToHex(color: Vector3): string {
     let c2 = new Color3(color.x, color.y, color.z);
     return c2.toHexString();

@@ -71,7 +71,7 @@ export class Star extends CelestialBody {
         this.starMaterial.setMatrix("planetWorldMatrix", this.mesh.getWorldMatrix());
 
         this.internalTime += deltaTime;
-        this.internalTime %= 24 * 60 * 60;
+        this.internalTime %= 24 * 60 * 60; // prevent imprecision in shader material (noise offset)
     }
 
     public getRadius(): number {

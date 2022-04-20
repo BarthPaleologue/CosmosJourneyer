@@ -19,7 +19,7 @@ export class OceanPostProcess extends PlanetPostProcess {
             oceanRadius: planet.getRadius(),
             depthModifier: 0.002,
             alphaModifier: 0.007,
-            specularPower: 2,
+            specularPower: 1.5,
             smoothness: 0.9,
         };
 
