@@ -21,6 +21,7 @@ export class OceanPostProcess extends PlanetPostProcess {
             alphaModifier: 0.007,
             specularPower: 1.5,
             smoothness: 0.9,
+            waveBlendingSharpness: 0.5,
         };
 
         let uniforms: ShaderUniformData = {
@@ -44,6 +45,10 @@ export class OceanPostProcess extends PlanetPostProcess {
             "depthModifier": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.depthModifier}
+            },
+            "waveBlendingSharpness": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.waveBlendingSharpness}
             },
 
             "planetWorldMatrix": {

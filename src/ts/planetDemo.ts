@@ -117,6 +117,10 @@ sliders.push(new Slider("smoothness", document.getElementById("smoothness")!, 0,
     ocean.settings.smoothness = val / 100;
 }));
 
+sliders.push(new Slider("waveBlendingSharpness", document.getElementById("waveBlendingSharpness")!, 0, 100, ocean.settings.smoothness * 100, (val: number) => {
+    ocean.settings.waveBlendingSharpness = val / 100;
+}));
+
 function babylonToHex(color: Vector3): string {
     let c2 = new Color3(color.x, color.y, color.z);
     return c2.toHexString();

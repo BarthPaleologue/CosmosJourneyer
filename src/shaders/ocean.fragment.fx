@@ -26,6 +26,7 @@ uniform float smoothness;
 uniform float specularPower;
 uniform float alphaModifier;
 uniform float depthModifier;
+uniform float waveBlendingSharpness;
 
 uniform mat4 planetWorldMatrix;
 
@@ -182,11 +183,11 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
 
     vec3 planetNormal = normalize(samplePoint - planetPosition);
     
-    vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time) * 100.0, planetNormal, normalMap1, 0.0001, 0.8, 0.5);
-    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 100.0, normalWave, normalMap2, 0.0001, 0.8, 1.0);
+    vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time) * 100.0, planetNormal, normalMap1, 0.0001, waveBlendingSharpness, 0.5);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 100.0, normalWave, normalMap2, 0.0001, waveBlendingSharpness, 1.0);
 
-    normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time, -time, -time) * 300.0, normalWave, normalMap2, 0.00002, 0.8, 1.0);
-    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 300.0, normalWave, normalMap2, 0.00002, 0.8, 1.0);
+    normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time, -time, -time) * 300.0, normalWave, normalMap2, 0.00002, waveBlendingSharpness, 1.0);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 300.0, normalWave, normalMap2, 0.00002, waveBlendingSharpness, 1.0);
 
     vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
 

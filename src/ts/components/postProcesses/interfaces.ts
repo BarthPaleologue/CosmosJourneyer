@@ -32,6 +32,7 @@ export interface OceanSettings {
     specularPower: number,
     depthModifier: number,
     alphaModifier: number,
+    waveBlendingSharpness: number;
 }
 
 export interface RingsSettings {
