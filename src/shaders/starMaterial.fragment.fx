@@ -53,11 +53,11 @@ void main() {
 
 	unitPosition += vec3(time, -time, time) / 100.0;
 	
-	float noiseValue = completeNoise(unitPosition * 20.0, 10, 2.0, 2.0);
+	float noiseValue = completeNoise(unitPosition * 20.0, 8, 2.0, 2.0);
 
 	vec3 finalColor = starColor;
 
-	finalColor -= vec3(pow(noiseValue, 0.8) / 1.2);
+	finalColor -= vec3(pow(noiseValue, 4.0));
 
 	gl_FragColor = vec4(finalColor, 1.0); // apply color and lighting	
 } 

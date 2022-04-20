@@ -1,7 +1,7 @@
 import {getRgbFromTemperature} from "../../../utils/specrend";
 import {CelestialBody} from "../celestialBody";
 
-import {Axis, Mesh, Quaternion, Scene, ShaderMaterial, Space, Vector3} from "@babylonjs/core";
+import {Axis, Matrix, Mesh, Quaternion, Scene, ShaderMaterial, Space, Vector3} from "@babylonjs/core";
 import {CelestialBodyType, StarPhysicalProperties} from "../interfaces";
 import {initMeshTransform} from "../../../utils/mesh";
 import {PlayerController} from "../../player/playerController";
@@ -60,17 +60,18 @@ export class Star extends CelestialBody {
     }
     public rotate(axis: Vector3, amount: number) {
         this.mesh.rotate(axis, amount, Space.WORLD);
-        this.physicalProperties.rotationAxis = this.mesh.up;
+        this.physicalProperties.rotationAxis = Vector3.TransformCoordinates(this.physicalProperties.rotationAxis, Matrix.RotationAxis(axis, amount));
     }
 
     public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
-        this.mesh.rotate(this.physicalProperties.rotationAxis, this.mesh.getEngine().getDeltaTime() / (1000 * this.physicalProperties.rotationPeriod));
+        this.mesh.rotate(this.physicalProperties.rotationAxis, deltaTime / this.physicalProperties.rotationPeriod);
 
         this.starMaterial.setFloat("time", this.internalTime);
         this.starMaterial.setVector3("starColor", getRgbFromTemperature(this.physicalProperties.temperature));
         this.starMaterial.setMatrix("planetWorldMatrix", this.mesh.getWorldMatrix());
 
         this.internalTime += deltaTime;
+        this.internalTime %= 24 * 60 * 60;
     }
 
     public getRadius(): number {
