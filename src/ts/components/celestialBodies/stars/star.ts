@@ -1,7 +1,7 @@
 import {getRgbFromTemperature} from "../../../utils/specrend";
 import {CelestialBody} from "../celestialBody";
 
-import {Axis, Matrix, Mesh, Quaternion, Scene, ShaderMaterial, Space, Vector3} from "@babylonjs/core";
+import {Axis, MaterialHelper, Matrix, Mesh, Quaternion, Scene, ShaderMaterial, Space, Vector3} from "@babylonjs/core";
 import {CelestialBodyType, StarPhysicalProperties} from "../interfaces";
 import {initMeshTransform} from "../../../utils/mesh";
 import {PlayerController} from "../../player/playerController";
@@ -34,10 +34,15 @@ export class Star extends CelestialBody {
                 attributes: ["position"],
                 uniforms: [
                     "world", "worldViewProjection", "planetWorldMatrix",
-                    "starColor", "time"
-                ]
+                    "starColor", "time", "logarithmicDepthConstant"
+                ],
+                //defines: ["#define LOGARITHMICDEPTH"]
             }
         );
+        /*starMaterial.onBindObservable.add(() => {
+            let effect = starMaterial.getEffect();
+            MaterialHelper.BindLogDepth(null, effect, scene);
+        });*/
 
         this.starMaterial = starMaterial;
 

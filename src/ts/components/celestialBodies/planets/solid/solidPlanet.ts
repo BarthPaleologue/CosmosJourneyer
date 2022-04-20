@@ -132,10 +132,18 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
                     "minTemperature", "maxTemperature",
 
-                    "waterAmount"
-                ]
+                    "waterAmount",
+
+                    "logarithmicDepthConstant"
+                ],
+                defines: ["#define LOGARITHMICDEPTH"]
             }
         );
+
+        surfaceMaterial.onBindObservable.add(() => {
+            let effect = surfaceMaterial.getEffect();
+            MaterialHelper.BindLogDepth(null, effect, scene);
+        });
 
         surfaceMaterial.setVector3("seed", new Vector3(this._seed[0], this._seed[1], this._seed[2]));
 

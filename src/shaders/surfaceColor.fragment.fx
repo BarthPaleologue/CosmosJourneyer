@@ -1,4 +1,9 @@
-precision lowp float;
+precision highp float;
+
+#ifdef LOGARITHMICDEPTH
+	uniform float logarithmicDepthConstant;
+	varying float vFragmentDepth;
+#endif
 
 // Lights
 varying vec3 vPositionW;
@@ -122,9 +127,6 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, flo
     tNormalY = normalize(tNormalY * 2.0 - 1.0) * normalStrength;
     tNormalZ = normalize(tNormalZ * 2.0 - 1.0) * normalStrength;
 
-    tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
-    tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
-    tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, tNormalZ.z * surfaceNormal.z);
     tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, surfaceNormal.x);
     tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, surfaceNormal.y);
     tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, surfaceNormal.z);
@@ -290,11 +292,9 @@ float waterBoilingPointCelsius(float pressure) {
 
 void main() {
 	vec3 viewRayW = normalize(playerPosition - vPositionW); // view direction in world space
-	vec3 parallelLightRayW = normalize(sunPosition - planetPosition); // light ray direction in world space
 	vec3 lightRayW = normalize(sunPosition - vPositionW); // light ray direction in world space
 
 	vec3 sphereNormalW = normalize(vec3(world * vec4(normalize(vPosition), 0.0)));
-	float ndl = max(0.07, dot(sphereNormalW, parallelLightRayW));
 	float ndl = max(0.01, dot(sphereNormalW, lightRayW));
 
 	// la unitPosition ne prend pas en compte la rotation de la planète
@@ -356,7 +356,6 @@ void main() {
 	vec3 color = computeColorAndNormal(elevation01, waterLevel01, slope, normal, temperature01, moisture01, waterMeltingPoint01, absLatitude01);
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
-	float ndl2 = max(0.1, dot(normalW, parallelLightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
 	float ndl2 = max(0.1, dot(normalW, lightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
 
 	// specular
@@ -368,7 +367,6 @@ void main() {
 	specComp *= (color.r + color.g + color.b) / 3.0;
 	specComp /= 2.0;
 
-	vec3 screenColor = color.rgb * (ndl2*ndl + specComp);
 	vec3 screenColor = color.rgb * (sqrt(ndl*ndl2) + specComp);
 
 	int colorMode = 0;
@@ -378,5 +376,8 @@ void main() {
 	if(colorMode == 4) screenColor = vec3(elevation01);
 	if(colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vPosition)));
 
-	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting	
+	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting
+	#ifdef LOGARITHMICDEPTH
+    	gl_FragDepthEXT = log2(vFragmentDepth) * logarithmicDepthConstant * 0.5;
+    #endif
 } 

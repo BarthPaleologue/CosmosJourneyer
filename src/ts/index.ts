@@ -71,6 +71,7 @@ player.setSpeed(0.2 * radius);
 player.mesh.rotate(player.camera.getDirection(Axis.Y), 0.8, Space.WORLD);
 
 player.camera.maxZ = Math.max(radius * 50, 10000);
+player.camera.maxZ = Math.max(radius * 100, 10000);
 
 //https://github.com/BabylonJS/Babylon.js/issues/7133 messing around with depth buffer
 /*engine.setDepthFunctionToGreaterOrEqual();
