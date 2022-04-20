@@ -183,15 +183,16 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
 
     vec3 planetNormal = normalize(samplePoint - planetPosition);
     
-    vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time) * 100.0, planetNormal, normalMap1, 0.0001, waveBlendingSharpness, 0.5);
+    vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time) * 100.0, planetNormal, normalMap2, 0.00015, waveBlendingSharpness, 1.0);
     normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 100.0, normalWave, normalMap2, 0.0001, waveBlendingSharpness, 1.0);
 
-    normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time, -time, -time) * 300.0, normalWave, normalMap2, 0.00002, waveBlendingSharpness, 1.0);
-    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 300.0, normalWave, normalMap2, 0.00002, waveBlendingSharpness, 1.0);
+    normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time, -time, -time) * 300.0, normalWave, normalMap2, 0.000025, waveBlendingSharpness, 1.0);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 300.0, normalWave, normalMap2, 0.00002, waveBlendingSharpness, 1.0);
 
-    vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
+    vec3 sunDir = normalize(sunPosition - samplePoint);
 
-    float ndl = max(dot(normalWave, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
+    float ndl1 = max(dot(normalWave, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
+    float ndl2 = max(dot(planetNormal, sunDir), 0.0);
 
     float specularAngle = fastAcos(dot(normalize(sunDir - rayDir), normalWave));
     float specularExponent = specularAngle / (1.0 - smoothness);
@@ -209,7 +210,7 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         
         vec3 ambiant = lerp(originalColor, oceanColor, alpha);
 
-        return ambiant * ndl + specularHighlight;
+        return ambiant * sqrt(ndl1 * ndl2) + specularHighlight;
     } else {
         return originalColor;
     }

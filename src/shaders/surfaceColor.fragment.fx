@@ -295,6 +295,7 @@ void main() {
 
 	vec3 sphereNormalW = normalize(vec3(world * vec4(normalize(vPosition), 0.0)));
 	float ndl = max(0.07, dot(sphereNormalW, parallelLightRayW));
+	float ndl = max(0.01, dot(sphereNormalW, lightRayW));
 
 	// la unitPosition ne prend pas en compte la rotation de la planète
 	vec3 unitPosition = normalize(vPosition);
@@ -356,6 +357,7 @@ void main() {
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
 	float ndl2 = max(0.1, dot(normalW, parallelLightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
+	float ndl2 = max(0.1, dot(normalW, lightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
 
 	// specular
 	vec3 angleW = normalize(viewRayW + lightRayW);
@@ -367,6 +369,7 @@ void main() {
 	specComp /= 2.0;
 
 	vec3 screenColor = color.rgb * (ndl2*ndl + specComp);
+	vec3 screenColor = color.rgb * (sqrt(ndl*ndl2) + specComp);
 
 	int colorMode = 0;
 	if(colorMode == 1) screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
