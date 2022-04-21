@@ -25,6 +25,9 @@ uniform float planetRadius; // planet radius
 uniform float cloudFrequency; // cloud frequency
 uniform float cloudDetailFrequency; // cloud detail frequency
 uniform float cloudPower; // cloud power
+uniform float cloudSharpness;
+
+uniform vec3 cloudColor;
 
 uniform float worleySpeed; // worley noise speed
 uniform float detailSpeed; // detail noise speed
@@ -297,9 +300,9 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, flo
     tNormalY = normalize(tNormalY * 2.0 - 1.0) * normalStrength;
     tNormalZ = normalize(tNormalZ * 2.0 - 1.0) * normalStrength;
 
-    tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, tNormalX.z * surfaceNormal.x);
-    tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, tNormalY.z * surfaceNormal.y);
-    tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, tNormalZ.z * surfaceNormal.z);
+    tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, surfaceNormal.x);
+    tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, surfaceNormal.y);
+    tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, surfaceNormal.z);
 
     vec3 blendWeight = pow(abs(surfaceNormal), vec3(sharpness));
     blendWeight /= dot(blendWeight, vec3(1.0));
@@ -312,23 +315,25 @@ vec3 lerp(vec3 v1, vec3 v2, float s) {
     return s * v1 + (1.0 - s) * v2;
 }
 
+float tanh01(float x) {
+	return (tanh(x) + 1.0) / 2.0;
+}
+float tanhSharpener(float x, float s) {
+	float sampleValue = (x - 0.5) * s;
+	return tanh01(sampleValue);
+}
+
 float cloudDensityAtPoint(vec3 samplePoint) {
 
-    float density = worley(normalize(samplePoint) * cloudFrequency + vec3(time * 0.01 * worleySpeed), 1.0).x;
-
-    density = 1.0 - density;
-
-    float minValue = 0.0;
-    
-    density = max(0.0, density - minValue);
-
-    density /= 1.0 - minValue;
+    float density = 1.0 - worley(normalize(samplePoint) * cloudFrequency + vec3(time * 0.01 * worleySpeed), 1.0).x;
 
     density *= completeNoise(normalize(samplePoint) * cloudDetailFrequency + vec3(time * 0.01 * detailSpeed), 5, 2.0, 2.0);
 
     density = saturate(density * 2.0);
 
     density = pow(density, cloudPower);
+
+    density = tanhSharpener(density, cloudSharpness);
 
     return density;
 }
@@ -339,8 +344,6 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint))) {
         return originalColor; // if not intersecting with atmosphere, return original color
     }
-
-	//impactPoint += 10000.0 * completeNoise(normalize(rayOrigin + impactPoint * rayDir), 5, 2.0, 2.0);
 
 	float waterImpact, waterEscape;
     if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, waterImpact, waterEscape)) {
@@ -357,38 +360,27 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     }
     if(impactPoint > maximumDistance) return originalColor;
 
-
-    // traiter le cas où les deux points sont acceptables.
-
     vec3 samplePoint1 = rayOrigin + impactPoint * rayDir;
     vec3 samplePoint2 = rayOrigin + escapePoint * rayDir;
 
-    vec3 samplePointPlanetSpace1 = vec3(inverse(planetWorldMatrix) * vec4(samplePoint1, 1.0));//samplePoint - planetPosition;
-    vec3 samplePointPlanetSpace2 = vec3(inverse(planetWorldMatrix) * vec4(samplePoint2, 1.0));//samplePoint - planetPosition;
+    vec3 samplePointPlanetSpace1 = vec3(inverse(planetWorldMatrix) * vec4(samplePoint1, 1.0));
+    vec3 samplePointPlanetSpace2 = vec3(inverse(planetWorldMatrix) * vec4(samplePoint2, 1.0));
 
     vec3 planetNormal = normalize(samplePoint1 - planetPosition);
 
     /// Cloud point 1
     float cloudDensity = cloudDensityAtPoint(samplePointPlanetSpace1);
 
-
     /// Cloud point 2
     if(twoPoints) {
         cloudDensity += cloudDensityAtPoint(samplePointPlanetSpace2);
-		//return vec3(1.0,0.0,0.0);
-    } else {
-		//return vec3(0.0, 1.0, 0.0);
-	}
-
-
+    }
 
 	cloudDensity = saturate(cloudDensity);
 
-	cloudDensity *= saturate((maximumDistance - impactPoint)/10000.0);
+	cloudDensity *= saturate((maximumDistance - impactPoint) / 10000.0); // fade away when close to surface
 
-
-	vec3 normal = triplanarNormal(samplePointPlanetSpace1, planetNormal, normalMap, 0.00002, 1.0, cloudDensity);
-	//vec3 normal = planetNormal;
+	vec3 normal = triplanarNormal(samplePointPlanetSpace1, planetNormal, normalMap, 0.00001, 0.5, cloudDensity);
 
     vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
 
@@ -400,14 +392,10 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     float specularExponent = specularAngle / (1.0 - smoothness);
     float specularHighlight = exp(-specularExponent * specularExponent);
 
-	vec3 ambiant = lerp(originalColor, vec3(ndl), 1.0 - cloudDensity);
+	vec3 ambiant = lerp(originalColor, ndl * cloudColor, 1.0 - cloudDensity);
 
     return ambiant + specularHighlight * cloudDensity;
 }
-
-
-
-
 
 void main() {
     vec3 screenColor = texture2D(textureSampler, vUV).rgb; // the current screen color

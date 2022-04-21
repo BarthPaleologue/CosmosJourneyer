@@ -197,6 +197,14 @@ document.getElementById("cloudsToggler")?.addEventListener("click", () => {
     flatClouds.settings.cloudLayerRadius = checkbox.checked ? planetRadius + 15e3 : 0;
 });
 
+let cloudColorPicker = document.getElementById("cloudColor") as HTMLInputElement;
+cloudColorPicker.value = babylonToHex(flatClouds.settings.cloudColor);
+cloudColorPicker.addEventListener("input", () => {
+    let color = Color3.FromHexString(cloudColorPicker.value);
+    flatClouds.settings.cloudColor = new Vector3(color.r, color.g, color.b);
+});
+
+
 sliders.push(new Slider("cloudFrequency", document.getElementById("cloudFrequency")!, 0, 20, flatClouds.settings.cloudFrequency, (val: number) => {
     flatClouds.settings.cloudFrequency = val;
 }));
@@ -207,6 +215,10 @@ sliders.push(new Slider("cloudDetailFrequency", document.getElementById("cloudDe
 
 sliders.push(new Slider("cloudPower", document.getElementById("cloudPower")!, 0, 100, flatClouds.settings.cloudPower * 10, (val: number) => {
     flatClouds.settings.cloudPower = val / 10;
+}));
+
+sliders.push(new Slider("cloudSharpness", document.getElementById("cloudSharpness")!, 0, 100, flatClouds.settings.cloudSharpness, (val: number) => {
+    flatClouds.settings.cloudSharpness = val;
 }));
 
 sliders.push(new Slider("worleySpeed", document.getElementById("worleySpeed")!, 0.0, 200.0, flatClouds.settings.worleySpeed * 10, (val: number) => {

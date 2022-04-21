@@ -1,4 +1,4 @@
-import {Scene, Texture} from "@babylonjs/core";
+import {Scene, Texture, Vector3} from "@babylonjs/core";
 
 import {CloudSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
@@ -18,9 +18,11 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             cloudLayerRadius: cloudLayerRadius,
             specularPower: 2,
             smoothness: 0.9,
-            cloudFrequency: 3,
-            cloudDetailFrequency: 15.0,
-            cloudPower: 5,
+            cloudFrequency: 4,
+            cloudDetailFrequency: 20,
+            cloudPower: 2,
+            cloudSharpness: 7,
+            cloudColor: new Vector3(0.8, 0.8, 0.8),
             worleySpeed: 0.5,
             detailSpeed: 1.0,
         };
@@ -41,6 +43,14 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             "cloudPower": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.cloudPower}
+            },
+            "cloudSharpness": {
+                type: ShaderDataType.Float,
+                get: () => {return settings.cloudSharpness}
+            },
+            "cloudColor": {
+                type: ShaderDataType.Vector3,
+                get: () => {return settings.cloudColor}
             },
             "worleySpeed": {
                 type: ShaderDataType.Float,

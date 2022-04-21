@@ -1,3 +1,5 @@
+import {Vector3} from "@babylonjs/core";
+
 export interface AtmosphereSettings {
     atmosphereRadius: number;
     falloffFactor: number;
@@ -12,14 +14,16 @@ export interface AtmosphereSettings {
 }
 
 export interface CloudSettings {
-    cloudLayerRadius: number,
-    smoothness: number,
-    specularPower: number,
-    cloudFrequency: number,
-    cloudDetailFrequency: number,
-    cloudPower: number,
-    worleySpeed: number,
-    detailSpeed: number,
+    cloudLayerRadius: number;
+    smoothness: number;
+    specularPower: number;
+    cloudFrequency: number;
+    cloudDetailFrequency: number;
+    cloudPower: number;
+    cloudSharpness: number;
+    cloudColor: Vector3;
+    worleySpeed: number;
+    detailSpeed: number;
 }
 
 export interface VolumetricCloudSettings {
