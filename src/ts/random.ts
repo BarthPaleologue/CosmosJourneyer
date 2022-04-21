@@ -17,7 +17,7 @@ import { RingsPostProcess } from "./components/postProcesses/planetPostProcesses
 import { centeredRandom, nrand, randInt } from "./utils/random";
 import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
 import { Star } from "./components/celestialBodies/stars/star";
-import {Algebra, LQuaternion} from "./utils/algebra";
+
 style.default;
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -30,7 +30,6 @@ engine.loadingScreen.displayLoadingUI();
 console.log("GPU utilisé : " + engine.getGlInfo().renderer);
 
 let scene = new Scene(engine);
-scene.clearColor = new Color4(0, 0, 0, 1);
 
 let depthRenderer = new DepthRenderer(scene);
 scene.renderTargetsEnabled = true;
@@ -90,7 +89,7 @@ planet.colorSettings.beachSize = 250 + 100 * centeredRandom();
 planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
 
 planet.updateColors();
-planet.attachNode.position.x = radius * 2;
+planet.translate(new Vector3(radius * 2, 0, 0));
 
 planet.rotate(Axis.X, centeredRandom());
 
@@ -143,10 +142,6 @@ scene.executeWhenReady(() => {
 
     scene.beforeRender = () => {
         player.nearestBody = starSystemManager.getNearestBody();
-        // si trop loin on osef
-        if (player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() > player.nearestBody.getRadius() * 2) {
-            player.nearestBody = null;
-        }
 
         starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, engine.getDeltaTime() / 1000);
 
@@ -162,7 +157,7 @@ scene.executeWhenReady(() => {
 
         starSystemManager.translateAllCelestialBody(deplacement);
 
-        if (!collisionWorker.isBusy() && player.nearestBody != null) {
+        if (!collisionWorker.isBusy() && player.isOrbiting()) {
             if(player.nearestBody instanceof SolidPlanet) {
                 //FIXME: se passer de instanceof
                 collisionWorker.checkCollision(player.nearestBody);

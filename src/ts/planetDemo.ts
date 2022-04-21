@@ -6,7 +6,6 @@ import {
     Texture,
     DepthRenderer,
     Axis,
-    Space,
     Vector3,
     Tools,
     FxaaPostProcess,
@@ -40,7 +39,6 @@ let engine = new Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 
 let scene = new Scene(engine);
-scene.clearColor = new Color4(0, 0, 0, 1);
 
 let depthRenderer = new DepthRenderer(scene);
 scene.renderTargetsEnabled = true;

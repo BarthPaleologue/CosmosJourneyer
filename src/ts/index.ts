@@ -50,7 +50,6 @@ engine.loadingScreen.displayLoadingUI();
 console.log("GPU utilisé : " + engine.getGlInfo().renderer);
 
 let scene = new Scene(engine);
-scene.clearColor = new Color4(0, 0, 0, 1);
 
 let depthRenderer = new DepthRenderer(scene);
 scene.renderTargetsEnabled = true;
@@ -171,11 +170,7 @@ function updateScene() {
 
     player.nearestBody = starSystemManager.getNearestBody();
 
-    if (player.isOrbiting()) {
-        document.getElementById("planetName")!.innerText = player.nearestBody!.getName();
-    } else {
-        document.getElementById("planetName")!.innerText = "Outer Space";
-    }
+    document.getElementById("planetName")!.innerText = player.isOrbiting() ? player.nearestBody!.getName() : "Outer Space";
 
     starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, timeMultiplicator * deltaTime);
 
@@ -189,7 +184,7 @@ function updateScene() {
     deplacement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
     starSystemManager.translateAllCelestialBody(deplacement);
 
-    if (!collisionWorker.isBusy() && player.nearestBody != null && player.nearestBody.getAbsolutePosition().length() < player.nearestBody.getRadius() * 2) {
+    if (!collisionWorker.isBusy() && player.isOrbiting()) {
         if (player.nearestBody instanceof SolidPlanet) {
             //FIXME: se passer de instanceof
             collisionWorker.checkCollision(player.nearestBody);
@@ -205,7 +200,7 @@ document.addEventListener("keydown", e => {
     if (e.key == "o") ocean.settings.oceanRadius = (ocean.settings.oceanRadius == 0) ? planet.getRadius() : 0;
     if (e.key == "y") flatClouds.settings.cloudLayerRadius = (flatClouds.settings.cloudLayerRadius == 0) ? radius + 15e3 : 0;
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
-    if (e.key == "w" && player.nearestBody != null) (<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe = !(<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe;
+    if (e.key == "w" && player.isOrbiting()) (<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe = !(<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe;
 });
 
 window.addEventListener("resize", () => {

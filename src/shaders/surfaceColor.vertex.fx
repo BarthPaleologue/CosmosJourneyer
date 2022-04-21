@@ -1,4 +1,4 @@
-precision highp float;
+precision lowp float;
 
 // Attributes
 attribute vec3 vertex;
