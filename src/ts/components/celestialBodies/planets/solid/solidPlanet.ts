@@ -33,8 +33,17 @@ import {TaskType} from "../../../forge/taskInterfaces";
 import {initMeshTransform} from "../../../../utils/mesh";
 import {PlayerController} from "../../../player/playerController";
 
+export enum ColorMode {
+    DEFAULT,
+    MOISTURE,
+    TEMPERATURE,
+    NORMAL,
+    HEIGHT
+}
 
 export interface ColorSettings {
+    mode: number;
+
     snowColor: Vector3;
     steepColor: Vector3;
     plainColor: Vector3;
@@ -108,6 +117,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         };
 
         this.colorSettings = {
+            mode: ColorMode.DEFAULT,
+
             snowColor: new Vector3(1, 1, 1),
             steepColor: new Vector3(55, 42, 42).scale(1 / 255),
             plainColor: new Vector3(0.5, 0.3, 0.08),
@@ -126,6 +137,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
                     "world", "worldViewProjection", "projection", "view",
 
                     "textureSampler", "depthSampler",
+
+                    "colorMode",
 
                     "bottomNormalMap",
                     "plainNormalMap", "beachNormalMap", "desertNormalMap",
@@ -262,6 +275,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
      */
     public updateColors(): void {
         //TODO: when the code is robust enough, get rid of this method
+        this.surfaceMaterial.setInt("colorMode", this.colorSettings.mode);
+
         this.surfaceMaterial.setFloat("waterLevel", this.waterLevel);
         this.surfaceMaterial.setFloat("beachSize", this.colorSettings.beachSize);
         this.surfaceMaterial.setFloat("steepSharpness", this.colorSettings.steepSharpness);

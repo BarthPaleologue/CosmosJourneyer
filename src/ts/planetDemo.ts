@@ -14,7 +14,7 @@ import {
 } from "@babylonjs/core";
 
 import { AtmosphericScatteringPostProcess } from "./components/postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
-import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
+import {ColorMode, SolidPlanet} from "./components/celestialBodies/planets/solid/solidPlanet";
 import { OceanPostProcess } from "./components/postProcesses/planetPostProcesses/oceanPostProcess";
 
 import * as style from "../styles/style.scss";
@@ -92,6 +92,15 @@ let sliders: Slider[] = [];
 
 sliders.push(new Slider("zoom", document.getElementById("zoom")!, 0, 100, 100 * planet._radius / planet.attachNode.position.z, (value: number) => {
     planet.attachNode.position.z = 100 * planet._radius / (value);
+}));
+
+
+sliders.push(new Slider("minTemperature", document.getElementById("minTemperature")!, -273, 300, planet.physicalProperties.minTemperature, (val: number) => {
+    planet.physicalProperties.minTemperature = val;
+}));
+
+sliders.push(new Slider("maxTemperature", document.getElementById("maxTemperature")!, -273, 300, planet.physicalProperties.maxTemperature, (val: number) => {
+    planet.physicalProperties.maxTemperature = val;
 }));
 
 
@@ -313,6 +322,27 @@ for(const link of document.querySelector("nav")!.children) {
        }
     });
 }
+
+document.getElementById("defaultMapButton")!.addEventListener("click", () => {
+   planet.colorSettings.mode = ColorMode.DEFAULT;
+   planet.updateColors();
+});
+document.getElementById("moistureMapButton")!.addEventListener("click", () => {
+    planet.colorSettings.mode = ColorMode.MOISTURE;
+    planet.updateColors();
+});
+document.getElementById("temperatureMapButton")!.addEventListener("click", () => {
+    planet.colorSettings.mode = ColorMode.TEMPERATURE;
+    planet.updateColors();
+});
+document.getElementById("normalMapButton")!.addEventListener("click", () => {
+    planet.colorSettings.mode = ColorMode.NORMAL;
+    planet.updateColors();
+});
+document.getElementById("heightMapButton")!.addEventListener("click", () => {
+    planet.colorSettings.mode = ColorMode.HEIGHT;
+    planet.updateColors();
+});
 
 window.addEventListener("resize", () => {
     canvas.width = window.innerWidth - 300; // on compte le panneau

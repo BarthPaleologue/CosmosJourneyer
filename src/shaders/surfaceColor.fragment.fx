@@ -24,6 +24,8 @@ uniform mat4 projection;
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler; // evaluate sceneDepth
 
+uniform int colorMode;
+
 uniform sampler2D bottomNormalMap;
 uniform sampler2D plainNormalMap;
 
@@ -382,7 +384,6 @@ void main() {
 
 	vec3 screenColor = color.rgb * (sqrt(ndl*ndl2) + specComp);
 
-	int colorMode = 0;
 	if(colorMode == 1) screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
 	if(colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.7, 0.7, 1.0), temperature01);
 	if(colorMode == 3) screenColor = normal*0.5 + 0.5;

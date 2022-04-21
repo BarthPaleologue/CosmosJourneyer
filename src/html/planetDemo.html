@@ -13,12 +13,14 @@
 <body>
     <nav>
         <div id="generalLink">General</div>
+        <div id="physicLink">Physic</div>
         <div id="oceanLink">Ocean</div>
         <div id="surfaceLink">Surface</div>
         <div id="cloudsLink">Clouds</div>
         <div id="atmosphereLink">Atmosphere</div>
         <div id="ringsLink">Rings</div>
     </nav>
+
     <div class="ui" id="generalUI">
         <h1>General</h1>
 
@@ -33,6 +35,16 @@
 
         <p>Camera FOV : </p>
         <div id="cameraFOV"></div>
+    </div>
+
+    <div hidden class="ui" id="physicUI">
+        <h1>Physics</h1>
+
+        <p>Minimum Temperature : </p>
+        <div id="minTemperature"></div>
+
+        <p>Maximum Temperature : </p>
+        <div id="maxTemperature"></div>
     </div>
 
     <div hidden class="ui" id="oceanUI">
@@ -188,6 +200,15 @@
 
         <p>Rings Opacity : </p>
         <div id="ringsOpacity"></div>
+    </div>
+    
+    <div id="toolbar">
+        <img id="defaultMapButton" src="../asset/buttonIcons/defaultmap.png">
+        <img id="moistureMapButton" src="../asset/buttonIcons/moisturemap.png">
+        <img id="temperatureMapButton" src="../asset/buttonIcons/temperaturemap.png">
+        <img id="normalMapButton" src="../asset/buttonIcons/normalmap.png">
+        <img id="heightMapButton" src="../asset/buttonIcons/heightmap.png">
+
     </div>
 
 
