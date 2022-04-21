@@ -24,7 +24,7 @@ import {Gamepad} from "./components/inputs/gamepad";
 import {CollisionWorker} from "./components/workers/collisionWorker";
 import {StarSystemManager} from "./components/celestialBodies/starSystemManager";
 
-import rockn from "../asset/textures/rockn.png";
+import rockNormalMap from "../asset/textures/rockn.png";
 
 import {FlatCloudsPostProcess} from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import {RingsPostProcess} from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
@@ -72,18 +72,6 @@ player.mesh.rotate(player.camera.getDirection(Axis.Y), 0.8, Space.WORLD);
 
 player.camera.maxZ = Math.max(radius * 100, 10000);
 
-//https://github.com/BabylonJS/Babylon.js/issues/7133 messing around with depth buffer
-/*engine.setDepthFunctionToGreaterOrEqual();
-scene.autoClear = false;
-scene.autoClearDepthAndStencil = false;
-scene.setRenderingAutoClearDepthStencil(0, false, false, false);
-scene.setRenderingAutoClearDepthStencil(1, false, false, false);
-scene.onBeforeDrawPhaseObservable.add((scene, state) => {
-    const gl = scene.getEngine()._gl;
-    gl.clearDepth(0.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
-});*/
-
 let starSystemManager = new StarSystemManager(64);
 
 let sun = new Star("Weierstrass", 0.4 * radius, new Vector3(-910000, 0, -1700000), scene);
@@ -129,9 +117,9 @@ moon.colorSettings.desertColor = moon.colorSettings.plainColor.scale(0.5);
 moon.colorSettings.steepColor = new Vector3(0.1, 0.1, 0.1);
 moon.updateColors();
 
-moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockn, scene));
-moon.surfaceMaterial.setTexture("bottomNormalMap", new Texture(rockn, scene));
-moon.surfaceMaterial.setTexture("sandNormalMap", new Texture(rockn, scene));
+moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockNormalMap, scene));
+moon.surfaceMaterial.setTexture("bottomNormalMap", new Texture(rockNormalMap, scene));
+moon.surfaceMaterial.setTexture("sandNormalMap", new Texture(rockNormalMap, scene));
 
 moon.translate(planet.attachNode.getAbsolutePosition());
 
