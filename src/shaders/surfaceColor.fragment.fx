@@ -215,7 +215,8 @@ vec3 computeColorAndNormal(
 	if(elevation01 > waterLevel01) {
 
 		// séparation biome désert biome plaine
-		float moistureFactor = tanherpFactor(moisture01, 32.0);
+		float moistureSharpness = 20.0;
+		float moistureFactor = tanherpFactor(moisture01, moistureSharpness);
 		vec3 plainColor = tanherp(plainColor, 0.7 * plainColor, noise(vPosition/10000.0), 3.0);
 
 		vec3 flatColor = lerp(plainColor, desertColor, moistureFactor);
@@ -330,7 +331,7 @@ void main() {
 	float pressure = 1.0;
 	float waterSublimationPression = 0.006; //https://www.wikiwand.com/en/Sublimation_(phase_transition)#/Water
 	
-	// Températures
+	// Temperatures
 	
 	float waterMeltingPoint = 0.0; // fairly good approximation
 	float waterMeltingPoint01 = (waterMeltingPoint - minTemperature) / (maxTemperature - minTemperature);
@@ -338,19 +339,33 @@ void main() {
 
 	//https://qph.fs.quoracdn.net/main-qimg-6a0fa3c05fb4db3d7d081680aec4b541
 	float co2SublimationTemperature = 0.0; // https://www.wikiwand.com/en/Sublimation_(phase_transition)#/CO2
-	// TODO: trouver l'équation de ses morts
+	// TODO: find the equation ; even better use a texture
 	float co2SublimationTemperature01 = (co2SublimationTemperature - minTemperature) / (maxTemperature - minTemperature);
 
 	float temperatureHeightFalloff = 3.0;
 	float temperatureLatitudeFalloff = 1.0;
-	float temperatureRotationFactor = tanh(dayDuration * 0.2);
-	// https://www.researchgate.net/profile/Anders-Levermann/publication/274494740/figure/fig3/AS:391827732615174@1470430419170/a-Surface-air-temperature-as-a-function-of-latitude-for-data-averaged-over-1961-90-for.png
+
+	// TODO: do not hardcode that factor
+	float temperatureRotationFactor = tanh(0.15 * dayDuration);
+
 	// https://www.desmos.com/calculator/apezlfvwic
-	float temperature01 = -pow(temperatureLatitudeFalloff * absLatitude01, 3.0) + 1.0; // la température diminue vers les pôles
-	temperature01 *= exp(-elevation01 * temperatureHeightFalloff); // la température diminue exponentiellement avec l'altitude
-	temperature01 += (completeNoise(unitPosition * 300.0, 5, 1.7, 2.5) - 0.5) / 4.0; // on ajoute des fluctuations locales
-	temperature01 *= (ndl * temperatureRotationFactor) + 1.0 - temperatureRotationFactor; // la température diminue la nuit
-	temperature01 = clamp(temperature01, 0.0, 1.0); // on reste dans la range [0, 1]
+	float temperature01 = 1.0;
+
+	// temperature drops with latitude
+	// https://www.researchgate.net/profile/Anders-Levermann/publication/274494740/figure/fig3/AS:391827732615174@1470430419170/a-Surface-air-temperature-as-a-function-of-latitude-for-data-averaged-over-1961-90-for.png
+   	temperature01 -= pow(temperatureLatitudeFalloff * absLatitude01, 3.0);
+
+	// temperature drops exponentially with elevation
+	temperature01 *= exp(-elevation01 * temperatureHeightFalloff);
+
+	// added random fluctuations
+	temperature01 += (completeNoise(unitPosition * 300.0, 5, 1.7, 2.5) - 0.5) / 4.0;
+
+	// temperature drops during nighttime (more ice)
+	temperature01 *= ndl * temperatureRotationFactor + 1.0 - temperatureRotationFactor;
+
+    // cannot exceed max and min temperatures
+	temperature01 = clamp(temperature01, 0.0, 1.0);
 
 	float temperature = lerp(maxTemperature, minTemperature, temperature01);
 
