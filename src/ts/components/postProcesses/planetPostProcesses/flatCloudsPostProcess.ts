@@ -10,8 +10,6 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
 
     settings: CloudSettings;
 
-    internalTime: number;
-
     constructor(name: string, planet: SolidPlanet, cloudLayerRadius: number, sun: Star, scene: Scene) {
 
         let settings: CloudSettings = {
@@ -24,7 +22,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             cloudSharpness: 7,
             cloudColor: new Vector3(0.8, 0.8, 0.8),
             worleySpeed: 0.5,
-            detailSpeed: 1.0,
+            detailSpeed: 3,
         };
 
         let uniforms: ShaderUniformData = {
@@ -74,10 +72,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             },
             "time": {
                 type: ShaderDataType.Float,
-                get: () => {
-                    this.internalTime += scene.getEngine().getDeltaTime() / 1000;
-                    return this.internalTime;
-                }
+                get: () => {return this.internalTime}
             }
         };
 
@@ -89,8 +84,6 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
         }
 
         super(name, "./shaders/flatClouds", uniforms, samplers, planet, sun, scene);
-
-        this.internalTime = 0;
 
         this.settings = settings;
     }

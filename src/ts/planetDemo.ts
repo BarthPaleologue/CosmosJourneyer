@@ -45,7 +45,7 @@ scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
-let timeMultiplicator = 500;
+let timeMultiplicator = 1;
 const planetRadius = 1000e3;
 
 let player = new PlayerController(scene);
@@ -61,8 +61,10 @@ starSystemManager.addStar(sun);
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
-let planet = new SolidPlanet("Gaia", planetRadius, new Vector3(0, 0, planetRadius*3), 2, scene);
+let planet = new SolidPlanet("Hécate", planetRadius, new Vector3(0, 0, planetRadius*3), 2, scene);
 planet.rotate(Axis.X, 0.2);
+
+planet.physicalProperties.rotationPeriod /= 500;
 
 planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
 planet.colorSettings.beachSize = 300;
@@ -301,8 +303,8 @@ sliders.push(new Slider("sunOrientation", document.getElementById("sunOrientatio
     sunOrientation = val;
 }));
 
-sliders.push(new Slider("timeModifier", document.getElementById("timeModifier")!, 0, 1000, Number(Math.sqrt(timeMultiplicator).toFixed(0)), (val: number) => {
-    timeMultiplicator = val ** 2;
+sliders.push(new Slider("timeModifier", document.getElementById("timeModifier")!, 0, 200, timeMultiplicator, (val: number) => {
+    timeMultiplicator = val;
 }));
 
 sliders.push(new Slider("cameraFOV", document.getElementById("cameraFOV")!, 0, 360, player.camera.fov * 360 / Math.PI, (val: number) => {
@@ -372,6 +374,9 @@ scene.executeWhenReady(() => {
         starSystemManager.translateAllCelestialBody(deplacement);
 
         starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime * timeMultiplicator);
+
+        ocean.update(deltaTime * timeMultiplicator);
+        flatClouds.update(deltaTime * timeMultiplicator);
 
         scene.render();
     });

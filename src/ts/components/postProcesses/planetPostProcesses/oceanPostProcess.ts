@@ -11,8 +11,6 @@ export class OceanPostProcess extends PlanetPostProcess {
 
     settings: OceanSettings;
 
-    internalTime: number;
-
     constructor(name: string, planet: SolidPlanet, sun: Star, scene: Scene) {
 
         let settings: OceanSettings = {
@@ -58,11 +56,7 @@ export class OceanPostProcess extends PlanetPostProcess {
 
             "time": {
                 type: ShaderDataType.Float,
-                get: () => {
-                    //TODO: this won't speed up with artificial time dilation : it should
-                    this.internalTime += scene.getEngine().getDeltaTime() / 1000;
-                    return this.internalTime;
-                }
+                get: () => {return this.internalTime}
             }
         };
 
@@ -78,8 +72,6 @@ export class OceanPostProcess extends PlanetPostProcess {
         }
 
         super(name, "./shaders/ocean", uniforms, samplers, planet, sun, scene);
-
-        this.internalTime = 0;
 
         this.settings = settings;
     }

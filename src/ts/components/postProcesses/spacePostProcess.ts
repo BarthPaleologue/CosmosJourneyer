@@ -7,6 +7,8 @@ export abstract class SpacePostProcess extends PostProcess {
     uniforms: ShaderUniformData;
     samplers: ShaderSamplerData;
 
+    protected internalTime: number = 0;
+
     protected constructor(name: string, fragmentURL: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, scene: Scene) {
 
         let commonUniforms: ShaderUniformData = {
@@ -83,5 +85,8 @@ export abstract class SpacePostProcess extends PostProcess {
         this.camera.detachPostProcess(this);
         this.camera = camera;
         camera.attachPostProcess(this);
+    }
+    update(deltaTime: number) {
+        this.internalTime += deltaTime;
     }
 }

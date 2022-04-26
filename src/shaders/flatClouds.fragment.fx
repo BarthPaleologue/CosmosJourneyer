@@ -325,9 +325,11 @@ float tanhSharpener(float x, float s) {
 
 float cloudDensityAtPoint(vec3 samplePoint) {
 
-    float density = 1.0 - worley(normalize(samplePoint) * cloudFrequency + vec3(time * 0.01 * worleySpeed), 1.0).x;
+    vec3 timeOffset = vec3(-time, 0.0, 0.0) * 0.01;
 
-    density *= completeNoise(normalize(samplePoint) * cloudDetailFrequency + vec3(time * 0.01 * detailSpeed), 5, 2.0, 2.0);
+    float density = 1.0 - worley(normalize(samplePoint) * cloudFrequency + timeOffset * worleySpeed, 1.0).x;
+
+    density *= completeNoise(normalize(samplePoint) * cloudDetailFrequency + timeOffset * detailSpeed, 5, 2.0, 2.0);
 
     density = saturate(density * 2.0);
 

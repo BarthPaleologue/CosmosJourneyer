@@ -56,8 +56,8 @@ scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
-const timeMultiplicator = 100;
-console.log(`Time is going ${timeMultiplicator} times faster than in reality`);
+const timeMultiplicator = 1;
+console.log(`Time is going ${timeMultiplicator} time${timeMultiplicator > 1 ? "s" : ""} faster than in reality`);
 
 const radius = 1000 * 1e3; // diamètre en m
 
@@ -81,7 +81,7 @@ depthRenderer.getDepthMap().renderList?.push(sun.mesh);
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
 let planet = new SolidPlanet("Hécate", radius, new Vector3(radius * 5, 0, 4 * radius), 1, scene);
-planet.physicalProperties.rotationPeriod = 24 * 60 * 60;
+planet.physicalProperties.rotationPeriod = 24 * 60 * 60 / 100;
 
 planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
 planet.colorSettings.beachSize = 300;
@@ -173,6 +173,10 @@ function updateScene() {
     document.getElementById("planetName")!.innerText = player.isOrbiting() ? player.nearestBody!.getName() : "Outer Space";
 
     starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, timeMultiplicator * deltaTime);
+
+    // TODO: make post process manager
+    ocean.update(timeMultiplicator * deltaTime);
+    flatClouds.update(timeMultiplicator * deltaTime);
 
     if (isMouseEnabled) {
         player.listenToMouse(mouse, deltaTime);
