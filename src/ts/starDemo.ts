@@ -9,8 +9,11 @@ import {
     VolumetricLightScatteringPostProcess, Vector3
 } from "@babylonjs/core";
 
+import {Slider} from "handle-sliderjs";
+
+import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";
 import * as style from "../styles/style.scss";
-import * as style2 from "../sliderjs/style2.min.css";
+
 import {StarSystemManager} from "./components/celestialBodies/starSystemManager";
 import {PlayerController} from "./components/player/playerController";
 import {Keyboard} from "./components/inputs/keyboard";
@@ -18,7 +21,7 @@ import {StarfieldPostProcess} from "./components/postProcesses/starfieldPostProc
 import {Star} from "./components/celestialBodies/stars/star";
 
 style.default;
-style2.default;
+sliderStyle.default;
 
 // TODO: euh oui alors si on prend en compte la physique tout doit changer par ici mdr
 

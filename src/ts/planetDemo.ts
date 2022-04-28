@@ -2,7 +2,6 @@ import {
     Engine,
     Scene,
     Color3,
-    Color4,
     Texture,
     DepthRenderer,
     Axis,
@@ -12,24 +11,27 @@ import {
     VolumetricLightScatteringPostProcess
 } from "@babylonjs/core";
 
-import { AtmosphericScatteringPostProcess } from "./components/postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import {
+    AtmosphericScatteringPostProcess
+} from "./components/postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import {ColorMode, SolidPlanet} from "./components/celestialBodies/planets/solid/solidPlanet";
-import { OceanPostProcess } from "./components/postProcesses/planetPostProcesses/oceanPostProcess";
+import {OceanPostProcess} from "./components/postProcesses/planetPostProcesses/oceanPostProcess";
 
+import {Slider} from "handle-sliderjs";
+
+import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";
 import * as style from "../styles/style.scss";
-import * as style2 from "../sliderjs/style2.min.css";
-import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
-import { PlayerController } from "./components/player/playerController";
-import { FlatCloudsPostProcess } from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
-import { Keyboard } from "./components/inputs/keyboard";
-import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
+
+import {StarSystemManager} from "./components/celestialBodies/starSystemManager";
+import {PlayerController} from "./components/player/playerController";
+import {FlatCloudsPostProcess} from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import {RingsPostProcess} from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
+import {Keyboard} from "./components/inputs/keyboard";
+import {StarfieldPostProcess} from "./components/postProcesses/starfieldPostProcess";
 import {Star} from "./components/celestialBodies/stars/star";
 
 style.default;
-style2.default;
-
-// TODO: euh oui alors si on prend en compte la physique tout doit changer par ici mdr
+sliderStyle.default;
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth - 300;
@@ -61,7 +63,7 @@ starSystemManager.addStar(sun);
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
-let planet = new SolidPlanet("Hécate", planetRadius, new Vector3(0, 0, planetRadius*3), 2, scene);
+let planet = new SolidPlanet("Hécate", planetRadius, new Vector3(0, 0, planetRadius * 3), 2, scene);
 planet.rotate(Axis.X, 0.2);
 
 planet.physicalProperties.rotationPeriod /= 500;
@@ -299,7 +301,7 @@ sliders.push(new Slider("ringsOpacity", document.getElementById("ringsOpacity")!
 
 let sunOrientation = 220;
 sliders.push(new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
-    sun.mesh.rotateAround(planet.getAbsolutePosition(), new Vector3(0,1,0), -2*Math.PI*(val - sunOrientation)/360);
+    sun.mesh.rotateAround(planet.getAbsolutePosition(), new Vector3(0, 1, 0), -2 * Math.PI * (val - sunOrientation) / 360);
     sunOrientation = val;
 }));
 
@@ -315,7 +317,7 @@ sliders.push(new Slider("cameraFOV", document.getElementById("cameraFOV")!, 0, 3
 
 document.addEventListener("keyup", e => {
     if (e.key == "p") { // take screenshots
-        Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, { precision: 4 });
+        Tools.CreateScreenshotUsingRenderTarget(engine, scene.activeCamera!, {precision: 4});
     }
     if (e.key == "w") {
         planet.surfaceMaterial.wireframe = !planet.surfaceMaterial.wireframe;
@@ -323,21 +325,21 @@ document.addEventListener("keyup", e => {
 });
 
 let currentUI: HTMLElement | null = null;
-for(const link of document.querySelector("nav")!.children) {
+for (const link of document.querySelector("nav")!.children) {
     link.addEventListener("click", e => {
-       let id = link.id.substring(0, link.id.length-4) + "UI";
-       if(currentUI != null) currentUI.hidden = true;
-       currentUI = document.getElementById(id)!;
-       currentUI.hidden = false;
-       for(const slider of sliders) {
-           slider.updateWithoutCallback();
-       }
+        let id = link.id.substring(0, link.id.length - 4) + "UI";
+        if (currentUI != null) currentUI.hidden = true;
+        currentUI = document.getElementById(id)!;
+        currentUI.hidden = false;
+        for (const slider of sliders) {
+            slider.update(false);
+        }
     });
 }
 
 document.getElementById("defaultMapButton")!.addEventListener("click", () => {
-   planet.colorSettings.mode = ColorMode.DEFAULT;
-   planet.updateColors();
+    planet.colorSettings.mode = ColorMode.DEFAULT;
+    planet.updateColors();
 });
 document.getElementById("moistureMapButton")!.addEventListener("click", () => {
     planet.colorSettings.mode = ColorMode.MOISTURE;
