@@ -10,19 +10,33 @@ export abstract class PlanetPostProcess extends SpacePostProcess {
         let commonUniforms = {
             "sunPosition": {
                 type: ShaderDataType.Vector3,
-                get: () => {return sun.getAbsolutePosition()}
+                get: () => {
+                    return sun.getAbsolutePosition()
+                }
             },
             "planetPosition": {
                 type: ShaderDataType.Vector3,
-                get: () => {return planet.getAbsolutePosition()}
+                get: () => {
+                    return planet.getAbsolutePosition()
+                }
+            },
+            "planetRotationAxis": {
+                type: ShaderDataType.Vector3,
+                get: () => {
+                    return planet.physicalProperties.rotationAxis
+                }
             },
             "cameraDirection": {
                 type: ShaderDataType.Vector3,
-                get: () => {return scene.activeCamera!.getDirection(Axis.Z)}
+                get: () => {
+                    return scene.activeCamera!.getDirection(Axis.Z)
+                }
             },
             "planetRadius": {
                 type: ShaderDataType.Float,
-                get: () => {return planet.getRadius()}
+                get: () => {
+                    return planet.getRadius()
+                }
             }
         }
 

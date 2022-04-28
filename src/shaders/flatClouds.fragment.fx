@@ -19,6 +19,7 @@ uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
 
 uniform vec3 planetPosition; // planet position in world space
+uniform vec3 planetRotationAxis; // planet rotation axis in world space
 uniform float cloudLayerRadius; // atmosphere radius (calculate from planet center)
 uniform float planetRadius; // planet radius
 
@@ -323,14 +324,23 @@ float tanhSharpener(float x, float s) {
 	return tanh01(sampleValue);
 }
 
+vec3 rotateAround(vec3 vector, vec3 axis, float theta) {
+    // rotation using https://www.wikiwand.com/en/Rodrigues%27_rotation_formula
+    // Please note that unit vector are required, i did not divided by the norms
+    return cos(theta) * vector + cross(axis, vector) * sin(theta) + axis * dot(axis, vector) * (1.0 - cos(theta));
+}
+
 float cloudDensityAtPoint(vec3 samplePoint) {
 
-    // TODO: rotate it with the planet
-    vec3 timeOffset = vec3(-time, 0.0, 0.0) * 0.01;
+    float timeOffset = -time * 0.001;
+    vec3 rotationAxisPlanetSpace = vec3(0.0, 1.0, 0.0);
 
-    float density = 1.0 - worley(normalize(samplePoint) * cloudFrequency + timeOffset * worleySpeed, 1.0).x;
+    vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, timeOffset * worleySpeed);
+    vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, timeOffset * detailSpeed);
 
-    density *= completeNoise(normalize(samplePoint) * cloudDetailFrequency + timeOffset * detailSpeed, 5, 2.0, 2.0);
+    float density = 1.0 - worley(samplePointRotatedWorley * cloudFrequency, 1.0).x;
+
+    density *= completeNoise(samplePointRotatedDetail * cloudDetailFrequency, 5, 2.0, 2.0);
 
     density = saturate(density * 2.0);
 
@@ -372,11 +382,11 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     vec3 planetNormal = normalize(samplePoint1 - planetPosition);
 
     /// Cloud point 1
-    float cloudDensity = cloudDensityAtPoint(samplePointPlanetSpace1);
+    float cloudDensity = cloudDensityAtPoint(normalize(samplePointPlanetSpace1));
 
     /// Cloud point 2
     if(twoPoints) {
-        cloudDensity += cloudDensityAtPoint(samplePointPlanetSpace2);
+        cloudDensity += cloudDensityAtPoint(normalize(samplePointPlanetSpace2));
     }
 
 	cloudDensity = saturate(cloudDensity);

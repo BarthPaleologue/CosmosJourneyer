@@ -66,7 +66,7 @@ let starSystemManager = new StarSystemManager(64);
 let sun = new Star("Weierstrass", 0.4 * radius, new Vector3(-910000, 0, -1700000), scene);
 starSystemManager.addStar(sun);
 
-depthRenderer.getDepthMap().renderList?.push(sun.mesh);
+depthRenderer.setMaterialForRendering(sun.mesh);
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 

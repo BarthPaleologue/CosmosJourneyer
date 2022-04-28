@@ -95,9 +95,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             "time": {
                 type: ShaderDataType.Float,
                 get: () => {
-                    // TODO: do not hardcode de 100000
-                    // use rotating time offset to prevent float imprecision and distant artifacts
-                    return this.internalTime % 100000
+                    return this.internalTime
                 }
             }
         };

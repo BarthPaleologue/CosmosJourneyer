@@ -110,7 +110,7 @@ export class ChunkForge {
         if (this.applyTasks.length > 0) {
             let task = this.applyTasks.shift()!;
             task.vertexData.applyToMesh(task.mesh, false);
-            depthRenderer.getDepthMap().renderList!.push(task.mesh);
+            depthRenderer.getDepthMap().renderList?.push(task.mesh)
 
             /* WORKING VERSION */
             /*let planetSpacePosition = task.mesh.absolutePosition.subtract(task.planet.getAbsolutePosition());
