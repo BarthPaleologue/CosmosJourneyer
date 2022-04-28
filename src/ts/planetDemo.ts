@@ -2,7 +2,6 @@ import {
     Engine,
     Scene,
     Color3,
-    Texture,
     DepthRenderer,
     Axis,
     Vector3,
@@ -11,11 +10,7 @@ import {
     VolumetricLightScatteringPostProcess
 } from "@babylonjs/core";
 
-import {
-    AtmosphericScatteringPostProcess
-} from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import {ColorMode, SolidPlanet} from "./celestialBodies/planets/solid/solidPlanet";
-import {OceanPostProcess} from "./postProcesses/planetPostProcesses/oceanPostProcess";
 
 import {Slider} from "handle-sliderjs";
 
@@ -24,8 +19,6 @@ import * as style from "../styles/style.scss";
 
 import {StarSystemManager} from "./celestialBodies/starSystemManager";
 import {PlayerController} from "./player/playerController";
-import {FlatCloudsPostProcess} from "./postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import {RingsPostProcess} from "./postProcesses/planetPostProcesses/ringsPostProcess";
 import {Keyboard} from "./inputs/keyboard";
 import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
 import {Star} from "./celestialBodies/stars/star";
@@ -74,15 +67,12 @@ planet.updateColors();
 
 starSystemManager.addSolidPlanet(planet);
 
-let ocean = new OceanPostProcess("ocean", planet, sun, scene);
+let ocean = planet.createOcean(sun, scene);
+let flatClouds = planet.createClouds(sun, scene);
+let atmosphere = planet.createAtmosphere(sun, scene);
+let rings = planet.createRings(sun, scene);
 
-let flatClouds = new FlatCloudsPostProcess("clouds", planet, planetRadius + 15e3, sun, scene);
-
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, planetRadius + 100e3, sun, scene);
-
-let rings = new RingsPostProcess("rings", planet, sun, scene);
-
-let fxaa = new FxaaPostProcess("fxaa", 1, scene.activeCamera, Texture.BILINEAR_SAMPLINGMODE);
+let fxaa = new FxaaPostProcess("fxaa", 1, scene.activeCamera);
 
 let vls = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
 vls.exposure = 1.0;
@@ -95,7 +85,6 @@ let sliders: Slider[] = [];
 sliders.push(new Slider("zoom", document.getElementById("zoom")!, 0, 100, 100 * planet._radius / planet.attachNode.position.z, (value: number) => {
     planet.attachNode.position.z = 100 * planet._radius / (value);
 }));
-
 
 sliders.push(new Slider("minTemperature", document.getElementById("minTemperature")!, -273, 300, planet.physicalProperties.minTemperature, (val: number) => {
     planet.physicalProperties.minTemperature = val;
@@ -376,9 +365,6 @@ scene.executeWhenReady(() => {
         starSystemManager.translateAllCelestialBody(deplacement);
 
         starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime * timeMultiplicator);
-
-        ocean.update(deltaTime * timeMultiplicator);
-        flatClouds.update(deltaTime * timeMultiplicator);
 
         scene.render();
     });

@@ -1,8 +1,6 @@
-import { Engine, Texture, Scene, Color4, DepthRenderer, Axis, Space, Vector3, Tools, FxaaPostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import { Engine, Scene, DepthRenderer, Axis, Vector3, Tools, FxaaPostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 
-import { AtmosphericScatteringPostProcess } from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { SolidPlanet } from "./celestialBodies/planets/solid/solidPlanet";
-import { OceanPostProcess } from "./postProcesses/planetPostProcesses/oceanPostProcess";
 
 import * as style from "../styles/style.scss";
 import { PlayerController } from "./player/playerController";
@@ -12,8 +10,6 @@ import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystemManager } from "./celestialBodies/starSystemManager";
 
-import { FlatCloudsPostProcess } from "./postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "./postProcesses/planetPostProcesses/ringsPostProcess";
 import { centeredRandom, nrand, randInt } from "./utils/random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Star } from "./celestialBodies/stars/star";
@@ -44,11 +40,9 @@ let gamepad = new Gamepad();
 
 let player = new PlayerController(scene);
 player.setSpeed(0.2 * radius);
-player.mesh.rotate(player.camera.getDirection(Axis.Y), 0.45, Space.WORLD);
+player.rotate(player.getUpwardDirection(), 0.45);
 
 player.camera.maxZ = Math.max(radius * 50, 10000);
-
-
 
 let starSystemManager = new StarSystemManager(64);
 
@@ -93,19 +87,19 @@ planet.translate(new Vector3(radius * 2, 0, 0));
 
 planet.rotate(Axis.X, centeredRandom());
 
-let ocean = new OceanPostProcess("ocean", planet, sun, scene);
+let ocean = planet.createOcean(sun, scene);
 
 if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0) {
-    let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius + 15e3, sun, scene);
+    let flatClouds = planet.createClouds(sun, scene);
     flatClouds.settings.cloudPower = 10 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure);
 }
 
 if (planet.physicalProperties.pressure > 0) {
-    let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius + 100e3 * planet.physicalProperties.pressure, sun, scene);
+    let atmosphere = planet.createAtmosphere(sun, scene);
     atmosphere.settings.intensity = 12 * planet.physicalProperties.pressure;
 }
 
-let rings = new RingsPostProcess("rings", planet, sun, scene);
+let rings = planet.createRings(sun, scene);
 rings.settings.ringStart = 1.8 + 0.4 * centeredRandom();
 rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom();
 
@@ -113,7 +107,7 @@ starSystemManager.addSolidPlanet(planet);
 
 let vls = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
 
-let fxaa = new FxaaPostProcess("fxaa", 1, player.camera, Texture.BILINEAR_SAMPLINGMODE);
+let fxaa = new FxaaPostProcess("fxaa", 1);
 
 let isMouseEnabled = false;
 
@@ -141,19 +135,22 @@ scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
     scene.beforeRender = () => {
+
+        const deltaTime = engine.getDeltaTime() / 1000;
+
         player.nearestBody = starSystemManager.getNearestBody();
 
-        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, engine.getDeltaTime() / 1000);
+        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime);
 
         if (isMouseEnabled) {
-            player.listenToMouse(mouse, engine.getDeltaTime() / 1000);
+            player.listenToMouse(mouse, deltaTime);
         }
 
         gamepad.update();
 
-        let deplacement = player.listenToGamepad(gamepad, engine.getDeltaTime() / 1000);
+        let deplacement = player.listenToGamepad(gamepad, deltaTime);
 
-        deplacement.addInPlace(player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000));
+        deplacement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
 
         starSystemManager.translateAllCelestialBody(deplacement);
 

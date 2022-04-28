@@ -223,10 +223,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         return collisionData;
     }
 
-    /**
-     * Returns the world matrix of the planet (see babylonjs world matrix for reference)
-     */
-    public getWorldMatrix(): Matrix {
+    public override getWorldMatrix(): Matrix {
         return this.attachNode.getWorldMatrix();
     }
 

@@ -1,19 +1,18 @@
 import {Scene} from "@babylonjs/core";
 
-import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
-
 import {AtmosphereSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
+import {AbstractPlanet} from "../../celestialBodies/planets/abstractPlanet";
 
 export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
 
     settings: AtmosphereSettings;
 
-    constructor(name: string, planet: SolidPlanet, atmosphereRadius: number, sun: Star, scene: Scene) {
+    constructor(name: string, planet: AbstractPlanet, atmosphereHeight: number, sun: Star, scene: Scene) {
 
         let settings: AtmosphereSettings = {
-            atmosphereRadius: atmosphereRadius,
+            atmosphereRadius: planet.getRadius() + atmosphereHeight,
             falloffFactor: 23,
             intensity: 12,
             rayleighStrength: 1,

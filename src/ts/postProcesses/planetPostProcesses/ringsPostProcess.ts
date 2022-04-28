@@ -1,14 +1,14 @@
 import {Scene} from "@babylonjs/core";
-import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
 import {RingsSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
+import {AbstractPlanet} from "../../celestialBodies/planets/abstractPlanet";
 
 export class RingsPostProcess extends PlanetPostProcess {
 
     settings: RingsSettings;
 
-    constructor(name: string, planet: SolidPlanet, sun: Star, scene: Scene) {
+    constructor(name: string, planet: AbstractPlanet, sun: Star, scene: Scene) {
 
         let settings: RingsSettings = {
             ringStart: 1.5,

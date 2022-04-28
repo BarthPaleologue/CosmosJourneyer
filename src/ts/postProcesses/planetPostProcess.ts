@@ -1,11 +1,11 @@
 import {SpacePostProcess} from "./spacePostProcess";
-import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
 import {Axis, Scene} from "@babylonjs/core";
 import {ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
 import {Star} from "../celestialBodies/stars/star";
+import {AbstractPlanet} from "../celestialBodies/planets/abstractPlanet";
 
 export abstract class PlanetPostProcess extends SpacePostProcess {
-    protected constructor(name: string, fragmentURL: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, planet: SolidPlanet, sun: Star, scene: Scene) {
+    protected constructor(name: string, fragmentURL: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, planet: AbstractPlanet, sun: Star, scene: Scene) {
 
         let commonUniforms = {
             "sunPosition": {

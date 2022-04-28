@@ -325,6 +325,7 @@ float tanhSharpener(float x, float s) {
 
 float cloudDensityAtPoint(vec3 samplePoint) {
 
+    // TODO: rotate it with the planet
     vec3 timeOffset = vec3(-time, 0.0, 0.0) * 0.01;
 
     float density = 1.0 - worley(normalize(samplePoint) * cloudFrequency + timeOffset * worleySpeed, 1.0).x;

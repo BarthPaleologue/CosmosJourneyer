@@ -1,10 +1,8 @@
 import {
     Engine,
     Scene,
-    Color4,
     DepthRenderer,
     Axis,
-    Space,
     Vector3,
     Texture,
     Tools,
@@ -26,15 +24,7 @@ import {StarSystemManager} from "./celestialBodies/starSystemManager";
 
 import rockNormalMap from "../asset/textures/rockn.png";
 
-import {FlatCloudsPostProcess} from "./postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import {RingsPostProcess} from "./postProcesses/planetPostProcesses/ringsPostProcess";
-import {VolumetricCloudsPostProcess} from "./postProcesses/planetPostProcesses/volumetricCloudsPostProcess";
 import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
-import {OceanPostProcess} from "./postProcesses/planetPostProcesses/oceanPostProcess";
-import {
-    AtmosphericScatteringPostProcess
-} from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
-
 
 import * as style from "../styles/style.scss";
 
@@ -67,7 +57,7 @@ let gamepad = new Gamepad();
 
 let player = new PlayerController(scene);
 player.setSpeed(0.2 * radius);
-player.mesh.rotate(player.camera.getDirection(Axis.Y), 0.8, Space.WORLD);
+player.rotate(player.getUpwardDirection(), 0.8);
 
 player.camera.maxZ = Math.max(radius * 100, 10000);
 
@@ -89,14 +79,10 @@ planet.updateColors();
 
 planet.rotate(Axis.X, 0.2);
 
-let ocean = new OceanPostProcess("ocean", planet, sun, scene);
-
-let flatClouds = new FlatCloudsPostProcess("clouds", planet, radius + 15e3, sun, scene);
-//let volClouds = new VolumetricCloudsPostProcess("clouds", planet, radius + waterElevation + 100e3, sun, player.camera, scene);
-
-let atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, radius + 100e3, sun, scene);
-
-let rings = new RingsPostProcess("rings", planet, sun, scene);
+const ocean = planet.createOcean(sun, scene);
+const flatClouds = planet.createClouds(sun, scene);
+const atmosphere = planet.createAtmosphere(sun, scene);
+planet.createRings(sun, scene);
 
 starSystemManager.addSolidPlanet(planet);
 
@@ -144,9 +130,8 @@ Ares.updateColors();
 
 Ares.translate(new Vector3(-radius * 4, 0, 0));
 
-let atmosphere2 = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, scene);
-atmosphere2.settings.intensity = 15 * Ares.physicalProperties.pressure;
-atmosphere2.settings.greenWaveLength = 680;
+let aresAtmosphere = Ares.createAtmosphere(sun, scene); // = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, scene);
+aresAtmosphere.settings.greenWaveLength = 680;
 
 starSystemManager.addSolidPlanet(Ares);
 
@@ -174,10 +159,6 @@ function updateScene() {
 
     starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, timeMultiplicator * deltaTime);
 
-    // TODO: make post process manager
-    ocean.update(timeMultiplicator * deltaTime);
-    flatClouds.update(timeMultiplicator * deltaTime);
-
     if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 
     gamepad.update();
@@ -198,7 +179,7 @@ document.addEventListener("keydown", e => {
     if (e.key == "p") { // take screenshots
         Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, {precision: 4});
     }
-    //if (e.key == "u") atmosphere.settings.intensity = (atmosphere.settings.intensity == 0) ? 15 : 0;
+    if (e.key == "u") atmosphere.settings.intensity = (atmosphere.settings.intensity == 0) ? 15 : 0;
     if (e.key == "o") ocean.settings.oceanRadius = (ocean.settings.oceanRadius == 0) ? planet.getRadius() : 0;
     if (e.key == "y") flatClouds.settings.cloudLayerRadius = (flatClouds.settings.cloudLayerRadius == 0) ? radius + 15e3 : 0;
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;

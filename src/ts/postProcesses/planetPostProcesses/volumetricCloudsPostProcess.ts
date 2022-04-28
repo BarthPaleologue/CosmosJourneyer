@@ -1,14 +1,14 @@
 import {Scene} from "@babylonjs/core";
-import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
 import {ShaderDataType, ShaderSamplerData, ShaderUniformData, VolumetricCloudSettings} from "../interfaces";
 import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
+import {AbstractPlanet} from "../../celestialBodies/planets/abstractPlanet";
 
 export class VolumetricCloudsPostProcess extends PlanetPostProcess {
 
     settings: VolumetricCloudSettings;
 
-    constructor(name: string, planet: SolidPlanet, atmosphereRadius: number, sun: Star, scene: Scene) {
+    constructor(name: string, planet: AbstractPlanet, atmosphereRadius: number, sun: Star, scene: Scene) {
 
         let settings: VolumetricCloudSettings = {
             atmosphereRadius: atmosphereRadius

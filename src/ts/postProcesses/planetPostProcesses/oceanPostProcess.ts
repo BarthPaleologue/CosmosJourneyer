@@ -2,16 +2,16 @@ import {Scene, Texture} from "@babylonjs/core";
 
 import waterNormal1 from "../../../asset/textures/waterbump.png";
 import waterNormal2 from "../../../asset/textures/waterNormal2.png";
-import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
 import {OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
+import {AbstractPlanet} from "../../celestialBodies/planets/abstractPlanet";
 
 export class OceanPostProcess extends PlanetPostProcess {
 
     settings: OceanSettings;
 
-    constructor(name: string, planet: SolidPlanet, sun: Star, scene: Scene) {
+    constructor(name: string, planet: AbstractPlanet, sun: Star, scene: Scene) {
 
         let settings: OceanSettings = {
             oceanRadius: planet.getRadius(),
@@ -25,49 +25,71 @@ export class OceanPostProcess extends PlanetPostProcess {
         let uniforms: ShaderUniformData = {
             "oceanRadius": {
                 type: ShaderDataType.Float,
-                get: () => {return settings.oceanRadius}
+                get: () => {
+                    return settings.oceanRadius
+                }
             },
 
             "smoothness": {
                 type: ShaderDataType.Float,
-                get: () => {return settings.smoothness}
+                get: () => {
+                    return settings.smoothness
+                }
             },
             "specularPower": {
                 type: ShaderDataType.Float,
-                get: () => {return settings.specularPower}
+                get: () => {
+                    return settings.specularPower
+                }
             },
             "alphaModifier": {
                 type: ShaderDataType.Float,
-                get: () => {return settings.alphaModifier}
+                get: () => {
+                    return settings.alphaModifier
+                }
             },
             "depthModifier": {
                 type: ShaderDataType.Float,
-                get: () => {return settings.depthModifier}
+                get: () => {
+                    return settings.depthModifier
+                }
             },
             "waveBlendingSharpness": {
                 type: ShaderDataType.Float,
-                get: () => {return settings.waveBlendingSharpness}
+                get: () => {
+                    return settings.waveBlendingSharpness
+                }
             },
 
             "planetWorldMatrix": {
                 type: ShaderDataType.Matrix,
-                get: () => {return planet.getWorldMatrix()}
+                get: () => {
+                    return planet.getWorldMatrix()
+                }
             },
 
             "time": {
                 type: ShaderDataType.Float,
-                get: () => {return this.internalTime}
+                get: () => {
+                    //TODO: do not hardcode the 100000
+                    // use rotating time offset to prevent float imprecision and distant artifacts
+                    return this.internalTime % 100000
+                }
             }
         };
 
         let samplers: ShaderSamplerData = {
             "normalMap1": {
                 type: ShaderDataType.Texture,
-                get: () => {return new Texture(waterNormal1, scene)}
+                get: () => {
+                    return new Texture(waterNormal1, scene)
+                }
             },
             "normalMap2": {
                 type: ShaderDataType.Texture,
-                get: () => {return new Texture(waterNormal2, scene)}
+                get: () => {
+                    return new Texture(waterNormal2, scene)
+                }
             }
         }
 
