@@ -1,6 +1,6 @@
 import {ChunkForge} from "../../../forge/chunkForge";
 import {PlanetSide} from "./planetSide";
-import {Direction} from "../../../../utils/direction";
+import {Direction} from "../../../utils/direction";
 import {TerrainSettings} from "../../../terrain/terrainSettings";
 import {AbstractPlanet} from "../abstractPlanet";
 
@@ -17,20 +17,20 @@ import {
     MaterialHelper
 } from "@babylonjs/core";
 
-import bottomNormalMap from "../../../../../asset/textures/crackednormal.jpg";
-import steepNormalMap from "../../../../../asset/textures/rockn.png";
-import grassNormalMap from "../../../../../asset/textures/grassNormalMap.jpg";
+import bottomNormalMap from "../../../../asset/textures/crackednormal.jpg";
+import steepNormalMap from "../../../../asset/textures/rockn.png";
+import grassNormalMap from "../../../../asset/textures/grassNormalMap.jpg";
 
-import snowNormalMap from "../../../../../asset/textures/snowNormalMap.png";
-import snowNormalMap2 from "../../../../../asset/textures/snowNormalMap2.png";
+import snowNormalMap from "../../../../asset/textures/snowNormalMap.png";
+import snowNormalMap2 from "../../../../asset/textures/snowNormalMap2.png";
 
-import beachNormalMap from "../../../../../asset/textures/sandNormalMap2.png";
-import desertNormalMap from "../../../../../asset/textures/sandNormalMap2.jpg";
+import beachNormalMap from "../../../../asset/textures/sandNormalMap2.png";
+import desertNormalMap from "../../../../asset/textures/sandNormalMap2.jpg";
 
 import {CelestialBodyType, RigidBody, SolidPhysicalProperties} from "../../interfaces";
 import {CollisionData} from "../../../forge/workerDataInterfaces";
 import {TaskType} from "../../../forge/taskInterfaces";
-import {initMeshTransform} from "../../../../utils/mesh";
+import {initMeshTransform} from "../../../utils/mesh";
 import {PlayerController} from "../../../player/playerController";
 
 export enum ColorMode {

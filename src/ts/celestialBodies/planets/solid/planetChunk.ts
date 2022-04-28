@@ -3,8 +3,8 @@ import {Quaternion, Vector3, Mesh, SolidParticleSystem, Scene, Material} from "@
 import { SolidPlanet } from "./solidPlanet";
 import { ChunkForge } from "../../../forge/chunkForge";
 import {BuildTask, TaskType} from "../../../forge/taskInterfaces";
-import { Direction, getQuaternionFromDirection } from "../../../../utils/direction";
-import {Algebra} from "../../../../utils/algebra";
+import { Direction, getQuaternionFromDirection } from "../../../utils/direction";
+import {Algebra} from "../../../utils/algebra";
 
 /**
  * Returns the node position in plane space

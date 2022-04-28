@@ -12,28 +12,28 @@ import {
     VolumetricLightScatteringPostProcess
 } from "@babylonjs/core";
 
-import {SolidPlanet} from "./components/celestialBodies/planets/solid/solidPlanet";
-import {Star} from "./components/celestialBodies/stars/star";
+import {SolidPlanet} from "./celestialBodies/planets/solid/solidPlanet";
+import {Star} from "./celestialBodies/stars/star";
 
-import {PlayerController} from "./components/player/playerController";
+import {PlayerController} from "./player/playerController";
 
-import {Keyboard} from "./components/inputs/keyboard";
-import {Mouse} from "./components/inputs/mouse";
-import {Gamepad} from "./components/inputs/gamepad";
+import {Keyboard} from "./inputs/keyboard";
+import {Mouse} from "./inputs/mouse";
+import {Gamepad} from "./inputs/gamepad";
 
-import {CollisionWorker} from "./components/workers/collisionWorker";
-import {StarSystemManager} from "./components/celestialBodies/starSystemManager";
+import {CollisionWorker} from "./workers/collisionWorker";
+import {StarSystemManager} from "./celestialBodies/starSystemManager";
 
 import rockNormalMap from "../asset/textures/rockn.png";
 
-import {FlatCloudsPostProcess} from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import {RingsPostProcess} from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
-import {VolumetricCloudsPostProcess} from "./components/postProcesses/planetPostProcesses/volumetricCloudsPostProcess";
-import {StarfieldPostProcess} from "./components/postProcesses/starfieldPostProcess";
-import {OceanPostProcess} from "./components/postProcesses/planetPostProcesses/oceanPostProcess";
+import {FlatCloudsPostProcess} from "./postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import {RingsPostProcess} from "./postProcesses/planetPostProcesses/ringsPostProcess";
+import {VolumetricCloudsPostProcess} from "./postProcesses/planetPostProcesses/volumetricCloudsPostProcess";
+import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
+import {OceanPostProcess} from "./postProcesses/planetPostProcesses/oceanPostProcess";
 import {
     AtmosphericScatteringPostProcess
-} from "./components/postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+} from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 
 
 import * as style from "../styles/style.scss";
@@ -178,9 +178,7 @@ function updateScene() {
     ocean.update(timeMultiplicator * deltaTime);
     flatClouds.update(timeMultiplicator * deltaTime);
 
-    if (isMouseEnabled) {
-        player.listenToMouse(mouse, deltaTime);
-    }
+    if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 
     gamepad.update();
 

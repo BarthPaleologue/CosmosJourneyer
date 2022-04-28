@@ -13,22 +13,22 @@ import {
 
 import {
     AtmosphericScatteringPostProcess
-} from "./components/postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
-import {ColorMode, SolidPlanet} from "./components/celestialBodies/planets/solid/solidPlanet";
-import {OceanPostProcess} from "./components/postProcesses/planetPostProcesses/oceanPostProcess";
+} from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import {ColorMode, SolidPlanet} from "./celestialBodies/planets/solid/solidPlanet";
+import {OceanPostProcess} from "./postProcesses/planetPostProcesses/oceanPostProcess";
 
 import {Slider} from "handle-sliderjs";
 
 import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";
 import * as style from "../styles/style.scss";
 
-import {StarSystemManager} from "./components/celestialBodies/starSystemManager";
-import {PlayerController} from "./components/player/playerController";
-import {FlatCloudsPostProcess} from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import {RingsPostProcess} from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
-import {Keyboard} from "./components/inputs/keyboard";
-import {StarfieldPostProcess} from "./components/postProcesses/starfieldPostProcess";
-import {Star} from "./components/celestialBodies/stars/star";
+import {StarSystemManager} from "./celestialBodies/starSystemManager";
+import {PlayerController} from "./player/playerController";
+import {FlatCloudsPostProcess} from "./postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import {RingsPostProcess} from "./postProcesses/planetPostProcesses/ringsPostProcess";
+import {Keyboard} from "./inputs/keyboard";
+import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
+import {Star} from "./celestialBodies/stars/star";
 
 style.default;
 sliderStyle.default;

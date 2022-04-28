@@ -1,5 +1,5 @@
-import { LVector3 } from "../../../utils/algebra";
-import { sFloor } from "../../../utils/math";
+import { LVector3 } from "../../utils/algebra";
+import { sFloor } from "../../utils/math";
 import { elevationFunction } from "./elevationFunction";
 
 export function fractalLayer3D(frequency: number, nbOctaves: number, decay: number, lacunarity: number, power: number, minValue: number, f: (coords: LVector3, gradient: LVector3) => number): elevationFunction {

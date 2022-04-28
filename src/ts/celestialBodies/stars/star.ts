@@ -1,9 +1,9 @@
-import {getRgbFromTemperature} from "../../../utils/specrend";
+import {getRgbFromTemperature} from "../../utils/specrend";
 import {CelestialBody} from "../celestialBody";
 
 import {Axis, MaterialHelper, Matrix, Mesh, Quaternion, Scene, ShaderMaterial, Space, Vector3} from "@babylonjs/core";
 import {CelestialBodyType, StarPhysicalProperties} from "../interfaces";
-import {initMeshTransform} from "../../../utils/mesh";
+import {initMeshTransform} from "../../utils/mesh";
 import {PlayerController} from "../../player/playerController";
 
 // TODO: implement RigidBody for star

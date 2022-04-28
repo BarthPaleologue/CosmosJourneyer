@@ -1,22 +1,22 @@
 import { Engine, Texture, Scene, Color4, DepthRenderer, Axis, Space, Vector3, Tools, FxaaPostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 
-import { AtmosphericScatteringPostProcess } from "./components/postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
-import { SolidPlanet } from "./components/celestialBodies/planets/solid/solidPlanet";
-import { OceanPostProcess } from "./components/postProcesses/planetPostProcesses/oceanPostProcess";
+import { AtmosphericScatteringPostProcess } from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import { SolidPlanet } from "./celestialBodies/planets/solid/solidPlanet";
+import { OceanPostProcess } from "./postProcesses/planetPostProcesses/oceanPostProcess";
 
 import * as style from "../styles/style.scss";
-import { PlayerController } from "./components/player/playerController";
-import { Keyboard } from "./components/inputs/keyboard";
-import { Mouse } from "./components/inputs/mouse";
-import { Gamepad } from "./components/inputs/gamepad";
-import { CollisionWorker } from "./components/workers/collisionWorker";
-import { StarSystemManager } from "./components/celestialBodies/starSystemManager";
+import { PlayerController } from "./player/playerController";
+import { Keyboard } from "./inputs/keyboard";
+import { Mouse } from "./inputs/mouse";
+import { Gamepad } from "./inputs/gamepad";
+import { CollisionWorker } from "./workers/collisionWorker";
+import { StarSystemManager } from "./celestialBodies/starSystemManager";
 
-import { FlatCloudsPostProcess } from "./components/postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "./components/postProcesses/planetPostProcesses/ringsPostProcess";
+import { FlatCloudsPostProcess } from "./postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import { RingsPostProcess } from "./postProcesses/planetPostProcesses/ringsPostProcess";
 import { centeredRandom, nrand, randInt } from "./utils/random";
-import { StarfieldPostProcess } from "./components/postProcesses/starfieldPostProcess";
-import { Star } from "./components/celestialBodies/stars/star";
+import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
+import { Star } from "./celestialBodies/stars/star";
 
 style.default;
 

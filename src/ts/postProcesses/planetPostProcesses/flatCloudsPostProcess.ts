@@ -2,7 +2,7 @@ import {Scene, Texture, Vector3} from "@babylonjs/core";
 
 import {CloudSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
-import normalMap from "../../../../asset/textures/cloudNormalMap2.jpg";
+import normalMap from "../../../asset/textures/cloudNormalMap2.jpg";
 import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
 

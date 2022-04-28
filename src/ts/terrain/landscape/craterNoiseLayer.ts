@@ -1,5 +1,5 @@
-import { LVector3 } from "../../../utils/algebra";
-import { simplex401 } from "../../../utils/simplex";
+import { LVector3 } from "../../utils/algebra";
+import { simplex401 } from "../../utils/simplex";
 
 export function craterNoiseLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, minValue: number): (coords: LVector3) => number {
     return function (coords: LVector3) {

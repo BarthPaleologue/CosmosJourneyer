@@ -5,7 +5,7 @@ import {Keyboard} from "../inputs/keyboard";
 import {Mouse} from "../inputs/mouse";
 import {CelestialBody} from "../celestialBodies/celestialBody";
 import {Transformable} from "../celestialBodies/interfaces";
-import {Algebra} from "../../utils/algebra";
+import {Algebra} from "../utils/algebra";
 
 export class PlayerController implements Transformable {
 

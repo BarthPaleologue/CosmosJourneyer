@@ -14,11 +14,11 @@ import {Slider} from "handle-sliderjs";
 import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";
 import * as style from "../styles/style.scss";
 
-import {StarSystemManager} from "./components/celestialBodies/starSystemManager";
-import {PlayerController} from "./components/player/playerController";
-import {Keyboard} from "./components/inputs/keyboard";
-import {StarfieldPostProcess} from "./components/postProcesses/starfieldPostProcess";
-import {Star} from "./components/celestialBodies/stars/star";
+import {StarSystemManager} from "./celestialBodies/starSystemManager";
+import {PlayerController} from "./player/playerController";
+import {Keyboard} from "./inputs/keyboard";
+import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
+import {Star} from "./celestialBodies/stars/star";
 
 style.default;
 sliderStyle.default;

@@ -1,4 +1,4 @@
-import {Direction} from "../../utils/direction";
+import {Direction} from "../utils/direction";
 import {TerrainSettings} from "../terrain/terrainSettings";
 import {TaskType} from "./taskInterfaces";
 

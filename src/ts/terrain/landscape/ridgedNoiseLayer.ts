@@ -1,6 +1,6 @@
-import { LVector3 } from "../../../utils/algebra";
-import { sAbs } from "../../../utils/math";
-import { simplex411 } from "../../../utils/simplex";
+import { LVector3 } from "../../utils/algebra";
+import { sAbs } from "../../utils/math";
+import { simplex411 } from "../../utils/simplex";
 import { elevationFunction } from "./elevationFunction";
 import { fractalLayer3D } from "./fractalLayer3D";
 

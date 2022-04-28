@@ -1,7 +1,7 @@
 import {Scene, Texture} from "@babylonjs/core";
 
-import waterNormal1 from "../../../../asset/textures/waterbump.png";
-import waterNormal2 from "../../../../asset/textures/waterNormal2.png";
+import waterNormal1 from "../../../asset/textures/waterbump.png";
+import waterNormal2 from "../../../asset/textures/waterNormal2.png";
 import {SolidPlanet} from "../../celestialBodies/planets/solid/solidPlanet";
 import {OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import {PlanetPostProcess} from "../planetPostProcess";
