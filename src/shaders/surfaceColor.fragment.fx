@@ -194,6 +194,12 @@ vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
 	return lerp(value1, value2, alpha);
 }
 
+float saturate(float x) {
+    if(x > 1.0) return 1.0;
+    if(x < 0.0) return 0.0;
+    return x;
+}
+
 
 
 vec3 computeColorAndNormal(
@@ -263,6 +269,13 @@ vec3 computeColorAndNormal(
 
 		outColor = lerp(flatColor, steepColor, 1.0 - steepFactor);
 	}
+
+	bottomFactor = saturate(bottomFactor);
+	beachFactor = saturate(beachFactor);
+	plainFactor = saturate(plainFactor);
+	desertFactor = saturate(desertFactor);
+	snowFactor = saturate(snowFactor);
+	steepFactor = saturate(steepFactor);
 
 	// TODO: briser la répétition avec du simplex
 	normal = triplanarNormal(vPosition, normal, bottomNormalMap, 0.001, normalSharpness, bottomFactor);
