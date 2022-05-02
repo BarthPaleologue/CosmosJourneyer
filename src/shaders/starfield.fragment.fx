@@ -176,7 +176,7 @@ void main() {
 
     vec3 finalColor;
 
-    if(maximumDistance < cameraFar) finalColor = screenColor;
+    if(maximumDistance * 1.1 < cameraFar) finalColor = screenColor;
     else {
         vec3 samplePoint = normalize(closestPoint);
         //float offset = vec3(cnoise(samplePoint.xyz * 431.0), -cnoise(samplePoint.zxy * 73.0), cnoise(samplePoint.yzx * 47.0)).x;
