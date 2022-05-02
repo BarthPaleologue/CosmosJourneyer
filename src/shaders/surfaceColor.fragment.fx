@@ -53,7 +53,7 @@ uniform vec3 steepColor; // the color of steep slopes
 uniform vec3 plainColor; // the color of plains at the bottom of moutains
 uniform vec3 beachColor; // the color of the sand
 uniform vec3 desertColor;
-vec3 toundraColor = vec3(40.0, 40.0, 40.0) / 255.0;
+uniform vec3 bottomColor;
 
 uniform float minTemperature;
 uniform float maxTemperature;
@@ -254,7 +254,7 @@ vec3 computeColorAndNormal(
 		outColor = lerp(flatColor, steepColor, 1.0 - steepFactor);
 	} else {
 		// entre abysse et surface
-		vec3 flatColor = lnear(beachColor, vec3(0.5), elevation01, waterLevel01, beachSize / maxElevation);
+		vec3 flatColor = lnear(beachColor, bottomColor, elevation01, waterLevel01, beachSize / maxElevation);
 
 		beachFactor = getLnearFactor(elevation01, waterLevel01, beachSize / maxElevation);
 		bottomFactor = 1.0 - beachFactor;

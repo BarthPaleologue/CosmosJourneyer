@@ -50,6 +50,7 @@ export interface ColorSettings {
     plainColor: Vector3;
     beachColor: Vector3;
     desertColor: Vector3;
+    bottomColor: Vector3;
 
     beachSize: number;
     steepSharpness: number;
@@ -120,6 +121,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             plainColor: new Vector3(56, 94, 6).scale(1/255),
             beachColor: new Vector3(0.7, 0.7, 0.2),
             desertColor: new Vector3(178, 107, 42).scale(1 / 255),
+            bottomColor: new Vector3(0.5, 0.5, 0.5),
 
             beachSize: 300,
             steepSharpness: 5,
@@ -149,7 +151,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
                     "waterLevel", "beachSize", "steepSharpness", "normalSharpness",
 
-                    "snowColor", "steepColor", "plainColor", "beachColor", "desertColor",
+                    "snowColor", "steepColor", "plainColor", "beachColor", "desertColor", "bottomColor",
 
                     "maxElevation",
 
@@ -269,6 +271,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.surfaceMaterial.setVector3("plainColor", this.colorSettings.plainColor);
         this.surfaceMaterial.setVector3("beachColor", this.colorSettings.beachColor);
         this.surfaceMaterial.setVector3("desertColor", this.colorSettings.desertColor);
+        this.surfaceMaterial.setVector3("bottomColor", this.colorSettings.bottomColor);
 
         this.surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
     }

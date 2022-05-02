@@ -116,18 +116,22 @@ let Ares = new SolidPlanet("Ares", radius, starSystem, scene, {
 });
 Ares.translate(new Vector3(0, 0, 4 * radius));
 
-Ares.terrainSettings.continentsFragmentation = 0.7;
-Ares.terrainSettings.continentBaseHeight = 4e3;
+Ares.terrainSettings.continentsFragmentation = 0.6;
+Ares.terrainSettings.continentBaseHeight = 10e3;
 Ares.terrainSettings.maxMountainHeight = 15e3;
 Ares.terrainSettings.mountainsMinValue = 0.7;
 
-Ares.colorSettings.beachColor = Ares.colorSettings.plainColor;
+Ares.colorSettings.plainColor = new Vector3(0.6, 0.2, 0.05);
+Ares.colorSettings.beachColor = new Vector3(0.3, 0.15, 0.1);
+Ares.colorSettings.bottomColor = new Vector3(0.05, 0.1, 0.15);
 Ares.updateColors();
 
 Ares.translate(new Vector3(-radius * 4, 0, 0));
 
 let aresAtmosphere = Ares.createAtmosphere(sun, scene); // = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, scene);
+aresAtmosphere.settings.redWaveLength = 500;
 aresAtmosphere.settings.greenWaveLength = 680;
+aresAtmosphere.settings.blueWaveLength = 670;
 
 
 // TODO: mettre le VLS dans Star => par extension créer un système de gestion des post process généralisé
