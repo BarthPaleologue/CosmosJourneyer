@@ -20,12 +20,6 @@ export abstract class PlanetPostProcess extends SpacePostProcess {
                     return planet.getAbsolutePosition()
                 }
             },
-            "planetRotationAxis": {
-                type: ShaderDataType.Vector3,
-                get: () => {
-                    return planet.physicalProperties.rotationAxis
-                }
-            },
             "cameraDirection": {
                 type: ShaderDataType.Vector3,
                 get: () => {

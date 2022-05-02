@@ -51,21 +51,17 @@ let keyboard = new Keyboard();
 
 let starSystemManager = new StarSystemManager();
 
-let sun = new Star("Weierstrass", 0.4 * planetRadius, new Vector3(-1, 0.5, -1).scale(planetRadius * 5), scene);
-starSystemManager.addStar(sun);
+let sun = new Star("Weierstrass", 0.4 * planetRadius, starSystemManager, scene);
+sun.translate(new Vector3(-1, 0.5, -1).scale(planetRadius * 5));
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
-let planet = new SolidPlanet("Hécate", planetRadius, new Vector3(0, 0, planetRadius * 3), 2, scene);
+let planet = new SolidPlanet("Hécate", planetRadius, starSystemManager, scene);
 planet.rotate(Axis.X, 0.2);
 
 planet.physicalProperties.rotationPeriod /= 500;
 
-planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
-planet.colorSettings.beachSize = 300;
-planet.updateColors();
-
-starSystemManager.addSolidPlanet(planet);
+planet.translate(new Vector3(0, 0, planetRadius * 3));
 
 let ocean = planet.createOcean(sun, scene);
 let flatClouds = planet.createClouds(sun, scene);
@@ -82,9 +78,38 @@ vls.decay = 0.95;
 
 let sliders: Slider[] = [];
 
+//#region general
+
 sliders.push(new Slider("zoom", document.getElementById("zoom")!, 0, 100, 100 * planet._radius / planet.attachNode.position.z, (value: number) => {
-    planet.attachNode.position.z = 100 * planet._radius / (value);
+    let playerDir = planet.getAbsolutePosition().normalizeToNew();
+    planet.setAbsolutePosition(playerDir.scale(100 * planet._radius / value));
 }));
+
+let sunOrientation = 220;
+sliders.push(new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
+    sun.mesh.rotateAround(planet.getAbsolutePosition(), new Vector3(0, 1, 0), -2 * Math.PI * (val - sunOrientation) / 360);
+    sunOrientation = val;
+}));
+
+let axialTilt = 0.2;
+sliders.push(new Slider("axialTilt", document.getElementById("axialTilt")!, -180, 180, Math.round(180 * axialTilt / Math.PI), (val: number) => {
+    let newAxialTilt = val * Math.PI / 180;
+    planet.rotate(Axis.X, newAxialTilt - axialTilt);
+    if(player.isOrbiting()) player.rotateAround(planet.getAbsolutePosition(), Axis.X, newAxialTilt - axialTilt);
+    axialTilt = newAxialTilt;
+}));
+
+sliders.push(new Slider("timeModifier", document.getElementById("timeModifier")!, 0, 200, timeMultiplicator, (val: number) => {
+    timeMultiplicator = val;
+}));
+
+sliders.push(new Slider("cameraFOV", document.getElementById("cameraFOV")!, 0, 360, player.camera.fov * 360 / Math.PI, (val: number) => {
+    player.camera.fov = val * Math.PI / 360;
+}));
+
+//#endregion general
+
+//#region physic
 
 sliders.push(new Slider("minTemperature", document.getElementById("minTemperature")!, -273, 300, planet.physicalProperties.minTemperature, (val: number) => {
     planet.physicalProperties.minTemperature = val;
@@ -94,6 +119,9 @@ sliders.push(new Slider("maxTemperature", document.getElementById("maxTemperatur
     planet.physicalProperties.maxTemperature = val;
 }));
 
+//#endregion physic
+
+//#region ocean
 
 document.getElementById("oceanToggler")?.addEventListener("click", () => {
     let checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
@@ -117,14 +145,18 @@ sliders.push(new Slider("smoothness", document.getElementById("smoothness")!, 0,
     ocean.settings.smoothness = val / 100;
 }));
 
-sliders.push(new Slider("waveBlendingSharpness", document.getElementById("waveBlendingSharpness")!, 0, 100, ocean.settings.smoothness * 100, (val: number) => {
+sliders.push(new Slider("waveBlendingSharpness", document.getElementById("waveBlendingSharpness")!, 0, 100, ocean.settings.waveBlendingSharpness * 100, (val: number) => {
     ocean.settings.waveBlendingSharpness = val / 100;
 }));
+
+//#endregion ocean
 
 function babylonToHex(color: Vector3): string {
     let c2 = new Color3(color.x, color.y, color.z);
     return c2.toHexString();
 }
+
+//#region surface
 
 let snowColorPicker = document.getElementById("snowColor") as HTMLInputElement;
 snowColorPicker.value = babylonToHex(planet.colorSettings.snowColor);
@@ -182,6 +214,10 @@ sliders.push(new Slider("normalSharpness", document.getElementById("normalSharpn
     planet.updateColors();
 }));
 
+//#endregion surface
+
+//#region clouds
+
 document.getElementById("cloudsToggler")?.addEventListener("click", () => {
     let checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
     checkbox.checked = !checkbox.checked;
@@ -219,6 +255,10 @@ sliders.push(new Slider("worleySpeed", document.getElementById("worleySpeed")!, 
 sliders.push(new Slider("detailSpeed", document.getElementById("detailSpeed")!, 0, 200, flatClouds.settings.detailSpeed * 10, (val: number) => {
     flatClouds.settings.detailSpeed = val / 10;
 }));
+
+//#endregion clouds
+
+//#region atmosphere
 
 document.getElementById("atmosphereToggler")?.addEventListener("click", () => {
     let checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
@@ -266,6 +306,10 @@ sliders.push(new Slider("mieHaloRadius", document.getElementById("mieHaloRadius"
     atmosphere.settings.mieHaloRadius = val / 100;
 }));
 
+//#endregion atmosphere
+
+//#region rings
+
 document.getElementById("ringsToggler")?.addEventListener("click", () => {
     let checkbox = document.querySelectorAll("input[type='checkbox']")[3] as HTMLInputElement;
     checkbox.checked = !checkbox.checked;
@@ -288,19 +332,8 @@ sliders.push(new Slider("ringsOpacity", document.getElementById("ringsOpacity")!
     rings.settings.ringOpacity = val / 100;
 }));
 
-let sunOrientation = 220;
-sliders.push(new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
-    sun.mesh.rotateAround(planet.getAbsolutePosition(), new Vector3(0, 1, 0), -2 * Math.PI * (val - sunOrientation) / 360);
-    sunOrientation = val;
-}));
+//#endregion rings
 
-sliders.push(new Slider("timeModifier", document.getElementById("timeModifier")!, 0, 200, timeMultiplicator, (val: number) => {
-    timeMultiplicator = val;
-}));
-
-sliders.push(new Slider("cameraFOV", document.getElementById("cameraFOV")!, 0, 360, player.camera.fov * 360 / Math.PI, (val: number) => {
-    player.camera.fov = val * Math.PI / 360;
-}));
 
 //#endregion
 
@@ -313,13 +346,21 @@ document.addEventListener("keyup", e => {
     }
 });
 
-let currentUI: HTMLElement | null = null;
+let currentUI: HTMLElement | null = document.getElementById("generalUI");
 for (const link of document.querySelector("nav")!.children) {
     link.addEventListener("click", e => {
         let id = link.id.substring(0, link.id.length - 4) + "UI";
-        if (currentUI != null) currentUI.hidden = true;
+        if (currentUI != null) {
+            currentUI.hidden = true;
+            if (currentUI.id == id) {
+                currentUI = null;
+                resizeUI();
+                return;
+            }
+        }
         currentUI = document.getElementById(id)!;
         currentUI.hidden = false;
+        resizeUI();
         for (const slider of sliders) {
             slider.update(false);
         }
@@ -347,11 +388,16 @@ document.getElementById("heightMapButton")!.addEventListener("click", () => {
     planet.updateColors();
 });
 
-window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth - 300; // on compte le panneau
+function resizeUI() {
+    if (currentUI == null) canvas.width = window.innerWidth;
+    else canvas.width = window.innerWidth - 300; // on compte le panneau
     canvas.height = window.innerHeight;
     engine.resize();
-});
+}
+
+window.addEventListener("resize", () => resizeUI());
+
+//starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();

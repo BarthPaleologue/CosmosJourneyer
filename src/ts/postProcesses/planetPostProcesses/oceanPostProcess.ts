@@ -1,7 +1,7 @@
 import {Scene, Texture} from "@babylonjs/core";
 
-import waterNormal1 from "../../../asset/textures/waterbump.png";
-import waterNormal2 from "../../../asset/textures/waterNormal2.png";
+import waterNormal1 from "../../../asset/textures/waterNormalMap3.jpg";
+import waterNormal2 from "../../../asset/textures/waterNormalMap4.jpg";
 import {OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
@@ -19,7 +19,7 @@ export class OceanPostProcess extends PlanetPostProcess {
             alphaModifier: 0.007,
             specularPower: 1.5,
             smoothness: 0.9,
-            waveBlendingSharpness: 0.5,
+            waveBlendingSharpness: 0.1,
         };
 
         let uniforms: ShaderUniformData = {

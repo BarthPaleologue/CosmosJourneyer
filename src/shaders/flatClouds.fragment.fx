@@ -19,7 +19,6 @@ uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
 
 uniform vec3 planetPosition; // planet position in world space
-uniform vec3 planetRotationAxis; // planet rotation axis in world space
 uniform float cloudLayerRadius; // atmosphere radius (calculate from planet center)
 uniform float planetRadius; // planet radius
 
@@ -332,7 +331,7 @@ vec3 rotateAround(vec3 vector, vec3 axis, float theta) {
 
 float cloudDensityAtPoint(vec3 samplePoint) {
 
-    float timeOffset = -time * 0.001;
+    float timeOffset = time * 0.001;
     vec3 rotationAxisPlanetSpace = vec3(0.0, 1.0, 0.0);
 
     vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, timeOffset * worleySpeed);
@@ -397,7 +396,7 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
 
     vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
 
-    float ndl = max(dot(planetNormal, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
+    float ndl = max(dot(normal, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
 
     //TODO : en faire un uniform
     float smoothness = 0.7;

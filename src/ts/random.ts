@@ -1,18 +1,27 @@
-import { Engine, Scene, DepthRenderer, Axis, Vector3, Tools, FxaaPostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import {
+    Engine,
+    Scene,
+    DepthRenderer,
+    Axis,
+    Vector3,
+    Tools,
+    FxaaPostProcess,
+    VolumetricLightScatteringPostProcess
+} from "@babylonjs/core";
 
-import { SolidPlanet } from "./celestialBodies/planets/solid/solidPlanet";
+import {SolidPlanet} from "./celestialBodies/planets/solid/solidPlanet";
 
 import * as style from "../styles/style.scss";
-import { PlayerController } from "./player/playerController";
-import { Keyboard } from "./inputs/keyboard";
-import { Mouse } from "./inputs/mouse";
-import { Gamepad } from "./inputs/gamepad";
-import { CollisionWorker } from "./workers/collisionWorker";
-import { StarSystemManager } from "./celestialBodies/starSystemManager";
+import {PlayerController} from "./player/playerController";
+import {Keyboard} from "./inputs/keyboard";
+import {Mouse} from "./inputs/mouse";
+import {Gamepad} from "./inputs/gamepad";
+import {CollisionWorker} from "./workers/collisionWorker";
+import {StarSystemManager} from "./celestialBodies/starSystemManager";
 
-import { centeredRandom, nrand, randInt } from "./utils/random";
-import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Star } from "./celestialBodies/stars/star";
+import {centeredRandom, nrand, randInt} from "./utils/random";
+import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
+import {Star} from "./celestialBodies/stars/star";
 
 style.default;
 
@@ -46,11 +55,8 @@ player.camera.maxZ = Math.max(radius * 50, 10000);
 
 let starSystemManager = new StarSystemManager(64);
 
-let sun = new Star("Weierstrass", Math.max(nrand(0.5, 0.2),0) * radius, new Vector3(
-    -900000,
-    0,
-    -1700000
-), scene, {
+let starRadius = Math.max(nrand(0.5, 0.2), 0) * radius
+let sun = new Star("Weierstrass", starRadius, starSystemManager, scene, {
     rotationPeriod: 60 * 60 * 24,
     rotationAxis: Axis.Y,
 
@@ -58,13 +64,13 @@ let sun = new Star("Weierstrass", Math.max(nrand(0.5, 0.2),0) * radius, new Vect
 });
 console.table(sun.physicalProperties);
 
-starSystemManager.addStar(sun);
+sun.translate(new Vector3(-900000, 0, -1700000));
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
 
-let planet = new SolidPlanet("Hécate", radius, new Vector3(0, 0, 4 * radius), 1, scene, {
-    rotationPeriod: 60 * 60,
+let planet = new SolidPlanet("Hécate", radius, starSystemManager, scene, {
+    rotationPeriod: 60 * 60 / 10,
     rotationAxis: Axis.Y,
 
     minTemperature: randInt(-50, 5),
@@ -76,6 +82,7 @@ let planet = new SolidPlanet("Hécate", radius, new Vector3(0, 0, 4 * radius), 1
     centeredRandom(),
     centeredRandom()
 ]);
+planet.translate(new Vector3(0, 0, 4 * radius));
 console.log("seed : ", planet.getSeed().toString());
 console.table(planet.physicalProperties);
 planet.colorSettings.plainColor = new Vector3(0.22, 0.37, 0.024).add(new Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
@@ -103,17 +110,15 @@ let rings = planet.createRings(sun, scene);
 rings.settings.ringStart = 1.8 + 0.4 * centeredRandom();
 rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom();
 
-starSystemManager.addSolidPlanet(planet);
-
 let vls = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
 
-let fxaa = new FxaaPostProcess("fxaa", 1);
+let fxaa = new FxaaPostProcess("fxaa", 1, player.camera);
 
 let isMouseEnabled = false;
 
 document.addEventListener("keydown", e => {
     if (e.key == "p") { // take screenshots
-        Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
+        Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, {precision: 4});
     }
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
     if (e.key == "w" && player.nearestBody != null) (<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe = !(<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe;
@@ -124,7 +129,6 @@ window.addEventListener("resize", () => {
     canvas.height = window.innerHeight;
     engine.resize();
 });
-
 
 
 depthRenderer.getDepthMap().renderList?.push(sun.mesh);
@@ -155,7 +159,7 @@ scene.executeWhenReady(() => {
         starSystemManager.translateAllCelestialBody(deplacement);
 
         if (!collisionWorker.isBusy() && player.isOrbiting()) {
-            if(player.nearestBody instanceof SolidPlanet) {
+            if (player.nearestBody instanceof SolidPlanet) {
                 //FIXME: se passer de instanceof
                 collisionWorker.checkCollision(player.nearestBody);
             }

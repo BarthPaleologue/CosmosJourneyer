@@ -1,17 +1,22 @@
-import { Vector3, Quaternion } from "@babylonjs/core";
+import {Vector3, Quaternion, Space, Matrix} from "@babylonjs/core";
 import {Algebra} from "../utils/algebra";
 import {BodyPhysicalProperties, CelestialBodyType, Transformable} from "./interfaces";
 import {PlayerController} from "../player/playerController";
+import {StarSystemManager} from "./starSystemManager";
 
 export abstract class CelestialBody implements Transformable {
     protected abstract bodyType: CelestialBodyType;
 
     abstract physicalProperties: BodyPhysicalProperties;
 
+    readonly _starSystemManager: StarSystemManager;
+
     readonly _name: string;
 
-    protected constructor(name: string) {
+    protected constructor(name: string, starSystemManager: StarSystemManager) {
         this._name = name;
+        this._starSystemManager = starSystemManager;
+        starSystemManager.addBody(this);
     }
 
     /**
@@ -22,7 +27,9 @@ export abstract class CelestialBody implements Transformable {
     }
 
     public abstract setAbsolutePosition(newPosition: Vector3): void;
+
     public abstract getAbsolutePosition(): Vector3;
+
     public abstract getRotationQuaternion(): Quaternion;
 
     /**
@@ -46,9 +53,10 @@ export abstract class CelestialBody implements Transformable {
     public update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
         let dtheta = deltaTime / this.physicalProperties.rotationPeriod;
 
-        if(player.isOrbiting() && player.nearestBody?.getName() == this.getName()) {
-            player.rotateAround(this.getAbsolutePosition(), this.physicalProperties.rotationAxis, dtheta);
+        if (player.isOrbiting() && player.nearestBody?.getName() == this.getName()) {
+            player.rotateAround(this.getAbsolutePosition(), this.physicalProperties.rotationAxis, -dtheta);
         }
+        this.rotate(this.physicalProperties.rotationAxis, -dtheta);
     }
 
     public getOriginBodySpaceSamplePosition(): Vector3 {
@@ -64,5 +72,7 @@ export abstract class CelestialBody implements Transformable {
 
     public abstract rotateAround(pivot: Vector3, axis: Vector3, amount: number): void;
 
-    public abstract rotate(axis: Vector3, amount: number): void;
+    public rotate(axis: Vector3, amount: number) {
+        this.physicalProperties.rotationAxis = Vector3.TransformCoordinates(this.physicalProperties.rotationAxis, Matrix.RotationAxis(axis, amount));
+    }
 }

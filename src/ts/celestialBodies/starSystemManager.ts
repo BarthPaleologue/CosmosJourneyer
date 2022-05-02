@@ -12,16 +12,10 @@ export class StarSystemManager {
     constructor(nbVertices = 64) {
         this._chunkForge = new ChunkForge(nbVertices);
     }
-    private addBody(body: CelestialBody) {
+    public addBody(body: CelestialBody) {
         this._celestialBodies.push(body);
     }
-    public addStar(star: Star): void {
-        this.addBody(star);
-    }
-    public addSolidPlanet(planet: SolidPlanet): void {
-        planet.setChunkForge(this._chunkForge);
-        this.addBody(planet);
-    }
+
     public translateAllCelestialBody(deplacement: Vector3): void {
         for (const planet of this._celestialBodies) {
             planet.setAbsolutePosition(planet.getAbsolutePosition().add(deplacement));
@@ -31,6 +25,10 @@ export class StarSystemManager {
         for(const planet of this._celestialBodies) {
             planet.rotateAround(pivot, axis, amount);
         }
+    }
+
+    public getChunkForge(): ChunkForge {
+        return this._chunkForge;
     }
 
     /**
@@ -61,5 +59,13 @@ export class StarSystemManager {
         }
         this.translateAllCelestialBody(player.getAbsolutePosition().scale(-1));
         player.translate(player.getAbsolutePosition().scale(-1));
+    }
+
+    public getBodiesDataAsArray(): number[] {
+        let tab: number[] = [];
+        for(const body of this._celestialBodies) {
+            tab = tab.concat(body.getAbsolutePosition().asArray(), body.getRadius());
+        }
+        return tab;
     }
 }

@@ -1,10 +1,21 @@
 import {getRgbFromTemperature} from "../../utils/specrend";
 import {CelestialBody} from "../celestialBody";
 
-import {Axis, MaterialHelper, Matrix, Mesh, Quaternion, Scene, ShaderMaterial, Space, Vector3} from "@babylonjs/core";
+import {
+    Axis,
+    Matrix,
+    Mesh,
+    MeshBuilder,
+    Quaternion,
+    Scene,
+    ShaderMaterial,
+    Space,
+    Vector3
+} from "@babylonjs/core";
 import {CelestialBodyType, StarPhysicalProperties} from "../interfaces";
 import {initMeshTransform} from "../../utils/mesh";
 import {PlayerController} from "../../player/playerController";
+import {StarSystemManager} from "../starSystemManager";
 
 // TODO: implement RigidBody for star
 export class Star extends CelestialBody {
@@ -14,19 +25,22 @@ export class Star extends CelestialBody {
     private internalTime = 0;
     protected bodyType = CelestialBodyType.STAR;
     physicalProperties: StarPhysicalProperties;
-    constructor(name: string, radius: number, position: Vector3, scene: Scene, physicalProperties: StarPhysicalProperties = {
-        //TODO: ne pas hardcoder
-        rotationPeriod: 24 * 60 * 60,
-        rotationAxis: Axis.Y,
 
-        temperature: 5778
-    }) {
-        super(name);
+    constructor(name: string, radius: number,
+                starSystemManager: StarSystemManager, scene: Scene,
+                physicalProperties: StarPhysicalProperties = {
+                    //TODO: ne pas hardcoder
+                    rotationPeriod: 24 * 60 * 60,
+                    rotationAxis: Axis.Y,
+
+                    temperature: 5778
+                }) {
+        super(name, starSystemManager);
         this.physicalProperties = physicalProperties;
         this.radius = radius;
 
-        this.mesh = Mesh.CreateSphere(name, 32, this.radius, scene);
-        this.mesh.setAbsolutePosition(position);
+        this.mesh = MeshBuilder.CreateSphere(name, {diameter: this.radius, segments: 32}, scene);
+
         initMeshTransform(this.mesh);
 
         let starMaterial = new ShaderMaterial("starColor", scene, "./shaders/starMaterial",
@@ -60,17 +74,17 @@ export class Star extends CelestialBody {
     public translate(displacement: Vector3): void {
         this.mesh.position.addInPlace(displacement);
     }
+
     public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
         this.mesh.rotateAround(pivot, axis, amount);
     }
+
     public rotate(axis: Vector3, amount: number) {
         this.mesh.rotate(axis, amount, Space.WORLD);
-        this.physicalProperties.rotationAxis = Vector3.TransformCoordinates(this.physicalProperties.rotationAxis, Matrix.RotationAxis(axis, amount));
+        super.rotate(axis, amount);
     }
 
     public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
-        this.mesh.rotate(this.physicalProperties.rotationAxis, deltaTime / this.physicalProperties.rotationPeriod);
-
         this.starMaterial.setFloat("time", this.internalTime);
         this.starMaterial.setVector3("starColor", getRgbFromTemperature(this.physicalProperties.temperature));
         this.starMaterial.setMatrix("planetWorldMatrix", this.mesh.getWorldMatrix());

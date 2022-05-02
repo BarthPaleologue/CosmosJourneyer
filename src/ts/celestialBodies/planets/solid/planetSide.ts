@@ -52,19 +52,23 @@ export class PlanetSide {
      * @param surfaceMaterial 
      * @param planet 
      */
-    constructor(id: string, minDepth: number, maxDepth: number, rootChunkLength: number, direction: Direction, parentNode: Mesh, scene: Scene, surfaceMaterial: Material, planet: SolidPlanet) {
+    constructor(id: string, direction: Direction, planet: SolidPlanet) {
         this.id = id;
 
-        this.maxDepth = maxDepth;
-        this.minDepth = minDepth;
+        this.minDepth = 1;
+        this.maxDepth = Math.round(Math.log2(planet.rootChunkLength / 2) - 12);
+        //let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
+        //console.log(spaceBetweenVertex);
 
-        this.rootChunkLength = rootChunkLength;
+        this.rootChunkLength = planet.rootChunkLength;
+
+        this.chunkForge = planet._starSystemManager.getChunkForge();
 
         this.direction = direction;
-        this.parent = parentNode;
-        this.scene = scene;
+        this.parent = planet.attachNode;
+        this.scene = planet.attachNode.getScene();
 
-        this.surfaceMaterial = surfaceMaterial;
+        this.surfaceMaterial = planet.surfaceMaterial;
 
         this.planet = planet;
     }

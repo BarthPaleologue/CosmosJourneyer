@@ -32,6 +32,7 @@ import {CollisionData} from "../../../forge/workerDataInterfaces";
 import {TaskType} from "../../../forge/taskInterfaces";
 import {initMeshTransform} from "../../../utils/mesh";
 import {PlayerController} from "../../../player/playerController";
+import {StarSystemManager} from "../../starSystemManager";
 
 export enum ColorMode {
     DEFAULT,
@@ -70,23 +71,23 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     readonly rootChunkLength: number; // length of eachChunk
 
-    readonly maxDepth: number;
-
     readonly attachNode: Mesh; // reprensents the center of the sphere
     readonly sides: PlanetSide[] = new Array(6); // stores the 6 sides of the sphere
 
     surfaceMaterial: ShaderMaterial;
 
-    constructor(id: string, radius: number, position: Vector3, minDepth: number, scene: Scene, physicalProperties: SolidPhysicalProperties = {
-        rotationPeriod: 60 * 60 * 24,
-        rotationAxis: Axis.Y,
+    constructor(id: string, radius: number,
+                starSystemManager: StarSystemManager, scene: Scene,
+                physicalProperties: SolidPhysicalProperties = {
+                    rotationPeriod: 60 * 60 * 24,
+                    rotationAxis: Axis.Y,
 
-        minTemperature: -40,
-        maxTemperature: 50,
-        pressure: 1,
-        waterAmount: 1
-    }, seed = [0, 0, 0]) {
-        super(id, radius, seed);
+                    minTemperature: -40,
+                    maxTemperature: 50,
+                    pressure: 1,
+                    waterAmount: 1
+                }, seed = [0, 0, 0]) {
+        super(id, radius, starSystemManager, seed);
 
         this.physicalProperties = physicalProperties;
 
@@ -95,13 +96,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         this.rootChunkLength = this._radius * 2;
 
-        this.maxDepth = Math.round(Math.log2(radius) - 12);
-
-        let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
-        //console.log(spaceBetweenVertex);
-
         this.attachNode = new Mesh(`${this._name}AttachNode`, scene);
-        this.attachNode.setAbsolutePosition(position);
+
         initMeshTransform(this.attachNode);
 
         this.terrainSettings = {
@@ -121,11 +117,11 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
             snowColor: new Vector3(1, 1, 1),
             steepColor: new Vector3(55, 42, 42).scale(1 / 255),
-            plainColor: new Vector3(0.5, 0.3, 0.08),
+            plainColor: new Vector3(56, 94, 6).scale(1/255),
             beachColor: new Vector3(0.7, 0.7, 0.2),
             desertColor: new Vector3(178, 107, 42).scale(1 / 255),
 
-            beachSize: 1,
+            beachSize: 300,
             steepSharpness: 5,
             normalSharpness: 0.5,
         };
@@ -197,12 +193,12 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.surfaceMaterial = surfaceMaterial;
 
         this.sides = [
-            new PlanetSide(`${this._name}UpSide`, minDepth, this.maxDepth, this.rootChunkLength, Direction.Up, this.attachNode, scene, this.surfaceMaterial, this),
-            new PlanetSide(`${this._name}DownSide`, minDepth, this.maxDepth, this.rootChunkLength, Direction.Down, this.attachNode, scene, this.surfaceMaterial, this),
-            new PlanetSide(`${this._name}ForwardSide`, minDepth, this.maxDepth, this.rootChunkLength, Direction.Forward, this.attachNode, scene, this.surfaceMaterial, this),
-            new PlanetSide(`${this._name}BackwardSide`, minDepth, this.maxDepth, this.rootChunkLength, Direction.Backward, this.attachNode, scene, this.surfaceMaterial, this),
-            new PlanetSide(`${this._name}RightSide`, minDepth, this.maxDepth, this.rootChunkLength, Direction.Right, this.attachNode, scene, this.surfaceMaterial, this),
-            new PlanetSide(`${this._name}LeftSide`, minDepth, this.maxDepth, this.rootChunkLength, Direction.Left, this.attachNode, scene, this.surfaceMaterial, this),
+            new PlanetSide(`${this.getName()}UpSide`, Direction.Up, this),
+            new PlanetSide(`${this.getName()}DownSide`, Direction.Down, this),
+            new PlanetSide(`${this.getName()}ForwardSide`, Direction.Forward, this),
+            new PlanetSide(`${this.getName()}BackwardSide`, Direction.Backward, this),
+            new PlanetSide(`${this.getName()}RightSide`, Direction.Right, this),
+            new PlanetSide(`${this.getName()}LeftSide`, Direction.Left, this)
         ];
 
         this.updateColors();
@@ -225,16 +221,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     public override getWorldMatrix(): Matrix {
         return this.attachNode.getWorldMatrix();
-    }
-
-    /**
-     * Sets the chunkforge of the planet
-     * @param chunkForge The chunkforge the planet will use to generate its terrain
-     */
-    public setChunkForge(chunkForge: ChunkForge): void {
-        for (const planetSide of this.sides) {
-            planetSide.setChunkForge(chunkForge);
-        }
     }
 
     /**
@@ -290,9 +276,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     public update(player: PlayerController, lightPosition: Vector3, deltaTime: number) {
         super.update(player, lightPosition, deltaTime);
 
-        let dtheta = deltaTime / this.physicalProperties.rotationPeriod;
-        this.attachNode.rotate(this.physicalProperties.rotationAxis, dtheta, Space.WORLD);
-
         this.surfaceMaterial.setVector3("playerPosition", player.getAbsolutePosition());
         this.surfaceMaterial.setVector3("sunPosition", lightPosition);
         this.surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
@@ -337,6 +320,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     public rotate(axis: Vector3, amount: number) {
         this.attachNode.rotate(axis, amount, Space.WORLD);
-        this.physicalProperties.rotationAxis = Vector3.TransformCoordinates(this.physicalProperties.rotationAxis, Matrix.RotationAxis(axis, amount));
+        super.rotate(axis, amount);
     }
 }

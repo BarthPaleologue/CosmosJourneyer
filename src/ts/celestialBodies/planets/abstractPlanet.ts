@@ -10,14 +10,15 @@ import {FlatCloudsPostProcess} from "../../postProcesses/planetPostProcesses/fla
 import {PlayerController} from "../../player/playerController";
 import {OceanPostProcess} from "../../postProcesses/planetPostProcesses/oceanPostProcess";
 import {RingsPostProcess} from "../../postProcesses/planetPostProcesses/ringsPostProcess";
+import {StarSystemManager} from "../starSystemManager";
 
 export abstract class AbstractPlanet extends CelestialBody implements Seedable {
     readonly _radius: number;
     protected _seed: number[];
     abstract override physicalProperties: PlanetPhysicalProperties;
     protected postProcessList: PlanetPostProcess[] = [];
-    protected constructor(name: string, radius: number, seed = [0, 0, 0]) {
-        super(name);
+    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed = [0, 0, 0]) {
+        super(name, starSystemManager);
         this._radius = radius;
         this._seed = seed;
     }

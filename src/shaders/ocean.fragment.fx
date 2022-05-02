@@ -183,11 +183,11 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
 
     vec3 planetNormal = normalize(samplePoint - planetPosition);
     
-    vec3 normalWave = triplanarNormal(samplePointPlanetSpace - vec3(-time, time, -time) * 100.0, planetNormal, normalMap2, 0.00015, waveBlendingSharpness, 1.0);
-    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 100.0, normalWave, normalMap2, 0.0001, waveBlendingSharpness, 1.0);
+    vec3 normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, time, -time) * 100.0, planetNormal, normalMap2, 0.00015, waveBlendingSharpness, 1.0);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 100.0, normalWave, normalMap1, 0.0001, waveBlendingSharpness, 1.0);
 
-    normalWave = triplanarNormal(samplePointPlanetSpace - vec3(time, -time, -time) * 300.0, normalWave, normalMap2, 0.000025, waveBlendingSharpness, 1.0);
-    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 300.0, normalWave, normalMap2, 0.00002, waveBlendingSharpness, 1.0);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 300.0, normalWave, normalMap1, 0.000025, waveBlendingSharpness, 0.5);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 300.0, normalWave, normalMap2, 0.00002, waveBlendingSharpness, 0.5);
 
     vec3 sunDir = normalize(sunPosition - samplePoint);
 

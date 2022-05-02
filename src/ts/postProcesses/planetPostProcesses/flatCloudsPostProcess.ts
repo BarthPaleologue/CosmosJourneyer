@@ -95,7 +95,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             "time": {
                 type: ShaderDataType.Float,
                 get: () => {
-                    return this.internalTime
+                    return this.internalTime % 100000
                 }
             }
         };

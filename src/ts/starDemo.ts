@@ -50,9 +50,8 @@ let keyboard = new Keyboard();
 
 let starSystemManager = new StarSystemManager();
 
-let sun = new Star("Weierstrass", starRadius, new Vector3(0, 0, starRadius * 3), scene);
-
-starSystemManager.addStar(sun);
+let sun = new Star("Weierstrass", starRadius, starSystemManager, scene);
+sun.translate(new Vector3(0, 0, starRadius * 3));
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
@@ -66,6 +65,14 @@ vls.decay = 0.95;
 
 new Slider("temperature", document.getElementById("temperature")!, 3000, 15000, sun.physicalProperties.temperature, (val: number) => {
     sun.physicalProperties.temperature = val;
+});
+
+new Slider("exposure", document.getElementById("exposure")!, 0, 200, vls.exposure * 100, (val: number) => {
+    vls.exposure = val / 100;
+});
+
+new Slider("decay", document.getElementById("decay")!, 0, 200, vls.decay * 100, (val: number) => {
+    vls.decay = val / 100;
 });
 
 //#endregion

@@ -61,21 +61,17 @@ player.rotate(player.getUpwardDirection(), 0.8);
 
 player.camera.maxZ = Math.max(radius * 100, 10000);
 
-let starSystemManager = new StarSystemManager(64);
+let starSystem = new StarSystemManager(64);
 
-let sun = new Star("Weierstrass", 0.4 * radius, new Vector3(-910000, 0, -1700000), scene);
-starSystemManager.addStar(sun);
+let sun = new Star("Weierstrass", 0.4 * radius, starSystem, scene);
+sun.translate(new Vector3(-910000, 0, -1700000));
 
 depthRenderer.setMaterialForRendering(sun.mesh);
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
-let planet = new SolidPlanet("Hécate", radius, new Vector3(radius * 5, 0, 4 * radius), 1, scene);
+let planet = new SolidPlanet("Hécate", radius, starSystem, scene);
 planet.physicalProperties.rotationPeriod = 24 * 60 * 60 / 100;
-
-planet.colorSettings.plainColor = new Vector3(0.1, 0.4, 0).scale(0.7).add(new Vector3(0.5, 0.3, 0.08).scale(0.3));
-planet.colorSettings.beachSize = 300;
-planet.updateColors();
 
 planet.rotate(Axis.X, 0.2);
 
@@ -84,9 +80,9 @@ const flatClouds = planet.createClouds(sun, scene);
 const atmosphere = planet.createAtmosphere(sun, scene);
 planet.createRings(sun, scene);
 
-starSystemManager.addSolidPlanet(planet);
+planet.translate(new Vector3(radius * 5, 0, 4 * radius))
 
-let moon = new SolidPlanet("Manaleth", radius / 4, new Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius), 1, scene, {
+let moon = new SolidPlanet("Manaleth", radius / 4, starSystem, scene, {
     rotationPeriod: 28 * 24 * 60 * 60,
     rotationAxis: Axis.Y,
 
@@ -106,11 +102,10 @@ moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockNormalMap, sce
 moon.surfaceMaterial.setTexture("bottomNormalMap", new Texture(rockNormalMap, scene));
 moon.surfaceMaterial.setTexture("sandNormalMap", new Texture(rockNormalMap, scene));
 
+moon.translate(new Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius));
 moon.translate(planet.attachNode.getAbsolutePosition());
 
-starSystemManager.addSolidPlanet(moon);
-
-let Ares = new SolidPlanet("Ares", radius, new Vector3(0, 0, 4 * radius), 1, scene, {
+let Ares = new SolidPlanet("Ares", radius, starSystem, scene, {
     rotationPeriod: 24 * 60 * 60,
     rotationAxis: Axis.Y,
 
@@ -119,6 +114,7 @@ let Ares = new SolidPlanet("Ares", radius, new Vector3(0, 0, 4 * radius), 1, sce
     pressure: 0.5,
     waterAmount: 0.3
 });
+Ares.translate(new Vector3(0, 0, 4 * radius));
 
 Ares.terrainSettings.continentsFragmentation = 0.7;
 Ares.terrainSettings.continentBaseHeight = 4e3;
@@ -133,7 +129,6 @@ Ares.translate(new Vector3(-radius * 4, 0, 0));
 let aresAtmosphere = Ares.createAtmosphere(sun, scene); // = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, scene);
 aresAtmosphere.settings.greenWaveLength = 680;
 
-starSystemManager.addSolidPlanet(Ares);
 
 // TODO: mettre le VLS dans Star => par extension créer un système de gestion des post process généralisé
 let vls = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
@@ -144,20 +139,20 @@ let fxaa = new FxaaPostProcess("fxaa", 1, player.camera, Texture.BILINEAR_SAMPLI
 
 let isMouseEnabled = false;
 
-let collisionWorker = new CollisionWorker(player, starSystemManager);
+let collisionWorker = new CollisionWorker(player, starSystem);
 
 // update to current date
-starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
+starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
 
 function updateScene() {
 
     let deltaTime = engine.getDeltaTime() / 1000;
 
-    player.nearestBody = starSystemManager.getNearestBody();
+    player.nearestBody = starSystem.getNearestBody();
 
     document.getElementById("planetName")!.innerText = player.isOrbiting() ? player.nearestBody!.getName() : "Outer Space";
 
-    starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, timeMultiplicator * deltaTime);
+    starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, timeMultiplicator * deltaTime);
 
     if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 
@@ -165,7 +160,7 @@ function updateScene() {
 
     let deplacement = player.listenToGamepad(gamepad, deltaTime);
     deplacement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
-    starSystemManager.translateAllCelestialBody(deplacement);
+    starSystem.translateAllCelestialBody(deplacement);
 
     if (!collisionWorker.isBusy() && player.isOrbiting()) {
         if (player.nearestBody instanceof SolidPlanet) {
