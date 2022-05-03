@@ -94,7 +94,7 @@ let moon = new SolidPlanet("Manaleth", radius / 4, starSystem, scene, {
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
 moon.colorSettings.plainColor = new Vector3(0.5, 0.5, 0.5);
-moon.colorSettings.desertColor = moon.colorSettings.plainColor.scale(0.5);
+moon.colorSettings.desertColor = new Vector3(0.4, 0.4, 0.4);
 moon.colorSettings.steepColor = new Vector3(0.1, 0.1, 0.1);
 moon.updateColors();
 
@@ -116,12 +116,12 @@ let Ares = new SolidPlanet("Ares", radius, starSystem, scene, {
 });
 Ares.translate(new Vector3(0, 0, 4 * radius));
 
-Ares.terrainSettings.continentsFragmentation = 0.6;
-Ares.terrainSettings.continentBaseHeight = 10e3;
-Ares.terrainSettings.maxMountainHeight = 15e3;
-Ares.terrainSettings.mountainsMinValue = 0.7;
+Ares.terrainSettings.continentsFragmentation = 0.5;
+Ares.terrainSettings.continentBaseHeight = 5e3;
+Ares.terrainSettings.maxMountainHeight = 20e3;
+Ares.terrainSettings.mountainsMinValue = 0.4;
 
-Ares.colorSettings.plainColor = new Vector3(0.6, 0.2, 0.05);
+Ares.colorSettings.plainColor = new Vector3(0.4, 0.3, 0.3);
 Ares.colorSettings.beachColor = new Vector3(0.3, 0.15, 0.1);
 Ares.colorSettings.bottomColor = new Vector3(0.05, 0.1, 0.15);
 Ares.updateColors();

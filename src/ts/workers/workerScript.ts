@@ -6,6 +6,7 @@ import {BuildData, CollisionData, WorkerData} from "../forge/workerDataInterface
 import {TerrainSettings} from "../terrain/terrainSettings";
 import {elevationFunction} from "../terrain/landscape/elevationFunction";
 import {TaskType} from "../forge/taskInterfaces";
+import {tanhSharpen} from "../utils/math";
 
 let currentPlanetID = "";
 
@@ -33,7 +34,7 @@ function initLayers() {
 
     bumpyLayer = simplexNoiseLayer(terrainSettings.bumpsFrequency, 3, 2, 2, 1.0, 0.2);
 
-    mountainsLayer = ridgedNoiseLayer(terrainSettings.mountainsFrequency, 6, 1.9, 2.0, 2.5, terrainSettings.mountainsMinValue);
+    mountainsLayer = ridgedNoiseLayer(terrainSettings.mountainsFrequency, 6, 1.9, 2.0, 2, terrainSettings.mountainsMinValue);
 }
 
 initLayers();
@@ -58,6 +59,7 @@ function terrainFunction(position: LVector3, gradient: LVector3, seed = LVector3
     let mountainGradient = LVector3.Zero();
     let mountainElevation = mountainsLayer(samplePoint, mountainGradient);
 
+    mountainElevation = tanhSharpen(mountainElevation, 3, mountainGradient);
 
     elevation += continentMask * mountainElevation * terrainSettings.maxMountainHeight;
     mountainGradient.scaleInPlace(terrainSettings.maxMountainHeight * continentMask);

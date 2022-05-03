@@ -83,8 +83,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
                     rotationPeriod: 60 * 60 * 24,
                     rotationAxis: Axis.Y,
 
-                    minTemperature: -40,
-                    maxTemperature: 50,
+                    minTemperature: -60,
+                    maxTemperature: 40,
                     pressure: 1,
                     waterAmount: 1
                 }, seed = [0, 0, 0]) {
@@ -103,14 +103,15 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         this.terrainSettings = {
             continentsFragmentation: 0.47,
-            continentBaseHeight: 5e3,
 
-            maxBumpHeight: 1.5e3,
             bumpsFrequency: 3e-5,
 
-            maxMountainHeight: 15e3,
-            mountainsFrequency: 9e-6,
-            mountainsMinValue: 0.6
+            maxBumpHeight: 1.5e3,
+            maxMountainHeight: 20e3,
+            continentBaseHeight: 5e3,
+
+            mountainsFrequency: 10e-6,
+            mountainsMinValue: 0.5
         };
 
         this.colorSettings = {
@@ -124,7 +125,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             bottomColor: new Vector3(0.5, 0.5, 0.5),
 
             beachSize: 300,
-            steepSharpness: 5,
+            steepSharpness: 2,
             normalSharpness: 0.5,
         };
 
@@ -155,7 +156,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
                     "maxElevation",
 
-                    "minTemperature", "maxTemperature",
+                    "minTemperature", "maxTemperature", "pressure",
 
                     "waterAmount",
 
@@ -285,6 +286,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         this.surfaceMaterial.setFloat("minTemperature", this.physicalProperties.minTemperature);
         this.surfaceMaterial.setFloat("maxTemperature", this.physicalProperties.maxTemperature);
+        this.surfaceMaterial.setFloat("pressure", this.physicalProperties.pressure);
 
         this.surfaceMaterial.setFloat("waterAmount", this.physicalProperties.waterAmount);
 
