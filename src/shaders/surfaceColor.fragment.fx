@@ -55,6 +55,7 @@ uniform vec3 beachColor; // the color of the sand
 uniform vec3 desertColor;
 uniform vec3 bottomColor;
 
+uniform float pressure;
 uniform float minTemperature;
 uniform float maxTemperature;
 
@@ -355,7 +356,8 @@ void main() {
 	// TODO: find the equation ; even better use a texture
 	float co2SublimationTemperature01 = (co2SublimationTemperature - minTemperature) / (maxTemperature - minTemperature);
 
-	float temperatureHeightFalloff = 3.0;
+    // TODO: do not hardcode both
+	float temperatureHeightFalloff = 1.5;
 	float temperatureLatitudeFalloff = 1.0;
 
 	// TODO: do not hardcode that factor
@@ -386,7 +388,10 @@ void main() {
 	float moisture01 = 0.0; // 0.0 = sec, 1.0 = humid : sec par défaut
 	if(waterMeltingPoint01 < 1.0) {
 		// if there is liquid water on the surface
-		moisture01 += completeNoise(seededSamplePoint * 2.0, 5, 2.0, 2.0) * sqrt(1.0-waterMeltingPoint01) * waterBoilingPoint01;
+		moisture01 += completeNoise(seededSamplePoint * 2.0, 5, 1.7, 2.2) * sqrt(1.0-waterMeltingPoint01) * waterBoilingPoint01;
+	}
+	if(pressure == 0.0) {
+	    moisture01 += completeNoise(seededSamplePoint * 5.0, 5, 1.7, 2.2);
 	}
 	moisture01 = clamp(moisture01, 0.0, 1.0);
 
