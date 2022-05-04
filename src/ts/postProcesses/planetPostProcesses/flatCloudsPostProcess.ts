@@ -5,6 +5,7 @@ import normalMap from "../../../asset/textures/cloudNormalMap2.jpg";
 import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
 import {AbstractPlanet} from "../../celestialBodies/planets/abstractPlanet";
+import {gcd} from "../../utils/math";
 
 export class FlatCloudsPostProcess extends PlanetPostProcess {
 
@@ -21,8 +22,8 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             cloudPower: 2,
             cloudSharpness: 7,
             cloudColor: new Vector3(0.8, 0.8, 0.8),
-            worleySpeed: 0.5,
-            detailSpeed: 3,
+            worleySpeed: 0.0005,
+            detailSpeed: 0.003,
         };
 
         let uniforms: ShaderUniformData = {
@@ -95,7 +96,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             "time": {
                 type: ShaderDataType.Float,
                 get: () => {
-                    return this.internalTime % 100000
+                    return this.internalTime % (2 * Math.PI * gcd(this.settings.worleySpeed * 10000, this.settings.detailSpeed * 10000) / this.settings.worleySpeed);
                 }
             }
         };

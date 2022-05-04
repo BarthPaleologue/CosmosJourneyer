@@ -342,7 +342,6 @@ void main() {
 	float dayDuration = 1.0;
 	
 	// pressions
-	float pressure = 1.0;
 	float waterSublimationPression = 0.006; //https://www.wikiwand.com/en/Sublimation_(phase_transition)#/Water
 	
 	// Temperatures

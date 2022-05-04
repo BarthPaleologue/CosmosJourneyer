@@ -136,4 +136,10 @@ export function tanhSharpen(x: number, s: number, grad?: Vec3): number {
     return 0.5 * (1 + (tanhX / tanhHalfS));
 }
 
+export function gcd(a: number, b: number): number {
+    if (!b) return a;
+
+    return gcd(b, a % b);
+}
+
 

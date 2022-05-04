@@ -248,12 +248,12 @@ sliders.push(new Slider("cloudSharpness", document.getElementById("cloudSharpnes
     flatClouds.settings.cloudSharpness = val;
 }));
 
-sliders.push(new Slider("worleySpeed", document.getElementById("worleySpeed")!, 0.0, 200.0, flatClouds.settings.worleySpeed * 10, (val: number) => {
-    flatClouds.settings.worleySpeed = val / 10;
+sliders.push(new Slider("worleySpeed", document.getElementById("worleySpeed")!, 0.0, 200.0, flatClouds.settings.worleySpeed * 10000, (val: number) => {
+    flatClouds.settings.worleySpeed = val / 10000;
 }));
 
-sliders.push(new Slider("detailSpeed", document.getElementById("detailSpeed")!, 0, 200, flatClouds.settings.detailSpeed * 10, (val: number) => {
-    flatClouds.settings.detailSpeed = val / 10;
+sliders.push(new Slider("detailSpeed", document.getElementById("detailSpeed")!, 0, 200, flatClouds.settings.detailSpeed * 10000, (val: number) => {
+    flatClouds.settings.detailSpeed = val / 10000;
 }));
 
 //#endregion clouds

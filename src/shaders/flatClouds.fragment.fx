@@ -331,11 +331,10 @@ vec3 rotateAround(vec3 vector, vec3 axis, float theta) {
 
 float cloudDensityAtPoint(vec3 samplePoint) {
 
-    float timeOffset = time * 0.001;
     vec3 rotationAxisPlanetSpace = vec3(0.0, 1.0, 0.0);
 
-    vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, timeOffset * worleySpeed);
-    vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, timeOffset * detailSpeed);
+    vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, time * worleySpeed);
+    vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, time * detailSpeed);
 
     float density = 1.0 - worley(samplePointRotatedWorley * cloudFrequency, 1.0).x;
 
@@ -375,24 +374,33 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     vec3 samplePoint1 = rayOrigin + impactPoint * rayDir;
     vec3 samplePoint2 = rayOrigin + escapePoint * rayDir;
 
-    vec3 samplePointPlanetSpace1 = vec3(inverse(planetWorldMatrix) * vec4(samplePoint1, 1.0));
-    vec3 samplePointPlanetSpace2 = vec3(inverse(planetWorldMatrix) * vec4(samplePoint2, 1.0));
+    vec3 samplePointPlanetSpace1 = normalize(vec3(inverse(planetWorldMatrix) * vec4(samplePoint1, 1.0)));
+    vec3 samplePointPlanetSpace2 = normalize(vec3(inverse(planetWorldMatrix) * vec4(samplePoint2, 1.0)));
+
+
 
     vec3 planetNormal = normalize(samplePoint1 - planetPosition);
 
     /// Cloud point 1
-    float cloudDensity = cloudDensityAtPoint(normalize(samplePointPlanetSpace1));
+    float cloudDensity = cloudDensityAtPoint(samplePointPlanetSpace1);
 
     /// Cloud point 2
     if(twoPoints) {
-        cloudDensity += cloudDensityAtPoint(normalize(samplePointPlanetSpace2));
+        cloudDensity += cloudDensityAtPoint(samplePointPlanetSpace2);
     }
 
 	cloudDensity = saturate(cloudDensity);
 
 	cloudDensity *= saturate((maximumDistance - impactPoint) / 10000.0); // fade away when close to surface
 
-	vec3 normal = triplanarNormal(samplePointPlanetSpace1, planetNormal, normalMap, 0.00001, 0.5, cloudDensity);
+    // rotate sample point accordingly
+    vec3 normalRotatedSamplePoint1 = rotateAround(samplePointPlanetSpace1, vec3(0.0, 1.0, 0.0), time * detailSpeed);
+    
+    float cloudNormalStrength = 1.5;
+	vec3 normal = triplanarNormal(normalRotatedSamplePoint1, planetNormal, normalMap, 10.0, 0.5, cloudDensity * cloudNormalStrength);
+
+    // TODO: add another normalmap
+    //normal = triplanarNormal(normalRotatedSamplePoint, normal, normalMap, 20.0, 0.5, 0.5 * cloudDensity * cloudNormalStrength);
 
     vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
 
