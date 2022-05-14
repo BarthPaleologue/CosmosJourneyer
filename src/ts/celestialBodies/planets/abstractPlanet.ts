@@ -43,6 +43,7 @@ export abstract class AbstractPlanet extends CelestialBody implements Seedable {
     }
 
     public createClouds(star: Star, scene: Scene): FlatCloudsPostProcess {
+        // TODO: do not hardcode
         const cloudLayerHeight = 15e3;
         let clouds = new FlatCloudsPostProcess(`${this.getName()}Clouds`, this, cloudLayerHeight, star, scene);
         this.postProcessList.push(clouds);

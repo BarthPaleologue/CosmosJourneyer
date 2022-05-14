@@ -1,4 +1,3 @@
-import {ChunkForge} from "../../../forge/chunkForge";
 import {PlanetSide} from "./planetSide";
 import {Direction} from "../../../utils/direction";
 import {TerrainSettings} from "../../../terrain/terrainSettings";
@@ -70,6 +69,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     public terrainSettings: TerrainSettings;
 
+    private internalTime = 0;
+
     readonly rootChunkLength: number; // length of eachChunk
 
     readonly attachNode: Mesh; // reprensents the center of the sphere
@@ -82,7 +83,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
                 physicalProperties: SolidPhysicalProperties = {
                     rotationPeriod: 60 * 60 * 24,
                     rotationAxis: Axis.Y,
-
                     minTemperature: -60,
                     maxTemperature: 40,
                     pressure: 1,
@@ -119,7 +119,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
             snowColor: new Vector3(1, 1, 1),
             steepColor: new Vector3(55, 42, 42).scale(1 / 255),
-            plainColor: new Vector3(56, 94, 6).scale(1/255),
+            plainColor: new Vector3(56, 94, 6).scale(1 / 255),
             beachColor: new Vector3(0.7, 0.7, 0.2),
             desertColor: new Vector3(178, 107, 42).scale(1 / 255),
             bottomColor: new Vector3(0.5, 0.5, 0.5),
@@ -129,6 +129,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             normalSharpness: 0.5,
         };
 
+
+        // TODO: make a class for that monster
         let surfaceMaterial = new ShaderMaterial("surfaceColor", scene, "./shaders/surfaceColor",
             {
                 attributes: ["position", "normal", "uv"],
@@ -147,6 +149,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
                     "seed",
 
                     "cameraNear", "cameraFar", "planetPosition", "planetRadius", "planetWorldMatrix",
+
+                    "planetRotationAxis", "rotationTheta",
 
                     "playerPosition",
 
@@ -280,9 +284,14 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     public update(player: PlayerController, lightPosition: Vector3, deltaTime: number) {
         super.update(player, lightPosition, deltaTime);
 
+        this.internalTime += deltaTime;
+
         this.surfaceMaterial.setVector3("playerPosition", player.getAbsolutePosition());
         this.surfaceMaterial.setVector3("sunPosition", lightPosition);
         this.surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
+
+        this.surfaceMaterial.setVector3("planetRotationAxis", this.physicalProperties.rotationAxis);
+        this.surfaceMaterial.setFloat("rotationTheta", (this.internalTime / this.physicalProperties.rotationPeriod) % (2 * Math.PI));
 
         this.surfaceMaterial.setFloat("minTemperature", this.physicalProperties.minTemperature);
         this.surfaceMaterial.setFloat("maxTemperature", this.physicalProperties.maxTemperature);

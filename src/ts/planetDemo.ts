@@ -30,7 +30,7 @@ let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth - 300;
 canvas.height = window.innerHeight;
 
-let engine = new Engine(canvas);
+let engine = new Engine(canvas, true);
 engine.loadingScreen.displayLoadingUI();
 
 let scene = new Scene(engine);
@@ -95,7 +95,7 @@ let axialTilt = 0.2;
 sliders.push(new Slider("axialTilt", document.getElementById("axialTilt")!, -180, 180, Math.round(180 * axialTilt / Math.PI), (val: number) => {
     let newAxialTilt = val * Math.PI / 180;
     planet.rotate(Axis.X, newAxialTilt - axialTilt);
-    if(player.isOrbiting()) player.rotateAround(planet.getAbsolutePosition(), Axis.X, newAxialTilt - axialTilt);
+    if (player.isOrbiting()) player.rotateAround(planet.getAbsolutePosition(), Axis.X, newAxialTilt - axialTilt);
     axialTilt = newAxialTilt;
 }));
 

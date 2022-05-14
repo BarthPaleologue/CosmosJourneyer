@@ -34,7 +34,7 @@ let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let engine = new Engine(canvas);
+let engine = new Engine(canvas, true);
 engine.loadingScreen.displayLoadingUI();
 
 console.log("GPU utilisé : " + engine.getGlInfo().renderer);
@@ -49,7 +49,7 @@ depthRenderer.getDepthMap().renderList = [];
 const timeMultiplicator = 1;
 console.log(`Time is going ${timeMultiplicator} time${timeMultiplicator > 1 ? "s" : ""} faster than in reality`);
 
-const radius = 1000 * 1e3; // diamètre en m
+const radius = 1000 * 1e3;
 
 let keyboard = new Keyboard();
 let mouse = new Mouse();
@@ -106,7 +106,7 @@ moon.translate(new Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * radius));
 moon.translate(planet.attachNode.getAbsolutePosition());
 
 let Ares = new SolidPlanet("Ares", radius, starSystem, scene, {
-    rotationPeriod: 24 * 60 * 60,
+    rotationPeriod: 24 * 60 * 60 / 100,
     rotationAxis: Axis.Y,
 
     minTemperature: -80,
@@ -146,7 +146,7 @@ let isMouseEnabled = false;
 let collisionWorker = new CollisionWorker(player, starSystem);
 
 // update to current date
-starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
+//starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
 
 function updateScene() {
 

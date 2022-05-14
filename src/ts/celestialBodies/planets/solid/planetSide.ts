@@ -1,10 +1,11 @@
 import {Mesh, Scene, Material, Vector3} from "@babylonjs/core";
 
-import { getChunkSphereSpacePositionFromPath, PlanetChunk } from "./planetChunk";
-import { Direction } from "../../../utils/direction";
-import { ChunkForge } from "../../../forge/chunkForge";
-import {TaskType} from "../../../forge/taskInterfaces";
-import { SolidPlanet } from "./solidPlanet";
+import {getChunkSphereSpacePositionFromPath, PlanetChunk} from "./planetChunk";
+import {Direction} from "../../../utils/direction";
+import {ChunkForge} from "../../../forge/chunkForge";
+import {DeleteTask, TaskType} from "../../../forge/taskInterfaces";
+import {SolidPlanet} from "./solidPlanet";
+import {rayIntersectSphere} from "../../../utils/math";
 
 type quadTree = quadTree[] | PlanetChunk;
 
@@ -34,29 +35,29 @@ export class PlanetSide {
     private readonly scene: Scene; // scène dans laquelle instancier les chunks
 
     // Le CEO des chunks
-    private chunkForge: ChunkForge | undefined;
+    private readonly chunkForge: ChunkForge;
 
     private readonly surfaceMaterial: Material;
 
     private readonly planet: SolidPlanet;
 
     /**
-     * 
-     * @param id 
-     * @param minDepth 
-     * @param maxDepth 
-     * @param rootChunkLength 
-     * @param direction 
-     * @param parentNode 
+     *
+     * @param id
+     * @param minDepth
+     * @param maxDepth
+     * @param rootChunkLength
+     * @param direction
+     * @param parentNode
      * @param scene
-     * @param surfaceMaterial 
-     * @param planet 
+     * @param surfaceMaterial
+     * @param planet
      */
     constructor(id: string, direction: Direction, planet: SolidPlanet) {
         this.id = id;
 
-        this.minDepth = 1;
-        this.maxDepth = Math.round(Math.log2(planet.rootChunkLength / 2) - 12);
+        this.minDepth = Math.max(Math.round(Math.log2(planet.rootChunkLength / 2) - 19), 0);
+        this.maxDepth = Math.max(Math.round(Math.log2(planet.rootChunkLength / 2) - 12), 0);
         //let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
         //console.log(spaceBetweenVertex);
 
@@ -71,10 +72,6 @@ export class PlanetSide {
         this.surfaceMaterial = planet.surfaceMaterial;
 
         this.planet = planet;
-    }
-
-    public setChunkForge(chunkForge: ChunkForge): void {
-        this.chunkForge = chunkForge;
     }
 
     /**
@@ -93,14 +90,18 @@ export class PlanetSide {
     /**
      * Send deletion request to chunkforge regarding the chunks of a branch
      * @param tree The tree to delete
+     * @param newChunks
+     * @param isFiner
      */
-    private requestDeletion(tree: quadTree): void {
+    private requestDeletion(tree: quadTree, newChunks: PlanetChunk[], isFiner: boolean): void {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
-            this.chunkForge?.addTask({
+            let deleteTask: DeleteTask = {
                 taskType: TaskType.Deletion,
-                id: chunk.mesh.id,
-                mesh: chunk.mesh,
-            });
+                chunk: chunk,
+                newChunks: newChunks,
+                isFiner: isFiner
+            }
+            this.chunkForge?.addTask(deleteTask);
         }, tree);
     }
 
@@ -126,24 +127,24 @@ export class PlanetSide {
         let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.parent.rotationQuaternion!);
 
         // position par rapport à la caméra
-        let parentPosition = this.parent.absolutePosition.clone();
-        let absolutePosition = relativePosition.add(parentPosition);
+        let planetPosition = this.planet.getAbsolutePosition().clone();
+        let absolutePosition = relativePosition.add(planetPosition);
         let direction = absolutePosition.subtract(observerPosition);
         // distance carré entre caméra et noeud du quadtree
-        let d2 = direction.lengthSquared();
-        let limit = this.renderDistanceFactor * this.rootChunkLength / (2 ** walked.length);
+        let distanceToNodeSquared = direction.lengthSquared();
+        let distanceThreshold = this.renderDistanceFactor * this.rootChunkLength / (2 ** walked.length);
 
-        if ((d2 < limit ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
+        if ((distanceToNodeSquared < distanceThreshold ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
             // si on est proche de la caméra ou si on doit le générer car LOD minimal
             if (tree instanceof PlanetChunk) {
                 // si c'est un chunk, on le subdivise
                 let newTree = [
-                    this.createChunk(walked.concat([0])),
-                    this.createChunk(walked.concat([1])),
-                    this.createChunk(walked.concat([2])),
-                    this.createChunk(walked.concat([3])),
+                    this.createChunk(walked.concat([0]), true),
+                    this.createChunk(walked.concat([1]), true),
+                    this.createChunk(walked.concat([2]), true),
+                    this.createChunk(walked.concat([3]), true),
                 ];
-                this.requestDeletion(tree);
+                this.requestDeletion(tree, newTree, true);
                 return newTree;
             } else {
                 // si c'en est pas un, on continue
@@ -157,24 +158,20 @@ export class PlanetSide {
         } else {
             // si on est loin
             if (tree instanceof PlanetChunk) {
-                let dn = direction.normalize();
-                let dot = Vector3.Dot(relativePosition.normalizeToNew(), dn);
 
-                // sera d'occludé les chunks derrière la caméra
-                //let dot2 = Algebra.Dot(absolutePosition.normalize(), observerDirection);
-                // mais si un chunk est très proche, il sera toujours visible (on est proche donc le dot2 peut être négatif alors que le chunk est visible)
-                //let c2 = dot2 > - 0.5 && absolutePosition.getMagnitude() > this.rootChunkLength / (2 ** (walked.length + 3));
+                let enableOcclusion = false;
 
-                //TODO: faire un vrai truc qui marche => là je perd la main sur certains chunks...
-                tree.mesh.setEnabled(dot < 0.5);
-                //tree.mesh.setEnabled(!tree.mesh.isOccluded);
-
+                if(enableOcclusion) {
+                    let rayDir = direction.normalize();
+                    let [intersect, t0, t1] = rayIntersectSphere(observerPosition, rayDir, planetPosition, (this.rootChunkLength - 100e3 * 2 ** -tree.depth) / 2);
+                    tree.mesh.setEnabled(!(intersect && t0 ** 2 < distanceToNodeSquared) && tree.isReady());
+                }
                 return tree;
             } else {
                 // si c'est un noeud, on supprime tous les enfants, on remplace par un nouveau chunk
                 if (walked.length >= this.minDepth) {
-                    let newChunk = this.createChunk(walked);
-                    this.requestDeletion(tree);
+                    let newChunk = this.createChunk(walked, false);
+                    this.requestDeletion(tree, [newChunk], false);
                     return newChunk;
                 } else {
                     return tree;
@@ -186,22 +183,19 @@ export class PlanetSide {
     /**
      * Create new chunk of terrain at the specified location
      * @param path The path leading to the location where to add the new chunk
+     * @param isFiner
      * @returns The new Chunk
      */
-    private createChunk(path: number[]): PlanetChunk {
-        if (this.chunkForge != undefined) {
-            return new PlanetChunk(path, this.rootChunkLength, this.direction, this.parent, this.scene, this.chunkForge, this.surfaceMaterial, this.planet);
-        } else {
-            throw Error("Cannot create chunk when no ChunkForge is attached to the planet");
-        }
+    private createChunk(path: number[], isFiner: boolean): PlanetChunk {
+        return new PlanetChunk(path, this.direction, this.chunkForge, this.planet, isFiner);
     }
 
     /**
      * Regenerate planet chunks
      */
     public reset(): void {
-        let newTree = this.createChunk([]);
-        this.requestDeletion(this.tree);
+        let newTree = this.createChunk([], true);
+        this.requestDeletion(this.tree, [newTree], false);
         this.tree = newTree;
     }
 }

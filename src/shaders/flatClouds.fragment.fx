@@ -395,7 +395,7 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
 
     // rotate sample point accordingly
     vec3 normalRotatedSamplePoint1 = rotateAround(samplePointPlanetSpace1, vec3(0.0, 1.0, 0.0), time * detailSpeed);
-    
+
     float cloudNormalStrength = 1.5;
 	vec3 normal = triplanarNormal(normalRotatedSamplePoint1, planetNormal, normalMap, 10.0, 0.5, cloudDensity * cloudNormalStrength);
 

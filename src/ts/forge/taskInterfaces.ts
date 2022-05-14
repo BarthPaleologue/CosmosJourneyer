@@ -11,9 +11,9 @@ export enum TaskType {
 }
 
 export interface Task {
-    id: string;
     taskType: TaskType;
-    mesh: Mesh;
+    isFiner: boolean
+    chunk: PlanetChunk;
 }
 
 export interface BuildTask extends Task {
@@ -21,19 +21,17 @@ export interface BuildTask extends Task {
     depth: number,
     direction: Direction,
     position: Vector3;
-    chunk: PlanetChunk;
 }
 
 export interface ApplyTask extends Task {
     vertexData: VertexData;
     grassData: Float32Array;
-    chunk: PlanetChunk;
     planet: SolidPlanet;
     callbackTasks: DeleteTask[];
 }
 
 export interface DeleteTask extends Task {
-
+    newChunks: PlanetChunk[];
 }
 
 export interface ReturnedChunkData {

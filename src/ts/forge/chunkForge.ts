@@ -1,12 +1,26 @@
-import {DepthRenderer, VertexData} from "@babylonjs/core";
+import {
+    AbstractMesh,
+    BoundingInfo,
+    DepthRenderer,
+    Matrix,
+    Observable,
+    TransformNode,
+    Vector3,
+    VertexData
+} from "@babylonjs/core";
 import {BuildData} from "./workerDataInterfaces";
 import {ApplyTask, BuildTask, DeleteTask, ReturnedChunkData, Task, TaskType} from "./taskInterfaces";
 import {WorkerPool} from "./workerPool";
+
 export class ChunkForge {
     subdivisions: number;
     workerPool: WorkerPool;
     applyTasks: ApplyTask[] = [];
-    trashCan: DeleteTask[] = [];
+
+    /**
+     * Contains deletion task grouped together in sublist
+     */
+    trashCan: DeleteTask[][] = [];
 
     constructor(subdivisions: number) {
         this.subdivisions = subdivisions;
@@ -31,10 +45,10 @@ export class ChunkForge {
     }
 
     private executeBuildTask(task: BuildTask, worker: Worker): void {
-        // tâches de supressions associées : on les stock et on les execute après les créations
+        // delete tasks always follow build task, they are stored to be executed as callbacks of the build task
         let callbackTasks: DeleteTask[] = [];
         while (this.workerPool.taskQueue.length > 0 && this.workerPool.taskQueue[0].taskType == TaskType.Deletion) {
-            callbackTasks.push(this.workerPool.taskQueue[0]);
+            callbackTasks.push(this.workerPool.taskQueue[0] as DeleteTask);
             this.workerPool.taskQueue.shift();
         }
 
@@ -45,7 +59,7 @@ export class ChunkForge {
             subdivisions: this.subdivisions,
             depth: task.depth,
             direction: task.direction,
-            position: [task.position.x,task.position.y,task.position.z],
+            position: [task.position.x, task.position.y, task.position.z],
             terrainSettings: task.planet.terrainSettings,
             seed: task.planet.getSeed(),
         }
@@ -62,14 +76,13 @@ export class ChunkForge {
             let grassData = data.g;
 
             let applyTask: ApplyTask = {
-                id: task.id,
                 taskType: TaskType.Apply,
-                mesh: task.mesh,
                 vertexData: vertexData,
                 grassData: grassData,
                 chunk: task.chunk,
                 callbackTasks: callbackTasks,
-                planet: task.planet
+                planet: task.planet,
+                isFiner: task.isFiner
             }
             this.applyTasks.push(applyTask);
             this.workerPool.finishedWorkers.push(worker);
@@ -94,13 +107,20 @@ export class ChunkForge {
     }
 
     /**
-     * Supprime n chunks inutiles
-     * @param n nombre de chunk à supprimer
+     * Removes all useless chunks
      */
-    private emptyTrashCan(n = this.trashCan.length) {
-        for (let i = 0; i < Math.min(n, this.trashCan.length); ++i) {
-            this.trashCan.shift()!.mesh.dispose();
+    private emptyTrashCan() {
+        for (const taskGroup of this.trashCan) {
+            for (let i = 0; i < taskGroup.length; i++) {
+                const task = taskGroup[i];
+                // disabling old chunk
+                task.chunk.markAsNotReady();
+                // if we are removing the last old chunk, enabling new chunks
+                if (i == taskGroup.length - 1) for (const chunk of task.newChunks) chunk.markAsReady();
+                task.chunk.mesh.dispose();
+            }
         }
+        this.trashCan = [];
     }
 
     /**
@@ -109,21 +129,21 @@ export class ChunkForge {
     private executeNextApplyTask(depthRenderer: DepthRenderer) {
         if (this.applyTasks.length > 0) {
             let task = this.applyTasks.shift()!;
-            task.vertexData.applyToMesh(task.mesh, false);
-            depthRenderer.getDepthMap().renderList?.push(task.mesh)
+            task.vertexData.applyToMesh(task.chunk.mesh, false);
+            task.chunk.mesh.freezeNormals();
 
-            /* WORKING VERSION */
-            /*let planetSpacePosition = task.mesh.absolutePosition.subtract(task.planet.getAbsolutePosition());
-            task.chunk.grassParticleSystem?.mesh.setAbsolutePosition(task.planet.getAbsolutePosition().add(planetSpacePosition.scale(1.1)));
-            depthRenderer.getDepthMap().renderList!.push(task.chunk.grassParticleSystem!.mesh);*/
+            // TODO: check if equal to minDepth
+            if (task.chunk.depth <= 1) task.chunk.markAsReady();
 
-            this.trashCan = this.trashCan.concat(task.callbackTasks);
+            depthRenderer.getDepthMap().renderList?.push(task.chunk.mesh);
+
+            this.trashCan.push(task.callbackTasks);
         }
     }
 
     /**
-    * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
-    */
+     * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
+     */
     public update(depthRenderer: DepthRenderer) {
         for (let i = 0; i < this.workerPool.availableWorkers.length; i++) {
             let worker = this.workerPool.availableWorkers.shift()!;

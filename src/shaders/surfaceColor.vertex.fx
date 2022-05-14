@@ -1,4 +1,4 @@
-precision lowp float;
+precision highp float;
 
 // Attributes
 attribute vec3 vertex;
@@ -21,6 +21,10 @@ uniform vec3 v3LightPos; // light position in world space
 uniform vec3 planetPosition; // nécessaire temporairement le temps de régler le problème des floats
 uniform mat4 planetWorldMatrix;
 
+uniform vec3 planetRotationAxis;
+uniform float rotationTheta;
+uniform float planetRadius;
+
 // Varying
 varying vec3 vPositionW;
 varying vec3 vNormalW;
@@ -28,7 +32,16 @@ varying vec3 vNormalW;
 varying vec3 vNormal;
 varying vec3 vPosition;
 
+varying vec3 vUnitSamplePoint;
+varying vec3 vSamplePoint;
+
 varying vec2 vUV;
+
+vec3 rotateAround(vec3 vector, vec3 axis, float theta) {
+    // rotation using https://www.wikiwand.com/en/Rodrigues%27_rotation_formula
+    // Please note that unit vector are required, i did not divide by the norms
+    return cos(theta) * vector + cross(axis, vector) * sin(theta) + axis * dot(axis, vector) * (1.0 - cos(theta));
+}
 
 void main() {
 
@@ -40,9 +53,14 @@ void main() {
     #endif
     
     vPositionW = vec3(world * vec4(position, 1.0));
-    vNormalW = normalize(vec3(world * vec4(normal, 0.0)));
+    vNormalW = vec3(world * vec4(normal, 0.0));
 	
-	vPosition = vec3(inverse(planetWorldMatrix) * vec4(vPositionW, 1.0));
+	//vPosition = vec3(inverse(planetWorldMatrix) * vec4(vPositionW, 1.0));
+	vPosition = vPositionW - planetPosition;
+
+	vUnitSamplePoint = rotateAround(normalize(vPosition), planetRotationAxis, rotationTheta);
+	vSamplePoint = rotateAround(vPosition, planetRotationAxis, rotationTheta);
+
 	vNormal = normal;
     vUV = uv;
 }

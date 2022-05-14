@@ -27,6 +27,8 @@ export class WorkerPool {
     }
 
     public submitTask(task: Task) {
+        // FIXME: handle all tasks
+        //@ts-ignore
         this.taskQueue.push(task);
     }
 }

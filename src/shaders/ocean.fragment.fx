@@ -63,9 +63,6 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
     float r0 = (-b - s) / (2.0*a);
     float r1 = (-b + s) / (2.0*a);
 
-    t0 = min(r0, r1);
-    t1 = max(r0, r1);
-
     t0 = max(min(r0, r1), 0.0);
     t1 = max(max(r0, r1), 0.0);
 

@@ -1,9 +1,9 @@
-import {Quaternion, Vector3, Mesh, SolidParticleSystem, Scene, Material} from "@babylonjs/core";
+import {Quaternion, Vector3, Mesh} from "@babylonjs/core";
 
-import { SolidPlanet } from "./solidPlanet";
-import { ChunkForge } from "../../../forge/chunkForge";
+import {SolidPlanet} from "./solidPlanet";
+import {ChunkForge} from "../../../forge/chunkForge";
 import {BuildTask, TaskType} from "../../../forge/taskInterfaces";
-import { Direction, getQuaternionFromDirection } from "../../../utils/direction";
+import {Direction, getQuaternionFromDirection} from "../../../utils/direction";
 import {Algebra} from "../../../utils/algebra";
 
 /**
@@ -77,77 +77,43 @@ export function getChunkSphereSpacePositionFromPath(chunkLength: number, path: n
     return position;
 }
 
-//import grass from "../../../../asset/textures/grass.png";
-
 // ne pas supprimer la classe pour cause de peut être des arbres et de l'herbe
 export class PlanetChunk {
 
     public readonly mesh: Mesh;
 
-    public grassParticleSystem: SolidParticleSystem | null = null;
-    public grassPositions: Vector3[] = [];
+    public readonly depth: number;
 
-    //public testBox: Mesh;
+    private ready = false;
 
-    constructor(path: number[], rootChunkLength: number, direction: Direction, parentNode: Mesh, scene: Scene, chunkForge: ChunkForge, surfaceMaterial: Material, planet: SolidPlanet) {
-        let id = `[D${direction}][P${path.join("")}]`;
+    constructor(path: number[], direction: Direction, chunkForge: ChunkForge, planet: SolidPlanet, isFiner: boolean) {
+        let id = `D${direction}P${path.join("")}`;
 
         // computing the position of the chunk on the side of the planet
-        let position = getChunkPlaneSpacePositionFromPath(rootChunkLength, path);
+        let position = getChunkPlaneSpacePositionFromPath(planet.rootChunkLength, path);
 
         // offseting from planet center to position on the side (default side then rotation for all sides)
-        position.z -= rootChunkLength / 2;
+        position.z -= planet.rootChunkLength / 2;
 
-        this.mesh = new Mesh(`Chunk${id}`, scene);
-        this.mesh.material = surfaceMaterial;
+        this.depth = path.length;
 
-        // TODO: ajouter transparence, orienter et tout le bazar tmtc
-        // bientôt des arbres
-        /*let testBox = Mesh.CreatePlane(`TestBox${id}`, 5000, scene);
-        let TestBoxMaterial = new StandardMaterial("TestBoxMaterial", scene);
-        TestBoxMaterial.emissiveTexture = new Texture(grass, scene);
-        TestBoxMaterial.emissiveTexture.hasAlpha = true;
-        TestBoxMaterial.backFaceCulling = false;
-        testBox.material = TestBoxMaterial;
+        this.mesh = new Mesh(`Chunk${id}`, planet.attachNode.getScene());
+        this.mesh.setEnabled(false);
 
-        this.testBox = testBox;
-        this.testBox.isVisible = false;*/
+        this.mesh.material = planet.surfaceMaterial;
 
-        /* WORK IN PROGRESS */
-        /*let gps = new SolidParticleSystem(`GrassParticles${id}`, scene);
-        gps.addShape(this.testBox, 1);
-        this.grassParticleSystem = gps;
-        this.grassParticleSystem.setParticles();
-        this.grassParticleSystem.buildMesh();
-        this.grassParticleSystem.mesh.material = TestBoxMaterial;
-        this.grassParticleSystem.mesh.parent = this.mesh;*/
-
-        /*let debugMaterial = new StandardMaterial("debug", scene);
-        debugMaterial.emissiveColor = Color3.Random();
-        debugMaterial.specularColor = Color3.Black();
-        debugMaterial.diffuseColor = Color3.Black();
-        debugMaterial.backFaceCulling = false;
-        debugMaterial.useLogarithmicDepth = true;
-        debugMaterial.wireframe = true;
-
-        this.mesh.material = debugMaterial;*/
-
-        this.mesh.parent = parentNode;
-
-        //needed for potential lens flares
-        //this.mesh.isBlocker = true;
+        this.mesh.parent = planet.attachNode;
 
         // revoir les paramètres passés dans la taches => trouver les dénos communs
 
         let buildTask: BuildTask = {
             taskType: TaskType.Build,
-            id: id,
             planet: planet,
             position: position,
             depth: path.length,
             direction: direction,
-            mesh: this.mesh,
-            chunk: this
+            chunk: this,
+            isFiner: isFiner
         }
 
         chunkForge.addTask(buildTask);
@@ -155,10 +121,28 @@ export class PlanetChunk {
         // sphérisation du cube
         // note : on sphérise après car le worker script calcule les positions à partir du cube
         Algebra.normalizeInPlace(position);
-        position.scaleInPlace(rootChunkLength / 2);
+        position.scaleInPlace(planet.rootChunkLength / 2);
 
         this.mesh.position.x = position.x;
         this.mesh.position.y = position.y;
         this.mesh.position.z = position.z;
+    }
+
+    public isReady() {
+        return this.ready;
+    }
+
+    public markAsReady() {
+        this.ready = true;
+        this.mesh.setEnabled(true);
+    }
+
+    public markAsNotReady() {
+        this.ready = false;
+        this.mesh.setEnabled(false);
+    }
+
+    public dispose() {
+        this.mesh.dispose();
     }
 }

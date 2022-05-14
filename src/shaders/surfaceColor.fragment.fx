@@ -1,13 +1,14 @@
-precision lowp float;
+precision highp float;
 
 #ifdef LOGARITHMICDEPTH
 	uniform float logarithmicDepthConstant;
 	varying float vFragmentDepth;
 #endif
 
-// Lights
 varying vec3 vPositionW;
 varying vec3 vNormalW;
+varying vec3 vUnitSamplePoint;
+varying vec3 vSamplePoint;
 
 // Refs
 
@@ -101,6 +102,23 @@ float completeNoise(vec3 p, int nbOctaves, float decay, float lacunarity) {
 		value += noise(samplePoint) / pow(decay, float(i));
 	}
 	return value / totalAmplitude;
+}
+
+// https://stackoverflow.com/questions/3380628/fast-arc-cos-algorithm
+float fastAcos(float x) {
+      float negate = 0.0;
+      if(x < 0.0) negate = 1.0; //float(x < 0);
+      x = abs(x);
+      float ret = -0.0187293;
+      ret = ret * x;
+      ret = ret + 0.0742610;
+      ret = ret * x;
+      ret = ret - 0.2121144;
+      ret = ret * x;
+      ret = ret + 1.5707288;
+      ret = ret * sqrt(1.0-x);
+      ret = ret - 2.0 * negate * ret;
+      return negate * 3.14159265358979 + ret;
 }
 
 float remap(float value, float low1, float high1, float low2, float high2) {
@@ -201,8 +219,6 @@ float saturate(float x) {
     return x;
 }
 
-
-
 vec3 computeColorAndNormal(
 	float elevation01, float waterLevel01, float slope, 
 	out vec3 normal, float temperature01, float moisture01, 
@@ -224,7 +240,7 @@ vec3 computeColorAndNormal(
 		// séparation biome désert biome plaine
 		float moistureSharpness = 20.0;
 		float moistureFactor = tanherpFactor(moisture01, moistureSharpness);
-		vec3 plainColor = tanherp(plainColor, 0.7 * plainColor, noise(vPosition/10000.0), 3.0);
+		vec3 plainColor = tanherp(plainColor, 0.7 * plainColor, noise(vSamplePoint / 10000.0), 3.0);
 
 		vec3 flatColor = lerp(plainColor, desertColor, moistureFactor);
 
@@ -279,23 +295,23 @@ vec3 computeColorAndNormal(
 	steepFactor = saturate(steepFactor);
 
 	// TODO: briser la répétition avec du simplex
-	normal = triplanarNormal(vPosition, normal, bottomNormalMap, 0.001, normalSharpness, bottomFactor);
-	normal = triplanarNormal(vPosition, normal, bottomNormalMap, 0.00001, normalSharpness, bottomFactor);
+	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.001, normalSharpness, bottomFactor);
+	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.00001, normalSharpness, bottomFactor);
 
-    normal = triplanarNormal(vPosition, normal, beachNormalMap, 0.001, normalSharpness, beachFactor);
-   	normal = triplanarNormal(vPosition, normal, beachNormalMap, 0.00001, normalSharpness, beachFactor);
+    normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.001, normalSharpness, beachFactor);
+   	normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.00001, normalSharpness, beachFactor);
 
-    normal = triplanarNormal(vPosition, normal, plainNormalMap, 0.001, normalSharpness, plainFactor);
-	normal = triplanarNormal(vPosition, normal, plainNormalMap, 0.00001, normalSharpness, plainFactor);
+    normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.001, normalSharpness, plainFactor);
+	normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.00001, normalSharpness, plainFactor);
 
-	normal = triplanarNormal(vPosition, normal, desertNormalMap, 0.001, normalSharpness, desertFactor);
-    normal = triplanarNormal(vPosition, normal, desertNormalMap, 0.00001, normalSharpness, desertFactor);
+	normal = triplanarNormal(vSamplePoint, normal, desertNormalMap, 0.001, normalSharpness, desertFactor);
+    normal = triplanarNormal(vSamplePoint, normal, desertNormalMap, 0.00001, normalSharpness, desertFactor);
 
-    normal = triplanarNormal(vPosition, normal, snowNormalMap, 0.001, normalSharpness, snowFactor);
-	normal = triplanarNormal(vPosition, normal, snowNormalMap, 0.00001, normalSharpness, snowFactor);
+    normal = triplanarNormal(vSamplePoint, normal, snowNormalMap, 0.001, normalSharpness, snowFactor);
+	normal = triplanarNormal(vSamplePoint, normal, snowNormalMap, 0.00001, normalSharpness, snowFactor);
 
-    normal = triplanarNormal(vPosition, normal, steepNormalMap, 0.001, normalSharpness, steepFactor);
-	normal = triplanarNormal(vPosition, normal, steepNormalMap, 0.00001, normalSharpness, steepFactor);
+    normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.001, normalSharpness, steepFactor);
+	normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.00001, normalSharpness, steepFactor);
 
 	return outColor;
 }
@@ -320,22 +336,22 @@ void main() {
 	vec3 viewRayW = normalize(playerPosition - vPositionW); // view direction in world space
 	vec3 lightRayW = normalize(sunPosition - vPositionW); // light ray direction in world space
 
-	vec3 sphereNormalW = normalize(vec3(world * vec4(normalize(vPosition), 0.0)));
+	vec3 sphereNormalW = vec3(world * vec4(vUnitSamplePoint, 0.0));
 	float ndl = max(0.01, dot(sphereNormalW, lightRayW));
 
 	// la unitPosition ne prend pas en compte la rotation de la planète
-	vec3 unitPosition = normalize(vPosition);
-	vec3 seededSamplePoint = normalize(normalize(unitPosition) + seed);//normalize(unitPosition + normalize(seed));
-	
-	float latitude = unitPosition.y;
+	vec3 seededSamplePoint = normalize(vUnitSamplePoint + seed);//normalize(unitPosition + normalize(seed));
+
+	// TODO: this is no longer accurate (not using inverse matrix)
+	float latitude = vUnitSamplePoint.y;
 	float absLatitude01 = abs(latitude);
 	
-	float elevation = length(vPosition) - planetRadius;
+	float elevation = length(vSamplePoint) - planetRadius;
 
 	float elevation01 = elevation / maxElevation;
 	float waterLevel01 = waterLevel / maxElevation;
 
-	float slope = 1.0 - dot(unitPosition, vNormal);
+	float slope = 1.0 - dot(vUnitSamplePoint, vNormal);
 
 	/// Analyse Physique de la planète
 
@@ -373,7 +389,7 @@ void main() {
 	temperature01 *= exp(-elevation01 * temperatureHeightFalloff);
 
 	// added random fluctuations
-	temperature01 += (completeNoise(unitPosition * 300.0, 5, 1.7, 2.5) - 0.5) / 4.0;
+	temperature01 += (completeNoise(vUnitSamplePoint * 300.0, 5, 1.7, 2.5) - 0.5) / 4.0;
 
 	// temperature drops during nighttime (more ice)
 	temperature01 *= ndl * temperatureRotationFactor + 1.0 - temperatureRotationFactor;
@@ -406,9 +422,11 @@ void main() {
     float specComp = max(0., dot(normalW, angleW));
     specComp = pow(specComp, 32.0);
 
-    //float specularAngle = fastAcos(dot(normalize(sunDir - rayDir), normalWave));
-    //float specularExponent = specularAngle / (1.0 - smoothness);
-    //float specularHighlight = exp(-specularExponent * specularExponent) * specularPower;
+    // TODO: finish this (uniforms...)
+    /*float smoothness = 0.7;
+    float specularAngle = fastAcos(dot(normalize(viewRayW + lightRayW), normalW));
+    float specularExponent = specularAngle / (1.0 - smoothness);
+    float specComp = exp(-specularExponent * specularExponent);*/
 
 	// suppresion du reflet partout hors la neige
 	specComp *= (color.r + color.g + color.b) / 3.0;
@@ -420,7 +438,7 @@ void main() {
 	if(colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.7, 0.7, 1.0), temperature01);
 	if(colorMode == 3) screenColor = normal*0.5 + 0.5;
 	if(colorMode == 4) screenColor = vec3(elevation01);
-	if(colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vPosition)));
+	if(colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vSamplePoint)));
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting
 	#ifdef LOGARITHMICDEPTH

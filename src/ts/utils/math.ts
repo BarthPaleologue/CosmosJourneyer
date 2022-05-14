@@ -1,4 +1,5 @@
 import {Vec3} from "./algebra";
+import {Vector3} from "@babylonjs/core";
 
 // https://www.desmos.com/calculator/968c7smugx
 /**
@@ -140,6 +141,28 @@ export function gcd(a: number, b: number): number {
     if (!b) return a;
 
     return gcd(b, a % b);
+}
+
+export function rayIntersectSphere(rayOrigin: Vector3, rayDir: Vector3, spherePosition: Vector3, sphereRadius: number): [boolean, number, number] {
+    let relativeOrigin = rayOrigin.subtract(spherePosition); // rayOrigin in sphere space
+
+    let a = 1.0;
+    let b = 2.0 * Vector3.Dot(relativeOrigin, rayDir);
+    let c = Vector3.Dot(relativeOrigin, relativeOrigin) - sphereRadius**2;
+
+    let d = b*b - 4.0*a*c;
+
+    if(d < 0.0) return [false, 0, 0]; // no intersection
+
+    let s = Math.sqrt(d);
+
+    let r0 = (-b - s) / (2.0*a);
+    let r1 = (-b + s) / (2.0*a);
+
+    let t0 = Math.max(Math.min(r0, r1), 0.0);
+    let t1 = Math.max(Math.max(r0, r1), 0.0);
+
+    return [t1 > 0.0, t0, t1];
 }
 
 
