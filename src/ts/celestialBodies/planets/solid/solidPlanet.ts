@@ -1,4 +1,4 @@
-import {PlanetSide} from "./planetSide";
+import {ChunkTree} from "./chunkTree";
 import {Direction} from "../../../utils/direction";
 import {TerrainSettings} from "../../../terrain/terrainSettings";
 import {AbstractPlanet} from "../abstractPlanet";
@@ -74,7 +74,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     readonly rootChunkLength: number; // length of eachChunk
 
     readonly attachNode: Mesh; // reprensents the center of the sphere
-    readonly sides: PlanetSide[] = new Array(6); // stores the 6 sides of the sphere
+    readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
 
     surfaceMaterial: ShaderMaterial;
 
@@ -200,12 +200,12 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.surfaceMaterial = surfaceMaterial;
 
         this.sides = [
-            new PlanetSide(`${this.getName()}UpSide`, Direction.Up, this),
-            new PlanetSide(`${this.getName()}DownSide`, Direction.Down, this),
-            new PlanetSide(`${this.getName()}ForwardSide`, Direction.Forward, this),
-            new PlanetSide(`${this.getName()}BackwardSide`, Direction.Backward, this),
-            new PlanetSide(`${this.getName()}RightSide`, Direction.Right, this),
-            new PlanetSide(`${this.getName()}LeftSide`, Direction.Left, this)
+            new ChunkTree(Direction.Up, this),
+            new ChunkTree(Direction.Down, this),
+            new ChunkTree(Direction.Forward, this),
+            new ChunkTree(Direction.Backward, this),
+            new ChunkTree(Direction.Right, this),
+            new ChunkTree(Direction.Left, this)
         ];
 
         this.updateColors();
@@ -214,14 +214,14 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     public generateCollisionTask(relativePosition: Vector3): CollisionData {
         let collisionData: CollisionData = {
             taskType: TaskType.Collision,
-            planetID: this._name,
+            planetName: this._name,
             terrainSettings: this.terrainSettings,
             position: [
                 relativePosition.x,
                 relativePosition.y,
                 relativePosition.z
             ],
-            chunkLength: this.rootChunkLength
+            planetDiameter: this.getDiameter()
         }
         return collisionData;
     }
@@ -312,7 +312,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         return this.attachNode.getAbsolutePosition().clone();
     }
 
-    public override getRadius(): number {
+    public override getApparentRadius(): number {
         return super.getRadius() + this.waterLevel;
     }
 

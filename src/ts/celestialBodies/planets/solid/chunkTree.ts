@@ -1,4 +1,4 @@
-import {Mesh, Scene, Material, Vector3} from "@babylonjs/core";
+import {Vector3} from "@babylonjs/core";
 
 import {getChunkSphereSpacePositionFromPath, PlanetChunk} from "./planetChunk";
 import {Direction} from "../../../utils/direction";
@@ -7,69 +7,49 @@ import {DeleteTask, TaskType} from "../../../forge/taskInterfaces";
 import {SolidPlanet} from "./solidPlanet";
 import {rayIntersectSphere} from "../../../utils/math";
 
+/**
+ * A quadTree is defined recursively
+ */
 type quadTree = quadTree[] | PlanetChunk;
 
 /**
- * Un PlanetSide est un plan généré procéduralement qui peut être morph à volonté
+ * A ChunkTree is a structure designed to manage LOD using a quadtree
  */
-export class PlanetSide {
-    // l'objet en lui même
-    private readonly id: string; // un id unique
+export class ChunkTree {
 
-    // le quadtree
-    private readonly minDepth: number;
-    private readonly maxDepth: number; // profondeur maximale du quadtree envisagé
+    private readonly minDepth: number; // minimum depth of the tree
+    private readonly maxDepth: number; // maximum depth of the tree
 
-    private tree: quadTree = []; // le quadtree en question
+    private tree: quadTree = [];
 
-    // paramètre de debug
+    // FIXME: get rid of this one
     renderDistanceFactor = 2;
 
-    // les chunks
-    private readonly rootChunkLength: number; // taille du côté de base
+    private readonly rootChunkLength: number;
 
-    private readonly direction: Direction; // direction de la normale au plan
+    private readonly direction: Direction;
 
-    private readonly parent: Mesh; // objet parent des chunks
-
-    private readonly scene: Scene; // scène dans laquelle instancier les chunks
-
-    // Le CEO des chunks
     private readonly chunkForge: ChunkForge;
-
-    private readonly surfaceMaterial: Material;
 
     private readonly planet: SolidPlanet;
 
     /**
      *
-     * @param id
-     * @param minDepth
-     * @param maxDepth
-     * @param rootChunkLength
      * @param direction
-     * @param parentNode
-     * @param scene
-     * @param surfaceMaterial
      * @param planet
      */
-    constructor(id: string, direction: Direction, planet: SolidPlanet) {
-        this.id = id;
+    constructor(direction: Direction, planet: SolidPlanet) {
 
-        this.minDepth = Math.max(Math.round(Math.log2(planet.rootChunkLength / 2) - 19), 0);
-        this.maxDepth = Math.max(Math.round(Math.log2(planet.rootChunkLength / 2) - 12), 0);
+        this.rootChunkLength = planet.getDiameter();
+
+        this.minDepth = Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 19), 0);
+        this.maxDepth = Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 12), 0);
         //let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
         //console.log(spaceBetweenVertex);
-
-        this.rootChunkLength = planet.rootChunkLength;
 
         this.chunkForge = planet._starSystemManager.getChunkForge();
 
         this.direction = direction;
-        this.parent = planet.attachNode;
-        this.scene = planet.attachNode.getScene();
-
-        this.surfaceMaterial = planet.surfaceMaterial;
 
         this.planet = planet;
     }
@@ -124,7 +104,7 @@ export class PlanetSide {
      */
     private updateLODRecursively(observerPosition: Vector3, observerDirection: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
-        let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.parent.rotationQuaternion!);
+        let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.planet.getRotationQuaternion());
 
         // position par rapport à la caméra
         let planetPosition = this.planet.getAbsolutePosition().clone();

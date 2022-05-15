@@ -126,7 +126,7 @@ sliders.push(new Slider("maxTemperature", document.getElementById("maxTemperatur
 document.getElementById("oceanToggler")?.addEventListener("click", () => {
     let checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
     checkbox.checked = !checkbox.checked;
-    ocean.settings.oceanRadius = checkbox.checked ? planet.getRadius() : 0;
+    ocean.settings.oceanRadius = checkbox.checked ? planet.getApparentRadius() : 0;
 });
 
 sliders.push(new Slider("alphaModifier", document.getElementById("alphaModifier")!, 0, 200, ocean.settings.alphaModifier * 10000, (val: number) => {

@@ -13,8 +13,19 @@ import {ApplyTask, BuildTask, DeleteTask, ReturnedChunkData, Task, TaskType} fro
 import {WorkerPool} from "./workerPool";
 
 export class ChunkForge {
-    subdivisions: number;
+    /**
+     * the number of subdivisions per chunk
+     */
+    nbVerticesPerSide: number;
+
+    /**
+     * The worker manager
+     */
     workerPool: WorkerPool;
+
+    /**
+     * The queue of tasks containing chunks ready to be enabled
+     */
     applyTasks: ApplyTask[] = [];
 
     /**
@@ -22,8 +33,8 @@ export class ChunkForge {
      */
     trashCan: DeleteTask[][] = [];
 
-    constructor(subdivisions: number) {
-        this.subdivisions = subdivisions;
+    constructor(nbVerticesPerSide: number) {
+        this.nbVerticesPerSide = nbVerticesPerSide;
         const nbMaxWorkers = navigator.hardwareConcurrency - 2; // le -2 c'est parce que faut compter le main thread et le collision worker
         this.workerPool = new WorkerPool(nbMaxWorkers);
     }
@@ -54,9 +65,9 @@ export class ChunkForge {
 
         let buildData: BuildData = {
             taskType: TaskType.Build,
-            planetID: task.planet.getName(),
-            chunkLength: task.planet.rootChunkLength,
-            subdivisions: this.subdivisions,
+            planetName: task.planet.getName(),
+            planetDiameter: task.planet.getDiameter(),
+            nbVerticesPerSide: this.nbVerticesPerSide,
             depth: task.depth,
             direction: task.direction,
             position: [task.position.x, task.position.y, task.position.z],

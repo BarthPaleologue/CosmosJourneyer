@@ -12,7 +12,7 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
     constructor(name: string, planet: AbstractPlanet, atmosphereHeight: number, sun: Star, scene: Scene) {
 
         let settings: AtmosphereSettings = {
-            atmosphereRadius: planet.getRadius() + atmosphereHeight,
+            atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 23,
             intensity: 12,
             rayleighStrength: 1,
@@ -64,6 +64,11 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
             "mieHaloRadius": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.mieHaloRadius}
+            },
+            "planetsData": {
+                // TODO: implement that for real
+                type: ShaderDataType.FloatArray,
+                get: () => {return []}
             }
         };
 

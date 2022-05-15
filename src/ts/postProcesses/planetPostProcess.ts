@@ -29,7 +29,7 @@ export abstract class PlanetPostProcess extends SpacePostProcess {
             "planetRadius": {
                 type: ShaderDataType.Float,
                 get: () => {
-                    return planet.getRadius()
+                    return planet.getApparentRadius()
                 }
             }
         }

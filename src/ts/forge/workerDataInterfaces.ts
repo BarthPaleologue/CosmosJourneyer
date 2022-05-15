@@ -4,14 +4,14 @@ import {TaskType} from "./taskInterfaces";
 
 export interface WorkerData {
     taskType: TaskType;
-    planetID: string;
-    chunkLength: number;
+    planetName: string;
+    planetDiameter: number;
     terrainSettings: TerrainSettings;
     position: number[];
 }
 
 export interface BuildData extends WorkerData {
-    subdivisions: number;
+    nbVerticesPerSide: number;
     depth: number;
     direction: Direction;
     seed: number[];

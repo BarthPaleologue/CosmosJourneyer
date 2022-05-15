@@ -64,7 +64,7 @@ export class StarSystemManager {
     public getBodiesDataAsArray(): number[] {
         let tab: number[] = [];
         for(const body of this._celestialBodies) {
-            tab = tab.concat(body.getAbsolutePosition().asArray(), body.getRadius());
+            tab = tab.concat(body.getAbsolutePosition().asArray(), body.getApparentRadius());
         }
         return tab;
     }

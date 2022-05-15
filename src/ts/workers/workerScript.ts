@@ -79,45 +79,44 @@ function terrainFunction(position: LVector3, gradient: LVector3, seed = LVector3
 
 function buildChunkVertexData(data: BuildData): void {
 
-    const chunkLength = data.chunkLength;
-    const subs = data.subdivisions;
+    const planetDiameter = data.planetDiameter;
     const depth = data.depth;
     const direction = data.direction;
-    const chunkPosition: number[] = data.position;
+    const chunkPosition = new LVector3(data.position[0], data.position[1], data.position[2]);
     const seed = new LVector3(data.seed[0], data.seed[1], data.seed[2]);
 
-    if (data.planetID != currentPlanetID) {
-        currentPlanetID = data.planetID;
+    if (data.planetName != currentPlanetID) {
+        currentPlanetID = data.planetName;
 
         terrainSettings = data.terrainSettings;
         initLayers();
     }
 
-    const size = chunkLength / (2 ** depth);
-    const planetRadius = chunkLength / 2;
+    const size = planetDiameter / (2 ** depth);
+    const planetRadius = planetDiameter / 2;
 
-    const vertexPerLine = subs + 1;
+    const nbVerticesPerSide = data.nbVerticesPerSide;
+    const nbSubdivisions = nbVerticesPerSide - 1;
 
     const rotationQuaternion = getQuaternionFromDirection(direction);
 
-    const verticesPositions = new Float32Array(vertexPerLine * vertexPerLine * 3);
+    const verticesPositions = new Float32Array(nbVerticesPerSide * nbVerticesPerSide * 3);
     let faces: number[][] = [];
 
     const normals = new Float32Array(verticesPositions.length);
 
-    let vecchunkPosition = new LVector3(chunkPosition[0], chunkPosition[1], chunkPosition[2]);
 
-    for (let x = 0; x < vertexPerLine; x++) {
-        for (let y = 0; y < vertexPerLine; y++) {
+    for (let x = 0; x < nbVerticesPerSide; x++) {
+        for (let y = 0; y < nbVerticesPerSide; y++) {
 
             // on crée un plan dans le plan Oxy
-            let vertexPosition = new LVector3(x - subs / 2, y - subs / 2, 0);
+            let vertexPosition = new LVector3(x - nbSubdivisions / 2, y - nbSubdivisions / 2, 0);
 
             // on le met à la bonne taille
-            vertexPosition.scaleInPlace(size / subs);
+            vertexPosition.scaleInPlace(size / nbSubdivisions);
 
             // on le met au bon endroit de la face par défaut (Oxy devant)
-            vertexPosition.addInPlace(vecchunkPosition);
+            vertexPosition.addInPlace(chunkPosition);
 
             // on le met sur la bonne face
             vertexPosition.applyQuaternionInPlace(rotationQuaternion);
@@ -140,24 +139,24 @@ function buildChunkVertexData(data: BuildData): void {
             vertexNormal.normalizeInPlace();
 
             // on le ramène à l'origine
-            let offset = vecchunkPosition.clone();
+            let offset = chunkPosition.clone();
             offset.setMagnitudeInPlace(planetRadius);
             vertexPosition.subtractInPlace(offset);
 
-            verticesPositions[(x * vertexPerLine + y) * 3] = vertexPosition.x;
-            verticesPositions[(x * vertexPerLine + y) * 3 + 1] = vertexPosition.y;
-            verticesPositions[(x * vertexPerLine + y) * 3 + 2] = vertexPosition.z;
+            verticesPositions[(x * nbVerticesPerSide + y) * 3] = vertexPosition.x;
+            verticesPositions[(x * nbVerticesPerSide + y) * 3 + 1] = vertexPosition.y;
+            verticesPositions[(x * nbVerticesPerSide + y) * 3 + 2] = vertexPosition.z;
 
-            normals[(x * vertexPerLine + y) * 3] = vertexNormal.x;
-            normals[(x * vertexPerLine + y) * 3 + 1] = vertexNormal.y;
-            normals[(x * vertexPerLine + y) * 3 + 2] = vertexNormal.z;
+            normals[(x * nbVerticesPerSide + y) * 3] = vertexNormal.x;
+            normals[(x * nbVerticesPerSide + y) * 3 + 1] = vertexNormal.y;
+            normals[(x * nbVerticesPerSide + y) * 3 + 2] = vertexNormal.z;
 
-            if (x < vertexPerLine - 1 && y < vertexPerLine - 1) {
+            if (x < nbVerticesPerSide - 1 && y < nbVerticesPerSide - 1) {
                 faces.push([
-                    x * vertexPerLine + y,
-                    x * vertexPerLine + y + 1,
-                    (x + 1) * vertexPerLine + y + 1,
-                    (x + 1) * vertexPerLine + y,
+                    x * nbVerticesPerSide + y,
+                    x * nbVerticesPerSide + y + 1,
+                    (x + 1) * nbVerticesPerSide + y + 1,
+                    (x + 1) * nbVerticesPerSide + y,
                 ]);
             }
         }
@@ -177,12 +176,12 @@ function buildChunkVertexData(data: BuildData): void {
 
     const grassPositions = new Float32Array(100 * 3 * 0);
 
-    //vecchunkPosition.applyQuaternionInPlace(rotationQuaternion);
+    //chunkPosition.applyQuaternionInPlace(rotationQuaternion);
 
     /*for (let i = 0; i < 100; ++i) {
-        let x = vecchunkPosition.x + Math.random() * size - size / 2;
-        let y = vecchunkPosition.y + Math.random() * size - size / 2;
-        let z = vecchunkPosition.z + Math.random() * size - size / 2;
+        let x = chunkPosition.x + Math.random() * size - size / 2;
+        let y = chunkPosition.y + Math.random() * size - size / 2;
+        let z = chunkPosition.z + Math.random() * size - size / 2;
         let mag = Math.sqrt(x * x + y * y + z * z);
         let gp = new Vector3(x, y, z);
         gp.divideInPlace(mag);
@@ -191,7 +190,7 @@ function buildChunkVertexData(data: BuildData): void {
         terrainFunction(gp, new Vector3(1, 1, 1));
 
         gp.addInPlace(gp.normalize().scale(100 / 2));
-        gp.subtractInPlace(vecchunkPosition);
+        gp.subtractInPlace(chunkPosition);
 
         //gp = gp.normalize().scale(planetRadius * 1.01);
 
@@ -224,7 +223,7 @@ self.onmessage = e => {
     switch (data.taskType) {
         case TaskType.Build:
             //let clock = Date.now();
-            buildChunkVertexData(e.data);
+            buildChunkVertexData(e.data as BuildData);
 
             //console.log("Time for creation : " + (Date.now() - clock));
             // benchmark fait le 5/10/2021 (normale non analytique) : ~2s/chunk
@@ -237,8 +236,8 @@ self.onmessage = e => {
         case TaskType.Collision:
             let data = e.data as CollisionData;
 
-            if (data.planetID != currentPlanetID) {
-                currentPlanetID = data.planetID;
+            if (data.planetName != currentPlanetID) {
+                currentPlanetID = data.planetName;
 
                 terrainSettings = data.terrainSettings;
                 initLayers();
@@ -246,7 +245,7 @@ self.onmessage = e => {
 
             let samplePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
             samplePosition.normalizeInPlace();
-            samplePosition.scaleInPlace(data.chunkLength / 2);
+            samplePosition.scaleInPlace(data.planetDiameter / 2);
 
             sendHeightAtPoint(samplePosition);
             break;

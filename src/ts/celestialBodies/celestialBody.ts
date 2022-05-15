@@ -45,6 +45,20 @@ export abstract class CelestialBody implements Transformable {
     public abstract getRadius(): number;
 
     /**
+     * Returns apparent radius of the celestial body (can be greater than the actual radius for example : ocean)
+     */
+    public getApparentRadius(): number {
+        return this.getRadius();
+    }
+
+    /**
+     * Returns the diameter of the celestial body
+     */
+    public getDiameter(): number {
+        return 2 * this.getRadius();
+    }
+
+    /**
      * Updates the state of the celestial body for a given time step of deltaTime
      * @param player the player in the simulation
      * @param lightPosition the position of the main light source

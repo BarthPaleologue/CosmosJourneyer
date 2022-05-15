@@ -14,7 +14,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
     constructor(name: string, planet: AbstractPlanet, cloudLayerHeight: number, sun: Star, scene: Scene) {
 
         let settings: CloudSettings = {
-            cloudLayerRadius: planet.getRadius() + cloudLayerHeight,
+            cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
             specularPower: 2,
             smoothness: 0.9,
             cloudFrequency: 4,
