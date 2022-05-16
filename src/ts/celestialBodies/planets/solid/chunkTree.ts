@@ -6,6 +6,7 @@ import {ChunkForge} from "../../../forge/chunkForge";
 import {DeleteTask, TaskType} from "../../../forge/taskInterfaces";
 import {SolidPlanet} from "./solidPlanet";
 import {rayIntersectSphere} from "../../../utils/math";
+import {Settings} from "../../../settings";
 
 /**
  * A quadTree is defined recursively
@@ -96,20 +97,19 @@ export class ChunkTree {
 
     /**
      * Recursive function used internaly to update LOD
-     * @param observerPosition The observer position
+     * @param observerPositionW The observer position in world space
      * @param observerDirection
      * @param tree The tree to update recursively
      * @param walked The position of the current root relative to the absolute root
      * @returns The updated tree
      */
-    private updateLODRecursively(observerPosition: Vector3, observerDirection: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
+    private updateLODRecursively(observerPositionW: Vector3, observerDirection: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
         let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.planet.getRotationQuaternion());
 
         // position par rapport à la caméra
-        let planetPosition = this.planet.getAbsolutePosition().clone();
-        let absolutePosition = relativePosition.add(planetPosition);
-        let direction = absolutePosition.subtract(observerPosition);
+        let chunkPositionW = relativePosition.add(this.planet.getAbsolutePosition());
+        let direction = chunkPositionW.subtract(observerPositionW);
         // distance carré entre caméra et noeud du quadtree
         let distanceToNodeSquared = direction.lengthSquared();
         let distanceThreshold = this.renderDistanceFactor * this.rootChunkLength / (2 ** walked.length);
@@ -130,20 +130,15 @@ export class ChunkTree {
                 return tree;
             }
             return [
-                this.updateLODRecursively(observerPosition, observerDirection, tree[0], walked.concat([0])),
-                this.updateLODRecursively(observerPosition, observerDirection, tree[1], walked.concat([1])),
-                this.updateLODRecursively(observerPosition, observerDirection, tree[2], walked.concat([2])),
-                this.updateLODRecursively(observerPosition, observerDirection, tree[3], walked.concat([3])),
+                this.updateLODRecursively(observerPositionW, observerDirection, tree[0], walked.concat([0])),
+                this.updateLODRecursively(observerPositionW, observerDirection, tree[1], walked.concat([1])),
+                this.updateLODRecursively(observerPositionW, observerDirection, tree[2], walked.concat([2])),
+                this.updateLODRecursively(observerPositionW, observerDirection, tree[3], walked.concat([3])),
             ];
         } else {
             // if we are far from the node
             if (tree instanceof PlanetChunk) {
-                let enableOcclusion = false;
-                if (enableOcclusion) {
-                    let rayDir = direction.normalize();
-                    let [intersect, t0, t1] = rayIntersectSphere(observerPosition, rayDir, planetPosition, (this.rootChunkLength - 100e3 * 2 ** -tree.depth) / 2);
-                    tree.mesh.setEnabled(!(intersect && t0 ** 2 < distanceToNodeSquared) && tree.isReady());
-                }
+                this.checkForOcclusion(tree, chunkPositionW, observerPositionW);
                 return tree;
             }
             if (walked.length >= this.minDepth) {
@@ -152,6 +147,16 @@ export class ChunkTree {
                 return newChunk;
             }
             return tree;
+        }
+    }
+
+    //TODO: put this somewhere else for generalization purposes
+    private checkForOcclusion(chunk: PlanetChunk, chunkPositionW: Vector3, observerPositionW: Vector3) {
+        if (chunk.isReady() && Settings.ENABLE_OCCLUSION) {
+            let direction = chunkPositionW.subtract(observerPositionW);
+            let rayDir = direction.normalizeToNew();
+            let [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.planet.getAbsolutePosition(), this.planet.getRadius() - 50e3 * 2 ** -chunk.depth);
+            chunk.mesh.setEnabled(!(intersect && t0 ** 2 < direction.lengthSquared()));
         }
     }
 
