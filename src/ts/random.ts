@@ -22,6 +22,7 @@ import {StarSystemManager} from "./celestialBodies/starSystemManager";
 import {centeredRandom, nrand, randInt} from "./utils/random";
 import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
 import {Star} from "./celestialBodies/stars/star";
+import {Settings} from "./settings";
 
 style.default;
 
@@ -41,21 +42,19 @@ scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
-const radius = 1000 * 1e3; // diamètre en m
-
 let keyboard = new Keyboard();
 let mouse = new Mouse();
 let gamepad = new Gamepad();
 
 let player = new PlayerController(scene);
-player.setSpeed(0.2 * radius);
+player.setSpeed(0.2 * Settings.PLANET_RADIUS);
 player.rotate(player.getUpwardDirection(), 0.45);
 
-player.camera.maxZ = Math.max(radius * 50, 10000);
+player.camera.maxZ = Math.max(Settings.PLANET_RADIUS * 50, 10000);
 
 let starSystemManager = new StarSystemManager(64);
 
-let starRadius = Math.max(nrand(0.5, 0.2), 0) * radius
+let starRadius = Math.max(nrand(0.5, 0.2), 0) * Settings.PLANET_RADIUS
 let sun = new Star("Weierstrass", starRadius, starSystemManager, scene, {
     rotationPeriod: 60 * 60 * 24,
     rotationAxis: Axis.Y,
@@ -69,7 +68,7 @@ sun.translate(new Vector3(-900000, 0, -1700000));
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
 
-let planet = new SolidPlanet("Hécate", radius, starSystemManager, scene, {
+let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, {
     rotationPeriod: 60 * 60 / 10,
     rotationAxis: Axis.Y,
 
@@ -82,7 +81,7 @@ let planet = new SolidPlanet("Hécate", radius, starSystemManager, scene, {
     centeredRandom(),
     centeredRandom()
 ]);
-planet.translate(new Vector3(0, 0, 4 * radius));
+planet.translate(new Vector3(planet.getRadius() * 2, 0, 4 * planet.getRadius()));
 console.log("seed : ", planet.getSeed().toString());
 console.table(planet.physicalProperties);
 planet.colorSettings.plainColor = new Vector3(0.22, 0.37, 0.024).add(new Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
@@ -90,19 +89,18 @@ planet.colorSettings.beachSize = 250 + 100 * centeredRandom();
 planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
 
 planet.updateColors();
-planet.translate(new Vector3(radius * 2, 0, 0));
 
 planet.rotate(Axis.X, centeredRandom());
 
 let ocean = planet.createOcean(sun, scene);
 
 if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0) {
-    let flatClouds = planet.createClouds(sun, scene);
+    let flatClouds = planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
     flatClouds.settings.cloudPower = 10 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure);
 }
 
 if (planet.physicalProperties.pressure > 0) {
-    let atmosphere = planet.createAtmosphere(sun, scene);
+    let atmosphere = planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
     atmosphere.settings.intensity = 12 * planet.physicalProperties.pressure;
 }
 

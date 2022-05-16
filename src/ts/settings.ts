@@ -1,0 +1,7 @@
+export const Settings = {
+    PLANET_RADIUS: 1000e3,
+    VERTEX_RESOLUTION: 64,
+    CLOUD_LAYER_HEIGHT: 15e3,
+    ATMOSPHERE_HEIGHT: 100e3,
+    TIME_MULTIPLIER: 1
+}

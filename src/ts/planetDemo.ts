@@ -22,6 +22,7 @@ import {PlayerController} from "./player/playerController";
 import {Keyboard} from "./inputs/keyboard";
 import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
 import {Star} from "./celestialBodies/stars/star";
+import {Settings} from "./settings";
 
 style.default;
 sliderStyle.default;
@@ -41,31 +42,30 @@ scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
 let timeMultiplicator = 1;
-const planetRadius = 1000e3;
 
 let player = new PlayerController(scene);
-player.setSpeed(0.2 * planetRadius);
-player.camera.maxZ = planetRadius * 20;
+player.setSpeed(0.2 * Settings.PLANET_RADIUS);
+player.camera.maxZ = Settings.PLANET_RADIUS * 20;
 
 let keyboard = new Keyboard();
 
-let starSystemManager = new StarSystemManager();
+let starSystemManager = new StarSystemManager(Settings.VERTEX_RESOLUTION);
 
-let sun = new Star("Weierstrass", 0.4 * planetRadius, starSystemManager, scene);
-sun.translate(new Vector3(-1, 0.5, -1).scale(planetRadius * 5));
+let sun = new Star("Weierstrass", 0.4 * Settings.PLANET_RADIUS, starSystemManager, scene);
+sun.translate(new Vector3(-1, 0.5, -1).scale(Settings.PLANET_RADIUS * 5));
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
-let planet = new SolidPlanet("Hécate", planetRadius, starSystemManager, scene);
+let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene);
 planet.rotate(Axis.X, 0.2);
 
 planet.physicalProperties.rotationPeriod /= 500;
 
-planet.translate(new Vector3(0, 0, planetRadius * 3));
+planet.translate(new Vector3(0, 0, planet.getRadius() * 3));
 
 let ocean = planet.createOcean(sun, scene);
-let flatClouds = planet.createClouds(sun, scene);
-let atmosphere = planet.createAtmosphere(sun, scene);
+let flatClouds = planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
+let atmosphere = planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
 let rings = planet.createRings(sun, scene);
 
 let fxaa = new FxaaPostProcess("fxaa", 1, scene.activeCamera);
@@ -82,7 +82,7 @@ let sliders: Slider[] = [];
 
 sliders.push(new Slider("zoom", document.getElementById("zoom")!, 0, 100, 100 * planet._radius / planet.attachNode.position.z, (value: number) => {
     let playerDir = planet.getAbsolutePosition().normalizeToNew();
-    planet.setAbsolutePosition(playerDir.scale(100 * planet._radius / value));
+    planet.setAbsolutePosition(playerDir.scale(100 * planet.getRadius() / value));
 }));
 
 let sunOrientation = 220;
@@ -221,7 +221,7 @@ sliders.push(new Slider("normalSharpness", document.getElementById("normalSharpn
 document.getElementById("cloudsToggler")?.addEventListener("click", () => {
     let checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
     checkbox.checked = !checkbox.checked;
-    flatClouds.settings.cloudLayerRadius = checkbox.checked ? planetRadius + 15e3 : 0;
+    flatClouds.settings.cloudLayerRadius = checkbox.checked ? Settings.PLANET_RADIUS + Settings.CLOUD_LAYER_HEIGHT : 0;
 });
 
 let cloudColorPicker = document.getElementById("cloudColor") as HTMLInputElement;
@@ -263,7 +263,7 @@ sliders.push(new Slider("detailSpeed", document.getElementById("detailSpeed")!, 
 document.getElementById("atmosphereToggler")?.addEventListener("click", () => {
     let checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
     checkbox.checked = !checkbox.checked;
-    atmosphere.settings.atmosphereRadius = checkbox.checked ? planetRadius + 100e3 : 0;
+    atmosphere.settings.atmosphereRadius = checkbox.checked ? Settings.PLANET_RADIUS + Settings.ATMOSPHERE_HEIGHT : 0;
 });
 
 sliders.push(new Slider("intensity", document.getElementById("intensity")!, 0, 40, atmosphere.settings.intensity, (val: number) => {
@@ -274,8 +274,8 @@ sliders.push(new Slider("density", document.getElementById("density")!, 0, 40, a
     atmosphere.settings.densityModifier = val / 10;
 }));
 
-sliders.push(new Slider("atmosphereRadius", document.getElementById("atmosphereRadius")!, 0, 100, (atmosphere.settings.atmosphereRadius - planetRadius) / 10000, (val: number) => {
-    atmosphere.settings.atmosphereRadius = planetRadius + val * 10000;
+sliders.push(new Slider("atmosphereRadius", document.getElementById("atmosphereRadius")!, 0, 100, (atmosphere.settings.atmosphereRadius - planet.getRadius()) / 10000, (val: number) => {
+    atmosphere.settings.atmosphereRadius = planet.getRadius() + val * 10000;
 }));
 
 sliders.push(new Slider("rayleighStrength", document.getElementById("rayleighStrength")!, 0, 40, atmosphere.settings.rayleighStrength * 10, (val: number) => {
@@ -361,9 +361,7 @@ for (const link of document.querySelector("nav")!.children) {
         currentUI = document.getElementById(id)!;
         currentUI.hidden = false;
         resizeUI();
-        for (const slider of sliders) {
-            slider.update(false);
-        }
+        for (const slider of sliders) slider.update(false);
     });
 }
 
