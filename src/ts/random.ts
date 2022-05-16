@@ -25,6 +25,7 @@ import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
 import {Star} from "./celestialBodies/stars/star";
 import {Settings} from "./settings";
 import {CelestialBodyType} from "./celestialBodies/interfaces";
+import {clamp} from "./utils/math";
 
 style.default;
 
@@ -55,12 +56,12 @@ player.camera.maxZ = Math.max(Settings.PLANET_RADIUS * 50, 10000);
 
 let starSystemManager = new StarSystemManager(64);
 
-let starRadius = Math.max(nrand(0.5, 0.2), 0) * Settings.PLANET_RADIUS
+let starRadius = clamp(nrand(0.5, 0.2), 0, 1.5) * Settings.PLANET_RADIUS
 let sun = new Star("Weierstrass", starRadius, starSystemManager, scene, {
     rotationPeriod: 60 * 60 * 24,
     rotationAxis: Axis.Y,
 
-    temperature: Math.max(nrand(5778, 2000), 0)
+    temperature: clamp(nrand(5778, 2000), 0, 10000)
 });
 console.table(sun.physicalProperties);
 
@@ -78,24 +79,24 @@ let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManage
     pressure: Math.max(nrand(1, 0.5), 0),
     waterAmount: Math.max(nrand(1, 0.6), 0),
 }, [
-    centeredRandom(),
-    centeredRandom(),
-    centeredRandom()
+    centeredRandom() * 100000e3,
+    centeredRandom() * 100000e3,
+    centeredRandom() * 100000e3
 ]);
 planet.translate(new Vector3(planet.getRadius() * 2, 0, 4 * planet.getRadius()));
 console.log("seed : ", planet.getSeed().toString());
 console.table(planet.physicalProperties);
 planet.colorSettings.plainColor = new Color3(0.22, 0.37, 0.024).add(new Color3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
 planet.colorSettings.beachSize = 250 + 100 * centeredRandom();
-planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
+planet.terrainSettings.continentsFragmentation = clamp(nrand(0.5, 0.2), 0, 1);
 
 planet.updateColors();
 
-planet.rotate(Axis.X, centeredRandom());
+planet.rotate(Axis.X, centeredRandom() / 2);
 
 let ocean = planet.createOcean(sun, scene);
 
-if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0) {
+if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0 && Math.random() < 0.8) {
     let flatClouds = planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
     flatClouds.settings.cloudPower = 10 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure);
 }
@@ -103,11 +104,15 @@ if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.press
 if (planet.physicalProperties.pressure > 0) {
     let atmosphere = planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
     atmosphere.settings.intensity = 12 * planet.physicalProperties.pressure;
+    atmosphere.settings.redWaveLength *= 1 + centeredRandom() / 3;
+    atmosphere.settings.greenWaveLength *= 1 + centeredRandom() / 3;
+    atmosphere.settings.blueWaveLength *= 1 + centeredRandom() / 3;
 }
 
 let rings = planet.createRings(sun, scene);
 rings.settings.ringStart = 1.8 + 0.4 * centeredRandom();
 rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom();
+rings.settings.ringOpacity = Math.random();
 
 let vls = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
 

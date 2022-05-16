@@ -165,4 +165,10 @@ export function rayIntersectSphere(rayOrigin: Vector3, rayDir: Vector3, spherePo
     return [t1 > 0.0, t0, t1];
 }
 
+export function clamp(x: number, min: number, max: number) {
+    if(x < min) return min;
+    if(x > max) return max;
+    return x;
+}
+
 
