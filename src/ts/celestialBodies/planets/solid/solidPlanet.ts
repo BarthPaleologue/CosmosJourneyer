@@ -229,31 +229,16 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     /**
      * Update terrain of the sphere relative to the observer position
      * @param observerPosition
-     * @param observerDirection
      */
-    private updateLOD(observerPosition: Vector3, observerDirection: Vector3): void {
-        for (let side of this.sides) {
-            side.updateLOD(observerPosition, observerDirection);
-        }
-    }
-
-    /**
-     * Sets the treshold distance for changing the LOD
-     * @param renderDistanceFactor the scaling factor of the default change of LOD distance
-     */
-    public setRenderDistanceFactor(renderDistanceFactor: number): void {
-        for (let side of this.sides) {
-            side.renderDistanceFactor = renderDistanceFactor;
-        }
+    private updateLOD(observerPosition: Vector3): void {
+        for (const side of this.sides) side.update(observerPosition);
     }
 
     /**
      * Regenerates the chunks
      */
     public reset(): void {
-        for (let side of this.sides) {
-            side.reset();
-        }
+        for (const side of this.sides) side.reset();
     }
 
     /**
@@ -297,7 +282,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         this.surfaceMaterial.setMatrix("planetWorldMatrix", this.attachNode.getWorldMatrix());
 
-        this.updateLOD(player.getAbsolutePosition(), player.getForwardDirection());
+        this.updateLOD(player.getAbsolutePosition());
     }
 
     public getRelativePosition() {

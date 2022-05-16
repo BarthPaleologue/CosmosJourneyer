@@ -88,23 +88,21 @@ export class ChunkTree {
     }
 
     /**
-     * Update LOD of terrain relative to the observerPosition
+     * Update tree to create matching LOD relative to the observer's position
      * @param observerPosition The observer position
-     * @param observerDirection
      */
-    public updateLOD(observerPosition: Vector3, observerDirection: Vector3): void {
-        this.tree = this.updateLODRecursively(observerPosition, observerDirection);
+    public update(observerPosition: Vector3): void {
+        this.tree = this.updateLODRecursively(observerPosition);
     }
 
     /**
      * Recursive function used internaly to update LOD
      * @param observerPositionW The observer position in world space
-     * @param observerDirection
      * @param tree The tree to update recursively
      * @param walked The position of the current root relative to the absolute root
      * @returns The updated tree
      */
-    private updateLODRecursively(observerPositionW: Vector3, observerDirection: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
+    private updateLODRecursively(observerPositionW: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
         let relativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.planet);
 
@@ -131,10 +129,10 @@ export class ChunkTree {
                 return tree;
             }
             return [
-                this.updateLODRecursively(observerPositionW, observerDirection, tree[0], walked.concat([0])),
-                this.updateLODRecursively(observerPositionW, observerDirection, tree[1], walked.concat([1])),
-                this.updateLODRecursively(observerPositionW, observerDirection, tree[2], walked.concat([2])),
-                this.updateLODRecursively(observerPositionW, observerDirection, tree[3], walked.concat([3])),
+                this.updateLODRecursively(observerPositionW, tree[0], walked.concat([0])),
+                this.updateLODRecursively(observerPositionW, tree[1], walked.concat([1])),
+                this.updateLODRecursively(observerPositionW, tree[2], walked.concat([2])),
+                this.updateLODRecursively(observerPositionW, tree[3], walked.concat([3])),
             ];
         } else {
             // if we are far from the node
