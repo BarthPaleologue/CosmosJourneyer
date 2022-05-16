@@ -142,10 +142,6 @@ export class Algebra {
         vector.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
         vector.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
     }
-    public static normalizeInPlace(vector: Vector3): void {
-        let mag = vector.length();
-        vector.scaleInPlace(1 / mag);
-    }
     public static Dot(vector1: Vec3, vector2: Vec3): number {
         return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
     }

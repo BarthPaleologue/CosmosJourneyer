@@ -63,7 +63,7 @@ export function getChunkSphereSpacePositionFromPath(path: number[], direction: D
     Algebra.applyQuaternionInPlace(rotationQuaternion, position);
 
     // on projette cette position sur la sphère
-    Algebra.normalizeInPlace(position);
+    position.normalize();
     position.scaleInPlace(planet.getRadius());
 
     // on match cette position avec la rotation de la planète

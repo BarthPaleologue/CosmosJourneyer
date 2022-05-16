@@ -1,4 +1,4 @@
-import { LQuaternion } from "./algebra";
+import {LQuaternion} from "./algebra";
 
 import {Quaternion} from "@babylonjs/core";
 

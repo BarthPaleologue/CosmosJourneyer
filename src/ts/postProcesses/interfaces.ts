@@ -56,6 +56,7 @@ export enum ShaderDataType {
     Vector3,
     Matrix,
     Texture,
+    FloatArray
 }
 
 interface ShaderData {

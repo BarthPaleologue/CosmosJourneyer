@@ -24,9 +24,6 @@ export class ChunkTree {
 
     private tree: quadTree = [];
 
-    // FIXME: get rid of this one
-    renderDistanceFactor = 2;
-
     private readonly rootChunkLength: number;
 
     private readonly direction: Direction;
@@ -111,7 +108,7 @@ export class ChunkTree {
         let direction = chunkPositionW.subtract(observerPositionW);
         // distance carré entre caméra et noeud du quadtree
         let distanceToNodeSquared = direction.lengthSquared();
-        let distanceThreshold = this.renderDistanceFactor * this.rootChunkLength / (2 ** walked.length);
+        let distanceThreshold = Settings.RENDER_DISTANCE_MULTIPLIER * this.rootChunkLength / (2 ** walked.length);
 
         if ((distanceToNodeSquared < distanceThreshold ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
             // if the node is near the camera or if we are loading minimal LOD

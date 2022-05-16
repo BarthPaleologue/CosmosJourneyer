@@ -69,6 +69,8 @@ export abstract class SpacePostProcess extends PostProcess {
                     case ShaderDataType.Matrix:
                         effect.setMatrix(uniformName, (this.uniforms[uniformName] as CShaderData<Matrix>).get());
                         break;
+                    case ShaderDataType.FloatArray:
+                        effect.setFloatArray(uniformName, (this.uniforms[uniformName] as CShaderData<number[]>).get());
                 }
             }
 

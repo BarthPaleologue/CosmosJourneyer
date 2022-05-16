@@ -19,39 +19,35 @@ import {PlayerController} from "./player/playerController";
 import {Keyboard} from "./inputs/keyboard";
 import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
 import {Star} from "./celestialBodies/stars/star";
+import {Settings} from "./settings";
 
 style.default;
 sliderStyle.default;
-
-// TODO: euh oui alors si on prend en compte la physique tout doit changer par ici mdr
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth - 300;
 canvas.height = window.innerHeight;
 
-let engine = new Engine(canvas);
+let engine = new Engine(canvas, true);
 engine.loadingScreen.displayLoadingUI();
 
 let scene = new Scene(engine);
-scene.clearColor = new Color4(0, 0, 0, 1);
 
 let depthRenderer = new DepthRenderer(scene);
 scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
-const starRadius = 500e3;
-
 let player = new PlayerController(scene);
-player.setSpeed(0.2 * starRadius);
-player.camera.maxZ = starRadius * 20;
+player.setSpeed(0.2 * Settings.PLANET_RADIUS);
+player.camera.maxZ = Settings.PLANET_RADIUS * 20;
 
 let keyboard = new Keyboard();
 
 let starSystemManager = new StarSystemManager();
 
-let sun = new Star("Weierstrass", starRadius, starSystemManager, scene);
-sun.translate(new Vector3(0, 0, starRadius * 3));
+let sun = new Star("Weierstrass", Settings.PLANET_RADIUS, starSystemManager, scene);
+sun.translate(new Vector3(0, 0, Settings.PLANET_RADIUS * 3));
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
@@ -92,12 +88,13 @@ window.addEventListener("resize", () => {
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
+        const deltaTime = engine.getDeltaTime() / 1000;
 
-        let deplacement = player.listenToKeyboard(keyboard, engine.getDeltaTime() / 1000);
+        let deplacement = player.listenToKeyboard(keyboard, deltaTime);
 
         starSystemManager.translateAllCelestialBody(deplacement);
 
-        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, engine.getDeltaTime() / 1000);
+        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime);
 
         scene.render();
     });

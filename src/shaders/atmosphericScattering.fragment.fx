@@ -12,6 +12,8 @@ varying vec2 vUV; // screen coordinates
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
 
+uniform float planetsData[4 * 50];
+
 uniform vec3 sunPosition; // position of the sun in world space
 uniform vec3 cameraPosition; // position of the camera in world space
 
@@ -228,7 +230,11 @@ void main() {
     vec3 screenColor = texture2D(textureSampler, vUV).rgb; // the current screen color
 
     float depth = texture2D(depthSampler, vUV).r; // the depth corresponding to the pixel in the depth map
-    
+
+    /*float logarithmicDepthConstant = 2.0 / (log(cameraFar + 1.0) / log(2.0));
+    float d2 = log2(depth) * logarithmicDepthConstant * 0.5;
+    depth = d2;*/
+
     vec3 pixelWorldPosition = worldFromUV(vUV); // the pixel position in world space (near plane)
 
     // closest physical point from the camera in the direction of the pixel (occlusion)
@@ -247,5 +253,4 @@ void main() {
     vec3 finalColor = scatter(screenColor, cameraPosition, rayDir, maximumDistance); // the color to be displayed on the screen
 
     gl_FragColor = vec4(finalColor, 1.0); // displaying the final color
-    
 }
