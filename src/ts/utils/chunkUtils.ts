@@ -1,6 +1,6 @@
 import {Vector3} from "@babylonjs/core";
 import {Direction, getQuaternionFromDirection} from "./direction";
-import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
+import {SolidPlanet} from "../celestialBodies/planets/solidPlanet";
 import {Algebra} from "./algebra";
 
 /**

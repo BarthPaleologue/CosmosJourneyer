@@ -1,7 +1,7 @@
-import {SolidPlanet} from "../celestialBodies/planets/solid/solidPlanet";
+import {SolidPlanet} from "../celestialBodies/planets/solidPlanet";
 import {Direction} from "../utils/direction";
 import {Mesh, Vector3, VertexData} from "@babylonjs/core";
-import {PlanetChunk} from "../celestialBodies/planets/solid/planetChunk";
+import {PlanetChunk} from "./planetChunk";
 
 export enum TaskType {
     Deletion,

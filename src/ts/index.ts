@@ -10,7 +10,7 @@ import {
     VolumetricLightScatteringPostProcess
 } from "@babylonjs/core";
 
-import {SolidPlanet} from "./celestialBodies/planets/solid/solidPlanet";
+import {SolidPlanet} from "./celestialBodies/planets/solidPlanet";
 import {Star} from "./celestialBodies/stars/star";
 
 import {PlayerController} from "./player/playerController";

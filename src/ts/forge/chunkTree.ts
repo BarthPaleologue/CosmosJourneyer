@@ -1,13 +1,13 @@
 import {Vector3} from "@babylonjs/core";
 
 import {PlanetChunk} from "./planetChunk";
-import {Direction} from "../../../utils/direction";
-import {ChunkForge} from "../../../forge/chunkForge";
-import {DeleteTask, TaskType} from "../../../forge/taskInterfaces";
-import {SolidPlanet} from "./solidPlanet";
-import {rayIntersectSphere} from "../../../utils/math";
-import {Settings} from "../../../settings";
-import {getChunkSphereSpacePositionFromPath} from "../../../utils/chunkUtils";
+import {Direction} from "../utils/direction";
+import {ChunkForge} from "./chunkForge";
+import {DeleteTask, TaskType} from "./taskInterfaces";
+import {SolidPlanet} from "../celestialBodies/planets/solidPlanet";
+import {rayIntersectSphere} from "../utils/math";
+import {Settings} from "../settings";
+import {getChunkSphereSpacePositionFromPath} from "../utils/chunkUtils";
 
 /**
  * A quadTree is defined recursively

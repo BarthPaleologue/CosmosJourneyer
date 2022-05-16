@@ -1,9 +1,9 @@
 import {Vector3, Quaternion} from "@babylonjs/core";
 
-import {AbstractPlanet} from "../abstractPlanet";
-import {CelestialBodyType, PlanetPhysicalProperties} from "../../interfaces";
-import {PlayerController} from "../../../player/playerController";
-import {StarSystemManager} from "../../starSystemManager";
+import {AbstractPlanet} from "./abstractPlanet";
+import {CelestialBodyType, PlanetPhysicalProperties} from "../interfaces";
+import {PlayerController} from "../../player/playerController";
+import {StarSystemManager} from "../starSystemManager";
 
 export class GazPlanet extends AbstractPlanet {
     protected bodyType = CelestialBodyType.GAZ;
@@ -14,7 +14,7 @@ export class GazPlanet extends AbstractPlanet {
         super(name, radius, starSystemManager);
         this.physicalProperties = {
             // FIXME: choose physically accurates values
-            rotationPeriod: 1 * 24 * 60 * 60,
+            rotationPeriod: 24 * 60 * 60,
             rotationAxis: new Vector3(0, 1, 0),
             minTemperature: 100,
             maxTemperature: 110,

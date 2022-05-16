@@ -1,10 +1,10 @@
 import {Mesh} from "@babylonjs/core";
 
-import {SolidPlanet} from "./solidPlanet";
-import {ChunkForge} from "../../../forge/chunkForge";
-import {BuildTask, TaskType} from "../../../forge/taskInterfaces";
-import {Direction} from "../../../utils/direction";
-import {getChunkPlaneSpacePositionFromPath} from "../../../utils/chunkUtils";
+import {SolidPlanet} from "../celestialBodies/planets/solidPlanet";
+import {ChunkForge} from "./chunkForge";
+import {BuildTask, TaskType} from "./taskInterfaces";
+import {Direction} from "../utils/direction";
+import {getChunkPlaneSpacePositionFromPath} from "../utils/chunkUtils";
 
 export class PlanetChunk {
 

@@ -1,7 +1,7 @@
-import {ChunkTree} from "./chunkTree";
-import {Direction} from "../../../utils/direction";
-import {TerrainSettings} from "../../../terrain/terrainSettings";
-import {AbstractPlanet} from "../abstractPlanet";
+import {ChunkTree} from "../../forge/chunkTree";
+import {Direction} from "../../utils/direction";
+import {TerrainSettings} from "../../terrain/terrainSettings";
+import {AbstractPlanet} from "./abstractPlanet";
 
 import {
     Vector3,
@@ -16,22 +16,22 @@ import {
     MaterialHelper
 } from "@babylonjs/core";
 
-import bottomNormalMap from "../../../../asset/textures/crackednormal.jpg";
-import steepNormalMap from "../../../../asset/textures/rockn.png";
-import grassNormalMap from "../../../../asset/textures/grassNormalMap.jpg";
+import bottomNormalMap from "../../../asset/textures/crackednormal.jpg";
+import steepNormalMap from "../../../asset/textures/rockn.png";
+import grassNormalMap from "../../../asset/textures/grassNormalMap.jpg";
 
-import snowNormalMap from "../../../../asset/textures/snowNormalMap.png";
-import snowNormalMap2 from "../../../../asset/textures/snowNormalMap2.png";
+import snowNormalMap from "../../../asset/textures/snowNormalMap.png";
+import snowNormalMap2 from "../../../asset/textures/snowNormalMap2.png";
 
-import beachNormalMap from "../../../../asset/textures/sandNormalMap2.png";
-import desertNormalMap from "../../../../asset/textures/sandNormalMap2.jpg";
+import beachNormalMap from "../../../asset/textures/sandNormalMap2.png";
+import desertNormalMap from "../../../asset/textures/sandNormalMap2.jpg";
 
-import {CelestialBodyType, RigidBody, SolidPhysicalProperties} from "../../interfaces";
-import {CollisionData} from "../../../forge/workerDataInterfaces";
-import {TaskType} from "../../../forge/taskInterfaces";
-import {initMeshTransform} from "../../../utils/mesh";
-import {PlayerController} from "../../../player/playerController";
-import {StarSystemManager} from "../../starSystemManager";
+import {CelestialBodyType, RigidBody, SolidPhysicalProperties} from "../interfaces";
+import {CollisionData} from "../../forge/workerDataInterfaces";
+import {TaskType} from "../../forge/taskInterfaces";
+import {initMeshTransform} from "../../utils/mesh";
+import {PlayerController} from "../../player/playerController";
+import {StarSystemManager} from "../starSystemManager";
 
 export enum ColorMode {
     DEFAULT,
@@ -144,7 +144,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
                     "seed",
 
-                    "cameraNear", "cameraFar", "planetPosition", "planetRadius", "planetWorldMatrix",
+                    "cameraNear", "cameraFar", "planetPosition", "planetRadius",
 
                     "planetRotationAxis", "rotationTheta",
 
@@ -279,8 +279,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.surfaceMaterial.setFloat("pressure", this.physicalProperties.pressure);
 
         this.surfaceMaterial.setFloat("waterAmount", this.physicalProperties.waterAmount);
-
-        this.surfaceMaterial.setMatrix("planetWorldMatrix", this.attachNode.getWorldMatrix());
 
         this.updateLOD(player.getAbsolutePosition());
     }

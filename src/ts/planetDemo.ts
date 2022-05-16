@@ -10,7 +10,7 @@ import {
     VolumetricLightScatteringPostProcess
 } from "@babylonjs/core";
 
-import {ColorMode, SolidPlanet} from "./celestialBodies/planets/solid/solidPlanet";
+import {ColorMode, SolidPlanet} from "./celestialBodies/planets/solidPlanet";
 
 import {Slider} from "handle-sliderjs";
 

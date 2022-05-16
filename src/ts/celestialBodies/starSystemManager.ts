@@ -2,7 +2,7 @@ import {Vector3, DepthRenderer} from "@babylonjs/core";
 
 import { ChunkForge } from "../forge/chunkForge";
 import { PlayerController } from "../player/playerController";
-import { SolidPlanet } from "./planets/solid/solidPlanet";
+import { SolidPlanet } from "./planets/solidPlanet";
 import {CelestialBody} from "./celestialBody";
 import {Star} from "./stars/star";
 
