@@ -115,48 +115,43 @@ export class ChunkTree {
         let distanceThreshold = this.renderDistanceFactor * this.rootChunkLength / (2 ** walked.length);
 
         if ((distanceToNodeSquared < distanceThreshold ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
-            // si on est proche de la caméra ou si on doit le générer car LOD minimal
+            // if the node is near the camera or if we are loading minimal LOD
             if (tree instanceof PlanetChunk) {
-                // si c'est un chunk, on le subdivise
-                let newTree = [
-                    this.createChunk(walked.concat([0]), true),
-                    this.createChunk(walked.concat([1]), true),
-                    this.createChunk(walked.concat([2]), true),
-                    this.createChunk(walked.concat([3]), true),
-                ];
-                this.requestDeletion(tree, newTree, true);
-                return newTree;
-            } else {
-                // si c'en est pas un, on continue
-                return [
-                    this.updateLODRecursively(observerPosition, observerDirection, tree[0], walked.concat([0])),
-                    this.updateLODRecursively(observerPosition, observerDirection, tree[1], walked.concat([1])),
-                    this.updateLODRecursively(observerPosition, observerDirection, tree[2], walked.concat([2])),
-                    this.updateLODRecursively(observerPosition, observerDirection, tree[3], walked.concat([3])),
-                ];
+                if (tree.isReady()) {
+                    let newTree = [
+                        this.createChunk(walked.concat([0]), true),
+                        this.createChunk(walked.concat([1]), true),
+                        this.createChunk(walked.concat([2]), true),
+                        this.createChunk(walked.concat([3]), true),
+                    ];
+                    this.requestDeletion(tree, newTree, true);
+                    return newTree;
+                }
+                return tree;
             }
+            return [
+                this.updateLODRecursively(observerPosition, observerDirection, tree[0], walked.concat([0])),
+                this.updateLODRecursively(observerPosition, observerDirection, tree[1], walked.concat([1])),
+                this.updateLODRecursively(observerPosition, observerDirection, tree[2], walked.concat([2])),
+                this.updateLODRecursively(observerPosition, observerDirection, tree[3], walked.concat([3])),
+            ];
         } else {
-            // si on est loin
+            // if we are far from the node
             if (tree instanceof PlanetChunk) {
-
                 let enableOcclusion = false;
-
-                if(enableOcclusion) {
+                if (enableOcclusion) {
                     let rayDir = direction.normalize();
                     let [intersect, t0, t1] = rayIntersectSphere(observerPosition, rayDir, planetPosition, (this.rootChunkLength - 100e3 * 2 ** -tree.depth) / 2);
                     tree.mesh.setEnabled(!(intersect && t0 ** 2 < distanceToNodeSquared) && tree.isReady());
                 }
                 return tree;
-            } else {
-                // si c'est un noeud, on supprime tous les enfants, on remplace par un nouveau chunk
-                if (walked.length >= this.minDepth) {
-                    let newChunk = this.createChunk(walked, false);
-                    this.requestDeletion(tree, [newChunk], false);
-                    return newChunk;
-                } else {
-                    return tree;
-                }
             }
+            if (walked.length >= this.minDepth) {
+                let newChunk = this.createChunk(walked, false);
+                this.requestDeletion(tree, [newChunk], false);
+                return newChunk;
+            }
+            return tree;
         }
     }
 
