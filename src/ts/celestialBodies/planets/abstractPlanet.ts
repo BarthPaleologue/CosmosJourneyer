@@ -34,17 +34,14 @@ export abstract class AbstractPlanet extends CelestialBody implements Seedable {
         return this._radius;
     }
 
-    public createAtmosphere(star: Star, scene: Scene): AtmosphericScatteringPostProcess {
-        const atmosphereHeight = 100e3;
+    public createAtmosphere(atmosphereHeight: number, star: Star, scene: Scene): AtmosphericScatteringPostProcess {
         let atmosphere = new AtmosphericScatteringPostProcess(`${this.getName()}Atmosphere`, this, atmosphereHeight, star, scene);
         atmosphere.settings.intensity = 15 * this.physicalProperties.pressure;
         this.postProcessList.push(atmosphere);
         return atmosphere;
     }
 
-    public createClouds(star: Star, scene: Scene): FlatCloudsPostProcess {
-        // TODO: do not hardcode
-        const cloudLayerHeight = 15e3;
+    public createClouds(cloudLayerHeight: number, star: Star, scene: Scene): FlatCloudsPostProcess {
         let clouds = new FlatCloudsPostProcess(`${this.getName()}Clouds`, this, cloudLayerHeight, star, scene);
         this.postProcessList.push(clouds);
         return clouds;
