@@ -1,13 +1,4 @@
-import {
-    AbstractMesh,
-    BoundingInfo,
-    DepthRenderer,
-    Matrix,
-    Observable,
-    TransformNode,
-    Vector3,
-    VertexData
-} from "@babylonjs/core";
+import {DepthRenderer, VertexData} from "@babylonjs/core";
 import {BuildData} from "./workerDataInterfaces";
 import {ApplyTask, BuildTask, DeleteTask, ReturnedChunkData, Task, TaskType} from "./taskInterfaces";
 import {WorkerPool} from "./workerPool";
@@ -48,19 +39,15 @@ export class ChunkForge {
      * @param worker the web worker assigned to the next task
      */
     private executeNextTask(worker: Worker) {
-        if (this.workerPool.taskQueue.length > 0) {
-            this.dispatchTask(this.workerPool.taskQueue.shift()!, worker);
-        } else {
-            this.workerPool.finishedWorkers.push(worker);
-        }
+        if (this.workerPool.hasTask()) this.dispatchTask(this.workerPool.nextTask(), worker);
+        else this.workerPool.finishedWorkers.push(worker);
     }
 
     private executeBuildTask(task: BuildTask, worker: Worker): void {
         // delete tasks always follow build task, they are stored to be executed as callbacks of the build task
         let callbackTasks: DeleteTask[] = [];
-        while (this.workerPool.taskQueue.length > 0 && this.workerPool.taskQueue[0].taskType == TaskType.Deletion) {
-            callbackTasks.push(this.workerPool.taskQueue[0] as DeleteTask);
-            this.workerPool.taskQueue.shift();
+        while (this.workerPool.taskQueue.length > 0 && this.workerPool.taskQueue[0].type == TaskType.Deletion) {
+            callbackTasks.push(this.workerPool.nextTask() as DeleteTask);
         }
 
         let buildData: BuildData = {
@@ -87,7 +74,7 @@ export class ChunkForge {
             let grassData = data.g;
 
             let applyTask: ApplyTask = {
-                taskType: TaskType.Apply,
+                type: TaskType.Apply,
                 vertexData: vertexData,
                 grassData: grassData,
                 chunk: task.chunk,
@@ -101,19 +88,17 @@ export class ChunkForge {
     }
 
     private dispatchTask(task: DeleteTask | BuildTask, worker: Worker) {
-        switch (task.taskType) {
+        switch (task.type) {
             case TaskType.Build:
                 this.executeBuildTask(task as BuildTask, worker);
                 break;
             case TaskType.Deletion:
-                // une tâche de suppression solitaire ne devrait pas exister
-                console.error("Tâche de supression solitaire détectée");
+                console.error("Solitary Delete Task received, this cannot happen !");
                 this.workerPool.finishedWorkers.push(worker);
                 break;
             default:
-                console.error("Tache illegale");
+                console.error(`Illegal task received ! TaskType : ${task.type}`);
                 this.workerPool.finishedWorkers.push(worker);
-                break;
         }
     }
 
@@ -125,9 +110,9 @@ export class ChunkForge {
             for (let i = 0; i < taskGroup.length; i++) {
                 const task = taskGroup[i];
                 // disabling old chunk
-                task.chunk.markAsNotReady();
+                task.chunk.setReady(false);
                 // if we are removing the last old chunk, enabling new chunks
-                if (i == taskGroup.length - 1) for (const chunk of task.newChunks) chunk.markAsReady();
+                if (i == taskGroup.length - 1) for (const chunk of task.newChunks) chunk.setReady(true);
                 task.chunk.mesh.dispose();
             }
         }
@@ -144,7 +129,7 @@ export class ChunkForge {
             task.chunk.mesh.freezeNormals();
 
             // TODO: check if equal to minDepth
-            if (task.chunk.depth <= 1) task.chunk.markAsReady();
+            if (task.chunk.depth <= 1) task.chunk.setReady(true);
 
             depthRenderer.getDepthMap().renderList?.push(task.chunk.mesh);
 

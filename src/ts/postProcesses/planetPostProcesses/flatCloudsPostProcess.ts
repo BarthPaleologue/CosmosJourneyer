@@ -1,4 +1,4 @@
-import {Scene, Texture, Vector3} from "@babylonjs/core";
+import {Color3, Scene, Texture, Vector3} from "@babylonjs/core";
 
 import {CloudSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import normalMap from "../../../asset/textures/cloudNormalMap2.jpg";
@@ -21,7 +21,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             cloudDetailFrequency: 20,
             cloudPower: 2,
             cloudSharpness: 7,
-            cloudColor: new Vector3(0.8, 0.8, 0.8),
+            cloudColor: new Color3(0.8, 0.8, 0.8),
             worleySpeed: 0.0005,
             detailSpeed: 0.003,
         };
@@ -58,7 +58,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
                 }
             },
             "cloudColor": {
-                type: ShaderDataType.Vector3,
+                type: ShaderDataType.Color3,
                 get: () => {
                     return settings.cloudColor
                 }

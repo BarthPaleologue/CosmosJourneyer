@@ -1,7 +1,6 @@
 import {
     Engine,
     Scene,
-    Color4,
     Texture,
     DepthRenderer,
     Tools,
@@ -34,7 +33,6 @@ engine.loadingScreen.displayLoadingUI();
 let scene = new Scene(engine);
 
 let depthRenderer = new DepthRenderer(scene);
-scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 

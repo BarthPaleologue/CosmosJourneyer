@@ -37,11 +37,8 @@ engine.loadingScreen.displayLoadingUI();
 let scene = new Scene(engine);
 
 let depthRenderer = new DepthRenderer(scene);
-scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
-
-let timeMultiplicator = 1;
 
 let player = new PlayerController(scene);
 player.setSpeed(0.2 * Settings.PLANET_RADIUS);
@@ -99,8 +96,8 @@ sliders.push(new Slider("axialTilt", document.getElementById("axialTilt")!, -180
     axialTilt = newAxialTilt;
 }));
 
-sliders.push(new Slider("timeModifier", document.getElementById("timeModifier")!, 0, 200, timeMultiplicator, (val: number) => {
-    timeMultiplicator = val;
+sliders.push(new Slider("timeModifier", document.getElementById("timeModifier")!, 0, 200, Settings.TIME_MULTIPLIER, (val: number) => {
+    Settings.TIME_MULTIPLIER = val;
 }));
 
 sliders.push(new Slider("cameraFOV", document.getElementById("cameraFOV")!, 0, 360, player.camera.fov * 360 / Math.PI, (val: number) => {
@@ -151,50 +148,40 @@ sliders.push(new Slider("waveBlendingSharpness", document.getElementById("waveBl
 
 //#endregion ocean
 
-function babylonToHex(color: Vector3): string {
-    let c2 = new Color3(color.x, color.y, color.z);
-    return c2.toHexString();
-}
-
 //#region surface
 
 let snowColorPicker = document.getElementById("snowColor") as HTMLInputElement;
-snowColorPicker.value = babylonToHex(planet.colorSettings.snowColor);
+snowColorPicker.value = planet.colorSettings.snowColor.toHexString();
 snowColorPicker.addEventListener("input", () => {
-    let color = Color3.FromHexString(snowColorPicker.value);
-    planet.colorSettings.snowColor = new Vector3(color.r, color.g, color.b);
+    planet.colorSettings.snowColor = Color3.FromHexString(snowColorPicker.value);
     planet.updateColors();
 });
 
 let plainColorPicker = document.getElementById("plainColor") as HTMLInputElement;
-plainColorPicker.value = babylonToHex(planet.colorSettings.plainColor);
+plainColorPicker.value = planet.colorSettings.plainColor.toHexString();
 plainColorPicker.addEventListener("input", () => {
-    let color = Color3.FromHexString(plainColorPicker.value);
-    planet.colorSettings.plainColor = new Vector3(color.r, color.g, color.b);
+    planet.colorSettings.plainColor = Color3.FromHexString(plainColorPicker.value);
     planet.updateColors();
 });
 
 let steepColorPicker = document.getElementById("steepColor") as HTMLInputElement;
-steepColorPicker.value = babylonToHex(planet.colorSettings.steepColor);
+steepColorPicker.value = planet.colorSettings.steepColor.toHexString();
 steepColorPicker.addEventListener("input", () => {
-    let color = Color3.FromHexString(steepColorPicker.value);
-    planet.colorSettings.steepColor = new Vector3(color.r, color.g, color.b);
+    planet.colorSettings.steepColor = Color3.FromHexString(steepColorPicker.value);
     planet.updateColors();
 });
 
 let sandColorPicker = document.getElementById("sandColor") as HTMLInputElement;
-sandColorPicker.value = babylonToHex(planet.colorSettings.beachColor);
+sandColorPicker.value = planet.colorSettings.beachColor.toHexString();
 sandColorPicker.addEventListener("input", () => {
-    let color = Color3.FromHexString(sandColorPicker.value);
-    planet.colorSettings.beachColor = new Vector3(color.r, color.g, color.b);
+    planet.colorSettings.beachColor = Color3.FromHexString(sandColorPicker.value);
     planet.updateColors();
 });
 
 let desertColorPicker = document.getElementById("desertColor") as HTMLInputElement;
-desertColorPicker.value = babylonToHex(planet.colorSettings.desertColor);
+desertColorPicker.value = planet.colorSettings.desertColor.toHexString();
 desertColorPicker.addEventListener("input", () => {
-    let color = Color3.FromHexString(desertColorPicker.value);
-    planet.colorSettings.desertColor = new Vector3(color.r, color.g, color.b);
+    planet.colorSettings.desertColor = Color3.FromHexString(desertColorPicker.value);
     planet.updateColors();
 });
 
@@ -225,10 +212,9 @@ document.getElementById("cloudsToggler")?.addEventListener("click", () => {
 });
 
 let cloudColorPicker = document.getElementById("cloudColor") as HTMLInputElement;
-cloudColorPicker.value = babylonToHex(flatClouds.settings.cloudColor);
+cloudColorPicker.value = flatClouds.settings.cloudColor.toHexString();
 cloudColorPicker.addEventListener("input", () => {
-    let color = Color3.FromHexString(cloudColorPicker.value);
-    flatClouds.settings.cloudColor = new Vector3(color.r, color.g, color.b);
+    flatClouds.settings.cloudColor = Color3.FromHexString(cloudColorPicker.value);
 });
 
 
@@ -395,12 +381,9 @@ function resizeUI() {
 
 window.addEventListener("resize", () => resizeUI());
 
-//starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
-
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
-
         let deltaTime = engine.getDeltaTime() / 1000;
 
         player.nearestBody = starSystemManager.getNearestBody();
@@ -408,9 +391,8 @@ scene.executeWhenReady(() => {
         let deplacement = player.listenToKeyboard(keyboard, deltaTime);
         starSystemManager.translateAllCelestialBody(deplacement);
 
-        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime * timeMultiplicator);
+        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime * Settings.TIME_MULTIPLIER);
 
         scene.render();
     });
 });
-

@@ -1,5 +1,6 @@
 import {
     Axis,
+    Color3,
     DepthRenderer,
     Engine,
     FxaaPostProcess,
@@ -44,7 +45,6 @@ console.log("GPU utilisé : " + engine.getGlInfo().renderer);
 let scene = new Scene(engine);
 
 let depthRenderer = new DepthRenderer(scene);
-scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
@@ -63,7 +63,7 @@ player.camera.maxZ = Math.max(Settings.PLANET_RADIUS * 100, 10000);
 let starSystem = new StarSystemManager(Settings.VERTEX_RESOLUTION);
 
 let sun = new Star("Weierstrass", 0.4 * Settings.PLANET_RADIUS, starSystem, scene);
-sun.translate(new Vector3(-910000, 0, -1700000));
+sun.translate(new Vector3(-910e3, 0, -1700e3));
 
 depthRenderer.setMaterialForRendering(sun.mesh);
 
@@ -92,9 +92,9 @@ let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, s
 });
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
-moon.colorSettings.plainColor = new Vector3(0.5, 0.5, 0.5);
-moon.colorSettings.desertColor = new Vector3(0.4, 0.4, 0.4);
-moon.colorSettings.steepColor = new Vector3(0.1, 0.1, 0.1);
+moon.colorSettings.plainColor = new Color3(0.5, 0.5, 0.5);
+moon.colorSettings.desertColor = new Color3(0.4, 0.4, 0.4);
+moon.colorSettings.steepColor = new Color3(0.1, 0.1, 0.1);
 moon.updateColors();
 
 moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockNormalMap, scene));
@@ -120,9 +120,9 @@ Ares.terrainSettings.continentBaseHeight = 5e3;
 Ares.terrainSettings.maxMountainHeight = 20e3;
 Ares.terrainSettings.mountainsMinValue = 0.4;
 
-Ares.colorSettings.plainColor = new Vector3(0.4, 0.3, 0.3);
-Ares.colorSettings.beachColor = new Vector3(0.3, 0.15, 0.1);
-Ares.colorSettings.bottomColor = new Vector3(0.05, 0.1, 0.15);
+Ares.colorSettings.plainColor = new Color3(0.4, 0.3, 0.3);
+Ares.colorSettings.beachColor = new Color3(0.3, 0.15, 0.1);
+Ares.colorSettings.bottomColor = new Color3(0.05, 0.1, 0.15);
 Ares.updateColors();
 
 let aresAtmosphere = Ares.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene); // = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, scene);

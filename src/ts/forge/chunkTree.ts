@@ -59,11 +59,8 @@ export class ChunkTree {
      * @param f the function to apply on every chunk
      */
     public executeOnEveryChunk(f: (chunk: PlanetChunk) => void, tree: quadTree = this.tree): void {
-        if (tree instanceof PlanetChunk) {
-            f(tree);
-        } else {
-            for (let stem of tree) this.executeOnEveryChunk(f, stem);
-        }
+        if (tree instanceof PlanetChunk) f(tree);
+        else for (const stem of tree) this.executeOnEveryChunk(f, stem);
     }
 
     /**
@@ -75,7 +72,7 @@ export class ChunkTree {
     private requestDeletion(tree: quadTree, newChunks: PlanetChunk[], isFiner: boolean): void {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             let deleteTask: DeleteTask = {
-                taskType: TaskType.Deletion,
+                type: TaskType.Deletion,
                 chunk: chunk,
                 newChunks: newChunks,
                 isFiner: isFiner
@@ -100,14 +97,12 @@ export class ChunkTree {
      * @returns The updated tree
      */
     private updateLODRecursively(observerPositionW: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
-        // position du noeud du quadtree par rapport à la sphère 
-        let relativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.planet);
+        let nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.planet);
+        let nodePositionW = nodeRelativePosition.add(this.planet.getAbsolutePosition());
 
-        // position par rapport à la caméra
-        let chunkPositionW = relativePosition.add(this.planet.getAbsolutePosition());
-        let direction = chunkPositionW.subtract(observerPositionW);
-        // distance carré entre caméra et noeud du quadtree
+        let direction = nodePositionW.subtract(observerPositionW);
         let distanceToNodeSquared = direction.lengthSquared();
+
         let distanceThreshold = Settings.RENDER_DISTANCE_MULTIPLIER * this.rootChunkLength / (2 ** walked.length);
 
         if ((distanceToNodeSquared < distanceThreshold ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
@@ -134,7 +129,7 @@ export class ChunkTree {
         } else {
             // if we are far from the node
             if (tree instanceof PlanetChunk) {
-                this.checkForOcclusion(tree, chunkPositionW, observerPositionW);
+                this.checkForOcclusion(tree, nodePositionW, observerPositionW);
                 return tree;
             }
             if (walked.length >= this.minDepth) {

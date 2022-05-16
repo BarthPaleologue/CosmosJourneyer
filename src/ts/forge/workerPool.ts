@@ -31,4 +31,13 @@ export class WorkerPool {
         //@ts-ignore
         this.taskQueue.push(task);
     }
+
+    public hasTask(): boolean {
+        return this.taskQueue.length > 0;
+    }
+
+    public nextTask(): DeleteTask | BuildTask {
+        if(this.hasTask()) return this.taskQueue.shift()!;
+        throw new Error("The workerpool has no task to dispatch");
+    }
 }

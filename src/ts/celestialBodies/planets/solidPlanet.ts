@@ -13,7 +13,7 @@ import {
     Texture,
     Quaternion,
     Matrix,
-    MaterialHelper
+    MaterialHelper, Color3
 } from "@babylonjs/core";
 
 import bottomNormalMap from "../../../asset/textures/crackednormal.jpg";
@@ -44,12 +44,12 @@ export enum ColorMode {
 export interface ColorSettings {
     mode: number;
 
-    snowColor: Vector3;
-    steepColor: Vector3;
-    plainColor: Vector3;
-    beachColor: Vector3;
-    desertColor: Vector3;
-    bottomColor: Vector3;
+    snowColor: Color3;
+    steepColor: Color3;
+    plainColor: Color3;
+    beachColor: Color3;
+    desertColor: Color3;
+    bottomColor: Color3;
 
     beachSize: number;
     steepSharpness: number;
@@ -113,12 +113,12 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.colorSettings = {
             mode: ColorMode.DEFAULT,
 
-            snowColor: new Vector3(1, 1, 1),
-            steepColor: new Vector3(55, 42, 42).scale(1 / 255),
-            plainColor: new Vector3(56, 94, 6).scale(1 / 255),
-            beachColor: new Vector3(0.7, 0.7, 0.2),
-            desertColor: new Vector3(178, 107, 42).scale(1 / 255),
-            bottomColor: new Vector3(0.5, 0.5, 0.5),
+            snowColor: new Color3(1, 1, 1),
+            steepColor: new Color3(55, 42, 42).scale(1 / 255),
+            plainColor: new Color3(56, 94, 6).scale(1 / 255),
+            beachColor: new Color3(0.7, 0.7, 0.2),
+            desertColor: new Color3(178, 107, 42).scale(1 / 255),
+            bottomColor: new Color3(0.5, 0.5, 0.5),
 
             beachSize: 300,
             steepSharpness: 2,
@@ -252,12 +252,12 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.surfaceMaterial.setFloat("beachSize", this.colorSettings.beachSize);
         this.surfaceMaterial.setFloat("steepSharpness", this.colorSettings.steepSharpness);
 
-        this.surfaceMaterial.setVector3("snowColor", this.colorSettings.snowColor);
-        this.surfaceMaterial.setVector3("steepColor", this.colorSettings.steepColor);
-        this.surfaceMaterial.setVector3("plainColor", this.colorSettings.plainColor);
-        this.surfaceMaterial.setVector3("beachColor", this.colorSettings.beachColor);
-        this.surfaceMaterial.setVector3("desertColor", this.colorSettings.desertColor);
-        this.surfaceMaterial.setVector3("bottomColor", this.colorSettings.bottomColor);
+        this.surfaceMaterial.setColor3("snowColor", this.colorSettings.snowColor);
+        this.surfaceMaterial.setColor3("steepColor", this.colorSettings.steepColor);
+        this.surfaceMaterial.setColor3("plainColor", this.colorSettings.plainColor);
+        this.surfaceMaterial.setColor3("beachColor", this.colorSettings.beachColor);
+        this.surfaceMaterial.setColor3("desertColor", this.colorSettings.desertColor);
+        this.surfaceMaterial.setColor3("bottomColor", this.colorSettings.bottomColor);
 
         this.surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
     }

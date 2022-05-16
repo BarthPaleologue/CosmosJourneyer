@@ -1,11 +1,12 @@
 import {
-    Engine,
-    Scene,
-    DepthRenderer,
     Axis,
-    Vector3,
-    Tools,
+    Color3,
+    DepthRenderer,
+    Engine,
     FxaaPostProcess,
+    Scene,
+    Tools,
+    Vector3,
     VolumetricLightScatteringPostProcess
 } from "@babylonjs/core";
 
@@ -23,6 +24,7 @@ import {centeredRandom, nrand, randInt} from "./utils/random";
 import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
 import {Star} from "./celestialBodies/stars/star";
 import {Settings} from "./settings";
+import {CelestialBodyType} from "./celestialBodies/interfaces";
 
 style.default;
 
@@ -30,7 +32,7 @@ let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let engine = new Engine(canvas);
+let engine = new Engine(canvas, true);
 engine.loadingScreen.displayLoadingUI();
 
 console.log("GPU utilisé : " + engine.getGlInfo().renderer);
@@ -38,7 +40,6 @@ console.log("GPU utilisé : " + engine.getGlInfo().renderer);
 let scene = new Scene(engine);
 
 let depthRenderer = new DepthRenderer(scene);
-scene.renderTargetsEnabled = true;
 scene.customRenderTargets.push(depthRenderer.getDepthMap());
 depthRenderer.getDepthMap().renderList = [];
 
@@ -84,7 +85,7 @@ let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManage
 planet.translate(new Vector3(planet.getRadius() * 2, 0, 4 * planet.getRadius()));
 console.log("seed : ", planet.getSeed().toString());
 console.table(planet.physicalProperties);
-planet.colorSettings.plainColor = new Vector3(0.22, 0.37, 0.024).add(new Vector3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
+planet.colorSettings.plainColor = new Color3(0.22, 0.37, 0.024).add(new Color3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
 planet.colorSettings.beachSize = 250 + 100 * centeredRandom();
 planet.terrainSettings.continentsFragmentation = nrand(0.5, 0.2);
 
@@ -128,7 +129,6 @@ window.addEventListener("resize", () => {
     engine.resize();
 });
 
-
 depthRenderer.getDepthMap().renderList?.push(sun.mesh);
 
 let collisionWorker = new CollisionWorker(player, starSystemManager);
@@ -144,9 +144,7 @@ scene.executeWhenReady(() => {
 
         starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime);
 
-        if (isMouseEnabled) {
-            player.listenToMouse(mouse, deltaTime);
-        }
+        if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 
         gamepad.update();
 
@@ -157,9 +155,8 @@ scene.executeWhenReady(() => {
         starSystemManager.translateAllCelestialBody(deplacement);
 
         if (!collisionWorker.isBusy() && player.isOrbiting()) {
-            if (player.nearestBody instanceof SolidPlanet) {
-                //FIXME: se passer de instanceof
-                collisionWorker.checkCollision(player.nearestBody);
+            if (player.nearestBody?.getBodyType() == CelestialBodyType.SOLID) {
+                collisionWorker.checkCollision(player.nearestBody as SolidPlanet);
             }
         }
     };

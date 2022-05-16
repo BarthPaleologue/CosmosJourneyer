@@ -11,7 +11,7 @@ export enum TaskType {
 }
 
 export interface Task {
-    taskType: TaskType;
+    type: TaskType;
     isFiner: boolean
     chunk: PlanetChunk;
 }

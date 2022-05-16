@@ -1,4 +1,4 @@
-import {Camera, Effect, Matrix, PostProcess, Scene, Texture, Vector3} from "@babylonjs/core";
+import {Camera, Effect, Matrix, PostProcess, Scene, Texture, Vector3, Color3} from "@babylonjs/core";
 import {CShaderData, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
 
 export abstract class SpacePostProcess extends PostProcess {
@@ -65,6 +65,9 @@ export abstract class SpacePostProcess extends PostProcess {
                         break;
                     case ShaderDataType.Vector3:
                         effect.setVector3(uniformName, (this.uniforms[uniformName] as CShaderData<Vector3>).get());
+                        break;
+                    case ShaderDataType.Color3:
+                        effect.setColor3(uniformName, (this.uniforms[uniformName] as CShaderData<Color3>).get());
                         break;
                     case ShaderDataType.Matrix:
                         effect.setMatrix(uniformName, (this.uniforms[uniformName] as CShaderData<Matrix>).get());

@@ -29,7 +29,7 @@ export class PlanetChunk {
         this.mesh.position.z -= planet.getRadius();
 
         let buildTask: BuildTask = {
-            taskType: TaskType.Build,
+            type: TaskType.Build,
             planet: planet,
             position: this.mesh.position.clone(),
             depth: path.length,
@@ -51,14 +51,9 @@ export class PlanetChunk {
         return this.ready;
     }
 
-    public markAsReady() {
-        this.ready = true;
-        this.mesh.setEnabled(true);
-    }
-
-    public markAsNotReady() {
-        this.ready = false;
-        this.mesh.setEnabled(false);
+    public setReady(ready: boolean) {
+        this.ready = ready;
+        this.mesh.setEnabled(ready);
     }
 
     public dispose() {

@@ -1,4 +1,4 @@
-import {Vector3} from "@babylonjs/core";
+import {Color3} from "@babylonjs/core";
 
 export interface AtmosphereSettings {
     atmosphereRadius: number;
@@ -21,7 +21,7 @@ export interface CloudSettings {
     cloudDetailFrequency: number;
     cloudPower: number;
     cloudSharpness: number;
-    cloudColor: Vector3;
+    cloudColor: Color3;
     worleySpeed: number;
     detailSpeed: number;
 }
@@ -54,6 +54,7 @@ export enum ShaderDataType {
     Auto,
     Float,
     Vector3,
+    Color3,
     Matrix,
     Texture,
     FloatArray
