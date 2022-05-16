@@ -61,7 +61,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     public colorSettings: ColorSettings;
 
-    readonly waterLevel: number;
+    readonly oceanLevel: number;
 
     override readonly physicalProperties: SolidPhysicalProperties;
 
@@ -70,8 +70,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     public terrainSettings: TerrainSettings;
 
     private internalTime = 0;
-
-    readonly rootChunkLength: number; // length of eachChunk
 
     readonly attachNode: Mesh; // reprensents the center of the sphere
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
@@ -93,9 +91,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.physicalProperties = physicalProperties;
 
         // TODO: faire quelque chose de réaliste
-        this.waterLevel = 20e2 * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
-
-        this.rootChunkLength = this._radius * 2;
+        this.oceanLevel = 20e2 * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
 
         this.attachNode = new Mesh(`${this._name}AttachNode`, scene);
 
@@ -267,7 +263,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         //TODO: when the code is robust enough, get rid of this method
         this.surfaceMaterial.setInt("colorMode", this.colorSettings.mode);
 
-        this.surfaceMaterial.setFloat("waterLevel", this.waterLevel);
+        this.surfaceMaterial.setFloat("waterLevel", this.oceanLevel);
         this.surfaceMaterial.setFloat("beachSize", this.colorSettings.beachSize);
         this.surfaceMaterial.setFloat("steepSharpness", this.colorSettings.steepSharpness);
 
@@ -313,7 +309,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     }
 
     public override getApparentRadius(): number {
-        return super.getRadius() + this.waterLevel;
+        return super.getRadius() + this.oceanLevel;
     }
 
     setAbsolutePosition(newPosition: Vector3): void {

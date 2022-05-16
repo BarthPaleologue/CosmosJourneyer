@@ -239,6 +239,7 @@ export class PlayerController implements Transformable {
     }
 
     public isOrbiting(): boolean {
+        //TODO: do not hardcode
         const orbitLimitFactor = 2.5;
         if (this.nearestBody == null) return false;
         else return this.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * this.nearestBody.getRadius()) ** 2;

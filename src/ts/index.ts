@@ -1,12 +1,12 @@
 import {
-    Engine,
-    Scene,
-    DepthRenderer,
     Axis,
-    Vector3,
+    DepthRenderer,
+    Engine,
+    FxaaPostProcess,
+    Scene,
     Texture,
     Tools,
-    FxaaPostProcess,
+    Vector3,
     VolumetricLightScatteringPostProcess
 } from "@babylonjs/core";
 
@@ -28,6 +28,7 @@ import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
 
 import * as style from "../styles/style.scss";
 import {Settings} from "./settings";
+import {CelestialBodyType} from "./celestialBodies/interfaces";
 
 style.default;
 
@@ -163,9 +164,8 @@ function updateScene() {
     starSystem.translateAllCelestialBody(deplacement);
 
     if (!collisionWorker.isBusy() && player.isOrbiting()) {
-        if (player.nearestBody instanceof SolidPlanet) {
-            //FIXME: se passer de instanceof
-            collisionWorker.checkCollision(player.nearestBody);
+        if (player.nearestBody?.getBodyType() == CelestialBodyType.SOLID) {
+            collisionWorker.checkCollision(player.nearestBody as SolidPlanet);
         }
     }
 }

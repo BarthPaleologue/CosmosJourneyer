@@ -1,12 +1,13 @@
 import {Vector3} from "@babylonjs/core";
 
-import {getChunkSphereSpacePositionFromPath, PlanetChunk} from "./planetChunk";
+import {PlanetChunk} from "./planetChunk";
 import {Direction} from "../../../utils/direction";
 import {ChunkForge} from "../../../forge/chunkForge";
 import {DeleteTask, TaskType} from "../../../forge/taskInterfaces";
 import {SolidPlanet} from "./solidPlanet";
 import {rayIntersectSphere} from "../../../utils/math";
 import {Settings} from "../../../settings";
+import {getChunkSphereSpacePositionFromPath} from "../../../utils/chunkUtils";
 
 /**
  * A quadTree is defined recursively
@@ -105,7 +106,7 @@ export class ChunkTree {
      */
     private updateLODRecursively(observerPositionW: Vector3, observerDirection: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         // position du noeud du quadtree par rapport à la sphère 
-        let relativePosition = getChunkSphereSpacePositionFromPath(this.rootChunkLength, walked, this.direction, this.planet.getRotationQuaternion());
+        let relativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.planet);
 
         // position par rapport à la caméra
         let chunkPositionW = relativePosition.add(this.planet.getAbsolutePosition());
