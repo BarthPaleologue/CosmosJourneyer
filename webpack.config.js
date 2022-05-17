@@ -39,23 +39,27 @@ const config = {
       },
     }),
     new HtmlWebpackPlugin({
+      title: 'Planet Engine',
       filename: "index.html",
       template: path.join(htmlPath, "index.html"),
       chunks: ["showcase"]
     }),
     new HtmlWebpackPlugin({
+      title: 'Demo Planet',
       filename: "planetDemo.html",
-      template: path.join(htmlPath, "planetDemo.html"),
+      template: path.join(htmlPath, "index.html"),
       chunks: ["experimental"]
     }),
     new HtmlWebpackPlugin({
+      title: 'Randomizer',
       filename: "random.html",
-      template: path.join(htmlPath, "random.html"),
+      template: path.join(htmlPath, "index.html"),
       chunks: ["random"]
     }),
     new HtmlWebpackPlugin({
+      title: 'Demo Star',
       filename: "starDemo.html",
-      template: path.join(htmlPath, "starDemo.html"),
+      template: path.join(htmlPath, "index.html"),
       chunks: ["starDemo"]
     }),
 
@@ -86,8 +90,10 @@ const config = {
 
       {
         test: /\.html$/i,
+        exclude: /node_modules/,
         loader: "html-loader",
       },
+
       {
         test: /\.(glsl|vs|fs|vert|frag|fx)$/,
         exclude: /node_modules/,

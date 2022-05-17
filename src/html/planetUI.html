@@ -1,0 +1,225 @@
+<nav>
+    <div id="generalLink">General</div>
+    <div id="physicLink">Physic</div>
+    <div id="oceanLink">Ocean</div>
+    <div id="surfaceLink">Surface</div>
+    <div id="cloudsLink">Clouds</div>
+    <div id="atmosphereLink">Atmosphere</div>
+    <div id="ringsLink">Rings</div>
+</nav>
+
+<div class="ui" id="generalUI">
+    <h1>General</h1>
+
+    <p>Zoom : </p>
+    <div id="zoom"></div>
+
+    <p>Sun Orientation : </p>
+    <div id="sunOrientation"></div>
+
+    <p>Axial Tilt</p>
+    <div id="axialTilt"></div>
+
+    <p>Time speed : </p>
+    <div id="timeModifier"></div>
+
+    <p>Camera FOV : </p>
+    <div id="cameraFOV"></div>
+</div>
+
+<div hidden class="ui" id="starPhysicUI">
+
+    <h1>Star</h1>
+
+    <p>Temperature (K) : </p>
+    <div id="temperature"></div>
+
+    <p>Exposure : </p>
+    <div id="exposure"></div>
+
+    <p>Decay : </p>
+    <div id="decay"></div>
+
+</div>
+
+<div hidden class="ui" id="physicUI">
+    <h1>Physics</h1>
+
+    <p>Minimum Temperature : </p>
+    <div id="minTemperature"></div>
+
+    <p>Maximum Temperature : </p>
+    <div id="maxTemperature"></div>
+</div>
+
+<div hidden class="ui" id="oceanUI">
+    <h1>Ocean</h1>
+
+    <div id="oceanToggler" class="container">
+        <p>Enable</p>
+        <input type="checkbox" checked>
+        <span class="checkmark"></span>
+    </div>
+
+    <p>Alpha Modifier : </p>
+    <div id="alphaModifier"></div>
+
+    <p>Depth Modifier : </p>
+    <div id="depthModifier"></div>
+
+    <p>Specular Power : </p>
+    <div id="specularPower"></div>
+
+    <p>Smoothness : </p>
+    <div id="smoothness"></div>
+
+    <p>Wave Blending Sharpness : </p>
+    <div id="waveBlendingSharpness"></div>
+
+</div>
+<div hidden class="ui" id="surfaceUI">
+
+    <h1>Surface Color</h1>
+
+    <div class="colorPickerContainer">
+        <p>Snow Color :</p>
+        <input type="color" id="snowColor">
+    </div>
+
+    <div class="colorPickerContainer">
+        <p>Plain Color :</p>
+        <input type="color" id="plainColor">
+    </div>
+
+    <div class="colorPickerContainer">
+        <p>Steep Color :</p>
+        <input type="color" id="steepColor">
+    </div>
+
+    <div class="colorPickerContainer">
+        <p>Beach Sand Color :</p>
+        <input type="color" id="sandColor">
+    </div>
+
+    <div class="colorPickerContainer">
+        <p>Desert Sand Color :</p>
+        <input type="color" id="desertColor">
+    </div>
+
+
+    <p>Sand Size : </p>
+    <div id="sandSize"></div>
+
+    <p>Steep Sharpness : </p>
+    <div id="steepSharpness"></div>
+
+    <p>Normal Sharpness : </p>
+    <div id="normalSharpness"></div>
+
+</div>
+<div hidden class="ui" id="cloudsUI">
+
+    <h1>Clouds</h1>
+
+    <div id="cloudsToggler" class="container">
+        <p>Enable</p>
+        <input type="checkbox" checked>
+        <span class="checkmark"></span>
+    </div>
+
+    <div class="colorPickerContainer">
+        <p>Cloud Color :</p>
+        <input type="color" id="cloudColor">
+    </div>
+
+    <p>Frequency : </p>
+    <div id="cloudFrequency"></div>
+
+    <p>Detail Frequency : </p>
+    <div id="cloudDetailFrequency"></div>
+
+    <p>Power : </p>
+    <div id="cloudPower"></div>
+
+    <p>Sharpness : </p>
+    <div id="cloudSharpness"></div>
+
+    <p>Main speed : </p>
+    <div id="worleySpeed"></div>
+
+    <p>Detail speed : </p>
+    <div id="detailSpeed"></div>
+
+</div>
+
+<div hidden class="ui" id="atmosphereUI">
+    <h1>Atmosphere</h1>
+
+    <div id="atmosphereToggler" class="container">
+        <p>Enable</p>
+        <input type="checkbox" checked>
+        <span class="checkmark"></span>
+    </div>
+
+    <p>Intensity : </p>
+    <div id="intensity"></div>
+
+    <p>Density : </p>
+    <div id="density"></div>
+
+    <p>Rayleigh Scattering Strength : </p>
+    <div id="rayleighStrength"></div>
+
+    <p>Mie Scattering Strength : </p>
+    <div id="mieStrength"></div>
+
+    <p>Atmosphere Radius : </p>
+    <div id="atmosphereRadius"></div>
+
+    <p>Falloff : </p>
+    <div id="falloff"></div>
+
+    <p>"Red" Wavelength : </p>
+    <div id="redWaveLength"></div>
+
+    <p>"Green" Wavelength : </p>
+    <div id="greenWaveLength"></div>
+
+    <p>"Blue" Wavelength : </p>
+    <div id="blueWaveLength"></div>
+
+    <p>Mie Halo radius</p>
+    <div id="mieHaloRadius"></div>
+
+</div>
+<div hidden class="ui" id="ringsUI">
+
+    <h1>Rings</h1>
+
+    <div id="ringsToggler" class="container">
+        <p>Enable</p>
+        <input type="checkbox" checked>
+        <span class="checkmark"></span>
+    </div>
+
+    <p>Rings minRadius : </p>
+    <div id="ringsMinRadius"></div>
+
+    <p>Rings maxRadius : </p>
+    <div id="ringsMaxRadius"></div>
+
+    <p>Rings Frequency : </p>
+    <div id="ringsFrequency"></div>
+
+    <p>Rings Opacity : </p>
+    <div id="ringsOpacity"></div>
+</div>
+
+<div id="toolbar">
+    <img id="defaultMapButton" src="../asset/buttonIcons/defaultmap.png">
+    <img id="moistureMapButton" src="../asset/buttonIcons/moisturemap.png">
+    <img id="temperatureMapButton" src="../asset/buttonIcons/temperaturemap.png">
+    <img id="normalMapButton" src="../asset/buttonIcons/normalmap.png">
+    <img id="heightMapButton" src="../asset/buttonIcons/heightmap.png">
+
+</div>

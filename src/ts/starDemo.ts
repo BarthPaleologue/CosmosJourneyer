@@ -8,6 +8,10 @@ import {
     VolumetricLightScatteringPostProcess, Vector3
 } from "@babylonjs/core";
 
+import UIHTML from "../html/starUI.html";
+
+document.body.innerHTML += UIHTML;
+
 import {Slider} from "handle-sliderjs";
 
 import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";

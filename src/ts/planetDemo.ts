@@ -24,6 +24,9 @@ import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
 import {Star} from "./celestialBodies/stars/star";
 import {Settings} from "./settings";
 
+import PlanetUI from "../html/planetUI.html";
+document.body.innerHTML += PlanetUI;
+
 style.default;
 sliderStyle.default;
 

@@ -56,6 +56,7 @@ export enum ShaderDataType {
     Vector3,
     Color3,
     Matrix,
+    Quaternion,
     Texture,
     FloatArray
 }
