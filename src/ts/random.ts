@@ -90,7 +90,7 @@ planet.colorSettings.plainColor = new Color3(0.22, 0.37, 0.024).add(new Color3(c
 planet.colorSettings.beachSize = 250 + 100 * centeredRandom();
 planet.terrainSettings.continentsFragmentation = clamp(nrand(0.5, 0.2), 0, 1);
 
-planet.updateColors();
+planet.updateMaterial();
 
 planet.rotate(Axis.X, centeredRandom() / 2);
 

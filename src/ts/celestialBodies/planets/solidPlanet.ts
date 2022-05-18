@@ -32,6 +32,7 @@ import {TaskType} from "../../forge/taskInterfaces";
 import {initMeshTransform} from "../../utils/mesh";
 import {PlayerController} from "../../player/playerController";
 import {StarSystemManager} from "../starSystemManager";
+import {Settings} from "../../settings";
 
 export enum ColorMode {
     DEFAULT,
@@ -91,7 +92,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.physicalProperties = physicalProperties;
 
         // TODO: faire quelque chose de réaliste
-        this.oceanLevel = 20e2 * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
+        this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
 
         this.attachNode = new Mesh(`${this._name}AttachNode`, scene);
 
@@ -204,7 +205,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             new ChunkTree(Direction.Left, this)
         ];
 
-        this.updateColors();
+        this.updateMaterial();
     }
 
     public generateCollisionTask(relativePosition: Vector3): CollisionData {
@@ -244,7 +245,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     /**
      * Updates surfaceMaterial with its new values
      */
-    public updateColors(): void {
+    public updateMaterial(): void {
         //TODO: when the code is robust enough, get rid of this method
         this.surfaceMaterial.setInt("colorMode", this.colorSettings.mode);
 
@@ -260,35 +261,36 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.surfaceMaterial.setColor3("bottomColor", this.colorSettings.bottomColor);
 
         this.surfaceMaterial.setFloat("normalSharpness", this.colorSettings.normalSharpness);
-    }
-
-    public update(player: PlayerController, lightPosition: Vector3, deltaTime: number) {
-        super.update(player, lightPosition, deltaTime);
-
-        this.internalTime += deltaTime;
-
-        this.surfaceMaterial.setVector3("playerPosition", player.getAbsolutePosition());
-        this.surfaceMaterial.setVector3("sunPosition", lightPosition);
-        this.surfaceMaterial.setVector3("planetPosition", this.attachNode.absolutePosition);
-
-        this.surfaceMaterial.setVector3("planetRotationAxis", this.physicalProperties.rotationAxis);
-        this.surfaceMaterial.setFloat("rotationTheta", (this.internalTime / this.physicalProperties.rotationPeriod) % (2 * Math.PI));
 
         this.surfaceMaterial.setFloat("minTemperature", this.physicalProperties.minTemperature);
         this.surfaceMaterial.setFloat("maxTemperature", this.physicalProperties.maxTemperature);
         this.surfaceMaterial.setFloat("pressure", this.physicalProperties.pressure);
-
         this.surfaceMaterial.setFloat("waterAmount", this.physicalProperties.waterAmount);
+
+    }
+
+    public update(player: PlayerController, starPosition: Vector3, deltaTime: number) {
+        super.update(player, starPosition, deltaTime);
+
+        this.internalTime += deltaTime;
+
+        this.surfaceMaterial.setVector3("playerPosition", player.getAbsolutePosition());
+        this.surfaceMaterial.setVector3("sunPosition", starPosition);
+
+        this.surfaceMaterial.setVector3("planetPosition", this.getAbsolutePosition());
+
+        this.surfaceMaterial.setVector3("planetRotationAxis", this.physicalProperties.rotationAxis);
+        this.surfaceMaterial.setFloat("rotationTheta", (this.internalTime / this.physicalProperties.rotationPeriod) % (2 * Math.PI));
 
         this.updateLOD(player.getAbsolutePosition());
     }
 
     public getRelativePosition() {
-        return this.attachNode.position;
+        return this.attachNode.position.clone();
     }
 
     public getAbsolutePosition() {
-        return this.attachNode.getAbsolutePosition().clone();
+        return this.attachNode.getAbsolutePosition();
     }
 
     public override getApparentRadius(): number {

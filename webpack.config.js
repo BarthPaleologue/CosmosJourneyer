@@ -12,7 +12,6 @@ const config = {
 
   entry: {
     showcase: "./src/ts/index.ts",
-    experimental: "./src/ts/planetDemo.ts",
     random: "./src/ts/random.ts",
     starDemo: "./src/ts/starDemo.ts"
   },
@@ -43,12 +42,6 @@ const config = {
       filename: "index.html",
       template: path.join(htmlPath, "index.html"),
       chunks: ["showcase"]
-    }),
-    new HtmlWebpackPlugin({
-      title: 'Demo Planet',
-      filename: "planetDemo.html",
-      template: path.join(htmlPath, "index.html"),
-      chunks: ["experimental"]
     }),
     new HtmlWebpackPlugin({
       title: 'Randomizer',
