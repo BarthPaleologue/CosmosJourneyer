@@ -1,5 +1,5 @@
 import {CelestialBody} from "../celestialBody";
-import {PlanetPhysicalProperties, Seedable} from "../interfaces";
+import {PlanetPhysicalProperties, PlanetPostProcesses, Seedable} from "../interfaces";
 import {PlanetPostProcess} from "../../postProcesses/planetPostProcess";
 import {
     AtmosphericScatteringPostProcess
@@ -16,11 +16,18 @@ export abstract class AbstractPlanet extends CelestialBody implements Seedable {
     readonly _radius: number;
     protected _seed: number[];
     abstract override physicalProperties: PlanetPhysicalProperties;
-    protected postProcessList: PlanetPostProcess[] = [];
+    public postProcesses: PlanetPostProcesses;
+
     protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed = [0, 0, 0]) {
         super(name, starSystemManager);
         this._radius = radius;
         this._seed = seed;
+        this.postProcesses = {
+            atmosphere: null,
+            ocean: null,
+            clouds: null,
+            rings: null
+        }
     }
 
     /**
@@ -37,25 +44,25 @@ export abstract class AbstractPlanet extends CelestialBody implements Seedable {
     public createAtmosphere(atmosphereHeight: number, star: Star, scene: Scene): AtmosphericScatteringPostProcess {
         let atmosphere = new AtmosphericScatteringPostProcess(`${this.getName()}Atmosphere`, this, atmosphereHeight, star, scene);
         atmosphere.settings.intensity = 15 * this.physicalProperties.pressure;
-        this.postProcessList.push(atmosphere);
+        this.postProcesses.atmosphere = atmosphere;
         return atmosphere;
     }
 
     public createClouds(cloudLayerHeight: number, star: Star, scene: Scene): FlatCloudsPostProcess {
         let clouds = new FlatCloudsPostProcess(`${this.getName()}Clouds`, this, cloudLayerHeight, star, scene);
-        this.postProcessList.push(clouds);
+        this.postProcesses.clouds = clouds;
         return clouds;
     }
 
     public createOcean(star: Star, scene: Scene): OceanPostProcess {
         let ocean = new OceanPostProcess(`${this.getName()}Ocean`, this, star, scene);
-        this.postProcessList.push(ocean);
+        this.postProcesses.ocean = ocean;
         return ocean;
     }
 
     public createRings(star: Star, scene: Scene): RingsPostProcess {
         let rings = new RingsPostProcess(`${this.getName()}Rings`, this, star, scene);
-        this.postProcessList.push(rings);
+        this.postProcesses.rings = rings;
         return rings;
     }
 
@@ -68,6 +75,10 @@ export abstract class AbstractPlanet extends CelestialBody implements Seedable {
 
     public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number) {
         super.update(player, lightPosition, deltaTime);
-        for(const postprocess of this.postProcessList) postprocess.update(deltaTime);
+        for (const postprocessKey in this.postProcesses) {
+            if (this.postProcesses[postprocessKey] != null) {
+                this.postProcesses[postprocessKey]!.update(deltaTime);
+            }
+        }
     }
 }

@@ -1,5 +1,10 @@
 import {Quaternion, Vector3} from "@babylonjs/core";
 import {CollisionData} from "../forge/workerDataInterfaces";
+import {AtmosphericScatteringPostProcess} from "../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import {OceanPostProcess} from "../postProcesses/planetPostProcesses/oceanPostProcess";
+import {FlatCloudsPostProcess} from "../postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import {RingsPostProcess} from "../postProcesses/planetPostProcesses/ringsPostProcess";
+import {PlanetPostProcess} from "../postProcesses/planetPostProcess";
 
 export enum CelestialBodyType {
     STAR,
@@ -87,4 +92,12 @@ export interface PlanetPhysicalProperties extends BodyPhysicalProperties {
 
 export interface SolidPhysicalProperties extends PlanetPhysicalProperties {
     waterAmount: number;
+}
+
+export interface PlanetPostProcesses {
+    [details: string] : PlanetPostProcess | null;
+    atmosphere: AtmosphericScatteringPostProcess | null;
+    ocean: OceanPostProcess | null;
+    clouds: FlatCloudsPostProcess | null;
+    rings: RingsPostProcess | null;
 }
