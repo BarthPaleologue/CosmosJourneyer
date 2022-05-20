@@ -58,7 +58,7 @@ console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTI
 
 let player = new PlayerController(scene);
 player.setSpeed(0.2 * Settings.PLANET_RADIUS);
-player.camera.maxZ = Settings.PLANET_RADIUS * 100;
+player.camera.maxZ = Settings.PLANET_RADIUS * 600;
 
 let keyboard = new Keyboard();
 let mouse = new Mouse();
@@ -66,8 +66,8 @@ let gamepad = new Gamepad();
 
 let starSystem = new StarSystemManager(Settings.VERTEX_RESOLUTION);
 
-let sun = new Star("Weierstrass", 0.4 * Settings.PLANET_RADIUS, starSystem, scene);
-sun.translate(new Vector3(-1, 0, -1).normalizeToNew().scale(Settings.PLANET_RADIUS * 5));
+let sun = new Star("Weierstrass", 6.4 * Settings.PLANET_RADIUS, starSystem, scene);
+sun.translate(new Vector3(-1, 0, -1).normalizeToNew().scale(Settings.PLANET_RADIUS * 160));
 
 let starfield = new StarfieldPostProcess("starfield", sun, scene);
 
@@ -103,8 +103,8 @@ moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockNormalMap, sce
 moon.surfaceMaterial.setTexture("bottomNormalMap", new Texture(rockNormalMap, scene));
 moon.surfaceMaterial.setTexture("sandNormalMap", new Texture(rockNormalMap, scene));
 
-moon.translate(new Vector3(Math.cos(2.5), 0, Math.sin(2.5)).scale(3 * planet.getRadius()));
-moon.translate(planet.attachNode.getAbsolutePosition());
+moon.translate(new Vector3(Math.cos(2.2), 0, Math.sin(2.2)).scale(5 * planet.getRadius()));
+moon.translate(planet.getAbsolutePosition());
 
 let Ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene, {
     rotationPeriod: 24 * 60 * 60 / 100,
@@ -115,7 +115,7 @@ let Ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene, {
     pressure: 0.5,
     waterAmount: 0.3
 });
-Ares.translate(new Vector3(-1, 0, 1).scale(Settings.PLANET_RADIUS * 4));
+Ares.translate(new Vector3(-1.5, 0, 2).scale(Settings.PLANET_RADIUS * 7));
 
 Ares.terrainSettings.continentsFragmentation = 0.5;
 Ares.terrainSettings.continentBaseHeight = 5e3;
