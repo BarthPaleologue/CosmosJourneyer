@@ -435,7 +435,7 @@ void main() {
 	vec3 screenColor = color.rgb * (sqrt(ndl*ndl2) + specComp*ndl2);
 
 	if(colorMode == 1) screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
-	if(colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.7, 0.7, 1.0), temperature01);
+	if(colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.1, 0.2, 1.0), temperature01);
 	if(colorMode == 3) screenColor = normal*0.5 + 0.5;
 	if(colorMode == 4) screenColor = vec3(elevation01);
 	if(colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vSamplePoint)));

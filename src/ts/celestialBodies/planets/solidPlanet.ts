@@ -128,7 +128,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
 
         // TODO: make a class for that monster
-        let surfaceMaterial = new ShaderMaterial("surfaceColor", scene, "./shaders/surfaceColor",
+        let surfaceMaterial = new ShaderMaterial(`${this.getName()}SurfaceColor`, scene, "./shaders/surfaceColor",
             {
                 attributes: ["position", "normal", "uv"],
                 uniforms: [
