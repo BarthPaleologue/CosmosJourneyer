@@ -135,9 +135,9 @@ aresAtmosphere.settings.blueWaveLength = 670;
 let fxaa = new FxaaPostProcess("fxaa", 1, player.camera, Texture.BILINEAR_SAMPLINGMODE);
 
 // TODO: mettre le VLS dans Star => par extension créer un système de gestion des post process généralisé
-let vls = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
-vls.exposure = 1.0;
-vls.decay = 0.95;
+sun.postProcesses.volumetricLight = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
+sun.postProcesses.volumetricLight.exposure = 1.0;
+sun.postProcesses.volumetricLight.decay = 0.95;
 
 let isMouseEnabled = false;
 

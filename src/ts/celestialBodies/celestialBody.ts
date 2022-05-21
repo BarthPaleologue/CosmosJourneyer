@@ -1,6 +1,12 @@
 import {Vector3, Quaternion, Space, Matrix} from "@babylonjs/core";
 import {Algebra} from "../utils/algebra";
-import {BodyPhysicalProperties, CelestialBodyType, Transformable} from "./interfaces";
+import {
+    BodyPhysicalProperties,
+    BodyPostProcesses,
+    CelestialBodyType,
+    PlanetPostProcesses,
+    Transformable
+} from "./interfaces";
 import {PlayerController} from "../player/playerController";
 import {StarSystemManager} from "./starSystemManager";
 
@@ -8,6 +14,7 @@ export abstract class CelestialBody implements Transformable {
     protected abstract bodyType: CelestialBodyType;
 
     abstract physicalProperties: BodyPhysicalProperties;
+    abstract postProcesses: BodyPostProcesses;
 
     readonly _starSystemManager: StarSystemManager;
 

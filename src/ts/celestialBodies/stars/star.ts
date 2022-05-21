@@ -3,16 +3,15 @@ import {CelestialBody} from "../celestialBody";
 
 import {
     Axis,
-    Matrix,
     Mesh,
     MeshBuilder,
     Quaternion,
     Scene,
     ShaderMaterial,
     Space,
-    Vector3
+    Vector3, VolumetricLightScatteringPostProcess
 } from "@babylonjs/core";
-import {CelestialBodyType, StarPhysicalProperties} from "../interfaces";
+import {StarPostProcesses, CelestialBodyType, StarPhysicalProperties} from "../interfaces";
 import {initMeshTransform} from "../../utils/mesh";
 import {PlayerController} from "../../player/playerController";
 import {StarSystemManager} from "../starSystemManager";
@@ -25,6 +24,8 @@ export class Star extends CelestialBody {
     private internalTime = 0;
     protected bodyType = CelestialBodyType.STAR;
     physicalProperties: StarPhysicalProperties;
+
+    public override postProcesses: StarPostProcesses
 
     constructor(name: string, radius: number,
                 starSystemManager: StarSystemManager, scene: Scene,
@@ -49,18 +50,20 @@ export class Star extends CelestialBody {
                 uniforms: [
                     "world", "worldViewProjection", "planetWorldMatrix",
                     "starColor", "time", "logarithmicDepthConstant"
-                ],
-                //defines: ["#define LOGARITHMICDEPTH"]
+                ]
             }
         );
-        /*starMaterial.onBindObservable.add(() => {
-            let effect = starMaterial.getEffect();
-            MaterialHelper.BindLogDepth(null, effect, scene);
-        });*/
 
         this.starMaterial = starMaterial;
 
         this.mesh.material = this.starMaterial;
+
+        //TODO: post process arrives too early (need painting composition)
+        this.postProcesses = {
+            volumetricLight: new VolumetricLightScatteringPostProcess(`${name}VolumetricLight`, 1, scene.activeCamera!, this.mesh, 100)
+        }
+        this.postProcesses.volumetricLight!.exposure = 1.0;
+        this.postProcesses.volumetricLight!.decay = 0.95;
     }
 
     public setAbsolutePosition(newPosition: Vector3): void {

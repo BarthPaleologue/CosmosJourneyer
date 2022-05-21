@@ -16,7 +16,7 @@ export abstract class AbstractPlanet extends CelestialBody implements Seedable {
     readonly _radius: number;
     protected _seed: number[];
     abstract override physicalProperties: PlanetPhysicalProperties;
-    public postProcesses: PlanetPostProcesses;
+    public override postProcesses: PlanetPostProcesses;
 
     protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed = [0, 0, 0]) {
         super(name, starSystemManager);
