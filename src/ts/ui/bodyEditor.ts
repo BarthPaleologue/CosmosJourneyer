@@ -223,7 +223,7 @@ export class BodyEditor {
         for (const slider of this.atmosphereSliders) slider.remove();
         this.atmosphereSliders.length = 0;
 
-        if(planet.postProcesses.atmosphere != null) {
+        if (planet.postProcesses.atmosphere != null) {
             let atmosphere = planet.postProcesses.atmosphere;
 
             document.getElementById("atmosphereToggler")?.addEventListener("click", () => {
@@ -278,7 +278,7 @@ export class BodyEditor {
         for (const slider of this.cloudsSliders) slider.remove();
         this.cloudsSliders.length = 0;
 
-        if(planet.postProcesses.clouds != null) {
+        if (planet.postProcesses.clouds != null) {
             let flatClouds = planet.postProcesses.clouds!;
 
             document.getElementById("cloudsToggler")?.addEventListener("click", () => {
@@ -354,7 +354,7 @@ export class BodyEditor {
         for (const slider of this.oceanSliders) slider.remove();
         this.oceanSliders.length = 0;
 
-        if(planet.postProcesses.ocean != null) {
+        if (planet.postProcesses.ocean != null) {
             let ocean = planet.postProcesses.ocean;
 
             document.getElementById("oceanToggler")?.addEventListener("click", () => {
@@ -391,19 +391,19 @@ export class BodyEditor {
             planet.updateMaterial();
         });
         document.getElementById("moistureMapButton")!.addEventListener("click", () => {
-            planet.colorSettings.mode = ColorMode.MOISTURE;
+            planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.MOISTURE) ? ColorMode.MOISTURE : ColorMode.DEFAULT;
             planet.updateMaterial();
         });
         document.getElementById("temperatureMapButton")!.addEventListener("click", () => {
-            planet.colorSettings.mode = ColorMode.TEMPERATURE;
+            planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.TEMPERATURE) ? ColorMode.TEMPERATURE : ColorMode.DEFAULT;
             planet.updateMaterial();
         });
         document.getElementById("normalMapButton")!.addEventListener("click", () => {
-            planet.colorSettings.mode = ColorMode.NORMAL;
+            planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.NORMAL) ? ColorMode.NORMAL : ColorMode.DEFAULT;
             planet.updateMaterial();
         });
         document.getElementById("heightMapButton")!.addEventListener("click", () => {
-            planet.colorSettings.mode = ColorMode.HEIGHT;
+            planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.HEIGHT) ? ColorMode.HEIGHT : ColorMode.DEFAULT;
             planet.updateMaterial();
         });
     }
