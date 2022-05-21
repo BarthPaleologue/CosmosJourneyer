@@ -337,7 +337,7 @@ void main() {
 	vec3 lightRayW = normalize(sunPosition - vPositionW); // light ray direction in world space
 
 	vec3 sphereNormalW = vec3(world * vec4(vUnitSamplePoint, 0.0));
-	float ndl = max(0.01, dot(sphereNormalW, lightRayW));
+	float ndl = max(0.002, dot(sphereNormalW, lightRayW));
 
 	// la unitPosition ne prend pas en compte la rotation de la planète
 	vec3 seededSamplePoint = normalize(vUnitSamplePoint + seed);//normalize(unitPosition + normalize(seed));
@@ -415,7 +415,7 @@ void main() {
 	vec3 color = computeColorAndNormal(elevation01, waterLevel01, slope, normal, temperature01, moisture01, waterMeltingPoint01, absLatitude01);
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
-	float ndl2 = max(0.01, dot(normalW, lightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
+	float ndl2 = max(0.0, dot(normalW, lightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
 
 	// specular
 	vec3 angleW = normalize(viewRayW + lightRayW);
@@ -432,7 +432,7 @@ void main() {
 	specComp *= (color.r + color.g + color.b) / 3.0;
 	specComp /= 2.0;
 
-	vec3 screenColor = color.rgb * (sqrt(ndl*ndl2) + specComp*ndl2);
+	vec3 screenColor = color.rgb * (sqrt(ndl*ndl2) + specComp*ndl);
 
 	if(colorMode == 1) screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
 	if(colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.1, 0.2, 1.0), temperature01);
