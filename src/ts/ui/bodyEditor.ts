@@ -17,6 +17,9 @@ export enum EditorVisibility {
 export class BodyEditor {
     visibility: EditorVisibility = EditorVisibility.HIDDEN
 
+    navBar: HTMLElement;
+    currentPanel: HTMLElement | null;
+
     currentBodyId: string | null = null;
 
     generalSliders: Slider[] = [];
@@ -33,26 +36,35 @@ export class BodyEditor {
 
     constructor(visibility: EditorVisibility) {
         document.body.innerHTML += editorHTML;
+        this.navBar = document.getElementById("navBar")!;
+
         this.setVisibility(visibility);
 
-        let currentUI: HTMLElement | null = document.getElementById("generalUI");
-        for (const link of document.querySelector("nav")!.children) {
+        this.currentPanel = document.getElementById("generalUI");
+        for (const link of this.navBar.children) {
             link.addEventListener("click", () => {
                 let id = link.id.substring(0, link.id.length - 4) + "UI";
-                if (currentUI != null) {
-                    currentUI.hidden = true;
-                    if (currentUI.id == id) {
-                        currentUI = null;
-                        this.setVisibility(EditorVisibility.NAVBAR);
-                        return;
-                    }
-                }
-                this.setVisibility(EditorVisibility.FULL);
-                currentUI = document.getElementById(id)!;
-                currentUI.hidden = false;
-                this.updateAllSliders();
+                this.switchPanel(id);
             });
         }
+    }
+
+    public switchPanel(panelId: string): void {
+        let newPanel = document.getElementById(panelId);
+        if(newPanel == null) throw new Error(`The panel you requested does not exist : ${panelId}`);
+
+        if(this.currentPanel == null) this.setVisibility(EditorVisibility.FULL);
+        else {
+            this.currentPanel.hidden = true;
+            if (this.currentPanel.id == panelId) {
+                this.currentPanel = null;
+                this.setVisibility(EditorVisibility.NAVBAR);
+                return;
+            }
+        }
+        this.currentPanel = newPanel;
+        this.currentPanel.hidden = false;
+        this.updateAllSliders();
     }
 
     public setVisibility(visibility: EditorVisibility): void {
@@ -99,7 +111,6 @@ export class BodyEditor {
     }
 
     public setPlanet(planet: SolidPlanet, star: Star, player: PlayerController) {
-
         this.initGeneralSliders(planet, star, player);
         this.initPhysicSliders(planet);
         this.initSurfaceSliders(planet);
@@ -112,11 +123,32 @@ export class BodyEditor {
     }
 
     public setStar(star: Star) {
-        this.setVisibility(EditorVisibility.NAVBAR);
-        for (const sliderGroup of this.sliders) {
-            for (const slider of sliderGroup) slider.remove();
-            sliderGroup.length = 0;
+        this.initStarSliders(star);
+    }
+
+    //TODO: finish this method
+    public initNavBar(bodyType: CelestialBodyType): void {
+        switch (bodyType) {
+            case CelestialBodyType.STAR:
+                //this.navBar.querySelector("#generalLink").ariaHidden = "false";
         }
+    }
+
+    public initStarSliders(star: Star): void {
+        for (const slider of this.starSliders) slider.remove();
+        this.starSliders.length = 0;
+
+        this.starSliders.push(new Slider("temperature", document.getElementById("temperature")!, 3000, 15000, star.physicalProperties.temperature, (val: number) => {
+            star.physicalProperties.temperature = val;
+        }));
+
+        this.starSliders.push(new Slider("exposure", document.getElementById("exposure")!, 0, 200, star.postProcesses.volumetricLight!.exposure * 100, (val: number) => {
+            star.postProcesses.volumetricLight!.exposure = val / 100;
+        }));
+
+        this.starSliders.push(new Slider("decay", document.getElementById("decay")!, 0, 200, star.postProcesses.volumetricLight!.decay * 100, (val: number) => {
+            star.postProcesses.volumetricLight!.decay = val / 100;
+        }));
     }
 
     public initGeneralSliders(planet: SolidPlanet, star: Star, player: PlayerController) {
@@ -403,6 +435,7 @@ export class BodyEditor {
             planet.updateMaterial();
         });
         document.getElementById("heightMapButton")!.addEventListener("click", () => {
+            planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.HEIGHT) ? ColorMode.HEIGHT : ColorMode.DEFAULT;
             planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.HEIGHT) ? ColorMode.HEIGHT : ColorMode.DEFAULT;
             planet.updateMaterial();
         });
