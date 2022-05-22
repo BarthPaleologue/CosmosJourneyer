@@ -48,16 +48,15 @@ let keyboard = new Keyboard();
 
 let starSystemManager = new StarSystemManager();
 
+let starfield = new StarfieldPostProcess("starfield", scene);
+
 let sun = new Star("Weierstrass", Settings.PLANET_RADIUS, starSystemManager, scene);
 sun.translate(new Vector3(0, 0, Settings.PLANET_RADIUS * 3));
 
-let starfield = new StarfieldPostProcess("starfield", sun, scene);
+starfield.setStar(sun);
 
 let fxaa = new FxaaPostProcess("fxaa", 1, scene.activeCamera, Texture.BILINEAR_SAMPLINGMODE);
 
-let vls = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
-vls.exposure = 1.0;
-vls.decay = 0.95;
 
 //#region Sliders
 
@@ -65,12 +64,12 @@ new Slider("temperature", document.getElementById("temperature")!, 3000, 15000, 
     sun.physicalProperties.temperature = val;
 });
 
-new Slider("exposure", document.getElementById("exposure")!, 0, 200, vls.exposure * 100, (val: number) => {
-    vls.exposure = val / 100;
+new Slider("exposure", document.getElementById("exposure")!, 0, 200, sun.postProcesses.volumetricLight!.exposure * 100, (val: number) => {
+    sun.postProcesses.volumetricLight!.exposure = val / 100;
 });
 
-new Slider("decay", document.getElementById("decay")!, 0, 200, vls.decay * 100, (val: number) => {
-    vls.decay = val / 100;
+new Slider("decay", document.getElementById("decay")!, 0, 200, sun.postProcesses.volumetricLight!.decay * 100, (val: number) => {
+    sun.postProcesses.volumetricLight!.decay = val / 100;
 });
 
 //#endregion

@@ -66,10 +66,12 @@ let gamepad = new Gamepad();
 
 let starSystem = new StarSystemManager(Settings.VERTEX_RESOLUTION);
 
+let starfield = new StarfieldPostProcess("starfield", scene);
+
 let sun = new Star("Weierstrass", 6.4 * Settings.PLANET_RADIUS, starSystem, scene);
 sun.translate(new Vector3(-1, 0, -1).normalizeToNew().scale(Settings.PLANET_RADIUS * 160));
 
-let starfield = new StarfieldPostProcess("starfield", sun, scene);
+starfield.setStar(sun);
 
 let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene);
 planet.rotate(Axis.X, 0.2);
@@ -133,11 +135,6 @@ aresAtmosphere.settings.greenWaveLength = 680;
 aresAtmosphere.settings.blueWaveLength = 670;
 
 let fxaa = new FxaaPostProcess("fxaa", 1, player.camera, Texture.BILINEAR_SAMPLINGMODE);
-
-// TODO: mettre le VLS dans Star => par extension créer un système de gestion des post process généralisé
-sun.postProcesses.volumetricLight = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
-sun.postProcesses.volumetricLight.exposure = 1.0;
-sun.postProcesses.volumetricLight.decay = 0.95;
 
 let isMouseEnabled = false;
 

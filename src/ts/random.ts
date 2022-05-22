@@ -67,8 +67,8 @@ console.table(sun.physicalProperties);
 
 sun.translate(new Vector3(-900000, 0, -1700000));
 
-let starfield = new StarfieldPostProcess("starfield", sun, scene);
-
+let starfield = new StarfieldPostProcess("starfield", scene);
+starfield.setStar(sun);
 
 let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, {
     rotationPeriod: 60 * 60 / 10,
