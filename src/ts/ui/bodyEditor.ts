@@ -210,8 +210,10 @@ export class BodyEditor {
         this.generalSliders.push(new Slider("cameraFOV", document.getElementById("cameraFOV")!, 0, 360, player.camera.fov * 360 / Math.PI, (val: number) => {
             player.camera.fov = val * Math.PI / 360;
         }));
-        this.generalSliders.push(new Slider("timeModifier", document.getElementById("timeModifier")!, 0, 200, Settings.TIME_MULTIPLIER, (val: number) => {
-            Settings.TIME_MULTIPLIER = val;
+        //TODO: do not hardcode here
+        const power = 1.7;
+        this.generalSliders.push(new Slider("timeModifier", document.getElementById("timeModifier")!, 0, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {
+            Settings.TIME_MULTIPLIER = Math.pow(val, power);
         }));
     }
 
