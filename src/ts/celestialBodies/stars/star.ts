@@ -71,6 +71,7 @@ export class Star extends CelestialBody {
     }
 
     public getAbsolutePosition(): Vector3 {
+        if(this.mesh.getAbsolutePosition()._isDirty) this.mesh.computeWorldMatrix(true);
         return this.mesh.getAbsolutePosition();
     }
 

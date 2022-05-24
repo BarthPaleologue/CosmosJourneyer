@@ -286,11 +286,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.updateLOD(player.getAbsolutePosition());
     }
 
-    public getRelativePosition() {
-        return this.attachNode.position;
-    }
-
     public getAbsolutePosition() {
+        if(this.attachNode.getAbsolutePosition()._isDirty) this.attachNode.computeWorldMatrix(true);
         return this.attachNode.getAbsolutePosition();
     }
 
