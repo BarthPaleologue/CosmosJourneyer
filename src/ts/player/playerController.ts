@@ -205,6 +205,7 @@ export class PlayerController implements Transformable {
     }
 
     public getAbsolutePosition(): Vector3 {
+        if(this.mesh.getAbsolutePosition()._isDirty) this.mesh.computeWorldMatrix(true);
         return this.mesh.getAbsolutePosition();
     }
 
@@ -213,7 +214,9 @@ export class PlayerController implements Transformable {
     }
 
     getRotationQuaternion(): Quaternion {
-        return this.mesh.rotationQuaternion!;
+        if(this.mesh.rotationQuaternion == undefined) throw new Error(`PlayerController's rotation Quaternion is undefined !`);
+        if(this.mesh.rotationQuaternion._isDirty) this.mesh.computeWorldMatrix(true);
+        return this.mesh.rotationQuaternion;
     }
 
     getOriginBodySpaceSamplePosition(): Vector3 {

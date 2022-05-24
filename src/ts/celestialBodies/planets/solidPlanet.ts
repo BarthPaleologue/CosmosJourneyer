@@ -300,7 +300,9 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     }
 
     getRotationQuaternion(): Quaternion {
-        return this.attachNode.rotationQuaternion!;
+        if(this.attachNode.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.getName()}`)
+        if(this.attachNode.rotationQuaternion._isDirty) this.attachNode.computeWorldMatrix(true);
+        return this.attachNode.rotationQuaternion;
     }
 
     public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
