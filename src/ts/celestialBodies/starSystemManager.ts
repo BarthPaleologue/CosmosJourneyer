@@ -1,17 +1,19 @@
 import {Vector3, DepthRenderer} from "@babylonjs/core";
 
-import { ChunkForge } from "../forge/chunkForge";
-import { PlayerController } from "../player/playerController";
-import { SolidPlanet } from "./planets/solidPlanet";
+import {ChunkForge} from "../forge/chunkForge";
+import {PlayerController} from "../player/playerController";
+import {SolidPlanet} from "./planets/solidPlanet";
 import {CelestialBody} from "./celestialBody";
 import {Star} from "./stars/star";
 
 export class StarSystemManager {
     private readonly _chunkForge: ChunkForge;
     private readonly _celestialBodies: CelestialBody[] = [];
+
     constructor(nbVertices = 64) {
         this._chunkForge = new ChunkForge(nbVertices);
     }
+
     public addBody(body: CelestialBody) {
         this._celestialBodies.push(body);
     }
@@ -21,8 +23,9 @@ export class StarSystemManager {
             planet.setAbsolutePosition(planet.getAbsolutePosition().add(deplacement));
         }
     }
+
     public rotateAllAround(pivot: Vector3, axis: Vector3, amount: number) {
-        for(const planet of this._celestialBodies) {
+        for (const planet of this._celestialBodies) {
             planet.rotateAround(pivot, axis, amount);
         }
     }
@@ -51,19 +54,18 @@ export class StarSystemManager {
         }
         return nearest;
     }
+
     public update(player: PlayerController, lightOrigin: Vector3, depthRenderer: DepthRenderer, deltaTime: number): void {
         this._chunkForge.update(depthRenderer);
-        // TODO : il faudra update les planètes des plus lointaines au plus proches quand il y aura les postprocess
-        for (const body of this._celestialBodies) {
-            body.update(player, lightOrigin, deltaTime);
-        }
+        for (const body of this._celestialBodies) body.update(player, lightOrigin, deltaTime);
+
         this.translateAllCelestialBody(player.getAbsolutePosition().scale(-1));
         player.translate(player.getAbsolutePosition().scale(-1));
     }
 
     public getBodiesDataAsArray(): number[] {
         let tab: number[] = [];
-        for(const body of this._celestialBodies) {
+        for (const body of this._celestialBodies) {
             tab = tab.concat(body.getAbsolutePosition().asArray(), body.getApparentRadius());
         }
         return tab;

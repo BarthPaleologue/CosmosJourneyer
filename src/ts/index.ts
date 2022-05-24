@@ -7,8 +7,7 @@ import {
     Scene,
     Texture,
     Tools,
-    Vector3,
-    VolumetricLightScatteringPostProcess
+    Vector3
 } from "@babylonjs/core";
 
 import {SolidPlanet} from "./celestialBodies/planets/solidPlanet";
@@ -33,6 +32,7 @@ import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";
 import {Settings} from "./settings";
 import {CelestialBodyType} from "./celestialBodies/interfaces";
 import {BodyEditor, EditorVisibility} from "./ui/bodyEditor";
+import {rockNormalMapTexture} from "./assets";
 
 style.default;
 sliderStyle.default;
@@ -100,8 +100,8 @@ moon.colorSettings.plainColor = new Color3(0.67, 0.67, 0.67);
 moon.colorSettings.desertColor = new Color3(116, 134, 121).scale(1 / 255);
 moon.updateMaterial();
 
-moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockNormalMap, scene));
-moon.surfaceMaterial.setTexture("bottomNormalMap", new Texture(rockNormalMap, scene));
+moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockNormalMap));
+moon.surfaceMaterial.setTexture("bottomNormalMap", new Texture(rockNormalMap));
 
 moon.translate(new Vector3(Math.cos(2.2), 0, Math.sin(2.2)).scale(5 * planet.getRadius()));
 moon.translate(planet.getAbsolutePosition());
@@ -187,7 +187,7 @@ resizeUI();
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
-    scene.beforeRender = updateScene;
+    scene.registerBeforeRender(() => updateScene());
     engine.runRenderLoop(() => scene.render());
 });
 

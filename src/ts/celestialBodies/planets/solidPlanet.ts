@@ -4,16 +4,17 @@ import {TerrainSettings} from "../../terrain/terrainSettings";
 import {AbstractPlanet} from "./abstractPlanet";
 
 import {
-    Vector3,
+    Axis,
+    Color3,
+    MaterialHelper,
+    Matrix,
     Mesh,
+    Quaternion,
     Scene,
     ShaderMaterial,
-    Axis,
     Space,
     Texture,
-    Quaternion,
-    Matrix,
-    MaterialHelper, Color3
+    Vector3
 } from "@babylonjs/core";
 
 import bottomNormalMap from "../../../asset/textures/crackednormal.jpg";
@@ -175,15 +176,15 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         surfaceMaterial.setVector3("seed", new Vector3(this._seed[0], this._seed[1], this._seed[2]));
 
-        surfaceMaterial.setTexture("bottomNormalMap", new Texture(bottomNormalMap, scene));
-        surfaceMaterial.setTexture("steepNormalMap", new Texture(steepNormalMap, scene));
-        surfaceMaterial.setTexture("plainNormalMap", new Texture(grassNormalMap, scene));
+        surfaceMaterial.setTexture("bottomNormalMap", new Texture(bottomNormalMap));
+        surfaceMaterial.setTexture("steepNormalMap", new Texture(steepNormalMap));
+        surfaceMaterial.setTexture("plainNormalMap", new Texture(grassNormalMap));
 
-        surfaceMaterial.setTexture("snowNormalMap", new Texture(snowNormalMap, scene));
-        surfaceMaterial.setTexture("snowNormalMap2", new Texture(snowNormalMap2, scene));
+        surfaceMaterial.setTexture("snowNormalMap", new Texture(snowNormalMap));
+        surfaceMaterial.setTexture("snowNormalMap2", new Texture(snowNormalMap2));
 
-        surfaceMaterial.setTexture("beachNormalMap", new Texture(beachNormalMap, scene));
-        surfaceMaterial.setTexture("desertNormalMap", new Texture(desertNormalMap, scene));
+        surfaceMaterial.setTexture("beachNormalMap", new Texture(beachNormalMap));
+        surfaceMaterial.setTexture("desertNormalMap", new Texture(desertNormalMap));
 
         surfaceMaterial.setVector3("playerPosition", Vector3.Zero());
         surfaceMaterial.setVector3("sunPosition", Vector3.Zero());
@@ -286,7 +287,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     }
 
     public getRelativePosition() {
-        return this.attachNode.position.clone();
+        return this.attachNode.position;
     }
 
     public getAbsolutePosition() {
@@ -303,10 +304,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     getRotationQuaternion(): Quaternion {
         return this.attachNode.rotationQuaternion!;
-    }
-
-    public translate(displacement: Vector3): void {
-        this.attachNode.position.addInPlace(displacement);
     }
 
     public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {

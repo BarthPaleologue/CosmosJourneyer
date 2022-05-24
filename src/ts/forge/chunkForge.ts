@@ -128,8 +128,7 @@ export class ChunkForge {
             task.vertexData.applyToMesh(task.chunk.mesh, false);
             task.chunk.mesh.freezeNormals();
 
-            // TODO: check if equal to minDepth
-            if (task.chunk.depth <= 1) task.chunk.setReady(true);
+            if (task.chunk.depth == task.chunk.tree.minDepth) task.chunk.setReady(true);
 
             depthRenderer.getDepthMap().renderList?.push(task.chunk.mesh);
 

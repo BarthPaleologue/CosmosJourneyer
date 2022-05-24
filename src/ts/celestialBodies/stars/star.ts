@@ -74,10 +74,6 @@ export class Star extends CelestialBody {
         return this.mesh.getAbsolutePosition();
     }
 
-    public translate(displacement: Vector3): void {
-        this.mesh.position.addInPlace(displacement);
-    }
-
     public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
         this.mesh.rotateAround(pivot, axis, amount);
     }

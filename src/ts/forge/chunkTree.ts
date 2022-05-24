@@ -19,8 +19,8 @@ type quadTree = quadTree[] | PlanetChunk;
  */
 export class ChunkTree {
 
-    private readonly minDepth: number; // minimum depth of the tree
-    private readonly maxDepth: number; // maximum depth of the tree
+    readonly minDepth: number; // minimum depth of the tree
+    readonly maxDepth: number; // maximum depth of the tree
 
     private tree: quadTree = [];
 
@@ -30,7 +30,7 @@ export class ChunkTree {
 
     private readonly chunkForge: ChunkForge;
 
-    private readonly planet: SolidPlanet;
+    readonly planet: SolidPlanet;
 
     /**
      *
@@ -158,7 +158,7 @@ export class ChunkTree {
      * @returns The new Chunk
      */
     private createChunk(path: number[], isFiner: boolean): PlanetChunk {
-        return new PlanetChunk(path, this.direction, this.chunkForge, this.planet, isFiner);
+        return new PlanetChunk(path, this.direction, this.chunkForge, this, isFiner);
     }
 
     /**

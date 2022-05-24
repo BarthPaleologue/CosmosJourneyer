@@ -89,7 +89,9 @@ export abstract class CelestialBody implements Transformable {
         return position;
     }
 
-    public abstract translate(displacement: Vector3): void;
+    public translate(displacement: Vector3): void {
+        this.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
+    }
 
     public abstract rotateAround(pivot: Vector3, axis: Vector3, amount: number): void;
 

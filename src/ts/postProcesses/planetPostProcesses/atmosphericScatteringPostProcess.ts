@@ -64,11 +64,6 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
             "mieHaloRadius": {
                 type: ShaderDataType.Float,
                 get: () => {return settings.mieHaloRadius}
-            },
-            "planetsData": {
-                // TODO: implement that for real
-                type: ShaderDataType.FloatArray,
-                get: () => {return []}
             }
         };
 

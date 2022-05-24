@@ -41,11 +41,6 @@ export class GazPlanet extends AbstractPlanet {
         throw new Error("Method not implemented.");
     }
 
-    translate(displacement: Vector3): void {
-        //TODO: implement
-        throw new Error("Method not implemented.");
-    }
-
     rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
         //TODO: implement
         throw new Error("Method not implemented.");
