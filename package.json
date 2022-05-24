@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "@babylonjs/core": "^5.5.5",
+    "@babylonjs/core": "^5.7.0",
     "@webpack-cli/generators": "^1.1.0",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.3.0",
