@@ -12,8 +12,7 @@ const config = {
 
   entry: {
     showcase: "./src/ts/index.ts",
-    random: "./src/ts/random.ts",
-    starDemo: "./src/ts/starDemo.ts"
+    random: "./src/ts/random.ts"
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -48,14 +47,7 @@ const config = {
       filename: "random.html",
       template: path.join(htmlPath, "index.html"),
       chunks: ["random"]
-    }),
-    new HtmlWebpackPlugin({
-      title: 'Demo Star',
-      filename: "starDemo.html",
-      template: path.join(htmlPath, "index.html"),
-      chunks: ["starDemo"]
-    }),
-
+    })
   ],
 
 

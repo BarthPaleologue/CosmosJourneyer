@@ -97,13 +97,11 @@ let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, s
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
 moon.colorSettings.plainColor = new Color3(0.5, 0.5, 0.5);
-moon.colorSettings.desertColor = new Color3(0.4, 0.4, 0.4);
-moon.colorSettings.steepColor = new Color3(0.1, 0.1, 0.1);
+moon.colorSettings.desertColor = new Color3(0.4, 0.4, 0.5);
 moon.updateMaterial();
 
 moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockNormalMap, scene));
 moon.surfaceMaterial.setTexture("bottomNormalMap", new Texture(rockNormalMap, scene));
-moon.surfaceMaterial.setTexture("sandNormalMap", new Texture(rockNormalMap, scene));
 
 moon.translate(new Vector3(Math.cos(2.2), 0, Math.sin(2.2)).scale(5 * planet.getRadius()));
 moon.translate(planet.getAbsolutePosition());
@@ -144,7 +142,6 @@ let collisionWorker = new CollisionWorker(player, starSystem);
 starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
 
 function updateScene() {
-
     let deltaTime = engine.getDeltaTime() / 1000;
 
     player.nearestBody = starSystem.getNearestBody();

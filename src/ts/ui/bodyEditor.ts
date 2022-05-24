@@ -97,6 +97,7 @@ export class BodyEditor {
 
     public setBody(body: CelestialBody, star: Star, player: PlayerController) {
         this.currentBodyId = body.getName();
+        this.initNavBar(body);
         switch (body.getBodyType()) {
             case CelestialBodyType.SOLID:
                 this.setPlanet(body as SolidPlanet, star, player);
@@ -126,11 +127,43 @@ export class BodyEditor {
         this.initStarSliders(star);
     }
 
-    //TODO: finish this method
-    public initNavBar(bodyType: CelestialBodyType): void {
-        switch (bodyType) {
+    //TODO: make it maintainable
+    public initNavBar(body: CelestialBody): void {
+        switch (body.getBodyType()) {
             case CelestialBodyType.STAR:
-                //this.navBar.querySelector("#generalLink").ariaHidden = "false";
+                document.getElementById("generalLink")!.hidden = false;
+                document.getElementById("starPhysicLink")!.hidden = false;
+                document.getElementById("physicLink")!.hidden = true;
+                document.getElementById("oceanLink")!.hidden = true;
+                document.getElementById("surfaceLink")!.hidden = true;
+                document.getElementById("cloudsLink")!.hidden = true;
+                document.getElementById("atmosphereLink")!.hidden = true;
+                document.getElementById("ringsLink")!.hidden = true;
+                break;
+            case CelestialBodyType.SOLID:
+                document.getElementById("generalLink")!.hidden = false;
+                document.getElementById("starPhysicLink")!.hidden = true;
+                document.getElementById("physicLink")!.hidden = false;
+                document.getElementById("oceanLink")!.hidden = (body as SolidPlanet).postProcesses.ocean == null;
+                document.getElementById("surfaceLink")!.hidden = false;
+                document.getElementById("cloudsLink")!.hidden = (body as SolidPlanet).postProcesses.clouds == null;
+                document.getElementById("atmosphereLink")!.hidden = (body as SolidPlanet).postProcesses.atmosphere == null;
+                document.getElementById("ringsLink")!.hidden = (body as SolidPlanet).postProcesses.rings == null;
+                break;
+            default:
+                document.getElementById("generalLink")!.hidden = false;
+                document.getElementById("starPhysicLink")!.hidden = true;
+                document.getElementById("physicLink")!.hidden = true;
+                document.getElementById("oceanLink")!.hidden = true;
+                document.getElementById("surfaceLink")!.hidden = true;
+                document.getElementById("cloudsLink")!.hidden = true;
+                document.getElementById("atmosphereLink")!.hidden = true;
+                document.getElementById("ringsLink")!.hidden = true;
+        }
+        if(this.currentPanel != null) {
+            //TODO: this is messed up
+            let currentNavBarButton = document.getElementById(this.currentPanel.id.substring(0, this.currentPanel.id.length - 2) + "Link")
+            if (currentNavBarButton!.hidden) this.setVisibility(EditorVisibility.NAVBAR);
         }
     }
 
