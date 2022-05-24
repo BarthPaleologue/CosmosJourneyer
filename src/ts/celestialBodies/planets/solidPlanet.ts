@@ -33,6 +33,7 @@ import {initMeshTransform} from "../../utils/mesh";
 import {PlayerController} from "../../player/playerController";
 import {StarSystemManager} from "../starSystemManager";
 import {Settings} from "../../settings";
+import {Algebra} from "../../utils/algebra";
 
 export enum ColorMode {
     DEFAULT,
@@ -147,7 +148,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
                     "cameraNear", "cameraFar", "planetPosition", "planetRadius",
 
-                    "planetRotationAxis", "rotationTheta",
+                    "planetRotationQuaternion",
 
                     "playerPosition",
 
@@ -274,13 +275,12 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         this.internalTime += deltaTime;
 
+        this.surfaceMaterial.setVector4("planetRotationQuaternion", Algebra.QuaternionAsVector4(Quaternion.Inverse(this.getRotationQuaternion())));
+
         this.surfaceMaterial.setVector3("playerPosition", player.getAbsolutePosition());
         this.surfaceMaterial.setVector3("sunPosition", starPosition);
 
         this.surfaceMaterial.setVector3("planetPosition", this.getAbsolutePosition());
-
-        this.surfaceMaterial.setVector3("planetRotationAxis", this.physicalProperties.rotationAxis);
-        this.surfaceMaterial.setFloat("rotationTheta", (this.internalTime / this.physicalProperties.rotationPeriod) % (2 * Math.PI));
 
         this.updateLOD(player.getAbsolutePosition());
     }

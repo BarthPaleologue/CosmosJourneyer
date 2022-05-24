@@ -1,4 +1,4 @@
-import {Vector3, Quaternion} from "@babylonjs/core";
+import {Vector3, Quaternion, Vector4, Axis} from "@babylonjs/core";
 
 /**
  * Lightweight vector3 for fast algebra computation
@@ -145,19 +145,7 @@ export class Algebra {
     public static Dot(vector1: Vec3, vector2: Vec3): number {
         return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
     }
-}
-
-export class LQuaternion extends Quaternion {
-    constructor(x: number, y: number, z: number, w: number) {
-        super(x, y, z, w);
-    }
-    static RotationX(angle: number): Quaternion {
-        return new Quaternion(Math.sin(angle / 2), 0, 0, Math.cos(angle / 2));
-    }
-    static RotationY(angle: number): Quaternion {
-        return new Quaternion(0, Math.sin(angle / 2), 0, Math.cos(angle / 2));
-    }
-    static RotationZ(angle: number): Quaternion {
-        return new Quaternion(0, 0, Math.sin(angle / 2), Math.cos(angle / 2));
+    public static QuaternionAsVector4(q: Quaternion): Vector4 {
+        return new Vector4(q.x, q.y, q.z, q.w);
     }
 }

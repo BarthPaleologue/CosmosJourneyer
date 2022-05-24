@@ -21,8 +21,7 @@ uniform vec3 v3LightPos; // light position in world space
 uniform vec3 planetPosition; // nécessaire temporairement le temps de régler le problème des floats
 uniform mat4 planetWorldMatrix;
 
-uniform vec3 planetRotationAxis;
-uniform float rotationTheta;
+uniform vec4 planetRotationQuaternion;
 uniform float planetRadius;
 
 // Varying
@@ -43,6 +42,27 @@ vec3 rotateAround(vec3 vector, vec3 axis, float theta) {
     return cos(theta) * vector + cross(axis, vector) * sin(theta) + axis * dot(axis, vector) * (1.0 - cos(theta));
 }
 
+vec3 applyQuaternion(vec4 quaternion, vec3 vector) {
+    float qx = quaternion.x;
+    float qy = quaternion.y;
+    float qz = quaternion.z;
+    float qw = quaternion.w;
+    float x = vector.x;
+    float y = vector.y;
+    float z = vector.z;
+    // apply quaternion to vector
+    float ix = qw * x + qy * z - qz * y;
+    float iy = qw * y + qz * x - qx * z;
+    float iz = qw * z + qx * y - qy * x;
+    float iw = -qx * x - qy * y - qz * z;
+    // calculate result * inverse quat
+    float nX = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+    float nY = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+    float nZ = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+
+    return vec3(nX, nY, nZ);
+}
+
 void main() {
 
     vec4 outPosition = worldViewProjection * vec4(position, 1.0);
@@ -58,8 +78,9 @@ void main() {
 	//vPosition = vec3(inverse(planetWorldMatrix) * vec4(vPositionW, 1.0));
 	vPosition = vPositionW - planetPosition;
 
-	vUnitSamplePoint = rotateAround(normalize(vPosition), planetRotationAxis, rotationTheta);
-	vSamplePoint = rotateAround(vPosition, planetRotationAxis, rotationTheta);
+
+	vUnitSamplePoint = applyQuaternion(planetRotationQuaternion, normalize(vPosition));
+	vSamplePoint = applyQuaternion(planetRotationQuaternion, vPosition);
 
 	vNormal = normal;
     vUV = uv;

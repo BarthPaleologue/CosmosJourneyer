@@ -469,7 +469,6 @@ export class BodyEditor {
         });
         document.getElementById("heightMapButton")!.addEventListener("click", () => {
             planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.HEIGHT) ? ColorMode.HEIGHT : ColorMode.DEFAULT;
-            planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.HEIGHT) ? ColorMode.HEIGHT : ColorMode.DEFAULT;
             planet.updateMaterial();
         });
     }
