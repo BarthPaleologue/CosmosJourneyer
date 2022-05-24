@@ -61,8 +61,8 @@ body {
 
     .colorPickerContainer {
       p {
-        display: inline;
-        padding-top: -10px;
+        display: inline-block;
+        padding: 0 !important;
       }
 
       input {

@@ -43,7 +43,7 @@ export abstract class AbstractPlanet extends CelestialBody implements Seedable {
 
     public createAtmosphere(atmosphereHeight: number, star: Star, scene: Scene): AtmosphericScatteringPostProcess {
         let atmosphere = new AtmosphericScatteringPostProcess(`${this.getName()}Atmosphere`, this, atmosphereHeight, star, scene);
-        atmosphere.settings.intensity = 15 * this.physicalProperties.pressure;
+        atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
         this.postProcesses.atmosphere = atmosphere;
         return atmosphere;
     }

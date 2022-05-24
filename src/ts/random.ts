@@ -103,7 +103,6 @@ if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.press
 
 if (planet.physicalProperties.pressure > 0) {
     let atmosphere = planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
-    atmosphere.settings.intensity = 12 * planet.physicalProperties.pressure;
     atmosphere.settings.redWaveLength *= 1 + centeredRandom() / 3;
     atmosphere.settings.greenWaveLength *= 1 + centeredRandom() / 3;
     atmosphere.settings.blueWaveLength *= 1 + centeredRandom() / 3;

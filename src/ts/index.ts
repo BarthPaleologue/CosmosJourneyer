@@ -76,7 +76,7 @@ starfield.setStar(sun);
 let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene);
 planet.rotate(Axis.X, 0.2);
 
-planet.physicalProperties.rotationPeriod /= 500
+planet.physicalProperties.rotationPeriod /= 200
 
 planet.translate(new Vector3(0, 0, 3 * planet.getRadius()));
 
@@ -96,8 +96,8 @@ let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, s
 });
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
-moon.colorSettings.plainColor = new Color3(0.5, 0.5, 0.5);
-moon.colorSettings.desertColor = new Color3(0.4, 0.4, 0.5);
+moon.colorSettings.plainColor = new Color3(0.67, 0.67, 0.67);
+moon.colorSettings.desertColor = new Color3(116, 134, 121).scale(1 / 255);
 moon.updateMaterial();
 
 moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockNormalMap, scene));
