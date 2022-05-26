@@ -7,6 +7,7 @@ import {Settings} from "../settings";
 import {Axis, Color3, Vector3} from "@babylonjs/core";
 import {PlayerController} from "../player/playerController";
 import {CelestialBody} from "../celestialBodies/celestialBody";
+import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -35,6 +36,8 @@ export class BodyEditor {
         this.starSliders];
 
     constructor(visibility: EditorVisibility) {
+        sliderStyle.default;
+
         document.body.innerHTML += editorHTML;
         this.navBar = document.getElementById("navBar")!;
 
@@ -71,19 +74,19 @@ export class BodyEditor {
         this.visibility = visibility;
         switch (this.visibility) {
             case EditorVisibility.HIDDEN:
-                document.getElementById("navBar")!.style.visibility = "hidden";
-                document.getElementById("editorPanelContainer")!.style.visibility = "hidden";
-                document.getElementById("toolbar")!.style.visibility = "hidden";
+                document.getElementById("navBar")!.style.display = "none";
+                document.getElementById("editorPanelContainer")!.hidden = true;
+                document.getElementById("toolbar")!.hidden = true;
                 break;
             case EditorVisibility.NAVBAR:
-                document.getElementById("navBar")!.style.visibility = "visible";
-                document.getElementById("editorPanelContainer")!.style.visibility = "hidden";
-                document.getElementById("toolbar")!.style.visibility = "hidden";
+                document.getElementById("navBar")!.style.display = "flex";
+                document.getElementById("editorPanelContainer")!.hidden = true;
+                document.getElementById("toolbar")!.hidden = true;
                 break;
             case EditorVisibility.FULL:
-                document.getElementById("navBar")!.style.visibility = "visible";
-                document.getElementById("editorPanelContainer")!.style.visibility = "visible";
-                document.getElementById("toolbar")!.style.visibility = "visible";
+                document.getElementById("navBar")!.style.display = "flex";
+                document.getElementById("editorPanelContainer")!.hidden = false;
+                document.getElementById("toolbar")!.hidden = false;
                 break;
             default:
                 throw new Error("BodyEditor received an unusual visibility state");
@@ -199,7 +202,7 @@ export class BodyEditor {
             sunOrientation = val;
         }));
 
-        let axialTilt = 0.2;
+        let axialTilt = planet.getRotationQuaternion().toEulerAngles().x;
         this.generalSliders.push(new Slider("axialTilt", document.getElementById("axialTilt")!, -180, 180, Math.round(180 * axialTilt / Math.PI), (val: number) => {
             let newAxialTilt = val * Math.PI / 180;
             planet.rotate(Axis.X, newAxialTilt - axialTilt);

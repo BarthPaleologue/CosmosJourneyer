@@ -1,14 +1,4 @@
-import {
-    Axis,
-    Color3,
-    DepthRenderer,
-    Engine,
-    FxaaPostProcess,
-    Scene,
-    Texture,
-    Tools,
-    Vector3
-} from "@babylonjs/core";
+import {Axis, Color3, DepthRenderer, Engine, FxaaPostProcess, Scene, Texture, Tools, Vector3} from "@babylonjs/core";
 
 import {SolidPlanet} from "./celestialBodies/planets/solidPlanet";
 import {Star} from "./celestialBodies/stars/star";
@@ -27,15 +17,12 @@ import rockNormalMap from "../asset/textures/rockn.png";
 import {StarfieldPostProcess} from "./postProcesses/starfieldPostProcess";
 
 import * as style from "../styles/style.scss";
-import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";
 
 import {Settings} from "./settings";
 import {CelestialBodyType} from "./celestialBodies/interfaces";
 import {BodyEditor, EditorVisibility} from "./ui/bodyEditor";
-import {rockNormalMapTexture} from "./assets";
 
 style.default;
-sliderStyle.default;
 
 let bodyEditor = new BodyEditor(EditorVisibility.FULL);
 
@@ -43,7 +30,7 @@ let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let engine = new Engine(canvas, true);
+let engine = new Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 
 console.log("GPU utilisé : " + engine.getGlInfo().renderer);
@@ -76,7 +63,7 @@ starfield.setStar(sun);
 let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene);
 planet.rotate(Axis.X, 0.2);
 
-planet.physicalProperties.rotationPeriod /= 200
+planet.physicalProperties.rotationPeriod /= 50
 
 planet.translate(new Vector3(0, 0, 3 * planet.getRadius()));
 
@@ -96,9 +83,11 @@ let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, s
     waterAmount: 0.5
 });
 
-moon.orbitalProperties.periapsis = 5 * planet.getRadius();
-moon.orbitalProperties.apoapsis = 10 * planet.getRadius();
-moon.orbitalProperties.period = moon.physicalProperties.rotationPeriod;
+moon.orbitalProperties = {
+    period: moon.physicalProperties.rotationPeriod,
+    apoapsis: 10 * planet.getRadius(),
+    periapsis: 7 * planet.getRadius()
+}
 
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
@@ -109,7 +98,7 @@ moon.updateMaterial();
 moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockNormalMap));
 moon.surfaceMaterial.setTexture("bottomNormalMap", new Texture(rockNormalMap));
 
-moon.translate(new Vector3(Math.cos(2.2), 0, Math.sin(2.2)).scale(5 * planet.getRadius()));
+moon.translate(new Vector3(moon.orbitalProperties.periapsis, 0, 0));
 moon.translate(planet.getAbsolutePosition());
 
 let Ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene, {
@@ -158,8 +147,6 @@ function updateScene() {
 
     if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 
-    gamepad.update();
-
     let deplacement = player.listenToGamepad(gamepad, deltaTime);
     deplacement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
     starSystem.translateAllCelestialBody(deplacement);
@@ -174,9 +161,8 @@ function updateScene() {
 }
 
 document.addEventListener("keydown", e => {
-    if (e.key == "p") { // take screenshots
-        Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, {precision: 4});
-    }
+    if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, {precision: 4});
+    if (e.key == "u") bodyEditor.setVisibility((bodyEditor.getVisibility() == EditorVisibility.HIDDEN) ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
     if (e.key == "w" && player.isOrbiting()) (<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe = !(<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe;
 });

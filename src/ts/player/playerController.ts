@@ -176,6 +176,7 @@ export class PlayerController implements Transformable {
      * @returns the negative displacement of the playerControler given the inputs
      */
     public listenToGamepad(gamepad: Gamepad, deltaTime: number): Vector3 {
+        gamepad.update();
 
         let deplacement = Vector3.Zero();
 

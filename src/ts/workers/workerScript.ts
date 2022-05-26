@@ -209,8 +209,8 @@ function buildChunkVertexData(data: BuildData): void {
 
 }
 
-function sendHeightAtPoint(point: LVector3):void {
-    terrainFunction(point, LVector3.Zero());
+function sendHeightAtPoint(point: LVector3, seed: LVector3):void {
+    terrainFunction(point, seed);
 
     self.postMessage({
         h: point.getMagnitude(),
@@ -243,11 +243,13 @@ self.onmessage = e => {
                 initLayers();
             }
 
+            const seed = new LVector3(data.seed[0], data.seed[1], data.seed[2]);
+
             let samplePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
             samplePosition.normalizeInPlace();
             samplePosition.scaleInPlace(data.planetDiameter / 2);
 
-            sendHeightAtPoint(samplePosition);
+            sendHeightAtPoint(samplePosition, seed);
             break;
 
         default:

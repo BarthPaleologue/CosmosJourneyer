@@ -61,5 +61,5 @@ export function computePointOnOrbit(centerOfMass: Vector3, periapsis: number, ap
     let pointY = ellipseCenterY;
     let pointZ = Math.sin(eccentricAnomaly) * semiMinorLength + ellipseCenterZ;
 
-    return new Vector3(pointX, ellipseCenterY, pointZ);
+    return new Vector3(pointX, pointY, pointZ);
 }

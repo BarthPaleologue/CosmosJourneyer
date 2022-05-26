@@ -92,7 +92,7 @@ export abstract class CelestialBody implements Transformable {
         }
 
         if(this.physicalProperties.rotationPeriod > 0) {
-            let dtheta = deltaTime / this.physicalProperties.rotationPeriod;
+            let dtheta = 2 * Math.PI * deltaTime / this.physicalProperties.rotationPeriod;
 
             if (player.isOrbiting(this)) player.rotateAround(this.getAbsolutePosition(), this.physicalProperties.rotationAxis, -dtheta);
             this.rotate(this.physicalProperties.rotationAxis, -dtheta);

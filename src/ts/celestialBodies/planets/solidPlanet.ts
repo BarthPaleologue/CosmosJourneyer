@@ -214,6 +214,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     public generateCollisionTask(relativePosition: Vector3): CollisionData {
         let collisionData: CollisionData = {
+            seed: this.getSeed(),
             taskType: TaskType.Collision,
             planetName: this._name,
             terrainSettings: this.terrainSettings,

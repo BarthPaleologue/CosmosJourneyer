@@ -6,8 +6,7 @@ import {
     FxaaPostProcess,
     Scene,
     Tools,
-    Vector3,
-    VolumetricLightScatteringPostProcess
+    Vector3
 } from "@babylonjs/core";
 
 import {SolidPlanet} from "./celestialBodies/planets/solidPlanet";
@@ -26,14 +25,17 @@ import {Star} from "./celestialBodies/stars/star";
 import {Settings} from "./settings";
 import {CelestialBodyType} from "./celestialBodies/interfaces";
 import {clamp} from "./utils/math";
+import {BodyEditor, EditorVisibility} from "./ui/bodyEditor";
 
 style.default;
+
+let bodyEditor = new BodyEditor(EditorVisibility.FULL);
 
 let canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let engine = new Engine(canvas, true);
+let engine = new Engine(canvas);
 engine.loadingScreen.displayLoadingUI();
 
 console.log("GPU utilisé : " + engine.getGlInfo().renderer);
@@ -50,13 +52,14 @@ let gamepad = new Gamepad();
 
 let player = new PlayerController(scene);
 player.setSpeed(0.2 * Settings.PLANET_RADIUS);
-player.rotate(player.getUpwardDirection(), 0.45);
 
-player.camera.maxZ = Math.max(Settings.PLANET_RADIUS * 50, 10000);
+player.camera.maxZ = Settings.PLANET_RADIUS * 5000;
+
+let starfield = new StarfieldPostProcess("starfield", scene);
 
 let starSystemManager = new StarSystemManager(64);
 
-let starRadius = clamp(nrand(0.5, 0.2), 0, 1.5) * Settings.PLANET_RADIUS
+let starRadius = clamp(nrand(0.5, 0.2), 0.2, 1.5) * Settings.PLANET_RADIUS * 100
 let sun = new Star("Weierstrass", starRadius, starSystemManager, scene, {
     mass: 1000,
     rotationPeriod: 60 * 60 * 24,
@@ -66,14 +69,13 @@ let sun = new Star("Weierstrass", starRadius, starSystemManager, scene, {
 });
 console.table(sun.physicalProperties);
 
-sun.translate(new Vector3(-900000, 0, -1700000));
+sun.translate(new Vector3(-9, 0, -17).scale(100000000));
 
-let starfield = new StarfieldPostProcess("starfield", scene);
 starfield.setStar(sun);
 
 let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, {
     mass: 10,
-    rotationPeriod: 60 * 60 / 10,
+    rotationPeriod: 24 * 60 * 60 / 10,
     rotationAxis: Axis.Y,
 
     minTemperature: randInt(-50, 5),
@@ -85,7 +87,7 @@ let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManage
     centeredRandom() * 100000e3,
     centeredRandom() * 100000e3
 ]);
-planet.translate(new Vector3(planet.getRadius() * 2, 0, 4 * planet.getRadius()));
+planet.translate(new Vector3(0, 0, 4 * planet.getRadius()));
 console.log("seed : ", planet.getSeed().toString());
 console.table(planet.physicalProperties);
 planet.colorSettings.plainColor = new Color3(0.22, 0.37, 0.024).add(new Color3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
@@ -96,7 +98,7 @@ planet.updateMaterial();
 
 planet.rotate(Axis.X, centeredRandom() / 2);
 
-let ocean = planet.createOcean(sun, scene);
+planet.createOcean(sun, scene);
 
 if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0 && Math.random() < 0.8) {
     let flatClouds = planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
@@ -110,49 +112,39 @@ if (planet.physicalProperties.pressure > 0) {
     atmosphere.settings.blueWaveLength *= 1 + centeredRandom() / 3;
 }
 
-let rings = planet.createRings(sun, scene);
-rings.settings.ringStart = 1.8 + 0.4 * centeredRandom();
-rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom();
-rings.settings.ringOpacity = Math.random();
-
-let vls = new VolumetricLightScatteringPostProcess("trueLight", 1, player.camera, sun.mesh, 100);
+if(Math.random() < 0.9) {
+    let rings = planet.createRings(sun, scene);
+    rings.settings.ringStart = 1.8 + 0.4 * centeredRandom();
+    rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom();
+    rings.settings.ringOpacity = Math.random();
+}
 
 let fxaa = new FxaaPostProcess("fxaa", 1, player.camera);
 
 let isMouseEnabled = false;
 
 document.addEventListener("keydown", e => {
-    if (e.key == "p") { // take screenshots
-        Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, {precision: 4});
-    }
+    if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, {precision: 4});
+    if (e.key == "u") bodyEditor.setVisibility((bodyEditor.getVisibility() == EditorVisibility.HIDDEN) ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
     if (e.key == "w" && player.nearestBody != null) (<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe = !(<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe;
 });
-
-window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    engine.resize();
-});
-
-depthRenderer.getDepthMap().renderList?.push(sun.mesh);
 
 let collisionWorker = new CollisionWorker(player, starSystemManager);
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
 
-    scene.beforeRender = () => {
+    scene.registerBeforeRender(() => {
 
         const deltaTime = engine.getDeltaTime() / 1000;
 
         player.nearestBody = starSystemManager.getNearestBody();
+        if (player.nearestBody.getName() != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, sun, player);
 
-        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime);
+        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, Settings.TIME_MULTIPLIER * deltaTime);
 
         if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
-
-        gamepad.update();
 
         let deplacement = player.listenToGamepad(gamepad, deltaTime);
 
@@ -165,8 +157,19 @@ scene.executeWhenReady(() => {
                 collisionWorker.checkCollision(player.nearestBody as SolidPlanet);
             }
         }
-    };
+    });
 
     engine.runRenderLoop(() => scene.render());
 });
+
+function resizeUI() {
+    if (bodyEditor.getVisibility() != EditorVisibility.FULL) canvas.width = window.innerWidth;
+    else canvas.width = window.innerWidth - 300; // on compte le panneau
+    canvas.height = window.innerHeight;
+    engine.resize();
+}
+
+window.addEventListener("resize", () => resizeUI());
+
+resizeUI();
 

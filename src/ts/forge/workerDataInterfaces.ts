@@ -8,13 +8,13 @@ export interface WorkerData {
     planetDiameter: number;
     terrainSettings: TerrainSettings;
     position: number[];
+    seed: number[];
 }
 
 export interface BuildData extends WorkerData {
     nbVerticesPerSide: number;
     depth: number;
     direction: Direction;
-    seed: number[];
 }
 
 export interface CollisionData extends WorkerData {
