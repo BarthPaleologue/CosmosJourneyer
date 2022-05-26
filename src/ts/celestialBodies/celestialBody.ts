@@ -9,11 +9,14 @@ import {StarSystemManager} from "./starSystemManager";
 import {BodyPhysicalProperties} from "./physicalPropertiesInterfaces";
 import {BodyPostProcesses, PlanetPostProcesses} from "./postProcessesInterfaces";
 import {OrbitalProperties} from "./orbitalPropertiesInterface";
+import {computeBarycenter, computePointOnOrbit} from "../utils/kepler";
+import {Settings} from "../settings";
 
 export abstract class CelestialBody implements Transformable {
     protected abstract bodyType: CelestialBodyType;
 
     abstract physicalProperties: BodyPhysicalProperties;
+    orbitalProperties: OrbitalProperties;
     abstract postProcesses: BodyPostProcesses;
 
     readonly _starSystemManager: StarSystemManager;
@@ -24,6 +27,12 @@ export abstract class CelestialBody implements Transformable {
         this._name = name;
         this._starSystemManager = starSystemManager;
         starSystemManager.addBody(this);
+
+        this.orbitalProperties = {
+            periapsis: this.getRadius() * 5,
+            apoapsis: this.getRadius() * 5,
+            period: 0
+        }
     }
 
     /**
@@ -72,12 +81,22 @@ export abstract class CelestialBody implements Transformable {
      * @param deltaTime the time step to update for
      */
     public update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
-        let dtheta = deltaTime / this.physicalProperties.rotationPeriod;
+        if (this.orbitalProperties.period > 0) {
+            let barycenter = computeBarycenter(this, this._starSystemManager.getBodies());
 
-        if (player.isOrbiting() && player.nearestBody?.getName() == this.getName()) {
-            player.rotateAround(this.getAbsolutePosition(), this.physicalProperties.rotationAxis, -dtheta);
+            let initialPosition = this.getAbsolutePosition().clone();
+            let newPosition = computePointOnOrbit(barycenter, this.orbitalProperties.periapsis, this.orbitalProperties.apoapsis, this.orbitalProperties.period, this._starSystemManager.getTime())
+
+            if (player.isOrbiting(this)) player.translate(newPosition.subtract(initialPosition));
+            this.setAbsolutePosition(newPosition);
         }
-        this.rotate(this.physicalProperties.rotationAxis, -dtheta);
+
+        if(this.physicalProperties.rotationPeriod > 0) {
+            let dtheta = deltaTime / this.physicalProperties.rotationPeriod;
+
+            if (player.isOrbiting(this)) player.rotateAround(this.getAbsolutePosition(), this.physicalProperties.rotationAxis, -dtheta);
+            this.rotate(this.physicalProperties.rotationAxis, -dtheta);
+        }
     }
 
     public getOriginBodySpaceSamplePosition(): Vector3 {

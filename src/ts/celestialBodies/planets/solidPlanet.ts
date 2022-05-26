@@ -83,6 +83,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     constructor(id: string, radius: number,
                 starSystemManager: StarSystemManager, scene: Scene,
                 physicalProperties: SolidPhysicalProperties = {
+                    mass: 10,
                     rotationPeriod: 60 * 60 * 24,
                     rotationAxis: Axis.Y,
                     minTemperature: -60,
@@ -288,7 +289,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     }
 
     public getAbsolutePosition() {
-        if(this.attachNode.getAbsolutePosition()._isDirty) this.attachNode.computeWorldMatrix(true);
+        if (this.attachNode.getAbsolutePosition()._isDirty) this.attachNode.computeWorldMatrix(true);
         return this.attachNode.getAbsolutePosition();
     }
 
@@ -301,8 +302,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     }
 
     getRotationQuaternion(): Quaternion {
-        if(this.attachNode.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.getName()}`)
-        if(this.attachNode.rotationQuaternion._isDirty) this.attachNode.computeWorldMatrix(true);
+        if (this.attachNode.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.getName()}`)
+        if (this.attachNode.rotationQuaternion._isDirty) this.attachNode.computeWorldMatrix(true);
         return this.attachNode.rotationQuaternion;
     }
 

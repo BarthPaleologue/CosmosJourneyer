@@ -1,6 +1,8 @@
 // from https://www.youtube.com/watch?v=UXD97l7ZT0w
 
-import {Vector2} from "@babylonjs/core";
+import {Vector3} from "@babylonjs/core";
+import {CelestialBody} from "../celestialBodies/celestialBody";
+import {Transformable} from "../celestialBodies/interfaces";
 
 /**
  * Returns 0 when the arguments are solution to the Kepler's equation
@@ -28,7 +30,21 @@ export function solveKepler(M: number, e: number) {
     return guess;
 }
 
-export function computePointOnOrbit(centerOfMass: Vector2, periapsis: number, apoapsis: number, t: number) {
+export function computeBarycenter(body: Transformable, bodies: CelestialBody[]) {
+    let barycenter = Vector3.Zero();
+    let sum = 0;
+    for (const otherBody of bodies) {
+        if (otherBody == body) continue;
+        const d2 = body.getAbsolutePosition().subtract(otherBody.getAbsolutePosition()).lengthSquared();
+        const factor = otherBody.physicalProperties.mass / d2;
+        barycenter.addInPlace(otherBody.getAbsolutePosition().scale(factor));
+        sum += factor;
+    }
+    if (sum > 0) barycenter.scaleInPlace(1 / sum);
+    return barycenter;
+}
+
+export function computePointOnOrbit(centerOfMass: Vector3, periapsis: number, apoapsis: number, period: number, t: number): Vector3 {
     let semiMajorLength = (periapsis + apoapsis) / 2;
     let linearEccentricity = semiMajorLength - periapsis;
     let eccentricity = linearEccentricity / semiMajorLength;
@@ -36,12 +52,14 @@ export function computePointOnOrbit(centerOfMass: Vector2, periapsis: number, ap
     let semiMinorLength = Math.sqrt(semiMajorLength ** 2 - linearEccentricity ** 2);
     let ellipseCenterX = centerOfMass.x - linearEccentricity;
     let ellipseCenterY = centerOfMass.y;
+    let ellipseCenterZ = centerOfMass.z;
 
-    let meanAnomaly = Math.PI * 2 * t;
+    let meanAnomaly = Math.PI * 2 * t / period;
     let eccentricAnomaly = solveKepler(meanAnomaly, eccentricity);
 
     let pointX = Math.cos(eccentricAnomaly) * semiMajorLength + ellipseCenterX;
-    let pointY = Math.sin(eccentricAnomaly) * semiMinorLength + ellipseCenterY;
+    let pointY = ellipseCenterY;
+    let pointZ = Math.sin(eccentricAnomaly) * semiMinorLength + ellipseCenterZ;
 
-    return new Vector2(pointX, pointY);
+    return new Vector3(pointX, ellipseCenterY, pointZ);
 }

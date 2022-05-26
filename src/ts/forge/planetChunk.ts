@@ -1,4 +1,4 @@
-import {Mesh, Animation} from "@babylonjs/core";
+import {Mesh, Animation, StandardMaterial, Color3} from "@babylonjs/core";
 
 import {SolidPlanet} from "../celestialBodies/planets/solidPlanet";
 import {ChunkForge} from "./chunkForge";
@@ -49,6 +49,11 @@ export class PlanetChunk {
         // note : on sphérise après car le worker script calcule les positions à partir du cube
         this.mesh.position.normalize();
         this.mesh.position.scaleInPlace(tree.planet.getRadius());
+
+        /*let debugMaterial = new StandardMaterial(`rand${id}`);
+        debugMaterial.emissiveColor = Color3.Random();
+
+        this.mesh.material = debugMaterial;*/
     }
 
     public isReady() {

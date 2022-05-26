@@ -58,7 +58,7 @@ console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTI
 
 let player = new PlayerController(scene);
 player.setSpeed(0.2 * Settings.PLANET_RADIUS);
-player.camera.maxZ = Settings.PLANET_RADIUS * 600;
+player.camera.maxZ = Settings.PLANET_RADIUS * 100000;
 
 let keyboard = new Keyboard();
 let mouse = new Mouse();
@@ -68,8 +68,8 @@ let starSystem = new StarSystemManager(Settings.VERTEX_RESOLUTION);
 
 let starfield = new StarfieldPostProcess("starfield", scene);
 
-let sun = new Star("Weierstrass", 6.4 * Settings.PLANET_RADIUS, starSystem, scene);
-sun.translate(new Vector3(-1, 0, -1).normalizeToNew().scale(Settings.PLANET_RADIUS * 160));
+let sun = new Star("Weierstrass", 400 * Settings.PLANET_RADIUS, starSystem, scene);
+sun.translate(new Vector3(-1, 0, -1).normalizeToNew().scale(Settings.PLANET_RADIUS * 10000));
 
 starfield.setStar(sun);
 
@@ -86,7 +86,8 @@ planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
 planet.createRings(sun, scene);
 
 let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, scene, {
-    rotationPeriod: 28 * 24 * 60 * 60,
+    mass: 2,
+    rotationPeriod: 24 * 60 * 60,
     rotationAxis: Axis.Y,
 
     minTemperature: -180,
@@ -94,6 +95,11 @@ let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, s
     pressure: 0,
     waterAmount: 0.5
 });
+
+moon.orbitalProperties.periapsis = 5 * planet.getRadius();
+moon.orbitalProperties.apoapsis = 10 * planet.getRadius();
+moon.orbitalProperties.period = moon.physicalProperties.rotationPeriod;
+
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
 moon.colorSettings.plainColor = new Color3(0.67, 0.67, 0.67);
@@ -107,6 +113,7 @@ moon.translate(new Vector3(Math.cos(2.2), 0, Math.sin(2.2)).scale(5 * planet.get
 moon.translate(planet.getAbsolutePosition());
 
 let Ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene, {
+    mass: 7,
     rotationPeriod: 24 * 60 * 60 / 100,
     rotationAxis: Axis.Y,
 
@@ -115,7 +122,7 @@ let Ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene, {
     pressure: 0.5,
     waterAmount: 0.3
 });
-Ares.translate(new Vector3(-1.5, 0, 2).scale(Settings.PLANET_RADIUS * 7));
+Ares.translate(new Vector3(-1.5, 0, 2).scale(Settings.PLANET_RADIUS * 30));
 
 Ares.terrainSettings.continentsFragmentation = 0.5;
 Ares.terrainSettings.continentBaseHeight = 5e3;
@@ -144,10 +151,10 @@ starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() /
 function updateScene() {
     let deltaTime = engine.getDeltaTime() / 1000;
 
-    player.nearestBody = starSystem.getNearestBody();
-    if (player.nearestBody && player.nearestBody.getName() != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, sun, player);
+    player.nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.getAbsolutePosition());
+    if (player.nearestBody.getName() != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, sun, player);
 
-    document.getElementById("planetName")!.innerText = player.isOrbiting() ? player.nearestBody!.getName() : "Outer Space";
+    document.getElementById("planetName")!.innerText = player.isOrbiting() ? player.nearestBody.getName() : "Outer Space";
 
     if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 

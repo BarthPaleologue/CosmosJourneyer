@@ -33,6 +33,7 @@ export class Star extends CelestialBody {
                 starSystemManager: StarSystemManager, scene: Scene,
                 physicalProperties: StarPhysicalProperties = {
                     //TODO: ne pas hardcoder
+                    mass: 1000,
                     rotationPeriod: 24 * 60 * 60,
                     rotationAxis: Axis.Y,
 

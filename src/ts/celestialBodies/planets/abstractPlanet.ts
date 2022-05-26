@@ -1,6 +1,5 @@
 import {CelestialBody} from "../celestialBody";
 import {Seedable} from "../interfaces";
-import {PlanetPostProcess} from "../../postProcesses/planetPostProcess";
 import {
     AtmosphericScatteringPostProcess
 } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";

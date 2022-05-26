@@ -1,6 +1,7 @@
 import {Vector3} from "@babylonjs/core";
 
 export interface BodyPhysicalProperties {
+    mass: number;
     rotationPeriod: number;
     rotationAxis: Vector3;
 }

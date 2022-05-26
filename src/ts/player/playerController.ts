@@ -229,7 +229,7 @@ export class PlayerController implements Transformable {
     }
 
     translate(displacement: Vector3): void {
-        this.mesh.position.addInPlace(displacement);
+        this.mesh.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
     }
 
     rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
@@ -240,10 +240,18 @@ export class PlayerController implements Transformable {
         this.mesh.rotate(axis, amount, Space.WORLD);
     }
 
-    public isOrbiting(): boolean {
+    /**
+     * If the parameter is unset, returns whereas the player is orbiting a body, if the parameter is set returns if the player orbits the given body
+     * @param body
+     */
+    public isOrbiting(body: CelestialBody | null = null): boolean {
         //TODO: do not hardcode
         const orbitLimitFactor = 2.5;
         if (this.nearestBody == null) return false;
-        else return this.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * this.nearestBody.getRadius()) ** 2;
+        else if(body == null) {
+            return this.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * this.nearestBody.getRadius()) ** 2;
+        } else {
+            return (this.nearestBody == body) && this.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * this.nearestBody.getRadius()) ** 2;
+        }
     }
 }

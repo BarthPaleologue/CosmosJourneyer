@@ -15,6 +15,7 @@ export class GazPlanet extends AbstractPlanet {
         super(name, radius, starSystemManager);
         this.physicalProperties = {
             // FIXME: choose physically accurates values
+            mass: 20,
             rotationPeriod: 24 * 60 * 60,
             rotationAxis: new Vector3(0, 1, 0),
             minTemperature: 100,

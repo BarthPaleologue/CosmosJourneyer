@@ -58,6 +58,7 @@ let starSystemManager = new StarSystemManager(64);
 
 let starRadius = clamp(nrand(0.5, 0.2), 0, 1.5) * Settings.PLANET_RADIUS
 let sun = new Star("Weierstrass", starRadius, starSystemManager, scene, {
+    mass: 1000,
     rotationPeriod: 60 * 60 * 24,
     rotationAxis: Axis.Y,
 
@@ -71,6 +72,7 @@ let starfield = new StarfieldPostProcess("starfield", scene);
 starfield.setStar(sun);
 
 let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, {
+    mass: 10,
     rotationPeriod: 60 * 60 / 10,
     rotationAxis: Axis.Y,
 
