@@ -211,7 +211,7 @@ export class BodyEditor {
             player.camera.fov = val * Math.PI / 360;
         }));
         //TODO: do not hardcode here
-        const power = 1.7;
+        const power = 1.4;
         this.generalSliders.push(new Slider("timeModifier", document.getElementById("timeModifier")!, 0, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {
             Settings.TIME_MULTIPLIER = Math.pow(val, power);
         }));
