@@ -27,7 +27,7 @@ import snowNormalMap2 from "../../../asset/textures/snowNormalMap2.png";
 import beachNormalMap from "../../../asset/textures/sandNormalMap2.png";
 import desertNormalMap from "../../../asset/textures/sandNormalMap2.jpg";
 
-import {CelestialBodyType, RigidBody, SolidPhysicalProperties} from "../interfaces";
+import {CelestialBodyType, RigidBody} from "../interfaces";
 import {CollisionData} from "../../forge/workerDataInterfaces";
 import {TaskType} from "../../forge/taskInterfaces";
 import {initMeshTransform} from "../../utils/mesh";
@@ -35,6 +35,7 @@ import {PlayerController} from "../../player/playerController";
 import {StarSystemManager} from "../starSystemManager";
 import {Settings} from "../../settings";
 import {Algebra} from "../../utils/algebra";
+import {SolidPhysicalProperties} from "../physicalPropertiesInterfaces";
 
 export enum ColorMode {
     DEFAULT,

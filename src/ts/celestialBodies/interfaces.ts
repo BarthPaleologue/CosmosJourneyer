@@ -1,10 +1,5 @@
-import {PostProcess, Quaternion, Vector3, VolumetricLightScatteringPostProcess} from "@babylonjs/core";
+import {Quaternion, Vector3} from "@babylonjs/core";
 import {CollisionData} from "../forge/workerDataInterfaces";
-import {AtmosphericScatteringPostProcess} from "../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
-import {OceanPostProcess} from "../postProcesses/planetPostProcesses/oceanPostProcess";
-import {FlatCloudsPostProcess} from "../postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import {RingsPostProcess} from "../postProcesses/planetPostProcesses/ringsPostProcess";
-import {PlanetPostProcess} from "../postProcesses/planetPostProcess";
 
 export enum CelestialBodyType {
     STAR,
@@ -73,40 +68,5 @@ export interface RigidBody {
      * @param relativePosition The relative position to the planet
      */
     generateCollisionTask(relativePosition: Vector3): CollisionData;
-}
-
-export interface BodyPhysicalProperties {
-    rotationPeriod: number;
-    rotationAxis: Vector3;
-}
-
-export interface StarPhysicalProperties extends BodyPhysicalProperties {
-    temperature: number;
-}
-
-export interface PlanetPhysicalProperties extends BodyPhysicalProperties {
-    minTemperature: number;
-    maxTemperature: number;
-    pressure: number;
-}
-
-export interface SolidPhysicalProperties extends PlanetPhysicalProperties {
-    waterAmount: number;
-}
-
-export interface BodyPostProcesses {
-    [details: string] : PostProcess | null;
-}
-
-export interface PlanetPostProcesses extends BodyPostProcesses {
-    [details: string] : PlanetPostProcess | null;
-    atmosphere: AtmosphericScatteringPostProcess | null;
-    ocean: OceanPostProcess | null;
-    clouds: FlatCloudsPostProcess | null;
-    rings: RingsPostProcess | null;
-}
-
-export interface StarPostProcesses extends BodyPostProcesses {
-    volumetricLight: VolumetricLightScatteringPostProcess | null;
 }
 

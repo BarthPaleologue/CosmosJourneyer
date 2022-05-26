@@ -11,10 +11,12 @@ import {
     Space,
     Vector3, VolumetricLightScatteringPostProcess
 } from "@babylonjs/core";
-import {StarPostProcesses, CelestialBodyType, StarPhysicalProperties} from "../interfaces";
+import {CelestialBodyType} from "../interfaces";
 import {initMeshTransform} from "../../utils/mesh";
 import {PlayerController} from "../../player/playerController";
 import {StarSystemManager} from "../starSystemManager";
+import {StarPhysicalProperties} from "../physicalPropertiesInterfaces";
+import {StarPostProcesses} from "../postProcessesInterfaces";
 
 // TODO: implement RigidBody for star
 export class Star extends CelestialBody {

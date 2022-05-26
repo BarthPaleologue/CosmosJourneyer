@@ -1,5 +1,5 @@
 import {CelestialBody} from "../celestialBody";
-import {PlanetPhysicalProperties, PlanetPostProcesses, Seedable} from "../interfaces";
+import {Seedable} from "../interfaces";
 import {PlanetPostProcess} from "../../postProcesses/planetPostProcess";
 import {
     AtmosphericScatteringPostProcess
@@ -11,6 +11,8 @@ import {PlayerController} from "../../player/playerController";
 import {OceanPostProcess} from "../../postProcesses/planetPostProcesses/oceanPostProcess";
 import {RingsPostProcess} from "../../postProcesses/planetPostProcesses/ringsPostProcess";
 import {StarSystemManager} from "../starSystemManager";
+import {PlanetPhysicalProperties} from "../physicalPropertiesInterfaces";
+import {PlanetPostProcesses} from "../postProcessesInterfaces";
 
 export abstract class AbstractPlanet extends CelestialBody implements Seedable {
     readonly _radius: number;
