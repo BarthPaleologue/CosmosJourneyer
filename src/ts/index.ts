@@ -85,8 +85,8 @@ let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, s
 
 moon.orbitalProperties = {
     period: moon.physicalProperties.rotationPeriod,
-    apoapsis: 10 * planet.getRadius(),
-    periapsis: 7 * planet.getRadius()
+    apoapsis: 6 * planet.getRadius(),
+    periapsis: 5 * planet.getRadius()
 }
 
 moon.terrainSettings.continentsFragmentation = 1;

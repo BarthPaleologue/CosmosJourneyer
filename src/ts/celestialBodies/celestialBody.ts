@@ -48,6 +48,10 @@ export abstract class CelestialBody implements Transformable {
 
     public abstract getRotationQuaternion(): Quaternion;
 
+    public getInverseRotationQuaternion(): Quaternion {
+        return this.getRotationQuaternion().conjugate();
+    }
+
     /**
      * Returns the body type of the body (useful for casts)
      */

@@ -101,6 +101,8 @@ export class Star extends CelestialBody {
     }
 
     public getRotationQuaternion(): Quaternion {
-        return this.mesh.rotationQuaternion!;
+        if(this.mesh.rotationQuaternion == undefined) throw new Error(`${this.getName()}'s rotation quaternion is null !`);
+        if(this.mesh.rotationQuaternion._isDirty) this.mesh.computeWorldMatrix(true);
+        return this.mesh.rotationQuaternion;
     }
 }

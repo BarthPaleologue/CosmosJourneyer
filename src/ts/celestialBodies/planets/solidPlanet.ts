@@ -151,7 +151,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
                     "cameraNear", "cameraFar", "planetPosition", "planetRadius",
 
-                    "planetRotationQuaternion",
+                    "planetInverseRotationQuaternion",
 
                     "playerPosition",
 
@@ -279,7 +279,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         this.internalTime += deltaTime;
 
-        this.surfaceMaterial.setVector4("planetRotationQuaternion", Algebra.QuaternionAsVector4(Quaternion.Inverse(this.getRotationQuaternion())));
+        this.surfaceMaterial.setVector4("planetInverseRotationQuaternion", Algebra.QuaternionAsVector4(this.getInverseRotationQuaternion()));
 
         this.surfaceMaterial.setVector3("playerPosition", player.getAbsolutePosition());
         this.surfaceMaterial.setVector3("sunPosition", starPosition);
@@ -298,11 +298,11 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         return super.getRadius() + this.oceanLevel;
     }
 
-    setAbsolutePosition(newPosition: Vector3): void {
+    public setAbsolutePosition(newPosition: Vector3): void {
         this.attachNode.setAbsolutePosition(newPosition);
     }
 
-    getRotationQuaternion(): Quaternion {
+    public getRotationQuaternion(): Quaternion {
         if (this.attachNode.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.getName()}`)
         if (this.attachNode.rotationQuaternion._isDirty) this.attachNode.computeWorldMatrix(true);
         return this.attachNode.rotationQuaternion;

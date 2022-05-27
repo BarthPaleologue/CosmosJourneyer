@@ -115,6 +115,9 @@ export class LVector3 {
     static Zero(): LVector3 {
         return new LVector3(0, 0, 0);
     }
+    public static Dot(vector1: Vec3, vector2: Vec3): number {
+        return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
+    }
     //https://www.wikiwand.com/en/Quaternions_and_spatial_rotation
     applyQuaternionInPlace(quaternion: Quaternion): void {
         Algebra.applyQuaternionInPlace(quaternion, this);
@@ -141,9 +144,6 @@ export class Algebra {
         vector.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
         vector.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
         vector.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
-    }
-    public static Dot(vector1: Vec3, vector2: Vec3): number {
-        return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
     }
     public static QuaternionAsVector4(q: Quaternion): Vector4 {
         return new Vector4(q.x, q.y, q.z, q.w);

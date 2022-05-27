@@ -133,7 +133,7 @@ function buildChunkVertexData(data: BuildData): void {
             terrainFunction(vertexPosition, vertexGradient, seed);
 
             let h = vertexGradient;
-            h.subtractInPlace(unitSphereCoords.scale(Algebra.Dot(vertexGradient, unitSphereCoords)));
+            h.subtractInPlace(unitSphereCoords.scale(LVector3.Dot(vertexGradient, unitSphereCoords)));
 
             let vertexNormal = unitSphereCoords.subtract(h);
             vertexNormal.normalizeInPlace();

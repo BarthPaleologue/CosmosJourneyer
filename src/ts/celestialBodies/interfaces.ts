@@ -28,6 +28,11 @@ export interface Transformable {
     getRotationQuaternion(): Quaternion;
 
     /**
+     * Returns the inverse of the quaternion describing the rotation of the object
+     */
+    getInverseRotationQuaternion(): Quaternion;
+
+    /**
      * Returns the position of the origin relative to the celestial body, with negation of its rotation (useful to retrieve a sample point on a sphere)
      */
     getOriginBodySpaceSamplePosition(): Vector3;

@@ -21,7 +21,7 @@ uniform vec3 v3LightPos; // light position in world space
 uniform vec3 planetPosition; // nécessaire temporairement le temps de régler le problème des floats
 uniform mat4 planetWorldMatrix;
 
-uniform vec4 planetRotationQuaternion;
+uniform vec4 planetInverseRotationQuaternion;
 uniform float planetRadius;
 
 // Varying
@@ -79,8 +79,8 @@ void main() {
 	vPosition = vPositionW - planetPosition;
 
 
-	vUnitSamplePoint = applyQuaternion(planetRotationQuaternion, normalize(vPosition));
-	vSamplePoint = applyQuaternion(planetRotationQuaternion, vPosition);
+	vUnitSamplePoint = applyQuaternion(planetInverseRotationQuaternion, normalize(vPosition));
+	vSamplePoint = applyQuaternion(planetInverseRotationQuaternion, vPosition);
 
 	vNormal = normal;
     vUV = uv;
