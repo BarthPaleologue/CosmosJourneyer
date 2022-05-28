@@ -1,4 +1,4 @@
-import {Color3, Scene, Texture, Vector3} from "@babylonjs/core";
+import {Color3, Effect, Scene, Texture} from "@babylonjs/core";
 
 import {CloudSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import normalMap from "../../../asset/textures/cloudNormalMap2.jpg";
@@ -6,6 +6,11 @@ import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
 import {AbstractPlanet} from "../../celestialBodies/planets/abstractPlanet";
 import {gcd} from "../../utils/math";
+
+import flatCloudsFragment from "../../../shaders/flatClouds.fragment.fx";
+
+const shaderName = "flatClouds"
+Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
 
 export class FlatCloudsPostProcess extends PlanetPostProcess {
 
@@ -110,7 +115,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             }
         }
 
-        super(name, "./shaders/flatClouds", uniforms, samplers, planet, sun, scene);
+        super(name, shaderName, uniforms, samplers, planet, sun, scene);
 
         this.settings = settings;
     }

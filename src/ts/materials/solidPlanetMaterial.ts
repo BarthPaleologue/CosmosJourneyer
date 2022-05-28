@@ -1,4 +1,4 @@
-import {Color3, MaterialHelper, Scene, ShaderMaterial, Texture, Vector3} from "@babylonjs/core";
+import {Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Texture, Vector3} from "@babylonjs/core";
 import bottomNormalMap from "../../asset/textures/crackednormal.jpg";
 import steepNormalMap from "../../asset/textures/rockn.png";
 import grassNormalMap from "../../asset/textures/grassNormalMap.jpg";
@@ -11,13 +11,21 @@ import {ColorMode, ColorSettings} from "./colorSettingsInterface";
 import {Algebra} from "../utils/algebra";
 import {PlayerController} from "../player/playerController";
 
+import surfaceMaterialFragment from "../../shaders/solidPlanetMaterial.fragment.fx";
+import surfaceMaterialVertex from "../../shaders/solidPlanetMaterial.vertex.fx";
+
+const shaderName = "surfaceMaterial"
+Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
+Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
+
 export class SolidPlanetMaterial extends ShaderMaterial {
 
     readonly planet: SolidPlanet;
     colorSettings: ColorSettings;
 
     constructor(planet: SolidPlanet, scene: Scene) {
-        super(`${planet.getName()}SurfaceColor`, scene, "./shaders/surfaceColor", {
+
+        super(`${planet.getName()}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
             uniforms: [
                 "world", "worldViewProjection", "projection", "view",

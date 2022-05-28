@@ -1,8 +1,13 @@
-import {Axis, Scene, Vector3} from "@babylonjs/core";
+import {Axis, Effect, Scene, Vector3} from "@babylonjs/core";
 
 import {SpacePostProcess} from "./spacePostProcess";
 import {ShaderDataType, ShaderSamplerData, ShaderUniformData, StarfieldSettings} from "./interfaces";
 import {Star} from "../celestialBodies/stars/star";
+
+import starfieldFragment from "../../shaders/starfield.fragment.fx";
+
+const shaderName = "starfield";
+Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
 
 export class StarfieldPostProcess extends SpacePostProcess {
 
@@ -28,7 +33,7 @@ export class StarfieldPostProcess extends SpacePostProcess {
 
         let samplers: ShaderSamplerData = {}
 
-        super(name, "./shaders/starfield", uniforms, samplers, scene);
+        super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
     }

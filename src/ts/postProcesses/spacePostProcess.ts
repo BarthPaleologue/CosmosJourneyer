@@ -9,7 +9,7 @@ export abstract class SpacePostProcess extends PostProcess {
 
     protected internalTime: number = 0;
 
-    protected constructor(name: string, fragmentURL: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, scene: Scene) {
+    protected constructor(name: string, fragmentName: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, scene: Scene) {
 
         let commonUniforms: ShaderUniformData = {
             "cameraPosition": {
@@ -49,7 +49,7 @@ export abstract class SpacePostProcess extends PostProcess {
         Object.assign(commonUniforms, commonUniforms, uniforms);
         Object.assign(commonSamplers, commonSamplers, samplers);
 
-        super(name, fragmentURL, Object.keys(commonUniforms), Object.keys(commonSamplers), 1, scene.activeCamera!);
+        super(name, fragmentName, Object.keys(commonUniforms), Object.keys(commonSamplers), 1, scene.activeCamera!);
 
         this.camera = scene.activeCamera!;
         this.setCamera(this.camera);

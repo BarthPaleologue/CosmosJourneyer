@@ -1,11 +1,18 @@
-import {Scene, ShaderMaterial} from "@babylonjs/core";
+import {Effect, Scene, ShaderMaterial} from "@babylonjs/core";
 import {Star} from "../celestialBodies/stars/star";
 import {getRgbFromTemperature} from "../utils/specrend";
+
+import starMaterialFragment from "../../shaders/starMaterial.fragment.fx";
+import starMaterialVertex from "../../shaders/starMaterial.vertex.fx";
+
+const shaderName = "starMaterial"
+Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;
+Effect.ShadersStore[`${shaderName}VertexShader`] = starMaterialVertex;
 
 export class StarMaterial extends ShaderMaterial {
     star: Star;
     constructor(star: Star, scene: Scene) {
-        super("starColor", scene, "./shaders/starMaterial", {
+        super("starColor", scene, shaderName, {
             attributes: ["position"],
             uniforms: [
                 "world", "worldViewProjection", "planetWorldMatrix",

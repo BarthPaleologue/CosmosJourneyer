@@ -1,4 +1,4 @@
-import {Scene, Texture} from "@babylonjs/core";
+import {Effect, Scene, Texture} from "@babylonjs/core";
 
 import waterNormal1 from "../../../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../../../asset/textures/waterNormalMap4.jpg";
@@ -6,6 +6,11 @@ import {OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} fro
 import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
 import {AbstractPlanet} from "../../celestialBodies/planets/abstractPlanet";
+
+import oceanFragment from "../../../shaders/ocean.fragment.fx";
+
+const shaderName = "ocean"
+Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
 
 export class OceanPostProcess extends PlanetPostProcess {
 
@@ -93,7 +98,7 @@ export class OceanPostProcess extends PlanetPostProcess {
             }
         }
 
-        super(name, "./shaders/ocean", uniforms, samplers, planet, sun, scene);
+        super(name, shaderName, uniforms, samplers, planet, sun, scene);
 
         this.settings = settings;
     }

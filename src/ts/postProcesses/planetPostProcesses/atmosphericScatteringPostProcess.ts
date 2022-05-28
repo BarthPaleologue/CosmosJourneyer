@@ -1,9 +1,14 @@
-import {Scene} from "@babylonjs/core";
+import {Effect, Scene} from "@babylonjs/core";
 
 import {AtmosphereSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
 import {PlanetPostProcess} from "../planetPostProcess";
 import {Star} from "../../celestialBodies/stars/star";
 import {AbstractPlanet} from "../../celestialBodies/planets/abstractPlanet";
+
+import atmosphericScatteringFragment from "../../../shaders/atmosphericScattering.fragment.fx";
+
+const shaderName = "atmosphericScattering"
+Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
 
 export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
 
@@ -69,7 +74,7 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
 
         let samplers: ShaderSamplerData = {}
 
-        super(name, "./shaders/atmosphericScattering", uniforms, samplers, planet, sun, scene);
+        super(name, shaderName, uniforms, samplers, planet, sun, scene);
 
         this.settings = settings;
     }
