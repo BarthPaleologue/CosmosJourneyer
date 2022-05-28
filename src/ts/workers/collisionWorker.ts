@@ -1,4 +1,4 @@
-import {CollisionData} from "../forge/workerDataInterfaces";
+import {CollisionData} from "../chunks/workerDataInterfaces";
 import {StarSystemManager} from "../celestialBodies/starSystemManager";
 import {PlayerController} from "../player/playerController";
 import {RigidBody, Transformable} from "../celestialBodies/interfaces";

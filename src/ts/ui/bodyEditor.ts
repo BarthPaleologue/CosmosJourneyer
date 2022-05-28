@@ -1,5 +1,5 @@
 import editorHTML from "../../html/bodyEditor.html";
-import {ColorMode, SolidPlanet} from "../celestialBodies/planets/solidPlanet";
+import {SolidPlanet} from "../celestialBodies/planets/solidPlanet";
 import {Star} from "../celestialBodies/stars/star";
 import {Slider} from "handle-sliderjs";
 import {CelestialBodyType} from "../celestialBodies/interfaces";
@@ -8,6 +8,7 @@ import {Axis, Color3, Vector3} from "@babylonjs/core";
 import {PlayerController} from "../player/playerController";
 import {CelestialBody} from "../celestialBodies/celestialBody";
 import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";
+import {ColorMode} from "../materials/colorSettingsInterface";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -226,11 +227,11 @@ export class BodyEditor {
 
         this.physicSliders.push(new Slider("minTemperature", document.getElementById("minTemperature")!, -273, 300, planet.physicalProperties.minTemperature, (val: number) => {
             planet.physicalProperties.minTemperature = val;
-            planet.updateMaterial();
+            planet.material.updateManual();
         }));
         this.physicSliders.push(new Slider("maxTemperature", document.getElementById("maxTemperature")!, -273, 300, planet.physicalProperties.maxTemperature, (val: number) => {
             planet.physicalProperties.maxTemperature = val;
-            planet.updateMaterial();
+            planet.material.updateManual();
         }));
     }
 
@@ -238,54 +239,57 @@ export class BodyEditor {
         for (const slider of this.surfaceSliders) slider.remove();
         this.surfaceSliders.length = 0;
 
+        const material = planet.material;
+        const colorSettings = material.colorSettings;
+
         let snowColorPicker = document.getElementById("snowColor") as HTMLInputElement;
-        snowColorPicker.value = planet.colorSettings.snowColor.toHexString();
+        snowColorPicker.value = colorSettings.snowColor.toHexString();
         snowColorPicker.addEventListener("input", () => {
-            planet.colorSettings.snowColor = Color3.FromHexString(snowColorPicker.value);
-            planet.updateMaterial();
+            colorSettings.snowColor = Color3.FromHexString(snowColorPicker.value);
+            material.updateManual();
         });
 
         let plainColorPicker = document.getElementById("plainColor") as HTMLInputElement;
-        plainColorPicker.value = planet.colorSettings.plainColor.toHexString();
+        plainColorPicker.value = colorSettings.plainColor.toHexString();
         plainColorPicker.addEventListener("input", () => {
-            planet.colorSettings.plainColor = Color3.FromHexString(plainColorPicker.value);
-            planet.updateMaterial();
+            colorSettings.plainColor = Color3.FromHexString(plainColorPicker.value);
+            material.updateManual();
         });
 
         let steepColorPicker = document.getElementById("steepColor") as HTMLInputElement;
-        steepColorPicker.value = planet.colorSettings.steepColor.toHexString();
+        steepColorPicker.value = colorSettings.steepColor.toHexString();
         steepColorPicker.addEventListener("input", () => {
-            planet.colorSettings.steepColor = Color3.FromHexString(steepColorPicker.value);
-            planet.updateMaterial();
+            colorSettings.steepColor = Color3.FromHexString(steepColorPicker.value);
+            material.updateManual();
         });
 
         let sandColorPicker = document.getElementById("sandColor") as HTMLInputElement;
-        sandColorPicker.value = planet.colorSettings.beachColor.toHexString();
+        sandColorPicker.value = colorSettings.beachColor.toHexString();
         sandColorPicker.addEventListener("input", () => {
-            planet.colorSettings.beachColor = Color3.FromHexString(sandColorPicker.value);
-            planet.updateMaterial();
+            colorSettings.beachColor = Color3.FromHexString(sandColorPicker.value);
+            material.updateManual();
         });
 
         let desertColorPicker = document.getElementById("desertColor") as HTMLInputElement;
-        desertColorPicker.value = planet.colorSettings.desertColor.toHexString();
+        desertColorPicker.value = colorSettings.desertColor.toHexString();
         desertColorPicker.addEventListener("input", () => {
-            planet.colorSettings.desertColor = Color3.FromHexString(desertColorPicker.value);
-            planet.updateMaterial();
+            colorSettings.desertColor = Color3.FromHexString(desertColorPicker.value);
+            material.updateManual();
         });
 
-        this.surfaceSliders.push(new Slider("sandSize", document.getElementById("sandSize")!, 0, 300, planet.colorSettings.beachSize / 10, (val: number) => {
-            planet.colorSettings.beachSize = val * 10;
-            planet.updateMaterial();
+        this.surfaceSliders.push(new Slider("sandSize", document.getElementById("sandSize")!, 0, 300, planet.material.colorSettings.beachSize / 10, (val: number) => {
+            colorSettings.beachSize = val * 10;
+            material.updateManual();
         }));
 
-        this.surfaceSliders.push(new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 100, planet.colorSettings.steepSharpness * 10, (val: number) => {
-            planet.colorSettings.steepSharpness = val / 10;
-            planet.updateMaterial();
+        this.surfaceSliders.push(new Slider("steepSharpness", document.getElementById("steepSharpness")!, 0, 100, planet.material.colorSettings.steepSharpness * 10, (val: number) => {
+            colorSettings.steepSharpness = val / 10;
+            material.updateManual();
         }));
 
-        this.surfaceSliders.push(new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 100, planet.colorSettings.normalSharpness * 100, (val: number) => {
-            planet.colorSettings.normalSharpness = val / 100;
-            planet.updateMaterial();
+        this.surfaceSliders.push(new Slider("normalSharpness", document.getElementById("normalSharpness")!, 0, 100, planet.material.colorSettings.normalSharpness * 100, (val: number) => {
+            colorSettings.normalSharpness = val / 100;
+            material.updateManual();
         }));
     }
 
@@ -456,25 +460,27 @@ export class BodyEditor {
     }
 
     public initToolbar(planet: SolidPlanet) {
+        const material = planet.material;
+        const colorSettings = material.colorSettings;
         document.getElementById("defaultMapButton")!.addEventListener("click", () => {
-            planet.colorSettings.mode = ColorMode.DEFAULT;
-            planet.updateMaterial();
+            colorSettings.mode = ColorMode.DEFAULT;
+            material.updateManual();
         });
         document.getElementById("moistureMapButton")!.addEventListener("click", () => {
-            planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.MOISTURE) ? ColorMode.MOISTURE : ColorMode.DEFAULT;
-            planet.updateMaterial();
+            colorSettings.mode = (colorSettings.mode != ColorMode.MOISTURE) ? ColorMode.MOISTURE : ColorMode.DEFAULT;
+            material.updateManual();
         });
         document.getElementById("temperatureMapButton")!.addEventListener("click", () => {
-            planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.TEMPERATURE) ? ColorMode.TEMPERATURE : ColorMode.DEFAULT;
-            planet.updateMaterial();
+            colorSettings.mode = (colorSettings.mode != ColorMode.TEMPERATURE) ? ColorMode.TEMPERATURE : ColorMode.DEFAULT;
+            material.updateManual();
         });
         document.getElementById("normalMapButton")!.addEventListener("click", () => {
-            planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.NORMAL) ? ColorMode.NORMAL : ColorMode.DEFAULT;
-            planet.updateMaterial();
+            colorSettings.mode = (colorSettings.mode != ColorMode.NORMAL) ? ColorMode.NORMAL : ColorMode.DEFAULT;
+            material.updateManual();
         });
         document.getElementById("heightMapButton")!.addEventListener("click", () => {
-            planet.colorSettings.mode = (planet.colorSettings.mode != ColorMode.HEIGHT) ? ColorMode.HEIGHT : ColorMode.DEFAULT;
-            planet.updateMaterial();
+            colorSettings.mode = (colorSettings.mode != ColorMode.HEIGHT) ? ColorMode.HEIGHT : ColorMode.DEFAULT;
+            material.updateManual();
         });
     }
 

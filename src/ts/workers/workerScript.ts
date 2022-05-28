@@ -2,10 +2,10 @@ import {getQuaternionFromDirection} from "../utils/direction";
 import {simplexNoiseLayer} from "../terrain/landscape/simplexNoiseLayer";
 import {Algebra, LVector3} from "../utils/algebra";
 import {ridgedNoiseLayer} from "../terrain/landscape/ridgedNoiseLayer";
-import {BuildData, CollisionData, WorkerData} from "../forge/workerDataInterfaces";
+import {BuildData, CollisionData, WorkerData} from "../chunks/workerDataInterfaces";
 import {TerrainSettings} from "../terrain/terrainSettings";
 import {elevationFunction} from "../terrain/landscape/elevationFunction";
-import {TaskType} from "../forge/taskInterfaces";
+import {TaskType} from "../chunks/taskInterfaces";
 import {tanhSharpen} from "../utils/math";
 
 let currentPlanetID = "";

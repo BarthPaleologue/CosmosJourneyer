@@ -91,12 +91,12 @@ moon.orbitalProperties = {
 
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
-moon.colorSettings.plainColor = new Color3(0.67, 0.67, 0.67);
-moon.colorSettings.desertColor = new Color3(116, 134, 121).scale(1 / 255);
-moon.updateMaterial();
+moon.material.colorSettings.plainColor = new Color3(0.67, 0.67, 0.67);
+moon.material.colorSettings.desertColor = new Color3(116, 134, 121).scale(1 / 255);
+moon.material.updateManual();
 
-moon.surfaceMaterial.setTexture("plainNormalMap", new Texture(rockNormalMap));
-moon.surfaceMaterial.setTexture("bottomNormalMap", new Texture(rockNormalMap));
+moon.material.setTexture("plainNormalMap", new Texture(rockNormalMap));
+moon.material.setTexture("bottomNormalMap", new Texture(rockNormalMap));
 
 moon.translate(new Vector3(moon.orbitalProperties.periapsis, 0, 0));
 moon.translate(planet.getAbsolutePosition());
@@ -118,10 +118,10 @@ Ares.terrainSettings.continentBaseHeight = 5e3;
 Ares.terrainSettings.maxMountainHeight = 20e3;
 Ares.terrainSettings.mountainsMinValue = 0.4;
 
-Ares.colorSettings.plainColor = new Color3(0.4, 0.3, 0.3);
-Ares.colorSettings.beachColor = new Color3(0.3, 0.15, 0.1);
-Ares.colorSettings.bottomColor = new Color3(0.05, 0.1, 0.15);
-Ares.updateMaterial();
+Ares.material.colorSettings.plainColor = new Color3(0.4, 0.3, 0.3);
+Ares.material.colorSettings.beachColor = new Color3(0.3, 0.15, 0.1);
+Ares.material.colorSettings.bottomColor = new Color3(0.05, 0.1, 0.15);
+Ares.material.updateManual();
 
 let aresAtmosphere = Ares.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene); // = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, scene);
 aresAtmosphere.settings.redWaveLength = 500;
@@ -164,7 +164,7 @@ document.addEventListener("keydown", e => {
     if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, {precision: 4});
     if (e.key == "u") bodyEditor.setVisibility((bodyEditor.getVisibility() == EditorVisibility.HIDDEN) ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
-    if (e.key == "w" && player.isOrbiting()) (<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe = !(<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe;
+    if (e.key == "w" && player.isOrbiting()) (<SolidPlanet><unknown>player.nearestBody).material.wireframe = !(<SolidPlanet><unknown>player.nearestBody).material.wireframe;
 });
 
 function resizeUI() {

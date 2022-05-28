@@ -1,5 +1,5 @@
 import {Quaternion, Vector3} from "@babylonjs/core";
-import {CollisionData} from "../forge/workerDataInterfaces";
+import {CollisionData} from "../chunks/workerDataInterfaces";
 
 export enum CelestialBodyType {
     STAR,

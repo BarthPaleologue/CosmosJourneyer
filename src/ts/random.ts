@@ -90,11 +90,11 @@ let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManage
 planet.translate(new Vector3(0, 0, 4 * planet.getRadius()));
 console.log("seed : ", planet.getSeed().toString());
 console.table(planet.physicalProperties);
-planet.colorSettings.plainColor = new Color3(0.22, 0.37, 0.024).add(new Color3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
-planet.colorSettings.beachSize = 250 + 100 * centeredRandom();
+planet.material.colorSettings.plainColor = new Color3(0.22, 0.37, 0.024).add(new Color3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
+planet.material.colorSettings.beachSize = 250 + 100 * centeredRandom();
 planet.terrainSettings.continentsFragmentation = clamp(nrand(0.5, 0.2), 0, 1);
 
-planet.updateMaterial();
+planet.material.updateManual();
 
 planet.rotate(Axis.X, centeredRandom() / 2);
 
@@ -127,7 +127,7 @@ document.addEventListener("keydown", e => {
     if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, {precision: 4});
     if (e.key == "u") bodyEditor.setVisibility((bodyEditor.getVisibility() == EditorVisibility.HIDDEN) ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
-    if (e.key == "w" && player.nearestBody != null) (<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe = !(<SolidPlanet><unknown>player.nearestBody).surfaceMaterial.wireframe;
+    if (e.key == "w" && player.nearestBody != null) (<SolidPlanet><unknown>player.nearestBody).material.wireframe = !(<SolidPlanet><unknown>player.nearestBody).material.wireframe;
 });
 
 let collisionWorker = new CollisionWorker(player, starSystemManager);

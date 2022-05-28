@@ -17,13 +17,14 @@ import {PlayerController} from "../../player/playerController";
 import {StarSystemManager} from "../starSystemManager";
 import {StarPhysicalProperties} from "../physicalPropertiesInterfaces";
 import {StarPostProcesses} from "../postProcessesInterfaces";
+import {StarMaterial} from "../../materials/starMaterial";
 
 // TODO: implement RigidBody for star
 export class Star extends CelestialBody {
     public mesh: Mesh;
     private readonly radius: number;
-    private readonly starMaterial: ShaderMaterial;
-    private internalTime = 0;
+    private readonly material: StarMaterial;
+    internalTime = 0;
     protected bodyType = CelestialBodyType.STAR;
     physicalProperties: StarPhysicalProperties;
 
@@ -47,21 +48,10 @@ export class Star extends CelestialBody {
 
         initMeshTransform(this.mesh);
 
-        let starMaterial = new ShaderMaterial("starColor", scene, "./shaders/starMaterial",
-            {
-                attributes: ["position"],
-                uniforms: [
-                    "world", "worldViewProjection", "planetWorldMatrix",
-                    "starColor", "time", "logarithmicDepthConstant"
-                ]
-            }
-        );
+        this.material = new StarMaterial(this, scene);
 
-        this.starMaterial = starMaterial;
+        this.mesh.material = this.material;
 
-        this.mesh.material = this.starMaterial;
-
-        //TODO: post process arrives too early (need painting composition)
         this.postProcesses = {
             volumetricLight: new VolumetricLightScatteringPostProcess(`${name}VolumetricLight`, 1, scene.activeCamera!, this.mesh, 100)
         }
@@ -88,9 +78,7 @@ export class Star extends CelestialBody {
     }
 
     public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
-        this.starMaterial.setFloat("time", this.internalTime);
-        this.starMaterial.setVector3("starColor", getRgbFromTemperature(this.physicalProperties.temperature));
-        this.starMaterial.setMatrix("planetWorldMatrix", this.mesh.getWorldMatrix());
+        this.material.update();
 
         this.internalTime += deltaTime;
         this.internalTime %= 24 * 60 * 60; // prevent imprecision in shader material (noise offset)
