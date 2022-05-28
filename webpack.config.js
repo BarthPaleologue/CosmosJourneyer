@@ -3,7 +3,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
 
 const isProduction = process.env.NODE_ENV === "production";
 const htmlPath = path.join(__dirname, "/src/html/");
@@ -28,14 +27,6 @@ const config = {
   },
 
   plugins: [
-    new CopyPlugin({
-      patterns: [
-        { from: path.resolve(__dirname, "src", "shaders"), to: "shaders" },
-      ],
-      options: {
-        concurrency: 100,
-      },
-    }),
     new HtmlWebpackPlugin({
       title: 'Planet Engine',
       filename: "index.html",
