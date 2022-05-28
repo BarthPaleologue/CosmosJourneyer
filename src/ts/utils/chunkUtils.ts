@@ -1,7 +1,7 @@
-import {Vector3} from "@babylonjs/core";
-import {Direction, getQuaternionFromDirection} from "./direction";
-import {SolidPlanet} from "../celestialBodies/planets/solidPlanet";
-import {Algebra} from "./algebra";
+import { Vector3 } from "@babylonjs/core";
+import { Direction, getQuaternionFromDirection } from "./direction";
+import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
+import { Algebra } from "./algebra";
 
 /**
  * Returns the node position in plane space
@@ -22,20 +22,20 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
         // (chunkLength / 2) / (2 ** (i + 1)) est la moitié de la taille d'un chunk enfant (offset) donc on simplifie pas : c'est plus clair ainsi
         switch (path[i]) {
             case 0:
-                x -= (chunkLength / 2) / (2 ** (i + 1));
-                y -= (chunkLength / 2) / (2 ** (i + 1));
+                x -= chunkLength / 2 / 2 ** (i + 1);
+                y -= chunkLength / 2 / 2 ** (i + 1);
                 break;
             case 1:
-                x += (chunkLength / 2) / (2 ** (i + 1));
-                y -= (chunkLength / 2) / (2 ** (i + 1));
+                x += chunkLength / 2 / 2 ** (i + 1);
+                y -= chunkLength / 2 / 2 ** (i + 1);
                 break;
             case 2:
-                x += (chunkLength / 2) / (2 ** (i + 1));
-                y += (chunkLength / 2) / (2 ** (i + 1));
+                x += chunkLength / 2 / 2 ** (i + 1);
+                y += chunkLength / 2 / 2 ** (i + 1);
                 break;
             case 3:
-                x -= (chunkLength / 2) / (2 ** (i + 1));
-                y += (chunkLength / 2) / (2 ** (i + 1));
+                x -= chunkLength / 2 / 2 ** (i + 1);
+                y += chunkLength / 2 / 2 ** (i + 1);
                 break;
             default:
                 throw new Error(`${path[i]} is not a valid index for a child of a quadtree node !`);
@@ -52,7 +52,6 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
  * @returns the position in planet space
  */
 export function getChunkSphereSpacePositionFromPath(path: number[], direction: Direction, planet: SolidPlanet): Vector3 {
-
     // on récupère la position dans le plan
     let position = getChunkPlaneSpacePositionFromPath(planet.getDiameter(), path);
 

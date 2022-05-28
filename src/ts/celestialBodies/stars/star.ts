@@ -1,23 +1,14 @@
-import {getRgbFromTemperature} from "../../utils/specrend";
-import {CelestialBody} from "../celestialBody";
+import { getRgbFromTemperature } from "../../utils/specrend";
+import { CelestialBody } from "../celestialBody";
 
-import {
-    Axis,
-    Mesh,
-    MeshBuilder,
-    Quaternion,
-    Scene,
-    ShaderMaterial,
-    Space,
-    Vector3, VolumetricLightScatteringPostProcess
-} from "@babylonjs/core";
-import {CelestialBodyType} from "../interfaces";
-import {initMeshTransform} from "../../utils/mesh";
-import {PlayerController} from "../../player/playerController";
-import {StarSystemManager} from "../starSystemManager";
-import {StarPhysicalProperties} from "../physicalPropertiesInterfaces";
-import {StarPostProcesses} from "../postProcessesInterfaces";
-import {StarMaterial} from "../../materials/starMaterial";
+import { Axis, Mesh, MeshBuilder, Quaternion, Scene, ShaderMaterial, Space, Vector3, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import { CelestialBodyType } from "../interfaces";
+import { initMeshTransform } from "../../utils/mesh";
+import { PlayerController } from "../../player/playerController";
+import { StarSystemManager } from "../starSystemManager";
+import { StarPhysicalProperties } from "../physicalPropertiesInterfaces";
+import { StarPostProcesses } from "../postProcessesInterfaces";
+import { StarMaterial } from "../../materials/starMaterial";
 
 // TODO: implement RigidBody for star
 export class Star extends CelestialBody {
@@ -28,23 +19,27 @@ export class Star extends CelestialBody {
     protected bodyType = CelestialBodyType.STAR;
     physicalProperties: StarPhysicalProperties;
 
-    public override postProcesses: StarPostProcesses
+    public override postProcesses: StarPostProcesses;
 
-    constructor(name: string, radius: number,
-                starSystemManager: StarSystemManager, scene: Scene,
-                physicalProperties: StarPhysicalProperties = {
-                    //TODO: ne pas hardcoder
-                    mass: 1000,
-                    rotationPeriod: 24 * 60 * 60,
-                    rotationAxis: Axis.Y,
+    constructor(
+        name: string,
+        radius: number,
+        starSystemManager: StarSystemManager,
+        scene: Scene,
+        physicalProperties: StarPhysicalProperties = {
+            //TODO: ne pas hardcoder
+            mass: 1000,
+            rotationPeriod: 24 * 60 * 60,
+            rotationAxis: Axis.Y,
 
-                    temperature: 5778
-                }) {
+            temperature: 5778
+        }
+    ) {
         super(name, starSystemManager);
         this.physicalProperties = physicalProperties;
         this.radius = radius;
 
-        this.mesh = MeshBuilder.CreateSphere(name, {diameter: this.radius, segments: 32}, scene);
+        this.mesh = MeshBuilder.CreateSphere(name, { diameter: this.radius, segments: 32 }, scene);
 
         initMeshTransform(this.mesh);
 
@@ -54,7 +49,7 @@ export class Star extends CelestialBody {
 
         this.postProcesses = {
             volumetricLight: new VolumetricLightScatteringPostProcess(`${name}VolumetricLight`, 1, scene.activeCamera!, this.mesh, 100)
-        }
+        };
         this.postProcesses.volumetricLight!.exposure = 1.0;
         this.postProcesses.volumetricLight!.decay = 0.95;
     }
@@ -64,7 +59,7 @@ export class Star extends CelestialBody {
     }
 
     public getAbsolutePosition(): Vector3 {
-        if(this.mesh.getAbsolutePosition()._isDirty) this.mesh.computeWorldMatrix(true);
+        if (this.mesh.getAbsolutePosition()._isDirty) this.mesh.computeWorldMatrix(true);
         return this.mesh.getAbsolutePosition();
     }
 
@@ -89,8 +84,8 @@ export class Star extends CelestialBody {
     }
 
     public getRotationQuaternion(): Quaternion {
-        if(this.mesh.rotationQuaternion == undefined) throw new Error(`${this.getName()}'s rotation quaternion is null !`);
-        if(this.mesh.rotationQuaternion._isDirty) this.mesh.computeWorldMatrix(true);
+        if (this.mesh.rotationQuaternion == undefined) throw new Error(`${this.getName()}'s rotation quaternion is null !`);
+        if (this.mesh.rotationQuaternion._isDirty) this.mesh.computeWorldMatrix(true);
         return this.mesh.rotationQuaternion;
     }
 }

@@ -1,10 +1,10 @@
-import {Vector3, Quaternion} from "@babylonjs/core";
+import { Vector3, Quaternion } from "@babylonjs/core";
 
-import {AbstractPlanet} from "./abstractPlanet";
-import {CelestialBodyType} from "../interfaces";
-import {PlayerController} from "../../player/playerController";
-import {StarSystemManager} from "../starSystemManager";
-import {PlanetPhysicalProperties} from "../physicalPropertiesInterfaces";
+import { AbstractPlanet } from "./abstractPlanet";
+import { CelestialBodyType } from "../interfaces";
+import { PlayerController } from "../../player/playerController";
+import { StarSystemManager } from "../starSystemManager";
+import { PlanetPhysicalProperties } from "../physicalPropertiesInterfaces";
 
 export class GazPlanet extends AbstractPlanet {
     protected bodyType = CelestialBodyType.GAZ;
@@ -21,7 +21,7 @@ export class GazPlanet extends AbstractPlanet {
             minTemperature: 100,
             maxTemperature: 110,
             pressure: 1
-        }
+        };
     }
 
     setAbsolutePosition(newPosition: Vector3): void {

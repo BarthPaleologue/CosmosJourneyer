@@ -11,7 +11,7 @@ export class Mouse {
     private _deadAreaRadius = 100;
 
     constructor(deadAreaRadius = 100) {
-        window.addEventListener("mousemove", e => {
+        window.addEventListener("mousemove", (e) => {
             this.mouseDX = (e.x - this.mouseX) / window.innerWidth;
             this.mouseDY = (e.y - this.mouseY) / window.innerHeight;
 

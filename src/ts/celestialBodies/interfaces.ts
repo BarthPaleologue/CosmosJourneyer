@@ -1,5 +1,5 @@
-import {Quaternion, Vector3} from "@babylonjs/core";
-import {CollisionData} from "../chunks/workerDataInterfaces";
+import { Quaternion, Vector3 } from "@babylonjs/core";
+import { CollisionData } from "../chunks/workerDataInterfaces";
 
 export enum CelestialBodyType {
     STAR,
@@ -57,12 +57,9 @@ export interface Transformable {
      * @param amount The amount of rotation in radians
      */
     rotate(axis: Vector3, amount: number): void;
-
 }
 
-export interface Seedable {
-
-}
+export interface Seedable {}
 
 /**
  * Describes object that can be collided with
@@ -74,4 +71,3 @@ export interface RigidBody {
      */
     generateCollisionTask(relativePosition: Vector3): CollisionData;
 }
-

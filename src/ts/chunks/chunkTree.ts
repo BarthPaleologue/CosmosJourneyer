@@ -1,13 +1,13 @@
-import {Vector3} from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core";
 
-import {PlanetChunk} from "./planetChunk";
-import {Direction} from "../utils/direction";
-import {ChunkForge} from "./chunkForge";
-import {DeleteTask, TaskType} from "./taskInterfaces";
-import {SolidPlanet} from "../celestialBodies/planets/solidPlanet";
-import {rayIntersectSphere} from "../utils/math";
-import {Settings} from "../settings";
-import {getChunkSphereSpacePositionFromPath} from "../utils/chunkUtils";
+import { PlanetChunk } from "./planetChunk";
+import { Direction } from "../utils/direction";
+import { ChunkForge } from "./chunkForge";
+import { DeleteTask, TaskType } from "./taskInterfaces";
+import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
+import { rayIntersectSphere } from "../utils/math";
+import { Settings } from "../settings";
+import { getChunkSphereSpacePositionFromPath } from "../utils/chunkUtils";
 
 /**
  * A quadTree is defined recursively
@@ -18,7 +18,6 @@ type quadTree = quadTree[] | PlanetChunk;
  * A ChunkTree is a structure designed to manage LOD using a quadtree
  */
 export class ChunkTree {
-
     readonly minDepth: number; // minimum depth of the tree
     readonly maxDepth: number; // maximum depth of the tree
 
@@ -38,7 +37,6 @@ export class ChunkTree {
      * @param planet
      */
     constructor(direction: Direction, planet: SolidPlanet) {
-
         this.rootChunkLength = planet.getDiameter();
 
         this.minDepth = Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 19), 0);
@@ -76,7 +74,7 @@ export class ChunkTree {
                 chunk: chunk,
                 newChunks: newChunks,
                 isFiner: isFiner
-            }
+            };
             this.chunkForge?.addTask(deleteTask);
         }, tree);
     }
@@ -103,7 +101,7 @@ export class ChunkTree {
         let direction = nodePositionW.subtract(observerPositionW);
         let distanceToNodeSquared = direction.lengthSquared();
 
-        let distanceThreshold = Settings.RENDER_DISTANCE_MULTIPLIER * this.rootChunkLength / (2 ** walked.length);
+        let distanceThreshold = (Settings.RENDER_DISTANCE_MULTIPLIER * this.rootChunkLength) / 2 ** walked.length;
 
         if ((distanceToNodeSquared < distanceThreshold ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
             // if the node is near the camera or if we are loading minimal LOD
@@ -113,7 +111,7 @@ export class ChunkTree {
                         this.createChunk(walked.concat([0]), true),
                         this.createChunk(walked.concat([1]), true),
                         this.createChunk(walked.concat([2]), true),
-                        this.createChunk(walked.concat([3]), true),
+                        this.createChunk(walked.concat([3]), true)
                     ];
                     this.requestDeletion(tree, newTree, true);
                     return newTree;
@@ -124,7 +122,7 @@ export class ChunkTree {
                 this.updateLODRecursively(observerPositionW, tree[0], walked.concat([0])),
                 this.updateLODRecursively(observerPositionW, tree[1], walked.concat([1])),
                 this.updateLODRecursively(observerPositionW, tree[2], walked.concat([2])),
-                this.updateLODRecursively(observerPositionW, tree[3], walked.concat([3])),
+                this.updateLODRecursively(observerPositionW, tree[3], walked.concat([3]))
             ];
         } else {
             // if we are far from the node

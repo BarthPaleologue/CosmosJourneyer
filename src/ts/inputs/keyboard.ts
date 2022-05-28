@@ -2,10 +2,10 @@
  * Classe gérant la lecture du clavier
  */
 export class Keyboard {
-    private keys: { [key: string]: boolean; } = {}; // le dictionnaire stockant l'état du clavier
+    private keys: { [key: string]: boolean } = {}; // le dictionnaire stockant l'état du clavier
     constructor() {
-        window.addEventListener("keypress", e => this.keys[e.key] = true);
-        window.addEventListener("keyup", e => this.keys[e.key] = false);
+        window.addEventListener("keypress", (e) => (this.keys[e.key] = true));
+        window.addEventListener("keyup", (e) => (this.keys[e.key] = false));
     }
     /**
      * Returns whether or not a key is pressed

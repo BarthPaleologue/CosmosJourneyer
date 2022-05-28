@@ -120,4 +120,4 @@ export const polarizabilities = {
     Og: 58,
     Uue: 169,
     Ubn: 159
-}
+};

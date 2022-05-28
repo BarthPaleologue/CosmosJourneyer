@@ -1,16 +1,16 @@
-import {CollisionData} from "../chunks/workerDataInterfaces";
-import {StarSystemManager} from "../celestialBodies/starSystemManager";
-import {PlayerController} from "../player/playerController";
-import {RigidBody, Transformable} from "../celestialBodies/interfaces";
+import { CollisionData } from "../chunks/workerDataInterfaces";
+import { StarSystemManager } from "../celestialBodies/starSystemManager";
+import { PlayerController } from "../player/playerController";
+import { RigidBody, Transformable } from "../celestialBodies/interfaces";
 
 export class CollisionWorker {
     _player: PlayerController;
     _busy = false;
     _worker: Worker;
     constructor(player: PlayerController, planetManager: StarSystemManager) {
-        this._worker = new Worker(new URL('workerScript', import.meta.url), { type: "module" });
+        this._worker = new Worker(new URL("workerScript", import.meta.url), { type: "module" });
         this._player = player;
-        this._worker.onmessage = e => {
+        this._worker.onmessage = (e) => {
             if (player.nearestBody == null) return;
 
             let direction = player.nearestBody.getAbsolutePosition().normalizeToNew();
@@ -39,11 +39,9 @@ export class CollisionWorker {
         this._busy = true;
     }
     public checkCollision(planet: RigidBody & Transformable): void {
-
         let playerSamplePosition = planet.getOriginBodySpaceSamplePosition();
 
         let collisionData = planet.generateCollisionTask(playerSamplePosition);
         this.postMessage(collisionData);
-
     }
 }

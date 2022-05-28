@@ -1,14 +1,13 @@
-import {Vector3, FreeCamera, Mesh, StandardMaterial, Color3, Axis, Space, Scene, Quaternion} from "@babylonjs/core";
+import { Vector3, FreeCamera, Mesh, StandardMaterial, Color3, Axis, Space, Scene, Quaternion } from "@babylonjs/core";
 
-import {Gamepad, GamepadAxis, GamepadButton} from "../inputs/gamepad";
-import {Keyboard} from "../inputs/keyboard";
-import {Mouse} from "../inputs/mouse";
-import {CelestialBody} from "../celestialBodies/celestialBody";
-import {Transformable} from "../celestialBodies/interfaces";
-import {Algebra} from "../utils/algebra";
+import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
+import { Keyboard } from "../inputs/keyboard";
+import { Mouse } from "../inputs/mouse";
+import { CelestialBody } from "../celestialBodies/celestialBody";
+import { Transformable } from "../celestialBodies/interfaces";
+import { Algebra } from "../utils/algebra";
 
 export class PlayerController implements Transformable {
-
     nearestBody: CelestialBody | null;
 
     collisionRadius = 100;
@@ -33,7 +32,7 @@ export class PlayerController implements Transformable {
         picthDownKey: "k",
 
         yawLeftKey: "j",
-        yawRightKey: "l",
+        yawRightKey: "l"
     };
 
     readonly mesh: Mesh;
@@ -119,7 +118,8 @@ export class PlayerController implements Transformable {
      */
     public listenToKeyboard(keyboard: Keyboard, deltaTime: number): Vector3 {
         // Update Rotation state
-        if (keyboard.isPressed(this.controls.rollLeftKey)) { // rotation autour de l'axe de déplacement
+        if (keyboard.isPressed(this.controls.rollLeftKey)) {
+            // rotation autour de l'axe de déplacement
             this.mesh.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
         } else if (keyboard.isPressed(this.controls.rollRightKey)) {
             this.mesh.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
@@ -165,8 +165,8 @@ export class PlayerController implements Transformable {
      */
     public listenToMouse(mouse: Mouse, deltaTime: number): void {
         // Update Rotation state
-        this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * mouse.getDYToCenter() / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
-        this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * mouse.getDXToCenter() / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
+        this.mesh.rotate(this.getRightDirection(), (this.rotationSpeed * deltaTime * mouse.getDYToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
+        this.mesh.rotate(this.getUpwardDirection(), (this.rotationSpeed * deltaTime * mouse.getDXToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
     }
 
     /**
@@ -206,7 +206,7 @@ export class PlayerController implements Transformable {
     }
 
     public getAbsolutePosition(): Vector3 {
-        if(this.mesh.getAbsolutePosition()._isDirty) this.mesh.computeWorldMatrix(true);
+        if (this.mesh.getAbsolutePosition()._isDirty) this.mesh.computeWorldMatrix(true);
         return this.mesh.getAbsolutePosition();
     }
 
@@ -215,8 +215,8 @@ export class PlayerController implements Transformable {
     }
 
     public getRotationQuaternion(): Quaternion {
-        if(this.mesh.rotationQuaternion == undefined) throw new Error(`PlayerController's rotation Quaternion is undefined !`);
-        if(this.mesh.rotationQuaternion._isDirty) this.mesh.computeWorldMatrix(true);
+        if (this.mesh.rotationQuaternion == undefined) throw new Error(`PlayerController's rotation Quaternion is undefined !`);
+        if (this.mesh.rotationQuaternion._isDirty) this.mesh.computeWorldMatrix(true);
         return this.mesh.rotationQuaternion;
     }
 
@@ -253,10 +253,10 @@ export class PlayerController implements Transformable {
         //TODO: do not hardcode
         const orbitLimitFactor = 2.5;
         if (this.nearestBody == null) return false;
-        else if(body == null) {
+        else if (body == null) {
             return this.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * this.nearestBody.getRadius()) ** 2;
         } else {
-            return (this.nearestBody == body) && this.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * this.nearestBody.getRadius()) ** 2;
+            return this.nearestBody == body && this.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * this.nearestBody.getRadius()) ** 2;
         }
     }
 }

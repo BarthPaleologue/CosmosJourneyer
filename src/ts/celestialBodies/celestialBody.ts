@@ -1,16 +1,13 @@
-import {Vector3, Quaternion, Space, Matrix} from "@babylonjs/core";
-import {Algebra} from "../utils/algebra";
-import {
-    CelestialBodyType,
-    Transformable
-} from "./interfaces";
-import {PlayerController} from "../player/playerController";
-import {StarSystemManager} from "./starSystemManager";
-import {BodyPhysicalProperties} from "./physicalPropertiesInterfaces";
-import {BodyPostProcesses, PlanetPostProcesses} from "./postProcessesInterfaces";
-import {OrbitalProperties} from "./orbitalPropertiesInterface";
-import {computeBarycenter, computePointOnOrbit} from "../utils/kepler";
-import {Settings} from "../settings";
+import { Vector3, Quaternion, Space, Matrix } from "@babylonjs/core";
+import { Algebra } from "../utils/algebra";
+import { CelestialBodyType, Transformable } from "./interfaces";
+import { PlayerController } from "../player/playerController";
+import { StarSystemManager } from "./starSystemManager";
+import { BodyPhysicalProperties } from "./physicalPropertiesInterfaces";
+import { BodyPostProcesses, PlanetPostProcesses } from "./postProcessesInterfaces";
+import { OrbitalProperties } from "./orbitalPropertiesInterface";
+import { computeBarycenter, computePointOnOrbit } from "../utils/kepler";
+import { Settings } from "../settings";
 
 export abstract class CelestialBody implements Transformable {
     protected abstract bodyType: CelestialBodyType;
@@ -32,7 +29,7 @@ export abstract class CelestialBody implements Transformable {
             periapsis: this.getRadius() * 5,
             apoapsis: this.getRadius() * 5,
             period: 0
-        }
+        };
     }
 
     /**
@@ -89,14 +86,20 @@ export abstract class CelestialBody implements Transformable {
             let barycenter = computeBarycenter(this, this._starSystemManager.getBodies());
 
             let initialPosition = this.getAbsolutePosition().clone();
-            let newPosition = computePointOnOrbit(barycenter, this.orbitalProperties.periapsis, this.orbitalProperties.apoapsis, this.orbitalProperties.period, this._starSystemManager.getTime())
+            let newPosition = computePointOnOrbit(
+                barycenter,
+                this.orbitalProperties.periapsis,
+                this.orbitalProperties.apoapsis,
+                this.orbitalProperties.period,
+                this._starSystemManager.getTime()
+            );
 
             if (player.isOrbiting(this)) player.translate(newPosition.subtract(initialPosition));
             this.setAbsolutePosition(newPosition);
         }
 
-        if(this.physicalProperties.rotationPeriod > 0) {
-            let dtheta = 2 * Math.PI * deltaTime / this.physicalProperties.rotationPeriod;
+        if (this.physicalProperties.rotationPeriod > 0) {
+            let dtheta = (2 * Math.PI * deltaTime) / this.physicalProperties.rotationPeriod;
 
             if (player.isOrbiting(this)) player.rotateAround(this.getAbsolutePosition(), this.physicalProperties.rotationAxis, -dtheta);
             this.rotate(this.physicalProperties.rotationAxis, -dtheta);

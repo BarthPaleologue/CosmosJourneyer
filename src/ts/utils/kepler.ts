@@ -1,8 +1,8 @@
 // from https://www.youtube.com/watch?v=UXD97l7ZT0w
 
-import {Vector3} from "@babylonjs/core";
-import {CelestialBody} from "../celestialBodies/celestialBody";
-import {Transformable} from "../celestialBodies/interfaces";
+import { Vector3 } from "@babylonjs/core";
+import { CelestialBody } from "../celestialBodies/celestialBody";
+import { Transformable } from "../celestialBodies/interfaces";
 
 /**
  * Returns 0 when the arguments are solution to the Kepler's equation
@@ -54,7 +54,7 @@ export function computePointOnOrbit(centerOfMass: Vector3, periapsis: number, ap
     let ellipseCenterY = centerOfMass.y;
     let ellipseCenterZ = centerOfMass.z;
 
-    let meanAnomaly = Math.PI * 2 * t / period;
+    let meanAnomaly = (Math.PI * 2 * t) / period;
     let eccentricAnomaly = solveKepler(meanAnomaly, eccentricity);
 
     let pointX = Math.cos(eccentricAnomaly) * semiMajorLength + ellipseCenterX;

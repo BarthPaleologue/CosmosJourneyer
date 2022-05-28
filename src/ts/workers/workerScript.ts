@@ -1,19 +1,18 @@
-import {getQuaternionFromDirection} from "../utils/direction";
-import {simplexNoiseLayer} from "../terrain/landscape/simplexNoiseLayer";
-import {Algebra, LVector3} from "../utils/algebra";
-import {ridgedNoiseLayer} from "../terrain/landscape/ridgedNoiseLayer";
-import {BuildData, CollisionData, WorkerData} from "../chunks/workerDataInterfaces";
-import {TerrainSettings} from "../terrain/terrainSettings";
-import {elevationFunction} from "../terrain/landscape/elevationFunction";
-import {TaskType} from "../chunks/taskInterfaces";
-import {tanhSharpen} from "../utils/math";
+import { getQuaternionFromDirection } from "../utils/direction";
+import { simplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
+import { Algebra, LVector3 } from "../utils/algebra";
+import { ridgedNoiseLayer } from "../terrain/landscape/ridgedNoiseLayer";
+import { BuildData, CollisionData, WorkerData } from "../chunks/workerDataInterfaces";
+import { TerrainSettings } from "../terrain/terrainSettings";
+import { elevationFunction } from "../terrain/landscape/elevationFunction";
+import { TaskType } from "../chunks/taskInterfaces";
+import { tanhSharpen } from "../utils/math";
 
 let currentPlanetID = "";
 
 let bumpyLayer: elevationFunction;
 let continentsLayer: elevationFunction;
 let mountainsLayer: elevationFunction;
-
 
 let terrainSettings: TerrainSettings = {
     continentsFragmentation: 0.5,
@@ -24,9 +23,8 @@ let terrainSettings: TerrainSettings = {
 
     maxMountainHeight: 0,
     mountainsFrequency: 1,
-    mountainsMinValue: 0.5,
+    mountainsMinValue: 0.5
 };
-
 
 function initLayers() {
     // TODO: ne pas hardcoder
@@ -40,7 +38,6 @@ function initLayers() {
 initLayers();
 
 function terrainFunction(position: LVector3, gradient: LVector3, seed = LVector3.Zero()): void {
-
     const unitCoords = position.normalize();
 
     let samplePoint = position.add(seed);
@@ -78,7 +75,6 @@ function terrainFunction(position: LVector3, gradient: LVector3, seed = LVector3
 }
 
 function buildChunkVertexData(data: BuildData): void {
-
     const planetDiameter = data.planetDiameter;
     const depth = data.depth;
     const direction = data.direction;
@@ -92,7 +88,7 @@ function buildChunkVertexData(data: BuildData): void {
         initLayers();
     }
 
-    const size = planetDiameter / (2 ** depth);
+    const size = planetDiameter / 2 ** depth;
     const planetRadius = planetDiameter / 2;
 
     const nbVerticesPerSide = data.nbVerticesPerSide;
@@ -105,10 +101,8 @@ function buildChunkVertexData(data: BuildData): void {
 
     const normals = new Float32Array(verticesPositions.length);
 
-
     for (let x = 0; x < nbVerticesPerSide; x++) {
         for (let y = 0; y < nbVerticesPerSide; y++) {
-
             // on crée un plan dans le plan Oxy
             let vertexPosition = new LVector3(x - nbSubdivisions / 2, y - nbSubdivisions / 2, 0);
 
@@ -152,12 +146,7 @@ function buildChunkVertexData(data: BuildData): void {
             normals[(x * nbVerticesPerSide + y) * 3 + 2] = vertexNormal.z;
 
             if (x < nbVerticesPerSide - 1 && y < nbVerticesPerSide - 1) {
-                faces.push([
-                    x * nbVerticesPerSide + y,
-                    x * nbVerticesPerSide + y + 1,
-                    (x + 1) * nbVerticesPerSide + y + 1,
-                    (x + 1) * nbVerticesPerSide + y,
-                ]);
+                faces.push([x * nbVerticesPerSide + y, x * nbVerticesPerSide + y + 1, (x + 1) * nbVerticesPerSide + y + 1, (x + 1) * nbVerticesPerSide + y]);
             }
         }
     }
@@ -199,25 +188,27 @@ function buildChunkVertexData(data: BuildData): void {
         grassPositions[i * 3 + 2] = gp.z;
     }*/
 
-    self.postMessage({
-        p: verticesPositions,
-        i: indices,
-        n: normals,
-        g: grassPositions
-        //@ts-ignore
-    }, [verticesPositions.buffer, indices.buffer, normals.buffer, grassPositions.buffer]);
-
+    self.postMessage(
+        {
+            p: verticesPositions,
+            i: indices,
+            n: normals,
+            g: grassPositions
+            //@ts-ignore
+        },
+        [verticesPositions.buffer, indices.buffer, normals.buffer, grassPositions.buffer]
+    );
 }
 
-function sendHeightAtPoint(point: LVector3, seed: LVector3):void {
+function sendHeightAtPoint(point: LVector3, seed: LVector3): void {
     terrainFunction(point, seed);
 
     self.postMessage({
-        h: point.getMagnitude(),
+        h: point.getMagnitude()
     });
 }
 
-self.onmessage = e => {
+self.onmessage = (e) => {
     let data: WorkerData = e.data;
 
     switch (data.taskType) {
@@ -253,7 +244,7 @@ self.onmessage = e => {
             break;
 
         default:
-            if(e.data.taskType) console.error(`Type de tâche reçue invalide : ${e.data.taskType}`);
+            if (e.data.taskType) console.error(`Type de tâche reçue invalide : ${e.data.taskType}`);
             else console.log("Shared memory received");
     }
 };

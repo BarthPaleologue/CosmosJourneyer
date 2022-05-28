@@ -1,7 +1,7 @@
-import {SolidPlanet} from "../celestialBodies/planets/solidPlanet";
-import {Direction} from "../utils/direction";
-import {Mesh, Vector3, VertexData} from "@babylonjs/core";
-import {PlanetChunk} from "./planetChunk";
+import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
+import { Direction } from "../utils/direction";
+import { Mesh, Vector3, VertexData } from "@babylonjs/core";
+import { PlanetChunk } from "./planetChunk";
 
 export enum TaskType {
     Deletion,
@@ -12,14 +12,14 @@ export enum TaskType {
 
 export interface Task {
     type: TaskType;
-    isFiner: boolean
+    isFiner: boolean;
     chunk: PlanetChunk;
 }
 
 export interface BuildTask extends Task {
-    planet: SolidPlanet,
-    depth: number,
-    direction: Direction,
+    planet: SolidPlanet;
+    depth: number;
+    direction: Direction;
     position: Vector3;
 }
 

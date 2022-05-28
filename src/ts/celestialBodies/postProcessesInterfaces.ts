@@ -1,9 +1,9 @@
-import {PlanetPostProcess} from "../postProcesses/planetPostProcess";
-import {AtmosphericScatteringPostProcess} from "../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
-import {OceanPostProcess} from "../postProcesses/planetPostProcesses/oceanPostProcess";
-import {FlatCloudsPostProcess} from "../postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import {RingsPostProcess} from "../postProcesses/planetPostProcesses/ringsPostProcess";
-import {PostProcess, VolumetricLightScatteringPostProcess} from "@babylonjs/core";
+import { PlanetPostProcess } from "../postProcesses/planetPostProcess";
+import { AtmosphericScatteringPostProcess } from "../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import { OceanPostProcess } from "../postProcesses/planetPostProcesses/oceanPostProcess";
+import { FlatCloudsPostProcess } from "../postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
+import { PostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 
 export interface BodyPostProcesses {
     [details: string]: PostProcess | null;

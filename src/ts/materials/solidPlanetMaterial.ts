@@ -1,4 +1,4 @@
-import {Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Texture, Vector3} from "@babylonjs/core";
+import { Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Texture, Vector3 } from "@babylonjs/core";
 import bottomNormalMap from "../../asset/textures/crackednormal.jpg";
 import steepNormalMap from "../../asset/textures/rockn.png";
 import grassNormalMap from "../../asset/textures/grassNormalMap.jpg";
@@ -6,54 +6,72 @@ import snowNormalMap from "../../asset/textures/snowNormalMap.png";
 import snowNormalMap2 from "../../asset/textures/snowNormalMap2.png";
 import beachNormalMap from "../../asset/textures/sandNormalMap2.png";
 import desertNormalMap from "../../asset/textures/sandNormalMap2.jpg";
-import {SolidPlanet} from "../celestialBodies/planets/solidPlanet";
-import {ColorMode, ColorSettings} from "./colorSettingsInterface";
-import {Algebra} from "../utils/algebra";
-import {PlayerController} from "../player/playerController";
+import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
+import { ColorMode, ColorSettings } from "./colorSettingsInterface";
+import { Algebra } from "../utils/algebra";
+import { PlayerController } from "../player/playerController";
 
 import surfaceMaterialFragment from "../../shaders/solidPlanetMaterial.fragment.fx";
 import surfaceMaterialVertex from "../../shaders/solidPlanetMaterial.vertex.fx";
 
-const shaderName = "surfaceMaterial"
+const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 
 export class SolidPlanetMaterial extends ShaderMaterial {
-
     readonly planet: SolidPlanet;
     colorSettings: ColorSettings;
 
     constructor(planet: SolidPlanet, scene: Scene) {
-
         super(`${planet.getName()}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
             uniforms: [
-                "world", "worldViewProjection", "projection", "view",
+                "world",
+                "worldViewProjection",
+                "projection",
+                "view",
 
-                "textureSampler", "depthSampler",
+                "textureSampler",
+                "depthSampler",
 
                 "colorMode",
 
                 "bottomNormalMap",
-                "plainNormalMap", "beachNormalMap", "desertNormalMap",
-                "snowNormalMap", "snowNormalMap2",
+                "plainNormalMap",
+                "beachNormalMap",
+                "desertNormalMap",
+                "snowNormalMap",
+                "snowNormalMap2",
                 "steepNormalMap",
 
                 "seed",
 
-                "cameraNear", "cameraFar", "planetPosition", "planetRadius",
+                "cameraNear",
+                "cameraFar",
+                "planetPosition",
+                "planetRadius",
 
                 "planetInverseRotationQuaternion",
 
                 "playerPosition",
 
-                "waterLevel", "beachSize", "steepSharpness", "normalSharpness",
+                "waterLevel",
+                "beachSize",
+                "steepSharpness",
+                "normalSharpness",
 
-                "snowColor", "steepColor", "plainColor", "beachColor", "desertColor", "bottomColor",
+                "snowColor",
+                "steepColor",
+                "plainColor",
+                "beachColor",
+                "desertColor",
+                "bottomColor",
 
                 "maxElevation",
 
-                "minTemperature", "maxTemperature", "pressure",
+                "minTemperature",
+                "maxTemperature",
+                "pressure",
 
                 "waterAmount",
 
@@ -75,7 +93,7 @@ export class SolidPlanetMaterial extends ShaderMaterial {
 
             beachSize: 300,
             steepSharpness: 2,
-            normalSharpness: 0.5,
+            normalSharpness: 0.5
         };
 
         this.onBindObservable.add(() => {

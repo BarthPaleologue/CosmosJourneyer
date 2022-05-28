@@ -1,21 +1,19 @@
-import {Effect, Scene} from "@babylonjs/core";
+import { Effect, Scene } from "@babylonjs/core";
 
-import {AtmosphereSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
-import {PlanetPostProcess} from "../planetPostProcess";
-import {Star} from "../../celestialBodies/stars/star";
-import {AbstractPlanet} from "../../celestialBodies/planets/abstractPlanet";
+import { AtmosphereSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
+import { PlanetPostProcess } from "../planetPostProcess";
+import { Star } from "../../celestialBodies/stars/star";
+import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
 
 import atmosphericScatteringFragment from "../../../shaders/atmosphericScattering.fragment.fx";
 
-const shaderName = "atmosphericScattering"
+const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
 
 export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
-
     settings: AtmosphereSettings;
 
     constructor(name: string, planet: AbstractPlanet, atmosphereHeight: number, sun: Star, scene: Scene) {
-
         let settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 23,
@@ -30,49 +28,69 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
         };
 
         let uniforms: ShaderUniformData = {
-            "atmosphereRadius": {
+            atmosphereRadius: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.atmosphereRadius}
+                get: () => {
+                    return settings.atmosphereRadius;
+                }
             },
-            "falloffFactor": {
+            falloffFactor: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.falloffFactor}
+                get: () => {
+                    return settings.falloffFactor;
+                }
             },
-            "sunIntensity": {
+            sunIntensity: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.intensity}
+                get: () => {
+                    return settings.intensity;
+                }
             },
-            "rayleighStrength": {
+            rayleighStrength: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.rayleighStrength}
+                get: () => {
+                    return settings.rayleighStrength;
+                }
             },
-            "mieStrength": {
+            mieStrength: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.mieStrength}
+                get: () => {
+                    return settings.mieStrength;
+                }
             },
-            "densityModifier": {
+            densityModifier: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.densityModifier}
+                get: () => {
+                    return settings.densityModifier;
+                }
             },
-            "redWaveLength": {
+            redWaveLength: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.redWaveLength}
+                get: () => {
+                    return settings.redWaveLength;
+                }
             },
-            "greenWaveLength": {
+            greenWaveLength: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.greenWaveLength}
+                get: () => {
+                    return settings.greenWaveLength;
+                }
             },
-            "blueWaveLength": {
+            blueWaveLength: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.blueWaveLength}
+                get: () => {
+                    return settings.blueWaveLength;
+                }
             },
-            "mieHaloRadius": {
+            mieHaloRadius: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.mieHaloRadius}
+                get: () => {
+                    return settings.mieHaloRadius;
+                }
             }
         };
 
-        let samplers: ShaderSamplerData = {}
+        let samplers: ShaderSamplerData = {};
 
         super(name, shaderName, uniforms, samplers, planet, sun, scene);
 

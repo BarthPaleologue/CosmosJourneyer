@@ -1,4 +1,4 @@
-import {Vector3, Quaternion, Vector4, Axis} from "@babylonjs/core";
+import { Vector3, Quaternion, Vector4, Axis } from "@babylonjs/core";
 
 /**
  * Lightweight vector3 for fast algebra computation
@@ -31,7 +31,7 @@ export class LVector3 {
         this._z = value;
     }
     /**
-     * 
+     *
      * @returns the euclidean squared magnitude of the current vector
      */
     getSquaredMagnitude(): number {
@@ -39,7 +39,7 @@ export class LVector3 {
     }
 
     /**
-     * 
+     *
      * @returns the euclidean magnitude of the current vector
      */
     getMagnitude(): number {
@@ -47,7 +47,7 @@ export class LVector3 {
     }
 
     /**
-     * 
+     *
      * @param scaleFactor the factor you want your new vector scaled to
      * @returns a new Vector3, copy of the current one scaled by the scaleFactor
      */
@@ -72,7 +72,7 @@ export class LVector3 {
     }
 
     /**
-     * 
+     *
      * @param otherVector The other Vector3 you want to add
      * @returns returns the sum of the current Vector3 and the other Vector3 as a new Vector3
      */

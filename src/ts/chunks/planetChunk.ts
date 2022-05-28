@@ -1,14 +1,13 @@
-import {Mesh, Animation, StandardMaterial, Color3} from "@babylonjs/core";
+import { Mesh, Animation, StandardMaterial, Color3 } from "@babylonjs/core";
 
-import {SolidPlanet} from "../celestialBodies/planets/solidPlanet";
-import {ChunkForge} from "./chunkForge";
-import {BuildTask, TaskType} from "./taskInterfaces";
-import {Direction} from "../utils/direction";
-import {getChunkPlaneSpacePositionFromPath} from "../utils/chunkUtils";
-import {ChunkTree} from "./chunkTree";
+import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
+import { ChunkForge } from "./chunkForge";
+import { BuildTask, TaskType } from "./taskInterfaces";
+import { Direction } from "../utils/direction";
+import { getChunkPlaneSpacePositionFromPath } from "../utils/chunkUtils";
+import { ChunkTree } from "./chunkTree";
 
 export class PlanetChunk {
-
     public readonly mesh: Mesh;
     public readonly depth: number;
     public readonly tree: ChunkTree;
@@ -40,7 +39,7 @@ export class PlanetChunk {
             direction: direction,
             chunk: this,
             isFiner: isFiner
-        }
+        };
 
         chunkForge.addTask(buildTask);
 

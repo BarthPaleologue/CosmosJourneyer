@@ -1,4 +1,3 @@
-
 /*function permute(x: Vector3): Vector3 {
     return Vector3.Mod(x.multiply(x.scale(34).addNumber(1)), Vector.Ns(289.0, x.dim));
 }

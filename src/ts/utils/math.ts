@@ -1,5 +1,5 @@
-import {Vec3} from "./algebra";
-import {Vector3} from "@babylonjs/core";
+import { Vec3 } from "./algebra";
+import { Vector3 } from "@babylonjs/core";
 
 // https://www.desmos.com/calculator/968c7smugx
 /**
@@ -132,9 +132,9 @@ export function tanhSharpen(x: number, s: number, grad?: Vec3): number {
     let tanhX = Math.tanh(sampleX);
     let tanhHalfS = Math.tanh(0.5 * s);
 
-    if (grad) grad.scaleInPlace(0.5 * s * (1.0 - tanhX ** 2) / tanhHalfS)
+    if (grad) grad.scaleInPlace((0.5 * s * (1.0 - tanhX ** 2)) / tanhHalfS);
 
-    return 0.5 * (1 + (tanhX / tanhHalfS));
+    return 0.5 * (1 + tanhX / tanhHalfS);
 }
 
 export function gcd(a: number, b: number): number {
@@ -148,16 +148,16 @@ export function rayIntersectSphere(rayOrigin: Vector3, rayDir: Vector3, spherePo
 
     let a = 1.0;
     let b = 2.0 * Vector3.Dot(relativeOrigin, rayDir);
-    let c = Vector3.Dot(relativeOrigin, relativeOrigin) - sphereRadius**2;
+    let c = Vector3.Dot(relativeOrigin, relativeOrigin) - sphereRadius ** 2;
 
-    let d = b*b - 4.0*a*c;
+    let d = b * b - 4.0 * a * c;
 
-    if(d < 0.0) return [false, 0, 0]; // no intersection
+    if (d < 0.0) return [false, 0, 0]; // no intersection
 
     let s = Math.sqrt(d);
 
-    let r0 = (-b - s) / (2.0*a);
-    let r1 = (-b + s) / (2.0*a);
+    let r0 = (-b - s) / (2.0 * a);
+    let r1 = (-b + s) / (2.0 * a);
 
     let t0 = Math.max(Math.min(r0, r1), 0.0);
     let t1 = Math.max(Math.max(r0, r1), 0.0);
@@ -166,9 +166,7 @@ export function rayIntersectSphere(rayOrigin: Vector3, rayDir: Vector3, spherePo
 }
 
 export function clamp(x: number, min: number, max: number) {
-    if(x < min) return min;
-    if(x > max) return max;
+    if (x < min) return min;
+    if (x > max) return max;
     return x;
 }
-
-

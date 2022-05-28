@@ -1,7 +1,7 @@
-import {DepthRenderer, VertexData} from "@babylonjs/core";
-import {BuildData} from "./workerDataInterfaces";
-import {ApplyTask, BuildTask, DeleteTask, ReturnedChunkData, Task, TaskType} from "./taskInterfaces";
-import {WorkerPool} from "./workerPool";
+import { DepthRenderer, VertexData } from "@babylonjs/core";
+import { BuildData } from "./workerDataInterfaces";
+import { ApplyTask, BuildTask, DeleteTask, ReturnedChunkData, Task, TaskType } from "./taskInterfaces";
+import { WorkerPool } from "./workerPool";
 
 export class ChunkForge {
     /**
@@ -59,12 +59,12 @@ export class ChunkForge {
             direction: task.direction,
             position: [task.position.x, task.position.y, task.position.z],
             terrainSettings: task.planet.terrainSettings,
-            seed: task.planet.getSeed(),
-        }
+            seed: task.planet.getSeed()
+        };
 
         worker.postMessage(buildData);
 
-        worker.onmessage = e => {
+        worker.onmessage = (e) => {
             let data: ReturnedChunkData = e.data;
 
             let vertexData = new VertexData();
@@ -81,7 +81,7 @@ export class ChunkForge {
                 callbackTasks: callbackTasks,
                 planet: task.planet,
                 isFiner: task.isFiner
-            }
+            };
             this.applyTasks.push(applyTask);
             this.workerPool.finishedWorkers.push(worker);
         };

@@ -1,4 +1,4 @@
-import {Axis, Quaternion} from "@babylonjs/core";
+import { Axis, Quaternion } from "@babylonjs/core";
 
 export enum Direction {
     Up,

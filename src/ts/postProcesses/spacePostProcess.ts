@@ -1,5 +1,5 @@
-import {Camera, Effect, Matrix, PostProcess, Scene, Texture, Vector3, Color3} from "@babylonjs/core";
-import {CShaderData, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
+import { Camera, Effect, Matrix, PostProcess, Scene, Texture, Vector3, Color3 } from "@babylonjs/core";
+import { CShaderData, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "./interfaces";
 
 export abstract class SpacePostProcess extends PostProcess {
     camera: Camera;
@@ -10,41 +10,54 @@ export abstract class SpacePostProcess extends PostProcess {
     protected internalTime: number = 0;
 
     protected constructor(name: string, fragmentName: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, scene: Scene) {
-
         let commonUniforms: ShaderUniformData = {
-            "cameraPosition": {
+            cameraPosition: {
                 type: ShaderDataType.Vector3,
-                get: () => {return Vector3.Zero()}
+                get: () => {
+                    return Vector3.Zero();
+                }
             },
-            "projection": {
+            projection: {
                 type: ShaderDataType.Matrix,
-                get: () => {return scene.activeCamera!.getProjectionMatrix()}
+                get: () => {
+                    return scene.activeCamera!.getProjectionMatrix();
+                }
             },
-            "view": {
+            view: {
                 type: ShaderDataType.Matrix,
-                get: () => {return scene.activeCamera!.getViewMatrix()}
+                get: () => {
+                    return scene.activeCamera!.getViewMatrix();
+                }
             },
 
-            "cameraNear": {
+            cameraNear: {
                 type: ShaderDataType.Float,
-                get: () => {return scene.activeCamera!.minZ}
+                get: () => {
+                    return scene.activeCamera!.minZ;
+                }
             },
-            "cameraFar": {
+            cameraFar: {
                 type: ShaderDataType.Float,
-                get: () => {return scene.activeCamera!.maxZ}
+                get: () => {
+                    return scene.activeCamera!.maxZ;
+                }
             }
-        }
+        };
 
         let commonSamplers: ShaderSamplerData = {
-            "textureSampler": {
+            textureSampler: {
                 type: ShaderDataType.Auto,
-                get: () => {return 0}
+                get: () => {
+                    return 0;
+                }
             },
-            "depthSampler": {
+            depthSampler: {
                 type: ShaderDataType.Texture,
-                get: () => {return scene.customRenderTargets[0]}
+                get: () => {
+                    return scene.customRenderTargets[0];
+                }
             }
-        }
+        };
 
         Object.assign(commonUniforms, commonUniforms, uniforms);
         Object.assign(commonSamplers, commonSamplers, samplers);
@@ -58,7 +71,7 @@ export abstract class SpacePostProcess extends PostProcess {
         this.samplers = commonSamplers;
 
         this.onApply = (effect: Effect) => {
-            for(const uniformName in this.uniforms) {
+            for (const uniformName in this.uniforms) {
                 switch (this.uniforms[uniformName].type) {
                     case ShaderDataType.Float:
                         effect.setFloat(uniformName, (this.uniforms[uniformName] as CShaderData<number>).get());
@@ -77,7 +90,7 @@ export abstract class SpacePostProcess extends PostProcess {
                 }
             }
 
-            for(const samplerName in this.samplers) {
+            for (const samplerName in this.samplers) {
                 switch (this.samplers[samplerName].type) {
                     case ShaderDataType.Texture:
                         effect.setTexture(samplerName, (this.samplers[samplerName] as CShaderData<Texture>).get());

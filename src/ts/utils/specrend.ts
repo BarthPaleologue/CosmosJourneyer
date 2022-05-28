@@ -39,16 +39,16 @@
    the white point. */
 
 class ColourSystem {
-    name: string;                     /* Colour system name */
+    name: string; /* Colour system name */
     xRed: number;
-    yRed: number;              /* Red x, y */
+    yRed: number; /* Red x, y */
     xGreen: number;
-    yGreen: number;          /* Green x, y */
+    yGreen: number; /* Green x, y */
     xBlue: number;
-    yBlue: number;            /* Blue x, y */
+    yBlue: number; /* Blue x, y */
     xWhite: number;
-    yWhite: number;          /* White point x, y */
-    gamma: number;                   /* Gamma correction for system */
+    yWhite: number; /* White point x, y */
+    gamma: number; /* Gamma correction for system */
     constructor(name: string, xRed: number, yRed: number, xGreen: number, yGreen: number, xBlue: number, yBlue: number, xWhite: number, yWhite: number, gamma: number) {
         this.name = name;
         this.xRed = xRed;
@@ -65,9 +65,9 @@ class ColourSystem {
 
 /* White point chromaticities. */
 
-const IlluminantC = [0.3101, 0.3162];          /* For NTSC television */
-const IlluminantD65 = [0.3127, 0.3291];          /* For EBU and SMPTE */
-const IlluminantE = [0.33333333, 0.33333333];  /* CIE equal-energy illuminant */
+const IlluminantC = [0.3101, 0.3162]; /* For NTSC television */
+const IlluminantD65 = [0.3127, 0.3291]; /* For EBU and SMPTE */
+const IlluminantE = [0.33333333, 0.33333333]; /* CIE equal-energy illuminant */
 
 /*  Gamma of nonlinear correction.
  
@@ -78,15 +78,15 @@ const IlluminantE = [0.33333333, 0.33333333];  /* CIE equal-energy illuminant */
  
 */
 
-const GAMMA_REC709 = 0;               /* Rec. 709 */
+const GAMMA_REC709 = 0; /* Rec. 709 */
 
 /* Name                  xRed    yRed    xGreen  yGreen  xBlue  yBlue    White point        Gamma   */
 let NTSCsystem = new ColourSystem("NTSC", 0.67, 0.33, 0.21, 0.71, 0.14, 0.08, IlluminantC[0], IlluminantC[1], GAMMA_REC709);
-let EBUsystem = new ColourSystem("EBU (PAL/SECAM)", 0.64, 0.33, 0.29, 0.60, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
-let SMPTEsystem = new ColourSystem("SMPTE", 0.630, 0.340, 0.310, 0.595, 0.155, 0.070, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
-let HDTVsystem = new ColourSystem("HDTV", 0.670, 0.330, 0.210, 0.710, 0.150, 0.060, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
+let EBUsystem = new ColourSystem("EBU (PAL/SECAM)", 0.64, 0.33, 0.29, 0.6, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
+let SMPTEsystem = new ColourSystem("SMPTE", 0.63, 0.34, 0.31, 0.595, 0.155, 0.07, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
+let HDTVsystem = new ColourSystem("HDTV", 0.67, 0.33, 0.21, 0.71, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
 let CIEsystem = new ColourSystem("CIE", 0.7355, 0.2645, 0.2658, 0.7243, 0.1669, 0.0085, IlluminantE[0], IlluminantE[1], GAMMA_REC709);
-let Rec709system = new ColourSystem("CIE REC 709", 0.64, 0.33, 0.30, 0.60, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
+let Rec709system = new ColourSystem("CIE REC 709", 0.64, 0.33, 0.3, 0.6, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
 
 /*                          UPVP_TO_XY
 
@@ -95,8 +95,8 @@ let Rec709system = new ColourSystem("CIE REC 709", 0.64, 0.33, 0.30, 0.60, 0.15,
 */
 
 function upvp_to_xy(up: number, vp: number): number[] {
-    let xc = (9 * up) / ((6 * up) - (16 * vp) + 12);
-    let yc = (4 * vp) / ((6 * up) - (16 * vp) + 12);
+    let xc = (9 * up) / (6 * up - 16 * vp + 12);
+    let yc = (4 * vp) / (6 * up - 16 * vp + 12);
 
     return [xc, yc];
 }
@@ -108,8 +108,8 @@ function upvp_to_xy(up: number, vp: number): number[] {
 */
 
 function xy_to_upvp(xc: number, yc: number): number[] {
-    let up = (4 * xc) / ((-2 * xc) + (12 * yc) + 3);
-    let vp = (9 * yc) / ((-2 * xc) + (12 * yc) + 3);
+    let up = (4 * xc) / (-2 * xc + 12 * yc + 3);
+    let vp = (9 * yc) / (-2 * xc + 12 * yc + 3);
 
     return [up, vp];
 }
@@ -132,44 +132,62 @@ function xy_to_upvp(xc: number, yc: number): number[] {
 
 */
 
-function xyz_to_rgb(cs: ColourSystem,
-    xc: number, yc: number, zc: number): number[] {
-
+function xyz_to_rgb(cs: ColourSystem, xc: number, yc: number, zc: number): number[] {
     let [xr, yr, zr, xg, yg, zg, xb, yb, zb]: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     let [xw, yw, zw]: number[] = [0, 0, 0];
     let [rx, ry, rz, gx, gy, gz, bx, by, bz]: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     let [rw, gw, bw]: number[] = [0, 0, 0];
 
-    xr = cs.xRed; yr = cs.yRed; zr = 1 - (xr + yr);
-    xg = cs.xGreen; yg = cs.yGreen; zg = 1 - (xg + yg);
-    xb = cs.xBlue; yb = cs.yBlue; zb = 1 - (xb + yb);
+    xr = cs.xRed;
+    yr = cs.yRed;
+    zr = 1 - (xr + yr);
+    xg = cs.xGreen;
+    yg = cs.yGreen;
+    zg = 1 - (xg + yg);
+    xb = cs.xBlue;
+    yb = cs.yBlue;
+    zb = 1 - (xb + yb);
 
-    xw = cs.xWhite; yw = cs.yWhite; zw = 1 - (xw + yw);
+    xw = cs.xWhite;
+    yw = cs.yWhite;
+    zw = 1 - (xw + yw);
 
     /* xyz -> rgb matrix, before scaling to white. */
 
-    rx = (yg * zb) - (yb * zg); ry = (xb * zg) - (xg * zb); rz = (xg * yb) - (xb * yg);
-    gx = (yb * zr) - (yr * zb); gy = (xr * zb) - (xb * zr); gz = (xb * yr) - (xr * yb);
-    bx = (yr * zg) - (yg * zr); by = (xg * zr) - (xr * zg); bz = (xr * yg) - (xg * yr);
+    rx = yg * zb - yb * zg;
+    ry = xb * zg - xg * zb;
+    rz = xg * yb - xb * yg;
+    gx = yb * zr - yr * zb;
+    gy = xr * zb - xb * zr;
+    gz = xb * yr - xr * yb;
+    bx = yr * zg - yg * zr;
+    by = xg * zr - xr * zg;
+    bz = xr * yg - xg * yr;
 
     /* White scaling factors.
        Dividing by yw scales the white luminance to unity, as conventional. */
 
-    rw = ((rx * xw) + (ry * yw) + (rz * zw)) / yw;
-    gw = ((gx * xw) + (gy * yw) + (gz * zw)) / yw;
-    bw = ((bx * xw) + (by * yw) + (bz * zw)) / yw;
+    rw = (rx * xw + ry * yw + rz * zw) / yw;
+    gw = (gx * xw + gy * yw + gz * zw) / yw;
+    bw = (bx * xw + by * yw + bz * zw) / yw;
 
     /* xyz -> rgb matrix, correctly scaled to white. */
 
-    rx = rx / rw; ry = ry / rw; rz = rz / rw;
-    gx = gx / gw; gy = gy / gw; gz = gz / gw;
-    bx = bx / bw; by = by / bw; bz = bz / bw;
+    rx = rx / rw;
+    ry = ry / rw;
+    rz = rz / rw;
+    gx = gx / gw;
+    gy = gy / gw;
+    gz = gz / gw;
+    bx = bx / bw;
+    by = by / bw;
+    bz = bz / bw;
 
     /* rgb of the desired point */
 
-    let r = (rx * xc) + (ry * yc) + (rz * zc);
-    let g = (gx * xc) + (gy * yc) + (gz * zc);
-    let b = (bx * xc) + (by * yc) + (bz * zc);
+    let r = rx * xc + ry * yc + rz * zc;
+    let g = gx * xc + gy * yc + gz * zc;
+    let b = bx * xc + by * yc + bz * zc;
 
     return [r, g, b];
 }
@@ -182,7 +200,7 @@ function xyz_to_rgb(cs: ColourSystem,
      primary weights are non-negative. */
 
 function inside_gamut(r: number, g: number, b: number): boolean {
-    return (r >= 0) && (g >= 0) && (b >= 0);
+    return r >= 0 && g >= 0 && b >= 0;
 }
 
 /*                          CONSTRAIN_RGB
@@ -201,15 +219,17 @@ function constrain_rgb(r: number, g: number, b: number): number[] {
 
     /* Amount of white needed is w = - min(0, *r, *g, *b) */
 
-    w = (0 < r) ? 0 : r;
-    w = (w < g) ? w : g;
-    w = (w < b) ? w : b;
+    w = 0 < r ? 0 : r;
+    w = w < g ? w : g;
+    w = w < b ? w : b;
     w = -w;
 
     /* Add just enough white to make r, g, b all positive. */
 
     if (w > 0) {
-        r += w; g += w; b += w;
+        r += w;
+        g += w;
+        b += w;
     }
 
     return [r + w, g + w, b + w];
@@ -237,9 +257,9 @@ function gamma_correct(cs: ColourSystem, c: number): number {
         let cc = 0.018;
 
         if (c < cc) {
-            c *= ((1.099 * Math.pow(cc, 0.45)) - 0.099) / cc;
+            c *= (1.099 * Math.pow(cc, 0.45) - 0.099) / cc;
         } else {
-            c = (1.099 * Math.pow(c, 0.45)) - 0.099;
+            c = 1.099 * Math.pow(c, 0.45) - 0.099;
         }
     } else {
         /* Nonlinear colour = (Linear colour)^(1/gamma) */
@@ -250,9 +270,7 @@ function gamma_correct(cs: ColourSystem, c: number): number {
 }
 
 function gamma_correct_rgb(cs: ColourSystem, r: number, g: number, b: number): number[] {
-    return [gamma_correct(cs, r),
-    gamma_correct(cs, g),
-    gamma_correct(cs, b)];
+    return [gamma_correct(cs, r), gamma_correct(cs, g), gamma_correct(cs, b)];
 }
 
 /*                          NORM_RGB
@@ -286,7 +304,11 @@ function norm_rgb(r: number, g: number, b: number): number[] {
 
 function spectrum_to_xyz(f: (wavelength: number) => number): number[] {
     let i;
-    let lambda, X = 0, Y = 0, Z = 0, XYZ;
+    let lambda,
+        X = 0,
+        Y = 0,
+        Z = 0,
+        XYZ;
 
     /* CIE colour matching functions xBar, yBar, and zBar for
        wavelengths from 380 through 780 nanometers, every 5
@@ -304,33 +326,87 @@ function spectrum_to_xyz(f: (wavelength: number) => number): number[] {
         compilers. */
 
     let cie_colour_match: number[][] = [
-        [0.0014, 0.0000, 0.0065], [0.0022, 0.0001, 0.0105], [0.0042, 0.0001, 0.0201],
-        [0.0076, 0.0002, 0.0362], [0.0143, 0.0004, 0.0679], [0.0232, 0.0006, 0.1102],
-        [0.0435, 0.0012, 0.2074], [0.0776, 0.0022, 0.3713], [0.1344, 0.0040, 0.6456],
-        [0.2148, 0.0073, 1.0391], [0.2839, 0.0116, 1.3856], [0.3285, 0.0168, 1.6230],
-        [0.3483, 0.0230, 1.7471], [0.3481, 0.0298, 1.7826], [0.3362, 0.0380, 1.7721],
-        [0.3187, 0.0480, 1.7441], [0.2908, 0.0600, 1.6692], [0.2511, 0.0739, 1.5281],
-        [0.1954, 0.0910, 1.2876], [0.1421, 0.1126, 1.0419], [0.0956, 0.1390, 0.8130],
-        [0.0580, 0.1693, 0.6162], [0.0320, 0.2080, 0.4652], [0.0147, 0.2586, 0.3533],
-        [0.0049, 0.3230, 0.2720], [0.0024, 0.4073, 0.2123], [0.0093, 0.5030, 0.1582],
-        [0.0291, 0.6082, 0.1117], [0.0633, 0.7100, 0.0782], [0.1096, 0.7932, 0.0573],
-        [0.1655, 0.8620, 0.0422], [0.2257, 0.9149, 0.0298], [0.2904, 0.9540, 0.0203],
-        [0.3597, 0.9803, 0.0134], [0.4334, 0.9950, 0.0087], [0.5121, 1.0000, 0.0057],
-        [0.5945, 0.9950, 0.0039], [0.6784, 0.9786, 0.0027], [0.7621, 0.9520, 0.0021],
-        [0.8425, 0.9154, 0.0018], [0.9163, 0.8700, 0.0017], [0.9786, 0.8163, 0.0014],
-        [1.0263, 0.7570, 0.0011], [1.0567, 0.6949, 0.0010], [1.0622, 0.6310, 0.0008],
-        [1.0456, 0.5668, 0.0006], [1.0026, 0.5030, 0.0003], [0.9384, 0.4412, 0.0002],
-        [0.8544, 0.3810, 0.0002], [0.7514, 0.3210, 0.0001], [0.6424, 0.2650, 0.0000],
-        [0.5419, 0.2170, 0.0000], [0.4479, 0.1750, 0.0000], [0.3608, 0.1382, 0.0000],
-        [0.2835, 0.1070, 0.0000], [0.2187, 0.0816, 0.0000], [0.1649, 0.0610, 0.0000],
-        [0.1212, 0.0446, 0.0000], [0.0874, 0.0320, 0.0000], [0.0636, 0.0232, 0.0000],
-        [0.0468, 0.0170, 0.0000], [0.0329, 0.0119, 0.0000], [0.0227, 0.0082, 0.0000],
-        [0.0158, 0.0057, 0.0000], [0.0114, 0.0041, 0.0000], [0.0081, 0.0029, 0.0000],
-        [0.0058, 0.0021, 0.0000], [0.0041, 0.0015, 0.0000], [0.0029, 0.0010, 0.0000],
-        [0.0020, 0.0007, 0.0000], [0.0014, 0.0005, 0.0000], [0.0010, 0.0004, 0.0000],
-        [0.0007, 0.0002, 0.0000], [0.0005, 0.0002, 0.0000], [0.0003, 0.0001, 0.0000],
-        [0.0002, 0.0001, 0.0000], [0.0002, 0.0001, 0.0000], [0.0001, 0.0000, 0.0000],
-        [0.0001, 0.0000, 0.0000], [0.0001, 0.0000, 0.0000], [0.0000, 0.0000, 0.0000]
+        [0.0014, 0.0, 0.0065],
+        [0.0022, 0.0001, 0.0105],
+        [0.0042, 0.0001, 0.0201],
+        [0.0076, 0.0002, 0.0362],
+        [0.0143, 0.0004, 0.0679],
+        [0.0232, 0.0006, 0.1102],
+        [0.0435, 0.0012, 0.2074],
+        [0.0776, 0.0022, 0.3713],
+        [0.1344, 0.004, 0.6456],
+        [0.2148, 0.0073, 1.0391],
+        [0.2839, 0.0116, 1.3856],
+        [0.3285, 0.0168, 1.623],
+        [0.3483, 0.023, 1.7471],
+        [0.3481, 0.0298, 1.7826],
+        [0.3362, 0.038, 1.7721],
+        [0.3187, 0.048, 1.7441],
+        [0.2908, 0.06, 1.6692],
+        [0.2511, 0.0739, 1.5281],
+        [0.1954, 0.091, 1.2876],
+        [0.1421, 0.1126, 1.0419],
+        [0.0956, 0.139, 0.813],
+        [0.058, 0.1693, 0.6162],
+        [0.032, 0.208, 0.4652],
+        [0.0147, 0.2586, 0.3533],
+        [0.0049, 0.323, 0.272],
+        [0.0024, 0.4073, 0.2123],
+        [0.0093, 0.503, 0.1582],
+        [0.0291, 0.6082, 0.1117],
+        [0.0633, 0.71, 0.0782],
+        [0.1096, 0.7932, 0.0573],
+        [0.1655, 0.862, 0.0422],
+        [0.2257, 0.9149, 0.0298],
+        [0.2904, 0.954, 0.0203],
+        [0.3597, 0.9803, 0.0134],
+        [0.4334, 0.995, 0.0087],
+        [0.5121, 1.0, 0.0057],
+        [0.5945, 0.995, 0.0039],
+        [0.6784, 0.9786, 0.0027],
+        [0.7621, 0.952, 0.0021],
+        [0.8425, 0.9154, 0.0018],
+        [0.9163, 0.87, 0.0017],
+        [0.9786, 0.8163, 0.0014],
+        [1.0263, 0.757, 0.0011],
+        [1.0567, 0.6949, 0.001],
+        [1.0622, 0.631, 0.0008],
+        [1.0456, 0.5668, 0.0006],
+        [1.0026, 0.503, 0.0003],
+        [0.9384, 0.4412, 0.0002],
+        [0.8544, 0.381, 0.0002],
+        [0.7514, 0.321, 0.0001],
+        [0.6424, 0.265, 0.0],
+        [0.5419, 0.217, 0.0],
+        [0.4479, 0.175, 0.0],
+        [0.3608, 0.1382, 0.0],
+        [0.2835, 0.107, 0.0],
+        [0.2187, 0.0816, 0.0],
+        [0.1649, 0.061, 0.0],
+        [0.1212, 0.0446, 0.0],
+        [0.0874, 0.032, 0.0],
+        [0.0636, 0.0232, 0.0],
+        [0.0468, 0.017, 0.0],
+        [0.0329, 0.0119, 0.0],
+        [0.0227, 0.0082, 0.0],
+        [0.0158, 0.0057, 0.0],
+        [0.0114, 0.0041, 0.0],
+        [0.0081, 0.0029, 0.0],
+        [0.0058, 0.0021, 0.0],
+        [0.0041, 0.0015, 0.0],
+        [0.0029, 0.001, 0.0],
+        [0.002, 0.0007, 0.0],
+        [0.0014, 0.0005, 0.0],
+        [0.001, 0.0004, 0.0],
+        [0.0007, 0.0002, 0.0],
+        [0.0005, 0.0002, 0.0],
+        [0.0003, 0.0001, 0.0],
+        [0.0002, 0.0001, 0.0],
+        [0.0002, 0.0001, 0.0],
+        [0.0001, 0.0, 0.0],
+        [0.0001, 0.0, 0.0],
+        [0.0001, 0.0, 0.0],
+        [0.0, 0.0, 0.0]
     ];
 
     for (i = 0, lambda = 380; lambda < 780.1; i++, lambda += 5) {
@@ -341,7 +417,7 @@ function spectrum_to_xyz(f: (wavelength: number) => number): number[] {
         Y += Me * cie_colour_match[i][1];
         Z += Me * cie_colour_match[i][2];
     }
-    XYZ = (X + Y + Z);
+    XYZ = X + Y + Z;
 
     return [X / XYZ, Y / XYZ, Z / XYZ];
 }
@@ -351,13 +427,12 @@ function spectrum_to_xyz(f: (wavelength: number) => number): number[] {
     Calculate, by Planck's radiation law, the emittance of a black body
     of temperature bbTemp at the given wavelength (in metres).  */
 
-let bbTemp = 5000;                 /* Hidden temperature argument
+let bbTemp = 5000; /* Hidden temperature argument
                                          to BB_SPECTRUM. */
 function bb_spectrum(wavelength: number): number {
-    let wlm = wavelength * 1e-9;   /* Wavelength in meters */
+    let wlm = wavelength * 1e-9; /* Wavelength in meters */
 
-    return (3.74183e-16 * Math.pow(wlm, -5.0)) /
-        (Math.exp(1.4388e-2 / (wlm * bbTemp)) - 1.0);
+    return (3.74183e-16 * Math.pow(wlm, -5.0)) / (Math.exp(1.4388e-2 / (wlm * bbTemp)) - 1.0);
 }
 
 /*  Built-in test program which displays the x, y, and Z and RGB
@@ -401,11 +476,10 @@ export function demonstrate() {
         [r, g, b] = constrain_rgb(r, g, b);
         [r, g, b] = norm_rgb(r, g, b);
         console.log(`  ${t} K      ${x.toFixed(4)} ${y.toFixed(4)} ${z.toFixed(4)}   ${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)}`);
-
     }
 }
 
-import {Vector3} from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core";
 
 export function getRgbFromTemperature(temperature: number): Vector3 {
     let [x, y, z]: number[] = [0, 0, 0];

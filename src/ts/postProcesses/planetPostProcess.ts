@@ -1,38 +1,37 @@
-import {SpacePostProcess} from "./spacePostProcess";
-import {Axis, Scene} from "@babylonjs/core";
-import {ShaderDataType, ShaderSamplerData, ShaderUniformData} from "./interfaces";
-import {Star} from "../celestialBodies/stars/star";
-import {AbstractPlanet} from "../celestialBodies/planets/abstractPlanet";
+import { SpacePostProcess } from "./spacePostProcess";
+import { Axis, Scene } from "@babylonjs/core";
+import { ShaderDataType, ShaderSamplerData, ShaderUniformData } from "./interfaces";
+import { Star } from "../celestialBodies/stars/star";
+import { AbstractPlanet } from "../celestialBodies/planets/abstractPlanet";
 
 export abstract class PlanetPostProcess extends SpacePostProcess {
     protected constructor(name: string, fragmentName: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, planet: AbstractPlanet, sun: Star, scene: Scene) {
-
         let commonUniforms = {
-            "sunPosition": {
+            sunPosition: {
                 type: ShaderDataType.Vector3,
                 get: () => {
-                    return sun.getAbsolutePosition()
+                    return sun.getAbsolutePosition();
                 }
             },
-            "planetPosition": {
+            planetPosition: {
                 type: ShaderDataType.Vector3,
                 get: () => {
-                    return planet.getAbsolutePosition()
+                    return planet.getAbsolutePosition();
                 }
             },
-            "cameraDirection": {
+            cameraDirection: {
                 type: ShaderDataType.Vector3,
                 get: () => {
-                    return scene.activeCamera!.getDirection(Axis.Z)
+                    return scene.activeCamera!.getDirection(Axis.Z);
                 }
             },
-            "planetRadius": {
+            planetRadius: {
                 type: ShaderDataType.Float,
                 get: () => {
-                    return planet.getApparentRadius()
+                    return planet.getApparentRadius();
                 }
             }
-        }
+        };
 
         Object.assign(commonUniforms, commonUniforms, uniforms);
 

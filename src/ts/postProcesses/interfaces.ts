@@ -1,4 +1,4 @@
-import {Color3} from "@babylonjs/core";
+import { Color3 } from "@babylonjs/core";
 
 export interface AtmosphereSettings {
     atmosphereRadius: number;
@@ -31,11 +31,11 @@ export interface VolumetricCloudSettings {
 }
 
 export interface OceanSettings {
-    oceanRadius: number,
-    smoothness: number,
-    specularPower: number,
-    depthModifier: number,
-    alphaModifier: number,
+    oceanRadius: number;
+    smoothness: number;
+    specularPower: number;
+    depthModifier: number;
+    alphaModifier: number;
     waveBlendingSharpness: number;
 }
 
@@ -46,9 +46,7 @@ export interface RingsSettings {
     ringOpacity: number;
 }
 
-export interface StarfieldSettings {
-
-}
+export interface StarfieldSettings {}
 
 export enum ShaderDataType {
     Auto,
@@ -70,5 +68,5 @@ export interface CShaderData<T> extends ShaderData {
     get: () => T;
 }
 
-export type ShaderUniformData = {[uniformName: string]: ShaderData};
-export type ShaderSamplerData = {[samplerName: string]: ShaderData};
+export type ShaderUniformData = { [uniformName: string]: ShaderData };
+export type ShaderSamplerData = { [samplerName: string]: ShaderData };

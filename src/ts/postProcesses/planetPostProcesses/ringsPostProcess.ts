@@ -1,20 +1,18 @@
-import {Effect, Scene} from "@babylonjs/core";
-import {RingsSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
-import {PlanetPostProcess} from "../planetPostProcess";
-import {Star} from "../../celestialBodies/stars/star";
-import {AbstractPlanet} from "../../celestialBodies/planets/abstractPlanet";
+import { Effect, Scene } from "@babylonjs/core";
+import { RingsSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
+import { PlanetPostProcess } from "../planetPostProcess";
+import { Star } from "../../celestialBodies/stars/star";
+import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
 
 import ringsFragment from "../../../shaders/rings.fragment.fx";
 
-const shaderName = "rings"
+const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
 
 export class RingsPostProcess extends PlanetPostProcess {
-
     settings: RingsSettings;
 
     constructor(name: string, planet: AbstractPlanet, sun: Star, scene: Scene) {
-
         let settings: RingsSettings = {
             ringStart: 1.5,
             ringEnd: 2.5,
@@ -23,30 +21,40 @@ export class RingsPostProcess extends PlanetPostProcess {
         };
 
         let uniforms: ShaderUniformData = {
-            "ringStart": {
+            ringStart: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.ringStart}
+                get: () => {
+                    return settings.ringStart;
+                }
             },
-            "ringEnd": {
+            ringEnd: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.ringEnd}
+                get: () => {
+                    return settings.ringEnd;
+                }
             },
-            "ringFrequency": {
+            ringFrequency: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.ringFrequency}
+                get: () => {
+                    return settings.ringFrequency;
+                }
             },
-            "ringOpacity": {
+            ringOpacity: {
                 type: ShaderDataType.Float,
-                get: () => {return settings.ringOpacity}
+                get: () => {
+                    return settings.ringOpacity;
+                }
             },
 
-            "planetWorldMatrix": {
+            planetWorldMatrix: {
                 type: ShaderDataType.Matrix,
-                get: () => {return planet.getWorldMatrix()}
+                get: () => {
+                    return planet.getWorldMatrix();
+                }
             }
         };
 
-        let samplers: ShaderSamplerData = {}
+        let samplers: ShaderSamplerData = {};
 
         super(name, shaderName, uniforms, samplers, planet, sun, scene);
 

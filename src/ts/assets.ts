@@ -1,4 +1,4 @@
-import {Texture} from "@babylonjs/core";
+import { Texture } from "@babylonjs/core";
 
 import rockNormalMap from "../asset/textures/rockn.png";
 

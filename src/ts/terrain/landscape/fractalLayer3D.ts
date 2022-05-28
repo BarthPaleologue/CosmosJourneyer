@@ -1,15 +1,22 @@
 import { LVector3 } from "../../utils/algebra";
-import {sFloor} from "../../utils/math";
+import { sFloor } from "../../utils/math";
 import { elevationFunction } from "./elevationFunction";
 
-export function fractalLayer3D(frequency: number, nbOctaves: number, decay: number, lacunarity: number, power: number, minValue: number, f: (coords: LVector3, gradient: LVector3) => number): elevationFunction {
+export function fractalLayer3D(
+    frequency: number,
+    nbOctaves: number,
+    decay: number,
+    lacunarity: number,
+    power: number,
+    minValue: number,
+    f: (coords: LVector3, gradient: LVector3) => number
+): elevationFunction {
     return function (coords: LVector3, gradient: LVector3) {
         let noiseValue = 0.0;
         let totalAmplitude = 0.0;
         let localGradient = LVector3.Zero();
         let samplePoint = coords.scale(frequency);
         for (let i = 0; i < nbOctaves; i++) {
-
             let localElevation = f(samplePoint, localGradient);
 
             localGradient.divideInPlace(decay ** i);

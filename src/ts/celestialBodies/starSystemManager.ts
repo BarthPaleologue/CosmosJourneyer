@@ -1,10 +1,10 @@
-import {Vector3, DepthRenderer} from "@babylonjs/core";
+import { Vector3, DepthRenderer } from "@babylonjs/core";
 
-import {ChunkForge} from "../chunks/chunkForge";
-import {PlayerController} from "../player/playerController";
-import {SolidPlanet} from "./planets/solidPlanet";
-import {CelestialBody} from "./celestialBody";
-import {Star} from "./stars/star";
+import { ChunkForge } from "../chunks/chunkForge";
+import { PlayerController } from "../player/playerController";
+import { SolidPlanet } from "./planets/solidPlanet";
+import { CelestialBody } from "./celestialBody";
+import { Star } from "./stars/star";
 
 export class StarSystemManager {
     private readonly _chunkForge: ChunkForge;
@@ -47,7 +47,7 @@ export class StarSystemManager {
      * Returns the nearest body to the origin
      */
     public getNearestBody(): CelestialBody {
-        if(this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
+        if (this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
         let nearest = null;
         for (const body of this.getBodies()) {
             if (nearest == null) nearest = body;
@@ -62,7 +62,7 @@ export class StarSystemManager {
      * Returns the most influential body at a given point
      */
     public getMostInfluentialBodyAtPoint(point: Vector3): CelestialBody {
-        if(this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
+        if (this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
         let nearest = null;
         for (const body of this._celestialBodies) {
             if (nearest == null) nearest = body;

@@ -1,102 +1,100 @@
-import {Effect, Scene, Texture} from "@babylonjs/core";
+import { Effect, Scene, Texture } from "@babylonjs/core";
 
 import waterNormal1 from "../../../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../../../asset/textures/waterNormalMap4.jpg";
-import {OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData} from "../interfaces";
-import {PlanetPostProcess} from "../planetPostProcess";
-import {Star} from "../../celestialBodies/stars/star";
-import {AbstractPlanet} from "../../celestialBodies/planets/abstractPlanet";
+import { OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
+import { PlanetPostProcess } from "../planetPostProcess";
+import { Star } from "../../celestialBodies/stars/star";
+import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
 
 import oceanFragment from "../../../shaders/ocean.fragment.fx";
 
-const shaderName = "ocean"
+const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
 
 export class OceanPostProcess extends PlanetPostProcess {
-
     settings: OceanSettings;
 
     constructor(name: string, planet: AbstractPlanet, sun: Star, scene: Scene) {
-
         let settings: OceanSettings = {
             oceanRadius: planet.getApparentRadius(),
             depthModifier: 0.002,
             alphaModifier: 0.007,
             specularPower: 1.5,
             smoothness: 0.9,
-            waveBlendingSharpness: 0.1,
+            waveBlendingSharpness: 0.1
         };
 
         let uniforms: ShaderUniformData = {
-            "oceanRadius": {
+            oceanRadius: {
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.oceanRadius
+                    return settings.oceanRadius;
                 }
             },
 
-            "smoothness": {
+            smoothness: {
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.smoothness
+                    return settings.smoothness;
                 }
             },
-            "specularPower": {
+            specularPower: {
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.specularPower
+                    return settings.specularPower;
                 }
             },
-            "alphaModifier": {
+            alphaModifier: {
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.alphaModifier
+                    return settings.alphaModifier;
                 }
             },
-            "depthModifier": {
+            depthModifier: {
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.depthModifier
+                    return settings.depthModifier;
                 }
             },
-            "waveBlendingSharpness": {
+            waveBlendingSharpness: {
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.waveBlendingSharpness
+                    return settings.waveBlendingSharpness;
                 }
             },
 
-            "planetWorldMatrix": {
+            planetWorldMatrix: {
                 type: ShaderDataType.Matrix,
                 get: () => {
-                    return planet.getWorldMatrix()
+                    return planet.getWorldMatrix();
                 }
             },
 
-            "time": {
+            time: {
                 type: ShaderDataType.Float,
                 get: () => {
                     //TODO: do not hardcode the 100000
                     // use rotating time offset to prevent float imprecision and distant artifacts
-                    return this.internalTime % 100000
+                    return this.internalTime % 100000;
                 }
             }
         };
 
         let samplers: ShaderSamplerData = {
-            "normalMap1": {
+            normalMap1: {
                 type: ShaderDataType.Texture,
                 get: () => {
-                    return new Texture(waterNormal1, scene)
+                    return new Texture(waterNormal1, scene);
                 }
             },
-            "normalMap2": {
+            normalMap2: {
                 type: ShaderDataType.Texture,
                 get: () => {
-                    return new Texture(waterNormal2, scene)
+                    return new Texture(waterNormal2, scene);
                 }
             }
-        }
+        };
 
         super(name, shaderName, uniforms, samplers, planet, sun, scene);
 

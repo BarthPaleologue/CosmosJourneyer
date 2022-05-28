@@ -66,18 +66,22 @@ export class Gamepad {
         [GamepadAxis.LX]: 0,
         [GamepadAxis.LY]: 1,
         [GamepadAxis.RX]: 2,
-        [GamepadAxis.RY]: 3,
+        [GamepadAxis.RY]: 3
     };
     constructor() {
         this.gamepad = null;
         console.warn("Gamepad non connecté !");
 
         //https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API
-        window.addEventListener("gamepadconnected", e => {
-            console.log("%cGamepad connected at index %d: %s. %d buttons, %d axes.",
-                'background: #222; color: #bada55',
-                e.gamepad.index, e.gamepad.id,
-                e.gamepad.buttons.length, e.gamepad.axes.length);
+        window.addEventListener("gamepadconnected", (e) => {
+            console.log(
+                "%cGamepad connected at index %d: %s. %d buttons, %d axes.",
+                "background: #222; color: #bada55",
+                e.gamepad.index,
+                e.gamepad.id,
+                e.gamepad.buttons.length,
+                e.gamepad.axes.length
+            );
 
             this.gamepad = e.gamepad;
         });

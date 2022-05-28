@@ -7,4 +7,4 @@ export const Settings = {
     TIME_MULTIPLIER: 1,
     ENABLE_OCCLUSION: false,
     RENDER_DISTANCE_MULTIPLIER: 2
-}
+};

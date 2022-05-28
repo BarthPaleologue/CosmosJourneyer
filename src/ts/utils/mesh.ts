@@ -1,4 +1,4 @@
-import {Axis, Mesh, Space} from "@babylonjs/core";
+import { Axis, Mesh, Space } from "@babylonjs/core";
 
 /**
  * Aims at fixing the weirdness of babylonjs (properties not defined until called)

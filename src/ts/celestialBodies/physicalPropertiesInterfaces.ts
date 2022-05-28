@@ -1,4 +1,4 @@
-import {Vector3} from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core";
 
 export interface BodyPhysicalProperties {
     mass: number;

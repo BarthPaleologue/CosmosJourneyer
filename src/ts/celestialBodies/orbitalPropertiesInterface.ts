@@ -1,5 +1,5 @@
 export interface OrbitalProperties {
-    periapsis: number,
-    apoapsis: number,
-    period: number
+    periapsis: number;
+    apoapsis: number;
+    period: number;
 }

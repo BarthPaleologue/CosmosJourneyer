@@ -1,6 +1,6 @@
-import {Direction} from "../utils/direction";
-import {TerrainSettings} from "../terrain/terrainSettings";
-import {TaskType} from "./taskInterfaces";
+import { Direction } from "../utils/direction";
+import { TerrainSettings } from "../terrain/terrainSettings";
+import { TaskType } from "./taskInterfaces";
 
 export interface WorkerData {
     taskType: TaskType;
@@ -17,6 +17,4 @@ export interface BuildData extends WorkerData {
     direction: Direction;
 }
 
-export interface CollisionData extends WorkerData {
-
-}
+export interface CollisionData extends WorkerData {}

@@ -1,4 +1,4 @@
-import {BuildTask, DeleteTask, Task} from "./taskInterfaces";
+import { BuildTask, DeleteTask, Task } from "./taskInterfaces";
 
 /*export class BuildTaskQueue {
     array: ArrayBuffer
@@ -20,7 +20,7 @@ export class WorkerPool {
         //this.sharedMemoryBuffer = new SharedArrayBuffer(0);
         //this.sharedTaskQueue = new BuildTaskQueue(this.sharedMemoryBuffer);
         for (let i = 0; i < nbWorkers; i++) {
-            let worker = new Worker(new URL('../workers/workerScript', import.meta.url), { type: "module" });
+            let worker = new Worker(new URL("../workers/workerScript", import.meta.url), { type: "module" });
             this.availableWorkers.push(worker);
             //worker.postMessage(this.sharedMemoryBuffer);
         }
@@ -37,7 +37,7 @@ export class WorkerPool {
     }
 
     public nextTask(): DeleteTask | BuildTask {
-        if(this.hasTask()) return this.taskQueue.shift()!;
+        if (this.hasTask()) return this.taskQueue.shift()!;
         throw new Error("The workerpool has no task to dispatch");
     }
 }
