@@ -65,13 +65,6 @@ export abstract class AbstractPlanet extends CelestialBody implements Seedable {
         return rings;
     }
 
-    /**
-     * Returns the world matrix of the planet (see babylonjs world matrix for reference)
-     */
-    public getWorldMatrix(): Matrix {
-        throw new Error("Not implemented");
-    }
-
     public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number) {
         super.update(player, lightPosition, deltaTime);
         for (const postprocessKey in this.postProcesses) {

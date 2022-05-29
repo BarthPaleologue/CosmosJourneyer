@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, Vector4, Axis } from "@babylonjs/core";
+import { Vector3, Quaternion, Vector4 } from "@babylonjs/core";
 
 /**
  * Lightweight vector3 for fast algebra computation

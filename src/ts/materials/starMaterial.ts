@@ -22,6 +22,6 @@ export class StarMaterial extends ShaderMaterial {
     public update() {
         this.setFloat("time", this.star.internalTime);
         this.setVector3("starColor", getRgbFromTemperature(this.star.physicalProperties.temperature));
-        this.setMatrix("planetWorldMatrix", this.star.mesh.getWorldMatrix());
+        this.setMatrix("planetWorldMatrix", this.star.transform.getWorldMatrix());
     }
 }

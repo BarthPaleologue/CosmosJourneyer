@@ -9,6 +9,7 @@ import { PlayerController } from "../player/playerController";
 import { CelestialBody } from "../celestialBodies/celestialBody";
 import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../materials/colorSettingsInterface";
+import { clearAllEventListenersById } from "../utils/html";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -43,7 +44,7 @@ export class BodyEditor {
         this.starSliders
     ];
 
-    constructor(visibility: EditorVisibility) {
+    constructor(visibility: EditorVisibility = EditorVisibility.FULL) {
         sliderStyle.default;
 
         document.body.innerHTML += editorHTML;
@@ -206,7 +207,7 @@ export class BodyEditor {
         this.generalSliders.length = 0;
 
         this.generalSliders.push(
-            new Slider("zoom", document.getElementById("zoom")!, 0, 100, (100 * planet._radius) / planet.attachNode.position.z, (value: number) => {
+            new Slider("zoom", document.getElementById("zoom")!, 0, 100, (100 * planet._radius) / planet.transform.position.z, (value: number) => {
                 let playerDir = planet.getAbsolutePosition().normalizeToNew();
                 planet.setAbsolutePosition(playerDir.scale((100 * planet.getRadius()) / value));
             })
@@ -215,7 +216,7 @@ export class BodyEditor {
         let sunOrientation = 220;
         this.generalSliders.push(
             new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
-                star.mesh.rotateAround(planet.getAbsolutePosition(), new Vector3(0, 1, 0), (-2 * Math.PI * (val - sunOrientation)) / 360);
+                star.rotateAround(planet.getAbsolutePosition(), new Vector3(0, 1, 0), (-2 * Math.PI * (val - sunOrientation)) / 360);
                 sunOrientation = val;
             })
         );
@@ -269,39 +270,34 @@ export class BodyEditor {
         const material = planet.material;
         const colorSettings = material.colorSettings;
 
-        let snowColorPicker = document.getElementById("snowColor") as HTMLInputElement;
+        let snowColorPicker = clearAllEventListenersById("snowColor") as HTMLInputElement;
         snowColorPicker.value = colorSettings.snowColor.toHexString();
         snowColorPicker.addEventListener("input", () => {
-            colorSettings.snowColor = Color3.FromHexString(snowColorPicker.value);
-            material.updateManual();
+            colorSettings.snowColor.copyFrom(Color3.FromHexString(snowColorPicker.value));
         });
 
-        let plainColorPicker = document.getElementById("plainColor") as HTMLInputElement;
+        let plainColorPicker = clearAllEventListenersById("plainColor") as HTMLInputElement;
         plainColorPicker.value = colorSettings.plainColor.toHexString();
         plainColorPicker.addEventListener("input", () => {
-            colorSettings.plainColor = Color3.FromHexString(plainColorPicker.value);
-            material.updateManual();
+            colorSettings.plainColor.copyFrom(Color3.FromHexString(plainColorPicker.value));
         });
 
-        let steepColorPicker = document.getElementById("steepColor") as HTMLInputElement;
+        let steepColorPicker = clearAllEventListenersById("steepColor") as HTMLInputElement;
         steepColorPicker.value = colorSettings.steepColor.toHexString();
         steepColorPicker.addEventListener("input", () => {
-            colorSettings.steepColor = Color3.FromHexString(steepColorPicker.value);
-            material.updateManual();
+            colorSettings.steepColor.copyFrom(Color3.FromHexString(steepColorPicker.value));
         });
 
-        let sandColorPicker = document.getElementById("sandColor") as HTMLInputElement;
+        let sandColorPicker = clearAllEventListenersById("sandColor") as HTMLInputElement;
         sandColorPicker.value = colorSettings.beachColor.toHexString();
         sandColorPicker.addEventListener("input", () => {
-            colorSettings.beachColor = Color3.FromHexString(sandColorPicker.value);
-            material.updateManual();
+            colorSettings.beachColor.copyFrom(Color3.FromHexString(sandColorPicker.value));
         });
 
-        let desertColorPicker = document.getElementById("desertColor") as HTMLInputElement;
+        let desertColorPicker = clearAllEventListenersById("desertColor") as HTMLInputElement;
         desertColorPicker.value = colorSettings.desertColor.toHexString();
         desertColorPicker.addEventListener("input", () => {
-            colorSettings.desertColor = Color3.FromHexString(desertColorPicker.value);
-            material.updateManual();
+            colorSettings.desertColor.copyFrom(Color3.FromHexString(desertColorPicker.value));
         });
 
         this.surfaceSliders.push(

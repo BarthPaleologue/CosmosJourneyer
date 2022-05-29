@@ -113,6 +113,13 @@ export class SolidPlanetMaterial extends ShaderMaterial {
         this.setTexture("beachNormalMap", new Texture(beachNormalMap));
         this.setTexture("desertNormalMap", new Texture(desertNormalMap));
 
+        this.setColor3("snowColor", this.colorSettings.snowColor);
+        this.setColor3("steepColor", this.colorSettings.steepColor);
+        this.setColor3("plainColor", this.colorSettings.plainColor);
+        this.setColor3("beachColor", this.colorSettings.beachColor);
+        this.setColor3("desertColor", this.colorSettings.desertColor);
+        this.setColor3("bottomColor", this.colorSettings.bottomColor);
+
         this.setVector3("playerPosition", Vector3.Zero());
         this.setVector3("sunPosition", Vector3.Zero());
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
@@ -133,13 +140,6 @@ export class SolidPlanetMaterial extends ShaderMaterial {
         this.setFloat("waterLevel", this.planet.oceanLevel);
         this.setFloat("beachSize", this.colorSettings.beachSize);
         this.setFloat("steepSharpness", this.colorSettings.steepSharpness);
-
-        this.setColor3("snowColor", this.colorSettings.snowColor);
-        this.setColor3("steepColor", this.colorSettings.steepColor);
-        this.setColor3("plainColor", this.colorSettings.plainColor);
-        this.setColor3("beachColor", this.colorSettings.beachColor);
-        this.setColor3("desertColor", this.colorSettings.desertColor);
-        this.setColor3("bottomColor", this.colorSettings.bottomColor);
 
         this.setFloat("normalSharpness", this.colorSettings.normalSharpness);
 

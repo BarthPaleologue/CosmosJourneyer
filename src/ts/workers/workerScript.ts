@@ -194,8 +194,8 @@ function buildChunkVertexData(data: BuildData): void {
             i: indices,
             n: normals,
             g: grassPositions
-            //@ts-ignore
         },
+        //@ts-ignore
         [verticesPositions.buffer, indices.buffer, normals.buffer, grassPositions.buffer]
     );
 }

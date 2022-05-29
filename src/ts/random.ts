@@ -17,25 +17,13 @@ import { Settings } from "./settings";
 import { CelestialBodyType } from "./celestialBodies/interfaces";
 import { clamp } from "./utils/math";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
+import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
 
 style.default;
 
-let bodyEditor = new BodyEditor(EditorVisibility.FULL);
-
-let canvas = document.getElementById("renderer") as HTMLCanvasElement;
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let engine = new Engine(canvas);
-engine.loadingScreen.displayLoadingUI();
-
-console.log("GPU utilisé : " + engine.getGlInfo().renderer);
-
-let scene = new Scene(engine);
-
-let depthRenderer = new DepthRenderer(scene);
-scene.customRenderTargets.push(depthRenderer.getDepthMap());
-depthRenderer.getDepthMap().renderList = [];
+const bodyEditor = new BodyEditor();
+const [canvas, engine, scene] = initCanvasEngineScene("renderer");
+const depthRenderer = initDepthRenderer(scene);
 
 let keyboard = new Keyboard();
 let mouse = new Mouse();

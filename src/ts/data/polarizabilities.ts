@@ -9,7 +9,7 @@ export const polarizabilities = {
     N: 7.4,
     O: 5.3,
     F: 3.74,
-    Ne: 2.66110,
+    Ne: 2.6611,
     Na: 162.7,
     Mg: 71.2,
     Al: 57.8,

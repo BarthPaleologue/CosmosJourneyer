@@ -1,13 +1,12 @@
-import { Vector3, Quaternion, Space, Matrix } from "@babylonjs/core";
+import { Vector3, Quaternion, Space, Matrix, TransformNode } from "@babylonjs/core";
 import { Algebra } from "../utils/algebra";
 import { CelestialBodyType, Transformable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
 import { BodyPhysicalProperties } from "./physicalPropertiesInterfaces";
-import { BodyPostProcesses, PlanetPostProcesses } from "./postProcessesInterfaces";
+import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { OrbitalProperties } from "./orbitalPropertiesInterface";
 import { computeBarycenter, computePointOnOrbit } from "../utils/kepler";
-import { Settings } from "../settings";
 
 export abstract class CelestialBody implements Transformable {
     protected abstract bodyType: CelestialBodyType;
@@ -20,10 +19,16 @@ export abstract class CelestialBody implements Transformable {
 
     readonly _name: string;
 
+    readonly transform: TransformNode;
+
     protected constructor(name: string, starSystemManager: StarSystemManager) {
         this._name = name;
         this._starSystemManager = starSystemManager;
         starSystemManager.addBody(this);
+
+        this.transform = new TransformNode(`${name}Transform`);
+        this.transform.position = Vector3.Zero();
+        this.transform.rotationQuaternion = Quaternion.Identity();
 
         this.orbitalProperties = {
             periapsis: this.getRadius() * 5,
@@ -39,14 +44,39 @@ export abstract class CelestialBody implements Transformable {
         return this._name;
     }
 
-    public abstract setAbsolutePosition(newPosition: Vector3): void;
+    public setAbsolutePosition(newPosition: Vector3): void {
+        this.transform.setAbsolutePosition(newPosition);
+    }
 
-    public abstract getAbsolutePosition(): Vector3;
+    public getAbsolutePosition(): Vector3 {
+        if (this.transform.getAbsolutePosition()._isDirty) this.transform.computeWorldMatrix(true);
+        return this.transform.getAbsolutePosition();
+    }
 
-    public abstract getRotationQuaternion(): Quaternion;
+    public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
+        this.transform.rotateAround(pivot, axis, amount);
+    }
+
+    public rotate(axis: Vector3, amount: number) {
+        this.transform.rotate(axis, amount, Space.WORLD);
+        this.physicalProperties.rotationAxis = Vector3.TransformCoordinates(this.physicalProperties.rotationAxis, Matrix.RotationAxis(axis, amount));
+    }
+
+    public getRotationQuaternion(): Quaternion {
+        if (this.transform.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.getName()}`);
+        if (this.transform.rotationQuaternion._isDirty) this.transform.computeWorldMatrix(true);
+        return this.transform.rotationQuaternion;
+    }
 
     public getInverseRotationQuaternion(): Quaternion {
         return this.getRotationQuaternion().conjugate();
+    }
+
+    /**
+     * Returns the world matrix of the planet (see babylonjs world matrix for reference)
+     */
+    public getWorldMatrix(): Matrix {
+        return this.transform.getWorldMatrix();
     }
 
     /**
@@ -117,11 +147,5 @@ export abstract class CelestialBody implements Transformable {
 
     public translate(displacement: Vector3): void {
         this.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
-    }
-
-    public abstract rotateAround(pivot: Vector3, axis: Vector3, amount: number): void;
-
-    public rotate(axis: Vector3, amount: number) {
-        this.physicalProperties.rotationAxis = Vector3.TransformCoordinates(this.physicalProperties.rotationAxis, Matrix.RotationAxis(axis, amount));
     }
 }

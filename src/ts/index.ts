@@ -1,4 +1,4 @@
-import { Axis, Color3, DepthRenderer, Engine, FxaaPostProcess, Scene, Texture, Tools, Vector3 } from "@babylonjs/core";
+import { Axis, Color3, FxaaPostProcess, Texture, Tools, Vector3 } from "@babylonjs/core";
 
 import { SolidPlanet } from "./celestialBodies/planets/solidPlanet";
 import { Star } from "./celestialBodies/stars/star";
@@ -21,25 +21,13 @@ import * as style from "../styles/style.scss";
 import { Settings } from "./settings";
 import { CelestialBodyType } from "./celestialBodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
+import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
 
 style.default;
 
-let bodyEditor = new BodyEditor(EditorVisibility.FULL);
-
-let canvas = document.getElementById("renderer") as HTMLCanvasElement;
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let engine = new Engine(canvas);
-engine.loadingScreen.displayLoadingUI();
-
-console.log("GPU utilisé : " + engine.getGlInfo().renderer);
-
-let scene = new Scene(engine);
-
-let depthRenderer = new DepthRenderer(scene);
-scene.customRenderTargets.push(depthRenderer.getDepthMap());
-depthRenderer.getDepthMap().renderList = [];
+const bodyEditor = new BodyEditor();
+const [canvas, engine, scene] = initCanvasEngineScene("renderer");
+const depthRenderer = initDepthRenderer(scene);
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
@@ -74,7 +62,7 @@ planet.createRings(sun, scene);
 
 let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, scene, {
     mass: 2,
-    rotationPeriod: 24 * 60 * 60,
+    rotationPeriod: 7 * 60 * 60,
     rotationAxis: Axis.Y,
 
     minTemperature: -180,

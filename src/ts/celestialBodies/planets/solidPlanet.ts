@@ -3,16 +3,14 @@ import { Direction } from "../../utils/direction";
 import { TerrainSettings } from "../../terrain/terrainSettings";
 import { AbstractPlanet } from "./abstractPlanet";
 
-import { Axis, Matrix, Mesh, Quaternion, Scene, Space, Vector3 } from "@babylonjs/core";
+import { Axis, Scene, Vector3 } from "@babylonjs/core";
 
 import { CelestialBodyType, RigidBody } from "../interfaces";
 import { CollisionData } from "../../chunks/workerDataInterfaces";
 import { TaskType } from "../../chunks/taskInterfaces";
-import { initMeshTransform } from "../../utils/mesh";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
 import { Settings } from "../../settings";
-import { Algebra } from "../../utils/algebra";
 import { SolidPhysicalProperties } from "../physicalPropertiesInterfaces";
 import { SolidPlanetMaterial } from "../../materials/solidPlanetMaterial";
 
@@ -25,7 +23,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     public terrainSettings: TerrainSettings;
 
-    readonly attachNode: Mesh; // reprensents the center of the sphere
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
 
     material: SolidPlanetMaterial;
@@ -52,10 +49,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         // TODO: faire quelque chose de réaliste
         this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
-
-        this.attachNode = new Mesh(`${this._name}AttachNode`, scene);
-
-        initMeshTransform(this.attachNode);
 
         this.terrainSettings = {
             continentsFragmentation: 0.47,
@@ -94,10 +87,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         return collisionData;
     }
 
-    public override getWorldMatrix(): Matrix {
-        return this.attachNode.getWorldMatrix();
-    }
-
     /**
      * Update terrain of the sphere relative to the observer position
      * @param observerPosition
@@ -119,31 +108,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.updateLOD(player.getAbsolutePosition());
     }
 
-    public getAbsolutePosition() {
-        if (this.attachNode.getAbsolutePosition()._isDirty) this.attachNode.computeWorldMatrix(true);
-        return this.attachNode.getAbsolutePosition();
-    }
-
     public override getApparentRadius(): number {
         return super.getRadius() + this.oceanLevel;
-    }
-
-    public setAbsolutePosition(newPosition: Vector3): void {
-        this.attachNode.setAbsolutePosition(newPosition);
-    }
-
-    public getRotationQuaternion(): Quaternion {
-        if (this.attachNode.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.getName()}`);
-        if (this.attachNode.rotationQuaternion._isDirty) this.attachNode.computeWorldMatrix(true);
-        return this.attachNode.rotationQuaternion;
-    }
-
-    public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
-        this.attachNode.rotateAround(pivot, axis, amount);
-    }
-
-    public rotate(axis: Vector3, amount: number) {
-        this.attachNode.rotate(axis, amount, Space.WORLD);
-        super.rotate(axis, amount);
     }
 }
