@@ -4,7 +4,7 @@ import { PlanetPostProcess } from "../planetPostProcess";
 import { Star } from "../../celestialBodies/stars/star";
 import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
 
-import volumetricCloudsFragment from "../../../shaders/volumetricClouds.fragment.fx";
+import volumetricCloudsFragment from "../../../shaders/volumetricCloudsFragment.glsl";
 
 const shaderName = "volumetricClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;

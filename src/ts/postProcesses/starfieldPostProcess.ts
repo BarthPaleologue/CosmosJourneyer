@@ -4,7 +4,7 @@ import { SpacePostProcess } from "./spacePostProcess";
 import { ShaderDataType, ShaderSamplerData, ShaderUniformData, StarfieldSettings } from "./interfaces";
 import { Star } from "../celestialBodies/stars/star";
 
-import starfieldFragment from "../../shaders/starfield.fragment.fx";
+import starfieldFragment from "../../shaders/starfieldFragment.glsl";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;

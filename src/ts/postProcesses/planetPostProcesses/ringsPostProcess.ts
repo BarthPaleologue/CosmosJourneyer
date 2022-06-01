@@ -4,7 +4,7 @@ import { PlanetPostProcess } from "../planetPostProcess";
 import { Star } from "../../celestialBodies/stars/star";
 import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
 
-import ringsFragment from "../../../shaders/rings.fragment.fx";
+import ringsFragment from "../../../shaders/ringsFragment.glsl";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;

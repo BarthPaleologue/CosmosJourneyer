@@ -2,8 +2,8 @@ import { Effect, Scene, ShaderMaterial } from "@babylonjs/core";
 import { Star } from "../celestialBodies/stars/star";
 import { getRgbFromTemperature } from "../utils/specrend";
 
-import starMaterialFragment from "../../shaders/starMaterial.fragment.fx";
-import starMaterialVertex from "../../shaders/starMaterial.vertex.fx";
+import starMaterialFragment from "../../shaders/starMaterial/starMaterialFragment.glsl";
+import starMaterialVertex from "../../shaders/starMaterial/starMaterialVertex.glsl";
 
 const shaderName = "starMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;

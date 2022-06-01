@@ -7,7 +7,7 @@ import { PlanetPostProcess } from "../planetPostProcess";
 import { Star } from "../../celestialBodies/stars/star";
 import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
 
-import oceanFragment from "../../../shaders/ocean.fragment.fx";
+import oceanFragment from "../../../shaders/oceanFragment.glsl";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;

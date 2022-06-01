@@ -7,7 +7,7 @@ import { Star } from "../../celestialBodies/stars/star";
 import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
 import { gcd } from "../../utils/math";
 
-import flatCloudsFragment from "../../../shaders/flatClouds.fragment.fx";
+import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;

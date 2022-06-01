@@ -20,7 +20,7 @@ import { Settings } from "./settings";
 import { BodyType } from "./celestialBodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
-import { AssetsManager } from "./assetsManager";
+import { Assets } from "./assets";
 
 style.default;
 
@@ -28,7 +28,7 @@ const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
 const depthRenderer = initDepthRenderer(scene);
 
-AssetsManager.Init();
+Assets.Init(scene);
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
@@ -82,8 +82,8 @@ moon.terrainSettings.maxMountainHeight = 5e3;
 moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
 moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
 
-moon.material.setTexture("plainNormalMap", AssetsManager.RockNormalMap!);
-moon.material.setTexture("bottomNormalMap", AssetsManager.RockNormalMap!);
+moon.material.setTexture("plainNormalMap", Assets.RockNormalMap!);
+moon.material.setTexture("bottomNormalMap", Assets.RockNormalMap!);
 
 moon.translate(new Vector3(moon.orbitalProperties.periapsis, 0, 0));
 moon.translate(planet.getAbsolutePosition());

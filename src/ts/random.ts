@@ -18,7 +18,7 @@ import { BodyType } from "./celestialBodies/interfaces";
 import { clamp } from "./utils/math";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
-import { AssetsManager } from "./assetsManager";
+import { Assets } from "./assets";
 
 style.default;
 
@@ -26,7 +26,7 @@ const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
 const depthRenderer = initDepthRenderer(scene);
 
-AssetsManager.Init();
+Assets.Init(scene);
 
 let keyboard = new Keyboard();
 let mouse = new Mouse();

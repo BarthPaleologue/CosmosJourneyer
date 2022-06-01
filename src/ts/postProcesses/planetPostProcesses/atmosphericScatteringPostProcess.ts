@@ -5,7 +5,7 @@ import { PlanetPostProcess } from "../planetPostProcess";
 import { Star } from "../../celestialBodies/stars/star";
 import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
 
-import atmosphericScatteringFragment from "../../../shaders/atmosphericScattering.fragment.fx";
+import atmosphericScatteringFragment from "../../../shaders/atmosphericScatteringFragment.glsl";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
