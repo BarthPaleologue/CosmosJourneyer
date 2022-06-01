@@ -1,6 +1,6 @@
 import { Vector3, Quaternion, Space, Matrix, TransformNode } from "@babylonjs/core";
 import { Algebra } from "../utils/algebra";
-import { CelestialBodyType, Transformable } from "./interfaces";
+import { BodyType, Transformable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
 import { BodyPhysicalProperties } from "./physicalPropertiesInterfaces";
@@ -8,8 +8,8 @@ import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { OrbitalProperties } from "./orbitalPropertiesInterface";
 import { computeBarycenter, computePointOnOrbit } from "../utils/kepler";
 
-export abstract class CelestialBody implements Transformable {
-    protected abstract bodyType: CelestialBodyType;
+export abstract class AbstractBody implements Transformable {
+    protected abstract bodyType: BodyType;
 
     abstract physicalProperties: BodyPhysicalProperties;
     orbitalProperties: OrbitalProperties;
@@ -59,7 +59,6 @@ export abstract class CelestialBody implements Transformable {
 
     public rotate(axis: Vector3, amount: number) {
         this.transform.rotate(axis, amount, Space.WORLD);
-        this.physicalProperties.rotationAxis = Vector3.TransformCoordinates(this.physicalProperties.rotationAxis, Matrix.RotationAxis(axis, amount));
     }
 
     public getRotationQuaternion(): Quaternion {
@@ -82,7 +81,7 @@ export abstract class CelestialBody implements Transformable {
     /**
      * Returns the body type of the body (useful for casts)
      */
-    public getBodyType(): CelestialBodyType {
+    public getBodyType(): BodyType {
         return this.bodyType;
     }
 
@@ -131,8 +130,8 @@ export abstract class CelestialBody implements Transformable {
         if (this.physicalProperties.rotationPeriod > 0) {
             let dtheta = (2 * Math.PI * deltaTime) / this.physicalProperties.rotationPeriod;
 
-            if (player.isOrbiting(this)) player.rotateAround(this.getAbsolutePosition(), this.physicalProperties.rotationAxis, -dtheta);
-            this.rotate(this.physicalProperties.rotationAxis, -dtheta);
+            if (player.isOrbiting(this)) player.rotateAround(this.getAbsolutePosition(), this.transform.up, -dtheta);
+            this.rotate(this.transform.up, -dtheta);
         }
     }
 

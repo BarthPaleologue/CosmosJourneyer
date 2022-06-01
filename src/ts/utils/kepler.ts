@@ -1,7 +1,7 @@
 // from https://www.youtube.com/watch?v=UXD97l7ZT0w
 
 import { Vector3 } from "@babylonjs/core";
-import { CelestialBody } from "../celestialBodies/celestialBody";
+import { AbstractBody } from "../celestialBodies/abstractBody";
 import { Transformable } from "../celestialBodies/interfaces";
 
 /**
@@ -30,7 +30,7 @@ export function solveKepler(M: number, e: number) {
     return guess;
 }
 
-export function computeBarycenter(body: Transformable, bodies: CelestialBody[]) {
+export function computeBarycenter(body: Transformable, bodies: AbstractBody[]) {
     let barycenter = Vector3.Zero();
     let sum = 0;
     for (const otherBody of bodies) {

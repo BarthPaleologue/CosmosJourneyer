@@ -12,22 +12,23 @@ import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystemManager } from "./celestialBodies/starSystemManager";
 
-import rockNormalMap from "../asset/textures/rockn.png";
-
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 
 import * as style from "../styles/style.scss";
 
 import { Settings } from "./settings";
-import { CelestialBodyType } from "./celestialBodies/interfaces";
+import { BodyType } from "./celestialBodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
+import { AssetsManager } from "./assetsManager";
 
 style.default;
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
 const depthRenderer = initDepthRenderer(scene);
+
+AssetsManager.Init();
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
@@ -63,7 +64,6 @@ planet.createRings(sun, scene);
 let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, scene, {
     mass: 2,
     rotationPeriod: 7 * 60 * 60,
-    rotationAxis: Axis.Y,
 
     minTemperature: -180,
     maxTemperature: 200,
@@ -79,12 +79,11 @@ moon.orbitalProperties = {
 
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
-moon.material.colorSettings.plainColor = new Color3(0.67, 0.67, 0.67);
-moon.material.colorSettings.desertColor = new Color3(116, 134, 121).scale(1 / 255);
-moon.material.updateManual();
+moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
+moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
 
-moon.material.setTexture("plainNormalMap", new Texture(rockNormalMap));
-moon.material.setTexture("bottomNormalMap", new Texture(rockNormalMap));
+moon.material.setTexture("plainNormalMap", AssetsManager.RockNormalMap!);
+moon.material.setTexture("bottomNormalMap", AssetsManager.RockNormalMap!);
 
 moon.translate(new Vector3(moon.orbitalProperties.periapsis, 0, 0));
 moon.translate(planet.getAbsolutePosition());
@@ -92,7 +91,6 @@ moon.translate(planet.getAbsolutePosition());
 let Ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene, {
     mass: 7,
     rotationPeriod: (24 * 60 * 60) / 100,
-    rotationAxis: Axis.Y,
 
     minTemperature: -80,
     maxTemperature: 20,
@@ -106,17 +104,16 @@ Ares.terrainSettings.continentBaseHeight = 5e3;
 Ares.terrainSettings.maxMountainHeight = 20e3;
 Ares.terrainSettings.mountainsMinValue = 0.4;
 
-Ares.material.colorSettings.plainColor = new Color3(0.4, 0.3, 0.3);
-Ares.material.colorSettings.beachColor = new Color3(0.3, 0.15, 0.1);
-Ares.material.colorSettings.bottomColor = new Color3(0.05, 0.1, 0.15);
-Ares.material.updateManual();
+Ares.material.colorSettings.plainColor.copyFromFloats(0.4, 0.3, 0.3);
+Ares.material.colorSettings.beachColor.copyFromFloats(0.3, 0.15, 0.1);
+Ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);
 
 let aresAtmosphere = Ares.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene); // = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, scene);
 aresAtmosphere.settings.redWaveLength = 500;
 aresAtmosphere.settings.greenWaveLength = 680;
 aresAtmosphere.settings.blueWaveLength = 670;
 
-let fxaa = new FxaaPostProcess("fxaa", 1, player.camera, Texture.BILINEAR_SAMPLINGMODE);
+const fxaa = new FxaaPostProcess("fxaa", 1, player.camera, Texture.BILINEAR_SAMPLINGMODE);
 
 let isMouseEnabled = false;
 
@@ -126,7 +123,7 @@ let collisionWorker = new CollisionWorker(player, starSystem);
 starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
 
 function updateScene() {
-    let deltaTime = engine.getDeltaTime() / 1000;
+    const deltaTime = engine.getDeltaTime() / 1000;
 
     player.nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.getAbsolutePosition());
     if (player.nearestBody.getName() != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, sun, player);
@@ -135,14 +132,14 @@ function updateScene() {
 
     if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 
-    let deplacement = player.listenToGamepad(gamepad, deltaTime);
-    deplacement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
-    starSystem.translateAllCelestialBody(deplacement);
+    let playerMovement = player.listenToGamepad(gamepad, deltaTime);
+    playerMovement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
+    starSystem.translateAllCelestialBody(playerMovement);
 
     starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime * Settings.TIME_MULTIPLIER);
 
     if (!collisionWorker.isBusy() && player.isOrbiting()) {
-        if (player.nearestBody?.getBodyType() == CelestialBodyType.SOLID) {
+        if (player.nearestBody?.getBodyType() == BodyType.SOLID) {
             collisionWorker.checkCollision(player.nearestBody as SolidPlanet);
         }
     }

@@ -1,8 +1,8 @@
-import { CelestialBody } from "../celestialBody";
+import { AbstractBody } from "../abstractBody";
 import { Seedable } from "../interfaces";
 import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { Star } from "../stars/star";
-import { Matrix, Scene, Vector3 } from "@babylonjs/core";
+import { Scene, Vector3 } from "@babylonjs/core";
 import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import { PlayerController } from "../../player/playerController";
 import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
@@ -11,7 +11,7 @@ import { StarSystemManager } from "../starSystemManager";
 import { PlanetPhysicalProperties } from "../physicalPropertiesInterfaces";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
 
-export abstract class AbstractPlanet extends CelestialBody implements Seedable {
+export abstract class AbstractPlanet extends AbstractBody implements Seedable {
     readonly _radius: number;
     protected _seed: number[];
     abstract override physicalProperties: PlanetPhysicalProperties;

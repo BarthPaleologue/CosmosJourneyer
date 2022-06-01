@@ -1,7 +1,7 @@
-import { CelestialBody } from "../celestialBody";
+import { AbstractBody } from "../abstractBody";
 
-import { Axis, Mesh, MeshBuilder, Quaternion, Scene, Vector3, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
-import { CelestialBodyType } from "../interfaces";
+import { Mesh, MeshBuilder, Quaternion, Scene, Vector3, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
 import { StarPhysicalProperties } from "../physicalPropertiesInterfaces";
@@ -9,12 +9,12 @@ import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
 
 // TODO: implement RigidBody for star
-export class Star extends CelestialBody {
+export class Star extends AbstractBody {
     private readonly mesh: Mesh;
     private readonly radius: number;
     private readonly material: StarMaterial;
     internalTime = 0;
-    protected bodyType = CelestialBodyType.STAR;
+    protected bodyType = BodyType.STAR;
     readonly physicalProperties: StarPhysicalProperties;
 
     public override postProcesses: StarPostProcesses;
@@ -28,7 +28,6 @@ export class Star extends CelestialBody {
             //TODO: ne pas hardcoder
             mass: 1000,
             rotationPeriod: 24 * 60 * 60,
-            rotationAxis: Axis.Y,
 
             temperature: 5778
         }

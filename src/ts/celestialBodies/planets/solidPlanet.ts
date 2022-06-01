@@ -3,9 +3,9 @@ import { Direction } from "../../utils/direction";
 import { TerrainSettings } from "../../terrain/terrainSettings";
 import { AbstractPlanet } from "./abstractPlanet";
 
-import { Axis, Scene, Vector3 } from "@babylonjs/core";
+import { Scene, Vector3 } from "@babylonjs/core";
 
-import { CelestialBodyType, RigidBody } from "../interfaces";
+import { BodyType, RigidBody } from "../interfaces";
 import { CollisionData } from "../../chunks/workerDataInterfaces";
 import { TaskType } from "../../chunks/taskInterfaces";
 import { PlayerController } from "../../player/playerController";
@@ -19,7 +19,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     override readonly physicalProperties: SolidPhysicalProperties;
 
-    protected bodyType = CelestialBodyType.SOLID;
+    protected bodyType = BodyType.SOLID;
 
     public terrainSettings: TerrainSettings;
 
@@ -35,7 +35,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         physicalProperties: SolidPhysicalProperties = {
             mass: 10,
             rotationPeriod: 60 * 60 * 24,
-            rotationAxis: Axis.Y,
             minTemperature: -60,
             maxTemperature: 40,
             pressure: 1,

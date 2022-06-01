@@ -1,4 +1,4 @@
-import { Axis, Color3, DepthRenderer, Engine, FxaaPostProcess, Scene, Tools, Vector3 } from "@babylonjs/core";
+import { Axis, Color3, FxaaPostProcess, Tools, Vector3 } from "@babylonjs/core";
 
 import { SolidPlanet } from "./celestialBodies/planets/solidPlanet";
 
@@ -14,16 +14,19 @@ import { centeredRandom, nrand, randInt } from "./utils/random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Star } from "./celestialBodies/stars/star";
 import { Settings } from "./settings";
-import { CelestialBodyType } from "./celestialBodies/interfaces";
+import { BodyType } from "./celestialBodies/interfaces";
 import { clamp } from "./utils/math";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
+import { AssetsManager } from "./assetsManager";
 
 style.default;
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
 const depthRenderer = initDepthRenderer(scene);
+
+AssetsManager.Init();
 
 let keyboard = new Keyboard();
 let mouse = new Mouse();
@@ -42,7 +45,6 @@ let starRadius = clamp(nrand(0.5, 0.2), 0.2, 1.5) * Settings.PLANET_RADIUS * 100
 let sun = new Star("Weierstrass", starRadius, starSystemManager, scene, {
     mass: 1000,
     rotationPeriod: 60 * 60 * 24,
-    rotationAxis: Axis.Y,
 
     temperature: clamp(nrand(5778, 2000), 0, 10000)
 });
@@ -60,7 +62,6 @@ let planet = new SolidPlanet(
     {
         mass: 10,
         rotationPeriod: (24 * 60 * 60) / 10,
-        rotationAxis: Axis.Y,
 
         minTemperature: randInt(-50, 5),
         maxTemperature: randInt(10, 50),
@@ -72,7 +73,7 @@ let planet = new SolidPlanet(
 planet.translate(new Vector3(0, 0, 4 * planet.getRadius()));
 console.log("seed : ", planet.getSeed().toString());
 console.table(planet.physicalProperties);
-planet.material.colorSettings.plainColor = new Color3(0.22, 0.37, 0.024).add(new Color3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1));
+planet.material.colorSettings.plainColor.copyFrom(new Color3(0.22, 0.37, 0.024).add(new Color3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1)));
 planet.material.colorSettings.beachSize = 250 + 100 * centeredRandom();
 planet.terrainSettings.continentsFragmentation = clamp(nrand(0.5, 0.2), 0, 1);
 
@@ -135,7 +136,7 @@ scene.executeWhenReady(() => {
         starSystemManager.translateAllCelestialBody(deplacement);
 
         if (!collisionWorker.isBusy() && player.isOrbiting()) {
-            if (player.nearestBody?.getBodyType() == CelestialBodyType.SOLID) {
+            if (player.nearestBody?.getBodyType() == BodyType.SOLID) {
                 collisionWorker.checkCollision(player.nearestBody as SolidPlanet);
             }
         }

@@ -3,12 +3,12 @@ import { Vector3, FreeCamera, Mesh, StandardMaterial, Color3, Axis, Space, Scene
 import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
-import { CelestialBody } from "../celestialBodies/celestialBody";
+import { AbstractBody } from "../celestialBodies/abstractBody";
 import { Transformable } from "../celestialBodies/interfaces";
 import { Algebra } from "../utils/algebra";
 
 export class PlayerController implements Transformable {
-    nearestBody: CelestialBody | null;
+    nearestBody: AbstractBody | null;
 
     collisionRadius = 100;
 
@@ -249,7 +249,7 @@ export class PlayerController implements Transformable {
      * If the parameter is unset, returns whereas the player is orbiting a body, if the parameter is set returns if the player orbits the given body
      * @param body
      */
-    public isOrbiting(body: CelestialBody | null = null): boolean {
+    public isOrbiting(body: AbstractBody | null = null): boolean {
         //TODO: do not hardcode
         const orbitLimitFactor = 2.5;
         if (this.nearestBody == null) return false;

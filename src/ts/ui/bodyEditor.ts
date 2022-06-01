@@ -2,11 +2,11 @@ import editorHTML from "../../html/bodyEditor.html";
 import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
 import { Star } from "../celestialBodies/stars/star";
 import { Slider } from "handle-sliderjs";
-import { CelestialBodyType } from "../celestialBodies/interfaces";
+import { BodyType } from "../celestialBodies/interfaces";
 import { Settings } from "../settings";
 import { Axis, Color3, Vector3 } from "@babylonjs/core";
 import { PlayerController } from "../player/playerController";
-import { CelestialBody } from "../celestialBodies/celestialBody";
+import { AbstractBody } from "../celestialBodies/abstractBody";
 import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../materials/colorSettingsInterface";
 import { clearAllEventListenersById } from "../utils/html";
@@ -107,17 +107,17 @@ export class BodyEditor {
         return this.visibility;
     }
 
-    public setBody(body: CelestialBody, star: Star, player: PlayerController) {
+    public setBody(body: AbstractBody, star: Star, player: PlayerController) {
         this.currentBodyId = body.getName();
         this.initNavBar(body);
         switch (body.getBodyType()) {
-            case CelestialBodyType.SOLID:
+            case BodyType.SOLID:
                 this.setPlanet(body as SolidPlanet, star, player);
                 break;
-            case CelestialBodyType.STAR:
+            case BodyType.STAR:
                 this.setStar(body as Star);
                 break;
-            case CelestialBodyType.GAZ:
+            case BodyType.GAZ:
                 break;
             default:
         }
@@ -140,9 +140,9 @@ export class BodyEditor {
     }
 
     //TODO: make it maintainable
-    public initNavBar(body: CelestialBody): void {
+    public initNavBar(body: AbstractBody): void {
         switch (body.getBodyType()) {
-            case CelestialBodyType.STAR:
+            case BodyType.STAR:
                 document.getElementById("generalLink")!.hidden = false;
                 document.getElementById("starPhysicLink")!.hidden = false;
                 document.getElementById("physicLink")!.hidden = true;
@@ -152,7 +152,7 @@ export class BodyEditor {
                 document.getElementById("atmosphereLink")!.hidden = true;
                 document.getElementById("ringsLink")!.hidden = true;
                 break;
-            case CelestialBodyType.SOLID:
+            case BodyType.SOLID:
                 document.getElementById("generalLink")!.hidden = false;
                 document.getElementById("starPhysicLink")!.hidden = true;
                 document.getElementById("physicLink")!.hidden = false;

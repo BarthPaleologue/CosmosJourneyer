@@ -1,11 +1,4 @@
-import { Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Texture, Vector3 } from "@babylonjs/core";
-import bottomNormalMap from "../../asset/textures/crackednormal.jpg";
-import steepNormalMap from "../../asset/textures/rockn.png";
-import grassNormalMap from "../../asset/textures/grassNormalMap.jpg";
-import snowNormalMap from "../../asset/textures/snowNormalMap.png";
-import snowNormalMap2 from "../../asset/textures/snowNormalMap2.png";
-import beachNormalMap from "../../asset/textures/sandNormalMap2.png";
-import desertNormalMap from "../../asset/textures/sandNormalMap2.jpg";
+import { Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
 import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
 import { ColorMode, ColorSettings } from "./colorSettingsInterface";
 import { Algebra } from "../utils/algebra";
@@ -13,6 +6,7 @@ import { PlayerController } from "../player/playerController";
 
 import surfaceMaterialFragment from "../../shaders/solidPlanetMaterial.fragment.fx";
 import surfaceMaterialVertex from "../../shaders/solidPlanetMaterial.vertex.fx";
+import { AssetsManager } from "../assetsManager";
 
 const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -103,15 +97,17 @@ export class SolidPlanetMaterial extends ShaderMaterial {
 
         this.setVector3("seed", Vector3.FromArray(this.planet.getSeed()));
 
-        this.setTexture("bottomNormalMap", new Texture(bottomNormalMap));
-        this.setTexture("steepNormalMap", new Texture(steepNormalMap));
-        this.setTexture("plainNormalMap", new Texture(grassNormalMap));
+        if(!AssetsManager.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 
-        this.setTexture("snowNormalMap", new Texture(snowNormalMap));
-        this.setTexture("snowNormalMap2", new Texture(snowNormalMap2));
+        this.setTexture("bottomNormalMap", AssetsManager.BottomNormalMap!);
+        this.setTexture("steepNormalMap", AssetsManager.RockNormalMap!);
+        this.setTexture("plainNormalMap", AssetsManager.GrassNormalMap!);
 
-        this.setTexture("beachNormalMap", new Texture(beachNormalMap));
-        this.setTexture("desertNormalMap", new Texture(desertNormalMap));
+        this.setTexture("snowNormalMap", AssetsManager.SnowNormalMap1!);
+        this.setTexture("snowNormalMap2", AssetsManager.SnowNormalMap2!);
+
+        this.setTexture("beachNormalMap", AssetsManager.SandNormalMap1!);
+        this.setTexture("desertNormalMap", AssetsManager.SnowNormalMap2!);
 
         this.setColor3("snowColor", this.colorSettings.snowColor);
         this.setColor3("steepColor", this.colorSettings.steepColor);
