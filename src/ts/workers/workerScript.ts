@@ -1,6 +1,6 @@
 import { getQuaternionFromDirection } from "../utils/direction";
 import { simplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
-import { Algebra, LVector3 } from "../utils/algebra";
+import { LVector3 } from "../utils/algebra";
 import { ridgedNoiseLayer } from "../terrain/landscape/ridgedNoiseLayer";
 import { BuildData, CollisionData, WorkerData } from "../chunks/workerDataInterfaces";
 import { TerrainSettings } from "../terrain/terrainSettings";
@@ -113,7 +113,7 @@ function buildChunkVertexData(data: BuildData): void {
             vertexPosition.addInPlace(chunkPosition);
 
             // on le met sur la bonne face
-            vertexPosition.applyQuaternionInPlace(rotationQuaternion);
+            vertexPosition.applyRotationQuaternionInPlace(rotationQuaternion);
 
             // Théorie : https://math.stackexchange.com/questions/1071662/surface-normal-to-point-on-displaced-sphere
 
@@ -163,40 +163,14 @@ function buildChunkVertexData(data: BuildData): void {
         }
     }
 
-    const grassPositions = new Float32Array(100 * 3 * 0);
-
-    //chunkPosition.applyQuaternionInPlace(rotationQuaternion);
-
-    /*for (let i = 0; i < 100; ++i) {
-        let x = chunkPosition.x + Math.random() * size - size / 2;
-        let y = chunkPosition.y + Math.random() * size - size / 2;
-        let z = chunkPosition.z + Math.random() * size - size / 2;
-        let mag = Math.sqrt(x * x + y * y + z * z);
-        let gp = new Vector3(x, y, z);
-        gp.divideInPlace(mag);
-        gp.scaleInPlace(planetRadius);
-
-        terrainFunction(gp, new Vector3(1, 1, 1));
-
-        gp.addInPlace(gp.normalize().scale(100 / 2));
-        gp.subtractInPlace(chunkPosition);
-
-        //gp = gp.normalize().scale(planetRadius * 1.01);
-
-        grassPositions[i * 3] = gp.x;
-        grassPositions[i * 3 + 1] = gp.y;
-        grassPositions[i * 3 + 2] = gp.z;
-    }*/
-
     self.postMessage(
         {
             p: verticesPositions,
             i: indices,
             n: normals,
-            g: grassPositions
         },
         //@ts-ignore
-        [verticesPositions.buffer, indices.buffer, normals.buffer, grassPositions.buffer]
+        [verticesPositions.buffer, indices.buffer, normals.buffer]
     );
 }
 

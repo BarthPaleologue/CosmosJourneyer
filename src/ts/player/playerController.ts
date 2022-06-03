@@ -1,11 +1,9 @@
-import { Vector3, FreeCamera, Mesh, StandardMaterial, Color3, Axis, Space, Scene, Quaternion } from "@babylonjs/core";
-
+import { Vector3, FreeCamera, Axis, Space, Scene, Quaternion, TransformNode } from "@babylonjs/core";
 import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
 import { AbstractBody } from "../celestialBodies/abstractBody";
 import { Transformable } from "../celestialBodies/interfaces";
-import { Algebra } from "../utils/algebra";
 
 export class PlayerController implements Transformable {
     nearestBody: AbstractBody | null;
@@ -35,16 +33,13 @@ export class PlayerController implements Transformable {
         yawRightKey: "l"
     };
 
-    readonly mesh: Mesh;
+    readonly transform: TransformNode;
 
     constructor(scene: Scene) {
-        this.mesh = Mesh.CreateBox("player", 1, scene);
-        let mat = new StandardMaterial("mat", scene);
-        mat.emissiveColor = Color3.White();
-        this.mesh.material = mat;
+        this.transform = new TransformNode("playerTransform", scene);
 
         this.camera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
-        this.camera.parent = this.mesh;
+        this.camera.parent = this.transform;
         scene.activeCamera = this.camera;
 
         this.nearestBody = null;
@@ -57,7 +52,7 @@ export class PlayerController implements Transformable {
      * @returns the unit vector pointing forward the player controler in world space
      */
     public getForwardDirection(): Vector3 {
-        return this.mesh.getDirection(Axis.Z);
+        return this.transform.getDirection(Axis.Z);
     }
 
     /**
@@ -73,7 +68,7 @@ export class PlayerController implements Transformable {
      * @returns the unit vector pointing upward the player controler in world space
      */
     public getUpwardDirection(): Vector3 {
-        return this.mesh.getDirection(Axis.Y);
+        return this.transform.getDirection(Axis.Y);
     }
 
     /**
@@ -89,7 +84,7 @@ export class PlayerController implements Transformable {
      * @returns the unit vector pointing to the right of the player controler in world space
      */
     public getRightDirection(): Vector3 {
-        return this.mesh.getDirection(Axis.X);
+        return this.transform.getDirection(Axis.X);
     }
 
     /**
@@ -120,21 +115,21 @@ export class PlayerController implements Transformable {
         // Update Rotation state
         if (keyboard.isPressed(this.controls.rollLeftKey)) {
             // rotation autour de l'axe de déplacement
-            this.mesh.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
+            this.transform.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
         } else if (keyboard.isPressed(this.controls.rollRightKey)) {
-            this.mesh.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
+            this.transform.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
         }
 
         if (keyboard.isPressed(this.controls.pitchUpKey)) {
-            this.mesh.rotate(this.getRightDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
+            this.transform.rotate(this.getRightDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
         } else if (keyboard.isPressed(this.controls.picthDownKey)) {
-            this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
+            this.transform.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
         }
 
         if (keyboard.isPressed(this.controls.yawLeftKey)) {
-            this.mesh.rotate(this.getUpwardDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
+            this.transform.rotate(this.getUpwardDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
         } else if (keyboard.isPressed(this.controls.yawRightKey)) {
-            this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
+            this.transform.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
         }
 
         // Update displacement state
@@ -165,8 +160,8 @@ export class PlayerController implements Transformable {
      */
     public listenToMouse(mouse: Mouse, deltaTime: number): void {
         // Update Rotation state
-        this.mesh.rotate(this.getRightDirection(), (this.rotationSpeed * deltaTime * mouse.getDYToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
-        this.mesh.rotate(this.getUpwardDirection(), (this.rotationSpeed * deltaTime * mouse.getDXToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
+        this.transform.rotate(this.getRightDirection(), (this.rotationSpeed * deltaTime * mouse.getDYToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
+        this.transform.rotate(this.getUpwardDirection(), (this.rotationSpeed * deltaTime * mouse.getDXToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
     }
 
     /**
@@ -195,29 +190,29 @@ export class PlayerController implements Transformable {
 
         // Update Rotation state
         // pitch and yaw control
-        this.mesh.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RY), Space.WORLD);
-        this.mesh.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RX), Space.WORLD);
+        this.transform.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RY), Space.WORLD);
+        this.transform.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RX), Space.WORLD);
 
         // roll control
-        this.mesh.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.L), Space.WORLD);
-        this.mesh.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.R), Space.WORLD);
+        this.transform.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.L), Space.WORLD);
+        this.transform.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.R), Space.WORLD);
 
         return deplacement.scale(-1);
     }
 
     public getAbsolutePosition(): Vector3 {
-        if (this.mesh.getAbsolutePosition()._isDirty) this.mesh.computeWorldMatrix(true);
-        return this.mesh.getAbsolutePosition();
+        if (this.transform.getAbsolutePosition()._isDirty) this.transform.computeWorldMatrix(true);
+        return this.transform.getAbsolutePosition();
     }
 
     setAbsolutePosition(newPosition: Vector3): void {
-        this.mesh.setAbsolutePosition(newPosition);
+        this.transform.setAbsolutePosition(newPosition);
     }
 
     public getRotationQuaternion(): Quaternion {
-        if (this.mesh.rotationQuaternion == undefined) throw new Error(`PlayerController's rotation Quaternion is undefined !`);
-        if (this.mesh.rotationQuaternion._isDirty) this.mesh.computeWorldMatrix(true);
-        return this.mesh.rotationQuaternion;
+        if (this.transform.rotationQuaternion == undefined) throw new Error(`PlayerController's rotation Quaternion is undefined !`);
+        if (this.transform.rotationQuaternion._isDirty) this.transform.computeWorldMatrix(true);
+        return this.transform.rotationQuaternion;
     }
 
     public getInverseRotationQuaternion(): Quaternion {
@@ -225,24 +220,24 @@ export class PlayerController implements Transformable {
     }
 
     getOriginBodySpaceSamplePosition(): Vector3 {
-        let position = this.getAbsolutePosition().scale(-1); // position du joueur / au centre de la planète
+        let position = this.getAbsolutePosition().negate(); // position du joueur / au centre de la planète
 
         // on applique le quaternion inverse pour obtenir le sample point correspondant à la planète rotatée (fais un dessin si c'est pas clair)
-        Algebra.applyQuaternionInPlace(this.getInverseRotationQuaternion(), position);
+        position.applyRotationQuaternionInPlace(this.getInverseRotationQuaternion());
 
         return position;
     }
 
     translate(displacement: Vector3): void {
-        this.mesh.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
+        this.transform.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
     }
 
     rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
-        this.mesh.rotateAround(pivot, axis, amount);
+        this.transform.rotateAround(pivot, axis, amount);
     }
 
     rotate(axis: Vector3, amount: number): void {
-        this.mesh.rotate(axis, amount, Space.WORLD);
+        this.transform.rotate(axis, amount, Space.WORLD);
     }
 
     /**

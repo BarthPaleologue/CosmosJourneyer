@@ -71,12 +71,10 @@ export class ChunkForge {
             vertexData.positions = data.p;
             vertexData.normals = data.n;
             vertexData.indices = data.i;
-            let grassData = data.g;
 
             let applyTask: ApplyTask = {
                 type: TaskType.Apply,
                 vertexData: vertexData,
-                grassData: grassData,
                 chunk: task.chunk,
                 callbackTasks: callbackTasks,
                 planet: task.planet,

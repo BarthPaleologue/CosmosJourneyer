@@ -7,29 +7,37 @@ export class LVector3 {
     private _x: number;
     private _y: number;
     private _z: number;
+
     constructor(x: number, y: number, z: number) {
         this._x = x;
         this._y = y;
         this._z = z;
     }
+
     public get x(): number {
         return this._x;
     }
+
     public set x(value: number) {
         this._x = value;
     }
+
     public get y(): number {
         return this._y;
     }
+
     public set y(value: number) {
         this._y = value;
     }
+
     public get z(): number {
         return this._z;
     }
+
     public set z(value: number) {
         this._z = value;
     }
+
     /**
      *
      * @returns the euclidean squared magnitude of the current vector
@@ -99,6 +107,7 @@ export class LVector3 {
     normalize(): LVector3 {
         return this.scale(1 / this.getMagnitude());
     }
+
     normalizeInPlace(): void {
         this.scaleInPlace(1 / this.getMagnitude());
     }
@@ -115,37 +124,27 @@ export class LVector3 {
     static Zero(): LVector3 {
         return new LVector3(0, 0, 0);
     }
+
     public static Dot(vector1: Vec3, vector2: Vec3): number {
         return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
     }
-    //https://www.wikiwand.com/en/Quaternions_and_spatial_rotation
-    applyQuaternionInPlace(quaternion: Quaternion): void {
-        Algebra.applyQuaternionInPlace(quaternion, this);
+
+    applyRotationQuaternionInPlace(q: Quaternion): void {
+        // apply quaternion to vector
+        let ix = q.w * this.x + q.y * this.z - q.z * this.y;
+        let iy = q.w * this.y + q.z * this.x - q.x * this.z;
+        let iz = q.w * this.z + q.x * this.y - q.y * this.x;
+        let iw = -q.x * this.x - q.y * this.y - q.z * this.z;
+        // calculate result * inverse quat
+        this.x = ix * q.w + iw * -q.x + iy * -q.z - iz * -q.y;
+        this.y = iy * q.w + iw * -q.y + iz * -q.x - ix * -q.z;
+        this.z = iz * q.w + iw * -q.z + ix * -q.y - iy * -q.x;
     }
 }
 
 export type Vec3 = Vector3 | LVector3;
 
-export class Algebra {
-    public static applyQuaternionInPlace(quaternion: Quaternion, vector: Vec3) {
-        let qx = quaternion.x;
-        let qy = quaternion.y;
-        let qz = quaternion.z;
-        let qw = quaternion.w;
-        let x = vector.x;
-        let y = vector.y;
-        let z = vector.z;
-        // apply quaternion to vector
-        let ix = qw * x + qy * z - qz * y;
-        let iy = qw * y + qz * x - qx * z;
-        let iz = qw * z + qx * y - qy * x;
-        let iw = -qx * x - qy * y - qz * z;
-        // calculate result * inverse quat
-        vector.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
-        vector.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
-        vector.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
-    }
-    public static QuaternionAsVector4(q: Quaternion): Vector4 {
-        return new Vector4(q.x, q.y, q.z, q.w);
-    }
+export function quaternionAsVector4(q: Quaternion): Vector4 {
+    return new Vector4(q.x, q.y, q.z, q.w);
 }
+

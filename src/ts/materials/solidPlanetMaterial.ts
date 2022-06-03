@@ -1,7 +1,7 @@
 import { Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
 import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
 import { ColorMode, ColorSettings } from "./colorSettingsInterface";
-import { Algebra } from "../utils/algebra";
+import { quaternionAsVector4 } from "../utils/algebra";
 import { PlayerController } from "../player/playerController";
 
 import surfaceMaterialFragment from "../../shaders/solidPlanetMaterial/solidPlanetMaterialFragment.glsl";
@@ -146,7 +146,7 @@ export class SolidPlanetMaterial extends ShaderMaterial {
     }
 
     public update(player: PlayerController, starPosition: Vector3) {
-        this.setVector4("planetInverseRotationQuaternion", Algebra.QuaternionAsVector4(this.planet.getInverseRotationQuaternion()));
+        this.setVector4("planetInverseRotationQuaternion", quaternionAsVector4(this.planet.getInverseRotationQuaternion()));
 
         this.setVector3("playerPosition", player.getAbsolutePosition());
         this.setVector3("sunPosition", starPosition);

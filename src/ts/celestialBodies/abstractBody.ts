@@ -1,5 +1,4 @@
 import { Vector3, Quaternion, Space, Matrix, TransformNode } from "@babylonjs/core";
-import { Algebra } from "../utils/algebra";
 import { BodyType, Transformable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
@@ -136,10 +135,11 @@ export abstract class AbstractBody implements Transformable {
     }
 
     public getOriginBodySpaceSamplePosition(): Vector3 {
-        let position = this.getAbsolutePosition().scale(-1); // position du joueur / au centre de la planète
+        // FIXME: fix everything here
+        let position = this.getAbsolutePosition().negate(); // position du joueur / au centre de la planète
 
         // negates planet rotation using inverse quaternion to go back to original sample point
-        Algebra.applyQuaternionInPlace(Quaternion.Inverse(this.getRotationQuaternion()), position);
+        position.applyRotationQuaternionInPlace(this.getInverseRotationQuaternion());
 
         return position;
     }

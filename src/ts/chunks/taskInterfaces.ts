@@ -25,7 +25,6 @@ export interface BuildTask extends Task {
 
 export interface ApplyTask extends Task {
     vertexData: VertexData;
-    grassData: Float32Array;
     planet: SolidPlanet;
     callbackTasks: DeleteTask[];
 }
