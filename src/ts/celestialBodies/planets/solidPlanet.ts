@@ -40,7 +40,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             pressure: 1,
             waterAmount: 1
         },
-        seed = [0, 0, 0]
+        seed = 0
     ) {
         super(id, radius, starSystemManager, seed);
 

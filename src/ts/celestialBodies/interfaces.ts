@@ -54,7 +54,13 @@ export interface Transformable {
     rotate(axis: Vector3, amount: number): void;
 }
 
-export interface Seedable {}
+export interface Seedable {
+    /**
+     * Returns the seed of the planet
+     */
+    getSeed(): number;
+    getSeed3(): Vector3;
+}
 
 /**
  * Describes object that can be collided with

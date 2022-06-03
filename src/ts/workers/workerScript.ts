@@ -7,6 +7,7 @@ import { TerrainSettings } from "../terrain/terrainSettings";
 import { elevationFunction } from "../terrain/landscape/elevationFunction";
 import { TaskType } from "../chunks/taskInterfaces";
 import { tanhSharpen } from "../utils/math";
+import { unpackSeedToVector3 } from "../utils/random";
 
 let currentPlanetID = "";
 
@@ -40,7 +41,8 @@ initLayers();
 function terrainFunction(position: LVector3, gradient: LVector3, seed: LVector3): void {
     const unitCoords = position.normalize();
 
-    const samplePoint = position.add(seed);
+    //FIXME: do not hardcode 1000 (amplifies seed)
+    const samplePoint = position.add(seed.scale(1000));
 
     let elevation = 0;
 
@@ -79,7 +81,10 @@ function buildChunkVertexData(data: BuildData): void {
     const depth = data.depth;
     const direction = data.direction;
     const chunkPosition = new LVector3(data.position[0], data.position[1], data.position[2]);
-    const seed = new LVector3(data.seed[0], data.seed[1], data.seed[2]);
+    const seed = data.seed;
+
+    let seedOffsetArray = unpackSeedToVector3(seed);
+    let seedOffset = new LVector3(seedOffsetArray[0], seedOffsetArray[1], seedOffsetArray[2]);
 
     if (data.planetName != currentPlanetID) {
         currentPlanetID = data.planetName;
@@ -124,7 +129,7 @@ function buildChunkVertexData(data: BuildData): void {
 
             // on applique la fonction de terrain
             let vertexGradient = LVector3.Zero();
-            terrainFunction(vertexPosition, vertexGradient, seed);
+            terrainFunction(vertexPosition, vertexGradient, seedOffset);
 
             let h = vertexGradient;
             h.subtractInPlace(unitSphereCoords.scale(LVector3.Dot(vertexGradient, unitSphereCoords)));
@@ -208,12 +213,14 @@ self.onmessage = (e) => {
                 initLayers();
             }
 
-            const seed = new LVector3(data.seed[0], data.seed[1], data.seed[2]);
+            const seed = data.seed;
+            const seedArray = unpackSeedToVector3(seed);
+            const seedOffset = new LVector3(seedArray[0], seedArray[1], seedArray[2]);
 
             const samplePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
             samplePosition.setMagnitudeInPlace(data.planetDiameter / 2);
 
-            sendHeightAtPoint(samplePosition, seed);
+            sendHeightAtPoint(samplePosition, seedOffset);
             break;
 
         default:

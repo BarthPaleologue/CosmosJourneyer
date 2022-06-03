@@ -10,7 +10,15 @@ import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystemManager } from "./celestialBodies/starSystemManager";
 
-import { centeredRandom, nrand, randInt } from "./utils/random";
+import {
+    centeredRandom,
+    normalRandom,
+    randBool,
+    randRange,
+    randRangeBigInt,
+    randRangeInt,
+    unpackSeedToVector3
+} from "./utils/random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Star } from "./celestialBodies/stars/star";
 import { Settings } from "./settings";
@@ -19,6 +27,8 @@ import { clamp } from "./utils/math";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
 import { Assets } from "./assets";
+
+import { alea } from "seedrandom";
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
@@ -37,20 +47,27 @@ player.camera.maxZ = Settings.PLANET_RADIUS * 5000;
 
 let starfield = new StarfieldPostProcess("starfield", scene);
 
-let starSystemManager = new StarSystemManager(64);
+let starSystemManager = new StarSystemManager(Settings.VERTEX_RESOLUTION);
 
-let starRadius = clamp(nrand(0.5, 0.2), 0.2, 1.5) * Settings.PLANET_RADIUS * 200;
+const starSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER);
+console.log("Star seed : ", starSeed);
+const randStar = alea(starSeed.toString());
+
+let starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.2, 1.5) * Settings.PLANET_RADIUS * 200;
 let sun = new Star("Weierstrass", starRadius, starSystemManager, scene, {
     mass: 1000,
     rotationPeriod: 60 * 60 * 24,
 
-    temperature: clamp(nrand(5778, 2000), 0, 10000)
+    temperature: clamp(normalRandom(5778, 2000, randStar), 0, 10000)
 });
-console.table(sun.physicalProperties);
-
 sun.translate(new Vector3(-9, 0, -17).scale(100000000));
 
 starfield.setStar(sun);
+
+const planetSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER);
+console.log("Planet seed : ", planetSeed);
+console.log("UNPACKED", unpackSeedToVector3(planetSeed));
+const planetRand = alea(planetSeed.toString());
 
 let planet = new SolidPlanet(
     "Hécate",
@@ -61,43 +78,41 @@ let planet = new SolidPlanet(
         mass: 10,
         rotationPeriod: (24 * 60 * 60) / 10,
 
-        minTemperature: randInt(-50, 5),
-        maxTemperature: randInt(10, 50),
-        pressure: Math.max(nrand(1, 0.5), 0),
-        waterAmount: Math.max(nrand(1, 0.6), 0)
-    },
-    [centeredRandom() * 100000e3, centeredRandom() * 100000e3, centeredRandom() * 100000e3]
+        minTemperature: randRangeInt(-50, 5, planetRand),
+        maxTemperature: randRangeInt(10, 50, planetRand),
+        pressure: Math.max(normalRandom(1, 0.5, planetRand), 0),
+        waterAmount: Math.max(normalRandom(1, 0.6, planetRand), 0)
+    }, planetSeed
 );
 planet.translate(new Vector3(0, 0, 4 * planet.getRadius()));
-console.log("seed : ", planet.getSeed().toString());
-console.table(planet.physicalProperties);
-planet.material.colorSettings.plainColor.copyFrom(new Color3(0.22, 0.37, 0.024).add(new Color3(centeredRandom(), centeredRandom(), centeredRandom()).scale(0.1)));
-planet.material.colorSettings.beachSize = 250 + 100 * centeredRandom();
-planet.terrainSettings.continentsFragmentation = clamp(nrand(0.5, 0.2), 0, 1);
 
+planet.material.colorSettings.plainColor.copyFrom(new Color3(0.22, 0.37, 0.024).add(new Color3(centeredRandom(planetRand), centeredRandom(planetRand), centeredRandom(planetRand)).scale(0.1)));
+planet.material.colorSettings.beachSize = 250 + 100 * centeredRandom(planetRand);
 planet.material.updateManual();
 
-planet.rotate(Axis.X, centeredRandom() / 2);
+planet.terrainSettings.continentsFragmentation = clamp(normalRandom(0.5, 0.2, planetRand), 0, 1);
+
+planet.rotate(Axis.X, centeredRandom(planetRand) / 2);
 
 planet.createOcean(sun, scene);
 
-if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0 && Math.random() < 0.8) {
+if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0 && randBool(0.8, planetRand)) {
     let flatClouds = planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
     flatClouds.settings.cloudPower = 10 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure);
 }
 
 if (planet.physicalProperties.pressure > 0) {
     let atmosphere = planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
-    atmosphere.settings.redWaveLength *= 1 + centeredRandom() / 3;
-    atmosphere.settings.greenWaveLength *= 1 + centeredRandom() / 3;
-    atmosphere.settings.blueWaveLength *= 1 + centeredRandom() / 3;
+    atmosphere.settings.redWaveLength *= 1 + centeredRandom(planetRand) / 3;
+    atmosphere.settings.greenWaveLength *= 1 + centeredRandom(planetRand) / 3;
+    atmosphere.settings.blueWaveLength *= 1 + centeredRandom(planetRand) / 3;
 }
 
 if (Math.random() < 0.9) {
     let rings = planet.createRings(sun, scene);
-    rings.settings.ringStart = 1.8 + 0.4 * centeredRandom();
-    rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom();
-    rings.settings.ringOpacity = Math.random();
+    rings.settings.ringStart = 1.8 + 0.4 * centeredRandom(planetRand);
+    rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom(planetRand);
+    rings.settings.ringOpacity = planetRand();
 }
 
 let fxaa = new FxaaPostProcess("fxaa", 1, player.camera);

@@ -8,7 +8,7 @@ export interface WorkerData {
     planetDiameter: number;
     terrainSettings: TerrainSettings;
     position: number[];
-    seed: number[];
+    seed: number;
 }
 
 export interface BuildData extends WorkerData {

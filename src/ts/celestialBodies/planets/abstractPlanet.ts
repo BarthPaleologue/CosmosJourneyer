@@ -10,14 +10,15 @@ import { RingsPostProcess } from "../../postProcesses/planetPostProcesses/ringsP
 import { StarSystemManager } from "../starSystemManager";
 import { PlanetPhysicalProperties } from "../physicalPropertiesInterfaces";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
+import { unpackSeedToVector3 } from "../../utils/random";
 
 export abstract class AbstractPlanet extends AbstractBody implements Seedable {
     readonly _radius: number;
-    protected _seed: number[];
+    protected readonly _seed: number;
     abstract override physicalProperties: PlanetPhysicalProperties;
     public override postProcesses: PlanetPostProcesses;
 
-    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed = [0, 0, 0]) {
+    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed = 0) {
         super(name, starSystemManager);
         this._radius = radius;
         this._seed = seed;
@@ -29,11 +30,12 @@ export abstract class AbstractPlanet extends AbstractBody implements Seedable {
         };
     }
 
-    /**
-     * Returns the seed of the planet
-     */
-    public getSeed(): number[] {
+    public getSeed(): number {
         return this._seed;
+    }
+
+    public getSeed3(): Vector3 {
+        return Vector3.FromArray(unpackSeedToVector3(this.getSeed()));
     }
 
     public override getRadius(): number {
