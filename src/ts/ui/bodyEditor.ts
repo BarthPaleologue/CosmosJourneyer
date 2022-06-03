@@ -7,7 +7,7 @@ import { Settings } from "../settings";
 import { Axis, Color3, Vector3 } from "@babylonjs/core";
 import { PlayerController } from "../player/playerController";
 import { AbstractBody } from "../celestialBodies/abstractBody";
-import * as sliderStyle from "handle-sliderjs/dist/css/style2.css";
+import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../materials/colorSettingsInterface";
 import { clearAllEventListenersById } from "../utils/html";
 
@@ -45,8 +45,6 @@ export class BodyEditor {
     ];
 
     constructor(visibility: EditorVisibility = EditorVisibility.FULL) {
-        sliderStyle.default;
-
         document.body.innerHTML += editorHTML;
         this.navBar = document.getElementById("navBar")!;
 

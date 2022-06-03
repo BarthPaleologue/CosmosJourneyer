@@ -2,7 +2,7 @@ import { Axis, Color3, FxaaPostProcess, Tools, Vector3 } from "@babylonjs/core";
 
 import { SolidPlanet } from "./celestialBodies/planets/solidPlanet";
 
-import * as style from "../styles/style.scss";
+import "../styles/style.scss";
 import { PlayerController } from "./player/playerController";
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
@@ -19,8 +19,6 @@ import { clamp } from "./utils/math";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
 import { Assets } from "./assets";
-
-style.default;
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");

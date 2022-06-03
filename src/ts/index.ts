@@ -14,15 +14,13 @@ import { StarSystemManager } from "./celestialBodies/starSystemManager";
 
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 
-import * as style from "../styles/style.scss";
+import "../styles/style.scss";
 
 import { Settings } from "./settings";
 import { BodyType } from "./celestialBodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
 import { Assets } from "./assets";
-
-style.default;
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");

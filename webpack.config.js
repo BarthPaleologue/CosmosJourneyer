@@ -38,7 +38,8 @@ const config = {
       filename: "random.html",
       template: path.join(htmlPath, "index.html"),
       chunks: ["random"]
-    })
+    }),
+    new MiniCssExtractPlugin()
   ],
 
 
@@ -88,14 +89,9 @@ const config = {
   },
 };
 
-
-
 module.exports = () => {
-
   if (isProduction) {
     config.mode = "production";
-
-    config.plugins.push(new MiniCssExtractPlugin());
   } else {
     config.mode = "development";
     config.devtool = "source-map";
