@@ -16,8 +16,6 @@
  * General Public License for more details.
  */
 
-import { LVector3 } from "./algebra";
-
 /*
  * This is an implementation of Perlin "simplex noise" over one
  * dimension (x), two dimensions (x,y), three dimensions (x,y,z)
@@ -31,6 +29,9 @@ import { LVector3 } from "./algebra";
  *
  * 2012-01-12: Slight update to compile with MSVC (declarations moved).
  */
+
+import { LVector3 } from "./algebra";
+import { IVector3Like } from "@babylonjs/core/Maths/math.like";
 
 function FASTFLOOR(x: number): number {
     return x > 0 ? Math.trunc(x) : Math.trunc(x) - 1;
@@ -624,7 +625,7 @@ const G4 = 0.138196601; // G4 = (5.0-Math.sqrt(5.0))/20.0
  * If the last four arguments are not null, the analytic derivative
  * (the 4D gradient of the scalar noise field) is also calculated.
  */
-export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: LVector3): number {
+export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: IVector3Like): number {
     let n0, n1, n2, n3, n4; // Noise contributions from the five corners
     let noise; // Return value
     let gx0, gy0, gz0, gw0, gx1, gy1, gz1, gw1; /* Gradients at simplex corners */
@@ -776,7 +777,7 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
 
     /* Compute derivative, if requested by supplying non-null pointers
      * for the last four arguments */
-    if (gradient) {
+    if (gradient != null) {
         /*  A straight, unoptimised calculation would be like:
          *     *dnoise_dx = -8.0f * t20 * t0 * x0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gx0;
          *    *dnoise_dy = -8.0f * t20 * t0 * y0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gy0;
@@ -845,15 +846,26 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
     return noise;
 }
 
-export function simplex401(vector: LVector3, gradient?: LVector3, seed = 0): number {
+/**
+ * Returns a random value in [0,1] based on simplex noise and computes the gradient if specified
+ * @param vector the position to sample the noise at
+ * @param gradient the recipient for the gradient (will be overridden)
+ * @param seed an offset along the 4th dimension
+ */
+export function simplex401(vector: IVector3Like, gradient?: LVector3, seed = 0): number {
     let noiseValue = sdnoise4(vector.x, vector.y, vector.z, seed, gradient);
 
-    // on divise le vecteur gradient par 2 pour cause que [0,1] deux fois plus petit que [-1,1]
+    // [0,1] is half the length of [-1,1]
     if (gradient) gradient.divideInPlace(2);
-
     return (noiseValue + 1) / 2;
 }
 
-export function simplex411(vector: LVector3, gradient?: LVector3, seed = 0): number {
+/**
+ * Returns a random value in [-1,1] based on simplex noise and computes the gradient if specified
+ * @param vector the position to sample the noise at
+ * @param gradient the recipient for the gradient (will be overridden)
+ * @param seed an offset along the 4th dimension
+ */
+export function simplex411(vector: IVector3Like, gradient?: IVector3Like, seed = 0): number {
     return sdnoise4(vector.x, vector.y, vector.z, seed, gradient);
 }

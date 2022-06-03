@@ -11,7 +11,7 @@ const config = {
 
   entry: {
     showcase: "./src/ts/index.ts",
-    random: "./src/ts/random.ts"
+    random: "./src/ts/randomizer.ts"
   },
   output: {
     path: path.resolve(__dirname, "dist"),

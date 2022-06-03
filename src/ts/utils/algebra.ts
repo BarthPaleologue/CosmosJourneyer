@@ -1,9 +1,10 @@
 import { Vector3, Quaternion, Vector4 } from "@babylonjs/core";
+import { IVector3Like } from "@babylonjs/core/Maths/math.like";
 
 /**
  * Lightweight vector3 for fast algebra computation
  */
-export class LVector3 {
+export class LVector3 implements IVector3Like {
     private _x: number;
     private _y: number;
     private _z: number;
