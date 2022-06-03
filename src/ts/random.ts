@@ -39,7 +39,7 @@ let starfield = new StarfieldPostProcess("starfield", scene);
 
 let starSystemManager = new StarSystemManager(64);
 
-let starRadius = clamp(nrand(0.5, 0.2), 0.2, 1.5) * Settings.PLANET_RADIUS * 100;
+let starRadius = clamp(nrand(0.5, 0.2), 0.2, 1.5) * Settings.PLANET_RADIUS * 200;
 let sun = new Star("Weierstrass", starRadius, starSystemManager, scene, {
     mass: 1000,
     rotationPeriod: 60 * 60 * 24,

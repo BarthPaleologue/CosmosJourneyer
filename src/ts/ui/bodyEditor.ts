@@ -84,11 +84,13 @@ export class BodyEditor {
                 document.getElementById("navBar")!.style.display = "none";
                 document.getElementById("editorPanelContainer")!.hidden = true;
                 document.getElementById("toolbar")!.hidden = true;
+                this.currentPanel = null;
                 break;
             case EditorVisibility.NAVBAR:
                 document.getElementById("navBar")!.style.display = "flex";
                 document.getElementById("editorPanelContainer")!.hidden = true;
                 document.getElementById("toolbar")!.hidden = true;
+                this.currentPanel = null;
                 break;
             case EditorVisibility.FULL:
                 document.getElementById("navBar")!.style.display = "flex";
@@ -142,33 +144,70 @@ export class BodyEditor {
         switch (body.getBodyType()) {
             case BodyType.STAR:
                 document.getElementById("generalLink")!.hidden = false;
+
                 document.getElementById("starPhysicLink")!.hidden = false;
+
                 document.getElementById("physicLink")!.hidden = true;
+                document.getElementById("physicUI")!.hidden = true;
+
                 document.getElementById("oceanLink")!.hidden = true;
+                document.getElementById("oceanUI")!.hidden = true;
+
                 document.getElementById("surfaceLink")!.hidden = true;
+                document.getElementById("surfaceUI")!.hidden = true;
+
                 document.getElementById("cloudsLink")!.hidden = true;
+                document.getElementById("cloudsUI")!.hidden = true;
+
                 document.getElementById("atmosphereLink")!.hidden = true;
+                document.getElementById("atmosphereUI")!.hidden = true;
+
                 document.getElementById("ringsLink")!.hidden = true;
+                document.getElementById("ringsUI")!.hidden = true;
                 break;
             case BodyType.SOLID:
                 document.getElementById("generalLink")!.hidden = false;
+
                 document.getElementById("starPhysicLink")!.hidden = true;
+                document.getElementById("starPhysicUI")!.hidden = true;
+
                 document.getElementById("physicLink")!.hidden = false;
+
                 document.getElementById("oceanLink")!.hidden = (body as SolidPlanet).postProcesses.ocean == null;
+                document.getElementById("oceanUI")!.hidden = this.currentPanel?.id != "oceanUI" || (body as SolidPlanet).postProcesses.ocean == null;
+
                 document.getElementById("surfaceLink")!.hidden = false;
+
                 document.getElementById("cloudsLink")!.hidden = (body as SolidPlanet).postProcesses.clouds == null;
+                document.getElementById("cloudsUI")!.hidden = this.currentPanel?.id != "cloudsUI" || (body as SolidPlanet).postProcesses.clouds == null;
+
                 document.getElementById("atmosphereLink")!.hidden = (body as SolidPlanet).postProcesses.atmosphere == null;
+                document.getElementById("atmosphereUI")!.hidden = this.currentPanel?.id != "atmosphereUI" || (body as SolidPlanet).postProcesses.atmosphere == null;
+
                 document.getElementById("ringsLink")!.hidden = (body as SolidPlanet).postProcesses.rings == null;
+                document.getElementById("ringsUI")!.hidden = this.currentPanel?.id != "ringsUI" || (body as SolidPlanet).postProcesses.rings == null;
                 break;
             default:
                 document.getElementById("generalLink")!.hidden = false;
+
                 document.getElementById("starPhysicLink")!.hidden = true;
+                document.getElementById("starPhysicUI")!.hidden = true;
+
                 document.getElementById("physicLink")!.hidden = true;
+
                 document.getElementById("oceanLink")!.hidden = true;
+                document.getElementById("oceanUI")!.hidden = true;
+
                 document.getElementById("surfaceLink")!.hidden = true;
+
                 document.getElementById("cloudsLink")!.hidden = true;
+                document.getElementById("cloudsUI")!.hidden = true;
+
                 document.getElementById("atmosphereLink")!.hidden = true;
+                document.getElementById("atmosphereUI")!.hidden = true;
+
                 document.getElementById("ringsLink")!.hidden = true;
+                document.getElementById("ringsUI")!.hidden = true;
         }
         if (this.currentPanel != null) {
             //TODO: this is messed up
