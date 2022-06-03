@@ -39,7 +39,8 @@ export class CollisionWorker {
         this._busy = true;
     }
     public checkCollision(planet: RigidBody & Transformable): void {
-        let playerSamplePosition = planet.getOriginBodySpaceSamplePosition();
+        let playerSamplePosition = planet.getAbsolutePosition().negate();
+        playerSamplePosition.applyRotationQuaternionInPlace(planet.getInverseRotationQuaternion());
 
         let collisionData = planet.generateCollisionTask(playerSamplePosition);
         this.postMessage(collisionData);

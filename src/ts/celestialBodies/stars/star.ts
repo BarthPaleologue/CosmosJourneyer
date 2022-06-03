@@ -59,10 +59,4 @@ export class Star extends AbstractBody {
     public getRadius(): number {
         return this.radius;
     }
-
-    public getRotationQuaternion(): Quaternion {
-        if (this.transform.rotationQuaternion == undefined) throw new Error(`${this.getName()}'s rotation quaternion is null !`);
-        if (this.transform.rotationQuaternion._isDirty) this.transform.computeWorldMatrix(true);
-        return this.transform.rotationQuaternion;
-    }
 }

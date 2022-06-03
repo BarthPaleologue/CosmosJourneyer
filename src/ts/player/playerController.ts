@@ -219,15 +219,6 @@ export class PlayerController implements Transformable {
         return this.getRotationQuaternion().conjugate();
     }
 
-    getOriginBodySpaceSamplePosition(): Vector3 {
-        let position = this.getAbsolutePosition().negate(); // position du joueur / au centre de la planète
-
-        // on applique le quaternion inverse pour obtenir le sample point correspondant à la planète rotatée (fais un dessin si c'est pas clair)
-        position.applyRotationQuaternionInPlace(this.getInverseRotationQuaternion());
-
-        return position;
-    }
-
     translate(displacement: Vector3): void {
         this.transform.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
     }

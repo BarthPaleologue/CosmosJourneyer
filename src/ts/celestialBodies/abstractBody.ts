@@ -52,6 +52,10 @@ export abstract class AbstractBody implements Transformable {
         return this.transform.getAbsolutePosition();
     }
 
+    public translate(displacement: Vector3): void {
+        this.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
+    }
+
     public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
         this.transform.rotateAround(pivot, axis, amount);
     }
@@ -132,19 +136,5 @@ export abstract class AbstractBody implements Transformable {
             if (player.isOrbiting(this)) player.rotateAround(this.getAbsolutePosition(), this.transform.up, -dtheta);
             this.rotate(this.transform.up, -dtheta);
         }
-    }
-
-    public getOriginBodySpaceSamplePosition(): Vector3 {
-        // FIXME: fix everything here
-        let position = this.getAbsolutePosition().negate(); // position du joueur / au centre de la planète
-
-        // negates planet rotation using inverse quaternion to go back to original sample point
-        position.applyRotationQuaternionInPlace(this.getInverseRotationQuaternion());
-
-        return position;
-    }
-
-    public translate(displacement: Vector3): void {
-        this.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
     }
 }

@@ -1,4 +1,4 @@
-import { Vector3, Quaternion } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core";
 
 import { AbstractPlanet } from "./abstractPlanet";
 import { BodyType } from "../interfaces";
@@ -23,32 +23,7 @@ export class GazPlanet extends AbstractPlanet {
         };
     }
 
-    setAbsolutePosition(newPosition: Vector3): void {
-        //TODO: set absolute position of gaz giant
-        throw new Error("Method not implemented.");
-    }
-
-    getAbsolutePosition(): Vector3 {
-        //TODO: return the true value
-        throw new Error("Method not implemented.");
-    }
-
-    public getRotationQuaternion(): Quaternion {
-        throw new Error("Method not implemented.");
-    }
-
-    update(player: PlayerController, lightPosition: Vector3): void {
-        // TODO: update planet
-        throw new Error("Method not implemented.");
-    }
-
-    rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
-        //TODO: implement
-        throw new Error("Method not implemented.");
-    }
-
-    rotate(axis: Vector3, amount: number): void {
-        //TODO: implement
-        throw new Error("Method not implemented.");
+    public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
+        super.update(player, lightPosition, deltaTime);
     }
 }

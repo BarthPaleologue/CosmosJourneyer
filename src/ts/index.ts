@@ -90,7 +90,7 @@ moon.translate(planet.getAbsolutePosition());
 
 let Ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene, {
     mass: 7,
-    rotationPeriod: (24 * 60 * 60) / 100,
+    rotationPeriod: (24 * 60 * 60) / 30,
 
     minTemperature: -80,
     maxTemperature: 20,

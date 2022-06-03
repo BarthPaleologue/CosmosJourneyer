@@ -329,7 +329,8 @@ export class BodyEditor {
         if (planet.postProcesses.atmosphere != null) {
             let atmosphere = planet.postProcesses.atmosphere;
 
-            document.getElementById("atmosphereToggler")?.addEventListener("click", () => {
+            let atmosphereToggler = clearAllEventListenersById("atmosphereToggler");
+            atmosphereToggler.addEventListener("click", () => {
                 let checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
                 checkbox.checked = !checkbox.checked;
                 atmosphere.settings.atmosphereRadius = checkbox.checked ? Settings.PLANET_RADIUS + Settings.ATMOSPHERE_HEIGHT : 0;
@@ -411,13 +412,14 @@ export class BodyEditor {
         if (planet.postProcesses.clouds != null) {
             let flatClouds = planet.postProcesses.clouds!;
 
-            document.getElementById("cloudsToggler")?.addEventListener("click", () => {
+            let cloudsToggler = clearAllEventListenersById("cloudsToggler");
+            cloudsToggler.addEventListener("click", () => {
                 let checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
                 checkbox.checked = !checkbox.checked;
                 flatClouds.settings.cloudLayerRadius = checkbox.checked ? Settings.PLANET_RADIUS + Settings.CLOUD_LAYER_HEIGHT : 0;
             });
 
-            let cloudColorPicker = document.getElementById("cloudColor") as HTMLInputElement;
+            let cloudColorPicker = clearAllEventListenersById("cloudColor") as HTMLInputElement;
             cloudColorPicker.value = flatClouds.settings.cloudColor.toHexString();
             cloudColorPicker.addEventListener("input", () => {
                 flatClouds.settings.cloudColor = Color3.FromHexString(cloudColorPicker.value);
@@ -467,7 +469,9 @@ export class BodyEditor {
 
         if (planet.postProcesses.rings != null) {
             let rings = planet.postProcesses.rings!;
-            document.getElementById("ringsToggler")?.addEventListener("click", () => {
+
+            let ringsToggler = clearAllEventListenersById("ringsToggler");
+            ringsToggler.addEventListener("click", () => {
                 let checkbox = document.querySelectorAll("input[type='checkbox']")[3] as HTMLInputElement;
                 checkbox.checked = !checkbox.checked;
                 rings.settings.ringFrequency = checkbox.checked ? 30 : 0;
@@ -506,7 +510,8 @@ export class BodyEditor {
         if (planet.postProcesses.ocean != null) {
             let ocean = planet.postProcesses.ocean;
 
-            document.getElementById("oceanToggler")?.addEventListener("click", () => {
+            let oceanToggler = clearAllEventListenersById("oceanToggler");
+            oceanToggler.addEventListener("click", () => {
                 let checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
                 checkbox.checked = !checkbox.checked;
                 ocean.settings.oceanRadius = checkbox.checked ? planet.getApparentRadius() : 0;

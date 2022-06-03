@@ -37,10 +37,10 @@ function initLayers() {
 
 initLayers();
 
-function terrainFunction(position: LVector3, gradient: LVector3, seed = LVector3.Zero()): void {
+function terrainFunction(position: LVector3, gradient: LVector3, seed: LVector3): void {
     const unitCoords = position.normalize();
 
-    let samplePoint = position.add(seed);
+    const samplePoint = position.add(seed);
 
     let elevation = 0;
 
@@ -175,7 +175,7 @@ function buildChunkVertexData(data: BuildData): void {
 }
 
 function sendHeightAtPoint(point: LVector3, seed: LVector3): void {
-    terrainFunction(point, seed);
+    terrainFunction(point, LVector3.Zero(), seed);
 
     self.postMessage({
         h: point.getMagnitude()
@@ -199,7 +199,7 @@ self.onmessage = (e) => {
             // benchmark fait le 19/02/2022 (normale analytique v2.6) : ~ 40ms/chunk
             break;
         case TaskType.Collision:
-            let data = e.data as CollisionData;
+            const data = e.data as CollisionData;
 
             if (data.planetName != currentPlanetID) {
                 currentPlanetID = data.planetName;
@@ -210,9 +210,8 @@ self.onmessage = (e) => {
 
             const seed = new LVector3(data.seed[0], data.seed[1], data.seed[2]);
 
-            let samplePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
-            samplePosition.normalizeInPlace();
-            samplePosition.scaleInPlace(data.planetDiameter / 2);
+            const samplePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
+            samplePosition.setMagnitudeInPlace(data.planetDiameter / 2);
 
             sendHeightAtPoint(samplePosition, seed);
             break;
