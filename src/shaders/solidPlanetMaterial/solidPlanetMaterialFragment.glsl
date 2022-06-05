@@ -340,7 +340,7 @@ void main() {
 	float ndl = max(0.002, dot(sphereNormalW, lightRayW));
 
 	// la unitPosition ne prend pas en compte la rotation de la planète
-	vec3 seededSamplePoint = normalize(vUnitSamplePoint + seed);//normalize(unitPosition + normalize(seed));
+	vec3 seededSamplePoint = vUnitSamplePoint + normalize(seed);//normalize(unitPosition + normalize(seed));
 
 	// TODO: this is no longer accurate (not using inverse matrix)
 	float latitude = vUnitSamplePoint.y;
