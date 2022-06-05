@@ -7,6 +7,7 @@ import { PostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/co
 
 export interface BodyPostProcesses {
     [details: string]: PostProcess | null;
+    rings: RingsPostProcess | null;
 }
 
 export interface PlanetPostProcesses extends BodyPostProcesses {
@@ -15,7 +16,6 @@ export interface PlanetPostProcesses extends BodyPostProcesses {
     atmosphere: AtmosphericScatteringPostProcess | null;
     ocean: OceanPostProcess | null;
     clouds: FlatCloudsPostProcess | null;
-    rings: RingsPostProcess | null;
 }
 
 export interface StarPostProcesses extends BodyPostProcesses {

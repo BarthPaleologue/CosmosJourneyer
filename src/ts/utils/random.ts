@@ -60,5 +60,14 @@ export function unpackSeedToVector3(seed: number): [number, number, number] {
                 zString += newChar;
         }
     }
-    return [Number(xString), Number(yString), Number(zString)];
+    // removing zero padding
+    xString = Number(xString).toString();
+    yString = Number(yString).toString();
+    zString = Number(zString).toString();
+
+    let x = Number(xString + yString);
+    let y = Number(yString + zString);
+    let z = Number(zString + xString);
+
+    return [x, y, z];
 }

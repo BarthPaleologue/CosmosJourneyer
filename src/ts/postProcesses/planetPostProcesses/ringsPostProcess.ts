@@ -2,9 +2,9 @@ import { Effect, Scene } from "@babylonjs/core";
 import { RingsSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
 import { Star } from "../../celestialBodies/stars/star";
-import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
 
 import ringsFragment from "../../../shaders/ringsFragment.glsl";
+import { AbstractBody } from "../../celestialBodies/abstractBody";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -12,7 +12,7 @@ Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
 export class RingsPostProcess extends PlanetPostProcess {
     settings: RingsSettings;
 
-    constructor(name: string, planet: AbstractPlanet, sun: Star, scene: Scene) {
+    constructor(name: string, body: AbstractBody, sun: Star, scene: Scene) {
         let settings: RingsSettings = {
             ringStart: 1.5,
             ringEnd: 2.5,
@@ -49,14 +49,14 @@ export class RingsPostProcess extends PlanetPostProcess {
             planetWorldMatrix: {
                 type: ShaderDataType.Matrix,
                 get: () => {
-                    return planet.getWorldMatrix();
+                    return body.getWorldMatrix();
                 }
             }
         };
 
         let samplers: ShaderSamplerData = {};
 
-        super(name, shaderName, uniforms, samplers, planet, sun, scene);
+        super(name, shaderName, uniforms, samplers, body, sun, scene);
 
         this.settings = settings;
     }

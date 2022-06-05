@@ -15,7 +15,7 @@ import { SolidPhysicalProperties } from "../physicalPropertiesInterfaces";
 import { SolidPlanetMaterial } from "../../materials/solidPlanetMaterial";
 
 export class SolidPlanet extends AbstractPlanet implements RigidBody {
-    readonly oceanLevel: number;
+    oceanLevel: number;
 
     override readonly physicalProperties: SolidPhysicalProperties;
 
@@ -32,19 +32,18 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         radius: number,
         starSystemManager: StarSystemManager,
         scene: Scene,
-        physicalProperties: SolidPhysicalProperties = {
+        seed = 0
+    ) {
+        super(id, radius, starSystemManager, seed);
+
+        this.physicalProperties = {
             mass: 10,
             rotationPeriod: 60 * 60 * 24,
             minTemperature: -60,
             maxTemperature: 40,
             pressure: 1,
             waterAmount: 1
-        },
-        seed = 0
-    ) {
-        super(id, radius, starSystemManager, seed);
-
-        this.physicalProperties = physicalProperties;
+        };
 
         // TODO: faire quelque chose de réaliste
         this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;

@@ -61,12 +61,6 @@ export abstract class AbstractPlanet extends AbstractBody implements Seedable {
         return ocean;
     }
 
-    public createRings(star: Star, scene: Scene): RingsPostProcess {
-        let rings = new RingsPostProcess(`${this.getName()}Rings`, this, star, scene);
-        this.postProcesses.rings = rings;
-        return rings;
-    }
-
     public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number) {
         super.update(player, lightPosition, deltaTime);
         for (const postprocessKey in this.postProcesses) {

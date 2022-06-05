@@ -41,8 +41,7 @@ initLayers();
 function terrainFunction(position: LVector3, gradient: LVector3, seed: LVector3): void {
     const unitCoords = position.normalize();
 
-    //FIXME: do not hardcode 1000 (amplifies seed)
-    const samplePoint = position.add(seed.scale(1000));
+    const samplePoint = position.add(seed);
 
     let elevation = 0;
 

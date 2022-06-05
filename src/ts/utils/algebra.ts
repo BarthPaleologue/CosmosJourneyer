@@ -85,21 +85,21 @@ export class LVector3 implements IVector3Like {
      * @param otherVector The other Vector3 you want to add
      * @returns returns the sum of the current Vector3 and the other Vector3 as a new Vector3
      */
-    add(otherVector: LVector3): LVector3 {
+    add(otherVector: IVector3Like): LVector3 {
         return new LVector3(this._x + otherVector.x, this._y + otherVector.y, this._z + otherVector.z);
     }
 
-    addInPlace(otherVector: LVector3): void {
+    addInPlace(otherVector: IVector3Like): void {
         this._x += otherVector.x;
         this._y += otherVector.y;
         this._z += otherVector.z;
     }
 
-    subtract(otherVector: LVector3): LVector3 {
+    subtract(otherVector: IVector3Like): LVector3 {
         return new LVector3(this._x - otherVector.x, this._y - otherVector.y, this._z - otherVector.z);
     }
 
-    subtractInPlace(otherVector: LVector3): void {
+    subtractInPlace(otherVector: IVector3Like): void {
         this._x -= otherVector.x;
         this._y -= otherVector.y;
         this._z -= otherVector.z;
@@ -126,7 +126,7 @@ export class LVector3 implements IVector3Like {
         return new LVector3(0, 0, 0);
     }
 
-    public static Dot(vector1: Vec3, vector2: Vec3): number {
+    public static Dot(vector1: IVector3Like, vector2: IVector3Like): number {
         return vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
     }
 

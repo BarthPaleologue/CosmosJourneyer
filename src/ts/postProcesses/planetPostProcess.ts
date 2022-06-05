@@ -3,9 +3,10 @@ import { Axis, Scene } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplerData, ShaderUniformData } from "./interfaces";
 import { Star } from "../celestialBodies/stars/star";
 import { AbstractPlanet } from "../celestialBodies/planets/abstractPlanet";
+import { AbstractBody } from "../celestialBodies/abstractBody";
 
 export abstract class PlanetPostProcess extends SpacePostProcess {
-    protected constructor(name: string, fragmentName: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, planet: AbstractPlanet, sun: Star, scene: Scene) {
+    protected constructor(name: string, fragmentName: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, body: AbstractBody, sun: Star, scene: Scene) {
         let commonUniforms = {
             sunPosition: {
                 type: ShaderDataType.Vector3,
@@ -16,7 +17,7 @@ export abstract class PlanetPostProcess extends SpacePostProcess {
             planetPosition: {
                 type: ShaderDataType.Vector3,
                 get: () => {
-                    return planet.getAbsolutePosition();
+                    return body.getAbsolutePosition();
                 }
             },
             cameraDirection: {
@@ -28,7 +29,7 @@ export abstract class PlanetPostProcess extends SpacePostProcess {
             planetRadius: {
                 type: ShaderDataType.Float,
                 get: () => {
-                    return planet.getApparentRadius();
+                    return body.getApparentRadius();
                 }
             }
         };

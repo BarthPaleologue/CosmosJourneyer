@@ -42,7 +42,7 @@ let starSystem = new StarSystemManager(Settings.VERTEX_RESOLUTION);
 
 let starfield = new StarfieldPostProcess("starfield", scene);
 
-let sun = new Star("Weierstrass", 400 * Settings.PLANET_RADIUS, starSystem, scene);
+let sun = new Star("Weierstrass", 200 * Settings.PLANET_RADIUS, starSystem, scene);
 sun.translate(new Vector3(-1, 0, -1).normalizeToNew().scale(Settings.PLANET_RADIUS * 10000));
 
 starfield.setStar(sun);
@@ -59,15 +59,13 @@ planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
 planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
 planet.createRings(sun, scene);
 
-let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, scene, {
-    mass: 2,
-    rotationPeriod: 7 * 60 * 60,
-
-    minTemperature: -180,
-    maxTemperature: 200,
-    pressure: 0,
-    waterAmount: 0.5
-});
+let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, scene);
+moon.physicalProperties.mass = 2;
+moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
+moon.physicalProperties.minTemperature = -180;
+moon.physicalProperties.maxTemperature = 200;
+moon.physicalProperties.pressure = 0;
+moon.physicalProperties.waterAmount = 0.5;
 
 moon.orbitalProperties = {
     period: moon.physicalProperties.rotationPeriod,
@@ -80,33 +78,38 @@ moon.terrainSettings.maxMountainHeight = 5e3;
 moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
 moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
 
-moon.material.setTexture("plainNormalMap", Assets.RockNormalMap!);
-moon.material.setTexture("bottomNormalMap", Assets.RockNormalMap!);
+moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap!);
+moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
+moon.material.updateManual();
 
 moon.translate(new Vector3(moon.orbitalProperties.periapsis, 0, 0));
 moon.translate(planet.getAbsolutePosition());
 
-let Ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene, {
-    mass: 7,
-    rotationPeriod: (24 * 60 * 60) / 30,
+let ares = new SolidPlanet("ares", Settings.PLANET_RADIUS, starSystem, scene);
+ares.physicalProperties.mass = 7;
+ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
+ares.physicalProperties.minTemperature = -80;
+ares.physicalProperties.maxTemperature = 20;
+ares.physicalProperties.pressure = 0.5;
+ares.physicalProperties.waterAmount = 0.3;
 
-    minTemperature: -80,
-    maxTemperature: 20,
-    pressure: 0.5,
-    waterAmount: 0.3
-});
-Ares.translate(new Vector3(-1.5, 0, 2).scale(Settings.PLANET_RADIUS * 30));
+ares.translate(new Vector3(-1.5, 0, 2).scale(Settings.PLANET_RADIUS * 30));
 
-Ares.terrainSettings.continentsFragmentation = 0.5;
-Ares.terrainSettings.continentBaseHeight = 5e3;
-Ares.terrainSettings.maxMountainHeight = 20e3;
-Ares.terrainSettings.mountainsMinValue = 0.4;
+ares.terrainSettings.continentsFragmentation = 0.5;
+ares.terrainSettings.continentBaseHeight = 5e3;
+ares.terrainSettings.maxMountainHeight = 20e3;
+ares.terrainSettings.mountainsMinValue = 0.4;
 
-Ares.material.colorSettings.plainColor.copyFromFloats(0.4, 0.3, 0.3);
-Ares.material.colorSettings.beachColor.copyFromFloats(0.3, 0.15, 0.1);
-Ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);
+ares.material.colorSettings.plainColor.copyFromFloats(0.4, 0.3, 0.3);
+ares.material.colorSettings.beachColor.copyFromFloats(0.3, 0.15, 0.1);
+ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);
 
-let aresAtmosphere = Ares.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene); // = new AtmosphericScatteringPostProcess("atmosphere", Ares, radius + 70e3, sun, scene);
+ares.oceanLevel = Settings.OCEAN_DEPTH * ares.physicalProperties.waterAmount * ares.physicalProperties.pressure;
+
+
+ares.material.updateManual();
+
+let aresAtmosphere = ares.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene); // = new AtmosphericScatteringPostProcess("atmosphere", ares, radius + 70e3, sun, scene);
 aresAtmosphere.settings.redWaveLength = 500;
 aresAtmosphere.settings.greenWaveLength = 680;
 aresAtmosphere.settings.blueWaveLength = 670;

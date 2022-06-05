@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, Space, Matrix, TransformNode } from "@babylonjs/core";
+import { Vector3, Quaternion, Space, Matrix, TransformNode, Scene } from "@babylonjs/core";
 import { BodyType, Transformable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
@@ -6,6 +6,8 @@ import { BodyPhysicalProperties } from "./physicalPropertiesInterfaces";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { OrbitalProperties } from "./orbitalPropertiesInterface";
 import { computeBarycenter, computePointOnOrbit } from "../utils/kepler";
+import { Star } from "./stars/star";
+import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 
 export abstract class AbstractBody implements Transformable {
     protected abstract bodyType: BodyType;
@@ -105,6 +107,12 @@ export abstract class AbstractBody implements Transformable {
      */
     public getDiameter(): number {
         return 2 * this.getRadius();
+    }
+
+    public createRings(star: Star, scene: Scene): RingsPostProcess {
+        let rings = new RingsPostProcess(`${this.getName()}Rings`, this, star, scene);
+        this.postProcesses.rings = rings;
+        return rings;
     }
 
     /**

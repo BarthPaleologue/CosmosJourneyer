@@ -36,16 +36,17 @@ export class Star extends AbstractBody {
         this.physicalProperties = physicalProperties;
         this.radius = radius;
 
-        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius, segments: 32 }, scene);
+        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius * 2, segments: 32 }, scene);
         this.mesh.parent = this.transform;
 
         this.material = new StarMaterial(this, scene);
         this.mesh.material = this.material;
 
         this.postProcesses = {
-            volumetricLight: new VolumetricLightScatteringPostProcess(`${name}VolumetricLight`, 1, scene.activeCamera!, this.mesh, 100)
+            volumetricLight: new VolumetricLightScatteringPostProcess(`${name}VolumetricLight`, 1, scene.activeCamera!, this.mesh, 100),
+            rings: null
         };
-        this.postProcesses.volumetricLight!.exposure = 1.0;
+        this.postProcesses.volumetricLight!.exposure = 0.26;
         this.postProcesses.volumetricLight!.decay = 0.95;
     }
 

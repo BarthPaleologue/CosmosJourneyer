@@ -1,13 +1,12 @@
 import { Effect, Scene, Texture } from "@babylonjs/core";
 
-import waterNormal1 from "../../../asset/textures/waterNormalMap3.jpg";
-import waterNormal2 from "../../../asset/textures/waterNormalMap4.jpg";
 import { OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
 import { Star } from "../../celestialBodies/stars/star";
 import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
 
 import oceanFragment from "../../../shaders/oceanFragment.glsl";
+import { Assets } from "../../assets";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -85,13 +84,13 @@ export class OceanPostProcess extends PlanetPostProcess {
             normalMap1: {
                 type: ShaderDataType.Texture,
                 get: () => {
-                    return new Texture(waterNormal1, scene);
+                    return Assets.WaterNormalMap1!;
                 }
             },
             normalMap2: {
                 type: ShaderDataType.Texture,
                 get: () => {
-                    return new Texture(waterNormal2, scene);
+                    return Assets.WaterNormalMap2!;
                 }
             }
         };
