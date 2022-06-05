@@ -77,7 +77,7 @@ planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
 planet.physicalProperties.minTemperature = randRangeInt(-50, 5, planetRand);
 planet.physicalProperties.maxTemperature = randRangeInt(10, 50, planetRand);
 planet.physicalProperties.pressure = Math.max(normalRandom(1, 0.5, planetRand), 0);
-planet.physicalProperties.waterAmount = Math.max(normalRandom(0.8, 0.3, planetRand), 0);
+planet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planetRand), 0);
 
 planet.oceanLevel = Settings.OCEAN_DEPTH * planet.physicalProperties.waterAmount * planet.physicalProperties.pressure;
 
