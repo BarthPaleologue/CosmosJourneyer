@@ -8,7 +8,12 @@ precision highp float;
 varying vec3 vPositionW;
 varying vec3 vNormalW;
 varying vec3 vUnitSamplePoint;
+varying vec3 vSphereNormalW;
 varying vec3 vSamplePoint;
+
+varying vec3 vPosition; // position of the vertex in sphere space
+varying vec3 vNormal; // normal of the vertex in sphere space
+varying vec2 vUV;
 
 // Refs
 
@@ -62,104 +67,19 @@ uniform float maxTemperature;
 
 uniform float waterAmount;
 
-varying vec3 vPosition; // position of the vertex in sphere space
-varying vec3 vNormal; // normal of the vertex in sphere space
-varying vec2 vUV; // 
+#pragma glslify: completeNoise = require(../utils/noise.glsl)
 
-// Noise functions to spice things up a little bit
-float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
+#pragma glslify: fastAcos = require(../utils/fastAcos.glsl)
 
-float noise(vec3 p){
-    vec3 a = floor(p);
-    vec3 d = p - a;
-    d = d * d * (3.0 - 2.0 * d);
+#pragma glslify: remap = require(../utils/remap.glsl)
 
-    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);
-    vec4 k1 = perm(b.xyxy);
-    vec4 k2 = perm(k1.xyxy + b.zzww);
-
-    vec4 c = k2 + a.zzzz;
-    vec4 k3 = perm(c);
-    vec4 k4 = perm(c + 1.0);
-
-    vec4 o1 = fract(k3 * (1.0 / 41.0));
-    vec4 o2 = fract(k4 * (1.0 / 41.0));
-
-    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
-    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
-
-    return o4.y * d.y + o4.x * (1.0 - d.y);
-}
-
-float completeNoise(vec3 p, int nbOctaves, float decay, float lacunarity) {
-	float totalAmplitude = 0.0;
-	float value = 0.0;
-	for(int i = 0; i < nbOctaves; ++i) {
-		totalAmplitude += 1.0 / pow(decay, float(i));
-		vec3 samplePoint = p * pow(lacunarity, float(i)); 
-		value += noise(samplePoint) / pow(decay, float(i));
-	}
-	return value / totalAmplitude;
-}
-
-// https://stackoverflow.com/questions/3380628/fast-arc-cos-algorithm
-float fastAcos(float x) {
-      float negate = 0.0;
-      if(x < 0.0) negate = 1.0; //float(x < 0);
-      x = abs(x);
-      float ret = -0.0187293;
-      ret = ret * x;
-      ret = ret + 0.0742610;
-      ret = ret * x;
-      ret = ret - 0.2121144;
-      ret = ret * x;
-      ret = ret + 1.5707288;
-      ret = ret * sqrt(1.0-x);
-      ret = ret - 2.0 * negate * ret;
-      return negate * 3.14159265358979 + ret;
-}
-
-float remap(float value, float low1, float high1, float low2, float high2) {
-    return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
-}
-
-vec3 lerp(vec3 vector1, vec3 vector2, float x) {
-	return x * vector1 + (1.0 - x) * vector2;
-}
-
-vec2 lerp(vec2 vector1, vec2 vector2, float x) {
-	return x * vector1 + (1.0 - x) * vector2;
-}
+#pragma glslify: lerp = require(../utils/vec3Lerp.glsl)
 
 float lerp(float value1, float value2, float x) {
 	return x * value1 + (1.0 - x) * value2;
 }
 
-// https://bgolus.medium.com/normal-mapping-for-a-triplanar-shader-10bf39dca05a
-vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
-    vec2 uvX = position.zy * scale;
-    vec2 uvY = position.xz * scale;
-    vec2 uvZ = position.xy * scale;
-
-    vec3 tNormalX = texture2D(normalMap, uvX).rgb;
-    vec3 tNormalY = texture2D(normalMap, uvY).rgb;
-    vec3 tNormalZ = texture2D(normalMap, uvZ).rgb;
-
-    tNormalX = normalize(tNormalX * 2.0 - 1.0) * normalStrength;
-    tNormalY = normalize(tNormalY * 2.0 - 1.0) * normalStrength;
-    tNormalZ = normalize(tNormalZ * 2.0 - 1.0) * normalStrength;
-
-    tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, surfaceNormal.x);
-    tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, surfaceNormal.y);
-    tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, surfaceNormal.z);
-
-    vec3 blendWeight = pow(abs(surfaceNormal), vec3(sharpness));
-    blendWeight /= dot(blendWeight, vec3(1.0));
-
-    return normalize(tNormalX.zyx * blendWeight.x + tNormalY.xzy * blendWeight.y + tNormalZ.xyz * blendWeight.z);
-}
+#pragma glslify: triplanarNormal = require(../utils/triplanarNormal.glsl)
 
 bool near(float value, float reference, float range) {
 	return abs(reference - value) < range; 
@@ -213,11 +133,7 @@ vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
 	return lerp(value1, value2, alpha);
 }
 
-float saturate(float x) {
-    if(x > 1.0) return 1.0;
-    if(x < 0.0) return 0.0;
-    return x;
-}
+#pragma glslify: saturate = require(../utils/saturate.glsl)
 
 vec3 computeColorAndNormal(
 	float elevation01, float waterLevel01, float slope, 
@@ -240,7 +156,7 @@ vec3 computeColorAndNormal(
 		// séparation biome désert biome plaine
 		float moistureSharpness = 20.0;
 		float moistureFactor = tanherpFactor(moisture01, moistureSharpness);
-		vec3 plainColor = tanherp(plainColor, 0.7 * plainColor, noise(vSamplePoint / 10000.0), 3.0);
+		vec3 plainColor = tanherp(plainColor, 0.7 * plainColor, completeNoise(vSamplePoint / 10000.0, 1, 2.0, 2.0), 3.0);
 
 		vec3 flatColor = lerp(plainColor, desertColor, moistureFactor);
 
@@ -336,7 +252,7 @@ void main() {
 	vec3 viewRayW = normalize(playerPosition - vPositionW); // view direction in world space
 	vec3 lightRayW = normalize(sunPosition - vPositionW); // light ray direction in world space
 
-	vec3 sphereNormalW = vec3(world * vec4(vUnitSamplePoint, 0.0));
+	vec3 sphereNormalW = vSphereNormalW;
 	float ndl = max(0.002, dot(sphereNormalW, lightRayW));
 
 	// la unitPosition ne prend pas en compte la rotation de la planète

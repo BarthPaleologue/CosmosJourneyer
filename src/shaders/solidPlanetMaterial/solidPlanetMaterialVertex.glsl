@@ -27,6 +27,7 @@ uniform float planetRadius;
 // Varying
 varying vec3 vPositionW;
 varying vec3 vNormalW;
+varying vec3 vSphereNormalW;
 
 varying vec3 vNormal;
 varying vec3 vPosition;
@@ -36,32 +37,7 @@ varying vec3 vSamplePoint;
 
 varying vec2 vUV;
 
-vec3 rotateAround(vec3 vector, vec3 axis, float theta) {
-    // rotation using https://www.wikiwand.com/en/Rodrigues%27_rotation_formula
-    // Please note that unit vector are required, i did not divide by the norms
-    return cos(theta) * vector + cross(axis, vector) * sin(theta) + axis * dot(axis, vector) * (1.0 - cos(theta));
-}
-
-vec3 applyQuaternion(vec4 quaternion, vec3 vector) {
-    float qx = quaternion.x;
-    float qy = quaternion.y;
-    float qz = quaternion.z;
-    float qw = quaternion.w;
-    float x = vector.x;
-    float y = vector.y;
-    float z = vector.z;
-    // apply quaternion to vector
-    float ix = qw * x + qy * z - qz * y;
-    float iy = qw * y + qz * x - qx * z;
-    float iz = qw * z + qx * y - qy * x;
-    float iw = -qx * x - qy * y - qz * z;
-    // calculate result * inverse quat
-    float nX = ix * qw + iw * -qx + iy * -qz - iz * -qy;
-    float nY = iy * qw + iw * -qy + iz * -qx - ix * -qz;
-    float nZ = iz * qw + iw * -qz + ix * -qy - iy * -qx;
-
-    return vec3(nX, nY, nZ);
-}
+#pragma glslify: applyQuaternion = require(../utils/applyQuaternion.glsl)
 
 void main() {
 
@@ -80,6 +56,7 @@ void main() {
 
 
 	vUnitSamplePoint = applyQuaternion(planetInverseRotationQuaternion, normalize(vPosition));
+    vSphereNormalW = vec3(world * vec4(vUnitSamplePoint, 0.0));
 	vSamplePoint = applyQuaternion(planetInverseRotationQuaternion, vPosition);
 
 	vNormal = normal;

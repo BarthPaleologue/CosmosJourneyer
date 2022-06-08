@@ -39,42 +39,11 @@ uniform float blueWaveLength; // same with blue
 
 uniform float mieHaloRadius;
 
-// remap a value comprised between low1 and high1 to a value between low2 and high2
-float remap(float value, float low1, float high1, float low2, float high2) {
-    return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
-}
+#pragma glslify: remap = require(./utils/remap.glsl)
 
-// compute the world position of a pixel from its uv coordinates
-vec3 worldFromUV(vec2 pos) {
-    vec4 ndc = vec4(pos.xy * 2.0 - 1.0, -1.0, 1.0); // get ndc position -1 because i want every point in the near camera plane
-    vec4 posVS = inverse(projection) * ndc; // unproject the ndc coordinates : we are now in view space if i understand correctly
-    vec4 posWS = inverse(view) * vec4((posVS.xyz / posVS.w), 1.0); // then we use inverse view to get to world space, division by w to get actual coordinates
-    return posWS.xyz; // the coordinates in world space
-}
+#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, projection=projection, view=view)
 
-// returns whether or not a ray hits a sphere, if yes out intersection points
-// a good explanation of how it works : https://viclw17.github.io/2018/07/16/raytracing-ray-sphere-intersection/
-bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float sphereRadius, out float t0, out float t1) {
-    vec3 relativeOrigin = rayOrigin - spherePosition; // rayOrigin in sphere space
-
-    float a = 1.0;
-    float b = 2.0 * dot(relativeOrigin, rayDir); // sera toujours positif quand on regarde la planète
-    float c = dot(relativeOrigin, relativeOrigin) - sphereRadius*sphereRadius;
-    
-    float d = b*b - 4.0*a*c;
-
-    if(d <= 0.0) return false; // no intersection
-
-    float s = sqrt(d);
-
-    float r0 = (-b - s) / (2.0*a);
-    float r1 = (-b + s) / (2.0*a);
-
-    t0 = max(min(r0, r1), 0.0);
-    t1 = max(max(r0, r1), 0.0);
-
-    return (t1 > 0.0);
-}
+#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
 // based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
 float densityAtPoint(vec3 samplePoint) {

@@ -14,7 +14,6 @@ uniform vec3 cameraPosition; // position of the camera in world space
 
 uniform mat4 projection; // camera's projection matrix
 uniform mat4 view; // camera's view matrix
-uniform mat4 world;
 
 uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
@@ -32,149 +31,21 @@ uniform vec4 planetInverseRotationQuaternion;
 
 uniform float time;
 
-// remap a value comprised between low1 and high1 to a value between low2 and high2
-float remap(float value, float low1, float high1, float low2, float high2) {
-    return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
-}
+#pragma glslify: remap = require(./utils/remap.glsl)
 
-// compute the world position of a pixel from its uv coordinates
-vec3 worldFromUV(vec2 pos) {
-    vec4 ndc = vec4(pos.xy * 2.0 - 1.0, -1.0, 1.0); // get ndc position -1 because i want every point in the near camera plane
-    vec4 posVS = inverse(projection) * ndc; // unproject the ndc coordinates : we are now in view space if i understand correctly
-    vec4 posWS = inverse(view) * vec4((posVS.xyz / posVS.w), 1.0); // then we use inverse view to get to world space, division by w to get actual coordinates
-    return posWS.xyz; // the coordinates in world space
-}
+#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, projection=projection, view=view)
 
-// returns whether or not a ray hits a sphere, if yes out intersection points
-// a good explanation of how it works : https://viclw17.github.io/2018/07/16/raytracing-ray-sphere-intersection/
-bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float sphereRadius, out float t0, out float t1) {
-    vec3 relativeOrigin = rayOrigin - spherePosition; // rayOrigin in sphere space
+#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
-    float a = 1.0;
-    float b = 2.0 * dot(relativeOrigin, rayDir);
-    float c = dot(relativeOrigin, relativeOrigin) - sphereRadius*sphereRadius;
-    
-    float d = b*b - 4.0*a*c;
+#pragma glslify: triplanarNormal = require(./utils/triplanarNormal.glsl)
 
-    if(d < 0.0) return false; // no intersection
+#pragma glslify: completeNoise = require(./utils/noise.glsl)
 
-    float s = sqrt(d);
+#pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 
-    float r0 = (-b - s) / (2.0*a);
-    float r1 = (-b + s) / (2.0*a);
+#pragma glslify: fastAcos = require(./utils/fastAcos.glsl)
 
-    t0 = max(min(r0, r1), 0.0);
-    t1 = max(max(r0, r1), 0.0);
-
-    return (t1 > 0.0);
-}
-
-// https://bgolus.medium.com/normal-mapping-for-a-triplanar-shader-10bf39dca05a
-vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
-    vec2 uvX = position.zy * scale;
-    vec2 uvY = position.xz * scale;
-    vec2 uvZ = position.xy * scale;
-
-    vec3 tNormalX = texture2D(normalMap, uvX).rgb;
-    vec3 tNormalY = texture2D(normalMap, uvY).rgb;
-    vec3 tNormalZ = texture2D(normalMap, uvZ).rgb;
-
-    tNormalX = normalize(tNormalX * 2.0 - 1.0) * normalStrength;
-    tNormalY = normalize(tNormalY * 2.0 - 1.0) * normalStrength;
-    tNormalZ = normalize(tNormalZ * 2.0 - 1.0) * normalStrength;
-
-    tNormalX = vec3(tNormalX.xy + surfaceNormal.zy, surfaceNormal.x);
-    tNormalY = vec3(tNormalY.xy + surfaceNormal.xz, surfaceNormal.y);
-    tNormalZ = vec3(tNormalZ.xy + surfaceNormal.xy, surfaceNormal.z);
-
-    vec3 blendWeight = pow(abs(surfaceNormal), vec3(sharpness));
-    blendWeight /= dot(blendWeight, vec3(1.0));
-
-    return normalize(tNormalX.zyx * blendWeight.x + tNormalY.xzy * blendWeight.y + tNormalZ.xyz * blendWeight.z);
-}
-
-
-float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
-vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
-
-float noise(vec3 p){
-    vec3 a = floor(p);
-    vec3 d = p - a;
-    d = d * d * (3.0 - 2.0 * d);
-
-    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);
-    vec4 k1 = perm(b.xyxy);
-    vec4 k2 = perm(k1.xyxy + b.zzww);
-
-    vec4 c = k2 + a.zzzz;
-    vec4 k3 = perm(c);
-    vec4 k4 = perm(c + 1.0);
-
-    vec4 o1 = fract(k3 * (1.0 / 41.0));
-    vec4 o2 = fract(k4 * (1.0 / 41.0));
-
-    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
-    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
-
-    return o4.y * d.y + o4.x * (1.0 - d.y);
-}
-
-
-float completeNoise(vec3 p, int nbOctaves, float decay, float lacunarity) {
-	float totalAmplitude = 0.0;
-	float value = 0.0;
-	for(int i = 0; i < nbOctaves; ++i) {
-		totalAmplitude += 1.0 / pow(decay, float(i));
-		vec3 samplePoint = p * pow(lacunarity, float(i)); 
-		value += noise(samplePoint) / pow(decay, float(i));
-	}
-	return value / totalAmplitude;
-}
-
-
-vec3 lerp(vec3 v1, vec3 v2, float s) {
-    return s * v1 + (1.0 - s) * v2;
-}
-
-// https://stackoverflow.com/questions/3380628/fast-arc-cos-algorithm
-float fastAcos(float x) {
-      float negate = 0.0;
-      if(x < 0.0) negate = 1.0; //float(x < 0);
-      x = abs(x);
-      float ret = -0.0187293;
-      ret = ret * x;
-      ret = ret + 0.0742610;
-      ret = ret * x;
-      ret = ret - 0.2121144;
-      ret = ret * x;
-      ret = ret + 1.5707288;
-      ret = ret * sqrt(1.0-x);
-      ret = ret - 2.0 * negate * ret;
-      return negate * 3.14159265358979 + ret;
-}
-
-
-vec3 applyQuaternion(vec4 quaternion, vec3 vector) {
-    float qx = quaternion.x;
-    float qy = quaternion.y;
-    float qz = quaternion.z;
-    float qw = quaternion.w;
-    float x = vector.x;
-    float y = vector.y;
-    float z = vector.z;
-    // apply quaternion to vector
-    float ix = qw * x + qy * z - qz * y;
-    float iy = qw * y + qz * x - qx * z;
-    float iz = qw * z + qx * y - qy * x;
-    float iw = -qx * x - qy * y - qz * z;
-    // calculate result * inverse quat
-    float nX = ix * qw + iw * -qx + iy * -qz - iz * -qy;
-    float nY = iy * qw + iw * -qy + iz * -qx - ix * -qz;
-    float nZ = iz * qw + iw * -qz + ix * -qy - iy * -qx;
-
-    return vec3(nX, nY, nZ);
-}
+#pragma glslify: applyQuaternion = require(./utils/applyQuaternion.glsl)
 
 vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
