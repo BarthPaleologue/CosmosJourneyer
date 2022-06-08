@@ -28,7 +28,7 @@ uniform float alphaModifier;
 uniform float depthModifier;
 uniform float waveBlendingSharpness;
 
-uniform mat4 planetWorldMatrix;
+uniform vec4 planetInverseRotationQuaternion;
 
 uniform float time;
 
@@ -154,6 +154,28 @@ float fastAcos(float x) {
       return negate * 3.14159265358979 + ret;
 }
 
+
+vec3 applyQuaternion(vec4 quaternion, vec3 vector) {
+    float qx = quaternion.x;
+    float qy = quaternion.y;
+    float qz = quaternion.z;
+    float qw = quaternion.w;
+    float x = vector.x;
+    float y = vector.y;
+    float z = vector.z;
+    // apply quaternion to vector
+    float ix = qw * x + qy * z - qz * y;
+    float iy = qw * y + qz * x - qx * z;
+    float iz = qw * z + qx * y - qy * x;
+    float iw = -qx * x - qy * y - qz * z;
+    // calculate result * inverse quat
+    float nX = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+    float nY = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+    float nZ = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+
+    return vec3(nX, nY, nZ);
+}
+
 vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
 
@@ -172,13 +194,13 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
 
     float distanceThroughOcean = max(0.0, escapePoint - impactPoint); // probably doesn't need the max but for the sake of coherence the distance cannot be negative
     
-    vec3 samplePoint = rayOrigin + impactPoint * rayDir;
+    vec3 samplePoint = rayOrigin + impactPoint * rayDir - planetPosition;
 
-    vec3 samplePointPlanetSpace = vec3(inverse(planetWorldMatrix) * vec4(samplePoint, 1.0));//samplePoint - planetPosition;
+    vec3 samplePointPlanetSpace = applyQuaternion(planetInverseRotationQuaternion, samplePoint);
     
     vec3 unitSamplePoint = normalize(samplePointPlanetSpace);
 
-    vec3 planetNormal = normalize(samplePoint - planetPosition);
+    vec3 planetNormal = normalize(samplePoint);
     
     vec3 normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, time, -time) * 100.0, planetNormal, normalMap2, 0.00015, waveBlendingSharpness, 1.0);
     normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 100.0, normalWave, normalMap1, 0.0001, waveBlendingSharpness, 1.0);

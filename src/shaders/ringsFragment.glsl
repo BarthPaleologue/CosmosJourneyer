@@ -25,7 +25,7 @@ uniform float ringEnd; // ring end
 uniform float ringFrequency; // ring frequency
 uniform float ringOpacity; // ring opacity
 
-uniform mat4 planetWorldMatrix;
+uniform vec4 planetRotationQuaternion;
 
 float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
@@ -113,6 +113,27 @@ vec3 lerp(vec3 v1, vec3 v2, float s) {
     return s * v1 + (1.0 - s) * v2;
 }
 
+vec3 applyQuaternion(vec4 quaternion, vec3 vector) {
+    float qx = quaternion.x;
+    float qy = quaternion.y;
+    float qz = quaternion.z;
+    float qw = quaternion.w;
+    float x = vector.x;
+    float y = vector.y;
+    float z = vector.z;
+    // apply quaternion to vector
+    float ix = qw * x + qy * z - qz * y;
+    float iy = qw * y + qz * x - qx * z;
+    float iz = qw * z + qx * y - qy * x;
+    float iw = -qx * x - qy * y - qz * z;
+    // calculate result * inverse quat
+    float nX = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+    float nY = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+    float nZ = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+
+    return vec3(nX, nY, nZ);
+}
+
 float ringDensityAtPoint(vec3 samplePoint) {
 	vec3 samplePointPlanetSpace = samplePoint - planetPosition;
 
@@ -144,8 +165,7 @@ void main() {
     vec3 finalColor;
 
     vec3 planetUpVector = vec3(0.0, 1.0, 0.0);
-    planetUpVector = vec3(planetWorldMatrix * vec4(planetUpVector, 0.0)); // planet up vector in world space
-    planetUpVector = normalize(planetUpVector); // normalize the planet up vector
+    planetUpVector = applyQuaternion(planetRotationQuaternion, planetUpVector);
 
 	float impactPoint;
 	if(rayIntersectPlane(cameraPosition, rayDir, planetPosition, planetUpVector, impactPoint)) {

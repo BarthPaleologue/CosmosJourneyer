@@ -147,7 +147,8 @@ export class SolidPlanetMaterial extends ShaderMaterial {
 
     public update(player: PlayerController, starPosition: Vector3) {
         this.setVector4("planetInverseRotationQuaternion", quaternionAsVector4(this.planet.getInverseRotationQuaternion()));
-
+        //TODO: ad setQuaternion to ShaderMaterial
+        //this.setQuaternion("planetInverseQuaternion", this.planet.getInverseRotationQuaternion());
         this.setVector3("playerPosition", player.getAbsolutePosition());
         this.setVector3("sunPosition", starPosition);
 

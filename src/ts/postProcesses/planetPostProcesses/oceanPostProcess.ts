@@ -1,4 +1,4 @@
-import { Effect, Scene, Texture } from "@babylonjs/core";
+import { Effect, Scene } from "@babylonjs/core";
 
 import { OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
@@ -62,14 +62,12 @@ export class OceanPostProcess extends PlanetPostProcess {
                     return settings.waveBlendingSharpness;
                 }
             },
-
-            planetWorldMatrix: {
-                type: ShaderDataType.Matrix,
+            planetInverseRotationQuaternion: {
+                type: ShaderDataType.Quaternion,
                 get: () => {
-                    return planet.getWorldMatrix();
+                    return planet.getInverseRotationQuaternion();
                 }
             },
-
             time: {
                 type: ShaderDataType.Float,
                 get: () => {

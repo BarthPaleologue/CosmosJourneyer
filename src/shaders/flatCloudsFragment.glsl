@@ -13,7 +13,6 @@ uniform vec3 cameraPosition; // position of the camera in world space
 
 uniform mat4 projection; // camera's projection matrix
 uniform mat4 view; // camera's view matrix
-uniform mat4 world;
 
 uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
@@ -37,7 +36,7 @@ uniform float specularPower;
 uniform float alphaModifier;
 uniform float depthModifier;
 
-uniform mat4 planetWorldMatrix;
+uniform vec4 planetInverseRotationQuaternion;
 
 uniform float time;
 
@@ -323,6 +322,27 @@ float tanhSharpener(float x, float s) {
 	return tanh01(sampleValue);
 }
 
+vec3 applyQuaternion(vec4 quaternion, vec3 vector) {
+	float qx = quaternion.x;
+	float qy = quaternion.y;
+	float qz = quaternion.z;
+	float qw = quaternion.w;
+	float x = vector.x;
+	float y = vector.y;
+	float z = vector.z;
+	// apply quaternion to vector
+	float ix = qw * x + qy * z - qz * y;
+	float iy = qw * y + qz * x - qx * z;
+	float iz = qw * z + qx * y - qy * x;
+	float iw = -qx * x - qy * y - qz * z;
+	// calculate result * inverse quat
+	float nX = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+	float nY = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+	float nZ = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+
+	return vec3(nX, nY, nZ);
+}
+
 vec3 rotateAround(vec3 vector, vec3 axis, float theta) {
     // rotation using https://www.wikiwand.com/en/Rodrigues%27_rotation_formula
     // Please note that unit vector are required, i did not divided by the norms
@@ -371,22 +391,21 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     }
     if(impactPoint > maximumDistance) return originalColor;
 
-    vec3 samplePoint1 = rayOrigin + impactPoint * rayDir;
-    vec3 samplePoint2 = rayOrigin + escapePoint * rayDir;
+    vec3 planetSpacePoint1 = normalize(rayOrigin + impactPoint * rayDir - planetPosition);
+    vec3 planetSpacePoint2 = normalize(rayOrigin + escapePoint * rayDir - planetPosition);
 
-    vec3 samplePointPlanetSpace1 = normalize(vec3(inverse(planetWorldMatrix) * vec4(samplePoint1, 1.0)));
-    vec3 samplePointPlanetSpace2 = normalize(vec3(inverse(planetWorldMatrix) * vec4(samplePoint2, 1.0)));
+	vec3 planetNormal1 = planetSpacePoint1;
+	vec3 planetNormal2 = planetSpacePoint2;
 
-
-
-    vec3 planetNormal = normalize(samplePoint1 - planetPosition);
+    vec3 samplePoint1 = applyQuaternion(planetInverseRotationQuaternion, planetSpacePoint1);
+    vec3 samplePoint2 = applyQuaternion(planetInverseRotationQuaternion, planetSpacePoint2);
 
     /// Cloud point 1
-    float cloudDensity = cloudDensityAtPoint(samplePointPlanetSpace1);
+    float cloudDensity = cloudDensityAtPoint(samplePoint1);
 
     /// Cloud point 2
     if(twoPoints) {
-        cloudDensity += cloudDensityAtPoint(samplePointPlanetSpace2);
+        cloudDensity += cloudDensityAtPoint(samplePoint2);
     }
 
 	cloudDensity = saturate(cloudDensity);
@@ -394,10 +413,10 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
 	cloudDensity *= saturate((maximumDistance - impactPoint) / 10000.0); // fade away when close to surface
 
     // rotate sample point accordingly
-    vec3 normalRotatedSamplePoint1 = rotateAround(samplePointPlanetSpace1, vec3(0.0, 1.0, 0.0), time * detailSpeed);
+    vec3 normalRotatedSamplePoint1 = rotateAround(samplePoint1, vec3(0.0, 1.0, 0.0), time * detailSpeed);
 
     float cloudNormalStrength = 1.5;
-	vec3 normal = triplanarNormal(normalRotatedSamplePoint1, planetNormal, normalMap, 10.0, 0.5, cloudDensity * cloudNormalStrength);
+	vec3 normal = triplanarNormal(normalRotatedSamplePoint1, planetNormal1, normalMap, 10.0, 0.5, cloudDensity * cloudNormalStrength);
 
     // TODO: add another normalmap
     //normal = triplanarNormal(normalRotatedSamplePoint, normal, normalMap, 20.0, 0.5, 0.5 * cloudDensity * cloudNormalStrength);

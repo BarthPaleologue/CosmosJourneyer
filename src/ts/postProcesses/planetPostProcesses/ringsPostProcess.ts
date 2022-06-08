@@ -46,10 +46,10 @@ export class RingsPostProcess extends PlanetPostProcess {
                 }
             },
 
-            planetWorldMatrix: {
-                type: ShaderDataType.Matrix,
+            planetRotationQuaternion: {
+                type: ShaderDataType.Quaternion,
                 get: () => {
-                    return body.getWorldMatrix();
+                    return body.getRotationQuaternion();
                 }
             }
         };

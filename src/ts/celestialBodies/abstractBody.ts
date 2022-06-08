@@ -73,14 +73,7 @@ export abstract class AbstractBody implements Transformable {
     }
 
     public getInverseRotationQuaternion(): Quaternion {
-        return this.getRotationQuaternion().conjugate();
-    }
-
-    /**
-     * Returns the world matrix of the planet (see babylonjs world matrix for reference)
-     */
-    public getWorldMatrix(): Matrix {
-        return this.transform.getWorldMatrix();
+        return this.getRotationQuaternion().invert();
     }
 
     /**

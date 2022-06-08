@@ -90,10 +90,10 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
                     return settings.specularPower;
                 }
             },
-            planetWorldMatrix: {
-                type: ShaderDataType.Matrix,
+            planetInverseRotationQuaternion: {
+                type: ShaderDataType.Quaternion,
                 get: () => {
-                    return planet.getWorldMatrix();
+                    return planet.getInverseRotationQuaternion();
                 }
             },
             time: {
