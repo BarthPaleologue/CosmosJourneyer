@@ -1,0 +1,22 @@
+nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  z-index: 3;
+
+  div {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+    flex: 1;
+    color: white;
+    text-align: center;
+    font-family: sans-serif;
+    cursor: pointer;
+    transition: .1s;
+    &:hover {
+      background: rgba(50, 50, 50, 0.7);
+    }
+  }
+}

@@ -1,0 +1,33 @@
+*,
+*::before,
+*::after {
+  box-sizing: content-box;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  user-select: none;
+  background: black;
+
+  @import "bodyEditor/nav";
+
+  @import "bodyEditor/panels";
+
+  #renderer {
+    z-index: 1;
+  }
+
+  #planetName {
+    position: absolute;
+    color: white;
+    bottom: 0;
+    margin: 0;
+    font-size: 200%;
+    padding: 10px 20px;
+    font-family: sans-serif;
+    background: rgba(0, 0, 0, .7);
+  }
+
+  @import "bodyEditor/toolbar";
+}

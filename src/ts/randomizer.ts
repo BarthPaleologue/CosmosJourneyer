@@ -2,7 +2,7 @@ import { Axis, FxaaPostProcess, Tools, Vector3 } from "@babylonjs/core";
 
 import { SolidPlanet } from "./celestialBodies/planets/solidPlanet";
 
-import "../styles/style.scss";
+import "../styles/index.scss";
 import { PlayerController } from "./player/playerController";
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";

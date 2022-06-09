@@ -1,0 +1,23 @@
+.colorPickerContainer {
+  p {
+    display: inline-block;
+    padding: 0 !important;
+  }
+
+  input {
+    -webkit-appearance: none;
+    border: none;
+    width: 32px;
+    height: 16px;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    &::-webkit-color-swatch {
+      border: none;
+    }
+  }
+
+  display: block;
+}

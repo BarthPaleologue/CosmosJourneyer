@@ -14,7 +14,7 @@ import { StarSystemManager } from "./celestialBodies/starSystemManager";
 
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 
-import "../styles/style.scss";
+import "../styles/index.scss";
 
 import { Settings } from "./settings";
 import { BodyType } from "./celestialBodies/interfaces";
