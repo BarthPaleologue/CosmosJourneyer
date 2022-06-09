@@ -2,7 +2,6 @@ import { SpacePostProcess } from "./spacePostProcess";
 import { Axis, Scene } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplerData, ShaderUniformData } from "./interfaces";
 import { Star } from "../celestialBodies/stars/star";
-import { AbstractPlanet } from "../celestialBodies/planets/abstractPlanet";
 import { AbstractBody } from "../celestialBodies/abstractBody";
 
 export abstract class PlanetPostProcess extends SpacePostProcess {

@@ -1,6 +1,6 @@
 import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
 import { Direction } from "../utils/direction";
-import { Mesh, Vector3, VertexData } from "@babylonjs/core";
+import { Vector3, VertexData } from "@babylonjs/core";
 import { PlanetChunk } from "./planetChunk";
 
 export enum TaskType {

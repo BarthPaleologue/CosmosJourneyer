@@ -2,9 +2,7 @@ import { Vector3, DepthRenderer } from "@babylonjs/core";
 
 import { ChunkForge } from "../chunks/chunkForge";
 import { PlayerController } from "../player/playerController";
-import { SolidPlanet } from "./planets/solidPlanet";
 import { AbstractBody } from "./abstractBody";
-import { Star } from "./stars/star";
 
 export class StarSystemManager {
     private readonly _chunkForge: ChunkForge;
@@ -62,6 +60,7 @@ export class StarSystemManager {
      * Returns the most influential body at a given point
      */
     public getMostInfluentialBodyAtPoint(point: Vector3): AbstractBody {
+        //FIXME: use point
         if (this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
         let nearest = null;
         for (const body of this._celestialBodies) {

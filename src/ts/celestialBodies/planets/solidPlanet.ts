@@ -11,13 +11,13 @@ import { TaskType } from "../../chunks/taskInterfaces";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
 import { Settings } from "../../settings";
-import { SolidPhysicalProperties } from "../physicalPropertiesInterfaces";
+import { ISolidPhysicalProperties } from "../iPhysicalProperties";
 import { SolidPlanetMaterial } from "../../materials/solidPlanetMaterial";
 
 export class SolidPlanet extends AbstractPlanet implements RigidBody {
     oceanLevel: number;
 
-    override readonly physicalProperties: SolidPhysicalProperties;
+    override readonly physicalProperties: ISolidPhysicalProperties;
 
     protected bodyType = BodyType.SOLID;
 

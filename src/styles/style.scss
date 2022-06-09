@@ -86,24 +86,6 @@ body {
       margin-top: -5%;
     }
 
-    .button {
-      padding: 10px 20px;
-      margin: 10px auto;
-      background: green;
-      text-align: center;
-      width: 150px;
-      border-radius: 3px;
-      cursor: pointer;
-      border: 2px solid green;
-      font-family: sans-serif;
-      color: white;
-      transition: .2s;
-
-      &:hover {
-        background: rgba(0, 0, 0, .7);
-      }
-    }
-
     /* Customize the label (the container) */
     .container {
       margin-left: 5px;

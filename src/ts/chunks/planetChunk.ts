@@ -1,6 +1,5 @@
-import { Mesh, Animation, StandardMaterial, Color3 } from "@babylonjs/core";
+import { Mesh } from "@babylonjs/core";
 
-import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
 import { ChunkForge } from "./chunkForge";
 import { BuildTask, TaskType } from "./taskInterfaces";
 import { Direction } from "../utils/direction";

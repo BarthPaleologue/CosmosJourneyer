@@ -1,19 +1,20 @@
-import { Vector3, Quaternion, Space, Matrix, TransformNode, Scene } from "@babylonjs/core";
+import { Vector3, Quaternion, Space, TransformNode, Scene } from "@babylonjs/core";
 import { BodyType, Transformable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
-import { BodyPhysicalProperties } from "./physicalPropertiesInterfaces";
+import { IPhysicalProperties } from "./iPhysicalProperties";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
-import { OrbitalProperties } from "./orbitalPropertiesInterface";
+import { IOrbitalProperties } from "./iOrbitalProperties";
 import { computeBarycenter, computePointOnOrbit } from "../utils/kepler";
 import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
+import { IOrbitalBody } from "./iOrbitalBody";
 
-export abstract class AbstractBody implements Transformable {
+export abstract class AbstractBody implements Transformable, IOrbitalBody {
     protected abstract bodyType: BodyType;
 
-    abstract physicalProperties: BodyPhysicalProperties;
-    orbitalProperties: OrbitalProperties;
+    abstract physicalProperties: IPhysicalProperties;
+    orbitalProperties: IOrbitalProperties;
     abstract postProcesses: BodyPostProcesses;
 
     readonly _starSystemManager: StarSystemManager;
@@ -21,6 +22,8 @@ export abstract class AbstractBody implements Transformable {
     readonly _name: string;
 
     readonly transform: TransformNode;
+
+    relevantBodies: IOrbitalBody[] = [];
 
     protected constructor(name: string, starSystemManager: StarSystemManager) {
         this._name = name;
@@ -106,6 +109,18 @@ export abstract class AbstractBody implements Transformable {
         let rings = new RingsPostProcess(`${this.getName()}Rings`, this, star, scene);
         this.postProcesses.rings = rings;
         return rings;
+    }
+
+    public addRelevantBody(body: IOrbitalBody): void {
+        this.relevantBodies.push(body);
+    }
+
+    public removeRelevantBody(body: IOrbitalBody): void {
+        let newRelevantBodies = [];
+        for(const relevantBody of this.relevantBodies) {
+            if(body != relevantBody) newRelevantBodies.push(relevantBody);
+        }
+        this.relevantBodies = newRelevantBodies;
     }
 
     /**

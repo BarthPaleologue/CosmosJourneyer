@@ -1,10 +1,10 @@
 import { AbstractBody } from "../abstractBody";
 
-import { Mesh, MeshBuilder, Quaternion, Scene, Vector3, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import { Mesh, MeshBuilder, Scene, Vector3, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
-import { StarPhysicalProperties } from "../physicalPropertiesInterfaces";
+import { IStarPhysicalProperties } from "../iPhysicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
 
@@ -15,7 +15,7 @@ export class Star extends AbstractBody {
     private readonly material: StarMaterial;
     internalTime = 0;
     protected bodyType = BodyType.STAR;
-    readonly physicalProperties: StarPhysicalProperties;
+    readonly physicalProperties: IStarPhysicalProperties;
 
     public override postProcesses: StarPostProcesses;
 
@@ -24,7 +24,7 @@ export class Star extends AbstractBody {
         radius: number,
         starSystemManager: StarSystemManager,
         scene: Scene,
-        physicalProperties: StarPhysicalProperties = {
+        physicalProperties: IStarPhysicalProperties = {
             //TODO: ne pas hardcoder
             mass: 1000,
             rotationPeriod: 24 * 60 * 60,

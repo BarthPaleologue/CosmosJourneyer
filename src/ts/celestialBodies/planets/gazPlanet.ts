@@ -4,12 +4,12 @@ import { AbstractPlanet } from "./abstractPlanet";
 import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
-import { PlanetPhysicalProperties } from "../physicalPropertiesInterfaces";
+import { IPlanetPhysicalProperties } from "../iPhysicalProperties";
 
 export class GazPlanet extends AbstractPlanet {
     protected bodyType = BodyType.GAZ;
 
-    override readonly physicalProperties: PlanetPhysicalProperties;
+    override readonly physicalProperties: IPlanetPhysicalProperties;
 
     constructor(name: string, radius: number, starSystemManager: StarSystemManager) {
         super(name, radius, starSystemManager);

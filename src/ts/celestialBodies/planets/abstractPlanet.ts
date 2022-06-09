@@ -6,16 +6,15 @@ import { Scene, Vector3 } from "@babylonjs/core";
 import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import { PlayerController } from "../../player/playerController";
 import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
-import { RingsPostProcess } from "../../postProcesses/planetPostProcesses/ringsPostProcess";
 import { StarSystemManager } from "../starSystemManager";
-import { PlanetPhysicalProperties } from "../physicalPropertiesInterfaces";
+import { IPlanetPhysicalProperties } from "../iPhysicalProperties";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
 import { unpackSeedToVector3 } from "../../utils/random";
 
 export abstract class AbstractPlanet extends AbstractBody implements Seedable {
     readonly _radius: number;
     protected readonly _seed: number;
-    abstract override physicalProperties: PlanetPhysicalProperties;
+    abstract override physicalProperties: IPlanetPhysicalProperties;
     public override postProcesses: PlanetPostProcesses;
 
     protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed = 0) {
