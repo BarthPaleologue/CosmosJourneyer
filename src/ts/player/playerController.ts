@@ -160,8 +160,16 @@ export class PlayerController implements Transformable {
      */
     public listenToMouse(mouse: Mouse, deltaTime: number): void {
         // Update Rotation state
-        this.transform.rotate(this.getRightDirection(), (this.rotationSpeed * deltaTime * mouse.getDYToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
-        this.transform.rotate(this.getUpwardDirection(), (this.rotationSpeed * deltaTime * mouse.getDXToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2), Space.WORLD);
+        this.transform.rotate(
+            this.getRightDirection(),
+            (this.rotationSpeed * deltaTime * mouse.getDYToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2),
+            Space.WORLD
+        );
+        this.transform.rotate(
+            this.getUpwardDirection(),
+            (this.rotationSpeed * deltaTime * mouse.getDXToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2),
+            Space.WORLD
+        );
     }
 
     /**

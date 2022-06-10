@@ -1,7 +1,7 @@
 import { Scene, Texture } from "@babylonjs/core";
 
 import rockNormalMap from "../asset/textures/rockn.png";
-import dirtNormalMap from "../asset/textures/dirt/Ground_Dirt_008_normal.jpg"
+import dirtNormalMap from "../asset/textures/dirt/Ground_Dirt_008_normal.jpg";
 import bottomNormalMap from "../asset/textures/crackednormal.jpg";
 import grassNormalMap from "../asset/textures/grassNormalMap.jpg";
 import snowNormalMap1 from "../asset/textures/snow/Snow_002_NORM.jpg";

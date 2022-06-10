@@ -106,7 +106,6 @@ ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);
 
 ares.oceanLevel = Settings.OCEAN_DEPTH * ares.physicalProperties.waterAmount * ares.physicalProperties.pressure;
 
-
 ares.material.updateManual();
 
 let aresAtmosphere = ares.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene); // = new AtmosphericScatteringPostProcess("atmosphere", ares, radius + 70e3, sun, scene);

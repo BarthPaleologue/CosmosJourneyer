@@ -47,9 +47,9 @@ export function unpackSeedToVector3(seed: number): [number, number, number] {
     let xString = "0";
     let yString = "0";
     let zString = "0";
-    for(let i = 0; i < seedString.length; i++) {
+    for (let i = 0; i < seedString.length; i++) {
         const newChar = seedString[i];
-        switch (i%3) {
+        switch (i % 3) {
             case 0:
                 xString += newChar;
                 break;

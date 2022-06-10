@@ -31,7 +31,7 @@ export function solveKepler(M: number, e: number) {
 }
 
 function hermiteCorrector(x: number, n: number): number {
-    return 4 * x ** 3 + (-4 - (4 / n)) * x ** 2 + (1 + (4 / n)) * x;
+    return 4 * x ** 3 + (-4 - 4 / n) * x ** 2 + (1 + 4 / n) * x;
 }
 
 export function computeBarycenter(body: Transformable, bodies: AbstractBody[]) {

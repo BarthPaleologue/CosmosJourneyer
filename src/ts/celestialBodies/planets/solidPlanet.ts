@@ -27,13 +27,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     material: SolidPlanetMaterial;
 
-    constructor(
-        id: string,
-        radius: number,
-        starSystemManager: StarSystemManager,
-        scene: Scene,
-        seed = 0
-    ) {
+    constructor(id: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, seed = 0) {
         super(id, radius, starSystemManager, seed);
 
         this.physicalProperties = {

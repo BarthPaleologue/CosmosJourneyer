@@ -97,7 +97,7 @@ export class SolidPlanetMaterial extends ShaderMaterial {
 
         this.setVector3("seed", this.planet.getSeed3());
 
-        if(!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
+        if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 
         this.setTexture("bottomNormalMap", Assets.BottomNormalMap!);
         this.setTexture("steepNormalMap", Assets.RockNormalMap!);

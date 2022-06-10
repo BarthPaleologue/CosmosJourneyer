@@ -117,8 +117,8 @@ export abstract class AbstractBody implements Transformable, IOrbitalBody {
 
     public removeRelevantBody(body: IOrbitalBody): void {
         let newRelevantBodies = [];
-        for(const relevantBody of this.relevantBodies) {
-            if(body != relevantBody) newRelevantBodies.push(relevantBody);
+        for (const relevantBody of this.relevantBodies) {
+            if (body != relevantBody) newRelevantBodies.push(relevantBody);
         }
         this.relevantBodies = newRelevantBodies;
     }

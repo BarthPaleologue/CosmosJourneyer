@@ -171,7 +171,7 @@ function buildChunkVertexData(data: BuildData): void {
         {
             p: verticesPositions,
             i: indices,
-            n: normals,
+            n: normals
         },
         //@ts-ignore
         [verticesPositions.buffer, indices.buffer, normals.buffer]

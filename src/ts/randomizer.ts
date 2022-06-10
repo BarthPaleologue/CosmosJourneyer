@@ -81,7 +81,6 @@ planet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planetRand
 
 planet.oceanLevel = Settings.OCEAN_DEPTH * planet.physicalProperties.waterAmount * planet.physicalProperties.pressure;
 
-
 planet.translate(new Vector3(0, 0, 4 * planet.getRadius()));
 
 planet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRandom(planetRand) / 10, 0.37 + centeredRandom(planetRand) / 10, 0.024 + centeredRandom(planetRand) / 10);
