@@ -1,5 +1,5 @@
 import { Vector3, Quaternion, Space, TransformNode, Scene } from "@babylonjs/core";
-import { BodyType, Transformable } from "./interfaces";
+import { BodyType } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
 import { IPhysicalProperties } from "./iPhysicalProperties";
@@ -10,7 +10,7 @@ import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "./iOrbitalBody";
 
-export abstract class AbstractBody implements Transformable, IOrbitalBody {
+export abstract class AbstractBody implements IOrbitalBody {
     protected abstract bodyType: BodyType;
 
     abstract physicalProperties: IPhysicalProperties;
@@ -131,7 +131,7 @@ export abstract class AbstractBody implements Transformable, IOrbitalBody {
      */
     public update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
         if (this.orbitalProperties.period > 0) {
-            let barycenter = computeBarycenter(this, this._starSystemManager.getBodies());
+            let barycenter = computeBarycenter(this, this.relevantBodies);
 
             let initialPosition = this.getAbsolutePosition().clone();
             let newPosition = computePointOnOrbit(

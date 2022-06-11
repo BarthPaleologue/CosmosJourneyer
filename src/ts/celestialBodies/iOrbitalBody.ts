@@ -1,7 +1,8 @@
 import { IPhysicalProperties } from "./iPhysicalProperties";
 import { IOrbitalProperties } from "./iOrbitalProperties";
+import { ITransformable } from "./iTransformable";
 
-export interface IOrbitalBody {
+export interface IOrbitalBody extends ITransformable {
     /**
      * Describes the fundamental properties of the body used in physical computations
      */

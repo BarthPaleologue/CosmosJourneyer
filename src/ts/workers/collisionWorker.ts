@@ -1,7 +1,8 @@
 import { CollisionData } from "../chunks/workerDataInterfaces";
 import { StarSystemManager } from "../celestialBodies/starSystemManager";
 import { PlayerController } from "../player/playerController";
-import { RigidBody, Transformable } from "../celestialBodies/interfaces";
+import { RigidBody} from "../celestialBodies/interfaces";
+import { ITransformable } from "../celestialBodies/iTransformable";
 
 export class CollisionWorker {
     _player: PlayerController;
@@ -38,7 +39,7 @@ export class CollisionWorker {
         this._worker.postMessage(data);
         this._busy = true;
     }
-    public checkCollision(planet: RigidBody & Transformable): void {
+    public checkCollision(planet: RigidBody & ITransformable): void {
         let playerSamplePosition = planet.getAbsolutePosition().negate();
         playerSamplePosition.applyRotationQuaternionInPlace(planet.getInverseRotationQuaternion());
 

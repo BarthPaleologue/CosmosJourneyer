@@ -72,6 +72,7 @@ moon.orbitalProperties = {
     apoapsis: 6 * planet.getRadius(),
     periapsis: 5 * planet.getRadius()
 };
+moon.addRelevantBody(planet);
 
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;

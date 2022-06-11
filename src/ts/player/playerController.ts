@@ -3,9 +3,9 @@ import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
 import { AbstractBody } from "../celestialBodies/abstractBody";
-import { Transformable } from "../celestialBodies/interfaces";
+import { ITransformable } from "../celestialBodies/iTransformable";
 
-export class PlayerController implements Transformable {
+export class PlayerController implements ITransformable {
     nearestBody: AbstractBody | null;
 
     collisionRadius = 100;
