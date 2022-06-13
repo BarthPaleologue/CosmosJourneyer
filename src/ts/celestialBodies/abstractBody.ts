@@ -9,8 +9,12 @@ import { computeBarycenter, computePointOnOrbit } from "../utils/kepler";
 import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "./iOrbitalBody";
-import { centeredRandom, unpackSeedToVector3 } from "../utils/random";
+import { centeredRandom, unpackSeedToArray3 } from "../utils/random";
 import { alea } from "seedrandom";
+import sha256 from "fast-sha256";
+import {encodeUTF8, decodeUTF8} from "tweetnacl-util"
+import { Buffer } from "buffer";
+
 
 export abstract class AbstractBody implements IOrbitalBody, Seedable {
     protected abstract bodyType: BodyType;
@@ -24,6 +28,7 @@ export abstract class AbstractBody implements IOrbitalBody, Seedable {
     protected readonly _name: string;
 
     protected readonly _seed: number;
+    protected readonly _seedOffset: number[];
 
     readonly rng: () => number;
 
@@ -39,6 +44,8 @@ export abstract class AbstractBody implements IOrbitalBody, Seedable {
         this._radius = radius;
 
         this.rng = alea(seed.toString());
+
+        this._seedOffset = unpackSeedToArray3(this._seed);
 
         this._starSystemManager = starSystemManager;
         starSystemManager.addBody(this);
@@ -142,8 +149,8 @@ export abstract class AbstractBody implements IOrbitalBody, Seedable {
         return this._seed;
     }
 
-    public getSeed3(): Vector3 {
-        return Vector3.FromArray(unpackSeedToVector3(this.getSeed()));
+    public getSeed3(): number[] {
+        return this._seedOffset;
     }
 
     /**

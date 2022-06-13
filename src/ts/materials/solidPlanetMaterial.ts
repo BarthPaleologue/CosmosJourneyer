@@ -95,7 +95,7 @@ export class SolidPlanetMaterial extends ShaderMaterial {
             MaterialHelper.BindLogDepth(null, effect, scene);
         });
 
-        this.setVector3("seed", this.planet.getSeed3());
+        this.setVector3("seed", Vector3.FromArray(this.planet.getSeed3()));
 
         if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 

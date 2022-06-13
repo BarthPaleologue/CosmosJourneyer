@@ -42,7 +42,7 @@ export function randBool(p: number, rand = Math.random) {
     return rand() < p;
 }
 
-export function unpackSeedToVector3(seed: number): [number, number, number] {
+export function unpackSeedToArray3(seed: number): [number, number, number] {
     const seedString = seed.toString();
     let xString = "0";
     let yString = "0";

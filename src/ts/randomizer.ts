@@ -10,7 +10,7 @@ import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystemManager } from "./celestialBodies/starSystemManager";
 
-import { centeredRandom, normalRandom, randBool, randRangeInt, unpackSeedToVector3 } from "./utils/random";
+import { centeredRandom, normalRandom, randBool, randRangeInt, unpackSeedToArray3 } from "./utils/random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Star } from "./celestialBodies/stars/star";
 import { Settings } from "./settings";
@@ -58,7 +58,7 @@ starfield.setStar(sun);
 
 const planetSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER, starSystemRand);
 console.log("Planet seed : ", planetSeed);
-console.log("UNPACKED", unpackSeedToVector3(planetSeed));
+console.log("UNPACKED", unpackSeedToArray3(planetSeed));
 const planetRand = alea(planetSeed.toString());
 
 const planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, planetSeed);

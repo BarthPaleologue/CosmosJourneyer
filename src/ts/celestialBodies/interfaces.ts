@@ -12,7 +12,7 @@ export interface Seedable {
      * Returns the seed of the planet
      */
     getSeed(): number;
-    getSeed3(): Vector3;
+    getSeed3(): number[];
 }
 
 /**

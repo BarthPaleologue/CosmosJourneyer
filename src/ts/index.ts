@@ -47,7 +47,7 @@ sun.translate(new Vector3(-1, 0, -1).normalizeToNew().scale(Settings.PLANET_RADI
 
 starfield.setStar(sun);
 
-let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene, 1234567890);
+let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene, 1234567882);
 
 planet.physicalProperties.rotationPeriod /= 50;
 
