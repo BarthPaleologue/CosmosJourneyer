@@ -1,9 +1,10 @@
-import { Vector3, FreeCamera, Axis, Space, Scene, Quaternion, TransformNode } from "@babylonjs/core";
+import { Vector3, FreeCamera, Axis, Space, Scene, Quaternion, TransformNode, MeshBuilder, StandardMaterial, Color3 } from "@babylonjs/core";
 import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
 import { AbstractBody } from "../celestialBodies/abstractBody";
 import { ITransformable } from "../celestialBodies/iTransformable";
+import { Star } from "../celestialBodies/stars/star";
 
 export class PlayerController implements ITransformable {
     nearestBody: AbstractBody | null;
@@ -37,6 +38,8 @@ export class PlayerController implements ITransformable {
 
     constructor(scene: Scene) {
         this.transform = new TransformNode("playerTransform", scene);
+        this.transform.position = Vector3.Zero();
+        this.transform.rotationQuaternion = Quaternion.Identity();
 
         this.camera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.transform;
@@ -60,7 +63,7 @@ export class PlayerController implements ITransformable {
      * @returns the unit vector pointing backward the player controler in world space
      */
     public getBackwardDirection(): Vector3 {
-        return this.getForwardDirection().scale(-1);
+        return this.getForwardDirection().negate();
     }
 
     /**
@@ -76,7 +79,7 @@ export class PlayerController implements ITransformable {
      * @returns the unit vector pointing downward the player controler in world space
      */
     public getDownwardDirection(): Vector3 {
-        return this.getUpwardDirection().scale(-1);
+        return this.getUpwardDirection().negate();
     }
 
     /**
@@ -114,22 +117,21 @@ export class PlayerController implements ITransformable {
     public listenToKeyboard(keyboard: Keyboard, deltaTime: number): Vector3 {
         // Update Rotation state
         if (keyboard.isPressed(this.controls.rollLeftKey)) {
-            // rotation autour de l'axe de déplacement
-            this.transform.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
+            this.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime);
         } else if (keyboard.isPressed(this.controls.rollRightKey)) {
-            this.transform.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
+            this.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime);
         }
 
         if (keyboard.isPressed(this.controls.pitchUpKey)) {
-            this.transform.rotate(this.getRightDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
+            this.rotate(this.getRightDirection(), -this.rotationSpeed * deltaTime);
         } else if (keyboard.isPressed(this.controls.picthDownKey)) {
-            this.transform.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
+            this.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime);
         }
 
         if (keyboard.isPressed(this.controls.yawLeftKey)) {
-            this.transform.rotate(this.getUpwardDirection(), -this.rotationSpeed * deltaTime, Space.WORLD);
+            this.rotate(this.getUpwardDirection(), -this.rotationSpeed * deltaTime);
         } else if (keyboard.isPressed(this.controls.yawRightKey)) {
-            this.transform.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime, Space.WORLD);
+            this.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime);
         }
 
         // Update displacement state
@@ -150,7 +152,7 @@ export class PlayerController implements ITransformable {
         if (keyboard.isPressed("-")) this.speed /= 1.1;
         if (keyboard.isPressed("8")) this.speed = 30;
 
-        return deplacement.scale(-1);
+        return deplacement.negate();
     }
 
     /**
@@ -159,17 +161,9 @@ export class PlayerController implements ITransformable {
      * @param deltaTime the time between 2 frames
      */
     public listenToMouse(mouse: Mouse, deltaTime: number): void {
-        // Update Rotation state
-        this.transform.rotate(
-            this.getRightDirection(),
-            (this.rotationSpeed * deltaTime * mouse.getDYToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2),
-            Space.WORLD
-        );
-        this.transform.rotate(
-            this.getUpwardDirection(),
-            (this.rotationSpeed * deltaTime * mouse.getDXToCenter()) / (Math.max(window.innerWidth, window.innerHeight) / 2),
-            Space.WORLD
-        );
+        const greaterLength = Math.max(window.innerWidth, window.innerHeight);
+        this.rotate(this.getRightDirection(), (this.rotationSpeed * deltaTime * mouse.getDYToCenter()) / (greaterLength / 2));
+        this.rotate(this.getUpwardDirection(), (this.rotationSpeed * deltaTime * mouse.getDXToCenter()) / (greaterLength / 2));
     }
 
     /**
@@ -196,16 +190,15 @@ export class PlayerController implements ITransformable {
         if (gamepad.isPressed(GamepadButton.Start)) this.speed *= 1.1;
         if (gamepad.isPressed(GamepadButton.Select)) this.speed /= 1.1;
 
-        // Update Rotation state
         // pitch and yaw control
-        this.transform.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RY), Space.WORLD);
-        this.transform.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RX), Space.WORLD);
+        this.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RY));
+        this.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RX));
 
         // roll control
-        this.transform.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.L), Space.WORLD);
-        this.transform.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.R), Space.WORLD);
+        this.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.L));
+        this.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.R));
 
-        return deplacement.scale(-1);
+        return deplacement.negate();
     }
 
     public getAbsolutePosition(): Vector3 {
@@ -213,13 +206,12 @@ export class PlayerController implements ITransformable {
         return this.transform.getAbsolutePosition();
     }
 
-    setAbsolutePosition(newPosition: Vector3): void {
+    public setAbsolutePosition(newPosition: Vector3): void {
         this.transform.setAbsolutePosition(newPosition);
     }
 
     public getRotationQuaternion(): Quaternion {
         if (this.transform.rotationQuaternion == undefined) throw new Error(`PlayerController's rotation Quaternion is undefined !`);
-        if (this.transform.rotationQuaternion._isDirty) this.transform.computeWorldMatrix(true);
         return this.transform.rotationQuaternion;
     }
 
@@ -227,15 +219,15 @@ export class PlayerController implements ITransformable {
         return this.getRotationQuaternion().conjugate();
     }
 
-    translate(displacement: Vector3): void {
+    public translate(displacement: Vector3): void {
         this.transform.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
     }
 
-    rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
+    public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
         this.transform.rotateAround(pivot, axis, amount);
     }
 
-    rotate(axis: Vector3, amount: number): void {
+    public rotate(axis: Vector3, amount: number): void {
         this.transform.rotate(axis, amount, Space.WORLD);
     }
 
