@@ -10,6 +10,7 @@ import { AbstractBody } from "../celestialBodies/abstractBody";
 import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../materials/colorSettingsInterface";
 import { clearAllEventListenersById } from "../utils/html";
+import { stripAxisFromQuaternion } from "../utils/algebra";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -250,15 +251,7 @@ export class BodyEditor {
             })
         );
 
-        let sunOrientation = 220;
-        this.generalSliders.push(
-            new Slider("sunOrientation", document.getElementById("sunOrientation")!, 1, 360, sunOrientation, (val: number) => {
-                star.rotateAround(planet.getAbsolutePosition(), new Vector3(0, 1, 0), (-2 * Math.PI * (val - sunOrientation)) / 360);
-                sunOrientation = val;
-            })
-        );
-
-        let axialTilt = planet.getRotationQuaternion().toEulerAngles().x;
+        let axialTilt = stripAxisFromQuaternion(planet.getRotationQuaternion(), Axis.Y).toEulerAngles().x;
         this.generalSliders.push(
             new Slider("axialTilt", document.getElementById("axialTilt")!, -180, 180, Math.round((180 * axialTilt) / Math.PI), (val: number) => {
                 let newAxialTilt = (val * Math.PI) / 180;

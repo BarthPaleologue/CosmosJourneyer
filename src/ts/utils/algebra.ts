@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, Vector4 } from "@babylonjs/core";
+import { Quaternion, Vector3, Vector4 } from "@babylonjs/core";
 import { IVector3Like } from "@babylonjs/core/Maths/math.like";
 
 /**
@@ -147,4 +147,26 @@ export type Vec3 = Vector3 | LVector3;
 
 export function quaternionAsVector4(q: Quaternion): Vector4 {
     return new Vector4(q.x, q.y, q.z, q.w);
+}
+
+/**
+ * Removes the rotation around an axis from the quaternion
+ * @param quaternion the quaternion to strip
+ * @param axisToRemove the axis to remove the rotation around (unit vector)
+ * @return a new Quaternion
+ * @see https://stackoverflow.com/a/22401169
+ */
+export function stripAxisFromQuaternion(quaternion: Quaternion, axisToRemove: Vector3): Quaternion {
+    const rotationAxis = new Vector3(quaternion.x, quaternion.y, quaternion.z);
+    const p = axisToRemove.scale(Vector3.Dot(rotationAxis, axisToRemove)); // return projection v1 on to v2  (parallel component)
+    const twist = new Quaternion(p.x, p.y, p.z, quaternion.w);
+    twist.normalize();
+    return quaternion.multiply(twist.conjugate());
+}
+
+export function getAxisComponentFromQuaternion(quaternion: Quaternion, axisToGet: Vector3): Quaternion {
+    const rotationAxis = new Vector3(quaternion.x, quaternion.y, quaternion.z);
+    const p = axisToGet.scale(Vector3.Dot(rotationAxis, axisToGet)); // return projection v1 on to v2  (parallel component)
+    const twist = new Quaternion(p.x, p.y, p.z, quaternion.w);
+    return twist.normalize().conjugate();
 }
