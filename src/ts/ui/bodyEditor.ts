@@ -251,13 +251,23 @@ export class BodyEditor {
             })
         );
 
-        let axialTilt = stripAxisFromQuaternion(planet.getRotationQuaternion(), Axis.Y).toEulerAngles().x;
+        let axialTiltX = stripAxisFromQuaternion(planet.getRotationQuaternion(), Axis.Y).toEulerAngles().x;
         this.generalSliders.push(
-            new Slider("axialTilt", document.getElementById("axialTilt")!, -180, 180, Math.round((180 * axialTilt) / Math.PI), (val: number) => {
+            new Slider("axialTiltX", document.getElementById("axialTiltX")!, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
                 let newAxialTilt = (val * Math.PI) / 180;
-                planet.rotate(Axis.X, newAxialTilt - axialTilt);
-                if (player.isOrbiting()) player.rotateAround(planet.getAbsolutePosition(), Axis.X, newAxialTilt - axialTilt);
-                axialTilt = newAxialTilt;
+                planet.rotate(Axis.X, newAxialTilt - axialTiltX);
+                if (player.isOrbiting()) player.rotateAround(planet.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
+                axialTiltX = newAxialTilt;
+            })
+        );
+
+        let axialTiltZ = stripAxisFromQuaternion(planet.getRotationQuaternion(), Axis.Y).toEulerAngles().z;
+        this.generalSliders.push(
+            new Slider("axialTiltZ", document.getElementById("axialTiltZ")!, -180, 180, Math.round((180 * axialTiltZ) / Math.PI), (val: number) => {
+                let newAxialTilt = (val * Math.PI) / 180;
+                planet.rotate(Axis.Z, newAxialTilt - axialTiltZ);
+                if (player.isOrbiting()) player.rotateAround(planet.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
+                axialTiltZ = newAxialTilt;
             })
         );
 

@@ -52,15 +52,7 @@ const randStar = alea(starSeed.toString());
 const starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.2, 1.5) * Settings.PLANET_RADIUS * 100;
 
 const sun = new Star("Weierstrass", starRadius, starSystemManager, scene, starSeed);
-sun.rotate(Axis.Z, centeredRandom(sun.rng) / 2);
 sun.translate(new Vector3(-9, 0, -17).scale(100000000));
-
-if (randBool(0.2, sun.rng)) {
-    let rings = sun.createRings(sun, scene);
-    rings.settings.ringStart = normalRandom(3, 1, sun.rng);
-    rings.settings.ringEnd = normalRandom(7, 1, sun.rng);
-    rings.settings.ringOpacity = sun.rng();
-}
 
 starfield.setStar(sun);
 
@@ -85,8 +77,6 @@ planet.material.colorSettings.beachSize = 250 + 100 * centeredRandom(planet.rng)
 planet.material.updateManual();
 
 planet.terrainSettings.continentsFragmentation = clamp(normalRandom(0.5, 0.2, planet.rng), 0, 1);
-
-planet.rotate(Axis.X, centeredRandom(planet.rng) / 2);
 
 planet.createOcean(sun, scene);
 

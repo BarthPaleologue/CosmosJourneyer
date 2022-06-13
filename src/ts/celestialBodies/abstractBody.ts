@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, Space, TransformNode, Scene } from "@babylonjs/core";
+import { Vector3, Quaternion, Space, TransformNode, Scene, Axis } from "@babylonjs/core";
 import { BodyType, Seedable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
@@ -9,7 +9,7 @@ import { computeBarycenter, computePointOnOrbit } from "../utils/kepler";
 import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "./iOrbitalBody";
-import { unpackSeedToVector3 } from "../utils/random";
+import { centeredRandom, unpackSeedToVector3 } from "../utils/random";
 import { alea } from "seedrandom";
 
 export abstract class AbstractBody implements IOrbitalBody, Seedable {
@@ -46,6 +46,9 @@ export abstract class AbstractBody implements IOrbitalBody, Seedable {
         this.transform = new TransformNode(`${name}Transform`);
         this.transform.position = Vector3.Zero();
         this.transform.rotationQuaternion = Quaternion.Identity();
+
+        this.rotate(Axis.X, centeredRandom(this.rng) / 2);
+        this.rotate(Axis.Z, centeredRandom(this.rng) / 2);
 
         this.orbitalProperties = {
             periapsis: this.getRadius() * 5,

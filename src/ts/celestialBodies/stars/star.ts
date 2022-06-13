@@ -1,13 +1,13 @@
 import { AbstractBody } from "../abstractBody";
 
-import { Mesh, MeshBuilder, Scene, Vector3, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import { Axis, Mesh, MeshBuilder, Scene, Vector3, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
 import { IStarPhysicalProperties } from "../iPhysicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
-import { normalRandom } from "../../utils/random";
+import { centeredRandom, normalRandom, randBool } from "../../utils/random";
 import { clamp } from "../../utils/math";
 
 // TODO: implement RigidBody for star
@@ -42,6 +42,13 @@ export class Star extends AbstractBody {
         };
         this.postProcesses.volumetricLight!.exposure = 0.26;
         this.postProcesses.volumetricLight!.decay = 0.95;
+
+        if (randBool(0.2, this.rng)) {
+            let rings = this.createRings(this, scene);
+            rings.settings.ringStart = normalRandom(3, 1, this.rng);
+            rings.settings.ringEnd = normalRandom(7, 1, this.rng);
+            rings.settings.ringOpacity = this.rng();
+        }
     }
 
     public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
