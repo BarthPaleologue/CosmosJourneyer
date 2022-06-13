@@ -46,18 +46,20 @@ const starSystemRand = alea(starSystemSeed.toString());
 
 const starSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER, starSystemRand);
 console.log("Star seed : ", starSeed);
-const randStar = alea(starSeed.toString());
 
+// TODO: generate radius inside body constructor
+const randStar = alea(starSeed.toString());
 const starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.2, 1.5) * Settings.PLANET_RADIUS * 100;
+
 const sun = new Star("Weierstrass", starRadius, starSystemManager, scene, starSeed);
-sun.rotate(Axis.Z, centeredRandom(randStar) / 2);
+sun.rotate(Axis.Z, centeredRandom(sun.rng) / 2);
 sun.translate(new Vector3(-9, 0, -17).scale(100000000));
 
-if (randBool(0.2, randStar)) {
+if (randBool(0.2, sun.rng)) {
     let rings = sun.createRings(sun, scene);
-    rings.settings.ringStart = normalRandom(3, 1, randStar);
-    rings.settings.ringEnd = normalRandom(7, 1, randStar);
-    rings.settings.ringOpacity = randStar();
+    rings.settings.ringStart = normalRandom(3, 1, sun.rng);
+    rings.settings.ringEnd = normalRandom(7, 1, sun.rng);
+    rings.settings.ringOpacity = sun.rng();
 }
 
 starfield.setStar(sun);
@@ -69,42 +71,42 @@ const planetRand = alea(planetSeed.toString());
 
 const planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, planetSeed);
 planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
-planet.physicalProperties.minTemperature = randRangeInt(-50, 5, planetRand);
-planet.physicalProperties.maxTemperature = randRangeInt(10, 50, planetRand);
-planet.physicalProperties.pressure = Math.max(normalRandom(1, 0.5, planetRand), 0);
-planet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planetRand), 0);
+planet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng);
+planet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng);
+planet.physicalProperties.pressure = Math.max(normalRandom(1, 0.5, planet.rng), 0);
+planet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planet.rng), 0);
 
 planet.oceanLevel = Settings.OCEAN_DEPTH * planet.physicalProperties.waterAmount * planet.physicalProperties.pressure;
 
 planet.translate(new Vector3(0, 0, 4 * planet.getRadius()));
 
-planet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRandom(planetRand) / 10, 0.37 + centeredRandom(planetRand) / 10, 0.024 + centeredRandom(planetRand) / 10);
-planet.material.colorSettings.beachSize = 250 + 100 * centeredRandom(planetRand);
+planet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRandom(planet.rng) / 10, 0.37 + centeredRandom(planetRand) / 10, 0.024 + centeredRandom(planetRand) / 10);
+planet.material.colorSettings.beachSize = 250 + 100 * centeredRandom(planet.rng);
 planet.material.updateManual();
 
-planet.terrainSettings.continentsFragmentation = clamp(normalRandom(0.5, 0.2, planetRand), 0, 1);
+planet.terrainSettings.continentsFragmentation = clamp(normalRandom(0.5, 0.2, planet.rng), 0, 1);
 
-planet.rotate(Axis.X, centeredRandom(planetRand) / 2);
+planet.rotate(Axis.X, centeredRandom(planet.rng) / 2);
 
 planet.createOcean(sun, scene);
 
-if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0 && randBool(0.8, planetRand)) {
+if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0 && randBool(0.8, planet.rng)) {
     let flatClouds = planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
     flatClouds.settings.cloudPower = 10 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure);
 }
 
 if (planet.physicalProperties.pressure > 0) {
     let atmosphere = planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
-    atmosphere.settings.redWaveLength *= 1 + centeredRandom(planetRand) / 3;
-    atmosphere.settings.greenWaveLength *= 1 + centeredRandom(planetRand) / 3;
-    atmosphere.settings.blueWaveLength *= 1 + centeredRandom(planetRand) / 3;
+    atmosphere.settings.redWaveLength *= 1 + centeredRandom(planet.rng) / 3;
+    atmosphere.settings.greenWaveLength *= 1 + centeredRandom(planet.rng) / 3;
+    atmosphere.settings.blueWaveLength *= 1 + centeredRandom(planet.rng) / 3;
 }
 
-if (randBool(0.6, planetRand)) {
+if (randBool(0.6, planet.rng)) {
     let rings = planet.createRings(sun, scene);
-    rings.settings.ringStart = 1.8 + 0.4 * centeredRandom(planetRand);
-    rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom(planetRand);
-    rings.settings.ringOpacity = planetRand();
+    rings.settings.ringStart = 1.8 + 0.4 * centeredRandom(planet.rng);
+    rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom(planet.rng);
+    rings.settings.ringOpacity = planet.rng();
 }
 
 let fxaa = new FxaaPostProcess("fxaa", 1, player.camera);
