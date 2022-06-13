@@ -1,5 +1,5 @@
 import { Vector3, Quaternion, Space, TransformNode, Scene } from "@babylonjs/core";
-import { BodyType } from "./interfaces";
+import { BodyType, Seedable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
 import { IPhysicalProperties } from "./iPhysicalProperties";
@@ -9,8 +9,10 @@ import { computeBarycenter, computePointOnOrbit } from "../utils/kepler";
 import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "./iOrbitalBody";
+import { unpackSeedToVector3 } from "../utils/random";
+import { alea } from "seedrandom";
 
-export abstract class AbstractBody implements IOrbitalBody {
+export abstract class AbstractBody implements IOrbitalBody, Seedable {
     protected abstract bodyType: BodyType;
 
     abstract physicalProperties: IPhysicalProperties;
@@ -19,14 +21,25 @@ export abstract class AbstractBody implements IOrbitalBody {
 
     readonly _starSystemManager: StarSystemManager;
 
-    readonly _name: string;
+    protected readonly _name: string;
+
+    protected readonly _seed: number;
+
+    readonly rng: () => number;
+
+    readonly _radius: number;
 
     readonly transform: TransformNode;
 
-    relevantBodies: IOrbitalBody[] = [];
+    readonly relevantBodies: IOrbitalBody[] = [];
 
-    protected constructor(name: string, starSystemManager: StarSystemManager) {
+    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number) {
         this._name = name;
+        this._seed = seed;
+        this._radius = radius;
+
+        this.rng = alea(seed.toString());
+
         this._starSystemManager = starSystemManager;
         starSystemManager.addBody(this);
 
@@ -37,7 +50,8 @@ export abstract class AbstractBody implements IOrbitalBody {
         this.orbitalProperties = {
             periapsis: this.getRadius() * 5,
             apoapsis: this.getRadius() * 5,
-            period: 0
+            period: 0,
+            orientationQuaternion: Quaternion.Identity()
         };
     }
 
@@ -71,7 +85,6 @@ export abstract class AbstractBody implements IOrbitalBody {
 
     public getRotationQuaternion(): Quaternion {
         if (this.transform.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.getName()}`);
-        if (this.transform.rotationQuaternion._isDirty) this.transform.computeWorldMatrix(true);
         return this.transform.rotationQuaternion;
     }
 
@@ -89,7 +102,9 @@ export abstract class AbstractBody implements IOrbitalBody {
     /**
      * Returns the radius of the celestial body
      */
-    public abstract getRadius(): number;
+    public getRadius(): number {
+        return this._radius;
+    }
 
     /**
      * Returns apparent radius of the celestial body (can be greater than the actual radius for example : ocean)
@@ -116,11 +131,16 @@ export abstract class AbstractBody implements IOrbitalBody {
     }
 
     public removeRelevantBody(body: IOrbitalBody): void {
-        let newRelevantBodies = [];
-        for (const relevantBody of this.relevantBodies) {
-            if (body != relevantBody) newRelevantBodies.push(relevantBody);
-        }
-        this.relevantBodies = newRelevantBodies;
+        const index = this.relevantBodies.indexOf(body);
+        if (index > -1) this.relevantBodies.splice(index, 1);
+    }
+
+    public getSeed(): number {
+        return this._seed;
+    }
+
+    public getSeed3(): Vector3 {
+        return Vector3.FromArray(unpackSeedToVector3(this.getSeed()));
     }
 
     /**
@@ -131,16 +151,13 @@ export abstract class AbstractBody implements IOrbitalBody {
      */
     public update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
         if (this.orbitalProperties.period > 0) {
-            let barycenter = computeBarycenter(this, this.relevantBodies);
+            const [barycenter, orientationQuaternion] = computeBarycenter(this, this.relevantBodies);
+            this.orbitalProperties.orientationQuaternion = orientationQuaternion;
 
-            let initialPosition = this.getAbsolutePosition().clone();
-            let newPosition = computePointOnOrbit(
-                barycenter,
-                this.orbitalProperties.periapsis,
-                this.orbitalProperties.apoapsis,
-                this.orbitalProperties.period,
-                this._starSystemManager.getTime()
-            );
+            //TODO: orient the planet accurately
+
+            const initialPosition = this.getAbsolutePosition().clone();
+            const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this._starSystemManager.getTime());
 
             if (player.isOrbiting(this)) player.translate(newPosition.subtract(initialPosition));
             this.setAbsolutePosition(newPosition);

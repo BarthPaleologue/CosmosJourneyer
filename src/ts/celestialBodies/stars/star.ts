@@ -7,11 +7,12 @@ import { StarSystemManager } from "../starSystemManager";
 import { IStarPhysicalProperties } from "../iPhysicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
+import { normalRandom } from "../../utils/random";
+import { clamp } from "../../utils/math";
 
 // TODO: implement RigidBody for star
 export class Star extends AbstractBody {
     private readonly mesh: Mesh;
-    private readonly radius: number;
     private readonly material: StarMaterial;
     internalTime = 0;
     protected bodyType = BodyType.STAR;
@@ -19,24 +20,17 @@ export class Star extends AbstractBody {
 
     public override postProcesses: StarPostProcesses;
 
-    constructor(
-        name: string,
-        radius: number,
-        starSystemManager: StarSystemManager,
-        scene: Scene,
-        physicalProperties: IStarPhysicalProperties = {
+    constructor(name: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, seed = 0) {
+        super(name, radius, starSystemManager, seed);
+        this.physicalProperties = {
             //TODO: ne pas hardcoder
             mass: 1000,
             rotationPeriod: 24 * 60 * 60,
 
-            temperature: 5778
-        }
-    ) {
-        super(name, starSystemManager);
-        this.physicalProperties = physicalProperties;
-        this.radius = radius;
+            temperature: clamp(normalRandom(5778, 2000, this.rng), 4000, 10000)
+        };
 
-        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius * 2, segments: 32 }, scene);
+        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this._radius * 2, segments: 32 }, scene);
         this.mesh.parent = this.transform;
 
         this.material = new StarMaterial(this, scene);
@@ -55,9 +49,5 @@ export class Star extends AbstractBody {
 
         this.internalTime += deltaTime;
         this.internalTime %= 24 * 60 * 60; // prevent imprecision in shader material (noise offset)
-    }
-
-    public getRadius(): number {
-        return this.radius;
     }
 }

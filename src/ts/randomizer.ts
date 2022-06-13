@@ -49,12 +49,7 @@ console.log("Star seed : ", starSeed);
 const randStar = alea(starSeed.toString());
 
 const starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.2, 1.5) * Settings.PLANET_RADIUS * 100;
-const sun = new Star("Weierstrass", starRadius, starSystemManager, scene, {
-    mass: 1000,
-    rotationPeriod: 60 * 60 * 24,
-
-    temperature: clamp(normalRandom(5778, 2000, randStar), 4000, 10000)
-});
+const sun = new Star("Weierstrass", starRadius, starSystemManager, scene, starSeed);
 sun.rotate(Axis.Z, centeredRandom(randStar) / 2);
 sun.translate(new Vector3(-9, 0, -17).scale(100000000));
 
@@ -143,7 +138,7 @@ scene.executeWhenReady(() => {
 
         deplacement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
 
-        starSystemManager.translateAllCelestialBody(deplacement);
+        starSystemManager.translateAllBodies(deplacement);
 
         if (!collisionWorker.isBusy() && player.isOrbiting()) {
             if (player.nearestBody?.getBodyType() == BodyType.SOLID) {

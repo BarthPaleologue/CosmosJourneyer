@@ -231,6 +231,18 @@ export class PlayerController implements ITransformable {
         this.transform.rotate(axis, amount, Space.WORLD);
     }
 
+    public positionNearBody(body: AbstractBody): void {
+        const dir = body.getAbsolutePosition();
+        const dist = dir.length();
+        dir.normalize();
+        this.setAbsolutePosition(dir.scale(dist - body.getRadius() * 3));
+
+        body._starSystemManager.translateAllBodies(this.getAbsolutePosition().negate());
+        this.translate(this.getAbsolutePosition().negate());
+
+        this.transform.lookAt(body.getAbsolutePosition());
+    }
+
     /**
      * If the parameter is unset, returns whereas the player is orbiting a body, if the parameter is set returns if the player orbits the given body
      * @param body

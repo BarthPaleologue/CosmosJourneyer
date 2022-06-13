@@ -1,5 +1,4 @@
 import { AbstractBody } from "../abstractBody";
-import { Seedable } from "../interfaces";
 import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { Star } from "../stars/star";
 import { Scene, Vector3 } from "@babylonjs/core";
@@ -9,36 +8,19 @@ import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanP
 import { StarSystemManager } from "../starSystemManager";
 import { IPlanetPhysicalProperties } from "../iPhysicalProperties";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
-import { unpackSeedToVector3 } from "../../utils/random";
 
-export abstract class AbstractPlanet extends AbstractBody implements Seedable {
-    readonly _radius: number;
-    protected readonly _seed: number;
+export abstract class AbstractPlanet extends AbstractBody {
     abstract override physicalProperties: IPlanetPhysicalProperties;
     public override postProcesses: PlanetPostProcesses;
 
-    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed = 0) {
-        super(name, starSystemManager);
-        this._radius = radius;
-        this._seed = seed;
+    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number) {
+        super(name, radius, starSystemManager, seed);
         this.postProcesses = {
             atmosphere: null,
             ocean: null,
             clouds: null,
             rings: null
         };
-    }
-
-    public getSeed(): number {
-        return this._seed;
-    }
-
-    public getSeed3(): Vector3 {
-        return Vector3.FromArray(unpackSeedToVector3(this.getSeed()));
-    }
-
-    public override getRadius(): number {
-        return this._radius;
     }
 
     public createAtmosphere(atmosphereHeight: number, star: Star, scene: Scene): AtmosphericScatteringPostProcess {

@@ -1,4 +1,4 @@
-import { Axis, Color3, FxaaPostProcess, Texture, Tools, Vector3 } from "@babylonjs/core";
+import { Axis, Color3, FxaaPostProcess, Quaternion, Texture, Tools, Vector3 } from "@babylonjs/core";
 
 import { SolidPlanet } from "./celestialBodies/planets/solidPlanet";
 import { Star } from "./celestialBodies/stars/star";
@@ -42,17 +42,23 @@ let starSystem = new StarSystemManager(Settings.VERTEX_RESOLUTION);
 
 let starfield = new StarfieldPostProcess("starfield", scene);
 
-let sun = new Star("Weierstrass", 200 * Settings.PLANET_RADIUS, starSystem, scene);
-sun.translate(new Vector3(-1, 0, -1).normalizeToNew().scale(Settings.PLANET_RADIUS * 10000));
+let sun = new Star("Weierstrass", 2 * Settings.PLANET_RADIUS, starSystem, scene, 788);
+sun.translate(new Vector3(-1, 0, -1).normalizeToNew().scale(Settings.PLANET_RADIUS * 100));
 
 starfield.setStar(sun);
 
-let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene);
+let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene, 1234567890);
 planet.rotate(Axis.X, 0.2);
 
 planet.physicalProperties.rotationPeriod /= 50;
 
-planet.translate(new Vector3(0, 0, 3 * planet.getRadius()));
+planet.orbitalProperties = {
+    period: 60 * 60 * 24 * 365.25,
+    apoapsis: 80 * planet.getRadius(),
+    periapsis: 75 * planet.getRadius(),
+    orientationQuaternion: Quaternion.Identity()
+};
+planet.addRelevantBody(sun);
 
 planet.createOcean(sun, scene);
 planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
@@ -70,9 +76,11 @@ moon.physicalProperties.waterAmount = 0.5;
 moon.orbitalProperties = {
     period: moon.physicalProperties.rotationPeriod,
     apoapsis: 6 * planet.getRadius(),
-    periapsis: 5 * planet.getRadius()
+    periapsis: 5 * planet.getRadius(),
+    orientationQuaternion: Quaternion.Identity()
 };
 moon.addRelevantBody(planet);
+planet.addRelevantBody(moon);
 
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
@@ -83,9 +91,6 @@ moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap!);
 moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
 moon.material.updateManual();
 
-moon.translate(new Vector3(moon.orbitalProperties.periapsis, 0, 0));
-moon.translate(planet.getAbsolutePosition());
-
 let ares = new SolidPlanet("ares", Settings.PLANET_RADIUS, starSystem, scene);
 ares.physicalProperties.mass = 7;
 ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
@@ -94,7 +99,13 @@ ares.physicalProperties.maxTemperature = 20;
 ares.physicalProperties.pressure = 0.5;
 ares.physicalProperties.waterAmount = 0.3;
 
-ares.translate(new Vector3(-1.5, 0, 2).scale(Settings.PLANET_RADIUS * 30));
+ares.orbitalProperties = {
+    period: 60 * 60 * 24 * 430,
+    periapsis: 90 * ares.getRadius(),
+    apoapsis: 95 * ares.getRadius(),
+    orientationQuaternion: Quaternion.Identity()
+};
+ares.addRelevantBody(sun);
 
 ares.terrainSettings.continentsFragmentation = 0.5;
 ares.terrainSettings.continentBaseHeight = 5e3;
@@ -109,7 +120,7 @@ ares.oceanLevel = Settings.OCEAN_DEPTH * ares.physicalProperties.waterAmount * a
 
 ares.material.updateManual();
 
-let aresAtmosphere = ares.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene); // = new AtmosphericScatteringPostProcess("atmosphere", ares, radius + 70e3, sun, scene);
+let aresAtmosphere = ares.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
 aresAtmosphere.settings.redWaveLength = 500;
 aresAtmosphere.settings.greenWaveLength = 680;
 aresAtmosphere.settings.blueWaveLength = 670;
@@ -122,6 +133,7 @@ let collisionWorker = new CollisionWorker(player, starSystem);
 
 // update to current date
 starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
+player.positionNearBody(planet);
 
 function updateScene() {
     const deltaTime = engine.getDeltaTime() / 1000;
@@ -135,7 +147,7 @@ function updateScene() {
 
     let playerMovement = player.listenToGamepad(gamepad, deltaTime);
     playerMovement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
-    starSystem.translateAllCelestialBody(playerMovement);
+    starSystem.translateAllBodies(playerMovement);
 
     starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime * Settings.TIME_MULTIPLIER);
 

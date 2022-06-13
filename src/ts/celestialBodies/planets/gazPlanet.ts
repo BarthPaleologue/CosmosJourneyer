@@ -11,8 +11,8 @@ export class GazPlanet extends AbstractPlanet {
 
     override readonly physicalProperties: IPlanetPhysicalProperties;
 
-    constructor(name: string, radius: number, starSystemManager: StarSystemManager) {
-        super(name, radius, starSystemManager);
+    constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed = 0) {
+        super(name, radius, starSystemManager, seed);
         this.physicalProperties = {
             // FIXME: choose physically accurates values
             mass: 20,

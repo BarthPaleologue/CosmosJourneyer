@@ -1,7 +1,9 @@
 // from https://www.youtube.com/watch?v=UXD97l7ZT0w
 
-import { Vector3 } from "@babylonjs/core";
+import { Axis, Quaternion, Vector3 } from "@babylonjs/core";
 import { IOrbitalBody } from "../celestialBodies/iOrbitalBody";
+import { IOrbitalProperties } from "../celestialBodies/iOrbitalProperties";
+import { stripAxisFromQuaternion } from "./algebra";
 
 /**
  * Returns 0 when the arguments are solution to the Kepler's equation
@@ -29,38 +31,41 @@ export function solveKepler(M: number, e: number) {
     return guess;
 }
 
-function hermiteCorrector(x: number, n: number): number {
-    return 4 * x ** 3 + (-4 - 4 / n) * x ** 2 + (1 + 4 / n) * x;
-}
-
-export function computeBarycenter(body: IOrbitalBody, relevantBodies: IOrbitalBody[]): Vector3 {
-    let barycenter = body.getAbsolutePosition().scale(body.physicalProperties.mass);
-    let sum = body.physicalProperties.mass;
+export function computeBarycenter(body: IOrbitalBody, relevantBodies: IOrbitalBody[]): [Vector3, Quaternion] {
+    const barycenter = body.getAbsolutePosition().scale(body.physicalProperties.mass);
+    const meanQuaternion = Quaternion.Zero();
+    let sumPosition = body.physicalProperties.mass;
+    let sumQuaternion = 0;
     for (const otherBody of relevantBodies) {
         const mass = otherBody.physicalProperties.mass;
         barycenter.addInPlace(otherBody.getAbsolutePosition().scale(mass));
-        sum += mass;
+        meanQuaternion.addInPlace(stripAxisFromQuaternion(otherBody.getRotationQuaternion(), Axis.Y).scale(mass));
+        sumPosition += mass;
+        sumQuaternion += mass;
     }
-    if (sum > 0) barycenter.scaleInPlace(1 / sum);
-    return barycenter;
+    if (sumPosition > 0) {
+        barycenter.scaleInPlace(1 / sumPosition);
+    }
+    if (sumQuaternion > 0) meanQuaternion.normalize();
+    else meanQuaternion.copyFromFloats(0, 0, 0, 1);
+
+    return [barycenter, meanQuaternion];
 }
 
-export function computePointOnOrbit(centerOfMass: Vector3, periapsis: number, apoapsis: number, period: number, t: number): Vector3 {
-    let semiMajorLength = (periapsis + apoapsis) / 2;
-    let linearEccentricity = semiMajorLength - periapsis;
-    let eccentricity = linearEccentricity / semiMajorLength;
+export function computePointOnOrbit(centerOfMass: Vector3, settings: IOrbitalProperties, t: number): Vector3 {
+    const semiMajorLength = (settings.periapsis + settings.apoapsis) / 2;
+    const linearEccentricity = semiMajorLength - settings.periapsis;
+    const eccentricity = linearEccentricity / semiMajorLength;
 
-    let semiMinorLength = Math.sqrt(semiMajorLength ** 2 - linearEccentricity ** 2);
-    let ellipseCenterX = centerOfMass.x - linearEccentricity;
-    let ellipseCenterY = centerOfMass.y;
-    let ellipseCenterZ = centerOfMass.z;
+    const semiMinorLength = Math.sqrt(semiMajorLength ** 2 - linearEccentricity ** 2);
 
-    let meanAnomaly = (Math.PI * 2 * t) / period;
-    let eccentricAnomaly = solveKepler(meanAnomaly, eccentricity);
+    const ellipseCenter = new Vector3(centerOfMass.x - linearEccentricity, centerOfMass.y, centerOfMass.z);
 
-    let pointX = Math.cos(eccentricAnomaly) * semiMajorLength + ellipseCenterX;
-    let pointY = ellipseCenterY;
-    let pointZ = Math.sin(eccentricAnomaly) * semiMinorLength + ellipseCenterZ;
+    const meanAnomaly = (Math.PI * 2 * t) / settings.period;
+    const eccentricAnomaly = solveKepler(meanAnomaly, eccentricity);
 
-    return new Vector3(pointX, pointY, pointZ);
+    const relativePosition = new Vector3(Math.cos(eccentricAnomaly) * semiMajorLength, 0, Math.sin(eccentricAnomaly) * semiMinorLength);
+    relativePosition.applyRotationQuaternionInPlace(settings.orientationQuaternion);
+
+    return relativePosition.add(ellipseCenter);
 }

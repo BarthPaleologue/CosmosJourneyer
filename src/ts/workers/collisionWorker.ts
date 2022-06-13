@@ -1,7 +1,7 @@
 import { CollisionData } from "../chunks/workerDataInterfaces";
 import { StarSystemManager } from "../celestialBodies/starSystemManager";
 import { PlayerController } from "../player/playerController";
-import { RigidBody} from "../celestialBodies/interfaces";
+import { RigidBody } from "../celestialBodies/interfaces";
 import { ITransformable } from "../celestialBodies/iTransformable";
 
 export class CollisionWorker {
@@ -27,7 +27,7 @@ export class CollisionWorker {
 
             let deviation = newPosition.subtract(currentPosition);
 
-            planetManager.translateAllCelestialBody(deviation);
+            planetManager.translateAllBodies(deviation);
 
             this._busy = false;
         };

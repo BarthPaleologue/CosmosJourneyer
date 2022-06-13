@@ -6,7 +6,7 @@ import { AbstractBody } from "./abstractBody";
 
 export class StarSystemManager {
     private readonly _chunkForge: ChunkForge;
-    private readonly _celestialBodies: AbstractBody[] = [];
+    private readonly _bodies: AbstractBody[] = [];
 
     private clock: number = 0;
 
@@ -15,17 +15,17 @@ export class StarSystemManager {
     }
 
     public addBody(body: AbstractBody) {
-        this._celestialBodies.push(body);
+        this._bodies.push(body);
     }
 
-    public translateAllCelestialBody(deplacement: Vector3): void {
-        for (const planet of this._celestialBodies) {
+    public translateAllBodies(deplacement: Vector3): void {
+        for (const planet of this._bodies) {
             planet.setAbsolutePosition(planet.getAbsolutePosition().add(deplacement));
         }
     }
 
     public rotateAllAround(pivot: Vector3, axis: Vector3, amount: number) {
-        for (const planet of this._celestialBodies) {
+        for (const planet of this._bodies) {
             planet.rotateAround(pivot, axis, amount);
         }
     }
@@ -38,7 +38,7 @@ export class StarSystemManager {
      * Returns the list of all celestial bodies managed by the star system manager
      */
     public getBodies(): AbstractBody[] {
-        return this._celestialBodies;
+        return this._bodies;
     }
 
     /**
@@ -63,7 +63,7 @@ export class StarSystemManager {
         //FIXME: use point
         if (this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
         let nearest = null;
-        for (const body of this._celestialBodies) {
+        for (const body of this._bodies) {
             if (nearest == null) nearest = body;
             else if (body.physicalProperties.mass / body.getAbsolutePosition().lengthSquared() > nearest.physicalProperties.mass / nearest.getAbsolutePosition().lengthSquared()) {
                 nearest = body;
@@ -82,7 +82,7 @@ export class StarSystemManager {
         this._chunkForge.update(depthRenderer);
         for (const body of this.getBodies()) body.update(player, lightOrigin, deltaTime);
 
-        this.translateAllCelestialBody(player.getAbsolutePosition().scale(-1));
+        this.translateAllBodies(player.getAbsolutePosition().scale(-1));
         player.translate(player.getAbsolutePosition().scale(-1));
     }
 }

@@ -1,3 +1,5 @@
+import { Quaternion } from "@babylonjs/core";
+
 export interface IOrbitalProperties {
     /**
      * The lowest distance to the barycenter of the orbit
@@ -13,4 +15,9 @@ export interface IOrbitalProperties {
      * The duration it takes for the body to make one orbit
      */
     period: number;
+
+    /**
+     * The orientation of the orbit (inclination + precession)
+     */
+    orientationQuaternion: Quaternion;
 }

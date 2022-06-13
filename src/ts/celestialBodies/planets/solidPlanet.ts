@@ -3,7 +3,7 @@ import { Direction } from "../../utils/direction";
 import { TerrainSettings } from "../../terrain/terrainSettings";
 import { AbstractPlanet } from "./abstractPlanet";
 
-import { Scene, Vector3 } from "@babylonjs/core";
+import { Color3, MeshBuilder, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
 
 import { BodyType, RigidBody } from "../interfaces";
 import { CollisionData } from "../../chunks/workerDataInterfaces";

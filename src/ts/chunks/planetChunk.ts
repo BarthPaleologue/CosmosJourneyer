@@ -47,11 +47,6 @@ export class PlanetChunk {
         // note : on sphérise après car le worker script calcule les positions à partir du cube
         this.mesh.position.normalize();
         this.mesh.position.scaleInPlace(tree.planet.getRadius());
-
-        /*let debugMaterial = new StandardMaterial(`rand${id}`);
-        debugMaterial.emissiveColor = Color3.Random();
-
-        this.mesh.material = debugMaterial;*/
     }
 
     public isReady() {
