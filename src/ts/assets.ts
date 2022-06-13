@@ -1,4 +1,4 @@
-import { Scene, Texture } from "@babylonjs/core";
+import { Color3, Scene, StandardMaterial, Texture } from "@babylonjs/core";
 
 import rockNormalMap from "../asset/textures/rockn.png";
 import dirtNormalMap from "../asset/textures/dirt/Ground_Dirt_008_normal.jpg";
@@ -23,6 +23,9 @@ export class Assets {
     static SandNormalMap2: Texture | null;
     static WaterNormalMap1: Texture | null;
     static WaterNormalMap2: Texture | null;
+
+    static DebugMaterial: StandardMaterial | null;
+
     static Init(scene: Scene) {
         console.log("Initializing assets...");
         Assets.RockNormalMap = new Texture(rockNormalMap, scene);
@@ -35,6 +38,10 @@ export class Assets {
         Assets.SandNormalMap2 = new Texture(sandNormalMap2, scene);
         Assets.WaterNormalMap1 = new Texture(waterNormal1, scene);
         Assets.WaterNormalMap2 = new Texture(waterNormal2, scene);
+
+        Assets.DebugMaterial = new StandardMaterial("DebugMaterial");
+        Assets.DebugMaterial.emissiveColor = Color3.Random();
+
         console.log("Assets initialized.");
         Assets.IS_READY = true;
     }
