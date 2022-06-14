@@ -59,8 +59,7 @@ export class ChunkForge {
             direction: task.direction,
             position: [task.position.x, task.position.y, task.position.z],
             terrainSettings: task.planet.terrainSettings,
-            seed: task.planet.getSeed(),
-            seedOffset: task.planet.getSeed3()
+            seed: task.planet.getSeed()
         };
 
         worker.postMessage(buildData);

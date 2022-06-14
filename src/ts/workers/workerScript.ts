@@ -38,15 +38,16 @@ function initLayers() {
 
 initLayers();
 
-function terrainFunction(position: LVector3, gradient: LVector3, seed: LVector3): void {
-    const unitCoords = position.normalize();
+function terrainFunction(samplePoint: LVector3, gradient: LVector3, seed: number): void {
+    const unitCoords = samplePoint.normalize();
 
-    const samplePoint = position.add(seed);
+    // TODO: do not hardcode
+    const usableSeed = seed;
 
     let elevation = 0;
 
     let continentGradient = LVector3.Zero();
-    let continentMask = continentsLayer(samplePoint, continentGradient);
+    let continentMask = continentsLayer(samplePoint, usableSeed, continentGradient);
 
     let continentElevation = continentMask * terrainSettings.continentBaseHeight;
 
@@ -55,7 +56,7 @@ function terrainFunction(position: LVector3, gradient: LVector3, seed: LVector3)
     gradient.addInPlace(continentGradient);
 
     let mountainGradient = LVector3.Zero();
-    let mountainElevation = mountainsLayer(samplePoint, mountainGradient);
+    let mountainElevation = mountainsLayer(samplePoint, usableSeed, mountainGradient);
 
     mountainElevation = tanhSharpen(mountainElevation, 3, mountainGradient);
 
@@ -64,13 +65,13 @@ function terrainFunction(position: LVector3, gradient: LVector3, seed: LVector3)
     gradient.addInPlace(mountainGradient);
 
     let bumpyGradient = LVector3.Zero();
-    let bumpyElevation = bumpyLayer(samplePoint, bumpyGradient);
+    let bumpyElevation = bumpyLayer(samplePoint, usableSeed, bumpyGradient);
 
     elevation += bumpyElevation * terrainSettings.maxBumpHeight;
     bumpyGradient.scaleInPlace(terrainSettings.maxBumpHeight);
     gradient.addInPlace(bumpyGradient);
 
-    position.addInPlace(unitCoords.scale(elevation));
+    samplePoint.addInPlace(unitCoords.scale(elevation));
 
     gradient.divideInPlace(terrainSettings.continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
 }
@@ -80,7 +81,7 @@ function buildChunkVertexData(data: BuildData): void {
     const depth = data.depth;
     const direction = data.direction;
     const chunkPosition = new LVector3(data.position[0], data.position[1], data.position[2]);
-    const seedOffset = new LVector3(data.seedOffset[0],data.seedOffset[1],data.seedOffset[2]);
+    const seed = data.seed;
 
     if (data.planetName != currentPlanetID) {
         currentPlanetID = data.planetName;
@@ -125,7 +126,7 @@ function buildChunkVertexData(data: BuildData): void {
 
             // on applique la fonction de terrain
             let vertexGradient = LVector3.Zero();
-            terrainFunction(vertexPosition, vertexGradient, seedOffset);
+            terrainFunction(vertexPosition, vertexGradient, seed);
 
             let h = vertexGradient;
             h.subtractInPlace(unitSphereCoords.scale(LVector3.Dot(vertexGradient, unitSphereCoords)));
@@ -175,7 +176,7 @@ function buildChunkVertexData(data: BuildData): void {
     );
 }
 
-function sendHeightAtPoint(point: LVector3, seed: LVector3): void {
+function sendHeightAtPoint(point: LVector3, seed: number): void {
     terrainFunction(point, LVector3.Zero(), seed);
 
     self.postMessage({
@@ -209,12 +210,12 @@ self.onmessage = (e) => {
                 initLayers();
             }
 
-            const seedOffset = new LVector3(data.seedOffset[0], data.seedOffset[1], data.seedOffset[2]);
+            const seed = data.seed;
 
             const samplePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
             samplePosition.setMagnitudeInPlace(data.planetDiameter / 2);
 
-            sendHeightAtPoint(samplePosition, seedOffset);
+            sendHeightAtPoint(samplePosition, seed);
             break;
 
         default:

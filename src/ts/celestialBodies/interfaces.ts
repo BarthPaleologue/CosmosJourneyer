@@ -7,12 +7,11 @@ export enum BodyType {
     GAZ
 }
 
-export interface Seedable {
+export interface ISeedable {
     /**
      * Returns the seed of the planet
      */
     getSeed(): number;
-    getSeed3(): number[];
 }
 
 /**

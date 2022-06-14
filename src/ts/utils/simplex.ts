@@ -852,7 +852,7 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
  * @param gradient the recipient for the gradient (will be overridden)
  * @param seed an offset along the 4th dimension
  */
-export function simplex401(vector: IVector3Like, gradient?: LVector3, seed = 0): number {
+export function simplex401(vector: IVector3Like, seed: number, gradient?: LVector3): number {
     let noiseValue = sdnoise4(vector.x, vector.y, vector.z, seed, gradient);
 
     // [0,1] is half the length of [-1,1]
@@ -866,6 +866,6 @@ export function simplex401(vector: IVector3Like, gradient?: LVector3, seed = 0):
  * @param gradient the recipient for the gradient (will be overridden)
  * @param seed an offset along the 4th dimension
  */
-export function simplex411(vector: IVector3Like, gradient?: IVector3Like, seed = 0): number {
+export function simplex411(vector: IVector3Like, seed: number, gradient?: IVector3Like): number {
     return sdnoise4(vector.x, vector.y, vector.z, seed, gradient);
 }

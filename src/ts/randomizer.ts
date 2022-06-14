@@ -10,7 +10,7 @@ import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystemManager } from "./celestialBodies/starSystemManager";
 
-import { centeredRandom, normalRandom, randBool, randRangeInt, unpackSeedToArray3 } from "./utils/random";
+import { centeredRandom, normalRandom, randBool, randRange, randRangeInt, unpackSeedToArray3 } from "./utils/random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Star } from "./celestialBodies/stars/star";
 import { Settings } from "./settings";
@@ -44,7 +44,7 @@ const starSystemManager = new StarSystemManager(Settings.VERTEX_RESOLUTION);
 const starSystemSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER);
 const starSystemRand = alea(starSystemSeed.toString());
 
-const starSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER, starSystemRand);
+const starSeed = randRange(-1e9, 1e9, starSystemRand);
 console.log("Star seed : ", starSeed);
 
 // TODO: generate radius inside body constructor
@@ -56,12 +56,15 @@ sun.translate(new Vector3(-9, 0, -17).scale(100000000));
 
 starfield.setStar(sun);
 
-const planetSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER, starSystemRand);
+const planetSeed = randRange(-1e9, 1e9, starSystemRand); //randRangeInt(0, Number.MAX_SAFE_INTEGER, starSystemRand);
 console.log("Planet seed : ", planetSeed);
-console.log("UNPACKED", unpackSeedToArray3(planetSeed));
 const planetRand = alea(planetSeed.toString());
 
 const planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, planetSeed);
+planet.addRelevantBody(sun);
+
+console.table(planet.orbitalProperties);
+
 planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
 planet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng);
 planet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng);
@@ -70,7 +73,6 @@ planet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planet.rng
 
 planet.oceanLevel = Settings.OCEAN_DEPTH * planet.physicalProperties.waterAmount * planet.physicalProperties.pressure;
 
-planet.translate(new Vector3(0, 0, 4 * planet.getRadius()));
 
 planet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRandom(planet.rng) / 10, 0.37 + centeredRandom(planetRand) / 10, 0.024 + centeredRandom(planetRand) / 10);
 planet.material.colorSettings.beachSize = 250 + 100 * centeredRandom(planet.rng);
@@ -112,6 +114,11 @@ document.addEventListener("keydown", (e) => {
 });
 
 let collisionWorker = new CollisionWorker(player, starSystemManager);
+
+starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
+starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
+starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
+player.positionNearBody(planet);
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();

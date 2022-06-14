@@ -19,7 +19,6 @@ uniform vec3 v3CameraPos; // camera position in world space
 uniform vec3 v3LightPos; // light position in world space
 
 uniform vec3 planetPosition; // nécessaire temporairement le temps de régler le problème des floats
-uniform mat4 planetWorldMatrix;
 
 uniform vec4 planetInverseRotationQuaternion;
 uniform float planetRadius;
@@ -50,8 +49,7 @@ void main() {
     
     vPositionW = vec3(world * vec4(position, 1.0));
     vNormalW = vec3(world * vec4(normal, 0.0));
-	
-	//vPosition = vec3(inverse(planetWorldMatrix) * vec4(vPositionW, 1.0));
+
 	vPosition = vPositionW - planetPosition;
 
 

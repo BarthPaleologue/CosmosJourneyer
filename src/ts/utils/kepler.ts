@@ -69,3 +69,19 @@ export function computePointOnOrbit(centerOfMass: Vector3, settings: IOrbitalPro
 
     return relativePosition.add(ellipseCenter);
 }
+
+/**
+ *
+ * @param periapsis
+ * @param apoapsis
+ * @param otherBodies
+ * @see https://www.wikiwand.com/fr/Lois_de_Kepler#/Troisi%C3%A8me_loi_%E2%80%93_Loi_des_p%C3%A9riodes
+ */
+export function getOrbitalPeriod(periapsis: number, apoapsis: number, otherBodies: IOrbitalBody[]) {
+    const a = (periapsis + apoapsis) / 2;
+    const G = 1;
+    let M = 0;
+    for(const otherBody of otherBodies) M += otherBody.physicalProperties.mass;
+    if(M == 0) return 0;
+    return Math.sqrt(4 * Math.PI ** 2 * a ** 3 / (G * M));
+}

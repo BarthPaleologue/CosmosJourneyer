@@ -1,4 +1,11 @@
-import { Axis, Color3, FxaaPostProcess, Quaternion, Texture, Tools, Vector3 } from "@babylonjs/core";
+import {
+    Color3,
+    FxaaPostProcess, LensFlare, LensFlareSystem,
+    Quaternion,
+    Texture,
+    Tools,
+    Vector3
+} from "@babylonjs/core";
 
 import { SolidPlanet } from "./celestialBodies/planets/solidPlanet";
 import { Star } from "./celestialBodies/stars/star";
@@ -13,6 +20,8 @@ import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystemManager } from "./celestialBodies/starSystemManager";
 
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
+
+import lensFlare from "../asset/lensflare.png";
 
 import "../styles/index.scss";
 
@@ -42,22 +51,35 @@ let starSystem = new StarSystemManager(Settings.VERTEX_RESOLUTION);
 
 let starfield = new StarfieldPostProcess("starfield", scene);
 
-let sun = new Star("Weierstrass", 2 * Settings.PLANET_RADIUS, starSystem, scene, 788);
-sun.translate(new Vector3(-1, 0, -1).normalizeToNew().scale(Settings.PLANET_RADIUS * 100));
+let sun = new Star("Weierstrass", Settings.PLANET_RADIUS, starSystem, scene, 788);
+sun.orbitalProperties.period = 60 * 60 * 24;
+starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 
 starfield.setStar(sun);
 
-let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene, 1234567882);
+/*const lensFlareSystem = new LensFlareSystem("lensFlareSystem", sun.transform, scene);
+const flare00 = new LensFlare(
+    1.5, // size
+    0, // position
+    new Color3(1, 1, 1), // color
+    lensFlare, // texture
+    lensFlareSystem // lens flare system
+);*/
+
+
+let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene, 1e9);
 
 planet.physicalProperties.rotationPeriod /= 50;
 
 planet.orbitalProperties = {
     period: 60 * 60 * 24 * 365.25,
-    apoapsis: 80 * planet.getRadius(),
-    periapsis: 75 * planet.getRadius(),
+    apoapsis: 40 * planet.getRadius(),
+    periapsis: 35 * planet.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
 planet.addRelevantBody(sun);
+sun.addRelevantBody(planet);
+starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 
 planet.createOcean(sun, scene);
 planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
@@ -80,6 +102,7 @@ moon.orbitalProperties = {
 };
 moon.addRelevantBody(planet);
 planet.addRelevantBody(moon);
+starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
@@ -90,7 +113,7 @@ moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap!);
 moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
 moon.material.updateManual();
 
-let ares = new SolidPlanet("ares", Settings.PLANET_RADIUS, starSystem, scene);
+let ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene);
 ares.physicalProperties.mass = 7;
 ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 ares.physicalProperties.minTemperature = -80;
@@ -100,11 +123,13 @@ ares.physicalProperties.waterAmount = 0.3;
 
 ares.orbitalProperties = {
     period: 60 * 60 * 24 * 430,
-    periapsis: 90 * ares.getRadius(),
-    apoapsis: 95 * ares.getRadius(),
+    periapsis: 50 * ares.getRadius(),
+    apoapsis: 51 * ares.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
 ares.addRelevantBody(sun);
+sun.addRelevantBody(ares);
+starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 
 ares.terrainSettings.continentsFragmentation = 0.5;
 ares.terrainSettings.continentBaseHeight = 5e3;
@@ -132,7 +157,13 @@ let collisionWorker = new CollisionWorker(player, starSystem);
 
 // update to current date
 starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
+
 player.positionNearBody(planet);
+
+/*const trail = new TrailMesh(`trail`, moon.transform, scene, 100e3, 200, false);
+trail.material = Assets.DebugMaterial;
+trail.start();
+depthRenderer.getDepthMap().renderList!.push(trail);*/
 
 function updateScene() {
     const deltaTime = engine.getDeltaTime() / 1000;

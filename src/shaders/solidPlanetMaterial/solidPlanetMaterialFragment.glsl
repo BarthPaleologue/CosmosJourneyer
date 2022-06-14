@@ -43,7 +43,7 @@ uniform sampler2D snowNormalMap2;
 
 uniform sampler2D steepNormalMap;
 
-uniform vec3 seed;
+uniform float seed;
 
 uniform float planetRadius; // planet radius
 uniform float waterLevel; // controls sand layer
@@ -67,7 +67,7 @@ uniform float maxTemperature;
 
 uniform float waterAmount;
 
-#pragma glslify: completeNoise = require(../utils/noise.glsl)
+#pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl)
 
 #pragma glslify: fastAcos = require(../utils/fastAcos.glsl)
 
@@ -156,7 +156,7 @@ vec3 computeColorAndNormal(
 		// séparation biome désert biome plaine
 		float moistureSharpness = 20.0;
 		float moistureFactor = tanherpFactor(moisture01, moistureSharpness);
-		vec3 plainColor = tanherp(plainColor, 0.7 * plainColor, completeNoise(vSamplePoint / 10000.0, 1, 2.0, 2.0), 3.0);
+		vec3 plainColor = tanherp(plainColor, 0.7 * plainColor, fractalSimplex4(vec4(vSamplePoint, 0.0) / 10000.0, 1, 2.0, 2.0), 3.0);
 
 		vec3 flatColor = lerp(plainColor, desertColor, moistureFactor);
 
@@ -255,10 +255,9 @@ void main() {
 	vec3 sphereNormalW = vSphereNormalW;
 	float ndl = max(0.002, dot(sphereNormalW, lightRayW));
 
-	// la unitPosition ne prend pas en compte la rotation de la planète
-	vec3 seededSamplePoint = vUnitSamplePoint + normalize(seed);//normalize(unitPosition + normalize(seed));
+	// FIXME: remove scaling
+	vec4 seededSamplePoint = vec4(vUnitSamplePoint, seed / 1e13);
 
-	// TODO: this is no longer accurate (not using inverse matrix)
 	float latitude = vUnitSamplePoint.y;
 	float absLatitude01 = abs(latitude);
 	
@@ -305,7 +304,7 @@ void main() {
 	temperature01 *= exp(-elevation01 * temperatureHeightFalloff);
 
 	// added random fluctuations
-	temperature01 += (completeNoise(vUnitSamplePoint * 300.0, 5, 1.7, 2.5) - 0.5) / 4.0;
+	temperature01 += (fractalSimplex4(vec4(vUnitSamplePoint,0.0) * 300.0, 5, 1.7, 2.5) - 0.5) / 4.0;
 
 	// temperature drops during nighttime (more ice)
 	temperature01 *= ndl * temperatureRotationFactor + 1.0 - temperatureRotationFactor;
@@ -319,10 +318,10 @@ void main() {
 	float moisture01 = 0.0; // 0.0 = sec, 1.0 = humid : sec par défaut
 	if(waterMeltingPoint01 < 1.0) {
 		// if there is liquid water on the surface
-		moisture01 += completeNoise(seededSamplePoint * 2.0, 5, 1.7, 2.2) * sqrt(1.0-waterMeltingPoint01) * waterBoilingPoint01;
+		moisture01 += fractalSimplex4(seededSamplePoint * 2.0, 5, 1.7, 2.2) * sqrt(1.0-waterMeltingPoint01) * waterBoilingPoint01;
 	}
 	if(pressure == 0.0) {
-	    moisture01 += completeNoise(seededSamplePoint * 5.0, 5, 1.7, 2.2);
+	    moisture01 += fractalSimplex4(seededSamplePoint * 5.0, 5, 1.7, 2.2);
 	}
 	moisture01 = clamp(moisture01, 0.0, 1.0);
 

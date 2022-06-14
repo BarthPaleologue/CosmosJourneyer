@@ -21,6 +21,7 @@ export class PlanetChunk {
 
         this.mesh = new Mesh(`Chunk${id}`, tree.planet.transform.getScene());
         this.mesh.setEnabled(false);
+        this.mesh.isBlocker = true;
         this.mesh.material = tree.planet.material;
         this.mesh.parent = tree.planet.transform;
 

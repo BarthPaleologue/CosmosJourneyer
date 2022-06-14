@@ -9,7 +9,6 @@ export interface WorkerData {
     terrainSettings: TerrainSettings;
     position: number[];
     seed: number;
-    seedOffset: number[];
 }
 
 export interface BuildData extends WorkerData {

@@ -1,22 +1,18 @@
-import { Vector3, Quaternion, Space, TransformNode, Scene, Axis } from "@babylonjs/core";
-import { BodyType, Seedable } from "./interfaces";
+import { Vector3, Quaternion, Space, TransformNode, Scene, Axis, TrailMesh } from "@babylonjs/core";
+import { BodyType, ISeedable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
 import { IPhysicalProperties } from "./iPhysicalProperties";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalProperties } from "./iOrbitalProperties";
-import { computeBarycenter, computePointOnOrbit } from "../utils/kepler";
+import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../utils/kepler";
 import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "./iOrbitalBody";
 import { centeredRandom, unpackSeedToArray3 } from "../utils/random";
 import { alea } from "seedrandom";
-import sha256 from "fast-sha256";
-import {encodeUTF8, decodeUTF8} from "tweetnacl-util"
-import { Buffer } from "buffer";
 
-
-export abstract class AbstractBody implements IOrbitalBody, Seedable {
+export abstract class AbstractBody implements IOrbitalBody, ISeedable {
     protected abstract bodyType: BodyType;
 
     abstract physicalProperties: IPhysicalProperties;
@@ -51,16 +47,17 @@ export abstract class AbstractBody implements IOrbitalBody, Seedable {
         starSystemManager.addBody(this);
 
         this.transform = new TransformNode(`${name}Transform`);
-        this.transform.position = Vector3.Zero();
-        this.transform.rotationQuaternion = Quaternion.Identity();
 
         this.rotate(Axis.X, centeredRandom(this.rng) / 2);
         this.rotate(Axis.Z, centeredRandom(this.rng) / 2);
 
+        const periapsis = this.rng() * 10000000e3;
+        const apoapsis = periapsis * (1 + this.rng() / 10);
+
         this.orbitalProperties = {
-            periapsis: this.getRadius() * 5,
-            apoapsis: this.getRadius() * 5,
-            period: 0,
+            periapsis: periapsis,
+            apoapsis: apoapsis,
+            period: getOrbitalPeriod(periapsis, apoapsis, this.relevantBodies),
             orientationQuaternion: Quaternion.Identity()
         };
     }
@@ -138,19 +135,19 @@ export abstract class AbstractBody implements IOrbitalBody, Seedable {
 
     public addRelevantBody(body: IOrbitalBody): void {
         this.relevantBodies.push(body);
+        this.orbitalProperties.period = getOrbitalPeriod(this.orbitalProperties.periapsis, this.orbitalProperties.apoapsis, this.relevantBodies);
     }
 
     public removeRelevantBody(body: IOrbitalBody): void {
         const index = this.relevantBodies.indexOf(body);
-        if (index > -1) this.relevantBodies.splice(index, 1);
+        if (index > -1) {
+            this.relevantBodies.splice(index, 1);
+            this.orbitalProperties.period = getOrbitalPeriod(this.orbitalProperties.periapsis, this.orbitalProperties.apoapsis, this.relevantBodies);
+        }
     }
 
     public getSeed(): number {
         return this._seed;
-    }
-
-    public getSeed3(): number[] {
-        return this._seedOffset;
     }
 
     /**

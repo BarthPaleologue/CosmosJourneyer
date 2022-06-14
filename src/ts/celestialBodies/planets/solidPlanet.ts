@@ -3,7 +3,7 @@ import { Direction } from "../../utils/direction";
 import { TerrainSettings } from "../../terrain/terrainSettings";
 import { AbstractPlanet } from "./abstractPlanet";
 
-import { Color3, MeshBuilder, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
+import { Scene, Vector3 } from "@babylonjs/core";
 
 import { BodyType, RigidBody } from "../interfaces";
 import { CollisionData } from "../../chunks/workerDataInterfaces";
@@ -70,7 +70,6 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     public generateCollisionTask(relativePosition: Vector3): CollisionData {
         let collisionData: CollisionData = {
             seed: this.getSeed(),
-            seedOffset: this.getSeed3(),
             taskType: TaskType.Collision,
             planetName: this._name,
             terrainSettings: this.terrainSettings,
