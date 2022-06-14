@@ -1,11 +1,4 @@
-import {
-    Color3,
-    FxaaPostProcess, LensFlare, LensFlareSystem,
-    Quaternion,
-    Texture,
-    Tools,
-    Vector3
-} from "@babylonjs/core";
+import { Color3, FxaaPostProcess, LensFlare, LensFlareSystem, Quaternion, Texture, Tools, Vector3 } from "@babylonjs/core";
 
 import { SolidPlanet } from "./celestialBodies/planets/solidPlanet";
 import { Star } from "./celestialBodies/stars/star";
@@ -65,7 +58,6 @@ const flare00 = new LensFlare(
     lensFlare, // texture
     lensFlareSystem // lens flare system
 );*/
-
 
 let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene, 1e9);
 

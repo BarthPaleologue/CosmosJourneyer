@@ -10,7 +10,7 @@ import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystemManager } from "./celestialBodies/starSystemManager";
 
-import { centeredRandom, normalRandom, randBool, randRange, randRangeInt, unpackSeedToArray3 } from "./utils/random";
+import { centeredRandom, normalRandom, randBool, randRange, randRangeInt } from "./utils/random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Star } from "./celestialBodies/stars/star";
 import { Settings } from "./settings";
@@ -72,7 +72,6 @@ planet.physicalProperties.pressure = Math.max(normalRandom(1, 0.5, planet.rng), 
 planet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planet.rng), 0);
 
 planet.oceanLevel = Settings.OCEAN_DEPTH * planet.physicalProperties.waterAmount * planet.physicalProperties.pressure;
-
 
 planet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRandom(planet.rng) / 10, 0.37 + centeredRandom(planetRand) / 10, 0.024 + centeredRandom(planetRand) / 10);
 planet.material.colorSettings.beachSize = 250 + 100 * centeredRandom(planet.rng);

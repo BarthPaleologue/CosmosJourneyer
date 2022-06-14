@@ -7,7 +7,6 @@ import { TerrainSettings } from "../terrain/terrainSettings";
 import { elevationFunction } from "../terrain/landscape/elevationFunction";
 import { TaskType } from "../chunks/taskInterfaces";
 import { tanhSharpen } from "../utils/math";
-import { unpackSeedToArray3 } from "../utils/random";
 
 let currentPlanetID = "";
 

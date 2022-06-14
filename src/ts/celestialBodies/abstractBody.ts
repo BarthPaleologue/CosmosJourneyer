@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, Space, TransformNode, Scene, Axis, TrailMesh } from "@babylonjs/core";
+import { Vector3, Quaternion, Space, TransformNode, Scene, Axis } from "@babylonjs/core";
 import { BodyType, ISeedable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
@@ -9,7 +9,7 @@ import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../uti
 import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "./iOrbitalBody";
-import { centeredRandom, unpackSeedToArray3 } from "../utils/random";
+import { centeredRandom } from "../utils/random";
 import { alea } from "seedrandom";
 
 export abstract class AbstractBody implements IOrbitalBody, ISeedable {
@@ -24,7 +24,6 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
     protected readonly _name: string;
 
     protected readonly _seed: number;
-    protected readonly _seedOffset: number[];
 
     readonly rng: () => number;
 
@@ -40,8 +39,6 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
         this._radius = radius;
 
         this.rng = alea(seed.toString());
-
-        this._seedOffset = unpackSeedToArray3(this._seed);
 
         this._starSystemManager = starSystemManager;
         starSystemManager.addBody(this);
