@@ -1,6 +1,5 @@
 precision highp float;
 
-// Attributes
 attribute vec3 vertex;
 attribute vec3 position;
 attribute vec3 normal;
@@ -11,19 +10,13 @@ attribute vec2 uv;
 	varying float vFragmentDepth;
 #endif
 
-// Uniforms
 uniform mat4 world;
 uniform mat4 worldViewProjection;
-
-uniform vec3 v3CameraPos; // camera position in world space
-uniform vec3 v3LightPos; // light position in world space
 
 uniform vec3 planetPosition; // nécessaire temporairement le temps de régler le problème des floats
 
 uniform vec4 planetInverseRotationQuaternion;
-uniform float planetRadius;
 
-// Varying
 varying vec3 vPositionW;
 varying vec3 vNormalW;
 varying vec3 vSphereNormalW;
@@ -33,8 +26,6 @@ varying vec3 vPosition;
 
 varying vec3 vUnitSamplePoint;
 varying vec3 vSamplePoint;
-
-varying vec2 vUV;
 
 #pragma glslify: applyQuaternion = require(../utils/applyQuaternion.glsl)
 
@@ -58,5 +49,4 @@ void main() {
 	vSamplePoint = applyQuaternion(planetInverseRotationQuaternion, vPosition);
 
 	vNormal = normal;
-    vUV = uv;
 }

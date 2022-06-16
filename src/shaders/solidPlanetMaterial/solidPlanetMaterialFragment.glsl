@@ -13,9 +13,6 @@ varying vec3 vSamplePoint;
 
 varying vec3 vPosition; // position of the vertex in sphere space
 varying vec3 vNormal; // normal of the vertex in sphere space
-varying vec2 vUV;
-
-// Refs
 
 uniform mat4 world;
 
@@ -24,8 +21,6 @@ uniform float cameraNear;
 uniform float cameraFar;
 uniform vec3 sunPosition; // light position in world space
 uniform vec3 planetPosition;
-uniform mat4 view;
-uniform mat4 projection;
 
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler; // evaluate sceneDepth
@@ -80,18 +75,6 @@ float lerp(float value1, float value2, float x) {
 }
 
 #pragma glslify: triplanarNormal = require(../utils/triplanarNormal.glsl)
-
-bool near(float value, float reference, float range) {
-	return abs(reference - value) < range; 
-}
-
-float nearFloat(float value, float reference, float range) {
-	if(near(value, reference, range)) {
-		return 1.0;
-	} else {
-		return 0.0;
-	}
-}
 
 /*
  * Get lerp factor around summit with certain slope (triangle function)
@@ -232,21 +215,9 @@ vec3 computeColorAndNormal(
 	return outColor;
 }
 
-// https://www.omnicalculator.com/chemistry/boiling-point
-// https://www.wikiwand.com/en/Boiling_point#/Saturation_temperature_and_pressure
-// https://www.desmos.com/calculator/ctxerbh48s
-float waterBoilingPointCelsius(float pressure) {
-	float P1 = 1.0;
-	float P2 = pressure;
-	float T1 = 100.0 + 273.15;
-	float DH = 40660.0;
-	float R = 8.314;
-	if(P2 > 0.0) {
-		return (1.0 / ((1.0 / T1) + log(P1 / P2) * (R / DH))) - 273.15;
-	} else {
-		return -273.15;
-	}
-}
+#pragma glslify: waterBoilingPointCelsius = require(./utils/waterBoilingPointCelsius.glsl)
+
+#pragma glslify: computeTemperature01 = require(./utils/computeTemperature01.glsl, vUnitSamplePoint=vUnitSamplePoint, fractalSimplex4=fractalSimplex4, tanh=tanh)
 
 void main() {
 	vec3 viewRayW = normalize(playerPosition - vPositionW); // view direction in world space
@@ -256,7 +227,7 @@ void main() {
 	float ndl = max(0.002, dot(sphereNormalW, lightRayW));
 
 	// FIXME: remove scaling
-	vec4 seededSamplePoint = vec4(vUnitSamplePoint, seed / 1e13);
+	vec4 seededSamplePoint = vec4(vUnitSamplePoint, seed / 1e15);
 
 	float latitude = vUnitSamplePoint.y;
 	float absLatitude01 = abs(latitude);
@@ -286,31 +257,7 @@ void main() {
 	// TODO: find the equation ; even better use a texture
 	float co2SublimationTemperature01 = (co2SublimationTemperature - minTemperature) / (maxTemperature - minTemperature);
 
-    // TODO: do not hardcode both
-	float temperatureHeightFalloff = 1.5;
-	float temperatureLatitudeFalloff = 1.0;
-
-	// TODO: do not hardcode that factor
-	float temperatureRotationFactor = tanh(0.15 * dayDuration);
-
-	// https://www.desmos.com/calculator/apezlfvwic
-	float temperature01 = 1.0;
-
-	// temperature drops with latitude
-	// https://www.researchgate.net/profile/Anders-Levermann/publication/274494740/figure/fig3/AS:391827732615174@1470430419170/a-Surface-air-temperature-as-a-function-of-latitude-for-data-averaged-over-1961-90-for.png
-   	temperature01 -= pow(temperatureLatitudeFalloff * absLatitude01, 3.0);
-
-	// temperature drops exponentially with elevation
-	temperature01 *= exp(-elevation01 * temperatureHeightFalloff);
-
-	// added random fluctuations
-	temperature01 += (fractalSimplex4(vec4(vUnitSamplePoint,0.0) * 300.0, 5, 1.7, 2.5) - 0.5) / 4.0;
-
-	// temperature drops during nighttime (more ice)
-	temperature01 *= ndl * temperatureRotationFactor + 1.0 - temperatureRotationFactor;
-
-    // cannot exceed max and min temperatures
-	temperature01 = clamp(temperature01, 0.0, 1.0);
+	float temperature01 = computeTemperature01(elevation01, absLatitude01, ndl, dayDuration);
 
 	float temperature = lerp(maxTemperature, minTemperature, temperature01);
 

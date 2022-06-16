@@ -1,9 +1,7 @@
 precision lowp float;
 
-// varying
 varying vec2 vUV; // screen coordinates
 
-// uniforms
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
 

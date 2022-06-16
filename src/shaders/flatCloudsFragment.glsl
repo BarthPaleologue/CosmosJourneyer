@@ -56,21 +56,11 @@ uniform float time;
 
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 
-float tanh01(float x) {
-	return (tanh(x) + 1.0) / 2.0;
-}
-float tanhSharpener(float x, float s) {
-	float sampleValue = (x - 0.5) * s;
-	return tanh01(sampleValue);
-}
+#pragma glslify: tanhSharpener = require(./utils/tanhSharpener.glsl)
 
 #pragma glslify: applyQuaternion = require(./utils/applyQuaternion.glsl)
 
-vec3 rotateAround(vec3 vector, vec3 axis, float theta) {
-    // rotation using https://www.wikiwand.com/en/Rodrigues%27_rotation_formula
-    // Please note that unit vector are required, i did not divided by the norms
-    return cos(theta) * vector + cross(axis, vector) * sin(theta) + axis * dot(axis, vector) * (1.0 - cos(theta));
-}
+#pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
 
 float cloudDensityAtPoint(vec3 samplePoint) {
 

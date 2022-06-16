@@ -81,7 +81,7 @@ planet.terrainSettings.continentsFragmentation = clamp(normalRandom(0.5, 0.2, pl
 
 planet.createOcean(sun, scene);
 
-if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0 && randBool(0.8, planet.rng)) {
+if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0.1 && randBool(0.8, planet.rng)) {
     let flatClouds = planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
     flatClouds.settings.cloudPower = 10 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure);
 }
