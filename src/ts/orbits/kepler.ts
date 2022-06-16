@@ -1,9 +1,9 @@
 // from https://www.youtube.com/watch?v=UXD97l7ZT0w
 
 import { Axis, Quaternion, Vector3 } from "@babylonjs/core";
-import { IOrbitalBody } from "../celestialBodies/iOrbitalBody";
+import { IOrbitalBody } from "./iOrbitalBody";
 import { IOrbitalProperties } from "../celestialBodies/iOrbitalProperties";
-import { stripAxisFromQuaternion } from "./algebra";
+import { stripAxisFromQuaternion } from "../utils/algebra";
 
 /**
  * Returns 0 when the arguments are solution to the Kepler's equation

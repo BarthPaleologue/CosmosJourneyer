@@ -5,10 +5,10 @@ import { StarSystemManager } from "./starSystemManager";
 import { IPhysicalProperties } from "./iPhysicalProperties";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalProperties } from "./iOrbitalProperties";
-import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../utils/kepler";
+import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../orbits/kepler";
 import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
-import { IOrbitalBody } from "./iOrbitalBody";
+import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { centeredRandom } from "../utils/random";
 import { alea } from "seedrandom";
 

@@ -1,6 +1,6 @@
-import { IPhysicalProperties } from "./iPhysicalProperties";
-import { IOrbitalProperties } from "./iOrbitalProperties";
-import { ITransformable } from "./iTransformable";
+import { IPhysicalProperties } from "../celestialBodies/iPhysicalProperties";
+import { IOrbitalProperties } from "../celestialBodies/iOrbitalProperties";
+import { ITransformable } from "../celestialBodies/iTransformable";
 
 export interface IOrbitalBody extends ITransformable {
     /**
