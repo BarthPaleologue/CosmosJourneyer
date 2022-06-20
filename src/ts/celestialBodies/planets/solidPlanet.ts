@@ -13,6 +13,7 @@ import { StarSystemManager } from "../starSystemManager";
 import { Settings } from "../../settings";
 import { ISolidPhysicalProperties } from "../iPhysicalProperties";
 import { SolidPlanetMaterial } from "../../materials/solidPlanetMaterial";
+import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 
 export class SolidPlanet extends AbstractPlanet implements RigidBody {
     oceanLevel: number;
@@ -27,8 +28,8 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     material: SolidPlanetMaterial;
 
-    constructor(id: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, seed = 0) {
-        super(id, radius, starSystemManager, seed);
+    constructor(id: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, seed: number, parentBodies: IOrbitalBody[]) {
+        super(id, radius, starSystemManager, seed, parentBodies);
 
         this.physicalProperties = {
             mass: 10,

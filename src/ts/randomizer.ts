@@ -51,17 +51,16 @@ console.log("Star seed : ", starSeed);
 const randStar = alea(starSeed.toString());
 const starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.2, 1.5) * Settings.PLANET_RADIUS * 100;
 
-const sun = new Star("Weierstrass", starRadius, starSystemManager, scene, starSeed);
+const sun = new Star("Weierstrass", starRadius, starSystemManager, scene, starSeed, []);
 sun.translate(new Vector3(-9, 0, -17).scale(100000000));
 
 starfield.setStar(sun);
 
-const planetSeed = randRange(-1e9, 1e9, starSystemRand); //randRangeInt(0, Number.MAX_SAFE_INTEGER, starSystemRand);
+const planetSeed = randRange(-1e6, 1e6, starSystemRand);
 console.log("Planet seed : ", planetSeed);
 const planetRand = alea(planetSeed.toString());
 
-const planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, planetSeed);
-planet.addRelevantBody(sun);
+const planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, planetSeed, [sun]);
 
 console.table(planet.orbitalProperties);
 

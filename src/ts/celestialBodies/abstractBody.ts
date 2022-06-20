@@ -4,7 +4,7 @@ import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
 import { IPhysicalProperties } from "./iPhysicalProperties";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
-import { IOrbitalProperties } from "./iOrbitalProperties";
+import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../orbits/kepler";
 import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
@@ -31,9 +31,10 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
 
     readonly transform: TransformNode;
 
-    readonly relevantBodies: IOrbitalBody[] = [];
+    readonly parentBodies: IOrbitalBody[];
+    readonly childrenBodies: IOrbitalBody[] = [];
 
-    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number) {
+    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         this._name = name;
         this._seed = seed;
         this._radius = radius;
@@ -42,6 +43,8 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
 
         this._starSystemManager = starSystemManager;
         starSystemManager.addBody(this);
+
+        this.parentBodies = parentBodies;
 
         this.transform = new TransformNode(`${name}Transform`);
 
@@ -54,7 +57,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
         this.orbitalProperties = {
             periapsis: periapsis,
             apoapsis: apoapsis,
-            period: getOrbitalPeriod(periapsis, apoapsis, this.relevantBodies),
+            period: getOrbitalPeriod(periapsis, apoapsis, this.parentBodies),
             orientationQuaternion: Quaternion.Identity()
         };
     }
@@ -130,19 +133,6 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
         return rings;
     }
 
-    public addRelevantBody(body: IOrbitalBody): void {
-        this.relevantBodies.push(body);
-        this.orbitalProperties.period = getOrbitalPeriod(this.orbitalProperties.periapsis, this.orbitalProperties.apoapsis, this.relevantBodies);
-    }
-
-    public removeRelevantBody(body: IOrbitalBody): void {
-        const index = this.relevantBodies.indexOf(body);
-        if (index > -1) {
-            this.relevantBodies.splice(index, 1);
-            this.orbitalProperties.period = getOrbitalPeriod(this.orbitalProperties.periapsis, this.orbitalProperties.apoapsis, this.relevantBodies);
-        }
-    }
-
     public getSeed(): number {
         return this._seed;
     }
@@ -155,7 +145,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
      */
     public update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
         if (this.orbitalProperties.period > 0) {
-            const [barycenter, orientationQuaternion] = computeBarycenter(this, this.relevantBodies);
+            const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
             this.orbitalProperties.orientationQuaternion = orientationQuaternion;
 
             //TODO: orient the planet accurately

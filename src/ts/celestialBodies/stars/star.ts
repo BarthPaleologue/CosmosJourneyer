@@ -9,6 +9,7 @@ import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
+import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 
 // TODO: implement RigidBody for star
 export class Star extends AbstractBody {
@@ -22,8 +23,8 @@ export class Star extends AbstractBody {
 
     public override postProcesses: StarPostProcesses;
 
-    constructor(name: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, seed = 0) {
-        super(name, radius, starSystemManager, seed);
+    constructor(name: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, seed: number, parentBodies: IOrbitalBody[]) {
+        super(name, radius, starSystemManager, seed, parentBodies);
         this.physicalProperties = {
             //TODO: ne pas hardcoder
             mass: 1000,

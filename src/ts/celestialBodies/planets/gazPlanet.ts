@@ -5,14 +5,15 @@ import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
 import { IPlanetPhysicalProperties } from "../iPhysicalProperties";
+import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 
 export class GazPlanet extends AbstractPlanet {
     protected bodyType = BodyType.GAZ;
 
     override readonly physicalProperties: IPlanetPhysicalProperties;
 
-    constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed = 0) {
-        super(name, radius, starSystemManager, seed);
+    constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+        super(name, radius, starSystemManager, seed, parentBodies);
         this.physicalProperties = {
             // FIXME: choose physically accurates values
             mass: 20,

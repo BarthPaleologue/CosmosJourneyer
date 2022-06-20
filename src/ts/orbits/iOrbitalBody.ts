@@ -1,5 +1,5 @@
 import { IPhysicalProperties } from "../celestialBodies/iPhysicalProperties";
-import { IOrbitalProperties } from "../celestialBodies/iOrbitalProperties";
+import { IOrbitalProperties } from "./iOrbitalProperties";
 import { ITransformable } from "../celestialBodies/iTransformable";
 
 export interface IOrbitalBody extends ITransformable {
@@ -14,19 +14,12 @@ export interface IOrbitalBody extends ITransformable {
     orbitalProperties: IOrbitalProperties;
 
     /**
-     * The array of bodies accounted for in the orbital computations of the current body
+     * The array of bodies immediately above in the orbit hierarchy
      */
-    relevantBodies: IOrbitalBody[]; // might go to private at some point
+    parentBodies: IOrbitalBody[];
 
     /**
-     * Add another body to the orbital computations for the current body
-     * @param body
+     * The array of bodies immediately beneath in the orbit hierarchy
      */
-    addRelevantBody: (body: IOrbitalBody) => void;
-
-    /**
-     * Removes another body from the orbital computations of the current body
-     * @param body
-     */
-    removeRelevantBody: (body: IOrbitalBody) => void;
+    childrenBodies: IOrbitalBody[];
 }

@@ -44,7 +44,7 @@ let starSystem = new StarSystemManager(Settings.VERTEX_RESOLUTION);
 
 let starfield = new StarfieldPostProcess("starfield", scene);
 
-let sun = new Star("Weierstrass", Settings.PLANET_RADIUS, starSystem, scene, 788);
+let sun = new Star("Weierstrass", Settings.PLANET_RADIUS, starSystem, scene, 788, []);
 sun.orbitalProperties.period = 60 * 60 * 24;
 starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 
@@ -59,7 +59,7 @@ const flare00 = new LensFlare(
     lensFlareSystem // lens flare system
 );*/
 
-let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene, 1e9);
+let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene, 1e6, [sun]);
 
 planet.physicalProperties.rotationPeriod /= 50;
 
@@ -69,8 +69,6 @@ planet.orbitalProperties = {
     periapsis: 35 * planet.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
-planet.addRelevantBody(sun);
-sun.addRelevantBody(planet);
 starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 
 planet.createOcean(sun, scene);
@@ -78,7 +76,7 @@ planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
 planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
 planet.createRings(sun, scene);
 
-let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, scene);
+let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, scene, 549,[planet]);
 moon.physicalProperties.mass = 2;
 moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moon.physicalProperties.minTemperature = -180;
@@ -92,8 +90,6 @@ moon.orbitalProperties = {
     periapsis: 5 * planet.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
-moon.addRelevantBody(planet);
-planet.addRelevantBody(moon);
 starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 
 moon.terrainSettings.continentsFragmentation = 1;
@@ -105,7 +101,7 @@ moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap!);
 moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
 moon.material.updateManual();
 
-let ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene);
+let ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene, 432, [sun]);
 ares.physicalProperties.mass = 7;
 ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 ares.physicalProperties.minTemperature = -80;
@@ -119,8 +115,6 @@ ares.orbitalProperties = {
     apoapsis: 51 * ares.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
-ares.addRelevantBody(sun);
-sun.addRelevantBody(ares);
 starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 
 ares.terrainSettings.continentsFragmentation = 0.5;

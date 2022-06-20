@@ -2,7 +2,7 @@
 
 import { Axis, Quaternion, Vector3 } from "@babylonjs/core";
 import { IOrbitalBody } from "./iOrbitalBody";
-import { IOrbitalProperties } from "../celestialBodies/iOrbitalProperties";
+import { IOrbitalProperties } from "./iOrbitalProperties";
 import { stripAxisFromQuaternion } from "../utils/algebra";
 
 /**

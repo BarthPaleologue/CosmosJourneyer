@@ -8,13 +8,14 @@ import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanP
 import { StarSystemManager } from "../starSystemManager";
 import { IPlanetPhysicalProperties } from "../iPhysicalProperties";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
+import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 
 export abstract class AbstractPlanet extends AbstractBody {
     abstract override physicalProperties: IPlanetPhysicalProperties;
     public override postProcesses: PlanetPostProcesses;
 
-    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number) {
-        super(name, radius, starSystemManager, seed);
+    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+        super(name, radius, starSystemManager, seed, parentBodies);
         this.postProcesses = {
             atmosphere: null,
             ocean: null,
