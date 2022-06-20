@@ -1,4 +1,4 @@
-import { Axis, FxaaPostProcess, Tools, Vector3 } from "@babylonjs/core";
+import { FxaaPostProcess, Tools, Vector3 } from "@babylonjs/core";
 
 import { SolidPlanet } from "./celestialBodies/planets/solidPlanet";
 
