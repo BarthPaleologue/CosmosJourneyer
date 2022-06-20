@@ -33,9 +33,9 @@ export function solveKepler(M: number, e: number) {
 
 export function computeBarycenter(body: IOrbitalBody, relevantBodies: IOrbitalBody[]): [Vector3, Quaternion] {
     const barycenter = body.getAbsolutePosition().scale(body.physicalProperties.mass);
-    const meanQuaternion = Quaternion.Zero();
+    const meanQuaternion = Quaternion.Identity();
     let sumPosition = body.physicalProperties.mass;
-    let sumQuaternion = 0;
+    let sumQuaternion = body.physicalProperties.mass;
     for (const otherBody of relevantBodies) {
         const mass = otherBody.physicalProperties.mass;
         barycenter.addInPlace(otherBody.getAbsolutePosition().scale(mass));
@@ -79,7 +79,7 @@ export function computePointOnOrbit(centerOfMass: Vector3, settings: IOrbitalPro
  */
 export function getOrbitalPeriod(periapsis: number, apoapsis: number, otherBodies: IOrbitalBody[]) {
     const a = (periapsis + apoapsis) / 2;
-    const G = 1;
+    const G = 1e12;
     let M = 0;
     for (const otherBody of otherBodies) M += otherBody.physicalProperties.mass;
     if (M == 0) return 0;

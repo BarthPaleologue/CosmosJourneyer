@@ -34,6 +34,8 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
     readonly parentBodies: IOrbitalBody[];
     readonly childrenBodies: IOrbitalBody[] = [];
 
+    depth: number;
+
     protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         this._name = name;
         this._seed = seed;
@@ -46,11 +48,20 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
 
         this.parentBodies = parentBodies;
 
+        let minDepth = -1;
+        for (const parentBody of parentBodies) {
+            if (minDepth == -1) minDepth = parentBody.depth;
+            else minDepth = Math.min(minDepth, parentBody.depth);
+        }
+        if (minDepth == -1) this.depth = 0;
+        else this.depth = minDepth + 1;
+
         this.transform = new TransformNode(`${name}Transform`);
 
         this.rotate(Axis.X, centeredRand(this.rng) / 2);
         this.rotate(Axis.Z, centeredRand(this.rng) / 2);
 
+        // TODO: do not hardcode
         const periapsis = this.rng() * 10000000e3;
         const apoapsis = periapsis * (1 + this.rng() / 10);
 
@@ -153,7 +164,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
             const initialPosition = this.getAbsolutePosition().clone();
             const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this._starSystemManager.getTime());
 
-            if (player.isOrbiting(this)) player.translate(newPosition.subtract(initialPosition));
+            if (player.isOrbiting(this, 50 / ((this.depth + 1) ** 3))) player.translate(newPosition.subtract(initialPosition));
             this.setAbsolutePosition(newPosition);
         }
 

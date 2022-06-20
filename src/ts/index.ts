@@ -46,8 +46,6 @@ let starfield = new StarfieldPostProcess("starfield", scene);
 
 let sun = new Star("Weierstrass", Settings.PLANET_RADIUS, starSystem, scene, 788, []);
 sun.orbitalProperties.period = 60 * 60 * 24;
-starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
-
 starfield.setStar(sun);
 
 /*const lensFlareSystem = new LensFlareSystem("lensFlareSystem", sun.transform, scene);
@@ -90,7 +88,6 @@ moon.orbitalProperties = {
     periapsis: 5 * planet.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
-starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
@@ -115,7 +112,6 @@ ares.orbitalProperties = {
     apoapsis: 51 * ares.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
-starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 
 ares.terrainSettings.continentsFragmentation = 0.5;
 ares.terrainSettings.continentBaseHeight = 5e3;

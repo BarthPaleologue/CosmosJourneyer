@@ -1,4 +1,4 @@
-import { FxaaPostProcess, Tools, Vector3 } from "@babylonjs/core";
+import { Axis, FxaaPostProcess, Quaternion, Tools, Vector3 } from "@babylonjs/core";
 
 import { SolidPlanet } from "./celestialBodies/planets/solidPlanet";
 
@@ -21,6 +21,7 @@ import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
 import { Assets } from "./assets";
 
 import { alea } from "seedrandom";
+import { getOrbitalPeriod } from "./orbits/kepler";
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
@@ -52,7 +53,6 @@ const randStar = alea(starSeed.toString());
 const starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.2, 1.5) * Settings.PLANET_RADIUS * 100;
 
 const sun = new Star("Weierstrass", starRadius, starSystemManager, scene, starSeed, []);
-sun.translate(new Vector3(-9, 0, -17).scale(100000000));
 
 starfield.setStar(sun);
 
@@ -99,6 +99,23 @@ if (uniformRandBool(0.6, planet.rng)) {
     rings.settings.ringOpacity = planet.rng();
 }
 
+for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
+    const satelliteSeed = Math.random();
+    const randSatellite = alea(satelliteSeed.toString());
+    const satelliteRadius = (planet.getRadius() / 5) * clamp(normalRandom(1, 0.1, randSatellite), 0.5, 1.5);
+    const satellite = new SolidPlanet(`${planet.getName()}Sattelite${i}`, satelliteRadius, starSystemManager, scene, satelliteSeed, [planet]);
+    console.log(satellite.depth)
+    const periapsis = 2 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, randSatellite), 0.9, 1.0) * planet.getRadius();
+    const apoapsis = periapsis * clamp(normalRandom(1, 0.05, randSatellite), 1, 1.5);
+    satellite.physicalProperties.mass = 0.001;
+    satellite.orbitalProperties = {
+        periapsis: periapsis,
+        apoapsis: apoapsis,
+        period: getOrbitalPeriod(periapsis, apoapsis, satellite.parentBodies),
+        orientationQuaternion: satellite.getRotationQuaternion()
+    }
+}
+
 let fxaa = new FxaaPostProcess("fxaa", 1, player.camera);
 
 let isMouseEnabled = false;
@@ -113,9 +130,13 @@ document.addEventListener("keydown", (e) => {
 
 let collisionWorker = new CollisionWorker(player, starSystemManager);
 
+
+starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
+starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now());
 starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
 starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
+
 player.positionNearBody(planet);
 
 scene.executeWhenReady(() => {

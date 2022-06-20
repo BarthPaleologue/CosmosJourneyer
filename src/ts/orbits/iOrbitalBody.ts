@@ -22,4 +22,9 @@ export interface IOrbitalBody extends ITransformable {
      * The array of bodies immediately beneath in the orbit hierarchy
      */
     childrenBodies: IOrbitalBody[];
+
+    /**
+     * The depth of the body in the orbital tree
+     */
+    depth: number;
 }

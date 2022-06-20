@@ -247,9 +247,7 @@ export class PlayerController implements ITransformable {
      * If the parameter is unset, returns whereas the player is orbiting a body, if the parameter is set returns if the player orbits the given body
      * @param body
      */
-    public isOrbiting(body: AbstractBody | null = null): boolean {
-        //TODO: do not hardcode
-        const orbitLimitFactor = 2.5;
+    public isOrbiting(body: AbstractBody | null = null, orbitLimitFactor = 2.5): boolean {
         if (this.nearestBody == null) return false;
         else if (body == null) {
             return this.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * this.nearestBody.getRadius()) ** 2;
