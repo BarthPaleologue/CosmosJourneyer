@@ -10,7 +10,7 @@ import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystemManager } from "./celestialBodies/starSystemManager";
 
-import { centeredRandom, normalRandom, randBool, randRange, randRangeInt } from "./utils/random";
+import { centeredRand, normalRandom, uniformRandBool, randRange, randRangeInt } from "extended-random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Star } from "./celestialBodies/stars/star";
 import { Settings } from "./settings";
@@ -73,30 +73,30 @@ planet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planet.rng
 
 planet.oceanLevel = Settings.OCEAN_DEPTH * planet.physicalProperties.waterAmount * planet.physicalProperties.pressure;
 
-planet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRandom(planet.rng) / 10, 0.37 + centeredRandom(planetRand) / 10, 0.024 + centeredRandom(planetRand) / 10);
-planet.material.colorSettings.beachSize = 250 + 100 * centeredRandom(planet.rng);
+planet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRand(planet.rng) / 10, 0.37 + centeredRand(planetRand) / 10, 0.024 + centeredRand(planetRand) / 10);
+planet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng);
 planet.material.updateManual();
 
 planet.terrainSettings.continentsFragmentation = clamp(normalRandom(0.5, 0.2, planet.rng), 0, 1);
 
 planet.createOcean(sun, scene);
 
-if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0.1 && randBool(0.8, planet.rng)) {
+if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0.1 && uniformRandBool(0.8, planet.rng)) {
     let flatClouds = planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
     flatClouds.settings.cloudPower = 10 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure);
 }
 
 if (planet.physicalProperties.pressure > 0) {
     let atmosphere = planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
-    atmosphere.settings.redWaveLength *= 1 + centeredRandom(planet.rng) / 3;
-    atmosphere.settings.greenWaveLength *= 1 + centeredRandom(planet.rng) / 3;
-    atmosphere.settings.blueWaveLength *= 1 + centeredRandom(planet.rng) / 3;
+    atmosphere.settings.redWaveLength *= 1 + centeredRand(planet.rng) / 3;
+    atmosphere.settings.greenWaveLength *= 1 + centeredRand(planet.rng) / 3;
+    atmosphere.settings.blueWaveLength *= 1 + centeredRand(planet.rng) / 3;
 }
 
-if (randBool(0.6, planet.rng)) {
+if (uniformRandBool(0.6, planet.rng)) {
     let rings = planet.createRings(sun, scene);
-    rings.settings.ringStart = 1.8 + 0.4 * centeredRandom(planet.rng);
-    rings.settings.ringEnd = 2.5 + 0.4 * centeredRandom(planet.rng);
+    rings.settings.ringStart = 1.8 + 0.4 * centeredRand(planet.rng);
+    rings.settings.ringEnd = 2.5 + 0.4 * centeredRand(planet.rng);
     rings.settings.ringOpacity = planet.rng();
 }
 

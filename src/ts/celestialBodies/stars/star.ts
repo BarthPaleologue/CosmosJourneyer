@@ -7,7 +7,7 @@ import { StarSystemManager } from "../starSystemManager";
 import { IStarPhysicalProperties } from "../iPhysicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
-import { normalRandom, randBool } from "../../utils/random";
+import { normalRandom, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
 
 // TODO: implement RigidBody for star
@@ -45,7 +45,7 @@ export class Star extends AbstractBody {
         this.postProcesses.volumetricLight!.exposure = 0.26;
         this.postProcesses.volumetricLight!.decay = 0.95;
 
-        if (randBool(Star.RING_PROPORTION, this.rng)) {
+        if (uniformRandBool(Star.RING_PROPORTION, this.rng)) {
             let rings = this.createRings(this, scene);
             rings.settings.ringStart = normalRandom(3, 1, this.rng);
             rings.settings.ringEnd = normalRandom(7, 1, this.rng);

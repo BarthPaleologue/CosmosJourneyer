@@ -9,7 +9,7 @@ import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../orb
 import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
-import { centeredRandom } from "../utils/random";
+import { centeredRand } from "extended-random";
 import { alea } from "seedrandom";
 
 export abstract class AbstractBody implements IOrbitalBody, ISeedable {
@@ -45,8 +45,8 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
 
         this.transform = new TransformNode(`${name}Transform`);
 
-        this.rotate(Axis.X, centeredRandom(this.rng) / 2);
-        this.rotate(Axis.Z, centeredRandom(this.rng) / 2);
+        this.rotate(Axis.X, centeredRand(this.rng) / 2);
+        this.rotate(Axis.Z, centeredRand(this.rng) / 2);
 
         const periapsis = this.rng() * 10000000e3;
         const apoapsis = periapsis * (1 + this.rng() / 10);
