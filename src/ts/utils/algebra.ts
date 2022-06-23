@@ -145,10 +145,6 @@ export class LVector3 implements IVector3Like {
 
 export type Vec3 = Vector3 | LVector3;
 
-export function quaternionAsVector4(q: Quaternion): Vector4 {
-    return new Vector4(q.x, q.y, q.z, q.w);
-}
-
 /**
  * Removes the rotation around an axis from the quaternion
  * @param quaternion the quaternion to strip
