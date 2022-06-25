@@ -25,6 +25,9 @@ export class Star extends AbstractBody {
 
     constructor(name: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, radius, starSystemManager, seed, parentBodies);
+
+        starSystemManager.stars.push(this);
+
         this.physicalProperties = {
             //TODO: ne pas hardcoder
             mass: 1000,

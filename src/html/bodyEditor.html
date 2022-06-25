@@ -4,6 +4,7 @@
     <div id="physicLink">Physic</div>
     <div id="oceanLink">Ocean</div>
     <div id="surfaceLink">Surface</div>
+    <div id="gazCloudsLink">Gaz Clouds</div>
     <div id="cloudsLink">Clouds</div>
     <div id="atmosphereLink">Atmosphere</div>
     <div id="ringsLink">Rings</div>
@@ -13,23 +14,23 @@
     <div class="ui" id="generalUI">
         <h1>General</h1>
 
-        <div id="zoom" data-requirePlanet="true">
+        <div id="zoom">
             <p>Zoom : </p>
         </div>
 
-        <div id="axialTiltX" data-requirePlanet="true">
+        <div id="axialTiltX">
             <p>Axial Tilt X</p>
         </div>
 
-        <div id="axialTiltZ" data-requirePlanet="true">
+        <div id="axialTiltZ">
             <p>Axial Tilt Z</p>
         </div>
 
-        <div id="timeModifier" data-requirePlanet="false">
+        <div id="timeModifier">
             <p>Time speed : </p>
         </div>
 
-        <div id="cameraFOV" data-requirePlanet="false">
+        <div id="cameraFOV">
             <p>Camera FOV : </p>
         </div>
     </div>
@@ -122,6 +123,24 @@
 
         <p>Normal Sharpness : </p>
         <div id="normalSharpness"></div>
+
+    </div>
+    <div hidden class="ui" id="gazCloudsUI">
+
+        <h1>Surface Color</h1>
+
+        <div class="colorPickerContainer">
+            <p>Snow Color :</p>
+            <input type="color" id="gazColor1">
+        </div>
+
+        <div class="colorPickerContainer">
+            <p>Plain Color :</p>
+            <input type="color" id="gazColor2">
+        </div>
+
+        <p>Color Sharpness : </p>
+        <div id="colorSharpness"></div>
 
     </div>
     <div hidden class="ui" id="cloudsUI">

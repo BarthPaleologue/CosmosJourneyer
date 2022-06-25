@@ -22,6 +22,7 @@ import { Assets } from "./assets";
 
 import { alea } from "seedrandom";
 import { getOrbitalPeriod } from "./orbits/kepler";
+import { GazPlanet } from "./celestialBodies/planets/gazPlanet";
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
@@ -60,37 +61,38 @@ const planetSeed = randRange(-1e6, 1e6, starSystemRand);
 console.log("Planet seed : ", planetSeed);
 const planetRand = alea(planetSeed.toString());
 
-const planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, planetSeed, [sun]);
+//const planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, planetSeed, [sun]);
+const planet = new GazPlanet("Elaria", Settings.PLANET_RADIUS, starSystemManager, scene, depthRenderer, planetSeed, [sun]);
 
 console.table(planet.orbitalProperties);
 
 planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
 planet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng);
 planet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng);
-planet.physicalProperties.pressure = Math.max(normalRandom(1, 0.5, planet.rng), 0);
-planet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planet.rng), 0);
+planet.physicalProperties.pressure = Math.max(normalRandom(0.7, 0.1, planet.rng), 0)//Math.max(normalRandom(1, 0.5, planet.rng), 0);
+//planet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planet.rng), 0);
 
-planet.oceanLevel = Settings.OCEAN_DEPTH * planet.physicalProperties.waterAmount * planet.physicalProperties.pressure;
+//planet.oceanLevel = Settings.OCEAN_DEPTH * planet.physicalProperties.waterAmount * planet.physicalProperties.pressure;
 
-planet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRand(planet.rng) / 10, 0.37 + centeredRand(planetRand) / 10, 0.024 + centeredRand(planetRand) / 10);
-planet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng);
-planet.material.updateManual();
+//planet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRand(planet.rng) / 10, 0.37 + centeredRand(planetRand) / 10, 0.024 + centeredRand(planetRand) / 10);
+//planet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng);
+//planet.material.updateManual();
 
-planet.terrainSettings.continentsFragmentation = clamp(normalRandom(0.5, 0.2, planet.rng), 0, 1);
+//planet.terrainSettings.continentsFragmentation = clamp(normalRandom(0.5, 0.2, planet.rng), 0, 1);
 
-planet.createOcean(sun, scene);
+//planet.createOcean(sun, scene);
 
-if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0.1 && uniformRandBool(0.8, planet.rng)) {
+/*if (planet.physicalProperties.waterAmount > 0 && planet.physicalProperties.pressure > 0.1 && uniformRandBool(0.8, planet.rng)) {
     let flatClouds = planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
     flatClouds.settings.cloudPower = 10 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure);
-}
+}*/
 
-if (planet.physicalProperties.pressure > 0) {
+/*if (planet.physicalProperties.pressure > 0) {
     let atmosphere = planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
-    atmosphere.settings.redWaveLength *= 1 + centeredRand(planet.rng) / 3;
-    atmosphere.settings.greenWaveLength *= 1 + centeredRand(planet.rng) / 3;
-    atmosphere.settings.blueWaveLength *= 1 + centeredRand(planet.rng) / 3;
-}
+    atmosphere.settings.redWaveLength *= 1 + centeredRand(planet.rng) / 6;
+    atmosphere.settings.greenWaveLength *= 1 + centeredRand(planet.rng) / 6;
+    atmosphere.settings.blueWaveLength *= 1 + centeredRand(planet.rng) / 6;
+}*/
 
 if (uniformRandBool(0.6, planet.rng)) {
     let rings = planet.createRings(sun, scene);
@@ -105,7 +107,7 @@ for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
     const satelliteRadius = (planet.getRadius() / 5) * clamp(normalRandom(1, 0.1, randSatellite), 0.5, 1.5);
     const satellite = new SolidPlanet(`${planet.getName()}Sattelite${i}`, satelliteRadius, starSystemManager, scene, satelliteSeed, [planet]);
     console.log(satellite.depth)
-    const periapsis = 2 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, randSatellite), 0.9, 1.0) * planet.getRadius();
+    const periapsis = 5 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, randSatellite), 0.9, 1.0) * planet.getRadius() * 2;
     const apoapsis = periapsis * clamp(normalRandom(1, 0.05, randSatellite), 1, 1.5);
     satellite.physicalProperties.mass = 0.001;
     satellite.orbitalProperties = {

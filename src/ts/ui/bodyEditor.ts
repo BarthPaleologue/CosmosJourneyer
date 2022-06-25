@@ -11,6 +11,8 @@ import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../materials/colorSettingsInterface";
 import { clearAllEventListenersById } from "../utils/html";
 import { stripAxisFromQuaternion } from "../utils/algebra";
+import { GazPlanet } from "../celestialBodies/planets/gazPlanet";
+import { AbstractPlanet } from "../celestialBodies/planets/abstractPlanet";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -30,6 +32,7 @@ export class BodyEditor {
     physicSliders: Slider[] = [];
     oceanSliders: Slider[] = [];
     surfaceSliders: Slider[] = [];
+    gazCloudsSliders: Slider[] = [];
     cloudsSliders: Slider[] = [];
     atmosphereSliders: Slider[] = [];
     ringsSliders: Slider[] = [];
@@ -113,65 +116,72 @@ export class BodyEditor {
         this.initNavBar(body);
         switch (body.getBodyType()) {
             case BodyType.SOLID:
-                this.setPlanet(body as SolidPlanet, star, player);
+                this.setSolidPlanet(body as SolidPlanet, star, player);
                 break;
             case BodyType.STAR:
                 this.setStar(body as Star);
                 break;
             case BodyType.GAZ:
+                this.setGazPlanet(body as GazPlanet, star, player);
                 break;
             default:
         }
+        this.initGeneralSliders(body, star, player);
+        this.initRingsSliders(body);
     }
 
-    public setPlanet(planet: SolidPlanet, star: Star, player: PlayerController) {
-        this.initGeneralSliders(planet, star, player);
+    public setSolidPlanet(planet: SolidPlanet, star: Star, player: PlayerController) {
         this.initPhysicSliders(planet);
         this.initSurfaceSliders(planet);
         this.initAtmosphereSliders(planet);
         this.initCloudsSliders(planet);
-        this.initRingsSliders(planet);
         this.initOceanSliders(planet);
 
         this.initToolbar(planet);
+    }
+
+    public setGazPlanet(planet: GazPlanet, star: Star, player: PlayerController) {
+        this.initGazCloudsSliders(planet);
+        this.initAtmosphereSliders(planet);
     }
 
     public setStar(star: Star) {
         this.initStarSliders(star);
     }
 
-    //TODO: make it maintainable
     public initNavBar(body: AbstractBody): void {
+        document.getElementById("generalLink")!.hidden = true;
+        document.getElementById("generalUI")!.hidden = true;
+
+        document.getElementById("starPhysicLink")!.hidden = true;
+        document.getElementById("starPhysicUI")!.hidden = true;
+
+        document.getElementById("starPhysicLink")!.hidden = true;
+        document.getElementById("starPhysicUI")!.hidden = true;
+
+        document.getElementById("physicLink")!.hidden = true;
+        document.getElementById("physicUI")!.hidden = true;
+
+        document.getElementById("oceanLink")!.hidden = true;
+        document.getElementById("oceanUI")!.hidden = true;
+
+        document.getElementById("surfaceLink")!.hidden = true;
+        document.getElementById("surfaceUI")!.hidden = true;
+
+        document.getElementById("gazCloudsLink")!.hidden = true;
+        document.getElementById("gazCloudsUI")!.hidden = true;
+
+        document.getElementById("cloudsLink")!.hidden = true;
+        document.getElementById("cloudsUI")!.hidden = true;
+
+        document.getElementById("atmosphereLink")!.hidden = true;
+        document.getElementById("atmosphereUI")!.hidden = true;
+
         switch (body.getBodyType()) {
             case BodyType.STAR:
-                document.getElementById("generalLink")!.hidden = false;
-
                 document.getElementById("starPhysicLink")!.hidden = false;
-
-                document.getElementById("physicLink")!.hidden = true;
-                document.getElementById("physicUI")!.hidden = true;
-
-                document.getElementById("oceanLink")!.hidden = true;
-                document.getElementById("oceanUI")!.hidden = true;
-
-                document.getElementById("surfaceLink")!.hidden = true;
-                document.getElementById("surfaceUI")!.hidden = true;
-
-                document.getElementById("cloudsLink")!.hidden = true;
-                document.getElementById("cloudsUI")!.hidden = true;
-
-                document.getElementById("atmosphereLink")!.hidden = true;
-                document.getElementById("atmosphereUI")!.hidden = true;
-
-                document.getElementById("ringsLink")!.hidden = true;
-                document.getElementById("ringsUI")!.hidden = true;
                 break;
             case BodyType.SOLID:
-                document.getElementById("generalLink")!.hidden = false;
-
-                document.getElementById("starPhysicLink")!.hidden = true;
-                document.getElementById("starPhysicUI")!.hidden = true;
-
                 document.getElementById("physicLink")!.hidden = false;
 
                 document.getElementById("oceanLink")!.hidden = (body as SolidPlanet).postProcesses.ocean == null;
@@ -184,36 +194,20 @@ export class BodyEditor {
 
                 document.getElementById("atmosphereLink")!.hidden = (body as SolidPlanet).postProcesses.atmosphere == null;
                 document.getElementById("atmosphereUI")!.hidden = this.currentPanel?.id != "atmosphereUI" || (body as SolidPlanet).postProcesses.atmosphere == null;
-
-                document.getElementById("ringsLink")!.hidden = (body as SolidPlanet).postProcesses.rings == null;
-                document.getElementById("ringsUI")!.hidden = this.currentPanel?.id != "ringsUI" || (body as SolidPlanet).postProcesses.rings == null;
                 break;
-            default:
-                document.getElementById("generalLink")!.hidden = false;
+            case BodyType.GAZ:
+                document.getElementById("atmosphereLink")!.hidden = (body as SolidPlanet).postProcesses.atmosphere == null;
+                document.getElementById("atmosphereUI")!.hidden = this.currentPanel?.id != "atmosphereUI" || (body as SolidPlanet).postProcesses.atmosphere == null;
 
-                document.getElementById("starPhysicLink")!.hidden = true;
-                document.getElementById("starPhysicUI")!.hidden = true;
-
-                document.getElementById("physicLink")!.hidden = true;
-
-                document.getElementById("oceanLink")!.hidden = true;
-                document.getElementById("oceanUI")!.hidden = true;
-
-                document.getElementById("surfaceLink")!.hidden = true;
-
-                document.getElementById("cloudsLink")!.hidden = true;
-                document.getElementById("cloudsUI")!.hidden = true;
-
-                document.getElementById("atmosphereLink")!.hidden = true;
-                document.getElementById("atmosphereUI")!.hidden = true;
-
-                document.getElementById("ringsLink")!.hidden = true;
-                document.getElementById("ringsUI")!.hidden = true;
+                document.getElementById("gazCloudsLink")!.hidden = false;
+                document.getElementById("gazCloudsUI")!.hidden = this.currentPanel?.id != "gazCloudsUI";
+                break;
         }
         if (this.currentPanel != null) {
             //TODO: this is messed up
-            let currentNavBarButton = document.getElementById(this.currentPanel.id.substring(0, this.currentPanel.id.length - 2) + "Link");
+            const currentNavBarButton = document.getElementById(this.currentPanel.id.substring(0, this.currentPanel.id.length - 2) + "Link");
             if (currentNavBarButton!.hidden) this.setVisibility(EditorVisibility.NAVBAR);
+            else this.currentPanel.hidden = false;
         }
     }
 
@@ -240,9 +234,11 @@ export class BodyEditor {
         );
     }
 
-    public initGeneralSliders(planet: SolidPlanet, star: Star, player: PlayerController) {
+    public initGeneralSliders(planet: AbstractBody, star: Star, player: PlayerController) {
+        document.getElementById("generalLink")!.hidden = false;
+
         for (const slider of this.generalSliders) slider.remove();
-        this.generalSliders.length = 0;
+        this.generalSliders = [];
 
         this.generalSliders.push(
             new Slider("zoom", document.getElementById("zoom")!, 0, 100, (100 * planet._radius) / planet.transform.position.z, (value: number) => {
@@ -287,7 +283,7 @@ export class BodyEditor {
 
     public initPhysicSliders(planet: SolidPlanet) {
         for (const slider of this.physicSliders) slider.remove();
-        this.physicSliders.length = 0;
+        this.physicSliders = [];
 
         this.physicSliders.push(
             new Slider("minTemperature", document.getElementById("minTemperature")!, -273, 300, planet.physicalProperties.minTemperature, (val: number) => {
@@ -362,185 +358,191 @@ export class BodyEditor {
         );
     }
 
-    public initAtmosphereSliders(planet: SolidPlanet) {
+    public initGazCloudsSliders(planet: GazPlanet) {
+        for (const slider of this.gazCloudsSliders) slider.remove();
+        this.gazCloudsSliders = [];
+
+        const material = planet.material;
+        const colorSettings = material.colorSettings;
+
+        let gazColor1Picker = clearAllEventListenersById("gazColor1") as HTMLInputElement;
+        gazColor1Picker.value = colorSettings.color1.toHexString();
+        gazColor1Picker.addEventListener("input", () => {
+            colorSettings.color1.copyFrom(Color3.FromHexString(gazColor1Picker.value));
+        });
+
+        let gazColor2Picker = clearAllEventListenersById("gazColor2") as HTMLInputElement;
+        gazColor2Picker.value = colorSettings.color2.toHexString();
+        gazColor2Picker.addEventListener("input", () => {
+            colorSettings.color2.copyFrom(Color3.FromHexString(gazColor2Picker.value));
+        });
+
+        this.gazCloudsSliders.push(
+            new Slider("colorSharpness", document.getElementById("colorSharpness")!, 0, 30, planet.material.colorSettings.colorSharpness, (val: number) => {
+                colorSettings.colorSharpness = val;
+                material.updateManual();
+            })
+        );
+    }
+
+    public initAtmosphereSliders(planet: AbstractPlanet) {
         for (const slider of this.atmosphereSliders) slider.remove();
-        this.atmosphereSliders.length = 0;
+        this.atmosphereSliders = [];
 
-        if (planet.postProcesses.atmosphere != null) {
-            let atmosphere = planet.postProcesses.atmosphere;
+        if(planet.postProcesses.atmosphere == null) return;
 
-            let atmosphereToggler = clearAllEventListenersById("atmosphereToggler");
-            atmosphereToggler.addEventListener("click", () => {
-                let checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
-                checkbox.checked = !checkbox.checked;
-                atmosphere.settings.atmosphereRadius = checkbox.checked ? Settings.PLANET_RADIUS + Settings.ATMOSPHERE_HEIGHT : 0;
-            });
-
-            this.atmosphereSliders.push(
-                new Slider("intensity", document.getElementById("intensity")!, 0, 40, atmosphere.settings.intensity, (val: number) => {
-                    atmosphere.settings.intensity = val;
-                })
-            );
-
-            this.atmosphereSliders.push(
-                new Slider("density", document.getElementById("density")!, 0, 40, atmosphere.settings.densityModifier * 10, (val: number) => {
-                    atmosphere.settings.densityModifier = val / 10;
-                })
-            );
-
-            this.atmosphereSliders.push(
-                new Slider(
-                    "atmosphereRadius",
-                    document.getElementById("atmosphereRadius")!,
-                    0,
-                    100,
-                    (atmosphere.settings.atmosphereRadius - planet.getRadius()) / 10000,
-                    (val: number) => {
-                        atmosphere.settings.atmosphereRadius = planet.getRadius() + val * 10000;
-                    }
-                )
-            );
-
-            this.atmosphereSliders.push(
-                new Slider("rayleighStrength", document.getElementById("rayleighStrength")!, 0, 40, atmosphere.settings.rayleighStrength * 10, (val: number) => {
-                    atmosphere.settings.rayleighStrength = val / 10;
-                })
-            );
-
-            this.atmosphereSliders.push(
-                new Slider("mieStrength", document.getElementById("mieStrength")!, 0, 40, atmosphere.settings.mieStrength * 10, (val: number) => {
-                    atmosphere.settings.mieStrength = val / 10;
-                })
-            );
-
-            this.atmosphereSliders.push(
-                new Slider("falloff", document.getElementById("falloff")!, -10, 200, atmosphere.settings.falloffFactor, (val: number) => {
-                    atmosphere.settings.falloffFactor = val;
-                })
-            );
-
-            this.atmosphereSliders.push(
-                new Slider("redWaveLength", document.getElementById("redWaveLength")!, 0, 1000, atmosphere.settings.redWaveLength, (val: number) => {
-                    atmosphere.settings.redWaveLength = val;
-                })
-            );
-
-            this.atmosphereSliders.push(
-                new Slider("greenWaveLength", document.getElementById("greenWaveLength")!, 0, 1000, atmosphere.settings.greenWaveLength, (val: number) => {
-                    atmosphere.settings.greenWaveLength = val;
-                })
-            );
-
-            this.atmosphereSliders.push(
-                new Slider("blueWaveLength", document.getElementById("blueWaveLength")!, 0, 1000, atmosphere.settings.blueWaveLength, (val: number) => {
-                    atmosphere.settings.blueWaveLength = val;
-                })
-            );
-
-            this.atmosphereSliders.push(
-                new Slider("mieHaloRadius", document.getElementById("mieHaloRadius")!, 0, 200, atmosphere.settings.mieHaloRadius * 100, (val: number) => {
-                    atmosphere.settings.mieHaloRadius = val / 100;
-                })
-            );
-        }
+        let atmosphere = planet.postProcesses.atmosphere;
+        let atmosphereToggler = clearAllEventListenersById("atmosphereToggler");
+        atmosphereToggler.addEventListener("click", () => {
+            let checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
+            checkbox.checked = !checkbox.checked;
+            atmosphere.settings.atmosphereRadius = checkbox.checked ? Settings.PLANET_RADIUS + Settings.ATMOSPHERE_HEIGHT : 0;
+        });
+        this.atmosphereSliders.push(
+            new Slider("intensity", document.getElementById("intensity")!, 0, 40, atmosphere.settings.intensity, (val: number) => {
+                atmosphere.settings.intensity = val;
+            })
+        );
+        this.atmosphereSliders.push(
+            new Slider("density", document.getElementById("density")!, 0, 40, atmosphere.settings.densityModifier * 10, (val: number) => {
+                atmosphere.settings.densityModifier = val / 10;
+            })
+        );
+        this.atmosphereSliders.push(
+            new Slider(
+                "atmosphereRadius",
+                document.getElementById("atmosphereRadius")!,
+                0,
+                100,
+                (atmosphere.settings.atmosphereRadius - planet.getRadius()) / 10000,
+                (val: number) => {
+                    atmosphere.settings.atmosphereRadius = planet.getRadius() + val * 10000;
+                }
+            )
+        );
+        this.atmosphereSliders.push(
+            new Slider("rayleighStrength", document.getElementById("rayleighStrength")!, 0, 40, atmosphere.settings.rayleighStrength * 10, (val: number) => {
+                atmosphere.settings.rayleighStrength = val / 10;
+            })
+        );
+        this.atmosphereSliders.push(
+            new Slider("mieStrength", document.getElementById("mieStrength")!, 0, 40, atmosphere.settings.mieStrength * 10, (val: number) => {
+                atmosphere.settings.mieStrength = val / 10;
+            })
+        );
+        this.atmosphereSliders.push(
+            new Slider("falloff", document.getElementById("falloff")!, -10, 200, atmosphere.settings.falloffFactor, (val: number) => {
+                atmosphere.settings.falloffFactor = val;
+            })
+        );
+        this.atmosphereSliders.push(
+            new Slider("redWaveLength", document.getElementById("redWaveLength")!, 0, 1000, atmosphere.settings.redWaveLength, (val: number) => {
+                atmosphere.settings.redWaveLength = val;
+            })
+        );
+        this.atmosphereSliders.push(
+            new Slider("greenWaveLength", document.getElementById("greenWaveLength")!, 0, 1000, atmosphere.settings.greenWaveLength, (val: number) => {
+                atmosphere.settings.greenWaveLength = val;
+            })
+        );
+        this.atmosphereSliders.push(
+            new Slider("blueWaveLength", document.getElementById("blueWaveLength")!, 0, 1000, atmosphere.settings.blueWaveLength, (val: number) => {
+                atmosphere.settings.blueWaveLength = val;
+            })
+        );
+        this.atmosphereSliders.push(
+            new Slider("mieHaloRadius", document.getElementById("mieHaloRadius")!, 0, 200, atmosphere.settings.mieHaloRadius * 100, (val: number) => {
+                atmosphere.settings.mieHaloRadius = val / 100;
+            })
+        );
     }
 
     public initCloudsSliders(planet: SolidPlanet) {
         for (const slider of this.cloudsSliders) slider.remove();
-        this.cloudsSliders.length = 0;
+        this.cloudsSliders = [];
 
-        if (planet.postProcesses.clouds != null) {
-            let flatClouds = planet.postProcesses.clouds!;
+        if(planet.postProcesses.clouds == null) return;
 
-            let cloudsToggler = clearAllEventListenersById("cloudsToggler");
-            cloudsToggler.addEventListener("click", () => {
-                let checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
-                checkbox.checked = !checkbox.checked;
-                flatClouds.settings.cloudLayerRadius = checkbox.checked ? Settings.PLANET_RADIUS + Settings.CLOUD_LAYER_HEIGHT : 0;
-            });
-
-            let cloudColorPicker = clearAllEventListenersById("cloudColor") as HTMLInputElement;
-            cloudColorPicker.value = flatClouds.settings.cloudColor.toHexString();
-            cloudColorPicker.addEventListener("input", () => {
-                flatClouds.settings.cloudColor = Color3.FromHexString(cloudColorPicker.value);
-            });
-
-            this.cloudsSliders.push(
-                new Slider("cloudFrequency", document.getElementById("cloudFrequency")!, 0, 20, flatClouds.settings.cloudFrequency, (val: number) => {
-                    flatClouds.settings.cloudFrequency = val;
-                })
-            );
-
-            this.cloudsSliders.push(
-                new Slider("cloudDetailFrequency", document.getElementById("cloudDetailFrequency")!, 0, 50, flatClouds.settings.cloudDetailFrequency, (val: number) => {
-                    flatClouds.settings.cloudDetailFrequency = val;
-                })
-            );
-
-            this.cloudsSliders.push(
-                new Slider("cloudPower", document.getElementById("cloudPower")!, 0, 100, flatClouds.settings.cloudPower * 10, (val: number) => {
-                    flatClouds.settings.cloudPower = val / 10;
-                })
-            );
-
-            this.cloudsSliders.push(
-                new Slider("cloudSharpness", document.getElementById("cloudSharpness")!, 0, 100, flatClouds.settings.cloudSharpness, (val: number) => {
-                    flatClouds.settings.cloudSharpness = val;
-                })
-            );
-
-            this.cloudsSliders.push(
-                new Slider("worleySpeed", document.getElementById("worleySpeed")!, 0.0, 200.0, flatClouds.settings.worleySpeed * 10000, (val: number) => {
-                    flatClouds.settings.worleySpeed = val / 10000;
-                })
-            );
-
-            this.cloudsSliders.push(
-                new Slider("detailSpeed", document.getElementById("detailSpeed")!, 0, 200, flatClouds.settings.detailSpeed * 10000, (val: number) => {
-                    flatClouds.settings.detailSpeed = val / 10000;
-                })
-            );
-        }
+        let flatClouds = planet.postProcesses.clouds!;
+        let cloudsToggler = clearAllEventListenersById("cloudsToggler");
+        cloudsToggler.addEventListener("click", () => {
+            let checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
+            checkbox.checked = !checkbox.checked;
+            flatClouds.settings.cloudLayerRadius = checkbox.checked ? Settings.PLANET_RADIUS + Settings.CLOUD_LAYER_HEIGHT : 0;
+        });
+        let cloudColorPicker = clearAllEventListenersById("cloudColor") as HTMLInputElement;
+        cloudColorPicker.value = flatClouds.settings.cloudColor.toHexString();
+        cloudColorPicker.addEventListener("input", () => {
+            flatClouds.settings.cloudColor = Color3.FromHexString(cloudColorPicker.value);
+        });
+        this.cloudsSliders.push(
+            new Slider("cloudFrequency", document.getElementById("cloudFrequency")!, 0, 20, flatClouds.settings.cloudFrequency, (val: number) => {
+                flatClouds.settings.cloudFrequency = val;
+            })
+        );
+        this.cloudsSliders.push(
+            new Slider("cloudDetailFrequency", document.getElementById("cloudDetailFrequency")!, 0, 50, flatClouds.settings.cloudDetailFrequency, (val: number) => {
+                flatClouds.settings.cloudDetailFrequency = val;
+            })
+        );
+        this.cloudsSliders.push(
+            new Slider("cloudPower", document.getElementById("cloudPower")!, 0, 100, flatClouds.settings.cloudPower * 10, (val: number) => {
+                flatClouds.settings.cloudPower = val / 10;
+            })
+        );
+        this.cloudsSliders.push(
+            new Slider("cloudSharpness", document.getElementById("cloudSharpness")!, 0, 100, flatClouds.settings.cloudSharpness, (val: number) => {
+                flatClouds.settings.cloudSharpness = val;
+            })
+        );
+        this.cloudsSliders.push(
+            new Slider("worleySpeed", document.getElementById("worleySpeed")!, 0.0, 200.0, flatClouds.settings.worleySpeed * 10000, (val: number) => {
+                flatClouds.settings.worleySpeed = val / 10000;
+            })
+        );
+        this.cloudsSliders.push(
+            new Slider("detailSpeed", document.getElementById("detailSpeed")!, 0, 200, flatClouds.settings.detailSpeed * 10000, (val: number) => {
+                flatClouds.settings.detailSpeed = val / 10000;
+            })
+        );
     }
 
-    public initRingsSliders(planet: SolidPlanet) {
+    public initRingsSliders(planet: AbstractBody) {
+        document.getElementById("ringsLink")!.hidden = planet.postProcesses.rings == null;
+        document.getElementById("ringsUI")!.hidden = this.currentPanel?.id != "ringsUI" || planet.postProcesses.rings == null;
+
         for (const slider of this.ringsSliders) slider.remove();
-        this.ringsSliders.length = 0;
+        this.ringsSliders = [];
 
-        if (planet.postProcesses.rings != null) {
-            let rings = planet.postProcesses.rings!;
+        if(planet.postProcesses.rings == null) return;
 
-            let ringsToggler = clearAllEventListenersById("ringsToggler");
-            ringsToggler.addEventListener("click", () => {
-                let checkbox = document.querySelectorAll("input[type='checkbox']")[3] as HTMLInputElement;
-                checkbox.checked = !checkbox.checked;
-                rings.settings.ringFrequency = checkbox.checked ? 30 : 0;
-            });
-
-            this.ringsSliders.push(
-                new Slider("ringsMinRadius", document.getElementById("ringsMinRadius")!, 100, 200, rings.settings.ringStart * 100, (val: number) => {
-                    rings.settings.ringStart = val / 100;
-                })
-            );
-
-            this.ringsSliders.push(
-                new Slider("ringsMaxRadius", document.getElementById("ringsMaxRadius")!, 150, 400, rings.settings.ringEnd * 100, (val: number) => {
-                    rings.settings.ringEnd = val / 100;
-                })
-            );
-
-            this.ringsSliders.push(
-                new Slider("ringsFrequency", document.getElementById("ringsFrequency")!, 10, 100, rings.settings.ringFrequency, (val: number) => {
-                    rings.settings.ringFrequency = val;
-                })
-            );
-
-            this.ringsSliders.push(
-                new Slider("ringsOpacity", document.getElementById("ringsOpacity")!, 0, 100, rings.settings.ringOpacity * 100, (val: number) => {
-                    rings.settings.ringOpacity = val / 100;
-                })
-            );
-        }
+        let rings = planet.postProcesses.rings!;
+        let ringsToggler = clearAllEventListenersById("ringsToggler");
+        ringsToggler.addEventListener("click", () => {
+            let checkbox = document.querySelectorAll("input[type='checkbox']")[3] as HTMLInputElement;
+            checkbox.checked = !checkbox.checked;
+            rings.settings.ringFrequency = checkbox.checked ? 30 : 0;
+        });
+        this.ringsSliders.push(
+            new Slider("ringsMinRadius", document.getElementById("ringsMinRadius")!, 100, 200, rings.settings.ringStart * 100, (val: number) => {
+                rings.settings.ringStart = val / 100;
+            })
+        );
+        this.ringsSliders.push(
+            new Slider("ringsMaxRadius", document.getElementById("ringsMaxRadius")!, 150, 400, rings.settings.ringEnd * 100, (val: number) => {
+                rings.settings.ringEnd = val / 100;
+            })
+        );
+        this.ringsSliders.push(
+            new Slider("ringsFrequency", document.getElementById("ringsFrequency")!, 10, 100, rings.settings.ringFrequency, (val: number) => {
+                rings.settings.ringFrequency = val;
+            })
+        );
+        this.ringsSliders.push(
+            new Slider("ringsOpacity", document.getElementById("ringsOpacity")!, 0, 100, rings.settings.ringOpacity * 100, (val: number) => {
+                rings.settings.ringOpacity = val / 100;
+            })
+        );
     }
 
     public initOceanSliders(planet: SolidPlanet) {

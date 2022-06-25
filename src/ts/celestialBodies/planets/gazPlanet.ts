@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { DepthRenderer, Mesh, MeshBuilder, Scene, Vector3 } from "@babylonjs/core";
 
 import { AbstractPlanet } from "./abstractPlanet";
 import { BodyType } from "../interfaces";
@@ -6,25 +6,46 @@ import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
 import { IPlanetPhysicalProperties } from "../iPhysicalProperties";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
+import { GazPlanetMaterial } from "../../materials/gazPlanetMaterial";
+import { centeredRand } from "extended-random";
+import { Settings } from "../../settings";
 
 export class GazPlanet extends AbstractPlanet {
     protected bodyType = BodyType.GAZ;
 
     override readonly physicalProperties: IPlanetPhysicalProperties;
 
-    constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+    private readonly mesh: Mesh;
+    readonly material: GazPlanetMaterial;
+
+    constructor(name: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, depthRenderer: DepthRenderer, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, radius, starSystemManager, seed, parentBodies);
         this.physicalProperties = {
             // FIXME: choose physically accurates values
-            mass: 20,
+            mass: 10,
             rotationPeriod: 24 * 60 * 60,
             minTemperature: 100,
             maxTemperature: 110,
             pressure: 1
         };
+
+        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: radius * 2, segments: 64 }, scene);
+        depthRenderer.getDepthMap().renderList!.push(this.mesh);
+        this.mesh.parent = this.transform;
+
+        this.material = new GazPlanetMaterial(this, scene);
+        this.mesh.material = this.material;
+
+        // FIXME: implement multiple stars
+        let atmosphere = this.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, starSystemManager.stars[0], scene);
+        atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng) / 6;
+        atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;
+        atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng) / 6;
+
     }
 
     public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
         super.update(player, lightPosition, deltaTime);
+        this.material.update(player, lightPosition);
     }
 }

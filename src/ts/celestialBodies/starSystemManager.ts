@@ -1,12 +1,16 @@
-import { Vector3, DepthRenderer } from "@babylonjs/core";
+import { DepthRenderer, Vector3 } from "@babylonjs/core";
 
 import { ChunkForge } from "../chunks/chunkForge";
 import { PlayerController } from "../player/playerController";
 import { AbstractBody } from "./abstractBody";
+import { Star } from "./stars/star";
+import { BodyType } from "./interfaces";
 
 export class StarSystemManager {
     private readonly _chunkForge: ChunkForge;
     private readonly _bodies: AbstractBody[] = [];
+
+    stars: Star[] = [];
 
     private clock: number = 0;
 

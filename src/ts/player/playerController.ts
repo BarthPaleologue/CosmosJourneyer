@@ -95,7 +95,7 @@ export class PlayerController implements ITransformable {
      * @returns the unit vector pointing to the left of the player controler in world space
      */
     public getLeftDirection(): Vector3 {
-        return this.getRightDirection().scale(-1);
+        return this.getRightDirection().negate();
     }
 
     /* #endregion directions */

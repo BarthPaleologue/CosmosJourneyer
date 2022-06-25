@@ -22,3 +22,9 @@ export interface ColorSettings {
     steepSharpness: number;
     normalSharpness: number;
 }
+
+export interface GazColorSettings {
+    color1: Color3,
+    color2: Color3,
+    colorSharpness: number
+}
