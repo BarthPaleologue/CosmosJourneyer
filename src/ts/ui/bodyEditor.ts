@@ -4,12 +4,12 @@ import { Star } from "../celestialBodies/stars/star";
 import { Slider } from "handle-sliderjs";
 import { BodyType } from "../celestialBodies/interfaces";
 import { Settings } from "../settings";
-import { Axis, Color3, Vector3 } from "@babylonjs/core";
+import { Axis, Color3 } from "@babylonjs/core";
 import { PlayerController } from "../player/playerController";
 import { AbstractBody } from "../celestialBodies/abstractBody";
 import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../materials/colorSettingsInterface";
-import { clearAllEventListenersById } from "../utils/html";
+import { clearAllEventListenersById, hide, show } from "../utils/html";
 import { stripAxisFromQuaternion } from "../utils/algebra";
 import { GazPlanet } from "../celestialBodies/planets/gazPlanet";
 import { AbstractPlanet } from "../celestialBodies/planets/abstractPlanet";
@@ -69,7 +69,7 @@ export class BodyEditor {
 
         if (this.currentPanel == null) this.setVisibility(EditorVisibility.FULL);
         else {
-            this.currentPanel.hidden = true;
+            hide(this.currentPanel.id);
             if (this.currentPanel.id == panelId) {
                 this.currentPanel = null;
                 this.setVisibility(EditorVisibility.NAVBAR);
@@ -77,29 +77,28 @@ export class BodyEditor {
             }
         }
         this.currentPanel = newPanel;
-        this.currentPanel.hidden = false;
-        this.updateAllSliders();
+        show(this.currentPanel.id);
+        setTimeout(() => this.updateAllSliders(), 500);
     }
 
     public setVisibility(visibility: EditorVisibility): void {
         this.visibility = visibility;
         switch (this.visibility) {
             case EditorVisibility.HIDDEN:
-                document.getElementById("navBar")!.style.display = "none";
-                document.getElementById("editorPanelContainer")!.hidden = true;
-                document.getElementById("toolbar")!.hidden = true;
+                hide("navBar");
+                hide("editorPanelContainer");
+                hide("toolbar");
                 this.currentPanel = null;
                 break;
             case EditorVisibility.NAVBAR:
                 document.getElementById("navBar")!.style.display = "flex";
-                document.getElementById("editorPanelContainer")!.hidden = true;
-                document.getElementById("toolbar")!.hidden = true;
-                this.currentPanel = null;
+                hide("editorPanelContainer");
+                hide("toolbar");
                 break;
             case EditorVisibility.FULL:
                 document.getElementById("navBar")!.style.display = "flex";
-                document.getElementById("editorPanelContainer")!.hidden = false;
-                document.getElementById("toolbar")!.hidden = false;
+                show("editorPanelContainer");
+                show("toolbar");
                 break;
             default:
                 throw new Error("BodyEditor received an unusual visibility state");
@@ -150,70 +149,70 @@ export class BodyEditor {
     }
 
     public initNavBar(body: AbstractBody): void {
-        document.getElementById("generalLink")!.hidden = true;
-        document.getElementById("generalUI")!.hidden = true;
+        hide("generalLink");
+        hide("generalUI");
 
-        document.getElementById("starPhysicLink")!.hidden = true;
-        document.getElementById("starPhysicUI")!.hidden = true;
+        hide("starPhysicLink");
+        hide("starPhysicUI");
 
-        document.getElementById("starPhysicLink")!.hidden = true;
-        document.getElementById("starPhysicUI")!.hidden = true;
+        hide("starPhysicLink");
+        hide("starPhysicUI");
 
-        document.getElementById("physicLink")!.hidden = true;
-        document.getElementById("physicUI")!.hidden = true;
+        hide("physicLink");
+        hide("physicUI");
 
-        document.getElementById("oceanLink")!.hidden = true;
-        document.getElementById("oceanUI")!.hidden = true;
+        hide("oceanLink");
+        hide("oceanUI");
 
-        document.getElementById("surfaceLink")!.hidden = true;
-        document.getElementById("surfaceUI")!.hidden = true;
+        hide("surfaceLink");
+        hide("surfaceUI");
 
-        document.getElementById("gazCloudsLink")!.hidden = true;
-        document.getElementById("gazCloudsUI")!.hidden = true;
+        hide("gazCloudsLink");
+        hide("gazCloudsUI");
 
-        document.getElementById("cloudsLink")!.hidden = true;
-        document.getElementById("cloudsUI")!.hidden = true;
+        hide("cloudsLink");
+        hide("cloudsUI");
 
-        document.getElementById("atmosphereLink")!.hidden = true;
-        document.getElementById("atmosphereUI")!.hidden = true;
+        hide("atmosphereLink");
+        hide("atmosphereUI");
 
         switch (body.getBodyType()) {
             case BodyType.STAR:
-                document.getElementById("starPhysicLink")!.hidden = false;
+                show("starPhysicLink");
                 break;
             case BodyType.SOLID:
-                document.getElementById("physicLink")!.hidden = false;
+                show("physicLink");
 
-                document.getElementById("oceanLink")!.hidden = (body as SolidPlanet).postProcesses.ocean == null;
-                document.getElementById("oceanUI")!.hidden = this.currentPanel?.id != "oceanUI" || (body as SolidPlanet).postProcesses.ocean == null;
+                show("oceanLink", (body as SolidPlanet).postProcesses.ocean != null);
+                show("oceanUI", this.currentPanel?.id == "oceanUI" && (body as SolidPlanet).postProcesses.ocean != null);
 
-                document.getElementById("surfaceLink")!.hidden = false;
+                show("surfaceLink");
 
-                document.getElementById("cloudsLink")!.hidden = (body as SolidPlanet).postProcesses.clouds == null;
-                document.getElementById("cloudsUI")!.hidden = this.currentPanel?.id != "cloudsUI" || (body as SolidPlanet).postProcesses.clouds == null;
+                show("cloudsLink", (body as SolidPlanet).postProcesses.clouds != null);
+                show("cloudsUI", this.currentPanel?.id == "cloudsUI" && (body as SolidPlanet).postProcesses.clouds != null);
 
-                document.getElementById("atmosphereLink")!.hidden = (body as SolidPlanet).postProcesses.atmosphere == null;
-                document.getElementById("atmosphereUI")!.hidden = this.currentPanel?.id != "atmosphereUI" || (body as SolidPlanet).postProcesses.atmosphere == null;
+                show("atmosphereLink", (body as SolidPlanet).postProcesses.atmosphere != null);
+                show("atmosphereUI", this.currentPanel?.id == "atmosphereUI" && (body as SolidPlanet).postProcesses.atmosphere != null);
                 break;
             case BodyType.GAZ:
-                document.getElementById("atmosphereLink")!.hidden = (body as SolidPlanet).postProcesses.atmosphere == null;
-                document.getElementById("atmosphereUI")!.hidden = this.currentPanel?.id != "atmosphereUI" || (body as SolidPlanet).postProcesses.atmosphere == null;
+                show("atmosphereLink");
+                show("atmosphereUI", this.currentPanel?.id == "atmosphereUI");
 
-                document.getElementById("gazCloudsLink")!.hidden = false;
-                document.getElementById("gazCloudsUI")!.hidden = this.currentPanel?.id != "gazCloudsUI";
+                show("gazCloudsLink");
+                show("gazCloudsUI", this.currentPanel?.id == "gazCloudsUI");
                 break;
         }
         if (this.currentPanel != null) {
             //TODO: this is messed up
             const currentNavBarButton = document.getElementById(this.currentPanel.id.substring(0, this.currentPanel.id.length - 2) + "Link");
-            if (currentNavBarButton!.hidden) this.setVisibility(EditorVisibility.NAVBAR);
-            else this.currentPanel.hidden = false;
+            if (currentNavBarButton!.style.display == "none") this.setVisibility(EditorVisibility.NAVBAR);
+            else show(this.currentPanel.id);
         }
     }
 
     public initStarSliders(star: Star): void {
         for (const slider of this.starSliders) slider.remove();
-        this.starSliders.length = 0;
+        this.starSliders = [];
 
         this.starSliders.push(
             new Slider("temperature", document.getElementById("temperature")!, 3000, 15000, star.physicalProperties.temperature, (val: number) => {
@@ -235,7 +234,7 @@ export class BodyEditor {
     }
 
     public initGeneralSliders(planet: AbstractBody, star: Star, player: PlayerController) {
-        document.getElementById("generalLink")!.hidden = false;
+        show("generalLink");
 
         for (const slider of this.generalSliders) slider.remove();
         this.generalSliders = [];
@@ -360,7 +359,7 @@ export class BodyEditor {
 
     public initGazCloudsSliders(planet: GazPlanet) {
         for (const slider of this.gazCloudsSliders) slider.remove();
-        this.gazCloudsSliders = [];
+        this.gazCloudsSliders.length = 0;
 
         const material = planet.material;
         const colorSettings = material.colorSettings;
@@ -508,15 +507,15 @@ export class BodyEditor {
     }
 
     public initRingsSliders(planet: AbstractBody) {
-        document.getElementById("ringsLink")!.hidden = planet.postProcesses.rings == null;
-        document.getElementById("ringsUI")!.hidden = this.currentPanel?.id != "ringsUI" || planet.postProcesses.rings == null;
-
         for (const slider of this.ringsSliders) slider.remove();
         this.ringsSliders = [];
 
         if(planet.postProcesses.rings == null) return;
 
-        let rings = planet.postProcesses.rings!;
+        show("ringsLink");
+        show("ringsUI", this.currentPanel?.id == "ringsUI");
+
+        let rings = planet.postProcesses.rings;
         let ringsToggler = clearAllEventListenersById("ringsToggler");
         ringsToggler.addEventListener("click", () => {
             let checkbox = document.querySelectorAll("input[type='checkbox']")[3] as HTMLInputElement;
@@ -549,46 +548,40 @@ export class BodyEditor {
         for (const slider of this.oceanSliders) slider.remove();
         this.oceanSliders.length = 0;
 
-        if (planet.postProcesses.ocean != null) {
-            let ocean = planet.postProcesses.ocean;
+        if(planet.postProcesses.ocean == null) return;
 
-            let oceanToggler = clearAllEventListenersById("oceanToggler");
-            oceanToggler.addEventListener("click", () => {
-                let checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
-                checkbox.checked = !checkbox.checked;
-                ocean.settings.oceanRadius = checkbox.checked ? planet.getApparentRadius() : 0;
-            });
-
-            this.oceanSliders.push(
-                new Slider("alphaModifier", document.getElementById("alphaModifier")!, 0, 200, ocean.settings.alphaModifier * 10000, (val: number) => {
-                    ocean.settings.alphaModifier = val / 10000;
-                })
-            );
-
-            this.oceanSliders.push(
-                new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 70, ocean.settings.depthModifier * 10000, (val: number) => {
-                    ocean.settings.depthModifier = val / 10000;
-                })
-            );
-
-            this.oceanSliders.push(
-                new Slider("specularPower", document.getElementById("specularPower")!, 0, 100, ocean.settings.specularPower * 10, (val: number) => {
-                    ocean.settings.specularPower = val / 10;
-                })
-            );
-
-            this.oceanSliders.push(
-                new Slider("smoothness", document.getElementById("smoothness")!, 0, 100, ocean.settings.smoothness * 100, (val: number) => {
-                    ocean.settings.smoothness = val / 100;
-                })
-            );
-
-            this.oceanSliders.push(
-                new Slider("waveBlendingSharpness", document.getElementById("waveBlendingSharpness")!, 0, 100, ocean.settings.waveBlendingSharpness * 100, (val: number) => {
-                    ocean.settings.waveBlendingSharpness = val / 100;
-                })
-            );
-        }
+        let ocean = planet.postProcesses.ocean;
+        let oceanToggler = clearAllEventListenersById("oceanToggler");
+        oceanToggler.addEventListener("click", () => {
+            let checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
+            checkbox.checked = !checkbox.checked;
+            ocean.settings.oceanRadius = checkbox.checked ? planet.getApparentRadius() : 0;
+        });
+        this.oceanSliders.push(
+            new Slider("alphaModifier", document.getElementById("alphaModifier")!, 0, 200, ocean.settings.alphaModifier * 10000, (val: number) => {
+                ocean.settings.alphaModifier = val / 10000;
+            })
+        );
+        this.oceanSliders.push(
+            new Slider("depthModifier", document.getElementById("depthModifier")!, 0, 70, ocean.settings.depthModifier * 10000, (val: number) => {
+                ocean.settings.depthModifier = val / 10000;
+            })
+        );
+        this.oceanSliders.push(
+            new Slider("specularPower", document.getElementById("specularPower")!, 0, 100, ocean.settings.specularPower * 10, (val: number) => {
+                ocean.settings.specularPower = val / 10;
+            })
+        );
+        this.oceanSliders.push(
+            new Slider("smoothness", document.getElementById("smoothness")!, 0, 100, ocean.settings.smoothness * 100, (val: number) => {
+                ocean.settings.smoothness = val / 100;
+            })
+        );
+        this.oceanSliders.push(
+            new Slider("waveBlendingSharpness", document.getElementById("waveBlendingSharpness")!, 0, 100, ocean.settings.waveBlendingSharpness * 100, (val: number) => {
+                ocean.settings.waveBlendingSharpness = val / 100;
+            })
+        );
     }
 
     public initToolbar(planet: SolidPlanet) {

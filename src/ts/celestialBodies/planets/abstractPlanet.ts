@@ -9,6 +9,7 @@ import { StarSystemManager } from "../starSystemManager";
 import { IPlanetPhysicalProperties } from "../iPhysicalProperties";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
+import { centeredRand, uniformRandBool } from "extended-random";
 
 export abstract class AbstractPlanet extends AbstractBody {
     abstract override physicalProperties: IPlanetPhysicalProperties;

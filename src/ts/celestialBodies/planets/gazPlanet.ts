@@ -7,7 +7,7 @@ import { StarSystemManager } from "../starSystemManager";
 import { IPlanetPhysicalProperties } from "../iPhysicalProperties";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { GazPlanetMaterial } from "../../materials/gazPlanetMaterial";
-import { centeredRand } from "extended-random";
+import { centeredRand, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 
 export class GazPlanet extends AbstractPlanet {
@@ -41,6 +41,10 @@ export class GazPlanet extends AbstractPlanet {
         atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng) / 6;
         atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;
         atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng) / 6;
+
+        if (uniformRandBool(0.8, this.rng)) {
+            this.createRings(starSystemManager.stars[0], scene);
+        }
 
     }
 

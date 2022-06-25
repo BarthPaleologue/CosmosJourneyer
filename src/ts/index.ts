@@ -23,6 +23,7 @@ import { BodyType } from "./celestialBodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
 import { Assets } from "./assets";
+import { GazPlanet } from "./celestialBodies/planets/gazPlanet";
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
@@ -74,7 +75,8 @@ planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
 planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
 planet.createRings(sun, scene);
 
-let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, scene, 549,[planet]);
+let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, scene, 437,[planet]);
+moon.postProcesses.clouds?.dispose();
 moon.physicalProperties.mass = 2;
 moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moon.physicalProperties.minTemperature = -180;
@@ -99,6 +101,7 @@ moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
 moon.material.updateManual();
 
 let ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene, 432, [sun]);
+ares.postProcesses.clouds?.dispose();
 ares.physicalProperties.mass = 7;
 ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 ares.physicalProperties.minTemperature = -80;
@@ -130,6 +133,14 @@ let aresAtmosphere = ares.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scen
 aresAtmosphere.settings.redWaveLength = 500;
 aresAtmosphere.settings.greenWaveLength = 680;
 aresAtmosphere.settings.blueWaveLength = 670;
+
+const andromaque = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystem, scene, depthRenderer, 25, [sun]);
+andromaque.orbitalProperties = {
+    period: 60 * 60 * 24 * 431 * 10,
+    periapsis: 70 * ares.getRadius(),
+    apoapsis: 71 * ares.getRadius(),
+    orientationQuaternion: Quaternion.Identity()
+};
 
 const fxaa = new FxaaPostProcess("fxaa", 1, player.camera, Texture.BILINEAR_SAMPLINGMODE);
 

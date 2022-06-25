@@ -14,6 +14,7 @@ import { Settings } from "../../settings";
 import { ISolidPhysicalProperties } from "../iPhysicalProperties";
 import { SolidPlanetMaterial } from "../../materials/solidPlanetMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
+import { centeredRand, uniformRandBool } from "extended-random";
 
 export class SolidPlanet extends AbstractPlanet implements RigidBody {
     oceanLevel: number;
@@ -66,6 +67,15 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             new ChunkTree(Direction.Right, this),
             new ChunkTree(Direction.Left, this)
         ];
+
+        if (uniformRandBool(0.6, this.rng)) {
+            this.createRings(starSystemManager.stars[0], scene);
+        }
+
+        if (this.physicalProperties.waterAmount > 0 && this.physicalProperties.pressure > 0.3 && uniformRandBool(0.95, this.rng)) {
+            let flatClouds = this.createClouds(Settings.CLOUD_LAYER_HEIGHT, starSystemManager.stars[0], scene);
+            flatClouds.settings.cloudPower = 10 * Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
+        }
     }
 
     public generateCollisionTask(relativePosition: Vector3): CollisionData {

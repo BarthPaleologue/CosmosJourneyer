@@ -83,7 +83,7 @@ void main() {
 
     seededSamplePoint.y *= 2.0;
 
-    float cloudSpeed = 0.002;
+    float cloudSpeed = 0.0005;
     vec4 seededSamplePoint2 = vec4(rotateAround(seededSamplePoint.xyz, vec3(0.0, 1.0, 0.0), time * cloudSpeed), seededSamplePoint.w);
 
     for(int i = 0; i < 2; i++) {
