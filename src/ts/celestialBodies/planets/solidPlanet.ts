@@ -16,6 +16,7 @@ import { SolidPlanetMaterial } from "../../materials/solidPlanetMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { uniformRandBool } from "extended-random";
 import { RingMaterial } from "../../materials/ringMaterial";
+import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 
 export class SolidPlanet extends AbstractPlanet implements RigidBody {
     oceanLevel: number;
@@ -42,8 +43,14 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             waterAmount: 1
         };
 
-        // TODO: faire quelque chose de réaliste
-        this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
+        const waterBoilingPoint = waterBoilingPointCelsius(this.physicalProperties.pressure);
+        const waterFreezingPoint = 0.0;
+        if(waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
+            this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
+            this.createOcean(starSystemManager.stars[0], starSystemManager.scene);
+        } else {
+            this.oceanLevel = 0;
+        }
 
         this.terrainSettings = {
             continentsFragmentation: 0.47,

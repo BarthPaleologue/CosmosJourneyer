@@ -69,12 +69,13 @@ planet.orbitalProperties = {
 };
 starSystem.update(player, sun.getAbsolutePosition(), 0);
 
-planet.createOcean(sun, scene);
+//planet.createOcean(sun, scene);
 planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
 planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
 
 let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, 437, [planet]);
 moon.postProcesses.clouds?.dispose();
+moon.postProcesses.ocean?.dispose();
 moon.physicalProperties.mass = 2;
 moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moon.physicalProperties.minTemperature = -180;
@@ -101,6 +102,7 @@ moon.material.updateManual();
 
 let ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, 432, [sun]);
 ares.postProcesses.clouds?.dispose();
+ares.postProcesses.ocean?.dispose();
 ares.physicalProperties.mass = 7;
 ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 ares.physicalProperties.minTemperature = -80;
