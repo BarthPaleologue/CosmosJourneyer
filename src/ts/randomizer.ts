@@ -45,7 +45,7 @@ const starSystemManager = new StarSystemManager(scene, Settings.VERTEX_RESOLUTIO
 const starSystemSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER);
 const starSystemRand = alea(starSystemSeed.toString());
 
-const starSeed = randRange(-1e6, 1e6, starSystemRand);
+const starSeed = randRange(-10, 10, starSystemRand);
 console.log("Star seed : ", starSeed);
 
 // TODO: generate radius inside body constructor
@@ -56,7 +56,7 @@ const sun = new Star("Weierstrass", starRadius, starSystemManager, scene, starSe
 
 starfield.setStar(sun);
 
-const planetSeed = randRange(-1e6, 1e6, starSystemRand);
+const planetSeed = randRange(-10, 10, starSystemRand);
 console.log("Planet seed : ", planetSeed);
 
 let planet: AbstractBody;

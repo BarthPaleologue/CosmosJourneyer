@@ -20,10 +20,8 @@ uniform float seed;
 #pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl, tanh=tanh)
 
 void main() {
-	// la unitPosition ne prend pas en compte la rotation de la planète
-
 	float plasmaSpeed = 0.005;
-	vec4 seededSamplePoint = vec4(rotateAround(vUnitSamplePoint, vec3(0.0, 1.0, 0.0), time * plasmaSpeed), seed / 1e5);
+	vec4 seededSamplePoint = vec4(rotateAround(vUnitSamplePoint, vec3(0.0, 1.0, 0.0), time * plasmaSpeed), seed);
 
 	float noiseValue = fractalSimplex4(seededSamplePoint * 5.0, 8, 2.0, 2.0);
 

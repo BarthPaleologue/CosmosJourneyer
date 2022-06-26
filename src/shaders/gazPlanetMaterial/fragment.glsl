@@ -79,7 +79,7 @@ void main() {
     float ndl = max(0.002, dot(sphereNormalW, lightRayW));
 
     // FIXME: remove scaling
-    vec4 seededSamplePoint = vec4(vUnitSamplePoint * 2.0, seed / 1e5);
+    vec4 seededSamplePoint = vec4(vUnitSamplePoint * 2.0, seed);
 
     seededSamplePoint.y *= 2.0;
 

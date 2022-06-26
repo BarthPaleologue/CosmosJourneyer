@@ -226,8 +226,7 @@ void main() {
 	vec3 sphereNormalW = vSphereNormalW;
 	float ndl = max(0.002, dot(sphereNormalW, lightRayW));
 
-	// FIXME: remove scaling
-	vec4 seededSamplePoint = vec4(vUnitSamplePoint, seed / 1e15);
+	vec4 seededSamplePoint = vec4(vUnitSamplePoint, seed);
 
 	float latitude = vUnitSamplePoint.y;
 	float absLatitude01 = abs(latitude);
