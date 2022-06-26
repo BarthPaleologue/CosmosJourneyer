@@ -159,7 +159,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
      */
     public update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
         if (this.orbitalProperties.period > 0) {
-            const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
+            const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies.concat(this.childrenBodies));
             this.orbitalProperties.orientationQuaternion = orientationQuaternion;
 
             //TODO: orient the planet accurately

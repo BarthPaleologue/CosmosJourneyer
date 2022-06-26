@@ -57,7 +57,7 @@ const flare00 = new LensFlare(
     lensFlareSystem // lens flare system
 );*/
 
-let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, 724, [sun]);
+const planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, -52, [sun]);
 
 planet.physicalProperties.rotationPeriod /= 50;
 
@@ -67,15 +67,11 @@ planet.orbitalProperties = {
     periapsis: 35 * planet.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
-starSystem.update(player, sun.getAbsolutePosition(), 0);
 
-//planet.createOcean(sun, scene);
-planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
-planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
-
-let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, 437, [planet]);
-moon.postProcesses.clouds?.dispose();
+const moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, 437, [planet]);
 moon.postProcesses.ocean?.dispose();
+moon.postProcesses.clouds?.dispose();
+moon.postProcesses.atmosphere?.dispose();
 moon.physicalProperties.mass = 2;
 moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moon.physicalProperties.minTemperature = -180;
@@ -101,8 +97,8 @@ moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
 moon.material.updateManual();
 
 let ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, 432, [sun]);
-ares.postProcesses.clouds?.dispose();
 ares.postProcesses.ocean?.dispose();
+ares.postProcesses.clouds?.dispose();
 ares.physicalProperties.mass = 7;
 ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 ares.physicalProperties.minTemperature = -80;
@@ -130,7 +126,7 @@ ares.oceanLevel = Settings.OCEAN_DEPTH * ares.physicalProperties.waterAmount * a
 
 ares.material.updateManual();
 
-let aresAtmosphere = ares.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
+const aresAtmosphere = ares.postProcesses.atmosphere!;
 aresAtmosphere.settings.redWaveLength = 500;
 aresAtmosphere.settings.greenWaveLength = 680;
 aresAtmosphere.settings.blueWaveLength = 670;

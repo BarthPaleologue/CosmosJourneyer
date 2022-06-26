@@ -86,7 +86,7 @@ export class SolidPlanetMaterial extends ShaderMaterial {
             bottomColor: new Color3(0.5, 0.5, 0.5),
 
             beachSize: 300,
-            steepSharpness: 2,
+            steepSharpness: 1.4,
             normalSharpness: 0.5
         };
 

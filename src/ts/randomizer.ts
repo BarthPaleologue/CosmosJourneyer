@@ -73,7 +73,6 @@ if(planet.getBodyType() == BodyType.SOLID) {
 
     solidPlanet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng);
     solidPlanet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng);
-    solidPlanet.physicalProperties.pressure = Math.max(normalRandom(0.8, 0.4, planet.rng), 0);
 
     solidPlanet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planet.rng), 0);
 
@@ -84,16 +83,6 @@ if(planet.getBodyType() == BodyType.SOLID) {
     solidPlanet.material.updateManual();
 
     solidPlanet.terrainSettings.continentsFragmentation = clamp(normalRandom(0.5, 0.2, planet.rng), 0, 1);
-
-    solidPlanet.createOcean(sun, scene);
-
-    if (solidPlanet.physicalProperties.pressure > 0) {
-        let atmosphere = solidPlanet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
-        atmosphere.settings.redWaveLength *= 1 + centeredRand(planet.rng) / 6;
-        atmosphere.settings.greenWaveLength *= 1 + centeredRand(planet.rng) / 6;
-        atmosphere.settings.blueWaveLength *= 1 + centeredRand(planet.rng) / 6;
-    }
-
 }
 
 
@@ -101,17 +90,20 @@ for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
     const satelliteSeed = planet.rng();
     const randSatellite = alea(satelliteSeed.toString());
     const satelliteRadius = (planet.getRadius() / 5) * clamp(normalRandom(1, 0.1, randSatellite), 0.5, 1.5);
+    const ratio = satelliteRadius / Settings.PLANET_RADIUS;
     const satellite = new SolidPlanet(`${planet.getName()}Sattelite${i}`, satelliteRadius, starSystemManager, satelliteSeed, [planet]);
     console.log(satellite.depth)
     const periapsis = 5 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, randSatellite), 0.9, 1.0) * planet.getRadius() * 2;
     const apoapsis = periapsis * clamp(normalRandom(1, 0.05, randSatellite), 1, 1.5);
-    satellite.physicalProperties.mass = 0.001;
+    satellite.physicalProperties.mass = 1;
     satellite.orbitalProperties = {
         periapsis: periapsis,
         apoapsis: apoapsis,
         period: getOrbitalPeriod(periapsis, apoapsis, satellite.parentBodies),
         orientationQuaternion: satellite.getRotationQuaternion()
     }
+    satellite.terrainSettings.maxMountainHeight *= ratio;
+    satellite.terrainSettings.mountainsFrequency *= ratio;
 }
 
 let fxaa = new FxaaPostProcess("fxaa", 1, player.camera);

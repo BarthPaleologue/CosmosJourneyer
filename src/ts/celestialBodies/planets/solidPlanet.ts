@@ -14,9 +14,11 @@ import { Settings } from "../../settings";
 import { ISolidPhysicalProperties } from "../iPhysicalProperties";
 import { SolidPlanetMaterial } from "../../materials/solidPlanetMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
-import { uniformRandBool } from "extended-random";
+import { normalRandom, uniformRandBool } from "extended-random";
 import { RingMaterial } from "../../materials/ringMaterial";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
+import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
 
 export class SolidPlanet extends AbstractPlanet implements RigidBody {
     oceanLevel: number;
@@ -34,12 +36,14 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
     constructor(id: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(id, radius, starSystemManager, seed, parentBodies);
 
+        const pressure = Math.max(normalRandom(0.8, 0.4, this.rng), 0);
+
         this.physicalProperties = {
             mass: 10,
             rotationPeriod: 60 * 60 * 24,
             minTemperature: -60,
             maxTemperature: 40,
-            pressure: 1,
+            pressure: pressure,
             waterAmount: 1
         };
 
@@ -47,9 +51,30 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         const waterFreezingPoint = 0.0;
         if(waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
             this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
-            this.createOcean(starSystemManager.stars[0], starSystemManager.scene);
+            const ocean = new OceanPostProcess(`${this.getName()}Ocean`, this, starSystemManager.stars[0], starSystemManager.scene);
+            this.postProcesses.ocean = ocean;
+
+            const clouds = new FlatCloudsPostProcess(`${this.getName()}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
+            clouds.settings.cloudPower = 5 * Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
+            this.postProcesses.clouds = clouds;
         } else {
             this.oceanLevel = 0;
+        }
+
+        if(pressure > 0) {
+            this.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
+        }
+
+        if (uniformRandBool(0.6, this.rng)) {
+            this.createRings(starSystemManager.stars[0], starSystemManager.scene);
+            /*let ringMesh = MeshBuilder.CreatePlane(`${this._name}Rings`, {
+                size: this.postProcesses.rings!.settings.ringEnd * this.getApparentRadius() * 2
+            }, scene);
+            ringMesh.rotate(Axis.X, Math.PI/2, Space.WORLD);
+            ringMesh.material = new RingMaterial(this, scene);
+            starSystemManager.depthRenderer.getDepthMap().renderList!.push(ringMesh);
+            ringMesh.parent = this.transform;
+            this.postProcesses.rings!.dispose();*/
         }
 
         this.terrainSettings = {
@@ -58,7 +83,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             bumpsFrequency: 30,
 
             maxBumpHeight: 1.5e3,
-            maxMountainHeight: 20e3,
+            maxMountainHeight: 40e3,
             continentBaseHeight: 5e3,
 
             mountainsFrequency: 10,
@@ -76,23 +101,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             new ChunkTree(Direction.Left, this)
         ];
 
-        /// POSTPROCESSES ORDER : OCEAN, CLOUD, ATMO, RINGS
-        if (uniformRandBool(0.6, this.rng)) {
-            this.createRings(starSystemManager.stars[0], starSystemManager.scene);
-            /*let ringMesh = MeshBuilder.CreatePlane(`${this._name}Rings`, {
-                size: this.postProcesses.rings!.settings.ringEnd * this.getApparentRadius() * 2
-            }, scene);
-            ringMesh.rotate(Axis.X, Math.PI/2, Space.WORLD);
-            ringMesh.material = new RingMaterial(this, scene);
-            starSystemManager.depthRenderer.getDepthMap().renderList!.push(ringMesh);
-            ringMesh.parent = this.transform;
-            this.postProcesses.rings!.dispose();*/
-        }
 
-        if (this.physicalProperties.waterAmount > 0 && this.physicalProperties.pressure > 0.3 && uniformRandBool(0.95, this.rng)) {
-            let flatClouds = this.createClouds(Settings.CLOUD_LAYER_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
-            flatClouds.settings.cloudPower = 10 * Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
-        }
     }
 
     public generateCollisionTask(relativePosition: Vector3): CollisionData {
