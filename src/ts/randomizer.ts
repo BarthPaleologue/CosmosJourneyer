@@ -24,6 +24,7 @@ import { alea } from "seedrandom";
 import { getOrbitalPeriod } from "./orbits/kepler";
 import { AbstractBody } from "./celestialBodies/abstractBody";
 import { GazPlanet } from "./celestialBodies/planets/gazPlanet";
+import { computeMeanTemperature } from "./utils/temperatureComputation";
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
@@ -123,6 +124,14 @@ starSystemManager.update(player, sun.getAbsolutePosition(), 0);
 starSystemManager.update(player, sun.getAbsolutePosition(), 0);
 
 player.positionNearBody(planet);
+
+console.log("Average Temperature : ", computeMeanTemperature(
+    sun.physicalProperties.temperature,
+    sun.getApparentRadius(),
+    planet.getAbsolutePosition().subtract(sun.getAbsolutePosition()).length(),
+    0.3,
+    0.3
+) - 273, "°C");
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
