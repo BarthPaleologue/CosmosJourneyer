@@ -1,4 +1,4 @@
-import { DepthRenderer, Engine, Scene } from "@babylonjs/core";
+import { Engine, Scene } from "@babylonjs/core";
 
 export function initCanvasEngineScene(idCanvas: string): [HTMLCanvasElement, Engine, Scene] {
     const canvas = document.getElementById(idCanvas) as HTMLCanvasElement;
@@ -13,12 +13,4 @@ export function initCanvasEngineScene(idCanvas: string): [HTMLCanvasElement, Eng
     const scene = new Scene(engine);
 
     return [canvas, engine, scene];
-}
-
-export function initDepthRenderer(scene: Scene): DepthRenderer {
-    const depthRenderer = new DepthRenderer(scene);
-    scene.customRenderTargets.push(depthRenderer.getDepthMap());
-    depthRenderer.getDepthMap().renderList = [];
-
-    return depthRenderer;
 }

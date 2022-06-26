@@ -37,6 +37,7 @@ export class Star extends AbstractBody {
         };
 
         this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this._radius * 2, segments: 32 }, scene);
+        starSystemManager.depthRenderer.getDepthMap().renderList!.push(this.mesh);
         this.mesh.parent = this.transform;
 
         this.material = new StarMaterial(this, scene);

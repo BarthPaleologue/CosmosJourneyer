@@ -17,7 +17,7 @@ import { Settings } from "./settings";
 import { BodyType } from "./celestialBodies/interfaces";
 import { clamp } from "./utils/math";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
-import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
+import { initCanvasEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 
 import { alea } from "seedrandom";
@@ -27,7 +27,10 @@ import { GazPlanet } from "./celestialBodies/planets/gazPlanet";
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
-const depthRenderer = initDepthRenderer(scene);
+
+const player = new PlayerController(scene);
+player.setSpeed(0.2 * Settings.PLANET_RADIUS);
+player.camera.maxZ = Settings.PLANET_RADIUS * 100000;
 
 Assets.Init(scene);
 
@@ -35,24 +38,19 @@ const keyboard = new Keyboard();
 const mouse = new Mouse();
 const gamepad = new Gamepad();
 
-const player = new PlayerController(scene);
-player.setSpeed(0.2 * Settings.PLANET_RADIUS);
-
-player.camera.maxZ = Settings.PLANET_RADIUS * 100000;
-
 const starfield = new StarfieldPostProcess("starfield", scene);
 
-const starSystemManager = new StarSystemManager(Settings.VERTEX_RESOLUTION);
+const starSystemManager = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
 const starSystemSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER);
 const starSystemRand = alea(starSystemSeed.toString());
 
-const starSeed = randRange(-1e9, 1e9, starSystemRand);
+const starSeed = randRange(-1e6, 1e6, starSystemRand);
 console.log("Star seed : ", starSeed);
 
 // TODO: generate radius inside body constructor
 const randStar = alea(starSeed.toString());
-const starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.2, 1.5) * Settings.PLANET_RADIUS * 400;
+const starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.4, 1.5) * Settings.PLANET_RADIUS * 100;
 
 const sun = new Star("Weierstrass", starRadius, starSystemManager, scene, starSeed, []);
 
@@ -64,7 +62,7 @@ console.log("Planet seed : ", planetSeed);
 let planet: AbstractBody;
 
 if(uniformRandBool(0.5)) planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, planetSeed, [sun]);
-else planet = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystemManager, scene, depthRenderer, planetSeed, [sun]);
+else planet = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystemManager, scene, planetSeed, [sun]);
 
 console.table(planet.orbitalProperties);
 
@@ -76,7 +74,6 @@ if(planet.getBodyType() == BodyType.SOLID) {
     solidPlanet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng);
     solidPlanet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng);
     solidPlanet.physicalProperties.pressure = Math.max(normalRandom(0.8, 0.4, planet.rng), 0);
-
 
     solidPlanet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planet.rng), 0);
 
@@ -101,7 +98,7 @@ if(planet.getBodyType() == BodyType.SOLID) {
 
 
 for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
-    const satelliteSeed = Math.random();
+    const satelliteSeed = planet.rng();
     const randSatellite = alea(satelliteSeed.toString());
     const satelliteRadius = (planet.getRadius() / 5) * clamp(normalRandom(1, 0.1, randSatellite), 0.5, 1.5);
     const satellite = new SolidPlanet(`${planet.getName()}Sattelite${i}`, satelliteRadius, starSystemManager, scene, satelliteSeed, [planet]);
@@ -132,11 +129,11 @@ document.addEventListener("keydown", (e) => {
 let collisionWorker = new CollisionWorker(player, starSystemManager);
 
 
-starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
-starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now());
-starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
-starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
-starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
+starSystemManager.update(player, sun.getAbsolutePosition(), 0);
+starSystemManager.update(player, sun.getAbsolutePosition(), Date.now());
+starSystemManager.update(player, sun.getAbsolutePosition(), 0);
+starSystemManager.update(player, sun.getAbsolutePosition(), 0);
+starSystemManager.update(player, sun.getAbsolutePosition(), 0);
 
 player.positionNearBody(planet);
 
@@ -149,7 +146,7 @@ scene.executeWhenReady(() => {
         player.nearestBody = starSystemManager.getNearestBody();
         if (player.nearestBody.getName() != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, sun, player);
 
-        starSystemManager.update(player, sun.getAbsolutePosition(), depthRenderer, Settings.TIME_MULTIPLIER * deltaTime);
+        starSystemManager.update(player, sun.getAbsolutePosition(), Settings.TIME_MULTIPLIER * deltaTime);
 
         if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 

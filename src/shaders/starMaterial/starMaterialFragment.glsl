@@ -1,6 +1,7 @@
 precision lowp float;
 
 varying vec3 vPosition; // position of the vertex in sphere space
+varying vec3 vUnitSamplePoint;
 
 #ifdef LOGARITHMICDEPTH
 	uniform float logarithmicDepthConstant;
@@ -10,17 +11,23 @@ varying vec3 vPosition; // position of the vertex in sphere space
 uniform vec3 starColor;
 uniform float time;
 
+uniform float seed;
+
 #pragma glslify: completeNoise = require(../utils/noise.glsl)
 
 #pragma glslify: lerp = require(../utils/vec3Lerp.glsl)
 
+#pragma glslify: rotateAround = require(../utils/rotateAround.glsl)
+
+#pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl, tanh=tanh)
+
 void main() {
 	// la unitPosition ne prend pas en compte la rotation de la planète
-	vec3 unitPosition = normalize(vPosition);
 
-	unitPosition += vec3(time, -time, time) / 100.0;
-	
-	float noiseValue = completeNoise(unitPosition * 20.0, 8, 2.0, 2.0);
+	float plasmaSpeed = 0.005;
+	vec4 seededSamplePoint = vec4(rotateAround(vUnitSamplePoint, vec3(0.0, 1.0, 0.0), time * plasmaSpeed), seed / 1e5);
+
+	float noiseValue = fractalSimplex4(seededSamplePoint * 5.0, 8, 2.0, 2.0);
 
 	vec3 finalColor = starColor;
 

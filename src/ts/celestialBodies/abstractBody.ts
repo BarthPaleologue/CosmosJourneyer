@@ -62,7 +62,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
         this.rotate(Axis.Z, centeredRand(this.rng) / 2);
 
         // TODO: do not hardcode
-        const periapsis = this.rng() * 10000000e3;
+        const periapsis = this.rng() * 5000000e3;
         const apoapsis = periapsis * (1 + this.rng() / 10);
 
         this.orbitalProperties = {

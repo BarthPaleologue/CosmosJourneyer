@@ -1,4 +1,4 @@
-import { DepthRenderer, Vector3 } from "@babylonjs/core";
+import { DepthRenderer, Scene, Vector3 } from "@babylonjs/core";
 
 import { ChunkForge } from "../chunks/chunkForge";
 import { PlayerController } from "../player/playerController";
@@ -7,6 +7,8 @@ import { Star } from "./stars/star";
 import { BodyType } from "./interfaces";
 
 export class StarSystemManager {
+    readonly scene: Scene;
+    readonly depthRenderer: DepthRenderer;
     private readonly _chunkForge: ChunkForge;
     private readonly _bodies: AbstractBody[] = [];
 
@@ -14,7 +16,13 @@ export class StarSystemManager {
 
     private clock: number = 0;
 
-    constructor(nbVertices = 64) {
+    constructor(scene: Scene, nbVertices = 64) {
+        this.scene = scene;
+
+        this.depthRenderer = new DepthRenderer(scene);
+        scene.customRenderTargets.push(this.depthRenderer.getDepthMap());
+        this.depthRenderer.getDepthMap().renderList = [];
+
         this._chunkForge = new ChunkForge(nbVertices);
     }
 
@@ -80,10 +88,10 @@ export class StarSystemManager {
         return this.clock;
     }
 
-    public update(player: PlayerController, lightOrigin: Vector3, depthRenderer: DepthRenderer, deltaTime: number): void {
+    public update(player: PlayerController, lightOrigin: Vector3, deltaTime: number): void {
         this.clock += deltaTime;
 
-        this._chunkForge.update(depthRenderer);
+        this._chunkForge.update(this.depthRenderer);
         for (const body of this.getBodies()) body.update(player, lightOrigin, deltaTime);
 
         this.translateAllBodies(player.getAbsolutePosition().scale(-1));

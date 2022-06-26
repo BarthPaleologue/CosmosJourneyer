@@ -21,27 +21,26 @@ import "../styles/index.scss";
 import { Settings } from "./settings";
 import { BodyType } from "./celestialBodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
-import { initCanvasEngineScene, initDepthRenderer } from "./utils/init";
+import { initCanvasEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { GazPlanet } from "./celestialBodies/planets/gazPlanet";
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
-const depthRenderer = initDepthRenderer(scene);
+
+const player = new PlayerController(scene);
+player.setSpeed(0.2 * Settings.PLANET_RADIUS);
+player.camera.maxZ = Settings.PLANET_RADIUS * 100000;
 
 Assets.Init(scene);
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
-let player = new PlayerController(scene);
-player.setSpeed(0.2 * Settings.PLANET_RADIUS);
-player.camera.maxZ = Settings.PLANET_RADIUS * 100000;
-
 let keyboard = new Keyboard();
 let mouse = new Mouse();
 let gamepad = new Gamepad();
 
-let starSystem = new StarSystemManager(Settings.VERTEX_RESOLUTION);
+let starSystem = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
 let starfield = new StarfieldPostProcess("starfield", scene);
 
@@ -68,7 +67,7 @@ planet.orbitalProperties = {
     periapsis: 35 * planet.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
-starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, 0);
+starSystem.update(player, sun.getAbsolutePosition(), 0);
 
 planet.createOcean(sun, scene);
 planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
@@ -134,7 +133,7 @@ aresAtmosphere.settings.redWaveLength = 500;
 aresAtmosphere.settings.greenWaveLength = 680;
 aresAtmosphere.settings.blueWaveLength = 670;
 
-const andromaque = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystem, scene, depthRenderer, 25, [sun]);
+const andromaque = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystem, scene, 25, [sun]);
 andromaque.orbitalProperties = {
     period: 60 * 60 * 24 * 431 * 10,
     periapsis: 70 * ares.getRadius(),
@@ -149,14 +148,9 @@ let isMouseEnabled = false;
 let collisionWorker = new CollisionWorker(player, starSystem);
 
 // update to current date
-starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, Date.now() / 1000);
+starSystem.update(player, sun.getAbsolutePosition(), Date.now() / 1000);
 
 player.positionNearBody(planet);
-
-/*const trail = new TrailMesh(`trail`, moon.transform, scene, 100e3, 200, false);
-trail.material = Assets.DebugMaterial;
-trail.start();
-depthRenderer.getDepthMap().renderList!.push(trail);*/
 
 function updateScene() {
     const deltaTime = engine.getDeltaTime() / 1000;
@@ -172,7 +166,7 @@ function updateScene() {
     playerMovement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
     starSystem.translateAllBodies(playerMovement);
 
-    starSystem.update(player, sun.getAbsolutePosition(), depthRenderer, deltaTime * Settings.TIME_MULTIPLIER);
+    starSystem.update(player, sun.getAbsolutePosition(), deltaTime * Settings.TIME_MULTIPLIER);
 
     if (!collisionWorker.isBusy() && player.isOrbiting()) {
         if (player.nearestBody?.getBodyType() == BodyType.SOLID) {

@@ -18,7 +18,7 @@ export class GazPlanet extends AbstractPlanet {
     private readonly mesh: Mesh;
     readonly material: GazPlanetMaterial;
 
-    constructor(name: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, depthRenderer: DepthRenderer, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(name: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, radius, starSystemManager, seed, parentBodies);
         this.physicalProperties = {
             // FIXME: choose physically accurates values
@@ -30,7 +30,7 @@ export class GazPlanet extends AbstractPlanet {
         };
 
         this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: radius * 2, segments: 64 }, scene);
-        depthRenderer.getDepthMap().renderList!.push(this.mesh);
+        starSystemManager.depthRenderer.getDepthMap().renderList!.push(this.mesh);
         this.mesh.parent = this.transform;
 
         this.material = new GazPlanetMaterial(this, scene);

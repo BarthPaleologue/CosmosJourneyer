@@ -14,7 +14,12 @@ export class StarMaterial extends ShaderMaterial {
     constructor(star: Star, scene: Scene) {
         super("starColor", scene, shaderName, {
             attributes: ["position"],
-            uniforms: ["world", "worldViewProjection", "planetWorldMatrix", "starColor", "time", "logarithmicDepthConstant"]
+            uniforms: [
+                "world", "worldViewProjection",
+                "seed", "starColor",
+                "starPosition",
+                "starInverseRotationQuaternion",
+                "time", "logarithmicDepthConstant"]
         });
         this.star = star;
     }
@@ -22,6 +27,8 @@ export class StarMaterial extends ShaderMaterial {
     public update() {
         this.setFloat("time", this.star.internalTime);
         this.setVector3("starColor", getRgbFromTemperature(this.star.physicalProperties.temperature));
-        this.setMatrix("planetWorldMatrix", this.star.transform.getWorldMatrix());
+        this.setQuaternion("starInverseRotationQuaternion", this.star.getInverseRotationQuaternion());
+        this.setFloat("seed", this.star.getSeed());
+        this.setVector3("starPosition", this.star.getAbsolutePosition());
     }
 }
