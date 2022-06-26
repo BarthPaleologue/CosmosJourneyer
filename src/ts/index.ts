@@ -57,7 +57,7 @@ const flare00 = new LensFlare(
     lensFlareSystem // lens flare system
 );*/
 
-const planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, -52, [sun]);
+const planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, -2.951332749798894, [sun]);
 
 planet.physicalProperties.rotationPeriod /= 50;
 

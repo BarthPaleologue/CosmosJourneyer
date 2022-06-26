@@ -71,18 +71,13 @@ planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
 if(planet.getBodyType() == BodyType.SOLID) {
     const solidPlanet = planet as SolidPlanet;
 
+    //TODO: use formula
     solidPlanet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng);
     solidPlanet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng);
-
-    solidPlanet.physicalProperties.waterAmount = Math.max(normalRandom(1, 0.3, planet.rng), 0);
-
-    solidPlanet.oceanLevel = Settings.OCEAN_DEPTH * solidPlanet.physicalProperties.waterAmount * solidPlanet.physicalProperties.pressure;
 
     solidPlanet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRand(planet.rng) / 10, 0.37 + centeredRand(planet.rng) / 10, 0.024 + centeredRand(planet.rng) / 10);
     solidPlanet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng);
     solidPlanet.material.updateManual();
-
-    solidPlanet.terrainSettings.continentsFragmentation = clamp(normalRandom(0.5, 0.2, planet.rng), 0, 1);
 }
 
 

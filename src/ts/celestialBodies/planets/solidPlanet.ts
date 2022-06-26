@@ -3,7 +3,7 @@ import { Direction } from "../../utils/direction";
 import { TerrainSettings } from "../../terrain/terrainSettings";
 import { AbstractPlanet } from "./abstractPlanet";
 
-import { Axis, MeshBuilder, Space, Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core";
 
 import { BodyType, RigidBody } from "../interfaces";
 import { CollisionData } from "../../chunks/workerDataInterfaces";
@@ -15,10 +15,10 @@ import { ISolidPhysicalProperties } from "../iPhysicalProperties";
 import { SolidPlanetMaterial } from "../../materials/solidPlanetMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { normalRandom, uniformRandBool } from "extended-random";
-import { RingMaterial } from "../../materials/ringMaterial";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
+import { clamp } from "../../utils/math";
 
 export class SolidPlanet extends AbstractPlanet implements RigidBody {
     oceanLevel: number;
@@ -37,6 +37,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         super(id, radius, starSystemManager, seed, parentBodies);
 
         const pressure = Math.max(normalRandom(0.8, 0.4, this.rng), 0);
+        const waterAmount = Math.max(normalRandom(1.2, 0.3, this.rng), 0);
 
         this.physicalProperties = {
             mass: 10,
@@ -44,7 +45,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             minTemperature: -60,
             maxTemperature: 40,
             pressure: pressure,
-            waterAmount: 1
+            waterAmount: waterAmount
         };
 
         const waterBoilingPoint = waterBoilingPointCelsius(this.physicalProperties.pressure);
@@ -77,13 +78,15 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             this.postProcesses.rings!.dispose();*/
         }
 
+        const continentsFragmentation = clamp(normalRandom(0.5, 0.2, this.rng), 0, 1);
+
         this.terrainSettings = {
-            continentsFragmentation: 0.47,
+            continentsFragmentation: continentsFragmentation,
 
             bumpsFrequency: 30,
 
             maxBumpHeight: 1.5e3,
-            maxMountainHeight: 40e3,
+            maxMountainHeight: 30e3,
             continentBaseHeight: 5e3,
 
             mountainsFrequency: 10,
