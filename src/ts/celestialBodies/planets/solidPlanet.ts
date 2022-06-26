@@ -15,6 +15,7 @@ import { ISolidPhysicalProperties } from "../iPhysicalProperties";
 import { SolidPlanetMaterial } from "../../materials/solidPlanetMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { uniformRandBool } from "extended-random";
+import { RingMaterial } from "../../materials/ringMaterial";
 
 export class SolidPlanet extends AbstractPlanet implements RigidBody {
     oceanLevel: number;
@@ -47,13 +48,13 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         this.terrainSettings = {
             continentsFragmentation: 0.47,
 
-            bumpsFrequency: 3e-5,
+            bumpsFrequency: 30,
 
             maxBumpHeight: 1.5e3,
             maxMountainHeight: 20e3,
             continentBaseHeight: 5e3,
 
-            mountainsFrequency: 10e-6,
+            mountainsFrequency: 10,
             mountainsMinValue: 0.5
         };
 
@@ -68,12 +69,17 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             new ChunkTree(Direction.Left, this)
         ];
 
+        /// POSTPROCESSES ORDER : OCEAN, CLOUD, ATMO, RINGS
         if (uniformRandBool(0.6, this.rng)) {
             this.createRings(starSystemManager.stars[0], scene);
-            /*let ringMesh = MeshBuilder.CreatePlane(`${this._name}Rings`, {size: this.postProcesses.rings!.settings.ringEnd * this.getApparentRadius() * 2}, scene);
+            /*let ringMesh = MeshBuilder.CreatePlane(`${this._name}Rings`, {
+                size: this.postProcesses.rings!.settings.ringEnd * this.getApparentRadius() * 2
+            }, scene);
             ringMesh.rotate(Axis.X, Math.PI/2, Space.WORLD);
+            ringMesh.material = new RingMaterial(this, scene);
             starSystemManager.depthRenderer.getDepthMap().renderList!.push(ringMesh);
-            ringMesh.parent = this.transform;*/
+            ringMesh.parent = this.transform;
+            this.postProcesses.rings!.dispose();*/
         }
 
         if (this.physicalProperties.waterAmount > 0 && this.physicalProperties.pressure > 0.3 && uniformRandBool(0.95, this.rng)) {

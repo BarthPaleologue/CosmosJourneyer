@@ -57,7 +57,7 @@ const flare00 = new LensFlare(
     lensFlareSystem // lens flare system
 );*/
 
-let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene, 1e6, [sun]);
+let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene, 723, [sun]);
 
 planet.physicalProperties.rotationPeriod /= 50;
 
@@ -72,7 +72,6 @@ starSystem.update(player, sun.getAbsolutePosition(), 0);
 planet.createOcean(sun, scene);
 planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
 planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
-planet.createRings(sun, scene);
 
 let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, scene, 437,[planet]);
 moon.postProcesses.clouds?.dispose();
@@ -90,6 +89,7 @@ moon.orbitalProperties = {
     orientationQuaternion: Quaternion.Identity()
 };
 
+moon.terrainSettings.mountainsFrequency /= 4;
 moon.terrainSettings.continentsFragmentation = 1;
 moon.terrainSettings.maxMountainHeight = 5e3;
 moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);

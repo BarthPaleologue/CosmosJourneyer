@@ -28,7 +28,7 @@ let terrainSettings: TerrainSettings = {
 
 function initLayers() {
     // TODO: ne pas hardcoder
-    continentsLayer = simplexNoiseLayer(1e-6, 6, 1.8, 2.1, 0.5, 1 - terrainSettings.continentsFragmentation);
+    continentsLayer = simplexNoiseLayer(1, 6, 1.8, 2.1, 0.5, 1 - terrainSettings.continentsFragmentation);
 
     bumpyLayer = simplexNoiseLayer(terrainSettings.bumpsFrequency, 3, 2, 2, 1.0, 0.2);
 
@@ -37,42 +37,37 @@ function initLayers() {
 
 initLayers();
 
-function terrainFunction(samplePoint: LVector3, gradient: LVector3, seed: number): void {
-    const unitCoords = samplePoint.normalize();
-
-    // TODO: do not hardcode
-    const usableSeed = seed;
-
+function terrainFunction(samplePoint: LVector3, seed: number, outPosition: LVector3, outGradient: LVector3): void {
     let elevation = 0;
 
     let continentGradient = LVector3.Zero();
-    let continentMask = continentsLayer(samplePoint, usableSeed, continentGradient);
+    let continentMask = continentsLayer(samplePoint, seed, continentGradient);
 
     let continentElevation = continentMask * terrainSettings.continentBaseHeight;
 
     elevation += continentElevation;
     continentGradient.scaleInPlace(terrainSettings.continentBaseHeight);
-    gradient.addInPlace(continentGradient);
+    outGradient.addInPlace(continentGradient);
 
     let mountainGradient = LVector3.Zero();
-    let mountainElevation = mountainsLayer(samplePoint, usableSeed, mountainGradient);
+    let mountainElevation = mountainsLayer(samplePoint, seed, mountainGradient);
 
     mountainElevation = tanhSharpen(mountainElevation, 3, mountainGradient);
 
     elevation += continentMask * mountainElevation * terrainSettings.maxMountainHeight;
     mountainGradient.scaleInPlace(terrainSettings.maxMountainHeight * continentMask);
-    gradient.addInPlace(mountainGradient);
+    outGradient.addInPlace(mountainGradient);
 
     let bumpyGradient = LVector3.Zero();
-    let bumpyElevation = bumpyLayer(samplePoint, usableSeed, bumpyGradient);
+    let bumpyElevation = bumpyLayer(samplePoint, seed, bumpyGradient);
 
     elevation += bumpyElevation * terrainSettings.maxBumpHeight;
     bumpyGradient.scaleInPlace(terrainSettings.maxBumpHeight);
-    gradient.addInPlace(bumpyGradient);
+    outGradient.addInPlace(bumpyGradient);
 
-    samplePoint.addInPlace(unitCoords.scale(elevation));
+    outPosition.addInPlace(samplePoint.scale(elevation));
 
-    gradient.divideInPlace(terrainSettings.continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
+    outGradient.divideInPlace(terrainSettings.continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
 }
 
 function buildChunkVertexData(data: BuildData): void {
@@ -125,7 +120,7 @@ function buildChunkVertexData(data: BuildData): void {
 
             // on applique la fonction de terrain
             let vertexGradient = LVector3.Zero();
-            terrainFunction(vertexPosition, vertexGradient, seed);
+            terrainFunction(unitSphereCoords, seed, vertexPosition, vertexGradient);
 
             let h = vertexGradient;
             h.subtractInPlace(unitSphereCoords.scale(LVector3.Dot(vertexGradient, unitSphereCoords)));
@@ -176,7 +171,7 @@ function buildChunkVertexData(data: BuildData): void {
 }
 
 function sendHeightAtPoint(point: LVector3, seed: number): void {
-    terrainFunction(point, LVector3.Zero(), seed);
+    terrainFunction(point.normalize(), seed, point, LVector3.Zero());
 
     self.postMessage({
         h: point.getMagnitude()

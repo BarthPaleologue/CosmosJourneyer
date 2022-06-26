@@ -1,8 +1,8 @@
 import { Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
 import { PlayerController } from "../player/playerController";
 
-import surfaceMaterialFragment from "../../shaders/gazPlanetMaterial/gazPlanetMaterialFragment.glsl";
-import surfaceMaterialVertex from "../../shaders/gazPlanetMaterial/gazPlanetMaterialVertex.glsl";
+import surfaceMaterialFragment from "../../shaders/gazPlanetMaterial/fragment.glsl";
+import surfaceMaterialVertex from "../../shaders/gazPlanetMaterial/vertex.glsl";
 import { GazPlanet } from "../celestialBodies/planets/gazPlanet";
 import { GazColorSettings } from "./colorSettingsInterface";
 import { randRangeInt } from "extended-random";

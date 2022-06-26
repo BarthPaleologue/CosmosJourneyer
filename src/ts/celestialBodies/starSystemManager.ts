@@ -22,6 +22,7 @@ export class StarSystemManager {
         this.depthRenderer = new DepthRenderer(scene);
         scene.customRenderTargets.push(this.depthRenderer.getDepthMap());
         this.depthRenderer.getDepthMap().renderList = [];
+        //this.depthRenderer.forceDepthWriteTransparentMeshes = true;
 
         this._chunkForge = new ChunkForge(nbVertices);
     }

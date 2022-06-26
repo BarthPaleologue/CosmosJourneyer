@@ -3,8 +3,8 @@ import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
 import { ColorMode, ColorSettings } from "./colorSettingsInterface";
 import { PlayerController } from "../player/playerController";
 
-import surfaceMaterialFragment from "../../shaders/solidPlanetMaterial/solidPlanetMaterialFragment.glsl";
-import surfaceMaterialVertex from "../../shaders/solidPlanetMaterial/solidPlanetMaterialVertex.glsl";
+import surfaceMaterialFragment from "../../shaders/solidPlanetMaterial/fragment.glsl";
+import surfaceMaterialVertex from "../../shaders/solidPlanetMaterial/vertex.glsl";
 import { Assets } from "../assets";
 
 const shaderName = "surfaceMaterial";

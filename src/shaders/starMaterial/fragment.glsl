@@ -13,8 +13,6 @@ uniform float time;
 
 uniform float seed;
 
-#pragma glslify: completeNoise = require(../utils/noise.glsl)
-
 #pragma glslify: lerp = require(../utils/vec3Lerp.glsl)
 
 #pragma glslify: rotateAround = require(../utils/rotateAround.glsl)
