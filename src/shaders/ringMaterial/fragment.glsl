@@ -27,7 +27,7 @@ void main() {
     if(normalizedDistance < ringStart || normalizedDistance > ringEnd) discard;
 
     // compute the actual density of the rings at the sample point
-    vec4 seededSamplePoint = vec4(normalizedDistance, normalizedDistance, normalizedDistance, seed / 1e8);
+    vec4 seededSamplePoint = vec4(normalizedDistance, normalizedDistance, normalizedDistance, seed);
     float noiseValue = fractalSimplex4(seededSamplePoint * 10.0, 5, 2.0, 2.0);
 
     vec3 finalColor = lerp(vec3(0.0), vec3(1.0), noiseValue);
