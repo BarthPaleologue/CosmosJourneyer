@@ -52,7 +52,7 @@ console.log("Star seed : ", starSeed);
 const randStar = alea(starSeed.toString());
 const starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.4, 1.5) * Settings.PLANET_RADIUS * 100;
 
-const sun = new Star("Weierstrass", starRadius, starSystemManager, scene, starSeed, []);
+const sun = new Star("Weierstrass", starRadius, starSystemManager, starSeed, []);
 
 starfield.setStar(sun);
 
@@ -61,8 +61,8 @@ console.log("Planet seed : ", planetSeed);
 
 let planet: AbstractBody;
 
-if(uniformRandBool(0.5)) planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, scene, planetSeed, [sun]);
-else planet = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystemManager, scene, planetSeed, [sun]);
+if(uniformRandBool(0.5)) planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, planetSeed, [sun]);
+else planet = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystemManager, planetSeed, [sun]);
 
 console.table(planet.orbitalProperties);
 
@@ -101,7 +101,7 @@ for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
     const satelliteSeed = planet.rng();
     const randSatellite = alea(satelliteSeed.toString());
     const satelliteRadius = (planet.getRadius() / 5) * clamp(normalRandom(1, 0.1, randSatellite), 0.5, 1.5);
-    const satellite = new SolidPlanet(`${planet.getName()}Sattelite${i}`, satelliteRadius, starSystemManager, scene, satelliteSeed, [planet]);
+    const satellite = new SolidPlanet(`${planet.getName()}Sattelite${i}`, satelliteRadius, starSystemManager, satelliteSeed, [planet]);
     console.log(satellite.depth)
     const periapsis = 5 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, randSatellite), 0.9, 1.0) * planet.getRadius() * 2;
     const apoapsis = periapsis * clamp(normalRandom(1, 0.05, randSatellite), 1, 1.5);

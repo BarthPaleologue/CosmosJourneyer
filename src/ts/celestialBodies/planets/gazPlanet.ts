@@ -18,7 +18,7 @@ export class GazPlanet extends AbstractPlanet {
     private readonly mesh: Mesh;
     readonly material: GazPlanetMaterial;
 
-    constructor(name: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, radius, starSystemManager, seed, parentBodies);
         this.physicalProperties = {
             // FIXME: choose physically accurates values
@@ -29,21 +29,21 @@ export class GazPlanet extends AbstractPlanet {
             pressure: 1
         };
 
-        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: radius * 2, segments: 64 }, scene);
+        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: radius * 2, segments: 64 }, starSystemManager.scene);
         starSystemManager.depthRenderer.getDepthMap().renderList!.push(this.mesh);
         this.mesh.parent = this.transform;
 
-        this.material = new GazPlanetMaterial(this, scene);
+        this.material = new GazPlanetMaterial(this, starSystemManager.scene);
         this.mesh.material = this.material;
 
         // FIXME: implement multiple stars
-        let atmosphere = this.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, starSystemManager.stars[0], scene);
+        let atmosphere = this.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
         atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng) / 6;
         atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;
         atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng) / 6;
 
         if (uniformRandBool(0.8, this.rng)) {
-            this.createRings(starSystemManager.stars[0], scene);
+            this.createRings(starSystemManager.stars[0], starSystemManager.scene);
         }
 
     }

@@ -44,7 +44,7 @@ let starSystem = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
 let starfield = new StarfieldPostProcess("starfield", scene);
 
-let sun = new Star("Weierstrass", Settings.PLANET_RADIUS, starSystem, scene, 788, []);
+let sun = new Star("Weierstrass", Settings.PLANET_RADIUS, starSystem, 788, []);
 sun.orbitalProperties.period = 60 * 60 * 24;
 starfield.setStar(sun);
 
@@ -57,7 +57,7 @@ const flare00 = new LensFlare(
     lensFlareSystem // lens flare system
 );*/
 
-let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, scene, 723, [sun]);
+let planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, 724, [sun]);
 
 planet.physicalProperties.rotationPeriod /= 50;
 
@@ -73,7 +73,7 @@ planet.createOcean(sun, scene);
 planet.createClouds(Settings.CLOUD_LAYER_HEIGHT, sun, scene);
 planet.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, sun, scene);
 
-let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, scene, 437,[planet]);
+let moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, 437, [planet]);
 moon.postProcesses.clouds?.dispose();
 moon.physicalProperties.mass = 2;
 moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
@@ -99,7 +99,7 @@ moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap!);
 moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
 moon.material.updateManual();
 
-let ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, scene, 432, [sun]);
+let ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, 432, [sun]);
 ares.postProcesses.clouds?.dispose();
 ares.physicalProperties.mass = 7;
 ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
@@ -133,7 +133,7 @@ aresAtmosphere.settings.redWaveLength = 500;
 aresAtmosphere.settings.greenWaveLength = 680;
 aresAtmosphere.settings.blueWaveLength = 670;
 
-const andromaque = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystem, scene, 25, [sun]);
+const andromaque = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystem, 25, [sun]);
 andromaque.orbitalProperties = {
     period: 60 * 60 * 24 * 431 * 10,
     periapsis: 70 * ares.getRadius(),

@@ -23,7 +23,7 @@ export class Star extends AbstractBody {
 
     public override postProcesses: StarPostProcesses;
 
-    constructor(name: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, radius, starSystemManager, seed, parentBodies);
 
         starSystemManager.stars.push(this);
@@ -36,22 +36,22 @@ export class Star extends AbstractBody {
             temperature: clamp(normalRandom(5778, 2000, this.rng), 4000, 10000)
         };
 
-        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this._radius * 2, segments: 32 }, scene);
+        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this._radius * 2, segments: 32 }, starSystemManager.scene);
         starSystemManager.depthRenderer.getDepthMap().renderList!.push(this.mesh);
         this.mesh.parent = this.transform;
 
-        this.material = new StarMaterial(this, scene);
+        this.material = new StarMaterial(this, starSystemManager.scene);
         this.mesh.material = this.material;
 
         this.postProcesses = {
-            volumetricLight: new VolumetricLightScatteringPostProcess(`${name}VolumetricLight`, 1, scene.activeCamera!, this.mesh, 100),
+            volumetricLight: new VolumetricLightScatteringPostProcess(`${name}VolumetricLight`, 1, starSystemManager.scene.activeCamera!, this.mesh, 100),
             rings: null
         };
         this.postProcesses.volumetricLight!.exposure = 0.26;
         this.postProcesses.volumetricLight!.decay = 0.95;
 
         if (uniformRandBool(Star.RING_PROPORTION, this.rng)) {
-            let rings = this.createRings(this, scene);
+            let rings = this.createRings(this, starSystemManager.scene);
             rings.settings.ringStart = normalRandom(3, 1, this.rng);
             rings.settings.ringEnd = normalRandom(7, 1, this.rng);
             rings.settings.ringOpacity = this.rng();

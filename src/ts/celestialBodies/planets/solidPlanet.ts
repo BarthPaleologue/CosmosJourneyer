@@ -3,7 +3,7 @@ import { Direction } from "../../utils/direction";
 import { TerrainSettings } from "../../terrain/terrainSettings";
 import { AbstractPlanet } from "./abstractPlanet";
 
-import { Axis, MeshBuilder, Scene, Space, Vector3 } from "@babylonjs/core";
+import { Axis, MeshBuilder, Space, Vector3 } from "@babylonjs/core";
 
 import { BodyType, RigidBody } from "../interfaces";
 import { CollisionData } from "../../chunks/workerDataInterfaces";
@@ -30,7 +30,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
     material: SolidPlanetMaterial;
 
-    constructor(id: string, radius: number, starSystemManager: StarSystemManager, scene: Scene, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(id: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(id, radius, starSystemManager, seed, parentBodies);
 
         this.physicalProperties = {
@@ -58,7 +58,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             mountainsMinValue: 0.5
         };
 
-        this.material = new SolidPlanetMaterial(this, scene);
+        this.material = new SolidPlanetMaterial(this, starSystemManager.scene);
 
         this.sides = [
             new ChunkTree(Direction.Up, this),
@@ -71,7 +71,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
 
         /// POSTPROCESSES ORDER : OCEAN, CLOUD, ATMO, RINGS
         if (uniformRandBool(0.6, this.rng)) {
-            this.createRings(starSystemManager.stars[0], scene);
+            this.createRings(starSystemManager.stars[0], starSystemManager.scene);
             /*let ringMesh = MeshBuilder.CreatePlane(`${this._name}Rings`, {
                 size: this.postProcesses.rings!.settings.ringEnd * this.getApparentRadius() * 2
             }, scene);
@@ -83,7 +83,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
         }
 
         if (this.physicalProperties.waterAmount > 0 && this.physicalProperties.pressure > 0.3 && uniformRandBool(0.95, this.rng)) {
-            let flatClouds = this.createClouds(Settings.CLOUD_LAYER_HEIGHT, starSystemManager.stars[0], scene);
+            let flatClouds = this.createClouds(Settings.CLOUD_LAYER_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
             flatClouds.settings.cloudPower = 10 * Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
         }
     }
