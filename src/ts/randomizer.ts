@@ -39,9 +39,10 @@ const keyboard = new Keyboard();
 const mouse = new Mouse();
 const gamepad = new Gamepad();
 
-const starfield = new StarfieldPostProcess("starfield", scene);
 
 const starSystemManager = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
+
+const starfield = new StarfieldPostProcess("starfield", starSystemManager);
 
 const starSystemSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER);
 const starSystemRand = alea(starSystemSeed.toString());
@@ -102,7 +103,7 @@ for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
     satellite.terrainSettings.mountainsFrequency *= ratio;
 }
 
-let fxaa = new FxaaPostProcess("fxaa", 1, player.camera);
+starSystemManager.init();
 
 let isMouseEnabled = false;
 

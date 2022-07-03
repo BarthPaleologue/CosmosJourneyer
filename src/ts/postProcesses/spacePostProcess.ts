@@ -62,10 +62,10 @@ export abstract class SpacePostProcess extends PostProcess {
         Object.assign(commonUniforms, commonUniforms, uniforms);
         Object.assign(commonSamplers, commonSamplers, samplers);
 
-        super(name, fragmentName, Object.keys(commonUniforms), Object.keys(commonSamplers), 1, scene.activeCamera!);
+        super(name, fragmentName, Object.keys(commonUniforms), Object.keys(commonSamplers), 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
 
         this.camera = scene.activeCamera!;
-        this.setCamera(this.camera);
+        //this.setCamera(this.camera);
 
         this.uniforms = commonUniforms;
         this.samplers = commonSamplers;

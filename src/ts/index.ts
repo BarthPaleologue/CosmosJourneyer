@@ -1,4 +1,8 @@
-import { Color3, FxaaPostProcess, LensFlare, LensFlareSystem, Quaternion, Texture, Tools, Vector3 } from "@babylonjs/core";
+import {
+    Color3,
+    Quaternion,
+    Tools,
+} from "@babylonjs/core";
 
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 import { Star } from "./bodies/stars/star";
@@ -36,15 +40,15 @@ Assets.Init(scene);
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
-let keyboard = new Keyboard();
-let mouse = new Mouse();
-let gamepad = new Gamepad();
+const keyboard = new Keyboard();
+const mouse = new Mouse();
+const gamepad = new Gamepad();
 
-let starSystem = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
+const starSystem = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
-let starfield = new StarfieldPostProcess("starfield", scene);
+const starfield = new StarfieldPostProcess("starfield", starSystem);
 
-let sun = new Star("Weierstrass", Settings.EARTH_RADIUS, starSystem, 788, []);
+const sun = new Star("Weierstrass", Settings.EARTH_RADIUS, starSystem, 788, []);
 sun.orbitalProperties.period = 60 * 60 * 24;
 starfield.setStar(sun);
 
@@ -69,9 +73,16 @@ planet.orbitalProperties = {
 };
 
 const moon = new TelluricPlanet("Manaleth", Settings.EARTH_RADIUS / 4, starSystem, 437, [planet]);
+
 moon.postProcesses.ocean?.dispose();
+starSystem.spaceRenderingPipeline.oceans.splice(starSystem.spaceRenderingPipeline.oceans.indexOf(moon.postProcesses.ocean!), 1);
+
 moon.postProcesses.clouds?.dispose();
+starSystem.spaceRenderingPipeline.clouds.splice(starSystem.spaceRenderingPipeline.clouds.indexOf(moon.postProcesses.clouds!), 1);
+
 moon.postProcesses.atmosphere?.dispose();
+starSystem.spaceRenderingPipeline.atmospheres.splice(starSystem.spaceRenderingPipeline.atmospheres.indexOf(moon.postProcesses.atmosphere!), 1);
+
 moon.physicalProperties.mass = 2;
 moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moon.physicalProperties.minTemperature = -180;
@@ -97,8 +108,13 @@ moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
 moon.material.updateManual();
 
 const ares = new TelluricPlanet("Ares", Settings.EARTH_RADIUS, starSystem, 432, [sun]);
+
 ares.postProcesses.ocean?.dispose();
+starSystem.spaceRenderingPipeline.oceans.splice(starSystem.spaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);
+
 ares.postProcesses.clouds?.dispose();
+starSystem.spaceRenderingPipeline.clouds.splice(starSystem.spaceRenderingPipeline.clouds.indexOf(ares.postProcesses.clouds!), 1);
+
 ares.physicalProperties.mass = 7;
 ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 ares.physicalProperties.minTemperature = -80;
@@ -139,7 +155,7 @@ andromaque.orbitalProperties = {
     orientationQuaternion: Quaternion.Identity()
 };
 
-const fxaa = new FxaaPostProcess("fxaa", 1, player.camera, Texture.BILINEAR_SAMPLINGMODE);
+starSystem.init();
 
 let isMouseEnabled = false;
 

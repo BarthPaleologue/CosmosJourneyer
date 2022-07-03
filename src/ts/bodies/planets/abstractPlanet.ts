@@ -24,7 +24,7 @@ export abstract class AbstractPlanet extends AbstractBody {
     }
 
     public createAtmosphere(atmosphereHeight: number, star: Star, scene: Scene): AtmosphericScatteringPostProcess {
-        let atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, atmosphereHeight, star, scene);
+        const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, atmosphereHeight, this.starSystem);
         atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
         atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng) / 6;
         atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;

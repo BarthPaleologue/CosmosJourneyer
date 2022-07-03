@@ -1,13 +1,13 @@
-import { Color3, Effect, Scene, Texture } from "@babylonjs/core";
+import { Color3, Effect, Texture } from "@babylonjs/core";
 
 import { CloudSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
 import normalMap from "../../../asset/textures/cloudNormalMap2.jpg";
 import { PlanetPostProcess } from "../planetPostProcess";
-import { Star } from "../../bodies/stars/star";
 import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 import { gcd } from "../../utils/math";
 
 import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
+import { StarSystemManager } from "../../bodies/starSystemManager";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -15,7 +15,7 @@ Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
 export class FlatCloudsPostProcess extends PlanetPostProcess {
     settings: CloudSettings;
 
-    constructor(name: string, planet: AbstractPlanet, cloudLayerHeight: number, sun: Star, scene: Scene) {
+    constructor(name: string, planet: AbstractPlanet, cloudLayerHeight: number, starSystem: StarSystemManager) {
         let settings: CloudSettings = {
             cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
             specularPower: 2,
@@ -108,13 +108,15 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             normalMap: {
                 type: ShaderDataType.Texture,
                 get: () => {
-                    return new Texture(normalMap, scene);
+                    return new Texture(normalMap, starSystem.scene);
                 }
             }
         };
 
-        super(name, shaderName, uniforms, samplers, planet, sun, scene);
+        super(name, shaderName, uniforms, samplers, planet, starSystem.stars[0], starSystem.scene);
 
         this.settings = settings;
+
+        starSystem.spaceRenderingPipeline.clouds.push(this);
     }
 }

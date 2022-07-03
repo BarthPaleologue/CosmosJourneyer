@@ -1,16 +1,24 @@
-import { DepthRenderer, Scene, Vector3 } from "@babylonjs/core";
+import { DepthRenderer, PostProcessRenderEffect, PostProcessRenderPipeline, Scene, Vector3 } from "@babylonjs/core";
 
 import { ChunkForge } from "../chunks/chunkForge";
 import { PlayerController } from "../player/playerController";
 import { AbstractBody } from "./abstractBody";
 import { Star } from "./stars/star";
-import { BodyType } from "./interfaces";
+import {
+    AtmosphericScatteringPostProcess
+} from "../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import { OceanPostProcess } from "../postProcesses/planetPostProcesses/oceanPostProcess";
+import { FlatCloudsPostProcess } from "../postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import { StarfieldPostProcess } from "../postProcesses/starfieldPostProcess";
+import { SpaceRenderingPipeline } from "../postProcesses/spaceRenderingPipeline";
 
 export class StarSystemManager {
     readonly scene: Scene;
     readonly depthRenderer: DepthRenderer;
     private readonly _chunkForge: ChunkForge;
-    private readonly _bodies: AbstractBody[] = [];
+    private readonly bodies: AbstractBody[] = [];
+
+    readonly spaceRenderingPipeline: SpaceRenderingPipeline;
 
     stars: Star[] = [];
 
@@ -18,6 +26,8 @@ export class StarSystemManager {
 
     constructor(scene: Scene, nbVertices = 64) {
         this.scene = scene;
+
+        this.spaceRenderingPipeline = new SpaceRenderingPipeline("spaceRenderingPipeline", scene);
 
         this.depthRenderer = new DepthRenderer(scene);
         scene.customRenderTargets.push(this.depthRenderer.getDepthMap());
@@ -28,17 +38,17 @@ export class StarSystemManager {
     }
 
     public addBody(body: AbstractBody) {
-        this._bodies.push(body);
+        this.bodies.push(body);
     }
 
     public translateAllBodies(deplacement: Vector3): void {
-        for (const planet of this._bodies) {
+        for (const planet of this.bodies) {
             planet.setAbsolutePosition(planet.getAbsolutePosition().add(deplacement));
         }
     }
 
     public rotateAllAround(pivot: Vector3, axis: Vector3, amount: number) {
-        for (const planet of this._bodies) {
+        for (const planet of this.bodies) {
             planet.rotateAround(pivot, axis, amount);
         }
     }
@@ -51,7 +61,7 @@ export class StarSystemManager {
      * Returns the list of all celestial bodies managed by the star system manager
      */
     public getBodies(): AbstractBody[] {
-        return this._bodies;
+        return this.bodies;
     }
 
     /**
@@ -76,7 +86,7 @@ export class StarSystemManager {
         //FIXME: use point
         if (this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
         let nearest = null;
-        for (const body of this._bodies) {
+        for (const body of this.bodies) {
             if (nearest == null) nearest = body;
             else if (body.physicalProperties.mass / body.getAbsolutePosition().lengthSquared() > nearest.physicalProperties.mass / nearest.getAbsolutePosition().lengthSquared()) {
                 nearest = body;
@@ -97,5 +107,10 @@ export class StarSystemManager {
 
         this.translateAllBodies(player.getAbsolutePosition().scale(-1));
         player.translate(player.getAbsolutePosition().scale(-1));
+    }
+
+    public init() {
+        this.spaceRenderingPipeline.init();
+        this.spaceRenderingPipeline.attachToCamera(this.scene.activeCamera!);
     }
 }

@@ -1,11 +1,11 @@
-import { Effect, Scene } from "@babylonjs/core";
+import { Effect } from "@babylonjs/core";
 
 import { AtmosphereSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
-import { Star } from "../../bodies/stars/star";
 import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 
 import atmosphericScatteringFragment from "../../../shaders/atmosphericScatteringFragment.glsl";
+import { StarSystemManager } from "../../bodies/starSystemManager";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -13,7 +13,7 @@ Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragme
 export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
     settings: AtmosphereSettings;
 
-    constructor(name: string, planet: AbstractPlanet, atmosphereHeight: number, sun: Star, scene: Scene) {
+    constructor(name: string, planet: AbstractPlanet, atmosphereHeight: number, starSystem: StarSystemManager) {
         let settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 23,
@@ -92,8 +92,10 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
 
         let samplers: ShaderSamplerData = {};
 
-        super(name, shaderName, uniforms, samplers, planet, sun, scene);
+        super(name, shaderName, uniforms, samplers, planet, starSystem.stars[0], starSystem.scene);
 
         this.settings = settings;
+
+        starSystem.spaceRenderingPipeline.atmospheres.push(this);
     }
 }

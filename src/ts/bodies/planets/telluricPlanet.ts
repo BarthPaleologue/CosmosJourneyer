@@ -60,10 +60,10 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
         const waterFreezingPoint = 0.0;
         if(waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
             this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
-            const ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystemManager.stars[0], starSystemManager.scene);
+            const ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystemManager);
             this.postProcesses.ocean = ocean;
 
-            const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
+            const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystemManager);
             clouds.settings.cloudPower = 5 * Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
             this.postProcesses.clouds = clouds;
         } else {

@@ -1,12 +1,12 @@
-import { Effect, Scene } from "@babylonjs/core";
+import { Effect } from "@babylonjs/core";
 
 import { OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
-import { Star } from "../../bodies/stars/star";
 import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 
 import oceanFragment from "../../../shaders/oceanFragment.glsl";
 import { Assets } from "../../assets";
+import { StarSystemManager } from "../../bodies/starSystemManager";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -14,7 +14,7 @@ Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
 export class OceanPostProcess extends PlanetPostProcess {
     settings: OceanSettings;
 
-    constructor(name: string, planet: AbstractPlanet, sun: Star, scene: Scene) {
+    constructor(name: string, planet: AbstractPlanet, starSystem: StarSystemManager) {
         let settings: OceanSettings = {
             oceanRadius: planet.getApparentRadius(),
             depthModifier: 0.002,
@@ -93,8 +93,10 @@ export class OceanPostProcess extends PlanetPostProcess {
             }
         };
 
-        super(name, shaderName, uniforms, samplers, planet, sun, scene);
+        super(name, shaderName, uniforms, samplers, planet, starSystem.stars[0], starSystem.scene);
 
         this.settings = settings;
+
+        starSystem.spaceRenderingPipeline.oceans.push(this);
     }
 }
