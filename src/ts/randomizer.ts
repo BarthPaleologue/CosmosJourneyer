@@ -63,7 +63,7 @@ console.log("Planet seed : ", planetSeed);
 let planet: AbstractBody;
 
 if(uniformRandBool(0.5)) planet = new TelluricPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, planetSeed, [sun]);
-else planet = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystemManager, planetSeed, [sun]);
+else planet = new GazPlanet("Andromaque", starSystemManager, planetSeed, [sun]);
 
 console.table(planet.orbitalProperties);
 

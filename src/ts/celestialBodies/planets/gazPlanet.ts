@@ -7,7 +7,7 @@ import { StarSystemManager } from "../starSystemManager";
 import { IPlanetPhysicalProperties } from "../iPhysicalProperties";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { GazPlanetMaterial } from "../../materials/gazPlanetMaterial";
-import { centeredRand, uniformRandBool } from "extended-random";
+import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 
 export class GazPlanet extends AbstractPlanet {
@@ -18,10 +18,10 @@ export class GazPlanet extends AbstractPlanet {
     private readonly mesh: Mesh;
     readonly material: GazPlanetMaterial;
 
-    constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystemManager, seed, parentBodies);
 
-        this.radius = radius;
+        this.radius = randRangeInt(Settings.PLANET_RADIUS * 4, Settings.PLANET_RADIUS * 20, this.rng);
 
         this.physicalProperties = {
             // FIXME: choose physically accurates values
@@ -32,7 +32,7 @@ export class GazPlanet extends AbstractPlanet {
             pressure: 1
         };
 
-        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: radius * 2, segments: 64 }, starSystemManager.scene);
+        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius * 2, segments: 64 }, starSystemManager.scene);
         starSystemManager.depthRenderer.getDepthMap().renderList!.push(this.mesh);
         this.mesh.parent = this.transform;
 

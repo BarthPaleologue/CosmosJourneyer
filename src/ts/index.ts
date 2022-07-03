@@ -96,7 +96,7 @@ moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap!);
 moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
 moon.material.updateManual();
 
-let ares = new TelluricPlanet("Ares", Settings.PLANET_RADIUS, starSystem, 432, [sun]);
+const ares = new TelluricPlanet("Ares", Settings.PLANET_RADIUS, starSystem, 432, [sun]);
 ares.postProcesses.ocean?.dispose();
 ares.postProcesses.clouds?.dispose();
 ares.physicalProperties.mass = 7;
@@ -131,11 +131,11 @@ aresAtmosphere.settings.redWaveLength = 500;
 aresAtmosphere.settings.greenWaveLength = 680;
 aresAtmosphere.settings.blueWaveLength = 670;
 
-const andromaque = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystem, 25, [sun]);
+const andromaque = new GazPlanet("Andromaque", starSystem, 0.68, [sun]);
 andromaque.orbitalProperties = {
     period: 60 * 60 * 24 * 431 * 10,
-    periapsis: 70 * ares.getRadius(),
-    apoapsis: 71 * ares.getRadius(),
+    periapsis: 150 * ares.getRadius(),
+    apoapsis: 150 * ares.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
 
