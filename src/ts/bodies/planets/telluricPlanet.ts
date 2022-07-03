@@ -43,7 +43,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
         }
 
         const pressure = Math.max(normalRandom(0.8, 0.4, this.rng), 0);
-        const waterAmount = Math.max(normalRandom(1.2, 0.3, this.rng), 0);
+        const waterAmount = Math.max(normalRandom(1.0, 0.3, this.rng), 0);
 
         this.radius = radius;
 
@@ -95,7 +95,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
 
             maxBumpHeight: 1.5e3,
             maxMountainHeight: 30e3,
-            continentBaseHeight: 5e3,
+            continentBaseHeight: this.oceanLevel * 1.3,
 
             mountainsFrequency: 10,
             mountainsMinValue: 0.5

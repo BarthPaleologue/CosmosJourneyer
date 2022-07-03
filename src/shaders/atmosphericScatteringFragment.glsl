@@ -49,8 +49,8 @@ float densityAtPoint(vec3 samplePoint) {
     
     float height01 = heightAboveSurface / (atmosphereRadius - (planetRadius)); // normalized height between 0 and 1
     
-    // FIXME: le fix le plus au pif du monde
-    height01 = remap(height01, 0.0, 1.0, 0.4, 1.0);
+    // FIXME: this sould not be a thing
+    height01 = remap(height01, 0.0, 1.0, 0.4, 0.9);
 
     float localDensity = densityModifier * exp(-height01 * falloffFactor); // density with exponential falloff
 
