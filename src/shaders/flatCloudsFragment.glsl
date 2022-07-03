@@ -71,6 +71,12 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     float density = 1.0 - completeWorley(samplePointRotatedWorley * cloudFrequency, 1, 2.0, 2.0);
 
+    /*samplePointRotatedDetail += vec3(
+        completeNoise(samplePointRotatedDetail, 1, 2.0, 2.0),
+        completeNoise(samplePointRotatedDetail + vec3(2.0, 3.0, -4.0), 1, 2.0, 2.0),
+        completeNoise(samplePointRotatedDetail + vec3(-5.0, 2.0, 4.0), 1, 2.0, 2.0)
+    );*/
+
     density *= completeNoise(samplePointRotatedDetail * cloudDetailFrequency, 5, 2.0, 2.0);
 
     density = saturate(density * 2.0);

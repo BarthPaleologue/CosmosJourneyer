@@ -9,7 +9,7 @@ import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../orb
 import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
-import { centeredRand } from "extended-random";
+import { centeredRand, randRange } from "extended-random";
 import { alea } from "seedrandom";
 
 export abstract class AbstractBody implements IOrbitalBody, ISeedable {
@@ -125,8 +125,8 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
 
     public createRings(star: Star, scene: Scene): RingsPostProcess {
         let rings = new RingsPostProcess(`${this.name}Rings`, this, star, scene);
-        rings.settings.ringStart = 1.8 + 0.4 * centeredRand(this.rng);
-        rings.settings.ringEnd = 2.5 + 0.4 * centeredRand(this.rng);
+        rings.settings.ringStart = randRange(1.4, 2.2, this.rng);
+        rings.settings.ringEnd = randRange(2.1, 2.9, this.rng);
         rings.settings.ringOpacity = this.rng();
         this.postProcesses.rings = rings;
         return rings;
