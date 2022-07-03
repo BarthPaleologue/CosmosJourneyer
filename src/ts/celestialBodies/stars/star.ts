@@ -17,9 +17,11 @@ export class Star extends AbstractBody {
 
     private readonly mesh: Mesh;
     private readonly material: StarMaterial;
+
     internalTime = 0;
-    protected bodyType = BodyType.STAR;
-    readonly physicalProperties: IStarPhysicalProperties;
+
+    override readonly bodyType = BodyType.STAR;
+    override readonly physicalProperties: IStarPhysicalProperties;
 
     public override postProcesses: StarPostProcesses;
 

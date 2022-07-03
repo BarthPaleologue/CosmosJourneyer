@@ -237,7 +237,7 @@ export class PlayerController implements ITransformable {
         dir.normalize();
         this.setAbsolutePosition(dir.scale(dist - body.getRadius() * 3));
 
-        body._starSystemManager.translateAllBodies(this.getAbsolutePosition().negate());
+        body.starSystem.translateAllBodies(this.getAbsolutePosition().negate());
         this.translate(this.getAbsolutePosition().negate());
 
         this.transform.lookAt(body.getAbsolutePosition());

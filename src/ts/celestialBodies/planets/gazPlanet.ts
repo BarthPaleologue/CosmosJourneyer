@@ -11,7 +11,7 @@ import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 
 export class GazPlanet extends AbstractPlanet {
-    protected override bodyType = BodyType.GAZ;
+    override readonly bodyType = BodyType.GAZ;
     override readonly physicalProperties: IPlanetPhysicalProperties;
     override readonly radius;
 

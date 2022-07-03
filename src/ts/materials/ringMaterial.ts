@@ -33,13 +33,13 @@ export class RingMaterial extends ShaderMaterial {
         this.setFloat("ringStart", 2);
         this.setFloat("ringEnd", 4);
         this.setFloat("planetRadius", this.body.getApparentRadius());
-        this.setFloat("seed", this.body.getSeed());
+        this.setFloat("seed", this.body.seed);
     }
 
     public update() {
         this.setFloat("ringStart", 2);
         this.setFloat("ringEnd", 4);
         this.setFloat("planetRadius", this.body.getApparentRadius());
-        this.setFloat("seed", this.body.getSeed());
+        this.setFloat("seed", this.body.seed);
     }
 }

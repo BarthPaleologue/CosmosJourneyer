@@ -28,7 +28,7 @@ export class StarMaterial extends ShaderMaterial {
         this.setFloat("time", this.star.internalTime);
         this.setVector3("starColor", getRgbFromTemperature(this.star.physicalProperties.temperature));
         this.setQuaternion("starInverseRotationQuaternion", this.star.getInverseRotationQuaternion());
-        this.setFloat("seed", this.star.getSeed());
+        this.setFloat("seed", this.star.seed);
         this.setVector3("starPosition", this.star.getAbsolutePosition());
     }
 }

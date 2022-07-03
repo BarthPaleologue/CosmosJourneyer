@@ -9,9 +9,9 @@ export enum BodyType {
 
 export interface ISeedable {
     /**
-     * Returns the seed of the planet
+     * The seed of the planet
      */
-    getSeed(): number;
+    seed: number;
 }
 
 /**

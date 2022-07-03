@@ -13,17 +13,17 @@ import { centeredRand } from "extended-random";
 import { alea } from "seedrandom";
 
 export abstract class AbstractBody implements IOrbitalBody, ISeedable {
-    protected abstract bodyType: BodyType;
+    readonly abstract bodyType: BodyType;
 
     abstract physicalProperties: IPhysicalProperties;
     orbitalProperties: IOrbitalProperties;
     abstract postProcesses: BodyPostProcesses;
 
-    readonly _starSystemManager: StarSystemManager;
+    readonly starSystem: StarSystemManager;
 
-    protected readonly _name: string;
+    readonly name: string;
 
-    protected readonly _seed: number;
+    readonly seed: number;
 
     readonly rng: () => number;
 
@@ -37,12 +37,12 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
     depth: number;
 
     protected constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
-        this._name = name;
-        this._seed = seed;
+        this.name = name;
+        this.seed = seed;
 
         this.rng = alea(seed.toString());
 
-        this._starSystemManager = starSystemManager;
+        this.starSystem = starSystemManager;
         starSystemManager.addBody(this);
 
         this.parentBodies = parentBodies;
@@ -72,13 +72,6 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
         };
     }
 
-    /**
-     * Returns the name of the body
-     */
-    public getName(): string {
-        return this._name;
-    }
-
     public setAbsolutePosition(newPosition: Vector3): void {
         this.transform.setAbsolutePosition(newPosition);
     }
@@ -101,19 +94,12 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
     }
 
     public getRotationQuaternion(): Quaternion {
-        if (this.transform.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.getName()}`);
+        if (this.transform.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.name}`);
         return this.transform.rotationQuaternion;
     }
 
     public getInverseRotationQuaternion(): Quaternion {
         return this.getRotationQuaternion().invert();
-    }
-
-    /**
-     * Returns the body type of the body (useful for casts)
-     */
-    public getBodyType(): BodyType {
-        return this.bodyType;
     }
 
     /**
@@ -138,16 +124,12 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
     }
 
     public createRings(star: Star, scene: Scene): RingsPostProcess {
-        let rings = new RingsPostProcess(`${this.getName()}Rings`, this, star, scene);
+        let rings = new RingsPostProcess(`${this.name}Rings`, this, star, scene);
         rings.settings.ringStart = 1.8 + 0.4 * centeredRand(this.rng);
         rings.settings.ringEnd = 2.5 + 0.4 * centeredRand(this.rng);
         rings.settings.ringOpacity = this.rng();
         this.postProcesses.rings = rings;
         return rings;
-    }
-
-    public getSeed(): number {
-        return this._seed;
     }
 
     /**
@@ -164,7 +146,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
             //TODO: orient the planet accurately
 
             const initialPosition = this.getAbsolutePosition().clone();
-            const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this._starSystemManager.getTime());
+            const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this.starSystem.getTime());
 
             if (player.isOrbiting(this, 50 / ((this.depth + 1) ** 3))) player.translate(newPosition.subtract(initialPosition));
             this.setAbsolutePosition(newPosition);

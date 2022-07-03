@@ -24,17 +24,23 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
     oceanLevel: number;
 
     override readonly physicalProperties: ISolidPhysicalProperties;
-    protected override bodyType = BodyType.TELLURIC;
+    override readonly bodyType = BodyType.TELLURIC;
     override readonly radius: number;
 
-    public terrainSettings: TerrainSettings;
+    readonly terrainSettings: TerrainSettings;
 
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
 
-    material: TelluricPlanetMaterial;
+    readonly material: TelluricPlanetMaterial;
+
+    private isSatelliteOfTelluric = false;
 
     constructor(id: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(id, starSystemManager, seed, parentBodies);
+
+        for(const parentBody of parentBodies) {
+            if(parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true
+        }
 
         const pressure = Math.max(normalRandom(0.8, 0.4, this.rng), 0);
         const waterAmount = Math.max(normalRandom(1.2, 0.3, this.rng), 0);
@@ -54,10 +60,10 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
         const waterFreezingPoint = 0.0;
         if(waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
             this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
-            const ocean = new OceanPostProcess(`${this.getName()}Ocean`, this, starSystemManager.stars[0], starSystemManager.scene);
+            const ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystemManager.stars[0], starSystemManager.scene);
             this.postProcesses.ocean = ocean;
 
-            const clouds = new FlatCloudsPostProcess(`${this.getName()}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
+            const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
             clouds.settings.cloudPower = 5 * Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
             this.postProcesses.clouds = clouds;
         } else {
@@ -111,9 +117,9 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
 
     public generateCollisionTask(relativePosition: Vector3): CollisionData {
         let collisionData: CollisionData = {
-            seed: this.getSeed(),
+            seed: this.seed,
             taskType: TaskType.Collision,
-            planetName: this._name,
+            planetName: this.name,
             terrainSettings: this.terrainSettings,
             position: [relativePosition.x, relativePosition.y, relativePosition.z],
             planetDiameter: this.getDiameter()

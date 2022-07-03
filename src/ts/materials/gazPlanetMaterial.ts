@@ -16,7 +16,7 @@ export class GazPlanetMaterial extends ShaderMaterial {
     readonly colorSettings: GazColorSettings;
 
     constructor(planet: GazPlanet, scene: Scene) {
-        super(`${planet.getName()}SurfaceColor`, scene, shaderName, {
+        super(`${planet.name}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
             uniforms: [
                 "world",
@@ -62,7 +62,7 @@ export class GazPlanetMaterial extends ShaderMaterial {
             MaterialHelper.BindLogDepth(null, effect, scene);
         });
 
-        this.setFloat("seed", this.planet.getSeed());
+        this.setFloat("seed", this.planet.seed);
 
         this.setVector3("playerPosition", Vector3.Zero());
         this.setVector3("sunPosition", Vector3.Zero());
@@ -86,6 +86,6 @@ export class GazPlanetMaterial extends ShaderMaterial {
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
 
-        this.setFloat("time", this.planet._starSystemManager.getTime() % 100000);
+        this.setFloat("time", this.planet.starSystem.getTime() % 100000);
     }
 }

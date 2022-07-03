@@ -69,16 +69,16 @@ console.table(planet.orbitalProperties);
 
 planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
 
-if(planet.getBodyType() == BodyType.TELLURIC) {
-    const solidPlanet = planet as TelluricPlanet;
+if(planet.bodyType == BodyType.TELLURIC) {
+    const telluricPlanet = planet as TelluricPlanet;
 
     //TODO: use formula
-    solidPlanet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng);
-    solidPlanet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng);
+    telluricPlanet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng);
+    telluricPlanet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng);
 
-    solidPlanet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRand(planet.rng) / 10, 0.37 + centeredRand(planet.rng) / 10, 0.024 + centeredRand(planet.rng) / 10);
-    solidPlanet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng);
-    solidPlanet.material.updateManual();
+    telluricPlanet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRand(planet.rng) / 10, 0.37 + centeredRand(planet.rng) / 10, 0.024 + centeredRand(planet.rng) / 10);
+    telluricPlanet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng);
+    telluricPlanet.material.updateManual();
 }
 
 
@@ -87,7 +87,7 @@ for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
     const randSatellite = alea(satelliteSeed.toString());
     const satelliteRadius = (planet.getRadius() / 5) * clamp(normalRandom(1, 0.1, randSatellite), 0.5, 1.5);
     const ratio = satelliteRadius / Settings.PLANET_RADIUS;
-    const satellite = new TelluricPlanet(`${planet.getName()}Sattelite${i}`, satelliteRadius, starSystemManager, satelliteSeed, [planet]);
+    const satellite = new TelluricPlanet(`${planet.name}Sattelite${i}`, satelliteRadius, starSystemManager, satelliteSeed, [planet]);
     console.log(satellite.depth)
     const periapsis = 5 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, randSatellite), 0.9, 1.0) * planet.getRadius() * 2;
     const apoapsis = periapsis * clamp(normalRandom(1, 0.05, randSatellite), 1, 1.5);
@@ -140,7 +140,7 @@ scene.executeWhenReady(() => {
         const deltaTime = engine.getDeltaTime() / 1000;
 
         player.nearestBody = starSystemManager.getNearestBody();
-        if (player.nearestBody.getName() != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, sun, player);
+        if (player.nearestBody.name != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, sun, player);
 
         starSystemManager.update(player, sun.getAbsolutePosition(), Settings.TIME_MULTIPLIER * deltaTime);
 
@@ -153,7 +153,7 @@ scene.executeWhenReady(() => {
         starSystemManager.translateAllBodies(deplacement);
 
         if (!collisionWorker.isBusy() && player.isOrbiting()) {
-            if (player.nearestBody?.getBodyType() == BodyType.TELLURIC) {
+            if (player.nearestBody?.bodyType == BodyType.TELLURIC) {
                 collisionWorker.checkCollision(player.nearestBody as TelluricPlanet);
             }
         }

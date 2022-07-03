@@ -1,6 +1,7 @@
 import { IPhysicalProperties } from "../celestialBodies/iPhysicalProperties";
 import { IOrbitalProperties } from "./iOrbitalProperties";
 import { ITransformable } from "../celestialBodies/iTransformable";
+import { BodyType } from "../celestialBodies/interfaces";
 
 export interface IOrbitalBody extends ITransformable {
     /**
@@ -27,4 +28,9 @@ export interface IOrbitalBody extends ITransformable {
      * The depth of the body in the orbital tree
      */
     depth: number;
+
+    /**
+     * A label identifying the type of the body
+     */
+    bodyType: BodyType;
 }

@@ -44,7 +44,7 @@ export class ChunkTree {
         //let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
         //console.log(spaceBetweenVertex);
 
-        this.chunkForge = planet._starSystemManager.getChunkForge();
+        this.chunkForge = planet.starSystem.getChunkForge();
 
         this.direction = direction;
 

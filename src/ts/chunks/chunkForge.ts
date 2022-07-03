@@ -52,14 +52,14 @@ export class ChunkForge {
 
         let buildData: BuildData = {
             taskType: TaskType.Build,
-            planetName: task.planet.getName(),
+            planetName: task.planet.name,
             planetDiameter: task.planet.getDiameter(),
             nbVerticesPerSide: this.nbVerticesPerSide,
             depth: task.depth,
             direction: task.direction,
             position: [task.position.x, task.position.y, task.position.z],
             terrainSettings: task.planet.terrainSettings,
-            seed: task.planet.getSeed()
+            seed: task.planet.seed
         };
 
         worker.postMessage(buildData);

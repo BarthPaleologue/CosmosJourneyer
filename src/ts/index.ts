@@ -154,9 +154,9 @@ function updateScene() {
     const deltaTime = engine.getDeltaTime() / 1000;
 
     player.nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.getAbsolutePosition());
-    if (player.nearestBody.getName() != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, sun, player);
+    if (player.nearestBody.name != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, sun, player);
 
-    document.getElementById("planetName")!.innerText = player.isOrbiting() ? player.nearestBody.getName() : "Outer Space";
+    document.getElementById("planetName")!.innerText = player.isOrbiting() ? player.nearestBody.name : "Outer Space";
 
     if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 
@@ -167,7 +167,7 @@ function updateScene() {
     starSystem.update(player, sun.getAbsolutePosition(), deltaTime * Settings.TIME_MULTIPLIER);
 
     if (!collisionWorker.isBusy() && player.isOrbiting()) {
-        if (player.nearestBody?.getBodyType() == BodyType.TELLURIC) {
+        if (player.nearestBody?.bodyType == BodyType.TELLURIC) {
             collisionWorker.checkCollision(player.nearestBody as TelluricPlanet);
         }
     }

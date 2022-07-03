@@ -111,9 +111,9 @@ export class BodyEditor {
     }
 
     public setBody(body: AbstractBody, star: Star, player: PlayerController) {
-        this.currentBodyId = body.getName();
+        this.currentBodyId = body.name;
         this.initNavBar(body);
-        switch (body.getBodyType()) {
+        switch (body.bodyType) {
             case BodyType.TELLURIC:
                 this.setSolidPlanet(body as TelluricPlanet, star, player);
                 break;
@@ -176,7 +176,7 @@ export class BodyEditor {
         hide("atmosphereLink");
         hide("atmosphereUI");
 
-        switch (body.getBodyType()) {
+        switch (body.bodyType) {
             case BodyType.STAR:
                 show("starPhysicLink");
                 break;

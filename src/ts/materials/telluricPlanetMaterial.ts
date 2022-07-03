@@ -16,7 +16,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     colorSettings: ColorSettings;
 
     constructor(planet: TelluricPlanet, scene: Scene) {
-        super(`${planet.getName()}SurfaceColor`, scene, shaderName, {
+        super(`${planet.name}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
             uniforms: [
                 "world",
@@ -95,7 +95,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             MaterialHelper.BindLogDepth(null, effect, scene);
         });
 
-        this.setFloat("seed", this.planet.getSeed());
+        this.setFloat("seed", this.planet.seed);
 
         if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 
