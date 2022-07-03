@@ -24,8 +24,8 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
     oceanLevel: number;
 
     override readonly physicalProperties: ISolidPhysicalProperties;
-
-    protected bodyType = BodyType.TELLURIC;
+    protected override bodyType = BodyType.TELLURIC;
+    override readonly radius: number;
 
     public terrainSettings: TerrainSettings;
 
@@ -34,10 +34,12 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
     material: TelluricPlanetMaterial;
 
     constructor(id: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
-        super(id, radius, starSystemManager, seed, parentBodies);
+        super(id, starSystemManager, seed, parentBodies);
 
         const pressure = Math.max(normalRandom(0.8, 0.4, this.rng), 0);
         const waterAmount = Math.max(normalRandom(1.2, 0.3, this.rng), 0);
+
+        this.radius = radius;
 
         this.physicalProperties = {
             mass: 10,

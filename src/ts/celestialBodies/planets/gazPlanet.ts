@@ -11,15 +11,18 @@ import { centeredRand, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 
 export class GazPlanet extends AbstractPlanet {
-    protected bodyType = BodyType.GAZ;
-
+    protected override bodyType = BodyType.GAZ;
     override readonly physicalProperties: IPlanetPhysicalProperties;
+    override readonly radius;
 
     private readonly mesh: Mesh;
     readonly material: GazPlanetMaterial;
 
     constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
-        super(name, radius, starSystemManager, seed, parentBodies);
+        super(name, starSystemManager, seed, parentBodies);
+
+        this.radius = radius;
+
         this.physicalProperties = {
             // FIXME: choose physically accurates values
             mass: 10,

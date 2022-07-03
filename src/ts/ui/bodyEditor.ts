@@ -240,7 +240,7 @@ export class BodyEditor {
         this.generalSliders = [];
 
         this.generalSliders.push(
-            new Slider("zoom", document.getElementById("zoom")!, 0, 100, (100 * planet._radius) / planet.transform.position.z, (value: number) => {
+            new Slider("zoom", document.getElementById("zoom")!, 0, 100, (100 * planet.radius) / planet.transform.position.z, (value: number) => {
                 let playerDir = planet.getAbsolutePosition().normalizeToNew();
                 planet.setAbsolutePosition(playerDir.scale((100 * planet.getRadius()) / value));
             })

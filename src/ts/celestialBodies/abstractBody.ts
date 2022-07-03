@@ -27,7 +27,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
 
     readonly rng: () => number;
 
-    readonly _radius: number;
+    readonly abstract radius: number;
 
     readonly transform: TransformNode;
 
@@ -36,10 +36,9 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
 
     depth: number;
 
-    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+    protected constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         this._name = name;
         this._seed = seed;
-        this._radius = radius;
 
         this.rng = alea(seed.toString());
 
@@ -121,7 +120,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
      * Returns the radius of the celestial body
      */
     public getRadius(): number {
-        return this._radius;
+        return this.radius;
     }
 
     /**

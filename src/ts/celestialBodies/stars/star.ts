@@ -23,8 +23,12 @@ export class Star extends AbstractBody {
 
     public override postProcesses: StarPostProcesses;
 
+    override readonly radius;
+
     constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
-        super(name, radius, starSystemManager, seed, parentBodies);
+        super(name, starSystemManager, seed, parentBodies);
+
+        this.radius = radius;
 
         starSystemManager.stars.push(this);
 
@@ -36,7 +40,7 @@ export class Star extends AbstractBody {
             temperature: clamp(normalRandom(5778, 2000, this.rng), 4000, 10000)
         };
 
-        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this._radius * 2, segments: 32 }, starSystemManager.scene);
+        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius * 2, segments: 32 }, starSystemManager.scene);
         starSystemManager.depthRenderer.getDepthMap().renderList!.push(this.mesh);
         this.mesh.parent = this.transform;
 

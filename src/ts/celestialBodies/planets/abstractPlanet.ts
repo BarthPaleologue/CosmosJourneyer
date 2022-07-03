@@ -13,8 +13,8 @@ export abstract class AbstractPlanet extends AbstractBody {
     abstract override physicalProperties: IPlanetPhysicalProperties;
     public override postProcesses: PlanetPostProcesses;
 
-    protected constructor(name: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
-        super(name, radius, starSystemManager, seed, parentBodies);
+    protected constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+        super(name, starSystemManager, seed, parentBodies);
         this.postProcesses = {
             atmosphere: null,
             ocean: null,
