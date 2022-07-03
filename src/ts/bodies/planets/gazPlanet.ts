@@ -21,7 +21,7 @@ export class GazPlanet extends AbstractPlanet {
     constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystemManager, seed, parentBodies);
 
-        this.radius = randRangeInt(Settings.PLANET_RADIUS * 4, Settings.PLANET_RADIUS * 20, this.rng);
+        this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng);
 
         this.physicalProperties = {
             // FIXME: choose physically accurates values

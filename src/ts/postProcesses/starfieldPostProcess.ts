@@ -2,7 +2,7 @@ import { Axis, Effect, Scene, Vector3 } from "@babylonjs/core";
 
 import { SpacePostProcess } from "./spacePostProcess";
 import { ShaderDataType, ShaderSamplerData, ShaderUniformData, StarfieldSettings } from "./interfaces";
-import { Star } from "../celestialBodies/stars/star";
+import { Star } from "../bodies/stars/star";
 
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
 

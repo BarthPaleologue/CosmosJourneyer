@@ -1,5 +1,6 @@
 export const Settings = {
-    PLANET_RADIUS: 1000e3,
+    EARTH_RADIUS: 1000e3, // target is 6000e3
+    AU: 150e9, // target is 150e9
     VERTEX_RESOLUTION: 64,
     CLOUD_LAYER_HEIGHT: 15e3,
     ATMOSPHERE_HEIGHT: 100e3,

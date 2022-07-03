@@ -1,6 +1,6 @@
 import { Vector3 } from "@babylonjs/core";
 import { Direction, getQuaternionFromDirection } from "./direction";
-import { TelluricPlanet } from "../celestialBodies/planets/telluricPlanet";
+import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 
 /**
  * Returns the node position in plane space

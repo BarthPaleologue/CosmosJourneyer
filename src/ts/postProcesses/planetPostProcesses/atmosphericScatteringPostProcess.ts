@@ -2,8 +2,8 @@ import { Effect, Scene } from "@babylonjs/core";
 
 import { AtmosphereSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
-import { Star } from "../../celestialBodies/stars/star";
-import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
+import { Star } from "../../bodies/stars/star";
+import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 
 import atmosphericScatteringFragment from "../../../shaders/atmosphericScatteringFragment.glsl";
 

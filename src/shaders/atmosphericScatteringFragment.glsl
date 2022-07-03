@@ -12,8 +12,6 @@ varying vec2 vUV; // screen coordinates
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
 
-uniform float planetsData[4 * 50];
-
 uniform vec3 sunPosition; // position of the sun in world space
 uniform vec3 cameraPosition; // position of the camera in world space
 

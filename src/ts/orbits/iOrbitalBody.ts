@@ -1,7 +1,7 @@
-import { IPhysicalProperties } from "../celestialBodies/iPhysicalProperties";
+import { IPhysicalProperties } from "../bodies/iPhysicalProperties";
 import { IOrbitalProperties } from "./iOrbitalProperties";
-import { ITransformable } from "../celestialBodies/iTransformable";
-import { BodyType } from "../celestialBodies/interfaces";
+import { ITransformable } from "../bodies/iTransformable";
+import { BodyType } from "../bodies/interfaces";
 
 export interface IOrbitalBody extends ITransformable {
     /**

@@ -2,7 +2,7 @@ import { Effect, Material, MaterialHelper, Scene, ShaderMaterial } from "@babylo
 
 import starMaterialFragment from "../../shaders/ringMaterial/fragment.glsl";
 import starMaterialVertex from "../../shaders/ringMaterial/vertex.glsl";
-import { AbstractBody } from "../celestialBodies/abstractBody";
+import { AbstractBody } from "../bodies/abstractBody";
 
 const shaderName = "ringMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;

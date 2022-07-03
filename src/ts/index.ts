@@ -1,7 +1,7 @@
 import { Color3, FxaaPostProcess, LensFlare, LensFlareSystem, Quaternion, Texture, Tools, Vector3 } from "@babylonjs/core";
 
-import { TelluricPlanet } from "./celestialBodies/planets/telluricPlanet";
-import { Star } from "./celestialBodies/stars/star";
+import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
+import { Star } from "./bodies/stars/star";
 
 import { PlayerController } from "./player/playerController";
 
@@ -10,7 +10,7 @@ import { Mouse } from "./inputs/mouse";
 import { Gamepad } from "./inputs/gamepad";
 
 import { CollisionWorker } from "./workers/collisionWorker";
-import { StarSystemManager } from "./celestialBodies/starSystemManager";
+import { StarSystemManager } from "./bodies/starSystemManager";
 
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 
@@ -19,18 +19,18 @@ import lensFlare from "../asset/lensflare.png";
 import "../styles/index.scss";
 
 import { Settings } from "./settings";
-import { BodyType } from "./celestialBodies/interfaces";
+import { BodyType } from "./bodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initCanvasEngineScene } from "./utils/init";
 import { Assets } from "./assets";
-import { GazPlanet } from "./celestialBodies/planets/gazPlanet";
+import { GazPlanet } from "./bodies/planets/gazPlanet";
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
 
 const player = new PlayerController(scene);
-player.setSpeed(0.2 * Settings.PLANET_RADIUS);
-player.camera.maxZ = Settings.PLANET_RADIUS * 100000;
+player.setSpeed(0.2 * Settings.EARTH_RADIUS);
+player.camera.maxZ = Settings.EARTH_RADIUS * 100000;
 
 Assets.Init(scene);
 
@@ -44,7 +44,7 @@ let starSystem = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
 let starfield = new StarfieldPostProcess("starfield", scene);
 
-let sun = new Star("Weierstrass", Settings.PLANET_RADIUS, starSystem, 788, []);
+let sun = new Star("Weierstrass", Settings.EARTH_RADIUS, starSystem, 788, []);
 sun.orbitalProperties.period = 60 * 60 * 24;
 starfield.setStar(sun);
 
@@ -57,7 +57,7 @@ const flare00 = new LensFlare(
     lensFlareSystem // lens flare system
 );*/
 
-const planet = new TelluricPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, -2.951332749798894, [sun]);
+const planet = new TelluricPlanet("Hécate", Settings.EARTH_RADIUS, starSystem, -2.951332749798894, [sun]);
 
 planet.physicalProperties.rotationPeriod /= 50;
 
@@ -68,7 +68,7 @@ planet.orbitalProperties = {
     orientationQuaternion: Quaternion.Identity()
 };
 
-const moon = new TelluricPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, 437, [planet]);
+const moon = new TelluricPlanet("Manaleth", Settings.EARTH_RADIUS / 4, starSystem, 437, [planet]);
 moon.postProcesses.ocean?.dispose();
 moon.postProcesses.clouds?.dispose();
 moon.postProcesses.atmosphere?.dispose();
@@ -96,7 +96,7 @@ moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap!);
 moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
 moon.material.updateManual();
 
-const ares = new TelluricPlanet("Ares", Settings.PLANET_RADIUS, starSystem, 432, [sun]);
+const ares = new TelluricPlanet("Ares", Settings.EARTH_RADIUS, starSystem, 432, [sun]);
 ares.postProcesses.ocean?.dispose();
 ares.postProcesses.clouds?.dispose();
 ares.physicalProperties.mass = 7;

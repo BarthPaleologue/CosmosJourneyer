@@ -1,8 +1,8 @@
 import { Effect, Scene } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplerData, ShaderUniformData, VolumetricCloudSettings } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
-import { Star } from "../../celestialBodies/stars/star";
-import { AbstractPlanet } from "../../celestialBodies/planets/abstractPlanet";
+import { Star } from "../../bodies/stars/star";
+import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 
 import volumetricCloudsFragment from "../../../shaders/volumetricCloudsFragment.glsl";
 

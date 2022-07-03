@@ -1,10 +1,10 @@
 import { Effect, Scene } from "@babylonjs/core";
 import { RingsSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
-import { Star } from "../../celestialBodies/stars/star";
+import { Star } from "../../bodies/stars/star";
 
 import ringsFragment from "../../../shaders/ringsFragment.glsl";
-import { AbstractBody } from "../../celestialBodies/abstractBody";
+import { AbstractBody } from "../../bodies/abstractBody";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;

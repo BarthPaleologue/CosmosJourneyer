@@ -2,9 +2,9 @@ import { Vector3, FreeCamera, Axis, Space, Scene, Quaternion, TransformNode, Mes
 import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
-import { AbstractBody } from "../celestialBodies/abstractBody";
-import { ITransformable } from "../celestialBodies/iTransformable";
-import { Star } from "../celestialBodies/stars/star";
+import { AbstractBody } from "../bodies/abstractBody";
+import { ITransformable } from "../bodies/iTransformable";
+import { Star } from "../bodies/stars/star";
 
 export class PlayerController implements ITransformable {
     nearestBody: AbstractBody | null;

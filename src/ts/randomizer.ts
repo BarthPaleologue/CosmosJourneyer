@@ -1,6 +1,6 @@
 import { FxaaPostProcess, Tools } from "@babylonjs/core";
 
-import { TelluricPlanet } from "./celestialBodies/planets/telluricPlanet";
+import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 
 import "../styles/index.scss";
 import { PlayerController } from "./player/playerController";
@@ -8,13 +8,13 @@ import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
 import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
-import { StarSystemManager } from "./celestialBodies/starSystemManager";
+import { StarSystemManager } from "./bodies/starSystemManager";
 
 import { centeredRand, normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Star } from "./celestialBodies/stars/star";
+import { Star } from "./bodies/stars/star";
 import { Settings } from "./settings";
-import { BodyType } from "./celestialBodies/interfaces";
+import { BodyType } from "./bodies/interfaces";
 import { clamp } from "./utils/math";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initCanvasEngineScene } from "./utils/init";
@@ -22,16 +22,16 @@ import { Assets } from "./assets";
 
 import { alea } from "seedrandom";
 import { getOrbitalPeriod } from "./orbits/kepler";
-import { AbstractBody } from "./celestialBodies/abstractBody";
-import { GazPlanet } from "./celestialBodies/planets/gazPlanet";
+import { AbstractBody } from "./bodies/abstractBody";
+import { GazPlanet } from "./bodies/planets/gazPlanet";
 import { computeMeanTemperature } from "./utils/temperatureComputation";
 
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
 
 const player = new PlayerController(scene);
-player.setSpeed(0.2 * Settings.PLANET_RADIUS);
-player.camera.maxZ = Settings.PLANET_RADIUS * 100000;
+player.setSpeed(0.2 * Settings.EARTH_RADIUS);
+player.camera.maxZ = Settings.EARTH_RADIUS * 100000;
 
 Assets.Init(scene);
 
@@ -51,7 +51,7 @@ console.log("Star seed : ", starSeed);
 
 // TODO: generate radius inside body constructor
 const randStar = alea(starSeed.toString());
-const starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.4, 1.5) * Settings.PLANET_RADIUS * 100;
+const starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.4, 1.5) * Settings.EARTH_RADIUS * 100;
 
 const sun = new Star("Weierstrass", starRadius, starSystemManager, starSeed, []);
 
@@ -62,7 +62,7 @@ console.log("Planet seed : ", planetSeed);
 
 let planet: AbstractBody;
 
-if(uniformRandBool(0.5)) planet = new TelluricPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, planetSeed, [sun]);
+if(uniformRandBool(0.5)) planet = new TelluricPlanet("Hécate", Settings.EARTH_RADIUS, starSystemManager, planetSeed, [sun]);
 else planet = new GazPlanet("Andromaque", starSystemManager, planetSeed, [sun]);
 
 console.table(planet.orbitalProperties);
@@ -86,7 +86,7 @@ for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
     const satelliteSeed = planet.rng();
     const randSatellite = alea(satelliteSeed.toString());
     const satelliteRadius = (planet.getRadius() / 5) * clamp(normalRandom(1, 0.1, randSatellite), 0.5, 1.5);
-    const ratio = satelliteRadius / Settings.PLANET_RADIUS;
+    const ratio = satelliteRadius / Settings.EARTH_RADIUS;
     const satellite = new TelluricPlanet(`${planet.name}Sattelite${i}`, satelliteRadius, starSystemManager, satelliteSeed, [planet]);
     console.log(satellite.depth)
     const periapsis = 5 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, randSatellite), 0.9, 1.0) * planet.getRadius() * 2;

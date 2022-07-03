@@ -3,7 +3,7 @@ import { PlayerController } from "../player/playerController";
 
 import surfaceMaterialFragment from "../../shaders/gazPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../shaders/gazPlanetMaterial/vertex.glsl";
-import { GazPlanet } from "../celestialBodies/planets/gazPlanet";
+import { GazPlanet } from "../bodies/planets/gazPlanet";
 import { GazColorSettings } from "./colorSettingsInterface";
 import { randRangeInt } from "extended-random";
 

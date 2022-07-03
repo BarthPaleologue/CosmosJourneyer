@@ -1,5 +1,5 @@
 import { Effect, Scene, ShaderMaterial } from "@babylonjs/core";
-import { Star } from "../celestialBodies/stars/star";
+import { Star } from "../bodies/stars/star";
 import { getRgbFromTemperature } from "../utils/specrend";
 
 import starMaterialFragment from "../../shaders/starMaterial/fragment.glsl";

@@ -1,18 +1,18 @@
 import editorHTML from "../../html/bodyEditor.html";
-import { TelluricPlanet } from "../celestialBodies/planets/telluricPlanet";
-import { Star } from "../celestialBodies/stars/star";
+import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
+import { Star } from "../bodies/stars/star";
 import { Slider } from "handle-sliderjs";
-import { BodyType } from "../celestialBodies/interfaces";
+import { BodyType } from "../bodies/interfaces";
 import { Settings } from "../settings";
 import { Axis, Color3 } from "@babylonjs/core";
 import { PlayerController } from "../player/playerController";
-import { AbstractBody } from "../celestialBodies/abstractBody";
+import { AbstractBody } from "../bodies/abstractBody";
 import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../materials/colorSettingsInterface";
 import { clearAllEventListenersById, hide, show } from "../utils/html";
 import { stripAxisFromQuaternion } from "../utils/algebra";
-import { GazPlanet } from "../celestialBodies/planets/gazPlanet";
-import { AbstractPlanet } from "../celestialBodies/planets/abstractPlanet";
+import { GazPlanet } from "../bodies/planets/gazPlanet";
+import { AbstractPlanet } from "../bodies/planets/abstractPlanet";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -395,7 +395,7 @@ export class BodyEditor {
         atmosphereToggler.addEventListener("click", () => {
             let checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            atmosphere.settings.atmosphereRadius = checkbox.checked ? Settings.PLANET_RADIUS + Settings.ATMOSPHERE_HEIGHT : 0;
+            atmosphere.settings.atmosphereRadius = checkbox.checked ? Settings.EARTH_RADIUS + Settings.ATMOSPHERE_HEIGHT : 0;
         });
         this.atmosphereSliders.push(
             new Slider("intensity", document.getElementById("intensity")!, 0, 40, atmosphere.settings.intensity, (val: number) => {
@@ -467,7 +467,7 @@ export class BodyEditor {
         cloudsToggler.addEventListener("click", () => {
             let checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            flatClouds.settings.cloudLayerRadius = checkbox.checked ? Settings.PLANET_RADIUS + Settings.CLOUD_LAYER_HEIGHT : 0;
+            flatClouds.settings.cloudLayerRadius = checkbox.checked ? Settings.EARTH_RADIUS + Settings.CLOUD_LAYER_HEIGHT : 0;
         });
         let cloudColorPicker = clearAllEventListenersById("cloudColor") as HTMLInputElement;
         cloudColorPicker.value = flatClouds.settings.cloudColor.toHexString();

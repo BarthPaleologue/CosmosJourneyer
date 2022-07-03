@@ -1,4 +1,4 @@
-import { TelluricPlanet } from "../celestialBodies/planets/telluricPlanet";
+import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { Direction } from "../utils/direction";
 import { Vector3, VertexData } from "@babylonjs/core";
 import { PlanetChunk } from "./planetChunk";

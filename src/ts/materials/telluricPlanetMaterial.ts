@@ -1,5 +1,5 @@
 import { Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
-import { TelluricPlanet } from "../celestialBodies/planets/telluricPlanet";
+import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { ColorMode, ColorSettings } from "./colorSettingsInterface";
 import { PlayerController } from "../player/playerController";
 
