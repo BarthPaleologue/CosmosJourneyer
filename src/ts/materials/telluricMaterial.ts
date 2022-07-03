@@ -11,7 +11,7 @@ const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 
-export class TelluricPlanetMaterial extends ShaderMaterial {
+export class TelluricMaterial extends ShaderMaterial {
     readonly planet: TelluricPlanet;
     colorSettings: ColorSettings;
 

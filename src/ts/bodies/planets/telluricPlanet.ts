@@ -12,7 +12,7 @@ import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
 import { Settings } from "../../settings";
 import { ISolidPhysicalProperties } from "../iPhysicalProperties";
-import { TelluricPlanetMaterial } from "../../materials/telluricPlanetMaterial";
+import { TelluricMaterial } from "../../materials/telluricMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
@@ -31,7 +31,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
 
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
 
-    readonly material: TelluricPlanetMaterial;
+    readonly material: TelluricMaterial;
 
     private isSatelliteOfTelluric = false;
 
@@ -101,7 +101,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
             mountainsMinValue: 0.5
         };
 
-        this.material = new TelluricPlanetMaterial(this, starSystemManager.scene);
+        this.material = new TelluricMaterial(this, starSystemManager.scene);
 
         this.sides = [
             new ChunkTree(Direction.Up, this),
