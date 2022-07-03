@@ -1,4 +1,4 @@
-import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
+import { TelluricPlanet } from "../celestialBodies/planets/telluricPlanet";
 import { Direction } from "../utils/direction";
 import { Vector3, VertexData } from "@babylonjs/core";
 import { PlanetChunk } from "./planetChunk";
@@ -17,7 +17,7 @@ export interface Task {
 }
 
 export interface BuildTask extends Task {
-    planet: SolidPlanet;
+    planet: TelluricPlanet;
     depth: number;
     direction: Direction;
     position: Vector3;
@@ -25,7 +25,7 @@ export interface BuildTask extends Task {
 
 export interface ApplyTask extends Task {
     vertexData: VertexData;
-    planet: SolidPlanet;
+    planet: TelluricPlanet;
     callbackTasks: DeleteTask[];
 }
 

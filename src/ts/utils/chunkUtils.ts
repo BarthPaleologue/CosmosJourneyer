@@ -1,6 +1,6 @@
 import { Vector3 } from "@babylonjs/core";
 import { Direction, getQuaternionFromDirection } from "./direction";
-import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
+import { TelluricPlanet } from "../celestialBodies/planets/telluricPlanet";
 
 /**
  * Returns the node position in plane space
@@ -50,7 +50,7 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
  * @param planet
  * @returns the position in planet space
  */
-export function getChunkSphereSpacePositionFromPath(path: number[], direction: Direction, planet: SolidPlanet): Vector3 {
+export function getChunkSphereSpacePositionFromPath(path: number[], direction: Direction, planet: TelluricPlanet): Vector3 {
     // FIXME: fix documentation
     // on récupère la position dans le plan
     let position = getChunkPlaneSpacePositionFromPath(planet.getDiameter(), path);

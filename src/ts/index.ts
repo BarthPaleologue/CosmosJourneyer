@@ -1,6 +1,6 @@
 import { Color3, FxaaPostProcess, LensFlare, LensFlareSystem, Quaternion, Texture, Tools, Vector3 } from "@babylonjs/core";
 
-import { SolidPlanet } from "./celestialBodies/planets/solidPlanet";
+import { TelluricPlanet } from "./celestialBodies/planets/telluricPlanet";
 import { Star } from "./celestialBodies/stars/star";
 
 import { PlayerController } from "./player/playerController";
@@ -57,7 +57,7 @@ const flare00 = new LensFlare(
     lensFlareSystem // lens flare system
 );*/
 
-const planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, -2.951332749798894, [sun]);
+const planet = new TelluricPlanet("Hécate", Settings.PLANET_RADIUS, starSystem, -2.951332749798894, [sun]);
 
 planet.physicalProperties.rotationPeriod /= 50;
 
@@ -68,7 +68,7 @@ planet.orbitalProperties = {
     orientationQuaternion: Quaternion.Identity()
 };
 
-const moon = new SolidPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, 437, [planet]);
+const moon = new TelluricPlanet("Manaleth", Settings.PLANET_RADIUS / 4, starSystem, 437, [planet]);
 moon.postProcesses.ocean?.dispose();
 moon.postProcesses.clouds?.dispose();
 moon.postProcesses.atmosphere?.dispose();
@@ -96,7 +96,7 @@ moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap!);
 moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
 moon.material.updateManual();
 
-let ares = new SolidPlanet("Ares", Settings.PLANET_RADIUS, starSystem, 432, [sun]);
+let ares = new TelluricPlanet("Ares", Settings.PLANET_RADIUS, starSystem, 432, [sun]);
 ares.postProcesses.ocean?.dispose();
 ares.postProcesses.clouds?.dispose();
 ares.physicalProperties.mass = 7;
@@ -167,8 +167,8 @@ function updateScene() {
     starSystem.update(player, sun.getAbsolutePosition(), deltaTime * Settings.TIME_MULTIPLIER);
 
     if (!collisionWorker.isBusy() && player.isOrbiting()) {
-        if (player.nearestBody?.getBodyType() == BodyType.SOLID) {
-            collisionWorker.checkCollision(player.nearestBody as SolidPlanet);
+        if (player.nearestBody?.getBodyType() == BodyType.TELLURIC) {
+            collisionWorker.checkCollision(player.nearestBody as TelluricPlanet);
         }
     }
 }
@@ -177,7 +177,7 @@ document.addEventListener("keydown", (e) => {
     if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
     if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
-    if (e.key == "w" && player.isOrbiting()) (<SolidPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<SolidPlanet>(<unknown>player.nearestBody)).material.wireframe;
+    if (e.key == "w" && player.isOrbiting()) (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
 });
 
 function resizeUI() {

@@ -1,21 +1,21 @@
 import { Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
-import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
+import { TelluricPlanet } from "../celestialBodies/planets/telluricPlanet";
 import { ColorMode, ColorSettings } from "./colorSettingsInterface";
 import { PlayerController } from "../player/playerController";
 
-import surfaceMaterialFragment from "../../shaders/solidPlanetMaterial/fragment.glsl";
-import surfaceMaterialVertex from "../../shaders/solidPlanetMaterial/vertex.glsl";
+import surfaceMaterialFragment from "../../shaders/telluricPlanetMaterial/fragment.glsl";
+import surfaceMaterialVertex from "../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../assets";
 
 const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 
-export class SolidPlanetMaterial extends ShaderMaterial {
-    readonly planet: SolidPlanet;
+export class TelluricPlanetMaterial extends ShaderMaterial {
+    readonly planet: TelluricPlanet;
     colorSettings: ColorSettings;
 
-    constructor(planet: SolidPlanet, scene: Scene) {
+    constructor(planet: TelluricPlanet, scene: Scene) {
         super(`${planet.getName()}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
             uniforms: [

@@ -12,7 +12,7 @@ import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
 import { Settings } from "../../settings";
 import { ISolidPhysicalProperties } from "../iPhysicalProperties";
-import { SolidPlanetMaterial } from "../../materials/solidPlanetMaterial";
+import { TelluricPlanetMaterial } from "../../materials/telluricPlanetMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
@@ -20,18 +20,18 @@ import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/f
 import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
 import { clamp } from "../../utils/math";
 
-export class SolidPlanet extends AbstractPlanet implements RigidBody {
+export class TelluricPlanet extends AbstractPlanet implements RigidBody {
     oceanLevel: number;
 
     override readonly physicalProperties: ISolidPhysicalProperties;
 
-    protected bodyType = BodyType.SOLID;
+    protected bodyType = BodyType.TELLURIC;
 
     public terrainSettings: TerrainSettings;
 
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
 
-    material: SolidPlanetMaterial;
+    material: TelluricPlanetMaterial;
 
     constructor(id: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(id, radius, starSystemManager, seed, parentBodies);
@@ -93,7 +93,7 @@ export class SolidPlanet extends AbstractPlanet implements RigidBody {
             mountainsMinValue: 0.5
         };
 
-        this.material = new SolidPlanetMaterial(this, starSystemManager.scene);
+        this.material = new TelluricPlanetMaterial(this, starSystemManager.scene);
 
         this.sides = [
             new ChunkTree(Direction.Up, this),

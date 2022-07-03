@@ -4,7 +4,7 @@ import { PlanetChunk } from "./planetChunk";
 import { Direction } from "../utils/direction";
 import { ChunkForge } from "./chunkForge";
 import { DeleteTask, TaskType } from "./taskInterfaces";
-import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
+import { TelluricPlanet } from "../celestialBodies/planets/telluricPlanet";
 import { rayIntersectSphere } from "../utils/math";
 import { Settings } from "../settings";
 import { getChunkSphereSpacePositionFromPath } from "../utils/chunkUtils";
@@ -29,14 +29,14 @@ export class ChunkTree {
 
     private readonly chunkForge: ChunkForge;
 
-    readonly planet: SolidPlanet;
+    readonly planet: TelluricPlanet;
 
     /**
      *
      * @param direction
      * @param planet
      */
-    constructor(direction: Direction, planet: SolidPlanet) {
+    constructor(direction: Direction, planet: TelluricPlanet) {
         this.rootChunkLength = planet.getDiameter();
 
         this.minDepth = Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 19), 0);

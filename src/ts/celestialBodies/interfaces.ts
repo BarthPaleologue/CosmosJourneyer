@@ -3,7 +3,7 @@ import { CollisionData } from "../chunks/workerDataInterfaces";
 
 export enum BodyType {
     STAR,
-    SOLID,
+    TELLURIC,
     GAZ
 }
 

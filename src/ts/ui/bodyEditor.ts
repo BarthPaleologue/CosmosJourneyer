@@ -1,5 +1,5 @@
 import editorHTML from "../../html/bodyEditor.html";
-import { SolidPlanet } from "../celestialBodies/planets/solidPlanet";
+import { TelluricPlanet } from "../celestialBodies/planets/telluricPlanet";
 import { Star } from "../celestialBodies/stars/star";
 import { Slider } from "handle-sliderjs";
 import { BodyType } from "../celestialBodies/interfaces";
@@ -114,8 +114,8 @@ export class BodyEditor {
         this.currentBodyId = body.getName();
         this.initNavBar(body);
         switch (body.getBodyType()) {
-            case BodyType.SOLID:
-                this.setSolidPlanet(body as SolidPlanet, star, player);
+            case BodyType.TELLURIC:
+                this.setSolidPlanet(body as TelluricPlanet, star, player);
                 break;
             case BodyType.STAR:
                 this.setStar(body as Star);
@@ -129,7 +129,7 @@ export class BodyEditor {
         this.initRingsSliders(body);
     }
 
-    public setSolidPlanet(planet: SolidPlanet, star: Star, player: PlayerController) {
+    public setSolidPlanet(planet: TelluricPlanet, star: Star, player: PlayerController) {
         this.initPhysicSliders(planet);
         this.initSurfaceSliders(planet);
         this.initAtmosphereSliders(planet);
@@ -180,19 +180,19 @@ export class BodyEditor {
             case BodyType.STAR:
                 show("starPhysicLink");
                 break;
-            case BodyType.SOLID:
+            case BodyType.TELLURIC:
                 show("physicLink");
 
-                show("oceanLink", (body as SolidPlanet).postProcesses.ocean != null);
-                show("oceanUI", this.currentPanel?.id == "oceanUI" && (body as SolidPlanet).postProcesses.ocean != null);
+                show("oceanLink", (body as TelluricPlanet).postProcesses.ocean != null);
+                show("oceanUI", this.currentPanel?.id == "oceanUI" && (body as TelluricPlanet).postProcesses.ocean != null);
 
                 show("surfaceLink");
 
-                show("cloudsLink", (body as SolidPlanet).postProcesses.clouds != null);
-                show("cloudsUI", this.currentPanel?.id == "cloudsUI" && (body as SolidPlanet).postProcesses.clouds != null);
+                show("cloudsLink", (body as TelluricPlanet).postProcesses.clouds != null);
+                show("cloudsUI", this.currentPanel?.id == "cloudsUI" && (body as TelluricPlanet).postProcesses.clouds != null);
 
-                show("atmosphereLink", (body as SolidPlanet).postProcesses.atmosphere != null);
-                show("atmosphereUI", this.currentPanel?.id == "atmosphereUI" && (body as SolidPlanet).postProcesses.atmosphere != null);
+                show("atmosphereLink", (body as TelluricPlanet).postProcesses.atmosphere != null);
+                show("atmosphereUI", this.currentPanel?.id == "atmosphereUI" && (body as TelluricPlanet).postProcesses.atmosphere != null);
                 break;
             case BodyType.GAZ:
                 show("atmosphereLink");
@@ -280,7 +280,7 @@ export class BodyEditor {
         );
     }
 
-    public initPhysicSliders(planet: SolidPlanet) {
+    public initPhysicSliders(planet: TelluricPlanet) {
         for (const slider of this.physicSliders) slider.remove();
         this.physicSliders = [];
 
@@ -298,7 +298,7 @@ export class BodyEditor {
         );
     }
 
-    public initSurfaceSliders(planet: SolidPlanet) {
+    public initSurfaceSliders(planet: TelluricPlanet) {
         for (const slider of this.surfaceSliders) slider.remove();
         this.surfaceSliders.length = 0;
 
@@ -456,7 +456,7 @@ export class BodyEditor {
         );
     }
 
-    public initCloudsSliders(planet: SolidPlanet) {
+    public initCloudsSliders(planet: TelluricPlanet) {
         for (const slider of this.cloudsSliders) slider.remove();
         this.cloudsSliders = [];
 
@@ -544,7 +544,7 @@ export class BodyEditor {
         );
     }
 
-    public initOceanSliders(planet: SolidPlanet) {
+    public initOceanSliders(planet: TelluricPlanet) {
         for (const slider of this.oceanSliders) slider.remove();
         this.oceanSliders.length = 0;
 
@@ -584,7 +584,7 @@ export class BodyEditor {
         );
     }
 
-    public initToolbar(planet: SolidPlanet) {
+    public initToolbar(planet: TelluricPlanet) {
         const material = planet.material;
         const colorSettings = material.colorSettings;
         document.getElementById("defaultMapButton")!.addEventListener("click", () => {

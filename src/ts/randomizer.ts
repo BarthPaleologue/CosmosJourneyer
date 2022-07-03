@@ -1,6 +1,6 @@
 import { FxaaPostProcess, Tools } from "@babylonjs/core";
 
-import { SolidPlanet } from "./celestialBodies/planets/solidPlanet";
+import { TelluricPlanet } from "./celestialBodies/planets/telluricPlanet";
 
 import "../styles/index.scss";
 import { PlayerController } from "./player/playerController";
@@ -62,15 +62,15 @@ console.log("Planet seed : ", planetSeed);
 
 let planet: AbstractBody;
 
-if(uniformRandBool(0.5)) planet = new SolidPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, planetSeed, [sun]);
+if(uniformRandBool(0.5)) planet = new TelluricPlanet("Hécate", Settings.PLANET_RADIUS, starSystemManager, planetSeed, [sun]);
 else planet = new GazPlanet("Andromaque", Settings.PLANET_RADIUS, starSystemManager, planetSeed, [sun]);
 
 console.table(planet.orbitalProperties);
 
 planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
 
-if(planet.getBodyType() == BodyType.SOLID) {
-    const solidPlanet = planet as SolidPlanet;
+if(planet.getBodyType() == BodyType.TELLURIC) {
+    const solidPlanet = planet as TelluricPlanet;
 
     //TODO: use formula
     solidPlanet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng);
@@ -87,7 +87,7 @@ for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
     const randSatellite = alea(satelliteSeed.toString());
     const satelliteRadius = (planet.getRadius() / 5) * clamp(normalRandom(1, 0.1, randSatellite), 0.5, 1.5);
     const ratio = satelliteRadius / Settings.PLANET_RADIUS;
-    const satellite = new SolidPlanet(`${planet.getName()}Sattelite${i}`, satelliteRadius, starSystemManager, satelliteSeed, [planet]);
+    const satellite = new TelluricPlanet(`${planet.getName()}Sattelite${i}`, satelliteRadius, starSystemManager, satelliteSeed, [planet]);
     console.log(satellite.depth)
     const periapsis = 5 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, randSatellite), 0.9, 1.0) * planet.getRadius() * 2;
     const apoapsis = periapsis * clamp(normalRandom(1, 0.05, randSatellite), 1, 1.5);
@@ -111,7 +111,7 @@ document.addEventListener("keydown", (e) => {
     if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
     if (e.key == "w" && player.nearestBody != null)
-        (<SolidPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<SolidPlanet>(<unknown>player.nearestBody)).material.wireframe;
+        (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
 });
 
 let collisionWorker = new CollisionWorker(player, starSystemManager);
@@ -153,8 +153,8 @@ scene.executeWhenReady(() => {
         starSystemManager.translateAllBodies(deplacement);
 
         if (!collisionWorker.isBusy() && player.isOrbiting()) {
-            if (player.nearestBody?.getBodyType() == BodyType.SOLID) {
-                collisionWorker.checkCollision(player.nearestBody as SolidPlanet);
+            if (player.nearestBody?.getBodyType() == BodyType.TELLURIC) {
+                collisionWorker.checkCollision(player.nearestBody as TelluricPlanet);
             }
         }
     });
