@@ -50,11 +50,7 @@ const starSystemRand = alea(starSystemSeed.toString());
 const starSeed = randRange(-10, 10, starSystemRand);
 console.log("Star seed : ", starSeed);
 
-// TODO: generate radius inside body constructor
-const randStar = alea(starSeed.toString());
-const starRadius = clamp(normalRandom(0.5, 0.2, randStar), 0.4, 1.5) * Settings.EARTH_RADIUS * 100;
-
-const sun = new Star("Weierstrass", starRadius, starSystemManager, starSeed, []);
+const sun = new Star("Weierstrass", starSystemManager, starSeed, []);
 
 starfield.setStar(sun);
 

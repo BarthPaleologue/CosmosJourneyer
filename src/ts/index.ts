@@ -48,7 +48,7 @@ const starSystem = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
 const starfield = new StarfieldPostProcess("starfield", starSystem);
 
-const sun = new Star("Weierstrass", Settings.EARTH_RADIUS, starSystem, 788, []);
+const sun = new Star("Weierstrass", starSystem, 22, []);
 sun.orbitalProperties.period = 60 * 60 * 24;
 starfield.setStar(sun);
 
@@ -67,8 +67,8 @@ planet.physicalProperties.rotationPeriod /= 50;
 
 planet.orbitalProperties = {
     period: 60 * 60 * 24 * 365.25,
-    apoapsis: 40 * planet.getRadius(),
-    periapsis: 35 * planet.getRadius(),
+    apoapsis: 4000 * planet.getRadius(),
+    periapsis: 4000 * planet.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
 
@@ -123,9 +123,9 @@ ares.physicalProperties.pressure = 0.5;
 ares.physicalProperties.waterAmount = 0.3;
 
 ares.orbitalProperties = {
-    period: 60 * 60 * 24 * 430,
-    periapsis: 50 * ares.getRadius(),
-    apoapsis: 51 * ares.getRadius(),
+    period: 60 * 60 * 24 * 365.24,
+    periapsis: 4020 * planet.getRadius(),
+    apoapsis: 4020 * planet.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
 
@@ -149,9 +149,9 @@ aresAtmosphere.settings.blueWaveLength = 670;
 
 const andromaque = new GazPlanet("Andromaque", starSystem, 0.68, [sun]);
 andromaque.orbitalProperties = {
-    period: 60 * 60 * 24 * 431 * 10,
-    periapsis: 150 * ares.getRadius(),
-    apoapsis: 150 * ares.getRadius(),
+    period: 60 * 60 * 24 * 365.29,
+    periapsis: 4300 * ares.getRadius(),
+    apoapsis: 4300 * ares.getRadius(),
     orientationQuaternion: Quaternion.Identity()
 };
 
