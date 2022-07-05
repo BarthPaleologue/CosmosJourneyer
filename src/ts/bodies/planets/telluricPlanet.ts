@@ -81,7 +81,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
             }, scene);
             ringMesh.rotate(Axis.X, Math.PI/2, Space.WORLD);
             ringMesh.material = new RingMaterial(this, scene);
-            starSystemManager.depthRenderer.getDepthMap().renderList!.push(ringMesh);
+            starSystemManager.registerDepthMesh.push(ringMesh);
             ringMesh.parent = this.transform;
             this.postProcesses.rings!.dispose();*/
         }

@@ -9,7 +9,7 @@ import { PlayerController } from "../player/playerController";
 import { AbstractBody } from "../bodies/abstractBody";
 import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../materials/colorSettingsInterface";
-import { clearAllEventListenersById, hide, show } from "../utils/html";
+import { clearAllEventListenersById, hideNavItem, hidePanel, showNavItem, showPanel } from "../utils/html";
 import { stripAxisFromQuaternion } from "../utils/algebra";
 import { GazPlanet } from "../bodies/planets/gazPlanet";
 import { AbstractPlanet } from "../bodies/planets/abstractPlanet";
@@ -69,7 +69,7 @@ export class BodyEditor {
 
         if (this.currentPanel == null) this.setVisibility(EditorVisibility.FULL);
         else {
-            hide(this.currentPanel.id);
+            hidePanel(this.currentPanel.id);
             if (this.currentPanel.id == panelId) {
                 this.currentPanel = null;
                 this.setVisibility(EditorVisibility.NAVBAR);
@@ -77,7 +77,7 @@ export class BodyEditor {
             }
         }
         this.currentPanel = newPanel;
-        show(this.currentPanel.id);
+        showPanel(this.currentPanel.id);
         setTimeout(() => this.updateAllSliders(), 500);
     }
 
@@ -85,20 +85,20 @@ export class BodyEditor {
         this.visibility = visibility;
         switch (this.visibility) {
             case EditorVisibility.HIDDEN:
-                hide("navBar");
-                hide("editorPanelContainer");
-                hide("toolbar");
+                hidePanel("navBar");
+                hidePanel("editorPanelContainer");
+                hidePanel("toolbar");
                 this.currentPanel = null;
                 break;
             case EditorVisibility.NAVBAR:
                 document.getElementById("navBar")!.style.display = "flex";
-                hide("editorPanelContainer");
-                hide("toolbar");
+                hidePanel("editorPanelContainer");
+                hidePanel("toolbar");
                 break;
             case EditorVisibility.FULL:
                 document.getElementById("navBar")!.style.display = "flex";
-                show("editorPanelContainer");
-                show("toolbar");
+                showPanel("editorPanelContainer");
+                showPanel("toolbar");
                 break;
             default:
                 throw new Error("BodyEditor received an unusual visibility state");
@@ -149,64 +149,64 @@ export class BodyEditor {
     }
 
     public initNavBar(body: AbstractBody): void {
-        hide("generalLink");
-        hide("generalUI");
+        hideNavItem("generalLink");
+        hidePanel("generalUI");
 
-        hide("starPhysicLink");
-        hide("starPhysicUI");
+        hideNavItem("starPhysicLink");
+        hidePanel("starPhysicUI");
 
-        hide("starPhysicLink");
-        hide("starPhysicUI");
+        hideNavItem("starPhysicLink");
+        hidePanel("starPhysicUI");
 
-        hide("physicLink");
-        hide("physicUI");
+        hideNavItem("physicLink");
+        hidePanel("physicUI");
 
-        hide("oceanLink");
-        hide("oceanUI");
+        hideNavItem("oceanLink");
+        hidePanel("oceanUI");
 
-        hide("surfaceLink");
-        hide("surfaceUI");
+        hideNavItem("surfaceLink");
+        hidePanel("surfaceUI");
 
-        hide("gazCloudsLink");
-        hide("gazCloudsUI");
+        hideNavItem("gazCloudsLink");
+        hidePanel("gazCloudsUI");
 
-        hide("cloudsLink");
-        hide("cloudsUI");
+        hideNavItem("cloudsLink");
+        hidePanel("cloudsUI");
 
-        hide("atmosphereLink");
-        hide("atmosphereUI");
+        hideNavItem("atmosphereLink");
+        hidePanel("atmosphereUI");
 
         switch (body.bodyType) {
             case BodyType.STAR:
-                show("starPhysicLink");
+                showNavItem("starPhysicLink");
                 break;
             case BodyType.TELLURIC:
-                show("physicLink");
+                showNavItem("physicLink");
 
-                show("oceanLink", (body as TelluricPlanet).postProcesses.ocean != null);
-                show("oceanUI", this.currentPanel?.id == "oceanUI" && (body as TelluricPlanet).postProcesses.ocean != null);
+                showNavItem("oceanLink", (body as TelluricPlanet).postProcesses.ocean != null);
+                showPanel("oceanUI", this.currentPanel?.id == "oceanUI" && (body as TelluricPlanet).postProcesses.ocean != null);
 
-                show("surfaceLink");
+                showNavItem("surfaceLink");
 
-                show("cloudsLink", (body as TelluricPlanet).postProcesses.clouds != null);
-                show("cloudsUI", this.currentPanel?.id == "cloudsUI" && (body as TelluricPlanet).postProcesses.clouds != null);
+                showNavItem("cloudsLink", (body as TelluricPlanet).postProcesses.clouds != null);
+                showPanel("cloudsUI", this.currentPanel?.id == "cloudsUI" && (body as TelluricPlanet).postProcesses.clouds != null);
 
-                show("atmosphereLink", (body as TelluricPlanet).postProcesses.atmosphere != null);
-                show("atmosphereUI", this.currentPanel?.id == "atmosphereUI" && (body as TelluricPlanet).postProcesses.atmosphere != null);
+                showNavItem("atmosphereLink", (body as TelluricPlanet).postProcesses.atmosphere != null);
+                showPanel("atmosphereUI", this.currentPanel?.id == "atmosphereUI" && (body as TelluricPlanet).postProcesses.atmosphere != null);
                 break;
             case BodyType.GAZ:
-                show("atmosphereLink");
-                show("atmosphereUI", this.currentPanel?.id == "atmosphereUI");
+                showNavItem("atmosphereLink");
+                showPanel("atmosphereUI", this.currentPanel?.id == "atmosphereUI");
 
-                show("gazCloudsLink");
-                show("gazCloudsUI", this.currentPanel?.id == "gazCloudsUI");
+                showNavItem("gazCloudsLink");
+                showPanel("gazCloudsUI", this.currentPanel?.id == "gazCloudsUI");
                 break;
         }
         if (this.currentPanel != null) {
             //TODO: this is messed up
             const currentNavBarButton = document.getElementById(this.currentPanel.id.substring(0, this.currentPanel.id.length - 2) + "Link");
             if (currentNavBarButton!.style.display == "none") this.setVisibility(EditorVisibility.NAVBAR);
-            else show(this.currentPanel.id);
+            else showPanel(this.currentPanel.id);
         }
     }
 
@@ -234,7 +234,7 @@ export class BodyEditor {
     }
 
     public initGeneralSliders(planet: AbstractBody, star: Star, player: PlayerController) {
-        show("generalLink");
+        showNavItem("generalLink");
 
         for (const slider of this.generalSliders) slider.remove();
         this.generalSliders = [];
@@ -512,8 +512,8 @@ export class BodyEditor {
 
         if(planet.postProcesses.rings == null) return;
 
-        show("ringsLink");
-        show("ringsUI", this.currentPanel?.id == "ringsUI");
+        showPanel("ringsLink");
+        showPanel("ringsUI", this.currentPanel?.id == "ringsUI");
 
         let rings = planet.postProcesses.rings;
         let ringsToggler = clearAllEventListenersById("ringsToggler");

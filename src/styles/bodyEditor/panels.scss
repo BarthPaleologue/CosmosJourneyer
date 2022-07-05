@@ -1,5 +1,6 @@
 #editorPanelContainer {
   float: right;
+  position: relative;
   margin-top: 38px;
   height: calc(100vh - 38px);
   .ui {
@@ -8,6 +9,9 @@
     height: 100%;
     z-index: 2;
     overflow-y: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
 
     h1 {
       font-family: sans-serif;

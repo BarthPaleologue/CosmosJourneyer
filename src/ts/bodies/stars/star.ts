@@ -31,12 +31,13 @@ export class Star extends AbstractBody {
     constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystemManager, seed, parentBodies);
 
+        //TODO: make it dependent on star type
         this.radius = randRange(50, 200, this.rng) * Settings.EARTH_RADIUS;
 
         starSystemManager.stars.push(this);
 
         this.physicalProperties = {
-            //TODO: ne pas hardcoder
+            //TODO: do not hardcode
             mass: 1000,
             rotationPeriod: 24 * 60 * 60,
 
@@ -44,7 +45,7 @@ export class Star extends AbstractBody {
         };
 
         this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius * 2, segments: 32 }, starSystemManager.scene);
-        starSystemManager.depthRenderer.getDepthMap().renderList!.push(this.mesh);
+        starSystemManager.registerMeshDepth(this.mesh);
         this.mesh.parent = this.transform;
 
         this.material = new StarMaterial(this, starSystemManager.scene);

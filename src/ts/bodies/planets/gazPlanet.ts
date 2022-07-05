@@ -33,7 +33,7 @@ export class GazPlanet extends AbstractPlanet {
         };
 
         this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius * 2, segments: 64 }, starSystemManager.scene);
-        starSystemManager.depthRenderer.getDepthMap().renderList!.push(this.mesh);
+        starSystemManager.registerMeshDepth(this.mesh);
         this.mesh.parent = this.transform;
 
         this.material = new GazPlanetMaterial(this, starSystemManager.scene);

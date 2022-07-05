@@ -1,4 +1,11 @@
-import { DepthRenderer, PostProcessRenderEffect, PostProcessRenderPipeline, Scene, Vector3 } from "@babylonjs/core";
+import {
+    DepthRenderer,
+    Mesh,
+    PostProcessRenderEffect,
+    PostProcessRenderPipeline,
+    Scene,
+    Vector3
+} from "@babylonjs/core";
 
 import { ChunkForge } from "../chunks/chunkForge";
 import { PlayerController } from "../player/playerController";
@@ -93,6 +100,10 @@ export class StarSystemManager {
             }
         }
         return nearest!;
+    }
+
+    public registerMeshDepth(mesh: Mesh) {
+        this.depthRenderer.getDepthMap().renderList!.push(mesh);
     }
 
     public getTime() {

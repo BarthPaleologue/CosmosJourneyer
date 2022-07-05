@@ -6,11 +6,20 @@ export function clearAllEventListenersById(id: string): HTMLElement {
     return document.getElementById(id)!;
 }
 
-export function show(id: string, condition=true) {
-    if(condition) document.getElementById(id)!.hidden = false;
-    else hide(id);
+export function showPanel(id: string, condition=true) {
+    if(condition) document.getElementById(id)!.style.zIndex = '15';
+    else hidePanel(id);
 }
 
-export function hide(id: string) {
+export function hidePanel(id: string) {
+    document.getElementById(id)!.style.zIndex = '-1';
+}
+
+export function showNavItem(id: string, condition=true) {
+    if(condition) document.getElementById(id)!.hidden = false;
+    else hideNavItem(id);
+}
+
+export function hideNavItem(id: string) {
     document.getElementById(id)!.hidden = true;
 }
