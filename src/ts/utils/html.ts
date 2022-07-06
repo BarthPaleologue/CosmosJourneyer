@@ -15,11 +15,11 @@ export function hidePanel(id: string) {
     document.getElementById(id)!.style.zIndex = '-1';
 }
 
-export function showNavItem(id: string, condition=true) {
+export function show(id: string, condition=true) {
     if(condition) document.getElementById(id)!.hidden = false;
-    else hideNavItem(id);
+    else hide(id);
 }
 
-export function hideNavItem(id: string) {
+export function hide(id: string) {
     document.getElementById(id)!.hidden = true;
 }

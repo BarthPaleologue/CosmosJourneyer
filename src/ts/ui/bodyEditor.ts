@@ -9,7 +9,7 @@ import { PlayerController } from "../player/playerController";
 import { AbstractBody } from "../bodies/abstractBody";
 import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../materials/colorSettingsInterface";
-import { clearAllEventListenersById, hideNavItem, hidePanel, showNavItem, showPanel } from "../utils/html";
+import { clearAllEventListenersById, hide, hidePanel, show, showPanel } from "../utils/html";
 import { stripAxisFromQuaternion } from "../utils/algebra";
 import { GazPlanet } from "../bodies/planets/gazPlanet";
 import { AbstractPlanet } from "../bodies/planets/abstractPlanet";
@@ -85,20 +85,20 @@ export class BodyEditor {
         this.visibility = visibility;
         switch (this.visibility) {
             case EditorVisibility.HIDDEN:
-                hidePanel("navBar");
-                hidePanel("editorPanelContainer");
-                hidePanel("toolbar");
+                hide("navBar");
+                hide("editorPanelContainer");
+                hide("toolbar");
                 this.currentPanel = null;
                 break;
             case EditorVisibility.NAVBAR:
                 document.getElementById("navBar")!.style.display = "flex";
-                hidePanel("editorPanelContainer");
-                hidePanel("toolbar");
+                hide("editorPanelContainer");
+                hide("toolbar");
                 break;
             case EditorVisibility.FULL:
                 document.getElementById("navBar")!.style.display = "flex";
-                showPanel("editorPanelContainer");
-                showPanel("toolbar");
+                show("editorPanelContainer");
+                show("toolbar");
                 break;
             default:
                 throw new Error("BodyEditor received an unusual visibility state");
@@ -149,56 +149,56 @@ export class BodyEditor {
     }
 
     public initNavBar(body: AbstractBody): void {
-        hideNavItem("generalLink");
+        hide("generalLink");
         hidePanel("generalUI");
 
-        hideNavItem("starPhysicLink");
+        hide("starPhysicLink");
         hidePanel("starPhysicUI");
 
-        hideNavItem("starPhysicLink");
+        hide("starPhysicLink");
         hidePanel("starPhysicUI");
 
-        hideNavItem("physicLink");
+        hide("physicLink");
         hidePanel("physicUI");
 
-        hideNavItem("oceanLink");
+        hide("oceanLink");
         hidePanel("oceanUI");
 
-        hideNavItem("surfaceLink");
+        hide("surfaceLink");
         hidePanel("surfaceUI");
 
-        hideNavItem("gazCloudsLink");
+        hide("gazCloudsLink");
         hidePanel("gazCloudsUI");
 
-        hideNavItem("cloudsLink");
+        hide("cloudsLink");
         hidePanel("cloudsUI");
 
-        hideNavItem("atmosphereLink");
+        hide("atmosphereLink");
         hidePanel("atmosphereUI");
 
         switch (body.bodyType) {
             case BodyType.STAR:
-                showNavItem("starPhysicLink");
+                show("starPhysicLink");
                 break;
             case BodyType.TELLURIC:
-                showNavItem("physicLink");
+                show("physicLink");
 
-                showNavItem("oceanLink", (body as TelluricPlanet).postProcesses.ocean != null);
+                show("oceanLink", (body as TelluricPlanet).postProcesses.ocean != null);
                 showPanel("oceanUI", this.currentPanel?.id == "oceanUI" && (body as TelluricPlanet).postProcesses.ocean != null);
 
-                showNavItem("surfaceLink");
+                show("surfaceLink");
 
-                showNavItem("cloudsLink", (body as TelluricPlanet).postProcesses.clouds != null);
+                show("cloudsLink", (body as TelluricPlanet).postProcesses.clouds != null);
                 showPanel("cloudsUI", this.currentPanel?.id == "cloudsUI" && (body as TelluricPlanet).postProcesses.clouds != null);
 
-                showNavItem("atmosphereLink", (body as TelluricPlanet).postProcesses.atmosphere != null);
+                show("atmosphereLink", (body as TelluricPlanet).postProcesses.atmosphere != null);
                 showPanel("atmosphereUI", this.currentPanel?.id == "atmosphereUI" && (body as TelluricPlanet).postProcesses.atmosphere != null);
                 break;
             case BodyType.GAZ:
-                showNavItem("atmosphereLink");
+                show("atmosphereLink");
                 showPanel("atmosphereUI", this.currentPanel?.id == "atmosphereUI");
 
-                showNavItem("gazCloudsLink");
+                show("gazCloudsLink");
                 showPanel("gazCloudsUI", this.currentPanel?.id == "gazCloudsUI");
                 break;
         }
@@ -234,7 +234,7 @@ export class BodyEditor {
     }
 
     public initGeneralSliders(planet: AbstractBody, star: Star, player: PlayerController) {
-        showNavItem("generalLink");
+        show("generalLink");
 
         for (const slider of this.generalSliders) slider.remove();
         this.generalSliders = [];
