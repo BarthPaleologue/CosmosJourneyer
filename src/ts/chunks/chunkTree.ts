@@ -69,7 +69,7 @@ export class ChunkTree {
      */
     private requestDeletion(tree: quadTree, newChunks: PlanetChunk[], isFiner: boolean): void {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
-            let deleteTask: DeleteTask = {
+            const deleteTask: DeleteTask = {
                 type: TaskType.Deletion,
                 chunk: chunk,
                 newChunks: newChunks,
@@ -95,19 +95,19 @@ export class ChunkTree {
      * @returns The updated tree
      */
     private updateLODRecursively(observerPositionW: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
-        let nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.planet);
-        let nodePositionW = nodeRelativePosition.add(this.planet.getAbsolutePosition());
+        const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.planet);
+        const nodePositionW = nodeRelativePosition.add(this.planet.getAbsolutePosition());
 
-        let direction = nodePositionW.subtract(observerPositionW);
-        let distanceToNodeSquared = direction.lengthSquared();
+        const direction = nodePositionW.subtract(observerPositionW);
+        const distanceToNodeSquared = direction.lengthSquared();
 
-        let distanceThreshold = (Settings.RENDER_DISTANCE_MULTIPLIER * this.rootChunkLength) / 2 ** walked.length;
+        const distanceThreshold = (Settings.RENDER_DISTANCE_MULTIPLIER * this.rootChunkLength) / 2 ** walked.length;
 
         if ((distanceToNodeSquared < distanceThreshold ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
             // if the node is near the camera or if we are loading minimal LOD
             if (tree instanceof PlanetChunk) {
                 if (tree.isReady()) {
-                    let newTree = [
+                    const newTree = [
                         this.createChunk(walked.concat([0]), true),
                         this.createChunk(walked.concat([1]), true),
                         this.createChunk(walked.concat([2]), true),
@@ -131,7 +131,7 @@ export class ChunkTree {
                 return tree;
             }
             if (walked.length >= this.minDepth) {
-                let newChunk = this.createChunk(walked, false);
+                const newChunk = this.createChunk(walked, false);
                 this.requestDeletion(tree, [newChunk], false);
                 return newChunk;
             }
@@ -142,9 +142,9 @@ export class ChunkTree {
     //TODO: put this somewhere else for generalization purposes
     private checkForOcclusion(chunk: PlanetChunk, chunkPositionW: Vector3, observerPositionW: Vector3) {
         if (chunk.isReady() && Settings.ENABLE_OCCLUSION) {
-            let direction = chunkPositionW.subtract(observerPositionW);
-            let rayDir = direction.normalizeToNew();
-            let [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.planet.getAbsolutePosition(), this.planet.getRadius() - 50e3 * 2 ** -chunk.depth);
+            const direction = chunkPositionW.subtract(observerPositionW);
+            const rayDir = direction.normalizeToNew();
+            const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.planet.getAbsolutePosition(), this.planet.getRadius() - 50e3 * 2 ** -chunk.depth);
             chunk.mesh.setEnabled(!(intersect && t0 ** 2 < direction.lengthSquared()));
         }
     }
@@ -163,7 +163,7 @@ export class ChunkTree {
      * Regenerate planet chunks
      */
     public reset(): void {
-        let newTree = this.createChunk([], true);
+        const newTree = this.createChunk([], true);
         this.requestDeletion(this.tree, [newTree], false);
         this.tree = newTree;
     }
