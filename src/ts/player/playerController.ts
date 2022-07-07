@@ -1,10 +1,9 @@
-import { Vector3, FreeCamera, Axis, Space, Scene, Quaternion, TransformNode, MeshBuilder, StandardMaterial, Color3 } from "@babylonjs/core";
+import { Vector3, FreeCamera, Axis, Space, Scene, Quaternion, TransformNode } from "@babylonjs/core";
 import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
 import { AbstractBody } from "../bodies/abstractBody";
 import { ITransformable } from "../bodies/iTransformable";
-import { Star } from "../bodies/stars/star";
 
 export class PlayerController implements ITransformable {
     nearestBody: AbstractBody | null;

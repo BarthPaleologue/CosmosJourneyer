@@ -1,4 +1,4 @@
-import { FxaaPostProcess, Tools } from "@babylonjs/core";
+import { Tools } from "@babylonjs/core";
 
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 

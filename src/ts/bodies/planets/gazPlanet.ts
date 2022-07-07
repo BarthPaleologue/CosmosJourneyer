@@ -1,4 +1,4 @@
-import { DepthRenderer, Mesh, MeshBuilder, Scene, Vector3 } from "@babylonjs/core";
+import { Mesh, MeshBuilder, Vector3 } from "@babylonjs/core";
 
 import { AbstractPlanet } from "./abstractPlanet";
 import { BodyType } from "../interfaces";

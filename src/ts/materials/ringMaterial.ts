@@ -1,4 +1,4 @@
-import { Effect, Material, MaterialHelper, Scene, ShaderMaterial } from "@babylonjs/core";
+import { Effect, MaterialHelper, Scene, ShaderMaterial } from "@babylonjs/core";
 
 import starMaterialFragment from "../../shaders/ringMaterial/fragment.glsl";
 import starMaterialVertex from "../../shaders/ringMaterial/vertex.glsl";

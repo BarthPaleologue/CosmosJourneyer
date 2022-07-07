@@ -1,13 +1,9 @@
-import { DepthRenderer, Mesh, PostProcessRenderEffect, PostProcessRenderPipeline, Scene, Vector3 } from "@babylonjs/core";
+import { DepthRenderer, Mesh, Scene, Vector3 } from "@babylonjs/core";
 
 import { ChunkForge } from "../chunks/chunkForge";
 import { PlayerController } from "../player/playerController";
 import { AbstractBody } from "./abstractBody";
 import { Star } from "./stars/star";
-import { AtmosphericScatteringPostProcess } from "../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
-import { OceanPostProcess } from "../postProcesses/planetPostProcesses/oceanPostProcess";
-import { FlatCloudsPostProcess } from "../postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import { StarfieldPostProcess } from "../postProcesses/starfieldPostProcess";
 import { SpaceRenderingPipeline } from "../postProcesses/spaceRenderingPipeline";
 
 export class StarSystemManager {

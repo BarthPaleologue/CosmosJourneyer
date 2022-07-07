@@ -141,12 +141,10 @@ self.onmessage = (e) => {
                 terrainFunction = makeTerrainFunction(data.terrainSettings);
             }
 
-            const seed = data.seed;
-
             const samplePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
             samplePosition.setMagnitudeInPlace(data.planetDiameter / 2);
 
-            sendHeightAtPoint(samplePosition, seed);
+            sendHeightAtPoint(samplePosition, data.seed);
             break;
 
         default:
