@@ -7,6 +7,6 @@ export function waterBoilingPointCelsius(pressure: number): number {
     const T1 = 100.0 + 273.15;
     const DH = 40660.0;
     const R = 8.314;
-    if(P2 > 0.0) return (1.0 / ((1.0 / T1) + Math.log(P1 / P2) * (R / DH))) - 273.15;
+    if (P2 > 0.0) return 1.0 / (1.0 / T1 + Math.log(P1 / P2) * (R / DH)) - 273.15;
     return -273.15;
 }

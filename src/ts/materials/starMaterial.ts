@@ -14,12 +14,7 @@ export class StarMaterial extends ShaderMaterial {
     constructor(star: Star, scene: Scene) {
         super("starColor", scene, shaderName, {
             attributes: ["position"],
-            uniforms: [
-                "world", "worldViewProjection",
-                "seed", "starColor",
-                "starPosition",
-                "starInverseRotationQuaternion",
-                "time", "logarithmicDepthConstant"]
+            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time", "logarithmicDepthConstant"]
         });
         this.star = star;
     }

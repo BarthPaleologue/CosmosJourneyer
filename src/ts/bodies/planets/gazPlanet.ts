@@ -48,7 +48,6 @@ export class GazPlanet extends AbstractPlanet {
         if (uniformRandBool(0.8, this.rng)) {
             this.createRings(starSystemManager.stars[0], starSystemManager.scene);
         }
-
     }
 
     public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {

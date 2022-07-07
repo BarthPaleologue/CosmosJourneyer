@@ -13,7 +13,7 @@ import { centeredRand, randRange } from "extended-random";
 import { alea } from "seedrandom";
 
 export abstract class AbstractBody implements IOrbitalBody, ISeedable {
-    readonly abstract bodyType: BodyType;
+    abstract readonly bodyType: BodyType;
 
     abstract physicalProperties: IPhysicalProperties;
     orbitalProperties: IOrbitalProperties;
@@ -27,7 +27,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
 
     readonly rng: () => number;
 
-    readonly abstract radius: number;
+    abstract readonly radius: number;
 
     readonly transform: TransformNode;
 
@@ -148,7 +148,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
             const initialPosition = this.getAbsolutePosition().clone();
             const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this.starSystem.getTime());
 
-            if (player.isOrbiting(this, 50 / ((this.depth + 1) ** 3))) player.translate(newPosition.subtract(initialPosition));
+            if (player.isOrbiting(this, 50 / (this.depth + 1) ** 3)) player.translate(newPosition.subtract(initialPosition));
             this.setAbsolutePosition(newPosition);
         }
 

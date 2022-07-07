@@ -80,7 +80,7 @@ function buildChunkVertexData(data: BuildData): void {
             normals[(x * nbVerticesPerSide + y) * 3 + 1] = vertexNormal.y;
             normals[(x * nbVerticesPerSide + y) * 3 + 2] = vertexNormal.z;
 
-            if(x >= nbVerticesPerSide - 1 || y >= nbVerticesPerSide - 1) continue
+            if (x >= nbVerticesPerSide - 1 || y >= nbVerticesPerSide - 1) continue;
 
             faces.push([x * nbVerticesPerSide + y, x * nbVerticesPerSide + y + 1, (x + 1) * nbVerticesPerSide + y + 1, (x + 1) * nbVerticesPerSide + y]);
         }

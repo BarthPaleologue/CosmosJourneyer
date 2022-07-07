@@ -39,7 +39,6 @@ const keyboard = new Keyboard();
 const mouse = new Mouse();
 const gamepad = new Gamepad();
 
-
 const starSystemManager = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
 const starfield = new StarfieldPostProcess("starfield", starSystemManager);
@@ -59,33 +58,36 @@ console.log("Planet seed : ", planetSeed);
 
 let planet: AbstractBody;
 
-if(uniformRandBool(0.5)) planet = new TelluricPlanet("Hécate", starSystemManager, planetSeed, [sun]);
+if (uniformRandBool(0.5)) planet = new TelluricPlanet("Hécate", starSystemManager, planetSeed, [sun]);
 else planet = new GazPlanet("Andromaque", starSystemManager, planetSeed, [sun]);
 
 console.table(planet.orbitalProperties);
 
 planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
 
-if(planet.bodyType == BodyType.TELLURIC) {
+if (planet.bodyType == BodyType.TELLURIC) {
     const telluricPlanet = planet as TelluricPlanet;
 
     //TODO: use formula
     telluricPlanet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng);
     telluricPlanet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng);
 
-    telluricPlanet.material.colorSettings.plainColor.copyFromFloats(0.22 + centeredRand(planet.rng) / 10, 0.37 + centeredRand(planet.rng) / 10, 0.024 + centeredRand(planet.rng) / 10);
+    telluricPlanet.material.colorSettings.plainColor.copyFromFloats(
+        0.22 + centeredRand(planet.rng) / 10,
+        0.37 + centeredRand(planet.rng) / 10,
+        0.024 + centeredRand(planet.rng) / 10
+    );
     telluricPlanet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng);
     telluricPlanet.material.updateManual();
 }
 
-
-for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
+for (let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
     const satelliteSeed = planet.rng();
     const randSatellite = alea(satelliteSeed.toString());
     const satelliteRadius = (planet.getRadius() / 5) * clamp(normalRandom(1, 0.1, randSatellite), 0.5, 1.5);
     const ratio = satelliteRadius / Settings.EARTH_RADIUS;
     const satellite = new TelluricPlanet(`${planet.name}Sattelite${i}`, starSystemManager, satelliteSeed, [planet]);
-    console.log(satellite.depth)
+    console.log(satellite.depth);
     const periapsis = 5 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, randSatellite), 0.9, 1.0) * planet.getRadius() * 2;
     const apoapsis = periapsis * clamp(normalRandom(1, 0.05, randSatellite), 1, 1.5);
     satellite.physicalProperties.mass = 1;
@@ -94,7 +96,7 @@ for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
         apoapsis: apoapsis,
         period: getOrbitalPeriod(periapsis, apoapsis, satellite.parentBodies),
         orientationQuaternion: satellite.getRotationQuaternion()
-    }
+    };
     satellite.terrainSettings.maxMountainHeight *= ratio;
     satellite.terrainSettings.mountainsFrequency *= ratio;
 }
@@ -113,7 +115,6 @@ document.addEventListener("keydown", (e) => {
 
 let collisionWorker = new CollisionWorker(player, starSystemManager);
 
-
 starSystemManager.update(player, sun.getAbsolutePosition(), 0);
 starSystemManager.update(player, sun.getAbsolutePosition(), Date.now());
 starSystemManager.update(player, sun.getAbsolutePosition(), 0);
@@ -122,13 +123,11 @@ starSystemManager.update(player, sun.getAbsolutePosition(), 0);
 
 player.positionNearBody(planet);
 
-console.log("Average Temperature : ", computeMeanTemperature(
-    sun.physicalProperties.temperature,
-    sun.getApparentRadius(),
-    planet.getAbsolutePosition().subtract(sun.getAbsolutePosition()).length(),
-    0.3,
-    0.3
-) - 273, "°C");
+console.log(
+    "Average Temperature : ",
+    computeMeanTemperature(sun.physicalProperties.temperature, sun.getApparentRadius(), planet.getAbsolutePosition().subtract(sun.getAbsolutePosition()).length(), 0.3, 0.3) - 273,
+    "°C"
+);
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();

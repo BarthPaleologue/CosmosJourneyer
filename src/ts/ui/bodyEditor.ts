@@ -388,7 +388,7 @@ export class BodyEditor {
         for (const slider of this.atmosphereSliders) slider.remove();
         this.atmosphereSliders = [];
 
-        if(planet.postProcesses.atmosphere == null) return;
+        if (planet.postProcesses.atmosphere == null) return;
 
         let atmosphere = planet.postProcesses.atmosphere;
         let atmosphereToggler = clearAllEventListenersById("atmosphereToggler");
@@ -460,7 +460,7 @@ export class BodyEditor {
         for (const slider of this.cloudsSliders) slider.remove();
         this.cloudsSliders = [];
 
-        if(planet.postProcesses.clouds == null) return;
+        if (planet.postProcesses.clouds == null) return;
 
         let flatClouds = planet.postProcesses.clouds!;
         let cloudsToggler = clearAllEventListenersById("cloudsToggler");
@@ -510,7 +510,7 @@ export class BodyEditor {
         for (const slider of this.ringsSliders) slider.remove();
         this.ringsSliders = [];
 
-        if(planet.postProcesses.rings == null) return;
+        if (planet.postProcesses.rings == null) return;
 
         showPanel("ringsLink");
         showPanel("ringsUI", this.currentPanel?.id == "ringsUI");
@@ -548,7 +548,7 @@ export class BodyEditor {
         for (const slider of this.oceanSliders) slider.remove();
         this.oceanSliders.length = 0;
 
-        if(planet.postProcesses.ocean == null) return;
+        if (planet.postProcesses.ocean == null) return;
 
         let ocean = planet.postProcesses.ocean;
         let oceanToggler = clearAllEventListenersById("oceanToggler");

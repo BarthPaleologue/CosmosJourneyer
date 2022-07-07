@@ -52,7 +52,15 @@ export class Star extends AbstractBody {
         this.mesh.material = this.material;
 
         this.postProcesses = {
-            volumetricLight: new VolumetricLightScatteringPostProcess(`${name}VolumetricLight`, 1, starSystemManager.scene.activeCamera!, this.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, starSystemManager.scene.getEngine()),
+            volumetricLight: new VolumetricLightScatteringPostProcess(
+                `${name}VolumetricLight`,
+                1,
+                starSystemManager.scene.activeCamera!,
+                this.mesh,
+                100,
+                Texture.BILINEAR_SAMPLINGMODE,
+                starSystemManager.scene.getEngine()
+            ),
             rings: null
         };
         this.postProcesses.volumetricLight!.exposure = 0.26;

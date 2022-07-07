@@ -55,7 +55,7 @@ export class GazPlanetMaterial extends ShaderMaterial {
             color1: new Color3(this.planet.rng(), this.planet.rng(), this.planet.rng()),
             color2: new Color3(this.planet.rng(), this.planet.rng(), this.planet.rng()),
             colorSharpness: randRangeInt(6, 20, this.planet.rng)
-        }
+        };
 
         this.onBindObservable.add(() => {
             let effect = this.getEffect();

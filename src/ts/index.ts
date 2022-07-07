@@ -1,8 +1,4 @@
-import {
-    Color3,
-    Quaternion,
-    Tools,
-} from "@babylonjs/core";
+import { Color3, Quaternion, Tools } from "@babylonjs/core";
 
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 import { Star } from "./bodies/stars/star";
@@ -190,7 +186,8 @@ document.addEventListener("keydown", (e) => {
     if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
     if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
     if (e.key == "m") isMouseEnabled = !isMouseEnabled;
-    if (e.key == "w" && player.isOrbiting()) (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
+    if (e.key == "w" && player.isOrbiting())
+        (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
 });
 
 function resizeUI() {

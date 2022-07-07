@@ -42,5 +42,5 @@ export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction 
         outPosition.addInPlace(samplePoint.scale(elevation));
 
         outGradient.divideInPlace(settings.continentBaseHeight + settings.maxMountainHeight + settings.maxBumpHeight);
-    }
+    };
 }

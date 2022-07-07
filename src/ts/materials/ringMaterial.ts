@@ -13,11 +13,7 @@ export class RingMaterial extends ShaderMaterial {
     constructor(body: AbstractBody, scene: Scene) {
         super("starColor", scene, shaderName, {
             attributes: ["position"],
-            uniforms: [
-                "world", "worldViewProjection",
-                "ringStart", "ringEnd",
-                "planetRadius", "seed",
-                "logarithmicDepthConstant"],
+            uniforms: ["world", "worldViewProjection", "ringStart", "ringEnd", "planetRadius", "seed", "logarithmicDepthConstant"],
             defines: ["#define LOGARITHMICDEPTH"]
         });
 

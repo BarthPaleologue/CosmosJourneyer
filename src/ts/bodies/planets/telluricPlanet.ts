@@ -38,12 +38,12 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
     constructor(id: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(id, starSystemManager, seed, parentBodies);
 
-        for(const parentBody of parentBodies) {
-            if(parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true
+        for (const parentBody of parentBodies) {
+            if (parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true;
         }
 
         let pressure;
-        if(this.isSatelliteOfTelluric) {
+        if (this.isSatelliteOfTelluric) {
             pressure = Math.max(normalRandom(0.01, 0.01, this.rng), 0);
         } else {
             pressure = Math.max(normalRandom(0.9, 0.2, this.rng), 0);
@@ -70,7 +70,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
 
         const waterBoilingPoint = waterBoilingPointCelsius(this.physicalProperties.pressure);
         const waterFreezingPoint = 0.0;
-        if(waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
+        if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
             this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
             const ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystemManager);
             this.postProcesses.ocean = ocean;
@@ -83,7 +83,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
         }
 
         const epsilon = 0.05;
-        if(pressure > epsilon) {
+        if (pressure > epsilon) {
             this.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
         }
 
@@ -125,8 +125,6 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
             new ChunkTree(Direction.Right, this),
             new ChunkTree(Direction.Left, this)
         ];
-
-
     }
 
     public generateCollisionTask(relativePosition: Vector3): CollisionData {

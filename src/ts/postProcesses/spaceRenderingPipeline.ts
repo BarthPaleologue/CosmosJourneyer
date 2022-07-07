@@ -1,11 +1,4 @@
-import {
-    Camera,
-    Engine, FxaaPostProcess,
-    PostProcessRenderEffect,
-    PostProcessRenderPipeline,
-    Scene, Texture,
-    VolumetricLightScatteringPostProcess
-} from "@babylonjs/core";
+import { Camera, Engine, FxaaPostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Scene, Texture, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 import { StarfieldPostProcess } from "./starfieldPostProcess";
 import { FlatCloudsPostProcess } from "./planetPostProcesses/flatCloudsPostProcess";
 import { AtmosphericScatteringPostProcess } from "./planetPostProcesses/atmosphericScatteringPostProcess";
@@ -53,11 +46,11 @@ export class SpaceRenderingPipeline extends PostProcessRenderPipeline {
 
         const ringRenderEffect = new PostProcessRenderEffect(this.engine, "ringRenderEffect", () => {
             return this.rings;
-        })
+        });
 
         const fxaaRenderEffect = new PostProcessRenderEffect(this.engine, "fxaaRenderEffect", () => {
             return [new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, this.engine)];
-        })
+        });
 
         this.addEffect(starfieldRenderEffect);
         this.addEffect(vlsRenderEffect);
