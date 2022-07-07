@@ -33,19 +33,31 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
 
     readonly material: TelluricMaterial;
 
-    private isSatelliteOfTelluric = false;
+    isSatelliteOfTelluric = false;
 
-    constructor(id: string, radius: number, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(id: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(id, starSystemManager, seed, parentBodies);
 
         for(const parentBody of parentBodies) {
             if(parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true
         }
 
-        const pressure = Math.max(normalRandom(0.8, 0.4, this.rng), 0);
+        let pressure;
+        if(this.isSatelliteOfTelluric) {
+            pressure = Math.max(normalRandom(0.01, 0.01, this.rng), 0);
+        } else {
+            pressure = Math.max(normalRandom(0.9, 0.2, this.rng), 0);
+        }
+
         const waterAmount = Math.max(normalRandom(1.0, 0.3, this.rng), 0);
 
-        this.radius = radius;
+        if (this.isSatelliteOfTelluric) {
+            this.radius = Math.max(0.05, normalRandom(0.2, 0.05, this.rng)) * Settings.EARTH_RADIUS;
+        } else {
+            this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng)) * Settings.EARTH_RADIUS;
+        }
+
+        const ratio = this.radius / Settings.EARTH_RADIUS;
 
         this.physicalProperties = {
             mass: 10,
@@ -70,7 +82,8 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
             this.oceanLevel = 0;
         }
 
-        if(pressure > 0) {
+        const epsilon = 0.05;
+        if(pressure > epsilon) {
             this.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
         }
 
@@ -97,7 +110,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
             maxMountainHeight: 30e3,
             continentBaseHeight: this.oceanLevel * 1.3,
 
-            mountainsFrequency: 10,
+            mountainsFrequency: 10 * ratio,
             mountainsMinValue: 0.5
         };
 

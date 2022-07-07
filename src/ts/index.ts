@@ -61,7 +61,7 @@ const flare00 = new LensFlare(
     lensFlareSystem // lens flare system
 );*/
 
-const planet = new TelluricPlanet("Hécate", Settings.EARTH_RADIUS, starSystem, -2.951332749798894, [sun]);
+const planet = new TelluricPlanet("Hécate", starSystem, -2.994, [sun]);
 
 planet.physicalProperties.rotationPeriod /= 50;
 
@@ -72,16 +72,13 @@ planet.orbitalProperties = {
     orientationQuaternion: Quaternion.Identity()
 };
 
-const moon = new TelluricPlanet("Manaleth", Settings.EARTH_RADIUS / 4, starSystem, 437, [planet]);
+const moon = new TelluricPlanet("Manaleth", starSystem, 2, [planet]);
 
 moon.postProcesses.ocean?.dispose();
 starSystem.spaceRenderingPipeline.oceans.splice(starSystem.spaceRenderingPipeline.oceans.indexOf(moon.postProcesses.ocean!), 1);
 
 moon.postProcesses.clouds?.dispose();
 starSystem.spaceRenderingPipeline.clouds.splice(starSystem.spaceRenderingPipeline.clouds.indexOf(moon.postProcesses.clouds!), 1);
-
-moon.postProcesses.atmosphere?.dispose();
-starSystem.spaceRenderingPipeline.atmospheres.splice(starSystem.spaceRenderingPipeline.atmospheres.indexOf(moon.postProcesses.atmosphere!), 1);
 
 moon.physicalProperties.mass = 2;
 moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
@@ -107,7 +104,7 @@ moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap!);
 moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
 moon.material.updateManual();
 
-const ares = new TelluricPlanet("Ares", Settings.EARTH_RADIUS, starSystem, 432, [sun]);
+const ares = new TelluricPlanet("Ares", starSystem, 432, [sun]);
 
 ares.postProcesses.ocean?.dispose();
 starSystem.spaceRenderingPipeline.oceans.splice(starSystem.spaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);

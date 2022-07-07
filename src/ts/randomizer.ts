@@ -59,7 +59,7 @@ console.log("Planet seed : ", planetSeed);
 
 let planet: AbstractBody;
 
-if(uniformRandBool(0.5)) planet = new TelluricPlanet("Hécate", Settings.EARTH_RADIUS, starSystemManager, planetSeed, [sun]);
+if(uniformRandBool(0.5)) planet = new TelluricPlanet("Hécate", starSystemManager, planetSeed, [sun]);
 else planet = new GazPlanet("Andromaque", starSystemManager, planetSeed, [sun]);
 
 console.table(planet.orbitalProperties);
@@ -84,7 +84,7 @@ for(let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
     const randSatellite = alea(satelliteSeed.toString());
     const satelliteRadius = (planet.getRadius() / 5) * clamp(normalRandom(1, 0.1, randSatellite), 0.5, 1.5);
     const ratio = satelliteRadius / Settings.EARTH_RADIUS;
-    const satellite = new TelluricPlanet(`${planet.name}Sattelite${i}`, satelliteRadius, starSystemManager, satelliteSeed, [planet]);
+    const satellite = new TelluricPlanet(`${planet.name}Sattelite${i}`, starSystemManager, satelliteSeed, [planet]);
     console.log(satellite.depth)
     const periapsis = 5 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, randSatellite), 0.9, 1.0) * planet.getRadius() * 2;
     const apoapsis = periapsis * clamp(normalRandom(1, 0.05, randSatellite), 1, 1.5);
