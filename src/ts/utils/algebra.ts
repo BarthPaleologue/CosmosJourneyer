@@ -105,7 +105,7 @@ export class LVector3 implements IVector3Like {
         this._z -= otherVector.z;
     }
 
-    normalize(): LVector3 {
+    normalizeToNew(): LVector3 {
         return this.scale(1 / this.getMagnitude());
     }
 

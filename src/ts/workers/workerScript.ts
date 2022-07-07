@@ -34,9 +34,9 @@ function buildChunkVertexData(data: BuildData): void {
     const normals = new Float32Array(verticesPositions.length);
 
     // the offset used to bring back the vertices close to the origin (the position of the chunk on the sphere)
-    const offset = chunkFrontFacePosition.clone();
-    offset.applyRotationQuaternionInPlace(rotationQuaternion);
-    offset.setMagnitudeInPlace(planetRadius);
+    const chunkSpherePosition = chunkFrontFacePosition.clone();
+    chunkSpherePosition.applyRotationQuaternionInPlace(rotationQuaternion);
+    chunkSpherePosition.setMagnitudeInPlace(planetRadius);
 
     for (let x = 0; x < nbVerticesPerSide; x++) {
         for (let y = 0; y < nbVerticesPerSide; y++) {
@@ -55,7 +55,7 @@ function buildChunkVertexData(data: BuildData): void {
             // Théorie : https://math.stackexchange.com/questions/1071662/surface-normal-to-point-on-displaced-sphere
 
             // on l'arrondi pour en faire un chunk de sphère
-            const unitSphereCoords = vertexPosition.normalize();
+            const unitSphereCoords = vertexPosition.normalizeToNew();
 
             vertexPosition.setMagnitudeInPlace(planetRadius);
 
@@ -70,7 +70,7 @@ function buildChunkVertexData(data: BuildData): void {
             vertexNormal.normalizeInPlace();
 
             // on le ramène à l'origine
-            vertexPosition.subtractInPlace(offset);
+            vertexPosition.subtractInPlace(chunkSpherePosition);
 
             verticesPositions[(x * nbVerticesPerSide + y) * 3] = vertexPosition.x;
             verticesPositions[(x * nbVerticesPerSide + y) * 3 + 1] = vertexPosition.y;
@@ -110,7 +110,7 @@ function buildChunkVertexData(data: BuildData): void {
 }
 
 function sendHeightAtPoint(point: LVector3, seed: number): void {
-    terrainFunction(point.normalize(), seed, point, LVector3.Zero());
+    terrainFunction(point.normalizeToNew(), seed, point, LVector3.Zero());
 
     self.postMessage({
         h: point.getMagnitude()
