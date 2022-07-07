@@ -6,7 +6,7 @@ import { AbstractBody } from "../bodies/abstractBody";
 
 export abstract class PlanetPostProcess extends SpacePostProcess {
     protected constructor(name: string, fragmentName: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, body: AbstractBody, sun: Star, scene: Scene) {
-        let commonUniforms = {
+        const commonUniforms = {
             sunPosition: {
                 type: ShaderDataType.Vector3,
                 get: () => {

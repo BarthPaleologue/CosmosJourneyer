@@ -113,7 +113,7 @@ document.addEventListener("keydown", (e) => {
         (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
 });
 
-let collisionWorker = new CollisionWorker(player, starSystemManager);
+const collisionWorker = new CollisionWorker(player, starSystemManager);
 
 starSystemManager.update(player, sun.getAbsolutePosition(), 0);
 starSystemManager.update(player, sun.getAbsolutePosition(), Date.now());
@@ -142,7 +142,7 @@ scene.executeWhenReady(() => {
 
         if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 
-        let deplacement = player.listenToGamepad(gamepad, deltaTime);
+        const deplacement = player.listenToGamepad(gamepad, deltaTime);
 
         deplacement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
 

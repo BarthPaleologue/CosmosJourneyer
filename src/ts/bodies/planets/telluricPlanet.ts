@@ -128,7 +128,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
     }
 
     public generateCollisionTask(relativePosition: Vector3): CollisionData {
-        let collisionData: CollisionData = {
+        const collisionData: CollisionData = {
             seed: this.seed,
             taskType: TaskType.Collision,
             planetName: this.name,

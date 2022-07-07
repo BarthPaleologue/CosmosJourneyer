@@ -16,9 +16,9 @@ export class StarfieldPostProcess extends SpacePostProcess {
     star: Star | null = null;
 
     constructor(name: string, starSystem: StarSystemManager) {
-        let settings: StarfieldSettings = {};
+        const settings: StarfieldSettings = {};
 
-        let uniforms: ShaderUniformData = {
+        const uniforms: ShaderUniformData = {
             visibility: {
                 type: ShaderDataType.Float,
                 get: () => {
@@ -31,7 +31,7 @@ export class StarfieldPostProcess extends SpacePostProcess {
             }
         };
 
-        let samplers: ShaderSamplerData = {};
+        const samplers: ShaderSamplerData = {};
 
         super(name, shaderName, uniforms, samplers, starSystem.scene);
 

@@ -69,7 +69,7 @@ export class Star extends AbstractBody {
         starSystemManager.spaceRenderingPipeline.volumetricLights.push(this.postProcesses.volumetricLight!);
 
         if (uniformRandBool(Star.RING_PROPORTION, this.rng)) {
-            let rings = this.createRings(this, starSystemManager.scene);
+            const rings = this.createRings(this, starSystemManager.scene);
             rings.settings.ringStart = normalRandom(3, 1, this.rng);
             rings.settings.ringEnd = normalRandom(7, 1, this.rng);
             rings.settings.ringOpacity = this.rng();

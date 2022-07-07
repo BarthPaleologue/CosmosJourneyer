@@ -15,7 +15,7 @@ export class OceanPostProcess extends PlanetPostProcess {
     settings: OceanSettings;
 
     constructor(name: string, planet: AbstractPlanet, starSystem: StarSystemManager) {
-        let settings: OceanSettings = {
+        const settings: OceanSettings = {
             oceanRadius: planet.getApparentRadius(),
             depthModifier: 0.002,
             alphaModifier: 0.007,
@@ -24,7 +24,7 @@ export class OceanPostProcess extends PlanetPostProcess {
             waveBlendingSharpness: 0.1
         };
 
-        let uniforms: ShaderUniformData = {
+        const uniforms: ShaderUniformData = {
             oceanRadius: {
                 type: ShaderDataType.Float,
                 get: () => {
@@ -78,7 +78,7 @@ export class OceanPostProcess extends PlanetPostProcess {
             }
         };
 
-        let samplers: ShaderSamplerData = {
+        const samplers: ShaderSamplerData = {
             normalMap1: {
                 type: ShaderDataType.Texture,
                 get: () => {

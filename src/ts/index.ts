@@ -152,7 +152,7 @@ starSystem.init();
 
 let isMouseEnabled = false;
 
-let collisionWorker = new CollisionWorker(player, starSystem);
+const collisionWorker = new CollisionWorker(player, starSystem);
 
 // update to current date
 starSystem.update(player, sun.getAbsolutePosition(), Date.now() / 1000);
@@ -169,7 +169,7 @@ function updateScene() {
 
     if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 
-    let playerMovement = player.listenToGamepad(gamepad, deltaTime);
+    const playerMovement = player.listenToGamepad(gamepad, deltaTime);
     playerMovement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
     starSystem.translateAllBodies(playerMovement);
 

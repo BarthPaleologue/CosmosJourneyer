@@ -45,12 +45,12 @@ export class ChunkForge {
 
     private executeBuildTask(task: BuildTask, worker: Worker): void {
         // delete tasks always follow build task, they are stored to be executed as callbacks of the build task
-        let callbackTasks: DeleteTask[] = [];
+        const callbackTasks: DeleteTask[] = [];
         while (this.workerPool.taskQueue.length > 0 && this.workerPool.taskQueue[0].type == TaskType.Deletion) {
             callbackTasks.push(this.workerPool.nextTask() as DeleteTask);
         }
 
-        let buildData: BuildData = {
+        const buildData: BuildData = {
             taskType: TaskType.Build,
             planetName: task.planet.name,
             planetDiameter: task.planet.getDiameter(),
@@ -65,14 +65,14 @@ export class ChunkForge {
         worker.postMessage(buildData);
 
         worker.onmessage = (e) => {
-            let data: ReturnedChunkData = e.data;
+            const data: ReturnedChunkData = e.data;
 
-            let vertexData = new VertexData();
+            const vertexData = new VertexData();
             vertexData.positions = data.p;
             vertexData.normals = data.n;
             vertexData.indices = data.i;
 
-            let applyTask: ApplyTask = {
+            const applyTask: ApplyTask = {
                 type: TaskType.Apply,
                 vertexData: vertexData,
                 chunk: task.chunk,
@@ -122,7 +122,7 @@ export class ChunkForge {
      */
     private executeNextApplyTask(depthRenderer: DepthRenderer) {
         if (this.applyTasks.length > 0) {
-            let task = this.applyTasks.shift()!;
+            const task = this.applyTasks.shift()!;
             task.vertexData.applyToMesh(task.chunk.mesh, false);
             task.chunk.mesh.freezeNormals();
 
@@ -139,7 +139,7 @@ export class ChunkForge {
      */
     public update(depthRenderer: DepthRenderer) {
         for (let i = 0; i < this.workerPool.availableWorkers.length; i++) {
-            let worker = this.workerPool.availableWorkers.shift()!;
+            const worker = this.workerPool.availableWorkers.shift()!;
             this.executeNextTask(worker);
         }
         this.workerPool.availableWorkers = this.workerPool.availableWorkers.concat(this.workerPool.finishedWorkers);

@@ -7,10 +7,10 @@ export abstract class SpacePostProcess extends PostProcess {
     uniforms: ShaderUniformData;
     samplers: ShaderSamplerData;
 
-    protected internalTime: number = 0;
+    protected internalTime = 0;
 
     protected constructor(name: string, fragmentName: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, scene: Scene) {
-        let commonUniforms: ShaderUniformData = {
+        const commonUniforms: ShaderUniformData = {
             cameraPosition: {
                 type: ShaderDataType.Vector3,
                 get: () => {
@@ -44,7 +44,7 @@ export abstract class SpacePostProcess extends PostProcess {
             }
         };
 
-        let commonSamplers: ShaderSamplerData = {
+        const commonSamplers: ShaderSamplerData = {
             textureSampler: {
                 type: ShaderDataType.Auto,
                 get: () => {

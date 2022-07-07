@@ -53,12 +53,12 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
 export function getChunkSphereSpacePositionFromPath(path: number[], direction: Direction, planet: TelluricPlanet): Vector3 {
     // FIXME: fix documentation
     // on récupère la position dans le plan
-    let position = getChunkPlaneSpacePositionFromPath(planet.getDiameter(), path);
+    const position = getChunkPlaneSpacePositionFromPath(planet.getDiameter(), path);
 
     // on l'offset pour préparer à récupérer la position dans le cube
     position.addInPlace(new Vector3(0, 0, -planet.getRadius()));
 
-    let rotationQuaternion = getQuaternionFromDirection(direction);
+    const rotationQuaternion = getQuaternionFromDirection(direction);
     position.applyRotationQuaternionInPlace(rotationQuaternion);
 
     // on projette cette position sur la sphère

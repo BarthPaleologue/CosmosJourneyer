@@ -14,7 +14,7 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
     settings: AtmosphereSettings;
 
     constructor(name: string, planet: AbstractPlanet, atmosphereHeight: number, starSystem: StarSystemManager) {
-        let settings: AtmosphereSettings = {
+        const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 23,
             intensity: 12,
@@ -27,7 +27,7 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
             mieHaloRadius: 0.75
         };
 
-        let uniforms: ShaderUniformData = {
+        const uniforms: ShaderUniformData = {
             atmosphereRadius: {
                 type: ShaderDataType.Float,
                 get: () => {
@@ -90,7 +90,7 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
             }
         };
 
-        let samplers: ShaderSamplerData = {};
+        const samplers: ShaderSamplerData = {};
 
         super(name, shaderName, uniforms, samplers, planet, starSystem.stars[0], starSystem.scene);
 

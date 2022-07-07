@@ -57,14 +57,14 @@ export class BodyEditor {
         this.currentPanel = document.getElementById("generalUI");
         for (const link of this.navBar.children) {
             link.addEventListener("click", () => {
-                let id = link.id.substring(0, link.id.length - 4) + "UI";
+                const id = link.id.substring(0, link.id.length - 4) + "UI";
                 this.switchPanel(id);
             });
         }
     }
 
     public switchPanel(panelId: string): void {
-        let newPanel = document.getElementById(panelId);
+        const newPanel = document.getElementById(panelId);
         if (newPanel == null) throw new Error(`The panel you requested does not exist : ${panelId}`);
 
         if (this.currentPanel == null) this.setVisibility(EditorVisibility.FULL);
@@ -241,7 +241,7 @@ export class BodyEditor {
 
         this.generalSliders.push(
             new Slider("zoom", document.getElementById("zoom")!, 0, 100, (100 * planet.radius) / planet.transform.position.z, (value: number) => {
-                let playerDir = planet.getAbsolutePosition().normalizeToNew();
+                const playerDir = planet.getAbsolutePosition().normalizeToNew();
                 planet.setAbsolutePosition(playerDir.scale((100 * planet.getRadius()) / value));
             })
         );
@@ -249,7 +249,7 @@ export class BodyEditor {
         let axialTiltX = stripAxisFromQuaternion(planet.getRotationQuaternion(), Axis.Y).toEulerAngles().x;
         this.generalSliders.push(
             new Slider("axialTiltX", document.getElementById("axialTiltX")!, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
-                let newAxialTilt = (val * Math.PI) / 180;
+                const newAxialTilt = (val * Math.PI) / 180;
                 planet.rotate(Axis.X, newAxialTilt - axialTiltX);
                 if (player.isOrbiting()) player.rotateAround(planet.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
                 axialTiltX = newAxialTilt;
@@ -259,7 +259,7 @@ export class BodyEditor {
         let axialTiltZ = stripAxisFromQuaternion(planet.getRotationQuaternion(), Axis.Y).toEulerAngles().z;
         this.generalSliders.push(
             new Slider("axialTiltZ", document.getElementById("axialTiltZ")!, -180, 180, Math.round((180 * axialTiltZ) / Math.PI), (val: number) => {
-                let newAxialTilt = (val * Math.PI) / 180;
+                const newAxialTilt = (val * Math.PI) / 180;
                 planet.rotate(Axis.Z, newAxialTilt - axialTiltZ);
                 if (player.isOrbiting()) player.rotateAround(planet.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
                 axialTiltZ = newAxialTilt;
@@ -305,31 +305,31 @@ export class BodyEditor {
         const material = planet.material;
         const colorSettings = material.colorSettings;
 
-        let snowColorPicker = clearAllEventListenersById("snowColor") as HTMLInputElement;
+        const snowColorPicker = clearAllEventListenersById("snowColor") as HTMLInputElement;
         snowColorPicker.value = colorSettings.snowColor.toHexString();
         snowColorPicker.addEventListener("input", () => {
             colorSettings.snowColor.copyFrom(Color3.FromHexString(snowColorPicker.value));
         });
 
-        let plainColorPicker = clearAllEventListenersById("plainColor") as HTMLInputElement;
+        const plainColorPicker = clearAllEventListenersById("plainColor") as HTMLInputElement;
         plainColorPicker.value = colorSettings.plainColor.toHexString();
         plainColorPicker.addEventListener("input", () => {
             colorSettings.plainColor.copyFrom(Color3.FromHexString(plainColorPicker.value));
         });
 
-        let steepColorPicker = clearAllEventListenersById("steepColor") as HTMLInputElement;
+        const steepColorPicker = clearAllEventListenersById("steepColor") as HTMLInputElement;
         steepColorPicker.value = colorSettings.steepColor.toHexString();
         steepColorPicker.addEventListener("input", () => {
             colorSettings.steepColor.copyFrom(Color3.FromHexString(steepColorPicker.value));
         });
 
-        let sandColorPicker = clearAllEventListenersById("sandColor") as HTMLInputElement;
+        const sandColorPicker = clearAllEventListenersById("sandColor") as HTMLInputElement;
         sandColorPicker.value = colorSettings.beachColor.toHexString();
         sandColorPicker.addEventListener("input", () => {
             colorSettings.beachColor.copyFrom(Color3.FromHexString(sandColorPicker.value));
         });
 
-        let desertColorPicker = clearAllEventListenersById("desertColor") as HTMLInputElement;
+        const desertColorPicker = clearAllEventListenersById("desertColor") as HTMLInputElement;
         desertColorPicker.value = colorSettings.desertColor.toHexString();
         desertColorPicker.addEventListener("input", () => {
             colorSettings.desertColor.copyFrom(Color3.FromHexString(desertColorPicker.value));
@@ -364,13 +364,13 @@ export class BodyEditor {
         const material = planet.material;
         const colorSettings = material.colorSettings;
 
-        let gazColor1Picker = clearAllEventListenersById("gazColor1") as HTMLInputElement;
+        const gazColor1Picker = clearAllEventListenersById("gazColor1") as HTMLInputElement;
         gazColor1Picker.value = colorSettings.color1.toHexString();
         gazColor1Picker.addEventListener("input", () => {
             colorSettings.color1.copyFrom(Color3.FromHexString(gazColor1Picker.value));
         });
 
-        let gazColor2Picker = clearAllEventListenersById("gazColor2") as HTMLInputElement;
+        const gazColor2Picker = clearAllEventListenersById("gazColor2") as HTMLInputElement;
         gazColor2Picker.value = colorSettings.color2.toHexString();
         gazColor2Picker.addEventListener("input", () => {
             colorSettings.color2.copyFrom(Color3.FromHexString(gazColor2Picker.value));
@@ -390,10 +390,10 @@ export class BodyEditor {
 
         if (planet.postProcesses.atmosphere == null) return;
 
-        let atmosphere = planet.postProcesses.atmosphere;
-        let atmosphereToggler = clearAllEventListenersById("atmosphereToggler");
+        const atmosphere = planet.postProcesses.atmosphere;
+        const atmosphereToggler = clearAllEventListenersById("atmosphereToggler");
         atmosphereToggler.addEventListener("click", () => {
-            let checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
+            const checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
             atmosphere.settings.atmosphereRadius = checkbox.checked ? Settings.EARTH_RADIUS + Settings.ATMOSPHERE_HEIGHT : 0;
         });
@@ -462,14 +462,14 @@ export class BodyEditor {
 
         if (planet.postProcesses.clouds == null) return;
 
-        let flatClouds = planet.postProcesses.clouds!;
-        let cloudsToggler = clearAllEventListenersById("cloudsToggler");
+        const flatClouds = planet.postProcesses.clouds!;
+        const cloudsToggler = clearAllEventListenersById("cloudsToggler");
         cloudsToggler.addEventListener("click", () => {
-            let checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
+            const checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
             flatClouds.settings.cloudLayerRadius = checkbox.checked ? Settings.EARTH_RADIUS + Settings.CLOUD_LAYER_HEIGHT : 0;
         });
-        let cloudColorPicker = clearAllEventListenersById("cloudColor") as HTMLInputElement;
+        const cloudColorPicker = clearAllEventListenersById("cloudColor") as HTMLInputElement;
         cloudColorPicker.value = flatClouds.settings.cloudColor.toHexString();
         cloudColorPicker.addEventListener("input", () => {
             flatClouds.settings.cloudColor = Color3.FromHexString(cloudColorPicker.value);
@@ -515,10 +515,10 @@ export class BodyEditor {
         showPanel("ringsLink");
         showPanel("ringsUI", this.currentPanel?.id == "ringsUI");
 
-        let rings = planet.postProcesses.rings;
-        let ringsToggler = clearAllEventListenersById("ringsToggler");
+        const rings = planet.postProcesses.rings;
+        const ringsToggler = clearAllEventListenersById("ringsToggler");
         ringsToggler.addEventListener("click", () => {
-            let checkbox = document.querySelectorAll("input[type='checkbox']")[3] as HTMLInputElement;
+            const checkbox = document.querySelectorAll("input[type='checkbox']")[3] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
             rings.settings.ringFrequency = checkbox.checked ? 30 : 0;
         });
@@ -550,10 +550,10 @@ export class BodyEditor {
 
         if (planet.postProcesses.ocean == null) return;
 
-        let ocean = planet.postProcesses.ocean;
-        let oceanToggler = clearAllEventListenersById("oceanToggler");
+        const ocean = planet.postProcesses.ocean;
+        const oceanToggler = clearAllEventListenersById("oceanToggler");
         oceanToggler.addEventListener("click", () => {
-            let checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
+            const checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
             ocean.settings.oceanRadius = checkbox.checked ? planet.getApparentRadius() : 0;
         });

@@ -81,12 +81,12 @@ const IlluminantE = [0.33333333, 0.33333333]; /* CIE equal-energy illuminant */
 const GAMMA_REC709 = 0; /* Rec. 709 */
 
 /* Name                  xRed    yRed    xGreen  yGreen  xBlue  yBlue    White point        Gamma   */
-let NTSCsystem = new ColourSystem("NTSC", 0.67, 0.33, 0.21, 0.71, 0.14, 0.08, IlluminantC[0], IlluminantC[1], GAMMA_REC709);
-let EBUsystem = new ColourSystem("EBU (PAL/SECAM)", 0.64, 0.33, 0.29, 0.6, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
-let SMPTEsystem = new ColourSystem("SMPTE", 0.63, 0.34, 0.31, 0.595, 0.155, 0.07, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
-let HDTVsystem = new ColourSystem("HDTV", 0.67, 0.33, 0.21, 0.71, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
-let CIEsystem = new ColourSystem("CIE", 0.7355, 0.2645, 0.2658, 0.7243, 0.1669, 0.0085, IlluminantE[0], IlluminantE[1], GAMMA_REC709);
-let Rec709system = new ColourSystem("CIE REC 709", 0.64, 0.33, 0.3, 0.6, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
+const NTSCsystem = new ColourSystem("NTSC", 0.67, 0.33, 0.21, 0.71, 0.14, 0.08, IlluminantC[0], IlluminantC[1], GAMMA_REC709);
+const EBUsystem = new ColourSystem("EBU (PAL/SECAM)", 0.64, 0.33, 0.29, 0.6, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
+const SMPTEsystem = new ColourSystem("SMPTE", 0.63, 0.34, 0.31, 0.595, 0.155, 0.07, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
+const HDTVsystem = new ColourSystem("HDTV", 0.67, 0.33, 0.21, 0.71, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
+const CIEsystem = new ColourSystem("CIE", 0.7355, 0.2645, 0.2658, 0.7243, 0.1669, 0.0085, IlluminantE[0], IlluminantE[1], GAMMA_REC709);
+const Rec709system = new ColourSystem("CIE REC 709", 0.64, 0.33, 0.3, 0.6, 0.15, 0.06, IlluminantD65[0], IlluminantD65[1], GAMMA_REC709);
 
 /*                          UPVP_TO_XY
 
@@ -95,8 +95,8 @@ let Rec709system = new ColourSystem("CIE REC 709", 0.64, 0.33, 0.3, 0.6, 0.15, 0
 */
 
 function upvp_to_xy(up: number, vp: number): number[] {
-    let xc = (9 * up) / (6 * up - 16 * vp + 12);
-    let yc = (4 * vp) / (6 * up - 16 * vp + 12);
+    const xc = (9 * up) / (6 * up - 16 * vp + 12);
+    const yc = (4 * vp) / (6 * up - 16 * vp + 12);
 
     return [xc, yc];
 }
@@ -108,8 +108,8 @@ function upvp_to_xy(up: number, vp: number): number[] {
 */
 
 function xy_to_upvp(xc: number, yc: number): number[] {
-    let up = (4 * xc) / (-2 * xc + 12 * yc + 3);
-    let vp = (9 * yc) / (-2 * xc + 12 * yc + 3);
+    const up = (4 * xc) / (-2 * xc + 12 * yc + 3);
+    const vp = (9 * yc) / (-2 * xc + 12 * yc + 3);
 
     return [up, vp];
 }
@@ -185,9 +185,9 @@ function xyz_to_rgb(cs: ColourSystem, xc: number, yc: number, zc: number): numbe
 
     /* rgb of the desired point */
 
-    let r = rx * xc + ry * yc + rz * zc;
-    let g = gx * xc + gy * yc + gz * zc;
-    let b = bx * xc + by * yc + bz * zc;
+    const r = rx * xc + ry * yc + rz * zc;
+    const g = gx * xc + gy * yc + gz * zc;
+    const b = bx * xc + by * yc + bz * zc;
 
     return [r, g, b];
 }
@@ -254,7 +254,7 @@ function gamma_correct(cs: ColourSystem, c: number): number {
 
     if (gamma == GAMMA_REC709) {
         /* Rec. 709 gamma correction. */
-        let cc = 0.018;
+        const cc = 0.018;
 
         if (c < cc) {
             c *= (1.099 * Math.pow(cc, 0.45) - 0.099) / cc;
@@ -325,7 +325,7 @@ function spectrum_to_xyz(f: (wavelength: number) => number): number[] {
         between floating-point types" from certain persnickety
         compilers. */
 
-    let cie_colour_match: number[][] = [
+    const cie_colour_match: number[][] = [
         [0.0014, 0.0, 0.0065],
         [0.0022, 0.0001, 0.0105],
         [0.0042, 0.0001, 0.0201],
@@ -430,7 +430,7 @@ function spectrum_to_xyz(f: (wavelength: number) => number): number[] {
 let bbTemp = 5000; /* Hidden temperature argument
                                          to BB_SPECTRUM. */
 function bb_spectrum(wavelength: number): number {
-    let wlm = wavelength * 1e-9; /* Wavelength in meters */
+    const wlm = wavelength * 1e-9; /* Wavelength in meters */
 
     return (3.74183e-16 * Math.pow(wlm, -5.0)) / (Math.exp(1.4388e-2 / (wlm * bbTemp)) - 1.0);
 }
@@ -464,7 +464,7 @@ function bb_spectrum(wavelength: number): number {
 
 export function demonstrate() {
     let [t, x, y, z, r, g, b]: number[] = [1000, 0, 0, 0, 0, 0, 0];
-    let cs = SMPTEsystem;
+    const cs = SMPTEsystem;
 
     console.log("Temperature       x      y      z       R     G     B");
     console.log("-----------    ------ ------ ------   ----- ----- -----");
@@ -484,7 +484,7 @@ import { Vector3 } from "@babylonjs/core";
 export function getRgbFromTemperature(temperature: number): Vector3 {
     let [x, y, z]: number[] = [0, 0, 0];
     let [r, g, b]: number[] = [0, 0, 0];
-    let cs = SMPTEsystem;
+    const cs = SMPTEsystem;
 
     bbTemp = temperature;
     [x, y, z] = spectrum_to_xyz(bb_spectrum);

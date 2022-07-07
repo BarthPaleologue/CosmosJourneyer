@@ -20,7 +20,7 @@ export class WorkerPool {
         //this.sharedMemoryBuffer = new SharedArrayBuffer(0);
         //this.sharedTaskQueue = new BuildTaskQueue(this.sharedMemoryBuffer);
         for (let i = 0; i < nbWorkers; i++) {
-            let worker = new Worker(new URL("../workers/workerScript", import.meta.url), { type: "module" });
+            const worker = new Worker(new URL("../workers/workerScript", import.meta.url), { type: "module" });
             this.availableWorkers.push(worker);
             //worker.postMessage(this.sharedMemoryBuffer);
         }

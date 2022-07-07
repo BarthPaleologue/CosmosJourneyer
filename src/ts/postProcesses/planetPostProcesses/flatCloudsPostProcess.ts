@@ -16,7 +16,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
     settings: CloudSettings;
 
     constructor(name: string, planet: AbstractPlanet, cloudLayerHeight: number, starSystem: StarSystemManager) {
-        let settings: CloudSettings = {
+        const settings: CloudSettings = {
             cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
             specularPower: 2,
             smoothness: 0.9,
@@ -29,7 +29,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             detailSpeed: 0.003
         };
 
-        let uniforms: ShaderUniformData = {
+        const uniforms: ShaderUniformData = {
             cloudLayerRadius: {
                 type: ShaderDataType.Float,
                 get: () => {
@@ -104,7 +104,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             }
         };
 
-        let samplers: ShaderSamplerData = {
+        const samplers: ShaderSamplerData = {
             normalMap: {
                 type: ShaderDataType.Texture,
                 get: () => {

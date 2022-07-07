@@ -105,7 +105,7 @@ export class Gamepad {
      * Renvoie la liste des bouttons pressés (debug)
      */
     private list() {
-        let r = [];
+        const r = [];
         for (let i = 0; i < (this.gamepad?.buttons || 0); ++i) {
             if (this.gamepad?.buttons[i].pressed) r.push(i);
         }

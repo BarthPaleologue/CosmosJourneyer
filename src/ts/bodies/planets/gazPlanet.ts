@@ -40,7 +40,7 @@ export class GazPlanet extends AbstractPlanet {
         this.mesh.material = this.material;
 
         // FIXME: implement multiple stars
-        let atmosphere = this.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
+        const atmosphere = this.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
         atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng) / 6;
         atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;
         atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng) / 6;

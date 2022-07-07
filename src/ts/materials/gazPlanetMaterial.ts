@@ -58,7 +58,7 @@ export class GazPlanetMaterial extends ShaderMaterial {
         };
 
         this.onBindObservable.add(() => {
-            let effect = this.getEffect();
+            const effect = this.getEffect();
             MaterialHelper.BindLogDepth(null, effect, scene);
         });
 

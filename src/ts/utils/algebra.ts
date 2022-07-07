@@ -132,10 +132,10 @@ export class LVector3 implements IVector3Like {
 
     applyRotationQuaternionInPlace(q: Quaternion): void {
         // apply quaternion to vector
-        let ix = q.w * this.x + q.y * this.z - q.z * this.y;
-        let iy = q.w * this.y + q.z * this.x - q.x * this.z;
-        let iz = q.w * this.z + q.x * this.y - q.y * this.x;
-        let iw = -q.x * this.x - q.y * this.y - q.z * this.z;
+        const ix = q.w * this.x + q.y * this.z - q.z * this.y;
+        const iy = q.w * this.y + q.z * this.x - q.x * this.z;
+        const iz = q.w * this.z + q.x * this.y - q.y * this.x;
+        const iw = -q.x * this.x - q.y * this.y - q.z * this.z;
         // calculate result * inverse quat
         this.x = ix * q.w + iw * -q.x + iy * -q.z - iz * -q.y;
         this.y = iy * q.w + iw * -q.y + iz * -q.x - ix * -q.z;

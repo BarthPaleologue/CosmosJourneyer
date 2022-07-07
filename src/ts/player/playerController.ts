@@ -135,11 +135,11 @@ export class PlayerController implements ITransformable {
         }
 
         // Update displacement state
-        let deplacement = Vector3.Zero();
+        const deplacement = Vector3.Zero();
 
-        let forwardDeplacement = this.getForwardDirection().scale(this.speed * deltaTime);
-        let upwardDeplacement = this.getUpwardDirection().scale(this.speed * deltaTime);
-        let rightDeplacement = this.getRightDirection().scale(this.speed * deltaTime);
+        const forwardDeplacement = this.getForwardDirection().scale(this.speed * deltaTime);
+        const upwardDeplacement = this.getUpwardDirection().scale(this.speed * deltaTime);
+        const rightDeplacement = this.getRightDirection().scale(this.speed * deltaTime);
 
         if (keyboard.isAnyPressed(this.controls.forwardKeys)) deplacement.addInPlace(forwardDeplacement);
         if (keyboard.isAnyPressed(this.controls.backwardKeys)) deplacement.subtractInPlace(forwardDeplacement);
@@ -175,11 +175,11 @@ export class PlayerController implements ITransformable {
     public listenToGamepad(gamepad: Gamepad, deltaTime: number): Vector3 {
         gamepad.update();
 
-        let deplacement = Vector3.Zero();
+        const deplacement = Vector3.Zero();
 
-        let forwardDeplacement = this.getForwardDirection().scale(this.speed * deltaTime);
-        let upwardDeplacement = this.getUpwardDirection().scale(this.speed * deltaTime);
-        let rightDeplacement = this.getRightDirection().scale(this.speed * deltaTime);
+        const forwardDeplacement = this.getForwardDirection().scale(this.speed * deltaTime);
+        const upwardDeplacement = this.getUpwardDirection().scale(this.speed * deltaTime);
+        const rightDeplacement = this.getRightDirection().scale(this.speed * deltaTime);
 
         deplacement.addInPlace(forwardDeplacement.scale(-gamepad.getAxisValue(GamepadAxis.LY)));
         deplacement.addInPlace(rightDeplacement.scale(gamepad.getAxisValue(GamepadAxis.LX)));

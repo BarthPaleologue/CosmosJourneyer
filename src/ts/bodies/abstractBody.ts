@@ -124,7 +124,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
     }
 
     public createRings(star: Star, scene: Scene): RingsPostProcess {
-        let rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem);
+        const rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem);
         rings.settings.ringStart = randRange(1.4, 2.2, this.rng);
         rings.settings.ringEnd = randRange(2.1, 2.9, this.rng);
         rings.settings.ringOpacity = this.rng();
@@ -153,7 +153,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
         }
 
         if (this.physicalProperties.rotationPeriod > 0) {
-            let dtheta = (2 * Math.PI * deltaTime) / this.physicalProperties.rotationPeriod;
+            const dtheta = (2 * Math.PI * deltaTime) / this.physicalProperties.rotationPeriod;
 
             if (player.isOrbiting(this)) player.rotateAround(this.getAbsolutePosition(), this.transform.up, -dtheta);
             this.rotate(this.transform.up, -dtheta);

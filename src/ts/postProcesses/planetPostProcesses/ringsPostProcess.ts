@@ -13,14 +13,14 @@ export class RingsPostProcess extends PlanetPostProcess {
     settings: RingsSettings;
 
     constructor(name: string, body: AbstractBody, starSystem: StarSystemManager) {
-        let settings: RingsSettings = {
+        const settings: RingsSettings = {
             ringStart: 1.5,
             ringEnd: 2.5,
             ringFrequency: 30.0,
             ringOpacity: 0.4
         };
 
-        let uniforms: ShaderUniformData = {
+        const uniforms: ShaderUniformData = {
             ringStart: {
                 type: ShaderDataType.Float,
                 get: () => {
@@ -54,7 +54,7 @@ export class RingsPostProcess extends PlanetPostProcess {
             }
         };
 
-        let samplers: ShaderSamplerData = {};
+        const samplers: ShaderSamplerData = {};
 
         super(name, shaderName, uniforms, samplers, body, starSystem.stars[0], starSystem.scene);
 

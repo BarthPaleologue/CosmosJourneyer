@@ -14,18 +14,18 @@ export class CollisionWorker {
         this._worker.onmessage = (e) => {
             if (player.nearestBody == null) return;
 
-            let direction = player.nearestBody.getAbsolutePosition().normalizeToNew();
-            let currentHeight = player.nearestBody.getAbsolutePosition().length();
-            let terrainHeight = e.data.h;
+            const direction = player.nearestBody.getAbsolutePosition().normalizeToNew();
+            const currentHeight = player.nearestBody.getAbsolutePosition().length();
+            const terrainHeight = e.data.h;
 
-            let currentPosition = player.nearestBody.getAbsolutePosition();
+            const currentPosition = player.nearestBody.getAbsolutePosition();
             let newPosition = currentPosition;
 
             if (currentHeight - player.collisionRadius < terrainHeight) {
                 newPosition = direction.scale(terrainHeight + player.collisionRadius);
             }
 
-            let deviation = newPosition.subtract(currentPosition);
+            const deviation = newPosition.subtract(currentPosition);
 
             planetManager.translateAllBodies(deviation);
 
@@ -40,10 +40,10 @@ export class CollisionWorker {
         this._busy = true;
     }
     public checkCollision(planet: RigidBody & ITransformable): void {
-        let playerSamplePosition = planet.getAbsolutePosition().negate();
+        const playerSamplePosition = planet.getAbsolutePosition().negate();
         playerSamplePosition.applyRotationQuaternionInPlace(planet.getInverseRotationQuaternion());
 
-        let collisionData = planet.generateCollisionTask(playerSamplePosition);
+        const collisionData = planet.generateCollisionTask(playerSamplePosition);
         this.postMessage(collisionData);
     }
 }

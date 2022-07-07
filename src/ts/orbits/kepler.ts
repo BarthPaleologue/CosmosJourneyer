@@ -21,10 +21,10 @@ export function solveKepler(M: number, e: number) {
     let guess = M;
     const maxIterations = 100;
     for (let i = 0; i < maxIterations; i++) {
-        let y = keplerEquation(guess, M, e);
+        const y = keplerEquation(guess, M, e);
         if (Math.abs(y) < epsilon) break;
-        let slope = (keplerEquation(guess + h, M, e) - y) / h;
-        let step = y / slope;
+        const slope = (keplerEquation(guess + h, M, e) - y) / h;
+        const step = y / slope;
 
         guess -= step;
     }

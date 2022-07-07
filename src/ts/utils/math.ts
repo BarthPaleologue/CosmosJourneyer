@@ -10,7 +10,7 @@ import { Vector3 } from "@babylonjs/core";
  * @returns the smooth minimum between a and b
  */
 export function smin(a: number, b: number, k: number): number {
-    let res = Math.exp(-k * a) + Math.exp(-k * b);
+    const res = Math.exp(-k * a) + Math.exp(-k * b);
     return -Math.log(res) / k;
 }
 
@@ -22,7 +22,7 @@ export function smin(a: number, b: number, k: number): number {
  * @returns the smooth maximum between a and b
  */
 export function smax(a: number, b: number, k: number): number {
-    let res = Math.exp(k * a) + Math.exp(k * b);
+    const res = Math.exp(k * a) + Math.exp(k * b);
     return Math.log(res) / k;
 }
 
@@ -37,9 +37,9 @@ export function smax(a: number, b: number, k: number): number {
  * @returns the smooth minimum between u and v
  */
 export function sMinGradient(u: number, v: number, k: number, gradU: Vec3, gradV: Vec3): number {
-    let eku = Math.exp(k * u);
-    let ekv = Math.exp(k * v);
-    let ekuv = eku + ekv;
+    const eku = Math.exp(k * u);
+    const ekv = Math.exp(k * v);
+    const ekuv = eku + ekv;
 
     gradU.x = (eku * gradV.x + ekv * gradU.x) / ekuv;
     gradU.y = (eku * gradV.y + ekv * gradU.y) / ekuv;
@@ -58,9 +58,9 @@ export function sMinGradient(u: number, v: number, k: number, gradU: Vec3, gradV
  * @returns the smooth maximum between u and v and overrides gradU with the new gradient
  */
 export function sMaxGradient(u: number, v: number, k: number, gradU?: Vec3, gradV?: Vec3): number {
-    let eku = Math.exp(k * u);
-    let ekv = Math.exp(k * v);
-    let ekuv = eku + ekv;
+    const eku = Math.exp(k * u);
+    const ekv = Math.exp(k * v);
+    const ekuv = eku + ekv;
 
     if (gradU && gradV) {
         gradU.scaleInPlace(eku / ekuv);
@@ -79,8 +79,8 @@ export function sMaxGradient(u: number, v: number, k: number, gradU?: Vec3, grad
  * @returns the result of the smooth min
  */
 export function sCeil(x: number, ceil: number, k: number, grad?: Vec3): number {
-    let emkx = Math.exp(-k * x);
-    let emkceil = Math.exp(-k * ceil);
+    const emkx = Math.exp(-k * x);
+    const emkceil = Math.exp(-k * ceil);
 
     if (grad) grad.scaleInPlace(-emkx / (emkx + emkceil));
 
@@ -96,8 +96,8 @@ export function sCeil(x: number, ceil: number, k: number, grad?: Vec3): number {
  * @returns the smooth max value between floor and x
  */
 export function sFloor(x: number, floor: number, k: number, grad?: Vec3): number {
-    let ekx = Math.exp(k * x);
-    let ekfloor = Math.exp(k * floor);
+    const ekx = Math.exp(k * x);
+    const ekfloor = Math.exp(k * floor);
 
     if (grad) grad.scaleInPlace(ekx / (ekx + ekfloor));
 
@@ -112,8 +112,8 @@ export function sFloor(x: number, floor: number, k: number, grad?: Vec3): number
  * @returns the smooth absolute value of x
  */
 export function sAbs(x: number, k: number, grad?: Vec3): number {
-    let ekx = Math.exp(k * x);
-    let emkx = 1 / ekx;
+    const ekx = Math.exp(k * x);
+    const emkx = 1 / ekx;
 
     if (grad) grad.scaleInPlace((ekx - emkx) / (ekx + emkx));
 
@@ -128,9 +128,9 @@ export function sAbs(x: number, k: number, grad?: Vec3): number {
  * @param grad The gradient to alter
  */
 export function tanhSharpen(x: number, s: number, grad?: Vec3): number {
-    let sampleX = s * (x - 0.5);
-    let tanhX = Math.tanh(sampleX);
-    let tanhHalfS = Math.tanh(0.5 * s);
+    const sampleX = s * (x - 0.5);
+    const tanhX = Math.tanh(sampleX);
+    const tanhHalfS = Math.tanh(0.5 * s);
 
     if (grad) grad.scaleInPlace((0.5 * s * (1.0 - tanhX ** 2)) / tanhHalfS);
 
@@ -144,23 +144,23 @@ export function gcd(a: number, b: number): number {
 }
 
 export function rayIntersectSphere(rayOrigin: Vector3, rayDir: Vector3, spherePosition: Vector3, sphereRadius: number): [boolean, number, number] {
-    let relativeOrigin = rayOrigin.subtract(spherePosition); // rayOrigin in sphere space
+    const relativeOrigin = rayOrigin.subtract(spherePosition); // rayOrigin in sphere space
 
-    let a = 1.0;
-    let b = 2.0 * Vector3.Dot(relativeOrigin, rayDir);
-    let c = Vector3.Dot(relativeOrigin, relativeOrigin) - sphereRadius ** 2;
+    const a = 1.0;
+    const b = 2.0 * Vector3.Dot(relativeOrigin, rayDir);
+    const c = Vector3.Dot(relativeOrigin, relativeOrigin) - sphereRadius ** 2;
 
-    let d = b * b - 4.0 * a * c;
+    const d = b * b - 4.0 * a * c;
 
     if (d < 0.0) return [false, 0, 0]; // no intersection
 
-    let s = Math.sqrt(d);
+    const s = Math.sqrt(d);
 
-    let r0 = (-b - s) / (2.0 * a);
-    let r1 = (-b + s) / (2.0 * a);
+    const r0 = (-b - s) / (2.0 * a);
+    const r1 = (-b + s) / (2.0 * a);
 
-    let t0 = Math.max(Math.min(r0, r1), 0.0);
-    let t1 = Math.max(Math.max(r0, r1), 0.0);
+    const t0 = Math.max(Math.min(r0, r1), 0.0);
+    const t1 = Math.max(Math.max(r0, r1), 0.0);
 
     return [t1 > 0.0, t0, t1];
 }

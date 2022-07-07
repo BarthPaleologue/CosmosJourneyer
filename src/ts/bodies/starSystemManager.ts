@@ -20,7 +20,7 @@ export class StarSystemManager {
 
     stars: Star[] = [];
 
-    private clock: number = 0;
+    private clock = 0;
 
     constructor(scene: Scene, nbVertices = 64) {
         this.scene = scene;

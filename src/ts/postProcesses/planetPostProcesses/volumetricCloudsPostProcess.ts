@@ -13,11 +13,11 @@ export class VolumetricCloudsPostProcess extends PlanetPostProcess {
     settings: VolumetricCloudSettings;
 
     constructor(name: string, planet: AbstractPlanet, atmosphereRadius: number, sun: Star, scene: Scene) {
-        let settings: VolumetricCloudSettings = {
+        const settings: VolumetricCloudSettings = {
             atmosphereRadius: atmosphereRadius
         };
 
-        let uniforms: ShaderUniformData = {
+        const uniforms: ShaderUniformData = {
             atmosphereRadius: {
                 type: ShaderDataType.Float,
                 get: () => {
@@ -26,7 +26,7 @@ export class VolumetricCloudsPostProcess extends PlanetPostProcess {
             }
         };
 
-        let samplers: ShaderSamplerData = {};
+        const samplers: ShaderSamplerData = {};
 
         super(name, shaderName, uniforms, samplers, planet, sun, scene);
 

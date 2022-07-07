@@ -43,7 +43,7 @@ function FASTFLOOR(x: number): number {
  * Permutation table. This is just a random jumble of all numbers 0-255,
  * repeated twice to avoid wrapping the index at 255 for each lookup.
  */
-let perm = [
+const perm = [
     151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62,
     94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166, 77, 146, 158, 231, 83, 111,
     229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244, 102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196, 135, 130,
@@ -64,7 +64,7 @@ let perm = [
  * Gradient tables. These could be programmed the Ken Perlin way with
  * some clever bit-twiddling, but this is more clear, and not really slower.
  */
-let grad2lut = [
+const grad2lut = [
     [-1.0, -1.0],
     [1.0, 0.0],
     [-1.0, 0.0],
@@ -84,7 +84,7 @@ let grad2lut = [
  * to represent a small, isotropic set of directions.
  */
 
-let grad3lut = [
+const grad3lut = [
     [1.0, 0.0, 1.0],
     [0.0, 1.0, 1.0], // 12 cube edges
     [-1.0, 0.0, 1.0],
@@ -103,7 +103,7 @@ let grad3lut = [
     [0.0, -1.0, -1.0]
 ];
 
-let grad4lut = [
+const grad4lut = [
     [0.0, 1.0, 1.0, 1.0],
     [0.0, 1.0, 1.0, -1.0],
     [0.0, 1.0, -1.0, 1.0],
@@ -141,7 +141,7 @@ let grad4lut = [
 // A lookup table to traverse the simplex around a given point in 4D.
 // Details can be found where this table is used, in the 4D noise method.
 /* TODO: This should not be required, backport it from Bill's GLSL code! */
-let simplex = [
+const simplex = [
     [0, 1, 2, 3],
     [0, 1, 3, 2],
     [0, 0, 0, 0],
@@ -216,33 +216,33 @@ let simplex = [
  */
 
 function grad1(hash: number, gx: number): number {
-    let h = hash & 15;
+    const h = hash & 15;
     let res = 1.0 + (h & 7); // Gradient value is one of 1.0, 2.0, ..., 8.0
     if (h & 8) res = -res; // Make half of the gradients negative
     return res;
 }
 
 function grad2(hash: number): [number, number] {
-    let h = hash & 7;
-    let gx = grad2lut[h][0];
-    let gy = grad2lut[h][1];
+    const h = hash & 7;
+    const gx = grad2lut[h][0];
+    const gy = grad2lut[h][1];
     return [gx, gy];
 }
 
 function grad3(hash: number): [number, number, number] {
-    let h = hash & 15;
-    let gx = grad3lut[h][0];
-    let gy = grad3lut[h][1];
-    let gz = grad3lut[h][2];
+    const h = hash & 15;
+    const gx = grad3lut[h][0];
+    const gy = grad3lut[h][1];
+    const gz = grad3lut[h][2];
     return [gx, gy, gz];
 }
 
 function grad4(hash: number): [number, number, number, number] {
-    let h = hash & 31;
-    let gx = grad4lut[h][0];
-    let gy = grad4lut[h][1];
-    let gz = grad4lut[h][2];
-    let gw = grad4lut[h][3];
+    const h = hash & 31;
+    const gx = grad4lut[h][0];
+    const gy = grad4lut[h][1];
+    const gz = grad4lut[h][2];
+    const gw = grad4lut[h][3];
     return [gx, gy, gz, gw];
 }
 
@@ -251,18 +251,18 @@ function grad4(hash: number): [number, number, number, number] {
  * is also calculated.
  */
 export function sdnoise1(x: number): [number, number] {
-    let i0 = FASTFLOOR(x);
-    let i1 = i0 + 1;
-    let x0 = x - i0;
-    let x1 = x0 - 1.0;
+    const i0 = FASTFLOOR(x);
+    const i1 = i0 + 1;
+    const x0 = x - i0;
+    const x1 = x0 - 1.0;
 
-    let gx0: number = 0;
-    let gx1: number = 0;
+    let gx0 = 0;
+    let gx1 = 0;
     let n0, n1;
     let t1, t20, t40, t21, t41, x21;
 
-    let x20 = x0 * x0;
-    let t0 = 1.0 - x20;
+    const x20 = x0 * x0;
+    const t0 = 1.0 - x20;
     //  if(t0 < 0.0) t0 = 0.0; // Never happens for 1D: x0<=1 always
     t20 = t0 * t0;
     t40 = t20 * t20;
@@ -317,19 +317,19 @@ export function sdnoise2(x: number, y: number): number[] {
     let temp0, temp1, temp2, noise;
 
     /* Skew the input space to determine which simplex cell we're in */
-    let s = (x + y) * F2; /* Hairy factor for 2D */
-    let xs = x + s;
-    let ys = y + s;
+    const s = (x + y) * F2; /* Hairy factor for 2D */
+    const xs = x + s;
+    const ys = y + s;
     let ii,
         i = FASTFLOOR(xs);
     let jj,
         j = FASTFLOOR(ys);
 
-    let t = (i + j) * G2;
-    let X0 = i - t; /* Unskew the cell origin back to (x,y) space */
-    let Y0 = j - t;
-    let x0 = x - X0; /* The x,y distances from the cell origin */
-    let y0 = y - Y0;
+    const t = (i + j) * G2;
+    const X0 = i - t; /* Unskew the cell origin back to (x,y) space */
+    const Y0 = j - t;
+    const x0 = x - X0; /* The x,y distances from the cell origin */
+    const y0 = y - Y0;
 
     /* For the 2D case, the simplex shape is an equilateral triangle.
      * Determine which simplex we are in. */
@@ -436,10 +436,10 @@ export function sdnoise3(x: number, y: number, z: number): [number, LVector3] {
     let temp0, temp1, temp2, temp3;
 
     /* Skew the input space to determine which simplex cell we're in */
-    let s = (x + y + z) * F3; /* Very nice and simple skew factor for 3D */
-    let xs = x + s;
-    let ys = y + s;
-    let zs = z + s;
+    const s = (x + y + z) * F3; /* Very nice and simple skew factor for 3D */
+    const xs = x + s;
+    const ys = y + s;
+    const zs = z + s;
     let ii,
         i = FASTFLOOR(xs);
     let jj,
@@ -447,13 +447,13 @@ export function sdnoise3(x: number, y: number, z: number): [number, LVector3] {
     let kk,
         k = FASTFLOOR(zs);
 
-    let t = (i + j + k) * G3;
-    let X0 = i - t; /* Unskew the cell origin back to (x,y,z) space */
-    let Y0 = j - t;
-    let Z0 = k - t;
-    let x0 = x - X0; /* The x,y,z distances from the cell origin */
-    let y0 = y - Y0;
-    let z0 = z - Z0;
+    const t = (i + j + k) * G3;
+    const X0 = i - t; /* Unskew the cell origin back to (x,y,z) space */
+    const Y0 = j - t;
+    const Z0 = k - t;
+    const x0 = x - X0; /* The x,y,z distances from the cell origin */
+    const y0 = y - Y0;
+    const z0 = z - Z0;
 
     /* For the 3D case, the simplex shape is a slightly irregular tetrahedron.
      * Determine which simplex we are in. */
@@ -637,11 +637,11 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
     let temp0, temp1, temp2, temp3, temp4;
 
     // Skew the (x,y,z,w) space to determine which cell of 24 simplices we're in
-    let s = (x + y + z + w) * F4; // Factor for 4D skewing
-    let xs = x + s;
-    let ys = y + s;
-    let zs = z + s;
-    let ws = w + s;
+    const s = (x + y + z + w) * F4; // Factor for 4D skewing
+    const xs = x + s;
+    const ys = y + s;
+    const zs = z + s;
+    const ws = w + s;
     let ii,
         i = FASTFLOOR(xs);
     let jj,
@@ -651,16 +651,16 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
     let ll,
         l = FASTFLOOR(ws);
 
-    let t = (i + j + k + l) * G4; // Factor for 4D unskewing
-    let X0 = i - t; // Unskew the cell origin back to (x,y,z,w) space
-    let Y0 = j - t;
-    let Z0 = k - t;
-    let W0 = l - t;
+    const t = (i + j + k + l) * G4; // Factor for 4D unskewing
+    const X0 = i - t; // Unskew the cell origin back to (x,y,z,w) space
+    const Y0 = j - t;
+    const Z0 = k - t;
+    const W0 = l - t;
 
-    let x0 = x - X0; // The x,y,z,w distances from the cell origin
-    let y0 = y - Y0;
-    let z0 = z - Z0;
-    let w0 = w - W0;
+    const x0 = x - X0; // The x,y,z,w distances from the cell origin
+    const y0 = y - Y0;
+    const z0 = z - Z0;
+    const w0 = w - W0;
 
     // For the 4D case, the simplex is a 4D shape I won't even try to describe.
     // To find out which of the 24 possible simplices we're in, we need to
@@ -670,13 +670,13 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
     // First, six pair-wise comparisons are performed between each possible pair
     // of the four coordinates, and then the results are used to add up binary
     // bits for an integer index into a precomputed lookup table, simplex[].
-    let c1 = x0 > y0 ? 32 : 0;
-    let c2 = x0 > z0 ? 16 : 0;
-    let c3 = y0 > z0 ? 8 : 0;
-    let c4 = x0 > w0 ? 4 : 0;
-    let c5 = y0 > w0 ? 2 : 0;
-    let c6 = z0 > w0 ? 1 : 0;
-    let c = c1 | c2 | c3 | c4 | c5 | c6; // '|' is mostly faster than '+'
+    const c1 = x0 > y0 ? 32 : 0;
+    const c2 = x0 > z0 ? 16 : 0;
+    const c3 = y0 > z0 ? 8 : 0;
+    const c4 = x0 > w0 ? 4 : 0;
+    const c5 = y0 > w0 ? 2 : 0;
+    const c6 = z0 > w0 ? 1 : 0;
+    const c = c1 | c2 | c3 | c4 | c5 | c6; // '|' is mostly faster than '+'
 
     let i1, j1, k1, l1; // The integer offsets for the second simplex corner
     let i2, j2, k2, l2; // The integer offsets for the third simplex corner
@@ -853,7 +853,7 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
  * @param seed an offset along the 4th dimension
  */
 export function simplex401(vector: IVector3Like, seed: number, gradient?: LVector3): number {
-    let noiseValue = sdnoise4(vector.x, vector.y, vector.z, seed, gradient);
+    const noiseValue = sdnoise4(vector.x, vector.y, vector.z, seed, gradient);
 
     // [0,1] is half the length of [-1,1]
     if (gradient) gradient.divideInPlace(2);

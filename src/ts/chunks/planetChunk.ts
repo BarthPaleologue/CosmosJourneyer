@@ -13,7 +13,7 @@ export class PlanetChunk {
     private ready = false;
 
     constructor(path: number[], direction: Direction, chunkForge: ChunkForge, tree: ChunkTree, isFiner: boolean) {
-        let id = `D${direction}P${path.join("")}`;
+        const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;
 

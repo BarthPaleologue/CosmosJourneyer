@@ -9,7 +9,7 @@ export function ridgedNoiseLayer(frequency: number, nbOctaves: number, decay: nu
         let elevation = simplex411(coords, seed, gradient);
 
         // TODO: ne pas hardcoder
-        let sharpness = 15.0;
+        const sharpness = 15.0;
         elevation = 1.0 - sAbs(elevation, sharpness, gradient);
 
         gradient.divideInPlace(-1);

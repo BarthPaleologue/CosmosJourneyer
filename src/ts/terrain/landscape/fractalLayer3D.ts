@@ -6,10 +6,10 @@ export function fractalLayer3D(frequency: number, nbOctaves: number, decay: numb
     return function (coords: LVector3, seed: number, gradient: LVector3) {
         let noiseValue = 0.0;
         let totalAmplitude = 0.0;
-        let localGradient = LVector3.Zero();
-        let samplePoint = coords.scale(frequency);
+        const localGradient = LVector3.Zero();
+        const samplePoint = coords.scale(frequency);
         for (let i = 0; i < nbOctaves; i++) {
-            let localElevation = f(samplePoint, seed, localGradient);
+            const localElevation = f(samplePoint, seed, localGradient);
 
             localGradient.divideInPlace(decay ** i);
 
