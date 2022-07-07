@@ -1,74 +1,12 @@
 import { getQuaternionFromDirection } from "../utils/direction";
-import { simplexNoiseLayer } from "../terrain/landscape/simplexNoiseLayer";
 import { LVector3 } from "../utils/algebra";
-import { ridgedNoiseLayer } from "../terrain/landscape/ridgedNoiseLayer";
 import { BuildData, CollisionData, WorkerData } from "../chunks/workerDataInterfaces";
-import { TerrainSettings } from "../terrain/terrainSettings";
-import { elevationFunction } from "../terrain/landscape/elevationFunction";
 import { TaskType } from "../chunks/taskInterfaces";
-import { tanhSharpen } from "../utils/math";
+import { makeTerrainFunction, TerrainFunction } from "../terrain/makeTerrainFunction";
 
 let currentPlanetID = "";
 
-let bumpyLayer: elevationFunction;
-let continentsLayer: elevationFunction;
-let mountainsLayer: elevationFunction;
-
-let terrainSettings: TerrainSettings = {
-    continentsFragmentation: 0.5,
-    continentBaseHeight: 0,
-
-    maxBumpHeight: 0,
-    bumpsFrequency: 1,
-
-    maxMountainHeight: 0,
-    mountainsFrequency: 1,
-    mountainsMinValue: 0.5
-};
-
-function initLayers() {
-    // TODO: ne pas hardcoder
-    continentsLayer = simplexNoiseLayer(1, 6, 1.8, 2.1, 0.5, 1 - terrainSettings.continentsFragmentation);
-
-    bumpyLayer = simplexNoiseLayer(terrainSettings.bumpsFrequency, 3, 2, 2, 1.0, 0.2);
-
-    mountainsLayer = ridgedNoiseLayer(terrainSettings.mountainsFrequency, 6, 1.9, 2.0, 2, terrainSettings.mountainsMinValue);
-}
-
-initLayers();
-
-function terrainFunction(samplePoint: LVector3, seed: number, outPosition: LVector3, outGradient: LVector3): void {
-    let elevation = 0;
-
-    let continentGradient = LVector3.Zero();
-    let continentMask = continentsLayer(samplePoint, seed, continentGradient);
-
-    let continentElevation = continentMask * terrainSettings.continentBaseHeight;
-
-    elevation += continentElevation;
-    continentGradient.scaleInPlace(terrainSettings.continentBaseHeight);
-    outGradient.addInPlace(continentGradient);
-
-    let mountainGradient = LVector3.Zero();
-    let mountainElevation = mountainsLayer(samplePoint, seed, mountainGradient);
-
-    mountainElevation = tanhSharpen(mountainElevation, 3, mountainGradient);
-
-    elevation += continentMask * mountainElevation * terrainSettings.maxMountainHeight;
-    mountainGradient.scaleInPlace(terrainSettings.maxMountainHeight * continentMask);
-    outGradient.addInPlace(mountainGradient);
-
-    let bumpyGradient = LVector3.Zero();
-    let bumpyElevation = bumpyLayer(samplePoint, seed, bumpyGradient);
-
-    elevation += bumpyElevation * terrainSettings.maxBumpHeight;
-    bumpyGradient.scaleInPlace(terrainSettings.maxBumpHeight);
-    outGradient.addInPlace(bumpyGradient);
-
-    outPosition.addInPlace(samplePoint.scale(elevation));
-
-    outGradient.divideInPlace(terrainSettings.continentBaseHeight + terrainSettings.maxMountainHeight + terrainSettings.maxBumpHeight);
-}
+let terrainFunction: TerrainFunction;
 
 function buildChunkVertexData(data: BuildData): void {
     const planetDiameter = data.planetDiameter;
@@ -79,12 +17,10 @@ function buildChunkVertexData(data: BuildData): void {
 
     if (data.planetName != currentPlanetID) {
         currentPlanetID = data.planetName;
-
-        terrainSettings = data.terrainSettings;
-        initLayers();
+        terrainFunction = makeTerrainFunction(data.terrainSettings);
     }
 
-    const size = planetDiameter / 2 ** depth;
+    const chunkSize = planetDiameter / 2 ** depth;
     const planetRadius = planetDiameter / 2;
 
     const nbVerticesPerSide = data.nbVerticesPerSide;
@@ -93,17 +29,17 @@ function buildChunkVertexData(data: BuildData): void {
     const rotationQuaternion = getQuaternionFromDirection(direction);
 
     const verticesPositions = new Float32Array(nbVerticesPerSide * nbVerticesPerSide * 3);
-    let faces: number[][] = [];
+    const faces: number[][] = [];
 
     const normals = new Float32Array(verticesPositions.length);
 
     for (let x = 0; x < nbVerticesPerSide; x++) {
         for (let y = 0; y < nbVerticesPerSide; y++) {
             // on crée un plan dans le plan Oxy
-            let vertexPosition = new LVector3(x - nbSubdivisions / 2, y - nbSubdivisions / 2, 0);
+            const vertexPosition = new LVector3(x - nbSubdivisions / 2, y - nbSubdivisions / 2, 0);
 
             // on le met à la bonne taille
-            vertexPosition.scaleInPlace(size / nbSubdivisions);
+            vertexPosition.scaleInPlace(chunkSize / nbSubdivisions);
 
             // on le met au bon endroit de la face par défaut (Oxy devant)
             vertexPosition.addInPlace(chunkPosition);
@@ -114,22 +50,22 @@ function buildChunkVertexData(data: BuildData): void {
             // Théorie : https://math.stackexchange.com/questions/1071662/surface-normal-to-point-on-displaced-sphere
 
             // on l'arrondi pour en faire un chunk de sphère
-            let unitSphereCoords = vertexPosition.normalize();
+            const unitSphereCoords = vertexPosition.normalize();
 
             vertexPosition.setMagnitudeInPlace(planetRadius);
 
             // on applique la fonction de terrain
-            let vertexGradient = LVector3.Zero();
+            const vertexGradient = LVector3.Zero();
             terrainFunction(unitSphereCoords, seed, vertexPosition, vertexGradient);
 
-            let h = vertexGradient;
+            const h = vertexGradient;
             h.subtractInPlace(unitSphereCoords.scale(LVector3.Dot(vertexGradient, unitSphereCoords)));
 
-            let vertexNormal = unitSphereCoords.subtract(h);
+            const vertexNormal = unitSphereCoords.subtract(h);
             vertexNormal.normalizeInPlace();
 
-            // on le ramène à l'origine
-            let offset = chunkPosition.clone();
+            // on le ramène à l'origine //TODO: something could be optimized here
+            const offset = chunkPosition.clone();
             offset.setMagnitudeInPlace(planetRadius);
             vertexPosition.subtractInPlace(offset);
 
@@ -141,9 +77,9 @@ function buildChunkVertexData(data: BuildData): void {
             normals[(x * nbVerticesPerSide + y) * 3 + 1] = vertexNormal.y;
             normals[(x * nbVerticesPerSide + y) * 3 + 2] = vertexNormal.z;
 
-            if (x < nbVerticesPerSide - 1 && y < nbVerticesPerSide - 1) {
-                faces.push([x * nbVerticesPerSide + y, x * nbVerticesPerSide + y + 1, (x + 1) * nbVerticesPerSide + y + 1, (x + 1) * nbVerticesPerSide + y]);
-            }
+            if(x >= nbVerticesPerSide - 1 || y >= nbVerticesPerSide - 1) continue
+
+            faces.push([x * nbVerticesPerSide + y, x * nbVerticesPerSide + y + 1, (x + 1) * nbVerticesPerSide + y + 1, (x + 1) * nbVerticesPerSide + y]);
         }
     }
 
@@ -179,7 +115,7 @@ function sendHeightAtPoint(point: LVector3, seed: number): void {
 }
 
 self.onmessage = (e) => {
-    let data: WorkerData = e.data;
+    const data: WorkerData = e.data;
 
     switch (data.taskType) {
         case TaskType.Build:
@@ -199,9 +135,7 @@ self.onmessage = (e) => {
 
             if (data.planetName != currentPlanetID) {
                 currentPlanetID = data.planetName;
-
-                terrainSettings = data.terrainSettings;
-                initLayers();
+                terrainFunction = makeTerrainFunction(data.terrainSettings);
             }
 
             const seed = data.seed;

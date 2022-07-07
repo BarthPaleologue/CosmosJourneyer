@@ -102,6 +102,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
         const continentsFragmentation = clamp(normalRandom(0.5, 0.2, this.rng), 0, 1);
 
         this.terrainSettings = {
+            continentsFrequency: 1 * ratio,
             continentsFragmentation: continentsFragmentation,
 
             bumpsFrequency: 30,
