@@ -2,7 +2,7 @@ import { Mesh } from "@babylonjs/core";
 
 import { ChunkForge } from "./chunkForge";
 import { BuildTask, TaskType } from "./taskInterfaces";
-import { Direction } from "../utils/direction";
+import { Direction, getQuaternionFromDirection } from "../utils/direction";
 import { getChunkPlaneSpacePositionFromPath } from "../utils/chunkUtils";
 import { ChunkTree } from "./chunkTree";
 
@@ -31,7 +31,7 @@ export class PlanetChunk {
         // offseting from planet center to position on the side (default side then rotation for all sides)
         this.mesh.position.z -= tree.planet.getRadius();
 
-        let buildTask: BuildTask = {
+        const buildTask: BuildTask = {
             type: TaskType.Build,
             planet: tree.planet,
             position: this.mesh.position.clone(),
@@ -48,6 +48,7 @@ export class PlanetChunk {
         // note : on sphérise après car le worker script calcule les positions à partir du cube
         this.mesh.position.normalize();
         this.mesh.position.scaleInPlace(tree.planet.getRadius());
+        this.mesh.position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
     }
 
     public isReady() {

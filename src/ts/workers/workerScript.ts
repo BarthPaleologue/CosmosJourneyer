@@ -12,7 +12,7 @@ function buildChunkVertexData(data: BuildData): void {
     const planetDiameter = data.planetDiameter;
     const depth = data.depth;
     const direction = data.direction;
-    const chunkPosition = new LVector3(data.position[0], data.position[1], data.position[2]);
+    const chunkFrontFacePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
     const seed = data.seed;
 
     if (data.planetName != currentPlanetID) {
@@ -33,6 +33,11 @@ function buildChunkVertexData(data: BuildData): void {
 
     const normals = new Float32Array(verticesPositions.length);
 
+    // the offset used to bring back the vertices close to the origin (the position of the chunk on the sphere)
+    const offset = chunkFrontFacePosition.clone();
+    offset.applyRotationQuaternionInPlace(rotationQuaternion);
+    offset.setMagnitudeInPlace(planetRadius);
+
     for (let x = 0; x < nbVerticesPerSide; x++) {
         for (let y = 0; y < nbVerticesPerSide; y++) {
             // on crée un plan dans le plan Oxy
@@ -42,7 +47,7 @@ function buildChunkVertexData(data: BuildData): void {
             vertexPosition.scaleInPlace(chunkSize / nbSubdivisions);
 
             // on le met au bon endroit de la face par défaut (Oxy devant)
-            vertexPosition.addInPlace(chunkPosition);
+            vertexPosition.addInPlace(chunkFrontFacePosition);
 
             // on le met sur la bonne face
             vertexPosition.applyRotationQuaternionInPlace(rotationQuaternion);
@@ -64,9 +69,7 @@ function buildChunkVertexData(data: BuildData): void {
             const vertexNormal = unitSphereCoords.subtract(h);
             vertexNormal.normalizeInPlace();
 
-            // on le ramène à l'origine //TODO: something could be optimized here
-            const offset = chunkPosition.clone();
-            offset.setMagnitudeInPlace(planetRadius);
+            // on le ramène à l'origine
             vertexPosition.subtractInPlace(offset);
 
             verticesPositions[(x * nbVerticesPerSide + y) * 3] = vertexPosition.x;
