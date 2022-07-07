@@ -17,4 +17,4 @@ export interface BuildData extends WorkerData {
     direction: Direction;
 }
 
-export type CollisionData = WorkerData
+export type CollisionData = WorkerData;

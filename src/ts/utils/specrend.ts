@@ -133,43 +133,39 @@ function xy_to_upvp(xc: number, yc: number): number[] {
 */
 
 function xyz_to_rgb(cs: ColourSystem, xc: number, yc: number, zc: number): number[] {
-    let [xr, yr, zr, xg, yg, zg, xb, yb, zb]: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    let [xw, yw, zw]: number[] = [0, 0, 0];
-    let [rx, ry, rz, gx, gy, gz, bx, by, bz]: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    let [rw, gw, bw]: number[] = [0, 0, 0];
 
-    xr = cs.xRed;
-    yr = cs.yRed;
-    zr = 1 - (xr + yr);
-    xg = cs.xGreen;
-    yg = cs.yGreen;
-    zg = 1 - (xg + yg);
-    xb = cs.xBlue;
-    yb = cs.yBlue;
-    zb = 1 - (xb + yb);
+    const xr = cs.xRed;
+    const yr = cs.yRed;
+    const zr = 1 - (xr + yr);
+    const xg = cs.xGreen;
+    const yg = cs.yGreen;
+    const zg = 1 - (xg + yg);
+    const xb = cs.xBlue;
+    const yb = cs.yBlue;
+    const zb = 1 - (xb + yb);
 
-    xw = cs.xWhite;
-    yw = cs.yWhite;
-    zw = 1 - (xw + yw);
+    const xw = cs.xWhite;
+    const yw = cs.yWhite;
+    const zw = 1 - (xw + yw);
 
     /* xyz -> rgb matrix, before scaling to white. */
 
-    rx = yg * zb - yb * zg;
-    ry = xb * zg - xg * zb;
-    rz = xg * yb - xb * yg;
-    gx = yb * zr - yr * zb;
-    gy = xr * zb - xb * zr;
-    gz = xb * yr - xr * yb;
-    bx = yr * zg - yg * zr;
-    by = xg * zr - xr * zg;
-    bz = xr * yg - xg * yr;
+    let rx = yg * zb - yb * zg;
+    let ry = xb * zg - xg * zb;
+    let rz = xg * yb - xb * yg;
+    let gx = yb * zr - yr * zb;
+    let gy = xr * zb - xb * zr;
+    let gz = xb * yr - xr * yb;
+    let bx = yr * zg - yg * zr;
+    let by = xg * zr - xr * zg;
+    let bz = xr * yg - xg * yr;
 
     /* White scaling factors.
        Dividing by yw scales the white luminance to unity, as conventional. */
 
-    rw = (rx * xw + ry * yw + rz * zw) / yw;
-    gw = (gx * xw + gy * yw + gz * zw) / yw;
-    bw = (bx * xw + by * yw + bz * zw) / yw;
+    const rw = (rx * xw + ry * yw + rz * zw) / yw;
+    const gw = (gx * xw + gy * yw + gz * zw) / yw;
+    const bw = (bx * xw + by * yw + bz * zw) / yw;
 
     /* xyz -> rgb matrix, correctly scaled to white. */
 
@@ -248,11 +244,7 @@ function constrain_rgb(r: number, g: number, b: number): number[] {
 */
 
 function gamma_correct(cs: ColourSystem, c: number): number {
-    let gamma: number;
-
-    gamma = cs.gamma;
-
-    if (gamma == GAMMA_REC709) {
+    if (cs.gamma == GAMMA_REC709) {
         /* Rec. 709 gamma correction. */
         const cc = 0.018;
 
@@ -263,7 +255,7 @@ function gamma_correct(cs: ColourSystem, c: number): number {
         }
     } else {
         /* Nonlinear colour = (Linear colour)^(1/gamma) */
-        c = Math.pow(c, 1.0 / gamma);
+        c = Math.pow(c, 1.0 / cs.gamma);
     }
 
     return c;
@@ -307,8 +299,7 @@ function spectrum_to_xyz(f: (wavelength: number) => number): number[] {
     let lambda,
         X = 0,
         Y = 0,
-        Z = 0,
-        XYZ;
+        Z = 0;
 
     /* CIE colour matching functions xBar, yBar, and zBar for
        wavelengths from 380 through 780 nanometers, every 5
@@ -410,14 +401,12 @@ function spectrum_to_xyz(f: (wavelength: number) => number): number[] {
     ];
 
     for (i = 0, lambda = 380; lambda < 780.1; i++, lambda += 5) {
-        let Me;
-
-        Me = f(lambda);
+        const Me = f(lambda);
         X += Me * cie_colour_match[i][0];
         Y += Me * cie_colour_match[i][1];
         Z += Me * cie_colour_match[i][2];
     }
-    XYZ = X + Y + Z;
+    const XYZ = X + Y + Z;
 
     return [X / XYZ, Y / XYZ, Z / XYZ];
 }
@@ -482,13 +471,11 @@ export function demonstrate() {
 import { Vector3 } from "@babylonjs/core";
 
 export function getRgbFromTemperature(temperature: number): Vector3 {
-    let [x, y, z]: number[] = [0, 0, 0];
-    let [r, g, b]: number[] = [0, 0, 0];
     const cs = SMPTEsystem;
 
     bbTemp = temperature;
-    [x, y, z] = spectrum_to_xyz(bb_spectrum);
-    [r, g, b] = xyz_to_rgb(cs, x, y, z);
+    const [x, y, z] = spectrum_to_xyz(bb_spectrum);
+    let [r, g, b] = xyz_to_rgb(cs, x, y, z);
     [r, g, b] = constrain_rgb(r, g, b);
     [r, g, b] = norm_rgb(r, g, b);
     return new Vector3(r, g, b);

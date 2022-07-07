@@ -122,7 +122,7 @@ self.onmessage = (e) => {
 
     switch (data.taskType) {
         case TaskType.Build:
-            //let clock = Date.now();
+            //const clock = Date.now();
             buildChunkVertexData(e.data as BuildData);
 
             //console.log("Time for creation : " + (Date.now() - clock));

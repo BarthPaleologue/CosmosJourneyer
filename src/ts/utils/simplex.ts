@@ -215,7 +215,7 @@ const simplex = [
  * and gradients-dot-residualvectors in 2D to 4D.
  */
 
-function grad1(hash: number, gx: number): number {
+function grad1(hash: number): number {
     const h = hash & 15;
     let res = 1.0 + (h & 7); // Gradient value is one of 1.0, 2.0, ..., 8.0
     if (h & 8) res = -res; // Make half of the gradients negative
@@ -256,26 +256,21 @@ export function sdnoise1(x: number): [number, number] {
     const x0 = x - i0;
     const x1 = x0 - 1.0;
 
-    let gx0 = 0;
-    let gx1 = 0;
-    let n0, n1;
-    let t1, t20, t40, t21, t41, x21;
-
     const x20 = x0 * x0;
     const t0 = 1.0 - x20;
     //  if(t0 < 0.0) t0 = 0.0; // Never happens for 1D: x0<=1 always
-    t20 = t0 * t0;
-    t40 = t20 * t20;
-    gx0 = grad1(perm[i0 & 0xff], gx0);
-    n0 = t40 * gx0 * x0;
+    const t20 = t0 * t0;
+    const t40 = t20 * t20;
+    const gx0 = grad1(perm[i0 & 0xff]);
+    const n0 = t40 * gx0 * x0;
 
-    x21 = x1 * x1;
-    t1 = 1.0 - x21;
+    const x21 = x1 * x1;
+    const t1 = 1.0 - x21;
     //  if(t1 < 0.0) t1 = 0.0; // Never happens for 1D: |x1|<=1 always
-    t21 = t1 * t1;
-    t41 = t21 * t21;
-    gx1 = grad1(perm[i1 & 0xff], gx1);
-    n1 = t41 * gx1 * x1;
+    const t21 = t1 * t1;
+    const t41 = t21 * t21;
+    const gx1 = grad1(perm[i1 & 0xff]);
+    const n1 = t41 * gx1 * x1;
 
     /* Compute derivative, if requested by supplying non-null pointer
      * for the last argument
@@ -284,9 +279,7 @@ export function sdnoise1(x: number): [number, number] {
      *  *dnoise_dx += -8.0f * t21 * t1 * x1 * (gx1 * x1) + t41 * gx1;
      */
 
-    let dnoise_dx = 0;
-
-    dnoise_dx = t20 * t0 * gx0 * x20;
+    let dnoise_dx = t20 * t0 * gx0 * x20;
     dnoise_dx += t21 * t1 * gx1 * x21;
     dnoise_dx *= -8.0;
     dnoise_dx += t40 * gx0 + t41 * gx1;
@@ -312,18 +305,16 @@ const G2 = 0.211324865;
 export function sdnoise2(x: number, y: number): number[] {
     let n0, n1, n2; /* Noise contributions from the three simplex corners */
     let gx0, gy0, gx1, gy1, gx2, gy2; /* Gradients at simplex corners */
-    let t0, t1, t2, x1, x2, y1, y2;
+    let t0, t1, t2;
     let t20, t40, t21, t41, t22, t42;
-    let temp0, temp1, temp2, noise;
 
     /* Skew the input space to determine which simplex cell we're in */
     const s = (x + y) * F2; /* Hairy factor for 2D */
     const xs = x + s;
     const ys = y + s;
-    let ii,
-        i = FASTFLOOR(xs);
-    let jj,
-        j = FASTFLOOR(ys);
+
+    const i = FASTFLOOR(xs);
+    const j = FASTFLOOR(ys);
 
     const t = (i + j) * G2;
     const X0 = i - t; /* Unskew the cell origin back to (x,y) space */
@@ -345,14 +336,14 @@ export function sdnoise2(x: number, y: number): number[] {
     /* A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
      * a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
      * c = (3-sqrt(3))/6   */
-    x1 = x0 - i1 + G2; /* Offsets for middle corner in (x,y) unskewed coords */
-    y1 = y0 - j1 + G2;
-    x2 = x0 - 1.0 + 2.0 * G2; /* Offsets for last corner in (x,y) unskewed coords */
-    y2 = y0 - 1.0 + 2.0 * G2;
+    const x1 = x0 - i1 + G2; /* Offsets for middle corner in (x,y) unskewed coords */
+    const y1 = y0 - j1 + G2;
+    const x2 = x0 - 1.0 + 2.0 * G2; /* Offsets for last corner in (x,y) unskewed coords */
+    const y2 = y0 - 1.0 + 2.0 * G2;
 
     /* Wrap the integer indices at 256, to avoid indexing perm[] out of bounds */
-    ii = i % 256;
-    jj = j % 256;
+    const ii = i % 256;
+    const jj = j % 256;
 
     /* Calculate the contribution from the three corners */
     t0 = 0.5 - x0 * x0 - y0 * y0;
@@ -384,7 +375,7 @@ export function sdnoise2(x: number, y: number): number[] {
 
     /* Add contributions from each corner to get the final noise value.
      * The result is scaled to return values in the interval [-1,1]. */
-    noise = 40.0 * (n0 + n1 + n2);
+    const noise = 40.0 * (n0 + n1 + n2);
 
     /* Compute derivative, if requested by supplying non-null pointers
      * for the last two arguments */
@@ -397,13 +388,13 @@ export function sdnoise2(x: number, y: number): number[] {
      *    *dnoise_dx += -8.0f * t22 * t2 * x2 * ( gx2 * x2 + gy2 * y2 ) + t42 * gx2;
      *    *dnoise_dy += -8.0f * t22 * t2 * y2 * ( gx2 * x2 + gy2 * y2 ) + t42 * gy2;
      */
-    temp0 = t20 * t0 * (gx0 * x0 + gy0 * y0);
+    const temp0 = t20 * t0 * (gx0 * x0 + gy0 * y0);
     let dnoise_dx = temp0 * x0;
     let dnoise_dy = temp0 * y0;
-    temp1 = t21 * t1 * (gx1 * x1 + gy1 * y1);
+    const temp1 = t21 * t1 * (gx1 * x1 + gy1 * y1);
     dnoise_dx += temp1 * x1;
     dnoise_dy += temp1 * y1;
-    temp2 = t22 * t2 * (gx2 * x2 + gy2 * y2);
+    const temp2 = t22 * t2 * (gx2 * x2 + gy2 * y2);
     dnoise_dx += temp2 * x2;
     dnoise_dy += temp2 * y2;
     dnoise_dx *= -8.0;
@@ -428,24 +419,19 @@ const G3 = 0.166666667;
  */
 export function sdnoise3(x: number, y: number, z: number): [number, LVector3] {
     let n0, n1, n2, n3; /* Noise contributions from the four simplex corners */
-    let noise; /* Return value */
     let gx0, gy0, gz0, gx1, gy1, gz1; /* Gradients at simplex corners */
     let gx2, gy2, gz2, gx3, gy3, gz3;
-    let x1, y1, z1, x2, y2, z2, x3, y3, z3;
     let t0, t1, t2, t3, t20, t40, t21, t41, t22, t42, t23, t43;
-    let temp0, temp1, temp2, temp3;
 
     /* Skew the input space to determine which simplex cell we're in */
     const s = (x + y + z) * F3; /* Very nice and simple skew factor for 3D */
     const xs = x + s;
     const ys = y + s;
     const zs = z + s;
-    let ii,
-        i = FASTFLOOR(xs);
-    let jj,
-        j = FASTFLOOR(ys);
-    let kk,
-        k = FASTFLOOR(zs);
+
+    const i = FASTFLOOR(xs);
+    const j = FASTFLOOR(ys);
+    const k = FASTFLOOR(zs);
 
     const t = (i + j + k) * G3;
     const X0 = i - t; /* Unskew the cell origin back to (x,y,z) space */
@@ -515,20 +501,20 @@ export function sdnoise3(x: number, y: number, z: number): [number, LVector3] {
      * a step of (0,0,1) in (i,j,k) means a step of (-c,-c,1-c) in (x,y,z), where
      * c = 1/6.   */
 
-    x1 = x0 - i1 + G3; /* Offsets for second corner in (x,y,z) coords */
-    y1 = y0 - j1 + G3;
-    z1 = z0 - k1 + G3;
-    x2 = x0 - i2 + 2.0 * G3; /* Offsets for third corner in (x,y,z) coords */
-    y2 = y0 - j2 + 2.0 * G3;
-    z2 = z0 - k2 + 2.0 * G3;
-    x3 = x0 - 1.0 + 3.0 * G3; /* Offsets for last corner in (x,y,z) coords */
-    y3 = y0 - 1.0 + 3.0 * G3;
-    z3 = z0 - 1.0 + 3.0 * G3;
+    const x1 = x0 - i1 + G3; /* Offsets for second corner in (x,y,z) coords */
+    const y1 = y0 - j1 + G3;
+    const z1 = z0 - k1 + G3;
+    const x2 = x0 - i2 + 2.0 * G3; /* Offsets for third corner in (x,y,z) coords */
+    const y2 = y0 - j2 + 2.0 * G3;
+    const z2 = z0 - k2 + 2.0 * G3;
+    const x3 = x0 - 1.0 + 3.0 * G3; /* Offsets for last corner in (x,y,z) coords */
+    const y3 = y0 - 1.0 + 3.0 * G3;
+    const z3 = z0 - 1.0 + 3.0 * G3;
 
     /* Wrap the integer indices at 256, to avoid indexing perm[] out of bounds */
-    ii = i % 256;
-    jj = j % 256;
-    kk = k % 256;
+    const ii = i % 256;
+    const jj = j % 256;
+    const kk = k % 256;
 
     /* Calculate the contribution from the four corners */
     t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;
@@ -569,7 +555,7 @@ export function sdnoise3(x: number, y: number, z: number): [number, LVector3] {
 
     /*  Add contributions from each corner to get the final noise value.
      * The result is scaled to return values in the range [-1,1] */
-    noise = 28.0 * (n0 + n1 + n2 + n3);
+    const noise = 28.0 * (n0 + n1 + n2 + n3);
 
     /* Compute derivative, if requested by supplying non-null pointers
      * for the last three arguments */
@@ -588,19 +574,19 @@ export function sdnoise3(x: number, y: number, z: number): [number, LVector3] {
      *    *dnoise_dy += -8.0f * t23 * t3 * y3 * dot(gx3, gy3, gz3, x3, y3, z3) + t43 * gy3;
      *    *dnoise_dz += -8.0f * t23 * t3 * z3 * dot(gx3, gy3, gz3, x3, y3, z3) + t43 * gz3;
      */
-    temp0 = t20 * t0 * (gx0 * x0 + gy0 * y0 + gz0 * z0);
+    const temp0 = t20 * t0 * (gx0 * x0 + gy0 * y0 + gz0 * z0);
     let dnoise_dx = temp0 * x0;
     let dnoise_dy = temp0 * y0;
     let dnoise_dz = temp0 * z0;
-    temp1 = t21 * t1 * (gx1 * x1 + gy1 * y1 + gz1 * z1);
+    const temp1 = t21 * t1 * (gx1 * x1 + gy1 * y1 + gz1 * z1);
     dnoise_dx += temp1 * x1;
     dnoise_dy += temp1 * y1;
     dnoise_dz += temp1 * z1;
-    temp2 = t22 * t2 * (gx2 * x2 + gy2 * y2 + gz2 * z2);
+    const temp2 = t22 * t2 * (gx2 * x2 + gy2 * y2 + gz2 * z2);
     dnoise_dx += temp2 * x2;
     dnoise_dy += temp2 * y2;
     dnoise_dz += temp2 * z2;
-    temp3 = t23 * t3 * (gx3 * x3 + gy3 * y3 + gz3 * z3);
+    const temp3 = t23 * t3 * (gx3 * x3 + gy3 * y3 + gz3 * z3);
     dnoise_dx += temp3 * x3;
     dnoise_dy += temp3 * y3;
     dnoise_dz += temp3 * z3;
@@ -627,14 +613,11 @@ const G4 = 0.138196601; // G4 = (5.0-Math.sqrt(5.0))/20.0
  */
 export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: IVector3Like): number {
     let n0, n1, n2, n3, n4; // Noise contributions from the five corners
-    let noise; // Return value
     let gx0, gy0, gz0, gw0, gx1, gy1, gz1, gw1; /* Gradients at simplex corners */
     let gx2, gy2, gz2, gw2, gx3, gy3, gz3, gw3, gx4, gy4, gz4, gw4;
     let t20, t21, t22, t23, t24;
     let t40, t41, t42, t43, t44;
-    let x1, y1, z1, w1, x2, y2, z2, w2, x3, y3, z3, w3, x4, y4, z4, w4;
     let t0, t1, t2, t3, t4;
-    let temp0, temp1, temp2, temp3, temp4;
 
     // Skew the (x,y,z,w) space to determine which cell of 24 simplices we're in
     const s = (x + y + z + w) * F4; // Factor for 4D skewing
@@ -642,14 +625,11 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
     const ys = y + s;
     const zs = z + s;
     const ws = w + s;
-    let ii,
-        i = FASTFLOOR(xs);
-    let jj,
-        j = FASTFLOOR(ys);
-    let kk,
-        k = FASTFLOOR(zs);
-    let ll,
-        l = FASTFLOOR(ws);
+
+    const i = FASTFLOOR(xs);
+    const j = FASTFLOOR(ys);
+    const k = FASTFLOOR(zs);
+    const l = FASTFLOOR(ws);
 
     const t = (i + j + k + l) * G4; // Factor for 4D unskewing
     const X0 = i - t; // Unskew the cell origin back to (x,y,z,w) space
@@ -678,53 +658,49 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
     const c6 = z0 > w0 ? 1 : 0;
     const c = c1 | c2 | c3 | c4 | c5 | c6; // '|' is mostly faster than '+'
 
-    let i1, j1, k1, l1; // The integer offsets for the second simplex corner
-    let i2, j2, k2, l2; // The integer offsets for the third simplex corner
-    let i3, j3, k3, l3; // The integer offsets for the fourth simplex corner
-
     // simplex[c] is a 4-vector with the numbers 0, 1, 2 and 3 in some order.
     // Many values of c will never occur, since e.g. x>y>z>w makes x<z, y<w and x<w
     // impossible. Only the 24 indices which have non-zero entries make any sense.
     // We use a thresholding to set the coordinates in turn from the largest magnitude.
     // The number 3 in the "simplex" array is at the position of the largest coordinate.
-    i1 = simplex[c][0] >= 3 ? 1 : 0;
-    j1 = simplex[c][1] >= 3 ? 1 : 0;
-    k1 = simplex[c][2] >= 3 ? 1 : 0;
-    l1 = simplex[c][3] >= 3 ? 1 : 0;
+    const i1 = simplex[c][0] >= 3 ? 1 : 0;
+    const j1 = simplex[c][1] >= 3 ? 1 : 0;
+    const k1 = simplex[c][2] >= 3 ? 1 : 0;
+    const l1 = simplex[c][3] >= 3 ? 1 : 0;
     // The number 2 in the "simplex" array is at the second largest coordinate.
-    i2 = simplex[c][0] >= 2 ? 1 : 0;
-    j2 = simplex[c][1] >= 2 ? 1 : 0;
-    k2 = simplex[c][2] >= 2 ? 1 : 0;
-    l2 = simplex[c][3] >= 2 ? 1 : 0;
+    const i2 = simplex[c][0] >= 2 ? 1 : 0;
+    const j2 = simplex[c][1] >= 2 ? 1 : 0;
+    const k2 = simplex[c][2] >= 2 ? 1 : 0;
+    const l2 = simplex[c][3] >= 2 ? 1 : 0;
     // The number 1 in the "simplex" array is at the second smallest coordinate.
-    i3 = simplex[c][0] >= 1 ? 1 : 0;
-    j3 = simplex[c][1] >= 1 ? 1 : 0;
-    k3 = simplex[c][2] >= 1 ? 1 : 0;
-    l3 = simplex[c][3] >= 1 ? 1 : 0;
+    const i3 = simplex[c][0] >= 1 ? 1 : 0;
+    const j3 = simplex[c][1] >= 1 ? 1 : 0;
+    const k3 = simplex[c][2] >= 1 ? 1 : 0;
+    const l3 = simplex[c][3] >= 1 ? 1 : 0;
     // The fifth corner has all coordinate offsets = 1, so no need to look that up.
 
-    x1 = x0 - i1 + G4; // Offsets for second corner in (x,y,z,w) coords
-    y1 = y0 - j1 + G4;
-    z1 = z0 - k1 + G4;
-    w1 = w0 - l1 + G4;
-    x2 = x0 - i2 + 2.0 * G4; // Offsets for third corner in (x,y,z,w) coords
-    y2 = y0 - j2 + 2.0 * G4;
-    z2 = z0 - k2 + 2.0 * G4;
-    w2 = w0 - l2 + 2.0 * G4;
-    x3 = x0 - i3 + 3.0 * G4; // Offsets for fourth corner in (x,y,z,w) coords
-    y3 = y0 - j3 + 3.0 * G4;
-    z3 = z0 - k3 + 3.0 * G4;
-    w3 = w0 - l3 + 3.0 * G4;
-    x4 = x0 - 1.0 + 4.0 * G4; // Offsets for last corner in (x,y,z,w) coords
-    y4 = y0 - 1.0 + 4.0 * G4;
-    z4 = z0 - 1.0 + 4.0 * G4;
-    w4 = w0 - 1.0 + 4.0 * G4;
+    const x1 = x0 - i1 + G4; // Offsets for second corner in (x,y,z,w) coords
+    const y1 = y0 - j1 + G4;
+    const z1 = z0 - k1 + G4;
+    const w1 = w0 - l1 + G4;
+    const x2 = x0 - i2 + 2.0 * G4; // Offsets for third corner in (x,y,z,w) coords
+    const y2 = y0 - j2 + 2.0 * G4;
+    const z2 = z0 - k2 + 2.0 * G4;
+    const w2 = w0 - l2 + 2.0 * G4;
+    const x3 = x0 - i3 + 3.0 * G4; // Offsets for fourth corner in (x,y,z,w) coords
+    const y3 = y0 - j3 + 3.0 * G4;
+    const z3 = z0 - k3 + 3.0 * G4;
+    const w3 = w0 - l3 + 3.0 * G4;
+    const x4 = x0 - 1.0 + 4.0 * G4; // Offsets for last corner in (x,y,z,w) coords
+    const y4 = y0 - 1.0 + 4.0 * G4;
+    const z4 = z0 - 1.0 + 4.0 * G4;
+    const w4 = w0 - 1.0 + 4.0 * G4;
 
     // Wrap the integer indices at 256, to avoid indexing perm[] out of bounds
-    ii = i & 0xff;
-    jj = j & 0xff;
-    kk = k & 0xff;
-    ll = l & 0xff;
+    const ii = i & 0xff;
+    const jj = j & 0xff;
+    const kk = k & 0xff;
+    const ll = l & 0xff;
 
     // Calculate the contribution from the five corners
     t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;
@@ -773,7 +749,7 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
     }
 
     // Sum up and scale the result to cover the range [-1,1]
-    noise = 27.0 * (n0 + n1 + n2 + n3 + n4); // TODO: The scale factor is preliminary!
+    const noise = 27.0 * (n0 + n1 + n2 + n3 + n4); // TODO: The scale factor is preliminary!
 
     /* Compute derivative, if requested by supplying non-null pointers
      * for the last four arguments */
@@ -800,39 +776,47 @@ export function sdnoise4(x: number, y: number, z: number, w: number, gradient?: 
          *    *dnoise_dz += -8.0f * t24 * t4 * z4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gz4;
          *    *dnoise_dw += -8.0f * t24 * t4 * w4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gw4;
          */
-        temp0 = t20 * t0 * (gx0 * x0 + gy0 * y0 + gz0 * z0 + gw0 * w0);
+        const temp0 = t20 * t0 * (gx0 * x0 + gy0 * y0 + gz0 * z0 + gw0 * w0);
+        const temp1 = t21 * t1 * (gx1 * x1 + gy1 * y1 + gz1 * z1 + gw1 * w1);
+        const temp2 = t22 * t2 * (gx2 * x2 + gy2 * y2 + gz2 * z2 + gw2 * w2);
+        const temp3 = t23 * t3 * (gx3 * x3 + gy3 * y3 + gz3 * z3 + gw3 * w3);
+        const temp4 = t24 * t4 * (gx4 * x4 + gy4 * y4 + gz4 * z4 + gw4 * w4);
+
         let dnoise_dx = temp0 * x0;
         let dnoise_dy = temp0 * y0;
         let dnoise_dz = temp0 * z0;
         let dnoise_dw = temp0 * w0;
-        temp1 = t21 * t1 * (gx1 * x1 + gy1 * y1 + gz1 * z1 + gw1 * w1);
+
         dnoise_dx += temp1 * x1;
         dnoise_dy += temp1 * y1;
         dnoise_dz += temp1 * z1;
         dnoise_dw += temp1 * w1;
-        temp2 = t22 * t2 * (gx2 * x2 + gy2 * y2 + gz2 * z2 + gw2 * w2);
+
         dnoise_dx += temp2 * x2;
         dnoise_dy += temp2 * y2;
         dnoise_dz += temp2 * z2;
         dnoise_dw += temp2 * w2;
-        temp3 = t23 * t3 * (gx3 * x3 + gy3 * y3 + gz3 * z3 + gw3 * w3);
+
         dnoise_dx += temp3 * x3;
         dnoise_dy += temp3 * y3;
         dnoise_dz += temp3 * z3;
         dnoise_dw += temp3 * w3;
-        temp4 = t24 * t4 * (gx4 * x4 + gy4 * y4 + gz4 * z4 + gw4 * w4);
+
         dnoise_dx += temp4 * x4;
         dnoise_dy += temp4 * y4;
         dnoise_dz += temp4 * z4;
         dnoise_dw += temp4 * w4;
+
         dnoise_dx *= -8.0;
         dnoise_dy *= -8.0;
         dnoise_dz *= -8.0;
         dnoise_dw *= -8.0;
+
         dnoise_dx += t40 * gx0 + t41 * gx1 + t42 * gx2 + t43 * gx3 + t44 * gx4;
         dnoise_dy += t40 * gy0 + t41 * gy1 + t42 * gy2 + t43 * gy3 + t44 * gy4;
         dnoise_dz += t40 * gz0 + t41 * gz1 + t42 * gz2 + t43 * gz3 + t44 * gz4;
         dnoise_dw += t40 * gw0 + t41 * gw1 + t42 * gw2 + t43 * gw3 + t44 * gw4;
+
         dnoise_dx *= 28.0; /* Scale derivative to match the noise scaling */
         dnoise_dy *= 28.0;
         dnoise_dz *= 28.0;
