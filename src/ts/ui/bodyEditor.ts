@@ -85,7 +85,7 @@ export class BodyEditor {
         this.visibility = visibility;
         switch (this.visibility) {
             case EditorVisibility.HIDDEN:
-                hide("navBar");
+                document.getElementById("navBar")!.style.display = "none";
                 hide("editorPanelContainer");
                 hide("toolbar");
                 this.currentPanel = null;
