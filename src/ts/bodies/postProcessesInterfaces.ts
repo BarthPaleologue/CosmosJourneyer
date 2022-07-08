@@ -19,5 +19,5 @@ export interface PlanetPostProcesses extends BodyPostProcesses {
 }
 
 export interface StarPostProcesses extends BodyPostProcesses {
-    volumetricLight: VolumetricLightScatteringPostProcess | null;
+    volumetricLight: VolumetricLightScatteringPostProcess;
 }

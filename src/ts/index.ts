@@ -59,7 +59,7 @@ const flare00 = new LensFlare(
 
 const planet = new TelluricPlanet("Hécate", starSystem, -2.994, [sun]);
 
-planet.physicalProperties.rotationPeriod /= 50;
+planet.physicalProperties.rotationPeriod /= 20;
 
 planet.orbitalProperties = {
     period: 60 * 60 * 24 * 365.25,
@@ -70,17 +70,10 @@ planet.orbitalProperties = {
 
 const moon = new TelluricPlanet("Manaleth", starSystem, 2, [planet]);
 
-moon.postProcesses.ocean?.dispose();
-starSystem.spaceRenderingPipeline.oceans.splice(starSystem.spaceRenderingPipeline.oceans.indexOf(moon.postProcesses.ocean!), 1);
-
-moon.postProcesses.clouds?.dispose();
-starSystem.spaceRenderingPipeline.clouds.splice(starSystem.spaceRenderingPipeline.clouds.indexOf(moon.postProcesses.clouds!), 1);
-
 moon.physicalProperties.mass = 2;
 moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moon.physicalProperties.minTemperature = -180;
 moon.physicalProperties.maxTemperature = 200;
-moon.physicalProperties.pressure = 0;
 moon.physicalProperties.waterAmount = 0.5;
 
 moon.orbitalProperties = {
@@ -104,9 +97,11 @@ const ares = new TelluricPlanet("Ares", starSystem, 432, [sun]);
 
 ares.postProcesses.ocean?.dispose();
 starSystem.spaceRenderingPipeline.oceans.splice(starSystem.spaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);
+starSystem.surfaceRenderingPipeline.oceans.splice(starSystem.surfaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);
 
 ares.postProcesses.clouds?.dispose();
 starSystem.spaceRenderingPipeline.clouds.splice(starSystem.spaceRenderingPipeline.clouds.indexOf(ares.postProcesses.clouds!), 1);
+starSystem.surfaceRenderingPipeline.clouds.splice(starSystem.surfaceRenderingPipeline.clouds.indexOf(ares.postProcesses.clouds!), 1);
 
 ares.physicalProperties.mass = 7;
 ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;

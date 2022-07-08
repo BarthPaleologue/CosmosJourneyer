@@ -96,6 +96,8 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
 
         this.settings = settings;
 
-        starSystem.spaceRenderingPipeline.atmospheres.push(this);
+        for(const pipeline of starSystem.pipelines) {
+            pipeline.atmospheres.push(this);
+        }
     }
 }

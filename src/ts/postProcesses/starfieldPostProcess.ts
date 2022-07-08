@@ -37,7 +37,9 @@ export class StarfieldPostProcess extends SpacePostProcess {
 
         this.settings = settings;
 
-        starSystem.spaceRenderingPipeline.starfields.push(this);
+        for(const pipeline of starSystem.pipelines) {
+            pipeline.starfields.push(this);
+        }
     }
 
     public setStar(star: Star) {

@@ -4,7 +4,10 @@ import { ChunkForge } from "../chunks/chunkForge";
 import { PlayerController } from "../player/playerController";
 import { AbstractBody } from "./abstractBody";
 import { Star } from "./stars/star";
-import { SpaceRenderingPipeline } from "../postProcesses/spaceRenderingPipeline";
+import { SpaceRenderingPipeline } from "../postProcesses/pipelines/spaceRenderingPipeline";
+import { SurfaceRenderingPipeline } from "../postProcesses/pipelines/surfaceRenderingPipeline";
+import { PipelineTypes } from "../postProcesses/pipelines/pipelineTypes";
+import { AbstractRenderingPipeline } from "../postProcesses/pipelines/abstractRenderingPipeline";
 
 export class StarSystemManager {
     readonly scene: Scene;
@@ -13,6 +16,9 @@ export class StarSystemManager {
     private readonly bodies: AbstractBody[] = [];
 
     readonly spaceRenderingPipeline: SpaceRenderingPipeline;
+    readonly surfaceRenderingPipeline: SurfaceRenderingPipeline;
+
+    readonly pipelines: AbstractRenderingPipeline[];
 
     stars: Star[] = [];
 
@@ -22,6 +28,9 @@ export class StarSystemManager {
         this.scene = scene;
 
         this.spaceRenderingPipeline = new SpaceRenderingPipeline("spaceRenderingPipeline", scene);
+        this.surfaceRenderingPipeline = new SurfaceRenderingPipeline("surfaceRenderingPipeline", scene);
+
+        this.pipelines = [this.spaceRenderingPipeline, this.surfaceRenderingPipeline];
 
         this.depthRenderer = new DepthRenderer(scene);
         scene.customRenderTargets.push(this.depthRenderer.getDepthMap());
@@ -105,10 +114,26 @@ export class StarSystemManager {
 
         this.translateAllBodies(player.getAbsolutePosition().scale(-1));
         player.translate(player.getAbsolutePosition().scale(-1));
+
+        const switchLimit = player.nearestBody?.postProcesses.rings?.settings.ringStart || 2;
+        if(player.isOrbiting(player.nearestBody, switchLimit)) {
+            //console.log(this.surfaceRenderingPipeline.cameras);
+            if(this.spaceRenderingPipeline.cameras.length > 0) {
+                this.spaceRenderingPipeline.detachCamera(player.camera);
+                this.surfaceRenderingPipeline.attachToCamera(player.camera);
+            }
+        } else {
+            if(this.surfaceRenderingPipeline.cameras.length > 0) {
+                this.surfaceRenderingPipeline.detachCamera(player.camera);
+                this.spaceRenderingPipeline.attachToCamera(player.camera);
+            }
+        }
     }
 
     public init() {
         this.spaceRenderingPipeline.init();
+        this.surfaceRenderingPipeline.init();
+
         this.spaceRenderingPipeline.attachToCamera(this.scene.activeCamera!);
     }
 }

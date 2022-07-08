@@ -60,6 +60,8 @@ export class RingsPostProcess extends PlanetPostProcess {
 
         this.settings = settings;
 
-        starSystem.spaceRenderingPipeline.rings.push(this);
+        for(const pipeline of starSystem.pipelines) {
+            pipeline.rings.push(this);
+        }
     }
 }

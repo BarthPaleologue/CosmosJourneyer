@@ -63,10 +63,13 @@ export class Star extends AbstractBody {
             ),
             rings: null
         };
-        this.postProcesses.volumetricLight!.exposure = 0.26;
-        this.postProcesses.volumetricLight!.decay = 0.95;
-        this.postProcesses.volumetricLight?.getCamera().detachPostProcess(this.postProcesses.volumetricLight!);
-        starSystemManager.spaceRenderingPipeline.volumetricLights.push(this.postProcesses.volumetricLight!);
+        this.postProcesses.volumetricLight.exposure = 0.26;
+        this.postProcesses.volumetricLight.decay = 0.95;
+        this.postProcesses.volumetricLight.getCamera().detachPostProcess(this.postProcesses.volumetricLight);
+
+        for(const pipeline of starSystemManager.pipelines) {
+            pipeline.volumetricLights.push(this.postProcesses.volumetricLight);
+        }
 
         if (uniformRandBool(Star.RING_PROPORTION, this.rng)) {
             const rings = this.createRings(this, starSystemManager.scene);

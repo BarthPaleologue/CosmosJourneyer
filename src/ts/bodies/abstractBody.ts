@@ -125,7 +125,7 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
 
     public createRings(star: Star, scene: Scene): RingsPostProcess {
         const rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem);
-        rings.settings.ringStart = randRange(1.4, 2.2, this.rng);
+        rings.settings.ringStart = randRange(1.8, 2.2, this.rng);
         rings.settings.ringEnd = randRange(2.1, 2.9, this.rng);
         rings.settings.ringOpacity = this.rng();
         this.postProcesses.rings = rings;

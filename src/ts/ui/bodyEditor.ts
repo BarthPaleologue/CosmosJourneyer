@@ -221,14 +221,14 @@ export class BodyEditor {
         );
 
         this.starSliders.push(
-            new Slider("exposure", document.getElementById("exposure")!, 0, 200, star.postProcesses.volumetricLight!.exposure * 100, (val: number) => {
-                star.postProcesses.volumetricLight!.exposure = val / 100;
+            new Slider("exposure", document.getElementById("exposure")!, 0, 200, star.postProcesses.volumetricLight.exposure * 100, (val: number) => {
+                star.postProcesses.volumetricLight.exposure = val / 100;
             })
         );
 
         this.starSliders.push(
-            new Slider("decay", document.getElementById("decay")!, 0, 200, star.postProcesses.volumetricLight!.decay * 100, (val: number) => {
-                star.postProcesses.volumetricLight!.decay = val / 100;
+            new Slider("decay", document.getElementById("decay")!, 0, 200, star.postProcesses.volumetricLight.decay * 100, (val: number) => {
+                star.postProcesses.volumetricLight.decay = val / 100;
             })
         );
     }
