@@ -79,17 +79,14 @@ if (planet.bodyType == BodyType.TELLURIC) {
     );
     telluricPlanet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng);
     telluricPlanet.material.updateManual();
+
+    console.table(telluricPlanet.terrainSettings);
 }
 
 for (let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
-    const satelliteSeed = planet.rng();
-    const randSatellite = alea(satelliteSeed.toString());
-    const satelliteRadius = (planet.getRadius() / 5) * clamp(normalRandom(1, 0.1, randSatellite), 0.5, 1.5);
-    const ratio = satelliteRadius / Settings.EARTH_RADIUS;
-    const satellite = new TelluricPlanet(`${planet.name}Sattelite${i}`, starSystemManager, satelliteSeed, [planet]);
-    console.log(satellite.depth);
-    const periapsis = 5 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, randSatellite), 0.9, 1.0) * planet.getRadius() * 2;
-    const apoapsis = periapsis * clamp(normalRandom(1, 0.05, randSatellite), 1, 1.5);
+    const satellite = new TelluricPlanet(`${planet.name}Sattelite${i}`, starSystemManager, planet.rng(), [planet]);
+    const periapsis = 5 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, satellite.rng), 0.9, 1.0) * planet.getRadius() * 2;
+    const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.rng), 1, 1.5);
     satellite.physicalProperties.mass = 1;
     satellite.orbitalProperties = {
         periapsis: periapsis,
@@ -97,8 +94,6 @@ for (let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
         period: getOrbitalPeriod(periapsis, apoapsis, satellite.parentBodies),
         orientationQuaternion: satellite.getRotationQuaternion()
     };
-    satellite.terrainSettings.maxMountainHeight *= ratio;
-    satellite.terrainSettings.mountainsFrequency *= ratio;
 }
 
 starSystemManager.init();

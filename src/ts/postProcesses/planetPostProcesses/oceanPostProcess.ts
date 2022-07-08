@@ -17,8 +17,8 @@ export class OceanPostProcess extends PlanetPostProcess {
     constructor(name: string, planet: AbstractPlanet, starSystem: StarSystemManager) {
         const settings: OceanSettings = {
             oceanRadius: planet.getApparentRadius(),
-            depthModifier: 0.002,
-            alphaModifier: 0.007,
+            depthModifier: 0.001,
+            alphaModifier: 0.001,
             specularPower: 1.5,
             smoothness: 0.9,
             waveBlendingSharpness: 0.1

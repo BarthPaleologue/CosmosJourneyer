@@ -186,7 +186,7 @@ void main() {
 	float moistureSharpness = 20.0;
 	float moistureFactor = tanherpFactor(moisture01, moistureSharpness);
 
-	vec3 plainColor2 = 0.5 * plainColor;
+	vec3 plainColor2 = 0.7 * plainColor;
 	vec3 plainColor = tanherp(plainColor, plainColor2, fractalSimplex4(vec4(vUnitSamplePoint * 100.0, 0.0), 4, 2.0, 2.0), 10.0);
 
 
