@@ -118,103 +118,6 @@ vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
 
 #pragma glslify: saturate = require(../utils/saturate.glsl)
 
-vec3 computeColorAndNormal(
-	float elevation01, float waterLevel01, float slope, 
-	out vec3 normal, float temperature01, float moisture01, 
-	float waterMeltingPoint01, float absLatitude01) {
-	
-	normal = vNormal;
-
-	float plainFactor = 0.0,
-	beachFactor = 0.0,
-	desertFactor = 0.0,
-	bottomFactor = 0.0,
-	snowFactor = 0.0, 
-	steepFactor = 0.0;
-
-	vec3 outColor;
-
-	if(elevation01 > waterLevel01) {
-
-		// séparation biome désert biome plaine
-		float moistureSharpness = 20.0;
-		float moistureFactor = tanherpFactor(moisture01, moistureSharpness);
-		vec3 plainColor = tanherp(plainColor, 0.7 * plainColor, fractalSimplex4(vec4(vSamplePoint, 0.0) / 10000.0, 1, 2.0, 2.0), 3.0);
-
-		vec3 flatColor = lerp(plainColor, desertColor, moistureFactor);
-
-		// séparation biome sélectionné avec biome neige
-		// waterMeltingPoint01 * waterAmount : il est plus difficile de former de la neige quand y a moins d'eau
-		float snowColorFactor = tanh01((waterMeltingPoint01 * min(waterAmount, 1.0) - temperature01) * 64.0);
-		flatColor = lerp(snowColor, flatColor, snowColorFactor);
-		snowFactor = snowColorFactor;
-
-		// séparation biome sélectionné avec biome plage
-		flatColor = lnear(beachColor, flatColor, elevation01, waterLevel01, beachSize / maxElevation);
-
-		beachFactor = getLnearFactor(elevation01, waterLevel01, beachSize / maxElevation);
-		desertFactor = 1.0 - moistureFactor;
-		plainFactor = 1.0 - desertFactor;
-		plainFactor *= 1.0 - snowFactor;
-
-		// détermination de la couleur due à la pente
-		float steepDominance = 6.0;
-		steepFactor = tanherpFactor(1.0 - pow(1.0-slope, steepDominance), steepSharpness); // tricks pour éviter un calcul couteux d'exposant décimal
-		steepFactor *= 1.0 - snowFactor;
-
-		beachFactor *= 1.0 - steepFactor;
-		plainFactor *= 1.0 - steepFactor;
-
-		steepFactor *= steepFactor;
-
-		outColor = lerp(flatColor, steepColor, 1.0 - steepFactor);
-	} else {
-		// entre abysse et surface
-		vec3 flatColor = lnear(beachColor, bottomColor, elevation01, waterLevel01, beachSize / maxElevation);
-
-		beachFactor = getLnearFactor(elevation01, waterLevel01, beachSize / maxElevation);
-		bottomFactor = 1.0 - beachFactor;
-
-		float steepDominance = 6.0;
-		steepFactor = tanherpFactor(1.0 - pow(1.0-slope, steepDominance), steepSharpness); // tricks pour éviter un calcul couteux d'exposant décimal
-
-		beachFactor *= 1.0 - steepFactor;
-		bottomFactor *= 1.0 - steepFactor;
-
-		steepFactor *= steepFactor;
-
-		outColor = lerp(flatColor, steepColor, 1.0 - steepFactor);
-	}
-
-	bottomFactor = saturate(bottomFactor);
-	beachFactor = saturate(beachFactor);
-	plainFactor = saturate(plainFactor);
-	desertFactor = saturate(desertFactor);
-	snowFactor = saturate(snowFactor);
-	steepFactor = saturate(steepFactor);
-
-	// TODO: briser la répétition avec du simplex
-	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.001, normalSharpness, bottomFactor);
-	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.00001, normalSharpness, bottomFactor);
-
-    normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.001, normalSharpness, beachFactor);
-   	normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.00001, normalSharpness, beachFactor);
-
-    normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.001, normalSharpness, plainFactor);
-	normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.00001, normalSharpness, plainFactor);
-
-	normal = triplanarNormal(vSamplePoint, normal, desertNormalMap, 0.001, normalSharpness, desertFactor);
-    normal = triplanarNormal(vSamplePoint, normal, desertNormalMap, 0.00001, normalSharpness, desertFactor);
-
-    normal = triplanarNormal(vSamplePoint, normal, snowNormalMap, 0.001, normalSharpness, snowFactor);
-	normal = triplanarNormal(vSamplePoint, normal, snowNormalMap, 0.00001, normalSharpness, snowFactor);
-
-    normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.001, normalSharpness, steepFactor);
-	normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.00001, normalSharpness, steepFactor);
-
-	return outColor;
-}
-
 #pragma glslify: waterBoilingPointCelsius = require(./utils/waterBoilingPointCelsius.glsl)
 
 #pragma glslify: computeTemperature01 = require(./utils/computeTemperature01.glsl, vUnitSamplePoint=vUnitSamplePoint, fractalSimplex4=fractalSimplex4, tanh=tanh)
@@ -273,7 +176,85 @@ void main() {
 
 	// calcul de la couleur et de la normale
 	vec3 normal = vNormal;
-	vec3 color = computeColorAndNormal(elevation01, waterLevel01, slope, normal, temperature01, moisture01, waterMeltingPoint01, absLatitude01);
+
+	float plainFactor = 0.0,
+	desertFactor = 0.0,
+	bottomFactor = 0.0,
+	snowFactor = 0.0;
+
+	// hard separation between wet and dry
+	float moistureSharpness = 20.0;
+	float moistureFactor = tanherpFactor(moisture01, moistureSharpness);
+
+	vec3 plainColor2 = 0.5 * plainColor;
+	vec3 plainColor = tanherp(plainColor, plainColor2, fractalSimplex4(vec4(vUnitSamplePoint * 100.0, 0.0), 4, 2.0, 2.0), 10.0);
+
+
+	float beachFactor = getLnearFactor(elevation01, waterLevel01, beachSize / maxElevation);
+
+	float steepFactor = remap(slope, 0.0, 0.9, 0.0, 1.0);
+	steepFactor = saturate(steepFactor);
+	steepFactor = tanherpFactor(steepFactor, steepSharpness);
+
+	if(elevation01 > waterLevel01) {
+
+		plainFactor = moistureFactor;
+		desertFactor = 1.0 - moistureFactor;
+
+		// Snow
+		// waterMeltingPoint01 * waterAmount : il est plus difficile de former de la neige quand y a moins d'eau
+		snowFactor = tanh01((waterMeltingPoint01 * min(waterAmount, 1.0) - temperature01) * 64.0);
+		plainFactor *= 1.0 - snowFactor;
+		desertFactor *= 1.0 - snowFactor;
+
+		// Beach
+		desertFactor *= 1.0 - beachFactor;
+		plainFactor *= 1.0 - beachFactor;
+		snowFactor *= 1.0 - beachFactor;
+
+		// Steep
+		beachFactor *= 1.0 - steepFactor;
+		desertFactor *= 1.0 - steepFactor;
+		plainFactor *= 1.0 - steepFactor;
+		snowFactor *= 1.0 - steepFactor;
+	} else {
+		// entre abysse et surface
+		bottomFactor = 1.0 - beachFactor;
+
+		beachFactor *= 1.0 - steepFactor;
+		bottomFactor *= 1.0 - steepFactor;
+	}
+
+	vec3 color = steepFactor * steepColor
+	+ beachFactor * beachColor
+	+ desertFactor * desertColor
+	+ plainFactor * plainColor
+	+ snowFactor * snowColor
+	+ bottomFactor * bottomColor;
+
+	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.001, normalSharpness, bottomFactor);
+	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.00001, normalSharpness, bottomFactor);
+
+	normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.001, normalSharpness, beachFactor);
+	normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.00001, normalSharpness, beachFactor);
+
+	normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.001, normalSharpness, plainFactor);
+	normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.00001, normalSharpness, plainFactor);
+
+	normal = triplanarNormal(vSamplePoint, normal, desertNormalMap, 0.001, normalSharpness, desertFactor);
+	normal = triplanarNormal(vSamplePoint, normal, desertNormalMap, 0.00001, normalSharpness, desertFactor);
+
+	normal = triplanarNormal(vSamplePoint, normal, snowNormalMap, 0.001, normalSharpness, snowFactor);
+	normal = triplanarNormal(vSamplePoint, normal, snowNormalMap, 0.00001, normalSharpness, snowFactor);
+
+	normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.001, normalSharpness, steepFactor);
+	normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.00001, normalSharpness, steepFactor);
+
+
+
+
+
+
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
 	float ndl2 = max(0.0, dot(normalW, lightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
