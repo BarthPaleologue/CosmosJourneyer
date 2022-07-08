@@ -76,32 +76,34 @@ void main() {
     vec3 lightRayW = normalize(sunPosition - vPositionW); // light ray direction in world space
 
     vec3 sphereNormalW = vSphereNormalW;
-    float ndl = max(0.002, dot(sphereNormalW, lightRayW));
+    float ndl = max(0.0, dot(sphereNormalW, lightRayW));
 
-    // FIXME: remove scaling
-    vec4 seededSamplePoint = vec4(vUnitSamplePoint * 2.0, seed);
+    vec3 color = vec3(0.0);
 
-    seededSamplePoint.y *= 2.0;
+    if(ndl > 0.0) {
+        vec4 seededSamplePoint = vec4(vUnitSamplePoint * 2.0, seed);
 
-    float cloudSpeed = 0.0005;
-    vec4 seededSamplePoint2 = vec4(rotateAround(seededSamplePoint.xyz, vec3(0.0, 1.0, 0.0), time * cloudSpeed), seededSamplePoint.w);
+        seededSamplePoint.y *= 2.0;
 
-    for(int i = 0; i < 2; i++) {
-        seededSamplePoint += vec4(
+        float cloudSpeed = 0.0005;
+        vec4 seededSamplePoint2 = vec4(rotateAround(seededSamplePoint.xyz, vec3(0.0, 1.0, 0.0), time * cloudSpeed), seededSamplePoint.w);
+
+        for (int i = 0; i < 2; i++) {
+            seededSamplePoint += vec4(
             fractalSimplex4(seededSamplePoint2, 3, 2.0, 2.0),
             fractalSimplex4(seededSamplePoint2 + vec4(13.0, 37.0, -73.0, 0.0), 3, 2.0, 2.0),
             fractalSimplex4(seededSamplePoint2 + vec4(-56.0, 19.0, 47.0, 0.0), 3, 2.0, 2.0),
             0.0
-        );
+            );
+        }
+
+        float value = fractalSimplex4(seededSamplePoint, 7, 1.7, 2.0);
+        value = tanhSharpener(value, colorSharpness * dot(color1, color2));
+
+        color = lerp(color1, color2, value);
     }
 
-    float value = fractalSimplex4(seededSamplePoint, 7, 1.7, 2.0);
-
-    value = tanhSharpener(value, colorSharpness * dot(color1, color2));
-
-    // calcul de la couleur et de la normale
     vec3 normal = vNormal;
-    vec3 color = lerp(color1, color2, value);
     vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
     // specular
@@ -120,6 +122,7 @@ void main() {
     specComp /= 2.0;
 
     vec3 screenColor = color.rgb * (ndl + specComp * ndl);
+
 
     gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting
     #ifdef LOGARITHMICDEPTH
