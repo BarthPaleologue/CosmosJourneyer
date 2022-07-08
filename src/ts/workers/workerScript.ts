@@ -89,8 +89,8 @@ function buildChunkVertexData(data: BuildData): void {
     const indices = new Uint16Array(faces.length * (faces[0].length - 2) * 3);
 
     // indices from faces (magie noire)
-    for (let i = 0; i < faces.length; ++i) {
-        for (let j = 0; j < faces[i].length - 2; ++j) {
+    for (let i = 0; i < faces.length; i++) {
+        for (let j = 0; j < faces[i].length - 2; j++) {
             // on à noter que le 0 m'intrigue
             indices[(i * (faces[i].length - 2) + j) * 3] = faces[i][0];
             indices[(i * (faces[i].length - 2) + j) * 3 + 1] = faces[i][j + 2];
@@ -104,16 +104,25 @@ function buildChunkVertexData(data: BuildData): void {
             i: indices,
             n: normals
         },
-        //@ts-ignore
-        [verticesPositions.buffer, indices.buffer, normals.buffer]
+        {
+            transfer: [verticesPositions.buffer, indices.buffer, normals.buffer]
+        }
     );
 }
 
-function sendHeightAtPoint(point: LVector3, seed: number): void {
-    terrainFunction(point.normalizeToNew(), seed, point, LVector3.Zero());
+function computeHeightForData(data: CollisionData): void {
+    if (data.planetName != currentPlanetID) {
+        currentPlanetID = data.planetName;
+        terrainFunction = makeTerrainFunction(data.terrainSettings);
+    }
+
+    const samplePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
+    samplePosition.setMagnitudeInPlace(data.planetDiameter / 2);
+
+    terrainFunction(samplePosition.normalizeToNew(), data.seed, samplePosition, LVector3.Zero());
 
     self.postMessage({
-        h: point.getMagnitude()
+        h: samplePosition.getMagnitude()
     });
 }
 
@@ -124,8 +133,8 @@ self.onmessage = (e) => {
         case TaskType.Build:
             //const clock = Date.now();
             buildChunkVertexData(e.data as BuildData);
-
             //console.log("Time for creation : " + (Date.now() - clock));
+
             // benchmark fait le 5/10/2021 (normale non analytique) : ~2s/chunk
             // benchmark fait le 12/11/2021 (normale non analyique) : ~0.5s/chunk
             // benchmark fait le 20/11/2021 20h30 (normale analytique v2) : ~0.8s/chunk
@@ -134,19 +143,8 @@ self.onmessage = (e) => {
             // benchmark fait le 19/02/2022 (normale analytique v2.6) : ~ 40ms/chunk
             break;
         case TaskType.Collision:
-            const data = e.data as CollisionData;
-
-            if (data.planetName != currentPlanetID) {
-                currentPlanetID = data.planetName;
-                terrainFunction = makeTerrainFunction(data.terrainSettings);
-            }
-
-            const samplePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
-            samplePosition.setMagnitudeInPlace(data.planetDiameter / 2);
-
-            sendHeightAtPoint(samplePosition, data.seed);
+            computeHeightForData(e.data as CollisionData);
             break;
-
         default:
             if (e.data.taskType) console.error(`Type de tâche reçue invalide : ${e.data.taskType}`);
             else console.log("Shared memory received");
