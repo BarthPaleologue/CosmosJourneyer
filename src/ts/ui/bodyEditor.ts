@@ -335,6 +335,12 @@ export class BodyEditor {
             colorSettings.desertColor.copyFrom(Color3.FromHexString(desertColorPicker.value));
         });
 
+        const bottomColorPicker = clearAllEventListenersById("bottomColor") as HTMLInputElement;
+        bottomColorPicker.value = colorSettings.bottomColor.toHexString();
+        bottomColorPicker.addEventListener("input", () => {
+            colorSettings.bottomColor.copyFrom(Color3.FromHexString(bottomColorPicker.value));
+        });
+
         this.surfaceSliders.push(
             new Slider("sandSize", document.getElementById("sandSize")!, 0, 300, planet.material.colorSettings.beachSize / 10, (val: number) => {
                 colorSettings.beachSize = val * 10;
