@@ -8,6 +8,7 @@ import { SpaceRenderingPipeline } from "../postProcesses/pipelines/spaceRenderin
 import { SurfaceRenderingPipeline } from "../postProcesses/pipelines/surfaceRenderingPipeline";
 import { PipelineTypes } from "../postProcesses/pipelines/pipelineTypes";
 import { AbstractRenderingPipeline } from "../postProcesses/pipelines/abstractRenderingPipeline";
+import { computeBarycenter, computeBarycenter2 } from "../orbits/kepler";
 
 export class StarSystemManager {
     readonly scene: Scene;
@@ -112,12 +113,11 @@ export class StarSystemManager {
         this._chunkForge.update(this.depthRenderer);
         for (const body of this.getBodies()) body.update(player, lightOrigin, deltaTime);
 
-        this.translateAllBodies(player.getAbsolutePosition().scale(-1));
-        player.translate(player.getAbsolutePosition().scale(-1));
+        this.translateAllBodies(player.getAbsolutePosition().negate());
+        player.translate(player.getAbsolutePosition().negate());
 
         const switchLimit = player.nearestBody?.postProcesses.rings?.settings.ringStart || 2;
         if (player.isOrbiting(player.nearestBody, switchLimit)) {
-            //console.log(this.surfaceRenderingPipeline.cameras);
             if (this.spaceRenderingPipeline.cameras.length > 0) {
                 this.spaceRenderingPipeline.detachCamera(player.camera);
                 this.surfaceRenderingPipeline.attachToCamera(player.camera);

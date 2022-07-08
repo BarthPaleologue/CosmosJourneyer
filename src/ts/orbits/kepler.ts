@@ -31,6 +31,17 @@ export function solveKepler(M: number, e: number) {
     return guess;
 }
 
+export function computeBarycenter2(bodies: IOrbitalBody[]): Vector3 {
+    if(bodies.length == 0) throw new Error("Can compute the barycenter of zero bodies");
+    const barycenter = Vector3.Zero();
+    let sum = 0;
+    for(const body of bodies) {
+        barycenter.addInPlace(body.getAbsolutePosition().scale(body.physicalProperties.mass));
+        sum += body.physicalProperties.mass;
+    }
+    return barycenter.scaleInPlace(1 / sum);
+}
+
 export function computeBarycenter(body: IOrbitalBody, relevantBodies: IOrbitalBody[]): [Vector3, Quaternion] {
     const barycenter = body.getAbsolutePosition().scale(body.physicalProperties.mass);
     const meanQuaternion = Quaternion.Zero();

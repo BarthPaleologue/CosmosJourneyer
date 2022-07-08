@@ -1,6 +1,13 @@
 import { AbstractBody } from "../abstractBody";
 
-import { Mesh, MeshBuilder, Texture, Vector3, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import {
+    Mesh,
+    MeshBuilder,
+    StandardMaterial,
+    Texture,
+    Vector3,
+    VolumetricLightScatteringPostProcess
+} from "@babylonjs/core";
 import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
@@ -11,6 +18,7 @@ import { normalRandom, randRange, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { Settings } from "../../settings";
+import { Assets } from "../../assets";
 
 // TODO: implement RigidBody for star
 export class Star extends AbstractBody {
@@ -80,6 +88,10 @@ export class Star extends AbstractBody {
     }
 
     public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
+        //FIXME: should address stars orbits
+        this.orbitalProperties.period = 0;
+        super.update(player, lightPosition, deltaTime);
+
         this.material.update();
 
         this.internalTime += deltaTime;

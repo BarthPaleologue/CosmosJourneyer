@@ -57,7 +57,7 @@ const flare00 = new LensFlare(
     lensFlareSystem // lens flare system
 );*/
 
-const planet = new TelluricPlanet("Hécate", starSystem, -2.994, [sun]);
+const planet = new TelluricPlanet("Hécate", starSystem, -2.994, starSystem.stars);
 
 planet.physicalProperties.rotationPeriod /= 20;
 
@@ -93,7 +93,7 @@ moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap);
 moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap);
 moon.material.updateManual();
 
-const ares = new TelluricPlanet("Ares", starSystem, 432, [sun]);
+const ares = new TelluricPlanet("Ares", starSystem, 432, starSystem.stars);
 
 ares.postProcesses.ocean?.dispose();
 starSystem.spaceRenderingPipeline.oceans.splice(starSystem.spaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);

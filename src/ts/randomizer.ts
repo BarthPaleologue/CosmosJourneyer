@@ -49,17 +49,26 @@ const starSystemRand = alea(starSystemSeed.toString());
 const starSeed = randRange(-10, 10, starSystemRand);
 console.log("Star seed : ", starSeed);
 
-const sun = new Star("Weierstrass", starSystemManager, starSeed, []);
+const star1 = new Star("Weierstrass", starSystemManager, starSeed, []);
+//star1.orbitalProperties.periapsis = star1.getRadius();
+//star1.orbitalProperties.apoapsis = star1.getRadius();
+//star1.orbitalProperties.period = 60 * 60;
 
-starfield.setStar(sun);
+//const star2 = new Star("Hilbert", starSystemManager, randRange(-10, 10, starSystemRand), [star1]);
+//star2.orbitalProperties.periapsis = (star1.getRadius() + star2.getRadius()) * 2;
+//star2.orbitalProperties.apoapsis = (star1.getRadius() + star2.getRadius()) * 2;
+//star2.orbitalProperties.period = 60 * 60;
+//star1.parentBodies.push(star1);
+
+starfield.setStar(star1);
 
 const planetSeed = randRange(-10, 10, starSystemRand);
 console.log("Planet seed : ", planetSeed);
 
 let planet: AbstractBody;
 
-if (uniformRandBool(0.5)) planet = new TelluricPlanet("Hécate", starSystemManager, planetSeed, [sun]);
-else planet = new GazPlanet("Andromaque", starSystemManager, planetSeed, [sun]);
+if (uniformRandBool(0.5)) planet = new TelluricPlanet("Hécate", starSystemManager, planetSeed, starSystemManager.stars);
+else planet = new GazPlanet("Andromaque", starSystemManager, planetSeed, starSystemManager.stars);
 
 console.table(planet.orbitalProperties);
 
@@ -82,6 +91,7 @@ if (planet.bodyType == BodyType.TELLURIC) {
 
     console.table(telluricPlanet.terrainSettings);
 }
+
 
 for (let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
     const satellite = new TelluricPlanet(`${planet.name}Sattelite${i}`, starSystemManager, planet.rng(), [planet]);
@@ -110,17 +120,17 @@ document.addEventListener("keydown", (e) => {
 
 const collisionWorker = new CollisionWorker(player, starSystemManager);
 
-starSystemManager.update(player, sun.getAbsolutePosition(), 0);
-starSystemManager.update(player, sun.getAbsolutePosition(), Date.now());
-starSystemManager.update(player, sun.getAbsolutePosition(), 0);
-starSystemManager.update(player, sun.getAbsolutePosition(), 0);
-starSystemManager.update(player, sun.getAbsolutePosition(), 0);
+starSystemManager.update(player, star1.getAbsolutePosition(), 0);
+starSystemManager.update(player, star1.getAbsolutePosition(), Date.now());
+starSystemManager.update(player, star1.getAbsolutePosition(), 0);
+starSystemManager.update(player, star1.getAbsolutePosition(), 0);
+starSystemManager.update(player, star1.getAbsolutePosition(), 0);
 
 player.positionNearBody(planet);
 
 console.log(
     "Average Temperature : ",
-    computeMeanTemperature(sun.physicalProperties.temperature, sun.getApparentRadius(), planet.getAbsolutePosition().subtract(sun.getAbsolutePosition()).length(), 0.3, 0.3) - 273,
+    computeMeanTemperature(star1.physicalProperties.temperature, star1.getApparentRadius(), planet.getAbsolutePosition().subtract(star1.getAbsolutePosition()).length(), 0.3, 0.3) - 273,
     "°C"
 );
 
@@ -131,9 +141,9 @@ scene.executeWhenReady(() => {
         const deltaTime = engine.getDeltaTime() / 1000;
 
         player.nearestBody = starSystemManager.getNearestBody();
-        if (player.nearestBody.name != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, sun, player);
+        if (player.nearestBody.name != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, star1, player);
 
-        starSystemManager.update(player, sun.getAbsolutePosition(), Settings.TIME_MULTIPLIER * deltaTime);
+        starSystemManager.update(player, star1.getAbsolutePosition(), Settings.TIME_MULTIPLIER * deltaTime);
 
         if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
 

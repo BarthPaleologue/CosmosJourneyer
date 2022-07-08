@@ -24,8 +24,6 @@ export class Assets {
     static WaterNormalMap1: Texture;
     static WaterNormalMap2: Texture;
 
-    static DebugMaterial: StandardMaterial;
-
     static Init(scene: Scene) {
         console.log("Initializing assets...");
         Assets.RockNormalMap = new Texture(rockNormalMap, scene);
@@ -39,10 +37,13 @@ export class Assets {
         Assets.WaterNormalMap1 = new Texture(waterNormal1, scene);
         Assets.WaterNormalMap2 = new Texture(waterNormal2, scene);
 
-        Assets.DebugMaterial = new StandardMaterial("DebugMaterial");
-        Assets.DebugMaterial.emissiveColor = Color3.Random();
-
         console.log("Assets initialized.");
         Assets.IS_READY = true;
+    }
+
+    static DebugMaterial(name: string) {
+        const mat = new StandardMaterial(`${name}DebugMaterial`);
+        mat.emissiveColor = Color3.Random();
+        return mat;
     }
 }
