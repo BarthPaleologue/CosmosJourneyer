@@ -133,7 +133,6 @@ function xy_to_upvp(xc: number, yc: number): number[] {
 */
 
 function xyz_to_rgb(cs: ColourSystem, xc: number, yc: number, zc: number): number[] {
-
     const xr = cs.xRed;
     const yr = cs.yRed;
     const zr = 1 - (xr + yr);

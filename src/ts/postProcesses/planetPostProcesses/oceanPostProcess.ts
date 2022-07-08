@@ -97,7 +97,7 @@ export class OceanPostProcess extends PlanetPostProcess {
 
         this.settings = settings;
 
-        for(const pipeline of starSystem.pipelines) {
+        for (const pipeline of starSystem.pipelines) {
             pipeline.oceans.push(this);
         }
     }

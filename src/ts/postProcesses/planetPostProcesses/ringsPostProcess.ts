@@ -60,7 +60,7 @@ export class RingsPostProcess extends PlanetPostProcess {
 
         this.settings = settings;
 
-        for(const pipeline of starSystem.pipelines) {
+        for (const pipeline of starSystem.pipelines) {
             pipeline.rings.push(this);
         }
     }

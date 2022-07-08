@@ -1,7 +1,6 @@
-import { Effect, Scene } from "@babylonjs/core";
+import { Effect } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplerData, ShaderUniformData, VolumetricCloudSettings } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
-import { Star } from "../../bodies/stars/star";
 import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 
 import volumetricCloudsFragment from "../../../shaders/volumetricCloudsFragment.glsl";
@@ -33,7 +32,7 @@ export class VolumetricCloudsPostProcess extends PlanetPostProcess {
 
         this.settings = settings;
 
-        for(const pipeline of starSystem.pipelines) {
+        for (const pipeline of starSystem.pipelines) {
             pipeline.clouds.push(this);
         }
     }

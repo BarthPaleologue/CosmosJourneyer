@@ -17,11 +17,15 @@ uniform float visibility; // visibility of the starfield
 
 #pragma glslify: completeNoise = require(./utils/noise.glsl)
 
+#pragma glslify: saturate = require(./utils/saturate.glsl)
+
 #pragma glslify: remap = require(./utils/remap.glsl)
 
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, projection=projection, view=view)
 
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
+
+#pragma glslify: fractalSimplex4 = require(./utils/simplex4.glsl, tanh=tanh)
 
 void main() {
     vec3 screenColor = texture2D(textureSampler, vUV).rgb; // the current screen color
@@ -41,17 +45,20 @@ void main() {
     if(maximumDistance * 1.1 < cameraFar) finalColor = screenColor;
     else {
         vec3 samplePoint = normalize(closestPoint);
-        float noiseValue = completeNoise(samplePoint*500.0, 1, 2.0, 2.0);
-        float noiseValue2 = clamp(completeNoise(samplePoint, 1, 2.0, 2.0), 0.5, 1.0);
-        float noiseValue3 = completeNoise(samplePoint*200.0, 1, 2.0, 2.0);
+
+        float noiseValue = fractalSimplex4(vec4(samplePoint * 150.0, 0.0), 1, 2.0, 2.0);
+        float minValue = 0.87;
+        noiseValue = max(noiseValue - minValue, 0.0) / (1.0 - minValue);
+
+        float colorSeparation = completeNoise(samplePoint * 200.0, 1, 2.0, 2.0);
 
         float starLight = 0.0;
-        if(noiseValue > 0.87) starLight = 1.0;
+        if(noiseValue > 0.05) starLight = saturate(noiseValue * 10.0);
 
         vec3 color1 = vec3(1.0);
         vec3 color2 = vec3(0.4, 0.4, 2.0);
 
-        finalColor = starLight * lerp(color1, color2, noiseValue3) * visibility;
+        finalColor = starLight * lerp(color1, color2, colorSeparation) * visibility;
     }
 
     gl_FragColor = vec4(finalColor, 1.0); // displaying the final color

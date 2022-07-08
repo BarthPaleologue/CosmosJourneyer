@@ -1,4 +1,4 @@
-import { BuildTask, DeleteTask, Task } from "./taskInterfaces";
+import { BuildTask, DeleteTask } from "./taskInterfaces";
 
 /*export class BuildTaskQueue {
     array: ArrayBuffer
@@ -26,9 +26,7 @@ export class WorkerPool {
         }
     }
 
-    public submitTask(task: Task) {
-        // FIXME: handle all tasks
-        //@ts-ignore
+    public submitTask(task: BuildTask | DeleteTask) {
         this.taskQueue.push(task);
     }
 

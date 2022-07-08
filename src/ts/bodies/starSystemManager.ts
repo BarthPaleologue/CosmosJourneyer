@@ -116,14 +116,14 @@ export class StarSystemManager {
         player.translate(player.getAbsolutePosition().scale(-1));
 
         const switchLimit = player.nearestBody?.postProcesses.rings?.settings.ringStart || 2;
-        if(player.isOrbiting(player.nearestBody, switchLimit)) {
+        if (player.isOrbiting(player.nearestBody, switchLimit)) {
             //console.log(this.surfaceRenderingPipeline.cameras);
-            if(this.spaceRenderingPipeline.cameras.length > 0) {
+            if (this.spaceRenderingPipeline.cameras.length > 0) {
                 this.spaceRenderingPipeline.detachCamera(player.camera);
                 this.surfaceRenderingPipeline.attachToCamera(player.camera);
             }
         } else {
-            if(this.surfaceRenderingPipeline.cameras.length > 0) {
+            if (this.surfaceRenderingPipeline.cameras.length > 0) {
                 this.surfaceRenderingPipeline.detachCamera(player.camera);
                 this.spaceRenderingPipeline.attachToCamera(player.camera);
             }

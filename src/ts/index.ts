@@ -89,8 +89,8 @@ moon.terrainSettings.maxMountainHeight = 5e3;
 moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
 moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
 
-moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap!);
-moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap!);
+moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap);
+moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap);
 moon.material.updateManual();
 
 const ares = new TelluricPlanet("Ares", starSystem, 432, [sun]);

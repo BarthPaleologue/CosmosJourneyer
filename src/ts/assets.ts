@@ -13,18 +13,18 @@ import waterNormal2 from "../asset/textures/waterNormalMap4.jpg";
 
 export class Assets {
     static IS_READY = false;
-    static RockNormalMap: Texture | null;
-    static DirtNormalMap: Texture | null;
-    static BottomNormalMap: Texture | null;
-    static GrassNormalMap: Texture | null;
-    static SnowNormalMap1: Texture | null;
-    static SnowNormalMap2: Texture | null;
-    static SandNormalMap1: Texture | null;
-    static SandNormalMap2: Texture | null;
-    static WaterNormalMap1: Texture | null;
-    static WaterNormalMap2: Texture | null;
+    static RockNormalMap: Texture;
+    static DirtNormalMap: Texture;
+    static BottomNormalMap: Texture;
+    static GrassNormalMap: Texture;
+    static SnowNormalMap1: Texture;
+    static SnowNormalMap2: Texture;
+    static SandNormalMap1: Texture;
+    static SandNormalMap2: Texture;
+    static WaterNormalMap1: Texture;
+    static WaterNormalMap2: Texture;
 
-    static DebugMaterial: StandardMaterial | null;
+    static DebugMaterial: StandardMaterial;
 
     static Init(scene: Scene) {
         console.log("Initializing assets...");

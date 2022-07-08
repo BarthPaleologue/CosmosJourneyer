@@ -7,14 +7,16 @@ export class SurfaceRenderingPipeline extends AbstractRenderingPipeline {
     }
 
     init() {
-        super.init(new Set<PostProcessType>([
-            PostProcessType.Starfields,
-            PostProcessType.VolumetricLights,
-            PostProcessType.Rings,
-            PostProcessType.Oceans,
-            PostProcessType.Clouds,
-            PostProcessType.Atmospheres,
-            PostProcessType.FXAA
-        ]));
+        super.init(
+            new Set<PostProcessType>([
+                PostProcessType.Starfields,
+                PostProcessType.VolumetricLights,
+                PostProcessType.Rings,
+                PostProcessType.Oceans,
+                PostProcessType.Clouds,
+                PostProcessType.Atmospheres,
+                PostProcessType.FXAA
+            ])
+        );
     }
 }

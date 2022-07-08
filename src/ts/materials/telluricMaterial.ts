@@ -99,15 +99,15 @@ export class TelluricMaterial extends ShaderMaterial {
 
         if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 
-        this.setTexture("bottomNormalMap", Assets.BottomNormalMap!);
-        this.setTexture("steepNormalMap", Assets.RockNormalMap!);
-        this.setTexture("plainNormalMap", Assets.GrassNormalMap!);
+        this.setTexture("bottomNormalMap", Assets.BottomNormalMap);
+        this.setTexture("steepNormalMap", Assets.RockNormalMap);
+        this.setTexture("plainNormalMap", Assets.GrassNormalMap);
 
-        this.setTexture("snowNormalMap", Assets.SnowNormalMap1!);
-        this.setTexture("snowNormalMap2", Assets.SnowNormalMap2!);
+        this.setTexture("snowNormalMap", Assets.SnowNormalMap1);
+        this.setTexture("snowNormalMap2", Assets.SnowNormalMap2);
 
-        this.setTexture("beachNormalMap", Assets.SandNormalMap1!);
-        this.setTexture("desertNormalMap", Assets.SandNormalMap2!);
+        this.setTexture("beachNormalMap", Assets.SandNormalMap1);
+        this.setTexture("desertNormalMap", Assets.SandNormalMap2);
 
         this.setColor3("snowColor", this.colorSettings.snowColor);
         this.setColor3("steepColor", this.colorSettings.steepColor);

@@ -1,11 +1,4 @@
-import {
-    Camera,
-    Engine, FxaaPostProcess,
-    PostProcessRenderEffect,
-    PostProcessRenderPipeline,
-    Scene, Texture,
-    VolumetricLightScatteringPostProcess
-} from "@babylonjs/core";
+import { Camera, Engine, FxaaPostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Scene, Texture, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 import { StarfieldPostProcess } from "../starfieldPostProcess";
 import { OceanPostProcess } from "../planetPostProcesses/oceanPostProcess";
 import { FlatCloudsPostProcess } from "../planetPostProcesses/flatCloudsPostProcess";
@@ -97,8 +90,6 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
                     throw new Error("Invalid postprocess type in " + this.name);
             }
         }
-
-
     }
 
     attachToCamera(camera: Camera) {

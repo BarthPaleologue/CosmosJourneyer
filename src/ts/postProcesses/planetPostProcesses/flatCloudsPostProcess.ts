@@ -117,7 +117,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
 
         this.settings = settings;
 
-        for(const pipeline of starSystem.pipelines) {
+        for (const pipeline of starSystem.pipelines) {
             pipeline.clouds.push(this);
         }
     }

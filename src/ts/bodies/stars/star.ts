@@ -67,7 +67,7 @@ export class Star extends AbstractBody {
         this.postProcesses.volumetricLight.decay = 0.95;
         this.postProcesses.volumetricLight.getCamera().detachPostProcess(this.postProcesses.volumetricLight);
 
-        for(const pipeline of starSystemManager.pipelines) {
+        for (const pipeline of starSystemManager.pipelines) {
             pipeline.volumetricLights.push(this.postProcesses.volumetricLight);
         }
 

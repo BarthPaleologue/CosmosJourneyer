@@ -7,14 +7,16 @@ export class SpaceRenderingPipeline extends AbstractRenderingPipeline {
     }
 
     init() {
-       super.init(new Set<PostProcessType>([
-           PostProcessType.Starfields,
-           PostProcessType.VolumetricLights,
-           PostProcessType.Oceans,
-           PostProcessType.Clouds,
-           PostProcessType.Atmospheres,
-           PostProcessType.Rings,
-           PostProcessType.FXAA
-       ]));
+        super.init(
+            new Set<PostProcessType>([
+                PostProcessType.Starfields,
+                PostProcessType.VolumetricLights,
+                PostProcessType.Oceans,
+                PostProcessType.Clouds,
+                PostProcessType.Atmospheres,
+                PostProcessType.Rings,
+                PostProcessType.FXAA
+            ])
+        );
     }
 }
