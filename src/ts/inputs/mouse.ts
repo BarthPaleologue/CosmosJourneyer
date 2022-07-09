@@ -1,57 +1,80 @@
-export class Mouse {
-    private mouseX = 0;
-    private mouseY = 0;
+import { Input } from "./input";
 
-    private mouseDX = 0;
-    private mouseDY = 0;
+export class Mouse implements Input {
+    private x = 0;
+    private y = 0;
 
-    private mouseDXToCenter = 0;
-    private mouseDYToCenter = 0;
+    private dx = 0;
+    private dy = 0;
 
-    private _deadAreaRadius = 100;
+    private dxToCenter = 0;
+    private dyToCenter = 0;
+
+    private deadAreaRadius = 100;
 
     constructor(deadAreaRadius = 100) {
-        window.addEventListener("mousemove", (e) => {
-            this.mouseDX = (e.x - this.mouseX) / window.innerWidth;
-            this.mouseDY = (e.y - this.mouseY) / window.innerHeight;
+        window.addEventListener("mousemove", e => {
+            this.dx = (e.x - this.x) / window.innerWidth;
+            this.dy = (e.y - this.y) / window.innerHeight;
 
-            this.mouseX = e.x;
-            this.mouseY = e.y;
+            this.x = e.x;
+            this.y = e.y;
 
-            this.mouseDXToCenter = e.x - window.innerWidth / 2;
-            this.mouseDYToCenter = e.y - window.innerHeight / 2;
+            this.dxToCenter = e.x - window.innerWidth / 2;
+            this.dyToCenter = e.y - window.innerHeight / 2;
 
-            if (this.mouseDXToCenter ** 2 + this.mouseDYToCenter ** 2 < this._deadAreaRadius ** 2) {
-                this.mouseDXToCenter = 0;
-                this.mouseDYToCenter = 0;
+            if (this.dxToCenter ** 2 + this.dyToCenter ** 2 < this.deadAreaRadius ** 2) {
+                this.dxToCenter = 0;
+                this.dyToCenter = 0;
             }
 
-            this._deadAreaRadius = deadAreaRadius;
+            this.deadAreaRadius = deadAreaRadius;
         });
     }
 
-    public getX(): number {
-        return this.mouseX;
+    getRoll() {
+        return 0;
     }
-    public getY(): number {
-        return this.mouseY;
+
+    getPitch() {
+        const greaterLength = Math.max(window.innerWidth, window.innerHeight);
+        return this.dyToCenter / (greaterLength / 2);
     }
-    public getDX(): number {
-        return this.mouseDX;
+
+    getYaw() {
+        const greaterLength = Math.max(window.innerWidth, window.innerHeight);
+        return this.dxToCenter / (greaterLength / 2);
     }
-    public getDY(): number {
-        return this.mouseDY;
+
+    getZAxis() {
+        return 0;
     }
+
+    getXAxis() {
+        return 0;
+    }
+
+    getYAxis() {
+        return 0;
+    }
+
     public getDXToCenter(): number {
-        return this.mouseDXToCenter;
+        return this.dxToCenter;
     }
+
     public getDYToCenter(): number {
-        return this.mouseDYToCenter;
+        return this.dyToCenter;
     }
+
     public getDeadAreaRadius() {
-        return this._deadAreaRadius;
+        return this.deadAreaRadius;
     }
+
     public setDeadAreaRadius(newDeadAreaRadius: number) {
-        this._deadAreaRadius = newDeadAreaRadius;
+        this.deadAreaRadius = newDeadAreaRadius;
+    }
+
+    getAcceleration(): number {
+        return 0;
     }
 }

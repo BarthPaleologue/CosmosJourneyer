@@ -150,7 +150,7 @@ let isMouseEnabled = false;
 const collisionWorker = new CollisionWorker(player, starSystem);
 
 // update to current date
-starSystem.update(player, sun.getAbsolutePosition(), Date.now() / 1000);
+starSystem.update(player, Date.now() / 1000);
 
 player.positionNearBody(planet);
 
@@ -158,17 +158,18 @@ function updateScene() {
     const deltaTime = engine.getDeltaTime() / 1000;
 
     player.nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.getAbsolutePosition());
-    if (player.nearestBody.name != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, sun, player);
+
+    bodyEditor.update(player.nearestBody, player);
 
     document.getElementById("planetName")!.innerText = player.isOrbiting() ? player.nearestBody.name : "Outer Space";
 
-    if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
+    if (isMouseEnabled) player.listenTo(mouse, deltaTime);
 
-    const playerMovement = player.listenToGamepad(gamepad, deltaTime);
-    playerMovement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
+    const playerMovement = player.listenTo(gamepad, deltaTime);
+    playerMovement.addInPlace(player.listenTo(keyboard, deltaTime));
     starSystem.translateAllBodies(playerMovement);
 
-    starSystem.update(player, sun.getAbsolutePosition(), deltaTime * Settings.TIME_MULTIPLIER);
+    starSystem.update(player, deltaTime * Settings.TIME_MULTIPLIER);
 
     if (!collisionWorker.isBusy() && player.isOrbiting()) {
         if (player.nearestBody?.bodyType == BodyType.TELLURIC) {

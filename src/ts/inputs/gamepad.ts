@@ -1,6 +1,8 @@
 /**
  * All possible buttons on a gamepad
  */
+import { Input } from "./input";
+
 export enum GamepadButton {
     B,
     A,
@@ -38,7 +40,7 @@ type EnumDictionary<T extends string | symbol | number, U> = { [K in T]: U };
 /**
  * Classe gérant les intéractions avec le gamepad
  */
-export class Gamepad {
+export class Gamepad implements Input {
     private gamepad: globalThis.Gamepad | null;
     // Provisoire ne fonctionne que avec la manette switch
     private buttonMapping: EnumDictionary<GamepadButton, number> = {
@@ -86,6 +88,49 @@ export class Gamepad {
             this.gamepad = e.gamepad;
         });
     }
+
+    getRoll() {
+        this.update();
+        if(this.getPressedValue(GamepadButton.L) > 0) return 1;
+        if(this.getPressedValue(GamepadButton.R) > 0) return -1;
+        return 0;
+    }
+
+    getPitch() {
+        this.update();
+        return this.getAxisValue(GamepadAxis.RY);
+    }
+
+    getYaw() {
+        this.update();
+        return this.getAxisValue(GamepadAxis.RX);
+    }
+
+    getZAxis() {
+        this.update();
+        return -this.getAxisValue(GamepadAxis.LY);
+    }
+
+    getXAxis() {
+        this.update();
+        return this.getAxisValue(GamepadAxis.LX);
+    }
+
+    getYAxis() {
+        this.update();
+        if (this.getPressedValue(GamepadButton.ZR) > 0) {
+            return this.getPressedValue(GamepadButton.ZR);
+        }
+        return this.getPressedValue(GamepadButton.ZL);
+    }
+
+    getAcceleration() {
+        this.update();
+        if (this.isPressed(GamepadButton.Start)) return 1;
+        if (this.isPressed(GamepadButton.Select)) return -1;
+        return 0;
+    }
+
     /**
      * Fonction à exécuter à chaque frame pour update les états des boutons (à cause Chrome ça)
      */

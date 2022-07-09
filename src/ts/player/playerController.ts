@@ -4,6 +4,7 @@ import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
 import { AbstractBody } from "../bodies/abstractBody";
 import { ITransformable } from "../bodies/iTransformable";
+import { Input } from "../inputs/input";
 
 export class PlayerController implements ITransformable {
     nearestBody: AbstractBody | null;
@@ -12,7 +13,7 @@ export class PlayerController implements ITransformable {
 
     camera: FreeCamera;
 
-    private speed = 1;
+    speed = 1;
     private rotationSpeed = Math.PI / 4;
 
     private controls = {
@@ -108,30 +109,16 @@ export class PlayerController implements ITransformable {
     }
 
     /**
-     * Listens to keyboard, rotate the player accordingly and computes equivalent displacement (the player is fixed at the origin)
-     * @param keyboard the keyboard to listen to
+     * Listens to input, rotate the player accordingly and computes equivalent displacement (the player is fixed at the origin)
+     * @param input the input to listen to
      * @param deltaTime the time between 2 frames
      * @returns the negative displacement of the player to apply to every other mesh given the inputs
      */
-    public listenToKeyboard(keyboard: Keyboard, deltaTime: number): Vector3 {
+    public listenTo(input: Input, deltaTime: number): Vector3 {
         // Update Rotation state
-        if (keyboard.isPressed(this.controls.rollLeftKey)) {
-            this.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime);
-        } else if (keyboard.isPressed(this.controls.rollRightKey)) {
-            this.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime);
-        }
-
-        if (keyboard.isPressed(this.controls.pitchUpKey)) {
-            this.rotate(this.getRightDirection(), -this.rotationSpeed * deltaTime);
-        } else if (keyboard.isPressed(this.controls.picthDownKey)) {
-            this.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime);
-        }
-
-        if (keyboard.isPressed(this.controls.yawLeftKey)) {
-            this.rotate(this.getUpwardDirection(), -this.rotationSpeed * deltaTime);
-        } else if (keyboard.isPressed(this.controls.yawRightKey)) {
-            this.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime);
-        }
+        if (input.getRoll() != 0) this.rotate(this.getForwardDirection(), input.getRoll() * this.rotationSpeed * deltaTime);
+        if (input.getPitch() != 0) this.rotate(this.getRightDirection(), input.getPitch() * this.rotationSpeed * deltaTime);
+        if (input.getYaw() != 0) this.rotate(this.getUpwardDirection(), input.getYaw() * this.rotationSpeed * deltaTime);
 
         // Update displacement state
         const deplacement = Vector3.Zero();
@@ -140,62 +127,11 @@ export class PlayerController implements ITransformable {
         const upwardDeplacement = this.getUpwardDirection().scale(this.speed * deltaTime);
         const rightDeplacement = this.getRightDirection().scale(this.speed * deltaTime);
 
-        if (keyboard.isAnyPressed(this.controls.forwardKeys)) deplacement.addInPlace(forwardDeplacement);
-        if (keyboard.isAnyPressed(this.controls.backwardKeys)) deplacement.subtractInPlace(forwardDeplacement);
-        if (keyboard.isAnyPressed(this.controls.leftKeys)) deplacement.subtractInPlace(rightDeplacement);
-        if (keyboard.isAnyPressed(this.controls.rightKeys)) deplacement.addInPlace(rightDeplacement);
-        if (keyboard.isAnyPressed(this.controls.upKeys)) deplacement.addInPlace(upwardDeplacement);
-        if (keyboard.isAnyPressed(this.controls.downKeys)) deplacement.subtractInPlace(upwardDeplacement);
+        if (input.getZAxis() != 0) deplacement.addInPlace(forwardDeplacement.scale(input.getZAxis()));
+        if (input.getXAxis() != 0) deplacement.addInPlace(rightDeplacement.scale(input.getXAxis()));
+        if (input.getYAxis() != 0) deplacement.addInPlace(upwardDeplacement.scale(input.getYAxis()));
 
-        if (keyboard.isPressed("+")) this.speed *= 1.1;
-        if (keyboard.isPressed("-")) this.speed /= 1.1;
-        if (keyboard.isPressed("8")) this.speed = 30;
-
-        return deplacement.negate();
-    }
-
-    /**
-     * Listens to mouse and rotate player accordingly
-     * @param mouse the mouse to listen to
-     * @param deltaTime the time between 2 frames
-     */
-    public listenToMouse(mouse: Mouse, deltaTime: number): void {
-        const greaterLength = Math.max(window.innerWidth, window.innerHeight);
-        this.rotate(this.getRightDirection(), (this.rotationSpeed * deltaTime * mouse.getDYToCenter()) / (greaterLength / 2));
-        this.rotate(this.getUpwardDirection(), (this.rotationSpeed * deltaTime * mouse.getDXToCenter()) / (greaterLength / 2));
-    }
-
-    /**
-     * Listens to gamepad and rotate player accordingly and computes equivalent displacement (the player is fixed at the origin)
-     * @param gamepad the gamepad to listen to
-     * @param deltaTime the time between 2 frames
-     * @returns the negative displacement of the playerControler given the inputs
-     */
-    public listenToGamepad(gamepad: Gamepad, deltaTime: number): Vector3 {
-        gamepad.update();
-
-        const deplacement = Vector3.Zero();
-
-        const forwardDeplacement = this.getForwardDirection().scale(this.speed * deltaTime);
-        const upwardDeplacement = this.getUpwardDirection().scale(this.speed * deltaTime);
-        const rightDeplacement = this.getRightDirection().scale(this.speed * deltaTime);
-
-        deplacement.addInPlace(forwardDeplacement.scale(-gamepad.getAxisValue(GamepadAxis.LY)));
-        deplacement.addInPlace(rightDeplacement.scale(gamepad.getAxisValue(GamepadAxis.LX)));
-
-        deplacement.addInPlace(upwardDeplacement.scale(gamepad.getPressedValue(GamepadButton.ZR)));
-        deplacement.subtractInPlace(upwardDeplacement.scale(gamepad.getPressedValue(GamepadButton.ZL)));
-
-        if (gamepad.isPressed(GamepadButton.Start)) this.speed *= 1.1;
-        if (gamepad.isPressed(GamepadButton.Select)) this.speed /= 1.1;
-
-        // pitch and yaw control
-        this.rotate(this.getRightDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RY));
-        this.rotate(this.getUpwardDirection(), this.rotationSpeed * deltaTime * gamepad.getAxisValue(GamepadAxis.RX));
-
-        // roll control
-        this.rotate(this.getForwardDirection(), this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.L));
-        this.rotate(this.getForwardDirection(), -this.rotationSpeed * deltaTime * gamepad.getPressedValue(GamepadButton.R));
+        if (input.getAcceleration() != 0) this.speed *= 1 + input.getAcceleration() / 10;
 
         return deplacement.negate();
     }

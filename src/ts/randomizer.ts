@@ -120,11 +120,11 @@ document.addEventListener("keydown", (e) => {
 
 const collisionWorker = new CollisionWorker(player, starSystemManager);
 
-starSystemManager.update(player, star1.getAbsolutePosition(), 0);
-starSystemManager.update(player, star1.getAbsolutePosition(), Date.now());
-starSystemManager.update(player, star1.getAbsolutePosition(), 0);
-starSystemManager.update(player, star1.getAbsolutePosition(), 0);
-starSystemManager.update(player, star1.getAbsolutePosition(), 0);
+starSystemManager.update(player, 0);
+starSystemManager.update(player, Date.now());
+starSystemManager.update(player, 0);
+starSystemManager.update(player, 0);
+starSystemManager.update(player, 0);
 
 player.positionNearBody(planet);
 
@@ -141,15 +141,18 @@ scene.executeWhenReady(() => {
         const deltaTime = engine.getDeltaTime() / 1000;
 
         player.nearestBody = starSystemManager.getNearestBody();
-        if (player.nearestBody.name != bodyEditor.currentBodyId) bodyEditor.setBody(player.nearestBody, star1, player);
+        if (keyboard.isPressed("+")) player.speed *= 1.1;
+        if (keyboard.isPressed("-")) player.speed /= 1.1;
 
-        starSystemManager.update(player, star1.getAbsolutePosition(), Settings.TIME_MULTIPLIER * deltaTime);
+        bodyEditor.update(player.nearestBody, player);
 
-        if (isMouseEnabled) player.listenToMouse(mouse, deltaTime);
+        starSystemManager.update(player, Settings.TIME_MULTIPLIER * deltaTime);
 
-        const deplacement = player.listenToGamepad(gamepad, deltaTime);
+        if (isMouseEnabled) player.listenTo(mouse, deltaTime);
 
-        deplacement.addInPlace(player.listenToKeyboard(keyboard, deltaTime));
+        const deplacement = player.listenTo(gamepad, deltaTime);
+
+        deplacement.addInPlace(player.listenTo(keyboard, deltaTime));
 
         starSystemManager.translateAllBodies(deplacement);
 

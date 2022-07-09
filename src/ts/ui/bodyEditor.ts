@@ -110,7 +110,7 @@ export class BodyEditor {
         return this.visibility;
     }
 
-    public setBody(body: AbstractBody, star: Star, player: PlayerController) {
+    public setBody(body: AbstractBody, player: PlayerController) {
         this.currentBodyId = body.name;
         this.initNavBar(body);
         switch (body.bodyType) {
@@ -125,7 +125,7 @@ export class BodyEditor {
                 break;
             default:
         }
-        this.initGeneralSliders(body, star, player);
+        this.initGeneralSliders(body, player);
         this.initRingsSliders(body);
     }
 
@@ -233,7 +233,7 @@ export class BodyEditor {
         );
     }
 
-    public initGeneralSliders(planet: AbstractBody, star: Star, player: PlayerController) {
+    public initGeneralSliders(planet: AbstractBody, player: PlayerController) {
         show("generalLink");
 
         for (const slider of this.generalSliders) slider.remove();
@@ -626,5 +626,9 @@ export class BodyEditor {
         for (const sliderGroup of this.sliders) {
             for (const slider of sliderGroup) slider.update(false);
         }
+    }
+
+    public update(nearestBody: AbstractBody, player: PlayerController) {
+        if (nearestBody.name != this.currentBodyId) this.setBody(nearestBody, player);
     }
 }
