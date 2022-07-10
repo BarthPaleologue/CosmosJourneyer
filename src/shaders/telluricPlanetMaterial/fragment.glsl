@@ -236,7 +236,7 @@ void main() {
 	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.00001, normalSharpness, bottomFactor);
 
 	normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.001, normalSharpness, beachFactor);
-	normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.00001, normalSharpness, beachFactor);
+	normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.0001, normalSharpness, beachFactor);
 
 	normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.001, normalSharpness, plainFactor);
 	normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.00001, normalSharpness, plainFactor);
