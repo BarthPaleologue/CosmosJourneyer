@@ -39,6 +39,8 @@ uniform float time;
 
 #pragma glslify: completeNoise = require(./utils/noise.glsl)
 
+#pragma glslify: saturate = require(./utils/saturate.glsl)
+
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 
 #pragma glslify: fastAcos = require(./utils/fastAcos.glsl)
@@ -48,9 +50,9 @@ uniform float time;
 vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
 
-    float waveAmplitude = 7.0;
+    float waveAmplitude = 20.0;
 
-    float waveOmega = 1.0/3000.0;
+    float waveOmega = 1.0/7.0;
 
     float actualRadius = oceanRadius + waveAmplitude * sin(time * waveOmega);
 
@@ -98,10 +100,14 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         
         vec3 ambiant = lerp(originalColor, oceanColor, alpha);
 
+        float foamSize = 30.0;
+        float foamFactor = saturate((foamSize - distanceThroughOcean) / foamSize);
+        vec3 foamColor = vec3(0.8);
+        ambiant = lerp(foamColor, ambiant, foamFactor);
+
         return ambiant * sqrt(ndl1 * ndl2) + specularHighlight;
-    } else {
-        return originalColor;
     }
+    return originalColor;
 }
 
 
