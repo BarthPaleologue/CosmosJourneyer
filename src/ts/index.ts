@@ -21,12 +21,19 @@ import "../styles/index.scss";
 import { Settings } from "./settings";
 import { BodyType } from "./bodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
-import { initCanvasEngineScene } from "./utils/init";
+import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { GazPlanet } from "./bodies/planets/gazPlanet";
 
 const bodyEditor = new BodyEditor();
-const [canvas, engine, scene] = initCanvasEngineScene("renderer");
+
+const canvas = document.getElementById("renderer") as HTMLCanvasElement;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+bodyEditor.setCanvas(canvas);
+
+const [engine, scene] = initEngineScene(canvas);
 
 const mouse = new Mouse(canvas, 1e5);
 
@@ -181,16 +188,12 @@ document.addEventListener("keydown", (e) => {
         (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
 });
 
-function resizeUI() {
-    if (bodyEditor.getVisibility() != EditorVisibility.FULL) canvas.width = window.innerWidth;
-    else canvas.width = window.innerWidth - 300; // on compte le panneau
-    canvas.height = window.innerHeight;
+window.addEventListener("resize", () => {
+    bodyEditor.resize();
     engine.resize();
-}
+});
 
-window.addEventListener("resize", () => resizeUI());
-
-resizeUI();
+bodyEditor.resize();
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();

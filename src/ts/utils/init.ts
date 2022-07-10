@@ -1,9 +1,6 @@
 import { Engine, Scene } from "@babylonjs/core";
 
-export function initCanvasEngineScene(idCanvas: string): [HTMLCanvasElement, Engine, Scene] {
-    const canvas = document.getElementById(idCanvas) as HTMLCanvasElement;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+export function initEngineScene(canvas: HTMLCanvasElement): [Engine, Scene] {
 
     const engine = new Engine(canvas);
     engine.loadingScreen.displayLoadingUI();
@@ -12,5 +9,5 @@ export function initCanvasEngineScene(idCanvas: string): [HTMLCanvasElement, Eng
 
     const scene = new Scene(engine);
 
-    return [canvas, engine, scene];
+    return [engine, scene];
 }

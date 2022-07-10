@@ -17,7 +17,7 @@ import { Settings } from "./settings";
 import { BodyType } from "./bodies/interfaces";
 import { clamp } from "./utils/math";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
-import { initCanvasEngineScene } from "./utils/init";
+import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 
 import { alea } from "seedrandom";
@@ -27,7 +27,14 @@ import { GazPlanet } from "./bodies/planets/gazPlanet";
 import { computeMeanTemperature } from "./utils/temperatureComputation";
 
 const bodyEditor = new BodyEditor();
-const [canvas, engine, scene] = initCanvasEngineScene("renderer");
+
+const canvas = document.getElementById("renderer") as HTMLCanvasElement;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+bodyEditor.setCanvas(canvas);
+
+const [engine, scene] = initEngineScene(canvas);
 
 const mouse = new Mouse(canvas, 1e5);
 
@@ -127,7 +134,7 @@ player.positionNearBody(planet);
 
 console.log(
     "Average Temperature : ",
-    computeMeanTemperature(star1.physicalProperties.temperature, star1.getApparentRadius(), planet.getAbsolutePosition().subtract(star1.getAbsolutePosition()).length(), 0.3, 0.3) - 273,
+    computeMeanTemperature(star1.physicalProperties.temperature, star1.getApparentRadius(), (planet.orbitalProperties.periapsis + planet.orbitalProperties.apoapsis) / 2, 0.3, 0.3) - 273,
     "°C"
 );
 
@@ -155,13 +162,9 @@ scene.executeWhenReady(() => {
     engine.runRenderLoop(() => scene.render());
 });
 
-function resizeUI() {
-    if (bodyEditor.getVisibility() != EditorVisibility.FULL) canvas.width = window.innerWidth;
-    else canvas.width = window.innerWidth - 300; // on compte le panneau
-    canvas.height = window.innerHeight;
+window.addEventListener("resize", () => {
+    bodyEditor.resize();
     engine.resize();
-}
+});
 
-window.addEventListener("resize", () => resizeUI());
-
-resizeUI();
+bodyEditor.resize();

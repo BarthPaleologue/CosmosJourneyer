@@ -21,6 +21,8 @@ export enum EditorVisibility {
 }
 
 export class BodyEditor {
+    canvas: HTMLCanvasElement | null = null;
+
     visibility: EditorVisibility = EditorVisibility.HIDDEN;
 
     navBar: HTMLElement;
@@ -79,6 +81,18 @@ export class BodyEditor {
         this.currentPanel = newPanel;
         showPanel(this.currentPanel.id);
         setTimeout(() => this.updateAllSliders(), 500);
+    }
+
+    public setCanvas(canvas: HTMLCanvasElement) {
+        this.canvas = canvas;
+    }
+
+    public resize() {
+        if(this.canvas == null) throw new Error("BodyEditor has no canvas");
+
+        if (this.visibility != EditorVisibility.FULL) this.canvas.width = window.innerWidth;
+        else this.canvas.width = window.innerWidth - 300;
+        this.canvas.height = window.innerHeight;
     }
 
     public setVisibility(visibility: EditorVisibility): void {
