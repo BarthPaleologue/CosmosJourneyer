@@ -174,6 +174,7 @@ void main() {
 	}
 	moisture01 = clamp(moisture01, 0.0, 1.0);
 
+
 	// calcul de la couleur et de la normale
 	vec3 normal = vNormal;
 
@@ -232,27 +233,30 @@ void main() {
 	+ snowFactor * snowColor
 	+ bottomFactor * bottomColor;
 
-	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.001, normalSharpness, bottomFactor);
-	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.00001, normalSharpness, bottomFactor);
+	// template:
+	// small scale
+	// large scale
 
-	normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.001, normalSharpness, beachFactor);
-	normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.0001, normalSharpness, beachFactor);
+	float normalStrengthNear = 1.0;
+	float normalStrengthFar = 1.0;
 
-	normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.001, normalSharpness, plainFactor);
-	normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.00001, normalSharpness, plainFactor);
+	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.001, normalSharpness, bottomFactor * normalStrengthNear);
+	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.00001, normalSharpness, bottomFactor * normalStrengthFar);
 
-	normal = triplanarNormal(vSamplePoint, normal, desertNormalMap, 0.001, normalSharpness, desertFactor);
-	normal = triplanarNormal(vSamplePoint, normal, desertNormalMap, 0.00001, normalSharpness, desertFactor);
+	normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.001, normalSharpness, beachFactor * normalStrengthNear);
+	normal = triplanarNormal(vSamplePoint, normal, beachNormalMap, 0.00001, normalSharpness, beachFactor * normalStrengthFar);
 
-	normal = triplanarNormal(vSamplePoint, normal, snowNormalMap, 0.001, normalSharpness, snowFactor);
-	normal = triplanarNormal(vSamplePoint, normal, snowNormalMap, 0.00001, normalSharpness, snowFactor);
+	normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.001, normalSharpness, plainFactor * normalStrengthNear);
+	normal = triplanarNormal(vSamplePoint, normal, plainNormalMap, 0.00001, normalSharpness, plainFactor * normalStrengthFar);
 
-	normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.001, normalSharpness, steepFactor);
-	normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.00001, normalSharpness, steepFactor);
+	normal = triplanarNormal(vSamplePoint, normal, desertNormalMap, 0.001, normalSharpness, desertFactor * normalStrengthNear);
+	normal = triplanarNormal(vSamplePoint, normal, desertNormalMap, 0.00001, normalSharpness, desertFactor * normalStrengthFar);
 
+	normal = triplanarNormal(vSamplePoint, normal, snowNormalMap, 0.001, normalSharpness, snowFactor * normalStrengthNear);
+	normal = triplanarNormal(vSamplePoint, normal, snowNormalMap, 0.00001, normalSharpness, snowFactor * normalStrengthFar);
 
-
-
+	normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.001, normalSharpness, steepFactor * normalStrengthNear);
+	normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.00001, normalSharpness, steepFactor * normalStrengthFar);
 
 
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
