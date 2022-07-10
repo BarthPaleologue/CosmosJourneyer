@@ -28,17 +28,18 @@ import { GazPlanet } from "./bodies/planets/gazPlanet";
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
 
+const mouse = new Mouse(canvas, 1e5);
+
 const player = new PlayerController(scene);
 player.setSpeed(0.2 * Settings.EARTH_RADIUS);
 player.camera.maxZ = Settings.EARTH_RADIUS * 100000;
+player.inputs.push(new Keyboard(), mouse, new Gamepad());
 
 Assets.Init(scene);
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
-const keyboard = new Keyboard();
-const mouse = new Mouse();
-const gamepad = new Gamepad();
+
 
 const starSystem = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
@@ -145,8 +146,6 @@ andromaque.orbitalProperties = {
 
 starSystem.init();
 
-let isMouseEnabled = false;
-
 const collisionWorker = new CollisionWorker(player, starSystem);
 
 // update to current date
@@ -159,15 +158,11 @@ function updateScene() {
 
     player.nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.getAbsolutePosition());
 
-    bodyEditor.update(player.nearestBody, player);
+    bodyEditor.update(player);
 
     document.getElementById("planetName")!.innerText = player.isOrbiting() ? player.nearestBody.name : "Outer Space";
 
-    if (isMouseEnabled) player.listenTo(mouse, deltaTime);
-
-    const playerMovement = player.listenTo(gamepad, deltaTime);
-    playerMovement.addInPlace(player.listenTo(keyboard, deltaTime));
-    starSystem.translateAllBodies(playerMovement);
+    starSystem.translateAllBodies(player.update(deltaTime));
 
     starSystem.update(player, deltaTime * Settings.TIME_MULTIPLIER);
 
@@ -181,7 +176,7 @@ function updateScene() {
 document.addEventListener("keydown", (e) => {
     if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
     if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
-    if (e.key == "m") isMouseEnabled = !isMouseEnabled;
+    if (e.key == "m") mouse.deadAreaRadius == 50 ? mouse.deadAreaRadius = 1e5 : mouse.deadAreaRadius = 50;
     if (e.key == "w" && player.isOrbiting())
         (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
 });

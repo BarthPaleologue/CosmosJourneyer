@@ -16,6 +16,8 @@ export class PlayerController implements ITransformable {
     speed = 1;
     private rotationSpeed = Math.PI / 4;
 
+    readonly inputs: Input[] = [];
+
     private controls = {
         upKeys: [" "],
         downKeys: ["Shift", "ShiftLeft", "c", "C"],
@@ -189,5 +191,13 @@ export class PlayerController implements ITransformable {
         } else {
             return this.nearestBody == body && this.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * this.nearestBody.getRadius()) ** 2;
         }
+    }
+
+    public update(deltaTime: number): Vector3 {
+        const playerMovement = Vector3.Zero();
+        for(const input of this.inputs) {
+            playerMovement.addInPlace(this.listenTo(input, deltaTime));
+        }
+        return playerMovement;
     }
 }

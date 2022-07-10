@@ -29,15 +29,14 @@ import { computeMeanTemperature } from "./utils/temperatureComputation";
 const bodyEditor = new BodyEditor();
 const [canvas, engine, scene] = initCanvasEngineScene("renderer");
 
+const mouse = new Mouse(canvas, 1e5);
+
 const player = new PlayerController(scene);
 player.setSpeed(0.2 * Settings.EARTH_RADIUS);
 player.camera.maxZ = Settings.EARTH_RADIUS * 100000;
+player.inputs.push(new Keyboard(), mouse, new Gamepad());
 
 Assets.Init(scene);
-
-const keyboard = new Keyboard();
-const mouse = new Mouse();
-const gamepad = new Gamepad();
 
 const starSystemManager = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
@@ -108,12 +107,10 @@ for (let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
 
 starSystemManager.init();
 
-let isMouseEnabled = false;
-
 document.addEventListener("keydown", (e) => {
     if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
     if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
-    if (e.key == "m") isMouseEnabled = !isMouseEnabled;
+    if (e.key == "m") mouse.deadAreaRadius == 50 ? mouse.deadAreaRadius = 1e5 : mouse.deadAreaRadius = 50;
     if (e.key == "w" && player.nearestBody != null)
         (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
 });
@@ -141,20 +138,12 @@ scene.executeWhenReady(() => {
         const deltaTime = engine.getDeltaTime() / 1000;
 
         player.nearestBody = starSystemManager.getNearestBody();
-        if (keyboard.isPressed("+")) player.speed *= 1.1;
-        if (keyboard.isPressed("-")) player.speed /= 1.1;
 
-        bodyEditor.update(player.nearestBody, player);
+        bodyEditor.update(player);
 
         starSystemManager.update(player, Settings.TIME_MULTIPLIER * deltaTime);
 
-        if (isMouseEnabled) player.listenTo(mouse, deltaTime);
-
-        const deplacement = player.listenTo(gamepad, deltaTime);
-
-        deplacement.addInPlace(player.listenTo(keyboard, deltaTime));
-
-        starSystemManager.translateAllBodies(deplacement);
+        starSystemManager.translateAllBodies(player.update(deltaTime));
 
         if (!collisionWorker.isBusy() && player.isOrbiting()) {
             if (player.nearestBody?.bodyType == BodyType.TELLURIC) {

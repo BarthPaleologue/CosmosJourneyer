@@ -628,7 +628,8 @@ export class BodyEditor {
         }
     }
 
-    public update(nearestBody: AbstractBody, player: PlayerController) {
-        if (nearestBody.name != this.currentBodyId) this.setBody(nearestBody, player);
+    public update(player: PlayerController) {
+        if (player.nearestBody == null) return;
+        if (player.nearestBody.name != this.currentBodyId) this.setBody(player.nearestBody, player);
     }
 }

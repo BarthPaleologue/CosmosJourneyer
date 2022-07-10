@@ -10,25 +10,27 @@ export class Mouse implements Input {
     private dxToCenter = 0;
     private dyToCenter = 0;
 
-    private deadAreaRadius = 100;
+    deadAreaRadius = 100;
+    private canvas: HTMLCanvasElement;
 
-    constructor(deadAreaRadius = 100) {
-        window.addEventListener("mousemove", e => {
-            this.dx = (e.x - this.x) / window.innerWidth;
-            this.dy = (e.y - this.y) / window.innerHeight;
+    constructor(canvas: HTMLCanvasElement, deadAreaRadius = 50) {
+        this.deadAreaRadius = deadAreaRadius;
+        this.canvas = canvas;
+
+        this.canvas.addEventListener("mousemove", e => {
+            this.dx = (e.x - this.x) / this.canvas.width;
+            this.dy = (e.y - this.y) / this.canvas.height;
 
             this.x = e.x;
             this.y = e.y;
 
-            this.dxToCenter = e.x - window.innerWidth / 2;
-            this.dyToCenter = e.y - window.innerHeight / 2;
+            this.dxToCenter = e.x - this.canvas.width / 2;
+            this.dyToCenter = e.y - this.canvas.height / 2;
 
-            if (this.dxToCenter ** 2 + this.dyToCenter ** 2 < this.deadAreaRadius ** 2) {
+            /*if (this.dxToCenter ** 2 + this.dyToCenter ** 2 < this.deadAreaRadius ** 2) {
                 this.dxToCenter = 0;
                 this.dyToCenter = 0;
-            }
-
-            this.deadAreaRadius = deadAreaRadius;
+            }*/
         });
     }
 
@@ -37,13 +39,17 @@ export class Mouse implements Input {
     }
 
     getPitch() {
-        const greaterLength = Math.max(window.innerWidth, window.innerHeight);
-        return this.dyToCenter / (greaterLength / 2);
+        const d2 = this.dxToCenter ** 2 + this.dyToCenter ** 2;
+        const adaptedLength = Math.max(Math.log(d2 / this.deadAreaRadius ** 2), 0) / 3;
+        const greaterLength = Math.max(this.canvas.width, this.canvas.height);
+        return this.dyToCenter * adaptedLength / (greaterLength / 2);
     }
 
     getYaw() {
-        const greaterLength = Math.max(window.innerWidth, window.innerHeight);
-        return this.dxToCenter / (greaterLength / 2);
+        const d2 = this.dxToCenter ** 2 + this.dyToCenter ** 2;
+        const adaptedLength = Math.max(Math.log(d2 / this.deadAreaRadius ** 2), 0) / 3;
+        const greaterLength = Math.max(this.canvas.width, this.canvas.height);
+        return this.dxToCenter * adaptedLength / (greaterLength / 2);
     }
 
     getZAxis() {
@@ -56,22 +62,6 @@ export class Mouse implements Input {
 
     getYAxis() {
         return 0;
-    }
-
-    public getDXToCenter(): number {
-        return this.dxToCenter;
-    }
-
-    public getDYToCenter(): number {
-        return this.dyToCenter;
-    }
-
-    public getDeadAreaRadius() {
-        return this.deadAreaRadius;
-    }
-
-    public setDeadAreaRadius(newDeadAreaRadius: number) {
-        this.deadAreaRadius = newDeadAreaRadius;
     }
 
     getAcceleration(): number {
