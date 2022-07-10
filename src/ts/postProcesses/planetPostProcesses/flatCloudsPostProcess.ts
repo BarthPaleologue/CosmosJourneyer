@@ -1,7 +1,7 @@
 import { Color3, Effect, Texture } from "@babylonjs/core";
 
 import { CloudSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
-import normalMap from "../../../asset/textures/cloudNormalMap2.jpg";
+import normalMap from "../../../asset/textures/cloudNormalMap3.jpg";
 import { PlanetPostProcess } from "../planetPostProcess";
 import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 import { gcd } from "../../utils/math";
