@@ -32,10 +32,10 @@ export function solveKepler(M: number, e: number) {
 }
 
 export function computeBarycenter2(bodies: IOrbitalBody[]): Vector3 {
-    if(bodies.length == 0) throw new Error("Can compute the barycenter of zero bodies");
+    if (bodies.length == 0) throw new Error("Can compute the barycenter of zero bodies");
     const barycenter = Vector3.Zero();
     let sum = 0;
-    for(const body of bodies) {
+    for (const body of bodies) {
         barycenter.addInPlace(body.getAbsolutePosition().scale(body.physicalProperties.mass));
         sum += body.physicalProperties.mass;
     }

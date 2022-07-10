@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, Space, TransformNode, Scene, Axis } from "@babylonjs/core";
+import { Vector3, Quaternion, Scene, Axis } from "@babylonjs/core";
 import { BodyType, ISeedable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
@@ -11,8 +11,9 @@ import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPost
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { centeredRand, randRange } from "extended-random";
 import { alea } from "seedrandom";
+import { BasicTransform } from "../transforms/basicTransform";
 
-export abstract class AbstractBody implements IOrbitalBody, ISeedable {
+export abstract class AbstractBody extends BasicTransform implements IOrbitalBody, ISeedable {
     abstract readonly bodyType: BodyType;
 
     abstract physicalProperties: IPhysicalProperties;
@@ -29,14 +30,13 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
 
     abstract readonly radius: number;
 
-    readonly transform: TransformNode;
-
     readonly parentBodies: IOrbitalBody[];
     readonly childrenBodies: IOrbitalBody[] = [];
 
     depth: number;
 
     protected constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+        super(name);
         this.name = name;
         this.seed = seed;
 
@@ -55,8 +55,6 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
         if (minDepth == -1) this.depth = 0;
         else this.depth = minDepth + 1;
 
-        this.transform = new TransformNode(`${name}Transform`);
-
         this.rotate(Axis.X, centeredRand(this.rng) / 2);
         this.rotate(Axis.Z, centeredRand(this.rng) / 2);
 
@@ -70,36 +68,6 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
             period: getOrbitalPeriod(periapsis, apoapsis, this.parentBodies),
             orientationQuaternion: Quaternion.Identity()
         };
-    }
-
-    public setAbsolutePosition(newPosition: Vector3): void {
-        this.transform.setAbsolutePosition(newPosition);
-    }
-
-    public getAbsolutePosition(): Vector3 {
-        if (this.transform.getAbsolutePosition()._isDirty) this.transform.computeWorldMatrix(true);
-        return this.transform.getAbsolutePosition();
-    }
-
-    public translate(displacement: Vector3): void {
-        this.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
-    }
-
-    public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
-        this.transform.rotateAround(pivot, axis, amount);
-    }
-
-    public rotate(axis: Vector3, amount: number) {
-        this.transform.rotate(axis, amount, Space.WORLD);
-    }
-
-    public getRotationQuaternion(): Quaternion {
-        if (this.transform.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.name}`);
-        return this.transform.rotationQuaternion;
-    }
-
-    public getInverseRotationQuaternion(): Quaternion {
-        return this.getRotationQuaternion().invert();
     }
 
     /**

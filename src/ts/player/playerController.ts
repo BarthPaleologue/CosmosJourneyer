@@ -1,12 +1,10 @@
-import { Vector3, FreeCamera, Axis, Space, Scene, Quaternion, TransformNode } from "@babylonjs/core";
-import { Gamepad, GamepadAxis, GamepadButton } from "../inputs/gamepad";
-import { Keyboard } from "../inputs/keyboard";
-import { Mouse } from "../inputs/mouse";
+import { Vector3, FreeCamera, Scene } from "@babylonjs/core";
 import { AbstractBody } from "../bodies/abstractBody";
-import { ITransformable } from "../bodies/iTransformable";
+import { ITransformable } from "../transforms/iTransformable";
 import { Input } from "../inputs/input";
+import { BasicTransform } from "../transforms/basicTransform";
 
-export class PlayerController implements ITransformable {
+export class PlayerController extends BasicTransform implements ITransformable {
     nearestBody: AbstractBody | null;
 
     collisionRadius = 100;
@@ -14,100 +12,19 @@ export class PlayerController implements ITransformable {
     camera: FreeCamera;
 
     speed = 1;
-    private rotationSpeed = Math.PI / 4;
+
+    rotationSpeed = Math.PI / 4;
 
     readonly inputs: Input[] = [];
 
-    private controls = {
-        upKeys: [" "],
-        downKeys: ["Shift", "ShiftLeft", "c", "C"],
-        forwardKeys: ["z", "Z"],
-        leftKeys: ["q", "Q"],
-        backwardKeys: ["s", "S"],
-        rightKeys: ["d", "D"],
-
-        rollLeftKey: "a",
-        rollRightKey: "e",
-
-        pitchUpKey: "i",
-        picthDownKey: "k",
-
-        yawLeftKey: "j",
-        yawRightKey: "l"
-    };
-
-    readonly transform: TransformNode;
-
     constructor(scene: Scene) {
-        this.transform = new TransformNode("playerTransform", scene);
-        this.transform.position = Vector3.Zero();
-        this.transform.rotationQuaternion = Quaternion.Identity();
+        super("player");
 
         this.camera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.transform;
         scene.activeCamera = this.camera;
 
         this.nearestBody = null;
-    }
-
-    /* #region directions */
-
-    /**
-     *
-     * @returns the unit vector pointing forward the player controler in world space
-     */
-    public getForwardDirection(): Vector3 {
-        return this.transform.getDirection(Axis.Z);
-    }
-
-    /**
-     *
-     * @returns the unit vector pointing backward the player controler in world space
-     */
-    public getBackwardDirection(): Vector3 {
-        return this.getForwardDirection().negate();
-    }
-
-    /**
-     *
-     * @returns the unit vector pointing upward the player controler in world space
-     */
-    public getUpwardDirection(): Vector3 {
-        return this.transform.getDirection(Axis.Y);
-    }
-
-    /**
-     *
-     * @returns the unit vector pointing downward the player controler in world space
-     */
-    public getDownwardDirection(): Vector3 {
-        return this.getUpwardDirection().negate();
-    }
-
-    /**
-     *
-     * @returns the unit vector pointing to the right of the player controler in world space
-     */
-    public getRightDirection(): Vector3 {
-        return this.transform.getDirection(Axis.X);
-    }
-
-    /**
-     *
-     * @returns the unit vector pointing to the left of the player controler in world space
-     */
-    public getLeftDirection(): Vector3 {
-        return this.getRightDirection().negate();
-    }
-
-    /* #endregion directions */
-
-    /**
-     * Set new speed for player controler
-     * @param newSpeed the new speed value
-     */
-    public setSpeed(newSpeed: number) {
-        this.speed = newSpeed;
     }
 
     /**
@@ -138,36 +55,6 @@ export class PlayerController implements ITransformable {
         return deplacement.negate();
     }
 
-    public getAbsolutePosition(): Vector3 {
-        if (this.transform.getAbsolutePosition()._isDirty) this.transform.computeWorldMatrix(true);
-        return this.transform.getAbsolutePosition();
-    }
-
-    public setAbsolutePosition(newPosition: Vector3): void {
-        this.transform.setAbsolutePosition(newPosition);
-    }
-
-    public getRotationQuaternion(): Quaternion {
-        if (this.transform.rotationQuaternion == undefined) throw new Error(`PlayerController's rotation Quaternion is undefined !`);
-        return this.transform.rotationQuaternion;
-    }
-
-    public getInverseRotationQuaternion(): Quaternion {
-        return this.getRotationQuaternion().conjugate();
-    }
-
-    public translate(displacement: Vector3): void {
-        this.transform.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
-    }
-
-    public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
-        this.transform.rotateAround(pivot, axis, amount);
-    }
-
-    public rotate(axis: Vector3, amount: number): void {
-        this.transform.rotate(axis, amount, Space.WORLD);
-    }
-
     public positionNearBody(body: AbstractBody): void {
         const dir = body.getAbsolutePosition();
         const dist = dir.length();
@@ -182,7 +69,8 @@ export class PlayerController implements ITransformable {
 
     /**
      * If the parameter is unset, returns whereas the player is orbiting a body, if the parameter is set returns if the player orbits the given body
-     * @param body
+     * @param body the body to check whereas the player is orbiting
+     * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
      */
     public isOrbiting(body: AbstractBody | null = null, orbitLimitFactor = 2.5): boolean {
         if (this.nearestBody == null) return false;
@@ -195,7 +83,7 @@ export class PlayerController implements ITransformable {
 
     public update(deltaTime: number): Vector3 {
         const playerMovement = Vector3.Zero();
-        for(const input of this.inputs) {
+        for (const input of this.inputs) {
             playerMovement.addInPlace(this.listenTo(input, deltaTime));
         }
         return playerMovement;

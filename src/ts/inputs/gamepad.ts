@@ -91,8 +91,8 @@ export class Gamepad implements Input {
 
     getRoll() {
         this.update();
-        if(this.getPressedValue(GamepadButton.L) > 0) return 1;
-        if(this.getPressedValue(GamepadButton.R) > 0) return -1;
+        if (this.getPressedValue(GamepadButton.L) > 0) return 1;
+        if (this.getPressedValue(GamepadButton.R) > 0) return -1;
         return 0;
     }
 

@@ -30,7 +30,7 @@ export class ChunkForge {
         this.workerPool = new WorkerPool(nbMaxWorkers);
     }
 
-    public addTask(task: (BuildTask | DeleteTask)) {
+    public addTask(task: BuildTask | DeleteTask) {
         this.workerPool.submitTask(task);
     }
 

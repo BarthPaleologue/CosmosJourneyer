@@ -2,7 +2,7 @@ import { CollisionData } from "../chunks/workerDataInterfaces";
 import { StarSystemManager } from "../bodies/starSystemManager";
 import { PlayerController } from "../player/playerController";
 import { RigidBody } from "../bodies/interfaces";
-import { ITransformable } from "../bodies/iTransformable";
+import { ITransformable } from "../transforms/iTransformable";
 
 export class CollisionWorker {
     _player: PlayerController;

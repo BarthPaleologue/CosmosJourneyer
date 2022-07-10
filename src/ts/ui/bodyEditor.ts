@@ -88,7 +88,7 @@ export class BodyEditor {
     }
 
     public resize() {
-        if(this.canvas == null) throw new Error("BodyEditor has no canvas");
+        if (this.canvas == null) throw new Error("BodyEditor has no canvas");
 
         if (this.visibility != EditorVisibility.FULL) this.canvas.width = window.innerWidth;
         else this.canvas.width = window.innerWidth - 300;

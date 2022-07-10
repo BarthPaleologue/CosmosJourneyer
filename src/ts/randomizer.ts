@@ -39,7 +39,7 @@ const [engine, scene] = initEngineScene(canvas);
 const mouse = new Mouse(canvas, 1e5);
 
 const player = new PlayerController(scene);
-player.setSpeed(0.2 * Settings.EARTH_RADIUS);
+player.speed = 0.2 * Settings.EARTH_RADIUS;
 player.camera.maxZ = Settings.EARTH_RADIUS * 100000;
 player.inputs.push(new Keyboard(), mouse, new Gamepad());
 
@@ -98,7 +98,6 @@ if (planet.bodyType == BodyType.TELLURIC) {
     console.table(telluricPlanet.terrainSettings);
 }
 
-
 for (let i = 0; i < randRangeInt(0, 4, planet.rng); i++) {
     const satellite = new TelluricPlanet(`${planet.name}Sattelite${i}`, starSystemManager, planet.rng(), [planet]);
     const periapsis = 5 * planet.getRadius() + i * clamp(normalRandom(1, 0.1, satellite.rng), 0.9, 1.0) * planet.getRadius() * 2;
@@ -117,7 +116,7 @@ starSystemManager.init();
 document.addEventListener("keydown", (e) => {
     if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
     if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
-    if (e.key == "m") mouse.deadAreaRadius == 50 ? mouse.deadAreaRadius = 1e5 : mouse.deadAreaRadius = 50;
+    if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
     if (e.key == "w" && player.nearestBody != null)
         (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
 });
@@ -134,7 +133,13 @@ player.positionNearBody(planet);
 
 console.log(
     "Average Temperature : ",
-    computeMeanTemperature(star1.physicalProperties.temperature, star1.getApparentRadius(), (planet.orbitalProperties.periapsis + planet.orbitalProperties.apoapsis) / 2, 0.3, 0.3) - 273,
+    computeMeanTemperature(
+        star1.physicalProperties.temperature,
+        star1.getApparentRadius(),
+        (planet.orbitalProperties.periapsis + planet.orbitalProperties.apoapsis) / 2,
+        0.3,
+        0.3
+    ) - 273,
     "°C"
 );
 

@@ -8,38 +8,38 @@ export class Keyboard implements Input {
     }
 
     getRoll() {
-        if(this.isPressed("a")) return 1;
-        if(this.isPressed("e")) return -1;
+        if (this.isPressed("a")) return 1;
+        if (this.isPressed("e")) return -1;
         return 0;
     }
 
     getPitch() {
-        if(this.isPressed("i")) return -1;
-        if(this.isPressed("k")) return 1;
+        if (this.isPressed("i")) return -1;
+        if (this.isPressed("k")) return 1;
         return 0;
     }
 
     getYaw() {
-        if(this.isPressed("j")) return -1;
-        if(this.isPressed("l")) return 1;
+        if (this.isPressed("j")) return -1;
+        if (this.isPressed("l")) return 1;
         return 0;
     }
 
     getZAxis() {
-        if(this.isPressed("z")) return 1;
-        if(this.isPressed("s")) return -1;
+        if (this.isPressed("z")) return 1;
+        if (this.isPressed("s")) return -1;
         return 0;
     }
 
     getXAxis() {
-        if(this.isPressed("q")) return -1;
-        if(this.isPressed("d")) return 1;
+        if (this.isPressed("q")) return -1;
+        if (this.isPressed("d")) return 1;
         return 0;
     }
 
     getYAxis() {
-        if(this.isPressed(" ")) return 1;
-        if(this.isPressed("c")) return -1;
+        if (this.isPressed(" ")) return 1;
+        if (this.isPressed("c")) return -1;
         return 0;
     }
 

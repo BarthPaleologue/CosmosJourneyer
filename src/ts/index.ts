@@ -38,15 +38,13 @@ const [engine, scene] = initEngineScene(canvas);
 const mouse = new Mouse(canvas, 1e5);
 
 const player = new PlayerController(scene);
-player.setSpeed(0.2 * Settings.EARTH_RADIUS);
+player.speed = 0.2 * Settings.EARTH_RADIUS;
 player.camera.maxZ = Settings.EARTH_RADIUS * 100000;
 player.inputs.push(new Keyboard(), mouse, new Gamepad());
 
 Assets.Init(scene);
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
-
-
 
 const starSystem = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
@@ -183,7 +181,7 @@ function updateScene() {
 document.addEventListener("keydown", (e) => {
     if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
     if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
-    if (e.key == "m") mouse.deadAreaRadius == 50 ? mouse.deadAreaRadius = 1e5 : mouse.deadAreaRadius = 50;
+    if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
     if (e.key == "w" && player.isOrbiting())
         (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
 });

@@ -1,13 +1,6 @@
 import { AbstractBody } from "../abstractBody";
 
-import {
-    Mesh,
-    MeshBuilder,
-    StandardMaterial,
-    Texture,
-    Vector3,
-    VolumetricLightScatteringPostProcess
-} from "@babylonjs/core";
+import { Mesh, MeshBuilder, StandardMaterial, Texture, Vector3, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";

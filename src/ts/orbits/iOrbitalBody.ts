@@ -1,6 +1,6 @@
 import { IPhysicalProperties } from "../bodies/iPhysicalProperties";
 import { IOrbitalProperties } from "./iOrbitalProperties";
-import { ITransformable } from "../bodies/iTransformable";
+import { ITransformable } from "../transforms/iTransformable";
 import { BodyType } from "../bodies/interfaces";
 
 export interface IOrbitalBody extends ITransformable {
