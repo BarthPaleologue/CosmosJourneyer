@@ -81,7 +81,7 @@ export class TelluricMaterial extends ShaderMaterial {
             snowColor: new Color3(1, 1, 1),
             steepColor: new Color3(55, 42, 42).scale(1 / 255),
             plainColor: new Color3(56, 94, 6).scale(1 / 255),
-            beachColor: new Color3(0.7, 0.7, 0.2),
+            beachColor: new Color3(136, 136, 48).scale(1 / 255),
             desertColor: new Color3(178, 107, 42).scale(1 / 255),
             bottomColor: new Color3(0.5, 0.5, 0.5),
 
