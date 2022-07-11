@@ -1,40 +1,44 @@
 import { SpacePostProcess } from "./spacePostProcess";
 import { Axis, Scene } from "@babylonjs/core";
-import { ShaderDataType, ShaderSamplerData, ShaderUniformData } from "./interfaces";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
 import { Star } from "../bodies/stars/star";
 import { AbstractBody } from "../bodies/abstractBody";
 
 export abstract class PlanetPostProcess extends SpacePostProcess {
-    protected constructor(name: string, fragmentName: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, body: AbstractBody, sun: Star, scene: Scene) {
-        const commonUniforms = {
-            sunPosition: {
+    protected constructor(name: string, fragmentName: string, otherUniforms: ShaderUniforms, otherSamplers: ShaderSamplers, body: AbstractBody, sun: Star, scene: Scene) {
+        const uniforms: ShaderUniforms = [
+            {
+                name: "sunPosition",
                 type: ShaderDataType.Vector3,
                 get: () => {
                     return sun.getAbsolutePosition();
                 }
             },
-            planetPosition: {
+            {
+                name: "planetPosition",
                 type: ShaderDataType.Vector3,
                 get: () => {
                     return body.getAbsolutePosition();
                 }
             },
-            cameraDirection: {
+            {
+                name: "cameraDirection",
                 type: ShaderDataType.Vector3,
                 get: () => {
                     return scene.activeCamera!.getDirection(Axis.Z);
                 }
             },
-            planetRadius: {
+            {
+                name: "planetRadius",
                 type: ShaderDataType.Float,
                 get: () => {
                     return body.getApparentRadius();
                 }
             }
-        };
+        ];
 
-        Object.assign(commonUniforms, commonUniforms, uniforms);
+        uniforms.push(...otherUniforms);
 
-        super(name, fragmentName, commonUniforms, samplers, scene);
+        super(name, fragmentName, uniforms, otherSamplers, scene);
     }
 }

@@ -1,5 +1,5 @@
 import { Effect } from "@babylonjs/core";
-import { RingsSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
 
 import ringsFragment from "../../../shaders/ringsFragment.glsl";
@@ -8,6 +8,13 @@ import { StarSystemManager } from "../../bodies/starSystemManager";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
+
+export interface RingsSettings {
+    ringStart: number;
+    ringEnd: number;
+    ringFrequency: number;
+    ringOpacity: number;
+}
 
 export class RingsPostProcess extends PlanetPostProcess {
     settings: RingsSettings;
@@ -20,41 +27,45 @@ export class RingsPostProcess extends PlanetPostProcess {
             ringOpacity: 0.4
         };
 
-        const uniforms: ShaderUniformData = {
-            ringStart: {
+        const uniforms: ShaderUniforms = [
+            {
+                name: "ringStart",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.ringStart;
                 }
             },
-            ringEnd: {
+            {
+                name: "ringEnd",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.ringEnd;
                 }
             },
-            ringFrequency: {
+            {
+                name: "ringFrequency",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.ringFrequency;
                 }
             },
-            ringOpacity: {
+            {
+                name: "ringOpacity",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.ringOpacity;
                 }
             },
-
-            planetRotationQuaternion: {
+            {
+                name: "planetRotationQuaternion",
                 type: ShaderDataType.Quaternion,
                 get: () => {
                     return body.getRotationQuaternion();
                 }
             }
-        };
+        ];
 
-        const samplers: ShaderSamplerData = {};
+        const samplers: ShaderSamplers = [];
 
         super(name, shaderName, uniforms, samplers, body, starSystem.stars[0], starSystem.scene);
 

@@ -1,7 +1,7 @@
 import { Axis, Effect, Vector3 } from "@babylonjs/core";
 
 import { SpacePostProcess } from "./spacePostProcess";
-import { ShaderDataType, ShaderSamplerData, ShaderUniformData, StarfieldSettings } from "./interfaces";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
 import { Star } from "../bodies/stars/star";
 
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
@@ -10,16 +10,23 @@ import { StarSystemManager } from "../bodies/starSystemManager";
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
 
+export interface StarfieldSettings {
+    foo: number;
+}
+
 export class StarfieldPostProcess extends SpacePostProcess {
     settings: StarfieldSettings;
 
     star: Star | null = null;
 
     constructor(name: string, starSystem: StarSystemManager) {
-        const settings: StarfieldSettings = {};
+        const settings: StarfieldSettings = {
+            foo: 1
+        };
 
-        const uniforms: ShaderUniformData = {
-            visibility: {
+        const uniforms: ShaderUniforms = [
+            {
+                name: "visibility",
                 type: ShaderDataType.Float,
                 get: () => {
                     //TODO: do something better
@@ -29,9 +36,9 @@ export class StarfieldPostProcess extends SpacePostProcess {
                     return vis;
                 }
             }
-        };
+        ];
 
-        const samplers: ShaderSamplerData = {};
+        const samplers: ShaderSamplers = [];
 
         super(name, shaderName, uniforms, samplers, starSystem.scene);
 

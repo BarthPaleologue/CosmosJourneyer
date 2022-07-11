@@ -1,52 +1,4 @@
-import { Color3 } from "@babylonjs/core";
-
-export interface AtmosphereSettings {
-    atmosphereRadius: number;
-    falloffFactor: number;
-    intensity: number;
-    rayleighStrength: number;
-    mieStrength: number;
-    densityModifier: number;
-    redWaveLength: number;
-    greenWaveLength: number;
-    blueWaveLength: number;
-    mieHaloRadius: number;
-}
-
-export interface CloudSettings {
-    cloudLayerRadius: number;
-    smoothness: number;
-    specularPower: number;
-    cloudFrequency: number;
-    cloudDetailFrequency: number;
-    cloudPower: number;
-    cloudSharpness: number;
-    cloudColor: Color3;
-    worleySpeed: number;
-    detailSpeed: number;
-}
-
-export interface VolumetricCloudSettings {
-    atmosphereRadius: number;
-}
-
-export interface OceanSettings {
-    oceanRadius: number;
-    smoothness: number;
-    specularPower: number;
-    depthModifier: number;
-    alphaModifier: number;
-    waveBlendingSharpness: number;
-}
-
-export interface RingsSettings {
-    ringStart: number;
-    ringEnd: number;
-    ringFrequency: number;
-    ringOpacity: number;
-}
-
-export interface StarfieldSettings {}
+import { Color3, Matrix, Quaternion, Texture, Vector3 } from "@babylonjs/core";
 
 export enum ShaderDataType {
     Auto,
@@ -56,17 +8,15 @@ export enum ShaderDataType {
     Matrix,
     Quaternion,
     Texture,
-    FloatArray
 }
 
-interface ShaderData {
+export type shaderData = number | Vector3 | Color3 | Matrix | Quaternion | Texture;
+
+export interface ShaderData<shaderData> {
+    name: string;
     type: ShaderDataType;
-    get: () => {};
+    get: () => shaderData;
 }
 
-export interface CShaderData<T> extends ShaderData {
-    get: () => T;
-}
-
-export type ShaderUniformData = { [uniformName: string]: ShaderData };
-export type ShaderSamplerData = { [samplerName: string]: ShaderData };
+export type ShaderUniforms = ShaderData<shaderData>[];
+export type ShaderSamplers = ShaderData<shaderData>[];

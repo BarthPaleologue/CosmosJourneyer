@@ -1,5 +1,5 @@
 import { Effect } from "@babylonjs/core";
-import { ShaderDataType, ShaderSamplerData, ShaderUniformData, VolumetricCloudSettings } from "../interfaces";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
 import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 
@@ -9,6 +9,10 @@ import { StarSystemManager } from "../../bodies/starSystemManager";
 const shaderName = "volumetricClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
 
+export interface VolumetricCloudSettings {
+    atmosphereRadius: number;
+}
+
 export class VolumetricCloudsPostProcess extends PlanetPostProcess {
     settings: VolumetricCloudSettings;
 
@@ -17,16 +21,17 @@ export class VolumetricCloudsPostProcess extends PlanetPostProcess {
             atmosphereRadius: atmosphereRadius
         };
 
-        const uniforms: ShaderUniformData = {
-            atmosphereRadius: {
+        const uniforms: ShaderUniforms = [
+            {
+                name: "atmosphereRadius",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.atmosphereRadius;
                 }
             }
-        };
+        ];
 
-        const samplers: ShaderSamplerData = {};
+        const samplers: ShaderSamplers = [];
 
         super(name, shaderName, uniforms, samplers, planet, starSystem.stars[0], starSystem.scene);
 

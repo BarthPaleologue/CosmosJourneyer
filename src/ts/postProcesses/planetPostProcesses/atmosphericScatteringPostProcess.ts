@@ -1,6 +1,6 @@
 import { Effect } from "@babylonjs/core";
 
-import { AtmosphereSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
 import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 
@@ -9,6 +9,19 @@ import { StarSystemManager } from "../../bodies/starSystemManager";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
+
+export interface AtmosphereSettings {
+    atmosphereRadius: number;
+    falloffFactor: number;
+    intensity: number;
+    rayleighStrength: number;
+    mieStrength: number;
+    densityModifier: number;
+    redWaveLength: number;
+    greenWaveLength: number;
+    blueWaveLength: number;
+    mieHaloRadius: number;
+}
 
 export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
     settings: AtmosphereSettings;
@@ -27,70 +40,80 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
             mieHaloRadius: 0.75
         };
 
-        const uniforms: ShaderUniformData = {
-            atmosphereRadius: {
+        const uniforms: ShaderUniforms = [
+            {
+                name: "atmosphereRadius",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.atmosphereRadius;
                 }
             },
-            falloffFactor: {
+            {
+                name: "falloffFactor",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.falloffFactor;
                 }
             },
-            sunIntensity: {
+{
+                name: "sunIntensity",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.intensity;
                 }
             },
-            rayleighStrength: {
+            {
+                name: "rayleighStrength",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.rayleighStrength;
                 }
             },
-            mieStrength: {
+            {
+                name: "mieStrength",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.mieStrength;
                 }
             },
-            densityModifier: {
+            {
+                name: "densityModifier",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.densityModifier;
                 }
             },
-            redWaveLength: {
+            {
+                name: "redWaveLength",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.redWaveLength;
                 }
             },
-            greenWaveLength: {
+            {
+                name: "greenWaveLength",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.greenWaveLength;
                 }
             },
-            blueWaveLength: {
+            {
+                name: "blueWaveLength",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.blueWaveLength;
                 }
             },
-            mieHaloRadius: {
+            {
+                name: "mieHaloRadius",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.mieHaloRadius;
                 }
             }
-        };
+        ];
 
-        const samplers: ShaderSamplerData = {};
+        const samplers: ShaderSamplers = [];
 
         super(name, shaderName, uniforms, samplers, planet, starSystem.stars[0], starSystem.scene);
 

@@ -1,112 +1,124 @@
 import { Camera, Color3, Effect, Matrix, PostProcess, Quaternion, Scene, Texture, Vector3 } from "@babylonjs/core";
-import { CShaderData, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "./interfaces";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
 
 export abstract class SpacePostProcess extends PostProcess {
     camera: Camera;
 
-    uniforms: ShaderUniformData;
-    samplers: ShaderSamplerData;
+    uniforms: ShaderUniforms;
+    samplers: ShaderSamplers;
 
     protected internalTime = 0;
 
-    protected constructor(name: string, fragmentName: string, uniforms: ShaderUniformData, samplers: ShaderSamplerData, scene: Scene) {
-        const commonUniforms: ShaderUniformData = {
-            cameraPosition: {
+    protected constructor(name: string, fragmentName: string, otherUniforms: ShaderUniforms, otherSamplers: ShaderSamplers, scene: Scene) {
+        const uniforms: ShaderUniforms = [
+            {
+                name: "cameraPosition",
                 type: ShaderDataType.Vector3,
                 get: () => {
                     return Vector3.Zero();
                 }
             },
-            projection: {
+            {
+                name: "projection",
                 type: ShaderDataType.Matrix,
                 get: () => {
                     return scene.activeCamera!.getProjectionMatrix();
                 }
             },
-            view: {
+            {
+                name: "view",
                 type: ShaderDataType.Matrix,
                 get: () => {
                     return scene.activeCamera!.getViewMatrix();
                 }
             },
-
-            cameraNear: {
+            {
+                name: "cameraNear",
                 type: ShaderDataType.Float,
                 get: () => {
                     return scene.activeCamera!.minZ;
                 }
             },
-            cameraFar: {
+            {
+                name: "cameraFar",
                 type: ShaderDataType.Float,
                 get: () => {
                     return scene.activeCamera!.maxZ;
                 }
             }
-        };
+        ];
 
-        const commonSamplers: ShaderSamplerData = {
-            textureSampler: {
+        const samplers: ShaderSamplers = [
+            {
+                name: "textureSampler",
                 type: ShaderDataType.Auto,
                 get: () => {
                     return 0;
                 }
             },
-            depthSampler: {
+            {
+                name: "depthSampler",
                 type: ShaderDataType.Texture,
                 get: () => {
                     return scene.customRenderTargets[0];
                 }
             }
-        };
+        ];
 
-        Object.assign(commonUniforms, commonUniforms, uniforms);
-        Object.assign(commonSamplers, commonSamplers, samplers);
+        uniforms.push(...otherUniforms);
+        samplers.push(...otherSamplers);
 
-        super(name, fragmentName, Object.keys(commonUniforms), Object.keys(commonSamplers), 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        const uniformNames = uniforms.map(uniform => uniform.name);
+        const samplerNames = samplers.map(sampler => sampler.name);
+
+        super(name, fragmentName, uniformNames, samplerNames, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
 
         this.camera = scene.activeCamera!;
-        //this.setCamera(this.camera);
 
-        this.uniforms = commonUniforms;
-        this.samplers = commonSamplers;
+        this.uniforms = uniforms;
+        this.samplers = samplers;
 
         this.onApply = (effect: Effect) => {
-            for (const uniformName in this.uniforms) {
-                switch (this.uniforms[uniformName].type) {
+            for (const uniform of this.uniforms) {
+                switch (uniform.type) {
                     case ShaderDataType.Float:
-                        effect.setFloat(uniformName, (this.uniforms[uniformName] as CShaderData<number>).get());
+                        effect.setFloat(uniform.name, uniform.get() as number);
                         break;
                     case ShaderDataType.Vector3:
-                        effect.setVector3(uniformName, (this.uniforms[uniformName] as CShaderData<Vector3>).get());
+                        effect.setVector3(uniform.name, uniform.get() as Vector3);
                         break;
                     case ShaderDataType.Color3:
-                        effect.setColor3(uniformName, (this.uniforms[uniformName] as CShaderData<Color3>).get());
+                        effect.setColor3(uniform.name, uniform.get() as Color3);
                         break;
                     case ShaderDataType.Quaternion:
-                        effect.setQuaternion(uniformName, (this.uniforms[uniformName] as CShaderData<Quaternion>).get());
+                        effect.setQuaternion(uniform.name, uniform.get() as Quaternion);
                         break;
                     case ShaderDataType.Matrix:
-                        effect.setMatrix(uniformName, (this.uniforms[uniformName] as CShaderData<Matrix>).get());
+                        effect.setMatrix(uniform.name, uniform.get() as Matrix);
                         break;
-                    case ShaderDataType.FloatArray:
-                        effect.setFloatArray(uniformName, (this.uniforms[uniformName] as CShaderData<number[]>).get());
+                    case ShaderDataType.Auto:
+                        // BabylonJS already handles this
+                        break;
+                    default:
+                        throw new Error(`Unknown enum shader data type in uniform (not samplers): ${uniform.type}`);
                 }
             }
 
-            for (const samplerName in this.samplers) {
-                switch (this.samplers[samplerName].type) {
+            for (const sampler of this.samplers) {
+                switch (sampler.type) {
                     case ShaderDataType.Texture:
-                        effect.setTexture(samplerName, (this.samplers[samplerName] as CShaderData<Texture>).get());
+                        effect.setTexture(sampler.name, sampler.get() as Texture);
                         break;
+                    case ShaderDataType.Auto:
+                        // BabylonJS already handles this
+                        break;
+                    default:
+                        throw new Error(`Unknown enum shader data type in uniform samplers: ${sampler.type}`);
                 }
             }
         };
     }
-    setCamera(camera: Camera) {
-        this.camera.detachPostProcess(this);
-        this.camera = camera;
-        camera.attachPostProcess(this);
-    }
+
     update(deltaTime: number) {
         this.internalTime += deltaTime;
     }

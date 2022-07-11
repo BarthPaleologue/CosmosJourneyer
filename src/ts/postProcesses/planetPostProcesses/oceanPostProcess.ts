@@ -1,6 +1,6 @@
 import { Effect } from "@babylonjs/core";
 
-import { OceanSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
 import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 
@@ -10,6 +10,15 @@ import { StarSystemManager } from "../../bodies/starSystemManager";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
+
+export interface OceanSettings {
+    oceanRadius: number;
+    smoothness: number;
+    specularPower: number;
+    depthModifier: number;
+    alphaModifier: number;
+    waveBlendingSharpness: number;
+}
 
 export class OceanPostProcess extends PlanetPostProcess {
     settings: OceanSettings;
@@ -24,51 +33,58 @@ export class OceanPostProcess extends PlanetPostProcess {
             waveBlendingSharpness: 0.1
         };
 
-        const uniforms: ShaderUniformData = {
-            oceanRadius: {
+        const uniforms: ShaderUniforms = [
+            {
+                name: "oceanRadius",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.oceanRadius;
                 }
             },
-
-            smoothness: {
+            {
+                name: "smoothness",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.smoothness;
                 }
             },
-            specularPower: {
+            {
+                name: "specularPower",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.specularPower;
                 }
             },
-            alphaModifier: {
+            {
+                name: "alphaModifier",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.alphaModifier;
                 }
             },
-            depthModifier: {
+            {
+                name: "depthModifier",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.depthModifier;
                 }
             },
-            waveBlendingSharpness: {
+            {
+                name: "waveBlendingSharpness",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.waveBlendingSharpness;
                 }
             },
-            planetInverseRotationQuaternion: {
+            {
+                name: "planetInverseRotationQuaternion",
                 type: ShaderDataType.Quaternion,
                 get: () => {
                     return planet.getInverseRotationQuaternion();
                 }
             },
-            time: {
+            {
+                name: "time",
                 type: ShaderDataType.Float,
                 get: () => {
                     //TODO: do not hardcode the 100000
@@ -76,22 +92,24 @@ export class OceanPostProcess extends PlanetPostProcess {
                     return this.internalTime % 100000;
                 }
             }
-        };
+        ];
 
-        const samplers: ShaderSamplerData = {
-            normalMap1: {
+        const samplers: ShaderSamplers = [
+            {
+                name: "normalMap1",
                 type: ShaderDataType.Texture,
                 get: () => {
                     return Assets.WaterNormalMap1!;
                 }
             },
-            normalMap2: {
+            {
+                name: "normalMap2",
                 type: ShaderDataType.Texture,
                 get: () => {
                     return Assets.WaterNormalMap2!;
                 }
             }
-        };
+        ];
 
         super(name, shaderName, uniforms, samplers, planet, starSystem.stars[0], starSystem.scene);
 

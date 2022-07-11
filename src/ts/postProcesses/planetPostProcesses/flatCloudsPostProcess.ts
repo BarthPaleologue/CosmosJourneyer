@@ -1,6 +1,6 @@
 import { Color3, Effect, Texture } from "@babylonjs/core";
 
-import { CloudSettings, ShaderDataType, ShaderSamplerData, ShaderUniformData } from "../interfaces";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import normalMap from "../../../asset/textures/cloudNormalMap3.jpg";
 import { PlanetPostProcess } from "../planetPostProcess";
 import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
@@ -11,6 +11,19 @@ import { StarSystemManager } from "../../bodies/starSystemManager";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
+
+export interface CloudSettings {
+    cloudLayerRadius: number;
+    smoothness: number;
+    specularPower: number;
+    cloudFrequency: number;
+    cloudDetailFrequency: number;
+    cloudPower: number;
+    cloudSharpness: number;
+    cloudColor: Color3;
+    worleySpeed: number;
+    detailSpeed: number;
+}
 
 export class FlatCloudsPostProcess extends PlanetPostProcess {
     settings: CloudSettings;
@@ -29,89 +42,102 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             detailSpeed: 0.003
         };
 
-        const uniforms: ShaderUniformData = {
-            cloudLayerRadius: {
+        const uniforms: ShaderUniforms = [
+            {
+                name: "cloudLayerRadius",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.cloudLayerRadius;
                 }
             },
-            cloudFrequency: {
+            {
+                name: "cloudFrequency",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.cloudFrequency;
                 }
             },
-            cloudDetailFrequency: {
+            {
+                name: "cloudDetailFrequency",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.cloudDetailFrequency;
                 }
             },
-            cloudPower: {
+            {
+                name: "cloudPower",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.cloudPower;
                 }
             },
-            cloudSharpness: {
+            {
+                name: "cloudSharpness",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.cloudSharpness;
                 }
             },
-            cloudColor: {
+            {
+                name: "cloudColor",
                 type: ShaderDataType.Color3,
                 get: () => {
                     return settings.cloudColor;
                 }
             },
-            worleySpeed: {
+            {
+                name: "worleySpeed",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.worleySpeed;
                 }
             },
-            detailSpeed: {
+            {
+                name: "detailSpeed",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.detailSpeed;
                 }
             },
-            smoothness: {
+            {
+                name: "smoothness",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.smoothness;
                 }
             },
-            specularPower: {
+            {
+                name: "specularPower",
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.specularPower;
                 }
             },
-            planetInverseRotationQuaternion: {
+            {
+                name: "planetInverseRotationQuaternion",
                 type: ShaderDataType.Quaternion,
                 get: () => {
                     return planet.getInverseRotationQuaternion();
                 }
             },
-            time: {
+            {
+                name: "time",
                 type: ShaderDataType.Float,
                 get: () => {
                     return this.internalTime % ((2 * Math.PI * gcd(this.settings.worleySpeed * 10000, this.settings.detailSpeed * 10000)) / this.settings.worleySpeed);
                 }
             }
-        };
+        ];
 
-        const samplers: ShaderSamplerData = {
-            normalMap: {
+        const samplers: ShaderSamplers = [
+            {
+                name: "normalMap",
                 type: ShaderDataType.Texture,
                 get: () => {
                     return new Texture(normalMap, starSystem.scene);
                 }
             }
-        };
+        ];
 
         super(name, shaderName, uniforms, samplers, planet, starSystem.stars[0], starSystem.scene);
 
