@@ -169,6 +169,10 @@ function updateScene() {
 
     starSystem.translateAllBodies(player.update(deltaTime));
 
+    //FIXME: should address stars orbits
+    for (const star of starSystem.stars) {
+        star.orbitalProperties.period = 0;
+    }
     starSystem.update(player, deltaTime * Settings.TIME_MULTIPLIER);
 
     if (!collisionWorker.isBusy() && player.isOrbiting()) {

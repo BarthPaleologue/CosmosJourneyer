@@ -1,4 +1,4 @@
-import { Effect } from "@babylonjs/core";
+import { Effect, Vector3 } from "@babylonjs/core";
 
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
@@ -111,7 +111,7 @@ export class OceanPostProcess extends PlanetPostProcess {
             }
         ];
 
-        super(name, shaderName, uniforms, samplers, planet, starSystem.stars[0], starSystem.scene);
+        super(name, shaderName, uniforms, samplers, planet, starSystem.stars[0], starSystem);
 
         this.settings = settings;
 

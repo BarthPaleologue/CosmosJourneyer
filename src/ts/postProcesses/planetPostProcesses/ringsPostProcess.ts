@@ -67,7 +67,7 @@ export class RingsPostProcess extends PlanetPostProcess {
 
         const samplers: ShaderSamplers = [];
 
-        super(name, shaderName, uniforms, samplers, body, starSystem.stars[0], starSystem.scene);
+        super(name, shaderName, uniforms, samplers, body, starSystem.stars[0], starSystem);
 
         this.settings = settings;
 

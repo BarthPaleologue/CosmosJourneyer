@@ -80,10 +80,8 @@ export class Star extends AbstractBody {
         }
     }
 
-    public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
-        //FIXME: should address stars orbits
-        this.orbitalProperties.period = 0;
-        super.update(player, lightPosition, deltaTime);
+    public override update(player: PlayerController, deltaTime: number): void {
+        super.update(player, deltaTime);
 
         this.material.update();
 

@@ -1,5 +1,7 @@
-import { Camera, Color3, Effect, Matrix, PostProcess, Quaternion, Scene, Texture, Vector3 } from "@babylonjs/core";
+import { Camera, Color3, Effect, Matrix, PostProcess, Quaternion, Texture, Vector3 } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
+import { flattenVector3Array } from "../utils/algebra";
+import { StarSystemManager } from "../bodies/starSystemManager";
 
 export abstract class SpacePostProcess extends PostProcess {
     camera: Camera;
@@ -9,7 +11,7 @@ export abstract class SpacePostProcess extends PostProcess {
 
     protected internalTime = 0;
 
-    protected constructor(name: string, fragmentName: string, otherUniforms: ShaderUniforms, otherSamplers: ShaderSamplers, scene: Scene) {
+    protected constructor(name: string, fragmentName: string, otherUniforms: ShaderUniforms, otherSamplers: ShaderSamplers, starSystem: StarSystemManager) {
         const uniforms: ShaderUniforms = [
             {
                 name: "cameraPosition",
@@ -22,28 +24,42 @@ export abstract class SpacePostProcess extends PostProcess {
                 name: "projection",
                 type: ShaderDataType.Matrix,
                 get: () => {
-                    return scene.activeCamera!.getProjectionMatrix();
+                    return starSystem.scene.activeCamera!.getProjectionMatrix();
                 }
             },
             {
                 name: "view",
                 type: ShaderDataType.Matrix,
                 get: () => {
-                    return scene.activeCamera!.getViewMatrix();
+                    return starSystem.scene.activeCamera!.getViewMatrix();
                 }
             },
             {
                 name: "cameraNear",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return scene.activeCamera!.minZ;
+                    return starSystem.scene.activeCamera!.minZ;
                 }
             },
             {
                 name: "cameraFar",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return scene.activeCamera!.maxZ;
+                    return starSystem.scene.activeCamera!.maxZ;
+                }
+            },
+            {
+                name: "starPositions",
+                type: ShaderDataType.Vector3Array,
+                get: () => {
+                    return starSystem.stars.map((star) => star.getAbsolutePosition());
+                }
+            },
+            {
+                name: "nbStars",
+                type: ShaderDataType.Int,
+                get: () => {
+                    return starSystem.stars.length;
                 }
             }
         ];
@@ -60,7 +76,7 @@ export abstract class SpacePostProcess extends PostProcess {
                 name: "depthSampler",
                 type: ShaderDataType.Texture,
                 get: () => {
-                    return scene.customRenderTargets[0];
+                    return starSystem.scene.customRenderTargets[0];
                 }
             }
         ];
@@ -68,12 +84,12 @@ export abstract class SpacePostProcess extends PostProcess {
         uniforms.push(...otherUniforms);
         samplers.push(...otherSamplers);
 
-        const uniformNames = uniforms.map(uniform => uniform.name);
-        const samplerNames = samplers.map(sampler => sampler.name);
+        const uniformNames = uniforms.map((uniform) => uniform.name);
+        const samplerNames = samplers.map((sampler) => sampler.name);
 
-        super(name, fragmentName, uniformNames, samplerNames, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        super(name, fragmentName, uniformNames, samplerNames, 1, null, Texture.BILINEAR_SAMPLINGMODE, starSystem.scene.getEngine(), false);
 
-        this.camera = scene.activeCamera!;
+        this.camera = starSystem.scene.activeCamera!;
 
         this.uniforms = uniforms;
         this.samplers = samplers;
@@ -83,6 +99,9 @@ export abstract class SpacePostProcess extends PostProcess {
                 switch (uniform.type) {
                     case ShaderDataType.Float:
                         effect.setFloat(uniform.name, uniform.get() as number);
+                        break;
+                    case ShaderDataType.Int:
+                        effect.setInt(uniform.name, uniform.get() as number);
                         break;
                     case ShaderDataType.Vector3:
                         effect.setVector3(uniform.name, uniform.get() as Vector3);
@@ -95,6 +114,9 @@ export abstract class SpacePostProcess extends PostProcess {
                         break;
                     case ShaderDataType.Matrix:
                         effect.setMatrix(uniform.name, uniform.get() as Matrix);
+                        break;
+                    case ShaderDataType.Vector3Array:
+                        effect.setArray3(uniform.name, flattenVector3Array(uniform.get() as Vector3[]));
                         break;
                     case ShaderDataType.Auto:
                         // BabylonJS already handles this

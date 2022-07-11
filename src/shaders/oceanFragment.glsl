@@ -7,7 +7,6 @@ uniform sampler2D depthSampler; // the depth map of the camera
 uniform sampler2D normalMap1;
 uniform sampler2D normalMap2;
 
-uniform vec3 sunPosition; // position of the sun in world space
 uniform vec3 cameraPosition; // position of the camera in world space
 
 uniform mat4 projection; // camera's projection matrix
@@ -15,6 +14,10 @@ uniform mat4 view; // camera's view matrix
 
 uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
+
+#define MAX_STARS 5
+uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
+uniform int nbStars; // number of stars
 
 uniform vec3 planetPosition; // planet position in world space
 uniform float oceanRadius; // atmosphere radius (calculate from planet center)
@@ -46,6 +49,8 @@ uniform float time;
 #pragma glslify: fastAcos = require(./utils/fastAcos.glsl)
 
 #pragma glslify: applyQuaternion = require(./utils/applyQuaternion.glsl)
+
+#pragma glslify: computeSpecularHighlight = require(./utils/computeSpecularHighlight.glsl)
 
 vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
@@ -79,14 +84,21 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
     normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 300.0, normalWave, normalMap1, 0.000025, waveBlendingSharpness, 0.5);
     normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 300.0, normalWave, normalMap2, 0.00002, waveBlendingSharpness, 0.5);
 
-    vec3 sunDir = normalize(sunPosition - samplePoint);
+    float ndl = 0.0;
+    float specularHighlight = 0.0;
 
-    float ndl1 = max(dot(normalWave, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
-    float ndl2 = max(dot(planetNormal, sunDir), 0.0);
+    for(int i = 0; i < nbStars; i++) {
+        vec3 sunDir = normalize(starPositions[i] - samplePoint);
 
-    float specularAngle = fastAcos(dot(normalize(sunDir - rayDir), normalWave));
-    float specularExponent = specularAngle / (1.0 - smoothness);
-    float specularHighlight = exp(-specularExponent * specularExponent) * specularPower;
+        float ndl1 = max(dot(normalWave, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
+        float ndl2 = max(dot(planetNormal, sunDir), 0.0);
+
+        ndl += sqrt(ndl1 * ndl2);
+        specularHighlight += computeSpecularHighlight(sunDir, rayDir, normalWave, smoothness, specularPower);
+    }
+
+    ndl = saturate(ndl);
+    specularHighlight = saturate(specularHighlight);
 
     if(distanceThroughOcean > 0.0) {
         float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * depthModifier);
@@ -105,7 +117,7 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         vec3 foamColor = vec3(0.8);
         ambiant = lerp(foamColor, ambiant, foamFactor);
 
-        return ambiant * sqrt(ndl1 * ndl2) + specularHighlight;
+        return ambiant * ndl + specularHighlight;
     }
     return originalColor;
 }

@@ -103,10 +103,9 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
     /**
      * Updates the state of the celestial body for a given time step of deltaTime
      * @param player the player in the simulation
-     * @param lightPosition the position of the main light source
      * @param deltaTime the time step to update for
      */
-    public update(player: PlayerController, lightPosition: Vector3, deltaTime: number): void {
+    public update(player: PlayerController, deltaTime: number): void {
         if (this.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
             this.orbitalProperties.orientationQuaternion = orientationQuaternion;

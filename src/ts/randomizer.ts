@@ -60,11 +60,15 @@ const star1 = new Star("Weierstrass", starSystemManager, starSeed, []);
 //star1.orbitalProperties.apoapsis = star1.getRadius();
 //star1.orbitalProperties.period = 60 * 60;
 
-//const star2 = new Star("Hilbert", starSystemManager, randRange(-10, 10, starSystemRand), [star1]);
-//star2.orbitalProperties.periapsis = (star1.getRadius() + star2.getRadius()) * 2;
-//star2.orbitalProperties.apoapsis = (star1.getRadius() + star2.getRadius()) * 2;
-//star2.orbitalProperties.period = 60 * 60;
-//star1.parentBodies.push(star1);
+/*const star2 = new Star("Hilbert", starSystemManager, randRange(-10, 10, starSystemRand), [star1]);
+star2.orbitalProperties.periapsis = (star1.getRadius() + star2.getRadius()) * 2;
+star2.orbitalProperties.apoapsis = (star1.getRadius() + star2.getRadius()) * 2;
+star2.orbitalProperties.period = 60 * 60;
+
+const star3 = new Star("Pythagoras", starSystemManager, randRange(-10, 10, starSystemRand), [star2]);
+star3.orbitalProperties.periapsis = (star3.getRadius() + star2.getRadius()) * 2;
+star3.orbitalProperties.apoapsis = (star3.getRadius() + star2.getRadius()) * 2;
+star3.orbitalProperties.period = 60 * 60 * 1.5;*/
 
 starfield.setStar(star1);
 
@@ -153,6 +157,10 @@ scene.executeWhenReady(() => {
 
         bodyEditor.update(player);
 
+        //FIXME: should address stars orbits
+        for (const star of starSystemManager.stars) {
+            star.orbitalProperties.period = 0;
+        }
         starSystemManager.update(player, Settings.TIME_MULTIPLIER * deltaTime);
 
         starSystemManager.translateAllBodies(player.update(deltaTime));

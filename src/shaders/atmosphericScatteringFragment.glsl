@@ -12,7 +12,10 @@ varying vec2 vUV; // screen coordinates
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
 
-uniform vec3 sunPosition; // position of the sun in world space
+#define MAX_STARS 5
+uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
+uniform int nbStars; // number of stars
+
 uniform vec3 cameraPosition; // position of the camera in world space
 
 uniform mat4 projection; // camera's projection matrix
@@ -88,41 +91,26 @@ vec3 opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     return accumulatedOpticalDepth;
 }
 
-vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
+vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLength) {
 
     vec3 samplePoint = rayOrigin; // first sampling point coming from camera ray
 
-    vec3 sunDir = normalize(sunPosition - samplePoint); // direction to the light source
-    
     vec3 wavelength = vec3(redWaveLength, greenWaveLength, blueWaveLength); // the wavelength that will be scattered (rgb so we get everything)
-
-    // http://hyperphysics.phy-astr.gsu.edu/hbase/atmos/blusky.html
-    // https://www.wikiwand.com/en/Rayleigh_scattering#/From_molecules
-    // https://www.shadertoy.com/view/wlBXWK
-
-    float costheta = dot(rayDir, sunDir);
-    float costheta2 = pow(costheta, 2.0);
 
     // Rayleigh Scattering Coeffs
 
     //float phaseRayleigh = 1.0 + costheta2;
 
-    float alpha = 0.8 * 7.4 + 0.2 * 5.3; // Polarizability // TODO: make uniform
-
-    float prefix = 0.035 * 8.0 * PI4 * pow(alpha, 2.0);
+    // Polarizabilities
+    //float alpha = 0.8 * 7.4 + 0.2 * 5.3; // Polarizability // TODO: make uniform
+    //float prefix = 0.035 * 8.0 * PI4 * pow(alpha, 2.0);
 
     vec3 rayleighCoeffs = pow(400.0 / wavelength.xyz, vec3(4.0)) * rayleighStrength; // the scattering is inversely proportional to the fourth power of the wave length
+    vec3 mieCoeffs = vec3(10e-3) * mieStrength; //21e-6
 
     //rayleighCoeffs = vec3(5.5e-6, 13.0e-6, 22.4e-6);
 
     float stepSize = rayLength / float(POINTS_FROM_CAMERA - 1); // the ray length between sample points
-
-    // Mie Scattering coeffs
-    float g = mieHaloRadius; //0.7
-    float gg = g * g;
-
-    vec3 mieCoeffs = vec3(10e-3) * mieStrength; //21e-6
-    float phaseMie = 3.0 / (8.0 * PI) * ((1.0 - gg) * (costheta2 + 1.0)) / (pow(1.0 + gg - 2.0 * costheta * g, 1.5) * (2.0 + gg));
 
     // Computing the scattering
 
@@ -141,9 +129,10 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
         float height = length(samplePoint - planetPosition);
 
         float viewRayLengthInAtm = stepSize * float(i); // distance traveled by light through atmosphere from sample point to cameraPosition
-        
-        sunRayOpticalDepth = opticalDepth(samplePoint, sunDir, sunRayLengthInAtm); // scattered from the sun to the point
-        
+
+        vec3 starDir = normalize(starPosition - samplePoint);
+        vec3 sunRayOpticalDepth = opticalDepth(samplePoint, starDir, sunRayLengthInAtm);  // scattered from the sun to the point
+
         viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
         
         vec3 transmittance = exp(- (sunRayOpticalDepth.x + viewRayOpticalDepth.x) * rayleighCoeffs - (sunRayOpticalDepth.y + viewRayOpticalDepth.y) * mieCoeffs - (sunRayOpticalDepth.z + viewRayOpticalDepth.z) * absorptionCoeffs); // exponential scattering with coefficients
@@ -158,9 +147,21 @@ vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength) {
         samplePoint += rayDir * stepSize; // move sample point along view ray
     }
 
+    // http://hyperphysics.phy-astr.gsu.edu/hbase/atmos/blusky.html
+    // https://www.wikiwand.com/en/Rayleigh_scattering#/From_molecules
+    // https://www.shadertoy.com/view/wlBXWK
+
+    float costheta = dot(rayDir, normalize(starPosition - samplePoint));
+    float costheta2 = pow(costheta, 2.0);
+
+    float g = mieHaloRadius; //0.7
+    float gg = g * g;
+
+    float phaseMie = 3.0 / (8.0 * PI) * ((1.0 - gg) * (costheta2 + 1.0)) / (pow(1.0 + gg - 2.0 * costheta * g, 1.5) * (2.0 + gg));
+
+
     // scattering depends on the direction of the light ray and the view ray : it's the rayleigh phase function
     // https://glossary.ametsoc.org/wiki/Rayleigh_phase_function
-    //float costheta2 = pow(dot(rayDir, sunDir), 2.0);
     float phaseRayleigh = (3.0 / (16.0 * PI)) * (1.0 + costheta2);
     
     inScatteredRayleigh *= phaseRayleigh; // apply rayleigh pahse
@@ -187,8 +188,11 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     vec3 firstPointInAtmosphere = rayOrigin + rayDir * impactPoint; // the first atmosphere point to be hit by the ray
 
-    vec3 light = calculateLight(firstPointInAtmosphere, rayDir, distanceThroughAtmosphere); // calculate scattering
-    
+    vec3 light = vec3(0.0);
+
+    for(int i = 0; i < nbStars; i++) {
+        light += calculateLight(firstPointInAtmosphere, starPositions[i], rayDir, distanceThroughAtmosphere);// calculate scattering
+    }
     return light + (1.0 - light) * originalColor; // blending scattered color with original color
 }
 

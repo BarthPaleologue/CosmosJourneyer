@@ -6,6 +6,7 @@ import { PlayerController } from "../player/playerController";
 import surfaceMaterialFragment from "../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../assets";
+import { flattenVector3Array } from "../utils/algebra";
 
 const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -43,7 +44,9 @@ export class TelluricMaterial extends ShaderMaterial {
                 "cameraFar",
                 "planetPosition",
                 "planetRadius",
-                "sunPosition",
+
+                "starPositions",
+                "nbStars",
 
                 "planetInverseRotationQuaternion",
 
@@ -117,7 +120,9 @@ export class TelluricMaterial extends ShaderMaterial {
         this.setColor3("bottomColor", this.colorSettings.bottomColor);
 
         this.setVector3("playerPosition", Vector3.Zero());
-        this.setVector3("sunPosition", Vector3.Zero());
+
+        this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
+
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
         this.setFloat("planetRadius", this.planet.getRadius());
 
@@ -145,10 +150,12 @@ export class TelluricMaterial extends ShaderMaterial {
         this.setFloat("waterAmount", this.planet.physicalProperties.waterAmount);
     }
 
-    public update(player: PlayerController, starPosition: Vector3) {
+    public update(player: PlayerController) {
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
         this.setVector3("playerPosition", player.getAbsolutePosition());
-        this.setVector3("sunPosition", starPosition);
+
+        this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
+        this.setInt("nbStars", this.planet.starSystem.stars.length);
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
     }

@@ -1,4 +1,4 @@
-import { Quaternion, Vector3, Vector4 } from "@babylonjs/core";
+import { Quaternion, Vector3 } from "@babylonjs/core";
 import { IVector3Like } from "@babylonjs/core/Maths/math.like";
 
 /**
@@ -165,4 +165,12 @@ export function getAxisComponentFromQuaternion(quaternion: Quaternion, axisToGet
     const p = axisToGet.scale(Vector3.Dot(rotationAxis, axisToGet)); // return projection v1 on to v2  (parallel component)
     const twist = new Quaternion(p.x, p.y, p.z, quaternion.w);
     return twist.normalize().conjugate();
+}
+
+export function flattenVector3Array(vector3Array: Vector3[]): number[] {
+    const result: number[] = [];
+    for (const vector3 of vector3Array) {
+        result.push(vector3.x, vector3.y, vector3.z);
+    }
+    return result;
 }

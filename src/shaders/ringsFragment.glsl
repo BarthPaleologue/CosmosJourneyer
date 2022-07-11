@@ -5,8 +5,11 @@ varying vec2 vUV; // screen coordinates
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
 
-uniform vec3 sunPosition; // position of the sun in world space
 uniform vec3 cameraPosition; // position of the camera in world space
+
+#define MAX_STARS 5
+uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
+uniform int nbStars; // number of stars
 
 uniform mat4 projection; // camera's projection matrix
 uniform mat4 view; // camera's view matrix
@@ -89,12 +92,15 @@ void main() {
                 ringColor = lerp(ringColor, screenColor, ringOpacity);
 
                 // hypothèse des rayons parallèles
-                vec3 rayToSun = normalize(sunPosition - planetPosition);
-                float t2, t3;
-                if(rayIntersectSphere(samplePoint, rayToSun, planetPosition, planetRadius, t2,t3)) {
-                    //si intersection avec la planète, ombre
-                    ringColor *= 0.1;
+                int nbLightSources = nbStars;
+                for(int i = 0; i < nbStars; i++) {
+                    vec3 rayToSun = normalize(starPositions[i] - planetPosition);
+                    float t2, t3;
+                    if (rayIntersectSphere(samplePoint, rayToSun, planetPosition, planetRadius, t2, t3)) {
+                        nbLightSources -= 1;
+                    }
                 }
+                if(nbLightSources == 0) ringColor *= 0.1;
 
                 finalColor = lerp(ringColor, screenColor, ringDensity);
             }

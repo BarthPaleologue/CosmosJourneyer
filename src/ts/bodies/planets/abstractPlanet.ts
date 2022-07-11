@@ -33,8 +33,8 @@ export abstract class AbstractPlanet extends AbstractBody {
         return atmosphere;
     }
 
-    public override update(player: PlayerController, lightPosition: Vector3, deltaTime: number) {
-        super.update(player, lightPosition, deltaTime);
+    public override update(player: PlayerController, deltaTime: number): void {
+        super.update(player, deltaTime);
         for (const postprocessKey in this.postProcesses) {
             if (this.postProcesses[postprocessKey] != null) {
                 this.postProcesses[postprocessKey]!.update(deltaTime);

@@ -111,7 +111,7 @@ export class StarSystemManager {
         this.clock += deltaTime;
 
         this._chunkForge.update(this.depthRenderer);
-        for (const body of this.getBodies()) body.update(player, this.stars[0].getAbsolutePosition(), deltaTime);
+        for (const body of this.getBodies()) body.update(player, deltaTime);
 
         this.translateAllBodies(player.getAbsolutePosition().negate());
         player.translate(player.getAbsolutePosition().negate());

@@ -19,8 +19,12 @@ uniform mat4 world;
 uniform vec3 playerPosition; // camera position in world space
 uniform float cameraNear;
 uniform float cameraFar;
-uniform vec3 sunPosition; // light position in world space
+
 uniform vec3 planetPosition;
+
+#define MAX_STARS 5
+uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
+uniform int nbStars; // number of stars
 
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler; // evaluate sceneDepth
@@ -124,10 +128,16 @@ vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
 
 void main() {
 	vec3 viewRayW = normalize(playerPosition - vPositionW); // view direction in world space
-	vec3 lightRayW = normalize(sunPosition - vPositionW); // light ray direction in world space
+	vec3 lightRayW = normalize(starPositions[0] - vPositionW); // light ray direction in world space
 
 	vec3 sphereNormalW = vSphereNormalW;
-	float ndl = max(0.002, dot(sphereNormalW, lightRayW));
+	float ndl1 = 0.0;
+
+	for(int i = 0; i < nbStars; i++) {
+		vec3 starLightRayW = normalize(starPositions[i] - vPositionW); // light ray direction in world space
+		ndl1 += max(dot(sphereNormalW, starLightRayW), 0.0);
+	}
+	ndl1 = saturate(ndl1);
 
 	vec4 seededSamplePoint = vec4(vUnitSamplePoint, seed);
 
@@ -159,7 +169,7 @@ void main() {
 	// TODO: find the equation ; even better use a texture
 	float co2SublimationTemperature01 = (co2SublimationTemperature - minTemperature) / (maxTemperature - minTemperature);
 
-	float temperature01 = computeTemperature01(elevation01, absLatitude01, ndl, dayDuration);
+	float temperature01 = computeTemperature01(elevation01, absLatitude01, ndl1, dayDuration);
 
 	float temperature = lerp(maxTemperature, minTemperature, temperature01);
 
@@ -261,24 +271,31 @@ void main() {
 
 	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
 
-	float ndl2 = max(0.0, dot(normalW, lightRayW)); // dimming factor due to light inclination relative to vertex normal in world space
 
-	// specular
-	vec3 angleW = normalize(viewRayW + lightRayW);
-    float specComp = max(0., dot(normalW, angleW));
-    specComp = pow(specComp, 32.0);
+	float ndl2 = 0.0; // dimming factor due to light inclination relative to vertex normal in world space
+	float specComp = 0.0;
+	for(int i = 0; i < nbStars; i++) {
+		vec3 starLightRayW = normalize(starPositions[i] - vPositionW);
+		ndl2 += max(0.0, dot(normalW, starLightRayW));
+
+		vec3 angleW = normalize(viewRayW + starLightRayW);
+		specComp += max(0.0, dot(normalW, angleW));
+	}
+	ndl2 = saturate(ndl2);
+	specComp = saturate(specComp);
+	specComp = pow(specComp, 32.0);
 
     // TODO: finish this (uniforms...)
-    /*float smoothness = 0.7;
-    float specularAngle = fastAcos(dot(normalize(viewRayW + lightRayW), normalW));
-    float specularExponent = specularAngle / (1.0 - smoothness);
-    float specComp = exp(-specularExponent * specularExponent);*/
+    //float smoothness = 0.7;
+    //float specularAngle = fastAcos(dot(normalize(viewRayW + lightRayW), normalW));
+    //float specularExponent = specularAngle / (1.0 - smoothness);
+    //float specComp = exp(-specularExponent * specularExponent);
 
 	// suppresion du reflet partout hors la neige
 	specComp *= (color.r + color.g + color.b) / 3.0;
 	specComp /= 2.0;
 
-	vec3 screenColor = color.rgb * (sqrt(ndl*ndl2) + specComp*ndl);
+	vec3 screenColor = color.rgb * (sqrt(ndl1*ndl2) + specComp*ndl1);
 
 	if(colorMode == 1) screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
 	if(colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.1, 0.2, 1.0), temperature01);

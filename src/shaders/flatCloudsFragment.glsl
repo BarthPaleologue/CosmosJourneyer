@@ -8,8 +8,11 @@ uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
 uniform sampler2D normalMap;
 
-uniform vec3 sunPosition; // position of the sun in world space
 uniform vec3 cameraPosition; // position of the camera in world space
+
+#define MAX_STARS 5
+uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
+uniform int nbStars; // number of stars
 
 uniform mat4 projection; // camera's projection matrix
 uniform mat4 view; // camera's view matrix
@@ -61,6 +64,8 @@ uniform float time;
 #pragma glslify: applyQuaternion = require(./utils/applyQuaternion.glsl)
 
 #pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
+
+#pragma glslify: computeSpecularHighlight = require(./utils/computeSpecularHighlight.glsl)
 
 float cloudDensityAtPoint(vec3 samplePoint) {
 
@@ -140,15 +145,17 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     // TODO: add another normalmap
     //normal = triplanarNormal(normalRotatedSamplePoint, normal, normalMap, 20.0, 0.5, 0.5 * cloudDensity * cloudNormalStrength);
 
-    vec3 sunDir = normalize(sunPosition - planetPosition); // direction to the light source with parallel rays hypothesis
+    float ndl = 0.0; // dimming factor due to light inclination relative to vertex normal in world space
+    float specularHighlight = 0.0;
+    for(int i = 0; i < nbStars; i++) {
+        vec3 sunDir = normalize(starPositions[i] - planetPosition);
 
-    float ndl = max(dot(normal, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
+        ndl += max(dot(normal, sunDir), 0.0);
 
-    //TODO : en faire un uniform
-    float smoothness = 0.7;
-    float specularAngle = acos(dot(normalize(sunDir - rayDir), normal));
-    float specularExponent = specularAngle / (1.0 - smoothness);
-    float specularHighlight = exp(-specularExponent * specularExponent);
+        float smoothness = 0.7; //TODO : en faire un uniform
+        specularHighlight += computeSpecularHighlight(sunDir, rayDir, normal, smoothness, 1.0);
+    }
+    ndl = saturate(ndl);
 
 	vec3 ambiant = lerp(originalColor, ndl * cloudColor, 1.0 - cloudDensity);
 

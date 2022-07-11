@@ -6,6 +6,7 @@ import surfaceMaterialVertex from "../../shaders/gazPlanetMaterial/vertex.glsl";
 import { GazPlanet } from "../bodies/planets/gazPlanet";
 import { GazColorSettings } from "./colorSettingsInterface";
 import { randRangeInt } from "extended-random";
+import { flattenVector3Array } from "../utils/algebra";
 
 const shaderName = "gazPlanetMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -33,7 +34,9 @@ export class GazPlanetMaterial extends ShaderMaterial {
                 "cameraFar",
                 "planetPosition",
                 "planetRadius",
-                "sunPosition",
+
+                "starPositions",
+                "nbStars",
 
                 "color1",
                 "color2",
@@ -65,9 +68,11 @@ export class GazPlanetMaterial extends ShaderMaterial {
         this.setFloat("seed", this.planet.seed);
 
         this.setVector3("playerPosition", Vector3.Zero());
-        this.setVector3("sunPosition", Vector3.Zero());
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
         this.setFloat("planetRadius", this.planet.getRadius());
+
+        this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
+        this.setInt("nbStars", this.planet.starSystem.stars.length);
 
         this.setColor3("color1", this.colorSettings.color1);
         this.setColor3("color2", this.colorSettings.color2);
@@ -79,10 +84,12 @@ export class GazPlanetMaterial extends ShaderMaterial {
         this.setFloat("colorSharpness", this.colorSettings.colorSharpness);
     }
 
-    public update(player: PlayerController, starPosition: Vector3) {
+    public update(player: PlayerController) {
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
         this.setVector3("playerPosition", player.getAbsolutePosition());
-        this.setVector3("sunPosition", starPosition);
+
+        this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
+        this.setInt("nbStars", this.planet.starSystem.stars.length);
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
 

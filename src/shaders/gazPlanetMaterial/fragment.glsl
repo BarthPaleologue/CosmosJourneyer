@@ -19,8 +19,12 @@ uniform mat4 world;
 uniform vec3 playerPosition; // camera position in world space
 uniform float cameraNear;
 uniform float cameraFar;
-uniform vec3 sunPosition; // light position in world space
+
 uniform vec3 planetPosition;
+
+#define MAX_STARS 5
+uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
+uniform int nbStars; // number of stars
 
 uniform vec3 color1;
 uniform vec3 color2;
@@ -73,10 +77,29 @@ vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
 
 void main() {
     vec3 viewRayW = normalize(playerPosition - vPositionW); // view direction in world space
-    vec3 lightRayW = normalize(sunPosition - vPositionW); // light ray direction in world space
 
     vec3 sphereNormalW = vSphereNormalW;
-    float ndl = max(0.0, dot(sphereNormalW, lightRayW));
+    vec3 normal = vNormal;
+    vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
+
+    float ndl = 0.0;
+    float specComp = 0.0;
+    for(int i = 0; i < nbStars; i++) {
+        vec3 starLightRayW = normalize(starPositions[i] - vPositionW); // light ray direction in world space
+        ndl += max(0.0, dot(sphereNormalW, starLightRayW));
+
+        vec3 angleW = normalize(viewRayW + starLightRayW);
+        specComp += max(0.0, dot(normalW, angleW));
+    }
+    ndl = saturate(ndl);
+    specComp = saturate(specComp);
+    specComp = pow(specComp, 128.0);
+
+    // TODO: finish this (uniforms...)
+    /*float smoothness = 0.7;
+    float specularAngle = fastAcos(dot(normalize(viewRayW + lightRayW), normalW));
+    float specularExponent = specularAngle / (1.0 - smoothness);
+    float specComp = exp(-specularExponent * specularExponent);*/
 
     vec3 color = vec3(0.0);
 
@@ -102,20 +125,6 @@ void main() {
 
         color = lerp(color1, color2, value);
     }
-
-    vec3 normal = vNormal;
-    vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
-
-    // specular
-    vec3 angleW = normalize(viewRayW + lightRayW);
-    float specComp = max(0., dot(normalW, angleW));
-    specComp = pow(specComp, 32.0);
-
-    // TODO: finish this (uniforms...)
-    /*float smoothness = 0.7;
-    float specularAngle = fastAcos(dot(normalize(viewRayW + lightRayW), normalW));
-    float specularExponent = specularAngle / (1.0 - smoothness);
-    float specComp = exp(-specularExponent * specularExponent);*/
 
     // suppresion du reflet partout hors la neige
     specComp *= (color.r + color.g + color.b) / 3.0;

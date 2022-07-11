@@ -11,8 +11,11 @@ varying vec2 vUV; // screen coordinates
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
 
-uniform vec3 sunPosition; // position of the sun in world space
 uniform vec3 cameraPosition; // position of the camera in world space
+
+#define MAX_STARS 5
+uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
+uniform int nbStars; // number of stars
 
 uniform mat4 projection; // camera's projection matrix
 uniform mat4 view; // camera's view matrix
@@ -121,7 +124,7 @@ float calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 original
 
     vec3 samplePointPlanetSpace = rayOrigin - planetPosition;
 
-    vec3 sunDir = normalize(sunPosition); // direction to the light source
+    vec3 sunDir = normalize(starPositions[0]); // direction to the light source
     
     float stepSize = rayLength / float(POINTS_FROM_CAMERA - 1); // the ray length between sample points
 
@@ -169,7 +172,7 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     vec3 light = vec3(calculateLight(firstPointInAtmosphere, rayDir, distanceThroughAtmosphere, originalColor)); // calculate scattering
     
-	float ndl = -dot(normalize(rayOrigin + rayDir * impactPoint - planetPosition), normalize(rayOrigin + rayDir * impactPoint - sunPosition));
+	float ndl = -dot(normalize(rayOrigin + rayDir * impactPoint - planetPosition), normalize(rayOrigin + rayDir * impactPoint - starPositions[0]));
 
 	//ndl = saturate(ndl + 0.2);
 
