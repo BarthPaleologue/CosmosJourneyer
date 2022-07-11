@@ -18,7 +18,7 @@ export class TelluricMaterial extends ShaderMaterial {
 
     constructor(planet: TelluricPlanet, scene: Scene) {
         super(`${planet.name}SurfaceColor`, scene, shaderName, {
-            attributes: ["position", "normal", "uv"],
+            attributes: ["position", "normal"],
             uniforms: [
                 "world",
                 "worldViewProjection",
