@@ -153,7 +153,10 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
         ndl += max(dot(normal, sunDir), 0.0);
 
         float smoothness = 0.7; //TODO : en faire un uniform
-        specularHighlight += computeSpecularHighlight(sunDir, rayDir, normal, smoothness, 1.0);
+        if(length(rayOrigin - planetPosition) > cloudLayerRadius) {
+            // if above cloud coverage then specular highlight
+            specularHighlight += computeSpecularHighlight(sunDir, rayDir, normal, smoothness, 1.0);
+        }
     }
     ndl = saturate(ndl);
 
