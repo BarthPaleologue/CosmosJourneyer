@@ -59,6 +59,8 @@ export class Assets {
         const characterTask = Assets.manager.addMeshTask("characterTask", "", "", character);
         characterTask.onSuccess = function (task: MeshAssetTask) {
             Assets.Character = task.loadedMeshes[0];
+            //TODO: removed that when we use it
+            Assets.Character.setEnabled(false);
             console.log("Character loaded");
         };
         Assets.manager.load();
