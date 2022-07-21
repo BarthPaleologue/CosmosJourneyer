@@ -7,3 +7,5 @@ declare module "*.scss";
 declare module "*.css";
 
 declare module "*.glsl";
+
+declare module "*.glb";

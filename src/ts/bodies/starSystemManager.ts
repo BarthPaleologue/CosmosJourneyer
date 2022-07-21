@@ -1,4 +1,4 @@
-import { DepthRenderer, Mesh, Scene, Vector3 } from "@babylonjs/core";
+import { AbstractMesh, DepthRenderer, Mesh, Scene, Vector3 } from "@babylonjs/core";
 
 import { ChunkForge } from "../chunks/chunkForge";
 import { PlayerController } from "../player/playerController";
@@ -99,7 +99,7 @@ export class StarSystemManager {
         return nearest!;
     }
 
-    public registerMeshDepth(mesh: Mesh) {
+    public registerMeshDepth(mesh: AbstractMesh) {
         this.depthRenderer.getDepthMap().renderList!.push(mesh);
     }
 
