@@ -98,7 +98,11 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         float ndl2 = max(dot(planetNormal, sunDir), 0.0);
 
         ndl += sqrt(ndl1 * ndl2);
-        specularHighlight += computeSpecularHighlight(sunDir, rayDir, normalWave, smoothness, specularPower);
+
+        if(length(rayOrigin - planetPosition) > oceanRadius) {
+            // if above cloud coverage then specular highlight
+            specularHighlight += computeSpecularHighlight(sunDir, rayDir, normalWave, smoothness, 1.0);
+        }
     }
 
     ndl = saturate(ndl);
