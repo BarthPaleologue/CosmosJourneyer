@@ -1,0 +1,591 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Mean temperature of a planet using orbital settings and star properties
+\end_layout
+
+\begin_layout Author
+by Barthélemy Paléologue
+\end_layout
+
+\begin_layout Abstract
+To achieve the goal of creating procedural solar systems with realistic
+ properties, it is necessary to compute the temperature of each planet so
+ that it can influence its geological generation, enabling the differenciation
+ between frozen world from toasted ones from habitables ones.
+ The approach I will use here is to use a planet's energy budget to compute
+ its average temperature using only the physical properties of its star
+ such as its temperature and radius and using the properties of the planet
+ : its distance to the star, its albedo, and greenhouse effect.
+ 
+\end_layout
+
+\begin_layout Section*
+Symbols
+\end_layout
+
+\begin_layout Standard
+Here are the variables that we will be using :
+\end_layout
+
+\begin_layout Standard
+- 
+\begin_inset Formula $T_{star}$
+\end_inset
+
+ is the temperature of the star in 
+\begin_inset Formula $K$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+- 
+\begin_inset Formula $R_{star}$
+\end_inset
+
+ is the radius of the star in 
+\begin_inset Formula $m$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+- 
+\begin_inset Formula $T_{planet}$
+\end_inset
+
+ is the temperature of the planet in 
+\begin_inset Formula $K$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+- 
+\begin_inset Formula $R_{planet}$
+\end_inset
+
+ is the radius of the planet in 
+\begin_inset Formula $m$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+- 
+\begin_inset Formula $D$
+\end_inset
+
+ is the distance between the planet and its star in 
+\begin_inset Formula $m$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+- 
+\begin_inset Formula $A$
+\end_inset
+
+ is the albedo of the planet
+\end_layout
+
+\begin_layout Standard
+- 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ is the greenhouse effect factor
+\end_layout
+
+\begin_layout Standard
+- 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ is the Stefan-Boltzmann constant
+\end_layout
+
+\begin_layout Section*
+Hypothesis
+\end_layout
+
+\begin_layout Standard
+The star will be assimilated to a perfect black body for the entirety of
+ the demonstration.
+\end_layout
+
+\begin_layout Section
+The energy emitted by the star
+\end_layout
+
+\begin_layout Standard
+The total energy emitted by the star can be obtained using Stefan-Boltzmann
+ law to compute the energy per unit of surface (
+\begin_inset Formula $\Phi_{star}=\sigma T_{star}^{4}$
+\end_inset
+
+).
+ Then we can multiply by the surface of the sun (
+\begin_inset Formula $4\pi R_{star}^{2}$
+\end_inset
+
+) :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P_{star}=\Phi_{star}\times S_{star}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P_{star}=4\pi\sigma R_{star}^{2}T_{star}^{4}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+The energy received by the planet
+\end_layout
+
+\begin_layout Standard
+The planet we are studying will only receive part of this energy.
+ As the planet is at a distance 
+\begin_inset Formula $D$
+\end_inset
+
+ of the star, the energy of the star will be spread across the emission
+ sphere centered on the star, whose radius is 
+\begin_inset Formula $D$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Therefore we have to compute the per surface energy received by the planet
+ at the distance 
+\begin_inset Formula $D$
+\end_inset
+
+.
+ We can then find the amount of energy received by the planet by multiplying
+ by the surface of the apparent disk of the planet.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P_{received}=\frac{P_{star}}{S_{emission}}S_{planetdisk}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P_{received}=\frac{4\pi\sigma R_{star}^{2}T_{star}^{4}}{4\pi D^{2}}\pi R_{planet}^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P_{received}=\frac{\pi\sigma R_{star}^{2}R_{planet}^{2}T_{star}^{4}}{D^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Accounting for the albedo
+\end_layout
+
+\begin_layout Standard
+Part of this energy is reflected into space because of the natural color
+ of the planet.
+ This phenomenon is called albedo, which represents the percentage of energy
+ reflected into space.
+ Knowing that we can compute the amount of energy absorbed by the planet
+ :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P_{absorbed}=(1-A)P_{received}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P_{absorbed}=(1-A)\frac{\pi\sigma R_{star}^{2}R_{planet}^{2}T_{star}^{4}}{D^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Greenhouse effect
+\end_layout
+
+\begin_layout Standard
+The energy absorbed is then reemitted by infrared radiation using the Stefan-Bol
+tzmann law we used during part 1.
+ We have already taken account of the albedo so we can consider all the
+ remaining energy is absorbed, thus we do not need to specify the emissivity
+ of the planet in the Stefan-Boltzmann formula :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P_{reemitted}=P_{absorbed}=\sigma T_{planet}^{4}\times4\pi R_{planet}^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A fraction 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ of this reemitted energy will be sent back to the planet's surface because
+ of the greenhouse effect.
+\end_layout
+
+\begin_layout Standard
+We can then write the complete energy budget of the planet using this model
+ :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P_{reemited}=P_{absorbed}+P_{greenhouse}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P_{greenhouse}=\alpha P_{reemited}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P_{absorbed}+\alpha P_{reemited}=P_{reemited}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{1-A}{1-\alpha}P_{received}=P_{reemited}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Calculating the planet's average temperature
+\end_layout
+
+\begin_layout Standard
+Using the relation we found, we can extract the temperature of the planet
+ :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{1-A}{1-\alpha}\times\frac{\pi\sigma R_{star}^{2}R_{planet}^{2}T_{star}^{4}}{D^{2}}=4\pi\sigma R_{planet}^{2}T_{planet}^{4}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{1-A}{1-\alpha}\times\frac{R_{star}^{2}T_{star}^{4}}{D^{2}}=4T_{planet}^{4}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+T_{planet}^{4}=\frac{1-A}{1-\alpha}\times\frac{R_{star}^{2}}{4D^{2}}T_{star}^{4}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boxed{T_{planet}=T_{star}\times\sqrt[4]{\frac{(1-A)R_{star}^{2}}{4(1-\alpha)D^{2}}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Testing the formula
+\end_layout
+
+\begin_layout Standard
+Let's test this formula for the earth and the sun.
+ We have 
+\begin_inset Formula $T_{star}=5770K$
+\end_inset
+
+, 
+\begin_inset Formula $R_{star}=696\times10^{6}m$
+\end_inset
+
+, 
+\begin_inset Formula $D=150\times10^{9}m$
+\end_inset
+
+, 
+\begin_inset Formula $A=0.3$
+\end_inset
+
+, 
+\begin_inset Formula $\alpha=0.4$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+T_{planet}=289K=16°C
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Close enough ! Moreover this simple model can also show how greenhouse effect
+ can have a huge impact on the average temperature of earth : by changing
+ 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ from 
+\begin_inset Formula $0.4$
+\end_inset
+
+ to 
+\begin_inset Formula $0.42$
+\end_inset
+
+, we already increase the temperature by more than two degrees on the surface
+ of the planet !
+\end_layout
+
+\begin_layout Section
+Usability in procedural generation
+\end_layout
+
+\begin_layout Standard
+The generation of procedural solar systems can be boiled down to the choice
+ of the different physical parameters of the planets and the stars.
+ As we have large amounts of data on stars like their radius and temperatures,
+ generating these parameters in a realistic way is achievable.
+ Therefore knowing 
+\begin_inset Formula $T_{star}$
+\end_inset
+
+ and 
+\begin_inset Formula $R_{star}$
+\end_inset
+
+ is not problematic.
+\end_layout
+
+\begin_layout Standard
+The distance of the planet to its star is someting that can be chosen using
+ a random range during the generation of the system, consequently we know
+ the value of 
+\begin_inset Formula $D$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The difficulties arise when talking about 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ and 
+\begin_inset Formula $A$
+\end_inset
+
+.
+ Indeed, the two parameters are interdependent, making the generation process
+ difficult.
+ An increase of temperature caused by an increase in 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ can for example reduce the amount of ice on a planet, thus reducing its
+ albedo 
+\begin_inset Formula $A$
+\end_inset
+
+, thus decreasing the temperature of the planet.
+\end_layout
+
+\begin_layout Standard
+One way to avoid this complication could be choosing first the temperature
+ of the planet in a reasonable range and then derivating the albedo and
+ the the greenhouse effect, but it would defeat the purpose of the formula
+ which was to compute the temperature.
+\end_layout
+
+\end_body
+\end_document
