@@ -10,30 +10,30 @@ export enum TaskType {
     Collision
 }
 
-export interface Task {
+export type Task = {
     type: TaskType;
     isFiner: boolean;
     chunk: PlanetChunk;
 }
 
-export interface BuildTask extends Task {
+export type BuildTask = Task & {
     planet: TelluricPlanet;
     depth: number;
     direction: Direction;
     position: Vector3;
 }
 
-export interface ApplyTask extends Task {
+export type ApplyTask = Task & {
     vertexData: VertexData;
     planet: TelluricPlanet;
     callbackTasks: DeleteTask[];
 }
 
-export interface DeleteTask extends Task {
+export type DeleteTask = Task & {
     newChunks: PlanetChunk[];
 }
 
-export interface ReturnedChunkData {
+export type ReturnedChunkData = {
     p: Float32Array;
     n: Float32Array;
     i: Uint16Array;

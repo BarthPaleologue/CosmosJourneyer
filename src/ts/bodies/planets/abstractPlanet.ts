@@ -4,13 +4,13 @@ import { Star } from "../stars/star";
 import { Scene, Vector3 } from "@babylonjs/core";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
-import { IPlanetPhysicalProperties } from "../iPhysicalProperties";
+import { PlanetPhysicalProperties } from "../physicalProperties";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { centeredRand } from "extended-random";
 
 export abstract class AbstractPlanet extends AbstractBody {
-    abstract override physicalProperties: IPlanetPhysicalProperties;
+    abstract override physicalProperties: PlanetPhysicalProperties;
     public override postProcesses: PlanetPostProcesses;
 
     protected constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {

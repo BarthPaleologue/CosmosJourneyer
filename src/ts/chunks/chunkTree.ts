@@ -3,7 +3,7 @@ import { Vector3 } from "@babylonjs/core";
 import { PlanetChunk } from "./planetChunk";
 import { Direction } from "../utils/direction";
 import { ChunkForge } from "./chunkForge";
-import { DeleteTask, TaskType } from "./taskInterfaces";
+import { DeleteTask, TaskType } from "./taskTypes";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { rayIntersectSphere } from "../utils/math";
 import { Settings } from "../settings";
@@ -116,6 +116,8 @@ export class ChunkTree {
                     this.requestDeletion(tree, newTree, true);
                     return newTree;
                 }
+                // TODO: check collision
+                //tree.mesh.intersectsMesh(observerPositionW, true)
                 return tree;
             }
             return [

@@ -1,4 +1,4 @@
-import { CollisionData } from "../chunks/workerDataInterfaces";
+import { CollisionData } from "../chunks/workerDataTypes";
 import { StarSystemManager } from "../bodies/starSystemManager";
 import { PlayerController } from "../player/playerController";
 import { RigidBody } from "../bodies/interfaces";

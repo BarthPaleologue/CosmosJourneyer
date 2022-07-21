@@ -1,7 +1,7 @@
 import { getQuaternionFromDirection } from "../utils/direction";
 import { LVector3 } from "../utils/algebra";
-import { BuildData, CollisionData, WorkerData } from "../chunks/workerDataInterfaces";
-import { TaskType } from "../chunks/taskInterfaces";
+import { BuildData, CollisionData, WorkerData } from "../chunks/workerDataTypes";
+import { TaskType } from "../chunks/taskTypes";
 import { makeTerrainFunction, TerrainFunction } from "../terrain/makeTerrainFunction";
 
 let currentPlanetID = "";

@@ -1,4 +1,4 @@
-import { IPhysicalProperties } from "../bodies/iPhysicalProperties";
+import { PhysicalProperties } from "../bodies/physicalProperties";
 import { IOrbitalProperties } from "./iOrbitalProperties";
 import { ITransformable } from "../transforms/iTransformable";
 import { BodyType } from "../bodies/interfaces";
@@ -7,7 +7,7 @@ export interface IOrbitalBody extends ITransformable {
     /**
      * Describes the fundamental properties of the body used in physical computations
      */
-    physicalProperties: IPhysicalProperties;
+    physicalProperties: PhysicalProperties;
 
     /**
      * Describes the fundamental properties of the body used in orbital computations

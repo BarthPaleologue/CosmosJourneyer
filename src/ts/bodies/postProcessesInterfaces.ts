@@ -5,12 +5,12 @@ import { FlatCloudsPostProcess } from "../postProcesses/planetPostProcesses/flat
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { PostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 
-export interface BodyPostProcesses {
+export type BodyPostProcesses = {
     [details: string]: PostProcess | null;
     rings: RingsPostProcess | null;
 }
 
-export interface PlanetPostProcesses extends BodyPostProcesses {
+export type PlanetPostProcesses = BodyPostProcesses & {
     [details: string]: PlanetPostProcess | null;
 
     atmosphere: AtmosphericScatteringPostProcess | null;
@@ -18,6 +18,6 @@ export interface PlanetPostProcesses extends BodyPostProcesses {
     clouds: FlatCloudsPostProcess | null;
 }
 
-export interface StarPostProcesses extends BodyPostProcesses {
+export type StarPostProcesses = BodyPostProcesses & {
     volumetricLight: VolumetricLightScatteringPostProcess;
 }

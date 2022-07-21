@@ -1,7 +1,7 @@
 import { Mesh } from "@babylonjs/core";
 
 import { ChunkForge } from "./chunkForge";
-import { BuildTask, TaskType } from "./taskInterfaces";
+import { BuildTask, TaskType } from "./taskTypes";
 import { Direction, getQuaternionFromDirection } from "../utils/direction";
 import { getChunkPlaneSpacePositionFromPath } from "../utils/chunkUtils";
 import { ChunkTree } from "./chunkTree";

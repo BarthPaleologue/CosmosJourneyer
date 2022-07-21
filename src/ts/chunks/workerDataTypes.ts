@@ -1,8 +1,8 @@
 import { Direction } from "../utils/direction";
 import { TerrainSettings } from "../terrain/terrainSettings";
-import { TaskType } from "./taskInterfaces";
+import { TaskType } from "./taskTypes";
 
-export interface WorkerData {
+export type WorkerData = {
     taskType: TaskType;
     planetName: string;
     planetDiameter: number;
@@ -11,7 +11,7 @@ export interface WorkerData {
     seed: number;
 }
 
-export interface BuildData extends WorkerData {
+export type BuildData = WorkerData & {
     nbVerticesPerSide: number;
     depth: number;
     direction: Direction;

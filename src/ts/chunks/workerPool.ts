@@ -1,4 +1,4 @@
-import { BuildTask, DeleteTask } from "./taskInterfaces";
+import { BuildTask, DeleteTask } from "./taskTypes";
 
 /*export class BuildTaskQueue {
     array: ArrayBuffer

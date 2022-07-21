@@ -1,6 +1,6 @@
 import { DepthRenderer, VertexData } from "@babylonjs/core";
-import { BuildData } from "./workerDataInterfaces";
-import { ApplyTask, BuildTask, DeleteTask, ReturnedChunkData, Task, TaskType } from "./taskInterfaces";
+import { BuildData } from "./workerDataTypes";
+import { ApplyTask, BuildTask, DeleteTask, ReturnedChunkData, Task, TaskType } from "./taskTypes";
 import { WorkerPool } from "./workerPool";
 
 export class ChunkForge {

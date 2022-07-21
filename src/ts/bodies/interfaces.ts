@@ -1,5 +1,5 @@
 import { Vector3 } from "@babylonjs/core";
-import { CollisionData } from "../chunks/workerDataInterfaces";
+import { CollisionData } from "../chunks/workerDataTypes";
 
 export enum BodyType {
     STAR,

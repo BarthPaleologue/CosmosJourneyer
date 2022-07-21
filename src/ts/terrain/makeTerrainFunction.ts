@@ -3,6 +3,8 @@ import { simplexNoiseLayer } from "./landscape/simplexNoiseLayer";
 import { ridgedNoiseLayer } from "./landscape/ridgedNoiseLayer";
 import { LVector3 } from "../utils/algebra";
 import { tanhSharpen } from "../utils/math";
+import { zeroLayer } from "./landscape/zeroLayer";
+import { oneLayer } from "./landscape/oneLayer";
 
 export type TerrainFunction = (samplePoint: LVector3, seed: number, outPosition: LVector3, outGradient: LVector3) => void;
 

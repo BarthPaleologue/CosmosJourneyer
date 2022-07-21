@@ -6,12 +6,12 @@ import { AbstractPlanet } from "./abstractPlanet";
 import { Vector3 } from "@babylonjs/core";
 
 import { BodyType, RigidBody } from "../interfaces";
-import { CollisionData } from "../../chunks/workerDataInterfaces";
-import { TaskType } from "../../chunks/taskInterfaces";
+import { CollisionData } from "../../chunks/workerDataTypes";
+import { TaskType } from "../../chunks/taskTypes";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
 import { Settings } from "../../settings";
-import { ISolidPhysicalProperties } from "../iPhysicalProperties";
+import { SolidPhysicalProperties } from "../physicalProperties";
 import { TelluricMaterial } from "../../materials/telluricMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { normalRandom, uniformRandBool } from "extended-random";
@@ -23,7 +23,7 @@ import { clamp } from "../../utils/math";
 export class TelluricPlanet extends AbstractPlanet implements RigidBody {
     oceanLevel: number;
 
-    override readonly physicalProperties: ISolidPhysicalProperties;
+    override readonly physicalProperties: SolidPhysicalProperties;
     override readonly bodyType = BodyType.TELLURIC;
     override readonly radius: number;
 
@@ -89,7 +89,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
         }
 
         if (uniformRandBool(0.6, this.rng)) {
-            this.createRings(starSystemManager.stars[0], starSystemManager.scene);
+            this.createRings();
             /*let ringMesh = MeshBuilder.CreatePlane(`${this._name}Rings`, {
                 size: this.postProcesses.rings!.settings.ringEnd * this.getApparentRadius() * 2
             }, scene);

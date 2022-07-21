@@ -1,8 +1,8 @@
-import { Vector3, Quaternion, Scene, Axis } from "@babylonjs/core";
+import { Quaternion, Scene, Axis } from "@babylonjs/core";
 import { BodyType, ISeedable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
 import { StarSystemManager } from "./starSystemManager";
-import { IPhysicalProperties } from "./iPhysicalProperties";
+import { PhysicalProperties } from "./physicalProperties";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../orbits/kepler";
@@ -16,7 +16,7 @@ import { BasicTransform } from "../transforms/basicTransform";
 export abstract class AbstractBody extends BasicTransform implements IOrbitalBody, ISeedable {
     abstract readonly bodyType: BodyType;
 
-    abstract physicalProperties: IPhysicalProperties;
+    abstract physicalProperties: PhysicalProperties;
     orbitalProperties: IOrbitalProperties;
     abstract postProcesses: BodyPostProcesses;
 
@@ -91,7 +91,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         return 2 * this.getRadius();
     }
 
-    public createRings(star: Star, scene: Scene): RingsPostProcess {
+    public createRings(): RingsPostProcess {
         const rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem);
         rings.settings.ringStart = randRange(1.8, 2.2, this.rng);
         rings.settings.ringEnd = randRange(2.1, 2.9, this.rng);
