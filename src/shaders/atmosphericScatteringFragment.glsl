@@ -191,7 +191,8 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
     vec3 light = vec3(0.0);
 
     for(int i = 0; i < nbStars; i++) {
-        light += calculateLight(firstPointInAtmosphere, starPositions[i], rayDir, distanceThroughAtmosphere);// calculate scattering
+        //TODO: the max should be taken at mie, rayleigh and absorption level, not globally
+        light = max(light, calculateLight(firstPointInAtmosphere, starPositions[i], rayDir, distanceThroughAtmosphere));// calculate scattering
     }
     return light + (1.0 - light) * originalColor; // blending scattered color with original color
 }
