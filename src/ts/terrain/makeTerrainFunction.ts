@@ -5,13 +5,14 @@ import { LVector3 } from "../utils/algebra";
 import { tanhSharpen } from "../utils/math";
 import { mountainsLayer } from "./landscape/mountainsLayer";
 import { oneLayer, zeroLayer } from "./landscape/constantLayers";
+import { continentLayer } from "./landscape/continentLayer";
 
 export type TerrainFunction = (samplePoint: LVector3, seed: number, outPosition: LVector3, outGradient: LVector3) => void;
 
 export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction {
-    const continents = simplexNoiseLayer(settings.continentsFrequency, 6, 1.8, 2.1, 0.5, 1 - settings.continentsFragmentation);
+    const continents = continentLayer(settings.continentsFrequency, 6, settings.continentsFragmentation);
     const bumps = simplexNoiseLayer(settings.bumpsFrequency, 3, 2, 2, 1.0, 0.2);
-    const mountains = mountainsLayer(settings.mountainsFrequency, 7, 1.9, 2.2, 2, settings.mountainsMinValue);
+    const mountains = mountainsLayer(settings.mountainsFrequency, 7, 1.9, 2.0, 2, settings.mountainsMinValue);
 
     return (samplePoint: LVector3, seed: number, outPosition: LVector3, outGradient: LVector3): void => {
         let elevation = 0;
@@ -30,8 +31,8 @@ export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction 
 
         mountainElevation = tanhSharpen(mountainElevation, 3, mountainGradient);
 
-        elevation += continentMask * mountainElevation * settings.maxMountainHeight;
-        mountainGradient.scaleInPlace(settings.maxMountainHeight * continentMask);
+        elevation += tanhSharpen(continentMask, 32.0) * mountainElevation * settings.maxMountainHeight;
+        mountainGradient.scaleInPlace(settings.maxMountainHeight * tanhSharpen(continentMask, 32.0));
         outGradient.addInPlace(mountainGradient);
 
         const bumpyGradient = LVector3.Zero();

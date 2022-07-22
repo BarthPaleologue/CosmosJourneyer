@@ -64,10 +64,12 @@ export class LVector3 implements IVector3Like {
         return new LVector3(this._x * scaleFactor, this._y * scaleFactor, this._z * scaleFactor);
     }
 
-    scaleInPlace(scaleFactor: number): void {
+    scaleInPlace(scaleFactor: number): LVector3 {
         this._x *= scaleFactor;
         this._y *= scaleFactor;
         this._z *= scaleFactor;
+
+        return this;
     }
 
     divide(divisor: number): LVector3 {
@@ -140,6 +142,12 @@ export class LVector3 implements IVector3Like {
         this.x = ix * q.w + iw * -q.x + iy * -q.z - iz * -q.y;
         this.y = iy * q.w + iw * -q.y + iz * -q.x - ix * -q.z;
         this.z = iz * q.w + iw * -q.z + ix * -q.y - iy * -q.x;
+    }
+
+    public copyFrom(vector: IVector3Like): void {
+        this.x = vector.x;
+        this.y = vector.y;
+        this.z = vector.z;
     }
 }
 

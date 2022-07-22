@@ -9,7 +9,7 @@ import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../orb
 import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
-import { centeredRand, randRange } from "extended-random";
+import { centeredRand, normalRandom, randRange } from "extended-random";
 import { alea } from "seedrandom";
 import { BasicTransform } from "../transforms/basicTransform";
 
@@ -55,8 +55,8 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         if (minDepth == -1) this.depth = 0;
         else this.depth = minDepth + 1;
 
-        this.rotate(Axis.X, centeredRand(this.rng) / 2);
-        this.rotate(Axis.Z, centeredRand(this.rng) / 2);
+        this.rotate(Axis.X, normalRandom(0, 0.2, this.rng));
+        this.rotate(Axis.Z, normalRandom(0, 0.2, this.rng));
 
         // TODO: do not hardcode
         const periapsis = this.rng() * 5000000e3;

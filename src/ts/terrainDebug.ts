@@ -18,6 +18,7 @@ import { Settings } from "./settings";
 import { BodyType } from "./bodies/interfaces";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
+import { randRange } from "extended-random";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -41,7 +42,7 @@ Assets.onFinish = () => {
     const sun = new Star("Weierstrass", starSystem, 22, []);
     sun.orbitalProperties.period = 60 * 60 * 24;
 
-    const planet = new TelluricPlanet("Hécate", starSystem, -2.994, starSystem.stars);
+    const planet = new TelluricPlanet("Hécate", starSystem, randRange(-1, 1), starSystem.stars);
 
     planet.physicalProperties.rotationPeriod /= 20;
 

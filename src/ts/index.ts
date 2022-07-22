@@ -50,7 +50,7 @@ Assets.onFinish = () => {
 
     const starfield = new StarfieldPostProcess("starfield", player, starSystem);
 
-    const sun = new Star("Weierstrass", starSystem, 22, []);
+    const sun = new Star("Weierstrass", starSystem, 0.51, []);
     sun.orbitalProperties.period = 60 * 60 * 24;
 
     /*const lensFlareSystem = new LensFlareSystem("lensFlareSystem", sun.transform, scene);
@@ -62,7 +62,7 @@ Assets.onFinish = () => {
         lensFlareSystem // lens flare system
     );*/
 
-    const planet = new TelluricPlanet("Hécate", starSystem, -2.994, starSystem.stars);
+    const planet = new TelluricPlanet("Hécate", starSystem, -1.9383521191775799, starSystem.stars);
 
     planet.physicalProperties.rotationPeriod /= 20;
 
@@ -89,7 +89,7 @@ Assets.onFinish = () => {
     };
 
     moon.terrainSettings.mountainsFrequency /= 4;
-    moon.terrainSettings.continentsFragmentation = 1;
+    moon.terrainSettings.continentsFragmentation = 0;
     moon.terrainSettings.maxMountainHeight = 5e3;
     moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
     moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
@@ -122,7 +122,7 @@ Assets.onFinish = () => {
         orientationQuaternion: Quaternion.Identity()
     };
 
-    ares.terrainSettings.continentsFragmentation = 0.5;
+    ares.terrainSettings.continentsFragmentation = 0.15;
     ares.terrainSettings.continentBaseHeight = 5e3;
     ares.terrainSettings.maxMountainHeight = 20e3;
     ares.terrainSettings.mountainsMinValue = 0.4;
@@ -140,7 +140,7 @@ Assets.onFinish = () => {
     aresAtmosphere.settings.greenWaveLength = 680;
     aresAtmosphere.settings.blueWaveLength = 670;
 
-    const andromaque = new GazPlanet("Andromaque", starSystem, 0.68, [sun]);
+    const andromaque = new GazPlanet("Andromaque", starSystem, 7.353198234923184, [sun]);
     andromaque.orbitalProperties = {
         period: 60 * 60 * 24 * 365.29,
         periapsis: 4300 * ares.getRadius(),

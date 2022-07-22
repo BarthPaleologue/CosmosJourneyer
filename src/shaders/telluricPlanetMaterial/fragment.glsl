@@ -204,8 +204,7 @@ void main() {
 	float beachFactor = getLnearFactor(elevation01, waterLevel01, beachSize / maxElevation);
 
 	float steepFactor = remap(slope, 0.0, 0.9, 0.0, 1.0);
-	steepFactor = saturate(steepFactor);
-	steepFactor = tanherpFactor(steepFactor, steepSharpness);
+	steepFactor = pow(steepFactor, steepSharpness);
 
 	if(elevation01 > waterLevel01) {
 
@@ -299,7 +298,7 @@ void main() {
 
 	if(colorMode == 1) screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
 	if(colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.1, 0.2, 1.0), temperature01);
-	if(colorMode == 3) screenColor = normal*0.5 + 0.5;
+	if(colorMode == 3) screenColor = normal * 0.5 + 0.5;
 	if(colorMode == 4) screenColor = vec3(elevation01);
 	if(colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vSamplePoint)));
 
