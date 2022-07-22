@@ -48,7 +48,7 @@ Assets.onFinish = () => {
 
     const starSystemManager = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
-    const starfield = new StarfieldPostProcess("starfield", starSystemManager);
+    const starfield = new StarfieldPostProcess("starfield", player, starSystemManager);
 
     const starSystemSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER);
     const starSystemRand = alea(starSystemSeed.toString());
@@ -70,8 +70,6 @@ Assets.onFinish = () => {
     star3.orbitalProperties.periapsis = (star3.getRadius() + star2.getRadius()) * 2;
     star3.orbitalProperties.apoapsis = (star3.getRadius() + star2.getRadius()) * 2;
     star3.orbitalProperties.period = 60 * 60 * 1.5;*/
-
-    starfield.setStar(star1);
 
     const planetSeed = randRange(-10, 10, starSystemRand);
     console.log("Planet seed : ", planetSeed);

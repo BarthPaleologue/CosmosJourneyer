@@ -1,4 +1,4 @@
-import { Axis, Effect, Vector3 } from "@babylonjs/core";
+import { Effect, Vector3 } from "@babylonjs/core";
 
 import { SpacePostProcess } from "./spacePostProcess";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
@@ -6,6 +6,9 @@ import { Star } from "../bodies/stars/star";
 
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
 import { StarSystemManager } from "../bodies/starSystemManager";
+import { PlayerController } from "../player/playerController";
+import { BodyType } from "../bodies/interfaces";
+import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -17,9 +20,7 @@ export interface StarfieldSettings {
 export class StarfieldPostProcess extends SpacePostProcess {
     settings: StarfieldSettings;
 
-    star: Star | null = null;
-
-    constructor(name: string, starSystem: StarSystemManager) {
+    constructor(name: string, player: PlayerController, starSystem: StarSystemManager) {
         const settings: StarfieldSettings = {
             foo: 1
         };
@@ -29,11 +30,33 @@ export class StarfieldPostProcess extends SpacePostProcess {
                 name: "visibility",
                 type: ShaderDataType.Float,
                 get: () => {
-                    //TODO: do something better
-                    if (this.star == null) throw new Error("Your starfield doesn't have a star attached to it");
-                    let vis = 1.0 - Vector3.Dot(this.star.getAbsolutePosition().normalizeToNew(), starSystem.scene.activeCamera!.getDirection(Axis.Z));
+                    //TODO: probably should be in the glsl
+                    let vis = 1.0;
+                    for(const star of starSystem.stars) {
+                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.getAbsolutePosition().normalizeToNew(), player.getForwardDirection()))
+                    }
                     vis /= 2;
+                    let vis2 = 1.0;
+                    if(player.nearestBody != null && player.nearestBody.bodyType == BodyType.TELLURIC) {
+                        const planet = player.nearestBody as TelluricPlanet;
+                        if(planet.postProcesses.atmosphere != null) {
+                            const height = planet.getAbsolutePosition().length();
+                            const maxHeight = planet.postProcesses.atmosphere.settings.atmosphereRadius;
+                            for(const star of starSystem.stars) {
+                                const sunDir = planet.getAbsolutePosition().subtract(star.getAbsolutePosition()).normalize();
+                                vis2 = Math.min(vis2, (height / maxHeight) ** 24 + Math.max(Vector3.Dot(sunDir, planet.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5);
+                            }
+                        }
+                    }
+                    vis = Math.min(vis, vis2);
                     return vis;
+                }
+            },
+            {
+                name: "time",
+                type: ShaderDataType.Float,
+                get: () => {
+                    return starSystem.getTime() % 100000;
                 }
             }
         ];
@@ -47,9 +70,5 @@ export class StarfieldPostProcess extends SpacePostProcess {
         for (const pipeline of starSystem.pipelines) {
             pipeline.starfields.push(this);
         }
-    }
-
-    public setStar(star: Star) {
-        this.star = star;
     }
 }

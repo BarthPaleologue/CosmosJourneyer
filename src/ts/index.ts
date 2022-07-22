@@ -48,11 +48,10 @@ Assets.onFinish = () => {
 
     const starSystem = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
 
-    const starfield = new StarfieldPostProcess("starfield", starSystem);
+    const starfield = new StarfieldPostProcess("starfield", player, starSystem);
 
     const sun = new Star("Weierstrass", starSystem, 22, []);
     sun.orbitalProperties.period = 60 * 60 * 24;
-    starfield.setStar(sun);
 
     /*const lensFlareSystem = new LensFlareSystem("lensFlareSystem", sun.transform, scene);
     const flare00 = new LensFlare(
