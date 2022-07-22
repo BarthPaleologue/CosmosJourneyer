@@ -22,6 +22,7 @@ export class PlayerController extends BasicTransform implements ITransformable {
 
         this.camera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.transform;
+        this.camera.fov = (80 / 360) * Math.PI;
         scene.activeCamera = this.camera;
 
         this.nearestBody = null;
