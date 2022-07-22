@@ -35,6 +35,8 @@ uniform vec4 planetRotationQuaternion;
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
+#pragma glslify: saturate = require(./utils/saturate.glsl)
+
 bool rayIntersectPlane(vec3 rayOrigin, vec3 rayDir, vec3 planetPosition, vec3 planeNormal, out float t) {
 	float denom = dot(rayDir, planeNormal);
 	if(abs(denom) <= 0.001) return false; // ray is parallel to the plane
@@ -88,6 +90,8 @@ void main() {
             } else {
                 vec3 samplePoint = cameraPosition + impactPoint * rayDir;
                 float ringDensity = ringDensityAtPoint(samplePoint);
+                ringDensity *= saturate((maximumDistance - impactPoint) / 1e11); // fade away when close to surface
+
                 vec3 ringColor = vec3(0.5) * ringDensity;
                 ringColor = lerp(ringColor, screenColor, ringOpacity);
 
