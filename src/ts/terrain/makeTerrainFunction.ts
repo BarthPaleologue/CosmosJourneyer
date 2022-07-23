@@ -12,7 +12,7 @@ export type TerrainFunction = (samplePoint: LVector3, seed: number, outPosition:
 export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction {
     const continents = continentLayer(settings.continentsFrequency, 6, settings.continentsFragmentation);
     const bumps = simplexNoiseLayer(settings.bumpsFrequency, 3, 2, 2, 1.0, 0.2);
-    const mountains = mountainsLayer(settings.mountainsFrequency, 7, 1.9, 2.0, 2, settings.mountainsMinValue);
+    const mountains = mountainsLayer(settings.mountainsFrequency, 7, 2.0, 2.0, 1, settings.mountainsMinValue);
 
     return (samplePoint: LVector3, seed: number, outPosition: LVector3, outGradient: LVector3): void => {
         let elevation = 0;

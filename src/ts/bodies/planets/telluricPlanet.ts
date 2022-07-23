@@ -109,11 +109,11 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
             bumpsFrequency: 30,
 
             maxBumpHeight: 1.5e3,
-            maxMountainHeight: 20e3,
+            maxMountainHeight: 15e3,
             continentBaseHeight: this.oceanLevel * 2.0,
 
             mountainsFrequency: 10 * Math.sqrt(ratio),
-            mountainsMinValue: 0.5
+            mountainsMinValue: 0.0
         };
 
         this.material = new TelluricMaterial(this, starSystemManager.scene);
