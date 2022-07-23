@@ -8,7 +8,7 @@ import { PostProcess, VolumetricLightScatteringPostProcess } from "@babylonjs/co
 export type BodyPostProcesses = {
     [details: string]: PostProcess | null;
     rings: RingsPostProcess | null;
-}
+};
 
 export type PlanetPostProcesses = BodyPostProcesses & {
     [details: string]: PlanetPostProcess | null;
@@ -16,8 +16,8 @@ export type PlanetPostProcesses = BodyPostProcesses & {
     atmosphere: AtmosphericScatteringPostProcess | null;
     ocean: OceanPostProcess | null;
     clouds: FlatCloudsPostProcess | null;
-}
+};
 
 export type StarPostProcesses = BodyPostProcesses & {
     volumetricLight: VolumetricLightScatteringPostProcess;
-}
+};

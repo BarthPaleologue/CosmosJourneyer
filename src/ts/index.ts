@@ -201,5 +201,3 @@ window.addEventListener("resize", () => {
 });
 
 bodyEditor.resize();
-
-

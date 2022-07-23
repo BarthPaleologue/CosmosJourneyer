@@ -1,12 +1,4 @@
-import {
-    AbstractMesh,
-    AssetsManager,
-    Color3,
-    MeshAssetTask,
-    Scene,
-    StandardMaterial,
-    Texture
-} from "@babylonjs/core";
+import { AbstractMesh, AssetsManager, Color3, MeshAssetTask, Scene, StandardMaterial, Texture } from "@babylonjs/core";
 import "@babylonjs/loaders/glTF";
 
 import rockNormalMap from "../asset/textures/rockn.png";
@@ -45,16 +37,16 @@ export class Assets {
         Assets.manager = new AssetsManager(scene);
         console.log("Initializing assets...");
 
-        Assets.manager.addTextureTask("RockNormalMap", rockNormalMap).onSuccess = (task) => Assets.RockNormalMap = task.texture;
-        Assets.manager.addTextureTask("DirtNormalMap", dirtNormalMap).onSuccess = (task) => Assets.DirtNormalMap = task.texture;
-        Assets.manager.addTextureTask("BottomNormalMap", bottomNormalMap).onSuccess = (task) => Assets.BottomNormalMap = task.texture;
-        Assets.manager.addTextureTask("GrassNormalMap", grassNormalMap).onSuccess = (task) => Assets.GrassNormalMap = task.texture;
-        Assets.manager.addTextureTask("SnowNormalMap1", snowNormalMap1).onSuccess = (task) => Assets.SnowNormalMap1 = task.texture;
-        Assets.manager.addTextureTask("SnowNormalMap2", snowNormalMap2).onSuccess = (task) => Assets.SnowNormalMap2 = task.texture;
-        Assets.manager.addTextureTask("SandNormalMap1", sandNormalMap1).onSuccess = (task) => Assets.SandNormalMap1 = task.texture;
-        Assets.manager.addTextureTask("SandNormalMap2", sandNormalMap2).onSuccess = (task) => Assets.SandNormalMap2 = task.texture;
-        Assets.manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => Assets.WaterNormalMap1 = task.texture;
-        Assets.manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => Assets.WaterNormalMap2 = task.texture;
+        Assets.manager.addTextureTask("RockNormalMap", rockNormalMap).onSuccess = (task) => (Assets.RockNormalMap = task.texture);
+        Assets.manager.addTextureTask("DirtNormalMap", dirtNormalMap).onSuccess = (task) => (Assets.DirtNormalMap = task.texture);
+        Assets.manager.addTextureTask("BottomNormalMap", bottomNormalMap).onSuccess = (task) => (Assets.BottomNormalMap = task.texture);
+        Assets.manager.addTextureTask("GrassNormalMap", grassNormalMap).onSuccess = (task) => (Assets.GrassNormalMap = task.texture);
+        Assets.manager.addTextureTask("SnowNormalMap1", snowNormalMap1).onSuccess = (task) => (Assets.SnowNormalMap1 = task.texture);
+        Assets.manager.addTextureTask("SnowNormalMap2", snowNormalMap2).onSuccess = (task) => (Assets.SnowNormalMap2 = task.texture);
+        Assets.manager.addTextureTask("SandNormalMap1", sandNormalMap1).onSuccess = (task) => (Assets.SandNormalMap1 = task.texture);
+        Assets.manager.addTextureTask("SandNormalMap2", sandNormalMap2).onSuccess = (task) => (Assets.SandNormalMap2 = task.texture);
+        Assets.manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Assets.WaterNormalMap1 = task.texture);
+        Assets.manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Assets.WaterNormalMap2 = task.texture);
 
         const characterTask = Assets.manager.addMeshTask("characterTask", "", "", character);
         characterTask.onSuccess = function (task: MeshAssetTask) {
@@ -69,7 +61,7 @@ export class Assets {
             console.log("Assets loaded");
             Assets.IS_READY = true;
             Assets.onFinish();
-        }
+        };
     }
 
     static DebugMaterial(name: string) {

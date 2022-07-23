@@ -153,7 +153,7 @@ export function minimumValue(y: number, minValue: number, grad?: Vec3): number {
 
     // TODO: ne pas hardcoder k
     const newY = sFloor(y - minValue, 0, 100.0, grad) / (1 - minValue);
-    if(grad) grad.scaleInPlace(1 / (1 - minValue));
+    if (grad) grad.scaleInPlace(1 / (1 - minValue));
     return newY;
 }
 

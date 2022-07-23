@@ -32,17 +32,17 @@ export class StarfieldPostProcess extends SpacePostProcess {
                 get: () => {
                     //TODO: probably should be in the glsl
                     let vis = 1.0;
-                    for(const star of starSystem.stars) {
-                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.getAbsolutePosition().normalizeToNew(), player.getForwardDirection()))
+                    for (const star of starSystem.stars) {
+                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.getAbsolutePosition().normalizeToNew(), player.getForwardDirection()));
                     }
                     vis /= 2;
                     let vis2 = 1.0;
-                    if(player.nearestBody != null && player.nearestBody.bodyType == BodyType.TELLURIC) {
+                    if (player.nearestBody != null && player.nearestBody.bodyType == BodyType.TELLURIC) {
                         const planet = player.nearestBody as TelluricPlanet;
-                        if(planet.postProcesses.atmosphere != null) {
+                        if (planet.postProcesses.atmosphere != null) {
                             const height = planet.getAbsolutePosition().length();
                             const maxHeight = planet.postProcesses.atmosphere.settings.atmosphereRadius;
-                            for(const star of starSystem.stars) {
+                            for (const star of starSystem.stars) {
                                 const sunDir = planet.getAbsolutePosition().subtract(star.getAbsolutePosition()).normalize();
                                 vis2 = Math.min(vis2, (height / maxHeight) ** 24 + Math.max(Vector3.Dot(sunDir, planet.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5);
                             }

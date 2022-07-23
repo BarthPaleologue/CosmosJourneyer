@@ -4,7 +4,7 @@ import { simplex411 } from "../../utils/simplex";
 import { simpleElevationFunction } from "./elevationFunction";
 
 export function mountainLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, power: number, minValue: number): simpleElevationFunction {
-    return function(coords: LVector3, seed: number, gradient: LVector3) {
+    return function (coords: LVector3, seed: number, gradient: LVector3) {
         let noiseValue = 0.0;
         let totalAmplitude = 0.0;
         const localGradient = LVector3.Zero();
@@ -18,8 +18,8 @@ export function mountainLayer(frequency: number, nbOctaves: number, decay: numbe
 
             localGradient.divideInPlace(-1);
 
-            localElevation /= (decay ** i) * (1.0 + gradient.getSquaredMagnitude());
-            localGradient.divideInPlace((decay ** i) * (1.0 + gradient.getSquaredMagnitude()));
+            localElevation /= decay ** i * (1.0 + gradient.getSquaredMagnitude());
+            localGradient.divideInPlace(decay ** i * (1.0 + gradient.getSquaredMagnitude()));
 
             noiseValue += localElevation;
             gradient.addInPlace(localGradient);
@@ -34,5 +34,5 @@ export function mountainLayer(frequency: number, nbOctaves: number, decay: numbe
         if (minValue > 0) noiseValue = minimumValue(noiseValue, minValue, gradient);
 
         return pow(noiseValue, power, gradient);
-    }
+    };
 }

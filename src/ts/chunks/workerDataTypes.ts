@@ -9,12 +9,12 @@ export type WorkerData = {
     terrainSettings: TerrainSettings;
     position: number[];
     seed: number;
-}
+};
 
 export type BuildData = WorkerData & {
     nbVerticesPerSide: number;
     depth: number;
     direction: Direction;
-}
+};
 
 export type CollisionData = WorkerData;

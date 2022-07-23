@@ -65,7 +65,6 @@ Assets.onFinish = () => {
     starSystem.spaceRenderingPipeline.rings.splice(starSystem.spaceRenderingPipeline.rings.indexOf(planet.postProcesses.rings!), 1);
     starSystem.surfaceRenderingPipeline.rings.splice(starSystem.surfaceRenderingPipeline.rings.indexOf(planet.postProcesses.rings!), 1);
 
-
     starSystem.init();
 
     const collisionWorker = new CollisionWorker(player, starSystem);
