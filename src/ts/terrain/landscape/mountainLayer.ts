@@ -1,13 +1,12 @@
 import { LVector3 } from "../../utils/algebra";
-import { sAbs, sFloor } from "../../utils/math";
+import { minimumValue, pow, sAbs, sFloor } from "../../utils/math";
 import { simplex411 } from "../../utils/simplex";
-import { elevationFunction } from "./elevationFunction";
+import { simpleElevationFunction } from "./elevationFunction";
 
-export function mountainsLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, power: number, minValue: number): elevationFunction {
+export function mountainLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, power: number, minValue: number): simpleElevationFunction {
     return function(coords: LVector3, seed: number, gradient: LVector3) {
         let noiseValue = 0.0;
         let totalAmplitude = 0.0;
-
         const localGradient = LVector3.Zero();
         const samplePoint = coords.scale(frequency);
         for (let i = 0; i < nbOctaves; i++) {
@@ -32,20 +31,8 @@ export function mountainsLayer(frequency: number, nbOctaves: number, decay: numb
         noiseValue /= totalAmplitude;
         gradient.divideInPlace(totalAmplitude);
 
-        if (minValue > 0) {
-            if (minValue != 1) {
-                // TODO: ne pas hardcoder k
-                noiseValue = sFloor(noiseValue - minValue, 0, 100.0, gradient);
-                noiseValue /= 1 - minValue;
-                gradient.divideInPlace(1 - minValue);
-            } else {
-                throw new Error("minValue must be != 1");
-            }
-        }
+        if (minValue > 0) noiseValue = minimumValue(noiseValue, minValue, gradient);
 
-        gradient.scaleInPlace(power * Math.pow(noiseValue, power - 1));
-        noiseValue = noiseValue ** power;
-
-        return noiseValue;
+        return pow(noiseValue, power, gradient);
     }
 }

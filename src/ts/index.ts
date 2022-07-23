@@ -88,9 +88,8 @@ Assets.onFinish = () => {
         orientationQuaternion: Quaternion.Identity()
     };
 
-    moon.terrainSettings.mountainsFrequency /= 4;
     moon.terrainSettings.continentsFragmentation = 0;
-    moon.terrainSettings.maxMountainHeight = 5e3;
+    moon.terrainSettings.maxMountainHeight = 15e3;
     moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
     moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
 
@@ -125,7 +124,7 @@ Assets.onFinish = () => {
     ares.terrainSettings.continentsFragmentation = 0.15;
     ares.terrainSettings.continentBaseHeight = 5e3;
     ares.terrainSettings.maxMountainHeight = 20e3;
-    ares.terrainSettings.mountainsMinValue = 0.4;
+    ares.terrainSettings.mountainsMinValue = 0.0;
 
     ares.material.colorSettings.plainColor.copyFromFloats(0.4, 0.3, 0.3);
     ares.material.colorSettings.beachColor.copyFromFloats(0.3, 0.15, 0.1);

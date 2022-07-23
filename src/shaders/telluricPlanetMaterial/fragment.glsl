@@ -120,6 +120,8 @@ vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
 	return lerp(value1, value2, alpha);
 }
 
+#pragma glslify: tanhSharpener = require(../utils/tanhSharpener.glsl, tanh=tanh)
+
 #pragma glslify: saturate = require(../utils/saturate.glsl)
 
 #pragma glslify: waterBoilingPointCelsius = require(./utils/waterBoilingPointCelsius.glsl)
@@ -149,7 +151,7 @@ void main() {
 	float elevation01 = elevation / maxElevation;
 	float waterLevel01 = waterLevel / maxElevation;
 
-	float slope = 1.0 - dot(vUnitSamplePoint, vNormal);
+	float slope = 1.0 - max(dot(vUnitSamplePoint, vNormal), 0.0);
 
 	/// Analyse Physique de la planète
 
@@ -203,8 +205,7 @@ void main() {
 
 	float beachFactor = getLnearFactor(elevation01, waterLevel01, beachSize / maxElevation);
 
-	float steepFactor = remap(slope, 0.0, 0.9, 0.0, 1.0);
-	steepFactor = pow(steepFactor, steepSharpness);
+	float steepFactor = pow(slope, steepSharpness);
 
 	if(elevation01 > waterLevel01) {
 

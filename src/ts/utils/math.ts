@@ -137,6 +137,26 @@ export function tanhSharpen(x: number, s: number, grad?: Vec3): number {
     return 0.5 * (1 + tanhX / tanhHalfS);
 }
 
+/**
+ * Applies power function to a value and scales the optional gradient accordingly
+ * @param y the value to apply the power function to
+ * @param exponent the exponent of the power function
+ * @param grad the optional gradient to be modified
+ */
+export function pow(y: number, exponent: number, grad?: Vec3): number {
+    if (grad) grad.scaleInPlace(exponent * y ** (exponent - 1));
+    return y ** exponent;
+}
+
+export function minimumValue(y: number, minValue: number, grad?: Vec3): number {
+    if (minValue == 1) throw new Error("minValue must be != 1");
+
+    // TODO: ne pas hardcoder k
+    const newY = sFloor(y - minValue, 0, 100.0, grad) / (1 - minValue);
+    if(grad) grad.scaleInPlace(1 / (1 - minValue));
+    return newY;
+}
+
 export function gcd(a: number, b: number): number {
     if (!b) return a;
 

@@ -363,8 +363,8 @@ export class BodyEditor {
         );
 
         this.surfaceSliders.push(
-            new Slider("steepSharpness", document.getElementById("steepSharpness") as HTMLElement, 0, 250, planet.material.colorSettings.steepSharpness * 10, (val: number) => {
-                colorSettings.steepSharpness = val / 10;
+            new Slider("steepSharpness", document.getElementById("steepSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.steepSharpness * 100, (val: number) => {
+                colorSettings.steepSharpness = val / 100;
                 material.updateManual();
             })
         );

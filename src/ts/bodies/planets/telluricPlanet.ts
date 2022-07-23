@@ -100,7 +100,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
             this.postProcesses.rings!.dispose();*/
         }
 
-        const continentsFragmentation = clamp(normalRandom(0.3, 0.1, this.rng), 0.2, 0.95);
+        const continentsFragmentation = clamp(normalRandom(0.3, 0.1, this.rng), 0, 0.95);
 
         this.terrainSettings = {
             continentsFrequency: Math.sqrt(ratio),
@@ -110,7 +110,7 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
 
             maxBumpHeight: 1.5e3,
             maxMountainHeight: 15e3,
-            continentBaseHeight: this.oceanLevel * 1.5,
+            continentBaseHeight: this.oceanLevel * 1.1,
 
             mountainsFrequency: 10 * Math.sqrt(ratio),
             mountainsMinValue: 0.0
