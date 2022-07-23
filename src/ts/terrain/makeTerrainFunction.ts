@@ -29,10 +29,8 @@ export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction 
         const mountainGradient = LVector3.Zero();
         let mountainElevation = mountains(samplePoint, seed, mountainGradient);
 
-        mountainElevation = tanhSharpen(mountainElevation, 3, mountainGradient);
-
-        elevation += tanhSharpen(continentMask, 32.0) * mountainElevation * settings.maxMountainHeight;
-        mountainGradient.scaleInPlace(settings.maxMountainHeight * tanhSharpen(continentMask, 32.0));
+        elevation += tanhSharpen(continentMask, 16.0) * mountainElevation * settings.maxMountainHeight;
+        mountainGradient.scaleInPlace(settings.maxMountainHeight * tanhSharpen(continentMask, 16.0));
         outGradient.addInPlace(mountainGradient);
 
         const bumpyGradient = LVector3.Zero();
