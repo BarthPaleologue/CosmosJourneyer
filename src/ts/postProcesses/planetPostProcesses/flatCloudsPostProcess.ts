@@ -36,7 +36,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             cloudFrequency: 4,
             cloudDetailFrequency: 20,
             cloudPower: 2,
-            cloudSharpness: 7,
+            cloudSharpness: 4,
             cloudColor: new Color3(0.8, 0.8, 0.8),
             worleySpeed: 0.0005,
             detailSpeed: 0.003

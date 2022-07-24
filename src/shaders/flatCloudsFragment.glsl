@@ -59,7 +59,7 @@ uniform float time;
 
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 
-#pragma glslify: tanhSharpener = require(./utils/tanhSharpener.glsl)
+#pragma glslify: smoothSharpener = require(./utils/smoothSharpener.glsl)
 
 #pragma glslify: applyQuaternion = require(./utils/applyQuaternion.glsl)
 
@@ -88,7 +88,7 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     density = pow(density, cloudPower);
 
-    density = tanhSharpener(density, cloudSharpness);
+    density = smoothSharpener(density, cloudSharpness);
 
     return density;
 }

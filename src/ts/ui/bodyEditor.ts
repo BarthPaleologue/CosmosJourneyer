@@ -510,8 +510,8 @@ export class BodyEditor {
             })
         );
         this.cloudsSliders.push(
-            new Slider("cloudSharpness", document.getElementById("cloudSharpness") as HTMLElement, 0, 100, flatClouds.settings.cloudSharpness, (val: number) => {
-                flatClouds.settings.cloudSharpness = val;
+            new Slider("cloudSharpness", document.getElementById("cloudSharpness") as HTMLElement, 1, 100, flatClouds.settings.cloudSharpness * 10, (val: number) => {
+                flatClouds.settings.cloudSharpness = val / 10;
             })
         );
         this.cloudsSliders.push(
