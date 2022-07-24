@@ -17,7 +17,7 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess implem
         }
     }
 
-    public update(deltaTime : number): void {
+    public update(deltaTime: number): void {
         return;
     }
 }

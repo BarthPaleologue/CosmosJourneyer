@@ -18,9 +18,7 @@ import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
 import { clamp } from "../../utils/math";
-import {
-    AtmosphericScatteringPostProcess
-} from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 
@@ -102,7 +100,6 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;
             atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng) / 6;
             this.postProcesses.atmosphere = atmosphere;
-
         } else {
             this.oceanLevel = 0;
         }

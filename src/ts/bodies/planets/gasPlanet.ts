@@ -8,9 +8,7 @@ import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import {
-    AtmosphericScatteringPostProcess
-} from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 
@@ -38,10 +36,14 @@ export class GasPlanet extends AbstractBody {
             pressure: 1
         };
 
-        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, {
-            diameter: this.radius * 2,
-            segments: 64
-        }, starSystemManager.scene);
+        this.mesh = MeshBuilder.CreateSphere(
+            `${name}Mesh`,
+            {
+                diameter: this.radius * 2,
+                segments: 64
+            },
+            starSystemManager.scene
+        );
         starSystemManager.registerMeshDepth(this.mesh);
         this.mesh.parent = this.transform;
 
@@ -63,7 +65,6 @@ export class GasPlanet extends AbstractBody {
         this.postProcesses.atmosphere = atmosphere;
 
         if (uniformRandBool(0.8, this.rng)) this.createRings();
-
     }
 
     public override update(player: PlayerController, deltaTime: number): void {

@@ -17,7 +17,7 @@ export type PlanetPostProcesses = BodyPostProcesses & {
 export type TelluricPlanetPostProcesses = PlanetPostProcesses & {
     ocean: OceanPostProcess | null;
     clouds: FlatCloudsPostProcess | null;
-}
+};
 
 export type StarPostProcesses = BodyPostProcesses & {
     volumetricLight: VolumetricLight;
