@@ -4,7 +4,7 @@ float computeTemperature01(float elevation01, float absLatitude01, float ndl, fl
     float temperatureLatitudeFalloff = 1.0;
 
     // TODO: do not hardcode that factor
-    float temperatureRotationFactor = tanh(0.15 * dayDuration);
+    float temperatureRotationFactor = smoothstep(0.0, 1.0, 0.15 * dayDuration);
 
     // https://www.desmos.com/calculator/apezlfvwic
     float temperature01 = 1.0;

@@ -15,7 +15,7 @@ uniform float ringEnd;
 
 #pragma glslify: lerp = require(../utils/vec3Lerp.glsl)
 
-#pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl, tanh=tanh)
+#pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl)
 
 void main() {
     // la unitPosition ne prend pas en compte la rotation de la planète

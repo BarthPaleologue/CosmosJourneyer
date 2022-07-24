@@ -88,7 +88,7 @@ float lerp(float value1, float value2, float x) {
 
 #pragma glslify: waterBoilingPointCelsius = require(./utils/waterBoilingPointCelsius.glsl)
 
-#pragma glslify: computeTemperature01 = require(./utils/computeTemperature01.glsl, vUnitSamplePoint=vUnitSamplePoint, fractalSimplex4=fractalSimplex4, tanh=tanh)
+#pragma glslify: computeTemperature01 = require(./utils/computeTemperature01.glsl, vUnitSamplePoint=vUnitSamplePoint, fractalSimplex4=fractalSimplex4)
 
 void main() {
 	vec3 viewRayW = normalize(playerPosition - vPositionW); // view direction in world space
