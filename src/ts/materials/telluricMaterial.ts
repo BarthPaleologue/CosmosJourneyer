@@ -89,7 +89,7 @@ export class TelluricMaterial extends ShaderMaterial {
             bottomColor: new Color3(0.5, 0.5, 0.5),
 
             beachSize: 600,
-            steepSharpness: 0.4,
+            steepSharpness: 1,
             normalSharpness: 0.5
         };
 

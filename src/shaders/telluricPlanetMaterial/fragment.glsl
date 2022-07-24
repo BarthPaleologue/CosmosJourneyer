@@ -80,47 +80,9 @@ float lerp(float value1, float value2, float x) {
 
 #pragma glslify: triplanarNormal = require(../utils/triplanarNormal.glsl)
 
-/*
- * Get lerp factor around summit with certain slope (triangle function)
- */
-float getLnearFactor(float x, float summitX, float range) {
-	float lnearFactor = 0.0;
-	if(x >= summitX) lnearFactor = max(-x/range + 1.0 + summitX/range, 0.0);
-	else lnearFactor = max(x/range + 1.0 - summitX/range, 0.0);
-	
-	float blendingSharpness = 1.0;
-	lnearFactor = pow(lnearFactor, blendingSharpness);
-
-	return lnearFactor;
-}
-
-/*
- * Get lerp value around summit with certain slope (triangle function)
- */
-vec3 lnear(vec3 value1, vec3 value2, float x, float summitX, float range) {
-	float lnearFactor = getLnearFactor(x, summitX, range);
-	
-	return lerp(value1, value2, lnearFactor);
-}
-
 //https://www.desmos.com/calculator/8etk6vdfzi
 
-float tanh01(float x) {
-	return (tanh(x) + 1.0) / 2.0;
-} 
-
-float tanherpFactor(float x, float s) {
-	float sampleValue = (x - 0.5) * s;
-	return tanh01(sampleValue);
-}
-
-vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
-	float alpha = tanherpFactor(x, s);
-
-	return lerp(value1, value2, alpha);
-}
-
-#pragma glslify: tanhSharpener = require(../utils/tanhSharpener.glsl, tanh=tanh)
+#pragma glslify: smoothSharpener = require(../utils/smoothSharpener.glsl)
 
 #pragma glslify: saturate = require(../utils/saturate.glsl)
 
@@ -151,7 +113,7 @@ void main() {
 	float elevation01 = elevation / maxElevation;
 	float waterLevel01 = waterLevel / maxElevation;
 
-	float slope = 1.0 - max(dot(vUnitSamplePoint, vNormal), 0.0);
+	float slope = smoothstep(0.0, 0.3, 1.0 - max(dot(vUnitSamplePoint, vNormal), 0.0));
 
 	/// Analyse Physique de la planète
 
@@ -196,14 +158,17 @@ void main() {
 	snowFactor = 0.0;
 
 	// hard separation between wet and dry
-	float moistureSharpness = 20.0;
-	float moistureFactor = tanherpFactor(moisture01, moistureSharpness);
+	float moistureSharpness = 10.0;
+	float moistureFactor = smoothSharpener(moisture01, moistureSharpness);
 
 	vec3 plainColor2 = 0.7 * plainColor;
-	vec3 plainColor = tanherp(plainColor, plainColor2, fractalSimplex4(vec4(vUnitSamplePoint * 100.0, 0.0), 4, 2.0, 2.0), 10.0);
+	vec3 plainColor = lerp(plainColor, plainColor2, smoothSharpener(fractalSimplex4(vec4(vUnitSamplePoint * 100.0, 0.0), 4, 2.0, 2.0), 5.0));
 
 
-	float beachFactor = getLnearFactor(elevation01, waterLevel01, beachSize / maxElevation);
+	float beachFactor = min(
+		smoothstep(waterLevel01 - beachSize / maxElevation, waterLevel01 - 0.5 * beachSize / maxElevation, elevation01),
+		smoothstep(waterLevel01 + beachSize / maxElevation, waterLevel01 + 0.5 * beachSize / maxElevation, elevation01)
+	);
 
 	float steepFactor = pow(slope, steepSharpness);
 
@@ -214,7 +179,8 @@ void main() {
 
 		// Snow
 		// waterMeltingPoint01 * waterAmount : il est plus difficile de former de la neige quand y a moins d'eau
-		snowFactor = tanh01((waterMeltingPoint01 * min(waterAmount, 1.0) - temperature01) * 64.0);
+		float waterReducing = pow(min(waterAmount, 1.0), 0.3);
+		snowFactor = smoothstep(1.1 * waterMeltingPoint01 * waterReducing, waterMeltingPoint01 * waterReducing, temperature01);
 		plainFactor *= 1.0 - snowFactor;
 		desertFactor *= 1.0 - snowFactor;
 
@@ -302,6 +268,8 @@ void main() {
 	if(colorMode == 3) screenColor = normal * 0.5 + 0.5;
 	if(colorMode == 4) screenColor = vec3(elevation01);
 	if(colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vSamplePoint)));
+	if(colorMode == 6) screenColor = vec3(slope);
+
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting
 	#ifdef LOGARITHMICDEPTH

@@ -1,6 +1,6 @@
 float computeTemperature01(float elevation01, float absLatitude01, float ndl, float dayDuration) {
     // TODO: do not hardcode both
-    float temperatureHeightFalloff = 0.9;
+    float temperatureHeightFalloff = 0.7;
     float temperatureLatitudeFalloff = 1.0;
 
     // TODO: do not hardcode that factor
@@ -17,7 +17,7 @@ float computeTemperature01(float elevation01, float absLatitude01, float ndl, fl
     temperature01 *= exp(-elevation01 * temperatureHeightFalloff);
 
     // added random fluctuations
-    temperature01 += (fractalSimplex4(vec4(vUnitSamplePoint, 0.0) * 300.0, 5, 1.7, 2.5) - 0.5) / 4.0;
+    temperature01 += (fractalSimplex4(vec4(vUnitSamplePoint, 0.0) * 800.0, 5, 1.7, 2.7) - 0.5) / 10.0;
 
     // temperature drops during nighttime (more ice)
     temperature01 *= ndl * temperatureRotationFactor + 1.0 - temperatureRotationFactor;
