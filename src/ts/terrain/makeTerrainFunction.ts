@@ -1,7 +1,7 @@
 import { TerrainSettings } from "./terrainSettings";
 import { simplexNoiseLayer } from "./landscape/simplexNoiseLayer";
 import { LVector3 } from "../utils/algebra";
-import { tanhSharpen } from "../utils/math";
+import { smoothstep, tanhSharpen } from "../utils/gradientMath";
 import { mountainLayer } from "./landscape/mountainLayer";
 import { continentLayer } from "./landscape/continentLayer";
 import { zeroLayer } from "./landscape/constantLayers";
@@ -9,7 +9,7 @@ import { zeroLayer } from "./landscape/constantLayers";
 export type TerrainFunction = (samplePoint: LVector3, seed: number, outPosition: LVector3, outGradient: LVector3) => void;
 
 export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction {
-    const continents = continentLayer(settings.continentsFrequency, 6, settings.continentsFragmentation);
+    const continents = continentLayer(settings.continentsFrequency, 6);
     const bumps = simplexNoiseLayer(settings.bumpsFrequency, 8, 2, 2, 1.0, 0.0);
     const mountains = mountainLayer(settings.mountainsFrequency, 7, 1.8, 2.0, 1, settings.mountainsMinValue);
 
@@ -17,7 +17,8 @@ export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction 
         let elevation = 0;
 
         const continentGradient = LVector3.Zero();
-        const continentMask = continents(samplePoint, seed, continentGradient);
+        let continentMask = continents(samplePoint, seed, continentGradient);
+        continentMask = smoothstep(settings.continentsFragmentation, 1.1, continentMask, continentGradient)
 
         const continentElevation = continentMask;
 
@@ -29,8 +30,8 @@ export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction 
         const mountainGradient = LVector3.Zero();
         const mountainElevation = mountains(samplePoint, seed, mountainGradient);
 
-        elevation += tanhSharpen(continentMask, 32.0) * mountainElevation * settings.maxMountainHeight;
-        mountainGradient.scaleInPlace(settings.maxMountainHeight * tanhSharpen(continentMask, 32.0));
+        elevation += smoothstep(0.0, 0.5, continentMask) * mountainElevation * settings.maxMountainHeight;
+        mountainGradient.scaleInPlace(settings.maxMountainHeight * smoothstep(0.0, 0.5, continentMask));
 
         outGradient.addInPlace(mountainGradient);
 

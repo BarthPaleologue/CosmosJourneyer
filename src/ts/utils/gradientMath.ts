@@ -157,6 +157,29 @@ export function minimumValue(y: number, minValue: number, grad?: Vec3): number {
     return newY;
 }
 
+/**
+ * Applies smoothstep to a value and scales the optional gradient accordingly
+ * @param edge0 the minimum value of the smoothstep
+ * @param edge1 the maximum value of the smoothstep
+ * @param x the value to apply the smoothstep to
+ * @param grad?? the optional gradient to be modified
+ * @see https://www.wikiwand.com/en/Smoothstep
+ */
+export function smoothstep(edge0: number, edge1: number, x: number, grad?: Vec3): number {
+    if (x < edge0) {
+        if (grad) grad.scaleInPlace(0);
+        return  0;
+    } else if (x >= edge1) {
+        return  1;
+    }
+    // Scale/bias into [0..1] range
+    x = (x - edge0) / (edge1 - edge0);
+
+    if(grad) grad.scaleInPlace(6*x - 6*x**2);
+
+    return x * x * (3 - 2 * x);
+}
+
 export function gcd(a: number, b: number): number {
     if (!b) return a;
 

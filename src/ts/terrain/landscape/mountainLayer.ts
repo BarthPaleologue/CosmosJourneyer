@@ -1,5 +1,5 @@
 import { LVector3 } from "../../utils/algebra";
-import { minimumValue, pow, sAbs } from "../../utils/math";
+import { minimumValue, pow, sAbs } from "../../utils/gradientMath";
 import { simplex411 } from "../../utils/simplex";
 import { simpleElevationFunction } from "./elevationFunction";
 

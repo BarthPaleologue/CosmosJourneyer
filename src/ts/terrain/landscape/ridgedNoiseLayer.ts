@@ -1,5 +1,5 @@
 import { LVector3 } from "../../utils/algebra";
-import { sAbs } from "../../utils/math";
+import { sAbs } from "../../utils/gradientMath";
 import { simplex411 } from "../../utils/simplex";
 import { simpleElevationFunction } from "./elevationFunction";
 import { simpleFractalLayer3D } from "./simpleFractalLayer3D";

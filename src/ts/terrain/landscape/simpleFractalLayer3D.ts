@@ -1,5 +1,5 @@
 import { LVector3 } from "../../utils/algebra";
-import { minimumValue, pow } from "../../utils/math";
+import { minimumValue, pow } from "../../utils/gradientMath";
 import { simpleElevationFunction } from "./elevationFunction";
 
 export function simpleFractalLayer3D(

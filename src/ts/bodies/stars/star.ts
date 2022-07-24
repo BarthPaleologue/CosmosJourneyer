@@ -8,7 +8,7 @@ import { StarPhysicalProperties } from "../physicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
 import { normalRandom, randRange, uniformRandBool } from "extended-random";
-import { clamp } from "../../utils/math";
+import { clamp } from "../../utils/gradientMath";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { Settings } from "../../settings";
 import { VolumetricLight } from "../../postProcesses/volumetricLight";

@@ -13,11 +13,9 @@ uniform float time;
 
 uniform float seed;
 
-#pragma glslify: lerp = require(../utils/vec3Lerp.glsl)
-
 #pragma glslify: rotateAround = require(../utils/rotateAround.glsl)
 
-#pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl, tanh=tanh)
+#pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl)
 
 void main() {
 	float plasmaSpeed = 0.005;

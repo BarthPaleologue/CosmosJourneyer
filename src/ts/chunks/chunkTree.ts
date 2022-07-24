@@ -5,7 +5,7 @@ import { Direction } from "../utils/direction";
 import { ChunkForge } from "./chunkForge";
 import { DeleteTask, TaskType } from "./taskTypes";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
-import { rayIntersectSphere } from "../utils/math";
+import { rayIntersectSphere } from "../utils/gradientMath";
 import { Settings } from "../settings";
 import { getChunkSphereSpacePositionFromPath } from "../utils/chunkUtils";
 

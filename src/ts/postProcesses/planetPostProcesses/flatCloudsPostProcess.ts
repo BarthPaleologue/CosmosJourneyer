@@ -3,7 +3,7 @@ import { Color3, Effect, Texture } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import normalMap from "../../../asset/textures/cloudNormalMap3.jpg";
 import { PlanetPostProcess } from "../planetPostProcess";
-import { gcd } from "../../utils/math";
+import { gcd } from "../../utils/gradientMath";
 
 import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
 import { StarSystemManager } from "../../bodies/starSystemManager";

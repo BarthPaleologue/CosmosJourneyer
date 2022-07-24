@@ -62,9 +62,12 @@ Assets.onFinish = () => {
         lensFlareSystem // lens flare system
     );*/
 
-    const planet = new TelluricPlanet("Hécate", starSystem, 7.882042364217341, starSystem.stars);
+    const planet = new TelluricPlanet("Hécate", starSystem, -1.7213974380865693, starSystem.stars);
 
     planet.physicalProperties.rotationPeriod /= 20;
+    planet.physicalProperties.minTemperature = -37;
+    planet.physicalProperties.maxTemperature = 24;
+    planet.material.updateManual();
 
     planet.orbitalProperties = {
         period: 60 * 60 * 24 * 365.25,
@@ -88,10 +91,11 @@ Assets.onFinish = () => {
         orientationQuaternion: Quaternion.Identity()
     };
 
-    moon.terrainSettings.continentsFragmentation = 0;
+    moon.terrainSettings.continentsFragmentation = 0.3;
     moon.terrainSettings.maxMountainHeight = 10e3;
     moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
     moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
+    moon.material.colorSettings.steepColor.copyFrom(new Color3(92, 92, 92).scale(1 / 255));
 
     moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap);
     moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap);
@@ -121,12 +125,12 @@ Assets.onFinish = () => {
         orientationQuaternion: Quaternion.Identity()
     };
 
-    ares.terrainSettings.continentsFragmentation = 0.15;
+    ares.terrainSettings.continentsFragmentation = 0.35;
     ares.terrainSettings.continentBaseHeight = 5e3;
     ares.terrainSettings.maxMountainHeight = 20e3;
-    ares.terrainSettings.mountainsMinValue = 0.0;
 
     ares.material.colorSettings.plainColor.copyFromFloats(0.4, 0.3, 0.3);
+    ares.material.colorSettings.steepColor.copyFrom(ares.material.colorSettings.desertColor.scale(0.9));
     ares.material.colorSettings.beachColor.copyFromFloats(0.3, 0.15, 0.1);
     ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);
 

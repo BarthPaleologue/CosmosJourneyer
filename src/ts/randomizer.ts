@@ -15,7 +15,7 @@ import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Star } from "./bodies/stars/star";
 import { Settings } from "./settings";
 import { BodyType } from "./bodies/interfaces";
-import { clamp } from "./utils/math";
+import { clamp } from "./utils/gradientMath";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";

@@ -17,7 +17,7 @@ import { centeredRand, normalRandom, uniformRandBool } from "extended-random";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
-import { clamp } from "../../utils/math";
+import { clamp } from "../../utils/gradientMath";
 import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
@@ -116,7 +116,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             this.postProcesses.rings!.dispose();*/
         }
 
-        const continentsFragmentation = clamp(normalRandom(0.25, 0.1, this.rng), 0, 0.95);
+        const continentsFragmentation = clamp(normalRandom(0.40, 0.02, this.rng), 0, 0.95);
 
         this.terrainSettings = {
             continentsFrequency: Math.sqrt(ratio),
@@ -126,7 +126,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
             maxBumpHeight: 1.5e3,
             maxMountainHeight: 15e3,
-            continentBaseHeight: this.oceanLevel * 1.1,
+            continentBaseHeight: this.oceanLevel * 2,
 
             mountainsFrequency: 10 * Math.sqrt(ratio),
             mountainsMinValue: 0.0
