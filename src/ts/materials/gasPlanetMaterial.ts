@@ -1,9 +1,9 @@
 import { Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
 import { PlayerController } from "../player/playerController";
 
-import surfaceMaterialFragment from "../../shaders/gazPlanetMaterial/fragment.glsl";
-import surfaceMaterialVertex from "../../shaders/gazPlanetMaterial/vertex.glsl";
-import { GazPlanet } from "../bodies/planets/gazPlanet";
+import surfaceMaterialFragment from "../../shaders/gasPlanetMaterial/fragment.glsl";
+import surfaceMaterialVertex from "../../shaders/gasPlanetMaterial/vertex.glsl";
+import { GasPlanet } from "../bodies/planets/gasPlanet";
 import { GazColorSettings } from "./colorSettingsInterface";
 import { randRangeInt } from "extended-random";
 import { flattenVector3Array } from "../utils/algebra";
@@ -12,11 +12,11 @@ const shaderName = "gazPlanetMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 
-export class GazPlanetMaterial extends ShaderMaterial {
-    readonly planet: GazPlanet;
+export class GasPlanetMaterial extends ShaderMaterial {
+    readonly planet: GasPlanet;
     readonly colorSettings: GazColorSettings;
 
-    constructor(planet: GazPlanet, scene: Scene) {
+    constructor(planet: GasPlanet, scene: Scene) {
         super(`${planet.name}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
             uniforms: [

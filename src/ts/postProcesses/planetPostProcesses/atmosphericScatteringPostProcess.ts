@@ -2,10 +2,10 @@ import { Effect } from "@babylonjs/core";
 
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import { PlanetPostProcess } from "../planetPostProcess";
-import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 
 import atmosphericScatteringFragment from "../../../shaders/atmosphericScatteringFragment.glsl";
 import { StarSystemManager } from "../../bodies/starSystemManager";
+import { Planet } from "../../bodies/planets/planet";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -26,7 +26,7 @@ export interface AtmosphereSettings {
 export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
     settings: AtmosphereSettings;
 
-    constructor(name: string, planet: AbstractPlanet, atmosphereHeight: number, starSystem: StarSystemManager) {
+    constructor(name: string, planet: Planet, atmosphereHeight: number, starSystem: StarSystemManager) {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 23,

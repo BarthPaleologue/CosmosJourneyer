@@ -3,11 +3,11 @@ import { Color3, Effect, Texture } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import normalMap from "../../../asset/textures/cloudNormalMap3.jpg";
 import { PlanetPostProcess } from "../planetPostProcess";
-import { AbstractPlanet } from "../../bodies/planets/abstractPlanet";
 import { gcd } from "../../utils/math";
 
 import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
 import { StarSystemManager } from "../../bodies/starSystemManager";
+import { Planet } from "../../bodies/planets/planet";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -28,7 +28,7 @@ export interface CloudSettings {
 export class FlatCloudsPostProcess extends PlanetPostProcess {
     settings: CloudSettings;
 
-    constructor(name: string, planet: AbstractPlanet, cloudLayerHeight: number, starSystem: StarSystemManager) {
+    constructor(name: string, planet: Planet, cloudLayerHeight: number, starSystem: StarSystemManager) {
         const settings: CloudSettings = {
             cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
             specularPower: 2,

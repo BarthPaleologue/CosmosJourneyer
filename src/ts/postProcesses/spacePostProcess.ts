@@ -2,8 +2,9 @@ import { Camera, Color3, Effect, Matrix, PostProcess, Quaternion, Texture, Vecto
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
 import { flattenVector3Array } from "../utils/algebra";
 import { StarSystemManager } from "../bodies/starSystemManager";
+import { IPostProcess } from "./iPostProcess";
 
-export abstract class SpacePostProcess extends PostProcess {
+export abstract class SpacePostProcess extends PostProcess implements IPostProcess {
     camera: Camera;
 
     uniforms: ShaderUniforms;

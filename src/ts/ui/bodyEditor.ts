@@ -11,8 +11,8 @@ import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../materials/colorSettingsInterface";
 import { clearAllEventListenersById, hide, hidePanel, show, showPanel } from "../utils/html";
 import { stripAxisFromQuaternion } from "../utils/algebra";
-import { GazPlanet } from "../bodies/planets/gazPlanet";
-import { AbstractPlanet } from "../bodies/planets/abstractPlanet";
+import { GasPlanet } from "../bodies/planets/gasPlanet";
+import { Planet } from "../bodies/planets/planet";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -135,7 +135,7 @@ export class BodyEditor {
                 this.setStar(body as Star);
                 break;
             case BodyType.GAZ:
-                this.setGazPlanet(body as GazPlanet);
+                this.setGazPlanet(body as GasPlanet);
                 break;
             default:
         }
@@ -153,7 +153,7 @@ export class BodyEditor {
         this.initToolbar(planet);
     }
 
-    public setGazPlanet(planet: GazPlanet) {
+    public setGazPlanet(planet: GasPlanet) {
         this.initGazCloudsSliders(planet);
         this.initAtmosphereSliders(planet);
     }
@@ -363,8 +363,8 @@ export class BodyEditor {
         );
 
         this.surfaceSliders.push(
-            new Slider("steepSharpness", document.getElementById("steepSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.steepSharpness * 100, (val: number) => {
-                colorSettings.steepSharpness = val / 100;
+            new Slider("steepSharpness", document.getElementById("steepSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.steepSharpness * 10, (val: number) => {
+                colorSettings.steepSharpness = val / 10;
                 material.updateManual();
             })
         );
@@ -377,7 +377,7 @@ export class BodyEditor {
         );
     }
 
-    public initGazCloudsSliders(planet: GazPlanet) {
+    public initGazCloudsSliders(planet: GasPlanet) {
         for (const slider of this.gazCloudsSliders) slider.remove();
         this.gazCloudsSliders.length = 0;
 
@@ -404,7 +404,7 @@ export class BodyEditor {
         );
     }
 
-    public initAtmosphereSliders(planet: AbstractPlanet) {
+    public initAtmosphereSliders(planet: Planet) {
         for (const slider of this.atmosphereSliders) slider.remove();
         this.atmosphereSliders = [];
 

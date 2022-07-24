@@ -1,6 +1,6 @@
 import { AbstractBody } from "../abstractBody";
 
-import { Mesh, MeshBuilder, Texture, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import { Mesh, MeshBuilder } from "@babylonjs/core";
 import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
@@ -11,6 +11,7 @@ import { normalRandom, randRange, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { Settings } from "../../settings";
+import { VolumetricLight } from "../../postProcesses/volumetricLight";
 
 // TODO: implement RigidBody for star
 export class Star extends AbstractBody {
@@ -52,25 +53,9 @@ export class Star extends AbstractBody {
         this.mesh.material = this.material;
 
         this.postProcesses = {
-            volumetricLight: new VolumetricLightScatteringPostProcess(
-                `${name}VolumetricLight`,
-                1,
-                starSystemManager.scene.activeCamera!,
-                this.mesh,
-                100,
-                Texture.BILINEAR_SAMPLINGMODE,
-                starSystemManager.scene.getEngine()
-            ),
+            volumetricLight: new VolumetricLight(this, this.mesh, this.starSystem),
             rings: null
         };
-        this.postProcesses.volumetricLight.exposure = 0.26;
-        this.postProcesses.volumetricLight.decay = 0.95;
-        this.postProcesses.volumetricLight.getCamera().detachPostProcess(this.postProcesses.volumetricLight);
-
-        // the volumetric light must be attached manually as it is not a custom post process
-        for (const pipeline of starSystemManager.pipelines) {
-            pipeline.volumetricLights.push(this.postProcesses.volumetricLight);
-        }
 
         if (uniformRandBool(Star.RING_PROPORTION, this.rng)) {
             const rings = this.createRings();

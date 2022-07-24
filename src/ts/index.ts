@@ -23,7 +23,7 @@ import { BodyType } from "./bodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
-import { GazPlanet } from "./bodies/planets/gazPlanet";
+import { GasPlanet } from "./bodies/planets/gasPlanet";
 
 const bodyEditor = new BodyEditor();
 
@@ -62,7 +62,7 @@ Assets.onFinish = () => {
         lensFlareSystem // lens flare system
     );*/
 
-    const planet = new TelluricPlanet("Hécate", starSystem, -1.9383521191775799, starSystem.stars);
+    const planet = new TelluricPlanet("Hécate", starSystem, 7.882042364217341, starSystem.stars);
 
     planet.physicalProperties.rotationPeriod /= 20;
 
@@ -79,7 +79,7 @@ Assets.onFinish = () => {
     moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
     moon.physicalProperties.minTemperature = -180;
     moon.physicalProperties.maxTemperature = 200;
-    moon.physicalProperties.waterAmount = 0.5;
+    moon.physicalProperties.waterAmount = 0.9;
 
     moon.orbitalProperties = {
         period: moon.physicalProperties.rotationPeriod,
@@ -89,7 +89,7 @@ Assets.onFinish = () => {
     };
 
     moon.terrainSettings.continentsFragmentation = 0;
-    moon.terrainSettings.maxMountainHeight = 15e3;
+    moon.terrainSettings.maxMountainHeight = 10e3;
     moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
     moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
 
@@ -112,7 +112,7 @@ Assets.onFinish = () => {
     ares.physicalProperties.minTemperature = -80;
     ares.physicalProperties.maxTemperature = 20;
     ares.physicalProperties.pressure = 0.5;
-    ares.physicalProperties.waterAmount = 0.3;
+    ares.physicalProperties.waterAmount = 0.2;
 
     ares.orbitalProperties = {
         period: 60 * 60 * 24 * 365.24,
@@ -139,7 +139,7 @@ Assets.onFinish = () => {
     aresAtmosphere.settings.greenWaveLength = 680;
     aresAtmosphere.settings.blueWaveLength = 670;
 
-    const andromaque = new GazPlanet("Andromaque", starSystem, 7.353198234923184, [sun]);
+    const andromaque = new GasPlanet("Andromaque", starSystem, 7.353198234923184, [sun]);
     andromaque.orbitalProperties = {
         period: 60 * 60 * 24 * 365.29,
         periapsis: 4300 * ares.getRadius(),

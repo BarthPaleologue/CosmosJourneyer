@@ -23,7 +23,7 @@ import { Assets } from "./assets";
 import { alea } from "seedrandom";
 import { getOrbitalPeriod } from "./orbits/kepler";
 import { AbstractBody } from "./bodies/abstractBody";
-import { GazPlanet } from "./bodies/planets/gazPlanet";
+import { GasPlanet } from "./bodies/planets/gasPlanet";
 import { computeMeanTemperature } from "./utils/temperatureComputation";
 
 const bodyEditor = new BodyEditor();
@@ -76,7 +76,7 @@ Assets.onFinish = () => {
     let planet: AbstractBody;
 
     if (uniformRandBool(0.5)) planet = new TelluricPlanet("Hécate", starSystemManager, planetSeed, starSystemManager.stars);
-    else planet = new GazPlanet("Andromaque", starSystemManager, planetSeed, starSystemManager.stars);
+    else planet = new GasPlanet("Andromaque", starSystemManager, planetSeed, starSystemManager.stars);
 
     console.table(planet.orbitalProperties);
 

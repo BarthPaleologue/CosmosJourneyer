@@ -1,22 +1,28 @@
-import { Mesh, MeshBuilder, Vector3 } from "@babylonjs/core";
+import { Mesh, MeshBuilder } from "@babylonjs/core";
 
-import { AbstractPlanet } from "./abstractPlanet";
 import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
 import { StarSystemManager } from "../starSystemManager";
 import { PlanetPhysicalProperties } from "../physicalProperties";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
-import { GazPlanetMaterial } from "../../materials/gazPlanetMaterial";
+import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
+import {
+    AtmosphericScatteringPostProcess
+} from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import { PlanetPostProcesses } from "../postProcessesInterfaces";
+import { AbstractBody } from "../abstractBody";
 
-export class GazPlanet extends AbstractPlanet {
+export class GasPlanet extends AbstractBody {
     override readonly bodyType = BodyType.GAZ;
     override readonly physicalProperties: PlanetPhysicalProperties;
     override readonly radius;
 
+    override readonly postProcesses: PlanetPostProcesses;
+
     private readonly mesh: Mesh;
-    readonly material: GazPlanetMaterial;
+    readonly material: GasPlanetMaterial;
 
     constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystemManager, seed, parentBodies);
@@ -32,22 +38,32 @@ export class GazPlanet extends AbstractPlanet {
             pressure: 1
         };
 
-        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius * 2, segments: 64 }, starSystemManager.scene);
+        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, {
+            diameter: this.radius * 2,
+            segments: 64
+        }, starSystemManager.scene);
         starSystemManager.registerMeshDepth(this.mesh);
         this.mesh.parent = this.transform;
 
-        this.material = new GazPlanetMaterial(this, starSystemManager.scene);
+        this.material = new GasPlanetMaterial(this, starSystemManager.scene);
         this.mesh.material = this.material;
 
+        this.postProcesses = {
+            atmosphere: null,
+            rings: null
+        };
+
         // FIXME: implement multiple stars
-        const atmosphere = this.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
+        const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem);
+        atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
         atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng) / 6;
         atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;
         atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng) / 6;
 
-        if (uniformRandBool(0.8, this.rng)) {
-            this.createRings();
-        }
+        this.postProcesses.atmosphere = atmosphere;
+
+        if (uniformRandBool(0.8, this.rng)) this.createRings();
+
     }
 
     public override update(player: PlayerController, deltaTime: number): void {
