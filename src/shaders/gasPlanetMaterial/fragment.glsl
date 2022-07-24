@@ -1,4 +1,4 @@
-precision highp float;
+precision lowp float;
 
 #ifdef LOGARITHMICDEPTH
 uniform float logarithmicDepthConstant;
@@ -51,26 +51,9 @@ float lerp(float value1, float value2, float x) {
     return x * value1 + (1.0 - x) * value2;
 }
 
-//https://www.desmos.com/calculator/8etk6vdfzi
-
-float tanh01(float x) {
-    return (tanh(x) + 1.0) / 2.0;
-}
-
-float tanherpFactor(float x, float s) {
-    float sampleValue = (x - 0.5) * s;
-    return tanh01(sampleValue);
-}
-
-vec3 tanherp(vec3 value1, vec3 value2, float x, float s) {
-    float alpha = tanherpFactor(x, s);
-
-    return lerp(value1, value2, alpha);
-}
-
 #pragma glslify: saturate = require(../utils/saturate.glsl)
 
-#pragma glslify: tanhSharpener = require(../utils/tanhSharpener.glsl, tanh=tanh)
+#pragma glslify: smoothSharpener = require(../utils/smoothSharpener.glsl)
 
 #pragma glslify: rotateAround = require(../utils/rotateAround.glsl)
 
@@ -121,7 +104,7 @@ void main() {
         }
 
         float value = fractalSimplex4(seededSamplePoint, 7, 1.7, 2.0);
-        value = tanhSharpener(value, colorSharpness * dot(color1, color2));
+        value = smoothSharpener(value, colorSharpness * dot(color1, color2));
 
         color = lerp(color1, color2, value);
     }
