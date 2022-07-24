@@ -125,5 +125,11 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
             if (player.isOrbiting(this)) player.rotateAround(this.getAbsolutePosition(), this.transform.up, -dtheta);
             this.rotate(this.transform.up, -dtheta);
         }
+
+        for (const postprocessKey in this.postProcesses) {
+            const postProcess = this.postProcesses[postprocessKey];
+            if (postProcess == null) continue;
+            postProcess.update(deltaTime);
+        }
     }
 }

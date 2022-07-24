@@ -1,7 +1,6 @@
 import { ChunkTree } from "../../chunks/chunkTree";
 import { Direction } from "../../utils/direction";
 import { TerrainSettings } from "../../terrain/terrainSettings";
-import { AbstractPlanet } from "./abstractPlanet";
 
 import { Vector3 } from "@babylonjs/core";
 
@@ -14,18 +13,25 @@ import { Settings } from "../../settings";
 import { SolidPhysicalProperties } from "../physicalProperties";
 import { TelluricMaterial } from "../../materials/telluricMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
-import { normalRandom, uniformRandBool } from "extended-random";
+import { centeredRand, normalRandom, uniformRandBool } from "extended-random";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
 import { clamp } from "../../utils/math";
+import {
+    AtmosphericScatteringPostProcess
+} from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
+import { AbstractBody } from "../abstractBody";
 
-export class TelluricPlanet extends AbstractPlanet implements RigidBody {
+export class TelluricPlanet extends AbstractBody implements RigidBody {
     oceanLevel: number;
 
     override readonly physicalProperties: SolidPhysicalProperties;
     override readonly bodyType = BodyType.TELLURIC;
     override readonly radius: number;
+
+    override readonly postProcesses: TelluricPlanetPostProcesses;
 
     readonly terrainSettings: TerrainSettings;
 
@@ -68,6 +74,13 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
             waterAmount: waterAmount
         };
 
+        this.postProcesses = {
+            atmosphere: null,
+            ocean: null,
+            clouds: null,
+            rings: null
+        };
+
         const waterBoilingPoint = waterBoilingPointCelsius(this.physicalProperties.pressure);
         const waterFreezingPoint = 0.0;
         const epsilon = 0.05;
@@ -83,7 +96,13 @@ export class TelluricPlanet extends AbstractPlanet implements RigidBody {
             } else {
                 this.oceanLevel = 0;
             }
-            this.createAtmosphere(Settings.ATMOSPHERE_HEIGHT, starSystemManager.stars[0], starSystemManager.scene);
+            const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem);
+            atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
+            atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng) / 6;
+            atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;
+            atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng) / 6;
+            this.postProcesses.atmosphere = atmosphere;
+
         } else {
             this.oceanLevel = 0;
         }
