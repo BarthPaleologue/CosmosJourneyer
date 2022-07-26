@@ -61,7 +61,7 @@ Assets.onFinish = () => {
         lensFlareSystem // lens flare system
     );*/
 
-    const planet = new TelluricPlanet("Hécate", starSystem, -1.7213974380865693, starSystem.stars);
+    const planet = new TelluricPlanet("Hécate", starSystem, -3.6498816637322307, starSystem.stars);
 
     planet.physicalProperties.rotationPeriod /= 20;
     planet.physicalProperties.minTemperature = -37;
