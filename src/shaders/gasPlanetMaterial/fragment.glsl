@@ -28,6 +28,8 @@ uniform int nbStars; // number of stars
 
 uniform vec3 color1;
 uniform vec3 color2;
+uniform vec3 color3;
+uniform vec3 color4;
 uniform float colorSharpness;
 
 uniform float time;
@@ -89,24 +91,43 @@ void main() {
     if(ndl > 0.0) {
         vec4 seededSamplePoint = vec4(vUnitSamplePoint * 2.0, seed);
 
-        seededSamplePoint.y *= 2.0;
+        seededSamplePoint.y *= 2.5;
 
         float cloudSpeed = 0.0005;
         vec4 seededSamplePoint2 = vec4(rotateAround(seededSamplePoint.xyz, vec3(0.0, 1.0, 0.0), time * cloudSpeed), seededSamplePoint.w);
 
-        for (int i = 0; i < 2; i++) {
-            seededSamplePoint += vec4(
+        float warpStrength = 4.0;
+
+        vec4 q = vec4(
             fractalSimplex4(seededSamplePoint2, 3, 2.0, 2.0),
             fractalSimplex4(seededSamplePoint2 + vec4(13.0, 37.0, -73.0, 0.0), 3, 2.0, 2.0),
             fractalSimplex4(seededSamplePoint2 + vec4(-56.0, 19.0, 47.0, 0.0), 3, 2.0, 2.0),
             0.0
-            );
-        }
+        );
+        //q = vec4(rotateAround(q.xyz, vec3(0.0, 1.0, 0.0), time * cloudSpeed), q.w);
 
-        float value = fractalSimplex4(seededSamplePoint, 7, 1.7, 2.0);
-        value = smoothSharpener(value, colorSharpness * dot(color1, color2));
 
-        color = lerp(color1, color2, value);
+        vec4 r = vec4(
+            fractalSimplex4(seededSamplePoint2 + warpStrength * q + vec4(21.0, -16.0, 7.0, 0.0), 3, 2.0, 2.0),
+            fractalSimplex4(seededSamplePoint2 + warpStrength * q + vec4(-5.0, 3.0, 12.0, 0.0), 3, 2.0, 2.0),
+            fractalSimplex4(seededSamplePoint2 + warpStrength * q + vec4(9.0, -1.0, 13.0, 0.0), 3, 2.0, 2.0),
+            0.0
+        );
+        //r = vec4(rotateAround(r.xyz, vec3(0.0, 1.0, 0.0), time * cloudSpeed), r.w);
+
+        seededSamplePoint = seededSamplePoint2 + q + warpStrength * r;
+        
+        float value = fractalSimplex4(seededSamplePoint * 0.1, 10, 2.0, 2.0);
+
+        //float colorSharpness = 1.5;
+
+        float sep1 = smoothSharpener(value, colorSharpness);
+        float sep2 = smoothSharpener(abs(q.x), colorSharpness);
+        float sep3 = smoothSharpener(abs(r.y), colorSharpness);
+
+        color = lerp(color1, color2, sep1);
+        color = lerp(color, color3, sep2);
+        color = lerp(color, color4, sep3);
     }
 
     // suppresion du reflet partout hors la neige

@@ -143,7 +143,7 @@ Assets.onFinish = () => {
     aresAtmosphere.settings.greenWaveLength = 680;
     aresAtmosphere.settings.blueWaveLength = 670;
 
-    const andromaque = new GasPlanet("Andromaque", starSystem, 7.353198234923184, [sun]);
+    const andromaque = new GasPlanet("Andromaque", starSystem, 8.550883810967207, [sun]);
     andromaque.orbitalProperties = {
         period: 60 * 60 * 24 * 365.29,
         periapsis: 4300 * ares.getRadius(),

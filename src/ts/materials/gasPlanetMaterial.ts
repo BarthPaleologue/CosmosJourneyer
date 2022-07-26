@@ -5,8 +5,9 @@ import surfaceMaterialFragment from "../../shaders/gasPlanetMaterial/fragment.gl
 import surfaceMaterialVertex from "../../shaders/gasPlanetMaterial/vertex.glsl";
 import { GasPlanet } from "../bodies/planets/gasPlanet";
 import { GazColorSettings } from "./colorSettingsInterface";
-import { randRangeInt } from "extended-random";
+import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { flattenVector3Array } from "../utils/algebra";
+import { HSVtoRGB } from "../utils/color";
 
 const shaderName = "gazPlanetMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -40,6 +41,8 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
                 "color1",
                 "color2",
+                "color3",
+                "color4",
                 "colorSharpness",
 
                 "time",
@@ -54,10 +57,23 @@ export class GasPlanetMaterial extends ShaderMaterial {
         });
 
         this.planet = planet;
+
+        const hue1 = normalRandom(0.6, 0.1, this.planet.rng);
+        const hue2 = normalRandom(0.01, 0.1, this.planet.rng);
+
+        const divergence = 0.07;
+
+        const color1 = new Color3(...HSVtoRGB(hue1 % 1, randRange(0.4, 0.9, this.planet.rng), randRange(0.7, 0.9, this.planet.rng)));
+        const color2 = new Color3(...HSVtoRGB(hue2 % 1, randRange(0.6, 0.9, this.planet.rng), randRange(0.1, 0.9, this.planet.rng)));
+        const color3 = new Color3(...HSVtoRGB(hue1 + divergence % 1, randRange(0.4, 0.9, this.planet.rng), randRange(0.7, 0.9, this.planet.rng)));
+        const color4 = new Color3(...HSVtoRGB(hue2 + divergence % 1, randRange(0.6, 0.9, this.planet.rng), randRange(0.1, 0.9, this.planet.rng)));
+
         this.colorSettings = {
-            color1: new Color3(this.planet.rng(), this.planet.rng(), this.planet.rng()),
-            color2: new Color3(this.planet.rng(), this.planet.rng(), this.planet.rng()),
-            colorSharpness: randRangeInt(6, 20, this.planet.rng)
+            color1: color1,
+            color2: color2,
+            color3: color3,
+            color4: color4,
+            colorSharpness: randRangeInt(40, 80, this.planet.rng) / 10
         };
 
         this.onBindObservable.add(() => {
@@ -76,6 +92,8 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         this.setColor3("color1", this.colorSettings.color1);
         this.setColor3("color2", this.colorSettings.color2);
+        this.setColor3("color3", this.colorSettings.color3);
+        this.setColor3("color4", this.colorSettings.color4);
 
         this.updateManual();
     }

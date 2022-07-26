@@ -396,9 +396,21 @@ export class BodyEditor {
             colorSettings.color2.copyFrom(Color3.FromHexString(gazColor2Picker.value));
         });
 
+        const gazColor3Picker = clearAllEventListenersById("gazColor3") as HTMLInputElement;
+        gazColor3Picker.value = colorSettings.color3.toHexString();
+        gazColor3Picker.addEventListener("input", () => {
+            colorSettings.color3.copyFrom(Color3.FromHexString(gazColor3Picker.value));
+        });
+
+        const gazColor4Picker = clearAllEventListenersById("gazColor4") as HTMLInputElement;
+        gazColor4Picker.value = colorSettings.color4.toHexString();
+        gazColor4Picker.addEventListener("input", () => {
+            colorSettings.color4.copyFrom(Color3.FromHexString(gazColor4Picker.value));
+        });
+
         this.gazCloudsSliders.push(
-            new Slider("colorSharpness", document.getElementById("colorSharpness") as HTMLElement, 0, 30, planet.material.colorSettings.colorSharpness, (val: number) => {
-                colorSettings.colorSharpness = val;
+            new Slider("colorSharpness", document.getElementById("colorSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.colorSharpness * 10, (val: number) => {
+                colorSettings.colorSharpness = val / 10;
                 material.updateManual();
             })
         );

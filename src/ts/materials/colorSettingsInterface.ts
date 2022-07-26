@@ -26,5 +26,7 @@ export interface ColorSettings {
 export interface GazColorSettings {
     color1: Color3;
     color2: Color3;
+    color3: Color3;
+    color4: Color3;
     colorSharpness: number;
 }

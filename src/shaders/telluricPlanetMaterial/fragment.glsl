@@ -217,6 +217,7 @@ void main() {
 	// small scale
 	// large scale
 
+	// TODO: make uniforms
 	float normalStrengthNear = 1.0;
 	float normalStrengthFar = 1.0;
 
