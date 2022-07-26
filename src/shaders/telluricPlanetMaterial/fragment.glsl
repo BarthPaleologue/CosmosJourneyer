@@ -84,6 +84,8 @@ float lerp(float value1, float value2, float x) {
 
 #pragma glslify: smoothSharpener = require(../utils/smoothSharpener.glsl)
 
+#pragma glslify: rayIntersectSphere = require(../utils/rayIntersectSphere.glsl)
+
 #pragma glslify: saturate = require(../utils/saturate.glsl)
 
 #pragma glslify: waterBoilingPointCelsius = require(./utils/waterBoilingPointCelsius.glsl)
@@ -92,7 +94,6 @@ float lerp(float value1, float value2, float x) {
 
 void main() {
 	vec3 viewRayW = normalize(playerPosition - vPositionW); // view direction in world space
-	vec3 lightRayW = normalize(starPositions[0] - vPositionW); // light ray direction in world space
 
 	vec3 sphereNormalW = vSphereNormalW;
 	float ndl1 = 0.0;
@@ -244,7 +245,14 @@ void main() {
 	float specComp = 0.0;
 	for(int i = 0; i < nbStars; i++) {
 		vec3 starLightRayW = normalize(starPositions[i] - vPositionW);
-		ndl2 += max(0.0, dot(normalW, starLightRayW));
+		float ndl2part = max(0.0, dot(normalW, starLightRayW));
+		// removing light where light ray goes through the surface
+		float t0, t1;
+		//TODO: DO NOT HARDCODE
+		if(rayIntersectSphere(vPositionW, starLightRayW, planetPosition, planetRadius, t0, t1)) {
+			ndl2part *= 1.0 / (1.0 + 1e-5 * (t1 - t0));
+		}
+		ndl2 += ndl2part;
 
 		vec3 angleW = normalize(viewRayW + starLightRayW);
 		specComp += max(0.0, dot(normalW, angleW));

@@ -76,7 +76,7 @@ Assets.onFinish = () => {
         orientationQuaternion: Quaternion.Identity()
     };
 
-    const moon = new TelluricPlanet("Manaleth", starSystem, 2, [planet]);
+    const moon = new TelluricPlanet("Manaleth", starSystem, 0.4, [planet]);
 
     moon.physicalProperties.mass = 2;
     moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
