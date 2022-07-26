@@ -36,7 +36,6 @@ bodyEditor.setCanvas(canvas);
 
 const [engine, scene] = initEngineScene(canvas);
 
-Assets.Init(scene);
 Assets.onFinish = () => {
     const mouse = new Mouse(canvas, 1e5);
 
@@ -173,6 +172,8 @@ Assets.onFinish = () => {
         engine.runRenderLoop(() => scene.render());
     });
 };
+
+Assets.Init(scene);
 
 window.addEventListener("resize", () => {
     bodyEditor.resize();

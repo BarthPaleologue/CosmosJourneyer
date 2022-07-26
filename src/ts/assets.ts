@@ -55,6 +55,9 @@ export class Assets {
             Assets.Character.setEnabled(false);
             console.log("Character loaded");
         };
+        Assets.manager.onProgress = (remainingCount, totalCount, task) => {
+            scene.getEngine().loadingUIText = `Loading assets... ${totalCount - remainingCount}/${totalCount}`;
+        }
         Assets.manager.load();
 
         Assets.manager.onFinish = (tasks) => {
