@@ -113,7 +113,7 @@ void main() {
 	float elevation01 = elevation / maxElevation;
 	float waterLevel01 = waterLevel / maxElevation;
 
-	float slope = smoothstep(0.0, 0.3, 1.0 - max(dot(vUnitSamplePoint, vNormal), 0.0));
+	float slope = smoothstep(0.3, 0.5, 1.0 - max(dot(vUnitSamplePoint, vNormal), 0.0));
 
 	/// Analyse Physique de la planète
 
@@ -166,9 +166,10 @@ void main() {
 
 
 	float beachFactor = min(
-		smoothstep(waterLevel01 - beachSize / maxElevation, waterLevel01 - 0.5 * beachSize / maxElevation, elevation01),
-		smoothstep(waterLevel01 + beachSize / maxElevation, waterLevel01 + 0.5 * beachSize / maxElevation, elevation01)
+		smoothstep(waterLevel01 - beachSize / maxElevation, waterLevel01, elevation01),
+		smoothstep(waterLevel01 + beachSize / maxElevation, waterLevel01, elevation01)
 	);
+	beachFactor = smoothSharpener(beachFactor, 2.0);
 
 	float steepFactor = pow(slope, steepSharpness);
 
@@ -181,6 +182,7 @@ void main() {
 		// waterMeltingPoint01 * waterAmount : il est plus difficile de former de la neige quand y a moins d'eau
 		float waterReducing = pow(min(waterAmount, 1.0), 0.3);
 		snowFactor = smoothstep(1.1 * waterMeltingPoint01 * waterReducing, waterMeltingPoint01 * waterReducing, temperature01);
+		if(waterMeltingPoint01 < 0.0) snowFactor = 0.0;
 		plainFactor *= 1.0 - snowFactor;
 		desertFactor *= 1.0 - snowFactor;
 
@@ -261,14 +263,14 @@ void main() {
 	specComp *= (color.r + color.g + color.b) / 3.0;
 	specComp /= 2.0;
 
-	vec3 screenColor = color.rgb * (sqrt(ndl1*ndl2) + specComp*ndl1);
+	vec3 screenColor = color.rgb * (ndl2 + specComp*ndl1);
 
 	if(colorMode == 1) screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
 	if(colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.1, 0.2, 1.0), temperature01);
 	if(colorMode == 3) screenColor = normal * 0.5 + 0.5;
 	if(colorMode == 4) screenColor = vec3(elevation01);
 	if(colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vSamplePoint)));
-	if(colorMode == 6) screenColor = vec3(slope);
+	if(colorMode == 6) screenColor = vec3(1.0 - slope);
 
 
 	gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting

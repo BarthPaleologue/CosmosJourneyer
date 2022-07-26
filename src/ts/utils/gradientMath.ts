@@ -1,4 +1,4 @@
-import { Vec3 } from "./algebra";
+import { LVector3, Vec3 } from "./algebra";
 import { Vector3 } from "@babylonjs/core";
 
 // https://www.desmos.com/calculator/968c7smugx
@@ -168,16 +168,33 @@ export function minimumValue(y: number, minValue: number, grad?: Vec3): number {
 export function smoothstep(edge0: number, edge1: number, x: number, grad?: Vec3): number {
     if (x < edge0) {
         if (grad) grad.scaleInPlace(0);
-        return  0;
-    } else if (x >= edge1) {
-        return  1;
-    }
+        return 0;
+    } else if (x >= edge1) return 1;
+
     // Scale/bias into [0..1] range
     x = (x - edge0) / (edge1 - edge0);
 
-    if(grad) grad.scaleInPlace(6*x - 6*x**2);
+    if (grad) {
+        grad.scaleInPlace(1 / (edge1 - edge0));
+        grad.scaleInPlace(6 * x - 6 * x ** 2);
+    }
 
-    return x * x * (3 - 2 * x);
+    return 3 * x ** 2 - 2 * x ** 3;
+}
+
+/**
+ * Multiplies x1 and x2 and scales the optional gradient accordingly and stores it in grad1
+ * @param x1 the first value
+ * @param x2 the second value
+ * @param grad1 the gradient of x1 WILL STORE THE RESULT
+ * @param grad2 the gradient of x2 WILL NOT BE MODIFIED
+ */
+export function multiply(x1: number, x2: number, grad1?: LVector3, grad2?: LVector3): number {
+    if (grad1 && grad2) {
+        grad1.scaleInPlace(x2);
+        grad1.addInPlace(grad2.scale(x1));
+    }
+    return x1 * x2;
 }
 
 export function gcd(a: number, b: number): number {

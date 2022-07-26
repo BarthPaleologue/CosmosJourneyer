@@ -7,7 +7,6 @@ export interface TerrainSettings {
 
     maxMountainHeight: number;
     mountainsFrequency: number;
-    mountainsMinValue: number;
 
     maxBumpHeight: number;
     bumpsFrequency: number;
