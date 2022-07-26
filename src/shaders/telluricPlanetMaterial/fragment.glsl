@@ -172,7 +172,7 @@ void main() {
 	);
 	beachFactor = smoothSharpener(beachFactor, 2.0);
 
-	float steepFactor = pow(slope, steepSharpness);
+	float steepFactor = smoothSharpener(slope, steepSharpness);
 
 	if(elevation01 > waterLevel01) {
 
@@ -183,6 +183,7 @@ void main() {
 		// waterMeltingPoint01 * waterAmount : il est plus difficile de former de la neige quand y a moins d'eau
 		float waterReducing = pow(min(waterAmount, 1.0), 0.3);
 		snowFactor = smoothstep(1.1 * waterMeltingPoint01 * waterReducing, waterMeltingPoint01 * waterReducing, temperature01);
+		snowFactor = smoothSharpener(snowFactor, 4.0);
 		if(waterMeltingPoint01 < 0.0) snowFactor = 0.0;
 		plainFactor *= 1.0 - snowFactor;
 		desertFactor *= 1.0 - snowFactor;
