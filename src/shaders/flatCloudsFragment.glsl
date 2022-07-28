@@ -26,7 +26,7 @@ uniform float planetRadius; // planet radius
 
 uniform float cloudFrequency; // cloud frequency
 uniform float cloudDetailFrequency; // cloud detail frequency
-uniform float cloudPower; // cloud power
+uniform float cloudCoverage; // cloud power
 uniform float cloudSharpness;
 
 uniform vec3 cloudColor;
@@ -86,7 +86,7 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     density = saturate(density * 2.0);
 
-    density = pow(density, cloudPower);
+    density = smoothstep(cloudCoverage, 1.0, density);
 
     density = smoothSharpener(density, cloudSharpness);
 

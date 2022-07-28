@@ -89,7 +89,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
                 this.postProcesses.ocean = ocean;
 
                 const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystemManager);
-                clouds.settings.cloudPower = 5 * Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
+                clouds.settings.cloudCoverage = Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
                 this.postProcesses.clouds = clouds;
             } else {
                 this.oceanLevel = 0;
@@ -116,19 +116,19 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             this.postProcesses.rings!.dispose();*/
         }
 
-        const continentsFragmentation = clamp(normalRandom(0.47, 0.03, this.rng), 0, 0.95);
+        const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.rng), 0, 0.95);
 
         this.terrainSettings = {
-            continentsFrequency: Math.sqrt(ratio),
+            continentsFrequency: ratio,
             continentsFragmentation: continentsFragmentation,
 
             bumpsFrequency: 30,
 
             maxBumpHeight: 1.5e3,
-            maxMountainHeight: 20e3,
+            maxMountainHeight: 13e3,
             continentBaseHeight: this.oceanLevel * 2,
 
-            mountainsFrequency: 10 * Math.sqrt(ratio),
+            mountainsFrequency: 20 * ratio,
         };
 
         this.material = new TelluricMaterial(this, starSystemManager.scene);

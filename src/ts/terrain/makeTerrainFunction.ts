@@ -32,9 +32,7 @@ export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction 
         //mountainGradient.addInPlace(terraceGradient.scaleInPlace(0.1));
 
         elevation += mountainElevation * settings.maxMountainHeight;
-        mountainGradient.scaleInPlace(settings.maxMountainHeight);
-
-        outGradient.addInPlace(mountainGradient);
+        outGradient.addInPlace(mountainGradient.scaleInPlace(settings.maxMountainHeight));
 
         const bumpyGradient = LVector3.Zero();
         const bumpyElevation = bumps(samplePoint, seed, bumpyGradient);

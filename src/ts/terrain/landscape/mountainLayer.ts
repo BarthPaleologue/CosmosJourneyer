@@ -13,7 +13,7 @@ export function mountainLayer(frequency: number, nbOctaves: number, decay: numbe
             let localElevation = simplex411(samplePoint, seed, localGradient);
 
             // TODO: ne pas hardcoder
-            const sharpness = 8.0;
+            const sharpness = 4.0;
             localElevation = 1.0 - sAbs(localElevation, sharpness, localGradient);
 
             localGradient.divideInPlace(-1);

@@ -85,8 +85,8 @@ Assets.onFinish = () => {
 
     moon.orbitalProperties = {
         period: moon.physicalProperties.rotationPeriod,
-        apoapsis: 6 * planet.getRadius(),
-        periapsis: 5 * planet.getRadius(),
+        apoapsis: 8 * planet.getRadius(),
+        periapsis: 8 * planet.getRadius(),
         orientationQuaternion: Quaternion.Identity()
     };
 
@@ -112,7 +112,7 @@ Assets.onFinish = () => {
 
     ares.physicalProperties.mass = 7;
     ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
-    ares.physicalProperties.minTemperature = -80;
+    ares.physicalProperties.minTemperature = -48;
     ares.physicalProperties.maxTemperature = 20;
     ares.physicalProperties.pressure = 0.5;
     ares.physicalProperties.waterAmount = 0.2;

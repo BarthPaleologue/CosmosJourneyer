@@ -114,7 +114,7 @@ void main() {
 	float elevation01 = elevation / maxElevation;
 	float waterLevel01 = waterLevel / maxElevation;
 
-	float slope = smoothstep(0.3, 0.5, 1.0 - max(dot(vUnitSamplePoint, vNormal), 0.0));
+	float slope = smoothstep(0.2, 0.5, 1.0 - max(dot(vUnitSamplePoint, vNormal), 0.0));
 
 	/// Analyse Physique de la planète
 
@@ -252,7 +252,7 @@ void main() {
 		float t0, t1;
 		//TODO: DO NOT HARDCODE
 		if(rayIntersectSphere(vPositionW, starLightRayW, planetPosition, planetRadius, t0, t1)) {
-			ndl2part *= 1.0 / (1.0 + 1e-5 * (t1 - t0));
+			ndl2part *= smoothstep(3e5, 0.0, abs(t1 - t0));//1.0 / (1.0 + 1e-5 * (t1 - t0));
 		}
 		ndl2 += ndl2part;
 

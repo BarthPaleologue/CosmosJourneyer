@@ -18,7 +18,7 @@ export interface CloudSettings {
     specularPower: number;
     cloudFrequency: number;
     cloudDetailFrequency: number;
-    cloudPower: number;
+    cloudCoverage: number;
     cloudSharpness: number;
     cloudColor: Color3;
     worleySpeed: number;
@@ -35,8 +35,8 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             smoothness: 0.9,
             cloudFrequency: 4,
             cloudDetailFrequency: 20,
-            cloudPower: 2,
-            cloudSharpness: 4,
+            cloudCoverage: 0.4,
+            cloudSharpness: 3.5,
             cloudColor: new Color3(0.8, 0.8, 0.8),
             worleySpeed: 0.0005,
             detailSpeed: 0.003
@@ -65,10 +65,10 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
                 }
             },
             {
-                name: "cloudPower",
+                name: "cloudCoverage",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.cloudPower;
+                    return settings.cloudCoverage;
                 }
             },
             {

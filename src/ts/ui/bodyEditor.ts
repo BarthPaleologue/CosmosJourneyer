@@ -517,8 +517,8 @@ export class BodyEditor {
             })
         );
         this.cloudsSliders.push(
-            new Slider("cloudPower", document.getElementById("cloudPower") as HTMLElement, 0, 100, flatClouds.settings.cloudPower * 10, (val: number) => {
-                flatClouds.settings.cloudPower = val / 10;
+            new Slider("cloudCoverage", document.getElementById("cloudCoverage") as HTMLElement, 0, 200, 100 + flatClouds.settings.cloudCoverage * 100, (val: number) => {
+                flatClouds.settings.cloudCoverage = (val-100) / 100;
             })
         );
         this.cloudsSliders.push(
