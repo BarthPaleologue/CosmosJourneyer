@@ -141,6 +141,7 @@ self.onmessage = (e) => {
             // benchmark fait le 20/11/2021 21h20 (normale analytique v2.1) : ~0.03s/chunk (30ms/chunk)
             // benchmark fait le 10/12/2021 (normale analytique v2.5) : ~ 50ms/chunk
             // benchmark fait le 19/02/2022 (normale analytique v2.6) : ~ 40ms/chunk
+            // benchmark fait le 28/07/2022 (Terrain V3.1) : ~70ms/chunk
             break;
         case TaskType.Collision:
             computeHeightForData(e.data as CollisionData);

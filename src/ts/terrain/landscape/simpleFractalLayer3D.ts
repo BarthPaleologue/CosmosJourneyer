@@ -8,7 +8,6 @@ export function simpleFractalLayer3D(
     decay: number,
     lacunarity: number,
     power: number,
-    minValue: number,
     f: simpleElevationFunction
 ): simpleElevationFunction {
     return function (coords: LVector3, seed: number, gradient: LVector3) {
@@ -27,8 +26,6 @@ export function simpleFractalLayer3D(
         }
         noiseValue /= totalAmplitude;
         gradient.divideInPlace(totalAmplitude);
-
-        if (minValue > 0) noiseValue = minimumValue(noiseValue, minValue, gradient);
 
         return pow(noiseValue, power, gradient);
     };

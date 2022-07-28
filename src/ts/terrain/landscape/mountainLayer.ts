@@ -1,9 +1,9 @@
 import { LVector3 } from "../../utils/algebra";
-import { minimumValue, pow, sAbs } from "../../utils/gradientMath";
-import { simplex401, simplex411 } from "../../utils/simplex";
+import { pow, sAbs } from "../../utils/gradientMath";
+import { simplex411 } from "../../utils/simplex";
 import { simpleElevationFunction } from "./elevationFunction";
 
-export function mountainLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, power: number, minValue: number): simpleElevationFunction {
+export function mountainLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, power: number): simpleElevationFunction {
     return function (coords: LVector3, seed: number, gradient: LVector3) {
         let noiseValue = 0.0;
         let totalAmplitude = 0.0;
@@ -30,8 +30,6 @@ export function mountainLayer(frequency: number, nbOctaves: number, decay: numbe
         }
         noiseValue /= totalAmplitude;
         gradient.divideInPlace(totalAmplitude);
-
-        if (minValue > 0) noiseValue = minimumValue(noiseValue, minValue, gradient);
 
         return pow(noiseValue, power, gradient);
     };

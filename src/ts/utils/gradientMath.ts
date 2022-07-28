@@ -158,6 +158,29 @@ export function minimumValue(y: number, minValue: number, grad?: Vec3): number {
 }
 
 /**
+ * Adds two values and adds the optional gradients in grad1
+ * @param x1 the first value
+ * @param x2 the second value
+ * @param grad1 the optional gradient of x1 WILL STORE THE RESULT
+ * @param grad2 the optional gradient of x2
+ */
+export function add(x1: number, x2: number, grad1?: LVector3, grad2?: LVector3): number {
+    if (grad1 && grad2) grad1.addInPlace(grad2);
+    return x1 + x2;
+}
+
+/**
+ * Scales the value and the optional gradient accordingly
+ * @param x the value to scale
+ * @param scale the scale factor
+ * @param grad the optional gradient to be modified
+ */
+export function scale(x: number, scale: number, grad?: LVector3): number {
+    if (grad) grad.scaleInPlace(scale);
+    return x * scale;
+}
+
+/**
  * Applies smoothstep to a value and scales the optional gradient accordingly
  * @param edge0 the minimum value of the smoothstep
  * @param edge1 the maximum value of the smoothstep

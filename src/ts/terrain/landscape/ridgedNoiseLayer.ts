@@ -5,7 +5,7 @@ import { simpleElevationFunction } from "./elevationFunction";
 import { simpleFractalLayer3D } from "./simpleFractalLayer3D";
 
 export function ridgedNoiseLayer(frequency: number, nbOctaves: number, decay: number, lacunarity: number, power: number, minValue: number): simpleElevationFunction {
-    return simpleFractalLayer3D(frequency, nbOctaves, decay, lacunarity, power, minValue, (coords: LVector3, seed: number, gradient: LVector3) => {
+    return simpleFractalLayer3D(frequency, nbOctaves, decay, lacunarity, power, (coords: LVector3, seed: number, gradient: LVector3) => {
         let elevation = simplex411(coords, seed, gradient);
 
         // TODO: ne pas hardcoder
