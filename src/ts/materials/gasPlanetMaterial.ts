@@ -7,7 +7,6 @@ import { GasPlanet } from "../bodies/planets/gasPlanet";
 import { GazColorSettings } from "./colorSettingsInterface";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { flattenVector3Array } from "../utils/algebra";
-import { HSVtoRGB } from "../utils/color";
 
 const shaderName = "gazPlanetMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -63,10 +62,10 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         const divergence = 25;
 
-        const color1 = new Color3(...HSVtoRGB(hue1 % 360, randRange(0.4, 0.9, this.planet.rng), randRange(0.7, 0.9, this.planet.rng)));
-        const color2 = new Color3(...HSVtoRGB(hue2 % 360, randRange(0.6, 0.9, this.planet.rng), randRange(0.1, 0.9, this.planet.rng)));
-        const color3 = new Color3(...HSVtoRGB((hue1 + divergence) % 360, randRange(0.4, 0.9, this.planet.rng), randRange(0.7, 0.9, this.planet.rng)));
-        const color4 = new Color3(...HSVtoRGB((hue2 + divergence) % 360, randRange(0.6, 0.9, this.planet.rng), randRange(0.1, 0.9, this.planet.rng)));
+        const color1 = Color3.FromHSV(hue1 % 360, randRange(0.4, 0.9, this.planet.rng), randRange(0.7, 0.9, this.planet.rng));
+        const color2 = Color3.FromHSV(hue2 % 360, randRange(0.6, 0.9, this.planet.rng), randRange(0.1, 0.9, this.planet.rng));
+        const color3 = Color3.FromHSV((hue1 + divergence) % 360, randRange(0.4, 0.9, this.planet.rng), randRange(0.7, 0.9, this.planet.rng));
+        const color4 = Color3.FromHSV((hue2 + divergence) % 360, randRange(0.6, 0.9, this.planet.rng), randRange(0.1, 0.9, this.planet.rng));
 
         this.colorSettings = {
             color1: color1,
