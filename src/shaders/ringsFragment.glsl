@@ -55,15 +55,12 @@ float ringDensityAtPoint(vec3 samplePoint) {
     float normalizedDistance = distanceToPlanet / planetRadius;
 
     // out if not intersecting with rings and interpolation area
-	if(normalizedDistance < ringStart * 0.9 || normalizedDistance > ringEnd * 1.1) return 0.0;
+	if(normalizedDistance < ringStart || normalizedDistance > ringEnd) return 0.0;
 
     // compute the actual density of the rings at the sample point
 	float ringDensity = completeNoise(vec3(normalizedDistance) * ringFrequency, 4, 2.0, 2.0);
-
-    // cutting rings smoothly
-    float ringCutoffSharpness = 64.0;
-    ringDensity *= pow(saturate(normalizedDistance / ringStart), ringCutoffSharpness);
-    ringDensity *= pow(saturate(ringEnd / normalizedDistance), ringCutoffSharpness);
+    ringDensity *= smoothstep(ringStart, ringStart + 0.03, normalizedDistance);
+    ringDensity *= smoothstep(ringEnd, ringEnd - 0.03, normalizedDistance);
 
     return ringDensity;
 }
