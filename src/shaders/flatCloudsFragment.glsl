@@ -76,12 +76,6 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     float density = 1.0 - completeWorley(samplePointRotatedWorley * cloudFrequency, 1, 2.0, 2.0);
 
-    /*samplePointRotatedDetail += vec3(
-        completeNoise(samplePointRotatedDetail, 1, 2.0, 2.0),
-        completeNoise(samplePointRotatedDetail + vec3(2.0, 3.0, -4.0), 1, 2.0, 2.0),
-        completeNoise(samplePointRotatedDetail + vec3(-5.0, 2.0, 4.0), 1, 2.0, 2.0)
-    );*/
-
     density *= completeNoise(samplePointRotatedDetail * cloudDetailFrequency, 5, 2.0, 2.0);
 
     density = saturate(density * 2.0);
@@ -142,9 +136,6 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     float cloudNormalStrength = 1.5;
 	vec3 normal = triplanarNormal(normalRotatedSamplePoint1, planetNormal1, normalMap, 10.0, 0.5, cloudDensity * cloudNormalStrength);
 
-    // TODO: add another normalmap
-    //normal = triplanarNormal(normalRotatedSamplePoint, normal, normalMap, 20.0, 0.5, 0.5 * cloudDensity * cloudNormalStrength);
-
     float ndl = 0.0; // dimming factor due to light inclination relative to vertex normal in world space
     float specularHighlight = 0.0;
     for(int i = 0; i < nbStars; i++) {
@@ -160,9 +151,33 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     }
     ndl = saturate(ndl);
 
-	vec3 ambiant = lerp(originalColor, ndl * cloudColor, 1.0 - cloudDensity);
+	vec3 ambiant = lerp(originalColor, sqrt(ndl) * cloudColor, 1.0 - cloudDensity);
 
     return ambiant + specularHighlight * cloudDensity;
+}
+
+vec3 shadows(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
+    if(maximumDistance >= cameraFar) return originalColor;
+    float impactPoint, escapePoint;
+    if(rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint)) {
+        //hit the planet
+        vec3 hitPoint = rayOrigin + maximumDistance * rayDir;
+        if(length(hitPoint - planetPosition) > 2.0 * planetRadius) return originalColor;
+        float lightAmount = 0.0;
+        for (int i = 0; i < nbStars; i++) {
+            vec3 sunDir = normalize(starPositions[i] - hitPoint);
+            float t0, t1;
+            if (rayIntersectSphere(hitPoint, sunDir, planetPosition, cloudLayerRadius, t0, t1)) {
+                vec3 samplePoint = normalize(hitPoint + t1 * sunDir - planetPosition);
+                if (dot(samplePoint, sunDir) < 0.0) continue;
+                samplePoint = applyQuaternion(planetInverseRotationQuaternion, samplePoint);
+                float density = cloudDensityAtPoint(samplePoint);
+                lightAmount += 1.0 - density;
+            }
+        }
+        return originalColor * (0.2 + saturate(lightAmount) / 0.8);
+    }
+    return originalColor;
 }
 
 void main() {
@@ -178,7 +193,11 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
-    vec3 finalColor = computeCloudCoverage(screenColor, cameraPosition, rayDir, maximumDistance);
+    vec3 finalColor;// = computeCloudCoverage(screenColor, cameraPosition, rayDir, maximumDistance);
+
+    finalColor = shadows(screenColor, cameraPosition, rayDir, maximumDistance);
+
+    finalColor = computeCloudCoverage(finalColor, cameraPosition, rayDir, maximumDistance);
 
     gl_FragColor = vec4(finalColor, 1.0); // displaying the final color
 }
