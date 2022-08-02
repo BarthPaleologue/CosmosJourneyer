@@ -159,25 +159,27 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
 vec3 shadows(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     if(maximumDistance >= cameraFar) return originalColor;
     float impactPoint, escapePoint;
-    if(rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint)) {
-        //hit the planet
-        vec3 hitPoint = rayOrigin + maximumDistance * rayDir;
-        if(length(hitPoint - planetPosition) > 2.0 * planetRadius) return originalColor;
-        float lightAmount = 0.0;
-        for (int i = 0; i < nbStars; i++) {
-            vec3 sunDir = normalize(starPositions[i] - hitPoint);
-            float t0, t1;
-            if (rayIntersectSphere(hitPoint, sunDir, planetPosition, cloudLayerRadius, t0, t1)) {
-                vec3 samplePoint = normalize(hitPoint + t1 * sunDir - planetPosition);
-                if (dot(samplePoint, sunDir) < 0.0) continue;
-                samplePoint = applyQuaternion(planetInverseRotationQuaternion, samplePoint);
-                float density = cloudDensityAtPoint(samplePoint);
-                lightAmount += 1.0 - density;
-            }
-        }
-        return originalColor * (0.2 + saturate(lightAmount) / 0.8);
+    if(!rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint)) return originalColor;
+    //hit the planet
+    float maxDist = maximumDistance;
+    if(rayIntersectSphere(rayOrigin, rayDir, planetPosition, planetRadius, impactPoint, escapePoint)) {
+        maxDist = min(maxDist, impactPoint);
     }
-    return originalColor;
+    vec3 hitPoint = rayOrigin + maxDist * rayDir;
+    if(length(hitPoint - planetPosition) > 2.0 * planetRadius) return originalColor;
+    float lightAmount = 0.0;
+    for (int i = 0; i < nbStars; i++) {
+        vec3 sunDir = normalize(starPositions[i] - hitPoint);
+        float t0, t1;
+        if (rayIntersectSphere(hitPoint, sunDir, planetPosition, cloudLayerRadius, t0, t1)) {
+            vec3 samplePoint = normalize(hitPoint + t1 * sunDir - planetPosition);
+            if (dot(samplePoint, sunDir) < 0.0) continue;
+            samplePoint = applyQuaternion(planetInverseRotationQuaternion, samplePoint);
+            float density = cloudDensityAtPoint(samplePoint);
+            lightAmount += 1.0 - density;
+        }
+    }
+    return originalColor * (0.2 + saturate(lightAmount) / 0.8);
 }
 
 void main() {
