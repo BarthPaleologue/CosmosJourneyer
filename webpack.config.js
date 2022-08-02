@@ -12,7 +12,6 @@ const config = {
     entry: {
         showcase: "./src/ts/index.ts",
         random: "./src/ts/randomizer.ts",
-        terrainDebug: "./src/ts/terrainDebug.ts",
     },
     output: {
         path: path.resolve(__dirname, "dist")
@@ -39,12 +38,6 @@ const config = {
             filename: "random.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["random"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "Terrain Debug",
-            filename: "debug.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["terrainDebug"]
         }),
         new MiniCssExtractPlugin()
     ],
