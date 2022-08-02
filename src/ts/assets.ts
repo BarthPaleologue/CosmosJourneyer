@@ -31,7 +31,7 @@ export class Assets {
 
     private static manager: AssetsManager;
 
-    static onFinish: Function = () => {};
+    static onFinish: () => void = () => {};
 
     static Init(scene: Scene) {
         Assets.manager = new AssetsManager(scene);

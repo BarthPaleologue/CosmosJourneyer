@@ -3,7 +3,7 @@ import { AbstractBody } from "../abstractBody";
 import { Mesh, MeshBuilder } from "@babylonjs/core";
 import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
-import { StarSystemManager } from "../starSystemManager";
+import { StarSystem } from "../starSystem";
 import { StarPhysicalProperties } from "../physicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
@@ -29,7 +29,7 @@ export class Star extends AbstractBody {
 
     override readonly radius;
 
-    constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(name: string, starSystemManager: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystemManager, seed, parentBodies);
 
         //TODO: make it dependent on star type
@@ -46,14 +46,14 @@ export class Star extends AbstractBody {
         };
 
         this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius * 2, segments: 32 }, starSystemManager.scene);
-        starSystemManager.registerMeshDepth(this.mesh);
+        starSystemManager.scene.registerMeshDepth(this.mesh);
         this.mesh.parent = this.transform;
 
         this.material = new StarMaterial(this, starSystemManager.scene);
         this.mesh.material = this.material;
 
         this.postProcesses = {
-            volumetricLight: new VolumetricLight(this, this.mesh, this.starSystem),
+            volumetricLight: new VolumetricLight(this, this.mesh, this.starSystem.scene),
             rings: null
         };
 

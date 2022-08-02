@@ -1,7 +1,7 @@
 import { Camera, Color3, Effect, Matrix, PostProcess, Quaternion, Texture, Vector3 } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
 import { flattenVector3Array } from "../utils/algebra";
-import { StarSystemManager } from "../bodies/starSystemManager";
+import { StarSystem } from "../bodies/starSystem";
 import { IPostProcess } from "./iPostProcess";
 
 export abstract class SpacePostProcess extends PostProcess implements IPostProcess {
@@ -12,7 +12,7 @@ export abstract class SpacePostProcess extends PostProcess implements IPostProce
 
     protected internalTime = 0;
 
-    protected constructor(name: string, fragmentName: string, otherUniforms: ShaderUniforms, otherSamplers: ShaderSamplers, starSystem: StarSystemManager) {
+    protected constructor(name: string, fragmentName: string, otherUniforms: ShaderUniforms, otherSamplers: ShaderSamplers, starSystem: StarSystem) {
         const uniforms: ShaderUniforms = [
             {
                 name: "cameraPosition",

@@ -13,6 +13,7 @@ import { clearAllEventListenersById, hide, hidePanel, show, showPanel } from "..
 import { stripAxisFromQuaternion } from "../utils/algebra";
 import { GasPlanet } from "../bodies/planets/gasPlanet";
 import { Planet } from "../bodies/planets/planet";
+import { UberScene } from "../core/uberScene";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -124,7 +125,7 @@ export class BodyEditor {
         return this.visibility;
     }
 
-    public setBody(body: AbstractBody, player: PlayerController) {
+    public setBody(body: AbstractBody) {
         this.currentBodyId = body.name;
         this.initNavBar(body);
         switch (body.bodyType) {
@@ -139,7 +140,7 @@ export class BodyEditor {
                 break;
             default:
         }
-        this.initGeneralSliders(body, player);
+        this.initGeneralSliders(body, body.starSystem.scene);
         this.initRingsSliders(body);
     }
 
@@ -235,7 +236,7 @@ export class BodyEditor {
         );
 
         this.starSliders.push(
-            new Slider("exposure", document.getElementById("exposure") as HTMLElement, 0, 200, star.postProcesses.volumetricLight.exposure * 100, (val: number) => {
+            new Slider("starExposure", document.getElementById("starExposure") as HTMLElement, 0, 200, star.postProcesses.volumetricLight.exposure * 100, (val: number) => {
                 star.postProcesses.volumetricLight.exposure = val / 100;
             })
         );
@@ -247,7 +248,7 @@ export class BodyEditor {
         );
     }
 
-    public initGeneralSliders(planet: AbstractBody, player: PlayerController) {
+    public initGeneralSliders(planet: AbstractBody, scene: UberScene) {
         show("generalLink");
 
         for (const slider of this.generalSliders) slider.remove();
@@ -265,7 +266,7 @@ export class BodyEditor {
             new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
                 planet.rotate(Axis.X, newAxialTilt - axialTiltX);
-                if (player.isOrbiting()) player.rotateAround(planet.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
+                if (scene.getPlayer().isOrbiting()) scene.getPlayer().rotateAround(planet.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
                 axialTiltX = newAxialTilt;
             })
         );
@@ -275,14 +276,14 @@ export class BodyEditor {
             new Slider("axialTiltZ", document.getElementById("axialTiltZ") as HTMLElement, -180, 180, Math.round((180 * axialTiltZ) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
                 planet.rotate(Axis.Z, newAxialTilt - axialTiltZ);
-                if (player.isOrbiting()) player.rotateAround(planet.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
+                if (scene.getPlayer().isOrbiting()) scene.getPlayer().rotateAround(planet.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
                 axialTiltZ = newAxialTilt;
             })
         );
 
         this.generalSliders.push(
-            new Slider("cameraFOV", document.getElementById("cameraFOV") as HTMLElement, 0, 360, (player.camera.fov * 360) / Math.PI, (val: number) => {
-                player.camera.fov = (val * Math.PI) / 360;
+            new Slider("cameraFOV", document.getElementById("cameraFOV") as HTMLElement, 0, 360, (scene.getPlayer().camera.fov * 360) / Math.PI, (val: number) => {
+                scene.getPlayer().camera.fov = (val * Math.PI) / 360;
             })
         );
         //TODO: do not hardcode here
@@ -290,6 +291,36 @@ export class BodyEditor {
         this.generalSliders.push(
             new Slider("timeModifier", document.getElementById("timeModifier") as HTMLElement, -200, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {
                 Settings.TIME_MULTIPLIER = Math.sign(val) * Math.pow(Math.abs(val), power);
+            })
+        );
+
+        this.generalSliders.push(
+            new Slider("exposure", document.getElementById("exposure") as HTMLElement, 0, 200, scene.colorCorrection.settings.exposure * 100, (val: number) => {
+                scene.colorCorrection.settings.exposure = val / 100;
+            })
+        );
+
+        this.generalSliders.push(
+            new Slider("contrast", document.getElementById("contrast") as HTMLElement, 0, 200, scene.colorCorrection.settings.contrast * 100, (val: number) => {
+                scene.colorCorrection.settings.contrast = val / 100;
+            })
+        );
+
+        this.generalSliders.push(
+            new Slider("brightness", document.getElementById("brightness") as HTMLElement, -100, 100, scene.colorCorrection.settings.brightness * 100, (val: number) => {
+                scene.colorCorrection.settings.brightness = val / 100;
+            })
+        );
+
+        this.generalSliders.push(
+            new Slider("saturation", document.getElementById("saturation") as HTMLElement, 0, 200, scene.colorCorrection.settings.saturation * 100, (val: number) => {
+                scene.colorCorrection.settings.saturation = val / 100;
+            })
+        );
+
+        this.generalSliders.push(
+            new Slider("gamma", document.getElementById("gamma") as HTMLElement, 0, 200, scene.colorCorrection.settings.gamma * 100, (val: number) => {
+                scene.colorCorrection.settings.gamma = val / 100;
             })
         );
     }
@@ -518,7 +549,7 @@ export class BodyEditor {
         );
         this.cloudsSliders.push(
             new Slider("cloudCoverage", document.getElementById("cloudCoverage") as HTMLElement, 0, 200, 100 + flatClouds.settings.cloudCoverage * 100, (val: number) => {
-                flatClouds.settings.cloudCoverage = (val-100) / 100;
+                flatClouds.settings.cloudCoverage = (val - 100) / 100;
             })
         );
         this.cloudsSliders.push(
@@ -656,6 +687,6 @@ export class BodyEditor {
 
     public update(player: PlayerController) {
         if (player.nearestBody == null) return;
-        if (player.nearestBody.name != this.currentBodyId) this.setBody(player.nearestBody, player);
+        if (player.nearestBody.name != this.currentBodyId) this.setBody(player.nearestBody);
     }
 }

@@ -8,7 +8,7 @@ import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
 import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
-import { StarSystemManager } from "./bodies/starSystemManager";
+import { StarSystem } from "./bodies/starSystem";
 
 import { centeredRand, normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
@@ -44,9 +44,13 @@ Assets.onFinish = () => {
     player.camera.maxZ = Settings.EARTH_RADIUS * 100000;
     player.inputs.push(new Keyboard(), mouse, new Gamepad());
 
-    const starSystemManager = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
+    scene.setPlayer(player);
 
-    const starfield = new StarfieldPostProcess("starfield", player, starSystemManager);
+    const starSystemManager = new StarSystem(scene);
+    scene.setStarSystem(starSystemManager);
+
+    const starfield = new StarfieldPostProcess("starfield", player, scene);
+    scene.setStarField(starfield);
 
     const starSystemSeed = randRangeInt(0, Number.MAX_SAFE_INTEGER);
     const starSystemRand = alea(starSystemSeed.toString());
@@ -112,7 +116,7 @@ Assets.onFinish = () => {
         };
     }
 
-    starSystemManager.init();
+    scene.initPostProcesses();
 
     document.addEventListener("keydown", (e) => {
         if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
@@ -124,11 +128,11 @@ Assets.onFinish = () => {
 
     const collisionWorker = new CollisionWorker(player, starSystemManager);
 
-    starSystemManager.update(player, 0);
-    starSystemManager.update(player, Date.now());
-    starSystemManager.update(player, 0);
-    starSystemManager.update(player, 0);
-    starSystemManager.update(player, 0);
+    starSystemManager.update(0);
+    starSystemManager.update(Date.now());
+    starSystemManager.update(0);
+    starSystemManager.update(0);
+    starSystemManager.update(0);
 
     player.positionNearBody(planet);
 
@@ -158,7 +162,7 @@ Assets.onFinish = () => {
             for (const star of starSystemManager.stars) {
                 star.orbitalProperties.period = 0;
             }
-            starSystemManager.update(player, Settings.TIME_MULTIPLIER * deltaTime);
+            scene.update(Settings.TIME_MULTIPLIER * deltaTime);
 
             starSystemManager.translateAllBodies(player.update(deltaTime));
 

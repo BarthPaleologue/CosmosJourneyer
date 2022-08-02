@@ -1,10 +1,19 @@
-import { Camera, Engine, FxaaPostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Scene, Texture, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import {
+    Camera,
+    Engine,
+    FxaaPostProcess,
+    PostProcessRenderEffect,
+    PostProcessRenderPipeline,
+    Texture,
+    VolumetricLightScatteringPostProcess
+} from "@babylonjs/core";
 import { StarfieldPostProcess } from "../starfieldPostProcess";
 import { OceanPostProcess } from "../planetPostProcesses/oceanPostProcess";
 import { FlatCloudsPostProcess } from "../planetPostProcesses/flatCloudsPostProcess";
 import { AtmosphericScatteringPostProcess } from "../planetPostProcesses/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "../planetPostProcesses/ringsPostProcess";
 import { VolumetricCloudsPostProcess } from "../planetPostProcesses/volumetricCloudsPostProcess";
+import { UberScene } from "../../core/uberScene";
 
 export enum PostProcessType {
     Starfields,
@@ -17,7 +26,7 @@ export enum PostProcessType {
 }
 
 export abstract class AbstractRenderingPipeline extends PostProcessRenderPipeline {
-    readonly scene: Scene;
+    readonly scene: UberScene;
     readonly engine: Engine;
 
     readonly starfields: StarfieldPostProcess[] = [];
@@ -27,7 +36,7 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
     readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
     readonly rings: RingsPostProcess[] = [];
 
-    protected constructor(name: string, scene: Scene) {
+    protected constructor(name: string, scene: UberScene) {
         super(scene.getEngine(), name);
         this.scene = scene;
         this.engine = this.scene.getEngine();
@@ -90,6 +99,11 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
                     throw new Error("Invalid postprocess type in " + this.name);
             }
         }
+
+        this.addEffect(new PostProcessRenderEffect(this.engine, "colorCorrectionRenderEffect", () => {
+            return [this.scene.colorCorrection];
+        }));
+        //this.addEffect(new BloomEffect(this.scene, 1, 0.2, 3));
     }
 
     attachToCamera(camera: Camera) {

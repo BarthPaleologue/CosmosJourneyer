@@ -1,8 +1,8 @@
 import { AbstractRenderingPipeline, PostProcessType } from "./abstractRenderingPipeline";
-import { Scene } from "@babylonjs/core";
+import { UberScene } from "../../core/uberScene";
 
 export class SurfaceRenderingPipeline extends AbstractRenderingPipeline {
-    constructor(name: string, scene: Scene) {
+    constructor(name: string, scene: UberScene) {
         super(name, scene);
     }
 

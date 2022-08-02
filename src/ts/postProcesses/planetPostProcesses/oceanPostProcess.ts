@@ -5,8 +5,8 @@ import { PlanetPostProcess } from "../planetPostProcess";
 
 import oceanFragment from "../../../shaders/oceanFragment.glsl";
 import { Assets } from "../../assets";
-import { StarSystemManager } from "../../bodies/starSystemManager";
 import { Planet } from "../../bodies/planets/planet";
+import { UberScene } from "../../core/uberScene";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -23,7 +23,7 @@ export interface OceanSettings {
 export class OceanPostProcess extends PlanetPostProcess {
     settings: OceanSettings;
 
-    constructor(name: string, planet: Planet, starSystem: StarSystemManager) {
+    constructor(name: string, planet: Planet, scene: UberScene) {
         const settings: OceanSettings = {
             oceanRadius: planet.getApparentRadius(),
             depthModifier: 0.001,
@@ -99,23 +99,23 @@ export class OceanPostProcess extends PlanetPostProcess {
                 name: "normalMap1",
                 type: ShaderDataType.Texture,
                 get: () => {
-                    return Assets.WaterNormalMap1!;
+                    return Assets.WaterNormalMap1;
                 }
             },
             {
                 name: "normalMap2",
                 type: ShaderDataType.Texture,
                 get: () => {
-                    return Assets.WaterNormalMap2!;
+                    return Assets.WaterNormalMap2;
                 }
             }
         ];
 
-        super(name, shaderName, uniforms, samplers, planet, starSystem.stars[0], starSystem);
+        super(name, shaderName, uniforms, samplers, planet, scene);
 
         this.settings = settings;
 
-        for (const pipeline of starSystem.pipelines) {
+        for (const pipeline of scene.pipelines) {
             pipeline.oceans.push(this);
         }
     }

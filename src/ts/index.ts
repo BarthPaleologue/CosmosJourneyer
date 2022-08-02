@@ -10,11 +10,9 @@ import { Mouse } from "./inputs/mouse";
 import { Gamepad } from "./inputs/gamepad";
 
 import { CollisionWorker } from "./workers/collisionWorker";
-import { StarSystemManager } from "./bodies/starSystemManager";
+import { StarSystem } from "./bodies/starSystem";
 
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-
-import lensFlare from "../asset/lensflare.png";
 
 import "../styles/index.scss";
 
@@ -43,23 +41,19 @@ Assets.onFinish = () => {
     player.camera.maxZ = Settings.EARTH_RADIUS * 100000;
     player.inputs.push(new Keyboard(), mouse, new Gamepad());
 
+    scene.setPlayer(player);
+
     console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
-    const starSystem = new StarSystemManager(scene, Settings.VERTEX_RESOLUTION);
+    const starSystem = new StarSystem(scene);
 
-    const starfield = new StarfieldPostProcess("starfield", player, starSystem);
+    scene.setStarSystem(starSystem);
+
+    const starfield = new StarfieldPostProcess("starfield", player, scene);
+    scene.setStarField(starfield);
 
     const sun = new Star("Weierstrass", starSystem, 0.51, []);
     sun.orbitalProperties.period = 60 * 60 * 24;
-
-    /*const lensFlareSystem = new LensFlareSystem("lensFlareSystem", sun.transform, scene);
-    const flare00 = new LensFlare(
-        1.5, // size
-        0, // position
-        new Color3(1, 1, 1), // color
-        lensFlare, // texture
-        lensFlareSystem // lens flare system
-    );*/
 
     const planet = new TelluricPlanet("Hécate", starSystem, -3.6498816637322307, starSystem.stars);
 
@@ -103,12 +97,12 @@ Assets.onFinish = () => {
     const ares = new TelluricPlanet("Ares", starSystem, 432, starSystem.stars);
 
     ares.postProcesses.ocean?.dispose();
-    starSystem.spaceRenderingPipeline.oceans.splice(starSystem.spaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);
-    starSystem.surfaceRenderingPipeline.oceans.splice(starSystem.surfaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);
+    scene.spaceRenderingPipeline.oceans.splice(scene.spaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);
+    scene.surfaceRenderingPipeline.oceans.splice(scene.surfaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);
 
     ares.postProcesses.clouds?.dispose();
-    starSystem.spaceRenderingPipeline.clouds.splice(starSystem.spaceRenderingPipeline.clouds.indexOf(ares.postProcesses.clouds!), 1);
-    starSystem.surfaceRenderingPipeline.clouds.splice(starSystem.surfaceRenderingPipeline.clouds.indexOf(ares.postProcesses.clouds!), 1);
+    scene.spaceRenderingPipeline.clouds.splice(scene.spaceRenderingPipeline.clouds.indexOf(ares.postProcesses.clouds!), 1);
+    scene.surfaceRenderingPipeline.clouds.splice(scene.surfaceRenderingPipeline.clouds.indexOf(ares.postProcesses.clouds!), 1);
 
     ares.physicalProperties.mass = 7;
     ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
@@ -150,12 +144,12 @@ Assets.onFinish = () => {
         orientationQuaternion: Quaternion.Identity()
     };
 
-    starSystem.init();
+    scene.initPostProcesses();
 
     const collisionWorker = new CollisionWorker(player, starSystem);
 
     // update to current date
-    starSystem.update(player, Date.now() / 1000);
+    starSystem.update(Date.now() / 1000);
 
     player.positionNearBody(planet);
 
@@ -174,7 +168,7 @@ Assets.onFinish = () => {
         for (const star of starSystem.stars) {
             star.orbitalProperties.period = 0;
         }
-        starSystem.update(player, deltaTime * Settings.TIME_MULTIPLIER);
+        scene.update(deltaTime * Settings.TIME_MULTIPLIER);
 
         if (!collisionWorker.isBusy() && player.isOrbiting()) {
             if (player.nearestBody?.bodyType == BodyType.TELLURIC) {

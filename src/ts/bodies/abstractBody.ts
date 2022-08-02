@@ -1,17 +1,16 @@
-import { Quaternion, Scene, Axis } from "@babylonjs/core";
+import { Quaternion, Axis } from "@babylonjs/core";
 import { BodyType, ISeedable } from "./interfaces";
 import { PlayerController } from "../player/playerController";
-import { StarSystemManager } from "./starSystemManager";
+import { StarSystem } from "./starSystem";
 import { PhysicalProperties } from "./physicalProperties";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../orbits/kepler";
-import { Star } from "./stars/star";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
-import { centeredRand, normalRandom, randRange } from "extended-random";
+import { normalRandom, randRange } from "extended-random";
 import { alea } from "seedrandom";
-import { BasicTransform } from "../transforms/basicTransform";
+import { BasicTransform } from "../core/transforms/basicTransform";
 
 export abstract class AbstractBody extends BasicTransform implements IOrbitalBody, ISeedable {
     abstract readonly bodyType: BodyType;
@@ -20,7 +19,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
     orbitalProperties: IOrbitalProperties;
     abstract postProcesses: BodyPostProcesses;
 
-    readonly starSystem: StarSystemManager;
+    readonly starSystem: StarSystem;
 
     readonly name: string;
 
@@ -35,7 +34,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
 
     depth: number;
 
-    protected constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+    protected constructor(name: string, starSystemManager: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
         super(name);
         this.name = name;
         this.seed = seed;
@@ -92,7 +91,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
     }
 
     public createRings(): RingsPostProcess {
-        const rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem);
+        const rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem.scene);
         rings.settings.ringStart = randRange(1.8, 2.2, this.rng);
         rings.settings.ringEnd = randRange(2.1, 2.9, this.rng);
         rings.settings.ringOpacity = this.rng();

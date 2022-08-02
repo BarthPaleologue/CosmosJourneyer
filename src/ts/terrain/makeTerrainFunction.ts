@@ -4,12 +4,13 @@ import { LVector3 } from "../utils/algebra";
 import { multiply, smoothstep } from "../utils/gradientMath";
 import { mountainLayer } from "./landscape/mountainLayer";
 import { continentLayer } from "./landscape/continentLayer";
+import { oneLayer, zeroLayer } from "./landscape/constantLayers";
 
 export type TerrainFunction = (samplePoint: LVector3, seed: number, outPosition: LVector3, outGradient: LVector3) => void;
 
 export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction {
     const continents = continentLayer(settings.continentsFrequency, 6);
-    const bumps = simplexNoiseLayer(settings.bumpsFrequency, 8, 2, 2, 1.0);
+    const bumps = simplexNoiseLayer(settings.bumpsFrequency, 8, 1.7, 2, 1.0);
     const mountains = mountainLayer(settings.mountainsFrequency, 7, 1.8, 2.0, 0.8);
     //const terraceMask = simplexNoiseLayer(settings.mountainsFrequency / 20, 1, 2, 2, 1.0);
 

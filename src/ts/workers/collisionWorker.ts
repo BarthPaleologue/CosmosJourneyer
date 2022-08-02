@@ -1,14 +1,14 @@
 import { CollisionData } from "../chunks/workerDataTypes";
-import { StarSystemManager } from "../bodies/starSystemManager";
+import { StarSystem } from "../bodies/starSystem";
 import { PlayerController } from "../player/playerController";
 import { RigidBody } from "../bodies/interfaces";
-import { ITransformable } from "../transforms/iTransformable";
+import { ITransformable } from "../core/transforms/iTransformable";
 
 export class CollisionWorker {
     _player: PlayerController;
     _busy = false;
     _worker: Worker;
-    constructor(player: PlayerController, planetManager: StarSystemManager) {
+    constructor(player: PlayerController, planetManager: StarSystem) {
         this._worker = new Worker(new URL("workerScript", import.meta.url), { type: "module" });
         this._player = player;
         this._worker.onmessage = (e) => {

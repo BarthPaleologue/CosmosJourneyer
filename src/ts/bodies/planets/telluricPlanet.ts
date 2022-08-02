@@ -8,7 +8,7 @@ import { BodyType, RigidBody } from "../interfaces";
 import { CollisionData } from "../../chunks/workerDataTypes";
 import { TaskType } from "../../chunks/taskTypes";
 import { PlayerController } from "../../player/playerController";
-import { StarSystemManager } from "../starSystemManager";
+import { StarSystem } from "../starSystem";
 import { Settings } from "../../settings";
 import { SolidPhysicalProperties } from "../physicalProperties";
 import { TelluricMaterial } from "../../materials/telluricMaterial";
@@ -39,7 +39,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
     isSatelliteOfTelluric = false;
 
-    constructor(id: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(id: string, starSystemManager: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
         super(id, starSystemManager, seed, parentBodies);
 
         for (const parentBody of parentBodies) {
@@ -85,16 +85,16 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         if (pressure > epsilon) {
             if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
                 this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
-                const ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystemManager);
+                const ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystemManager.scene);
                 this.postProcesses.ocean = ocean;
 
-                const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystemManager);
+                const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystemManager.scene);
                 clouds.settings.cloudCoverage = Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
                 this.postProcesses.clouds = clouds;
             } else {
                 this.oceanLevel = 0;
             }
-            const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem);
+            const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene);
             atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
             atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng) / 6;
             atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;
@@ -106,14 +106,6 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
         if (uniformRandBool(0.6, this.rng)) {
             this.createRings();
-            /*let ringMesh = MeshBuilder.CreatePlane(`${this._name}Rings`, {
-                size: this.postProcesses.rings!.settings.ringEnd * this.getApparentRadius() * 2
-            }, scene);
-            ringMesh.rotate(Axis.X, Math.PI/2, Space.WORLD);
-            ringMesh.material = new RingMaterial(this, scene);
-            starSystemManager.registerDepthMesh.push(ringMesh);
-            ringMesh.parent = this.transform;
-            this.postProcesses.rings!.dispose();*/
         }
 
         const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.rng), 0, 0.95);

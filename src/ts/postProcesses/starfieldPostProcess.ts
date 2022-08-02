@@ -2,13 +2,12 @@ import { Effect, Vector3 } from "@babylonjs/core";
 
 import { SpacePostProcess } from "./spacePostProcess";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
-import { Star } from "../bodies/stars/star";
 
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
-import { StarSystemManager } from "../bodies/starSystemManager";
 import { PlayerController } from "../player/playerController";
 import { BodyType } from "../bodies/interfaces";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
+import { UberScene } from "../core/uberScene";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -20,7 +19,7 @@ export interface StarfieldSettings {
 export class StarfieldPostProcess extends SpacePostProcess {
     settings: StarfieldSettings;
 
-    constructor(name: string, player: PlayerController, starSystem: StarSystemManager) {
+    constructor(name: string, player: PlayerController, scene: UberScene) {
         const settings: StarfieldSettings = {
             foo: 1
         };
@@ -32,7 +31,7 @@ export class StarfieldPostProcess extends SpacePostProcess {
                 get: () => {
                     //TODO: probably should be in the glsl
                     let vis = 1.0;
-                    for (const star of starSystem.stars) {
+                    for (const star of scene.getStarSystem().stars) {
                         vis = Math.min(vis, 1.0 - Vector3.Dot(star.getAbsolutePosition().normalizeToNew(), player.getForwardDirection()));
                     }
                     vis /= 2;
@@ -42,7 +41,7 @@ export class StarfieldPostProcess extends SpacePostProcess {
                         if (planet.postProcesses.atmosphere != null) {
                             const height = planet.getAbsolutePosition().length();
                             const maxHeight = planet.postProcesses.atmosphere.settings.atmosphereRadius;
-                            for (const star of starSystem.stars) {
+                            for (const star of scene.getStarSystem().stars) {
                                 const sunDir = planet.getAbsolutePosition().subtract(star.getAbsolutePosition()).normalize();
                                 vis2 = Math.min(vis2, (height / maxHeight) ** 24 + Math.max(Vector3.Dot(sunDir, planet.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5);
                             }
@@ -56,18 +55,18 @@ export class StarfieldPostProcess extends SpacePostProcess {
                 name: "time",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return starSystem.getTime() % 100000;
+                    return scene.getStarSystem().getTime() % 100000;
                 }
             }
         ];
 
         const samplers: ShaderSamplers = [];
 
-        super(name, shaderName, uniforms, samplers, starSystem);
+        super(name, shaderName, uniforms, samplers, scene.getStarSystem());
 
         this.settings = settings;
 
-        for (const pipeline of starSystem.pipelines) {
+        for (const pipeline of scene.pipelines) {
             pipeline.starfields.push(this);
         }
     }

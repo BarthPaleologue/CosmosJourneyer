@@ -2,7 +2,7 @@ import { Mesh, MeshBuilder } from "@babylonjs/core";
 
 import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
-import { StarSystemManager } from "../starSystemManager";
+import { StarSystem } from "../starSystem";
 import { PlanetPhysicalProperties } from "../physicalProperties";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
@@ -22,7 +22,7 @@ export class GasPlanet extends AbstractBody {
     private readonly mesh: Mesh;
     readonly material: GasPlanetMaterial;
 
-    constructor(name: string, starSystemManager: StarSystemManager, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(name: string, starSystemManager: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystemManager, seed, parentBodies);
 
         this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng);
@@ -44,7 +44,7 @@ export class GasPlanet extends AbstractBody {
             },
             starSystemManager.scene
         );
-        starSystemManager.registerMeshDepth(this.mesh);
+        starSystemManager.scene.registerMeshDepth(this.mesh);
         this.mesh.parent = this.transform;
 
         this.material = new GasPlanetMaterial(this, starSystemManager.scene);
@@ -56,7 +56,7 @@ export class GasPlanet extends AbstractBody {
         };
 
         // FIXME: implement multiple stars
-        const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem);
+        const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene);
         atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
         atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng) / 6;
         atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;

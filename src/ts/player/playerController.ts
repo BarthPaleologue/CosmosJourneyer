@@ -1,8 +1,8 @@
 import { Vector3, FreeCamera, Scene } from "@babylonjs/core";
 import { AbstractBody } from "../bodies/abstractBody";
-import { ITransformable } from "../transforms/iTransformable";
+import { ITransformable } from "../core/transforms/iTransformable";
 import { Input } from "../inputs/input";
-import { BasicTransform } from "../transforms/basicTransform";
+import { BasicTransform } from "../core/transforms/basicTransform";
 
 export class PlayerController extends BasicTransform implements ITransformable {
     nearestBody: AbstractBody | null;
