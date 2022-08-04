@@ -45,7 +45,8 @@ Assets.onFinish = () => {
 
     console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
-    const starSystem = new StarSystem(scene);
+    const starSystemSeed = 0;
+    const starSystem = new StarSystem(starSystemSeed, scene);
 
     scene.setStarSystem(starSystem);
 

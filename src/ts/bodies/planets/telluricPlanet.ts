@@ -39,8 +39,10 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
     isSatelliteOfTelluric = false;
 
-    constructor(id: string, starSystemManager: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
-        super(id, starSystemManager, seed, parentBodies);
+    constructor(id: string, starSystem: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
+        super(id, starSystem, seed, parentBodies);
+
+        starSystem.planets.push(this);
 
         for (const parentBody of parentBodies) {
             if (parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true;
@@ -85,10 +87,10 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         if (pressure > epsilon) {
             if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
                 this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
-                const ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystemManager.scene);
+                const ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystem.scene);
                 this.postProcesses.ocean = ocean;
 
-                const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystemManager.scene);
+                const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystem.scene);
                 clouds.settings.cloudCoverage = Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
                 this.postProcesses.clouds = clouds;
             } else {
@@ -123,7 +125,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             mountainsFrequency: 20 * ratio,
         };
 
-        this.material = new TelluricMaterial(this, starSystemManager.scene);
+        this.material = new TelluricMaterial(this, starSystem.scene);
 
         this.sides = [
             new ChunkTree(Direction.Up, this),

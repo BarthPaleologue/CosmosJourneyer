@@ -35,7 +35,7 @@ export class Star extends AbstractBody {
         //TODO: make it dependent on star type
         this.radius = randRange(50, 200, this.rng) * Settings.EARTH_RADIUS;
 
-        starSystemManager.stars.push(this);
+        starSystemManager.addStar(this)
 
         this.physicalProperties = {
             //TODO: do not hardcode

@@ -22,8 +22,10 @@ export class GasPlanet extends AbstractBody {
     private readonly mesh: Mesh;
     readonly material: GasPlanetMaterial;
 
-    constructor(name: string, starSystemManager: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
-        super(name, starSystemManager, seed, parentBodies);
+    constructor(name: string, starSystem: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
+        super(name, starSystem, seed, parentBodies);
+
+        starSystem.planets.push(this);
 
         this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng);
 
@@ -42,12 +44,12 @@ export class GasPlanet extends AbstractBody {
                 diameter: this.radius * 2,
                 segments: 64
             },
-            starSystemManager.scene
+            starSystem.scene
         );
-        starSystemManager.scene.registerMeshDepth(this.mesh);
+        starSystem.scene.registerMeshDepth(this.mesh);
         this.mesh.parent = this.transform;
 
-        this.material = new GasPlanetMaterial(this, starSystemManager.scene);
+        this.material = new GasPlanetMaterial(this, starSystem.scene);
         this.mesh.material = this.material;
 
         this.postProcesses = {
