@@ -62,7 +62,7 @@ export class StarfieldPostProcess extends SpacePostProcess {
 
         const samplers: ShaderSamplers = [];
 
-        super(name, shaderName, uniforms, samplers, scene.getStarSystem());
+        super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
 

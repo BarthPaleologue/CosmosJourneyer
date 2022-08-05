@@ -28,6 +28,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
     override readonly physicalProperties: SolidPhysicalProperties;
     override readonly bodyType = BodyType.TELLURIC;
     override readonly radius: number;
+    readonly ratio: number;
 
     override readonly postProcesses: TelluricPlanetPostProcesses;
 
@@ -63,7 +64,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng)) * Settings.EARTH_RADIUS;
         }
 
-        const ratio = this.radius / Settings.EARTH_RADIUS;
+        this.ratio = this.radius / Settings.EARTH_RADIUS;
 
         this.physicalProperties = {
             mass: 10,
@@ -113,7 +114,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.rng), 0, 0.95);
 
         this.terrainSettings = {
-            continentsFrequency: ratio,
+            continentsFrequency: this.ratio,
             continentsFragmentation: continentsFragmentation,
 
             bumpsFrequency: 30,
@@ -122,8 +123,10 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             maxMountainHeight: 13e3,
             continentBaseHeight: this.oceanLevel * 2,
 
-            mountainsFrequency: 20 * ratio,
+            mountainsFrequency: 20 * this.ratio,
         };
+
+        if(this.isSatelliteOfTelluric) this.terrainSettings.continentsFragmentation = 0;
 
         this.material = new TelluricMaterial(this, starSystem.scene);
 

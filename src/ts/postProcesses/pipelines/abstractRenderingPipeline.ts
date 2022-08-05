@@ -14,6 +14,7 @@ import { AtmosphericScatteringPostProcess } from "../planetPostProcesses/atmosph
 import { RingsPostProcess } from "../planetPostProcesses/ringsPostProcess";
 import { VolumetricCloudsPostProcess } from "../planetPostProcesses/volumetricCloudsPostProcess";
 import { UberScene } from "../../core/uberScene";
+import { OverlayPostProcess } from "../overlayPostProcess";
 
 export enum PostProcessType {
     Starfields,
@@ -102,6 +103,10 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
 
         this.addEffect(new PostProcessRenderEffect(this.engine, "colorCorrectionRenderEffect", () => {
             return [this.scene.colorCorrection];
+        }));
+
+        this.addEffect(new PostProcessRenderEffect(this.engine, "overlayRenderEffect", () => {
+            return [this.scene.overlay];
         }));
         //this.addEffect(new BloomEffect(this.scene, 1, 0.2, 3));
     }

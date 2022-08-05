@@ -7,7 +7,7 @@ import { BasicTransform } from "../core/transforms/basicTransform";
 export class PlayerController extends BasicTransform implements ITransformable {
     nearestBody: AbstractBody | null;
 
-    collisionRadius = 100;
+    collisionRadius = 10;
 
     camera: FreeCamera;
 

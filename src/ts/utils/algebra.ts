@@ -1,4 +1,4 @@
-import { Quaternion, Vector3 } from "@babylonjs/core";
+import { Quaternion, Vector3, Vector4 } from "@babylonjs/core";
 import { IVector3Like } from "@babylonjs/core/Maths/math.like";
 
 /**
@@ -179,6 +179,14 @@ export function flattenVector3Array(vector3Array: Vector3[]): number[] {
     const result: number[] = [];
     for (const vector3 of vector3Array) {
         result.push(vector3.x, vector3.y, vector3.z);
+    }
+    return result;
+}
+
+export function flattenVector4Array(vector4Array: Vector4[]): number[] {
+    const result: number[] = [];
+    for (const vector4 of vector4Array) {
+        result.push(vector4.x, vector4.y, vector4.z, vector4.w);
     }
     return result;
 }

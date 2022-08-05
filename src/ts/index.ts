@@ -179,7 +179,8 @@ Assets.onFinish = () => {
     }
 
     document.addEventListener("keydown", (e) => {
-        if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, player.camera, { precision: 4 });
+        if (e.key == "o") scene.isOverlayEnabled = !scene.isOverlayEnabled;
+        if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getPlayer().camera, { precision: 4 });
         if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
         if (e.key == "w" && player.isOrbiting())

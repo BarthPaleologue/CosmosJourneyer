@@ -8,6 +8,7 @@ import { ChunkForge } from "../chunks/chunkForge";
 import { Settings } from "../settings";
 import { PlayerController } from "../player/playerController";
 import { ColorCorrection } from "../postProcesses/colorCorrection";
+import { OverlayPostProcess } from "../postProcesses/overlayPostProcess";
 
 export class UberScene extends Scene {
     starSystem: StarSystem | null = null;
@@ -20,6 +21,9 @@ export class UberScene extends Scene {
     readonly pipelines: AbstractRenderingPipeline[];
 
     readonly colorCorrection: ColorCorrection;
+    readonly overlay: OverlayPostProcess;
+
+    isOverlayEnabled = true;
 
     readonly depthRenderer: DepthRenderer;
     readonly _chunkForge: ChunkForge;
@@ -31,6 +35,7 @@ export class UberScene extends Scene {
         this.pipelines = [this.spaceRenderingPipeline, this.surfaceRenderingPipeline];
 
         this.colorCorrection = new ColorCorrection("colorCorrection", this);
+        this.overlay = new OverlayPostProcess("overlay", this);
 
         this.depthRenderer = new DepthRenderer(this);
         this.customRenderTargets.push(this.depthRenderer.getDepthMap());

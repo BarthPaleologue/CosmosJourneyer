@@ -39,6 +39,6 @@ export abstract class PlanetPostProcess extends SpacePostProcess {
 
         uniforms.push(...otherUniforms);
 
-        super(name, fragmentName, uniforms, otherSamplers, scene.getStarSystem());
+        super(name, fragmentName, uniforms, otherSamplers, scene);
     }
 }

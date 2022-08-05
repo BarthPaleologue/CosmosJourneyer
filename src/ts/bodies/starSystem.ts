@@ -67,7 +67,7 @@ export class StarSystem {
     public makeGasPlanet(): void {
         const planet = new GasPlanet(`gasPlanet`, this, this.rng(), this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
-        this.makeSatellites(planet, randRangeInt(0, 7, planet.rng));
+        this.makeSatellites(planet, randRangeInt(0, 3, planet.rng));
     }
 
     public makePlanets(n: number): void {
