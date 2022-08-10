@@ -39,6 +39,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
     readonly material: TelluricMaterial;
 
     isSatelliteOfTelluric = false;
+    isSatelliteOfGas = false;
 
     constructor(id: string, starSystem: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
         super(id, starSystem, seed, parentBodies);
@@ -47,6 +48,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
         for (const parentBody of parentBodies) {
             if (parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true;
+            if (parentBody.bodyType == BodyType.GAZ) this.isSatelliteOfGas = true;
         }
 
         let pressure;
@@ -58,11 +60,13 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
         const waterAmount = Math.max(normalRandom(1.0, 0.3, this.rng), 0);
 
-        if (this.isSatelliteOfTelluric) {
-            this.radius = Math.max(0.05, normalRandom(0.2, 0.05, this.rng)) * Settings.EARTH_RADIUS;
+        if (this.isSatelliteOfTelluric || this.isSatelliteOfGas) {
+            this.radius = Math.max(0.02, normalRandom(0.08, 0.03, this.rng)) * Settings.EARTH_RADIUS;
         } else {
             this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng)) * Settings.EARTH_RADIUS;
         }
+
+        if(this.radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
 
         this.ratio = this.radius / Settings.EARTH_RADIUS;
 
@@ -107,7 +111,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             this.oceanLevel = 0;
         }
 
-        if (uniformRandBool(0.6, this.rng)) {
+        if (uniformRandBool(0.6, this.rng) && !this.isSatelliteOfTelluric) {
             this.createRings();
         }
 

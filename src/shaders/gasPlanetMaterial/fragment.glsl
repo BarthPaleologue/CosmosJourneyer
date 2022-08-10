@@ -128,6 +128,8 @@ void main() {
         color = lerp(color1, color2, sep1);
         color = lerp(color, color3, sep2);
         color = lerp(color, color4, sep3);
+
+        color = min(color * 1.2, vec3(1.0));
     }
 
     // suppresion du reflet partout hors la neige

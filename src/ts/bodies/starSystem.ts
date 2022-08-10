@@ -126,7 +126,8 @@ export class StarSystem {
                 nearest = body;
             }
         }
-        return nearest!;
+        if (nearest == null) throw new Error("There are no bodies in the solar system");
+        return nearest;
     }
 
     /**
@@ -142,7 +143,8 @@ export class StarSystem {
                 nearest = body;
             }
         }
-        return nearest!;
+        if (nearest == null) throw new Error("There are no bodies in the solar system");
+        return nearest;
     }
 
     public getTime() {

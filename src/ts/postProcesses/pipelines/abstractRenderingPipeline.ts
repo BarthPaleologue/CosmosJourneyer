@@ -14,7 +14,6 @@ import { AtmosphericScatteringPostProcess } from "../planetPostProcesses/atmosph
 import { RingsPostProcess } from "../planetPostProcesses/ringsPostProcess";
 import { VolumetricCloudsPostProcess } from "../planetPostProcesses/volumetricCloudsPostProcess";
 import { UberScene } from "../../core/uberScene";
-import { OverlayPostProcess } from "../overlayPostProcess";
 
 export enum PostProcessType {
     Starfields,

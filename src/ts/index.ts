@@ -22,6 +22,7 @@ import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { GasPlanet } from "./bodies/planets/gasPlanet";
+import { AtmosphericScatteringPostProcess } from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 
 const bodyEditor = new BodyEditor();
 
@@ -33,7 +34,8 @@ bodyEditor.setCanvas(canvas);
 
 const [engine, scene] = initEngineScene(canvas);
 
-Assets.onFinish = () => {
+
+Assets.Init(scene).then(() => {
     const mouse = new Mouse(canvas, 1e5);
 
     const player = new PlayerController(scene);
@@ -132,7 +134,7 @@ Assets.onFinish = () => {
 
     ares.material.updateManual();
 
-    const aresAtmosphere = ares.postProcesses.atmosphere!;
+    const aresAtmosphere = ares.postProcesses.atmosphere as AtmosphericScatteringPostProcess;
     aresAtmosphere.settings.redWaveLength = 500;
     aresAtmosphere.settings.greenWaveLength = 680;
     aresAtmosphere.settings.blueWaveLength = 670;
@@ -157,11 +159,11 @@ Assets.onFinish = () => {
     function updateScene() {
         const deltaTime = engine.getDeltaTime() / 1000;
 
-        player.nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.getAbsolutePosition());
+        scene.getPlayer().nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.getAbsolutePosition());
 
-        bodyEditor.update(player);
+        bodyEditor.update(scene.getPlayer());
 
-        document.getElementById("planetName")!.innerText = player.isOrbiting() ? player.nearestBody.name : "Outer Space";
+        document.getElementById("planetName")!.innerText = player.isOrbiting() ? scene.getPlayer().getNearestBody().name : "Outer Space";
 
         starSystem.translateAllBodies(player.update(deltaTime));
 
@@ -192,9 +194,7 @@ Assets.onFinish = () => {
         scene.registerBeforeRender(() => updateScene());
         engine.runRenderLoop(() => scene.render());
     });
-};
-
-Assets.Init(scene);
+});
 
 window.addEventListener("resize", () => {
     bodyEditor.resize();

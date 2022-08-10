@@ -3,7 +3,7 @@ export function clearAllEventListenersById(id: string): HTMLElement {
     if (oldElement == null) throw new Error(`Could not find #${id} in document`);
     const newElement = oldElement.cloneNode(true);
     oldElement.parentNode!.replaceChild(newElement, oldElement);
-    return document.getElementById(id)!;
+    return document.getElementById(id) as HTMLElement;
 }
 
 export function showPanel(id: string, condition = true) {

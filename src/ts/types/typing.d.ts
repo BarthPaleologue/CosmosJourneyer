@@ -9,3 +9,4 @@ declare module "*.css";
 declare module "*.glsl";
 
 declare module "*.glb";
+declare module "*.obj";

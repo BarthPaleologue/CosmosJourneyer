@@ -1,6 +1,5 @@
-import { Camera, Vector3, Vector4 } from "@babylonjs/core";
+import { Vector3, Vector4 } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
-import { StarSystem } from "../bodies/starSystem";
 import { IPostProcess } from "./iPostProcess";
 import { UberPostProcess } from "./uberPostProcess";
 import { UberScene } from "../core/uberScene";

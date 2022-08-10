@@ -82,6 +82,11 @@ export class PlayerController extends BasicTransform implements ITransformable {
         }
     }
 
+    public getNearestBody(): AbstractBody {
+        if (this.nearestBody == null) throw new Error("No nearest body");
+        return this.nearestBody;
+    }
+
     public update(deltaTime: number): Vector3 {
         const playerMovement = Vector3.Zero();
         for (const input of this.inputs) {

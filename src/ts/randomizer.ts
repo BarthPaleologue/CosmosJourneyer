@@ -10,15 +10,13 @@ import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystem } from "./bodies/starSystem";
 
-import { randRange, uniformRandBool } from "extended-random";
+import { randRange } from "extended-random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Settings } from "./settings";
 import { BodyType } from "./bodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
-
-import { alea } from "seedrandom";
 
 const bodyEditor = new BodyEditor();
 
@@ -30,7 +28,8 @@ bodyEditor.setCanvas(canvas);
 
 const [engine, scene] = initEngineScene(canvas);
 
-Assets.onFinish = () => {
+
+Assets.Init(scene).then(() => {
     const mouse = new Mouse(canvas, 1e5);
 
     const player = new PlayerController(scene);
@@ -98,9 +97,7 @@ Assets.onFinish = () => {
 
         engine.runRenderLoop(() => scene.render());
     });
-};
-
-Assets.Init(scene);
+});
 
 window.addEventListener("resize", () => {
     bodyEditor.resize();
