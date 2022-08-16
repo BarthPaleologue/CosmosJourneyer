@@ -53,17 +53,17 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
         let pressure;
         if (this.isSatelliteOfTelluric) {
-            pressure = Math.max(normalRandom(0.01, 0.01, this.rng), 0);
+            pressure = Math.max(normalRandom(0.01, 0.01, this.getRNG(), 30), 0);
         } else {
-            pressure = Math.max(normalRandom(0.9, 0.2, this.rng), 0);
+            pressure = Math.max(normalRandom(0.9, 0.2, this.getRNG(), 30), 0);
         }
 
-        const waterAmount = Math.max(normalRandom(1.0, 0.3, this.rng), 0);
+        const waterAmount = Math.max(normalRandom(1.0, 0.3, this.getRNG(), 31), 0);
 
         if (this.isSatelliteOfTelluric || this.isSatelliteOfGas) {
-            this.radius = Math.max(0.02, normalRandom(0.08, 0.03, this.rng)) * Settings.EARTH_RADIUS;
+            this.radius = Math.max(0.02, normalRandom(0.08, 0.03, this.getRNG(), 32)) * Settings.EARTH_RADIUS;
         } else {
-            this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng)) * Settings.EARTH_RADIUS;
+            this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.getRNG(), 32)) * Settings.EARTH_RADIUS;
         }
 
         if(this.radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
@@ -103,19 +103,19 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             }
             const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene);
             atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
-            atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng) / 6;
-            atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;
-            atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng) / 6;
+            atmosphere.settings.redWaveLength *= 1 + centeredRand(this.getRNG(), 40) / 6;
+            atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.getRNG(), 41) / 6;
+            atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.getRNG(), 42) / 6;
             this.postProcesses.atmosphere = atmosphere;
         } else {
             this.oceanLevel = 0;
         }
 
-        if (uniformRandBool(0.6, this.rng) && !this.isSatelliteOfTelluric) {
+        if (uniformRandBool(0.6, this.getRNG(), 50) && !this.isSatelliteOfTelluric) {
             this.createRings();
         }
 
-        const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.rng), 0, 0.95);
+        const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.getRNG(), 60), 0, 0.95);
 
         this.terrainSettings = {
             continentsFrequency: this.ratio,

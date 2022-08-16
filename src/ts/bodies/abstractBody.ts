@@ -9,8 +9,8 @@ import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../orb
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { normalRandom, randRange } from "extended-random";
-import { alea } from "seedrandom";
 import { BasicTransform } from "../core/transforms/basicTransform";
+import { seededSquirrelNoise } from "../utils/squirrelNoise";
 
 export abstract class AbstractBody extends BasicTransform implements IOrbitalBody, ISeedable {
     abstract readonly bodyType: BodyType;
@@ -25,7 +25,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
 
     readonly seed: number;
 
-    readonly rng: () => number;
+    readonly rng: (step: number) => number;
 
     abstract readonly radius: number;
 
@@ -39,7 +39,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         this.name = name;
         this.seed = seed;
 
-        this.rng = alea(seed.toString());
+        this.rng = seededSquirrelNoise(seed);
 
         this.starSystem = starSystemManager;
         starSystemManager.addBody(this);
@@ -54,12 +54,12 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         if (minDepth == -1) this.depth = 0;
         else this.depth = minDepth + 1;
 
-        this.rotate(Axis.X, normalRandom(0, 0.2, this.rng));
-        this.rotate(Axis.Z, normalRandom(0, 0.2, this.rng));
+        this.rotate(Axis.X, normalRandom(0, 0.2, this.getRNG(), 0));
+        this.rotate(Axis.Z, normalRandom(0, 0.2, this.getRNG(), 2));
 
         // TODO: do not hardcode
-        const periapsis = this.rng() * 5000000e3;
-        const apoapsis = periapsis * (1 + this.rng() / 10);
+        const periapsis = this.rng(10) * 5000000e3;
+        const apoapsis = periapsis * (1 + this.rng(11) / 10);
 
         this.orbitalProperties = {
             periapsis: periapsis,
@@ -67,6 +67,10 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
             period: getOrbitalPeriod(periapsis, apoapsis, this.parentBodies),
             orientationQuaternion: Quaternion.Identity()
         };
+    }
+
+    public getRNG(): (step?: number) => number {
+        return this.rng as (step?: number) => number;
     }
 
     /**
@@ -92,9 +96,9 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
 
     public createRings(): RingsPostProcess {
         const rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem.scene);
-        rings.settings.ringStart = randRange(1.8, 2.2, this.rng);
-        rings.settings.ringEnd = randRange(2.1, 2.9, this.rng);
-        rings.settings.ringOpacity = this.rng();
+        rings.settings.ringStart = randRange(1.8, 2.2, this.getRNG(), 20);
+        rings.settings.ringEnd = randRange(2.1, 2.9, this.getRNG(), 21);
+        rings.settings.ringOpacity = this.rng(22);
         this.postProcesses.rings = rings;
         return rings;
     }

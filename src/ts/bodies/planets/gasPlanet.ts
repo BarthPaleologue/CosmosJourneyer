@@ -27,7 +27,7 @@ export class GasPlanet extends AbstractBody {
 
         starSystem.planets.push(this);
 
-        this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng);
+        this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.getRNG(), 33);
 
         this.physicalProperties = {
             // FIXME: choose physically accurates values
@@ -60,13 +60,13 @@ export class GasPlanet extends AbstractBody {
         // FIXME: implement multiple stars
         const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene);
         atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
-        atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng) / 6;
-        atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng) / 6;
-        atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng) / 6;
+        atmosphere.settings.redWaveLength *= 1 + centeredRand(this.getRNG(), 70) / 6;
+        atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.getRNG(), 71) / 6;
+        atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.getRNG(), 72) / 6;
 
         this.postProcesses.atmosphere = atmosphere;
 
-        if (uniformRandBool(0.8, this.rng)) this.createRings();
+        if (uniformRandBool(0.8, this.getRNG(), 73)) this.createRings();
     }
 
     public override update(player: PlayerController, deltaTime: number): void {

@@ -162,7 +162,7 @@ void main() {
 	float moistureSharpness = 10.0;
 	float moistureFactor = smoothSharpener(moisture01, moistureSharpness);
 
-	vec3 plainColor2 = 0.7 * plainColor;
+	vec3 plainColor2 = 0.8 * plainColor;
 	vec3 plainColor = lerp(plainColor, plainColor2, smoothSharpener(fractalSimplex4(vec4(vUnitSamplePoint * 100.0, 0.0), 4, 2.0, 2.0), 5.0));
 
 
@@ -219,7 +219,7 @@ void main() {
 
 	// TODO: make uniforms
 	float normalStrengthNear = 1.0;
-	float normalStrengthFar = 1.0;
+	float normalStrengthFar = 0.2;
 
 	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.001, normalSharpness, bottomFactor * normalStrengthNear);
 	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.00001, normalSharpness, bottomFactor * normalStrengthFar);

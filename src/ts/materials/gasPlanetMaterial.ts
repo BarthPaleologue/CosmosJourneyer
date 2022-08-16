@@ -57,22 +57,22 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         this.planet = planet;
 
-        const hue1 = normalRandom(240, 20, this.planet.rng);
-        const hue2 = normalRandom(0, 20, this.planet.rng);
+        const hue1 = normalRandom(240, 20, this.planet.rng as (step?: number) => number, 70);
+        const hue2 = normalRandom(0, 20, this.planet.rng as (step?: number) => number, 72);
 
         const divergence = 25;
 
-        const color1 = Color3.FromHSV(hue1 % 360, randRange(0.4, 0.9, this.planet.rng), randRange(0.7, 0.9, this.planet.rng));
-        const color2 = Color3.FromHSV(hue2 % 360, randRange(0.6, 0.9, this.planet.rng), randRange(0.1, 0.9, this.planet.rng));
-        const color3 = Color3.FromHSV((hue1 + divergence) % 360, randRange(0.4, 0.9, this.planet.rng), randRange(0.7, 0.9, this.planet.rng));
-        const color4 = Color3.FromHSV((hue2 + divergence) % 360, randRange(0.6, 0.9, this.planet.rng), randRange(0.1, 0.9, this.planet.rng));
+        const color1 = Color3.FromHSV(hue1 % 360, randRange(0.4, 0.9, this.planet.getRNG(), 72), randRange(0.7, 0.9, this.planet.getRNG(), 73));
+        const color2 = Color3.FromHSV(hue2 % 360, randRange(0.6, 0.9, this.planet.getRNG(), 74), randRange(0.1, 0.9, this.planet.getRNG(), 75));
+        const color3 = Color3.FromHSV((hue1 + divergence) % 360, randRange(0.4, 0.9, this.planet.getRNG(), 76), randRange(0.7, 0.9, this.planet.getRNG(), 77));
+        const color4 = Color3.FromHSV((hue2 + divergence) % 360, randRange(0.6, 0.9, this.planet.getRNG(), 78), randRange(0.1, 0.9, this.planet.getRNG(), 79));
 
         this.colorSettings = {
             color1: color1,
             color2: color2,
             color3: color3,
             color4: color4,
-            colorSharpness: randRangeInt(40, 80, this.planet.rng) / 10
+            colorSharpness: randRangeInt(40, 80, this.planet.getRNG(), 80) / 10
         };
 
         this.onBindObservable.add(() => {

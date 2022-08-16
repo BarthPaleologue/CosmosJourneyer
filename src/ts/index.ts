@@ -23,6 +23,7 @@ import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { GasPlanet } from "./bodies/planets/gasPlanet";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import { squirrelNoise } from "./utils/squirrelNoise";
 
 const bodyEditor = new BodyEditor();
 
@@ -33,7 +34,6 @@ canvas.height = window.innerHeight;
 bodyEditor.setCanvas(canvas);
 
 const [engine, scene] = initEngineScene(canvas);
-
 
 Assets.Init(scene).then(() => {
     const mouse = new Mouse(canvas, 1e5);
