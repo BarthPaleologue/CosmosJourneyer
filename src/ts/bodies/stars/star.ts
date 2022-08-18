@@ -33,7 +33,7 @@ export class Star extends AbstractBody {
         super(name, starSystemManager, seed, parentBodies);
 
         //TODO: make it dependent on star type
-        this.radius = randRange(50, 200, this.getRNG(), 49) * Settings.EARTH_RADIUS;
+        this.radius = randRange(50, 200, this.rng, 49) * Settings.EARTH_RADIUS;
 
         starSystemManager.addStar(this)
 
@@ -42,7 +42,7 @@ export class Star extends AbstractBody {
             mass: 1000,
             rotationPeriod: 24 * 60 * 60,
 
-            temperature: clamp(normalRandom(5778, 2000, this.getRNG(), 50), 4000, 10000)
+            temperature: clamp(normalRandom(5778, 2000, this.rng, 50), 4000, 10000)
         };
 
         this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius * 2, segments: 32 }, starSystemManager.scene);
@@ -57,10 +57,10 @@ export class Star extends AbstractBody {
             rings: null
         };
 
-        if (uniformRandBool(Star.RING_PROPORTION, this.getRNG(), 60)) {
+        if (uniformRandBool(Star.RING_PROPORTION, this.rng, 60)) {
             const rings = this.createRings();
-            rings.settings.ringStart = normalRandom(3, 1, this.getRNG(), 61);
-            rings.settings.ringEnd = normalRandom(7, 1, this.getRNG(), 63);
+            rings.settings.ringStart = normalRandom(3, 1, this.rng, 61);
+            rings.settings.ringEnd = normalRandom(7, 1, this.rng, 63);
             rings.settings.ringOpacity = this.rng(65);
         }
     }

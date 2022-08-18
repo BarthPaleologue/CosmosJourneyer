@@ -26,6 +26,8 @@ uniform float visibility; // visibility of the starfield
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 
 #pragma glslify: completeWorley = require(./utils/worley.glsl)
+
+#pragma glslify: fractalSimplex4 = require(./utils/simplex4.glsl)
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
 void main() {
@@ -50,18 +52,34 @@ void main() {
 
         vec3 samplePoint = normalize(cameraPosition + max(t0, t1) * rayDir);
 
-        float noiseValue = 1.0 - completeWorley(samplePoint * 100.0, 1, 2.0, 2.0);
-        noiseValue = smoothstep(0.87, 1.0, noiseValue);
+        vec3 nebulaSamplePoint = samplePoint + vec3(
+            completeNoise(samplePoint, 1, 2.0, 2.0),
+            37.0 * completeNoise(samplePoint, 1, 2.0, 2.0),
+            -15.0 * completeNoise(samplePoint, 1, 2.0, 2.0)
+        ) * 0.1;
+        float nebulaNoise = 1.0 - completeWorley(nebulaSamplePoint, 1, 2.0, 2.0);
+        nebulaNoise = pow(nebulaNoise, 3.0);
+        //nebulaNoise = smoothstep(0.4, 0.6, nebulaNoise);
+
+        float detailNoise = fractalSimplex4(vec4(samplePoint * 10.0, 0.0), 5, 2.0, 2.0);
+        nebulaNoise *= detailNoise;
+
+        float starNoise = 1.0 - completeWorley(samplePoint * 150.0, 1, 2.0, 2.0);
+        starNoise = smoothstep(0.8, 1.0, starNoise);
 
         float colorSeparation = completeNoise(samplePoint * 200.0, 1, 2.0, 2.0);
 
-        float starLight = 0.0;
-        if(noiseValue > 0.05) starLight = saturate(noiseValue * 10.0);
+
+        float starLight = starNoise;
+        if(starNoise > 0.82) starLight = 1.0;
+        else starLight /= 1.5;
 
         vec3 color1 = vec3(1.0);
         vec3 color2 = vec3(0.4, 0.4, 2.0);
 
-        finalColor = starLight * lerp(color1, color2, colorSeparation) * visibility;
+        finalColor = 5.0 * starLight * lerp(color1, color2, colorSeparation) * visibility;
+
+        finalColor += nebulaNoise * vec3(0.3, 0.0, 0.0);
     }
 
     gl_FragColor = vec4(finalColor, 1.0); // displaying the final color

@@ -10,13 +10,14 @@ import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystem } from "./bodies/starSystem";
 
-import { randRange } from "extended-random";
+import { randRange, randRangeInt } from "extended-random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Settings } from "./settings";
 import { BodyType } from "./bodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
+import { squirrelNoise } from "squirrel-noise";
 
 const bodyEditor = new BodyEditor();
 
@@ -39,7 +40,7 @@ Assets.Init(scene).then(() => {
 
     scene.setPlayer(player);
 
-    const starSystemSeed = randRange(-1, 1);
+    const starSystemSeed = randRange(-1, 1, (step:number) => Math.random(), 0);
     const starSystem = new StarSystem(starSystemSeed, scene);
     scene.setStarSystem(starSystem);
 

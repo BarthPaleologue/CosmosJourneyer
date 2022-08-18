@@ -43,7 +43,7 @@ export class StarfieldPostProcess extends SpacePostProcess {
                             const maxHeight = planet.postProcesses.atmosphere.settings.atmosphereRadius;
                             for (const star of scene.getStarSystem().stars) {
                                 const sunDir = planet.getAbsolutePosition().subtract(star.getAbsolutePosition()).normalize();
-                                vis2 = Math.min(vis2, (height / maxHeight) ** 24 + Math.max(Vector3.Dot(sunDir, planet.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5);
+                                vis2 = Math.min(vis2, (height / maxHeight) ** 32 + Math.max(Vector3.Dot(sunDir, planet.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5);
                             }
                         }
                     }

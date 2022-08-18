@@ -39,7 +39,7 @@ export class ChunkTree {
     constructor(direction: Direction, planet: TelluricPlanet) {
         this.rootChunkLength = planet.getDiameter();
 
-        this.minDepth = Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 19), 0);
+        this.minDepth = 1;//Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 19), 0);
         this.maxDepth = Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 12), 0);
         //let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
         //console.log(spaceBetweenVertex);
