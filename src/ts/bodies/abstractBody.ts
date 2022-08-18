@@ -10,7 +10,7 @@ import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPost
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { normalRandom, randRange } from "extended-random";
 import { BasicTransform } from "../core/transforms/basicTransform";
-import { seededSquirrelNoise } from "../utils/squirrelNoise";
+import { seededSquirrelNoise } from "squirrel-noise";
 
 export abstract class AbstractBody extends BasicTransform implements IOrbitalBody, ISeedable {
     abstract readonly bodyType: BodyType;

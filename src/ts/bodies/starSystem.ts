@@ -9,7 +9,13 @@ import { TelluricPlanet } from "./planets/telluricPlanet";
 import { GasPlanet } from "./planets/gasPlanet";
 import { clamp } from "../utils/gradientMath";
 import { getOrbitalPeriod } from "../orbits/kepler";
-import { seededSquirrelNoise } from "../utils/squirrelNoise";
+import { seededSquirrelNoise } from "squirrel-noise";
+
+enum Steps {
+    GENERATE_STARS=100,
+    GENERATE_PLANETS=200,
+    CHOOSE_PLANET_TYPE=300,
+}
 
 export class StarSystem {
     readonly scene: UberScene;
@@ -44,7 +50,7 @@ export class StarSystem {
     public makeStars(n: number): void {
         if(n < 1) throw new Error("Cannot make less than 1 star");
         for (let i = 0; i < n; i++) {
-            const star = new Star(`star${i}`, this, this.rng(0), this.stars);
+            const star = new Star(`star${i}`, this, this.rng(Steps.GENERATE_STARS + this.stars.length), this.stars);
             //TODO: make this better, make it part of the generation
             star.orbitalProperties.periapsis = star.getRadius() * 4;
             star.orbitalProperties.apoapsis = star.getRadius() * 4;
@@ -52,7 +58,7 @@ export class StarSystem {
     }
 
     public makeTelluricPlanet(): void {
-        const planet = new TelluricPlanet(`telluricPlanet`, this, this.rng(this.planets.length), this.stars);
+        const planet = new TelluricPlanet(`telluricPlanet`, this, this.rng(Steps.GENERATE_PLANETS + this.planets.length), this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
         //TODO: use formula
         planet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.getRNG(), 80);
@@ -69,7 +75,7 @@ export class StarSystem {
     }
 
     public makeGasPlanet(): void {
-        const planet = new GasPlanet(`gasPlanet`, this, this.rng(this.planets.length), this.stars);
+        const planet = new GasPlanet(`gasPlanet`, this, this.rng(Steps.GENERATE_PLANETS + this.planets.length), this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
         this.makeSatellites(planet, randRangeInt(0, 3, planet.getRNG(), 86));
     }
@@ -77,7 +83,7 @@ export class StarSystem {
     public makePlanets(n: number): void {
         if(n < 0) throw new Error(`Cannot make a negative amount of planets : ${n}`);
         for (let i = 0; i < n; i++) {
-            if(uniformRandBool(0.5, this.getRNG(), this.planets.length)) {
+            if(uniformRandBool(0.5, this.getRNG(), Steps.CHOOSE_PLANET_TYPE + this.planets.length)) {
                 this.makeTelluricPlanet()
             } else {
                 this.makeGasPlanet()

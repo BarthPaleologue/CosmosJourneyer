@@ -23,7 +23,6 @@ import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { GasPlanet } from "./bodies/planets/gasPlanet";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
-import { squirrelNoise } from "./utils/squirrelNoise";
 
 const bodyEditor = new BodyEditor();
 
@@ -88,7 +87,7 @@ Assets.Init(scene).then(() => {
     };
 
     moon.terrainSettings.continentsFragmentation = 0.3;
-    moon.terrainSettings.maxMountainHeight = 10e3;
+    moon.terrainSettings.maxMountainHeight = 5e3;
     moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
     moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
     moon.material.colorSettings.steepColor.copyFrom(new Color3(92, 92, 92).scale(1 / 255));
