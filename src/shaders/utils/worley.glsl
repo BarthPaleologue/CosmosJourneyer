@@ -162,5 +162,4 @@ float completeWorley(vec3 p, int nbOctaves, float decay, float lacunarity) {
     return value / totalAmplitude;
 }
 
-#pragma glslify: export(worley)
 #pragma glslify: export(completeWorley)

@@ -25,7 +25,8 @@ uniform float visibility; // visibility of the starfield
 
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 
-#pragma glslify: fractalSimplex4 = require(./utils/simplex4.glsl, tanh=tanh)
+#pragma glslify: completeWorley = require(./utils/worley.glsl)
+#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
 void main() {
     vec3 screenColor = texture2D(textureSampler, vUV).rgb; // the current screen color
@@ -42,13 +43,15 @@ void main() {
 
     vec3 finalColor;
 
-    if(maximumDistance * 1.1 < cameraFar) finalColor = screenColor;
+    if(maximumDistance < cameraFar) finalColor = screenColor;
     else {
-        vec3 samplePoint = normalize(closestPoint);
+        float t0, t1;
+        rayIntersectSphere(cameraPosition, rayDir, vec3(0.0), 100.0, t0, t1);
 
-        float noiseValue = fractalSimplex4(vec4(samplePoint * 150.0, 0.0), 1, 2.0, 2.0);
-        float minValue = 0.87;
-        noiseValue = max(noiseValue - minValue, 0.0) / (1.0 - minValue);
+        vec3 samplePoint = normalize(cameraPosition + max(t0, t1) * rayDir);
+
+        float noiseValue = 1.0 - completeWorley(samplePoint * 100.0, 1, 2.0, 2.0);
+        noiseValue = smoothstep(0.87, 1.0, noiseValue);
 
         float colorSeparation = completeNoise(samplePoint * 200.0, 1, 2.0, 2.0);
 
