@@ -27,6 +27,8 @@ varying vec3 vPosition;
 varying vec3 vUnitSamplePoint;
 varying vec3 vSamplePoint;
 
+varying vec3 vLocalPosition;
+
 #pragma glslify: applyQuaternion = require(../utils/applyQuaternion.glsl)
 
 void main() {
@@ -39,10 +41,10 @@ void main() {
     #endif
     
     vPositionW = vec3(world * vec4(position, 1.0));
-    vNormalW = vec3(world * vec4(normal, 0.0));
+    vNormalW = vec3(world * vec4(normal, 1.0));
 
 	vPosition = vPositionW - planetPosition;
-
+	vLocalPosition = position;
 
 	vUnitSamplePoint = applyQuaternion(planetInverseRotationQuaternion, normalize(vPosition));
     vSphereNormalW = vec3(world * vec4(vUnitSamplePoint, 0.0));

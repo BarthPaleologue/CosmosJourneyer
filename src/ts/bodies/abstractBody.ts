@@ -73,7 +73,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         this.rotate(Axis.Z, normalRandom(0, 0.2, this.rng, Steps.AXIAL_TILT + 10));
 
         // TODO: do not hardcode
-        const periapsis = this.rng(Steps.ORBIT) * 5000000e3;
+        const periapsis = this.rng(Steps.ORBIT) * 30000000e3;
         const apoapsis = periapsis * (1 + this.rng(Steps.ORBIT + 10) / 10);
 
         this.orbitalProperties = {

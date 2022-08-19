@@ -1,7 +1,7 @@
 import { TerrainSettings } from "./terrainSettings";
 import { simplexNoiseLayer } from "./landscape/simplexNoiseLayer";
 import { LVector3 } from "../utils/algebra";
-import { multiply, smoothstep } from "../utils/gradientMath";
+import { multiply, pow, smoothstep } from "../utils/gradientMath";
 import { mountainLayer } from "./landscape/mountainLayer";
 import { continentLayer } from "./landscape/continentLayer";
 import { oneLayer, zeroLayer } from "./landscape/constantLayers";
@@ -21,7 +21,7 @@ export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction 
 
         const continentMaskGradient = LVector3.Zero();
         let continentMask = continents(unitSamplePoint, seed, continentMaskGradient);
-        continentMask = smoothstep(settings.continentsFragmentation, 1.1, continentMask, continentMaskGradient);
+        continentMask = smoothstep(settings.continentsFragmentation, settings.continentsFragmentation + 0.5, continentMask, continentMaskGradient);
 
         elevation += continentMask * settings.continentBaseHeight;
         outGradient.addInPlace(continentMaskGradient.scale(settings.continentBaseHeight));
@@ -31,7 +31,7 @@ export function makeTerrainFunction(settings: TerrainSettings): TerrainFunction 
         const mountainGradient = LVector3.Zero();
         let mountainElevation = mountains(unitSamplePoint, seed, mountainGradient);
 
-        mountainElevation = multiply(mountainElevation, smoothstep(0.0, 0.5, continentMask), mountainGradient, continentMaskGradient);
+        mountainElevation = multiply(mountainElevation, pow(continentMask, 2.0, continentMaskGradient), mountainGradient, continentMaskGradient);
 
         // Terrace Generation
 

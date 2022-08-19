@@ -11,8 +11,9 @@ varying vec3 vUnitSamplePoint;
 varying vec3 vSphereNormalW;
 varying vec3 vSamplePoint;
 
-varying vec3 vPosition; // position of the vertex in sphere space
+varying vec3 vPosition; // position of the vertex in chunk
 varying vec3 vNormal; // normal of the vertex in sphere space
+varying vec3 vLocalPosition;
 
 uniform mat4 world;
 
@@ -121,7 +122,7 @@ void main() {
 	float dayDuration = 1.0;
 	
 	// pressions
-	float waterSublimationPression = 0.006; //https://www.wikiwand.com/en/Sublimation_(phase_transition)#/Water
+	//float waterSublimationPression = 0.006; //https://www.wikiwand.com/en/Sublimation_(phase_transition)#/Water
 	
 	// Temperatures
 	
@@ -130,9 +131,9 @@ void main() {
 	float waterBoilingPoint01 = (waterBoilingPointCelsius(pressure) - minTemperature) / (maxTemperature - minTemperature);
 
 	//https://qph.fs.quoracdn.net/main-qimg-6a0fa3c05fb4db3d7d081680aec4b541
-	float co2SublimationTemperature = 0.0; // https://www.wikiwand.com/en/Sublimation_(phase_transition)#/CO2
+	//float co2SublimationTemperature = 0.0; // https://www.wikiwand.com/en/Sublimation_(phase_transition)#/CO2
 	// TODO: find the equation ; even better use a texture
-	float co2SublimationTemperature01 = (co2SublimationTemperature - minTemperature) / (maxTemperature - minTemperature);
+	//float co2SublimationTemperature01 = (co2SublimationTemperature - minTemperature) / (maxTemperature - minTemperature);
 
 	float temperature01 = computeTemperature01(elevation01, absLatitude01, ndl1, dayDuration);
 
