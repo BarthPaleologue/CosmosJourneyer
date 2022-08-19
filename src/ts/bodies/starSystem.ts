@@ -66,7 +66,7 @@ export class StarSystem {
             0.024 + centeredRand(planet.rng, 84) / 10
         );
         planet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng, 85);
-        planet.material.updateManual();
+        planet.material.updateConstants();
         this.makeSatellites(planet, randRangeInt(1, 3, planet.rng, 86));
     }
 

@@ -119,6 +119,7 @@ export class ChunkTree {
                 }
                 // TODO: check collision
                 //tree.mesh.intersectsMesh(observerPositionW, true)
+                //tree.mesh.computeWorldMatrix(true);
                 return tree;
             }
             return [

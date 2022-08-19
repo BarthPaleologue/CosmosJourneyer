@@ -332,13 +332,13 @@ export class BodyEditor {
         this.physicSliders.push(
             new Slider("minTemperature", document.getElementById("minTemperature") as HTMLElement, -273, 300, planet.physicalProperties.minTemperature, (val: number) => {
                 planet.physicalProperties.minTemperature = val;
-                planet.material.updateManual();
+                planet.material.updateConstants();
             })
         );
         this.physicSliders.push(
             new Slider("maxTemperature", document.getElementById("maxTemperature") as HTMLElement, -273, 300, planet.physicalProperties.maxTemperature, (val: number) => {
                 planet.physicalProperties.maxTemperature = val;
-                planet.material.updateManual();
+                planet.material.updateConstants();
             })
         );
     }
@@ -389,21 +389,21 @@ export class BodyEditor {
         this.surfaceSliders.push(
             new Slider("sandSize", document.getElementById("sandSize") as HTMLElement, 0, 300, planet.material.colorSettings.beachSize / 10, (val: number) => {
                 colorSettings.beachSize = val * 10;
-                material.updateManual();
+                material.updateConstants();
             })
         );
 
         this.surfaceSliders.push(
             new Slider("steepSharpness", document.getElementById("steepSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.steepSharpness * 10, (val: number) => {
                 colorSettings.steepSharpness = val / 10;
-                material.updateManual();
+                material.updateConstants();
             })
         );
 
         this.surfaceSliders.push(
             new Slider("normalSharpness", document.getElementById("normalSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.normalSharpness * 100, (val: number) => {
                 colorSettings.normalSharpness = val / 100;
-                material.updateManual();
+                material.updateConstants();
             })
         );
     }
@@ -659,23 +659,23 @@ export class BodyEditor {
         const colorSettings = material.colorSettings;
         document.getElementById("defaultMapButton")!.addEventListener("click", () => {
             colorSettings.mode = ColorMode.DEFAULT;
-            material.updateManual();
+            material.updateConstants();
         });
         document.getElementById("moistureMapButton")!.addEventListener("click", () => {
             colorSettings.mode = colorSettings.mode != ColorMode.MOISTURE ? ColorMode.MOISTURE : ColorMode.DEFAULT;
-            material.updateManual();
+            material.updateConstants();
         });
         document.getElementById("temperatureMapButton")!.addEventListener("click", () => {
             colorSettings.mode = colorSettings.mode != ColorMode.TEMPERATURE ? ColorMode.TEMPERATURE : ColorMode.DEFAULT;
-            material.updateManual();
+            material.updateConstants();
         });
         document.getElementById("normalMapButton")!.addEventListener("click", () => {
             colorSettings.mode = colorSettings.mode != ColorMode.NORMAL ? ColorMode.NORMAL : ColorMode.DEFAULT;
-            material.updateManual();
+            material.updateConstants();
         });
         document.getElementById("heightMapButton")!.addEventListener("click", () => {
             colorSettings.mode = colorSettings.mode != ColorMode.HEIGHT ? ColorMode.HEIGHT : ColorMode.DEFAULT;
-            material.updateManual();
+            material.updateConstants();
         });
     }
 

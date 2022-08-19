@@ -62,7 +62,7 @@ Assets.Init(scene).then(() => {
     planet.physicalProperties.rotationPeriod /= 20;
     planet.physicalProperties.minTemperature = -37;
     planet.physicalProperties.maxTemperature = 24;
-    planet.material.updateManual();
+    planet.material.updateConstants();
 
     planet.orbitalProperties = {
         period: 60 * 60 * 24 * 365.25,
@@ -94,7 +94,7 @@ Assets.Init(scene).then(() => {
 
     moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap);
     moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap);
-    moon.material.updateManual();
+    moon.material.updateConstants();
 
     const ares = new TelluricPlanet("Ares", starSystem, 432, starSystem.stars);
 
@@ -131,7 +131,7 @@ Assets.Init(scene).then(() => {
 
     ares.oceanLevel = Settings.OCEAN_DEPTH * ares.physicalProperties.waterAmount * ares.physicalProperties.pressure;
 
-    ares.material.updateManual();
+    ares.material.updateConstants();
 
     const aresAtmosphere = ares.postProcesses.atmosphere as AtmosphericScatteringPostProcess;
     aresAtmosphere.settings.redWaveLength = 500;

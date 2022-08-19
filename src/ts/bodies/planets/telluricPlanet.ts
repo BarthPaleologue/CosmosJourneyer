@@ -18,7 +18,9 @@ import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
 import { clamp } from "../../utils/gradientMath";
-import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import {
+    AtmosphericScatteringPostProcess
+} from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 
@@ -82,7 +84,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
         const waterAmount = Math.max(normalRandom(1.0, 0.3, this.rng, Steps.WATER_AMOUNT), 0);
 
-        if(this.radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
+        if (this.radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
 
         this.ratio = this.radius / Settings.EARTH_RADIUS;
 
@@ -132,22 +134,22 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         }
 
         const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.rng, Steps.TERRAIN), 0, 0.95);
-        console.log(continentsFragmentation)
+        console.log(continentsFragmentation);
 
         this.terrainSettings = {
             continentsFrequency: this.ratio,
             continentsFragmentation: continentsFragmentation,
 
-            bumpsFrequency: 30 * this.ratio,
+            bumpsFrequency: 6 * 30 * this.ratio,
 
             maxBumpHeight: 1.5e3,
             maxMountainHeight: 13e3,
             continentBaseHeight: this.oceanLevel * 2.5,
 
-            mountainsFrequency: 20 * this.ratio,
+            mountainsFrequency: 6 * 20 * this.ratio
         };
 
-        if(this.isSatelliteOfTelluric) this.terrainSettings.continentsFragmentation = 0;
+        if (this.isSatelliteOfTelluric) this.terrainSettings.continentsFragmentation = 0;
 
         this.material = new TelluricMaterial(this, starSystem.scene);
 
