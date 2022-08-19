@@ -22,6 +22,15 @@ import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPost
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 
+enum Steps {
+    RADIUS = 1000,
+    PRESSURE = 1100,
+    WATER_AMOUNT = 1200,
+    ATMOSPHERE = 1300,
+    RINGS = 1400,
+    TERRAIN = 1500,
+}
+
 export class TelluricPlanet extends AbstractBody implements RigidBody {
     oceanLevel: number;
 
@@ -41,8 +50,15 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
     isSatelliteOfTelluric = false;
     isSatelliteOfGas = false;
 
-    constructor(id: string, starSystem: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
-        super(id, starSystem, seed, parentBodies);
+    /**
+     * New Telluric Planet
+     * @param name The name of the planet
+     * @param starSystem The star system the planet is in
+     * @param seed The seed of the planet in [-1, 1]
+     * @param parentBodies The bodies the planet is orbiting
+     */
+    constructor(name: string, starSystem: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
+        super(name, starSystem, seed, parentBodies);
 
         starSystem.planets.push(this);
 
@@ -51,20 +67,20 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             if (parentBody.bodyType == BodyType.GAZ) this.isSatelliteOfGas = true;
         }
 
+        if (this.isSatelliteOfTelluric || this.isSatelliteOfGas) {
+            this.radius = Math.max(0.02, normalRandom(0.08, 0.03, this.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
+        } else {
+            this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
+        }
+
         let pressure;
         if (this.isSatelliteOfTelluric) {
-            pressure = Math.max(normalRandom(0.01, 0.01, this.rng, 30), 0);
+            pressure = Math.max(normalRandom(0.01, 0.01, this.rng, Steps.PRESSURE), 0);
         } else {
-            pressure = Math.max(normalRandom(0.9, 0.2, this.rng, 30), 0);
+            pressure = Math.max(normalRandom(0.9, 0.2, this.rng, Steps.PRESSURE), 0);
         }
 
-        const waterAmount = Math.max(normalRandom(1.0, 0.3, this.rng, 31), 0);
-
-        if (this.isSatelliteOfTelluric || this.isSatelliteOfGas) {
-            this.radius = Math.max(0.02, normalRandom(0.08, 0.03, this.rng, 32)) * Settings.EARTH_RADIUS;
-        } else {
-            this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, 32)) * Settings.EARTH_RADIUS;
-        }
+        const waterAmount = Math.max(normalRandom(1.0, 0.3, this.rng, Steps.WATER_AMOUNT), 0);
 
         if(this.radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
 
@@ -103,19 +119,19 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             }
             const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene);
             atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
-            atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng, 40) / 6;
-            atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng, 41) / 6;
-            atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng, 42) / 6;
+            atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE) / 6;
+            atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE + 10) / 6;
+            atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE + 20) / 6;
             this.postProcesses.atmosphere = atmosphere;
         } else {
             this.oceanLevel = 0;
         }
 
-        if (uniformRandBool(0.6, this.rng, 50) && !this.isSatelliteOfTelluric) {
+        if (uniformRandBool(0.6, this.rng, Steps.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
             this.createRings();
         }
 
-        const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.rng, 60), 0, 0.95);
+        const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.rng, Steps.TERRAIN), 0, 0.95);
         console.log(continentsFragmentation)
 
         this.terrainSettings = {

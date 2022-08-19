@@ -12,6 +12,12 @@ import { normalRandom, randRange } from "extended-random";
 import { BasicTransform } from "../core/transforms/basicTransform";
 import { seededSquirrelNoise } from "squirrel-noise";
 
+enum Steps {
+    AXIAL_TILT = 100,
+    ORBIT = 200,
+    RINGS = 300,
+}
+
 export abstract class AbstractBody extends BasicTransform implements IOrbitalBody, ISeedable {
     abstract readonly bodyType: BodyType;
 
@@ -35,16 +41,17 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
     depth: number;
 
     /**
-     *
-     * @param name
-     * @param starSystemManager
-     * @param seed
-     * @param parentBodies
-     * @protected
+     * An abstract representation of a celestial body
+     * @param name the name of the celestial body
+     * @param starSystemManager the star system manager that this body belongs to
+     * @param seed the seed for the random number generator in [-1, 1]
+     * @param parentBodies the parent bodies of this body
      */
     protected constructor(name: string, starSystemManager: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
         super(name);
         this.name = name;
+
+        console.assert(-1 <= seed && seed <= 1, "seed must be in [-1, 1]");
         this.seed = seed;
 
         this.rng = seededSquirrelNoise(seed * Number.MAX_SAFE_INTEGER);
@@ -62,12 +69,12 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         if (minDepth == -1) this.depth = 0;
         else this.depth = minDepth + 1;
 
-        this.rotate(Axis.X, normalRandom(0, 0.2, this.rng, 0));
-        this.rotate(Axis.Z, normalRandom(0, 0.2, this.rng, 2));
+        this.rotate(Axis.X, normalRandom(0, 0.2, this.rng, Steps.AXIAL_TILT));
+        this.rotate(Axis.Z, normalRandom(0, 0.2, this.rng, Steps.AXIAL_TILT + 10));
 
         // TODO: do not hardcode
-        const periapsis = this.rng(10) * 5000000e3;
-        const apoapsis = periapsis * (1 + this.rng(11) / 10);
+        const periapsis = this.rng(Steps.ORBIT) * 5000000e3;
+        const apoapsis = periapsis * (1 + this.rng(Steps.ORBIT + 10) / 10);
 
         this.orbitalProperties = {
             periapsis: periapsis,
@@ -100,9 +107,9 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
 
     public createRings(): RingsPostProcess {
         const rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem.scene);
-        rings.settings.ringStart = randRange(1.8, 2.2, this.rng, 20);
-        rings.settings.ringEnd = randRange(2.1, 2.9, this.rng, 21);
-        rings.settings.ringOpacity = this.rng(22);
+        rings.settings.ringStart = randRange(1.8, 2.2, this.rng, Steps.RINGS);
+        rings.settings.ringEnd = randRange(2.1, 2.9, this.rng, Steps.RINGS + 10);
+        rings.settings.ringOpacity = this.rng(Steps.RINGS + 20);
         this.postProcesses.rings = rings;
         return rings;
     }
