@@ -133,7 +133,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             this.createRings();
         }
 
-        const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.rng, Steps.TERRAIN), 0, 0.95);
+        const continentsFragmentation = clamp(normalRandom(0.5, 0.03, this.rng, Steps.TERRAIN), 0, 0.95);
         console.log(continentsFragmentation);
 
         this.terrainSettings = {
@@ -143,8 +143,8 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             bumpsFrequency: 6 * 30 * this.ratio,
 
             maxBumpHeight: 1.5e3,
-            maxMountainHeight: 13e3,
-            continentBaseHeight: this.oceanLevel * 2.5,
+            maxMountainHeight: 7e3,
+            continentBaseHeight: this.oceanLevel * 2.0,
 
             mountainsFrequency: 6 * 20 * this.ratio
         };

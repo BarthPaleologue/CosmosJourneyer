@@ -115,7 +115,9 @@ void main() {
 	float elevation01 = elevation / maxElevation;
 	float waterLevel01 = waterLevel / maxElevation;
 
-	float slope = smoothstep(0.2, 0.5, 1.0 - max(dot(vUnitSamplePoint, vNormal), 0.0));
+	float slope = 1.0 - max(dot(vUnitSamplePoint, vNormal), 0.0);
+	slope = smoothstep(0.5, 1.0, slope);
+	slope = smoothSharpener(slope, steepSharpness);
 
 	/// Analyse Physique de la planète
 
@@ -173,7 +175,7 @@ void main() {
 	);
 	beachFactor = smoothSharpener(beachFactor, 2.0);
 
-	float steepFactor = smoothSharpener(slope, steepSharpness);
+	float steepFactor = slope;//smoothSharpener(slope, steepSharpness);
 
 	if(elevation01 > waterLevel01) {
 
@@ -253,7 +255,7 @@ void main() {
 		float t0, t1;
 		//TODO: DO NOT HARDCODE
 		if(rayIntersectSphere(vPositionW, starLightRayW, planetPosition, planetRadius, t0, t1)) {
-			ndl2part *= smoothstep(3e5, 0.0, abs(t1 - t0));//1.0 / (1.0 + 1e-5 * (t1 - t0));
+			ndl2part *= smoothstep(18e5, 0.0, abs(t1 - t0));//1.0 / (1.0 + 1e-5 * (t1 - t0));
 		}
 		ndl2 += ndl2part;
 

@@ -61,7 +61,7 @@ Assets.Init(scene).then(() => {
 
     planet.physicalProperties.rotationPeriod /= 20;
     planet.physicalProperties.minTemperature = -37;
-    planet.physicalProperties.maxTemperature = 24;
+    planet.physicalProperties.maxTemperature = 40;
     planet.material.updateConstants();
 
     planet.orbitalProperties = {
@@ -86,7 +86,7 @@ Assets.Init(scene).then(() => {
         orientationQuaternion: Quaternion.Identity()
     };
 
-    moon.terrainSettings.continentsFragmentation = 0.3;
+    moon.terrainSettings.continentsFragmentation = 0.0;
     moon.terrainSettings.maxMountainHeight = 5e3;
     moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
     moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
@@ -121,8 +121,8 @@ Assets.Init(scene).then(() => {
     };
 
     ares.terrainSettings.continentsFragmentation = 0.35;
-    ares.terrainSettings.continentBaseHeight = 5e3;
-    ares.terrainSettings.maxMountainHeight = 20e3;
+    ares.terrainSettings.continentBaseHeight = 2e3;
+    ares.terrainSettings.maxMountainHeight = 12e3;
 
     ares.material.colorSettings.plainColor.copyFromFloats(0.4, 0.3, 0.3);
     ares.material.colorSettings.steepColor.copyFrom(ares.material.colorSettings.desertColor.scale(0.9));

@@ -89,8 +89,8 @@ export class TelluricMaterial extends ShaderMaterial {
             desertColor: new Color3(178, 107, 42).scaleInPlace(1 / 255),
             bottomColor: new Color3(0.5, 0.5, 0.5),
 
-            beachSize: 600,
-            steepSharpness: 6,
+            beachSize: 200,
+            steepSharpness: 2,
             normalSharpness: 0.5
         };
 
