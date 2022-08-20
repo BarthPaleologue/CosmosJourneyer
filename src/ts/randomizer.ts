@@ -63,11 +63,8 @@ Assets.Init(scene).then(() => {
 
     const collisionWorker = new CollisionWorker(player, starSystem);
 
-    starSystem.update(0);
-    starSystem.update(Date.now());
-    starSystem.update(0);
-    starSystem.update(0);
-    starSystem.update(0);
+
+    starSystem.update(Date.now() / 1000);
 
     player.positionNearBody(starSystem.planets[0]);
 

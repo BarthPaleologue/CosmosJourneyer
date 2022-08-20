@@ -57,7 +57,7 @@ export class PlayerController extends BasicTransform implements ITransformable {
     }
 
     public positionNearBody(body: AbstractBody): void {
-        const dir = body.getAbsolutePosition();
+        const dir = body.getAbsolutePosition().clone();
         const dist = dir.length();
         dir.normalize();
         this.setAbsolutePosition(dir.scale(dist - body.getRadius() * 3));
