@@ -18,7 +18,6 @@ export class BasicTransform implements ITransformable {
     }
 
     public getAbsolutePosition(): Vector3 {
-        if (this.transform.getAbsolutePosition()._isDirty) this.transform.computeWorldMatrix(true);
         return this.transform.getAbsolutePosition();
     }
 
@@ -28,6 +27,7 @@ export class BasicTransform implements ITransformable {
 
     public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
         this.transform.rotateAround(pivot, axis, amount);
+        this.transform.computeWorldMatrix(true);
     }
 
     public rotate(axis: Vector3, amount: number) {
