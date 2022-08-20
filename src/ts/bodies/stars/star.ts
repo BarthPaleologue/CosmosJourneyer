@@ -1,6 +1,6 @@
 import { AbstractBody } from "../abstractBody";
 
-import { Mesh, MeshBuilder } from "@babylonjs/core";
+import { Mesh, MeshBuilder, Quaternion } from "@babylonjs/core";
 import { BodyType } from "../interfaces";
 import { PlayerController } from "../../player/playerController";
 import { StarSystem } from "../starSystem";
@@ -63,6 +63,9 @@ export class Star extends AbstractBody {
 
         this.material = new StarMaterial(this, starSystemManager.scene);
         this.mesh.material = this.material;
+
+        // TODO: remove when rotation is transmitted to children
+        this.transform.rotationQuaternion = Quaternion.Identity();
 
         this.postProcesses = {
             volumetricLight: new VolumetricLight(this, this.mesh, this.starSystem.scene),

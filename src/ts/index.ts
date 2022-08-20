@@ -61,7 +61,7 @@ Assets.Init(scene).then(() => {
 
     planet.physicalProperties.rotationPeriod /= 20;
     planet.physicalProperties.minTemperature = -37;
-    planet.physicalProperties.maxTemperature = 40;
+    planet.physicalProperties.maxTemperature = 60;
     planet.material.updateConstants();
 
     planet.orbitalProperties = {
@@ -138,7 +138,7 @@ Assets.Init(scene).then(() => {
     aresAtmosphere.settings.greenWaveLength = 680;
     aresAtmosphere.settings.blueWaveLength = 670;
 
-    const andromaque = new GasPlanet("Andromaque", starSystem, 8.550883810967207, [sun]);
+    const andromaque = new GasPlanet("Andromaque", starSystem, 0.46, [sun]);
     andromaque.orbitalProperties = {
         period: 60 * 60 * 24 * 365.29,
         periapsis: 4300 * ares.getRadius(),
