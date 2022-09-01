@@ -61,7 +61,7 @@ Assets.Init(scene).then(() => {
 
     planet.physicalProperties.rotationPeriod /= 20;
     planet.physicalProperties.minTemperature = -37;
-    planet.physicalProperties.maxTemperature = 60;
+    planet.physicalProperties.maxTemperature = 40;
     planet.material.updateConstants();
 
     planet.orbitalProperties = {
