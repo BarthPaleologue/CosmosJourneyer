@@ -59,7 +59,6 @@ export class GasPlanet extends AbstractBody {
             },
             starSystem.scene
         );
-        starSystem.scene.registerMeshDepth(this.mesh);
         this.mesh.parent = this.transform;
 
         this.material = new GasPlanetMaterial(this, starSystem.scene);

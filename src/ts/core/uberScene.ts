@@ -1,4 +1,4 @@
-import { AbstractMesh, DepthRenderer, Engine, Scene } from "@babylonjs/core";
+import { Engine, Scene } from "@babylonjs/core";
 import { StarSystem } from "../bodies/starSystem";
 import { StarfieldPostProcess } from "../postProcesses/starfieldPostProcess";
 import { SpaceRenderingPipeline } from "../postProcesses/pipelines/spaceRenderingPipeline";
@@ -25,7 +25,6 @@ export class UberScene extends Scene {
 
     isOverlayEnabled = true;
 
-    readonly depthRenderer: DepthRenderer;
     readonly _chunkForge: ChunkForge;
 
     constructor(engine: Engine, nbVertices = Settings.VERTEX_RESOLUTION) {
@@ -36,11 +35,6 @@ export class UberScene extends Scene {
 
         this.colorCorrection = new ColorCorrection("colorCorrection", this);
         this.overlay = new OverlayPostProcess("overlay", this);
-
-        this.depthRenderer = new DepthRenderer(this);
-        this.customRenderTargets.push(this.depthRenderer.getDepthMap());
-        this.depthRenderer.getDepthMap().renderList = [];
-        //this.depthRenderer.forceDepthWriteTransparentMeshes = true;
 
         this._chunkForge = new ChunkForge(nbVertices);
     }
@@ -61,11 +55,7 @@ export class UberScene extends Scene {
         if(this.player === null) throw new Error("Player not set");
         return this.player;
     }
-    public registerMeshDepth(mesh: AbstractMesh) {
-        const renderList = this.depthRenderer.getDepthMap().renderList;
-        if(renderList === null) throw new Error("Depth map not set");
-        renderList.push(mesh);
-    }
+
     public update(deltaTime: number) {
         if(this.starSystem && this.player) this.starSystem.update(deltaTime);
 

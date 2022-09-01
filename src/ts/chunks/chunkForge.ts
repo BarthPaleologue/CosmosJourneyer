@@ -1,4 +1,4 @@
-import { DepthRenderer, VertexData } from "@babylonjs/core";
+import { VertexData } from "@babylonjs/core";
 import { BuildData } from "./workerDataTypes";
 import { ApplyTask, BuildTask, DeleteTask, ReturnedChunkData, TaskType } from "./taskTypes";
 import { WorkerPool } from "./workerPool";
@@ -120,15 +120,13 @@ export class ChunkForge {
     /**
      * Apply generated vertexData to waiting chunks
      */
-    private executeNextApplyTask(depthRenderer: DepthRenderer) {
+    private executeNextApplyTask() {
         if (this.applyTasks.length > 0) {
             const task = this.applyTasks.shift()!;
             task.vertexData.applyToMesh(task.chunk.mesh, false);
             task.chunk.mesh.freezeNormals();
 
             if (task.chunk.depth == task.chunk.tree.minDepth) task.chunk.setReady(true);
-
-            depthRenderer.getDepthMap().renderList?.push(task.chunk.mesh);
 
             this.trashCan.push(task.callbackTasks);
         }
@@ -137,7 +135,7 @@ export class ChunkForge {
     /**
      * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
      */
-    public update(depthRenderer: DepthRenderer) {
+    public update() {
         for (let i = 0; i < this.workerPool.availableWorkers.length; i++) {
             const worker = this.workerPool.availableWorkers.shift()!;
             this.executeNextTask(worker);
@@ -146,6 +144,6 @@ export class ChunkForge {
         this.workerPool.finishedWorkers = [];
         this.emptyTrashCan();
 
-        this.executeNextApplyTask(depthRenderer);
+        this.executeNextApplyTask();
     }
 }

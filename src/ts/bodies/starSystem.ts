@@ -160,7 +160,7 @@ export class StarSystem {
     public update(deltaTime: number): void {
         this.clock += deltaTime;
 
-        this.scene._chunkForge.update(this.scene.depthRenderer);
+        this.scene._chunkForge.update();
         for (const body of this.getBodies()) body.update(this.scene.getPlayer(), deltaTime);
 
         this.translateAllBodies(this.scene.getPlayer().getAbsolutePosition().negate());

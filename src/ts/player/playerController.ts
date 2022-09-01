@@ -3,13 +3,15 @@ import { AbstractBody } from "../bodies/abstractBody";
 import { ITransformable } from "../core/transforms/iTransformable";
 import { Input } from "../inputs/input";
 import { BasicTransform } from "../core/transforms/basicTransform";
+import { UberFreeCamera } from "../core/uberFreeCamera";
+import { UberScene } from "../core/uberScene";
 
 export class PlayerController extends BasicTransform implements ITransformable {
     nearestBody: AbstractBody | null;
 
     collisionRadius = 10;
 
-    camera: FreeCamera;
+    camera: UberFreeCamera;
 
     speed = 1;
 
@@ -17,10 +19,10 @@ export class PlayerController extends BasicTransform implements ITransformable {
 
     readonly inputs: Input[] = [];
 
-    constructor(scene: Scene) {
+    constructor(scene: UberScene) {
         super("player");
 
-        this.camera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
+        this.camera = new UberFreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.transform;
         this.camera.fov = (80 / 360) * Math.PI;
         scene.activeCamera = this.camera;
