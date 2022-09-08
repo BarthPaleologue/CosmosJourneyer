@@ -49,6 +49,7 @@ Assets.Init(scene).then(() => {
 
     starSystem.makeStars(1);
     starSystem.makePlanets(1);
+    console.log(starSystem.planets[0].seed);
 
     scene.initPostProcesses();
 
