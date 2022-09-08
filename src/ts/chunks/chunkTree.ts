@@ -148,7 +148,7 @@ export class ChunkTree {
         if (chunk.isReady() && Settings.ENABLE_OCCLUSION) {
             const direction = chunkPositionW.subtract(observerPositionW);
             const rayDir = direction.normalizeToNew();
-            const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.planet.getAbsolutePosition(), this.planet.getRadius() - 50e3 * 2 ** -chunk.depth);
+            const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.planet.getAbsolutePosition(), this.planet.getRadius() - 100e3 * 2 ** -chunk.depth);
             chunk.mesh.setEnabled(!(intersect && t0 ** 2 < direction.lengthSquared()));
         }
     }
