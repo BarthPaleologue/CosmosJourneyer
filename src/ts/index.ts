@@ -23,7 +23,9 @@ import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { GasPlanet } from "./bodies/planets/gasPlanet";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import { HelmetOverlay } from "./ui/helmetOverlay";
 
+const helmetOverlay = new HelmetOverlay();
 const bodyEditor = new BodyEditor();
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -161,8 +163,8 @@ Assets.Init(scene).then(() => {
         scene.getPlayer().nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.getAbsolutePosition());
 
         bodyEditor.update(scene.getPlayer());
-
-        document.getElementById("planetName")!.innerText = player.isOrbiting() ? scene.getPlayer().getNearestBody().name : "Outer Space";
+        helmetOverlay.update(scene.getPlayer().getNearestBody());
+        helmetOverlay.setVisibility(bodyEditor.getVisibility() != EditorVisibility.FULL);
 
         starSystem.translateAllBodies(player.update(deltaTime));
 

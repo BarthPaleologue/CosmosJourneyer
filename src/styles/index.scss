@@ -14,6 +14,8 @@ body {
 
   @import "bodyEditor/panels";
 
+  @import "helmetOverlay/helmetOverlay";
+
   #renderer {
     z-index: 1;
     float: left;

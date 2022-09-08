@@ -1,0 +1,27 @@
+#helmetOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+  #bodyData {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 300px;
+    p {
+      margin-block-start: 0;
+      margin-block-end: 0;
+      padding: 5px 10px;
+      text-shadow: white 0 0 3px;
+    }
+    #bodyName {
+      font-size: 200%;
+      color: white;
+    }
+    #bodySeed {
+      color: white;
+    }
+  }
+}

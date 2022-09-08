@@ -17,8 +17,9 @@ import { BodyType } from "./bodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
-import { squirrelNoise } from "squirrel-noise";
+import { HelmetOverlay } from "./ui/helmetOverlay";
 
+const helmetOverlay = new HelmetOverlay();
 const bodyEditor = new BodyEditor();
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -75,9 +76,11 @@ Assets.Init(scene).then(() => {
         scene.registerBeforeRender(() => {
             const deltaTime = engine.getDeltaTime() / 1000;
 
-            player.nearestBody = starSystem.getNearestBody();
+            scene.getPlayer().nearestBody = starSystem.getNearestBody();
 
-            bodyEditor.update(player);
+            bodyEditor.update(scene.getPlayer());
+            helmetOverlay.update(scene.getPlayer().getNearestBody());
+            helmetOverlay.setVisibility(bodyEditor.getVisibility() != EditorVisibility.FULL);
 
             //FIXME: should address stars orbits
             for (const star of starSystem.stars) {

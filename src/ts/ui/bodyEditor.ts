@@ -52,7 +52,7 @@ export class BodyEditor {
     ];
 
     constructor(visibility: EditorVisibility = EditorVisibility.FULL) {
-        document.body.innerHTML += editorHTML;
+        document.body.insertAdjacentHTML("beforeend", editorHTML);
         this.navBar = document.getElementById("navBar")!;
 
         this.setVisibility(visibility);
@@ -232,16 +232,10 @@ export class BodyEditor {
         this.starSliders.push(
             new Slider("temperature", document.getElementById("temperature") as HTMLElement, 3000, 15000, star.physicalProperties.temperature, (val: number) => {
                 star.physicalProperties.temperature = val;
-            })
-        );
-
-        this.starSliders.push(
+            }),
             new Slider("starExposure", document.getElementById("starExposure") as HTMLElement, 0, 200, star.postProcesses.volumetricLight.exposure * 100, (val: number) => {
                 star.postProcesses.volumetricLight.exposure = val / 100;
-            })
-        );
-
-        this.starSliders.push(
+            }),
             new Slider("decay", document.getElementById("decay") as HTMLElement, 0, 200, star.postProcesses.volumetricLight.decay * 100, (val: number) => {
                 star.postProcesses.volumetricLight.decay = val / 100;
             })
@@ -254,71 +248,46 @@ export class BodyEditor {
         for (const slider of this.generalSliders) slider.remove();
         this.generalSliders = [];
 
+        let axialTiltX = stripAxisFromQuaternion(planet.getRotationQuaternion(), Axis.Y).toEulerAngles().x;
+        let axialTiltZ = stripAxisFromQuaternion(planet.getRotationQuaternion(), Axis.Y).toEulerAngles().z;
+        //TODO: do not hardcode here
+        const power = 1.4;
+
         this.generalSliders.push(
             new Slider("zoom", document.getElementById("zoom") as HTMLElement, 0, 100, (100 * planet.radius) / planet.transform.position.z, (value: number) => {
                 const playerDir = planet.getAbsolutePosition().normalizeToNew();
                 planet.setAbsolutePosition(playerDir.scale((100 * planet.getRadius()) / value));
-            })
-        );
-
-        let axialTiltX = stripAxisFromQuaternion(planet.getRotationQuaternion(), Axis.Y).toEulerAngles().x;
-        this.generalSliders.push(
+            }),
             new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
                 planet.rotate(Axis.X, newAxialTilt - axialTiltX);
                 if (scene.getPlayer().isOrbiting()) scene.getPlayer().rotateAround(planet.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
                 axialTiltX = newAxialTilt;
-            })
-        );
-
-        let axialTiltZ = stripAxisFromQuaternion(planet.getRotationQuaternion(), Axis.Y).toEulerAngles().z;
-        this.generalSliders.push(
+            }),
             new Slider("axialTiltZ", document.getElementById("axialTiltZ") as HTMLElement, -180, 180, Math.round((180 * axialTiltZ) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
                 planet.rotate(Axis.Z, newAxialTilt - axialTiltZ);
                 if (scene.getPlayer().isOrbiting()) scene.getPlayer().rotateAround(planet.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
                 axialTiltZ = newAxialTilt;
-            })
-        );
-
-        this.generalSliders.push(
+            }),
             new Slider("cameraFOV", document.getElementById("cameraFOV") as HTMLElement, 0, 360, (scene.getPlayer().camera.fov * 360) / Math.PI, (val: number) => {
                 scene.getPlayer().camera.fov = (val * Math.PI) / 360;
-            })
-        );
-        //TODO: do not hardcode here
-        const power = 1.4;
-        this.generalSliders.push(
+            }),
             new Slider("timeModifier", document.getElementById("timeModifier") as HTMLElement, -200, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {
                 Settings.TIME_MULTIPLIER = Math.sign(val) * Math.pow(Math.abs(val), power);
-            })
-        );
-
-        this.generalSliders.push(
+            }),
             new Slider("exposure", document.getElementById("exposure") as HTMLElement, 0, 200, scene.colorCorrection.settings.exposure * 100, (val: number) => {
                 scene.colorCorrection.settings.exposure = val / 100;
-            })
-        );
-
-        this.generalSliders.push(
+            }),
             new Slider("contrast", document.getElementById("contrast") as HTMLElement, 0, 200, scene.colorCorrection.settings.contrast * 100, (val: number) => {
                 scene.colorCorrection.settings.contrast = val / 100;
-            })
-        );
-
-        this.generalSliders.push(
+            }),
             new Slider("brightness", document.getElementById("brightness") as HTMLElement, -100, 100, scene.colorCorrection.settings.brightness * 100, (val: number) => {
                 scene.colorCorrection.settings.brightness = val / 100;
-            })
-        );
-
-        this.generalSliders.push(
+            }),
             new Slider("saturation", document.getElementById("saturation") as HTMLElement, 0, 200, scene.colorCorrection.settings.saturation * 100, (val: number) => {
                 scene.colorCorrection.settings.saturation = val / 100;
-            })
-        );
-
-        this.generalSliders.push(
+            }),
             new Slider("gamma", document.getElementById("gamma") as HTMLElement, 0, 200, scene.colorCorrection.settings.gamma * 100, (val: number) => {
                 scene.colorCorrection.settings.gamma = val / 100;
             })
@@ -333,9 +302,7 @@ export class BodyEditor {
             new Slider("minTemperature", document.getElementById("minTemperature") as HTMLElement, -273, 300, planet.physicalProperties.minTemperature, (val: number) => {
                 planet.physicalProperties.minTemperature = val;
                 planet.material.updateConstants();
-            })
-        );
-        this.physicSliders.push(
+            }),
             new Slider("maxTemperature", document.getElementById("maxTemperature") as HTMLElement, -273, 300, planet.physicalProperties.maxTemperature, (val: number) => {
                 planet.physicalProperties.maxTemperature = val;
                 planet.material.updateConstants();
@@ -390,17 +357,11 @@ export class BodyEditor {
             new Slider("sandSize", document.getElementById("sandSize") as HTMLElement, 0, 300, planet.material.colorSettings.beachSize / 10, (val: number) => {
                 colorSettings.beachSize = val * 10;
                 material.updateConstants();
-            })
-        );
-
-        this.surfaceSliders.push(
+            }),
             new Slider("steepSharpness", document.getElementById("steepSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.steepSharpness * 10, (val: number) => {
                 colorSettings.steepSharpness = val / 10;
                 material.updateConstants();
-            })
-        );
-
-        this.surfaceSliders.push(
+            }),
             new Slider("normalSharpness", document.getElementById("normalSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.normalSharpness * 100, (val: number) => {
                 colorSettings.normalSharpness = val / 100;
                 material.updateConstants();
@@ -463,14 +424,10 @@ export class BodyEditor {
         this.atmosphereSliders.push(
             new Slider("intensity", document.getElementById("intensity") as HTMLElement, 0, 40, atmosphere.settings.intensity, (val: number) => {
                 atmosphere.settings.intensity = val;
-            })
-        );
-        this.atmosphereSliders.push(
+            }),
             new Slider("density", document.getElementById("density") as HTMLElement, 0, 40, atmosphere.settings.densityModifier * 10, (val: number) => {
                 atmosphere.settings.densityModifier = val / 10;
-            })
-        );
-        this.atmosphereSliders.push(
+            }),
             new Slider(
                 "atmosphereRadius",
                 document.getElementById("atmosphereRadius")!,
@@ -480,39 +437,25 @@ export class BodyEditor {
                 (val: number) => {
                     atmosphere.settings.atmosphereRadius = planet.getRadius() + val * 10000;
                 }
-            )
-        );
-        this.atmosphereSliders.push(
+            ),
             new Slider("rayleighStrength", document.getElementById("rayleighStrength") as HTMLElement, 0, 40, atmosphere.settings.rayleighStrength * 10, (val: number) => {
                 atmosphere.settings.rayleighStrength = val / 10;
-            })
-        );
-        this.atmosphereSliders.push(
+            }),
             new Slider("mieStrength", document.getElementById("mieStrength") as HTMLElement, 0, 40, atmosphere.settings.mieStrength * 10, (val: number) => {
                 atmosphere.settings.mieStrength = val / 10;
-            })
-        );
-        this.atmosphereSliders.push(
+            }),
             new Slider("falloff", document.getElementById("falloff") as HTMLElement, -10, 200, atmosphere.settings.falloffFactor, (val: number) => {
                 atmosphere.settings.falloffFactor = val;
-            })
-        );
-        this.atmosphereSliders.push(
+            }),
             new Slider("redWaveLength", document.getElementById("redWaveLength") as HTMLElement, 0, 1000, atmosphere.settings.redWaveLength, (val: number) => {
                 atmosphere.settings.redWaveLength = val;
-            })
-        );
-        this.atmosphereSliders.push(
+            }),
             new Slider("greenWaveLength", document.getElementById("greenWaveLength") as HTMLElement, 0, 1000, atmosphere.settings.greenWaveLength, (val: number) => {
                 atmosphere.settings.greenWaveLength = val;
-            })
-        );
-        this.atmosphereSliders.push(
+            }),
             new Slider("blueWaveLength", document.getElementById("blueWaveLength") as HTMLElement, 0, 1000, atmosphere.settings.blueWaveLength, (val: number) => {
                 atmosphere.settings.blueWaveLength = val;
-            })
-        );
-        this.atmosphereSliders.push(
+            }),
             new Slider("mieHaloRadius", document.getElementById("mieHaloRadius") as HTMLElement, 0, 200, atmosphere.settings.mieHaloRadius * 100, (val: number) => {
                 atmosphere.settings.mieHaloRadius = val / 100;
             })
@@ -540,29 +483,19 @@ export class BodyEditor {
         this.cloudsSliders.push(
             new Slider("cloudFrequency", document.getElementById("cloudFrequency") as HTMLElement, 0, 20, flatClouds.settings.cloudFrequency, (val: number) => {
                 flatClouds.settings.cloudFrequency = val;
-            })
-        );
-        this.cloudsSliders.push(
+            }),
             new Slider("cloudDetailFrequency", document.getElementById("cloudDetailFrequency") as HTMLElement, 0, 50, flatClouds.settings.cloudDetailFrequency, (val: number) => {
                 flatClouds.settings.cloudDetailFrequency = val;
-            })
-        );
-        this.cloudsSliders.push(
+            }),
             new Slider("cloudCoverage", document.getElementById("cloudCoverage") as HTMLElement, 0, 200, 100 + flatClouds.settings.cloudCoverage * 100, (val: number) => {
                 flatClouds.settings.cloudCoverage = (val - 100) / 100;
-            })
-        );
-        this.cloudsSliders.push(
+            }),
             new Slider("cloudSharpness", document.getElementById("cloudSharpness") as HTMLElement, 1, 100, flatClouds.settings.cloudSharpness * 10, (val: number) => {
                 flatClouds.settings.cloudSharpness = val / 10;
-            })
-        );
-        this.cloudsSliders.push(
+            }),
             new Slider("worleySpeed", document.getElementById("worleySpeed") as HTMLElement, 0.0, 200.0, flatClouds.settings.worleySpeed * 10000, (val: number) => {
                 flatClouds.settings.worleySpeed = val / 10000;
-            })
-        );
-        this.cloudsSliders.push(
+            }),
             new Slider("detailSpeed", document.getElementById("detailSpeed") as HTMLElement, 0, 200, flatClouds.settings.detailSpeed * 10000, (val: number) => {
                 flatClouds.settings.detailSpeed = val / 10000;
             })
@@ -593,14 +526,10 @@ export class BodyEditor {
         this.ringsSliders.push(
             new Slider("ringsMaxRadius", document.getElementById("ringsMaxRadius") as HTMLElement, 150, 400, rings.settings.ringEnd * 100, (val: number) => {
                 rings.settings.ringEnd = val / 100;
-            })
-        );
-        this.ringsSliders.push(
+            }),
             new Slider("ringsFrequency", document.getElementById("ringsFrequency") as HTMLElement, 10, 100, rings.settings.ringFrequency, (val: number) => {
                 rings.settings.ringFrequency = val;
-            })
-        );
-        this.ringsSliders.push(
+            }),
             new Slider("ringsOpacity", document.getElementById("ringsOpacity") as HTMLElement, 0, 100, rings.settings.ringOpacity * 100, (val: number) => {
                 rings.settings.ringOpacity = val / 100;
             })
@@ -623,24 +552,16 @@ export class BodyEditor {
         this.oceanSliders.push(
             new Slider("alphaModifier", document.getElementById("alphaModifier") as HTMLElement, 0, 200, ocean.settings.alphaModifier * 10000, (val: number) => {
                 ocean.settings.alphaModifier = val / 10000;
-            })
-        );
-        this.oceanSliders.push(
+            }),
             new Slider("depthModifier", document.getElementById("depthModifier") as HTMLElement, 0, 70, ocean.settings.depthModifier * 10000, (val: number) => {
                 ocean.settings.depthModifier = val / 10000;
-            })
-        );
-        this.oceanSliders.push(
+            }),
             new Slider("specularPower", document.getElementById("specularPower") as HTMLElement, 0, 100, ocean.settings.specularPower * 10, (val: number) => {
                 ocean.settings.specularPower = val / 10;
-            })
-        );
-        this.oceanSliders.push(
+            }),
             new Slider("smoothness", document.getElementById("smoothness") as HTMLElement, 0, 100, ocean.settings.smoothness * 100, (val: number) => {
                 ocean.settings.smoothness = val / 100;
-            })
-        );
-        this.oceanSliders.push(
+            }),
             new Slider(
                 "waveBlendingSharpness",
                 document.getElementById("waveBlendingSharpness") as HTMLElement,
