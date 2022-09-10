@@ -29,7 +29,7 @@ export class UberScene extends Scene {
 
     constructor(engine: Engine, nbVertices = Settings.VERTEX_RESOLUTION) {
         super(engine);
-        this.performancePriority = ScenePerformancePriority.Aggressive;
+        this.performancePriority = ScenePerformancePriority.Intermediate;
 
         this.spaceRenderingPipeline = new SpaceRenderingPipeline("spaceRenderingPipeline", this);
         this.surfaceRenderingPipeline = new SurfaceRenderingPipeline("surfaceRenderingPipeline", this);
