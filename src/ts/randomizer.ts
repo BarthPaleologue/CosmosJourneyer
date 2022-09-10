@@ -14,7 +14,7 @@ import { randRange, randRangeInt } from "extended-random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Settings } from "./settings";
 import { BodyType } from "./bodies/interfaces";
-import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
+import { BodyEditor, EditorVisibility } from "./ui/bodyEditor/bodyEditor";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { HelmetOverlay } from "./ui/helmetOverlay";

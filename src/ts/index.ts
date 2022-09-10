@@ -18,7 +18,7 @@ import "../styles/index.scss";
 
 import { Settings } from "./settings";
 import { BodyType } from "./bodies/interfaces";
-import { BodyEditor, EditorVisibility } from "./ui/bodyEditor";
+import { BodyEditor, EditorVisibility } from "./ui/bodyEditor/bodyEditor";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { GasPlanet } from "./bodies/planets/gasPlanet";
