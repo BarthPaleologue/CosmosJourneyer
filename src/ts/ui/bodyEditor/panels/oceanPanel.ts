@@ -10,9 +10,9 @@ export class OceanPanel extends EditorPanel {
     init(planet: TelluricPlanet) {
         for (const slider of this.sliders) slider.remove();
 
-        if (planet.postProcesses.ocean == null) return;
-
         const ocean = planet.postProcesses.ocean;
+        if (ocean == null) return;
+
         const oceanToggler = clearAllEventListenersById("oceanToggler");
         oceanToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;

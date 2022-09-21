@@ -11,9 +11,9 @@ export class AtmospherePanel extends EditorPanel {
     init(planet: Planet) {
         for (const slider of this.sliders) slider.remove();
 
-        if (planet.postProcesses.atmosphere == null) return;
-
         const atmosphere = planet.postProcesses.atmosphere;
+        if (atmosphere == null) return;
+
         const atmosphereToggler = clearAllEventListenersById("atmosphereToggler");
         atmosphereToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
@@ -29,7 +29,7 @@ export class AtmospherePanel extends EditorPanel {
             }),
             new Slider(
                 "atmosphereRadius",
-                document.getElementById("atmosphereRadius")!,
+                document.getElementById("atmosphereRadius") as HTMLElement,
                 0,
                 100,
                 (atmosphere.settings.atmosphereRadius - planet.getRadius()) / 10000,

@@ -41,7 +41,7 @@ export class Assets {
     private static manager: AssetsManager;
 
     static Init(scene: Scene): Promise<void> {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             Assets.manager = new AssetsManager(scene);
             console.log("Initializing assets...");
 
@@ -63,12 +63,12 @@ export class Assets {
                 Assets.Character.setEnabled(false);
                 console.log("Character loaded");
             };
-            Assets.manager.onProgress = (remainingCount, totalCount, task) => {
+            Assets.manager.onProgress = (remainingCount, totalCount) => {
                 scene.getEngine().loadingUIText = `Loading assets... ${totalCount - remainingCount}/${totalCount}`;
             }
             Assets.manager.load();
 
-            Assets.manager.onFinish = (tasks) => {
+            Assets.manager.onFinish = () => {
                 console.log("Assets loaded");
                 Assets.IS_READY = true;
                 resolve();

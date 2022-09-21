@@ -10,10 +10,10 @@ export class RingsPanel extends EditorPanel {
     init(body: AbstractBody) {
         for (const slider of this.sliders) slider.remove();
 
-        if (body.postProcesses.rings == null) return;
+        const rings = body.postProcesses.rings;
+        if (rings == null) return;
         this.enable();
         
-        const rings = body.postProcesses.rings;
         const ringsToggler = clearAllEventListenersById("ringsToggler");
         ringsToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[3] as HTMLInputElement;

@@ -12,9 +12,9 @@ export class CloudsPanel extends EditorPanel {
     init(planet: TelluricPlanet) {
         for (const slider of this.sliders) slider.remove();
 
-        if (planet.postProcesses.clouds == null) return;
+        const flatClouds = planet.postProcesses.clouds;
+        if (flatClouds == null) return;
 
-        const flatClouds = planet.postProcesses.clouds!;
         const cloudsToggler = clearAllEventListenersById("cloudsToggler");
         cloudsToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;

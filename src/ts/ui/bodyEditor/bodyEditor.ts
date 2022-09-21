@@ -48,7 +48,7 @@ export class BodyEditor {
 
     constructor(visibility: EditorVisibility = EditorVisibility.FULL) {
         document.body.insertAdjacentHTML("beforeend", editorHTML);
-        this.navBar = document.getElementById("navBar")!;
+        this.navBar = document.getElementById("navBar") as HTMLElement;
 
         this.generalPanel = new GeneralPanel();
         this.physicPanel = new PhysicPanel();
@@ -110,18 +110,18 @@ export class BodyEditor {
         this.visibility = visibility;
         switch (this.visibility) {
             case EditorVisibility.HIDDEN:
-                document.getElementById("navBar")!.style.display = "none";
+                this.navBar.style.display = "none";
                 hide("editorPanelContainer");
                 hide("toolbar");
                 this.currentPanel = null;
                 break;
             case EditorVisibility.NAVBAR:
-                document.getElementById("navBar")!.style.display = "flex";
+                this.navBar.style.display = "flex";
                 hide("editorPanelContainer");
                 hide("toolbar");
                 break;
             case EditorVisibility.FULL:
-                document.getElementById("navBar")!.style.display = "flex";
+                this.navBar.style.display = "flex";
                 show("editorPanelContainer");
                 show("toolbar");
                 break;

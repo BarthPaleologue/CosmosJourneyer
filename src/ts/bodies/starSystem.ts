@@ -140,12 +140,11 @@ export class StarSystem {
      * Returns the most influential body at a given point
      */
     public getMostInfluentialBodyAtPoint(point: Vector3): AbstractBody {
-        //FIXME: use point
         if (this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
         let nearest = null;
         for (const body of this.bodies) {
             if (nearest == null) nearest = body;
-            else if (body.physicalProperties.mass / body.getAbsolutePosition().lengthSquared() > nearest.physicalProperties.mass / nearest.getAbsolutePosition().lengthSquared()) {
+            else if (body.physicalProperties.mass / Vector3.DistanceSquared(body.getAbsolutePosition(), point) > nearest.physicalProperties.mass / Vector3.DistanceSquared(nearest.getAbsolutePosition(), point)) {
                 nearest = body;
             }
         }

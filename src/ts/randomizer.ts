@@ -10,7 +10,7 @@ import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystem } from "./bodies/starSystem";
 
-import { randRange, randRangeInt } from "extended-random";
+import { randRange } from "extended-random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Settings } from "./settings";
 import { BodyType } from "./bodies/interfaces";

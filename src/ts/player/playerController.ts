@@ -1,4 +1,4 @@
-import { Vector3, FreeCamera, Scene } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core";
 import { AbstractBody } from "../bodies/abstractBody";
 import { ITransformable } from "../core/transforms/iTransformable";
 import { Input } from "../inputs/input";
