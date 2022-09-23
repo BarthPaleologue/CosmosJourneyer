@@ -452,7 +452,7 @@ function bb_spectrum(wavelength: number): number {
 
 export function demonstrate() {
     let [t, x, y, z, r, g, b]: number[] = [1000, 0, 0, 0, 0, 0, 0];
-    const cs = SMPTEsystem;
+    const cs = HDTVsystem;
 
     console.log("Temperature       x      y      z       R     G     B");
     console.log("-----------    ------ ------ ------   ----- ----- -----");
@@ -470,7 +470,7 @@ export function demonstrate() {
 import { Vector3 } from "@babylonjs/core";
 
 export function getRgbFromTemperature(temperature: number): Vector3 {
-    const cs = SMPTEsystem;
+    const cs = HDTVsystem;
 
     bbTemp = temperature;
     const [x, y, z] = spectrum_to_xyz(bb_spectrum);
