@@ -1,0 +1,37 @@
+newmtl material_1
+d 1
+Ns 1
+Ni 0
+Ka 1 0.756863 0.0196078
+Kd 1 1 0
+Ks 1 1 1
+Km 0
+
+newmtl material_1_justice_3
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+
+newmtl material_1_justice_4
+d 1
+Ns 1
+Ni 0
+Ka 0.501961 1 1
+Kd 0.501961 1 1
+Ks 1 1 1
+Km 0
+
+newmtl default
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/zqw1b.jpg
+

@@ -107,7 +107,9 @@ void main() {
 
 	vec4 seededSamplePoint = vec4(vUnitSamplePoint, seed);
 
-	float latitude = vUnitSamplePoint.y;
+	//FIXME: should use the angle between the axis and the normal
+	float latitude = fastAcos(vUnitSamplePoint.y) - 3.1415 / 2.0;
+	//float latitude = vUnitSamplePoint.y;
 	float absLatitude01 = abs(latitude);
 	
 	float elevation = length(vSamplePoint) - planetRadius;

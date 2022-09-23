@@ -1,4 +1,4 @@
-import { Tools } from "@babylonjs/core";
+import { AbstractMesh, Color3, Mesh, StandardMaterial, Tools } from "@babylonjs/core";
 
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 
@@ -14,19 +14,15 @@ import { randRange } from "extended-random";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Settings } from "./settings";
 import { BodyType } from "./bodies/interfaces";
-import { BodyEditor, EditorVisibility } from "./ui/bodyEditor/bodyEditor";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { HelmetOverlay } from "./ui/helmetOverlay";
 
 const helmetOverlay = new HelmetOverlay();
-const bodyEditor = new BodyEditor();
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
-bodyEditor.setCanvas(canvas);
 
 const [engine, scene] = initEngineScene(canvas);
 
@@ -38,6 +34,10 @@ Assets.Init(scene).then(() => {
     player.speed = 0.2 * Settings.EARTH_RADIUS;
     player.camera.maxZ = Settings.EARTH_RADIUS * 100000;
     player.inputs.push(new Keyboard(), mouse, new Gamepad());
+    const spaceship = Assets.Spaceship.createInstance("spaceshipdemo");
+    spaceship.parent = player.transform;
+    spaceship.position.z = 5;
+    spaceship.position.y = -2;
 
     scene.setPlayer(player);
 
@@ -55,7 +55,6 @@ Assets.Init(scene).then(() => {
     document.addEventListener("keydown", (e) => {
         if (e.key == "o") scene.isOverlayEnabled = !scene.isOverlayEnabled;
         if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getPlayer().camera, { precision: 4 });
-        if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
         if (e.key == "w" && player.nearestBody != null)
             (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
@@ -76,9 +75,8 @@ Assets.Init(scene).then(() => {
 
             scene.getPlayer().nearestBody = starSystem.getNearestBody();
 
-            bodyEditor.update(scene.getPlayer());
             helmetOverlay.update(scene.getPlayer().getNearestBody());
-            helmetOverlay.setVisibility(bodyEditor.getVisibility() != EditorVisibility.FULL);
+            helmetOverlay.setVisibility(true);
 
             //FIXME: should address stars orbits
             for (const star of starSystem.stars) {
@@ -100,8 +98,5 @@ Assets.Init(scene).then(() => {
 });
 
 window.addEventListener("resize", () => {
-    bodyEditor.resize();
     engine.resize();
 });
-
-bodyEditor.resize();

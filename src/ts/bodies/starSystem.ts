@@ -61,9 +61,10 @@ export class StarSystem {
         planet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng, 81);
 
         planet.material.colorSettings.plainColor.copyFromFloats(
-            0.22 + centeredRand(planet.rng, 82) / 10,
-            0.37 + centeredRand(planet.rng, 83) / 10,
-            0.024 + centeredRand(planet.rng, 84) / 10
+            //TODO: make this better
+            Math.max(0.22 + centeredRand(planet.rng, 82) / 20, 0),
+            Math.max(0.37 + centeredRand(planet.rng, 83) / 20, 0),
+            Math.max(0.024 + centeredRand(planet.rng, 84) / 20, 0)
         );
         planet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng, 85);
         planet.material.updateConstants();
@@ -98,6 +99,7 @@ export class StarSystem {
             period: getOrbitalPeriod(periapsis, apoapsis, satellite.parentBodies),
             orientationQuaternion: satellite.getRotationQuaternion()
         };
+        satellite.material.colorSettings.desertColor.copyFromFloats(92/255, 92/255, 92/255);
     }
 
     public makeSatellites(planet: Planet, n: number): void {

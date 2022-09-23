@@ -53,8 +53,7 @@ Assets.Init(scene).then(() => {
 
     scene.setStarSystem(starSystem);
 
-    const starfield = new StarfieldPostProcess("starfield", player, scene);
-    scene.setStarField(starfield);
+    new StarfieldPostProcess("starfield", player, scene);
 
     const sun = new Star("Weierstrass", starSystem, 0.51, []);
     sun.orbitalProperties.period = 60 * 60 * 24;
@@ -127,6 +126,7 @@ Assets.Init(scene).then(() => {
     ares.terrainSettings.maxMountainHeight = 12e3;
 
     ares.material.colorSettings.plainColor.copyFromFloats(0.4, 0.3, 0.3);
+    ares.material.colorSettings.desertColor.copyFromFloats(178 / 255, 107 / 255, 42 / 255);
     ares.material.colorSettings.steepColor.copyFrom(ares.material.colorSettings.desertColor.scale(0.9));
     ares.material.colorSettings.beachColor.copyFromFloats(0.3, 0.15, 0.1);
     ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);

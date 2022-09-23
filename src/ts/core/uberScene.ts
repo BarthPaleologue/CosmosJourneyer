@@ -1,6 +1,5 @@
 import { Engine, Scene, ScenePerformancePriority } from "@babylonjs/core";
 import { StarSystem } from "../bodies/starSystem";
-import { StarfieldPostProcess } from "../postProcesses/starfieldPostProcess";
 import { SpaceRenderingPipeline } from "../postProcesses/pipelines/spaceRenderingPipeline";
 import { SurfaceRenderingPipeline } from "../postProcesses/pipelines/surfaceRenderingPipeline";
 import { AbstractRenderingPipeline } from "../postProcesses/pipelines/abstractRenderingPipeline";
@@ -12,7 +11,6 @@ import { OverlayPostProcess } from "../postProcesses/overlayPostProcess";
 
 export class UberScene extends Scene {
     starSystem: StarSystem | null = null;
-    starField: StarfieldPostProcess | null = null;
 
     player: PlayerController | null = null;
 
@@ -46,9 +44,6 @@ export class UberScene extends Scene {
     public getStarSystem(): StarSystem {
         if(this.starSystem === null) throw new Error("Star system not set");
         return this.starSystem;
-    }
-    public setStarField(starField: StarfieldPostProcess) {
-        this.starField = starField;
     }
     public setPlayer(player: PlayerController) {
         this.player = player;

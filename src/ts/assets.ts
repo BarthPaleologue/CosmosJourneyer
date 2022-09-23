@@ -1,7 +1,7 @@
 import {
     AbstractMesh,
     AssetsManager,
-    Color3,
+    Color3, Mesh,
     MeshAssetTask,
     Scene,
     StandardMaterial,
@@ -22,6 +22,7 @@ import waterNormal1 from "../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../asset/textures/waterNormalMap4.jpg";
 
 import character from "../asset/man/man.obj";
+import spaceship from "../asset/spaceship/justigue league flying vehicle.obj";
 
 export class Assets {
     static IS_READY = false;
@@ -37,6 +38,7 @@ export class Assets {
     static WaterNormalMap2: Texture;
 
     static Character: AbstractMesh;
+    static Spaceship: Mesh;
 
     private static manager: AssetsManager;
 
@@ -58,14 +60,35 @@ export class Assets {
 
             const characterTask = Assets.manager.addMeshTask("characterTask", "", "", character);
             characterTask.onSuccess = function(task: MeshAssetTask) {
-                Assets.Character = task.loadedMeshes[0];
+                const meshes: Mesh[] = [];
+                for (const mesh of task.loadedMeshes) {
+                    if (mesh.hasBoundingInfo) meshes.push(mesh as Mesh);
+                }
+                Assets.Character = Mesh.MergeMeshes(meshes, true, true, undefined, false, true) as Mesh;
                 Assets.Character.scaling = new Vector3(0.1, 0.1, 0.1);
-                Assets.Character.setEnabled(false);
+                Assets.Character.isVisible = false;
                 console.log("Character loaded");
             };
+
+            const spaceshipTask = Assets.manager.addMeshTask("spaceshipTask", "", "", spaceship);
+            spaceshipTask.onSuccess = function(task: MeshAssetTask) {
+                const meshes: Mesh[] = [];
+                for (const mesh of task.loadedMeshes) {
+                    if (mesh.hasBoundingInfo) meshes.push(mesh as Mesh);
+                }
+                Assets.Spaceship = Mesh.MergeMeshes(meshes, true, true, undefined, false, true) as Mesh;
+                Assets.Spaceship.scaling = new Vector3(0.01, 0.01, 0.01);
+                Assets.Spaceship.isVisible = false;
+                const spaceshipMat = new StandardMaterial("spaceshipMat", scene);
+                spaceshipMat.emissiveColor = new Color3(0.5, 0.5, 0.5);
+                spaceshipMat.useLogarithmicDepth = true;
+                Assets.Spaceship.material = spaceshipMat;
+                console.log("Spaceship loaded");
+            };
+
             Assets.manager.onProgress = (remainingCount, totalCount) => {
                 scene.getEngine().loadingUIText = `Loading assets... ${totalCount - remainingCount}/${totalCount}`;
-            }
+            };
             Assets.manager.load();
 
             Assets.manager.onFinish = () => {
