@@ -162,9 +162,9 @@ export class StarSystem {
         this.clock += deltaTime;
 
         this.scene._chunkForge.update();
-        for (const body of this.getBodies()) body.update(this.scene.getPlayer(), deltaTime);
+        for (const body of this.getBodies()) body.update(this.scene.getController(), deltaTime);
 
-        this.translateAllBodies(this.scene.getPlayer().getAbsolutePosition().negate());
-        this.scene.getPlayer().translate(this.scene.getPlayer().getAbsolutePosition().negate());
+        this.translateAllBodies(this.scene.getController().transform.getAbsolutePosition().negate());
+        this.scene.getController().transform.translate(this.scene.getController().transform.getAbsolutePosition().negate());
     }
 }

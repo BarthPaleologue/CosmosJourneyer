@@ -1,7 +1,7 @@
 import { Mesh, MeshBuilder } from "@babylonjs/core";
 
 import { BodyType } from "../interfaces";
-import { PlayerController } from "../../player/playerController";
+import { AbstractController } from "../../controllers/abstractController";
 import { StarSystem } from "../starSystem";
 import { PlanetPhysicalProperties } from "../physicalProperties";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
@@ -59,7 +59,7 @@ export class GasPlanet extends AbstractBody {
             },
             starSystem.scene
         );
-        this.mesh.parent = this.transform;
+        this.mesh.parent = this.node;
 
         this.material = new GasPlanetMaterial(this, starSystem.scene);
         this.mesh.material = this.material;
@@ -81,7 +81,7 @@ export class GasPlanet extends AbstractBody {
         if (uniformRandBool(0.8, this.rng, Steps.RINGS)) this.createRings();
     }
 
-    public override update(player: PlayerController, deltaTime: number): void {
+    public override update(player: AbstractController, deltaTime: number): void {
         super.update(player, deltaTime);
         this.material.update(player);
     }

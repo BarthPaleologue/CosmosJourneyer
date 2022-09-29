@@ -4,7 +4,7 @@ import { SpacePostProcess } from "./spacePostProcess";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
 
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
-import { PlayerController } from "../player/playerController";
+import { AbstractController } from "../controllers/abstractController";
 import { BodyType } from "../bodies/interfaces";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { UberScene } from "../core/uberScene";
@@ -19,7 +19,7 @@ export interface StarfieldSettings {
 export class StarfieldPostProcess extends SpacePostProcess {
     settings: StarfieldSettings;
 
-    constructor(name: string, player: PlayerController, scene: UberScene) {
+    constructor(name: string, player: AbstractController, scene: UberScene) {
         const settings: StarfieldSettings = {
             foo: 1
         };
@@ -32,7 +32,7 @@ export class StarfieldPostProcess extends SpacePostProcess {
                     //TODO: probably should be in the glsl
                     let vis = 1.0;
                     for (const star of scene.getStarSystem().stars) {
-                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.getAbsolutePosition().normalizeToNew(), player.getForwardDirection()));
+                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.getAbsolutePosition().normalizeToNew(), player.transform.getForwardDirection()));
                     }
                     vis /= 2;
                     let vis2 = 1.0;

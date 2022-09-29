@@ -3,7 +3,7 @@ import { Color3, Quaternion, Tools } from "@babylonjs/core";
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 import { Star } from "./bodies/stars/star";
 
-import { PlayerController } from "./player/playerController";
+import { AbstractController } from "./controllers/abstractController";
 
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
@@ -24,6 +24,7 @@ import { Assets } from "./assets";
 import { GasPlanet } from "./bodies/planets/gasPlanet";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { HelmetOverlay } from "./ui/helmetOverlay";
+import { PlayerController } from "./controllers/playerController";
 
 const helmetOverlay = new HelmetOverlay();
 const bodyEditor = new BodyEditor();
@@ -41,10 +42,10 @@ Assets.Init(scene).then(() => {
 
     const player = new PlayerController(scene);
     player.speed = 0.2 * Settings.EARTH_RADIUS;
-    player.camera.maxZ = Settings.EARTH_RADIUS * 100000;
+    player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
     player.inputs.push(new Keyboard(), mouse, new Gamepad());
 
-    scene.setPlayer(player);
+    scene.setController(player);
 
     console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
@@ -160,18 +161,17 @@ Assets.Init(scene).then(() => {
     function updateScene() {
         const deltaTime = engine.getDeltaTime() / 1000;
 
-        scene.getPlayer().nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.getAbsolutePosition());
+        scene.getController().nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.transform.getAbsolutePosition());
 
-        bodyEditor.update(scene.getPlayer());
-        helmetOverlay.update(scene.getPlayer().getNearestBody());
+        bodyEditor.update(scene.getController());
+        helmetOverlay.update(scene.getController().getNearestBody());
         helmetOverlay.setVisibility(bodyEditor.getVisibility() != EditorVisibility.FULL);
 
         starSystem.translateAllBodies(player.update(deltaTime));
 
         //FIXME: should address stars orbits
-        for (const star of starSystem.stars) {
-            star.orbitalProperties.period = 0;
-        }
+        for (const star of starSystem.stars) star.orbitalProperties.period = 0;
+
         scene.update(deltaTime * Settings.TIME_MULTIPLIER);
 
         if (!collisionWorker.isBusy() && player.isOrbiting()) {
@@ -183,7 +183,7 @@ Assets.Init(scene).then(() => {
 
     document.addEventListener("keydown", (e) => {
         if (e.key == "o") scene.isOverlayEnabled = !scene.isOverlayEnabled;
-        if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getPlayer().camera, { precision: 4 });
+        if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getController().getActiveCamera(), { precision: 4 });
         if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
         if (e.key == "w" && player.isOrbiting())

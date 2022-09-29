@@ -7,7 +7,7 @@ import { Vector3 } from "@babylonjs/core";
 import { BodyType, RigidBody } from "../interfaces";
 import { CollisionData } from "../../chunks/workerDataTypes";
 import { TaskType } from "../../chunks/taskTypes";
-import { PlayerController } from "../../player/playerController";
+import { AbstractController } from "../../controllers/abstractController";
 import { StarSystem } from "../starSystem";
 import { Settings } from "../../settings";
 import { SolidPhysicalProperties } from "../physicalProperties";
@@ -189,10 +189,10 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         for (const side of this.sides) side.reset();
     }
 
-    public override update(player: PlayerController, deltaTime: number): void {
+    public override update(player: AbstractController, deltaTime: number): void {
         super.update(player, deltaTime);
         this.material.update(player);
-        this.updateLOD(player.getAbsolutePosition());
+        this.updateLOD(player.transform.getAbsolutePosition());
     }
 
     public override getApparentRadius(): number {

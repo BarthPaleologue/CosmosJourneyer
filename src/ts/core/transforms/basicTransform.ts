@@ -5,20 +5,20 @@ import { Axis, Quaternion, Space, TransformNode, Vector3 } from "@babylonjs/core
  * Very thin wrapper around a BabylonJS TransformNode
  */
 export class BasicTransform implements ITransformable {
-    transform: TransformNode;
+    node: TransformNode;
 
     constructor(name: string) {
-        this.transform = new TransformNode(name + "Transform");
-        this.transform.position = Vector3.Zero();
-        this.transform.rotationQuaternion = Quaternion.Identity();
+        this.node = new TransformNode(name + "Transform");
+        this.node.position = Vector3.Zero();
+        this.node.rotationQuaternion = Quaternion.Identity();
     }
 
     public setAbsolutePosition(newPosition: Vector3): void {
-        this.transform.setAbsolutePosition(newPosition);
+        this.node.setAbsolutePosition(newPosition);
     }
 
     public getAbsolutePosition(): Vector3 {
-        return this.transform.getAbsolutePosition();
+        return this.node.getAbsolutePosition();
     }
 
     public translate(displacement: Vector3): void {
@@ -26,17 +26,17 @@ export class BasicTransform implements ITransformable {
     }
 
     public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {
-        this.transform.rotateAround(pivot, axis, amount);
-        this.transform.computeWorldMatrix(true);
+        this.node.rotateAround(pivot, axis, amount);
+        this.node.computeWorldMatrix(true);
     }
 
     public rotate(axis: Vector3, amount: number) {
-        this.transform.rotate(axis, amount, Space.WORLD);
+        this.node.rotate(axis, amount, Space.WORLD);
     }
 
     public getRotationQuaternion(): Quaternion {
-        if (this.transform.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.transform.name}`);
-        return this.transform.rotationQuaternion;
+        if (this.node.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.node.name}`);
+        return this.node.rotationQuaternion;
     }
 
     public getInverseRotationQuaternion(): Quaternion {
@@ -50,7 +50,7 @@ export class BasicTransform implements ITransformable {
      * @returns the unit vector pointing forward the player controler in world space
      */
     public getForwardDirection(): Vector3 {
-        return this.transform.getDirection(Axis.Z);
+        return this.node.getDirection(Axis.Z);
     }
 
     /**
@@ -66,7 +66,7 @@ export class BasicTransform implements ITransformable {
      * @returns the unit vector pointing upward the player controler in world space
      */
     public getUpwardDirection(): Vector3 {
-        return this.transform.getDirection(Axis.Y);
+        return this.node.getDirection(Axis.Y);
     }
 
     /**
@@ -82,7 +82,7 @@ export class BasicTransform implements ITransformable {
      * @returns the unit vector pointing to the right of the player controler in world space
      */
     public getRightDirection(): Vector3 {
-        return this.transform.getDirection(Axis.X);
+        return this.node.getDirection(Axis.X);
     }
 
     /**
@@ -91,6 +91,30 @@ export class BasicTransform implements ITransformable {
      */
     public getLeftDirection(): Vector3 {
         return this.getRightDirection().negate();
+    }
+
+    /**
+     *
+     * @param amount
+     */
+    public roll(amount: number): void {
+        this.rotate(this.getForwardDirection(), amount);
+    }
+
+    /**
+     *
+     * @param amount
+     */
+    public pitch(amount: number): void {
+        this.rotate(this.getRightDirection(), amount);
+    }
+
+    /**
+     *
+     * @param amount
+     */
+    public yaw(amount: number): void {
+        this.rotate(this.getUpwardDirection(), amount);
     }
 
     /* #endregion directions */

@@ -21,24 +21,24 @@ export class GeneralPanel extends EditorPanel {
         const power = 1.4;
 
         this.sliders = [
-            new Slider("zoom", document.getElementById("zoom") as HTMLElement, 0, 100, (100 * body.radius) / body.transform.position.z, (value: number) => {
+            new Slider("zoom", document.getElementById("zoom") as HTMLElement, 0, 100, (100 * body.radius) / body.node.position.z, (value: number) => {
                 const playerDir = body.getAbsolutePosition().normalizeToNew();
                 body.setAbsolutePosition(playerDir.scale((100 * body.getRadius()) / value));
             }),
             new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
                 body.rotate(Axis.X, newAxialTilt - axialTiltX);
-                if (scene.getPlayer().isOrbiting()) scene.getPlayer().rotateAround(body.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
+                if (scene.getController().isOrbiting()) scene.getController().transform.rotateAround(body.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
                 axialTiltX = newAxialTilt;
             }),
             new Slider("axialTiltZ", document.getElementById("axialTiltZ") as HTMLElement, -180, 180, Math.round((180 * axialTiltZ) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
                 body.rotate(Axis.Z, newAxialTilt - axialTiltZ);
-                if (scene.getPlayer().isOrbiting()) scene.getPlayer().rotateAround(body.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
+                if (scene.getController().isOrbiting()) scene.getController().transform.rotateAround(body.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
                 axialTiltZ = newAxialTilt;
             }),
-            new Slider("cameraFOV", document.getElementById("cameraFOV") as HTMLElement, 0, 360, (scene.getPlayer().camera.fov * 360) / Math.PI, (val: number) => {
-                scene.getPlayer().camera.fov = (val * Math.PI) / 360;
+            new Slider("cameraFOV", document.getElementById("cameraFOV") as HTMLElement, 0, 360, (scene.getController().getActiveCamera().fov * 360) / Math.PI, (val: number) => {
+                scene.getController().getActiveCamera().fov = (val * Math.PI) / 360;
             }),
             new Slider("timeModifier", document.getElementById("timeModifier") as HTMLElement, -200, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {
                 Settings.TIME_MULTIPLIER = Math.sign(val) * Math.pow(Math.abs(val), power);

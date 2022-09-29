@@ -3,7 +3,7 @@ import { AbstractMesh, Color3, Mesh, StandardMaterial, Tools } from "@babylonjs/
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 
 import "../styles/index.scss";
-import { PlayerController } from "./player/playerController";
+import { AbstractController } from "./controllers/abstractController";
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
 import { Gamepad } from "./inputs/gamepad";
@@ -17,6 +17,7 @@ import { BodyType } from "./bodies/interfaces";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { HelmetOverlay } from "./ui/helmetOverlay";
+import { ShipController } from "./controllers/shipController";
 
 const helmetOverlay = new HelmetOverlay();
 
@@ -30,22 +31,17 @@ const [engine, scene] = initEngineScene(canvas);
 Assets.Init(scene).then(() => {
     const mouse = new Mouse(canvas, 1e5);
 
-    const player = new PlayerController(scene);
-    player.speed = 0.2 * Settings.EARTH_RADIUS;
-    player.camera.maxZ = Settings.EARTH_RADIUS * 100000;
-    player.inputs.push(new Keyboard(), mouse, new Gamepad());
-    const spaceship = Assets.Spaceship.createInstance("spaceshipdemo");
-    spaceship.parent = player.transform;
-    spaceship.position.z = 5;
-    spaceship.position.y = -2;
+    const spaceshipController = new ShipController(scene);
+    spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
+    spaceshipController.inputs.push(new Keyboard(), mouse, new Gamepad());
 
-    scene.setPlayer(player);
+    scene.setController(spaceshipController);
 
     const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
     const starSystem = new StarSystem(starSystemSeed, scene);
     scene.setStarSystem(starSystem);
 
-    new StarfieldPostProcess("starfield", player, scene);
+    new StarfieldPostProcess("starfield", spaceshipController, scene);
 
     starSystem.makeStars(1);
     starSystem.makePlanets(1);
@@ -54,18 +50,18 @@ Assets.Init(scene).then(() => {
 
     document.addEventListener("keydown", (e) => {
         if (e.key == "o") scene.isOverlayEnabled = !scene.isOverlayEnabled;
-        if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getPlayer().camera, { precision: 4 });
+        if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getController().getActiveCamera(), { precision: 4 });
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
-        if (e.key == "w" && player.nearestBody != null)
-            (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
+        if (e.key == "w" && spaceshipController.nearestBody != null)
+            (<TelluricPlanet>(<unknown>spaceshipController.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>spaceshipController.nearestBody)).material.wireframe;
     });
 
-    const collisionWorker = new CollisionWorker(player, starSystem);
+    const collisionWorker = new CollisionWorker(spaceshipController, starSystem);
 
 
     starSystem.update(Date.now() / 1000);
 
-    player.positionNearBody(starSystem.planets[0]);
+    spaceshipController.positionNearBody(starSystem.planets[0]);
 
     scene.executeWhenReady(() => {
         engine.loadingScreen.hideLoadingUI();
@@ -73,22 +69,21 @@ Assets.Init(scene).then(() => {
         scene.registerBeforeRender(() => {
             const deltaTime = engine.getDeltaTime() / 1000;
 
-            scene.getPlayer().nearestBody = starSystem.getNearestBody();
+            scene.getController().nearestBody = starSystem.getNearestBody();
 
-            helmetOverlay.update(scene.getPlayer().getNearestBody());
+            helmetOverlay.update(scene.getController().getNearestBody());
             helmetOverlay.setVisibility(true);
 
             //FIXME: should address stars orbits
-            for (const star of starSystem.stars) {
-                star.orbitalProperties.period = 0;
-            }
+            for (const star of starSystem.stars) star.orbitalProperties.period = 0;
+
             scene.update(Settings.TIME_MULTIPLIER * deltaTime);
 
-            starSystem.translateAllBodies(player.update(deltaTime));
+            starSystem.translateAllBodies(spaceshipController.update(deltaTime));
 
-            if (!collisionWorker.isBusy() && player.isOrbiting()) {
-                if (player.nearestBody?.bodyType == BodyType.TELLURIC) {
-                    collisionWorker.checkCollision(player.nearestBody as TelluricPlanet);
+            if (!collisionWorker.isBusy() && spaceshipController.isOrbiting()) {
+                if (spaceshipController.nearestBody?.bodyType == BodyType.TELLURIC) {
+                    collisionWorker.checkCollision(spaceshipController.nearestBody as TelluricPlanet);
                 }
             }
         });

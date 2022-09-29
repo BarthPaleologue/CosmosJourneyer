@@ -1,7 +1,7 @@
 import { Color3, Effect, MaterialHelper, ShaderMaterial } from "@babylonjs/core";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { ColorMode, ColorSettings } from "./colorSettingsInterface";
-import { PlayerController } from "../player/playerController";
+import { AbstractController } from "../controllers/abstractController";
 
 import surfaceMaterialFragment from "../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../shaders/telluricPlanetMaterial/vertex.glsl";
@@ -110,7 +110,7 @@ export class TelluricMaterial extends ShaderMaterial {
         this.setColor3("desertColor", this.colorSettings.desertColor);
         this.setColor3("bottomColor", this.colorSettings.bottomColor);
 
-        this.setVector3("playerPosition", scene.getPlayer().camera.position);
+        this.setVector3("playerPosition", scene.getController().getActiveCamera().position);
 
         this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
 
@@ -148,9 +148,9 @@ export class TelluricMaterial extends ShaderMaterial {
         this.setFloat("maxElevation", this.planet.terrainSettings.continentBaseHeight + this.planet.terrainSettings.maxMountainHeight + this.planet.terrainSettings.maxBumpHeight);
     }
 
-    public update(player: PlayerController) {
+    public update(player: AbstractController) {
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
-        this.setVector3("playerPosition", player.getAbsolutePosition());
+        this.setVector3("playerPosition", player.transform.getAbsolutePosition());
 
         this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
         this.setInt("nbStars", this.planet.starSystem.stars.length);

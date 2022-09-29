@@ -18,28 +18,28 @@ export abstract class SpacePostProcess extends UberPostProcess implements IPostP
                 name: "projection",
                 type: ShaderDataType.Matrix,
                 get: () => {
-                    return scene.getPlayer().camera.getProjectionMatrix();
+                    return scene.getController().getActiveCamera().getProjectionMatrix();
                 }
             },
             {
                 name: "view",
                 type: ShaderDataType.Matrix,
                 get: () => {
-                    return scene.getPlayer().camera.getViewMatrix();
+                    return scene.getController().getActiveCamera().getViewMatrix();
                 }
             },
             {
                 name: "cameraNear",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return scene.getPlayer().camera.minZ;
+                    return scene.getController().getActiveCamera().minZ;
                 }
             },
             {
                 name: "cameraFar",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return scene.getPlayer().camera.maxZ;
+                    return scene.getController().getActiveCamera().maxZ;
                 }
             },
             {
@@ -87,7 +87,7 @@ export abstract class SpacePostProcess extends UberPostProcess implements IPostP
                 name: "depthSampler",
                 type: ShaderDataType.Texture,
                 get: () => {
-                    return scene.customRenderTargets[0];
+                    return scene.getActiveUberCamera().depthRenderer.getDepthMap();//scene.customRenderTargets[0];
                 }
             }
         ];

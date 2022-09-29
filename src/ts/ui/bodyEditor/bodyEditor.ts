@@ -2,7 +2,7 @@ import editorHTML from "../../../html/bodyEditor.html";
 import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
 import { Star } from "../../bodies/stars/star";
 import { BodyType } from "../../bodies/interfaces";
-import { PlayerController } from "../../player/playerController";
+import { AbstractController } from "../../controllers/abstractController";
 import { AbstractBody } from "../../bodies/abstractBody";
 import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../../materials/colorSettingsInterface";
@@ -239,7 +239,7 @@ export class BodyEditor {
         for (const panel of this.panels) panel.updateAllSliders();
     }
 
-    public update(player: PlayerController) {
+    public update(player: AbstractController) {
         if (player.getNearestBody().name != this.currentBodyId) this.setBody(player.getNearestBody());
     }
 }

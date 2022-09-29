@@ -1,5 +1,5 @@
 import { Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
-import { PlayerController } from "../player/playerController";
+import { AbstractController } from "../controllers/abstractController";
 
 import surfaceMaterialFragment from "../../shaders/gasPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../shaders/gasPlanetMaterial/vertex.glsl";
@@ -101,9 +101,9 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setFloat("colorSharpness", this.colorSettings.colorSharpness);
     }
 
-    public update(player: PlayerController) {
+    public update(player: AbstractController) {
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
-        this.setVector3("playerPosition", player.getAbsolutePosition());
+        this.setVector3("playerPosition", player.transform.getAbsolutePosition());
 
         this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
         this.setInt("nbStars", this.planet.starSystem.stars.length);

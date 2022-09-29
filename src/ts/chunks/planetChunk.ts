@@ -19,11 +19,11 @@ export class PlanetChunk {
 
         this.tree = tree;
 
-        this.mesh = new Mesh(`Chunk${id}`, tree.planet.transform.getScene());
+        this.mesh = new Mesh(`Chunk${id}`, tree.planet.node.getScene());
         this.mesh.setEnabled(false);
         this.mesh.isBlocker = true;
         this.mesh.material = tree.planet.material;
-        this.mesh.parent = tree.planet.transform;
+        this.mesh.parent = tree.planet.node;
 
         // computing the position of the chunk on the side of the planet
         this.mesh.position = getChunkPlaneSpacePositionFromPath(tree.planet.getDiameter(), path);

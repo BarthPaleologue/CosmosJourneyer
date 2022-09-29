@@ -1,6 +1,6 @@
 import { Quaternion, Axis } from "@babylonjs/core";
 import { BodyType, ISeedable } from "./interfaces";
-import { PlayerController } from "../player/playerController";
+import { AbstractController } from "../controllers/abstractController";
 import { StarSystem } from "./starSystem";
 import { PhysicalProperties } from "./physicalProperties";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
@@ -119,7 +119,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
      * @param player the player in the simulation
      * @param deltaTime the time step to update for
      */
-    public update(player: PlayerController, deltaTime: number): void {
+    public update(player: AbstractController, deltaTime: number): void {
         if (this.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
             this.orbitalProperties.orientationQuaternion = orientationQuaternion;
@@ -129,15 +129,15 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
             const initialPosition = this.getAbsolutePosition().clone();
             const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this.starSystem.getTime());
 
-            if (player.isOrbiting(this, 50 / (this.depth + 1) ** 3)) player.translate(newPosition.subtract(initialPosition));
+            if (player.isOrbiting(this, 50 / (this.depth + 1) ** 3)) player.transform.translate(newPosition.subtract(initialPosition));
             this.setAbsolutePosition(newPosition);
         }
 
         if (this.physicalProperties.rotationPeriod > 0) {
             const dtheta = (2 * Math.PI * deltaTime) / this.physicalProperties.rotationPeriod;
 
-            if (player.isOrbiting(this)) player.rotateAround(this.getAbsolutePosition(), this.transform.up, -dtheta);
-            this.rotate(this.transform.up, -dtheta);
+            if (player.isOrbiting(this)) player.transform.rotateAround(this.getAbsolutePosition(), this.node.up, -dtheta);
+            this.rotate(this.node.up, -dtheta);
         }
 
         for (const postprocessKey in this.postProcesses) {

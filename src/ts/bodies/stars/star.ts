@@ -2,7 +2,7 @@ import { AbstractBody } from "../abstractBody";
 
 import { Mesh, MeshBuilder, Quaternion } from "@babylonjs/core";
 import { BodyType } from "../interfaces";
-import { PlayerController } from "../../player/playerController";
+import { AbstractController } from "../../controllers/abstractController";
 import { StarSystem } from "../starSystem";
 import { StarPhysicalProperties } from "../physicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
@@ -58,13 +58,13 @@ export class Star extends AbstractBody {
         };
 
         this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius * 2, segments: 32 }, starSystemManager.scene);
-        this.mesh.parent = this.transform;
+        this.mesh.parent = this.node;
 
         this.material = new StarMaterial(this, starSystemManager.scene);
         this.mesh.material = this.material;
 
         // TODO: remove when rotation is transmitted to children
-        this.transform.rotationQuaternion = Quaternion.Identity();
+        this.node.rotationQuaternion = Quaternion.Identity();
 
         this.postProcesses = {
             volumetricLight: new VolumetricLight(this, this.mesh, this.starSystem.scene),
@@ -79,7 +79,7 @@ export class Star extends AbstractBody {
         }
     }
 
-    public override update(player: PlayerController, deltaTime: number): void {
+    public override update(player: AbstractController, deltaTime: number): void {
         super.update(player, deltaTime);
 
         this.material.update();
