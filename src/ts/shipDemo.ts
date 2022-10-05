@@ -54,6 +54,7 @@ Assets.Init(scene).then(() => {
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
         if (e.key == "w" && spaceshipController.nearestBody != null)
             (<TelluricPlanet>(<unknown>spaceshipController.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>spaceshipController.nearestBody)).material.wireframe;
+        if (e.key == "f") spaceshipController.flightAssistEnabled = !spaceshipController.flightAssistEnabled;
     });
 
     const collisionWorker = new CollisionWorker(spaceshipController, starSystem);

@@ -20,6 +20,8 @@ export class ShipController extends AbstractController {
     readonly thirdPersonCamera: UberFreeCamera;
     readonly firstPersonCamera: UberFreeCamera;
 
+    flightAssistEnabled: boolean = true;
+
     constructor(scene: UberScene) {
         super();
 
@@ -30,6 +32,8 @@ export class ShipController extends AbstractController {
 
         this.thirdPersonCamera = new UberFreeCamera("thirdPersonCamera", Vector3.Zero(), scene);
         this.thirdPersonCamera.parent = this.transform.node;
+        //this.thirdPersonCamera.position.z = -5;
+        //this.thirdPersonCamera.position.y = 2;
 
         scene.setActiveUberCamera(this.getActiveCamera());
 
@@ -63,8 +67,11 @@ export class ShipController extends AbstractController {
         this.transform.rotationAcceleration.copyFromFloats(0, 0, 0);
         this.transform.acceleration.copyFromFloats(0, 0, 0);
         for (const input of this.inputs) this.listenTo(input, deltaTime);
-        const displacement = this.transform.update(deltaTime).clone();
-        this.transform.translate(displacement.negate());
-        return displacement.negate();
+        const displacement = this.transform.update(deltaTime).negate();
+        if(this.flightAssistEnabled && this.transform.rotationAcceleration.length() == 0) {
+            this.transform.rotationSpeed.scaleInPlace(0.9);
+        }
+        this.transform.translate(displacement);
+        return displacement;
     }
 }
