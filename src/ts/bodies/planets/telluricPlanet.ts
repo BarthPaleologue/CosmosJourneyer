@@ -189,10 +189,13 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         for (const side of this.sides) side.reset();
     }
 
-    public override update(player: AbstractController, deltaTime: number): void {
-        super.update(player, deltaTime);
-        this.material.update(player);
+    public override updateTransform(player: AbstractController, deltaTime: number): void {
+        super.updateTransform(player, deltaTime);
         this.updateLOD(player.transform.getAbsolutePosition());
+    }
+
+    public override updateGraphics(player: AbstractController, deltaTime: number): void {
+        this.material.update(player);
     }
 
     public override getApparentRadius(): number {

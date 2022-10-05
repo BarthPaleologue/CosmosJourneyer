@@ -169,16 +169,16 @@ Assets.Init(scene).then(() => {
 
         starSystem.translateAllBodies(player.update(deltaTime));
 
-        //FIXME: should address stars orbits
-        for (const star of starSystem.stars) star.orbitalProperties.period = 0;
-
-        scene.update(deltaTime * Settings.TIME_MULTIPLIER);
-
         if (!collisionWorker.isBusy() && player.isOrbiting()) {
             if (player.nearestBody?.bodyType == BodyType.TELLURIC) {
                 collisionWorker.checkCollision(player.nearestBody as TelluricPlanet);
             }
         }
+
+        //FIXME: should address stars orbits
+        for (const star of starSystem.stars) star.orbitalProperties.period = 0;
+
+        scene.update(deltaTime * Settings.TIME_MULTIPLIER);
     }
 
     document.addEventListener("keydown", (e) => {

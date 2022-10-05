@@ -12,9 +12,9 @@ import { getOrbitalPeriod } from "../orbits/kepler";
 import { seededSquirrelNoise } from "squirrel-noise";
 
 enum Steps {
-    GENERATE_STARS=100,
-    GENERATE_PLANETS=200,
-    CHOOSE_PLANET_TYPE=300,
+    GENERATE_STARS = 100,
+    GENERATE_PLANETS = 200,
+    CHOOSE_PLANET_TYPE = 300,
 }
 
 export class StarSystem {
@@ -44,7 +44,7 @@ export class StarSystem {
     }
 
     public makeStars(n: number): void {
-        if(n < 1) throw new Error("Cannot make less than 1 star");
+        if (n < 1) throw new Error("Cannot make less than 1 star");
         for (let i = 0; i < n; i++) {
             const star = new Star(`star${i}`, this, this.rng(Steps.GENERATE_STARS + this.stars.length), this.stars);
             //TODO: make this better, make it part of the generation
@@ -78,12 +78,12 @@ export class StarSystem {
     }
 
     public makePlanets(n: number): void {
-        if(n < 0) throw new Error(`Cannot make a negative amount of planets : ${n}`);
+        if (n < 0) throw new Error(`Cannot make a negative amount of planets : ${n}`);
         for (let i = 0; i < n; i++) {
-            if(uniformRandBool(0.5, this.rng, Steps.CHOOSE_PLANET_TYPE + this.planets.length)) {
-                this.makeTelluricPlanet()
+            if (uniformRandBool(0.5, this.rng, Steps.CHOOSE_PLANET_TYPE + this.planets.length)) {
+                this.makeTelluricPlanet();
             } else {
-                this.makeGasPlanet()
+                this.makeGasPlanet();
             }
         }
     }
@@ -99,11 +99,11 @@ export class StarSystem {
             period: getOrbitalPeriod(periapsis, apoapsis, satellite.parentBodies),
             orientationQuaternion: satellite.getRotationQuaternion()
         };
-        satellite.material.colorSettings.desertColor.copyFromFloats(92/255, 92/255, 92/255);
+        satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
     }
 
     public makeSatellites(planet: Planet, n: number): void {
-        if(n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
+        if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
         for (let i = 0; i < n; i++) {
             this.makeSatellite(planet);
         }
@@ -161,10 +161,13 @@ export class StarSystem {
     public update(deltaTime: number): void {
         this.clock += deltaTime;
 
-        this.scene._chunkForge.update();
-        for (const body of this.getBodies()) body.update(this.scene.getController(), deltaTime);
+        for (const body of this.getBodies()) body.updateTransform(this.scene.getController(), deltaTime);
 
-        this.translateAllBodies(this.scene.getController().transform.getAbsolutePosition().negate());
-        this.scene.getController().transform.translate(this.scene.getController().transform.getAbsolutePosition().negate());
+        const displacement = this.scene.getController().transform.getAbsolutePosition().negate();
+
+        this.translateAllBodies(displacement);
+        this.scene.getController().transform.translate(displacement);
+
+        for (const body of this.getBodies()) body.updateGraphics(this.scene.getController(), deltaTime);
     }
 }

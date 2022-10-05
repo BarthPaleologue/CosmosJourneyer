@@ -119,7 +119,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
      * @param player the player in the simulation
      * @param deltaTime the time step to update for
      */
-    public update(player: AbstractController, deltaTime: number): void {
+    public updateTransform(player: AbstractController, deltaTime: number): void {
         if (this.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
             this.orbitalProperties.orientationQuaternion = orientationQuaternion;
@@ -139,11 +139,13 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
             if (player.isOrbiting(this)) player.transform.rotateAround(this.getAbsolutePosition(), this.node.up, -dtheta);
             this.rotate(this.node.up, -dtheta);
         }
+    }
 
+    public updateGraphics(controller: AbstractController, deltaTime: number): void {
         for (const postprocessKey in this.postProcesses) {
             const postProcess = this.postProcesses[postprocessKey];
             if (postProcess == null) continue;
             postProcess.update(deltaTime);
         }
-    }
+    };
 }

@@ -15,7 +15,7 @@ varying vec3 vPosition; // position of the vertex in chunk
 varying vec3 vNormal; // normal of the vertex in sphere space
 varying vec3 vLocalPosition;
 
-uniform mat4 world;
+uniform mat4 normalMatrix;
 
 uniform vec3 playerPosition; // camera position in world space
 uniform float cameraNear;
@@ -245,7 +245,7 @@ void main() {
 	normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.00001, normalSharpness, steepFactor * normalStrengthFar);
 
 
-	vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
+	vec3 normalW = mat3(normalMatrix) * normal;
 
 
 	float ndl2 = 0.0; // dimming factor due to light inclination relative to vertex normal in world space

@@ -12,6 +12,7 @@ attribute vec2 uv;
 
 uniform mat4 world;
 uniform mat4 worldViewProjection;
+uniform mat4 normalMatrix;
 
 uniform vec3 planetPosition; // nécessaire temporairement le temps de régler le problème des floats
 
@@ -41,13 +42,13 @@ void main() {
     #endif
     
     vPositionW = vec3(world * vec4(position, 1.0));
-    vNormalW = vec3(world * vec4(normal, 1.0));
+    vNormalW = mat3(normalMatrix) * normal;
 
 	vPosition = vPositionW - planetPosition;
 	vLocalPosition = position;
 
 	vUnitSamplePoint = applyQuaternion(planetInverseRotationQuaternion, normalize(vPosition));
-    vSphereNormalW = vec3(world * vec4(vUnitSamplePoint, 0.0));
+    vSphereNormalW = mat3(normalMatrix) * vUnitSamplePoint;
 	vSamplePoint = applyQuaternion(planetInverseRotationQuaternion, vPosition);
 
 	vNormal = normal;

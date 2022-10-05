@@ -65,6 +65,7 @@ export class UberScene extends Scene {
     }
 
     public update(deltaTime: number) {
+        this._chunkForge.update();
         if(this.starSystem && this.controller) this.starSystem.update(deltaTime);
 
         const switchLimit = this.getController().getNearestBody().postProcesses.rings?.settings.ringStart || 2;
@@ -80,6 +81,7 @@ export class UberScene extends Scene {
             }
         }
     }
+
     public initPostProcesses() {
         this.spaceRenderingPipeline.init();
         this.surfaceRenderingPipeline.init();

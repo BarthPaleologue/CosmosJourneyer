@@ -149,6 +149,8 @@ export class TelluricMaterial extends ShaderMaterial {
     }
 
     public update(player: AbstractController) {
+        this.setMatrix("normalMatrix", this.planet.node.getWorldMatrix().invert().transpose());
+
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
         this.setVector3("playerPosition", player.transform.getAbsolutePosition());
 
