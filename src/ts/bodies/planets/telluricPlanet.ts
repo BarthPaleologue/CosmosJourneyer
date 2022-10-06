@@ -114,7 +114,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
                 this.postProcesses.ocean = ocean;
 
                 const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystem.scene);
-                clouds.settings.cloudCoverage = Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
+                clouds.settings.cloudCoverage = 0.8 * Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
                 this.postProcesses.clouds = clouds;
             } else {
                 this.oceanLevel = 0;
