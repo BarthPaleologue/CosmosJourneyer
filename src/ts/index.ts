@@ -3,8 +3,6 @@ import { Color3, Quaternion, Tools } from "@babylonjs/core";
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 import { Star } from "./bodies/stars/star";
 
-import { AbstractController } from "./controllers/abstractController";
-
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
 import { Gamepad } from "./inputs/gamepad";
@@ -45,7 +43,7 @@ Assets.Init(scene).then(() => {
     player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
     player.inputs.push(new Keyboard(), mouse, new Gamepad());
 
-    scene.setController(player);
+    scene.setActiveController(player);
 
     console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
@@ -161,10 +159,10 @@ Assets.Init(scene).then(() => {
     function updateScene() {
         const deltaTime = engine.getDeltaTime() / 1000;
 
-        scene.getController().nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.transform.getAbsolutePosition());
+        scene.getActiveController().nearestBody = starSystem.getMostInfluentialBodyAtPoint(player.transform.getAbsolutePosition());
 
-        bodyEditor.update(scene.getController());
-        helmetOverlay.update(scene.getController().getNearestBody());
+        bodyEditor.update(scene.getActiveController());
+        helmetOverlay.update(scene.getActiveController().getNearestBody());
         helmetOverlay.setVisibility(bodyEditor.getVisibility() != EditorVisibility.FULL);
 
         starSystem.translateAllBodies(player.update(deltaTime));
@@ -183,7 +181,7 @@ Assets.Init(scene).then(() => {
 
     document.addEventListener("keydown", (e) => {
         if (e.key == "o") scene.isOverlayEnabled = !scene.isOverlayEnabled;
-        if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getController().getActiveCamera(), { precision: 4 });
+        if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getActiveController().getActiveCamera(), { precision: 4 });
         if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
         if (e.key == "w" && player.isOrbiting())

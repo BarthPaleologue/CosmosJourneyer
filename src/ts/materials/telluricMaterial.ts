@@ -110,7 +110,7 @@ export class TelluricMaterial extends ShaderMaterial {
         this.setColor3("desertColor", this.colorSettings.desertColor);
         this.setColor3("bottomColor", this.colorSettings.bottomColor);
 
-        this.setVector3("playerPosition", scene.getController().getActiveCamera().position);
+        this.setVector3("playerPosition", scene.getActiveController().getActiveCamera().position);
 
         this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
 

@@ -25,7 +25,7 @@ export abstract class PlanetPostProcess extends SpacePostProcess {
                 name: "cameraDirection",
                 type: ShaderDataType.Vector3,
                 get: () => {
-                    return scene.getController().getActiveCamera().getDirection(Axis.Z);
+                    return scene.getActiveUberCamera().getDirection(Axis.Z);
                 }
             },
             {

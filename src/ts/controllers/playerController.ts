@@ -16,7 +16,6 @@ export class PlayerController extends AbstractController {
         this.camera = new UberFreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.transform.node;
         this.camera.fov = (80 / 360) * Math.PI;
-        scene.setActiveUberCamera(this.getActiveCamera());
     }
 
     getActiveCamera(): UberFreeCamera {

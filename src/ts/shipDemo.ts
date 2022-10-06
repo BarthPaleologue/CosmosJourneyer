@@ -35,7 +35,7 @@ Assets.Init(scene).then(() => {
     spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
     spaceshipController.inputs.push(new Keyboard(), mouse, new Gamepad());
 
-    scene.setController(spaceshipController);
+    scene.setActiveController(spaceshipController);
 
     const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
     const starSystem = new StarSystem(starSystemSeed, scene);
@@ -50,7 +50,7 @@ Assets.Init(scene).then(() => {
 
     document.addEventListener("keydown", (e) => {
         if (e.key == "o") scene.isOverlayEnabled = !scene.isOverlayEnabled;
-        if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getController().getActiveCamera(), { precision: 4 });
+        if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getActiveController().getActiveCamera(), { precision: 4 });
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
         if (e.key == "w" && spaceshipController.nearestBody != null)
             (<TelluricPlanet>(<unknown>spaceshipController.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>spaceshipController.nearestBody)).material.wireframe;
@@ -70,9 +70,9 @@ Assets.Init(scene).then(() => {
         scene.registerBeforeRender(() => {
             const deltaTime = engine.getDeltaTime() / 1000;
 
-            scene.getController().nearestBody = starSystem.getNearestBody();
+            scene.getActiveController().nearestBody = starSystem.getNearestBody();
 
-            helmetOverlay.update(scene.getController().getNearestBody());
+            helmetOverlay.update(scene.getActiveController().getNearestBody());
             helmetOverlay.setVisibility(true);
 
             //FIXME: should address stars orbits

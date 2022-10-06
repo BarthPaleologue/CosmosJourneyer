@@ -161,13 +161,13 @@ export class StarSystem {
     public update(deltaTime: number): void {
         this.clock += deltaTime;
 
-        for (const body of this.getBodies()) body.updateTransform(this.scene.getController(), deltaTime);
+        for (const body of this.getBodies()) body.updateTransform(this.scene.getActiveController(), deltaTime);
 
-        const displacement = this.scene.getController().transform.getAbsolutePosition().negate();
+        const displacement = this.scene.getActiveController().transform.getAbsolutePosition().negate();
 
         this.translateAllBodies(displacement);
-        this.scene.getController().transform.translate(displacement);
+        this.scene.getActiveController().transform.translate(displacement);
 
-        for (const body of this.getBodies()) body.updateGraphics(this.scene.getController(), deltaTime);
+        for (const body of this.getBodies()) body.updateGraphics(this.scene.getActiveController(), deltaTime);
     }
 }

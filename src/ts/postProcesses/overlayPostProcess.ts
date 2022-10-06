@@ -21,7 +21,7 @@ export class OverlayPostProcess extends SpacePostProcess {
                 name: "cameraDirection",
                 type: ShaderDataType.Vector3,
                 get: () => {
-                    return scene.getController().transform.getForwardDirection();
+                    return scene.getActiveController().transform.getForwardDirection();
                 }
             },
             {

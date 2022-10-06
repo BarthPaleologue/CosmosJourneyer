@@ -13,9 +13,7 @@ import { UberFreeCamera } from "./uberFreeCamera";
 export class UberScene extends Scene {
     starSystem: StarSystem | null = null;
 
-    activeUberCamera: UberFreeCamera | null = null;
-
-    controller: AbstractController | null = null;
+    activeController: AbstractController | null = null;
 
     readonly spaceRenderingPipeline: SpaceRenderingPipeline;
     readonly surfaceRenderingPipeline: SurfaceRenderingPipeline;
@@ -48,36 +46,33 @@ export class UberScene extends Scene {
         if(this.starSystem === null) throw new Error("Star system not set");
         return this.starSystem;
     }
-    public setController(player: AbstractController) {
-        this.controller = player;
+    public setActiveController(controller: AbstractController) {
+        this.activeController = controller;
+        this.activeCamera = controller.getActiveCamera();
     }
-    public getController(): AbstractController {
-        if(this.controller === null) throw new Error("Controller not set");
-        return this.controller;
-    }
-    public setActiveUberCamera(uberCamera: UberFreeCamera) {
-        this.activeUberCamera = uberCamera;
-        this.activeCamera = uberCamera;
+    public getActiveController(): AbstractController {
+        if(this.activeController === null) throw new Error("Controller not set");
+        return this.activeController;
     }
     public getActiveUberCamera(): UberFreeCamera {
-        if(this.activeUberCamera == null) throw new Error("No active Uber Camera");
-        return this.activeUberCamera;
+        if(this.getActiveController().getActiveCamera() === null) throw new Error("No active Uber Camera");
+        return this.getActiveController().getActiveCamera();
     }
 
     public update(deltaTime: number) {
         this._chunkForge.update();
-        if(this.starSystem && this.controller) this.starSystem.update(deltaTime);
+        if(this.starSystem && this.activeController) this.starSystem.update(deltaTime);
 
-        const switchLimit = this.getController().getNearestBody().postProcesses.rings?.settings.ringStart || 2;
-        if (this.getController().isOrbiting(this.getController().getNearestBody(), switchLimit)) {
+        const switchLimit = this.getActiveController().getNearestBody().postProcesses.rings?.settings.ringStart || 2;
+        if (this.getActiveController().isOrbiting(this.getActiveController().getNearestBody(), switchLimit)) {
             if (this.spaceRenderingPipeline.cameras.length > 0) {
                 this.spaceRenderingPipeline.detachCameras();
-                this.surfaceRenderingPipeline.attachToCamera(this.getController().getActiveCamera());
+                this.surfaceRenderingPipeline.attachToCamera(this.getActiveController().getActiveCamera());
             }
         } else {
             if (this.surfaceRenderingPipeline.cameras.length > 0) {
                 this.surfaceRenderingPipeline.detachCameras();
-                this.spaceRenderingPipeline.attachToCamera(this.getController().getActiveCamera());
+                this.spaceRenderingPipeline.attachToCamera(this.getActiveController().getActiveCamera());
             }
         }
     }
@@ -85,6 +80,6 @@ export class UberScene extends Scene {
     public initPostProcesses() {
         this.spaceRenderingPipeline.init();
         this.surfaceRenderingPipeline.init();
-        this.spaceRenderingPipeline.attachToCamera(this.getController().getActiveCamera());
+        this.spaceRenderingPipeline.attachToCamera(this.getActiveController().getActiveCamera());
     }
 }

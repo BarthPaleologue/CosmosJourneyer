@@ -11,35 +11,35 @@ export abstract class SpacePostProcess extends UberPostProcess implements IPostP
                 name: "cameraPosition",
                 type: ShaderDataType.Vector3,
                 get: () => {
-                    return Vector3.Zero();
+                    return scene.getActiveUberCamera().position;
                 }
             },
             {
                 name: "projection",
                 type: ShaderDataType.Matrix,
                 get: () => {
-                    return scene.getController().getActiveCamera().getProjectionMatrix();
+                    return scene.getActiveUberCamera().getProjectionMatrix();
                 }
             },
             {
                 name: "view",
                 type: ShaderDataType.Matrix,
                 get: () => {
-                    return scene.getController().getActiveCamera().getViewMatrix();
+                    return scene.getActiveUberCamera().getViewMatrix();
                 }
             },
             {
                 name: "cameraNear",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return scene.getController().getActiveCamera().minZ;
+                    return scene.getActiveUberCamera().minZ;
                 }
             },
             {
                 name: "cameraFar",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return scene.getController().getActiveCamera().maxZ;
+                    return scene.getActiveUberCamera().maxZ;
                 }
             },
             {
@@ -87,7 +87,7 @@ export abstract class SpacePostProcess extends UberPostProcess implements IPostP
                 name: "depthSampler",
                 type: ShaderDataType.Texture,
                 get: () => {
-                    return scene.getActiveUberCamera().depthRenderer.getDepthMap();//scene.customRenderTargets[0];
+                    return scene.getActiveUberCamera().depthRenderer.getDepthMap();
                 }
             }
         ];
