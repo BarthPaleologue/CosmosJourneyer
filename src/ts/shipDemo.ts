@@ -25,7 +25,7 @@ const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const [engine, scene] = initEngineScene(canvas);
+const [engine, scene] = await initEngineScene(canvas);
 
 
 Assets.Init(scene).then(() => {

@@ -101,5 +101,8 @@ module.exports = () => {
         config.mode = "development";
         config.devtool = "source-map";
     }
+    config.experiments = {
+        topLevelAwait: true
+    }
     return config;
 };

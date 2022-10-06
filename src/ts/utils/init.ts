@@ -1,12 +1,15 @@
-import { Engine } from "@babylonjs/core";
+import { Engine, WebGPUEngine } from "@babylonjs/core";
 import { UberScene } from "../core/uberScene";
 
-export function initEngineScene(canvas: HTMLCanvasElement): [Engine, UberScene] {
-    const engine = new Engine(canvas, false, {
+export async function initEngineScene(canvas: HTMLCanvasElement): Promise<[Engine, UberScene]> {
+    const engine = !("gpu" in navigator) ? new Engine(canvas, false, {
         //useHighPrecisionFloats: true,
         //useHighPrecisionMatrix: true,
         //adaptToDeviceRatio: true,
-    });
+    }) : new WebGPUEngine(canvas);
+
+    if("gpu" in navigator) await (engine as WebGPUEngine).initAsync();
+
     engine.loadingScreen.displayLoadingUI();
 
     console.log("GPU utilisé : " + engine.getGlInfo().renderer);

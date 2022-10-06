@@ -29,7 +29,7 @@ canvas.height = window.innerHeight;
 
 bodyEditor.setCanvas(canvas);
 
-const [engine, scene] = initEngineScene(canvas);
+const [engine, scene] = await initEngineScene(canvas);
 
 
 Assets.Init(scene).then(() => {
