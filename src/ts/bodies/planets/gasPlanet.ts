@@ -86,6 +86,7 @@ export class GasPlanet extends AbstractBody {
     }
 
     public override updateGraphics(controller: AbstractController, deltaTime: number): void {
+        super.updateGraphics(controller, deltaTime);
         this.material.update(controller);
     }
 }

@@ -87,6 +87,7 @@ export class Star extends AbstractBody {
     }
 
     public override updateGraphics(controller: AbstractController, deltaTime: number) {
+        super.updateGraphics(controller, deltaTime);
         this.material.update();
     }
 }

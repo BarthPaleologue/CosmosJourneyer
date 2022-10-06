@@ -195,6 +195,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
     }
 
     public override updateGraphics(player: AbstractController, deltaTime: number): void {
+        super.updateGraphics(player, deltaTime);
         this.material.update(player);
     }
 
