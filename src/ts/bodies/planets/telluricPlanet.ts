@@ -71,7 +71,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
         if (this.isSatelliteOfTelluric) {
             this.radius = Math.max(0.02, normalRandom(0.08, 0.03, this.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
-        } else if(this.isSatelliteOfGas) {
+        } else if (this.isSatelliteOfGas) {
             this.radius = Math.max(0.02, normalRandom(0.5, 0.1, this.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
         } else {
             this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
@@ -112,8 +112,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         if (pressure > epsilon) {
             if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
                 this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
-                const ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystem.scene);
-                this.postProcesses.ocean = ocean;
+                this.postProcesses.ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystem.scene);
 
                 const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystem.scene);
                 clouds.settings.cloudCoverage = 0.8 * Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
@@ -196,9 +195,9 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         this.updateLOD(player.transform.getAbsolutePosition());
     }
 
-    public override updateGraphics(player: AbstractController, deltaTime: number): void {
-        super.updateGraphics(player, deltaTime);
-        this.material.update(player);
+    public override updateGraphics(controller: AbstractController, deltaTime: number) {
+        super.updateGraphics(controller, deltaTime);
+        this.material.update(controller);
     }
 
     public override getApparentRadius(): number {

@@ -53,7 +53,7 @@ float densityAtPoint(vec3 samplePoint) {
     float height01 = heightAboveSurface / (atmosphereRadius - (planetRadius)); // normalized height between 0 and 1
     
     // FIXME: this sould not be a thing
-    height01 = remap(height01, 0.0, 1.0, 0.4, 0.9);
+    height01 = remap(height01, 0.0, 1.0, 0.45, 0.8);
 
     float localDensity = densityModifier * exp(-height01 * falloffFactor); // density with exponential falloff
 
@@ -120,17 +120,17 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     vec3 sunRayOpticalDepth = vec3(0.0);
     vec3 viewRayOpticalDepth = vec3(0.0);
 
-    for (int i = 0 ; i < POINTS_FROM_CAMERA ; ++i) {
+    vec3 starDir = normalize(starPosition - planetPosition);
 
-        float sunRayLengthInAtm = atmosphereRadius - length(samplePoint - planetPosition); // distance traveled by light through atmosphere from light source
-        
-        sunRayLengthInAtm = min(sunRayLengthInAtm, atmosphereRadius - planetRadius);
+    for (int i = 0 ; i < POINTS_FROM_CAMERA ; ++i) {
 
         float height = length(samplePoint - planetPosition);
 
+        float sunRayLengthInAtm = atmosphereRadius - height; // distance traveled by light through atmosphere from light source
+        sunRayLengthInAtm = min(sunRayLengthInAtm, atmosphereRadius - planetRadius);
+
         float viewRayLengthInAtm = stepSize * float(i); // distance traveled by light through atmosphere from sample point to cameraPosition
 
-        vec3 starDir = normalize(starPosition - samplePoint);
         vec3 sunRayOpticalDepth = opticalDepth(samplePoint, starDir, sunRayLengthInAtm);  // scattered from the sun to the point
 
         viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
@@ -151,14 +151,13 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     // https://www.wikiwand.com/en/Rayleigh_scattering#/From_molecules
     // https://www.shadertoy.com/view/wlBXWK
 
-    float costheta = dot(rayDir, normalize(starPosition - samplePoint));
+    float costheta = dot(rayDir, starDir);
     float costheta2 = pow(costheta, 2.0);
 
     float g = mieHaloRadius; //0.7
     float gg = g * g;
 
     float phaseMie = 3.0 / (8.0 * PI) * ((1.0 - gg) * (costheta2 + 1.0)) / (pow(1.0 + gg - 2.0 * costheta * g, 1.5) * (2.0 + gg));
-
 
     // scattering depends on the direction of the light ray and the view ray : it's the rayleigh phase function
     // https://glossary.ametsoc.org/wiki/Rayleigh_phase_function
@@ -169,7 +168,6 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
 
     vec3 opacity = exp(-(mieCoeffs * sunRayOpticalDepth.y + rayleighCoeffs * sunRayOpticalDepth.x + absorptionCoeffs * sunRayOpticalDepth.z));
 
-    
     return (inScatteredRayleigh + inScatteredMie) * sunIntensity;
 }
 
@@ -184,12 +182,9 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     float distanceThroughAtmosphere = max(0.0, escapePoint - impactPoint); // probably doesn't need the max but for the sake of coherence the distance cannot be negative
 
-    //distanceThroughAtmosphere = min(escapePoint - impactPoint, maximumDistance - impactPoint);
-
     vec3 firstPointInAtmosphere = rayOrigin + rayDir * impactPoint; // the first atmosphere point to be hit by the ray
 
     vec3 light = vec3(0.0);
-
     for(int i = 0; i < nbStars; i++) {
         //TODO: the max should be taken at mie, rayleigh and absorption level, not globally
         light = max(light, calculateLight(firstPointInAtmosphere, starPositions[i], rayDir, distanceThroughAtmosphere));// calculate scattering

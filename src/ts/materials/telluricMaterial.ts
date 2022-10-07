@@ -148,11 +148,11 @@ export class TelluricMaterial extends ShaderMaterial {
         this.setFloat("maxElevation", this.planet.terrainSettings.continentBaseHeight + this.planet.terrainSettings.maxMountainHeight + this.planet.terrainSettings.maxBumpHeight);
     }
 
-    public update(player: AbstractController) {
-        this.setMatrix("normalMatrix", this.planet.node.getWorldMatrix().invert().transpose());
+    public update(controller: AbstractController) {
+        this.setMatrix("normalMatrix", this.planet.node.getWorldMatrix().clone().invert().transpose());
 
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
-        this.setVector3("playerPosition", player.transform.getAbsolutePosition());
+        this.setVector3("playerPosition", controller.transform.getAbsolutePosition());
 
         this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
         this.setInt("nbStars", this.planet.starSystem.stars.length);
