@@ -11,8 +11,8 @@ uniform vec3 cameraPosition; // position of the camera in world space
 uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
 uniform int nbStars; // number of stars
 
-uniform mat4 projection; // camera's projection matrix
-uniform mat4 view; // camera's view matrix
+uniform mat4 inverseProjection; // camera's projection matrix
+uniform mat4 inverseView; // camera's view matrix
 
 uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
@@ -25,17 +25,16 @@ uniform float ringEnd; // ring end
 uniform float ringFrequency; // ring frequency
 uniform float ringOpacity; // ring opacity
 
-uniform vec4 planetRotationQuaternion;
+uniform vec3 planetRotationAxis;
 
 #pragma glslify: completeNoise = require(./utils/noise.glsl)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, projection=projection, view=view)
+#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
-#pragma glslify: saturate = require(./utils/saturate.glsl)
 
 bool rayIntersectPlane(vec3 rayOrigin, vec3 rayDir, vec3 planetPosition, vec3 planeNormal, out float t) {
 	float denom = dot(rayDir, planeNormal);
@@ -45,8 +44,6 @@ bool rayIntersectPlane(vec3 rayOrigin, vec3 rayDir, vec3 planetPosition, vec3 pl
 }
 
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
-
-#pragma glslify: applyQuaternion = require(./utils/applyQuaternion.glsl)
 
 float ringDensityAtPoint(vec3 samplePoint) {
 	vec3 samplePointPlanetSpace = samplePoint - planetPosition;
@@ -80,11 +77,8 @@ void main() {
 
     vec3 finalColor;
 
-    vec3 planetUpVector = vec3(0.0, 1.0, 0.0);
-    planetUpVector = applyQuaternion(planetRotationQuaternion, planetUpVector);
-
 	float impactPoint;
-	if(rayIntersectPlane(cameraPosition, rayDir, planetPosition, planetUpVector, impactPoint)) {
+	if(rayIntersectPlane(cameraPosition, rayDir, planetPosition, planetRotationAxis, impactPoint)) {
 		if(impactPoint < maximumDistance) {
             float t0, t1;
             if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, t0, t1) && t0 < impactPoint) {
@@ -92,7 +86,6 @@ void main() {
             } else {
                 vec3 samplePoint = cameraPosition + impactPoint * rayDir;
                 float ringDensity = ringDensityAtPoint(samplePoint);
-                //ringDensity *= saturate((maximumDistance - impactPoint) / 1e9); // fade away when close to surface
 
                 vec3 ringColor = vec3(0.5) * ringDensity;
                 ringColor = lerp(ringColor, screenColor, ringOpacity);

@@ -1,4 +1,4 @@
-import { Quaternion, Axis } from "@babylonjs/core";
+import { Quaternion, Axis, Vector3 } from "@babylonjs/core";
 import { BodyType, ISeedable } from "./interfaces";
 import { AbstractController } from "../controllers/abstractController";
 import { StarSystem } from "./starSystem";
@@ -105,6 +105,13 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         return 2 * this.getRadius();
     }
 
+    /**
+     * Returns the axis of rotation of the body
+     */
+    public getRotationAxis(): Vector3 {
+        return new Vector3(0, 1, 0).applyRotationQuaternionInPlace(this.getRotationQuaternion());
+    }
+
     public createRings(): RingsPostProcess {
         const rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem.scene);
         rings.settings.ringStart = randRange(1.8, 2.2, this.rng, Steps.RINGS);
@@ -147,5 +154,5 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
             if (postProcess == null) continue;
             postProcess.update(deltaTime);
         }
-    };
+    }
 }

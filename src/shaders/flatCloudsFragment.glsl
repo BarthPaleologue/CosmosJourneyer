@@ -14,8 +14,8 @@ uniform vec3 cameraPosition; // position of the camera in world space
 uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
 uniform int nbStars; // number of stars
 
-uniform mat4 projection; // camera's projection matrix
-uniform mat4 view; // camera's view matrix
+uniform mat4 inverseProjection; // camera's projection matrix
+uniform mat4 inverseView; // camera's view matrix
 
 uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
@@ -51,7 +51,7 @@ uniform float time;
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, projection=projection, view=view)
+#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 

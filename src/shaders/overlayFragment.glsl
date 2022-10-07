@@ -8,7 +8,9 @@ uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
 uniform mat4 view;
+uniform mat4 inverseView;
 uniform mat4 projection;
+uniform mat4 inverseProjection;
 
 uniform float cameraNear;
 uniform float cameraFar;
@@ -20,7 +22,7 @@ uniform bool isEnabled;
 uniform float aspectRatio;
 varying vec2 vUV;
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, projection=projection, view=view);
+#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView);
 #pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=projection, view=view);
 
 #pragma glslify: remap = require(./utils/remap.glsl)

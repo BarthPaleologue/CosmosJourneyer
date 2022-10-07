@@ -22,10 +22,24 @@ export abstract class SpacePostProcess extends UberPostProcess implements IPostP
                 }
             },
             {
+                name: "inverseProjection",
+                type: ShaderDataType.Matrix,
+                get: () => {
+                    return scene.getActiveUberCamera().getInverseProjectionMatrix();
+                }
+            },
+            {
                 name: "view",
                 type: ShaderDataType.Matrix,
                 get: () => {
                     return scene.getActiveUberCamera().getViewMatrix();
+                }
+            },
+            {
+                name: "inverseView",
+                type: ShaderDataType.Matrix,
+                get: () => {
+                    return scene.getActiveUberCamera().getInverseViewMatrix();
                 }
             },
             {
