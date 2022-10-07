@@ -4,6 +4,7 @@ import { FlatCloudsPostProcess } from "../postProcesses/planetPostProcesses/flat
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { VolumetricLight } from "../postProcesses/volumetricLight";
 import { IPostProcess } from "../postProcesses/iPostProcess";
+import { BlackHolePostProcess } from "../postProcesses/planetPostProcesses/blackHolePostProcess";
 
 export type BodyPostProcesses = {
     [details: string]: IPostProcess | null;
@@ -22,3 +23,7 @@ export type TelluricPlanetPostProcesses = PlanetPostProcesses & {
 export type StarPostProcesses = BodyPostProcesses & {
     volumetricLight: VolumetricLight;
 };
+
+export type BlackHolePostProcesses = BodyPostProcesses & {
+    blackHole: BlackHolePostProcess;
+}

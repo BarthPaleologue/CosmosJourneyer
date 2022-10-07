@@ -4,7 +4,8 @@ import { CollisionData } from "../chunks/workerDataTypes";
 export enum BodyType {
     STAR,
     TELLURIC,
-    GAZ
+    GAZ,
+    BLACK_HOLE,
 }
 
 export interface ISeedable {

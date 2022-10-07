@@ -13,6 +13,7 @@ const config = {
         showcase: "./src/ts/index.ts",
         random: "./src/ts/randomizer.ts",
         shipDemo: "./src/ts/shipDemo.ts",
+        blackHole: "./src/ts/blackHoleDemo.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist")
@@ -45,6 +46,12 @@ const config = {
             filename: "shipdemo.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["shipDemo"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "BlackHole Demo",
+            filename: "blackhole.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["blackHole"]
         }),
         new MiniCssExtractPlugin()
     ],

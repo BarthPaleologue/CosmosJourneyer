@@ -14,6 +14,7 @@ import { AtmosphericScatteringPostProcess } from "../planetPostProcesses/atmosph
 import { RingsPostProcess } from "../planetPostProcesses/ringsPostProcess";
 import { VolumetricCloudsPostProcess } from "../planetPostProcesses/volumetricCloudsPostProcess";
 import { UberScene } from "../../core/uberScene";
+import { BlackHolePostProcess } from "../planetPostProcesses/blackHolePostProcess";
 
 export enum PostProcessType {
     Starfields,
@@ -22,7 +23,8 @@ export enum PostProcessType {
     Clouds,
     Atmospheres,
     Rings,
-    FXAA
+    FXAA,
+    BLACK_HOLE
 }
 
 export abstract class AbstractRenderingPipeline extends PostProcessRenderPipeline {
@@ -35,6 +37,7 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
     readonly clouds: (FlatCloudsPostProcess | VolumetricCloudsPostProcess)[] = [];
     readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
     readonly rings: RingsPostProcess[] = [];
+    readonly blackHoles: BlackHolePostProcess[] = [];
 
     protected constructor(name: string, scene: UberScene) {
         super(scene.getEngine(), name);
@@ -72,6 +75,10 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
             return [new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, this.engine)];
         });
 
+        const blackHoleRenderEffect = new PostProcessRenderEffect(this.engine, "blackHoleRenderEffect", () => {
+            return this.blackHoles;
+        })
+
         for (const postProcessType of order) {
             switch (postProcessType) {
                 case PostProcessType.Starfields:
@@ -99,6 +106,9 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
                     throw new Error("Invalid postprocess type in " + this.name);
             }
         }
+
+        //TODO: integrate to label system
+        this.addEffect(blackHoleRenderEffect);
 
         this.addEffect(new PostProcessRenderEffect(this.engine, "colorCorrectionRenderEffect", () => {
             return [this.scene.colorCorrection];
