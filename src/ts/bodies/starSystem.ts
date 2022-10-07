@@ -90,7 +90,7 @@ export class StarSystem {
 
     public makeSatellite(planet: Planet): void {
         const satellite = new TelluricPlanet(`${planet.name}Sattelite`, this, planet.rng(100), [planet]);
-        const periapsis = 5 * planet.getRadius() + clamp(normalRandom(10, 1, satellite.rng, 90), -2, 20) * planet.getRadius() * 2;
+        const periapsis = 2 * planet.getRadius() + clamp(normalRandom(3, 1, satellite.rng, 90), 0, 20) * planet.getRadius() * 2;
         const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.rng, 92), 1, 1.5);
         satellite.physicalProperties.mass = 1;
         satellite.orbitalProperties = {

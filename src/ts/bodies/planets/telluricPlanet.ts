@@ -69,8 +69,10 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             if (parentBody.bodyType == BodyType.GAZ) this.isSatelliteOfGas = true;
         }
 
-        if (this.isSatelliteOfTelluric || this.isSatelliteOfGas) {
+        if (this.isSatelliteOfTelluric) {
             this.radius = Math.max(0.02, normalRandom(0.08, 0.03, this.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
+        } else if(this.isSatelliteOfGas) {
+            this.radius = Math.max(0.02, normalRandom(0.5, 0.1, this.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
         } else {
             this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
         }
@@ -148,7 +150,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             mountainsFrequency: 20 * this.ratio
         };
 
-        if (this.isSatelliteOfTelluric) this.terrainSettings.continentsFragmentation = 0;
+        if (this.isSatelliteOfTelluric) this.terrainSettings.continentsFragmentation /= 2;
 
         this.material = new TelluricMaterial(this, starSystem.scene);
 
