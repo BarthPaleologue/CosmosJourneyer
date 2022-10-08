@@ -47,7 +47,9 @@ Assets.Init(scene).then(() => {
     starSystem.makeStars(1);
     starSystem.makePlanets(1);
 
-    const BH = new BlackHole("trou", 10, starSystem, 0, []);
+    const BH = new BlackHole("trou", 1000e3, starSystem, 0, []/*[starSystem.planets[0]]*/);
+    //BH.orbitalProperties.periapsis = starSystem.planets[0].getRadius() * 3;
+    //BH.orbitalProperties.apoapsis = starSystem.planets[0].getRadius() * 3;
 
     scene.initPostProcesses();
 
@@ -62,9 +64,9 @@ Assets.Init(scene).then(() => {
     const collisionWorker = new CollisionWorker(playerController, starSystem);
 
 
-    starSystem.update(Date.now() / 1000);
+    starSystem.update(0);
 
-    playerController.positionNearBody(starSystem.planets[0]);
+    playerController.positionNearBody(BH);
 
     scene.executeWhenReady(() => {
         engine.loadingScreen.hideLoadingUI();

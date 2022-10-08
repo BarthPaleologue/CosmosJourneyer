@@ -9,11 +9,26 @@ precision highp float;
 #define _Steps  12. //disk texture layers
 #define _Size 0.3 //size of BH
 
-#define iTime 1.0
+varying vec2 vUV;
+
+uniform float time;
 
 uniform sampler2D textureSampler;
+uniform sampler2D depthSampler;
 
-varying vec2 vUV;
+uniform vec3 planetPosition;
+uniform vec3 cameraPosition;
+
+uniform mat4 inverseView;
+uniform mat4 inverseProjection;
+
+uniform float cameraNear;
+uniform float cameraFar;
+
+#pragma glslify: remap = require(./utils/remap.glsl)
+
+#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
+
 
 float hash(float x){ return fract(sin(x)*152754.742);}
 float hash(vec2 x){	return hash(x.x + hash(x.y));}
@@ -40,7 +55,7 @@ vec4 background(vec3 ray)
 
 vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
 {
-    //return vec4(1.,1.,1.,0.); //no disk
+    if(false) return vec4(1.,1.,1.,0.); //no disk
 
     vec3 position = zeroPos;
     float lengthPos = length(position.xz);
@@ -73,7 +88,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
 
     for(float i = 0. ; i < _Steps; i++)
     {
-        position -= dist * ray ;
+        position -= dist * ray;
 
         float intensity =clamp( 1. - abs((i - 0.8) * (1./_Steps) * 2.), 0., 1.);
         float lengthPos = length(position.xz);
@@ -83,12 +98,13 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
         distMult *= clamp(( _Size * 10. -lengthPos) * (1./_Size) * 0.20, 0., 1.);
         distMult *= distMult;
 
-        float u = lengthPos + iTime* _Size*0.3 + intensity * _Size * 0.2;
+        float u = lengthPos + time * _Size * 0.3 + intensity * _Size * 0.2;
 
+        // rotation of the disk
         vec2 xy ;
-        float rot = mod(iTime*_Speed, 8192.);
-        xy.x = -position.z*sin(rot) + position.x*cos(rot);
-        xy.y = position.x*sin(rot) + position.z*cos(rot);
+        float rot = mod(time * _Speed, 8192.);
+        xy.x = -position.z * sin(rot) + position.x * cos(rot);
+        xy.y = position.x * sin(rot) + position.z * cos(rot);
 
         float x = abs( xy.x/(xy.y));
         float angle = 0.02*atan(x);
@@ -99,7 +115,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
 
         float extraWidth =  noise * 1. * (1. -  clamp(i * (1./_Steps)*2. - 1., 0., 1.));
 
-        float alpha = clamp(noise*(intensity + extraWidth)*( (1./_Size) * 10.  + 0.01 ) *  dist * distMult , 0., 1.);
+        float alpha = clamp(noise*(intensity + extraWidth) * ( (1./_Size) * 10.  + 0.01 ) *  dist * distMult , 0., 1.);
 
         vec3 col = 2.*mix(vec3(0.3,0.2,0.15)*insideCol, insideCol, min(1.,intensity*2.));
         o = clamp(vec4(col*alpha + o.rgb*(1.-alpha), o.a*(1.-alpha) + alpha), vec4(0.), vec4(1.));
@@ -124,27 +140,26 @@ void Rotate( inout vec3 vector, vec2 angle )
 
 void main()
 {
-    vec4 colOut = vec4(0.);
+    vec3 screenColor = texture2D(textureSampler, vUV).rgb; // the current screen color
 
-    vec2 iResolution = vec2(1.5, 1.0);
-    vec2 iMouse = vec2(1.3, 0.5);
-    vec2 fragCoordRot = vUV;
-    /*fragCoordRot.x = vUV.x*0.985 + vUV.y * 0.174;
-    fragCoordRot.y = vUV.y*0.985 - vUV.x * 0.174;
-    fragCoordRot += vec2(-0.06, 0.12) * iResolution.xy;*/
+    float depth = texture2D(depthSampler, vUV).r; // the depth corresponding to the pixel in the depth map
+
+    vec3 pixelWorldPosition = worldFromUV(vUV); // the pixel position in world space (near plane)
+
+    // closest physical point from the camera in the direction of the pixel (occlusion)
+    vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
+    float maximumDistance = length(closestPoint); // the maxium ray length due to occlusion
+
+    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
+
+    vec4 colOut = vec4(0.);
 
     for( int j=0; j<AA; j++ )
     for( int i=0; i<AA; i++ )
     {
         //setting up camera
-        vec3 ray = normalize( vec3((fragCoordRot-iResolution.xy*.5  + vec2(i,j)/(float(AA)))/iResolution.x, 1 ));
-        vec3 pos = vec3(0.,0.05,-(20.*iMouse.xy/iResolution.y-10.)*(20.*iMouse.xy/iResolution.y-10.)*.05);
-        vec2 angle = vec2(iTime*0.1,.2);
-        angle.y = (2.*iMouse.y/iResolution.y)*3.14 + 0.1 + 3.14;
-        float dist = length(pos);
-        Rotate(pos,angle);
-        angle.xy -= min(.3/dist , 3.14) * vec2(1, 0.5);
-        Rotate(ray,angle);
+        vec3 ray = -rayDir;
+        vec3 pos = planetPosition - cameraPosition;
 
         vec4 col = vec4(0.);
         vec4 glow = vec4(0.);
@@ -181,7 +196,8 @@ void main()
 
             else if(dist2 > _Size * 1000.) //ray escaped BH
             {
-                vec4 bg = background (ray);
+                vec4 bg = background(ray);
+                bg = vec4(screenColor, 1.0);
                 outCol = vec4(col.rgb*col.a + bg.rgb*(1.-col.a)  + glow.rgb *(1.-col.a    ), 1.);
                 break;
             }
@@ -204,8 +220,6 @@ void main()
 
         colOut += col/float(AA*AA);
     }
-
-    //gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 
     gl_FragColor = colOut;
 }

@@ -5,7 +5,6 @@ import { BlackHolePostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { PhysicalProperties } from "./physicalProperties";
 import { BlackHolePostProcess } from "../postProcesses/planetPostProcesses/blackHolePostProcess";
-import { Planet } from "./planets/planet";
 
 export class BlackHole extends AbstractBody {
 
