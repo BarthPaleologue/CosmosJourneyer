@@ -87,6 +87,9 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
                 case PostProcessType.VolumetricLights:
                     this.addEffect(vlsRenderEffect);
                     break;
+                case PostProcessType.BLACK_HOLE:
+                    this.addEffect(blackHoleRenderEffect);
+                    break;
                 case PostProcessType.Oceans:
                     this.addEffect(oceanRenderEffect);
                     break;
@@ -106,9 +109,6 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
                     throw new Error("Invalid postprocess type in " + this.name);
             }
         }
-
-        //TODO: integrate to label system
-        this.addEffect(blackHoleRenderEffect);
 
         this.addEffect(new PostProcessRenderEffect(this.engine, "colorCorrectionRenderEffect", () => {
             return [this.scene.colorCorrection];

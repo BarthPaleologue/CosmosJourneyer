@@ -11,6 +11,7 @@ export class SurfaceRenderingPipeline extends AbstractRenderingPipeline {
             new Set<PostProcessType>([
                 PostProcessType.Starfields,
                 PostProcessType.VolumetricLights,
+                PostProcessType.BLACK_HOLE,
                 PostProcessType.Rings,
                 PostProcessType.Oceans,
                 PostProcessType.Clouds,

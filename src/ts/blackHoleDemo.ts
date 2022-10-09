@@ -33,6 +33,7 @@ Assets.Init(scene).then(() => {
     const mouse = new Mouse(canvas, 1e5);
 
     const playerController = new PlayerController(scene);
+    playerController.speed = 0.2 * Settings.EARTH_RADIUS;
     playerController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
     playerController.inputs.push(new Keyboard(), mouse, new Gamepad());
 
@@ -47,9 +48,9 @@ Assets.Init(scene).then(() => {
     starSystem.makeStars(1);
     starSystem.makePlanets(1);
 
-    const BH = new BlackHole("trou", 1000e3, starSystem, 0, []/*[starSystem.planets[0]]*/);
-    //BH.orbitalProperties.periapsis = starSystem.planets[0].getRadius() * 3;
-    //BH.orbitalProperties.apoapsis = starSystem.planets[0].getRadius() * 3;
+    const BH = new BlackHole("trou", 1000e3, starSystem, 0, [starSystem.planets[0]]);
+    BH.orbitalProperties.periapsis = starSystem.planets[0].getRadius() * 3;
+    BH.orbitalProperties.apoapsis = starSystem.planets[0].getRadius() * 3;
 
     scene.initPostProcesses();
 
@@ -65,7 +66,12 @@ Assets.Init(scene).then(() => {
 
 
     starSystem.update(0);
+    starSystem.update(0);
+    starSystem.update(0);
+    starSystem.update(0);
 
+
+    //playerController.positionNearBody(starSystem.planets[0]);
     playerController.positionNearBody(BH);
 
     scene.executeWhenReady(() => {
