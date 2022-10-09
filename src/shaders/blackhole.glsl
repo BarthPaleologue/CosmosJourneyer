@@ -148,12 +148,12 @@ void main()
     for (int disks = 0; disks< 20; disks++) {
         for (int h = 0; h < 6; h++)//reduces tests for exit conditions (to minimise branching)
         {
-            float dotpos = dot(pos, pos);
-            float invDist = inversesqrt(dotpos);//1/distance to BH
             float centDist = length(pos); //dotpos * invDist;//distance to BH
-            float stepDist = 0.92 * abs(pos.y /(ray.y));//conservative distance to disk (y==0)
-            float farLimit = centDist * 0.5;//limit step size far from to BH
-            float closeLimit = centDist*0.1 + 0.05*centDist*centDist*(1./planetRadius);//limit step size closse to BH
+            float dotpos = centDist * centDist;
+            float invDist = 1.0 / centDist; //inversesqrt(dotpos);//1/distance to BH
+            float stepDist = 0.92 * abs(pos.y / ray.y); //conservative distance to disk (y==0)
+            float farLimit = centDist * 0.5; //limit step size far from to BH
+            float closeLimit = centDist * 0.1 + 0.05 * dotpos / planetRadius;//limit step size closse to BH
             stepDist = min(stepDist, min(farLimit, closeLimit));
 
             float invDistSqr = invDist * invDist;

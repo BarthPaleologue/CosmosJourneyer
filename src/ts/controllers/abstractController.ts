@@ -35,11 +35,15 @@ export abstract class AbstractController {
      */
     abstract listenTo(input: Input, deltaTime: number): Vector3;
 
-    public positionNearBody(body: AbstractBody): void {
+    public positionNearBody(body: AbstractBody, nRadius = 3): void {
         const dir = body.getAbsolutePosition().clone();
         const dist = dir.length();
-        dir.normalize();
-        this.transform.setAbsolutePosition(dir.scale(dist - body.getRadius() * 3));
+        if(dist > 0) {
+            dir.normalize();
+            this.transform.setAbsolutePosition(dir.scale(dist - body.getRadius() * nRadius));
+        } else {
+            this.transform.setAbsolutePosition(new Vector3(0, 0.2, 1).scaleInPlace(body.getRadius() * nRadius));
+        }
 
         body.starSystem.translateAllBodies(this.transform.getAbsolutePosition().negate());
         this.transform.translate(this.transform.getAbsolutePosition().negate());

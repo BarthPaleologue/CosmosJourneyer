@@ -15,6 +15,8 @@ export class BlackHole extends AbstractBody {
 
     constructor(name: string, radius: number, starSystem: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystem, seed, parentBodies);
+        starSystem.addStar(this);
+
         this.radius = radius;
         this.physicalProperties = {
             mass: 10,

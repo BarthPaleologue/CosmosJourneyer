@@ -45,12 +45,14 @@ Assets.Init(scene).then(() => {
 
     new StarfieldPostProcess("starfield", playerController, scene);
 
-    starSystem.makeStars(1);
+    const BH = new BlackHole("gwo twou sanfon", 1000e3, starSystem, 0, starSystem.stars);
+    BH.orbitalProperties.periapsis = BH.getRadius() * 4;
+    BH.orbitalProperties.apoapsis = BH.getRadius() * 4;
+
     starSystem.makePlanets(1);
 
-    const BH = new BlackHole("trou", 1000e3, starSystem, 0, [starSystem.planets[0]]);
-    BH.orbitalProperties.periapsis = starSystem.planets[0].getRadius() * 3;
-    BH.orbitalProperties.apoapsis = starSystem.planets[0].getRadius() * 3;
+    starSystem.planets[0].orbitalProperties.periapsis /= 20;
+    starSystem.planets[0].orbitalProperties.apoapsis /= 20;
 
     scene.initPostProcesses();
 
@@ -65,14 +67,9 @@ Assets.Init(scene).then(() => {
     const collisionWorker = new CollisionWorker(playerController, starSystem);
 
 
-    starSystem.update(0);
-    starSystem.update(0);
-    starSystem.update(0);
-    starSystem.update(0);
+    starSystem.update(Date.now() / 1000);
 
-
-    //playerController.positionNearBody(starSystem.planets[0]);
-    playerController.positionNearBody(BH);
+    playerController.positionNearBody(BH, 20);
 
     scene.executeWhenReady(() => {
         engine.loadingScreen.hideLoadingUI();
