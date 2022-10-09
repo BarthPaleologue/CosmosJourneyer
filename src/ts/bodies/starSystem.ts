@@ -10,6 +10,7 @@ import { GasPlanet } from "./planets/gasPlanet";
 import { clamp } from "../utils/gradientMath";
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { seededSquirrelNoise } from "squirrel-noise";
+import { BlackHole } from "./blackHole";
 
 enum Steps {
     GENERATE_STARS = 100,
@@ -21,7 +22,7 @@ export class StarSystem {
     readonly scene: UberScene;
     private readonly bodies: AbstractBody[] = [];
 
-    readonly stars: Star[] = [];
+    readonly stars: (Star | BlackHole)[] = [];
 
     readonly planets: Planet[] = [];
 
@@ -38,9 +39,8 @@ export class StarSystem {
         this.bodies.push(body);
     }
 
-    public addStar(star: Star): void {
+    public addStar(star: Star | BlackHole): void {
         this.stars.push(star);
-        //this.bodies.push(star);
     }
 
     public makeStars(n: number): void {
