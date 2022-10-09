@@ -87,11 +87,13 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
         distance = length(position.xz);
         relativeDistance = distance / planetRadius;
 
-        float distMult = 1.0 / 30.0;// FIXME: why do i need to divide by 50 when the radius is x3000e3 ???
-        distMult *= clamp((relativeDistance - 0.75) * 1.5, 0.0, 1.0);
-        float diskRadius = 10000e3; //TODO: make uniform
+        float distMult = 1.0;
+        distMult *= clamp(relativeDistance - 0.6, 0.0, 1.0); //FIXME: does this mean the event horizon is not as big as i want?
+
+        float diskRadius = 8000e3; //TODO: make uniform
         float relativeDiskRadius = diskRadius / planetRadius;
-        distMult *= clamp((relativeDiskRadius - relativeDistance) * 0.20, 0.0, 1.0);
+        distMult *= clamp((relativeDiskRadius - relativeDistance), 0.0, 1.0);
+
         distMult *= distMult;
 
         // rotation of the disk
@@ -109,12 +111,12 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
         // outer part of the accretion disk
         float extraWidth = noise * (1.0 - clamp(2.0 * i / _Steps - 1.0, 0.0, 1.0));
 
-        float alpha = clamp(noise * (intensity + extraWidth) * (0.01 + 10.0 / planetRadius) *  dist * distMult, 0.0, 1.0);
+        float alpha = clamp(noise * (intensity + extraWidth) * (0.01 + 10.0 / planetRadius) * dist * distMult * (1.0 / 900.0), 0.0, 1.0);
 
         vec3 col = 2.0 * mix(vec3(0.3, 0.2, 0.15) * insideCol, insideCol, min(1.0, intensity * 2.0));
         diskColor = clamp(vec4(col*alpha + diskColor.rgb*(1.-alpha), diskColor.a * (1.0-alpha) + alpha), vec4(0.0), vec4(1.0));
 
-        diskColor.rgb += redShift * (intensity + 0.5) * (1.0 / _Steps) * 100.0 * distMult / (relativeDistance * relativeDistance);
+        diskColor.rgb += (1.0 / 900.0) * redShift * (intensity + 0.5) * (1.0 / _Steps) * 100.0 * distMult / (relativeDistance * relativeDistance);
     }
 
     return diskColor;
@@ -135,6 +137,8 @@ void main()
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
 
     vec4 colOut = vec4(0.);
+
+    float accretionDiskHeight = 100.0;
 
     //setting up camera
     vec3 ray = -rayDir;
@@ -180,7 +184,7 @@ void main()
             return;
         }
 
-        else if (abs(pos.y) <= planetRadius * 0.002) //ray hit accretion disk //FIXME: Break when rotate
+        else if (abs(pos.y) <= accretionDiskHeight) //ray hit accretion disk //FIXME: Break when rotate
         {
             if (maximumDistance < length(pos)) {
                 glFragColor = vec4(screenColor, 1.0);
