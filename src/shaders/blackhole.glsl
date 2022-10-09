@@ -50,7 +50,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
     if (false) return vec4(1., 1., 1., 0.);//no disk
 
     vec3 position = zeroPos;
-    float lengthPos = length(position); // distance to the center of the disk
+    float lengthPos = length(position.xz); // distance to the center of the disk
     float relativeDistance = lengthPos / planetRadius;
 
     float dist = min(1.0, relativeDistance * 0.5) * planetRadius * 0.4 * (1./_Steps) / abs(ray.y);
@@ -81,53 +81,39 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
     {
         position -= dist * ray;
 
-        float intensity = clamp(1. - abs((i - 0.8) * (1./_Steps) * 2.), 0., 1.);
-        lengthPos = length(position);
+        float intensity = clamp(1.0 - abs((i - 0.8) * (1.0 / _Steps) * 2.0), 0.0, 1.0);
+        lengthPos = length(position.xz);
         relativeDistance = lengthPos / planetRadius;
         float distMult = 1.0 / 30.0;// FIXME: why do i need to divide by 50 when the radius is x3000e3 ???
-
+        
         distMult *= clamp((relativeDistance - 0.75) * 1.5, 0.0, 1.0);
-        distMult *= clamp((planetRadius * 10.0 - lengthPos) * (1.0 / planetRadius) * 0.20, 0.0, 1.0);
+        distMult *= clamp((10.0 - relativeDistance) * 0.20, 0.0, 1.0);
         distMult *= distMult;
 
         // rotation of the disk
-        vec2 xy;
+        vec2 xz;
         float rot = mod(time * _Speed, 8192.0);
-        xy.x = -position.z * sin(rot) + position.x * cos(rot);
-        xy.y = position.x * sin(rot) + position.z * cos(rot);
+        xz.x = position.x * cos(rot) - position.z * sin(rot);
+        xz.y = position.x * sin(rot) + position.z * cos(rot);
 
-        float x = abs(xy.x / (xy.y));
-        float angle = 0.02 * atan(x);
-
-
-        float u = time + intensity + lengthPos / planetRadius;// some kind of disk coordinate
-        const float f = 70.0;
-        float noise = valueNoise(vec2(angle, u * 0.05), f);
-        noise = noise * 0.66 + 0.33 * valueNoise(vec2(angle, u * 0.05), f * 2.0);
+        float angle = atan(abs(xz.x / (xz.y)));
+        float u = time + intensity + relativeDistance;// some kind of disk coordinate
+        const float f = 0.7;
+        float noise = valueNoise(vec2(2.0 * angle, 5.0 * u), f);
+        noise = noise * 0.66 + 0.33 * valueNoise(vec2(2.0 * angle, 5.0 * u), f * 2.0);
 
         // outer part of the accretion disk
-        float extraWidth = noise * (1.0 - clamp(i * (1./_Steps) * 2.0 - 1.0, 0.0, 1.0));
+        float extraWidth = noise * (1.0 - clamp(2.0 * i / _Steps - 1.0, 0.0, 1.0));
 
         float alpha = clamp(noise * (intensity + extraWidth) * (0.01 + 10.0 / planetRadius) *  dist * distMult, 0.0, 1.0);
 
         vec3 col = 2.0 * mix(vec3(0.3, 0.2, 0.15) * insideCol, insideCol, min(1.0, intensity * 2.0));
         diskColor = clamp(vec4(col*alpha + diskColor.rgb*(1.-alpha), diskColor.a * (1.0-alpha) + alpha), vec4(0.0), vec4(1.0));
 
-        lengthPos /= planetRadius;
-
-        diskColor.rgb += redShift * (intensity + 0.5) * (1.0 / _Steps) * 100.0 * distMult / (lengthPos * lengthPos);
+        diskColor.rgb += redShift * (intensity + 0.5) * (1.0 / _Steps) * 100.0 * distMult / (relativeDistance * relativeDistance);
     }
 
     return diskColor;
-}
-
-
-void Rotate(inout vec3 vector, vec2 angle)
-{
-    vector.yz = cos(angle.y)*vector.yz
-    +sin(angle.y)*vec2(-1, 1)*vector.zy;
-    vector.xz = cos(angle.x)*vector.xz
-    +sin(angle.x)*vec2(-1, 1)*vector.zx;
 }
 
 void main()
@@ -142,11 +128,6 @@ void main()
     vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
     float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
 
-    if (maximumDistance < cameraFar - cameraNear) {
-        glFragColor = vec4(screenColor, 1.0);
-        return;
-    }
-
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
 
     vec4 colOut = vec4(0.);
@@ -155,18 +136,21 @@ void main()
     vec3 ray = -rayDir;
     vec3 pos = planetPosition - cameraPosition;
 
+    if (maximumDistance < length(pos)) {
+        glFragColor = vec4(screenColor, 1.0);
+        return;
+    }
+
     vec4 col = vec4(0.);
     vec4 glow = vec4(0.);
     vec4 outCol =vec4(100.);
 
-    for (int disks = 0; disks< 20; disks++)//steps
-    {
-
+    for (int disks = 0; disks< 20; disks++) {
         for (int h = 0; h < 6; h++)//reduces tests for exit conditions (to minimise branching)
         {
             float dotpos = dot(pos, pos);
             float invDist = inversesqrt(dotpos);//1/distance to BH
-            float centDist = dotpos * invDist;//distance to BH
+            float centDist = length(pos); //dotpos * invDist;//distance to BH
             float stepDist = 0.92 * abs(pos.y /(ray.y));//conservative distance to disk (y==0)
             float farLimit = centDist * 0.5;//limit step size far from to BH
             float closeLimit = centDist*0.1 + 0.05*centDist*centDist*(1./planetRadius);//limit step size closse to BH
