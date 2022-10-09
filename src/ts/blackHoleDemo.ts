@@ -51,8 +51,8 @@ Assets.Init(scene).then(() => {
 
     starSystem.makePlanets(1);
 
-    starSystem.planets[0].orbitalProperties.periapsis /= 20;
-    starSystem.planets[0].orbitalProperties.apoapsis /= 20;
+    starSystem.planets[0].orbitalProperties.periapsis /= 40;
+    starSystem.planets[0].orbitalProperties.apoapsis /= 40;
 
     scene.initPostProcesses();
 

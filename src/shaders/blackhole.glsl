@@ -4,7 +4,7 @@ precision highp float;
 
 #define _Speed 3.0//disk rotation speed
 
-#define _Steps  12.//disk texture layers
+#define _Steps  12.0 //disk texture layers
 
 varying vec2 vUV;
 
@@ -27,7 +27,7 @@ uniform float cameraFar;
 
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
 
-float hash(float x) { return fract(sin(x)*152754.742); }
+float hash(float x) { return fract(sin(x) * 152754.742); }
 float hash(vec2 x) { return hash(x.x + hash(x.y)); }
 
 float valueNoise(vec2 p, float f) {
@@ -59,8 +59,8 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
 
     // elementary rotation around the hole //FIXME: will break when the black hole has a rotation
     vec2 deltaPos;
-    deltaPos.x = zeroPos.x - zeroPos.z * 0.01 * _Speed;
-    deltaPos.y = zeroPos.x * 0.01 * _Speed + zeroPos.z;
+    deltaPos.x = zeroPos.x - zeroPos.z * 0.01;
+    deltaPos.y = zeroPos.x * 0.01 + zeroPos.z;
     deltaPos = normalize(deltaPos - zeroPos.xz);
 
     float parallel = dot(ray.xz, deltaPos);
@@ -70,10 +70,12 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
     redShift *= redShift;
     redShift = clamp(redShift, 0.0, 1.0);
 
-    float disMix = clamp((relativeDistance - 2.0) * 0.24, 0., 1.);
-    vec3 insideCol =  mix(vec3(1.0, 0.8, 0.0), vec3(0.5, 0.13, 0.02) * 0.2, disMix);
+    float diskMix = smoothstep(4.0, 7.0, relativeDistance);
+    vec3 innerDiskColor = vec3(1.0, 0.8, 0.0);
+    vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
+    vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix);
 
-    insideCol *= mix(vec3(0.4, 0.2, 0.1), vec3(1.6, 2.4, 4.0), redShift);
+    insideCol *= mix(vec3(0.4, 0.2, 0.1), vec3(1.6, 1.0, 4.0) * 2.0, redShift);
     insideCol *= 1.25;
 
     vec4 diskColor = vec4(0.0);
