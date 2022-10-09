@@ -49,10 +49,11 @@ Assets.Init(scene).then(() => {
     BH.orbitalProperties.periapsis = BH.getRadius() * 4;
     BH.orbitalProperties.apoapsis = BH.getRadius() * 4;
 
-    starSystem.makePlanets(1);
+    starSystem.makeTelluricPlanet();
+    starSystem.planets[0].orbitalProperties.periapsis = 5000e3;
+    starSystem.planets[0].orbitalProperties.apoapsis = 5000e3;
 
-    starSystem.planets[0].orbitalProperties.periapsis /= 40;
-    starSystem.planets[0].orbitalProperties.apoapsis /= 40;
+    starSystem.makePlanets(1);
 
     scene.initPostProcesses();
 

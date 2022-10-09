@@ -50,8 +50,8 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
     if (false) return vec4(1., 1., 1., 0.);//no disk
 
     vec3 position = zeroPos;
-    float lengthPos = length(position.xz); // distance to the center of the disk
-    float relativeDistance = lengthPos / planetRadius;
+    float distance = length(position.xz); // distance to the center of the disk
+    float relativeDistance = distance / planetRadius;
 
     float dist = min(1.0, relativeDistance * 0.5) * planetRadius * 0.4 * (1./_Steps) / abs(ray.y);
 
@@ -84,12 +84,14 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
         position -= dist * ray;
 
         float intensity = clamp(1.0 - abs((i - 0.8) * (1.0 / _Steps) * 2.0), 0.0, 1.0);
-        lengthPos = length(position.xz);
-        relativeDistance = lengthPos / planetRadius;
+        distance = length(position.xz);
+        relativeDistance = distance / planetRadius;
+
         float distMult = 1.0 / 30.0;// FIXME: why do i need to divide by 50 when the radius is x3000e3 ???
-        
         distMult *= clamp((relativeDistance - 0.75) * 1.5, 0.0, 1.0);
-        distMult *= clamp((10.0 - relativeDistance) * 0.20, 0.0, 1.0);
+        float diskRadius = 10000e3; //TODO: make uniform
+        float relativeDiskRadius = diskRadius / planetRadius;
+        distMult *= clamp((relativeDiskRadius - relativeDistance) * 0.20, 0.0, 1.0);
         distMult *= distMult;
 
         // rotation of the disk
@@ -143,11 +145,9 @@ void main()
         return;
     }
 
-    vec4 col = vec4(0.);
-    vec4 glow = vec4(0.);
-    vec4 outCol =vec4(100.);
+    vec4 col = vec4(0.0);
 
-    for (int disks = 0; disks< 20; disks++) {
+    for (int disks = 0; disks < 15; disks++) {
         for (int h = 0; h < 6; h++)//reduces tests for exit conditions (to minimise branching)
         {
             float centDist = length(pos); //dotpos * invDist;//distance to BH
@@ -162,43 +162,38 @@ void main()
             float bendForce = stepDist * invDistSqr * planetRadius * 0.625;//bending force
             ray =  normalize(ray - (bendForce * invDist)*pos);//bend ray towards BH
             pos += stepDist * ray;
-
-            glow += vec4(1.2, 1.1, 1, 1.0) *(0.01*stepDist * invDistSqr * invDistSqr *clamp(centDist*(2.) - 1.2, 0., 1.));//adds fairly cheap glow
         }
 
         float dist2 = length(pos);
 
         if (dist2 < planetRadius * 0.1)//ray sucked in to BH
         {
-            outCol =  vec4(col.rgb * col.a + glow.rgb *(1.-col.a), 1.);
-            break;
+            glFragColor =  vec4(col.rgb * col.a, 1.0);
+            return;
         }
 
         else if (dist2 > planetRadius * 1000.)//ray escaped BH
         {
             vec4 bg = background(ray);
             bg = vec4(screenColor, 1.0);
-            outCol = vec4(col.rgb*col.a + bg.rgb*(1.-col.a)  + glow.rgb *(1.-col.a), 1.);
-            break;
+            glFragColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
+            return;
         }
 
-        else if (abs(pos.y) <= planetRadius * 0.002)//ray hit accretion disk
+        else if (abs(pos.y) <= planetRadius * 0.002) //ray hit accretion disk //FIXME: Break when rotate
         {
+            if (maximumDistance < length(pos)) {
+                glFragColor = vec4(screenColor, 1.0);
+                return;
+            }
+
             vec4 diskCol = raymarchDisk(ray, pos);//render disk
-            pos.y = 0.;
-            pos += abs(planetRadius * 0.001 /ray.y) * ray;
-            col = vec4(diskCol.rgb*(1.-col.a) + col.rgb, col.a + diskCol.a*(1.-col.a));
+            diskCol.rgb = pow(diskCol.rgb, vec3(0.8));
+            pos.y = 0.0;
+            pos += abs(planetRadius * 0.001 / ray.y) * ray;
+            col += diskCol * (1.0 - col.a);
         }
     }
 
-    //if the ray never escaped or got sucked in
-    if (outCol.r == 100.)
-    outCol = vec4(col.rgb + glow.rgb *(col.a +  glow.a), 1.);
-
-    col = outCol;
-    col.rgb =  pow(col.rgb, vec3(0.6));
-
-    colOut += col;
-
-    gl_FragColor = colOut;
+    gl_FragColor = vec4(col.rgb, 1.0);
 }
