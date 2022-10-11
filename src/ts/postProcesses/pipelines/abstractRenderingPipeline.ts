@@ -17,12 +17,12 @@ import { UberScene } from "../../core/uberScene";
 import { BlackHolePostProcess } from "../planetPostProcesses/blackHolePostProcess";
 
 export enum PostProcessType {
-    Starfields,
-    VolumetricLights,
-    Oceans,
-    Clouds,
-    Atmospheres,
-    Rings,
+    STARFIELD,
+    VOLUMETRIC_LIGHT,
+    OCEAN,
+    CLOUDS,
+    ATMOSPHERE,
+    RING,
     FXAA,
     BLACK_HOLE
 }
@@ -31,7 +31,9 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
     readonly scene: UberScene;
     readonly engine: Engine;
 
-    readonly starfields: StarfieldPostProcess[] = [];
+    abstract readonly renderingOrder: Set<PostProcessType>;
+
+    readonly starFields: StarfieldPostProcess[] = [];
     readonly volumetricLights: VolumetricLightScatteringPostProcess[] = [];
     readonly oceans: OceanPostProcess[] = [];
     readonly clouds: (FlatCloudsPostProcess | VolumetricCloudsPostProcess)[] = [];
@@ -46,9 +48,9 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
         this.scene.postProcessRenderPipelineManager.addPipeline(this);
     }
 
-    init(order: Set<PostProcessType>) {
-        const starfieldRenderEffect = new PostProcessRenderEffect(this.engine, "starfieldRenderEffect", () => {
-            return this.starfields;
+    public init() {
+        const starFieldRenderEffect = new PostProcessRenderEffect(this.engine, "starFieldRenderEffect", () => {
+            return this.starFields;
         });
 
         const vlsRenderEffect = new PostProcessRenderEffect(this.engine, "vlsRenderEffect", () => {
@@ -77,29 +79,29 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
 
         const blackHoleRenderEffect = new PostProcessRenderEffect(this.engine, "blackHoleRenderEffect", () => {
             return this.blackHoles;
-        })
+        });
 
-        for (const postProcessType of order) {
+        for (const postProcessType of this.renderingOrder) {
             switch (postProcessType) {
-                case PostProcessType.Starfields:
-                    this.addEffect(starfieldRenderEffect);
+                case PostProcessType.STARFIELD:
+                    this.addEffect(starFieldRenderEffect);
                     break;
-                case PostProcessType.VolumetricLights:
+                case PostProcessType.VOLUMETRIC_LIGHT:
                     this.addEffect(vlsRenderEffect);
                     break;
                 case PostProcessType.BLACK_HOLE:
                     this.addEffect(blackHoleRenderEffect);
                     break;
-                case PostProcessType.Oceans:
+                case PostProcessType.OCEAN:
                     this.addEffect(oceanRenderEffect);
                     break;
-                case PostProcessType.Clouds:
+                case PostProcessType.CLOUDS:
                     this.addEffect(cloudsRenderEffect);
                     break;
-                case PostProcessType.Atmospheres:
+                case PostProcessType.ATMOSPHERE:
                     this.addEffect(atmosphereRenderEffect);
                     break;
-                case PostProcessType.Rings:
+                case PostProcessType.RING:
                     this.addEffect(ringRenderEffect);
                     break;
                 case PostProcessType.FXAA:
@@ -128,12 +130,12 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
 
     detachCamera(camera: Camera) {
         this.scene.postProcessRenderPipelineManager.detachCamerasFromRenderPipeline(this.name, camera);
-        //FIXME: this is a BabylonJS issue : the length does not increase for some reason
+        //FIXME: this is a BabylonJS issue : the length does not decrease for some reason
         this.cameras.length -= 1;
     }
 
     detachCameras() {
-        for(const camera of this.cameras) {
+        for (const camera of this.cameras) {
             this.detachCamera(camera);
         }
     }
