@@ -81,7 +81,9 @@ export class ChunkForge {
                 isFiner: task.isFiner
             };
             this.applyTasks.push(applyTask);
-            this.workerPool.finishedWorkers.push(worker);
+
+            if(this.workerPool.hasTask()) this.dispatchTask(this.workerPool.nextTask(), worker);
+            else this.workerPool.finishedWorkers.push(worker);
         };
     }
 
