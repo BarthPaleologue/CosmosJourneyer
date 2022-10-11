@@ -111,12 +111,14 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
         // outer part of the accretion disk
         float extraWidth = noise * (1.0 - clamp(2.0 * i / _Steps - 1.0, 0.0, 1.0));
 
-        float alpha = clamp(noise * (intensity + extraWidth) * (0.01 + 10.0 / planetRadius) * dist * distMult * (1.0 / 900.0), 0.0, 1.0);
+        float alpha = clamp(noise * (intensity + extraWidth) * relativeDistance * distMult / 6.0, 0.0, 1.0);
 
+        // FIXME: hard to describe
         vec3 col = 2.0 * mix(vec3(0.3, 0.2, 0.15) * insideCol, insideCol, min(1.0, intensity * 2.0));
-        diskColor = clamp(vec4(col*alpha + diskColor.rgb*(1.-alpha), diskColor.a * (1.0-alpha) + alpha), vec4(0.0), vec4(1.0));
+        diskColor = clamp(vec4(col * alpha + diskColor.rgb * (1.0-alpha), diskColor.a * (1.0-alpha) + alpha), vec4(0.0), vec4(1.0));
 
-        diskColor.rgb += (1.0 / 900.0) * redShift * (intensity + 0.5) * (1.0 / _Steps) * 100.0 * distMult / (relativeDistance * relativeDistance);
+        // redshift glow
+        diskColor.rgb += redShift * (intensity + extraWidth) * (1.0 / _Steps) * distMult / (relativeDistance * relativeDistance);
     }
 
     return diskColor;
@@ -136,7 +138,7 @@ void main()
 
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
 
-    vec4 colOut = vec4(0.);
+    vec4 colOut = vec4(0.0);
 
     float accretionDiskHeight = 100.0;
 
@@ -159,12 +161,12 @@ void main()
             float invDist = 1.0 / centDist; //inversesqrt(dotpos);//1/distance to BH
             float stepDist = 0.92 * abs(pos.y / ray.y); //conservative distance to disk (y==0)
             float farLimit = centDist * 0.5; //limit step size far from to BH
-            float closeLimit = centDist * 0.1 + 0.05 * dotpos / planetRadius;//limit step size closse to BH
+            float closeLimit = centDist * 0.1 + 0.05 * dotpos / planetRadius; //limit step size closse to BH
             stepDist = min(stepDist, min(farLimit, closeLimit));
 
             float invDistSqr = invDist * invDist;
-            float bendForce = stepDist * invDistSqr * planetRadius * 0.625;//bending force
-            ray =  normalize(ray - (bendForce * invDist)*pos);//bend ray towards BH
+            float bendForce = stepDist * invDistSqr * planetRadius * 0.625; //bending force
+            ray =  normalize(ray - (bendForce * invDist) * pos); //bend ray towards BH
             pos += stepDist * ray;
         }
 
@@ -174,17 +176,13 @@ void main()
         {
             glFragColor =  vec4(col.rgb * col.a, 1.0);
             return;
-        }
-
-        else if (dist2 > planetRadius * 1000.)//ray escaped BH
+        } else if (dist2 > planetRadius * 1000.)//ray escaped BH
         {
             vec4 bg = background(ray);
             bg = vec4(screenColor, 1.0);
             glFragColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
             return;
-        }
-
-        else if (abs(pos.y) <= accretionDiskHeight) //ray hit accretion disk //FIXME: Break when rotate
+        } else if (abs(pos.y) <= accretionDiskHeight) //ray hit accretion disk //FIXME: Break when rotate
         {
             if (maximumDistance < length(pos)) {
                 glFragColor = vec4(screenColor, 1.0);
