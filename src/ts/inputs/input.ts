@@ -1,7 +1,7 @@
 export enum InputType {
     KEYBOARD,
     MOUSE,
-    GAMEPAD,
+    GAMEPAD
 }
 
 export interface Input {

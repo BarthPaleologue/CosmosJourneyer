@@ -15,7 +15,7 @@ import { AbstractBody } from "../abstractBody";
 enum Steps {
     RADIUS = 1000,
     ATMOSPHERE = 1100,
-    RINGS = 1200,
+    RINGS = 1200
 }
 
 export class GasPlanet extends AbstractBody {

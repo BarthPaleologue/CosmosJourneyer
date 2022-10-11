@@ -74,7 +74,7 @@ export class BodyEditor {
         this.setVisibility(visibility);
 
         this.currentPanel = this.generalPanel;
-        for(const panel of this.panels) {
+        for (const panel of this.panels) {
             panel.anchor.addEventListener("click", () => this.switchPanel(panel));
         }
     }
@@ -174,7 +174,7 @@ export class BodyEditor {
     }
 
     public initNavBar(body: AbstractBody): void {
-        for(const panel of this.panels) panel.disable();
+        for (const panel of this.panels) panel.disable();
 
         switch (body.bodyType) {
             case BodyType.STAR:

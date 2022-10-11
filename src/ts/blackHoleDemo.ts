@@ -28,7 +28,6 @@ canvas.height = window.innerHeight;
 
 const [engine, scene] = await initEngineScene(canvas);
 
-
 Assets.Init(scene).then(() => {
     const mouse = new Mouse(canvas, 1e5);
 
@@ -66,7 +65,6 @@ Assets.Init(scene).then(() => {
     });
 
     const collisionWorker = new CollisionWorker(playerController, starSystem);
-
 
     starSystem.update(Date.now() / 1000);
 

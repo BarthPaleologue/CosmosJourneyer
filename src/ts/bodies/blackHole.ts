@@ -7,7 +7,6 @@ import { PhysicalProperties } from "./physicalProperties";
 import { BlackHolePostProcess } from "../postProcesses/planetPostProcesses/blackHolePostProcess";
 
 export class BlackHole extends AbstractBody {
-
     readonly bodyType: BodyType = BodyType.BLACK_HOLE;
     physicalProperties: PhysicalProperties;
     postProcesses: BlackHolePostProcesses;
@@ -20,8 +19,8 @@ export class BlackHole extends AbstractBody {
         this.radius = radius;
         this.physicalProperties = {
             mass: 10,
-            rotationPeriod: 24 * 60 * 60,
-        }
+            rotationPeriod: 24 * 60 * 60
+        };
         this.postProcesses = {
             rings: null,
             blackHole: new BlackHolePostProcess("BH", this, starSystem.scene)

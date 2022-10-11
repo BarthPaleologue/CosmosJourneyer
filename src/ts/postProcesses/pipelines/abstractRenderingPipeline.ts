@@ -1,12 +1,4 @@
-import {
-    Camera,
-    Engine,
-    FxaaPostProcess,
-    PostProcessRenderEffect,
-    PostProcessRenderPipeline,
-    Texture,
-    VolumetricLightScatteringPostProcess
-} from "@babylonjs/core";
+import { Camera, Engine, FxaaPostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Texture, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 import { StarfieldPostProcess } from "../starfieldPostProcess";
 import { OceanPostProcess } from "../planetPostProcesses/oceanPostProcess";
 import { FlatCloudsPostProcess } from "../planetPostProcesses/flatCloudsPostProcess";
@@ -112,13 +104,17 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
             }
         }
 
-        this.addEffect(new PostProcessRenderEffect(this.engine, "colorCorrectionRenderEffect", () => {
-            return [this.scene.colorCorrection];
-        }));
+        this.addEffect(
+            new PostProcessRenderEffect(this.engine, "colorCorrectionRenderEffect", () => {
+                return [this.scene.colorCorrection];
+            })
+        );
 
-        this.addEffect(new PostProcessRenderEffect(this.engine, "overlayRenderEffect", () => {
-            return [this.scene.overlay];
-        }));
+        this.addEffect(
+            new PostProcessRenderEffect(this.engine, "overlayRenderEffect", () => {
+                return [this.scene.overlay];
+            })
+        );
         //this.addEffect(new BloomEffect(this.scene, 1, 0.2, 3));
     }
 

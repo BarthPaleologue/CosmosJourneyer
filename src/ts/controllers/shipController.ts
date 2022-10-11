@@ -50,9 +50,18 @@ export class ShipController extends AbstractController {
         this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
         this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
 
-        const forwardAcceleration = this.transform.getForwardDirection().scale(this.forwardAuthority * deltaTime).scaleInPlace(input.getZAxis());
-        const verticalAcceleration = this.transform.getUpwardDirection().scale(this.verticalAuthority * deltaTime).scaleInPlace(input.getYAxis());
-        const sideAcceleration = this.transform.getRightDirection().scale(this.sideAuthority * deltaTime).scaleInPlace(input.getXAxis());
+        const forwardAcceleration = this.transform
+            .getForwardDirection()
+            .scale(this.forwardAuthority * deltaTime)
+            .scaleInPlace(input.getZAxis());
+        const verticalAcceleration = this.transform
+            .getUpwardDirection()
+            .scale(this.verticalAuthority * deltaTime)
+            .scaleInPlace(input.getYAxis());
+        const sideAcceleration = this.transform
+            .getRightDirection()
+            .scale(this.sideAuthority * deltaTime)
+            .scaleInPlace(input.getXAxis());
 
         this.transform.acceleration.addInPlace(forwardAcceleration);
         this.transform.acceleration.addInPlace(verticalAcceleration);
@@ -66,7 +75,7 @@ export class ShipController extends AbstractController {
         this.transform.acceleration.copyFromFloats(0, 0, 0);
         for (const input of this.inputs) this.listenTo(input, deltaTime);
         const displacement = this.transform.update(deltaTime).negate();
-        if(this.flightAssistEnabled && this.transform.rotationAcceleration.length() == 0) {
+        if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() == 0) {
             this.transform.rotationSpeed.scaleInPlace(0.9);
         }
         this.transform.translate(displacement);

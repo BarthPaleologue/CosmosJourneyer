@@ -43,7 +43,7 @@ export class UberScene extends Scene {
         this.starSystem = starSystem;
     }
     public getStarSystem(): StarSystem {
-        if(this.starSystem === null) throw new Error("Star system not set");
+        if (this.starSystem === null) throw new Error("Star system not set");
         return this.starSystem;
     }
     public setActiveController(controller: AbstractController) {
@@ -51,17 +51,17 @@ export class UberScene extends Scene {
         this.activeCamera = controller.getActiveCamera();
     }
     public getActiveController(): AbstractController {
-        if(this.activeController === null) throw new Error("Controller not set");
+        if (this.activeController === null) throw new Error("Controller not set");
         return this.activeController;
     }
     public getActiveUberCamera(): UberFreeCamera {
-        if(this.getActiveController().getActiveCamera() === null) throw new Error("No active Uber Camera");
+        if (this.getActiveController().getActiveCamera() === null) throw new Error("No active Uber Camera");
         return this.getActiveController().getActiveCamera();
     }
 
     public update(deltaTime: number) {
         this._chunkForge.update();
-        if(this.starSystem && this.activeController) this.starSystem.update(deltaTime);
+        if (this.starSystem && this.activeController) this.starSystem.update(deltaTime);
 
         const switchLimit = this.getActiveController().getNearestBody().postProcesses.rings?.settings.ringStart || 2;
         if (this.getActiveController().isOrbiting(this.getActiveController().getNearestBody(), switchLimit)) {

@@ -43,6 +43,5 @@ export class OceanPanel extends EditorPanel {
                 }
             )
         ];
-
     }
 }

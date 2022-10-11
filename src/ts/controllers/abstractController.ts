@@ -38,7 +38,7 @@ export abstract class AbstractController {
     public positionNearBody(body: AbstractBody, nRadius = 3): void {
         const dir = body.getAbsolutePosition().clone();
         const dist = dir.length();
-        if(dist > 0) {
+        if (dist > 0) {
             dir.normalize();
             this.transform.setAbsolutePosition(dir.scale(dist - body.getRadius() * nRadius));
         } else {

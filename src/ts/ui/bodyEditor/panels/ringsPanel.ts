@@ -13,7 +13,7 @@ export class RingsPanel extends EditorPanel {
         const rings = body.postProcesses.rings;
         if (rings == null) return;
         this.enable();
-        
+
         const ringsToggler = clearAllEventListenersById("ringsToggler");
         ringsToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[3] as HTMLInputElement;

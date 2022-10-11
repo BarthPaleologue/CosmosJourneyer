@@ -16,7 +16,7 @@ import { VolumetricLight } from "../../postProcesses/volumetricLight";
 enum Steps {
     RADIUS = 1000,
     TEMPERATURE = 1100,
-    RINGS = 1200,
+    RINGS = 1200
 }
 
 export class Star extends AbstractBody {
@@ -47,7 +47,7 @@ export class Star extends AbstractBody {
         //TODO: make it dependent on star type
         this.radius = randRange(50, 200, this.rng, Steps.RADIUS) * Settings.EARTH_RADIUS;
 
-        starSystemManager.addStar(this)
+        starSystemManager.addStar(this);
 
         this.physicalProperties = {
             //TODO: do not hardcode
@@ -57,7 +57,14 @@ export class Star extends AbstractBody {
             temperature: clamp(normalRandom(5778, 2000, this.rng, Steps.TEMPERATURE), 4000, 10000)
         };
 
-        this.mesh = MeshBuilder.CreateSphere(`${name}Mesh`, { diameter: this.radius * 2, segments: 32 }, starSystemManager.scene);
+        this.mesh = MeshBuilder.CreateSphere(
+            `${name}Mesh`,
+            {
+                diameter: this.radius * 2,
+                segments: 32
+            },
+            starSystemManager.scene
+        );
         this.mesh.parent = this.node;
 
         this.material = new StarMaterial(this, starSystemManager.scene);

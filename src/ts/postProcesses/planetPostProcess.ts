@@ -5,14 +5,7 @@ import { AbstractBody } from "../bodies/abstractBody";
 import { UberScene } from "../core/uberScene";
 
 export abstract class PlanetPostProcess extends SpacePostProcess {
-    constructor(
-        name: string,
-        fragmentName: string,
-        otherUniforms: ShaderUniforms,
-        otherSamplers: ShaderSamplers,
-        body: AbstractBody,
-        scene: UberScene
-    ) {
+    constructor(name: string, fragmentName: string, otherUniforms: ShaderUniforms, otherSamplers: ShaderSamplers, body: AbstractBody, scene: UberScene) {
         const uniforms: ShaderUniforms = [
             {
                 name: "planetPosition",

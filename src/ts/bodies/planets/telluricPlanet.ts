@@ -18,9 +18,7 @@ import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
 import { clamp } from "../../utils/gradientMath";
-import {
-    AtmosphericScatteringPostProcess
-} from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 
@@ -30,7 +28,7 @@ enum Steps {
     WATER_AMOUNT = 1200,
     ATMOSPHERE = 1300,
     RINGS = 1400,
-    TERRAIN = 1500,
+    TERRAIN = 1500
 }
 
 export class TelluricPlanet extends AbstractBody implements RigidBody {

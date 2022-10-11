@@ -10,7 +10,7 @@ type ColorCorrectionSettings = {
     exposure: number;
     gamma: number;
     saturation: number;
-}
+};
 
 export class ColorCorrection extends PostProcess {
     settings: ColorCorrectionSettings = {
@@ -19,17 +19,9 @@ export class ColorCorrection extends PostProcess {
         exposure: 1.1,
         gamma: 1.2,
         saturation: 0.9
-    }
+    };
     constructor(name: string, scene: Scene) {
-        super(name, shaderName, [
-            "brightness",
-            "contrast",
-            "exposure",
-            "gamma",
-            "saturation"
-        ], [
-            "textureSampler"
-        ], 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine());
+        super(name, shaderName, ["brightness", "contrast", "exposure", "gamma", "saturation"], ["textureSampler"], 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine());
 
         this.onApply = (effect: Effect) => {
             effect.setFloat("brightness", this.settings.brightness);
@@ -37,6 +29,6 @@ export class ColorCorrection extends PostProcess {
             effect.setFloat("exposure", this.settings.exposure);
             effect.setFloat("gamma", this.settings.gamma);
             effect.setFloat("saturation", this.settings.saturation);
-        }
+        };
     }
 }

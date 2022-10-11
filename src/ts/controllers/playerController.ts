@@ -36,9 +36,18 @@ export class PlayerController extends AbstractController {
 
         const displacement = Vector3.Zero();
 
-        const forwardDisplacement = this.transform.getForwardDirection().scale(this.speed * deltaTime).scaleInPlace(input.getZAxis());
-        const upwardDisplacement = this.transform.getUpwardDirection().scale(this.speed * deltaTime).scaleInPlace(input.getYAxis());
-        const rightDisplacement = this.transform.getRightDirection().scale(this.speed * deltaTime).scaleInPlace(input.getXAxis());
+        const forwardDisplacement = this.transform
+            .getForwardDirection()
+            .scale(this.speed * deltaTime)
+            .scaleInPlace(input.getZAxis());
+        const upwardDisplacement = this.transform
+            .getUpwardDirection()
+            .scale(this.speed * deltaTime)
+            .scaleInPlace(input.getYAxis());
+        const rightDisplacement = this.transform
+            .getRightDirection()
+            .scale(this.speed * deltaTime)
+            .scaleInPlace(input.getXAxis());
 
         displacement.addInPlace(forwardDisplacement);
         displacement.addInPlace(upwardDisplacement);

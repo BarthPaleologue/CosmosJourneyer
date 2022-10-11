@@ -26,4 +26,4 @@ export type StarPostProcesses = BodyPostProcesses & {
 
 export type BlackHolePostProcesses = BodyPostProcesses & {
     blackHole: BlackHolePostProcess;
-}
+};

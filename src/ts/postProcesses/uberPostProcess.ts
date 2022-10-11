@@ -11,8 +11,6 @@ export abstract class UberPostProcess extends PostProcess implements IPostProces
     protected internalTime = 0;
 
     protected constructor(name: string, fragmentName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: UberScene) {
-
-
         const uniformNames = uniforms.map((uniform) => uniform.name);
         const samplerNames = samplers.map((sampler) => sampler.name);
 

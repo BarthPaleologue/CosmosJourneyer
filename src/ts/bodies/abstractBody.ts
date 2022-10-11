@@ -15,7 +15,7 @@ import { seededSquirrelNoise } from "squirrel-noise";
 enum Steps {
     AXIAL_TILT = 100,
     ORBIT = 200,
-    RINGS = 300,
+    RINGS = 300
 }
 
 export abstract class AbstractBody extends BasicTransform implements IOrbitalBody, ISeedable {

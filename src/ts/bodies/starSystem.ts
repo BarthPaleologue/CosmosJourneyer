@@ -15,7 +15,7 @@ import { BlackHole } from "./blackHole";
 enum Steps {
     GENERATE_STARS = 100,
     GENERATE_PLANETS = 200,
-    CHOOSE_PLANET_TYPE = 300,
+    CHOOSE_PLANET_TYPE = 300
 }
 
 export class StarSystem {
@@ -146,7 +146,10 @@ export class StarSystem {
         let nearest = null;
         for (const body of this.bodies) {
             if (nearest == null) nearest = body;
-            else if (body.physicalProperties.mass / Vector3.DistanceSquared(body.getAbsolutePosition(), point) > nearest.physicalProperties.mass / Vector3.DistanceSquared(nearest.getAbsolutePosition(), point)) {
+            else if (
+                body.physicalProperties.mass / Vector3.DistanceSquared(body.getAbsolutePosition(), point) >
+                nearest.physicalProperties.mass / Vector3.DistanceSquared(nearest.getAbsolutePosition(), point)
+            ) {
                 nearest = body;
             }
         }

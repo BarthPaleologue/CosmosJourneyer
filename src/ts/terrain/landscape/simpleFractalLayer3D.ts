@@ -2,14 +2,7 @@ import { LVector3 } from "../../utils/algebra";
 import { pow } from "../../utils/gradientMath";
 import { simpleElevationFunction } from "./elevationFunction";
 
-export function simpleFractalLayer3D(
-    frequency: number,
-    nbOctaves: number,
-    decay: number,
-    lacunarity: number,
-    power: number,
-    f: simpleElevationFunction
-): simpleElevationFunction {
+export function simpleFractalLayer3D(frequency: number, nbOctaves: number, decay: number, lacunarity: number, power: number, f: simpleElevationFunction): simpleElevationFunction {
     return function (coords: LVector3, seed: number, gradient: LVector3) {
         let noiseValue = 0.0;
         const totalAmplitude = (1.0 - (1.0 / decay) ** (nbOctaves + 1)) / (1.0 - 1.0 / decay);

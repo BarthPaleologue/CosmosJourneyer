@@ -1,14 +1,5 @@
-import {
-    AbstractMesh,
-    AssetsManager,
-    Color3, Mesh,
-    MeshAssetTask,
-    Scene,
-    StandardMaterial,
-    Texture,
-    Vector3
-} from "@babylonjs/core";
-import "@babylonjs/loaders/OBJ";
+import { AbstractMesh, AssetsManager, Color3, Mesh, MeshAssetTask, Scene, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
+import "@babylonjs/loaders";
 
 import rockNormalMap from "../asset/textures/rockn.png";
 import dirtNormalMap from "../asset/textures/dirt/Ground_Dirt_008_normal.jpg";
@@ -59,7 +50,7 @@ export class Assets {
             Assets.manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Assets.WaterNormalMap2 = task.texture);
 
             const characterTask = Assets.manager.addMeshTask("characterTask", "", "", character);
-            characterTask.onSuccess = function(task: MeshAssetTask) {
+            characterTask.onSuccess = function (task: MeshAssetTask) {
                 const meshes: Mesh[] = [];
                 for (const mesh of task.loadedMeshes) {
                     if (mesh.hasBoundingInfo) meshes.push(mesh as Mesh);
@@ -71,7 +62,7 @@ export class Assets {
             };
 
             const spaceshipTask = Assets.manager.addMeshTask("spaceshipTask", "", "", spaceship);
-            spaceshipTask.onSuccess = function(task: MeshAssetTask) {
+            spaceshipTask.onSuccess = function (task: MeshAssetTask) {
                 const meshes: Mesh[] = [];
                 for (const mesh of task.loadedMeshes) {
                     if (mesh.hasBoundingInfo) meshes.push(mesh as Mesh);

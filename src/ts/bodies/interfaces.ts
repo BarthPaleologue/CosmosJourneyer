@@ -5,7 +5,7 @@ export enum BodyType {
     STAR,
     TELLURIC,
     GAZ,
-    BLACK_HOLE,
+    BLACK_HOLE
 }
 
 export interface ISeedable {
