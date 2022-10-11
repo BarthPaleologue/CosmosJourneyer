@@ -2,14 +2,14 @@ precision highp float;
 
 // based on https://www.shadertoy.com/view/tsBXW3
 
-#define _Speed 3.0//disk rotation speed
-
 #define _Steps  12.0 //disk texture layers
 
 varying vec2 vUV;
 
 uniform float time;
 uniform float planetRadius;
+uniform float accretionDiskRadius;
+uniform float rotationPeriod;
 
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
@@ -90,15 +90,14 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
         float distMult = 1.0;
         distMult *= clamp(relativeDistance - 0.6, 0.0, 1.0); //FIXME: does this mean the event horizon is not as big as i want?
 
-        float diskRadius = 8000e3; //TODO: make uniform
-        float relativeDiskRadius = diskRadius / planetRadius;
+        float relativeDiskRadius = accretionDiskRadius / planetRadius;
         distMult *= clamp((relativeDiskRadius - relativeDistance), 0.0, 1.0);
 
         distMult *= distMult;
 
         // rotation of the disk
         vec2 xz;
-        float rot = mod(time * _Speed, 8192.0);
+        float rot = 2.0 * 3.1415 * mod(time / rotationPeriod, 8192.0);
         xz.x = position.x * cos(rot) - position.z * sin(rot);
         xz.y = position.x * sin(rot) + position.z * cos(rot);
 
@@ -142,9 +141,9 @@ void main()
 
     float accretionDiskHeight = 100.0;
 
-    //setting up camera
-    vec3 ray = -rayDir;
-    vec3 pos = planetPosition - cameraPosition;
+    vec3 pos = cameraPosition - planetPosition; // position of the camera in blackhole space
+
+    float camToBH = length(pos); // distance from the camera to the black hole
 
     if (maximumDistance < length(pos)) {
         glFragColor = vec4(screenColor, 1.0);
@@ -159,15 +158,15 @@ void main()
             float centDist = length(pos); //dotpos * invDist;//distance to BH
             float dotpos = centDist * centDist;
             float invDist = 1.0 / centDist; //inversesqrt(dotpos);//1/distance to BH
-            float stepDist = 0.92 * abs(pos.y / ray.y); //conservative distance to disk (y==0)
+            float stepDist = 0.92 * abs(pos.y / rayDir.y); //conservative distance to disk (y==0)
             float farLimit = centDist * 0.5; //limit step size far from to BH
             float closeLimit = centDist * 0.1 + 0.05 * dotpos / planetRadius; //limit step size closse to BH
             stepDist = min(stepDist, min(farLimit, closeLimit));
 
             float invDistSqr = invDist * invDist;
             float bendForce = stepDist * invDistSqr * planetRadius * 0.625; //bending force
-            ray =  normalize(ray - (bendForce * invDist) * pos); //bend ray towards BH
-            pos += stepDist * ray;
+            rayDir =  normalize(rayDir - (bendForce * invDist) * pos); //bend ray towards BH
+            pos += stepDist * rayDir;
         }
 
         float dist2 = length(pos);
@@ -189,10 +188,10 @@ void main()
                 return;
             }
 
-            vec4 diskCol = raymarchDisk(ray, pos);//render disk
+            vec4 diskCol = raymarchDisk(rayDir, pos);//render disk
             diskCol.rgb = pow(diskCol.rgb, vec3(0.8));
             pos.y = 0.0;
-            pos += abs(planetRadius * 0.001 / ray.y) * ray;
+            pos += abs(planetRadius * 0.001 / rayDir.y) * rayDir;
             col += diskCol * (1.0 - col.a);
         }
     }
