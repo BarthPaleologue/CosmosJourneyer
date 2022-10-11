@@ -123,20 +123,14 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
     }
 
     attachToCamera(camera: Camera) {
-        this.scene.postProcessRenderPipelineManager.attachCamerasToRenderPipeline(this.name, camera);
-        //FIXME: this is a BabylonJS issue : the length does not increase for some reason
-        this.cameras.length += 1;
+        this._attachCameras([camera], false);
     }
 
     detachCamera(camera: Camera) {
-        this.scene.postProcessRenderPipelineManager.detachCamerasFromRenderPipeline(this.name, camera);
-        //FIXME: this is a BabylonJS issue : the length does not decrease for some reason
-        this.cameras.length -= 1;
+        this._detachCameras([camera]);
     }
 
     detachCameras() {
-        for (const camera of this.cameras) {
-            this.detachCamera(camera);
-        }
+        this._detachCameras(this.cameras);
     }
 }
