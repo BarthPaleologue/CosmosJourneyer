@@ -1,6 +1,8 @@
-import { Input } from "./input";
+import { Input, InputType } from "./input";
 
 export class Keyboard implements Input {
+    readonly type = InputType.KEYBOARD;
+
     private keys: { [key: string]: boolean } = {}; // le dictionnaire stockant l'état du clavier
     constructor() {
         window.addEventListener("keypress", (e) => (this.keys[e.key] = true));

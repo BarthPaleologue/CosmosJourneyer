@@ -2,7 +2,8 @@ import { AbstractController } from "./abstractController";
 import { UberScene } from "../core/uberScene";
 import { UberFreeCamera } from "../core/uberFreeCamera";
 import { Vector3 } from "@babylonjs/core";
-import { Input } from "../inputs/input";
+import { Input, InputType } from "../inputs/input";
+import { Mouse } from "../inputs/mouse";
 
 export class PlayerController extends AbstractController {
     private readonly camera: UberFreeCamera;
@@ -23,6 +24,12 @@ export class PlayerController extends AbstractController {
     }
 
     public listenTo(input: Input, deltaTime: number): Vector3 {
+        /*if(input.type == InputType.MOUSE) {
+            const mouse = input as Mouse;
+            this.transform.yaw(mouse.getDx() * 100 * this.rotationSpeed * deltaTime);
+            this.transform.pitch(mouse.getDy() * 100 * this.rotationSpeed * deltaTime);
+        }*/
+
         this.transform.roll(input.getRoll() * this.rotationSpeed * deltaTime);
         this.transform.pitch(input.getPitch() * this.rotationSpeed * deltaTime);
         this.transform.yaw(input.getYaw() * this.rotationSpeed * deltaTime);

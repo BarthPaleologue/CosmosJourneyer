@@ -1,4 +1,12 @@
+export enum InputType {
+    KEYBOARD,
+    MOUSE,
+    GAMEPAD,
+}
+
 export interface Input {
+    readonly type: InputType;
+
     /**
      * Returns a number between -1 and 1 describing the roll intensity
      */

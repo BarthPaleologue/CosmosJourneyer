@@ -1,7 +1,7 @@
 /**
  * All possible buttons on a gamepad
  */
-import { Input } from "./input";
+import { Input, InputType } from "./input";
 
 export enum GamepadButton {
     B,
@@ -41,6 +41,8 @@ type EnumDictionary<T extends string | symbol | number, U> = { [K in T]: U };
  * Classe gérant les intéractions avec le gamepad
  */
 export class Gamepad implements Input {
+    readonly type = InputType.GAMEPAD;
+
     private gamepad: globalThis.Gamepad | null;
     // Provisoire ne fonctionne que avec la manette switch
     private buttonMapping: EnumDictionary<GamepadButton, number> = {

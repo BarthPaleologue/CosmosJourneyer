@@ -1,6 +1,8 @@
-import { Input } from "./input";
+import { Input, InputType } from "./input";
 
 export class Mouse implements Input {
+    readonly type = InputType.MOUSE;
+
     private x = 0;
     private y = 0;
 
@@ -66,5 +68,13 @@ export class Mouse implements Input {
 
     getAcceleration(): number {
         return 0;
+    }
+
+    getDx(): number {
+        return this.dx;
+    }
+
+    getDy(): number {
+        return this.dy;
     }
 }
