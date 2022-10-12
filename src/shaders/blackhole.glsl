@@ -31,10 +31,10 @@ float hash(float x) { return fract(sin(x) * 152754.742); }
 float hash(vec2 x) { return hash(x.x + hash(x.y)); }
 
 float valueNoise(vec2 p, float f) {
-    float bl = hash(floor(p*f + vec2(0., 0.)));
-    float br = hash(floor(p*f + vec2(1., 0.)));
-    float tl = hash(floor(p*f + vec2(0., 1.)));
-    float tr = hash(floor(p*f + vec2(1., 1.)));
+    float bl = hash(floor(p*f + vec2(0.0, 0.0)));
+    float br = hash(floor(p*f + vec2(1.0, 0.0)));
+    float tl = hash(floor(p*f + vec2(0.0, 1.0)));
+    float tr = hash(floor(p*f + vec2(1.0, 1.0)));
 
     vec2 fr = fract(p*f);
     fr = (3. - 2.*fr)*fr*fr;
@@ -50,12 +50,13 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
     if (!hasAccretionDisk) return vec4(1., 1., 1., 0.);//no disk
 
     vec3 position = zeroPos;
-    float distance = length(position.xz); // distance to the center of the disk
+    float distance = length(position.xyz); // distance to the center of the disk
     float relativeDistance = distance / planetRadius;
+    float relativeDiskSize = accretionDiskRadius / planetRadius;
 
-    float dist = min(1.0, relativeDistance * 0.5) * planetRadius * 0.4 * (1./_Steps) / abs(ray.y);
+    float dist = min(planetRadius, distance * 0.5) * 0.4 / abs(ray.y);
 
-    position += dist * _Steps * ray * 0.5;
+    position += dist * ray * 0.5;
 
     // elementary rotation around the hole //FIXME: will break when the black hole has a rotation
     vec2 deltaPos;
@@ -64,24 +65,21 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
     deltaPos = normalize(deltaPos - zeroPos.xz);
 
     float parallel = dot(ray.xz, deltaPos);
-    parallel /= sqrt(relativeDistance);
+    parallel /= sqrt(relativeDistance); //FIXME: probably should be removed
 
-    float redShift = parallel + 0.5;
-    redShift *= redShift;
-    redShift = clamp(redShift, 0.0, 1.0);
+    float redShift = (parallel + 0.4) / 2.0; //TODO: need better redshift mechanic   
 
-    float diskMix = smoothstep(4.0, 7.0, relativeDistance);
+    float diskMix = smoothstep(3.5 / 6.0, 5.0 / 6.0, relativeDistance / relativeDiskSize);
     vec3 innerDiskColor = vec3(1.0, 0.8, 0.0);
     vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
     vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix);
 
-    insideCol *= mix(vec3(0.4, 0.2, 0.1), vec3(1.6, 1.0, 4.0) * 2.0, redShift);
-    insideCol *= 1.25;
+    insideCol *= mix(vec3(0.4, 0.2, 0.1), vec3(1.6, 1.0, 8.0) * 2.0, redShift); //FIXME: need better redshift
 
     vec4 diskColor = vec4(0.0);
     for (float i = 0.; i < _Steps; i++)
     {
-        position -= dist * ray;
+        position -= dist * ray / _Steps;
 
         float intensity = clamp(1.0 - abs((i - 0.8) * (1.0 / _Steps) * 2.0), 0.0, 1.0);
         distance = length(position.xz);
@@ -92,8 +90,6 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
 
         float relativeDiskRadius = accretionDiskRadius / planetRadius;
         distMult *= clamp((relativeDiskRadius - relativeDistance), 0.0, 1.0);
-
-        distMult *= distMult;
 
         // rotation of the disk
         vec2 xz;
@@ -117,7 +113,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
         diskColor = clamp(vec4(col * alpha + diskColor.rgb * (1.0-alpha), diskColor.a * (1.0-alpha) + alpha), vec4(0.0), vec4(1.0));
 
         // redshift glow
-        diskColor.rgb += redShift * (intensity + extraWidth) * (1.0 / _Steps) * distMult / (relativeDistance * relativeDistance);
+        diskColor.rgb += 0.1 * redShift * (intensity + extraWidth) * distMult / (relativeDistance * relativeDistance);
     }
 
     return diskColor;
