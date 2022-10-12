@@ -45,9 +45,9 @@ float valueNoise(vec2 p, float f) {
 
 vec4 background(vec3 ray) { return texture2D(textureSampler, vec2(ray.x, ray.y)); }
 
-vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
-{
-    if (false) return vec4(1., 1., 1., 0.);//no disk
+vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
+    const bool hasAccretionDisk = true;
+    if (!hasAccretionDisk) return vec4(1., 1., 1., 0.);//no disk
 
     vec3 position = zeroPos;
     float distance = length(position.xz); // distance to the center of the disk
@@ -88,7 +88,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
         relativeDistance = distance / planetRadius;
 
         float distMult = 1.0;
-        distMult *= clamp(relativeDistance - 0.6, 0.0, 1.0); //FIXME: does this mean the event horizon is not as big as i want?
+        distMult *= clamp(relativeDistance - 1.2, 0.0, 1.0);
 
         float relativeDiskRadius = accretionDiskRadius / planetRadius;
         distMult *= clamp((relativeDiskRadius - relativeDistance), 0.0, 1.0);
@@ -97,7 +97,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
 
         // rotation of the disk
         vec2 xz;
-        float rot = 2.0 * 3.1415 * mod(time / rotationPeriod, 8192.0);
+        float rot = 2.0 * 3.1415 * time / rotationPeriod;
         xz.x = position.x * cos(rot) - position.z * sin(rot);
         xz.y = position.x * sin(rot) + position.z * cos(rot);
 
@@ -112,7 +112,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos)
 
         float alpha = clamp(noise * (intensity + extraWidth) * relativeDistance * distMult / 6.0, 0.0, 1.0);
 
-        // FIXME: hard to describe
+        // blending with current color in the disk
         vec3 col = 2.0 * mix(vec3(0.3, 0.2, 0.15) * insideCol, insideCol, min(1.0, intensity * 2.0));
         diskColor = clamp(vec4(col * alpha + diskColor.rgb * (1.0-alpha), diskColor.a * (1.0-alpha) + alpha), vec4(0.0), vec4(1.0));
 
@@ -143,8 +143,6 @@ void main()
 
     vec3 pos = cameraPosition - planetPosition; // position of the camera in blackhole space
 
-    float camToBH = length(pos); // distance from the camera to the black hole
-
     if (maximumDistance < length(pos)) {
         glFragColor = vec4(screenColor, 1.0);
         return;
@@ -160,24 +158,24 @@ void main()
             float invDist = 1.0 / centDist; //inversesqrt(dotpos);//1/distance to BH
             float stepDist = 0.92 * abs(pos.y / rayDir.y); //conservative distance to disk (y==0)
             float farLimit = centDist * 0.5; //limit step size far from to BH
-            float closeLimit = centDist * 0.1 + 0.05 * dotpos / planetRadius; //limit step size closse to BH
+            float closeLimit = centDist * 0.1 + 0.05 * dotpos / planetRadius; //limit step size close to BH
             stepDist = min(stepDist, min(farLimit, closeLimit));
 
             float invDistSqr = invDist * invDist;
-            float bendForce = stepDist * invDistSqr * planetRadius * 0.625; //bending force
-            rayDir =  normalize(rayDir - (bendForce * invDist) * pos); //bend ray towards BH
+            float bendForce = stepDist * invDistSqr * planetRadius; //bending force
+            rayDir =  normalize(rayDir - bendForce * pos * invDist); //bend ray towards BH
             pos += stepDist * rayDir;
         }
 
         float dist2 = length(pos);
 
-        if (dist2 < planetRadius * 0.1)//ray sucked in to BH
+        if (dist2 < planetRadius)//ray sucked in to BH
         {
             glFragColor =  vec4(col.rgb * col.a, 1.0);
             return;
         } else if (dist2 > planetRadius * 1000.)//ray escaped BH
         {
-            vec4 bg = background(ray);
+            vec4 bg = background(rayDir);
             bg = vec4(screenColor, 1.0);
             glFragColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
             return;
@@ -189,9 +187,8 @@ void main()
             }
 
             vec4 diskCol = raymarchDisk(rayDir, pos);//render disk
-            diskCol.rgb = pow(diskCol.rgb, vec3(0.8));
             pos.y = 0.0;
-            pos += abs(planetRadius * 0.001 / rayDir.y) * rayDir;
+            pos += 0.001 * abs(planetRadius / rayDir.y) * rayDir;
             col += diskCol * (1.0 - col.a);
         }
     }
