@@ -1,4 +1,12 @@
-import { Engine, FreeCamera, Nullable, Scene, ScenePerformancePriority } from "@babylonjs/core";
+import {
+    Engine,
+    FreeCamera,
+    FxaaPostProcess,
+    Nullable,
+    Scene,
+    ScenePerformancePriority,
+    Texture
+} from "@babylonjs/core";
 import { StarSystem } from "../bodies/starSystem";
 import { SpaceRenderingPipeline } from "../postProcesses/pipelines/spaceRenderingPipeline";
 import { SurfaceRenderingPipeline } from "../postProcesses/pipelines/surfaceRenderingPipeline";
@@ -21,6 +29,7 @@ export class UberScene extends Scene {
 
     readonly colorCorrection: ColorCorrection;
     readonly overlay: OverlayPostProcess;
+    readonly fxaa: FxaaPostProcess;
 
     isOverlayEnabled = true;
 
@@ -36,6 +45,7 @@ export class UberScene extends Scene {
 
         this.colorCorrection = new ColorCorrection("colorCorrection", this);
         this.overlay = new OverlayPostProcess("overlay", this);
+        this.fxaa = new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, engine);
 
         this._chunkForge = new ChunkForge(nbVertices);
     }
