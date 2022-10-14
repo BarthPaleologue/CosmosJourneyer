@@ -1,8 +1,6 @@
 import {
     Engine,
-    FreeCamera,
     FxaaPostProcess,
-    Nullable,
     Scene,
     ScenePerformancePriority,
     Texture
@@ -49,21 +47,26 @@ export class UberScene extends Scene {
 
         this._chunkForge = new ChunkForge(nbVertices);
     }
+
     public setStarSystem(starSystem: StarSystem) {
         this.starSystem = starSystem;
     }
+
     public getStarSystem(): StarSystem {
         if (this.starSystem === null) throw new Error("Star system not set");
         return this.starSystem;
     }
+
     public setActiveController(controller: AbstractController) {
         this.activeController = controller;
         this.activeCamera = controller.getActiveCamera();
     }
+
     public getActiveController(): AbstractController {
         if (this.activeController === null) throw new Error("Controller not set");
         return this.activeController;
     }
+
     public getActiveUberCamera(): UberFreeCamera {
         if (this.getActiveController().getActiveCamera() === null) throw new Error("No active Uber Camera");
         return this.getActiveController().getActiveCamera();
@@ -73,23 +76,23 @@ export class UberScene extends Scene {
         this._chunkForge.update();
         if (this.starSystem && this.activeController) this.starSystem.update(deltaTime);
 
-        const switchLimit = this.getActiveController().getNearestBody().postProcesses.rings?.settings.ringStart || 2;
-        if (this.getActiveController().isOrbiting(this.getActiveController().getNearestBody(), switchLimit)) {
-            if (this.spaceRenderingPipeline.cameras.length > 0) {
-                this.spaceRenderingPipeline.detachCameras();
-                this.surfaceRenderingPipeline.attachToCamera(this.getActiveController().getActiveCamera());
+        const activeCamera = this.getActiveUberCamera();
+        const nearestBody = this.getActiveController().getNearestBody();
+
+        this.spaceRenderingPipeline.setBody(this.getActiveController().getNearestBody());
+        this.surfaceRenderingPipeline.setBody(this.getActiveController().getNearestBody());
+
+        const switchLimit = nearestBody.postProcesses.rings?.settings.ringStart || 2;
+        if (this.getActiveController().isOrbiting(nearestBody, switchLimit)) {
+            if (!this.surfaceRenderingPipeline.cameras.includes(activeCamera)) {
+                if(this.spaceRenderingPipeline.cameras.includes(activeCamera)) this.spaceRenderingPipeline.detachCamera(activeCamera);
+                this.surfaceRenderingPipeline.attachToCamera(activeCamera);
             }
         } else {
-            if (this.surfaceRenderingPipeline.cameras.length > 0) {
-                this.surfaceRenderingPipeline.detachCameras();
-                this.spaceRenderingPipeline.attachToCamera(this.getActiveController().getActiveCamera());
+            if (!this.spaceRenderingPipeline.cameras.includes(activeCamera)) {
+                if(this.surfaceRenderingPipeline.cameras.includes(activeCamera)) this.surfaceRenderingPipeline.detachCamera(activeCamera);
+                this.spaceRenderingPipeline.attachToCamera(activeCamera);
             }
         }
-    }
-
-    public initPostProcesses() {
-        this.spaceRenderingPipeline.init();
-        this.surfaceRenderingPipeline.init();
-        this.spaceRenderingPipeline.attachToCamera(this.getActiveController().getActiveCamera());
     }
 }

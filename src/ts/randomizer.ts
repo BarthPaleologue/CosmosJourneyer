@@ -50,8 +50,6 @@ Assets.Init(scene).then(() => {
     starSystem.makeStars(1);
     starSystem.makePlanets(1);
 
-    scene.initPostProcesses();
-
     document.addEventListener("keydown", (e) => {
         if (e.key == "o") scene.isOverlayEnabled = !scene.isOverlayEnabled;
         if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getActiveController().getActiveCamera(), { precision: 4 });

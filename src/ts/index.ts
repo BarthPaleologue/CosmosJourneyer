@@ -101,10 +101,12 @@ Assets.Init(scene).then(() => {
     ares.postProcesses.ocean?.dispose();
     scene.spaceRenderingPipeline.oceans.splice(scene.spaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);
     scene.surfaceRenderingPipeline.oceans.splice(scene.surfaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);
+    ares.postProcesses.ocean = null;
 
     ares.postProcesses.clouds?.dispose();
     scene.spaceRenderingPipeline.clouds.splice(scene.spaceRenderingPipeline.clouds.indexOf(ares.postProcesses.clouds!), 1);
     scene.surfaceRenderingPipeline.clouds.splice(scene.surfaceRenderingPipeline.clouds.indexOf(ares.postProcesses.clouds!), 1);
+    ares.postProcesses.clouds = null;
 
     ares.physicalProperties.mass = 7;
     ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
@@ -146,8 +148,6 @@ Assets.Init(scene).then(() => {
         apoapsis: 4300 * ares.getRadius(),
         orientationQuaternion: Quaternion.Identity()
     };
-
-    scene.initPostProcesses();
 
     const collisionWorker = new CollisionWorker(player, starSystem);
 
