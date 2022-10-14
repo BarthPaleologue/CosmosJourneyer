@@ -99,7 +99,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         };
 
         this.postProcesses = {
-            overlay: new OverlayPostProcess(this.name, this, starSystem.scene, starSystem),
+            overlay: new OverlayPostProcess(this.name, this, starSystem.scene),
             atmosphere: null,
             ocean: null,
             clouds: null,

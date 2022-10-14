@@ -1,12 +1,13 @@
 import { Effect } from "@babylonjs/core";
 
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
-import { PlanetPostProcess } from "../planetPostProcess";
 
 import blackHoleFragment from "../../../shaders/blackhole.glsl";
 import { UberScene } from "../../core/uberScene";
 import { AbstractBody } from "../../bodies/abstractBody";
 import { StarSystem } from "../../bodies/starSystem";
+import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "../uniforms";
+import { UberPostProcess } from "../uberPostProcess";
 
 const shaderName = "blackhole";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
@@ -16,7 +17,7 @@ export interface BlackHoleSettings {
     rotationPeriod: number;
 }
 
-export class BlackHolePostProcess extends PlanetPostProcess {
+export class BlackHolePostProcess extends UberPostProcess {
     settings: BlackHoleSettings;
 
     constructor(name: string, planet: AbstractBody, scene: UberScene, starSystem: StarSystem) {
@@ -26,6 +27,8 @@ export class BlackHolePostProcess extends PlanetPostProcess {
         };
 
         const uniforms: ShaderUniforms = [
+            ...getBodyUniforms(planet),
+            ...getActiveCameraUniforms(scene),
             {
                 name: "time",
                 type: ShaderDataType.Float,
@@ -49,9 +52,9 @@ export class BlackHolePostProcess extends PlanetPostProcess {
             }
         ];
 
-        const samplers: ShaderSamplers = [];
+        const samplers: ShaderSamplers = getSamplers(scene);
 
-        super(name, shaderName, uniforms, samplers, planet, scene, starSystem);
+        super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
 

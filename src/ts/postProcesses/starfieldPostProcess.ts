@@ -1,6 +1,5 @@
 import { Effect, Vector3 } from "@babylonjs/core";
 
-import { SpacePostProcess } from "./spacePostProcess";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
 
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
@@ -9,6 +8,8 @@ import { BodyType } from "../bodies/interfaces";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { UberScene } from "../core/uberScene";
 import { StarSystem } from "../bodies/starSystem";
+import { getActiveCameraUniforms, getSamplers, getStarsUniforms } from "./uniforms";
+import { UberPostProcess } from "./uberPostProcess";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -17,7 +18,7 @@ export interface StarfieldSettings {
     foo: number;
 }
 
-export class StarfieldPostProcess extends SpacePostProcess {
+export class StarfieldPostProcess extends UberPostProcess {
     settings: StarfieldSettings;
 
     constructor(name: string, player: AbstractController, scene: UberScene, starSystem: StarSystem) {
@@ -26,6 +27,8 @@ export class StarfieldPostProcess extends SpacePostProcess {
         };
 
         const uniforms: ShaderUniforms = [
+            ...getActiveCameraUniforms(scene),
+            ...getStarsUniforms(starSystem),
             {
                 name: "visibility",
                 type: ShaderDataType.Float,
@@ -61,9 +64,9 @@ export class StarfieldPostProcess extends SpacePostProcess {
             }
         ];
 
-        const samplers: ShaderSamplers = [];
+        const samplers: ShaderSamplers = getSamplers(scene);
 
-        super(name, shaderName, uniforms, samplers, scene, starSystem);
+        super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
 

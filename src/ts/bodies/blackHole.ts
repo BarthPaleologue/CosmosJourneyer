@@ -24,7 +24,7 @@ export class BlackHole extends AbstractBody {
         };
         this.postProcesses = {
             rings: null,
-            overlay: new OverlayPostProcess("BH", this, starSystem.scene, starSystem),
+            overlay: new OverlayPostProcess("BH", this, starSystem.scene),
             blackHole: new BlackHolePostProcess("BH", this, starSystem.scene, starSystem)
         };
     }

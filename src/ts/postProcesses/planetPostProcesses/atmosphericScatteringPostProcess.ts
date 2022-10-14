@@ -1,12 +1,13 @@
 import { Effect } from "@babylonjs/core";
 
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
-import { PlanetPostProcess } from "../planetPostProcess";
 
 import atmosphericScatteringFragment from "../../../shaders/atmosphericScatteringFragment.glsl";
 import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
 import { StarSystem } from "../../bodies/starSystem";
+import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
+import { UberPostProcess } from "../uberPostProcess";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -24,7 +25,7 @@ export interface AtmosphereSettings {
     mieHaloRadius: number;
 }
 
-export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
+export class AtmosphericScatteringPostProcess extends UberPostProcess {
     settings: AtmosphereSettings;
 
     constructor(name: string, planet: Planet, atmosphereHeight: number, scene: UberScene, starSystem: StarSystem) {
@@ -42,6 +43,9 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
         };
 
         const uniforms: ShaderUniforms = [
+            ...getBodyUniforms(planet),
+            ...getStarsUniforms(starSystem),
+            ...getActiveCameraUniforms(scene),
             {
                 name: "atmosphereRadius",
                 type: ShaderDataType.Float,
@@ -114,9 +118,9 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
             }
         ];
 
-        const samplers: ShaderSamplers = [];
+        const samplers: ShaderSamplers = getSamplers(scene);
 
-        super(name, shaderName, uniforms, samplers, planet, scene, starSystem);
+        super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
 

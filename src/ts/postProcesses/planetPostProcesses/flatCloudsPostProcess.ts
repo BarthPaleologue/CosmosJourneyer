@@ -2,13 +2,14 @@ import { Color3, Effect, Texture } from "@babylonjs/core";
 
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import normalMap from "../../../asset/textures/cloudNormalMap3.jpg";
-import { PlanetPostProcess } from "../planetPostProcess";
 import { gcd } from "../../utils/gradientMath";
 
 import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
 import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
 import { StarSystem } from "../../bodies/starSystem";
+import { UberPostProcess } from "../uberPostProcess";
+import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -26,7 +27,7 @@ export interface CloudSettings {
     detailSpeed: number;
 }
 
-export class FlatCloudsPostProcess extends PlanetPostProcess {
+export class FlatCloudsPostProcess extends UberPostProcess {
     settings: CloudSettings;
 
     constructor(name: string, planet: Planet, cloudLayerHeight: number, scene: UberScene, starSystem: StarSystem) {
@@ -44,6 +45,9 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
         };
 
         const uniforms: ShaderUniforms = [
+            ...getBodyUniforms(planet),
+            ...getStarsUniforms(starSystem),
+            ...getActiveCameraUniforms(scene),
             {
                 name: "cloudLayerRadius",
                 type: ShaderDataType.Float,
@@ -131,6 +135,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
         ];
 
         const samplers: ShaderSamplers = [
+            ...getSamplers(scene),
             {
                 name: "normalMap",
                 type: ShaderDataType.Texture,
@@ -140,7 +145,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             }
         ];
 
-        super(name, shaderName, uniforms, samplers, planet, scene, starSystem);
+        super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
 

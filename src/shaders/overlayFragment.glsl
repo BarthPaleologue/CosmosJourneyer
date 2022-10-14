@@ -11,7 +11,6 @@ uniform mat4 inverseProjection;
 uniform float cameraNear;
 uniform float cameraFar;
 uniform vec3 cameraPosition;
-uniform vec3 cameraDirection;
 
 uniform vec3 planetPosition;
 uniform float planetRadius;

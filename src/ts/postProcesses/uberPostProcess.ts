@@ -5,8 +5,8 @@ import { IPostProcess } from "./iPostProcess";
 import { UberScene } from "../core/uberScene";
 
 export abstract class UberPostProcess extends PostProcess implements IPostProcess {
-    uniforms: ShaderUniforms;
-    samplers: ShaderSamplers;
+    protected readonly uniforms: ShaderUniforms = [];
+    protected readonly samplers: ShaderSamplers = [];
 
     protected internalTime = 0;
 
@@ -16,8 +16,8 @@ export abstract class UberPostProcess extends PostProcess implements IPostProces
 
         super(name, fragmentName, uniformNames, samplerNames, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
 
-        this.uniforms = uniforms;
-        this.samplers = samplers;
+        this.uniforms.push(...uniforms);
+        this.samplers.push(...samplers);
 
         this.onApply = (effect: Effect) => {
             for (const uniform of this.uniforms) {

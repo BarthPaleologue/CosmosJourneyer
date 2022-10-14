@@ -2,30 +2,25 @@ import { Effect } from "@babylonjs/core";
 import overlayFragment from "../../shaders/overlayFragment.glsl";
 import { UberScene } from "../core/uberScene";
 import { ShaderDataType, ShaderUniforms } from "./interfaces";
-import { StarSystem } from "../bodies/starSystem";
-import { PlanetPostProcess } from "./planetPostProcess";
 import { AbstractBody } from "../bodies/abstractBody";
+import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "./uniforms";
+import { UberPostProcess } from "./uberPostProcess";
 
 const shaderName = "overlay";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = overlayFragment;
 
-export class OverlayPostProcess extends PlanetPostProcess {
-    //FIXME: should not require starSystem
+export class OverlayPostProcess extends UberPostProcess {
     static ARE_ENABLED = true;
-    constructor(name: string, body: AbstractBody, scene: UberScene, starSystem: StarSystem) {
+
+    constructor(name: string, body: AbstractBody, scene: UberScene) {
         const uniforms: ShaderUniforms = [
+            ...getActiveCameraUniforms(scene),
+            ...getBodyUniforms(body),
             {
                 name: "aspectRatio",
                 type: ShaderDataType.Float,
                 get: () => {
                     return scene.getEngine().getScreenAspectRatio();
-                }
-            },
-            {
-                name: "cameraDirection",
-                type: ShaderDataType.Vector3,
-                get: () => {
-                    return scene.getActiveController().transform.getForwardDirection();
                 }
             },
             {
@@ -36,7 +31,10 @@ export class OverlayPostProcess extends PlanetPostProcess {
                 }
             }
         ];
-        super(name, shaderName, uniforms, [], body, scene, starSystem);
+
+        const samplers = getSamplers(scene);
+
+        super(name, shaderName, uniforms, samplers, scene);
 
         for (const pipeline of scene.pipelines) {
             pipeline.overlays.push(this);

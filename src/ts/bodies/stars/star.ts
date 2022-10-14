@@ -75,7 +75,7 @@ export class Star extends AbstractBody {
         this.node.rotationQuaternion = Quaternion.Identity();
 
         this.postProcesses = {
-            overlay: new OverlayPostProcess(name, this, starSystemManager.scene, starSystemManager),
+            overlay: new OverlayPostProcess(name, this, starSystemManager.scene),
             volumetricLight: new VolumetricLight(this, this.mesh, this.starSystem.scene),
             rings: null
         };

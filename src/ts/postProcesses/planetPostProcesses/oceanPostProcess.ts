@@ -1,13 +1,14 @@
 import { Effect } from "@babylonjs/core";
 
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
-import { PlanetPostProcess } from "../planetPostProcess";
 
 import oceanFragment from "../../../shaders/oceanFragment.glsl";
 import { Assets } from "../../assets";
 import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
 import { StarSystem } from "../../bodies/starSystem";
+import { UberPostProcess } from "../uberPostProcess";
+import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -21,7 +22,7 @@ export interface OceanSettings {
     waveBlendingSharpness: number;
 }
 
-export class OceanPostProcess extends PlanetPostProcess {
+export class OceanPostProcess extends UberPostProcess {
     settings: OceanSettings;
 
     constructor(name: string, planet: Planet, scene: UberScene, starSystem: StarSystem) {
@@ -35,6 +36,9 @@ export class OceanPostProcess extends PlanetPostProcess {
         };
 
         const uniforms: ShaderUniforms = [
+            ...getBodyUniforms(planet),
+            ...getStarsUniforms(starSystem),
+            ...getActiveCameraUniforms(scene),
             {
                 name: "oceanRadius",
                 type: ShaderDataType.Float,
@@ -96,6 +100,7 @@ export class OceanPostProcess extends PlanetPostProcess {
         ];
 
         const samplers: ShaderSamplers = [
+            ...getSamplers(scene),
             {
                 name: "normalMap1",
                 type: ShaderDataType.Texture,
@@ -112,7 +117,7 @@ export class OceanPostProcess extends PlanetPostProcess {
             }
         ];
 
-        super(name, shaderName, uniforms, samplers, planet, scene, starSystem);
+        super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
 

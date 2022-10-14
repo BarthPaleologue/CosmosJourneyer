@@ -1,60 +1,62 @@
 import { Effect } from "@babylonjs/core";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
-import { PlanetPostProcess } from "../planetPostProcess";
+import { ShaderDataType, ShaderUniforms } from "../interfaces";
 
 import ringsFragment from "../../../shaders/ringsFragment.glsl";
 import { AbstractBody } from "../../bodies/abstractBody";
 import { UberScene } from "../../core/uberScene";
 import { StarSystem } from "../../bodies/starSystem";
+import { UberPostProcess } from "../uberPostProcess";
+import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
 
-export interface RingsSettings {
+interface RingsSettings {
     ringStart: number;
     ringEnd: number;
     ringFrequency: number;
     ringOpacity: number;
 }
 
-export class RingsPostProcess extends PlanetPostProcess {
-    settings: RingsSettings;
+export class RingsPostProcess extends UberPostProcess {
+    settings: RingsSettings = {
+        ringStart: 1.5,
+        ringEnd: 2.5,
+        ringFrequency: 30.0,
+        ringOpacity: 0.4
+    };
 
     constructor(name: string, body: AbstractBody, scene: UberScene, starSystem: StarSystem) {
-        const settings: RingsSettings = {
-            ringStart: 1.5,
-            ringEnd: 2.5,
-            ringFrequency: 30.0,
-            ringOpacity: 0.4
-        };
-
         const uniforms: ShaderUniforms = [
+            ...getBodyUniforms(body),
+            ...getStarsUniforms(starSystem),
+            ...getActiveCameraUniforms(scene),
             {
                 name: "ringStart",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.ringStart;
+                    return this.settings.ringStart;
                 }
             },
             {
                 name: "ringEnd",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.ringEnd;
+                    return this.settings.ringEnd;
                 }
             },
             {
                 name: "ringFrequency",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.ringFrequency;
+                    return this.settings.ringFrequency;
                 }
             },
             {
                 name: "ringOpacity",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.ringOpacity;
+                    return this.settings.ringOpacity;
                 }
             },
             {
@@ -66,11 +68,7 @@ export class RingsPostProcess extends PlanetPostProcess {
             }
         ];
 
-        const samplers: ShaderSamplers = [];
-
-        super(name, shaderName, uniforms, samplers, body, scene, starSystem);
-
-        this.settings = settings;
+        super(name, shaderName, uniforms, getSamplers(scene), scene);
 
         for (const pipeline of scene.pipelines) {
             pipeline.rings.push(this);

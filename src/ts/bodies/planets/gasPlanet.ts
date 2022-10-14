@@ -66,7 +66,7 @@ export class GasPlanet extends AbstractBody {
         this.mesh.material = this.material;
 
         this.postProcesses = {
-            overlay: new OverlayPostProcess(name, this, starSystem.scene, starSystem),
+            overlay: new OverlayPostProcess(name, this, starSystem.scene),
             atmosphere: null,
             rings: null
         };
