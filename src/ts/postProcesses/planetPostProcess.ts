@@ -3,9 +3,10 @@ import { Axis } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
 import { AbstractBody } from "../bodies/abstractBody";
 import { UberScene } from "../core/uberScene";
+import { StarSystem } from "../bodies/starSystem";
 
 export abstract class PlanetPostProcess extends SpacePostProcess {
-    constructor(name: string, fragmentName: string, otherUniforms: ShaderUniforms, otherSamplers: ShaderSamplers, body: AbstractBody, scene: UberScene) {
+    protected constructor(name: string, fragmentName: string, otherUniforms: ShaderUniforms, otherSamplers: ShaderSamplers, body: AbstractBody, scene: UberScene, starSystem: StarSystem) {
         const uniforms: ShaderUniforms = [
             {
                 name: "planetPosition",
@@ -32,6 +33,6 @@ export abstract class PlanetPostProcess extends SpacePostProcess {
 
         uniforms.push(...otherUniforms);
 
-        super(name, fragmentName, uniforms, otherSamplers, scene);
+        super(name, fragmentName, uniforms, otherSamplers, scene, starSystem);
     }
 }

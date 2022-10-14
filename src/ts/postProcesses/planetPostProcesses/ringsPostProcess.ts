@@ -5,6 +5,7 @@ import { PlanetPostProcess } from "../planetPostProcess";
 import ringsFragment from "../../../shaders/ringsFragment.glsl";
 import { AbstractBody } from "../../bodies/abstractBody";
 import { UberScene } from "../../core/uberScene";
+import { StarSystem } from "../../bodies/starSystem";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -19,7 +20,7 @@ export interface RingsSettings {
 export class RingsPostProcess extends PlanetPostProcess {
     settings: RingsSettings;
 
-    constructor(name: string, body: AbstractBody, scene: UberScene) {
+    constructor(name: string, body: AbstractBody, scene: UberScene, starSystem: StarSystem) {
         const settings: RingsSettings = {
             ringStart: 1.5,
             ringEnd: 2.5,
@@ -67,7 +68,7 @@ export class RingsPostProcess extends PlanetPostProcess {
 
         const samplers: ShaderSamplers = [];
 
-        super(name, shaderName, uniforms, samplers, body, scene);
+        super(name, shaderName, uniforms, samplers, body, scene, starSystem);
 
         this.settings = settings;
 

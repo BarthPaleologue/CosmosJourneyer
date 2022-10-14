@@ -21,6 +21,7 @@ import { clamp } from "../../utils/gradientMath";
 import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
+import { OverlayPostProcess } from "../../postProcesses/overlayPostProcess";
 
 enum Steps {
     RADIUS = 1000,
@@ -98,6 +99,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         };
 
         this.postProcesses = {
+            overlay: new OverlayPostProcess(this.name, this, starSystem.scene, starSystem),
             atmosphere: null,
             ocean: null,
             clouds: null,
@@ -110,15 +112,15 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         if (pressure > epsilon) {
             if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
                 this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
-                this.postProcesses.ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystem.scene);
+                this.postProcesses.ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystem.scene, this.starSystem);
 
-                const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystem.scene);
+                const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystem.scene, this.starSystem);
                 clouds.settings.cloudCoverage = 0.8 * Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
                 this.postProcesses.clouds = clouds;
             } else {
                 this.oceanLevel = 0;
             }
-            const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene);
+            const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene, this.starSystem);
             atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
             atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE) / 6;
             atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE + 10) / 6;

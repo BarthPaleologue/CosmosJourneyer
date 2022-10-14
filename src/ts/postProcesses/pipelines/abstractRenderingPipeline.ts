@@ -13,6 +13,7 @@ import { BodyType } from "../../bodies/interfaces";
 import { Star } from "../../bodies/stars/star";
 import { BlackHole } from "../../bodies/blackHole";
 import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
+import { OverlayPostProcess } from "../overlayPostProcess";
 
 export enum PostProcessType {
     VOLUMETRIC_LIGHT,
@@ -36,6 +37,7 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
     readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
     readonly rings: RingsPostProcess[] = [];
     readonly blackHoles: BlackHolePostProcess[] = [];
+    readonly overlays: OverlayPostProcess[] = [];
 
     readonly starFieldRenderEffect: PostProcessRenderEffect;
     readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
@@ -59,7 +61,7 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
         });
 
         this.overlayRenderEffect = new PostProcessRenderEffect(this.engine, "overlayRenderEffect", () => {
-            return [this.scene.overlay];
+            return this.overlays;
         });
 
         this.fxaaRenderEffect = new PostProcessRenderEffect(this.engine, "fxaaRenderEffect", () => {

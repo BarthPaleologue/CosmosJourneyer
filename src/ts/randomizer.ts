@@ -19,6 +19,7 @@ import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { HelmetOverlay } from "./ui/helmetOverlay";
 import { PlayerController } from "./controllers/playerController";
+import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
 
 const helmetOverlay = new HelmetOverlay();
 const bodyEditor = new BodyEditor();
@@ -43,15 +44,14 @@ Assets.Init(scene).then(() => {
 
     const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
     const starSystem = new StarSystem(starSystemSeed, scene);
-    scene.setStarSystem(starSystem);
 
-    new StarfieldPostProcess("starfield", player, scene);
+    new StarfieldPostProcess("starfield", player, scene, starSystem);
 
     starSystem.makeStars(1);
     starSystem.makePlanets(1);
 
     document.addEventListener("keydown", (e) => {
-        if (e.key == "o") scene.isOverlayEnabled = !scene.isOverlayEnabled;
+        if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
         if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getActiveController().getActiveCamera(), { precision: 4 });
         if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
@@ -80,7 +80,8 @@ Assets.Init(scene).then(() => {
             //FIXME: should address stars orbits
             for (const star of starSystem.stars) star.orbitalProperties.period = 0;
 
-            scene.update(Settings.TIME_MULTIPLIER * deltaTime);
+            scene.update();
+            starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
 
             starSystem.translateAllBodies(player.update(deltaTime));
 

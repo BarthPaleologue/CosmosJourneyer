@@ -3,9 +3,10 @@ import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
 import { IPostProcess } from "./iPostProcess";
 import { UberPostProcess } from "./uberPostProcess";
 import { UberScene } from "../core/uberScene";
+import { StarSystem } from "../bodies/starSystem";
 
 export abstract class SpacePostProcess extends UberPostProcess implements IPostProcess {
-    protected constructor(name: string, fragmentName: string, otherUniforms: ShaderUniforms, otherSamplers: ShaderSamplers, scene: UberScene) {
+    protected constructor(name: string, fragmentName: string, otherUniforms: ShaderUniforms, otherSamplers: ShaderSamplers, scene: UberScene, starSystem: StarSystem) {
         const uniforms: ShaderUniforms = [
             {
                 name: "cameraPosition",
@@ -60,21 +61,21 @@ export abstract class SpacePostProcess extends UberPostProcess implements IPostP
                 name: "starPositions",
                 type: ShaderDataType.Vector3Array,
                 get: () => {
-                    return scene.getStarSystem().stars.map((star) => star.getAbsolutePosition());
+                    return starSystem.stars.map((star) => star.getAbsolutePosition());
                 }
             },
             {
                 name: "nbStars",
                 type: ShaderDataType.Int,
                 get: () => {
-                    return scene.getStarSystem().stars.length;
+                    return starSystem.stars.length;
                 }
             },
             {
                 name: "planetPositions",
                 type: ShaderDataType.Vector4Array,
                 get: () => {
-                    return scene.getStarSystem().planets.map((planet) => {
+                    return starSystem.planets.map((planet) => {
                         const position = planet.getAbsolutePosition();
                         return new Vector4(position.x, position.y, position.z, planet.radius);
                     });
@@ -84,7 +85,7 @@ export abstract class SpacePostProcess extends UberPostProcess implements IPostP
                 name: "nbPlanets",
                 type: ShaderDataType.Int,
                 get: () => {
-                    return scene.getStarSystem().planets.length;
+                    return starSystem.planets.length;
                 }
             }
         ];

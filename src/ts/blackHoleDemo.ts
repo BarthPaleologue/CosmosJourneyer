@@ -16,9 +16,9 @@ import { BodyType } from "./bodies/interfaces";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { HelmetOverlay } from "./ui/helmetOverlay";
-import { ShipController } from "./controllers/shipController";
 import { PlayerController } from "./controllers/playerController";
 import { BlackHole } from "./bodies/blackHole";
+import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
 
 const helmetOverlay = new HelmetOverlay();
 
@@ -40,9 +40,8 @@ Assets.Init(scene).then(() => {
 
     const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
     const starSystem = new StarSystem(starSystemSeed, scene);
-    scene.setStarSystem(starSystem);
 
-    new StarfieldPostProcess("starfield", playerController, scene);
+    new StarfieldPostProcess("starfield", playerController, scene, starSystem);
 
     const BH = new BlackHole("gwo twou sanfon", 1000e3, starSystem, 0, starSystem.stars);
     BH.orbitalProperties.periapsis = BH.getRadius() * 4;
@@ -51,11 +50,12 @@ Assets.Init(scene).then(() => {
     starSystem.makeTelluricPlanet();
     starSystem.planets[0].orbitalProperties.periapsis = 5000e3;
     starSystem.planets[0].orbitalProperties.apoapsis = 5000e3;
+    console.log(starSystem.planets[0].getRadius());
 
     starSystem.makePlanets(1);
 
     document.addEventListener("keydown", (e) => {
-        if (e.key == "o") scene.isOverlayEnabled = !scene.isOverlayEnabled;
+        if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
         if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getActiveController().getActiveCamera(), { precision: 4 });
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
         if (e.key == "w" && playerController.nearestBody != null)
@@ -82,8 +82,8 @@ Assets.Init(scene).then(() => {
             //FIXME: should address stars orbits
             for (const star of starSystem.stars) star.orbitalProperties.period = 0;
 
-            scene.update(Settings.TIME_MULTIPLIER * deltaTime);
-
+            scene.update();
+            starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
             starSystem.translateAllBodies(playerController.update(deltaTime));
 
             if (!collisionWorker.isBusy() && playerController.isOrbiting()) {

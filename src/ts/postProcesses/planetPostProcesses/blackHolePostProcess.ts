@@ -6,6 +6,7 @@ import { PlanetPostProcess } from "../planetPostProcess";
 import blackHoleFragment from "../../../shaders/blackhole.glsl";
 import { UberScene } from "../../core/uberScene";
 import { AbstractBody } from "../../bodies/abstractBody";
+import { StarSystem } from "../../bodies/starSystem";
 
 const shaderName = "blackhole";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
@@ -18,7 +19,7 @@ export interface BlackHoleSettings {
 export class BlackHolePostProcess extends PlanetPostProcess {
     settings: BlackHoleSettings;
 
-    constructor(name: string, planet: AbstractBody, scene: UberScene) {
+    constructor(name: string, planet: AbstractBody, scene: UberScene, starSystem: StarSystem) {
         const settings: BlackHoleSettings = {
             accretionDiskRadius: 8000e3,
             rotationPeriod: 1.5
@@ -29,7 +30,7 @@ export class BlackHolePostProcess extends PlanetPostProcess {
                 name: "time",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return this.internalTime % 100000;
+                    return this.internalTime % (settings.rotationPeriod*10000);
                 }
             },
             {
@@ -50,7 +51,7 @@ export class BlackHolePostProcess extends PlanetPostProcess {
 
         const samplers: ShaderSamplers = [];
 
-        super(name, shaderName, uniforms, samplers, planet, scene);
+        super(name, shaderName, uniforms, samplers, planet, scene, starSystem);
 
         this.settings = settings;
 

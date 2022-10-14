@@ -8,6 +8,7 @@ import { gcd } from "../../utils/gradientMath";
 import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
 import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
+import { StarSystem } from "../../bodies/starSystem";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -28,7 +29,7 @@ export interface CloudSettings {
 export class FlatCloudsPostProcess extends PlanetPostProcess {
     settings: CloudSettings;
 
-    constructor(name: string, planet: Planet, cloudLayerHeight: number, scene: UberScene) {
+    constructor(name: string, planet: Planet, cloudLayerHeight: number, scene: UberScene, starSystem: StarSystem) {
         const settings: CloudSettings = {
             cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
             specularPower: 2,
@@ -139,7 +140,7 @@ export class FlatCloudsPostProcess extends PlanetPostProcess {
             }
         ];
 
-        super(name, shaderName, uniforms, samplers, planet, scene);
+        super(name, shaderName, uniforms, samplers, planet, scene, starSystem);
 
         this.settings = settings;
 

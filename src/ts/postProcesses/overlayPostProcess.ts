@@ -1,14 +1,18 @@
-import { SpacePostProcess } from "./spacePostProcess";
 import { Effect } from "@babylonjs/core";
 import overlayFragment from "../../shaders/overlayFragment.glsl";
 import { UberScene } from "../core/uberScene";
 import { ShaderDataType, ShaderUniforms } from "./interfaces";
+import { StarSystem } from "../bodies/starSystem";
+import { PlanetPostProcess } from "./planetPostProcess";
+import { AbstractBody } from "../bodies/abstractBody";
 
 const shaderName = "overlay";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = overlayFragment;
 
-export class OverlayPostProcess extends SpacePostProcess {
-    constructor(name: string, scene: UberScene) {
+export class OverlayPostProcess extends PlanetPostProcess {
+    //FIXME: should not require starSystem
+    static ARE_ENABLED = true;
+    constructor(name: string, body: AbstractBody, scene: UberScene, starSystem: StarSystem) {
         const uniforms: ShaderUniforms = [
             {
                 name: "aspectRatio",
@@ -28,10 +32,14 @@ export class OverlayPostProcess extends SpacePostProcess {
                 name: "isEnabled",
                 type: ShaderDataType.Bool,
                 get: () => {
-                    return scene.isOverlayEnabled;
+                    return OverlayPostProcess.ARE_ENABLED;
                 }
             }
         ];
-        super(name, shaderName, uniforms, [], scene);
+        super(name, shaderName, uniforms, [], body, scene, starSystem);
+
+        for (const pipeline of scene.pipelines) {
+            pipeline.overlays.push(this);
+        }
     }
 }

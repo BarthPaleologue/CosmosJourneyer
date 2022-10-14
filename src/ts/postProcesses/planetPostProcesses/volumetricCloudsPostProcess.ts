@@ -5,6 +5,7 @@ import { PlanetPostProcess } from "../planetPostProcess";
 import volumetricCloudsFragment from "../../../shaders/volumetricCloudsFragment.glsl";
 import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
+import { StarSystem } from "../../bodies/starSystem";
 
 const shaderName = "volumetricClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
@@ -16,7 +17,7 @@ export interface VolumetricCloudSettings {
 export class VolumetricCloudsPostProcess extends PlanetPostProcess {
     settings: VolumetricCloudSettings;
 
-    constructor(name: string, planet: Planet, atmosphereRadius: number, scene: UberScene) {
+    constructor(name: string, planet: Planet, atmosphereRadius: number, scene: UberScene, starSystem: StarSystem) {
         const settings: VolumetricCloudSettings = {
             atmosphereRadius: atmosphereRadius
         };
@@ -33,7 +34,7 @@ export class VolumetricCloudsPostProcess extends PlanetPostProcess {
 
         const samplers: ShaderSamplers = [];
 
-        super(name, shaderName, uniforms, samplers, planet, scene);
+        super(name, shaderName, uniforms, samplers, planet, scene, starSystem);
 
         this.settings = settings;
 

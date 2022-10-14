@@ -5,7 +5,6 @@ import {
     ScenePerformancePriority,
     Texture
 } from "@babylonjs/core";
-import { StarSystem } from "../bodies/starSystem";
 import { SpaceRenderingPipeline } from "../postProcesses/pipelines/spaceRenderingPipeline";
 import { SurfaceRenderingPipeline } from "../postProcesses/pipelines/surfaceRenderingPipeline";
 import { AbstractRenderingPipeline } from "../postProcesses/pipelines/abstractRenderingPipeline";
@@ -13,12 +12,9 @@ import { ChunkForge } from "../chunks/chunkForge";
 import { Settings } from "../settings";
 import { AbstractController } from "../controllers/abstractController";
 import { ColorCorrection } from "../postProcesses/colorCorrection";
-import { OverlayPostProcess } from "../postProcesses/overlayPostProcess";
 import { UberFreeCamera } from "./uberFreeCamera";
 
 export class UberScene extends Scene {
-    starSystem: StarSystem | null = null;
-
     activeController: AbstractController | null = null;
 
     readonly spaceRenderingPipeline: SpaceRenderingPipeline;
@@ -26,10 +22,8 @@ export class UberScene extends Scene {
     readonly pipelines: AbstractRenderingPipeline[];
 
     readonly colorCorrection: ColorCorrection;
-    readonly overlay: OverlayPostProcess;
     readonly fxaa: FxaaPostProcess;
 
-    isOverlayEnabled = true;
 
     readonly _chunkForge: ChunkForge;
 
@@ -42,19 +36,10 @@ export class UberScene extends Scene {
         this.pipelines = [this.spaceRenderingPipeline, this.surfaceRenderingPipeline];
 
         this.colorCorrection = new ColorCorrection("colorCorrection", this);
-        this.overlay = new OverlayPostProcess("overlay", this);
+        //this.overlay = new OverlayPostProcess("overlay", this, this.starSystem);
         this.fxaa = new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, engine);
 
         this._chunkForge = new ChunkForge(nbVertices);
-    }
-
-    public setStarSystem(starSystem: StarSystem) {
-        this.starSystem = starSystem;
-    }
-
-    public getStarSystem(): StarSystem {
-        if (this.starSystem === null) throw new Error("Star system not set");
-        return this.starSystem;
     }
 
     public setActiveController(controller: AbstractController) {
@@ -72,9 +57,8 @@ export class UberScene extends Scene {
         return this.getActiveController().getActiveCamera();
     }
 
-    public update(deltaTime: number) {
+    public update() {
         this._chunkForge.update();
-        if (this.starSystem && this.activeController) this.starSystem.update(deltaTime);
 
         const activeCamera = this.getActiveUberCamera();
         const nearestBody = this.getActiveController().getNearestBody();

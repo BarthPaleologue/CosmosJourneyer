@@ -7,6 +7,7 @@ import oceanFragment from "../../../shaders/oceanFragment.glsl";
 import { Assets } from "../../assets";
 import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
+import { StarSystem } from "../../bodies/starSystem";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -23,7 +24,7 @@ export interface OceanSettings {
 export class OceanPostProcess extends PlanetPostProcess {
     settings: OceanSettings;
 
-    constructor(name: string, planet: Planet, scene: UberScene) {
+    constructor(name: string, planet: Planet, scene: UberScene, starSystem: StarSystem) {
         const settings: OceanSettings = {
             oceanRadius: planet.getApparentRadius(),
             depthModifier: 0.001,
@@ -111,7 +112,7 @@ export class OceanPostProcess extends PlanetPostProcess {
             }
         ];
 
-        super(name, shaderName, uniforms, samplers, planet, scene);
+        super(name, shaderName, uniforms, samplers, planet, scene, starSystem);
 
         this.settings = settings;
 

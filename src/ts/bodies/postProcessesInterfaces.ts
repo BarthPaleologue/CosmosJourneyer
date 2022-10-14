@@ -5,10 +5,12 @@ import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPost
 import { VolumetricLight } from "../postProcesses/volumetricLight";
 import { IPostProcess } from "../postProcesses/iPostProcess";
 import { BlackHolePostProcess } from "../postProcesses/planetPostProcesses/blackHolePostProcess";
+import { OverlayPostProcess } from "../postProcesses/overlayPostProcess";
 
 export type BodyPostProcesses = {
     [details: string]: IPostProcess | null;
     rings: RingsPostProcess | null;
+    overlay: OverlayPostProcess | null;
 };
 
 export type PlanetPostProcesses = BodyPostProcesses & {

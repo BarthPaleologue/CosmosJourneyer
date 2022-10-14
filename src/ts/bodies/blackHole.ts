@@ -5,6 +5,7 @@ import { BlackHolePostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { PhysicalProperties } from "./physicalProperties";
 import { BlackHolePostProcess } from "../postProcesses/planetPostProcesses/blackHolePostProcess";
+import { OverlayPostProcess } from "../postProcesses/overlayPostProcess";
 
 export class BlackHole extends AbstractBody {
     readonly bodyType: BodyType = BodyType.BLACK_HOLE;
@@ -23,7 +24,8 @@ export class BlackHole extends AbstractBody {
         };
         this.postProcesses = {
             rings: null,
-            blackHole: new BlackHolePostProcess("BH", this, starSystem.scene)
+            overlay: new OverlayPostProcess("BH", this, starSystem.scene, starSystem),
+            blackHole: new BlackHolePostProcess("BH", this, starSystem.scene, starSystem)
         };
     }
 }

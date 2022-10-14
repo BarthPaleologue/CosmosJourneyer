@@ -12,6 +12,7 @@ import { clamp } from "../../utils/gradientMath";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { Settings } from "../../settings";
 import { VolumetricLight } from "../../postProcesses/volumetricLight";
+import { OverlayPostProcess } from "../../postProcesses/overlayPostProcess";
 
 enum Steps {
     RADIUS = 1000,
@@ -74,6 +75,7 @@ export class Star extends AbstractBody {
         this.node.rotationQuaternion = Quaternion.Identity();
 
         this.postProcesses = {
+            overlay: new OverlayPostProcess(name, this, starSystemManager.scene, starSystemManager),
             volumetricLight: new VolumetricLight(this, this.mesh, this.starSystem.scene),
             rings: null
         };

@@ -23,6 +23,7 @@ import { GasPlanet } from "./bodies/planets/gasPlanet";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { HelmetOverlay } from "./ui/helmetOverlay";
 import { PlayerController } from "./controllers/playerController";
+import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
 
 const helmetOverlay = new HelmetOverlay();
 const bodyEditor = new BodyEditor();
@@ -50,9 +51,7 @@ Assets.Init(scene).then(() => {
     const starSystemSeed = 0;
     const starSystem = new StarSystem(starSystemSeed, scene);
 
-    scene.setStarSystem(starSystem);
-
-    new StarfieldPostProcess("starfield", player, scene);
+    new StarfieldPostProcess("starfield", player, scene, starSystem);
 
     const sun = new Star("Weierstrass", starSystem, 0.51, []);
     sun.orbitalProperties.period = 60 * 60 * 24;
@@ -176,11 +175,12 @@ Assets.Init(scene).then(() => {
         //FIXME: should address stars orbits
         for (const star of starSystem.stars) star.orbitalProperties.period = 0;
 
-        scene.update(deltaTime * Settings.TIME_MULTIPLIER);
+        scene.update();
+        starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
     }
 
     document.addEventListener("keydown", (e) => {
-        if (e.key == "o") scene.isOverlayEnabled = !scene.isOverlayEnabled;
+        if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
         if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getActiveController().getActiveCamera(), { precision: 4 });
         if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);

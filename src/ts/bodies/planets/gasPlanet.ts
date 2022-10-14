@@ -11,6 +11,7 @@ import { Settings } from "../../settings";
 import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
+import { OverlayPostProcess } from "../../postProcesses/overlayPostProcess";
 
 enum Steps {
     RADIUS = 1000,
@@ -65,12 +66,13 @@ export class GasPlanet extends AbstractBody {
         this.mesh.material = this.material;
 
         this.postProcesses = {
+            overlay: new OverlayPostProcess(name, this, starSystem.scene, starSystem),
             atmosphere: null,
             rings: null
         };
 
         // FIXME: implement multiple stars
-        const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene);
+        const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene, this.starSystem);
         atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
         atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE) / 6;
         atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE + 10) / 6;

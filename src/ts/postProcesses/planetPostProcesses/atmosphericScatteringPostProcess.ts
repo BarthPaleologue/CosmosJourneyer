@@ -6,6 +6,7 @@ import { PlanetPostProcess } from "../planetPostProcess";
 import atmosphericScatteringFragment from "../../../shaders/atmosphericScatteringFragment.glsl";
 import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
+import { StarSystem } from "../../bodies/starSystem";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -26,7 +27,7 @@ export interface AtmosphereSettings {
 export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
     settings: AtmosphereSettings;
 
-    constructor(name: string, planet: Planet, atmosphereHeight: number, scene: UberScene) {
+    constructor(name: string, planet: Planet, atmosphereHeight: number, scene: UberScene, starSystem: StarSystem) {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 23,
@@ -115,7 +116,7 @@ export class AtmosphericScatteringPostProcess extends PlanetPostProcess {
 
         const samplers: ShaderSamplers = [];
 
-        super(name, shaderName, uniforms, samplers, planet, scene);
+        super(name, shaderName, uniforms, samplers, planet, scene, starSystem);
 
         this.settings = settings;
 
