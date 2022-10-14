@@ -50,6 +50,11 @@ void main() {
     float planetDistance = length(planetPosition - cameraPosition);
     vec3 planetDirection = (planetPosition - cameraPosition) / planetDistance;
 
+    if(dot(planetDirection, normalize(closestPoint)) < 0.0) {
+        gl_FragColor = vec4(screenColor, 1.0);
+        return;
+    }
+
     vec2 uv = uvFromWorld(planetPosition);
 
     vec2 vUVSquare = vec2(vUV.x * aspectRatio, vUV.y);
