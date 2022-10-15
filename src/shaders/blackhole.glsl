@@ -17,6 +17,8 @@ uniform sampler2D depthSampler;
 uniform vec3 planetPosition;
 uniform vec3 cameraPosition;
 
+uniform mat4 view;
+uniform mat4 projection;
 uniform mat4 inverseView;
 uniform mat4 inverseProjection;
 
@@ -26,6 +28,8 @@ uniform float cameraFar;
 #pragma glslify: remap = require(./utils/remap.glsl)
 
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
+
+#pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=projection, view=view)
 
 float hash(float x) { return fract(sin(x) * 152754.742); }
 float hash(vec2 x) { return hash(x.x + hash(x.y)); }
@@ -43,17 +47,6 @@ float valueNoise(vec2 p, float f) {
     return mix(b, t, fr.y);
 }
 
-vec4 background(vec3 ray) {
-    vec2 uv = ray.xy;
-
-    if (abs(ray.x) > 0.5)
-    uv.x = ray.z;
-    else if (abs(ray.y) > 0.5)
-    uv.y = ray.z;
-
-    return texture2D(textureSampler, uv * 1.5);
-}
-
 vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
     const bool hasAccretionDisk = true;
     if (!hasAccretionDisk) return vec4(0.0);//no disk
@@ -63,9 +56,9 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
     float relativeDistance = distance / planetRadius;
     float relativeDiskSize = accretionDiskRadius / planetRadius;
 
-    float dist = 0.02 * distance / abs(ray.y);
+    float dist = 0.02 * distance / abs(ray.y); //FIXME: this is not correct, but it works
 
-    position += dist * ray; //FIXME: this is not correct, but it works
+    position += dist * ray;
 
     // elementary rotation around the hole //FIXME: will break when the black hole has a rotation
     vec2 deltaPos;
@@ -77,7 +70,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
 
     float redShift = (1.0 + parallel) / 2.0;
 
-    float diskMix = smoothstep(3.5 / 6.0, 5.0 / 6.0, relativeDistance / relativeDiskSize);
+    float diskMix = smoothstep(3.5 / 6.0, 5.5 / 6.0, relativeDistance / relativeDiskSize);
     vec3 innerDiskColor = vec3(1.0, 0.8, 0.0);
     vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
     vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix);
@@ -97,7 +90,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
 
         float distMult = 1.0;
         distMult *= clamp(relativeDistance - 1.2, 0.0, 1.0);
-        distMult *= clamp((relativeDiskRadius - relativeDistance), 0.0, 1.0);
+        distMult *= clamp(relativeDiskRadius - relativeDistance, 0.0, 1.0);
 
         // rotation of the disk
         vec2 xz;
@@ -111,11 +104,10 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
         float noise = valueNoise(vec2(2.0 * angle, 5.0 * u), f);
         noise = noise * 0.66 + 0.33 * valueNoise(vec2(2.0 * angle, 5.0 * u), f * 2.0);
 
-        float alpha = 0.2 * noise * intensity * relativeDistance * distMult;
+        float alpha = distMult * noise * intensity; // The pow is only for aesthetics
 
         // blending with current color in the disk
-        vec3 col = mix(vec3(0.3, 0.2, 0.15) * insideCol, insideCol, intensity);
-        diskColor = vec4(col * alpha + diskColor.rgb * (1.0-alpha), diskColor.a * (1.0 - alpha) + alpha);
+        diskColor = mix(diskColor, vec4(insideCol * intensity, 1.0), alpha);
     }
 
     return diskColor;
@@ -165,7 +157,7 @@ void main()
             pos += stepDist * rayDir;
         }
 
-        float dist2 = length(pos);
+        float dist2 = length(cameraPosition - pos);
 
         if (dist2 < planetRadius)//ray sucked in to BH
         {
@@ -173,13 +165,17 @@ void main()
             return;
         } else if (dist2 > planetRadius * 1000.)//ray escaped BH
         {
-            vec4 bg = background(-rayDir);
-            bg = vec4(screenColor, 1.0);
+            if (maximumDistance < length(cameraPosition - pos)) {
+                glFragColor = vec4(screenColor, 1.0);
+                return;
+            }
+            vec2 uv = uvFromWorld(pos);
+            vec4 bg = texture2D(textureSampler, uv);
             glFragColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
             return;
         } else if (abs(pos.y) <= accretionDiskHeight)//ray hit accretion disk //FIXME: Break when rotate
         {
-            if (maximumDistance < length(pos)) {
+            if (maximumDistance < length(cameraPosition - pos)) {
                 glFragColor = vec4(screenColor, 1.0);
                 return;
             }
