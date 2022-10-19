@@ -24,6 +24,10 @@ export enum PostProcessType {
     BLACK_HOLE
 }
 
+export enum DistanceType {
+    SURFACE, SPACE
+}
+
 export abstract class AbstractRenderingPipeline extends PostProcessRenderPipeline {
     readonly scene: UberScene;
     readonly engine: Engine;
@@ -69,54 +73,53 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
         });
     }
 
-    public setBody(body: AbstractBody) {
-        if(this.currentBody == body) return;
-        this.currentBody = body;
-        this._renderEffects = {};
-        this._renderEffectsForIsolatedPass = [];
-        const cameras = new Array(...this.cameras);
-        this.detachCameras();
+    private getCurrentBody(): AbstractBody {
+        if (this.currentBody == null) throw new Error("No body set");
+        return this.currentBody;
+    }
 
+    private init() {
+        const bodyType = this.getCurrentBody().bodyType;
         let otherVolumetricLights = this.volumetricLights;
         let bodyVolumetricLight: VolumetricLight | null = null;
-        if (body.bodyType == BodyType.STAR) {
-            otherVolumetricLights = this.volumetricLights.filter((volumetricLight) => volumetricLight !== (body as Star).postProcesses.volumetricLight);
-            bodyVolumetricLight = (body as Star).postProcesses.volumetricLight;
+        if (bodyType == BodyType.STAR) {
+            otherVolumetricLights = this.volumetricLights.filter((volumetricLight) => volumetricLight !== (this.getCurrentBody() as Star).postProcesses.volumetricLight);
+            bodyVolumetricLight = (this.getCurrentBody() as Star).postProcesses.volumetricLight;
         }
 
         let otherBlackHoles = this.blackHoles;
         let bodyBlackHole: BlackHolePostProcess | null = null;
-        if (body.bodyType == BodyType.BLACK_HOLE) {
-            otherBlackHoles = this.blackHoles.filter((blackHole) => blackHole !== (body as BlackHole).postProcesses.blackHole);
-            bodyBlackHole = (body as BlackHole).postProcesses.blackHole;
+        if (bodyType == BodyType.BLACK_HOLE) {
+            otherBlackHoles = this.blackHoles.filter((blackHole) => blackHole !== (this.getCurrentBody() as BlackHole).postProcesses.blackHole);
+            bodyBlackHole = (this.getCurrentBody() as BlackHole).postProcesses.blackHole;
         }
 
         let otherOceans = this.oceans;
         let bodyOcean: OceanPostProcess | null = null;
-        if (body.bodyType == BodyType.TELLURIC && (body as TelluricPlanet).postProcesses.ocean) {
-            otherOceans = this.oceans.filter((ocean) => ocean !== (body as TelluricPlanet).postProcesses.ocean);
-            bodyOcean = (body as TelluricPlanet).postProcesses.ocean as OceanPostProcess;
+        if (bodyType == BodyType.TELLURIC && (this.getCurrentBody() as TelluricPlanet).postProcesses.ocean) {
+            otherOceans = this.oceans.filter((ocean) => ocean !== (this.getCurrentBody() as TelluricPlanet).postProcesses.ocean);
+            bodyOcean = (this.getCurrentBody() as TelluricPlanet).postProcesses.ocean as OceanPostProcess;
         }
 
         let otherClouds = this.clouds;
         let bodyClouds: FlatCloudsPostProcess | VolumetricCloudsPostProcess | null = null;
-        if (body.bodyType == BodyType.TELLURIC && (body as TelluricPlanet).postProcesses.clouds) {
-            otherClouds = this.clouds.filter((cloud) => cloud !== (body as TelluricPlanet).postProcesses.clouds);
-            bodyClouds = (body as TelluricPlanet).postProcesses.clouds as (FlatCloudsPostProcess | VolumetricCloudsPostProcess);
+        if (bodyType == BodyType.TELLURIC && (this.getCurrentBody() as TelluricPlanet).postProcesses.clouds) {
+            otherClouds = this.clouds.filter((cloud) => cloud !== (this.getCurrentBody() as TelluricPlanet).postProcesses.clouds);
+            bodyClouds = (this.getCurrentBody() as TelluricPlanet).postProcesses.clouds as (FlatCloudsPostProcess | VolumetricCloudsPostProcess);
         }
 
         let otherAtmospheres = this.atmospheres;
         let bodyAtmosphere: AtmosphericScatteringPostProcess | null = null;
-        if ((body.bodyType == BodyType.TELLURIC || body.bodyType == BodyType.GAZ) && (body as TelluricPlanet).postProcesses.atmosphere) {
-            otherAtmospheres = this.atmospheres.filter((atmosphere) => atmosphere !== (body as TelluricPlanet).postProcesses.atmosphere);
-            bodyAtmosphere = (body as TelluricPlanet).postProcesses.atmosphere as AtmosphericScatteringPostProcess;
+        if ((bodyType == BodyType.TELLURIC || bodyType == BodyType.GAZ) && (this.getCurrentBody() as TelluricPlanet).postProcesses.atmosphere) {
+            otherAtmospheres = this.atmospheres.filter((atmosphere) => atmosphere !== (this.getCurrentBody() as TelluricPlanet).postProcesses.atmosphere);
+            bodyAtmosphere = (this.getCurrentBody() as TelluricPlanet).postProcesses.atmosphere as AtmosphericScatteringPostProcess;
         }
 
         let otherRings = this.rings;
         let bodyRings: RingsPostProcess | null = null;
-        if (body.postProcesses.rings) {
-            otherRings = this.rings.filter((ring) => ring != body.postProcesses.rings);
-            bodyRings = body.postProcesses.rings;
+        if (this.getCurrentBody().postProcesses.rings) {
+            otherRings = this.rings.filter((ring) => ring != this.getCurrentBody().postProcesses.rings);
+            bodyRings = this.getCurrentBody().postProcesses.rings;
         }
 
         const otherVolumetricLightsRenderEffect = new PostProcessRenderEffect(this.engine, "otherVolumetricLightsRenderEffect", () => {
@@ -219,8 +222,19 @@ export abstract class AbstractRenderingPipeline extends PostProcessRenderPipelin
 
         this.addEffect(this.fxaaRenderEffect);
 
-        this._attachCameras(cameras, false);
+    }
 
+    public setBody(body: AbstractBody) {
+        if (this.currentBody == body) return;
+        this.currentBody = body;
+        this._reset();
+
+        const cameras = new Array(...this.cameras);
+        this.detachCameras();
+
+        this.init();
+
+        this._attachCameras(cameras, false);
     }
 
     attachToCamera(camera: Camera) {
