@@ -19,7 +19,7 @@ export abstract class UberPostProcess extends PostProcess implements IPostProces
         this.uniforms.push(...uniforms);
         this.samplers.push(...samplers);
 
-        this.onApply = (effect: Effect) => {
+        this.onApplyObservable.add((effect: Effect) => {
             for (const uniform of this.uniforms) {
                 switch (uniform.type) {
                     case ShaderDataType.Float:
@@ -69,7 +69,7 @@ export abstract class UberPostProcess extends PostProcess implements IPostProces
                         throw new Error(`Unknown enum shader data type in uniform samplers: ${sampler.type}`);
                 }
             }
-        };
+        });
     }
 
     update(deltaTime: number) {
