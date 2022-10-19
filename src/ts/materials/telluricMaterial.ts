@@ -25,6 +25,7 @@ export class TelluricMaterial extends ShaderMaterial {
                 "worldViewProjection",
                 "projection",
                 "view",
+                "normalMatrix",
 
                 "textureSampler",
                 "depthSampler",
@@ -146,13 +147,13 @@ export class TelluricMaterial extends ShaderMaterial {
         this.setFloat("waterAmount", this.planet.physicalProperties.waterAmount);
 
         this.setFloat("maxElevation", this.planet.terrainSettings.continentBaseHeight + this.planet.terrainSettings.maxMountainHeight + this.planet.terrainSettings.maxBumpHeight);
-    }
+}
 
-    public update(controller: AbstractController) {
+    public update() {
         this.setMatrix("normalMatrix", this.planet.node.getWorldMatrix().clone().invert().transpose());
 
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
-        this.setVector3("playerPosition", controller.transform.getAbsolutePosition());
+        this.setVector3("playerPosition", this.planet.starSystem.scene.getActiveController().transform.getAbsolutePosition());
 
         this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
         this.setInt("nbStars", this.planet.starSystem.stars.length);

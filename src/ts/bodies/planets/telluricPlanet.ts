@@ -197,7 +197,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
     public override updateGraphics(controller: AbstractController, deltaTime: number) {
         super.updateGraphics(controller, deltaTime);
-        this.material.update(controller);
+        this.material.update();
     }
 
     public override getApparentRadius(): number {
