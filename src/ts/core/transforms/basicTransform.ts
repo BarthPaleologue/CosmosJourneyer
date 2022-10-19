@@ -21,8 +21,12 @@ export class BasicTransform implements ITransformable {
         return this.node.getAbsolutePosition();
     }
 
+    public getPosition(): Vector3 {
+        return this.node.position;
+    }
+
     public translate(displacement: Vector3): void {
-        this.setAbsolutePosition(this.getAbsolutePosition().add(displacement));
+        this.node.setAbsolutePosition(this.node.getAbsolutePosition().add(displacement));
     }
 
     public rotateAround(pivot: Vector3, axis: Vector3, amount: number): void {

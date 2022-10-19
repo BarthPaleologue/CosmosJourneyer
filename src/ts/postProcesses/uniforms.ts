@@ -130,7 +130,7 @@ export function getSamplers(scene: UberScene): ShaderSamplers {
             name: "depthSampler",
             type: ShaderDataType.Texture,
             get: () => {
-                return scene.getActiveUberCamera().depthRenderer.getDepthMap();
+                return scene.getDepthRenderer().getDepthMap();
             }
         }
     ];

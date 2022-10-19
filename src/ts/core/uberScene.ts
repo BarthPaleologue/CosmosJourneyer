@@ -1,4 +1,5 @@
 import {
+    DepthRenderer,
     Engine,
     FxaaPostProcess,
     Scene,
@@ -24,6 +25,7 @@ export class UberScene extends Scene {
     readonly colorCorrection: ColorCorrection;
     readonly fxaa: FxaaPostProcess;
 
+    private depthRenderer: DepthRenderer | null = null;
 
     readonly _chunkForge: ChunkForge;
 
@@ -42,9 +44,18 @@ export class UberScene extends Scene {
         this._chunkForge = new ChunkForge(nbVertices);
     }
 
+    public getDepthRenderer(): DepthRenderer {
+        if(this.depthRenderer === null) throw new Error("Depth Renderer not initialized");
+        return this.depthRenderer;
+    }
+
     public setActiveController(controller: AbstractController) {
         this.activeController = controller;
         this.activeCamera = controller.getActiveCamera();
+        if(this.depthRenderer === null) {
+            this.depthRenderer = this.enableDepthRenderer(null, false, true);
+            this.customRenderTargets.push(this.depthRenderer.getDepthMap());
+        }
     }
 
     public getActiveController(): AbstractController {

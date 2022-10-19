@@ -39,7 +39,7 @@ const [engine, scene] = await initEngineScene(canvas);
 Assets.Init(scene).then(() => {
     const mouse = new Mouse(canvas, 1e5);
 
-    const player = new PlayerController(scene);
+    const player = new PlayerController();
     player.speed = 0.2 * Settings.EARTH_RADIUS;
     player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
     player.inputs.push(new Keyboard(), mouse, new Gamepad());

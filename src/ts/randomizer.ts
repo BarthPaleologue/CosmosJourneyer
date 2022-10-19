@@ -3,7 +3,6 @@ import { Tools } from "@babylonjs/core";
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 
 import "../styles/index.scss";
-import { AbstractController } from "./controllers/abstractController";
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
 import { Gamepad } from "./inputs/gamepad";
@@ -35,7 +34,7 @@ const [engine, scene] = await initEngineScene(canvas);
 Assets.Init(scene).then(() => {
     const mouse = new Mouse(canvas, 1e5);
 
-    const player = new PlayerController(scene);
+    const player = new PlayerController();
     player.speed = 0.2 * Settings.EARTH_RADIUS;
     player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
     player.inputs.push(new Keyboard(), mouse, new Gamepad());

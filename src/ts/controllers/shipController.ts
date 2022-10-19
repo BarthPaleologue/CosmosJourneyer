@@ -1,10 +1,10 @@
 import { NewtonianTransform } from "../core/transforms/newtonianTransform";
-import { Input } from "../inputs/input";
+import { Input, InputType } from "../inputs/input";
 import { Vector3 } from "@babylonjs/core";
 import { UberFreeCamera } from "../core/uberFreeCamera";
-import { UberScene } from "../core/uberScene";
 import { AbstractController } from "./abstractController";
 import { Assets } from "../assets";
+import { Keyboard } from "../inputs/keyboard";
 
 export class ShipController extends AbstractController {
     readonly transform: NewtonianTransform;
@@ -20,17 +20,18 @@ export class ShipController extends AbstractController {
     readonly thirdPersonCamera: UberFreeCamera;
     readonly firstPersonCamera: UberFreeCamera;
 
-    flightAssistEnabled: boolean = true;
+    flightAssistEnabled = true;
+    isHyperAccelerated = false;
 
-    constructor(scene: UberScene) {
+    constructor() {
         super();
 
         this.transform = new NewtonianTransform("shipTransform");
 
-        this.firstPersonCamera = new UberFreeCamera("firstPersonCamera", Vector3.Zero(), scene);
+        this.firstPersonCamera = new UberFreeCamera("firstPersonCamera", Vector3.Zero());
         this.firstPersonCamera.parent = this.transform.node;
 
-        this.thirdPersonCamera = new UberFreeCamera("thirdPersonCamera", Vector3.Zero(), scene);
+        this.thirdPersonCamera = new UberFreeCamera("thirdPersonCamera", Vector3.Zero());
         this.thirdPersonCamera.parent = this.transform.node;
         //this.thirdPersonCamera.position.z = -5;
         //this.thirdPersonCamera.position.y = 2;
@@ -46,6 +47,10 @@ export class ShipController extends AbstractController {
     }
 
     listenTo(input: Input, deltaTime: number): Vector3 {
+        if(input.type == InputType.KEYBOARD) {
+            const keyboard = input as Keyboard;
+            if(keyboard.isPressed("U")) this.isHyperAccelerated = !this.isHyperAccelerated;
+        }
         this.transform.rotationAcceleration.x += this.rollAuthority * input.getRoll() * deltaTime;
         this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
         this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
