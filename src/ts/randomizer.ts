@@ -10,7 +10,6 @@ import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystem } from "./bodies/starSystem";
 
 import { randRange } from "extended-random";
-import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Settings } from "./settings";
 import { BodyType } from "./bodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor/bodyEditor";
@@ -44,8 +43,6 @@ Assets.Init(scene).then(() => {
 
     const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
     const starSystem = new StarSystem(starSystemSeed, scene);
-
-    new StarfieldPostProcess("starfield", player, scene, starSystem);
 
     starSystem.makeStars(1);
     starSystem.makePlanets(1);

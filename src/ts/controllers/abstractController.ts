@@ -35,6 +35,7 @@ export abstract class AbstractController {
      */
     abstract listenTo(input: Input, deltaTime: number): Vector3;
 
+    //TODO: remove this from here to avoid cyclic dependencies
     public getNearestBody(): AbstractBody {
         if (this.nearestBody == null) throw new Error("No nearest body");
         return this.nearestBody;

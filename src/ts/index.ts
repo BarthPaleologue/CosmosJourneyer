@@ -10,8 +10,6 @@ import { Gamepad } from "./inputs/gamepad";
 import { CollisionWorker } from "./workers/collisionWorker";
 import { StarSystem } from "./bodies/starSystem";
 
-import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-
 import "../styles/index.scss";
 
 import { Settings } from "./settings";
@@ -51,8 +49,6 @@ Assets.Init(scene).then(() => {
 
     const starSystemSeed = 0;
     const starSystem = new StarSystem(starSystemSeed, scene);
-
-    new StarfieldPostProcess("starfield", player, scene, starSystem);
 
     const sun = new Star("Weierstrass", starSystem, 0.51, []);
     sun.orbitalProperties.period = 60 * 60 * 24;

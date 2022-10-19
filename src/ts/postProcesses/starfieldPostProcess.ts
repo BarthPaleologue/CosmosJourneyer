@@ -3,7 +3,6 @@ import { Effect, Vector3 } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
 
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
-import { AbstractController } from "../controllers/abstractController";
 import { BodyType } from "../bodies/interfaces";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { UberScene } from "../core/uberScene";
@@ -21,7 +20,7 @@ export interface StarfieldSettings {
 export class StarfieldPostProcess extends UberPostProcess {
     settings: StarfieldSettings;
 
-    constructor(name: string, player: AbstractController, scene: UberScene, starSystem: StarSystem) {
+    constructor(name: string, scene: UberScene, starSystem: StarSystem) {
         const settings: StarfieldSettings = {
             foo: 1
         };
@@ -36,12 +35,12 @@ export class StarfieldPostProcess extends UberPostProcess {
                     //TODO: should be cleaned up
                     let vis = 1.0;
                     for (const star of starSystem.stars) {
-                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.getAbsolutePosition().normalizeToNew(), player.transform.getForwardDirection()));
+                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.getAbsolutePosition().normalizeToNew(), scene.getActiveController().transform.getForwardDirection()));
                     }
                     vis /= 2;
                     let vis2 = 1.0;
-                    if (player.nearestBody != null && player.nearestBody.bodyType == BodyType.TELLURIC) {
-                        const planet = player.nearestBody as TelluricPlanet;
+                    if (scene.getActiveController().getNearestBody() != null && scene.getActiveController().getNearestBody().bodyType == BodyType.TELLURIC) {
+                        const planet = scene.getActiveController().getNearestBody() as TelluricPlanet;
                         if (planet.postProcesses.atmosphere != null) {
                             const height = planet.getAbsolutePosition().length();
                             const maxHeight = planet.postProcesses.atmosphere.settings.atmosphereRadius;

@@ -12,6 +12,7 @@ import { getOrbitalPeriod } from "../orbits/kepler";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BlackHole } from "./blackHole";
 import { BodyType } from "./interfaces";
+import { StarfieldPostProcess } from "../postProcesses/starfieldPostProcess";
 
 enum Steps {
     GENERATE_STARS = 100,
@@ -34,6 +35,8 @@ export class StarSystem {
     constructor(seed: number, scene: UberScene) {
         this.scene = scene;
         this.rng = seededSquirrelNoise(seed * Number.MAX_SAFE_INTEGER);
+
+        new StarfieldPostProcess("starfield", scene, this);
     }
 
     public addBody(body: AbstractBody) {
