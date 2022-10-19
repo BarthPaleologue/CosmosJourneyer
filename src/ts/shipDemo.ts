@@ -18,6 +18,7 @@ import { Assets } from "./assets";
 import { HelmetOverlay } from "./ui/helmetOverlay";
 import { ShipController } from "./controllers/shipController";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
+import { isOrbiting, positionNearBody } from "./utils/positionNearBody";
 
 const helmetOverlay = new HelmetOverlay();
 
@@ -55,9 +56,9 @@ Assets.Init(scene).then(() => {
 
     const collisionWorker = new CollisionWorker(spaceshipController, starSystem);
 
-    starSystem.update(Date.now() / 1000);
+    starSystem.init();
 
-    spaceshipController.positionNearBody(starSystem.planets[0]);
+    positionNearBody(spaceshipController, starSystem.planets[0], starSystem);
 
     scene.executeWhenReady(() => {
         engine.loadingScreen.hideLoadingUI();
@@ -77,7 +78,7 @@ Assets.Init(scene).then(() => {
             starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
             starSystem.translateAllBodies(spaceshipController.update(deltaTime));
 
-            if (!collisionWorker.isBusy() && spaceshipController.isOrbiting()) {
+            if (!collisionWorker.isBusy() && isOrbiting(spaceshipController)) {
                 if (spaceshipController.nearestBody?.bodyType == BodyType.TELLURIC) {
                     collisionWorker.checkCollision(spaceshipController.nearestBody as TelluricPlanet);
                 }

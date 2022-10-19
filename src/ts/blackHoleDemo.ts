@@ -19,6 +19,7 @@ import { HelmetOverlay } from "./ui/helmetOverlay";
 import { PlayerController } from "./controllers/playerController";
 import { BlackHole } from "./bodies/blackHole";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
+import { isOrbiting, positionNearBody } from "./utils/positionNearBody";
 
 const helmetOverlay = new HelmetOverlay();
 
@@ -48,8 +49,8 @@ Assets.Init(scene).then(() => {
     BH.orbitalProperties.apoapsis = BH.getRadius() * 4;
 
     starSystem.makeTelluricPlanet();
-    starSystem.planets[0].orbitalProperties.periapsis = 5000e3;
-    starSystem.planets[0].orbitalProperties.apoapsis = 5000e3;
+    starSystem.planets[0].orbitalProperties.periapsis = 10000e3;
+    starSystem.planets[0].orbitalProperties.apoapsis = 10000e3;
     console.log(starSystem.planets[0].getRadius());
 
     starSystem.makePlanets(1);
@@ -64,9 +65,9 @@ Assets.Init(scene).then(() => {
 
     const collisionWorker = new CollisionWorker(playerController, starSystem);
 
-    starSystem.update(Date.now() / 1000);
+    starSystem.init();
 
-    playerController.positionNearBody(BH, 20);
+    positionNearBody(playerController, BH, starSystem, 20);
 
     scene.executeWhenReady(() => {
         engine.loadingScreen.hideLoadingUI();
@@ -86,7 +87,7 @@ Assets.Init(scene).then(() => {
             starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
             starSystem.translateAllBodies(playerController.update(deltaTime));
 
-            if (!collisionWorker.isBusy() && playerController.isOrbiting()) {
+            if (!collisionWorker.isBusy() && isOrbiting(playerController)) {
                 if (playerController.nearestBody?.bodyType == BodyType.TELLURIC) {
                     collisionWorker.checkCollision(playerController.nearestBody as TelluricPlanet);
                 }

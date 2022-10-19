@@ -19,6 +19,7 @@ import { Assets } from "./assets";
 import { HelmetOverlay } from "./ui/helmetOverlay";
 import { PlayerController } from "./controllers/playerController";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
+import { isOrbiting, positionNearBody } from "./utils/positionNearBody";
 
 const helmetOverlay = new HelmetOverlay();
 const bodyEditor = new BodyEditor();
@@ -60,9 +61,9 @@ Assets.Init(scene).then(() => {
 
     const collisionWorker = new CollisionWorker(player, starSystem);
 
-    starSystem.update(Date.now() / 1000);
+    starSystem.init();
 
-    player.positionNearBody(starSystem.planets[0]);
+    positionNearBody(player, starSystem.planets[0], starSystem);
 
     scene.executeWhenReady(() => {
         engine.loadingScreen.hideLoadingUI();
@@ -84,7 +85,7 @@ Assets.Init(scene).then(() => {
 
             starSystem.translateAllBodies(player.update(deltaTime));
 
-            if (!collisionWorker.isBusy() && player.isOrbiting()) {
+            if (!collisionWorker.isBusy() && isOrbiting(player)) {
                 if (player.nearestBody?.bodyType == BodyType.TELLURIC) {
                     collisionWorker.checkCollision(player.nearestBody as TelluricPlanet);
                 }

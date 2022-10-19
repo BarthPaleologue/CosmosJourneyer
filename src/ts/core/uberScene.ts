@@ -14,6 +14,7 @@ import { Settings } from "../settings";
 import { AbstractController } from "../controllers/abstractController";
 import { ColorCorrection } from "../postProcesses/colorCorrection";
 import { UberFreeCamera } from "./uberFreeCamera";
+import { isOrbiting } from "../utils/positionNearBody";
 
 export class UberScene extends Scene {
     activeController: AbstractController | null = null;
@@ -45,14 +46,14 @@ export class UberScene extends Scene {
     }
 
     public getDepthRenderer(): DepthRenderer {
-        if(this.depthRenderer === null) throw new Error("Depth Renderer not initialized");
+        if (this.depthRenderer === null) throw new Error("Depth Renderer not initialized");
         return this.depthRenderer;
     }
 
     public setActiveController(controller: AbstractController) {
         this.activeController = controller;
         this.activeCamera = controller.getActiveCamera();
-        if(this.depthRenderer === null) {
+        if (this.depthRenderer === null) {
             this.depthRenderer = this.enableDepthRenderer(null, false, true);
             this.customRenderTargets.push(this.depthRenderer.getDepthMap());
         }
@@ -68,26 +69,35 @@ export class UberScene extends Scene {
         return this.getActiveController().getActiveCamera();
     }
 
+    public enableSurfaceRenderingPipeline() {
+        const activeCamera = this.getActiveUberCamera();
+        if (!this.surfaceRenderingPipeline.cameras.includes(activeCamera)) {
+            if (this.spaceRenderingPipeline.cameras.includes(activeCamera)) this.spaceRenderingPipeline.detachCamera(activeCamera);
+            this.surfaceRenderingPipeline.attachToCamera(activeCamera);
+        }
+    }
+
+    public enableSpaceRenderingPipeline() {
+        const activeCamera = this.getActiveUberCamera();
+        if (!this.spaceRenderingPipeline.cameras.includes(activeCamera)) {
+            if(this.surfaceRenderingPipeline.cameras.includes(activeCamera)) this.surfaceRenderingPipeline.detachCamera(activeCamera);
+            this.spaceRenderingPipeline.attachToCamera(activeCamera);
+        }
+    }
+
     public update() {
         this._chunkForge.update();
 
-        const activeCamera = this.getActiveUberCamera();
         const nearestBody = this.getActiveController().getNearestBody();
 
         this.spaceRenderingPipeline.setBody(this.getActiveController().getNearestBody());
         this.surfaceRenderingPipeline.setBody(this.getActiveController().getNearestBody());
 
         const switchLimit = nearestBody.postProcesses.rings?.settings.ringStart || 2;
-        if (this.getActiveController().isOrbiting(nearestBody, switchLimit)) {
-            if (!this.surfaceRenderingPipeline.cameras.includes(activeCamera)) {
-                if(this.spaceRenderingPipeline.cameras.includes(activeCamera)) this.spaceRenderingPipeline.detachCamera(activeCamera);
-                this.surfaceRenderingPipeline.attachToCamera(activeCamera);
-            }
+        if (isOrbiting(this.getActiveController(), nearestBody, switchLimit)) {
+            this.enableSurfaceRenderingPipeline();
         } else {
-            if (!this.spaceRenderingPipeline.cameras.includes(activeCamera)) {
-                if(this.surfaceRenderingPipeline.cameras.includes(activeCamera)) this.surfaceRenderingPipeline.detachCamera(activeCamera);
-                this.spaceRenderingPipeline.attachToCamera(activeCamera);
-            }
+            this.enableSpaceRenderingPipeline();
         }
     }
 }

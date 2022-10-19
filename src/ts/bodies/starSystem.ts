@@ -11,6 +11,7 @@ import { clamp } from "../utils/gradientMath";
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BlackHole } from "./blackHole";
+import { BodyType } from "./interfaces";
 
 enum Steps {
     GENERATE_STARS = 100,
@@ -159,6 +160,56 @@ export class StarSystem {
 
     public getTime() {
         return this.clock;
+    }
+
+    public init() {
+        this.initPostProcesses();
+        this.update(Date.now() / 1000);
+    }
+
+    public initPostProcesses() {
+        for (const body of this.bodies) {
+            if (body.postProcesses.rings) {
+                //TODO: add rings postprocess to pipeline and disconnect the class
+            }
+            if (body.postProcesses.overlay) {
+                //TODO: add overlay postprocess to pipeline and disconnect the class
+            }
+            switch (body.bodyType) {
+                case BodyType.STAR:
+                    const star = body as Star;
+                    if(star.postProcesses.volumetricLight) {
+                        //TODO: add volumetric light postprocess to pipeline and disconnect the class
+                    }
+                    break;
+                case BodyType.TELLURIC:
+                    const telluric = body as TelluricPlanet;
+                    if(telluric.postProcesses.atmosphere) {
+                        //TODO: add atmosphere postprocess to pipeline and disconnect the class
+                    }
+                    if(telluric.postProcesses.clouds) {
+                        //TODO: add clouds postprocess to pipeline and disconnect the class
+                    }
+                    if(telluric.postProcesses.ocean) {
+                        //TODO: add ocean postprocess to pipeline and disconnect the class
+                    }
+                    break;
+                case BodyType.GAZ:
+                    const gas = body as GasPlanet;
+                    if(gas.postProcesses.atmosphere) {
+                        //TODO: add atmosphere postprocess to pipeline and disconnect the class
+                    }
+                    break;
+                case BodyType.BLACK_HOLE:
+                    const blackHole = body as BlackHole;
+                    if(blackHole.postProcesses.blackHole) {
+                        //TODO: add black hole postprocess to pipeline and disconnect the class
+                    }
+                    break;
+                default:
+                    throw new Error(`Unknown body type : ${body.bodyType}`);
+            }
+        }
     }
 
     public update(deltaTime: number): void {

@@ -11,6 +11,7 @@ import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { normalRandom, randRange } from "extended-random";
 import { BasicTransform } from "../core/transforms/basicTransform";
 import { seededSquirrelNoise } from "squirrel-noise";
+import { isOrbiting } from "../utils/positionNearBody";
 
 enum Steps {
     AXIAL_TILT = 100,
@@ -136,7 +137,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
             const initialPosition = this.getAbsolutePosition().clone();
             const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this.starSystem.getTime());
 
-            if (player.isOrbiting(this, 50 / (this.depth + 1) ** 3)) player.transform.translate(newPosition.subtract(initialPosition));
+            if (isOrbiting(player, this, 50 / (this.depth + 1) ** 3)) player.transform.translate(newPosition.subtract(initialPosition));
             this.starSystem.translateAllBodies(player.transform.getAbsolutePosition().negate());
             player.transform.translate(player.transform.getAbsolutePosition().negate());
             this.translate(newPosition.subtract(initialPosition));
@@ -145,7 +146,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         if (this.physicalProperties.rotationPeriod > 0) {
             const dtheta = (2 * Math.PI * deltaTime) / this.physicalProperties.rotationPeriod;
 
-            if (player.isOrbiting(this)) player.transform.rotateAround(this.getAbsolutePosition(), this.node.up, -dtheta);
+            if (isOrbiting(player, this)) player.transform.rotateAround(this.getAbsolutePosition(), this.node.up, -dtheta);
             this.starSystem.translateAllBodies(player.transform.getAbsolutePosition().negate());
             player.transform.translate(player.transform.getAbsolutePosition().negate());
             this.rotate(this.getRotationAxis(), -dtheta);

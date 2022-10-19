@@ -24,6 +24,7 @@ import { AtmosphericScatteringPostProcess } from "./postProcesses/planetPostProc
 import { HelmetOverlay } from "./ui/helmetOverlay";
 import { PlayerController } from "./controllers/playerController";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
+import { isOrbiting, positionNearBody } from "./utils/positionNearBody";
 
 const helmetOverlay = new HelmetOverlay();
 const bodyEditor = new BodyEditor();
@@ -151,9 +152,9 @@ Assets.Init(scene).then(() => {
     const collisionWorker = new CollisionWorker(player, starSystem);
 
     // update to current date
-    starSystem.update(Date.now() / 1000);
+    starSystem.init();
 
-    player.positionNearBody(planet);
+    positionNearBody(player, planet, starSystem);
 
     function updateScene() {
         const deltaTime = engine.getDeltaTime() / 1000;
@@ -166,7 +167,7 @@ Assets.Init(scene).then(() => {
 
         starSystem.translateAllBodies(player.update(deltaTime));
 
-        if (!collisionWorker.isBusy() && player.isOrbiting()) {
+        if (!collisionWorker.isBusy() && isOrbiting(player)) {
             if (player.nearestBody?.bodyType == BodyType.TELLURIC) {
                 collisionWorker.checkCollision(player.nearestBody as TelluricPlanet);
             }
@@ -184,7 +185,7 @@ Assets.Init(scene).then(() => {
         if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getActiveController().getActiveCamera(), { precision: 4 });
         if (e.key == "u") bodyEditor.setVisibility(bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
-        if (e.key == "w" && player.isOrbiting())
+        if (e.key == "w" && isOrbiting(player))
             (<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>player.nearestBody)).material.wireframe;
     });
 
