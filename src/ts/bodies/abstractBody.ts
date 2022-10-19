@@ -114,12 +114,8 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
     }
 
     public createRings(): RingsPostProcess {
-        const rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem.scene, this.starSystem);
-        rings.settings.ringStart = randRange(1.8, 2.2, this.rng, Steps.RINGS);
-        rings.settings.ringEnd = randRange(2.1, 2.9, this.rng, Steps.RINGS + 10);
-        rings.settings.ringOpacity = this.rng(Steps.RINGS + 20);
-        this.postProcesses.rings = rings;
-        return rings;
+        this.postProcesses.rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem.scene, this.starSystem);
+        return this.postProcesses.rings;
     }
 
     /**

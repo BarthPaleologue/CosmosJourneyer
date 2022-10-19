@@ -6,9 +6,11 @@ import { StarSystem } from "../starSystem";
 import { PlanetPhysicalProperties } from "../physicalProperties";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
-import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
+import { randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import {
+    AtmosphericScatteringPostProcess
+} from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 import { OverlayPostProcess } from "../../postProcesses/overlayPostProcess";
@@ -71,14 +73,7 @@ export class GasPlanet extends AbstractBody {
             rings: null
         };
 
-        // FIXME: implement multiple stars
-        const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene, this.starSystem);
-        atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
-        atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE) / 6;
-        atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE + 10) / 6;
-        atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE + 20) / 6;
-
-        this.postProcesses.atmosphere = atmosphere;
+        this.postProcesses.atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene, this.starSystem);
 
         if (uniformRandBool(0.8, this.rng, Steps.RINGS)) this.createRings();
     }

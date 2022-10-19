@@ -7,6 +7,7 @@ import { UberScene } from "../../core/uberScene";
 import { StarSystem } from "../../bodies/starSystem";
 import { UberPostProcess } from "../uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
+import { randRange } from "extended-random";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -19,14 +20,15 @@ interface RingsSettings {
 }
 
 export class RingsPostProcess extends UberPostProcess {
-    settings: RingsSettings = {
-        ringStart: 1.5,
-        ringEnd: 2.5,
-        ringFrequency: 30.0,
-        ringOpacity: 0.4
-    };
+    settings: RingsSettings;
 
     constructor(name: string, body: AbstractBody, scene: UberScene, starSystem: StarSystem) {
+        const settings: RingsSettings = {
+            ringStart: randRange(1.8, 2.2, body.rng, 1400),
+            ringEnd: randRange(2.1, 2.9, body.rng, 1410),
+            ringFrequency: 30.0,
+            ringOpacity: body.rng(1420)
+        }
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(body),
             ...getStarsUniforms(starSystem),
@@ -35,28 +37,28 @@ export class RingsPostProcess extends UberPostProcess {
                 name: "ringStart",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return this.settings.ringStart;
+                    return settings.ringStart;
                 }
             },
             {
                 name: "ringEnd",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return this.settings.ringEnd;
+                    return settings.ringEnd;
                 }
             },
             {
                 name: "ringFrequency",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return this.settings.ringFrequency;
+                    return settings.ringFrequency;
                 }
             },
             {
                 name: "ringOpacity",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return this.settings.ringOpacity;
+                    return settings.ringOpacity;
                 }
             },
             {
@@ -69,6 +71,8 @@ export class RingsPostProcess extends UberPostProcess {
         ];
 
         super(name, shaderName, uniforms, getSamplers(scene), scene);
+
+        this.settings = settings;
 
         for (const pipeline of scene.pipelines) {
             pipeline.rings.push(this);

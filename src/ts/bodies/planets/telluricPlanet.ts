@@ -13,12 +13,14 @@ import { Settings } from "../../settings";
 import { SolidPhysicalProperties } from "../physicalProperties";
 import { TelluricMaterial } from "../../materials/telluricMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
-import { centeredRand, normalRandom, uniformRandBool } from "extended-random";
+import { normalRandom, uniformRandBool } from "extended-random";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/flatCloudsPostProcess";
 import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
 import { clamp } from "../../utils/gradientMath";
-import { AtmosphericScatteringPostProcess } from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import {
+    AtmosphericScatteringPostProcess
+} from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 import { OverlayPostProcess } from "../../postProcesses/overlayPostProcess";
@@ -113,19 +115,11 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
                 this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
                 this.postProcesses.ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystem.scene, this.starSystem);
-
-                const clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystem.scene, this.starSystem);
-                clouds.settings.cloudCoverage = 0.8 * Math.exp(-this.physicalProperties.waterAmount * this.physicalProperties.pressure);
-                this.postProcesses.clouds = clouds;
+                this.postProcesses.clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystem.scene, this.starSystem);
             } else {
                 this.oceanLevel = 0;
             }
-            const atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene, this.starSystem);
-            atmosphere.settings.intensity = 12 * this.physicalProperties.pressure;
-            atmosphere.settings.redWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE) / 6;
-            atmosphere.settings.greenWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE + 10) / 6;
-            atmosphere.settings.blueWaveLength *= 1 + centeredRand(this.rng, Steps.ATMOSPHERE + 20) / 6;
-            this.postProcesses.atmosphere = atmosphere;
+            this.postProcesses.atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene, this.starSystem);
         } else {
             this.oceanLevel = 0;
         }

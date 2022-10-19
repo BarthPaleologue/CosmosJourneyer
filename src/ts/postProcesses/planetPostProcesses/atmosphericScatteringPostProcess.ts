@@ -8,6 +8,7 @@ import { UberScene } from "../../core/uberScene";
 import { StarSystem } from "../../bodies/starSystem";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
 import { UberPostProcess } from "../uberPostProcess";
+import { centeredRand } from "extended-random";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -32,13 +33,13 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 23,
-            intensity: 12,
+            intensity: 12 * planet.physicalProperties.pressure,
             rayleighStrength: 1,
             mieStrength: 1,
             densityModifier: 1,
-            redWaveLength: 700,
-            greenWaveLength: 530,
-            blueWaveLength: 440,
+            redWaveLength: 700 * (1 + centeredRand(planet.rng, 1300) / 6),
+            greenWaveLength: 530 * (1 + centeredRand(planet.rng, 1310) / 6),
+            blueWaveLength: 440 * (1 + centeredRand(planet.rng, 1320) / 6),
             mieHaloRadius: 0.75
         };
 

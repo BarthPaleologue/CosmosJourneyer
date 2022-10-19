@@ -5,11 +5,11 @@ import normalMap from "../../../asset/textures/cloudNormalMap3.jpg";
 import { gcd } from "../../utils/gradientMath";
 
 import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
-import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
 import { StarSystem } from "../../bodies/starSystem";
 import { UberPostProcess } from "../uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
+import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -30,14 +30,14 @@ export interface CloudSettings {
 export class FlatCloudsPostProcess extends UberPostProcess {
     settings: CloudSettings;
 
-    constructor(name: string, planet: Planet, cloudLayerHeight: number, scene: UberScene, starSystem: StarSystem) {
+    constructor(name: string, planet: TelluricPlanet, cloudLayerHeight: number, scene: UberScene, starSystem: StarSystem) {
         const settings: CloudSettings = {
             cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
             specularPower: 2,
             smoothness: 0.9,
             cloudFrequency: 4,
             cloudDetailFrequency: 20,
-            cloudCoverage: 0.4,
+            cloudCoverage: 0.8 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure),
             cloudSharpness: 3.5,
             cloudColor: new Color3(0.8, 0.8, 0.8),
             worleySpeed: 0.0005,

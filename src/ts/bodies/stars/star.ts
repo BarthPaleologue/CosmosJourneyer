@@ -80,12 +80,7 @@ export class Star extends AbstractBody {
             rings: null
         };
 
-        if (uniformRandBool(Star.RING_PROPORTION, this.rng, Steps.RINGS)) {
-            const rings = this.createRings();
-            rings.settings.ringStart = normalRandom(3, 1, this.rng, Steps.RINGS + 10);
-            rings.settings.ringEnd = normalRandom(7, 1, this.rng, Steps.RINGS + 20);
-            rings.settings.ringOpacity = this.rng(Steps.RINGS + 30);
-        }
+        if (uniformRandBool(Star.RING_PROPORTION, this.rng, Steps.RINGS)) this.createRings();
     }
 
     public override updateTransform(player: AbstractController, deltaTime: number): void {
