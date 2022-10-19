@@ -109,7 +109,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
      * Returns the axis of rotation of the body
      */
     public getRotationAxis(): Vector3 {
-        return new Vector3(0, 1, 0).applyRotationQuaternionInPlace(this.getRotationQuaternion());
+        return this.node.up;
     }
 
     public createRings(): RingsPostProcess {
@@ -137,14 +137,18 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
             const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this.starSystem.getTime());
 
             if (player.isOrbiting(this, 50 / (this.depth + 1) ** 3)) player.transform.translate(newPosition.subtract(initialPosition));
-            this.setAbsolutePosition(newPosition);
+            this.starSystem.translateAllBodies(player.transform.getAbsolutePosition().negate());
+            player.transform.translate(player.transform.getAbsolutePosition().negate());
+            this.translate(newPosition.subtract(initialPosition));
         }
 
         if (this.physicalProperties.rotationPeriod > 0) {
             const dtheta = (2 * Math.PI * deltaTime) / this.physicalProperties.rotationPeriod;
 
             if (player.isOrbiting(this)) player.transform.rotateAround(this.getAbsolutePosition(), this.node.up, -dtheta);
-            this.rotate(this.node.up, -dtheta);
+            this.starSystem.translateAllBodies(player.transform.getAbsolutePosition().negate());
+            player.transform.translate(player.transform.getAbsolutePosition().negate());
+            this.rotate(this.getRotationAxis(), -dtheta);
         }
     }
 

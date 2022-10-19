@@ -111,7 +111,7 @@ export class StarSystem {
 
     public translateAllBodies(deplacement: Vector3): void {
         for (const planet of this.bodies) {
-            planet.setAbsolutePosition(planet.getAbsolutePosition().add(deplacement));
+            planet.translate(deplacement);
         }
     }
 
