@@ -3,6 +3,7 @@ import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
 import { StarSystem } from "../bodies/starSystem";
 import { Vector4 } from "@babylonjs/core";
 import { AbstractBody } from "../bodies/abstractBody";
+import { ITransformable } from "../core/transforms/iTransformable";
 
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     return [
@@ -57,20 +58,20 @@ export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
         }];
 }
 
-export function getStarsUniforms(starSystem: StarSystem): ShaderUniforms {
+export function getStarsUniforms(stars: ITransformable[]): ShaderUniforms {
     return [
         {
             name: "starPositions",
             type: ShaderDataType.Vector3Array,
             get: () => {
-                return starSystem.stars.map((star) => star.getAbsolutePosition());
+                return stars.map((star) => star.getAbsolutePosition());
             }
         },
         {
             name: "nbStars",
             type: ShaderDataType.Int,
             get: () => {
-                return starSystem.stars.length;
+                return stars.length;
             }
         }
     ];

@@ -4,9 +4,10 @@ import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import volumetricCloudsFragment from "../../../shaders/volumetricCloudsFragment.glsl";
 import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
-import { StarSystem } from "../../bodies/starSystem";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
 import { UberPostProcess } from "../uberPostProcess";
+import { BlackHole } from "../../bodies/blackHole";
+import { Star } from "../../bodies/stars/star";
 
 const shaderName = "volumetricClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
@@ -18,14 +19,14 @@ export interface VolumetricCloudSettings {
 export class VolumetricCloudsPostProcess extends UberPostProcess {
     settings: VolumetricCloudSettings;
 
-    constructor(name: string, planet: Planet, atmosphereRadius: number, scene: UberScene, starSystem: StarSystem) {
+    constructor(name: string, planet: Planet, atmosphereRadius: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: VolumetricCloudSettings = {
             atmosphereRadius: atmosphereRadius
         };
 
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(planet),
-            ...getStarsUniforms(starSystem),
+            ...getStarsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
                 name: "atmosphereRadius",
@@ -41,7 +42,5 @@ export class VolumetricCloudsPostProcess extends UberPostProcess {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
-        scene.uberRenderingPipeline.clouds.push(this);
-
     }
 }

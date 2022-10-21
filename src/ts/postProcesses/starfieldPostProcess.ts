@@ -6,10 +6,11 @@ import starfieldFragment from "../../shaders/starfieldFragment.glsl";
 import { BodyType } from "../bodies/interfaces";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { UberScene } from "../core/uberScene";
-import { StarSystem } from "../bodies/starSystem";
 import { getActiveCameraUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { UberPostProcess } from "./uberPostProcess";
 import { Settings } from "../settings";
+import { BlackHole } from "../bodies/blackHole";
+import { Star } from "../bodies/stars/star";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -21,21 +22,21 @@ export interface StarfieldSettings {
 export class StarfieldPostProcess extends UberPostProcess {
     settings: StarfieldSettings;
 
-    constructor(name: string, scene: UberScene, starSystem: StarSystem) {
+    constructor(name: string, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: StarfieldSettings = {
             foo: 1
         };
 
         const uniforms: ShaderUniforms = [
             ...getActiveCameraUniforms(scene),
-            ...getStarsUniforms(starSystem),
+            ...getStarsUniforms(stars),
             {
                 name: "visibility",
                 type: ShaderDataType.Float,
                 get: () => {
                     //TODO: should be cleaned up
                     let vis = 1.0;
-                    for (const star of starSystem.stars) {
+                    for (const star of stars) {
                         vis = Math.min(vis, 1.0 - Vector3.Dot(star.getAbsolutePosition().normalizeToNew(), scene.getActiveController().transform.getForwardDirection()));
                     }
                     vis /= 2;
@@ -46,7 +47,7 @@ export class StarfieldPostProcess extends UberPostProcess {
                             const height = planet.getAbsolutePosition().length();
                             //FIXME: has to be dynamic
                             const maxHeight = Settings.ATMOSPHERE_HEIGHT;//planet.postProcesses.atmosphere.settings.atmosphereRadius;
-                            for (const star of starSystem.stars) {
+                            for (const star of stars) {
                                 const sunDir = planet.getAbsolutePosition().subtract(star.getAbsolutePosition()).normalize();
                                 vis2 = Math.min(vis2, (height / maxHeight) ** 32 + Math.max(Vector3.Dot(sunDir, planet.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5);
                             }
@@ -54,13 +55,6 @@ export class StarfieldPostProcess extends UberPostProcess {
                     }
                     vis = Math.min(vis, vis2);
                     return vis;
-                }
-            },
-            {
-                name: "time",
-                type: ShaderDataType.Float,
-                get: () => {
-                    return starSystem.getTime() % 100000;
                 }
             }
         ];
@@ -70,7 +64,5 @@ export class StarfieldPostProcess extends UberPostProcess {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
-        scene.uberRenderingPipeline.starFields.push(this);
-
     }
 }

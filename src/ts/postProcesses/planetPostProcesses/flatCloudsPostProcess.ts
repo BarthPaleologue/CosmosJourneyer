@@ -6,10 +6,11 @@ import { gcd } from "../../utils/gradientMath";
 
 import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
 import { UberScene } from "../../core/uberScene";
-import { StarSystem } from "../../bodies/starSystem";
 import { UberPostProcess } from "../uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
 import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
+import { BlackHole } from "../../bodies/blackHole";
+import { Star } from "../../bodies/stars/star";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -30,7 +31,7 @@ export interface CloudSettings {
 export class FlatCloudsPostProcess extends UberPostProcess {
     settings: CloudSettings;
 
-    constructor(name: string, planet: TelluricPlanet, cloudLayerHeight: number, scene: UberScene, starSystem: StarSystem) {
+    constructor(name: string, planet: TelluricPlanet, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: CloudSettings = {
             cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
             specularPower: 2,
@@ -46,7 +47,7 @@ export class FlatCloudsPostProcess extends UberPostProcess {
 
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(planet),
-            ...getStarsUniforms(starSystem),
+            ...getStarsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
                 name: "cloudLayerRadius",

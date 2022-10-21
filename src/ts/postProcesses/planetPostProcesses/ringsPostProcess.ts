@@ -4,10 +4,11 @@ import { ShaderDataType, ShaderUniforms } from "../interfaces";
 import ringsFragment from "../../../shaders/ringsFragment.glsl";
 import { AbstractBody } from "../../bodies/abstractBody";
 import { UberScene } from "../../core/uberScene";
-import { StarSystem } from "../../bodies/starSystem";
 import { UberPostProcess } from "../uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
 import { randRange } from "extended-random";
+import { BlackHole } from "../../bodies/blackHole";
+import { Star } from "../../bodies/stars/star";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -22,7 +23,7 @@ interface RingsSettings {
 export class RingsPostProcess extends UberPostProcess {
     settings: RingsSettings;
 
-    constructor(name: string, body: AbstractBody, scene: UberScene, starSystem: StarSystem) {
+    constructor(name: string, body: AbstractBody, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: RingsSettings = {
             ringStart: randRange(1.8, 2.2, body.rng, 1400),
             ringEnd: randRange(2.1, 2.9, body.rng, 1410),
@@ -31,7 +32,7 @@ export class RingsPostProcess extends UberPostProcess {
         };
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(body),
-            ...getStarsUniforms(starSystem),
+            ...getStarsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
                 name: "ringStart",

@@ -6,9 +6,10 @@ import oceanFragment from "../../../shaders/oceanFragment.glsl";
 import { Assets } from "../../assets";
 import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
-import { StarSystem } from "../../bodies/starSystem";
 import { UberPostProcess } from "../uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
+import { Star } from "../../bodies/stars/star";
+import { BlackHole } from "../../bodies/blackHole";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -25,7 +26,7 @@ export interface OceanSettings {
 export class OceanPostProcess extends UberPostProcess {
     settings: OceanSettings;
 
-    constructor(name: string, planet: Planet, scene: UberScene, starSystem: StarSystem) {
+    constructor(name: string, planet: Planet, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: OceanSettings = {
             oceanRadius: planet.getApparentRadius(),
             depthModifier: 0.001,
@@ -37,7 +38,7 @@ export class OceanPostProcess extends UberPostProcess {
 
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(planet),
-            ...getStarsUniforms(starSystem),
+            ...getStarsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
                 name: "oceanRadius",

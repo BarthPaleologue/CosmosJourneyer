@@ -5,10 +5,11 @@ import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import atmosphericScatteringFragment from "../../../shaders/atmosphericScatteringFragment.glsl";
 import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
-import { StarSystem } from "../../bodies/starSystem";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
 import { UberPostProcess } from "../uberPostProcess";
 import { centeredRand } from "extended-random";
+import { BlackHole } from "../../bodies/blackHole";
+import { Star } from "../../bodies/stars/star";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -29,7 +30,7 @@ export interface AtmosphereSettings {
 export class AtmosphericScatteringPostProcess extends UberPostProcess {
     settings: AtmosphereSettings;
 
-    constructor(name: string, planet: Planet, atmosphereHeight: number, scene: UberScene, starSystem: StarSystem) {
+    constructor(name: string, planet: Planet, atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 23,
@@ -45,7 +46,7 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess {
 
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(planet),
-            ...getStarsUniforms(starSystem),
+            ...getStarsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
                 name: "atmosphereRadius",

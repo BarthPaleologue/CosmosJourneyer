@@ -12,17 +12,6 @@ import { getOrbitalPeriod } from "../orbits/kepler";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BlackHole } from "./blackHole";
 import { BodyType } from "./interfaces";
-import { StarfieldPostProcess } from "../postProcesses/starfieldPostProcess";
-import { OceanPostProcess } from "../postProcesses/planetPostProcesses/oceanPostProcess";
-import { Settings } from "../settings";
-import { FlatCloudsPostProcess } from "../postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import {
-    AtmosphericScatteringPostProcess
-} from "../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
-import { VolumetricLight } from "../postProcesses/volumetricLight";
-import { BlackHolePostProcess } from "../postProcesses/planetPostProcesses/blackHolePostProcess";
-import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
-import { OverlayPostProcess } from "../postProcesses/overlayPostProcess";
 import { PostProcessManager } from "../postProcesses/pipelines/postProcessManager";
 
 enum Steps {
@@ -51,8 +40,6 @@ export class StarSystem {
         this.postProcessManager = new PostProcessManager(this.scene);
 
         this.rng = seededSquirrelNoise(seed * Number.MAX_SAFE_INTEGER);
-
-        new StarfieldPostProcess("starfield", scene, this);
     }
 
     public addBody(body: AbstractBody) {
@@ -187,48 +174,35 @@ export class StarSystem {
     }
 
     public initPostProcesses() {
+        this.postProcessManager.addStarField(this.stars);
+
         for (const body of this.bodies) {
-            if (body.postProcesses.rings) {
-                this.scene.uberRenderingPipeline.rings.push(new RingsPostProcess(`${body.name}Rings`, body, this.scene, this));
-            }
-            if (body.postProcesses.overlay) {
-                this.scene.uberRenderingPipeline.overlays.push(new OverlayPostProcess(body.name, body, this.scene));
-            }
+            if (body.postProcesses.rings) this.postProcessManager.addRings(body, this.stars);
+            if (body.postProcesses.overlay) this.postProcessManager.addOverlay(body);
             switch (body.bodyType) {
                 case BodyType.STAR:
                     const star = body as Star;
-                    if(star.postProcesses.volumetricLight) {
-                        this.scene.uberRenderingPipeline.volumetricLights.push(new VolumetricLight(star, star.mesh, this.scene));
-                    }
+                    if (star.postProcesses.volumetricLight) this.postProcessManager.addVolumetricLight(star);
                     break;
                 case BodyType.TELLURIC:
                     const telluric = body as TelluricPlanet;
-                    if(telluric.postProcesses.atmosphere) {
-                        this.scene.uberRenderingPipeline.atmospheres.push(new AtmosphericScatteringPostProcess(`${telluric.name}Atmosphere`, telluric, Settings.ATMOSPHERE_HEIGHT, this.scene, this));
-                    }
-                    if(telluric.postProcesses.clouds) {
-                        this.scene.uberRenderingPipeline.clouds.push(new FlatCloudsPostProcess(`${telluric.name}Clouds`, telluric, Settings.CLOUD_LAYER_HEIGHT, this.scene, this));
-                    }
-                    if(telluric.postProcesses.ocean) {
-                        this.scene.uberRenderingPipeline.oceans.push(new OceanPostProcess(`${telluric.name}Ocean`, telluric, this.scene, this));
-                    }
+                    if (telluric.postProcesses.atmosphere) this.postProcessManager.addAtmosphere(telluric, this.stars);
+                    if (telluric.postProcesses.clouds) this.postProcessManager.addClouds(telluric, this.stars);
+                    if (telluric.postProcesses.ocean) this.postProcessManager.addOcean(telluric, this.stars);
                     break;
                 case BodyType.GAZ:
                     const gas = body as GasPlanet;
-                    if(gas.postProcesses.atmosphere) {
-                        this.scene.uberRenderingPipeline.atmospheres.push(new AtmosphericScatteringPostProcess(`${gas.name}Atmosphere`, gas, Settings.ATMOSPHERE_HEIGHT, this.scene, this));
-                    }
+                    if (gas.postProcesses.atmosphere) this.postProcessManager.addAtmosphere(gas, this.stars);
                     break;
                 case BodyType.BLACK_HOLE:
                     const blackHole = body as BlackHole;
-                    if(blackHole.postProcesses.blackHole) {
-                        this.scene.uberRenderingPipeline.blackHoles.push(new BlackHolePostProcess("BH", blackHole, this.scene));
-                    }
+                    if (blackHole.postProcesses.blackHole) this.postProcessManager.addBlackHole(blackHole);
                     break;
                 default:
                     throw new Error(`Unknown body type : ${body.bodyType}`);
             }
         }
+        this.postProcessManager.init();
     }
 
     public update(deltaTime: number): void {
