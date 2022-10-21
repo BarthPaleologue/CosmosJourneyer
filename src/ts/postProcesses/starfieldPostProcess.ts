@@ -68,9 +68,7 @@ export class StarfieldPostProcess extends UberPostProcess {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
+        scene.uberRenderingPipeline.starFields.push(this);
 
-        for (const pipeline of scene.pipelines) {
-            pipeline.starFields.push(this);
-        }
     }
 }

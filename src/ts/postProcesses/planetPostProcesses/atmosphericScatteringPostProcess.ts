@@ -125,8 +125,7 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess {
 
         this.settings = settings;
 
-        for (const pipeline of scene.pipelines) {
-            pipeline.atmospheres.push(this);
-        }
+        scene.uberRenderingPipeline.atmospheres.push(this);
+
     }
 }

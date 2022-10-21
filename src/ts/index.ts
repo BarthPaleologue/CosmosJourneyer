@@ -93,16 +93,8 @@ Assets.Init(scene).then(() => {
     moon.material.updateConstants();
 
     const ares = new TelluricPlanet("Ares", starSystem, 0.3725, starSystem.stars);
-
-    ares.postProcesses.ocean?.dispose();
-    scene.spaceRenderingPipeline.oceans.splice(scene.spaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);
-    scene.surfaceRenderingPipeline.oceans.splice(scene.surfaceRenderingPipeline.oceans.indexOf(ares.postProcesses.ocean!), 1);
-    ares.postProcesses.ocean = null;
-
-    ares.postProcesses.clouds?.dispose();
-    scene.spaceRenderingPipeline.clouds.splice(scene.spaceRenderingPipeline.clouds.indexOf(ares.postProcesses.clouds!), 1);
-    scene.surfaceRenderingPipeline.clouds.splice(scene.surfaceRenderingPipeline.clouds.indexOf(ares.postProcesses.clouds!), 1);
-    ares.postProcesses.clouds = null;
+    ares.postProcesses.ocean = false;
+    ares.postProcesses.clouds = false;
 
     ares.physicalProperties.mass = 7;
     ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;

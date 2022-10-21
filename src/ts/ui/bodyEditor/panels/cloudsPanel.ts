@@ -1,8 +1,5 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { Settings } from "../../../settings";
-import { Color3 } from "@babylonjs/core";
-import { Slider } from "handle-sliderjs";
 import { TelluricPlanet } from "../../../bodies/planets/telluricPlanet";
 
 export class CloudsPanel extends EditorPanel {
@@ -19,15 +16,15 @@ export class CloudsPanel extends EditorPanel {
         cloudsToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            flatClouds.settings.cloudLayerRadius = checkbox.checked ? Settings.EARTH_RADIUS + Settings.CLOUD_LAYER_HEIGHT : 0;
+            //flatClouds.settings.cloudLayerRadius = checkbox.checked ? Settings.EARTH_RADIUS + Settings.CLOUD_LAYER_HEIGHT : 0;
         });
         const cloudColorPicker = clearAllEventListenersById("cloudColor") as HTMLInputElement;
-        cloudColorPicker.value = flatClouds.settings.cloudColor.toHexString();
+        //cloudColorPicker.value = flatClouds.settings.cloudColor.toHexString();
         cloudColorPicker.addEventListener("input", () => {
-            flatClouds.settings.cloudColor = Color3.FromHexString(cloudColorPicker.value);
+            //flatClouds.settings.cloudColor = Color3.FromHexString(cloudColorPicker.value);
         });
         this.sliders = [
-            new Slider("cloudFrequency", document.getElementById("cloudFrequency") as HTMLElement, 0, 20, flatClouds.settings.cloudFrequency, (val: number) => {
+            /*new Slider("cloudFrequency", document.getElementById("cloudFrequency") as HTMLElement, 0, 20, flatClouds.settings.cloudFrequency, (val: number) => {
                 flatClouds.settings.cloudFrequency = val;
             }),
             new Slider("cloudDetailFrequency", document.getElementById("cloudDetailFrequency") as HTMLElement, 0, 50, flatClouds.settings.cloudDetailFrequency, (val: number) => {
@@ -44,7 +41,7 @@ export class CloudsPanel extends EditorPanel {
             }),
             new Slider("detailSpeed", document.getElementById("detailSpeed") as HTMLElement, 0, 200, flatClouds.settings.detailSpeed * 10000, (val: number) => {
                 flatClouds.settings.detailSpeed = val / 10000;
-            })
+            })*/
         ];
     }
 }

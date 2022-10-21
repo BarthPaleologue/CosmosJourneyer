@@ -6,9 +6,7 @@ import {
     ScenePerformancePriority,
     Texture
 } from "@babylonjs/core";
-import { SpaceRenderingPipeline } from "../postProcesses/pipelines/spaceRenderingPipeline";
-import { SurfaceRenderingPipeline } from "../postProcesses/pipelines/surfaceRenderingPipeline";
-import { AbstractRenderingPipeline } from "../postProcesses/pipelines/abstractRenderingPipeline";
+import { UberRenderingPipeline } from "../postProcesses/pipelines/uberRenderingPipeline";
 import { ChunkForge } from "../chunks/chunkForge";
 import { Settings } from "../settings";
 import { AbstractController } from "../controllers/abstractController";
@@ -19,9 +17,7 @@ import { isOrbiting } from "../utils/positionNearBody";
 export class UberScene extends Scene {
     activeController: AbstractController | null = null;
 
-    readonly spaceRenderingPipeline: SpaceRenderingPipeline;
-    readonly surfaceRenderingPipeline: SurfaceRenderingPipeline;
-    readonly pipelines: AbstractRenderingPipeline[];
+    readonly uberRenderingPipeline: UberRenderingPipeline;
 
     readonly colorCorrection: ColorCorrection;
     readonly fxaa: FxaaPostProcess;
@@ -34,13 +30,14 @@ export class UberScene extends Scene {
         super(engine);
         this.performancePriority = ScenePerformancePriority.Intermediate;
 
-        this.spaceRenderingPipeline = new SpaceRenderingPipeline("spaceRenderingPipeline", this);
-        this.surfaceRenderingPipeline = new SurfaceRenderingPipeline("surfaceRenderingPipeline", this);
-        this.pipelines = [this.spaceRenderingPipeline, this.surfaceRenderingPipeline];
+        this.uberRenderingPipeline = new UberRenderingPipeline("uberRenderingPipeline", this);
+        this.postProcessRenderPipelineManager.addPipeline(this.uberRenderingPipeline);
 
         this.colorCorrection = new ColorCorrection("colorCorrection", this);
-        //this.overlay = new OverlayPostProcess("overlay", this, this.starSystem);
         this.fxaa = new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, engine);
+
+        this.uberRenderingPipeline.colorCorrections.push(this.colorCorrection);
+        this.uberRenderingPipeline.fxaas.push(this.fxaa);
 
         this._chunkForge = new ChunkForge(nbVertices);
     }
@@ -53,6 +50,7 @@ export class UberScene extends Scene {
     public setActiveController(controller: AbstractController) {
         this.activeController = controller;
         this.activeCamera = controller.getActiveCamera();
+        this.uberRenderingPipeline.attachToCamera(controller.getActiveCamera());
         if (this.depthRenderer === null) {
             this.depthRenderer = this.enableDepthRenderer(null, false, true);
             this.customRenderTargets.push(this.depthRenderer.getDepthMap());
@@ -70,19 +68,11 @@ export class UberScene extends Scene {
     }
 
     public enableSurfaceRenderingPipeline() {
-        const activeCamera = this.getActiveUberCamera();
-        if (!this.surfaceRenderingPipeline.cameras.includes(activeCamera)) {
-            if (this.spaceRenderingPipeline.cameras.includes(activeCamera)) this.spaceRenderingPipeline.detachCamera(activeCamera);
-            this.surfaceRenderingPipeline.attachToCamera(activeCamera);
-        }
+        this.uberRenderingPipeline.setSurfaceOrder();
     }
 
     public enableSpaceRenderingPipeline() {
-        const activeCamera = this.getActiveUberCamera();
-        if (!this.spaceRenderingPipeline.cameras.includes(activeCamera)) {
-            if(this.surfaceRenderingPipeline.cameras.includes(activeCamera)) this.surfaceRenderingPipeline.detachCamera(activeCamera);
-            this.spaceRenderingPipeline.attachToCamera(activeCamera);
-        }
+        this.uberRenderingPipeline.setSpaceOrder();
     }
 
     public update() {
@@ -90,8 +80,7 @@ export class UberScene extends Scene {
 
         const nearestBody = this.getActiveController().getNearestBody();
 
-        this.spaceRenderingPipeline.setBody(this.getActiveController().getNearestBody());
-        this.surfaceRenderingPipeline.setBody(this.getActiveController().getNearestBody());
+        this.uberRenderingPipeline.setBody(this.getActiveController().getNearestBody());
 
         const switchLimit = nearestBody.postProcesses.rings?.settings.ringStart || 2;
         if (isOrbiting(this.getActiveController(), nearestBody, switchLimit)) {

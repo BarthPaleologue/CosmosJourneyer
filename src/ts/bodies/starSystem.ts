@@ -13,6 +13,9 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { BlackHole } from "./blackHole";
 import { BodyType } from "./interfaces";
 import { StarfieldPostProcess } from "../postProcesses/starfieldPostProcess";
+import { OceanPostProcess } from "../postProcesses/planetPostProcesses/oceanPostProcess";
+import { Settings } from "../settings";
+import { FlatCloudsPostProcess } from "../postProcesses/planetPostProcesses/flatCloudsPostProcess";
 
 enum Steps {
     GENERATE_STARS = 100,
@@ -191,10 +194,10 @@ export class StarSystem {
                         //TODO: add atmosphere postprocess to pipeline and disconnect the class
                     }
                     if(telluric.postProcesses.clouds) {
-                        //TODO: add clouds postprocess to pipeline and disconnect the class
+                        new FlatCloudsPostProcess(`${telluric.name}Clouds`, telluric, Settings.CLOUD_LAYER_HEIGHT, this.scene, this);
                     }
                     if(telluric.postProcesses.ocean) {
-                        //TODO: add ocean postprocess to pipeline and disconnect the class
+                        new OceanPostProcess(`${telluric.name}Ocean`, telluric, this.scene, this);
                     }
                     break;
                 case BodyType.GAZ:

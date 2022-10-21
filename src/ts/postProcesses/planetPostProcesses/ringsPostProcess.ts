@@ -28,7 +28,7 @@ export class RingsPostProcess extends UberPostProcess {
             ringEnd: randRange(2.1, 2.9, body.rng, 1410),
             ringFrequency: 30.0,
             ringOpacity: body.rng(1420)
-        }
+        };
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(body),
             ...getStarsUniforms(starSystem),
@@ -74,8 +74,6 @@ export class RingsPostProcess extends UberPostProcess {
 
         this.settings = settings;
 
-        for (const pipeline of scene.pipelines) {
-            pipeline.rings.push(this);
-        }
+        scene.uberRenderingPipeline.rings.push(this);
     }
 }

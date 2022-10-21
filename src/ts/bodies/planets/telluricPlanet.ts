@@ -15,8 +15,6 @@ import { TelluricMaterial } from "../../materials/telluricMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
-import { FlatCloudsPostProcess } from "../../postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import { OceanPostProcess } from "../../postProcesses/planetPostProcesses/oceanPostProcess";
 import { clamp } from "../../utils/gradientMath";
 import {
     AtmosphericScatteringPostProcess
@@ -103,8 +101,8 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         this.postProcesses = {
             overlay: new OverlayPostProcess(this.name, this, starSystem.scene),
             atmosphere: null,
-            ocean: null,
-            clouds: null,
+            ocean: false,
+            clouds: false,
             rings: null
         };
 
@@ -114,8 +112,8 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         if (pressure > epsilon) {
             if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
                 this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
-                this.postProcesses.ocean = new OceanPostProcess(`${this.name}Ocean`, this, starSystem.scene, this.starSystem);
-                this.postProcesses.clouds = new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystem.scene, this.starSystem);
+                this.postProcesses.ocean = true;
+                this.postProcesses.clouds = true;//new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystem.scene, this.starSystem);
             } else {
                 this.oceanLevel = 0;
             }

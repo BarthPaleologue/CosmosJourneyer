@@ -5,7 +5,6 @@ import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 import blackHoleFragment from "../../../shaders/blackhole.glsl";
 import { UberScene } from "../../core/uberScene";
 import { AbstractBody } from "../../bodies/abstractBody";
-import { StarSystem } from "../../bodies/starSystem";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "../uniforms";
 import { UberPostProcess } from "../uberPostProcess";
 
@@ -20,7 +19,7 @@ export interface BlackHoleSettings {
 export class BlackHolePostProcess extends UberPostProcess {
     settings: BlackHoleSettings;
 
-    constructor(name: string, planet: AbstractBody, scene: UberScene, starSystem: StarSystem) {
+    constructor(name: string, planet: AbstractBody, scene: UberScene) {
         const settings: BlackHoleSettings = {
             accretionDiskRadius: 8000e3,
             rotationPeriod: 1.5
@@ -33,7 +32,7 @@ export class BlackHolePostProcess extends UberPostProcess {
                 name: "time",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return this.internalTime % (settings.rotationPeriod*10000);
+                    return this.internalTime % (settings.rotationPeriod * 10000);
                 }
             },
             {
@@ -58,8 +57,7 @@ export class BlackHolePostProcess extends UberPostProcess {
 
         this.settings = settings;
 
-        for (const pipeline of scene.pipelines) {
-            pipeline.blackHoles.push(this);
-        }
+        scene.uberRenderingPipeline.blackHoles.push(this);
+
     }
 }

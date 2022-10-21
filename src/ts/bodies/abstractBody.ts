@@ -1,4 +1,4 @@
-import { Quaternion, Axis, Vector3 } from "@babylonjs/core";
+import { Quaternion, Axis, Vector3, PostProcess } from "@babylonjs/core";
 import { BodyType, ISeedable } from "./interfaces";
 import { AbstractController } from "../controllers/abstractController";
 import { StarSystem } from "./starSystem";
@@ -153,6 +153,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         for (const postprocessKey in this.postProcesses) {
             const postProcess = this.postProcesses[postprocessKey];
             if (postProcess == null) continue;
+            if (typeof (postProcess) == "boolean") continue; //FIXME: REMOVE WHEN POSTPROCESSES ARE DETACHED
             postProcess.update(deltaTime);
         }
     }

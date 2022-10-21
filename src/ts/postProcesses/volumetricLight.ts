@@ -13,9 +13,8 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess implem
         this.getCamera().detachPostProcess(this);
 
         // the volumetric light must be attached manually as it is not a custom post process
-        for (const pipeline of scene.pipelines) {
-            pipeline.volumetricLights.push(this);
-        }
+        scene.uberRenderingPipeline.volumetricLights.push(this);
+
     }
 
     public update(deltaTime: number): void {

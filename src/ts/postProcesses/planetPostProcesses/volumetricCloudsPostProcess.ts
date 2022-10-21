@@ -41,9 +41,7 @@ export class VolumetricCloudsPostProcess extends UberPostProcess {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
+        scene.uberRenderingPipeline.clouds.push(this);
 
-        for (const pipeline of scene.pipelines) {
-            pipeline.clouds.push(this);
-        }
     }
 }

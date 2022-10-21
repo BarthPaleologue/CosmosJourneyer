@@ -121,8 +121,7 @@ export class OceanPostProcess extends UberPostProcess {
 
         this.settings = settings;
 
-        for (const pipeline of scene.pipelines) {
-            pipeline.oceans.push(this);
-        }
+        scene.uberRenderingPipeline.oceans.push(this);
+
     }
 }

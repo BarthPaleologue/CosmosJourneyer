@@ -36,8 +36,7 @@ export class OverlayPostProcess extends UberPostProcess {
 
         super(name, shaderName, uniforms, samplers, scene);
 
-        for (const pipeline of scene.pipelines) {
-            pipeline.overlays.push(this);
-        }
+        scene.uberRenderingPipeline.overlays.push(this);
+
     }
 }
