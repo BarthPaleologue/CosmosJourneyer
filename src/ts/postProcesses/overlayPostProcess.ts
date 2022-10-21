@@ -35,8 +35,5 @@ export class OverlayPostProcess extends UberPostProcess {
         const samplers = getSamplers(scene);
 
         super(name, shaderName, uniforms, samplers, scene);
-
-        scene.uberRenderingPipeline.overlays.push(this);
-
     }
 }

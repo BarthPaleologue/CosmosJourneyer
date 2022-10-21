@@ -8,12 +8,8 @@ import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
 import { randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import {
-    AtmosphericScatteringPostProcess
-} from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
-import { OverlayPostProcess } from "../../postProcesses/overlayPostProcess";
 
 enum Steps {
     RADIUS = 1000,
@@ -68,14 +64,12 @@ export class GasPlanet extends AbstractBody {
         this.mesh.material = this.material;
 
         this.postProcesses = {
-            overlay: new OverlayPostProcess(name, this, starSystem.scene),
-            atmosphere: null,
-            rings: null
+            overlay: true,
+            atmosphere: true,
+            rings: false
         };
 
-        this.postProcesses.atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene, this.starSystem);
-
-        if (uniformRandBool(0.8, this.rng, Steps.RINGS)) this.createRings();
+        if (uniformRandBool(0.8, this.rng, Steps.RINGS)) this.postProcesses.rings = true;
     }
 
     updateGraphics(controller: AbstractController, deltaTime: number) {

@@ -11,8 +11,6 @@ import { normalRandom, randRange, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/gradientMath";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { Settings } from "../../settings";
-import { VolumetricLight } from "../../postProcesses/volumetricLight";
-import { OverlayPostProcess } from "../../postProcesses/overlayPostProcess";
 
 enum Steps {
     RADIUS = 1000,
@@ -23,7 +21,7 @@ enum Steps {
 export class Star extends AbstractBody {
     static RING_PROPORTION = 0.2;
 
-    private readonly mesh: Mesh;
+    readonly mesh: Mesh;
     private readonly material: StarMaterial;
 
     internalTime = 0;
@@ -75,12 +73,12 @@ export class Star extends AbstractBody {
         this.node.rotationQuaternion = Quaternion.Identity();
 
         this.postProcesses = {
-            overlay: new OverlayPostProcess(name, this, starSystemManager.scene),
-            volumetricLight: new VolumetricLight(this, this.mesh, this.starSystem.scene),
-            rings: null
+            overlay: true,
+            volumetricLight: true,
+            rings: false
         };
 
-        if (uniformRandBool(Star.RING_PROPORTION, this.rng, Steps.RINGS)) this.createRings();
+        if (uniformRandBool(Star.RING_PROPORTION, this.rng, Steps.RINGS)) this.postProcesses.rings = true;
     }
 
     public override updateTransform(player: AbstractController, deltaTime: number): void {

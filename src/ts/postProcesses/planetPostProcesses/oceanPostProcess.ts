@@ -120,8 +120,5 @@ export class OceanPostProcess extends UberPostProcess {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
-
-        scene.uberRenderingPipeline.oceans.push(this);
-
     }
 }

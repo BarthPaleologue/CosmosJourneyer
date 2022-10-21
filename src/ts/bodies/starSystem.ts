@@ -16,6 +16,13 @@ import { StarfieldPostProcess } from "../postProcesses/starfieldPostProcess";
 import { OceanPostProcess } from "../postProcesses/planetPostProcesses/oceanPostProcess";
 import { Settings } from "../settings";
 import { FlatCloudsPostProcess } from "../postProcesses/planetPostProcesses/flatCloudsPostProcess";
+import {
+    AtmosphericScatteringPostProcess
+} from "../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
+import { VolumetricLight } from "../postProcesses/volumetricLight";
+import { BlackHolePostProcess } from "../postProcesses/planetPostProcesses/blackHolePostProcess";
+import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
+import { OverlayPostProcess } from "../postProcesses/overlayPostProcess";
 
 enum Steps {
     GENERATE_STARS = 100,
@@ -176,40 +183,40 @@ export class StarSystem {
     public initPostProcesses() {
         for (const body of this.bodies) {
             if (body.postProcesses.rings) {
-                //TODO: add rings postprocess to pipeline and disconnect the class
+                this.scene.uberRenderingPipeline.rings.push(new RingsPostProcess(`${body.name}Rings`, body, this.scene, this));
             }
             if (body.postProcesses.overlay) {
-                //TODO: add overlay postprocess to pipeline and disconnect the class
+                this.scene.uberRenderingPipeline.overlays.push(new OverlayPostProcess(body.name, body, this.scene));
             }
             switch (body.bodyType) {
                 case BodyType.STAR:
                     const star = body as Star;
                     if(star.postProcesses.volumetricLight) {
-                        //TODO: add volumetric light postprocess to pipeline and disconnect the class
+                        this.scene.uberRenderingPipeline.volumetricLights.push(new VolumetricLight(star, star.mesh, this.scene));
                     }
                     break;
                 case BodyType.TELLURIC:
                     const telluric = body as TelluricPlanet;
                     if(telluric.postProcesses.atmosphere) {
-                        //TODO: add atmosphere postprocess to pipeline and disconnect the class
+                        this.scene.uberRenderingPipeline.atmospheres.push(new AtmosphericScatteringPostProcess(`${telluric.name}Atmosphere`, telluric, Settings.ATMOSPHERE_HEIGHT, this.scene, this));
                     }
                     if(telluric.postProcesses.clouds) {
-                        new FlatCloudsPostProcess(`${telluric.name}Clouds`, telluric, Settings.CLOUD_LAYER_HEIGHT, this.scene, this);
+                        this.scene.uberRenderingPipeline.clouds.push(new FlatCloudsPostProcess(`${telluric.name}Clouds`, telluric, Settings.CLOUD_LAYER_HEIGHT, this.scene, this));
                     }
                     if(telluric.postProcesses.ocean) {
-                        new OceanPostProcess(`${telluric.name}Ocean`, telluric, this.scene, this);
+                        this.scene.uberRenderingPipeline.oceans.push(new OceanPostProcess(`${telluric.name}Ocean`, telluric, this.scene, this));
                     }
                     break;
                 case BodyType.GAZ:
                     const gas = body as GasPlanet;
                     if(gas.postProcesses.atmosphere) {
-                        //TODO: add atmosphere postprocess to pipeline and disconnect the class
+                        this.scene.uberRenderingPipeline.atmospheres.push(new AtmosphericScatteringPostProcess(`${gas.name}Atmosphere`, gas, Settings.ATMOSPHERE_HEIGHT, this.scene, this));
                     }
                     break;
                 case BodyType.BLACK_HOLE:
                     const blackHole = body as BlackHole;
                     if(blackHole.postProcesses.blackHole) {
-                        //TODO: add black hole postprocess to pipeline and disconnect the class
+                        this.scene.uberRenderingPipeline.blackHoles.push(new BlackHolePostProcess("BH", blackHole, this.scene));
                     }
                     break;
                 default:

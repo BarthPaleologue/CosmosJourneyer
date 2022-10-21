@@ -73,7 +73,5 @@ export class RingsPostProcess extends UberPostProcess {
         super(name, shaderName, uniforms, getSamplers(scene), scene);
 
         this.settings = settings;
-
-        scene.uberRenderingPipeline.rings.push(this);
     }
 }

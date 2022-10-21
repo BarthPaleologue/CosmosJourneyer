@@ -9,6 +9,7 @@ import { UberScene } from "../core/uberScene";
 import { StarSystem } from "../bodies/starSystem";
 import { getActiveCameraUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { UberPostProcess } from "./uberPostProcess";
+import { Settings } from "../settings";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -43,7 +44,8 @@ export class StarfieldPostProcess extends UberPostProcess {
                         const planet = scene.getActiveController().getNearestBody() as TelluricPlanet;
                         if (planet.postProcesses.atmosphere != null) {
                             const height = planet.getAbsolutePosition().length();
-                            const maxHeight = planet.postProcesses.atmosphere.settings.atmosphereRadius;
+                            //FIXME: has to be dynamic
+                            const maxHeight = Settings.ATMOSPHERE_HEIGHT;//planet.postProcesses.atmosphere.settings.atmosphereRadius;
                             for (const star of starSystem.stars) {
                                 const sunDir = planet.getAbsolutePosition().subtract(star.getAbsolutePosition()).normalize();
                                 vis2 = Math.min(vis2, (height / maxHeight) ** 32 + Math.max(Vector3.Dot(sunDir, planet.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5);

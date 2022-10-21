@@ -82,7 +82,7 @@ export class UberScene extends Scene {
 
         this.uberRenderingPipeline.setBody(this.getActiveController().getNearestBody());
 
-        const switchLimit = nearestBody.postProcesses.rings?.settings.ringStart || 2;
+        const switchLimit = 2;//nearestBody.postProcesses.rings?.settings.ringStart || 2;
         if (isOrbiting(this.getActiveController(), nearestBody, switchLimit)) {
             this.enableSurfaceRenderingPipeline();
         } else {

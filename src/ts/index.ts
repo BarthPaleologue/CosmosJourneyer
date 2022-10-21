@@ -124,10 +124,10 @@ Assets.Init(scene).then(() => {
 
     ares.material.updateConstants();
 
-    const aresAtmosphere = ares.postProcesses.atmosphere as AtmosphericScatteringPostProcess;
+    /*const aresAtmosphere = ares.postProcesses.atmosphere as AtmosphericScatteringPostProcess;
     aresAtmosphere.settings.redWaveLength = 500;
     aresAtmosphere.settings.greenWaveLength = 680;
-    aresAtmosphere.settings.blueWaveLength = 670;
+    aresAtmosphere.settings.blueWaveLength = 670;*/
 
     const andromaque = new GasPlanet("Andromaque", starSystem, 0.28711440474126226, [sun]);
     andromaque.orbitalProperties = {

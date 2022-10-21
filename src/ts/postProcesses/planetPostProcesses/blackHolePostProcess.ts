@@ -56,8 +56,5 @@ export class BlackHolePostProcess extends UberPostProcess {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
-
-        scene.uberRenderingPipeline.blackHoles.push(this);
-
     }
 }

@@ -1,4 +1,4 @@
-import { Quaternion, Axis, Vector3, PostProcess } from "@babylonjs/core";
+import { Quaternion, Axis, Vector3 } from "@babylonjs/core";
 import { BodyType, ISeedable } from "./interfaces";
 import { AbstractController } from "../controllers/abstractController";
 import { StarSystem } from "./starSystem";
@@ -6,9 +6,8 @@ import { PhysicalProperties } from "./physicalProperties";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../orbits/kepler";
-import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
-import { normalRandom, randRange } from "extended-random";
+import { normalRandom } from "extended-random";
 import { BasicTransform } from "../core/transforms/basicTransform";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { isOrbiting } from "../utils/positionNearBody";
@@ -113,11 +112,6 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         return this.node.up;
     }
 
-    public createRings(): RingsPostProcess {
-        this.postProcesses.rings = new RingsPostProcess(`${this.name}Rings`, this, this.starSystem.scene, this.starSystem);
-        return this.postProcesses.rings;
-    }
-
     /**
      * Updates the state of the celestial body for a given time step of deltaTime
      * @param player the player in the simulation
@@ -150,11 +144,6 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
     }
 
     public updateGraphics(controller: AbstractController, deltaTime: number): void {
-        for (const postprocessKey in this.postProcesses) {
-            const postProcess = this.postProcesses[postprocessKey];
-            if (postProcess == null) continue;
-            if (typeof (postProcess) == "boolean") continue; //FIXME: REMOVE WHEN POSTPROCESSES ARE DETACHED
-            postProcess.update(deltaTime);
-        }
+        //TODO: find a way to update postprocesses => probably not here though
     }
 }

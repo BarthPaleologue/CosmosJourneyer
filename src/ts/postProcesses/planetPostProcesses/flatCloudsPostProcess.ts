@@ -148,8 +148,5 @@ export class FlatCloudsPostProcess extends UberPostProcess {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
-
-        scene.uberRenderingPipeline.clouds.push(this);
-
     }
 }

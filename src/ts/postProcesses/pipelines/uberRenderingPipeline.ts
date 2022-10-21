@@ -2,10 +2,6 @@ import { Camera, Engine, PostProcess, PostProcessRenderEffect, PostProcessRender
 import { UberScene } from "../../core/uberScene";
 import { AbstractBody } from "../../bodies/abstractBody";
 import { VolumetricLight } from "../volumetricLight";
-import { BodyType } from "../../bodies/interfaces";
-import { Star } from "../../bodies/stars/star";
-import { BlackHole } from "../../bodies/blackHole";
-import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
 
 export enum PostProcessType {
     VOLUMETRIC_LIGHT,
@@ -87,17 +83,17 @@ export class UberRenderingPipeline extends PostProcessRenderPipeline {
         const bodyType = this.getCurrentBody().bodyType;
         let otherVolumetricLights = this.volumetricLights;
         let bodyVolumetricLight: VolumetricLight | null = null;
-        if (bodyType == BodyType.STAR) {
+        /*if (bodyType == BodyType.STAR) {
             otherVolumetricLights = this.volumetricLights.filter((volumetricLight) => volumetricLight !== (this.getCurrentBody() as Star).postProcesses.volumetricLight);
             bodyVolumetricLight = (this.getCurrentBody() as Star).postProcesses.volumetricLight;
-        }
+        }*/
 
         let otherBlackHoles = this.blackHoles;
         let bodyBlackHole: PostProcess | null = null;
-        if (bodyType == BodyType.BLACK_HOLE) {
+        /*if (bodyType == BodyType.BLACK_HOLE) {
             otherBlackHoles = this.blackHoles.filter((blackHole) => blackHole !== (this.getCurrentBody() as BlackHole).postProcesses.blackHole);
             bodyBlackHole = (this.getCurrentBody() as BlackHole).postProcesses.blackHole;
-        }
+        }*/
 
         let otherOceans = this.oceans;
         let bodyOcean: PostProcess | null = null;
@@ -115,17 +111,17 @@ export class UberRenderingPipeline extends PostProcessRenderPipeline {
 
         let otherAtmospheres = this.atmospheres;
         let bodyAtmosphere: PostProcess | null = null;
-        if ((bodyType == BodyType.TELLURIC || bodyType == BodyType.GAZ) && (this.getCurrentBody() as TelluricPlanet).postProcesses.atmosphere) {
+        /*if ((bodyType == BodyType.TELLURIC || bodyType == BodyType.GAZ) && (this.getCurrentBody() as TelluricPlanet).postProcesses.atmosphere) {
             otherAtmospheres = this.atmospheres.filter((atmosphere) => atmosphere !== (this.getCurrentBody() as TelluricPlanet).postProcesses.atmosphere);
             bodyAtmosphere = (this.getCurrentBody() as TelluricPlanet).postProcesses.atmosphere as PostProcess;
-        }
+        }*/
 
         let otherRings = this.rings;
         let bodyRings: PostProcess | null = null;
-        if (this.getCurrentBody().postProcesses.rings) {
+        /*if (this.getCurrentBody().postProcesses.rings) {
             otherRings = this.rings.filter((ring) => ring != this.getCurrentBody().postProcesses.rings);
             bodyRings = this.getCurrentBody().postProcesses.rings;
-        }
+        }*/
 
         const otherVolumetricLightsRenderEffect = new PostProcessRenderEffect(this.engine, "otherVolumetricLightsRenderEffect", () => {
             return otherVolumetricLights;

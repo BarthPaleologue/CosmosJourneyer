@@ -16,12 +16,8 @@ import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { clamp } from "../../utils/gradientMath";
-import {
-    AtmosphericScatteringPostProcess
-} from "../../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
-import { OverlayPostProcess } from "../../postProcesses/overlayPostProcess";
 
 enum Steps {
     RADIUS = 1000,
@@ -99,11 +95,11 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         };
 
         this.postProcesses = {
-            overlay: new OverlayPostProcess(this.name, this, starSystem.scene),
-            atmosphere: null,
+            overlay: true,
+            atmosphere: false,
             ocean: false,
             clouds: false,
-            rings: null
+            rings: false
         };
 
         const waterBoilingPoint = waterBoilingPointCelsius(this.physicalProperties.pressure);
@@ -117,13 +113,13 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             } else {
                 this.oceanLevel = 0;
             }
-            this.postProcesses.atmosphere = new AtmosphericScatteringPostProcess(`${this.name}Atmosphere`, this, Settings.ATMOSPHERE_HEIGHT, this.starSystem.scene, this.starSystem);
+            this.postProcesses.atmosphere = true;
         } else {
             this.oceanLevel = 0;
         }
 
         if (uniformRandBool(0.6, this.rng, Steps.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
-            this.createRings();
+            this.postProcesses.rings = true;
         }
 
         const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.rng, Steps.TERRAIN), 0, 0.95);

@@ -1,19 +1,11 @@
-import { AtmosphericScatteringPostProcess } from "../postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
-import { FlatCloudsPostProcess } from "../postProcesses/planetPostProcesses/flatCloudsPostProcess";
-import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
-import { VolumetricLight } from "../postProcesses/volumetricLight";
-import { IPostProcess } from "../postProcesses/iPostProcess";
-import { BlackHolePostProcess } from "../postProcesses/planetPostProcesses/blackHolePostProcess";
-import { OverlayPostProcess } from "../postProcesses/overlayPostProcess";
-
 export type BodyPostProcesses = {
-    [details: string]: IPostProcess | boolean | null;
-    rings: RingsPostProcess | null;
-    overlay: OverlayPostProcess | null;
+    [details: string]: boolean;
+    rings: boolean;
+    overlay: boolean;
 };
 
 export type PlanetPostProcesses = BodyPostProcesses & {
-    atmosphere: AtmosphericScatteringPostProcess | null;
+    atmosphere: boolean;
 };
 
 export type TelluricPlanetPostProcesses = PlanetPostProcesses & {
@@ -22,9 +14,9 @@ export type TelluricPlanetPostProcesses = PlanetPostProcesses & {
 };
 
 export type StarPostProcesses = BodyPostProcesses & {
-    volumetricLight: VolumetricLight;
+    volumetricLight: boolean;
 };
 
 export type BlackHolePostProcesses = BodyPostProcesses & {
-    blackHole: BlackHolePostProcess;
+    blackHole: boolean;
 };

@@ -1,7 +1,5 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { Settings } from "../../../settings";
-import { Slider } from "handle-sliderjs";
 import { Planet } from "../../../bodies/planets/planet";
 
 export class AtmospherePanel extends EditorPanel {
@@ -18,10 +16,10 @@ export class AtmospherePanel extends EditorPanel {
         atmosphereToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            atmosphere.settings.atmosphereRadius = checkbox.checked ? Settings.EARTH_RADIUS + Settings.ATMOSPHERE_HEIGHT : 0;
+            //atmosphere.settings.atmosphereRadius = checkbox.checked ? Settings.EARTH_RADIUS + Settings.ATMOSPHERE_HEIGHT : 0;
         });
         this.sliders = [
-            new Slider("intensity", document.getElementById("intensity") as HTMLElement, 0, 40, atmosphere.settings.intensity, (val: number) => {
+            /*new Slider("intensity", document.getElementById("intensity") as HTMLElement, 0, 40, atmosphere.settings.intensity, (val: number) => {
                 atmosphere.settings.intensity = val;
             }),
             new Slider("density", document.getElementById("density") as HTMLElement, 0, 40, atmosphere.settings.densityModifier * 10, (val: number) => {
@@ -57,7 +55,7 @@ export class AtmospherePanel extends EditorPanel {
             }),
             new Slider("mieHaloRadius", document.getElementById("mieHaloRadius") as HTMLElement, 0, 200, atmosphere.settings.mieHaloRadius * 100, (val: number) => {
                 atmosphere.settings.mieHaloRadius = val / 100;
-            })
+            })*/
         ];
     }
 }
