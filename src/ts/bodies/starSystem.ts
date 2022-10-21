@@ -23,6 +23,7 @@ import { VolumetricLight } from "../postProcesses/volumetricLight";
 import { BlackHolePostProcess } from "../postProcesses/planetPostProcesses/blackHolePostProcess";
 import { RingsPostProcess } from "../postProcesses/planetPostProcesses/ringsPostProcess";
 import { OverlayPostProcess } from "../postProcesses/overlayPostProcess";
+import { PostProcessManager } from "../postProcesses/pipelines/postProcessManager";
 
 enum Steps {
     GENERATE_STARS = 100,
@@ -32,6 +33,9 @@ enum Steps {
 
 export class StarSystem {
     readonly scene: UberScene;
+
+    readonly postProcessManager: PostProcessManager;
+
     private readonly bodies: AbstractBody[] = [];
 
     readonly stars: (Star | BlackHole)[] = [];
@@ -44,6 +48,8 @@ export class StarSystem {
 
     constructor(seed: number, scene: UberScene) {
         this.scene = scene;
+        this.postProcessManager = new PostProcessManager(this.scene);
+
         this.rng = seededSquirrelNoise(seed * Number.MAX_SAFE_INTEGER);
 
         new StarfieldPostProcess("starfield", scene, this);
