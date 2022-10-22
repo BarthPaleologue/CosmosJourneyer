@@ -1,6 +1,5 @@
-import { Vector3 } from "@babylonjs/core";
+import { Quaternion, Vector3 } from "@babylonjs/core";
 import { Direction, getQuaternionFromDirection } from "./direction";
-import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 
 /**
  * Returns the node position in plane space
@@ -50,23 +49,22 @@ export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: nu
  * @param planet
  * @returns the position in planet space
  */
-export function getChunkSphereSpacePositionFromPath(path: number[], direction: Direction, planet: TelluricPlanet): Vector3 {
+export function getChunkSphereSpacePositionFromPath(path: number[], direction: Direction, planetRadius: number, planetRotationQuaternion: Quaternion): Vector3 {
     // FIXME: fix documentation
     // on récupère la position dans le plan
-    const position = getChunkPlaneSpacePositionFromPath(planet.getDiameter(), path);
+    const position = getChunkPlaneSpacePositionFromPath(2 * planetRadius, path);
 
     // on l'offset pour préparer à récupérer la position dans le cube
-    position.addInPlace(new Vector3(0, 0, -planet.getRadius()));
+    position.addInPlace(new Vector3(0, 0, -planetRadius));
 
     const rotationQuaternion = getQuaternionFromDirection(direction);
     position.applyRotationQuaternionInPlace(rotationQuaternion);
 
     // on projette cette position sur la sphère
-    position.normalize();
-    position.scaleInPlace(planet.getRadius());
+    position.normalize().scaleInPlace(planetRadius);
 
     // on match cette position avec la rotation de la planète
-    position.applyRotationQuaternionInPlace(planet.getRotationQuaternion());
+    position.applyRotationQuaternionInPlace(planetRotationQuaternion);
 
     return position;
 }

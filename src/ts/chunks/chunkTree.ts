@@ -1,13 +1,14 @@
-import { Vector3 } from "@babylonjs/core";
+import { Material, Vector3 } from "@babylonjs/core";
 
 import { PlanetChunk } from "./planetChunk";
 import { Direction } from "../utils/direction";
 import { ChunkForge } from "./chunkForge";
-import { DeleteTask, TaskType } from "./taskTypes";
+import { BuildTask, DeleteTask, TaskType } from "./taskTypes";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { rayIntersectSphere } from "../utils/gradientMath";
 import { Settings } from "../settings";
 import { getChunkSphereSpacePositionFromPath } from "../utils/chunkUtils";
+import { BasicTransform } from "../core/transforms/basicTransform";
 
 /**
  * A quadTree is defined recursively
@@ -31,6 +32,10 @@ export class ChunkTree {
 
     readonly planet: TelluricPlanet;
 
+    readonly parent: BasicTransform;
+
+    readonly material: Material;
+
     /**
      *
      * @param direction
@@ -49,7 +54,11 @@ export class ChunkTree {
 
         this.direction = direction;
 
+        this.parent = planet;
+
         this.planet = planet;
+
+        this.material = planet.material;
     }
 
     /**
@@ -96,7 +105,7 @@ export class ChunkTree {
      * @returns The updated tree
      */
     private updateLODRecursively(observerPositionW: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
-        const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.planet);
+        const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, this.parent.getRotationQuaternion());
         const nodePositionW = nodeRelativePosition.add(this.planet.getAbsolutePosition());
 
         const direction = nodePositionW.subtract(observerPositionW);
@@ -159,7 +168,24 @@ export class ChunkTree {
      * @returns The new Chunk
      */
     private createChunk(path: number[], isFiner: boolean): PlanetChunk {
-        return new PlanetChunk(path, this.direction, this.chunkForge, this, isFiner);
+        const chunk = new PlanetChunk(path, this.direction, this.parent, this.material, this.rootChunkLength, this.minDepth == path.length, isFiner);
+
+        const buildTask: BuildTask = {
+            type: TaskType.Build,
+            planetName: this.planet.name,
+            planetSeed: this.planet.seed,
+            planetDiameter: this.planet.getDiameter(),
+            terrainSettings: this.planet.terrainSettings,
+            position: chunk.cubePosition,
+            depth: path.length,
+            direction: this.direction,
+            chunk: chunk,
+            isFiner: isFiner
+        };
+
+        this.chunkForge.addTask(buildTask);
+
+        return chunk;
     }
 
     /**

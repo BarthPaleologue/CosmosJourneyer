@@ -1,7 +1,7 @@
-import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { Direction } from "../utils/direction";
 import { Vector3, VertexData } from "@babylonjs/core";
 import { PlanetChunk } from "./planetChunk";
+import { TerrainSettings } from "../terrain/terrainSettings";
 
 export enum TaskType {
     Deletion,
@@ -17,7 +17,10 @@ export type Task = {
 };
 
 export type BuildTask = Task & {
-    planet: TelluricPlanet;
+    planetName: string;
+    planetSeed: number;
+    planetDiameter: number;
+    terrainSettings: TerrainSettings;
     depth: number;
     direction: Direction;
     position: Vector3;
@@ -25,7 +28,6 @@ export type BuildTask = Task & {
 
 export type ApplyTask = Task & {
     vertexData: VertexData;
-    planet: TelluricPlanet;
     callbackTasks: DeleteTask[];
 };
 

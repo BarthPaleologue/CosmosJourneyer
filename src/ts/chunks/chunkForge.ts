@@ -52,14 +52,14 @@ export class ChunkForge {
 
         const buildData: BuildData = {
             taskType: TaskType.Build,
-            planetName: task.planet.name,
-            planetDiameter: task.planet.getDiameter(),
+            planetName: task.planetName,
+            planetDiameter: task.planetDiameter,
             nbVerticesPerSide: this.nbVerticesPerSide,
             depth: task.depth,
             direction: task.direction,
             position: [task.position.x, task.position.y, task.position.z],
-            terrainSettings: task.planet.terrainSettings,
-            seed: task.planet.seed
+            terrainSettings: task.terrainSettings,
+            seed: task.planetSeed
         };
 
         worker.postMessage(buildData);
@@ -77,7 +77,6 @@ export class ChunkForge {
                 vertexData: vertexData,
                 chunk: task.chunk,
                 callbackTasks: callbackTasks,
-                planet: task.planet,
                 isFiner: task.isFiner
             };
             this.applyTasks.push(applyTask);
@@ -127,8 +126,9 @@ export class ChunkForge {
             const task = this.applyTasks.shift()!;
             task.vertexData.applyToMesh(task.chunk.mesh, false);
             task.chunk.mesh.freezeNormals();
+            task.chunk.mesh.refreshBoundingInfo(true);
 
-            if (task.chunk.depth == task.chunk.tree.minDepth) task.chunk.setReady(true);
+            if (task.chunk.isMinDepth) task.chunk.setReady(true);
 
             this.trashCan.push(task.callbackTasks);
         }
