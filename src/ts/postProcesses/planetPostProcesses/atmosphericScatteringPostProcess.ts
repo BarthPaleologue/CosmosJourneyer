@@ -30,6 +30,7 @@ export interface AtmosphereSettings {
 
 export class AtmosphericScatteringPostProcess extends UberPostProcess {
     settings: AtmosphereSettings;
+    planet: TelluricPlanet | GasPlanet;
 
     constructor(name: string, planet: (TelluricPlanet | GasPlanet), atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: AtmosphereSettings = {
@@ -126,5 +127,6 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
+        this.planet = planet;
     }
 }

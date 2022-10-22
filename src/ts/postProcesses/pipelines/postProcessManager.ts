@@ -17,6 +17,7 @@ import { VolumetricLight } from "../volumetricLight";
 import { BlackHolePostProcess } from "../planetPostProcesses/blackHolePostProcess";
 import { ColorCorrection } from "../colorCorrection";
 import { GasPlanet } from "../../bodies/planets/gasPlanet";
+import { BodyType } from "../../bodies/interfaces";
 
 export enum PostProcessType {
     VOLUMETRIC_LIGHT,
@@ -38,7 +39,7 @@ export class PostProcessManager {
         PostProcessType.CLOUDS,
         PostProcessType.ATMOSPHERE,
         PostProcessType.RING,
-        PostProcessType.BLACK_HOLE,
+        PostProcessType.BLACK_HOLE
     ];
 
     private currentBody: AbstractBody | null = null;
@@ -96,6 +97,14 @@ export class PostProcessManager {
         this.atmospheres.push(new AtmosphericScatteringPostProcess(`${planet.name}Atmosphere`, planet, Settings.ATMOSPHERE_HEIGHT, this.scene, stars));
     }
 
+    public getAtmosphere(planet: (GasPlanet | TelluricPlanet)): AtmosphericScatteringPostProcess {
+        for (const atmosphere of this.atmospheres) {
+            if (atmosphere.planet === planet) return atmosphere;
+
+        }
+        throw new Error("No atmosphere found for: " + planet.name);
+    }
+
     public addRings(body: AbstractBody, stars: (Star | BlackHole)[]) {
         this.rings.push(new RingsPostProcess(`${body.name}Rings`, body, this.scene, stars));
     }
@@ -114,6 +123,33 @@ export class PostProcessManager {
 
     public addBlackHole(blackHole: BlackHole) {
         this.blackHoles.push(new BlackHolePostProcess(blackHole.name, blackHole, this.scene));
+    }
+
+    public addBody(body: AbstractBody, stars: (Star | BlackHole)[]) {
+        if (body.postProcesses.rings) this.addRings(body, stars);
+        if (body.postProcesses.overlay) this.addOverlay(body);
+        switch (body.bodyType) {
+            case BodyType.STAR:
+                const star = body as Star;
+                if (star.postProcesses.volumetricLight) this.addVolumetricLight(star);
+                break;
+            case BodyType.TELLURIC:
+                const telluric = body as TelluricPlanet;
+                if (telluric.postProcesses.atmosphere) this.addAtmosphere(telluric, stars);
+                if (telluric.postProcesses.clouds) this.addClouds(telluric, stars);
+                if (telluric.postProcesses.ocean) this.addOcean(telluric, stars);
+                break;
+            case BodyType.GAZ:
+                const gas = body as GasPlanet;
+                if (gas.postProcesses.atmosphere) this.addAtmosphere(gas, stars);
+                break;
+            case BodyType.BLACK_HOLE:
+                const blackHole = body as BlackHole;
+                if (blackHole.postProcesses.blackHole) this.addBlackHole(blackHole);
+                break;
+            default:
+                throw new Error(`Unknown body type : ${body.bodyType}`);
+        }
     }
 
     private getCurrentBody(): AbstractBody {
@@ -135,14 +171,14 @@ export class PostProcessManager {
     }
 
     public setOrder(order: PostProcessType[]) {
-        let sameOrder=true;
-        for(let i=0;i<order.length;i++){
-            if(order[i]!=this.renderingOrder[i]){
-                sameOrder=false;
+        let sameOrder = true;
+        for (let i = 0; i < order.length; i++) {
+            if (order[i] != this.renderingOrder[i]) {
+                sameOrder = false;
                 break;
             }
         }
-        if(sameOrder) return;
+        if (sameOrder) return;
 
         this.renderingOrder = order;
         this.uberRenderingPipeline._reset();
@@ -162,7 +198,7 @@ export class PostProcessManager {
             PostProcessType.CLOUDS,
             PostProcessType.ATMOSPHERE,
             PostProcessType.RING,
-            PostProcessType.BLACK_HOLE,
+            PostProcessType.BLACK_HOLE
         ]);
     }
 
@@ -334,11 +370,11 @@ export class PostProcessManager {
     }
 
     public update(deltaTime: number) {
-        for(const ring of this.rings) ring.update(deltaTime);
-        for(const volumetricLight of this.volumetricLights) volumetricLight.update(deltaTime);
-        for(const atmosphere of this.atmospheres) atmosphere.update(deltaTime);
-        for(const clouds of this.clouds) clouds.update(deltaTime);
-        for(const oceans of this.oceans) oceans.update(deltaTime);
-        for(const blackhole of this.blackHoles) blackhole.update(deltaTime);
+        for (const ring of this.rings) ring.update(deltaTime);
+        for (const volumetricLight of this.volumetricLights) volumetricLight.update(deltaTime);
+        for (const atmosphere of this.atmospheres) atmosphere.update(deltaTime);
+        for (const clouds of this.clouds) clouds.update(deltaTime);
+        for (const oceans of this.oceans) oceans.update(deltaTime);
+        for (const blackhole of this.blackHoles) blackhole.update(deltaTime);
     }
 }

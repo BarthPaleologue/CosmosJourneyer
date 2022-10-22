@@ -205,33 +205,7 @@ export class StarSystem {
 
     public initPostProcesses() {
         this.postProcessManager.addStarField(this.stars, this.bodies);
-
-        for (const body of this.bodies) {
-            if (body.postProcesses.rings) this.postProcessManager.addRings(body, this.stars);
-            if (body.postProcesses.overlay) this.postProcessManager.addOverlay(body);
-            switch (body.bodyType) {
-                case BodyType.STAR:
-                    const star = body as Star;
-                    if (star.postProcesses.volumetricLight) this.postProcessManager.addVolumetricLight(star);
-                    break;
-                case BodyType.TELLURIC:
-                    const telluric = body as TelluricPlanet;
-                    if (telluric.postProcesses.atmosphere) this.postProcessManager.addAtmosphere(telluric, this.stars);
-                    if (telluric.postProcesses.clouds) this.postProcessManager.addClouds(telluric, this.stars);
-                    if (telluric.postProcesses.ocean) this.postProcessManager.addOcean(telluric, this.stars);
-                    break;
-                case BodyType.GAZ:
-                    const gas = body as GasPlanet;
-                    if (gas.postProcesses.atmosphere) this.postProcessManager.addAtmosphere(gas, this.stars);
-                    break;
-                case BodyType.BLACK_HOLE:
-                    const blackHole = body as BlackHole;
-                    if (blackHole.postProcesses.blackHole) this.postProcessManager.addBlackHole(blackHole);
-                    break;
-                default:
-                    throw new Error(`Unknown body type : ${body.bodyType}`);
-            }
-        }
+        for(const body of this.bodies) this.postProcessManager.addBody(body, this.stars);
         this.postProcessManager.setBody(nearestBody(this.scene.getActiveController().transform, this.bodies));
         this.postProcessManager.init();
     }

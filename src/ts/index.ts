@@ -1,7 +1,6 @@
 import { Color3, Quaternion, Tools } from "@babylonjs/core";
 
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
-import { Star } from "./bodies/stars/star";
 
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
@@ -17,8 +16,6 @@ import { BodyType } from "./bodies/interfaces";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor/bodyEditor";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
-import { GasPlanet } from "./bodies/planets/gasPlanet";
-import { AtmosphericScatteringPostProcess } from "./postProcesses/planetPostProcesses/atmosphericScatteringPostProcess";
 import { HelmetOverlay } from "./ui/helmetOverlay";
 import { PlayerController } from "./controllers/playerController";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
@@ -125,11 +122,6 @@ Assets.Init(scene).then(() => {
 
     ares.material.updateConstants();
 
-    /*const aresAtmosphere = ares.postProcesses.atmosphere as AtmosphericScatteringPostProcess;
-    aresAtmosphere.settings.redWaveLength = 500;
-    aresAtmosphere.settings.greenWaveLength = 680;
-    aresAtmosphere.settings.blueWaveLength = 670;*/
-
     const andromaque = starSystem.makeGasPlanet(0.28711440474126226);
     andromaque.orbitalProperties = {
         period: 60 * 60 * 24 * 365.29,
@@ -140,8 +132,12 @@ Assets.Init(scene).then(() => {
 
     const collisionWorker = new CollisionWorker(player, starSystem);
 
-    // update to current date
     starSystem.init();
+
+    const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
+    aresAtmosphere.settings.redWaveLength = 500;
+    aresAtmosphere.settings.greenWaveLength = 680;
+    aresAtmosphere.settings.blueWaveLength = 670;
 
     positionNearBody(player, planet, starSystem);
 
