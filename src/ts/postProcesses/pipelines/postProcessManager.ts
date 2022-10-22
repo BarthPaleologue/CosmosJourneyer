@@ -42,16 +42,16 @@ export class PostProcessManager {
 
     private currentBody: AbstractBody | null = null;
 
-    readonly starFields: PostProcess[] = [];
-    readonly volumetricLights: PostProcess[] = [];
-    readonly oceans: PostProcess[] = [];
-    readonly clouds: PostProcess[] = [];
-    readonly atmospheres: PostProcess[] = [];
-    readonly rings: PostProcess[] = [];
-    readonly blackHoles: PostProcess[] = [];
-    readonly overlays: PostProcess[] = [];
-    readonly colorCorrections: PostProcess[] = [];
-    readonly fxaas: PostProcess[] = [];
+    readonly starFields: StarfieldPostProcess[] = [];
+    readonly volumetricLights: VolumetricLight[] = [];
+    readonly oceans: OceanPostProcess[] = [];
+    readonly clouds: FlatCloudsPostProcess[] = [];
+    readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
+    readonly rings: RingsPostProcess[] = [];
+    readonly blackHoles: BlackHolePostProcess[] = [];
+    readonly overlays: OverlayPostProcess[] = [];
+    readonly colorCorrections: ColorCorrection[] = [];
+    readonly fxaas: FxaaPostProcess[] = [];
 
     readonly starFieldRenderEffect: PostProcessRenderEffect;
     readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
@@ -99,8 +99,8 @@ export class PostProcessManager {
         this.rings.push(new RingsPostProcess(`${body.name}Rings`, body, this.scene, stars));
     }
 
-    public addStarField(stars: (Star | BlackHole)[]) {
-        this.starFields.push(new StarfieldPostProcess("starField", this.scene, stars));
+    public addStarField(stars: (Star | BlackHole)[], planets: Planet[]) {
+        this.starFields.push(new StarfieldPostProcess("starField", this.scene, stars, planets));
     }
 
     public addOverlay(body: AbstractBody) {
@@ -330,5 +330,14 @@ export class PostProcessManager {
         this.uberRenderingPipeline.addEffect(this.overlayRenderEffect);
 
         this.uberRenderingPipeline.addEffect(this.fxaaRenderEffect);
+    }
+
+    public update(deltaTime: number) {
+        for(const ring of this.rings) ring.update(deltaTime);
+        for(const volumetricLight of this.volumetricLights) volumetricLight.update(deltaTime);
+        for(const atmosphere of this.atmospheres) atmosphere.update(deltaTime);
+        for(const clouds of this.clouds) clouds.update(deltaTime);
+        for(const oceans of this.oceans) oceans.update(deltaTime);
+        for(const blackhole of this.blackHoles) blackhole.update(deltaTime);
     }
 }

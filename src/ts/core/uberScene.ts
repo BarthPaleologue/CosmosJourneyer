@@ -51,16 +51,5 @@ export class UberScene extends Scene {
 
     public update() {
         this._chunkForge.update();
-
-        const nearestBody = this.getActiveController().getNearestBody();
-
-        /*this.uberRenderingPipeline.setBody(this.getActiveController().getNearestBody());
-
-        const switchLimit = 2;//nearestBody.postProcesses.rings?.settings.ringStart || 2;
-        if (isOrbiting(this.getActiveController(), nearestBody, switchLimit)) {
-            this.enableSurfaceRenderingPipeline();
-        } else {
-            this.enableSpaceRenderingPipeline();
-        }*/
     }
 }

@@ -11,6 +11,8 @@ import { UberPostProcess } from "./uberPostProcess";
 import { Settings } from "../settings";
 import { BlackHole } from "../bodies/blackHole";
 import { Star } from "../bodies/stars/star";
+import { Planet } from "../bodies/planets/planet";
+import { nearestBody } from "../utils/nearestBody";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -22,7 +24,7 @@ export interface StarfieldSettings {
 export class StarfieldPostProcess extends UberPostProcess {
     settings: StarfieldSettings;
 
-    constructor(name: string, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, scene: UberScene, stars: (Star | BlackHole)[], planets: Planet[]) {
         const settings: StarfieldSettings = {
             foo: 1
         };
@@ -41,8 +43,9 @@ export class StarfieldPostProcess extends UberPostProcess {
                     }
                     vis /= 2;
                     let vis2 = 1.0;
-                    if (scene.getActiveController().getNearestBody() != null && scene.getActiveController().getNearestBody().bodyType == BodyType.TELLURIC) {
-                        const planet = scene.getActiveController().getNearestBody() as TelluricPlanet;
+                    const nearest = nearestBody(scene.getActiveController().transform, planets);
+                    if (nearest.bodyType == BodyType.TELLURIC) {
+                        const planet = nearest as TelluricPlanet;
                         if (planet.postProcesses.atmosphere != null) {
                             const height = planet.getAbsolutePosition().length();
                             //FIXME: has to be dynamic

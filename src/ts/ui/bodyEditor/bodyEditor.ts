@@ -240,6 +240,6 @@ export class BodyEditor {
     }
 
     public update(player: AbstractController) {
-        if (player.getNearestBody().name != this.currentBodyId) this.setBody(player.getNearestBody());
+        //if (player.getNearestBody().name != this.currentBodyId) this.setBody(player.getNearestBody());
     }
 }

@@ -18,6 +18,7 @@ import { HelmetOverlay } from "./ui/helmetOverlay";
 import { ShipController } from "./controllers/shipController";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
 import { isOrbiting, positionNearBody } from "./utils/positionNearBody";
+import { nearestBody } from "./utils/nearestBody";
 
 const helmetOverlay = new HelmetOverlay();
 
@@ -46,8 +47,9 @@ Assets.Init(scene).then(() => {
         if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
         if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getActiveController().getActiveCamera(), { precision: 4 });
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
-        if (e.key == "w" && spaceshipController.nearestBody != null)
-            (<TelluricPlanet>(<unknown>spaceshipController.nearestBody)).material.wireframe = !(<TelluricPlanet>(<unknown>spaceshipController.nearestBody)).material.wireframe;
+
+        if (e.key == "w" && isOrbiting(spaceshipController, starSystem.getNearestBody()))
+            (starSystem.getNearestBody() as TelluricPlanet).material.wireframe = !(starSystem.getNearestBody() as TelluricPlanet).material.wireframe;
         if (e.key == "f") spaceshipController.flightAssistEnabled = !spaceshipController.flightAssistEnabled;
     });
 
@@ -63,9 +65,9 @@ Assets.Init(scene).then(() => {
         scene.registerBeforeRender(() => {
             const deltaTime = engine.getDeltaTime() / 1000;
 
-            scene.getActiveController().nearestBody = starSystem.getNearestBody();
+            const nearest = nearestBody(scene.getActiveController().transform, starSystem.getBodies());
 
-            helmetOverlay.update(scene.getActiveController().getNearestBody());
+            helmetOverlay.update(nearest);
             helmetOverlay.setVisibility(true);
 
             //FIXME: should address stars orbits
@@ -75,9 +77,9 @@ Assets.Init(scene).then(() => {
             starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
             starSystem.translateAllBodies(spaceshipController.update(deltaTime));
 
-            if (!collisionWorker.isBusy() && isOrbiting(spaceshipController)) {
-                if (spaceshipController.nearestBody?.bodyType == BodyType.TELLURIC) {
-                    collisionWorker.checkCollision(spaceshipController.nearestBody as TelluricPlanet);
+            if (!collisionWorker.isBusy() && isOrbiting(spaceshipController, nearest)) {
+                if (nearest.bodyType == BodyType.TELLURIC) {
+                    collisionWorker.checkCollision(nearest as TelluricPlanet);
                 }
             }
         });

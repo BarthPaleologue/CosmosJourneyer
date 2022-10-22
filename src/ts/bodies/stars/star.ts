@@ -84,12 +84,9 @@ export class Star extends AbstractBody {
     public override updateTransform(player: AbstractController, deltaTime: number): void {
         super.updateTransform(player, deltaTime);
 
+        this.material.update();
+
         this.internalTime += deltaTime;
         this.internalTime %= 24 * 60 * 60; // prevent imprecision in shader material (noise offset)
-    }
-
-    public override updateGraphics(controller: AbstractController, deltaTime: number) {
-        super.updateGraphics(controller, deltaTime);
-        this.material.update();
     }
 }

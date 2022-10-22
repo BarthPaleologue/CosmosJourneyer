@@ -25,11 +25,6 @@ export function positionNearBody(controller: AbstractController, body: AbstractB
  * @param body the body to check whereas the player is orbiting
  * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
  */
-export function isOrbiting(controller: AbstractController, body: AbstractBody | null = null, orbitLimitFactor = 2.5): boolean {
-    if (controller.nearestBody == null) return false;
-    else if (body == null) {
-        return controller.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * controller.nearestBody.getRadius()) ** 2;
-    } else {
-        return controller.nearestBody == body && controller.nearestBody.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * controller.nearestBody.getRadius()) ** 2;
-    }
+export function isOrbiting(controller: AbstractController, body: AbstractBody, orbitLimitFactor = 2.5): boolean {
+    return body.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * body.getRadius()) ** 2;
 }

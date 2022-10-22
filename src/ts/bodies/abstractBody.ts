@@ -142,8 +142,4 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
             this.rotate(this.getRotationAxis(), -dtheta);
         }
     }
-
-    public updateGraphics(controller: AbstractController, deltaTime: number): void {
-        //TODO: find a way to update postprocesses => probably not here though
-    }
 }

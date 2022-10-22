@@ -72,8 +72,8 @@ export class GasPlanet extends AbstractBody {
         if (uniformRandBool(0.8, this.rng, Steps.RINGS)) this.postProcesses.rings = true;
     }
 
-    updateGraphics(controller: AbstractController, deltaTime: number) {
-        super.updateGraphics(controller, deltaTime);
-        this.material.update(controller);
+    updateTransform(player: AbstractController, deltaTime: number) {
+        super.updateTransform(player, deltaTime);
+        this.material.update(player);
     }
 }

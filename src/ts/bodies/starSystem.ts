@@ -176,7 +176,7 @@ export class StarSystem {
     }
 
     public initPostProcesses() {
-        this.postProcessManager.addStarField(this.stars);
+        this.postProcessManager.addStarField(this.stars, this.planets);
 
         for (const body of this.bodies) {
             if (body.postProcesses.rings) this.postProcessManager.addRings(body, this.stars);
@@ -229,7 +229,6 @@ export class StarSystem {
         } else {
             this.postProcessManager.setSpaceOrder();
         }
-
-        for (const body of this.getBodies()) body.updateGraphics(this.scene.getActiveController(), deltaTime);
+        this.postProcessManager.update(deltaTime);
     }
 }

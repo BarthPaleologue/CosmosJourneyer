@@ -5,20 +5,19 @@ import { RigidBody } from "../bodies/interfaces";
 import { ITransformable } from "../core/transforms/iTransformable";
 
 export class CollisionWorker {
-    _player: AbstractController;
+    currentBody: (RigidBody & ITransformable) | null = null;
     _busy = false;
     _worker: Worker;
     constructor(player: AbstractController, planetManager: StarSystem) {
         this._worker = new Worker(new URL("workerScript", import.meta.url), { type: "module" });
-        this._player = player;
         this._worker.onmessage = (e) => {
-            if (player.nearestBody == null) return;
+            if (this.currentBody == null) return;
 
-            const direction = player.nearestBody.getAbsolutePosition().normalizeToNew();
-            const currentHeight = player.nearestBody.getAbsolutePosition().length();
+            const direction = this.currentBody.getAbsolutePosition().normalizeToNew();
+            const currentHeight = this.currentBody.getAbsolutePosition().length();
             const terrainHeight = e.data.h;
 
-            const currentPosition = player.nearestBody.getAbsolutePosition();
+            const currentPosition = this.currentBody.getAbsolutePosition();
             let newPosition = currentPosition;
 
             if (currentHeight - player.collisionRadius < terrainHeight) {
@@ -40,6 +39,7 @@ export class CollisionWorker {
         this._busy = true;
     }
     public checkCollision(planet: RigidBody & ITransformable): void {
+        this.currentBody = planet;
         const playerSamplePosition = planet.getAbsolutePosition().negate();
         playerSamplePosition.applyRotationQuaternionInPlace(planet.getInverseRotationQuaternion());
 

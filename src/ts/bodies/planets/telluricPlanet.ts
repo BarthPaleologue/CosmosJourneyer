@@ -181,10 +181,6 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
     public override updateTransform(player: AbstractController, deltaTime: number): void {
         super.updateTransform(player, deltaTime);
         this.updateLOD(player.transform.getAbsolutePosition());
-    }
-
-    public override updateGraphics(controller: AbstractController, deltaTime: number) {
-        super.updateGraphics(controller, deltaTime);
         this.material.update();
     }
 

@@ -1,12 +1,9 @@
 import { Vector3 } from "@babylonjs/core";
-import { AbstractBody } from "../bodies/abstractBody";
 import { Input } from "../inputs/input";
 import { BasicTransform } from "../core/transforms/basicTransform";
 import { UberFreeCamera } from "../core/uberFreeCamera";
 
 export abstract class AbstractController {
-    nearestBody: AbstractBody | null;
-
     collisionRadius = 10;
 
     readonly transform: BasicTransform;
@@ -18,7 +15,6 @@ export abstract class AbstractController {
 
     protected constructor() {
         this.transform = new BasicTransform("playerTransform");
-        this.nearestBody = null;
     }
 
     /**
@@ -34,12 +30,6 @@ export abstract class AbstractController {
      * @internal
      */
     abstract listenTo(input: Input, deltaTime: number): Vector3;
-
-    //TODO: remove this from here to avoid cyclic dependencies
-    public getNearestBody(): AbstractBody {
-        if (this.nearestBody == null) throw new Error("No nearest body");
-        return this.nearestBody;
-    }
 
     /**
      * Makes the controller listen to all its inputs and returns the displacement to apply to the player
