@@ -51,12 +51,11 @@ Assets.Init(scene).then(() => {
     const starSystemSeed = 0;
     const starSystem = new StarSystem(starSystemSeed, scene);
 
-    const sun = new Star("Weierstrass", starSystem, 0.51, []);
+    const sun = starSystem.makeStar(0.51);
     sun.orbitalProperties.period = 60 * 60 * 24;
 
-    const planet = new TelluricPlanet("Hécate", starSystem, 0.4233609183800225, starSystem.stars);
+    const planet = starSystem.makeTelluricPlanet(0.4233609183800225);
 
-    planet.physicalProperties.rotationPeriod /= 20;
     planet.physicalProperties.minTemperature = -37;
     planet.physicalProperties.maxTemperature = 40;
     planet.material.updateConstants();
@@ -68,7 +67,7 @@ Assets.Init(scene).then(() => {
         orientationQuaternion: Quaternion.Identity()
     };
 
-    const moon = new TelluricPlanet("Manaleth", starSystem, 0.4, [planet]);
+    const moon = starSystem.makeSatellite(planet, 0.4);
 
     moon.physicalProperties.mass = 2;
     moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
@@ -93,7 +92,7 @@ Assets.Init(scene).then(() => {
     moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap);
     moon.material.updateConstants();
 
-    const ares = new TelluricPlanet("Ares", starSystem, 0.3725, starSystem.stars);
+    const ares = starSystem.makeTelluricPlanet(0.3725);
     ares.postProcesses.ocean = false;
     ares.postProcesses.clouds = false;
 
@@ -130,7 +129,7 @@ Assets.Init(scene).then(() => {
     aresAtmosphere.settings.greenWaveLength = 680;
     aresAtmosphere.settings.blueWaveLength = 670;*/
 
-    const andromaque = new GasPlanet("Andromaque", starSystem, 0.28711440474126226, [sun]);
+    const andromaque = starSystem.makeGasPlanet(0.28711440474126226);
     andromaque.orbitalProperties = {
         period: 60 * 60 * 24 * 365.29,
         periapsis: 4300 * ares.getRadius(),

@@ -37,8 +37,6 @@ export class GasPlanet extends AbstractBody {
     constructor(name: string, starSystem: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystem, seed, parentBodies);
 
-        starSystem.planets.push(this);
-
         this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng, Steps.RADIUS);
 
         this.physicalProperties = {

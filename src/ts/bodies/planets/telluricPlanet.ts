@@ -57,8 +57,6 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
     constructor(name: string, starSystem: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystem, seed, parentBodies);
 
-        starSystem.planets.push(this);
-
         for (const parentBody of parentBodies) {
             if (parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true;
             if (parentBody.bodyType == BodyType.GAZ) this.isSatelliteOfGas = true;
@@ -142,12 +140,12 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         this.material = new TelluricMaterial(this, starSystem.scene);
 
         this.sides = [
-            new ChunkTree(Direction.Up, this),
-            new ChunkTree(Direction.Down, this),
-            new ChunkTree(Direction.Forward, this),
-            new ChunkTree(Direction.Backward, this),
-            new ChunkTree(Direction.Right, this),
-            new ChunkTree(Direction.Left, this)
+            new ChunkTree(Direction.Up, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene),
+            new ChunkTree(Direction.Down, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene),
+            new ChunkTree(Direction.Forward, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene),
+            new ChunkTree(Direction.Backward, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene),
+            new ChunkTree(Direction.Right, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene),
+            new ChunkTree(Direction.Left, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene)
         ];
     }
 

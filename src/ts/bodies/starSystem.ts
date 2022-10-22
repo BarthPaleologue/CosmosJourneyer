@@ -52,18 +52,25 @@ export class StarSystem {
         this.stars.push(star);
     }
 
-    public makeStars(n: number): void {
-        if (n < 1) throw new Error("Cannot make less than 1 star");
-        for (let i = 0; i < n; i++) {
-            const star = new Star(`star${i}`, this, this.rng(Steps.GENERATE_STARS + this.stars.length), this.stars);
-            //TODO: make this better, make it part of the generation
-            star.orbitalProperties.periapsis = star.getRadius() * 4;
-            star.orbitalProperties.apoapsis = star.getRadius() * 4;
-        }
+    public makeStar(seed = this.rng(Steps.GENERATE_STARS + this.stars.length)): Star {
+        const star = new Star(`star${this.stars.length}`, this, seed, this.stars);
+        //TODO: make this better, make it part of the generation
+        star.orbitalProperties.periapsis = star.getRadius() * 4;
+        star.orbitalProperties.apoapsis = star.getRadius() * 4;
+
+        this.addBody(star);
+        this.addStar(star);
+        return star;
     }
 
-    public makeTelluricPlanet(): void {
-        const planet = new TelluricPlanet(`telluricPlanet`, this, this.rng(Steps.GENERATE_PLANETS + this.planets.length), this.stars);
+    public makeStars(n: number): void {
+        if (n < 1) throw new Error("Cannot make less than 1 star");
+        for (let i = 0; i < n; i++) this.makeStar();
+
+    }
+
+    public makeTelluricPlanet(seed = this.rng(Steps.GENERATE_PLANETS + this.planets.length)): TelluricPlanet {
+        const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this, seed, this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
         //TODO: use formula
         planet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng, 80);
@@ -77,28 +84,38 @@ export class StarSystem {
         );
         planet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng, 85);
         planet.material.updateConstants();
-        this.makeSatellites(planet, randRangeInt(1, 3, planet.rng, 86));
+
+        this.planets.push(planet);
+        this.addBody(planet);
+
+        return planet;
     }
 
-    public makeGasPlanet(): void {
-        const planet = new GasPlanet(`gasPlanet`, this, this.rng(Steps.GENERATE_PLANETS + this.planets.length), this.stars);
+    public makeGasPlanet(seed = this.rng(Steps.GENERATE_PLANETS + this.planets.length)): GasPlanet {
+        const planet = new GasPlanet(`gasPlanet`, this, seed, this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
-        this.makeSatellites(planet, randRangeInt(0, 3, planet.rng, 86));
+
+        this.planets.push(planet);
+        this.addBody(planet);
+
+        return planet;
     }
 
     public makePlanets(n: number): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of planets : ${n}`);
         for (let i = 0; i < n; i++) {
             if (uniformRandBool(0.5, this.rng, Steps.CHOOSE_PLANET_TYPE + this.planets.length)) {
-                this.makeTelluricPlanet();
+                const planet = this.makeTelluricPlanet();
+                this.makeSatellites(planet, randRangeInt(0, 3, planet.rng, 86));
             } else {
-                this.makeGasPlanet();
+                const planet = this.makeGasPlanet();
+                this.makeSatellites(planet, randRangeInt(0, 3, planet.rng, 86));
             }
         }
     }
 
-    public makeSatellite(planet: Planet): void {
-        const satellite = new TelluricPlanet(`${planet.name}Sattelite`, this, planet.rng(100), [planet]);
+    public makeSatellite(planet: Planet, seed = planet.rng(100)): TelluricPlanet {
+        const satellite = new TelluricPlanet(`${planet.name}Sattelite`, this, seed, [planet]);
         const periapsis = 2 * planet.getRadius() + clamp(normalRandom(3, 1, satellite.rng, 90), 0, 20) * planet.getRadius() * 2;
         const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.rng, 92), 1, 1.5);
         satellite.physicalProperties.mass = 1;
@@ -109,6 +126,9 @@ export class StarSystem {
             orientationQuaternion: satellite.getRotationQuaternion()
         };
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
+
+        this.addBody(satellite);
+        return satellite;
     }
 
     public makeSatellites(planet: Planet, n: number): void {

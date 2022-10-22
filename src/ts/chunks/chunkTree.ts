@@ -4,11 +4,12 @@ import { PlanetChunk } from "./planetChunk";
 import { Direction } from "../utils/direction";
 import { ChunkForge } from "./chunkForge";
 import { BuildTask, DeleteTask, TaskType } from "./taskTypes";
-import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { rayIntersectSphere } from "../utils/gradientMath";
 import { Settings } from "../settings";
 import { getChunkSphereSpacePositionFromPath } from "../utils/chunkUtils";
 import { BasicTransform } from "../core/transforms/basicTransform";
+import { TerrainSettings } from "../terrain/terrainSettings";
+import { UberScene } from "../core/uberScene";
 
 /**
  * A quadTree is defined recursively
@@ -30,7 +31,9 @@ export class ChunkTree {
 
     private readonly chunkForge: ChunkForge;
 
-    readonly planet: TelluricPlanet;
+    readonly planetName: string;
+    readonly planetSeed: number;
+    readonly terrainSettings: TerrainSettings;
 
     readonly parent: BasicTransform;
 
@@ -41,8 +44,11 @@ export class ChunkTree {
      * @param direction
      * @param planet
      */
-    constructor(direction: Direction, planet: TelluricPlanet) {
-        this.rootChunkLength = planet.getDiameter();
+    constructor(direction: Direction, planetName: string, planetSeed: number, planetRadius: number, terrainSettings: TerrainSettings, parent: BasicTransform, material: Material, scene: UberScene) {
+        this.rootChunkLength = planetRadius * 2;
+        this.planetName = planetName;
+        this.planetSeed = planetSeed;
+        this.terrainSettings = terrainSettings;
 
         this.minDepth = 1; //Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 19), 0);
         this.maxDepth = Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 12), 0);
@@ -50,15 +56,13 @@ export class ChunkTree {
         //console.log(spaceBetweenVertex);
 
         //TODO: make it register to the forge instead using uberscene
-        this.chunkForge = planet.starSystem.scene._chunkForge;
+        this.chunkForge = scene._chunkForge;
 
         this.direction = direction;
 
-        this.parent = planet;
+        this.parent = parent;
 
-        this.planet = planet;
-
-        this.material = planet.material;
+        this.material = material;
     }
 
     /**
@@ -106,7 +110,7 @@ export class ChunkTree {
      */
     private updateLODRecursively(observerPositionW: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, this.parent.getRotationQuaternion());
-        const nodePositionW = nodeRelativePosition.add(this.planet.getAbsolutePosition());
+        const nodePositionW = nodeRelativePosition.add(this.parent.getAbsolutePosition());
 
         const direction = nodePositionW.subtract(observerPositionW);
         const distanceToNodeSquared = direction.lengthSquared();
@@ -156,7 +160,7 @@ export class ChunkTree {
         if (chunk.isReady() && Settings.ENABLE_OCCLUSION) {
             const direction = chunkPositionW.subtract(observerPositionW);
             const rayDir = direction.normalizeToNew();
-            const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.planet.getAbsolutePosition(), this.planet.getRadius() - 100e3 * 2 ** -chunk.depth);
+            const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.parent.getAbsolutePosition(), (this.rootChunkLength / 2) - 100e3 * 2 ** -chunk.depth);
             chunk.mesh.setEnabled(!(intersect && t0 ** 2 < direction.lengthSquared()));
         }
     }
@@ -172,10 +176,10 @@ export class ChunkTree {
 
         const buildTask: BuildTask = {
             type: TaskType.Build,
-            planetName: this.planet.name,
-            planetSeed: this.planet.seed,
-            planetDiameter: this.planet.getDiameter(),
-            terrainSettings: this.planet.terrainSettings,
+            planetName: this.planetName,
+            planetSeed: this.planetSeed,
+            planetDiameter: this.rootChunkLength,
+            terrainSettings: this.terrainSettings,
             position: chunk.cubePosition,
             depth: path.length,
             direction: this.direction,

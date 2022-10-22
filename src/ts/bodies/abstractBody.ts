@@ -57,7 +57,6 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         this.rng = seededSquirrelNoise(seed * Number.MAX_SAFE_INTEGER);
 
         this.starSystem = starSystemManager;
-        starSystemManager.addBody(this);
 
         this.parentBodies = parentBodies;
 
