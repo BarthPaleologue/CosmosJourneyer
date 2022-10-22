@@ -11,6 +11,7 @@ import { normalRandom, randRange, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/gradientMath";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { Settings } from "../../settings";
+import { UberScene } from "../../core/uberScene";
 
 enum Steps {
     RADIUS = 1000,
@@ -40,7 +41,7 @@ export class Star extends AbstractBody {
      * @param seed The seed of the star in [-1, 1]
      * @param parentBodies The bodies the star is orbiting
      */
-    constructor(name: string, starSystemManager: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(name: string, starSystemManager: StarSystem, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystemManager, seed, parentBodies);
 
         //TODO: make it dependent on star type
@@ -60,11 +61,11 @@ export class Star extends AbstractBody {
                 diameter: this.radius * 2,
                 segments: 32
             },
-            starSystemManager.scene
+            scene
         );
         this.mesh.parent = this.node;
 
-        this.material = new StarMaterial(this, starSystemManager.scene);
+        this.material = new StarMaterial(this, scene);
         this.mesh.material = this.material;
 
         // TODO: remove when rotation is transmitted to children

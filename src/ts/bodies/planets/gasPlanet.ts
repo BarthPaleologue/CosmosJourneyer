@@ -10,6 +10,7 @@ import { randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
+import { UberScene } from "../../core/uberScene";
 
 enum Steps {
     RADIUS = 1000,
@@ -34,7 +35,7 @@ export class GasPlanet extends AbstractBody {
      * @param seed The seed of the planet in [-1, 1]
      * @param parentBodies The bodies the planet is orbiting
      */
-    constructor(name: string, starSystem: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(name: string, starSystem: StarSystem, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystem, seed, parentBodies);
 
         this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng, Steps.RADIUS);
@@ -54,11 +55,11 @@ export class GasPlanet extends AbstractBody {
                 diameter: this.radius * 2,
                 segments: 64
             },
-            starSystem.scene
+            scene
         );
         this.mesh.parent = this.node;
 
-        this.material = new GasPlanetMaterial(this, starSystem.scene);
+        this.material = new GasPlanetMaterial(this, scene);
         this.mesh.material = this.material;
 
         this.postProcesses = {

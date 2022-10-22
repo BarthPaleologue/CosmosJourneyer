@@ -42,7 +42,7 @@ Assets.Init(scene).then(() => {
     const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
     const starSystem = new StarSystem(starSystemSeed, scene);
 
-    const BH = new BlackHole("gwo twou sanfon", 1000e3, starSystem, 0, starSystem.stars);
+    const BH = starSystem.makeBlackHole(0);
     BH.orbitalProperties.periapsis = BH.getRadius() * 4;
     BH.orbitalProperties.apoapsis = BH.getRadius() * 4;
 

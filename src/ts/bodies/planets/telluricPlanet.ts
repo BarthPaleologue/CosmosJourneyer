@@ -18,6 +18,7 @@ import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { clamp } from "../../utils/gradientMath";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
+import { UberScene } from "../../core/uberScene";
 
 enum Steps {
     RADIUS = 1000,
@@ -54,7 +55,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
      * @param seed The seed of the planet in [-1, 1]
      * @param parentBodies The bodies the planet is orbiting
      */
-    constructor(name: string, starSystem: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
+    constructor(name: string, starSystem: StarSystem, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, starSystem, seed, parentBodies);
 
         for (const parentBody of parentBodies) {
@@ -107,7 +108,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
                 this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
                 this.postProcesses.ocean = true;
-                this.postProcesses.clouds = true;//new FlatCloudsPostProcess(`${this.name}Clouds`, this, Settings.CLOUD_LAYER_HEIGHT, starSystem.scene, this.starSystem);
+                this.postProcesses.clouds = true;
             } else {
                 this.oceanLevel = 0;
             }
@@ -137,15 +138,15 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
         if (this.isSatelliteOfTelluric) this.terrainSettings.continentsFragmentation /= 2;
 
-        this.material = new TelluricMaterial(this, starSystem.scene);
+        this.material = new TelluricMaterial(this, scene);
 
         this.sides = [
-            new ChunkTree(Direction.Up, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene),
-            new ChunkTree(Direction.Down, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene),
-            new ChunkTree(Direction.Forward, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene),
-            new ChunkTree(Direction.Backward, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene),
-            new ChunkTree(Direction.Right, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene),
-            new ChunkTree(Direction.Left, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, this.starSystem.scene)
+            new ChunkTree(Direction.Up, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene),
+            new ChunkTree(Direction.Down, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene),
+            new ChunkTree(Direction.Forward, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene),
+            new ChunkTree(Direction.Backward, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene),
+            new ChunkTree(Direction.Right, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene),
+            new ChunkTree(Direction.Left, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene)
         ];
     }
 

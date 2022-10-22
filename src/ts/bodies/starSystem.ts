@@ -53,7 +53,7 @@ export class StarSystem {
     }
 
     public makeStar(seed = this.rng(Steps.GENERATE_STARS + this.stars.length)): Star {
-        const star = new Star(`star${this.stars.length}`, this, seed, this.stars);
+        const star = new Star(`star${this.stars.length}`, this, this.scene, seed, this.stars);
         //TODO: make this better, make it part of the generation
         star.orbitalProperties.periapsis = star.getRadius() * 4;
         star.orbitalProperties.apoapsis = star.getRadius() * 4;
@@ -63,6 +63,13 @@ export class StarSystem {
         return star;
     }
 
+    public makeBlackHole(seed = this.rng(Steps.GENERATE_STARS + this.stars.length)): BlackHole {
+        const blackHole = new BlackHole(`blackHole${this.stars.length}`, 1000e3, this, seed, this.stars);
+        this.addBody(blackHole);
+        this.addStar(blackHole);
+        return blackHole;
+    }
+
     public makeStars(n: number): void {
         if (n < 1) throw new Error("Cannot make less than 1 star");
         for (let i = 0; i < n; i++) this.makeStar();
@@ -70,7 +77,7 @@ export class StarSystem {
     }
 
     public makeTelluricPlanet(seed = this.rng(Steps.GENERATE_PLANETS + this.planets.length)): TelluricPlanet {
-        const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this, seed, this.stars);
+        const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this, this.scene, seed, this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
         //TODO: use formula
         planet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng, 80);
@@ -92,7 +99,7 @@ export class StarSystem {
     }
 
     public makeGasPlanet(seed = this.rng(Steps.GENERATE_PLANETS + this.planets.length)): GasPlanet {
-        const planet = new GasPlanet(`gasPlanet`, this, seed, this.stars);
+        const planet = new GasPlanet(`gasPlanet`, this, this.scene, seed, this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
 
         this.planets.push(planet);
@@ -115,7 +122,7 @@ export class StarSystem {
     }
 
     public makeSatellite(planet: Planet, seed = planet.rng(100)): TelluricPlanet {
-        const satellite = new TelluricPlanet(`${planet.name}Sattelite`, this, seed, [planet]);
+        const satellite = new TelluricPlanet(`${planet.name}Sattelite`, this, this.scene, seed, [planet]);
         const periapsis = 2 * planet.getRadius() + clamp(normalRandom(3, 1, satellite.rng, 90), 0, 20) * planet.getRadius() * 2;
         const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.rng, 92), 1, 1.5);
         satellite.physicalProperties.mass = 1;
