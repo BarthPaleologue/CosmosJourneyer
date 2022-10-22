@@ -121,7 +121,7 @@ Assets.Init(scene).then(() => {
     ares.material.colorSettings.beachColor.copyFromFloats(0.3, 0.15, 0.1);
     ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);
 
-    ares.oceanLevel = Settings.OCEAN_DEPTH * ares.physicalProperties.waterAmount * ares.physicalProperties.pressure;
+    ares.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * ares.physicalProperties.waterAmount * ares.physicalProperties.pressure;
 
     ares.material.updateConstants();
 

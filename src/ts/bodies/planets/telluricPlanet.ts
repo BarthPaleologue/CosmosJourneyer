@@ -189,6 +189,6 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
     }
 
     public override getApparentRadius(): number {
-        return super.getRadius() + this.oceanLevel;
+        return super.getRadius() + this.physicalProperties.oceanLevel;
     }
 }
