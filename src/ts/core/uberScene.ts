@@ -1,26 +1,14 @@
-import {
-    DepthRenderer,
-    Engine,
-    FxaaPostProcess,
-    Scene,
-    ScenePerformancePriority,
-    Texture
-} from "@babylonjs/core";
-import { UberRenderingPipeline } from "../postProcesses/pipelines/uberRenderingPipeline";
+import { DepthRenderer, Engine, Scene, ScenePerformancePriority } from "@babylonjs/core";
+import { UberRenderingPipeline } from "./uberRenderingPipeline";
 import { ChunkForge } from "../chunks/chunkForge";
 import { Settings } from "../settings";
 import { AbstractController } from "../controllers/abstractController";
-import { ColorCorrection } from "../postProcesses/colorCorrection";
 import { UberFreeCamera } from "./uberFreeCamera";
-import { isOrbiting } from "../utils/positionNearBody";
 
 export class UberScene extends Scene {
     activeController: AbstractController | null = null;
 
     readonly uberRenderingPipeline: UberRenderingPipeline;
-
-    readonly colorCorrection: ColorCorrection;
-    readonly fxaa: FxaaPostProcess;
 
     private depthRenderer: DepthRenderer | null = null;
 
@@ -30,14 +18,8 @@ export class UberScene extends Scene {
         super(engine);
         this.performancePriority = ScenePerformancePriority.Intermediate;
 
-        this.uberRenderingPipeline = new UberRenderingPipeline("uberRenderingPipeline", this);
+        this.uberRenderingPipeline = new UberRenderingPipeline("uberRenderingPipeline", this.getEngine());
         this.postProcessRenderPipelineManager.addPipeline(this.uberRenderingPipeline);
-
-        this.colorCorrection = new ColorCorrection("colorCorrection", this);
-        this.fxaa = new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, engine);
-
-        this.uberRenderingPipeline.colorCorrections.push(this.colorCorrection);
-        this.uberRenderingPipeline.fxaas.push(this.fxaa);
 
         this._chunkForge = new ChunkForge(nbVertices);
     }
@@ -67,26 +49,18 @@ export class UberScene extends Scene {
         return this.getActiveController().getActiveCamera();
     }
 
-    public enableSurfaceRenderingPipeline() {
-        this.uberRenderingPipeline.setSurfaceOrder();
-    }
-
-    public enableSpaceRenderingPipeline() {
-        this.uberRenderingPipeline.setSpaceOrder();
-    }
-
     public update() {
         this._chunkForge.update();
 
         const nearestBody = this.getActiveController().getNearestBody();
 
-        this.uberRenderingPipeline.setBody(this.getActiveController().getNearestBody());
+        /*this.uberRenderingPipeline.setBody(this.getActiveController().getNearestBody());
 
         const switchLimit = 2;//nearestBody.postProcesses.rings?.settings.ringStart || 2;
         if (isOrbiting(this.getActiveController(), nearestBody, switchLimit)) {
             this.enableSurfaceRenderingPipeline();
         } else {
             this.enableSpaceRenderingPipeline();
-        }
+        }*/
     }
 }

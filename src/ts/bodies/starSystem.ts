@@ -13,6 +13,8 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { BlackHole } from "./blackHole";
 import { BodyType } from "./interfaces";
 import { PostProcessManager } from "../postProcesses/pipelines/postProcessManager";
+import { isOrbiting } from "../utils/positionNearBody";
+import { nearestBody } from "../utils/nearestBody";
 
 enum Steps {
     GENERATE_STARS = 100,
@@ -202,6 +204,7 @@ export class StarSystem {
                     throw new Error(`Unknown body type : ${body.bodyType}`);
             }
         }
+        this.postProcessManager.setBody(nearestBody(this.scene.getActiveController().transform, this.bodies));
         this.postProcessManager.init();
     }
 
@@ -214,6 +217,18 @@ export class StarSystem {
 
         this.translateAllBodies(displacement);
         this.scene.getActiveController().transform.translate(displacement);
+
+
+        const nearest = nearestBody(this.scene.getActiveController().transform, this.bodies);
+
+        this.postProcessManager.setBody(nearest);
+
+        const switchLimit = 2;//nearestBody.postProcesses.rings?.settings.ringStart || 2;
+        if (isOrbiting(this.scene.getActiveController(), nearest, switchLimit)) {
+            this.postProcessManager.setSurfaceOrder();
+        } else {
+            this.postProcessManager.setSpaceOrder();
+        }
 
         for (const body of this.getBodies()) body.updateGraphics(this.scene.getActiveController(), deltaTime);
     }

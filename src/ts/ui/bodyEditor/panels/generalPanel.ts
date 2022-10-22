@@ -51,7 +51,7 @@ export class GeneralPanel extends EditorPanel {
             new Slider("timeModifier", document.getElementById("timeModifier") as HTMLElement, -200, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {
                 Settings.TIME_MULTIPLIER = Math.sign(val) * Math.pow(Math.abs(val), power);
             }),
-            new Slider("exposure", document.getElementById("exposure") as HTMLElement, 0, 200, scene.colorCorrection.settings.exposure * 100, (val: number) => {
+            /*new Slider("exposure", document.getElementById("exposure") as HTMLElement, 0, 200, scene.colorCorrection.settings.exposure * 100, (val: number) => {
                 scene.colorCorrection.settings.exposure = val / 100;
             }),
             new Slider("contrast", document.getElementById("contrast") as HTMLElement, 0, 200, scene.colorCorrection.settings.contrast * 100, (val: number) => {
@@ -65,7 +65,7 @@ export class GeneralPanel extends EditorPanel {
             }),
             new Slider("gamma", document.getElementById("gamma") as HTMLElement, 0, 200, scene.colorCorrection.settings.gamma * 100, (val: number) => {
                 scene.colorCorrection.settings.gamma = val / 100;
-            })
+            })*/
         ];
     }
 }
