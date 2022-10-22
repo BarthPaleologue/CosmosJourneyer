@@ -15,4 +15,5 @@ export type PlanetPhysicalProperties = PhysicalProperties & {
 
 export type SolidPhysicalProperties = PlanetPhysicalProperties & {
     waterAmount: number;
+    oceanLevel: number;
 };

@@ -1,16 +1,17 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { Planet } from "../../../bodies/planets/planet";
+import { TelluricPlanet } from "../../../bodies/planets/telluricPlanet";
+import { GasPlanet } from "../../../bodies/planets/gasPlanet";
 
 export class AtmospherePanel extends EditorPanel {
     constructor() {
         super("atmosphere");
     }
-    init(planet: Planet) {
+    init(planet: (TelluricPlanet | GasPlanet)) {
         for (const slider of this.sliders) slider.remove();
 
-        const atmosphere = planet.postProcesses.atmosphere;
-        if (atmosphere == null) return;
+        //const atmosphere = planet.postProcesses.atmosphere;
+        //if (atmosphere == null) return;
 
         const atmosphereToggler = clearAllEventListenersById("atmosphereToggler");
         atmosphereToggler.addEventListener("click", () => {

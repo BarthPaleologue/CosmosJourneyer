@@ -19,12 +19,3 @@ export function positionNearBody(controller: AbstractController, body: AbstractB
     controller.transform.node.lookAt(body.getAbsolutePosition());
 }
 
-/**
- * If the parameter is unset, returns whereas the player is orbiting a body, if the parameter is set returns if the player orbits the given body
- * @param controller the controller to check
- * @param body the body to check whereas the player is orbiting
- * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
- */
-export function isOrbiting(controller: AbstractController, body: AbstractBody, orbitLimitFactor = 2.5): boolean {
-    return body.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * body.getRadius()) ** 2;
-}

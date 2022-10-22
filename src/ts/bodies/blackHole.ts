@@ -1,5 +1,4 @@
 import { AbstractBody } from "./abstractBody";
-import { StarSystem } from "./starSystem";
 import { BodyType } from "./interfaces";
 import { BlackHolePostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
@@ -11,8 +10,8 @@ export class BlackHole extends AbstractBody {
     postProcesses: BlackHolePostProcesses;
     readonly radius: number;
 
-    constructor(name: string, radius: number, starSystem: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
-        super(name, starSystem, seed, parentBodies);
+    constructor(name: string, radius: number, seed: number, parentBodies: IOrbitalBody[]) {
+        super(name, seed, parentBodies);
 
         this.radius = radius;
         this.physicalProperties = {

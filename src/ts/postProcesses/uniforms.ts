@@ -1,7 +1,5 @@
 import { UberScene } from "../core/uberScene";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
-import { StarSystem } from "../bodies/starSystem";
-import { Vector4 } from "@babylonjs/core";
 import { AbstractBody } from "../bodies/abstractBody";
 import { ITransformable } from "../core/transforms/iTransformable";
 
@@ -75,28 +73,6 @@ export function getStarsUniforms(stars: ITransformable[]): ShaderUniforms {
             }
         }
     ];
-}
-
-export function getPlanetsUniforms(starSystem: StarSystem): ShaderUniforms {
-    return [
-        {
-            name: "planetPositions",
-            type: ShaderDataType.Vector4Array,
-            get: () => {
-                return starSystem.planets.map((planet) => {
-                    const position = planet.getAbsolutePosition();
-                    return new Vector4(position.x, position.y, position.z, planet.radius);
-                });
-            }
-        },
-        {
-            name: "nbPlanets",
-            type: ShaderDataType.Int,
-            get: () => {
-                return starSystem.planets.length;
-            }
-        }
-    ]
 }
 
 export function getBodyUniforms(body: AbstractBody): ShaderUniforms {

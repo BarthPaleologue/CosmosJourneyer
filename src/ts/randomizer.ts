@@ -18,8 +18,9 @@ import { Assets } from "./assets";
 import { HelmetOverlay } from "./ui/helmetOverlay";
 import { PlayerController } from "./controllers/playerController";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
-import { isOrbiting, positionNearBody } from "./utils/positionNearBody";
+import { positionNearBody } from "./utils/positionNearBody";
 import { nearestBody } from "./utils/nearestBody";
+import { isOrbiting } from "./bodies/abstractBody";
 
 const helmetOverlay = new HelmetOverlay();
 const bodyEditor = new BodyEditor();
@@ -62,7 +63,7 @@ Assets.Init(scene).then(() => {
 
     starSystem.init();
 
-    positionNearBody(player, starSystem.planets[0], starSystem);
+    positionNearBody(player, starSystem.getBodies()[1], starSystem);
 
     scene.executeWhenReady(() => {
         engine.loadingScreen.hideLoadingUI();

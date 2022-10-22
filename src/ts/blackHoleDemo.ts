@@ -16,10 +16,10 @@ import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { HelmetOverlay } from "./ui/helmetOverlay";
 import { PlayerController } from "./controllers/playerController";
-import { BlackHole } from "./bodies/blackHole";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
-import { isOrbiting, positionNearBody } from "./utils/positionNearBody";
+import { positionNearBody } from "./utils/positionNearBody";
 import { nearestBody } from "./utils/nearestBody";
+import { isOrbiting } from "./bodies/abstractBody";
 
 const helmetOverlay = new HelmetOverlay();
 
@@ -46,10 +46,9 @@ Assets.Init(scene).then(() => {
     BH.orbitalProperties.periapsis = BH.getRadius() * 4;
     BH.orbitalProperties.apoapsis = BH.getRadius() * 4;
 
-    starSystem.makeTelluricPlanet();
-    starSystem.planets[0].orbitalProperties.periapsis = 10000e3;
-    starSystem.planets[0].orbitalProperties.apoapsis = 10000e3;
-    console.log(starSystem.planets[0].getRadius());
+    const planet = starSystem.makeTelluricPlanet();
+    planet.orbitalProperties.periapsis = 10000e3;
+    planet.orbitalProperties.apoapsis = 10000e3;
 
     starSystem.makePlanets(1);
 

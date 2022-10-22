@@ -1,6 +1,6 @@
 import { Vector3 } from "@babylonjs/core";
 
-import { AbstractBody } from "./abstractBody";
+import { AbstractBody, isOrbiting } from "./abstractBody";
 import { Star } from "./stars/star";
 import { UberScene } from "../core/uberScene";
 import { Planet } from "./planets/planet";
@@ -13,7 +13,6 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { BlackHole } from "./blackHole";
 import { BodyType } from "./interfaces";
 import { PostProcessManager } from "../postProcesses/pipelines/postProcessManager";
-import { isOrbiting } from "../utils/positionNearBody";
 import { nearestBody } from "../utils/nearestBody";
 
 enum Steps {
@@ -31,7 +30,7 @@ export class StarSystem {
 
     readonly stars: (Star | BlackHole)[] = [];
 
-    readonly planets: Planet[] = [];
+    readonly planets: Planet[] = []; //TODO: contains satellites : make sense out of this
 
     private clock = 0;
 
@@ -53,7 +52,7 @@ export class StarSystem {
     }
 
     public makeStar(seed = this.rng(Steps.GENERATE_STARS + this.stars.length)): Star {
-        const star = new Star(`star${this.stars.length}`, this, this.scene, seed, this.stars);
+        const star = new Star(`star${this.stars.length}`, this.scene, seed, this.stars);
         //TODO: make this better, make it part of the generation
         star.orbitalProperties.periapsis = star.getRadius() * 4;
         star.orbitalProperties.apoapsis = star.getRadius() * 4;
@@ -64,7 +63,7 @@ export class StarSystem {
     }
 
     public makeBlackHole(seed = this.rng(Steps.GENERATE_STARS + this.stars.length)): BlackHole {
-        const blackHole = new BlackHole(`blackHole${this.stars.length}`, 1000e3, this, seed, this.stars);
+        const blackHole = new BlackHole(`blackHole${this.stars.length}`, 1000e3, seed, this.stars);
         this.addBody(blackHole);
         this.addStar(blackHole);
         return blackHole;
@@ -77,7 +76,7 @@ export class StarSystem {
     }
 
     public makeTelluricPlanet(seed = this.rng(Steps.GENERATE_PLANETS + this.planets.length)): TelluricPlanet {
-        const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this, this.scene, seed, this.stars);
+        const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this.scene, seed, this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
         //TODO: use formula
         planet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng, 80);
@@ -99,7 +98,7 @@ export class StarSystem {
     }
 
     public makeGasPlanet(seed = this.rng(Steps.GENERATE_PLANETS + this.planets.length)): GasPlanet {
-        const planet = new GasPlanet(`gasPlanet`, this, this.scene, seed, this.stars);
+        const planet = new GasPlanet(`gasPlanet`, this.scene, seed, this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
 
         this.planets.push(planet);
@@ -121,8 +120,8 @@ export class StarSystem {
         }
     }
 
-    public makeSatellite(planet: Planet, seed = planet.rng(100)): TelluricPlanet {
-        const satellite = new TelluricPlanet(`${planet.name}Sattelite`, this, this.scene, seed, [planet]);
+    public makeSatellite(planet: AbstractBody, seed = planet.rng(100)): TelluricPlanet {
+        const satellite = new TelluricPlanet(`${planet.name}Sattelite`, this.scene, seed, [planet]);
         const periapsis = 2 * planet.getRadius() + clamp(normalRandom(3, 1, satellite.rng, 90), 0, 20) * planet.getRadius() * 2;
         const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.rng, 92), 1, 1.5);
         satellite.physicalProperties.mass = 1;
@@ -135,10 +134,12 @@ export class StarSystem {
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
 
         this.addBody(satellite);
+        this.planets.push(satellite);
+
         return satellite;
     }
 
-    public makeSatellites(planet: Planet, n: number): void {
+    public makeSatellites(planet: AbstractBody, n: number): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
         for (let i = 0; i < n; i++) {
             this.makeSatellite(planet);
@@ -203,7 +204,7 @@ export class StarSystem {
     }
 
     public initPostProcesses() {
-        this.postProcessManager.addStarField(this.stars, this.planets);
+        this.postProcessManager.addStarField(this.stars, this.bodies);
 
         for (const body of this.bodies) {
             if (body.postProcesses.rings) this.postProcessManager.addRings(body, this.stars);
@@ -239,6 +240,8 @@ export class StarSystem {
         this.clock += deltaTime;
 
         for (const body of this.getBodies()) body.updateTransform(this.scene.getActiveController(), deltaTime);
+
+        for (const planet of this.planets) planet.updateMaterial(this.scene.getActiveController(), this.stars);
 
         const displacement = this.scene.getActiveController().transform.getAbsolutePosition().negate();
 

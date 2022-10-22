@@ -1,7 +1,6 @@
-import { Quaternion, Axis, Vector3 } from "@babylonjs/core";
+import { Axis, Quaternion, Vector3 } from "@babylonjs/core";
 import { BodyType, ISeedable } from "./interfaces";
 import { AbstractController } from "../controllers/abstractController";
-import { StarSystem } from "./starSystem";
 import { PhysicalProperties } from "./physicalProperties";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
@@ -10,12 +9,21 @@ import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { normalRandom } from "extended-random";
 import { BasicTransform } from "../core/transforms/basicTransform";
 import { seededSquirrelNoise } from "squirrel-noise";
-import { isOrbiting } from "../utils/positionNearBody";
 
 enum Steps {
     AXIAL_TILT = 100,
     ORBIT = 200,
     RINGS = 300
+}
+
+/**
+ * If the parameter is unset, returns whereas the player is orbiting a body, if the parameter is set returns if the player orbits the given body
+ * @param controller the controller to check
+ * @param body the body to check whereas the player is orbiting
+ * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
+ */
+export function isOrbiting(controller: AbstractController, body: AbstractBody, orbitLimitFactor = 2.5): boolean {
+    return body.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * body.getRadius()) ** 2;
 }
 
 export abstract class AbstractBody extends BasicTransform implements IOrbitalBody, ISeedable {
@@ -25,7 +33,8 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
     orbitalProperties: IOrbitalProperties;
     abstract postProcesses: BodyPostProcesses;
 
-    readonly starSystem: StarSystem;
+    //TODO: make an universal clock ?? or not it could be funny
+    private internalTime = 0;
 
     readonly name: string;
 
@@ -47,7 +56,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
      * @param seed the seed for the random number generator in [-1, 1]
      * @param parentBodies the parent bodies of this body
      */
-    protected constructor(name: string, starSystemManager: StarSystem, seed: number, parentBodies: IOrbitalBody[]) {
+    protected constructor(name: string, seed: number, parentBodies: IOrbitalBody[]) {
         super(name);
         this.name = name;
 
@@ -55,8 +64,6 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         this.seed = seed;
 
         this.rng = seededSquirrelNoise(seed * Number.MAX_SAFE_INTEGER);
-
-        this.starSystem = starSystemManager;
 
         this.parentBodies = parentBodies;
 
@@ -111,12 +118,17 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         return this.node.up;
     }
 
+    public getInternalTime(): number {
+        return this.internalTime;
+    }
+
     /**
      * Updates the state of the celestial body for a given time step of deltaTime
      * @param player the player in the simulation
      * @param deltaTime the time step to update for
      */
     public updateTransform(player: AbstractController, deltaTime: number): void {
+        this.internalTime += deltaTime;
         if (this.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
             this.orbitalProperties.orientationQuaternion = orientationQuaternion;
@@ -124,11 +136,9 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
             //TODO: orient the planet accurately
 
             const initialPosition = this.getAbsolutePosition().clone();
-            const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this.starSystem.getTime());
+            const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this.internalTime);
 
             if (isOrbiting(player, this, 50 / (this.depth + 1) ** 3)) player.transform.translate(newPosition.subtract(initialPosition));
-            this.starSystem.translateAllBodies(player.transform.getAbsolutePosition().negate());
-            player.transform.translate(player.transform.getAbsolutePosition().negate());
             this.translate(newPosition.subtract(initialPosition));
         }
 
@@ -136,8 +146,6 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
             const dtheta = (2 * Math.PI * deltaTime) / this.physicalProperties.rotationPeriod;
 
             if (isOrbiting(player, this)) player.transform.rotateAround(this.getAbsolutePosition(), this.node.up, -dtheta);
-            this.starSystem.translateAllBodies(player.transform.getAbsolutePosition().negate());
-            player.transform.translate(player.transform.getAbsolutePosition().negate());
             this.rotate(this.getRotationAxis(), -dtheta);
         }
     }

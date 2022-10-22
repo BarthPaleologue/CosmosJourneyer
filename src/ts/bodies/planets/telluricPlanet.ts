@@ -8,7 +8,6 @@ import { BodyType, RigidBody } from "../interfaces";
 import { CollisionData } from "../../chunks/workerDataTypes";
 import { TaskType } from "../../chunks/taskTypes";
 import { AbstractController } from "../../controllers/abstractController";
-import { StarSystem } from "../starSystem";
 import { Settings } from "../../settings";
 import { SolidPhysicalProperties } from "../physicalProperties";
 import { TelluricMaterial } from "../../materials/telluricMaterial";
@@ -19,6 +18,9 @@ import { clamp } from "../../utils/gradientMath";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../core/uberScene";
+import { Planet } from "./planet";
+import { Star } from "../stars/star";
+import { BlackHole } from "../blackHole";
 
 enum Steps {
     RADIUS = 1000,
@@ -29,9 +31,7 @@ enum Steps {
     TERRAIN = 1500
 }
 
-export class TelluricPlanet extends AbstractBody implements RigidBody {
-    oceanLevel: number;
-
+export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
     override readonly physicalProperties: SolidPhysicalProperties;
     override readonly bodyType = BodyType.TELLURIC;
     override readonly radius: number;
@@ -55,8 +55,8 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
      * @param seed The seed of the planet in [-1, 1]
      * @param parentBodies The bodies the planet is orbiting
      */
-    constructor(name: string, starSystem: StarSystem, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
-        super(name, starSystem, seed, parentBodies);
+    constructor(name: string, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
+        super(name, seed, parentBodies);
 
         for (const parentBody of parentBodies) {
             if (parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true;
@@ -90,7 +90,8 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
             minTemperature: -60,
             maxTemperature: 40,
             pressure: pressure,
-            waterAmount: waterAmount
+            waterAmount: waterAmount,
+            oceanLevel: 0
         };
 
         this.postProcesses = {
@@ -106,15 +107,15 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
         const epsilon = 0.05;
         if (pressure > epsilon) {
             if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
-                this.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
+                this.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
                 this.postProcesses.ocean = true;
                 this.postProcesses.clouds = true;
             } else {
-                this.oceanLevel = 0;
+                this.physicalProperties.oceanLevel = 0;
             }
             this.postProcesses.atmosphere = true;
         } else {
-            this.oceanLevel = 0;
+            this.physicalProperties.oceanLevel = 0;
         }
 
         if (uniformRandBool(0.6, this.rng, Steps.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
@@ -131,14 +132,14 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
 
             maxBumpHeight: 1.5e3,
             maxMountainHeight: 13e3,
-            continentBaseHeight: this.oceanLevel * 2.5,
+            continentBaseHeight: this.physicalProperties.oceanLevel * 2.5,
 
             mountainsFrequency: 20 * this.ratio
         };
 
         if (this.isSatelliteOfTelluric) this.terrainSettings.continentsFragmentation /= 2;
 
-        this.material = new TelluricMaterial(this, scene);
+        this.material = new TelluricMaterial(this.name, this, this.getRadius(), this.seed, this.terrainSettings, this.physicalProperties, scene);
 
         this.sides = [
             new ChunkTree(Direction.Up, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene),
@@ -180,7 +181,11 @@ export class TelluricPlanet extends AbstractBody implements RigidBody {
     public override updateTransform(player: AbstractController, deltaTime: number): void {
         super.updateTransform(player, deltaTime);
         this.updateLOD(player.transform.getAbsolutePosition());
-        this.material.update();
+        this.material.update(player, []);
+    }
+
+    updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[]): void {
+        this.material.update(controller, stars);
     }
 
     public override getApparentRadius(): number {

@@ -3,7 +3,6 @@ import { AbstractBody } from "../abstractBody";
 import { Mesh, MeshBuilder, Quaternion } from "@babylonjs/core";
 import { BodyType } from "../interfaces";
 import { AbstractController } from "../../controllers/abstractController";
-import { StarSystem } from "../starSystem";
 import { StarPhysicalProperties } from "../physicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
@@ -25,8 +24,6 @@ export class Star extends AbstractBody {
     readonly mesh: Mesh;
     private readonly material: StarMaterial;
 
-    internalTime = 0;
-
     override readonly bodyType = BodyType.STAR;
     override readonly physicalProperties: StarPhysicalProperties;
 
@@ -41,8 +38,8 @@ export class Star extends AbstractBody {
      * @param seed The seed of the star in [-1, 1]
      * @param parentBodies The bodies the star is orbiting
      */
-    constructor(name: string, starSystemManager: StarSystem, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
-        super(name, starSystemManager, seed, parentBodies);
+    constructor(name: string, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
+        super(name, seed, parentBodies);
 
         //TODO: make it dependent on star type
         this.radius = randRange(50, 200, this.rng, Steps.RADIUS) * Settings.EARTH_RADIUS;
@@ -65,7 +62,7 @@ export class Star extends AbstractBody {
         );
         this.mesh.parent = this.node;
 
-        this.material = new StarMaterial(this, scene);
+        this.material = new StarMaterial(this, this.seed, this.physicalProperties, scene);
         this.mesh.material = this.material;
 
         // TODO: remove when rotation is transmitted to children
@@ -82,10 +79,6 @@ export class Star extends AbstractBody {
 
     public override updateTransform(player: AbstractController, deltaTime: number): void {
         super.updateTransform(player, deltaTime);
-
-        this.material.update();
-
-        this.internalTime += deltaTime;
-        this.internalTime %= 24 * 60 * 60; // prevent imprecision in shader material (noise offset)
+        this.material.update(this.getInternalTime());
     }
 }

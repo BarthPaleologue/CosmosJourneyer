@@ -3,13 +3,14 @@ import { Effect } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 
 import atmosphericScatteringFragment from "../../../shaders/atmosphericScatteringFragment.glsl";
-import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
 import { UberPostProcess } from "../uberPostProcess";
 import { centeredRand } from "extended-random";
 import { BlackHole } from "../../bodies/blackHole";
 import { Star } from "../../bodies/stars/star";
+import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
+import { GasPlanet } from "../../bodies/planets/gasPlanet";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -30,7 +31,7 @@ export interface AtmosphereSettings {
 export class AtmosphericScatteringPostProcess extends UberPostProcess {
     settings: AtmosphereSettings;
 
-    constructor(name: string, planet: Planet, atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, planet: (TelluricPlanet | GasPlanet), atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 23,

@@ -16,6 +16,7 @@ import { OverlayPostProcess } from "../overlayPostProcess";
 import { VolumetricLight } from "../volumetricLight";
 import { BlackHolePostProcess } from "../planetPostProcesses/blackHolePostProcess";
 import { ColorCorrection } from "../colorCorrection";
+import { GasPlanet } from "../../bodies/planets/gasPlanet";
 
 export enum PostProcessType {
     VOLUMETRIC_LIGHT,
@@ -91,7 +92,7 @@ export class PostProcessManager {
         this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
     }
 
-    public addAtmosphere(planet: Planet, stars: (Star | BlackHole)[]) {
+    public addAtmosphere(planet: (GasPlanet | TelluricPlanet), stars: (Star | BlackHole)[]) {
         this.atmospheres.push(new AtmosphericScatteringPostProcess(`${planet.name}Atmosphere`, planet, Settings.ATMOSPHERE_HEIGHT, this.scene, stars));
     }
 
@@ -99,7 +100,7 @@ export class PostProcessManager {
         this.rings.push(new RingsPostProcess(`${body.name}Rings`, body, this.scene, stars));
     }
 
-    public addStarField(stars: (Star | BlackHole)[], planets: Planet[]) {
+    public addStarField(stars: (Star | BlackHole)[], planets: AbstractBody[]) {
         this.starFields.push(new StarfieldPostProcess("starField", this.scene, stars, planets));
     }
 

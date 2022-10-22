@@ -17,8 +17,9 @@ import { Assets } from "./assets";
 import { HelmetOverlay } from "./ui/helmetOverlay";
 import { ShipController } from "./controllers/shipController";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
-import { isOrbiting, positionNearBody } from "./utils/positionNearBody";
+import { positionNearBody } from "./utils/positionNearBody";
 import { nearestBody } from "./utils/nearestBody";
+import { isOrbiting } from "./bodies/abstractBody";
 
 const helmetOverlay = new HelmetOverlay();
 
@@ -41,7 +42,7 @@ Assets.Init(scene).then(() => {
     const starSystem = new StarSystem(starSystemSeed, scene);
 
     starSystem.makeStars(1);
-    starSystem.makePlanets(1);
+    const planet = starSystem.makeTelluricPlanet();
 
     document.addEventListener("keydown", (e) => {
         if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
@@ -57,7 +58,7 @@ Assets.Init(scene).then(() => {
 
     starSystem.init();
 
-    positionNearBody(spaceshipController, starSystem.planets[0], starSystem);
+    positionNearBody(spaceshipController, planet, starSystem);
 
     scene.executeWhenReady(() => {
         engine.loadingScreen.hideLoadingUI();

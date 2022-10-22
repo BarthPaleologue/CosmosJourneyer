@@ -2,7 +2,6 @@ import { Mesh, MeshBuilder } from "@babylonjs/core";
 
 import { BodyType } from "../interfaces";
 import { AbstractController } from "../../controllers/abstractController";
-import { StarSystem } from "../starSystem";
 import { PlanetPhysicalProperties } from "../physicalProperties";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
@@ -11,6 +10,9 @@ import { Settings } from "../../settings";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../core/uberScene";
+import { Planet } from "./planet";
+import { Star } from "../stars/star";
+import { BlackHole } from "../blackHole";
 
 enum Steps {
     RADIUS = 1000,
@@ -18,7 +20,7 @@ enum Steps {
     RINGS = 1200
 }
 
-export class GasPlanet extends AbstractBody {
+export class GasPlanet extends AbstractBody implements Planet {
     override readonly bodyType = BodyType.GAZ;
     override readonly physicalProperties: PlanetPhysicalProperties;
     override readonly radius;
@@ -35,8 +37,8 @@ export class GasPlanet extends AbstractBody {
      * @param seed The seed of the planet in [-1, 1]
      * @param parentBodies The bodies the planet is orbiting
      */
-    constructor(name: string, starSystem: StarSystem, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
-        super(name, starSystem, seed, parentBodies);
+    constructor(name: string, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
+        super(name, seed, parentBodies);
 
         this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng, Steps.RADIUS);
 
@@ -59,7 +61,7 @@ export class GasPlanet extends AbstractBody {
         );
         this.mesh.parent = this.node;
 
-        this.material = new GasPlanetMaterial(this, scene);
+        this.material = new GasPlanetMaterial(this.name, this, this.getRadius(), this.seed, this.rng, scene);
         this.mesh.material = this.material;
 
         this.postProcesses = {
@@ -73,6 +75,9 @@ export class GasPlanet extends AbstractBody {
 
     updateTransform(player: AbstractController, deltaTime: number) {
         super.updateTransform(player, deltaTime);
-        this.material.update(player);
+    }
+
+    updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[]): void {
+        this.material.update(controller, stars);
     }
 }

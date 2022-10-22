@@ -2,12 +2,12 @@ import { Effect } from "@babylonjs/core";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 
 import volumetricCloudsFragment from "../../../shaders/volumetricCloudsFragment.glsl";
-import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
 import { UberPostProcess } from "../uberPostProcess";
 import { BlackHole } from "../../bodies/blackHole";
 import { Star } from "../../bodies/stars/star";
+import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
 
 const shaderName = "volumetricClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
@@ -19,7 +19,7 @@ export interface VolumetricCloudSettings {
 export class VolumetricCloudsPostProcess extends UberPostProcess {
     settings: VolumetricCloudSettings;
 
-    constructor(name: string, planet: Planet, atmosphereRadius: number, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, planet: TelluricPlanet, atmosphereRadius: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: VolumetricCloudSettings = {
             atmosphereRadius: atmosphereRadius
         };

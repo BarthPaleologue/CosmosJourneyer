@@ -1,4 +1,7 @@
-import { TelluricPlanet } from "./telluricPlanet";
-import { GasPlanet } from "./gasPlanet";
+import { AbstractController } from "../../controllers/abstractController";
+import { Star } from "../stars/star";
+import { BlackHole } from "../blackHole";
 
-export type Planet = TelluricPlanet | GasPlanet;
+export interface Planet {
+    updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[]): void;
+}

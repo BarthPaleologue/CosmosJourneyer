@@ -11,8 +11,8 @@ import { UberPostProcess } from "./uberPostProcess";
 import { Settings } from "../settings";
 import { BlackHole } from "../bodies/blackHole";
 import { Star } from "../bodies/stars/star";
-import { Planet } from "../bodies/planets/planet";
 import { nearestBody } from "../utils/nearestBody";
+import { AbstractBody } from "../bodies/abstractBody";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -24,7 +24,7 @@ export interface StarfieldSettings {
 export class StarfieldPostProcess extends UberPostProcess {
     settings: StarfieldSettings;
 
-    constructor(name: string, scene: UberScene, stars: (Star | BlackHole)[], planets: Planet[]) {
+    constructor(name: string, scene: UberScene, stars: (Star | BlackHole)[], bodies: AbstractBody[]) {
         const settings: StarfieldSettings = {
             foo: 1
         };
@@ -43,13 +43,13 @@ export class StarfieldPostProcess extends UberPostProcess {
                     }
                     vis /= 2;
                     let vis2 = 1.0;
-                    const nearest = nearestBody(scene.getActiveController().transform, planets);
+                    const nearest = nearestBody(scene.getActiveController().transform, bodies);
                     if (nearest.bodyType == BodyType.TELLURIC) {
                         const planet = nearest as TelluricPlanet;
                         if (planet.postProcesses.atmosphere != null) {
                             const height = planet.getAbsolutePosition().length();
                             //FIXME: has to be dynamic
-                            const maxHeight = Settings.ATMOSPHERE_HEIGHT;//planet.postProcesses.atmosphere.settings.atmosphereRadius;
+                            const maxHeight = Settings.ATMOSPHERE_HEIGHT;
                             for (const star of stars) {
                                 const sunDir = planet.getAbsolutePosition().subtract(star.getAbsolutePosition()).normalize();
                                 vis2 = Math.min(vis2, (height / maxHeight) ** 32 + Math.max(Vector3.Dot(sunDir, planet.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5);

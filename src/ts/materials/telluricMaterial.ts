@@ -1,24 +1,31 @@
 import { Color3, Effect, MaterialHelper, ShaderMaterial } from "@babylonjs/core";
-import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { ColorMode, ColorSettings } from "./colorSettingsInterface";
-import { AbstractController } from "../controllers/abstractController";
 
 import surfaceMaterialFragment from "../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../assets";
 import { flattenVector3Array } from "../utils/algebra";
 import { UberScene } from "../core/uberScene";
+import { Star } from "../bodies/stars/star";
+import { AbstractController } from "../controllers/abstractController";
+import { BlackHole } from "../bodies/blackHole";
+import { BasicTransform } from "../core/transforms/basicTransform";
+import { TerrainSettings } from "../terrain/terrainSettings";
+import { SolidPhysicalProperties } from "../bodies/physicalProperties";
 
 const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 
 export class TelluricMaterial extends ShaderMaterial {
-    readonly planet: TelluricPlanet;
+    readonly planet: BasicTransform;
     colorSettings: ColorSettings;
+    terrainSettings: TerrainSettings;
+    physicalProperties: SolidPhysicalProperties;
+    planetRadius: number;
 
-    constructor(planet: TelluricPlanet, scene: UberScene) {
-        super(`${planet.name}SurfaceColor`, scene, shaderName, {
+    constructor(planetName: string, planet: BasicTransform, planetRadius: number, planetSeed: number, terrainSettings: TerrainSettings, physicalProperties: SolidPhysicalProperties, scene: UberScene) {
+        super(`${planetName}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
             uniforms: [
                 "world",
@@ -80,6 +87,9 @@ export class TelluricMaterial extends ShaderMaterial {
         });
 
         this.planet = planet;
+        this.planetRadius = planetRadius;
+        this.terrainSettings = terrainSettings;
+        this.physicalProperties = physicalProperties;
         this.colorSettings = {
             mode: ColorMode.DEFAULT,
 
@@ -100,7 +110,7 @@ export class TelluricMaterial extends ShaderMaterial {
             MaterialHelper.BindLogDepth(null, effect, scene);
         });
 
-        this.setFloat("seed", this.planet.seed);
+        this.setFloat("seed", planetSeed);
 
         if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 
@@ -113,19 +123,17 @@ export class TelluricMaterial extends ShaderMaterial {
 
         this.setVector3("playerPosition", scene.getActiveController().getActiveCamera().position);
 
-        this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
-
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
 
         this.updateConstants();
     }
 
     public updateConstants(): void {
-        this.setFloat("planetRadius", this.planet.getRadius());
+        this.setFloat("planetRadius", this.planetRadius);
 
         this.setInt("colorMode", this.colorSettings.mode);
 
-        this.setFloat("waterLevel", this.planet.oceanLevel);
+        this.setFloat("waterLevel", this.physicalProperties.oceanLevel);
         this.setFloat("beachSize", this.colorSettings.beachSize);
         this.setFloat("steepSharpness", this.colorSettings.steepSharpness);
 
@@ -141,22 +149,22 @@ export class TelluricMaterial extends ShaderMaterial {
         this.setTexture("beachNormalMap", Assets.SandNormalMap1);
         this.setTexture("desertNormalMap", Assets.SandNormalMap2);
 
-        this.setFloat("minTemperature", this.planet.physicalProperties.minTemperature);
-        this.setFloat("maxTemperature", this.planet.physicalProperties.maxTemperature);
-        this.setFloat("pressure", this.planet.physicalProperties.pressure);
-        this.setFloat("waterAmount", this.planet.physicalProperties.waterAmount);
+        this.setFloat("minTemperature", this.physicalProperties.minTemperature);
+        this.setFloat("maxTemperature", this.physicalProperties.maxTemperature);
+        this.setFloat("pressure", this.physicalProperties.pressure);
+        this.setFloat("waterAmount", this.physicalProperties.waterAmount);
 
-        this.setFloat("maxElevation", this.planet.terrainSettings.continentBaseHeight + this.planet.terrainSettings.maxMountainHeight + this.planet.terrainSettings.maxBumpHeight);
+        this.setFloat("maxElevation", this.terrainSettings.continentBaseHeight + this.terrainSettings.maxMountainHeight + this.terrainSettings.maxBumpHeight);
 }
 
-    public update() {
+    public update(activeController: AbstractController, stars: (Star | BlackHole)[]) {
         this.setMatrix("normalMatrix", this.planet.node.getWorldMatrix().clone().invert().transpose());
 
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
-        this.setVector3("playerPosition", this.planet.starSystem.scene.getActiveController().transform.getAbsolutePosition());
+        this.setVector3("playerPosition", activeController.transform.getAbsolutePosition());
 
-        this.setArray3("starPositions", flattenVector3Array(this.planet.starSystem.stars.map((star) => star.getAbsolutePosition())));
-        this.setInt("nbStars", this.planet.starSystem.stars.length);
+        this.setArray3("starPositions", flattenVector3Array(stars.map((star) => star.getAbsolutePosition())));
+        this.setInt("nbStars", stars.length);
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
     }

@@ -4,12 +4,12 @@ import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 
 import oceanFragment from "../../../shaders/oceanFragment.glsl";
 import { Assets } from "../../assets";
-import { Planet } from "../../bodies/planets/planet";
 import { UberScene } from "../../core/uberScene";
 import { UberPostProcess } from "../uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
 import { Star } from "../../bodies/stars/star";
 import { BlackHole } from "../../bodies/blackHole";
+import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -26,7 +26,7 @@ export interface OceanSettings {
 export class OceanPostProcess extends UberPostProcess {
     settings: OceanSettings;
 
-    constructor(name: string, planet: Planet, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, planet: TelluricPlanet, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: OceanSettings = {
             oceanRadius: planet.getApparentRadius(),
             depthModifier: 0.001,
