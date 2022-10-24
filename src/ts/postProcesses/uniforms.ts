@@ -53,7 +53,8 @@ export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
             get: () => {
                 return scene.getActiveUberCamera().maxZ;
             }
-        }];
+        }
+    ];
 }
 
 export function getStarsUniforms(stars: ITransformable[]): ShaderUniforms {
@@ -91,7 +92,7 @@ export function getBodyUniforms(body: AbstractBody): ShaderUniforms {
                 return body.getApparentRadius();
             }
         }
-    ]
+    ];
 }
 
 export function getSamplers(scene: UberScene): ShaderSamplers {

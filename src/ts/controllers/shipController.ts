@@ -47,9 +47,9 @@ export class ShipController extends AbstractController {
     }
 
     listenTo(input: Input, deltaTime: number): Vector3 {
-        if(input.type == InputType.KEYBOARD) {
+        if (input.type == InputType.KEYBOARD) {
             const keyboard = input as Keyboard;
-            if(keyboard.isPressed("U")) this.isHyperAccelerated = !this.isHyperAccelerated;
+            if (keyboard.isPressed("U")) this.isHyperAccelerated = !this.isHyperAccelerated;
         }
         this.transform.rotationAcceleration.x += this.rollAuthority * input.getRoll() * deltaTime;
         this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;

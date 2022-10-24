@@ -12,7 +12,6 @@ import { getOrbitalPeriod } from "../orbits/kepler";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BlackHole } from "./blackHole";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
-import { nearestBody } from "../utils/nearestBody";
 
 enum Steps {
     GENERATE_STARS = 100,
@@ -44,8 +43,16 @@ export class StarSystem {
         this.bodies.push(body);
     }
 
-    public addStar(star: Star | BlackHole): void {
+    public addPlanet(planet: TelluricPlanet | GasPlanet): TelluricPlanet | GasPlanet {
+        this.bodies.push(planet);
+        this.planets.push(planet);
+        return planet;
+    }
+
+    public addStar(star: Star | BlackHole): Star | BlackHole {
+        this.bodies.push(star);
         this.stars.push(star);
+        return star;
     }
 
     public makeStar(seed = this.rng(Steps.GENERATE_STARS + this.stars.length)): Star {
@@ -54,14 +61,12 @@ export class StarSystem {
         star.orbitalProperties.periapsis = star.getRadius() * 4;
         star.orbitalProperties.apoapsis = star.getRadius() * 4;
 
-        this.addBody(star);
         this.addStar(star);
         return star;
     }
 
     public makeBlackHole(seed = this.rng(Steps.GENERATE_STARS + this.stars.length)): BlackHole {
         const blackHole = new BlackHole(`blackHole${this.stars.length}`, 1000e3, seed, this.stars);
-        this.addBody(blackHole);
         this.addStar(blackHole);
         return blackHole;
     }
@@ -69,7 +74,6 @@ export class StarSystem {
     public makeStars(n: number): void {
         if (n < 1) throw new Error("Cannot make less than 1 star");
         for (let i = 0; i < n; i++) this.makeStar();
-
     }
 
     public makeTelluricPlanet(seed = this.rng(Steps.GENERATE_PLANETS + this.planets.length)): TelluricPlanet {
@@ -88,8 +92,7 @@ export class StarSystem {
         planet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng, 85);
         planet.material.updateConstants();
 
-        this.planets.push(planet);
-        this.addBody(planet);
+        this.addPlanet(planet);
 
         return planet;
     }
@@ -98,8 +101,7 @@ export class StarSystem {
         const planet = new GasPlanet(`gasPlanet`, this.scene, seed, this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
 
-        this.planets.push(planet);
-        this.addBody(planet);
+        this.addPlanet(planet);
 
         return planet;
     }
@@ -131,22 +133,18 @@ export class StarSystem {
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
 
         this.addBody(satellite);
-        this.planets.push(satellite);
+        this.planets.push(satellite); //FIXME: this is to be removed
 
         return satellite;
     }
 
     public makeSatellites(planet: AbstractBody, n: number): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
-        for (let i = 0; i < n; i++) {
-            this.makeSatellite(planet);
-        }
+        for (let i = 0; i < n; i++) this.makeSatellite(planet);
     }
 
-    public translateAllBodies(deplacement: Vector3): void {
-        for (const planet of this.bodies) {
-            planet.translate(deplacement);
-        }
+    public translateAllBodies(displacement: Vector3): void {
+        for (const planet of this.bodies) planet.translate(displacement);
     }
 
     /**
@@ -159,32 +157,15 @@ export class StarSystem {
     /**
      * Returns the nearest body to the origin
      */
-    public getNearestBody(): AbstractBody {
+    public getNearestBody(position: Vector3 = Vector3.Zero()): AbstractBody {
         if (this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
         let nearest = null;
+        let smallerDistance2 = -1;
         for (const body of this.getBodies()) {
-            if (nearest == null) nearest = body;
-            else if (body.getAbsolutePosition().lengthSquared() < nearest.getAbsolutePosition().lengthSquared()) {
+            const distance2 = body.getAbsolutePosition().subtract(position).lengthSquared();
+            if (nearest == null || distance2 < smallerDistance2) {
                 nearest = body;
-            }
-        }
-        if (nearest == null) throw new Error("There are no bodies in the solar system");
-        return nearest;
-    }
-
-    /**
-     * Returns the most influential body at a given point
-     */
-    public getMostInfluentialBodyAtPoint(point: Vector3): AbstractBody {
-        if (this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
-        let nearest = null;
-        for (const body of this.bodies) {
-            if (nearest == null) nearest = body;
-            else if (
-                body.physicalProperties.mass / Vector3.DistanceSquared(body.getAbsolutePosition(), point) >
-                nearest.physicalProperties.mass / Vector3.DistanceSquared(nearest.getAbsolutePosition(), point)
-            ) {
-                nearest = body;
+                smallerDistance2 = distance2;
             }
         }
         if (nearest == null) throw new Error("There are no bodies in the solar system");
@@ -198,8 +179,8 @@ export class StarSystem {
 
     public initPostProcesses() {
         this.postProcessManager.addStarField(this.stars, this.bodies);
-        for(const body of this.bodies) this.postProcessManager.addBody(body, this.stars);
-        this.postProcessManager.setBody(nearestBody(this.scene.getActiveController().transform, this.bodies));
+        for (const body of this.bodies) this.postProcessManager.addBody(body, this.stars);
+        this.postProcessManager.setBody(this.getNearestBody(this.scene.getActiveUberCamera().position));
         this.postProcessManager.init();
     }
 
@@ -213,17 +194,14 @@ export class StarSystem {
         this.translateAllBodies(displacement);
         this.scene.getActiveController().transform.translate(displacement);
 
-
-        const nearest = nearestBody(this.scene.getActiveController().transform, this.bodies);
+        const nearest = this.getNearestBody(this.scene.getActiveUberCamera().position);
 
         this.postProcessManager.setBody(nearest);
 
-        const switchLimit = 2;//nearestBody.postProcesses.rings?.settings.ringStart || 2;
-        if (isOrbiting(this.scene.getActiveController(), nearest, switchLimit)) {
-            this.postProcessManager.setSurfaceOrder();
-        } else {
-            this.postProcessManager.setSpaceOrder();
-        }
+        const switchLimit = nearest.postProcesses.rings ? this.postProcessManager.getRings(nearest).settings.ringStart : 2;
+        if (isOrbiting(this.scene.getActiveController(), nearest, switchLimit)) this.postProcessManager.setSurfaceOrder();
+        else this.postProcessManager.setSpaceOrder();
+
         this.postProcessManager.update(deltaTime);
     }
 }

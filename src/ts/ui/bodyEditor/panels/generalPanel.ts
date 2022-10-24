@@ -29,13 +29,15 @@ export class GeneralPanel extends EditorPanel {
             new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
                 body.rotate(Axis.X, newAxialTilt - axialTiltX);
-                if (isOrbiting(scene.getActiveController(), body)) scene.getActiveController().transform.rotateAround(body.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
+                if (isOrbiting(scene.getActiveController(), body))
+                    scene.getActiveController().transform.rotateAround(body.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
                 axialTiltX = newAxialTilt;
             }),
             new Slider("axialTiltZ", document.getElementById("axialTiltZ") as HTMLElement, -180, 180, Math.round((180 * axialTiltZ) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
                 body.rotate(Axis.Z, newAxialTilt - axialTiltZ);
-                if (isOrbiting(scene.getActiveController(), body)) scene.getActiveController().transform.rotateAround(body.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
+                if (isOrbiting(scene.getActiveController(), body))
+                    scene.getActiveController().transform.rotateAround(body.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
                 axialTiltZ = newAxialTilt;
             }),
             new Slider(

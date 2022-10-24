@@ -1,12 +1,6 @@
 import { UberScene } from "../core/uberScene";
 import { UberRenderingPipeline } from "../core/uberRenderingPipeline";
-import {
-    Engine,
-    FxaaPostProcess,
-    PostProcess,
-    PostProcessRenderEffect,
-    VolumetricLightScatteringPostProcess
-} from "@babylonjs/core";
+import { Engine, FxaaPostProcess, PostProcess, PostProcessRenderEffect, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 import { OceanPostProcess } from "./oceanPostProcess";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { Star } from "../bodies/stars/star";
@@ -103,11 +97,11 @@ export class PostProcessManager {
         throw new Error("No clouds found for: " + planet.name);
     }
 
-    public addAtmosphere(planet: (GasPlanet | TelluricPlanet), stars: (Star | BlackHole)[]) {
+    public addAtmosphere(planet: GasPlanet | TelluricPlanet, stars: (Star | BlackHole)[]) {
         this.atmospheres.push(new AtmosphericScatteringPostProcess(`${planet.name}Atmosphere`, planet, Settings.ATMOSPHERE_HEIGHT, this.scene, stars));
     }
 
-    public getAtmosphere(planet: (GasPlanet | TelluricPlanet)): AtmosphericScatteringPostProcess {
+    public getAtmosphere(planet: GasPlanet | TelluricPlanet): AtmosphericScatteringPostProcess {
         for (const atmosphere of this.atmospheres) if (atmosphere.planet === planet) return atmosphere;
         throw new Error("No atmosphere found for: " + planet.name);
     }
@@ -240,7 +234,6 @@ export class PostProcessManager {
         this.uberRenderingPipeline.overlays.push(...this.overlays);
         this.uberRenderingPipeline.volumetricLights.push(...this.volumetricLights);
         this.uberRenderingPipeline.blackHoles.push(...this.blackHoles);*/
-
 
         const bodyType = this.getCurrentBody().bodyType;
         let otherVolumetricLights = this.volumetricLights;

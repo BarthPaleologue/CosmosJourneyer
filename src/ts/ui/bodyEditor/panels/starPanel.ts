@@ -10,7 +10,7 @@ export class StarPanel extends EditorPanel {
     init(star: Star, postProcessManager: PostProcessManager) {
         for (const slider of this.sliders) slider.remove();
 
-        if(!star.postProcesses.volumetricLight) return;
+        if (!star.postProcesses.volumetricLight) return;
         const volumetricLight = postProcessManager.getVolumetricLight(star);
 
         this.sliders = [

@@ -18,4 +18,3 @@ export function positionNearBody(controller: AbstractController, body: AbstractB
 
     controller.transform.node.lookAt(body.getAbsolutePosition());
 }
-

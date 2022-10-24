@@ -30,7 +30,7 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess {
     settings: AtmosphereSettings;
     planet: TelluricPlanet | GasPlanet;
 
-    constructor(name: string, planet: (TelluricPlanet | GasPlanet), atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, planet: TelluricPlanet | GasPlanet, atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 23,

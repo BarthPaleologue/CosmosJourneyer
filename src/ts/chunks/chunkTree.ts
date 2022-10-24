@@ -44,7 +44,16 @@ export class ChunkTree {
      * @param direction
      * @param planet
      */
-    constructor(direction: Direction, planetName: string, planetSeed: number, planetRadius: number, terrainSettings: TerrainSettings, parent: BasicTransform, material: Material, scene: UberScene) {
+    constructor(
+        direction: Direction,
+        planetName: string,
+        planetSeed: number,
+        planetRadius: number,
+        terrainSettings: TerrainSettings,
+        parent: BasicTransform,
+        material: Material,
+        scene: UberScene
+    ) {
         this.rootChunkLength = planetRadius * 2;
         this.planetName = planetName;
         this.planetSeed = planetSeed;
@@ -160,7 +169,7 @@ export class ChunkTree {
         if (chunk.isReady() && Settings.ENABLE_OCCLUSION) {
             const direction = chunkPositionW.subtract(observerPositionW);
             const rayDir = direction.normalizeToNew();
-            const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.parent.getAbsolutePosition(), (this.rootChunkLength / 2) - 100e3 * 2 ** -chunk.depth);
+            const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.parent.getAbsolutePosition(), this.rootChunkLength / 2 - 100e3 * 2 ** -chunk.depth);
             chunk.mesh.setEnabled(!(intersect && t0 ** 2 < direction.lengthSquared()));
         }
     }

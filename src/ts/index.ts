@@ -20,7 +20,6 @@ import { HelmetOverlay } from "./ui/helmetOverlay";
 import { PlayerController } from "./controllers/playerController";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
 import { positionNearBody } from "./utils/positionNearBody";
-import { nearestBody } from "./utils/nearestBody";
 import { isOrbiting } from "./bodies/abstractBody";
 
 const helmetOverlay = new HelmetOverlay();
@@ -144,8 +143,7 @@ Assets.Init(scene).then(() => {
     function updateScene() {
         const deltaTime = engine.getDeltaTime() / 1000;
 
-        const nearest = nearestBody(scene.getActiveController().transform, starSystem.getBodies())
-
+        const nearest = starSystem.getNearestBody(scene.getActiveUberCamera().position);
 
         bodyEditor.update(nearest, starSystem.postProcessManager, scene);
         helmetOverlay.update(nearest);

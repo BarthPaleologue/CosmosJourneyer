@@ -24,7 +24,15 @@ export class TelluricMaterial extends ShaderMaterial {
     physicalProperties: SolidPhysicalProperties;
     planetRadius: number;
 
-    constructor(planetName: string, planet: BasicTransform, planetRadius: number, planetSeed: number, terrainSettings: TerrainSettings, physicalProperties: SolidPhysicalProperties, scene: UberScene) {
+    constructor(
+        planetName: string,
+        planet: BasicTransform,
+        planetRadius: number,
+        planetSeed: number,
+        terrainSettings: TerrainSettings,
+        physicalProperties: SolidPhysicalProperties,
+        scene: UberScene
+    ) {
         super(`${planetName}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
             uniforms: [
@@ -155,7 +163,7 @@ export class TelluricMaterial extends ShaderMaterial {
         this.setFloat("waterAmount", this.physicalProperties.waterAmount);
 
         this.setFloat("maxElevation", this.terrainSettings.continentBaseHeight + this.terrainSettings.maxMountainHeight + this.terrainSettings.maxBumpHeight);
-}
+    }
 
     public update(activeController: AbstractController, stars: (Star | BlackHole)[]) {
         this.setMatrix("normalMatrix", this.planet.node.getWorldMatrix().clone().invert().transpose());

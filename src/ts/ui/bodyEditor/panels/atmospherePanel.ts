@@ -11,7 +11,7 @@ export class AtmospherePanel extends EditorPanel {
     constructor() {
         super("atmosphere");
     }
-    init(planet: (TelluricPlanet | GasPlanet), postProcessManager: PostProcessManager) {
+    init(planet: TelluricPlanet | GasPlanet, postProcessManager: PostProcessManager) {
         for (const slider of this.sliders) slider.remove();
 
         if (!planet.postProcesses.atmosphere) return;

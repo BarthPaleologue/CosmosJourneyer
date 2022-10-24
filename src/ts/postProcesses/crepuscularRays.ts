@@ -1,12 +1,24 @@
 import {
-    AbstractMesh, Camera, Color4, Constants, Effect, Engine,
-    Material, MaterialHelper, Matrix,
+    AbstractMesh,
+    Camera,
+    Color4,
+    Constants,
+    Effect,
+    Engine,
+    Material,
+    MaterialHelper,
+    Matrix,
     Mesh,
     PostProcess,
-    RenderTargetTexture, Scene,
-    SmartArray, SubMesh, Texture, TransformNode,
+    RenderTargetTexture,
+    Scene,
+    SmartArray,
+    SubMesh,
+    Texture,
+    TransformNode,
     Vector2,
-    Vector3, VertexBuffer,
+    Vector3,
+    VertexBuffer,
     Viewport
 } from "@babylonjs/core";
 
@@ -19,7 +31,6 @@ export class CrepuscularRays extends PostProcess {
     private _volumetricLightScatteringRTT: RenderTargetTexture;
     private _viewPort: Viewport;
     private _screenCoordinates: Vector2 = Vector2.Zero();
-
 
     /**
      * The internal mesh used by the post-process
