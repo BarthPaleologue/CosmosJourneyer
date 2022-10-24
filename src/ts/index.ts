@@ -147,7 +147,7 @@ Assets.Init(scene).then(() => {
         const nearest = nearestBody(scene.getActiveController().transform, starSystem.getBodies())
 
 
-        bodyEditor.update(nearest, starSystem.postProcessManager);
+        bodyEditor.update(nearest, starSystem.postProcessManager, scene);
         helmetOverlay.update(nearest);
         helmetOverlay.setVisibility(bodyEditor.getVisibility() != EditorVisibility.FULL);
 

@@ -1,17 +1,17 @@
 import { EditorPanel } from "../editorPanel";
-import { AbstractBody } from "../../../bodies/abstractBody";
+import { AbstractBody, isOrbiting } from "../../../bodies/abstractBody";
 import { stripAxisFromQuaternion } from "../../../utils/algebra";
 import { Axis } from "@babylonjs/core";
 import { Slider } from "handle-sliderjs";
 import { Settings } from "../../../settings";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
+import { UberScene } from "../../../core/uberScene";
 
 export class GeneralPanel extends EditorPanel {
     constructor() {
         super("general");
     }
-    init(body: AbstractBody, postProcessManager: PostProcessManager) {
-        //const scene = body.starSystem.scene;
+    init(body: AbstractBody, postProcessManager: PostProcessManager, scene: UberScene) {
         this.enable();
 
         for (const slider of this.sliders) slider.remove();
@@ -26,7 +26,7 @@ export class GeneralPanel extends EditorPanel {
                 const playerDir = body.getAbsolutePosition().normalizeToNew();
                 body.setAbsolutePosition(playerDir.scale((100 * body.getRadius()) / value));
             }),
-            /*new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
+            new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
                 body.rotate(Axis.X, newAxialTilt - axialTiltX);
                 if (isOrbiting(scene.getActiveController(), body)) scene.getActiveController().transform.rotateAround(body.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
@@ -47,7 +47,7 @@ export class GeneralPanel extends EditorPanel {
                 (val: number) => {
                     scene.getActiveController().getActiveCamera().fov = (val * Math.PI) / 360;
                 }
-            ),*/
+            ),
             new Slider("timeModifier", document.getElementById("timeModifier") as HTMLElement, -200, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {
                 Settings.TIME_MULTIPLIER = Math.sign(val) * Math.pow(Math.abs(val), power);
             }),
