@@ -11,7 +11,6 @@ import { clamp } from "../utils/gradientMath";
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BlackHole } from "./blackHole";
-import { BodyType } from "./interfaces";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { nearestBody } from "../utils/nearestBody";
 
@@ -31,8 +30,6 @@ export class StarSystem {
     readonly stars: (Star | BlackHole)[] = [];
 
     readonly planets: Planet[] = []; //TODO: contains satellites : make sense out of this
-
-    private clock = 0;
 
     readonly rng: (step: number) => number;
 
@@ -78,7 +75,7 @@ export class StarSystem {
     public makeTelluricPlanet(seed = this.rng(Steps.GENERATE_PLANETS + this.planets.length)): TelluricPlanet {
         const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this.scene, seed, this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
-        //TODO: use formula
+        //TODO: use formula in the research folder
         planet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng, 80);
         planet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng, 81);
 
@@ -194,10 +191,6 @@ export class StarSystem {
         return nearest;
     }
 
-    public getTime() {
-        return this.clock;
-    }
-
     public init() {
         this.initPostProcesses();
         this.update(Date.now() / 1000);
@@ -211,8 +204,6 @@ export class StarSystem {
     }
 
     public update(deltaTime: number): void {
-        this.clock += deltaTime;
-
         for (const body of this.getBodies()) body.updateTransform(this.scene.getActiveController(), deltaTime);
 
         for (const planet of this.planets) planet.updateMaterial(this.scene.getActiveController(), this.stars);
