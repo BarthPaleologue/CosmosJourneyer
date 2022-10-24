@@ -1,14 +1,14 @@
-import { Mesh, Texture, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
+import { Texture, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
 import { Star } from "../bodies/stars/star";
 import { UberScene } from "../core/uberScene";
 
 export class VolumetricLight extends VolumetricLightScatteringPostProcess {
-    readonly star: Star;
+    readonly body: Star;
 
     constructor(star: Star, scene: UberScene) {
         super(`${star.name}VolumetricLight`, 1, scene.getActiveUberCamera(), star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
 
-        this.star = star;
+        this.body = star;
 
         this.exposure = 0.26;
         this.decay = 0.95;

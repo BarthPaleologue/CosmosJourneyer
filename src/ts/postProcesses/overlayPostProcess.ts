@@ -3,12 +3,13 @@ import overlayFragment from "../../shaders/overlayFragment.glsl";
 import { UberScene } from "../core/uberScene";
 import { AbstractBody } from "../bodies/abstractBody";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "./uniforms";
-import { ShaderDataType, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
+import { ShaderDataType, ShaderUniforms } from "../core/postProcesses/uberPostProcess";
+import { BodyPostProcess } from "./bodyPostProcess";
 
 const shaderName = "overlay";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = overlayFragment;
 
-export class OverlayPostProcess extends UberPostProcess {
+export class OverlayPostProcess extends BodyPostProcess {
     static ARE_ENABLED = true;
 
     constructor(body: AbstractBody, scene: UberScene) {
@@ -33,6 +34,6 @@ export class OverlayPostProcess extends UberPostProcess {
 
         const samplers = getSamplers(scene);
 
-        super(body.name + "Overlay", shaderName, uniforms, samplers, scene);
+        super(body.name + "Overlay", body, shaderName, uniforms, samplers, scene);
     }
 }

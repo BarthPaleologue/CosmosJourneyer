@@ -5,11 +5,12 @@ import { gcd } from "../utils/gradientMath";
 
 import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
 import { UberScene } from "../core/uberScene";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../core/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { BlackHole } from "../bodies/blackHole";
 import { Star } from "../bodies/stars/star";
+import { BodyPostProcess } from "./bodyPostProcess";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -27,8 +28,7 @@ export interface CloudSettings {
     detailSpeed: number;
 }
 
-export class FlatCloudsPostProcess extends UberPostProcess {
-    readonly planet;
+export class FlatCloudsPostProcess extends BodyPostProcess {
     settings: CloudSettings;
 
     constructor(name: string, planet: TelluricPlanet, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
@@ -146,9 +146,8 @@ export class FlatCloudsPostProcess extends UberPostProcess {
             }
         ];
 
-        super(name, shaderName, uniforms, samplers, scene);
+        super(name, planet, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
-        this.planet = planet;
     }
 }

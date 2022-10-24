@@ -3,11 +3,12 @@ import { Effect } from "@babylonjs/core";
 import ringsFragment from "../../shaders/ringsFragment.glsl";
 import { AbstractBody } from "../bodies/abstractBody";
 import { UberScene } from "../core/uberScene";
-import { ShaderDataType, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
+import { ShaderDataType, ShaderUniforms } from "../core/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { randRange } from "extended-random";
 import { BlackHole } from "../bodies/blackHole";
 import { Star } from "../bodies/stars/star";
+import { BodyPostProcess } from "./bodyPostProcess";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -19,9 +20,8 @@ interface RingsSettings {
     ringOpacity: number;
 }
 
-export class RingsPostProcess extends UberPostProcess {
+export class RingsPostProcess extends BodyPostProcess {
     settings: RingsSettings;
-    readonly body: AbstractBody;
 
     constructor(body: AbstractBody, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: RingsSettings = {
@@ -71,9 +71,8 @@ export class RingsPostProcess extends UberPostProcess {
             }
         ];
 
-        super(body.name + "Rings", shaderName, uniforms, getSamplers(scene), scene);
+        super(body.name + "Rings", body, shaderName, uniforms, getSamplers(scene), scene);
 
         this.settings = settings;
-        this.body = body;
     }
 }

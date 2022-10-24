@@ -3,12 +3,13 @@ import { Effect } from "@babylonjs/core";
 import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
 import { UberScene } from "../core/uberScene";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../core/postProcesses/uberPostProcess";
 import { centeredRand } from "extended-random";
 import { BlackHole } from "../bodies/blackHole";
 import { Star } from "../bodies/stars/star";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { GasPlanet } from "../bodies/planets/gasPlanet";
+import { BodyPostProcess } from "./bodyPostProcess";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -26,9 +27,8 @@ export interface AtmosphereSettings {
     mieHaloRadius: number;
 }
 
-export class AtmosphericScatteringPostProcess extends UberPostProcess {
+export class AtmosphericScatteringPostProcess extends BodyPostProcess {
     settings: AtmosphereSettings;
-    planet: TelluricPlanet | GasPlanet;
 
     constructor(name: string, planet: TelluricPlanet | GasPlanet, atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: AtmosphereSettings = {
@@ -122,9 +122,8 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess {
 
         const samplers: ShaderSamplers = getSamplers(scene);
 
-        super(name, shaderName, uniforms, samplers, scene);
+        super(name, planet, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
-        this.planet = planet;
     }
 }

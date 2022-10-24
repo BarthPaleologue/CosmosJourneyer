@@ -2,9 +2,10 @@ import { Effect } from "@babylonjs/core";
 
 import blackHoleFragment from "../../shaders/blackhole.glsl";
 import { UberScene } from "../core/uberScene";
-import { AbstractBody } from "../bodies/abstractBody";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../core/postProcesses/uberPostProcess";
+import { BlackHole } from "../bodies/blackHole";
+import { BodyPostProcess } from "./bodyPostProcess";
 
 const shaderName = "blackhole";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
@@ -14,17 +15,17 @@ export interface BlackHoleSettings {
     rotationPeriod: number;
 }
 
-export class BlackHolePostProcess extends UberPostProcess {
+export class BlackHolePostProcess extends BodyPostProcess {
     settings: BlackHoleSettings;
 
-    constructor(name: string, planet: AbstractBody, scene: UberScene) {
+    constructor(name: string, blackHole: BlackHole, scene: UberScene) {
         const settings: BlackHoleSettings = {
             accretionDiskRadius: 8000e3,
             rotationPeriod: 1.5
         };
 
         const uniforms: ShaderUniforms = [
-            ...getBodyUniforms(planet),
+            ...getBodyUniforms(blackHole),
             ...getActiveCameraUniforms(scene),
             {
                 name: "time",
@@ -51,7 +52,7 @@ export class BlackHolePostProcess extends UberPostProcess {
 
         const samplers: ShaderSamplers = getSamplers(scene);
 
-        super(name, shaderName, uniforms, samplers, scene);
+        super(name, blackHole, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
     }

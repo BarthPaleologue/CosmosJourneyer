@@ -1,6 +1,6 @@
 import { UberScene } from "../core/uberScene";
 import { UberRenderingPipeline } from "../core/uberRenderingPipeline";
-import { Engine, FxaaPostProcess, PostProcess, PostProcessRenderEffect, Texture } from "@babylonjs/core";
+import { Engine, FxaaPostProcess, PostProcessRenderEffect, Texture } from "@babylonjs/core";
 import { OceanPostProcess } from "./oceanPostProcess";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { Star } from "../bodies/stars/star";
@@ -17,6 +17,7 @@ import { BlackHolePostProcess } from "./blackHolePostProcess";
 import { GasPlanet } from "../bodies/planets/gasPlanet";
 import { BodyType } from "../bodies/interfaces";
 import { ColorCorrection } from "../core/postProcesses/colorCorrection";
+import { extractRelevantPostProcesses } from "../utils/extractRelevantPostProcesses";
 
 export enum PostProcessType {
     VOLUMETRIC_LIGHT,
@@ -105,7 +106,7 @@ export class PostProcessManager {
     }
 
     public getOcean(planet: TelluricPlanet): OceanPostProcess {
-        for (const ocean of this.oceans) if (ocean.planet === planet) return ocean;
+        for (const ocean of this.oceans) if (ocean.body === planet) return ocean;
         throw new Error("No ocean found for: " + planet.name);
     }
 
@@ -114,7 +115,7 @@ export class PostProcessManager {
     }
 
     public getClouds(planet: TelluricPlanet): FlatCloudsPostProcess {
-        for (const clouds of this.clouds) if (clouds.planet === planet) return clouds;
+        for (const clouds of this.clouds) if (clouds.body === planet) return clouds;
         throw new Error("No clouds found for: " + planet.name);
     }
 
@@ -123,7 +124,7 @@ export class PostProcessManager {
     }
 
     public getAtmosphere(planet: GasPlanet | TelluricPlanet): AtmosphericScatteringPostProcess {
-        for (const atmosphere of this.atmospheres) if (atmosphere.planet === planet) return atmosphere;
+        for (const atmosphere of this.atmospheres) if (atmosphere.body === planet) return atmosphere;
         throw new Error("No atmosphere found for: " + planet.name);
     }
 
@@ -149,7 +150,7 @@ export class PostProcessManager {
     }
 
     public getVolumetricLight(star: Star): VolumetricLight {
-        for (const volumetricLight of this.volumetricLights) if (volumetricLight.star === star) return volumetricLight;
+        for (const volumetricLight of this.volumetricLights) if (volumetricLight.body === star) return volumetricLight;
         throw new Error("No volumetric light found for: " + star.name);
     }
 
@@ -222,30 +223,67 @@ export class PostProcessManager {
         this.init();
     }
 
+    public getCurrentBody() {
+        if(this.currentBody == null) throw new Error("No body set to the postProcessManager");
+        return this.currentBody;
+    }
+
     public init() {
+        //const [bodyVolumetricLights, otherVolumetricLights] = extractRelevantPostProcesses(this.volumetricLights, this.getCurrentBody());
+        const bodyVolumetricLights: VolumetricLight[] = [];
+        const otherVolumetricLights: VolumetricLight[] = [];
+        for(const volumetricLight of this.volumetricLights) {
+            if(volumetricLight.body == this.getCurrentBody()) bodyVolumetricLights.push(volumetricLight);
+            else otherVolumetricLights.push(volumetricLight);
+        }
         const otherVolumetricLightsRenderEffect = new PostProcessRenderEffect(this.engine, "otherVolumetricLightsRenderEffect", () => {
-            return this.volumetricLights;
+            return otherVolumetricLights;
+        });
+        const bodyVolumetricLightsRenderEffect = new PostProcessRenderEffect(this.engine, "bodyVolumetricLightsRenderEffect", () => {
+            return bodyVolumetricLights;
         });
 
+        const [bodyBlackHoles, otherBlackHoles] = extractRelevantPostProcesses(this.blackHoles, this.getCurrentBody());
         const otherBlackHolesRenderEffect = new PostProcessRenderEffect(this.engine, "otherBlackHolesRenderEffect", () => {
-            return this.blackHoles;
+            return otherBlackHoles;
+        });
+        const bodyBlackHolesRenderEffect = new PostProcessRenderEffect(this.engine, "bodyBlackHolesRenderEffect", () => {
+            return bodyBlackHoles;
         });
 
+        const [bodyOceans, otherOceans] = extractRelevantPostProcesses(this.oceans, this.getCurrentBody());
         const otherOceansRenderEffect = new PostProcessRenderEffect(this.engine, "otherOceansRenderEffect", () => {
-            return this.oceans;
+            return otherOceans;
+        });
+        const bodyOceansRenderEffect = new PostProcessRenderEffect(this.engine, "bodyOceansRenderEffect", () => {
+            return bodyOceans;
         });
 
+        const [bodyClouds, otherClouds] = extractRelevantPostProcesses(this.clouds, this.getCurrentBody());
         const otherCloudsRenderEffect = new PostProcessRenderEffect(this.engine, "otherCloudsRenderEffect", () => {
-            return this.clouds;
+            return otherClouds;
+        });
+        const bodyCloudsRenderEffect = new PostProcessRenderEffect(this.engine, "bodyCloudsRenderEffect", () => {
+            return bodyClouds;
         });
 
+        const [bodyAtmospheres, otherAtmospheres] = extractRelevantPostProcesses(this.atmospheres, this.getCurrentBody());
         const otherAtmospheresRenderEffect = new PostProcessRenderEffect(this.engine, "otherAtmospheresRenderEffect", () => {
-            return this.atmospheres;
+            return otherAtmospheres;
+        });
+        const bodyAtmospheresRenderEffect = new PostProcessRenderEffect(this.engine, "bodyAtmospheresRenderEffect", () => {
+            return bodyAtmospheres;
         });
 
+        const [bodyRings, otherRings] = extractRelevantPostProcesses(this.rings, this.getCurrentBody());
         const otherRingsRenderEffect = new PostProcessRenderEffect(this.engine, "otherRingsRenderEffect", () => {
-            return this.rings;
+            return otherRings;
         });
+        const bodyRingsRenderEffect = new PostProcessRenderEffect(this.engine, "bodyRingsHolesRenderEffect", () => {
+            return bodyRings;
+        });
+
+        console.log(otherRings);
 
         this.currentRenderingPipeline.addEffect(this.starFieldRenderEffect);
 
@@ -268,6 +306,31 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.RING:
                     this.currentRenderingPipeline.addEffect(otherRingsRenderEffect);
+                    break;
+                default:
+                    throw new Error("Invalid postprocess type: " + postProcessType);
+            }
+        }
+
+        for (const postProcessType of this.renderingOrder) {
+            switch (postProcessType) {
+                case PostProcessType.VOLUMETRIC_LIGHT:
+                    this.currentRenderingPipeline.addEffect(bodyVolumetricLightsRenderEffect);
+                    break;
+                case PostProcessType.BLACK_HOLE:
+                    this.currentRenderingPipeline.addEffect(bodyBlackHolesRenderEffect);
+                    break;
+                case PostProcessType.OCEAN:
+                    this.currentRenderingPipeline.addEffect(bodyOceansRenderEffect);
+                    break;
+                case PostProcessType.CLOUDS:
+                    this.currentRenderingPipeline.addEffect(bodyCloudsRenderEffect);
+                    break;
+                case PostProcessType.ATMOSPHERE:
+                    this.currentRenderingPipeline.addEffect(bodyAtmospheresRenderEffect);
+                    break;
+                case PostProcessType.RING:
+                    this.currentRenderingPipeline.addEffect(bodyRingsRenderEffect);
                     break;
                 default:
                     throw new Error("Invalid postprocess type: " + postProcessType);
