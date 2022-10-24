@@ -23,7 +23,7 @@ export class RingsPostProcess extends UberPostProcess {
     settings: RingsSettings;
     readonly body: AbstractBody;
 
-    constructor(name: string, body: AbstractBody, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(body: AbstractBody, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: RingsSettings = {
             ringStart: randRange(1.8, 2.2, body.rng, 1400),
             ringEnd: randRange(2.1, 2.9, body.rng, 1410),
@@ -71,7 +71,7 @@ export class RingsPostProcess extends UberPostProcess {
             }
         ];
 
-        super(name, shaderName, uniforms, getSamplers(scene), scene);
+        super(body.name + "Rings", shaderName, uniforms, getSamplers(scene), scene);
 
         this.settings = settings;
         this.body = body;

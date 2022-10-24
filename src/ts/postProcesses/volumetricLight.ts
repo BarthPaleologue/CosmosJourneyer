@@ -5,8 +5,8 @@ import { UberScene } from "../core/uberScene";
 export class VolumetricLight extends VolumetricLightScatteringPostProcess {
     readonly star: Star;
 
-    constructor(star: Star, starMesh: Mesh, scene: UberScene) {
-        super(`${star.name}VolumetricLight`, 1, scene.getActiveUberCamera(), starMesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
+    constructor(star: Star, scene: UberScene) {
+        super(`${star.name}VolumetricLight`, 1, scene.getActiveUberCamera(), star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
 
         this.star = star;
 

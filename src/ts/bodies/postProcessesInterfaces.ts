@@ -1,5 +1,4 @@
 export type BodyPostProcesses = {
-    [details: string]: boolean;
     rings: boolean;
     overlay: boolean;
 };

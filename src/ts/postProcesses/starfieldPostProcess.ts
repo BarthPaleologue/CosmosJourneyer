@@ -22,7 +22,7 @@ export interface StarfieldSettings {
 export class StarfieldPostProcess extends UberPostProcess {
     settings: StarfieldSettings;
 
-    constructor(name: string, scene: UberScene, stars: (Star | BlackHole)[], bodies: AbstractBody[]) {
+    constructor(scene: UberScene, stars: (Star | BlackHole)[], bodies: AbstractBody[]) {
         const settings: StarfieldSettings = {
             foo: 1
         };
@@ -62,7 +62,7 @@ export class StarfieldPostProcess extends UberPostProcess {
 
         const samplers: ShaderSamplers = getSamplers(scene);
 
-        super(name, shaderName, uniforms, samplers, scene);
+        super("starfield", shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
     }

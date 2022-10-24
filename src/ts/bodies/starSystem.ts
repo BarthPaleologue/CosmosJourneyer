@@ -181,7 +181,6 @@ export class StarSystem {
         this.postProcessManager.addStarField(this.stars, this.bodies);
         for (const body of this.bodies) this.postProcessManager.addBody(body, this.stars);
         this.postProcessManager.setBody(this.getNearestBody(this.scene.getActiveUberCamera().position));
-        this.postProcessManager.init();
     }
 
     public update(deltaTime: number): void {

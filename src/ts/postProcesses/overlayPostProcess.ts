@@ -11,7 +11,7 @@ Effect.ShadersStore[`${shaderName}FragmentShader`] = overlayFragment;
 export class OverlayPostProcess extends UberPostProcess {
     static ARE_ENABLED = true;
 
-    constructor(name: string, body: AbstractBody, scene: UberScene) {
+    constructor(body: AbstractBody, scene: UberScene) {
         const uniforms: ShaderUniforms = [
             ...getActiveCameraUniforms(scene),
             ...getBodyUniforms(body),
@@ -33,6 +33,6 @@ export class OverlayPostProcess extends UberPostProcess {
 
         const samplers = getSamplers(scene);
 
-        super(name, shaderName, uniforms, samplers, scene);
+        super(body.name + "Overlay", shaderName, uniforms, samplers, scene);
     }
 }
