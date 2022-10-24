@@ -1,5 +1,6 @@
 import { Slider } from "handle-sliderjs";
 import { AbstractBody } from "../../bodies/abstractBody";
+import { PostProcessManager } from "../../postProcesses/postProcessManager";
 
 export abstract class EditorPanel {
     sliders: Slider[] = [];
@@ -12,7 +13,7 @@ export abstract class EditorPanel {
         this.panel = document.getElementById(id + "UI") as HTMLElement;
     }
 
-    abstract init(body: AbstractBody): void;
+    abstract init(body: AbstractBody, postProcessManager: PostProcessManager): void;
 
     updateAllSliders() {
         for (const slider of this.sliders) slider.update(false);

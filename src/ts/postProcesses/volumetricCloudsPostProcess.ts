@@ -1,13 +1,12 @@
 import { Effect } from "@babylonjs/core";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
 
-import volumetricCloudsFragment from "../../../shaders/volumetricCloudsFragment.glsl";
-import { UberScene } from "../../core/uberScene";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
-import { UberPostProcess } from "../uberPostProcess";
-import { BlackHole } from "../../bodies/blackHole";
-import { Star } from "../../bodies/stars/star";
-import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
+import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
+import { UberScene } from "../core/uberScene";
+import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
+import { BlackHole } from "../bodies/blackHole";
+import { Star } from "../bodies/stars/star";
+import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 
 const shaderName = "volumetricClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;

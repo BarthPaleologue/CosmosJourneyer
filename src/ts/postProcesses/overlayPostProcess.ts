@@ -1,10 +1,9 @@
 import { Effect } from "@babylonjs/core";
 import overlayFragment from "../../shaders/overlayFragment.glsl";
 import { UberScene } from "../core/uberScene";
-import { ShaderDataType, ShaderUniforms } from "./interfaces";
 import { AbstractBody } from "../bodies/abstractBody";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "./uniforms";
-import { UberPostProcess } from "./uberPostProcess";
+import { ShaderDataType, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
 
 const shaderName = "overlay";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = overlayFragment;

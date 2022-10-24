@@ -1,16 +1,15 @@
 import { Color3, Effect, Texture } from "@babylonjs/core";
 
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
-import normalMap from "../../../asset/textures/cloudNormalMap3.jpg";
-import { gcd } from "../../utils/gradientMath";
+import normalMap from "../../asset/textures/cloudNormalMap3.jpg";
+import { gcd } from "../utils/gradientMath";
 
-import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
-import { UberScene } from "../../core/uberScene";
-import { UberPostProcess } from "../uberPostProcess";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
-import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
-import { BlackHole } from "../../bodies/blackHole";
-import { Star } from "../../bodies/stars/star";
+import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
+import { UberScene } from "../core/uberScene";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
+import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
+import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
+import { BlackHole } from "../bodies/blackHole";
+import { Star } from "../bodies/stars/star";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -29,6 +28,7 @@ export interface CloudSettings {
 }
 
 export class FlatCloudsPostProcess extends UberPostProcess {
+    readonly planet;
     settings: CloudSettings;
 
     constructor(name: string, planet: TelluricPlanet, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
@@ -149,5 +149,6 @@ export class FlatCloudsPostProcess extends UberPostProcess {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
+        this.planet = planet;
     }
 }

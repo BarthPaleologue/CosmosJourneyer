@@ -1,12 +1,10 @@
 import { Effect } from "@babylonjs/core";
 
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
-
-import blackHoleFragment from "../../../shaders/blackhole.glsl";
-import { UberScene } from "../../core/uberScene";
-import { AbstractBody } from "../../bodies/abstractBody";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "../uniforms";
-import { UberPostProcess } from "../uberPostProcess";
+import blackHoleFragment from "../../shaders/blackhole.glsl";
+import { UberScene } from "../core/uberScene";
+import { AbstractBody } from "../bodies/abstractBody";
+import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "./uniforms";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
 
 const shaderName = "blackhole";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;

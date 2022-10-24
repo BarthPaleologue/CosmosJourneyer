@@ -12,7 +12,7 @@ import { getOrbitalPeriod } from "../orbits/kepler";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BlackHole } from "./blackHole";
 import { BodyType } from "./interfaces";
-import { PostProcessManager } from "../postProcesses/pipelines/postProcessManager";
+import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { nearestBody } from "../utils/nearestBody";
 
 enum Steps {

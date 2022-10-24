@@ -1,23 +1,28 @@
-import { UberScene } from "../../core/uberScene";
-import { UberRenderingPipeline } from "../../core/uberRenderingPipeline";
-import { Engine, FxaaPostProcess, PostProcess, PostProcessRenderEffect, Texture } from "@babylonjs/core";
-import { OceanPostProcess } from "../planetPostProcesses/oceanPostProcess";
-import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
-import { Star } from "../../bodies/stars/star";
-import { BlackHole } from "../../bodies/blackHole";
-import { FlatCloudsPostProcess } from "../planetPostProcesses/flatCloudsPostProcess";
-import { Settings } from "../../settings";
-import { AtmosphericScatteringPostProcess } from "../planetPostProcesses/atmosphericScatteringPostProcess";
-import { Planet } from "../../bodies/planets/planet";
-import { AbstractBody } from "../../bodies/abstractBody";
-import { RingsPostProcess } from "../planetPostProcesses/ringsPostProcess";
-import { StarfieldPostProcess } from "../starfieldPostProcess";
-import { OverlayPostProcess } from "../overlayPostProcess";
-import { VolumetricLight } from "../volumetricLight";
-import { BlackHolePostProcess } from "../planetPostProcesses/blackHolePostProcess";
-import { ColorCorrection } from "../colorCorrection";
-import { GasPlanet } from "../../bodies/planets/gasPlanet";
-import { BodyType } from "../../bodies/interfaces";
+import { UberScene } from "../core/uberScene";
+import { UberRenderingPipeline } from "../core/uberRenderingPipeline";
+import {
+    Engine,
+    FxaaPostProcess,
+    PostProcess,
+    PostProcessRenderEffect,
+    VolumetricLightScatteringPostProcess
+} from "@babylonjs/core";
+import { OceanPostProcess } from "./oceanPostProcess";
+import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
+import { Star } from "../bodies/stars/star";
+import { BlackHole } from "../bodies/blackHole";
+import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
+import { Settings } from "../settings";
+import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";
+import { AbstractBody } from "../bodies/abstractBody";
+import { RingsPostProcess } from "./ringsPostProcess";
+import { StarfieldPostProcess } from "./starfieldPostProcess";
+import { OverlayPostProcess } from "./overlayPostProcess";
+import { VolumetricLight } from "./volumetricLight";
+import { BlackHolePostProcess } from "./blackHolePostProcess";
+import { GasPlanet } from "../bodies/planets/gasPlanet";
+import { BodyType } from "../bodies/interfaces";
+import { ColorCorrection } from "../core/postProcesses/colorCorrection";
 
 export enum PostProcessType {
     VOLUMETRIC_LIGHT,
@@ -52,45 +57,50 @@ export class PostProcessManager {
     readonly rings: RingsPostProcess[] = [];
     readonly blackHoles: BlackHolePostProcess[] = [];
     readonly overlays: OverlayPostProcess[] = [];
-    readonly colorCorrections: ColorCorrection[] = [];
-    readonly fxaas: FxaaPostProcess[] = [];
+
+    readonly colorCorrection: ColorCorrection;
+    readonly fxaa: FxaaPostProcess;
 
     readonly starFieldRenderEffect: PostProcessRenderEffect;
-    readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
     readonly overlayRenderEffect: PostProcessRenderEffect;
-    readonly fxaaRenderEffect: PostProcessRenderEffect;
 
     constructor(scene: UberScene) {
         this.scene = scene;
         this.engine = scene.getEngine();
         this.uberRenderingPipeline = scene.uberRenderingPipeline;
 
-        this.colorCorrections.push(new ColorCorrection("colorCorrection", this.scene));
-        this.fxaas.push(new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, this.scene.getEngine()));
+        this.colorCorrection = this.uberRenderingPipeline.colorCorrection;
+        this.fxaa = this.uberRenderingPipeline.fxaa;
 
         this.starFieldRenderEffect = new PostProcessRenderEffect(this.engine, "starFieldRenderEffect", () => {
             return this.starFields;
-        });
-
-        this.colorCorrectionRenderEffect = new PostProcessRenderEffect(this.engine, "colorCorrectionRenderEffect", () => {
-            return this.colorCorrections;
         });
 
         this.overlayRenderEffect = new PostProcessRenderEffect(this.engine, "overlayRenderEffect", () => {
             return this.overlays;
         });
 
-        this.fxaaRenderEffect = new PostProcessRenderEffect(this.engine, "fxaaRenderEffect", () => {
-            return this.fxaas;
-        });
+        this.colorCorrection.exposure = 1.1;
+        this.colorCorrection.gamma = 1.2;
+        this.colorCorrection.saturation = 0.9;
     }
 
     public addOcean(planet: TelluricPlanet, stars: (Star | BlackHole)[]) {
         this.oceans.push(new OceanPostProcess(`${planet.name}Ocean`, planet, this.scene, stars));
     }
 
+    public getOcean(planet: TelluricPlanet): OceanPostProcess {
+        for (const ocean of this.oceans) if (ocean.planet === planet) return ocean;
+        throw new Error("No ocean found for: " + planet.name);
+    }
+
     public addClouds(planet: TelluricPlanet, stars: (Star | BlackHole)[]) {
         this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
+    }
+
+    public getClouds(planet: TelluricPlanet): FlatCloudsPostProcess {
+        for (const clouds of this.clouds) if (clouds.planet === planet) return clouds;
+        throw new Error("No clouds found for: " + planet.name);
     }
 
     public addAtmosphere(planet: (GasPlanet | TelluricPlanet), stars: (Star | BlackHole)[]) {
@@ -98,15 +108,17 @@ export class PostProcessManager {
     }
 
     public getAtmosphere(planet: (GasPlanet | TelluricPlanet)): AtmosphericScatteringPostProcess {
-        for (const atmosphere of this.atmospheres) {
-            if (atmosphere.planet === planet) return atmosphere;
-
-        }
+        for (const atmosphere of this.atmospheres) if (atmosphere.planet === planet) return atmosphere;
         throw new Error("No atmosphere found for: " + planet.name);
     }
 
     public addRings(body: AbstractBody, stars: (Star | BlackHole)[]) {
         this.rings.push(new RingsPostProcess(`${body.name}Rings`, body, this.scene, stars));
+    }
+
+    public getRings(body: AbstractBody): RingsPostProcess {
+        for (const rings of this.rings) if (rings.body === body) return rings;
+        throw new Error("No rings found for: " + body.name);
     }
 
     public addStarField(stars: (Star | BlackHole)[], planets: AbstractBody[]) {
@@ -119,6 +131,11 @@ export class PostProcessManager {
 
     public addVolumetricLight(star: Star) {
         this.volumetricLights.push(new VolumetricLight(star, star.mesh, this.scene));
+    }
+
+    public getVolumetricLight(star: Star): VolumetricLight {
+        for (const volumetricLight of this.volumetricLights) if (volumetricLight.star === star) return volumetricLight;
+        throw new Error("No volumetric light found for: " + star.name);
     }
 
     public addBlackHole(blackHole: BlackHole) {
@@ -362,11 +379,11 @@ export class PostProcessManager {
             }
         }
 
-        this.uberRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
-
         this.uberRenderingPipeline.addEffect(this.overlayRenderEffect);
 
-        this.uberRenderingPipeline.addEffect(this.fxaaRenderEffect);
+        this.uberRenderingPipeline.addFXAA();
+
+        this.uberRenderingPipeline.addColorCorrection();
     }
 
     public update(deltaTime: number) {

@@ -1,10 +1,33 @@
 import { Color3, Effect, Matrix, PostProcess, Quaternion, Texture, Vector3, Vector4 } from "@babylonjs/core";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
-import { flattenVector3Array, flattenVector4Array } from "../utils/algebra";
-import { IPostProcess } from "./iPostProcess";
-import { UberScene } from "../core/uberScene";
+import { flattenVector3Array, flattenVector4Array } from "../../utils/algebra";
+import { UberScene } from "../uberScene";
 
-export abstract class UberPostProcess extends PostProcess implements IPostProcess {
+export enum ShaderDataType {
+    Auto,
+    Float,
+    Int,
+    Bool,
+    Vector3,
+    Color3,
+    Matrix,
+    Quaternion,
+    Texture,
+    Vector3Array,
+    Vector4Array
+}
+
+export type shaderData = number | boolean | Vector3 | Color3 | Matrix | Quaternion | Texture | Vector3[] | Vector4[];
+
+export interface ShaderData<shaderData> {
+    name: string;
+    type: ShaderDataType;
+    get: () => shaderData;
+}
+
+export type ShaderUniforms = ShaderData<shaderData>[];
+export type ShaderSamplers = ShaderData<shaderData>[];
+
+export abstract class UberPostProcess extends PostProcess {
     protected readonly uniforms: ShaderUniforms = [];
     protected readonly samplers: ShaderSamplers = [];
 

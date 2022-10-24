@@ -1,25 +1,27 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
 import { TelluricPlanet } from "../../../bodies/planets/telluricPlanet";
+import { PostProcessManager } from "../../../postProcesses/postProcessManager";
+import { Slider } from "handle-sliderjs";
 
 export class OceanPanel extends EditorPanel {
     constructor() {
         super("ocean");
     }
-    init(planet: TelluricPlanet) {
+    init(planet: TelluricPlanet, postProcessManager: PostProcessManager) {
         for (const slider of this.sliders) slider.remove();
 
-        const ocean = planet.postProcesses.ocean; //FIXME: we can't access it in this way
-        if (ocean == null) return;
+        if (!planet.postProcesses.ocean) return;
+        const ocean = postProcessManager.getOcean(planet);
 
         const oceanToggler = clearAllEventListenersById("oceanToggler");
         oceanToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            //ocean.settings.oceanRadius = checkbox.checked ? planet.getApparentRadius() : 0;
+            ocean.settings.oceanRadius = checkbox.checked ? planet.getApparentRadius() : 0;
         });
         this.sliders = [
-            /*new Slider("alphaModifier", document.getElementById("alphaModifier") as HTMLElement, 0, 200, ocean.settings.alphaModifier * 10000, (val: number) => {
+            new Slider("alphaModifier", document.getElementById("alphaModifier") as HTMLElement, 0, 200, ocean.settings.alphaModifier * 10000, (val: number) => {
                 ocean.settings.alphaModifier = val / 10000;
             }),
             new Slider("depthModifier", document.getElementById("depthModifier") as HTMLElement, 0, 70, ocean.settings.depthModifier * 10000, (val: number) => {
@@ -40,7 +42,7 @@ export class OceanPanel extends EditorPanel {
                 (val: number) => {
                     ocean.settings.waveBlendingSharpness = val / 100;
                 }
-            )*/
+            )
         ];
     }
 }

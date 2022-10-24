@@ -1,15 +1,13 @@
 import { Effect } from "@babylonjs/core";
 
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
-
-import oceanFragment from "../../../shaders/oceanFragment.glsl";
-import { Assets } from "../../assets";
-import { UberScene } from "../../core/uberScene";
-import { UberPostProcess } from "../uberPostProcess";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
-import { Star } from "../../bodies/stars/star";
-import { BlackHole } from "../../bodies/blackHole";
-import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
+import oceanFragment from "../../shaders/oceanFragment.glsl";
+import { Assets } from "../assets";
+import { UberScene } from "../core/uberScene";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
+import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
+import { Star } from "../bodies/stars/star";
+import { BlackHole } from "../bodies/blackHole";
+import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -25,6 +23,7 @@ export interface OceanSettings {
 
 export class OceanPostProcess extends UberPostProcess {
     settings: OceanSettings;
+    readonly planet: TelluricPlanet;
 
     constructor(name: string, planet: TelluricPlanet, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: OceanSettings = {
@@ -121,5 +120,6 @@ export class OceanPostProcess extends UberPostProcess {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.settings = settings;
+        this.planet = planet;
     }
 }

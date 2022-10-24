@@ -1,16 +1,14 @@
 import { Effect } from "@babylonjs/core";
 
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../interfaces";
-
-import atmosphericScatteringFragment from "../../../shaders/atmosphericScatteringFragment.glsl";
-import { UberScene } from "../../core/uberScene";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "../uniforms";
-import { UberPostProcess } from "../uberPostProcess";
+import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
+import { UberScene } from "../core/uberScene";
+import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
 import { centeredRand } from "extended-random";
-import { BlackHole } from "../../bodies/blackHole";
-import { Star } from "../../bodies/stars/star";
-import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
-import { GasPlanet } from "../../bodies/planets/gasPlanet";
+import { BlackHole } from "../bodies/blackHole";
+import { Star } from "../bodies/stars/star";
+import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
+import { GasPlanet } from "../bodies/planets/gasPlanet";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;

@@ -2,25 +2,29 @@ import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
 import { TelluricPlanet } from "../../../bodies/planets/telluricPlanet";
 import { GasPlanet } from "../../../bodies/planets/gasPlanet";
+import { StarSystem } from "../../../bodies/starSystem";
+import { Settings } from "../../../settings";
+import { Slider } from "handle-sliderjs";
+import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 
 export class AtmospherePanel extends EditorPanel {
     constructor() {
         super("atmosphere");
     }
-    init(planet: (TelluricPlanet | GasPlanet)) {
+    init(planet: (TelluricPlanet | GasPlanet), postProcessManager: PostProcessManager) {
         for (const slider of this.sliders) slider.remove();
 
-        //const atmosphere = planet.postProcesses.atmosphere;
-        //if (atmosphere == null) return;
+        if (!planet.postProcesses.atmosphere) return;
+        const atmosphere = postProcessManager.getAtmosphere(planet);
 
         const atmosphereToggler = clearAllEventListenersById("atmosphereToggler");
         atmosphereToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            //atmosphere.settings.atmosphereRadius = checkbox.checked ? Settings.EARTH_RADIUS + Settings.ATMOSPHERE_HEIGHT : 0;
+            atmosphere.settings.atmosphereRadius = checkbox.checked ? Settings.EARTH_RADIUS + Settings.ATMOSPHERE_HEIGHT : 0;
         });
         this.sliders = [
-            /*new Slider("intensity", document.getElementById("intensity") as HTMLElement, 0, 40, atmosphere.settings.intensity, (val: number) => {
+            new Slider("intensity", document.getElementById("intensity") as HTMLElement, 0, 40, atmosphere.settings.intensity, (val: number) => {
                 atmosphere.settings.intensity = val;
             }),
             new Slider("density", document.getElementById("density") as HTMLElement, 0, 40, atmosphere.settings.densityModifier * 10, (val: number) => {
@@ -56,7 +60,7 @@ export class AtmospherePanel extends EditorPanel {
             }),
             new Slider("mieHaloRadius", document.getElementById("mieHaloRadius") as HTMLElement, 0, 200, atmosphere.settings.mieHaloRadius * 100, (val: number) => {
                 atmosphere.settings.mieHaloRadius = val / 100;
-            })*/
+            })
         ];
     }
 }

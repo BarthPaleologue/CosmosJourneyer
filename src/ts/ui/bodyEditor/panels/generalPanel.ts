@@ -4,12 +4,13 @@ import { stripAxisFromQuaternion } from "../../../utils/algebra";
 import { Axis } from "@babylonjs/core";
 import { Slider } from "handle-sliderjs";
 import { Settings } from "../../../settings";
+import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 
 export class GeneralPanel extends EditorPanel {
     constructor() {
         super("general");
     }
-    init(body: AbstractBody) {
+    init(body: AbstractBody, postProcessManager: PostProcessManager) {
         //const scene = body.starSystem.scene;
         this.enable();
 
@@ -50,21 +51,21 @@ export class GeneralPanel extends EditorPanel {
             new Slider("timeModifier", document.getElementById("timeModifier") as HTMLElement, -200, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {
                 Settings.TIME_MULTIPLIER = Math.sign(val) * Math.pow(Math.abs(val), power);
             }),
-            /*new Slider("exposure", document.getElementById("exposure") as HTMLElement, 0, 200, scene.colorCorrection.settings.exposure * 100, (val: number) => {
-                scene.colorCorrection.settings.exposure = val / 100;
+            new Slider("exposure", document.getElementById("exposure") as HTMLElement, 0, 200, postProcessManager.colorCorrection.exposure * 100, (val: number) => {
+                postProcessManager.colorCorrection.exposure = val / 100;
             }),
-            new Slider("contrast", document.getElementById("contrast") as HTMLElement, 0, 200, scene.colorCorrection.settings.contrast * 100, (val: number) => {
-                scene.colorCorrection.settings.contrast = val / 100;
+            new Slider("contrast", document.getElementById("contrast") as HTMLElement, 0, 200, postProcessManager.colorCorrection.contrast * 100, (val: number) => {
+                postProcessManager.colorCorrection.contrast = val / 100;
             }),
-            new Slider("brightness", document.getElementById("brightness") as HTMLElement, -100, 100, scene.colorCorrection.settings.brightness * 100, (val: number) => {
-                scene.colorCorrection.settings.brightness = val / 100;
+            new Slider("brightness", document.getElementById("brightness") as HTMLElement, -100, 100, postProcessManager.colorCorrection.brightness * 100, (val: number) => {
+                postProcessManager.colorCorrection.brightness = val / 100;
             }),
-            new Slider("saturation", document.getElementById("saturation") as HTMLElement, 0, 200, scene.colorCorrection.settings.saturation * 100, (val: number) => {
-                scene.colorCorrection.settings.saturation = val / 100;
+            new Slider("saturation", document.getElementById("saturation") as HTMLElement, 0, 200, postProcessManager.colorCorrection.saturation * 100, (val: number) => {
+                postProcessManager.colorCorrection.saturation = val / 100;
             }),
-            new Slider("gamma", document.getElementById("gamma") as HTMLElement, 0, 200, scene.colorCorrection.settings.gamma * 100, (val: number) => {
-                scene.colorCorrection.settings.gamma = val / 100;
-            })*/
+            new Slider("gamma", document.getElementById("gamma") as HTMLElement, 0, 200, postProcessManager.uberRenderingPipeline.colorCorrection.gamma * 100, (val: number) => {
+                postProcessManager.colorCorrection.gamma = val / 100;
+            })
         ];
     }
 }

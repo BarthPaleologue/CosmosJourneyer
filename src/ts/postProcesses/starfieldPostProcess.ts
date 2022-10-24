@@ -1,13 +1,11 @@
 import { Effect, Vector3 } from "@babylonjs/core";
 
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./interfaces";
-
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
 import { BodyType } from "../bodies/interfaces";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { UberScene } from "../core/uberScene";
 import { getActiveCameraUniforms, getSamplers, getStarsUniforms } from "./uniforms";
-import { UberPostProcess } from "./uberPostProcess";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
 import { Settings } from "../settings";
 import { BlackHole } from "../bodies/blackHole";
 import { Star } from "../bodies/stars/star";

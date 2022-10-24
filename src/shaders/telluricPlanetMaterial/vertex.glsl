@@ -42,7 +42,7 @@ void main() {
     #endif
     
     vPositionW = vec3(world * vec4(position, 1.0));
-    vNormalW = mat3(normalMatrix) * normal;
+    vNormalW = normalize(mat3(normalMatrix) * normal);
 
 	vPosition = vPositionW - planetPosition;
 	vLocalPosition = position;

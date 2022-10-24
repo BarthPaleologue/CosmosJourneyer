@@ -2,7 +2,6 @@ import editorHTML from "../../../html/bodyEditor.html";
 import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
 import { Star } from "../../bodies/stars/star";
 import { BodyType } from "../../bodies/interfaces";
-import { AbstractController } from "../../controllers/abstractController";
 import { AbstractBody } from "../../bodies/abstractBody";
 import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../../materials/colorSettingsInterface";
@@ -18,6 +17,7 @@ import { AtmospherePanel } from "./panels/atmospherePanel";
 import { CloudsPanel } from "./panels/cloudsPanel";
 import { RingsPanel } from "./panels/ringsPanel";
 import { OceanPanel } from "./panels/oceanPanel";
+import { PostProcessManager } from "../../postProcesses/postProcessManager";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -135,42 +135,42 @@ export class BodyEditor {
         return this.visibility;
     }
 
-    public setBody(body: AbstractBody) {
+    public setBody(body: AbstractBody, postProcessManager: PostProcessManager) {
         this.currentBodyId = body.name;
         this.initNavBar(body);
         switch (body.bodyType) {
             case BodyType.TELLURIC:
-                this.setTelluricPlanet(body as TelluricPlanet);
+                this.setTelluricPlanet(body as TelluricPlanet, postProcessManager);
                 break;
             case BodyType.STAR:
-                this.setStar(body as Star);
+                this.setStar(body as Star, postProcessManager);
                 break;
             case BodyType.GAZ:
-                this.setGazPlanet(body as GasPlanet);
+                this.setGazPlanet(body as GasPlanet, postProcessManager);
                 break;
             default:
         }
-        this.generalPanel.init(body);
-        this.ringsPanel.init(body);
+        this.generalPanel.init(body, postProcessManager);
+        this.ringsPanel.init(body, postProcessManager);
     }
 
-    public setTelluricPlanet(planet: TelluricPlanet) {
-        this.physicPanel.init(planet);
-        this.surfacePanel.init(planet);
-        this.atmospherePanel.init(planet);
-        this.cloudsPanel.init(planet);
-        this.oceanPanel.init(planet);
+    public setTelluricPlanet(planet: TelluricPlanet, postProcessManager: PostProcessManager) {
+        this.physicPanel.init(planet, postProcessManager);
+        this.surfacePanel.init(planet, postProcessManager);
+        this.atmospherePanel.init(planet, postProcessManager);
+        this.cloudsPanel.init(planet, postProcessManager);
+        this.oceanPanel.init(planet, postProcessManager);
 
         this.initToolbar(planet);
     }
 
-    public setGazPlanet(planet: GasPlanet) {
-        this.gazCloudsPanel.init(planet);
-        this.atmospherePanel.init(planet);
+    public setGazPlanet(planet: GasPlanet, postProcessManager: PostProcessManager) {
+        this.gazCloudsPanel.init(planet, postProcessManager);
+        this.atmospherePanel.init(planet, postProcessManager);
     }
 
-    public setStar(star: Star) {
-        this.starPanel.init(star);
+    public setStar(star: Star, postProcesManager: PostProcessManager) {
+        this.starPanel.init(star, postProcesManager);
     }
 
     public initNavBar(body: AbstractBody): void {
@@ -239,7 +239,7 @@ export class BodyEditor {
         for (const panel of this.panels) panel.updateAllSliders();
     }
 
-    public update(player: AbstractController) {
-        //if (player.getNearestBody().name != this.currentBodyId) this.setBody(player.getNearestBody());
+    public update(nearestBody: AbstractBody, postProcessManager: PostProcessManager) {
+        if (nearestBody.name != this.currentBodyId) this.setBody(nearestBody, postProcessManager);
     }
 }

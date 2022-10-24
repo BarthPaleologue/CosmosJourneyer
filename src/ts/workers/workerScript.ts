@@ -35,8 +35,8 @@ function buildChunkVertexData(data: BuildData): void {
 
     // the offset used to bring back the vertices close to the origin (the position of the chunk on the sphere)
     const chunkSpherePosition = chunkFrontFacePosition.clone();
-    chunkSpherePosition.applyRotationQuaternionInPlace(rotationQuaternion);
     chunkSpherePosition.setMagnitudeInPlace(planetRadius);
+    chunkSpherePosition.applyRotationQuaternionInPlace(rotationQuaternion);
 
     for (let x = 0; x < nbVerticesPerSide; x++) {
         for (let y = 0; y < nbVerticesPerSide; y++) {
