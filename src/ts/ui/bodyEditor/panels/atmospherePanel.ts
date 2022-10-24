@@ -2,7 +2,6 @@ import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
 import { TelluricPlanet } from "../../../bodies/planets/telluricPlanet";
 import { GasPlanet } from "../../../bodies/planets/gasPlanet";
-import { StarSystem } from "../../../bodies/starSystem";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";

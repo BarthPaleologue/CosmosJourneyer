@@ -8,8 +8,6 @@ import { UberFreeCamera } from "./uberFreeCamera";
 export class UberScene extends Scene {
     activeController: AbstractController | null = null;
 
-    readonly uberRenderingPipeline: UberRenderingPipeline;
-
     private depthRenderer: DepthRenderer | null = null;
 
     readonly _chunkForge: ChunkForge;
@@ -17,10 +15,6 @@ export class UberScene extends Scene {
     constructor(engine: Engine, nbVertices = Settings.VERTEX_RESOLUTION) {
         super(engine);
         this.performancePriority = ScenePerformancePriority.Intermediate;
-
-        this.uberRenderingPipeline = new UberRenderingPipeline("uberRenderingPipeline", this.getEngine());
-        this.postProcessRenderPipelineManager.addPipeline(this.uberRenderingPipeline);
-
         this._chunkForge = new ChunkForge(nbVertices);
     }
 
@@ -32,7 +26,6 @@ export class UberScene extends Scene {
     public setActiveController(controller: AbstractController) {
         this.activeController = controller;
         this.activeCamera = controller.getActiveCamera();
-        this.uberRenderingPipeline.attachToCamera(controller.getActiveCamera());
         if (this.depthRenderer === null) {
             this.depthRenderer = this.enableDepthRenderer(null, false, true);
             this.customRenderTargets.push(this.depthRenderer.getDepthMap());

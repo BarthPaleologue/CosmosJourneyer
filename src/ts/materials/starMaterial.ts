@@ -26,7 +26,7 @@ export class StarMaterial extends ShaderMaterial {
     }
 
     public update(internalTime: number) {
-        this.setFloat("time", internalTime % 100000);
+        this.setFloat("time", internalTime % 100000); //FIXME: does this work??
         this.setVector3("starColor", getRgbFromTemperature(this.physicalProperties.temperature));
         this.setQuaternion("starInverseRotationQuaternion", this.star.getInverseRotationQuaternion());
         this.setFloat("seed", this.starSeed);
