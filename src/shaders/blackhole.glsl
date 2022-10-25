@@ -31,6 +31,8 @@ uniform float cameraFar;
 
 #pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=projection, view=view)
 
+#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
+
 float hash(float x) { return fract(sin(x) * 152754.742); }
 float hash(vec2 x) { return hash(x.x + hash(x.y)); }
 
@@ -56,7 +58,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
     float relativeDistance = distance / planetRadius;
     float relativeDiskSize = accretionDiskRadius / planetRadius;
 
-    float dist = 0.02 * distance / abs(ray.y); //FIXME: this is not correct, but it works
+    float dist = 0.02 * distance / abs(ray.y);//FIXME: this is not correct, but it works
 
     position += dist * ray;
 
@@ -104,7 +106,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
         float noise = valueNoise(vec2(2.0 * angle, 5.0 * u), f);
         noise = noise * 0.66 + 0.33 * valueNoise(vec2(2.0 * angle, 5.0 * u), f * 2.0);
 
-        float alpha = distMult * noise * intensity; // The pow is only for aesthetics
+        float alpha = distMult * noise * intensity;// The pow is only for aesthetics
 
         // blending with current color in the disk
         diskColor = mix(diskColor, vec4(insideCol * intensity, 1.0), alpha);
@@ -117,15 +119,23 @@ void main()
 {
     vec3 screenColor = texture2D(textureSampler, vUV).rgb;// the current screen color
 
-    float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
-
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
+    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
 
+    if(dot(rayDir, normalize(planetPosition - cameraPosition)) < 0.0) {
+        gl_FragColor = vec4(screenColor, 1.0);
+        return;
+    }
+    float t1, t2;
+    if (!rayIntersectSphere(cameraPosition, rayDir, planetPosition, max(planetRadius, accretionDiskRadius * 1.5), t1, t2)) {
+        gl_FragColor = vec4(screenColor, 1.0);
+        return;
+    }
+
+    float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
     // closest physical point from the camera in the direction of the pixel (occlusion)
     vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
     float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
-
-    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
 
     vec4 colOut = vec4(0.0);
 
@@ -157,13 +167,13 @@ void main()
             pos += stepDist * rayDir;
         }
 
-        float dist2 = length(cameraPosition - pos);
+        float dist2 = length(pos);
 
         if (dist2 < planetRadius)//ray sucked in to BH
         {
             glFragColor =  vec4(col.rgb * col.a, 1.0);
             return;
-        } else if (dist2 > planetRadius * 1000.)//ray escaped BH
+        } else if (dist2 > planetRadius * 1000.0)//ray escaped BH
         {
             if (maximumDistance < length(cameraPosition - pos)) {
                 glFragColor = vec4(screenColor, 1.0);
@@ -171,6 +181,8 @@ void main()
             }
             vec2 uv = uvFromWorld(pos);
             vec4 bg = texture2D(textureSampler, uv);
+            bg = texture2D(textureSampler, vUV);
+
             glFragColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
             return;
         } else if (abs(pos.y) <= accretionDiskHeight)//ray hit accretion disk //FIXME: Break when rotate
