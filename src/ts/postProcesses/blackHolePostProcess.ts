@@ -1,9 +1,9 @@
 import { Effect } from "@babylonjs/core";
 
 import blackHoleFragment from "../../shaders/blackhole.glsl";
-import { UberScene } from "../core/uberScene";
+import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../core/postProcesses/uberPostProcess";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { BlackHole } from "../bodies/blackHole";
 import { BodyPostProcess } from "./bodyPostProcess";
 

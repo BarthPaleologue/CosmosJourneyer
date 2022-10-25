@@ -7,7 +7,7 @@ import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { computeBarycenter, computePointOnOrbit, getOrbitalPeriod } from "../orbits/kepler";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { normalRandom } from "extended-random";
-import { BasicTransform } from "../core/transforms/basicTransform";
+import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { seededSquirrelNoise } from "squirrel-noise";
 
 enum Steps {

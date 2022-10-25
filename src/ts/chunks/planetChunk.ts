@@ -2,7 +2,7 @@ import { Material, Mesh, Vector3 } from "@babylonjs/core";
 
 import { Direction, getQuaternionFromDirection } from "../utils/direction";
 import { getChunkPlaneSpacePositionFromPath } from "../utils/chunkUtils";
-import { BasicTransform } from "../core/transforms/basicTransform";
+import { BasicTransform } from "../uberCore/transforms/basicTransform";
 
 export class PlanetChunk {
     public readonly mesh: Mesh;

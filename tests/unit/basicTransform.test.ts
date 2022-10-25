@@ -1,6 +1,6 @@
 import { NullEngine, Quaternion, Scene, Vector3 } from "@babylonjs/core";
 import { AbstractController } from "../../src/ts/controllers/abstractController";
-import { BasicTransform } from "../../src/ts/core/transforms/basicTransform";
+import { BasicTransform } from "../../src/ts/uberCore/transforms/basicTransform";
 
 const engine = new NullEngine();
 const scene = new Scene(engine);

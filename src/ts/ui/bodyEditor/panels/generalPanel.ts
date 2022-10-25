@@ -5,7 +5,7 @@ import { Axis } from "@babylonjs/core";
 import { Slider } from "handle-sliderjs";
 import { Settings } from "../../../settings";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
-import { UberScene } from "../../../core/uberScene";
+import { UberScene } from "../../../uberCore/uberScene";
 
 export class GeneralPanel extends EditorPanel {
     constructor() {

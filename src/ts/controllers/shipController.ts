@@ -1,7 +1,7 @@
-import { NewtonianTransform } from "../core/transforms/newtonianTransform";
+import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
 import { Input, InputType } from "../inputs/input";
 import { Vector3 } from "@babylonjs/core";
-import { UberFreeCamera } from "../core/uberFreeCamera";
+import { UberFreeCamera } from "../uberCore/uberFreeCamera";
 import { AbstractController } from "./abstractController";
 import { Assets } from "../assets";
 import { Keyboard } from "../inputs/keyboard";

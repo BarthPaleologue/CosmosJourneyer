@@ -2,8 +2,8 @@ import { Effect } from "@babylonjs/core";
 
 import ringsFragment from "../../shaders/ringsFragment.glsl";
 import { AbstractBody } from "../bodies/abstractBody";
-import { UberScene } from "../core/uberScene";
-import { ShaderDataType, ShaderUniforms } from "../core/postProcesses/uberPostProcess";
+import { UberScene } from "../uberCore/uberScene";
+import { ShaderDataType, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { randRange } from "extended-random";
 import { BlackHole } from "../bodies/blackHole";

@@ -7,9 +7,9 @@ import { BuildTask, DeleteTask, TaskType } from "./taskTypes";
 import { rayIntersectSphere } from "../utils/gradientMath";
 import { Settings } from "../settings";
 import { getChunkSphereSpacePositionFromPath } from "../utils/chunkUtils";
-import { BasicTransform } from "../core/transforms/basicTransform";
+import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";
-import { UberScene } from "../core/uberScene";
+import { UberScene } from "../uberCore/uberScene";
 
 /**
  * A quadTree is defined recursively

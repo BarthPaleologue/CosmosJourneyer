@@ -2,7 +2,7 @@ import { Vector3 } from "@babylonjs/core";
 
 import { AbstractBody, isOrbiting } from "./abstractBody";
 import { Star } from "./stars/star";
-import { UberScene } from "../core/uberScene";
+import { UberScene } from "../uberCore/uberScene";
 import { Planet } from "./planets/planet";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { TelluricPlanet } from "./planets/telluricPlanet";

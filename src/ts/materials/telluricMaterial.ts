@@ -5,11 +5,11 @@ import surfaceMaterialFragment from "../../shaders/telluricPlanetMaterial/fragme
 import surfaceMaterialVertex from "../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../assets";
 import { flattenVector3Array } from "../utils/algebra";
-import { UberScene } from "../core/uberScene";
+import { UberScene } from "../uberCore/uberScene";
 import { Star } from "../bodies/stars/star";
 import { AbstractController } from "../controllers/abstractController";
 import { BlackHole } from "../bodies/blackHole";
-import { BasicTransform } from "../core/transforms/basicTransform";
+import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { SolidPhysicalProperties } from "../bodies/physicalProperties";
 

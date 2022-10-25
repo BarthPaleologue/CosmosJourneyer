@@ -1,7 +1,7 @@
 import { Slider } from "handle-sliderjs";
 import { AbstractBody } from "../../bodies/abstractBody";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
-import { UberScene } from "../../core/uberScene";
+import { UberScene } from "../../uberCore/uberScene";
 
 export abstract class EditorPanel {
     sliders: Slider[] = [];

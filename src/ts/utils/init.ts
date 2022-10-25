@@ -1,5 +1,5 @@
 import { Engine, EngineFactory, WebGPUEngine } from "@babylonjs/core";
-import { UberScene } from "../core/uberScene";
+import { UberScene } from "../uberCore/uberScene";
 
 export async function initEngineScene(canvas: HTMLCanvasElement): Promise<[Engine, UberScene]> {
     const engine = await EngineFactory.CreateAsync(canvas, {

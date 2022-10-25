@@ -1,7 +1,7 @@
-import { UberScene } from "../core/uberScene";
+import { UberScene } from "../uberCore/uberScene";
 import { AbstractBody } from "../bodies/abstractBody";
-import { ITransformable } from "../core/transforms/iTransformable";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../core/postProcesses/uberPostProcess";
+import { ITransformable } from "../uberCore/transforms/iTransformable";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     return [

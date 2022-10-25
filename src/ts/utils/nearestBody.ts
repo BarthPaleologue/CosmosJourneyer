@@ -1,4 +1,4 @@
-import { ITransformable } from "../core/transforms/iTransformable";
+import { ITransformable } from "../uberCore/transforms/iTransformable";
 import { AbstractBody } from "../bodies/abstractBody";
 
 export function nearestBody(object: ITransformable, bodies: AbstractBody[]): AbstractBody {

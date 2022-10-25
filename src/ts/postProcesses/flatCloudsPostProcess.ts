@@ -4,8 +4,8 @@ import normalMap from "../../asset/textures/cloudNormalMap3.jpg";
 import { gcd } from "../utils/gradientMath";
 
 import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
-import { UberScene } from "../core/uberScene";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../core/postProcesses/uberPostProcess";
+import { UberScene } from "../uberCore/uberScene";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { BlackHole } from "../bodies/blackHole";

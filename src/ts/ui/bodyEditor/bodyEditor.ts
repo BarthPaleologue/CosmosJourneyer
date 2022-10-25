@@ -18,7 +18,7 @@ import { CloudsPanel } from "./panels/cloudsPanel";
 import { RingsPanel } from "./panels/ringsPanel";
 import { OceanPanel } from "./panels/oceanPanel";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
-import { UberScene } from "../../core/uberScene";
+import { UberScene } from "../../uberCore/uberScene";
 
 export enum EditorVisibility {
     HIDDEN,

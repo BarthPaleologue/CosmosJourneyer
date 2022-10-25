@@ -2,8 +2,8 @@ import { Effect } from "@babylonjs/core";
 
 import oceanFragment from "../../shaders/oceanFragment.glsl";
 import { Assets } from "../assets";
-import { UberScene } from "../core/uberScene";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../core/postProcesses/uberPostProcess";
+import { UberScene } from "../uberCore/uberScene";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { Star } from "../bodies/stars/star";
 import { BlackHole } from "../bodies/blackHole";

@@ -8,7 +8,7 @@ import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { flattenVector3Array } from "../utils/algebra";
 import { Star } from "../bodies/stars/star";
 import { BlackHole } from "../bodies/blackHole";
-import { BasicTransform } from "../core/transforms/basicTransform";
+import { BasicTransform } from "../uberCore/transforms/basicTransform";
 
 const shaderName = "gazPlanetMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;

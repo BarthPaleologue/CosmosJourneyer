@@ -1,6 +1,6 @@
 import { AbstractBody } from "../bodies/abstractBody";
-import { UberScene } from "../core/uberScene";
-import { ShaderSamplers, ShaderUniforms, UberPostProcess } from "../core/postProcesses/uberPostProcess";
+import { UberScene } from "../uberCore/uberScene";
+import { ShaderSamplers, ShaderUniforms, UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 
 export abstract class BodyPostProcess extends UberPostProcess {
     readonly body: AbstractBody;

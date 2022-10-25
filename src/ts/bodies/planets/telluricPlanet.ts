@@ -17,7 +17,7 @@ import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { clamp } from "../../utils/gradientMath";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
-import { UberScene } from "../../core/uberScene";
+import { UberScene } from "../../uberCore/uberScene";
 import { Planet } from "./planet";
 import { Star } from "../stars/star";
 import { BlackHole } from "../blackHole";

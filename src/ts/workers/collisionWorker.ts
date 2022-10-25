@@ -2,7 +2,7 @@ import { CollisionData } from "../chunks/workerDataTypes";
 import { StarSystem } from "../bodies/starSystem";
 import { AbstractController } from "../controllers/abstractController";
 import { RigidBody } from "../bodies/interfaces";
-import { ITransformable } from "../core/transforms/iTransformable";
+import { ITransformable } from "../uberCore/transforms/iTransformable";
 
 export class CollisionWorker {
     currentBody: (RigidBody & ITransformable) | null = null;

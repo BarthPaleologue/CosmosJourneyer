@@ -1,5 +1,5 @@
-import { UberScene } from "../core/uberScene";
-import { UberRenderingPipeline } from "../core/uberRenderingPipeline";
+import { UberScene } from "../uberCore/uberScene";
+import { UberRenderingPipeline } from "../uberCore/uberRenderingPipeline";
 import { Engine, FxaaPostProcess, PostProcessRenderEffect, Texture } from "@babylonjs/core";
 import { OceanPostProcess } from "./oceanPostProcess";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
@@ -16,7 +16,7 @@ import { VolumetricLight } from "./volumetricLight";
 import { BlackHolePostProcess } from "./blackHolePostProcess";
 import { GasPlanet } from "../bodies/planets/gasPlanet";
 import { BodyType } from "../bodies/interfaces";
-import { ColorCorrection } from "../core/postProcesses/colorCorrection";
+import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
 import { extractRelevantPostProcesses } from "../utils/extractRelevantPostProcesses";
 
 export enum PostProcessType {

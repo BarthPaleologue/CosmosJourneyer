@@ -10,7 +10,7 @@ import { normalRandom, randRange, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/gradientMath";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { Settings } from "../../settings";
-import { UberScene } from "../../core/uberScene";
+import { UberScene } from "../../uberCore/uberScene";
 
 enum Steps {
     RADIUS = 1000,

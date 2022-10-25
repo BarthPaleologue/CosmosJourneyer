@@ -3,7 +3,7 @@ import { getRgbFromTemperature } from "../utils/specrend";
 
 import starMaterialFragment from "../../shaders/starMaterial/fragment.glsl";
 import starMaterialVertex from "../../shaders/starMaterial/vertex.glsl";
-import { BasicTransform } from "../core/transforms/basicTransform";
+import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { StarPhysicalProperties } from "../bodies/physicalProperties";
 
 const shaderName = "starMaterial";

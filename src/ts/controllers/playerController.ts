@@ -1,5 +1,5 @@
 import { AbstractController } from "./abstractController";
-import { UberFreeCamera } from "../core/uberFreeCamera";
+import { UberFreeCamera } from "../uberCore/uberFreeCamera";
 import { Vector3 } from "@babylonjs/core";
 import { Input } from "../inputs/input";
 
