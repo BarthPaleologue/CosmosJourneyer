@@ -7,7 +7,7 @@ import { Assets } from "../assets";
 import { flattenVector3Array } from "../utils/algebra";
 import { UberScene } from "../uberCore/uberScene";
 import { Star } from "../bodies/stars/star";
-import { AbstractController } from "../controllers/abstractController";
+import { AbstractController } from "../uberCore/abstractController";
 import { BlackHole } from "../bodies/blackHole";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";

@@ -1,4 +1,4 @@
-import { AbstractController } from "../../controllers/abstractController";
+import { AbstractController } from "../../uberCore/abstractController";
 import { Star } from "../stars/star";
 import { BlackHole } from "../blackHole";
 

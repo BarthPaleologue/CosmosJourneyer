@@ -2,7 +2,7 @@ import { DepthRenderer, Engine, Scene, ScenePerformancePriority } from "@babylon
 import { UberRenderingPipeline } from "./uberRenderingPipeline";
 import { ChunkForge } from "../chunks/chunkForge";
 import { Settings } from "../settings";
-import { AbstractController } from "../controllers/abstractController";
+import { AbstractController } from "./abstractController";
 import { UberFreeCamera } from "./uberFreeCamera";
 
 export class UberScene extends Scene {

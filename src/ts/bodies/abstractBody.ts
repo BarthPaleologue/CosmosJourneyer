@@ -1,6 +1,6 @@
 import { Axis, Quaternion, Vector3 } from "@babylonjs/core";
 import { BodyType, ISeedable } from "./interfaces";
-import { AbstractController } from "../controllers/abstractController";
+import { AbstractController } from "../uberCore/abstractController";
 import { PhysicalProperties } from "./physicalProperties";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";

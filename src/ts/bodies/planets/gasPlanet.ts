@@ -1,7 +1,7 @@
 import { Mesh, MeshBuilder } from "@babylonjs/core";
 
 import { BodyType } from "../interfaces";
-import { AbstractController } from "../../controllers/abstractController";
+import { AbstractController } from "../../uberCore/abstractController";
 import { PlanetPhysicalProperties } from "../physicalProperties";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";

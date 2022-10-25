@@ -2,7 +2,7 @@ import { AbstractBody } from "../abstractBody";
 
 import { Mesh, MeshBuilder, Quaternion } from "@babylonjs/core";
 import { BodyType } from "../interfaces";
-import { AbstractController } from "../../controllers/abstractController";
+import { AbstractController } from "../../uberCore/abstractController";
 import { StarPhysicalProperties } from "../physicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";

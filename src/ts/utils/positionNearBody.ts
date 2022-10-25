@@ -1,16 +1,20 @@
 import { AbstractBody } from "../bodies/abstractBody";
 import { Vector3 } from "@babylonjs/core";
-import { AbstractController } from "../controllers/abstractController";
+import { AbstractController } from "../uberCore/abstractController";
 import { StarSystem } from "../bodies/starSystem";
+import { nearestBody } from "./nearestBody";
 
 export function positionNearBody(controller: AbstractController, body: AbstractBody, starSystem: StarSystem, nRadius = 3): void {
-    const dir = body.getAbsolutePosition().clone();
-    const dist = dir.length();
-    if (dist > 0) {
-        dir.normalize();
-        controller.transform.setAbsolutePosition(dir.scale(dist - body.getRadius() * nRadius));
+    const nearestStar = nearestBody(body, starSystem.stars);
+    const dirBodyToStar = body.getAbsolutePosition().subtract(nearestStar.getAbsolutePosition());
+    const distBodyToStar = dirBodyToStar.length();
+
+    if (distBodyToStar > 0) {
+        dirBodyToStar.scaleInPlace(1 / distBodyToStar);
+        const displacement = nearestStar.getAbsolutePosition().add(dirBodyToStar.scale(distBodyToStar - nRadius * body.getRadius()));
+        controller.transform.setAbsolutePosition(displacement);
     } else {
-        controller.transform.setAbsolutePosition(new Vector3(0, 0.2, 1).scaleInPlace(body.getRadius() * nRadius));
+        controller.transform.setAbsolutePosition(body.getAbsolutePosition().add(new Vector3(0, 0.2, 1).scaleInPlace(body.getRadius() * nRadius)));
     }
 
     starSystem.translateAllBodies(controller.transform.getAbsolutePosition().negate());

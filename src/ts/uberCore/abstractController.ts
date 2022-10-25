@@ -1,7 +1,7 @@
 import { Vector3 } from "@babylonjs/core";
 import { Input } from "../inputs/input";
-import { BasicTransform } from "../uberCore/transforms/basicTransform";
-import { UberFreeCamera } from "../uberCore/uberFreeCamera";
+import { BasicTransform } from "./transforms/basicTransform";
+import { UberFreeCamera } from "./uberFreeCamera";
 
 export abstract class AbstractController {
     collisionRadius = 10;

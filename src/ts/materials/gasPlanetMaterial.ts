@@ -1,5 +1,5 @@
 import { Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
-import { AbstractController } from "../controllers/abstractController";
+import { AbstractController } from "../uberCore/abstractController";
 
 import surfaceMaterialFragment from "../../shaders/gasPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../shaders/gasPlanetMaterial/vertex.glsl";

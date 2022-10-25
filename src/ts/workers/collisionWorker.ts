@@ -1,6 +1,6 @@
 import { CollisionData } from "../chunks/workerDataTypes";
 import { StarSystem } from "../bodies/starSystem";
-import { AbstractController } from "../controllers/abstractController";
+import { AbstractController } from "../uberCore/abstractController";
 import { RigidBody } from "../bodies/interfaces";
 import { ITransformable } from "../uberCore/transforms/iTransformable";
 

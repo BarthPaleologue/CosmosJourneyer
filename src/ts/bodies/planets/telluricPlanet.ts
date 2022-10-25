@@ -7,7 +7,7 @@ import { Vector3 } from "@babylonjs/core";
 import { BodyType, RigidBody } from "../interfaces";
 import { CollisionData } from "../../chunks/workerDataTypes";
 import { TaskType } from "../../chunks/taskTypes";
-import { AbstractController } from "../../controllers/abstractController";
+import { AbstractController } from "../../uberCore/abstractController";
 import { Settings } from "../../settings";
 import { SolidPhysicalProperties } from "../physicalProperties";
 import { TelluricMaterial } from "../../materials/telluricMaterial";
