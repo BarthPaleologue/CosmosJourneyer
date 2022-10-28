@@ -85,7 +85,7 @@ export class OceanPostProcess extends BodyPostProcess {
                 name: "planetInverseRotationQuaternion",
                 type: ShaderDataType.Quaternion,
                 get: () => {
-                    return planet.getInverseRotationQuaternion();
+                    return planet.transform.getInverseRotationQuaternion();
                 }
             },
             {

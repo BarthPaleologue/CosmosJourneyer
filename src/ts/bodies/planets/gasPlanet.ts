@@ -59,9 +59,9 @@ export class GasPlanet extends AbstractBody implements Planet {
             },
             scene
         );
-        this.mesh.parent = this.node;
+        this.mesh.parent = this.transform.node;
 
-        this.material = new GasPlanetMaterial(this.name, this, this.getRadius(), this.seed, this.rng, scene);
+        this.material = new GasPlanetMaterial(this.name, this.transform, this.getRadius(), this.seed, this.rng, scene);
         this.mesh.material = this.material;
 
         this.postProcesses = {

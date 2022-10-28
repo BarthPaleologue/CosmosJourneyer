@@ -23,11 +23,13 @@ enum Steps {
  * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
  */
 export function isOrbiting(controller: AbstractController, body: AbstractBody, orbitLimitFactor = 2.5): boolean {
-    return body.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * body.getRadius()) ** 2;
+    return body.transform.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * body.getRadius()) ** 2;
 }
 
-export abstract class AbstractBody extends BasicTransform implements IOrbitalBody, ISeedable {
+export abstract class AbstractBody implements IOrbitalBody, ISeedable {
     abstract readonly bodyType: BodyType;
+
+    readonly transform: BasicTransform;
 
     abstract physicalProperties: PhysicalProperties;
     orbitalProperties: IOrbitalProperties;
@@ -57,11 +59,12 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
      * @param parentBodies the parent bodies of this body
      */
     protected constructor(name: string, seed: number, parentBodies: IOrbitalBody[]) {
-        super(name);
         this.name = name;
 
         console.assert(-1 <= seed && seed <= 1, "seed must be in [-1, 1]");
         this.seed = seed;
+
+        this.transform = new BasicTransform(name);
 
         this.rng = seededSquirrelNoise(seed * Number.MAX_SAFE_INTEGER);
 
@@ -75,8 +78,8 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
         if (minDepth == -1) this.depth = 0;
         else this.depth = minDepth + 1;
 
-        this.rotate(Axis.X, normalRandom(0, 0.2, this.rng, Steps.AXIAL_TILT));
-        this.rotate(Axis.Z, normalRandom(0, 0.2, this.rng, Steps.AXIAL_TILT + 10));
+        this.transform.rotate(Axis.X, normalRandom(0, 0.2, this.rng, Steps.AXIAL_TILT));
+        this.transform.rotate(Axis.Z, normalRandom(0, 0.2, this.rng, Steps.AXIAL_TILT + 10));
 
         // TODO: do not hardcode
         const periapsis = this.rng(Steps.ORBIT) * 5000000e3;
@@ -115,7 +118,7 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
      * Returns the axis of rotation of the body
      */
     public getRotationAxis(): Vector3 {
-        return this.node.up;
+        return this.transform.node.up;
     }
 
     public getInternalTime(): number {
@@ -135,18 +138,18 @@ export abstract class AbstractBody extends BasicTransform implements IOrbitalBod
 
             //TODO: orient the planet accurately
 
-            const initialPosition = this.getAbsolutePosition().clone();
+            const initialPosition = this.transform.getAbsolutePosition().clone();
             const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this.internalTime);
 
             if (isOrbiting(player, this, 50 / (this.depth + 1) ** 3)) player.transform.translate(newPosition.subtract(initialPosition));
-            this.translate(newPosition.subtract(initialPosition));
+            this.transform.translate(newPosition.subtract(initialPosition));
         }
 
         if (this.physicalProperties.rotationPeriod > 0) {
             const dtheta = (2 * Math.PI * deltaTime) / this.physicalProperties.rotationPeriod;
 
-            if (isOrbiting(player, this)) player.transform.rotateAround(this.getAbsolutePosition(), this.node.up, -dtheta);
-            this.rotate(this.getRotationAxis(), -dtheta);
+            if (isOrbiting(player, this)) player.transform.rotateAround(this.transform.getAbsolutePosition(), this.getRotationAxis(), -dtheta);
+            this.transform.rotate(this.getRotationAxis(), -dtheta);
         }
     }
 }

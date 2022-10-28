@@ -3,7 +3,7 @@ import { Quaternion, Vector3 } from "@babylonjs/core";
 /**
  * Describes objects that have a position in space and a rotation quaternion
  */
-export interface ITransformable {
+export interface ITransformLike {
     /**
      * Sets the new position relative to the origin of the universe
      * @param newPosition The new relative position to the origin of the universe to set

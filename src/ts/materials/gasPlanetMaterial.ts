@@ -104,7 +104,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
         this.setVector3("playerPosition", player.transform.getAbsolutePosition());
 
-        this.setArray3("starPositions", flattenVector3Array(stars.map((star) => star.getAbsolutePosition())));
+        this.setArray3("starPositions", flattenVector3Array(stars.map((star) => star.transform.getAbsolutePosition())));
         this.setInt("nbStars", stars.length);
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());

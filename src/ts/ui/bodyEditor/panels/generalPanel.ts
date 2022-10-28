@@ -16,28 +16,24 @@ export class GeneralPanel extends EditorPanel {
 
         for (const slider of this.sliders) slider.remove();
 
-        let axialTiltX = stripAxisFromQuaternion(body.getRotationQuaternion(), Axis.Y).toEulerAngles().x;
-        let axialTiltZ = stripAxisFromQuaternion(body.getRotationQuaternion(), Axis.Y).toEulerAngles().z;
+        let axialTiltX = stripAxisFromQuaternion(body.transform.getRotationQuaternion(), Axis.Y).toEulerAngles().x;
+        let axialTiltZ = stripAxisFromQuaternion(body.transform.getRotationQuaternion(), Axis.Y).toEulerAngles().z;
         //TODO: do not hardcode here
         const power = 1.4;
 
         this.sliders = [
-            new Slider("zoom", document.getElementById("zoom") as HTMLElement, 0, 100, (100 * body.radius) / body.node.position.z, (value: number) => {
-                const playerDir = body.getAbsolutePosition().normalizeToNew();
-                body.setAbsolutePosition(playerDir.scale((100 * body.getRadius()) / value));
-            }),
             new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
-                body.rotate(Axis.X, newAxialTilt - axialTiltX);
+                body.transform.rotate(Axis.X, newAxialTilt - axialTiltX);
                 if (isOrbiting(scene.getActiveController(), body))
-                    scene.getActiveController().transform.rotateAround(body.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
+                    scene.getActiveController().transform.rotateAround(body.transform.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
                 axialTiltX = newAxialTilt;
             }),
             new Slider("axialTiltZ", document.getElementById("axialTiltZ") as HTMLElement, -180, 180, Math.round((180 * axialTiltZ) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
-                body.rotate(Axis.Z, newAxialTilt - axialTiltZ);
+                body.transform.rotate(Axis.Z, newAxialTilt - axialTiltZ);
                 if (isOrbiting(scene.getActiveController(), body))
-                    scene.getActiveController().transform.rotateAround(body.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
+                    scene.getActiveController().transform.rotateAround(body.transform.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
                 axialTiltZ = newAxialTilt;
             }),
             new Slider(

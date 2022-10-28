@@ -2,7 +2,7 @@ import { CollisionData } from "../chunks/workerDataTypes";
 import { StarSystem } from "../bodies/starSystem";
 import { AbstractController } from "../uberCore/abstractController";
 import { RigidBody } from "../bodies/interfaces";
-import { ITransformable } from "../uberCore/transforms/iTransformable";
+import { ITransformable } from "../orbits/iOrbitalBody";
 
 export class CollisionWorker {
     currentBody: (RigidBody & ITransformable) | null = null;
@@ -13,11 +13,11 @@ export class CollisionWorker {
         this._worker.onmessage = (e) => {
             if (this.currentBody == null) return;
 
-            const direction = this.currentBody.getAbsolutePosition().normalizeToNew();
-            const currentHeight = this.currentBody.getAbsolutePosition().length();
+            const direction = this.currentBody.transform.getAbsolutePosition().normalizeToNew();
+            const currentHeight = this.currentBody.transform.getAbsolutePosition().length();
             const terrainHeight = e.data.h;
 
-            const currentPosition = this.currentBody.getAbsolutePosition();
+            const currentPosition = this.currentBody.transform.getAbsolutePosition();
             let newPosition = currentPosition;
 
             if (currentHeight - player.collisionRadius < terrainHeight) {
@@ -40,8 +40,8 @@ export class CollisionWorker {
     }
     public checkCollision(planet: RigidBody & ITransformable): void {
         this.currentBody = planet;
-        const playerSamplePosition = planet.getAbsolutePosition().negate();
-        playerSamplePosition.applyRotationQuaternionInPlace(planet.getInverseRotationQuaternion());
+        const playerSamplePosition = planet.transform.getAbsolutePosition().negate();
+        playerSamplePosition.applyRotationQuaternionInPlace(planet.transform.getInverseRotationQuaternion());
 
         const collisionData = planet.generateCollisionTask(playerSamplePosition);
         this.postMessage(collisionData);

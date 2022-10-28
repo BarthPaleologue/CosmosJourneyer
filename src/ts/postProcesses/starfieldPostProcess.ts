@@ -37,7 +37,7 @@ export class StarfieldPostProcess extends UberPostProcess {
                     //TODO: should be cleaned up
                     let vis = 1.0;
                     for (const star of stars) {
-                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.getAbsolutePosition().normalizeToNew(), scene.getActiveController().transform.getForwardDirection()));
+                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.transform.getAbsolutePosition().normalizeToNew(), scene.getActiveController().transform.getForwardDirection()));
                     }
                     vis /= 2;
                     let vis2 = 1.0;
@@ -45,12 +45,12 @@ export class StarfieldPostProcess extends UberPostProcess {
                     if (nearest.bodyType == BodyType.TELLURIC) {
                         const planet = nearest as TelluricPlanet;
                         if (planet.postProcesses.atmosphere != null) {
-                            const height = planet.getAbsolutePosition().length();
+                            const height = planet.transform.getAbsolutePosition().length();
                             //FIXME: has to be dynamic
                             const maxHeight = Settings.ATMOSPHERE_HEIGHT;
                             for (const star of stars) {
-                                const sunDir = planet.getAbsolutePosition().subtract(star.getAbsolutePosition()).normalize();
-                                vis2 = Math.min(vis2, (height / maxHeight) ** 32 + Math.max(Vector3.Dot(sunDir, planet.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5);
+                                const sunDir = planet.transform.getAbsolutePosition().subtract(star.transform.getAbsolutePosition()).normalize();
+                                vis2 = Math.min(vis2, (height / maxHeight) ** 32 + Math.max(Vector3.Dot(sunDir, planet.transform.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5);
                             }
                         }
                     }

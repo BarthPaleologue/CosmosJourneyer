@@ -1,7 +1,11 @@
 import { PhysicalProperties } from "../bodies/physicalProperties";
 import { IOrbitalProperties } from "./iOrbitalProperties";
-import { ITransformable } from "../uberCore/transforms/iTransformable";
+import { ITransformLike } from "../uberCore/transforms/ITransformLike";
 import { BodyType } from "../bodies/interfaces";
+
+export interface ITransformable {
+    transform: ITransformLike;
+}
 
 export interface IOrbitalBody extends ITransformable {
     /**

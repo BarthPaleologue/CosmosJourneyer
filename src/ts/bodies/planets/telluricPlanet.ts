@@ -139,15 +139,15 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
 
         if (this.isSatelliteOfTelluric) this.terrainSettings.continentsFragmentation /= 2;
 
-        this.material = new TelluricMaterial(this.name, this, this.getRadius(), this.seed, this.terrainSettings, this.physicalProperties, scene);
+        this.material = new TelluricMaterial(this.name, this.transform, this.getRadius(), this.seed, this.terrainSettings, this.physicalProperties, scene);
 
         this.sides = [
-            new ChunkTree(Direction.Up, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene),
-            new ChunkTree(Direction.Down, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene),
-            new ChunkTree(Direction.Forward, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene),
-            new ChunkTree(Direction.Backward, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene),
-            new ChunkTree(Direction.Right, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene),
-            new ChunkTree(Direction.Left, this.name, this.seed, this.getRadius(), this.terrainSettings, this, this.material, scene)
+            new ChunkTree(Direction.Up, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene),
+            new ChunkTree(Direction.Down, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene),
+            new ChunkTree(Direction.Forward, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene),
+            new ChunkTree(Direction.Backward, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene),
+            new ChunkTree(Direction.Right, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene),
+            new ChunkTree(Direction.Left, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene)
         ];
     }
 

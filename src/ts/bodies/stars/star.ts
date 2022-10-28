@@ -60,13 +60,13 @@ export class Star extends AbstractBody {
             },
             scene
         );
-        this.mesh.parent = this.node;
+        this.mesh.parent = this.transform.node;
 
-        this.material = new StarMaterial(this, this.seed, this.physicalProperties, scene);
+        this.material = new StarMaterial(this.transform, this.seed, this.physicalProperties, scene);
         this.mesh.material = this.material;
 
         // TODO: remove when rotation is transmitted to children
-        this.node.rotationQuaternion = Quaternion.Identity();
+        this.transform.node.rotationQuaternion = Quaternion.Identity();
 
         this.postProcesses = {
             overlay: true,

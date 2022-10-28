@@ -1,10 +1,10 @@
-import { ITransformable } from "./iTransformable";
+import { ITransformLike } from "./ITransformLike";
 import { Axis, Quaternion, Space, TransformNode, Vector3 } from "@babylonjs/core";
 
 /**
  * Very thin wrapper around a BabylonJS TransformNode
  */
-export class BasicTransform implements ITransformable {
+export class BasicTransform implements ITransformLike {
     node: TransformNode;
 
     constructor(name: string) {

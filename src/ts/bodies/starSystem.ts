@@ -128,7 +128,7 @@ export class StarSystem {
             periapsis: periapsis,
             apoapsis: apoapsis,
             period: getOrbitalPeriod(periapsis, apoapsis, satellite.parentBodies),
-            orientationQuaternion: satellite.getRotationQuaternion()
+            orientationQuaternion: satellite.transform.getRotationQuaternion()
         };
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
 
@@ -144,7 +144,7 @@ export class StarSystem {
     }
 
     public translateAllBodies(displacement: Vector3): void {
-        for (const planet of this.bodies) planet.translate(displacement);
+        for (const planet of this.bodies) planet.transform.translate(displacement);
     }
 
     /**
@@ -162,7 +162,7 @@ export class StarSystem {
         let nearest = null;
         let smallerDistance2 = -1;
         for (const body of this.getBodies()) {
-            const distance2 = body.getAbsolutePosition().subtract(position).lengthSquared();
+            const distance2 = body.transform.getAbsolutePosition().subtract(position).lengthSquared();
             if (nearest == null || distance2 < smallerDistance2) {
                 nearest = body;
                 smallerDistance2 = distance2;

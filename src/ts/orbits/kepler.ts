@@ -36,21 +36,21 @@ export function computeBarycenter2(bodies: IOrbitalBody[]): Vector3 {
     const barycenter = Vector3.Zero();
     let sum = 0;
     for (const body of bodies) {
-        barycenter.addInPlace(body.getAbsolutePosition().scale(body.physicalProperties.mass));
+        barycenter.addInPlace(body.transform.getAbsolutePosition().scale(body.physicalProperties.mass));
         sum += body.physicalProperties.mass;
     }
     return barycenter.scaleInPlace(1 / sum);
 }
 
 export function computeBarycenter(body: IOrbitalBody, relevantBodies: IOrbitalBody[]): [Vector3, Quaternion] {
-    const barycenter = body.getAbsolutePosition().scale(body.physicalProperties.mass);
+    const barycenter = body.transform.getAbsolutePosition().scale(body.physicalProperties.mass);
     const meanQuaternion = Quaternion.Zero();
     let sumPosition = body.physicalProperties.mass;
     let sumQuaternion = 0;
     for (const otherBody of relevantBodies) {
         const mass = otherBody.physicalProperties.mass;
-        barycenter.addInPlace(otherBody.getAbsolutePosition().scale(mass));
-        meanQuaternion.addInPlace(stripAxisFromQuaternion(otherBody.getRotationQuaternion(), Axis.Y).scale(mass));
+        barycenter.addInPlace(otherBody.transform.getAbsolutePosition().scale(mass));
+        meanQuaternion.addInPlace(stripAxisFromQuaternion(otherBody.transform.getRotationQuaternion(), Axis.Y).scale(mass));
         sumPosition += mass;
         sumQuaternion += mass;
     }
