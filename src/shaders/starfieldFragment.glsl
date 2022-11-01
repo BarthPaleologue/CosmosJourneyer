@@ -37,11 +37,11 @@ void main() {
     
     vec3 pixelWorldPosition = worldFromUV(vUV); // the pixel position in world space (near plane)
 
+    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
+
     // closest physical point from the camera in the direction of the pixel (occlusion)
     vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
     float maximumDistance = length(closestPoint); // the maxium ray length due to occlusion
-
-    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
     vec3 finalColor;
 
@@ -50,7 +50,7 @@ void main() {
         float t0, t1;
         rayIntersectSphere(cameraPosition, rayDir, vec3(0.0), 100.0, t0, t1);
 
-        vec3 samplePoint = normalize(cameraPosition + max(t0, t1) * rayDir);
+        vec3 samplePoint = normalize(max(t0, t1) * rayDir - cameraPosition);
 
         vec3 nebulaSamplePoint = samplePoint + vec3(
             completeNoise(samplePoint, 1, 2.0, 2.0),

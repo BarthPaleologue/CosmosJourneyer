@@ -1,6 +1,5 @@
 import { UberScene } from "../uberCore/uberScene";
 import { AbstractBody } from "../bodies/abstractBody";
-import { ITransformLike } from "../uberCore/transforms/ITransformLike";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { ITransformable } from "../orbits/iOrbitalBody";
 
@@ -10,7 +9,7 @@ export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
             name: "cameraPosition",
             type: ShaderDataType.Vector3,
             get: () => {
-                return scene.getActiveUberCamera().position;
+                return scene.getActiveUberCamera().globalPosition;
             }
         },
         {
