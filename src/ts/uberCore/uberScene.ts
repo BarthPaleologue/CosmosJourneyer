@@ -3,7 +3,7 @@ import { UberRenderingPipeline } from "./uberRenderingPipeline";
 import { ChunkForge } from "../chunks/chunkForge";
 import { Settings } from "../settings";
 import { AbstractController } from "./abstractController";
-import { UberFreeCamera } from "./uberFreeCamera";
+import { UberCamera } from "./uberCamera";
 
 export class UberScene extends Scene {
     activeController: AbstractController | null = null;
@@ -37,7 +37,7 @@ export class UberScene extends Scene {
         return this.activeController;
     }
 
-    public getActiveUberCamera(): UberFreeCamera {
+    public getActiveUberCamera(): UberCamera {
         if (this.getActiveController().getActiveCamera() === null) throw new Error("No active Uber Camera");
         return this.getActiveController().getActiveCamera();
     }

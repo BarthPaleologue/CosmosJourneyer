@@ -1,6 +1,6 @@
 import { FreeCamera, Matrix, Vector3 } from "@babylonjs/core";
 
-export class UberFreeCamera extends FreeCamera {
+export class UberCamera extends FreeCamera {
     private inverseProjectionMatrix: Matrix;
     private inverseViewMatrix: Matrix;
 
@@ -25,5 +25,9 @@ export class UberFreeCamera extends FreeCamera {
 
     getInverseViewMatrix(): Matrix {
         return this.inverseViewMatrix;
+    }
+
+    getAbsolutePosition(): Vector3 {
+        return this.globalPosition;
     }
 }

@@ -1,7 +1,7 @@
 import { Vector3 } from "@babylonjs/core";
 import { Input } from "../inputs/input";
 import { BasicTransform } from "./transforms/basicTransform";
-import { UberFreeCamera } from "./uberFreeCamera";
+import { UberCamera } from "./uberCamera";
 
 export abstract class AbstractController {
     collisionRadius = 10;
@@ -20,7 +20,7 @@ export abstract class AbstractController {
     /**
      * Returns the camera that should be used to display the player
      */
-    abstract getActiveCamera(): UberFreeCamera;
+    abstract getActiveCamera(): UberCamera;
 
     /**
      * Listens to input, rotate the controller accordingly and computes equivalent displacement (the player is fixed at the origin)

@@ -1,10 +1,12 @@
 import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
 import { Input, InputType } from "../inputs/input";
 import { Vector3 } from "@babylonjs/core";
-import { UberFreeCamera } from "../uberCore/uberFreeCamera";
+import { UberCamera } from "../uberCore/uberCamera";
 import { AbstractController } from "../uberCore/abstractController";
 import { Assets } from "../assets";
 import { Keyboard } from "../inputs/keyboard";
+import { UberOrbitCamera } from "../uberCore/uberOrbitCamera";
+import { Mouse } from "../inputs/mouse";
 
 export class ShipController extends AbstractController {
     readonly transform: NewtonianTransform;
@@ -17,8 +19,8 @@ export class ShipController extends AbstractController {
     readonly verticalAuthority = 10000;
     readonly sideAuthority = 10000;
 
-    readonly thirdPersonCamera: UberFreeCamera;
-    readonly firstPersonCamera: UberFreeCamera;
+    readonly thirdPersonCamera: UberOrbitCamera;
+    readonly firstPersonCamera: UberCamera;
 
     flightAssistEnabled = true;
     isHyperAccelerated = false;
@@ -28,26 +30,34 @@ export class ShipController extends AbstractController {
 
         this.transform = new NewtonianTransform("shipTransform");
 
-        this.firstPersonCamera = new UberFreeCamera("firstPersonCamera", Vector3.Zero());
+        this.firstPersonCamera = new UberCamera("firstPersonCamera", Vector3.Zero());
         this.firstPersonCamera.parent = this.transform.node;
 
-        this.thirdPersonCamera = new UberFreeCamera("thirdPersonCamera", Vector3.Zero());
+        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), 7, 3.14, 1.4);
         this.thirdPersonCamera.parent = this.transform.node;
-        this.thirdPersonCamera.position.z = -5;
-        this.thirdPersonCamera.position.y = 2;
 
         const spaceship = Assets.Spaceship.createInstance("spaceshipdemo");
+        spaceship.position.y = -1;
         spaceship.parent = this.transform.node;
     }
 
-    getActiveCamera(): UberFreeCamera {
+    getActiveCamera(): UberCamera {
         return this.thirdPersonCamera;
     }
 
     listenTo(input: Input, deltaTime: number): Vector3 {
         if (input.type == InputType.KEYBOARD) {
             const keyboard = input as Keyboard;
-            if (keyboard.isPressed("U")) this.isHyperAccelerated = !this.isHyperAccelerated;
+            if (keyboard.isPressed("u")) this.isHyperAccelerated = !this.isHyperAccelerated;
+            if (keyboard.isPressed("1")) this.thirdPersonCamera.rotatePhi(0.8 * deltaTime);
+            if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-0.8 * deltaTime);
+            if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
+            if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
+        }
+        if(input.type == InputType.MOUSE) {
+            const mouse = input as Mouse;
+            this.thirdPersonCamera.rotatePhi(mouse.getYaw() * deltaTime);
+            this.thirdPersonCamera.rotateTheta(mouse.getPitch() * deltaTime);
         }
         this.transform.rotationAcceleration.x += this.rollAuthority * input.getRoll() * deltaTime;
         this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
@@ -74,6 +84,7 @@ export class ShipController extends AbstractController {
     }
 
     update(deltaTime: number): Vector3 {
+        //this.thirdPersonCamera.rotatePhi(0.02);
         this.transform.rotationAcceleration.copyFromFloats(0, 0, 0);
         this.transform.acceleration.copyFromFloats(0, 0, 0);
         for (const input of this.inputs) this.listenTo(input, deltaTime);

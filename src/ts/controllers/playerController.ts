@@ -1,10 +1,10 @@
 import { AbstractController } from "../uberCore/abstractController";
-import { UberFreeCamera } from "../uberCore/uberFreeCamera";
+import { UberCamera } from "../uberCore/uberCamera";
 import { Vector3 } from "@babylonjs/core";
 import { Input } from "../inputs/input";
 
 export class PlayerController extends AbstractController {
-    private readonly camera: UberFreeCamera;
+    private readonly camera: UberCamera;
 
     speed = 1;
     rotationSpeed = Math.PI / 4;
@@ -12,12 +12,12 @@ export class PlayerController extends AbstractController {
     constructor() {
         super();
 
-        this.camera = new UberFreeCamera("firstPersonCamera", Vector3.Zero());
+        this.camera = new UberCamera("firstPersonCamera", Vector3.Zero());
         this.camera.parent = this.transform.node;
         this.camera.fov = (80 / 360) * Math.PI;
     }
 
-    getActiveCamera(): UberFreeCamera {
+    getActiveCamera(): UberCamera {
         return this.camera;
     }
 

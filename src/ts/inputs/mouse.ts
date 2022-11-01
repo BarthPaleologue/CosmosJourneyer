@@ -28,11 +28,6 @@ export class Mouse implements Input {
 
             this.dxToCenter = e.x - this.canvas.width / 2;
             this.dyToCenter = e.y - this.canvas.height / 2;
-
-            /*if (this.dxToCenter ** 2 + this.dyToCenter ** 2 < this.deadAreaRadius ** 2) {
-                this.dxToCenter = 0;
-                this.dyToCenter = 0;
-            }*/
         });
     }
 
