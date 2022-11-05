@@ -13,7 +13,7 @@ import waterNormal1 from "../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../asset/textures/waterNormalMap4.jpg";
 
 import character from "../asset/man/man.obj";
-import spaceship from "../asset/spaceship/justigue league flying vehicle.obj";
+import spaceship from "../asset/spaceship/spaceship.glb";
 
 export class Assets {
     static IS_READY = false;
@@ -68,7 +68,6 @@ export class Assets {
                     if (mesh.hasBoundingInfo) meshes.push(mesh as Mesh);
                 }
                 Assets.Spaceship = Mesh.MergeMeshes(meshes, true, true, undefined, false, true) as Mesh;
-                Assets.Spaceship.scaling = new Vector3(0.01, 0.01, 0.01);
                 Assets.Spaceship.isVisible = false;
                 const spaceshipMat = new StandardMaterial("spaceshipMat", scene);
                 spaceshipMat.emissiveColor = new Color3(0.5, 0.5, 0.5);

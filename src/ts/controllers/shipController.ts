@@ -33,11 +33,10 @@ export class ShipController extends AbstractController {
         this.firstPersonCamera = new UberCamera("firstPersonCamera", Vector3.Zero());
         this.firstPersonCamera.parent = this.transform.node;
 
-        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), 7, 3.14, 1.4);
+        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), 30, 3.14, 1.4);
         this.thirdPersonCamera.parent = this.transform.node;
 
         const spaceship = Assets.Spaceship.createInstance("spaceshipdemo");
-        spaceship.position.y = -1;
         spaceship.parent = this.transform.node;
     }
 
