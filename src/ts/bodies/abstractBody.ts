@@ -125,13 +125,11 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
         return this.internalTime;
     }
 
-    /**
-     * Updates the state of the celestial body for a given time step of deltaTime
-     * @param player the player in the simulation
-     * @param deltaTime the time step to update for
-     */
-    public updateTransform(player: AbstractController, deltaTime: number): void {
+    public updateClock(deltaTime: number): void {
         this.internalTime += deltaTime;
+    }
+
+    public updateOrbitalPosition(controller: AbstractController): void {
         if (this.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
             this.orbitalProperties.orientationQuaternion = orientationQuaternion;
@@ -141,15 +139,28 @@ export abstract class AbstractBody implements IOrbitalBody, ISeedable {
             const initialPosition = this.transform.getAbsolutePosition().clone();
             const newPosition = computePointOnOrbit(barycenter, this.orbitalProperties, this.internalTime);
 
-            if (isOrbiting(player, this, 50 / (this.depth + 1) ** 3)) player.transform.translate(newPosition.subtract(initialPosition));
+            if (isOrbiting(controller, this, 50 / (this.depth + 1) ** 3)) controller.transform.translate(newPosition.subtract(initialPosition));
             this.transform.translate(newPosition.subtract(initialPosition));
         }
+    }
 
+    public updateRotation(controller: AbstractController, deltaTime: number): void {
         if (this.physicalProperties.rotationPeriod > 0) {
             const dtheta = (2 * Math.PI * deltaTime) / this.physicalProperties.rotationPeriod;
 
-            if (isOrbiting(player, this)) player.transform.rotateAround(this.transform.getAbsolutePosition(), this.getRotationAxis(), -dtheta);
+            if (isOrbiting(controller, this)) controller.transform.rotateAround(this.transform.getAbsolutePosition(), this.getRotationAxis(), -dtheta);
             this.transform.rotate(this.getRotationAxis(), -dtheta);
         }
+    }
+
+    /**
+     * Updates the state of the celestial body for a given time step of deltaTime
+     * @param player the player in the simulation
+     * @param deltaTime the time step to update for
+     */
+    public updateTransform(player: AbstractController, deltaTime: number): void {
+        this.updateClock(deltaTime);
+        this.updateOrbitalPosition(player);
+        this.updateRotation(player, deltaTime);
     }
 }

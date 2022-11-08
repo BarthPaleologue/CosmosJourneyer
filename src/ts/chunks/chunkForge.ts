@@ -122,11 +122,11 @@ export class ChunkForge {
      * Apply generated vertexData to waiting chunks
      */
     private executeNextApplyTask() {
-        if (this.applyTasks.length > 0) {
-            const task = this.applyTasks.shift()!;
+        const task = this.applyTasks.shift();
+        if (task) {
             task.vertexData.applyToMesh(task.chunk.mesh, false);
             task.chunk.mesh.freezeNormals();
-            task.chunk.mesh.refreshBoundingInfo(true);
+            //task.chunk.mesh.refreshBoundingInfo(true);
 
             if (task.chunk.isMinDepth) task.chunk.setReady(true);
 
@@ -139,8 +139,7 @@ export class ChunkForge {
      */
     public update() {
         for (let i = 0; i < this.workerPool.availableWorkers.length; i++) {
-            const worker = this.workerPool.availableWorkers.shift()!;
-            this.executeNextTask(worker);
+            this.executeNextTask(this.workerPool.availableWorkers.shift() as Worker);
         }
         this.workerPool.availableWorkers = this.workerPool.availableWorkers.concat(this.workerPool.finishedWorkers);
         this.workerPool.finishedWorkers = [];
