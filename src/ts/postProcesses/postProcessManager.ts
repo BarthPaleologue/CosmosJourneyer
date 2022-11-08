@@ -96,7 +96,7 @@ export class PostProcessManager {
             return this.overlays;
         });
 
-        this.bloomRenderEffect = new BloomEffect(scene, 1, 2, 8);
+        this.bloomRenderEffect = new BloomEffect(scene, 1, 0.5, 32);
 
         this.colorCorrection.exposure = 1.1;
         this.colorCorrection.gamma = 1.2;
@@ -341,9 +341,9 @@ export class PostProcessManager {
 
         this.currentRenderingPipeline.addEffect(this.fxaaRenderEffect);
 
-        this.currentRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
+        this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
 
-        //this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
+        this.currentRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
         this.currentRenderingPipeline.attachToCamera(this.scene.getActiveUberCamera());
     }
