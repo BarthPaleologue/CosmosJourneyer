@@ -1,5 +1,5 @@
-import { AbstractMesh, AssetsManager, Color3, Mesh, MeshAssetTask, Scene, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
-import "@babylonjs/loaders";
+import { AssetsManager, Color3, Mesh, MeshAssetTask, Scene, StandardMaterial, Texture } from "@babylonjs/core";
+import "@babylonjs/loaders/glTF/2.0";
 
 import rockNormalMap from "../asset/textures/rockn.png";
 import dirtNormalMap from "../asset/textures/dirt/Ground_Dirt_008_normal.jpg";
@@ -12,7 +12,7 @@ import sandNormalMap2 from "../asset/textures/sandNormalMap2.jpg";
 import waterNormal1 from "../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../asset/textures/waterNormalMap4.jpg";
 
-import character from "../asset/man/man.obj";
+//import character from "../asset/man/man.obj";
 import spaceship from "../asset/spaceship/spaceship.glb";
 
 export class Assets {
@@ -28,7 +28,7 @@ export class Assets {
     static WaterNormalMap1: Texture;
     static WaterNormalMap2: Texture;
 
-    static Character: AbstractMesh;
+    //static Character: AbstractMesh;
     static Spaceship: Mesh;
 
     private static manager: AssetsManager;
@@ -49,7 +49,7 @@ export class Assets {
             Assets.manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Assets.WaterNormalMap1 = task.texture);
             Assets.manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Assets.WaterNormalMap2 = task.texture);
 
-            const characterTask = Assets.manager.addMeshTask("characterTask", "", "", character);
+            /*const characterTask = Assets.manager.addMeshTask("characterTask", "", "", character);
             characterTask.onSuccess = function (task: MeshAssetTask) {
                 const meshes: Mesh[] = [];
                 for (const mesh of task.loadedMeshes) {
@@ -59,7 +59,7 @@ export class Assets {
                 Assets.Character.scaling = new Vector3(0.1, 0.1, 0.1);
                 Assets.Character.isVisible = false;
                 console.log("Character loaded");
-            };
+            };*/
 
             const spaceshipTask = Assets.manager.addMeshTask("spaceshipTask", "", "", spaceship);
             spaceshipTask.onSuccess = function (task: MeshAssetTask) {
@@ -69,8 +69,9 @@ export class Assets {
                 }
                 Assets.Spaceship = Mesh.MergeMeshes(meshes, true, true, undefined, false, true) as Mesh;
                 Assets.Spaceship.isVisible = false;
+                Assets.Spaceship.flipFaces(false);
                 const spaceshipMat = new StandardMaterial("spaceshipMat", scene);
-                spaceshipMat.emissiveColor = new Color3(0.5, 0.5, 0.5);
+                spaceshipMat.diffuseColor = new Color3(0.5, 0.5, 0.5);
                 spaceshipMat.useLogarithmicDepth = true;
                 Assets.Spaceship.material = spaceshipMat;
                 console.log("Spaceship loaded");

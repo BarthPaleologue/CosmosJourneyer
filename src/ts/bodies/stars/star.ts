@@ -1,6 +1,6 @@
 import { AbstractBody } from "../abstractBody";
 
-import { Mesh, MeshBuilder, Quaternion } from "@babylonjs/core";
+import { Mesh, MeshBuilder, PointLight, Quaternion, Vector3 } from "@babylonjs/core";
 import { BodyType } from "../interfaces";
 import { AbstractController } from "../../uberCore/abstractController";
 import { StarPhysicalProperties } from "../physicalProperties";
@@ -11,6 +11,7 @@ import { clamp } from "../../utils/gradientMath";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { Settings } from "../../settings";
 import { UberScene } from "../../uberCore/uberScene";
+import { getRgbFromTemperature } from "../../utils/specrend";
 
 enum Steps {
     RADIUS = 1000,
@@ -22,6 +23,7 @@ export class Star extends AbstractBody {
     static RING_PROPORTION = 0.2;
 
     readonly mesh: Mesh;
+    readonly light: PointLight;
     private readonly material: StarMaterial;
 
     override readonly bodyType = BodyType.STAR;
@@ -34,7 +36,7 @@ export class Star extends AbstractBody {
     /**
      * New Star
      * @param name The name of the star
-     * @param starSystemManager The star system the star is in
+     * @param scene
      * @param seed The seed of the star in [-1, 1]
      * @param parentBodies The bodies the star is orbiting
      */
@@ -61,6 +63,10 @@ export class Star extends AbstractBody {
             scene
         );
         this.mesh.parent = this.transform.node;
+
+        this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
+        this.light.diffuse.fromArray(getRgbFromTemperature(this.physicalProperties.temperature).asArray());
+        this.light.parent = this.transform.node;
 
         this.material = new StarMaterial(this.transform, this.seed, this.physicalProperties, scene);
         this.mesh.material = this.material;
