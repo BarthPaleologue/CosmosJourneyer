@@ -49,8 +49,6 @@ Assets.Init(scene).then(() => {
     planet.orbitalProperties.periapsis = 10000e3;
     planet.orbitalProperties.apoapsis = 10000e3;
 
-    starSystem.makePlanets(1);
-
     document.addEventListener("keydown", (e) => {
         if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
         if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, scene.getActiveController().getActiveCamera(), { precision: 4 });
