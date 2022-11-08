@@ -96,7 +96,7 @@ export class PostProcessManager {
             return this.overlays;
         });
 
-        this.bloomRenderEffect = new BloomEffect(scene, 1, 0.5, 32);
+        this.bloomRenderEffect = new BloomEffect(scene, 1, 0.3, 32);
 
         this.colorCorrection.exposure = 1.1;
         this.colorCorrection.gamma = 1.2;
