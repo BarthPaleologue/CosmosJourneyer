@@ -1,6 +1,6 @@
 import { UberScene } from "../uberCore/uberScene";
 import { UberRenderingPipeline } from "../uberCore/uberRenderingPipeline";
-import { Engine, FxaaPostProcess, PostProcessRenderEffect, Texture } from "@babylonjs/core";
+import { BloomEffect, Engine, FxaaPostProcess, PostProcessRenderEffect, Texture } from "@babylonjs/core";
 import { OceanPostProcess } from "./oceanPostProcess";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { Star } from "../bodies/stars/star";
@@ -64,6 +64,7 @@ export class PostProcessManager {
 
     readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
     readonly fxaaRenderEffect: PostProcessRenderEffect;
+    readonly bloomRenderEffect: BloomEffect;
 
     constructor(scene: UberScene) {
         this.scene = scene;
@@ -94,6 +95,8 @@ export class PostProcessManager {
         this.overlayRenderEffect = new PostProcessRenderEffect(this.engine, "overlayRenderEffect", () => {
             return this.overlays;
         });
+
+        this.bloomRenderEffect = new BloomEffect(scene, 1, 2, 8);
 
         this.colorCorrection.exposure = 1.1;
         this.colorCorrection.gamma = 1.2;
@@ -339,6 +342,8 @@ export class PostProcessManager {
         this.currentRenderingPipeline.addEffect(this.fxaaRenderEffect);
 
         this.currentRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
+
+        //this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
 
         this.currentRenderingPipeline.attachToCamera(this.scene.getActiveUberCamera());
     }
