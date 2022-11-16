@@ -78,7 +78,9 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     density *= completeNoise(samplePointRotatedDetail * cloudDetailFrequency, 5, 2.0, 2.0);
 
-    density = saturate(density * 2.0);
+    float cloudThickness = 2.0; //TODO: make this a uniform
+
+    density = saturate(density * cloudThickness);
 
     density = smoothstep(cloudCoverage, 1.0, density);
 
@@ -94,47 +96,46 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
         return originalColor; // if not intersecting with atmosphere, return original color
     }
 
+    // if ray intersect ocean, update maximum distance (the ocean is not it the depth buffer)
 	float waterImpact, waterEscape;
-    if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, waterImpact, waterEscape)) {
+    if(rayIntersectSphere(rayOrigin, rayDir, planetPosition, planetRadius, waterImpact, waterEscape)) {
         maximumDistance = min(maximumDistance, waterImpact);
     }
 
-	bool twoPoints = impactPoint > 0.0 && escapePoint > 0.0 && escapePoint < maximumDistance;
-
-    if(impactPoint < 0.0) {
-        impactPoint = escapePoint;
-        if(impactPoint > maximumDistance) {
-            return originalColor;
-        }
-    }
-    if(impactPoint > maximumDistance) return originalColor;
+    if(impactPoint > maximumDistance || escapePoint < 0.0) return originalColor;
 
     vec3 planetSpacePoint1 = normalize(rayOrigin + impactPoint * rayDir - planetPosition);
     vec3 planetSpacePoint2 = normalize(rayOrigin + escapePoint * rayDir - planetPosition);
 
-	vec3 planetNormal1 = planetSpacePoint1;
-	vec3 planetNormal2 = planetSpacePoint2;
-
     vec3 samplePoint1 = applyQuaternion(planetInverseRotationQuaternion, planetSpacePoint1);
     vec3 samplePoint2 = applyQuaternion(planetInverseRotationQuaternion, planetSpacePoint2);
 
-    /// Cloud point 1
-    float cloudDensity = cloudDensityAtPoint(samplePoint1);
+    float cloudDensity = 0.0;
 
-    /// Cloud point 2
-    if(twoPoints) {
-        cloudDensity += cloudDensityAtPoint(samplePoint2);
+    if(impactPoint > 0.0 && impactPoint < maximumDistance) {
+        float cloudDensity1 = cloudDensityAtPoint(samplePoint1);
+        cloudDensity1 *= saturate((maximumDistance - impactPoint) / 10000.0); // fade away when close to surface
+        cloudDensity += cloudDensity1;
     }
 
-	cloudDensity = saturate(cloudDensity);
+    if(escapePoint > 0.0 && escapePoint < maximumDistance) {
+        float cloudDensity2 = cloudDensityAtPoint(samplePoint2);
+        cloudDensity2 *= saturate((maximumDistance - escapePoint) / 10000.0); // fade away when close to surface
+        cloudDensity += cloudDensity2;
+    }
 
-	cloudDensity *= saturate((maximumDistance - impactPoint) / 10000.0); // fade away when close to surface
+    float cloudNormalStrength = 1.0; //TODO: make uniform ?
 
-    // rotate sample point accordingly
-    vec3 normalRotatedSamplePoint1 = rotateAround(samplePoint1, vec3(0.0, 1.0, 0.0), time * detailSpeed);
-
-    float cloudNormalStrength = 1.5;
-	vec3 normal = triplanarNormal(normalRotatedSamplePoint1, planetNormal1, normalMap, 10.0, 0.5, cloudDensity * cloudNormalStrength);
+    vec3 normal = vec3(0.0);
+    if(impactPoint > 0.0 && impactPoint < maximumDistance) {
+        // first cloud is in front of the camera
+        vec3 normalRotatedSamplePoint1 = rotateAround(samplePoint1, vec3(0.0, 1.0, 0.0), time * detailSpeed);
+        normal = triplanarNormal(normalRotatedSamplePoint1, planetSpacePoint1, normalMap, 10.0, 0.5, cloudDensity * cloudNormalStrength);
+    } else if (escapePoint > 0.0 && escapePoint < maximumDistance) {
+        // second cloud in front of the camera
+        vec3 normalRotatedSamplePoint2 = rotateAround(samplePoint2, vec3(0.0, 1.0, 0.0), time * detailSpeed);
+        normal = triplanarNormal(normalRotatedSamplePoint2, planetSpacePoint2, normalMap, 10.0, 0.5, cloudDensity * cloudNormalStrength);
+    }
 
     float ndl = 0.0; // dimming factor due to light inclination relative to vertex normal in world space
     float specularHighlight = 0.0;
@@ -195,9 +196,7 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
-    vec3 finalColor;// = computeCloudCoverage(screenColor, cameraPosition, rayDir, maximumDistance);
-
-    finalColor = shadows(screenColor, cameraPosition, rayDir, maximumDistance);
+    vec3 finalColor = shadows(screenColor, cameraPosition, rayDir, maximumDistance);
 
     finalColor = computeCloudCoverage(finalColor, cameraPosition, rayDir, maximumDistance);
 
