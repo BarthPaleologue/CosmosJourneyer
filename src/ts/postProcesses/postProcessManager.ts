@@ -18,6 +18,7 @@ import { GasPlanet } from "../bodies/planets/gasPlanet";
 import { BodyType } from "../bodies/interfaces";
 import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
 import { extractRelevantPostProcesses } from "../utils/extractRelevantPostProcesses";
+import { CloudsPostProcess, VolumetricCloudsPostProcess } from "./volumetricCloudsPostProcess";
 
 export enum PostProcessType {
     VOLUMETRIC_LIGHT,
@@ -50,7 +51,7 @@ export class PostProcessManager {
     readonly starFields: StarfieldPostProcess[] = [];
     readonly volumetricLights: VolumetricLight[] = [];
     readonly oceans: OceanPostProcess[] = [];
-    readonly clouds: FlatCloudsPostProcess[] = [];
+    readonly clouds: CloudsPostProcess[] = [];
     readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
     readonly rings: RingsPostProcess[] = [];
     readonly blackHoles: BlackHolePostProcess[] = [];
@@ -114,9 +115,10 @@ export class PostProcessManager {
 
     public addClouds(planet: TelluricPlanet, stars: (Star | BlackHole)[]) {
         this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
+        //this.clouds.push(new VolumetricCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
     }
 
-    public getClouds(planet: TelluricPlanet): FlatCloudsPostProcess {
+    public getClouds(planet: TelluricPlanet): CloudsPostProcess {
         for (const clouds of this.clouds) if (clouds.body === planet) return clouds;
         throw new Error("No clouds found for: " + planet.name);
     }

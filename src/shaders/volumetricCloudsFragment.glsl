@@ -1,8 +1,8 @@
 precision lowp float;
 
 #define PI 3.1415926535897932
-#define POINTS_FROM_CAMERA 4 // number sample points along camera ray
-#define OPTICAL_DEPTH_POINTS 4 // number sample points along light ray
+#define POINTS_FROM_CAMERA 12 // number sample points along camera ray
+#define OPTICAL_DEPTH_POINTS 8 // number sample points along light ray
 
 // varying
 varying vec2 vUV; // screen coordinates
@@ -25,7 +25,7 @@ uniform float cameraFar; // camera maxZ
 
 uniform vec3 planetPosition; // planet position in world space
 uniform float planetRadius; // planet radius for height calculations
-uniform float atmosphereRadius; // atmosphere radius (calculate from planet center)
+uniform float cloudLayerRadius; // atmosphere radius (calculate from planet center)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
@@ -44,7 +44,7 @@ uniform float atmosphereRadius; // atmosphere radius (calculate from planet cent
 float densityAtPoint(vec3 densitySamplePoint) {
     
 	float heightAboveSurface = length(densitySamplePoint - planetPosition) - planetRadius; // actual height above surface
-    float height01 = heightAboveSurface / (atmosphereRadius - planetRadius); // normalized height between 0 and 1
+    float height01 = heightAboveSurface / (cloudLayerRadius - planetRadius); // normalized height between 0 and 1
     
 	vec3 densitySamplePointPlanetSpace = densitySamplePoint - planetPosition;
 
@@ -132,7 +132,7 @@ float calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 original
 
     for (int i = 0 ; i < POINTS_FROM_CAMERA ; ++i) {
 
-        float sunRayLengthInAtm = atmosphereRadius - length(samplePoint - planetPosition); // distance traveled by light through atmosphere from light source
+        float sunRayLengthInAtm = cloudLayerRadius - length(samplePoint - planetPosition); // distance traveled by light through atmosphere from light source
         float viewRayLengthInAtm = stepSize * float(i); // distance traveled by light through atmosphere from sample point to cameraPosition
         
         float sunRayOpticalDepth = opticalDepth(samplePoint, sunDir, sunRayLengthInAtm); // scattered from the sun to the point
@@ -156,13 +156,12 @@ float calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 original
 
 vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, atmosphereRadius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint))) {
         return originalColor; // if not intersecting with atmosphere, return original color
     }
 
     impactPoint = max(0.0, impactPoint); // cannot be negative (the ray starts where the camera is in such a case)
-    //impactPoint = min(maximumDistance, impactPoint); // cannot be longer than the maximum distance
-	escapePoint = min(maximumDistance, escapePoint); // occlusion with other scene objects
+    escapePoint = min(maximumDistance, escapePoint); // occlusion with other scene objects
 
     float distanceThroughAtmosphere = max(0.0, escapePoint - impactPoint); // probably doesn't need the max but for the sake of coherence the distance cannot be negative
     

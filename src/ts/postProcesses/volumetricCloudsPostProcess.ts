@@ -1,4 +1,4 @@
-import { Effect } from "@babylonjs/core";
+import { Color3, Effect } from "@babylonjs/core";
 
 import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
 import { UberScene } from "../uberCore/uberScene";
@@ -8,20 +8,28 @@ import { BlackHole } from "../bodies/blackHole";
 import { Star } from "../bodies/stars/star";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { BodyPostProcess } from "./bodyPostProcess";
+import { CloudSettings, FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 
 const shaderName = "volumetricClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
 
-export interface VolumetricCloudSettings {
-    atmosphereRadius: number;
-}
+export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 
 export class VolumetricCloudsPostProcess extends BodyPostProcess {
-    settings: VolumetricCloudSettings;
+    settings: CloudSettings;
 
-    constructor(name: string, planet: TelluricPlanet, atmosphereRadius: number, scene: UberScene, stars: (Star | BlackHole)[]) {
-        const settings: VolumetricCloudSettings = {
-            atmosphereRadius: atmosphereRadius
+    constructor(name: string, planet: TelluricPlanet, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
+        const settings: CloudSettings = {
+            cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
+            specularPower: 2,
+            smoothness: 0.9,
+            cloudFrequency: 4,
+            cloudDetailFrequency: 20,
+            cloudCoverage: 0.8 * Math.exp(-planet.physicalProperties.waterAmount * planet.physicalProperties.pressure),
+            cloudSharpness: 3.5,
+            cloudColor: new Color3(0.8, 0.8, 0.8),
+            worleySpeed: 0.0005,
+            detailSpeed: 0.003
         };
 
         const uniforms: ShaderUniforms = [
@@ -29,10 +37,10 @@ export class VolumetricCloudsPostProcess extends BodyPostProcess {
             ...getStarsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
-                name: "atmosphereRadius",
+                name: "cloudLayerRadius",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.atmosphereRadius;
+                    return settings.cloudLayerRadius;
                 }
             }
         ];
