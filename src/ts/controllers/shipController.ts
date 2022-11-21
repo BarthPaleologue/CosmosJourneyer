@@ -1,6 +1,6 @@
 import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
 import { Input, InputType } from "../inputs/input";
-import { Vector3 } from "@babylonjs/core";
+import { Scene, Vector3 } from "@babylonjs/core";
 import { UberCamera } from "../uberCore/uberCamera";
 import { AbstractController } from "../uberCore/abstractController";
 import { Assets } from "../assets";
@@ -25,15 +25,15 @@ export class ShipController extends AbstractController {
     flightAssistEnabled = true;
     isHyperAccelerated = false;
 
-    constructor() {
+    constructor(scene: Scene) {
         super();
 
         this.transform = new NewtonianTransform("shipTransform");
 
-        this.firstPersonCamera = new UberCamera("firstPersonCamera", Vector3.Zero());
+        this.firstPersonCamera = new UberCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.transform.node;
 
-        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), 30, 3.14, 1.4);
+        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 1.4);
         this.thirdPersonCamera.parent = this.transform.node;
 
         const spaceship = Assets.Spaceship.createInstance("spaceshipdemo");

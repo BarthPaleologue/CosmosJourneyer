@@ -10,6 +10,7 @@ import { getChunkSphereSpacePositionFromPath } from "../utils/chunkUtils";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { UberScene } from "../uberCore/uberScene";
+import { Assets } from "../assets";
 
 /**
  * A quadTree is defined recursively
@@ -30,6 +31,7 @@ export class ChunkTree {
     private readonly direction: Direction;
 
     private readonly chunkForge: ChunkForge;
+    private readonly scene: UberScene;
 
     readonly planetName: string;
     readonly planetSeed: number;
@@ -64,8 +66,9 @@ export class ChunkTree {
         //let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
         //console.log(spaceBetweenVertex);
 
+        this.scene = scene;
         //TODO: make it register to the forge instead using uberscene
-        this.chunkForge = scene._chunkForge;
+        this.chunkForge = Assets.ChunkForge;
 
         this.direction = direction;
 
@@ -182,6 +185,7 @@ export class ChunkTree {
      */
     private createChunk(path: number[], isFiner: boolean): PlanetChunk {
         const chunk = new PlanetChunk(path, this.direction, this.parent, this.material, this.rootChunkLength, this.minDepth == path.length, isFiner);
+        this.scene.addMesh(chunk.mesh);
 
         const buildTask: BuildTask = {
             type: TaskType.Build,

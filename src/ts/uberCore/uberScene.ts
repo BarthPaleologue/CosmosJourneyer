@@ -1,7 +1,4 @@
 import { DepthRenderer, Engine, Scene, ScenePerformancePriority } from "@babylonjs/core";
-import { UberRenderingPipeline } from "./uberRenderingPipeline";
-import { ChunkForge } from "../chunks/chunkForge";
-import { Settings } from "../settings";
 import { AbstractController } from "./abstractController";
 import { UberCamera } from "./uberCamera";
 
@@ -10,12 +7,9 @@ export class UberScene extends Scene {
 
     private depthRenderer: DepthRenderer | null = null;
 
-    readonly _chunkForge: ChunkForge;
-
-    constructor(engine: Engine, nbVertices = Settings.VERTEX_RESOLUTION) {
+    constructor(engine: Engine) {
         super(engine);
         this.performancePriority = ScenePerformancePriority.Intermediate;
-        this._chunkForge = new ChunkForge(nbVertices);
     }
 
     public getDepthRenderer(): DepthRenderer {
@@ -40,9 +34,5 @@ export class UberScene extends Scene {
     public getActiveUberCamera(): UberCamera {
         if (this.getActiveController().getActiveCamera() === null) throw new Error("No active Uber Camera");
         return this.getActiveController().getActiveCamera();
-    }
-
-    public update() {
-        this._chunkForge.update();
     }
 }

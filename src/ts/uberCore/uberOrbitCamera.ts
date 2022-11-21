@@ -1,5 +1,5 @@
 import { UberCamera } from "./uberCamera";
-import { Vector3 } from "@babylonjs/core";
+import { Scene, Vector3 } from "@babylonjs/core";
 
 export class UberOrbitCamera extends UberCamera {
     private cameraTarget: Vector3;
@@ -7,8 +7,8 @@ export class UberOrbitCamera extends UberCamera {
     private phi: number;
     private theta: number;
 
-    constructor(name: string, target: Vector3, radius = 1, phi = 0, theta = 0) {
-        super(name, Vector3.Zero());
+    constructor(name: string, target: Vector3, scene: Scene, radius = 1, phi = 0, theta = 0) {
+        super(name, Vector3.Zero(), scene);
         this.cameraTarget = target;
         this.radius = radius;
         this.phi = phi;

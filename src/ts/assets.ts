@@ -14,6 +14,7 @@ import waterNormal2 from "../asset/textures/waterNormalMap4.jpg";
 
 //import character from "../asset/man/man.obj";
 import spaceship from "../asset/spaceship/spaceship.glb";
+import { ChunkForge } from "./chunks/chunkForge";
 
 export class Assets {
     static IS_READY = false;
@@ -30,6 +31,8 @@ export class Assets {
 
     //static Character: AbstractMesh;
     static Spaceship: Mesh;
+
+    static ChunkForge = new ChunkForge(64);
 
     private static manager: AssetsManager;
 

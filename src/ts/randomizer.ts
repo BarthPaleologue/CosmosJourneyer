@@ -35,7 +35,7 @@ const [engine, scene] = await initEngineScene(canvas);
 Assets.Init(scene).then(() => {
     const mouse = new Mouse(canvas, 1e5);
 
-    const player = new PlayerController();
+    const player = new PlayerController(scene);
     player.speed = 0.2 * Settings.EARTH_RADIUS;
     player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
     player.inputs.push(new Keyboard(), mouse, new Gamepad());
@@ -79,7 +79,7 @@ Assets.Init(scene).then(() => {
             //FIXME: should address stars orbits
             for (const star of starSystem.stars) star.orbitalProperties.period = 0;
 
-            scene.update();
+            Assets.ChunkForge.update();
             starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
 
             starSystem.translateAllBodies(player.update(deltaTime));
