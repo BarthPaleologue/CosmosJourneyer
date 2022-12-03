@@ -1,0 +1,3 @@
+[submodule "src/ts/terrainGeneration"]
+	path = src/ts/terrainGeneration
+	url = git@github.com:BarthPaleologue/terrainGeneration.git
