@@ -7,7 +7,7 @@ import { StarPhysicalProperties } from "../physicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
 import { normalRandom, randRange, uniformRandBool } from "extended-random";
-import { clamp } from "../../terrainGeneration/pkg";
+import { clamp } from "terrain-generation";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { Settings } from "../../settings";
 import { UberScene } from "../../uberCore/uberScene";

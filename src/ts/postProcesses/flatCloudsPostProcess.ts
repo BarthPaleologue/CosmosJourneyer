@@ -1,7 +1,7 @@
 import { Color3, Effect, Texture } from "@babylonjs/core";
 
 import normalMap from "../../asset/textures/cloudNormalMap3.jpg";
-import { gcd } from "../terrainGeneration/pkg";
+import { gcd } from "terrain-generation";
 
 import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
 import { UberScene } from "../uberCore/uberScene";

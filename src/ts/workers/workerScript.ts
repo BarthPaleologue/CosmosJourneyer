@@ -4,6 +4,8 @@ import { BuildData, CollisionData, WorkerData } from "../chunks/workerDataTypes"
 import { TaskType } from "../chunks/taskTypes";
 import { makeTerrainFunction, TerrainFunction } from "../terrain/makeTerrainFunction";
 
+import { greet } from "terrain-generation";
+
 let currentPlanetID = "";
 
 let terrainFunction: TerrainFunction;

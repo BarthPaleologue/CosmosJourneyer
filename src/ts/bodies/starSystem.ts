@@ -7,7 +7,7 @@ import { Planet } from "./planets/planet";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { TelluricPlanet } from "./planets/telluricPlanet";
 import { GasPlanet } from "./planets/gasPlanet";
-import { clamp } from "../terrainGeneration/pkg";
+import { clamp } from "terrain-generation";
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BlackHole } from "./blackHole";
