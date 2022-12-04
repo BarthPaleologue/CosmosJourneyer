@@ -15,7 +15,16 @@ jobs:
         node-version: [12.x, 14.x, 16.x]
     
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+        
+    - name: Compile Rust to Wasm
+      run: |
+        cd ./src/ts/terrainGeneration
+        cargo install wasm-pack
+        wasm-pack build
+        cd ../../../
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
