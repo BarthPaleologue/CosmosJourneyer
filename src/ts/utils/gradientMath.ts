@@ -220,12 +220,6 @@ export function multiply(x1: number, x2: number, grad1?: LVector3, grad2?: LVect
     return x1 * x2;
 }
 
-export function gcd(a: number, b: number): number {
-    if (!b) return a;
-
-    return gcd(b, a % b);
-}
-
 export function rayIntersectSphere(rayOrigin: Vector3, rayDir: Vector3, spherePosition: Vector3, sphereRadius: number): [boolean, number, number] {
     const relativeOrigin = rayOrigin.subtract(spherePosition); // rayOrigin in sphere space
 
@@ -246,10 +240,4 @@ export function rayIntersectSphere(rayOrigin: Vector3, rayDir: Vector3, spherePo
     const t1 = Math.max(Math.max(r0, r1), 0.0);
 
     return [t1 > 0.0, t0, t1];
-}
-
-export function clamp(x: number, min: number, max: number) {
-    if (x < min) return min;
-    if (x > max) return max;
-    return x;
 }

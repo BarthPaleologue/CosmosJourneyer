@@ -14,7 +14,7 @@ import { TelluricMaterial } from "../../materials/telluricMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
-import { clamp } from "../../utils/gradientMath";
+import { clamp } from "../../terrainGeneration/pkg";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
