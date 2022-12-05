@@ -58,7 +58,15 @@ export class ChunkForge {
             depth: task.depth,
             direction: task.direction,
             position: [task.position.x, task.position.y, task.position.z],
-            terrainSettings: task.terrainSettings,
+            terrainSettings: {
+                continents_frequency: task.terrainSettings.continents_frequency,
+                continents_fragmentation: task.terrainSettings.continents_fragmentation,
+                continent_base_height: task.terrainSettings.continent_base_height,
+                max_mountain_height: task.terrainSettings.max_mountain_height,
+                max_bump_height: task.terrainSettings.max_bump_height,
+                bumps_frequency: task.terrainSettings.bumps_frequency,
+                mountains_frequency: task.terrainSettings.mountains_frequency,
+            },
             seed: task.planetSeed
         };
 

@@ -10,7 +10,7 @@ import { Star } from "../bodies/stars/star";
 import { AbstractController } from "../uberCore/abstractController";
 import { BlackHole } from "../bodies/blackHole";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
-import { TerrainSettings } from "../terrain/terrainSettings";
+import { TerrainSettings } from "terrain-generation";
 import { SolidPhysicalProperties } from "../bodies/physicalProperties";
 
 const shaderName = "surfaceMaterial";
@@ -162,7 +162,7 @@ export class TelluricMaterial extends ShaderMaterial {
         this.setFloat("pressure", this.physicalProperties.pressure);
         this.setFloat("waterAmount", this.physicalProperties.waterAmount);
 
-        this.setFloat("maxElevation", this.terrainSettings.continentBaseHeight + this.terrainSettings.maxMountainHeight + this.terrainSettings.maxBumpHeight);
+        this.setFloat("maxElevation", this.terrainSettings.continent_base_height + this.terrainSettings.max_mountain_height + this.terrainSettings.max_bump_height);
     }
 
     public update(activeController: AbstractController, stars: (Star | BlackHole)[]) {

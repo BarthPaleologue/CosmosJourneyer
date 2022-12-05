@@ -1,6 +1,7 @@
 import { ChunkTree } from "../../chunks/chunkTree";
 import { Direction } from "../../utils/direction";
-import { TerrainSettings } from "../../terrain/terrainSettings";
+//import { TerrainSettings } from "../../terrain/terrainSettings";
+import { TerrainSettings } from "terrain-generation";
 
 import { Vector3 } from "@babylonjs/core";
 
@@ -125,19 +126,22 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
         const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.rng, Steps.TERRAIN), 0, 0.95);
 
         this.terrainSettings = {
-            continentsFrequency: this.ratio,
-            continentsFragmentation: continentsFragmentation,
+            continents_frequency: this.ratio,
+            continents_fragmentation: continentsFragmentation,
 
-            bumpsFrequency: 30 * this.ratio,
+            bumps_frequency: 30 * this.ratio,
 
-            maxBumpHeight: 1.5e3,
-            maxMountainHeight: 13e3,
-            continentBaseHeight: this.physicalProperties.oceanLevel * 2.5,
+            max_bump_height: 1.5e3,
+            max_mountain_height: 13e3,
+            continent_base_height: this.physicalProperties.oceanLevel * 2.5,
 
-            mountainsFrequency: 20 * this.ratio
+            mountains_frequency: 20 * this.ratio,
+            free() {
+                console.log("free");
+            }
         };
 
-        if (this.isSatelliteOfTelluric) this.terrainSettings.continentsFragmentation /= 2;
+        if (this.isSatelliteOfTelluric) this.terrainSettings.continents_fragmentation /= 2;
 
         this.material = new TelluricMaterial(this.name, this.transform, this.getRadius(), this.seed, this.terrainSettings, this.physicalProperties, scene);
 
