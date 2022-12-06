@@ -9,7 +9,7 @@ export class CollisionWorker {
     _busy = false;
     _worker: Worker;
     constructor(player: AbstractController, planetManager: StarSystem) {
-        this._worker = new Worker(new URL("workerScript", import.meta.url), { type: "module" });
+        this._worker = new Worker(new URL("collisionScript", import.meta.url), { type: "module" });
         this._worker.onmessage = (e) => {
             if (this.currentBody == null) return;
 
