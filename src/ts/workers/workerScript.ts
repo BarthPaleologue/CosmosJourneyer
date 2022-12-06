@@ -1,104 +1,42 @@
-import { getQuaternionFromDirection } from "../utils/direction";
-import { LVector3 } from "../utils/algebra";
-import { BuildData, CollisionData, WorkerData } from "../chunks/workerDataTypes";
+import { TransferBuildData, TransferCollisionData, WorkerData } from "../chunks/workerDataTypes";
 import { TaskType } from "../chunks/taskTypes";
-import { makeTerrainFunction, TerrainFunction } from "../terrain/makeTerrainFunction";
 
-import { greet } from "terrain-generation";
+import {
+    build_chunk_vertex_data, BuildData, CollisionData, compute_height_at_point, TerrainSettings
+} from "terrain-generation";
 
-let currentPlanetID = "";
-
-let terrainFunction: TerrainFunction;
-
-function buildChunkVertexData(data: BuildData): void {
-    const planetDiameter = data.planetDiameter;
-    const depth = data.depth;
-    const direction = data.direction;
-    const chunkFrontFacePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
-    const seed = data.seed;
-
-    if (data.planetName != currentPlanetID) {
-        currentPlanetID = data.planetName;
-        terrainFunction = makeTerrainFunction(data.terrainSettings);
-    }
-
-    const chunkSize = planetDiameter / 2 ** depth;
-    const planetRadius = planetDiameter / 2;
-
+function handle_build(data: TransferBuildData): void {
     const nbVerticesPerSide = data.nbVerticesPerSide;
     const nbSubdivisions = nbVerticesPerSide - 1;
 
-    const rotationQuaternion = getQuaternionFromDirection(direction);
-
     const verticesPositions = new Float32Array(nbVerticesPerSide * nbVerticesPerSide * 3);
-    const faces: number[][] = [];
-
+    const indices = new Uint16Array(nbSubdivisions * nbSubdivisions * 2 * 3);
     const normals = new Float32Array(verticesPositions.length);
 
-    // the offset used to bring back the vertices close to the origin (the position of the chunk on the sphere)
-    const chunkSpherePosition = chunkFrontFacePosition.clone();
-    chunkSpherePosition.setMagnitudeInPlace(planetRadius);
-    chunkSpherePosition.applyRotationQuaternionInPlace(rotationQuaternion);
+    const terrain_settings = new TerrainSettings();
+    terrain_settings.continent_base_height = data.terrainSettings.continent_base_height;
+    terrain_settings.continents_fragmentation = data.terrainSettings.continents_fragmentation;
+    terrain_settings.continents_frequency = data.terrainSettings.continents_frequency;
 
-    for (let x = 0; x < nbVerticesPerSide; x++) {
-        for (let y = 0; y < nbVerticesPerSide; y++) {
-            // on crée un plan dans le plan Oxy
-            const vertexPosition = new LVector3(x - nbSubdivisions / 2, y - nbSubdivisions / 2, 0);
+    terrain_settings.max_mountain_height = data.terrainSettings.max_mountain_height;
+    terrain_settings.mountains_frequency = data.terrainSettings.mountains_frequency;
 
-            // on le met à la bonne taille
-            vertexPosition.scaleInPlace(chunkSize / nbSubdivisions);
+    terrain_settings.bumps_frequency = data.terrainSettings.bumps_frequency;
+    terrain_settings.max_bump_height = data.terrainSettings.max_bump_height;
 
-            // on le met au bon endroit de la face par défaut (Oxy devant)
-            vertexPosition.addInPlace(chunkFrontFacePosition);
+    const buildData: BuildData = new BuildData();
 
-            // on le met sur la bonne face
-            vertexPosition.applyRotationQuaternionInPlace(rotationQuaternion);
+    buildData.chunk_depth = data.depth;
+    buildData.chunk_tree_direction = data.direction;
+    buildData.chunk_front_face_position_x = data.position[0];
+    buildData.chunk_front_face_position_y = data.position[1];
+    buildData.chunk_front_face_position_z = data.position[2];
+    buildData.planet_diameter = data.planetDiameter;
+    buildData.planet_seed = data.seed;
+    buildData.resolution = data.nbVerticesPerSide;
+    buildData.terrain_settings = terrain_settings;
 
-            // Théorie : https://math.stackexchange.com/questions/1071662/surface-normal-to-point-on-displaced-sphere
-
-            // on l'arrondi pour en faire un chunk de sphère
-            const unitSphereCoords = vertexPosition.normalizeToNew();
-
-            vertexPosition.setMagnitudeInPlace(planetRadius);
-
-            // on applique la fonction de terrain
-            const vertexGradient = LVector3.Zero();
-            terrainFunction(unitSphereCoords, seed, vertexPosition, vertexGradient);
-
-            const h = vertexGradient;
-            h.subtractInPlace(unitSphereCoords.scale(LVector3.Dot(vertexGradient, unitSphereCoords)));
-
-            const vertexNormal = unitSphereCoords.subtract(h);
-            vertexNormal.normalizeInPlace();
-
-            // on le ramène à l'origine
-            vertexPosition.subtractInPlace(chunkSpherePosition);
-
-            verticesPositions[(x * nbVerticesPerSide + y) * 3] = vertexPosition.x;
-            verticesPositions[(x * nbVerticesPerSide + y) * 3 + 1] = vertexPosition.y;
-            verticesPositions[(x * nbVerticesPerSide + y) * 3 + 2] = vertexPosition.z;
-
-            normals[(x * nbVerticesPerSide + y) * 3] = vertexNormal.x;
-            normals[(x * nbVerticesPerSide + y) * 3 + 1] = vertexNormal.y;
-            normals[(x * nbVerticesPerSide + y) * 3 + 2] = vertexNormal.z;
-
-            if (x >= nbVerticesPerSide - 1 || y >= nbVerticesPerSide - 1) continue;
-
-            faces.push([x * nbVerticesPerSide + y, x * nbVerticesPerSide + y + 1, (x + 1) * nbVerticesPerSide + y + 1, (x + 1) * nbVerticesPerSide + y]);
-        }
-    }
-
-    const indices = new Uint16Array(faces.length * (faces[0].length - 2) * 3);
-
-    // indices from faces (magie noire)
-    for (let i = 0; i < faces.length; i++) {
-        for (let j = 0; j < faces[i].length - 2; j++) {
-            // on à noter que le 0 m'intrigue
-            indices[(i * (faces[i].length - 2) + j) * 3] = faces[i][0];
-            indices[(i * (faces[i].length - 2) + j) * 3 + 1] = faces[i][j + 2];
-            indices[(i * (faces[i].length - 2) + j) * 3 + 2] = faces[i][j + 1];
-        }
-    }
+    build_chunk_vertex_data(buildData, verticesPositions, indices, normals);
 
     self.postMessage(
         {
@@ -112,30 +50,41 @@ function buildChunkVertexData(data: BuildData): void {
     );
 }
 
-function computeHeightForData(data: CollisionData): void {
-    if (data.planetName != currentPlanetID) {
-        currentPlanetID = data.planetName;
-        terrainFunction = makeTerrainFunction(data.terrainSettings);
-    }
+function computeHeightForData(data: TransferCollisionData): void {
+    const terrain_settings = new TerrainSettings();
+    terrain_settings.continent_base_height = data.terrainSettings.continent_base_height;
+    terrain_settings.continents_fragmentation = data.terrainSettings.continents_fragmentation;
+    terrain_settings.continents_frequency = data.terrainSettings.continents_frequency;
 
-    const samplePosition = new LVector3(data.position[0], data.position[1], data.position[2]);
-    samplePosition.setMagnitudeInPlace(data.planetDiameter / 2);
+    terrain_settings.max_mountain_height = data.terrainSettings.max_mountain_height;
+    terrain_settings.mountains_frequency = data.terrainSettings.mountains_frequency;
 
-    terrainFunction(samplePosition.normalizeToNew(), data.seed, samplePosition, LVector3.Zero());
+    terrain_settings.bumps_frequency = data.terrainSettings.bumps_frequency;
+    terrain_settings.max_bump_height = data.terrainSettings.max_bump_height;
+
+    const collision_data = new CollisionData();
+    collision_data.planet_seed = data.seed;
+    collision_data.planet_diameter = data.planetDiameter;
+    collision_data.sample_x = data.position[0];
+    collision_data.sample_y = data.position[1];
+    collision_data.sample_z = data.position[2];
+    collision_data.terrain_settings = terrain_settings;
+
+    const height = compute_height_at_point(collision_data);
 
     self.postMessage({
-        h: samplePosition.getMagnitude()
+        h: height
     });
 }
 
 self.onmessage = (e) => {
     const data: WorkerData = e.data;
+    const clock = Date.now();
 
     switch (data.taskType) {
         case TaskType.Build:
-            //const clock = Date.now();
-            buildChunkVertexData(e.data as BuildData);
-            //console.log("Time for creation : " + (Date.now() - clock));
+            handle_build(e.data as TransferBuildData);
+            console.log("Time for creation : " + (Date.now() - clock));
 
             // benchmark fait le 5/10/2021 (normale non analytique) : ~2s/chunk
             // benchmark fait le 12/11/2021 (normale non analyique) : ~0.5s/chunk
@@ -144,9 +93,10 @@ self.onmessage = (e) => {
             // benchmark fait le 10/12/2021 (normale analytique v2.5) : ~ 50ms/chunk
             // benchmark fait le 19/02/2022 (normale analytique v2.6) : ~ 40ms/chunk
             // benchmark fait le 28/07/2022 (Terrain V3.1) : ~70ms/chunk
+            // benchmark fait le 06/12/2022 (Terrain WASM v1) : ~140ms/chunk wtf
             break;
         case TaskType.Collision:
-            computeHeightForData(e.data as CollisionData);
+            computeHeightForData(e.data as TransferCollisionData);
             break;
         default:
             if (e.data.taskType) console.error(`Type de tâche reçue invalide : ${e.data.taskType}`);

@@ -1,5 +1,5 @@
 import { VertexData } from "@babylonjs/core";
-import { BuildData } from "./workerDataTypes";
+import { TransferBuildData } from "./workerDataTypes";
 import { ApplyTask, BuildTask, DeleteTask, ReturnedChunkData, TaskType } from "./taskTypes";
 import { WorkerPool } from "./workerPool";
 
@@ -50,7 +50,7 @@ export class ChunkForge {
             callbackTasks.push(this.workerPool.nextTask() as DeleteTask);
         }
 
-        const buildData: BuildData = {
+        const buildData: TransferBuildData = {
             taskType: TaskType.Build,
             planetName: task.planetName,
             planetDiameter: task.planetDiameter,

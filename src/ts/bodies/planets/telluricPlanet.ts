@@ -1,12 +1,11 @@
 import { ChunkTree } from "../../chunks/chunkTree";
 import { Direction } from "../../utils/direction";
-//import { TerrainSettings } from "../../terrain/terrainSettings";
-import { TerrainSettings } from "terrain-generation";
+import { TerrainSettings } from "../../terrain/terrainSettings";
 
 import { Vector3 } from "@babylonjs/core";
 
 import { BodyType, RigidBody } from "../interfaces";
-import { CollisionData } from "../../chunks/workerDataTypes";
+import { TransferCollisionData } from "../../chunks/workerDataTypes";
 import { TaskType } from "../../chunks/taskTypes";
 import { AbstractController } from "../../uberCore/abstractController";
 import { Settings } from "../../settings";
@@ -52,7 +51,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
     /**
      * New Telluric Planet
      * @param name The name of the planet
-     * @param starSystem The star system the planet is in
+     * @param scene
      * @param seed The seed of the planet in [-1, 1]
      * @param parentBodies The bodies the planet is orbiting
      */
@@ -136,9 +135,6 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
             continent_base_height: this.physicalProperties.oceanLevel * 2.5,
 
             mountains_frequency: 20 * this.ratio,
-            free() {
-                console.log("free");
-            }
         };
 
         if (this.isSatelliteOfTelluric) this.terrainSettings.continents_fragmentation /= 2;
@@ -155,8 +151,8 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
         ];
     }
 
-    public generateCollisionTask(relativePosition: Vector3): CollisionData {
-        const collisionData: CollisionData = {
+    public generateCollisionTask(relativePosition: Vector3): TransferCollisionData {
+        const collisionData: TransferCollisionData = {
             seed: this.seed,
             taskType: TaskType.Collision,
             planetName: this.name,

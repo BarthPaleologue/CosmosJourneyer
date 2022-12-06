@@ -1,4 +1,4 @@
-import { CollisionData } from "../chunks/workerDataTypes";
+import { TransferCollisionData } from "../chunks/workerDataTypes";
 import { StarSystem } from "../bodies/starSystem";
 import { AbstractController } from "../uberCore/abstractController";
 import { RigidBody } from "../bodies/interfaces";
@@ -34,7 +34,7 @@ export class CollisionWorker {
     public isBusy(): boolean {
         return this._busy;
     }
-    public postMessage(data: CollisionData): void {
+    private postMessage(data: TransferCollisionData): void {
         this._worker.postMessage(data);
         this._busy = true;
     }

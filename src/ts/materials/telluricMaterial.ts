@@ -10,7 +10,7 @@ import { Star } from "../bodies/stars/star";
 import { AbstractController } from "../uberCore/abstractController";
 import { BlackHole } from "../bodies/blackHole";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
-import { TerrainSettings } from "terrain-generation";
+import { TerrainSettings } from "../terrain/terrainSettings";
 import { SolidPhysicalProperties } from "../bodies/physicalProperties";
 
 const shaderName = "surfaceMaterial";

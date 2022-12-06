@@ -11,10 +11,10 @@ export type WorkerData = {
     seed: number;
 };
 
-export type BuildData = WorkerData & {
+export type TransferBuildData = WorkerData & {
     nbVerticesPerSide: number;
     depth: number;
     direction: Direction;
 };
 
-export type CollisionData = WorkerData;
+export type TransferCollisionData = WorkerData;

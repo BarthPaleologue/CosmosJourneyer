@@ -8,7 +8,7 @@ import { rayIntersectSphere } from "../utils/gradientMath";
 import { Settings } from "../settings";
 import { getChunkSphereSpacePositionFromPath } from "../utils/chunkUtils";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
-import { TerrainSettings } from "terrain-generation";
+import { TerrainSettings } from "../terrain/terrainSettings";
 import { UberScene } from "../uberCore/uberScene";
 import { Assets } from "../assets";
 

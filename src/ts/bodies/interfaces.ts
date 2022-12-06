@@ -1,5 +1,5 @@
 import { Vector3 } from "@babylonjs/core";
-import { CollisionData } from "../chunks/workerDataTypes";
+import { TransferCollisionData } from "../chunks/workerDataTypes";
 
 export enum BodyType {
     STAR,
@@ -23,5 +23,5 @@ export interface RigidBody {
      * Creates a task to check if the given position overlaps with the terrain of the planet
      * @param relativePosition The relative position to the planet
      */
-    generateCollisionTask(relativePosition: Vector3): CollisionData;
+    generateCollisionTask(relativePosition: Vector3): TransferCollisionData;
 }
