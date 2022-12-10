@@ -131,7 +131,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
             bumps_frequency: 30 * this.ratio,
 
             max_bump_height: 1.5e3,
-            max_mountain_height: 13e3,
+            max_mountain_height: 15e3,
             continent_base_height: this.physicalProperties.oceanLevel * 2.5,
 
             mountains_frequency: 20 * this.ratio,

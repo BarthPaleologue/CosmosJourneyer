@@ -167,7 +167,7 @@ vec3 shadows(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
         maxDist = min(maxDist, impactPoint);
     }
     vec3 hitPoint = rayOrigin + maxDist * rayDir;
-    if(length(hitPoint - planetPosition) > 2.0 * planetRadius) return originalColor;
+    if(length(hitPoint - planetPosition) > cloudLayerRadius) return originalColor;
     float lightAmount = 0.0;
     for (int i = 0; i < nbStars; i++) {
         vec3 sunDir = normalize(starPositions[i] - hitPoint);
