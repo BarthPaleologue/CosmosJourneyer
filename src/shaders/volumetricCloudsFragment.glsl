@@ -1,8 +1,8 @@
 precision lowp float;
 
 #define PI 3.1415926535897932
-#define POINTS_FROM_CAMERA 12 // number sample points along camera ray
-#define OPTICAL_DEPTH_POINTS 8 // number sample points along light ray
+#define POINTS_FROM_CAMERA 10 // number sample points along camera ray
+#define OPTICAL_DEPTH_POINTS 10 // number sample points along light ray
 
 // varying
 varying vec2 vUV; // screen coordinates
@@ -25,7 +25,9 @@ uniform float cameraFar; // camera maxZ
 
 uniform vec3 planetPosition; // planet position in world space
 uniform float planetRadius; // planet radius for height calculations
-uniform float cloudLayerRadius; // atmosphere radius (calculate from planet center)
+
+uniform float cloudLayerMaxHeight; // atmosphere radius (calculate from planet center)
+uniform float cloudLayerMinHeight;
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
@@ -33,156 +35,134 @@ uniform float cloudLayerRadius; // atmosphere radius (calculate from planet cent
 
 #pragma glslify: completeNoise = require(./utils/noise.glsl)
 
+#pragma glslify: smoothSharpener = require(./utils/smoothSharpener.glsl)
+
 #pragma glslify: completeWorley = require(./utils/worley.glsl)
+
+#pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
-
-// based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
 float densityAtPoint(vec3 densitySamplePoint) {
-    
-	float heightAboveSurface = length(densitySamplePoint - planetPosition) - planetRadius; // actual height above surface
-    float height01 = heightAboveSurface / (cloudLayerRadius - planetRadius); // normalized height between 0 and 1
-    
-	vec3 densitySamplePointPlanetSpace = densitySamplePoint - planetPosition;
+    vec3 samplePoint = densitySamplePoint - planetPosition;
+    vec3 unitSamplePoint = normalize(samplePoint);
+    float height = length(samplePoint);
+    float height01 = (height - cloudLayerMinHeight) / (cloudLayerMaxHeight - cloudLayerMinHeight);
 
-	vec3 unitSphereCoord = normalize(densitySamplePointPlanetSpace);
+    float cloudNoise = smoothSharpener(1.0 - completeWorley(unitSamplePoint * 5.0, 1, 2.0, 2.0), 7.0);
 
-	float weatherMap = 1.0 - completeWorley(unitSphereCoord*5.0, 1, 2.0, 2.0);
-	
-	float minValue = 0.2;
-	weatherMap = max(weatherMap - minValue, 0.0);
-	weatherMap /= 1.0 - minValue;
-    
-	weatherMap *= completeNoise(unitSphereCoord*10.0, 5, 2.0, 2.0);
-	
-	float detailNoise = completeNoise(densitySamplePointPlanetSpace/10000.0, 3, 2.0, 2.0);
-	float detailNoise2 = completeNoise(densitySamplePointPlanetSpace/3000.0, 3, 2.0, 2.0);
+    float detailNoise = completeNoise(samplePoint / 20e3, 3, 2.0, 2.0);
 
-	//localDensity = weatherMap * detailNoise * detailNoise2;
-	
-	float SNsample = remap(weatherMap, (weatherMap * 0.625 + detailNoise * 0.25 + detailNoise2 * 0.125)-1.0, 1.0, 0.0, 1.0);
+    float density = cloudNoise * detailNoise;
 
-	float roundBottom = saturate(remap(height01, 0.0, 0.07, 0.0, 1.0));
-	float roundTop = saturate(remap(height01, weatherMap * 0.2, weatherMap, 1.0, 0.0));
-	
-	float roundCorrection = roundBottom * roundTop;
+    density *= smoothstep(0.1, 0.3, height01);
+    //density *= smoothstep(0.9, 0.7, height01);
 
-	float reduceDensityBottom = weatherMap * saturate(remap(weatherMap, 0.0, 0.15, 0.0, 1.0));
-	float softerTransitionTowardTop = saturate(remap(weatherMap, 0.9, 1.0, 1.0, 0.0));
+    //density = saturate(density);
 
-	float densityCorrection = reduceDensityBottom * softerTransitionTowardTop * weatherMap;
-
-	//float WMc = max(wc0, SAT(gc −0.5) * wc1 * 2);
-
-	float localDensity = saturate(remap(SNsample * roundCorrection, 1.0 - 0.5 * 1.0, 1.0, 0.0, 1.0)) * densityCorrection;
-
-	//localDensity *= localDensity;
-	//localDensity *= roundBottom * roundTop * reduceDensityBottom * softerTransitionTowardTop;
-
-
-	//localDensity /= 1000.0;
-
-	//localDensity = pow(localDensity, 2.0);
-
-	//localDensity = 1.0 - exp(-localDensity/1000000.0);
-
-	localDensity = weatherMap / 300000.0;
-
-	// est lié au bug visuel
-	//localDensity *= exp(-height01*1000.0);
-
-    return localDensity;
+    return density / 30000.0;
 }
 
-float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
+float HenyeyGreenstein(float g, float costheta) {
+    return (1.0 / (4.0 * PI)) * ((1.0 - g * g) / pow(1.0 + g * g - 2.0 * g * costheta, 1.5));
+}
 
-    float stepSize = rayLength / float(OPTICAL_DEPTH_POINTS - 1); // ray length between sample points
-    
-    vec3 densitySamplePoint = rayOrigin; // that's where we start
+const float darknessThreshold = 0.0;
+const float lightAbsorptionTowardSun = 0.94;
+const float lightAbsorptionThroughClouds = 0.85;
 
-    vec3 densitySamplePointPlanetSpace = rayOrigin - planetPosition;
+float lightMarch(vec3 position) {
+    vec3 sunDir = normalize(starPositions[0] - position);
+    float t0, t1;
+    rayIntersectSphere(position, sunDir, planetPosition, cloudLayerMaxHeight, t0, t1);
 
-    float accumulatedOpticalDepth = 0.0;
+    float stepSize = t0 / float(OPTICAL_DEPTH_POINTS - 1);
+    float totalDensity = 0.0;
 
-    for(int i = 0 ; i < OPTICAL_DEPTH_POINTS ; ++i) {
-        float localDensity = densityAtPoint(densitySamplePoint); // we get the density at the sample point
-
-        accumulatedOpticalDepth += localDensity * stepSize; // linear approximation : density is constant between sample points
-
-        densitySamplePoint += rayDir * stepSize; // we move the sample point
+    for(int i = 0; i < OPTICAL_DEPTH_POINTS; i++) {
+        position += sunDir * stepSize;
+        totalDensity += densityAtPoint(position) * stepSize;
     }
-
-    return accumulatedOpticalDepth;
+    float transmittance = exp(-totalDensity * lightAbsorptionTowardSun);
+    return darknessThreshold + transmittance * (1.0 - darknessThreshold);
 }
 
-float calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 originalColor) {
-
+vec3 clouds(vec3 rayOrigin, vec3 rayDir, float distance, vec3 originalColor, vec3 geometryImpact) {
     vec3 samplePoint = rayOrigin; // first sampling point coming from camera ray
-
     vec3 samplePointPlanetSpace = rayOrigin - planetPosition;
 
-    vec3 sunDir = normalize(starPositions[0]); // direction to the light source
-    
-    float stepSize = rayLength / float(POINTS_FROM_CAMERA - 1); // the ray length between sample points
+    float stepSize = distance / float(POINTS_FROM_CAMERA - 1); // the ray length between sample points
 
-    float inScatteredLight = 0.0; // amount of light scattered for each channel
+    float totalDensity = 0.0; // amount of light scattered for each channel
 
-    for (int i = 0 ; i < POINTS_FROM_CAMERA ; ++i) {
+    float transmittance = 1.0;
+    vec3 lightEnergy = vec3(0.0);
 
-        float sunRayLengthInAtm = cloudLayerRadius - length(samplePoint - planetPosition); // distance traveled by light through atmosphere from light source
-        float viewRayLengthInAtm = stepSize * float(i); // distance traveled by light through atmosphere from sample point to cameraPosition
-        
-        float sunRayOpticalDepth = opticalDepth(samplePoint, sunDir, sunRayLengthInAtm); // scattered from the sun to the point
-        
-        float viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, viewRayLengthInAtm); // scattered from the point to the camera
-        
-        float transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth)); // exponential scattering with coefficients
-        
+    float costheta = dot(rayDir, normalize(starPositions[0] - planetPosition));
+    float phaseCloud = HenyeyGreenstein(0.3, costheta);
+
+    for (int i = 0 ; i < POINTS_FROM_CAMERA ; i++) {
+
         float localDensity = densityAtPoint(samplePoint); // density at sample point
+        float lightTransmittance = lightMarch(samplePoint);
 
-        inScatteredLight += localDensity * transmittance * stepSize; // add the resulting amount of light scattered toward the camera
-        
+        lightEnergy += localDensity * stepSize * transmittance * lightTransmittance * phaseCloud;
+        transmittance *= exp(-localDensity * stepSize * lightAbsorptionThroughClouds);
+
+        totalDensity += localDensity * stepSize; // add the resulting amount of light scattered toward the camera
+
         samplePoint += rayDir * stepSize; // move sample point along view ray
     }
 
-	// faudra revoir ça c'est fishy
-    inScatteredLight *= 10.0; // multiply by the intensity of the sun
+    /*vec3 sunDir = normalize(starPositions[0] - geometryImpact);
+    float t0, t1;
+    rayIntersectSphere(geometryImpact, sunDir, planetPosition, cloudLayerMaxHeight, t0, t1);
 
-    return inScatteredLight;
+    stepSize = t1 / float(OPTICAL_DEPTH_POINTS - 1);
+    samplePoint = geometryImpact;
+    float groundTransmittance = 1.0;
+    for(int i = 0; i < OPTICAL_DEPTH_POINTS; i++) {
+        float localDensity = densityAtPoint(samplePoint); // density at sample point
+        groundTransmittance *= exp(-localDensity * stepSize * lightAbsorptionThroughClouds);
+
+        totalDensity += localDensity * stepSize; // add the resulting amount of light scattered toward the camera
+
+        samplePoint += sunDir * stepSize; // move sample point along view ray
+    }*/
+
+    vec3 cloudColor = vec3(0.7) * lightEnergy;
+    return originalColor * transmittance + cloudColor;
 }
 
 vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
+    float height = length(rayOrigin - planetPosition);
+
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerMaxHeight, impactPoint, escapePoint))) {
         return originalColor; // if not intersecting with atmosphere, return original color
     }
 
     impactPoint = max(0.0, impactPoint); // cannot be negative (the ray starts where the camera is in such a case)
     escapePoint = min(maximumDistance, escapePoint); // occlusion with other scene objects
 
-    float distanceThroughAtmosphere = max(0.0, escapePoint - impactPoint); // probably doesn't need the max but for the sake of coherence the distance cannot be negative
+    float impactPoint2, escapePoint2;
+    if (rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerMinHeight, impactPoint2, escapePoint2)) {
+        escapePoint = min(maximumDistance, impactPoint2);
+    }
+
+    /*float temp = impactPoint;
+    impactPoint = min(impactPoint, escapePoint);
+    escapePoint = max(temp, escapePoint);*/
+
+    float distanceThroughClouds = max(0.0, escapePoint - impactPoint); // probably doesn't need the max but for the sake of coherence the distance cannot be negative
     
-    vec3 firstPointInAtmosphere = rayOrigin + rayDir * impactPoint; // the first atmosphere point to be hit by the ray
+    vec3 firstPointInCloudLayer = rayOrigin + rayDir * impactPoint; // the first atmosphere point to be hit by the ray
 
-    vec3 firstPointPlanetSpace = firstPointInAtmosphere - planetPosition;
+    vec3 firstPointPlanetSpace = firstPointInCloudLayer - planetPosition;
 
-    vec3 light = vec3(calculateLight(firstPointInAtmosphere, rayDir, distanceThroughAtmosphere, originalColor)); // calculate scattering
-    
-	float ndl = -dot(normalize(rayOrigin + rayDir * impactPoint - planetPosition), normalize(rayOrigin + rayDir * impactPoint - starPositions[0]));
-
-	//ndl = saturate(ndl + 0.2);
-
-	light = max(light * ndl, 0.0);
-	//light *= saturate(max(1.0 - pow(1.0 - ndl, 4.0), 0.0));
-
-    return originalColor * (1.0 - light) + light; // blending scattered color with original color
-}
-
-vec3 lerp(vec3 vector1, vec3 vector2, float x) {
-    return x * vector1 + (1.0 - x) * vector2;
+    return clouds(firstPointInCloudLayer, rayDir, distanceThroughClouds, originalColor, rayOrigin + rayDir * maximumDistance);
 }
 
 void main() {
@@ -199,12 +179,6 @@ void main() {
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
     vec3 finalColor = scatter(screenColor, cameraPosition, rayDir, maximumDistance); // the color to be displayed on the screen
-
-    finalColor = lerp(finalColor, screenColor, finalColor.x);
-
-    // exposure
-    //finalColor = 1.0 - exp(-1.0 * finalColor);
-    //finalColor = vec3(1.0);
 
     gl_FragColor = vec4(finalColor, 1.0); // displaying the final color
 }
