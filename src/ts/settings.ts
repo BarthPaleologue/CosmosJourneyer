@@ -8,5 +8,5 @@ export const Settings = {
     TIME_MULTIPLIER: 1,
     ENABLE_OCCLUSION: true,
     RENDER_DISTANCE_MULTIPLIER: 1.5,
-    ENABLE_VOLUMETRIC_CLOUDS: true
+    ENABLE_VOLUMETRIC_CLOUDS: false
 };
