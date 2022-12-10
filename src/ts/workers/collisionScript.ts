@@ -24,9 +24,7 @@ function computeHeightForData(data: TransferCollisionData): void {
 
     const height = compute_height_at_point(collision_data);
 
-    self.postMessage({
-        h: height
-    });
+    self.postMessage({ h: height });
 }
 
 self.onmessage = (e) => {

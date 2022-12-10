@@ -107,9 +107,9 @@ Assets.Init(scene).then(() => {
         orientationQuaternion: Quaternion.Identity()
     };
 
-    ares.terrainSettings.continents_fragmentation = 0.35;
-    ares.terrainSettings.continent_base_height = 2e3;
-    ares.terrainSettings.max_mountain_height = 12e3;
+    ares.terrainSettings.continents_fragmentation = 0.0;
+    ares.terrainSettings.continent_base_height = 10e3;
+    ares.terrainSettings.max_mountain_height = 20e3;
 
     ares.material.colorSettings.plainColor.copyFromFloats(0.4, 0.3, 0.3);
     ares.material.colorSettings.desertColor.copyFromFloats(178 / 255, 107 / 255, 42 / 255);
