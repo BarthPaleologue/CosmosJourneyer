@@ -1,7 +1,8 @@
 import {
-    BoundingBox,
+    ActionManager,
+    BoundingBox, Color3,
     Color4,
-    Engine, InstancedMesh, Matrix,
+    Engine, ExecuteCodeAction, InstancedMesh, Matrix,
     Mesh,
     MeshBuilder,
     Scene, ScenePerformancePriority,
@@ -27,13 +28,26 @@ function StringToVector3(s: string): Vector3 {
     return new Vector3(x, y, z);
 }
 
+type BuildData = {
+    name: string;
+    cellString: string;
+    scale: number;
+    position: Vector3;
+}
+
 export class StarMap {
     readonly scene: Scene;
     readonly controller: PlayerController;
     private globalNode: TransformNode;
     private starTemplate: Mesh;
 
-    private readonly loadedCells: Map<string, InstancedMesh[]> = new Map<string, InstancedMesh[]>();
+    readonly starBuildQueue: BuildData[] = [];
+    readonly starTrashQueue: InstancedMesh[] = [];
+
+    readonly cadence = 5;
+    readonly cellSize = 1;
+
+    private readonly loadedCells: { [key: string]: InstancedMesh[] } = {};
     private currentCell = Vector3.Zero();
 
     constructor(engine: Engine) {
@@ -55,48 +69,67 @@ export class StarMap {
         this.starTemplate = MeshBuilder.CreatePlane("star", { width: 0.2, height: 0.2 }, this.scene);
         this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
         this.starTemplate.convertToUnIndexedMesh();
+        this.starTemplate.isPickable = true;
         this.starTemplate.isVisible = false;
 
         const starMaterial = new StandardMaterial("starMaterial", this.scene);
         starMaterial.emissiveTexture = new Texture(starTexture, this.scene);
         starMaterial.opacityTexture = new Texture(starTexture, this.scene);
         starMaterial.opacityTexture.getAlphaFromRGB = true;
+        starMaterial.emissiveColor = new Color3(0.5, 0.2, 0.8);
         starMaterial.freeze();
 
         this.starTemplate.material = starMaterial;
 
-        this.globalNode.position.addInPlace(new Vector3(0, 0, 10));
+        /*this.scene.onPointerDown = function (evt, pickResult) {
+            console.log(pickResult);
+            if (pickResult.hit) {
+                console.log("!!", pickResult.pickedMesh?.name);
+            }
+
+        };*/
 
         this.scene.registerBeforeRender(() => {
-            const cameraPosition = this.globalNode.position.negate();
-            this.currentCell = new Vector3(Math.round(cameraPosition.x), Math.round(cameraPosition.y), Math.round(cameraPosition.z));
-
-            this.updateCells();
-
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
             this.globalNode.position.addInPlace(this.controller.update(deltaTime));
+            const cameraPosition = this.globalNode.position.negate();
+
+            this.currentCell = new Vector3(Math.round(cameraPosition.x), Math.round(cameraPosition.y), Math.round(cameraPosition.z));
+            this.updateCells();
         });
     }
 
     private generateCell(cell: Vector3) {
         const cellString = Vector3ToString(cell);
 
-        if (this.loadedCells.has(cellString)) return; // already generated
+        if (Object.keys(this.loadedCells).includes(cellString)) return; // already generated
+        //console.log(Object.keys(this.loadedCells).includes(cellString), cellString, Object.keys(this.loadedCells));
 
         // don't generate cells that are not in the frustum
-        //const bb = new BoundingBox(new Vector3(-0.5, -0.5, -0.5), new Vector3(0.5, 0.5, 0.5), Matrix.Translation(cell.x, cell.y, cell.z));
-        //if(!this.controller.getActiveCamera().isInFrustum(bb)) return;
+        const bb = new BoundingBox(new Vector3(-this.cellSize / 2, -this.cellSize / 2, -this.cellSize / 2), new Vector3(this.cellSize / 2, this.cellSize / 2, this.cellSize / 2), Matrix.Translation(cell.x + this.globalNode.position.x, cell.y + this.globalNode.position.y, cell.z + this.globalNode.position.z));
+        if (!this.controller.getActiveCamera().isInFrustum(bb)) return;
 
-        this.loadedCells.set(cellString, []);
+        this.loadedCells[cellString] = [];
+
+        /*const wire = MeshBuilder.CreateBox(cellString + "Wire", { width: 1, height: 1, depth: 1 }, this.scene);
+        const wireMaterial = new StandardMaterial("wireMaterial", this.scene);
+        wireMaterial.wireframe = true;
+        wireMaterial.emissiveColor = Color3.Random();
+        wire.material = wireMaterial;
+        wire.position = cell;
+        wire.parent = this.globalNode;*/
 
         const seed = hashVec3(cell);
         const rng = seededSquirrelNoise(seed);
-        const nbStars = rng(0) * 10;
+        const density = 10;
+        const nbStars = rng(0) * density;
         for (let i = 0; i < nbStars; i++) {
-            const star = this.starTemplate.createInstance(`starInstance|${cell.x}|${cell.y}|${cell.z}|${i}`);
-            star.position = new Vector3(centeredRand(rng, 10 * i + 1) / 2, centeredRand(rng, 10 * i + 2) / 2, centeredRand(rng, 10 * i + 3) / 2).addInPlace(cell);
-            star.parent = this.globalNode;
-            (this.loadedCells.get(cellString) as InstancedMesh[]).push(star);
+            this.starBuildQueue.push({
+                name: `starInstance|${cell.x}|${cell.y}|${cell.z}|${i}`,
+                cellString: cellString,
+                scale: 0.5 + rng(100 * i) / 2,
+                position: new Vector3(centeredRand(rng, 10 * i + 1) / 2, centeredRand(rng, 10 * i + 2) / 2, centeredRand(rng, 10 * i + 3) / 2).addInPlace(cell)
+            });
         }
     }
 
@@ -104,23 +137,64 @@ export class StarMap {
         const renderRadius = 3;
 
         // first remove all cells that are too far
-        for (const [cellString, meshes] of this.loadedCells) {
+        for (const cellString of Object.keys(this.loadedCells)) {
             const cell = StringToVector3(cellString);
-            if (cell.subtract(this.currentCell).length() > renderRadius) {
-                for (const mesh of meshes) mesh.dispose();
-                this.loadedCells.delete(cellString);
+            if (cell.add(this.globalNode.position).length() > renderRadius * 2) {
+                this.starTrashQueue.push(...this.loadedCells[cellString]);
+                delete this.loadedCells[cellString];
+                //this.scene.getMeshById(cellString + "Wire")?.dispose();
             }
         }
+
+        this.disposeNextStars(this.cadence);
 
         // then generate missing cells
         for (let x = -renderRadius; x <= renderRadius; x++) {
             for (let y = -renderRadius; y <= renderRadius; y++) {
                 for (let z = -renderRadius; z <= renderRadius; z++) {
                     const cell = this.currentCell.add(new Vector3(x, y, z));
-                    const cellString = Vector3ToString(cell);
-                    if(this.loadedCells.has(cellString)) continue;
                     this.generateCell(cell);
                 }
+            }
+        }
+
+        this.buildNextStars(this.cadence);
+
+        //console.log(this.starBuildQueue.length, this.starTrashQueue.length);
+    }
+
+    private disposeNextStars(n: number) {
+        for (let i = 0; i < n; i++) {
+            if (this.starTrashQueue.length > 0) {
+                this.starTrashQueue[0].dispose();
+                this.starTrashQueue.shift();
+            }
+        }
+    }
+
+    private buildNextStars(n: number) {
+        for (let i = 0; i < n; i++) {
+            if (this.starBuildQueue.length > 0) {
+                const data = this.starBuildQueue[0];
+                if (this.loadedCells[data.cellString]) {
+                    const star = this.starTemplate.createInstance(data.name);
+                    star.scaling = new Vector3(data.scale, data.scale, data.scale);
+                    star.position = data.position;
+                    star.parent = this.globalNode;
+
+                    star.isPickable = true;
+                    star.actionManager = new ActionManager(this.scene);
+
+                    star.actionManager.registerAction(
+                        new ExecuteCodeAction(
+                            ActionManager.OnPickTrigger, e => {
+                                console.log(e.source.name);
+                            }
+                        )
+                    );
+                    this.loadedCells[data.cellString].push(star);
+                }
+                this.starBuildQueue.shift();
             }
         }
     }
