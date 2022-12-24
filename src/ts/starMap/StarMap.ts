@@ -71,6 +71,7 @@ export class StarMap {
         this.starTemplate.convertToUnIndexedMesh();
         this.starTemplate.isPickable = true;
         this.starTemplate.isVisible = false;
+        this.starTemplate.hasVertexAlpha = true;
 
         const starMaterial = new StandardMaterial("starMaterial", this.scene);
         starMaterial.emissiveTexture = new Texture(starTexture, this.scene);
@@ -79,6 +80,7 @@ export class StarMap {
         starMaterial.emissiveColor = new Color3(0.5, 0.2, 0.8);
         starMaterial.freeze();
 
+        this.starTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
         this.starTemplate.material = starMaterial;
 
         /*this.scene.onPointerDown = function (evt, pickResult) {
@@ -192,6 +194,16 @@ export class StarMap {
                             }
                         )
                     );
+
+                    star.instancedBuffers.color = new Color4(Math.random(), Math.random(), Math.random(), 0.0);
+
+                    //fade the star in
+                    for (let i = 0; i < 100; i++) {
+                        setTimeout(() => {
+                            star.instancedBuffers.color.a = i / 100;
+                        }, i * 10);
+                    }
+
                     this.loadedCells[data.cellString].push(star);
                 }
                 this.starBuildQueue.shift();
