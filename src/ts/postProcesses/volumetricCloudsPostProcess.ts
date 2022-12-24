@@ -1,14 +1,14 @@
-import { Color3, Effect } from "@babylonjs/core";
+import {Color3, Effect} from "@babylonjs/core";
 
 import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
-import { UberScene } from "../uberCore/uberScene";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
-import { BlackHole } from "../bodies/blackHole";
-import { Star } from "../bodies/stars/star";
-import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
-import { BodyPostProcess } from "./bodyPostProcess";
-import { CloudSettings, FlatCloudsPostProcess } from "./flatCloudsPostProcess";
+import {UberScene} from "../uberCore/uberScene";
+import {getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms} from "./uniforms";
+import {ShaderDataType, ShaderSamplers, ShaderUniforms} from "../uberCore/postProcesses/uberPostProcess";
+import {BlackHole} from "../bodies/blackHole";
+import {Star} from "../bodies/stars/star";
+import {TelluricPlanet} from "../bodies/planets/telluricPlanet";
+import {BodyPostProcess} from "./bodyPostProcess";
+import {CloudSettings, FlatCloudsPostProcess} from "./flatCloudsPostProcess";
 
 const shaderName = "volumetricClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
@@ -37,10 +37,17 @@ export class VolumetricCloudsPostProcess extends BodyPostProcess {
             ...getStarsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
-                name: "cloudLayerRadius",
+              name: "cloudLayerMinHeight",
+              type: ShaderDataType.Float,
+              get: () => {
+                  return planet.getApparentRadius();
+              }
+            },
+            {
+                name: "cloudLayerMaxHeight",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return settings.cloudLayerRadius;
+                    return planet.getApparentRadius() + 30e3;
                 }
             }
         ];
