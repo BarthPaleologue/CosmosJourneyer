@@ -232,18 +232,18 @@ export class StarMap {
 
 //fade the star in
 function fadeIn(star: InstancedMesh, duration: number) {
-    for (let i = 0; i < duration / 10; i++) {
+    for (let i = 0; i < 100; i++) {
         setTimeout(() => {
-            star.instancedBuffers.color.a = 10 * i / duration;
-        }, i * 10);
+            star.instancedBuffers.color.a = i / 100;
+        }, i * duration / 100);
     }
 }
 
 function fadeOutThenDispose(star: InstancedMesh, duration: number) {
-    for (let i = 0; i < duration / 10; i++) {
+    for (let i = 0; i < 100; i++) {
         setTimeout(() => {
-            star.instancedBuffers.color.a = 1.0 - 10 * i / duration;
-        }, i * 10);
+            star.instancedBuffers.color.a = 1.0 - i / 100;
+        }, i * duration / 100);
     }
     setTimeout(() => star.dispose(), duration);
 }
