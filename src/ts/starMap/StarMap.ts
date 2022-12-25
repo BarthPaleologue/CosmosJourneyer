@@ -1,7 +1,7 @@
 import {
     ActionManager,
     BoundingBox, Color3,
-    Color4,
+    Color4, DefaultRenderingPipeline,
     Engine, ExecuteCodeAction, InstancedMesh, Matrix,
     Mesh,
     MeshBuilder,
@@ -18,6 +18,7 @@ import starTexture from "../../asset/textures/starParticle.png";
 import { hashVec3 } from "../utils/hashVec3";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand } from "extended-random";
+import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
 
 function Vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
@@ -44,8 +45,12 @@ export class StarMap {
     readonly starBuildQueue: BuildData[] = [];
     readonly starTrashQueue: InstancedMesh[] = [];
 
-    readonly cadence = 5;
+    readonly cadence = 7;
     readonly cellSize = 1;
+
+    readonly gui: AdvancedDynamicTexture;
+    readonly namePlate: Rectangle;
+    readonly nameLabel: TextBlock;
 
     private readonly loadedCells: { [key: string]: InstancedMesh[] } = {};
     private currentCell = Vector3.Zero();
@@ -64,6 +69,28 @@ export class StarMap {
 
         this.scene.activeCamera = this.controller.getActiveCamera();
 
+        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+        this.namePlate = new Rectangle();
+        this.namePlate.width = "250px";
+        this.namePlate.height = "40px";
+        this.namePlate.color = "white";
+        this.namePlate.background = "black";
+
+        this.nameLabel = new TextBlock();
+        this.nameLabel.text = "TEXTE";
+
+        this.namePlate.addControl(this.nameLabel);
+        this.namePlate.linkOffsetY = -50;
+
+        const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controller.getActiveCamera()]);
+        pipeline.fxaaEnabled = true;
+        pipeline.bloomEnabled = true;
+        pipeline.bloomThreshold = 0.0;
+        pipeline.bloomWeight = 1.0;
+        pipeline.bloomKernel = 128;
+        pipeline.imageProcessing.contrast = 1.7;
+
         this.globalNode = new TransformNode("node", this.scene);
 
         this.starTemplate = MeshBuilder.CreatePlane("star", { width: 0.2, height: 0.2 }, this.scene);
@@ -77,19 +104,11 @@ export class StarMap {
         starMaterial.emissiveTexture = new Texture(starTexture, this.scene);
         starMaterial.opacityTexture = new Texture(starTexture, this.scene);
         starMaterial.opacityTexture.getAlphaFromRGB = true;
-        starMaterial.emissiveColor = new Color3(0.5, 0.2, 0.8);
+        starMaterial.emissiveColor = Color3.White();
         starMaterial.freeze();
 
         this.starTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
         this.starTemplate.material = starMaterial;
-
-        /*this.scene.onPointerDown = function (evt, pickResult) {
-            console.log(pickResult);
-            if (pickResult.hit) {
-                console.log("!!", pickResult.pickedMesh?.name);
-            }
-
-        };*/
 
         this.scene.registerBeforeRender(() => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
@@ -168,7 +187,7 @@ export class StarMap {
     private disposeNextStars(n: number) {
         for (let i = 0; i < n; i++) {
             if (this.starTrashQueue.length > 0) {
-                this.starTrashQueue[0].dispose();
+                fadeOutThenDispose(this.starTrashQueue[0], 1000);
                 this.starTrashQueue.shift();
             }
         }
@@ -190,19 +209,18 @@ export class StarMap {
                     star.actionManager.registerAction(
                         new ExecuteCodeAction(
                             ActionManager.OnPickTrigger, e => {
-                                console.log(e.source.name);
+                                if(this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
+
+                                this.namePlate.linkWithMesh(star);
+                                this.nameLabel.text = e.source.name;
                             }
                         )
                     );
 
-                    star.instancedBuffers.color = new Color4(Math.random(), Math.random(), Math.random(), 0.0);
+                    star.instancedBuffers.color = new Color4(0.5, 0.2, 0.8, 0.0).scale(2.5);
 
                     //fade the star in
-                    for (let i = 0; i < 100; i++) {
-                        setTimeout(() => {
-                            star.instancedBuffers.color.a = i / 100;
-                        }, i * 10);
-                    }
+                    fadeIn(star, 1000);
 
                     this.loadedCells[data.cellString].push(star);
                 }
@@ -210,4 +228,22 @@ export class StarMap {
             }
         }
     }
+}
+
+//fade the star in
+function fadeIn(star: InstancedMesh, duration: number) {
+    for (let i = 0; i < duration / 10; i++) {
+        setTimeout(() => {
+            star.instancedBuffers.color.a = 10 * i / duration;
+        }, i * 10);
+    }
+}
+
+function fadeOutThenDispose(star: InstancedMesh, duration: number) {
+    for (let i = 0; i < duration / 10; i++) {
+        setTimeout(() => {
+            star.instancedBuffers.color.a = 1.0 - 10 * i / duration;
+        }, i * 10);
+    }
+    setTimeout(() => star.dispose(), duration);
 }
