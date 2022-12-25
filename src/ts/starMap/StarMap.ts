@@ -1,5 +1,6 @@
 import {
     ActionManager,
+    Animation,
     BoundingBox, Color3,
     Color4, DefaultRenderingPipeline,
     Engine, ExecuteCodeAction, InstancedMesh, Matrix,
@@ -167,7 +168,7 @@ export class StarMap {
             }
         }
 
-        this.disposeNextStars(this.cadence);
+        this.disposeNextStars(this.cadence * this.controller.getActiveCamera().speed);
 
         // then generate missing cells
         for (let x = -renderRadius; x <= renderRadius; x++) {
@@ -179,9 +180,18 @@ export class StarMap {
             }
         }
 
-        this.buildNextStars(this.cadence);
+        this.buildNextStars(this.cadence * this.controller.getActiveCamera().speed);
+
+        for(const mesh of this.scene.meshes) {
+            if(this.controller.getActiveCamera().isInFrustum(mesh.getBoundingInfo().boundingBox)) {
+                mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
+            } else {
+                mesh.billboardMode = Mesh.BILLBOARDMODE_NONE;
+            }
+        }
 
         //console.log(this.starBuildQueue.length, this.starTrashQueue.length);
+        if (this.namePlate.linkedMesh == null) this.gui.removeControl(this.namePlate);
     }
 
     private disposeNextStars(n: number) {
@@ -209,7 +219,7 @@ export class StarMap {
                     star.actionManager.registerAction(
                         new ExecuteCodeAction(
                             ActionManager.OnPickTrigger, e => {
-                                if(this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
+                                if (this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
 
                                 this.namePlate.linkWithMesh(star);
                                 this.nameLabel.text = e.source.name;
@@ -232,18 +242,32 @@ export class StarMap {
 
 //fade the star in
 function fadeIn(star: InstancedMesh, duration: number) {
-    for (let i = 0; i < 100; i++) {
-        setTimeout(() => {
-            star.instancedBuffers.color.a = i / 100;
-        }, i * duration / 100);
-    }
+    const fadeInAnimation = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+
+    fadeInAnimation.setKeys([{
+        frame: 0,
+        value: 0
+    }, {
+        frame: duration / 60,
+        value: 1
+    }]);
+
+    star.animations.push(fadeInAnimation);
+    star.getScene().beginAnimation(star, 0, duration / 60);
 }
 
 function fadeOutThenDispose(star: InstancedMesh, duration: number) {
-    for (let i = 0; i < 100; i++) {
-        setTimeout(() => {
-            star.instancedBuffers.color.a = 1.0 - i / 100;
-        }, i * duration / 100);
-    }
+    const fadeOutAnimation = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+
+    fadeOutAnimation.setKeys([{
+        frame: 0,
+        value: 1
+    }, {
+        frame: duration / 60,
+        value: 0
+    }]);
+
+    star.animations.push(fadeOutAnimation);
+    star.getScene().beginAnimation(star, 0, duration / 60);
     setTimeout(() => star.dispose(), duration);
 }
