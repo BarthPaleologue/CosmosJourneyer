@@ -9,9 +9,9 @@ import { TelluricPlanet } from "./planets/telluricPlanet";
 import { GasPlanet } from "./planets/gasPlanet";
 import { clamp } from "terrain-generation";
 import { getOrbitalPeriod } from "../orbits/kepler";
-import { seededSquirrelNoise } from "squirrel-noise";
 import { BlackHole } from "./blackHole";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
+import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 
 enum Steps {
     GENERATE_STARS = 100,
@@ -30,13 +30,13 @@ export class StarSystem {
 
     readonly planets: Planet[] = []; //TODO: contains satellites : make sense out of this
 
-    readonly rng: (step: number) => number;
+    readonly descriptor: StarSystemDescriptor;
 
     constructor(seed: number, scene: UberScene) {
         this.scene = scene;
         this.postProcessManager = new PostProcessManager(this.scene);
 
-        this.rng = seededSquirrelNoise(seed * Number.MAX_SAFE_INTEGER);
+        this.descriptor = new StarSystemDescriptor(seed);
     }
 
     public addBody(body: AbstractBody) {
@@ -55,7 +55,7 @@ export class StarSystem {
         return star;
     }
 
-    public makeStar(seed = this.rng(Steps.GENERATE_STARS + this.stars.length)): Star {
+    public makeStar(seed = this.descriptor.getStarSeed(this.stars.length)): Star {
         const star = new Star(`star${this.stars.length}`, this.scene, seed, this.stars);
         //TODO: make this better, make it part of the generation
         star.orbitalProperties.periapsis = star.getRadius() * 4;
@@ -65,7 +65,7 @@ export class StarSystem {
         return star;
     }
 
-    public makeBlackHole(seed = this.rng(Steps.GENERATE_STARS + this.stars.length)): BlackHole {
+    public makeBlackHole(seed = this.descriptor.rng(Steps.GENERATE_STARS + this.stars.length)): BlackHole {
         const blackHole = new BlackHole(`blackHole${this.stars.length}`, 1000e3, seed, this.stars);
         this.addStar(blackHole);
         return blackHole;
@@ -76,7 +76,7 @@ export class StarSystem {
         for (let i = 0; i < n; i++) this.makeStar();
     }
 
-    public makeTelluricPlanet(seed = this.rng(Steps.GENERATE_PLANETS + this.planets.length)): TelluricPlanet {
+    public makeTelluricPlanet(seed = this.descriptor.rng(Steps.GENERATE_PLANETS + this.planets.length)): TelluricPlanet {
         const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this.scene, seed, this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
         //TODO: use formula in the research folder
@@ -97,7 +97,7 @@ export class StarSystem {
         return planet;
     }
 
-    public makeGasPlanet(seed = this.rng(Steps.GENERATE_PLANETS + this.planets.length)): GasPlanet {
+    public makeGasPlanet(seed = this.descriptor.rng(Steps.GENERATE_PLANETS + this.planets.length)): GasPlanet {
         const planet = new GasPlanet(`gasPlanet`, this.scene, seed, this.stars);
         planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
 
@@ -109,7 +109,7 @@ export class StarSystem {
     public makePlanets(n: number): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of planets : ${n}`);
         for (let i = 0; i < n; i++) {
-            if (uniformRandBool(0.5, this.rng, Steps.CHOOSE_PLANET_TYPE + this.planets.length)) {
+            if (uniformRandBool(0.5, this.descriptor.rng, Steps.CHOOSE_PLANET_TYPE + this.planets.length)) {
                 const planet = this.makeTelluricPlanet();
                 this.makeSatellites(planet, randRangeInt(0, 3, planet.rng, 86));
             } else {

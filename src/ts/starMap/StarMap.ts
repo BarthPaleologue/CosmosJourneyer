@@ -20,6 +20,7 @@ import { hashVec3 } from "../utils/hashVec3";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand } from "extended-random";
 import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
+import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 
 function Vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
@@ -216,13 +217,15 @@ export class StarMap {
                     star.isPickable = true;
                     star.actionManager = new ActionManager(this.scene);
 
+                    const starSystem = new StarSystemDescriptor(hashVec3(star.position));
+
                     star.actionManager.registerAction(
                         new ExecuteCodeAction(
                             ActionManager.OnPickTrigger, e => {
                                 if (this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
 
                                 this.namePlate.linkWithMesh(star);
-                                this.nameLabel.text = e.source.name;
+                                this.nameLabel.text = starSystem.getName();
                             }
                         )
                     );
