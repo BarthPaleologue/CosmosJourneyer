@@ -1,14 +1,12 @@
 import {
     ActionManager,
     Animation,
-    BoundingBox,
     Color3,
     Color4,
     DefaultRenderingPipeline,
     Engine,
     ExecuteCodeAction,
     InstancedMesh,
-    Matrix,
     Mesh,
     MeshBuilder,
     Scene,
@@ -26,26 +24,26 @@ import { hashVec3 } from "../utils/hashVec3";
 import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 import { StarDescriptor } from "../descriptors/starDescriptor";
-import { BuildData, Cell, StringToVector3, Vector3ToString } from "./cell";
+import { BuildData, Cell, Vector3ToString } from "./cell";
 
 export class StarMap {
     readonly scene: Scene;
     readonly controller: PlayerController;
-    private globalNode: TransformNode;
-    private starTemplate: Mesh;
 
-    readonly starBuildQueue: BuildData[] = [];
-    readonly starTrashQueue: InstancedMesh[] = [];
+    private readonly globalNode: TransformNode;
+    private readonly starTemplate: Mesh;
 
-    readonly cadence = 7;
-    readonly cellSize = 1;
+    private readonly starBuildQueue: BuildData[] = [];
+    private readonly starTrashQueue: InstancedMesh[] = [];
 
-    readonly gui: AdvancedDynamicTexture;
-    readonly namePlate: Rectangle;
-    readonly nameLabel: TextBlock;
+    static readonly GENERATION_CADENCE = 7;
+
+    private readonly gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+    private readonly namePlate: Rectangle;
+    private readonly nameLabel = new TextBlock();
 
     private readonly loadedCells: Map<string, Cell> = new Map<string, Cell>();
-    private currentCell = Vector3.Zero();
+    private currentCellPosition = Vector3.Zero();
 
     constructor(engine: Engine) {
         this.scene = new Scene(engine);
@@ -59,19 +57,11 @@ export class StarMap {
         this.scene.activeCamera = this.controller.getActiveCamera();
         this.controller.inputs.push(new Keyboard());
 
-        this.scene.activeCamera = this.controller.getActiveCamera();
-
-        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-
         this.namePlate = new Rectangle();
         this.namePlate.width = "250px";
         this.namePlate.height = "40px";
         this.namePlate.color = "white";
         this.namePlate.background = "black";
-
-        this.nameLabel = new TextBlock();
-        this.nameLabel.text = "TEXTE";
-
         this.namePlate.addControl(this.nameLabel);
         this.namePlate.linkOffsetY = -50;
 
@@ -107,7 +97,7 @@ export class StarMap {
             this.globalNode.position.addInPlace(this.controller.update(deltaTime));
             const cameraPosition = this.globalNode.position.negate();
 
-            this.currentCell = new Vector3(Math.round(cameraPosition.x), Math.round(cameraPosition.y), Math.round(cameraPosition.z));
+            this.currentCellPosition = new Vector3(Math.round(cameraPosition.x), Math.round(cameraPosition.y), Math.round(cameraPosition.z));
             this.updateCells();
         });
     }
@@ -130,13 +120,13 @@ export class StarMap {
             }
         }
 
-        this.disposeNextStars(this.cadence * this.controller.getActiveCamera().speed);
+        this.disposeNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed);
 
         // then generate missing cells
         for (let x = -renderRadius; x <= renderRadius; x++) {
             for (let y = -renderRadius; y <= renderRadius; y++) {
                 for (let z = -renderRadius; z <= renderRadius; z++) {
-                    const position = this.currentCell.add(new Vector3(x, y, z));
+                    const position = this.currentCellPosition.add(new Vector3(x, y, z));
                     const cellString = Vector3ToString(position);
 
                     if (this.loadedCells.has(cellString)) continue; // already generated
@@ -149,69 +139,65 @@ export class StarMap {
             }
         }
 
-        this.buildNextStars(this.cadence * this.controller.getActiveCamera().speed);
+        this.buildNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed);
 
-        for(const mesh of this.scene.meshes) {
-            if(this.controller.getActiveCamera().isInFrustum(mesh.getBoundingInfo().boundingBox)) {
+        for (const mesh of this.scene.meshes) {
+            if (this.controller.getActiveCamera().isInFrustum(mesh.getBoundingInfo().boundingBox)) {
                 mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
             } else {
                 mesh.billboardMode = Mesh.BILLBOARDMODE_NONE;
             }
         }
-
-        //console.log(this.starBuildQueue.length, this.starTrashQueue.length);
         if (this.namePlate.linkedMesh == null) this.gui.removeControl(this.namePlate);
     }
 
     private disposeNextStars(n: number) {
         for (let i = 0; i < n; i++) {
-            if (this.starTrashQueue.length > 0) {
-                fadeOutThenDispose(this.starTrashQueue[0], 1000);
-                this.starTrashQueue.shift();
-            }
+            if (this.starTrashQueue.length == 0) return;
+            fadeOutThenDispose(this.starTrashQueue[0], 1000);
+            this.starTrashQueue.shift();
         }
     }
 
     private buildNextStars(n: number) {
         for (let i = 0; i < n; i++) {
-            if (this.starBuildQueue.length > 0) {
-                const data = this.starBuildQueue[0];
-                if (this.loadedCells.has(data.cellString)) {
-                    const star = this.starTemplate.createInstance(data.name);
-                    star.scaling = new Vector3(data.scale, data.scale, data.scale);
-                    star.position = data.position;
-                    star.parent = this.globalNode;
+            if (this.starBuildQueue.length == 0) return;
+            const data = this.starBuildQueue[0];
+            if (!this.loadedCells.has(data.cellString)) return; // if cell was removed in the meantime
 
-                    star.isPickable = true;
-                    star.actionManager = new ActionManager(this.scene);
+            const star = this.starTemplate.createInstance(data.name);
+            star.scaling = new Vector3(1, 1, 1).scaleInPlace(data.scale);
+            star.position = data.position;
+            star.parent = this.globalNode;
 
-                    const starSystem = new StarSystemDescriptor(hashVec3(star.position));
+            star.isPickable = true;
+            star.actionManager = new ActionManager(this.scene);
 
-                    const starSeed = starSystem.getStarSeed(0);
-                    const starDescriptor = new StarDescriptor(starSeed);
-                    const starColor = starDescriptor.getColor();
+            const starSystemDescriptor = new StarSystemDescriptor(hashVec3(star.position));
 
-                    star.actionManager.registerAction(
-                        new ExecuteCodeAction(
-                            ActionManager.OnPickTrigger, e => {
-                                if (this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
+            const starSeed = starSystemDescriptor.getStarSeed(0);
+            const starDescriptor = new StarDescriptor(starSeed);
+            const starColor = starDescriptor.getColor();
 
-                                this.namePlate.linkWithMesh(star);
-                                this.nameLabel.text = starSystem.getName();
-                            }
-                        )
-                    );
+            star.actionManager.registerAction(
+                new ExecuteCodeAction(
+                    ActionManager.OnPickTrigger, (_) => {
+                        if (this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
 
-                    star.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
+                        this.namePlate.linkWithMesh(star);
+                        this.nameLabel.text = starSystemDescriptor.getName();
+                    }
+                )
+            );
 
-                    //fade the star in
-                    fadeIn(star, 1000);
+            star.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
 
-                    this.loadedCells.get(data.cellString)?.meshes.push(star);
+            //fade the star in
+            fadeIn(star, 1000);
 
-                    this.starBuildQueue.shift();
-                }
-            }
+            this.loadedCells.get(data.cellString)?.meshes.push(star);
+
+            this.starBuildQueue.shift();
         }
     }
 }
