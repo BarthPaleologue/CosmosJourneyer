@@ -6,23 +6,12 @@ import { AbstractController } from "../../uberCore/abstractController";
 import { StarPhysicalProperties } from "../physicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
-import { normalRandom, randRange, uniformRandBool } from "extended-random";
-import { clamp } from "terrain-generation";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
-import { Settings } from "../../settings";
 import { UberScene } from "../../uberCore/uberScene";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { StarDescriptor } from "../../descriptors/starDescriptor";
 
-enum Steps {
-    RADIUS = 1000,
-    TEMPERATURE = 1100,
-    RINGS = 1200
-}
-
 export class Star extends AbstractBody {
-    static RING_PROPORTION = 0.2;
-
     readonly mesh: Mesh;
     readonly light: PointLight;
     private readonly material: StarMaterial;
@@ -48,21 +37,18 @@ export class Star extends AbstractBody {
 
         this.descriptor = new StarDescriptor(seed);
 
-        //TODO: make it dependent on star type
-        this.radius = randRange(50, 200, this.rng, Steps.RADIUS) * Settings.EARTH_RADIUS;
+        this.radius = this.descriptor.radius;
 
         this.physicalProperties = {
-            //TODO: do not hardcode
-            mass: 1000,
-            rotationPeriod: 24 * 60 * 60,
-
-            temperature: this.descriptor.getSurfaceTemperature()
+            mass: this.descriptor.mass,
+            rotationPeriod: this.descriptor.rotationPeriod,
+            temperature: this.descriptor.surfaceTemperature
         };
 
         this.mesh = MeshBuilder.CreateSphere(
             `${name}Mesh`,
             {
-                diameter: this.radius * 2,
+                diameter: this.descriptor.radius * 2,
                 segments: 32
             },
             scene
@@ -85,7 +71,7 @@ export class Star extends AbstractBody {
             rings: false
         };
 
-        if (uniformRandBool(Star.RING_PROPORTION, this.rng, Steps.RINGS)) this.postProcesses.rings = true;
+        if (this.descriptor.hasRings) this.postProcesses.rings = true;
     }
 
     public override updateTransform(player: AbstractController, deltaTime: number): void {

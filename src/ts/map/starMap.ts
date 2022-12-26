@@ -177,7 +177,7 @@ export class StarMap {
 
             const starSeed = starSystemDescriptor.getStarSeed(0);
             const starDescriptor = new StarDescriptor(starSeed);
-            const starColor = starDescriptor.getColor();
+            const starColor = starDescriptor.surfaceColor;
 
             star.actionManager.registerAction(
                 new ExecuteCodeAction(
