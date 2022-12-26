@@ -12,6 +12,7 @@ import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { Settings } from "../../settings";
 import { UberScene } from "../../uberCore/uberScene";
 import { getRgbFromTemperature } from "../../utils/specrend";
+import { StarDescriptor } from "../../descriptors/starDescriptor";
 
 enum Steps {
     RADIUS = 1000,
@@ -33,6 +34,8 @@ export class Star extends AbstractBody {
 
     override readonly radius;
 
+    readonly descriptor: StarDescriptor;
+
     /**
      * New Star
      * @param name The name of the star
@@ -43,6 +46,8 @@ export class Star extends AbstractBody {
     constructor(name: string, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, seed, parentBodies);
 
+        this.descriptor = new StarDescriptor(seed);
+
         //TODO: make it dependent on star type
         this.radius = randRange(50, 200, this.rng, Steps.RADIUS) * Settings.EARTH_RADIUS;
 
@@ -51,7 +56,7 @@ export class Star extends AbstractBody {
             mass: 1000,
             rotationPeriod: 24 * 60 * 60,
 
-            temperature: clamp(normalRandom(5778, 2000, this.rng, Steps.TEMPERATURE), 4000, 10000)
+            temperature: this.descriptor.getSurfaceTemperature()
         };
 
         this.mesh = MeshBuilder.CreateSphere(

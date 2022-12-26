@@ -1,12 +1,18 @@
 import {
     ActionManager,
     Animation,
-    BoundingBox, Color3,
-    Color4, DefaultRenderingPipeline,
-    Engine, ExecuteCodeAction, InstancedMesh, Matrix,
+    BoundingBox,
+    Color3,
+    Color4,
+    DefaultRenderingPipeline,
+    Engine,
+    ExecuteCodeAction,
+    InstancedMesh,
+    Matrix,
     Mesh,
     MeshBuilder,
-    Scene, ScenePerformancePriority,
+    Scene,
+    ScenePerformancePriority,
     StandardMaterial,
     Texture,
     TransformNode,
@@ -17,26 +23,10 @@ import { Keyboard } from "../inputs/keyboard";
 
 import starTexture from "../../asset/textures/starParticle.png";
 import { hashVec3 } from "../utils/hashVec3";
-import { seededSquirrelNoise } from "squirrel-noise";
-import { centeredRand } from "extended-random";
 import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
-
-function Vector3ToString(v: Vector3): string {
-    return `${v.x},${v.y},${v.z}`;
-}
-
-function StringToVector3(s: string): Vector3 {
-    const [x, y, z] = s.split(",").map(Number);
-    return new Vector3(x, y, z);
-}
-
-type BuildData = {
-    name: string;
-    cellString: string;
-    scale: number;
-    position: Vector3;
-}
+import { StarDescriptor } from "../descriptors/starDescriptor";
+import { BuildData, Cell, StringToVector3, Vector3ToString } from "./cell";
 
 export class StarMap {
     readonly scene: Scene;
@@ -54,7 +44,7 @@ export class StarMap {
     readonly namePlate: Rectangle;
     readonly nameLabel: TextBlock;
 
-    private readonly loadedCells: { [key: string]: InstancedMesh[] } = {};
+    private readonly loadedCells: Map<string, Cell> = new Map<string, Cell>();
     private currentCell = Vector3.Zero();
 
     constructor(engine: Engine) {
@@ -122,50 +112,21 @@ export class StarMap {
         });
     }
 
-    private generateCell(cell: Vector3) {
-        const cellString = Vector3ToString(cell);
-
-        if (Object.keys(this.loadedCells).includes(cellString)) return; // already generated
-        //console.log(Object.keys(this.loadedCells).includes(cellString), cellString, Object.keys(this.loadedCells));
-
-        // don't generate cells that are not in the frustum
-        const bb = new BoundingBox(new Vector3(-this.cellSize / 2, -this.cellSize / 2, -this.cellSize / 2), new Vector3(this.cellSize / 2, this.cellSize / 2, this.cellSize / 2), Matrix.Translation(cell.x + this.globalNode.position.x, cell.y + this.globalNode.position.y, cell.z + this.globalNode.position.z));
-        if (!this.controller.getActiveCamera().isInFrustum(bb)) return;
-
-        this.loadedCells[cellString] = [];
-
-        /*const wire = MeshBuilder.CreateBox(cellString + "Wire", { width: 1, height: 1, depth: 1 }, this.scene);
-        const wireMaterial = new StandardMaterial("wireMaterial", this.scene);
-        wireMaterial.wireframe = true;
-        wireMaterial.emissiveColor = Color3.Random();
-        wire.material = wireMaterial;
-        wire.position = cell;
-        wire.parent = this.globalNode;*/
-
-        const seed = hashVec3(cell);
-        const rng = seededSquirrelNoise(seed);
-        const density = 10;
-        const nbStars = rng(0) * density;
-        for (let i = 0; i < nbStars; i++) {
-            this.starBuildQueue.push({
-                name: `starInstance|${cell.x}|${cell.y}|${cell.z}|${i}`,
-                cellString: cellString,
-                scale: 0.5 + rng(100 * i) / 2,
-                position: new Vector3(centeredRand(rng, 10 * i + 1) / 2, centeredRand(rng, 10 * i + 2) / 2, centeredRand(rng, 10 * i + 3) / 2).addInPlace(cell)
-            });
-        }
+    private generateCell(position: Vector3) {
+        const cell = new Cell(position);
+        this.loadedCells.set(cell.uniqueString(), cell);
+        this.starBuildQueue.push(...cell.generate());
     }
 
     private updateCells() {
-        const renderRadius = 3;
+        const renderRadius = 4;
 
         // first remove all cells that are too far
-        for (const cellString of Object.keys(this.loadedCells)) {
-            const cell = StringToVector3(cellString);
-            if (cell.add(this.globalNode.position).length() > renderRadius * 2) {
-                this.starTrashQueue.push(...this.loadedCells[cellString]);
-                delete this.loadedCells[cellString];
-                //this.scene.getMeshById(cellString + "Wire")?.dispose();
+        for (const cell of this.loadedCells.values()) {
+            const position = cell.position;
+            if (position.add(this.globalNode.position).length() > renderRadius * 2) {
+                this.starTrashQueue.push(...cell.meshes);
+                this.loadedCells.delete(cell.uniqueString());
             }
         }
 
@@ -175,8 +136,15 @@ export class StarMap {
         for (let x = -renderRadius; x <= renderRadius; x++) {
             for (let y = -renderRadius; y <= renderRadius; y++) {
                 for (let z = -renderRadius; z <= renderRadius; z++) {
-                    const cell = this.currentCell.add(new Vector3(x, y, z));
-                    this.generateCell(cell);
+                    const position = this.currentCell.add(new Vector3(x, y, z));
+                    const cellString = Vector3ToString(position);
+
+                    if (this.loadedCells.has(cellString)) continue; // already generated
+                    // don't generate cells that are not in the frustum
+                    const bb = Cell.getBoundingBox(position, this.globalNode.position);
+                    if (!this.controller.getActiveCamera().isInFrustum(bb)) continue;
+
+                    this.generateCell(position);
                 }
             }
         }
@@ -208,7 +176,7 @@ export class StarMap {
         for (let i = 0; i < n; i++) {
             if (this.starBuildQueue.length > 0) {
                 const data = this.starBuildQueue[0];
-                if (this.loadedCells[data.cellString]) {
+                if (this.loadedCells.has(data.cellString)) {
                     const star = this.starTemplate.createInstance(data.name);
                     star.scaling = new Vector3(data.scale, data.scale, data.scale);
                     star.position = data.position;
@@ -218,6 +186,10 @@ export class StarMap {
                     star.actionManager = new ActionManager(this.scene);
 
                     const starSystem = new StarSystemDescriptor(hashVec3(star.position));
+
+                    const starSeed = starSystem.getStarSeed(0);
+                    const starDescriptor = new StarDescriptor(starSeed);
+                    const starColor = starDescriptor.getColor();
 
                     star.actionManager.registerAction(
                         new ExecuteCodeAction(
@@ -230,14 +202,15 @@ export class StarMap {
                         )
                     );
 
-                    star.instancedBuffers.color = new Color4(0.5, 0.2, 0.8, 0.0).scale(2.5);
+                    star.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
 
                     //fade the star in
                     fadeIn(star, 1000);
 
-                    this.loadedCells[data.cellString].push(star);
+                    this.loadedCells.get(data.cellString)?.meshes.push(star);
+
+                    this.starBuildQueue.shift();
                 }
-                this.starBuildQueue.shift();
             }
         }
     }
@@ -259,7 +232,7 @@ function fadeIn(star: InstancedMesh, duration: number) {
     star.getScene().beginAnimation(star, 0, duration / 60);
 }
 
-function fadeOutThenDispose(star: InstancedMesh, duration: number) {
+export function fadeOutThenDispose(star: InstancedMesh, duration: number) {
     const fadeOutAnimation = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
     fadeOutAnimation.setKeys([{
