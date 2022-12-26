@@ -21,7 +21,7 @@ import { Keyboard } from "../inputs/keyboard";
 
 import starTexture from "../../asset/textures/starParticle.png";
 import { hashVec3 } from "../utils/hashVec3";
-import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Button, Control, Rectangle, StackPanel, TextBlock } from "@babylonjs/gui";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 import { StarDescriptor } from "../descriptors/starDescriptor";
 import { BuildData, Cell, Vector3ToString } from "./cell";
@@ -38,9 +38,12 @@ export class StarMap {
 
     static readonly GENERATION_CADENCE = 7;
 
-    private readonly gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-    private readonly namePlate: Rectangle;
-    private readonly nameLabel = new TextBlock();
+    private readonly gui: AdvancedDynamicTexture;
+    private readonly namePlate: StackPanel;
+    private readonly nameLabel: TextBlock;
+    private readonly warpButton: Button;
+
+    private selectedSystemSeed: number | null = null;
 
     private readonly loadedCells: Map<string, Cell> = new Map<string, Cell>();
     private currentCellPosition = Vector3.Zero();
@@ -57,13 +60,35 @@ export class StarMap {
         this.scene.activeCamera = this.controller.getActiveCamera();
         this.controller.inputs.push(new Keyboard());
 
-        this.namePlate = new Rectangle();
+        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+        this.namePlate = new StackPanel();
         this.namePlate.width = "250px";
-        this.namePlate.height = "40px";
+        //this.namePlate.height = "150px";
         this.namePlate.color = "white";
         this.namePlate.background = "black";
+        this.namePlate.linkOffsetY = -100;
+
+        this.nameLabel = new TextBlock();
+        this.nameLabel.height = "100px";
+        this.nameLabel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
+        this.nameLabel.setPadding(10, 15, 10, 15);
+
+        this.warpButton = Button.CreateSimpleButton("warpButton", "WARP");
+        //this.warpButton.width = "100px";
+        this.warpButton.height = "40px";
+        this.warpButton.background = "darkgreen";
+        this.warpButton.fontWeight = "bold";
+        //this.warpButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        this.warpButton.onPointerClickObservable.add(() => {
+            if (this.selectedSystemSeed) {
+                const url = new URL(`random.html?seed=${encodeURIComponent(this.selectedSystemSeed)}`, window.location.href);
+                window.open(url, "_blank")?.focus();
+            } else throw new Error("No system selected!");
+        });
+
         this.namePlate.addControl(this.nameLabel);
-        this.namePlate.linkOffsetY = -50;
+        this.namePlate.addControl(this.warpButton);
 
         const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controller.getActiveCamera()]);
         pipeline.fxaaEnabled = true;
@@ -71,7 +96,8 @@ export class StarMap {
         pipeline.bloomThreshold = 0.0;
         pipeline.bloomWeight = 1.0;
         pipeline.bloomKernel = 128;
-        pipeline.imageProcessing.contrast = 1.7;
+        pipeline.imageProcessing.exposure = 1.1;
+        pipeline.imageProcessing.contrast = 1.0;
 
         this.globalNode = new TransformNode("node", this.scene);
 
@@ -173,7 +199,9 @@ export class StarMap {
             star.isPickable = true;
             star.actionManager = new ActionManager(this.scene);
 
-            const starSystemDescriptor = new StarSystemDescriptor(hashVec3(star.position));
+            const starSystemSeed = hashVec3(star.position) * Number.MAX_SAFE_INTEGER;
+
+            const starSystemDescriptor = new StarSystemDescriptor(starSystemSeed);
 
             const starSeed = starSystemDescriptor.getStarSeed(0);
             const starDescriptor = new StarDescriptor(starSeed);
@@ -185,7 +213,19 @@ export class StarMap {
                         if (this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
 
                         this.namePlate.linkWithMesh(star);
-                        this.nameLabel.text = starSystemDescriptor.getName();
+                        this.nameLabel.text =
+                            "Seed: " + starSystemDescriptor.seed + "\n"
+                            + "Type: " + starDescriptor.getStellarType() + "\n"
+                            + "Planets: " + starSystemDescriptor.getNbPlanets();
+
+                        this.selectedSystemSeed = starSystemSeed;
+                    }
+                )
+            );
+            star.actionManager.registerAction(
+                new ExecuteCodeAction(
+                    ActionManager.OnPointerOutTrigger, (_) => {
+                        console.log("!!!");
                     }
                 )
             );

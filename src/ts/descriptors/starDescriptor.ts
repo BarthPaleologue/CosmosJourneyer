@@ -29,7 +29,7 @@ export class StarDescriptor {
 
     readonly surfaceTemperature: number;
     readonly surfaceColor: Vector3;
-    readonly type: STAR_TYPE;
+    private readonly type: STAR_TYPE;
     readonly radius: number;
 
     readonly mass = 1000;
@@ -57,5 +57,24 @@ export class StarDescriptor {
         this.radius = randRange(50, 200, this.rng, GENERATION_STEPS.RADIUS) * Settings.EARTH_RADIUS;
 
         this.hasRings = uniformRandBool(StarDescriptor.RING_PROPORTION, this.rng, GENERATION_STEPS.RINGS);
+    }
+
+    getStellarType(): string {
+        switch (this.type) {
+            case STAR_TYPE.O:
+                return "O";
+            case STAR_TYPE.B:
+                return "B";
+            case STAR_TYPE.A:
+                return "A";
+            case STAR_TYPE.F:
+                return "F";
+            case STAR_TYPE.G:
+                return "G";
+            case STAR_TYPE.K:
+                return "K";
+            case STAR_TYPE.M:
+                return "M";
+        }
     }
 }

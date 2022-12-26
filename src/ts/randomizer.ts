@@ -42,11 +42,14 @@ Assets.Init(scene).then(() => {
 
     scene.setActiveController(player);
 
-    const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
-    const starSystem = new StarSystem(starSystemSeed, scene);
+    //check if url contains a seed
+    const urlParams = new URLSearchParams(window.location.search);
+    const seed = urlParams.get("seed");
 
-    starSystem.makeStars(1);
-    starSystem.makePlanets(1);
+    const starSystem = new StarSystem(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0), scene);
+
+    starSystem.makeStars(seed ? starSystem.descriptor.getNbStars() : 1);
+    starSystem.makePlanets(seed ? starSystem.descriptor.getNbPlanets() : 1);
 
     document.addEventListener("keydown", (e) => {
         if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
@@ -62,7 +65,7 @@ Assets.Init(scene).then(() => {
 
     starSystem.init();
 
-    positionNearBody(player, starSystem.getBodies()[1], starSystem);
+    positionNearBody(player, starSystem.descriptor.getNbPlanets() > 0 ? starSystem.getBodies()[1] : starSystem.stars[0], starSystem);
 
     scene.executeWhenReady(() => {
         engine.loadingScreen.hideLoadingUI();
