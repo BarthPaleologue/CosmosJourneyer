@@ -20,7 +20,7 @@ export class CloudsPanel extends EditorPanel {
         cloudsToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[1] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            flatClouds.settings.cloudLayerRadius = checkbox.checked ? Settings.EARTH_RADIUS + Settings.CLOUD_LAYER_HEIGHT : 0;
+            flatClouds.settings.cloudLayerRadius = checkbox.checked ? planet.getApparentRadius() + Settings.CLOUD_LAYER_HEIGHT : 0;
         });
         const cloudColorPicker = clearAllEventListenersById("cloudColor") as HTMLInputElement;
         cloudColorPicker.value = flatClouds.settings.cloudColor.toHexString();

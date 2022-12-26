@@ -119,7 +119,7 @@ export class StarSystem {
         }
     }
 
-    public makeSatellite(planet: AbstractBody, seed = planet.rng(100)): TelluricPlanet {
+    public makeSatellite(planet: AbstractBody, seed: number): TelluricPlanet {
         const satellite = new TelluricPlanet(`${planet.name}Sattelite`, this.scene, seed, [planet]);
         const periapsis = 2 * planet.getRadius() + clamp(normalRandom(3, 1, satellite.rng, 90), 0, 20) * planet.getRadius() * 2;
         const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.rng, 92), 1, 1.5);
@@ -132,15 +132,14 @@ export class StarSystem {
         };
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
 
-        this.addBody(satellite);
-        this.planets.push(satellite); //FIXME: this is to be removed
+        this.addPlanet(satellite); //FIXME: this is wrong
 
         return satellite;
     }
 
     public makeSatellites(planet: AbstractBody, n: number): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
-        for (let i = 0; i < n; i++) this.makeSatellite(planet);
+        for (let i = 0; i < n; i++) this.makeSatellite(planet, planet.rng(100 + i));
     }
 
     public translateAllBodies(displacement: Vector3): void {
