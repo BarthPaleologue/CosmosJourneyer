@@ -46,10 +46,10 @@ Assets.Init(scene).then(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const seed = urlParams.get("seed");
 
-    const starSystem = new StarSystem(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0), scene);
+    const starSystem = new StarSystem(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0) * Number.MAX_SAFE_INTEGER, scene);
 
-    starSystem.makeStars(seed ? starSystem.descriptor.getNbStars() : 1);
-    starSystem.makePlanets(seed ? starSystem.descriptor.getNbPlanets() : 1);
+    starSystem.makeStars(starSystem.descriptor.getNbStars());
+    starSystem.makePlanets(starSystem.descriptor.getNbPlanets());
 
     document.addEventListener("keydown", (e) => {
         if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
@@ -65,34 +65,36 @@ Assets.Init(scene).then(() => {
 
     starSystem.init();
 
-    positionNearBody(player, starSystem.descriptor.getNbPlanets() > 0 ? starSystem.getBodies()[1] : starSystem.stars[0], starSystem);
+    positionNearBody(player, starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stars[0], starSystem);
+
+    function updateScene() {
+        const deltaTime = engine.getDeltaTime() / 1000;
+
+        const nearest = starSystem.getNearestBody(scene.getActiveUberCamera().position);
+
+        bodyEditor.update(nearest, starSystem.postProcessManager, scene);
+        helmetOverlay.update(nearest);
+        helmetOverlay.setVisibility(bodyEditor.getVisibility() != EditorVisibility.FULL);
+
+        starSystem.translateAllBodies(player.update(deltaTime));
+
+        if (!collisionWorker.isBusy() && isOrbiting(player, nearest)) {
+            if (nearest.bodyType == BodyType.TELLURIC) {
+                collisionWorker.checkCollision(nearest as TelluricPlanet);
+            }
+        }
+
+        //FIXME: should address stars orbits
+        for (const star of starSystem.stars) star.orbitalProperties.period = 0;
+
+        Assets.ChunkForge.update();
+        starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
+   }
 
     scene.executeWhenReady(() => {
         engine.loadingScreen.hideLoadingUI();
 
-        scene.registerBeforeRender(() => {
-            const deltaTime = engine.getDeltaTime() / 1000;
-
-            const nearest = starSystem.getNearestBody(scene.getActiveUberCamera().position);
-
-            bodyEditor.update(starSystem.getNearestBody(), starSystem.postProcessManager, scene);
-            helmetOverlay.update(nearest);
-            helmetOverlay.setVisibility(bodyEditor.getVisibility() != EditorVisibility.FULL);
-
-            //FIXME: should address stars orbits
-            for (const star of starSystem.stars) star.orbitalProperties.period = 0;
-
-            Assets.ChunkForge.update();
-            starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
-
-            starSystem.translateAllBodies(player.update(deltaTime));
-
-            if (!collisionWorker.isBusy() && isOrbiting(player, nearest)) {
-                if (nearest.bodyType == BodyType.TELLURIC) {
-                    collisionWorker.checkCollision(nearest as TelluricPlanet);
-                }
-            }
-        });
+        scene.registerBeforeRender(() => updateScene());
 
         engine.runRenderLoop(() => scene.render());
     });
