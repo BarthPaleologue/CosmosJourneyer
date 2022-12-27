@@ -78,31 +78,13 @@ export class StarSystem {
 
     public makeTelluricPlanet(seed = this.descriptor.rng(Steps.GENERATE_PLANETS + this.planets.length)): TelluricPlanet {
         const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this.scene, seed, this.stars);
-        planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
-        //TODO: use formula in the research folder
-        planet.physicalProperties.minTemperature = randRangeInt(-50, 5, planet.rng, 80);
-        planet.physicalProperties.maxTemperature = randRangeInt(10, 50, planet.rng, 81);
-
-        planet.material.colorSettings.plainColor.copyFromFloats(
-            //TODO: make this better
-            Math.max(0.22 + centeredRand(planet.rng, 82) / 20, 0),
-            Math.max(0.37 + centeredRand(planet.rng, 83) / 20, 0),
-            Math.max(0.024 + centeredRand(planet.rng, 84) / 20, 0)
-        );
-        planet.material.colorSettings.beachSize = 250 + 100 * centeredRand(planet.rng, 85);
-        planet.material.updateConstants();
-
         this.addPlanet(planet);
-
         return planet;
     }
 
     public makeGasPlanet(seed = this.descriptor.rng(Steps.GENERATE_PLANETS + this.planets.length)): GasPlanet {
         const planet = new GasPlanet(`gasPlanet`, this.scene, seed, this.stars);
-        planet.physicalProperties.rotationPeriod = (24 * 60 * 60) / 10;
-
         this.addPlanet(planet);
-
         return planet;
     }
 
@@ -111,10 +93,10 @@ export class StarSystem {
         for (let i = 0; i < n; i++) {
             if (uniformRandBool(0.5, this.descriptor.rng, Steps.CHOOSE_PLANET_TYPE + this.planets.length)) {
                 const planet = this.makeTelluricPlanet();
-                this.makeSatellites(planet, randRangeInt(0, 3, planet.rng, 86));
+                this.makeSatellites(planet, planet.descriptor.nbMoons);
             } else {
                 const planet = this.makeGasPlanet();
-                this.makeSatellites(planet, randRangeInt(0, 3, planet.rng, 86));
+                this.makeSatellites(planet, planet.descriptor.nbMoons);
             }
         }
     }
@@ -131,9 +113,9 @@ export class StarSystem {
             orientationQuaternion: satellite.transform.getRotationQuaternion()
         };
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
+        satellite.material.updateConstants();
 
-        this.addPlanet(satellite); //FIXME: this is wrong
-
+        this.addPlanet(satellite); //FIXME: this is wrong, satellites are not planets
         return satellite;
     }
 

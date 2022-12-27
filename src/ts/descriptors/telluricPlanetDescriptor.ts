@@ -1,15 +1,18 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
 
 enum GENERATION_STEPS {
     RADIUS = 1000,
-    RINGS = 1200,
+    PRESSURE = 1100,
+    WATER_AMOUNT = 1200,
+    RINGS = 1400,
+    TERRAIN = 1500,
     NB_MOONS = 10,
     MOONS = 11,
 }
 
-export class GasPlanetDescriptor {
+export class TelluricPlanetDescriptor {
     readonly seed: number;
     readonly rng: (step: number) => number;
 
@@ -23,11 +26,11 @@ export class GasPlanetDescriptor {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
-        this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng, GENERATION_STEPS.RADIUS);
+        this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
 
-        this.hasRings = uniformRandBool(0.8, this.rng, GENERATION_STEPS.RINGS);
+        this.hasRings = uniformRandBool(0.6, this.rng, GENERATION_STEPS.RINGS);
 
-        this.nbMoons = randRangeInt(0, 3, this.rng, GENERATION_STEPS.NB_MOONS);
+        this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);
     }
 
     getMoonSeed(index: number) {

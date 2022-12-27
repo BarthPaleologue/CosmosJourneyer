@@ -12,7 +12,7 @@ import { Settings } from "../../settings";
 import { SolidPhysicalProperties } from "../physicalProperties";
 import { TelluricMaterial } from "../../materials/telluricMaterial";
 import { IOrbitalBody } from "../../orbits/iOrbitalBody";
-import { normalRandom, uniformRandBool } from "extended-random";
+import { normalRandom, randRangeInt } from "extended-random";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { clamp } from "terrain-generation";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
@@ -21,13 +21,12 @@ import { UberScene } from "../../uberCore/uberScene";
 import { Planet } from "./planet";
 import { Star } from "../stars/star";
 import { BlackHole } from "../blackHole";
+import { TelluricPlanetDescriptor } from "../../descriptors/telluricPlanetDescriptor";
 
 enum Steps {
     RADIUS = 1000,
     PRESSURE = 1100,
     WATER_AMOUNT = 1200,
-    ATMOSPHERE = 1300,
-    RINGS = 1400,
     TERRAIN = 1500
 }
 
@@ -48,6 +47,8 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
     isSatelliteOfTelluric = false;
     isSatelliteOfGas = false;
 
+    readonly descriptor: TelluricPlanetDescriptor;
+
     /**
      * New Telluric Planet
      * @param name The name of the planet
@@ -57,6 +58,8 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
      */
     constructor(name: string, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
         super(name, seed, parentBodies);
+
+        this.descriptor = new TelluricPlanetDescriptor(seed);
 
         for (const parentBody of parentBodies) {
             if (parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true;
@@ -68,7 +71,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
         } else if (this.isSatelliteOfGas) {
             this.radius = Math.max(0.02, normalRandom(0.5, 0.1, this.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
         } else {
-            this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
+            this.radius = this.descriptor.radius;
         }
 
         let pressure;
@@ -86,9 +89,9 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
 
         this.physicalProperties = {
             mass: 10,
-            rotationPeriod: 60 * 60 * 24,
-            minTemperature: -60,
-            maxTemperature: 40,
+            rotationPeriod: 60 * 60 * 24 / 10,
+            minTemperature: randRangeInt(-50, 5, this.descriptor.rng, 80),
+            maxTemperature: randRangeInt(10, 50, this.descriptor.rng, 81),
             pressure: pressure,
             waterAmount: waterAmount,
             oceanLevel: 0
@@ -118,7 +121,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
             this.physicalProperties.oceanLevel = 0;
         }
 
-        if (uniformRandBool(0.6, this.rng, Steps.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
+        if (this.descriptor.hasRings && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
             this.postProcesses.rings = true;
         }
 
@@ -139,15 +142,15 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
 
         if (this.isSatelliteOfTelluric) this.terrainSettings.continents_fragmentation /= 2;
 
-        this.material = new TelluricMaterial(this.name, this.transform, this.getRadius(), this.seed, this.terrainSettings, this.physicalProperties, scene);
+        this.material = new TelluricMaterial(this.name, this.transform, this.radius, this.descriptor, this.terrainSettings, this.physicalProperties, scene);
 
         this.sides = [
-            new ChunkTree(Direction.Up, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene),
-            new ChunkTree(Direction.Down, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene),
-            new ChunkTree(Direction.Forward, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene),
-            new ChunkTree(Direction.Backward, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene),
-            new ChunkTree(Direction.Right, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene),
-            new ChunkTree(Direction.Left, this.name, this.seed, this.getRadius(), this.terrainSettings, this.transform, this.material, scene)
+            new ChunkTree(Direction.Up, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene),
+            new ChunkTree(Direction.Down, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene),
+            new ChunkTree(Direction.Forward, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene),
+            new ChunkTree(Direction.Backward, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene),
+            new ChunkTree(Direction.Right, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene),
+            new ChunkTree(Direction.Left, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene)
         ];
     }
 

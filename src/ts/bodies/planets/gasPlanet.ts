@@ -42,7 +42,7 @@ export class GasPlanet extends AbstractBody implements Planet {
         this.physicalProperties = {
             // FIXME: choose physically accurates values
             mass: 10,
-            rotationPeriod: 24 * 60 * 60,
+            rotationPeriod: 24 * 60 * 60 / 10,
             minTemperature: -180,
             maxTemperature: 200,
             pressure: 1

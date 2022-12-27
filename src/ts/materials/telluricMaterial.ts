@@ -12,6 +12,8 @@ import { BlackHole } from "../bodies/blackHole";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { SolidPhysicalProperties } from "../bodies/physicalProperties";
+import { centeredRand } from "extended-random";
+import { TelluricPlanetDescriptor } from "../descriptors/telluricPlanetDescriptor";
 
 const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -28,7 +30,7 @@ export class TelluricMaterial extends ShaderMaterial {
         planetName: string,
         planet: BasicTransform,
         planetRadius: number,
-        planetSeed: number,
+        planetDescriptor: TelluricPlanetDescriptor,
         terrainSettings: TerrainSettings,
         physicalProperties: SolidPhysicalProperties,
         scene: UberScene
@@ -103,12 +105,18 @@ export class TelluricMaterial extends ShaderMaterial {
 
             snowColor: new Color3(1, 1, 1),
             steepColor: new Color3(115, 100, 100).scaleInPlace(1 / 255),
-            plainColor: new Color3(56, 94, 6).scaleInPlace(1 / 255),
+            //plainColor: plainColor: new Color3(56, 94, 6).scaleInPlace(1 / 255),
+            plainColor: new Color3(
+                //TODO: make this better
+                Math.max(0.22 + centeredRand(planetDescriptor.rng, 82) / 20, 0),
+                Math.max(0.37 + centeredRand(planetDescriptor.rng, 83) / 20, 0),
+                Math.max(0.024 + centeredRand(planetDescriptor.rng, 84) / 20, 0)
+            ),
             beachColor: new Color3(132, 114, 46).scaleInPlace(1 / 255),
             desertColor: new Color3(178, 107, 42).scaleInPlace(1 / 255),
             bottomColor: new Color3(0.5, 0.5, 0.5),
 
-            beachSize: 500,
+            beachSize: 250 + 100 * centeredRand(planetDescriptor.rng, 85),
             steepSharpness: 2,
             normalSharpness: 0.5
         };
@@ -118,7 +126,7 @@ export class TelluricMaterial extends ShaderMaterial {
             MaterialHelper.BindLogDepth(null, effect, scene);
         });
 
-        this.setFloat("seed", planetSeed);
+        this.setFloat("seed", planetDescriptor.seed);
 
         if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 
