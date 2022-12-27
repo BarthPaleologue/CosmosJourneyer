@@ -4,6 +4,7 @@ import { normalRandom, randRange, uniformRandBool } from "extended-random";
 import { Vector3 } from "@babylonjs/core";
 import { getRgbFromTemperature } from "../utils/specrend";
 import { Settings } from "../settings";
+import { BodyDescriptor } from "./interfaces";
 
 enum GENERATION_STEPS {
     NAME,
@@ -22,8 +23,9 @@ export enum STAR_TYPE {
     M,
 }
 
-export class StarDescriptor {
+export class StarDescriptor implements BodyDescriptor {
     readonly rng: (step: number) => number;
+    readonly seed: number;
 
     readonly name: string;
 
@@ -39,7 +41,8 @@ export class StarDescriptor {
     readonly hasRings: boolean;
 
     constructor(seed: number) {
-        this.rng = seededSquirrelNoise(seed * Number.MAX_SAFE_INTEGER);
+        this.seed = seed * Number.MAX_SAFE_INTEGER;
+        this.rng = seededSquirrelNoise(this.seed);
         this.name = "Star";
 
         this.surfaceTemperature = clamp(normalRandom(5778, 2000, this.rng, GENERATION_STEPS.TEMPERATURE), 3000, 10000);

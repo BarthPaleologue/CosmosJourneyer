@@ -74,28 +74,15 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
             this.radius = this.descriptor.radius;
         }
 
-        let pressure;
         if (this.isSatelliteOfTelluric) {
-            pressure = Math.max(normalRandom(0.01, 0.01, this.rng, Steps.PRESSURE), 0);
-        } else {
-            pressure = Math.max(normalRandom(0.9, 0.2, this.rng, Steps.PRESSURE), 0);
+            this.descriptor.physicalProperties.pressure = Math.max(normalRandom(0.01, 0.01, this.rng, Steps.PRESSURE), 0);
         }
 
-        const waterAmount = Math.max(normalRandom(1.0, 0.3, this.rng, Steps.WATER_AMOUNT), 0);
-
-        if (this.radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
+        if (this.radius <= 0.3 * Settings.EARTH_RADIUS) this.descriptor.physicalProperties.pressure = 0;
 
         this.ratio = this.radius / Settings.EARTH_RADIUS;
 
-        this.physicalProperties = {
-            mass: 10,
-            rotationPeriod: 60 * 60 * 24 / 10,
-            minTemperature: randRangeInt(-50, 5, this.descriptor.rng, 80),
-            maxTemperature: randRangeInt(10, 50, this.descriptor.rng, 81),
-            pressure: pressure,
-            waterAmount: waterAmount,
-            oceanLevel: 0
-        };
+        this.physicalProperties = this.descriptor.physicalProperties;
 
         this.postProcesses = {
             overlay: true,
@@ -108,7 +95,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
         const waterBoilingPoint = waterBoilingPointCelsius(this.physicalProperties.pressure);
         const waterFreezingPoint = 0.0;
         const epsilon = 0.05;
-        if (pressure > epsilon) {
+        if (this.descriptor.physicalProperties.pressure > epsilon) {
             if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
                 this.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
                 this.postProcesses.ocean = true;
@@ -125,21 +112,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
             this.postProcesses.rings = true;
         }
 
-        const continentsFragmentation = clamp(normalRandom(0.45, 0.03, this.rng, Steps.TERRAIN), 0, 0.95);
-
-        this.terrainSettings = {
-            continents_frequency: this.ratio,
-            continents_fragmentation: continentsFragmentation,
-
-            bumps_frequency: 30 * this.ratio,
-
-            max_bump_height: 1.5e3,
-            max_mountain_height: 15e3,
-            continent_base_height: this.physicalProperties.oceanLevel * 2.5,
-
-            mountains_frequency: 20 * this.ratio,
-        };
-
+        this.terrainSettings = this.descriptor.terrainSettings;
         if (this.isSatelliteOfTelluric) this.terrainSettings.continents_fragmentation /= 2;
 
         this.material = new TelluricMaterial(this.name, this.transform, this.radius, this.descriptor, this.terrainSettings, this.physicalProperties, scene);
@@ -156,7 +129,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
 
     public generateCollisionTask(relativePosition: Vector3): TransferCollisionData {
         const collisionData: TransferCollisionData = {
-            seed: this.seed,
+            seed: this.descriptor.seed,
             taskType: TaskType.Collision,
             planetName: this.name,
             terrainSettings: this.terrainSettings,

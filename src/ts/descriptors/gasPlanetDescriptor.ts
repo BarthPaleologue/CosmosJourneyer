@@ -1,6 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
+import { BodyDescriptor } from "./interfaces";
 
 enum GENERATION_STEPS {
     RADIUS = 1000,
@@ -9,7 +10,7 @@ enum GENERATION_STEPS {
     MOONS = 11,
 }
 
-export class GasPlanetDescriptor {
+export class GasPlanetDescriptor implements BodyDescriptor {
     readonly seed: number;
     readonly rng: (step: number) => number;
 
@@ -31,7 +32,7 @@ export class GasPlanetDescriptor {
     }
 
     getMoonSeed(index: number) {
-        if(index > this.nbMoons) throw new Error("Moon out of bound! " + index);
+        if (index > this.nbMoons) throw new Error("Moon out of bound! " + index);
         return this.rng(GENERATION_STEPS.MOONS + index);
     }
 }
