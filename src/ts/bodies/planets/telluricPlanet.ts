@@ -97,7 +97,6 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
         const epsilon = 0.05;
         if (this.descriptor.physicalProperties.pressure > epsilon) {
             if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
-                this.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
                 this.postProcesses.ocean = true;
                 this.postProcesses.clouds = true;
             } else {

@@ -51,10 +51,11 @@ Assets.Init(scene).then(() => {
     const sun = starSystem.makeStar(0.51);
     sun.orbitalProperties.period = 60 * 60 * 24;
 
-    const planet = starSystem.makeTelluricPlanet(0.4233609183800225);
+    const planet = starSystem.makeTelluricPlanet(0.4233609183800225 * Number.MAX_SAFE_INTEGER);
 
     planet.physicalProperties.minTemperature = -37;
     planet.physicalProperties.maxTemperature = 40;
+    //planet.physicalProperties.oceanLevel = 25e2;
     planet.material.updateConstants();
 
     planet.orbitalProperties = {

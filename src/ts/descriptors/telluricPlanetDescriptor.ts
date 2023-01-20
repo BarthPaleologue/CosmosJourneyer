@@ -45,16 +45,18 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
             waterAmount: Math.max(normalRandom(1.0, 0.3, this.rng, GENERATION_STEPS.WATER_AMOUNT), 0),
             oceanLevel: 0
         }
+        
+        this.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
 
         this.terrainSettings = {
             continents_frequency: this.radius / Settings.EARTH_RADIUS,
-            continents_fragmentation: clamp(normalRandom(0.45, 0.03, this.rng, GENERATION_STEPS.TERRAIN), 0, 0.95),
+            continents_fragmentation: clamp(normalRandom(0.65, 0.03, this.rng, GENERATION_STEPS.TERRAIN), 0, 0.95),
 
             bumps_frequency: 30 * this.radius / Settings.EARTH_RADIUS,
 
             max_bump_height: 1.5e3,
-            max_mountain_height: 15e3,
-            continent_base_height: this.physicalProperties.oceanLevel * 2.5,
+            max_mountain_height: 10e3,
+            continent_base_height: this.physicalProperties.oceanLevel * 1.9,
 
             mountains_frequency: 20 * this.radius / Settings.EARTH_RADIUS,
         };

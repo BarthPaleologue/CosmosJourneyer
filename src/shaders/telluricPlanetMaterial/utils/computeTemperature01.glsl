@@ -1,6 +1,6 @@
 float computeTemperature01(float elevation01, float absLatitude01, float ndl, float dayDuration) {
     // TODO: do not hardcode both
-    float temperatureHeightFalloff = 1.7;
+    float temperatureHeightFalloff = 1.2;
     float temperatureLatitudeFalloff = 1.0;
 
     // TODO: do not hardcode that factor
