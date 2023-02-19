@@ -1,9 +1,8 @@
 precision lowp float;
 
 #define PI 3.1415926535897932
-#define PI4 97.40909103400242
 #define POINTS_FROM_CAMERA 12 // number sample points along camera ray
-#define OPTICAL_DEPTH_POINTS 8 // number sample points along light ray
+#define OPTICAL_DEPTH_POINTS 12 // number sample points along light ray
 
 // varying
 varying vec2 vUV; // screen coordinates
@@ -52,9 +51,10 @@ uniform float mieHaloRadius;
 float densityAtPoint(vec3 samplePoint) {
     float heightAboveSurface = length(samplePoint - planetPosition) - planetRadius;    
     float height01 = heightAboveSurface / (atmosphereRadius - planetRadius); // normalized height between 0 and 1
-    float height01_fixed = height01 = remap(height01, 0.0, 1.0, 0.4, 1.0);//remap(height01, 0.0, 1.0, 0.5, 1.0); 
+    float localDensity = densityModifier * exp(-height01 * falloffFactor);
+    localDensity *= (1.0 - height01);
 
-    return densityModifier * exp(-height01_fixed * falloffFactor); // density with exponential falloff
+    return localDensity; // density with exponential falloff
 }
 
 
@@ -81,8 +81,11 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     vec3 wavelength = vec3(redWaveLength, greenWaveLength, blueWaveLength); // the wavelength that will be scattered (rgb so we get everything)
 
     // Scattering Coeffs
-    vec3 rayleighCoeffs = pow(400.0 / wavelength.xyz, vec3(4.0)) * rayleighStrength; // the scattering is inversely proportional to the fourth power of the wave length
+    vec3 rayleighCoeffs = pow(1063.0 / wavelength.xyz, vec3(4.0)) * rayleighStrength; // the scattering is inversely proportional to the fourth power of the wave length
+    rayleighCoeffs /= planetRadius;
+
     vec3 mieCoeffs = vec3(1e-2) * mieStrength;
+    mieCoeffs /= planetRadius;
 
     float stepSize = rayLength / float(POINTS_FROM_CAMERA - 1); // the ray length between sample points
 
@@ -94,16 +97,16 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     vec3 starDir = normalize(starPosition - planetPosition);
 
     for (int i = 0 ; i < POINTS_FROM_CAMERA ; i++, samplePoint += rayDir * stepSize) {
-	float t0, t1;
-    	rayIntersectSphere(samplePoint, starDir, planetPosition, atmosphereRadius, t0, t1);
-    	float sunRayLengthInAtm = t1 - t0;
-  
+	    float _, t1;
+    	rayIntersectSphere(samplePoint, starDir, planetPosition, atmosphereRadius, _, t1);
+    	float sunRayLengthInAtm = t1;
+
   	//float height = length(samplePoint - planetPosition);        
 	//float heightAboveSurface = height - planetRadius;
     	//float height01 = heightAboveSurface / (atmosphereRadius - planetRadius); // normalized height between 0 and 1
   	//float lutx = (dot(starDir, normalize(samplePoint - planetPosition)) + 1.0) / 2.0;
 	//vec3 sunRayOpticalDepth = texture2D(atmosphereLUT, vec2(lutx, height01)).rgb;
-	vec3 sunRayOpticalDepth = opticalDepth(samplePoint, starDir, sunRayLengthInAtm);  // scattered from the sun to the point
+	    vec3 sunRayOpticalDepth = opticalDepth(samplePoint, starDir, sunRayLengthInAtm);  // scattered from the sun to the point
 
         vec3 viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, stepSize * float(i)); // scattered from the point to the camera
         
@@ -130,7 +133,7 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
 
     // scattering depends on the direction of the light ray and the view ray : it's the rayleigh phase function
     // https://developer.nvidia.com/gpugems/gpugems2/part-ii-shading-lighting-and-shadows/chapter-16-accurate-atmospheric-scattering
-    float phaseRayleigh = (3.0 / 4.0) * (1.0 + costheta2);
+    float phaseRayleigh = (3.0 / (16.0 * PI)) * (1.0 + costheta2);
     
     inScatteredRayleigh *= phaseRayleigh; // apply rayleigh pahse
     inScatteredMie *= phaseMie;

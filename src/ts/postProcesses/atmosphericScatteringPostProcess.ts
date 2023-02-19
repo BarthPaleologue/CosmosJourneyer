@@ -34,9 +34,9 @@ export class AtmosphericScatteringPostProcess extends BodyPostProcess {
     constructor(name: string, planet: TelluricPlanet | GasPlanet, atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
-            falloffFactor: 24,
-            intensity: 3 * planet.physicalProperties.pressure,
-            rayleighStrength: 0.4,
+            falloffFactor: 15,
+            intensity: 15 * planet.physicalProperties.pressure,
+            rayleighStrength: 1,
             mieStrength: 0.2,
             densityModifier: 1,
             redWaveLength: 700 * (1 + centeredRand(planet.rng, 1300) / 6),
