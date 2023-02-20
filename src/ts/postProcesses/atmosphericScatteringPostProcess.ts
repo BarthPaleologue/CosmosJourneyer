@@ -34,10 +34,10 @@ export class AtmosphericScatteringPostProcess extends BodyPostProcess {
     constructor(name: string, planet: TelluricPlanet | GasPlanet, atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
-            falloffFactor: 15,
+            falloffFactor: 10,
             intensity: 15 * planet.physicalProperties.pressure,
             rayleighStrength: 1,
-            mieStrength: 0.2,
+            mieStrength: 1,
             densityModifier: 1,
             redWaveLength: 700 * (1 + centeredRand(planet.rng, 1300) / 6),
             greenWaveLength: 530 * (1 + centeredRand(planet.rng, 1310) / 6),
@@ -122,13 +122,13 @@ export class AtmosphericScatteringPostProcess extends BodyPostProcess {
         ];
 
         const samplers: ShaderSamplers = [
-        	...getSamplers(scene),
+            ...getSamplers(scene),
             {
-            	name: "atmosphereLUT",
-            	type: ShaderDataType.Texture,
-            	get: () => {
-            	    return Assets.AtmosphereLUT;
-            	}
+                name: "atmosphereLUT",
+                type: ShaderDataType.Texture,
+                get: () => {
+                    return Assets.AtmosphereLUT;
+                }
             }
         ];
 
