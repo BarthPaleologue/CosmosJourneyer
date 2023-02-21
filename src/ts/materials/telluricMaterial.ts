@@ -8,7 +8,7 @@ import { flattenVector3Array } from "../utils/algebra";
 import { UberScene } from "../uberCore/uberScene";
 import { Star } from "../bodies/stars/star";
 import { AbstractController } from "../uberCore/abstractController";
-import { BlackHole } from "../bodies/blackHole";
+import { BlackHole } from "../bodies/stars/blackHole";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { SolidPhysicalProperties } from "../bodies/physicalProperties";
@@ -29,10 +29,7 @@ export class TelluricMaterial extends ShaderMaterial {
     constructor(
         planetName: string,
         planet: BasicTransform,
-        planetRadius: number,
         planetDescriptor: TelluricPlanetDescriptor,
-        terrainSettings: TerrainSettings,
-        physicalProperties: SolidPhysicalProperties,
         scene: UberScene
     ) {
         super(`${planetName}SurfaceColor`, scene, shaderName, {
@@ -97,9 +94,9 @@ export class TelluricMaterial extends ShaderMaterial {
         });
 
         this.planet = planet;
-        this.planetRadius = planetRadius;
-        this.terrainSettings = terrainSettings;
-        this.physicalProperties = physicalProperties;
+        this.planetRadius = planetDescriptor.radius;
+        this.terrainSettings = planetDescriptor.terrainSettings;
+        this.physicalProperties = planetDescriptor.physicalProperties;
         this.colorSettings = {
             mode: ColorMode.DEFAULT,
 

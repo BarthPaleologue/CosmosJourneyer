@@ -17,7 +17,7 @@ import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planet } from "./planet";
 import { Star } from "../stars/star";
-import { BlackHole } from "../blackHole";
+import { BlackHole } from "../stars/blackHole";
 import { TelluricPlanetDescriptor } from "../../descriptors/telluricPlanetDescriptor";
 
 enum Steps {
@@ -27,8 +27,6 @@ enum Steps {
 
 export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
     override readonly bodyType = BodyType.TELLURIC;
-
-    override readonly radius: number;
 
     readonly ratio: number;
 
@@ -63,20 +61,18 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
         }
 
         if (this.isSatelliteOfTelluric) {
-            this.radius = Math.max(0.02, normalRandom(0.08, 0.03, this.descriptor.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
+            this.descriptor.radius = Math.max(0.02, normalRandom(0.08, 0.03, this.descriptor.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
         } else if (this.isSatelliteOfGas) {
-            this.radius = Math.max(0.02, normalRandom(0.5, 0.1, this.descriptor.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
-        } else {
-            this.radius = this.descriptor.radius;
+            this.descriptor.radius = Math.max(0.02, normalRandom(0.5, 0.1, this.descriptor.rng, Steps.RADIUS)) * Settings.EARTH_RADIUS;
         }
 
         if (this.isSatelliteOfTelluric) {
             this.descriptor.physicalProperties.pressure = Math.max(normalRandom(0.01, 0.01, this.descriptor.rng, Steps.PRESSURE), 0);
         }
 
-        if (this.radius <= 0.3 * Settings.EARTH_RADIUS) this.descriptor.physicalProperties.pressure = 0;
+        if (this.getRadius() <= 0.3 * Settings.EARTH_RADIUS) this.descriptor.physicalProperties.pressure = 0;
 
-        this.ratio = this.radius / Settings.EARTH_RADIUS;
+        this.ratio = this.getRadius() / Settings.EARTH_RADIUS;
 
         this.transform.rotate(Axis.X, this.descriptor.physicalProperties.axialTilt);
 
@@ -110,15 +106,15 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
         this.terrainSettings = this.descriptor.terrainSettings;
         if (this.isSatelliteOfTelluric) this.terrainSettings.continents_fragmentation /= 2;
 
-        this.material = new TelluricMaterial(this.name, this.transform, this.radius, this.descriptor, this.terrainSettings, this.descriptor.physicalProperties, scene);
+        this.material = new TelluricMaterial(this.name, this.transform, this.descriptor, scene);
 
         this.sides = [
-            new ChunkTree(Direction.Up, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene),
-            new ChunkTree(Direction.Down, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene),
-            new ChunkTree(Direction.Forward, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene),
-            new ChunkTree(Direction.Backward, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene),
-            new ChunkTree(Direction.Right, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene),
-            new ChunkTree(Direction.Left, this.name, this.descriptor, this.radius, this.terrainSettings, this.transform, this.material, scene)
+            new ChunkTree(Direction.Up, this.name, this.descriptor, this.transform, this.material, scene),
+            new ChunkTree(Direction.Down, this.name, this.descriptor, this.transform, this.material, scene),
+            new ChunkTree(Direction.Forward, this.name, this.descriptor, this.transform, this.material, scene),
+            new ChunkTree(Direction.Backward, this.name, this.descriptor, this.transform, this.material, scene),
+            new ChunkTree(Direction.Right, this.name, this.descriptor, this.transform, this.material, scene),
+            new ChunkTree(Direction.Left, this.name, this.descriptor, this.transform, this.material, scene)
         ];
     }
 

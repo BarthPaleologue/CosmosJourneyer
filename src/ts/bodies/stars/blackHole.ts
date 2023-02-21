@@ -1,10 +1,10 @@
-import { AbstractBody } from "./abstractBody";
-import { BodyType } from "./interfaces";
-import { BlackHolePostProcesses } from "./postProcessesInterfaces";
-import { PhysicalProperties } from "./physicalProperties";
-import { BlackHoleDescriptor } from "../descriptors/blackHoleDescriptor";
-import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
-import { BodyDescriptor } from "../descriptors/interfaces";
+import { AbstractBody } from "../abstractBody";
+import { BodyType } from "../interfaces";
+import { BlackHolePostProcesses } from "../postProcessesInterfaces";
+import { PhysicalProperties } from "../physicalProperties";
+import { BlackHoleDescriptor } from "../../descriptors/blackHoleDescriptor";
+import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
+import { BodyDescriptor } from "../../descriptors/interfaces";
 
 export class BlackHole extends AbstractBody {
     readonly bodyType: BodyType = BodyType.BLACK_HOLE;

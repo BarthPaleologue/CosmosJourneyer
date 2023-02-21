@@ -6,7 +6,7 @@ import { Assets } from "../assets";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { centeredRand } from "extended-random";
-import { BlackHole } from "../bodies/blackHole";
+import { BlackHole } from "../bodies/stars/blackHole";
 import { Star } from "../bodies/stars/star";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { GasPlanet } from "../bodies/planets/gasPlanet";

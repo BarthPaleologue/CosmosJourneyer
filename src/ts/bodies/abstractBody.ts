@@ -30,8 +30,6 @@ export abstract class AbstractBody implements IOrbitalBody {
 
     abstract readonly descriptor: BodyDescriptor;
 
-    abstract readonly radius: number;
-
     readonly parentBodies: AbstractBody[];
 
     depth: number;
@@ -61,7 +59,7 @@ export abstract class AbstractBody implements IOrbitalBody {
      * Returns the radius of the celestial body
      */
     public getRadius(): number {
-        return this.radius;
+        return this.descriptor.radius;
     }
 
     /**

@@ -9,7 +9,7 @@ import { TelluricPlanet } from "./planets/telluricPlanet";
 import { GasPlanet } from "./planets/gasPlanet";
 import { clamp } from "terrain-generation";
 import { getOrbitalPeriod } from "../orbits/kepler";
-import { BlackHole } from "./blackHole";
+import { BlackHole } from "./stars/blackHole";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 

@@ -4,7 +4,7 @@ import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.gls
 import {UberScene} from "../uberCore/uberScene";
 import {getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms} from "./uniforms";
 import {ShaderDataType, ShaderSamplers, ShaderUniforms} from "../uberCore/postProcesses/uberPostProcess";
-import {BlackHole} from "../bodies/blackHole";
+import {BlackHole} from "../bodies/stars/blackHole";
 import {Star} from "../bodies/stars/star";
 import {TelluricPlanet} from "../bodies/planets/telluricPlanet";
 import {BodyPostProcess} from "./bodyPostProcess";

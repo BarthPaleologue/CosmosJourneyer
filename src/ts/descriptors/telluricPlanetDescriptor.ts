@@ -27,7 +27,7 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
     readonly seed: number;
     readonly rng: (step: number) => number;
 
-    readonly radius: number;
+    radius: number;
 
     readonly orbitalProperties: IOrbitalProperties;
 

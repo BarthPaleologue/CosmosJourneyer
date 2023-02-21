@@ -5,6 +5,7 @@ import starMaterialFragment from "../../shaders/starMaterial/fragment.glsl";
 import starMaterialVertex from "../../shaders/starMaterial/vertex.glsl";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { StarPhysicalProperties } from "../bodies/physicalProperties";
+import { StarDescriptor } from "../descriptors/starDescriptor";
 
 const shaderName = "starMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;
@@ -15,14 +16,14 @@ export class StarMaterial extends ShaderMaterial {
     physicalProperties: StarPhysicalProperties;
     starSeed: number;
 
-    constructor(star: BasicTransform, starSeed: number, physicalProperties: StarPhysicalProperties, scene: Scene) {
+    constructor(star: BasicTransform, descriptor: StarDescriptor, scene: Scene) {
         super("starColor", scene, shaderName, {
             attributes: ["position"],
             uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time", "logarithmicDepthConstant"]
         });
         this.star = star;
-        this.physicalProperties = physicalProperties;
-        this.starSeed = starSeed;
+        this.physicalProperties = descriptor.physicalProperties;
+        this.starSeed = descriptor.seed;
     }
 
     public update(internalTime: number) {

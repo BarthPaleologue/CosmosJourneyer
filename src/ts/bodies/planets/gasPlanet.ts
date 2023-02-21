@@ -8,13 +8,11 @@ import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planet } from "./planet";
 import { Star } from "../stars/star";
-import { BlackHole } from "../blackHole";
+import { BlackHole } from "../stars/blackHole";
 import { GasPlanetDescriptor } from "../../descriptors/gasPlanetDescriptor";
 
 export class GasPlanet extends AbstractBody implements Planet {
     override readonly bodyType = BodyType.GAS;
-
-    override readonly radius;
 
     override readonly postProcesses: PlanetPostProcesses;
 
@@ -35,8 +33,6 @@ export class GasPlanet extends AbstractBody implements Planet {
 
         this.descriptor = new GasPlanetDescriptor(seed, parentBodies.map((body) => body.descriptor));
 
-        this.radius = this.descriptor.radius;
-
         this.mesh = MeshBuilder.CreateSphere(
             `${name}Mesh`,
             {
@@ -47,7 +43,7 @@ export class GasPlanet extends AbstractBody implements Planet {
         );
         this.mesh.parent = this.transform.node;
 
-        this.material = new GasPlanetMaterial(this.name, this.transform, this.descriptor.radius, this.descriptor.seed, this.descriptor.rng, scene);
+        this.material = new GasPlanetMaterial(this.name, this.transform, this.descriptor, scene);
         this.mesh.material = this.material;
 
         this.postProcesses = {

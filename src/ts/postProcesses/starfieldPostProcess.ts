@@ -7,7 +7,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Settings } from "../settings";
-import { BlackHole } from "../bodies/blackHole";
+import { BlackHole } from "../bodies/stars/blackHole";
 import { Star } from "../bodies/stars/star";
 import { nearestBody } from "../utils/nearestBody";
 import { AbstractBody } from "../bodies/abstractBody";

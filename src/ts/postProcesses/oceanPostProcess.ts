@@ -6,7 +6,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { Star } from "../bodies/stars/star";
-import { BlackHole } from "../bodies/blackHole";
+import { BlackHole } from "../bodies/stars/blackHole";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { BodyPostProcess } from "./bodyPostProcess";
 

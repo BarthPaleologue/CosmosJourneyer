@@ -47,8 +47,6 @@ export class ChunkTree {
      * @param direction
      * @param planetName
      * @param planetDescriptor
-     * @param planetRadius
-     * @param terrainSettings
      * @param parent
      * @param material
      * @param scene
@@ -57,16 +55,14 @@ export class ChunkTree {
         direction: Direction,
         planetName: string,
         planetDescriptor: TelluricPlanetDescriptor,
-        planetRadius: number,
-        terrainSettings: TerrainSettings,
         parent: BasicTransform,
         material: Material,
         scene: UberScene
     ) {
-        this.rootChunkLength = planetRadius * 2;
+        this.rootChunkLength = planetDescriptor.radius * 2;
         this.planetName = planetName;
         this.planetSeed = planetDescriptor.seed;
-        this.terrainSettings = terrainSettings;
+        this.terrainSettings = planetDescriptor.terrainSettings;
 
         this.minDepth = 1; //Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 19), 0);
         this.maxDepth = Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 12), 0);

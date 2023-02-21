@@ -4,7 +4,7 @@ import blackHoleFragment from "../../shaders/blackhole.glsl";
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
-import { BlackHole } from "../bodies/blackHole";
+import { BlackHole } from "../bodies/stars/blackHole";
 import { BodyPostProcess } from "./bodyPostProcess";
 
 const shaderName = "blackhole";

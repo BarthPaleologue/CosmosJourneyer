@@ -4,7 +4,7 @@ import { BloomEffect, Engine, FxaaPostProcess, PostProcessRenderEffect, Texture 
 import { OceanPostProcess } from "./oceanPostProcess";
 import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
 import { Star } from "../bodies/stars/star";
-import { BlackHole } from "../bodies/blackHole";
+import { BlackHole } from "../bodies/stars/blackHole";
 import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";

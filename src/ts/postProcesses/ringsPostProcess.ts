@@ -6,7 +6,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { ShaderDataType, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { randRange } from "extended-random";
-import { BlackHole } from "../bodies/blackHole";
+import { BlackHole } from "../bodies/stars/blackHole";
 import { Star } from "../bodies/stars/star";
 import { BodyPostProcess } from "./bodyPostProcess";
 

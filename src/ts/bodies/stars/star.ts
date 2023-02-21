@@ -8,7 +8,6 @@ import { StarMaterial } from "../../materials/starMaterial";
 import { UberScene } from "../../uberCore/uberScene";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { StarDescriptor } from "../../descriptors/starDescriptor";
-import { BodyDescriptor } from "../../descriptors/interfaces";
 
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
@@ -18,8 +17,6 @@ export class Star extends AbstractBody {
     override readonly bodyType = BodyType.STAR;
 
     public override postProcesses: StarPostProcesses;
-
-    override readonly radius;
 
     readonly descriptor: StarDescriptor;
 
@@ -35,8 +32,6 @@ export class Star extends AbstractBody {
 
         this.descriptor = new StarDescriptor(seed, parentBodies.map((body) => body.descriptor));
 
-        this.radius = this.descriptor.radius;
-
         this.mesh = MeshBuilder.CreateSphere(
             `${name}Mesh`,
             {
@@ -51,7 +46,7 @@ export class Star extends AbstractBody {
         this.light.diffuse.fromArray(getRgbFromTemperature(this.descriptor.physicalProperties.temperature).asArray());
         this.light.parent = this.transform.node;
 
-        this.material = new StarMaterial(this.transform, this.descriptor.seed, this.descriptor.physicalProperties, scene);
+        this.material = new StarMaterial(this.transform, this.descriptor, scene);
         this.mesh.material = this.material;
 
         // TODO: remove when rotation is transmitted to children
