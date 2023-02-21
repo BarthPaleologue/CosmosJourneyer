@@ -12,6 +12,8 @@ import sandNormalMap2 from "../asset/textures/sandNormalMap2.jpg";
 import waterNormal1 from "../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../asset/textures/waterNormalMap4.jpg";
 
+import atmosphereLUT from "../asset/textures/LUT/atmosphere.png";
+
 //import character from "../asset/man/man.obj";
 import spaceship from "../asset/spaceship/spaceship.glb";
 import { ChunkForge } from "./chunks/chunkForge";
@@ -28,6 +30,8 @@ export class Assets {
     static SandNormalMap2: Texture;
     static WaterNormalMap1: Texture;
     static WaterNormalMap2: Texture;
+    
+    static AtmosphereLUT: Texture;
 
     //static Character: AbstractMesh;
     static Spaceship: Mesh;
@@ -51,6 +55,8 @@ export class Assets {
             Assets.manager.addTextureTask("SandNormalMap2", sandNormalMap2).onSuccess = (task) => (Assets.SandNormalMap2 = task.texture);
             Assets.manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Assets.WaterNormalMap1 = task.texture);
             Assets.manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Assets.WaterNormalMap2 = task.texture);
+
+            Assets.manager.addTextureTask("AtmosphereLUT", atmosphereLUT).onSuccess = (task) => (Assets.AtmosphereLUT = task.texture);
 
             /*const characterTask = Assets.manager.addMeshTask("characterTask", "", "", character);
             characterTask.onSuccess = function (task: MeshAssetTask) {
