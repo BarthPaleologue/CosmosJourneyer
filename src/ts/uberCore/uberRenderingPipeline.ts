@@ -1,5 +1,4 @@
-import { Camera, Engine, FxaaPostProcess, PostProcessRenderEffect, PostProcessRenderPipeline, Texture } from "@babylonjs/core";
-import { ColorCorrection } from "./postProcesses/colorCorrection";
+import { Camera, Engine, PostProcessRenderPipeline } from "@babylonjs/core";
 
 export class UberRenderingPipeline extends PostProcessRenderPipeline {
     constructor(name: string, engine: Engine) {

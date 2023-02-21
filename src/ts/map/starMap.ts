@@ -21,7 +21,7 @@ import { Keyboard } from "../inputs/keyboard";
 
 import starTexture from "../../asset/textures/starParticle.png";
 import { hashVec3 } from "../utils/hashVec3";
-import { AdvancedDynamicTexture, Button, Control, Rectangle, StackPanel, TextBlock } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Button, StackPanel, TextBlock } from "@babylonjs/gui";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 import { StarDescriptor } from "../descriptors/starDescriptor";
 import { BuildData, Cell, Vector3ToString } from "./cell";
