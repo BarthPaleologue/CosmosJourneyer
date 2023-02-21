@@ -5,13 +5,19 @@ import { RigidBody } from "../bodies/interfaces";
 import { ITransformable } from "../orbits/iOrbitalBody";
 
 export class CollisionWorker {
-    currentBody: (RigidBody & ITransformable) | null = null;
-    _busy = false;
-    _worker: Worker;
-    constructor(player: AbstractController, planetManager: StarSystem) {
-        this._worker = new Worker(new URL("collisionScript", import.meta.url), { type: "module" });
-        this._worker.onmessage = (e) => {
-            if (this.currentBody == null) return;
+    private currentBody: (RigidBody & ITransformable) | null = null;
+    private _isBusy = false;
+    private worker: Worker;
+    private starSystem: StarSystem | null = null;
+    private player: AbstractController | null = null;
+
+    constructor(player: AbstractController | null = null, starSystem: StarSystem | null = null) {
+        this.starSystem = starSystem;
+        this.player = player;
+
+        this.worker = new Worker(new URL("collisionScript", import.meta.url), { type: "module" });
+        this.worker.onmessage = (e) => {
+            if (this.starSystem == null || this.player == null || this.currentBody == null) return;
 
             const direction = this.currentBody.transform.getAbsolutePosition().normalizeToNew();
             const currentHeight = this.currentBody.transform.getAbsolutePosition().length();
@@ -20,23 +26,32 @@ export class CollisionWorker {
             const currentPosition = this.currentBody.transform.getAbsolutePosition();
             let newPosition = currentPosition;
 
-            if (currentHeight - player.collisionRadius < terrainHeight) {
-                newPosition = direction.scale(terrainHeight + player.collisionRadius);
+            if (currentHeight - this.player.collisionRadius < terrainHeight) {
+                newPosition = direction.scale(terrainHeight + this.player.collisionRadius);
             }
 
             const deviation = newPosition.subtract(currentPosition);
 
-            planetManager.translateAllBodies(deviation);
+            this.starSystem.translateAllBodies(deviation);
 
-            this._busy = false;
+            this._isBusy = false;
         };
     }
+
+    public setStarSystem(starSystem: StarSystem): void {
+        this.starSystem = starSystem;
+    }
+
+    public setPlayer(player: AbstractController): void {
+        this.player = player;
+    }
+
     public isBusy(): boolean {
-        return this._busy;
+        return this._isBusy;
     }
     private postMessage(data: TransferCollisionData): void {
-        this._worker.postMessage(data);
-        this._busy = true;
+        this.worker.postMessage(data);
+        this._isBusy = true;
     }
     public checkCollision(planet: RigidBody & ITransformable): void {
         this.currentBody = planet;
