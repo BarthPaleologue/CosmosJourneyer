@@ -134,7 +134,7 @@ export class ChunkTree {
         const direction = nodePositionW.subtract(observerPositionW);
         const distanceToNodeSquared = direction.lengthSquared();
 
-        const distanceThreshold = (Settings.RENDER_DISTANCE_MULTIPLIER * this.rootChunkLength) / 2 ** walked.length;
+        const distanceThreshold = (Settings.CHUNK_RENDER_DISTANCE_MULTIPLIER * this.rootChunkLength) / 2 ** walked.length;
 
         if ((distanceToNodeSquared < distanceThreshold ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
             // if the node is near the camera or if we are loading minimal LOD

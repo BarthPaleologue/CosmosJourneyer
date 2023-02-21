@@ -15,16 +15,17 @@ import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
 
 export class PlanetEngine {
     // UI
-    readonly helmetOverlay: HelmetOverlay;
-    readonly bodyEditor: BodyEditor;
+    private readonly helmetOverlay: HelmetOverlay;
+    private readonly bodyEditor: BodyEditor;
     readonly canvas: HTMLCanvasElement;
 
     // BabylonJS
     private engine: Engine | null = null;
     private scene: UberScene | null = null;
+
     private starSystem: StarSystem | null = null;
 
-    readonly collisionWorker = new CollisionWorker();
+    private readonly collisionWorker = new CollisionWorker();
 
     constructor() {
         this.helmetOverlay = new HelmetOverlay();
