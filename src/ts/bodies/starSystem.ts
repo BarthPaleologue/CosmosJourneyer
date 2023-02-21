@@ -14,13 +14,11 @@ import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 
 enum Steps {
-    GENERATE_STARS = 100,
-    GENERATE_PLANETS = 200,
     CHOOSE_PLANET_TYPE = 300
 }
 
 export class StarSystem {
-    readonly scene: UberScene;
+    private readonly scene: UberScene;
 
     readonly postProcessManager: PostProcessManager;
 
@@ -39,16 +37,20 @@ export class StarSystem {
         this.descriptor = new StarSystemDescriptor(seed);
     }
 
-    public addBody(body: AbstractBody) {
-        this.bodies.push(body);
-    }
-
+    /**
+     * Adds a telluric or gas planet to the system and returns it
+     * @param planet The planet added to the system
+     */
     public addPlanet(planet: TelluricPlanet | GasPlanet): TelluricPlanet | GasPlanet {
         this.bodies.push(planet);
         this.planets.push(planet);
         return planet;
     }
 
+    /**
+     * Adds a star or a blackhole to the system and returns it
+     * @param star The star added to the system
+     */
     public addStar(star: Star | BlackHole): Star | BlackHole {
         this.bodies.push(star);
         this.stars.push(star);
@@ -65,7 +67,7 @@ export class StarSystem {
         return star;
     }
 
-    public makeBlackHole(seed = this.descriptor.rng(Steps.GENERATE_STARS + this.stars.length)): BlackHole {
+    public makeBlackHole(seed = this.descriptor.getStarSeed(this.stars.length)): BlackHole {
         const blackHole = new BlackHole(`blackHole${this.stars.length}`, 1000e3, seed, this.stars);
         this.addStar(blackHole);
         return blackHole;
@@ -128,6 +130,10 @@ export class StarSystem {
         for (let i = 0; i < n; i++) this.makeSatellite(planet, planet.descriptor.rng(100 + i));
     }
 
+    /**
+     * Translates all bodies in the system by the given displacement
+     * @param displacement The displacement applied to all bodies
+     */
     public translateAllBodies(displacement: Vector3): void {
         for (const planet of this.bodies) planet.transform.translate(displacement);
     }
@@ -157,35 +163,50 @@ export class StarSystem {
         return nearest;
     }
 
+    /**
+     * Inits the post processes and moves the system forward in time to the current time (it is additive)
+     */
     public init() {
         this.initPostProcesses();
         this.update(Date.now() / 1000);
     }
 
-    public initPostProcesses() {
+    /**
+     * Inits the post processes of all the bodies in the system
+     * @private
+     */
+    private initPostProcesses() {
         this.postProcessManager.addStarField(this.stars, this.bodies);
         for (const body of this.bodies) this.postProcessManager.addBody(body, this.stars);
         this.postProcessManager.setBody(this.getNearestBody(this.scene.getActiveUberCamera().position));
     }
 
+    /**
+     * Updates the system and all its bodies forward in time by the given delta time
+     * @param deltaTime The time elapsed since the last update
+     */
     public update(deltaTime: number): void {
         for (const body of this.getBodies()) body.updateTransform(this.scene.getActiveController(), deltaTime);
 
         for (const planet of this.planets) planet.updateMaterial(this.scene.getActiveController(), this.stars);
 
         const displacement = this.scene.getActiveController().transform.getAbsolutePosition().negate();
-
         this.translateAllBodies(displacement);
         this.scene.getActiveController().transform.translate(displacement);
 
         const nearest = this.getNearestBody(this.scene.getActiveUberCamera().position);
-
         this.postProcessManager.setBody(nearest);
-
         const switchLimit = nearest.postProcesses.rings ? this.postProcessManager.getRings(nearest).settings.ringStart : 2;
         if (isOrbiting(this.scene.getActiveController(), nearest, switchLimit)) this.postProcessManager.setSurfaceOrder();
         else this.postProcessManager.setSpaceOrder();
-
         this.postProcessManager.update(deltaTime);
+    }
+
+    /**
+     * Generates the system using the seed provided in the constructor
+     */
+    public generate() {
+        this.makeStars(this.descriptor.getNbStars());
+        this.makePlanets(this.descriptor.getNbPlanets());
     }
 }

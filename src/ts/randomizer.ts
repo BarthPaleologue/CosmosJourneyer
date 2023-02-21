@@ -32,8 +32,7 @@ const seed = urlParams.get("seed");
 const starSystem = new StarSystem(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0) * Number.MAX_SAFE_INTEGER, scene);
 engine.setStarSystem(starSystem);
 
-starSystem.makeStars(starSystem.descriptor.getNbStars());
-starSystem.makePlanets(starSystem.descriptor.getNbPlanets());
+starSystem.generate();
 
 document.addEventListener("keydown", (e) => {
     if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);

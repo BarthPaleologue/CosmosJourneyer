@@ -4,7 +4,7 @@ import { randRangeInt } from "extended-random";
 enum GENERATION_STEPS {
     NAME,
     NB_STARS = 20,
-    STARS = 21,
+    GENERATE_STARS = 21,
     NB_PLANETS = 30,
     GENERATE_PLANETS = 200
 }
@@ -32,9 +32,9 @@ export class StarSystemDescriptor {
         return randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_PLANETS);
     }
 
-    getStarSeed(index: number) {
+    public getStarSeed(index: number) {
         if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
-        return (this.rng(GENERATION_STEPS.STARS + index) * 2 - 1) * 100;
+        return (this.rng(GENERATION_STEPS.GENERATE_STARS + index) * 2 - 1) * 100;
     }
 
     public getPlanetSeed(index: number) {
