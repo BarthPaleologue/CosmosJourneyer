@@ -146,7 +146,7 @@ export class BodyEditor {
             case BodyType.STAR:
                 this.setStar(body as Star, postProcessManager, scene);
                 break;
-            case BodyType.GAZ:
+            case BodyType.GAS:
                 this.setGazPlanet(body as GasPlanet, postProcessManager, scene);
                 break;
             default:
@@ -196,7 +196,7 @@ export class BodyEditor {
                 this.atmospherePanel.setVisibility(this.currentPanel == this.atmospherePanel && (body as TelluricPlanet).postProcesses.atmosphere != null);
 
                 break;
-            case BodyType.GAZ:
+            case BodyType.GAS:
                 this.atmospherePanel.enable();
                 this.atmospherePanel.setVisibility(this.currentPanel == this.atmospherePanel);
 

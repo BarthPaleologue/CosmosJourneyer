@@ -59,7 +59,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
 
         for (const parentBody of parentBodies) {
             if (parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true;
-            if (parentBody.bodyType == BodyType.GAZ) this.isSatelliteOfGas = true;
+            if (parentBody.bodyType == BodyType.GAS) this.isSatelliteOfGas = true;
         }
 
         if (this.isSatelliteOfTelluric) {

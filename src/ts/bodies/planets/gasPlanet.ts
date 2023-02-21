@@ -12,7 +12,7 @@ import { BlackHole } from "../blackHole";
 import { GasPlanetDescriptor } from "../../descriptors/gasPlanetDescriptor";
 
 export class GasPlanet extends AbstractBody implements Planet {
-    override readonly bodyType = BodyType.GAZ;
+    override readonly bodyType = BodyType.GAS;
 
     override readonly radius;
 
