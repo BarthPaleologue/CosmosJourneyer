@@ -30,11 +30,11 @@ export enum PostProcessType {
 }
 
 export class PostProcessManager {
-    engine: Engine;
-    scene: UberScene;
+    private readonly engine: Engine;
+    private readonly scene: UberScene;
 
-    readonly spaceRenderingPipeline: UberRenderingPipeline;
-    readonly surfaceRenderingPipeline: UberRenderingPipeline;
+    private readonly spaceRenderingPipeline: UberRenderingPipeline;
+    private readonly surfaceRenderingPipeline: UberRenderingPipeline;
     private currentRenderingPipeline: UberRenderingPipeline;
 
     private renderingOrder: PostProcessType[] = [
@@ -48,24 +48,24 @@ export class PostProcessManager {
 
     private currentBody: AbstractBody | null = null;
 
-    readonly starFields: StarfieldPostProcess[] = [];
-    readonly volumetricLights: VolumetricLight[] = [];
-    readonly oceans: OceanPostProcess[] = [];
-    readonly clouds: CloudsPostProcess[] = [];
-    readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
-    readonly rings: RingsPostProcess[] = [];
-    readonly blackHoles: BlackHolePostProcess[] = [];
-    readonly overlays: OverlayPostProcess[] = [];
+    private readonly starFields: StarfieldPostProcess[] = [];
+    private readonly volumetricLights: VolumetricLight[] = [];
+    private readonly oceans: OceanPostProcess[] = [];
+    private readonly clouds: CloudsPostProcess[] = [];
+    private readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
+    private readonly rings: RingsPostProcess[] = [];
+    private readonly blackHoles: BlackHolePostProcess[] = [];
+    private readonly overlays: OverlayPostProcess[] = [];
 
     readonly colorCorrection: ColorCorrection;
     readonly fxaa: FxaaPostProcess;
 
-    readonly starFieldRenderEffect: PostProcessRenderEffect;
-    readonly overlayRenderEffect: PostProcessRenderEffect;
+    private readonly starFieldRenderEffect: PostProcessRenderEffect;
+    private readonly overlayRenderEffect: PostProcessRenderEffect;
 
-    readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
-    readonly fxaaRenderEffect: PostProcessRenderEffect;
-    readonly bloomRenderEffect: BloomEffect;
+    private readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
+    private readonly fxaaRenderEffect: PostProcessRenderEffect;
+    private readonly bloomRenderEffect: BloomEffect;
 
     constructor(scene: UberScene) {
         this.scene = scene;
@@ -104,64 +104,126 @@ export class PostProcessManager {
         this.colorCorrection.saturation = 0.9;
     }
 
+    /**
+     * Creates a new Ocean postprocess for the given planet and adds it to the manager.
+     * @param planet A telluric planet
+     * @param stars An array of stars or black holes
+     */
     public addOcean(planet: TelluricPlanet, stars: (Star | BlackHole)[]) {
         this.oceans.push(new OceanPostProcess(`${planet.name}Ocean`, planet, this.scene, stars));
     }
 
+    /**
+     * Returns the ocean post process for the given planet. Throws an error if no ocean is found.
+     * @param planet A telluric planet
+     */
     public getOcean(planet: TelluricPlanet): OceanPostProcess {
         for (const ocean of this.oceans) if (ocean.body === planet) return ocean;
         throw new Error("No ocean found for: " + planet.name);
     }
 
+    /**
+     * Creates a new Clouds postprocess for the given planet and adds it to the manager.
+     * @param planet A telluric planet
+     * @param stars An array of stars or black holes
+     */
     public addClouds(planet: TelluricPlanet, stars: (Star | BlackHole)[]) {
         if (!Settings.ENABLE_VOLUMETRIC_CLOUDS) this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
         else this.clouds.push(new VolumetricCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
     }
 
+    /**
+     * Returns the clouds post process for the given planet. Throws an error if no clouds are found.
+     * @param planet A telluric planet
+     */
     public getClouds(planet: TelluricPlanet): CloudsPostProcess {
         for (const clouds of this.clouds) if (clouds.body === planet) return clouds;
         throw new Error("No clouds found for: " + planet.name);
     }
 
+    /**
+     * Creates a new Atmosphere postprocess for the given planet and adds it to the manager.
+     * @param planet A gas or telluric planet
+     * @param stars An array of stars or black holes
+     */
     public addAtmosphere(planet: GasPlanet | TelluricPlanet, stars: (Star | BlackHole)[]) {
         this.atmospheres.push(new AtmosphericScatteringPostProcess(`${planet.name}Atmosphere`, planet, Settings.ATMOSPHERE_HEIGHT, this.scene, stars));
     }
 
+    /**
+     * Returns the atmosphere post process for the given planet. Throws an error if no atmosphere is found.
+     * @param planet A gas or telluric planet
+     */
     public getAtmosphere(planet: GasPlanet | TelluricPlanet): AtmosphericScatteringPostProcess {
         for (const atmosphere of this.atmospheres) if (atmosphere.body === planet) return atmosphere;
         throw new Error("No atmosphere found for: " + planet.name);
     }
 
+    /**
+     * Creates a Rings postprocess for the given body and adds it to the manager.
+     * @param body A body
+     * @param stars An array of stars or black holes
+     */
     public addRings(body: AbstractBody, stars: (Star | BlackHole)[]) {
         this.rings.push(new RingsPostProcess(body, this.scene, stars));
     }
 
+    /**
+     * Returns the rings post process for the given body. Throws an error if no rings are found.
+     * @param body A body
+     */
     public getRings(body: AbstractBody): RingsPostProcess {
         for (const rings of this.rings) if (rings.body === body) return rings;
         throw new Error("No rings found for: " + body.name);
     }
 
+    /**
+     * Creates a new Starfield postprocess and adds it to the manager.
+     * @param stars An array of stars or black holes
+     * @param planets An array of planets
+     */
     public addStarField(stars: (Star | BlackHole)[], planets: AbstractBody[]) {
         this.starFields.push(new StarfieldPostProcess(this.scene, stars, planets));
     }
 
+    /**
+     * Creates a new Overlay postprocess for the given body and adds it to the manager.
+     * @param body A body
+     */
     public addOverlay(body: AbstractBody) {
         this.overlays.push(new OverlayPostProcess(body, this.scene));
     }
 
+    /**
+     * Creates a new VolumetricLight postprocess for the given star and adds it to the manager.
+     * @param star A star
+     */
     public addVolumetricLight(star: Star) {
         this.volumetricLights.push(new VolumetricLight(star, this.scene));
     }
 
+    /**
+     * Returns the volumetric light post process for the given star. Throws an error if no volumetric light is found.
+     * @param star A star
+     */
     public getVolumetricLight(star: Star): VolumetricLight {
         for (const volumetricLight of this.volumetricLights) if (volumetricLight.body === star) return volumetricLight;
         throw new Error("No volumetric light found for: " + star.name);
     }
 
+    /**
+     * Creates a new BlackHole postprocess for the given black hole and adds it to the manager.
+     * @param blackHole A black hole
+     */
     public addBlackHole(blackHole: BlackHole) {
         this.blackHoles.push(new BlackHolePostProcess(blackHole.name, blackHole, this.scene));
     }
 
+    /**
+     * Adds all post processes for the given body.
+     * @param body A body
+     * @param stars An array of stars or black holes lighting the body
+     */
     public addBody(body: AbstractBody, stars: (Star | BlackHole)[]) {
         if (body.postProcesses.rings) this.addRings(body, stars);
         if (body.postProcesses.overlay) this.addOverlay(body);
@@ -191,10 +253,6 @@ export class PostProcessManager {
 
         this.currentRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
         this.init();
-    }
-
-    public setOrder(order: PostProcessType[]) {
-        this.renderingOrder = order;
     }
 
     public setSpaceOrder() {
@@ -227,12 +285,12 @@ export class PostProcessManager {
         this.init();
     }
 
-    public getCurrentBody() {
+    private getCurrentBody() {
         if (this.currentBody == null) throw new Error("No body set to the postProcessManager");
         return this.currentBody;
     }
 
-    public init() {
+    private init() {
         //const [bodyVolumetricLights, otherVolumetricLights] = extractRelevantPostProcesses(this.volumetricLights, this.getCurrentBody());
         const bodyVolumetricLights: VolumetricLight[] = [];
         const otherVolumetricLights: VolumetricLight[] = [];
