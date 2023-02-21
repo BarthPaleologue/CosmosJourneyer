@@ -83,7 +83,7 @@ export class StarSystem {
     }
 
     public makeGasPlanet(seed = this.descriptor.getPlanetSeed(this.planets.length)): GasPlanet {
-        const planet = new GasPlanet(`gasPlanet`, this.scene, seed, this.stars);
+        const planet = new GasPlanet(`gasPlanet${this.planets.length}`, this.scene, seed, this.stars);
         this.addPlanet(planet);
         return planet;
     }

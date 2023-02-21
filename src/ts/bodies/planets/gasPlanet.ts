@@ -10,7 +10,6 @@ import { Planet } from "./planet";
 import { Star } from "../stars/star";
 import { BlackHole } from "../blackHole";
 import { GasPlanetDescriptor } from "../../descriptors/gasPlanetDescriptor";
-import { BodyDescriptor } from "../../descriptors/interfaces";
 
 export class GasPlanet extends AbstractBody implements Planet {
     override readonly bodyType = BodyType.GAZ;

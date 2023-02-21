@@ -52,7 +52,7 @@ export class GasPlanetDescriptor implements PlanemoDescriptor {
         this.orbitalProperties = {
             periapsis: periapsis,
             apoapsis: apoapsis,
-            period: getOrbitalPeriod(periapsis, apoapsis, []),
+            period: getOrbitalPeriod(periapsis, apoapsis, parentBodies),
             orientationQuaternion: Quaternion.Identity()
         };
 
