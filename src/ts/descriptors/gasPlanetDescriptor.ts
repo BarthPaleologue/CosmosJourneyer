@@ -18,7 +18,7 @@ enum GENERATION_STEPS {
 }
 
 export class GasPlanetDescriptor implements PlanemoDescriptor {
-    readonly bodyType = BodyType.GAZ;
+    readonly bodyType = BodyType.GAS;
     readonly seed: number;
     readonly rng: (step: number) => number;
 

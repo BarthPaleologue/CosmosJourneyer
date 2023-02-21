@@ -174,7 +174,7 @@ export class PostProcessManager {
                 if ((body as TelluricPlanet).postProcesses.clouds) this.addClouds(body as TelluricPlanet, stars);
                 if ((body as TelluricPlanet).postProcesses.ocean) this.addOcean(body as TelluricPlanet, stars);
                 break;
-            case BodyType.GAZ:
+            case BodyType.GAS:
                 if ((body as GasPlanet).postProcesses.atmosphere) this.addAtmosphere(body as GasPlanet, stars);
                 break;
             case BodyType.BLACK_HOLE:

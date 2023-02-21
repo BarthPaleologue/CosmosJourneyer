@@ -4,7 +4,7 @@ import { TransferCollisionData } from "../chunks/workerDataTypes";
 export enum BodyType {
     STAR,
     TELLURIC,
-    GAZ,
+    GAS,
     BLACK_HOLE
 }
 
