@@ -114,7 +114,7 @@ export class PostProcessManager {
     }
 
     public addClouds(planet: TelluricPlanet, stars: (Star | BlackHole)[]) {
-        if(!Settings.ENABLE_VOLUMETRIC_CLOUDS) this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
+        if (!Settings.ENABLE_VOLUMETRIC_CLOUDS) this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
         else this.clouds.push(new VolumetricCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
     }
 

@@ -30,7 +30,10 @@ export class Star extends AbstractBody {
     constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
         super(name, parentBodies);
 
-        this.descriptor = new StarDescriptor(seed, parentBodies.map((body) => body.descriptor));
+        this.descriptor = new StarDescriptor(
+            seed,
+            parentBodies.map((body) => body.descriptor)
+        );
 
         this.mesh = MeshBuilder.CreateSphere(
             `${name}Mesh`,

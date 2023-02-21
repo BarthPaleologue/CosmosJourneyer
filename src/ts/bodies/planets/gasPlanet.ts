@@ -31,7 +31,10 @@ export class GasPlanet extends AbstractBody implements Planet {
     constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
         super(name, parentBodies);
 
-        this.descriptor = new GasPlanetDescriptor(seed, parentBodies.map((body) => body.descriptor));
+        this.descriptor = new GasPlanetDescriptor(
+            seed,
+            parentBodies.map((body) => body.descriptor)
+        );
 
         this.mesh = MeshBuilder.CreateSphere(
             `${name}Mesh`,

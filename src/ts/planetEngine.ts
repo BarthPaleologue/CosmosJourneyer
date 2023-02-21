@@ -38,12 +38,10 @@ export class PlanetEngine {
         this.bodyEditor.setCanvas(this.canvas);
 
         document.addEventListener("keydown", (e) => {
-            if (e.key == "o")
-                OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
+            if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
             if (e.key == "p" && this.engine != null && this.scene != null)
                 Tools.CreateScreenshotUsingRenderTarget(this.engine, this.scene.getActiveController().getActiveCamera(), { precision: 4 });
-            if (e.key == "u")
-                this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
+            if (e.key == "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
             //if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
             if (e.key == "w" && this.scene != null && this.starSystem != null && isOrbiting(this.scene.getActiveController(), this.starSystem.getNearestBody()))
                 (this.starSystem.getNearestBody() as TelluricPlanet).material.wireframe = !(this.starSystem.getNearestBody() as TelluricPlanet).material.wireframe;
@@ -68,15 +66,15 @@ export class PlanetEngine {
     }
 
     init() {
-        if(this.starSystem === null) throw new Error("Star system is null");
+        if (this.starSystem === null) throw new Error("Star system is null");
         this.starSystem.init();
         this.collisionWorker.setStarSystem(this.starSystem);
         this.collisionWorker.setPlayer(this.getScene().getActiveController());
 
         this.getScene().registerBeforeRender(() => {
-            if(this.engine === null) throw new Error("Engine is null");
-            if(this.scene === null) throw new Error("Scene is null");
-            if(this.starSystem === null) throw new Error("Star system is null");
+            if (this.engine === null) throw new Error("Engine is null");
+            if (this.scene === null) throw new Error("Scene is null");
+            if (this.starSystem === null) throw new Error("Star system is null");
 
             const deltaTime = this.engine.getDeltaTime() / 1000;
 
@@ -115,12 +113,12 @@ export class PlanetEngine {
     }
 
     getScene() {
-        if(this.scene === null) throw new Error("Scene is null");
+        if (this.scene === null) throw new Error("Scene is null");
         return this.scene;
     }
 
     getEngine() {
-        if(this.engine === null) throw new Error("Engine is null");
+        if (this.engine === null) throw new Error("Engine is null");
         return this.engine;
     }
 }

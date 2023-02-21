@@ -25,7 +25,7 @@ export enum STAR_TYPE {
     F,
     G,
     K,
-    M,
+    M
 }
 
 export class StarDescriptor implements BodyDescriptor {
@@ -69,8 +69,8 @@ export class StarDescriptor implements BodyDescriptor {
             mass: this.mass,
             rotationPeriod: this.rotationPeriod,
             temperature: this.surfaceTemperature,
-            axialTilt: 0,
-        }
+            axialTilt: 0
+        };
 
         this.surfaceColor = getRgbFromTemperature(this.surfaceTemperature);
 
@@ -100,7 +100,7 @@ export class StarDescriptor implements BodyDescriptor {
     }
 
     get depth(): number {
-        if(this.parentBodies.length === 0) return 0;
+        if (this.parentBodies.length === 0) return 0;
         return this.parentBodies[0].depth + 1;
     }
 

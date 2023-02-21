@@ -14,7 +14,7 @@ enum GENERATION_STEPS {
     RADIUS = 1000,
     RINGS = 1200,
     NB_MOONS = 10,
-    MOONS = 11,
+    MOONS = 11
 }
 
 export class GasPlanetDescriptor implements PlanemoDescriptor {
@@ -60,11 +60,11 @@ export class GasPlanetDescriptor implements PlanemoDescriptor {
             // FIXME: choose physically accurates values
             mass: 10,
             axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
-            rotationPeriod: 24 * 60 * 60 / 10,
+            rotationPeriod: (24 * 60 * 60) / 10,
             minTemperature: -180,
             maxTemperature: 200,
             pressure: 1
-        }
+        };
 
         this.hasRings = uniformRandBool(0.8, this.rng, GENERATION_STEPS.RINGS);
 
@@ -81,7 +81,7 @@ export class GasPlanetDescriptor implements PlanemoDescriptor {
     }
 
     get depth(): number {
-        if(this.parentBodies.length === 0) return 0;
+        if (this.parentBodies.length === 0) return 0;
         return this.parentBodies[0].depth + 1;
     }
 }

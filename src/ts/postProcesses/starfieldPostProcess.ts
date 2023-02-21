@@ -50,7 +50,10 @@ export class StarfieldPostProcess extends UberPostProcess {
                             const maxHeight = Settings.ATMOSPHERE_HEIGHT;
                             for (const star of stars) {
                                 const sunDir = planet.transform.getAbsolutePosition().subtract(star.transform.getAbsolutePosition()).normalize();
-                                vis2 = Math.min(vis2, (height / maxHeight) ** 32 + Math.max(Vector3.Dot(sunDir, planet.transform.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5);
+                                vis2 = Math.min(
+                                    vis2,
+                                    (height / maxHeight) ** 32 + Math.max(Vector3.Dot(sunDir, planet.transform.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5
+                                );
                             }
                         }
                     }

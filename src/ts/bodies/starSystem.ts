@@ -4,7 +4,7 @@ import { AbstractBody, isOrbiting } from "./abstractBody";
 import { Star } from "./stars/star";
 import { UberScene } from "../uberCore/uberScene";
 import { Planet } from "./planets/planet";
-import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, uniformRandBool } from "extended-random";
 import { TelluricPlanet } from "./planets/telluricPlanet";
 import { GasPlanet } from "./planets/gasPlanet";
 import { clamp } from "terrain-generation";
@@ -109,7 +109,11 @@ export class StarSystem {
 
         satellite.descriptor.orbitalProperties.periapsis = periapsis;
         satellite.descriptor.orbitalProperties.apoapsis = apoapsis;
-        satellite.descriptor.orbitalProperties.period = getOrbitalPeriod(periapsis, apoapsis, satellite.parentBodies.map(p => p.descriptor));
+        satellite.descriptor.orbitalProperties.period = getOrbitalPeriod(
+            periapsis,
+            apoapsis,
+            satellite.parentBodies.map((p) => p.descriptor)
+        );
         satellite.descriptor.orbitalProperties.orientationQuaternion = satellite.transform.getRotationQuaternion();
 
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);

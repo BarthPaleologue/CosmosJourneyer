@@ -19,7 +19,7 @@ enum GENERATION_STEPS {
     RINGS = 1400,
     TERRAIN = 1500,
     NB_MOONS = 10,
-    MOONS = 11,
+    MOONS = 11
 }
 
 export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
@@ -64,27 +64,27 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
         this.physicalProperties = {
             mass: 10,
             axialTilt: normalRandom(0, 0.2, this.rng, GENERATION_STEPS.AXIAL_TILT),
-            rotationPeriod: 60 * 60 * 24 / 10,
+            rotationPeriod: (60 * 60 * 24) / 10,
             minTemperature: randRangeInt(-50, 5, this.rng, 80),
             maxTemperature: randRangeInt(10, 50, this.rng, 81),
             pressure: Math.max(normalRandom(0.9, 0.2, this.rng, GENERATION_STEPS.PRESSURE), 0),
             waterAmount: Math.max(normalRandom(1.0, 0.3, this.rng, GENERATION_STEPS.WATER_AMOUNT), 0),
             oceanLevel: 0
-        }
-        
+        };
+
         this.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
 
         this.terrainSettings = {
             continents_frequency: this.radius / Settings.EARTH_RADIUS,
             continents_fragmentation: clamp(normalRandom(0.65, 0.03, this.rng, GENERATION_STEPS.TERRAIN), 0, 0.95),
 
-            bumps_frequency: 30 * this.radius / Settings.EARTH_RADIUS,
+            bumps_frequency: (30 * this.radius) / Settings.EARTH_RADIUS,
 
             max_bump_height: 1.5e3,
             max_mountain_height: 10e3,
             continent_base_height: this.physicalProperties.oceanLevel * 1.9,
 
-            mountains_frequency: 20 * this.radius / Settings.EARTH_RADIUS,
+            mountains_frequency: (20 * this.radius) / Settings.EARTH_RADIUS
         };
 
         this.hasRings = uniformRandBool(0.6, this.rng, GENERATION_STEPS.RINGS);
@@ -93,12 +93,12 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
     }
 
     get depth(): number {
-        if(this.parentBodies.length === 0) return 0;
+        if (this.parentBodies.length === 0) return 0;
         return this.parentBodies[0].depth + 1;
     }
 
     getMoonSeed(index: number) {
-        if(index > this.nbMoons) throw new Error("Moon out of bound! " + index);
+        if (index > this.nbMoons) throw new Error("Moon out of bound! " + index);
         return this.rng(GENERATION_STEPS.MOONS + index);
     }
 

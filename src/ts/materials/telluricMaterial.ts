@@ -26,12 +26,7 @@ export class TelluricMaterial extends ShaderMaterial {
     physicalProperties: SolidPhysicalProperties;
     planetRadius: number;
 
-    constructor(
-        planetName: string,
-        planet: BasicTransform,
-        planetDescriptor: TelluricPlanetDescriptor,
-        scene: UberScene
-    ) {
+    constructor(planetName: string, planet: BasicTransform, planetDescriptor: TelluricPlanetDescriptor, scene: UberScene) {
         super(`${planetName}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
             uniforms: [

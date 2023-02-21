@@ -65,7 +65,7 @@ export class ChunkForge {
                 max_mountain_height: task.terrainSettings.max_mountain_height,
                 max_bump_height: task.terrainSettings.max_bump_height,
                 bumps_frequency: task.terrainSettings.bumps_frequency,
-                mountains_frequency: task.terrainSettings.mountains_frequency,
+                mountains_frequency: task.terrainSettings.mountains_frequency
             },
             seed: task.planetSeed
         };

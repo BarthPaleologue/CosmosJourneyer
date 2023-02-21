@@ -52,10 +52,10 @@ export class ShipController extends AbstractController {
             if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
             if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
 
-            if(keyboard.isPressed("h")) this.isHyperAccelerated = !this.isHyperAccelerated;
-            if(keyboard.isPressed("f")) this.flightAssistEnabled = !this.flightAssistEnabled;
+            if (keyboard.isPressed("h")) this.isHyperAccelerated = !this.isHyperAccelerated;
+            if (keyboard.isPressed("f")) this.flightAssistEnabled = !this.flightAssistEnabled;
         }
-        if(input.type == InputType.MOUSE) {
+        if (input.type == InputType.MOUSE) {
             const mouse = input as Mouse;
             this.thirdPersonCamera.rotatePhi(mouse.getYaw() * deltaTime);
             this.thirdPersonCamera.rotateTheta(mouse.getPitch() * deltaTime);

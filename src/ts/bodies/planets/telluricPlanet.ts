@@ -22,7 +22,7 @@ import { TelluricPlanetDescriptor } from "../../descriptors/telluricPlanetDescri
 
 enum Steps {
     RADIUS = 1000,
-    PRESSURE = 1100,
+    PRESSURE = 1100
 }
 
 export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
@@ -53,7 +53,10 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planet {
     constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
         super(name, parentBodies);
 
-        this.descriptor = new TelluricPlanetDescriptor(seed, parentBodies.map((body) => body.descriptor));
+        this.descriptor = new TelluricPlanetDescriptor(
+            seed,
+            parentBodies.map((body) => body.descriptor)
+        );
 
         for (const parentBody of parentBodies) {
             if (parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true;

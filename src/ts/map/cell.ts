@@ -12,7 +12,7 @@ export type BuildData = {
     cellString: string;
     scale: number;
     position: Vector3;
-}
+};
 
 export class Cell {
     readonly meshes: InstancedMesh[];

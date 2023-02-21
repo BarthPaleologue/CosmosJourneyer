@@ -6,7 +6,7 @@ import { BodyType } from "../bodies/interfaces";
 export interface BodyDescriptor {
     bodyType: BodyType;
     rng: (step: number) => number;
-    seed: number
+    seed: number;
     radius: number;
 
     orbitalProperties: IOrbitalProperties;

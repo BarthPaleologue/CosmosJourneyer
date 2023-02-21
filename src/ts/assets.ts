@@ -30,7 +30,7 @@ export class Assets {
     static SandNormalMap2: Texture;
     static WaterNormalMap1: Texture;
     static WaterNormalMap2: Texture;
-    
+
     static AtmosphereLUT: Texture;
 
     //static Character: AbstractMesh;

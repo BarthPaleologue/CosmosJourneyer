@@ -208,26 +208,20 @@ export class StarMap {
             const starColor = starDescriptor.surfaceColor;
 
             star.actionManager.registerAction(
-                new ExecuteCodeAction(
-                    ActionManager.OnPickTrigger, (_) => {
-                        if (this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
+                new ExecuteCodeAction(ActionManager.OnPickTrigger, (_) => {
+                    if (this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
 
-                        this.namePlate.linkWithMesh(star);
-                        this.nameLabel.text =
-                            "Seed: " + starSystemDescriptor.seed + "\n"
-                            + "Type: " + starDescriptor.getStellarType() + "\n"
-                            + "Planets: " + starSystemDescriptor.getNbPlanets();
+                    this.namePlate.linkWithMesh(star);
+                    this.nameLabel.text =
+                        "Seed: " + starSystemDescriptor.seed + "\n" + "Type: " + starDescriptor.getStellarType() + "\n" + "Planets: " + starSystemDescriptor.getNbPlanets();
 
-                        this.selectedSystemSeed = starSystemSeed;
-                    }
-                )
+                    this.selectedSystemSeed = starSystemSeed;
+                })
             );
             star.actionManager.registerAction(
-                new ExecuteCodeAction(
-                    ActionManager.OnPointerOutTrigger, (_) => {
-                        console.log("!!!");
-                    }
-                )
+                new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (_) => {
+                    console.log("!!!");
+                })
             );
 
             star.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
@@ -246,13 +240,16 @@ export class StarMap {
 function fadeIn(star: InstancedMesh, duration: number) {
     const fadeInAnimation = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
-    fadeInAnimation.setKeys([{
-        frame: 0,
-        value: 0
-    }, {
-        frame: duration / 60,
-        value: 1
-    }]);
+    fadeInAnimation.setKeys([
+        {
+            frame: 0,
+            value: 0
+        },
+        {
+            frame: duration / 60,
+            value: 1
+        }
+    ]);
 
     star.animations.push(fadeInAnimation);
     star.getScene().beginAnimation(star, 0, duration / 60);
@@ -261,13 +258,16 @@ function fadeIn(star: InstancedMesh, duration: number) {
 export function fadeOutThenDispose(star: InstancedMesh, duration: number) {
     const fadeOutAnimation = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
-    fadeOutAnimation.setKeys([{
-        frame: 0,
-        value: 1
-    }, {
-        frame: duration / 60,
-        value: 0
-    }]);
+    fadeOutAnimation.setKeys([
+        {
+            frame: 0,
+            value: 1
+        },
+        {
+            frame: duration / 60,
+            value: 0
+        }
+    ]);
 
     star.animations.push(fadeOutAnimation);
     star.getScene().beginAnimation(star, 0, duration / 60);

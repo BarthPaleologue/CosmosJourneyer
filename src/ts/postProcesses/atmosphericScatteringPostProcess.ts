@@ -118,7 +118,7 @@ export class AtmosphericScatteringPostProcess extends BodyPostProcess {
                 get: () => {
                     return settings.mieHaloRadius;
                 }
-            },
+            }
         ];
 
         const samplers: ShaderSamplers = [

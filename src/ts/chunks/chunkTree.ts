@@ -51,14 +51,7 @@ export class ChunkTree {
      * @param material
      * @param scene
      */
-    constructor(
-        direction: Direction,
-        planetName: string,
-        planetDescriptor: TelluricPlanetDescriptor,
-        parent: BasicTransform,
-        material: Material,
-        scene: UberScene
-    ) {
+    constructor(direction: Direction, planetName: string, planetDescriptor: TelluricPlanetDescriptor, parent: BasicTransform, material: Material, scene: UberScene) {
         this.rootChunkLength = planetDescriptor.radius * 2;
         this.planetName = planetName;
         this.planetSeed = planetDescriptor.seed;
@@ -70,7 +63,7 @@ export class ChunkTree {
         //console.log(spaceBetweenVertex);
 
         this.scene = scene;
-        //TODO: make it register to the forge instead using uberscene
+
         this.chunkForge = Assets.ChunkForge;
 
         this.direction = direction;
@@ -145,8 +138,6 @@ export class ChunkTree {
                     this.requestDeletion(tree, newTree, true);
                     return newTree;
                 }
-                // TODO: check collision
-                //tree.mesh.intersectsMesh(observerPositionW, true)
                 return tree;
             }
             return [

@@ -42,11 +42,11 @@ export class BlackHoleDescriptor implements BodyDescriptor {
             mass: 10,
             rotationPeriod: 24 * 60 * 60,
             axialTilt: 0
-        }
+        };
     }
 
     get depth(): number {
-        if(this.parentBodies.length === 0) return 0;
+        if (this.parentBodies.length === 0) return 0;
         return this.parentBodies[0].depth + 1;
     }
 }
