@@ -56,10 +56,10 @@ export class StarSystem {
     }
 
     public makeStar(seed = this.descriptor.getStarSeed(this.stars.length)): Star {
-        const star = new Star(`star${this.stars.length}`, this.scene, seed, this.stars);
+        const star = new Star(`star${this.stars.length}`, this.scene, seed, []);
         //TODO: make this better, make it part of the generation
-        star.orbitalProperties.periapsis = star.getRadius() * 4;
-        star.orbitalProperties.apoapsis = star.getRadius() * 4;
+        star.descriptor.orbitalProperties.periapsis = star.getRadius() * 4;
+        star.descriptor.orbitalProperties.apoapsis = star.getRadius() * 4;
 
         this.addStar(star);
         return star;
@@ -76,13 +76,13 @@ export class StarSystem {
         for (let i = 0; i < n; i++) this.makeStar();
     }
 
-    public makeTelluricPlanet(seed = this.descriptor.rng(Steps.GENERATE_PLANETS + this.planets.length)): TelluricPlanet {
+    public makeTelluricPlanet(seed = this.descriptor.getPlanetSeed(this.planets.length)): TelluricPlanet {
         const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this.scene, seed, this.stars);
         this.addPlanet(planet);
         return planet;
     }
 
-    public makeGasPlanet(seed = this.descriptor.rng(Steps.GENERATE_PLANETS + this.planets.length)): GasPlanet {
+    public makeGasPlanet(seed = this.descriptor.getPlanetSeed(this.planets.length)): GasPlanet {
         const planet = new GasPlanet(`gasPlanet`, this.scene, seed, this.stars);
         this.addPlanet(planet);
         return planet;
@@ -103,15 +103,15 @@ export class StarSystem {
 
     public makeSatellite(planet: AbstractBody, seed: number): TelluricPlanet {
         const satellite = new TelluricPlanet(`${planet.name}Sattelite`, this.scene, seed, [planet]);
-        const periapsis = 2 * planet.getRadius() + clamp(normalRandom(3, 1, satellite.rng, 90), 0, 20) * planet.getRadius() * 2;
-        const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.rng, 92), 1, 1.5);
-        satellite.physicalProperties.mass = 1;
-        satellite.orbitalProperties = {
-            periapsis: periapsis,
-            apoapsis: apoapsis,
-            period: getOrbitalPeriod(periapsis, apoapsis, satellite.parentBodies),
-            orientationQuaternion: satellite.transform.getRotationQuaternion()
-        };
+        const periapsis = 2 * planet.getRadius() + clamp(normalRandom(3, 1, satellite.descriptor.rng, 90), 0, 20) * planet.getRadius() * 2;
+        const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.descriptor.rng, 92), 1, 1.5);
+        satellite.descriptor.physicalProperties.mass = 1;
+
+        satellite.descriptor.orbitalProperties.periapsis = periapsis;
+        satellite.descriptor.orbitalProperties.apoapsis = apoapsis;
+        satellite.descriptor.orbitalProperties.period = getOrbitalPeriod(periapsis, apoapsis, satellite.parentBodies.map(p => p.descriptor));
+        satellite.descriptor.orbitalProperties.orientationQuaternion = satellite.transform.getRotationQuaternion();
+
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
         satellite.material.updateConstants();
 
@@ -121,7 +121,7 @@ export class StarSystem {
 
     public makeSatellites(planet: AbstractBody, n: number): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
-        for (let i = 0; i < n; i++) this.makeSatellite(planet, planet.rng(100 + i));
+        for (let i = 0; i < n; i++) this.makeSatellite(planet, planet.descriptor.rng(100 + i));
     }
 
     public translateAllBodies(displacement: Vector3): void {

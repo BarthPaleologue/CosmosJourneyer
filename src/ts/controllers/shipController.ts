@@ -47,11 +47,13 @@ export class ShipController extends AbstractController {
     listenTo(input: Input, deltaTime: number): Vector3 {
         if (input.type == InputType.KEYBOARD) {
             const keyboard = input as Keyboard;
-            if (keyboard.isPressed("u")) this.isHyperAccelerated = !this.isHyperAccelerated;
             if (keyboard.isPressed("1")) this.thirdPersonCamera.rotatePhi(0.8 * deltaTime);
             if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-0.8 * deltaTime);
             if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
             if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
+
+            if(keyboard.isPressed("h")) this.isHyperAccelerated = !this.isHyperAccelerated;
+            if(keyboard.isPressed("f")) this.flightAssistEnabled = !this.flightAssistEnabled;
         }
         if(input.type == InputType.MOUSE) {
             const mouse = input as Mouse;
@@ -64,7 +66,7 @@ export class ShipController extends AbstractController {
 
         const forwardAcceleration = this.transform
             .getForwardDirection()
-            .scale(this.forwardAuthority * deltaTime)
+            .scale(this.forwardAuthority * deltaTime * (this.isHyperAccelerated ? 100 : 1))
             .scaleInPlace(input.getZAxis());
         const verticalAcceleration = this.transform
             .getUpwardDirection()

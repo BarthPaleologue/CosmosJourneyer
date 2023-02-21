@@ -1,4 +1,4 @@
-import { Color3, Quaternion, Scene, Tools } from "@babylonjs/core";
+import { Color3, Quaternion, Tools } from "@babylonjs/core";
 
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 
@@ -49,36 +49,32 @@ Assets.Init(scene).then(() => {
     const starSystem = new StarSystem(starSystemSeed, scene);
 
     const sun = starSystem.makeStar(0.51);
-    sun.orbitalProperties.period = 60 * 60 * 24;
+    sun.descriptor.orbitalProperties.period = 60 * 60 * 24;
 
-    const planet = starSystem.makeTelluricPlanet(0.4233609183800225 * Number.MAX_SAFE_INTEGER);
+    const planet = starSystem.makeTelluricPlanet(0.4233609183800225);
 
-    planet.physicalProperties.minTemperature = -37;
-    planet.physicalProperties.maxTemperature = 40;
+    planet.descriptor.physicalProperties.minTemperature = -37;
+    planet.descriptor.physicalProperties.maxTemperature = 40;
     //planet.physicalProperties.oceanLevel = 25e2;
     planet.material.updateConstants();
 
-    planet.orbitalProperties = {
-        period: 60 * 60 * 24 * 365.25,
-        apoapsis: 4000 * planet.getRadius(),
-        periapsis: 4000 * planet.getRadius(),
-        orientationQuaternion: Quaternion.Identity()
-    };
+    planet.descriptor.orbitalProperties.period = 60 * 60 * 24 * 365.25;
+    planet.descriptor.orbitalProperties.apoapsis = 4000 * planet.getRadius();
+    planet.descriptor.orbitalProperties.periapsis = 4000 * planet.getRadius();
+    planet.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
 
     const moon = starSystem.makeSatellite(planet, 0.4);
 
-    moon.physicalProperties.mass = 2;
-    moon.physicalProperties.rotationPeriod = 7 * 60 * 60;
-    moon.physicalProperties.minTemperature = -180;
-    moon.physicalProperties.maxTemperature = 200;
-    moon.physicalProperties.waterAmount = 0.9;
+    moon.descriptor.physicalProperties.mass = 2;
+    moon.descriptor.physicalProperties.rotationPeriod = 7 * 60 * 60;
+    moon.descriptor.physicalProperties.minTemperature = -180;
+    moon.descriptor.physicalProperties.maxTemperature = 200;
+    moon.descriptor.physicalProperties.waterAmount = 0.9;
 
-    moon.orbitalProperties = {
-        period: moon.physicalProperties.rotationPeriod,
-        apoapsis: 8 * planet.getRadius(),
-        periapsis: 8 * planet.getRadius(),
-        orientationQuaternion: Quaternion.Identity()
-    };
+    moon.descriptor.orbitalProperties.period = moon.descriptor.physicalProperties.rotationPeriod;
+    moon.descriptor.orbitalProperties.apoapsis = 8 * planet.getRadius();
+    moon.descriptor.orbitalProperties.periapsis = 8 * planet.getRadius();
+    moon.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
 
     moon.terrainSettings.continents_fragmentation = 0.0;
     moon.terrainSettings.max_mountain_height = 5e3;
@@ -94,19 +90,17 @@ Assets.Init(scene).then(() => {
     ares.postProcesses.ocean = false;
     ares.postProcesses.clouds = false;
 
-    ares.physicalProperties.mass = 7;
-    ares.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
-    ares.physicalProperties.minTemperature = -48;
-    ares.physicalProperties.maxTemperature = 20;
-    ares.physicalProperties.pressure = 0.5;
-    ares.physicalProperties.waterAmount = 0.2;
+    ares.descriptor.physicalProperties.mass = 7;
+    ares.descriptor.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
+    ares.descriptor.physicalProperties.minTemperature = -48;
+    ares.descriptor.physicalProperties.maxTemperature = 20;
+    ares.descriptor.physicalProperties.pressure = 0.5;
+    ares.descriptor.physicalProperties.waterAmount = 0.2;
 
-    ares.orbitalProperties = {
-        period: 60 * 60 * 24 * 365.24,
-        periapsis: 4020 * planet.getRadius(),
-        apoapsis: 4020 * planet.getRadius(),
-        orientationQuaternion: Quaternion.Identity()
-    };
+    ares.descriptor.orbitalProperties.period = 60 * 60 * 24 * 365.24;
+    ares.descriptor.orbitalProperties.periapsis = 4020 * planet.getRadius();
+    ares.descriptor.orbitalProperties.apoapsis = 4020 * planet.getRadius();
+    ares.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
 
     ares.terrainSettings.continents_fragmentation = 0.0;
     ares.terrainSettings.continent_base_height = 10e3;
@@ -118,17 +112,15 @@ Assets.Init(scene).then(() => {
     ares.material.colorSettings.beachColor.copyFromFloats(0.3, 0.15, 0.1);
     ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);
 
-    ares.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * ares.physicalProperties.waterAmount * ares.physicalProperties.pressure;
+    ares.descriptor.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * ares.descriptor.physicalProperties.waterAmount * ares.descriptor.physicalProperties.pressure;
 
     ares.material.updateConstants();
 
     const andromaque = starSystem.makeGasPlanet(0.28711440474126226);
-    andromaque.orbitalProperties = {
-        period: 60 * 60 * 24 * 365.29,
-        periapsis: 4300 * ares.getRadius(),
-        apoapsis: 4300 * ares.getRadius(),
-        orientationQuaternion: Quaternion.Identity()
-    };
+    andromaque.descriptor.orbitalProperties.period = 60 * 60 * 24 * 365.25;
+    andromaque.descriptor.orbitalProperties.periapsis = 4300 * ares.getRadius();
+    andromaque.descriptor.orbitalProperties.apoapsis = 4300 * ares.getRadius();
+    andromaque.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
 
     const collisionWorker = new CollisionWorker(player, starSystem);
 
@@ -159,7 +151,7 @@ Assets.Init(scene).then(() => {
         }
 
         //FIXME: should address stars orbits
-        for (const star of starSystem.stars) star.orbitalProperties.period = 0;
+        for (const star of starSystem.stars) star.descriptor.orbitalProperties.period = 0;
 
         Assets.ChunkForge.update();
         starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);

@@ -34,13 +34,13 @@ export class AtmosphericScatteringPostProcess extends BodyPostProcess {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 23,
-            intensity: 12 * planet.physicalProperties.pressure,
+            intensity: 12 * planet.descriptor.physicalProperties.pressure,
             rayleighStrength: 1,
             mieStrength: 1,
             densityModifier: 1,
-            redWaveLength: 700 * (1 + centeredRand(planet.rng, 1300) / 6),
-            greenWaveLength: 530 * (1 + centeredRand(planet.rng, 1310) / 6),
-            blueWaveLength: 440 * (1 + centeredRand(planet.rng, 1320) / 6),
+            redWaveLength: 700 * (1 + centeredRand(planet.descriptor.rng, 1300) / 6),
+            greenWaveLength: 530 * (1 + centeredRand(planet.descriptor.rng, 1310) / 6),
+            blueWaveLength: 440 * (1 + centeredRand(planet.descriptor.rng, 1320) / 6),
             mieHaloRadius: 0.75
         };
 

@@ -1,12 +1,18 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
-import { TelluricBodyDescriptor } from "./interfaces";
+import { BodyDescriptor, TelluricBodyDescriptor } from "./interfaces";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
 import { SolidPhysicalProperties } from "../bodies/physicalProperties";
+import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
+import { getOrbitalPeriod } from "../orbits/kepler";
+import { Quaternion } from "@babylonjs/core";
+import { BodyType } from "../bodies/interfaces";
 
 enum GENERATION_STEPS {
+    AXIAL_TILT = 100,
+    ORBIT = 200,
     RADIUS = 1000,
     PRESSURE = 1100,
     WATER_AMOUNT = 1200,
@@ -17,10 +23,13 @@ enum GENERATION_STEPS {
 }
 
 export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
+    readonly bodyType = BodyType.TELLURIC;
     readonly seed: number;
     readonly rng: (step: number) => number;
 
     readonly radius: number;
+
+    readonly orbitalProperties: IOrbitalProperties;
 
     readonly physicalProperties: SolidPhysicalProperties;
 
@@ -30,14 +39,31 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
 
     readonly nbMoons: number;
 
-    constructor(seed: number) {
+    readonly parentBodies: BodyDescriptor[];
+    readonly childrenBodies: BodyDescriptor[] = [];
+
+    constructor(seed: number, parentBodies: BodyDescriptor[]) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
+        this.parentBodies = parentBodies;
+
         this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
+
+        // TODO: do not hardcode
+        const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 5000000e3;
+        const apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
+
+        this.orbitalProperties = {
+            periapsis: periapsis,
+            apoapsis: apoapsis,
+            period: getOrbitalPeriod(periapsis, apoapsis, this.parentBodies),
+            orientationQuaternion: Quaternion.Identity()
+        };
 
         this.physicalProperties = {
             mass: 10,
+            axialTilt: normalRandom(0, 0.2, this.rng, GENERATION_STEPS.AXIAL_TILT),
             rotationPeriod: 60 * 60 * 24 / 10,
             minTemperature: randRangeInt(-50, 5, this.rng, 80),
             maxTemperature: randRangeInt(10, 50, this.rng, 81),
@@ -66,8 +92,17 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
         this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);
     }
 
+    get depth(): number {
+        if(this.parentBodies.length === 0) return 0;
+        return this.parentBodies[0].depth + 1;
+    }
+
     getMoonSeed(index: number) {
         if(index > this.nbMoons) throw new Error("Moon out of bound! " + index);
         return this.rng(GENERATION_STEPS.MOONS + index);
+    }
+
+    getApparentRadius(): number {
+        return this.radius + this.physicalProperties.oceanLevel;
     }
 }

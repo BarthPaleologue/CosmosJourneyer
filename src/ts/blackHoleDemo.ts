@@ -46,8 +46,8 @@ Assets.Init(scene).then(() => {
     BH.orbitalProperties.apoapsis = BH.getRadius() * 4;
 
     const planet = starSystem.makeTelluricPlanet();
-    planet.orbitalProperties.periapsis = 10000e3;
-    planet.orbitalProperties.apoapsis = 10000e3;
+    planet.descriptor.orbitalProperties.periapsis = 10000e3;
+    planet.descriptor.orbitalProperties.apoapsis = 10000e3;
 
     document.addEventListener("keydown", (e) => {
         if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
@@ -75,7 +75,7 @@ Assets.Init(scene).then(() => {
             helmetOverlay.setVisibility(true);
 
             //FIXME: should address stars orbits
-            for (const star of starSystem.stars) star.orbitalProperties.period = 0;
+            for (const star of starSystem.stars) star.descriptor.orbitalProperties.period = 0;
 
             Assets.ChunkForge.update();
             starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);

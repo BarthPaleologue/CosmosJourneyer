@@ -23,6 +23,6 @@ export class HelmetOverlay {
 
     public update(currentBody: AbstractBody) {
         this.bodyNamePlate.innerText = currentBody.name;
-        this.bodySeedPlate.innerText = `Seed: ${currentBody.seed.toString()}`;
+        this.bodySeedPlate.innerText = `Seed: ${currentBody.descriptor.seed.toString()}`;
     }
 }

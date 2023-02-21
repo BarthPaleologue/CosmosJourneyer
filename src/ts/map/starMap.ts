@@ -204,7 +204,7 @@ export class StarMap {
             const starSystemDescriptor = new StarSystemDescriptor(starSystemSeed);
 
             const starSeed = starSystemDescriptor.getStarSeed(0);
-            const starDescriptor = new StarDescriptor(starSeed);
+            const starDescriptor = new StarDescriptor(starSeed, []);
             const starColor = starDescriptor.surfaceColor;
 
             star.actionManager.registerAction(

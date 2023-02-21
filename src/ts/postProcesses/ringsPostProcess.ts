@@ -25,10 +25,10 @@ export class RingsPostProcess extends BodyPostProcess {
 
     constructor(body: AbstractBody, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: RingsSettings = {
-            ringStart: randRange(1.8, 2.2, body.rng, 1400),
-            ringEnd: randRange(2.1, 2.9, body.rng, 1410),
+            ringStart: randRange(1.8, 2.2, body.descriptor.rng, 1400),
+            ringEnd: randRange(2.1, 2.9, body.descriptor.rng, 1410),
             ringFrequency: 30.0,
-            ringOpacity: body.rng(1420)
+            ringOpacity: body.descriptor.rng(1420)
         };
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(body),

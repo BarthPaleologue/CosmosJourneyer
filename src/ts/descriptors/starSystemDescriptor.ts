@@ -6,6 +6,7 @@ enum GENERATION_STEPS {
     NB_STARS = 20,
     STARS = 21,
     NB_PLANETS = 30,
+    GENERATE_PLANETS = 200,
 }
 
 export class StarSystemDescriptor {
@@ -33,6 +34,10 @@ export class StarSystemDescriptor {
 
     getStarSeed(index: number) {
         if(index > this.getNbStars()) throw new Error("Star out of bound! " + index);
-        return this.rng(GENERATION_STEPS.STARS + index);
+        return (this.rng(GENERATION_STEPS.STARS + index) * 2 - 1) * 100;
+    }
+
+    public getPlanetSeed(index: number) {
+        return (2 * this.rng(GENERATION_STEPS.GENERATE_PLANETS + index) - 1) * 1000;
     }
 }

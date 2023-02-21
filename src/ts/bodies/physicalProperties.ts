@@ -1,6 +1,7 @@
 export type PhysicalProperties = {
     mass: number;
     rotationPeriod: number;
+    axialTilt: number;
 };
 
 export type StarPhysicalProperties = PhysicalProperties & {

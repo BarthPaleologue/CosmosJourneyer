@@ -8,13 +8,6 @@ export enum BodyType {
     BLACK_HOLE
 }
 
-export interface ISeedable {
-    /**
-     * The seed of the planet
-     */
-    seed: number;
-}
-
 /**
  * Describes object that can be collided with
  */

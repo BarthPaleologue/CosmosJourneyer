@@ -4,6 +4,7 @@ import { Axis, Quaternion, Vector3 } from "@babylonjs/core";
 import { IOrbitalBody } from "./iOrbitalBody";
 import { IOrbitalProperties } from "./iOrbitalProperties";
 import { stripAxisFromQuaternion } from "../utils/algebra";
+import { BodyDescriptor } from "../descriptors/interfaces";
 
 /**
  * Returns 0 when the arguments are solution to the Kepler's equation
@@ -36,19 +37,19 @@ export function computeBarycenter2(bodies: IOrbitalBody[]): Vector3 {
     const barycenter = Vector3.Zero();
     let sum = 0;
     for (const body of bodies) {
-        barycenter.addInPlace(body.transform.getAbsolutePosition().scale(body.physicalProperties.mass));
-        sum += body.physicalProperties.mass;
+        barycenter.addInPlace(body.transform.getAbsolutePosition().scale(body.descriptor.physicalProperties.mass));
+        sum += body.descriptor.physicalProperties.mass;
     }
     return barycenter.scaleInPlace(1 / sum);
 }
 
 export function computeBarycenter(body: IOrbitalBody, relevantBodies: IOrbitalBody[]): [Vector3, Quaternion] {
-    const barycenter = body.transform.getAbsolutePosition().scale(body.physicalProperties.mass);
+    const barycenter = body.transform.getAbsolutePosition().scale(body.descriptor.physicalProperties.mass);
     const meanQuaternion = Quaternion.Zero();
-    let sumPosition = body.physicalProperties.mass;
+    let sumPosition = body.descriptor.physicalProperties.mass;
     let sumQuaternion = 0;
     for (const otherBody of relevantBodies) {
-        const mass = otherBody.physicalProperties.mass;
+        const mass = otherBody.descriptor.physicalProperties.mass;
         barycenter.addInPlace(otherBody.transform.getAbsolutePosition().scale(mass));
         meanQuaternion.addInPlace(stripAxisFromQuaternion(otherBody.transform.getRotationQuaternion(), Axis.Y).scale(mass));
         sumPosition += mass;
@@ -88,7 +89,7 @@ export function computePointOnOrbit(centerOfMass: Vector3, settings: IOrbitalPro
  * @param otherBodies
  * @see https://www.wikiwand.com/fr/Lois_de_Kepler#/Troisi%C3%A8me_loi_%E2%80%93_Loi_des_p%C3%A9riodes
  */
-export function getOrbitalPeriod(periapsis: number, apoapsis: number, otherBodies: IOrbitalBody[]) {
+export function getOrbitalPeriod(periapsis: number, apoapsis: number, otherBodies: BodyDescriptor[]) {
     const a = (periapsis + apoapsis) / 2;
     const G = 1e12;
     let M = 0;

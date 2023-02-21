@@ -85,7 +85,7 @@ Assets.Init(scene).then(() => {
         }
 
         //FIXME: should address stars orbits
-        for (const star of starSystem.stars) star.orbitalProperties.period = 0;
+        for (const star of starSystem.stars) star.descriptor.orbitalProperties.period = 0;
 
         Assets.ChunkForge.update();
         starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);

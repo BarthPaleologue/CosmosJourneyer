@@ -1,30 +1,70 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
-import { BodyDescriptor } from "./interfaces";
+import { BodyDescriptor, PlanemoDescriptor } from "./interfaces";
+import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
+import { getOrbitalPeriod } from "../orbits/kepler";
+import { Quaternion } from "@babylonjs/core";
+import { PlanetPhysicalProperties } from "../bodies/physicalProperties";
+import { BodyType } from "../bodies/interfaces";
 
 enum GENERATION_STEPS {
+    AXIAL_TILT = 100,
+    ORBIT = 200,
     RADIUS = 1000,
     RINGS = 1200,
     NB_MOONS = 10,
     MOONS = 11,
 }
 
-export class GasPlanetDescriptor implements BodyDescriptor {
+export class GasPlanetDescriptor implements PlanemoDescriptor {
+    readonly bodyType = BodyType.GAZ;
     readonly seed: number;
     readonly rng: (step: number) => number;
 
     readonly radius: number;
 
+    readonly orbitalProperties: IOrbitalProperties;
+
+    readonly physicalProperties: PlanetPhysicalProperties;
+
     readonly hasRings: boolean;
 
     readonly nbMoons: number;
 
-    constructor(seed: number) {
+    readonly parentBodies: BodyDescriptor[];
+
+    readonly childrenBodies: BodyDescriptor[] = [];
+
+    constructor(seed: number, parentBodies: BodyDescriptor[]) {
         this.seed = seed;
+
         this.rng = seededSquirrelNoise(this.seed);
 
+        this.parentBodies = parentBodies;
+
         this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng, GENERATION_STEPS.RADIUS);
+
+        // TODO: do not hardcode
+        const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 5000000e3;
+        const apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
+
+        this.orbitalProperties = {
+            periapsis: periapsis,
+            apoapsis: apoapsis,
+            period: getOrbitalPeriod(periapsis, apoapsis, []),
+            orientationQuaternion: Quaternion.Identity()
+        };
+
+        this.physicalProperties = {
+            // FIXME: choose physically accurates values
+            mass: 10,
+            axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
+            rotationPeriod: 24 * 60 * 60 / 10,
+            minTemperature: -180,
+            maxTemperature: 200,
+            pressure: 1
+        }
 
         this.hasRings = uniformRandBool(0.8, this.rng, GENERATION_STEPS.RINGS);
 
@@ -34,5 +74,14 @@ export class GasPlanetDescriptor implements BodyDescriptor {
     getMoonSeed(index: number) {
         if (index > this.nbMoons) throw new Error("Moon out of bound! " + index);
         return this.rng(GENERATION_STEPS.MOONS + index);
+    }
+
+    getApparentRadius(): number {
+        return this.radius;
+    }
+
+    get depth(): number {
+        if(this.parentBodies.length === 0) return 0;
+        return this.parentBodies[0].depth + 1;
     }
 }

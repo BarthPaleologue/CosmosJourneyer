@@ -3,13 +3,12 @@ import { AbstractBody } from "../abstractBody";
 import { Mesh, MeshBuilder, PointLight, Quaternion, Vector3 } from "@babylonjs/core";
 import { BodyType } from "../interfaces";
 import { AbstractController } from "../../uberCore/abstractController";
-import { StarPhysicalProperties } from "../physicalProperties";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
-import { IOrbitalBody } from "../../orbits/iOrbitalBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { StarDescriptor } from "../../descriptors/starDescriptor";
+import { BodyDescriptor } from "../../descriptors/interfaces";
 
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
@@ -17,7 +16,6 @@ export class Star extends AbstractBody {
     private readonly material: StarMaterial;
 
     override readonly bodyType = BodyType.STAR;
-    override readonly physicalProperties: StarPhysicalProperties;
 
     public override postProcesses: StarPostProcesses;
 
@@ -32,18 +30,12 @@ export class Star extends AbstractBody {
      * @param seed The seed of the star in [-1, 1]
      * @param parentBodies The bodies the star is orbiting
      */
-    constructor(name: string, scene: UberScene, seed: number, parentBodies: IOrbitalBody[]) {
-        super(name, seed, parentBodies);
+    constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
+        super(name, parentBodies);
 
-        this.descriptor = new StarDescriptor(seed);
+        this.descriptor = new StarDescriptor(seed, parentBodies.map((body) => body.descriptor));
 
         this.radius = this.descriptor.radius;
-
-        this.physicalProperties = {
-            mass: this.descriptor.mass,
-            rotationPeriod: this.descriptor.rotationPeriod,
-            temperature: this.descriptor.surfaceTemperature
-        };
 
         this.mesh = MeshBuilder.CreateSphere(
             `${name}Mesh`,
@@ -56,10 +48,10 @@ export class Star extends AbstractBody {
         this.mesh.parent = this.transform.node;
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse.fromArray(getRgbFromTemperature(this.physicalProperties.temperature).asArray());
+        this.light.diffuse.fromArray(getRgbFromTemperature(this.descriptor.physicalProperties.temperature).asArray());
         this.light.parent = this.transform.node;
 
-        this.material = new StarMaterial(this.transform, this.seed, this.physicalProperties, scene);
+        this.material = new StarMaterial(this.transform, this.descriptor.seed, this.descriptor.physicalProperties, scene);
         this.mesh.material = this.material;
 
         // TODO: remove when rotation is transmitted to children

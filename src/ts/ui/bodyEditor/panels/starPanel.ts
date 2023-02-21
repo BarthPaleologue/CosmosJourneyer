@@ -14,8 +14,8 @@ export class StarPanel extends EditorPanel {
         const volumetricLight = postProcessManager.getVolumetricLight(star);
 
         this.sliders = [
-            new Slider("temperature", document.getElementById("temperature") as HTMLElement, 3000, 15000, star.physicalProperties.temperature, (val: number) => {
-                star.physicalProperties.temperature = val;
+            new Slider("temperature", document.getElementById("temperature") as HTMLElement, 3000, 15000, star.descriptor.physicalProperties.temperature, (val: number) => {
+                star.descriptor.physicalProperties.temperature = val;
             }),
             new Slider("starExposure", document.getElementById("starExposure") as HTMLElement, 0, 200, volumetricLight.exposure * 100, (val: number) => {
                 volumetricLight.exposure = val / 100;
