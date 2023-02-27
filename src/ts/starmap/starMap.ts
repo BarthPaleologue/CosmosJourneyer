@@ -39,9 +39,9 @@ export class StarMap {
     private readonly starBuildQueue: BuildData[] = [];
     private readonly starTrashQueue: InstancedMesh[] = [];
 
-    static readonly GENERATION_CADENCE = 7;
+    static readonly GENERATION_CADENCE = 10;
 
-    static readonly RENDER_RADIUS = 4;
+    static readonly RENDER_RADIUS = 5;
 
     private readonly gui: AdvancedDynamicTexture;
     private readonly namePlate: StackPanel;
@@ -176,7 +176,7 @@ export class StarMap {
      * @param position The position of the cell
      */
     private registerCell(position: Vector3) {
-        const cell = new Cell(position, this.starMapCenterPosition);
+        const cell = new Cell(position);
         this.loadedCells.set(cell.getKey(), cell);
         this.starBuildQueue.push(...cell.generate());
     }
@@ -222,7 +222,7 @@ export class StarMap {
     private disposeNextStars(n: number) {
         for (let i = 0; i < n; i++) {
             if (this.starTrashQueue.length == 0) return;
-            fadeOutThenDispose(this.starTrashQueue[0]);
+            this.fadeOutThenDispose(this.starTrashQueue[0]);
             this.starTrashQueue.shift();
         }
     }
@@ -271,20 +271,19 @@ export class StarMap {
             star.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
 
             //fade the star in
-            fadeIn(star);
+            this.fadeIn(star);
 
             this.loadedCells.get(data.cellString)?.meshes.push(star);
         }
     }
-}
 
-//fade the star in
-function fadeIn(star: InstancedMesh) {
-    star.animations.push(StarMap.FADE_IN_ANIMATION);
-    star.getScene().beginAnimation(star, 0, StarMap.FADE_IN_DURATION / 60);
-}
+    private fadeIn(star: InstancedMesh) {
+        star.animations.push(StarMap.FADE_IN_ANIMATION);
+        star.getScene().beginAnimation(star, 0, StarMap.FADE_IN_DURATION / 60);
+    }
 
-function fadeOutThenDispose(star: InstancedMesh) {
-    star.animations.push(StarMap.FADE_OUT_ANIMATION);
-    star.getScene().beginAnimation(star, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => star.dispose());
+    private fadeOutThenDispose(star: InstancedMesh) {
+        star.animations.push(StarMap.FADE_OUT_ANIMATION);
+        star.getScene().beginAnimation(star, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => star.dispose());
+    }
 }

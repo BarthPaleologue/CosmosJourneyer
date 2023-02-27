@@ -41,7 +41,7 @@ export class Cell {
      */
     readonly rng: (step: number) => number;
 
-    constructor(positionInStarMap: Vector3, starMapCenterPosition: Vector3) {
+    constructor(positionInStarMap: Vector3) {
         this.position = positionInStarMap;
         this.meshes = [];
         this.rng = seededSquirrelNoise(hashVec3(positionInStarMap));
