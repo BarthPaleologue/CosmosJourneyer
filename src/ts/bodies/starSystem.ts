@@ -3,7 +3,7 @@ import { Vector3 } from "@babylonjs/core";
 import { AbstractBody, isOrbiting } from "./abstractBody";
 import { Star } from "./stars/star";
 import { UberScene } from "../uberCore/uberScene";
-import { Planet } from "./planets/planet";
+import { Planemo } from "./planets/planemo";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { TelluricPlanet } from "./planets/telluricPlanet";
 import { GasPlanet } from "./planets/gasPlanet";
@@ -26,7 +26,13 @@ export class StarSystem {
 
     readonly stars: (Star | BlackHole)[] = [];
 
-    readonly planets: Planet[] = []; //TODO: contains satellites : make sense out of this
+    readonly planemos: Planemo[] = [];
+
+    readonly planets: Planemo[] = [];
+
+    readonly telluricPlanets: TelluricPlanet[] = [];
+    readonly gasPlanets: GasPlanet[] = [];
+    readonly satellites: TelluricPlanet[] = [];
 
     readonly descriptor: StarSystemDescriptor;
 
@@ -38,13 +44,38 @@ export class StarSystem {
     }
 
     /**
-     * Adds a telluric or gas planet to the system and returns it
-     * @param planet The planet added to the system
+     * Adds a telluric planet to the system and returns it
+     * @param planet The planet to add to the system
      */
-    public addPlanet(planet: TelluricPlanet | GasPlanet): TelluricPlanet | GasPlanet {
+    public addTelluricPlanet(planet: TelluricPlanet): TelluricPlanet {
         this.bodies.push(planet);
+        this.planemos.push(planet);
         this.planets.push(planet);
+        this.telluricPlanets.push(planet);
         return planet;
+    }
+
+    /**
+     * Adds a gas planet to the system and returns it
+     * @param planet The planet to add to the system
+     */
+    public addGasPlanet(planet: GasPlanet): GasPlanet {
+        this.bodies.push(planet);
+        this.planemos.push(planet);
+        this.planets.push(planet);
+        this.gasPlanets.push(planet);
+        return planet;
+    }
+
+    /**
+     * Adds a satellite to the system and returns it
+     * @param satellite The satellite to add to the system
+     */
+    public addTelluricSatellite(satellite: TelluricPlanet): TelluricPlanet {
+        this.bodies.push(satellite);
+        this.planemos.push(satellite);
+        this.satellites.push(satellite);
+        return satellite;
     }
 
     /**
@@ -57,7 +88,14 @@ export class StarSystem {
         return star;
     }
 
+    /**
+     * Makes a telluric planet and adds it to the system. By default, it will use the next available seed planned by the system descriptor
+     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system descriptor)
+     */
     public makeStar(seed = this.descriptor.getStarSeed(this.stars.length)): Star {
+        if(this.stars.length >= this.descriptor.getNbStars()) console.warn(`You are adding a star 
+        to a system that already has ${this.stars.length} stars.
+        The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`)
         const star = new Star(`star${this.stars.length}`, this.scene, seed, []);
         //TODO: make this better, make it part of the generation
         star.descriptor.orbitalProperties.periapsis = star.getRadius() * 4;
@@ -67,33 +105,58 @@ export class StarSystem {
         return star;
     }
 
+    /**
+     * Makes a black hole and adds it to the system. By default, it will use the next available seed planned by the system descriptor
+     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system descriptor)
+     */
     public makeBlackHole(seed = this.descriptor.getStarSeed(this.stars.length)): BlackHole {
+        if(this.stars.length >= this.descriptor.getNbStars()) console.warn(`You are adding a black hole
+        to a system that already has ${this.stars.length} stars.
+        The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
         const blackHole = new BlackHole(`blackHole${this.stars.length}`, 1000e3, seed, this.stars);
         this.addStar(blackHole);
         return blackHole;
     }
 
-    public makeStars(n: number): void {
+    /**
+     * Makes n stars and adds them to the system. By default, it will use the next available seeds planned by the system descriptor
+     * @param n The number of stars to make (by default, the number of stars planned by the system descriptor)
+     */
+    public makeStars(n= this.descriptor.getNbStars()): void {
         if (n < 1) throw new Error("Cannot make less than 1 star");
         for (let i = 0; i < n; i++) this.makeStar();
     }
 
+    /**
+     * Makes a telluric planet and adds it to the system. By default, it will use the next available seed planned by the system descriptor
+     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system descriptor)
+     */
     public makeTelluricPlanet(seed = this.descriptor.getPlanetSeed(this.planets.length)): TelluricPlanet {
+        if (this.planets.length >= this.descriptor.getNbPlanets()) console.warn(`You are adding a telluric planet to the system.
+            The system generator had planned for ${this.descriptor.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
+            This might cause issues, or not who knows.`);
         const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this.scene, seed, this.stars);
-        this.addPlanet(planet);
+        this.addTelluricPlanet(planet);
         return planet;
     }
 
+    /**
+     * Makes a gas planet and adds it to the system. By default, it will use the next available seed planned by the system descriptor
+     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system descriptor)
+     */
     public makeGasPlanet(seed = this.descriptor.getPlanetSeed(this.planets.length)): GasPlanet {
+        if (this.planets.length >= this.descriptor.getNbPlanets()) console.warn(`You are adding a gas planet to the system.
+            The system generator had planned for ${this.descriptor.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
+            This might cause issues, or not who knows.`);
         const planet = new GasPlanet(`gasPlanet${this.planets.length}`, this.scene, seed, this.stars);
-        this.addPlanet(planet);
+        this.addGasPlanet(planet);
         return planet;
     }
 
     public makePlanets(n: number): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of planets : ${n}`);
         for (let i = 0; i < n; i++) {
-            if (uniformRandBool(0.5, this.descriptor.rng, Steps.CHOOSE_PLANET_TYPE + this.planets.length)) {
+            if (uniformRandBool(0.5, this.descriptor.rng, Steps.CHOOSE_PLANET_TYPE + this.planemos.length)) {
                 const planet = this.makeTelluricPlanet();
                 this.makeSatellites(planet, planet.descriptor.nbMoons);
             } else {
@@ -103,8 +166,8 @@ export class StarSystem {
         }
     }
 
-    public makeSatellite(planet: AbstractBody, seed: number): TelluricPlanet {
-        const satellite = new TelluricPlanet(`${planet.name}Sattelite`, this.scene, seed, [planet]);
+    public makeSatellite(planet: TelluricPlanet | GasPlanet, seed = planet.descriptor.getMoonSeed(planet.descriptor.childrenBodies.length)): TelluricPlanet {
+        const satellite = new TelluricPlanet(`${planet.name}Sattelite${planet.descriptor.childrenBodies.length}`, this.scene, seed, [planet]);
         const periapsis = 2 * planet.getRadius() + clamp(normalRandom(3, 1, satellite.descriptor.rng, 90), 0, 20) * planet.getRadius() * 2;
         const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.descriptor.rng, 92), 1, 1.5);
         satellite.descriptor.physicalProperties.mass = 1;
@@ -121,13 +184,28 @@ export class StarSystem {
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
         satellite.material.updateConstants();
 
-        this.addPlanet(satellite); //FIXME: this is wrong, satellites are not planets
+        planet.descriptor.childrenBodies.push(satellite.descriptor);
+
+        this.addTelluricSatellite(satellite);
         return satellite;
     }
 
-    public makeSatellites(planet: AbstractBody, n: number): void {
+    /**
+     * Makes n more satellites for the given planet. By default, it will make as many as the planet has in the generation.
+     * You can make more, but it will generate warnings and might cause issues.
+     * @param planet The planet to make satellites for
+     * @param n The number of satellites to make
+     */
+    public makeSatellites(planet: TelluricPlanet | GasPlanet, n = planet.descriptor.nbMoons): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
-        for (let i = 0; i < n; i++) this.makeSatellite(planet, planet.descriptor.rng(100 + i));
+        if (planet.descriptor.childrenBodies.length + n > planet.descriptor.nbMoons) console.warn(
+            `You are making more satellites than the planet had planned in its the generation: 
+            You want ${n} more which will amount to a total ${planet.descriptor.childrenBodies.length + n}. 
+            The generator had planned ${planet.descriptor.nbMoons}.
+            This might cause issues, or not who knows. 
+            You can just leave this argument empty to make as many as the planet had planned.`);
+
+        for (let i = 0; i < n; i++) this.makeSatellite(planet, planet.descriptor.getMoonSeed(planet.descriptor.childrenBodies.length));
     }
 
     /**
@@ -139,10 +217,17 @@ export class StarSystem {
     }
 
     /**
-     * Returns the list of all celestial bodies managed by the star system manager
+     * Returns the list of all celestial bodies managed by the star system
      */
     public getBodies(): AbstractBody[] {
         return this.bodies;
+    }
+
+    /**
+     * Returns the list of all planets managed by the star system
+     */
+    public getPlanets(): Planemo[] {
+        return this.planemos;
     }
 
     /**
@@ -188,7 +273,7 @@ export class StarSystem {
     public update(deltaTime: number): void {
         for (const body of this.getBodies()) body.updateTransform(this.scene.getActiveController(), deltaTime);
 
-        for (const planet of this.planets) planet.updateMaterial(this.scene.getActiveController(), this.stars);
+        for (const planet of this.planemos) planet.updateMaterial(this.scene.getActiveController(), this.stars);
 
         const displacement = this.scene.getActiveController().transform.getAbsolutePosition().negate();
         this.translateAllBodies(displacement);

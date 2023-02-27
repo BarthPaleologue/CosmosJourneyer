@@ -91,12 +91,14 @@ export abstract class AbstractBody implements IOrbitalBody {
         this.internalTime += deltaTime;
     }
 
+    //TODO: The body should not manipulate the controller, this should be done in the star system
+
     public updateOrbitalPosition(controller: AbstractController): void {
         if (this.descriptor.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
             this.descriptor.orbitalProperties.orientationQuaternion = orientationQuaternion;
 
-            //TODO: orient the planet accurately
+            // TODO: orient the planet accurately
 
             const initialPosition = this.transform.getAbsolutePosition().clone();
             const newPosition = computePointOnOrbit(barycenter, this.descriptor.orbitalProperties, this.internalTime);

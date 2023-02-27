@@ -73,7 +73,7 @@ export class GasPlanetDescriptor implements PlanemoDescriptor {
 
     getMoonSeed(index: number) {
         if (index > this.nbMoons) throw new Error("Moon out of bound! " + index);
-        return this.rng(GENERATION_STEPS.MOONS + index);
+        return (this.rng(GENERATION_STEPS.MOONS + index) - 0.5) * 1e6;
     }
 
     getApparentRadius(): number {

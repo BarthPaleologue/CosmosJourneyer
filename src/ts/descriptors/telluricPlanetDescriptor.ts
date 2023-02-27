@@ -27,7 +27,7 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
     readonly seed: number;
     readonly rng: (step: number) => number;
 
-    radius: number;
+    readonly radius: number;
 
     readonly orbitalProperties: IOrbitalProperties;
 
@@ -39,6 +39,9 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
 
     readonly nbMoons: number;
 
+    private isSatelliteOfTelluric = false;
+    private isSatelliteOfGas = false;
+
     readonly parentBodies: BodyDescriptor[];
     readonly childrenBodies: BodyDescriptor[] = [];
 
@@ -48,7 +51,18 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
 
         this.parentBodies = parentBodies;
 
-        this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
+        for (const parentBody of parentBodies) {
+            if (parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true;
+            if (parentBody.bodyType == BodyType.GAS) this.isSatelliteOfGas = true;
+        }
+
+        if (this.isSatelliteOfTelluric) {
+            this.radius = Math.max(0.02, normalRandom(0.08, 0.03, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
+        } else if (this.isSatelliteOfGas) {
+            this.radius = Math.max(0.02, normalRandom(0.5, 0.1, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
+        } else {
+            this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
+        }
 
         // TODO: do not hardcode
         const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 5000000e3;
@@ -72,6 +86,11 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
             oceanLevel: 0
         };
 
+        if (this.isSatelliteOfTelluric) {
+            this.physicalProperties.pressure = Math.max(normalRandom(0.01, 0.01, this.rng, GENERATION_STEPS.PRESSURE), 0);
+        }
+        if (this.radius <= 0.3 * Settings.EARTH_RADIUS) this.physicalProperties.pressure = 0;
+
         this.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * this.physicalProperties.waterAmount * this.physicalProperties.pressure;
 
         this.terrainSettings = {
@@ -87,7 +106,12 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
             mountains_frequency: (20 * this.radius) / Settings.EARTH_RADIUS
         };
 
-        this.hasRings = uniformRandBool(0.6, this.rng, GENERATION_STEPS.RINGS);
+        if (this.isSatelliteOfTelluric) {
+            this.terrainSettings.continents_fragmentation = 0;
+            this.terrainSettings.max_mountain_height = 2e3;
+        }
+
+        this.hasRings = uniformRandBool(0.6, this.rng, GENERATION_STEPS.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas;
 
         this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);
     }
@@ -99,7 +123,7 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
 
     getMoonSeed(index: number) {
         if (index > this.nbMoons) throw new Error("Moon out of bound! " + index);
-        return this.rng(GENERATION_STEPS.MOONS + index);
+        return (this.rng(GENERATION_STEPS.MOONS + index) - 0.5) * 1e6;
     }
 
     getApparentRadius(): number {

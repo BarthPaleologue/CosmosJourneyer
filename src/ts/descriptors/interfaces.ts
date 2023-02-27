@@ -24,6 +24,8 @@ export interface PlanemoDescriptor extends BodyDescriptor {
     physicalProperties: PlanetPhysicalProperties;
 
     getApparentRadius(): number;
+
+    getMoonSeed(index: number): number;
 }
 
 export interface TelluricBodyDescriptor extends PlanemoDescriptor {

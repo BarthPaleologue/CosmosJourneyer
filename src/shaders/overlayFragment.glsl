@@ -62,7 +62,7 @@ void main() {
     vec2 unitUVSquare = (uvSquare - vUVSquare) / distance;
     vec3 color = vec3(0.0);
     float limit1 = 0.03 * pow(planetRadius / 1e6, 0.2);
-    float limit2 = 0.032 * pow(planetRadius / 1e6, 0.2);
+    float limit2 = max(limit1 + 0.005, 0.032 * limit1);
     if(distance >= limit1 && distance <= limit2) {
         float angle = atan(unitUVSquare.y, unitUVSquare.x);
         float angleOff = 0.2;

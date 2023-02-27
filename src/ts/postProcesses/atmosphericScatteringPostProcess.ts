@@ -35,7 +35,7 @@ export class AtmosphericScatteringPostProcess extends BodyPostProcess {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 10,
-            intensity: 15 * planet.descriptor.physicalProperties.pressure,
+            intensity: 11 * planet.descriptor.physicalProperties.pressure,
             rayleighStrength: 1,
             mieStrength: 1,
             densityModifier: 1,

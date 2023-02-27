@@ -9,6 +9,7 @@ export function Vector3ToString(v: Vector3): string {
 
 export type BuildData = {
     name: string;
+    seed: number;
     cellString: string;
     scale: number;
     position: Vector3;
@@ -19,24 +20,26 @@ export class Cell {
     readonly position: Vector3;
     static readonly SIZE = 1;
 
+    readonly rng: (step: number) => number;
+
     constructor(position: Vector3) {
         this.position = position;
         this.meshes = [];
+        this.rng = seededSquirrelNoise(hashVec3(position));
     }
 
     generate(): BuildData[] {
         const cellString = Vector3ToString(this.position);
-        const seed = hashVec3(this.position);
-        const rng = seededSquirrelNoise(seed);
         const density = 10;
-        const nbStars = rng(0) * density;
+        const nbStars = this.rng(0) * density;
         const data = [];
         for (let i = 0; i < nbStars; i++) {
             data.push({
                 name: `starInstance|${this.position.x}|${this.position.y}|${this.position.z}|${i}`,
+                seed: (this.rng(1 + i) - 0.5) * 1e6,
                 cellString: cellString,
-                scale: 0.5 + rng(100 * i) / 2,
-                position: new Vector3(centeredRand(rng, 10 * i + 1) / 2, centeredRand(rng, 10 * i + 2) / 2, centeredRand(rng, 10 * i + 3) / 2).addInPlace(this.position)
+                scale: 0.5 + this.rng(100 * i) / 2,
+                position: new Vector3(centeredRand(this.rng, 10 * i + 1) / 2, centeredRand(this.rng, 10 * i + 2) / 2, centeredRand(this.rng, 10 * i + 3) / 2).addInPlace(this.position)
             });
         }
         return data;

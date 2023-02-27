@@ -6,7 +6,7 @@ import "../styles/index.scss";
 
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
-import { StarMap } from "./map/starMap";
+import { StarMap } from "./starmap/starMap";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;

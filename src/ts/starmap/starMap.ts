@@ -199,7 +199,7 @@ export class StarMap {
             star.isPickable = true;
             star.actionManager = new ActionManager(this.scene);
 
-            const starSystemSeed = hashVec3(star.position) * Number.MAX_SAFE_INTEGER;
+            const starSystemSeed = data.seed;
 
             const starSystemDescriptor = new StarSystemDescriptor(starSystemSeed);
 
