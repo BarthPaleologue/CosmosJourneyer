@@ -71,10 +71,6 @@ const config = {
                 loader: "ts-loader",
                 exclude: ["/node_modules/"]
             },
-            /*{
-                test: /\.wasm$/i,
-                type: "asset/inline"
-            },*/
             {
                 test: /\.css$/i,
                 use: [MiniCssExtractPlugin.loader, "css-loader"]
@@ -121,6 +117,6 @@ module.exports = () => {
     config.experiments = {
         asyncWebAssembly: true,
         topLevelAwait: true
-    }
+    };
     return config;
 };
