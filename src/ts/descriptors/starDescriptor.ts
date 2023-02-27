@@ -55,8 +55,6 @@ export class StarDescriptor implements BodyDescriptor {
     readonly childrenBodies: BodyDescriptor[] = [];
 
     constructor(seed: number, parentBodies: BodyDescriptor[]) {
-        console.assert(-1 <= seed && seed <= 1, "seed must be in [-1, 1]");
-
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 

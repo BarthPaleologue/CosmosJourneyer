@@ -31,5 +31,7 @@ Assets.Init(starMap.scene).then(() => {
 });
 
 window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     engine.resize();
 });

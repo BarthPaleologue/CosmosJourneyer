@@ -20,7 +20,6 @@ import { PlayerController } from "../controllers/playerController";
 import { Keyboard } from "../inputs/keyboard";
 
 import starTexture from "../../asset/textures/starParticle.png";
-import { hashVec3 } from "../utils/hashVec3";
 import { AdvancedDynamicTexture, Button, StackPanel, TextBlock } from "@babylonjs/gui";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 import { StarDescriptor } from "../descriptors/starDescriptor";
@@ -38,6 +37,8 @@ export class StarMap {
 
     static readonly GENERATION_CADENCE = 7;
 
+    static readonly RENDER_RADIUS = 4;
+
     private readonly gui: AdvancedDynamicTexture;
     private readonly namePlate: StackPanel;
     private readonly nameLabel: TextBlock;
@@ -46,7 +47,17 @@ export class StarMap {
     private selectedSystemSeed: number | null = null;
 
     private readonly loadedCells: Map<string, Cell> = new Map<string, Cell>();
+
+    /**
+     * The position of the cell the player is currently in (relative to the global node).
+     */
     private currentCellPosition = Vector3.Zero();
+
+    static readonly FADE_OUT_ANIMATION = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    static readonly FADE_OUT_DURATION = 1000;
+
+    static readonly FADE_IN_ANIMATION = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    static readonly FADE_IN_DURATION = 1000;
 
     constructor(engine: Engine) {
         this.scene = new Scene(engine);
@@ -118,44 +129,68 @@ export class StarMap {
         this.starTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
         this.starTemplate.material = starMaterial;
 
+        StarMap.FADE_OUT_ANIMATION.setKeys([
+            {
+                frame: 0,
+                value: 1
+            },
+            {
+                frame: StarMap.FADE_OUT_DURATION / 60,
+                value: 0
+            }
+        ]);
+
+        StarMap.FADE_IN_ANIMATION.setKeys([
+            {
+                frame: 0,
+                value: 0
+            },
+            {
+                frame: StarMap.FADE_IN_DURATION / 60,
+                value: 1
+            }
+        ]);
+
         this.scene.registerBeforeRender(() => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
             this.globalNode.position.addInPlace(this.controller.update(deltaTime));
             const cameraPosition = this.globalNode.position.negate();
 
-            this.currentCellPosition = new Vector3(Math.round(cameraPosition.x), Math.round(cameraPosition.y), Math.round(cameraPosition.z));
+            this.currentCellPosition = new Vector3(Math.round(cameraPosition.x / Cell.SIZE), Math.round(cameraPosition.y / Cell.SIZE), Math.round(cameraPosition.z / Cell.SIZE));
+
             this.updateCells();
         });
     }
 
     private generateCell(position: Vector3) {
         const cell = new Cell(position);
-        this.loadedCells.set(cell.uniqueString(), cell);
+        this.loadedCells.set(cell.getKey(), cell);
         this.starBuildQueue.push(...cell.generate());
     }
 
     private updateCells() {
-        const renderRadius = 4;
-
         // first remove all cells that are too far
         for (const cell of this.loadedCells.values()) {
             const position = cell.position;
-            if (position.add(this.globalNode.position).length() > renderRadius * 2) {
+            if (position.add(this.globalNode.position).length() > StarMap.RENDER_RADIUS + 1) {
                 this.starTrashQueue.push(...cell.meshes);
-                this.loadedCells.delete(cell.uniqueString());
+                this.loadedCells.delete(cell.getKey());
             }
         }
 
-        this.disposeNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed);
+        this.disposeNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed ** 3);
 
         // then generate missing cells
-        for (let x = -renderRadius; x <= renderRadius; x++) {
-            for (let y = -renderRadius; y <= renderRadius; y++) {
-                for (let z = -renderRadius; z <= renderRadius; z++) {
-                    const position = this.currentCellPosition.add(new Vector3(x, y, z));
-                    const cellString = Vector3ToString(position);
+        for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
+            for (let y = -StarMap.RENDER_RADIUS; y <= StarMap.RENDER_RADIUS; y++) {
+                for (let z = -StarMap.RENDER_RADIUS; z <= StarMap.RENDER_RADIUS; z++) {
+                    if (x * x + y * y + z * z > StarMap.RENDER_RADIUS * StarMap.RENDER_RADIUS) continue; // skip cells that are too far away (this is a sphere, not a cube)
 
-                    if (this.loadedCells.has(cellString)) continue; // already generated
+                    const position = this.currentCellPosition.add(new Vector3(x, y, z));
+                    const cellKey = Vector3ToString(position);
+
+                    if (this.loadedCells.has(cellKey)) continue; // already generated
+
                     // don't generate cells that are not in the frustum
                     const bb = Cell.getBoundingBox(position, this.globalNode.position);
                     if (!this.controller.getActiveCamera().isInFrustum(bb)) continue;
@@ -165,31 +200,27 @@ export class StarMap {
             }
         }
 
-        this.buildNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed);
+        this.buildNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed ** 3);
 
-        for (const mesh of this.scene.meshes) {
-            if (this.controller.getActiveCamera().isInFrustum(mesh.getBoundingInfo().boundingBox)) {
-                mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
-            } else {
-                mesh.billboardMode = Mesh.BILLBOARDMODE_NONE;
-            }
-        }
+        // if the star was removed, remove the nameplate
         if (this.namePlate.linkedMesh == null) this.gui.removeControl(this.namePlate);
     }
 
     private disposeNextStars(n: number) {
         for (let i = 0; i < n; i++) {
             if (this.starTrashQueue.length == 0) return;
-            fadeOutThenDispose(this.starTrashQueue[0], 1000);
+            fadeOutThenDispose(this.starTrashQueue[0]);
             this.starTrashQueue.shift();
         }
     }
 
-    private buildNextStars(n: number) {
+    private buildNextStars(n: number): void {
         for (let i = 0; i < n; i++) {
             if (this.starBuildQueue.length == 0) return;
             const data = this.starBuildQueue[0];
-            if (!this.loadedCells.has(data.cellString)) return; // if cell was removed in the meantime
+            this.starBuildQueue.shift();
+
+            if (!this.loadedCells.has(data.cellString)) return this.buildNextStars(1); // if cell was removed in the meantime
 
             const star = this.starTemplate.createInstance(data.name);
             star.scaling = new Vector3(1, 1, 1).scaleInPlace(data.scale);
@@ -227,49 +258,20 @@ export class StarMap {
             star.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
 
             //fade the star in
-            fadeIn(star, 1000);
+            fadeIn(star);
 
             this.loadedCells.get(data.cellString)?.meshes.push(star);
-
-            this.starBuildQueue.shift();
         }
     }
 }
 
 //fade the star in
-function fadeIn(star: InstancedMesh, duration: number) {
-    const fadeInAnimation = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
-
-    fadeInAnimation.setKeys([
-        {
-            frame: 0,
-            value: 0
-        },
-        {
-            frame: duration / 60,
-            value: 1
-        }
-    ]);
-
-    star.animations.push(fadeInAnimation);
-    star.getScene().beginAnimation(star, 0, duration / 60);
+function fadeIn(star: InstancedMesh) {
+    star.animations.push(StarMap.FADE_IN_ANIMATION);
+    star.getScene().beginAnimation(star, 0, StarMap.FADE_IN_DURATION / 60);
 }
 
-export function fadeOutThenDispose(star: InstancedMesh, duration: number) {
-    const fadeOutAnimation = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
-
-    fadeOutAnimation.setKeys([
-        {
-            frame: 0,
-            value: 1
-        },
-        {
-            frame: duration / 60,
-            value: 0
-        }
-    ]);
-
-    star.animations.push(fadeOutAnimation);
-    star.getScene().beginAnimation(star, 0, duration / 60);
-    setTimeout(() => star.dispose(), duration);
+function fadeOutThenDispose(star: InstancedMesh) {
+    star.animations.push(StarMap.FADE_OUT_ANIMATION);
+    star.getScene().beginAnimation(star, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => star.dispose());
 }

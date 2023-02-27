@@ -147,10 +147,15 @@ export class PostProcessManager {
      * @param stars An array of stars or black holes
      */
     public addAtmosphere(planet: GasPlanet | TelluricPlanet, stars: (Star | BlackHole)[]) {
-        this.atmospheres.push(new AtmosphericScatteringPostProcess(`${planet.name}Atmosphere`, planet,
-            planet.descriptor.bodyType == BodyType.TELLURIC ?
-                Settings.ATMOSPHERE_HEIGHT : Settings.ATMOSPHERE_HEIGHT * 5,
-            this.scene, stars));
+        this.atmospheres.push(
+            new AtmosphericScatteringPostProcess(
+                `${planet.name}Atmosphere`,
+                planet,
+                planet.descriptor.bodyType == BodyType.TELLURIC ? Settings.ATMOSPHERE_HEIGHT : Settings.ATMOSPHERE_HEIGHT * 5,
+                this.scene,
+                stars
+            )
+        );
     }
 
     /**
