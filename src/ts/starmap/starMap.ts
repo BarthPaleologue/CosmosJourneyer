@@ -29,7 +29,11 @@ export class StarMap {
     readonly scene: Scene;
     readonly controller: PlayerController;
 
-    private readonly globalNode: TransformNode;
+    /**
+     * The node marking the center of the starmap in world space.
+     */
+    private readonly starMapCenterPosition: Vector3;
+
     private readonly starTemplate: Mesh;
 
     private readonly starBuildQueue: BuildData[] = [];
@@ -110,7 +114,7 @@ export class StarMap {
         pipeline.imageProcessing.exposure = 1.1;
         pipeline.imageProcessing.contrast = 1.0;
 
-        this.globalNode = new TransformNode("node", this.scene);
+        this.starMapCenterPosition = new Vector3(0, 0, 0);
 
         this.starTemplate = MeshBuilder.CreatePlane("star", { width: 0.2, height: 0.2 }, this.scene);
         this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
@@ -153,8 +157,13 @@ export class StarMap {
 
         this.scene.registerBeforeRender(() => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
-            this.globalNode.position.addInPlace(this.controller.update(deltaTime));
-            const cameraPosition = this.globalNode.position.negate();
+
+            const playerDisplacementNegated = this.controller.update(deltaTime);
+
+            this.starMapCenterPosition.addInPlace(playerDisplacementNegated);
+            for (const mesh of this.scene.meshes) mesh.position.addInPlace(playerDisplacementNegated);
+
+            const cameraPosition = this.starMapCenterPosition.negate();
 
             this.currentCellPosition = new Vector3(Math.round(cameraPosition.x / Cell.SIZE), Math.round(cameraPosition.y / Cell.SIZE), Math.round(cameraPosition.z / Cell.SIZE));
 
@@ -162,8 +171,12 @@ export class StarMap {
         });
     }
 
-    private generateCell(position: Vector3) {
-        const cell = new Cell(position);
+    /**
+     * Register a cell at the given position, it will be added to the generation queue
+     * @param position The position of the cell
+     */
+    private registerCell(position: Vector3) {
+        const cell = new Cell(position, this.starMapCenterPosition);
         this.loadedCells.set(cell.getKey(), cell);
         this.starBuildQueue.push(...cell.generate());
     }
@@ -172,7 +185,7 @@ export class StarMap {
         // first remove all cells that are too far
         for (const cell of this.loadedCells.values()) {
             const position = cell.position;
-            if (position.add(this.globalNode.position).length() > StarMap.RENDER_RADIUS + 1) {
+            if (position.add(this.starMapCenterPosition).length() > StarMap.RENDER_RADIUS + 1) {
                 this.starTrashQueue.push(...cell.meshes);
                 this.loadedCells.delete(cell.getKey());
             }
@@ -192,10 +205,10 @@ export class StarMap {
                     if (this.loadedCells.has(cellKey)) continue; // already generated
 
                     // don't generate cells that are not in the frustum
-                    const bb = Cell.getBoundingBox(position, this.globalNode.position);
+                    const bb = Cell.getBoundingBox(position, this.starMapCenterPosition);
                     if (!this.controller.getActiveCamera().isInFrustum(bb)) continue;
 
-                    this.generateCell(position);
+                    this.registerCell(position);
                 }
             }
         }
@@ -220,12 +233,12 @@ export class StarMap {
             const data = this.starBuildQueue[0];
             this.starBuildQueue.shift();
 
-            if (!this.loadedCells.has(data.cellString)) return this.buildNextStars(1); // if cell was removed in the meantime
+            if (!this.loadedCells.has(data.cellString)) return this.buildNextStars(1); // if cell was removed in the meantime we build another star
 
+            const cell = this.loadedCells.get(data.cellString) as Cell;
             const star = this.starTemplate.createInstance(data.name);
-            star.scaling = new Vector3(1, 1, 1).scaleInPlace(data.scale);
-            star.position = data.position;
-            star.parent = this.globalNode;
+            star.scaling = Vector3.One().scaleInPlace(data.scale);
+            star.position = data.position.add(this.starMapCenterPosition);
 
             star.isPickable = true;
             star.actionManager = new ActionManager(this.scene);

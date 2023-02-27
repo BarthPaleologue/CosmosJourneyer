@@ -21,16 +21,30 @@ export type BuildData = {
 };
 
 export class Cell {
+    /**
+     * The meshes of the cell
+     */
     readonly meshes: InstancedMesh[];
+
+    /**
+     * The position of the cell relative to the center of the starmap
+     */
     readonly position: Vector3;
+
+    /**
+     * The size of all cells
+     */
     static readonly SIZE = 1;
 
+    /**
+     * The random number generator of the cell
+     */
     readonly rng: (step: number) => number;
 
-    constructor(position: Vector3) {
-        this.position = position;
+    constructor(positionInStarMap: Vector3, starMapCenterPosition: Vector3) {
+        this.position = positionInStarMap;
         this.meshes = [];
-        this.rng = seededSquirrelNoise(hashVec3(position));
+        this.rng = seededSquirrelNoise(hashVec3(positionInStarMap));
     }
 
     generate(): BuildData[] {
@@ -44,9 +58,7 @@ export class Cell {
                 seed: centeredRand(this.rng, (1 + i)) * 1e6,
                 cellString: cellString,
                 scale: 0.5 + this.rng(100 * i) / 2,
-                position: new Vector3(centeredRand(this.rng, 10 * i + 1) / 2, centeredRand(this.rng, 10 * i + 2) / 2, centeredRand(this.rng, 10 * i + 3) / 2).addInPlace(
-                    this.position
-                )
+                position: new Vector3(centeredRand(this.rng, 10 * i + 1) / 2, centeredRand(this.rng, 10 * i + 2) / 2, centeredRand(this.rng, 10 * i + 3) / 2).addInPlace(this.position)
             });
         }
         return data;
