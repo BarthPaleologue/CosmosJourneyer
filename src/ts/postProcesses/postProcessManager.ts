@@ -151,7 +151,7 @@ export class PostProcessManager {
             new AtmosphericScatteringPostProcess(
                 `${planet.name}Atmosphere`,
                 planet,
-                planet.descriptor.bodyType == BodyType.TELLURIC ? Settings.ATMOSPHERE_HEIGHT : Settings.ATMOSPHERE_HEIGHT * 5,
+                Settings.ATMOSPHERE_HEIGHT * Math.max(1, planet.descriptor.radius / Settings.EARTH_RADIUS),
                 this.scene,
                 stars
             )

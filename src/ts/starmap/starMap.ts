@@ -23,6 +23,7 @@ import { AdvancedDynamicTexture, Button, StackPanel, TextBlock } from "@babylonj
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 import { StarDescriptor } from "../descriptors/starDescriptor";
 import { BuildData, Cell, Vector3ToString } from "./cell";
+import { Mouse } from "../inputs/mouse";
 
 export class StarMap {
     readonly scene: Scene;
