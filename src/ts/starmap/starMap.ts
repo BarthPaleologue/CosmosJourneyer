@@ -29,7 +29,7 @@ export class StarMap {
     readonly controller: PlayerController;
 
     /**
-     * The node marking the center of the starmap in world space.
+     * The position of the center of the starmap in world space.
      */
     private readonly starMapCenterPosition: Vector3;
 
