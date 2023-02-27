@@ -1,5 +1,5 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
 import { BodyDescriptor, TelluricBodyDescriptor } from "./interfaces";
 import { TerrainSettings } from "../terrain/terrainSettings";
@@ -123,7 +123,7 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
 
     getMoonSeed(index: number) {
         if (index > this.nbMoons) throw new Error("Moon out of bound! " + index);
-        return (this.rng(GENERATION_STEPS.MOONS + index) - 0.5) * 1e6;
+        return centeredRand(this.rng, GENERATION_STEPS.MOONS + index) * Settings.SEED_HALF_RANGE;
     }
 
     getApparentRadius(): number {

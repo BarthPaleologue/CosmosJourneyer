@@ -1,5 +1,6 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { randRangeInt } from "extended-random";
+import { centeredRand, randRangeInt } from "extended-random";
+import { Settings } from "../settings";
 
 enum GENERATION_STEPS {
     NAME,
@@ -34,10 +35,10 @@ export class StarSystemDescriptor {
 
     public getStarSeed(index: number) {
         if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
-        return (this.rng(GENERATION_STEPS.GENERATE_STARS + index) * 2 - 1) * 100;
+        return centeredRand(this.rng, GENERATION_STEPS.GENERATE_STARS + index) * Settings.SEED_HALF_RANGE;
     }
 
     public getPlanetSeed(index: number) {
-        return (2 * this.rng(GENERATION_STEPS.GENERATE_PLANETS + index) - 1) * 1000;
+        return centeredRand(this.rng, GENERATION_STEPS.GENERATE_PLANETS + index) * Settings.SEED_HALF_RANGE;
     }
 }

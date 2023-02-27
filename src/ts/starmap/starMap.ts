@@ -13,7 +13,6 @@ import {
     ScenePerformancePriority,
     StandardMaterial,
     Texture,
-    TransformNode,
     Vector3
 } from "@babylonjs/core";
 import { PlayerController } from "../controllers/playerController";

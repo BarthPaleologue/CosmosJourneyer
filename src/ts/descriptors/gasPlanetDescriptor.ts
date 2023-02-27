@@ -1,5 +1,5 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
 import { BodyDescriptor, PlanemoDescriptor } from "./interfaces";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
@@ -73,7 +73,7 @@ export class GasPlanetDescriptor implements PlanemoDescriptor {
 
     getMoonSeed(index: number) {
         if (index > this.nbMoons) throw new Error("Moon out of bound! " + index);
-        return (this.rng(GENERATION_STEPS.MOONS + index) - 0.5) * 1e6;
+        return centeredRand(this.rng, GENERATION_STEPS.MOONS + index) * Settings.SEED_HALF_RANGE;
     }
 
     getApparentRadius(): number {

@@ -19,7 +19,7 @@ uniform float seed;
 
 void main() {
 	float plasmaSpeed = 0.005;
-	vec4 seededSamplePoint = vec4(rotateAround(vUnitSamplePoint, vec3(0.0, 1.0, 0.0), time * plasmaSpeed), seed);
+	vec4 seededSamplePoint = vec4(rotateAround(vUnitSamplePoint, vec3(0.0, 1.0, 0.0), time * plasmaSpeed), mod(seed, 1e3));
 
 	float noiseValue = fractalSimplex4(seededSamplePoint * 5.0, 8, 2.0, 2.0);
 

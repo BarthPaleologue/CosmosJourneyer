@@ -2,6 +2,7 @@ import { BoundingBox, InstancedMesh, Matrix, Vector3 } from "@babylonjs/core";
 import { hashVec3 } from "../utils/hashVec3";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand } from "extended-random";
+import { Settings } from "../settings";
 
 export function Vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
@@ -55,10 +56,12 @@ export class Cell {
         for (let i = 0; i < nbStars; i++) {
             data.push({
                 name: `starInstance|${this.position.x}|${this.position.y}|${this.position.z}|${i}`,
-                seed: centeredRand(this.rng, (1 + i)) * 1e6,
+                seed: centeredRand(this.rng, 1 + i) * Settings.SEED_HALF_RANGE,
                 cellString: cellString,
                 scale: 0.5 + this.rng(100 * i) / 2,
-                position: new Vector3(centeredRand(this.rng, 10 * i + 1) / 2, centeredRand(this.rng, 10 * i + 2) / 2, centeredRand(this.rng, 10 * i + 3) / 2).addInPlace(this.position)
+                position: new Vector3(centeredRand(this.rng, 10 * i + 1) / 2, centeredRand(this.rng, 10 * i + 2) / 2, centeredRand(this.rng, 10 * i + 3) / 2).addInPlace(
+                    this.position
+                )
             });
         }
         return data;

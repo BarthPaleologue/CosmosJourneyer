@@ -89,7 +89,7 @@ void main() {
     vec3 color = vec3(0.0);
 
     if(ndl > 0.0) {
-        vec4 seededSamplePoint = vec4(vUnitSamplePoint * 2.0, seed);
+        vec4 seededSamplePoint = vec4(vUnitSamplePoint * 2.0, mod(seed, 1e3));
 
         seededSamplePoint.y *= 2.5;
 
