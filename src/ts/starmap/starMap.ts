@@ -36,12 +36,13 @@ export class StarMap {
 
     private readonly starTemplate: Mesh;
 
-    private readonly starBuildQueue: BuildData[] = [];
+    private readonly starBuildStack: BuildData[] = [];
     private readonly starTrashQueue: InstancedMesh[] = [];
 
     static readonly GENERATION_CADENCE = 10;
+    static readonly DELETION_CADENCE = 100;
 
-    static readonly RENDER_RADIUS = 5;
+    static readonly RENDER_RADIUS = 7;
 
     private readonly gui: AdvancedDynamicTexture;
     private readonly namePlate: StackPanel;
@@ -178,7 +179,7 @@ export class StarMap {
     private registerCell(position: Vector3) {
         const cell = new Cell(position);
         this.loadedCells.set(cell.getKey(), cell);
-        this.starBuildQueue.push(...cell.generate());
+        this.starBuildStack.push(...cell.generate());
     }
 
     private updateCells() {
@@ -191,7 +192,7 @@ export class StarMap {
             }
         }
 
-        this.disposeNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed ** 3);
+        this.disposeNextStars(StarMap.DELETION_CADENCE * this.controller.getActiveCamera().speed ** 2);
 
         // then generate missing cells
         for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
@@ -213,7 +214,7 @@ export class StarMap {
             }
         }
 
-        this.buildNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed ** 3);
+        this.buildNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed ** 2);
 
         // if the star was removed, remove the nameplate
         if (this.namePlate.linkedMesh == null) this.gui.removeControl(this.namePlate);
@@ -229,11 +230,15 @@ export class StarMap {
 
     private buildNextStars(n: number): void {
         for (let i = 0; i < n; i++) {
-            if (this.starBuildQueue.length == 0) return;
-            const data = this.starBuildQueue[0];
-            this.starBuildQueue.shift();
+            if (this.starBuildStack.length == 0) return;
 
-            if (!this.loadedCells.has(data.cellString)) return this.buildNextStars(1); // if cell was removed in the meantime we build another star
+            const data = this.starBuildStack.pop() as BuildData;
+
+            if (!this.loadedCells.has(data.cellString)) {
+                // if cell was removed in the meantime we build another star
+                n++;
+                continue;
+            }
 
             const cell = this.loadedCells.get(data.cellString) as Cell;
             const star = this.starTemplate.createInstance(data.name);
