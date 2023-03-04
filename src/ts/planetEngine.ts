@@ -7,11 +7,11 @@ import { AbstractController } from "./uberCore/abstractController";
 import { UberScene } from "./uberCore/uberScene";
 import { StarSystem } from "./bodies/starSystem";
 import { CollisionWorker } from "./workers/collisionWorker";
-import { isOrbiting } from "./bodies/abstractBody";
 import { BodyType } from "./bodies/interfaces";
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 import { Settings } from "./settings";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
+import { isOrbiting } from "./utils/nearestBody";
 
 export class PlanetEngine {
     // UI

@@ -1,11 +1,12 @@
 import { EditorPanel } from "../editorPanel";
-import { AbstractBody, isOrbiting } from "../../../bodies/abstractBody";
+import { AbstractBody } from "../../../bodies/abstractBody";
 import { stripAxisFromQuaternion } from "../../../utils/algebra";
 import { Axis } from "@babylonjs/core";
 import { Slider } from "handle-sliderjs";
 import { Settings } from "../../../settings";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 import { UberScene } from "../../../uberCore/uberScene";
+import { isOrbiting } from "../../../utils/nearestBody";
 
 export class GeneralPanel extends EditorPanel {
     constructor() {

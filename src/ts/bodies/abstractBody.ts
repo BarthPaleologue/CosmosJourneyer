@@ -1,21 +1,10 @@
 import { Vector3 } from "@babylonjs/core";
 import { BodyType } from "./interfaces";
-import { AbstractController } from "../uberCore/abstractController";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { BodyDescriptor } from "../descriptors/interfaces";
 import { computeBarycenter, computePointOnOrbit } from "../orbits/kepler";
-
-/**
- * If the parameter is unset, returns whereas the player is orbiting a body, if the parameter is set returns if the player orbits the given body
- * @param controller the controller to check
- * @param body the body to check whereas the player is orbiting
- * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
- */
-export function isOrbiting(controller: AbstractController, body: AbstractBody, orbitLimitFactor = 2.5): boolean {
-    return body.transform.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * body.getRadius()) ** 2;
-}
 
 export abstract class AbstractBody implements IOrbitalBody {
     abstract readonly bodyType: BodyType;
@@ -91,40 +80,25 @@ export abstract class AbstractBody implements IOrbitalBody {
         this.internalTime += deltaTime;
     }
 
-    //TODO: The body should not manipulate the controller, this should be done in the star system
-
-    public updateOrbitalPosition(controller: AbstractController): void {
+    public updateOrbitalPosition(): Vector3 {
         if (this.descriptor.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
             this.descriptor.orbitalProperties.orientationQuaternion = orientationQuaternion;
 
-            // TODO: orient the planet accurately
-
             const initialPosition = this.transform.getAbsolutePosition().clone();
             const newPosition = computePointOnOrbit(barycenter, this.descriptor.orbitalProperties, this.internalTime);
 
-            if (isOrbiting(controller, this, 50 / (this.depth + 1) ** 3)) controller.transform.translate(newPosition.subtract(initialPosition));
             this.transform.translate(newPosition.subtract(initialPosition));
         }
+        return this.transform.getAbsolutePosition();
     }
 
-    public updateRotation(controller: AbstractController, deltaTime: number): void {
+    public updateRotation(deltaTime: number): number {
         if (this.descriptor.physicalProperties.rotationPeriod > 0) {
-            const dtheta = (2 * Math.PI * deltaTime) / this.descriptor.physicalProperties.rotationPeriod;
-
-            if (isOrbiting(controller, this)) controller.transform.rotateAround(this.transform.getAbsolutePosition(), this.getRotationAxis(), -dtheta);
-            this.transform.rotate(this.getRotationAxis(), -dtheta);
+            const dtheta = -(2 * Math.PI * deltaTime) / this.descriptor.physicalProperties.rotationPeriod;
+            this.transform.rotate(this.getRotationAxis(), dtheta);
+            return dtheta;
         }
-    }
-
-    /**
-     * Updates the state of the celestial body for a given time step of deltaTime
-     * @param player the player in the simulation
-     * @param deltaTime the time step to update for
-     */
-    public updateTransform(player: AbstractController, deltaTime: number): void {
-        this.updateClock(deltaTime);
-        this.updateOrbitalPosition(player);
-        this.updateRotation(player, deltaTime);
+        return 0;
     }
 }

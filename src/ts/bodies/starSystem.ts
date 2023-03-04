@@ -1,6 +1,6 @@
 import { Vector3 } from "@babylonjs/core";
 
-import { AbstractBody, isOrbiting } from "./abstractBody";
+import { AbstractBody } from "./abstractBody";
 import { Star } from "./stars/star";
 import { UberScene } from "../uberCore/uberScene";
 import { Planemo } from "./planets/planemo";
@@ -12,6 +12,8 @@ import { getOrbitalPeriod } from "../orbits/kepler";
 import { BlackHole } from "./stars/blackHole";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
+import { BodyType } from "./interfaces";
+import { isOrbiting } from "../utils/nearestBody";
 
 enum Steps {
     CHOOSE_PLANET_TYPE = 300
@@ -277,18 +279,38 @@ export class StarSystem {
      * @param deltaTime The time elapsed since the last update
      */
     public update(deltaTime: number): void {
-        for (const body of this.getBodies()) body.updateTransform(this.scene.getActiveController(), deltaTime);
+        const controller = this.scene.getActiveController();
 
-        for (const planet of this.planemos) planet.updateMaterial(this.scene.getActiveController(), this.stars);
+        for (const body of this.bodies) {
+            body.updateClock(deltaTime);
 
-        const displacement = this.scene.getActiveController().transform.getAbsolutePosition().negate();
+            const initialPosition = body.transform.getAbsolutePosition().clone();
+            const newPosition = body.updateOrbitalPosition().clone();
+
+            if (isOrbiting(controller, body, 50 / (body.depth + 1) ** 2)) controller.transform.translate(newPosition.subtract(initialPosition));
+
+            const dtheta = body.updateRotation(deltaTime);
+            if (isOrbiting(controller, body)) controller.transform.rotateAround(body.transform.getAbsolutePosition(), body.getRotationAxis(), dtheta);
+
+            if (body.bodyType == BodyType.TELLURIC) {
+                const telluric = body as TelluricPlanet;
+                telluric.updateLOD(controller.transform.getAbsolutePosition());
+            }
+        }
+
+        for (const planet of this.planemos) planet.updateMaterial(controller, this.stars);
+        for (const star of this.stars) {
+            if (star.bodyType == BodyType.STAR) (star as Star).updateMaterial();
+        }
+
+        const displacement = controller.transform.getAbsolutePosition().negate();
         this.translateAllBodies(displacement);
-        this.scene.getActiveController().transform.translate(displacement);
+        controller.transform.translate(displacement);
 
         const nearest = this.getNearestBody(this.scene.getActiveUberCamera().position);
         this.postProcessManager.setBody(nearest);
         const switchLimit = nearest.postProcesses.rings ? this.postProcessManager.getRings(nearest).settings.ringStart : 2;
-        if (isOrbiting(this.scene.getActiveController(), nearest, switchLimit)) this.postProcessManager.setSurfaceOrder();
+        if (isOrbiting(controller, nearest, switchLimit)) this.postProcessManager.setSurfaceOrder();
         else this.postProcessManager.setSpaceOrder();
         this.postProcessManager.update(deltaTime);
     }

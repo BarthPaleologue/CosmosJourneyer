@@ -64,8 +64,7 @@ export class Star extends AbstractBody {
         if (this.descriptor.hasRings) this.postProcesses.rings = true;
     }
 
-    public override updateTransform(player: AbstractController, deltaTime: number): void {
-        super.updateTransform(player, deltaTime);
+    public updateMaterial(): void {
         this.material.update(this.getInternalTime());
     }
 }

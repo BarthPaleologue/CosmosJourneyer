@@ -98,7 +98,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planemo {
      * Update terrain of the sphere relative to the observer position
      * @param observerPosition
      */
-    private updateLOD(observerPosition: Vector3): void {
+    public updateLOD(observerPosition: Vector3): void {
         for (const side of this.sides) side.update(observerPosition);
     }
 
@@ -107,11 +107,6 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planemo {
      */
     public reset(): void {
         for (const side of this.sides) side.reset();
-    }
-
-    public override updateTransform(player: AbstractController, deltaTime: number): void {
-        super.updateTransform(player, deltaTime);
-        this.updateLOD(player.transform.getAbsolutePosition());
     }
 
     public updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[]): void {
