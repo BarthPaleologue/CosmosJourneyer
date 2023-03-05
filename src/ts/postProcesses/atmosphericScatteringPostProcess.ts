@@ -42,7 +42,7 @@ export class AtmosphericScatteringPostProcess extends BodyPostProcess {
             redWaveLength: 700 * (1 + centeredRand(planet.descriptor.rng, 1300) / 6),
             greenWaveLength: 530 * (1 + centeredRand(planet.descriptor.rng, 1310) / 6),
             blueWaveLength: 440 * (1 + centeredRand(planet.descriptor.rng, 1320) / 6),
-            mieHaloRadius: 0.75
+            mieHaloRadius: 0.6
         };
 
         const uniforms: ShaderUniforms = [

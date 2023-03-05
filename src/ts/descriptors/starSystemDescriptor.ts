@@ -30,7 +30,7 @@ export class StarSystemDescriptor {
     }
 
     getNbPlanets(): number {
-        return randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_PLANETS);
+        return randRangeInt(0, 7, this.rng, GENERATION_STEPS.NB_PLANETS);
     }
 
     public getStarSeed(index: number) {
