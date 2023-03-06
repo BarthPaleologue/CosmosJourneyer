@@ -38,16 +38,14 @@ void main() {
 
     if(maximumDistance < cameraFar) finalColor = screenColor;
     else {
-        vec3 samplePoint = rayDir;
-
         // get spherical coordinates uv for the starfield texture
-        vec2 samplePoint2D = vec2(
-            sign(samplePoint.z) * acos(samplePoint.x / length(vec2(samplePoint.x, samplePoint.z))) / 6.28318530718,
-            acos(samplePoint.y) / 3.14159265359
+        vec2 starfieldUV = vec2(
+            sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
+            acos(rayDir.y) / 3.14159265359
         );
 
         // get the starfield color
-        vec3 starfieldColor = texture2D(starfieldTexture, samplePoint2D).rgb;
+        vec3 starfieldColor = texture2D(starfieldTexture, starfieldUV).rgb;
 
         finalColor = starfieldColor * visibility;
     }

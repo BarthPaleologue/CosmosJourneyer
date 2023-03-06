@@ -2,7 +2,7 @@ precision highp float;
 
 // based on https://www.shadertoy.com/view/tsBXW3
 
-#define _Steps  12.0//disk texture layers
+#define _Steps 12.0 //disk texture layers
 
 varying vec2 vUV;
 
@@ -13,6 +13,8 @@ uniform float rotationPeriod;
 
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
+
+uniform sampler2D starfieldTexture;
 
 uniform vec3 planetPosition;
 uniform vec3 cameraPosition;
@@ -28,8 +30,6 @@ uniform float cameraFar;
 #pragma glslify: remap = require(./utils/remap.glsl)
 
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
-
-#pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=projection, view=view)
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
@@ -127,7 +127,7 @@ void main()
         return;
     }
     float t1, t2;
-    if (!rayIntersectSphere(cameraPosition, rayDir, planetPosition, max(planetRadius, accretionDiskRadius * 1.5), t1, t2)) {
+    if (!rayIntersectSphere(cameraPosition, rayDir, planetPosition, 100.0 * max(planetRadius, accretionDiskRadius), t1, t2)) {
         gl_FragColor = vec4(screenColor, 1.0);
         return;
     }
@@ -151,9 +151,9 @@ void main()
     vec4 col = vec4(0.0);
 
     for (int disks = 0; disks < 15; disks++) {
-        for (int h = 0; h < 6; h++)//reduces tests for exit conditions (to minimise branching)
-        {
-            float centDist = length(pos);//dotpos * invDist;//distance to BH
+        for (int h = 0; h < 6; h++) {
+            //reduces tests for exit conditions (to minimise branching)
+            float centDist = length(pos); //dotpos * invDist; //distance to BH
             float dotpos = centDist * centDist;
             float invDist = 1.0 / centDist;//inversesqrt(dotpos);//1/distance to BH
             float stepDist = 0.92 * abs(pos.y / rayDir.y);//conservative distance to disk (y==0)
@@ -163,30 +163,33 @@ void main()
 
             float invDistSqr = invDist * invDist;
             float bendForce = stepDist * invDistSqr * planetRadius;//bending force
-            rayDir =  normalize(rayDir - bendForce * pos * invDist);//bend ray towards BH
+            rayDir = normalize(rayDir - bendForce * pos * invDist);//bend ray towards BH
             pos += stepDist * rayDir;
         }
 
         float dist2 = length(pos);
 
-        if (dist2 < planetRadius)//ray sucked in to BH
-        {
+        if (dist2 < planetRadius) {
+            //ray sucked in to BH
             glFragColor =  vec4(col.rgb * col.a, 1.0);
             return;
-        } else if (dist2 > planetRadius * 1000.0)//ray escaped BH
-        {
+        } else if (dist2 > planetRadius * 1000.0) {
+            //ray escaped BH
             if (maximumDistance < length(cameraPosition - pos)) {
                 glFragColor = vec4(screenColor, 1.0);
                 return;
             }
-            vec2 uv = uvFromWorld(pos);
-            vec4 bg = texture2D(textureSampler, uv);
-            bg = texture2D(textureSampler, vUV);
+            
+            vec2 starfieldUV = vec2(
+                sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
+                acos(rayDir.y) / 3.14159265359
+            );
+            vec4 bg = texture2D(starfieldTexture, starfieldUV);
 
             glFragColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
             return;
-        } else if (abs(pos.y) <= accretionDiskHeight)//ray hit accretion disk //FIXME: Break when rotate
-        {
+        } else if (abs(pos.y) <= accretionDiskHeight) {
+            //ray hit accretion disk //FIXME: Break when rotate around edge of disk
             if (maximumDistance < length(cameraPosition - pos)) {
                 glFragColor = vec4(screenColor, 1.0);
                 return;
