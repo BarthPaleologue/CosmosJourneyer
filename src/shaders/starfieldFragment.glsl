@@ -5,6 +5,8 @@ varying vec2 vUV; // screen coordinates
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
 
+uniform sampler2D starfieldTexture; // the starfield texture
+
 uniform vec3 cameraPosition; // position of the camera in world space
 
 uniform mat4 inverseProjection; // camera's projection matrix
@@ -15,20 +17,9 @@ uniform float cameraFar; // camera maxZ
 
 uniform float visibility; // visibility of the starfield
 
-#pragma glslify: completeNoise = require(./utils/noise.glsl)
-
-#pragma glslify: saturate = require(./utils/saturate.glsl)
-
 #pragma glslify: remap = require(./utils/remap.glsl)
 
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
-
-#pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
-
-#pragma glslify: completeWorley = require(./utils/worley.glsl)
-
-#pragma glslify: fractalSimplex4 = require(./utils/simplex4.glsl)
-#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
 void main() {
     vec3 screenColor = texture2D(textureSampler, vUV).rgb; // the current screen color
@@ -47,39 +38,18 @@ void main() {
 
     if(maximumDistance < cameraFar) finalColor = screenColor;
     else {
-        float t0, t1;
-        rayIntersectSphere(cameraPosition, rayDir, vec3(0.0), 100.0, t0, t1);
+        vec3 samplePoint = rayDir;
 
-        vec3 samplePoint = normalize(max(t0, t1) * rayDir - cameraPosition);
+        // get spherical coordinates uv for the starfield texture
+        vec2 samplePoint2D = vec2(
+            sign(samplePoint.z) * acos(samplePoint.x / length(vec2(samplePoint.x, samplePoint.z))) / 6.28318530718,
+            acos(samplePoint.y) / 3.14159265359
+        );
 
-        vec3 nebulaSamplePoint = samplePoint + vec3(
-            completeNoise(samplePoint, 1, 2.0, 2.0),
-            37.0 * completeNoise(samplePoint, 1, 2.0, 2.0),
-            -15.0 * completeNoise(samplePoint, 1, 2.0, 2.0)
-        ) * 0.1;
-        float nebulaNoise = 1.0 - completeWorley(nebulaSamplePoint, 1, 2.0, 2.0);
-        nebulaNoise = pow(nebulaNoise, 3.0);
-        //nebulaNoise = smoothstep(0.4, 0.6, nebulaNoise);
+        // get the starfield color
+        vec3 starfieldColor = texture2D(starfieldTexture, samplePoint2D).rgb;
 
-        float detailNoise = fractalSimplex4(vec4(samplePoint * 10.0, 0.0), 5, 2.0, 2.0);
-        nebulaNoise *= detailNoise;
-
-        float starNoise = 1.0 - completeWorley(samplePoint * 150.0, 1, 2.0, 2.0);
-        starNoise = smoothstep(0.8, 1.0, starNoise);
-
-        float colorSeparation = completeNoise(samplePoint * 200.0, 1, 2.0, 2.0);
-
-
-        float starLight = starNoise;
-        if(starNoise > 0.82) starLight = 1.0;
-        else starLight /= 1.5;
-
-        vec3 color1 = vec3(1.0);
-        vec3 color2 = vec3(0.4, 0.4, 2.0);
-
-        finalColor = 5.0 * starLight * lerp(color1, color2, colorSeparation) * visibility;
-
-        finalColor += nebulaNoise * vec3(0.3, 0.0, 0.0);
+        finalColor = starfieldColor * visibility;
     }
 
     gl_FragColor = vec4(finalColor, 1.0); // displaying the final color

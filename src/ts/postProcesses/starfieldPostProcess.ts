@@ -11,6 +11,7 @@ import { BlackHole } from "../bodies/stars/blackHole";
 import { Star } from "../bodies/stars/star";
 import { nearestBody } from "../utils/nearestBody";
 import { AbstractBody } from "../bodies/abstractBody";
+import { Assets } from "../assets";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -63,7 +64,14 @@ export class StarfieldPostProcess extends UberPostProcess {
             }
         ];
 
-        const samplers: ShaderSamplers = getSamplers(scene);
+        const samplers: ShaderSamplers = [
+            ...getSamplers(scene),
+            {
+                name: "starfieldTexture",
+                type: ShaderDataType.Texture,
+                get: () => { return Assets.Starfield; }
+            }
+        ];
 
         super("starfield", shaderName, uniforms, samplers, scene);
 
