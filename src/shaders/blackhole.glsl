@@ -2,7 +2,7 @@ precision highp float;
 
 // based on https://www.shadertoy.com/view/tsBXW3
 
-#define _Steps 12.0 //disk texture layers
+#define DISK_STEPS 12.0 //disk texture layers
 
 varying vec2 vUV;
 
@@ -31,7 +31,7 @@ uniform float cameraFar;
 
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
 
-#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
+#pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=projection, view=view)
 
 float hash(float x) { return fract(sin(x) * 152754.742); }
 float hash(vec2 x) { return hash(x.x + hash(x.y)); }
@@ -49,64 +49,62 @@ float valueNoise(vec2 p, float f) {
     return mix(b, t, fr.y);
 }
 
-vec4 raymarchDisk(vec3 ray, vec3 zeroPos) {
-    const bool hasAccretionDisk = true;
-    if (!hasAccretionDisk) return vec4(0.0);//no disk
+vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
+    const bool hasAccretionDisk = true; //TODO: make this a uniform
+    if (!hasAccretionDisk) return vec4(0.0); // no disk
 
-    vec3 position = zeroPos;
-    float distance = length(position.xyz);// distance to the center of the disk
-    float relativeDistance = distance / planetRadius;
-    float relativeDiskSize = accretionDiskRadius / planetRadius;
+    vec3 samplePoint = initialPosition;
+    float distanceToCenter = length(samplePoint); // distance to the center of the disk
+    float relativeDistance = distanceToCenter / planetRadius;
+    float relativeDiskRadius = accretionDiskRadius / planetRadius;
 
-    float dist = 0.02 * distance / abs(ray.y);//FIXME: this is not correct, but it works
+    float stepSize = 0.02 * distanceToCenter / abs(rayDir.y); //FIXME: this is not correct, but it works
 
-    position += dist * ray;
+    samplePoint += stepSize * rayDir; //FIXME: somehow when I remove this line, the disk has no height.
 
-    // elementary rotation around the hole //FIXME: will break when the black hole has a rotation
+    // elementary rotation around the hole (see 2D rotation matrix) //FIXME: will break when the black hole has a rotation
     vec2 deltaPos;
-    deltaPos.x = zeroPos.x - zeroPos.z * 0.01;
-    deltaPos.y = zeroPos.x * 0.01 + zeroPos.z;
-    deltaPos = normalize(deltaPos - zeroPos.xz);
+    deltaPos.x = initialPosition.x - initialPosition.z * 0.01;
+    deltaPos.y = initialPosition.x * 0.01 + initialPosition.z;
+    deltaPos = normalize(deltaPos - initialPosition.xz);
 
-    float parallel = dot(ray.xz, deltaPos);
+    float parallel = dot(rayDir.xz, deltaPos);
 
     float redShift = (1.0 + parallel) / 2.0;
 
-    float diskMix = smoothstep(3.5 / 6.0, 5.5 / 6.0, relativeDistance / relativeDiskSize);
+    float diskMix = smoothstep(3.5 / 6.0, 5.5 / 6.0, relativeDistance / relativeDiskRadius);
     vec3 innerDiskColor = vec3(1.0, 0.8, 0.0);
     vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
     vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix);
 
-    vec3 redShiftMult = mix(vec3(0.4, 0.2, 0.1) * 0.5, vec3(1.6, 1.0, 8.0) * 3.0, redShift);//FIXME: need more realistic redshift
+    vec3 redShiftMult = mix(vec3(0.4, 0.2, 0.1) * 0.5, vec3(1.6, 1.0, 8.0) * 3.0, redShift); //FIXME: need more realistic redshift
     insideCol *= redShiftMult;
 
-    float relativeDiskRadius = accretionDiskRadius / planetRadius;
-
     vec4 diskColor = vec4(0.0);
-    for (float i = 0.; i < _Steps; i++) {
-        position -= dist * ray / _Steps;
+    for (float i = 0.0; i < DISK_STEPS; i++) {
+        samplePoint -= stepSize * rayDir / DISK_STEPS;
 
-        float intensity = 1.0 - (i / _Steps);
-        distance = length(position.xyz);
-        relativeDistance = distance / planetRadius;
+        float intensity = 1.0 - (i / DISK_STEPS);
+        distanceToCenter = length(samplePoint);
+        relativeDistance = distanceToCenter / planetRadius;
 
-        float distMult = 1.0;
-        distMult *= clamp(relativeDistance - 1.2, 0.0, 1.0);
-        distMult *= clamp(relativeDiskRadius - relativeDistance, 0.0, 1.0);
+        float diskMask = 1.0;
+        diskMask *= clamp(relativeDistance - 1.2, 0.0, 1.0); //FIXME: why 1.2?
+        diskMask *= smoothstep(0.0, 2.0, relativeDiskRadius - relativeDistance); // The 2.0 is only for aesthetics
 
-        // rotation of the disk
+        // rotation of the disk (2D rotation matrix)
         vec2 xz;
-        float rot = 2.0 * 3.1415 * time / rotationPeriod;
-        xz.x = position.x * cos(rot) - position.z * sin(rot);
-        xz.y = position.x * sin(rot) + position.z * cos(rot);
+        float theta = 2.0 * 3.1415 * time / rotationPeriod;
+        xz.x = samplePoint.x * cos(theta) - samplePoint.z * sin(theta);
+        xz.y = samplePoint.x * sin(theta) + samplePoint.z * cos(theta);
 
         float angle = atan(abs(xz.x / (xz.y)));
-        float u = time + intensity + relativeDistance;// some kind of disk coordinate
+        float u = time + intensity + relativeDistance; // some kind of disk coordinate (spiral)
         const float f = 1.0;
         float noise = valueNoise(vec2(2.0 * angle, 5.0 * u), f);
         noise = noise * 0.66 + 0.33 * valueNoise(vec2(2.0 * angle, 5.0 * u), f * 2.0);
 
-        float alpha = distMult * noise * intensity;// The pow is only for aesthetics
+        float alpha = diskMask * noise * intensity;
 
         // blending with current color in the disk
         diskColor = mix(diskColor, vec4(insideCol * intensity, 1.0), alpha);
@@ -122,16 +120,6 @@ void main()
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
 
-    if(dot(rayDir, normalize(planetPosition - cameraPosition)) < 0.0) {
-        gl_FragColor = vec4(screenColor, 1.0);
-        return;
-    }
-    float t1, t2;
-    if (!rayIntersectSphere(cameraPosition, rayDir, planetPosition, 100.0 * max(planetRadius, accretionDiskRadius), t1, t2)) {
-        gl_FragColor = vec4(screenColor, 1.0);
-        return;
-    }
-
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
     // closest physical point from the camera in the direction of the pixel (occlusion)
     vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
@@ -141,9 +129,9 @@ void main()
 
     float accretionDiskHeight = 100.0;
 
-    vec3 pos = cameraPosition - planetPosition;// position of the camera in blackhole space
+    vec3 positionBHS = cameraPosition - planetPosition;// position of the camera in blackhole space
 
-    if (maximumDistance < length(pos)) {
+    if (maximumDistance < length(positionBHS)) {
         glFragColor = vec4(screenColor, 1.0);
         return;
     }
@@ -153,50 +141,48 @@ void main()
     for (int disks = 0; disks < 15; disks++) {
         for (int h = 0; h < 6; h++) {
             //reduces tests for exit conditions (to minimise branching)
-            float centDist = length(pos); //dotpos * invDist; //distance to BH
-            float dotpos = centDist * centDist;
-            float invDist = 1.0 / centDist;//inversesqrt(dotpos);//1/distance to BH
-            float stepDist = 0.92 * abs(pos.y / rayDir.y);//conservative distance to disk (y==0)
-            float farLimit = centDist * 0.5;//limit step size far from to BH
-            float closeLimit = centDist * 0.1 + 0.05 * dotpos / planetRadius;//limit step size close to BH
-            stepDist = min(stepDist, min(farLimit, closeLimit));
+            float distanceToCenter = length(positionBHS); //distance to BH
+            float distanceToCenter2 = distanceToCenter * distanceToCenter;
+            float invDist = 1.0 / distanceToCenter; //inversesqrt(distanceToCenter2);//1/distance to BH
+            float stepSize = 0.92 * abs(positionBHS.y / rayDir.y); //conservative distance to disk (y==0)
+            float farLimit = distanceToCenter * 0.5; //limit step size far from to BH
+            float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / planetRadius; //limit step size close to BH
+            stepSize = min(stepSize, min(farLimit, closeLimit));
 
             float invDistSqr = invDist * invDist;
-            float bendForce = stepDist * invDistSqr * planetRadius;//bending force
-            rayDir = normalize(rayDir - bendForce * pos * invDist);//bend ray towards BH
-            pos += stepDist * rayDir;
+            float bendForce = stepSize * invDistSqr * planetRadius; //bending force
+            rayDir = normalize(rayDir - bendForce * positionBHS * invDist); //bend ray towards BH
+            positionBHS += stepSize * rayDir;
         }
 
-        float dist2 = length(pos);
+        float distanceToBlackhole = length(positionBHS);
 
-        if (dist2 < planetRadius) {
+        if (distanceToBlackhole < planetRadius) {
             //ray sucked in to BH
             glFragColor =  vec4(col.rgb * col.a, 1.0);
             return;
-        } else if (dist2 > planetRadius * 1000.0) {
+        } else if (distanceToBlackhole > planetRadius * 10000.0) {
             //ray escaped BH
-            if (maximumDistance < length(cameraPosition - pos)) {
-                glFragColor = vec4(screenColor, 1.0);
-                return;
-            }
             
+            /*vec2 uv = uvFromWorld(positionBHS);
+            vec4 bg = vec4(0.0);
+
+            if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) bg = texture2D(textureSampler, uv);
+            else {*/
             vec2 starfieldUV = vec2(
                 sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
                 acos(rayDir.y) / 3.14159265359
             );
             vec4 bg = texture2D(starfieldTexture, starfieldUV);
+            //}
 
             glFragColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
             return;
-        } else if (abs(pos.y) <= accretionDiskHeight) {
+        } else if (abs(positionBHS.y) <= accretionDiskHeight) {
             //ray hit accretion disk //FIXME: Break when rotate around edge of disk
-            if (maximumDistance < length(cameraPosition - pos)) {
-                glFragColor = vec4(screenColor, 1.0);
-                return;
-            }
 
-            vec4 diskCol = raymarchDisk(rayDir, pos);//render disk
-            pos += 10.0 * accretionDiskHeight * rayDir;
+            vec4 diskCol = raymarchDisk(rayDir, positionBHS);//render disk
+            positionBHS += 10.0 * accretionDiskHeight * rayDir;
             col += diskCol * (1.0 - col.a);
         }
     }
