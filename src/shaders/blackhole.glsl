@@ -142,16 +142,16 @@ void main()
         for (int h = 0; h < 6; h++) {
             //reduces tests for exit conditions (to minimise branching)
             float distanceToCenter = length(positionBHS); //distance to BH
+            vec3 blackholeDir = -positionBHS / distanceToCenter; //direction to BH
             float distanceToCenter2 = distanceToCenter * distanceToCenter;
-            float invDist = 1.0 / distanceToCenter; //inversesqrt(distanceToCenter2);//1/distance to BH
+            
             float stepSize = 0.92 * abs(positionBHS.y / rayDir.y); //conservative distance to disk (y==0)
             float farLimit = distanceToCenter * 0.5; //limit step size far from to BH
             float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / planetRadius; //limit step size close to BH
             stepSize = min(stepSize, min(farLimit, closeLimit));
 
-            float invDistSqr = invDist * invDist;
-            float bendForce = stepSize * invDistSqr * planetRadius; //bending force
-            rayDir = normalize(rayDir - bendForce * positionBHS * invDist); //bend ray towards BH
+            float bendForce = stepSize * planetRadius / distanceToCenter2; //bending force
+            rayDir = normalize(rayDir + bendForce * blackholeDir); //bend ray towards BH
             positionBHS += stepSize * rayDir;
         }
 
