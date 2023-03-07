@@ -34,6 +34,7 @@
     "ts-jest": "^28.0.5",
     "ts-loader": "^9.2.6",
     "ts-node": "^10.7.0",
+    "typedoc": "^0.24.0-beta.2",
     "typescript": "^4.4.3",
     "typescript-plugin-css-modules": "^3.4.0",
     "webpack": "^5.73.0",
@@ -52,6 +53,7 @@
     "serve:prod": "http-server dist -p 8080",
     "format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "test": "jest --coverage",
+    "doc": "typedoc src/ts/**/*.ts --out docs",
     "lint:check": "eslint src/ts",
     "lint:fix": "eslint src/ts --fix"
   }
