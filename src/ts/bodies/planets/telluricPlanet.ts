@@ -114,8 +114,8 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planemo {
         this.updateLOD(player.transform.getAbsolutePosition());
     }
 
-    public updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[]): void {
-        this.material.update(controller, stars);
+    public updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[], deltaTime: number): void {
+        this.material.update(controller, stars, deltaTime);
     }
 
     public override getApparentRadius(): number {

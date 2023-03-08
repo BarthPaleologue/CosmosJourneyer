@@ -279,7 +279,7 @@ export class StarSystem {
     public update(deltaTime: number): void {
         for (const body of this.getBodies()) body.updateTransform(this.scene.getActiveController(), deltaTime);
 
-        for (const planet of this.planemos) planet.updateMaterial(this.scene.getActiveController(), this.stars);
+        for (const planet of this.planemos) planet.updateMaterial(this.scene.getActiveController(), this.stars, deltaTime);
 
         const displacement = this.scene.getActiveController().transform.getAbsolutePosition().negate();
         this.translateAllBodies(displacement);

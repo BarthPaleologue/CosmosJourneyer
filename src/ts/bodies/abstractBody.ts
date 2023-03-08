@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Matrix, Vector3 } from "@babylonjs/core";
 import { BodyType } from "./interfaces";
 import { AbstractController } from "../uberCore/abstractController";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
@@ -25,6 +25,8 @@ export abstract class AbstractBody implements IOrbitalBody {
 
     //TODO: make an universal clock ?? or not it could be funny
     private internalTime = 0;
+    private theta = 0;
+    readonly rotationMatrixAroundAxis = new Matrix();
 
     readonly name: string;
 
@@ -114,6 +116,9 @@ export abstract class AbstractBody implements IOrbitalBody {
 
             if (isOrbiting(controller, this)) controller.transform.rotateAround(this.transform.getAbsolutePosition(), this.getRotationAxis(), -dtheta);
             this.transform.rotate(this.getRotationAxis(), -dtheta);
+
+            this.theta += -dtheta;
+            this.rotationMatrixAroundAxis.copyFrom(Matrix.RotationAxis(this.getRotationAxis(), this.theta));
         }
     }
 
