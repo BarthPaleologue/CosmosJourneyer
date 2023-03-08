@@ -70,7 +70,9 @@ export class StarfieldPostProcess extends UberPostProcess {
             {
                 name: "starfieldTexture",
                 type: ShaderDataType.Texture,
-                get: () => { return Assets.Starfield; }
+                get: () => {
+                    return Assets.Starfield;
+                }
             }
         ];
 

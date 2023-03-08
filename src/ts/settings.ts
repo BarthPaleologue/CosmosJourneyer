@@ -9,5 +9,5 @@ export const Settings = {
     ENABLE_OCCLUSION: true,
     CHUNK_RENDER_DISTANCE_MULTIPLIER: 1.5,
     ENABLE_VOLUMETRIC_CLOUDS: false,
-    SEED_HALF_RANGE: 1e6,
+    SEED_HALF_RANGE: 1e6
 };

@@ -56,7 +56,9 @@ export class BlackHolePostProcess extends BodyPostProcess {
             {
                 name: "starfieldTexture",
                 type: ShaderDataType.Texture,
-                get: () => { return Assets.Starfield; }
+                get: () => {
+                    return Assets.Starfield;
+                }
             }
         ];
 
