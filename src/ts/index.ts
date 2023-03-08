@@ -49,7 +49,7 @@ planet.descriptor.orbitalProperties.apoapsis = 4000 * planet.getRadius();
 planet.descriptor.orbitalProperties.periapsis = 4000 * planet.getRadius();
 planet.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
 
-const moon = starSystem.makeSatellite(planet, 0.4);
+const moon = starSystem.makeSatellite(planet, 10);
 
 moon.descriptor.physicalProperties.mass = 2;
 moon.descriptor.physicalProperties.rotationPeriod = 7 * 60 * 60;
