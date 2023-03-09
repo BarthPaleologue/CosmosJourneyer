@@ -5,11 +5,11 @@ import { PhysicalProperties } from "../physicalProperties";
 import { BlackHoleDescriptor } from "../../descriptors/blackHoleDescriptor";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { BodyDescriptor } from "../../descriptors/interfaces";
+import { Axis } from "@babylonjs/core";
 
 export class BlackHole extends AbstractBody {
     readonly bodyType: BodyType = BodyType.BLACK_HOLE;
     readonly orbitalProperties: IOrbitalProperties;
-    physicalProperties: PhysicalProperties;
     postProcesses: BlackHolePostProcesses;
     readonly radius: number;
 
@@ -22,11 +22,7 @@ export class BlackHole extends AbstractBody {
 
         this.radius = this.descriptor.radius;
 
-        this.physicalProperties = {
-            mass: 10,
-            rotationPeriod: 24 * 60 * 60,
-            axialTilt: 0
-        };
+        this.transform.rotate(Axis.X, this.descriptor.physicalProperties.axialTilt);
 
         this.orbitalProperties = this.descriptor.orbitalProperties;
 

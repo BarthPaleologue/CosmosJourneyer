@@ -11,6 +11,10 @@ uniform float planetRadius;
 uniform float accretionDiskRadius;
 uniform float rotationPeriod;
 
+const float accretionDiskHeight = 100.0;
+
+uniform vec3 rotationAxis;
+
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
@@ -32,6 +36,13 @@ uniform float cameraFar;
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
 
 #pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=projection, view=view)
+
+#pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
+
+vec3 projectOnPlace(vec3 vector, vec3 planeNormal) {
+    return vector - dot(vector, planeNormal) * planeNormal;
+}
+
 
 float hash(float x) { return fract(sin(x) * 152754.742); }
 float hash(vec2 x) { return hash(x.x + hash(x.y)); }
@@ -58,17 +69,22 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
     float relativeDistance = distanceToCenter / planetRadius;
     float relativeDiskRadius = accretionDiskRadius / planetRadius;
 
-    float stepSize = 0.02 * distanceToCenter / abs(rayDir.y); //FIXME: this is not correct, but it works
+    vec3 diskNormal = rotationAxis;
+
+    vec3 projectedRayDir = projectOnPlace(rayDir, diskNormal);
+    vec3 projectedInitialPosition = projectOnPlace(initialPosition, diskNormal);
+
+    float projectionDistance = length(projectedRayDir - rayDir); // if the vector is parallel to the disk the the projection distance is near 0. We use it to increase the step size.
+
+    float stepSize = 0.02 * distanceToCenter / projectionDistance; //FIXME: this is not correct, but it works
 
     samplePoint += stepSize * rayDir; //FIXME: somehow when I remove this line, the disk has no height.
 
-    // elementary rotation around the hole (see 2D rotation matrix) //FIXME: will break when the black hole has a rotation
-    vec2 deltaPos;
-    deltaPos.x = initialPosition.x - initialPosition.z * 0.01;
-    deltaPos.y = initialPosition.x * 0.01 + initialPosition.z;
-    deltaPos = normalize(deltaPos - initialPosition.xz);
+    // elementary rotation around the hole
+    vec3 deltaPos = rotateAround(projectedInitialPosition, diskNormal, 0.01);
+    deltaPos = normalize(deltaPos - projectedInitialPosition);
 
-    float parallel = dot(rayDir.xz, deltaPos);
+    float parallel = -dot(projectedRayDir, deltaPos);
 
     float redShift = (1.0 + parallel) / 2.0;
 
@@ -93,7 +109,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
         diskMask *= smoothstep(0.0, 2.0, relativeDiskRadius - relativeDistance); // The 2.0 is only for aesthetics
 
         // rotation of the disk (2D rotation matrix)
-        vec2 xz;
+        vec2 xz; //TODO: make this work with the rotation system
         float theta = 2.0 * 3.1415 * time / rotationPeriod;
         xz.x = samplePoint.x * cos(theta) - samplePoint.z * sin(theta);
         xz.y = samplePoint.x * sin(theta) + samplePoint.z * cos(theta);
@@ -127,8 +143,6 @@ void main()
 
     vec4 colOut = vec4(0.0);
 
-    float accretionDiskHeight = 100.0;
-
     vec3 positionBHS = cameraPosition - planetPosition;// position of the camera in blackhole space
 
     if (maximumDistance < length(positionBHS)) {
@@ -139,13 +153,27 @@ void main()
     vec4 col = vec4(0.0);
 
     for (int disks = 0; disks < 15; disks++) {
+        float distanceToCenter = 0.0; //distance to BH
+        
+        vec3 projectedPosition = vec3(0.0);
+        float projectedDistance = 0.0;
+
+        vec3 projectedRayDir = vec3(0.0);
+        float rayDirProjectedDistance = 0.0;
+
         for (int h = 0; h < 6; h++) {
             //reduces tests for exit conditions (to minimise branching)
-            float distanceToCenter = length(positionBHS); //distance to BH
+            distanceToCenter = length(positionBHS); //distance to BH
             vec3 blackholeDir = -positionBHS / distanceToCenter; //direction to BH
             float distanceToCenter2 = distanceToCenter * distanceToCenter;
+
+            projectedPosition = projectOnPlace(positionBHS, rotationAxis);
+            projectedDistance = length(projectedPosition - positionBHS);
+
+            projectedRayDir = projectOnPlace(rayDir, rotationAxis);
+            rayDirProjectedDistance = length(projectedRayDir - rayDir);
             
-            float stepSize = 0.92 * abs(positionBHS.y / rayDir.y); //conservative distance to disk (y==0)
+            float stepSize = 0.92 * projectedDistance / rayDirProjectedDistance; //conservative distance to disk (y==0)
             float farLimit = distanceToCenter * 0.5; //limit step size far from to BH
             float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / planetRadius; //limit step size close to BH
             stepSize = min(stepSize, min(farLimit, closeLimit));
@@ -155,13 +183,11 @@ void main()
             positionBHS += stepSize * rayDir;
         }
 
-        float distanceToBlackhole = length(positionBHS);
-
-        if (distanceToBlackhole < planetRadius) {
+        if (distanceToCenter < planetRadius) {
             //ray sucked in to BH
             glFragColor =  vec4(col.rgb * col.a, 1.0);
             return;
-        } else if (distanceToBlackhole > planetRadius * 10000.0) {
+        } else if (distanceToCenter > planetRadius * 10000.0) {
             //ray escaped BH
             
             /*vec2 uv = uvFromWorld(positionBHS);
@@ -178,11 +204,11 @@ void main()
 
             glFragColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
             return;
-        } else if (abs(positionBHS.y) <= accretionDiskHeight) {
+        } else if (projectedDistance <= accretionDiskHeight) {
             //ray hit accretion disk //FIXME: Break when rotate around edge of disk
-
             vec4 diskCol = raymarchDisk(rayDir, positionBHS);//render disk
-            positionBHS += 10.0 * accretionDiskHeight * rayDir;
+            //vec4 diskCol = raymarchDisk(rayDir, positionBHS);//render disk
+            positionBHS += 10.0 * accretionDiskHeight * rayDir / rayDirProjectedDistance; // we get out of the disk
             col += diskCol * (1.0 - col.a);
         }
     }

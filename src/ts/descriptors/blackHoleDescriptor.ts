@@ -5,6 +5,11 @@ import { Quaternion } from "@babylonjs/core";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { PhysicalProperties } from "../bodies/physicalProperties";
 import { BodyType } from "../bodies/interfaces";
+import { normalRandom } from "extended-random";
+
+enum GENERATION_STEPS {
+    AXIAL_TILT = 100
+}
 
 export class BlackHoleDescriptor implements BodyDescriptor {
     readonly bodyType = BodyType.BLACK_HOLE;
@@ -41,7 +46,7 @@ export class BlackHoleDescriptor implements BodyDescriptor {
         this.physicalProperties = {
             mass: 10,
             rotationPeriod: 24 * 60 * 60,
-            axialTilt: 0
+            axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
         };
     }
 
