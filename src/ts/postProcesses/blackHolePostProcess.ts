@@ -55,6 +55,13 @@ export class BlackHolePostProcess extends BodyPostProcess {
                 get: () => {
                     return blackHole.getRotationAxis();
                 }
+            },
+            {
+                name: "forwardAxis",
+                type: ShaderDataType.Vector3,
+                get: () => {
+                    return blackHole.transform.getForwardDirection();
+                }
             }
         ];
 

@@ -14,6 +14,7 @@ uniform float rotationPeriod;
 const float accretionDiskHeight = 100.0;
 
 uniform vec3 rotationAxis;
+uniform vec3 forwardAxis;
 
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
@@ -39,10 +40,13 @@ uniform float cameraFar;
 
 #pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
 
-vec3 projectOnPlace(vec3 vector, vec3 planeNormal) {
+vec3 projectOnPlane(vec3 vector, vec3 planeNormal) {
     return vector - dot(vector, planeNormal) * planeNormal;
 }
 
+float angleBetweenVectors(vec3 a, vec3 b) {
+    return acos(dot(a, b) / (length(a) * length(b)));
+}
 
 float hash(float x) { return fract(sin(x) * 152754.742); }
 float hash(vec2 x) { return hash(x.x + hash(x.y)); }
@@ -71,8 +75,8 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
     vec3 diskNormal = rotationAxis;
 
-    vec3 projectedRayDir = projectOnPlace(rayDir, diskNormal);
-    vec3 projectedInitialPosition = projectOnPlace(initialPosition, diskNormal);
+    vec3 projectedRayDir = projectOnPlane(rayDir, diskNormal);
+    vec3 projectedInitialPosition = projectOnPlane(initialPosition, diskNormal);
 
     float projectionDistance = length(projectedRayDir - rayDir); // if the vector is parallel to the disk the the projection distance is near 0. We use it to increase the step size.
 
@@ -84,37 +88,37 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
     vec3 deltaPos = rotateAround(projectedInitialPosition, diskNormal, 0.01);
     deltaPos = normalize(deltaPos - projectedInitialPosition);
 
-    float parallel = -dot(projectedRayDir, deltaPos);
+    float parallel = dot(projectedRayDir, deltaPos);
 
     float redShift = (1.0 + parallel) / 2.0;
 
-    float diskMix = smoothstep(3.5 / 6.0, 5.5 / 6.0, relativeDistance / relativeDiskRadius);
-    vec3 innerDiskColor = vec3(1.0, 0.8, 0.0);
+    float diskMix = smoothstep(0.6, 0.9, relativeDistance / relativeDiskRadius); // transition between inner and outer color
+    vec3 innerDiskColor = vec3(1.0, 0.8, 0.1);
     vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
     vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix);
 
-    vec3 redShiftMult = mix(vec3(0.4, 0.2, 0.1) * 0.5, vec3(1.6, 1.0, 8.0) * 3.0, redShift); //FIXME: need more realistic redshift
+    vec3 redShiftMult = mix(vec3(0.4, 0.2, 0.1) * 0.5, vec3(1.6, 1.0, 2.0) * 3.0, redShift); //FIXME: need more realistic redshift
     insideCol *= redShiftMult;
 
     vec4 diskColor = vec4(0.0);
     for (float i = 0.0; i < DISK_STEPS; i++) {
-        samplePoint -= stepSize * rayDir / DISK_STEPS;
+        samplePoint -= 2.0 * stepSize * rayDir / DISK_STEPS;
+
+        vec3 projectedSamplePoint = projectOnPlane(samplePoint, diskNormal);
 
         float intensity = 1.0 - (i / DISK_STEPS);
         distanceToCenter = length(samplePoint);
         relativeDistance = distanceToCenter / planetRadius;
 
         float diskMask = 1.0;
-        diskMask *= clamp(relativeDistance - 1.2, 0.0, 1.0); //FIXME: why 1.2?
+        diskMask *= clamp(relativeDistance - 1.2, 0.0, 1.0); // The 1.2 is only for aesthetics
         diskMask *= smoothstep(0.0, 2.0, relativeDiskRadius - relativeDistance); // The 2.0 is only for aesthetics
 
-        // rotation of the disk (2D rotation matrix)
-        vec2 xz; //TODO: make this work with the rotation system
+        // rotation of the disk
         float theta = 2.0 * 3.1415 * time / rotationPeriod;
-        xz.x = samplePoint.x * cos(theta) - samplePoint.z * sin(theta);
-        xz.y = samplePoint.x * sin(theta) + samplePoint.z * cos(theta);
-
-        float angle = atan(abs(xz.x / (xz.y)));
+        vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, diskNormal, theta);
+        
+        float angle = angleBetweenVectors(normalize(rotatedProjectedSamplePoint), forwardAxis);
         float u = time + intensity + relativeDistance; // some kind of disk coordinate (spiral)
         const float f = 1.0;
         float noise = valueNoise(vec2(2.0 * angle, 5.0 * u), f);
@@ -131,7 +135,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
 void main()
 {
-    vec3 screenColor = texture2D(textureSampler, vUV).rgb;// the current screen color
+    vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
@@ -146,7 +150,7 @@ void main()
     vec3 positionBHS = cameraPosition - planetPosition;// position of the camera in blackhole space
 
     if (maximumDistance < length(positionBHS)) {
-        glFragColor = vec4(screenColor, 1.0);
+        glFragColor = screenColor;
         return;
     }
 
@@ -167,10 +171,10 @@ void main()
             vec3 blackholeDir = -positionBHS / distanceToCenter; //direction to BH
             float distanceToCenter2 = distanceToCenter * distanceToCenter;
 
-            projectedPosition = projectOnPlace(positionBHS, rotationAxis);
+            projectedPosition = projectOnPlane(positionBHS, rotationAxis);
             projectedDistance = length(projectedPosition - positionBHS);
 
-            projectedRayDir = projectOnPlace(rayDir, rotationAxis);
+            projectedRayDir = projectOnPlane(rayDir, rotationAxis);
             rayDirProjectedDistance = length(projectedRayDir - rayDir);
             
             float stepSize = 0.92 * projectedDistance / rayDirProjectedDistance; //conservative distance to disk (y==0)
@@ -207,7 +211,6 @@ void main()
         } else if (projectedDistance <= accretionDiskHeight) {
             //ray hit accretion disk //FIXME: Break when rotate around edge of disk
             vec4 diskCol = raymarchDisk(rayDir, positionBHS);//render disk
-            //vec4 diskCol = raymarchDisk(rayDir, positionBHS);//render disk
             positionBHS += 10.0 * accretionDiskHeight * rayDir / rayDirProjectedDistance; // we get out of the disk
             col += diskCol * (1.0 - col.a);
         }
