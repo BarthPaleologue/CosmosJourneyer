@@ -22,7 +22,7 @@ uniform float visibility; // visibility of the starfield
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
 
 void main() {
-    vec3 screenColor = texture2D(textureSampler, vUV).rgb; // the current screen color
+    vec4 screenColor = texture2D(textureSampler, vUV); // the current screen color
 
     float depth = texture2D(depthSampler, vUV).r; // the depth corresponding to the pixel in the depth map
     
@@ -34,7 +34,7 @@ void main() {
     vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
     float maximumDistance = length(closestPoint); // the maxium ray length due to occlusion
 
-    vec3 finalColor;
+    vec4 finalColor;
 
     if(maximumDistance < cameraFar) finalColor = screenColor;
     else {
@@ -45,10 +45,10 @@ void main() {
         );
 
         // get the starfield color
-        vec3 starfieldColor = texture2D(starfieldTexture, starfieldUV).rgb;
+        vec4 starfieldColor = texture2D(starfieldTexture, starfieldUV);
 
-        finalColor = starfieldColor * visibility;
+        finalColor = vec4(starfieldColor.rgb * visibility, starfieldColor.a);
     }
 
-    gl_FragColor = vec4(finalColor, 1.0); // displaying the final color
+    gl_FragColor = finalColor; // displaying the final color
 }

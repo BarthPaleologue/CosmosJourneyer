@@ -63,7 +63,7 @@ float ringDensityAtPoint(vec3 samplePoint) {
 }
 
 void main() {
-    vec3 screenColor = texture2D(textureSampler, vUV).rgb; // the current screen color
+    vec4 screenColor = texture2D(textureSampler, vUV); // the current screen color
 
     float depth = texture2D(depthSampler, vUV).r; // the depth corresponding to the pixel in the depth map
     
@@ -75,7 +75,7 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
-    vec3 finalColor;
+    vec4 finalColor;
 
 	float impactPoint;
 	if(rayIntersectPlane(cameraPosition, rayDir, planetPosition, planetRotationAxis, impactPoint)) {
@@ -88,7 +88,7 @@ void main() {
                 float ringDensity = ringDensityAtPoint(samplePoint);
 
                 vec3 ringColor = vec3(0.5) * ringDensity;
-                ringColor = lerp(ringColor, screenColor, ringOpacity);
+                ringColor = lerp(ringColor, screenColor.rgb, ringOpacity);
 
                 // hypothèse des rayons parallèles
                 int nbLightSources = nbStars;
@@ -101,7 +101,7 @@ void main() {
                 }
                 if(nbLightSources == 0) ringColor *= 0.1;
 
-                finalColor = lerp(ringColor, screenColor, ringDensity);
+                finalColor = vec4(lerp(ringColor, screenColor.rgb, ringDensity), 1.0);
             }
 		} else {
 			finalColor = screenColor;
@@ -110,5 +110,5 @@ void main() {
 		finalColor = screenColor;
 	}
 
-    gl_FragColor = vec4(finalColor, 1.0); // displaying the final color
+    gl_FragColor = finalColor; // displaying the final color
 }

@@ -148,7 +148,7 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     return (inScatteredRayleigh + inScatteredMie) * sunIntensity;
 }
 
-vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
+vec4 scatter(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, atmosphereRadius, impactPoint, escapePoint))) {
         return originalColor;// if not intersecting with atmosphere, return original color
@@ -163,14 +163,16 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     vec3 light = vec3(0.0);
     for (int i = 0; i < nbStars; i++) {
-        light = max(light, calculateLight(firstPointInAtmosphere, starPositions[i], rayDir, distanceThroughAtmosphere, originalColor));// calculate scattering
+        light = max(light, calculateLight(firstPointInAtmosphere, starPositions[i], rayDir, distanceThroughAtmosphere, originalColor.rgb));// calculate scattering
     }
-    return mix(originalColor, vec3(1.0), light);
+
+    float lightAlpha = max(light.r, max(light.g, light.b));
+    return vec4(mix(originalColor.rgb, vec3(1.0), light), max(originalColor.a, lightAlpha));
 }
 
 
 void main() {
-    vec3 screenColor = texture2D(textureSampler, vUV).rgb;// the current screen color
+    vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
@@ -188,7 +190,7 @@ void main() {
         maximumDistance = min(maximumDistance, waterImpact);
     }
 
-    vec3 finalColor = scatter(screenColor, cameraPosition, rayDir, maximumDistance);// the color to be displayed on the screen
+    vec4 finalColor = scatter(screenColor, cameraPosition, rayDir, maximumDistance);// the color to be displayed on the screen
 
-    gl_FragColor = vec4(finalColor, 1.0);// displaying the final color
+    gl_FragColor = finalColor;// displaying the final color
 }

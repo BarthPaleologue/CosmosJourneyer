@@ -11,7 +11,9 @@ uniform float planetRadius;
 uniform float accretionDiskRadius;
 uniform float rotationPeriod;
 
+//TODO: make these uniforms
 const float accretionDiskHeight = 100.0;
+const bool hasAccretionDisk = true;
 
 uniform vec3 rotationAxis;
 uniform vec3 forwardAxis;
@@ -65,7 +67,6 @@ float valueNoise(vec2 p, float f) {
 }
 
 vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
-    const bool hasAccretionDisk = true; //TODO: make this a uniform
     if (!hasAccretionDisk) return vec4(0.0); // no disk
 
     vec3 samplePoint = initialPosition;
@@ -102,7 +103,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
     vec4 diskColor = vec4(0.0);
     for (float i = 0.0; i < DISK_STEPS; i++) {
-        samplePoint -= 2.0 * stepSize * rayDir / DISK_STEPS;
+        samplePoint -= stepSize * rayDir / DISK_STEPS;
 
         vec3 projectedSamplePoint = projectOnPlane(samplePoint, diskNormal);
 
@@ -133,8 +134,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
     return diskColor;
 }
 
-void main()
-{
+void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
@@ -185,6 +185,7 @@ void main()
             float bendForce = stepSize * planetRadius / distanceToCenter2; //bending force
             rayDir = normalize(rayDir + bendForce * blackholeDir); //bend ray towards BH
             positionBHS += stepSize * rayDir;
+
         }
 
         if (distanceToCenter < planetRadius) {
@@ -211,7 +212,7 @@ void main()
         } else if (projectedDistance <= accretionDiskHeight) {
             //ray hit accretion disk //FIXME: Break when rotate around edge of disk
             vec4 diskCol = raymarchDisk(rayDir, positionBHS);//render disk
-            positionBHS += 10.0 * accretionDiskHeight * rayDir / rayDirProjectedDistance; // we get out of the disk
+            positionBHS += accretionDiskHeight * rayDir / rayDirProjectedDistance; // we get out of the disk
             col += diskCol * (1.0 - col.a);
         }
     }
