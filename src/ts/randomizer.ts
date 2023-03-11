@@ -9,6 +9,7 @@ import { Settings } from "./settings";
 import { PlayerController } from "./controllers/playerController";
 import { positionNearBody } from "./utils/positionNearBody";
 import { PlanetEngine } from "./planetEngine";
+import { BodyType } from "./bodies/interfaces";
 
 const engine = new PlanetEngine();
 
@@ -40,4 +41,5 @@ document.addEventListener("keydown", (e) => {
 
 engine.init();
 
-positionNearBody(player, starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stars[0], starSystem);
+const nbRadius = starSystem.descriptor.getBodyTypeOfStar(0) == BodyType.BLACK_HOLE ? 8 : 3;
+positionNearBody(player, starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stars[0], starSystem, nbRadius);

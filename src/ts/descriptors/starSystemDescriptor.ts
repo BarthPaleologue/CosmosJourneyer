@@ -1,6 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { centeredRand, randRangeInt } from "extended-random";
+import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
+import { BodyType } from "../bodies/interfaces";
 
 enum GENERATION_STEPS {
     NAME,
@@ -30,12 +31,21 @@ export class StarSystemDescriptor {
     }
 
     getNbPlanets(): number {
+        if (this.getBodyTypeOfStar(0) === BodyType.BLACK_HOLE) return 0; //FIXME: will not apply when more than one star
         return randRangeInt(0, 7, this.rng, GENERATION_STEPS.NB_PLANETS);
     }
 
     public getStarSeed(index: number) {
         if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
         return centeredRand(this.rng, GENERATION_STEPS.GENERATE_STARS + index) * Settings.SEED_HALF_RANGE;
+    }
+
+    public getBodyTypeOfStar(index: number) {
+        if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
+        if (uniformRandBool(0.002, this.rng, GENERATION_STEPS.GENERATE_STARS + index))
+            return BodyType.BLACK_HOLE;
+
+        return BodyType.STAR;
     }
 
     public getPlanetSeed(index: number) {

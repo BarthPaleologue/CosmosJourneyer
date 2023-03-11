@@ -6,6 +6,7 @@ import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { PhysicalProperties } from "../bodies/physicalProperties";
 import { BodyType } from "../bodies/interfaces";
 import { normalRandom } from "extended-random";
+import { STAR_TYPE } from "./starDescriptor";
 
 enum GENERATION_STEPS {
     AXIAL_TILT = 100
@@ -17,6 +18,8 @@ export class BlackHoleDescriptor implements BodyDescriptor {
     readonly rng: (step: number) => number;
 
     readonly radius: number;
+
+    readonly type = STAR_TYPE.BLACK_HOLE;
 
     readonly orbitalProperties: IOrbitalProperties;
 
