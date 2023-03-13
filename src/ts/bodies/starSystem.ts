@@ -289,7 +289,7 @@ export class StarSystem {
         const controller = this.scene.getActiveController();
 
         for (const body of this.bodies) {
-            body.updateClock(deltaTime);
+            body.updateInternalClock(deltaTime);
 
             const initialPosition = body.transform.getAbsolutePosition().clone();
             const newPosition = body.updateOrbitalPosition().clone();

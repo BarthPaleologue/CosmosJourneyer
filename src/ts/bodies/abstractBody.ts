@@ -10,10 +10,11 @@ export abstract class AbstractBody implements IOrbitalBody {
     abstract readonly bodyType: BodyType;
 
     readonly transform: BasicTransform;
-    abstract postProcesses: BodyPostProcesses;
+
+    abstract readonly postProcesses: BodyPostProcesses;
 
     //TODO: make an universal clock ?? or not it could be funny
-    private internalTime = 0;
+    private internalClock = 0;
 
     private theta = 0;
     readonly rotationMatrixAroundAxis = new Matrix();
@@ -83,12 +84,20 @@ export abstract class AbstractBody implements IOrbitalBody {
         return this.theta;
     }
 
-    public getInternalTime(): number {
-        return this.internalTime;
+    /**
+     * Returns the internal clock of the body (in seconds)
+     * @returns the internal clock of the body (in seconds)
+     */
+    public getInternalClock(): number {
+        return this.internalClock;
     }
 
-    public updateClock(deltaTime: number): void {
-        this.internalTime += deltaTime;
+    /**
+     * Updates the internal clock of the body by adding the time elapsed since the last update
+     * @param deltaTime the time elapsed since the last update
+     */
+    public updateInternalClock(deltaTime: number): void {
+        this.internalClock += deltaTime;
     }
 
     public updateOrbitalPosition(): Vector3 {
@@ -96,25 +105,27 @@ export abstract class AbstractBody implements IOrbitalBody {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
             this.descriptor.orbitalProperties.orientationQuaternion = orientationQuaternion;
 
-            const initialPosition = this.transform.getAbsolutePosition().clone();
-            const newPosition = computePointOnOrbit(barycenter, this.descriptor.orbitalProperties, this.internalTime);
-
-            this.transform.translate(newPosition.subtract(initialPosition));
+            const newPosition = computePointOnOrbit(barycenter, this.descriptor.orbitalProperties, this.internalClock);
+            this.transform.setAbsolutePosition(newPosition);
         }
+
         return this.transform.getAbsolutePosition();
     }
 
+    /**
+     * Updates the rotation of the body around its axis
+     * @param deltaTime The time elapsed since the last update
+     * @returns The elapsed angle of rotation around the axis
+     */
     public updateRotation(deltaTime: number): number {
-        if (this.descriptor.physicalProperties.rotationPeriod > 0) {
+        if (this.descriptor.physicalProperties.rotationPeriod == 0) return 0;
 
-            const dtheta = -(2 * Math.PI * deltaTime) / this.descriptor.physicalProperties.rotationPeriod;
-            this.transform.rotate(this.getRotationAxis(), dtheta);
+        const dtheta = -(2 * Math.PI * deltaTime) / this.descriptor.physicalProperties.rotationPeriod;
+        this.transform.rotate(this.getRotationAxis(), dtheta);
 
-            this.theta += dtheta;
-            this.rotationMatrixAroundAxis.copyFrom(Matrix.RotationAxis(this.getRotationAxis(), this.theta));
+        this.theta += dtheta;
+        this.rotationMatrixAroundAxis.copyFrom(Matrix.RotationAxis(this.getRotationAxis(), this.theta));
 
-            return dtheta;
-        }
-        return 0;
+        return dtheta;
     }
 }

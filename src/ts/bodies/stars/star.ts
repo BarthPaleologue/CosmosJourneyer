@@ -65,6 +65,6 @@ export class Star extends AbstractBody {
     }
 
     public updateMaterial(): void {
-        this.material.update(this.getInternalTime());
+        this.material.update(this.getInternalClock());
     }
 }
