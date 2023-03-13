@@ -21,12 +21,12 @@ import { Keyboard } from "../inputs/keyboard";
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
-import { AdvancedDynamicTexture, Button, StackPanel, TextBlock } from "@babylonjs/gui";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 import { StarDescriptor, getStellarTypeString } from "../descriptors/starDescriptor";
 import { BuildData, Cell, Vector3ToString } from "./cell";
 import { BodyType } from "../bodies/interfaces";
 import { BlackHoleDescriptor } from "../descriptors/blackHoleDescriptor";
+import { StarMapUI } from "./starMapUI";
 
 export class StarMap {
     readonly scene: Scene;
@@ -48,10 +48,7 @@ export class StarMap {
 
     static readonly RENDER_RADIUS = 7;
 
-    private readonly gui: AdvancedDynamicTexture;
-    private readonly namePlate: StackPanel;
-    private readonly nameLabel: TextBlock;
-    private readonly warpButton: Button;
+    private readonly starMapUI: StarMapUI;
 
     private selectedSystemSeed: number | null = null;
 
@@ -80,35 +77,14 @@ export class StarMap {
         this.scene.activeCamera = this.controller.getActiveCamera();
         this.controller.inputs.push(new Keyboard());
 
-        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        this.starMapUI = new StarMapUI();
 
-        this.namePlate = new StackPanel();
-        this.namePlate.width = "250px";
-        //this.namePlate.height = "150px";
-        this.namePlate.color = "white";
-        this.namePlate.background = "black";
-        this.namePlate.linkOffsetY = -100;
-
-        this.nameLabel = new TextBlock();
-        this.nameLabel.height = "100px";
-        this.nameLabel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
-        this.nameLabel.setPadding(10, 15, 10, 15);
-
-        this.warpButton = Button.CreateSimpleButton("warpButton", "WARP");
-        //this.warpButton.width = "100px";
-        this.warpButton.height = "40px";
-        this.warpButton.background = "darkgreen";
-        this.warpButton.fontWeight = "bold";
-        //this.warpButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        this.warpButton.onPointerClickObservable.add(() => {
+        this.starMapUI.warpButton.onPointerClickObservable.add(() => {
             if (this.selectedSystemSeed) {
                 const url = new URL(`random.html?seed=${encodeURIComponent(this.selectedSystemSeed)}`, window.location.href);
                 window.open(url, "_blank")?.focus();
             } else throw new Error("No system selected!");
         });
-
-        this.namePlate.addControl(this.nameLabel);
-        this.namePlate.addControl(this.warpButton);
 
         const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controller.getActiveCamera()]);
         pipeline.fxaaEnabled = true;
@@ -141,13 +117,11 @@ export class StarMap {
         this.blackHoleTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
         this.blackHoleTemplate.isPickable = true;
         this.blackHoleTemplate.isVisible = false;
-        this.blackHoleTemplate.hasVertexAlpha = true;
 
         const blackHoleMaterial = new StandardMaterial("blackHoleMaterial", this.scene);
-        blackHoleMaterial.emissiveTexture = new Texture(blackHoleTexture, this.scene);
-        blackHoleMaterial.opacityTexture = new Texture(blackHoleTexture, this.scene);
-        blackHoleMaterial.opacityTexture.getAlphaFromRGB = true;
-        blackHoleMaterial.emissiveColor = Color3.White();
+        blackHoleMaterial.diffuseTexture = new Texture(blackHoleTexture, this.scene);
+        blackHoleMaterial.diffuseTexture.hasAlpha = true;
+        blackHoleMaterial.emissiveColor = new Color3(0.9, 1.0, 1.0);
         blackHoleMaterial.freeze();
 
         this.blackHoleTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
@@ -235,8 +209,7 @@ export class StarMap {
 
         this.buildNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed ** 2);
 
-        // if the star was removed, remove the nameplate
-        if (this.namePlate.linkedMesh == null) this.gui.removeControl(this.namePlate);
+        this.starMapUI.update();
     }
 
     private disposeNextStars(n: number) {
@@ -285,18 +258,11 @@ export class StarMap {
 
             star.actionManager.registerAction(
                 new ExecuteCodeAction(ActionManager.OnPickTrigger, (_) => {
-                    if (this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
-
-                    this.namePlate.linkWithMesh(star);
-                    this.nameLabel.text =
-                        "Seed: " + starSystemDescriptor.seed + "\n" + "Type: " + getStellarTypeString(starDescriptor.type) + "\n" + "Planets: " + starSystemDescriptor.getNbPlanets();
+                    this.starMapUI.attachUIToMesh(star);
+                    this.starMapUI.setUIText(
+                        "Seed: " + starSystemDescriptor.seed + "\n" + "Type: " + getStellarTypeString(starDescriptor.type) + "\n" + "Planets: " + starSystemDescriptor.getNbPlanets());
 
                     this.selectedSystemSeed = starSystemSeed;
-                })
-            );
-            star.actionManager.registerAction(
-                new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (_) => {
-                    console.log("!!!");
                 })
             );
 
