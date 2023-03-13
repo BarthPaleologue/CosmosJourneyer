@@ -32,7 +32,7 @@ export class CollisionWorker {
 
             const deviation = newPosition.subtract(currentPosition);
 
-            this.starSystem.translateAllBodies(deviation);
+            this.starSystem.translateAllBodiesNow(deviation);
 
             this._isBusy = false;
         };

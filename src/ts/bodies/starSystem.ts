@@ -26,14 +26,34 @@ export class StarSystem {
 
     private readonly bodies: AbstractBody[] = [];
 
-    readonly stars: (Star | BlackHole)[] = [];
+    /**
+     * The list of all stellar objects in the system (stars, black holes, pulsars)
+     */
+    readonly stellarObjects: (Star | BlackHole)[] = [];
 
+    /**
+     * The list of all planemos in the system (planets and satellites)
+     */
     readonly planemos: Planemo[] = [];
 
+    /**
+     * The list of all planets in the system (telluric and gas)
+     */
     readonly planets: Planemo[] = [];
 
+    /**
+     * The list of all telluric planets in the system
+     */
     readonly telluricPlanets: TelluricPlanet[] = [];
+
+    /**
+     * The list of all gas planets in the system
+     */
     readonly gasPlanets: GasPlanet[] = [];
+
+    /**
+     * The list of all satellites in the system
+     */
     readonly satellites: TelluricPlanet[] = [];
 
     readonly descriptor: StarSystemDescriptor;
@@ -86,7 +106,7 @@ export class StarSystem {
      */
     public addStar(star: Star | BlackHole): Star | BlackHole {
         this.bodies.push(star);
-        this.stars.push(star);
+        this.stellarObjects.push(star);
         return star;
     }
 
@@ -94,17 +114,17 @@ export class StarSystem {
      * Makes a star and adds it to the system. By default, it will use the next available seed planned by the system descriptor
      * @param seed The seed to use for the star generation (by default, the next available seed planned by the system descriptor)
      */
-    public makeStar(seed = this.descriptor.getStarSeed(this.stars.length)): Star | BlackHole {
-        if (this.stars.length >= this.descriptor.getNbStars())
+    public makeStar(seed = this.descriptor.getStarSeed(this.stellarObjects.length)): Star | BlackHole {
+        if (this.stellarObjects.length >= this.descriptor.getNbStars())
             console.warn(`You are adding a star 
-        to a system that already has ${this.stars.length} stars.
+        to a system that already has ${this.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
 
-        const isStarBlackHole = this.descriptor.getBodyTypeOfStar(this.stars.length) == BodyType.BLACK_HOLE;
+        const isStarBlackHole = this.descriptor.getBodyTypeOfStar(this.stellarObjects.length) == BodyType.BLACK_HOLE;
 
         const star = isStarBlackHole ?
-            new BlackHole(`blackHole${this.stars.length}`, seed, []) :
-            new Star(`star${this.stars.length}`, this.scene, seed, []);
+            new BlackHole(`blackHole${this.stellarObjects.length}`, seed, []) :
+            new Star(`star${this.stellarObjects.length}`, this.scene, seed, []);
 
         //TODO: make this better, make it part of the generation
         star.descriptor.orbitalProperties.periapsis = star.getRadius() * 4;
@@ -118,12 +138,12 @@ export class StarSystem {
      * Makes a black hole and adds it to the system. By default, it will use the next available seed planned by the system descriptor
      * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system descriptor)
      */
-    public makeBlackHole(seed = this.descriptor.getStarSeed(this.stars.length)): BlackHole {
-        if (this.stars.length >= this.descriptor.getNbStars())
+    public makeBlackHole(seed = this.descriptor.getStarSeed(this.stellarObjects.length)): BlackHole {
+        if (this.stellarObjects.length >= this.descriptor.getNbStars())
             console.warn(`You are adding a black hole
-        to a system that already has ${this.stars.length} stars.
+        to a system that already has ${this.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
-        const blackHole = new BlackHole(`blackHole${this.stars.length}`, seed, this.stars);
+        const blackHole = new BlackHole(`blackHole${this.stellarObjects.length}`, seed, this.stellarObjects);
 
         this.addStar(blackHole);
         return blackHole;
@@ -147,7 +167,7 @@ export class StarSystem {
             console.warn(`You are adding a telluric planet to the system.
             The system generator had planned for ${this.descriptor.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
             This might cause issues, or not who knows.`);
-        const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this.scene, seed, this.stars);
+        const planet = new TelluricPlanet(`telluricPlanet${this.planets.length}`, this.scene, seed, this.stellarObjects);
         this.addTelluricPlanet(planet);
         return planet;
     }
@@ -161,7 +181,7 @@ export class StarSystem {
             console.warn(`You are adding a gas planet to the system.
             The system generator had planned for ${this.descriptor.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
             This might cause issues, or not who knows.`);
-        const planet = new GasPlanet(`gasPlanet${this.planets.length}`, this.scene, seed, this.stars);
+        const planet = new GasPlanet(`gasPlanet${this.planets.length}`, this.scene, seed, this.stellarObjects);
         this.addGasPlanet(planet);
         return planet;
     }
@@ -227,8 +247,16 @@ export class StarSystem {
      * Translates all bodies in the system by the given displacement
      * @param displacement The displacement applied to all bodies
      */
-    public translateAllBodies(displacement: Vector3): void {
+    public translateAllBodiesNow(displacement: Vector3): void {
         for (const planet of this.bodies) planet.transform.translate(displacement);
+    }
+
+    /**
+     * Translates all bodies in the system by the given displacement
+     * @param displacement The displacement applied to all bodies
+     */
+    public registerTranslateAllBodies(displacement: Vector3): void {
+        for (const planet of this.bodies) planet.nextState.position.addInPlace(displacement);
     }
 
     /**
@@ -248,7 +276,7 @@ export class StarSystem {
     /**
      * Returns the nearest body to the origin
      */
-    public getNearestBody(position: Vector3 = Vector3.Zero()): AbstractBody {
+    public getNearestBody(position = Vector3.Zero()): AbstractBody {
         if (this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
         let nearest = null;
         let smallerDistance2 = -1;
@@ -266,9 +294,10 @@ export class StarSystem {
     /**
      * Inits the post processes and moves the system forward in time to the current time (it is additive)
      */
-    public init() {
+    public init(nbWarmUpUpdates = 100): void {
         this.initPostProcesses();
         this.update(Date.now() / 1000);
+        for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1);
     }
 
     /**
@@ -276,8 +305,8 @@ export class StarSystem {
      * @private
      */
     private initPostProcesses() {
-        this.postProcessManager.addStarField(this.stars, this.bodies);
-        for (const body of this.bodies) this.postProcessManager.addBody(body, this.stars);
+        this.postProcessManager.addStarField(this.stellarObjects, this.bodies);
+        for (const body of this.bodies) this.postProcessManager.addBody(body, this.stellarObjects);
         this.postProcessManager.setBody(this.getNearestBody(this.scene.getActiveUberCamera().position));
     }
 
@@ -292,27 +321,36 @@ export class StarSystem {
             body.updateInternalClock(deltaTime);
 
             const initialPosition = body.transform.getAbsolutePosition().clone();
-            const newPosition = body.updateOrbitalPosition().clone();
 
-            if (isOrbiting(controller, body, 50 / (body.depth + 1) ** 3)) controller.transform.translate(newPosition.subtract(initialPosition));
+            body.updateOrbitalPosition();
+
+            const newPosition = body.nextState.position.clone();
+
+            // if the controller is close to the body, it will follow its movement
+            if (isOrbiting(controller, body) && this.getNearestBody() === body) controller.transform.translate(newPosition.subtract(initialPosition));
+
+            const displacementTranslation = controller.transform.getAbsolutePosition().negate();
+            this.registerTranslateAllBodies(displacementTranslation);
+            controller.transform.translate(displacementTranslation);
 
             const dtheta = body.updateRotation(deltaTime);
-            if (isOrbiting(controller, body)) controller.transform.rotateAround(body.transform.getAbsolutePosition(), body.getRotationAxis(), dtheta);
 
-            if (body.bodyType == BodyType.TELLURIC) {
-                const telluric = body as TelluricPlanet;
-                telluric.updateLOD(controller.transform.getAbsolutePosition());
-            }
+            // if the controller is close to the body, it will follow its rotation
+            if (isOrbiting(controller, body) && this.getNearestBody() === body) controller.transform.rotateAround(body.nextState.position, body.getRotationAxis(), dtheta);
+
+            const displacementRotation = controller.transform.getAbsolutePosition().negate();
+            this.registerTranslateAllBodies(displacementRotation);
+            controller.transform.translate(displacementRotation);
         }
 
-        for (const planet of this.planemos) planet.updateMaterial(controller, this.stars, deltaTime);
-        for (const star of this.stars) {
-            if (star.bodyType == BodyType.STAR) (star as Star).updateMaterial();
+        for (const planet of this.planemos) planet.updateMaterial(controller, this.stellarObjects, deltaTime);
+        for (const star of this.stellarObjects) {
+            if (star.bodyType === BodyType.STAR) (star as Star).updateMaterial();
         }
 
-        const displacement = controller.transform.getAbsolutePosition().negate();
-        this.translateAllBodies(displacement);
-        controller.transform.translate(displacement);
+        for (const body of this.bodies) body.applyNextState();
+
+        for (const body of this.telluricPlanets.concat(this.satellites)) body.updateLOD(controller.transform.getAbsolutePosition());
 
         const nearest = this.getNearestBody(this.scene.getActiveUberCamera().position);
         this.postProcessManager.setBody(nearest);

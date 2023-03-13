@@ -47,6 +47,10 @@ export class BasicTransform implements ITransformLike {
         return this.getRotationQuaternion().invert();
     }
 
+    public setRotationQuaternion(newRotation: Quaternion): void {
+        this.node.rotationQuaternion = newRotation;
+    }
+
     /* #region directions */
 
     /**

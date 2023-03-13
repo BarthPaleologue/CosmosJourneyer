@@ -97,7 +97,7 @@ export class PlanetEngine {
             this.helmetOverlay.update(nearest);
             this.helmetOverlay.setVisibility(this.bodyEditor.getVisibility() != EditorVisibility.FULL);
 
-            this.starSystem.translateAllBodies(this.scene.getActiveController().update(deltaTime));
+            this.starSystem.translateAllBodiesNow(this.scene.getActiveController().update(deltaTime));
 
             if (!this.collisionWorker.isBusy() && isOrbiting(this.scene.getActiveController(), nearest)) {
                 if (nearest.bodyType == BodyType.TELLURIC) {
@@ -106,7 +106,7 @@ export class PlanetEngine {
             }
 
             //FIXME: should address stars orbits
-            for (const star of this.starSystem.stars) star.descriptor.orbitalProperties.period = 0;
+            for (const star of this.starSystem.stellarObjects) star.descriptor.orbitalProperties.period = 0;
 
             Assets.ChunkForge.update();
             this.starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);

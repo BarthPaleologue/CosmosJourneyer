@@ -42,4 +42,4 @@ document.addEventListener("keydown", (e) => {
 engine.init();
 
 const nbRadius = starSystem.descriptor.getBodyTypeOfStar(0) == BodyType.BLACK_HOLE ? 8 : 3;
-positionNearBody(player, starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stars[0], starSystem, nbRadius);
+positionNearBody(player, starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);

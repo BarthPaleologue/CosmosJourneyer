@@ -1,4 +1,4 @@
-import { Matrix, Vector3 } from "@babylonjs/core";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core";
 import { BodyType } from "./interfaces";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
@@ -6,10 +6,19 @@ import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { BodyDescriptor } from "../descriptors/interfaces";
 import { computeBarycenter, computePointOnOrbit } from "../orbits/kepler";
 
+interface NextState {
+    position: Vector3;
+    rotation: Quaternion;
+}
+
 export abstract class AbstractBody implements IOrbitalBody {
     abstract readonly bodyType: BodyType;
 
     readonly transform: BasicTransform;
+    readonly nextState = {
+        position: Vector3.Zero(),
+        rotation: Quaternion.Identity(),
+    };
 
     abstract readonly postProcesses: BodyPostProcesses;
 
@@ -100,16 +109,16 @@ export abstract class AbstractBody implements IOrbitalBody {
         this.internalClock += deltaTime;
     }
 
-    public updateOrbitalPosition(): Vector3 {
+    public updateOrbitalPosition() {
         if (this.descriptor.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
             this.descriptor.orbitalProperties.orientationQuaternion = orientationQuaternion;
 
             const newPosition = computePointOnOrbit(barycenter, this.descriptor.orbitalProperties, this.internalClock);
-            this.transform.setAbsolutePosition(newPosition);
+            this.nextState.position.copyFrom(newPosition);
+        } else {
+            this.nextState.position.copyFrom(this.transform.getAbsolutePosition());
         }
-
-        return this.transform.getAbsolutePosition();
     }
 
     /**
@@ -118,14 +127,27 @@ export abstract class AbstractBody implements IOrbitalBody {
      * @returns The elapsed angle of rotation around the axis
      */
     public updateRotation(deltaTime: number): number {
-        if (this.descriptor.physicalProperties.rotationPeriod == 0) return 0;
+        if (this.descriptor.physicalProperties.rotationPeriod == 0) {
+            this.nextState.rotation.copyFrom(this.transform.getRotationQuaternion());
+            return 0;
+        }
 
         const dtheta = -(2 * Math.PI * deltaTime) / this.descriptor.physicalProperties.rotationPeriod;
-        this.transform.rotate(this.getRotationAxis(), dtheta);
-
         this.theta += dtheta;
-        this.rotationMatrixAroundAxis.copyFrom(Matrix.RotationAxis(this.getRotationAxis(), this.theta));
+
+        this.rotationMatrixAroundAxis.copyFrom(Matrix.RotationAxis(new Vector3(0, 1, 0), this.theta));
+
+        const elementaryRotationMatrix = Matrix.RotationAxis(this.getRotationAxis(), dtheta);
+        const elementaryRotationQuaternion = Quaternion.FromRotationMatrix(elementaryRotationMatrix);
+        const newQuaternion = elementaryRotationQuaternion.multiply(this.transform.getRotationQuaternion());
+
+        this.nextState.rotation.copyFrom(newQuaternion);
 
         return dtheta;
+    }
+
+    public applyNextState(): void {
+        this.transform.setAbsolutePosition(this.nextState.position);
+        this.transform.setRotationQuaternion(this.nextState.rotation);
     }
 }
