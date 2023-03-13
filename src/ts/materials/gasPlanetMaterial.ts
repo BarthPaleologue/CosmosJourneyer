@@ -1,4 +1,4 @@
-import { Color3, Effect, MaterialHelper, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
+import { Color3, Effect, MaterialHelper, Matrix, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
 import { AbstractController } from "../uberCore/abstractController";
 
 import surfaceMaterialFragment from "../../shaders/gasPlanetMaterial/fragment.glsl";
@@ -18,6 +18,7 @@ Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 export class GasPlanetMaterial extends ShaderMaterial {
     readonly planet: BasicTransform;
     readonly colorSettings: GazColorSettings;
+    private clock = 0;
 
     constructor(planetName: string, planet: BasicTransform, descriptor: GasPlanetDescriptor, scene: Scene) {
         super(`${planetName}SurfaceColor`, scene, shaderName, {
@@ -28,13 +29,8 @@ export class GasPlanetMaterial extends ShaderMaterial {
                 "projection",
                 "view",
 
-                "textureSampler",
-                "depthSampler",
-
                 "seed",
 
-                "cameraNear",
-                "cameraFar",
                 "planetPosition",
                 "planetRadius",
 
@@ -50,6 +46,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
                 "time",
 
                 "planetInverseRotationQuaternion",
+                "rotationMatrixAroundAxis",
 
                 "playerPosition",
 
@@ -101,8 +98,12 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setFloat("colorSharpness", this.colorSettings.colorSharpness);
     }
 
-    public update(player: AbstractController, stars: (Star | BlackHole)[]) {
+    public update(player: AbstractController, stars: (Star | BlackHole)[], rotationMatrixAroundAxis: Matrix, deltaTime: number) {
+        this.clock += deltaTime;
+
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
+        this.setMatrix("rotationMatrixAroundAxis", rotationMatrixAroundAxis);
+
         this.setVector3("playerPosition", player.transform.getAbsolutePosition());
 
         this.setArray3("starPositions", flattenVector3Array(stars.map((star) => star.transform.getAbsolutePosition())));
@@ -110,6 +111,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
 
-        //this.setFloat("time", this.planet.getInternalTime() % 100000);
+        this.setFloat("time", this.clock % 100000);
     }
 }

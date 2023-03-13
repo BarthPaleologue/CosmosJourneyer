@@ -25,7 +25,29 @@ export enum STAR_TYPE {
     F,
     G,
     K,
-    M
+    M,
+    BLACK_HOLE
+}
+
+export function getStellarTypeString(type: STAR_TYPE): string {
+    switch (type) {
+        case STAR_TYPE.O:
+            return "O";
+        case STAR_TYPE.B:
+            return "B";
+        case STAR_TYPE.A:
+            return "A";
+        case STAR_TYPE.F:
+            return "F";
+        case STAR_TYPE.G:
+            return "G";
+        case STAR_TYPE.K:
+            return "K";
+        case STAR_TYPE.M:
+            return "M";
+        case STAR_TYPE.BLACK_HOLE:
+            return "Black hole";
+    }
 }
 
 export class StarDescriptor implements BodyDescriptor {
@@ -37,7 +59,7 @@ export class StarDescriptor implements BodyDescriptor {
 
     readonly surfaceTemperature: number;
     readonly surfaceColor: Vector3;
-    private readonly type: STAR_TYPE;
+    readonly type: STAR_TYPE;
     readonly radius: number;
 
     readonly mass = 1000;
@@ -100,24 +122,5 @@ export class StarDescriptor implements BodyDescriptor {
     get depth(): number {
         if (this.parentBodies.length === 0) return 0;
         return this.parentBodies[0].depth + 1;
-    }
-
-    getStellarType(): string {
-        switch (this.type) {
-            case STAR_TYPE.O:
-                return "O";
-            case STAR_TYPE.B:
-                return "B";
-            case STAR_TYPE.A:
-                return "A";
-            case STAR_TYPE.F:
-                return "F";
-            case STAR_TYPE.G:
-                return "G";
-            case STAR_TYPE.K:
-                return "K";
-            case STAR_TYPE.M:
-                return "M";
-        }
     }
 }

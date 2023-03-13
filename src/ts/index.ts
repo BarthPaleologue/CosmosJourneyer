@@ -49,7 +49,7 @@ planet.descriptor.orbitalProperties.apoapsis = 4000 * planet.getRadius();
 planet.descriptor.orbitalProperties.periapsis = 4000 * planet.getRadius();
 planet.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
 
-const moon = starSystem.makeSatellite(planet, 0.4);
+const moon = starSystem.makeSatellite(planet, 10);
 
 moon.descriptor.physicalProperties.mass = 2;
 moon.descriptor.physicalProperties.rotationPeriod = 7 * 60 * 60;
@@ -80,6 +80,7 @@ ares.descriptor.physicalProperties.minTemperature = -48;
 ares.descriptor.physicalProperties.maxTemperature = 20;
 ares.descriptor.physicalProperties.pressure = 0.5;
 ares.descriptor.physicalProperties.waterAmount = 0.2;
+ares.descriptor.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * ares.descriptor.physicalProperties.waterAmount * ares.descriptor.physicalProperties.pressure;
 
 ares.descriptor.orbitalProperties.period = 60 * 60 * 24 * 365.24;
 ares.descriptor.orbitalProperties.periapsis = 4020 * planet.getRadius();
@@ -95,8 +96,6 @@ ares.material.colorSettings.desertColor.copyFromFloats(178 / 255, 107 / 255, 42 
 ares.material.colorSettings.steepColor.copyFrom(ares.material.colorSettings.desertColor.scale(0.9));
 ares.material.colorSettings.beachColor.copyFromFloats(0.3, 0.15, 0.1);
 ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);
-
-ares.descriptor.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * ares.descriptor.physicalProperties.waterAmount * ares.descriptor.physicalProperties.pressure;
 
 ares.material.updateConstants();
 
@@ -114,6 +113,7 @@ const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
 aresAtmosphere.settings.redWaveLength = 500;
 aresAtmosphere.settings.greenWaveLength = 680;
 aresAtmosphere.settings.blueWaveLength = 670;
+
 document.addEventListener("keydown", (e) => {
     if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
 });

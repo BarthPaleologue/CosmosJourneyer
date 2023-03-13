@@ -58,7 +58,7 @@ export class GasPlanet extends AbstractBody implements Planemo {
         this.transform.rotate(Axis.X, this.descriptor.physicalProperties.axialTilt);
     }
 
-    updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[]): void {
-        this.material.update(controller, stars);
+    updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[], deltaTime: number): void {
+        this.material.update(controller, stars, this.rotationMatrixAroundAxis, deltaTime);
     }
 }

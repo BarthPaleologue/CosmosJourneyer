@@ -1,7 +1,6 @@
 import { HelmetOverlay } from "./ui/helmetOverlay";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor/bodyEditor";
-import { initEngineScene } from "./utils/init";
-import { Engine, Tools } from "@babylonjs/core";
+import { Color4, Engine, EngineFactory, Tools, WebGPUEngine } from "@babylonjs/core";
 import { Assets } from "./assets";
 import { AbstractController } from "./uberCore/abstractController";
 import { UberScene } from "./uberCore/uberScene";
@@ -49,7 +48,21 @@ export class PlanetEngine {
     }
 
     async setup() {
-        [this.engine, this.scene] = await initEngineScene(this.canvas);
+        this.engine = await EngineFactory.CreateAsync(this.canvas, {
+            antialias: false
+            //useHighPrecisionFloats: true,
+            //useHighPrecisionMatrix: true,
+            //adaptToDeviceRatio: true,
+        });
+
+        this.engine.loadingScreen.displayLoadingUI();
+
+        console.log(`API: ${this.engine instanceof WebGPUEngine ? "WebGPU" : "WebGL" + this.engine.webGLVersion}`);
+        console.log(`GPU detected: ${this.engine.getGlInfo().renderer}`);
+
+        this.scene = new UberScene(this.engine);
+        this.scene.clearColor = new Color4(0, 0, 0, 0);
+
         await Assets.Init(this.scene);
 
         this.scene.executeWhenReady(() => {

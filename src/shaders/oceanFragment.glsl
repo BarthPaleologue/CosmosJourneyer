@@ -52,7 +52,7 @@ uniform float time;
 
 #pragma glslify: computeSpecularHighlight = require(./utils/computeSpecularHighlight.glsl)
 
-vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
+vec4 ocean(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
 
     float waveAmplitude = 20.0;
@@ -120,14 +120,14 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         vec3 shallowColor = vec3(32.0,193.0,180.0)/255.0;
         vec3 oceanColor = lerp(deepColor, shallowColor, opticalDepth01);
         
-        vec3 ambiant = lerp(originalColor, oceanColor, alpha);
+        vec3 ambiant = lerp(originalColor.rgb, oceanColor, alpha);
 
         float foamSize = 30.0;
         float foamFactor = saturate((foamSize - distanceThroughOcean) / foamSize);
         vec3 foamColor = vec3(0.8);
         ambiant = lerp(foamColor, ambiant, foamFactor);
 
-        return ambiant * ndl + specularHighlight;
+        return vec4(ambiant * ndl + specularHighlight, 1.0);
     }
     return originalColor;
 }
@@ -135,7 +135,7 @@ vec3 ocean(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
 
 
 void main() {
-    vec3 screenColor = texture2D(textureSampler, vUV).rgb; // the current screen color
+    vec4 screenColor = texture2D(textureSampler, vUV); // the current screen color
 
     float depth = texture2D(depthSampler, vUV).r; // the depth corresponding to the pixel in the depth map
     
@@ -147,7 +147,7 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
-    vec3 finalColor = ocean(screenColor, cameraPosition, rayDir, maximumDistance);
+    vec4 finalColor = ocean(screenColor, cameraPosition, rayDir, maximumDistance);
 
-    gl_FragColor = vec4(finalColor, 1.0); // displaying the final color
+    gl_FragColor = finalColor; // displaying the final color
 }

@@ -5,5 +5,5 @@ import { PlanemoDescriptor } from "../../descriptors/interfaces";
 
 export interface Planemo {
     descriptor: PlanemoDescriptor;
-    updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[]): void;
+    updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[], deltaTime: number): void;
 }

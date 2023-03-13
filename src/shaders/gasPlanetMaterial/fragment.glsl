@@ -9,7 +9,6 @@ varying vec3 vPositionW;
 varying vec3 vNormalW;
 varying vec3 vUnitSamplePoint;
 varying vec3 vSphereNormalW;
-varying vec3 vSamplePoint;
 
 varying vec3 vPosition; // position of the vertex in sphere space
 varying vec3 vNormal; // normal of the vertex in sphere space
@@ -17,8 +16,6 @@ varying vec3 vNormal; // normal of the vertex in sphere space
 uniform mat4 world;
 
 uniform vec3 playerPosition; // camera position in world space
-uniform float cameraNear;
-uniform float cameraFar;
 
 uniform vec3 planetPosition;
 
@@ -34,12 +31,9 @@ uniform float colorSharpness;
 
 uniform float time;
 
-uniform sampler2D textureSampler;
-uniform sampler2D depthSampler; // evaluate sceneDepth
-
 uniform float seed;
 
-uniform float planetRadius; // planet radius
+uniform float planetRadius;
 
 #pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl)
 
@@ -48,10 +42,6 @@ uniform float planetRadius; // planet radius
 #pragma glslify: remap = require(../utils/remap.glsl)
 
 #pragma glslify: lerp = require(../utils/vec3Lerp.glsl)
-
-float lerp(float value1, float value2, float x) {
-    return x * value1 + (1.0 - x) * value2;
-}
 
 #pragma glslify: saturate = require(../utils/saturate.glsl)
 
@@ -93,35 +83,40 @@ void main() {
 
         seededSamplePoint.y *= 2.5;
 
-        float cloudSpeed = 0.0005;
-        vec4 seededSamplePoint2 = vec4(rotateAround(seededSamplePoint.xyz, vec3(0.0, 1.0, 0.0), time * cloudSpeed), seededSamplePoint.w);
+        float cloudSpeed = 0.005;
+        float offsetAmplitude = 0.0;
 
         float warpStrength = 4.0;
 
+        int nbOctaves = 3;
+
+        vec3 qOffset1 = vec3(0.0) + offsetAmplitude * vec3(cos(0.5 + time*cloudSpeed), 0.0, sin(time*cloudSpeed));
+        vec3 qOffset2 = vec3(13.0, 37.0, -73.0) + offsetAmplitude * vec3(cos(time*cloudSpeed), 0.0, sin(2.1 + time*cloudSpeed));
+        vec3 qOffset3 = vec3(-56.0, 19.0, 47.0) + offsetAmplitude * vec3(cos(4.0 + time*cloudSpeed), 0.0, sin(time*cloudSpeed));
         vec4 q = vec4(
-            fractalSimplex4(seededSamplePoint2, 3, 2.0, 2.0),
-            fractalSimplex4(seededSamplePoint2 + vec4(13.0, 37.0, -73.0, 0.0), 3, 2.0, 2.0),
-            fractalSimplex4(seededSamplePoint2 + vec4(-56.0, 19.0, 47.0, 0.0), 3, 2.0, 2.0),
+            fractalSimplex4(seededSamplePoint + vec4(qOffset1, 0.0), nbOctaves, 2.0, 2.0),
+            fractalSimplex4(seededSamplePoint + vec4(qOffset2, 0.0), nbOctaves, 2.0, 2.0),
+            fractalSimplex4(seededSamplePoint + vec4(qOffset3, 0.0), nbOctaves, 2.0, 2.0),
             0.0
         );
-        //q = vec4(rotateAround(q.xyz, vec3(0.0, 1.0, 0.0), time * cloudSpeed), q.w);
 
-
+        vec3 rOffset1 = vec3(21.0, -16.0, 7.0) + offsetAmplitude * vec3(cos(0.5 + time*cloudSpeed), 0.0, sin(time*cloudSpeed));
+        vec3 rOffset2 = vec3(-5.0, 3.0, 12.0) + offsetAmplitude * vec3(cos(time*cloudSpeed), 0.0, sin(2.1 + time*cloudSpeed));
+        vec3 rOffset3 = vec3(9.0, -1.0, 13.0) + offsetAmplitude * vec3(cos(4.0 + time*cloudSpeed), 0.0, sin(time*cloudSpeed));
         vec4 r = vec4(
-            fractalSimplex4(seededSamplePoint2 + warpStrength * q + vec4(21.0, -16.0, 7.0, 0.0), 3, 2.0, 2.0),
-            fractalSimplex4(seededSamplePoint2 + warpStrength * q + vec4(-5.0, 3.0, 12.0, 0.0), 3, 2.0, 2.0),
-            fractalSimplex4(seededSamplePoint2 + warpStrength * q + vec4(9.0, -1.0, 13.0, 0.0), 3, 2.0, 2.0),
+            fractalSimplex4(seededSamplePoint + warpStrength * q + vec4(rOffset1, 0.0), nbOctaves, 2.0, 2.0),
+            fractalSimplex4(seededSamplePoint + warpStrength * q + vec4(rOffset2, 0.0), nbOctaves, 2.0, 2.0),
+            fractalSimplex4(seededSamplePoint + warpStrength * q + vec4(rOffset3, 0.0), nbOctaves, 2.0, 2.0),
             0.0
         );
         //r = vec4(rotateAround(r.xyz, vec3(0.0, 1.0, 0.0), time * cloudSpeed), r.w);
+        //r.xyz += vec3(cos(time * 0.02), 0.0, sin(time * 0.02));
 
-        seededSamplePoint = seededSamplePoint2 + q + warpStrength * r;
+        seededSamplePoint += q + warpStrength * r;
         
-        float value = fractalSimplex4(seededSamplePoint * 0.1, 10, 2.0, 2.0);
-
         //float colorSharpness = 1.5;
 
-        float sep1 = smoothSharpener(value, colorSharpness);
+        float sep1 = smoothSharpener(abs(r.x), colorSharpness);
         float sep2 = smoothSharpener(abs(q.x), colorSharpness);
         float sep3 = smoothSharpener(abs(r.y), colorSharpness);
 
@@ -132,12 +127,9 @@ void main() {
         color = min(color * 1.2, vec3(1.0));
     }
 
-    // suppresion du reflet partout hors la neige
-    specComp *= (color.r + color.g + color.b) / 3.0;
     specComp /= 2.0;
 
     vec3 screenColor = color.rgb * (ndl + specComp * ndl);
-
 
     gl_FragColor = vec4(screenColor, 1.0); // apply color and lighting
     #ifdef LOGARITHMICDEPTH

@@ -15,6 +15,7 @@ uniform mat4 worldViewProjection;
 uniform vec3 planetPosition; // nécessaire temporairement le temps de régler le problème des floats
 
 uniform vec4 planetInverseRotationQuaternion;
+uniform mat4 rotationMatrixAroundAxis;
 
 varying vec3 vPositionW;
 varying vec3 vNormalW;
@@ -24,7 +25,6 @@ varying vec3 vNormal;
 varying vec3 vPosition;
 
 varying vec3 vUnitSamplePoint;
-varying vec3 vSamplePoint;
 
 #pragma glslify: applyQuaternion = require(../utils/applyQuaternion.glsl)
 
@@ -42,10 +42,8 @@ void main() {
 
     vPosition = vPositionW - planetPosition;
 
-
     vUnitSamplePoint = applyQuaternion(planetInverseRotationQuaternion, normalize(vPosition));
     vSphereNormalW = vec3(world * vec4(vUnitSamplePoint, 0.0));
-    vSamplePoint = applyQuaternion(planetInverseRotationQuaternion, vPosition);
 
     vNormal = normal;
 }

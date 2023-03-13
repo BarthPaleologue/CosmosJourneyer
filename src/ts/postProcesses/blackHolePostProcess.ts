@@ -1,4 +1,4 @@
-import { Effect } from "@babylonjs/core";
+import { Effect, Matrix, Vector3 } from "@babylonjs/core";
 
 import blackHoleFragment from "../../shaders/blackhole.glsl";
 import { UberScene } from "../uberCore/uberScene";
@@ -6,6 +6,7 @@ import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "./uniform
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { BlackHole } from "../bodies/stars/blackHole";
 import { BodyPostProcess } from "./bodyPostProcess";
+import { Assets } from "../assets";
 
 const shaderName = "blackhole";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
@@ -47,10 +48,33 @@ export class BlackHolePostProcess extends BodyPostProcess {
                 get: () => {
                     return settings.rotationPeriod;
                 }
+            },
+            {
+                name: "rotationAxis",
+                type: ShaderDataType.Vector3,
+                get: () => {
+                    return blackHole.getRotationAxis();
+                }
+            },
+            {
+                name: "forwardAxis",
+                type: ShaderDataType.Vector3,
+                get: () => {
+                    return blackHole.transform.getForwardDirection();
+                }
             }
         ];
 
-        const samplers: ShaderSamplers = getSamplers(scene);
+        const samplers: ShaderSamplers = [
+            ...getSamplers(scene),
+            {
+                name: "starfieldTexture",
+                type: ShaderDataType.Texture,
+                get: () => {
+                    return Assets.Starfield;
+                }
+            }
+        ];
 
         super(name, blackHole, shaderName, uniforms, samplers, scene);
 

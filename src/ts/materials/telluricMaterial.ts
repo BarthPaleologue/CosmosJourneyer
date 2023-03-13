@@ -165,7 +165,7 @@ export class TelluricMaterial extends ShaderMaterial {
         this.setFloat("maxElevation", this.terrainSettings.continent_base_height + this.terrainSettings.max_mountain_height + this.terrainSettings.max_bump_height);
     }
 
-    public update(activeController: AbstractController, stars: (Star | BlackHole)[]) {
+    public update(activeController: AbstractController, stars: (Star | BlackHole)[], deltaTime: number) {
         this.setMatrix("normalMatrix", this.planet.node.getWorldMatrix().clone().invert().transpose());
 
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());

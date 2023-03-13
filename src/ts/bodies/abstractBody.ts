@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Matrix, Vector3 } from "@babylonjs/core";
 import { BodyType } from "./interfaces";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
@@ -14,6 +14,9 @@ export abstract class AbstractBody implements IOrbitalBody {
 
     //TODO: make an universal clock ?? or not it could be funny
     private internalTime = 0;
+
+    private theta = 0;
+    readonly rotationMatrixAroundAxis = new Matrix();
 
     readonly name: string;
 
@@ -72,6 +75,14 @@ export abstract class AbstractBody implements IOrbitalBody {
         return this.transform.node.up;
     }
 
+    /**
+     * Returns the rotation angle of the body around its axis
+     * @returns the rotation angle of the body around its axis
+     */
+    public getRotationAngle(): number {
+        return this.theta;
+    }
+
     public getInternalTime(): number {
         return this.internalTime;
     }
@@ -95,8 +106,13 @@ export abstract class AbstractBody implements IOrbitalBody {
 
     public updateRotation(deltaTime: number): number {
         if (this.descriptor.physicalProperties.rotationPeriod > 0) {
+
             const dtheta = -(2 * Math.PI * deltaTime) / this.descriptor.physicalProperties.rotationPeriod;
             this.transform.rotate(this.getRotationAxis(), dtheta);
+
+            this.theta += dtheta;
+            this.rotationMatrixAroundAxis.copyFrom(Matrix.RotationAxis(this.getRotationAxis(), this.theta));
+
             return dtheta;
         }
         return 0;

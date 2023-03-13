@@ -19,11 +19,14 @@ import { PlayerController } from "../controllers/playerController";
 import { Keyboard } from "../inputs/keyboard";
 
 import starTexture from "../../asset/textures/starParticle.png";
-import { AdvancedDynamicTexture, Button, StackPanel, TextBlock } from "@babylonjs/gui";
+import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
+
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
-import { StarDescriptor } from "../descriptors/starDescriptor";
+import { StarDescriptor, getStellarTypeString } from "../descriptors/starDescriptor";
 import { BuildData, Cell, Vector3ToString } from "./cell";
-import { Mouse } from "../inputs/mouse";
+import { BodyType } from "../bodies/interfaces";
+import { BlackHoleDescriptor } from "../descriptors/blackHoleDescriptor";
+import { StarMapUI } from "./starMapUI";
 
 export class StarMap {
     readonly scene: Scene;
@@ -35,6 +38,7 @@ export class StarMap {
     private readonly starMapCenterPosition: Vector3;
 
     private readonly starTemplate: Mesh;
+    private readonly blackHoleTemplate: Mesh;
 
     private readonly starBuildStack: BuildData[] = [];
     private readonly starTrashQueue: InstancedMesh[] = [];
@@ -44,10 +48,7 @@ export class StarMap {
 
     static readonly RENDER_RADIUS = 7;
 
-    private readonly gui: AdvancedDynamicTexture;
-    private readonly namePlate: StackPanel;
-    private readonly nameLabel: TextBlock;
-    private readonly warpButton: Button;
+    private readonly starMapUI: StarMapUI;
 
     private selectedSystemSeed: number | null = null;
 
@@ -76,35 +77,14 @@ export class StarMap {
         this.scene.activeCamera = this.controller.getActiveCamera();
         this.controller.inputs.push(new Keyboard());
 
-        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        this.starMapUI = new StarMapUI();
 
-        this.namePlate = new StackPanel();
-        this.namePlate.width = "250px";
-        //this.namePlate.height = "150px";
-        this.namePlate.color = "white";
-        this.namePlate.background = "black";
-        this.namePlate.linkOffsetY = -100;
-
-        this.nameLabel = new TextBlock();
-        this.nameLabel.height = "100px";
-        this.nameLabel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
-        this.nameLabel.setPadding(10, 15, 10, 15);
-
-        this.warpButton = Button.CreateSimpleButton("warpButton", "WARP");
-        //this.warpButton.width = "100px";
-        this.warpButton.height = "40px";
-        this.warpButton.background = "darkgreen";
-        this.warpButton.fontWeight = "bold";
-        //this.warpButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        this.warpButton.onPointerClickObservable.add(() => {
+        this.starMapUI.warpButton.onPointerClickObservable.add(() => {
             if (this.selectedSystemSeed) {
                 const url = new URL(`random.html?seed=${encodeURIComponent(this.selectedSystemSeed)}`, window.location.href);
                 window.open(url, "_blank")?.focus();
             } else throw new Error("No system selected!");
         });
-
-        this.namePlate.addControl(this.nameLabel);
-        this.namePlate.addControl(this.warpButton);
 
         const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controller.getActiveCamera()]);
         pipeline.fxaaEnabled = true;
@@ -117,9 +97,8 @@ export class StarMap {
 
         this.starMapCenterPosition = new Vector3(0, 0, 0);
 
-        this.starTemplate = MeshBuilder.CreatePlane("star", { width: 0.2, height: 0.2 }, this.scene);
+        this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.2 }, this.scene);
         this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
-        this.starTemplate.convertToUnIndexedMesh();
         this.starTemplate.isPickable = true;
         this.starTemplate.isVisible = false;
         this.starTemplate.hasVertexAlpha = true;
@@ -133,6 +112,20 @@ export class StarMap {
 
         this.starTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
         this.starTemplate.material = starMaterial;
+
+        this.blackHoleTemplate = MeshBuilder.CreatePlane("blackHole", { size: 0.2 }, this.scene);
+        this.blackHoleTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
+        this.blackHoleTemplate.isPickable = true;
+        this.blackHoleTemplate.isVisible = false;
+
+        const blackHoleMaterial = new StandardMaterial("blackHoleMaterial", this.scene);
+        blackHoleMaterial.diffuseTexture = new Texture(blackHoleTexture, this.scene);
+        blackHoleMaterial.diffuseTexture.hasAlpha = true;
+        blackHoleMaterial.emissiveColor = new Color3(0.9, 1.0, 1.0);
+        blackHoleMaterial.freeze();
+
+        this.blackHoleTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
+        this.blackHoleTemplate.material = blackHoleMaterial;
 
         StarMap.FADE_OUT_ANIMATION.setKeys([
             {
@@ -216,8 +209,7 @@ export class StarMap {
 
         this.buildNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed ** 2);
 
-        // if the star was removed, remove the nameplate
-        if (this.namePlate.linkedMesh == null) this.gui.removeControl(this.namePlate);
+        this.starMapUI.update();
     }
 
     private disposeNextStars(n: number) {
@@ -240,42 +232,40 @@ export class StarMap {
                 continue;
             }
 
-            const cell = this.loadedCells.get(data.cellString) as Cell;
-            const star = this.starTemplate.createInstance(data.name);
+            const starSystemSeed = data.seed;
+            const starSystemDescriptor = new StarSystemDescriptor(starSystemSeed);
+
+            const starSeed = starSystemDescriptor.getStarSeed(0);
+            const isStarBlackHole = starSystemDescriptor.getBodyTypeOfStar(0) == BodyType.BLACK_HOLE;
+
+            const starDescriptor = !isStarBlackHole ?
+                new StarDescriptor(starSeed, []) :
+                new BlackHoleDescriptor(starSeed);
+
+            const star = !isStarBlackHole ? this.starTemplate.createInstance(data.name) : this.blackHoleTemplate.createInstance(data.name);
             star.scaling = Vector3.One().scaleInPlace(data.scale);
             star.position = data.position.add(this.starMapCenterPosition);
+
+            if (starDescriptor instanceof StarDescriptor) {
+                const starColor = starDescriptor.surfaceColor;
+                star.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
+            } else {
+                star.instancedBuffers.color = new Color4(1.0, 0.6, 0.3, 0.0);
+            }
 
             star.isPickable = true;
             star.actionManager = new ActionManager(this.scene);
 
-            const starSystemSeed = data.seed;
-
-            const starSystemDescriptor = new StarSystemDescriptor(starSystemSeed);
-
-            const starSeed = starSystemDescriptor.getStarSeed(0);
-            const starDescriptor = new StarDescriptor(starSeed, []);
-            const starColor = starDescriptor.surfaceColor;
-
             star.actionManager.registerAction(
                 new ExecuteCodeAction(ActionManager.OnPickTrigger, (_) => {
-                    if (this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
-
-                    this.namePlate.linkWithMesh(star);
-                    this.nameLabel.text =
-                        "Seed: " + starSystemDescriptor.seed + "\n" + "Type: " + starDescriptor.getStellarType() + "\n" + "Planets: " + starSystemDescriptor.getNbPlanets();
+                    this.starMapUI.attachUIToMesh(star);
+                    this.starMapUI.setUIText(
+                        "Seed: " + starSystemDescriptor.seed + "\n" + "Type: " + getStellarTypeString(starDescriptor.type) + "\n" + "Planets: " + starSystemDescriptor.getNbPlanets());
 
                     this.selectedSystemSeed = starSystemSeed;
                 })
             );
-            star.actionManager.registerAction(
-                new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, (_) => {
-                    console.log("!!!");
-                })
-            );
 
-            star.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
-
-            //fade the star in
             this.fadeIn(star);
 
             this.loadedCells.get(data.cellString)?.meshes.push(star);

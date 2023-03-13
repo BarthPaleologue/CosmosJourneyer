@@ -14,6 +14,7 @@ varying vec2 vUV;
 
 void main() {
     vec3 color = texture2D(textureSampler, vUV).rgb;
+    float alpha = texture2D(textureSampler, vUV).a;
 
     color *= exposure;
     color = clamp(color, 0.0, 1.0);
@@ -27,5 +28,5 @@ void main() {
 
     color = pow(color, vec3(gamma));
 
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(color, alpha);
 }

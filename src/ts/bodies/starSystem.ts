@@ -91,15 +91,21 @@ export class StarSystem {
     }
 
     /**
-     * Makes a telluric planet and adds it to the system. By default, it will use the next available seed planned by the system descriptor
-     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system descriptor)
+     * Makes a star and adds it to the system. By default, it will use the next available seed planned by the system descriptor
+     * @param seed The seed to use for the star generation (by default, the next available seed planned by the system descriptor)
      */
-    public makeStar(seed = this.descriptor.getStarSeed(this.stars.length)): Star {
+    public makeStar(seed = this.descriptor.getStarSeed(this.stars.length)): Star | BlackHole {
         if (this.stars.length >= this.descriptor.getNbStars())
             console.warn(`You are adding a star 
         to a system that already has ${this.stars.length} stars.
         The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
-        const star = new Star(`star${this.stars.length}`, this.scene, seed, []);
+
+        const isStarBlackHole = this.descriptor.getBodyTypeOfStar(this.stars.length) == BodyType.BLACK_HOLE;
+
+        const star = isStarBlackHole ?
+            new BlackHole(`blackHole${this.stars.length}`, seed, []) :
+            new Star(`star${this.stars.length}`, this.scene, seed, []);
+
         //TODO: make this better, make it part of the generation
         star.descriptor.orbitalProperties.periapsis = star.getRadius() * 4;
         star.descriptor.orbitalProperties.apoapsis = star.getRadius() * 4;
@@ -117,7 +123,8 @@ export class StarSystem {
             console.warn(`You are adding a black hole
         to a system that already has ${this.stars.length} stars.
         The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
-        const blackHole = new BlackHole(`blackHole${this.stars.length}`, 1000e3, seed, this.stars);
+        const blackHole = new BlackHole(`blackHole${this.stars.length}`, seed, this.stars);
+
         this.addStar(blackHole);
         return blackHole;
     }
@@ -298,7 +305,7 @@ export class StarSystem {
             }
         }
 
-        for (const planet of this.planemos) planet.updateMaterial(controller, this.stars);
+        for (const planet of this.planemos) planet.updateMaterial(controller, this.stars, deltaTime);
         for (const star of this.stars) {
             if (star.bodyType == BodyType.STAR) (star as Star).updateMaterial();
         }

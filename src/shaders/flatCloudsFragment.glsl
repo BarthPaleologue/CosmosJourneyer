@@ -89,7 +89,7 @@ float cloudDensityAtPoint(vec3 samplePoint) {
     return density;
 }
 
-vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
+vec4 computeCloudCoverage(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
 
     if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint))) {
@@ -152,12 +152,12 @@ vec3 computeCloudCoverage(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float
     }
     ndl = saturate(ndl);
 
-	vec3 ambiant = lerp(originalColor, sqrt(ndl) * cloudColor, 1.0 - cloudDensity);
+	vec3 ambiant = lerp(originalColor.rgb, sqrt(ndl) * cloudColor, 1.0 - cloudDensity);
 
-    return ambiant + specularHighlight * cloudDensity;
+    return vec4(ambiant + specularHighlight * cloudDensity, 1.0);
 }
 
-vec3 shadows(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
+vec4 shadows(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     if(maximumDistance >= cameraFar) return originalColor;
     float impactPoint, escapePoint;
     if(!rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint)) return originalColor;
@@ -184,7 +184,7 @@ vec3 shadows(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 }
 
 void main() {
-    vec3 screenColor = texture2D(textureSampler, vUV).rgb; // the current screen color
+    vec4 screenColor = texture2D(textureSampler, vUV); // the current screen color
 
     float depth = texture2D(depthSampler, vUV).r; // the depth corresponding to the pixel in the depth map
     
@@ -196,9 +196,9 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
-    vec3 finalColor = shadows(screenColor, cameraPosition, rayDir, maximumDistance);
+    vec4 finalColor = shadows(screenColor, cameraPosition, rayDir, maximumDistance);
 
     finalColor = computeCloudCoverage(finalColor, cameraPosition, rayDir, maximumDistance);
 
-    gl_FragColor = vec4(finalColor, 1.0); // displaying the final color
+    gl_FragColor = finalColor; // displaying the final color
 }

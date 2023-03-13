@@ -57,7 +57,7 @@ export class ChunkTree {
         this.planetSeed = planetDescriptor.seed;
         this.terrainSettings = planetDescriptor.terrainSettings;
 
-        this.minDepth = 1; //Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 19), 0);
+        this.minDepth = 0; //Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 19), 0);
         this.maxDepth = Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 12), 0);
         //let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
         //console.log(spaceBetweenVertex);
