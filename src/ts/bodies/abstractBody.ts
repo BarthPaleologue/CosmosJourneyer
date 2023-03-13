@@ -25,6 +25,7 @@ export abstract class AbstractBody implements IOrbitalBody {
 
     //TODO: make an universal clock ?? or not it could be funny
     private internalTime = 0;
+
     private theta = 0;
     readonly rotationMatrixAroundAxis = new Matrix();
 
@@ -83,6 +84,14 @@ export abstract class AbstractBody implements IOrbitalBody {
      */
     public getRotationAxis(): Vector3 {
         return this.transform.node.up;
+    }
+
+    /**
+     * Returns the rotation angle of the body around its axis
+     * @returns the rotation angle of the body around its axis
+     */
+    public getRotationAngle(): number {
+        return this.theta;
     }
 
     public getInternalTime(): number {
