@@ -294,7 +294,7 @@ export class StarSystem {
             const initialPosition = body.transform.getAbsolutePosition().clone();
             const newPosition = body.updateOrbitalPosition().clone();
 
-            if (isOrbiting(controller, body, 50 / (body.depth + 1) ** 2)) controller.transform.translate(newPosition.subtract(initialPosition));
+            if (isOrbiting(controller, body, 50 / (body.depth + 1) ** 3)) controller.transform.translate(newPosition.subtract(initialPosition));
 
             const dtheta = body.updateRotation(deltaTime);
             if (isOrbiting(controller, body)) controller.transform.rotateAround(body.transform.getAbsolutePosition(), body.getRotationAxis(), dtheta);

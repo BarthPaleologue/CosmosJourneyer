@@ -23,5 +23,5 @@ export function nearestBody(object: ITransformLike, bodies: AbstractBody[]): Abs
  * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
  */
 export function isOrbiting(controller: AbstractController, body: AbstractBody, orbitLimitFactor = 2.5): boolean {
-    return body.transform.getAbsolutePosition().lengthSquared() < (orbitLimitFactor * body.getRadius()) ** 2;
+    return body.transform.getAbsolutePosition().subtract(controller.transform.getAbsolutePosition()).lengthSquared() < (orbitLimitFactor * body.getRadius()) ** 2;
 }
