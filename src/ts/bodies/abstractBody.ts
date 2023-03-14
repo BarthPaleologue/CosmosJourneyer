@@ -15,7 +15,7 @@ export abstract class AbstractBody implements IOrbitalBody {
     abstract readonly bodyType: BodyType;
 
     readonly transform: BasicTransform;
-    readonly nextState = {
+    readonly nextState: NextState = {
         position: Vector3.Zero(),
         rotation: Quaternion.Identity()
     };

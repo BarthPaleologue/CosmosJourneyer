@@ -1,8 +1,7 @@
 import { AbstractController } from "../uberCore/abstractController";
 import { UberCamera } from "../uberCore/uberCamera";
 import { Scene, Vector3 } from "@babylonjs/core";
-import { Input, InputType } from "../inputs/input";
-import { Mouse } from "../inputs/mouse";
+import { Input } from "../inputs/input";
 
 export class PlayerController extends AbstractController {
     private readonly camera: UberCamera;

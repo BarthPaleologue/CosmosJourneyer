@@ -178,7 +178,7 @@ export class ChunkTree {
      * @returns The new Chunk
      */
     private createChunk(path: number[], isFiner: boolean): PlanetChunk {
-        const chunk = new PlanetChunk(path, this.direction, this.parent, this.material, this.rootChunkLength, this.minDepth == path.length, isFiner);
+        const chunk = new PlanetChunk(path, this.direction, this.parent, this.material, this.rootChunkLength, this.minDepth == path.length);
         this.scene.addMesh(chunk.mesh);
 
         const buildTask: BuildTask = {

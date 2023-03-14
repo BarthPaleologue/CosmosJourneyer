@@ -11,7 +11,7 @@ export class PlanetChunk {
     private ready = false;
     readonly isMinDepth;
 
-    constructor(path: number[], direction: Direction, parent: BasicTransform, material: Material, rootLength: number, isMinDepth: boolean, isFiner: boolean) {
+    constructor(path: number[], direction: Direction, parent: BasicTransform, material: Material, rootLength: number, isMinDepth: boolean) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;

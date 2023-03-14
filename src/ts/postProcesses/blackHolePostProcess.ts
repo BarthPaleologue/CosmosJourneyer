@@ -1,4 +1,4 @@
-import { Effect, Matrix, Vector3 } from "@babylonjs/core";
+import { Effect } from "@babylonjs/core";
 
 import blackHoleFragment from "../../shaders/blackhole.glsl";
 import { UberScene } from "../uberCore/uberScene";

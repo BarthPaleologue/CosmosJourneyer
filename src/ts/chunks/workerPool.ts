@@ -35,7 +35,7 @@ export class WorkerPool {
     }
 
     public nextTask(): DeleteTask | BuildTask {
-        if (this.hasTask()) return this.taskQueue.shift()!;
+        if (this.hasTask()) return this.taskQueue.shift() as DeleteTask | BuildTask;
         throw new Error("The workerpool has no task to dispatch");
     }
 }

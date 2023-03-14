@@ -100,9 +100,9 @@ export class BodyEditor {
     }
 
     public resize() {
-        if (this.canvas == null) throw new Error("BodyEditor has no canvas");
+        if (this.canvas === null) throw new Error("BodyEditor has no canvas");
 
-        if (this.visibility != EditorVisibility.FULL) this.canvas.width = window.innerWidth;
+        if (this.visibility !== EditorVisibility.FULL) this.canvas.width = window.innerWidth;
         else this.canvas.width = window.innerWidth - 300;
         this.canvas.height = window.innerHeight;
     }
@@ -185,28 +185,28 @@ export class BodyEditor {
                 this.physicPanel.enable();
 
                 this.oceanPanel.enable();
-                this.oceanPanel.setVisibility(this.currentPanel == this.oceanPanel && (body as TelluricPlanet).postProcesses.ocean != null);
+                this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel && (body as TelluricPlanet).postProcesses.ocean !== null);
 
                 this.surfacePanel.enable();
 
                 this.cloudsPanel.enable();
-                this.cloudsPanel.setVisibility(this.currentPanel == this.cloudsPanel && (body as TelluricPlanet).postProcesses.clouds != null);
+                this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel && (body as TelluricPlanet).postProcesses.clouds !== null);
 
                 this.atmospherePanel.enable();
-                this.atmospherePanel.setVisibility(this.currentPanel == this.atmospherePanel && (body as TelluricPlanet).postProcesses.atmosphere != null);
+                this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel && (body as TelluricPlanet).postProcesses.atmosphere !== null);
 
                 break;
             case BodyType.GAS:
                 this.atmospherePanel.enable();
-                this.atmospherePanel.setVisibility(this.currentPanel == this.atmospherePanel);
+                this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel);
 
                 this.gazCloudsPanel.enable();
-                this.gazCloudsPanel.setVisibility(this.currentPanel == this.gazCloudsPanel);
+                this.gazCloudsPanel.setVisibility(this.currentPanel === this.gazCloudsPanel);
                 break;
         }
-        if (this.currentPanel != null) {
+        if (this.currentPanel !== null) {
             const currentNavBarButton = this.currentPanel.anchor;
-            if (currentNavBarButton!.style.display == "none") this.setVisibility(EditorVisibility.NAVBAR);
+            if (currentNavBarButton.style.display === "none") this.setVisibility(EditorVisibility.NAVBAR);
             else this.currentPanel.show();
         }
     }
@@ -214,24 +214,24 @@ export class BodyEditor {
     public initToolbar(planet: TelluricPlanet) {
         const material = planet.material;
         const colorSettings = material.colorSettings;
-        document.getElementById("defaultMapButton")!.addEventListener("click", () => {
+        document.getElementById("defaultMapButton")?.addEventListener("click", () => {
             colorSettings.mode = ColorMode.DEFAULT;
             material.updateConstants();
         });
-        document.getElementById("moistureMapButton")!.addEventListener("click", () => {
-            colorSettings.mode = colorSettings.mode != ColorMode.MOISTURE ? ColorMode.MOISTURE : ColorMode.DEFAULT;
+        document.getElementById("moistureMapButton")?.addEventListener("click", () => {
+            colorSettings.mode = colorSettings.mode !== ColorMode.MOISTURE ? ColorMode.MOISTURE : ColorMode.DEFAULT;
             material.updateConstants();
         });
-        document.getElementById("temperatureMapButton")!.addEventListener("click", () => {
-            colorSettings.mode = colorSettings.mode != ColorMode.TEMPERATURE ? ColorMode.TEMPERATURE : ColorMode.DEFAULT;
+        document.getElementById("temperatureMapButton")?.addEventListener("click", () => {
+            colorSettings.mode = colorSettings.mode !== ColorMode.TEMPERATURE ? ColorMode.TEMPERATURE : ColorMode.DEFAULT;
             material.updateConstants();
         });
-        document.getElementById("normalMapButton")!.addEventListener("click", () => {
-            colorSettings.mode = colorSettings.mode != ColorMode.NORMAL ? ColorMode.NORMAL : ColorMode.DEFAULT;
+        document.getElementById("normalMapButton")?.addEventListener("click", () => {
+            colorSettings.mode = colorSettings.mode !== ColorMode.NORMAL ? ColorMode.NORMAL : ColorMode.DEFAULT;
             material.updateConstants();
         });
-        document.getElementById("heightMapButton")!.addEventListener("click", () => {
-            colorSettings.mode = colorSettings.mode != ColorMode.HEIGHT ? ColorMode.HEIGHT : ColorMode.DEFAULT;
+        document.getElementById("heightMapButton")?.addEventListener("click", () => {
+            colorSettings.mode = colorSettings.mode !== ColorMode.HEIGHT ? ColorMode.HEIGHT : ColorMode.DEFAULT;
             material.updateConstants();
         });
     }
@@ -241,6 +241,6 @@ export class BodyEditor {
     }
 
     public update(nearestBody: AbstractBody, postProcessManager: PostProcessManager, scene: UberScene) {
-        if (nearestBody.name != this.currentBodyId) this.setBody(nearestBody, postProcessManager, scene);
+        if (nearestBody.name !== this.currentBodyId) this.setBody(nearestBody, postProcessManager, scene);
     }
 }
