@@ -2,6 +2,7 @@ import { TerrainSettings } from "../terrain/terrainSettings";
 import { PhysicalProperties, PlanetPhysicalProperties, SolidPhysicalProperties } from "../bodies/physicalProperties";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { BodyType } from "../bodies/interfaces";
+import { STELLAR_TYPE } from "./stellarObjects/common";
 
 export interface BodyDescriptor {
     bodyType: BodyType;
@@ -17,6 +18,10 @@ export interface BodyDescriptor {
     readonly childrenBodies: BodyDescriptor[];
 
     get depth(): number;
+}
+
+export interface StellarObjectDescriptor extends BodyDescriptor {
+    stellarType: STELLAR_TYPE;
 }
 
 //https://en.wiktionary.org/wiki/planemo#English

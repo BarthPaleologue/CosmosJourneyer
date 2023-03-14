@@ -2,13 +2,14 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { clamp } from "terrain-generation";
 import { normalRandom, randRange, uniformRandBool } from "extended-random";
 import { Quaternion, Vector3 } from "@babylonjs/core";
-import { getRgbFromTemperature } from "../utils/specrend";
-import { Settings } from "../settings";
-import { BodyDescriptor } from "./interfaces";
-import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
-import { getOrbitalPeriod } from "../orbits/kepler";
-import { StarPhysicalProperties } from "../bodies/physicalProperties";
-import { BodyType } from "../bodies/interfaces";
+import { getRgbFromTemperature } from "../../utils/specrend";
+import { Settings } from "../../settings";
+import { BodyDescriptor, StellarObjectDescriptor } from "../interfaces";
+import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
+import { getOrbitalPeriod } from "../../orbits/kepler";
+import { StarPhysicalProperties } from "../../bodies/physicalProperties";
+import { BodyType } from "../../bodies/interfaces";
+import { STELLAR_TYPE } from "./common";
 
 enum GENERATION_STEPS {
     NAME,
@@ -18,39 +19,7 @@ enum GENERATION_STEPS {
     RINGS = 1200
 }
 
-export enum STAR_TYPE {
-    O,
-    B,
-    A,
-    F,
-    G,
-    K,
-    M,
-    BLACK_HOLE
-}
-
-export function getStellarTypeString(type: STAR_TYPE): string {
-    switch (type) {
-        case STAR_TYPE.O:
-            return "O";
-        case STAR_TYPE.B:
-            return "B";
-        case STAR_TYPE.A:
-            return "A";
-        case STAR_TYPE.F:
-            return "F";
-        case STAR_TYPE.G:
-            return "G";
-        case STAR_TYPE.K:
-            return "K";
-        case STAR_TYPE.M:
-            return "M";
-        case STAR_TYPE.BLACK_HOLE:
-            return "Black hole";
-    }
-}
-
-export class StarDescriptor implements BodyDescriptor {
+export class StarDescriptor implements StellarObjectDescriptor {
     readonly bodyType = BodyType.STAR;
     readonly rng: (step: number) => number;
     readonly seed: number;
@@ -59,7 +28,7 @@ export class StarDescriptor implements BodyDescriptor {
 
     readonly surfaceTemperature: number;
     readonly surfaceColor: Vector3;
-    readonly type: STAR_TYPE;
+    readonly stellarType: STELLAR_TYPE;
     readonly radius: number;
 
     readonly mass = 1000;
@@ -94,13 +63,13 @@ export class StarDescriptor implements BodyDescriptor {
 
         this.surfaceColor = getRgbFromTemperature(this.surfaceTemperature);
 
-        if (this.surfaceTemperature < 3500) this.type = STAR_TYPE.M;
-        else if (this.surfaceTemperature < 5000) this.type = STAR_TYPE.K;
-        else if (this.surfaceTemperature < 6000) this.type = STAR_TYPE.G;
-        else if (this.surfaceTemperature < 7500) this.type = STAR_TYPE.F;
-        else if (this.surfaceTemperature < 10000) this.type = STAR_TYPE.A;
-        else if (this.surfaceTemperature < 30000) this.type = STAR_TYPE.B;
-        else this.type = STAR_TYPE.O;
+        if (this.surfaceTemperature < 3500) this.stellarType = STELLAR_TYPE.M;
+        else if (this.surfaceTemperature < 5000) this.stellarType = STELLAR_TYPE.K;
+        else if (this.surfaceTemperature < 6000) this.stellarType = STELLAR_TYPE.G;
+        else if (this.surfaceTemperature < 7500) this.stellarType = STELLAR_TYPE.F;
+        else if (this.surfaceTemperature < 10000) this.stellarType = STELLAR_TYPE.A;
+        else if (this.surfaceTemperature < 30000) this.stellarType = STELLAR_TYPE.B;
+        else this.stellarType = STELLAR_TYPE.O;
 
         //TODO: make it dependent on star type
         this.radius = randRange(50, 200, this.rng, GENERATION_STEPS.RADIUS) * Settings.EARTH_RADIUS;

@@ -109,7 +109,7 @@ export abstract class AbstractBody implements IOrbitalBody {
         this.internalClock += deltaTime;
     }
 
-    public updateOrbitalPosition() {
+    public computeNextOrbitalPosition(): Vector3 {
         if (this.descriptor.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
             this.descriptor.orbitalProperties.orientationQuaternion = orientationQuaternion;
@@ -119,6 +119,8 @@ export abstract class AbstractBody implements IOrbitalBody {
         } else {
             this.nextState.position.copyFrom(this.transform.getAbsolutePosition());
         }
+
+        return this.nextState.position;
     }
 
     /**

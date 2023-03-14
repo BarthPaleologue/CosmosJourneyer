@@ -1,10 +1,8 @@
 import { AbstractBody } from "../abstractBody";
 import { BodyType } from "../interfaces";
 import { BlackHolePostProcesses } from "../postProcessesInterfaces";
-import { PhysicalProperties } from "../physicalProperties";
-import { BlackHoleDescriptor } from "../../descriptors/blackHoleDescriptor";
+import { BlackHoleDescriptor } from "../../descriptors/stellarObjects/blackHoleDescriptor";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
-import { BodyDescriptor } from "../../descriptors/interfaces";
 import { Axis } from "@babylonjs/core";
 
 export class BlackHole extends AbstractBody {

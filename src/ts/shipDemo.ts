@@ -28,7 +28,7 @@ const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
 const starSystem = new StarSystem(starSystemSeed, scene);
 engine.setStarSystem(starSystem);
 
-starSystem.makeStars(1);
+starSystem.makeStellarObjects(1);
 const planet = starSystem.makeTelluricPlanet();
 
 document.addEventListener("keydown", (e) => {

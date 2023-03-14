@@ -22,11 +22,12 @@ import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
-import { StarDescriptor, getStellarTypeString } from "../descriptors/starDescriptor";
+import { StarDescriptor } from "../descriptors/stellarObjects/starDescriptor";
 import { BuildData, Cell, Vector3ToString } from "./cell";
 import { BodyType } from "../bodies/interfaces";
-import { BlackHoleDescriptor } from "../descriptors/blackHoleDescriptor";
+import { BlackHoleDescriptor } from "../descriptors/stellarObjects/blackHoleDescriptor";
 import { StarMapUI } from "./starMapUI";
+import { getStellarTypeString } from "../descriptors/stellarObjects/common";
 
 export class StarMap {
     readonly scene: Scene;
@@ -260,7 +261,7 @@ export class StarMap {
                 new ExecuteCodeAction(ActionManager.OnPickTrigger, (_) => {
                     this.starMapUI.attachUIToMesh(star);
                     this.starMapUI.setUIText(
-                        "Seed: " + starSystemDescriptor.seed + "\n" + "Type: " + getStellarTypeString(starDescriptor.type) + "\n" + "Planets: " + starSystemDescriptor.getNbPlanets());
+                        "Seed: " + starSystemDescriptor.seed + "\n" + "Type: " + getStellarTypeString(starDescriptor.stellarType) + "\n" + "Planets: " + starSystemDescriptor.getNbPlanets());
 
                     this.selectedSystemSeed = starSystemSeed;
                 })
