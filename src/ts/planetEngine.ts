@@ -6,11 +6,10 @@ import { AbstractController } from "./uberCore/abstractController";
 import { UberScene } from "./uberCore/uberScene";
 import { StarSystem } from "./bodies/starSystem";
 import { CollisionWorker } from "./workers/collisionWorker";
-import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
+import { TelluricPlanemo } from "./bodies/planemos/telluricPlanemo";
 import { Settings } from "./settings";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
 import { isOrbiting } from "./utils/nearestBody";
-import { BODY_TYPE } from "./descriptors/common";
 
 export class PlanetEngine {
     // UI
@@ -43,7 +42,7 @@ export class PlanetEngine {
             if (e.key == "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
             //if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
             if (e.key == "w" && this.scene != null && this.starSystem != null && isOrbiting(this.scene.getActiveController(), this.starSystem.getNearestBody()))
-                (this.starSystem.getNearestBody() as TelluricPlanet).material.wireframe = !(this.starSystem.getNearestBody() as TelluricPlanet).material.wireframe;
+                (this.starSystem.getNearestBody() as TelluricPlanemo).material.wireframe = !(this.starSystem.getNearestBody() as TelluricPlanemo).material.wireframe;
         });
     }
 
@@ -100,9 +99,7 @@ export class PlanetEngine {
             this.starSystem.translateAllBodiesNow(this.scene.getActiveController().update(deltaTime));
 
             if (!this.collisionWorker.isBusy() && isOrbiting(this.scene.getActiveController(), nearest)) {
-                if (nearest.bodyType == BODY_TYPE.TELLURIC) {
-                    this.collisionWorker.checkCollision(nearest as TelluricPlanet);
-                }
+                if (nearest instanceof TelluricPlanemo) this.collisionWorker.checkCollision(nearest);
             }
 
             //FIXME: should address stars orbits

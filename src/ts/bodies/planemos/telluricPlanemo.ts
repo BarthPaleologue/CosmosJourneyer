@@ -7,24 +7,24 @@ import { RigidBody } from "../common";
 import { TransferCollisionData } from "../../chunks/workerDataTypes";
 import { TaskType } from "../../chunks/taskTypes";
 import { AbstractController } from "../../uberCore/abstractController";
-import { TelluricMaterial } from "../../materials/telluricMaterial";
+import { TelluricPlanemoMaterial } from "../../materials/telluricPlanemoMaterial";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planemo } from "./planemo";
-import { Star } from "../stars/star";
-import { BlackHole } from "../stars/blackHole";
-import { TelluricPlanetDescriptor } from "../../descriptors/telluricPlanetDescriptor";
+import { Star } from "../stellarObjects/star";
+import { BlackHole } from "../stellarObjects/blackHole";
+import { TelluricPlanemoDescriptor } from "../../descriptors/planemos/telluricPlanemoDescriptor";
 
-export class TelluricPlanet extends AbstractBody implements RigidBody, Planemo {
+export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo {
     override readonly postProcesses: TelluricPlanetPostProcesses;
 
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
 
-    readonly material: TelluricMaterial;
+    readonly material: TelluricPlanemoMaterial;
 
-    readonly descriptor: TelluricPlanetDescriptor;
+    readonly descriptor: TelluricPlanemoDescriptor;
 
     /**
      * New Telluric Planet
@@ -36,7 +36,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planemo {
     constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
         super(name, parentBodies);
 
-        this.descriptor = new TelluricPlanetDescriptor(
+        this.descriptor = new TelluricPlanemoDescriptor(
             seed,
             parentBodies.map((body) => body.descriptor)
         );
@@ -68,7 +68,7 @@ export class TelluricPlanet extends AbstractBody implements RigidBody, Planemo {
 
         this.postProcesses.rings = this.descriptor.hasRings;
 
-        this.material = new TelluricMaterial(this.name, this.transform, this.descriptor, scene);
+        this.material = new TelluricPlanemoMaterial(this.name, this.transform, this.descriptor, scene);
 
         this.sides = [
             new ChunkTree(Direction.Up, this.name, this.descriptor, this.transform, this.material, scene),

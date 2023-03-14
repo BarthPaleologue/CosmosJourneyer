@@ -1,5 +1,5 @@
 import { EditorPanel } from "../editorPanel";
-import { Star } from "../../../bodies/stars/star";
+import { Star } from "../../../bodies/stellarObjects/star";
 import { Slider } from "handle-sliderjs";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 

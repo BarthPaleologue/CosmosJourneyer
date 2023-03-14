@@ -1,5 +1,5 @@
 import { Texture, VolumetricLightScatteringPostProcess } from "@babylonjs/core";
-import { Star } from "../bodies/stars/star";
+import { Star } from "../bodies/stellarObjects/star";
 import { UberScene } from "../uberCore/uberScene";
 
 export class VolumetricLight extends VolumetricLightScatteringPostProcess {

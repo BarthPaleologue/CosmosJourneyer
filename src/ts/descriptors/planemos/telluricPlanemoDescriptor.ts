@@ -1,12 +1,12 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
-import { Settings } from "../settings";
-import { BODY_TYPE, BodyDescriptor, TelluricBodyDescriptor } from "./common";
-import { TerrainSettings } from "../terrain/terrainSettings";
+import { Settings } from "../../settings";
+import { BODY_TYPE, BodyDescriptor, PlanemoDescriptor } from "../common";
+import { TerrainSettings } from "../../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
-import { SolidPhysicalProperties } from "../bodies/physicalProperties";
-import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
-import { getOrbitalPeriod } from "../orbits/kepler";
+import { SolidPhysicalProperties } from "../../bodies/physicalProperties";
+import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
+import { getOrbitalPeriod } from "../../orbits/kepler";
 import { Quaternion } from "@babylonjs/core";
 
 enum GENERATION_STEPS {
@@ -21,7 +21,7 @@ enum GENERATION_STEPS {
     MOONS = 11
 }
 
-export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
+export class TelluricPlanemoDescriptor implements PlanemoDescriptor {
     readonly bodyType = BODY_TYPE.TELLURIC;
     readonly seed: number;
     readonly rng: (step: number) => number;

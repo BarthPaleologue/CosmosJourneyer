@@ -1,17 +1,16 @@
 import { Effect, Vector3 } from "@babylonjs/core";
 
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
-import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
+import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Settings } from "../settings";
-import { BlackHole } from "../bodies/stars/blackHole";
-import { Star } from "../bodies/stars/star";
+import { BlackHole } from "../bodies/stellarObjects/blackHole";
+import { Star } from "../bodies/stellarObjects/star";
 import { nearestBody } from "../utils/nearestBody";
 import { AbstractBody } from "../bodies/abstractBody";
 import { Assets } from "../assets";
-import { BODY_TYPE } from "../descriptors/common";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -38,14 +37,14 @@ export class StarfieldPostProcess extends UberPostProcess {
                     //TODO: should be cleaned up
                     let vis = 1.0;
                     for (const star of stars) {
-                        if (star.bodyType == BODY_TYPE.BLACK_HOLE) return 1;
+                        if (star instanceof Star) return 1;
                         vis = Math.min(vis, 1.0 - Vector3.Dot(star.transform.getAbsolutePosition().normalizeToNew(), scene.getActiveController().transform.getForwardDirection()));
                     }
                     vis /= 2;
                     let vis2 = 1.0;
                     const nearest = nearestBody(scene.getActiveController().transform, bodies);
-                    if (nearest.bodyType == BODY_TYPE.TELLURIC) {
-                        const planet = nearest as TelluricPlanet;
+                    if (nearest instanceof TelluricPlanemo) {
+                        const planet = nearest as TelluricPlanemo;
                         if (planet.postProcesses.atmosphere) {
                             const height = planet.transform.getAbsolutePosition().length();
                             //FIXME: has to be dynamic

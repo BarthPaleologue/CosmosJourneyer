@@ -1,6 +1,6 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanet } from "../../../bodies/planets/telluricPlanet";
+import { TelluricPlanemo } from "../../../bodies/planemos/telluricPlanemo";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 import { Settings } from "../../../settings";
 import { Color3 } from "@babylonjs/core";
@@ -10,7 +10,7 @@ export class CloudsPanel extends EditorPanel {
     constructor() {
         super("clouds");
     }
-    init(planet: TelluricPlanet, postProcessManager: PostProcessManager) {
+    init(planet: TelluricPlanemo, postProcessManager: PostProcessManager) {
         for (const slider of this.sliders) slider.remove();
 
         if (!planet.postProcesses.clouds) return;

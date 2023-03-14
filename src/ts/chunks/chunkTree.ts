@@ -11,7 +11,7 @@ import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { UberScene } from "../uberCore/uberScene";
 import { Assets } from "../assets";
-import { TelluricPlanetDescriptor } from "../descriptors/telluricPlanetDescriptor";
+import { TelluricPlanemoDescriptor } from "../descriptors/planemos/telluricPlanemoDescriptor";
 
 /**
  * A quadTree is defined recursively
@@ -51,7 +51,7 @@ export class ChunkTree {
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetName: string, planetDescriptor: TelluricPlanetDescriptor, parent: BasicTransform, material: Material, scene: UberScene) {
+    constructor(direction: Direction, planetName: string, planetDescriptor: TelluricPlanemoDescriptor, parent: BasicTransform, material: Material, scene: UberScene) {
         this.rootChunkLength = planetDescriptor.radius * 2;
         this.planetName = planetName;
         this.planetSeed = planetDescriptor.seed;

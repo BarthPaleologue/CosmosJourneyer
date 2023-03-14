@@ -1,7 +1,7 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanet } from "../../../bodies/planets/telluricPlanet";
-import { GasPlanet } from "../../../bodies/planets/gasPlanet";
+import { TelluricPlanemo } from "../../../bodies/planemos/telluricPlanemo";
+import { GasPlanet } from "../../../bodies/planemos/gasPlanet";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
@@ -10,7 +10,7 @@ export class AtmospherePanel extends EditorPanel {
     constructor() {
         super("atmosphere");
     }
-    init(planet: TelluricPlanet | GasPlanet, postProcessManager: PostProcessManager) {
+    init(planet: TelluricPlanemo | GasPlanet, postProcessManager: PostProcessManager) {
         for (const slider of this.sliders) slider.remove();
 
         if (!planet.postProcesses.atmosphere) return;

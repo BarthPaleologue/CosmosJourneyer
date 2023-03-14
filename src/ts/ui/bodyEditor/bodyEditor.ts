@@ -1,11 +1,11 @@
 import editorHTML from "../../../html/bodyEditor.html";
-import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
-import { Star } from "../../bodies/stars/star";
+import { TelluricPlanemo } from "../../bodies/planemos/telluricPlanemo";
+import { Star } from "../../bodies/stellarObjects/star";
 import { AbstractBody } from "../../bodies/abstractBody";
 import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../../materials/colorSettingsInterface";
 import { hide, show } from "../../utils/html";
-import { GasPlanet } from "../../bodies/planets/gasPlanet";
+import { GasPlanet } from "../../bodies/planemos/gasPlanet";
 import { EditorPanel } from "./editorPanel";
 import { GeneralPanel } from "./panels/generalPanel";
 import { PhysicPanel } from "./panels/physicPanel";
@@ -139,9 +139,9 @@ export class BodyEditor {
     public setBody(body: AbstractBody, postProcessManager: PostProcessManager, scene: UberScene) {
         this.currentBodyId = body.name;
         this.initNavBar(body);
-        switch (body.bodyType) {
+        switch (body.descriptor.bodyType) {
             case BODY_TYPE.TELLURIC:
-                this.setTelluricPlanet(body as TelluricPlanet, postProcessManager, scene);
+                this.setTelluricPlanet(body as TelluricPlanemo, postProcessManager, scene);
                 break;
             case BODY_TYPE.STAR:
                 this.setStar(body as Star, postProcessManager, scene);
@@ -155,7 +155,7 @@ export class BodyEditor {
         this.ringsPanel.init(body, postProcessManager, scene);
     }
 
-    public setTelluricPlanet(planet: TelluricPlanet, postProcessManager: PostProcessManager, scene: UberScene) {
+    public setTelluricPlanet(planet: TelluricPlanemo, postProcessManager: PostProcessManager, scene: UberScene) {
         this.physicPanel.init(planet, postProcessManager, scene);
         this.surfacePanel.init(planet, postProcessManager, scene);
         this.atmospherePanel.init(planet, postProcessManager, scene);
@@ -177,7 +177,7 @@ export class BodyEditor {
     public initNavBar(body: AbstractBody): void {
         for (const panel of this.panels) panel.disable();
 
-        switch (body.bodyType) {
+        switch (body.descriptor.bodyType) {
             case BODY_TYPE.STAR:
                 this.starPanel.enable();
                 break;
@@ -185,15 +185,15 @@ export class BodyEditor {
                 this.physicPanel.enable();
 
                 this.oceanPanel.enable();
-                this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel && (body as TelluricPlanet).postProcesses.ocean !== null);
+                this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel && (body as TelluricPlanemo).postProcesses.ocean !== null);
 
                 this.surfacePanel.enable();
 
                 this.cloudsPanel.enable();
-                this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel && (body as TelluricPlanet).postProcesses.clouds !== null);
+                this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel && (body as TelluricPlanemo).postProcesses.clouds !== null);
 
                 this.atmospherePanel.enable();
-                this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel && (body as TelluricPlanet).postProcesses.atmosphere !== null);
+                this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel && (body as TelluricPlanemo).postProcesses.atmosphere !== null);
 
                 break;
             case BODY_TYPE.GAS:
@@ -211,7 +211,7 @@ export class BodyEditor {
         }
     }
 
-    public initToolbar(planet: TelluricPlanet) {
+    public initToolbar(planet: TelluricPlanemo) {
         const material = planet.material;
         const colorSettings = material.colorSettings;
         document.getElementById("defaultMapButton")?.addEventListener("click", () => {

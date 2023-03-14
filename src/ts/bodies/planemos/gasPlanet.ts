@@ -6,9 +6,9 @@ import { PlanetPostProcesses } from "../postProcessesInterfaces";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planemo } from "./planemo";
-import { Star } from "../stars/star";
-import { BlackHole } from "../stars/blackHole";
-import { GasPlanetDescriptor } from "../../descriptors/gasPlanetDescriptor";
+import { Star } from "../stellarObjects/star";
+import { BlackHole } from "../stellarObjects/blackHole";
+import { GasPlanetDescriptor } from "../../descriptors/planemos/gasPlanetDescriptor";
 
 export class GasPlanet extends AbstractBody implements Planemo {
     override readonly postProcesses: PlanetPostProcesses;

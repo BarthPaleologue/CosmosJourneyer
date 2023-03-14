@@ -1,6 +1,6 @@
 import { AbstractController } from "../../uberCore/abstractController";
-import { Star } from "../stars/star";
-import { BlackHole } from "../stars/blackHole";
+import { Star } from "../stellarObjects/star";
+import { BlackHole } from "../stellarObjects/blackHole";
 import { PlanemoDescriptor } from "../../descriptors/common";
 
 export interface Planemo {

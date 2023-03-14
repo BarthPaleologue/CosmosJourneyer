@@ -6,10 +6,10 @@ import surfaceMaterialVertex from "../../shaders/gasPlanetMaterial/vertex.glsl";
 import { GazColorSettings } from "./colorSettingsInterface";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { flattenVector3Array } from "../utils/algebra";
-import { Star } from "../bodies/stars/star";
-import { BlackHole } from "../bodies/stars/blackHole";
+import { Star } from "../bodies/stellarObjects/star";
+import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
-import { GasPlanetDescriptor } from "../descriptors/gasPlanetDescriptor";
+import { GasPlanetDescriptor } from "../descriptors/planemos/gasPlanetDescriptor";
 
 const shaderName = "gazPlanetMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;

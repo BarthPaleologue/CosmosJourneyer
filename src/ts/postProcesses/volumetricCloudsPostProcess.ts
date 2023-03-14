@@ -4,9 +4,9 @@ import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.gls
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
-import { BlackHole } from "../bodies/stars/blackHole";
-import { Star } from "../bodies/stars/star";
-import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
+import { BlackHole } from "../bodies/stellarObjects/blackHole";
+import { Star } from "../bodies/stellarObjects/star";
+import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { BodyPostProcess } from "./bodyPostProcess";
 import { CloudSettings, FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 
@@ -18,7 +18,7 @@ export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProc
 export class VolumetricCloudsPostProcess extends BodyPostProcess {
     settings: CloudSettings;
 
-    constructor(name: string, planet: TelluricPlanet, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: CloudSettings = {
             cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
             specularPower: 2,

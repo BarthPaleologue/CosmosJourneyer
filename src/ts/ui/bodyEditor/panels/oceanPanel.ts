@@ -1,6 +1,6 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanet } from "../../../bodies/planets/telluricPlanet";
+import { TelluricPlanemo } from "../../../bodies/planemos/telluricPlanemo";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 import { Slider } from "handle-sliderjs";
 
@@ -8,7 +8,7 @@ export class OceanPanel extends EditorPanel {
     constructor() {
         super("ocean");
     }
-    init(planet: TelluricPlanet, postProcessManager: PostProcessManager) {
+    init(planet: TelluricPlanemo, postProcessManager: PostProcessManager) {
         for (const slider of this.sliders) slider.remove();
 
         if (!planet.postProcesses.ocean) return;

@@ -2,9 +2,9 @@ import { UberScene } from "../uberCore/uberScene";
 import { UberRenderingPipeline } from "../uberCore/uberRenderingPipeline";
 import { BloomEffect, Engine, FxaaPostProcess, PostProcessRenderEffect, Texture } from "@babylonjs/core";
 import { OceanPostProcess } from "./oceanPostProcess";
-import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
-import { Star } from "../bodies/stars/star";
-import { BlackHole } from "../bodies/stars/blackHole";
+import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
+import { Star } from "../bodies/stellarObjects/star";
+import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";
@@ -14,7 +14,7 @@ import { StarfieldPostProcess } from "./starfieldPostProcess";
 import { OverlayPostProcess } from "./overlayPostProcess";
 import { VolumetricLight } from "./volumetricLight";
 import { BlackHolePostProcess } from "./blackHolePostProcess";
-import { GasPlanet } from "../bodies/planets/gasPlanet";
+import { GasPlanet } from "../bodies/planemos/gasPlanet";
 import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
 import { extractRelevantPostProcesses } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess, VolumetricCloudsPostProcess } from "./volumetricCloudsPostProcess";
@@ -109,7 +109,7 @@ export class PostProcessManager {
      * @param planet A telluric planet
      * @param stars An array of stars or black holes
      */
-    public addOcean(planet: TelluricPlanet, stars: (Star | BlackHole)[]) {
+    public addOcean(planet: TelluricPlanemo, stars: (Star | BlackHole)[]) {
         this.oceans.push(new OceanPostProcess(`${planet.name}Ocean`, planet, this.scene, stars));
     }
 
@@ -117,7 +117,7 @@ export class PostProcessManager {
      * Returns the ocean post process for the given planet. Throws an error if no ocean is found.
      * @param planet A telluric planet
      */
-    public getOcean(planet: TelluricPlanet): OceanPostProcess {
+    public getOcean(planet: TelluricPlanemo): OceanPostProcess {
         for (const ocean of this.oceans) if (ocean.body === planet) return ocean;
         throw new Error("No ocean found for: " + planet.name);
     }
@@ -127,7 +127,7 @@ export class PostProcessManager {
      * @param planet A telluric planet
      * @param stars An array of stars or black holes
      */
-    public addClouds(planet: TelluricPlanet, stars: (Star | BlackHole)[]) {
+    public addClouds(planet: TelluricPlanemo, stars: (Star | BlackHole)[]) {
         if (!Settings.ENABLE_VOLUMETRIC_CLOUDS) this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
         else this.clouds.push(new VolumetricCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
     }
@@ -136,7 +136,7 @@ export class PostProcessManager {
      * Returns the clouds post process for the given planet. Throws an error if no clouds are found.
      * @param planet A telluric planet
      */
-    public getClouds(planet: TelluricPlanet): CloudsPostProcess {
+    public getClouds(planet: TelluricPlanemo): CloudsPostProcess {
         for (const clouds of this.clouds) if (clouds.body === planet) return clouds;
         throw new Error("No clouds found for: " + planet.name);
     }
@@ -146,7 +146,7 @@ export class PostProcessManager {
      * @param planet A gas or telluric planet
      * @param stars An array of stars or black holes
      */
-    public addAtmosphere(planet: GasPlanet | TelluricPlanet, stars: (Star | BlackHole)[]) {
+    public addAtmosphere(planet: GasPlanet | TelluricPlanemo, stars: (Star | BlackHole)[]) {
         this.atmospheres.push(
             new AtmosphericScatteringPostProcess(
                 `${planet.name}Atmosphere`,
@@ -162,7 +162,7 @@ export class PostProcessManager {
      * Returns the atmosphere post process for the given planet. Throws an error if no atmosphere is found.
      * @param planet A gas or telluric planet
      */
-    public getAtmosphere(planet: GasPlanet | TelluricPlanet): AtmosphericScatteringPostProcess {
+    public getAtmosphere(planet: GasPlanet | TelluricPlanemo): AtmosphericScatteringPostProcess {
         for (const atmosphere of this.atmospheres) if (atmosphere.body === planet) return atmosphere;
         throw new Error("No atmosphere found for: " + planet.name);
     }
@@ -235,14 +235,14 @@ export class PostProcessManager {
     public addBody(body: AbstractBody, stars: (Star | BlackHole)[]) {
         if (body.postProcesses.rings) this.addRings(body, stars);
         if (body.postProcesses.overlay) this.addOverlay(body);
-        switch (body.bodyType) {
+        switch (body.descriptor.bodyType) {
             case BODY_TYPE.STAR:
                 if ((body as Star).postProcesses.volumetricLight) this.addVolumetricLight(body as Star);
                 break;
             case BODY_TYPE.TELLURIC:
-                if ((body as TelluricPlanet).postProcesses.atmosphere) this.addAtmosphere(body as TelluricPlanet, stars);
-                if ((body as TelluricPlanet).postProcesses.clouds) this.addClouds(body as TelluricPlanet, stars);
-                if ((body as TelluricPlanet).postProcesses.ocean) this.addOcean(body as TelluricPlanet, stars);
+                if ((body as TelluricPlanemo).postProcesses.atmosphere) this.addAtmosphere(body as TelluricPlanemo, stars);
+                if ((body as TelluricPlanemo).postProcesses.clouds) this.addClouds(body as TelluricPlanemo, stars);
+                if ((body as TelluricPlanemo).postProcesses.ocean) this.addOcean(body as TelluricPlanemo, stars);
                 break;
             case BODY_TYPE.GAS:
                 if ((body as GasPlanet).postProcesses.atmosphere) this.addAtmosphere(body as GasPlanet, stars);
@@ -251,7 +251,7 @@ export class PostProcessManager {
                 if ((body as BlackHole).postProcesses.blackHole) this.addBlackHole(body as BlackHole);
                 break;
             default:
-                throw new Error(`Unknown body type : ${body.bodyType}`);
+                throw new Error(`Unknown body type : ${body.descriptor.bodyType}`);
         }
     }
 

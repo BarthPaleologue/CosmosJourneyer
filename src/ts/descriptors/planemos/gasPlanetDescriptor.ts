@@ -1,11 +1,11 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
-import { Settings } from "../settings";
-import { BODY_TYPE, BodyDescriptor, PlanemoDescriptor } from "./common";
-import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
-import { getOrbitalPeriod } from "../orbits/kepler";
+import { Settings } from "../../settings";
+import { BODY_TYPE, BodyDescriptor, PlanemoDescriptor } from "../common";
+import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
+import { getOrbitalPeriod } from "../../orbits/kepler";
 import { Quaternion } from "@babylonjs/core";
-import { PlanetPhysicalProperties } from "../bodies/physicalProperties";
+import { PlanetPhysicalProperties } from "../../bodies/physicalProperties";
 
 enum GENERATION_STEPS {
     AXIAL_TILT = 100,

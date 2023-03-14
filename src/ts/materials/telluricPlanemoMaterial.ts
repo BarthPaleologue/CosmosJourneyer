@@ -6,27 +6,27 @@ import surfaceMaterialVertex from "../../shaders/telluricPlanetMaterial/vertex.g
 import { Assets } from "../assets";
 import { flattenVector3Array } from "../utils/algebra";
 import { UberScene } from "../uberCore/uberScene";
-import { Star } from "../bodies/stars/star";
+import { Star } from "../bodies/stellarObjects/star";
 import { AbstractController } from "../uberCore/abstractController";
-import { BlackHole } from "../bodies/stars/blackHole";
+import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { SolidPhysicalProperties } from "../bodies/physicalProperties";
 import { centeredRand } from "extended-random";
-import { TelluricPlanetDescriptor } from "../descriptors/telluricPlanetDescriptor";
+import { TelluricPlanemoDescriptor } from "../descriptors/planemos/telluricPlanemoDescriptor";
 
 const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 
-export class TelluricMaterial extends ShaderMaterial {
+export class TelluricPlanemoMaterial extends ShaderMaterial {
     readonly planet: BasicTransform;
     colorSettings: ColorSettings;
     terrainSettings: TerrainSettings;
     physicalProperties: SolidPhysicalProperties;
     planetRadius: number;
 
-    constructor(planetName: string, planet: BasicTransform, planetDescriptor: TelluricPlanetDescriptor, scene: UberScene) {
+    constructor(planetName: string, planet: BasicTransform, planetDescriptor: TelluricPlanemoDescriptor, scene: UberScene) {
         super(`${planetName}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
             uniforms: [

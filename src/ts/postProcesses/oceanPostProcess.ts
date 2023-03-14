@@ -5,9 +5,9 @@ import { Assets } from "../assets";
 import { UberScene } from "../uberCore/uberScene";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
-import { Star } from "../bodies/stars/star";
-import { BlackHole } from "../bodies/stars/blackHole";
-import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
+import { Star } from "../bodies/stellarObjects/star";
+import { BlackHole } from "../bodies/stellarObjects/blackHole";
+import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { BodyPostProcess } from "./bodyPostProcess";
 
 const shaderName = "ocean";
@@ -25,7 +25,7 @@ export interface OceanSettings {
 export class OceanPostProcess extends BodyPostProcess {
     settings: OceanSettings;
 
-    constructor(name: string, planet: TelluricPlanet, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: OceanSettings = {
             oceanRadius: planet.getApparentRadius(),
             depthModifier: 0.001,

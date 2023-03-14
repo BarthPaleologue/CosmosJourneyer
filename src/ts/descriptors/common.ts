@@ -38,8 +38,3 @@ export interface PlanemoDescriptor extends BodyDescriptor {
 
     getMoonSeed(index: number): number;
 }
-
-export interface TelluricBodyDescriptor extends PlanemoDescriptor {
-    physicalProperties: SolidPhysicalProperties;
-    terrainSettings: TerrainSettings;
-}

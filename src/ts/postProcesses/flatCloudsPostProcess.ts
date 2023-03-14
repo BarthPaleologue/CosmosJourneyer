@@ -7,9 +7,9 @@ import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
 import { UberScene } from "../uberCore/uberScene";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
-import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
-import { BlackHole } from "../bodies/stars/blackHole";
-import { Star } from "../bodies/stars/star";
+import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
+import { BlackHole } from "../bodies/stellarObjects/blackHole";
+import { Star } from "../bodies/stellarObjects/star";
 import { BodyPostProcess } from "./bodyPostProcess";
 
 const shaderName = "flatClouds";
@@ -31,7 +31,7 @@ export interface CloudSettings {
 export class FlatCloudsPostProcess extends BodyPostProcess {
     settings: CloudSettings;
 
-    constructor(name: string, planet: TelluricPlanet, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: CloudSettings = {
             cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
             specularPower: 2,

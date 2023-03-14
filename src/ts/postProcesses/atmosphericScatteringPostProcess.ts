@@ -6,10 +6,10 @@ import { Assets } from "../assets";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { centeredRand } from "extended-random";
-import { BlackHole } from "../bodies/stars/blackHole";
-import { Star } from "../bodies/stars/star";
-import { TelluricPlanet } from "../bodies/planets/telluricPlanet";
-import { GasPlanet } from "../bodies/planets/gasPlanet";
+import { BlackHole } from "../bodies/stellarObjects/blackHole";
+import { Star } from "../bodies/stellarObjects/star";
+import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
+import { GasPlanet } from "../bodies/planemos/gasPlanet";
 import { BodyPostProcess } from "./bodyPostProcess";
 
 const shaderName = "atmosphericScattering";
@@ -31,7 +31,7 @@ export interface AtmosphereSettings {
 export class AtmosphericScatteringPostProcess extends BodyPostProcess {
     settings: AtmosphereSettings;
 
-    constructor(name: string, planet: TelluricPlanet | GasPlanet, atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 10,
