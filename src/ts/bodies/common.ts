@@ -1,13 +1,6 @@
 import { Vector3 } from "@babylonjs/core";
 import { TransferCollisionData } from "../chunks/workerDataTypes";
 
-export enum BodyType {
-    STAR,
-    TELLURIC,
-    GAS,
-    BLACK_HOLE
-}
-
 /**
  * Describes object that can be collided with
  */

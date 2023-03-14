@@ -6,11 +6,11 @@ import { AbstractController } from "./uberCore/abstractController";
 import { UberScene } from "./uberCore/uberScene";
 import { StarSystem } from "./bodies/starSystem";
 import { CollisionWorker } from "./workers/collisionWorker";
-import { BodyType } from "./bodies/interfaces";
 import { TelluricPlanet } from "./bodies/planets/telluricPlanet";
 import { Settings } from "./settings";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
 import { isOrbiting } from "./utils/nearestBody";
+import { BODY_TYPE } from "./descriptors/common";
 
 export class PlanetEngine {
     // UI
@@ -100,7 +100,7 @@ export class PlanetEngine {
             this.starSystem.translateAllBodiesNow(this.scene.getActiveController().update(deltaTime));
 
             if (!this.collisionWorker.isBusy() && isOrbiting(this.scene.getActiveController(), nearest)) {
-                if (nearest.bodyType == BodyType.TELLURIC) {
+                if (nearest.bodyType == BODY_TYPE.TELLURIC) {
                     this.collisionWorker.checkCollision(nearest as TelluricPlanet);
                 }
             }

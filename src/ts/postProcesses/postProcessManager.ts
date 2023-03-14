@@ -15,10 +15,10 @@ import { OverlayPostProcess } from "./overlayPostProcess";
 import { VolumetricLight } from "./volumetricLight";
 import { BlackHolePostProcess } from "./blackHolePostProcess";
 import { GasPlanet } from "../bodies/planets/gasPlanet";
-import { BodyType } from "../bodies/interfaces";
 import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
 import { extractRelevantPostProcesses } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess, VolumetricCloudsPostProcess } from "./volumetricCloudsPostProcess";
+import { BODY_TYPE } from "../descriptors/common";
 
 export enum PostProcessType {
     VOLUMETRIC_LIGHT,
@@ -236,18 +236,18 @@ export class PostProcessManager {
         if (body.postProcesses.rings) this.addRings(body, stars);
         if (body.postProcesses.overlay) this.addOverlay(body);
         switch (body.bodyType) {
-            case BodyType.STAR:
+            case BODY_TYPE.STAR:
                 if ((body as Star).postProcesses.volumetricLight) this.addVolumetricLight(body as Star);
                 break;
-            case BodyType.TELLURIC:
+            case BODY_TYPE.TELLURIC:
                 if ((body as TelluricPlanet).postProcesses.atmosphere) this.addAtmosphere(body as TelluricPlanet, stars);
                 if ((body as TelluricPlanet).postProcesses.clouds) this.addClouds(body as TelluricPlanet, stars);
                 if ((body as TelluricPlanet).postProcesses.ocean) this.addOcean(body as TelluricPlanet, stars);
                 break;
-            case BodyType.GAS:
+            case BODY_TYPE.GAS:
                 if ((body as GasPlanet).postProcesses.atmosphere) this.addAtmosphere(body as GasPlanet, stars);
                 break;
-            case BodyType.BLACK_HOLE:
+            case BODY_TYPE.BLACK_HOLE:
                 if ((body as BlackHole).postProcesses.blackHole) this.addBlackHole(body as BlackHole);
                 break;
             default:

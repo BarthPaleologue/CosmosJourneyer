@@ -1,7 +1,6 @@
 import editorHTML from "../../../html/bodyEditor.html";
 import { TelluricPlanet } from "../../bodies/planets/telluricPlanet";
 import { Star } from "../../bodies/stars/star";
-import { BodyType } from "../../bodies/interfaces";
 import { AbstractBody } from "../../bodies/abstractBody";
 import "handle-sliderjs/dist/css/style2.css";
 import { ColorMode } from "../../materials/colorSettingsInterface";
@@ -19,6 +18,7 @@ import { RingsPanel } from "./panels/ringsPanel";
 import { OceanPanel } from "./panels/oceanPanel";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
 import { UberScene } from "../../uberCore/uberScene";
+import { BODY_TYPE } from "../../descriptors/common";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -140,13 +140,13 @@ export class BodyEditor {
         this.currentBodyId = body.name;
         this.initNavBar(body);
         switch (body.bodyType) {
-            case BodyType.TELLURIC:
+            case BODY_TYPE.TELLURIC:
                 this.setTelluricPlanet(body as TelluricPlanet, postProcessManager, scene);
                 break;
-            case BodyType.STAR:
+            case BODY_TYPE.STAR:
                 this.setStar(body as Star, postProcessManager, scene);
                 break;
-            case BodyType.GAS:
+            case BODY_TYPE.GAS:
                 this.setGazPlanet(body as GasPlanet, postProcessManager, scene);
                 break;
             default:
@@ -178,10 +178,10 @@ export class BodyEditor {
         for (const panel of this.panels) panel.disable();
 
         switch (body.bodyType) {
-            case BodyType.STAR:
+            case BODY_TYPE.STAR:
                 this.starPanel.enable();
                 break;
-            case BodyType.TELLURIC:
+            case BODY_TYPE.TELLURIC:
                 this.physicPanel.enable();
 
                 this.oceanPanel.enable();
@@ -196,7 +196,7 @@ export class BodyEditor {
                 this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel && (body as TelluricPlanet).postProcesses.atmosphere !== null);
 
                 break;
-            case BodyType.GAS:
+            case BODY_TYPE.GAS:
                 this.atmospherePanel.enable();
                 this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel);
 

@@ -1,5 +1,5 @@
 import { ITransformLike } from "../uberCore/transforms/ITransformLike";
-import { BodyDescriptor } from "../descriptors/interfaces";
+import { BodyDescriptor } from "../descriptors/common";
 
 export interface ITransformable {
     transform: ITransformLike;

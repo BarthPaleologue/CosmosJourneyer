@@ -4,11 +4,10 @@ import { normalRandom, randRange, uniformRandBool } from "extended-random";
 import { Quaternion, Vector3 } from "@babylonjs/core";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
-import { BodyDescriptor, StellarObjectDescriptor } from "../interfaces";
+import { BodyDescriptor, BODY_TYPE, StellarObjectDescriptor } from "../common";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../../orbits/kepler";
 import { StarPhysicalProperties } from "../../bodies/physicalProperties";
-import { BodyType } from "../../bodies/interfaces";
 import { STELLAR_TYPE } from "./common";
 
 enum GENERATION_STEPS {
@@ -20,7 +19,7 @@ enum GENERATION_STEPS {
 }
 
 export class StarDescriptor implements StellarObjectDescriptor {
-    readonly bodyType = BodyType.STAR;
+    readonly bodyType = BODY_TYPE.STAR;
     readonly rng: (step: number) => number;
     readonly seed: number;
 

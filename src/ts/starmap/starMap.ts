@@ -24,10 +24,10 @@ import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 import { StarDescriptor } from "../descriptors/stellarObjects/starDescriptor";
 import { BuildData, Cell, Vector3ToString } from "./cell";
-import { BodyType } from "../bodies/interfaces";
 import { BlackHoleDescriptor } from "../descriptors/stellarObjects/blackHoleDescriptor";
 import { StarMapUI } from "./starMapUI";
 import { getStellarTypeString } from "../descriptors/stellarObjects/common";
+import { BODY_TYPE } from "../descriptors/common";
 
 export class StarMap {
     readonly scene: Scene;
@@ -237,7 +237,7 @@ export class StarMap {
             const starSystemDescriptor = new StarSystemDescriptor(starSystemSeed);
 
             const starSeed = starSystemDescriptor.getStarSeed(0);
-            const isStarBlackHole = starSystemDescriptor.getBodyTypeOfStar(0) == BodyType.BLACK_HOLE;
+            const isStarBlackHole = starSystemDescriptor.getBodyTypeOfStar(0) == BODY_TYPE.BLACK_HOLE;
 
             const starDescriptor = !isStarBlackHole ? new StarDescriptor(starSeed, []) : new BlackHoleDescriptor(starSeed);
 
@@ -260,13 +260,13 @@ export class StarMap {
                     this.starMapUI.attachUIToMesh(star);
                     this.starMapUI.setUIText(
                         "Seed: " +
-                            starSystemDescriptor.seed +
-                            "\n" +
-                            "Type: " +
-                            getStellarTypeString(starDescriptor.stellarType) +
-                            "\n" +
-                            "Planets: " +
-                            starSystemDescriptor.getNbPlanets()
+                        starSystemDescriptor.seed +
+                        "\n" +
+                        "Type: " +
+                        getStellarTypeString(starDescriptor.stellarType) +
+                        "\n" +
+                        "Planets: " +
+                        starSystemDescriptor.getNbPlanets()
                     );
 
                     this.selectedSystemSeed = starSystemSeed;

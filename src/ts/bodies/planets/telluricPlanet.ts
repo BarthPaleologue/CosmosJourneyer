@@ -3,7 +3,7 @@ import { Direction } from "../../utils/direction";
 
 import { Axis, Vector3 } from "@babylonjs/core";
 
-import { BodyType, RigidBody } from "../interfaces";
+import { RigidBody } from "../common";
 import { TransferCollisionData } from "../../chunks/workerDataTypes";
 import { TaskType } from "../../chunks/taskTypes";
 import { AbstractController } from "../../uberCore/abstractController";
@@ -18,8 +18,6 @@ import { BlackHole } from "../stars/blackHole";
 import { TelluricPlanetDescriptor } from "../../descriptors/telluricPlanetDescriptor";
 
 export class TelluricPlanet extends AbstractBody implements RigidBody, Planemo {
-    override readonly bodyType = BodyType.TELLURIC;
-
     override readonly postProcesses: TelluricPlanetPostProcesses;
 
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere

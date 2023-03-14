@@ -1,14 +1,13 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
-import { BodyDescriptor, TelluricBodyDescriptor } from "./interfaces";
+import { BODY_TYPE, BodyDescriptor, TelluricBodyDescriptor } from "./common";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
 import { SolidPhysicalProperties } from "../bodies/physicalProperties";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { Quaternion } from "@babylonjs/core";
-import { BodyType } from "../bodies/interfaces";
 
 enum GENERATION_STEPS {
     AXIAL_TILT = 100,
@@ -23,7 +22,7 @@ enum GENERATION_STEPS {
 }
 
 export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
-    readonly bodyType = BodyType.TELLURIC;
+    readonly bodyType = BODY_TYPE.TELLURIC;
     readonly seed: number;
     readonly rng: (step: number) => number;
 
@@ -52,8 +51,8 @@ export class TelluricPlanetDescriptor implements TelluricBodyDescriptor {
         this.parentBodies = parentBodies;
 
         for (const parentBody of parentBodies) {
-            if (parentBody.bodyType == BodyType.TELLURIC) this.isSatelliteOfTelluric = true;
-            if (parentBody.bodyType == BodyType.GAS) this.isSatelliteOfGas = true;
+            if (parentBody.bodyType == BODY_TYPE.TELLURIC) this.isSatelliteOfTelluric = true;
+            if (parentBody.bodyType == BODY_TYPE.GAS) this.isSatelliteOfGas = true;
         }
 
         if (this.isSatelliteOfTelluric) {

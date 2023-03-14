@@ -1,7 +1,6 @@
 import { AbstractBody } from "../abstractBody";
 
 import { Mesh, MeshBuilder, PointLight, Quaternion, Vector3 } from "@babylonjs/core";
-import { BodyType } from "../interfaces";
 import { StarPostProcesses } from "../postProcessesInterfaces";
 import { StarMaterial } from "../../materials/starMaterial";
 import { UberScene } from "../../uberCore/uberScene";
@@ -11,8 +10,6 @@ export class Star extends AbstractBody {
     readonly mesh: Mesh;
     readonly light: PointLight;
     private readonly material: StarMaterial;
-
-    override readonly bodyType = BodyType.STAR;
 
     public override postProcesses: StarPostProcesses;
 

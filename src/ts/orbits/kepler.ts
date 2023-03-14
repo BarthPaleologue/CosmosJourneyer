@@ -4,7 +4,7 @@ import { Axis, Quaternion, Vector3 } from "@babylonjs/core";
 import { IOrbitalBody } from "./iOrbitalBody";
 import { IOrbitalProperties } from "./iOrbitalProperties";
 import { stripAxisFromQuaternion } from "../utils/algebra";
-import { BodyDescriptor } from "../descriptors/interfaces";
+import { BodyDescriptor } from "../descriptors/common";
 
 /**
  * Returns 0 when the arguments are solution to the Kepler's equation

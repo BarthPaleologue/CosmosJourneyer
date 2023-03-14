@@ -1,6 +1,5 @@
 import { Axis, Mesh, MeshBuilder } from "@babylonjs/core";
 
-import { BodyType } from "../interfaces";
 import { AbstractController } from "../../uberCore/abstractController";
 import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
 import { PlanetPostProcesses } from "../postProcessesInterfaces";
@@ -12,8 +11,6 @@ import { BlackHole } from "../stars/blackHole";
 import { GasPlanetDescriptor } from "../../descriptors/gasPlanetDescriptor";
 
 export class GasPlanet extends AbstractBody implements Planemo {
-    override readonly bodyType = BodyType.GAS;
-
     override readonly postProcesses: PlanetPostProcesses;
 
     private readonly mesh: Mesh;

@@ -12,8 +12,8 @@ import { getOrbitalPeriod } from "../orbits/kepler";
 import { BlackHole } from "./stars/blackHole";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
-import { BodyType } from "./interfaces";
 import { isOrbiting } from "../utils/nearestBody";
+import { BODY_TYPE } from "../descriptors/common";
 
 enum Steps {
     CHOOSE_PLANET_TYPE = 300
@@ -120,7 +120,7 @@ export class StarSystem {
         to a system that already has ${this.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
 
-        const isStarBlackHole = this.descriptor.getBodyTypeOfStar(this.stellarObjects.length) == BodyType.BLACK_HOLE;
+        const isStarBlackHole = this.descriptor.getBodyTypeOfStar(this.stellarObjects.length) == BODY_TYPE.BLACK_HOLE;
 
         const star = isStarBlackHole ? new BlackHole(`blackHole${this.stellarObjects.length}`, seed, []) : new Star(`star${this.stellarObjects.length}`, this.scene, seed, []);
 
@@ -347,7 +347,7 @@ export class StarSystem {
         for (const planet of this.planemos) planet.updateMaterial(controller, this.stellarObjects, deltaTime);
 
         for (const star of this.stellarObjects) {
-            if (star.bodyType === BodyType.STAR) (star as Star).updateMaterial();
+            if (star.bodyType === BODY_TYPE.STAR) (star as Star).updateMaterial();
         }
 
         const nearest = this.getNearestBody(this.scene.getActiveUberCamera().position);

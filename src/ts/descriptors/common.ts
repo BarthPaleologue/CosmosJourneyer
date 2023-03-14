@@ -1,11 +1,17 @@
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { PhysicalProperties, PlanetPhysicalProperties, SolidPhysicalProperties } from "../bodies/physicalProperties";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
-import { BodyType } from "../bodies/interfaces";
 import { STELLAR_TYPE } from "./stellarObjects/common";
 
+export enum BODY_TYPE {
+    STAR,
+    TELLURIC,
+    GAS,
+    BLACK_HOLE
+}
+
 export interface BodyDescriptor {
-    bodyType: BodyType;
+    bodyType: BODY_TYPE;
     rng: (step: number) => number;
     seed: number;
     radius: number;

@@ -1,9 +1,8 @@
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core";
-import { BodyType } from "./interfaces";
 import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
-import { BodyDescriptor } from "../descriptors/interfaces";
+import { BodyDescriptor, BODY_TYPE } from "../descriptors/common";
 import { computeBarycenter, computePointOnOrbit } from "../orbits/kepler";
 
 interface NextState {
@@ -12,8 +11,6 @@ interface NextState {
 }
 
 export abstract class AbstractBody implements IOrbitalBody {
-    abstract readonly bodyType: BodyType;
-
     readonly transform: BasicTransform;
     readonly nextState: NextState = {
         position: Vector3.Zero(),
@@ -55,6 +52,10 @@ export abstract class AbstractBody implements IOrbitalBody {
         }
         if (minDepth == -1) this.depth = 0;
         else this.depth = minDepth + 1;
+    }
+
+    public get bodyType() {
+        return this.descriptor.bodyType;
     }
 
     /**
