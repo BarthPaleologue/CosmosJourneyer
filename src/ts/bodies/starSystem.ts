@@ -181,14 +181,17 @@ export class StarSystem {
     }
 
     public makePlanets(n: number): void {
-        console.assert(n < 0, `Cannot make a negative amount of planets : ${n}`);
+        console.assert(n >= 0, `Cannot make a negative amount of planets : ${n}`);
         for (let i = 0; i < n; i++) {
-            if (this.descriptor.getBodyTypeOfPlanet(this.planets.length) == BODY_TYPE.TELLURIC) {
-                const planet = this.makeTelluricPlanet();
-                this.makeSatellites(planet, planet.descriptor.nbMoons);
-            } else {
-                const planet = this.makeGasPlanet();
-                this.makeSatellites(planet, planet.descriptor.nbMoons);
+            switch (this.descriptor.getBodyTypeOfPlanet(this.planets.length)) {
+                case BODY_TYPE.TELLURIC:
+                    this.makeSatellites(this.makeTelluricPlanet());
+                    break;
+                case BODY_TYPE.GAS:
+                    this.makeSatellites(this.makeGasPlanet());
+                    break;
+                default:
+                    throw new Error(`Unknown body type ${this.descriptor.getBodyTypeOfPlanet(this.planets.length)}`);
             }
         }
     }

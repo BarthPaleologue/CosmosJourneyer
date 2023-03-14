@@ -37,10 +37,9 @@ export class StarfieldPostProcess extends UberPostProcess {
                     //TODO: should be cleaned up
                     let vis = 1.0;
                     for (const star of stars) {
-                        if (star instanceof Star) return 1;
+                        if (star instanceof BlackHole) return 1;
                         vis = Math.min(vis, 1.0 - Vector3.Dot(star.transform.getAbsolutePosition().normalizeToNew(), scene.getActiveController().transform.getForwardDirection()));
                     }
-                    vis /= 2;
                     let vis2 = 1.0;
                     const nearest = nearestBody(scene.getActiveController().transform, bodies);
                     if (nearest instanceof TelluricPlanemo) {
@@ -53,7 +52,7 @@ export class StarfieldPostProcess extends UberPostProcess {
                                 const sunDir = planet.transform.getAbsolutePosition().subtract(star.transform.getAbsolutePosition()).normalize();
                                 vis2 = Math.min(
                                     vis2,
-                                    (height / maxHeight) ** 32 + Math.max(Vector3.Dot(sunDir, planet.transform.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5
+                                    (height / maxHeight) ** 128 + Math.max(Vector3.Dot(sunDir, planet.transform.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5
                                 );
                             }
                         }
