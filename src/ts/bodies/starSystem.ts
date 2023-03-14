@@ -122,9 +122,7 @@ export class StarSystem {
 
         const isStarBlackHole = this.descriptor.getBodyTypeOfStar(this.stellarObjects.length) == BodyType.BLACK_HOLE;
 
-        const star = isStarBlackHole ?
-            new BlackHole(`blackHole${this.stellarObjects.length}`, seed, []) :
-            new Star(`star${this.stellarObjects.length}`, this.scene, seed, []);
+        const star = isStarBlackHole ? new BlackHole(`blackHole${this.stellarObjects.length}`, seed, []) : new Star(`star${this.stellarObjects.length}`, this.scene, seed, []);
 
         //TODO: make this better, make it part of the generation
         star.descriptor.orbitalProperties.periapsis = star.getRadius() * 4;

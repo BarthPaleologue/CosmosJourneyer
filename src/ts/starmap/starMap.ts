@@ -239,9 +239,7 @@ export class StarMap {
             const starSeed = starSystemDescriptor.getStarSeed(0);
             const isStarBlackHole = starSystemDescriptor.getBodyTypeOfStar(0) == BodyType.BLACK_HOLE;
 
-            const starDescriptor = !isStarBlackHole ?
-                new StarDescriptor(starSeed, []) :
-                new BlackHoleDescriptor(starSeed);
+            const starDescriptor = !isStarBlackHole ? new StarDescriptor(starSeed, []) : new BlackHoleDescriptor(starSeed);
 
             const star = !isStarBlackHole ? this.starTemplate.createInstance(data.name) : this.blackHoleTemplate.createInstance(data.name);
             star.scaling = Vector3.One().scaleInPlace(data.scale);
@@ -261,7 +259,15 @@ export class StarMap {
                 new ExecuteCodeAction(ActionManager.OnPickTrigger, (_) => {
                     this.starMapUI.attachUIToMesh(star);
                     this.starMapUI.setUIText(
-                        "Seed: " + starSystemDescriptor.seed + "\n" + "Type: " + getStellarTypeString(starDescriptor.stellarType) + "\n" + "Planets: " + starSystemDescriptor.getNbPlanets());
+                        "Seed: " +
+                            starSystemDescriptor.seed +
+                            "\n" +
+                            "Type: " +
+                            getStellarTypeString(starDescriptor.stellarType) +
+                            "\n" +
+                            "Planets: " +
+                            starSystemDescriptor.getNbPlanets()
+                    );
 
                     this.selectedSystemSeed = starSystemSeed;
                 })

@@ -42,8 +42,7 @@ export class StarSystemDescriptor {
 
     public getBodyTypeOfStar(index: number) {
         if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
-        if (uniformRandBool(0.002, this.rng, GENERATION_STEPS.GENERATE_STARS + index))
-            return BodyType.BLACK_HOLE;
+        if (uniformRandBool(0.002, this.rng, GENERATION_STEPS.GENERATE_STARS + index)) return BodyType.BLACK_HOLE;
 
         return BodyType.STAR;
     }

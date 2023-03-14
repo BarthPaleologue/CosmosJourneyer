@@ -49,7 +49,7 @@ export class BlackHoleDescriptor implements StellarObjectDescriptor {
         this.physicalProperties = {
             mass: 10,
             rotationPeriod: 24 * 60 * 60,
-            axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
+            axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT)
         };
     }
 
