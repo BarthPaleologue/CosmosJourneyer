@@ -1,7 +1,7 @@
 import { AbstractBody } from "../abstractBody";
 
 import { Mesh, MeshBuilder, PointLight, Quaternion, Vector3 } from "@babylonjs/core";
-import { StarPostProcesses } from "../postProcessesInterfaces";
+import { StarPostProcesses } from "../common";
 import { StarMaterial } from "../../materials/starMaterial";
 import { UberScene } from "../../uberCore/uberScene";
 import { getRgbFromTemperature } from "../../utils/specrend";

@@ -1,5 +1,5 @@
 import { AbstractBody } from "../abstractBody";
-import { BlackHolePostProcesses } from "../postProcessesInterfaces";
+import { BlackHolePostProcesses } from "../common";
 import { BlackHoleDescriptor } from "../../descriptors/stellarObjects/blackHoleDescriptor";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { Axis } from "@babylonjs/core";

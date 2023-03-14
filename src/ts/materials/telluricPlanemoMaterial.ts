@@ -11,7 +11,7 @@ import { AbstractController } from "../uberCore/abstractController";
 import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";
-import { SolidPhysicalProperties } from "../bodies/physicalProperties";
+import { SolidPhysicalProperties } from "../descriptors/common";
 import { centeredRand } from "extended-random";
 import { TelluricPlanemoDescriptor } from "../descriptors/planemos/telluricPlanemoDescriptor";
 

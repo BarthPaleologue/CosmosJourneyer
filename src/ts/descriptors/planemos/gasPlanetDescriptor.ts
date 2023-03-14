@@ -5,7 +5,7 @@ import { BODY_TYPE, BodyDescriptor, PlanemoDescriptor } from "../common";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../../orbits/kepler";
 import { Quaternion } from "@babylonjs/core";
-import { PlanetPhysicalProperties } from "../../bodies/physicalProperties";
+import { PlanetPhysicalProperties } from "../common";
 
 enum GENERATION_STEPS {
     AXIAL_TILT = 100,

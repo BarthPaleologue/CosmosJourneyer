@@ -2,7 +2,7 @@ import { Axis, Mesh, MeshBuilder } from "@babylonjs/core";
 
 import { AbstractController } from "../../uberCore/abstractController";
 import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
-import { PlanetPostProcesses } from "../postProcessesInterfaces";
+import { PlanetPostProcesses } from "../common";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planemo } from "./planemo";

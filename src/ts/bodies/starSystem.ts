@@ -15,10 +15,6 @@ import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 import { isOrbiting } from "../utils/nearestBody";
 import { BODY_TYPE } from "../descriptors/common";
 
-enum Steps {
-    CHOOSE_PLANET_TYPE = 300
-}
-
 export class StarSystem {
     private readonly scene: UberScene;
 
@@ -185,9 +181,9 @@ export class StarSystem {
     }
 
     public makePlanets(n: number): void {
-        if (n < 0) throw new Error(`Cannot make a negative amount of planets : ${n}`);
+        console.assert(n < 0, `Cannot make a negative amount of planets : ${n}`);
         for (let i = 0; i < n; i++) {
-            if (uniformRandBool(0.5, this.descriptor.rng, Steps.CHOOSE_PLANET_TYPE + this.planemos.length)) {
+            if (this.descriptor.getBodyTypeOfPlanet(this.planets.length) == BODY_TYPE.TELLURIC) {
                 const planet = this.makeTelluricPlanet();
                 this.makeSatellites(planet, planet.descriptor.nbMoons);
             } else {

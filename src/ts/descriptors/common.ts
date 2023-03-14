@@ -1,5 +1,3 @@
-import { TerrainSettings } from "../terrain/terrainSettings";
-import { PhysicalProperties, PlanetPhysicalProperties, SolidPhysicalProperties } from "../bodies/physicalProperties";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { STELLAR_TYPE } from "./stellarObjects/common";
 
@@ -9,6 +7,27 @@ export enum BODY_TYPE {
     GAS,
     BLACK_HOLE
 }
+
+export type PhysicalProperties = {
+    mass: number;
+    rotationPeriod: number;
+    axialTilt: number;
+};
+
+export type StarPhysicalProperties = PhysicalProperties & {
+    temperature: number;
+};
+
+export type PlanetPhysicalProperties = PhysicalProperties & {
+    minTemperature: number;
+    maxTemperature: number;
+    pressure: number;
+};
+
+export type SolidPhysicalProperties = PlanetPhysicalProperties & {
+    waterAmount: number;
+    oceanLevel: number;
+};
 
 export interface BodyDescriptor {
     bodyType: BODY_TYPE;

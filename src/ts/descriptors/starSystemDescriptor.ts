@@ -8,7 +8,8 @@ enum GENERATION_STEPS {
     NB_STARS = 20,
     GENERATE_STARS = 21,
     NB_PLANETS = 30,
-    GENERATE_PLANETS = 200
+    GENERATE_PLANETS = 200,
+    CHOOSE_PLANET_TYPE = 200
 }
 
 export class StarSystemDescriptor {
@@ -45,6 +46,11 @@ export class StarSystemDescriptor {
         if (uniformRandBool(0.002, this.rng, GENERATION_STEPS.GENERATE_STARS + index)) return BODY_TYPE.BLACK_HOLE;
 
         return BODY_TYPE.STAR;
+    }
+
+    public getBodyTypeOfPlanet(index: number) {
+        if (uniformRandBool(0.5, this.rng, GENERATION_STEPS.CHOOSE_PLANET_TYPE + index)) return BODY_TYPE.TELLURIC;
+        return BODY_TYPE.GAS;
     }
 
     public getPlanetSeed(index: number) {

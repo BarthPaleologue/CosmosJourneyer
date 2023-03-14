@@ -4,7 +4,7 @@ import { Settings } from "../../settings";
 import { BODY_TYPE, BodyDescriptor, PlanemoDescriptor } from "../common";
 import { TerrainSettings } from "../../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
-import { SolidPhysicalProperties } from "../../bodies/physicalProperties";
+import { SolidPhysicalProperties } from "../common";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../../orbits/kepler";
 import { Quaternion } from "@babylonjs/core";

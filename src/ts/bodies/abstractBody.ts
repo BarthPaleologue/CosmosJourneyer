@@ -1,9 +1,9 @@
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core";
-import { BodyPostProcesses } from "./postProcessesInterfaces";
 import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { BodyDescriptor } from "../descriptors/common";
 import { computeBarycenter, computePointOnOrbit } from "../orbits/kepler";
+import { BodyPostProcesses } from "./common";
 
 interface NextState {
     position: Vector3;

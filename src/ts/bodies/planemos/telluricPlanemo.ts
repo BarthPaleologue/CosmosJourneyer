@@ -9,7 +9,7 @@ import { TaskType } from "../../chunks/taskTypes";
 import { AbstractController } from "../../uberCore/abstractController";
 import { TelluricPlanemoMaterial } from "../../materials/telluricPlanemoMaterial";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
-import { TelluricPlanetPostProcesses } from "../postProcessesInterfaces";
+import { TelluricPlanetPostProcesses } from "../common";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planemo } from "./planemo";

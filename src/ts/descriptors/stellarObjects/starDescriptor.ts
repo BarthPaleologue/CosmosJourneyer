@@ -7,7 +7,7 @@ import { Settings } from "../../settings";
 import { BodyDescriptor, BODY_TYPE, StellarObjectDescriptor } from "../common";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../../orbits/kepler";
-import { StarPhysicalProperties } from "../../bodies/physicalProperties";
+import { StarPhysicalProperties } from "../common";
 import { STELLAR_TYPE } from "./common";
 
 enum GENERATION_STEPS {
