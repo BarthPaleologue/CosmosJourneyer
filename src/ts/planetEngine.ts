@@ -14,6 +14,7 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
+import "@babylonjs/core/Misc/screenshotTools";
 
 export class PlanetEngine {
     // UI
@@ -42,7 +43,7 @@ export class PlanetEngine {
         document.addEventListener("keydown", (e) => {
             if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
             if (e.key == "p" && this.engine != null && this.scene != null)
-                Tools.CreateScreenshotUsingRenderTargetAsync(this.engine, this.scene.getActiveController().getActiveCamera(), { precision: 4 });
+                Tools.CreateScreenshot(this.engine, this.scene.getActiveController().getActiveCamera(), { precision: 4 });
             if (e.key == "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
             //if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
             if (e.key == "w" && this.scene != null && this.starSystem != null && isOrbiting(this.scene.getActiveController(), this.starSystem.getNearestBody()))
@@ -50,7 +51,7 @@ export class PlanetEngine {
         });
     }
 
-    async setup() {
+    public async setup() {
         this.engine = await EngineFactory.CreateAsync(this.canvas, {
             antialias: false
             //useHighPrecisionFloats: true,
@@ -81,7 +82,7 @@ export class PlanetEngine {
         this.bodyEditor.resize();
     }
 
-    init() {
+    public init() {
         if (this.starSystem === null) throw new Error("Star system is null");
         this.starSystem.init();
         this.collisionWorker.setStarSystem(this.starSystem);
@@ -98,7 +99,7 @@ export class PlanetEngine {
 
             this.bodyEditor.update(nearest, this.starSystem.postProcessManager, this.scene);
             this.helmetOverlay.update(nearest);
-            this.helmetOverlay.setVisibility(this.bodyEditor.getVisibility() != EditorVisibility.FULL);
+            this.helmetOverlay.setVisibility(this.bodyEditor.getVisibility() !== EditorVisibility.FULL);
 
             this.starSystem.translateAllBodiesNow(this.scene.getActiveController().update(deltaTime));
 
@@ -114,24 +115,24 @@ export class PlanetEngine {
         });
     }
 
-    setActiveController(controller: AbstractController) {
+    public setActiveController(controller: AbstractController) {
         this.getScene().setActiveController(controller);
     }
 
-    setStarSystem(starSystem: StarSystem) {
+    public setStarSystem(starSystem: StarSystem) {
         this.starSystem = starSystem;
     }
 
-    registerUpdateCallback(callback: () => void) {
+    public registerUpdateCallback(callback: () => void) {
         this.getScene().registerBeforeRender(callback);
     }
 
-    getScene() {
+    public getScene() {
         if (this.scene === null) throw new Error("Scene is null");
         return this.scene;
     }
 
-    getEngine() {
+    public getEngine() {
         if (this.engine === null) throw new Error("Engine is null");
         return this.engine;
     }
