@@ -1,5 +1,5 @@
 import { AbstractBody } from "../bodies/abstractBody";
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractController } from "../uberCore/abstractController";
 import { StarSystem } from "../bodies/starSystem";
 import { nearestBody } from "./nearestBody";

@@ -1,7 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { clamp } from "terrain-generation";
 import { normalRandom, randRange, uniformRandBool } from "extended-random";
-import { Quaternion, Vector3 } from "@babylonjs/core";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
 import { BodyDescriptor, BODY_TYPE, StellarObjectDescriptor } from "../common";

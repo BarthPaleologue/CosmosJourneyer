@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransferCollisionData } from "../chunks/workerDataTypes";
 
 /**

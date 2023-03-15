@@ -1,8 +1,10 @@
-import { BoundingBox, InstancedMesh, Matrix, Vector3 } from "@babylonjs/core";
 import { hashVec3 } from "../utils/hashVec3";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand } from "extended-random";
 import { Settings } from "../settings";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
 
 export function Vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;

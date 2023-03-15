@@ -1,6 +1,5 @@
 import { UberScene } from "../uberCore/uberScene";
 import { UberRenderingPipeline } from "../uberCore/uberRenderingPipeline";
-import { BloomEffect, Engine, FxaaPostProcess, PostProcessRenderEffect, Texture } from "@babylonjs/core";
 import { OceanPostProcess } from "./oceanPostProcess";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { Star } from "../bodies/stellarObjects/star";
@@ -19,6 +18,14 @@ import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
 import { extractRelevantPostProcesses } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess, VolumetricCloudsPostProcess } from "./volumetricCloudsPostProcess";
 import { BODY_TYPE } from "../descriptors/common";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
+import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
+import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
+
 
 export enum PostProcessType {
     VOLUMETRIC_LIGHT,
@@ -107,10 +114,10 @@ export class PostProcessManager {
     /**
      * Creates a new Ocean postprocess for the given planet and adds it to the manager.
      * @param planet A telluric planet
-     * @param stars An array of stars or black holes
+     * @param stellarObjects An array of stars or black holes
      */
-    public addOcean(planet: TelluricPlanemo, stars: (Star | BlackHole)[]) {
-        this.oceans.push(new OceanPostProcess(`${planet.name}Ocean`, planet, this.scene, stars));
+    public addOcean(planet: TelluricPlanemo, stellarObjects: StellarObject[]) {
+        this.oceans.push(new OceanPostProcess(`${planet.name}Ocean`, planet, this.scene, stellarObjects));
     }
 
     /**
@@ -125,11 +132,12 @@ export class PostProcessManager {
     /**
      * Creates a new Clouds postprocess for the given planet and adds it to the manager.
      * @param planet A telluric planet
-     * @param stars An array of stars or black holes
+     * @param stellarObjects An array of stars or black holes
      */
-    public addClouds(planet: TelluricPlanemo, stars: (Star | BlackHole)[]) {
-        if (!Settings.ENABLE_VOLUMETRIC_CLOUDS) this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
-        else this.clouds.push(new VolumetricCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stars));
+    public addClouds(planet: TelluricPlanemo, stellarObjects: StellarObject[]) {
+        if (!Settings.ENABLE_VOLUMETRIC_CLOUDS)
+            this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stellarObjects));
+        else this.clouds.push(new VolumetricCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stellarObjects));
     }
 
     /**
@@ -144,16 +152,16 @@ export class PostProcessManager {
     /**
      * Creates a new Atmosphere postprocess for the given planet and adds it to the manager.
      * @param planet A gas or telluric planet
-     * @param stars An array of stars or black holes
+     * @param stellarObjects An array of stars or black holes
      */
-    public addAtmosphere(planet: GasPlanet | TelluricPlanemo, stars: (Star | BlackHole)[]) {
+    public addAtmosphere(planet: GasPlanet | TelluricPlanemo, stellarObjects: StellarObject[]) {
         this.atmospheres.push(
             new AtmosphericScatteringPostProcess(
                 `${planet.name}Atmosphere`,
                 planet,
                 Settings.ATMOSPHERE_HEIGHT * Math.max(1, planet.descriptor.radius / Settings.EARTH_RADIUS),
                 this.scene,
-                stars
+                stellarObjects
             )
         );
     }
@@ -170,10 +178,10 @@ export class PostProcessManager {
     /**
      * Creates a Rings postprocess for the given body and adds it to the manager.
      * @param body A body
-     * @param stars An array of stars or black holes
+     * @param stellarObjects An array of stars or black holes
      */
-    public addRings(body: AbstractBody, stars: (Star | BlackHole)[]) {
-        this.rings.push(new RingsPostProcess(body, this.scene, stars));
+    public addRings(body: AbstractBody, stellarObjects: StellarObject[]) {
+        this.rings.push(new RingsPostProcess(body, this.scene, stellarObjects));
     }
 
     /**
@@ -187,11 +195,11 @@ export class PostProcessManager {
 
     /**
      * Creates a new Starfield postprocess and adds it to the manager.
-     * @param stars An array of stars or black holes
+     * @param stellarObjects An array of stars or black holes
      * @param planets An array of planets
      */
-    public addStarField(stars: (Star | BlackHole)[], planets: AbstractBody[]) {
-        this.starFields.push(new StarfieldPostProcess(this.scene, stars, planets));
+    public addStarField(stellarObjects: StellarObject[], planets: AbstractBody[]) {
+        this.starFields.push(new StarfieldPostProcess(this.scene, stellarObjects, planets));
     }
 
     /**
@@ -230,22 +238,22 @@ export class PostProcessManager {
     /**
      * Adds all post processes for the given body.
      * @param body A body
-     * @param stars An array of stars or black holes lighting the body
+     * @param stellarObjects An array of stars or black holes lighting the body
      */
-    public addBody(body: AbstractBody, stars: (Star | BlackHole)[]) {
-        if (body.postProcesses.rings) this.addRings(body, stars);
+    public addBody(body: AbstractBody, stellarObjects: StellarObject[]) {
+        if (body.postProcesses.rings) this.addRings(body, stellarObjects);
         if (body.postProcesses.overlay) this.addOverlay(body);
         switch (body.descriptor.bodyType) {
             case BODY_TYPE.STAR:
                 if ((body as Star).postProcesses.volumetricLight) this.addVolumetricLight(body as Star);
                 break;
             case BODY_TYPE.TELLURIC:
-                if ((body as TelluricPlanemo).postProcesses.atmosphere) this.addAtmosphere(body as TelluricPlanemo, stars);
-                if ((body as TelluricPlanemo).postProcesses.clouds) this.addClouds(body as TelluricPlanemo, stars);
-                if ((body as TelluricPlanemo).postProcesses.ocean) this.addOcean(body as TelluricPlanemo, stars);
+                if ((body as TelluricPlanemo).postProcesses.atmosphere) this.addAtmosphere(body as TelluricPlanemo, stellarObjects);
+                if ((body as TelluricPlanemo).postProcesses.clouds) this.addClouds(body as TelluricPlanemo, stellarObjects);
+                if ((body as TelluricPlanemo).postProcesses.ocean) this.addOcean(body as TelluricPlanemo, stellarObjects);
                 break;
             case BODY_TYPE.GAS:
-                if ((body as GasPlanet).postProcesses.atmosphere) this.addAtmosphere(body as GasPlanet, stars);
+                if ((body as GasPlanet).postProcesses.atmosphere) this.addAtmosphere(body as GasPlanet, stellarObjects);
                 break;
             case BODY_TYPE.BLACK_HOLE:
                 if ((body as BlackHole).postProcesses.blackHole) this.addBlackHole(body as BlackHole);

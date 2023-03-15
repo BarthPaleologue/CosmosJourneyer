@@ -467,7 +467,7 @@ export function demonstrate() {
     }
 }
 
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export function getRgbFromTemperature(temperature: number): Vector3 {
     const cs = HDTVsystem;

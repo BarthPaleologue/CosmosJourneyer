@@ -1,4 +1,3 @@
-import { Color3, Effect, MaterialHelper, ShaderMaterial } from "@babylonjs/core";
 import { ColorMode, ColorSettings } from "./colorSettingsInterface";
 
 import surfaceMaterialFragment from "../../shaders/telluricPlanetMaterial/fragment.glsl";
@@ -6,14 +5,17 @@ import surfaceMaterialVertex from "../../shaders/telluricPlanetMaterial/vertex.g
 import { Assets } from "../assets";
 import { flattenVector3Array } from "../utils/algebra";
 import { UberScene } from "../uberCore/uberScene";
-import { Star } from "../bodies/stellarObjects/star";
 import { AbstractController } from "../uberCore/abstractController";
-import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { SolidPhysicalProperties } from "../descriptors/common";
 import { centeredRand } from "extended-random";
 import { TelluricPlanemoDescriptor } from "../descriptors/planemos/telluricPlanemoDescriptor";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { MaterialHelper } from "@babylonjs/core/Materials/materialHelper";
 
 const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -165,14 +167,14 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         this.setFloat("maxElevation", this.terrainSettings.continent_base_height + this.terrainSettings.max_mountain_height + this.terrainSettings.max_bump_height);
     }
 
-    public update(activeController: AbstractController, stars: (Star | BlackHole)[], deltaTime: number) {
+    public update(activeController: AbstractController, stellarObjects: StellarObject[], deltaTime: number) {
         this.setMatrix("normalMatrix", this.planet.node.getWorldMatrix().clone().invert().transpose());
 
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
         this.setVector3("playerPosition", activeController.transform.getAbsolutePosition());
 
-        this.setArray3("starPositions", flattenVector3Array(stars.map((star) => star.transform.getAbsolutePosition())));
-        this.setInt("nbStars", stars.length);
+        this.setArray3("starPositions", flattenVector3Array(stellarObjects.map((star) => star.transform.getAbsolutePosition())));
+        this.setInt("nbStars", stellarObjects.length);
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
     }

@@ -1,5 +1,6 @@
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { UberCamera } from "./uberCamera";
-import { Scene, Vector3 } from "@babylonjs/core";
+import { Scene } from "@babylonjs/core/scene";
 
 export class UberOrbitCamera extends UberCamera {
     private cameraTarget: Vector3;

@@ -1,20 +1,3 @@
-import {
-    ActionManager,
-    Animation,
-    Color3,
-    Color4,
-    DefaultRenderingPipeline,
-    Engine,
-    ExecuteCodeAction,
-    InstancedMesh,
-    Mesh,
-    MeshBuilder,
-    Scene,
-    ScenePerformancePriority,
-    StandardMaterial,
-    Texture,
-    Vector3
-} from "@babylonjs/core";
 import { PlayerController } from "../controllers/playerController";
 import { Keyboard } from "../inputs/keyboard";
 
@@ -28,6 +11,21 @@ import { BlackHoleDescriptor } from "../descriptors/stellarObjects/blackHoleDesc
 import { StarMapUI } from "./starMapUI";
 import { getStellarTypeString } from "../descriptors/stellarObjects/common";
 import { BODY_TYPE } from "../descriptors/common";
+import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { ActionManager } from "@babylonjs/core/Actions/actionManager";
+import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
+import { Animation } from "@babylonjs/core/Animations/animation";
+import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
+import "@babylonjs/core/Animations/animatable";
+import '@babylonjs/core/Culling/ray';
 
 export class StarMap {
     readonly scene: Scene;
@@ -256,7 +254,7 @@ export class StarMap {
             star.actionManager = new ActionManager(this.scene);
 
             star.actionManager.registerAction(
-                new ExecuteCodeAction(ActionManager.OnPickTrigger, (_) => {
+                new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
                     this.starMapUI.attachUIToMesh(star);
                     this.starMapUI.setUIText(
                         "Seed: " +

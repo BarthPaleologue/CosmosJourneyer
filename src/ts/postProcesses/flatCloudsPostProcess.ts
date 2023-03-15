@@ -1,6 +1,8 @@
-import { Color3, Effect, Texture } from "@babylonjs/core";
-
 import normalMap from "../../asset/textures/cloudNormalMap3.jpg";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+
 import { gcd } from "terrain-generation";
 
 import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
@@ -8,9 +10,8 @@ import { UberScene } from "../uberCore/uberScene";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
-import { BlackHole } from "../bodies/stellarObjects/blackHole";
-import { Star } from "../bodies/stellarObjects/star";
 import { BodyPostProcess } from "./bodyPostProcess";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -31,7 +32,7 @@ export interface CloudSettings {
 export class FlatCloudsPostProcess extends BodyPostProcess {
     settings: CloudSettings;
 
-    constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
         const settings: CloudSettings = {
             cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
             specularPower: 2,
@@ -47,7 +48,7 @@ export class FlatCloudsPostProcess extends BodyPostProcess {
 
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(planet),
-            ...getStarsUniforms(stars),
+            ...getStarsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
                 name: "cloudLayerRadius",

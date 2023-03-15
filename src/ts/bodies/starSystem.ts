@@ -1,10 +1,10 @@
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { AbstractBody } from "./abstractBody";
 import { Star } from "./stellarObjects/star";
 import { UberScene } from "../uberCore/uberScene";
 import { Planemo } from "./planemos/planemo";
-import { normalRandom, uniformRandBool } from "extended-random";
+import { normalRandom } from "extended-random";
 import { TelluricPlanemo } from "./planemos/telluricPlanemo";
 import { GasPlanet } from "./planemos/gasPlanet";
 import { clamp } from "terrain-generation";
@@ -14,6 +14,7 @@ import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
 import { isOrbiting } from "../utils/nearestBody";
 import { BODY_TYPE } from "../descriptors/common";
+import { StellarObject } from "./stellarObjects/stellarObject";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -25,7 +26,7 @@ export class StarSystem {
     /**
      * The list of all stellar objects in the system (stars, black holes, pulsars)
      */
-    readonly stellarObjects: (Star | BlackHole)[] = [];
+    readonly stellarObjects: StellarObject[] = [];
 
     /**
      * The list of all planemos in the system (planets and satellites)
@@ -98,27 +99,29 @@ export class StarSystem {
 
     /**
      * Adds a star or a blackhole to the system and returns it
-     * @param star The star added to the system
+     * @param stellarObject The star added to the system
      */
-    public addStellarObject(star: Star | BlackHole): Star | BlackHole {
-        this.bodies.push(star);
-        this.stellarObjects.push(star);
-        return star;
+    public addStellarObject(stellarObject: StellarObject): StellarObject {
+        this.bodies.push(stellarObject);
+        this.stellarObjects.push(stellarObject);
+        return stellarObject;
     }
 
     /**
      * Makes a star and adds it to the system. By default, it will use the next available seed planned by the system descriptor
      * @param seed The seed to use for the star generation (by default, the next available seed planned by the system descriptor)
      */
-    public makeStellarObject(seed = this.descriptor.getStarSeed(this.stellarObjects.length)): Star | BlackHole {
+    public makeStellarObject(seed = this.descriptor.getStarSeed(this.stellarObjects.length)): StellarObject {
         if (this.stellarObjects.length >= this.descriptor.getNbStars())
             console.warn(`You are adding a star 
         to a system that already has ${this.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
 
-        const isStarBlackHole = this.descriptor.getBodyTypeOfStar(this.stellarObjects.length) == BODY_TYPE.BLACK_HOLE;
+        const isStellarObjectBlackHole = this.descriptor.getBodyTypeOfStar(this.stellarObjects.length) == BODY_TYPE.BLACK_HOLE;
 
-        const star = isStarBlackHole ? new BlackHole(`blackHole${this.stellarObjects.length}`, seed, []) : new Star(`star${this.stellarObjects.length}`, this.scene, seed, []);
+        const star = isStellarObjectBlackHole
+            ? new BlackHole(`blackHole${this.stellarObjects.length}`, seed, [])
+            : new Star(`star${this.stellarObjects.length}`, this.scene, seed, []);
 
         //TODO: make this better, make it part of the generation
         star.descriptor.orbitalProperties.periapsis = star.getRadius() * 4;

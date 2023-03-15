@@ -1,5 +1,3 @@
-import { Effect, Vector3 } from "@babylonjs/core";
-
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { UberScene } from "../uberCore/uberScene";
@@ -7,10 +5,12 @@ import { getActiveCameraUniforms, getSamplers, getStarsUniforms } from "./unifor
 import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Settings } from "../settings";
 import { BlackHole } from "../bodies/stellarObjects/blackHole";
-import { Star } from "../bodies/stellarObjects/star";
 import { nearestBody } from "../utils/nearestBody";
 import { AbstractBody } from "../bodies/abstractBody";
 import { Assets } from "../assets";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -22,21 +22,21 @@ export interface StarfieldSettings {
 export class StarfieldPostProcess extends UberPostProcess {
     settings: StarfieldSettings;
 
-    constructor(scene: UberScene, stars: (Star | BlackHole)[], bodies: AbstractBody[]) {
+    constructor(scene: UberScene, stellarObjects: StellarObject[], bodies: AbstractBody[]) {
         const settings: StarfieldSettings = {
             foo: 1
         };
 
         const uniforms: ShaderUniforms = [
             ...getActiveCameraUniforms(scene),
-            ...getStarsUniforms(stars),
+            ...getStarsUniforms(stellarObjects),
             {
                 name: "visibility",
                 type: ShaderDataType.Float,
                 get: () => {
                     //TODO: should be cleaned up
                     let vis = 1.0;
-                    for (const star of stars) {
+                    for (const star of stellarObjects) {
                         if (star instanceof BlackHole) return 1;
                         vis = Math.min(vis, 1.0 - Vector3.Dot(star.transform.getAbsolutePosition().normalizeToNew(), scene.getActiveController().transform.getForwardDirection()));
                     }
@@ -48,7 +48,7 @@ export class StarfieldPostProcess extends UberPostProcess {
                             const height = planet.transform.getAbsolutePosition().length();
                             //FIXME: has to be dynamic
                             const maxHeight = Settings.ATMOSPHERE_HEIGHT;
-                            for (const star of stars) {
+                            for (const star of stellarObjects) {
                                 const sunDir = planet.transform.getAbsolutePosition().subtract(star.transform.getAbsolutePosition()).normalize();
                                 vis2 = Math.min(
                                     vis2,

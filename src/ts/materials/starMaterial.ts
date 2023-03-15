@@ -1,4 +1,3 @@
-import { Effect, Scene, ShaderMaterial } from "@babylonjs/core";
 import { getRgbFromTemperature } from "../utils/specrend";
 
 import starMaterialFragment from "../../shaders/starMaterial/fragment.glsl";
@@ -6,6 +5,9 @@ import starMaterialVertex from "../../shaders/starMaterial/vertex.glsl";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { StarPhysicalProperties } from "../descriptors/common";
 import { StarDescriptor } from "../descriptors/stellarObjects/starDescriptor";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import { Scene } from "@babylonjs/core/scene";
 
 const shaderName = "starMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;

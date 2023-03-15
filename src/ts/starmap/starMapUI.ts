@@ -1,5 +1,8 @@
-import { AbstractMesh } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Button, StackPanel, TextBlock } from "@babylonjs/gui/2D";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
+import { Button } from "@babylonjs/gui/2D/controls/button";
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;

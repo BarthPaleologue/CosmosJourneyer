@@ -1,6 +1,9 @@
-import { DepthRenderer, Engine, Scene, ScenePerformancePriority } from "@babylonjs/core";
+import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { AbstractController } from "./abstractController";
 import { UberCamera } from "./uberCamera";
+import { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 
 export class UberScene extends Scene {
     activeController: AbstractController | null = null;

@@ -1,7 +1,7 @@
 import { EditorPanel } from "../editorPanel";
 import { TelluricPlanemo } from "../../../bodies/planemos/telluricPlanemo";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { Color3 } from "@babylonjs/core";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Slider } from "handle-sliderjs";
 
 export class SurfacePanel extends EditorPanel {

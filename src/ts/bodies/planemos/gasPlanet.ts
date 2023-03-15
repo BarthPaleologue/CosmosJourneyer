@@ -1,14 +1,14 @@
-import { Axis, Mesh, MeshBuilder } from "@babylonjs/core";
-
 import { AbstractController } from "../../uberCore/abstractController";
 import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
 import { PlanetPostProcesses } from "../common";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planemo } from "./planemo";
-import { Star } from "../stellarObjects/star";
-import { BlackHole } from "../stellarObjects/blackHole";
 import { GasPlanetDescriptor } from "../../descriptors/planemos/gasPlanetDescriptor";
+import { StellarObject } from "../stellarObjects/stellarObject";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class GasPlanet extends AbstractBody implements Planemo {
     override readonly postProcesses: PlanetPostProcesses;
@@ -55,7 +55,7 @@ export class GasPlanet extends AbstractBody implements Planemo {
         this.transform.rotate(Axis.X, this.descriptor.physicalProperties.axialTilt);
     }
 
-    updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[], deltaTime: number): void {
-        this.material.update(controller, stars, this.rotationMatrixAroundAxis, deltaTime);
+    updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
+        this.material.update(controller, stellarObjects, this.rotationMatrixAroundAxis, deltaTime);
     }
 }

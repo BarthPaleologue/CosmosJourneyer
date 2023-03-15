@@ -1,5 +1,5 @@
 import { BasicTransform } from "./basicTransform";
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class NewtonianTransform extends BasicTransform {
     speed: Vector3 = Vector3.Zero();

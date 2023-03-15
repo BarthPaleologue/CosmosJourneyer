@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Input } from "../inputs/input";
 import { BasicTransform } from "./transforms/basicTransform";
 import { UberCamera } from "./uberCamera";

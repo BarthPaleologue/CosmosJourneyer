@@ -1,7 +1,8 @@
 import { ChunkTree } from "../../chunks/chunkTree";
 import { Direction } from "../../utils/direction";
 
-import { Axis, Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 import { RigidBody } from "../common";
 import { TransferCollisionData } from "../../chunks/workerDataTypes";
@@ -13,9 +14,8 @@ import { TelluricPlanetPostProcesses } from "../common";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planemo } from "./planemo";
-import { Star } from "../stellarObjects/star";
-import { BlackHole } from "../stellarObjects/blackHole";
 import { TelluricPlanemoDescriptor } from "../../descriptors/planemos/telluricPlanemoDescriptor";
+import { StellarObject } from "../stellarObjects/stellarObject";
 
 export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo {
     override readonly postProcesses: TelluricPlanetPostProcesses;
@@ -107,8 +107,8 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
         for (const side of this.sides) side.reset();
     }
 
-    public updateMaterial(controller: AbstractController, stars: (Star | BlackHole)[], deltaTime: number): void {
-        this.material.update(controller, stars, deltaTime);
+    public updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
+        this.material.update(controller, stellarObjects, deltaTime);
     }
 
     public override getApparentRadius(): number {

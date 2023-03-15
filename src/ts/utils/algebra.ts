@@ -1,4 +1,4 @@
-import { Quaternion, Vector3, Vector4 } from "@babylonjs/core";
+import { Quaternion, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 
 /**
  * Removes the rotation around an axis from the quaternion

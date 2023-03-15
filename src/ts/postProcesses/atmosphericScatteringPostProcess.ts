@@ -1,16 +1,15 @@
-import { Effect } from "@babylonjs/core";
-
 import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
+
+import { Effect } from "@babylonjs/core/Materials/effect";
 import { UberScene } from "../uberCore/uberScene";
 import { Assets } from "../assets";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { centeredRand } from "extended-random";
-import { BlackHole } from "../bodies/stellarObjects/blackHole";
-import { Star } from "../bodies/stellarObjects/star";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { GasPlanet } from "../bodies/planemos/gasPlanet";
 import { BodyPostProcess } from "./bodyPostProcess";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -31,7 +30,7 @@ export interface AtmosphereSettings {
 export class AtmosphericScatteringPostProcess extends BodyPostProcess {
     settings: AtmosphereSettings;
 
-    constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
             falloffFactor: 10,
@@ -47,7 +46,7 @@ export class AtmosphericScatteringPostProcess extends BodyPostProcess {
 
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(planet),
-            ...getStarsUniforms(stars),
+            ...getStarsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
                 name: "atmosphereRadius",

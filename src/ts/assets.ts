@@ -1,5 +1,5 @@
-import { AssetsManager, Color3, Mesh, MeshAssetTask, Scene, StandardMaterial, Texture } from "@babylonjs/core";
 import "@babylonjs/loaders/glTF/2.0";
+import "@babylonjs/core/Loading/loadingScreen";
 
 import rockNormalMap from "../asset/textures/rockn.png";
 import dirtNormalMap from "../asset/textures/dirt/Ground_Dirt_008_normal.jpg";
@@ -19,6 +19,12 @@ import starfield from "../asset/textures/milkyway.jpg";
 //import character from "../asset/man/man.obj";
 import spaceship from "../asset/spaceship/spaceship.glb";
 import { ChunkForge } from "./chunks/chunkForge";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { AssetsManager, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
+import { Scene } from "@babylonjs/core/scene";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export class Assets {
     static IS_READY = false;

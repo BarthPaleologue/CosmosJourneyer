@@ -1,5 +1,3 @@
-import { Color3, Effect } from "@babylonjs/core";
-
 import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
@@ -9,6 +7,8 @@ import { Star } from "../bodies/stellarObjects/star";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { BodyPostProcess } from "./bodyPostProcess";
 import { CloudSettings, FlatCloudsPostProcess } from "./flatCloudsPostProcess";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 const shaderName = "volumetricClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;

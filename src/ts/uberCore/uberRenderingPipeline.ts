@@ -1,4 +1,6 @@
-import { Camera, Engine, PostProcessRenderPipeline } from "@babylonjs/core";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 
 export class UberRenderingPipeline extends PostProcessRenderPipeline {
     constructor(name: string, engine: Engine) {

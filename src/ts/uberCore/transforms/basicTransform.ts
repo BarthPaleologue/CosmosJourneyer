@@ -1,5 +1,7 @@
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { ITransformLike } from "./ITransformLike";
-import { Axis, Quaternion, Space, TransformNode, Vector3 } from "@babylonjs/core";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 /**
  * Very thin wrapper around a BabylonJS TransformNode

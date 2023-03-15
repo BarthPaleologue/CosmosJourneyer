@@ -1,11 +1,14 @@
 import { AbstractBody } from "../abstractBody";
 
-import { Mesh, MeshBuilder, PointLight, Quaternion, Vector3 } from "@babylonjs/core";
 import { StarPostProcesses } from "../common";
 import { StarMaterial } from "../../materials/starMaterial";
 import { UberScene } from "../../uberCore/uberScene";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { StarDescriptor } from "../../descriptors/stellarObjects/starDescriptor";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
     readonly light: PointLight;

@@ -1,4 +1,3 @@
-import { Color3, Effect, MaterialHelper, Matrix, Scene, ShaderMaterial, Vector3 } from "@babylonjs/core";
 import { AbstractController } from "../uberCore/abstractController";
 
 import surfaceMaterialFragment from "../../shaders/gasPlanetMaterial/fragment.glsl";
@@ -6,10 +5,15 @@ import surfaceMaterialVertex from "../../shaders/gasPlanetMaterial/vertex.glsl";
 import { GazColorSettings } from "./colorSettingsInterface";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { flattenVector3Array } from "../utils/algebra";
-import { Star } from "../bodies/stellarObjects/star";
-import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { GasPlanetDescriptor } from "../descriptors/planemos/gasPlanetDescriptor";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
+import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import { Scene } from "@babylonjs/core/scene";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { MaterialHelper } from "@babylonjs/core/Materials/materialHelper";
 
 const shaderName = "gazPlanetMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -98,7 +102,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setFloat("colorSharpness", this.colorSettings.colorSharpness);
     }
 
-    public update(player: AbstractController, stars: (Star | BlackHole)[], rotationMatrixAroundAxis: Matrix, deltaTime: number) {
+    public update(player: AbstractController, stellarObjects: StellarObject[], rotationMatrixAroundAxis: Matrix, deltaTime: number) {
         this.clock += deltaTime;
 
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
@@ -106,8 +110,8 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         this.setVector3("playerPosition", player.transform.getAbsolutePosition());
 
-        this.setArray3("starPositions", flattenVector3Array(stars.map((star) => star.transform.getAbsolutePosition())));
-        this.setInt("nbStars", stars.length);
+        this.setArray3("starPositions", flattenVector3Array(stellarObjects.map((star) => star.transform.getAbsolutePosition())));
+        this.setInt("nbStars", stellarObjects.length);
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
 

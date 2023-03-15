@@ -1,7 +1,7 @@
-import { VertexData } from "@babylonjs/core";
 import { TransferBuildData } from "./workerDataTypes";
 import { ApplyTask, BuildTask, DeleteTask, ReturnedChunkData, TaskType } from "./taskTypes";
 import { WorkerPool } from "./workerPool";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
 export class ChunkForge {
     /**

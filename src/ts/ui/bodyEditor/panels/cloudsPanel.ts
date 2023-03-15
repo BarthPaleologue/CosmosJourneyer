@@ -3,8 +3,8 @@ import { clearAllEventListenersById } from "../../../utils/html";
 import { TelluricPlanemo } from "../../../bodies/planemos/telluricPlanemo";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 import { Settings } from "../../../settings";
-import { Color3 } from "@babylonjs/core";
 import { Slider } from "handle-sliderjs";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export class CloudsPanel extends EditorPanel {
     constructor() {

@@ -1,14 +1,13 @@
-import { Effect } from "@babylonjs/core";
+import { Effect } from "@babylonjs/core/Materials/effect";
 
 import oceanFragment from "../../shaders/oceanFragment.glsl";
 import { Assets } from "../assets";
 import { UberScene } from "../uberCore/uberScene";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
-import { Star } from "../bodies/stellarObjects/star";
-import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { BodyPostProcess } from "./bodyPostProcess";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -25,7 +24,7 @@ export interface OceanSettings {
 export class OceanPostProcess extends BodyPostProcess {
     settings: OceanSettings;
 
-    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: StellarObject[]) {
         const settings: OceanSettings = {
             oceanRadius: planet.getApparentRadius(),
             depthModifier: 0.001,

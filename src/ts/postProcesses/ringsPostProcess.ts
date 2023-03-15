@@ -1,14 +1,12 @@
-import { Effect } from "@babylonjs/core";
-
 import ringsFragment from "../../shaders/ringsFragment.glsl";
 import { AbstractBody } from "../bodies/abstractBody";
 import { UberScene } from "../uberCore/uberScene";
 import { ShaderDataType, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
 import { randRange } from "extended-random";
-import { BlackHole } from "../bodies/stellarObjects/blackHole";
-import { Star } from "../bodies/stellarObjects/star";
 import { BodyPostProcess } from "./bodyPostProcess";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
+import { Effect } from "@babylonjs/core/Materials/effect";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -23,7 +21,7 @@ interface RingsSettings {
 export class RingsPostProcess extends BodyPostProcess {
     settings: RingsSettings;
 
-    constructor(body: AbstractBody, scene: UberScene, stars: (Star | BlackHole)[]) {
+    constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
         const settings: RingsSettings = {
             ringStart: randRange(1.8, 2.2, body.descriptor.rng, 1400),
             ringEnd: randRange(2.1, 2.9, body.descriptor.rng, 1410),
@@ -32,7 +30,7 @@ export class RingsPostProcess extends BodyPostProcess {
         };
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(body),
-            ...getStarsUniforms(stars),
+            ...getStarsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
                 name: "ringStart",

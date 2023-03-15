@@ -1,6 +1,5 @@
 import { HelmetOverlay } from "./ui/helmetOverlay";
 import { BodyEditor, EditorVisibility } from "./ui/bodyEditor/bodyEditor";
-import { Color4, Engine, EngineFactory, Tools, WebGPUEngine } from "@babylonjs/core";
 import { Assets } from "./assets";
 import { AbstractController } from "./uberCore/abstractController";
 import { UberScene } from "./uberCore/uberScene";
@@ -10,6 +9,11 @@ import { TelluricPlanemo } from "./bodies/planemos/telluricPlanemo";
 import { Settings } from "./settings";
 import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
 import { isOrbiting } from "./utils/nearestBody";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Tools } from "@babylonjs/core/Misc/tools";
+import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
 
 export class PlanetEngine {
     // UI
@@ -38,7 +42,7 @@ export class PlanetEngine {
         document.addEventListener("keydown", (e) => {
             if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
             if (e.key == "p" && this.engine != null && this.scene != null)
-                Tools.CreateScreenshotUsingRenderTarget(this.engine, this.scene.getActiveController().getActiveCamera(), { precision: 4 });
+                Tools.CreateScreenshotUsingRenderTargetAsync(this.engine, this.scene.getActiveController().getActiveCamera(), { precision: 4 });
             if (e.key == "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
             //if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
             if (e.key == "w" && this.scene != null && this.starSystem != null && isOrbiting(this.scene.getActiveController(), this.starSystem.getNearestBody()))

@@ -1,4 +1,4 @@
-import { Quaternion } from "@babylonjs/core";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 
 export interface IOrbitalProperties {
     /**

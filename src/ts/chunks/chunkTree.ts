@@ -1,5 +1,3 @@
-import { Material, Vector3 } from "@babylonjs/core";
-
 import { PlanetChunk } from "./planetChunk";
 import { Direction } from "../utils/direction";
 import { ChunkForge } from "./chunkForge";
@@ -12,6 +10,8 @@ import { TerrainSettings } from "../terrain/terrainSettings";
 import { UberScene } from "../uberCore/uberScene";
 import { Assets } from "../assets";
 import { TelluricPlanemoDescriptor } from "../descriptors/planemos/telluricPlanemoDescriptor";
+import { Material } from "@babylonjs/core/Materials/material";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 /**
  * A quadTree is defined recursively

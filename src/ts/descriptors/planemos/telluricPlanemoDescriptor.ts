@@ -7,7 +7,7 @@ import { clamp } from "terrain-generation";
 import { SolidPhysicalProperties } from "../common";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../../orbits/kepler";
-import { Quaternion } from "@babylonjs/core";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 
 enum GENERATION_STEPS {
     AXIAL_TILT = 100,

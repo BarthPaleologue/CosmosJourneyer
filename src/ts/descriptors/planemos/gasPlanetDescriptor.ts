@@ -4,7 +4,7 @@ import { Settings } from "../../settings";
 import { BODY_TYPE, BodyDescriptor, PlanemoDescriptor } from "../common";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../../orbits/kepler";
-import { Quaternion } from "@babylonjs/core";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { PlanetPhysicalProperties } from "../common";
 
 enum GENERATION_STEPS {

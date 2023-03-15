@@ -1,6 +1,10 @@
-import { Color3, Effect, Matrix, PostProcess, Quaternion, Texture, Vector3, Vector4 } from "@babylonjs/core";
+import { Matrix, Quaternion, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 import { flattenVector3Array, flattenVector4Array } from "../../utils/algebra";
 import { UberScene } from "../uberScene";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Effect } from "@babylonjs/core/Materials/effect";
 
 export enum ShaderDataType {
     Auto,

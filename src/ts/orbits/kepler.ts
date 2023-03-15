@@ -1,10 +1,11 @@
 // from https://www.youtube.com/watch?v=UXD97l7ZT0w
 
-import { Axis, Quaternion, Vector3 } from "@babylonjs/core";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { IOrbitalBody } from "./iOrbitalBody";
 import { IOrbitalProperties } from "./iOrbitalProperties";
 import { stripAxisFromQuaternion } from "../utils/algebra";
 import { BodyDescriptor } from "../descriptors/common";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 /**
  * Returns 0 when the arguments are solution to the Kepler's equation

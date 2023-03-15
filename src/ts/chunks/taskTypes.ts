@@ -1,7 +1,8 @@
 import { Direction } from "../utils/direction";
-import { Vector3, VertexData } from "@babylonjs/core";
 import { PlanetChunk } from "./planetChunk";
 import { TerrainSettings } from "../terrain/terrainSettings";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
 export enum TaskType {
     Deletion,

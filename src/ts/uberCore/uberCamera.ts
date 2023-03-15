@@ -1,4 +1,6 @@
-import { FreeCamera, Matrix, Scene, Vector3 } from "@babylonjs/core";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core/scene";
 
 export class UberCamera extends FreeCamera {
     private inverseProjectionMatrix: Matrix;

@@ -2,7 +2,7 @@ import { AbstractBody } from "../abstractBody";
 import { BlackHolePostProcesses } from "../common";
 import { BlackHoleDescriptor } from "../../descriptors/stellarObjects/blackHoleDescriptor";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
-import { Axis } from "@babylonjs/core";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export class BlackHole extends AbstractBody {
     readonly orbitalProperties: IOrbitalProperties;

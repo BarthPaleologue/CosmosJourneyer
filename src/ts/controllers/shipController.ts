@@ -1,12 +1,13 @@
 import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
 import { Input, InputType } from "../inputs/input";
-import { Scene, Vector3 } from "@babylonjs/core";
 import { UberCamera } from "../uberCore/uberCamera";
 import { AbstractController } from "../uberCore/abstractController";
 import { Assets } from "../assets";
 import { Keyboard } from "../inputs/keyboard";
 import { UberOrbitCamera } from "../uberCore/uberOrbitCamera";
 import { Mouse } from "../inputs/mouse";
+import { Scene } from "@babylonjs/core/scene";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class ShipController extends AbstractController {
     readonly transform: NewtonianTransform;

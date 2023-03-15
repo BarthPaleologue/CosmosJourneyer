@@ -1,7 +1,5 @@
 import "../styles/index.scss";
 
-import { Color3, Quaternion } from "@babylonjs/core";
-
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
 import { Gamepad } from "./inputs/gamepad";
@@ -13,6 +11,8 @@ import { Assets } from "./assets";
 import { PlayerController } from "./controllers/playerController";
 import { positionNearBody } from "./utils/positionNearBody";
 import { PlanetEngine } from "./planetEngine";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 const engine = new PlanetEngine();
 

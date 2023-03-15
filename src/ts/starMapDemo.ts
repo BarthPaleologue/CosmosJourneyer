@@ -1,5 +1,3 @@
-import { Tools } from "@babylonjs/core";
-
 import { Mouse } from "./inputs/mouse";
 
 import "../styles/index.scss";
@@ -7,6 +5,7 @@ import "../styles/index.scss";
 import { initEngineScene } from "./utils/init";
 import { Assets } from "./assets";
 import { StarMap } from "./starmap/starMap";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -21,7 +20,7 @@ Assets.Init(starMap.scene).then(() => {
     starMap.controller.inputs.push(mouse);
 
     document.addEventListener("keydown", (e) => {
-        if (e.key == "p") Tools.CreateScreenshotUsingRenderTarget(engine, starMap.controller.getActiveCamera(), { precision: 4 });
+        if (e.key == "p") Tools.CreateScreenshotUsingRenderTargetAsync(engine, starMap.controller.getActiveCamera(), { precision: 4 });
         if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
     });
 

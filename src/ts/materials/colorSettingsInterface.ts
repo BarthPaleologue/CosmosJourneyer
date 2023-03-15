@@ -1,4 +1,4 @@
-import { Color3 } from "@babylonjs/core";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export enum ColorMode {
     DEFAULT,
