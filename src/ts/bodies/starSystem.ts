@@ -120,7 +120,7 @@ export class StarSystem {
         const isStellarObjectBlackHole = this.descriptor.getBodyTypeOfStar(this.stellarObjects.length) == BODY_TYPE.BLACK_HOLE;
 
         const star = isStellarObjectBlackHole
-            ? new BlackHole(`blackHole${this.stellarObjects.length}`, seed, [])
+            ? new BlackHole(`blackHole${this.stellarObjects.length}`, seed, [], this.scene)
             : new Star(`star${this.stellarObjects.length}`, this.scene, seed, []);
 
         //TODO: make this better, make it part of the generation
@@ -140,7 +140,7 @@ export class StarSystem {
             console.warn(`You are adding a black hole
         to a system that already has ${this.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
-        const blackHole = new BlackHole(`blackHole${this.stellarObjects.length}`, seed, this.stellarObjects);
+        const blackHole = new BlackHole(`blackHole${this.stellarObjects.length}`, seed, this.stellarObjects, this.scene);
 
         this.addStellarObject(blackHole);
         return blackHole;

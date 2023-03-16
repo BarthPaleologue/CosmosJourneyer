@@ -9,6 +9,7 @@ import { Settings } from "./settings";
 import { ShipController } from "./controllers/shipController";
 import { positionNearBody } from "./utils/positionNearBody";
 import { PlanetEngine } from "./planetEngine";
+import { BODY_TYPE } from "./descriptors/common";
 
 const engine = new PlanetEngine();
 
@@ -24,12 +25,14 @@ spaceshipController.inputs.push(new Keyboard(), mouse, new Gamepad());
 
 scene.setActiveController(spaceshipController);
 
-const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
-const starSystem = new StarSystem(starSystemSeed, scene);
+//check if url contains a seed
+const urlParams = new URLSearchParams(window.location.search);
+const seed = urlParams.get("seed");
+
+const starSystem = new StarSystem(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0) * Number.MAX_SAFE_INTEGER, scene);
 engine.setStarSystem(starSystem);
 
-starSystem.makeStellarObjects(1);
-const planet = starSystem.makeTelluricPlanet();
+starSystem.generate();
 
 document.addEventListener("keydown", (e) => {
     if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
@@ -38,4 +41,5 @@ document.addEventListener("keydown", (e) => {
 
 engine.init();
 
-positionNearBody(spaceshipController, planet, starSystem);
+const nbRadius = starSystem.descriptor.getBodyTypeOfStar(0) == BODY_TYPE.BLACK_HOLE ? 8 : 2;
+positionNearBody(spaceshipController, starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);

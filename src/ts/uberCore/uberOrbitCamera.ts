@@ -15,6 +15,10 @@ export class UberOrbitCamera extends UberCamera {
         this.phi = phi;
         this.theta = theta;
 
+        window.addEventListener("wheel", (e) => {
+            this.increaseRadius(e.deltaY * Math.log(this.radius) * 0.01);
+        });
+
         this.updatePosition();
     }
 
@@ -25,6 +29,11 @@ export class UberOrbitCamera extends UberCamera {
 
     public rotatePhi(deltaPhi: number) {
         this.phi += deltaPhi;
+        this.updatePosition();
+    }
+
+    public increaseRadius(deltaRadius: number) {
+        this.radius = Math.min(Math.max(this.radius + deltaRadius, 10), 1000);
         this.updatePosition();
     }
 
