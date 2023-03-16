@@ -1,5 +1,5 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { BodyDescriptor, BODY_TYPE, StellarObjectDescriptor } from "../common";
+import { BodyDescriptor, BODY_TYPE, StellarObjectDescriptor, BlackHolePhysicalProperties } from "../common";
 import { getOrbitalPeriod } from "../../orbits/kepler";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
@@ -22,7 +22,7 @@ export class BlackHoleDescriptor implements StellarObjectDescriptor {
 
     readonly orbitalProperties: IOrbitalProperties;
 
-    readonly physicalProperties: PhysicalProperties;
+    readonly physicalProperties: BlackHolePhysicalProperties;
 
     readonly parentBodies: BodyDescriptor[] = [];
 
@@ -48,7 +48,8 @@ export class BlackHoleDescriptor implements StellarObjectDescriptor {
         this.physicalProperties = {
             mass: 10,
             rotationPeriod: 24 * 60 * 60,
-            axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT)
+            axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
+            accretionDiskRadius: 8000e3
         };
     }
 

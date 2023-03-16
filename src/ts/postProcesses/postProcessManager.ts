@@ -235,6 +235,11 @@ export class PostProcessManager {
         this.blackHoles.push(new BlackHolePostProcess(blackHole.name, blackHole, this.scene));
     }
 
+    public getBlackHole(blackHole: BlackHole): BlackHolePostProcess {
+        for (const bh of this.blackHoles) if (bh.body === blackHole) return bh;
+        throw new Error("No black hole found for: " + blackHole.name);
+    }
+
     /**
      * Adds all post processes for the given body.
      * @param body A body

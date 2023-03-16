@@ -18,6 +18,10 @@ export type StarPhysicalProperties = PhysicalProperties & {
     temperature: number;
 };
 
+export type BlackHolePhysicalProperties = PhysicalProperties & {
+    accretionDiskRadius: number;
+};
+
 export type PlanetPhysicalProperties = PhysicalProperties & {
     minTemperature: number;
     maxTemperature: number;

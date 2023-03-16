@@ -19,6 +19,8 @@ import { OceanPanel } from "./panels/oceanPanel";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
 import { UberScene } from "../../uberCore/uberScene";
 import { BODY_TYPE } from "../../descriptors/common";
+import { BlackHole } from "../../bodies/stellarObjects/blackHole";
+import { BlackholePanel } from "./panels/blackholePanel";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -45,6 +47,7 @@ export class BodyEditor {
     private readonly atmospherePanel: EditorPanel;
     private readonly ringsPanel: EditorPanel;
     private readonly starPanel: EditorPanel;
+    private readonly blackHolePanel: EditorPanel;
     private readonly panels: EditorPanel[];
 
     constructor(visibility: EditorVisibility = EditorVisibility.FULL) {
@@ -60,6 +63,7 @@ export class BodyEditor {
         this.atmospherePanel = new AtmospherePanel();
         this.ringsPanel = new RingsPanel();
         this.starPanel = new StarPanel();
+        this.blackHolePanel = new BlackholePanel();
         this.panels = [
             this.generalPanel,
             this.physicPanel,
@@ -69,7 +73,8 @@ export class BodyEditor {
             this.gazCloudsPanel,
             this.atmospherePanel,
             this.ringsPanel,
-            this.starPanel
+            this.starPanel,
+            this.blackHolePanel
         ];
 
         this.setVisibility(visibility);
@@ -149,6 +154,8 @@ export class BodyEditor {
             case BODY_TYPE.GAS:
                 this.setGazPlanet(body as GasPlanet, postProcessManager, scene);
                 break;
+            case BODY_TYPE.BLACK_HOLE:
+                this.setBlackHole(body as BlackHole, postProcessManager, scene);
             default:
         }
         this.generalPanel.init(body, postProcessManager, scene);
@@ -174,12 +181,19 @@ export class BodyEditor {
         this.starPanel.init(star, postProcesManager, scene);
     }
 
+    public setBlackHole(blackHole: BlackHole, postProcessManager: PostProcessManager, scene: UberScene) {
+        this.blackHolePanel.init(blackHole, postProcessManager, scene);
+    }
+
     public initNavBar(body: AbstractBody): void {
         for (const panel of this.panels) panel.disable();
 
         switch (body.descriptor.bodyType) {
             case BODY_TYPE.STAR:
                 this.starPanel.enable();
+                break;
+            case BODY_TYPE.BLACK_HOLE:
+                this.blackHolePanel.enable();
                 break;
             case BODY_TYPE.TELLURIC:
                 this.physicPanel.enable();
