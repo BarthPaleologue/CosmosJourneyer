@@ -6,6 +6,7 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
+import { Light } from "@babylonjs/core/Lights/light";
 
 export class BlackHole extends AbstractBody {
     readonly orbitalProperties: IOrbitalProperties;
@@ -24,6 +25,7 @@ export class BlackHole extends AbstractBody {
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.descriptor.physicalProperties.temperature).asArray());
+        this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.transform.node;
         if (this.descriptor.physicalProperties.accretionDiskRadius == 0) this.light.intensity = 0;
 

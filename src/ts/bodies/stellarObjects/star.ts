@@ -9,6 +9,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Light } from "@babylonjs/core/Lights/light";
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
     readonly light: PointLight;
@@ -45,6 +46,7 @@ export class Star extends AbstractBody {
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
         this.light.diffuse.fromArray(getRgbFromTemperature(this.descriptor.physicalProperties.temperature).asArray());
+        this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.transform.node;
 
         this.material = new StarMaterial(this.transform, this.descriptor, scene);

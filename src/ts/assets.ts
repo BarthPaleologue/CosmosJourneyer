@@ -25,6 +25,8 @@ import { AssetsManager, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager
 import { Scene } from "@babylonjs/core/scene";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { PBRBaseMaterial } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 
 export class Assets {
     static IS_READY = false;
@@ -84,17 +86,12 @@ export class Assets {
 
             const spaceshipTask = Assets.manager.addMeshTask("spaceshipTask", "", "", spaceship);
             spaceshipTask.onSuccess = function (task: MeshAssetTask) {
-                const meshes: Mesh[] = [];
-                for (const mesh of task.loadedMeshes) {
-                    if (mesh.hasBoundingInfo) meshes.push(mesh as Mesh);
-                }
-                Assets.Spaceship = Mesh.MergeMeshes(meshes, true, true, undefined, false, true) as Mesh;
+                Assets.Spaceship = task.loadedMeshes[1] as Mesh;
                 Assets.Spaceship.isVisible = false;
-                Assets.Spaceship.flipFaces(false);
-                const spaceshipMat = new StandardMaterial("spaceshipMat", scene);
-                spaceshipMat.diffuseColor = new Color3(0.5, 0.5, 0.5);
-                spaceshipMat.useLogarithmicDepth = true;
-                Assets.Spaceship.material = spaceshipMat;
+
+                const pbr = Assets.Spaceship.material as PBRBaseMaterial;
+                pbr.useLogarithmicDepth = true;
+
                 console.log("Spaceship loaded");
             };
 
@@ -109,6 +106,17 @@ export class Assets {
                 resolve();
             };
         });
+    }
+
+    static CreateSpaceShipInstance(): InstancedMesh {
+        const spaceshipInstance = Assets.Spaceship.createInstance("spaceship");
+        const root = Assets.Spaceship.parent;
+        // make copy of root node using JS 
+        if (!root) throw new Error("Spaceship has no parent!");
+
+        spaceshipInstance.parent = root;
+
+        return spaceshipInstance;
     }
 
     static DebugMaterial(name: string) {
