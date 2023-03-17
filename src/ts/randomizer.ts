@@ -22,8 +22,9 @@ const mouse = new Mouse(engine.canvas, 1e5);
 const player = new PlayerController(scene);
 player.speed = 0.2 * Settings.EARTH_RADIUS;
 player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
-player.inputs.push(new Keyboard(), mouse, new Gamepad());
-
+player.addInput(new Keyboard());
+player.addInput(mouse);
+player.addInput(new Gamepad());
 scene.setActiveController(player);
 
 //check if url contains a seed

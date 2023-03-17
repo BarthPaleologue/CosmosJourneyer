@@ -3,10 +3,23 @@ import { Input, InputType } from "./input";
 export class Keyboard implements Input {
     readonly type = InputType.KEYBOARD;
 
-    private keys: { [key: string]: boolean } = {}; // le dictionnaire stockant l'état du clavier
+    private keysPressed: Map<string, boolean> = new Map();
+
+    private onPressedOnce: Map<string, (() => void)[]> = new Map();
+
     constructor() {
-        window.addEventListener("keypress", (e) => (this.keys[e.key] = true));
-        window.addEventListener("keyup", (e) => (this.keys[e.key] = false));
+        window.addEventListener("keypress", (e) => {
+            this.keysPressed.set(e.key, true);
+
+            if (!e.repeat) {
+                this.onPressedOnce.get(e.key)?.forEach(callback => {
+                    callback();
+                });
+            }
+        });
+        window.addEventListener("keyup", (e) => {
+            this.keysPressed.set(e.key, false);
+        });
     }
 
     getRoll() {
@@ -57,7 +70,7 @@ export class Keyboard implements Input {
      * @returns whether the key is pressed or not
      */
     public isPressed(key: string): boolean {
-        return this.keys[key];
+        return this.keysPressed.get(key) || false;
     }
 
     /**
@@ -67,8 +80,13 @@ export class Keyboard implements Input {
      */
     public isAnyPressed(keys: string[]): boolean {
         for (const key of keys) {
-            if (this.keys[key]) return true;
+            if (this.keysPressed.get(key)) return true;
         }
         return false;
+    }
+
+    public addPressedOnceListener(key: string, callback: () => void) {
+        if (!this.onPressedOnce.has(key)) this.onPressedOnce.set(key, []);
+        this.onPressedOnce.get(key)?.push(callback);
     }
 }

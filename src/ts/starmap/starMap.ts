@@ -74,7 +74,7 @@ export class StarMap {
         this.controller.getActiveCamera().minZ = 0.01;
 
         this.scene.activeCamera = this.controller.getActiveCamera();
-        this.controller.inputs.push(new Keyboard());
+        this.controller.addInput(new Keyboard());
 
         this.starMapUI = new StarMapUI();
 

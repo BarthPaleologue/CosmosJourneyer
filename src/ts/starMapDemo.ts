@@ -17,7 +17,7 @@ const starMap = new StarMap(engine);
 
 Assets.Init(starMap.scene).then(() => {
     const mouse = new Mouse(canvas, 50);
-    starMap.controller.inputs.push(mouse);
+    starMap.controller.addInput(mouse);
 
     document.addEventListener("keydown", (e) => {
         if (e.key == "p") Tools.CreateScreenshotUsingRenderTargetAsync(engine, starMap.controller.getActiveCamera(), { precision: 4 });

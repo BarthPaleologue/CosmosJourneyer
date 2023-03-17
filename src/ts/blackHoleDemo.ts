@@ -18,12 +18,13 @@ const scene = engine.getScene();
 
 const mouse = new Mouse(engine.canvas, 1e5);
 
-const playerController = new PlayerController(scene);
-playerController.speed = 0.2 * Settings.EARTH_RADIUS;
-playerController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
-playerController.inputs.push(new Keyboard(), mouse, new Gamepad());
-
-scene.setActiveController(playerController);
+const player = new PlayerController(scene);
+player.speed = 0.2 * Settings.EARTH_RADIUS;
+player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
+player.addInput(new Keyboard());
+player.addInput(mouse);
+player.addInput(new Gamepad());
+scene.setActiveController(player);
 
 const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
 const starSystem = new StarSystem(starSystemSeed, scene);
@@ -43,4 +44,4 @@ document.addEventListener("keydown", (e) => {
 
 engine.init();
 
-positionNearBody(playerController, BH, starSystem, 20);
+positionNearBody(player, BH, starSystem, 20);

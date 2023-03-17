@@ -11,7 +11,7 @@ export abstract class AbstractController {
     /**
      * The inputs that this controller listens to
      */
-    readonly inputs: Input[] = [];
+    protected readonly inputs: Input[] = [];
 
     protected constructor() {
         this.transform = new BasicTransform("playerTransform");
@@ -36,4 +36,8 @@ export abstract class AbstractController {
      * @param deltaTime the time between 2 frames
      */
     abstract update(deltaTime: number): Vector3;
+
+    public addInput(input: Input) {
+        this.inputs.push(input);
+    }
 }

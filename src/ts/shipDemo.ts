@@ -21,7 +21,9 @@ const mouse = new Mouse(engine.canvas, 1e5);
 
 const spaceshipController = new ShipController(scene);
 spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
-spaceshipController.inputs.push(new Keyboard(), mouse, new Gamepad());
+spaceshipController.addInput(new Keyboard());
+spaceshipController.addInput(mouse);
+spaceshipController.addInput(new Gamepad());
 
 scene.setActiveController(spaceshipController);
 
@@ -36,7 +38,6 @@ starSystem.generate();
 
 document.addEventListener("keydown", (e) => {
     if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
-    if (e.key == "f") spaceshipController.flightAssistEnabled = !spaceshipController.flightAssistEnabled;
 });
 
 engine.init();

@@ -23,8 +23,8 @@ export class ShipController extends AbstractController {
     readonly thirdPersonCamera: UberOrbitCamera;
     readonly firstPersonCamera: UberCamera;
 
-    flightAssistEnabled = true;
-    isHyperAccelerated = false;
+    private flightAssistEnabled = true;
+    private isHyperAccelerated = false;
 
     constructor(scene: Scene) {
         super();
@@ -41,6 +41,19 @@ export class ShipController extends AbstractController {
         spaceship.parent = this.transform.node;
     }
 
+    public override addInput(input: Input): void {
+        super.addInput(input);
+        if (input.type == InputType.KEYBOARD) {
+            const keyboard = input as Keyboard;
+            keyboard.addPressedOnceListener("f", () => {
+                this.flightAssistEnabled = !this.flightAssistEnabled;
+            });
+            keyboard.addPressedOnceListener("h", () => {
+                this.isHyperAccelerated = !this.isHyperAccelerated;
+            });
+        }
+    }
+
     getActiveCamera(): UberCamera {
         return this.thirdPersonCamera;
     }
@@ -52,9 +65,6 @@ export class ShipController extends AbstractController {
             if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-0.8 * deltaTime);
             if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
             if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
-
-            if (keyboard.isPressed("h")) this.isHyperAccelerated = !this.isHyperAccelerated;
-            if (keyboard.isPressed("f")) this.flightAssistEnabled = !this.flightAssistEnabled;
         }
         if (input.type == InputType.MOUSE) {
             const mouse = input as Mouse;
@@ -91,9 +101,11 @@ export class ShipController extends AbstractController {
         this.transform.acceleration.copyFromFloats(0, 0, 0);
         for (const input of this.inputs) this.listenTo(input, deltaTime);
         const displacement = this.transform.update(deltaTime).negate();
+
         if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() == 0) {
             this.transform.rotationSpeed.scaleInPlace(0.9);
         }
+
         this.transform.translate(displacement);
         return displacement;
     }
