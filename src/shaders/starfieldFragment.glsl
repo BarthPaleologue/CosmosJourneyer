@@ -47,7 +47,7 @@ void main() {
         // get the starfield color
         vec4 starfieldColor = texture2D(starfieldTexture, starfieldUV);
 
-        finalColor = vec4(starfieldColor.rgb * visibility, starfieldColor.a);
+        finalColor = screenColor;//vec4(starfieldColor.rgb * visibility, starfieldColor.a);
     }
 
     gl_FragColor = finalColor; // displaying the final color

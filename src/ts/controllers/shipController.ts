@@ -8,6 +8,19 @@ import { UberOrbitCamera } from "../uberCore/uberOrbitCamera";
 import { Mouse } from "../inputs/mouse";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
+import { DirectionnalParticleSystem } from "../utils/particleSystem";
+
+class Thruster {
+    readonly plume: DirectionnalParticleSystem;
+    readonly mesh: AbstractMesh;
+
+    constructor(mesh: AbstractMesh) {
+        this.mesh = mesh;
+        this.plume = new DirectionnalParticleSystem(mesh, new Vector3(1, 0, 0));
+    }
+}
 
 export class ShipController extends AbstractController {
     readonly transform: NewtonianTransform;
@@ -26,6 +39,8 @@ export class ShipController extends AbstractController {
     private flightAssistEnabled = true;
     private isHyperAccelerated = false;
 
+    private readonly thrusters: Thruster[] = [];
+
     constructor(scene: Scene) {
         super();
 
@@ -39,6 +54,13 @@ export class ShipController extends AbstractController {
 
         const spaceship = Assets.CreateSpaceShipInstance();
         spaceship.parent = this.transform.node;
+
+        spaceship.getChildMeshes().forEach((child) => {
+            if (child.name.includes("thruster")) {
+                console.log("Found thruster");
+                this.addThruster(child);
+            }
+        });
     }
 
     public override addInput(input: Input): void {
@@ -52,6 +74,10 @@ export class ShipController extends AbstractController {
                 this.isHyperAccelerated = !this.isHyperAccelerated;
             });
         }
+    }
+
+    private addThruster(mesh: AbstractMesh) {
+        this.thrusters.push(new Thruster(mesh));
     }
 
     getActiveCamera(): UberCamera {
@@ -96,11 +122,16 @@ export class ShipController extends AbstractController {
     }
 
     update(deltaTime: number): Vector3 {
-        //this.thirdPersonCamera.rotatePhi(0.02);
         this.transform.rotationAcceleration.copyFromFloats(0, 0, 0);
         this.transform.acceleration.copyFromFloats(0, 0, 0);
         for (const input of this.inputs) this.listenTo(input, deltaTime);
         const displacement = this.transform.update(deltaTime).negate();
+
+        this.thrusters.forEach((thruster) => {
+            thruster.plume.emitRate = this.transform.acceleration.length();
+            thruster.plume.setDirection(this.transform.getForwardDirection().negate());
+            thruster.plume.applyAcceleration(this.transform.acceleration);
+        });
 
         if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() == 0) {
             this.transform.rotationSpeed.scaleInPlace(0.9);

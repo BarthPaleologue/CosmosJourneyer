@@ -27,6 +27,8 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PBRBaseMaterial } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class Assets {
     static IS_READY = false;
@@ -89,6 +91,21 @@ export class Assets {
                 Assets.Spaceship = task.loadedMeshes[1] as Mesh;
                 Assets.Spaceship.isVisible = false;
 
+                const thrusterHelper = MeshBuilder.CreateBox("thruster1", { size: 0.5 }, scene);
+                const cubeMaterial = new StandardMaterial("cubeMat", scene);
+                cubeMaterial.diffuseColor = Color3.White();
+                cubeMaterial.emissiveColor = Color3.White();
+                cubeMaterial.useLogarithmicDepth = true;
+                thrusterHelper.material = cubeMaterial;
+                thrusterHelper.isVisible = false;
+                thrusterHelper.position = new Vector3(4, 0, 0.5);
+
+                const thrusterHelper2 = thrusterHelper.clone("thruster2");
+                thrusterHelper2.position = new Vector3(4, 0, -0.5);
+
+                thrusterHelper.parent = Assets.Spaceship;
+                thrusterHelper2.parent = Assets.Spaceship;
+
                 const pbr = Assets.Spaceship.material as PBRBaseMaterial;
                 pbr.useLogarithmicDepth = true;
 
@@ -109,12 +126,12 @@ export class Assets {
     }
 
     static CreateSpaceShipInstance(): InstancedMesh {
-        const spaceshipInstance = Assets.Spaceship.createInstance("spaceship");
+        const spaceshipInstance = Assets.Spaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
         const root = Assets.Spaceship.parent;
         // make copy of root node using JS 
         if (!root) throw new Error("Spaceship has no parent!");
 
-        spaceshipInstance.parent = root;
+        spaceshipInstance.setParent(root);
 
         return spaceshipInstance;
     }
