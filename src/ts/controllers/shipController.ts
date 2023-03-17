@@ -128,9 +128,9 @@ export class ShipController extends AbstractController {
         const displacement = this.transform.update(deltaTime).negate();
 
         this.thrusters.forEach((thruster) => {
-            thruster.plume.emitRate = this.transform.acceleration.length();
+            thruster.plume.emitRate = this.transform.acceleration.length() * 5;
             thruster.plume.setDirection(this.transform.getForwardDirection().negate());
-            thruster.plume.applyAcceleration(this.transform.acceleration);
+            thruster.plume.applyAcceleration(this.transform.acceleration.negate());
         });
 
         if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() == 0) {
