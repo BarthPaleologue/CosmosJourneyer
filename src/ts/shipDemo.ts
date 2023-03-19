@@ -10,6 +10,7 @@ import { ShipController } from "./spaceship/shipController";
 import { positionNearBody } from "./utils/positionNearBody";
 import { PlanetEngine } from "./planetEngine";
 import { BODY_TYPE } from "./descriptors/common";
+import { EditorVisibility } from "./ui/bodyEditor/bodyEditor";
 
 const engine = new PlanetEngine();
 
@@ -44,3 +45,5 @@ engine.init();
 
 const nbRadius = starSystem.descriptor.getBodyTypeOfStar(0) == BODY_TYPE.BLACK_HOLE ? 8 : 2;
 positionNearBody(spaceshipController, starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);
+
+engine.bodyEditor.setVisibility(EditorVisibility.NAVBAR);

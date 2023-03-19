@@ -91,7 +91,7 @@ export class Assets {
                 Assets.Spaceship = task.loadedMeshes[1] as Mesh;
                 Assets.Spaceship.isVisible = false;
 
-                const thrusterHelper = MeshBuilder.CreateBox("thruster1", { size: 0.5 }, scene);
+                const thrusterHelper = MeshBuilder.CreateCylinder("thruster1", { height: 0.5, diameterTop: 0, diameterBottom: 0.5 }, scene);
                 const cubeMaterial = new StandardMaterial("cubeMat", scene);
                 cubeMaterial.diffuseColor = Color3.White();
                 cubeMaterial.emissiveColor = Color3.White();
@@ -99,6 +99,7 @@ export class Assets {
                 thrusterHelper.material = cubeMaterial;
                 thrusterHelper.isVisible = false;
                 thrusterHelper.position = new Vector3(4, 0, 0.5);
+                thrusterHelper.rotation = new Vector3(0, 0, -Math.PI / 2);
 
                 const thrusterHelper2 = thrusterHelper.clone("thruster2");
                 thrusterHelper2.position = new Vector3(4, 0, -0.5);

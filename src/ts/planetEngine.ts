@@ -19,7 +19,7 @@ import "@babylonjs/core/Misc/screenshotTools";
 export class PlanetEngine {
     // UI
     private readonly helmetOverlay: HelmetOverlay;
-    private readonly bodyEditor: BodyEditor;
+    readonly bodyEditor: BodyEditor;
     readonly canvas: HTMLCanvasElement;
 
     // BabylonJS

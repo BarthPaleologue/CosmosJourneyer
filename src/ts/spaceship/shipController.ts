@@ -9,18 +9,9 @@ import { Mouse } from "../inputs/mouse";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
-import { DirectionnalParticleSystem } from "../utils/particleSystem";
-
-class Thruster {
-    readonly plume: DirectionnalParticleSystem;
-    readonly mesh: AbstractMesh;
-
-    constructor(mesh: AbstractMesh) {
-        this.mesh = mesh;
-        this.plume = new DirectionnalParticleSystem(mesh, new Vector3(1, 0, 0));
-    }
-}
+import { Thruster } from "./thruster";
+import { WarpDrive } from "./warpDrive";
+import { parseSpeed } from "../utils/parseSpeed";
 
 export class ShipController extends AbstractController {
     readonly transform: NewtonianTransform;
@@ -37,9 +28,12 @@ export class ShipController extends AbstractController {
     readonly firstPersonCamera: UberCamera;
 
     private flightAssistEnabled = true;
-    private isHyperAccelerated = false;
+
+    private isWarpDriveEnabled = false;
 
     private readonly thrusters: Thruster[] = [];
+
+    private readonly warpDrive = new WarpDrive();
 
     constructor(scene: Scene) {
         super();
@@ -71,48 +65,79 @@ export class ShipController extends AbstractController {
                 this.flightAssistEnabled = !this.flightAssistEnabled;
             });
             keyboard.addPressedOnceListener("h", () => {
-                this.isHyperAccelerated = !this.isHyperAccelerated;
+                this.isWarpDriveEnabled = !this.isWarpDriveEnabled;
             });
         }
     }
 
     private addThruster(mesh: AbstractMesh) {
-        this.thrusters.push(new Thruster(mesh));
+        this.thrusters.push(new Thruster(mesh, new Vector3(0, 0, 1)));
     }
 
     getActiveCamera(): UberCamera {
         return this.thirdPersonCamera;
     }
 
+    getTotalAuthority(direction: Vector3) {
+        if (this.isWarpDriveEnabled) return 1000000;
+
+        let totalAuthority = 0;
+        for (const thruster of this.thrusters) totalAuthority += thruster.getAuthority(direction);
+        return totalAuthority;
+    }
+
+    getTotalForwardAuthority(): number {
+        return this.getTotalAuthority(this.transform.getForwardDirectionLocal());
+    }
+
+    getTotalBackwardAuthority(): number {
+        return this.getTotalAuthority(this.transform.getBackwardDirectionLocal());
+    }
+
+    getUpwardAuthority(): number {
+        return this.getTotalAuthority(this.transform.getUpwardDirectionLocal());
+    }
+
+    getDownwardAuthority(): number {
+        return this.getTotalAuthority(this.transform.getDownwardDirectionLocal());
+    }
+
     listenTo(input: Input, deltaTime: number): Vector3 {
-        if (input.type == InputType.KEYBOARD) {
-            const keyboard = input as Keyboard;
-            if (keyboard.isPressed("1")) this.thirdPersonCamera.rotatePhi(0.8 * deltaTime);
-            if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-0.8 * deltaTime);
-            if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
-            if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
+        if (this.getActiveCamera() == this.thirdPersonCamera) {
+            if (input.type == InputType.KEYBOARD) {
+                const keyboard = input as Keyboard;
+                if (keyboard.isPressed("1")) this.thirdPersonCamera.rotatePhi(0.8 * deltaTime);
+                if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-0.8 * deltaTime);
+                if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
+                if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
+            } else if (input.type == InputType.MOUSE) {
+                const mouse = input as Mouse;
+                this.thirdPersonCamera.rotatePhi(mouse.getYaw() * deltaTime);
+                this.thirdPersonCamera.rotateTheta(mouse.getPitch() * deltaTime);
+            }
         }
-        if (input.type == InputType.MOUSE) {
-            const mouse = input as Mouse;
-            this.thirdPersonCamera.rotatePhi(mouse.getYaw() * deltaTime);
-            this.thirdPersonCamera.rotateTheta(mouse.getPitch() * deltaTime);
-        }
+
         this.transform.rotationAcceleration.x += this.rollAuthority * input.getRoll() * deltaTime;
         this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
         this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
 
         const forwardAcceleration = this.transform
             .getForwardDirection()
-            .scale(this.forwardAuthority * deltaTime * (this.isHyperAccelerated ? 100 : 1))
-            .scaleInPlace(input.getZAxis());
+            .scale(input.getZAxis() *
+                this.getTotalAuthority(this.transform.getForwardDirectionLocal().scaleInPlace(input.getZAxis()).normalize())
+                * deltaTime);
+
         const verticalAcceleration = this.transform
             .getUpwardDirection()
-            .scale(this.verticalAuthority * deltaTime)
-            .scaleInPlace(input.getYAxis());
+            .scale(input.getYAxis() *
+                this.getTotalAuthority(this.transform.getUpwardDirectionLocal().scaleInPlace(input.getYAxis()).normalize())
+                * deltaTime);
+
         const sideAcceleration = this.transform
             .getRightDirection()
-            .scale(this.sideAuthority * deltaTime)
-            .scaleInPlace(input.getXAxis());
+            .scale(input.getXAxis() *
+                this.getTotalAuthority(this.transform.getRightDirectionLocal().scaleInPlace(input.getXAxis()).normalize())
+                * deltaTime);
 
         this.transform.acceleration.addInPlace(forwardAcceleration);
         this.transform.acceleration.addInPlace(verticalAcceleration);
@@ -128,7 +153,7 @@ export class ShipController extends AbstractController {
         const displacement = this.transform.update(deltaTime).negate();
 
         this.thrusters.forEach((thruster) => {
-            thruster.plume.emitRate = this.transform.acceleration.length() * 5;
+            thruster.plume.emitRate = this.isWarpDriveEnabled ? 0 : this.transform.acceleration.length() * 5;
             thruster.plume.setDirection(this.transform.getForwardDirection().negate());
             thruster.plume.applyAcceleration(this.transform.acceleration.negate());
         });
@@ -136,6 +161,8 @@ export class ShipController extends AbstractController {
         if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() == 0) {
             this.transform.rotationSpeed.scaleInPlace(0.9);
         }
+
+        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${parseSpeed(this.transform.speed.length())}`;
 
         this.transform.translate(displacement);
         return displacement;
