@@ -22,14 +22,8 @@ export class Thruster {
         this.throttle = throttle;
     }
 
-    public increaseThrottle(delta: number): void {
-        console.assert(delta >= 0);
-        this.throttle = Math.min(1, this.throttle + delta);
-    }
-
-    public decreaseThrottle(delta: number): void {
-        console.assert(delta >= 0);
-        this.throttle = Math.max(0, this.throttle - delta);
+    public updateThrottle(delta: number): void {
+        this.throttle = Math.max(Math.min(1, this.throttle + delta), 0);
     }
 
     public getThrottle(): number {
@@ -46,7 +40,7 @@ export class Thruster {
      * @returns 
      */
     public getAuthority(direction: Vector3): number {
-        return Math.max(0, Vector3.Dot(this.direction, direction.negate())) * this.maxAuthority;
+        return Math.max(0, Vector3.Dot(this.direction, direction.negate())) * this.maxAuthority * this.throttle;
     }
 
     public getForwardAuthority(): number {
@@ -66,7 +60,7 @@ export class Thruster {
     }
 
     public update(): void {
-        this.plume.emitRate = this.throttle * 5;
+        this.plume.emitRate = this.throttle * 1000;
         /*this.plume.setDirection(this.transform.getForwardDirection().negate());
         this.plume.applyAcceleration(this.transform.acceleration.negate());*/
     }

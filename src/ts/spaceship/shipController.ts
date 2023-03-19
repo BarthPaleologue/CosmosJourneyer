@@ -65,7 +65,7 @@ export class ShipController extends AbstractController {
                 this.flightAssistEnabled = !this.flightAssistEnabled;
             });
             keyboard.addPressedOnceListener("h", () => {
-                this.isWarpDriveEnabled = !this.isWarpDriveEnabled;
+                this.toggleWarpDrive();
             });
         }
     }
@@ -78,8 +78,13 @@ export class ShipController extends AbstractController {
         return this.thirdPersonCamera;
     }
 
+    public toggleWarpDrive() {
+        this.isWarpDriveEnabled = !this.isWarpDriveEnabled;
+        if (this.isWarpDriveEnabled) for (const thruster of this.thrusters) thruster.setThrottle(0);
+    }
+
     getTotalAuthority(direction: Vector3) {
-        if (this.isWarpDriveEnabled) return 1000000;
+        if (this.isWarpDriveEnabled) return Math.max(Vector3.Dot(this.transform.getForwardDirectionLocal(), direction), 0) * 1000000;
 
         let totalAuthority = 0;
         for (const thruster of this.thrusters) totalAuthority += thruster.getAuthority(direction);
@@ -110,6 +115,7 @@ export class ShipController extends AbstractController {
                 if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-0.8 * deltaTime);
                 if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
                 if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
+
             } else if (input.type == InputType.MOUSE) {
                 const mouse = input as Mouse;
                 this.thirdPersonCamera.rotatePhi(mouse.getYaw() * deltaTime);
@@ -121,27 +127,31 @@ export class ShipController extends AbstractController {
         this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
         this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
 
-        const forwardAcceleration = this.transform
-            .getForwardDirection()
-            .scale(input.getZAxis() *
-                this.getTotalAuthority(this.transform.getForwardDirectionLocal().scaleInPlace(input.getZAxis()).normalize())
-                * deltaTime);
+        if (!this.isWarpDriveEnabled) for (const thruster of this.thrusters) thruster.updateThrottle(0.3 * deltaTime * input.getZAxis());
 
-        const verticalAcceleration = this.transform
-            .getUpwardDirection()
-            .scale(input.getYAxis() *
-                this.getTotalAuthority(this.transform.getUpwardDirectionLocal().scaleInPlace(input.getYAxis()).normalize())
-                * deltaTime);
+        const forwardAcceleration = this.transform.getForwardDirection()
+            .scale(this.getTotalAuthority(this.transform.getForwardDirectionLocal()) * deltaTime);
+        const backwardAcceleration = this.transform.getBackwardDirection()
+            .scale(this.getTotalAuthority(this.transform.getBackwardDirectionLocal()) * deltaTime);
 
-        const sideAcceleration = this.transform
-            .getRightDirection()
-            .scale(input.getXAxis() *
-                this.getTotalAuthority(this.transform.getRightDirectionLocal().scaleInPlace(input.getXAxis()).normalize())
-                * deltaTime);
+        const upwardAcceleration = this.transform.getUpwardDirection()
+            .scale(this.getTotalAuthority(this.transform.getUpwardDirectionLocal()) * deltaTime);
+        const downwardAcceleration = this.transform.getDownwardDirection()
+            .scale(this.getTotalAuthority(this.transform.getDownwardDirectionLocal()) * deltaTime);
+
+        const rightAcceleration = this.transform.getRightDirection()
+            .scale(this.getTotalAuthority(this.transform.getRightDirectionLocal()) * deltaTime);
+        const leftAcceleration = this.transform.getLeftDirection()
+            .scale(this.getTotalAuthority(this.transform.getLeftDirectionLocal()) * deltaTime);
 
         this.transform.acceleration.addInPlace(forwardAcceleration);
-        this.transform.acceleration.addInPlace(verticalAcceleration);
-        this.transform.acceleration.addInPlace(sideAcceleration);
+        this.transform.acceleration.addInPlace(backwardAcceleration);
+
+        this.transform.acceleration.addInPlace(upwardAcceleration);
+        this.transform.acceleration.addInPlace(downwardAcceleration);
+
+        this.transform.acceleration.addInPlace(rightAcceleration);
+        this.transform.acceleration.addInPlace(leftAcceleration);
 
         return Vector3.Zero();
     }
@@ -152,11 +162,11 @@ export class ShipController extends AbstractController {
         for (const input of this.inputs) this.listenTo(input, deltaTime);
         const displacement = this.transform.update(deltaTime).negate();
 
-        this.thrusters.forEach((thruster) => {
-            thruster.plume.emitRate = this.isWarpDriveEnabled ? 0 : this.transform.acceleration.length() * 5;
+        for (const thruster of this.thrusters) {
+            thruster.update();
             thruster.plume.setDirection(this.transform.getForwardDirection().negate());
             thruster.plume.applyAcceleration(this.transform.acceleration.negate());
-        });
+        };
 
         if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() == 0) {
             this.transform.rotationSpeed.scaleInPlace(0.9);
