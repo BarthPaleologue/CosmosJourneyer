@@ -8,7 +8,7 @@ import { StarSystem } from "./bodies/starSystem";
 
 import { Settings } from "./settings";
 import { Assets } from "./assets";
-import { PlayerController } from "./controllers/playerController";
+import { PlayerController } from "./spacelegs/playerController";
 import { positionNearBody } from "./utils/positionNearBody";
 import { PlanetEngine } from "./planetEngine";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";

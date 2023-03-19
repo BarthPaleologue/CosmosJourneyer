@@ -1,4 +1,4 @@
-import { PlayerController } from "../controllers/playerController";
+import { PlayerController } from "../spacelegs/playerController";
 import { Keyboard } from "../inputs/keyboard";
 
 import starTexture from "../../asset/textures/starParticle.png";

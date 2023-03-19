@@ -6,7 +6,7 @@ import { StarSystem } from "./bodies/starSystem";
 
 import { randRange } from "extended-random";
 import { Settings } from "./settings";
-import { PlayerController } from "./controllers/playerController";
+import { PlayerController } from "./spacelegs/playerController";
 import { positionNearBody } from "./utils/positionNearBody";
 import { PlanetEngine } from "./planetEngine";
 

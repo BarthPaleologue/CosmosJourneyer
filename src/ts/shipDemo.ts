@@ -6,7 +6,7 @@ import { StarSystem } from "./bodies/starSystem";
 
 import { randRange } from "extended-random";
 import { Settings } from "./settings";
-import { ShipController } from "./controllers/shipController";
+import { ShipController } from "./spaceship/shipController";
 import { positionNearBody } from "./utils/positionNearBody";
 import { PlanetEngine } from "./planetEngine";
 import { BODY_TYPE } from "./descriptors/common";
