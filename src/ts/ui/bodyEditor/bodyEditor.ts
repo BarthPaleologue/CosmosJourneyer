@@ -156,6 +156,7 @@ export class BodyEditor {
                 break;
             case BODY_TYPE.BLACK_HOLE:
                 this.setBlackHole(body as BlackHole, postProcessManager, scene);
+                break;
             default:
         }
         this.generalPanel.init(body, postProcessManager, scene);
