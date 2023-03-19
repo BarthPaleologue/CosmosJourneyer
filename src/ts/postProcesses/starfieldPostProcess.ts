@@ -40,6 +40,7 @@ export class StarfieldPostProcess extends UberPostProcess {
                         if (star instanceof BlackHole) return 1;
                         vis = Math.min(vis, 1.0 - Vector3.Dot(star.transform.getAbsolutePosition().normalizeToNew(), scene.getActiveController().transform.getForwardDirection()));
                     }
+                    vis = 0.5 + vis * 0.5;
                     let vis2 = 1.0;
                     const nearest = nearestBody(scene.getActiveController().transform, bodies);
                     if (nearest instanceof TelluricPlanemo) {
