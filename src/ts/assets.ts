@@ -104,8 +104,13 @@ export class Assets {
                 const thrusterHelper2 = thrusterHelper.clone("thruster2");
                 thrusterHelper2.position = new Vector3(4, 0, -0.5);
 
+                const thrusterHelper3 = thrusterHelper.clone("thruster3");
+                thrusterHelper3.position = new Vector3(0, -1, 0);
+                thrusterHelper3.rotation = new Vector3(0, 0, Math.PI);
+
                 thrusterHelper.parent = Assets.Spaceship;
                 thrusterHelper2.parent = Assets.Spaceship;
+                thrusterHelper3.parent = Assets.Spaceship;
 
                 const pbr = Assets.Spaceship.material as PBRBaseMaterial;
                 pbr.useLogarithmicDepth = true;

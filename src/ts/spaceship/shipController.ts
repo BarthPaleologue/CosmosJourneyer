@@ -20,10 +20,6 @@ export class ShipController extends AbstractController {
     readonly pitchAuthority = 1;
     readonly yawAuthority = 1;
 
-    readonly forwardAuthority = 10000;
-    readonly verticalAuthority = 10000;
-    readonly sideAuthority = 10000;
-
     readonly thirdPersonCamera: UberOrbitCamera;
     readonly firstPersonCamera: UberCamera;
 
@@ -71,10 +67,11 @@ export class ShipController extends AbstractController {
     }
 
     private addThruster(mesh: AbstractMesh) {
-        this.thrusters.push(new Thruster(mesh, new Vector3(0, 0, 1)));
+        const direction = mesh.getDirection(new Vector3(0, 1, 0));
+        this.thrusters.push(new Thruster(mesh, direction));
     }
 
-    getActiveCamera(): UberCamera {
+    public getActiveCamera(): UberCamera {
         return this.thirdPersonCamera;
     }
 
@@ -83,28 +80,12 @@ export class ShipController extends AbstractController {
         if (this.isWarpDriveEnabled) for (const thruster of this.thrusters) thruster.setThrottle(0);
     }
 
-    getTotalAuthority(direction: Vector3) {
-        if (this.isWarpDriveEnabled) return Math.max(Vector3.Dot(this.transform.getForwardDirectionLocal(), direction), 0) * 1000000;
+    private getTotalAuthority(direction: Vector3) {
+        if (this.isWarpDriveEnabled) return Math.max(Vector3.Dot(this.transform.getForwardDirectionLocal(), direction), 0) * 5000000 * this.warpDrive.getThrottle();
 
         let totalAuthority = 0;
         for (const thruster of this.thrusters) totalAuthority += thruster.getAuthority(direction);
         return totalAuthority;
-    }
-
-    getTotalForwardAuthority(): number {
-        return this.getTotalAuthority(this.transform.getForwardDirectionLocal());
-    }
-
-    getTotalBackwardAuthority(): number {
-        return this.getTotalAuthority(this.transform.getBackwardDirectionLocal());
-    }
-
-    getUpwardAuthority(): number {
-        return this.getTotalAuthority(this.transform.getUpwardDirectionLocal());
-    }
-
-    getDownwardAuthority(): number {
-        return this.getTotalAuthority(this.transform.getDownwardDirectionLocal());
     }
 
     listenTo(input: Input, deltaTime: number): Vector3 {
@@ -127,7 +108,16 @@ export class ShipController extends AbstractController {
         this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
         this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
 
-        if (!this.isWarpDriveEnabled) for (const thruster of this.thrusters) thruster.updateThrottle(0.3 * deltaTime * input.getZAxis());
+        if (!this.isWarpDriveEnabled) for (const thruster of this.thrusters) {
+            thruster.updateThrottle(0.3 * deltaTime * input.getZAxis() * thruster.getForwardAuthority01());
+            thruster.updateThrottle(0.3 * deltaTime * -input.getZAxis() * thruster.getBackwardAuthority01());
+
+            thruster.updateThrottle(0.3 * deltaTime * input.getYAxis() * thruster.getUpwardAuthority01());
+            thruster.updateThrottle(0.3 * deltaTime * -input.getYAxis() * thruster.getDownwardAuthority01());
+
+            thruster.updateThrottle(0.3 * deltaTime * input.getXAxis() * thruster.getLeftAuthority01());
+            thruster.updateThrottle(0.3 * deltaTime * -input.getXAxis() * thruster.getRightAuthority01());
+        }
 
         const forwardAcceleration = this.transform.getForwardDirection()
             .scale(this.getTotalAuthority(this.transform.getForwardDirectionLocal()) * deltaTime);
@@ -164,7 +154,10 @@ export class ShipController extends AbstractController {
 
         for (const thruster of this.thrusters) {
             thruster.update();
-            thruster.plume.setDirection(this.transform.getForwardDirection().negate());
+            const direction = thruster.getDirection();
+            const worldMatrix = this.transform.node.getWorldMatrix();
+            const localDirection = Vector3.TransformNormal(direction, worldMatrix);
+            thruster.plume.setDirection(localDirection.negate());
             thruster.plume.applyAcceleration(this.transform.acceleration.negate());
         };
 

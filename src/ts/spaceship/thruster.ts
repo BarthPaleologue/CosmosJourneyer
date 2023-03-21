@@ -2,6 +2,15 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
 
+class LOCAL_DIRECTION {
+    static readonly FORWARD = new Vector3(0, 0, 1);
+    static readonly BACKWARD = new Vector3(0, 0, -1);
+    static readonly UP = new Vector3(0, 1, 0);
+    static readonly DOWN = new Vector3(0, -1, 0);
+    static readonly RIGHT = new Vector3(1, 0, 0);
+    static readonly LEFT = new Vector3(-1, 0, 0);
+}
+
 export class Thruster {
     readonly plume: DirectionnalParticleSystem;
     readonly mesh: AbstractMesh;
@@ -43,20 +52,38 @@ export class Thruster {
         return Math.max(0, Vector3.Dot(this.direction, direction.negate())) * this.maxAuthority * this.throttle;
     }
 
-    public getForwardAuthority(): number {
-        return this.getAuthority(new Vector3(0, 0, -1));
+    /**
+     * Returns the theoretical authority of the thruster in the given direction between 0 and 1 (independent of throttle)
+     * @param direction The direction (in local space)
+     * @returns 
+     */
+    public getAuthority01(direction: Vector3): number {
+        //console.log(this.direction.toString(), direction.toString());
+        return Math.max(0, Vector3.Dot(this.direction, direction.negate()));
     }
 
-    public getBackwardAuthority(): number {
-        return this.getAuthority(new Vector3(0, 0, 1));
+    public getForwardAuthority01(): number {
+        return this.getAuthority01(LOCAL_DIRECTION.FORWARD);
     }
 
-    public getUpwardAuthority(): number {
-        return this.getAuthority(new Vector3(0, 1, 0));
+    public getBackwardAuthority01(): number {
+        return this.getAuthority01(LOCAL_DIRECTION.BACKWARD);
     }
 
-    public getRightAuthority(): number {
-        return this.getAuthority(new Vector3(1, 0, 0));
+    public getUpwardAuthority01(): number {
+        return this.getAuthority01(LOCAL_DIRECTION.UP);
+    }
+
+    public getDownwardAuthority01(): number {
+        return this.getAuthority01(LOCAL_DIRECTION.DOWN);
+    }
+
+    public getRightAuthority01(): number {
+        return this.getAuthority01(LOCAL_DIRECTION.RIGHT);
+    }
+
+    public getLeftAuthority01(): number {
+        return this.getAuthority01(LOCAL_DIRECTION.LEFT);
     }
 
     public update(): void {

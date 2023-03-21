@@ -5,6 +5,7 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
 import { Assets } from "../assets";
+import { Particle } from "@babylonjs/core/Particles/particle";
 
 function randomNumber(min: number, max: number): number {
     return Math.random() * (max - min) + min;
@@ -30,8 +31,8 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.useLogarithmicDepth = true;
         this.emitRate = 100;
         this.blendMode = ParticleSystem.BLENDMODE_ONEONE;
-        this.minLifeTime = 1;
-        this.maxLifeTime = 2;
+        this.minLifeTime = 0.5;
+        this.maxLifeTime = 0.6;
         this.minEmitPower = 11;
         this.maxEmitPower = 12;
         this.updateSpeed = 0.005;
@@ -42,10 +43,10 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.direction2 = direction;
         this.start();
 
-        this.startPositionFunction = (worldMatrix, positionToUpdate, particle, isLocal): void => {
-            var randX = randomNumber(this.minEmitBox.x, this.maxEmitBox.x);
-            var randY = randomNumber(this.minEmitBox.y, this.maxEmitBox.y);
-            var randZ = randomNumber(this.minEmitBox.z, this.maxEmitBox.z);
+        this.startPositionFunction = (worldMatrix, positionToUpdate, particle: Particle, isLocal): void => {
+            const randX = randomNumber(this.minEmitBox.x, this.maxEmitBox.x);
+            const randY = randomNumber(this.minEmitBox.y, this.maxEmitBox.y);
+            const randZ = randomNumber(this.minEmitBox.z, this.maxEmitBox.z);
 
             this.particleVelocities.set(particle.id, this.direction.scale(3));
 

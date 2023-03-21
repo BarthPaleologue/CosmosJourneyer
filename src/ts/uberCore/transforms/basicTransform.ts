@@ -104,7 +104,7 @@ export class BasicTransform implements ITransformLike {
     }
 
     public getForwardDirectionLocal(): Vector3 {
-        return new Vector3(0, 0, -1);
+        return new Vector3(0, 0, 1);
     }
 
     public getBackwardDirectionLocal(): Vector3 {

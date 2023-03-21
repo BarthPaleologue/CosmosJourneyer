@@ -1,3 +1,7 @@
 export class WarpDrive {
-    private throttle = 0;
+    private throttle = 1;
+
+    getThrottle(): number {
+        return this.throttle;
+    }
 }
