@@ -123,6 +123,11 @@ export class PlanetEngine {
         this.starSystem = starSystem;
     }
 
+    public getStarSystem() {
+        if (this.starSystem === null) throw new Error("Star system is null");
+        return this.starSystem;
+    }
+
     public registerUpdateCallback(callback: () => void) {
         this.getScene().registerBeforeRender(callback);
     }

@@ -28,6 +28,13 @@ spaceshipController.addInput(new Gamepad());
 
 scene.setActiveController(spaceshipController);
 
+engine.registerUpdateCallback(() => {
+    const shipPosition = spaceshipController.transform.getAbsolutePosition();
+    const nearestBody = engine.getStarSystem().getNearestBody(shipPosition);
+    const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
+    spaceshipController.registerClosestDistanceToPlanet(distance);
+});
+
 //check if url contains a seed
 const urlParams = new URLSearchParams(window.location.search);
 const seed = urlParams.get("seed");
