@@ -23,7 +23,6 @@ const mouse = new Mouse(engine.canvas, 1e5);
 const spaceshipController = new ShipController(scene);
 spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 spaceshipController.addInput(new Keyboard());
-spaceshipController.addInput(mouse);
 spaceshipController.addInput(new Gamepad());
 
 scene.setActiveController(spaceshipController);
@@ -32,7 +31,8 @@ engine.registerUpdateCallback(() => {
     const shipPosition = spaceshipController.transform.getAbsolutePosition();
     const nearestBody = engine.getStarSystem().getNearestBody(shipPosition);
     const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
-    spaceshipController.registerClosestDistanceToPlanet(distance);
+    const radius = nearestBody.getRadius();
+    spaceshipController.registerClosestDistanceToPlanet(distance - radius);
 });
 
 //check if url contains a seed
@@ -43,10 +43,6 @@ const starSystem = new StarSystem(seed ? Number(seed) : randRange(-1, 1, (step: 
 engine.setStarSystem(starSystem);
 
 starSystem.generate();
-
-document.addEventListener("keydown", (e) => {
-    if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
-});
 
 engine.init();
 

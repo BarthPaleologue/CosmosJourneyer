@@ -110,7 +110,7 @@ export class ShipController extends AbstractController {
     }
 
     private getWarpSpeedTarget() {
-        return this.closestDistanceToPlanet ** 1.1 / 40;
+        return Math.min(this.closestDistanceToPlanet / 10, (this.closestDistanceToPlanet / 2e3) ** 2);
     }
 
     private getTotalAuthority(direction: Vector3) {
