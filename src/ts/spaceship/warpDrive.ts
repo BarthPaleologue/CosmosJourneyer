@@ -65,7 +65,7 @@ export class WarpDrive {
 
         const sign = Math.sign(this.targetSpeed - currentSpeed);
 
-        let deltaThrottle = this.acceleration * deltaTime;
+        const deltaThrottle = this.acceleration * deltaTime;
         this.increaseThrottle(deltaThrottle * sign);
 
         const speed = this.getThrottle() * this.targetSpeed;
