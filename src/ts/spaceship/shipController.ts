@@ -69,7 +69,7 @@ export class ShipController extends AbstractController {
 
     private addThruster(mesh: AbstractMesh) {
         const direction = mesh.getDirection(new Vector3(0, 1, 0));
-        this.thrusters.push(new Thruster(mesh, direction));
+        this.thrusters.push(new Thruster(mesh, direction, this.transform));
     }
 
     public override getActiveCamera(): UberCamera {
@@ -163,14 +163,7 @@ export class ShipController extends AbstractController {
         const currentForwardSpeed = Vector3.Dot(this.transform.speed, this.transform.getForwardDirection());
         this.warpDrive.update(currentForwardSpeed, this.closestDistanceToPlanet, deltaTime);
 
-        for (const thruster of this.thrusters) {
-            thruster.update();
-            const direction = thruster.getDirection();
-            const worldMatrix = this.transform.node.getWorldMatrix();
-            const localDirection = Vector3.TransformNormal(direction, worldMatrix);
-            thruster.plume.setDirection(localDirection.negate());
-            thruster.plume.applyAcceleration(this.transform.acceleration.negate());
-        };
+        for (const thruster of this.thrusters) thruster.update();
 
         if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() == 0) {
             this.transform.rotationSpeed.scaleInPlace(0.9);

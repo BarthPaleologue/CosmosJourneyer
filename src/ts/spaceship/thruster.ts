@@ -1,6 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
+import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
 
 export class Thruster {
     readonly plume: DirectionnalParticleSystem;
@@ -12,10 +13,13 @@ export class Thruster {
 
     private direction: Vector3;
 
-    constructor(mesh: AbstractMesh, direction: Vector3) {
+    private parent: NewtonianTransform;
+
+    constructor(mesh: AbstractMesh, direction: Vector3, parent: NewtonianTransform) {
         this.mesh = mesh;
         this.direction = direction;
         this.plume = new DirectionnalParticleSystem(mesh, this.direction);
+        this.parent = parent;
     }
 
     public setThrottle(throttle: number): void {
@@ -54,7 +58,7 @@ export class Thruster {
 
     public update(): void {
         this.plume.emitRate = this.throttle * 1000;
-        /*this.plume.setDirection(this.transform.getForwardDirection().negate());
-        this.plume.applyAcceleration(this.transform.acceleration.negate());*/
+        this.plume.setDirection(this.parent.getForwardDirection().negate());
+        this.plume.applyAcceleration(this.parent.acceleration.negate());
     }
 }
