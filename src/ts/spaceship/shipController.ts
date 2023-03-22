@@ -10,7 +10,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Thruster } from "./thruster";
-import { WarpDrive } from "./warpDrive";
+import { WARPDRIVE_STATE, WarpDrive } from "./warpDrive";
 import { parseSpeed } from "../utils/parseSpeed";
 
 export class ShipController extends AbstractController {
@@ -25,13 +25,9 @@ export class ShipController extends AbstractController {
 
     private flightAssistEnabled = true;
 
-    private isWarpDriveEnabled = false;
-    private isLeavingWarp = false;
-
     private readonly thrusters: Thruster[] = [];
 
     private readonly warpDrive = new WarpDrive();
-    private warpTargetSpeed = this.getWarpSpeedTarget(); // 2 Mm/s
 
     private closestDistanceToPlanet = Infinity;
 
@@ -75,7 +71,7 @@ export class ShipController extends AbstractController {
         this.thrusters.push(new Thruster(mesh, direction));
     }
 
-    public getActiveCamera(): UberCamera {
+    public override getActiveCamera(): UberCamera {
         return this.thirdPersonCamera;
     }
 
@@ -84,33 +80,10 @@ export class ShipController extends AbstractController {
     }
 
     public toggleWarpDrive() {
-        if (!this.isWarpDriveEnabled || this.isLeavingWarp) {
-            this.isLeavingWarp = false;
-            this.isWarpDriveEnabled = true;
-            this.warpTargetSpeed = this.getWarpSpeedTarget();
+        if (this.warpDrive.getState() != WARPDRIVE_STATE.ENABLED) {
+            this.warpDrive.enable();
             for (const thruster of this.thrusters) thruster.setThrottle(0);
-        } else {
-            this.isLeavingWarp = true;
-        }
-    }
-
-    private getWarpDriveSpeed(deltaTime: number): Vector3 {
-        if (this.transform.speed.length() == this.warpTargetSpeed) return Vector3.Zero();
-
-        const currentSpeed = Vector3.Dot(this.transform.speed, this.transform.getForwardDirection());
-
-        const sign = Math.sign(this.warpTargetSpeed - currentSpeed);
-
-        let deltaThrottle = 0.02 * deltaTime;
-        this.warpDrive.setThrottle(this.warpDrive.getThrottle() + deltaThrottle * sign);
-
-        const speed = this.transform.getForwardDirection().scale(this.warpDrive.getThrottle() * this.warpTargetSpeed);
-
-        return speed;
-    }
-
-    private getWarpSpeedTarget() {
-        return Math.min(this.closestDistanceToPlanet / 10, (this.closestDistanceToPlanet / 2e3) ** 2);
+        } else this.warpDrive.desengage();
     }
 
     private getTotalAuthority(direction: Vector3) {
@@ -119,7 +92,7 @@ export class ShipController extends AbstractController {
         return totalAuthority;
     }
 
-    listenTo(input: Input, deltaTime: number): Vector3 {
+    protected override listenTo(input: Input, deltaTime: number): Vector3 {
         if (this.getActiveCamera() == this.thirdPersonCamera) {
             if (input.type == InputType.KEYBOARD) {
                 const keyboard = input as Keyboard;
@@ -127,7 +100,6 @@ export class ShipController extends AbstractController {
                 if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-0.8 * deltaTime);
                 if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
                 if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
-
             } else if (input.type == InputType.MOUSE) {
                 const mouse = input as Mouse;
                 this.thirdPersonCamera.rotatePhi(mouse.getYaw() * deltaTime);
@@ -139,7 +111,7 @@ export class ShipController extends AbstractController {
         this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
         this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
 
-        if (!this.isWarpDriveEnabled) for (const thruster of this.thrusters) {
+        if (this.warpDrive.getState() == WARPDRIVE_STATE.DISABLED) for (const thruster of this.thrusters) {
             thruster.updateThrottle(0.3 * deltaTime * input.getZAxis() * thruster.getForwardAuthority01());
             thruster.updateThrottle(0.3 * deltaTime * -input.getZAxis() * thruster.getBackwardAuthority01());
 
@@ -150,8 +122,7 @@ export class ShipController extends AbstractController {
             thruster.updateThrottle(0.3 * deltaTime * -input.getXAxis() * thruster.getRightAuthority01());
         }
 
-        if (!this.isWarpDriveEnabled) {
-
+        if (this.warpDrive.getState() == WARPDRIVE_STATE.DISABLED) {
             const forwardAcceleration = this.transform.getForwardDirection()
                 .scale(this.getTotalAuthority(this.transform.getForwardDirectionLocal()) * deltaTime);
             const backwardAcceleration = this.transform.getBackwardDirection()
@@ -176,7 +147,7 @@ export class ShipController extends AbstractController {
             this.transform.acceleration.addInPlace(rightAcceleration);
             this.transform.acceleration.addInPlace(leftAcceleration);
         } else {
-            const warpSpeed = this.getWarpDriveSpeed(deltaTime);
+            const warpSpeed = this.transform.getForwardDirection().scale(this.warpDrive.getWarpSpeed());
             this.transform.speed.copyFrom(warpSpeed);
         }
         return Vector3.Zero();
@@ -188,17 +159,8 @@ export class ShipController extends AbstractController {
         for (const input of this.inputs) this.listenTo(input, deltaTime);
         const displacement = this.transform.update(deltaTime).negate();
 
-        if (this.isLeavingWarp) this.warpTargetSpeed *= 0.9;
-        else if (this.isWarpDriveEnabled) {
-            this.warpTargetSpeed = this.getWarpSpeedTarget();
-        }
-
-        if (this.warpTargetSpeed < 1e2 && this.transform.speed.length() < 1e2 && this.isWarpDriveEnabled) {
-            this.isWarpDriveEnabled = false;
-            this.isLeavingWarp = false;
-            this.transform.speed.copyFromFloats(0, 0, 0);
-            this.warpDrive.setThrottle(0);
-        }
+        const currentForwardSpeed = Vector3.Dot(this.transform.speed, this.transform.getForwardDirection());
+        this.warpDrive.update(currentForwardSpeed, this.closestDistanceToPlanet, deltaTime);
 
         for (const thruster of this.thrusters) {
             thruster.update();

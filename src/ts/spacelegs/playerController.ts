@@ -18,11 +18,11 @@ export class PlayerController extends AbstractController {
         this.camera.fov = (80 / 360) * Math.PI;
     }
 
-    getActiveCamera(): UberCamera {
+    public override getActiveCamera(): UberCamera {
         return this.camera;
     }
 
-    public listenTo(input: Input, deltaTime: number): Vector3 {
+    protected override listenTo(input: Input, deltaTime: number): Vector3 {
         this.transform.roll(input.getRoll() * this.rotationSpeed * deltaTime);
         this.transform.pitch(input.getPitch() * this.rotationSpeed * deltaTime);
         this.transform.yaw(input.getYaw() * this.rotationSpeed * deltaTime);
@@ -51,7 +51,7 @@ export class PlayerController extends AbstractController {
         return displacement.negate();
     }
 
-    public update(deltaTime: number): Vector3 {
+    public override update(deltaTime: number): Vector3 {
         const playerMovement = Vector3.Zero();
         for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, deltaTime));
         return playerMovement;
