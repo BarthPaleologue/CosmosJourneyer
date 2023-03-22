@@ -1,5 +1,10 @@
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core/scene";
 import { BasicTransform } from "../../src/ts/uberCore/transforms/basicTransform";
+import { Vector3, Quaternion } from "@babylonjs/core/Maths/math";
+import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+
+const engine = new NullEngine();
+const scene = new Scene(engine);
 
 describe("BasicTransform", () => {
     const basicTransform = new BasicTransform("transform");

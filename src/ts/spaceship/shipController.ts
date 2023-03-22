@@ -169,7 +169,7 @@ export class ShipController extends AbstractController {
             const localDirection = Vector3.TransformNormal(direction, worldMatrix);
             thruster.plume.setDirection(localDirection.negate());
             thruster.plume.applyAcceleration(this.transform.acceleration.negate());
-        };
+        }
 
         if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() == 0) {
             this.transform.rotationSpeed.scaleInPlace(0.9);
