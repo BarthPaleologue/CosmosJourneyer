@@ -103,30 +103,6 @@ export class BasicTransform implements ITransformLike {
         return this.getRightDirection().negate();
     }
 
-    public getForwardDirectionLocal(): Vector3 {
-        return new Vector3(0, 0, 1);
-    }
-
-    public getBackwardDirectionLocal(): Vector3 {
-        return this.getForwardDirectionLocal().negateInPlace();
-    }
-
-    public getUpwardDirectionLocal(): Vector3 {
-        return new Vector3(0, 1, 0);
-    }
-
-    public getDownwardDirectionLocal(): Vector3 {
-        return this.getUpwardDirectionLocal().negateInPlace();
-    }
-
-    public getRightDirectionLocal(): Vector3 {
-        return new Vector3(1, 0, 0);
-    }
-
-    public getLeftDirectionLocal(): Vector3 {
-        return this.getRightDirectionLocal().negateInPlace();
-    }
-
     /**
      *
      * @param amount

@@ -12,6 +12,7 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Thruster } from "./thruster";
 import { WARPDRIVE_STATE, WarpDrive } from "./warpDrive";
 import { parseSpeed } from "../utils/parseSpeed";
+import { LOCAL_DIRECTION } from "../uberCore/localDirections";
 
 export class ShipController extends AbstractController {
     readonly transform: NewtonianTransform;
@@ -112,31 +113,31 @@ export class ShipController extends AbstractController {
         this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
 
         if (this.warpDrive.getState() == WARPDRIVE_STATE.DISABLED) for (const thruster of this.thrusters) {
-            thruster.updateThrottle(0.3 * deltaTime * input.getZAxis() * thruster.getForwardAuthority01());
-            thruster.updateThrottle(0.3 * deltaTime * -input.getZAxis() * thruster.getBackwardAuthority01());
+            thruster.updateThrottle(0.3 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
+            thruster.updateThrottle(0.3 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD));
 
-            thruster.updateThrottle(0.3 * deltaTime * input.getYAxis() * thruster.getUpwardAuthority01());
-            thruster.updateThrottle(0.3 * deltaTime * -input.getYAxis() * thruster.getDownwardAuthority01());
+            thruster.updateThrottle(0.3 * deltaTime * input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.UP));
+            thruster.updateThrottle(0.3 * deltaTime * -input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.DOWN));
 
-            thruster.updateThrottle(0.3 * deltaTime * input.getXAxis() * thruster.getLeftAuthority01());
-            thruster.updateThrottle(0.3 * deltaTime * -input.getXAxis() * thruster.getRightAuthority01());
+            thruster.updateThrottle(0.3 * deltaTime * input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.LEFT));
+            thruster.updateThrottle(0.3 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
         }
 
         if (this.warpDrive.getState() == WARPDRIVE_STATE.DISABLED) {
             const forwardAcceleration = this.transform.getForwardDirection()
-                .scale(this.getTotalAuthority(this.transform.getForwardDirectionLocal()) * deltaTime);
+                .scale(this.getTotalAuthority(LOCAL_DIRECTION.FORWARD) * deltaTime);
             const backwardAcceleration = this.transform.getBackwardDirection()
-                .scale(this.getTotalAuthority(this.transform.getBackwardDirectionLocal()) * deltaTime);
+                .scale(this.getTotalAuthority(LOCAL_DIRECTION.BACKWARD) * deltaTime);
 
             const upwardAcceleration = this.transform.getUpwardDirection()
-                .scale(this.getTotalAuthority(this.transform.getUpwardDirectionLocal()) * deltaTime);
+                .scale(this.getTotalAuthority(LOCAL_DIRECTION.UP) * deltaTime);
             const downwardAcceleration = this.transform.getDownwardDirection()
-                .scale(this.getTotalAuthority(this.transform.getDownwardDirectionLocal()) * deltaTime);
+                .scale(this.getTotalAuthority(LOCAL_DIRECTION.DOWN) * deltaTime);
 
             const rightAcceleration = this.transform.getRightDirection()
-                .scale(this.getTotalAuthority(this.transform.getRightDirectionLocal()) * deltaTime);
+                .scale(this.getTotalAuthority(LOCAL_DIRECTION.RIGHT) * deltaTime);
             const leftAcceleration = this.transform.getLeftDirection()
-                .scale(this.getTotalAuthority(this.transform.getLeftDirectionLocal()) * deltaTime);
+                .scale(this.getTotalAuthority(LOCAL_DIRECTION.LEFT) * deltaTime);
 
             this.transform.acceleration.addInPlace(forwardAcceleration);
             this.transform.acceleration.addInPlace(backwardAcceleration);
