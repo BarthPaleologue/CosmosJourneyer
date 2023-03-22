@@ -40,7 +40,7 @@ export class WarpDrive {
     }
 
     public computeTargetSpeed(closestDistanceToPlanet: number): number {
-        this.targetSpeed = Math.min(closestDistanceToPlanet / 10, (closestDistanceToPlanet / 2e3) ** 2);
+        this.targetSpeed = Math.min(closestDistanceToPlanet / 4, (closestDistanceToPlanet / 2e3) ** 2);
         return this.targetSpeed;
     }
 
