@@ -58,6 +58,8 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.updateFunction = (particles) => {
             const deltaTime = this.getScene()!.getEngine().getDeltaTime() / 1000;
             const scaledUpdateSpeed = deltaTime * this.updateSpeed * 60;
+            const scaledColorStep = this.color1.subtract(this.colorDead).scale(scaledUpdateSpeed);
+            const scaledDirection = this.direction.scale(scaledUpdateSpeed);
             const scaledAcceleration = this.currentAcceleration.scale(deltaTime);
 
             for (let i = 0; i < particles.length; i++) {
@@ -74,15 +76,13 @@ export class DirectionnalParticleSystem extends ParticleSystem {
                     const velocity = this.particleVelocities[particle.id];
                     velocity.addInPlace(scaledAcceleration);
 
-                    //@ts-ignore
-                    particle.colorStep.scaleToRef(scaledUpdateSpeed, this._scaledColorStep);
-                    //@ts-ignore
-                    particle.color.addInPlace(this._scaledColorStep);
+                    particle.colorStep.scaleToRef(scaledUpdateSpeed, scaledColorStep);
+                    particle.color.addInPlace(scaledColorStep);
 
                     if (particle.color.a < 0) particle.color.a = 0;
                     particle.angle += particle.angularSpeed * scaledUpdateSpeed;
-                    //@ts-ignore
-                    particle.direction.scaleToRef(scaledUpdateSpeed, this._scaledDirection);
+
+                    particle.direction.scaleToRef(scaledUpdateSpeed, scaledDirection);
 
                     particle.position.addInPlace(velocity.scale(deltaTime));
                 }
