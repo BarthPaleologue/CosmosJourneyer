@@ -67,9 +67,7 @@ uniform float maxTemperature;
 
 uniform float waterAmount;
 
-#pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl)
-
-#pragma glslify: fastAcos = require(../utils/fastAcos.glsl)
+#pragma glslify: perlin3 = require(../utils/perlin3.glsl)
 
 #pragma glslify: remap = require(../utils/remap.glsl)
 
@@ -91,24 +89,23 @@ float lerp(float value1, float value2, float x) {
 
 #pragma glslify: waterBoilingPointCelsius = require(./utils/waterBoilingPointCelsius.glsl)
 
-#pragma glslify: computeTemperature01 = require(./utils/computeTemperature01.glsl, vUnitSamplePoint=vUnitSamplePoint, fractalSimplex4=fractalSimplex4)
+#pragma glslify: computeTemperature01 = require(./utils/computeTemperature01.glsl)
 
 void main() {
 	vec3 viewRayW = normalize(playerPosition - vPositionW); // view direction in world space
 
 	vec3 sphereNormalW = vSphereNormalW;
+	
+	// diffuse lighting extinction
 	float ndl1 = 0.0;
-
 	for(int i = 0; i < nbStars; i++) {
 		vec3 starLightRayW = normalize(starPositions[i] - vPositionW); // light ray direction in world space
 		ndl1 += max(dot(sphereNormalW, starLightRayW), 0.0);
 	}
 	ndl1 = saturate(ndl1);
 
-	vec4 seededSamplePoint = vec4(vUnitSamplePoint, seed);
-
 	//FIXME: should use the angle between the axis and the normal
-	float latitude = fastAcos(vUnitSamplePoint.y) - 3.1415 / 2.0;
+	float latitude = acos(vUnitSamplePoint.y) - 3.1415 / 2.0;
 	//float latitude = vUnitSamplePoint.y;
 	float absLatitude01 = abs(latitude);
 	
@@ -147,10 +144,10 @@ void main() {
 	float moisture01 = 0.0; // 0.0 = sec, 1.0 = humid : sec par défaut
 	if(waterMeltingPoint01 < 1.0) {
 		// if there is liquid water on the surface
-		moisture01 += fractalSimplex4(seededSamplePoint * 2.0, 5, 1.7, 2.2) * sqrt(1.0-waterMeltingPoint01) * waterBoilingPoint01;
+		moisture01 += 0.5 * (1.0 + perlin3(vUnitSamplePoint * 2.0)) * sqrt(1.0-waterMeltingPoint01) * waterBoilingPoint01;
 	}
 	if(pressure == 0.0) {
-	    moisture01 += fractalSimplex4(seededSamplePoint * 5.0, 5, 1.7, 2.2);
+	    moisture01 += 0.5 * (1.0 + perlin3(vUnitSamplePoint * 5.0));
 	}
 	moisture01 = clamp(moisture01, 0.0, 1.0);
 
@@ -168,7 +165,7 @@ void main() {
 	float moistureFactor = smoothSharpener(moisture01, moistureSharpness);
 
 	vec3 plainColor2 = 0.8 * plainColor;
-	vec3 plainColor = lerp(plainColor, plainColor2, smoothSharpener(fractalSimplex4(vec4(vUnitSamplePoint * 100.0, 0.0), 4, 2.0, 2.0), 5.0));
+	vec3 plainColor = lerp(plainColor, plainColor2, smoothSharpener((perlin3(vUnitSamplePoint * 100.0) + 1.0) / 2.0, 2.0));
 
 
 	float beachFactor = min(
@@ -187,8 +184,9 @@ void main() {
 		// Snow
 		// waterMeltingPoint01 * waterAmount : il est plus difficile de former de la neige quand y a moins d'eau
 		float waterReducing = pow(min(waterAmount, 1.0), 0.3);
-		snowFactor = smoothstep(1.1 * waterMeltingPoint01 * waterReducing, waterMeltingPoint01 * waterReducing, temperature01);
-		snowFactor = smoothSharpener(snowFactor, 4.0);
+		float snowSeparation = temperature01 + (perlin3(vSamplePoint / 100.0) - 1.0) * 0.02 + pow((1.0 - moisture01), 2.0);
+		snowFactor = smoothstep(1.1 * waterMeltingPoint01 * waterReducing, waterMeltingPoint01 * waterReducing, snowSeparation);
+		snowFactor = smoothSharpener(snowFactor, 2.0);
 		if(waterMeltingPoint01 < 0.0) snowFactor = 0.0;
 		plainFactor *= 1.0 - snowFactor;
 		desertFactor *= 1.0 - snowFactor;
@@ -211,19 +209,12 @@ void main() {
 		bottomFactor *= 1.0 - steepFactor;
 	}
 
-	vec3 color = steepFactor * steepColor
-	+ beachFactor * beachColor
-	+ desertFactor * desertColor
-	+ plainFactor * plainColor
-	+ snowFactor * snowColor
-	+ bottomFactor * bottomColor;
-
 	// template:
 	// small scale
 	// large scale
 
 	// TODO: make uniforms
-	float normalStrengthNear = 1.0;
+	float normalStrengthNear = 0.5;
 	float normalStrengthFar = 0.2;
 
 	normal = triplanarNormal(vSamplePoint, normal, bottomNormalMap, 0.001, normalSharpness, bottomFactor * normalStrengthNear);
@@ -244,6 +235,13 @@ void main() {
 	normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.001, normalSharpness, steepFactor * normalStrengthNear);
 	normal = triplanarNormal(vSamplePoint, normal, steepNormalMap, 0.00001, normalSharpness, steepFactor * normalStrengthFar);
 
+
+	vec3 color = steepFactor * steepColor
+	+ beachFactor * beachColor
+	+ desertFactor * desertColor
+	+ plainFactor * plainColor
+	+ snowFactor * snowColor
+	+ bottomFactor * bottomColor;
 
 	vec3 normalW = mat3(normalMatrix) * normal;
 

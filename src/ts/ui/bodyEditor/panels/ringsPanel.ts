@@ -3,6 +3,7 @@ import { clearAllEventListenersById } from "../../../utils/html";
 import { AbstractBody } from "../../../bodies/abstractBody";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 import { Slider } from "handle-sliderjs";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export class RingsPanel extends EditorPanel {
     constructor() {
@@ -21,6 +22,14 @@ export class RingsPanel extends EditorPanel {
             checkbox.checked = !checkbox.checked;
             rings.settings.ringFrequency = checkbox.checked ? 30 : 0;
         });
+
+        const snowColorPicker = clearAllEventListenersById("ringColor") as HTMLInputElement;
+        snowColorPicker.value = rings.settings.ringColor.toHexString();
+        snowColorPicker.addEventListener("input", () => {
+            rings.settings.ringColor.copyFrom(Color3.FromHexString(snowColorPicker.value));
+        });
+
+
         this.sliders = [
             new Slider("ringsMinRadius", document.getElementById("ringsMinRadius") as HTMLElement, 100, 200, rings.settings.ringStart * 100, (val: number) => {
                 rings.settings.ringStart = val / 100;

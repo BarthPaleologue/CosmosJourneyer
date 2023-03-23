@@ -7,6 +7,8 @@ import { randRange } from "extended-random";
 import { BodyPostProcess } from "./bodyPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -16,6 +18,7 @@ interface RingsSettings {
     ringEnd: number;
     ringFrequency: number;
     ringOpacity: number;
+    ringColor: Color3;
 }
 
 export class RingsPostProcess extends BodyPostProcess {
@@ -24,9 +27,10 @@ export class RingsPostProcess extends BodyPostProcess {
     constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
         const settings: RingsSettings = {
             ringStart: randRange(1.8, 2.2, body.descriptor.rng, 1400),
-            ringEnd: randRange(2.1, 2.9, body.descriptor.rng, 1410),
+            ringEnd: randRange(2.1, 4.0, body.descriptor.rng, 1410),
             ringFrequency: 30.0,
-            ringOpacity: body.descriptor.rng(1420)
+            ringOpacity: body.descriptor.rng(1420),
+            ringColor: new Color3(214, 168, 122).scaleInPlace(1 / 255)
         };
         const uniforms: ShaderUniforms = [
             ...getBodyUniforms(body),
@@ -58,6 +62,13 @@ export class RingsPostProcess extends BodyPostProcess {
                 type: ShaderDataType.Float,
                 get: () => {
                     return settings.ringOpacity;
+                }
+            },
+            {
+                name: "ringColor",
+                type: ShaderDataType.Color3,
+                get: () => {
+                    return settings.ringColor;
                 }
             },
             {

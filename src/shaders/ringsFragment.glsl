@@ -24,6 +24,7 @@ uniform float ringStart; // ring start
 uniform float ringEnd; // ring end
 uniform float ringFrequency; // ring frequency
 uniform float ringOpacity; // ring opacity
+uniform vec3 ringColor; // ring color
 
 uniform vec3 planetRotationAxis;
 
@@ -87,8 +88,7 @@ void main() {
                 vec3 samplePoint = cameraPosition + impactPoint * rayDir;
                 float ringDensity = ringDensityAtPoint(samplePoint);
 
-                vec3 ringColor = vec3(0.5) * ringDensity;
-                ringColor = lerp(ringColor, screenColor.rgb, ringOpacity);
+                vec3 compositedColor = lerp(ringColor * ringDensity, screenColor.rgb, ringOpacity);
 
                 // hypothèse des rayons parallèles
                 int nbLightSources = nbStars;
@@ -99,9 +99,9 @@ void main() {
                         nbLightSources -= 1;
                     }
                 }
-                if(nbLightSources == 0) ringColor *= 0.1;
+                if(nbLightSources == 0) compositedColor *= 0.1;
 
-                finalColor = vec4(lerp(ringColor, screenColor.rgb, ringDensity), 1.0);
+                finalColor = vec4(lerp(compositedColor, screenColor.rgb, ringDensity), 1.0);
             }
 		} else {
 			finalColor = screenColor;

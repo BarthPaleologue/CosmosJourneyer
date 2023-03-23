@@ -15,10 +15,7 @@ float computeTemperature01(float elevation01, float absLatitude01, float ndl, fl
 
     // temperature drops exponentially with elevation
     temperature01 *= exp(-elevation01 * temperatureHeightFalloff);
-
-    // added random fluctuations
-    temperature01 += (fractalSimplex4(vec4(vUnitSamplePoint, 0.0) * 800.0, 5, 1.7, 2.7) - 0.5) / 10.0;
-
+    
     // temperature drops during nighttime (more ice)
     temperature01 *= ndl * temperatureRotationFactor + 1.0 - temperatureRotationFactor;
 

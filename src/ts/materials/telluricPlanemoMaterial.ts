@@ -97,7 +97,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         this.colorSettings = {
             mode: ColorMode.DEFAULT,
 
-            snowColor: new Color3(1, 1, 1),
+            snowColor: new Color3(0.7, 0.7, 0.7),
             steepColor: new Color3(115, 100, 100).scaleInPlace(1 / 255),
             //plainColor: plainColor: new Color3(56, 94, 6).scaleInPlace(1 / 255),
             plainColor: new Color3(
@@ -114,6 +114,10 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
             steepSharpness: 2,
             normalSharpness: 0.5
         };
+
+        if (planetDescriptor.physicalProperties.oceanLevel == 0) {
+            this.colorSettings.plainColor = this.colorSettings.desertColor.scale(0.7);
+        }
 
         this.onBindObservable.add(() => {
             const effect = this.getEffect();
