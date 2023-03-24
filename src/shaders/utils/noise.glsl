@@ -27,11 +27,15 @@ float noise(vec3 p){
 
 float completeNoise(vec3 p, int nbOctaves, float decay, float lacunarity) {
     float totalAmplitude = 0.0;
+    float amp = 1.0;
+    float samplePointMultiplier = 1.0;
     float value = 0.0;
-    for(int i = 0; i < nbOctaves; ++i) {
-        totalAmplitude += 1.0 / pow(decay, float(i));
-        vec3 samplePoint = p * pow(lacunarity, float(i));
-        value += noise(samplePoint) / pow(decay, float(i));
+    for(int i = 0; i < nbOctaves; i++) {
+        amp /= decay;
+        samplePointMultiplier *= lacunarity;
+        totalAmplitude += amp;
+        vec3 samplePoint = p * samplePointMultiplier;
+        value += amp * noise(samplePoint);
     }
     return value / totalAmplitude;
 }

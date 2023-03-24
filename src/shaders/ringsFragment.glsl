@@ -56,9 +56,11 @@ float ringDensityAtPoint(vec3 samplePoint) {
 	if(normalizedDistance < ringStart || normalizedDistance > ringEnd) return 0.0;
 
     // compute the actual density of the rings at the sample point
-	float ringDensity = completeNoise(vec3(normalizedDistance) * ringFrequency, 4, 2.0, 2.0);
+	float ringDensity = completeNoise(vec3(normalizedDistance) * ringFrequency, 5, 2.0, 2.0);
     ringDensity *= smoothstep(ringStart, ringStart + 0.03, normalizedDistance);
     ringDensity *= smoothstep(ringEnd, ringEnd - 0.03, normalizedDistance);
+
+    ringDensity *= ringDensity;
 
     return ringDensity;
 }
@@ -86,9 +88,9 @@ void main() {
                 finalColor = screenColor;
             } else {
                 vec3 samplePoint = cameraPosition + impactPoint * rayDir;
-                float ringDensity = ringDensityAtPoint(samplePoint);
+                float ringDensity = ringDensityAtPoint(samplePoint) * ringOpacity;
 
-                vec3 compositedColor = lerp(ringColor * ringDensity, screenColor.rgb, ringOpacity);
+                vec3 ringShadeColor = ringColor;
 
                 // hypothèse des rayons parallèles
                 int nbLightSources = nbStars;
@@ -99,9 +101,9 @@ void main() {
                         nbLightSources -= 1;
                     }
                 }
-                if(nbLightSources == 0) compositedColor *= 0.1;
+                if(nbLightSources == 0) ringShadeColor *= 0.1;
 
-                finalColor = vec4(lerp(compositedColor, screenColor.rgb, ringDensity), 1.0);
+                finalColor = vec4(lerp(ringShadeColor, screenColor.rgb, ringDensity), 1.0);
             }
 		} else {
 			finalColor = screenColor;
