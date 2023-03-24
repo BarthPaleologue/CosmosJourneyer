@@ -25,6 +25,7 @@ import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPip
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 
 export enum PostProcessType {
@@ -306,13 +307,25 @@ export class PostProcessManager {
         this.init();
     }
 
+    public rebuild(oldCamera: Camera) {
+        // rebuild all volumetric lights FIXME: bug of babylonjs
+        for (const volumetricLight of this.volumetricLights) {
+            volumetricLight.dispose(oldCamera);
+            this.volumetricLights.splice(this.volumetricLights.indexOf(volumetricLight), 1);
+
+            const newVolumetricLight = new VolumetricLight(volumetricLight.body, this.scene);
+            this.volumetricLights.push(newVolumetricLight);
+        }
+
+        this.init();
+    }
+
     private getCurrentBody() {
         if (this.currentBody == null) throw new Error("No body set to the postProcessManager");
         return this.currentBody;
     }
 
     private init() {
-        //const [bodyVolumetricLights, otherVolumetricLights] = extractRelevantPostProcesses(this.volumetricLights, this.getCurrentBody());
         const bodyVolumetricLights: VolumetricLight[] = [];
         const otherVolumetricLights: VolumetricLight[] = [];
         for (const volumetricLight of this.volumetricLights) {

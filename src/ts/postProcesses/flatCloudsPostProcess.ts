@@ -38,7 +38,7 @@ export class FlatCloudsPostProcess extends BodyPostProcess {
             specularPower: 2,
             smoothness: 0.9,
             cloudFrequency: 4,
-            cloudDetailFrequency: 20,
+            cloudDetailFrequency: 12,
             cloudCoverage: 0.8 * Math.exp(-planet.descriptor.physicalProperties.waterAmount * planet.descriptor.physicalProperties.pressure),
             cloudSharpness: 3.5,
             cloudColor: new Color3(0.8, 0.8, 0.8),

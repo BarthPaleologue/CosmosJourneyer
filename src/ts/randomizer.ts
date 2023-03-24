@@ -10,6 +10,8 @@ import { PlayerController } from "./spacelegs/playerController";
 import { positionNearBody } from "./utils/positionNearBody";
 import { PlanetEngine } from "./planetEngine";
 import { BODY_TYPE } from "./descriptors/common";
+import { ShipController } from "./spaceship/shipController";
+import { EditorVisibility } from "./ui/bodyEditor/bodyEditor";
 
 const engine = new PlanetEngine();
 
@@ -18,14 +20,32 @@ await engine.setup();
 const scene = engine.getScene();
 
 const mouse = new Mouse(engine.canvas, 1e5);
+const keyboard = new Keyboard();
+const gamepad = new Gamepad();
 
 const player = new PlayerController(scene);
 player.speed = 0.2 * Settings.EARTH_RADIUS;
 player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
-player.addInput(new Keyboard());
+player.addInput(keyboard);
 player.addInput(mouse);
-player.addInput(new Gamepad());
-scene.setActiveController(player);
+player.addInput(gamepad);
+
+const spaceshipController = new ShipController(scene);
+spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
+spaceshipController.addInput(keyboard);
+spaceshipController.addInput(gamepad);
+
+scene.setActiveController(spaceshipController);
+
+engine.registerUpdateCallback(() => {
+    if (scene.getActiveController() != spaceshipController) return;
+
+    const shipPosition = spaceshipController.transform.getAbsolutePosition();
+    const nearestBody = engine.getStarSystem().getNearestBody(shipPosition);
+    const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
+    const radius = nearestBody.getRadius();
+    spaceshipController.registerClosestDistanceToPlanet(distance - radius);
+});
 
 //check if url contains a seed
 const urlParams = new URLSearchParams(window.location.search);
@@ -38,9 +58,24 @@ starSystem.generate();
 
 document.addEventListener("keydown", (e) => {
     if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
+    if (e.key == "g") {
+        if (scene.getActiveController() == spaceshipController) {
+            scene.setActiveController(player);
+            player.transform.setRotationQuaternion(spaceshipController.transform.getRotationQuaternion().clone());
+            engine.getStarSystem().postProcessManager.rebuild(spaceshipController.getActiveCamera());
+            spaceshipController.setHidden(true);
+        } else {
+            scene.setActiveController(spaceshipController);
+            spaceshipController.transform.setRotationQuaternion(player.transform.getRotationQuaternion().clone());
+            engine.getStarSystem().postProcessManager.rebuild(player.getActiveCamera());
+            spaceshipController.setHidden(false);
+        }
+    }
 });
 
 engine.init();
 
 const nbRadius = starSystem.descriptor.getBodyTypeOfStar(0) == BODY_TYPE.BLACK_HOLE ? 8 : 3;
-positionNearBody(player, starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);
+positionNearBody(scene.getActiveController(), starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);
+
+engine.bodyEditor.setVisibility(EditorVisibility.NAVBAR);

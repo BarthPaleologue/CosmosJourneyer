@@ -39,6 +39,7 @@ export class ShipController extends AbstractController {
 
         this.firstPersonCamera = new UberCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.transform.node;
+        this.firstPersonCamera.position = new Vector3(0, 1, 0);
 
         this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 1.4);
         this.thirdPersonCamera.parent = this.transform.node;
@@ -74,6 +75,10 @@ export class ShipController extends AbstractController {
 
     public override getActiveCamera(): UberCamera {
         return this.thirdPersonCamera;
+    }
+
+    public setHidden(hidden: boolean) {
+        this.transform.node.setEnabled(!hidden);
     }
 
     public registerClosestDistanceToPlanet(distance: number) {

@@ -12,7 +12,6 @@ const config = {
     entry: {
         showcase: "./src/ts/index.ts",
         random: "./src/ts/randomizer.ts",
-        shipDemo: "./src/ts/shipDemo.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
         starMapDemo: "./src/ts/starMapDemo.ts",
     },
@@ -41,12 +40,6 @@ const config = {
             filename: "random.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["random"]
-        }),
-        new HtmlWebpackPlugin({
-            title: "Ship Demo",
-            filename: "shipdemo.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["shipDemo"]
         }),
         new HtmlWebpackPlugin({
             title: "BlackHole Demo",

@@ -6,8 +6,10 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 export class VolumetricLight extends VolumetricLightScatteringPostProcess {
     readonly body: Star;
 
+    private static ID = 0;
+
     constructor(star: Star, scene: UberScene) {
-        super(`${star.name}VolumetricLight`, 1, scene.getActiveUberCamera(), star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
+        super(`${star.name}VolumetricLight${VolumetricLight.ID++}`, 1, scene.getActiveUberCamera(), star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
 
         this.body = star;
 
