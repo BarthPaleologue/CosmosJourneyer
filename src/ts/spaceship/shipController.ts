@@ -33,9 +33,9 @@ export class ShipController extends AbstractController {
     private closestDistanceToPlanet = Infinity;
 
     constructor(scene: Scene) {
-        super();
+        super(scene);
 
-        this.transform = new NewtonianTransform("shipTransform");
+        this.transform = new NewtonianTransform("shipTransform", scene);
 
         this.firstPersonCamera = new UberCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.transform.node;

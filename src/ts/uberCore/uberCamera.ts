@@ -12,10 +12,6 @@ export class UberCamera extends FreeCamera {
         this.inverseProjectionMatrix = Matrix.Invert(this.getProjectionMatrix());
         this.inverseViewMatrix = Matrix.Invert(this.getViewMatrix());
 
-        this.onViewMatrixChangedObservable.add(() => {
-            this.inverseViewMatrix = Matrix.Invert(this.getViewMatrix());
-        });
-
         this.onProjectionMatrixChangedObservable.add(() => {
             this.inverseProjectionMatrix = Matrix.Invert(this.getProjectionMatrix());
         });
@@ -26,6 +22,7 @@ export class UberCamera extends FreeCamera {
     }
 
     getInverseViewMatrix(): Matrix {
+        this.inverseViewMatrix = Matrix.Invert(this.getViewMatrix());
         return this.inverseViewMatrix;
     }
 

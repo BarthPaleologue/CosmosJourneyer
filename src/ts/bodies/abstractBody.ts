@@ -4,6 +4,7 @@ import { BodyDescriptor } from "../descriptors/common";
 import { computeBarycenter, computePointOnOrbit } from "../orbits/kepler";
 import { BodyPostProcesses } from "./common";
 import { Vector3, Quaternion, Matrix } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core/scene";
 
 interface NextState {
     position: Vector3;
@@ -38,12 +39,12 @@ export abstract class AbstractBody implements IOrbitalBody {
      * @param name the name of the celestial body
      * @param parentBodies the parent bodies of this body
      */
-    protected constructor(name: string, parentBodies: AbstractBody[]) {
+    protected constructor(name: string, parentBodies: AbstractBody[], scene: Scene) {
         this.name = name;
 
         this.parentBodies = parentBodies;
 
-        this.transform = new BasicTransform(name);
+        this.transform = new BasicTransform(name, scene);
 
         let minDepth = -1;
         for (const parentBody of parentBodies) {
@@ -148,5 +149,9 @@ export abstract class AbstractBody implements IOrbitalBody {
     public applyNextState(): void {
         this.transform.setAbsolutePosition(this.nextState.position);
         this.transform.setRotationQuaternion(this.nextState.rotation);
+    }
+
+    public dispose(): void {
+        this.transform.dispose();
     }
 }

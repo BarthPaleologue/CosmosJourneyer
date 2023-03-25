@@ -26,7 +26,7 @@ export class GasPlanet extends AbstractBody implements Planemo {
      * @param parentBodies The bodies the planet is orbiting
      */
     constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
-        super(name, parentBodies);
+        super(name, parentBodies, scene);
 
         this.descriptor = new GasPlanetDescriptor(
             seed,
@@ -57,5 +57,11 @@ export class GasPlanet extends AbstractBody implements Planemo {
 
     updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
         this.material.update(controller, stellarObjects, this.rotationMatrixAroundAxis, deltaTime);
+    }
+
+    public override dispose(): void {
+        this.mesh.dispose();
+        this.material.dispose();
+        super.dispose();
     }
 }

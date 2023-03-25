@@ -367,4 +367,9 @@ export class StarSystem {
         this.makeStellarObjects(this.descriptor.getNbStars());
         this.makePlanets(this.descriptor.getNbPlanets());
     }
+
+    public dispose() {
+        this.postProcessManager.dispose();
+        for (const body of this.bodies) body.dispose();
+    }
 }

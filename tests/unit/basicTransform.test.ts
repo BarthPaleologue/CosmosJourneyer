@@ -7,7 +7,7 @@ const engine = new NullEngine();
 const scene = new Scene(engine);
 
 describe("BasicTransform", () => {
-    const basicTransform = new BasicTransform("transform");
+    const basicTransform = new BasicTransform("transform", scene);
     it("exists", () => expect(basicTransform).toBeDefined());
     it("has its position init at zero", () => {
         expect(basicTransform.getAbsolutePosition().equals(Vector3.Zero())).toBeTruthy();

@@ -4,10 +4,9 @@ import { normalRandom, randRange, uniformRandBool } from "extended-random";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
-import { BodyDescriptor, BODY_TYPE, StellarObjectDescriptor } from "../common";
+import { BodyDescriptor, BODY_TYPE, StellarObjectDescriptor , StarPhysicalProperties } from "../common";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../../orbits/kepler";
-import { StarPhysicalProperties } from "../common";
 import { STELLAR_TYPE } from "./common";
 
 enum GENERATION_STEPS {

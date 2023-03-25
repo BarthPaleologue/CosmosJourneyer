@@ -17,7 +17,7 @@ export class BlackHole extends AbstractBody {
     readonly descriptor: BlackHoleDescriptor;
 
     constructor(name: string, seed: number, parentBodies: AbstractBody[], scene: Scene) {
-        super(name, parentBodies);
+        super(name, parentBodies, scene);
 
         this.descriptor = new BlackHoleDescriptor(seed);
 
@@ -36,5 +36,10 @@ export class BlackHole extends AbstractBody {
             overlay: true,
             blackHole: true
         };
+    }
+
+    public override dispose(): void {
+        this.light.dispose();
+        super.dispose();
     }
 }

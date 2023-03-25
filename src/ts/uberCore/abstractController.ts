@@ -2,6 +2,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Input } from "../inputs/input";
 import { BasicTransform } from "./transforms/basicTransform";
 import { UberCamera } from "./uberCamera";
+import { Scene } from "@babylonjs/core/scene";
 
 export abstract class AbstractController {
     collisionRadius = 10;
@@ -13,8 +14,8 @@ export abstract class AbstractController {
      */
     protected readonly inputs: Input[] = [];
 
-    protected constructor() {
-        this.transform = new BasicTransform("playerTransform");
+    protected constructor(scene: Scene) {
+        this.transform = new BasicTransform("playerTransform", scene);
     }
 
     /**

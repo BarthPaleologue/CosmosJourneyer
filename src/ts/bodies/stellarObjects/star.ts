@@ -27,7 +27,7 @@ export class Star extends AbstractBody {
      * @param parentBodies The bodies the star is orbiting
      */
     constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
-        super(name, parentBodies);
+        super(name, parentBodies, scene);
 
         this.descriptor = new StarDescriptor(
             seed,
@@ -66,5 +66,12 @@ export class Star extends AbstractBody {
 
     public updateMaterial(): void {
         this.material.update(this.getInternalClock());
+    }
+
+    public override dispose(): void {
+        this.mesh.dispose();
+        this.light.dispose();
+        this.material.dispose();
+        super.dispose();
     }
 }

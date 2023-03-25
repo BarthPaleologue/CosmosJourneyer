@@ -3,7 +3,6 @@ import { BodyDescriptor, BODY_TYPE, StellarObjectDescriptor, BlackHolePhysicalPr
 import { getOrbitalPeriod } from "../../orbits/kepler";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
-import { PhysicalProperties } from "../common";
 import { normalRandom } from "extended-random";
 import { STELLAR_TYPE } from "./common";
 

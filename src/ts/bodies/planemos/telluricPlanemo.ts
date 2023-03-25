@@ -4,13 +4,12 @@ import { Direction } from "../../utils/direction";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
-import { RigidBody } from "../common";
+import { RigidBody, TelluricPlanetPostProcesses } from "../common";
 import { TransferCollisionData } from "../../chunks/workerDataTypes";
 import { TaskType } from "../../chunks/taskTypes";
 import { AbstractController } from "../../uberCore/abstractController";
 import { TelluricPlanemoMaterial } from "../../materials/telluricPlanemoMaterial";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
-import { TelluricPlanetPostProcesses } from "../common";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planemo } from "./planemo";
@@ -34,7 +33,7 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
      * @param parentBodies The bodies the planet is orbiting
      */
     constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
-        super(name, parentBodies);
+        super(name, parentBodies, scene);
 
         this.descriptor = new TelluricPlanemoDescriptor(
             seed,
@@ -113,5 +112,11 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
 
     public override getApparentRadius(): number {
         return super.getRadius() + this.descriptor.physicalProperties.oceanLevel;
+    }
+
+    public override dispose(): void {
+        this.material.dispose();
+        for (const side of this.sides) side.dispose();
+        super.dispose();
     }
 }

@@ -53,6 +53,8 @@ export class StarMap {
 
     private readonly loadedCells: Map<string, Cell> = new Map<string, Cell>();
 
+    private warpCallbacks: ((seed: number) => void)[] = [];
+
     /**
      * The position of the cell the player is currently in (relative to the global node).
      */
@@ -79,10 +81,8 @@ export class StarMap {
         this.starMapUI = new StarMapUI();
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
-            if (this.selectedSystemSeed) {
-                const url = new URL(`random.html?seed=${encodeURIComponent(this.selectedSystemSeed)}`, window.location.href);
-                window.open(url, "_blank")?.focus();
-            } else throw new Error("No system selected!");
+            if (this.selectedSystemSeed == null) throw new Error("No system selected!");
+            for (const callback of this.warpCallbacks) callback(this.selectedSystemSeed);
         });
 
         const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controller.getActiveCamera()]);
@@ -162,6 +162,10 @@ export class StarMap {
 
             this.updateCells();
         });
+    }
+
+    public registerWarpCallback(callback: (seed: number) => void) {
+        this.warpCallbacks.push(callback);
     }
 
     /**

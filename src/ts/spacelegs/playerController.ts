@@ -11,7 +11,7 @@ export class PlayerController extends AbstractController {
     rotationSpeed = Math.PI / 4;
 
     constructor(scene: Scene) {
-        super();
+        super(scene);
 
         this.camera = new UberCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.transform.node;

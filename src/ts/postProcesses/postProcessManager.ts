@@ -450,4 +450,19 @@ export class PostProcessManager {
         for (const oceans of this.oceans) oceans.update(deltaTime);
         for (const blackhole of this.blackHoles) blackhole.update(deltaTime);
     }
+
+    public dispose() {
+        for (const ring of this.rings) ring.dispose();
+        for (const volumetricLight of this.volumetricLights) volumetricLight.dispose(this.scene.getActiveUberCamera());
+        for (const atmosphere of this.atmospheres) atmosphere.dispose();
+        for (const clouds of this.clouds) clouds.dispose();
+        for (const oceans of this.oceans) oceans.dispose();
+        for (const blackhole of this.blackHoles) blackhole.dispose();
+
+        this.colorCorrection.dispose();
+        this.fxaa.dispose();
+
+        this.surfaceRenderingPipeline.dispose();
+        this.spaceRenderingPipeline.dispose();
+    }
 }

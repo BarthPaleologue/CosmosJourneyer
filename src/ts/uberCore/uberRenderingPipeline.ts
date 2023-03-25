@@ -18,4 +18,9 @@ export class UberRenderingPipeline extends PostProcessRenderPipeline {
     detachCameras() {
         this._detachCameras(this.cameras);
     }
+
+    public override dispose() {
+        this.detachCameras();
+        super.dispose();
+    }
 }

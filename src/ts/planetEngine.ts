@@ -15,6 +15,9 @@ import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import "@babylonjs/core/Misc/screenshotTools";
+import { StarMap } from "./starmap/starMap";
+import { Scene } from "@babylonjs/core/scene";
+import { positionNearBody } from "./utils/positionNearBody";
 
 export class PlanetEngine {
     // UI
@@ -24,9 +27,12 @@ export class PlanetEngine {
 
     // BabylonJS
     private engine: Engine | null = null;
-    private scene: UberScene | null = null;
+    private starSystemScene: UberScene | null = null;
 
     private starSystem: StarSystem | null = null;
+    private starMap: StarMap | null = null;
+
+    private activeScene: Scene | null = null;
 
     private readonly collisionWorker = new CollisionWorker();
 
@@ -40,38 +46,63 @@ export class PlanetEngine {
 
         this.bodyEditor.setCanvas(this.canvas);
 
+        //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
             if (e.key == "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
-            if (e.key == "p" && this.engine != null && this.scene != null)
-                Tools.CreateScreenshot(this.engine, this.scene.getActiveController().getActiveCamera(), { precision: 4 });
+            if (e.key == "p")
+                Tools.CreateScreenshot(this.getEngine(), this.getStarSystemScene().getActiveController().getActiveCamera(), { precision: 4 });
             if (e.key == "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() == EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
             //if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
-            if (e.key == "w" && this.scene != null && this.starSystem != null && isOrbiting(this.scene.getActiveController(), this.starSystem.getNearestBody()))
-                (this.starSystem.getNearestBody() as TelluricPlanemo).material.wireframe = !(this.starSystem.getNearestBody() as TelluricPlanemo).material.wireframe;
+            //if (e.key == "w" && isOrbiting(this.getStarSystemScene().getActiveController(), this.getStarSystem().getNearestBody()))
+            //    (this.getStarSystem().getNearestBody() as TelluricPlanemo).material.wireframe = !(this.getStarSystem().getNearestBody() as TelluricPlanemo).material.wireframe;
+
+            if (e.key == "m") this.toggleStarMap();
         });
     }
 
+    public toggleStarMap() {
+        if (this.activeScene == this.getStarSystemScene()) {
+            if (this.starMap == null) throw new Error("Star map is null");
+            this.activeScene = this.starMap.scene;
+            this.helmetOverlay.setVisibility(false);
+            this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
+        } else {
+            this.activeScene = this.getStarSystemScene();
+            this.helmetOverlay.setVisibility(true);
+            this.bodyEditor.setVisibility(EditorVisibility.NAVBAR);
+        }
+    }
+
     public async setup() {
-        this.engine = await EngineFactory.CreateAsync(this.canvas, {
-            antialias: false
-            //useHighPrecisionFloats: true,
-            //useHighPrecisionMatrix: true,
-            //adaptToDeviceRatio: true,
-        });
+        this.engine = await EngineFactory.CreateAsync(this.canvas, {});
 
         this.engine.loadingScreen.displayLoadingUI();
 
         console.log(`API: ${this.engine instanceof WebGPUEngine ? "WebGPU" : "WebGL" + this.engine.webGLVersion}`);
         console.log(`GPU detected: ${this.engine.getGlInfo().renderer}`);
 
-        this.scene = new UberScene(this.engine);
-        this.scene.clearColor = new Color4(0, 0, 0, 0);
+        this.starMap = new StarMap(this.engine);
+        this.starMap.registerWarpCallback((seed: number) => {
+            this.getStarSystem().dispose();
+            this.starSystem = new StarSystem(seed, this.getStarSystemScene());
+            this.starSystem.generate();
+            this.starSystem.init();
+            this.collisionWorker.setStarSystem(this.starSystem);
+            this.collisionWorker.setPlayer(this.getStarSystemScene().getActiveController());
+            positionNearBody(this.getStarSystemScene().getActiveController(), this.getStarSystem().getBodies()[0], this.getStarSystem());
+            this.toggleStarMap();
+        });
 
-        await Assets.Init(this.scene);
+        this.starSystemScene = new UberScene(this.engine);
+        this.starSystemScene.clearColor = new Color4(0, 0, 0, 0);
 
-        this.scene.executeWhenReady(() => {
+        this.activeScene = this.starSystemScene;
+
+        await Assets.Init(this.starSystemScene);
+
+        this.starSystemScene.executeWhenReady(() => {
             this.getEngine().loadingScreen.hideLoadingUI();
-            this.getEngine().runRenderLoop(() => this.getScene().render());
+            this.getEngine().runRenderLoop(() => this.getActiveScene().render());
         });
 
         window.addEventListener("resize", () => {
@@ -86,37 +117,37 @@ export class PlanetEngine {
         if (this.starSystem === null) throw new Error("Star system is null");
         this.starSystem.init();
         this.collisionWorker.setStarSystem(this.starSystem);
-        this.collisionWorker.setPlayer(this.getScene().getActiveController());
+        this.collisionWorker.setPlayer(this.getStarSystemScene().getActiveController());
 
-        this.getScene().registerBeforeRender(() => {
-            if (this.engine === null) throw new Error("Engine is null");
-            if (this.scene === null) throw new Error("Scene is null");
-            if (this.starSystem === null) throw new Error("Star system is null");
+        this.getStarSystemScene().registerBeforeRender(() => {
+            const starSystemScene = this.getStarSystemScene();
+            const starSystem = this.getStarSystem();
+            const activeController = starSystemScene.getActiveController();
 
-            const deltaTime = this.engine.getDeltaTime() / 1000;
+            const deltaTime = this.getEngine().getDeltaTime() / 1000;
 
-            const nearest = this.starSystem.getNearestBody(this.scene.getActiveUberCamera().position);
+            const nearest = starSystem.getNearestBody(starSystemScene.getActiveUberCamera().position);
 
-            this.bodyEditor.update(nearest, this.starSystem.postProcessManager, this.scene);
+            this.bodyEditor.update(nearest, starSystem.postProcessManager, starSystemScene);
             this.helmetOverlay.update(nearest);
             this.helmetOverlay.setVisibility(this.bodyEditor.getVisibility() !== EditorVisibility.FULL);
 
-            this.starSystem.translateAllBodiesNow(this.scene.getActiveController().update(deltaTime));
+            this.getStarSystem().translateAllBodiesNow(activeController.update(deltaTime));
 
-            if (!this.collisionWorker.isBusy() && isOrbiting(this.scene.getActiveController(), nearest)) {
+            if (!this.collisionWorker.isBusy() && isOrbiting(activeController, nearest)) {
                 if (nearest instanceof TelluricPlanemo) this.collisionWorker.checkCollision(nearest);
             }
 
             //FIXME: should address stars orbits
-            for (const star of this.starSystem.stellarObjects) star.descriptor.orbitalProperties.period = 0;
+            for (const star of starSystem.stellarObjects) star.descriptor.orbitalProperties.period = 0;
 
             Assets.ChunkForge.update();
-            this.starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
+            starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
         });
     }
 
     public setActiveController(controller: AbstractController) {
-        this.getScene().setActiveController(controller);
+        this.getStarSystemScene().setActiveController(controller);
     }
 
     public setStarSystem(starSystem: StarSystem) {
@@ -129,12 +160,17 @@ export class PlanetEngine {
     }
 
     public registerUpdateCallback(callback: () => void) {
-        this.getScene().registerBeforeRender(callback);
+        this.getStarSystemScene().registerBeforeRender(callback);
     }
 
-    public getScene() {
-        if (this.scene === null) throw new Error("Scene is null");
-        return this.scene;
+    public getStarSystemScene() {
+        if (this.starSystemScene === null) throw new Error("Star system scene is null");
+        return this.starSystemScene;
+    }
+
+    public getActiveScene(): Scene {
+        if (this.activeScene === null) throw new Error("Active scene is null");
+        return this.activeScene;
     }
 
     public getEngine() {

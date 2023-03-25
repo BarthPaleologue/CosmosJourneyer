@@ -15,7 +15,7 @@ const engine = new PlanetEngine();
 
 await engine.setup();
 
-const scene = engine.getScene();
+const scene = engine.getStarSystemScene();
 
 const mouse = new Mouse(engine.canvas, 1e5);
 const keyboard = new Keyboard();
@@ -58,7 +58,6 @@ planet.descriptor.orbitalProperties.periapsis = 10000e3;
 planet.descriptor.orbitalProperties.apoapsis = 10000e3;
 
 document.addEventListener("keydown", (e) => {
-    if (e.key == "m") mouse.deadAreaRadius == 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
     if (e.key == "g") {
         if (scene.getActiveController() == spaceshipController) {
             scene.setActiveController(player);

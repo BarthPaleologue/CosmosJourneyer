@@ -207,4 +207,10 @@ export class ChunkTree {
         this.requestDeletion(this.tree, [newTree], false);
         this.tree = newTree;
     }
+
+    public dispose(): void {
+        this.executeOnEveryChunk((chunk: PlanetChunk) => {
+            chunk.dispose();
+        });
+    }
 }

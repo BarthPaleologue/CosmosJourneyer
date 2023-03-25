@@ -1,3 +1,4 @@
+import { Scene } from "@babylonjs/core/scene";
 import { BasicTransform } from "./basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
@@ -7,8 +8,8 @@ export class NewtonianTransform extends BasicTransform {
     rotationSpeed: Vector3 = Vector3.Zero();
     rotationAcceleration: Vector3 = Vector3.Zero();
 
-    constructor(name: string) {
-        super(name);
+    constructor(name: string, scene: Scene) {
+        super(name, scene);
     }
 
     public update(deltaTime: number): Vector3 {

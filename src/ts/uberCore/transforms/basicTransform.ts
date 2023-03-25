@@ -2,6 +2,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { ITransformLike } from "./ITransformLike";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { Scene } from "@babylonjs/core/scene";
 
 /**
  * Very thin wrapper around a BabylonJS TransformNode
@@ -9,8 +10,8 @@ import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 export class BasicTransform implements ITransformLike {
     node: TransformNode;
 
-    constructor(name: string) {
-        this.node = new TransformNode(name + "Transform");
+    constructor(name: string, scene: Scene) {
+        this.node = new TransformNode(name + "Transform", scene);
         this.node.position = Vector3.Zero();
         this.node.rotationQuaternion = Quaternion.Identity();
     }
@@ -128,4 +129,8 @@ export class BasicTransform implements ITransformLike {
     }
 
     /* #endregion directions */
+
+    public dispose(): void {
+        this.node.dispose();
+    }
 }
