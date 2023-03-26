@@ -22,7 +22,7 @@ export class ChunkForge {
     /**
      * Contains deletion task grouped together in sublist
      */
-    trashCan: DeleteTask[][] = [];
+    deleteTasks: DeleteTask[][] = [];
 
     constructor(nbVerticesPerSide: number) {
         this.nbVerticesPerSide = nbVerticesPerSide;
@@ -112,18 +112,18 @@ export class ChunkForge {
     /**
      * Removes all useless chunks
      */
-    private emptyTrashCan() {
-        for (const taskGroup of this.trashCan) {
-            for (let i = 0; i < taskGroup.length; i++) {
-                const task = taskGroup[i];
+    private executeDeleteTasks() {
+        for (const deleteTask of this.deleteTasks) {
+            for (let i = 0; i < deleteTask.length; i++) {
+                const task = deleteTask[i];
                 // disabling old chunk
                 task.chunk.setReady(false);
                 // if we are removing the last old chunk, enabling new chunks
-                if (i == taskGroup.length - 1) for (const chunk of task.newChunks) chunk.setReady(true);
+                if (i == deleteTask.length - 1) for (const chunk of task.newChunks) chunk.setReady(true);
                 task.chunk.mesh.dispose();
             }
         }
-        this.trashCan = [];
+        this.deleteTasks = [];
     }
 
     /**
@@ -138,7 +138,7 @@ export class ChunkForge {
 
             if (task.chunk.isMinDepth) task.chunk.setReady(true);
 
-            this.trashCan.push(task.callbackTasks);
+            this.deleteTasks.push(task.callbackTasks);
         }
     }
 
@@ -151,7 +151,7 @@ export class ChunkForge {
         }
         this.workerPool.availableWorkers = this.workerPool.availableWorkers.concat(this.workerPool.finishedWorkers);
         this.workerPool.finishedWorkers = [];
-        this.emptyTrashCan();
+        this.executeDeleteTasks();
 
         this.executeNextApplyTask();
     }

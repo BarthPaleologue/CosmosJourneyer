@@ -47,9 +47,9 @@ function handle_build(data: TransferBuildData): void {
 }
 
 self.onmessage = (e) => {
-    const clock = Date.now();
+    //const clock = Date.now();
     handle_build(e.data as TransferBuildData);
-    console.log("The chunk took: " + (Date.now() - clock));
+    //console.log("The chunk took: " + (Date.now() - clock));
 
     // benchmark fait le 5/10/2021 (normale non analytique) : ~2s/chunk
     // benchmark fait le 12/11/2021 (normale non analyique) : ~0.5s/chunk
