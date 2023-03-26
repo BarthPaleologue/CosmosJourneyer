@@ -27,6 +27,7 @@ varying vec3 vPosition;
 
 varying vec3 vUnitSamplePoint;
 varying vec3 vSamplePoint;
+varying vec3 vSamplePointScaled;
 
 varying vec3 vLocalPosition;
 
@@ -48,6 +49,7 @@ void main() {
 	vLocalPosition = position;
 
 	vUnitSamplePoint = applyQuaternion(planetInverseRotationQuaternion, normalize(vPosition));
+	vSamplePointScaled = applyQuaternion(planetInverseRotationQuaternion, vPosition / 1000e3);
     vSphereNormalW = mat3(normalMatrix) * vUnitSamplePoint;
 	vSamplePoint = applyQuaternion(planetInverseRotationQuaternion, vPosition);
 
