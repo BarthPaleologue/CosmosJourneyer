@@ -30,11 +30,11 @@ export class PlanetChunk {
 
         // offseting from planet center to position on the side (default side then rotation for all sides)
         this.mesh.position.z -= rootLength / 2;
+        this.mesh.position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
 
         this.cubePosition = this.mesh.position.clone();
 
         this.mesh.position.normalize().scaleInPlace(rootLength / 2);
-        this.mesh.position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
     }
 
     public isReady() {

@@ -20,17 +20,17 @@ function handle_build(data: TransferBuildData): void {
     terrain_settings.bumps_frequency = data.terrainSettings.bumps_frequency;
     terrain_settings.max_bump_height = data.terrainSettings.max_bump_height;
 
-    const buildData: BuildData = new BuildData();
-
-    buildData.chunk_depth = data.depth;
-    buildData.chunk_tree_direction = data.direction;
-    buildData.chunk_front_face_position_x = data.position[0];
-    buildData.chunk_front_face_position_y = data.position[1];
-    buildData.chunk_front_face_position_z = data.position[2];
-    buildData.planet_diameter = data.planetDiameter;
-    buildData.planet_seed = data.seed;
-    buildData.resolution = data.nbVerticesPerSide;
-    buildData.terrain_settings = terrain_settings;
+    const buildData: BuildData = new BuildData(
+        data.planetDiameter,
+        data.depth,
+        data.direction,
+        data.position[0],
+        data.position[1],
+        data.position[2],
+        data.seed,
+        data.nbVerticesPerSide,
+        terrain_settings
+    );
 
     build_chunk_vertex_data(buildData, verticesPositions, indices, normals);
 
@@ -47,9 +47,9 @@ function handle_build(data: TransferBuildData): void {
 }
 
 self.onmessage = (e) => {
-    //const clock = Date.now();
+    const clock = Date.now();
     handle_build(e.data as TransferBuildData);
-    //console.log("The chunk took: " + (Date.now() - clock));
+    console.log("The chunk took: " + (Date.now() - clock));
 
     // benchmark fait le 5/10/2021 (normale non analytique) : ~2s/chunk
     // benchmark fait le 12/11/2021 (normale non analyique) : ~0.5s/chunk
@@ -59,4 +59,5 @@ self.onmessage = (e) => {
     // benchmark fait le 19/02/2022 (normale analytique v2.6) : ~ 40ms/chunk
     // benchmark fait le 28/07/2022 (Terrain V3.1) : ~70ms/chunk
     // benchmark fait le 06/12/2022 (Terrain WASM v1) : ~140ms/chunk wtf
+    // benchmark fait le 06/12/2022 (Terrain WASM v1.5) : ~60ms/chunk
 };
