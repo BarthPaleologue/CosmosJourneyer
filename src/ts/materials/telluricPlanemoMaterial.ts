@@ -115,7 +115,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
             normalSharpness: 0.5
         };
 
-        if (planetDescriptor.physicalProperties.oceanLevel == 0) {
+        if (planetDescriptor.physicalProperties.oceanLevel === 0) {
             this.colorSettings.plainColor = this.colorSettings.desertColor.scale(0.7);
         }
 

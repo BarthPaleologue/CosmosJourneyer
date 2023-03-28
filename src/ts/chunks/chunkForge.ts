@@ -46,7 +46,7 @@ export class ChunkForge {
     private executeBuildTask(task: BuildTask, worker: Worker): void {
         // delete tasks always follow build task, they are stored to be executed as callbacks of the build task
         const callbackTasks: DeleteTask[] = [];
-        while (this.workerPool.taskQueue.length > 0 && this.workerPool.taskQueue[0].type == TaskType.Deletion) {
+        while (this.workerPool.taskQueue.length > 0 && this.workerPool.taskQueue[0].type === TaskType.Deletion) {
             callbackTasks.push(this.workerPool.nextTask() as DeleteTask);
         }
 
@@ -119,7 +119,7 @@ export class ChunkForge {
                 // disabling old chunk
                 task.chunk.setReady(false);
                 // if we are removing the last old chunk, enabling new chunks
-                if (i == deleteTask.length - 1) for (const chunk of task.newChunks) chunk.setReady(true);
+                if (i === deleteTask.length - 1) for (const chunk of task.newChunks) chunk.setReady(true);
                 task.chunk.mesh.dispose();
             }
         }

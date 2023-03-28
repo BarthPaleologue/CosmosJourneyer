@@ -37,11 +37,11 @@ export class StarMapUI {
     }
 
     update() {
-        if (this.namePlate.linkedMesh == null) this.gui.removeControl(this.namePlate);
+        if (this.namePlate.linkedMesh === null) this.gui.removeControl(this.namePlate);
     }
 
     attachUIToMesh(mesh: AbstractMesh) {
-        if (this.gui._linkedControls.length == 0) this.gui.addControl(this.namePlate);
+        if (this.gui._linkedControls.length === 0) this.gui.addControl(this.namePlate);
 
         this.namePlate.linkWithMesh(mesh);
     }

@@ -1,3 +1,5 @@
+import { Settings } from "../settings";
+
 export function parseSpeed(speed: number): string {
     if (speed < 1000) {
         return `${speed.toFixed(0)} m/s`;
@@ -6,6 +8,6 @@ export function parseSpeed(speed: number): string {
     } else if (speed < 20000000) {
         return `${(speed / 1000000).toFixed(2)} Mm/s`;
     } else {
-        return `${(speed / 299792458).toFixed(2)} c`;
+        return `${(speed / Settings.C).toFixed(2)} c`;
     }
 }

@@ -27,7 +27,7 @@ export class BlackHole extends AbstractBody {
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.descriptor.physicalProperties.temperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.transform.node;
-        if (this.descriptor.physicalProperties.accretionDiskRadius == 0) this.light.intensity = 0;
+        if (this.descriptor.physicalProperties.accretionDiskRadius === 0) this.light.intensity = 0;
 
         this.orbitalProperties = this.descriptor.orbitalProperties;
 

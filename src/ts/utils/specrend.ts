@@ -243,7 +243,7 @@ function constrain_rgb(r: number, g: number, b: number): number[] {
 */
 
 function gamma_correct(cs: ColourSystem, c: number): number {
-    if (cs.gamma == GAMMA_REC709) {
+    if (cs.gamma === GAMMA_REC709) {
         /* Rec. 709 gamma correction. */
         const cc = 0.018;
 
@@ -274,7 +274,7 @@ function gamma_correct_rgb(cs: ColourSystem, r: number, g: number, b: number): n
 function norm_rgb(r: number, g: number, b: number): number[] {
     let greatest = Math.max(r, Math.max(g, b));
 
-    if (greatest == 0) greatest = 1;
+    if (greatest === 0) greatest = 1;
 
     return [r / greatest, g / greatest, b / greatest];
 }

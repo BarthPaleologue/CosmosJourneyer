@@ -34,7 +34,7 @@ export function solveKepler(M: number, e: number) {
 }
 
 export function computeBarycenter2(bodies: IOrbitalBody[]): Vector3 {
-    if (bodies.length == 0) throw new Error("Can compute the barycenter of zero bodies");
+    if (bodies.length === 0) throw new Error("Can compute the barycenter of zero bodies");
     const barycenter = Vector3.Zero();
     let sum = 0;
     for (const body of bodies) {
@@ -95,6 +95,6 @@ export function getOrbitalPeriod(periapsis: number, apoapsis: number, otherBodie
     const G = 1e12;
     let M = 0;
     for (const otherBody of otherBodies) M += otherBody.physicalProperties.mass;
-    if (M == 0) return 0;
+    if (M === 0) return 0;
     return Math.sqrt((4 * Math.PI ** 2 * a ** 3) / (G * M));
 }

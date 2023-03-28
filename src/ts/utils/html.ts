@@ -1,6 +1,6 @@
 export function clearAllEventListenersById(id: string): HTMLElement {
     const oldElement = document.getElementById(id);
-    if (oldElement == null) throw new Error(`Could not find #${id} in document`);
+    if (oldElement === null) throw new Error(`Could not find #${id} in document`);
     const newElement = oldElement.cloneNode(true);
     (oldElement.parentNode as HTMLElement).replaceChild(newElement, oldElement);
     return document.getElementById(id) as HTMLElement;

@@ -17,7 +17,7 @@ export class CollisionWorker {
 
         this.worker = new Worker(new URL("collisionScript", import.meta.url), { type: "module" });
         this.worker.onmessage = (e) => {
-            if (this.starSystem == null || this.player == null || this.currentBody == null) return;
+            if (this.starSystem === null || this.player === null || this.currentBody === null) return;
 
             const direction = this.currentBody.transform.getAbsolutePosition().normalizeToNew();
             const currentHeight = this.currentBody.transform.getAbsolutePosition().length();

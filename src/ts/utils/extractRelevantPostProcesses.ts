@@ -5,7 +5,7 @@ export function extractRelevantPostProcesses(postProcesses: BodyPostProcess[], b
     const relevant = [];
     const notRelevant = [];
     for (const postProcess of postProcesses) {
-        if (postProcess.body == body) relevant.push(postProcess);
+        if (postProcess.body === body) relevant.push(postProcess);
         else notRelevant.push(postProcess);
     }
     return [relevant, notRelevant];

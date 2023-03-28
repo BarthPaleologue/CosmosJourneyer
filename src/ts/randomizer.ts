@@ -37,7 +37,7 @@ spaceshipController.addInput(gamepad);
 
 scene.setActiveController(spaceshipController);
 
-engine.registerUpdateCallback(() => {
+engine.registerStarSystemUpdateCallback(() => {
     if (scene.getActiveController() != spaceshipController) return;
 
     const shipPosition = spaceshipController.transform.getAbsolutePosition();
@@ -57,8 +57,8 @@ engine.setStarSystem(starSystem);
 starSystem.generate();
 
 document.addEventListener("keydown", (e) => {
-    if (e.key == "g") {
-        if (scene.getActiveController() == spaceshipController) {
+    if (e.key === "g") {
+        if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);
             player.transform.setRotationQuaternion(spaceshipController.transform.getRotationQuaternion().clone());
             engine.getStarSystem().postProcessManager.rebuild(spaceshipController.getActiveCamera());
@@ -74,7 +74,7 @@ document.addEventListener("keydown", (e) => {
 
 engine.init();
 
-const nbRadius = starSystem.descriptor.getBodyTypeOfStar(0) == BODY_TYPE.BLACK_HOLE ? 8 : 3;
+const nbRadius = starSystem.descriptor.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 3;
 positionNearBody(scene.getActiveController(), starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);
 
 engine.bodyEditor.setVisibility(EditorVisibility.NAVBAR);

@@ -1,7 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { BODY_TYPE, BodyDescriptor, PlanemoDescriptor , SolidPhysicalProperties } from "../common";
+import { BODY_TYPE, BodyDescriptor, PlanemoDescriptor, SolidPhysicalProperties } from "../common";
 import { TerrainSettings } from "../../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
@@ -50,8 +50,8 @@ export class TelluricPlanemoDescriptor implements PlanemoDescriptor {
         this.parentBodies = parentBodies;
 
         for (const parentBody of parentBodies) {
-            if (parentBody.bodyType == BODY_TYPE.TELLURIC) this.isSatelliteOfTelluric = true;
-            if (parentBody.bodyType == BODY_TYPE.GAS) this.isSatelliteOfGas = true;
+            if (parentBody.bodyType === BODY_TYPE.TELLURIC) this.isSatelliteOfTelluric = true;
+            if (parentBody.bodyType === BODY_TYPE.GAS) this.isSatelliteOfGas = true;
         }
 
         if (this.isSatelliteOfTelluric) {

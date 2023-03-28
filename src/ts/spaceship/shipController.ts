@@ -57,7 +57,7 @@ export class ShipController extends AbstractController {
 
     public override addInput(input: Input): void {
         super.addInput(input);
-        if (input.type == InputType.KEYBOARD) {
+        if (input.type === InputType.KEYBOARD) {
             const keyboard = input as Keyboard;
             keyboard.addPressedOnceListener("f", () => {
                 this.flightAssistEnabled = !this.flightAssistEnabled;
@@ -99,14 +99,14 @@ export class ShipController extends AbstractController {
     }
 
     protected override listenTo(input: Input, deltaTime: number): Vector3 {
-        if (this.getActiveCamera() == this.thirdPersonCamera) {
-            if (input.type == InputType.KEYBOARD) {
+        if (this.getActiveCamera() === this.thirdPersonCamera) {
+            if (input.type === InputType.KEYBOARD) {
                 const keyboard = input as Keyboard;
                 if (keyboard.isPressed("1")) this.thirdPersonCamera.rotatePhi(0.8 * deltaTime);
                 if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-0.8 * deltaTime);
                 if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
                 if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
-            } else if (input.type == InputType.MOUSE) {
+            } else if (input.type === InputType.MOUSE) {
                 const mouse = input as Mouse;
                 this.thirdPersonCamera.rotatePhi(mouse.getYaw() * deltaTime);
                 this.thirdPersonCamera.rotateTheta(mouse.getPitch() * deltaTime);
@@ -117,18 +117,18 @@ export class ShipController extends AbstractController {
         this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
         this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
 
-        if (this.warpDrive.getState() == WARPDRIVE_STATE.DISABLED) for (const thruster of this.thrusters) {
-            thruster.updateThrottle(0.3 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
-            thruster.updateThrottle(0.3 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD));
+        if (this.warpDrive.getState() === WARPDRIVE_STATE.DISABLED) {
+            for (const thruster of this.thrusters) {
+                thruster.updateThrottle(0.3 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
+                thruster.updateThrottle(0.3 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD));
 
-            thruster.updateThrottle(0.3 * deltaTime * input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.UP));
-            thruster.updateThrottle(0.3 * deltaTime * -input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.DOWN));
+                thruster.updateThrottle(0.3 * deltaTime * input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.UP));
+                thruster.updateThrottle(0.3 * deltaTime * -input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.DOWN));
 
-            thruster.updateThrottle(0.3 * deltaTime * input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.LEFT));
-            thruster.updateThrottle(0.3 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
-        }
+                thruster.updateThrottle(0.3 * deltaTime * input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.LEFT));
+                thruster.updateThrottle(0.3 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
+            }
 
-        if (this.warpDrive.getState() == WARPDRIVE_STATE.DISABLED) {
             const forwardAcceleration = this.transform.getForwardDirection()
                 .scale(this.getTotalAuthority(LOCAL_DIRECTION.FORWARD) * deltaTime);
             const backwardAcceleration = this.transform.getBackwardDirection()
@@ -170,7 +170,7 @@ export class ShipController extends AbstractController {
 
         for (const thruster of this.thrusters) thruster.update();
 
-        if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() == 0) {
+        if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() === 0) {
             this.transform.rotationSpeed.scaleInPlace(0.9);
         }
 

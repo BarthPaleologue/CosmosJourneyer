@@ -35,7 +35,7 @@ spaceshipController.addInput(gamepad);
 
 scene.setActiveController(spaceshipController);
 
-engine.registerUpdateCallback(() => {
+engine.registerStarSystemUpdateCallback(() => {
     if (scene.getActiveController() != spaceshipController) return;
 
     const shipPosition = spaceshipController.transform.getAbsolutePosition();
@@ -58,8 +58,8 @@ planet.descriptor.orbitalProperties.periapsis = 10000e3;
 planet.descriptor.orbitalProperties.apoapsis = 10000e3;
 
 document.addEventListener("keydown", (e) => {
-    if (e.key == "g") {
-        if (scene.getActiveController() == spaceshipController) {
+    if (e.key === "g") {
+        if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);
             player.transform.setRotationQuaternion(spaceshipController.transform.getRotationQuaternion().clone());
             engine.getStarSystem().postProcessManager.rebuild(spaceshipController.getActiveCamera());

@@ -117,7 +117,7 @@ export class StarSystem {
         to a system that already has ${this.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
 
-        const isStellarObjectBlackHole = this.descriptor.getBodyTypeOfStar(this.stellarObjects.length) == BODY_TYPE.BLACK_HOLE;
+        const isStellarObjectBlackHole = this.descriptor.getBodyTypeOfStar(this.stellarObjects.length) === BODY_TYPE.BLACK_HOLE;
 
         const star = isStellarObjectBlackHole
             ? new BlackHole(`blackHole${this.stellarObjects.length}`, seed, [], this.scene)
@@ -277,17 +277,17 @@ export class StarSystem {
      * Returns the nearest body to the origin
      */
     public getNearestBody(position = Vector3.Zero()): AbstractBody {
-        if (this.getBodies().length == 0) throw new Error("There are no bodies in the solar system");
+        if (this.getBodies().length === 0) throw new Error("There are no bodies in the solar system");
         let nearest = null;
         let smallerDistance2 = -1;
         for (const body of this.getBodies()) {
             const distance2 = body.transform.getAbsolutePosition().subtract(position).lengthSquared();
-            if (nearest == null || distance2 < smallerDistance2) {
+            if (nearest === null || distance2 < smallerDistance2) {
                 nearest = body;
                 smallerDistance2 = distance2;
             }
         }
-        if (nearest == null) throw new Error("There are no bodies in the solar system");
+        if (nearest === null) throw new Error("There are no bodies in the solar system");
         return nearest;
     }
 

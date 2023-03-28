@@ -81,7 +81,7 @@ export class StarMap {
         this.starMapUI = new StarMapUI();
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
-            if (this.selectedSystemSeed == null) throw new Error("No system selected!");
+            if (this.selectedSystemSeed === null) throw new Error("No system selected!");
             for (const callback of this.warpCallbacks) callback(this.selectedSystemSeed);
         });
 
@@ -217,7 +217,7 @@ export class StarMap {
 
     private disposeNextStars(n: number) {
         for (let i = 0; i < n; i++) {
-            if (this.starTrashQueue.length == 0) return;
+            if (this.starTrashQueue.length === 0) return;
             this.fadeOutThenDispose(this.starTrashQueue[0]);
             this.starTrashQueue.shift();
         }
@@ -225,7 +225,7 @@ export class StarMap {
 
     private buildNextStars(n: number): void {
         for (let i = 0; i < n; i++) {
-            if (this.starBuildStack.length == 0) return;
+            if (this.starBuildStack.length === 0) return;
 
             const data = this.starBuildStack.pop() as BuildData;
 
@@ -239,7 +239,7 @@ export class StarMap {
             const starSystemDescriptor = new StarSystemDescriptor(starSystemSeed);
 
             const starSeed = starSystemDescriptor.getStarSeed(0);
-            const isStarBlackHole = starSystemDescriptor.getBodyTypeOfStar(0) == BODY_TYPE.BLACK_HOLE;
+            const isStarBlackHole = starSystemDescriptor.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE;
 
             const starDescriptor = !isStarBlackHole ? new StarDescriptor(starSeed, []) : new BlackHoleDescriptor(starSeed);
 

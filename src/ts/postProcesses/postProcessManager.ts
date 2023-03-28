@@ -270,7 +270,7 @@ export class PostProcessManager {
     }
 
     public setBody(body: AbstractBody) {
-        if (this.currentBody == body) return;
+        if (this.currentBody === body) return;
         this.currentBody = body;
 
         this.currentRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
@@ -278,7 +278,7 @@ export class PostProcessManager {
     }
 
     public setSpaceOrder() {
-        if (this.currentRenderingPipeline == this.spaceRenderingPipeline) return;
+        if (this.currentRenderingPipeline === this.spaceRenderingPipeline) return;
         this.surfaceRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
         this.currentRenderingPipeline = this.spaceRenderingPipeline;
         this.renderingOrder = [
@@ -293,7 +293,7 @@ export class PostProcessManager {
     }
 
     public setSurfaceOrder() {
-        if (this.currentRenderingPipeline == this.surfaceRenderingPipeline) return;
+        if (this.currentRenderingPipeline === this.surfaceRenderingPipeline) return;
         this.spaceRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
         this.currentRenderingPipeline = this.surfaceRenderingPipeline;
         this.renderingOrder = [
@@ -321,7 +321,7 @@ export class PostProcessManager {
     }
 
     private getCurrentBody() {
-        if (this.currentBody == null) throw new Error("No body set to the postProcessManager");
+        if (this.currentBody === null) throw new Error("No body set to the postProcessManager");
         return this.currentBody;
     }
 
@@ -329,7 +329,7 @@ export class PostProcessManager {
         const bodyVolumetricLights: VolumetricLight[] = [];
         const otherVolumetricLights: VolumetricLight[] = [];
         for (const volumetricLight of this.volumetricLights) {
-            if (volumetricLight.body == this.getCurrentBody()) bodyVolumetricLights.push(volumetricLight);
+            if (volumetricLight.body === this.getCurrentBody()) bodyVolumetricLights.push(volumetricLight);
             else otherVolumetricLights.push(volumetricLight);
         }
         const otherVolumetricLightsRenderEffect = new PostProcessRenderEffect(this.engine, "otherVolumetricLightsRenderEffect", () => {

@@ -86,10 +86,10 @@ export class BodyEditor {
     }
 
     public switchPanel(panel: EditorPanel): void {
-        if (this.currentPanel == null) this.setVisibility(EditorVisibility.FULL);
+        if (this.currentPanel === null) this.setVisibility(EditorVisibility.FULL);
         else {
             this.currentPanel.hide();
-            if (this.currentPanel == panel) {
+            if (this.currentPanel === panel) {
                 this.currentPanel = null;
                 this.setVisibility(EditorVisibility.NAVBAR);
                 return;

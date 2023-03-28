@@ -39,7 +39,7 @@ spaceshipController.addInput(gamepad);
 
 scene.setActiveController(spaceshipController);
 
-engine.registerUpdateCallback(() => {
+engine.registerStarSystemUpdateCallback(() => {
     if (scene.getActiveController() != spaceshipController) return;
 
     const shipPosition = spaceshipController.transform.getAbsolutePosition();
@@ -135,8 +135,8 @@ aresAtmosphere.settings.greenWaveLength = 680;
 aresAtmosphere.settings.blueWaveLength = 670;
 
 document.addEventListener("keydown", (e) => {
-    if (e.key == "g") {
-        if (scene.getActiveController() == spaceshipController) {
+    if (e.key === "g") {
+        if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);
             player.transform.setRotationQuaternion(spaceshipController.transform.getRotationQuaternion().clone());
             engine.getStarSystem().postProcessManager.rebuild(spaceshipController.getActiveCamera());

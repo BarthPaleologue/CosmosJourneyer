@@ -42,7 +42,8 @@ export class BasicTransform implements ITransformLike {
     }
 
     public getRotationQuaternion(): Quaternion {
-        if (this.node.rotationQuaternion == undefined) throw new Error(`Undefined quaternion for ${this.node.name}`);
+        if (this.node.rotationQuaternion === undefined) throw new Error(`Undefined quaternion for ${this.node.name}`);
+        if (this.node.rotationQuaternion === null) throw new Error(`Null quaternion for ${this.node.name}`);
         return this.node.rotationQuaternion;
     }
 

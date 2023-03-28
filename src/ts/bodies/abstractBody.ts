@@ -48,10 +48,10 @@ export abstract class AbstractBody implements IOrbitalBody {
 
         let minDepth = -1;
         for (const parentBody of parentBodies) {
-            if (minDepth == -1) minDepth = parentBody.depth;
+            if (minDepth === -1) minDepth = parentBody.depth;
             else minDepth = Math.min(minDepth, parentBody.depth);
         }
-        if (minDepth == -1) this.depth = 0;
+        if (minDepth === -1) this.depth = 0;
         else this.depth = minDepth + 1;
     }
 
@@ -127,7 +127,7 @@ export abstract class AbstractBody implements IOrbitalBody {
      * @returns The elapsed angle of rotation around the axis
      */
     public updateRotation(deltaTime: number): number {
-        if (this.descriptor.physicalProperties.rotationPeriod == 0) {
+        if (this.descriptor.physicalProperties.rotationPeriod === 0) {
             this.nextState.rotation.copyFrom(this.transform.getRotationQuaternion());
             return 0;
         }
