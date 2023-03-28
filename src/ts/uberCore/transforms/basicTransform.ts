@@ -1,6 +1,6 @@
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { ITransformLike } from "./ITransformLike";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Scene } from "@babylonjs/core/scene";
 
@@ -53,6 +53,18 @@ export class BasicTransform implements ITransformLike {
 
     public setRotationQuaternion(newRotation: Quaternion): void {
         this.node.rotationQuaternion = newRotation;
+    }
+
+    public getRotationMatrix(): Matrix {
+        const rotationMatrix = new Matrix();
+        this.getRotationQuaternion().toRotationMatrix(rotationMatrix);
+        return rotationMatrix;
+    }
+
+    public getInverseRotationMatrix(): Matrix {
+        const inverseRotationMatrix = new Matrix();
+        this.getInverseRotationQuaternion().toRotationMatrix(inverseRotationMatrix);
+        return inverseRotationMatrix;
     }
 
     /* #region directions */

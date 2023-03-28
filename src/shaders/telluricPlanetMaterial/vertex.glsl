@@ -1,9 +1,7 @@
 precision highp float;
 
-attribute vec3 vertex;
 attribute vec3 position;
 attribute vec3 normal;
-attribute vec2 uv;
 
 #ifdef LOGARITHMICDEPTH
 	uniform float logarithmicDepthConstant;
@@ -17,6 +15,7 @@ uniform mat4 normalMatrix;
 uniform vec3 planetPosition; // nécessaire temporairement le temps de régler le problème des floats
 
 uniform vec4 planetInverseRotationQuaternion;
+uniform mat4 planetInverseRotationMatrix;
 
 varying vec3 vPositionW;
 varying vec3 vNormalW;
@@ -30,8 +29,6 @@ varying vec3 vSamplePoint;
 varying vec3 vSamplePointScaled;
 
 varying vec3 vLocalPosition;
-
-#pragma glslify: applyQuaternion = require(../utils/applyQuaternion.glsl)
 
 void main() {
 
@@ -48,10 +45,10 @@ void main() {
 	vPosition = vPositionW - planetPosition;
 	vLocalPosition = position;
 
-	vUnitSamplePoint = applyQuaternion(planetInverseRotationQuaternion, normalize(vPosition));
-	vSamplePointScaled = applyQuaternion(planetInverseRotationQuaternion, vPosition / 1000e3);
+	vUnitSamplePoint = mat3(planetInverseRotationMatrix) * normalize(vPosition);
+	vSamplePointScaled = mat3(planetInverseRotationMatrix) * vPosition / 1000e3;
     vSphereNormalW = mat3(normalMatrix) * vUnitSamplePoint;
-	vSamplePoint = applyQuaternion(planetInverseRotationQuaternion, vPosition);
+	vSamplePoint = mat3(planetInverseRotationMatrix) * vPosition;
 
 	vNormal = normal;
 }

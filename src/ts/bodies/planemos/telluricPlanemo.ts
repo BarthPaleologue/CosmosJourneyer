@@ -107,7 +107,7 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
     }
 
     public updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
-        this.material.update(controller, stellarObjects, deltaTime);
+        this.material.update(controller, stellarObjects);
     }
 
     public override getApparentRadius(): number {

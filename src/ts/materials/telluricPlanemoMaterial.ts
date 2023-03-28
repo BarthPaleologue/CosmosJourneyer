@@ -48,7 +48,6 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "beachNormalMap",
                 "desertNormalMap",
                 "snowNormalMap",
-                "snowNormalMap2",
                 "steepNormalMap",
 
                 "seed",
@@ -61,7 +60,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "starPositions",
                 "nbStars",
 
-                "planetInverseRotationQuaternion",
+                "planetInverseRotationMatrix",
 
                 "playerPosition",
 
@@ -99,7 +98,6 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
 
             snowColor: new Color3(0.7, 0.7, 0.7),
             steepColor: new Color3(115, 100, 100).scaleInPlace(1 / 255),
-            //plainColor: plainColor: new Color3(56, 94, 6).scaleInPlace(1 / 255),
             plainColor: new Color3(
                 //TODO: make this better
                 Math.max(0.22 + centeredRand(planetDescriptor.rng, 82) / 20, 0),
@@ -156,10 +154,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         this.setTexture("bottomNormalMap", Assets.BottomNormalMap);
         this.setTexture("steepNormalMap", Assets.RockNormalMap);
         this.setTexture("plainNormalMap", Assets.GrassNormalMap);
-
         this.setTexture("snowNormalMap", Assets.SnowNormalMap1);
-        this.setTexture("snowNormalMap2", Assets.SnowNormalMap2);
-
         this.setTexture("beachNormalMap", Assets.SandNormalMap1);
         this.setTexture("desertNormalMap", Assets.SandNormalMap2);
 
@@ -171,10 +166,13 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         this.setFloat("maxElevation", this.terrainSettings.continent_base_height + this.terrainSettings.max_mountain_height + this.terrainSettings.max_bump_height);
     }
 
-    public update(activeController: AbstractController, stellarObjects: StellarObject[], deltaTime: number) {
-        this.setMatrix("normalMatrix", this.planet.node.getWorldMatrix().clone().invert().transpose());
+    public update(activeController: AbstractController, stellarObjects: StellarObject[]) {
+        //this.planet.node.computeWorldMatrix(true);
+        //for (const object of this.planet.node.getChildMeshes()) object.computeWorldMatrix(true);
 
-        this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
+        this.setMatrix("normalMatrix", this.planet.node.getWorldMatrix().clone().invert().transpose());
+        this.setMatrix("planetInverseRotationMatrix", this.planet.getInverseRotationMatrix());
+
         this.setVector3("playerPosition", activeController.transform.getAbsolutePosition());
 
         this.setArray3("starPositions", flattenVector3Array(stellarObjects.map((star) => star.transform.getAbsolutePosition())));

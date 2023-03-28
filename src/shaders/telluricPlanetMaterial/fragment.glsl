@@ -40,7 +40,6 @@ uniform sampler2D beachNormalMap;
 uniform sampler2D desertNormalMap;
 
 uniform sampler2D snowNormalMap;
-uniform sampler2D snowNormalMap2;
 
 uniform sampler2D steepNormalMap;
 
