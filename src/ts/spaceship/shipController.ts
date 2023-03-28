@@ -10,7 +10,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Thruster } from "./thruster";
-import { WARPDRIVE_STATE, WarpDrive } from "./warpDrive";
+import { WarpDrive } from "./warpDrive";
 import { parseSpeed } from "../utils/parseSpeed";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";
 
@@ -86,7 +86,7 @@ export class ShipController extends AbstractController {
     }
 
     public toggleWarpDrive() {
-        if (this.warpDrive.getState() != WARPDRIVE_STATE.ENABLED) {
+        if (this.warpDrive.isEnabled()) {
             this.warpDrive.enable();
             for (const thruster of this.thrusters) thruster.setThrottle(0);
         } else this.warpDrive.desengage();
@@ -117,7 +117,7 @@ export class ShipController extends AbstractController {
         this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
         this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
 
-        if (this.warpDrive.getState() === WARPDRIVE_STATE.DISABLED) {
+        if (this.warpDrive.isDisabled()) {
             for (const thruster of this.thrusters) {
                 thruster.updateThrottle(0.3 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
                 thruster.updateThrottle(0.3 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD));

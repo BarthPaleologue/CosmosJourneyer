@@ -1,6 +1,6 @@
 import { Settings } from "../settings";
 
-export enum WARPDRIVE_STATE {
+enum WARPDRIVE_STATE {
     /**
      * The warp drive is disabled. It can be enabled by the user.
      */
@@ -82,11 +82,27 @@ export class WarpDrive {
     }
 
     /**
-     * Returns the current state of the warp drive.
-     * @returns The current state of the warp drive.
+     * Returns true if the warp drive is enabled and not desengaging. Returns false otherwise.
+     * @returns True if the warp drive is enabled and not desengaging. Returns false otherwise.
      */
-    public getState(): WARPDRIVE_STATE {
-        return this.state;
+    public isEnabled(): boolean {
+        return this.state === WARPDRIVE_STATE.ENABLED;
+    }
+
+    /**
+     * Returns true if the warp drive is disabled. Returns false otherwise.
+     * @returns True if the warp drive is disabled. Returns false otherwise.
+     */
+    public isDisabled(): boolean {
+        return this.state === WARPDRIVE_STATE.DISABLED;
+    }
+
+    /**
+     * Returns true if the warp drive is desengaging. Returns false otherwise.
+     * @returns True if the warp drive is desengaging. Returns false otherwise.
+     */
+    public isDesengaging(): boolean {
+        return this.state === WARPDRIVE_STATE.DESENGAGING;
     }
 
     /**
