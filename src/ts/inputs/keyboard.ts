@@ -12,7 +12,7 @@ export class Keyboard implements Input {
             this.keysPressed.set(e.key, true);
 
             if (!e.repeat) {
-                this.onPressedOnce.get(e.key)?.forEach(callback => {
+                this.onPressedOnce.get(e.key)?.forEach((callback) => {
                     callback();
                 });
             }

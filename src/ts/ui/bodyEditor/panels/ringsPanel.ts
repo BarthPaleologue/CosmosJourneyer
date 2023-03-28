@@ -29,7 +29,6 @@ export class RingsPanel extends EditorPanel {
             rings.settings.ringColor.copyFrom(Color3.FromHexString(snowColorPicker.value));
         });
 
-
         this.sliders = [
             new Slider("ringsMinRadius", document.getElementById("ringsMinRadius") as HTMLElement, 100, 200, rings.settings.ringStart * 100, (val: number) => {
                 rings.settings.ringStart = val / 100;

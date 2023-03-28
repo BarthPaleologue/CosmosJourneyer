@@ -134,7 +134,7 @@ export class Assets {
     static CreateSpaceShipInstance(): InstancedMesh {
         const spaceshipInstance = Assets.Spaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
         const root = Assets.Spaceship.parent;
-        // make copy of root node using JS 
+        // make copy of root node using JS
         if (!root) throw new Error("Spaceship has no parent!");
 
         spaceshipInstance.setParent(root);

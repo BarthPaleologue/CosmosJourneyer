@@ -1,7 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { BODY_TYPE, BodyDescriptor, PlanemoDescriptor , PlanetPhysicalProperties } from "../common";
+import { BODY_TYPE, BodyDescriptor, PlanemoDescriptor, PlanetPhysicalProperties } from "../common";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../../orbits/kepler";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";

@@ -27,7 +27,6 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
-
 export enum PostProcessType {
     VOLUMETRIC_LIGHT,
     OCEAN,

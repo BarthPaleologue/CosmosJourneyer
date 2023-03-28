@@ -129,20 +129,14 @@ export class ShipController extends AbstractController {
                 thruster.updateThrottle(0.3 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
             }
 
-            const forwardAcceleration = this.transform.getForwardDirection()
-                .scale(this.getTotalAuthority(LOCAL_DIRECTION.FORWARD) * deltaTime);
-            const backwardAcceleration = this.transform.getBackwardDirection()
-                .scale(this.getTotalAuthority(LOCAL_DIRECTION.BACKWARD) * deltaTime);
+            const forwardAcceleration = this.transform.getForwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.FORWARD) * deltaTime);
+            const backwardAcceleration = this.transform.getBackwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.BACKWARD) * deltaTime);
 
-            const upwardAcceleration = this.transform.getUpwardDirection()
-                .scale(this.getTotalAuthority(LOCAL_DIRECTION.UP) * deltaTime);
-            const downwardAcceleration = this.transform.getDownwardDirection()
-                .scale(this.getTotalAuthority(LOCAL_DIRECTION.DOWN) * deltaTime);
+            const upwardAcceleration = this.transform.getUpwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.UP) * deltaTime);
+            const downwardAcceleration = this.transform.getDownwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.DOWN) * deltaTime);
 
-            const rightAcceleration = this.transform.getRightDirection()
-                .scale(this.getTotalAuthority(LOCAL_DIRECTION.RIGHT) * deltaTime);
-            const leftAcceleration = this.transform.getLeftDirection()
-                .scale(this.getTotalAuthority(LOCAL_DIRECTION.LEFT) * deltaTime);
+            const rightAcceleration = this.transform.getRightDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.RIGHT) * deltaTime);
+            const leftAcceleration = this.transform.getLeftDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.LEFT) * deltaTime);
 
             this.transform.acceleration.addInPlace(forwardAcceleration);
             this.transform.acceleration.addInPlace(backwardAcceleration);

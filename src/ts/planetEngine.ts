@@ -49,8 +49,7 @@ export class PlanetEngine {
         //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
             if (e.key === "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
-            if (e.key === "p")
-                Tools.CreateScreenshot(this.getEngine(), this.getStarSystemScene().getActiveController().getActiveCamera(), { precision: 4 });
+            if (e.key === "p") Tools.CreateScreenshot(this.getEngine(), this.getStarSystemScene().getActiveController().getActiveCamera(), { precision: 4 });
             if (e.key === "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
             //if (e.key === "m") mouse.deadAreaRadius === 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
             //if (e.key === "w" && isOrbiting(this.getStarSystemScene().getActiveController(), this.getStarSystem().getNearestBody()))
@@ -165,7 +164,7 @@ export class PlanetEngine {
 
     /**
      * Sets the star system (does not dispose the previous one !!!)
-     * @param starSystem 
+     * @param starSystem
      * @deprecated
      */
     public setStarSystem(starSystem: StarSystem): void {

@@ -25,7 +25,7 @@ import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import "@babylonjs/core/Animations/animatable";
-import '@babylonjs/core/Culling/ray';
+import "@babylonjs/core/Culling/ray";
 
 export class StarMap {
     readonly scene: Scene;
@@ -262,13 +262,13 @@ export class StarMap {
                     this.starMapUI.attachUIToMesh(star);
                     this.starMapUI.setUIText(
                         "Seed: " +
-                        starSystemDescriptor.seed +
-                        "\n" +
-                        "Type: " +
-                        getStellarTypeString(starDescriptor.stellarType) +
-                        "\n" +
-                        "Planets: " +
-                        starSystemDescriptor.getNbPlanets()
+                            starSystemDescriptor.seed +
+                            "\n" +
+                            "Type: " +
+                            getStellarTypeString(starDescriptor.stellarType) +
+                            "\n" +
+                            "Planets: " +
+                            starSystemDescriptor.getNbPlanets()
                     );
 
                     this.selectedSystemSeed = starSystemSeed;

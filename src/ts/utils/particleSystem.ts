@@ -10,7 +10,6 @@ function randomNumber(min: number, max: number): number {
 }
 
 export class DirectionnalParticleSystem extends ParticleSystem {
-
     private direction: Vector3;
 
     readonly nbParticles = 5000;
