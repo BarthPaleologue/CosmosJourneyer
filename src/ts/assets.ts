@@ -18,6 +18,8 @@ import starfield from "../asset/textures/milkyway.jpg";
 
 //import character from "../asset/man/man.obj";
 import spaceship from "../asset/spaceship/spaceship.glb";
+import spacestation from "../asset/spacestation/spacestation.glb";
+
 import { ChunkForge } from "./chunks/chunkForge";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -49,6 +51,7 @@ export class Assets {
 
     //static Character: AbstractMesh;
     static Spaceship: Mesh;
+    static Spacestation: Mesh;
 
     static ChunkForge = new ChunkForge(64);
 
@@ -88,8 +91,16 @@ export class Assets {
 
             const spaceshipTask = Assets.manager.addMeshTask("spaceshipTask", "", "", spaceship);
             spaceshipTask.onSuccess = function (task: MeshAssetTask) {
-                Assets.Spaceship = task.loadedMeshes[1] as Mesh;
+                Assets.Spaceship = task.loadedMeshes[0] as Mesh;
                 Assets.Spaceship.isVisible = false;
+                //Assets.Spaceship.rotate(Vector3.Up(), -Math.PI / 2);
+
+                for (const mesh of Assets.Spaceship.getChildMeshes()) {
+                    mesh.isVisible = false;
+                    //mesh.rotate(Vector3.Up(), -Math.PI / 2);
+                    const pbr = mesh.material as PBRBaseMaterial;
+                    pbr.useLogarithmicDepth = true;
+                }
 
                 const thrusterHelper = MeshBuilder.CreateCylinder("thruster1", { height: 0.5, diameterTop: 0, diameterBottom: 0.5 }, scene);
                 const cubeMaterial = new StandardMaterial("cubeMat", scene);
@@ -98,11 +109,11 @@ export class Assets {
                 cubeMaterial.useLogarithmicDepth = true;
                 thrusterHelper.material = cubeMaterial;
                 thrusterHelper.isVisible = false;
-                thrusterHelper.position = new Vector3(4, 0, 0.5);
-                thrusterHelper.rotation = new Vector3(0, 0, -Math.PI / 2);
+                thrusterHelper.position = new Vector3(0.5, 0, -4);
+                thrusterHelper.rotation = new Vector3(-Math.PI / 2, 0, 0);
 
                 const thrusterHelper2 = thrusterHelper.clone("thruster2");
-                thrusterHelper2.position = new Vector3(4, 0, -0.5);
+                thrusterHelper2.position = new Vector3(-0.5, 0, -4);
 
                 const thrusterHelper3 = thrusterHelper.clone("thruster3");
                 thrusterHelper3.position = new Vector3(0, -1, 0);
@@ -112,10 +123,21 @@ export class Assets {
                 thrusterHelper2.parent = Assets.Spaceship;
                 thrusterHelper3.parent = Assets.Spaceship;
 
-                const pbr = Assets.Spaceship.material as PBRBaseMaterial;
-                pbr.useLogarithmicDepth = true;
-
                 console.log("Spaceship loaded");
+            };
+
+            const spacestationTask = Assets.manager.addMeshTask("spacestationTask", "", "", spacestation);
+            spacestationTask.onSuccess = function (task: MeshAssetTask) {
+                Assets.Spacestation = task.loadedMeshes[0] as Mesh;
+                Assets.Spacestation.isVisible = false;
+
+                for (const mesh of Assets.Spacestation.getChildMeshes()) {
+                    mesh.isVisible = false;
+                    const pbr = mesh.material as PBRBaseMaterial;
+                    pbr.useLogarithmicDepth = true;
+                }
+
+                console.log("Spacestation loaded");
             };
 
             Assets.manager.onProgress = (remainingCount, totalCount) => {
@@ -132,14 +154,11 @@ export class Assets {
     }
 
     static CreateSpaceShipInstance(): InstancedMesh {
-        const spaceshipInstance = Assets.Spaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-        const root = Assets.Spaceship.parent;
-        // make copy of root node using JS
-        if (!root) throw new Error("Spaceship has no parent!");
+        return Assets.Spaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+    }
 
-        spaceshipInstance.setParent(root);
-
-        return spaceshipInstance;
+    static CreateSpaceStationInstance(): InstancedMesh {
+        return Assets.Spacestation.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static DebugMaterial(name: string) {

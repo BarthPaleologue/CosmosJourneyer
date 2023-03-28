@@ -86,7 +86,7 @@ export class ShipController extends AbstractController {
     }
 
     public toggleWarpDrive() {
-        if (this.warpDrive.isEnabled()) {
+        if (!this.warpDrive.isEnabled()) {
             this.warpDrive.enable();
             for (const thruster of this.thrusters) thruster.setThrottle(0);
         } else this.warpDrive.desengage();
