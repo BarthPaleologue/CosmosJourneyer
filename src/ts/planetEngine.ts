@@ -95,9 +95,7 @@ export class PlanetEngine {
 
         this.starMap = new StarMap(this.engine);
         this.starMap.registerWarpCallback((seed: number) => {
-            this.getStarSystem().dispose();
-            this.starSystem = new StarSystem(seed, this.getStarSystemScene());
-            this.starSystem.generate();
+            this.setStarSystem(new StarSystem(seed, this.getStarSystemScene()), true);
             this.init();
             positionNearBody(this.getStarSystemScene().getActiveController(), this.getStarSystem().getBodies()[0], this.getStarSystem());
             this.toggleStarMap();
@@ -168,12 +166,14 @@ export class PlanetEngine {
     }
 
     /**
-     * Sets the star system (does not dispose the previous one !!!)
-     * @param starSystem
-     * @deprecated
+     * Sets the star system and generates it if needed and disposes the old one. Does not perform the init method
+     * @param starSystem the star system to be set
+     * @param needsGenerating whether the star system needs to be generated or not
      */
-    public setStarSystem(starSystem: StarSystem): void {
+    public setStarSystem(starSystem: StarSystem, needsGenerating: boolean): void {
+        this.starSystem?.dispose();
         this.starSystem = starSystem;
+        if (needsGenerating) this.starSystem.generate();
     }
 
     /**

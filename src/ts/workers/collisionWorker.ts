@@ -1,8 +1,8 @@
 import { TransferCollisionData } from "../chunks/workerDataTypes";
 import { StarSystem } from "../bodies/starSystem";
 import { AbstractController } from "../uberCore/abstractController";
-import { RigidBody } from "../bodies/common";
 import { ITransformable } from "../orbits/iOrbitalBody";
+import { RigidBody } from "./rigidbody";
 
 export class CollisionWorker {
     private currentBody: (RigidBody & ITransformable) | null = null;
@@ -49,10 +49,12 @@ export class CollisionWorker {
     public isBusy(): boolean {
         return this._isBusy;
     }
+
     private postMessage(data: TransferCollisionData): void {
         this.worker.postMessage(data);
         this._isBusy = true;
     }
+
     public checkCollision(planet: RigidBody & ITransformable): void {
         this.currentBody = planet;
         const playerSamplePosition = planet.transform.getAbsolutePosition().negate();

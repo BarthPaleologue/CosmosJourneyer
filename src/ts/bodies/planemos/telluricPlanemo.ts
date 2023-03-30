@@ -4,7 +4,6 @@ import { Direction } from "../../utils/direction";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
-import { RigidBody, TelluricPlanetPostProcesses } from "../common";
 import { TransferCollisionData } from "../../chunks/workerDataTypes";
 import { TaskType } from "../../chunks/taskTypes";
 import { AbstractController } from "../../uberCore/abstractController";
@@ -15,9 +14,11 @@ import { UberScene } from "../../uberCore/uberScene";
 import { Planemo } from "./planemo";
 import { TelluricPlanemoDescriptor } from "../../descriptors/planemos/telluricPlanemoDescriptor";
 import { StellarObject } from "../stellarObjects/stellarObject";
+import { PostProcessType } from "../../postProcesses/postProcessTypes";
+import { RigidBody } from "../../workers/rigidbody";
 
 export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo {
-    override readonly postProcesses: TelluricPlanetPostProcesses;
+    override readonly postProcesses: PostProcessType[] = [];
 
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
 
@@ -42,30 +43,24 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
 
         this.transform.rotate(Axis.X, this.descriptor.physicalProperties.axialTilt);
 
-        this.postProcesses = {
-            overlay: true,
-            atmosphere: false,
-            ocean: false,
-            clouds: false,
-            rings: false
-        };
+        this.postProcesses.push(PostProcessType.OVERLAY);
 
         const waterBoilingPoint = waterBoilingPointCelsius(this.descriptor.physicalProperties.pressure);
         const waterFreezingPoint = 0.0;
         const epsilon = 0.05;
         if (this.descriptor.physicalProperties.pressure > epsilon) {
             if (waterFreezingPoint > this.descriptor.physicalProperties.minTemperature && waterFreezingPoint < this.descriptor.physicalProperties.maxTemperature) {
-                this.postProcesses.ocean = true;
-                this.postProcesses.clouds = true;
+                this.postProcesses.push(PostProcessType.OCEAN);
+                this.postProcesses.push(PostProcessType.CLOUDS);
             } else {
                 this.descriptor.physicalProperties.oceanLevel = 0;
             }
-            this.postProcesses.atmosphere = true;
+            this.postProcesses.push(PostProcessType.ATMOSPHERE);
         } else {
             this.descriptor.physicalProperties.oceanLevel = 0;
         }
 
-        this.postProcesses.rings = this.descriptor.hasRings;
+        if (this.descriptor.hasRings) this.postProcesses.push(PostProcessType.RING);
 
         this.material = new TelluricPlanemoMaterial(this.name, this.transform, this.descriptor, scene);
 

@@ -5,6 +5,7 @@ import { GasPlanet } from "../../../bodies/planemos/gasPlanet";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
+import { PostProcessType } from "../../../postProcesses/postProcessTypes";
 
 export class AtmospherePanel extends EditorPanel {
     constructor() {
@@ -13,7 +14,7 @@ export class AtmospherePanel extends EditorPanel {
     init(planet: TelluricPlanemo | GasPlanet, postProcessManager: PostProcessManager) {
         for (const slider of this.sliders) slider.remove();
 
-        if (!planet.postProcesses.atmosphere) return;
+        if (!planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) return;
         const atmosphere = postProcessManager.getAtmosphere(planet);
 
         const atmosphereToggler = clearAllEventListenersById("atmosphereToggler");

@@ -17,7 +17,6 @@ import { GasPlanet } from "../bodies/planemos/gasPlanet";
 import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
 import { extractRelevantPostProcesses } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess, VolumetricCloudsPostProcess } from "./volumetricCloudsPostProcess";
-import { BODY_TYPE } from "../descriptors/common";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
@@ -26,16 +25,9 @@ import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { BaseObject } from "../bodies/common";
-
-export enum PostProcessType {
-    VOLUMETRIC_LIGHT,
-    OCEAN,
-    CLOUDS,
-    ATMOSPHERE,
-    RING,
-    BLACK_HOLE
-}
+import { AbstractObject } from "../bodies/abstractObject";
+import { BaseObject } from "../orbits/iOrbitalBody";
+import { PostProcessType } from "./postProcessTypes";
 
 export class PostProcessManager {
     private readonly engine: Engine;
@@ -246,31 +238,39 @@ export class PostProcessManager {
      * @param body A body
      * @param stellarObjects An array of stars or black holes lighting the body
      */
-    public addBody(body: AbstractBody, stellarObjects: StellarObject[]) {
-        if (body.postProcesses.rings) this.addRings(body, stellarObjects);
-        if (body.postProcesses.overlay) this.addOverlay(body);
-        switch (body.descriptor.bodyType) {
-            case BODY_TYPE.STAR:
-                if ((body as Star).postProcesses.volumetricLight) this.addVolumetricLight(body as Star);
-                break;
-            case BODY_TYPE.TELLURIC:
-                if ((body as TelluricPlanemo).postProcesses.atmosphere) this.addAtmosphere(body as TelluricPlanemo, stellarObjects);
-                if ((body as TelluricPlanemo).postProcesses.clouds) this.addClouds(body as TelluricPlanemo, stellarObjects);
-                if ((body as TelluricPlanemo).postProcesses.ocean) this.addOcean(body as TelluricPlanemo, stellarObjects);
-                break;
-            case BODY_TYPE.GAS:
-                if ((body as GasPlanet).postProcesses.atmosphere) this.addAtmosphere(body as GasPlanet, stellarObjects);
-                break;
-            case BODY_TYPE.BLACK_HOLE:
-                if ((body as BlackHole).postProcesses.blackHole) this.addBlackHole(body as BlackHole);
-                break;
-            default:
-                throw new Error(`Unknown body type : ${body.descriptor.bodyType}`);
+    public addObject(body: AbstractObject, stellarObjects: StellarObject[]) {
+        for (const postProcess of body.postProcesses) {
+            switch (postProcess) {
+                case PostProcessType.RING:
+                    if (!(body instanceof AbstractBody)) throw new Error("Rings post process can only be added to bodies. Source:" + body.name);
+                    this.addRings(body, stellarObjects);
+                    break;
+                case PostProcessType.OVERLAY:
+                    this.addOverlay(body);
+                    break;
+                case PostProcessType.ATMOSPHERE:
+                    if (!(body instanceof GasPlanet) && !(body instanceof TelluricPlanemo))
+                        throw new Error("Atmosphere post process can only be added to gas or telluric planets. Source:" + body.name);
+                    this.addAtmosphere(body as GasPlanet | TelluricPlanemo, stellarObjects);
+                    break;
+                case PostProcessType.CLOUDS:
+                    if (!(body instanceof TelluricPlanemo)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + body.name);
+                    this.addClouds(body as TelluricPlanemo, stellarObjects);
+                    break;
+                case PostProcessType.OCEAN:
+                    if (!(body instanceof TelluricPlanemo)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + body.name);
+                    this.addOcean(body as TelluricPlanemo, stellarObjects);
+                    break;
+                case PostProcessType.VOLUMETRIC_LIGHT:
+                    if (!(body instanceof Star)) throw new Error("Volumetric light post process can only be added to stars. Source:" + body.name);
+                    this.addVolumetricLight(body as Star);
+                    break;
+                case PostProcessType.BLACK_HOLE:
+                    if (!(body instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + body.name);
+                    this.addBlackHole(body as BlackHole);
+                    break;
+            }
         }
-    }
-
-    public addObject(object: BaseObject) {
-        if (object.postProcesses.overlay) this.addOverlay(object);
     }
 
     public setBody(body: AbstractBody) {

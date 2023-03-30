@@ -1,6 +1,6 @@
 import { UberScene } from "../uberCore/uberScene";
 import { ShaderSamplers, ShaderUniforms, UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
-import { BaseObject } from "../bodies/common";
+import { BaseObject } from "../orbits/iOrbitalBody";
 
 export abstract class BodyPostProcess extends UberPostProcess {
     readonly body: BaseObject;

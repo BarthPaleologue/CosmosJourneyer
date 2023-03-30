@@ -52,9 +52,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const seed = urlParams.get("seed");
 
 const starSystem = new StarSystem(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0) * Number.MAX_SAFE_INTEGER, scene);
-engine.setStarSystem(starSystem);
-
-starSystem.generate();
+engine.setStarSystem(starSystem, true);
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "g") {

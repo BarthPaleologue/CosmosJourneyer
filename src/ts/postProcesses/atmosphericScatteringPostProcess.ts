@@ -3,13 +3,13 @@ import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFr
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { UberScene } from "../uberCore/uberScene";
 import { Assets } from "../assets";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
+import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { centeredRand } from "extended-random";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { GasPlanet } from "../bodies/planemos/gasPlanet";
 import { BodyPostProcess } from "./bodyPostProcess";
-import { StellarObject } from "../bodies/stellarObjects/stellarObject";
+import { IOrbitalBody } from "../orbits/iOrbitalBody";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -30,7 +30,7 @@ export interface AtmosphereSettings {
 export class AtmosphericScatteringPostProcess extends BodyPostProcess {
     settings: AtmosphereSettings;
 
-    constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
+    constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: IOrbitalBody[]) {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getBoundingRadius() + atmosphereHeight,
             falloffFactor: 10,
@@ -45,8 +45,8 @@ export class AtmosphericScatteringPostProcess extends BodyPostProcess {
         };
 
         const uniforms: ShaderUniforms = [
-            ...getBodyUniforms(planet),
-            ...getStarsUniforms(stellarObjects),
+            ...getObjectUniforms(planet),
+            ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
                 name: "atmosphereRadius",

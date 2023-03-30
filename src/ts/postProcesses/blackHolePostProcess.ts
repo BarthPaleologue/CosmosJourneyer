@@ -1,6 +1,6 @@
 import blackHoleFragment from "../../shaders/blackhole.glsl";
 import { UberScene } from "../uberCore/uberScene";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "./uniforms";
+import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { BodyPostProcess } from "./bodyPostProcess";
@@ -25,7 +25,7 @@ export class BlackHolePostProcess extends BodyPostProcess {
         };
 
         const uniforms: ShaderUniforms = [
-            ...getBodyUniforms(blackHole),
+            ...getObjectUniforms(blackHole),
             ...getActiveCameraUniforms(scene),
             {
                 name: "time",

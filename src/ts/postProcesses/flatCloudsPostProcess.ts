@@ -8,7 +8,7 @@ import { gcd } from "terrain-generation";
 import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
 import { UberScene } from "../uberCore/uberScene";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
+import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { BodyPostProcess } from "./bodyPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
@@ -47,8 +47,8 @@ export class FlatCloudsPostProcess extends BodyPostProcess {
         };
 
         const uniforms: ShaderUniforms = [
-            ...getBodyUniforms(planet),
-            ...getStarsUniforms(stellarObjects),
+            ...getObjectUniforms(planet),
+            ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
                 name: "cloudLayerRadius",

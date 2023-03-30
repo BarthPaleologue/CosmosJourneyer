@@ -21,6 +21,7 @@ import { UberScene } from "../../uberCore/uberScene";
 import { BODY_TYPE } from "../../descriptors/common";
 import { BlackHole } from "../../bodies/stellarObjects/blackHole";
 import { BlackholePanel } from "./panels/blackholePanel";
+import { PostProcessType } from "../../postProcesses/postProcessTypes";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -200,15 +201,15 @@ export class BodyEditor {
                 this.physicPanel.enable();
 
                 this.oceanPanel.enable();
-                this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel && (body as TelluricPlanemo).postProcesses.ocean !== null);
+                this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel && body.postProcesses.includes(PostProcessType.OCEAN));
 
                 this.surfacePanel.enable();
 
                 this.cloudsPanel.enable();
-                this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel && (body as TelluricPlanemo).postProcesses.clouds !== null);
+                this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel && body.postProcesses.includes(PostProcessType.CLOUDS));
 
                 this.atmospherePanel.enable();
-                this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel && (body as TelluricPlanemo).postProcesses.atmosphere !== null);
+                this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel && body.postProcesses.includes(PostProcessType.ATMOSPHERE));
 
                 break;
             case BODY_TYPE.GAS:

@@ -4,6 +4,7 @@ import { AbstractBody } from "../../../bodies/abstractBody";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { PostProcessType } from "../../../postProcesses/postProcessTypes";
 
 export class RingsPanel extends EditorPanel {
     constructor() {
@@ -12,7 +13,7 @@ export class RingsPanel extends EditorPanel {
     init(body: AbstractBody, postProcessManager: PostProcessManager) {
         for (const slider of this.sliders) slider.remove();
 
-        if (!body.postProcesses.rings) return;
+        if (!body.postProcesses.includes(PostProcessType.RING)) return;
         const rings = postProcessManager.getRings(body);
         this.enable();
 

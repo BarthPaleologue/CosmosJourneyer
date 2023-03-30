@@ -2,7 +2,7 @@ import ringsFragment from "../../shaders/ringsFragment.glsl";
 import { AbstractBody } from "../bodies/abstractBody";
 import { UberScene } from "../uberCore/uberScene";
 import { ShaderDataType, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
+import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { randRange } from "extended-random";
 import { BodyPostProcess } from "./bodyPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
@@ -32,8 +32,8 @@ export class RingsPostProcess extends BodyPostProcess {
             ringColor: new Color3(214, 168, 122).scaleInPlace(1 / 255)
         };
         const uniforms: ShaderUniforms = [
-            ...getBodyUniforms(body),
-            ...getStarsUniforms(stellarObjects),
+            ...getObjectUniforms(body),
+            ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
                 name: "ringStart",

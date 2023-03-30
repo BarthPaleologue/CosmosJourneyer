@@ -1,6 +1,5 @@
 import { AbstractController } from "../../uberCore/abstractController";
 import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
-import { PlanetPostProcesses } from "../common";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planemo } from "./planemo";
@@ -9,9 +8,10 @@ import { StellarObject } from "../stellarObjects/stellarObject";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { PostProcessType } from "../../postProcesses/postProcessTypes";
 
 export class GasPlanet extends AbstractBody implements Planemo {
-    override readonly postProcesses: PlanetPostProcesses;
+    override readonly postProcesses: PostProcessType[] = [];
 
     private readonly mesh: Mesh;
     readonly material: GasPlanetMaterial;
@@ -46,11 +46,7 @@ export class GasPlanet extends AbstractBody implements Planemo {
         this.material = new GasPlanetMaterial(this.name, this.transform, this.descriptor, scene);
         this.mesh.material = this.material;
 
-        this.postProcesses = {
-            overlay: true,
-            atmosphere: true,
-            rings: this.descriptor.hasRings
-        };
+        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.ATMOSPHERE, PostProcessType.RING);
 
         this.transform.rotate(Axis.X, this.descriptor.physicalProperties.axialTilt);
     }

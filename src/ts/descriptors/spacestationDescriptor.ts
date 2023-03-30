@@ -7,7 +7,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 enum GENERATION_STEPS {
     AXIAL_TILT = 100,
     ORBIT = 200,
-    RADIUS = 1000,
+    RADIUS = 1000
 }
 
 export class SpaceStationDescriptor implements BaseDescriptor {
@@ -39,7 +39,7 @@ export class SpaceStationDescriptor implements BaseDescriptor {
         this.physicalProperties = {
             mass: 1,
             rotationPeriod: 60 * 2,
-            axialTilt: 2 * this.rng(GENERATION_STEPS.AXIAL_TILT) * Math.PI,
+            axialTilt: 2 * this.rng(GENERATION_STEPS.AXIAL_TILT) * Math.PI
         };
     }
 

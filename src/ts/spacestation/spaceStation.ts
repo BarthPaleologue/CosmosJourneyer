@@ -1,15 +1,15 @@
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Assets } from "../assets";
-import { BasePostProcesses } from "../bodies/common";
 import { SpaceStationDescriptor } from "../descriptors/spacestationDescriptor";
 import { AbstractObject } from "../bodies/abstractObject";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { PostProcessType } from "../postProcesses/postProcessTypes";
 
 export class SpaceStation extends AbstractObject {
     readonly descriptor: SpaceStationDescriptor;
 
-    readonly postProcesses: BasePostProcesses;
+    readonly postProcesses: PostProcessType[] = [];
 
     readonly instance: InstancedMesh;
 
@@ -18,7 +18,10 @@ export class SpaceStation extends AbstractObject {
         //TODO: do not hardcode seed
         const seed = 1;
 
-        this.descriptor = new SpaceStationDescriptor(seed, parentBodies.map(body => body.descriptor));
+        this.descriptor = new SpaceStationDescriptor(
+            seed,
+            parentBodies.map((body) => body.descriptor)
+        );
 
         this.instance = Assets.CreateSpaceStationInstance();
         this.instance.parent = this.transform.node;
@@ -26,9 +29,7 @@ export class SpaceStation extends AbstractObject {
         this.transform.rotate(Axis.X, this.descriptor.physicalProperties.axialTilt);
         this.transform.rotate(Axis.Z, this.descriptor.physicalProperties.axialTilt);
 
-        this.postProcesses = {
-            overlay: true
-        };
+        this.postProcesses.push(PostProcessType.OVERLAY);
     }
 
     getBoundingRadius(): number {

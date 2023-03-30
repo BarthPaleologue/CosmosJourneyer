@@ -1,11 +1,10 @@
 import { Vector3, Quaternion, Matrix } from "@babylonjs/core/Maths/math";
-import { IOrbitalBody } from "../orbits/iOrbitalBody";
+import { BaseObject, IOrbitalBody } from "../orbits/iOrbitalBody";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
-import { BaseObject, BasePostProcesses } from "./common";
 import { BaseDescriptor } from "../descriptors/common";
 import { Scene } from "@babylonjs/core/scene";
 import { computeBarycenter, computePointOnOrbit } from "../orbits/kepler";
-import { BoundingSphere } from "@babylonjs/core/Culling/boundingSphere";
+import { PostProcessType } from "../postProcesses/postProcessTypes";
 
 export interface NextState {
     position: Vector3;
@@ -20,7 +19,7 @@ export abstract class AbstractObject implements IOrbitalBody, BaseObject {
         rotation: Quaternion.Identity()
     };
 
-    abstract readonly postProcesses: BasePostProcesses;
+    abstract readonly postProcesses: PostProcessType[];
 
     //TODO: make an universal clock ?? or not it could be funny
     private internalClock = 0;

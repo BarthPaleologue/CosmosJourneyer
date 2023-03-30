@@ -4,10 +4,10 @@ import oceanFragment from "../../shaders/oceanFragment.glsl";
 import { Assets } from "../assets";
 import { UberScene } from "../uberCore/uberScene";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
+import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { BodyPostProcess } from "./bodyPostProcess";
-import { StellarObject } from "../bodies/stellarObjects/stellarObject";
+import { IOrbitalBody } from "../orbits/iOrbitalBody";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -24,7 +24,7 @@ export interface OceanSettings {
 export class OceanPostProcess extends BodyPostProcess {
     settings: OceanSettings;
 
-    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: StellarObject[]) {
+    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: IOrbitalBody[]) {
         const settings: OceanSettings = {
             oceanRadius: planet.getBoundingRadius(),
             depthModifier: 0.001,
@@ -35,8 +35,8 @@ export class OceanPostProcess extends BodyPostProcess {
         };
 
         const uniforms: ShaderUniforms = [
-            ...getBodyUniforms(planet),
-            ...getStarsUniforms(stars),
+            ...getObjectUniforms(planet),
+            ...getStellarObjectsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
                 name: "oceanRadius",

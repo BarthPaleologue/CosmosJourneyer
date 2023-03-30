@@ -1,7 +1,7 @@
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { UberScene } from "../uberCore/uberScene";
-import { getActiveCameraUniforms, getSamplers, getStarsUniforms } from "./uniforms";
+import { getActiveCameraUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Settings } from "../settings";
 import { BlackHole } from "../bodies/stellarObjects/blackHole";
@@ -11,6 +11,7 @@ import { Assets } from "../assets";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { PostProcessType } from "./postProcessTypes";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -29,7 +30,7 @@ export class StarfieldPostProcess extends UberPostProcess {
 
         const uniforms: ShaderUniforms = [
             ...getActiveCameraUniforms(scene),
-            ...getStarsUniforms(stellarObjects),
+            ...getStellarObjectsUniforms(stellarObjects),
             {
                 name: "visibility",
                 type: ShaderDataType.Float,
@@ -45,7 +46,7 @@ export class StarfieldPostProcess extends UberPostProcess {
                     const nearest = nearestBody(scene.getActiveController().transform, bodies);
                     if (nearest instanceof TelluricPlanemo) {
                         const planet = nearest as TelluricPlanemo;
-                        if (planet.postProcesses.atmosphere) {
+                        if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {
                             const height = planet.transform.getAbsolutePosition().length();
                             //FIXME: has to be dynamic
                             const maxHeight = Settings.ATMOSPHERE_HEIGHT;

@@ -17,6 +17,7 @@ import { BODY_TYPE } from "../descriptors/common";
 import { StellarObject } from "./stellarObjects/stellarObject";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { AbstractObject } from "./abstractObject";
+import { PostProcessType } from "../postProcesses/postProcessTypes";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -337,8 +338,7 @@ export class StarSystem {
      */
     private initPostProcesses() {
         this.postProcessManager.addStarField(this.stellarObjects, this.celestialBodies);
-        for (const body of this.celestialBodies) this.postProcessManager.addBody(body, this.stellarObjects);
-        for (const object of this.spaceStations) this.postProcessManager.addObject(object);
+        for (const object of this.orbitalObjects) this.postProcessManager.addObject(object, this.stellarObjects);
         this.postProcessManager.setBody(this.getNearestBody(this.scene.getActiveUberCamera().position));
     }
 
@@ -387,7 +387,7 @@ export class StarSystem {
 
         const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
         this.postProcessManager.setBody(nearestBody);
-        const switchLimit = nearestBody.postProcesses.rings ? this.postProcessManager.getRings(nearestBody).settings.ringStart : 2;
+        const switchLimit = nearestBody.postProcesses.includes(PostProcessType.RING) ? this.postProcessManager.getRings(nearestBody).settings.ringStart : 2;
         if (isOrbiting(controller, nearestBody, switchLimit)) this.postProcessManager.setSurfaceOrder();
         else this.postProcessManager.setSpaceOrder();
         this.postProcessManager.update(deltaTime);

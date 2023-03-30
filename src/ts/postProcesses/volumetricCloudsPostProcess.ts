@@ -1,6 +1,6 @@
 import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
 import { UberScene } from "../uberCore/uberScene";
-import { getActiveCameraUniforms, getBodyUniforms, getSamplers, getStarsUniforms } from "./uniforms";
+import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { Star } from "../bodies/stellarObjects/star";
@@ -33,8 +33,8 @@ export class VolumetricCloudsPostProcess extends BodyPostProcess {
         };
 
         const uniforms: ShaderUniforms = [
-            ...getBodyUniforms(planet),
-            ...getStarsUniforms(stars),
+            ...getObjectUniforms(planet),
+            ...getStellarObjectsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
                 name: "cloudLayerMinHeight",

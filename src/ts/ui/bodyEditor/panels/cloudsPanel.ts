@@ -5,6 +5,7 @@ import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { PostProcessType } from "../../../postProcesses/postProcessTypes";
 
 export class CloudsPanel extends EditorPanel {
     constructor() {
@@ -13,7 +14,7 @@ export class CloudsPanel extends EditorPanel {
     init(planet: TelluricPlanemo, postProcessManager: PostProcessManager) {
         for (const slider of this.sliders) slider.remove();
 
-        if (!planet.postProcesses.clouds) return;
+        if (!planet.postProcesses.includes(PostProcessType.CLOUDS)) return;
         const flatClouds = postProcessManager.getClouds(planet);
 
         const cloudsToggler = clearAllEventListenersById("cloudsToggler");

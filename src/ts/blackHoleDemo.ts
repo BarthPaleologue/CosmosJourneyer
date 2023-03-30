@@ -47,11 +47,11 @@ engine.registerStarSystemUpdateCallback(() => {
 
 const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
 const starSystem = new StarSystem(starSystemSeed, scene);
-engine.setStarSystem(starSystem);
+engine.setStarSystem(starSystem, false);
 
 const BH = starSystem.makeBlackHole(0);
-BH.orbitalProperties.periapsis = BH.getRadius() * 4;
-BH.orbitalProperties.apoapsis = BH.getRadius() * 4;
+BH.descriptor.orbitalProperties.periapsis = BH.getRadius() * 4;
+BH.descriptor.orbitalProperties.apoapsis = BH.getRadius() * 4;
 
 const planet = starSystem.makeTelluricPlanet();
 planet.descriptor.orbitalProperties.periapsis = 10000e3;

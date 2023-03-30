@@ -1,12 +1,8 @@
-import { IOrbitalBody } from "../orbits/iOrbitalBody";
 import { BodyDescriptor } from "../descriptors/common";
-import { BaseObject, BodyPostProcesses } from "./common";
 import { Scene } from "@babylonjs/core/scene";
 import { AbstractObject } from "./abstractObject";
 
-export abstract class AbstractBody extends AbstractObject implements IOrbitalBody, BaseObject {
-    abstract readonly postProcesses: BodyPostProcesses;
-
+export abstract class AbstractBody extends AbstractObject {
     abstract readonly descriptor: BodyDescriptor;
 
     /**

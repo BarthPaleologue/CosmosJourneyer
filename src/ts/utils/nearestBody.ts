@@ -1,8 +1,7 @@
 import { ITransformLike } from "../uberCore/transforms/ITransformLike";
 import { AbstractBody } from "../bodies/abstractBody";
 import { AbstractController } from "../uberCore/abstractController";
-import { IOrbitalBody } from "../orbits/iOrbitalBody";
-import { BaseObject } from "../bodies/common";
+import { BaseObject } from "../orbits/iOrbitalBody";
 
 export function nearestBody(object: ITransformLike, bodies: AbstractBody[]): AbstractBody {
     let distance = -1;

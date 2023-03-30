@@ -11,10 +11,11 @@ import { Assets } from "./assets";
 import { PlayerController } from "./spacelegs/playerController";
 import { positionNearBody } from "./utils/positionNearBody";
 import { PlanetEngine } from "./planetEngine";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ShipController } from "./spaceship/shipController";
 import { SpaceStation } from "./spacestation/spaceStation";
+import { PostProcessType } from "./postProcesses/postProcessTypes";
 
 const engine = new PlanetEngine();
 
@@ -54,7 +55,7 @@ console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTI
 
 const starSystemSeed = 0;
 const starSystem = new StarSystem(starSystemSeed, scene);
-engine.setStarSystem(starSystem);
+engine.setStarSystem(starSystem, false);
 
 const sun = starSystem.makeStellarObject(0.51);
 sun.descriptor.orbitalProperties.period = 60 * 60 * 24;
@@ -69,7 +70,6 @@ planet.descriptor.orbitalProperties.period = 60 * 60 * 24 * 365.25;
 planet.descriptor.orbitalProperties.apoapsis = 4000 * planet.getRadius();
 planet.descriptor.orbitalProperties.periapsis = 4000 * planet.getRadius();
 planet.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
-
 
 const spacestation = new SpaceStation([planet], scene);
 engine.getStarSystem().addSpaceStation(spacestation);
@@ -96,8 +96,8 @@ moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap);
 moon.material.updateConstants();
 
 const ares = starSystem.makeTelluricPlanet(0.3725);
-ares.postProcesses.ocean = false;
-ares.postProcesses.clouds = false;
+ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.OCEAN), 1);
+ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.CLOUDS), 1);
 
 ares.descriptor.physicalProperties.mass = 7;
 ares.descriptor.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;

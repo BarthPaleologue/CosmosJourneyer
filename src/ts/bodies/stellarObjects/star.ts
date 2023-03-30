@@ -1,6 +1,5 @@
 import { AbstractBody } from "../abstractBody";
 
-import { StarPostProcesses } from "../common";
 import { StarMaterial } from "../../materials/starMaterial";
 import { UberScene } from "../../uberCore/uberScene";
 import { getRgbFromTemperature } from "../../utils/specrend";
@@ -10,12 +9,13 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Light } from "@babylonjs/core/Lights/light";
+import { PostProcessType } from "../../postProcesses/postProcessTypes";
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
     readonly light: PointLight;
     private readonly material: StarMaterial;
 
-    public override postProcesses: StarPostProcesses;
+    public override postProcesses: PostProcessType[] = [];
 
     readonly descriptor: StarDescriptor;
 
@@ -55,13 +55,9 @@ export class Star extends AbstractBody {
         // TODO: remove when rotation is transmitted to children
         this.transform.node.rotationQuaternion = Quaternion.Identity();
 
-        this.postProcesses = {
-            overlay: true,
-            volumetricLight: true,
-            rings: false
-        };
+        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.VOLUMETRIC_LIGHT);
 
-        if (this.descriptor.hasRings) this.postProcesses.rings = true;
+        if (this.descriptor.hasRings) this.postProcesses.push(PostProcessType.RING);
     }
 
     public updateMaterial(): void {

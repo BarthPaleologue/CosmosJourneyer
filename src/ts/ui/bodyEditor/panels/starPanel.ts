@@ -2,6 +2,7 @@ import { EditorPanel } from "../editorPanel";
 import { Star } from "../../../bodies/stellarObjects/star";
 import { Slider } from "handle-sliderjs";
 import { PostProcessManager } from "../../../postProcesses/postProcessManager";
+import { PostProcessType } from "../../../postProcesses/postProcessTypes";
 
 export class StarPanel extends EditorPanel {
     constructor() {
@@ -10,7 +11,7 @@ export class StarPanel extends EditorPanel {
     init(star: Star, postProcessManager: PostProcessManager) {
         for (const slider of this.sliders) slider.remove();
 
-        if (!star.postProcesses.volumetricLight) return;
+        if (!star.postProcesses.includes(PostProcessType.VOLUMETRIC_LIGHT)) return;
         const volumetricLight = postProcessManager.getVolumetricLight(star);
 
         this.sliders = [
