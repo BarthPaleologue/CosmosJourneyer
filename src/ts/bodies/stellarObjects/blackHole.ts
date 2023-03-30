@@ -30,6 +30,10 @@ export class BlackHole extends AbstractBody {
         this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.BLACK_HOLE);
     }
 
+    public override computeCulling(cameraPosition: Vector3): void {
+        // nothing to do
+    }
+
     public override dispose(): void {
         this.light.dispose();
         super.dispose();

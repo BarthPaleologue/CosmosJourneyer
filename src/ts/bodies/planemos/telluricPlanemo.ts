@@ -109,6 +109,10 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
         return super.getRadius() + this.descriptor.physicalProperties.oceanLevel;
     }
 
+    public override computeCulling(cameraPosition: Vector3): void {
+        //TODO: implement
+    }
+
     public override dispose(): void {
         this.material.dispose();
         for (const side of this.sides) side.dispose();

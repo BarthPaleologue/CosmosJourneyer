@@ -64,6 +64,10 @@ export class Star extends AbstractBody {
         this.material.update(this.getInternalClock());
     }
 
+    public override computeCulling(cameraPosition: Vector3): void {
+        //TODO: implement
+    }
+
     public override dispose(): void {
         this.mesh.dispose();
         this.light.dispose();

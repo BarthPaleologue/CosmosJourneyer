@@ -5,6 +5,9 @@ import { SpaceStationDescriptor } from "../descriptors/spacestationDescriptor";
 import { AbstractObject } from "../bodies/abstractObject";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
+import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Settings } from "../settings";
+import { isObjectVisibleOnScreen } from "../utils/isObjectVisibleOnScreen";
 
 export class SpaceStation extends AbstractObject {
     readonly descriptor: SpaceStationDescriptor;
@@ -32,11 +35,16 @@ export class SpaceStation extends AbstractObject {
         this.postProcesses.push(PostProcessType.OVERLAY);
     }
 
-    getBoundingRadius(): number {
+    public override getBoundingRadius(): number {
         return 2e3;
     }
 
-    public dispose(): void {
+    public override computeCulling(cameraPosition: Vector3): void {
+        const isVisible = isObjectVisibleOnScreen(this, cameraPosition);
+        for (const mesh of this.instance.getChildMeshes()) { mesh.isVisible = isVisible; }
+    }
+
+    public override dispose(): void {
         this.instance.dispose();
     }
 }

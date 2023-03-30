@@ -45,6 +45,7 @@ export class GeneralPanel extends EditorPanel {
                 (scene.getActiveController().getActiveCamera().fov * 360) / Math.PI,
                 (val: number) => {
                     scene.getActiveController().getActiveCamera().fov = (val * Math.PI) / 360;
+                    Settings.FOV = (val * Math.PI) / 360;
                 }
             ),
             new Slider("timeModifier", document.getElementById("timeModifier") as HTMLElement, -200, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {

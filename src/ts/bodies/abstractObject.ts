@@ -136,6 +136,8 @@ export abstract class AbstractObject implements IOrbitalBody, BaseObject {
         this.transform.setRotationQuaternion(this.nextState.rotation);
     }
 
+    public abstract computeCulling(cameraPosition: Vector3): void;
+
     public dispose(): void {
         this.transform.dispose();
     }

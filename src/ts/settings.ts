@@ -10,5 +10,6 @@ export const Settings = {
     CHUNK_RENDER_DISTANCE_MULTIPLIER: 1.5,
     ENABLE_VOLUMETRIC_CLOUDS: false,
     SEED_HALF_RANGE: 1e6,
-    C: 299792458
+    C: 299792458,
+    FOV: 92 * Math.PI / 180,
 };
