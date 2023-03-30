@@ -20,7 +20,7 @@ export class VolumetricCloudsPostProcess extends BodyPostProcess {
 
     constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const settings: CloudSettings = {
-            cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
+            cloudLayerRadius: planet.getBoundingRadius() + cloudLayerHeight,
             specularPower: 2,
             smoothness: 0.9,
             cloudFrequency: 4,
@@ -40,14 +40,14 @@ export class VolumetricCloudsPostProcess extends BodyPostProcess {
                 name: "cloudLayerMinHeight",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return planet.getApparentRadius();
+                    return planet.getBoundingRadius();
                 }
             },
             {
                 name: "cloudLayerMaxHeight",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return planet.getApparentRadius() + 30e3;
+                    return planet.getBoundingRadius() + 30e3;
                 }
             }
         ];

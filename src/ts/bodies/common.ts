@@ -1,5 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransferCollisionData } from "../chunks/workerDataTypes";
+import { BasicTransform } from "../uberCore/transforms/basicTransform";
+import { BoundingSphere } from "../utils/boundingSphere";
 
 /**
  * Describes object that can be collided with
@@ -12,9 +14,18 @@ export interface RigidBody {
     generateCollisionTask(relativePosition: Vector3): TransferCollisionData;
 }
 
-export type BodyPostProcesses = {
-    rings: boolean;
+export interface BaseObject extends BoundingSphere {
+    name: string;
+    transform: BasicTransform;
+    postProcesses: BasePostProcesses;
+}
+
+export type BasePostProcesses = {
     overlay: boolean;
+};
+
+export type BodyPostProcesses = BasePostProcesses & {
+    rings: boolean;
 };
 
 export type PlanetPostProcesses = BodyPostProcesses & {

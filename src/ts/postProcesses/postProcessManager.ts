@@ -26,6 +26,7 @@ import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { BaseObject } from "../bodies/common";
 
 export enum PostProcessType {
     VOLUMETRIC_LIGHT,
@@ -206,7 +207,7 @@ export class PostProcessManager {
      * Creates a new Overlay postprocess for the given body and adds it to the manager.
      * @param body A body
      */
-    public addOverlay(body: AbstractBody) {
+    public addOverlay(body: BaseObject) {
         this.overlays.push(new OverlayPostProcess(body, this.scene));
     }
 
@@ -266,6 +267,10 @@ export class PostProcessManager {
             default:
                 throw new Error(`Unknown body type : ${body.descriptor.bodyType}`);
         }
+    }
+
+    public addObject(object: BaseObject) {
+        if (object.postProcesses.overlay) this.addOverlay(object);
     }
 
     public setBody(body: AbstractBody) {

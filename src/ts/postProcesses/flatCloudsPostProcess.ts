@@ -34,7 +34,7 @@ export class FlatCloudsPostProcess extends BodyPostProcess {
 
     constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
         const settings: CloudSettings = {
-            cloudLayerRadius: planet.getApparentRadius() + cloudLayerHeight,
+            cloudLayerRadius: planet.getBoundingRadius() + cloudLayerHeight,
             specularPower: 2,
             smoothness: 0.9,
             cloudFrequency: 4,

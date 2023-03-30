@@ -12,9 +12,8 @@ uniform mat4 world;
 uniform mat4 worldViewProjection;
 uniform mat4 normalMatrix;
 
-uniform vec3 planetPosition; // nécessaire temporairement le temps de régler le problème des floats
+uniform vec3 planetPosition;
 
-uniform vec4 planetInverseRotationQuaternion;
 uniform mat4 planetInverseRotationMatrix;
 
 varying vec3 vPositionW;

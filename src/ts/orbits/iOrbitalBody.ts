@@ -1,5 +1,6 @@
 import { ITransformLike } from "../uberCore/transforms/ITransformLike";
-import { BodyDescriptor } from "../descriptors/common";
+import { BaseDescriptor } from "../descriptors/common";
+import { Vector3 } from "@babylonjs/core/Maths/math";
 
 export interface ITransformable {
     transform: ITransformLike;
@@ -13,5 +14,7 @@ export interface IOrbitalBody extends ITransformable {
 
     parentBodies: IOrbitalBody[];
 
-    descriptor: BodyDescriptor;
+    descriptor: BaseDescriptor;
+
+    computeNextOrbitalPosition(): Vector3;
 }

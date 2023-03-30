@@ -110,7 +110,7 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
         this.material.update(controller, stellarObjects);
     }
 
-    public override getApparentRadius(): number {
+    public override getBoundingRadius(): number {
         return super.getRadius() + this.descriptor.physicalProperties.oceanLevel;
     }
 

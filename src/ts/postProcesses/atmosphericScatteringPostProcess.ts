@@ -32,7 +32,7 @@ export class AtmosphericScatteringPostProcess extends BodyPostProcess {
 
     constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
         const settings: AtmosphereSettings = {
-            atmosphereRadius: planet.getApparentRadius() + atmosphereHeight,
+            atmosphereRadius: planet.getBoundingRadius() + atmosphereHeight,
             falloffFactor: 10,
             intensity: 11 * planet.descriptor.physicalProperties.pressure,
             rayleighStrength: 1,

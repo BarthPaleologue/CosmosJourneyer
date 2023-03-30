@@ -33,20 +33,22 @@ export type SolidPhysicalProperties = PlanetPhysicalProperties & {
     oceanLevel: number;
 };
 
-export interface BodyDescriptor {
-    bodyType: BODY_TYPE;
+export interface BaseDescriptor {
     rng: (step: number) => number;
     seed: number;
-    radius: number;
 
     orbitalProperties: IOrbitalProperties;
-
     physicalProperties: PhysicalProperties;
 
-    readonly parentBodies: BodyDescriptor[];
-    readonly childrenBodies: BodyDescriptor[];
+    readonly parentBodies: BaseDescriptor[];
+    readonly childrenBodies: BaseDescriptor[];
 
     get depth(): number;
+}
+
+export interface BodyDescriptor extends BaseDescriptor {
+    bodyType: BODY_TYPE;
+    radius: number;
 }
 
 export interface StellarObjectDescriptor extends BodyDescriptor {

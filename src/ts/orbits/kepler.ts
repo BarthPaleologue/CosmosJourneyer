@@ -4,7 +4,7 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { IOrbitalBody } from "./iOrbitalBody";
 import { IOrbitalProperties } from "./iOrbitalProperties";
 import { stripAxisFromQuaternion } from "../utils/algebra";
-import { BodyDescriptor } from "../descriptors/common";
+import { BaseDescriptor, BodyDescriptor } from "../descriptors/common";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 /**
@@ -90,7 +90,7 @@ export function computePointOnOrbit(centerOfMass: Vector3, settings: IOrbitalPro
  * @param otherBodies
  * @see https://www.wikiwand.com/fr/Lois_de_Kepler#/Troisi%C3%A8me_loi_%E2%80%93_Loi_des_p%C3%A9riodes
  */
-export function getOrbitalPeriod(periapsis: number, apoapsis: number, otherBodies: BodyDescriptor[]) {
+export function getOrbitalPeriod(periapsis: number, apoapsis: number, otherBodies: BaseDescriptor[]) {
     const a = (periapsis + apoapsis) / 2;
     const G = 1e12;
     let M = 0;

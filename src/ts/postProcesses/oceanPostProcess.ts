@@ -26,7 +26,7 @@ export class OceanPostProcess extends BodyPostProcess {
 
     constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: StellarObject[]) {
         const settings: OceanSettings = {
-            oceanRadius: planet.getApparentRadius(),
+            oceanRadius: planet.getBoundingRadius(),
             depthModifier: 0.001,
             alphaModifier: 0.001,
             specularPower: 1.5,

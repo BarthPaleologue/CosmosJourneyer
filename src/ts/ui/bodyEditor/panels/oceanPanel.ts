@@ -18,7 +18,7 @@ export class OceanPanel extends EditorPanel {
         oceanToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            ocean.settings.oceanRadius = checkbox.checked ? planet.getApparentRadius() : 0;
+            ocean.settings.oceanRadius = checkbox.checked ? planet.getBoundingRadius() : 0;
         });
         this.sliders = [
             new Slider("alphaModifier", document.getElementById("alphaModifier") as HTMLElement, 0, 200, ocean.settings.alphaModifier * 10000, (val: number) => {

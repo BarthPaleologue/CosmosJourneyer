@@ -20,7 +20,7 @@ export class AtmospherePanel extends EditorPanel {
         atmosphereToggler.addEventListener("click", () => {
             const checkbox = document.querySelectorAll("input[type='checkbox']")[2] as HTMLInputElement;
             checkbox.checked = !checkbox.checked;
-            atmosphere.settings.atmosphereRadius = checkbox.checked ? planet.getApparentRadius() + Settings.ATMOSPHERE_HEIGHT : 0;
+            atmosphere.settings.atmosphereRadius = checkbox.checked ? planet.getBoundingRadius() + Settings.ATMOSPHERE_HEIGHT : 0;
         });
         this.sliders = [
             new Slider("intensity", document.getElementById("intensity") as HTMLElement, 0, 40, atmosphere.settings.intensity, (val: number) => {

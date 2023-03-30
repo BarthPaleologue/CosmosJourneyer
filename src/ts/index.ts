@@ -11,9 +11,10 @@ import { Assets } from "./assets";
 import { PlayerController } from "./spacelegs/playerController";
 import { positionNearBody } from "./utils/positionNearBody";
 import { PlanetEngine } from "./planetEngine";
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ShipController } from "./spaceship/shipController";
+import { SpaceStation } from "./spacestation/spaceStation";
 
 const engine = new PlanetEngine();
 
@@ -43,9 +44,9 @@ engine.registerStarSystemUpdateCallback(() => {
     if (scene.getActiveController() != spaceshipController) return;
 
     const shipPosition = spaceshipController.transform.getAbsolutePosition();
-    const nearestBody = engine.getStarSystem().getNearestBody(shipPosition);
+    const nearestBody = engine.getStarSystem().getNearestObject(shipPosition);
     const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
-    const radius = nearestBody.getRadius();
+    const radius = nearestBody.getBoundingRadius();
     spaceshipController.registerClosestDistanceToPlanet(distance - radius);
 });
 
@@ -68,6 +69,10 @@ planet.descriptor.orbitalProperties.period = 60 * 60 * 24 * 365.25;
 planet.descriptor.orbitalProperties.apoapsis = 4000 * planet.getRadius();
 planet.descriptor.orbitalProperties.periapsis = 4000 * planet.getRadius();
 planet.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
+
+
+const spacestation = new SpaceStation([planet], scene);
+engine.getStarSystem().addSpaceStation(spacestation);
 
 const moon = starSystem.makeSatellite(planet, 10);
 
@@ -127,7 +132,7 @@ andromaque.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Ident
 
 engine.init();
 
-positionNearBody(scene.getActiveController(), planet, starSystem);
+positionNearBody(scene.getActiveController(), spacestation, starSystem, 2);
 
 const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
 aresAtmosphere.settings.redWaveLength = 500;

@@ -2,6 +2,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { AbstractBody } from "../bodies/abstractBody";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { ITransformable } from "../orbits/iOrbitalBody";
+import { BaseObject } from "../bodies/common";
 
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     return [
@@ -76,7 +77,7 @@ export function getStarsUniforms(stars: ITransformable[]): ShaderUniforms {
     ];
 }
 
-export function getBodyUniforms(body: AbstractBody): ShaderUniforms {
+export function getBodyUniforms(body: BaseObject): ShaderUniforms {
     return [
         {
             name: "planetPosition",
@@ -89,7 +90,7 @@ export function getBodyUniforms(body: AbstractBody): ShaderUniforms {
             name: "planetRadius",
             type: ShaderDataType.Float,
             get: () => {
-                return body.getApparentRadius();
+                return body.getBoundingRadius();
             }
         }
     ];

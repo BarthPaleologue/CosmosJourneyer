@@ -5,6 +5,7 @@ import { getActiveCameraUniforms, getBodyUniforms, getSamplers } from "./uniform
 import { ShaderDataType, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { BodyPostProcess } from "./bodyPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { BaseObject } from "../bodies/common";
 
 const shaderName = "overlay";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = overlayFragment;
@@ -12,10 +13,10 @@ Effect.ShadersStore[`${shaderName}FragmentShader`] = overlayFragment;
 export class OverlayPostProcess extends BodyPostProcess {
     static ARE_ENABLED = true;
 
-    constructor(body: AbstractBody, scene: UberScene) {
+    constructor(object: BaseObject, scene: UberScene) {
         const uniforms: ShaderUniforms = [
             ...getActiveCameraUniforms(scene),
-            ...getBodyUniforms(body),
+            ...getBodyUniforms(object),
             {
                 name: "aspectRatio",
                 type: ShaderDataType.Float,
@@ -34,6 +35,6 @@ export class OverlayPostProcess extends BodyPostProcess {
 
         const samplers = getSamplers(scene);
 
-        super(body.name + "Overlay", body, shaderName, uniforms, samplers, scene);
+        super(object.name + "Overlay", object, shaderName, uniforms, samplers, scene);
     }
 }

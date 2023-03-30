@@ -36,6 +36,8 @@ export class PlanetEngine {
 
     private readonly collisionWorker = new CollisionWorker();
 
+    private isFullscreen = false;
+
     constructor() {
         this.helmetOverlay = new HelmetOverlay();
         this.bodyEditor = new BodyEditor();
@@ -56,6 +58,9 @@ export class PlanetEngine {
             //    (this.getStarSystem().getNearestBody() as TelluricPlanemo).material.wireframe = !(this.getStarSystem().getNearestBody() as TelluricPlanemo).material.wireframe;
 
             if (e.key === "m") this.toggleStarMap();
+
+            // when pressing f11, the ui is hidden when the browser is in fullscreen mode
+            if (e.key === "F11") this.isFullscreen = !this.isFullscreen;
         });
     }
 
@@ -121,9 +126,9 @@ export class PlanetEngine {
 
             this.bodyEditor.update(nearestBody, starSystem.postProcessManager, starSystemScene);
             this.helmetOverlay.update(nearestBody);
-            this.helmetOverlay.setVisibility(this.bodyEditor.getVisibility() !== EditorVisibility.FULL);
+            this.helmetOverlay.setVisibility(!this.isFullscreen && this.bodyEditor.getVisibility() !== EditorVisibility.FULL);
 
-            this.getStarSystem().translateAllBodiesNow(activeController.update(deltaTime));
+            this.getStarSystem().translateEverythingNow(activeController.update(deltaTime));
 
             if (!this.collisionWorker.isBusy() && isOrbiting(activeController, nearestBody)) {
                 if (nearestBody instanceof TelluricPlanemo) this.collisionWorker.checkCollision(nearestBody);

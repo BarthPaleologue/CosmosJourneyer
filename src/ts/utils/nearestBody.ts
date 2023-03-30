@@ -1,6 +1,8 @@
 import { ITransformLike } from "../uberCore/transforms/ITransformLike";
 import { AbstractBody } from "../bodies/abstractBody";
 import { AbstractController } from "../uberCore/abstractController";
+import { IOrbitalBody } from "../orbits/iOrbitalBody";
+import { BaseObject } from "../bodies/common";
 
 export function nearestBody(object: ITransformLike, bodies: AbstractBody[]): AbstractBody {
     let distance = -1;
@@ -22,6 +24,6 @@ export function nearestBody(object: ITransformLike, bodies: AbstractBody[]): Abs
  * @param body the body to check whereas the player is orbiting
  * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
  */
-export function isOrbiting(controller: AbstractController, body: AbstractBody, orbitLimitFactor = 2.5): boolean {
-    return body.transform.getAbsolutePosition().subtract(controller.transform.getAbsolutePosition()).lengthSquared() < (orbitLimitFactor * body.getRadius()) ** 2;
+export function isOrbiting(controller: AbstractController, body: BaseObject, orbitLimitFactor = 2.5): boolean {
+    return body.transform.getAbsolutePosition().subtract(controller.transform.getAbsolutePosition()).lengthSquared() < (orbitLimitFactor * body.getBoundingRadius()) ** 2;
 }

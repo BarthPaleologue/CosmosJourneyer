@@ -60,16 +60,19 @@ void main() {
     vec2 uvSquare = vec2(uv.x * aspectRatio, uv.y);
     float distance = length(uvSquare - vUVSquare);
     vec2 unitUVSquare = (uvSquare - vUVSquare) / distance;
+    
     float limit1 = 0.03 * pow(planetRadius / 1e6, 0.2);
     float limit2 = max(limit1 + 0.005, 0.032 * limit1);
+
     if(distance >= limit1 && distance <= limit2) {
         float angle = atan(unitUVSquare.y, unitUVSquare.x);
         float angleOff = 0.2;
+        float targetAlpha = 1e-3 * planetDistance / planetRadius;
         if((angle > angleOff && angle < 0.5 * 3.14 - angleOff)
         || (angle < -angleOff && angle > -0.5 * 3.14 + angleOff)
         || (angle > 0.5 * 3.14 + angleOff && angle < 3.14 - angleOff)
         || (angle < -0.5 * 3.14 - angleOff && angle > -3.14 + angleOff)) {
-            overlayColor.rgb = 0.5e-3 * vec3(planetDistance / planetRadius);
+            overlayColor.rgb = vec3(targetAlpha);
             overlayColor.rgb = min(overlayColor.rgb, vec3(0.3));
             overlayColor.a = 1.0;
         }
