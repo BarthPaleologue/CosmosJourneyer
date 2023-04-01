@@ -4,12 +4,12 @@ import { StarMaterial } from "../../materials/starMaterial";
 import { UberScene } from "../../uberCore/uberScene";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { StarDescriptor } from "../../descriptors/stellarObjects/starDescriptor";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Light } from "@babylonjs/core/Lights/light";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
     readonly light: PointLight;
@@ -65,7 +65,7 @@ export class Star extends AbstractBody {
     }
 
     public override computeCulling(cameraPosition: Vector3): void {
-        //TODO: implement
+        this.mesh.isVisible = true;
     }
 
     public override dispose(): void {

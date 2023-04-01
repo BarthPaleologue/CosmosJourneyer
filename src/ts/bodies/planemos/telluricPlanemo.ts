@@ -110,7 +110,7 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
     }
 
     public override computeCulling(cameraPosition: Vector3): void {
-        //TODO: implement
+        for (const side of this.sides) side.computeCulling(cameraPosition);
     }
 
     public override dispose(): void {

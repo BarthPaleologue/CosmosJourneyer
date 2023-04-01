@@ -356,8 +356,7 @@ export class StarSystem {
             const newPosition = object.computeNextOrbitalPosition().clone();
 
             // if the controller is close to the body, it will follow its movement
-            const orbitLimit = object instanceof SpaceStation ? 10 : 2.5;
-            if (isOrbiting(controller, object, orbitLimit) && this.getNearestObject() === object) controller.transform.translate(newPosition.subtract(initialPosition));
+            if (isOrbiting(controller, object, 10) && this.getNearestObject() === object) controller.transform.translate(newPosition.subtract(initialPosition));
 
             // then we keep the controller at the origin
             const displacementTranslation = controller.transform.getAbsolutePosition().negate();

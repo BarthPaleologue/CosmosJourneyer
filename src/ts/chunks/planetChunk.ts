@@ -12,10 +12,14 @@ export class PlanetChunk {
     private ready = false;
     readonly isMinDepth;
 
+    readonly chunkSideLength: number;
+
     constructor(path: number[], direction: Direction, parent: BasicTransform, material: Material, rootLength: number, isMinDepth: boolean) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;
+
+        this.chunkSideLength = rootLength / 2 ** this.depth;
 
         this.isMinDepth = isMinDepth;
 
@@ -23,6 +27,9 @@ export class PlanetChunk {
         this.mesh.setEnabled(false);
         this.mesh.isBlocker = true;
         this.mesh.material = material;
+        /*this.mesh.material = Assets.DebugMaterial(id); //material;
+        (this.mesh.material as StandardMaterial).disableLighting = true;
+        this.mesh.material.wireframe = true;*/
         this.mesh.parent = parent.node;
 
         // computing the position of the chunk on the side of the planet
@@ -35,6 +42,10 @@ export class PlanetChunk {
         this.cubePosition = this.mesh.position.clone();
 
         this.mesh.position.normalize().scaleInPlace(rootLength / 2);
+    }
+
+    public getBoundingRadius(): number {
+        return this.chunkSideLength / 2;
     }
 
     public isReady() {

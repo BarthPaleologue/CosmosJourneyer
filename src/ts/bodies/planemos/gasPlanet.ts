@@ -10,7 +10,7 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { isObjectVisibleOnScreen } from "../../utils/isObjectVisibleOnScreen";
+import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 
 export class GasPlanet extends AbstractBody implements Planemo {
     override readonly postProcesses: PostProcessType[] = [];
@@ -58,8 +58,7 @@ export class GasPlanet extends AbstractBody implements Planemo {
     }
 
     public override computeCulling(cameraPosition: Vector3): void {
-        this.mesh.isVisible = isObjectVisibleOnScreen(this, cameraPosition);
-        console.log(this.mesh.isVisible);
+        this.mesh.isVisible = isSizeOnScreenEnough(this, cameraPosition);
     }
 
     public override dispose(): void {

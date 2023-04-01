@@ -7,7 +7,7 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Settings } from "../settings";
-import { isObjectVisibleOnScreen } from "../utils/isObjectVisibleOnScreen";
+import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 
 export class SpaceStation extends AbstractObject {
     readonly descriptor: SpaceStationDescriptor;
@@ -40,7 +40,7 @@ export class SpaceStation extends AbstractObject {
     }
 
     public override computeCulling(cameraPosition: Vector3): void {
-        const isVisible = isObjectVisibleOnScreen(this, cameraPosition);
+        const isVisible = isSizeOnScreenEnough(this, cameraPosition);
         for (const mesh of this.instance.getChildMeshes()) { mesh.isVisible = isVisible; }
     }
 

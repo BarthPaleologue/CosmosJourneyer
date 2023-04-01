@@ -19,6 +19,7 @@ import starfield from "../asset/textures/milkyway.jpg";
 //import character from "../asset/man/man.obj";
 import spaceship from "../asset/spaceship/spaceship.glb";
 import spacestation from "../asset/spacestation/spacestation.glb";
+import banana from "../asset/banana/banana.glb";
 
 import { ChunkForge } from "./chunks/chunkForge";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -52,6 +53,7 @@ export class Assets {
     //static Character: AbstractMesh;
     static Spaceship: Mesh;
     static Spacestation: Mesh;
+    static Banana: Mesh;
 
     static ChunkForge = new ChunkForge(64);
 
@@ -140,6 +142,21 @@ export class Assets {
                 console.log("Spacestation loaded");
             };
 
+            const bananaTask = Assets.manager.addMeshTask("bananaTask", "", "", banana);
+            bananaTask.onSuccess = function (task: MeshAssetTask) {
+                Assets.Banana = task.loadedMeshes[0] as Mesh;
+                Assets.Banana.isVisible = false;
+
+                for (const mesh of Assets.Banana.getChildMeshes()) {
+                    mesh.isVisible = false;
+                    const pbr = mesh.material as PBRBaseMaterial;
+                    pbr.useLogarithmicDepth = true;
+                    mesh.scaling.scaleInPlace(1000e5);
+                }
+
+                console.log("Banana loaded");
+            };
+
             Assets.manager.onProgress = (remainingCount, totalCount) => {
                 scene.getEngine().loadingUIText = `Loading assets... ${totalCount - remainingCount}/${totalCount}`;
             };
@@ -159,6 +176,17 @@ export class Assets {
 
     static CreateSpaceStationInstance(): InstancedMesh {
         return Assets.Spacestation.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+    }
+
+    static CreateBananaInstance(): InstancedMesh {
+        return Assets.Banana.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+    }
+
+    static CreateBananaClone(): Mesh {
+        const mesh = Assets.Banana.clone("bananaClone").getChildMeshes()[0] as Mesh;
+        mesh.isVisible = true;
+
+        return mesh;
     }
 
     static DebugMaterial(name: string) {

@@ -128,17 +128,24 @@ export class ChunkTree {
         if ((distanceToNodeSquared < distanceThreshold ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
             // if the node is near the camera or if we are loading minimal LOD
             if (tree instanceof PlanetChunk) {
-                if (tree.isReady()) {
-                    const newTree = [
-                        this.createChunk(walked.concat([0]), true),
-                        this.createChunk(walked.concat([1]), true),
-                        this.createChunk(walked.concat([2]), true),
-                        this.createChunk(walked.concat([3]), true)
-                    ];
-                    this.requestDeletion(tree, newTree, true);
-                    return newTree;
-                }
-                return tree;
+                if (!tree.isReady()) return tree;
+                if (!tree.mesh.isVisible) return tree;
+
+                // if view ray goes through planet then we don't need to load more chunks
+                /*const direction = tree.mesh.getAbsolutePosition().subtract(observerPositionW);
+                const rayDir = direction.normalizeToNew();
+
+                const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.parent.getAbsolutePosition(), this.rootChunkLength / 2);
+                if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
+
+                const newTree = [
+                    this.createChunk(walked.concat([0]), true),
+                    this.createChunk(walked.concat([1]), true),
+                    this.createChunk(walked.concat([2]), true),
+                    this.createChunk(walked.concat([3]), true)
+                ];
+                this.requestDeletion(tree, newTree, true);
+                return newTree;
             }
             return [
                 this.updateLODRecursively(observerPositionW, tree[0], walked.concat([0])),
@@ -148,26 +155,14 @@ export class ChunkTree {
             ];
         } else {
             // if we are far from the node
-            if (tree instanceof PlanetChunk) {
-                this.checkForOcclusion(tree, nodePositionW, observerPositionW);
-                return tree;
-            }
+            if (tree instanceof PlanetChunk) return tree;
+
             if (walked.length >= this.minDepth) {
                 const newChunk = this.createChunk(walked, false);
                 this.requestDeletion(tree, [newChunk], false);
                 return newChunk;
             }
             return tree;
-        }
-    }
-
-    //TODO: put this somewhere else for generalization purposes
-    private checkForOcclusion(chunk: PlanetChunk, chunkPositionW: Vector3, observerPositionW: Vector3) {
-        if (chunk.isReady() && Settings.ENABLE_OCCLUSION) {
-            const direction = chunkPositionW.subtract(observerPositionW);
-            const rayDir = direction.normalizeToNew();
-            const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.parent.getAbsolutePosition(), this.rootChunkLength / 2 - 100e3 * 2 ** -chunk.depth);
-            chunk.mesh.setEnabled(!(intersect && t0 ** 2 < direction.lengthSquared()));
         }
     }
 
@@ -197,6 +192,29 @@ export class ChunkTree {
         this.chunkForge.addTask(buildTask);
 
         return chunk;
+    }
+
+    public computeCulling(cameraPosition: Vector3): void {
+        this.executeOnEveryChunk((chunk: PlanetChunk) => {
+            if (chunk.isReady() && Settings.ENABLE_OCCLUSION) {
+                chunk.mesh.setEnabled(true);
+                chunk.mesh.computeWorldMatrix(true);
+
+                const cameraPositionPlanetSpace = cameraPosition.subtract(this.parent.getAbsolutePosition());
+                const chunkPositionPlanetSpace = chunk.mesh.getAbsolutePosition().subtract(this.parent.getAbsolutePosition());
+
+                const theta = Vector3.Dot(cameraPositionPlanetSpace, chunkPositionPlanetSpace) / (cameraPositionPlanetSpace.length() * chunkPositionPlanetSpace.length());
+
+                const beyondTheHorizon = theta < -0.5 + Math.min(1.3, (0.3 * this.rootChunkLength / Math.abs(cameraPositionPlanetSpace.length() - this.rootChunkLength / 2)));
+
+                const distance = Vector3.Distance(cameraPosition, chunk.mesh.getAbsolutePosition());
+                const angularSize = chunk.getBoundingRadius() * 2 / distance;
+
+                const chunkIsTooSmall = angularSize / Settings.FOV < 0.002;
+
+                chunk.mesh.setEnabled(!beyondTheHorizon && !chunkIsTooSmall);
+            }
+        });
     }
 
     /**

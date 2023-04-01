@@ -15,7 +15,7 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess {
 
         this.exposure = 0.26;
         this.decay = 0.95;
-        this.getCamera().detachPostProcess(this);
+        this.getCamera().detachPostProcess(this); // this is necessary because we can't set the camera to null in the volumetric light scattering post process
     }
 
     public update(deltaTime: number): void {
