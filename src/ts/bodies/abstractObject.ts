@@ -19,7 +19,7 @@ export abstract class AbstractObject implements IOrbitalBody, BaseObject {
         rotation: Quaternion.Identity()
     };
 
-    abstract readonly postProcesses: PostProcessType[];
+    readonly postProcesses: PostProcessType[] = [];
 
     //TODO: make an universal clock ?? or not it could be funny
     private internalClock = 0;
@@ -31,24 +31,24 @@ export abstract class AbstractObject implements IOrbitalBody, BaseObject {
 
     abstract readonly descriptor: BaseDescriptor;
 
-    readonly parentBodies: AbstractObject[];
+    readonly parentObjects: IOrbitalBody[];
 
     depth: number;
 
     /**
      * An abstract representation of a celestial body
      * @param name the name of the celestial body
-     * @param parentBodies the parent bodies of this body
+     * @param parentObjects the parent objects of this object
      */
-    protected constructor(name: string, parentBodies: AbstractObject[], scene: Scene) {
+    protected constructor(name: string, parentObjects: AbstractObject[], scene: Scene) {
         this.name = name;
 
-        this.parentBodies = parentBodies;
+        this.parentObjects = parentObjects;
 
         this.transform = new BasicTransform(name, scene);
 
         let minDepth = -1;
-        for (const parentBody of parentBodies) {
+        for (const parentBody of parentObjects) {
             if (minDepth === -1) minDepth = parentBody.depth;
             else minDepth = Math.min(minDepth, parentBody.depth);
         }
@@ -94,7 +94,7 @@ export abstract class AbstractObject implements IOrbitalBody, BaseObject {
 
     public computeNextOrbitalPosition(): Vector3 {
         if (this.descriptor.orbitalProperties.period > 0) {
-            const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentBodies);
+            const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentObjects);
             this.descriptor.orbitalProperties.orientationQuaternion = orientationQuaternion;
 
             const newPosition = computePointOnOrbit(barycenter, this.descriptor.orbitalProperties, this.internalClock);

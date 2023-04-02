@@ -8,8 +8,6 @@ import { Light } from "@babylonjs/core/Lights/light";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 
 export class BlackHole extends AbstractBody {
-    readonly postProcesses: PostProcessType[] = [];
-
     readonly light: PointLight;
 
     readonly descriptor: BlackHoleDescriptor;

@@ -44,7 +44,7 @@ export class GasPlanetDescriptor implements PlanemoDescriptor {
         this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng, GENERATION_STEPS.RADIUS);
 
         // TODO: do not hardcode
-        const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 5000000e3;
+        const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
         const apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
 
         this.orbitalProperties = {

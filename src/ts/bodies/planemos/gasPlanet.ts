@@ -13,8 +13,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 
 export class GasPlanet extends AbstractBody implements Planemo {
-    override readonly postProcesses: PostProcessType[] = [];
-
     private readonly mesh: Mesh;
     readonly material: GasPlanetMaterial;
 

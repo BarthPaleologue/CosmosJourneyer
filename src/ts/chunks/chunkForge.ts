@@ -120,7 +120,7 @@ export class ChunkForge {
                 task.chunk.setReady(false);
                 // if we are removing the last old chunk, enabling new chunks
                 if (i === deleteTask.length - 1) for (const chunk of task.newChunks) chunk.setReady(true);
-                task.chunk.mesh.dispose();
+                task.chunk.dispose();
             }
         }
         this.deleteTasks = [];
@@ -134,7 +134,6 @@ export class ChunkForge {
         if (task) {
             task.vertexData.applyToMesh(task.chunk.mesh, false);
             task.chunk.mesh.freezeNormals();
-            //task.chunk.mesh.refreshBoundingInfo(true);
 
             if (task.chunk.isMinDepth) task.chunk.setReady(true);
 

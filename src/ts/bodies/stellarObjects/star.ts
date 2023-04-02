@@ -16,8 +16,6 @@ export class Star extends AbstractBody {
     readonly light: PointLight;
     private readonly material: StarMaterial;
 
-    public override postProcesses: PostProcessType[] = [];
-
     readonly descriptor: StarDescriptor;
 
     /**

@@ -4,17 +4,21 @@ import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Material } from "@babylonjs/core/Materials/material";
+import { ITransformable } from "../orbits/iOrbitalBody";
+import { Scene } from "@babylonjs/core/scene";
 
-export class PlanetChunk {
+export class PlanetChunk implements ITransformable {
     public readonly mesh: Mesh;
     public readonly depth: number;
     public readonly cubePosition: Vector3;
     private ready = false;
     readonly isMinDepth;
 
+    public readonly transform: BasicTransform;
+
     readonly chunkSideLength: number;
 
-    constructor(path: number[], direction: Direction, parent: BasicTransform, material: Material, rootLength: number, isMinDepth: boolean) {
+    constructor(path: number[], direction: Direction, parent: BasicTransform, material: Material, rootLength: number, isMinDepth: boolean, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;
@@ -23,25 +27,30 @@ export class PlanetChunk {
 
         this.isMinDepth = isMinDepth;
 
-        this.mesh = new Mesh(`Chunk${id}`);
+        this.transform = new BasicTransform(id + "Transform", scene);
+
+        this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
         this.mesh.isBlocker = true;
         this.mesh.material = material;
         /*this.mesh.material = Assets.DebugMaterial(id); //material;
         (this.mesh.material as StandardMaterial).disableLighting = true;
         this.mesh.material.wireframe = true;*/
-        this.mesh.parent = parent.node;
+        this.transform.node.parent = parent.node;
+        this.mesh.parent = this.transform.node;
 
         // computing the position of the chunk on the side of the planet
-        this.mesh.position = getChunkPlaneSpacePositionFromPath(rootLength, path);
+        const position = getChunkPlaneSpacePositionFromPath(rootLength, path);
 
         // offseting from planet center to position on the side (default side then rotation for all sides)
-        this.mesh.position.z -= rootLength / 2;
-        this.mesh.position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
+        position.z -= rootLength / 2;
+        position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
 
-        this.cubePosition = this.mesh.position.clone();
+        this.cubePosition = position.clone();
 
-        this.mesh.position.normalize().scaleInPlace(rootLength / 2);
+        position.normalize().scaleInPlace(rootLength / 2);
+
+        this.transform.node.position = position;
     }
 
     public getBoundingRadius(): number {
@@ -58,6 +67,7 @@ export class PlanetChunk {
     }
 
     public dispose() {
+        this.transform.dispose();
         this.mesh.dispose();
     }
 }

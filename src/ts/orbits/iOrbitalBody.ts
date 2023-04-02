@@ -22,7 +22,7 @@ export interface IOrbitalBody extends ITransformable {
      */
     depth: number;
 
-    parentBodies: IOrbitalBody[];
+    parentObjects: IOrbitalBody[];
 
     descriptor: BaseDescriptor;
 

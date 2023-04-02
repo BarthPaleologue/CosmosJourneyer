@@ -173,8 +173,7 @@ export class ChunkTree {
      * @returns The new Chunk
      */
     private createChunk(path: number[], isFiner: boolean): PlanetChunk {
-        const chunk = new PlanetChunk(path, this.direction, this.parent, this.material, this.rootChunkLength, this.minDepth === path.length);
-        this.scene.addMesh(chunk.mesh);
+        const chunk = new PlanetChunk(path, this.direction, this.parent, this.material, this.rootChunkLength, this.minDepth === path.length, this.scene);
 
         const buildTask: BuildTask = {
             type: TaskType.Build,
@@ -198,16 +197,16 @@ export class ChunkTree {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             if (chunk.isReady() && Settings.ENABLE_OCCLUSION) {
                 chunk.mesh.setEnabled(true);
-                chunk.mesh.computeWorldMatrix(true);
+                chunk.transform.node.computeWorldMatrix(true);
 
                 const cameraPositionPlanetSpace = cameraPosition.subtract(this.parent.getAbsolutePosition());
-                const chunkPositionPlanetSpace = chunk.mesh.getAbsolutePosition().subtract(this.parent.getAbsolutePosition());
+                const chunkPositionPlanetSpace = chunk.transform.getAbsolutePosition().subtract(this.parent.getAbsolutePosition());
 
                 const theta = Vector3.Dot(cameraPositionPlanetSpace, chunkPositionPlanetSpace) / (cameraPositionPlanetSpace.length() * chunkPositionPlanetSpace.length());
 
                 const beyondTheHorizon = theta < -0.5 + Math.min(1.3, (0.3 * this.rootChunkLength / Math.abs(cameraPositionPlanetSpace.length() - this.rootChunkLength / 2)));
 
-                const distance = Vector3.Distance(cameraPosition, chunk.mesh.getAbsolutePosition());
+                const distance = Vector3.Distance(cameraPosition, chunk.transform.getAbsolutePosition());
                 const angularSize = chunk.getBoundingRadius() * 2 / distance;
 
                 const chunkIsTooSmall = angularSize / Settings.FOV < 0.002;

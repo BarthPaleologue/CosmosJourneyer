@@ -18,8 +18,6 @@ import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { RigidBody } from "../../workers/rigidbody";
 
 export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo {
-    override readonly postProcesses: PostProcessType[] = [];
-
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
 
     readonly material: TelluricPlanemoMaterial;

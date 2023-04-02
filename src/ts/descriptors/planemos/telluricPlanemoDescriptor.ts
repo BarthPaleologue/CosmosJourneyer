@@ -55,15 +55,15 @@ export class TelluricPlanemoDescriptor implements PlanemoDescriptor {
         }
 
         if (this.isSatelliteOfTelluric) {
-            this.radius = Math.max(0.02, normalRandom(0.08, 0.03, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
+            this.radius = Math.max(0.03, normalRandom(0.06, 0.03, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
         } else if (this.isSatelliteOfGas) {
-            this.radius = Math.max(0.02, normalRandom(0.5, 0.1, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
+            this.radius = Math.max(0.03, normalRandom(0.25, 0.15, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
         } else {
             this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
         }
 
         // TODO: do not hardcode
-        const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 5000000e3;
+        const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
         const apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
 
         this.orbitalProperties = {
