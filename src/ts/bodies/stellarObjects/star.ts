@@ -10,6 +10,7 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Light } from "@babylonjs/core/Lights/light";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Assets } from "../../assets";
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
     readonly light: PointLight;
@@ -34,14 +35,14 @@ export class Star extends AbstractBody {
             parentBodies.map((body) => body.descriptor)
         );
 
-        this.mesh = MeshBuilder.CreateSphere(
+        this.mesh = this.descriptor.rng(42) > 0.1 ? MeshBuilder.CreateSphere(
             `${name}Mesh`,
             {
                 diameter: this.descriptor.radius * 2,
                 segments: 32
             },
             scene
-        );
+        ) : Assets.CreateBananaClone(this.descriptor.radius * 2);
         this.mesh.parent = this.transform.node;
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);

@@ -16,7 +16,6 @@ import atmosphereLUT from "../asset/textures/LUT/atmosphere.png";
 
 import starfield from "../asset/textures/milkyway.jpg";
 
-//import character from "../asset/man/man.obj";
 import spaceship from "../asset/spaceship/spaceship.glb";
 import spacestation from "../asset/spacestation/spacestation.glb";
 import banana from "../asset/banana/banana.glb";
@@ -50,10 +49,9 @@ export class Assets {
 
     static Starfield: Texture;
 
-    //static Character: AbstractMesh;
-    static Spaceship: Mesh;
-    static Spacestation: Mesh;
-    static Banana: Mesh;
+    private static Spaceship: Mesh;
+    private static Spacestation: Mesh;
+    private static Banana: Mesh;
 
     static ChunkForge = new ChunkForge(64);
 
@@ -79,27 +77,12 @@ export class Assets {
 
             Assets.manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.Starfield = task.texture);
 
-            /*const characterTask = Assets.manager.addMeshTask("characterTask", "", "", character);
-            characterTask.onSuccess = function (task: MeshAssetTask) {
-                const meshes: Mesh[] = [];
-                for (const mesh of task.loadedMeshes) {
-                    if (mesh.hasBoundingInfo) meshes.push(mesh as Mesh);
-                }
-                Assets.Character = Mesh.MergeMeshes(meshes, true, true, undefined, false, true) as Mesh;
-                Assets.Character.scaling = new Vector3(0.1, 0.1, 0.1);
-                Assets.Character.isVisible = false;
-                console.log("Character loaded");
-            };*/
-
             const spaceshipTask = Assets.manager.addMeshTask("spaceshipTask", "", "", spaceship);
             spaceshipTask.onSuccess = function (task: MeshAssetTask) {
                 Assets.Spaceship = task.loadedMeshes[0] as Mesh;
-                Assets.Spaceship.isVisible = false;
-                //Assets.Spaceship.rotate(Vector3.Up(), -Math.PI / 2);
 
                 for (const mesh of Assets.Spaceship.getChildMeshes()) {
                     mesh.isVisible = false;
-                    //mesh.rotate(Vector3.Up(), -Math.PI / 2);
                     const pbr = mesh.material as PBRBaseMaterial;
                     pbr.useLogarithmicDepth = true;
                 }
@@ -131,7 +114,6 @@ export class Assets {
             const spacestationTask = Assets.manager.addMeshTask("spacestationTask", "", "", spacestation);
             spacestationTask.onSuccess = function (task: MeshAssetTask) {
                 Assets.Spacestation = task.loadedMeshes[0] as Mesh;
-                Assets.Spacestation.isVisible = false;
 
                 for (const mesh of Assets.Spacestation.getChildMeshes()) {
                     mesh.isVisible = false;
@@ -151,7 +133,6 @@ export class Assets {
                     mesh.isVisible = false;
                     const pbr = mesh.material as PBRBaseMaterial;
                     pbr.useLogarithmicDepth = true;
-                    mesh.scaling.scaleInPlace(1000e5);
                 }
 
                 console.log("Banana loaded");
@@ -182,9 +163,10 @@ export class Assets {
         return Assets.Banana.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
-    static CreateBananaClone(): Mesh {
+    static CreateBananaClone(sizeInMeters = 0.2): Mesh {
         const mesh = Assets.Banana.clone("bananaClone").getChildMeshes()[0] as Mesh;
         mesh.isVisible = true;
+        mesh.scaling.scaleInPlace(5 * sizeInMeters);
 
         return mesh;
     }
