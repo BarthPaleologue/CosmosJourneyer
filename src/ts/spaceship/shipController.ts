@@ -9,10 +9,11 @@ import { Mouse } from "../inputs/mouse";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Thruster } from "./thruster";
+import { MainThruster } from "./mainThruster";
 import { WarpDrive } from "./warpDrive";
 import { parseSpeed } from "../utils/parseSpeed";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";
+import { RCSThruster } from "./rcsThruster";
 
 export class ShipController extends AbstractController {
     readonly transform: NewtonianTransform;
@@ -26,7 +27,8 @@ export class ShipController extends AbstractController {
 
     private flightAssistEnabled = true;
 
-    private readonly thrusters: Thruster[] = [];
+    private readonly mainThrusters: MainThruster[] = [];
+    private readonly rcsThrusters: RCSThruster[] = [];
 
     private readonly warpDrive = new WarpDrive();
 
@@ -47,12 +49,15 @@ export class ShipController extends AbstractController {
         const spaceship = Assets.CreateSpaceShipInstance();
         spaceship.parent = this.transform.node;
 
-        spaceship.getChildMeshes().forEach((child) => {
-            if (child.name.includes("thruster")) {
-                console.log("Found thruster");
-                this.addThruster(child);
+        for (const child of spaceship.getChildMeshes()) {
+            if (child.name.includes("mainThruster")) {
+                console.log("Found main thruster");
+                this.addMainThruster(child);
+            } else if (child.name.includes("rcsThruster")) {
+                console.log("Found rcs thruster");
+                this.addRCSThruster(child);
             }
-        });
+        };
     }
 
     public override addInput(input: Input): void {
@@ -68,9 +73,14 @@ export class ShipController extends AbstractController {
         }
     }
 
-    private addThruster(mesh: AbstractMesh) {
+    private addMainThruster(mesh: AbstractMesh) {
         const direction = mesh.getDirection(new Vector3(0, 1, 0));
-        this.thrusters.push(new Thruster(mesh, direction, this.transform));
+        this.mainThrusters.push(new MainThruster(mesh, direction, this.transform));
+    }
+
+    private addRCSThruster(mesh: AbstractMesh) {
+        const direction = mesh.getDirection(new Vector3(0, 1, 0));
+        this.rcsThrusters.push(new RCSThruster(mesh, direction, this.transform));
     }
 
     public override getActiveCamera(): UberCamera {
@@ -88,13 +98,15 @@ export class ShipController extends AbstractController {
     public toggleWarpDrive() {
         if (!this.warpDrive.isEnabled()) {
             this.warpDrive.enable();
-            for (const thruster of this.thrusters) thruster.setThrottle(0);
+            for (const thruster of this.mainThrusters) thruster.setThrottle(0);
+            for (const thruster of this.rcsThrusters) thruster.deactivate();
         } else this.warpDrive.desengage();
     }
 
     private getTotalAuthority(direction: Vector3) {
         let totalAuthority = 0;
-        for (const thruster of this.thrusters) totalAuthority += thruster.getAuthority(direction);
+        for (const thruster of this.mainThrusters) totalAuthority += thruster.getAuthority(direction);
+        for (const thruster of this.rcsThrusters) totalAuthority += thruster.getAuthority(direction);
         return totalAuthority;
     }
 
@@ -118,7 +130,7 @@ export class ShipController extends AbstractController {
         this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
 
         if (this.warpDrive.isDisabled()) {
-            for (const thruster of this.thrusters) {
+            for (const thruster of this.mainThrusters) {
                 thruster.updateThrottle(0.3 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
                 thruster.updateThrottle(0.3 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD));
 
@@ -127,6 +139,19 @@ export class ShipController extends AbstractController {
 
                 thruster.updateThrottle(0.3 * deltaTime * input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.LEFT));
                 thruster.updateThrottle(0.3 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
+            }
+            if (input.type === InputType.KEYBOARD) {
+                // if we are listenning to multiple inputs, the thrusters will be activated and deactivated multiple times
+                for (const thruster of this.rcsThrusters) {
+                    // rcs thrusters are either activated or not
+                    if (input.getZAxis() > 0 && thruster.getAuthority01(LOCAL_DIRECTION.FORWARD) > 0.5) thruster.activate();
+                    else if (input.getZAxis() < 0 && thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD) > 0.5) thruster.activate();
+                    else if (input.getYAxis() > 0 && thruster.getAuthority01(LOCAL_DIRECTION.UP) > 0.5) thruster.activate();
+                    else if (input.getYAxis() < 0 && thruster.getAuthority01(LOCAL_DIRECTION.DOWN) > 0.5) thruster.activate();
+                    else if (input.getXAxis() > 0 && thruster.getAuthority01(LOCAL_DIRECTION.RIGHT) > 0.5) thruster.activate();
+                    else if (input.getXAxis() < 0 && thruster.getAuthority01(LOCAL_DIRECTION.LEFT) > 0.5) thruster.activate();
+                    else thruster.deactivate();
+                }
             }
 
             const forwardAcceleration = this.transform.getForwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.FORWARD) * deltaTime);
@@ -156,18 +181,21 @@ export class ShipController extends AbstractController {
     public override update(deltaTime: number): Vector3 {
         this.transform.rotationAcceleration.copyFromFloats(0, 0, 0);
         this.transform.acceleration.copyFromFloats(0, 0, 0);
+
         for (const input of this.inputs) this.listenTo(input, deltaTime);
         const displacement = this.transform.update(deltaTime).negate();
 
         const currentForwardSpeed = Vector3.Dot(this.transform.speed, this.transform.getForwardDirection());
         this.warpDrive.update(currentForwardSpeed, this.closestDistanceToPlanet, deltaTime);
 
-        for (const thruster of this.thrusters) thruster.update();
+        for (const thruster of this.mainThrusters) thruster.update();
+        for (const thruster of this.rcsThrusters) thruster.update();
 
         if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() === 0) {
             this.transform.rotationSpeed.scaleInPlace(0.9);
         }
 
+        //TODO: should be separated from the ship
         (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${parseSpeed(this.transform.speed.length())}`;
 
         this.transform.translate(displacement);

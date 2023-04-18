@@ -87,7 +87,7 @@ export class Assets {
                     pbr.useLogarithmicDepth = true;
                 }
 
-                const thrusterHelper = MeshBuilder.CreateCylinder("thruster1", { height: 0.5, diameterTop: 0, diameterBottom: 0.5 }, scene);
+                const thrusterHelper = MeshBuilder.CreateCylinder("mainThruster1", { height: 0.5, diameterTop: 0, diameterBottom: 0.5 }, scene);
                 const cubeMaterial = new StandardMaterial("cubeMat", scene);
                 cubeMaterial.diffuseColor = Color3.White();
                 cubeMaterial.emissiveColor = Color3.White();
@@ -97,16 +97,41 @@ export class Assets {
                 thrusterHelper.position = new Vector3(0.5, 0, -4);
                 thrusterHelper.rotation = new Vector3(-Math.PI / 2, 0, 0);
 
-                const thrusterHelper2 = thrusterHelper.clone("thruster2");
+                const thrusterHelper2 = thrusterHelper.clone("mainThruster2");
                 thrusterHelper2.position = new Vector3(-0.5, 0, -4);
 
-                const thrusterHelper3 = thrusterHelper.clone("thruster3");
+                const thrusterHelper3 = thrusterHelper.clone("rcsThruster1");
                 thrusterHelper3.position = new Vector3(0, -1, 0);
                 thrusterHelper3.rotation = new Vector3(0, 0, Math.PI);
+
+                const thrusterHelper4 = thrusterHelper.clone("rcsThruster2");
+                thrusterHelper4.position = new Vector3(-0.5, 0, 5);
+                thrusterHelper4.rotation = new Vector3(Math.PI / 2, 0, 0);
+
+                const thrusterHelper5 = thrusterHelper.clone("rcsThruster3");
+                thrusterHelper5.position = new Vector3(0.5, 0, 5);
+                thrusterHelper5.rotation = new Vector3(Math.PI / 2, 0, 0);
+
+                const thrusterHelper6 = thrusterHelper.clone("rcsThruster4");
+                thrusterHelper6.position = new Vector3(0, 1, 0);
+                thrusterHelper6.rotation = new Vector3(0, 0, 0);
+
+                const thrusterHelper7 = thrusterHelper.clone("rcsThruster5");
+                thrusterHelper7.position = new Vector3(7, 0, 0);
+                thrusterHelper7.rotation = new Vector3(0, 0, -Math.PI / 2);
+
+                const thrusterHelper8 = thrusterHelper.clone("rcsThruster6");
+                thrusterHelper8.position = new Vector3(-7, 0, 0);
+                thrusterHelper8.rotation = new Vector3(0, 0, Math.PI / 2);
 
                 thrusterHelper.parent = Assets.Spaceship;
                 thrusterHelper2.parent = Assets.Spaceship;
                 thrusterHelper3.parent = Assets.Spaceship;
+                thrusterHelper4.parent = Assets.Spaceship;
+                thrusterHelper5.parent = Assets.Spaceship;
+                thrusterHelper6.parent = Assets.Spaceship;
+                thrusterHelper7.parent = Assets.Spaceship;
+                thrusterHelper8.parent = Assets.Spaceship;
 
                 console.log("Spaceship loaded");
             };

@@ -32,8 +32,8 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.blendMode = ParticleSystem.BLENDMODE_ONEONE;
         this.minLifeTime = 0.5;
         this.maxLifeTime = 0.6;
-        this.minEmitPower = 11;
-        this.maxEmitPower = 12;
+        this.minEmitPower = 0;
+        this.maxEmitPower = 0;
         this.updateSpeed = 0.005;
         this.color1 = new Color4(0.5, 0.5, 0.5, 1);
         this.color2 = new Color4(0.5, 0.5, 0.5, 1);
@@ -47,7 +47,7 @@ export class DirectionnalParticleSystem extends ParticleSystem {
             const randY = randomNumber(this.minEmitBox.y, this.maxEmitBox.y);
             const randZ = randomNumber(this.minEmitBox.z, this.maxEmitBox.z);
 
-            this.particleVelocities[particle.id] = this.direction.scale(3);
+            this.particleVelocities[particle.id] = Vector3.Zero();//Vector3.TransformCoordinates(this.direction, worldMatrix).scale(3);
 
             Vector3.TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
         };
