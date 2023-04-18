@@ -2,8 +2,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
 import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
+import { Thruster } from "./thruster";
 
-export class MainThruster implements MainThruster {
+export class MainThruster implements Thruster {
+    readonly mesh: AbstractMesh;
+
     readonly plume: DirectionnalParticleSystem;
 
     readonly maxAuthority = 2e3;
@@ -12,9 +15,11 @@ export class MainThruster implements MainThruster {
 
     private direction: Vector3;
 
-    private parent: NewtonianTransform;
+    readonly parent: NewtonianTransform;
 
     constructor(mesh: AbstractMesh, direction: Vector3, parent: NewtonianTransform) {
+        this.mesh = mesh;
+
         this.direction = direction;
         this.plume = new DirectionnalParticleSystem(mesh, this.direction);
         this.parent = parent;
@@ -32,24 +37,10 @@ export class MainThruster implements MainThruster {
         return this.throttle;
     }
 
-    public getDirection(): Vector3 {
-        return this.direction;
-    }
-
-    /**
-     * Returns the authority of the thruster in the given direction
-     * @param direction The direction (in local space)
-     * @returns
-     */
     public getAuthority(direction: Vector3): number {
         return this.getAuthority01(direction) * this.maxAuthority * this.throttle;
     }
 
-    /**
-     * Returns the theoretical authority of the thruster in the given direction between 0 and 1 (independent of throttle)
-     * @param direction The direction (in local space)
-     * @returns
-     */
     public getAuthority01(direction: Vector3): number {
         return Math.max(0, Vector3.Dot(this.direction, direction.negate()));
     }

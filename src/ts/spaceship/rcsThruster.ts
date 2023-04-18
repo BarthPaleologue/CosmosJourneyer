@@ -5,19 +5,28 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
 
 export class RCSThruster implements Thruster {
+    readonly mesh: AbstractMesh;
+
     private throttle = 0;
 
     private direction: Vector3;
 
-    private plume: DirectionnalParticleSystem;
+    readonly plume: DirectionnalParticleSystem;
 
-    private parent: NewtonianTransform;
+    readonly parent: NewtonianTransform;
 
     readonly maxAuthority = 100;
 
     constructor(mesh: AbstractMesh, direction: Vector3, parent: NewtonianTransform) {
+        this.mesh = mesh;
+
         this.direction = direction;
         this.plume = new DirectionnalParticleSystem(mesh, this.direction);
+        this.plume.maxSize = 0.3;
+        this.plume.minSize = 0.3;
+
+        this.plume.minLifeTime = 0.2;
+        this.plume.maxLifeTime = 0.2;
 
         this.parent = parent;
     }
@@ -39,11 +48,6 @@ export class RCSThruster implements Thruster {
         return this.getAuthority01(direction) * this.throttle * this.maxAuthority;
     }
 
-    /**
-     * Returns the theoretical authority of the thruster in the given direction between 0 and 1 (independent of throttle)
-     * @param direction The direction (in local space)
-     * @returns
-     */
     public getAuthority01(direction: Vector3): number {
         return Math.max(0, Vector3.Dot(this.direction, direction.negate()));
     }
