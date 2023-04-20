@@ -57,7 +57,7 @@ const starSystemSeed = 0;
 const starSystem = new StarSystem(starSystemSeed, scene);
 engine.setStarSystem(starSystem, false);
 
-const sun = starSystem.makeStellarObject(0.51);
+const sun = starSystem.makeNeutronStar(0.51);
 sun.descriptor.orbitalProperties.period = 60 * 60 * 24;
 
 const planet = starSystem.makeTelluricPlanet(0.4233609183800225);

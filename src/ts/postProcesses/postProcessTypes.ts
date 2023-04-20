@@ -4,6 +4,7 @@ export enum PostProcessType {
     CLOUDS,
     ATMOSPHERE,
     RING,
+    MATTER_JETS,
     BLACK_HOLE,
     OVERLAY
 }

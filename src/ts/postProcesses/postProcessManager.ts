@@ -28,6 +28,8 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { AbstractObject } from "../bodies/abstractObject";
 import { BaseObject } from "../orbits/iOrbitalBody";
 import { PostProcessType } from "./postProcessTypes";
+import { NeutronStar } from "../bodies/stellarObjects/neutronStar";
+import { MatterJetPostProcess } from "./matterJetPostProcess";
 
 export class PostProcessManager {
     private readonly engine: Engine;
@@ -43,6 +45,7 @@ export class PostProcessManager {
         PostProcessType.CLOUDS,
         PostProcessType.ATMOSPHERE,
         PostProcessType.RING,
+        PostProcessType.MATTER_JETS,
         PostProcessType.BLACK_HOLE
     ];
 
@@ -56,6 +59,7 @@ export class PostProcessManager {
     private readonly rings: RingsPostProcess[] = [];
     private readonly blackHoles: BlackHolePostProcess[] = [];
     private readonly overlays: OverlayPostProcess[] = [];
+    private readonly matterJets: MatterJetPostProcess[] = [];
 
     readonly colorCorrection: ColorCorrection;
     readonly fxaa: FxaaPostProcess;
@@ -233,6 +237,15 @@ export class PostProcessManager {
         throw new Error("No black hole found for: " + blackHole.name);
     }
 
+    public addMatterJet(neutronStar: NeutronStar) {
+        this.matterJets.push(new MatterJetPostProcess(neutronStar.name, neutronStar, this.scene));
+    }
+
+    public getMatterJet(neutronStar: NeutronStar): MatterJetPostProcess {
+        for (const mj of this.matterJets) if (mj.body === neutronStar) return mj;
+        throw new Error("No matter jet found for: " + neutronStar.name);
+    }
+
     /**
      * Adds all post processes for the given body.
      * @param body A body
@@ -269,6 +282,11 @@ export class PostProcessManager {
                     if (!(body instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + body.name);
                     this.addBlackHole(body as BlackHole);
                     break;
+                case PostProcessType.MATTER_JETS:
+                    if (!(body instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + body.name);
+                    this.addMatterJet(body as NeutronStar);
+                    break;
+
             }
         }
     }
@@ -291,6 +309,7 @@ export class PostProcessManager {
             PostProcessType.CLOUDS,
             PostProcessType.ATMOSPHERE,
             PostProcessType.RING,
+            PostProcessType.MATTER_JETS,
             PostProcessType.BLACK_HOLE
         ];
         this.init();
@@ -303,6 +322,7 @@ export class PostProcessManager {
         this.renderingOrder = [
             PostProcessType.VOLUMETRIC_LIGHT,
             PostProcessType.BLACK_HOLE,
+            PostProcessType.MATTER_JETS,
             PostProcessType.RING,
             PostProcessType.OCEAN,
             PostProcessType.CLOUDS,
@@ -383,6 +403,14 @@ export class PostProcessManager {
             return bodyRings;
         });
 
+        const [bodyMatterJets, otherMatterJets] = extractRelevantPostProcesses(this.matterJets, this.getCurrentBody());
+        const otherMatterJetsRenderEffect = new PostProcessRenderEffect(this.engine, "otherMatterJetsRenderEffect", () => {
+            return otherMatterJets;
+        });
+        const bodyMatterJetsRenderEffect = new PostProcessRenderEffect(this.engine, "bodyMatterJetsRenderEffect", () => {
+            return bodyMatterJets;
+        });
+
         this.currentRenderingPipeline.addEffect(this.starFieldRenderEffect);
 
         for (const postProcessType of this.renderingOrder) {
@@ -404,6 +432,9 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.RING:
                     this.currentRenderingPipeline.addEffect(otherRingsRenderEffect);
+                    break;
+                case PostProcessType.MATTER_JETS:
+                    this.currentRenderingPipeline.addEffect(otherMatterJetsRenderEffect);
                     break;
                 default:
                     throw new Error("Invalid postprocess type: " + postProcessType);
@@ -429,6 +460,9 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.RING:
                     this.currentRenderingPipeline.addEffect(bodyRingsRenderEffect);
+                    break;
+                case PostProcessType.MATTER_JETS:
+                    this.currentRenderingPipeline.addEffect(bodyMatterJetsRenderEffect);
                     break;
                 default:
                     throw new Error("Invalid postprocess type: " + postProcessType);

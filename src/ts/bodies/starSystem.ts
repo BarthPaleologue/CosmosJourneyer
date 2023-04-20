@@ -18,6 +18,7 @@ import { StellarObject } from "./stellarObjects/stellarObject";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { AbstractObject } from "./abstractObject";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
+import { NeutronStar } from "./stellarObjects/neutronStar";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -161,6 +162,17 @@ export class StarSystem {
 
         this.addStellarObject(blackHole);
         return blackHole;
+    }
+
+    public makeNeutronStar(seed = this.descriptor.getStarSeed(this.stellarObjects.length)): NeutronStar {
+        if (this.stellarObjects.length >= this.descriptor.getNbStars())
+            console.warn(`You are adding a neutron star
+        to a system that already has ${this.stellarObjects.length} stars.
+        The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
+        const neutronStar = new NeutronStar(`neutronStar${this.stellarObjects.length}`, this.scene, seed, this.stellarObjects);
+
+        this.addStellarObject(neutronStar);
+        return neutronStar;
     }
 
     /**
