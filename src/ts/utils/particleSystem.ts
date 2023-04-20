@@ -47,7 +47,7 @@ export class DirectionnalParticleSystem extends ParticleSystem {
             const randY = randomNumber(this.minEmitBox.y, this.maxEmitBox.y);
             const randZ = randomNumber(this.minEmitBox.z, this.maxEmitBox.z);
 
-            this.particleVelocities[particle.id] = Vector3.Zero();//Vector3.TransformCoordinates(this.direction, worldMatrix).scale(3);
+            this.particleVelocities[particle.id] = Vector3.Zero(); //Vector3.TransformCoordinates(this.direction, worldMatrix).scale(3);
 
             Vector3.TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
         };

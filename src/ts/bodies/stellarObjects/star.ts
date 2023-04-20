@@ -33,14 +33,17 @@ export class Star extends AbstractBody {
             parentBodies.map((body) => body.descriptor)
         );
 
-        this.mesh = this.descriptor.rng(42) > 0.1 ? MeshBuilder.CreateSphere(
-            `${name}Mesh`,
-            {
-                diameter: this.descriptor.radius * 2,
-                segments: 32
-            },
-            scene
-        ) : Assets.CreateBananaClone(this.descriptor.radius * 2);
+        this.mesh =
+            this.descriptor.rng(42) > 0.1
+                ? MeshBuilder.CreateSphere(
+                      `${name}Mesh`,
+                      {
+                          diameter: this.descriptor.radius * 2,
+                          segments: 32
+                      },
+                      scene
+                  )
+                : Assets.CreateBananaClone(this.descriptor.radius * 2);
         this.mesh.parent = this.transform.node;
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);

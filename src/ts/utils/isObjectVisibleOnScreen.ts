@@ -11,7 +11,7 @@ import { Settings } from "../settings";
  */
 export function isSizeOnScreenEnough(object: BaseObject, cameraPosition: Vector3, threshold = 0.002) {
     const distance = Vector3.Distance(cameraPosition, object.transform.getAbsolutePosition());
-    const angularSize = object.getBoundingRadius() * 2 / distance;
+    const angularSize = (object.getBoundingRadius() * 2) / distance;
 
     return angularSize / Settings.FOV > threshold;
 }

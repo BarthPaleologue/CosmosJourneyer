@@ -11,5 +11,5 @@ export const Settings = {
     ENABLE_VOLUMETRIC_CLOUDS: false,
     SEED_HALF_RANGE: 1e6,
     C: 299792458,
-    FOV: 92 * Math.PI / 180,
+    FOV: (92 * Math.PI) / 180
 };
