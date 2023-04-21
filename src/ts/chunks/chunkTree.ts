@@ -195,24 +195,17 @@ export class ChunkTree {
 
     public computeCulling(cameraPosition: Vector3): void {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
-            if (chunk.isReady() && Settings.ENABLE_OCCLUSION) {
-                chunk.mesh.setEnabled(true);
-                chunk.transform.node.computeWorldMatrix(true);
+            if (!chunk.isReady()) return;
 
-                const cameraPositionPlanetSpace = cameraPosition.subtract(this.parent.getAbsolutePosition());
-                const chunkPositionPlanetSpace = chunk.transform.getAbsolutePosition().subtract(this.parent.getAbsolutePosition());
+            chunk.mesh.setEnabled(true);
+            chunk.transform.node.computeWorldMatrix(true);
 
-                const theta = Vector3.Dot(cameraPositionPlanetSpace, chunkPositionPlanetSpace) / (cameraPositionPlanetSpace.length() * chunkPositionPlanetSpace.length());
+            const distance = Vector3.Distance(cameraPosition, chunk.transform.getAbsolutePosition());
+            const angularSize = (chunk.getBoundingRadius() * 2) / distance;
 
-                const beyondTheHorizon = theta < -0.5 + Math.min(1.3, (0.3 * this.rootChunkLength) / Math.abs(cameraPositionPlanetSpace.length() - this.rootChunkLength / 2));
+            const chunkIsTooSmall = angularSize / Settings.FOV < 0.002;
 
-                const distance = Vector3.Distance(cameraPosition, chunk.transform.getAbsolutePosition());
-                const angularSize = (chunk.getBoundingRadius() * 2) / distance;
-
-                const chunkIsTooSmall = angularSize / Settings.FOV < 0.002;
-
-                chunk.mesh.setEnabled(!beyondTheHorizon && !chunkIsTooSmall);
-            }
+            chunk.mesh.setEnabled(!chunkIsTooSmall);
         });
     }
 

@@ -6,6 +6,8 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Material } from "@babylonjs/core/Materials/material";
 import { ITransformable } from "../orbits/iOrbitalBody";
 import { Scene } from "@babylonjs/core/scene";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import "@babylonjs/core/Engines/Extensions/engine.query";
 
 export class PlanetChunk implements ITransformable {
     public readonly mesh: Mesh;
@@ -38,6 +40,9 @@ export class PlanetChunk implements ITransformable {
         this.mesh.material.wireframe = true;*/
         this.transform.node.parent = parent.node;
         this.mesh.parent = this.transform.node;
+
+        this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+        this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_STRICT;
 
         // computing the position of the chunk on the side of the planet
         const position = getChunkPlaneSpacePositionFromPath(rootLength, path);
