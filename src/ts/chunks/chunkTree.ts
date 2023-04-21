@@ -204,10 +204,10 @@ export class ChunkTree {
 
                 const theta = Vector3.Dot(cameraPositionPlanetSpace, chunkPositionPlanetSpace) / (cameraPositionPlanetSpace.length() * chunkPositionPlanetSpace.length());
 
-                const beyondTheHorizon = theta < -0.5 + Math.min(1.3, (0.3 * this.rootChunkLength / Math.abs(cameraPositionPlanetSpace.length() - this.rootChunkLength / 2)));
+                const beyondTheHorizon = theta < -0.5 + Math.min(1.3, (0.3 * this.rootChunkLength) / Math.abs(cameraPositionPlanetSpace.length() - this.rootChunkLength / 2));
 
                 const distance = Vector3.Distance(cameraPosition, chunk.transform.getAbsolutePosition());
-                const angularSize = chunk.getBoundingRadius() * 2 / distance;
+                const angularSize = (chunk.getBoundingRadius() * 2) / distance;
 
                 const chunkIsTooSmall = angularSize / Settings.FOV < 0.002;
 

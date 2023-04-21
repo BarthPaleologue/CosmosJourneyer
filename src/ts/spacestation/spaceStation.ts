@@ -41,7 +41,9 @@ export class SpaceStation extends AbstractObject {
 
     public override computeCulling(cameraPosition: Vector3): void {
         const isVisible = isSizeOnScreenEnough(this, cameraPosition);
-        for (const mesh of this.instance.getChildMeshes()) { mesh.isVisible = isVisible; }
+        for (const mesh of this.instance.getChildMeshes()) {
+            mesh.isVisible = isVisible;
+        }
     }
 
     public override dispose(): void {

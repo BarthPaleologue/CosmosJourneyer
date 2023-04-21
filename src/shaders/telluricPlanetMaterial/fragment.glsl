@@ -114,7 +114,7 @@ void main() {
 	float elevation01 = elevation / maxElevation;
 	float waterLevel01 = waterLevel / maxElevation;
 
-	float slope = 1.0 - max(dot(vUnitSamplePoint, vNormal), 0.0);
+	float slope = 1.0 - abs(dot(vUnitSamplePoint, vNormal));
 
 	/// Analyse Physique de la planète
 
@@ -150,6 +150,10 @@ void main() {
 	moisture01 = clamp(moisture01, 0.0, 1.0);
 
 
+	vec3 blendingNormal = vNormal;
+	blendingNormal = triplanarNormal(vSamplePointScaled, blendingNormal, snowNormalMap, 0.0001 * 1000e3, normalSharpness, 1.0);
+	
+
 	// calcul de la couleur et de la normale
 	vec3 normal = vNormal;
 
@@ -162,9 +166,7 @@ void main() {
 	float moistureSharpness = 10.0;
 	float moistureFactor = smoothSharpener(moisture01, moistureSharpness);
 
-	vec3 plainColor2 = 0.8 * plainColor;
-	vec3 plainColor = lerp(plainColor, plainColor2, smoothSharpener((perlin3(vUnitSamplePoint * 100.0) + 1.0) / 2.0, 2.0));
-
+	vec3 plainColor = plainColor * (moisture01 * 0.5 + 0.5);
 
 	float beachFactor = min(
 		smoothstep(waterLevel01 - beachSize / maxElevation, waterLevel01, elevation01),
@@ -173,49 +175,35 @@ void main() {
 	beachFactor = smoothSharpener(beachFactor, 2.0);
 
 	float steepFactor = slope;//smoothSharpener(slope, steepSharpness);
-	steepFactor = smoothstep(0.5, 1.0, steepFactor);
+	steepFactor = smoothstep(0.3, 0.7, steepFactor);
 	steepFactor = smoothSharpener(steepFactor, steepSharpness);
 
-	if(elevation01 > waterLevel01) {
+	plainFactor = 1.0 - steepFactor;
 
-		plainFactor = moistureFactor;
-		desertFactor = 1.0 - moistureFactor;
+	// apply beach factor
+	plainFactor *= 1.0 - beachFactor;
+	beachFactor *= 1.0 - steepFactor;
 
-		// Snow
-		// waterMeltingPoint01 * waterAmount : il est plus difficile de former de la neige quand y a moins d'eau
-		float waterReducing = pow(min(waterAmount, 1.0), 0.3);
-		float snowSeparation = temperature01 + (perlin3(vSamplePoint / 100.0) - 1.0) * 0.02 + pow((1.0 - moisture01), 2.0);
-		snowFactor = smoothstep(1.1 * waterMeltingPoint01 * waterReducing, waterMeltingPoint01 * waterReducing, snowSeparation);
-		snowFactor = smoothSharpener(snowFactor, 2.0);
-		if(waterMeltingPoint01 < 0.0) snowFactor = 0.0;
-		plainFactor *= 1.0 - snowFactor;
-		desertFactor *= 1.0 - snowFactor;
+	// blend with snow factor when above water
+	snowFactor = smoothstep(0.0, -2.0, temperature - abs(blendingNormal.y) * 5.0);
+	snowFactor = smoothSharpener(snowFactor, 2.0);
+	plainFactor *= 1.0 - snowFactor;
+	beachFactor *= 1.0 - snowFactor;
 
-		// Beach
-		desertFactor *= 1.0 - beachFactor;
-		plainFactor *= 1.0 - beachFactor;
-		snowFactor *= 1.0 - beachFactor;
+	// blend with desert factor when above water
+	desertFactor = smoothstep(0.5, 0.3, moisture01);
+	desertFactor = smoothSharpener(desertFactor, 2.0);
+	plainFactor *= 1.0 - desertFactor;
+	beachFactor *= 1.0 - desertFactor;
 
-		// Steep
-		beachFactor *= 1.0 - steepFactor;
-		desertFactor *= 1.0 - steepFactor;
-		plainFactor *= 1.0 - steepFactor;
-		snowFactor *= 1.0 - steepFactor;
-	} else {
-		// entre abysse et surface
-		bottomFactor = 1.0 - beachFactor;
 
-		beachFactor *= 1.0 - steepFactor;
-		bottomFactor *= 1.0 - steepFactor;
-	}
-
-	float sum = snowFactor + plainFactor + desertFactor + bottomFactor + beachFactor + steepFactor;
-	snowFactor /= sum;
-	plainFactor /= sum;
-	desertFactor /= sum;
-	bottomFactor /= sum;
-	beachFactor /= sum;
-	steepFactor /= sum;
+	// blend with bottom factor when under water
+	bottomFactor = smoothstep(waterLevel01, waterLevel01 - 1e-2, elevation01);
+	bottomFactor = smoothSharpener(bottomFactor, 2.0);
+	plainFactor *= 1.0 - bottomFactor;
+	beachFactor *= 1.0 - bottomFactor;
+	snowFactor *= 1.0 - bottomFactor;
+	desertFactor *= 1.0 - bottomFactor;
 
 	// template:
 	// small scale

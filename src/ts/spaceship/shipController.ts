@@ -57,7 +57,7 @@ export class ShipController extends AbstractController {
                 console.log("Found rcs thruster");
                 this.addRCSThruster(child);
             }
-        };
+        }
     }
 
     public override addInput(input: Input): void {
