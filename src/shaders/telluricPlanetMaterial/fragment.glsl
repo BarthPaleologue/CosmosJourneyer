@@ -184,12 +184,6 @@ void main() {
 	plainFactor *= 1.0 - beachFactor;
 	beachFactor *= 1.0 - steepFactor;
 
-	// blend with bottom factor when under water
-	bottomFactor = smoothstep(waterLevel01, waterLevel01 - 1e-2, elevation01);
-	bottomFactor = smoothSharpener(bottomFactor, 2.0);
-	plainFactor *= 1.0 - bottomFactor;
-	beachFactor *= 1.0 - bottomFactor;
-
 	// blend with snow factor when above water
 	snowFactor = smoothstep(0.0, -2.0, temperature - abs(blendingNormal.y) * 5.0);
 	snowFactor = smoothSharpener(snowFactor, 2.0);
@@ -201,6 +195,15 @@ void main() {
 	desertFactor = smoothSharpener(desertFactor, 2.0);
 	plainFactor *= 1.0 - desertFactor;
 	beachFactor *= 1.0 - desertFactor;
+
+
+	// blend with bottom factor when under water
+	bottomFactor = smoothstep(waterLevel01, waterLevel01 - 1e-2, elevation01);
+	bottomFactor = smoothSharpener(bottomFactor, 2.0);
+	plainFactor *= 1.0 - bottomFactor;
+	beachFactor *= 1.0 - bottomFactor;
+	snowFactor *= 1.0 - bottomFactor;
+	desertFactor *= 1.0 - bottomFactor;
 
 	// template:
 	// small scale
