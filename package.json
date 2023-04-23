@@ -4,6 +4,7 @@
     "@babel/preset-typescript": "^7.21.4",
     "@babylonjs/core": "^6.0.0",
     "@babylonjs/gui": "^6.0.0",
+    "@babylonjs/havok": "^1.0.0",
     "@babylonjs/loaders": "^6.0.0",
     "@types/jest": "^28.1.8",
     "@types/seedrandom": "^3.0.5",

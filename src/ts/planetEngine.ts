@@ -18,12 +18,10 @@ import "@babylonjs/core/Misc/screenshotTools";
 import { StarMap } from "./starmap/starMap";
 import { Scene } from "@babylonjs/core/scene";
 import { positionNearObject } from "./utils/positionNearObject";
-import { Vector3 } from "@babylonjs/core/Maths/math";
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
-import "@babylonjs/core/Materials/standardMaterial";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
-
+import HavokPhysics from "@babylonjs/havok";
 
 export class PlanetEngine {
     // UI
@@ -110,8 +108,9 @@ export class PlanetEngine {
         this.starSystemScene = new UberScene(this.engine);
         this.starSystemScene.clearColor = new Color4(0, 0, 0, 0);
 
-        //const hk = new HavokPlugin();
-        //this.starSystemScene.enablePhysics(new Vector3(0, 0, 0), hk);
+        const havokInstance = await HavokPhysics();
+        const havokPlugin = new HavokPlugin(true, havokInstance);
+        this.starSystemScene.enablePhysics(null, havokPlugin);
 
         this.activeScene = this.starSystemScene;
 
