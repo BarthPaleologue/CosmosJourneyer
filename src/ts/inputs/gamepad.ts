@@ -153,7 +153,7 @@ export class Gamepad implements Input {
      */
     private list() {
         const r = [];
-        for (let i = 0; i < (this.gamepad?.buttons || 0); ++i) {
+        for (let i = 0; i < (this.gamepad?.buttons.length || 0); ++i) {
             if (this.gamepad?.buttons[i].pressed) r.push(i);
         }
         if (r.length > 0) console.log(r);
