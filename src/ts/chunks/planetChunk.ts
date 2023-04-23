@@ -4,7 +4,7 @@ import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Material } from "@babylonjs/core/Materials/material";
-import { ITransformable } from "../orbits/iOrbitalBody";
+import { ITransformable } from "../orbits/iOrbitalObject";
 import { Scene } from "@babylonjs/core/scene";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import "@babylonjs/core/Engines/Extensions/engine.query";

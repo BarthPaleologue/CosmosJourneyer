@@ -7,7 +7,7 @@ import { StarSystem } from "./bodies/starSystem";
 import { randRange } from "extended-random";
 import { Settings } from "./settings";
 import { PlayerController } from "./spacelegs/playerController";
-import { positionNearBody } from "./utils/positionNearBody";
+import { positionNearObject } from "./utils/positionNearObject";
 import { PlanetEngine } from "./planetEngine";
 import { ShipController } from "./spaceship/shipController";
 
@@ -75,4 +75,4 @@ document.addEventListener("keydown", (e) => {
 
 engine.init();
 
-positionNearBody(scene.getActiveController(), BH, starSystem, 20);
+positionNearObject(scene.getActiveController(), BH, starSystem, 20);

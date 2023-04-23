@@ -1,10 +1,10 @@
 // from https://www.youtube.com/watch?v=UXD97l7ZT0w
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { IOrbitalBody } from "./iOrbitalBody";
+import { IOrbitalObject } from "./iOrbitalObject";
 import { IOrbitalProperties } from "./iOrbitalProperties";
 import { stripAxisFromQuaternion } from "../utils/algebra";
-import { BaseDescriptor, BodyDescriptor } from "../descriptors/common";
+import { BaseDescriptor } from "../descriptors/common";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 /**
@@ -17,6 +17,12 @@ export function keplerEquation(E: number, M: number, e: number) {
     return M - E + e * Math.sin(E);
 }
 
+/**
+ * Solves Kepler's equation for the eccentric anomaly using Newton's method
+ * @param M 
+ * @param e 
+ * @returns 
+ */
 export function solveKepler(M: number, e: number) {
     const h = 1e-4;
     const epsilon = 1e-8;
@@ -33,18 +39,7 @@ export function solveKepler(M: number, e: number) {
     return guess;
 }
 
-export function computeBarycenter2(bodies: IOrbitalBody[]): Vector3 {
-    if (bodies.length === 0) throw new Error("Can compute the barycenter of zero bodies");
-    const barycenter = Vector3.Zero();
-    let sum = 0;
-    for (const body of bodies) {
-        barycenter.addInPlace(body.transform.getAbsolutePosition().scale(body.descriptor.physicalProperties.mass));
-        sum += body.descriptor.physicalProperties.mass;
-    }
-    return barycenter.scaleInPlace(1 / sum);
-}
-
-export function computeBarycenter(body: IOrbitalBody, relevantBodies: IOrbitalBody[]): [Vector3, Quaternion] {
+export function computeBarycenter(body: IOrbitalObject, relevantBodies: IOrbitalObject[]): [Vector3, Quaternion] {
     const barycenter = body.transform.getAbsolutePosition().scale(body.descriptor.physicalProperties.mass);
     const meanQuaternion = Quaternion.Zero();
     let sumPosition = body.descriptor.physicalProperties.mass;
@@ -56,9 +51,7 @@ export function computeBarycenter(body: IOrbitalBody, relevantBodies: IOrbitalBo
         sumPosition += mass;
         sumQuaternion += mass;
     }
-    if (sumPosition > 0) {
-        barycenter.scaleInPlace(1 / sumPosition);
-    }
+    if (sumPosition > 0) barycenter.scaleInPlace(1 / sumPosition);
     if (sumQuaternion > 0) meanQuaternion.normalize();
     else meanQuaternion.copyFromFloats(0, 0, 0, 1);
 
@@ -80,7 +73,7 @@ export function computePointOnOrbit(centerOfMass: Vector3, settings: IOrbitalPro
     const relativePosition = new Vector3(Math.cos(eccentricAnomaly) * semiMajorLength, 0, Math.sin(eccentricAnomaly) * semiMinorLength);
     relativePosition.applyRotationQuaternionInPlace(settings.orientationQuaternion);
 
-    return relativePosition.add(ellipseCenter);
+    return relativePosition.addInPlace(ellipseCenter);
 }
 
 /**

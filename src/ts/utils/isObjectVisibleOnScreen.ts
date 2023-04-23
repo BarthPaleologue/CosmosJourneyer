@@ -1,5 +1,5 @@
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { BaseObject } from "../orbits/iOrbitalBody";
+import { BaseObject } from "../orbits/iOrbitalObject";
 import { Settings } from "../settings";
 
 /**

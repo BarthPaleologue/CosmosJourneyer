@@ -16,13 +16,13 @@ export interface BaseObject extends BoundingSphere {
     postProcesses: PostProcessType[];
 }
 
-export interface IOrbitalBody extends ITransformable {
+export interface IOrbitalObject extends ITransformable {
     /**
      * The depth of the body in the orbital tree
      */
     depth: number;
 
-    parentObjects: IOrbitalBody[];
+    parentObjects: IOrbitalObject[];
 
     descriptor: BaseDescriptor;
 

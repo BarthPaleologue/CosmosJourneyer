@@ -1,5 +1,5 @@
 import { Vector3, Quaternion, Matrix } from "@babylonjs/core/Maths/math";
-import { BaseObject, IOrbitalBody } from "../orbits/iOrbitalBody";
+import { BaseObject, IOrbitalObject } from "../orbits/iOrbitalObject";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { BaseDescriptor } from "../descriptors/common";
 import { Scene } from "@babylonjs/core/scene";
@@ -11,7 +11,7 @@ export interface NextState {
     rotation: Quaternion;
 }
 
-export abstract class AbstractObject implements IOrbitalBody, BaseObject {
+export abstract class AbstractObject implements IOrbitalObject, BaseObject {
     readonly transform: BasicTransform;
 
     readonly nextState: NextState = {
@@ -31,7 +31,7 @@ export abstract class AbstractObject implements IOrbitalBody, BaseObject {
 
     abstract readonly descriptor: BaseDescriptor;
 
-    readonly parentObjects: IOrbitalBody[];
+    readonly parentObjects: IOrbitalObject[];
 
     depth: number;
 

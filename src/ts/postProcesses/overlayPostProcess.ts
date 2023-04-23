@@ -4,7 +4,7 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./unifo
 import { ShaderDataType, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { BodyPostProcess } from "./bodyPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { BaseObject } from "../orbits/iOrbitalBody";
+import { BaseObject } from "../orbits/iOrbitalObject";
 
 const shaderName = "overlay";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = overlayFragment;

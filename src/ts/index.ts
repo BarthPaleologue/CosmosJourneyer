@@ -9,7 +9,7 @@ import { StarSystem } from "./bodies/starSystem";
 import { Settings } from "./settings";
 import { Assets } from "./assets";
 import { PlayerController } from "./spacelegs/playerController";
-import { positionNearBody } from "./utils/positionNearBody";
+import { positionNearObject } from "./utils/positionNearObject";
 import { PlanetEngine } from "./planetEngine";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -132,7 +132,7 @@ andromaque.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Ident
 
 engine.init();
 
-positionNearBody(scene.getActiveController(), planet, starSystem, 4);
+positionNearObject(scene.getActiveController(), planet, starSystem, 4);
 
 const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
 aresAtmosphere.settings.redWaveLength = 500;

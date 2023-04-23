@@ -7,7 +7,7 @@ import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/post
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { BodyPostProcess } from "./bodyPostProcess";
-import { IOrbitalBody } from "../orbits/iOrbitalBody";
+import { IOrbitalObject } from "../orbits/iOrbitalObject";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -24,7 +24,7 @@ export interface OceanSettings {
 export class OceanPostProcess extends BodyPostProcess {
     settings: OceanSettings;
 
-    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: IOrbitalBody[]) {
+    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: IOrbitalObject[]) {
         const settings: OceanSettings = {
             oceanRadius: planet.getBoundingRadius(),
             depthModifier: 0.001,

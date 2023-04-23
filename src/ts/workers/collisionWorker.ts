@@ -1,7 +1,7 @@
 import { TransferCollisionData } from "../chunks/workerDataTypes";
 import { StarSystem } from "../bodies/starSystem";
 import { AbstractController } from "../uberCore/abstractController";
-import { ITransformable } from "../orbits/iOrbitalBody";
+import { ITransformable } from "../orbits/iOrbitalObject";
 import { RigidBody } from "./rigidbody";
 
 export class CollisionWorker {

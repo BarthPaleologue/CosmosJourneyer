@@ -2,7 +2,6 @@ import { PlanetChunk } from "./planetChunk";
 import { Direction } from "../utils/direction";
 import { ChunkForge } from "./chunkForge";
 import { BuildTask, DeleteTask, TaskType } from "./taskTypes";
-import { rayIntersectSphere } from "../utils/occlusion";
 import { Settings } from "../settings";
 import { getChunkSphereSpacePositionFromPath } from "../utils/chunkUtils";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
