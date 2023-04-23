@@ -9,7 +9,7 @@ export class MainThruster implements Thruster {
 
     readonly plume: DirectionnalParticleSystem;
 
-    readonly maxAuthority = 2e3;
+    private readonly maxAuthority = 2e3;
 
     private throttle = 0;
 

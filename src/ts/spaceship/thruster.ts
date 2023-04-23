@@ -6,8 +6,6 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 export interface Thruster {
     readonly mesh: AbstractMesh;
 
-    readonly maxAuthority: number;
-
     readonly plume: DirectionnalParticleSystem;
 
     readonly parent: NewtonianTransform;

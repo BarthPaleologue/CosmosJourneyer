@@ -100,9 +100,17 @@ export class Assets {
                 const thrusterHelper2 = thrusterHelper.clone("mainThruster2");
                 thrusterHelper2.position = new Vector3(-0.5, 0, -4);
 
-                const thrusterHelper3 = thrusterHelper.clone("rcsThruster1");
-                thrusterHelper3.position = new Vector3(0, -1, 0);
-                thrusterHelper3.rotation = new Vector3(0, 0, Math.PI);
+                // Roll RCS 1
+
+                const thrusterHelper31 = thrusterHelper.clone("rcsThruster11");
+                thrusterHelper31.position = new Vector3(-0.5, -1, 0);
+                thrusterHelper31.rotation = new Vector3(0, 0, Math.PI);
+
+                const thrusterHelper32 = thrusterHelper.clone("rcsThruster12");
+                thrusterHelper32.position = new Vector3(0.5, -1, 0);
+                thrusterHelper32.rotation = new Vector3(0, 0, Math.PI);
+
+                // Forward RCS
 
                 const thrusterHelper4 = thrusterHelper.clone("rcsThruster2");
                 thrusterHelper4.position = new Vector3(-0.5, 0, 5);
@@ -112,9 +120,17 @@ export class Assets {
                 thrusterHelper5.position = new Vector3(0.5, 0, 5);
                 thrusterHelper5.rotation = new Vector3(Math.PI / 2, 0, 0);
 
-                const thrusterHelper6 = thrusterHelper.clone("rcsThruster4");
-                thrusterHelper6.position = new Vector3(0, 1, 0);
-                thrusterHelper6.rotation = new Vector3(0, 0, 0);
+                // Roll RCS 2
+
+                const thrusterHelper61 = thrusterHelper.clone("rcsThruster41");
+                thrusterHelper61.position = new Vector3(0.5, 1, 0);
+                thrusterHelper61.rotation = new Vector3(0, 0, 0);
+
+                const thrusterHelper62 = thrusterHelper.clone("rcsThruster42");
+                thrusterHelper62.position = new Vector3(-0.5, 1, 0);
+                thrusterHelper62.rotation = new Vector3(0, 0, 0);
+
+                // Right-Left RCS
 
                 const thrusterHelper7 = thrusterHelper.clone("rcsThruster5");
                 thrusterHelper7.position = new Vector3(7, 0, 0);
@@ -124,14 +140,60 @@ export class Assets {
                 thrusterHelper8.position = new Vector3(-7, 0, 0);
                 thrusterHelper8.rotation = new Vector3(0, 0, Math.PI / 2);
 
+                // Pitch RCS
+
+                const thrusterHelper91 = thrusterHelper.clone("rcsThruster7");
+                thrusterHelper91.position = new Vector3(0, 1, 4);
+                thrusterHelper91.rotation = new Vector3(0, 0, 0);
+
+                const thrusterHelper92 = thrusterHelper.clone("rcsThruster8");
+                thrusterHelper92.position = new Vector3(0, 1, -4);
+                thrusterHelper92.rotation = new Vector3(0, 0, 0);
+
+                const thrusterHelper93 = thrusterHelper.clone("rcsThruster9");
+                thrusterHelper93.position = new Vector3(0, -1, 4);
+                thrusterHelper93.rotation = new Vector3(0, 0, Math.PI);
+
+                const thrusterHelper94 = thrusterHelper.clone("rcsThruster10");
+                thrusterHelper94.position = new Vector3(0, -1, -4);
+                thrusterHelper94.rotation = new Vector3(0, 0, Math.PI);
+
+                // Yaw RCS
+
+                const thrusterHelper101 = thrusterHelper.clone("rcsThruster11");
+                thrusterHelper101.position = new Vector3(4, 0, 4);
+                thrusterHelper101.rotation = new Vector3(Math.PI / 2, 0, 0);
+
+                const thrusterHelper102 = thrusterHelper.clone("rcsThruster12");
+                thrusterHelper102.position = new Vector3(-4, 0, 4);
+                thrusterHelper102.rotation = new Vector3(Math.PI / 2, 0, 0);
+
+                const thrusterHelper103 = thrusterHelper.clone("rcsThruster13");
+                thrusterHelper103.position = new Vector3(4, 0, -7);
+                thrusterHelper103.rotation = new Vector3(-Math.PI / 2, 0, 0);
+
+                const thrusterHelper104 = thrusterHelper.clone("rcsThruster14");
+                thrusterHelper104.position = new Vector3(-4, 0, -7);
+                thrusterHelper104.rotation = new Vector3(-Math.PI / 2, 0, 0);
+
                 thrusterHelper.parent = Assets.Spaceship;
                 thrusterHelper2.parent = Assets.Spaceship;
-                thrusterHelper3.parent = Assets.Spaceship;
+                thrusterHelper31.parent = Assets.Spaceship;
+                thrusterHelper32.parent = Assets.Spaceship;
                 thrusterHelper4.parent = Assets.Spaceship;
                 thrusterHelper5.parent = Assets.Spaceship;
-                thrusterHelper6.parent = Assets.Spaceship;
+                thrusterHelper61.parent = Assets.Spaceship;
+                thrusterHelper62.parent = Assets.Spaceship;
                 thrusterHelper7.parent = Assets.Spaceship;
                 thrusterHelper8.parent = Assets.Spaceship;
+                thrusterHelper91.parent = Assets.Spaceship;
+                thrusterHelper92.parent = Assets.Spaceship;
+                thrusterHelper93.parent = Assets.Spaceship;
+                thrusterHelper94.parent = Assets.Spaceship;
+                thrusterHelper101.parent = Assets.Spaceship;
+                thrusterHelper102.parent = Assets.Spaceship;
+                thrusterHelper103.parent = Assets.Spaceship;
+                thrusterHelper104.parent = Assets.Spaceship;
 
                 console.log("Spaceship loaded");
             };

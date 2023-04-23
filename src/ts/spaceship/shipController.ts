@@ -18,7 +18,7 @@ import { RCSThruster } from "./rcsThruster";
 export class ShipController extends AbstractController {
     readonly transform: NewtonianTransform;
 
-    readonly rollAuthority = 1;
+    readonly rollAuthority = 0.5;
     readonly pitchAuthority = 1;
     readonly yawAuthority = 1;
 
@@ -80,7 +80,11 @@ export class ShipController extends AbstractController {
 
     private addRCSThruster(mesh: AbstractMesh) {
         const direction = mesh.getDirection(new Vector3(0, 1, 0));
-        this.rcsThrusters.push(new RCSThruster(mesh, direction, this.transform));
+        const thruster = new RCSThruster(mesh, direction, this.transform);
+        this.rcsThrusters.push(thruster);
+
+        //FIXME: this is temporary to balance rc thrust
+        thruster.setMaxAuthority(1 / thruster.leverage);
     }
 
     public override getActiveCamera(): UberCamera {
@@ -110,6 +114,39 @@ export class ShipController extends AbstractController {
         return totalAuthority;
     }
 
+    private getTotalRollAuthority() {
+        let totalAuthority = 0;
+        // only rcs thrusters can contribute to roll authority
+        for (const thruster of this.rcsThrusters) {
+            totalAuthority += thruster.getAuthorityAroundAxis(LOCAL_DIRECTION.FORWARD);
+            totalAuthority -= thruster.getAuthorityAroundAxis(LOCAL_DIRECTION.BACKWARD);
+        }
+
+        return totalAuthority;
+    }
+
+    private getTotalPitchAuthority() {
+        let totalAuthority = 0;
+        // only rcs thrusters can contribute to pitch authority
+        for (const thruster of this.rcsThrusters) {
+            totalAuthority += thruster.getAuthorityAroundAxis(LOCAL_DIRECTION.RIGHT);
+            totalAuthority -= thruster.getAuthorityAroundAxis(LOCAL_DIRECTION.LEFT);
+        }
+
+        return totalAuthority;
+    }
+
+    private getTotalYawAuthority() {
+        let totalAuthority = 0;
+        // only rcs thrusters can contribute to yaw authority
+        for (const thruster of this.rcsThrusters) {
+            totalAuthority += thruster.getAuthorityAroundAxis(LOCAL_DIRECTION.UP);
+            totalAuthority -= thruster.getAuthorityAroundAxis(LOCAL_DIRECTION.DOWN);
+        }
+
+        return totalAuthority;
+    }
+
     protected override listenTo(input: Input, deltaTime: number): Vector3 {
         if (this.getActiveCamera() === this.thirdPersonCamera) {
             if (input.type === InputType.KEYBOARD) {
@@ -125,10 +162,6 @@ export class ShipController extends AbstractController {
             }
         }
 
-        this.transform.rotationAcceleration.x += this.rollAuthority * input.getRoll() * deltaTime;
-        this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
-        this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
-
         if (this.warpDrive.isDisabled()) {
             for (const thruster of this.mainThrusters) {
                 thruster.updateThrottle(0.3 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
@@ -140,19 +173,32 @@ export class ShipController extends AbstractController {
                 thruster.updateThrottle(0.3 * deltaTime * input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.LEFT));
                 thruster.updateThrottle(0.3 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
             }
+
             if (input.type === InputType.KEYBOARD) {
                 // if we are listenning to multiple inputs, the thrusters will be activated and deactivated multiple times
-                for (const thruster of this.rcsThrusters) {
-                    // rcs thrusters are either activated or not
-                    if (input.getZAxis() > 0 && thruster.getAuthority01(LOCAL_DIRECTION.FORWARD) > 0.5) thruster.activate();
-                    else if (input.getZAxis() < 0 && thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD) > 0.5) thruster.activate();
-                    else if (input.getYAxis() > 0 && thruster.getAuthority01(LOCAL_DIRECTION.UP) > 0.5) thruster.activate();
-                    else if (input.getYAxis() < 0 && thruster.getAuthority01(LOCAL_DIRECTION.DOWN) > 0.5) thruster.activate();
-                    else if (input.getXAxis() > 0 && thruster.getAuthority01(LOCAL_DIRECTION.RIGHT) > 0.5) thruster.activate();
-                    else if (input.getXAxis() < 0 && thruster.getAuthority01(LOCAL_DIRECTION.LEFT) > 0.5) thruster.activate();
-                    else thruster.deactivate();
+                for (const rcsThruster of this.rcsThrusters) {
+                    // rcs linear contribution
+                    if (input.getZAxis() > 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.FORWARD) > 0.5) rcsThruster.activate();
+                    else if (input.getZAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.BACKWARD) > 0.5) rcsThruster.activate();
+                    else if (input.getYAxis() > 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.UP) > 0.5) rcsThruster.activate();
+                    else if (input.getYAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.DOWN) > 0.5) rcsThruster.activate();
+                    else if (input.getXAxis() > 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.RIGHT) > 0.5) rcsThruster.activate();
+                    else if (input.getXAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.LEFT) > 0.5) rcsThruster.activate();
+                    // rcs rotation contribution
+                    else if (input.getRoll() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.FORWARD) > 0.2) rcsThruster.activate();
+                    else if (input.getRoll() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.BACKWARD) > 0.2) rcsThruster.activate();
+                    else if (input.getPitch() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.RIGHT) > 0.2) rcsThruster.activate();
+                    else if (input.getPitch() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.LEFT) > 0.2) rcsThruster.activate();
+                    else if (input.getYaw() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.UP) > 0.2) rcsThruster.activate();
+                    else if (input.getYaw() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.DOWN) > 0.2) rcsThruster.activate();
+
+                    else rcsThruster.deactivate();
                 }
             }
+
+            this.transform.rotationAcceleration.x = this.getTotalRollAuthority() * deltaTime;
+            this.transform.rotationAcceleration.y = this.getTotalPitchAuthority() * deltaTime;
+            this.transform.rotationAcceleration.z = this.getTotalYawAuthority() * deltaTime;
 
             const forwardAcceleration = this.transform.getForwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.FORWARD) * deltaTime);
             const backwardAcceleration = this.transform.getBackwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.BACKWARD) * deltaTime);
@@ -172,6 +218,10 @@ export class ShipController extends AbstractController {
             this.transform.acceleration.addInPlace(rightAcceleration);
             this.transform.acceleration.addInPlace(leftAcceleration);
         } else {
+            this.transform.rotationAcceleration.x += this.rollAuthority * input.getRoll() * deltaTime;
+            this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
+            this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
+
             const warpSpeed = this.transform.getForwardDirection().scale(this.warpDrive.getWarpSpeed());
             this.transform.speed.copyFrom(warpSpeed);
         }

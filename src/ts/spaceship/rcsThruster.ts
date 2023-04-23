@@ -15,10 +15,14 @@ export class RCSThruster implements Thruster {
 
     readonly parent: NewtonianTransform;
 
-    readonly maxAuthority = 100;
+    readonly leverage: number;
+
+    private maxAuthority = 1;
 
     constructor(mesh: AbstractMesh, direction: Vector3, parent: NewtonianTransform) {
         this.mesh = mesh;
+
+        this.leverage = this.mesh.position.length();
 
         this.direction = direction;
         this.plume = new DirectionnalParticleSystem(mesh, this.direction);
@@ -36,12 +40,15 @@ export class RCSThruster implements Thruster {
     }
 
     public deactivate(): void {
-        if (this.throttle === 1) console.trace("deactivated");
         this.throttle = 0;
     }
 
     public getThrottle(): number {
         return this.throttle;
+    }
+
+    public setMaxAuthority(maxAuthority: number): void {
+        this.maxAuthority = maxAuthority;
     }
 
     public getAuthority(direction: Vector3): number {
@@ -52,10 +59,26 @@ export class RCSThruster implements Thruster {
         return Math.max(0, Vector3.Dot(this.direction, direction.negate()));
     }
 
+    public getAuthorityAroundAxis01(rotationAxis: Vector3): number {
+        const thrusterPosition = this.mesh.position;
+        const thrusterRotationAxis = Vector3.Cross(thrusterPosition, this.direction);
+        const authorityAroundAxis = Math.max(0, Vector3.Dot(thrusterRotationAxis, rotationAxis)) / this.leverage;
+        return authorityAroundAxis;
+    }
+
+    public getAuthorityAroundAxis(rotationAxis: Vector3): number {
+        return this.getAuthorityAroundAxis01(rotationAxis) * this.leverage * this.throttle * this.maxAuthority;
+    }
+
     public update(): void {
         this.plume.emitRate = this.throttle * 1000;
-        if (this.throttle > 0) console.log(this.throttle);
         this.plume.setDirection(this.parent.getForwardDirection().negate());
         this.plume.applyAcceleration(this.parent.acceleration.negate());
+
+        if (this.throttle > 0) {
+            this.mesh.scaling = new Vector3(3, 3, 3);
+        } else {
+            this.mesh.scaling = new Vector3(1, 1, 1);
+        }
     }
 }
