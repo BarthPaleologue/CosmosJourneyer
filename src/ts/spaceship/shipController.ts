@@ -14,6 +14,7 @@ import { WarpDrive } from "./warpDrive";
 import { parseSpeed } from "../utils/parseSpeed";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";
 import { RCSThruster } from "./rcsThruster";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export class ShipController extends AbstractController {
     readonly transform: NewtonianTransform;
@@ -164,14 +165,14 @@ export class ShipController extends AbstractController {
 
         if (this.warpDrive.isDisabled()) {
             for (const thruster of this.mainThrusters) {
-                thruster.updateThrottle(0.3 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
-                thruster.updateThrottle(0.3 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD));
+                thruster.updateThrottle(0.8 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
+                thruster.updateThrottle(0.8 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD));
 
-                thruster.updateThrottle(0.3 * deltaTime * input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.UP));
-                thruster.updateThrottle(0.3 * deltaTime * -input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.DOWN));
+                thruster.updateThrottle(0.8 * deltaTime * input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.UP));
+                thruster.updateThrottle(0.8 * deltaTime * -input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.DOWN));
 
-                thruster.updateThrottle(0.3 * deltaTime * input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.LEFT));
-                thruster.updateThrottle(0.3 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
+                thruster.updateThrottle(0.8 * deltaTime * input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.LEFT));
+                thruster.updateThrottle(0.8 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
             }
 
             if (input.type === InputType.KEYBOARD) {
