@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Axis, Vector3 } from "@babylonjs/core/Maths/math";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
@@ -12,6 +12,8 @@ function randomNumber(min: number, max: number): number {
 export class DirectionnalParticleSystem extends ParticleSystem {
     private direction: Vector3;
 
+    readonly emitter: AbstractMesh;
+
     readonly nbParticles = 5000;
 
     readonly particleVelocities: Vector3[] = new Array(this.nbParticles);
@@ -22,6 +24,7 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         super("particles", 5000, mesh.getScene());
 
         this.direction = direction;
+        this.emitter = mesh;
 
         this.particleTexture = Assets.GrassNormalMap;
         this.emitter = mesh;
@@ -47,7 +50,7 @@ export class DirectionnalParticleSystem extends ParticleSystem {
             const randY = randomNumber(this.minEmitBox.y, this.maxEmitBox.y);
             const randZ = randomNumber(this.minEmitBox.z, this.maxEmitBox.z);
 
-            this.particleVelocities[particle.id] = Vector3.Zero(); //Vector3.TransformCoordinates(this.direction, worldMatrix).scale(3);
+            this.particleVelocities[particle.id] = this.emitter.getDirection(Axis.Y).scale(-3);//Vector3.TransformCoordinates(this.direction, worldMatrix).scale(3);
 
             Vector3.TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
         };

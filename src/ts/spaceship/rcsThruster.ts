@@ -74,11 +74,5 @@ export class RCSThruster implements Thruster {
         this.plume.emitRate = this.throttle * 1000;
         this.plume.setDirection(this.parent.getForwardDirection().negate());
         this.plume.applyAcceleration(this.parent.acceleration.negate());
-
-        if (this.throttle > 0) {
-            this.mesh.scaling = new Vector3(3, 3, 3);
-        } else {
-            this.mesh.scaling = new Vector3(1, 1, 1);
-        }
     }
 }
