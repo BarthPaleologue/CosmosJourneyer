@@ -28,8 +28,6 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.minSize = 0.6;
         this.maxSize = 0.7;
         this.useLogarithmicDepth = true;
-        this.emitRate = 100;
-        this.blendMode = ParticleSystem.BLENDMODE_ONEONE;
         this.minLifeTime = 0.5;
         this.maxLifeTime = 0.6;
         this.minEmitPower = 0;
@@ -40,6 +38,8 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.colorDead = new Color4(0, 0, 0, 0);
         this.direction1 = direction;
         this.direction2 = direction;
+        this.minEmitBox = new Vector3(-0.1, -0.1, -0.1);
+        this.maxEmitBox = new Vector3(0.1, 0.1, 0.1);
         this.start();
 
         this.startPositionFunction = (worldMatrix, positionToUpdate, particle: Particle, isLocal): void => {

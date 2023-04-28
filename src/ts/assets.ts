@@ -18,6 +18,7 @@ import starfield from "../asset/textures/milkyway.jpg";
 
 import spaceship from "../asset/spaceship/spaceship2.glb";
 import spacestation from "../asset/spacestation/spacestation.glb";
+import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
 
 import { ChunkForge } from "./chunks/chunkForge";
@@ -87,120 +88,10 @@ export class Assets {
                     pbr.useLogarithmicDepth = true;
                 }
 
-                const thrusterHelper = MeshBuilder.CreateCylinder("mainThrusterHelper1", { height: 0.5, diameterTop: 0, diameterBottom: 0.5 }, scene);
-                const cubeMaterial = new StandardMaterial("cubeMat", scene);
-                cubeMaterial.diffuseColor = Color3.White();
-                cubeMaterial.emissiveColor = Color3.White();
-                cubeMaterial.useLogarithmicDepth = true;
-                thrusterHelper.material = cubeMaterial;
-                thrusterHelper.isVisible = false;
-                thrusterHelper.position = new Vector3(0.5, 0, -4);
-                thrusterHelper.rotation = new Vector3(-Math.PI / 2, 0, 0);
-
-                const thrusterHelper2 = thrusterHelper.clone("mainThrusterHelper2");
-                thrusterHelper2.position = new Vector3(-0.5, 0, -4);
-
-                // Roll RCS 1
-
-                const thrusterHelper31 = thrusterHelper.clone("rcsThrusterHelper11");
-                thrusterHelper31.position = new Vector3(-0.5, -1, 0);
-                thrusterHelper31.rotation = new Vector3(0, 0, Math.PI);
-
-                const thrusterHelper32 = thrusterHelper.clone("rcsThrusterHelper12");
-                thrusterHelper32.position = new Vector3(0.5, -1, 0);
-                thrusterHelper32.rotation = new Vector3(0, 0, Math.PI);
-
-                // Forward RCS
-
-                const thrusterHelper4 = thrusterHelper.clone("rcsThrusterHelper2");
-                thrusterHelper4.position = new Vector3(-0.5, 0, 5);
-                thrusterHelper4.rotation = new Vector3(Math.PI / 2, 0, 0);
-
-                const thrusterHelper5 = thrusterHelper.clone("rcsThrusterHelper3");
-                thrusterHelper5.position = new Vector3(0.5, 0, 5);
-                thrusterHelper5.rotation = new Vector3(Math.PI / 2, 0, 0);
-
-                // Roll RCS 2
-
-                const thrusterHelper61 = thrusterHelper.clone("rcsThrusterHelper41");
-                thrusterHelper61.position = new Vector3(0.5, 1, 0);
-                thrusterHelper61.rotation = new Vector3(0, 0, 0);
-
-                const thrusterHelper62 = thrusterHelper.clone("rcsThrusterHelper42");
-                thrusterHelper62.position = new Vector3(-0.5, 1, 0);
-                thrusterHelper62.rotation = new Vector3(0, 0, 0);
-
-                // Right-Left RCS
-
-                const thrusterHelper7 = thrusterHelper.clone("rcsThrusterHelper5");
-                thrusterHelper7.position = new Vector3(7, 0, 0);
-                thrusterHelper7.rotation = new Vector3(0, 0, -Math.PI / 2);
-
-                const thrusterHelper8 = thrusterHelper.clone("rcsThrusterHelper6");
-                thrusterHelper8.position = new Vector3(-7, 0, 0);
-                thrusterHelper8.rotation = new Vector3(0, 0, Math.PI / 2);
-
-                // Pitch RCS
-
-                const thrusterHelper91 = thrusterHelper.clone("rcsThrusterHelper7");
-                thrusterHelper91.position = new Vector3(0, 1, 4);
-                thrusterHelper91.rotation = new Vector3(0, 0, 0);
-
-                const thrusterHelper92 = thrusterHelper.clone("rcsThrusterHelper8");
-                thrusterHelper92.position = new Vector3(0, 1, -4);
-                thrusterHelper92.rotation = new Vector3(0, 0, 0);
-
-                const thrusterHelper93 = thrusterHelper.clone("rcsThrusterHelper9");
-                thrusterHelper93.position = new Vector3(0, -1, 4);
-                thrusterHelper93.rotation = new Vector3(0, 0, Math.PI);
-
-                const thrusterHelper94 = thrusterHelper.clone("rcsThrusterHelper10");
-                thrusterHelper94.position = new Vector3(0, -1, -4);
-                thrusterHelper94.rotation = new Vector3(0, 0, Math.PI);
-
-                // Yaw RCS
-
-                const thrusterHelper101 = thrusterHelper.clone("rcsThrusterHelper11");
-                thrusterHelper101.position = new Vector3(4, 0, 4);
-                thrusterHelper101.rotation = new Vector3(Math.PI / 2, 0, 0);
-
-                const thrusterHelper102 = thrusterHelper.clone("rcsThrusterHelper12");
-                thrusterHelper102.position = new Vector3(-4, 0, 4);
-                thrusterHelper102.rotation = new Vector3(Math.PI / 2, 0, 0);
-
-                const thrusterHelper103 = thrusterHelper.clone("rcsThrusterHelper13");
-                thrusterHelper103.position = new Vector3(4, 0, -7);
-                thrusterHelper103.rotation = new Vector3(-Math.PI / 2, 0, 0);
-
-                const thrusterHelper104 = thrusterHelper.clone("rcsThrusterHelper14");
-                thrusterHelper104.position = new Vector3(-4, 0, -7);
-                thrusterHelper104.rotation = new Vector3(-Math.PI / 2, 0, 0);
-
-                thrusterHelper.dispose();
-                thrusterHelper2.dispose();
-                //thrusterHelper.parent = Assets.Spaceship;
-                //thrusterHelper2.parent = Assets.Spaceship;
-                thrusterHelper31.parent = Assets.Spaceship;
-                thrusterHelper32.parent = Assets.Spaceship;
-                thrusterHelper4.parent = Assets.Spaceship;
-                thrusterHelper5.parent = Assets.Spaceship;
-                thrusterHelper61.parent = Assets.Spaceship;
-                thrusterHelper62.parent = Assets.Spaceship;
-                thrusterHelper7.parent = Assets.Spaceship;
-                thrusterHelper8.parent = Assets.Spaceship;
-                thrusterHelper91.parent = Assets.Spaceship;
-                thrusterHelper92.parent = Assets.Spaceship;
-                thrusterHelper93.parent = Assets.Spaceship;
-                thrusterHelper94.parent = Assets.Spaceship;
-                thrusterHelper101.parent = Assets.Spaceship;
-                thrusterHelper102.parent = Assets.Spaceship;
-                thrusterHelper103.parent = Assets.Spaceship;
-                thrusterHelper104.parent = Assets.Spaceship;
-
                 console.log("Spaceship loaded");
             };
 
-            const spacestationTask = Assets.manager.addMeshTask("spacestationTask", "", "", spacestation);
+            const spacestationTask = Assets.manager.addMeshTask("spacestationTask", "", "", shipCarrier);
             spacestationTask.onSuccess = function (task: MeshAssetTask) {
                 Assets.Spacestation = task.loadedMeshes[0] as Mesh;
 
@@ -208,6 +99,8 @@ export class Assets {
                     mesh.isVisible = false;
                     const pbr = mesh.material as PBRBaseMaterial;
                     pbr.useLogarithmicDepth = true;
+                    //pbr._reflectionTexture = new Texture(starfield, scene);
+                    //pbr._reflectionTexture.coordinatesMode = Texture.SPHERICAL_MODE;
                 }
 
                 console.log("Spacestation loaded");

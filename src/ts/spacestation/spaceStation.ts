@@ -16,6 +16,8 @@ export class SpaceStation extends AbstractObject {
 
     readonly instance: InstancedMesh;
 
+    readonly ringInstances: InstancedMesh[] = [];
+
     constructor(parentBodies: AbstractObject[], scene: Scene) {
         super("spaceStation", parentBodies, scene);
         //TODO: do not hardcode seed
@@ -29,8 +31,14 @@ export class SpaceStation extends AbstractObject {
         this.instance = Assets.CreateSpaceStationInstance();
         this.instance.parent = this.transform.node;
 
+        for (const mesh of this.instance.getChildMeshes()) {
+            if (mesh.name.includes("ring")) {
+                this.ringInstances.push(mesh as InstancedMesh);
+            }
+        }
+
         this.transform.rotate(Axis.X, this.descriptor.physicalProperties.axialTilt);
-        this.transform.rotate(Axis.Z, this.descriptor.physicalProperties.axialTilt);
+        this.transform.rotate(Axis.Y, this.descriptor.physicalProperties.axialTilt);
 
         this.postProcesses.push(PostProcessType.OVERLAY);
     }
@@ -44,6 +52,18 @@ export class SpaceStation extends AbstractObject {
         for (const mesh of this.instance.getChildMeshes()) {
             mesh.isVisible = isVisible;
         }
+    }
+
+    public override updateRotation(deltaTime: number): number {
+        const dtheta = deltaTime / this.descriptor.physicalProperties.rotationPeriod;
+
+        if (this.ringInstances.length === 0) this.instance.rotate(Axis.Z, dtheta);
+        else {
+            for (const ring of this.ringInstances) {
+                ring.rotate(Axis.Y, dtheta);
+            }
+        }
+        return dtheta;
     }
 
     public override dispose(): void {
