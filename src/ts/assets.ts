@@ -16,6 +16,8 @@ import atmosphereLUT from "../asset/textures/LUT/atmosphere.png";
 
 import starfield from "../asset/textures/milkyway.jpg";
 
+import plumeParticle from "../asset/textures/plume.png";
+
 import spaceship from "../asset/spaceship/spaceship2.glb";
 import spacestation from "../asset/spacestation/spacestation.glb";
 import shipCarrier from "../asset/spacestation/shipcarrier.glb";
@@ -30,8 +32,6 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PBRBaseMaterial } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class Assets {
     static IS_READY = false;
@@ -49,6 +49,8 @@ export class Assets {
     static AtmosphereLUT: Texture;
 
     static Starfield: Texture;
+
+    static PlumeParticle: Texture;
 
     private static Spaceship: Mesh;
     private static Spacestation: Mesh;
@@ -77,6 +79,8 @@ export class Assets {
             Assets.manager.addTextureTask("AtmosphereLUT", atmosphereLUT).onSuccess = (task) => (Assets.AtmosphereLUT = task.texture);
 
             Assets.manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.Starfield = task.texture);
+
+            Assets.manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Assets.PlumeParticle = task.texture);
 
             const spaceshipTask = Assets.manager.addMeshTask("spaceshipTask", "", "", spaceship);
             spaceshipTask.onSuccess = function (task: MeshAssetTask) {

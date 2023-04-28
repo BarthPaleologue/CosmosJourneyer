@@ -26,7 +26,7 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.direction = direction;
         this.emitter = mesh;
 
-        this.particleTexture = Assets.GrassNormalMap;
+        this.particleTexture = Assets.PlumeParticle;
         this.emitter = mesh;
         this.minSize = 0.6;
         this.maxSize = 0.7;
