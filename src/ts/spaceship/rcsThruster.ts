@@ -1,10 +1,9 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Thruster } from "./thruster";
 import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AbstractThruster } from "./abstractThruster";
 
-export class RCSThruster extends AbstractThruster implements Thruster {
+export class RCSThruster extends AbstractThruster {
     protected override maxAuthority = 1;
 
     constructor(mesh: AbstractMesh, direction: Vector3, parent: NewtonianTransform) {

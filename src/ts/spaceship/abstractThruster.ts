@@ -52,10 +52,20 @@ export abstract class AbstractThruster {
         this.maxAuthority = maxAuthority;
     }
 
+    /**
+     * Returns the authority of the thruster in the given direction
+     * @param direction The direction (in local space)
+     * @returns
+     */
     public getAuthority(direction: Vector3): number {
         return this.getAuthority01(direction) * this.throttle * this.maxAuthority;
     }
 
+    /**
+     * Returns the theoretical authority of the thruster in the given direction between 0 and 1 (independent of throttle)
+     * @param direction The direction (in local space)
+     * @returns
+     */
     public getAuthority01(direction: Vector3): number {
         return Math.max(0, Vector3.Dot(this.localNozzleDown.negate(), direction));
     }
