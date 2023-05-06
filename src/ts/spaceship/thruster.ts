@@ -10,6 +10,8 @@ export interface Thruster {
 
     readonly parent: NewtonianTransform;
 
+    readonly localNozzleDown: Vector3;
+
     getThrottle(): number;
 
     getAuthority(direction: Vector3): number;

@@ -27,6 +27,8 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.emitter = mesh;
 
         this.particleTexture = Assets.PlumeParticle;
+        this.particleTexture.hasAlpha = true;
+
         this.emitter = mesh;
         this.minSize = 0.6;
         this.maxSize = 0.7;
@@ -36,6 +38,7 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.minEmitPower = 0;
         this.maxEmitPower = 0;
         this.updateSpeed = 0.005;
+        this.forceDepthWrite = true;
         this.color1 = new Color4(0.5, 0.5, 0.5, 1);
         this.color2 = new Color4(0.5, 0.5, 0.5, 1);
         this.colorDead = new Color4(0, 0, 0, 0);
@@ -50,7 +53,7 @@ export class DirectionnalParticleSystem extends ParticleSystem {
             const randY = randomNumber(this.minEmitBox.y, this.maxEmitBox.y);
             const randZ = randomNumber(this.minEmitBox.z, this.maxEmitBox.z);
 
-            this.particleVelocities[particle.id] = this.emitter.getDirection(Axis.Y).scale(-3);//Vector3.TransformCoordinates(this.direction, worldMatrix).scale(3);
+            this.particleVelocities[particle.id] = this.emitter.getDirection(Axis.Y).scale(3);
 
             Vector3.TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
         };
@@ -72,20 +75,20 @@ export class DirectionnalParticleSystem extends ParticleSystem {
                     this.recycleParticle(particle);
                     i--;
                     continue;
-                } else {
-                    const velocity = this.particleVelocities[particle.id];
-                    velocity.addInPlace(scaledAcceleration);
-
-                    particle.colorStep.scaleToRef(scaledUpdateSpeed, scaledColorStep);
-                    particle.color.addInPlace(scaledColorStep);
-
-                    if (particle.color.a < 0) particle.color.a = 0;
-                    particle.angle += particle.angularSpeed * scaledUpdateSpeed;
-
-                    particle.direction.scaleToRef(scaledUpdateSpeed, scaledDirection);
-
-                    particle.position.addInPlace(velocity.scale(deltaTime));
                 }
+
+                const velocity = this.particleVelocities[particle.id];
+                velocity.addInPlace(scaledAcceleration);
+
+                particle.colorStep.scaleToRef(scaledUpdateSpeed, scaledColorStep);
+                particle.color.addInPlace(scaledColorStep);
+
+                if (particle.color.a < 0) particle.color.a = 0;
+                particle.angle += particle.angularSpeed * scaledUpdateSpeed;
+
+                particle.direction.scaleToRef(scaledUpdateSpeed, scaledDirection);
+
+                particle.position.addInPlace(velocity.scale(deltaTime));
             }
         };
     }
