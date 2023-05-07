@@ -66,6 +66,9 @@ export class StarMap {
     static readonly FADE_IN_ANIMATION = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
     static readonly FADE_IN_DURATION = 1000;
 
+    static readonly SHIMMER_ANIMATION = new Animation("shimmer", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    static readonly SHIMMER_DURATION = 1000;
+
     constructor(engine: Engine) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
@@ -145,6 +148,21 @@ export class StarMap {
             {
                 frame: StarMap.FADE_IN_DURATION / 60,
                 value: 1
+            }
+        ]);
+
+        StarMap.SHIMMER_ANIMATION.setKeys([
+            {
+                frame: 0,
+                value: 1.0
+            },
+            {
+                frame: StarMap.SHIMMER_DURATION / 60 / 2,
+                value: 1.4,
+            },
+            {
+                frame: StarMap.SHIMMER_DURATION / 60,
+                value: 1.0
             }
         ]);
 
@@ -262,13 +280,13 @@ export class StarMap {
                     this.starMapUI.attachUIToMesh(star);
                     this.starMapUI.setUIText(
                         "Seed: " +
-                            starSystemDescriptor.seed +
-                            "\n" +
-                            "Type: " +
-                            getStellarTypeString(starDescriptor.stellarType) +
-                            "\n" +
-                            "Planets: " +
-                            starSystemDescriptor.getNbPlanets()
+                        starSystemDescriptor.seed +
+                        "\n" +
+                        "Type: " +
+                        getStellarTypeString(starDescriptor.stellarType) +
+                        "\n" +
+                        "Planets: " +
+                        starSystemDescriptor.getNbPlanets()
                     );
 
                     this.selectedSystemSeed = starSystemSeed;
@@ -283,7 +301,12 @@ export class StarMap {
 
     private fadeIn(star: InstancedMesh) {
         star.animations.push(StarMap.FADE_IN_ANIMATION);
-        star.getScene().beginAnimation(star, 0, StarMap.FADE_IN_DURATION / 60);
+        star.getScene().beginAnimation(star, 0, StarMap.FADE_IN_DURATION / 60, false, 1, () => {
+            star.animations.push(StarMap.SHIMMER_ANIMATION);
+            setTimeout(() => {
+                star.getScene().beginAnimation(star, 0, StarMap.SHIMMER_DURATION / 60, true, 0.2);
+            }, Math.random() * StarMap.SHIMMER_DURATION);
+        });
     }
 
     private fadeOutThenDispose(star: InstancedMesh) {
