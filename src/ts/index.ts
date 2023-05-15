@@ -132,7 +132,7 @@ andromaque.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Ident
 
 engine.init();
 
-positionNearObject(scene.getActiveController(), spacestation, starSystem, 2);
+positionNearObject(scene.getActiveController(), planet, starSystem, 2);
 
 const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
 aresAtmosphere.settings.redWaveLength = 500;
