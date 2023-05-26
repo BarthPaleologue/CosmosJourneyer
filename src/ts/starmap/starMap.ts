@@ -92,7 +92,7 @@ export class StarMap {
         pipeline.fxaaEnabled = true;
         pipeline.bloomEnabled = true;
         pipeline.bloomThreshold = 0.0;
-        pipeline.bloomWeight = 1.0;
+        pipeline.bloomWeight = 1.5;
         pipeline.bloomKernel = 128;
         pipeline.imageProcessing.exposure = 1.1;
         pipeline.imageProcessing.contrast = 1.0;
@@ -303,9 +303,7 @@ export class StarMap {
         star.animations.push(StarMap.FADE_IN_ANIMATION);
         star.getScene().beginAnimation(star, 0, StarMap.FADE_IN_DURATION / 60, false, 1, () => {
             star.animations.push(StarMap.SHIMMER_ANIMATION);
-            setTimeout(() => {
-                star.getScene().beginAnimation(star, 0, StarMap.SHIMMER_DURATION / 60, true, 0.2);
-            }, Math.random() * StarMap.SHIMMER_DURATION);
+            star.getScene().beginAnimation(star, 0, StarMap.SHIMMER_DURATION / 60, true, 0.1 + Math.random() * 0.2);
         });
     }
 
