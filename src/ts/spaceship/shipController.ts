@@ -189,16 +189,12 @@ export class ShipController extends AbstractController {
                     // rcs rotation contribution
                     else if (input.getRoll() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.BACKWARD) > 0.2) rcsThruster.activate();
                     else if (input.getRoll() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.FORWARD) > 0.2) rcsThruster.activate();
-                    else if (input.getPitch() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.RIGHT) > 0.2) rcsThruster.activate();
-                    else if (input.getPitch() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.LEFT) > 0.2) rcsThruster.activate();
-                    else if (input.getYaw() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.DOWN) > 0.2) rcsThruster.activate();
-                    else if (input.getYaw() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.UP) > 0.2) rcsThruster.activate();
+                    else if (input.getPitch() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.RIGHT) > 0.2) rcsThruster.activate();
+                    else if (input.getPitch() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.LEFT) > 0.2) rcsThruster.activate();
+                    else if (input.getYaw() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.DOWN) > 0.2) rcsThruster.activate();
+                    else if (input.getYaw() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.UP) > 0.2) rcsThruster.activate();
 
                     else rcsThruster.deactivate();
-
-                    if (input.getPitch() != 0) {
-                        console.log(rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.RIGHT), rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.LEFT));
-                    }
                 }
             }
 
