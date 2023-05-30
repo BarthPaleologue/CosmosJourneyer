@@ -26,10 +26,15 @@ import { Animation } from "@babylonjs/core/Animations/animation";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Culling/ray";
+import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
+import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 
 export class StarMap {
     readonly scene: Scene;
     readonly controller: PlayerController;
+
+    private rotationAnimation: TransformRotationAnimation | null = null;
+    private translationAnimation: TransformTranslationAnimation | null = null;
 
     /**
      * The position of the center of the starmap in world space.
@@ -169,7 +174,21 @@ export class StarMap {
         this.scene.registerBeforeRender(() => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
+            if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaTime);
+
             const playerDisplacementNegated = this.controller.update(deltaTime);
+
+            if (this.translationAnimation !== null) {
+                const oldPosition = this.controller.transform.getAbsolutePosition().clone();
+                this.translationAnimation.update(deltaTime);
+                const newPosition = this.controller.transform.getAbsolutePosition().clone();
+
+                const displacementNegated = newPosition.subtract(oldPosition).negateInPlace();
+
+                this.controller.transform.translate(displacementNegated);
+                playerDisplacementNegated.addInPlace(displacementNegated);
+            }
+
 
             this.starMapCenterPosition.addInPlace(playerDisplacementNegated);
             for (const mesh of this.scene.meshes) mesh.position.addInPlace(playerDisplacementNegated);
@@ -290,6 +309,25 @@ export class StarMap {
                     );
 
                     this.selectedSystemSeed = starSystemSeed;
+
+                    const cameraDir = this.controller.transform.getForwardDirection();
+                    const starDir = star.position.subtract(this.controller.transform.getAbsolutePosition()).normalize();
+
+                    const rotationAngle = Math.acos(Vector3.Dot(cameraDir, starDir));
+
+                    // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
+                    if (rotationAngle > 0.02) {
+                        const rotationAxis = Vector3.Cross(cameraDir, starDir).normalize();
+                        this.rotationAnimation = new TransformRotationAnimation(this.controller.transform, rotationAxis, rotationAngle, 1);
+                    }
+                    
+                    const distance = star.position.subtract(this.controller.transform.getAbsolutePosition()).length();
+                    const targetPosition = this.controller.transform.getAbsolutePosition().add(starDir.scale(distance - 0.5));
+
+                    // if the transform is already in the right position, do not animate
+                    if (targetPosition.subtract(this.controller.transform.getAbsolutePosition()).lengthSquared() > 0.1) {
+                        this.translationAnimation = new TransformTranslationAnimation(this.controller.transform, targetPosition, 1);
+                    }
                 })
             );
 
