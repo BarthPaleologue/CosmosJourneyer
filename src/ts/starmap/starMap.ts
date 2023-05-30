@@ -31,7 +31,7 @@ import { TransformTranslationAnimation } from "../uberCore/transforms/animations
 
 export class StarMap {
     readonly scene: Scene;
-    readonly controller: PlayerController;
+    private readonly controller: PlayerController;
 
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
@@ -67,14 +67,14 @@ export class StarMap {
      */
     private currentCellPosition = Vector3.Zero();
 
-    static readonly FADE_OUT_ANIMATION = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
-    static readonly FADE_OUT_DURATION = 1000;
+    private static readonly FADE_OUT_ANIMATION = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    private static readonly FADE_OUT_DURATION = 1000;
 
-    static readonly FADE_IN_ANIMATION = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
-    static readonly FADE_IN_DURATION = 1000;
+    private static readonly FADE_IN_ANIMATION = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    private static readonly FADE_IN_DURATION = 1000;
 
-    static readonly SHIMMER_ANIMATION = new Animation("shimmer", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
-    static readonly SHIMMER_DURATION = 1000;
+    private static readonly SHIMMER_ANIMATION = new Animation("shimmer", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    private static readonly SHIMMER_DURATION = 1000;
 
     constructor(engine: Engine) {
         this.scene = new Scene(engine);
@@ -185,7 +185,7 @@ export class StarMap {
                 this.translationAnimation.update(deltaTime);
                 const newPosition = this.controller.transform.getAbsolutePosition().clone();
 
-                const displacementNegated = newPosition.subtract(oldPosition).negateInPlace();
+                const displacementNegated = oldPosition.subtractInPlace(newPosition);
 
                 this.controller.transform.translate(displacementNegated);
                 playerDisplacementNegated.addInPlace(displacementNegated);
