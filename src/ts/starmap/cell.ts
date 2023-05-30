@@ -25,9 +25,11 @@ export type BuildData = {
 
 export class Cell {
     /**
-     * The meshes of the cell
+     * The star instances of the cell
      */
-    readonly meshes: InstancedMesh[];
+    readonly starInstances: InstancedMesh[] = [];
+
+    readonly blackHoleInstances: InstancedMesh[] = [];
 
     /**
      * The position of the cell relative to the center of the starmap
@@ -46,7 +48,6 @@ export class Cell {
 
     constructor(positionInStarMap: Vector3) {
         this.position = positionInStarMap;
-        this.meshes = [];
         this.rng = seededSquirrelNoise(hashVec3(positionInStarMap));
     }
 

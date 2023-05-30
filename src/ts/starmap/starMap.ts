@@ -45,12 +45,14 @@ export class StarMap {
     private readonly blackHoleTemplate: Mesh;
 
     private readonly starBuildStack: BuildData[] = [];
-    private readonly starTrashQueue: InstancedMesh[] = [];
+
+    private readonly recycledStars: InstancedMesh[] = [];
+    private readonly recycledBlackHoles: InstancedMesh[] = [];
 
     static readonly GENERATION_CADENCE = 10;
     static readonly DELETION_CADENCE = 100;
 
-    static readonly RENDER_RADIUS = 7;
+    static readonly RENDER_RADIUS = 6;
 
     private readonly starMapUI: StarMapUI;
 
@@ -220,14 +222,14 @@ export class StarMap {
         for (const cell of this.loadedCells.values()) {
             const position = cell.position;
             if (position.add(this.starMapCenterPosition).length() > StarMap.RENDER_RADIUS + 1) {
-                this.starTrashQueue.push(...cell.meshes);
+                for (const starInstance of cell.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
+                for (const blackHoleInstance of cell.blackHoleInstances) this.fadeOutThenRecycle(blackHoleInstance, this.recycledBlackHoles);
+
                 this.loadedCells.delete(cell.getKey());
             }
         }
 
-        this.disposeNextStars(StarMap.DELETION_CADENCE * this.controller.getActiveCamera().speed ** 2);
-
-        // then generate missing cells
+        // then generate missing cells // TODO: make this in parralel
         for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
             for (let y = -StarMap.RENDER_RADIUS; y <= StarMap.RENDER_RADIUS; y++) {
                 for (let z = -StarMap.RENDER_RADIUS; z <= StarMap.RENDER_RADIUS; z++) {
@@ -252,14 +254,6 @@ export class StarMap {
         this.starMapUI.update();
     }
 
-    private disposeNextStars(n: number) {
-        for (let i = 0; i < n; i++) {
-            if (this.starTrashQueue.length === 0) return;
-            this.fadeOutThenDispose(this.starTrashQueue[0]);
-            this.starTrashQueue.shift();
-        }
-    }
-
     private buildNextStars(n: number): void {
         for (let i = 0; i < n; i++) {
             if (this.starBuildStack.length === 0) return;
@@ -280,23 +274,45 @@ export class StarMap {
 
             const starDescriptor = !isStarBlackHole ? new StarDescriptor(starSeed, []) : new BlackHoleDescriptor(starSeed);
 
-            const star = !isStarBlackHole ? this.starTemplate.createInstance(data.name) : this.blackHoleTemplate.createInstance(data.name);
-            star.scaling = Vector3.One().scaleInPlace(data.scale);
-            star.position = data.position.add(this.starMapCenterPosition);
+            let instance: InstancedMesh | null = null;
+            let recycled = false;
+
+            if (!isStarBlackHole) {
+                if (this.recycledStars.length > 0) {
+                    instance = this.recycledStars[0];
+                    this.recycledStars.shift();
+                    recycled = true;
+                } else instance = this.starTemplate.createInstance(data.name)
+            } else {
+                if (this.recycledBlackHoles.length > 0) {
+                    instance = this.recycledBlackHoles[0];
+                    this.recycledBlackHoles.shift();
+                    recycled = true;
+                } else instance = this.blackHoleTemplate.createInstance(data.name);
+            }
+
+            const initializedInstance = instance;
+
+            initializedInstance.scaling = Vector3.One().scaleInPlace(data.scale);
+            initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
             if (starDescriptor instanceof StarDescriptor) {
                 const starColor = starDescriptor.surfaceColor;
-                star.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
+                initializedInstance.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
             } else {
-                star.instancedBuffers.color = new Color4(1.0, 0.6, 0.3, 0.0);
+                initializedInstance.instancedBuffers.color = new Color4(1.0, 0.6, 0.3, 0.0);
             }
 
-            star.isPickable = true;
-            star.actionManager = new ActionManager(this.scene);
+            if (!recycled) {
+                initializedInstance.isPickable = true;
+                initializedInstance.actionManager = new ActionManager(this.scene);
+            } else {
+                initializedInstance.actionManager?.unregisterAction(initializedInstance.actionManager.actions[0]);
+            }
 
-            star.actionManager.registerAction(
+            initializedInstance.actionManager?.registerAction(
                 new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
-                    this.starMapUI.attachUIToMesh(star);
+                    this.starMapUI.attachUIToMesh(initializedInstance);
                     this.starMapUI.setUIText(
                         "Seed: " +
                         starSystemDescriptor.seed +
@@ -311,7 +327,7 @@ export class StarMap {
                     this.selectedSystemSeed = starSystemSeed;
 
                     const cameraDir = this.controller.transform.getForwardDirection();
-                    const starDir = star.position.subtract(this.controller.transform.getAbsolutePosition()).normalize();
+                    const starDir = initializedInstance.position.subtract(this.controller.transform.getAbsolutePosition()).normalize();
 
                     const rotationAngle = Math.acos(Vector3.Dot(cameraDir, starDir));
 
@@ -320,8 +336,8 @@ export class StarMap {
                         const rotationAxis = Vector3.Cross(cameraDir, starDir).normalize();
                         this.rotationAnimation = new TransformRotationAnimation(this.controller.transform, rotationAxis, rotationAngle, 1);
                     }
-                    
-                    const distance = star.position.subtract(this.controller.transform.getAbsolutePosition()).length();
+
+                    const distance = initializedInstance.position.subtract(this.controller.transform.getAbsolutePosition()).length();
                     const targetPosition = this.controller.transform.getAbsolutePosition().add(starDir.scale(distance - 0.5));
 
                     // if the transform is already in the right position, do not animate
@@ -331,22 +347,23 @@ export class StarMap {
                 })
             );
 
-            this.fadeIn(star);
+            this.fadeIn(initializedInstance);
 
-            this.loadedCells.get(data.cellString)?.meshes.push(star);
+            if (isStarBlackHole) this.loadedCells.get(data.cellString)?.blackHoleInstances.push(initializedInstance);
+            else this.loadedCells.get(data.cellString)?.starInstances.push(initializedInstance);
         }
     }
 
-    private fadeIn(star: InstancedMesh) {
-        star.animations.push(StarMap.FADE_IN_ANIMATION);
-        star.getScene().beginAnimation(star, 0, StarMap.FADE_IN_DURATION / 60, false, 1, () => {
-            star.animations.push(StarMap.SHIMMER_ANIMATION);
-            star.getScene().beginAnimation(star, 0, StarMap.SHIMMER_DURATION / 60, true, 0.1 + Math.random() * 0.2);
+    private fadeIn(instance: InstancedMesh) {
+        instance.animations = [StarMap.FADE_IN_ANIMATION];
+        instance.getScene().beginAnimation(instance, 0, StarMap.FADE_IN_DURATION / 60, false, 1, () => {
+            instance.animations = [StarMap.SHIMMER_ANIMATION];
+            instance.getScene().beginAnimation(instance, 0, StarMap.SHIMMER_DURATION / 60, true, 0.1 + Math.random() * 0.2);
         });
     }
 
-    private fadeOutThenDispose(star: InstancedMesh) {
-        star.animations.push(StarMap.FADE_OUT_ANIMATION);
-        star.getScene().beginAnimation(star, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => star.dispose());
+    private fadeOutThenRecycle(instance: InstancedMesh, recyclingList: InstancedMesh[]) {
+        instance.animations = [StarMap.FADE_OUT_ANIMATION];
+        instance.getScene().beginAnimation(instance, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => recyclingList.push(instance));
     }
 }
