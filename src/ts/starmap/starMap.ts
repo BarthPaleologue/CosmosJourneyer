@@ -41,6 +41,8 @@ export class StarMap {
      */
     private readonly starMapCenterPosition: Vector3;
 
+    private readonly allowedCellRelativeCoordinates: Vector3[] = [];
+
     private readonly starTemplate: Mesh;
     private readonly blackHoleTemplate: Mesh;
 
@@ -173,6 +175,16 @@ export class StarMap {
             }
         ]);
 
+        // then generate missing cells // TODO: make this in parralel
+        for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
+            for (let y = -StarMap.RENDER_RADIUS; y <= StarMap.RENDER_RADIUS; y++) {
+                for (let z = -StarMap.RENDER_RADIUS; z <= StarMap.RENDER_RADIUS; z++) {
+                    if (x * x + y * y + z * z > StarMap.RENDER_RADIUS * StarMap.RENDER_RADIUS) continue;
+                    this.allowedCellRelativeCoordinates.push(new Vector3(x, y, z));
+                }
+            }
+        }
+
         this.scene.registerBeforeRender(() => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
@@ -229,25 +241,20 @@ export class StarMap {
             }
         }
 
-        // then generate missing cells // TODO: make this in parralel
-        for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
-            for (let y = -StarMap.RENDER_RADIUS; y <= StarMap.RENDER_RADIUS; y++) {
-                for (let z = -StarMap.RENDER_RADIUS; z <= StarMap.RENDER_RADIUS; z++) {
-                    if (x * x + y * y + z * z > StarMap.RENDER_RADIUS * StarMap.RENDER_RADIUS) continue; // skip cells that are too far away (this is a sphere, not a cube)
+        // then generate missing cells
+        for (const relativeCoordinate of this.allowedCellRelativeCoordinates) {
+            const position = this.currentCellPosition.add(relativeCoordinate);
+            const cellKey = Vector3ToString(position);
 
-                    const position = this.currentCellPosition.add(new Vector3(x, y, z));
-                    const cellKey = Vector3ToString(position);
+            if (this.loadedCells.has(cellKey)) continue; // already generated
 
-                    if (this.loadedCells.has(cellKey)) continue; // already generated
+            // don't generate cells that are not in the frustum
+            const bb = Cell.getBoundingBox(position, this.starMapCenterPosition);
+            if (!this.controller.getActiveCamera().isInFrustum(bb)) continue;
 
-                    // don't generate cells that are not in the frustum
-                    const bb = Cell.getBoundingBox(position, this.starMapCenterPosition);
-                    if (!this.controller.getActiveCamera().isInFrustum(bb)) continue;
-
-                    this.registerCell(position);
-                }
-            }
+            this.registerCell(position);
         }
+
 
         this.buildNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed ** 2);
 
@@ -338,7 +345,7 @@ export class StarMap {
                     }
 
                     const distance = initializedInstance.position.subtract(this.controller.transform.getAbsolutePosition()).length();
-                    const targetPosition = this.controller.transform.getAbsolutePosition().add(starDir.scale(distance - 0.5));
+                    const targetPosition = this.controller.transform.getAbsolutePosition().add(starDir.scaleInPlace(distance - 0.5));
 
                     // if the transform is already in the right position, do not animate
                     if (targetPosition.subtract(this.controller.transform.getAbsolutePosition()).lengthSquared() > 0.1) {
@@ -351,6 +358,8 @@ export class StarMap {
 
             if (isStarBlackHole) this.loadedCells.get(data.cellString)?.blackHoleInstances.push(initializedInstance);
             else this.loadedCells.get(data.cellString)?.starInstances.push(initializedInstance);
+
+            console.log(this.recycledBlackHoles.length);
         }
     }
 
