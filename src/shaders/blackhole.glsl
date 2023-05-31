@@ -47,7 +47,8 @@ vec3 projectOnPlane(vec3 vector, vec3 planeNormal) {
 }
 
 float angleBetweenVectors(vec3 a, vec3 b) {
-    return acos(dot(a, b) / (length(a) * length(b)));
+    // the clamping is necessary to prevent undefined values when acos(x) has |x| > 1
+    return acos(clamp(dot(normalize(a), normalize(b)), -1.0, 1.0));
 }
 
 float hash(float x) { return fract(sin(x) * 152754.742); }
@@ -119,7 +120,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
         float theta = 2.0 * 3.1415 * time / rotationPeriod;
         vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, diskNormal, theta);
         
-        float angle = angleBetweenVectors(normalize(rotatedProjectedSamplePoint), forwardAxis);
+        float angle = angleBetweenVectors(rotatedProjectedSamplePoint, forwardAxis);
         float u = time + intensity + relativeDistance; // some kind of disk coordinate (spiral)
         const float f = 1.0;
         float noise = valueNoise(vec2(2.0 * angle, 5.0 * u), f);
