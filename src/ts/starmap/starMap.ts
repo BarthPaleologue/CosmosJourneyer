@@ -314,6 +314,7 @@ export class StarMap {
                 initializedInstance.isPickable = true;
                 initializedInstance.actionManager = new ActionManager(this.scene);
             } else {
+                initializedInstance.setEnabled(true);
                 initializedInstance.actionManager?.unregisterAction(initializedInstance.actionManager.actions[0]);
             }
 
@@ -358,8 +359,6 @@ export class StarMap {
 
             if (isStarBlackHole) this.loadedCells.get(data.cellString)?.blackHoleInstances.push(initializedInstance);
             else this.loadedCells.get(data.cellString)?.starInstances.push(initializedInstance);
-
-            console.log(this.recycledBlackHoles.length);
         }
     }
 
@@ -373,6 +372,9 @@ export class StarMap {
 
     private fadeOutThenRecycle(instance: InstancedMesh, recyclingList: InstancedMesh[]) {
         instance.animations = [StarMap.FADE_OUT_ANIMATION];
-        instance.getScene().beginAnimation(instance, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => recyclingList.push(instance));
+        instance.getScene().beginAnimation(instance, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => {
+            instance.setEnabled(false);
+            recyclingList.push(instance)
+        });
     }
 }
