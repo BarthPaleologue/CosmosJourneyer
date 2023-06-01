@@ -1,9 +1,9 @@
 // https://bgolus.medium.com/normal-mapping-for-a-triplanar-shader-10bf39dca05a
 #define inline
 vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, float scale, float sharpness, float normalStrength) {
-    vec2 uvX = position.zy * scale;
-    vec2 uvY = position.xz * scale;
-    vec2 uvZ = position.xy * scale;
+    vec2 uvX = vec3(position).zy * scale;
+    vec2 uvY = vec3(position).xz * scale;
+    vec2 uvZ = vec3(position).xy * scale;
 
     // get the normal from the normal map
 
