@@ -38,9 +38,6 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "view",
                 "normalMatrix",
 
-                "textureSampler",
-                "depthSampler",
-
                 "colorMode",
 
                 "bottomNormalMap",

@@ -28,9 +28,6 @@ uniform vec3 planetPosition;
 uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
 uniform int nbStars; // number of stars
 
-uniform sampler2D textureSampler;
-uniform sampler2D depthSampler; // evaluate sceneDepth
-
 uniform int colorMode;
 
 uniform sampler2D bottomNormalMap;
