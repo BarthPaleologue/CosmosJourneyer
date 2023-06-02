@@ -10,6 +10,7 @@ import { PlayerController } from "./spacelegs/playerController";
 import { positionNearObject } from "./utils/positionNearObject";
 import { PlanetEngine } from "./planetEngine";
 import { ShipController } from "./spaceship/shipController";
+import { EditorVisibility } from "./ui/bodyEditor/bodyEditor";
 
 const engine = new PlanetEngine();
 
@@ -76,3 +77,5 @@ document.addEventListener("keydown", (e) => {
 engine.init();
 
 positionNearObject(scene.getActiveController(), BH, starSystem, 20);
+
+engine.bodyEditor.setVisibility(EditorVisibility.FULL);
