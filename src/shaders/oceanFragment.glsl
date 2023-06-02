@@ -52,6 +52,7 @@ uniform float time;
 
 #pragma glslify: computeSpecularHighlight = require(./utils/computeSpecularHighlight.glsl)
 
+#define inline
 vec4 ocean(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
 
@@ -86,10 +87,9 @@ vec4 ocean(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
 
     normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 500.0, normalWave, normalMap2, 0.000010, waveBlendingSharpness, 0.5);
     normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap1, 0.000005, waveBlendingSharpness, 0.5);
-
+    
     //normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 500.0, normalWave, normalMap1, 0.000001, waveBlendingSharpness, 0.2);
     //normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap2, 0.0000005, waveBlendingSharpness, 0.2);
-
 
     float ndl = 0.0;
     float specularHighlight = 0.0;
@@ -116,6 +116,7 @@ vec4 ocean(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         float alpha = exp(-distanceThroughOcean * alphaModifier);
         
         //vec3 oceanColor = lerp(vec3(10.0, 100.0, 249.0)/255.0, vec3(15.0,94.0,156.0)/255.0, opticalDepth01);
+        
         vec3 deepColor = vec3(0.0, 22.0, 82.0)/255.0;
         vec3 shallowColor = vec3(32.0,193.0,180.0)/255.0;
         vec3 oceanColor = lerp(deepColor, shallowColor, opticalDepth01);
@@ -127,8 +128,11 @@ vec4 ocean(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
         vec3 foamColor = vec3(0.8);
         ambiant = lerp(foamColor, ambiant, foamFactor);
 
-        return vec4(ambiant * ndl + specularHighlight, 1.0);
+        vec3 finalColor = ambiant * ndl + specularHighlight;
+
+        return vec4(finalColor, 1.0);
     }
+
     return originalColor;
 }
 
