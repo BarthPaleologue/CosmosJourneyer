@@ -24,19 +24,7 @@ import "@babylonjs/core/Physics/physicsEngineComponent";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
 
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.uniformBuffer";
-
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.renderTarget";
-
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.alpha";
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.computeShader";
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.cubeTexture";
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.debugging";
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.dynamicBuffer";
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.dynamicTexture";
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.multiRender";
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.query";
-import "@babylonjs/core/Engines/WebGPU/Extensions/engine.rawTexture";
+import "@babylonjs/core/Engines/WebGPU/Extensions/";
 
 export class PlanetEngine {
     // UI
