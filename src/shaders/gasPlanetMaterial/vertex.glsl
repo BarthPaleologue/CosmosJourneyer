@@ -1,6 +1,5 @@
 precision lowp float;
 
-attribute vec3 vertex;
 attribute vec3 position;
 attribute vec3 normal;
 
