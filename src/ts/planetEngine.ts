@@ -149,7 +149,7 @@ export class PlanetEngine {
 
         window.addEventListener("resize", () => {
             this.bodyEditor.resize();
-            this.getEngine().resize();
+            this.getEngine().resize(true);
         });
 
         this.bodyEditor.resize();
