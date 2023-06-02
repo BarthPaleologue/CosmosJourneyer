@@ -23,6 +23,20 @@ import "@babylonjs/core/Physics/physicsEngineComponent";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
 
+import "@babylonjs/core/Engines/WebGPU/Extensions/engine.uniformBuffer";
+
+import "@babylonjs/core/Engines/WebGPU/Extensions/engine.renderTarget";
+
+import "@babylonjs/core/Engines/WebGPU/Extensions/engine.alpha";
+import "@babylonjs/core/Engines/WebGPU/Extensions/engine.computeShader";
+import "@babylonjs/core/Engines/WebGPU/Extensions/engine.cubeTexture";
+import "@babylonjs/core/Engines/WebGPU/Extensions/engine.debugging";
+import "@babylonjs/core/Engines/WebGPU/Extensions/engine.dynamicBuffer";
+import "@babylonjs/core/Engines/WebGPU/Extensions/engine.dynamicTexture";
+import "@babylonjs/core/Engines/WebGPU/Extensions/engine.multiRender";
+import "@babylonjs/core/Engines/WebGPU/Extensions/engine.query";
+import "@babylonjs/core/Engines/WebGPU/Extensions/engine.rawTexture";
+
 export class PlanetEngine {
     // UI
     private readonly helmetOverlay: HelmetOverlay;
@@ -90,8 +104,8 @@ export class PlanetEngine {
      * @returns A promise that resolves when the engine and the scenes are created and the assets are loaded
      */
     public async setup(): Promise<void> {
-        this.engine = new Engine(this.canvas); //await EngineFactory.CreateAsync(this.canvas, {});
-
+        this.engine = await EngineFactory.CreateAsync(this.canvas, {});
+        
         this.engine.loadingScreen.displayLoadingUI();
 
         console.log(`API: ${this.engine instanceof WebGPUEngine ? "WebGPU" : "WebGL" + this.engine.webGLVersion}`);
