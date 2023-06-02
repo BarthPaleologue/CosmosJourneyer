@@ -103,6 +103,7 @@ export class BodyEditor {
 
     public setCanvas(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
+        this.resize();
     }
 
     public resize() {

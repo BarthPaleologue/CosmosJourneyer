@@ -77,5 +77,3 @@ document.addEventListener("keydown", (e) => {
 engine.init();
 
 positionNearObject(scene.getActiveController(), BH, starSystem, 20);
-
-engine.bodyEditor.setVisibility(EditorVisibility.FULL);
