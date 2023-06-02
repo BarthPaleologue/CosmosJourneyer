@@ -11,6 +11,7 @@ import { OverlayPostProcess } from "./postProcesses/overlayPostProcess";
 import { isOrbiting } from "./utils/nearestBody";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Tools } from "@babylonjs/core/Misc/tools";
+import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
@@ -38,6 +39,8 @@ export class PlanetEngine {
 
     private activeScene: Scene | null = null;
 
+    private videoRecorder: VideoRecorder | null = null;
+
     private readonly collisionWorker = new CollisionWorker();
 
     private isFullscreen = false;
@@ -56,6 +59,21 @@ export class PlanetEngine {
         document.addEventListener("keydown", (e) => {
             if (e.key === "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
             if (e.key === "p") Tools.CreateScreenshot(this.getEngine(), this.getStarSystemScene().getActiveController().getActiveCamera(), { precision: 4 });
+            if (e.key === "v") {
+                if(!VideoRecorder.IsSupported(this.getEngine())) console.warn("Your browser does not support video recording!");
+                if (this.videoRecorder === null) {
+                    this.videoRecorder = new VideoRecorder(this.getEngine(), {
+                        fps: 60,
+                        recordChunckSize: 3000000,
+                        mimeType: "video/webm;codecs=h264",
+                    });
+                    this.videoRecorder.startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10")));
+                } else if(this.videoRecorder.isRecording) {
+                    this.videoRecorder.stopRecording();
+                } else {
+                    this.videoRecorder.startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10")));
+                }
+            }
             if (e.key === "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
             //if (e.key === "m") mouse.deadAreaRadius === 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
             //if (e.key === "w" && isOrbiting(this.getStarSystemScene().getActiveController(), this.getStarSystem().getNearestBody()))
