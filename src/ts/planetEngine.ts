@@ -110,7 +110,7 @@ export class PlanetEngine {
      * @returns A promise that resolves when the engine and the scenes are created and the assets are loaded
      */
     public async setup(): Promise<void> {
-        this.engine = await EngineFactory.CreateAsync(this.canvas, {});
+        this.engine = new Engine(this.canvas); //await EngineFactory.CreateAsync(this.canvas, { enableAllFeatures: true });
         
         this.engine.loadingScreen.displayLoadingUI();
 
