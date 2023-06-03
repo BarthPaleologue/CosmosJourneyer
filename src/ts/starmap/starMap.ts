@@ -51,7 +51,7 @@ export class StarMap {
     private readonly recycledStars: InstancedMesh[] = [];
     private readonly recycledBlackHoles: InstancedMesh[] = [];
 
-    static readonly GENERATION_CADENCE = 10;
+    static readonly GENERATION_CADENCE = 100;
     static readonly DELETION_CADENCE = 100;
 
     static readonly RENDER_RADIUS = 6;
@@ -256,7 +256,7 @@ export class StarMap {
         }
 
 
-        this.buildNextStars(StarMap.GENERATION_CADENCE * this.controller.getActiveCamera().speed ** 2);
+        this.buildNextStars(Math.min(2000, StarMap.GENERATION_CADENCE * this.controller.speed));
 
         this.starMapUI.update();
     }
@@ -373,6 +373,7 @@ export class StarMap {
     private fadeOutThenRecycle(instance: InstancedMesh, recyclingList: InstancedMesh[]) {
         instance.animations = [StarMap.FADE_OUT_ANIMATION];
         instance.getScene().beginAnimation(instance, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => {
+            if(this.starMapUI.getCurrentMesh() === instance) this.starMapUI.detachUIFromMesh();
             instance.setEnabled(false);
             recyclingList.push(instance)
         });

@@ -46,6 +46,16 @@ export class StarMapUI {
         this.namePlate.linkWithMesh(mesh);
     }
 
+    detachUIFromMesh() {
+        this.namePlate.linkWithMesh(null);
+        this.gui.removeControl(this.namePlate);
+    }
+
+    getCurrentMesh() {
+        return this.namePlate.linkedMesh;
+    }
+
+
     setUIText(text: string) {
         this.nameLabel.text = text;
     }
