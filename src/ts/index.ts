@@ -154,3 +154,5 @@ document.addEventListener("keydown", (e) => {
         }
     }
 });
+
+engine.toggleStarMap();
