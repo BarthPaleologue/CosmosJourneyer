@@ -29,6 +29,8 @@ export class PlanetEngine {
     private readonly helmetOverlay: HelmetOverlay;
     readonly bodyEditor: BodyEditor;
     readonly canvas: HTMLCanvasElement;
+    private isFullscreen = false;
+    private videoRecorder: VideoRecorder | null = null;
 
     // BabylonJS
     private engine: Engine | null = null;
@@ -39,11 +41,7 @@ export class PlanetEngine {
 
     private activeScene: Scene | null = null;
 
-    private videoRecorder: VideoRecorder | null = null;
-
     private readonly collisionWorker = new CollisionWorker();
-
-    private isFullscreen = false;
 
     constructor() {
         this.helmetOverlay = new HelmetOverlay();
