@@ -26,7 +26,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
     constructor(planetName: string, planet: BasicTransform, descriptor: GasPlanetDescriptor, scene: Scene) {
         super(`${planetName}SurfaceColor`, scene, shaderName, {
-            attributes: ["position", "normal", "uv"],
+            attributes: ["position", "normal"],
             uniforms: [
                 "world",
                 "worldViewProjection",

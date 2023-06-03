@@ -24,6 +24,8 @@ import "@babylonjs/core/Physics/physicsEngineComponent";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
 
+import "@babylonjs/core/Engines/WebGPU/Extensions/";
+
 export class PlanetEngine {
     // UI
     private readonly helmetOverlay: HelmetOverlay;
@@ -106,8 +108,8 @@ export class PlanetEngine {
      * @returns A promise that resolves when the engine and the scenes are created and the assets are loaded
      */
     public async setup(): Promise<void> {
-        this.engine = new Engine(this.canvas); //await EngineFactory.CreateAsync(this.canvas, {});
-
+        this.engine = new Engine(this.canvas); //await EngineFactory.CreateAsync(this.canvas, { enableAllFeatures: true });
+        
         this.engine.loadingScreen.displayLoadingUI();
 
         console.log(`API: ${this.engine instanceof WebGPUEngine ? "WebGPU" : "WebGL" + this.engine.webGLVersion}`);
@@ -165,7 +167,7 @@ export class PlanetEngine {
 
         window.addEventListener("resize", () => {
             this.bodyEditor.resize();
-            this.getEngine().resize();
+            this.getEngine().resize(true);
         });
 
         this.bodyEditor.resize();
