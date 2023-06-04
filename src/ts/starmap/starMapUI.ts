@@ -76,7 +76,7 @@ export class StarMapUI {
 
     setHoveredMesh(mesh: AbstractMesh | null) {
         if (mesh !== null) {
-            let distance = mesh.getAbsolutePosition().length();
+            const distance = mesh.getAbsolutePosition().length();
             this.hoveringImage.scaleX = 1 / distance;
             this.hoveringImage.scaleY = 1 / distance;
 
