@@ -82,6 +82,7 @@ export class StarMap {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
         this.scene.performancePriority = ScenePerformancePriority.Intermediate;
+        this.scene.skipPointerMovePicking = false;
 
         this.controller = new PlayerController(this.scene);
         this.controller.speed /= 10;
@@ -90,7 +91,7 @@ export class StarMap {
         this.scene.activeCamera = this.controller.getActiveCamera();
         this.controller.addInput(new Keyboard());
 
-        this.starMapUI = new StarMapUI();
+        this.starMapUI = new StarMapUI(this.scene);
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
             if (this.selectedSystemSeed === null) throw new Error("No system selected!");
@@ -313,9 +314,21 @@ export class StarMap {
             if (!recycled) {
                 initializedInstance.isPickable = true;
                 initializedInstance.actionManager = new ActionManager(this.scene);
+
+                initializedInstance.actionManager.registerAction(
+                    new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
+                        this.starMapUI.setHoveredMesh(initializedInstance);
+                    })
+                );
+
+                initializedInstance.actionManager.registerAction(
+                    new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
+                        this.starMapUI.setHoveredMesh(null);
+                    })
+                );
             } else {
                 initializedInstance.setEnabled(true);
-                initializedInstance.actionManager?.unregisterAction(initializedInstance.actionManager.actions[0]);
+                initializedInstance.actionManager?.unregisterAction(initializedInstance.actionManager.actions[2]);
             }
 
             initializedInstance.actionManager?.registerAction(
@@ -352,6 +365,8 @@ export class StarMap {
                     if (targetPosition.subtract(this.controller.transform.getAbsolutePosition()).lengthSquared() > 0.1) {
                         this.translationAnimation = new TransformTranslationAnimation(this.controller.transform, targetPosition, 1);
                     }
+
+                    this.starMapUI.setHoveredMesh(null);
                 })
             );
 
@@ -373,7 +388,8 @@ export class StarMap {
     private fadeOutThenRecycle(instance: InstancedMesh, recyclingList: InstancedMesh[]) {
         instance.animations = [StarMap.FADE_OUT_ANIMATION];
         instance.getScene().beginAnimation(instance, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => {
-            if(this.starMapUI.getCurrentMesh() === instance) this.starMapUI.detachUIFromMesh();
+            if(this.starMapUI.getCurrentPickedMesh() === instance) this.starMapUI.detachUIFromMesh();
+            if(this.starMapUI.getCurrentHoveredMesh() === instance) this.starMapUI.setHoveredMesh(null);
             instance.setEnabled(false);
             recyclingList.push(instance)
         });
