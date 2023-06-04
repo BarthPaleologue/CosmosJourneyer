@@ -17,6 +17,7 @@
     "eslint": "^8.39.0",
     "eslint-plugin-import": "^2.27.5",
     "extended-random": "^1.2.2",
+    "fast-simplex-noise": "^4.0.0",
     "glslify-loader": "^2.0.0",
     "handle-sliderjs": "^1.3.1",
     "html-loader": "^4.2.0",

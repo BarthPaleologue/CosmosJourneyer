@@ -51,20 +51,24 @@ export class StarMapUI {
         this.hoveringImage = new Image("hoverImage", hoveredCircle)
         this.hoveringImage.width = 0.2;
         this.hoveringImage.autoScale = true;
-        this.hoveringImage.alpha = 0.5;
+        this.hoveringImage.alpha = 0.8;
         this.hoveringImage.zIndex = 4;
 
         StarMapUI.ALPHA_ANIMATION.setKeys([
             { frame: 0, value: 0.0 },
-            { frame: 15, value: 0.8 },
-            { frame: 30, value: 0.8 },
-            { frame: 45, value: 0.8 },
             { frame: 60, value: 0.8 }
         ]);
+
+        this.hoveringImage.animations = [StarMapUI.ALPHA_ANIMATION];
     }
 
     update() {
         if (this.namePlate.linkedMesh === null) this.gui.removeControl(this.namePlate);
+        if (this.hoveringImage.linkedMesh !== null && this.hoveringImage.linkedMesh !== undefined) {
+            const distance = this.hoveringImage.linkedMesh.getAbsolutePosition().length();
+            this.hoveringImage.scaleX = this.hoveringImage.linkedMesh.scaling.x / distance;
+            this.hoveringImage.scaleY = this.hoveringImage.linkedMesh.scaling.x / distance;
+        }
     }
 
     attachUIToMesh(mesh: AbstractMesh) {
@@ -76,16 +80,7 @@ export class StarMapUI {
 
     setHoveredMesh(mesh: AbstractMesh | null) {
         if (mesh !== null) {
-            const distance = mesh.getAbsolutePosition().length();
-            this.hoveringImage.scaleX = 1 / distance;
-            this.hoveringImage.scaleY = 1 / distance;
-
-
-            this.hoveringImage.animations = [StarMapUI.ALPHA_ANIMATION];
-            this.scene.beginAnimation(this.hoveringImage, 0, 60, false, 0.5, () => {
-                this.hoveringImage.alpha = 0.8;
-            });
-
+            this.scene.beginAnimation(this.hoveringImage, 0, 60, false, 2.0);
             this.gui.addControl(this.hoveringImage);
         } else {
             this.gui.removeControl(this.hoveringImage);

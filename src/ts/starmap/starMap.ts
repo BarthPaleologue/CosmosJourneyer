@@ -28,6 +28,9 @@ import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Culling/ray";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
+import { makeNoise3D } from "fast-simplex-noise";
+import { seededSquirrelNoise } from "squirrel-noise";
+import { Settings } from "../settings";
 
 export class StarMap {
     readonly scene: Scene;
@@ -78,6 +81,8 @@ export class StarMap {
     private static readonly SHIMMER_ANIMATION = new Animation("shimmer", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
     private static readonly SHIMMER_DURATION = 1000;
 
+    private readonly densityRNG;
+
     constructor(engine: Engine) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
@@ -102,12 +107,17 @@ export class StarMap {
         pipeline.fxaaEnabled = true;
         pipeline.bloomEnabled = true;
         pipeline.bloomThreshold = 0.0;
-        pipeline.bloomWeight = 1.5;
+        pipeline.bloomWeight = 1.2;
         pipeline.bloomKernel = 128;
         pipeline.imageProcessing.exposure = 1.1;
         pipeline.imageProcessing.contrast = 1.0;
 
-        this.starMapCenterPosition = new Vector3(0, 0, 0);
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialStarMapX = Number(urlParams.get("smx"));
+        const initialStarMapY = Number(urlParams.get("smy"));
+        const initialStarMapZ = Number(urlParams.get("smz"));
+
+        this.starMapCenterPosition = new Vector3(initialStarMapX ?? 0, initialStarMapY ?? 0, initialStarMapZ ?? 0);
 
         this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.2 }, this.scene);
         this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
@@ -186,6 +196,11 @@ export class StarMap {
             }
         }
 
+        const seedableRNG = seededSquirrelNoise(Settings.UNIVERSE_SEED);
+        let step = 0;
+        const perlinRNG = makeNoise3D(() => { return seedableRNG(step++) });
+        this.densityRNG = (x: number, y: number, z: number) => (1.0 - Math.abs(perlinRNG(x * 0.2, y * 0.2, z * 0.2))) ** 8;
+
         this.scene.registerBeforeRender(() => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
@@ -225,7 +240,7 @@ export class StarMap {
      * @param position The position of the cell
      */
     private registerCell(position: Vector3) {
-        const cell = new Cell(position);
+        const cell = new Cell(position, this.densityRNG(position.x, position.y, position.z));
         this.loadedCells.set(cell.getKey(), cell);
         this.starBuildStack.push(...cell.generate());
     }
@@ -388,8 +403,8 @@ export class StarMap {
     private fadeOutThenRecycle(instance: InstancedMesh, recyclingList: InstancedMesh[]) {
         instance.animations = [StarMap.FADE_OUT_ANIMATION];
         instance.getScene().beginAnimation(instance, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => {
-            if(this.starMapUI.getCurrentPickedMesh() === instance) this.starMapUI.detachUIFromMesh();
-            if(this.starMapUI.getCurrentHoveredMesh() === instance) this.starMapUI.setHoveredMesh(null);
+            if (this.starMapUI.getCurrentPickedMesh() === instance) this.starMapUI.detachUIFromMesh();
+            if (this.starMapUI.getCurrentHoveredMesh() === instance) this.starMapUI.setHoveredMesh(null);
             instance.setEnabled(false);
             recyclingList.push(instance)
         });

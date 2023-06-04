@@ -41,20 +41,23 @@ export class Cell {
      */
     static readonly SIZE = 1;
 
+    readonly density;
+
     /**
      * The random number generator of the cell
      */
     readonly rng: (step: number) => number;
 
-    constructor(positionInStarMap: Vector3) {
+    constructor(positionInStarMap: Vector3, density: number) {
         this.position = positionInStarMap;
         this.rng = seededSquirrelNoise(hashVec3(positionInStarMap));
+
+        this.density = density;
     }
 
     generate(): BuildData[] {
         const cellString = Vector3ToString(this.position);
-        const density = 10;
-        const nbStars = this.rng(0) * density;
+        const nbStars = 40 * this.density * this.rng(0);
         const data = [];
         for (let i = 0; i < nbStars; i++) {
             data.push({
