@@ -2,6 +2,7 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
 import { BODY_TYPE } from "./common";
+import { generateName } from "../utils/nameGenerator";
 
 enum GENERATION_STEPS {
     NAME,
@@ -22,8 +23,7 @@ export class StarSystemDescriptor {
     }
 
     getName(): string {
-        //TODO: procedural name generation
-        return this.rng(GENERATION_STEPS.NAME).toString();
+        return generateName(this.rng, GENERATION_STEPS.NAME);
     }
 
     getNbStars(): number {

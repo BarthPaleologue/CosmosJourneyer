@@ -18,6 +18,7 @@ import { StellarObject } from "./stellarObjects/stellarObject";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { AbstractObject } from "./abstractObject";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
+import { romanNumeral } from "../utils/nameGenerator";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -137,8 +138,8 @@ export class StarSystem {
         const isStellarObjectBlackHole = this.descriptor.getBodyTypeOfStar(this.stellarObjects.length) === BODY_TYPE.BLACK_HOLE;
 
         const star = isStellarObjectBlackHole
-            ? new BlackHole(`blackHole${this.stellarObjects.length}`, seed, [], this.scene)
-            : new Star(`star${this.stellarObjects.length}`, this.scene, seed, []);
+            ? new BlackHole(`${this.descriptor.getName()} ${this.stellarObjects.length}`, seed, [], this.scene)
+            : new Star(`${this.descriptor.getName()} ${this.stellarObjects.length}`, this.scene, seed, []);
 
         //TODO: make this better, make it part of the generation
         star.descriptor.orbitalProperties.periapsis = star.getRadius() * 4;
@@ -157,7 +158,7 @@ export class StarSystem {
             console.warn(`You are adding a black hole
         to a system that already has ${this.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
-        const blackHole = new BlackHole(`blackHole${this.stellarObjects.length}`, seed, this.stellarObjects, this.scene);
+        const blackHole = new BlackHole(`${this.descriptor.getName()} ${this.stellarObjects.length}`, seed, this.stellarObjects, this.scene);
 
         this.addStellarObject(blackHole);
         return blackHole;
@@ -181,7 +182,7 @@ export class StarSystem {
             console.warn(`You are adding a telluric planet to the system.
             The system generator had planned for ${this.descriptor.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
             This might cause issues, or not who knows.`);
-        const planet = new TelluricPlanemo(`telluricPlanet${this.planets.length}`, this.scene, seed, this.stellarObjects);
+        const planet = new TelluricPlanemo(`${this.descriptor.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, seed, this.stellarObjects);
         this.addTelluricPlanet(planet);
         return planet;
     }
@@ -195,7 +196,7 @@ export class StarSystem {
             console.warn(`You are adding a gas planet to the system.
             The system generator had planned for ${this.descriptor.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
             This might cause issues, or not who knows.`);
-        const planet = new GasPlanet(`gasPlanet${this.planets.length}`, this.scene, seed, this.stellarObjects);
+        const planet = new GasPlanet(`${this.descriptor.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, seed, this.stellarObjects);
         this.addGasPlanet(planet);
         return planet;
     }
@@ -217,7 +218,7 @@ export class StarSystem {
     }
 
     public makeSatellite(planet: TelluricPlanemo | GasPlanet, seed = planet.descriptor.getMoonSeed(planet.descriptor.childrenBodies.length)): TelluricPlanemo {
-        const satellite = new TelluricPlanemo(`${planet.name}Sattelite${planet.descriptor.childrenBodies.length}`, this.scene, seed, [planet]);
+        const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.descriptor.childrenBodies.length + 1)}`, this.scene, seed, [planet]);
         const periapsis = 2 * planet.getRadius() + clamp(normalRandom(3, 1, satellite.descriptor.rng, 90), 0, 20) * planet.getRadius() * 2;
         const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.descriptor.rng, 92), 1, 1.5);
         satellite.descriptor.physicalProperties.mass = 1;

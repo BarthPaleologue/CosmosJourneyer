@@ -350,6 +350,9 @@ export class StarMap {
                 new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
                     this.starMapUI.attachUIToMesh(initializedInstance);
                     this.starMapUI.setUIText(
+                        "Name: " +
+                        starSystemDescriptor.getName() +
+                        "\n" +
                         "Seed: " +
                         starSystemDescriptor.seed +
                         "\n" +

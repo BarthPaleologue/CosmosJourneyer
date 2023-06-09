@@ -22,15 +22,15 @@ export class StarMapUI {
     static ALPHA_ANIMATION = new Animation("alphaAnimation", "alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
     constructor(scene: Scene) {
-        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
+        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("StarMapUI", true, scene);
         this.scene = scene;
 
         this.namePlate = new StackPanel();
-        this.namePlate.width = "250px";
+        this.namePlate.width = "300px";
         //this.namePlate.height = "150px";
         this.namePlate.color = "white";
         this.namePlate.background = "black";
-        this.namePlate.linkOffsetY = -150;
+        this.namePlate.linkOffsetY = -200;
         this.namePlate.zIndex = 5;
 
         this.nameLabel = new TextBlock();
