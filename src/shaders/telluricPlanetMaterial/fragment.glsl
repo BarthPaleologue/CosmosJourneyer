@@ -247,12 +247,6 @@ void main() {
 	for(int i = 0; i < nbStars; i++) {
 		vec3 starLightRayW = normalize(starPositions[i] - vPositionW);
 		float ndl2part = max(0.0, dot(normalW, starLightRayW));
-		// removing light where light ray goes through the surface
-		float t0, t1;
-		//TODO: DO NOT HARDCODE
-		if(rayIntersectSphere(vPositionW, starLightRayW, planetPosition, planetRadius, t0, t1)) {
-			ndl2part *= smoothstep(3e5, 0.0, abs(t1 - t0));//1.0 / (1.0 + 1e-5 * (t1 - t0));
-		}
 		ndl2 += ndl2part;
 
 		vec3 angleW = normalize(viewRayW + starLightRayW);

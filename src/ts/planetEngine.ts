@@ -25,6 +25,7 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
 
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
+import { SystemUI } from "./ui/systemUI";
 
 export class PlanetEngine {
     // UI
@@ -37,6 +38,8 @@ export class PlanetEngine {
     // BabylonJS
     private engine: Engine | null = null;
     private starSystemScene: UberScene | null = null;
+
+    private starSystemUI: SystemUI | null = null;
 
     private starSystem: StarSystem | null = null;
     private starMap: StarMap | null = null;
@@ -125,6 +128,8 @@ export class PlanetEngine {
 
         this.starSystemScene = new UberScene(this.engine);
         this.starSystemScene.clearColor = new Color4(0, 0, 0, 0);
+
+        this.starSystemUI = new SystemUI(this.starSystemScene);
 
         const havokInstance = await HavokPhysics();
         const havokPlugin = new HavokPlugin(true, havokInstance);
