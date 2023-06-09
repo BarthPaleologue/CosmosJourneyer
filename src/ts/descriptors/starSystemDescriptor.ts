@@ -17,17 +17,21 @@ export class StarSystemDescriptor {
     readonly seed: number;
     readonly rng: (step: number) => number;
 
+    readonly name: string;
+
     constructor(seed: number) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
+
+        this.name = generateName(this.rng, GENERATION_STEPS.NAME);
     }
 
     getName(): string {
-        return generateName(this.rng, GENERATION_STEPS.NAME);
+        return this.name;
     }
 
     getNbStars(): number {
-        // this.rng(GENERATION_STEPS.NB_STARS);
+        //return 1 + Math.floor(2 * this.rng(GENERATION_STEPS.NB_STARS));
         return 1;
     }
 
