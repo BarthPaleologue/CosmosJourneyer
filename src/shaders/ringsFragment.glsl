@@ -37,11 +37,11 @@ uniform vec3 planetRotationAxis;
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
 
-bool rayIntersectPlane(vec3 rayOrigin, vec3 rayDir, vec3 planetPosition, vec3 planeNormal, out float t) {
+bool rayIntersectPlane(vec3 rayOrigin, vec3 rayDir, vec3 planetPosition, vec3 planeNormal, float tolerance, out float t) {
 	float denom = dot(rayDir, planeNormal);
-	if(abs(denom) <= 0.001) return false; // ray is parallel to the plane
-	t = dot(planeNormal, planetPosition - rayOrigin) / dot(planeNormal, rayDir);
-	return (t > 0.0);
+	if(abs(denom) <= tolerance) return false; // ray is parallel to the plane
+	t = dot(planeNormal, planetPosition - rayOrigin) / denom;
+	return t > 0.0;
 }
 
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
@@ -78,15 +78,19 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
-    vec4 finalColor;
+    vec4 finalColor = screenColor;
 
 	float impactPoint;
-	if(rayIntersectPlane(cameraPosition, rayDir, planetPosition, planetRotationAxis, impactPoint)) {
+	if(rayIntersectPlane(cameraPosition, rayDir, planetPosition, planetRotationAxis, 0.001, impactPoint)) {
+        // if the ray intersect the ring plane
 		if(impactPoint < maximumDistance) {
+            // if the ray intersects the ring before any other object
             float t0, t1;
             if(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, t0, t1) && t0 < impactPoint) {
+                // if the ray is impacting the ocean of a telluric planet before the ring plane (it is occulted)
                 finalColor = screenColor;
             } else {
+                // if the ray is impacting a solid object after the ring plane
                 vec3 samplePoint = cameraPosition + impactPoint * rayDir;
                 float ringDensity = ringDensityAtPoint(samplePoint) * ringOpacity;
 
@@ -105,11 +109,7 @@ void main() {
 
                 finalColor = vec4(lerp(ringShadeColor, screenColor.rgb, ringDensity), 1.0);
             }
-		} else {
-			finalColor = screenColor;
 		}
-	} else {
-		finalColor = screenColor;
 	}
 
     gl_FragColor = finalColor; // displaying the final color
