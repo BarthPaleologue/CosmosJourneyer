@@ -44,7 +44,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
                 "color1",
                 "color2",
                 "color3",
-                "color4",
                 "colorSharpness",
 
                 "time",
@@ -61,21 +60,19 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         this.planet = planet;
 
-        const hue1 = normalRandom(240, 20, descriptor.rng, 70);
-        const hue2 = normalRandom(0, 20, descriptor.rng, 72);
+        const hue1 = normalRandom(240, 30, descriptor.rng, 70);
+        const hue2 = normalRandom(0, 180, descriptor.rng, 72);
 
-        const divergence = 25;
+        const divergence = -180;
 
-        const color1 = Color3.FromHSV(hue1 % 360, randRange(0.4, 0.9, descriptor.rng, 72), randRange(0.7, 0.9, descriptor.rng, 73));
-        const color2 = Color3.FromHSV(hue2 % 360, randRange(0.6, 0.9, descriptor.rng, 74), randRange(0.1, 0.9, descriptor.rng, 75));
+        const color1 = Color3.FromHSV(hue1, randRange(0.4, 0.9, descriptor.rng, 72), randRange(0.7, 0.9, descriptor.rng, 73));
+        const color2 = Color3.FromHSV(hue2, randRange(0.6, 0.9, descriptor.rng, 74), randRange(0.0, 0.3, descriptor.rng, 75));
         const color3 = Color3.FromHSV((hue1 + divergence) % 360, randRange(0.4, 0.9, descriptor.rng, 76), randRange(0.7, 0.9, descriptor.rng, 77));
-        const color4 = Color3.FromHSV((hue2 + divergence) % 360, randRange(0.6, 0.9, descriptor.rng, 78), randRange(0.1, 0.9, descriptor.rng, 79));
 
         this.colorSettings = {
             color1: color1,
             color2: color2,
             color3: color3,
-            color4: color4,
             colorSharpness: randRangeInt(40, 80, descriptor.rng, 80) / 10
         };
 
@@ -93,7 +90,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setColor3("color1", this.colorSettings.color1);
         this.setColor3("color2", this.colorSettings.color2);
         this.setColor3("color3", this.colorSettings.color3);
-        this.setColor3("color4", this.colorSettings.color4);
 
         this.updateManual();
     }
@@ -114,7 +110,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setInt("nbStars", stellarObjects.length);
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
-
+        
         this.setFloat("time", this.clock % 100000);
     }
 }

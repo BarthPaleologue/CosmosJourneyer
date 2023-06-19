@@ -32,11 +32,6 @@ export class GasCloudsPanel extends EditorPanel {
             colorSettings.color3.copyFrom(Color3.FromHexString(gazColor3Picker.value));
         });
 
-        const gazColor4Picker = clearAllEventListenersById("gazColor4") as HTMLInputElement;
-        gazColor4Picker.value = colorSettings.color4.toHexString();
-        gazColor4Picker.addEventListener("input", () => {
-            colorSettings.color4.copyFrom(Color3.FromHexString(gazColor4Picker.value));
-        });
 
         this.sliders = [
             new Slider("colorSharpness", document.getElementById("colorSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.colorSharpness * 10, (val: number) => {
