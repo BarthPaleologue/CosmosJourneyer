@@ -51,7 +51,8 @@ export class GasPlanetDescriptor implements PlanemoDescriptor {
             periapsis: periapsis,
             apoapsis: apoapsis,
             period: getOrbitalPeriod(periapsis, apoapsis, parentBodies),
-            orientationQuaternion: Quaternion.Identity()
+            orientationQuaternion: Quaternion.Identity(),
+            isPlaneAlignedWithParent: true
         };
 
         this.physicalProperties = {

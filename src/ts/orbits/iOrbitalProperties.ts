@@ -20,4 +20,9 @@ export interface IOrbitalProperties {
      * The orientation of the orbit (inclination + precession)
      */
     orientationQuaternion: Quaternion;
+
+    /**
+     * Whether the orbital plane is aligned with the parent body or not (allows to see rings from satellites when false)
+     */
+    isPlaneAlignedWithParent: boolean;
 }

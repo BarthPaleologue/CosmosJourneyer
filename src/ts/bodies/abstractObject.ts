@@ -95,7 +95,7 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject {
     public computeNextOrbitalPosition(): Vector3 {
         if (this.descriptor.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentObjects);
-            this.descriptor.orbitalProperties.orientationQuaternion = orientationQuaternion;
+            if(this.descriptor.orbitalProperties.isPlaneAlignedWithParent) this.descriptor.orbitalProperties.orientationQuaternion = orientationQuaternion;
 
             const newPosition = computePointOnOrbit(barycenter, this.descriptor.orbitalProperties, this.internalClock);
             this.nextState.position.copyFrom(newPosition);

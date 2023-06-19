@@ -41,7 +41,8 @@ export class BlackHoleDescriptor implements StellarObjectDescriptor {
             periapsis: periapsis,
             apoapsis: apoapsis,
             period: getOrbitalPeriod(periapsis, apoapsis, []),
-            orientationQuaternion: Quaternion.Identity()
+            orientationQuaternion: Quaternion.Identity(),
+            isPlaneAlignedWithParent: true
         };
 
         this.physicalProperties = {

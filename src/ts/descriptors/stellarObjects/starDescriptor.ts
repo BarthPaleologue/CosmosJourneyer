@@ -80,7 +80,8 @@ export class StarDescriptor implements StellarObjectDescriptor {
             periapsis: periapsis,
             apoapsis: apoapsis,
             period: getOrbitalPeriod(periapsis, apoapsis, []),
-            orientationQuaternion: Quaternion.Identity()
+            orientationQuaternion: Quaternion.Identity(),
+            isPlaneAlignedWithParent: true
         };
 
         this.hasRings = uniformRandBool(StarDescriptor.RING_PROPORTION, this.rng, GENERATION_STEPS.RINGS);

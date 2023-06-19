@@ -6,7 +6,7 @@ import { TerrainSettings } from "../../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../../orbits/kepler";
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 enum GENERATION_STEPS {
     AXIAL_TILT = 100,
@@ -17,7 +17,8 @@ enum GENERATION_STEPS {
     RINGS = 1400,
     TERRAIN = 1500,
     NB_MOONS = 10,
-    MOONS = 11
+    MOONS = 11,
+    ORBITAL_PLANE_ALIGNEMENT = 1600
 }
 
 export class TelluricPlanemoDescriptor implements PlanemoDescriptor {
@@ -66,11 +67,15 @@ export class TelluricPlanemoDescriptor implements PlanemoDescriptor {
         const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
         const apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
 
+        const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.3, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
+        const orbitalQuaternion = isOrbitalPlaneAlignedWithParent ? Quaternion.Identity() : Quaternion.RotationAxis(Vector3.Random().normalize(), this.rng(GENERATION_STEPS.ORBIT + 20));
+
         this.orbitalProperties = {
             periapsis: periapsis,
             apoapsis: apoapsis,
             period: getOrbitalPeriod(periapsis, apoapsis, this.parentBodies),
-            orientationQuaternion: Quaternion.Identity()
+            orientationQuaternion: orbitalQuaternion,
+            isPlaneAlignedWithParent: isOrbitalPlaneAlignedWithParent
         };
 
         this.physicalProperties = {

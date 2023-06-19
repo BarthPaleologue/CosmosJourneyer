@@ -33,7 +33,8 @@ export class SpaceStationDescriptor implements BaseDescriptor {
             periapsis: periapsis,
             apoapsis: apoapsis,
             period: getOrbitalPeriod(periapsis, apoapsis, this.parentBodies),
-            orientationQuaternion: Quaternion.Identity()
+            orientationQuaternion: Quaternion.Identity(),
+            isPlaneAlignedWithParent: false
         };
 
         this.physicalProperties = {
