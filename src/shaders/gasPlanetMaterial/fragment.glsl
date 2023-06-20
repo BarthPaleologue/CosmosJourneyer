@@ -11,13 +11,10 @@ varying vec3 vUnitSamplePoint;
 varying vec3 vSphereNormalW;
 
 varying vec3 vPosition; // position of the vertex in sphere space
-varying vec3 vNormal; // normal of the vertex in sphere space
 
 uniform mat4 world;
 
 uniform vec3 playerPosition; // camera position in world space
-
-uniform vec3 planetPosition;
 
 #define MAX_STARS 5
 uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
@@ -32,13 +29,7 @@ uniform float time;
 
 uniform float seed;
 
-uniform float planetRadius;
-
 #pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl)
-
-#pragma glslify: fastAcos = require(../utils/fastAcos.glsl)
-
-#pragma glslify: remap = require(../utils/remap.glsl)
 
 #pragma glslify: lerp = require(../utils/vec3Lerp.glsl)
 
@@ -51,8 +42,7 @@ void main() {
     vec3 viewRayW = normalize(playerPosition - vPositionW); // view direction in world space
 
     vec3 sphereNormalW = vSphereNormalW;
-    vec3 normal = vNormal;
-    vec3 normalW = normalize(vec3(world * vec4(normal, 0.0)));
+    vec3 normalW = vNormalW;
 
     float ndl = 0.0;
     float specComp = 0.0;
@@ -66,12 +56,6 @@ void main() {
     ndl = saturate(ndl);
     specComp = saturate(specComp);
     specComp = pow(specComp, 128.0);
-
-    // TODO: finish this (uniforms...)
-    /*float smoothness = 0.7;
-    float specularAngle = fastAcos(dot(normalize(viewRayW + lightRayW), normalW));
-    float specularExponent = specularAngle / (1.0 - smoothness);
-    float specComp = exp(-specularExponent * specularExponent);*/
 
     vec3 color = vec3(0.0);
 

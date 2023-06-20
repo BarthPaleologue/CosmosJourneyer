@@ -30,13 +30,10 @@ export class GasPlanetMaterial extends ShaderMaterial {
             uniforms: [
                 "world",
                 "worldViewProjection",
-                "projection",
-                "view",
 
                 "seed",
 
                 "planetPosition",
-                "planetRadius",
 
                 "starPositions",
                 "nbStars",
@@ -49,7 +46,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
                 "time",
 
                 "planetInverseRotationQuaternion",
-                "rotationMatrixAroundAxis",
 
                 "playerPosition",
 
@@ -65,8 +61,8 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         const divergence = -180;
 
-        const color1 = Color3.FromHSV(hue1, randRange(0.4, 0.9, descriptor.rng, 72), randRange(0.7, 0.9, descriptor.rng, 73));
-        const color2 = Color3.FromHSV(hue2, randRange(0.6, 0.9, descriptor.rng, 74), randRange(0.0, 0.3, descriptor.rng, 75));
+        const color1 = Color3.FromHSV(hue1 % 360, randRange(0.4, 0.9, descriptor.rng, 72), randRange(0.7, 0.9, descriptor.rng, 73));
+        const color2 = Color3.FromHSV(hue2 % 360, randRange(0.6, 0.9, descriptor.rng, 74), randRange(0.0, 0.3, descriptor.rng, 75));
         const color3 = Color3.FromHSV((hue1 + divergence) % 360, randRange(0.4, 0.9, descriptor.rng, 76), randRange(0.7, 0.9, descriptor.rng, 77));
 
         this.colorSettings = {
@@ -85,7 +81,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         this.setVector3("playerPosition", Vector3.Zero());
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
-        this.setFloat("planetRadius", descriptor.radius);
 
         this.setColor3("color1", this.colorSettings.color1);
         this.setColor3("color2", this.colorSettings.color2);
@@ -98,11 +93,10 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setFloat("colorSharpness", this.colorSettings.colorSharpness);
     }
 
-    public update(player: AbstractController, stellarObjects: StellarObject[], rotationMatrixAroundAxis: Matrix, deltaTime: number) {
+    public update(player: AbstractController, stellarObjects: StellarObject[], deltaTime: number) {
         this.clock += deltaTime;
 
         this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
-        this.setMatrix("rotationMatrixAroundAxis", rotationMatrixAroundAxis);
 
         this.setVector3("playerPosition", player.transform.getAbsolutePosition());
 

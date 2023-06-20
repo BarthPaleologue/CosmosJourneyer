@@ -52,7 +52,7 @@ export class GasPlanet extends AbstractBody implements Planemo {
     }
 
     updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
-        this.material.update(controller, stellarObjects, this.rotationMatrixAroundAxis, deltaTime);
+        this.material.update(controller, stellarObjects, deltaTime);
     }
 
     public override computeCulling(cameraPosition: Vector3): void {
