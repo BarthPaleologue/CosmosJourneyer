@@ -219,7 +219,7 @@ export class StarSystem {
 
     public makeSatellite(planet: TelluricPlanemo | GasPlanet, seed = planet.descriptor.getMoonSeed(planet.descriptor.childrenBodies.length)): TelluricPlanemo {
         const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.descriptor.childrenBodies.length + 1)}`, this.scene, seed, [planet]);
-        const periapsis = 2 * planet.getRadius() + clamp(normalRandom(3, 1, satellite.descriptor.rng, 90), 0, 20) * planet.getRadius() * 2;
+        const periapsis = planet.getRadius() + clamp(normalRandom(4, 1, satellite.descriptor.rng, 90), 0, 20) * planet.getRadius() * 2;
         const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.descriptor.rng, 92), 1, 1.5);
         satellite.descriptor.physicalProperties.mass = 1;
 
