@@ -34,6 +34,7 @@ export class TelluricPlanemoDescriptor implements PlanemoDescriptor {
 
     readonly terrainSettings: TerrainSettings;
 
+    //TODO: replace by RingsSettings | null to use it to prevent satelittes from spawning in the rings of their parent
     readonly hasRings: boolean;
 
     readonly nbMoons: number;
@@ -64,11 +65,19 @@ export class TelluricPlanemoDescriptor implements PlanemoDescriptor {
         }
 
         // TODO: do not hardcode
-        const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
-        const apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
+        let periapsis = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
+        let apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
 
         const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.3, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
         const orbitalQuaternion = isOrbitalPlaneAlignedWithParent ? Quaternion.Identity() : Quaternion.RotationAxis(Vector3.Random().normalize(), this.rng(GENERATION_STEPS.ORBIT + 20));
+
+        const mass = this.isSatelliteOfTelluric ? 1 : 10;
+
+        if (this.isSatelliteOfGas || this.isSatelliteOfTelluric) {
+            const maxRadius = this.parentBodies.map((b) => b.radius).reduce((a, b) => Math.max(a, b), 0);
+            periapsis = maxRadius + clamp(normalRandom(2, 1, this.rng, GENERATION_STEPS.ORBIT), 0, 20) * this.radius * 2;
+            apoapsis = periapsis * clamp(normalRandom(1, 0.05, this.rng, GENERATION_STEPS.ORBIT + 10), 1, 1.5);
+        }
 
         this.orbitalProperties = {
             periapsis: periapsis,
@@ -79,7 +88,7 @@ export class TelluricPlanemoDescriptor implements PlanemoDescriptor {
         };
 
         this.physicalProperties = {
-            mass: 10,
+            mass: mass,
             axialTilt: normalRandom(0, 0.2, this.rng, GENERATION_STEPS.AXIAL_TILT),
             rotationPeriod: (60 * 60 * 24) / 10,
             minTemperature: randRangeInt(-50, 5, this.rng, 80),

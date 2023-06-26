@@ -219,18 +219,6 @@ export class StarSystem {
 
     public makeSatellite(planet: TelluricPlanemo | GasPlanet, seed = planet.descriptor.getMoonSeed(planet.descriptor.childrenBodies.length)): TelluricPlanemo {
         const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.descriptor.childrenBodies.length + 1)}`, this.scene, seed, [planet]);
-        const periapsis = planet.getRadius() + clamp(normalRandom(4, 1, satellite.descriptor.rng, 90), 0, 20) * planet.getRadius() * 2;
-        const apoapsis = periapsis * clamp(normalRandom(1, 0.05, satellite.descriptor.rng, 92), 1, 1.5);
-        satellite.descriptor.physicalProperties.mass = 1;
-
-        satellite.descriptor.orbitalProperties.periapsis = periapsis;
-        satellite.descriptor.orbitalProperties.apoapsis = apoapsis;
-        satellite.descriptor.orbitalProperties.period = getOrbitalPeriod(
-            periapsis,
-            apoapsis,
-            satellite.parentObjects.map((p) => p.descriptor)
-        );
-        satellite.descriptor.orbitalProperties.orientationQuaternion = satellite.transform.getRotationQuaternion();
 
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
         satellite.material.updateConstants();
