@@ -3,11 +3,12 @@ import { AbstractBody } from "../bodies/abstractBody";
 import { UberScene } from "../uberCore/uberScene";
 import { ShaderDataType, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { randRange } from "extended-random";
+import { normalRandom, randRange } from "extended-random";
 import { BodyPostProcess } from "./bodyPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { clamp } from "terrain-generation";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -28,7 +29,7 @@ export class RingsPostProcess extends BodyPostProcess {
             ringStart: randRange(1.8, 2.2, body.descriptor.rng, 1400),
             ringEnd: randRange(2.1, 4.0, body.descriptor.rng, 1410),
             ringFrequency: 30.0,
-            ringOpacity: body.descriptor.rng(1420),
+            ringOpacity: clamp(normalRandom(0.7, 0.1, body.descriptor.rng, 1420), 0, 1),
             ringColor: new Color3(214, 168, 122).scaleInPlace(1 / 255)
         };
         const uniforms: ShaderUniforms = [
