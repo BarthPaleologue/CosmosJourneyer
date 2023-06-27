@@ -181,16 +181,20 @@ export class ShipController extends AbstractController {
                     // rcs linear contribution
                     if (input.getZAxis() > 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.FORWARD) > 0.5) rcsThruster.activate();
                     else if (input.getZAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.BACKWARD) > 0.5) rcsThruster.activate();
+                    
                     else if (input.getYAxis() > 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.UP) > 0.5) rcsThruster.activate();
                     else if (input.getYAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.DOWN) > 0.5) rcsThruster.activate();
+                    
                     else if (input.getXAxis() > 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.RIGHT) > 0.5) rcsThruster.activate();
                     else if (input.getXAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.LEFT) > 0.5) rcsThruster.activate();
 
                     // rcs rotation contribution
-                    else if (input.getRoll() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.BACKWARD) > 0.2) rcsThruster.activate();
-                    else if (input.getRoll() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.FORWARD) > 0.2) rcsThruster.activate();
-                    else if (input.getPitch() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.RIGHT) > 0.2) rcsThruster.activate();
-                    else if (input.getPitch() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.LEFT) > 0.2) rcsThruster.activate();
+                    else if (input.getRoll() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.BACKWARD) > 0.2) rcsThruster.activate();
+                    else if (input.getRoll() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.FORWARD) > 0.2) rcsThruster.activate();
+                    
+                    else if (input.getPitch() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.RIGHT) > 0.2) rcsThruster.activate();
+                    else if (input.getPitch() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.LEFT) > 0.2) rcsThruster.activate();
+                    
                     else if (input.getYaw() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.DOWN) > 0.2) rcsThruster.activate();
                     else if (input.getYaw() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.UP) > 0.2) rcsThruster.activate();
 
