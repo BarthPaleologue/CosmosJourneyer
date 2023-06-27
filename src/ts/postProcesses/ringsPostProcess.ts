@@ -26,10 +26,10 @@ export class RingsPostProcess extends BodyPostProcess {
 
     constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
         const settings: RingsSettings = {
-            ringStart: randRange(1.8, 2.2, body.descriptor.rng, 1400),
-            ringEnd: randRange(2.1, 4.0, body.descriptor.rng, 1410),
+            ringStart: randRange(1.8, 2.2, body.model.rng, 1400),
+            ringEnd: randRange(2.1, 4.0, body.model.rng, 1410),
             ringFrequency: 30.0,
-            ringOpacity: clamp(normalRandom(0.7, 0.1, body.descriptor.rng, 1420), 0, 1),
+            ringOpacity: clamp(normalRandom(0.7, 0.1, body.model.rng, 1420), 0, 1),
             ringColor: new Color3(214, 168, 122).scaleInPlace(1 / 255)
         };
         const uniforms: ShaderUniforms = [

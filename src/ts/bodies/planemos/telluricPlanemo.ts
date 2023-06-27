@@ -12,7 +12,7 @@ import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planemo } from "./planemo";
-import { TelluricPlanemoDescriptor } from "../../descriptors/planemos/telluricPlanemoDescriptor";
+import { TelluricPlanemoModel } from "../../models/planemos/telluricPlanemoModel";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { RigidBody } from "../../workers/rigidbody";
@@ -22,7 +22,7 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
 
     readonly material: TelluricPlanemoMaterial;
 
-    readonly descriptor: TelluricPlanemoDescriptor;
+    readonly model: TelluricPlanemoModel;
 
     /**
      * New Telluric Planet
@@ -34,50 +34,50 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
     constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
         super(name, parentBodies, scene);
 
-        this.descriptor = new TelluricPlanemoDescriptor(
+        this.model = new TelluricPlanemoModel(
             seed,
-            parentBodies.map((body) => body.descriptor)
+            parentBodies.map((body) => body.model)
         );
 
-        this.transform.rotate(Axis.X, this.descriptor.physicalProperties.axialTilt);
+        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
 
         this.postProcesses.push(PostProcessType.OVERLAY);
 
-        const waterBoilingPoint = waterBoilingPointCelsius(this.descriptor.physicalProperties.pressure);
+        const waterBoilingPoint = waterBoilingPointCelsius(this.model.physicalProperties.pressure);
         const waterFreezingPoint = 0.0;
         const epsilon = 0.05;
-        if (this.descriptor.physicalProperties.pressure > epsilon) {
-            if (waterFreezingPoint > this.descriptor.physicalProperties.minTemperature && waterFreezingPoint < this.descriptor.physicalProperties.maxTemperature) {
+        if (this.model.physicalProperties.pressure > epsilon) {
+            if (waterFreezingPoint > this.model.physicalProperties.minTemperature && waterFreezingPoint < this.model.physicalProperties.maxTemperature) {
                 this.postProcesses.push(PostProcessType.OCEAN);
                 this.postProcesses.push(PostProcessType.CLOUDS);
             } else {
-                this.descriptor.physicalProperties.oceanLevel = 0;
+                this.model.physicalProperties.oceanLevel = 0;
             }
             this.postProcesses.push(PostProcessType.ATMOSPHERE);
         } else {
-            this.descriptor.physicalProperties.oceanLevel = 0;
+            this.model.physicalProperties.oceanLevel = 0;
         }
 
-        if (this.descriptor.hasRings) this.postProcesses.push(PostProcessType.RING);
+        if (this.model.hasRings) this.postProcesses.push(PostProcessType.RING);
 
-        this.material = new TelluricPlanemoMaterial(this.name, this.transform, this.descriptor, scene);
+        this.material = new TelluricPlanemoMaterial(this.name, this.transform, this.model, scene);
 
         this.sides = [
-            new ChunkTree(Direction.Up, this.name, this.descriptor, this.transform, this.material, scene),
-            new ChunkTree(Direction.Down, this.name, this.descriptor, this.transform, this.material, scene),
-            new ChunkTree(Direction.Forward, this.name, this.descriptor, this.transform, this.material, scene),
-            new ChunkTree(Direction.Backward, this.name, this.descriptor, this.transform, this.material, scene),
-            new ChunkTree(Direction.Right, this.name, this.descriptor, this.transform, this.material, scene),
-            new ChunkTree(Direction.Left, this.name, this.descriptor, this.transform, this.material, scene)
+            new ChunkTree(Direction.Up, this.name, this.model, this.transform, this.material, scene),
+            new ChunkTree(Direction.Down, this.name, this.model, this.transform, this.material, scene),
+            new ChunkTree(Direction.Forward, this.name, this.model, this.transform, this.material, scene),
+            new ChunkTree(Direction.Backward, this.name, this.model, this.transform, this.material, scene),
+            new ChunkTree(Direction.Right, this.name, this.model, this.transform, this.material, scene),
+            new ChunkTree(Direction.Left, this.name, this.model, this.transform, this.material, scene)
         ];
     }
 
     public generateCollisionTask(relativePosition: Vector3): TransferCollisionData {
         const collisionData: TransferCollisionData = {
-            seed: this.descriptor.seed,
+            seed: this.model.seed,
             taskType: TaskType.Collision,
             planetName: this.name,
-            terrainSettings: this.descriptor.terrainSettings,
+            terrainSettings: this.model.terrainSettings,
             position: [relativePosition.x, relativePosition.y, relativePosition.z],
             planetDiameter: this.getDiameter()
         };
@@ -104,7 +104,7 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
     }
 
     public override getBoundingRadius(): number {
-        return super.getRadius() + this.descriptor.physicalProperties.oceanLevel;
+        return super.getRadius() + this.model.physicalProperties.oceanLevel;
     }
 
     public override computeCulling(cameraPosition: Vector3): void {

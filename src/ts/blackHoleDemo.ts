@@ -51,12 +51,12 @@ const starSystem = new StarSystem(starSystemSeed, scene);
 engine.setStarSystem(starSystem, false);
 
 const BH = starSystem.makeBlackHole(0);
-BH.descriptor.orbitalProperties.periapsis = BH.getRadius() * 4;
-BH.descriptor.orbitalProperties.apoapsis = BH.getRadius() * 4;
+BH.model.orbitalProperties.periapsis = BH.getRadius() * 4;
+BH.model.orbitalProperties.apoapsis = BH.getRadius() * 4;
 
 const planet = starSystem.makeTelluricPlanet();
-planet.descriptor.orbitalProperties.periapsis = 10000e3;
-planet.descriptor.orbitalProperties.apoapsis = 10000e3;
+planet.model.orbitalProperties.periapsis = 10000e3;
+planet.model.orbitalProperties.apoapsis = 10000e3;
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "g") {

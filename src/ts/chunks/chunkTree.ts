@@ -8,7 +8,7 @@ import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { UberScene } from "../uberCore/uberScene";
 import { Assets } from "../assets";
-import { TelluricPlanemoDescriptor } from "../descriptors/planemos/telluricPlanemoDescriptor";
+import { TelluricPlanemoModel } from "../models/planemos/telluricPlanemoModel";
 import { Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
@@ -45,16 +45,16 @@ export class ChunkTree {
      *
      * @param direction
      * @param planetName
-     * @param planetDescriptor
+     * @param planetModel
      * @param parent
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetName: string, planetDescriptor: TelluricPlanemoDescriptor, parent: BasicTransform, material: Material, scene: UberScene) {
-        this.rootChunkLength = planetDescriptor.radius * 2;
+    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanemoModel, parent: BasicTransform, material: Material, scene: UberScene) {
+        this.rootChunkLength = planetModel.radius * 2;
         this.planetName = planetName;
-        this.planetSeed = planetDescriptor.seed;
-        this.terrainSettings = planetDescriptor.terrainSettings;
+        this.planetSeed = planetModel.seed;
+        this.terrainSettings = planetModel.terrainSettings;
 
         this.minDepth = 0; //Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 19), 0);
         this.maxDepth = Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 12), 0);

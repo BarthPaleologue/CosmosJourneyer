@@ -33,30 +33,30 @@ export type SolidPhysicalProperties = PlanetPhysicalProperties & {
     oceanLevel: number;
 };
 
-export interface BaseDescriptor {
+export interface BaseModel {
     rng: (step: number) => number;
     seed: number;
 
     orbitalProperties: IOrbitalProperties;
     physicalProperties: PhysicalProperties;
 
-    readonly parentBodies: BaseDescriptor[];
-    readonly childrenBodies: BaseDescriptor[];
+    readonly parentBodies: BaseModel[];
+    readonly childrenBodies: BaseModel[];
 
     get depth(): number;
 }
 
-export interface BodyDescriptor extends BaseDescriptor {
+export interface BodyModel extends BaseModel {
     bodyType: BODY_TYPE;
     radius: number;
 }
 
-export interface StellarObjectDescriptor extends BodyDescriptor {
+export interface StellarObjectModel extends BodyModel {
     stellarType: STELLAR_TYPE;
 }
 
 //https://en.wiktionary.org/wiki/planemo#English
-export interface PlanemoDescriptor extends BodyDescriptor {
+export interface PlanemoModel extends BodyModel {
     physicalProperties: PlanetPhysicalProperties;
 
     getApparentRadius(): number;

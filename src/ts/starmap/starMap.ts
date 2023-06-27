@@ -4,13 +4,13 @@ import { Keyboard } from "../inputs/keyboard";
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
-import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
-import { StarDescriptor } from "../descriptors/stellarObjects/starDescriptor";
+import { StarSystemModel } from "../models/starSystemModel";
+import { StarModel } from "../models/stellarObjects/starModel";
 import { BuildData, Cell, Vector3ToString } from "./cell";
-import { BlackHoleDescriptor } from "../descriptors/stellarObjects/blackHoleDescriptor";
+import { BlackHoleModel } from "../models/stellarObjects/blackHoleModel";
 import { StarMapUI } from "./starMapUI";
-import { getStellarTypeString } from "../descriptors/stellarObjects/common";
-import { BODY_TYPE } from "../descriptors/common";
+import { getStellarTypeString } from "../models/stellarObjects/common";
+import { BODY_TYPE } from "../models/common";
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -290,12 +290,12 @@ export class StarMap {
             }
 
             const starSystemSeed = data.seed;
-            const starSystemDescriptor = new StarSystemDescriptor(starSystemSeed);
+            const starSystemModel = new StarSystemModel(starSystemSeed);
 
-            const starSeed = starSystemDescriptor.getStarSeed(0);
-            const isStarBlackHole = starSystemDescriptor.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE;
+            const starSeed = starSystemModel.getStarSeed(0);
+            const isStarBlackHole = starSystemModel.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE;
 
-            const starDescriptor = !isStarBlackHole ? new StarDescriptor(starSeed, []) : new BlackHoleDescriptor(starSeed);
+            const starModel = !isStarBlackHole ? new StarModel(starSeed, []) : new BlackHoleModel(starSeed);
 
             let instance: InstancedMesh | null = null;
             let recycled = false;
@@ -319,8 +319,8 @@ export class StarMap {
             initializedInstance.scaling = Vector3.One().scaleInPlace(data.scale);
             initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
-            if (starDescriptor instanceof StarDescriptor) {
-                const starColor = starDescriptor.surfaceColor;
+            if (starModel instanceof StarModel) {
+                const starColor = starModel.surfaceColor;
                 initializedInstance.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
             } else {
                 initializedInstance.instancedBuffers.color = new Color4(1.0, 0.6, 0.3, 0.0);
@@ -351,16 +351,16 @@ export class StarMap {
                     this.starMapUI.attachUIToMesh(initializedInstance);
                     this.starMapUI.setUIText(
                         "Name: " +
-                        starSystemDescriptor.getName() +
+                        starSystemModel.getName() +
                         "\n" +
                         "Seed: " +
-                        starSystemDescriptor.seed +
+                        starSystemModel.seed +
                         "\n" +
                         "Type: " +
-                        getStellarTypeString(starDescriptor.stellarType) +
+                        getStellarTypeString(starModel.stellarType) +
                         "\n" +
                         "Planets: " +
-                        starSystemDescriptor.getNbPlanets()
+                        starSystemModel.getNbPlanets()
                     );
 
                     this.selectedSystemSeed = starSystemSeed;

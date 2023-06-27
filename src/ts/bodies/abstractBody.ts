@@ -1,9 +1,9 @@
-import { BodyDescriptor } from "../descriptors/common";
+import { BodyModel } from "../models/common";
 import { Scene } from "@babylonjs/core/scene";
 import { AbstractObject } from "./abstractObject";
 
 export abstract class AbstractBody extends AbstractObject {
-    abstract readonly descriptor: BodyDescriptor;
+    abstract readonly model: BodyModel;
 
     /**
      * An abstract representation of a celestial body
@@ -18,7 +18,7 @@ export abstract class AbstractBody extends AbstractObject {
      * Returns the radius of the celestial body
      */
     public getRadius(): number {
-        return this.descriptor.radius;
+        return this.model.radius;
     }
 
     /**

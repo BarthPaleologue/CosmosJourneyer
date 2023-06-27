@@ -1,5 +1,5 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { BodyDescriptor, BODY_TYPE, StellarObjectDescriptor, BlackHolePhysicalProperties } from "../common";
+import { BodyModel, BODY_TYPE, StellarObjectModel, BlackHolePhysicalProperties } from "../common";
 import { getOrbitalPeriod } from "../../orbits/kepler";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
@@ -10,7 +10,7 @@ enum GENERATION_STEPS {
     AXIAL_TILT = 100
 }
 
-export class BlackHoleDescriptor implements StellarObjectDescriptor {
+export class BlackHoleModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.BLACK_HOLE;
     readonly seed: number;
     readonly rng: (step: number) => number;
@@ -23,9 +23,9 @@ export class BlackHoleDescriptor implements StellarObjectDescriptor {
 
     readonly physicalProperties: BlackHolePhysicalProperties;
 
-    readonly parentBodies: BodyDescriptor[] = [];
+    readonly parentBodies: BodyModel[] = [];
 
-    readonly childrenBodies: BodyDescriptor[] = [];
+    readonly childrenBodies: BodyModel[] = [];
 
     constructor(seed: number) {
         this.seed = seed;

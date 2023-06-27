@@ -18,7 +18,7 @@ import { RingsPanel } from "./panels/ringsPanel";
 import { OceanPanel } from "./panels/oceanPanel";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
 import { UberScene } from "../../uberCore/uberScene";
-import { BODY_TYPE } from "../../descriptors/common";
+import { BODY_TYPE } from "../../models/common";
 import { BlackHole } from "../../bodies/stellarObjects/blackHole";
 import { BlackholePanel } from "./panels/blackholePanel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
@@ -146,7 +146,7 @@ export class BodyEditor {
     public setBody(body: AbstractBody, postProcessManager: PostProcessManager, scene: UberScene) {
         this.currentBodyId = body.name;
         this.initNavBar(body);
-        switch (body.descriptor.bodyType) {
+        switch (body.model.bodyType) {
             case BODY_TYPE.TELLURIC:
                 this.setTelluricPlanet(body as TelluricPlanemo, postProcessManager, scene);
                 break;
@@ -191,7 +191,7 @@ export class BodyEditor {
     public initNavBar(body: AbstractBody): void {
         for (const panel of this.panels) panel.disable();
 
-        switch (body.descriptor.bodyType) {
+        switch (body.model.bodyType) {
             case BODY_TYPE.STAR:
                 this.starPanel.enable();
                 break;

@@ -3,7 +3,7 @@ import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planemo } from "./planemo";
-import { GasPlanetDescriptor } from "../../descriptors/planemos/gasPlanetDescriptor";
+import { GasPlanetModel } from "../../models/planemos/gasPlanetModel";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
@@ -16,7 +16,7 @@ export class GasPlanet extends AbstractBody implements Planemo {
     private readonly mesh: Mesh;
     readonly material: GasPlanetMaterial;
 
-    readonly descriptor: GasPlanetDescriptor;
+    readonly model: GasPlanetModel;
 
     /**
      * New Gas Planet
@@ -28,27 +28,27 @@ export class GasPlanet extends AbstractBody implements Planemo {
     constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
         super(name, parentBodies, scene);
 
-        this.descriptor = new GasPlanetDescriptor(
+        this.model = new GasPlanetModel(
             seed,
-            parentBodies.map((body) => body.descriptor)
+            parentBodies.map((body) => body.model)
         );
 
         this.mesh = MeshBuilder.CreateSphere(
             `${name}Mesh`,
             {
-                diameter: this.descriptor.radius * 2,
+                diameter: this.model.radius * 2,
                 segments: 64
             },
             scene
         );
         this.mesh.parent = this.transform.node;
 
-        this.material = new GasPlanetMaterial(this.name, this.transform, this.descriptor, scene);
+        this.material = new GasPlanetMaterial(this.name, this.transform, this.model, scene);
         this.mesh.material = this.material;
 
         this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.ATMOSPHERE, PostProcessType.RING);
 
-        this.transform.rotate(Axis.X, this.descriptor.physicalProperties.axialTilt);
+        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
 
     updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {

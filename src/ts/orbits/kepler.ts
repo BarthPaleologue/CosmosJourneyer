@@ -4,7 +4,7 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { IOrbitalObject } from "./iOrbitalObject";
 import { IOrbitalProperties } from "./iOrbitalProperties";
 import { stripAxisFromQuaternion } from "../utils/algebra";
-import { BaseDescriptor } from "../descriptors/common";
+import { BaseModel } from "../models/common";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 /**
@@ -40,12 +40,12 @@ export function solveKepler(M: number, e: number) {
 }
 
 export function computeBarycenter(body: IOrbitalObject, relevantBodies: IOrbitalObject[]): [Vector3, Quaternion] {
-    const barycenter = body.transform.getAbsolutePosition().scale(body.descriptor.physicalProperties.mass);
+    const barycenter = body.transform.getAbsolutePosition().scale(body.model.physicalProperties.mass);
     const meanQuaternion = Quaternion.Zero();
-    let sumPosition = body.descriptor.physicalProperties.mass;
+    let sumPosition = body.model.physicalProperties.mass;
     let sumQuaternion = 0;
     for (const otherBody of relevantBodies) {
-        const mass = otherBody.descriptor.physicalProperties.mass;
+        const mass = otherBody.model.physicalProperties.mass;
         barycenter.addInPlace(otherBody.transform.getAbsolutePosition().scale(mass));
         meanQuaternion.addInPlace(stripAxisFromQuaternion(otherBody.transform.getRotationQuaternion(), Axis.Y).scale(mass));
         sumPosition += mass;
@@ -83,7 +83,7 @@ export function computePointOnOrbit(centerOfMass: Vector3, settings: IOrbitalPro
  * @param otherBodies
  * @see https://www.wikiwand.com/fr/Lois_de_Kepler#/Troisi%C3%A8me_loi_%E2%80%93_Loi_des_p%C3%A9riodes
  */
-export function getOrbitalPeriod(periapsis: number, apoapsis: number, otherBodies: BaseDescriptor[]) {
+export function getOrbitalPeriod(periapsis: number, apoapsis: number, otherBodies: BaseModel[]) {
     const a = (periapsis + apoapsis) / 2;
     const G = 1e12;
     let M = 0;

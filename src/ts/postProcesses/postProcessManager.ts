@@ -152,7 +152,7 @@ export class PostProcessManager {
             new AtmosphericScatteringPostProcess(
                 `${planet.name}Atmosphere`,
                 planet,
-                Settings.ATMOSPHERE_HEIGHT * Math.max(1, planet.descriptor.radius / Settings.EARTH_RADIUS),
+                Settings.ATMOSPHERE_HEIGHT * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS),
                 this.scene,
                 stellarObjects
             )

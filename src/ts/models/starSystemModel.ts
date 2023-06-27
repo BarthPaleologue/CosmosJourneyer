@@ -13,7 +13,7 @@ enum GENERATION_STEPS {
     CHOOSE_PLANET_TYPE = 200
 }
 
-export class StarSystemDescriptor {
+export class StarSystemModel {
     readonly seed: number;
     readonly rng: (step: number) => number;
 

@@ -20,7 +20,7 @@ export class BlackHolePostProcess extends BodyPostProcess {
 
     constructor(name: string, blackHole: BlackHole, scene: UberScene) {
         const settings: BlackHoleSettings = {
-            accretionDiskRadius: blackHole.descriptor.physicalProperties.accretionDiskRadius,
+            accretionDiskRadius: blackHole.model.physicalProperties.accretionDiskRadius,
             rotationPeriod: 1.5
         };
 

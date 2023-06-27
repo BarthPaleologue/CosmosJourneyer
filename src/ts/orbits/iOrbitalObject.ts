@@ -1,5 +1,5 @@
 import { ITransformLike } from "../uberCore/transforms/ITransformLike";
-import { BaseDescriptor } from "../descriptors/common";
+import { BaseModel } from "../models/common";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 
@@ -24,7 +24,7 @@ export interface IOrbitalObject extends ITransformable {
 
     parentObjects: IOrbitalObject[];
 
-    descriptor: BaseDescriptor;
+    model: BaseModel;
 
     computeNextOrbitalPosition(): Vector3;
 }

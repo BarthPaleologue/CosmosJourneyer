@@ -3,8 +3,8 @@ import { getRgbFromTemperature } from "../utils/specrend";
 import starMaterialFragment from "../../shaders/starMaterial/fragment.glsl";
 import starMaterialVertex from "../../shaders/starMaterial/vertex.glsl";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
-import { StarPhysicalProperties } from "../descriptors/common";
-import { StarDescriptor } from "../descriptors/stellarObjects/starDescriptor";
+import { StarPhysicalProperties } from "../models/common";
+import { StarModel } from "../models/stellarObjects/starModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
@@ -18,14 +18,14 @@ export class StarMaterial extends ShaderMaterial {
     physicalProperties: StarPhysicalProperties;
     starSeed: number;
 
-    constructor(star: BasicTransform, descriptor: StarDescriptor, scene: Scene) {
+    constructor(star: BasicTransform, model: StarModel, scene: Scene) {
         super("starColor", scene, shaderName, {
             attributes: ["position"],
             uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time", "logarithmicDepthConstant"]
         });
         this.star = star;
-        this.physicalProperties = descriptor.physicalProperties;
-        this.starSeed = descriptor.seed;
+        this.physicalProperties = model.physicalProperties;
+        this.starSeed = model.seed;
     }
 
     public update(internalTime: number) {

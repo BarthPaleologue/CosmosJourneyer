@@ -8,9 +8,9 @@ import { UberScene } from "../uberCore/uberScene";
 import { AbstractController } from "../uberCore/abstractController";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrain/terrainSettings";
-import { SolidPhysicalProperties } from "../descriptors/common";
+import { SolidPhysicalProperties } from "../models/common";
 import { centeredRand } from "extended-random";
-import { TelluricPlanemoDescriptor } from "../descriptors/planemos/telluricPlanemoDescriptor";
+import { TelluricPlanemoModel } from "../models/planemos/telluricPlanemoModel";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
@@ -28,7 +28,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
     physicalProperties: SolidPhysicalProperties;
     planetRadius: number;
 
-    constructor(planetName: string, planet: BasicTransform, planetDescriptor: TelluricPlanemoDescriptor, scene: UberScene) {
+    constructor(planetName: string, planet: BasicTransform, model: TelluricPlanemoModel, scene: UberScene) {
         super(`${planetName}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
             uniforms: [
@@ -87,9 +87,9 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         });
 
         this.planet = planet;
-        this.planetRadius = planetDescriptor.radius;
-        this.terrainSettings = planetDescriptor.terrainSettings;
-        this.physicalProperties = planetDescriptor.physicalProperties;
+        this.planetRadius = model.radius;
+        this.terrainSettings = model.terrainSettings;
+        this.physicalProperties = model.physicalProperties;
         this.colorSettings = {
             mode: ColorMode.DEFAULT,
 
@@ -97,20 +97,20 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
             steepColor: new Color3(115, 100, 100).scaleInPlace(1 / 255),
             plainColor: new Color3(
                 //TODO: make this better
-                Math.max(0.22 + centeredRand(planetDescriptor.rng, 82) / 20, 0),
-                Math.max(0.37 + centeredRand(planetDescriptor.rng, 83) / 20, 0),
-                Math.max(0.024 + centeredRand(planetDescriptor.rng, 84) / 20, 0)
+                Math.max(0.22 + centeredRand(model.rng, 82) / 20, 0),
+                Math.max(0.37 + centeredRand(model.rng, 83) / 20, 0),
+                Math.max(0.024 + centeredRand(model.rng, 84) / 20, 0)
             ),
             beachColor: new Color3(132, 114, 46).scaleInPlace(1 / 255),
             desertColor: new Color3(178, 107, 42).scaleInPlace(1 / 255),
             bottomColor: new Color3(0.5, 0.5, 0.5),
 
-            beachSize: 250 + 100 * centeredRand(planetDescriptor.rng, 85),
+            beachSize: 250 + 100 * centeredRand(model.rng, 85),
             steepSharpness: 2,
             normalSharpness: 0.5
         };
 
-        if (planetDescriptor.physicalProperties.oceanLevel === 0) {
+        if (model.physicalProperties.oceanLevel === 0) {
             this.colorSettings.plainColor = this.colorSettings.desertColor.scale(0.7);
         }
 
@@ -119,7 +119,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
             MaterialHelper.BindLogDepth(null, effect, scene);
         });
 
-        this.setFloat("seed", planetDescriptor.seed);
+        this.setFloat("seed", model.seed);
 
         if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
 

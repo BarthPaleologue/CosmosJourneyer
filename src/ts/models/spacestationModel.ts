@@ -1,5 +1,5 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { BaseDescriptor, PhysicalProperties } from "./common";
+import { BaseModel, PhysicalProperties } from "./common";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
@@ -10,15 +10,15 @@ enum GENERATION_STEPS {
     RADIUS = 1000
 }
 
-export class SpaceStationDescriptor implements BaseDescriptor {
+export class SpaceStationModel implements BaseModel {
     readonly seed: number;
     readonly rng: (step: number) => number;
     readonly orbitalProperties: IOrbitalProperties;
     readonly physicalProperties: PhysicalProperties;
-    readonly parentBodies: BaseDescriptor[] = [];
-    readonly childrenBodies: BaseDescriptor[] = [];
+    readonly parentBodies: BaseModel[] = [];
+    readonly childrenBodies: BaseModel[] = [];
 
-    constructor(seed: number, parentBodies: BaseDescriptor[]) {
+    constructor(seed: number, parentBodies: BaseModel[]) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 

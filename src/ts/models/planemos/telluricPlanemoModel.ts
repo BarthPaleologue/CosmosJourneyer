@@ -1,7 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { BODY_TYPE, BodyDescriptor, PlanemoDescriptor, SolidPhysicalProperties } from "../common";
+import { BODY_TYPE, BodyModel, PlanemoModel, SolidPhysicalProperties } from "../common";
 import { TerrainSettings } from "../../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
@@ -21,7 +21,7 @@ enum GENERATION_STEPS {
     ORBITAL_PLANE_ALIGNEMENT = 1600
 }
 
-export class TelluricPlanemoDescriptor implements PlanemoDescriptor {
+export class TelluricPlanemoModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.TELLURIC;
     readonly seed: number;
     readonly rng: (step: number) => number;
@@ -42,10 +42,10 @@ export class TelluricPlanemoDescriptor implements PlanemoDescriptor {
     private isSatelliteOfTelluric = false;
     private isSatelliteOfGas = false;
 
-    readonly parentBodies: BodyDescriptor[];
-    readonly childrenBodies: BodyDescriptor[] = [];
+    readonly parentBodies: BodyModel[];
+    readonly childrenBodies: BodyModel[] = [];
 
-    constructor(seed: number, parentBodies: BodyDescriptor[]) {
+    constructor(seed: number, parentBodies: BodyModel[]) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 

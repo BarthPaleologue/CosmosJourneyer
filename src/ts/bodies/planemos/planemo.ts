@@ -1,8 +1,8 @@
 import { AbstractController } from "../../uberCore/abstractController";
-import { PlanemoDescriptor } from "../../descriptors/common";
+import { PlanemoModel } from "../../models/common";
 import { StellarObject } from "../stellarObjects/stellarObject";
 
 export interface Planemo {
-    descriptor: PlanemoDescriptor;
+    model: PlanemoModel;
     updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void;
 }

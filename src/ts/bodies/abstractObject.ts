@@ -1,7 +1,7 @@
 import { Vector3, Quaternion, Matrix } from "@babylonjs/core/Maths/math";
 import { BaseObject, IOrbitalObject } from "../orbits/iOrbitalObject";
 import { BasicTransform } from "../uberCore/transforms/basicTransform";
-import { BaseDescriptor } from "../descriptors/common";
+import { BaseModel } from "../models/common";
 import { Scene } from "@babylonjs/core/scene";
 import { computeBarycenter, computePointOnOrbit } from "../orbits/kepler";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
@@ -29,7 +29,7 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject {
 
     readonly name: string;
 
-    abstract readonly descriptor: BaseDescriptor;
+    abstract readonly model: BaseModel;
 
     readonly parentObjects: IOrbitalObject[];
 
@@ -93,11 +93,11 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject {
     }
 
     public computeNextOrbitalPosition(): Vector3 {
-        if (this.descriptor.orbitalProperties.period > 0) {
+        if (this.model.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentObjects);
-            if(this.descriptor.orbitalProperties.isPlaneAlignedWithParent) this.descriptor.orbitalProperties.orientationQuaternion = orientationQuaternion;
+            if(this.model.orbitalProperties.isPlaneAlignedWithParent) this.model.orbitalProperties.orientationQuaternion = orientationQuaternion;
 
-            const newPosition = computePointOnOrbit(barycenter, this.descriptor.orbitalProperties, this.internalClock);
+            const newPosition = computePointOnOrbit(barycenter, this.model.orbitalProperties, this.internalClock);
             this.nextState.position.copyFrom(newPosition);
         } else {
             this.nextState.position.copyFrom(this.transform.getAbsolutePosition());
@@ -112,12 +112,12 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject {
      * @returns The elapsed angle of rotation around the axis
      */
     public updateRotation(deltaTime: number): number {
-        if (this.descriptor.physicalProperties.rotationPeriod === 0) {
+        if (this.model.physicalProperties.rotationPeriod === 0) {
             this.nextState.rotation.copyFrom(this.transform.getRotationQuaternion());
             return 0;
         }
 
-        const dtheta = -(2 * Math.PI * deltaTime) / this.descriptor.physicalProperties.rotationPeriod;
+        const dtheta = -(2 * Math.PI * deltaTime) / this.model.physicalProperties.rotationPeriod;
         this.theta += dtheta;
 
         this.rotationMatrixAroundAxis.copyFrom(Matrix.RotationAxis(new Vector3(0, 1, 0), this.theta));

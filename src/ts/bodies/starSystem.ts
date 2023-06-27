@@ -4,16 +4,13 @@ import { AbstractBody } from "./abstractBody";
 import { Star } from "./stellarObjects/star";
 import { UberScene } from "../uberCore/uberScene";
 import { Planemo } from "./planemos/planemo";
-import { normalRandom } from "extended-random";
 import { TelluricPlanemo } from "./planemos/telluricPlanemo";
 import { GasPlanet } from "./planemos/gasPlanet";
-import { clamp } from "terrain-generation";
-import { getOrbitalPeriod } from "../orbits/kepler";
 import { BlackHole } from "./stellarObjects/blackHole";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
-import { StarSystemDescriptor } from "../descriptors/starSystemDescriptor";
+import { StarSystemModel } from "../models/starSystemModel";
 import { isOrbiting } from "../utils/nearestBody";
-import { BODY_TYPE } from "../descriptors/common";
+import { BODY_TYPE } from "../models/common";
 import { StellarObject } from "./stellarObjects/stellarObject";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { AbstractObject } from "./abstractObject";
@@ -61,13 +58,13 @@ export class StarSystem {
      */
     readonly satellites: TelluricPlanemo[] = [];
 
-    readonly descriptor: StarSystemDescriptor;
+    readonly model: StarSystemModel;
 
     constructor(seed: number, scene: UberScene) {
         this.scene = scene;
         this.postProcessManager = new PostProcessManager(this.scene);
 
-        this.descriptor = new StarSystemDescriptor(seed);
+        this.model = new StarSystemModel(seed);
     }
 
     /**
@@ -126,77 +123,77 @@ export class StarSystem {
     }
 
     /**
-     * Makes a star and adds it to the system. By default, it will use the next available seed planned by the system descriptor
-     * @param seed The seed to use for the star generation (by default, the next available seed planned by the system descriptor)
+     * Makes a star and adds it to the system. By default, it will use the next available seed planned by the system model
+     * @param seed The seed to use for the star generation (by default, the next available seed planned by the system modell)
      */
-    public makeStellarObject(seed = this.descriptor.getStarSeed(this.stellarObjects.length)): StellarObject {
-        if (this.stellarObjects.length >= this.descriptor.getNbStars())
+    public makeStellarObject(seed = this.model.getStarSeed(this.stellarObjects.length)): StellarObject {
+        if (this.stellarObjects.length >= this.model.getNbStars())
             console.warn(`You are adding a star 
         to a system that already has ${this.stellarObjects.length} stars.
-        The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
+        The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
 
-        const isStellarObjectBlackHole = this.descriptor.getBodyTypeOfStar(this.stellarObjects.length) === BODY_TYPE.BLACK_HOLE;
+        const isStellarObjectBlackHole = this.model.getBodyTypeOfStar(this.stellarObjects.length) === BODY_TYPE.BLACK_HOLE;
 
         const star = isStellarObjectBlackHole
-            ? new BlackHole(`${this.descriptor.getName()} ${this.stellarObjects.length}`, seed, [], this.scene)
-            : new Star(`${this.descriptor.getName()} ${this.stellarObjects.length}`, this.scene, seed, []);
+            ? new BlackHole(`${this.model.getName()} ${this.stellarObjects.length}`, seed, [], this.scene)
+            : new Star(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, seed, []);
 
         //TODO: make this better, make it part of the generation
-        star.descriptor.orbitalProperties.periapsis = star.getRadius() * 4;
-        star.descriptor.orbitalProperties.apoapsis = star.getRadius() * 4;
+        star.model.orbitalProperties.periapsis = star.getRadius() * 4;
+        star.model.orbitalProperties.apoapsis = star.getRadius() * 4;
 
         this.addStellarObject(star);
         return star;
     }
 
     /**
-     * Makes a black hole and adds it to the system. By default, it will use the next available seed planned by the system descriptor
-     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system descriptor)
+     * Makes a black hole and adds it to the system. By default, it will use the next available seed planned by the system 
+     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public makeBlackHole(seed = this.descriptor.getStarSeed(this.stellarObjects.length)): BlackHole {
-        if (this.stellarObjects.length >= this.descriptor.getNbStars())
+    public makeBlackHole(seed = this.model.getStarSeed(this.stellarObjects.length)): BlackHole {
+        if (this.stellarObjects.length >= this.model.getNbStars())
             console.warn(`You are adding a black hole
         to a system that already has ${this.stellarObjects.length} stars.
-        The capacity of the generator was supposed to be ${this.descriptor.getNbStars()} This is not a problem, but it may be.`);
-        const blackHole = new BlackHole(`${this.descriptor.getName()} ${this.stellarObjects.length}`, seed, this.stellarObjects, this.scene);
+        The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
+        const blackHole = new BlackHole(`${this.model.getName()} ${this.stellarObjects.length}`, seed, this.stellarObjects, this.scene);
 
         this.addStellarObject(blackHole);
         return blackHole;
     }
 
     /**
-     * Makes n stars and adds them to the system. By default, it will use the next available seeds planned by the system descriptor
-     * @param n The number of stars to make (by default, the number of stars planned by the system descriptor)
+     * Makes n stars and adds them to the system. By default, it will use the next available seeds planned by the system model
+     * @param n The number of stars to make (by default, the number of stars planned by the system model)
      */
-    public makeStellarObjects(n = this.descriptor.getNbStars()): void {
+    public makeStellarObjects(n = this.model.getNbStars()): void {
         if (n < 1) throw new Error("Cannot make less than 1 star");
         for (let i = 0; i < n; i++) this.makeStellarObject();
     }
 
     /**
-     * Makes a telluric planet and adds it to the system. By default, it will use the next available seed planned by the system descriptor
-     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system descriptor)
+     * Makes a telluric planet and adds it to the system. By default, it will use the next available seed planned by the system model
+     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public makeTelluricPlanet(seed = this.descriptor.getPlanetSeed(this.planets.length)): TelluricPlanemo {
-        if (this.planets.length >= this.descriptor.getNbPlanets())
+    public makeTelluricPlanet(seed = this.model.getPlanetSeed(this.planets.length)): TelluricPlanemo {
+        if (this.planets.length >= this.model.getNbPlanets())
             console.warn(`You are adding a telluric planet to the system.
-            The system generator had planned for ${this.descriptor.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
+            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
             This might cause issues, or not who knows.`);
-        const planet = new TelluricPlanemo(`${this.descriptor.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, seed, this.stellarObjects);
+        const planet = new TelluricPlanemo(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, seed, this.stellarObjects);
         this.addTelluricPlanet(planet);
         return planet;
     }
 
     /**
-     * Makes a gas planet and adds it to the system. By default, it will use the next available seed planned by the system descriptor
-     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system descriptor)
+     * Makes a gas planet and adds it to the system. By default, it will use the next available seed planned by the system model
+     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public makeGasPlanet(seed = this.descriptor.getPlanetSeed(this.planets.length)): GasPlanet {
-        if (this.planets.length >= this.descriptor.getNbPlanets())
+    public makeGasPlanet(seed = this.model.getPlanetSeed(this.planets.length)): GasPlanet {
+        if (this.planets.length >= this.model.getNbPlanets())
             console.warn(`You are adding a gas planet to the system.
-            The system generator had planned for ${this.descriptor.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
+            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
             This might cause issues, or not who knows.`);
-        const planet = new GasPlanet(`${this.descriptor.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, seed, this.stellarObjects);
+        const planet = new GasPlanet(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, seed, this.stellarObjects);
         this.addGasPlanet(planet);
         return planet;
     }
@@ -204,7 +201,7 @@ export class StarSystem {
     public makePlanets(n: number): void {
         console.assert(n >= 0, `Cannot make a negative amount of planets : ${n}`);
         for (let i = 0; i < n; i++) {
-            switch (this.descriptor.getBodyTypeOfPlanet(this.planets.length)) {
+            switch (this.model.getBodyTypeOfPlanet(this.planets.length)) {
                 case BODY_TYPE.TELLURIC:
                     this.makeSatellites(this.makeTelluricPlanet());
                     break;
@@ -212,18 +209,18 @@ export class StarSystem {
                     this.makeSatellites(this.makeGasPlanet());
                     break;
                 default:
-                    throw new Error(`Unknown body type ${this.descriptor.getBodyTypeOfPlanet(this.planets.length)}`);
+                    throw new Error(`Unknown body type ${this.model.getBodyTypeOfPlanet(this.planets.length)}`);
             }
         }
     }
 
-    public makeSatellite(planet: TelluricPlanemo | GasPlanet, seed = planet.descriptor.getMoonSeed(planet.descriptor.childrenBodies.length)): TelluricPlanemo {
-        const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.descriptor.childrenBodies.length + 1)}`, this.scene, seed, [planet]);
+    public makeSatellite(planet: TelluricPlanemo | GasPlanet, seed = planet.model.getMoonSeed(planet.model.childrenBodies.length)): TelluricPlanemo {
+        const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, this.scene, seed, [planet]);
 
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
         satellite.material.updateConstants();
 
-        planet.descriptor.childrenBodies.push(satellite.descriptor);
+        planet.model.childrenBodies.push(satellite.model);
 
         this.addTelluricSatellite(satellite);
         return satellite;
@@ -235,18 +232,18 @@ export class StarSystem {
      * @param planet The planet to make satellites for
      * @param n The number of satellites to make
      */
-    public makeSatellites(planet: TelluricPlanemo | GasPlanet, n = planet.descriptor.nbMoons): void {
+    public makeSatellites(planet: TelluricPlanemo | GasPlanet, n = planet.model.nbMoons): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
-        if (planet.descriptor.childrenBodies.length + n > planet.descriptor.nbMoons)
+        if (planet.model.childrenBodies.length + n > planet.model.nbMoons)
             console.warn(
                 `You are making more satellites than the planet had planned in its the generation: 
-            You want ${n} more which will amount to a total ${planet.descriptor.childrenBodies.length + n}. 
-            The generator had planned ${planet.descriptor.nbMoons}.
+            You want ${n} more which will amount to a total ${planet.model.childrenBodies.length + n}. 
+            The generator had planned ${planet.model.nbMoons}.
             This might cause issues, or not who knows. 
             You can just leave this argument empty to make as many as the planet had planned.`
             );
 
-        for (let i = 0; i < n; i++) this.makeSatellite(planet, planet.descriptor.getMoonSeed(planet.descriptor.childrenBodies.length));
+        for (let i = 0; i < n; i++) this.makeSatellite(planet, planet.model.getMoonSeed(planet.model.childrenBodies.length));
     }
 
     /**
@@ -388,8 +385,8 @@ export class StarSystem {
      * Generates the system using the seed provided in the constructor
      */
     public generate() {
-        this.makeStellarObjects(this.descriptor.getNbStars());
-        this.makePlanets(this.descriptor.getNbPlanets());
+        this.makeStellarObjects(this.model.getNbStars());
+        this.makePlanets(this.model.getNbPlanets());
     }
 
     public dispose() {

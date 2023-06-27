@@ -15,9 +15,9 @@ export class PhysicPanel extends EditorPanel {
                 document.getElementById("minTemperature") as HTMLElement,
                 -273,
                 300,
-                planet.descriptor.physicalProperties.minTemperature,
+                planet.model.physicalProperties.minTemperature,
                 (val: number) => {
-                    planet.descriptor.physicalProperties.minTemperature = val;
+                    planet.model.physicalProperties.minTemperature = val;
                     planet.material.updateConstants();
                 }
             ),
@@ -26,9 +26,9 @@ export class PhysicPanel extends EditorPanel {
                 document.getElementById("maxTemperature") as HTMLElement,
                 -273,
                 300,
-                planet.descriptor.physicalProperties.maxTemperature,
+                planet.model.physicalProperties.maxTemperature,
                 (val: number) => {
-                    planet.descriptor.physicalProperties.maxTemperature = val;
+                    planet.model.physicalProperties.maxTemperature = val;
                     planet.material.updateConstants();
                 }
             )

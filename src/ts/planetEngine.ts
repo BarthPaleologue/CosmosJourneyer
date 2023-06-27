@@ -164,7 +164,7 @@ export class PlanetEngine {
             }
 
             //FIXME: should address stars orbits
-            for (const star of starSystem.stellarObjects) star.descriptor.orbitalProperties.period = 0;
+            for (const star of starSystem.stellarObjects) star.model.orbitalProperties.period = 0;
 
             Assets.ChunkForge.update();
             starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);

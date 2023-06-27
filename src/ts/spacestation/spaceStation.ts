@@ -1,7 +1,7 @@
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { Assets } from "../assets";
-import { SpaceStationDescriptor } from "../descriptors/spacestationDescriptor";
+import { SpaceStationModel } from "../models/spacestationModel";
 import { AbstractObject } from "../bodies/abstractObject";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
@@ -10,7 +10,7 @@ import { Settings } from "../settings";
 import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 
 export class SpaceStation extends AbstractObject {
-    readonly descriptor: SpaceStationDescriptor;
+    readonly model: SpaceStationModel;
 
     readonly postProcesses: PostProcessType[] = [];
 
@@ -23,9 +23,9 @@ export class SpaceStation extends AbstractObject {
         //TODO: do not hardcode seed
         const seed = 1;
 
-        this.descriptor = new SpaceStationDescriptor(
+        this.model = new SpaceStationModel(
             seed,
-            parentBodies.map((body) => body.descriptor)
+            parentBodies.map((body) => body.model)
         );
 
         this.instance = Assets.CreateSpaceStationInstance();
@@ -37,8 +37,8 @@ export class SpaceStation extends AbstractObject {
             }
         }
 
-        this.transform.rotate(Axis.X, this.descriptor.physicalProperties.axialTilt);
-        this.transform.rotate(Axis.Y, this.descriptor.physicalProperties.axialTilt);
+        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.transform.rotate(Axis.Y, this.model.physicalProperties.axialTilt);
 
         this.postProcesses.push(PostProcessType.OVERLAY);
     }
@@ -55,7 +55,7 @@ export class SpaceStation extends AbstractObject {
     }
 
     public override updateRotation(deltaTime: number): number {
-        const dtheta = deltaTime / this.descriptor.physicalProperties.rotationPeriod;
+        const dtheta = deltaTime / this.model.physicalProperties.rotationPeriod;
 
         if (this.ringInstances.length === 0) this.instance.rotate(Axis.Z, dtheta);
         else {

@@ -4,7 +4,7 @@ import { normalRandom, randRange, uniformRandBool } from "extended-random";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
-import { BodyDescriptor, BODY_TYPE, StellarObjectDescriptor, StarPhysicalProperties } from "../common";
+import { BodyModel, BODY_TYPE, StellarObjectModel, StarPhysicalProperties } from "../common";
 import { IOrbitalProperties } from "../../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../../orbits/kepler";
 import { STELLAR_TYPE } from "./common";
@@ -17,7 +17,7 @@ enum GENERATION_STEPS {
     RINGS = 1200
 }
 
-export class StarDescriptor implements StellarObjectDescriptor {
+export class StarModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.STAR;
     readonly rng: (step: number) => number;
     readonly seed: number;
@@ -39,11 +39,11 @@ export class StarDescriptor implements StellarObjectDescriptor {
     static RING_PROPORTION = 0.2;
     readonly hasRings: boolean;
 
-    readonly parentBodies: BodyDescriptor[];
+    readonly parentBodies: BodyModel[];
 
-    readonly childrenBodies: BodyDescriptor[] = [];
+    readonly childrenBodies: BodyModel[] = [];
 
-    constructor(seed: number, parentBodies: BodyDescriptor[]) {
+    constructor(seed: number, parentBodies: BodyModel[]) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
@@ -84,7 +84,7 @@ export class StarDescriptor implements StellarObjectDescriptor {
             isPlaneAlignedWithParent: true
         };
 
-        this.hasRings = uniformRandBool(StarDescriptor.RING_PROPORTION, this.rng, GENERATION_STEPS.RINGS);
+        this.hasRings = uniformRandBool(StarModel.RING_PROPORTION, this.rng, GENERATION_STEPS.RINGS);
     }
 
     get depth(): number {

@@ -9,7 +9,7 @@ import { Settings } from "./settings";
 import { PlayerController } from "./spacelegs/playerController";
 import { positionNearObject } from "./utils/positionNearObject";
 import { PlanetEngine } from "./planetEngine";
-import { BODY_TYPE } from "./descriptors/common";
+import { BODY_TYPE } from "./models/common";
 import { ShipController } from "./spaceship/shipController";
 import { EditorVisibility } from "./ui/bodyEditor/bodyEditor";
 
@@ -72,7 +72,7 @@ document.addEventListener("keydown", (e) => {
 
 engine.init();
 
-const nbRadius = starSystem.descriptor.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 3;
+const nbRadius = starSystem.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 3;
 positionNearObject(scene.getActiveController(), starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);
 
 engine.bodyEditor.setVisibility(EditorVisibility.NAVBAR);
