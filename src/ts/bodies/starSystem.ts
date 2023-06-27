@@ -14,7 +14,6 @@ import { BODY_TYPE } from "../models/common";
 import { StellarObject } from "./stellarObjects/stellarObject";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { AbstractObject } from "./abstractObject";
-import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { romanNumeral } from "../utils/nameGenerator";
 
 export class StarSystem {
@@ -375,7 +374,8 @@ export class StarSystem {
 
         const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
         this.postProcessManager.setBody(nearestBody);
-        const switchLimit = nearestBody.postProcesses.includes(PostProcessType.RING) ? this.postProcessManager.getRings(nearestBody).settings.ringStart : 2;
+        const rings = this.postProcessManager.getRings(nearestBody);
+        const switchLimit = rings !== null ? rings.settings.ringStart : 2;
         if (isOrbiting(controller, nearestBody, switchLimit)) this.postProcessManager.setSurfaceOrder();
         else this.postProcessManager.setSpaceOrder();
         this.postProcessManager.update(deltaTime);

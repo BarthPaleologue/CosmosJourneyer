@@ -4,11 +4,11 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { UberScene } from "../uberCore/uberScene";
 import { Assets } from "../assets";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { centeredRand } from "extended-random";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { GasPlanet } from "../bodies/planemos/gasPlanet";
-import { BodyPostProcess } from "./bodyPostProcess";
+import { ObjectPostProcess } from "./objectPostProcess";
 import { IOrbitalObject } from "../orbits/iOrbitalObject";
 
 const shaderName = "atmosphericScattering";
@@ -27,8 +27,9 @@ export interface AtmosphereSettings {
     mieHaloRadius: number;
 }
 
-export class AtmosphericScatteringPostProcess extends BodyPostProcess {
-    settings: AtmosphereSettings;
+export class AtmosphericScatteringPostProcess extends UberPostProcess implements ObjectPostProcess {
+    readonly settings: AtmosphereSettings;
+    readonly object: TelluricPlanemo | GasPlanet;
 
     constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: IOrbitalObject[]) {
         const settings: AtmosphereSettings = {
@@ -131,8 +132,9 @@ export class AtmosphericScatteringPostProcess extends BodyPostProcess {
             }
         ];
 
-        super(name, planet, shaderName, uniforms, samplers, scene);
+        super(name, shaderName, uniforms, samplers, scene);
 
+        this.object = planet;
         this.settings = settings;
     }
 }

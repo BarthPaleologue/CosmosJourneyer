@@ -135,9 +135,13 @@ engine.init();
 positionNearObject(scene.getActiveController(), planet, starSystem, 2);
 
 const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
-aresAtmosphere.settings.redWaveLength = 500;
-aresAtmosphere.settings.greenWaveLength = 680;
-aresAtmosphere.settings.blueWaveLength = 670;
+if (aresAtmosphere) {
+    aresAtmosphere.settings.redWaveLength = 500;
+    aresAtmosphere.settings.greenWaveLength = 680;
+    aresAtmosphere.settings.blueWaveLength = 670;
+} else {
+    console.warn("No atmosphere found for Ares");
+}
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "g") {

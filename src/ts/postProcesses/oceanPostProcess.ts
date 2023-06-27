@@ -3,10 +3,10 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import oceanFragment from "../../shaders/oceanFragment.glsl";
 import { Assets } from "../assets";
 import { UberScene } from "../uberCore/uberScene";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
-import { BodyPostProcess } from "./bodyPostProcess";
+import { ObjectPostProcess } from "./objectPostProcess";
 import { IOrbitalObject } from "../orbits/iOrbitalObject";
 
 const shaderName = "ocean";
@@ -21,8 +21,9 @@ export interface OceanSettings {
     waveBlendingSharpness: number;
 }
 
-export class OceanPostProcess extends BodyPostProcess {
-    settings: OceanSettings;
+export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess {
+    readonly settings: OceanSettings;
+    readonly object: TelluricPlanemo;
 
     constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: IOrbitalObject[]) {
         const settings: OceanSettings = {
@@ -116,8 +117,9 @@ export class OceanPostProcess extends BodyPostProcess {
             }
         ];
 
-        super(name, planet, shaderName, uniforms, samplers, scene);
+        super(name, shaderName, uniforms, samplers, scene);
 
+        this.object = planet;
         this.settings = settings;
     }
 }

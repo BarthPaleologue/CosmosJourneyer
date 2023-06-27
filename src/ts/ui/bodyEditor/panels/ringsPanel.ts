@@ -1,21 +1,16 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
 import { AbstractBody } from "../../../bodies/abstractBody";
-import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { PostProcessType } from "../../../postProcesses/postProcessTypes";
+import { RingsPostProcess } from "../../../postProcesses/ringsPostProcess";
 
 export class RingsPanel extends EditorPanel {
     constructor() {
         super("rings");
     }
-    init(body: AbstractBody, postProcessManager: PostProcessManager) {
+    init(body: AbstractBody, rings: RingsPostProcess) {
         for (const slider of this.sliders) slider.remove();
-
-        if (!body.postProcesses.includes(PostProcessType.RING)) return;
-        const rings = postProcessManager.getRings(body);
-        this.enable();
 
         const ringsToggler = clearAllEventListenersById("ringsToggler");
         ringsToggler.addEventListener("click", () => {

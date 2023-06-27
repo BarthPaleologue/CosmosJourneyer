@@ -117,9 +117,9 @@ export class PostProcessManager {
      * Returns the ocean post process for the given planet. Throws an error if no ocean is found.
      * @param planet A telluric planet
      */
-    public getOcean(planet: TelluricPlanemo): OceanPostProcess {
-        for (const ocean of this.oceans) if (ocean.body === planet) return ocean;
-        throw new Error("No ocean found for: " + planet.name);
+    public getOcean(planet: TelluricPlanemo): OceanPostProcess | null {
+        for (const ocean of this.oceans) if (ocean.object === planet) return ocean;
+        return null;
     }
 
     /**
@@ -137,9 +137,9 @@ export class PostProcessManager {
      * Returns the clouds post process for the given planet. Throws an error if no clouds are found.
      * @param planet A telluric planet
      */
-    public getClouds(planet: TelluricPlanemo): CloudsPostProcess {
-        for (const clouds of this.clouds) if (clouds.body === planet) return clouds;
-        throw new Error("No clouds found for: " + planet.name);
+    public getClouds(planet: TelluricPlanemo): CloudsPostProcess | null {
+        for (const clouds of this.clouds) if (clouds.object === planet) return clouds;
+        return null;
     }
 
     /**
@@ -163,9 +163,9 @@ export class PostProcessManager {
      * Returns the atmosphere post process for the given planet. Throws an error if no atmosphere is found.
      * @param planet A gas or telluric planet
      */
-    public getAtmosphere(planet: GasPlanet | TelluricPlanemo): AtmosphericScatteringPostProcess {
-        for (const atmosphere of this.atmospheres) if (atmosphere.body === planet) return atmosphere;
-        throw new Error("No atmosphere found for: " + planet.name);
+    public getAtmosphere(planet: GasPlanet | TelluricPlanemo): AtmosphericScatteringPostProcess | null {
+        for (const atmosphere of this.atmospheres) if (atmosphere.object === planet) return atmosphere;
+        return null;
     }
 
     /**
@@ -181,9 +181,9 @@ export class PostProcessManager {
      * Returns the rings post process for the given body. Throws an error if no rings are found.
      * @param body A body
      */
-    public getRings(body: AbstractBody): RingsPostProcess {
-        for (const rings of this.rings) if (rings.body === body) return rings;
-        throw new Error("No rings found for: " + body.name);
+    public getRings(body: AbstractBody): RingsPostProcess | null {
+        for (const rings of this.rings) if (rings.object === body) return rings;
+        return null;
     }
 
     /**
@@ -215,9 +215,9 @@ export class PostProcessManager {
      * Returns the volumetric light post process for the given star. Throws an error if no volumetric light is found.
      * @param star A star
      */
-    public getVolumetricLight(star: Star): VolumetricLight {
+    public getVolumetricLight(star: Star): VolumetricLight | null {
         for (const volumetricLight of this.volumetricLights) if (volumetricLight.body === star) return volumetricLight;
-        throw new Error("No volumetric light found for: " + star.name);
+        return null;
     }
 
     /**
@@ -228,9 +228,9 @@ export class PostProcessManager {
         this.blackHoles.push(new BlackHolePostProcess(blackHole.name, blackHole, this.scene));
     }
 
-    public getBlackHole(blackHole: BlackHole): BlackHolePostProcess {
-        for (const bh of this.blackHoles) if (bh.body === blackHole) return bh;
-        throw new Error("No black hole found for: " + blackHole.name);
+    public getBlackHole(blackHole: BlackHole): BlackHolePostProcess | null {
+        for (const bh of this.blackHoles) if (bh.object === blackHole) return bh;
+        return null;
     }
 
     /**

@@ -1,11 +1,11 @@
 import { AbstractBody } from "../bodies/abstractBody";
-import { BodyPostProcess } from "../postProcesses/bodyPostProcess";
+import { ObjectPostProcess } from "../postProcesses/objectPostProcess";
 
-export function extractRelevantPostProcesses(postProcesses: BodyPostProcess[], body: AbstractBody): [BodyPostProcess[], BodyPostProcess[]] {
+export function extractRelevantPostProcesses(postProcesses: ObjectPostProcess[], body: AbstractBody): [ObjectPostProcess[], ObjectPostProcess[]] {
     const relevant = [];
     const notRelevant = [];
     for (const postProcess of postProcesses) {
-        if (postProcess.body === body) relevant.push(postProcess);
+        if (postProcess.object === body) relevant.push(postProcess);
         else notRelevant.push(postProcess);
     }
     return [relevant, notRelevant];

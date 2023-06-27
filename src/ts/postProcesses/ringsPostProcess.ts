@@ -1,10 +1,10 @@
 import ringsFragment from "../../shaders/ringsFragment.glsl";
 import { AbstractBody } from "../bodies/abstractBody";
 import { UberScene } from "../uberCore/uberScene";
-import { ShaderDataType, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
+import { ShaderDataType, ShaderUniforms, UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { normalRandom, randRange } from "extended-random";
-import { BodyPostProcess } from "./bodyPostProcess";
+import { ObjectPostProcess } from "./objectPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -21,8 +21,9 @@ interface RingsSettings {
     ringColor: Color3;
 }
 
-export class RingsPostProcess extends BodyPostProcess {
-    settings: RingsSettings;
+export class RingsPostProcess extends UberPostProcess implements ObjectPostProcess {
+    readonly settings: RingsSettings;
+    readonly object: AbstractBody;
 
     constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
         const settings: RingsSettings = {
@@ -80,8 +81,9 @@ export class RingsPostProcess extends BodyPostProcess {
             }
         ];
 
-        super(body.name + "Rings", body, shaderName, uniforms, getSamplers(scene), scene);
+        super(body.name + "Rings", shaderName, uniforms, getSamplers(scene), scene);
 
+        this.object = body;
         this.settings = settings;
     }
 }

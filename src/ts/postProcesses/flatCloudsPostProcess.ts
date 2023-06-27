@@ -7,10 +7,10 @@ import { gcd } from "terrain-generation";
 
 import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
 import { UberScene } from "../uberCore/uberScene";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
-import { BodyPostProcess } from "./bodyPostProcess";
+import { ObjectPostProcess } from "./objectPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 
 const shaderName = "flatClouds";
@@ -29,8 +29,9 @@ export interface CloudSettings {
     detailSpeed: number;
 }
 
-export class FlatCloudsPostProcess extends BodyPostProcess {
-    settings: CloudSettings;
+export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPostProcess {
+    readonly settings: CloudSettings;
+    readonly object: TelluricPlanemo;
 
     constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
         const settings: CloudSettings = {
@@ -147,8 +148,9 @@ export class FlatCloudsPostProcess extends BodyPostProcess {
             }
         ];
 
-        super(name, planet, shaderName, uniforms, samplers, scene);
+        super(name, shaderName, uniforms, samplers, scene);
 
+        this.object = planet;
         this.settings = settings;
     }
 }

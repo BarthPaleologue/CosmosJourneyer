@@ -1,9 +1,9 @@
 import blackHoleFragment from "../../shaders/blackhole.glsl";
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/uberPostProcess";
+import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { BlackHole } from "../bodies/stellarObjects/blackHole";
-import { BodyPostProcess } from "./bodyPostProcess";
+import { ObjectPostProcess } from "./objectPostProcess";
 import { Assets } from "../assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 
@@ -15,8 +15,9 @@ export interface BlackHoleSettings {
     rotationPeriod: number;
 }
 
-export class BlackHolePostProcess extends BodyPostProcess {
-    settings: BlackHoleSettings;
+export class BlackHolePostProcess extends UberPostProcess implements ObjectPostProcess {
+    readonly settings: BlackHoleSettings;
+    readonly object: BlackHole;
 
     constructor(name: string, blackHole: BlackHole, scene: UberScene) {
         const settings: BlackHoleSettings = {
@@ -75,8 +76,9 @@ export class BlackHolePostProcess extends BodyPostProcess {
             }
         ];
 
-        super(name, blackHole, shaderName, uniforms, samplers, scene);
+        super(name, shaderName, uniforms, samplers, scene);
 
+        this.object = blackHole;
         this.settings = settings;
     }
 }

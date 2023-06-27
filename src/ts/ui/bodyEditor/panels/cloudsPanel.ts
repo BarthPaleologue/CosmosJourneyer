@@ -1,21 +1,17 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
 import { TelluricPlanemo } from "../../../bodies/planemos/telluricPlanemo";
-import { PostProcessManager } from "../../../postProcesses/postProcessManager";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { PostProcessType } from "../../../postProcesses/postProcessTypes";
+import { CloudsPostProcess } from "../../../postProcesses/volumetricCloudsPostProcess";
 
 export class CloudsPanel extends EditorPanel {
     constructor() {
         super("clouds");
     }
-    init(planet: TelluricPlanemo, postProcessManager: PostProcessManager) {
+    init(planet: TelluricPlanemo, flatClouds: CloudsPostProcess) {
         for (const slider of this.sliders) slider.remove();
-
-        if (!planet.postProcesses.includes(PostProcessType.CLOUDS)) return;
-        const flatClouds = postProcessManager.getClouds(planet);
 
         const cloudsToggler = clearAllEventListenersById("cloudsToggler");
         cloudsToggler.addEventListener("click", () => {

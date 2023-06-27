@@ -18,10 +18,8 @@ import { RingsPanel } from "./panels/ringsPanel";
 import { OceanPanel } from "./panels/oceanPanel";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
 import { UberScene } from "../../uberCore/uberScene";
-import { BODY_TYPE } from "../../models/common";
 import { BlackHole } from "../../bodies/stellarObjects/blackHole";
 import { BlackholePanel } from "./panels/blackholePanel";
-import { PostProcessType } from "../../postProcesses/postProcessTypes";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -39,16 +37,16 @@ export class BodyEditor {
 
     private currentBodyId: string | null = null;
 
-    private readonly generalPanel: EditorPanel;
-    private readonly physicPanel: EditorPanel;
-    private readonly oceanPanel: EditorPanel;
-    private readonly surfacePanel: EditorPanel;
-    private readonly gazCloudsPanel: EditorPanel;
-    private readonly cloudsPanel: EditorPanel;
-    private readonly atmospherePanel: EditorPanel;
-    private readonly ringsPanel: EditorPanel;
-    private readonly starPanel: EditorPanel;
-    private readonly blackHolePanel: EditorPanel;
+    private readonly generalPanel: GeneralPanel;
+    private readonly physicPanel: PhysicPanel;
+    private readonly oceanPanel: OceanPanel;
+    private readonly surfacePanel: SurfacePanel;
+    private readonly gazCloudsPanel: GasCloudsPanel;
+    private readonly cloudsPanel: CloudsPanel;
+    private readonly atmospherePanel: AtmospherePanel;
+    private readonly ringsPanel: RingsPanel;
+    private readonly starPanel: StarPanel;
+    private readonly blackHolePanel: BlackholePanel;
     private readonly panels: EditorPanel[];
 
     constructor(visibility: EditorVisibility = EditorVisibility.FULL) {
@@ -145,82 +143,67 @@ export class BodyEditor {
 
     public setBody(body: AbstractBody, postProcessManager: PostProcessManager, scene: UberScene) {
         this.currentBodyId = body.name;
-        this.initNavBar(body);
-        switch (body.model.bodyType) {
-            case BODY_TYPE.TELLURIC:
-                this.setTelluricPlanet(body as TelluricPlanemo, postProcessManager, scene);
-                break;
-            case BODY_TYPE.STAR:
-                this.setStar(body as Star, postProcessManager, scene);
-                break;
-            case BODY_TYPE.GAS:
-                this.setGazPlanet(body as GasPlanet, postProcessManager, scene);
-                break;
-            case BODY_TYPE.BLACK_HOLE:
-                this.setBlackHole(body as BlackHole, postProcessManager, scene);
-                break;
-            default:
-        }
-        this.generalPanel.init(body, postProcessManager, scene);
-        this.ringsPanel.init(body, postProcessManager, scene);
-    }
 
-    public setTelluricPlanet(planet: TelluricPlanemo, postProcessManager: PostProcessManager, scene: UberScene) {
-        this.physicPanel.init(planet, postProcessManager, scene);
-        this.surfacePanel.init(planet, postProcessManager, scene);
-        this.atmospherePanel.init(planet, postProcessManager, scene);
-        this.cloudsPanel.init(planet, postProcessManager, scene);
-        this.oceanPanel.init(planet, postProcessManager, scene);
-
-        this.initToolbar(planet);
-    }
-
-    public setGazPlanet(planet: GasPlanet, postProcessManager: PostProcessManager, scene: UberScene) {
-        this.gazCloudsPanel.init(planet, postProcessManager, scene);
-        this.atmospherePanel.init(planet, postProcessManager, scene);
-    }
-
-    public setStar(star: Star, postProcesManager: PostProcessManager, scene: UberScene) {
-        this.starPanel.init(star, postProcesManager, scene);
-    }
-
-    public setBlackHole(blackHole: BlackHole, postProcessManager: PostProcessManager, scene: UberScene) {
-        this.blackHolePanel.init(blackHole, postProcessManager, scene);
-    }
-
-    public initNavBar(body: AbstractBody): void {
         for (const panel of this.panels) panel.disable();
 
-        switch (body.model.bodyType) {
-            case BODY_TYPE.STAR:
-                this.starPanel.enable();
-                break;
-            case BODY_TYPE.BLACK_HOLE:
-                this.blackHolePanel.enable();
-                break;
-            case BODY_TYPE.TELLURIC:
-                this.physicPanel.enable();
+        const rings = postProcessManager.getRings(body as AbstractBody);
+        if (rings) {
+            this.ringsPanel.enable();
+            this.ringsPanel.setVisibility(this.currentPanel === this.ringsPanel);
+            this.ringsPanel.init(body, rings);
+        }
 
-                this.oceanPanel.enable();
-                this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel && body.postProcesses.includes(PostProcessType.OCEAN));
-
-                this.surfacePanel.enable();
-
-                this.cloudsPanel.enable();
-                this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel && body.postProcesses.includes(PostProcessType.CLOUDS));
-
-                this.atmospherePanel.enable();
-                this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel && body.postProcesses.includes(PostProcessType.ATMOSPHERE));
-
-                break;
-            case BODY_TYPE.GAS:
+        if (body instanceof TelluricPlanemo || body instanceof GasPlanet) {
+            const atmosphere = postProcessManager.getAtmosphere(body as TelluricPlanemo);
+            if (atmosphere) {
                 this.atmospherePanel.enable();
                 this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel);
+                this.atmospherePanel.init(body, atmosphere);
+            }
 
+            if (body instanceof TelluricPlanemo) {
+                this.surfacePanel.enable();
+                this.surfacePanel.setVisibility(this.currentPanel === this.surfacePanel);
+                this.surfacePanel.init(body);
+
+                this.physicPanel.enable();
+                this.physicPanel.setVisibility(this.currentPanel === this.physicPanel);
+                this.physicPanel.init(body);
+
+                const clouds = postProcessManager.getClouds(body as TelluricPlanemo);
+                if (clouds) {
+                    this.cloudsPanel.enable();
+                    this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel);
+                    this.cloudsPanel.init(body, clouds);
+                }
+
+                const ocean = postProcessManager.getOcean(body as TelluricPlanemo);
+                if (ocean) {
+                    this.oceanPanel.enable();
+                    this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel);
+                    this.oceanPanel.init(body, ocean);
+                }
+            } else {
                 this.gazCloudsPanel.enable();
                 this.gazCloudsPanel.setVisibility(this.currentPanel === this.gazCloudsPanel);
-                break;
+                this.gazCloudsPanel.init(body);
+            }
+        } else if (body instanceof Star) {
+            const volumetricLight = postProcessManager.getVolumetricLight(body as Star);
+            if (volumetricLight) {
+                this.starPanel.enable();
+                this.starPanel.setVisibility(this.currentPanel === this.starPanel);
+                this.starPanel.init(body, volumetricLight);
+            }
+        } else if (body instanceof BlackHole) {
+            const blackHole = postProcessManager.getBlackHole(body as BlackHole);
+            if (blackHole) {
+                this.blackHolePanel.enable();
+                this.blackHolePanel.setVisibility(this.currentPanel === this.blackHolePanel);
+                this.blackHolePanel.init(body, blackHole);
+            }
         }
+
         if (this.currentPanel !== null) {
             const currentNavBarButton = this.currentPanel.anchor;
             if (currentNavBarButton.style.display === "none") this.setVisibility(EditorVisibility.NAVBAR);
