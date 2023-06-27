@@ -26,6 +26,7 @@ import HavokPhysics from "@babylonjs/havok";
 
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
 import { SystemUI } from "./ui/systemUI";
+import { BlackHole } from "./bodies/stellarObjects/blackHole";
 
 export class PlanetEngine {
     // UI
@@ -122,7 +123,9 @@ export class PlanetEngine {
         this.starMap.registerWarpCallback((seed: number) => {
             this.setStarSystem(new StarSystem(seed, this.getStarSystemScene()), true);
             this.init();
-            positionNearObject(this.getStarSystemScene().getActiveController(), this.getStarSystem().getBodies()[0], this.getStarSystem());
+            const firstBody = this.getStarSystem().getBodies()[0];
+            if(firstBody === undefined) throw new Error("No bodies in star system");
+            positionNearObject(this.getStarSystemScene().getActiveController(), firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 5 : 3);
             this.toggleStarMap();
         });
 
