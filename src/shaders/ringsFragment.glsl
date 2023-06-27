@@ -56,7 +56,9 @@ float ringDensityAtPoint(vec3 samplePoint) {
 	if(normalizedDistance < ringStart || normalizedDistance > ringEnd) return 0.0;
 
     // compute the actual density of the rings at the sample point
+    float macroRingDensity = completeNoise(vec3(normalizedDistance) * ringFrequency / 10.0, 1, 2.0, 2.0);
 	float ringDensity = completeNoise(vec3(normalizedDistance) * ringFrequency, 5, 2.0, 2.0);
+    ringDensity = mix(ringDensity, macroRingDensity, 0.5);
     ringDensity *= smoothstep(ringStart, ringStart + 0.03, normalizedDistance);
     ringDensity *= smoothstep(ringEnd, ringEnd - 0.03, normalizedDistance);
 

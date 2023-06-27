@@ -30,7 +30,7 @@ export class RingsPostProcess extends BodyPostProcess {
             ringEnd: randRange(2.1, 4.0, body.model.rng, 1410),
             ringFrequency: 30.0,
             ringOpacity: clamp(normalRandom(0.7, 0.1, body.model.rng, 1420), 0, 1),
-            ringColor: new Color3(214, 168, 122).scaleInPlace(1 / 255)
+            ringColor: new Color3(214, 168, 122).scaleInPlace(randRange(1.0, 1.5, body.model.rng, 1430) / 255)
         };
         const uniforms: ShaderUniforms = [
             ...getObjectUniforms(body),
