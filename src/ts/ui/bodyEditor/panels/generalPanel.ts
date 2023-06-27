@@ -63,7 +63,7 @@ export class GeneralPanel extends EditorPanel {
             new Slider("saturation", document.getElementById("saturation") as HTMLElement, 0, 200, colorCorrection.saturation * 100, (val: number) => {
                 colorCorrection.saturation = val / 100;
             }),
-            new Slider("gamma", document.getElementById("gamma") as HTMLElement, 0, 200, colorCorrection.gamma * 100, (val: number) => {
+            new Slider("gamma", document.getElementById("gamma") as HTMLElement, 0, 300, colorCorrection.gamma * 100, (val: number) => {
                 colorCorrection.gamma = val / 100;
             })
         ];
