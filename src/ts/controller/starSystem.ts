@@ -279,13 +279,6 @@ export class StarSystem {
     }
 
     /**
-     * Returns the list of all planets managed by the star system
-     */
-    public getPlanets(): Planemo[] {
-        return this.planemos;
-    }
-
-    /**
      * Returns the nearest body to the origin
      */
     public getNearestBody(position = Vector3.Zero()): AbstractBody {
