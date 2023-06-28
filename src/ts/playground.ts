@@ -33,7 +33,7 @@ await Assets.Init(scene);
 
 const havokInstance = await HavokPhysics();
 const havokPlugin = new HavokPlugin(true, havokInstance);
-scene.enablePhysics(null, havokPlugin);
+scene.enablePhysics(Vector3.Zero(), havokPlugin);
 
 // This creates and positions a free camera (non-mesh)
 const camera = new ArcRotateCamera("camera", -Math.PI / 2, 1.0, 15, Vector3.Zero(), scene);
@@ -83,12 +83,19 @@ const spaceshipAggregate = new PhysicsAggregate(spaceship, PhysicsShapeType.BOX,
 // add impulse to box
 boxAggregate.body.applyImpulse(new Vector3(0, 0, -1), box.getAbsolutePosition());
 
+const physicBodies = [sphereAggregate, groundAggregate, boxAggregate, spaceshipAggregate];
+
+const gravity = new Vector3(0, -9.81, 0);
 
 let clock = 0;
 
 function updateScene() {
     const deltaTime = engine.getDeltaTime() / 1000;
     clock += deltaTime;
+
+    for(const body of physicBodies) {
+        body.body.applyForce(gravity, body.body.getObjectCenterWorld());
+    }
 }
 
 scene.executeWhenReady(() => {
