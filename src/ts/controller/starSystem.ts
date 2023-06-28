@@ -15,6 +15,10 @@ import { StellarObject } from "../view/bodies/stellarObjects/stellarObject";
 import { SpaceStation } from "../view/spacestation/spaceStation";
 import { AbstractObject } from "../view/bodies/abstractObject";
 import { romanNumeral } from "../utils/nameGenerator";
+import { TelluricPlanemoModel } from "../model/planemos/telluricPlanemoModel";
+import { GasPlanetModel } from "../model/planemos/gasPlanetModel";
+import { BlackHoleModel } from "../model/stellarObjects/blackHoleModel";
+import { StarModel } from "../model/stellarObjects/starModel";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -59,11 +63,11 @@ export class StarSystem {
 
     readonly model: StarSystemModel;
 
-    constructor(seed: number, scene: UberScene) {
+    constructor(model: StarSystemModel | number, scene: UberScene) {
         this.scene = scene;
         this.postProcessManager = new PostProcessManager(this.scene);
 
-        this.model = new StarSystemModel(seed);
+        this.model = model instanceof StarSystemModel ? model : new StarSystemModel(model);
     }
 
     /**
@@ -125,7 +129,7 @@ export class StarSystem {
      * Makes a star and adds it to the system. By default, it will use the next available seed planned by the system model
      * @param seed The seed to use for the star generation (by default, the next available seed planned by the system modell)
      */
-    public makeStellarObject(seed = this.model.getStarSeed(this.stellarObjects.length)): StellarObject {
+    public makeStellarObject(seed: number = this.model.getStarSeed(this.stellarObjects.length)): StellarObject {
         if (this.stellarObjects.length >= this.model.getNbStars())
             console.warn(`You are adding a star 
         to a system that already has ${this.stellarObjects.length} stars.
@@ -133,28 +137,31 @@ export class StarSystem {
 
         const isStellarObjectBlackHole = this.model.getBodyTypeOfStar(this.stellarObjects.length) === BODY_TYPE.BLACK_HOLE;
 
-        const star = isStellarObjectBlackHole
-            ? new BlackHole(`${this.model.getName()} ${this.stellarObjects.length}`, seed, [], this.scene)
-            : new Star(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, seed, []);
+        if (isStellarObjectBlackHole) return this.makeBlackHole(seed);
+        else return this.makeStar(seed);
+    }
 
-        //TODO: make this better, make it part of the generation
-        star.model.orbitalProperties.periapsis = star.getRadius() * 4;
-        star.model.orbitalProperties.apoapsis = star.getRadius() * 4;
+    public makeStar(model: number | StarModel = this.model.getStarSeed(this.stellarObjects.length)): Star {
+        if (this.stellarObjects.length >= this.model.getNbStars())
+            console.warn(`You are adding a star 
+        to a system that already has ${this.stellarObjects.length} stars.
+        The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
 
+        const star = new Star(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, [], model);
         this.addStellarObject(star);
         return star;
     }
 
     /**
-     * Makes a black hole and adds it to the system. By default, it will use the next available seed planned by the system 
-     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system model)
+     * Makes a black hole and adds it to the system. By default, it will use the next available model planned by the system
+     * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public makeBlackHole(seed = this.model.getStarSeed(this.stellarObjects.length)): BlackHole {
+    public makeBlackHole(model: number | BlackHoleModel = this.model.getStarSeed(this.stellarObjects.length)): BlackHole {
         if (this.stellarObjects.length >= this.model.getNbStars())
             console.warn(`You are adding a black hole
         to a system that already has ${this.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
-        const blackHole = new BlackHole(`${this.model.getName()} ${this.stellarObjects.length}`, seed, this.stellarObjects, this.scene);
+        const blackHole = new BlackHole(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, this.stellarObjects, model);
 
         this.addStellarObject(blackHole);
         return blackHole;
@@ -170,29 +177,29 @@ export class StarSystem {
     }
 
     /**
-     * Makes a telluric planet and adds it to the system. By default, it will use the next available seed planned by the system model
-     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system model)
+     * Makes a telluric planet and adds it to the system. By default, it will use the next available model planned by the system model
+     * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public makeTelluricPlanet(seed = this.model.getPlanetSeed(this.planets.length)): TelluricPlanemo {
+    public makeTelluricPlanet(model: number | TelluricPlanemoModel = this.model.getPlanetSeed(this.planets.length)): TelluricPlanemo {
         if (this.planets.length >= this.model.getNbPlanets())
             console.warn(`You are adding a telluric planet to the system.
             The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
             This might cause issues, or not who knows.`);
-        const planet = new TelluricPlanemo(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, seed, this.stellarObjects);
+        const planet = new TelluricPlanemo(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, this.stellarObjects, model);
         this.addTelluricPlanet(planet);
         return planet;
     }
 
     /**
-     * Makes a gas planet and adds it to the system. By default, it will use the next available seed planned by the system model
-     * @param seed The seed to use for the planet generation (by default, the next available seed planned by the system model)
+     * Makes a gas planet and adds it to the system. By default, it will use the next available model planned by the system model
+     * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public makeGasPlanet(seed = this.model.getPlanetSeed(this.planets.length)): GasPlanet {
+    public makeGasPlanet(model: number | GasPlanetModel = this.model.getPlanetSeed(this.planets.length)): GasPlanet {
         if (this.planets.length >= this.model.getNbPlanets())
             console.warn(`You are adding a gas planet to the system.
             The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
             This might cause issues, or not who knows.`);
-        const planet = new GasPlanet(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, seed, this.stellarObjects);
+        const planet = new GasPlanet(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, this.stellarObjects, model);
         this.addGasPlanet(planet);
         return planet;
     }
@@ -213,8 +220,11 @@ export class StarSystem {
         }
     }
 
-    public makeSatellite(planet: TelluricPlanemo | GasPlanet, seed = planet.model.getMoonSeed(planet.model.childrenBodies.length)): TelluricPlanemo {
-        const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, this.scene, seed, [planet]);
+    public makeSatellite(
+        planet: TelluricPlanemo | GasPlanet,
+        model: TelluricPlanemoModel | number = planet.model.getMoonSeed(planet.model.childrenBodies.length)
+    ): TelluricPlanemo {
+        const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, this.scene, [planet], model);
 
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
         satellite.material.updateConstants();

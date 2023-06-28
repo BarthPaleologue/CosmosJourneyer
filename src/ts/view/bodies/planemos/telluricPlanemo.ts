@@ -28,16 +28,19 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
      * New Telluric Planet
      * @param name The name of the planet
      * @param scene
-     * @param seed The seed of the planet in [-1, 1]
      * @param parentBodies The bodies the planet is orbiting
+     * @param model The model to build the planet or a seed for the planet in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
+    constructor(name: string, scene: UberScene, parentBodies: AbstractBody[], model: TelluricPlanemoModel | number) {
         super(name, parentBodies, scene);
 
-        this.model = new TelluricPlanemoModel(
-            seed,
-            parentBodies.map((body) => body.model)
-        );
+        this.model =
+            model instanceof TelluricPlanemoModel
+                ? model
+                : new TelluricPlanemoModel(
+                      model,
+                      parentBodies.map((body) => body.model)
+                  );
 
         this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
 

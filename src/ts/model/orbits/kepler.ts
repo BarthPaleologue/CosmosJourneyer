@@ -19,9 +19,9 @@ export function keplerEquation(E: number, M: number, e: number) {
 
 /**
  * Solves Kepler's equation for the eccentric anomaly using Newton's method
- * @param M 
- * @param e 
- * @returns 
+ * @param M
+ * @param e
+ * @returns
  */
 export function solveKepler(M: number, e: number) {
     const h = 1e-4;

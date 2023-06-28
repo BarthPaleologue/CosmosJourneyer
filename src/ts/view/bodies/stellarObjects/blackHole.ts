@@ -12,10 +12,10 @@ export class BlackHole extends AbstractBody {
 
     readonly model: BlackHoleModel;
 
-    constructor(name: string, seed: number, parentBodies: AbstractBody[], scene: Scene) {
+    constructor(name: string, scene: Scene, parentBodies: AbstractBody[], model: BlackHoleModel | number) {
         super(name, parentBodies, scene);
 
-        this.model = new BlackHoleModel(seed);
+        this.model = model instanceof BlackHoleModel ? model : new BlackHoleModel(model);
 
         this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
 

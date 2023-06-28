@@ -88,7 +88,7 @@ const constellationNames: string[] = [
     "Vela",
     "Virgo",
     "Volans",
-    "Vulpecula",
+    "Vulpecula"
 ];
 
 const greekLetters: string[] = [
@@ -120,20 +120,30 @@ const greekLetters: string[] = [
 
 export function romanNumeral(n: number): string {
     switch (n) {
-        case 1: return "I";
-        case 2: return "II";
-        case 3: return "III";
-        case 4: return "IV";
-        case 5: return "V";
-        case 6: return "VI";
-        case 7: return "VII";
-        case 8: return "VIII";
-        case 9: return "IX";
-        case 10: return "X";
-        default: return n.toString();
+        case 1:
+            return "I";
+        case 2:
+            return "II";
+        case 3:
+            return "III";
+        case 4:
+            return "IV";
+        case 5:
+            return "V";
+        case 6:
+            return "VI";
+        case 7:
+            return "VII";
+        case 8:
+            return "VIII";
+        case 9:
+            return "IX";
+        case 10:
+            return "X";
+        default:
+            return n.toString();
     }
 }
-
 
 export function generateName(rng: (step: number) => number, baseStep = 0): string {
     const constellation = constellationNames[Math.floor(rng(baseStep) * constellationNames.length)];

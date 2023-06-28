@@ -64,15 +64,15 @@ export class PlanetEngine {
             if (e.key === "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
             if (e.key === "p") Tools.CreateScreenshot(this.getEngine(), this.getStarSystemScene().getActiveController().getActiveCamera(), { precision: 4 });
             if (e.key === "v") {
-                if(!VideoRecorder.IsSupported(this.getEngine())) console.warn("Your browser does not support video recording!");
+                if (!VideoRecorder.IsSupported(this.getEngine())) console.warn("Your browser does not support video recording!");
                 if (this.videoRecorder === null) {
                     this.videoRecorder = new VideoRecorder(this.getEngine(), {
                         fps: 60,
                         recordChunckSize: 3000000,
-                        mimeType: "video/webm;codecs=h264",
+                        mimeType: "video/webm;codecs=h264"
                     });
                     this.videoRecorder.startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10")));
-                } else if(this.videoRecorder.isRecording) {
+                } else if (this.videoRecorder.isRecording) {
                     this.videoRecorder.stopRecording();
                 } else {
                     this.videoRecorder.startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10")));
@@ -113,7 +113,7 @@ export class PlanetEngine {
      */
     public async setup(): Promise<void> {
         this.engine = new Engine(this.canvas); //await EngineFactory.CreateAsync(this.canvas, { enableAllFeatures: true });
-        
+
         this.engine.loadingScreen.displayLoadingUI();
 
         console.log(`API: ${this.engine instanceof WebGPUEngine ? "WebGPU" : "WebGL" + this.engine.webGLVersion}`);
@@ -124,7 +124,7 @@ export class PlanetEngine {
             this.setStarSystem(new StarSystem(seed, this.getStarSystemScene()), true);
             this.init();
             const firstBody = this.getStarSystem().getBodies()[0];
-            if(firstBody === undefined) throw new Error("No bodies in star system");
+            if (firstBody === undefined) throw new Error("No bodies in star system");
             positionNearObject(this.getStarSystemScene().getActiveController(), firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 5 : 3);
             this.toggleStarMap();
         });

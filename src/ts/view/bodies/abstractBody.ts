@@ -9,6 +9,7 @@ export abstract class AbstractBody extends AbstractObject {
      * An abstract representation of a celestial body
      * @param name the name of the celestial body
      * @param parentBodies the parent bodies of this body
+     * @param scene
      */
     protected constructor(name: string, parentBodies: AbstractBody[], scene: Scene) {
         super(name, parentBodies, scene);

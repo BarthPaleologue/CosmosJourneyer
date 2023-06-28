@@ -8,6 +8,9 @@ export interface ITransformable {
 }
 
 export interface BoundingSphere extends ITransformable {
+    /**
+     * Returns apparent radius of the celestial body (can be greater than the actual radius for example : ocean)
+     */
     getBoundingRadius(): number;
 }
 

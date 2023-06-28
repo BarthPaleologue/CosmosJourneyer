@@ -69,7 +69,9 @@ export class TelluricPlanemoModel implements PlanemoModel {
         let apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
 
         const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.3, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
-        const orbitalQuaternion = isOrbitalPlaneAlignedWithParent ? Quaternion.Identity() : Quaternion.RotationAxis(Vector3.Random().normalize(), this.rng(GENERATION_STEPS.ORBIT + 20));
+        const orbitalQuaternion = isOrbitalPlaneAlignedWithParent
+            ? Quaternion.Identity()
+            : Quaternion.RotationAxis(Vector3.Random().normalize(), this.rng(GENERATION_STEPS.ORBIT + 20));
 
         const mass = this.isSatelliteOfTelluric ? 1 : 10;
 

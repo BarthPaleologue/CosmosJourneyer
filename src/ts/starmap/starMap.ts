@@ -178,7 +178,7 @@ export class StarMap {
             },
             {
                 frame: StarMap.SHIMMER_DURATION / 60 / 2,
-                value: 1.4,
+                value: 1.4
             },
             {
                 frame: StarMap.SHIMMER_DURATION / 60,
@@ -198,7 +198,9 @@ export class StarMap {
 
         const seedableRNG = seededSquirrelNoise(Settings.UNIVERSE_SEED);
         let step = 0;
-        const perlinRNG = makeNoise3D(() => { return seedableRNG(step++) });
+        const perlinRNG = makeNoise3D(() => {
+            return seedableRNG(step++);
+        });
         this.densityRNG = (x: number, y: number, z: number) => (1.0 - Math.abs(perlinRNG(x * 0.2, y * 0.2, z * 0.2))) ** 8;
 
         this.scene.registerBeforeRender(() => {
@@ -218,7 +220,6 @@ export class StarMap {
                 this.controller.transform.translate(displacementNegated);
                 playerDisplacementNegated.addInPlace(displacementNegated);
             }
-
 
             this.starMapCenterPosition.addInPlace(playerDisplacementNegated);
             for (const mesh of this.scene.meshes) mesh.position.addInPlace(playerDisplacementNegated);
@@ -271,7 +272,6 @@ export class StarMap {
             this.registerCell(position);
         }
 
-
         this.buildNextStars(Math.min(2000, StarMap.GENERATION_CADENCE * this.controller.speed));
 
         this.starMapUI.update();
@@ -305,7 +305,7 @@ export class StarMap {
                     instance = this.recycledStars[0];
                     this.recycledStars.shift();
                     recycled = true;
-                } else instance = this.starTemplate.createInstance(data.name)
+                } else instance = this.starTemplate.createInstance(data.name);
             } else {
                 if (this.recycledBlackHoles.length > 0) {
                     instance = this.recycledBlackHoles[0];
@@ -351,16 +351,16 @@ export class StarMap {
                     this.starMapUI.attachUIToMesh(initializedInstance);
                     this.starMapUI.setUIText(
                         "Name: " +
-                        starSystemModel.getName() +
-                        "\n" +
-                        "Seed: " +
-                        starSystemModel.seed +
-                        "\n" +
-                        "Type: " +
-                        getStellarTypeString(starModel.stellarType) +
-                        "\n" +
-                        "Planets: " +
-                        starSystemModel.getNbPlanets()
+                            starSystemModel.getName() +
+                            "\n" +
+                            "Seed: " +
+                            starSystemModel.seed +
+                            "\n" +
+                            "Type: " +
+                            getStellarTypeString(starModel.stellarType) +
+                            "\n" +
+                            "Planets: " +
+                            starSystemModel.getNbPlanets()
                     );
 
                     this.selectedSystemSeed = starSystemSeed;
@@ -409,7 +409,7 @@ export class StarMap {
             if (this.starMapUI.getCurrentPickedMesh() === instance) this.starMapUI.detachUIFromMesh();
             if (this.starMapUI.getCurrentHoveredMesh() === instance) this.starMapUI.setHoveredMesh(null);
             instance.setEnabled(false);
-            recyclingList.push(instance)
+            recyclingList.push(instance);
         });
     }
 }

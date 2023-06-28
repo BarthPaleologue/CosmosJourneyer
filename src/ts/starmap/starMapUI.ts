@@ -5,7 +5,7 @@ import { Button } from "@babylonjs/gui/2D/controls/button";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 
-import hoveredCircle from "../../asset/textures/hoveredCircle.png"
+import hoveredCircle from "../../asset/textures/hoveredCircle.png";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
 
@@ -48,7 +48,7 @@ export class StarMapUI {
         this.namePlate.addControl(this.nameLabel);
         this.namePlate.addControl(this.warpButton);
 
-        this.hoveringImage = new Image("hoverImage", hoveredCircle)
+        this.hoveringImage = new Image("hoverImage", hoveredCircle);
         this.hoveringImage.width = 0.2;
         this.hoveringImage.autoScale = true;
         this.hoveringImage.alpha = 0.8;

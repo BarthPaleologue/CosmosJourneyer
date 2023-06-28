@@ -5,13 +5,14 @@ import { BaseModel } from "../../model/common";
 import { Scene } from "@babylonjs/core/scene";
 import { computeBarycenter, computePointOnOrbit } from "../../model/orbits/kepler";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
+import { Cullable } from "./cullable";
 
 export interface NextState {
     position: Vector3;
     rotation: Quaternion;
 }
 
-export abstract class AbstractObject implements IOrbitalObject, BaseObject {
+export abstract class AbstractObject implements IOrbitalObject, BaseObject, Cullable {
     readonly transform: BasicTransform;
 
     readonly nextState: NextState = {
@@ -39,6 +40,7 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject {
      * An abstract representation of a celestial body
      * @param name the name of the celestial body
      * @param parentObjects the parent objects of this object
+     * @param scene
      */
     protected constructor(name: string, parentObjects: AbstractObject[], scene: Scene) {
         this.name = name;
@@ -56,9 +58,6 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject {
         else this.depth = minDepth + 1;
     }
 
-    /**
-     * Returns apparent radius of the celestial body (can be greater than the actual radius for example : ocean)
-     */
     public abstract getBoundingRadius(): number;
 
     /**
@@ -95,7 +94,7 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject {
     public computeNextOrbitalPosition(): Vector3 {
         if (this.model.orbitalProperties.period > 0) {
             const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentObjects);
-            if(this.model.orbitalProperties.isPlaneAlignedWithParent) this.model.orbitalProperties.orientationQuaternion = orientationQuaternion;
+            if (this.model.orbitalProperties.isPlaneAlignedWithParent) this.model.orbitalProperties.orientationQuaternion = orientationQuaternion;
 
             const newPosition = computePointOnOrbit(barycenter, this.model.orbitalProperties, this.internalClock);
             this.nextState.position.copyFrom(newPosition);

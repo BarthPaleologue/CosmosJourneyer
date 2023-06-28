@@ -7,7 +7,6 @@ export class SystemUI {
     constructor(scene: Scene) {
         //this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, scene);
         //console.log(this.gui);
-
         // display system name
         /*const name = new TextBlock();
         name.text = "System Name";

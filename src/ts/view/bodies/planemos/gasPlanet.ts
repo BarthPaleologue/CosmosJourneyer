@@ -22,16 +22,19 @@ export class GasPlanet extends AbstractBody implements Planemo {
      * New Gas Planet
      * @param name The name of the planet
      * @param scene
-     * @param seed The seed of the planet in [-1, 1]
      * @param parentBodies The bodies the planet is orbiting
+     * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
+    constructor(name: string, scene: UberScene, parentBodies: AbstractBody[], model: GasPlanetModel | number) {
         super(name, parentBodies, scene);
 
-        this.model = new GasPlanetModel(
-            seed,
-            parentBodies.map((body) => body.model)
-        );
+        this.model =
+            model instanceof GasPlanetModel
+                ? model
+                : new GasPlanetModel(
+                      model,
+                      parentBodies.map((body) => body.model)
+                  );
 
         this.mesh = MeshBuilder.CreateSphere(
             `${name}Mesh`,

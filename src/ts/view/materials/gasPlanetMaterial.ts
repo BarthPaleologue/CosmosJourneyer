@@ -104,7 +104,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setInt("nbStars", stellarObjects.length);
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
-        
+
         this.setFloat("time", this.clock % 100000);
     }
 }

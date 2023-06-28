@@ -11,6 +11,7 @@ import { Light } from "@babylonjs/core/Lights/light";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Assets } from "../../../controller/assets";
+
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
     readonly light: PointLight;
@@ -22,16 +23,19 @@ export class Star extends AbstractBody {
      * New Star
      * @param name The name of the star
      * @param scene
-     * @param seed The seed of the star in [-1, 1]
      * @param parentBodies The bodies the star is orbiting
+     * @param model The seed of the star in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, seed: number, parentBodies: AbstractBody[]) {
+    constructor(name: string, scene: UberScene, parentBodies: AbstractBody[], model: StarModel | number) {
         super(name, parentBodies, scene);
 
-        this.model = new StarModel(
-            seed,
-            parentBodies.map((body) => body.model)
-        );
+        this.model =
+            model instanceof StarModel
+                ? model
+                : new StarModel(
+                      model,
+                      parentBodies.map((body) => body.model)
+                  );
 
         this.mesh =
             this.model.rng(42) > 0.1
