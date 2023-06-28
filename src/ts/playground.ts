@@ -20,7 +20,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import "../styles/index.scss";
 import { Assets } from "./controller/assets";
-import { PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShapeBox, PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Mesh } from "@babylonjs/core/Meshes";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 
@@ -65,11 +65,8 @@ box.material = Assets.DebugMaterial("box", true);
 shadowGenerator.addShadowCaster(box);
 
 const spaceship = Assets.CreateSpaceShipInstance();
-spaceship.position.y = 8;
-spaceship.position.x = 4;
-spaceship.position.z = 0;
+spaceship.rotationQuaternion = Quaternion.Identity();
 shadowGenerator.addShadowCaster(spaceship);
-
 
 const capsule = MeshBuilder.CreateCapsule("capsule", { radius: 0.6, height: 2 }, scene);
 capsule.position.y = 4;
@@ -81,6 +78,7 @@ shadowGenerator.addShadowCaster(capsule);
 // Our built-in 'ground' shape.
 const ground = MeshBuilder.CreateGround("ground", { width: 30, height: 30 }, scene);
 ground.receiveShadows = true;
+ground.position.y = -5;
 const groundMaterial = Assets.DebugMaterial("ground", true);
 groundMaterial.diffuseColor.scaleInPlace(0.5);
 groundMaterial.specularColor.scaleInPlace(0.5);
@@ -96,7 +94,7 @@ const capsuleAggregate = new PhysicsAggregate(capsule, PhysicsShapeType.CAPSULE,
 const spaceshipAggregate = new PhysicsAggregate(spaceship, PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
 for(const child of spaceship.getChildMeshes()) {
     const childShape = new PhysicsShapeMesh(child as Mesh, scene);
-    spaceshipAggregate.shape.addChild(childShape);
+    spaceshipAggregate.shape.addChildFromParent(spaceship, childShape, child);
 }
 
 // add impulse to box
