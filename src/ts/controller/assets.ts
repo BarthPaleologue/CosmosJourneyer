@@ -157,9 +157,11 @@ export class Assets {
         return mesh;
     }
 
-    static DebugMaterial(name: string) {
+    static DebugMaterial(name: string, diffuse=false, wireframe=false) {
         const mat = new StandardMaterial(`${name}DebugMaterial`);
-        mat.emissiveColor = Color3.Random();
+        if(!diffuse) mat.emissiveColor = Color3.Random();
+        else mat.diffuseColor = Color3.Random();
+        mat.wireframe = wireframe;
         mat.useLogarithmicDepth = true;
         return mat;
     }
