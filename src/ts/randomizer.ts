@@ -1,15 +1,15 @@
 import "../styles/index.scss";
-import { Keyboard } from "./inputs/keyboard";
-import { Mouse } from "./inputs/mouse";
-import { Gamepad } from "./inputs/gamepad";
-import { StarSystem } from "./bodies/starSystem";
+import { Keyboard } from "./controller/inputs/keyboard";
+import { Mouse } from "./controller/inputs/mouse";
+import { Gamepad } from "./controller/inputs/gamepad";
+import { StarSystem } from "./controller/starSystem";
 
 import { randRange } from "extended-random";
 import { Settings } from "./settings";
 import { PlayerController } from "./spacelegs/playerController";
 import { positionNearObject } from "./utils/positionNearObject";
-import { PlanetEngine } from "./planetEngine";
-import { BODY_TYPE } from "./models/common";
+import { PlanetEngine } from "./controller/planetEngine";
+import { BODY_TYPE } from "./model/common";
 import { ShipController } from "./spaceship/shipController";
 import { EditorVisibility } from "./ui/bodyEditor/bodyEditor";
 

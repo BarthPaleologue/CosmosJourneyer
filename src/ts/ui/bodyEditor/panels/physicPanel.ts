@@ -1,6 +1,6 @@
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
-import { TelluricPlanemo } from "../../../bodies/planemos/telluricPlanemo";
+import { TelluricPlanemo } from "../../../view/bodies/planemos/telluricPlanemo";
 
 export class PhysicPanel extends EditorPanel {
     constructor() {

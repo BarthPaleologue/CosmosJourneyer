@@ -1,6 +1,6 @@
-import { AbstractController } from "../uberCore/abstractController";
-import { UberCamera } from "../uberCore/uberCamera";
-import { Input } from "../inputs/input";
+import { AbstractController } from "../controller/uberCore/abstractController";
+import { UberCamera } from "../controller/uberCore/uberCamera";
+import { Input } from "../controller/inputs/input";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 

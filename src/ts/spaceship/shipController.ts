@@ -1,18 +1,18 @@
-import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
-import { Input, InputType } from "../inputs/input";
-import { UberCamera } from "../uberCore/uberCamera";
-import { AbstractController } from "../uberCore/abstractController";
-import { Assets } from "../assets";
-import { Keyboard } from "../inputs/keyboard";
-import { UberOrbitCamera } from "../uberCore/uberOrbitCamera";
-import { Mouse } from "../inputs/mouse";
+import { NewtonianTransform } from "../controller/uberCore/transforms/newtonianTransform";
+import { Input, InputType } from "../controller/inputs/input";
+import { UberCamera } from "../controller/uberCore/uberCamera";
+import { AbstractController } from "../controller/uberCore/abstractController";
+import { Assets } from "../controller/assets";
+import { Keyboard } from "../controller/inputs/keyboard";
+import { UberOrbitCamera } from "../controller/uberCore/uberOrbitCamera";
+import { Mouse } from "../controller/inputs/mouse";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { MainThruster } from "./mainThruster";
 import { WarpDrive } from "./warpDrive";
 import { parseSpeed } from "../utils/parseSpeed";
-import { LOCAL_DIRECTION } from "../uberCore/localDirections";
+import { LOCAL_DIRECTION } from "../controller/uberCore/localDirections";
 import { RCSThruster } from "./rcsThruster";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 

@@ -1,7 +1,7 @@
 import { EditorPanel } from "../editorPanel";
-import { Star } from "../../../bodies/stellarObjects/star";
+import { Star } from "../../../view/bodies/stellarObjects/star";
 import { Slider } from "handle-sliderjs";
-import { VolumetricLight } from "../../../postProcesses/volumetricLight";
+import { VolumetricLight } from "../../../view/postProcesses/volumetricLight";
 
 export class StarPanel extends EditorPanel {
     constructor() {

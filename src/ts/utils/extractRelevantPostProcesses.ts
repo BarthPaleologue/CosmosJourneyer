@@ -1,5 +1,5 @@
-import { AbstractBody } from "../bodies/abstractBody";
-import { ObjectPostProcess } from "../postProcesses/objectPostProcess";
+import { AbstractBody } from "../view/bodies/abstractBody";
+import { ObjectPostProcess } from "../view/postProcesses/objectPostProcess";
 
 export function extractRelevantPostProcesses(postProcesses: ObjectPostProcess[], body: AbstractBody): [ObjectPostProcess[], ObjectPostProcess[]] {
     const relevant = [];

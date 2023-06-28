@@ -1,16 +1,16 @@
 import { PlayerController } from "../spacelegs/playerController";
-import { Keyboard } from "../inputs/keyboard";
+import { Keyboard } from "../controller/inputs/keyboard";
 
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
-import { StarSystemModel } from "../models/starSystemModel";
-import { StarModel } from "../models/stellarObjects/starModel";
+import { StarSystemModel } from "../model/starSystemModel";
+import { StarModel } from "../model/stellarObjects/starModel";
 import { BuildData, Cell, Vector3ToString } from "./cell";
-import { BlackHoleModel } from "../models/stellarObjects/blackHoleModel";
+import { BlackHoleModel } from "../model/stellarObjects/blackHoleModel";
 import { StarMapUI } from "./starMapUI";
-import { getStellarTypeString } from "../models/stellarObjects/common";
-import { BODY_TYPE } from "../models/common";
+import { getStellarTypeString } from "../model/stellarObjects/common";
+import { BODY_TYPE } from "../model/common";
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -26,8 +26,8 @@ import { Animation } from "@babylonjs/core/Animations/animation";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Culling/ray";
-import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
-import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
+import { TransformRotationAnimation } from "../controller/uberCore/transforms/animations/rotation";
+import { TransformTranslationAnimation } from "../controller/uberCore/transforms/animations/translation";
 import { makeNoise3D } from "fast-simplex-noise";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { Settings } from "../settings";

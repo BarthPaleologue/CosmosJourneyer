@@ -2,7 +2,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { AbstractMesh, MeshBuilder } from "@babylonjs/core/Meshes";
-import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
+import { NewtonianTransform } from "../controller/uberCore/transforms/newtonianTransform";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
 
 export abstract class AbstractThruster {

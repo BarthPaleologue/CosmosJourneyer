@@ -1,5 +1,5 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
+import { NewtonianTransform } from "../controller/uberCore/transforms/newtonianTransform";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AbstractThruster } from "./abstractThruster";
 

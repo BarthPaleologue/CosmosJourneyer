@@ -1,7 +1,7 @@
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
-import { BlackHole } from "../../../bodies/stellarObjects/blackHole";
-import { BlackHolePostProcess } from "../../../postProcesses/blackHolePostProcess";
+import { BlackHole } from "../../../view/bodies/stellarObjects/blackHole";
+import { BlackHolePostProcess } from "../../../view/postProcesses/blackHolePostProcess";
 
 export class BlackholePanel extends EditorPanel {
     constructor() {

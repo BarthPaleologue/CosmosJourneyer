@@ -1,21 +1,21 @@
 import "../styles/index.scss";
 
-import { Keyboard } from "./inputs/keyboard";
-import { Mouse } from "./inputs/mouse";
-import { Gamepad } from "./inputs/gamepad";
+import { Keyboard } from "./controller/inputs/keyboard";
+import { Mouse } from "./controller/inputs/mouse";
+import { Gamepad } from "./controller/inputs/gamepad";
 
-import { StarSystem } from "./bodies/starSystem";
+import { StarSystem } from "./controller/starSystem";
 
 import { Settings } from "./settings";
-import { Assets } from "./assets";
+import { Assets } from "./controller/assets";
 import { PlayerController } from "./spacelegs/playerController";
 import { positionNearObject } from "./utils/positionNearObject";
-import { PlanetEngine } from "./planetEngine";
+import { PlanetEngine } from "./controller/planetEngine";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ShipController } from "./spaceship/shipController";
-import { SpaceStation } from "./spacestation/spaceStation";
-import { PostProcessType } from "./postProcesses/postProcessTypes";
+import { SpaceStation } from "./view/spacestation/spaceStation";
+import { PostProcessType } from "./view/postProcesses/postProcessTypes";
 
 const engine = new PlanetEngine();
 

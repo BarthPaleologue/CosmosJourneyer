@@ -1,5 +1,5 @@
 import { Scene } from "@babylonjs/core/scene";
-import { BasicTransform } from "../../src/ts/uberCore/transforms/basicTransform";
+import { BasicTransform } from "../../src/ts/controller/uberCore/transforms/basicTransform";
 import { Vector3, Quaternion } from "@babylonjs/core/Maths/math";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 

@@ -1,5 +1,5 @@
 import overlayHTML from "../../html/helmetOverlay.html";
-import { AbstractBody } from "../bodies/abstractBody";
+import { AbstractBody } from "../view/bodies/abstractBody";
 
 export class HelmetOverlay {
     private readonly parentNode: HTMLElement;

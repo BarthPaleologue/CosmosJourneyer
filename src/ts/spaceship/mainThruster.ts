@@ -1,6 +1,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
+import { NewtonianTransform } from "../controller/uberCore/transforms/newtonianTransform";
 import { AbstractThruster } from "./abstractThruster";
 
 export class MainThruster extends AbstractThruster {

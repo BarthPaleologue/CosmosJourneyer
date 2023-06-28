@@ -1,11 +1,11 @@
 import editorHTML from "../../../html/bodyEditor.html";
-import { TelluricPlanemo } from "../../bodies/planemos/telluricPlanemo";
-import { Star } from "../../bodies/stellarObjects/star";
-import { AbstractBody } from "../../bodies/abstractBody";
+import { TelluricPlanemo } from "../../view/bodies/planemos/telluricPlanemo";
+import { Star } from "../../view/bodies/stellarObjects/star";
+import { AbstractBody } from "../../view/bodies/abstractBody";
 import "handle-sliderjs/dist/css/style2.css";
-import { ColorMode } from "../../materials/colorSettingsInterface";
+import { ColorMode } from "../../view/materials/colorSettingsInterface";
 import { hide, show } from "../../utils/html";
-import { GasPlanet } from "../../bodies/planemos/gasPlanet";
+import { GasPlanet } from "../../view/bodies/planemos/gasPlanet";
 import { EditorPanel } from "./editorPanel";
 import { GeneralPanel } from "./panels/generalPanel";
 import { PhysicPanel } from "./panels/physicPanel";
@@ -16,9 +16,9 @@ import { AtmospherePanel } from "./panels/atmospherePanel";
 import { CloudsPanel } from "./panels/cloudsPanel";
 import { RingsPanel } from "./panels/ringsPanel";
 import { OceanPanel } from "./panels/oceanPanel";
-import { PostProcessManager } from "../../postProcesses/postProcessManager";
-import { UberScene } from "../../uberCore/uberScene";
-import { BlackHole } from "../../bodies/stellarObjects/blackHole";
+import { PostProcessManager } from "../../controller/postProcessManager";
+import { UberScene } from "../../controller/uberCore/uberScene";
+import { BlackHole } from "../../view/bodies/stellarObjects/blackHole";
 import { BlackholePanel } from "./panels/blackholePanel";
 
 export enum EditorVisibility {

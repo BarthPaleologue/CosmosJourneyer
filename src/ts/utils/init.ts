@@ -1,5 +1,5 @@
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
-import { UberScene } from "../uberCore/uberScene";
+import { UberScene } from "../controller/uberCore/uberScene";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 
