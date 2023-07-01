@@ -21,8 +21,9 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import "../styles/index.scss";
 import { Assets } from "./controller/assets";
 import { PhysicsShapeBox, PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Mesh } from "@babylonjs/core/Meshes";
+import { Mesh, TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -32,6 +33,7 @@ canvas.height = window.innerHeight;
 const engine = new Engine(canvas);
 
 const scene = new Scene(engine);
+scene.useRightHandedSystem = true;
 
 await Assets.Init(scene);
 
@@ -64,8 +66,8 @@ box.position.x = -4;
 box.material = Assets.DebugMaterial("box", true);
 shadowGenerator.addShadowCaster(box);
 
-const spaceship = Assets.CreateSpaceShipInstance();
-spaceship.rotationQuaternion = Quaternion.Identity();
+const spaceship = Assets.CreateEndeavorSpaceShipInstance();
+spaceship.position.y = 8;
 shadowGenerator.addShadowCaster(spaceship);
 
 const capsule = MeshBuilder.CreateCapsule("capsule", { radius: 0.6, height: 2 }, scene);
@@ -78,7 +80,6 @@ shadowGenerator.addShadowCaster(capsule);
 // Our built-in 'ground' shape.
 const ground = MeshBuilder.CreateGround("ground", { width: 30, height: 30 }, scene);
 ground.receiveShadows = true;
-ground.position.y = -5;
 const groundMaterial = Assets.DebugMaterial("ground", true);
 groundMaterial.diffuseColor.scaleInPlace(0.5);
 groundMaterial.specularColor.scaleInPlace(0.5);
@@ -91,8 +92,9 @@ const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mas
 const boxAggregate = new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 1, restitution: 0.2 }, scene);
 const capsuleAggregate = new PhysicsAggregate(capsule, PhysicsShapeType.CAPSULE, { mass: 1, restitution: 0.2 }, scene);
 
-const spaceshipAggregate = new PhysicsAggregate(spaceship, PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
-for(const child of spaceship.getChildMeshes()) {
+const spaceshipAggregate = new PhysicsAggregate(spaceship
+    , PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
+for (const child of spaceship.getChildMeshes()) {
     const childShape = new PhysicsShapeMesh(child as Mesh, scene);
     spaceshipAggregate.shape.addChildFromParent(spaceship, childShape, child);
 }
@@ -101,7 +103,7 @@ for(const child of spaceship.getChildMeshes()) {
 boxAggregate.body.applyImpulse(new Vector3(0, 0, -1), box.getAbsolutePosition());
 
 const physicAggregates = [sphereAggregate, groundAggregate, boxAggregate, spaceshipAggregate, capsuleAggregate];
-for(const aggregate of physicAggregates) viewer.showBody(aggregate.body);
+//viewer.showBody(spaceshipAggregate.body);
 
 const gravity = new Vector3(0, -9.81, 0);
 
@@ -110,9 +112,9 @@ function updateScene() {
     const deltaTime = engine.getDeltaTime() / 1000;
     clock += deltaTime;
 
-    for(const aggregate of physicAggregates) {
+    for (const aggregate of physicAggregates) {
         const mass = aggregate.body.getMassProperties().mass;
-        if(mass === undefined) throw new Error(`Mass is undefined for ${aggregate.body}`);
+        if (mass === undefined) throw new Error(`Mass is undefined for ${aggregate.body}`);
         aggregate.body.applyForce(gravity.scale(mass), aggregate.body.getObjectCenterWorld());
     }
 }

@@ -22,6 +22,7 @@ import spaceship from "../../asset/spaceship/spaceship2.glb";
 import spacestation from "../../asset/spacestation/spacestation.glb";
 import shipCarrier from "../../asset/spacestation/shipcarrier.glb";
 import banana from "../../asset/banana/banana.glb";
+import endeavorSpaceship from "../../asset/spaceship/endeavour.glb"
 
 import { ChunkForge } from "./chunks/chunkForge";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -32,6 +33,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PBRBaseMaterial } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { TransformNode } from "@babylonjs/core/Meshes";
 
 export class Assets {
     static IS_READY = false;
@@ -53,6 +55,7 @@ export class Assets {
     static PlumeParticle: Texture;
 
     private static Spaceship: Mesh;
+    private static EndeavorSpaceship: Mesh;
     private static Spacestation: Mesh;
     private static Banana: Mesh;
 
@@ -93,6 +96,19 @@ export class Assets {
                 }
 
                 console.log("Spaceship loaded");
+            };
+
+            const endeavorSpaceshipTask = Assets.manager.addMeshTask("endeavorSpaceshipTask", "", "", endeavorSpaceship);
+            endeavorSpaceshipTask.onSuccess = function (task: MeshAssetTask) {
+                Assets.EndeavorSpaceship = task.loadedMeshes[0] as Mesh;
+
+                for (const mesh of Assets.EndeavorSpaceship.getChildMeshes()) {
+                    mesh.isVisible = false;
+                    const pbr = mesh.material as PBRBaseMaterial;
+                    pbr.useLogarithmicDepth = true;
+                }
+
+                console.log("Endeavor Spaceship loaded");
             };
 
             const spacestationTask = Assets.manager.addMeshTask("spacestationTask", "", "", shipCarrier);
@@ -139,6 +155,16 @@ export class Assets {
 
     static CreateSpaceShipInstance(): InstancedMesh {
         return Assets.Spaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+    }
+
+    static CreateEndeavorSpaceShipInstance(newParent: TransformNode | null = null): InstancedMesh {
+        const instance = Assets.EndeavorSpaceship.instantiateHierarchy(newParent, { doNotInstantiate: false }) as InstancedMesh;
+
+        for(const child of instance.getChildMeshes()) {
+            child.isVisible = true;
+        }
+
+        return instance;
     }
 
     static CreateSpaceStationInstance(): InstancedMesh {
