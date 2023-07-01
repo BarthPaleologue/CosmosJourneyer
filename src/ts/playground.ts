@@ -67,7 +67,7 @@ box.position.x = -4;
 box.material = Assets.DebugMaterial("box", true);
 shadowGenerator.addShadowCaster(box);
 
-const spaceship = new Spaceship(scene);
+const spaceship = new Spaceship();
 spaceship.instanceRoot.position.y = 8;
 shadowGenerator.addShadowCaster(spaceship.instanceRoot);
 

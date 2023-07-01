@@ -12,3 +12,5 @@ declare module "*.glb";
 declare module "*.obj";
 
 declare module "*.wasm";
+
+declare module "*.mp3";

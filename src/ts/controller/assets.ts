@@ -22,7 +22,9 @@ import spaceship from "../../asset/spaceship/spaceship2.glb";
 import spacestation from "../../asset/spacestation/spacestation.glb";
 import shipCarrier from "../../asset/spacestation/shipcarrier.glb";
 import banana from "../../asset/banana/banana.glb";
-import endeavorSpaceship from "../../asset/spaceship/endeavour.glb"
+import endeavorSpaceship from "../../asset/spaceship/endeavour.glb";
+
+import ouchSound from "../../asset/sound/ouch.mp3";
 
 import { ChunkForge } from "./chunks/chunkForge";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -34,6 +36,9 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PBRBaseMaterial } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import "@babylonjs/core/Audio/audioEngine";
+import "@babylonjs/core/Audio/audioSceneComponent";
+import { Sound } from "@babylonjs/core/Audio/sound";
 
 export class Assets {
     static IS_READY = false;
@@ -58,6 +63,8 @@ export class Assets {
     private static EndeavorSpaceship: Mesh;
     private static Spacestation: Mesh;
     private static Banana: Mesh;
+
+    public static OuchSound: Sound;
 
     static ChunkForge = new ChunkForge(64);
 
@@ -138,6 +145,13 @@ export class Assets {
                 }
 
                 console.log("Banana loaded");
+            };
+
+            const ouchSoundTask = Assets.manager.addBinaryFileTask("ouchSoundTask", ouchSound);
+            ouchSoundTask.onSuccess = function (task) {
+                Assets.OuchSound = new Sound("OuchSound", task.data, scene);
+
+                console.log("Ouch sound loaded");
             };
 
             Assets.manager.onProgress = (remainingCount, totalCount) => {
