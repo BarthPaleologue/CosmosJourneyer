@@ -24,6 +24,7 @@ import { PhysicsShapeBox, PhysicsShapeConvexHull, PhysicsShapeMesh } from "@baby
 import { Mesh, TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { Spaceship } from "./better_spaceship/spaceship";
 
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -66,9 +67,9 @@ box.position.x = -4;
 box.material = Assets.DebugMaterial("box", true);
 shadowGenerator.addShadowCaster(box);
 
-const spaceship = Assets.CreateEndeavorSpaceShipInstance();
-spaceship.position.y = 8;
-shadowGenerator.addShadowCaster(spaceship);
+const spaceship = new Spaceship(scene);
+spaceship.instanceRoot.position.y = 8;
+shadowGenerator.addShadowCaster(spaceship.instanceRoot);
 
 const capsule = MeshBuilder.CreateCapsule("capsule", { radius: 0.6, height: 2 }, scene);
 capsule.position.y = 4;
@@ -91,18 +92,12 @@ const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, { 
 const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0 }, scene);
 const boxAggregate = new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 1, restitution: 0.2 }, scene);
 const capsuleAggregate = new PhysicsAggregate(capsule, PhysicsShapeType.CAPSULE, { mass: 1, restitution: 0.2 }, scene);
-
-const spaceshipAggregate = new PhysicsAggregate(spaceship
-    , PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
-for (const child of spaceship.getChildMeshes()) {
-    const childShape = new PhysicsShapeMesh(child as Mesh, scene);
-    spaceshipAggregate.shape.addChildFromParent(spaceship, childShape, child);
-}
+spaceship.initPhysics(scene);
 
 // add impulse to box
 boxAggregate.body.applyImpulse(new Vector3(0, 0, -1), box.getAbsolutePosition());
 
-const physicAggregates = [sphereAggregate, groundAggregate, boxAggregate, spaceshipAggregate, capsuleAggregate];
+const physicAggregates = [sphereAggregate, groundAggregate, boxAggregate, spaceship.getAggregate(), capsuleAggregate];
 //viewer.showBody(spaceshipAggregate.body);
 
 const gravity = new Vector3(0, -9.81, 0);
