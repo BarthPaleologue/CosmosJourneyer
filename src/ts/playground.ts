@@ -61,6 +61,7 @@ const keyboard = new Keyboard();
 
 const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, scene);
 sphere.position.y = 4;
+sphere.position.x = 4;
 sphere.material = Assets.DebugMaterial("sphere", true);
 shadowGenerator.addShadowCaster(sphere);
 
@@ -70,7 +71,7 @@ box.position.x = -4;
 box.material = Assets.DebugMaterial("box", true);
 shadowGenerator.addShadowCaster(box);
 
-const spaceship = new Spaceship([keyboard]);
+const spaceship = new Spaceship(scene, [keyboard]);
 spaceship.instanceRoot.position.y = 8;
 shadowGenerator.addShadowCaster(spaceship.instanceRoot);
 
@@ -103,7 +104,7 @@ spaceship.initPhysics(scene);
 boxAggregate.body.applyImpulse(new Vector3(0, 0, -1), box.getAbsolutePosition());
 
 const otherPhysicAggregates = [sphereAggregate, groundAggregate, boxAggregate, capsuleAggregate];
-//viewer.showBody(spaceshipAggregate.body);
+//viewer.showBody(spaceship.getAggregate().body);
 
 const gravity = new Vector3(0, -9.81, 0);
 
