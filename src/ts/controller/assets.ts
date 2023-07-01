@@ -25,6 +25,7 @@ import banana from "../../asset/banana/banana.glb";
 import endeavorSpaceship from "../../asset/spaceship/endeavour.glb";
 
 import ouchSound from "../../asset/sound/ouch.mp3";
+import engineRunningSound from "../../asset/sound/engineRunning.mp3"
 
 import { ChunkForge } from "./chunks/chunkForge";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -65,6 +66,7 @@ export class Assets {
     private static Banana: Mesh;
 
     public static OuchSound: Sound;
+    public static EngineRunningSound: Sound;
 
     static ChunkForge = new ChunkForge(64);
 
@@ -152,6 +154,15 @@ export class Assets {
                 Assets.OuchSound = new Sound("OuchSound", task.data, scene);
 
                 console.log("Ouch sound loaded");
+            };
+
+            const engineRunningSoundTask = Assets.manager.addBinaryFileTask("engineRunningSoundTask", engineRunningSound);
+            engineRunningSoundTask.onSuccess = function (task) {
+                Assets.EngineRunningSound = new Sound("EngineRunningSound", task.data, scene, null, {
+                    loop: true,
+                });
+
+                console.log("Engine running sound loaded");
             };
 
             Assets.manager.onProgress = (remainingCount, totalCount) => {

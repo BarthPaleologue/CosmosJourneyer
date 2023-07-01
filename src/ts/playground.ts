@@ -25,6 +25,7 @@ import { Mesh, TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Spaceship } from "./better_spaceship/spaceship";
+import { Keyboard } from "./controller/inputs/keyboard";
 
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -56,6 +57,8 @@ hemiLight.intensity = 0.2;
 const shadowGenerator = new ShadowGenerator(1024, light);
 shadowGenerator.useBlurExponentialShadowMap = true;
 
+const keyboard = new Keyboard();
+
 const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, scene);
 sphere.position.y = 4;
 sphere.material = Assets.DebugMaterial("sphere", true);
@@ -67,9 +70,11 @@ box.position.x = -4;
 box.material = Assets.DebugMaterial("box", true);
 shadowGenerator.addShadowCaster(box);
 
-const spaceship = new Spaceship();
+const spaceship = new Spaceship([keyboard]);
 spaceship.instanceRoot.position.y = 8;
 shadowGenerator.addShadowCaster(spaceship.instanceRoot);
+
+camera.setTarget(spaceship.instanceRoot);
 
 const capsule = MeshBuilder.CreateCapsule("capsule", { radius: 0.6, height: 2 }, scene);
 capsule.position.y = 4;
@@ -97,7 +102,7 @@ spaceship.initPhysics(scene);
 // add impulse to box
 boxAggregate.body.applyImpulse(new Vector3(0, 0, -1), box.getAbsolutePosition());
 
-const physicAggregates = [sphereAggregate, groundAggregate, boxAggregate, spaceship.getAggregate(), capsuleAggregate];
+const otherPhysicAggregates = [sphereAggregate, groundAggregate, boxAggregate, capsuleAggregate];
 //viewer.showBody(spaceshipAggregate.body);
 
 const gravity = new Vector3(0, -9.81, 0);
@@ -107,11 +112,18 @@ function updateScene() {
     const deltaTime = engine.getDeltaTime() / 1000;
     clock += deltaTime;
 
-    for (const aggregate of physicAggregates) {
+    spaceship.listenToInputs();
+
+    const gravityForShip = gravity.scale(spaceship.getMass());
+
+    for (const aggregate of otherPhysicAggregates) {
         const mass = aggregate.body.getMassProperties().mass;
         if (mass === undefined) throw new Error(`Mass is undefined for ${aggregate.body}`);
         aggregate.body.applyForce(gravity.scale(mass), aggregate.body.getObjectCenterWorld());
+        //aggregate.body.applyForce(gravityForShip.scale(-1), aggregate.body.getObjectCenterWorld());
     }
+    spaceship.getAggregate().body.applyForce(gravityForShip, spaceship.getAggregate().body.getObjectCenterWorld());
+    //groundAggregate.body.applyForce(gravityForShip.scale(-1), groundAggregate.body.getObjectCenterWorld());
 }
 
 scene.executeWhenReady(() => {
