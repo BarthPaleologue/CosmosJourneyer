@@ -10,6 +10,8 @@ export class HoverThruster {
 
     private leverage: number | null = null;
 
+    private torque: Vector3;
+
     private particleSystem: DirectionnalParticleSystem;
 
     private throttle = 0;
@@ -17,8 +19,10 @@ export class HoverThruster {
     constructor(mesh: Mesh) {
         this.mesh = mesh;
         this.particleSystem = new DirectionnalParticleSystem(mesh, this.getThrustDirection().negateInPlace());
-        this.particleSystem.minEmitBox = new Vector3(-1, 0, -1);
-        this.particleSystem.maxEmitBox = new Vector3(1, 0, 1);
+        this.particleSystem.minEmitBox = new Vector3(-0.8, 0, -0.8);
+        this.particleSystem.maxEmitBox = new Vector3(0.8, 0, 0.8);
+
+        this.torque = Vector3.Cross(this.mesh.position, Vector3.Up());
     }
 
     initPhysics(parentNode: TransformNode, parentAggregate: PhysicsAggregate, scene: Scene) {
@@ -35,6 +39,10 @@ export class HoverThruster {
         return this.leverage;
     }
 
+    getTorque(): Vector3 {
+        return this.torque;
+    }
+
     getThrustDirection(): Vector3 {
         return this.mesh.getDirection(Vector3.Up());
     }
@@ -49,6 +57,10 @@ export class HoverThruster {
 
     setThrottle(throttle: number) {
         this.throttle = throttle;
+    }
+
+    getThrottle(): number {
+        return this.throttle;
     }
 
     update() {
