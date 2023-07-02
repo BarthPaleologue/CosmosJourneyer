@@ -125,10 +125,19 @@ export class Spaceship {
 
         if (this.engineRunning) {
             for (const thruster of this.hoverThrusters) {
+                thruster.setThrottle(1);
                 const leverage = thruster.getLeverage() ** 2;
                 const amplitude = 5000;
                 const force = thruster.getThrustDirection().scale(amplitude / leverage);
                 this.aggregate?.body.applyForce(force, thruster.getAbsolutePosition());
+
+                thruster.update();
+            }
+        } else {
+            for(const thruster of this.hoverThrusters) {
+                thruster.setThrottle(0);
+
+                thruster.update();
             }
         }
     }
