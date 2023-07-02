@@ -1,7 +1,7 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
@@ -20,10 +20,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import "../styles/index.scss";
 import { Assets } from "./controller/assets";
-import { PhysicsShapeBox, PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Mesh, TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
-import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Spaceship } from "./better_spaceship/spaceship";
 import { Keyboard } from "./controller/inputs/keyboard";
 
@@ -44,7 +41,7 @@ const havokPlugin = new HavokPlugin(true, havokInstance);
 scene.enablePhysics(Vector3.Zero(), havokPlugin);
 
 // This creates and positions a free camera (non-mesh)
-const camera = new ArcRotateCamera("camera", -Math.PI / 2, 1.0, 15, Vector3.Zero(), scene);
+const camera = new ArcRotateCamera("camera", -Math.PI / 4, 1.0, 40, Vector3.Zero(), scene);
 camera.setTarget(Vector3.Zero());
 camera.attachControl(canvas, true);
 
@@ -108,12 +105,12 @@ const otherPhysicAggregates = [sphereAggregate, groundAggregate, boxAggregate, c
 
 const gravity = new Vector3(0, -9.81, 0);
 
-let clock = 0;
+let clockSeconds = 0;
 function updateScene() {
     const deltaTime = engine.getDeltaTime() / 1000;
-    clock += deltaTime;
+    clockSeconds += deltaTime;
 
-    spaceship.listenToInputs();
+    spaceship.update(deltaTime);
 
     const gravityForShip = gravity.scale(spaceship.getMass());
 
