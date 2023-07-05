@@ -140,11 +140,14 @@ export class Spaceship {
         }
 
         if (this.engineRunning) {
+            const worldToSpaceShip = this.instanceRoot.computeWorldMatrix().getRotationMatrix().invert();
             const targetThrustWorld = new Vector3(0, 1, 0);
-            //const targetThrustLocal = Vector3.TransformCoordinates(targetThrustWorld, this.instanceRoot.computeWorldMatrix().getRotationMatrix());  
-            //console.log(targetThrustLocal);
-            const targetTorque = new Vector3(0, 0, 0);
+            const targetThrustLocal = Vector3.TransformCoordinates(targetThrustWorld, worldToSpaceShip);  
             const targetHeight = 15;
+
+            const upward = this.instanceRoot.getDirection(Vector3.Up());
+            const targetTorqueWorld = Vector3.Cross(upward, targetThrustWorld);
+            const targetTorqueLocal = Vector3.TransformCoordinates(targetTorqueWorld, worldToSpaceShip);
 
             if(this.targetThrustHelper !== null) this.targetThrustHelper.dispose();
             this.targetThrustHelper = MeshBuilder.CreateLines("targetThrustHelper", {
@@ -155,8 +158,8 @@ export class Spaceship {
             }, this.instanceRoot.getScene());
             this.targetThrustHelper.material = Assets.DebugMaterial("targetThrustHelper", true);
 
-            const thrusterConfiguration = getThrusterConfiguration(targetThrustWorld, targetTorque, this.inverseThrusterMatrix);
-
+            const thrusterConfiguration = getThrusterConfiguration(targetThrustLocal, targetTorqueLocal, this.inverseThrusterMatrix);
+            
             const linearVelocity = Vector3.Zero();
             this.aggregate?.body.getLinearVelocityToRef(linearVelocity);
 
@@ -171,7 +174,7 @@ export class Spaceship {
 
 
             const thrust = gravity.length() * heightFactor * this.getMass();
-            console.log((1 + clamp(fallSpeed, -0.5, 0.5)), heightFactor, thrust);
+            //console.log((1 + clamp(fallSpeed, -0.5, 0.5)), heightFactor, thrust);
 
             for (let i = 0; i < this.hoverThrusters.length; i++) {
                 this.hoverThrusters[i].setThrottle(thrusterConfiguration[i]);
