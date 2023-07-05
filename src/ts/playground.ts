@@ -100,7 +100,9 @@ spaceship.initPhysics(scene);
 // add impulse to box
 boxAggregate.body.applyImpulse(new Vector3(0, 0, -1), box.getAbsolutePosition());
 
-const otherPhysicAggregates = [sphereAggregate, groundAggregate, boxAggregate, capsuleAggregate];
+groundAggregate.body.setMassProperties({ inertia: Vector3.Zero() });
+
+const otherPhysicAggregates = [sphereAggregate, boxAggregate, capsuleAggregate];
 //viewer.showBody(spaceship.getAggregate().body);
 
 const gravity = new Vector3(0, -9.81, 0);
@@ -118,10 +120,13 @@ function updateScene() {
         const mass = aggregate.body.getMassProperties().mass;
         if (mass === undefined) throw new Error(`Mass is undefined for ${aggregate.body}`);
         aggregate.body.applyForce(gravity.scale(mass), aggregate.body.getObjectCenterWorld());
-        //aggregate.body.applyForce(gravityForShip.scale(-1), aggregate.body.getObjectCenterWorld());
+        //aggregate.body.applyForce(gravityForShip.scale(-mass / spaceship.getMass()), aggregate.body.getObjectCenterWorld());
     }
+
+    const groundMass = groundAggregate.body.getMassProperties().mass;
+    if (groundMass === undefined) throw new Error(`Mass is undefined for ${groundAggregate.body}`);
+    //groundAggregate.body.applyForce(gravityForShip.scale(-groundMass / spaceship.getMass()), groundAggregate.body.getObjectCenterWorld());
     spaceship.getAggregate().body.applyForce(gravityForShip, spaceship.getAggregate().body.getObjectCenterWorld());
-    //groundAggregate.body.applyForce(gravityForShip.scale(-1), groundAggregate.body.getObjectCenterWorld());
 }
 
 scene.executeWhenReady(() => {

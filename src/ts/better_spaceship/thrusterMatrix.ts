@@ -18,7 +18,7 @@ export function buildThrusterMatrix(hoverThrusters: HoverThruster[]) {
         rowForceY.push(thrustDirection.y);
         rowForceZ.push(thrustDirection.z);
 
-        const torque = thruster.getTorque();
+        const torque = thruster.getBaseTorque();
         rowTorqueX.push(torque.x);
         rowTorqueY.push(torque.y);
         rowTorqueZ.push(torque.z);
@@ -34,7 +34,7 @@ export function buildThrusterMatrix(hoverThrusters: HoverThruster[]) {
     ]);
 }
 
-export function getThrustAndTorque(thrusterConfiguration: number[], thrusterMatrix: Matrix): [number, number, number, number, number, number] {
+export function getThrustAndTorque(thrusterConfiguration: number[], thrusterMatrix: Matrix): [Vector3, Vector3] {
     if(thrusterMatrix.rows != 6) throw new Error("Thruster matrix must have 6 rows!");
     const thrustAndTorque: [number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0];
     for(let i = 0; i < thrusterMatrix.rows; i++) {
@@ -43,7 +43,10 @@ export function getThrustAndTorque(thrusterConfiguration: number[], thrusterMatr
             thrustAndTorque[i] += row[j] * thrusterConfiguration[j];
         }
     }
-    return thrustAndTorque;
+    return [
+        new Vector3(thrustAndTorque[0], thrustAndTorque[1], thrustAndTorque[2]),
+        new Vector3(thrustAndTorque[3], thrustAndTorque[4], thrustAndTorque[5])
+    ];
 }
 
 export function getThrusterConfiguration(targetThrust: Vector3, targetTorque: Vector3, inverseThrusterMatrix: Matrix): number[] {
