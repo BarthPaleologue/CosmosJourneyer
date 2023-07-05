@@ -11,6 +11,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import { HoverThruster } from "./hoverThruster";
 import { Matrix, inverse, pseudoInverse } from "ml-matrix";
 import { buildThrusterMatrix, getThrustAndTorque, getThrusterConfiguration } from "./thrusterMatrix";
+import { clamp } from "terrain-generation";
 
 export class Spaceship {
     readonly instanceRoot: InstancedMesh;
@@ -120,7 +121,7 @@ export class Spaceship {
         return this.collisionObservable;
     }
 
-    update(deltaTime: number) {
+    update() {
         for (const input of this.inputs) {
             if (input.type === InputType.KEYBOARD) {
                 const keyboard = input as Keyboard;
@@ -141,14 +142,27 @@ export class Spaceship {
             //const targetThrustLocal = Vector3.TransformCoordinates(targetThrustWorld, this.instanceRoot.computeWorldMatrix().getRotationMatrix().invert());  
             //console.log(targetThrustLocal);
             const targetTorque = new Vector3(0, 0, 0);
+            const targetHeight = 15;
 
             const thrusterConfiguration = getThrusterConfiguration(targetThrustWorld, targetTorque, this.inverseThrusterMatrix);
+
+            const linearVelocity = Vector3.Zero();
+            this.aggregate?.body.getLinearVelocityToRef(linearVelocity);
+
+            const gravity = new Vector3(0, -9.81, 0);
+            const fallDirection = gravity.normalizeToNew();
+            const fallSpeed = Vector3.Dot(linearVelocity, fallDirection);
+
+            const currentHeight = this.instanceRoot.position.y;
+            console.log(currentHeight);
+
+            const thrust = gravity.length() * (1 + fallSpeed) * (1 + (targetHeight - currentHeight)) * this.getMass();
 
             for (let i = 0; i < this.hoverThrusters.length; i++) {
                 this.hoverThrusters[i].setThrottle(thrusterConfiguration[i]);
                 this.hoverThrusters[i].update();
 
-                this.aggregate?.body.applyForce(this.hoverThrusters[i].getThrustDirection().scale(200 * thrusterConfiguration[i]), this.hoverThrusters[i].getAbsolutePosition());
+                this.aggregate?.body.applyForce(this.hoverThrusters[i].getThrustDirection().scale(thrust * thrusterConfiguration[i]), this.hoverThrusters[i].getAbsolutePosition());
             }
         } else {
             for (const thruster of this.hoverThrusters) {

@@ -112,7 +112,7 @@ function updateScene() {
     const deltaTime = engine.getDeltaTime() / 1000;
     clockSeconds += deltaTime;
 
-    spaceship.update(deltaTime);
+    spaceship.update();
 
     const gravityForShip = gravity.scale(spaceship.getMass());
 
