@@ -1,5 +1,6 @@
 import { Matrix } from 'ml-matrix';
 import { HoverThruster } from "./hoverThruster";
+import { Vector3 } from '@babylonjs/core/Maths/math';
 
 // the math behind this file is based on https://simblob.blogspot.com/2009/01/game-component-spaceship-editor-part-1.html
 
@@ -34,8 +35,8 @@ export function buildThrusterMatrix(hoverThrusters: HoverThruster[]) {
 }
 
 export function getThrustAndTorque(thrusterConfiguration: number[], thrusterMatrix: Matrix): [number, number, number, number, number, number] {
-    const thrustAndTorque: [number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0];
     if(thrusterMatrix.rows != 6) throw new Error("Thruster matrix must have 6 rows!");
+    const thrustAndTorque: [number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0];
     for(let i = 0; i < thrusterMatrix.rows; i++) {
         const row = thrusterMatrix.getRow(i);
         for(let j = 0; j < thrusterMatrix.columns; j++) {
@@ -43,4 +44,26 @@ export function getThrustAndTorque(thrusterConfiguration: number[], thrusterMatr
         }
     }
     return thrustAndTorque;
+}
+
+export function getThrusterConfiguration(targetThrust: Vector3, targetTorque: Vector3, inverseThrusterMatrix: Matrix): number[] {
+    if(inverseThrusterMatrix.columns != 6) throw new Error("Inverse thruster matrix must have 6 columns!");
+    const targetThrustAndTorque = [
+        targetThrust.x,
+        targetThrust.y,
+        targetThrust.z,
+        targetTorque.x,
+        targetTorque.y,
+        targetTorque.z
+    ]
+    const nbThrusters = inverseThrusterMatrix.rows;
+    const thrusterConfiguration = new Array(nbThrusters).fill(0);
+    for(let i = 0; i < inverseThrusterMatrix.rows; i++) {
+        const row = inverseThrusterMatrix.getRow(i);
+        for(let j = 0; j < inverseThrusterMatrix.columns; j++) {
+            thrusterConfiguration[i] += row[j] * targetThrustAndTorque[j];
+        }
+    }
+
+    return thrusterConfiguration;
 }

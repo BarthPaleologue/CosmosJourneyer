@@ -9,8 +9,8 @@ import { Input, InputType } from "../controller/inputs/input";
 import { Keyboard } from "../controller/inputs/keyboard";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { HoverThruster } from "./hoverThruster";
-import { Matrix } from "ml-matrix";
-import { buildThrusterMatrix, getThrustAndTorque } from "./thrusterMatrix";
+import { Matrix, inverse, pseudoInverse } from "ml-matrix";
+import { buildThrusterMatrix, getThrustAndTorque, getThrusterConfiguration } from "./thrusterMatrix";
 
 export class Spaceship {
     readonly instanceRoot: InstancedMesh;
@@ -27,23 +27,24 @@ export class Spaceship {
 
     private otherMeshes: AbstractMesh[] = [];
 
-    private centerOfMassHelper: Mesh;
+    //private centerOfMassHelper: Mesh;
 
     private thrusterMatrix: Matrix;
+    private inverseThrusterMatrix: Matrix;
 
     constructor(scene: Scene, inputs: Input[]) {
         if (!Assets.IS_READY) throw new Error("Assets are not ready yet!");
         this.instanceRoot = Assets.CreateEndeavorSpaceShipInstance();
         this.inputs = inputs;
 
-        const centerHelper = MeshBuilder.CreateBox("centerHelper", { size: 0.5 }, scene);
+        /*const centerHelper = MeshBuilder.CreateBox("centerHelper", { size: 0.5 }, scene);
         centerHelper.parent = this.instanceRoot;
         centerHelper.renderingGroupId = 1;
 
         this.centerOfMassHelper = MeshBuilder.CreateSphere("centerOfMassHelper", { diameter: 0.25 }, scene);
         this.centerOfMassHelper.parent = this.instanceRoot;
         this.centerOfMassHelper.renderingGroupId = 1;
-        this.centerOfMassHelper.material = Assets.DebugMaterial("centerOfMassHelper", true);
+        this.centerOfMassHelper.material = Assets.DebugMaterial("centerOfMassHelper", true);*/
 
         for (const child of this.instanceRoot.getChildMeshes()) {
             if (child.name.includes("hoverThruster")) {
@@ -68,6 +69,11 @@ export class Spaceship {
 
         this.thrusterMatrix = buildThrusterMatrix(this.hoverThrusters);
         console.log(this.thrusterMatrix);
+
+        this.inverseThrusterMatrix = pseudoInverse(this.thrusterMatrix);
+        console.log(this.inverseThrusterMatrix);
+
+        console.log(getThrusterConfiguration(new Vector3(0, 1, 0), new Vector3(0, 0, 0), this.inverseThrusterMatrix));
     }
 
     initPhysics(scene: Scene) {
@@ -79,7 +85,7 @@ export class Spaceship {
         }
         for (const thruster of this.hoverThrusters) thruster.initPhysics(this.instanceRoot, this.aggregate, scene);
 
-        this.centerOfMassHelper.position = this.getCenterOfMass();
+        //this.centerOfMassHelper.position = this.getCenterOfMass();
 
         this.aggregate.body.setCollisionCallbackEnabled(true);
 
@@ -131,17 +137,19 @@ export class Spaceship {
         }
 
         if (this.engineRunning) {
-            for (const thruster of this.hoverThrusters) {
-                thruster.setThrottle(1);
-                thruster.update();
+            const targetThrustWorld = new Vector3(0, 1, 0);
+            //const targetThrustLocal = Vector3.TransformCoordinates(targetThrustWorld, this.instanceRoot.computeWorldMatrix().getRotationMatrix().invert());  
+            //console.log(targetThrustLocal);
+            const targetTorque = new Vector3(0, 0, 0);
+
+            const thrusterConfiguration = getThrusterConfiguration(targetThrustWorld, targetTorque, this.inverseThrusterMatrix);
+
+            for (let i = 0; i < this.hoverThrusters.length; i++) {
+                this.hoverThrusters[i].setThrottle(thrusterConfiguration[i]);
+                this.hoverThrusters[i].update();
+
+                this.aggregate?.body.applyForce(this.hoverThrusters[i].getThrustDirection().scale(200 * thrusterConfiguration[i]), this.hoverThrusters[i].getAbsolutePosition());
             }
-
-            const thrusterVector = this.hoverThrusters.map(thruster => thruster.getThrottle());
-            const residuals = getThrustAndTorque(thrusterVector, this.thrusterMatrix);
-
-            const force = new Vector3(residuals[0], residuals[1], residuals[2]);
-
-            this.aggregate?.body.applyForce(force.scale(50), this.getCenterOfMass());
         } else {
             for (const thruster of this.hoverThrusters) {
                 thruster.setThrottle(0);

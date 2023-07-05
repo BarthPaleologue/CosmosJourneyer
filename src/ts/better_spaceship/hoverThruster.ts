@@ -1,7 +1,7 @@
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { Mesh, TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShapeBox, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
 
@@ -26,7 +26,7 @@ export class HoverThruster {
     }
 
     initPhysics(parentNode: TransformNode, parentAggregate: PhysicsAggregate, scene: Scene) {
-        const shape = new PhysicsShapeMesh(this.mesh, scene);
+        const shape = new PhysicsShapeBox(Vector3.Zero(), Quaternion.Identity(), this.mesh.getBoundingInfo().boundingBox.extendSize.scale(2), scene);
         parentAggregate.shape.addChildFromParent(parentNode, shape, this.mesh);
 
         const parentCenterOfMass = parentAggregate.body.getMassProperties().centerOfMass;
