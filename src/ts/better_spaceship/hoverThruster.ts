@@ -63,7 +63,7 @@ export class HoverThruster {
 
     update() {
         this.particleSystem.setDirection(this.getThrustDirection().negateInPlace());
-        this.particleSystem.applyAcceleration(this.getThrustDirection().scaleInPlace(-10));
-        this.particleSystem.emitRate = this.throttle * 5000;
+        this.particleSystem.applyAcceleration(this.getThrustDirection().scaleInPlace(-100));
+        this.particleSystem.emitRate = this.throttle * 10000;
     }
 }

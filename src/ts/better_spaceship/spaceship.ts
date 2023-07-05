@@ -30,6 +30,8 @@ export class Spaceship {
 
     //private centerOfMassHelper: Mesh;
 
+    private targetThrustHelper: Mesh | null = null;
+
     private thrusterMatrix: Matrix;
     private inverseThrusterMatrix: Matrix;
 
@@ -139,10 +141,19 @@ export class Spaceship {
 
         if (this.engineRunning) {
             const targetThrustWorld = new Vector3(0, 1, 0);
-            //const targetThrustLocal = Vector3.TransformCoordinates(targetThrustWorld, this.instanceRoot.computeWorldMatrix().getRotationMatrix().invert());  
+            //const targetThrustLocal = Vector3.TransformCoordinates(targetThrustWorld, this.instanceRoot.computeWorldMatrix().getRotationMatrix());  
             //console.log(targetThrustLocal);
             const targetTorque = new Vector3(0, 0, 0);
             const targetHeight = 15;
+
+            if(this.targetThrustHelper !== null) this.targetThrustHelper.dispose();
+            this.targetThrustHelper = MeshBuilder.CreateLines("targetThrustHelper", {
+                points: [
+                    this.instanceRoot.position,
+                    this.instanceRoot.position.add(targetThrustWorld.scale(5)),
+                ]
+            }, this.instanceRoot.getScene());
+            this.targetThrustHelper.material = Assets.DebugMaterial("targetThrustHelper", true);
 
             const thrusterConfiguration = getThrusterConfiguration(targetThrustWorld, targetTorque, this.inverseThrusterMatrix);
 
@@ -154,9 +165,13 @@ export class Spaceship {
             const fallSpeed = Vector3.Dot(linearVelocity, fallDirection);
 
             const currentHeight = this.instanceRoot.position.y;
-            console.log(currentHeight);
+            
+            let heightFactor = 1 + clamp(targetHeight - currentHeight, -0.5, 0.5) * (1 + fallSpeed);
+            if(Math.abs(currentHeight - targetHeight) < 0.5) heightFactor = 1;
 
-            const thrust = gravity.length() * (1 + fallSpeed) * (1 + (targetHeight - currentHeight)) * this.getMass();
+
+            const thrust = gravity.length() * heightFactor * this.getMass();
+            console.log((1 + clamp(fallSpeed, -0.5, 0.5)), heightFactor, thrust);
 
             for (let i = 0; i < this.hoverThrusters.length; i++) {
                 this.hoverThrusters[i].setThrottle(thrusterConfiguration[i]);
@@ -165,9 +180,10 @@ export class Spaceship {
                 this.aggregate?.body.applyForce(this.hoverThrusters[i].getThrustDirection().scale(thrust * thrusterConfiguration[i]), this.hoverThrusters[i].getAbsolutePosition());
             }
         } else {
+            this.targetThrustHelper?.dispose();
+
             for (const thruster of this.hoverThrusters) {
                 thruster.setThrottle(0);
-
                 thruster.update();
             }
         }
