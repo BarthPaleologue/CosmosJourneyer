@@ -45,7 +45,6 @@ function handle_build(data: TransferBuildData): void {
         }
     );
 
-    terrain_settings.free();
     buildData.free();
 }
 
