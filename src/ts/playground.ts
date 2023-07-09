@@ -1,5 +1,4 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { Scene } from "@babylonjs/core/scene";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -23,6 +22,11 @@ import { Assets } from "./controller/assets";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { Spaceship } from "./better_spaceship/spaceship";
 import { Keyboard } from "./controller/inputs/keyboard";
+import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
+import { TelluricPlanemo } from "./view/bodies/planemos/telluricPlanemo";
+import { UberScene } from "./controller/uberCore/uberScene";
+import { Settings } from "./settings";
+import { ScenePerformancePriority } from "@babylonjs/core/scene";
 
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -31,7 +35,7 @@ canvas.height = window.innerHeight;
 
 const engine = new Engine(canvas);
 
-const scene = new Scene(engine);
+const scene = new UberScene(engine);
 scene.useRightHandedSystem = true;
 
 await Assets.Init(scene);
@@ -44,6 +48,8 @@ scene.enablePhysics(Vector3.Zero(), havokPlugin);
 const camera = new ArcRotateCamera("camera", -Math.PI / 4, 1.0, 40, Vector3.Zero(), scene);
 camera.setTarget(Vector3.Zero());
 camera.attachControl(canvas, true);
+camera.minZ = 1;
+camera.maxZ = Settings.EARTH_RADIUS * 5;
 
 const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
 light.position = new Vector3(5, 5, 5).scaleInPlace(10);
@@ -81,13 +87,26 @@ capsule.position.z = 4;
 capsule.material = Assets.DebugMaterial("capsule", true);
 shadowGenerator.addShadowCaster(capsule);
 
-// Our built-in 'ground' shape.
 const ground = MeshBuilder.CreateGround("ground", { width: 30, height: 30 }, scene);
 ground.receiveShadows = true;
 const groundMaterial = Assets.DebugMaterial("ground", true);
 groundMaterial.diffuseColor.scaleInPlace(0.5);
 groundMaterial.specularColor.scaleInPlace(0.5);
 ground.material = groundMaterial;
+
+const newtonModel = new TelluricPlanemoModel(152, []);
+const newton = new TelluricPlanemo("newton", scene, [], newtonModel);
+newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 12e3, 0));
+const newtonHelper = MeshBuilder.CreateSphere("newtonHelper", { diameter: newtonModel.radius * 2, segments: 32 }, scene);
+newtonHelper.parent = newton.transform.node;
+newtonHelper.material = Assets.DebugMaterial("newtonHelper", false, true);
+
+newton.updateLOD(camera.globalPosition);
+for(const tree of newton.sides) {
+    tree.executeOnEveryChunk((chunk) => {
+        chunk.setReady(true);
+    });
+}
 
 const viewer = new PhysicsViewer();
 
@@ -127,6 +146,15 @@ function updateScene() {
     if (groundMass === undefined) throw new Error(`Mass is undefined for ${groundAggregate.body}`);
     //groundAggregate.body.applyForce(gravityForShip.scale(-groundMass / spaceship.getMass()), groundAggregate.body.getObjectCenterWorld());
     spaceship.getAggregate().body.applyForce(gravityForShip, spaceship.getAggregate().body.getObjectCenterWorld());
+
+
+
+
+    // planet thingy
+    newton.updateInternalClock(deltaTime);
+    newton.updateLOD(camera.globalPosition);
+    newton.material.update(camera.globalPosition, [light.position]);
+    Assets.ChunkForge.update();
 }
 
 scene.executeWhenReady(() => {

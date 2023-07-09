@@ -17,7 +17,7 @@ import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import "@babylonjs/core/Misc/screenshotTools";
 import { StarMap } from "../starmap/starMap";
-import { Scene } from "@babylonjs/core/scene";
+import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { positionNearObject } from "../utils/positionNearObject";
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
@@ -129,7 +129,7 @@ export class PlanetEngine {
             this.toggleStarMap();
         });
 
-        this.starSystemScene = new UberScene(this.engine);
+        this.starSystemScene = new UberScene(this.engine, ScenePerformancePriority.Intermediate);
         this.starSystemScene.clearColor = new Color4(0, 0, 0, 0);
 
         this.starSystemUI = new SystemUI(this.starSystemScene);

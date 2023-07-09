@@ -10,9 +10,9 @@ export class UberScene extends Scene {
 
     private depthRenderer: DepthRenderer | null = null;
 
-    constructor(engine: Engine) {
+    constructor(engine: Engine, performancePriority = ScenePerformancePriority.BackwardCompatible) {
         super(engine);
-        this.performancePriority = ScenePerformancePriority.Intermediate;
+        this.performancePriority = performancePriority;
     }
 
     public getDepthRenderer(): DepthRenderer {
