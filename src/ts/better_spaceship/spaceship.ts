@@ -36,8 +36,8 @@ export class Spaceship {
 
     private targetThrustHelper: Mesh | null = null;
 
-    private thrusterMatrix: Matrix;
-    private inverseThrusterMatrix: Matrix;
+    private hoverThrusterMatrix: Matrix;
+    private inverseHoverThrusterMatrix: Matrix;
 
     constructor(scene: Scene, inputs: Input[]) {
         if (!Assets.IS_READY) throw new Error("Assets are not ready yet!");
@@ -91,13 +91,13 @@ export class Spaceship {
             }
         }
 
-        this.thrusterMatrix = buildThrusterMatrix(this.hoverThrusters);
-        console.log(this.thrusterMatrix);
+        this.hoverThrusterMatrix = buildThrusterMatrix(this.hoverThrusters);
+        console.log(this.hoverThrusterMatrix);
 
-        this.inverseThrusterMatrix = pseudoInverse(this.thrusterMatrix);
-        console.log(this.inverseThrusterMatrix);
+        this.inverseHoverThrusterMatrix = inverse(this.hoverThrusterMatrix, true);
+        console.log(this.inverseHoverThrusterMatrix);
 
-        console.log(getThrusterConfiguration(new Vector3(0, 1, 0), new Vector3(0, 0, 0), this.inverseThrusterMatrix));
+        console.log(getThrusterConfiguration(new Vector3(0, 1, 0), new Vector3(0, 0, 0), this.inverseHoverThrusterMatrix));
     }
 
     initPhysics(scene: Scene) {
@@ -160,7 +160,7 @@ export class Spaceship {
                 }
 
                 if (forwardPressed != this.mainThrustersRunning) {
-                    if(forwardPressed) Assets.EngineRunningSound.play();
+                    if (forwardPressed) Assets.EngineRunningSound.play();
                     else Assets.EngineRunningSound.stop();
 
                     this.mainThrustersRunning = forwardPressed;
@@ -176,7 +176,15 @@ export class Spaceship {
 
             const upward = this.instanceRoot.getDirection(Vector3.Up());
             const targetTorqueWorld = Vector3.Cross(upward, targetThrustWorld);
+            const angle = Vector3.GetAngleBetweenVectors(upward, targetThrustWorld, targetTorqueWorld);
             const targetTorqueLocal = Vector3.TransformCoordinates(targetTorqueWorld, worldToSpaceShip);
+        
+            /*const angularSpeed = Vector3.Zero();
+            this.aggregate?.body.getAngularVelocityToRef(angularSpeed);
+
+            console.log(targetTorqueWorld, angularSpeed);
+            const targetTorque2 = angularSpeed.negate();
+            const targetTorque2Local = Vector3.TransformCoordinates(targetTorque2, worldToSpaceShip);*/
 
             if (this.targetThrustHelper !== null) this.targetThrustHelper.dispose();
             this.targetThrustHelper = MeshBuilder.CreateLines("targetThrustHelper", {
@@ -187,7 +195,7 @@ export class Spaceship {
             }, this.instanceRoot.getScene());
             this.targetThrustHelper.material = Assets.DebugMaterial("targetThrustHelper", true);
 
-            const thrusterConfiguration = getThrusterConfiguration(targetThrustLocal, targetTorqueLocal, this.inverseThrusterMatrix);
+            const thrusterConfiguration = getThrusterConfiguration(targetThrustLocal, targetTorqueLocal, this.inverseHoverThrusterMatrix);
 
             const linearVelocity = Vector3.Zero();
             this.aggregate?.body.getLinearVelocityToRef(linearVelocity);
@@ -203,13 +211,12 @@ export class Spaceship {
 
 
             const thrust = gravity.length() * heightFactor * this.getMass();
-            //console.log((1 + clamp(fallSpeed, -0.5, 0.5)), heightFactor, thrust);
 
             for (let i = 0; i < this.hoverThrusters.length; i++) {
                 this.hoverThrusters[i].setThrottle(thrusterConfiguration[i]);
                 this.hoverThrusters[i].update();
 
-                this.aggregate?.body.applyForce(this.hoverThrusters[i].getThrustDirection().scale(thrust * thrusterConfiguration[i]), this.hoverThrusters[i].getAbsolutePosition());
+                this.aggregate?.body.applyForce(this.hoverThrusters[i].getThrustDirection().scaleInPlace(thrust * thrusterConfiguration[i]), this.hoverThrusters[i].getAbsolutePosition());
             }
         } else {
             this.targetThrustHelper?.dispose();
@@ -220,18 +227,13 @@ export class Spaceship {
             }
         }
 
-        if (this.mainThrustersRunning) {
-            for(const thruster of this.mainThrusters) {
-                thruster.setThrottle(1);
-                thruster.update();
+        for (const thruster of this.mainThrusters) {
+            thruster.setThrottle(this.mainThrustersRunning ? 1 : 0);
+            thruster.update();
 
-                this.aggregate?.body.applyForce(thruster.getThrustDirection().scale(2), thruster.getAbsolutePosition());
-            }
-        } else {
-            for(const thruster of this.mainThrusters) {
-                thruster.setThrottle(0);
-                thruster.update();
-            }
+            const thrust = 3;
+
+            this.aggregate?.body.applyForce(thruster.getThrustDirection().scaleInPlace(thrust), thruster.getAbsolutePosition());
         }
     }
 }
