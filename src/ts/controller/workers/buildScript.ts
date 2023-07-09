@@ -44,6 +44,9 @@ function handle_build(data: TransferBuildData): void {
             transfer: [verticesPositions.buffer, indices.buffer, normals.buffer]
         }
     );
+
+    terrain_settings.free();
+    buildData.free();
 }
 
 self.onmessage = (e) => {
