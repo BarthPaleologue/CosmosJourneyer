@@ -8,7 +8,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Input, InputType } from "../controller/inputs/input";
 import { Keyboard } from "../controller/inputs/keyboard";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { HoverThruster } from "./hoverThruster";
+import { Thruster } from "./thruster";
 import { Matrix, inverse, pseudoInverse } from "ml-matrix";
 import { buildThrusterMatrix, getThrustAndTorque, getThrusterConfiguration } from "./thrusterMatrix";
 import { clamp } from "terrain-generation";
@@ -24,7 +24,7 @@ export class Spaceship {
 
     private engineRunning = false;
 
-    private hoverThrusters: HoverThruster[] = [];
+    private hoverThrusters: Thruster[] = [];
 
     private otherMeshes: AbstractMesh[] = [];
 
@@ -51,7 +51,7 @@ export class Spaceship {
 
         for (const child of this.instanceRoot.getChildMeshes()) {
             if (child.name.includes("hoverThruster")) {
-                const thruster = new HoverThruster(child as Mesh);
+                const thruster = new Thruster(child as Mesh);
                 this.hoverThrusters.push(thruster);
                 console.log("found", child.name);
 

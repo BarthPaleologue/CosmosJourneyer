@@ -5,7 +5,7 @@ import { PhysicsShapeBox } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
 
-export class HoverThruster {
+export class Thruster {
     private mesh: Mesh;
     private torque: Vector3;
 

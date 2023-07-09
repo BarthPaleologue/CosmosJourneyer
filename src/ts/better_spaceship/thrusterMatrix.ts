@@ -1,10 +1,10 @@
 import { Matrix } from 'ml-matrix';
-import { HoverThruster } from "./hoverThruster";
+import { Thruster } from "./thruster";
 import { Vector3 } from '@babylonjs/core/Maths/math';
 
 // the math behind this file is based on https://simblob.blogspot.com/2009/01/game-component-spaceship-editor-part-1.html
 
-export function buildThrusterMatrix(hoverThrusters: HoverThruster[]) {
+export function buildThrusterMatrix(hoverThrusters: Thruster[]) {
     const rowForceX = [];
     const rowForceY = [];
     const rowForceZ = [];
