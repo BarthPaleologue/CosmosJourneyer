@@ -8,10 +8,11 @@ import { ITransformable } from "../../model/orbits/iOrbitalObject";
 import { Scene } from "@babylonjs/core/scene";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import "@babylonjs/core/Engines/Extensions/engine.query";
+import { VertexData } from "@babylonjs/core/Meshes";
 
 export class PlanetChunk implements ITransformable {
     public readonly mesh: Mesh;
-    public readonly depth: number;
+    private readonly depth: number;
     public readonly cubePosition: Vector3;
     private ready = false;
     readonly isMinDepth;
@@ -56,6 +57,12 @@ export class PlanetChunk implements ITransformable {
         position.normalize().scaleInPlace(rootLength / 2);
 
         this.transform.node.position = position;
+    }
+
+    public init(vertexData: VertexData) {
+        vertexData.applyToMesh(this.mesh, false);
+        this.mesh.freezeNormals();
+        if (this.isMinDepth) this.setReady(true);
     }
 
     public getBoundingRadius(): number {

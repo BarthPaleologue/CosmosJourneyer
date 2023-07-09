@@ -132,11 +132,7 @@ export class ChunkForge {
     private executeNextApplyTask() {
         const task = this.applyTasks.shift();
         if (task) {
-            task.vertexData.applyToMesh(task.chunk.mesh, false);
-            task.chunk.mesh.freezeNormals();
-
-            if (task.chunk.isMinDepth) task.chunk.setReady(true);
-
+            task.chunk.init(task.vertexData);
             this.deleteTasks.push(task.callbackTasks);
         }
     }
