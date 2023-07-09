@@ -26,7 +26,6 @@ import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
 import { TelluricPlanemo } from "./view/bodies/planemos/telluricPlanemo";
 import { UberScene } from "./controller/uberCore/uberScene";
 import { Settings } from "./settings";
-import { ScenePerformancePriority } from "@babylonjs/core/scene";
 
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
@@ -97,10 +96,6 @@ ground.material = groundMaterial;
 const newtonModel = new TelluricPlanemoModel(152, []);
 const newton = new TelluricPlanemo("newton", scene, [], newtonModel);
 newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 12e3, 0));
-const newtonHelper = MeshBuilder.CreateSphere("newtonHelper", { diameter: newtonModel.radius * 2, segments: 32 }, scene);
-newtonHelper.parent = newton.transform.node;
-newtonHelper.material = Assets.DebugMaterial("newtonHelper", false, true);
-
 newton.updateLOD(camera.globalPosition);
 for(const tree of newton.sides) {
     tree.executeOnEveryChunk((chunk) => {
