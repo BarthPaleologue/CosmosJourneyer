@@ -22,9 +22,13 @@ export class Spaceship {
 
     private inputs: Input[] = [];
 
-    private engineRunning = false;
+    private mainThrustersRunning = false;
+    private hoverThrustersRunning = false;
 
+    private mainThrusters: Thruster[] = [];
     private hoverThrusters: Thruster[] = [];
+
+    private allThrusters: Thruster[] = [];
 
     private otherMeshes: AbstractMesh[] = [];
 
@@ -53,6 +57,23 @@ export class Spaceship {
             if (child.name.includes("hoverThruster")) {
                 const thruster = new Thruster(child as Mesh);
                 this.hoverThrusters.push(thruster);
+                this.allThrusters.push(thruster);
+                console.log("found", child.name);
+
+                const helperLine = MeshBuilder.CreateLines("helperLine", {
+                    points: [
+                        Vector3.Zero(),
+                        new Vector3(0, -1, 0),
+                    ]
+                }, scene);
+                helperLine.scaling.scaleInPlace(5);
+                helperLine.material = Assets.DebugMaterial(`helperLine${child.name}`, true);
+
+                helperLine.parent = child;
+            } else if (child.name.includes("mainThruster")) {
+                const thruster = new Thruster(child as Mesh);
+                this.mainThrusters.push(thruster);
+                this.allThrusters.push(thruster);
                 console.log("found", child.name);
 
                 const helperLine = MeshBuilder.CreateLines("helperLine", {
@@ -129,27 +150,35 @@ export class Spaceship {
                 const keyboard = input as Keyboard;
 
                 const spacePressed = keyboard.isPressed(" ");
+                const forwardPressed = keyboard.isAnyPressed(["w", "z"]);
 
-                if (spacePressed != this.engineRunning) {
+                if (spacePressed != this.hoverThrustersRunning) {
                     if (spacePressed) Assets.EngineRunningSound.play();
                     else Assets.EngineRunningSound.stop();
 
-                    this.engineRunning = spacePressed;
+                    this.hoverThrustersRunning = spacePressed;
+                }
+
+                if (forwardPressed != this.mainThrustersRunning) {
+                    if(forwardPressed) Assets.EngineRunningSound.play();
+                    else Assets.EngineRunningSound.stop();
+
+                    this.mainThrustersRunning = forwardPressed;
                 }
             }
         }
 
-        if (this.engineRunning) {
+        if (this.hoverThrustersRunning) {
             const worldToSpaceShip = this.instanceRoot.computeWorldMatrix().getRotationMatrix().invert();
             const targetThrustWorld = new Vector3(0, 1, 0);
-            const targetThrustLocal = Vector3.TransformCoordinates(targetThrustWorld, worldToSpaceShip);  
+            const targetThrustLocal = Vector3.TransformCoordinates(targetThrustWorld, worldToSpaceShip);
             const targetHeight = 15;
 
             const upward = this.instanceRoot.getDirection(Vector3.Up());
             const targetTorqueWorld = Vector3.Cross(upward, targetThrustWorld);
             const targetTorqueLocal = Vector3.TransformCoordinates(targetTorqueWorld, worldToSpaceShip);
 
-            if(this.targetThrustHelper !== null) this.targetThrustHelper.dispose();
+            if (this.targetThrustHelper !== null) this.targetThrustHelper.dispose();
             this.targetThrustHelper = MeshBuilder.CreateLines("targetThrustHelper", {
                 points: [
                     this.instanceRoot.position,
@@ -159,7 +188,7 @@ export class Spaceship {
             this.targetThrustHelper.material = Assets.DebugMaterial("targetThrustHelper", true);
 
             const thrusterConfiguration = getThrusterConfiguration(targetThrustLocal, targetTorqueLocal, this.inverseThrusterMatrix);
-            
+
             const linearVelocity = Vector3.Zero();
             this.aggregate?.body.getLinearVelocityToRef(linearVelocity);
 
@@ -168,9 +197,9 @@ export class Spaceship {
             const fallSpeed = Vector3.Dot(linearVelocity, fallDirection);
 
             const currentHeight = this.instanceRoot.position.y;
-            
+
             let heightFactor = (1 + clamp(targetHeight - currentHeight, -0.5, 0.5)) * (1 + fallSpeed);
-            if(Math.abs(currentHeight - targetHeight) < 0.5) heightFactor = 1;
+            if (Math.abs(currentHeight - targetHeight) < 0.5) heightFactor = 1;
 
 
             const thrust = gravity.length() * heightFactor * this.getMass();
@@ -186,6 +215,20 @@ export class Spaceship {
             this.targetThrustHelper?.dispose();
 
             for (const thruster of this.hoverThrusters) {
+                thruster.setThrottle(0);
+                thruster.update();
+            }
+        }
+
+        if (this.mainThrustersRunning) {
+            for(const thruster of this.mainThrusters) {
+                thruster.setThrottle(1);
+                thruster.update();
+
+                this.aggregate?.body.applyForce(thruster.getThrustDirection().scale(2), thruster.getAbsolutePosition());
+            }
+        } else {
+            for(const thruster of this.mainThrusters) {
                 thruster.setThrottle(0);
                 thruster.update();
             }
