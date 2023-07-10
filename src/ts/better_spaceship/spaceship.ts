@@ -238,6 +238,7 @@ export class Spaceship {
         for (const thruster of this.mainThrusters) {
             thruster.setThrottle(this.mainThrustersRunning ? 1 : 0);
             thruster.update();
+            if(thruster.getThrottle() === 0) continue;
 
             const thrust = 3;
 
