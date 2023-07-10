@@ -69,10 +69,18 @@ export class PlanetChunk implements ITransformable {
         return this.chunkSideLength / 2;
     }
 
+    /**
+     * Returns true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
+     * @returns true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
+     */
     public isReady() {
         return this.ready;
     }
 
+    /**
+     * Sets the chunk readiness. Call it with true when it recieves its vertex data and call it with false when it has to be deleted
+     * @param ready true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
+     */
     public setReady(ready: boolean) {
         this.ready = ready;
         this.mesh.setEnabled(ready);
