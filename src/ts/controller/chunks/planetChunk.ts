@@ -23,9 +23,12 @@ export class PlanetChunk implements ITransformable {
 
     readonly chunkSideLength: number;
 
-    private aggregate: PhysicsAggregate | null = null;
+    private readonly parent: BasicTransform;
 
-    constructor(path: number[], direction: Direction, parent: BasicTransform, material: Material, rootLength: number, isMinDepth: boolean, scene: Scene) {
+    private aggregate: PhysicsAggregate | null = null;
+    private readonly parentAggregate: PhysicsAggregate;
+
+    constructor(path: number[], direction: Direction, parent: BasicTransform, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, isMinDepth: boolean, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;
@@ -49,6 +52,9 @@ export class PlanetChunk implements ITransformable {
         this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
         this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_STRICT;
 
+        this.parent = parent;
+        this.parentAggregate = parentAggregate;
+
         // computing the position of the chunk on the side of the planet
         const position = getChunkPlaneSpacePositionFromPath(rootLength, path);
 
@@ -68,7 +74,13 @@ export class PlanetChunk implements ITransformable {
         this.mesh.freezeNormals();
         if (this.isMinDepth) this.setReady(true);
 
-        if(this.depth > 7) this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
+        if(this.depth > 7) {
+            this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
+            this.aggregate.body.disablePreStep = false;
+
+            //const childShape = new PhysicsShapeMesh(child as Mesh, scene);
+            this.aggregate.shape.addChildFromParent(this.parent.node, this.aggregate.shape, this.mesh);
+        }
     }
 
     public getBoundingRadius(): number {

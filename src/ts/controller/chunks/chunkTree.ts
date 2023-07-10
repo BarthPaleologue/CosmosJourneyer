@@ -11,6 +11,7 @@ import { Assets } from "../assets";
 import { TelluricPlanemoModel } from "../../model/planemos/telluricPlanemoModel";
 import { Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 /**
  * A quadTree is defined recursively
@@ -38,6 +39,7 @@ export class ChunkTree {
     readonly terrainSettings: TerrainSettings;
 
     readonly parent: BasicTransform;
+    readonly parentAggregate: PhysicsAggregate;
 
     readonly material: Material;
 
@@ -50,7 +52,7 @@ export class ChunkTree {
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanemoModel, parent: BasicTransform, material: Material, scene: UberScene) {
+    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanemoModel, parent: BasicTransform, parentAggregate: PhysicsAggregate, material: Material, scene: UberScene) {
         this.rootChunkLength = planetModel.radius * 2;
         this.planetName = planetName;
         this.planetSeed = planetModel.seed;
@@ -68,6 +70,7 @@ export class ChunkTree {
         this.direction = direction;
 
         this.parent = parent;
+        this.parentAggregate = parentAggregate;
 
         this.material = material;
     }
@@ -172,7 +175,16 @@ export class ChunkTree {
      * @returns The new Chunk
      */
     private createChunk(path: number[], isFiner: boolean): PlanetChunk {
-        const chunk = new PlanetChunk(path, this.direction, this.parent, this.material, this.rootChunkLength, this.minDepth === path.length, this.scene);
+        const chunk = new PlanetChunk(
+            path,
+            this.direction,
+            this.parent,
+            this.parentAggregate,
+            this.material,
+            this.rootChunkLength,
+            this.minDepth === path.length,
+            this.scene
+        );
 
         const buildTask: BuildTask = {
             type: TaskType.Build,

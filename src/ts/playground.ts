@@ -141,10 +141,11 @@ function updateScene() {
     spaceship.getAggregate().body.applyForce(gravityForShip, spaceship.getAggregate().body.getObjectCenterWorld());
 
 
-
-
     // planet thingy
-    newton.updateInternalClock(deltaTime);
+    /*newton.updateInternalClock(deltaTime / 10);
+    newton.updateRotation(deltaTime / 10);
+    newton.nextState.position = newton.transform.getAbsolutePosition();
+    newton.applyNextState();*/
     newton.updateLOD(camera.globalPosition);
     newton.material.update(camera.globalPosition, [light.position]);
     Assets.ChunkForge.update();

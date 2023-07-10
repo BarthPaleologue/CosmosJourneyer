@@ -16,6 +16,8 @@ import { TelluricPlanemoModel } from "../../../model/planemos/telluricPlanemoMod
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { RigidBody } from "../../../controller/workers/rigidbody";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo {
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
@@ -23,6 +25,8 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
     readonly material: TelluricPlanemoMaterial;
 
     readonly model: TelluricPlanemoModel;
+
+    readonly aggregate: PhysicsAggregate;
 
     /**
      * New Telluric Planet
@@ -65,13 +69,16 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
 
         this.material = new TelluricPlanemoMaterial(this.name, this.transform, this.model, scene);
 
+        this.aggregate = new PhysicsAggregate(this.transform.node, PhysicsShapeType.CONTAINER, { mass: 0, restitution: 0.2 }, scene);
+        this.aggregate.body.disablePreStep = false;
+
         this.sides = [
-            new ChunkTree(Direction.Up, this.name, this.model, this.transform, this.material, scene),
-            new ChunkTree(Direction.Down, this.name, this.model, this.transform, this.material, scene),
-            new ChunkTree(Direction.Forward, this.name, this.model, this.transform, this.material, scene),
-            new ChunkTree(Direction.Backward, this.name, this.model, this.transform, this.material, scene),
-            new ChunkTree(Direction.Right, this.name, this.model, this.transform, this.material, scene),
-            new ChunkTree(Direction.Left, this.name, this.model, this.transform, this.material, scene)
+            new ChunkTree(Direction.Up, this.name, this.model, this.transform, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.Down, this.name, this.model, this.transform, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.Forward, this.name, this.model, this.transform, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.Backward, this.name, this.model, this.transform, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.Right, this.name, this.model, this.transform, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.Left, this.name, this.model, this.transform, this.aggregate, this.material, scene)
         ];
     }
 

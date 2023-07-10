@@ -186,9 +186,10 @@ export class Spaceship {
             /*const angularSpeed = Vector3.Zero();
             this.aggregate?.body.getAngularVelocityToRef(angularSpeed);
 
-            console.log(targetTorqueWorld, angularSpeed);
             const targetTorque2 = angularSpeed.negate();
-            const targetTorque2Local = Vector3.TransformCoordinates(targetTorque2, worldToSpaceShip);*/
+            const targetTorque2Local = Vector3.TransformCoordinates(targetTorque2, worldToSpaceShip);
+
+            targetTorqueLocal.addInPlace(targetTorque2Local).normalize();*/
 
             if (this.targetThrustHelper !== null) this.targetThrustHelper.dispose();
             this.targetThrustHelper = MeshBuilder.CreateLines("targetThrustHelper", {
@@ -200,6 +201,9 @@ export class Spaceship {
             this.targetThrustHelper.material = Assets.DebugMaterial("targetThrustHelper", true);
 
             const thrusterConfiguration = getThrusterConfiguration(targetThrustLocal, targetTorqueLocal, this.inverseHoverThrusterMatrix);
+            for(let i = 0; i < thrusterConfiguration.length; i++) {
+                thrusterConfiguration[i] = clamp(thrusterConfiguration[i], 0, 1);
+            }
 
             const linearVelocity = Vector3.Zero();
             this.aggregate?.body.getLinearVelocityToRef(linearVelocity);
