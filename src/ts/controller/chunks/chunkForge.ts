@@ -134,6 +134,7 @@ export class ChunkForge {
         if (task) {
             task.chunk.init(task.vertexData);
             this.deleteTasks.push(task.callbackTasks);
+            if(task.callbackTasks.length === 0) task.chunk.setReady(true);
         }
     }
 

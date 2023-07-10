@@ -95,13 +95,8 @@ ground.material = groundMaterial;
 
 const newtonModel = new TelluricPlanemoModel(152, []);
 const newton = new TelluricPlanemo("newton", scene, [], newtonModel);
-newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 12e3, 0));
+newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.3e3, 0));
 newton.updateLOD(camera.globalPosition);
-for(const tree of newton.sides) {
-    tree.executeOnEveryChunk((chunk) => {
-        chunk.setReady(true);
-    });
-}
 
 const viewer = new PhysicsViewer();
 
