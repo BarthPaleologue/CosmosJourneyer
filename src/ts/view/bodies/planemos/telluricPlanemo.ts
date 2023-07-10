@@ -70,7 +70,7 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
         this.material = new TelluricPlanemoMaterial(this.name, this.transform, this.model, scene);
 
         this.aggregate = new PhysicsAggregate(this.transform.node, PhysicsShapeType.CONTAINER, { mass: 1e10, restitution: 0.2 }, scene);
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero() });
+        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 1e10 });
         this.aggregate.body.disablePreStep = false;
 
         this.sides = [
