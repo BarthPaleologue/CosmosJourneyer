@@ -52,6 +52,7 @@ camera.maxZ = Settings.EARTH_RADIUS * 5;
 
 const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
 light.position = new Vector3(5, 5, 5).scaleInPlace(10);
+light.parent = camera;
 
 const hemiLight = new HemisphericLight("hemiLight", new Vector3(0, 1, 0), scene);
 hemiLight.intensity = 0.2;
@@ -86,23 +87,23 @@ capsule.position.z = 4;
 capsule.material = Assets.DebugMaterial("capsule", true);
 shadowGenerator.addShadowCaster(capsule);
 
-const ground = MeshBuilder.CreateGround("ground", { width: 30, height: 30 }, scene);
+/*const ground = MeshBuilder.CreateGround("ground", { width: 30, height: 30 }, scene);
 ground.receiveShadows = true;
 const groundMaterial = Assets.DebugMaterial("ground", true);
 groundMaterial.diffuseColor.scaleInPlace(0.5);
 groundMaterial.specularColor.scaleInPlace(0.5);
 groundMaterial.backFaceCulling = false;
-ground.material = groundMaterial;
+ground.material = groundMaterial;*/
 
 const newtonModel = new TelluricPlanemoModel(152, []);
 const newton = new TelluricPlanemo("newton", scene, [], newtonModel);
-newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.3e3, 0));
+newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
 newton.updateLOD(camera.globalPosition);
 
 const viewer = new PhysicsViewer();
 
 const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, { mass: 1, restitution: 0.75 }, scene);
-const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0 }, scene);
+//const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0 }, scene);
 const boxAggregate = new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 1, restitution: 0.2 }, scene);
 const capsuleAggregate = new PhysicsAggregate(capsule, PhysicsShapeType.CAPSULE, { mass: 1, restitution: 0.2 }, scene);
 spaceship.initPhysics(scene);
@@ -110,7 +111,7 @@ spaceship.initPhysics(scene);
 // add impulse to box
 boxAggregate.body.applyImpulse(new Vector3(0, 0, -1), box.getAbsolutePosition());
 
-groundAggregate.body.setMassProperties({ inertia: Vector3.Zero() });
+//groundAggregate.body.setMassProperties({ inertia: Vector3.Zero() });
 
 const otherPhysicAggregates = [sphereAggregate, boxAggregate, capsuleAggregate];
 //viewer.showBody(spaceship.getAggregate().body);
@@ -132,22 +133,26 @@ function updateScene() {
         if (mass === undefined) throw new Error(`Mass is undefined for ${aggregate.body}`);
         const gravityDirection = aggregate.body.getObjectCenterWorld().subtract(gravityOrigin).normalize();
         aggregate.body.applyForce(gravityDirection.scaleInPlace(gravity * mass), aggregate.body.getObjectCenterWorld());
-        //aggregate.body.applyForce(gravityForShip.scale(-mass / spaceship.getMass()), aggregate.body.getObjectCenterWorld());
+        aggregate.body.applyForce(gravityForShip.scale(-mass / spaceship.getMass()), aggregate.body.getObjectCenterWorld());
     }
 
-    const groundMass = groundAggregate.body.getMassProperties().mass;
-    if (groundMass === undefined) throw new Error(`Mass is undefined for ${groundAggregate.body}`);
+    //const groundMass = groundAggregate.body.getMassProperties().mass;
+    //if (groundMass === undefined) throw new Error(`Mass is undefined for ${groundAggregate.body}`);
     //groundAggregate.body.applyForce(gravityForShip.scale(-groundMass / spaceship.getMass()), groundAggregate.body.getObjectCenterWorld());
-    spaceship.getAggregate().body.applyForce(gravityForShip, spaceship.getAggregate().body.getObjectCenterWorld());
+    //spaceship.getAggregate().body.applyForce(gravityForShip, spaceship.getAggregate().body.getObjectCenterWorld());
+
+    const newtonMass = newton.aggregate.body.getMassProperties().mass;
+    if (newtonMass === undefined) throw new Error(`Mass is undefined for ${newton.aggregate.body}`);
+    newton.aggregate.body.applyForce(gravityForShip.scale(-newtonMass / spaceship.getMass()), newton.aggregate.body.getObjectCenterWorld());
 
 
     // planet thingy
-    /*newton.updateInternalClock(deltaTime / 10);
-    newton.updateRotation(deltaTime / 10);
+    newton.updateInternalClock(-deltaTime / 10);
+    /*newton.updateRotation(deltaTime / 10);
     newton.nextState.position = newton.transform.getAbsolutePosition();
     newton.applyNextState();*/
     newton.updateLOD(camera.globalPosition);
-    newton.material.update(camera.globalPosition, [light.position]);
+    newton.material.update(camera.globalPosition, [light.getAbsolutePosition()]);
     Assets.ChunkForge.update();
 
     /*for (const tree of newton.sides) {

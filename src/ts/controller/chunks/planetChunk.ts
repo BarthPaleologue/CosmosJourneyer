@@ -10,7 +10,7 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import "@babylonjs/core/Engines/Extensions/engine.query";
 import { VertexData } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 
 export class PlanetChunk implements ITransformable {
     public readonly mesh: Mesh;
@@ -25,7 +25,7 @@ export class PlanetChunk implements ITransformable {
 
     private readonly parent: BasicTransform;
 
-    private aggregate: PhysicsAggregate | null = null;
+    private physicsShape: PhysicsShapeMesh | null = null;
     private readonly parentAggregate: PhysicsAggregate;
 
     constructor(path: number[], direction: Direction, parent: BasicTransform, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, isMinDepth: boolean, scene: Scene) {
@@ -75,20 +75,18 @@ export class PlanetChunk implements ITransformable {
         if (this.isMinDepth) this.setReady(true);
 
         if(this.depth > 7) {
-            this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
-            this.aggregate.body.disablePreStep = false;
+            //this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
+            //this.aggregate.body.disablePreStep = false;
 
-            //const childShape = new PhysicsShapeMesh(child as Mesh, scene);
-            this.aggregate.shape.addChildFromParent(this.parent.node, this.aggregate.shape, this.mesh);
+            this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
+
+            this.parentAggregate.shape.addChildFromParent(this.parent.node, this.physicsShape, this.mesh);
+            //this.aggregate.shape.addChildFromParent(this.parent.node, this.aggregate.shape, this.mesh);
         }
     }
 
     public getBoundingRadius(): number {
         return this.chunkSideLength / 2;
-    }
-
-    public getAggregate(): PhysicsAggregate | null {
-        return this.aggregate;
     }
 
     /**

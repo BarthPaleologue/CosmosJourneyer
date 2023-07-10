@@ -214,7 +214,7 @@ export class Spaceship {
 
             const currentHeight = this.instanceRoot.position.y;
 
-            let heightFactor = (1 + clamp(targetHeight - currentHeight, -0.5, 0.5)) * (1 + fallSpeed);
+            let heightFactor = (1 + clamp(targetHeight - currentHeight, -0.5, 0.5)); //* (1 + fallSpeed);
             if (Math.abs(currentHeight - targetHeight) < 0.5) heightFactor = 1;
 
 
