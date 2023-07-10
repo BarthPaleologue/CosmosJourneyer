@@ -91,6 +91,7 @@ ground.receiveShadows = true;
 const groundMaterial = Assets.DebugMaterial("ground", true);
 groundMaterial.diffuseColor.scaleInPlace(0.5);
 groundMaterial.specularColor.scaleInPlace(0.5);
+groundMaterial.backFaceCulling = false;
 ground.material = groundMaterial;
 
 const newtonModel = new TelluricPlanemoModel(152, []);
@@ -114,7 +115,8 @@ groundAggregate.body.setMassProperties({ inertia: Vector3.Zero() });
 const otherPhysicAggregates = [sphereAggregate, boxAggregate, capsuleAggregate];
 //viewer.showBody(spaceship.getAggregate().body);
 
-const gravity = new Vector3(0, -9.81, 0);
+const gravityOrigin = newton.transform.getAbsolutePosition();
+const gravity = -9.81;
 
 let clockSeconds = 0;
 function updateScene() {
@@ -123,12 +125,13 @@ function updateScene() {
 
     spaceship.update();
 
-    const gravityForShip = gravity.scale(spaceship.getMass());
+    const gravityForShip = spaceship.getAbsolutePosition().subtract(gravityOrigin).normalize().scaleInPlace(gravity * spaceship.getMass());
 
     for (const aggregate of otherPhysicAggregates) {
         const mass = aggregate.body.getMassProperties().mass;
         if (mass === undefined) throw new Error(`Mass is undefined for ${aggregate.body}`);
-        aggregate.body.applyForce(gravity.scale(mass), aggregate.body.getObjectCenterWorld());
+        const gravityDirection = aggregate.body.getObjectCenterWorld().subtract(gravityOrigin).normalize();
+        aggregate.body.applyForce(gravityDirection.scaleInPlace(gravity * mass), aggregate.body.getObjectCenterWorld());
         //aggregate.body.applyForce(gravityForShip.scale(-mass / spaceship.getMass()), aggregate.body.getObjectCenterWorld());
     }
 
@@ -145,6 +148,13 @@ function updateScene() {
     newton.updateLOD(camera.globalPosition);
     newton.material.update(camera.globalPosition, [light.position]);
     Assets.ChunkForge.update();
+
+    /*for (const tree of newton.sides) {
+        tree.executeOnEveryChunk(chunk => {
+            const aggregate = chunk.getAggregate();
+            if (aggregate !== null) viewer.showBody(aggregate.body);
+        });
+    }*/
 }
 
 scene.executeWhenReady(() => {

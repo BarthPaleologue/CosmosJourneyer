@@ -144,6 +144,10 @@ export class Spaceship {
         return this.collisionObservable;
     }
 
+    getAbsolutePosition(): Vector3 {
+        return this.instanceRoot.getAbsolutePosition();
+    }
+
     update() {
         for (const input of this.inputs) {
             if (input.type === InputType.KEYBOARD) {

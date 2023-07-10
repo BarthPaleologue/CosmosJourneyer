@@ -9,6 +9,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import "@babylonjs/core/Engines/Extensions/engine.query";
 import { VertexData } from "@babylonjs/core/Meshes";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export class PlanetChunk implements ITransformable {
     public readonly mesh: Mesh;
@@ -20,6 +22,8 @@ export class PlanetChunk implements ITransformable {
     public readonly transform: BasicTransform;
 
     readonly chunkSideLength: number;
+
+    private aggregate: PhysicsAggregate | null = null;
 
     constructor(path: number[], direction: Direction, parent: BasicTransform, material: Material, rootLength: number, isMinDepth: boolean, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
@@ -63,10 +67,16 @@ export class PlanetChunk implements ITransformable {
         vertexData.applyToMesh(this.mesh, false);
         this.mesh.freezeNormals();
         if (this.isMinDepth) this.setReady(true);
+
+        if(this.depth > 7) this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
     }
 
     public getBoundingRadius(): number {
         return this.chunkSideLength / 2;
+    }
+
+    public getAggregate(): PhysicsAggregate | null {
+        return this.aggregate;
     }
 
     /**
