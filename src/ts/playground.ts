@@ -85,6 +85,7 @@ capsule.position.y = 4;
 capsule.position.x = -4;
 capsule.position.z = 4;
 capsule.material = Assets.DebugMaterial("capsule", true);
+capsule.visibility = 0.5;
 shadowGenerator.addShadowCaster(capsule);
 
 const newtonModel = new TelluricPlanemoModel(152, []);
@@ -97,12 +98,26 @@ const viewer = new PhysicsViewer();
 const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, { mass: 1, restitution: 0.75 }, scene);
 const boxAggregate = new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 1, restitution: 0.2 }, scene);
 const capsuleAggregate = new PhysicsAggregate(capsule, PhysicsShapeType.CAPSULE, { mass: 1, restitution: 0.2 }, scene);
+capsuleAggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 1 });
 spaceship.initPhysics(scene);
 
 // add impulse to box
 boxAggregate.body.applyImpulse(new Vector3(0, 0, -1), box.getAbsolutePosition());
 
-const otherPhysicAggregates = [sphereAggregate, boxAggregate, capsuleAggregate];
+const aggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.getAggregate(), newton.aggregate];
+/*for (const aggregate of aggregates) {
+    spaceship.addOnApplyForceCallback((force) => {
+        aggregate.body.applyForce(force.negate(), aggregate.body.getObjectCenterWorld());
+    });
+    spaceship.addOnApplyImpulseCallback((impulse) => {
+        aggregate.body.applyImpulse(impulse, aggregate.body.getObjectCenterWorld());
+    });
+}*/
+for(const aggregate of aggregates) {
+    aggregate.body.disablePreStep = false;
+}
+
+const fallingAggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.getAggregate()];
 //viewer.showBody(spaceship.getAggregate().body);
 
 const gravityOrigin = newton.transform.getAbsolutePosition();
@@ -110,27 +125,30 @@ const gravity = -9.81;
 
 let clockSeconds = 0;
 function updateScene() {
+
+    const spaceshipPosition = spaceship.getAbsolutePosition();
+    for(const aggregate of aggregates) {
+        aggregate.transformNode.position.subtractInPlace(spaceshipPosition);
+    }
+    console.log(spaceship.getAbsolutePosition());
     const deltaTime = engine.getDeltaTime() / 1000;
     clockSeconds += deltaTime;
 
     spaceship.update();
 
-    const gravityForShip = spaceship.getAbsolutePosition().subtract(gravityOrigin).normalize().scaleInPlace(gravity * spaceship.getMass());
-
-    for (const aggregate of otherPhysicAggregates) {
+    for (const aggregate of fallingAggregates) {
         const mass = aggregate.body.getMassProperties().mass;
         if (mass === undefined) throw new Error(`Mass is undefined for ${aggregate.body}`);
         const gravityDirection = aggregate.body.getObjectCenterWorld().subtract(gravityOrigin).normalize();
         aggregate.body.applyForce(gravityDirection.scaleInPlace(gravity * mass), aggregate.body.getObjectCenterWorld());
-        aggregate.body.applyForce(gravityForShip.scale(-mass / spaceship.getMass()), aggregate.body.getObjectCenterWorld());
     }
 
     //spaceship.getAggregate().body.applyForce(gravityForShip, spaceship.getAggregate().body.getObjectCenterWorld());
 
     const newtonMass = newton.aggregate.body.getMassProperties().mass;
     if (newtonMass === undefined) throw new Error(`Mass is undefined for ${newton.aggregate.body}`);
-    newton.aggregate.body.applyForce(gravityForShip.scale(-newtonMass / spaceship.getMass()), newton.aggregate.body.getObjectCenterWorld());
-
+    //newton.aggregate.body.applyForce(gravityForShip.scale(-newtonMass / spaceship.getMass()), newton.aggregate.body.getObjectCenterWorld());
+    //newton.aggregate.body.setLinearVelocity(gravityForShip.scale(-1 / spaceship.getMass()));
 
     // planet thingy
     newton.updateInternalClock(-deltaTime / 10);

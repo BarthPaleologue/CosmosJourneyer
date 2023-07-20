@@ -36,8 +36,11 @@ export class Spaceship {
 
     private targetThrustHelper: Mesh | null = null;
 
-    private hoverThrusterMatrix: Matrix;
-    private inverseHoverThrusterMatrix: Matrix;
+    private readonly hoverThrusterMatrix: Matrix;
+    private readonly inverseHoverThrusterMatrix: Matrix;
+
+    private readonly onApplyForceCallbacks: ((force: Vector3) => void)[] = [];
+    private readonly onApplyImpulseCallbacks: ((impulse: Vector3) => void)[] = [];
 
     constructor(scene: Scene, inputs: Input[]) {
         if (!Assets.IS_READY) throw new Error("Assets are not ready yet!");
@@ -115,6 +118,8 @@ export class Spaceship {
 
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
         this.collisionObservable.add((collisionEvent: IPhysicsCollisionEvent) => {
+            if(collisionEvent.normal === null) return;
+            this.dispatchOnApplyImpulseCallbacks(collisionEvent.normal.scale(collisionEvent.impulse));
             if (collisionEvent.impulse < 0.8) return;
             Assets.OuchSound.play();
         });
@@ -146,6 +151,22 @@ export class Spaceship {
 
     getAbsolutePosition(): Vector3 {
         return this.instanceRoot.getAbsolutePosition();
+    }
+
+    addOnApplyForceCallback(callback: (force: Vector3) => void) {
+        this.onApplyForceCallbacks.push(callback);
+    }
+
+    dispatchApplyForceCallbacks(force: Vector3) {
+        for (const callback of this.onApplyForceCallbacks) callback(force);
+    }
+
+    addOnApplyImpulseCallback(callback: (impulse: Vector3) => void) {
+        this.onApplyImpulseCallbacks.push(callback);
+    }
+
+    dispatchOnApplyImpulseCallbacks(impulse: Vector3) {
+        for (const callback of this.onApplyImpulseCallbacks) callback(impulse);
     }
 
     update() {
@@ -182,7 +203,7 @@ export class Spaceship {
             const targetTorqueWorld = Vector3.Cross(upward, targetThrustWorld);
             const angle = Vector3.GetAngleBetweenVectors(upward, targetThrustWorld, targetTorqueWorld);
             const targetTorqueLocal = Vector3.TransformCoordinates(targetTorqueWorld, worldToSpaceShip);
-        
+
             /*const angularSpeed = Vector3.Zero();
             this.aggregate?.body.getAngularVelocityToRef(angularSpeed);
 
@@ -201,7 +222,7 @@ export class Spaceship {
             this.targetThrustHelper.material = Assets.DebugMaterial("targetThrustHelper", true);
 
             const thrusterConfiguration = getThrusterConfiguration(targetThrustLocal, targetTorqueLocal, this.inverseHoverThrusterMatrix);
-            for(let i = 0; i < thrusterConfiguration.length; i++) {
+            for (let i = 0; i < thrusterConfiguration.length; i++) {
                 thrusterConfiguration[i] = clamp(thrusterConfiguration[i], 0, 1);
             }
 
@@ -224,7 +245,11 @@ export class Spaceship {
                 this.hoverThrusters[i].setThrottle(thrusterConfiguration[i]);
                 this.hoverThrusters[i].update();
 
-                this.aggregate?.body.applyForce(this.hoverThrusters[i].getThrustDirection().scaleInPlace(thrust * thrusterConfiguration[i]), this.hoverThrusters[i].getAbsolutePosition());
+                const force = this.hoverThrusters[i].getThrustDirection().scaleInPlace(thrust * thrusterConfiguration[i]);
+
+                this.aggregate?.body.applyForce(force, this.hoverThrusters[i].getAbsolutePosition());
+
+                this.dispatchApplyForceCallbacks(force);
             }
         } else {
             this.targetThrustHelper?.dispose();
@@ -238,7 +263,7 @@ export class Spaceship {
         for (const thruster of this.mainThrusters) {
             thruster.setThrottle(this.mainThrustersRunning ? 1 : 0);
             thruster.update();
-            if(thruster.getThrottle() === 0) continue;
+            if (thruster.getThrottle() === 0) continue;
 
             const thrust = 3;
 

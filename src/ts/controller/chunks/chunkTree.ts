@@ -220,6 +220,13 @@ export class ChunkTree {
         });
     }
 
+    public getChunks(): PlanetChunk[] {
+        const chunks: PlanetChunk[] = [];
+        this.executeOnEveryChunk((chunk) => chunks.push(chunk));
+    
+        return chunks;
+    }
+
     /**
      * Regenerate planet chunks
      */
