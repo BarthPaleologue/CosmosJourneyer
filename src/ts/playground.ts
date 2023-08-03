@@ -108,6 +108,7 @@ const aggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.g
 for(const aggregate of aggregates) {
     aggregate.body.disablePreStep = false;
 }
+const meshes = [sphere, box, capsule, spaceship.instanceRoot, newton.transform.node];
 
 const fallingAggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.getAggregate()];
 //viewer.showBody(spaceship.getAggregate().body);
@@ -117,11 +118,7 @@ const gravity = -9.81;
 
 let clockSeconds = 0;
 function updateScene() {
-    // move back everything to the origin
-    const spaceshipPosition = spaceship.getAbsolutePosition();
-    for(const aggregate of aggregates) {
-        aggregate.transformNode.position.subtractInPlace(spaceshipPosition);
-    }
+    
 
     const deltaTime = engine.getDeltaTime() / 1000;
     clockSeconds += deltaTime;
@@ -144,6 +141,13 @@ function updateScene() {
     newton.updateLOD(camera.globalPosition);
     newton.material.update(camera.globalPosition, [light.getAbsolutePosition()]);
     Assets.ChunkForge.update();
+
+    // move back everything to the origin
+    const spaceshipPosition = spaceship.getAbsolutePosition();
+
+    for(const mesh of meshes) {
+        mesh.position.subtractInPlace(spaceshipPosition);
+    }
 }
 
 scene.executeWhenReady(() => {
