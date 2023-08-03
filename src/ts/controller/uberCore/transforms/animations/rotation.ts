@@ -1,6 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { BasicTransform } from "../basicTransform";
 import { easeInOutInterpolation } from "./interpolations";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { rotate } from "../basicTransform";
 
 export class TransformRotationAnimation {
     private clock = 0;
@@ -8,9 +9,9 @@ export class TransformRotationAnimation {
     private thetaAcc = 0;
     private readonly totalTheta;
     private readonly axis;
-    private readonly transform: BasicTransform;
+    private readonly transform: TransformNode;
 
-    constructor(transform: BasicTransform, axis: Vector3, theta: number, duration: number) {
+    constructor(transform: TransformNode, axis: Vector3, theta: number, duration: number) {
         this.transform = transform;
         this.axis = axis;
         this.totalTheta = theta;
@@ -25,7 +26,7 @@ export class TransformRotationAnimation {
         const dtheta = this.totalTheta * easeInOutInterpolation(this.clock / this.duration) - this.thetaAcc;
         this.thetaAcc += dtheta;
 
-        this.transform.rotate(this.axis, dtheta);
+        rotate(this.transform, this.axis, dtheta);
     }
 
     isFinished(): boolean {

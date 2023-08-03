@@ -8,6 +8,7 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { IOrbitalObject } from "../../model/orbits/iOrbitalObject";
+import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -85,7 +86,7 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
                 name: "planetInverseRotationQuaternion",
                 type: ShaderDataType.Quaternion,
                 get: () => {
-                    return planet.transform.getInverseRotationQuaternion();
+                    return getInverseRotationQuaternion(planet.transform);
                 }
             },
             {

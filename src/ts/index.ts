@@ -19,6 +19,7 @@ import { PostProcessType } from "./view/postProcesses/postProcessTypes";
 import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
 import { StarModel } from "./model/stellarObjects/starModel";
 import { GasPlanetModel } from "./model/planemos/gasPlanetModel";
+import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
 
 const engine = new PlanetEngine();
 
@@ -55,7 +56,7 @@ scene.setActiveController(spaceshipController);
 engine.registerStarSystemUpdateCallback(() => {
     if (scene.getActiveController() != spaceshipController) return;
 
-    const shipPosition = spaceshipController.transform.getAbsolutePosition();
+    const shipPosition = spaceshipController.aggregate.transformNode.getAbsolutePosition();
     const nearestBody = engine.getStarSystem().getNearestObject(shipPosition);
     const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getBoundingRadius();
@@ -163,12 +164,12 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "g") {
         if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);
-            player.transform.setRotationQuaternion(spaceshipController.transform.getRotationQuaternion().clone());
+            setRotationQuaternion(player.aggregate.transformNode, getRotationQuaternion(spaceshipController.aggregate.transformNode).clone());
             engine.getStarSystem().postProcessManager.rebuild(spaceshipController.getActiveCamera());
             spaceshipController.setHidden(true);
         } else {
             scene.setActiveController(spaceshipController);
-            spaceshipController.transform.setRotationQuaternion(player.transform.getRotationQuaternion().clone());
+            setRotationQuaternion(spaceshipController.aggregate.transformNode, getRotationQuaternion(player.aggregate.transformNode).clone());
             engine.getStarSystem().postProcessManager.rebuild(player.getActiveCamera());
             spaceshipController.setHidden(false);
         }

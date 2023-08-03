@@ -4,7 +4,6 @@ import { Assets } from "./assets";
 import { AbstractController } from "./uberCore/abstractController";
 import { UberScene } from "./uberCore/uberScene";
 import { StarSystem } from "./starSystem";
-import { CollisionWorker } from "./workers/collisionWorker";
 import { TelluricPlanemo } from "../view/bodies/planemos/telluricPlanemo";
 import { Settings } from "../settings";
 import { OverlayPostProcess } from "../view/postProcesses/overlayPostProcess";
@@ -12,7 +11,6 @@ import { isOrbiting } from "../utils/nearestBody";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
-import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import "@babylonjs/core/Misc/screenshotTools";
@@ -28,6 +26,7 @@ import "@babylonjs/core/Engines/WebGPU/Extensions/";
 import { SystemUI } from "../ui/systemUI";
 import { BlackHole } from "../view/bodies/stellarObjects/blackHole";
 import { ShipController } from "../spaceship/shipController";
+import { Vector3 } from "@babylonjs/core/Maths/math";
 
 enum EngineState {
     RUNNING,
@@ -52,8 +51,6 @@ export class PlanetEngine {
     private starMap: StarMap | null = null;
 
     private activeScene: Scene | null = null;
-
-    private readonly collisionWorker = new CollisionWorker();
 
     private state = EngineState.RUNNING;
 
@@ -135,7 +132,9 @@ export class PlanetEngine {
         console.log(`API: ${this.engine instanceof WebGPUEngine ? "WebGPU" : "WebGL" + this.engine.webGLVersion}`);
         console.log(`GPU detected: ${this.engine.getGlInfo().renderer}`);
 
-        this.starMap = new StarMap(this.engine);
+        const havokInstance = await HavokPhysics();
+
+        this.starMap = new StarMap(havokInstance, this.engine);
         this.starMap.registerWarpCallback((seed: number) => {
             this.setStarSystem(new StarSystem(seed, this.getStarSystemScene()), true);
             this.init();
@@ -153,9 +152,8 @@ export class PlanetEngine {
 
         this.starSystemUI = new SystemUI(this.starSystemScene);
 
-        const havokInstance = await HavokPhysics();
         const havokPlugin = new HavokPlugin(true, havokInstance);
-        this.starSystemScene.enablePhysics(null, havokPlugin);
+        this.starSystemScene.enablePhysics(Vector3.Zero(), havokPlugin);
 
         this.activeScene = this.starSystemScene;
 
@@ -183,10 +181,6 @@ export class PlanetEngine {
 
             this.getStarSystem().translateEverythingNow(activeController.update(deltaTime));
 
-            if (!this.collisionWorker.isBusy() && isOrbiting(activeController, nearestBody)) {
-                if (nearestBody instanceof TelluricPlanemo) this.collisionWorker.checkCollision(nearestBody);
-            }
-
             //FIXME: should address stars orbits
             for (const star of starSystem.stellarObjects) star.model.orbitalProperties.period = 0;
 
@@ -207,8 +201,6 @@ export class PlanetEngine {
      */
     public init(): void {
         this.getStarSystem().init();
-        this.collisionWorker.setStarSystem(this.getStarSystem());
-        this.collisionWorker.setPlayer(this.getStarSystemScene().getActiveController());
     }
 
     /**
@@ -217,7 +209,6 @@ export class PlanetEngine {
      */
     public setActiveController(controller: AbstractController): void {
         this.getStarSystemScene().setActiveController(controller);
-        this.collisionWorker.setPlayer(controller);
     }
 
     /**

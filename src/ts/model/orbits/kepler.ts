@@ -6,6 +6,7 @@ import { IOrbitalProperties } from "./iOrbitalProperties";
 import { stripAxisFromQuaternion } from "../../utils/algebra";
 import { BaseModel } from "../common";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { getRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
 
 /**
  * Returns 0 when the arguments are solution to the Kepler's equation
@@ -47,7 +48,7 @@ export function computeBarycenter(body: IOrbitalObject, relevantBodies: IOrbital
     for (const otherBody of relevantBodies) {
         const mass = otherBody.model.physicalProperties.mass;
         barycenter.addInPlace(otherBody.transform.getAbsolutePosition().scale(mass));
-        meanQuaternion.addInPlace(stripAxisFromQuaternion(otherBody.transform.getRotationQuaternion(), Axis.Y).scale(mass));
+        meanQuaternion.addInPlace(stripAxisFromQuaternion(getRotationQuaternion(otherBody.transform), Axis.Y).scale(mass));
         sumPosition += mass;
         sumQuaternion += mass;
     }

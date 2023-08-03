@@ -1,4 +1,3 @@
-import { NewtonianTransform } from "../controller/uberCore/transforms/newtonianTransform";
 import { Input, InputType } from "../controller/inputs/input";
 import { UberCamera } from "../controller/uberCore/uberCamera";
 import { AbstractController } from "../controller/uberCore/abstractController";
@@ -14,10 +13,17 @@ import { WarpDrive } from "./warpDrive";
 import { parseSpeed } from "../utils/parseSpeed";
 import { LOCAL_DIRECTION } from "../controller/uberCore/localDirections";
 import { RCSThruster } from "./rcsThruster";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { IPhysicsCollisionEvent, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Observable } from "@babylonjs/core/Misc/observable";
+import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export class ShipController extends AbstractController {
-    readonly transform: NewtonianTransform;
+    //readonly transform: NewtonianTransform;
+    readonly instanceRoot: AbstractMesh;
 
     readonly rollAuthority = 0.1;
     readonly pitchAuthority = 1;
@@ -25,6 +31,9 @@ export class ShipController extends AbstractController {
 
     readonly thirdPersonCamera: UberOrbitCamera;
     readonly firstPersonCamera: UberCamera;
+
+    readonly aggregate: PhysicsAggregate;
+    private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
 
     private flightAssistEnabled = true;
 
@@ -36,19 +45,37 @@ export class ShipController extends AbstractController {
     private closestDistanceToPlanet = Infinity;
 
     constructor(scene: Scene) {
-        super(scene);
+        super();
 
-        this.transform = new NewtonianTransform("shipTransform", scene);
+        const spaceship = Assets.CreateSpaceShipInstance();
+        this.instanceRoot = spaceship;
 
         this.firstPersonCamera = new UberCamera("firstPersonCamera", Vector3.Zero(), scene);
-        this.firstPersonCamera.parent = this.transform.node;
+        this.firstPersonCamera.parent = this.instanceRoot;
         this.firstPersonCamera.position = new Vector3(0, 1, 0);
 
         this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 1.4);
-        this.thirdPersonCamera.parent = this.transform.node;
+        this.thirdPersonCamera.parent = this.instanceRoot;
 
-        const spaceship = Assets.CreateSpaceShipInstance();
-        spaceship.parent = this.transform.node;
+        //const viewer = new PhysicsViewer();
+
+        this.aggregate = new PhysicsAggregate(spaceship
+            , PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
+        for (const child of spaceship.getChildMeshes()) {
+            const childShape = new PhysicsShapeMesh(child as Mesh, scene);
+            this.aggregate.shape.addChildFromParent(spaceship, childShape, child);
+        }
+        this.aggregate.body.disablePreStep = false;
+
+        //viewer.showBody(this.aggregate.body);
+
+        this.aggregate.body.setCollisionCallbackEnabled(true);
+
+        this.collisionObservable = this.aggregate.body.getCollisionObservable();
+        this.collisionObservable.add((collisionEvent: IPhysicsCollisionEvent) => {
+            if (collisionEvent.impulse < 0.8) return;
+            Assets.OuchSound.play();
+        });
 
         for (const child of spaceship.getChildMeshes()) {
             if (child.name.includes("mainThruster")) {
@@ -76,12 +103,12 @@ export class ShipController extends AbstractController {
 
     private addMainThruster(mesh: AbstractMesh) {
         const direction = mesh.getDirection(new Vector3(0, 1, 0));
-        this.mainThrusters.push(new MainThruster(mesh, direction, this.transform));
+        this.mainThrusters.push(new MainThruster(mesh, direction, this.aggregate));
     }
 
     private addRCSThruster(mesh: AbstractMesh) {
         const direction = mesh.getDirection(new Vector3(0, 1, 0));
-        const thruster = new RCSThruster(mesh, direction, this.transform);
+        const thruster = new RCSThruster(mesh, direction, this.aggregate);
         this.rcsThrusters.push(thruster);
 
         //FIXME: this is temporary to balance rc thrust
@@ -93,7 +120,7 @@ export class ShipController extends AbstractController {
     }
 
     public setHidden(hidden: boolean) {
-        this.transform.node.setEnabled(!hidden);
+        this.instanceRoot.setEnabled(!hidden);
     }
 
     public registerClosestDistanceToPlanet(distance: number) {
@@ -203,64 +230,67 @@ export class ShipController extends AbstractController {
                 }
             }
 
-            this.transform.rotationAcceleration.x = this.getTotalRollAuthority() * deltaTime;
+            /*this.transform.rotationAcceleration.x = this.getTotalRollAuthority() * deltaTime;
             this.transform.rotationAcceleration.y = this.getTotalPitchAuthority() * deltaTime;
-            this.transform.rotationAcceleration.z = this.getTotalYawAuthority() * deltaTime;
+            this.transform.rotationAcceleration.z = this.getTotalYawAuthority() * deltaTime;*/
 
-            const forwardAcceleration = this.transform.getForwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.FORWARD) * deltaTime);
+            /*const forwardAcceleration = this.transform.getForwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.FORWARD) * deltaTime);
             const backwardAcceleration = this.transform.getBackwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.BACKWARD) * deltaTime);
 
             const upwardAcceleration = this.transform.getUpwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.UP) * deltaTime);
             const downwardAcceleration = this.transform.getDownwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.DOWN) * deltaTime);
 
             const rightAcceleration = this.transform.getRightDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.RIGHT) * deltaTime);
-            const leftAcceleration = this.transform.getLeftDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.LEFT) * deltaTime);
+            const leftAcceleration = this.transform.getLeftDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.LEFT) * deltaTime);*/
 
-            this.transform.acceleration.addInPlace(forwardAcceleration);
+            /*this.transform.acceleration.addInPlace(forwardAcceleration);
             this.transform.acceleration.addInPlace(backwardAcceleration);
 
             this.transform.acceleration.addInPlace(upwardAcceleration);
             this.transform.acceleration.addInPlace(downwardAcceleration);
 
             this.transform.acceleration.addInPlace(rightAcceleration);
-            this.transform.acceleration.addInPlace(leftAcceleration);
+            this.transform.acceleration.addInPlace(leftAcceleration);*/
         } else {
             if(input.type === InputType.MOUSE) {
                 const mouse = input as Mouse;
                 const roll = mouse.getRoll();
                 const pitch = mouse.getPitch();
                 
-                this.transform.rotationAcceleration.x += 2 * this.rollAuthority * roll * deltaTime;
-                this.transform.rotationAcceleration.y += this.pitchAuthority * pitch * deltaTime;
+                /*this.transform.rotationAcceleration.x += 2 * this.rollAuthority * roll * deltaTime;
+                this.transform.rotationAcceleration.y += this.pitchAuthority * pitch * deltaTime;*/
             }
 
-            const warpSpeed = this.transform.getForwardDirection().scale(this.warpDrive.getWarpSpeed());
-            this.transform.speed.copyFrom(warpSpeed);
+            const warpSpeed = this.aggregate.transformNode.getDirection(Axis.Z).scale(this.warpDrive.getWarpSpeed());
+            this.aggregate.body.setLinearVelocity(warpSpeed);
         }
         return Vector3.Zero();
     }
 
     public override update(deltaTime: number): Vector3 {
-        this.transform.rotationAcceleration.copyFromFloats(0, 0, 0);
-        this.transform.acceleration.copyFromFloats(0, 0, 0);
-
         for (const input of this.inputs) this.listenTo(input, deltaTime);
-        const displacement = this.transform.update(deltaTime).negate();
+        //const displacement = this.transform.update(deltaTime).negate();
 
-        const currentForwardSpeed = Vector3.Dot(this.transform.speed, this.transform.getForwardDirection());
+        const speed = Vector3.Zero();
+        this.aggregate.body.getLinearVelocityToRef(speed);
+
+        const currentForwardSpeed = Vector3.Dot(speed, this.aggregate.transformNode.getDirection(Axis.Z));
         this.warpDrive.update(currentForwardSpeed, this.closestDistanceToPlanet, deltaTime);
 
         for (const thruster of this.mainThrusters) thruster.update();
         for (const thruster of this.rcsThrusters) thruster.update();
 
-        if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() === 0) {
-            this.transform.rotationSpeed.scaleInPlace(0.9);
+        if (this.flightAssistEnabled /*&& this.transform.rotationAcceleration.length() === 0*/) {
+            this.aggregate.body.setAngularDamping(0.9);
+            //this.transform.rotationSpeed.scaleInPlace(0.9);
+        } else {
+            this.aggregate.body.setAngularDamping(1);
         }
 
         //TODO: should be separated from the ship
-        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${parseSpeed(this.transform.speed.length())}`;
+        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${parseSpeed(speed.length())}`;
 
-        this.transform.translate(displacement);
-        return displacement;
+        //this.transform.translate(displacement);
+        return this.aggregate.transformNode.getAbsolutePosition();
     }
 }

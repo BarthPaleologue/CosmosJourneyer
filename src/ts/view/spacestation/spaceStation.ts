@@ -29,7 +29,7 @@ export class SpaceStation extends AbstractObject {
         );
 
         this.instance = Assets.CreateSpaceStationInstance();
-        this.instance.parent = this.transform.node;
+        this.instance.parent = this.transform;
 
         for (const mesh of this.instance.getChildMeshes()) {
             if (mesh.name.includes("ring")) {

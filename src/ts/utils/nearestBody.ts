@@ -1,9 +1,9 @@
-import { ITransformLike } from "../controller/uberCore/transforms/ITransformLike";
 import { AbstractBody } from "../view/bodies/abstractBody";
 import { AbstractController } from "../controller/uberCore/abstractController";
 import { BaseObject } from "../model/orbits/iOrbitalObject";
+import { TransformNode } from "@babylonjs/core/Meshes";
 
-export function nearestBody(object: ITransformLike, bodies: AbstractBody[]): AbstractBody {
+export function nearestBody(object: TransformNode, bodies: AbstractBody[]): AbstractBody {
     let distance = -1;
     if (bodies.length === 0) throw new Error("no bodieees !");
     let nearest = bodies[0];
@@ -24,5 +24,5 @@ export function nearestBody(object: ITransformLike, bodies: AbstractBody[]): Abs
  * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
  */
 export function isOrbiting(controller: AbstractController, body: BaseObject, orbitLimitFactor = 2.5): boolean {
-    return body.transform.getAbsolutePosition().subtract(controller.transform.getAbsolutePosition()).lengthSquared() < (orbitLimitFactor * body.getBoundingRadius()) ** 2;
+    return body.transform.getAbsolutePosition().subtract(controller.aggregate.transformNode.getAbsolutePosition()).lengthSquared() < (orbitLimitFactor * body.getBoundingRadius()) ** 2;
 }

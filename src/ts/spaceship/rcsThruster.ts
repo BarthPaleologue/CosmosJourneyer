@@ -1,13 +1,13 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { NewtonianTransform } from "../controller/uberCore/transforms/newtonianTransform";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AbstractThruster } from "./abstractThruster";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 export class RCSThruster extends AbstractThruster {
     protected override maxAuthority = 1;
 
-    constructor(mesh: AbstractMesh, direction: Vector3, parent: NewtonianTransform) {
-        super(mesh, direction, parent);
+    constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
+        super(mesh, direction, parentAggregate);
 
         this.plume.maxSize = 0.3;
         this.plume.minSize = 0.3;

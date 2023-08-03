@@ -108,7 +108,7 @@ const aggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.g
 for(const aggregate of aggregates) {
     aggregate.body.disablePreStep = false;
 }
-const meshes = [sphere, box, capsule, spaceship.instanceRoot, newton.transform.node];
+const meshes = [sphere, box, capsule, spaceship.instanceRoot, newton.transform];
 
 const fallingAggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.getAggregate()];
 //viewer.showBody(spaceship.getAggregate().body);

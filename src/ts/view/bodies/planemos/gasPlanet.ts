@@ -44,7 +44,7 @@ export class GasPlanet extends AbstractBody implements Planemo {
             },
             scene
         );
-        this.mesh.parent = this.transform.node;
+        this.mesh.parent = this.transform;
 
         this.material = new GasPlanetMaterial(this.name, this.transform, this.model, scene);
         this.mesh.material = this.material;

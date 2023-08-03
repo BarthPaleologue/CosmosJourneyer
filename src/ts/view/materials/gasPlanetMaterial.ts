@@ -5,7 +5,6 @@ import surfaceMaterialVertex from "../../../shaders/gasPlanetMaterial/vertex.gls
 import { GazColorSettings } from "./colorSettingsInterface";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { flattenVector3Array } from "../../utils/algebra";
-import { BasicTransform } from "../../controller/uberCore/transforms/basicTransform";
 import { GasPlanetModel } from "../../model/planemos/gasPlanetModel";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
@@ -14,17 +13,19 @@ import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MaterialHelper } from "@babylonjs/core/Materials/materialHelper";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
 
 const shaderName = "gazPlanetMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 
 export class GasPlanetMaterial extends ShaderMaterial {
-    readonly planet: BasicTransform;
+    readonly planet: TransformNode;
     readonly colorSettings: GazColorSettings;
     private clock = 0;
 
-    constructor(planetName: string, planet: BasicTransform, model: GasPlanetModel, scene: Scene) {
+    constructor(planetName: string, planet: TransformNode, model: GasPlanetModel, scene: Scene) {
         super(`${planetName}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
             uniforms: [
@@ -96,9 +97,9 @@ export class GasPlanetMaterial extends ShaderMaterial {
     public update(player: AbstractController, stellarObjects: StellarObject[], deltaTime: number) {
         this.clock += deltaTime;
 
-        this.setQuaternion("planetInverseRotationQuaternion", this.planet.getInverseRotationQuaternion());
+        this.setQuaternion("planetInverseRotationQuaternion", getInverseRotationQuaternion(this.planet));
 
-        this.setVector3("playerPosition", player.transform.getAbsolutePosition());
+        this.setVector3("playerPosition", player.aggregate.transformNode.getAbsolutePosition());
 
         this.setArray3("starPositions", flattenVector3Array(stellarObjects.map((star) => star.transform.getAbsolutePosition())));
         this.setInt("nbStars", stellarObjects.length);

@@ -1,11 +1,12 @@
 import { Vector3, Quaternion, Matrix } from "@babylonjs/core/Maths/math";
 import { BaseObject, IOrbitalObject } from "../../model/orbits/iOrbitalObject";
-import { BasicTransform } from "../../controller/uberCore/transforms/basicTransform";
 import { BaseModel } from "../../model/common";
 import { Scene } from "@babylonjs/core/scene";
 import { computeBarycenter, computePointOnOrbit } from "../../model/orbits/kepler";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Cullable } from "./cullable";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { getRotationQuaternion, setRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
 
 export interface NextState {
     position: Vector3;
@@ -13,7 +14,7 @@ export interface NextState {
 }
 
 export abstract class AbstractObject implements IOrbitalObject, BaseObject, Cullable {
-    readonly transform: BasicTransform;
+    readonly transform: TransformNode;
 
     readonly nextState: NextState = {
         position: Vector3.Zero(),
@@ -47,7 +48,7 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject, Cull
 
         this.parentObjects = parentObjects;
 
-        this.transform = new BasicTransform(name, scene);
+        this.transform = new TransformNode(name, scene);
 
         let minDepth = -1;
         for (const parentBody of parentObjects) {
@@ -64,7 +65,7 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject, Cull
      * Returns the axis of rotation of the body
      */
     public getRotationAxis(): Vector3 {
-        return this.transform.node.up;
+        return this.transform.up;
     }
 
     /**
@@ -112,7 +113,7 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject, Cull
      */
     public updateRotation(deltaTime: number): number {
         if (this.model.physicalProperties.rotationPeriod === 0) {
-            this.nextState.rotation.copyFrom(this.transform.getRotationQuaternion());
+            this.nextState.rotation.copyFrom(getRotationQuaternion(this.transform));
             return 0;
         }
 
@@ -123,7 +124,7 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject, Cull
 
         const elementaryRotationMatrix = Matrix.RotationAxis(this.getRotationAxis(), dtheta);
         const elementaryRotationQuaternion = Quaternion.FromRotationMatrix(elementaryRotationMatrix);
-        const newQuaternion = elementaryRotationQuaternion.multiply(this.transform.getRotationQuaternion());
+        const newQuaternion = elementaryRotationQuaternion.multiply(getRotationQuaternion(this.transform));
 
         this.nextState.rotation.copyFrom(newQuaternion);
 
@@ -132,7 +133,7 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject, Cull
 
     public applyNextState(): void {
         this.transform.setAbsolutePosition(this.nextState.position);
-        this.transform.setRotationQuaternion(this.nextState.rotation);
+        setRotationQuaternion(this.transform, this.nextState.rotation);
     }
 
     public abstract computeCulling(cameraPosition: Vector3): void;

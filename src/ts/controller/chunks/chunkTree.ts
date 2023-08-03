@@ -4,7 +4,6 @@ import { ChunkForge } from "./chunkForge";
 import { BuildTask, DeleteTask, TaskType } from "./taskTypes";
 import { Settings } from "../../settings";
 import { getChunkSphereSpacePositionFromPath } from "../../utils/chunkUtils";
-import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../../model/terrain/terrainSettings";
 import { UberScene } from "../uberCore/uberScene";
 import { Assets } from "../assets";
@@ -12,6 +11,8 @@ import { TelluricPlanemoModel } from "../../model/planemos/telluricPlanemoModel"
 import { Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { getRotationQuaternion } from "../uberCore/transforms/basicTransform";
 
 /**
  * A quadTree is defined recursively
@@ -38,7 +39,7 @@ export class ChunkTree {
     readonly planetSeed: number;
     readonly terrainSettings: TerrainSettings;
 
-    readonly parent: BasicTransform;
+    readonly parent: TransformNode;
     readonly parentAggregate: PhysicsAggregate;
 
     readonly material: Material;
@@ -52,7 +53,7 @@ export class ChunkTree {
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanemoModel, parent: BasicTransform, parentAggregate: PhysicsAggregate, material: Material, scene: UberScene) {
+    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanemoModel, parentAggregate: PhysicsAggregate, material: Material, scene: UberScene) {
         this.rootChunkLength = planetModel.radius * 2;
         this.planetName = planetName;
         this.planetSeed = planetModel.seed;
@@ -69,7 +70,7 @@ export class ChunkTree {
 
         this.direction = direction;
 
-        this.parent = parent;
+        this.parent = parentAggregate.transformNode;
         this.parentAggregate = parentAggregate;
 
         this.material = material;
@@ -119,7 +120,7 @@ export class ChunkTree {
      * @returns The updated tree
      */
     private updateLODRecursively(observerPositionW: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
-        const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, this.parent.getRotationQuaternion());
+        const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, getRotationQuaternion(this.parent));
         const nodePositionW = nodeRelativePosition.add(this.parent.getAbsolutePosition());
 
         const direction = nodePositionW.subtract(observerPositionW);
@@ -178,7 +179,6 @@ export class ChunkTree {
         const chunk = new PlanetChunk(
             path,
             this.direction,
-            this.parent,
             this.parentAggregate,
             this.material,
             this.rootChunkLength,
@@ -209,7 +209,7 @@ export class ChunkTree {
             if (!chunk.isReady()) return;
 
             chunk.mesh.setEnabled(true);
-            chunk.transform.node.computeWorldMatrix(true);
+            chunk.transform.computeWorldMatrix(true);
 
             const distance = Vector3.Distance(cameraPosition, chunk.transform.getAbsolutePosition());
             const angularSize = (chunk.getBoundingRadius() * 2) / distance;

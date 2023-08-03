@@ -1,9 +1,9 @@
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Axis, Vector3 } from "@babylonjs/core/Maths/math";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { AbstractMesh, MeshBuilder } from "@babylonjs/core/Meshes";
-import { NewtonianTransform } from "../controller/uberCore/transforms/newtonianTransform";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 export abstract class AbstractThruster {
     readonly mesh: AbstractMesh;
@@ -16,13 +16,13 @@ export abstract class AbstractThruster {
 
     readonly plume: DirectionnalParticleSystem;
 
-    readonly parent: NewtonianTransform;
+    readonly parentAggregate: PhysicsAggregate;
 
     readonly leverage: number;
 
     protected abstract maxAuthority: number;
 
-    constructor(mesh: AbstractMesh, direction: Vector3, parent: NewtonianTransform) {
+    constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
         this.mesh = mesh;
 
         this.leverage = this.mesh.position.length();
@@ -30,7 +30,7 @@ export abstract class AbstractThruster {
         this.localNozzleDown = direction;
         this.plume = new DirectionnalParticleSystem(mesh, this.localNozzleDown);
 
-        this.parent = parent;
+        this.parentAggregate = parentAggregate;
 
         const thrusterHelper = MeshBuilder.CreateCylinder(this.mesh.name + "Helper", { height: 0.5, diameterTop: 0, diameterBottom: 0.5 }, mesh.getScene());
         const cubeMaterial = new StandardMaterial("cubeMat", mesh.getScene());
@@ -86,8 +86,9 @@ export abstract class AbstractThruster {
 
     public update(): void {
         this.plume.emitRate = this.throttle * 1000;
-        this.plume.setDirection(this.parent.getForwardDirection().negate());
-        this.plume.applyAcceleration(this.parent.acceleration.negate());
+        this.plume.setDirection(this.parentAggregate.transformNode.getDirection(Axis.Z).negate());
+        //const parentAcceleration = this.parentAggregate.body.getL
+        //this.plume.applyAcceleration(this.parent.acceleration.negate());
 
         if (this.throttle > 0) {
             this.helperMesh.scaling = new Vector3(0.8, 0.8, 0.8);

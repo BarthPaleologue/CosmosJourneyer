@@ -1,6 +1,5 @@
 import { Direction, getQuaternionFromDirection } from "../../utils/direction";
 import { getChunkPlaneSpacePositionFromPath } from "../../utils/chunkUtils";
-import { BasicTransform } from "../uberCore/transforms/basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Material } from "@babylonjs/core/Materials/material";
@@ -8,7 +7,7 @@ import { ITransformable } from "../../model/orbits/iOrbitalObject";
 import { Scene } from "@babylonjs/core/scene";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import "@babylonjs/core/Engines/Extensions/engine.query";
-import { VertexData } from "@babylonjs/core/Meshes";
+import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 
@@ -19,16 +18,16 @@ export class PlanetChunk implements ITransformable {
     private ready = false;
     readonly isMinDepth;
 
-    public readonly transform: BasicTransform;
+    public readonly transform: TransformNode;
 
     readonly chunkSideLength: number;
 
-    private readonly parent: BasicTransform;
+    private readonly parent: TransformNode;
 
     private physicsShape: PhysicsShapeMesh | null = null;
     private readonly parentAggregate: PhysicsAggregate;
 
-    constructor(path: number[], direction: Direction, parent: BasicTransform, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, isMinDepth: boolean, scene: Scene) {
+    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, isMinDepth: boolean, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;
@@ -37,7 +36,7 @@ export class PlanetChunk implements ITransformable {
 
         this.isMinDepth = isMinDepth;
 
-        this.transform = new BasicTransform(id + "Transform", scene);
+        this.transform = new TransformNode(`${id}Transform`, scene);
 
         this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
@@ -46,13 +45,13 @@ export class PlanetChunk implements ITransformable {
         /*this.mesh.material = Assets.DebugMaterial(id); //material;
         (this.mesh.material as StandardMaterial).disableLighting = true;
         this.mesh.material.wireframe = true;*/
-        this.transform.node.parent = parent.node;
-        this.mesh.parent = this.transform.node;
+        this.transform.parent = parentAggregate.transformNode;
+        this.mesh.parent = this.transform;
 
         this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
         this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_STRICT;
 
-        this.parent = parent;
+        this.parent = parentAggregate.transformNode;
         this.parentAggregate = parentAggregate;
 
         // computing the position of the chunk on the side of the planet
@@ -66,7 +65,7 @@ export class PlanetChunk implements ITransformable {
 
         position.normalize().scaleInPlace(rootLength / 2);
 
-        this.transform.node.position = position;
+        this.transform.position = position;
     }
 
     public init(vertexData: VertexData) {
@@ -80,7 +79,7 @@ export class PlanetChunk implements ITransformable {
 
             this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
 
-            this.parentAggregate.shape.addChildFromParent(this.parent.node, this.physicsShape, this.mesh);
+            this.parentAggregate.shape.addChildFromParent(this.parent, this.physicsShape, this.mesh);
             //this.aggregate.shape.addChildFromParent(this.parent.node, this.aggregate.shape, this.mesh);
         }
     }

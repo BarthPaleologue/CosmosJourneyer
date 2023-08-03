@@ -12,6 +12,7 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
+import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -125,7 +126,7 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
                 name: "planetInverseRotationQuaternion",
                 type: ShaderDataType.Quaternion,
                 get: () => {
-                    return planet.transform.getInverseRotationQuaternion();
+                    return getInverseRotationQuaternion(planet.transform);
                 }
             },
             {
