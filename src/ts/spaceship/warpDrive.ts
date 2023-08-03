@@ -57,6 +57,10 @@ export class WarpDrive {
      */
     private state = WARPDRIVE_STATE.DISABLED;
 
+    constructor(enabledByDefault = false) {
+        this.state = enabledByDefault ? WARPDRIVE_STATE.ENABLED : WARPDRIVE_STATE.DISABLED;
+    }
+
     /**
      * Enables the warp drive: the ship will start to accelerate towards the target speed.
      */

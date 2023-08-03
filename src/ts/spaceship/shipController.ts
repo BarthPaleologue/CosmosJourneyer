@@ -19,7 +19,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 export class ShipController extends AbstractController {
     readonly transform: NewtonianTransform;
 
-    readonly rollAuthority = 0.5;
+    readonly rollAuthority = 0.1;
     readonly pitchAuthority = 1;
     readonly yawAuthority = 1;
 
@@ -31,7 +31,7 @@ export class ShipController extends AbstractController {
     private readonly mainThrusters: MainThruster[] = [];
     private readonly rcsThrusters: RCSThruster[] = [];
 
-    private readonly warpDrive = new WarpDrive();
+    private readonly warpDrive = new WarpDrive(true);
 
     private closestDistanceToPlanet = Infinity;
 
@@ -100,12 +100,15 @@ export class ShipController extends AbstractController {
         this.closestDistanceToPlanet = distance;
     }
 
+    public enableWarpDrive() {
+        for(const thruster of this.mainThrusters) thruster.setThrottle(0);
+        for(const thruster of this.rcsThrusters) thruster.deactivate();
+        this.warpDrive.enable();
+    }
+
     public toggleWarpDrive() {
-        if (!this.warpDrive.isEnabled()) {
-            this.warpDrive.enable();
-            for (const thruster of this.mainThrusters) thruster.setThrottle(0);
-            for (const thruster of this.rcsThrusters) thruster.deactivate();
-        } else this.warpDrive.desengage();
+        if (!this.warpDrive.isEnabled()) this.enableWarpDrive();
+        else this.warpDrive.desengage();
     }
 
     private getTotalAuthority(direction: Vector3) {
@@ -156,10 +159,6 @@ export class ShipController extends AbstractController {
                 if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-0.8 * deltaTime);
                 if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
                 if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
-            } else if (input.type === InputType.MOUSE) {
-                const mouse = input as Mouse;
-                this.thirdPersonCamera.rotatePhi(mouse.getYaw() * deltaTime);
-                this.thirdPersonCamera.rotateTheta(mouse.getPitch() * deltaTime);
             }
         }
 
@@ -185,14 +184,22 @@ export class ShipController extends AbstractController {
                     else if (input.getYAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.DOWN) > 0.5) rcsThruster.activate();
                     else if (input.getXAxis() > 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.RIGHT) > 0.5) rcsThruster.activate();
                     else if (input.getXAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.LEFT) > 0.5) rcsThruster.activate();
-                    // rcs rotation contribution
-                    else if (input.getRoll() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.BACKWARD) > 0.2) rcsThruster.activate();
-                    else if (input.getRoll() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.FORWARD) > 0.2) rcsThruster.activate();
-                    else if (input.getPitch() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.RIGHT) > 0.2) rcsThruster.activate();
-                    else if (input.getPitch() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.LEFT) > 0.2) rcsThruster.activate();
-                    else if (input.getYaw() < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.DOWN) > 0.2) rcsThruster.activate();
-                    else if (input.getYaw() > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.UP) > 0.2) rcsThruster.activate();
                     else rcsThruster.deactivate();
+                }
+            }
+
+            if(input.type === InputType.MOUSE) {
+                const mouse = input as Mouse;
+                const roll = mouse.getRoll();
+                const pitch = mouse.getPitch();
+                
+                for (const rcsThruster of this.rcsThrusters) {
+                    // rcs rotation contribution
+                    if (roll < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.FORWARD) > 0.2) rcsThruster.setThrottle(Math.abs(roll));
+                    else if (roll > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.BACKWARD) > 0.2) rcsThruster.setThrottle(Math.abs(roll));
+                    
+                    if (pitch > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.RIGHT) > 0.2) rcsThruster.setThrottle(Math.abs(pitch));
+                    else if (pitch < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.LEFT) > 0.2) rcsThruster.setThrottle(Math.abs(pitch));
                 }
             }
 
@@ -218,9 +225,14 @@ export class ShipController extends AbstractController {
             this.transform.acceleration.addInPlace(rightAcceleration);
             this.transform.acceleration.addInPlace(leftAcceleration);
         } else {
-            this.transform.rotationAcceleration.x += this.rollAuthority * input.getRoll() * deltaTime;
-            this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
-            this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
+            if(input.type === InputType.MOUSE) {
+                const mouse = input as Mouse;
+                const roll = mouse.getRoll();
+                const pitch = mouse.getPitch();
+                
+                this.transform.rotationAcceleration.x -= 2 * this.rollAuthority * roll * deltaTime;
+                this.transform.rotationAcceleration.y += this.pitchAuthority * pitch * deltaTime;
+            }
 
             const warpSpeed = this.transform.getForwardDirection().scale(this.warpDrive.getWarpSpeed());
             this.transform.speed.copyFrom(warpSpeed);

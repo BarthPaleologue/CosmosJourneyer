@@ -19,7 +19,7 @@ export class Mouse implements Input {
         this.deadAreaRadius = deadAreaRadius;
         this.canvas = canvas;
 
-        this.canvas.addEventListener("mousemove", (e) => {
+        window.addEventListener("mousemove", (e) => {
             this.dx = (e.x - this.x) / this.canvas.width;
             this.dy = (e.y - this.y) / this.canvas.height;
 
@@ -32,7 +32,10 @@ export class Mouse implements Input {
     }
 
     getRoll() {
-        return 0;
+        const d2 = this.dxToCenter ** 2 + this.dyToCenter ** 2;
+        const adaptedLength = Math.max(Math.log(d2 / this.deadAreaRadius ** 2), 0) / 3;
+        const greaterLength = Math.max(this.canvas.width, this.canvas.height);
+        return (this.dxToCenter * adaptedLength) / (greaterLength / 2);
     }
 
     getPitch() {
@@ -43,10 +46,7 @@ export class Mouse implements Input {
     }
 
     getYaw() {
-        const d2 = this.dxToCenter ** 2 + this.dyToCenter ** 2;
-        const adaptedLength = Math.max(Math.log(d2 / this.deadAreaRadius ** 2), 0) / 3;
-        const greaterLength = Math.max(this.canvas.width, this.canvas.height);
-        return (this.dxToCenter * adaptedLength) / (greaterLength / 2);
+        return 0;
     }
 
     getZAxis() {

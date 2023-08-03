@@ -26,7 +26,7 @@ await engine.setup();
 
 const scene = engine.getStarSystemScene();
 
-const mouse = new Mouse(engine.canvas, 1e5);
+const mouse = new Mouse(engine.canvas, 100);
 const keyboard = new Keyboard();
 const gamepad = new Gamepad();
 
@@ -41,6 +41,7 @@ const spaceshipController = new ShipController(scene);
 spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 spaceshipController.addInput(keyboard);
 spaceshipController.addInput(gamepad);
+spaceshipController.addInput(mouse);
 
 scene.setActiveController(spaceshipController);
 
