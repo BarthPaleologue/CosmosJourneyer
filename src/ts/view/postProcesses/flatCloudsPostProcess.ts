@@ -132,7 +132,7 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
                 name: "time",
                 type: ShaderDataType.Float,
                 get: () => {
-                    return this.internalTime % ((2 * Math.PI * gcd(this.settings.worleySpeed * 10000, this.settings.detailSpeed * 10000)) / this.settings.worleySpeed);
+                    return -this.internalTime % ((2 * Math.PI * gcd(this.settings.worleySpeed * 10000, this.settings.detailSpeed * 10000)) / this.settings.worleySpeed);
                 }
             }
         ];

@@ -149,6 +149,7 @@ export class PlanetEngine {
 
         this.starSystemScene = new UberScene(this.engine, ScenePerformancePriority.Intermediate);
         this.starSystemScene.clearColor = new Color4(0, 0, 0, 0);
+        this.starSystemScene.useRightHandedSystem = true;
 
         this.starSystemUI = new SystemUI(this.starSystemScene);
 

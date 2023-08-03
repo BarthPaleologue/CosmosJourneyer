@@ -88,6 +88,7 @@ export class StarMap {
         this.scene.clearColor = new Color4(0, 0, 0, 1);
         this.scene.performancePriority = ScenePerformancePriority.Intermediate;
         this.scene.skipPointerMovePicking = false;
+        this.scene.useRightHandedSystem = true;
 
         this.controller = new PlayerController(this.scene);
         this.controller.speed /= 10;

@@ -23,8 +23,8 @@ export class Keyboard implements Input {
     }
 
     getRoll() {
-        if (this.isPressed("a")) return 1;
-        if (this.isPressed("e")) return -1;
+        if (this.isPressed("a")) return -1;
+        if (this.isPressed("e")) return 1;
         return 0;
     }
 
@@ -35,8 +35,8 @@ export class Keyboard implements Input {
     }
 
     getYaw() {
-        if (this.isPressed("j")) return -1;
-        if (this.isPressed("l")) return 1;
+        if (this.isPressed("j")) return 1;
+        if (this.isPressed("l")) return -1;
         return 0;
     }
 

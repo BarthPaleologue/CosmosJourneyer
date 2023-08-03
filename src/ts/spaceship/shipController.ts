@@ -230,7 +230,7 @@ export class ShipController extends AbstractController {
                 const roll = mouse.getRoll();
                 const pitch = mouse.getPitch();
                 
-                this.transform.rotationAcceleration.x -= 2 * this.rollAuthority * roll * deltaTime;
+                this.transform.rotationAcceleration.x += 2 * this.rollAuthority * roll * deltaTime;
                 this.transform.rotationAcceleration.y += this.pitchAuthority * pitch * deltaTime;
             }
 

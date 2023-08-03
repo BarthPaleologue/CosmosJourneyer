@@ -67,7 +67,7 @@ export function computePointOnOrbit(centerOfMass: Vector3, settings: IOrbitalPro
 
     const ellipseCenter = new Vector3(centerOfMass.x - linearEccentricity, centerOfMass.y, centerOfMass.z);
 
-    const meanAnomaly = (Math.PI * 2 * t) / settings.period;
+    const meanAnomaly = -(Math.PI * 2 * t) / settings.period;
     const eccentricAnomaly = solveKepler(meanAnomaly, eccentricity);
 
     const relativePosition = new Vector3(Math.cos(eccentricAnomaly) * semiMajorLength, 0, Math.sin(eccentricAnomaly) * semiMinorLength);

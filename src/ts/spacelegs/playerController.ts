@@ -1,6 +1,6 @@
 import { AbstractController } from "../controller/uberCore/abstractController";
 import { UberCamera } from "../controller/uberCore/uberCamera";
-import { Input } from "../controller/inputs/input";
+import { Input, InputType } from "../controller/inputs/input";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
@@ -23,6 +23,7 @@ export class PlayerController extends AbstractController {
     }
 
     protected override listenTo(input: Input, deltaTime: number): Vector3 {
+        if(input.type !== InputType.KEYBOARD) return Vector3.Zero();
         this.transform.roll(input.getRoll() * this.rotationSpeed * deltaTime);
         this.transform.pitch(input.getPitch() * this.rotationSpeed * deltaTime);
         this.transform.yaw(input.getYaw() * this.rotationSpeed * deltaTime);

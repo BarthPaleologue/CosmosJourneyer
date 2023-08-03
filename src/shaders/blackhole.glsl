@@ -117,7 +117,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
         diskMask *= smoothstep(0.0, 2.0, relativeDiskRadius - relativeDistance); // The 2.0 is only for aesthetics
 
         // rotation of the disk
-        float theta = 2.0 * 3.1415 * time / rotationPeriod;
+        float theta = -2.0 * 3.1415 * time / rotationPeriod;
         vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, diskNormal, theta);
         
         float angle = angleBetweenVectors(rotatedProjectedSamplePoint, forwardAxis);

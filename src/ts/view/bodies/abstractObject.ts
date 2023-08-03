@@ -116,7 +116,7 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject, Cull
             return 0;
         }
 
-        const dtheta = -(2 * Math.PI * deltaTime) / this.model.physicalProperties.rotationPeriod;
+        const dtheta = (2 * Math.PI * deltaTime) / this.model.physicalProperties.rotationPeriod;
         this.theta += dtheta;
 
         this.rotationMatrixAroundAxis.copyFrom(Matrix.RotationAxis(new Vector3(0, 1, 0), this.theta));

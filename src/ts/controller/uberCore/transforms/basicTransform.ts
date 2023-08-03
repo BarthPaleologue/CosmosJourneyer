@@ -106,7 +106,7 @@ export class BasicTransform implements ITransformLike {
      * @returns the unit vector pointing to the right of the player controler in world space
      */
     public getRightDirection(): Vector3 {
-        return this.node.getDirection(Axis.X);
+        return this.getLeftDirection().negate();
     }
 
     /**
@@ -114,7 +114,7 @@ export class BasicTransform implements ITransformLike {
      * @returns the unit vector pointing to the left of the player controler in world space
      */
     public getLeftDirection(): Vector3 {
-        return this.getRightDirection().negate();
+        return this.node.getDirection(Axis.X);
     }
 
     /**
@@ -130,7 +130,7 @@ export class BasicTransform implements ITransformLike {
      * @param amount
      */
     public pitch(amount: number): void {
-        this.rotate(this.getRightDirection(), amount);
+        this.rotate(this.getLeftDirection(), amount);
     }
 
     /**
