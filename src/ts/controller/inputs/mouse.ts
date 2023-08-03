@@ -15,11 +15,14 @@ export class Mouse implements Input {
     deadAreaRadius = 100;
     private canvas: HTMLCanvasElement;
 
+    private onMouseEnterListeners: (() => void)[] = [];
+    private onMouseLeaveListeners: (() => void)[] = [];
+
     constructor(canvas: HTMLCanvasElement, deadAreaRadius = 50) {
         this.deadAreaRadius = deadAreaRadius;
         this.canvas = canvas;
 
-        window.addEventListener("mousemove", (e) => {
+        document.addEventListener("mousemove", (e) => {
             this.dx = (e.x - this.x) / this.canvas.width;
             this.dy = (e.y - this.y) / this.canvas.height;
 
@@ -29,6 +32,20 @@ export class Mouse implements Input {
             this.dxToCenter = e.x - this.canvas.width / 2;
             this.dyToCenter = e.y - this.canvas.height / 2;
         });
+
+        document.addEventListener("mouseenter", () => {
+            this.onMouseEnterListeners.forEach((listener) => listener());
+        });
+        document.addEventListener("mouseleave", () => {
+            this.onMouseLeaveListeners.forEach((listener) => listener());
+        });
+    }
+
+    addOnMouseEnterListener(listener: () => void) {
+        this.onMouseEnterListeners.push(listener);
+    }
+    addOnMouseLeaveListener(listener: () => void) {
+        this.onMouseLeaveListeners.push(listener);
     }
 
     getRoll() {

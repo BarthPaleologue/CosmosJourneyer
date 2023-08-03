@@ -43,6 +43,13 @@ spaceshipController.addInput(keyboard);
 spaceshipController.addInput(gamepad);
 spaceshipController.addInput(mouse);
 
+mouse.addOnMouseEnterListener(() => {
+    if (scene.getActiveController() === spaceshipController) engine.resume();
+});
+mouse.addOnMouseLeaveListener(() => {
+    if (scene.getActiveController() === spaceshipController) engine.pause();
+});
+
 scene.setActiveController(spaceshipController);
 
 engine.registerStarSystemUpdateCallback(() => {

@@ -29,6 +29,11 @@ import { SystemUI } from "../ui/systemUI";
 import { BlackHole } from "../view/bodies/stellarObjects/blackHole";
 import { ShipController } from "../spaceship/shipController";
 
+enum EngineState {
+    RUNNING,
+    PAUSED
+}
+
 export class PlanetEngine {
     // UI
     private readonly helmetOverlay: HelmetOverlay;
@@ -49,6 +54,8 @@ export class PlanetEngine {
     private activeScene: Scene | null = null;
 
     private readonly collisionWorker = new CollisionWorker();
+
+    private state = EngineState.RUNNING;
 
     constructor() {
         this.helmetOverlay = new HelmetOverlay();
@@ -89,6 +96,14 @@ export class PlanetEngine {
             // when pressing f11, the ui is hidden when the browser is in fullscreen mode
             if (e.key === "F11") this.isFullscreen = !this.isFullscreen;
         });
+    }
+
+    pause(): void {
+        this.state = EngineState.PAUSED;
+    }
+
+    resume(): void {
+        this.state = EngineState.RUNNING;
     }
 
     /**
@@ -151,6 +166,8 @@ export class PlanetEngine {
         });
 
         this.starSystemScene.registerBeforeRender(() => {
+            if (this.state === EngineState.PAUSED) return;
+
             const starSystemScene = this.getStarSystemScene();
             const starSystem = this.getStarSystem();
             const activeController = starSystemScene.getActiveController();
