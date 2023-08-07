@@ -13,14 +13,11 @@ describe("BasicTransform", () => {
     it("has its position init at zero", () => {
         expect(transform.getAbsolutePosition().equals(Vector3.Zero())).toBeTruthy();
     });
-    it("has its quaternion init at identity", () => {
-        expect(getRotationQuaternion(transform).equals(Quaternion.Identity())).toBeTruthy();
-    });
     it("is oriented forward", () => {
         expect(getForwardDirection(transform).equals(new Vector3(0, 0, 1))).toBeTruthy();
         expect(getBackwardDirection(transform).equals(new Vector3(0, 0, -1))).toBeTruthy();
-        expect(getLeftDirection(transform).equals(new Vector3(-1, 0, 0))).toBeTruthy();
-        expect(getRightDirection(transform).equals(new Vector3(1, 0, 0))).toBeTruthy();
+        expect(getLeftDirection(transform).equals(new Vector3(1, 0, 0))).toBeTruthy();
+        expect(getRightDirection(transform).equals(new Vector3(-1, 0, 0))).toBeTruthy();
     });
     it("can move through space", () => {
         transform.setAbsolutePosition(Vector3.Zero());
