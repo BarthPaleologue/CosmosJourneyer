@@ -11,6 +11,7 @@ import { Light } from "@babylonjs/core/Lights/light";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Assets } from "../../../controller/assets";
+import { setRotationQuaternion } from "../../../controller/uberCore/transforms/basicTransform";
 
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
@@ -59,7 +60,7 @@ export class Star extends AbstractBody {
         this.mesh.material = this.material;
 
         // TODO: remove when rotation is transmitted to children
-        this.transform.rotationQuaternion = Quaternion.Identity();
+        setRotationQuaternion(this.transform, Quaternion.Identity());
 
         this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.VOLUMETRIC_LIGHT);
 

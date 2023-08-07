@@ -20,6 +20,9 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { setEnabledBody } from "../utils/havok";
+import { getForwardDirection, pitch, roll, translate } from "../controller/uberCore/transforms/basicTransform";
 
 export class ShipController extends AbstractController {
     //readonly transform: NewtonianTransform;
@@ -119,8 +122,9 @@ export class ShipController extends AbstractController {
         return this.thirdPersonCamera;
     }
 
-    public setHidden(hidden: boolean) {
-        this.instanceRoot.setEnabled(!hidden);
+    public setEnabled(enabled: boolean, havokPlugin: HavokPlugin) {
+        this.instanceRoot.setEnabled(enabled);
+        setEnabledBody(this.aggregate.body, enabled, havokPlugin);
     }
 
     public registerClosestDistanceToPlanet(distance: number) {
@@ -254,15 +258,18 @@ export class ShipController extends AbstractController {
         } else {
             if(input.type === InputType.MOUSE) {
                 const mouse = input as Mouse;
-                const roll = mouse.getRoll();
-                const pitch = mouse.getPitch();
+                const rollContribution = mouse.getRoll();
+                const pitchContribution = mouse.getPitch();
                 
+                roll(this.aggregate.transformNode, rollContribution * deltaTime);
+                pitch(this.aggregate.transformNode, pitchContribution * deltaTime);
                 /*this.transform.rotationAcceleration.x += 2 * this.rollAuthority * roll * deltaTime;
                 this.transform.rotationAcceleration.y += this.pitchAuthority * pitch * deltaTime;*/
             }
 
-            const warpSpeed = this.aggregate.transformNode.getDirection(Axis.Z).scale(this.warpDrive.getWarpSpeed());
-            this.aggregate.body.setLinearVelocity(warpSpeed);
+            const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
+            //this.aggregate.body.setLinearVelocity(warpSpeed);
+            translate(this.aggregate.transformNode, warpSpeed.scale(deltaTime));
         }
         return Vector3.Zero();
     }
@@ -271,8 +278,8 @@ export class ShipController extends AbstractController {
         for (const input of this.inputs) this.listenTo(input, deltaTime);
         //const displacement = this.transform.update(deltaTime).negate();
 
-        const speed = Vector3.Zero();
-        this.aggregate.body.getLinearVelocityToRef(speed);
+        const speed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());//Vector3.Zero();
+        //this.aggregate.body.getLinearVelocityToRef(speed);
 
         const currentForwardSpeed = Vector3.Dot(speed, this.aggregate.transformNode.getDirection(Axis.Z));
         this.warpDrive.update(currentForwardSpeed, this.closestDistanceToPlanet, deltaTime);
@@ -291,6 +298,7 @@ export class ShipController extends AbstractController {
         (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${parseSpeed(speed.length())}`;
 
         //this.transform.translate(displacement);
+        //console.log(this.aggregate.transformNode.getAbsolutePosition());
         return this.aggregate.transformNode.getAbsolutePosition();
     }
 }

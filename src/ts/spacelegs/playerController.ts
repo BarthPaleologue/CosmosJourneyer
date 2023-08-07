@@ -8,6 +8,8 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll, yaw } from "../controller/uberCore/transforms/basicTransform";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
+import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { setEnabledBody } from "../utils/havok";
 
 export class PlayerController extends AbstractController {
     private readonly camera: UberCamera;
@@ -32,6 +34,10 @@ export class PlayerController extends AbstractController {
         this.camera = new UberCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.aggregate.transformNode;
         this.camera.fov = (80 / 360) * Math.PI;
+    }
+
+    public setEnabled(enabled: boolean, havokPlugin: HavokPlugin) {
+        setEnabledBody(this.aggregate.body, enabled, havokPlugin);
     }
 
     public override getActiveCamera(): UberCamera {
@@ -62,7 +68,7 @@ export class PlayerController extends AbstractController {
 
         if (input.getAcceleration() != 0) this.speed *= 1 + input.getAcceleration() / 10;
 
-        return displacement.negate();
+        return displacement;
     }
 
     public override update(deltaTime: number): Vector3 {

@@ -27,6 +27,7 @@ import { SystemUI } from "../ui/systemUI";
 import { BlackHole } from "../view/bodies/stellarObjects/blackHole";
 import { ShipController } from "../spaceship/shipController";
 import { Vector3 } from "@babylonjs/core/Maths/math";
+import { setMaxLinVel } from "../utils/havok";
 
 enum EngineState {
     RUNNING,
@@ -44,6 +45,8 @@ export class PlanetEngine {
     // BabylonJS
     private engine: Engine | null = null;
     private starSystemScene: UberScene | null = null;
+
+    private havokPlugin: HavokPlugin | null = null;
 
     private starSystemUI: SystemUI | null = null;
 
@@ -152,8 +155,10 @@ export class PlanetEngine {
 
         this.starSystemUI = new SystemUI(this.starSystemScene);
 
-        const havokPlugin = new HavokPlugin(true, havokInstance);
-        this.starSystemScene.enablePhysics(Vector3.Zero(), havokPlugin);
+        this.havokPlugin = new HavokPlugin(true, havokInstance);
+        this.starSystemScene.enablePhysics(Vector3.Zero(), this.havokPlugin);
+
+        setMaxLinVel(10000, 10000, this.havokPlugin);
 
         this.activeScene = this.starSystemScene;
 
@@ -179,7 +184,8 @@ export class PlanetEngine {
             this.helmetOverlay.update(nearestBody);
             this.helmetOverlay.setVisibility(!this.isFullscreen && this.bodyEditor.getVisibility() !== EditorVisibility.FULL);
 
-            this.getStarSystem().translateEverythingNow(activeController.update(deltaTime));
+            this.getStarSystem().translateEverythingNow(activeController.update(deltaTime).negate());
+            activeController.aggregate.transformNode.position = Vector3.Zero();
 
             //FIXME: should address stars orbits
             for (const star of starSystem.stellarObjects) star.model.orbitalProperties.period = 0;
@@ -268,5 +274,10 @@ export class PlanetEngine {
     public getEngine(): Engine {
         if (this.engine === null) throw new Error("Engine is null");
         return this.engine;
+    }
+
+    public getHavokPlugin(): HavokPlugin {
+        if (this.havokPlugin === null) throw new Error("Havok plugin is null");
+        return this.havokPlugin;
     }
 }

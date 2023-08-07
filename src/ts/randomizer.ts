@@ -20,7 +20,7 @@ await engine.setup();
 
 const scene = engine.getStarSystemScene();
 
-const mouse = new Mouse(engine.canvas, 1e5);
+const mouse = new Mouse(engine.canvas, 100);
 const keyboard = new Keyboard();
 const gamepad = new Gamepad();
 
@@ -30,10 +30,12 @@ player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 player.addInput(keyboard);
 player.addInput(mouse);
 player.addInput(gamepad);
+player.setEnabled(false, engine.getHavokPlugin());
 
 const spaceshipController = new ShipController(scene);
 spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 spaceshipController.addInput(keyboard);
+spaceshipController.addInput(mouse);
 spaceshipController.addInput(gamepad);
 
 scene.setActiveController(spaceshipController);
@@ -61,12 +63,16 @@ document.addEventListener("keydown", (e) => {
             scene.setActiveController(player);
             setRotationQuaternion(player.aggregate.transformNode, getRotationQuaternion(spaceshipController.aggregate.transformNode).clone());
             engine.getStarSystem().postProcessManager.rebuild(spaceshipController.getActiveCamera());
-            spaceshipController.setHidden(true);
+
+            spaceshipController.setEnabled(false, engine.getHavokPlugin());
+            player.setEnabled(true, engine.getHavokPlugin());
         } else {
             scene.setActiveController(spaceshipController);
             setRotationQuaternion(spaceshipController.aggregate.transformNode, getRotationQuaternion(player.aggregate.transformNode).clone());
             engine.getStarSystem().postProcessManager.rebuild(player.getActiveCamera());
-            spaceshipController.setHidden(false);
+
+            player.setEnabled(false, engine.getHavokPlugin());
+            spaceshipController.setEnabled(true, engine.getHavokPlugin());
         }
     }
 });
