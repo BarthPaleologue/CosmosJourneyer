@@ -144,7 +144,7 @@ export class PlanetEngine {
             const firstBody = this.getStarSystem().getBodies()[0];
             if (firstBody === undefined) throw new Error("No bodies in star system");
             const activeController = this.getStarSystemScene().getActiveController();
-            positionNearObject(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 5 : 3);
+            positionNearObject(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
             if (activeController instanceof ShipController) activeController.enableWarpDrive();
             this.toggleStarMap();
         });

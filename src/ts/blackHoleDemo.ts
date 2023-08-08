@@ -46,7 +46,7 @@ engine.registerStarSystemUpdateCallback(() => {
     const nearestBody = engine.getStarSystem().getNearestBody(shipPosition);
     const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getRadius();
-    spaceshipController.registerClosestDistanceToPlanet(distance - radius);
+    spaceshipController.registerClosestObject(distance, radius);
 });
 
 const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);

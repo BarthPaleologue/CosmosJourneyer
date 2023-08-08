@@ -1,3 +1,4 @@
+import { Vector3 } from "@babylonjs/havok";
 import { Settings } from "../settings";
 
 enum WARPDRIVE_STATE {
@@ -35,12 +36,12 @@ export class WarpDrive {
     /**
      * Acceleration of the internal throtle.
      */
-    private readonly internalThrottleAcceleration = 0.02;
+    private readonly internalThrottleAcceleration = 0.04;
 
     /**
      * Maximum speed of the warp drive in m/s. It can be reached when the ship is far from any body and the user throttle is set to 1.
      */
-    private readonly maxWarpSpeed = 50 * Settings.C;
+    private readonly maxWarpSpeed = 10 * Settings.C;
 
     /**
      * Target speed of the warp drive in m/s. It is computed based on the distance to the closest body and the user throttle.
@@ -111,11 +112,14 @@ export class WarpDrive {
 
     /**
      * Computes the target speed of the warp drive based on the distance to the closest body and the user throttle.
-     * @param closestDistanceToPlanet The distance to the closest body in m.
+     * @param closestObjectDistance The distance to the closest body in m.
      * @returns The computed target speed in m/s.
      */
-    public updateTargetSpeed(closestDistanceToPlanet: number): number {
-        this.targetSpeed = Math.min(this.maxWarpSpeed, Math.min(closestDistanceToPlanet / 4, (closestDistanceToPlanet / 2e3) ** 2));
+    public updateTargetSpeed(closestObjectDistance: number, closestObjectRadius: number): number {
+        const speedThreshold = 10e3;
+        const closeSpeed = speedThreshold * 0.025 * (closestObjectDistance - closestObjectRadius) / speedThreshold;
+        const deepSpaceSpeed = speedThreshold * (0.025 * (closestObjectDistance - closestObjectRadius) / speedThreshold) ** 1.1;
+        this.targetSpeed = Math.min(this.maxWarpSpeed, Math.max(closeSpeed, deepSpaceSpeed));
         return this.userThrottle * this.targetSpeed;
     }
 
@@ -152,10 +156,10 @@ export class WarpDrive {
     /**
      * Updates the warp drive based on the current speed of the ship, the distance to the closest body and the time elapsed since the last update.
      * @param currentForwardSpeed The current speed of the warp drive projected on the forward direction of the ship.
-     * @param closestDistanceToPlanet The distance to the closest body in m.
+     * @param closestObjectPosition The distance to the closest body in m.
      * @param deltaTime The time elapsed since the last update in seconds.
      */
-    public update(currentForwardSpeed: number, closestDistanceToPlanet: number, deltaTime: number): void {
+    public update(currentForwardSpeed: number, closestObjectDistance: number, clostestObjectRadius: number, deltaTime: number): void {
         switch (this.state) {
             case WARPDRIVE_STATE.DESENGAGING:
                 this.targetSpeed *= 0.9;
@@ -163,7 +167,7 @@ export class WarpDrive {
                 if (this.targetSpeed < 1e2 && this.currentSpeed < 1e2) this.disable();
                 break;
             case WARPDRIVE_STATE.ENABLED:
-                this.updateTargetSpeed(closestDistanceToPlanet);
+                this.updateTargetSpeed(closestObjectDistance, clostestObjectRadius);
                 this.updateWarpDriveSpeed(currentForwardSpeed, deltaTime);
                 break;
             case WARPDRIVE_STATE.DISABLED:

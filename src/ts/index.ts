@@ -61,7 +61,7 @@ engine.registerStarSystemUpdateCallback(() => {
     const nearestBody = engine.getStarSystem().getNearestObject(shipPosition);
     const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getBoundingRadius();
-    spaceshipController.registerClosestDistanceToPlanet(distance - radius);
+    spaceshipController.registerClosestObject(distance, radius);
 });
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);

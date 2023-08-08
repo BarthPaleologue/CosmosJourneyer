@@ -45,7 +45,10 @@ export class ShipController extends AbstractController {
 
     private readonly warpDrive = new WarpDrive(true);
 
-    private closestDistanceToPlanet = Infinity;
+    private closestObject = {
+        distance: Infinity,
+        radius: 1
+    }
 
     constructor(scene: Scene) {
         super();
@@ -127,8 +130,8 @@ export class ShipController extends AbstractController {
         setEnabledBody(this.aggregate.body, enabled, havokPlugin);
     }
 
-    public registerClosestDistanceToPlanet(distance: number) {
-        this.closestDistanceToPlanet = distance;
+    public registerClosestObject(distance: number, radius: number) {
+        this.closestObject = { distance, radius };
     }
 
     public enableWarpDrive() {
@@ -282,7 +285,7 @@ export class ShipController extends AbstractController {
         //this.aggregate.body.getLinearVelocityToRef(speed);
 
         const currentForwardSpeed = Vector3.Dot(speed, this.aggregate.transformNode.getDirection(Axis.Z));
-        this.warpDrive.update(currentForwardSpeed, this.closestDistanceToPlanet, deltaTime);
+        this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
 
         for (const thruster of this.mainThrusters) thruster.update();
         for (const thruster of this.rcsThrusters) thruster.update();
