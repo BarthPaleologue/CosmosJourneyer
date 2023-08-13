@@ -5,6 +5,7 @@ import { AbstractMesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { getDownwardDirection } from "../controller/uberCore/transforms/basicTransform";
+import { LOCAL_DIRECTION } from "../controller/uberCore/localDirections";
 
 export abstract class AbstractThruster {
     readonly mesh: AbstractMesh;
@@ -66,16 +67,22 @@ export abstract class AbstractThruster {
         return Math.max(0, Vector3.Dot(this.localNozzleDown.negate(), direction));
     }
 
-    public getAuthorityAroundAxis01(rotationAxis: Vector3): number {
+    public getAuthorityAroundAxisNormalized(rotationAxis: Vector3): number {
         const thrusterPosition = this.mesh.position;
         const thrusterPositionOnAxis = rotationAxis.scale(Vector3.Dot(thrusterPosition, rotationAxis));
         
         const thrusterPositionToAxisNormalized = thrusterPosition.subtract(thrusterPositionOnAxis).normalize();
         
         const thrusterRotationAxis = Vector3.Cross(this.localNozzleDown.negate(), thrusterPositionToAxisNormalized);
-        const authorityAroundAxis = Math.max(0, Vector3.Dot(thrusterRotationAxis, rotationAxis));
-        
-        return authorityAroundAxis;
+        return Vector3.Dot(thrusterRotationAxis, rotationAxis);
+    }
+
+    public getRollAuthorityNormalized(): number {
+        return this.getAuthorityAroundAxisNormalized(LOCAL_DIRECTION.FORWARD);
+    }
+
+    public getPitchAuthorityNormalized(): number {
+        return this.getAuthorityAroundAxisNormalized(LOCAL_DIRECTION.RIGHT);
     }
 
     public update(): void {

@@ -31,8 +31,8 @@ export class RCSThruster extends AbstractThruster {
     }
 
     public applyForce(): void {
-        const nozzleDirection = getDownwardDirection(this.mesh);
-        const thrustDirection = nozzleDirection.negate();
+        // the nozzle is directed upward
+        const thrustDirection = getDownwardDirection(this.mesh);
         const force = thrustDirection.scale(this.maxAuthority * this.throttle);
         //console.log(this.maxAuthority, this.throttle, this.leverage);
 

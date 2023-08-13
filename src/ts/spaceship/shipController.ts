@@ -25,7 +25,6 @@ import { setEnabledBody } from "../utils/havok";
 import { getForwardDirection, pitch, roll, translate } from "../controller/uberCore/transforms/basicTransform";
 
 export class ShipController extends AbstractController {
-    //readonly transform: NewtonianTransform;
     readonly instanceRoot: AbstractMesh;
 
     readonly rollAuthority = 0.1;
@@ -121,7 +120,7 @@ export class ShipController extends AbstractController {
         thruster.setMaxAuthority(thruster.getMaxAuthority() / thruster.leverage);
 
         const thrustDirectionLocal = thruster.localNozzleDown.negate();
-        const authority = thruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.FORWARD);
+        const authority = thruster.getAuthorityAroundAxisNormalized(LOCAL_DIRECTION.FORWARD);
         if(authority > 0.2) thruster.helperMesh.material = Assets.DebugMaterial("rcs");
 
         console.log(thrustDirectionLocal, authority);
@@ -175,20 +174,6 @@ export class ShipController extends AbstractController {
                 thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
             }
 
-            /*if (input.type === InputType.KEYBOARD) {
-                // if we are listenning to multiple inputs, the thrusters will be activated and deactivated multiple times
-                for (const rcsThruster of this.rcsThrusters) {
-                    // rcs linear contribution
-                    if (input.getZAxis() > 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.FORWARD) > 0.5) rcsThruster.activate();
-                    else if (input.getZAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.BACKWARD) > 0.5) rcsThruster.activate();
-                    else if (input.getYAxis() > 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.UP) > 0.5) rcsThruster.activate();
-                    else if (input.getYAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.DOWN) > 0.5) rcsThruster.activate();
-                    else if (input.getXAxis() > 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.RIGHT) > 0.5) rcsThruster.activate();
-                    else if (input.getXAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.LEFT) > 0.5) rcsThruster.activate();
-                    else rcsThruster.deactivate();
-                }
-            }*/
-
             if(input.type === InputType.MOUSE) {
                 const mouse = input as Mouse;
                 const roll = mouse.getRoll();
@@ -198,11 +183,11 @@ export class ShipController extends AbstractController {
                     let throttle = 0;
 
                     // rcs rotation contribution
-                    if (roll < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.FORWARD) > 0.2) throttle = Math.max(throttle, Math.abs(roll));
-                    else if (roll > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.BACKWARD) > 0.2) throttle = Math.max(throttle, Math.abs(roll));
+                    if (roll < 0 && rcsThruster.getRollAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(roll));
+                    else if (roll > 0 && rcsThruster.getRollAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(roll));
                     
-                    if (pitch < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.RIGHT) > 0.2) throttle = Math.max(throttle, Math.abs(pitch));
-                    else if (pitch > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.LEFT) > 0.2) throttle = Math.max(throttle, Math.abs(pitch));
+                    if (pitch < 0 && rcsThruster.getPitchAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(pitch));
+                    else if (pitch > 0 && rcsThruster.getPitchAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(pitch));
 
                     rcsThruster.setThrottle(throttle);
                 }
@@ -245,9 +230,8 @@ export class ShipController extends AbstractController {
         for (const thruster of this.mainThrusters) thruster.update();
         for (const thruster of this.rcsThrusters) thruster.update();
 
-        if (this.flightAssistEnabled /*&& this.transform.rotationAcceleration.length() === 0*/) {
+        if (this.flightAssistEnabled) {
             this.aggregate.body.setAngularDamping(0.9);
-            //this.transform.rotationSpeed.scaleInPlace(0.9);
         } else {
             this.aggregate.body.setAngularDamping(1);
         }
