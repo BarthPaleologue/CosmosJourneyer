@@ -76,7 +76,7 @@ sun.model.orbitalProperties.period = 60 * 60 * 24;
 
 const planetModel = new TelluricPlanemoModel(0.4233609183800225, [sunModel]);
 planetModel.physicalProperties.minTemperature = -37;
-planetModel.physicalProperties.maxTemperature = 40;
+planetModel.physicalProperties.maxTemperature = 30;
 
 planetModel.orbitalProperties.period = 60 * 60 * 24 * 365.25;
 planetModel.orbitalProperties.apoapsis = 4000 * planetModel.radius;

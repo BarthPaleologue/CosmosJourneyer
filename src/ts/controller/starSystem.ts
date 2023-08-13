@@ -347,22 +347,26 @@ export class StarSystem {
 
             // if the controller is close to the body, it will follow its movement
             const orbitLimit = object instanceof SpaceStation ? 200 : 10;
-            if (isOrbiting(controller, object, orbitLimit) && this.getNearestObject() === object) translate(controller.aggregate.transformNode, newPosition.subtract(initialPosition));
+            if (isOrbiting(controller, object, orbitLimit) && this.getNearestObject() === object) {
+                translate(controller.aggregate.transformNode, newPosition.subtract(initialPosition));
 
-            // then we keep the controller at the origin
-            const displacementTranslation = controller.aggregate.transformNode.getAbsolutePosition().negate();
-            this.registerTranslateAllBodies(displacementTranslation);
-            translate(controller.aggregate.transformNode, displacementTranslation);
+                // then we keep the controller at the origin
+                const displacementTranslation = controller.aggregate.transformNode.getAbsolutePosition().negate();
+                this.registerTranslateAllBodies(displacementTranslation);
+                translate(controller.aggregate.transformNode, displacementTranslation);
+            }
 
             const dtheta = object.updateRotation(deltaTime);
 
             // if the controller is close to the object and it is a body, it will follow its rotation
-            if (isOrbiting(controller, object) && this.getNearestBody() === object) rotateAround(controller.aggregate.transformNode, object.nextState.position, object.getRotationAxis(), dtheta);
+            if (isOrbiting(controller, object) && this.getNearestBody() === object) {
+                rotateAround(controller.aggregate.transformNode, object.nextState.position, object.getRotationAxis(), dtheta);
 
-            // then we keep the controller at the origin
-            const displacementRotation = controller.aggregate.transformNode.getAbsolutePosition().negate();
-            this.registerTranslateAllBodies(displacementRotation);
-            translate(controller.aggregate.transformNode, displacementRotation);
+                // then we keep the controller at the origin
+                const displacementRotation = controller.aggregate.transformNode.getAbsolutePosition().negate();
+                this.registerTranslateAllBodies(displacementRotation);
+                translate(controller.aggregate.transformNode, displacementRotation);
+            }
         }
 
         for (const object of this.orbitalObjects) object.applyNextState();
