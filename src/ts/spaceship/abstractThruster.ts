@@ -4,6 +4,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { AbstractMesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { getDownwardDirection } from "../controller/uberCore/transforms/basicTransform";
 
 export abstract class AbstractThruster {
     readonly mesh: AbstractMesh;
@@ -41,7 +42,7 @@ export abstract class AbstractThruster {
         thrusterHelper.parent = mesh;
 
         this.helperMesh = thrusterHelper;
-        this.helperMesh.isVisible = false;
+        //this.helperMesh.isVisible = false;
     }
 
     public getThrottle(): number {
@@ -57,15 +58,6 @@ export abstract class AbstractThruster {
     }
 
     /**
-     * Returns the authority of the thruster in the given direction
-     * @param direction The direction (in local space)
-     * @returns
-     */
-    public getAuthority(direction: Vector3): number {
-        return this.getAuthority01(direction) * this.throttle * this.maxAuthority;
-    }
-
-    /**
      * Returns the theoretical authority of the thruster in the given direction between 0 and 1 (independent of throttle)
      * @param direction The direction (in local space)
      * @returns
@@ -77,20 +69,18 @@ export abstract class AbstractThruster {
     public getAuthorityAroundAxis01(rotationAxis: Vector3): number {
         const thrusterPosition = this.mesh.position;
         const thrusterPositionOnAxis = rotationAxis.scale(Vector3.Dot(thrusterPosition, rotationAxis));
-        const thrusterPositionToAxis = thrusterPosition.subtract(thrusterPositionOnAxis);
-        const leverage = thrusterPositionToAxis.length();
-        const thrusterRotationAxis = Vector3.Cross(thrusterPositionToAxis, this.localNozzleDown);
-        const authorityAroundAxis = Math.max(0, Vector3.Dot(thrusterRotationAxis, rotationAxis)) / leverage;
+        
+        const thrusterPositionToAxisNormalized = thrusterPosition.subtract(thrusterPositionOnAxis).normalize();
+        
+        const thrusterRotationAxis = Vector3.Cross(this.localNozzleDown.negate(), thrusterPositionToAxisNormalized);
+        const authorityAroundAxis = Math.max(0, Vector3.Dot(thrusterRotationAxis, rotationAxis));
+        
         return authorityAroundAxis;
-    }
-
-    public getAuthorityAroundAxis(rotationAxis: Vector3): number {
-        return this.getAuthorityAroundAxis01(rotationAxis) * this.leverage * this.throttle * this.maxAuthority;
     }
 
     public update(): void {
         this.plume.emitRate = this.throttle * 1000;
-        this.plume.setDirection(this.parentAggregate.transformNode.getDirection(Axis.Z).negate());
+        this.plume.setDirection(getDownwardDirection(this.parentAggregate.transformNode));
         //const parentAcceleration = this.parentAggregate.body.getL
         //this.plume.applyAcceleration(this.parent.acceleration.negate());
 
