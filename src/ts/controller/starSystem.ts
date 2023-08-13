@@ -20,7 +20,7 @@ import { GasPlanetModel } from "../model/planemos/gasPlanetModel";
 import { BlackHoleModel } from "../model/stellarObjects/blackHoleModel";
 import { StarModel } from "../model/stellarObjects/starModel";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { translate } from "./uberCore/transforms/basicTransform";
+import { rotateAround, translate } from "./uberCore/transforms/basicTransform";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -357,7 +357,7 @@ export class StarSystem {
             const dtheta = object.updateRotation(deltaTime);
 
             // if the controller is close to the object and it is a body, it will follow its rotation
-            if (isOrbiting(controller, object) && this.getNearestBody() === object) controller.aggregate.transformNode.rotateAround(object.nextState.position, object.getRotationAxis(), dtheta);
+            if (isOrbiting(controller, object) && this.getNearestBody() === object) rotateAround(controller.aggregate.transformNode, object.nextState.position, object.getRotationAxis(), dtheta);
 
             // then we keep the controller at the origin
             const displacementRotation = controller.aggregate.transformNode.getAbsolutePosition().negate();
