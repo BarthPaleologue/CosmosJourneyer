@@ -43,7 +43,7 @@ export abstract class AbstractThruster {
         thrusterHelper.parent = mesh;
 
         this.helperMesh = thrusterHelper;
-        //this.helperMesh.isVisible = false;
+        this.helperMesh.isVisible = false;
     }
 
     public getThrottle(): number {

@@ -118,12 +118,6 @@ export class ShipController extends AbstractController {
 
         //FIXME: this is temporary to balance rc thrust
         thruster.setMaxAuthority(thruster.getMaxAuthority() / thruster.leverage);
-
-        const thrustDirectionLocal = thruster.localNozzleDown.negate();
-        const authority = thruster.getAuthorityAroundAxisNormalized(LOCAL_DIRECTION.FORWARD);
-        if(authority > 0.2) thruster.helperMesh.material = Assets.DebugMaterial("rcs");
-
-        console.log(thrustDirectionLocal, authority);
     }
 
     public override getActiveCamera(): UberCamera {
@@ -240,7 +234,6 @@ export class ShipController extends AbstractController {
         (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${parseSpeed(speed.length())}`;
 
         //this.transform.translate(displacement);
-        //console.log(this.aggregate.transformNode.getAbsolutePosition());
         return this.aggregate.transformNode.getAbsolutePosition();
     }
 }
