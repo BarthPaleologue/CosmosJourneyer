@@ -186,14 +186,6 @@ export class ShipController extends AbstractController {
                     rcsThruster.setThrottle(throttle);
                 }
             }
-
-            for(const mainThruster of this.mainThrusters) {
-                mainThruster.applyForce();
-            }
-
-            for(const rcsThruster of this.rcsThrusters) {
-                rcsThruster.applyForce();
-            }
         } else {
             if(input.type === InputType.MOUSE) {
                 const mouse = input as Mouse;
@@ -215,14 +207,21 @@ export class ShipController extends AbstractController {
         for (const input of this.inputs) this.listenTo(input, deltaTime);
         //const displacement = this.transform.update(deltaTime).negate();
 
-        const speed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());//Vector3.Zero();
-        //this.aggregate.body.getLinearVelocityToRef(speed);
+        const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());//Vector3.Zero();
+        
+        const speed = Vector3.Zero();
+        this.aggregate.body.getLinearVelocityToRef(speed);
 
-        const currentForwardSpeed = Vector3.Dot(speed, this.aggregate.transformNode.getDirection(Axis.Z));
+        const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
         this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
 
         for (const thruster of this.mainThrusters) thruster.update();
         for (const thruster of this.rcsThrusters) thruster.update();
+
+        if(this.warpDrive.isDisabled()) {
+            for (const thruster of this.mainThrusters) thruster.applyForce();
+            for (const thruster of this.rcsThrusters) thruster.applyForce();    
+        }
 
         if (this.flightAssistEnabled) {
             this.aggregate.body.setAngularDamping(0.9);
@@ -231,7 +230,7 @@ export class ShipController extends AbstractController {
         }
 
         //TODO: should be separated from the ship
-        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${parseSpeed(speed.length())}`;
+        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${parseSpeed(this.warpDrive.isEnabled() ? warpSpeed.length() : speed.length())}`;
 
         //this.transform.translate(displacement);
         return this.aggregate.transformNode.getAbsolutePosition();

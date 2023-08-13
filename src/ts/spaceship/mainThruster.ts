@@ -20,10 +20,9 @@ export class MainThruster extends AbstractThruster {
 
     public applyForce(): void {
         const nozzleDirection = this.localNozzleDown;
-        const force = nozzleDirection.scale(2);
+        const force = nozzleDirection.scale(-2000);
 
         // make the ship spin (apply force at the position of the thruster then apply the same force at the center of mass in the opposite direction)
-        this.parentAggregate.body.applyForce(force, this.mesh.getAbsolutePosition());
-        this.parentAggregate.body.applyForce(force.negate(), this.parentAggregate.body.getObjectCenterWorld());
+        this.parentAggregate.body.applyForce(force, this.parentAggregate.transformNode.getAbsolutePosition());
     }
 }

@@ -5,7 +5,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { getDownwardDirection } from "../controller/uberCore/transforms/basicTransform";
 
 export class RCSThruster extends AbstractThruster {
-    protected override maxAuthority = 10;
+    protected override maxAuthority = 30;
 
     constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
         super(mesh, direction, parentAggregate);
