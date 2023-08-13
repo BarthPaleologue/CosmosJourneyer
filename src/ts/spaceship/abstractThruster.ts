@@ -52,6 +52,10 @@ export abstract class AbstractThruster {
         this.maxAuthority = maxAuthority;
     }
 
+    public getMaxAuthority(): number {
+        return this.maxAuthority;
+    }
+
     /**
      * Returns the authority of the thruster in the given direction
      * @param direction The direction (in local space)
@@ -96,4 +100,6 @@ export abstract class AbstractThruster {
             this.helperMesh.scaling = new Vector3(0.5, 0.5, 0.5);
         }
     }
+
+    public abstract applyForce(): void;
 }

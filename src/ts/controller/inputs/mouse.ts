@@ -1,3 +1,4 @@
+import { clamp } from "../../utils/math";
 import { Input, InputType } from "./input";
 
 export class Mouse implements Input {
@@ -52,14 +53,14 @@ export class Mouse implements Input {
         const d2 = this.dxToCenter ** 2 + this.dyToCenter ** 2;
         const adaptedLength = Math.max(Math.log(d2 / this.deadAreaRadius ** 2), 0) / 3;
         const greaterLength = Math.max(this.canvas.width, this.canvas.height);
-        return (this.dxToCenter * adaptedLength) / (greaterLength / 2);
+        return clamp((this.dxToCenter * adaptedLength) / (greaterLength / 2), -1, 1);
     }
 
     getPitch() {
         const d2 = this.dxToCenter ** 2 + this.dyToCenter ** 2;
         const adaptedLength = Math.max(Math.log(d2 / this.deadAreaRadius ** 2), 0) / 3;
         const greaterLength = Math.max(this.canvas.width, this.canvas.height);
-        return (this.dyToCenter * adaptedLength) / (greaterLength / 2);
+        return clamp((this.dyToCenter * adaptedLength) / (greaterLength / 2), -1, 1);
     }
 
     getYaw() {

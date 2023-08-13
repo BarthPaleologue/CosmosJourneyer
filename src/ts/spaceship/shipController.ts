@@ -118,7 +118,7 @@ export class ShipController extends AbstractController {
         this.rcsThrusters.push(thruster);
 
         //FIXME: this is temporary to balance rc thrust
-        thruster.setMaxAuthority(1 / thruster.leverage);
+        thruster.setMaxAuthority(thruster.getMaxAuthority() / thruster.leverage);
     }
 
     public override getActiveCamera(): UberCamera {
@@ -191,8 +191,8 @@ export class ShipController extends AbstractController {
                 const keyboard = input as Keyboard;
                 if (keyboard.isPressed("1")) this.thirdPersonCamera.rotatePhi(0.8 * deltaTime);
                 if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-0.8 * deltaTime);
-                if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
-                if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
+                if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
+                if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
             }
         }
 
@@ -208,7 +208,7 @@ export class ShipController extends AbstractController {
                 thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
             }
 
-            if (input.type === InputType.KEYBOARD) {
+            /*if (input.type === InputType.KEYBOARD) {
                 // if we are listenning to multiple inputs, the thrusters will be activated and deactivated multiple times
                 for (const rcsThruster of this.rcsThrusters) {
                     // rcs linear contribution
@@ -220,44 +220,36 @@ export class ShipController extends AbstractController {
                     else if (input.getXAxis() < 0 && rcsThruster.getAuthority01(LOCAL_DIRECTION.LEFT) > 0.5) rcsThruster.activate();
                     else rcsThruster.deactivate();
                 }
-            }
+            }*/
 
             if(input.type === InputType.MOUSE) {
                 const mouse = input as Mouse;
                 const roll = mouse.getRoll();
                 const pitch = mouse.getPitch();
-                
+
                 for (const rcsThruster of this.rcsThrusters) {
+                    //console.log(rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.FORWARD));
+
+                    let throttle = 0;
+
                     // rcs rotation contribution
-                    if (roll < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.FORWARD) > 0.2) rcsThruster.setThrottle(Math.abs(roll));
-                    else if (roll > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.BACKWARD) > 0.2) rcsThruster.setThrottle(Math.abs(roll));
+                    if (roll > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.FORWARD) > 0.2) throttle = Math.max(throttle, Math.abs(roll));
+                    else if (roll < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.BACKWARD) > 0.2) throttle = Math.max(throttle, Math.abs(roll));
                     
-                    if (pitch > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.RIGHT) > 0.2) rcsThruster.setThrottle(Math.abs(pitch));
-                    else if (pitch < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.LEFT) > 0.2) rcsThruster.setThrottle(Math.abs(pitch));
+                    if (pitch > 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.RIGHT) > 0.2) throttle = Math.max(throttle, Math.abs(pitch));
+                    else if (pitch < 0 && rcsThruster.getAuthorityAroundAxis01(LOCAL_DIRECTION.LEFT) > 0.2) throttle = Math.max(throttle, Math.abs(pitch));
+
+                    rcsThruster.setThrottle(throttle);
                 }
             }
 
-            /*this.transform.rotationAcceleration.x = this.getTotalRollAuthority() * deltaTime;
-            this.transform.rotationAcceleration.y = this.getTotalPitchAuthority() * deltaTime;
-            this.transform.rotationAcceleration.z = this.getTotalYawAuthority() * deltaTime;*/
+            for(const mainThruster of this.mainThrusters) {
+                mainThruster.applyForce();
+            }
 
-            /*const forwardAcceleration = this.transform.getForwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.FORWARD) * deltaTime);
-            const backwardAcceleration = this.transform.getBackwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.BACKWARD) * deltaTime);
-
-            const upwardAcceleration = this.transform.getUpwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.UP) * deltaTime);
-            const downwardAcceleration = this.transform.getDownwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.DOWN) * deltaTime);
-
-            const rightAcceleration = this.transform.getRightDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.RIGHT) * deltaTime);
-            const leftAcceleration = this.transform.getLeftDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.LEFT) * deltaTime);*/
-
-            /*this.transform.acceleration.addInPlace(forwardAcceleration);
-            this.transform.acceleration.addInPlace(backwardAcceleration);
-
-            this.transform.acceleration.addInPlace(upwardAcceleration);
-            this.transform.acceleration.addInPlace(downwardAcceleration);
-
-            this.transform.acceleration.addInPlace(rightAcceleration);
-            this.transform.acceleration.addInPlace(leftAcceleration);*/
+            for(const rcsThruster of this.rcsThrusters) {
+                rcsThruster.applyForce();
+            }
         } else {
             if(input.type === InputType.MOUSE) {
                 const mouse = input as Mouse;
@@ -266,8 +258,6 @@ export class ShipController extends AbstractController {
                 
                 roll(this.aggregate.transformNode, rollContribution * deltaTime);
                 pitch(this.aggregate.transformNode, pitchContribution * deltaTime);
-                /*this.transform.rotationAcceleration.x += 2 * this.rollAuthority * roll * deltaTime;
-                this.transform.rotationAcceleration.y += this.pitchAuthority * pitch * deltaTime;*/
             }
 
             const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());

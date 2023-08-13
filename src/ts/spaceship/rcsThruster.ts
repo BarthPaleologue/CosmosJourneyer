@@ -2,9 +2,10 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AbstractThruster } from "./abstractThruster";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { getDownwardDirection } from "../controller/uberCore/transforms/basicTransform";
 
 export class RCSThruster extends AbstractThruster {
-    protected override maxAuthority = 1;
+    protected override maxAuthority = 10;
 
     constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
         super(mesh, direction, parentAggregate);
@@ -27,5 +28,16 @@ export class RCSThruster extends AbstractThruster {
 
     public deactivate(): void {
         this.throttle = 0;
+    }
+
+    public applyForce(): void {
+        const nozzleDirection = getDownwardDirection(this.mesh);
+        const thrustDirection = nozzleDirection.negate();
+        const force = thrustDirection.scale(this.maxAuthority * this.throttle);
+        //console.log(this.maxAuthority, this.throttle, this.leverage);
+
+        // make the ship spin (apply force at the position of the thruster then apply the same force at the center of mass in the opposite direction)
+        this.parentAggregate.body.applyForce(force, this.mesh.getAbsolutePosition());
+        this.parentAggregate.body.applyForce(force.negate(), this.parentAggregate.body.getObjectCenterWorld());
     }
 }
