@@ -111,6 +111,8 @@ export class Spaceship {
 
         //this.centerOfMassHelper.position = this.getCenterOfMass();
 
+        this.aggregate.body.disablePreStep = false;
+
         this.aggregate.body.setCollisionCallbackEnabled(true);
 
         this.collisionObservable = this.aggregate.body.getCollisionObservable();

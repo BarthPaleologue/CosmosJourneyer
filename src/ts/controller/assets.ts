@@ -180,20 +180,14 @@ export class Assets {
 
     static CreateSpaceShipInstance(): InstancedMesh {
         const instance = Assets.Spaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-
-        for (const child of instance.getChildMeshes()) {
-            child.isVisible = true;
-        }
+        for (const child of instance.getChildMeshes()) child.isVisible = true;
 
         return instance;
     }
 
     static CreateEndeavorSpaceShipInstance(): InstancedMesh {
         const instance = Assets.EndeavorSpaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-
-        for (const child of instance.getChildMeshes()) {
-            child.isVisible = true;
-        }
+        for (const child of instance.getChildMeshes()) child.isVisible = true;
 
         return instance;
     }

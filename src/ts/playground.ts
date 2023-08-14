@@ -117,8 +117,7 @@ const gravityOrigin = newton.transform.getAbsolutePosition();
 const gravity = -9.81;
 
 let clockSeconds = 0;
-function updateScene() {
-    
+function updateScene() {    
 
     const deltaTime = engine.getDeltaTime() / 1000;
     clockSeconds += deltaTime;

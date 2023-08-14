@@ -51,8 +51,7 @@ export class ShipController extends AbstractController {
     constructor(scene: Scene) {
         super();
 
-        const spaceship = Assets.CreateSpaceShipInstance();
-        this.instanceRoot = spaceship;
+        this.instanceRoot = Assets.CreateSpaceShipInstance();
 
         this.firstPersonCamera = new UberCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.instanceRoot;
@@ -62,11 +61,11 @@ export class ShipController extends AbstractController {
         this.thirdPersonCamera.parent = this.instanceRoot;
 
 
-        this.aggregate = new PhysicsAggregate(spaceship
+        this.aggregate = new PhysicsAggregate(this.instanceRoot
             , PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
-        for (const child of spaceship.getChildMeshes()) {
+        for (const child of this.instanceRoot.getChildMeshes()) {
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
-            this.aggregate.shape.addChildFromParent(spaceship, childShape, child);
+            this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
         }
         this.aggregate.body.disablePreStep = false;
 
@@ -81,7 +80,7 @@ export class ShipController extends AbstractController {
 
         //if(this.warpDrive.isEnabled()) setEnabledBody(this.aggregate.body, false, )
 
-        for (const child of spaceship.getChildMeshes()) {
+        for (const child of this.instanceRoot.getChildMeshes()) {
             if (child.name.includes("mainThruster")) {
                 console.log("Found main thruster");
                 this.addMainThruster(child);
