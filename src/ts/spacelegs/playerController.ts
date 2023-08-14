@@ -6,7 +6,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll, yaw } from "../controller/uberCore/transforms/basicTransform";
+import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll, translate, yaw } from "../controller/uberCore/transforms/basicTransform";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
@@ -74,6 +74,8 @@ export class PlayerController extends AbstractController {
     public override update(deltaTime: number): Vector3 {
         const playerMovement = Vector3.Zero();
         for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, deltaTime));
+        translate(this.aggregate.transformNode, playerMovement);
+        //console.log(this.aggregate.transformNode.position);
         return playerMovement;
     }
 }

@@ -93,7 +93,7 @@ const newton = new TelluricPlanemo("newton", scene, [], newtonModel);
 newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
 newton.updateLOD(camera.globalPosition);
 
-//const viewer = new PhysicsViewer();
+const viewer = new PhysicsViewer();
 
 const sphereAggregate = new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, { mass: 1, restitution: 0.75 }, scene);
 const boxAggregate = new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 1, restitution: 0.2 }, scene);
@@ -111,7 +111,7 @@ for(const aggregate of aggregates) {
 const meshes = [sphere, box, capsule, spaceship.instanceRoot, newton.transform];
 
 const fallingAggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.getAggregate()];
-//viewer.showBody(spaceship.getAggregate().body);
+viewer.showBody(spaceship.getAggregate().body);
 
 const gravityOrigin = newton.transform.getAbsolutePosition();
 const gravity = -9.81;

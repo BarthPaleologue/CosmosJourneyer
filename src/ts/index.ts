@@ -11,7 +11,7 @@ import { Assets } from "./controller/assets";
 import { PlayerController } from "./spacelegs/playerController";
 import { positionNearObject } from "./utils/positionNearObject";
 import { PlanetEngine } from "./controller/planetEngine";
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ShipController } from "./spaceship/shipController";
 import { SpaceStation } from "./view/spacestation/spaceStation";
@@ -20,6 +20,7 @@ import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
 import { StarModel } from "./model/stellarObjects/starModel";
 import { GasPlanetModel } from "./model/planemos/gasPlanetModel";
 import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
+import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 
 const engine = new PlanetEngine();
 
@@ -44,6 +45,9 @@ spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 spaceshipController.addInput(keyboard);
 spaceshipController.addInput(gamepad);
 spaceshipController.addInput(mouse);
+
+const physicsViewer = new PhysicsViewer();
+physicsViewer.showBody(spaceshipController.aggregate.body);
 
 mouse.addOnMouseEnterListener(() => {
     if (scene.getActiveController() === spaceshipController) engine.resume();

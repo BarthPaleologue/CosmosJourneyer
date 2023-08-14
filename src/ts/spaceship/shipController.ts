@@ -18,7 +18,6 @@ import { IPhysicsCollisionEvent, PhysicsShapeType } from "@babylonjs/core/Physic
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
@@ -42,7 +41,7 @@ export class ShipController extends AbstractController {
     private readonly mainThrusters: MainThruster[] = [];
     private readonly rcsThrusters: RCSThruster[] = [];
 
-    private readonly warpDrive = new WarpDrive(true);
+    private readonly warpDrive = new WarpDrive(false);
 
     private closestObject = {
         distance: Infinity,
@@ -62,7 +61,6 @@ export class ShipController extends AbstractController {
         this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 1.4);
         this.thirdPersonCamera.parent = this.instanceRoot;
 
-        //const viewer = new PhysicsViewer();
 
         this.aggregate = new PhysicsAggregate(spaceship
             , PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
@@ -72,15 +70,16 @@ export class ShipController extends AbstractController {
         }
         this.aggregate.body.disablePreStep = false;
 
-        //viewer.showBody(this.aggregate.body);
-
         this.aggregate.body.setCollisionCallbackEnabled(true);
 
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
         this.collisionObservable.add((collisionEvent: IPhysicsCollisionEvent) => {
+            console.log("Collision", collisionEvent);
             if (collisionEvent.impulse < 0.8) return;
             Assets.OuchSound.play();
         });
+
+        //if(this.warpDrive.isEnabled()) setEnabledBody(this.aggregate.body, false, )
 
         for (const child of spaceship.getChildMeshes()) {
             if (child.name.includes("mainThruster")) {
@@ -172,6 +171,8 @@ export class ShipController extends AbstractController {
                 const mouse = input as Mouse;
                 const roll = mouse.getRoll();
                 const pitch = mouse.getPitch();
+
+                //console.log(roll);
 
                 for (const rcsThruster of this.rcsThrusters) {
                     let throttle = 0;

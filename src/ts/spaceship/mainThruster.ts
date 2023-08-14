@@ -2,6 +2,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AbstractThruster } from "./abstractThruster";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { getDownwardDirection, getForwardDirection, getUpwardDirection } from "../controller/uberCore/transforms/basicTransform";
 
 export class MainThruster extends AbstractThruster {
     protected readonly maxAuthority = 3e3;
@@ -19,10 +20,10 @@ export class MainThruster extends AbstractThruster {
     }
 
     public applyForce(): void {
-        const nozzleDirection = this.localNozzleDown;
-        const force = nozzleDirection.scale(-2000);
+        const thrustDirection = getDownwardDirection(this.mesh);
+        const force = thrustDirection.scale(200 * this.throttle);
 
         // make the ship spin (apply force at the position of the thruster then apply the same force at the center of mass in the opposite direction)
-        this.parentAggregate.body.applyForce(force, this.parentAggregate.transformNode.getAbsolutePosition());
+        this.parentAggregate.body.applyForce(force, this.mesh.getAbsolutePosition());
     }
 }

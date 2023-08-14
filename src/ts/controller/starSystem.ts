@@ -339,6 +339,9 @@ export class StarSystem {
     public update(deltaTime: number): void {
         const controller = this.scene.getActiveController();
 
+        //this.translateEverythingNow(controller.update(deltaTime).negate());
+        //controller.aggregate.transformNode.position = Vector3.Zero();
+
         for (const object of this.orbitalObjects) {
             object.updateInternalClock(deltaTime);
 
@@ -350,10 +353,9 @@ export class StarSystem {
             if (isOrbiting(controller, object, orbitLimit) && this.getNearestObject() === object) {
                 translate(controller.aggregate.transformNode, newPosition.subtract(initialPosition));
 
-                // then we keep the controller at the origin
-                const displacementTranslation = controller.aggregate.transformNode.getAbsolutePosition().negate();
-                this.registerTranslateAllBodies(displacementTranslation);
-                translate(controller.aggregate.transformNode, displacementTranslation);
+                /*const direction = controller.aggregate.transformNode.getAbsolutePosition().subtract(object.nextState.position).normalize();
+                const gravity = 9.81;
+                controller.aggregate.body.applyForce(direction.scale(gravity), controller.aggregate.body.getObjectCenterWorld());*/
             }
 
             const dtheta = object.updateRotation(deltaTime);
@@ -361,13 +363,14 @@ export class StarSystem {
             // if the controller is close to the object and it is a body, it will follow its rotation
             if (isOrbiting(controller, object) && this.getNearestBody() === object) {
                 rotateAround(controller.aggregate.transformNode, object.nextState.position, object.getRotationAxis(), dtheta);
-
-                // then we keep the controller at the origin
-                const displacementRotation = controller.aggregate.transformNode.getAbsolutePosition().negate();
-                this.registerTranslateAllBodies(displacementRotation);
-                translate(controller.aggregate.transformNode, displacementRotation);
             }
         }
+
+        controller.update(deltaTime);
+
+        const displacementTranslation = controller.aggregate.transformNode.getAbsolutePosition().negate();
+        this.registerTranslateAllBodies(displacementTranslation);
+        translate(controller.aggregate.transformNode, displacementTranslation);
 
         for (const object of this.orbitalObjects) object.applyNextState();
 

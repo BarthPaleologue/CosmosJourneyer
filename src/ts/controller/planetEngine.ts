@@ -174,7 +174,6 @@ export class PlanetEngine {
 
             const starSystemScene = this.getStarSystemScene();
             const starSystem = this.getStarSystem();
-            const activeController = starSystemScene.getActiveController();
 
             const deltaTime = this.getEngine().getDeltaTime() / 1000;
 
@@ -183,9 +182,6 @@ export class PlanetEngine {
             this.bodyEditor.update(nearestBody, starSystem.postProcessManager, starSystemScene);
             this.helmetOverlay.update(nearestBody);
             this.helmetOverlay.setVisibility(!this.isFullscreen && this.bodyEditor.getVisibility() !== EditorVisibility.FULL);
-
-            this.getStarSystem().translateEverythingNow(activeController.update(deltaTime).negate());
-            activeController.aggregate.transformNode.position = Vector3.Zero();
 
             //FIXME: should address stars orbits
             for (const star of starSystem.stellarObjects) star.model.orbitalProperties.period = 0;
@@ -203,7 +199,7 @@ export class PlanetEngine {
     }
 
     /**
-     * Inits the current star system and the collision worker
+     * Inits the current star system
      */
     public init(): void {
         this.getStarSystem().init();

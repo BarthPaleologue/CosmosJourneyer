@@ -34,10 +34,7 @@ export class RCSThruster extends AbstractThruster {
         // the nozzle is directed upward
         const thrustDirection = getDownwardDirection(this.mesh);
         const force = thrustDirection.scale(this.maxAuthority * this.throttle);
-        //console.log(this.maxAuthority, this.throttle, this.leverage);
 
-        // make the ship spin (apply force at the position of the thruster then apply the same force at the center of mass in the opposite direction)
         this.parentAggregate.body.applyForce(force, this.mesh.getAbsolutePosition());
-        this.parentAggregate.body.applyForce(force.negate(), this.parentAggregate.body.getObjectCenterWorld());
     }
 }
