@@ -339,8 +339,9 @@ export class StarSystem {
     public update(deltaTime: number): void {
         const controller = this.scene.getActiveController();
 
-        //this.translateEverythingNow(controller.update(deltaTime).negate());
-        //controller.aggregate.transformNode.position = Vector3.Zero();
+        /*const displacementTranslation = controller.aggregate.transformNode.getAbsolutePosition().negate();
+        this.translateEverythingNow(displacementTranslation);
+        translate(controller.aggregate.transformNode, displacementTranslation);*/
 
         for (const object of this.orbitalObjects) {
             object.updateInternalClock(deltaTime);

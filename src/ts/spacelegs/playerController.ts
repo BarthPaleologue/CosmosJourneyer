@@ -75,7 +75,6 @@ export class PlayerController extends AbstractController {
         const playerMovement = Vector3.Zero();
         for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, deltaTime));
         translate(this.aggregate.transformNode, playerMovement);
-        //console.log(this.aggregate.transformNode.position);
         return playerMovement;
     }
 }

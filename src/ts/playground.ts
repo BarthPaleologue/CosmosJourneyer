@@ -117,7 +117,8 @@ const gravityOrigin = newton.transform.getAbsolutePosition();
 const gravity = -9.81;
 
 let clockSeconds = 0;
-function updateScene() {    
+
+function updateBeforeHavok() {    
 
     const deltaTime = engine.getDeltaTime() / 1000;
     clockSeconds += deltaTime;
@@ -141,6 +142,9 @@ function updateScene() {
     newton.material.update(camera.globalPosition, [light.getAbsolutePosition()]);
     Assets.ChunkForge.update();
     
+}
+
+function updateAfterHavok() {
     const spaceshipPosition = spaceship.getAbsolutePosition();
 
     for(const mesh of meshes) {
@@ -150,7 +154,8 @@ function updateScene() {
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
-    scene.registerBeforeRender(updateScene);
+    scene.onAfterPhysicsObservable.add(updateAfterHavok);
+    scene.onBeforePhysicsObservable.add(updateBeforeHavok);
     engine.runRenderLoop(() => scene.render());
 });
 
