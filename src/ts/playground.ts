@@ -140,8 +140,7 @@ function updateScene() {
     newton.updateLOD(camera.globalPosition);
     newton.material.update(camera.globalPosition, [light.getAbsolutePosition()]);
     Assets.ChunkForge.update();
-
-    // move back everything to the origin
+    
     const spaceshipPosition = spaceship.getAbsolutePosition();
 
     for(const mesh of meshes) {
@@ -151,7 +150,7 @@ function updateScene() {
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
-    scene.registerBeforeRender(() => updateScene());
+    scene.registerBeforeRender(updateScene);
     engine.runRenderLoop(() => scene.render());
 });
 
