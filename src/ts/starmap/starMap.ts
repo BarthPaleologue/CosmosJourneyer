@@ -215,10 +215,10 @@ export class StarMap {
 
             if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaTime);
 
-            const playerDisplacementNegated = this.controller.update(deltaTime);
+            const playerDisplacementNegated = this.controller.update(deltaTime).negate();
             //console.log(this.controller.aggregate.transformNode.getAbsolutePosition());
 
-            //this.controller.aggregate.transformNode.position = Vector3.Zero();
+            this.controller.aggregate.transformNode.position = Vector3.Zero();
 
             if (this.translationAnimation !== null) {
                 const oldPosition = this.controller.aggregate.transformNode.getAbsolutePosition().clone();
