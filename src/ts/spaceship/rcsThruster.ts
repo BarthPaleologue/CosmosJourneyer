@@ -1,13 +1,14 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { NewtonianTransform } from "../controller/uberCore/transforms/newtonianTransform";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AbstractThruster } from "./abstractThruster";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { getDownwardDirection } from "../controller/uberCore/transforms/basicTransform";
 
 export class RCSThruster extends AbstractThruster {
-    protected override maxAuthority = 1;
+    protected override maxAuthority = 30;
 
-    constructor(mesh: AbstractMesh, direction: Vector3, parent: NewtonianTransform) {
-        super(mesh, direction, parent);
+    constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
+        super(mesh, direction, parentAggregate);
 
         this.plume.maxSize = 0.3;
         this.plume.minSize = 0.3;
@@ -27,5 +28,13 @@ export class RCSThruster extends AbstractThruster {
 
     public deactivate(): void {
         this.throttle = 0;
+    }
+
+    public applyForce(): void {
+        // the nozzle is directed upward
+        const thrustDirection = getDownwardDirection(this.mesh);
+        const force = thrustDirection.scale(this.maxAuthority * this.throttle);
+
+        this.parentAggregate.body.applyForce(force, this.mesh.getAbsolutePosition());
     }
 }

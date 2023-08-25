@@ -4,8 +4,6 @@ import { Direction } from "../../../utils/direction";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
-import { TransferCollisionData } from "../../../controller/chunks/workerDataTypes";
-import { TaskType } from "../../../controller/chunks/taskTypes";
 import { AbstractController } from "../../../controller/uberCore/abstractController";
 import { TelluricPlanemoMaterial } from "../../materials/telluricPlanemoMaterial";
 import { waterBoilingPointCelsius } from "../../../utils/waterMechanics";
@@ -15,11 +13,10 @@ import { Planemo } from "./planemo";
 import { TelluricPlanemoModel } from "../../../model/planemos/telluricPlanemoModel";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
-import { RigidBody } from "../../../controller/workers/rigidbody";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
-export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo {
+export class TelluricPlanemo extends AbstractBody implements Planemo {
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
 
     readonly material: TelluricPlanemoMaterial;
@@ -69,30 +66,18 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
 
         this.material = new TelluricPlanemoMaterial(this.name, this.transform, this.model, scene);
 
-        this.aggregate = new PhysicsAggregate(this.transform.node, PhysicsShapeType.CONTAINER, { mass: 1e10, restitution: 0.2 }, scene);
+        this.aggregate = new PhysicsAggregate(this.transform, PhysicsShapeType.CONTAINER, { mass: 1e10, restitution: 0.2 }, scene);
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 1e10 });
         this.aggregate.body.disablePreStep = false;
 
         this.sides = [
-            new ChunkTree(Direction.Up, this.name, this.model, this.transform, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.Down, this.name, this.model, this.transform, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.Forward, this.name, this.model, this.transform, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.Backward, this.name, this.model, this.transform, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.Right, this.name, this.model, this.transform, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.Left, this.name, this.model, this.transform, this.aggregate, this.material, scene)
+            new ChunkTree(Direction.Up, this.name, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.Down, this.name, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.Forward, this.name, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.Backward, this.name, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.Right, this.name, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.Left, this.name, this.model, this.aggregate, this.material, scene)
         ];
-    }
-
-    public generateCollisionTask(relativePosition: Vector3): TransferCollisionData {
-        const collisionData: TransferCollisionData = {
-            seed: this.model.seed,
-            taskType: TaskType.Collision,
-            planetName: this.name,
-            terrainSettings: this.model.terrainSettings,
-            position: [relativePosition.x, relativePosition.y, relativePosition.z],
-            planetDiameter: this.getDiameter()
-        };
-        return collisionData;
     }
 
     /**
@@ -111,7 +96,7 @@ export class TelluricPlanemo extends AbstractBody implements RigidBody, Planemo 
     }
 
     public updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
-        this.material.update(controller.transform.getAbsolutePosition(), stellarObjects.map((star) => star.transform.getAbsolutePosition()));
+        this.material.update(controller.aggregate.transformNode.getAbsolutePosition(), stellarObjects.map((star) => star.transform.getAbsolutePosition()));
     }
 
     public override getBoundingRadius(): number {

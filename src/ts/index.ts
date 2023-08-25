@@ -11,7 +11,7 @@ import { Assets } from "./controller/assets";
 import { PlayerController } from "./spacelegs/playerController";
 import { positionNearObject } from "./utils/positionNearObject";
 import { PlanetEngine } from "./controller/planetEngine";
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ShipController } from "./spaceship/shipController";
 import { SpaceStation } from "./view/spacestation/spaceStation";
@@ -19,6 +19,9 @@ import { PostProcessType } from "./view/postProcesses/postProcessTypes";
 import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
 import { StarModel } from "./model/stellarObjects/starModel";
 import { GasPlanetModel } from "./model/planemos/gasPlanetModel";
+import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
+import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
+import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 
 const engine = new PlanetEngine();
 
@@ -36,12 +39,16 @@ player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 player.addInput(keyboard);
 player.addInput(mouse);
 player.addInput(gamepad);
+player.setEnabled(false, engine.getHavokPlugin());
 
 const spaceshipController = new ShipController(scene);
 spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 spaceshipController.addInput(keyboard);
 spaceshipController.addInput(gamepad);
 spaceshipController.addInput(mouse);
+
+const physicsViewer = new PhysicsViewer();
+//physicsViewer.showBody(spaceshipController.aggregate.body);
 
 mouse.addOnMouseEnterListener(() => {
     if (scene.getActiveController() === spaceshipController) engine.resume();
@@ -55,11 +62,19 @@ scene.setActiveController(spaceshipController);
 engine.registerStarSystemUpdateCallback(() => {
     if (scene.getActiveController() != spaceshipController) return;
 
-    const shipPosition = spaceshipController.transform.getAbsolutePosition();
+    const shipPosition = spaceshipController.aggregate.transformNode.getAbsolutePosition();
     const nearestBody = engine.getStarSystem().getNearestObject(shipPosition);
     const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getBoundingRadius();
-    spaceshipController.registerClosestDistanceToPlanet(distance - radius);
+    spaceshipController.registerClosestObject(distance, radius);
+
+    const warpDrive = spaceshipController.getWarpDrive();
+    const shipInternalThrottle = warpDrive.getInternalThrottle();
+    const shipTargetThrottle = warpDrive.getTargetThrottle();
+
+    const throttleString = warpDrive.isEnabled() ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}` : spaceshipController.getThrottle();
+
+    (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 });
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
@@ -74,7 +89,7 @@ sun.model.orbitalProperties.period = 60 * 60 * 24;
 
 const planetModel = new TelluricPlanemoModel(0.4233609183800225, [sunModel]);
 planetModel.physicalProperties.minTemperature = -37;
-planetModel.physicalProperties.maxTemperature = 40;
+planetModel.physicalProperties.maxTemperature = 30;
 
 planetModel.orbitalProperties.period = 60 * 60 * 24 * 365.25;
 planetModel.orbitalProperties.apoapsis = 4000 * planetModel.radius;
@@ -163,14 +178,18 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "g") {
         if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);
-            player.transform.setRotationQuaternion(spaceshipController.transform.getRotationQuaternion().clone());
+            setRotationQuaternion(player.aggregate.transformNode, getRotationQuaternion(spaceshipController.aggregate.transformNode).clone());
             engine.getStarSystem().postProcessManager.rebuild(spaceshipController.getActiveCamera());
-            spaceshipController.setHidden(true);
+
+            spaceshipController.setEnabled(false, engine.getHavokPlugin());
+            player.setEnabled(true, engine.getHavokPlugin());
         } else {
             scene.setActiveController(spaceshipController);
-            spaceshipController.transform.setRotationQuaternion(player.transform.getRotationQuaternion().clone());
+            setRotationQuaternion(spaceshipController.aggregate.transformNode, getRotationQuaternion(player.aggregate.transformNode).clone());
             engine.getStarSystem().postProcessManager.rebuild(player.getActiveCamera());
-            spaceshipController.setHidden(false);
+
+            player.setEnabled(false, engine.getHavokPlugin());
+            spaceshipController.setEnabled(true, engine.getHavokPlugin());
         }
     }
 });

@@ -6,6 +6,7 @@ import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Assets } from "../../controller/assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { getForwardDirection } from "../../controller/uberCore/transforms/basicTransform";
 
 const shaderName = "blackhole";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
@@ -60,7 +61,7 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
                 name: "forwardAxis",
                 type: ShaderDataType.Vector3,
                 get: () => {
-                    return blackHole.transform.getForwardDirection();
+                    return getForwardDirection(blackHole.transform);
                 }
             }
         ];

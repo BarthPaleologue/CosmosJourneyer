@@ -12,6 +12,8 @@ import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcessTypes";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { getForwardDirection } from "../../controller/uberCore/transforms/basicTransform";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -39,11 +41,11 @@ export class StarfieldPostProcess extends UberPostProcess {
                     let vis = 1.0;
                     for (const star of stellarObjects) {
                         if (star instanceof BlackHole) return 1;
-                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.transform.getAbsolutePosition().normalizeToNew(), scene.getActiveController().transform.getForwardDirection()));
+                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.transform.getAbsolutePosition().normalizeToNew(), getForwardDirection(scene.getActiveController().aggregate.transformNode)));
                     }
                     vis = 0.5 + vis * 0.5;
                     let vis2 = 1.0;
-                    const nearest = nearestBody(scene.getActiveController().transform, bodies);
+                    const nearest = nearestBody(scene.getActiveController().aggregate.transformNode, bodies);
                     if (nearest instanceof TelluricPlanemo) {
                         const planet = nearest as TelluricPlanemo;
                         if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {

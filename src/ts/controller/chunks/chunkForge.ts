@@ -26,7 +26,7 @@ export class ChunkForge {
 
     constructor(nbVerticesPerSide: number) {
         this.nbVerticesPerSide = nbVerticesPerSide;
-        const nbMaxWorkers = navigator.hardwareConcurrency - 2; // le -2 c'est parce que faut compter le main thread et le collision worker
+        const nbMaxWorkers = navigator.hardwareConcurrency - 1; // -1 because the main thread is also used
         this.workerPool = new WorkerPool(nbMaxWorkers);
     }
 

@@ -1,22 +1,15 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Input } from "../inputs/input";
-import { BasicTransform } from "./transforms/basicTransform";
 import { UberCamera } from "./uberCamera";
-import { Scene } from "@babylonjs/core/scene";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 export abstract class AbstractController {
-    collisionRadius = 10;
-
-    readonly transform: BasicTransform;
+    abstract aggregate: PhysicsAggregate;
 
     /**
      * The inputs that this controller listens to
      */
     protected readonly inputs: Input[] = [];
-
-    protected constructor(scene: Scene) {
-        this.transform = new BasicTransform("playerTransform", scene);
-    }
 
     /**
      * Returns the camera that should be used to display the player

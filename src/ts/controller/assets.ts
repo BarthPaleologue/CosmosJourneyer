@@ -179,15 +179,15 @@ export class Assets {
     }
 
     static CreateSpaceShipInstance(): InstancedMesh {
-        return Assets.Spaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        const instance = Assets.Spaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        for (const child of instance.getChildMeshes()) child.isVisible = true;
+
+        return instance;
     }
 
-    static CreateEndeavorSpaceShipInstance(newParent: TransformNode | null = null): InstancedMesh {
-        const instance = Assets.EndeavorSpaceship.instantiateHierarchy(newParent, { doNotInstantiate: false }) as InstancedMesh;
-
-        for(const child of instance.getChildMeshes()) {
-            child.isVisible = true;
-        }
+    static CreateEndeavorSpaceShipInstance(): InstancedMesh {
+        const instance = Assets.EndeavorSpaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        for (const child of instance.getChildMeshes()) child.isVisible = true;
 
         return instance;
     }
@@ -208,9 +208,9 @@ export class Assets {
         return mesh;
     }
 
-    static DebugMaterial(name: string, diffuse=false, wireframe=false) {
+    static DebugMaterial(name: string, diffuse = false, wireframe = false) {
         const mat = new StandardMaterial(`${name}DebugMaterial`);
-        if(!diffuse) mat.emissiveColor = Color3.Random();
+        if (!diffuse) mat.emissiveColor = Color3.Random();
         else mat.diffuseColor = Color3.Random();
         mat.wireframe = wireframe;
         mat.useLogarithmicDepth = true;

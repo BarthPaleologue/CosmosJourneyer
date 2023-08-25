@@ -19,6 +19,8 @@ import { TelluricPlanemoModel } from "../model/planemos/telluricPlanemoModel";
 import { GasPlanetModel } from "../model/planemos/gasPlanetModel";
 import { BlackHoleModel } from "../model/stellarObjects/blackHoleModel";
 import { StarModel } from "../model/stellarObjects/starModel";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { rotateAround, translate } from "./uberCore/transforms/basicTransform";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -260,7 +262,7 @@ export class StarSystem {
      * @param displacement The displacement applied to all bodies
      */
     public translateEverythingNow(displacement: Vector3): void {
-        for (const object of this.orbitalObjects) object.transform.translate(displacement);
+        for (const object of this.orbitalObjects) translate(object.transform, displacement);
     }
 
     /**
@@ -337,6 +339,10 @@ export class StarSystem {
     public update(deltaTime: number): void {
         const controller = this.scene.getActiveController();
 
+        /*const displacementTranslation = controller.aggregate.transformNode.getAbsolutePosition().negate();
+        this.translateEverythingNow(displacementTranslation);
+        translate(controller.aggregate.transformNode, displacementTranslation);*/
+
         for (const object of this.orbitalObjects) {
             object.updateInternalClock(deltaTime);
 
@@ -345,27 +351,31 @@ export class StarSystem {
 
             // if the controller is close to the body, it will follow its movement
             const orbitLimit = object instanceof SpaceStation ? 200 : 10;
-            if (isOrbiting(controller, object, orbitLimit) && this.getNearestObject() === object) controller.transform.translate(newPosition.subtract(initialPosition));
+            if (isOrbiting(controller, object, orbitLimit) && this.getNearestObject() === object) {
+                translate(controller.aggregate.transformNode, newPosition.subtract(initialPosition));
 
-            // then we keep the controller at the origin
-            const displacementTranslation = controller.transform.getAbsolutePosition().negate();
-            this.registerTranslateAllBodies(displacementTranslation);
-            controller.transform.translate(displacementTranslation);
+                /*const direction = controller.aggregate.transformNode.getAbsolutePosition().subtract(object.nextState.position).normalize();
+                const gravity = 9.81;
+                controller.aggregate.body.applyForce(direction.scale(gravity), controller.aggregate.body.getObjectCenterWorld());*/
+            }
 
             const dtheta = object.updateRotation(deltaTime);
 
             // if the controller is close to the object and it is a body, it will follow its rotation
-            if (isOrbiting(controller, object) && this.getNearestBody() === object) controller.transform.rotateAround(object.nextState.position, object.getRotationAxis(), dtheta);
-
-            // then we keep the controller at the origin
-            const displacementRotation = controller.transform.getAbsolutePosition().negate();
-            this.registerTranslateAllBodies(displacementRotation);
-            controller.transform.translate(displacementRotation);
+            if (isOrbiting(controller, object) && this.getNearestBody() === object) {
+                rotateAround(controller.aggregate.transformNode, object.nextState.position, object.getRotationAxis(), dtheta);
+            }
         }
+
+        controller.update(deltaTime);
+
+        const displacementTranslation = controller.aggregate.transformNode.getAbsolutePosition().negate();
+        this.registerTranslateAllBodies(displacementTranslation);
+        translate(controller.aggregate.transformNode, displacementTranslation);
 
         for (const object of this.orbitalObjects) object.applyNextState();
 
-        for (const body of this.telluricPlanets.concat(this.satellites)) body.updateLOD(controller.transform.getAbsolutePosition());
+        for (const body of this.telluricPlanets.concat(this.satellites)) body.updateLOD(controller.aggregate.transformNode.getAbsolutePosition());
 
         for (const object of this.orbitalObjects) object.computeCulling(controller.getActiveCamera().getAbsolutePosition());
 

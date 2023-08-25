@@ -11,6 +11,8 @@ import { positionNearObject } from "./utils/positionNearObject";
 import { PlanetEngine } from "./controller/planetEngine";
 import { ShipController } from "./spaceship/shipController";
 import { EditorVisibility } from "./ui/bodyEditor/bodyEditor";
+import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
+import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 
 const engine = new PlanetEngine();
 
@@ -18,7 +20,7 @@ await engine.setup();
 
 const scene = engine.getStarSystemScene();
 
-const mouse = new Mouse(engine.canvas, 1e5);
+const mouse = new Mouse(engine.canvas, 100);
 const keyboard = new Keyboard();
 const gamepad = new Gamepad();
 
@@ -28,10 +30,12 @@ player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 player.addInput(keyboard);
 player.addInput(mouse);
 player.addInput(gamepad);
+player.setEnabled(false, engine.getHavokPlugin());
 
 const spaceshipController = new ShipController(scene);
 spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 spaceshipController.addInput(keyboard);
+spaceshipController.addInput(mouse);
 spaceshipController.addInput(gamepad);
 
 scene.setActiveController(spaceshipController);
@@ -39,11 +43,19 @@ scene.setActiveController(spaceshipController);
 engine.registerStarSystemUpdateCallback(() => {
     if (scene.getActiveController() != spaceshipController) return;
 
-    const shipPosition = spaceshipController.transform.getAbsolutePosition();
+    const shipPosition = spaceshipController.aggregate.transformNode.getAbsolutePosition();
     const nearestBody = engine.getStarSystem().getNearestBody(shipPosition);
     const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getRadius();
-    spaceshipController.registerClosestDistanceToPlanet(distance - radius);
+    spaceshipController.registerClosestObject(distance, radius);
+
+    const warpDrive = spaceshipController.getWarpDrive();
+    const shipInternalThrottle = warpDrive.getInternalThrottle();
+    const shipTargetThrottle = warpDrive.getTargetThrottle();
+
+    const throttleString = warpDrive.isEnabled() ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}` : spaceshipController.getThrottle();
+
+    (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 });
 
 const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
@@ -62,14 +74,18 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "g") {
         if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);
-            player.transform.setRotationQuaternion(spaceshipController.transform.getRotationQuaternion().clone());
+            setRotationQuaternion(player.aggregate.transformNode, getRotationQuaternion(spaceshipController.aggregate.transformNode).clone());
             engine.getStarSystem().postProcessManager.rebuild(spaceshipController.getActiveCamera());
-            spaceshipController.setHidden(true);
+
+            spaceshipController.setEnabled(false, engine.getHavokPlugin());
+            player.setEnabled(true, engine.getHavokPlugin());
         } else {
             scene.setActiveController(spaceshipController);
-            spaceshipController.transform.setRotationQuaternion(player.transform.getRotationQuaternion().clone());
+            setRotationQuaternion(spaceshipController.aggregate.transformNode, getRotationQuaternion(player.aggregate.transformNode).clone());
             engine.getStarSystem().postProcessManager.rebuild(player.getActiveCamera());
-            spaceshipController.setHidden(false);
+
+            player.setEnabled(false, engine.getHavokPlugin());
+            spaceshipController.setEnabled(true, engine.getHavokPlugin());
         }
     }
 });

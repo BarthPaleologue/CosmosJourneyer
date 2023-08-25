@@ -22,7 +22,7 @@ export class BlackHole extends AbstractBody {
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
-        this.light.parent = this.transform.node;
+        this.light.parent = this.transform;
         if (this.model.physicalProperties.accretionDiskRadius === 0) this.light.intensity = 0;
 
         this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.BLACK_HOLE);

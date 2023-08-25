@@ -1,10 +1,10 @@
-import { ITransformLike } from "../../controller/uberCore/transforms/ITransformLike";
 import { BaseModel } from "../common";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../../view/postProcesses/postProcessTypes";
+import { TransformNode } from "@babylonjs/core/Meshes";
 
 export interface ITransformable {
-    transform: ITransformLike;
+    transform: TransformNode;
 }
 
 export interface BoundingSphere extends ITransformable {

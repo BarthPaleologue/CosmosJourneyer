@@ -5,31 +5,30 @@ import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/verte
 import { Assets } from "../../controller/assets";
 import { flattenVector3Array } from "../../utils/algebra";
 import { UberScene } from "../../controller/uberCore/uberScene";
-import { AbstractController } from "../../controller/uberCore/abstractController";
-import { BasicTransform } from "../../controller/uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../../model/terrain/terrainSettings";
 import { SolidPhysicalProperties } from "../../model/common";
 import { centeredRand } from "extended-random";
 import { TelluricPlanemoModel } from "../../model/planemos/telluricPlanemoModel";
-import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { MaterialHelper } from "@babylonjs/core/Materials/materialHelper";
 import { Vector3 } from "@babylonjs/core/Maths/math";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { getInverseRotationMatrix } from "../../controller/uberCore/transforms/basicTransform";
 
 const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 
 export class TelluricPlanemoMaterial extends ShaderMaterial {
-    readonly planet: BasicTransform;
+    readonly planet: TransformNode;
     colorSettings: ColorSettings;
     terrainSettings: TerrainSettings;
     physicalProperties: SolidPhysicalProperties;
     planetRadius: number;
 
-    constructor(planetName: string, planet: BasicTransform, model: TelluricPlanemoModel, scene: UberScene) {
+    constructor(planetName: string, planet: TransformNode, model: TelluricPlanemoModel, scene: UberScene) {
         super(`${planetName}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
             uniforms: [
@@ -166,8 +165,9 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         //this.planet.node.computeWorldMatrix(true);
         //for (const object of this.planet.node.getChildMeshes()) object.computeWorldMatrix(true);
 
-        this.setMatrix("normalMatrix", this.planet.node.getWorldMatrix().clone().invert().transpose());
-        this.setMatrix("planetInverseRotationMatrix", this.planet.getInverseRotationMatrix());
+        this.setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
+
+        this.setMatrix("planetInverseRotationMatrix", getInverseRotationMatrix(this.planet));
 
         this.setVector3("playerPosition", activeControllerPosition);
 
