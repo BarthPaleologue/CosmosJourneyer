@@ -158,7 +158,7 @@ export class PlanetEngine {
         this.havokPlugin = new HavokPlugin(true, havokInstance);
         this.starSystemScene.enablePhysics(Vector3.Zero(), this.havokPlugin);
 
-        setMaxLinVel(10000, 10000, this.havokPlugin);
+        setMaxLinVel(this.havokPlugin, 10000, 10000);
 
         this.activeScene = this.starSystemScene;
 
