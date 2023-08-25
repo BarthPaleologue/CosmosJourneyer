@@ -10,6 +10,7 @@ import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
+import { Settings } from "../settings";
 
 export class PlayerController extends AbstractController {
     private readonly camera: UberCamera;
@@ -73,7 +74,8 @@ export class PlayerController extends AbstractController {
 
     public override update(deltaTime: number): Vector3 {
         const playerMovement = Vector3.Zero();
-        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, deltaTime));
+        //FIXME: the division by Settings.TIME_MULTIPLIER is a hack to make the player move at the same speed regardless of the time multiplier
+        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, deltaTime / Settings.TIME_MULTIPLIER));
         translate(this.aggregate.transformNode, playerMovement);
         return playerMovement;
     }
