@@ -1,5 +1,6 @@
 import { Vector3 } from "@babylonjs/havok";
 import { Settings } from "../settings";
+import { clamp } from "../utils/math";
 
 enum WARPDRIVE_STATE {
     /**
@@ -20,7 +21,48 @@ enum WARPDRIVE_STATE {
     DESENGAGING
 }
 
-export class WarpDrive {
+/**
+ * Interface of the warp drive of a spaceship that can only be read.
+ */
+export interface ReadonlyWarpDrive {
+    /**
+     * Returns true if the warp drive is enabled and not desengaging. Returns false otherwise.
+     * @returns True if the warp drive is enabled and not desengaging. Returns false otherwise.
+     */
+    isEnabled(): boolean;
+
+    /**
+     * Returns true if the warp drive is disabled. Returns false otherwise.
+     * @returns True if the warp drive is disabled. Returns false otherwise.
+     */
+    isDisabled(): boolean;
+
+    /**
+     * Returns true if the warp drive is desengaging. Returns false otherwise.
+     * @returns True if the warp drive is desengaging. Returns false otherwise.
+     */
+    isDesengaging(): boolean;
+
+    /**
+     * Returns the current speed of the warp drive in m/s.
+     * @returns The current speed of the warp drive in m/s.
+     */
+    getWarpSpeed(): number;
+
+    /**
+     * Returns the current target throttle of the warp drive.
+     * @returns The current target throttle of the warp drive.
+     */
+    getTargetThrottle(): number;
+
+    /**
+     * Returns the current internal throttle of the warp drive.
+     * @returns The current internal throttle of the warp drive.
+     */
+    getInternalThrottle(): number;
+}
+
+export class WarpDrive implements ReadonlyWarpDrive {
     /**
      * Internal throttle of the warp drive. It is a value between 0 and 1. It defines the current speed ratio with the target speed.
      * (0 means that the ship is not moving, 1 means that the ship is moving at the target speed)
@@ -31,7 +73,7 @@ export class WarpDrive {
      * User throttle of the warp drive. It is a value between 0 and 1. It constrains the target speed of the warp drive.
      * (0 means the target speed is 0, 1 means the target speed is maximal)
      */
-    private userThrottle = 1;
+    private targetThrottle = 1;
 
     /**
      * Acceleration of the internal throtle.
@@ -86,26 +128,14 @@ export class WarpDrive {
         this.currentSpeed = 0;
     }
 
-    /**
-     * Returns true if the warp drive is enabled and not desengaging. Returns false otherwise.
-     * @returns True if the warp drive is enabled and not desengaging. Returns false otherwise.
-     */
     public isEnabled(): boolean {
         return this.state === WARPDRIVE_STATE.ENABLED;
     }
 
-    /**
-     * Returns true if the warp drive is disabled. Returns false otherwise.
-     * @returns True if the warp drive is disabled. Returns false otherwise.
-     */
     public isDisabled(): boolean {
         return this.state === WARPDRIVE_STATE.DISABLED;
     }
 
-    /**
-     * Returns true if the warp drive is desengaging. Returns false otherwise.
-     * @returns True if the warp drive is desengaging. Returns false otherwise.
-     */
     public isDesengaging(): boolean {
         return this.state === WARPDRIVE_STATE.DESENGAGING;
     }
@@ -120,7 +150,15 @@ export class WarpDrive {
         const closeSpeed = speedThreshold * 0.025 * (closestObjectDistance - closestObjectRadius) / speedThreshold;
         const deepSpaceSpeed = speedThreshold * (0.025 * (closestObjectDistance - closestObjectRadius) / speedThreshold) ** 1.1;
         this.targetSpeed = Math.min(this.maxWarpSpeed, Math.max(closeSpeed, deepSpaceSpeed));
-        return this.userThrottle * this.targetSpeed;
+        return this.targetThrottle * this.targetSpeed;
+    }
+
+    /**
+     * Increases the target throttle by the given delta and clamps it between 0 and 1.
+     * @param delta The delta to apply to the target throttle.
+     */
+    public increaseTargetThrottle(delta: number): void {
+        this.targetThrottle = clamp(this.targetThrottle + delta, 0, 1);
     }
 
     /**
@@ -128,15 +166,19 @@ export class WarpDrive {
      * @param delta The delta to apply to the internal throttle.
      */
     private increaseInternalThrottle(delta: number): void {
-        this.internalThrottle = Math.min(1, Math.max(0, this.internalThrottle + delta));
+        this.internalThrottle = clamp(this.internalThrottle + delta, 0, this.targetThrottle);
     }
 
-    /**
-     * Returns the current speed of the warp drive in m/s.
-     * @returns The current speed of the warp drive in m/s.
-     */
     public getWarpSpeed(): number {
         return this.currentSpeed;
+    }
+
+    public getTargetThrottle(): number {
+        return this.targetThrottle;
+    }
+
+    public getInternalThrottle(): number {
+        return this.internalThrottle;
     }
 
     /**

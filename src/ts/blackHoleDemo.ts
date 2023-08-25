@@ -12,6 +12,7 @@ import { PlanetEngine } from "./controller/planetEngine";
 import { ShipController } from "./spaceship/shipController";
 import { EditorVisibility } from "./ui/bodyEditor/bodyEditor";
 import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
+import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 
 const engine = new PlanetEngine();
 
@@ -47,6 +48,14 @@ engine.registerStarSystemUpdateCallback(() => {
     const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getRadius();
     spaceshipController.registerClosestObject(distance, radius);
+
+    const warpDrive = spaceshipController.getWarpDrive();
+    const shipInternalThrottle = warpDrive.getInternalThrottle();
+    const shipTargetThrottle = warpDrive.getTargetThrottle();
+
+    const throttleString = warpDrive.isEnabled() ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}` : spaceshipController.getThrottle();
+
+    (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 });
 
 const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);

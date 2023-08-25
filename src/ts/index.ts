@@ -21,6 +21,7 @@ import { StarModel } from "./model/stellarObjects/starModel";
 import { GasPlanetModel } from "./model/planemos/gasPlanetModel";
 import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
+import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 
 const engine = new PlanetEngine();
 
@@ -47,7 +48,7 @@ spaceshipController.addInput(gamepad);
 spaceshipController.addInput(mouse);
 
 const physicsViewer = new PhysicsViewer();
-physicsViewer.showBody(spaceshipController.aggregate.body);
+//physicsViewer.showBody(spaceshipController.aggregate.body);
 
 mouse.addOnMouseEnterListener(() => {
     if (scene.getActiveController() === spaceshipController) engine.resume();
@@ -66,6 +67,14 @@ engine.registerStarSystemUpdateCallback(() => {
     const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getBoundingRadius();
     spaceshipController.registerClosestObject(distance, radius);
+
+    const warpDrive = spaceshipController.getWarpDrive();
+    const shipInternalThrottle = warpDrive.getInternalThrottle();
+    const shipTargetThrottle = warpDrive.getTargetThrottle();
+
+    const throttleString = warpDrive.isEnabled() ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}` : spaceshipController.getThrottle();
+
+    (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 });
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);

@@ -9,8 +9,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { MainThruster } from "./mainThruster";
-import { WarpDrive } from "./warpDrive";
-import { parseSpeed } from "../utils/parseSpeed";
+import { ReadonlyWarpDrive, WarpDrive } from "./warpDrive";
 import { LOCAL_DIRECTION } from "../controller/uberCore/localDirections";
 import { RCSThruster } from "./rcsThruster";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -142,6 +141,14 @@ export class ShipController extends AbstractController {
         else this.warpDrive.desengage();
     }
 
+    /**
+     * Returns a readonly interface to the warp drive of the ship.
+     * @returns A readonly interface to the warp drive of the ship.
+     */
+    public getWarpDrive(): ReadonlyWarpDrive {
+        return this.warpDrive;
+    }
+
     protected override listenTo(input: Input, deltaTime: number): Vector3 {
         if (this.getActiveCamera() === this.thirdPersonCamera) {
             if (input.type === InputType.KEYBOARD) {
@@ -196,11 +203,31 @@ export class ShipController extends AbstractController {
                 pitch(this.aggregate.transformNode, pitchContribution * deltaTime);
             }
 
+            if(input.type === InputType.KEYBOARD) {
+                const keyboard = input as Keyboard;
+                const deltaThrottle = keyboard.getZAxis() * deltaTime;
+                this.warpDrive.increaseTargetThrottle(deltaThrottle);
+            }
+
             const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
             //this.aggregate.body.setLinearVelocity(warpSpeed);
             translate(this.aggregate.transformNode, warpSpeed.scale(deltaTime));
         }
         return Vector3.Zero();
+    }
+
+    /**
+     * Returns the speed of the ship in m/s
+     * If warp drive is enabled, returns the warp speed
+     * If warp drive is disabled, returns the linear velocity of the ship
+     * @returns The speed of the ship in m/s
+     */
+    public getSpeed(): number {
+        return this.warpDrive.isEnabled() ? this.warpDrive.getWarpSpeed() : this.aggregate.body.getLinearVelocity().length();
+    }
+
+    public getThrottle(): number {
+        return this.warpDrive.isEnabled() ? this.warpDrive.getTargetThrottle() : this.mainThrusters[0].getThrottle();
     }
 
     public override update(deltaTime: number): Vector3 {
@@ -209,8 +236,7 @@ export class ShipController extends AbstractController {
 
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());//Vector3.Zero();
         
-        const speed = Vector3.Zero();
-        this.aggregate.body.getLinearVelocityToRef(speed);
+        const speed = this.aggregate.body.getLinearVelocity();
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
         this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
@@ -228,9 +254,6 @@ export class ShipController extends AbstractController {
         } else {
             this.aggregate.body.setAngularDamping(1);
         }
-
-        //TODO: should be separated from the ship
-        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${parseSpeed(this.warpDrive.isEnabled() ? warpSpeed.length() : speed.length())}`;
 
         //this.transform.translate(displacement);
         return this.aggregate.transformNode.getAbsolutePosition();
