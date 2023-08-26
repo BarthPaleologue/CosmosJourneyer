@@ -113,13 +113,7 @@ export class SpaceEngine {
 
             if (e.key === "t") {
                 if (this.getActiveScene() === this.starSystemScene) {
-                    if (this.bodyEditor.getVisibility() === EditorVisibility.NAVBAR && this.helmetOverlay.isVisible()) {
-                        this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
-                        this.helmetOverlay.setVisibility(false);
-                    } else if (this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN && !this.helmetOverlay.isVisible()) {
-                        this.bodyEditor.setVisibility(EditorVisibility.NAVBAR);
-                        this.helmetOverlay.setVisibility(true);
-                    }
+                    this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
                 }
             }
 
