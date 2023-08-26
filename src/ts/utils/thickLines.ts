@@ -65,7 +65,7 @@ export class ThickLines {
             const distance = end.subtract(start).length();
 
             cylinder.position = middlePoint;
-            cylinder.scaling.y = distance - 0.05;
+            cylinder.scaling.y = Math.max(0, distance - 0.05);
 
             cylinder.lookAt(start);
             cylinder.rotate(Axis.X, Math.PI / 2, Space.LOCAL);
