@@ -29,6 +29,7 @@ import { ShipController } from "../spaceship/shipController";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { setMaxLinVel } from "../utils/havok";
 import { Animation } from "@babylonjs/core/Animations/animation";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 enum EngineState {
     RUNNING,
@@ -59,6 +60,8 @@ export class SpaceEngine {
     private state = EngineState.RUNNING;
 
     private static readonly unZoomAnimation = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+
+    readonly onToggleStarMapObservable = new Observable<boolean>();
 
     constructor() {
         this.helmetOverlay = new HelmetOverlay();
@@ -142,18 +145,20 @@ export class SpaceEngine {
             this.getStarSystemScene().getActiveController().getActiveCamera().animations = [SpaceEngine.unZoomAnimation];
             this.getStarSystemScene().beginAnimation(this.getStarSystemScene().getActiveController().getActiveCamera(), 0, 60, false, 2.0, () => {
                 this.getStarSystemScene().getActiveController().getActiveCamera().animations = [];
-                if (this.starMap === null) throw new Error("Star map is null");
                 this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
                 this.helmetOverlay.setVisibility(false);
 
-                this.activeScene = this.starMap.scene;
-                this.starMap.focusOnCurrentSystem();
+                const starMap = this.getStarMap();
+                this.activeScene = starMap.scene;
+                starMap.focusOnCurrentSystem();
             });
         } else {
             this.activeScene = this.getStarSystemScene();
             this.helmetOverlay.setVisibility(true);
             this.bodyEditor.setVisibility(EditorVisibility.NAVBAR);
         }
+
+        this.onToggleStarMapObservable.notifyObservers(this.activeScene === this.getStarMap().scene);
     }
 
     /**
