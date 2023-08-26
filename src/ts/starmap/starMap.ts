@@ -369,15 +369,15 @@ export class StarMap {
 
             initializedInstance.actionManager?.registerAction(
                 new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
-                    let text = `Seed: ${starSystemModel.seed}\n`;
-                    text += `Type: ${getStellarTypeString(starModel.stellarType)}\n`;
-                    text += `Planets: ${starSystemModel.getNbPlanets()}`;
-
+                    let text = "";
                     if (this.currentSystemSeed !== null) {
                         const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh;
                         const distance = 10 * currentInstance.getAbsolutePosition().subtract(initializedInstance.getAbsolutePosition()).length();
-                        text += `\nDistance: ${distance.toFixed(2)}ly`;
+                        text += `Distance: ${distance.toFixed(2)}ly\n`;
                     }
+                    text += `Planets: ${starSystemModel.getNbPlanets()}\n`;
+                    text += `Type: ${getStellarTypeString(starModel.stellarType)}\n`;
+                    text += `Seed: ${starSystemModel.seed}`;
 
                     this.starMapUI.attachUIToMesh(initializedInstance);
                     this.starMapUI.setSelectedSystem({name: starSystemModel.getName(), text});

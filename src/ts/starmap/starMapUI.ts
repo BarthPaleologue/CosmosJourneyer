@@ -19,6 +19,7 @@ export class StarMapUI {
     readonly warpButton: Button;
 
     readonly hoveredSystemRing: Image;
+    readonly selectedSystemRing: Image;
     readonly currentSystemRing: Image;
 
     readonly scene: Scene;
@@ -68,6 +69,12 @@ export class StarMapUI {
         this.hoveredSystemRing.alpha = 0.8;
         this.hoveredSystemRing.zIndex = 4;
 
+        this.selectedSystemRing = new Image("selectedSystemRing", hoveredCircle);
+        this.selectedSystemRing.fixedRatio = 1;
+        this.selectedSystemRing.width = 0.2;
+        this.selectedSystemRing.alpha = 0.8;
+        this.selectedSystemRing.zIndex = 4;
+
         this.currentSystemRing = new Image("currentSystemRing", selectedCircle);
         this.currentSystemRing.fixedRatio = 1;
         this.currentSystemRing.width = 0.2;
@@ -90,6 +97,12 @@ export class StarMapUI {
             this.hoveredSystemRing.scaleX = scale;
             this.hoveredSystemRing.scaleY = scale;
         }
+        if (this.selectedSystemRing.linkedMesh !== null && this.selectedSystemRing.linkedMesh !== undefined) {
+            const distance = this.selectedSystemRing.linkedMesh.getAbsolutePosition().length();
+            const scale = this.selectedSystemRing.linkedMesh.scaling.x / distance;
+            this.selectedSystemRing.scaleX = scale;
+            this.selectedSystemRing.scaleY = scale;
+        }
         if (this.currentSystemRing.linkedMesh !== null && this.currentSystemRing.linkedMesh !== undefined) {
             const distance = this.currentSystemRing.linkedMesh.getAbsolutePosition().length();
             const scale = Math.max(0.5, this.currentSystemRing.linkedMesh.scaling.x / distance);
@@ -103,6 +116,9 @@ export class StarMapUI {
         if (this.gui._linkedControls.length === 0) this.gui.addControl(this.systemUI);
 
         this.systemUI.linkWithMesh(mesh);
+
+        this.gui.addControl(this.selectedSystemRing);
+        this.selectedSystemRing.linkWithMesh(mesh);
 
 
         //FIXME: this should not be here, probably a BabylonJS bug
