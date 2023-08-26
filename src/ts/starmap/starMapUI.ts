@@ -6,6 +6,8 @@ import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture
 import { Image } from "@babylonjs/gui/2D/controls/image";
 
 import hoveredCircle from "../../asset/textures/hoveredCircle.png";
+import selectedCircle from "../../asset/textures/selectedCircle.png";
+
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
 
@@ -50,15 +52,15 @@ export class StarMapUI {
         this.namePlate.addControl(this.warpButton);
 
         this.hoveredSystemRing = new Image("hoverSystemRing", hoveredCircle);
+        this.hoveredSystemRing.fixedRatio = 1;
         this.hoveredSystemRing.width = 0.2;
-        this.hoveredSystemRing.autoScale = true;
         this.hoveredSystemRing.alpha = 0.8;
         this.hoveredSystemRing.zIndex = 4;
 
-        this.currentSystemRing = new Image("currentSystemRing", hoveredCircle);
+        this.currentSystemRing = new Image("currentSystemRing", selectedCircle);
+        this.currentSystemRing.fixedRatio = 1;
         this.currentSystemRing.width = 0.2;
-        this.currentSystemRing.autoScale = true;
-        this.currentSystemRing.alpha = 0.8;
+        this.currentSystemRing.alpha = 1;
         this.currentSystemRing.zIndex = 5;
 
         StarMapUI.ALPHA_ANIMATION.setKeys([
@@ -90,6 +92,10 @@ export class StarMapUI {
         if (this.gui._linkedControls.length === 0) this.gui.addControl(this.namePlate);
 
         this.namePlate.linkWithMesh(mesh);
+
+
+        //FIXME: this should not be here, probably a BabylonJS bug
+        this.currentSystemRing.linkWithMesh(this.currentSystemRing.linkedMesh);
     }
 
     setHoveredStarSystemMesh(mesh: AbstractMesh | null) {
@@ -100,13 +106,10 @@ export class StarMapUI {
             this.gui.removeControl(this.hoveredSystemRing);
         }
         this.hoveredSystemRing.linkWithMesh(mesh);
-
-        //FIXME: this should not be here, probably a BabylonJS bug
-        this.currentSystemRing.linkWithMesh(this.currentSystemRing.linkedMesh);
     }
 
     setCurrentStarSystemMesh(mesh: AbstractMesh | null) {
-        this.gui.addControl(this.currentSystemRing);
+        if(mesh !== null) this.gui.addControl(this.currentSystemRing);
         this.currentSystemRing.linkWithMesh(mesh);
     }
 
