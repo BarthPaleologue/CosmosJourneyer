@@ -10,18 +10,18 @@ export function positionNearObject(controller: AbstractController, object: Abstr
 
     if (nearestStar === object) {
         // the object is the nearest star
-        controller.aggregate.transformNode.setAbsolutePosition(object.transform.getAbsolutePosition().add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius)));
+        controller.getTransform().setAbsolutePosition(object.transform.getAbsolutePosition().add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius)));
     } else {
         const dirBodyToStar = object.transform.getAbsolutePosition().subtract(nearestStar.transform.getAbsolutePosition());
         const distBodyToStar = dirBodyToStar.length();
 
         dirBodyToStar.scaleInPlace(1 / distBodyToStar);
         const displacement = nearestStar.transform.getAbsolutePosition().add(dirBodyToStar.scale(distBodyToStar - nRadius * object.getBoundingRadius()));
-        controller.aggregate.transformNode.setAbsolutePosition(displacement);
+        controller.getTransform().setAbsolutePosition(displacement);
     }
 
-    starSystem.translateEverythingNow(controller.aggregate.transformNode.getAbsolutePosition().negate());
-    controller.aggregate.transformNode.setAbsolutePosition(Vector3.Zero());
+    starSystem.translateEverythingNow(controller.getTransform().getAbsolutePosition().negate());
+    controller.getTransform().setAbsolutePosition(Vector3.Zero());
 
-    controller.aggregate.transformNode.lookAt(object.transform.getAbsolutePosition());
+    controller.getTransform().lookAt(object.transform.getAbsolutePosition());
 }

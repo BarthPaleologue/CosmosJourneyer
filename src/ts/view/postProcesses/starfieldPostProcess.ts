@@ -41,11 +41,11 @@ export class StarfieldPostProcess extends UberPostProcess {
                     let vis = 1.0;
                     for (const star of stellarObjects) {
                         if (star instanceof BlackHole) return 1;
-                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.transform.getAbsolutePosition().normalizeToNew(), getForwardDirection(scene.getActiveController().aggregate.transformNode)));
+                        vis = Math.min(vis, 1.0 - Vector3.Dot(star.transform.getAbsolutePosition().normalizeToNew(), getForwardDirection(scene.getActiveController().getTransform())));
                     }
                     vis = 0.5 + vis * 0.5;
                     let vis2 = 1.0;
-                    const nearest = nearestBody(scene.getActiveController().aggregate.transformNode, bodies);
+                    const nearest = nearestBody(scene.getActiveController().getTransform(), bodies);
                     if (nearest instanceof TelluricPlanemo) {
                         const planet = nearest as TelluricPlanemo;
                         if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {

@@ -96,7 +96,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo {
     }
 
     public updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
-        this.material.update(controller.aggregate.transformNode.getAbsolutePosition(), stellarObjects.map((star) => star.transform.getAbsolutePosition()));
+        this.material.update(controller.getTransform().getAbsolutePosition(), stellarObjects.map((star) => star.transform.getAbsolutePosition()));
     }
 
     public override getBoundingRadius(): number {

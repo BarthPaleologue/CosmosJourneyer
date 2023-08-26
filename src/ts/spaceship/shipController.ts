@@ -21,6 +21,7 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
 import { getForwardDirection, pitch, roll, translate } from "../controller/uberCore/transforms/basicTransform";
+import { TransformNode } from "@babylonjs/core/Meshes";
 
 export class ShipController extends AbstractController {
     readonly instanceRoot: AbstractMesh;
@@ -101,6 +102,10 @@ export class ShipController extends AbstractController {
                 this.toggleWarpDrive();
             });
         }
+    }
+    
+    public override getTransform(): TransformNode {
+        return this.aggregate.transformNode;
     }
 
     private addMainThruster(mesh: AbstractMesh) {

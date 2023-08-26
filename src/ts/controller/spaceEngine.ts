@@ -139,7 +139,7 @@ export class SpaceEngine {
 
         const havokInstance = await HavokPhysics();
 
-        this.starMap = new StarMap(havokInstance, this.engine);
+        this.starMap = new StarMap(this.engine);
         this.starMap.registerWarpCallback((seed: number) => {
             this.setStarSystem(new StarSystem(seed, this.getStarSystemScene()), true);
             this.init();

@@ -31,8 +31,6 @@ import { TransformTranslationAnimation } from "../controller/uberCore/transforms
 import { makeNoise3D } from "fast-simplex-noise";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { Settings } from "../settings";
-import { HavokPhysicsWithBindings } from "@babylonjs/havok";
-import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { getForwardDirection, translate } from "../controller/uberCore/transforms/basicTransform";
 
 export class StarMap {
@@ -91,15 +89,12 @@ export class StarMap {
 
     private readonly densityRNG;
 
-    constructor(havokInstance: HavokPhysicsWithBindings, engine: Engine) {
+    constructor(engine: Engine) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
         this.scene.performancePriority = ScenePerformancePriority.Intermediate;
         this.scene.skipPointerMovePicking = false;
         this.scene.useRightHandedSystem = true;
-
-        const havokPlugin = new HavokPlugin(true, havokInstance);
-        this.scene.enablePhysics(Vector3.Zero(), havokPlugin);
 
         this.controller = new PlayerController(this.scene);
         this.controller.speed /= 10;
@@ -222,18 +217,18 @@ export class StarMap {
             if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaTime);
 
             const playerDisplacementNegated = this.controller.update(deltaTime).negate();
-            //console.log(this.controller.aggregate.transformNode.getAbsolutePosition());
+            //console.log(this.controller.getTransform().getAbsolutePosition());
 
-            this.controller.aggregate.transformNode.position = Vector3.Zero();
+            this.controller.getTransform().position = Vector3.Zero();
 
             if (this.translationAnimation !== null) {
-                const oldPosition = this.controller.aggregate.transformNode.getAbsolutePosition().clone();
+                const oldPosition = this.controller.getTransform().getAbsolutePosition().clone();
                 this.translationAnimation.update(deltaTime);
-                const newPosition = this.controller.aggregate.transformNode.getAbsolutePosition().clone();
+                const newPosition = this.controller.getTransform().getAbsolutePosition().clone();
 
                 const displacementNegated = oldPosition.subtractInPlace(newPosition);
 
-                translate(this.controller.aggregate.transformNode, displacementNegated);
+                translate(this.controller.getTransform(), displacementNegated);
                 playerDisplacementNegated.addInPlace(displacementNegated);
             }
 
@@ -403,23 +398,23 @@ export class StarMap {
     }
 
     private focusCameraOnStar(starInstance: InstancedMesh) {
-        const cameraDir = getForwardDirection(this.controller.aggregate.transformNode);
-        const starDir = starInstance.position.subtract(this.controller.aggregate.transformNode.getAbsolutePosition()).normalize();
+        const cameraDir = getForwardDirection(this.controller.getTransform());
+        const starDir = starInstance.position.subtract(this.controller.getTransform().getAbsolutePosition()).normalize();
 
         const rotationAngle = Math.acos(Vector3.Dot(cameraDir, starDir));
 
         // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
         if (rotationAngle > 0.02) {
             const rotationAxis = Vector3.Cross(cameraDir, starDir).normalize();
-            this.rotationAnimation = new TransformRotationAnimation(this.controller.aggregate.transformNode, rotationAxis, rotationAngle, 1);
+            this.rotationAnimation = new TransformRotationAnimation(this.controller.getTransform(), rotationAxis, rotationAngle, 1);
         }
 
-        const distance = starInstance.position.subtract(this.controller.aggregate.transformNode.getAbsolutePosition()).length();
-        const targetPosition = this.controller.aggregate.transformNode.getAbsolutePosition().add(starDir.scaleInPlace(distance - 0.5));
+        const distance = starInstance.position.subtract(this.controller.getTransform().getAbsolutePosition()).length();
+        const targetPosition = this.controller.getTransform().getAbsolutePosition().add(starDir.scaleInPlace(distance - 0.5));
 
         // if the transform is already in the right position, do not animate
-        if (targetPosition.subtract(this.controller.aggregate.transformNode.getAbsolutePosition()).lengthSquared() > 0.1) {
-            this.translationAnimation = new TransformTranslationAnimation(this.controller.aggregate.transformNode, targetPosition, 1);
+        if (targetPosition.subtract(this.controller.getTransform().getAbsolutePosition()).lengthSquared() > 0.1) {
+            this.translationAnimation = new TransformTranslationAnimation(this.controller.getTransform(), targetPosition, 1);
         }
 
         this.starMapUI.setHoveredStarSystemMesh(null);

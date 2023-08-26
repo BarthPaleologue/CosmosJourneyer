@@ -2,10 +2,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Input } from "../inputs/input";
 import { UberCamera } from "./uberCamera";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { TransformNode } from "@babylonjs/core/Meshes";
 
 export abstract class AbstractController {
-    abstract aggregate: PhysicsAggregate;
-
     /**
      * The inputs that this controller listens to
      */
@@ -34,4 +33,6 @@ export abstract class AbstractController {
     public addInput(input: Input) {
         this.inputs.push(input);
     }
+
+    public abstract getTransform(): TransformNode;
 }

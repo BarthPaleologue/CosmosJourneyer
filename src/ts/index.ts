@@ -39,7 +39,6 @@ player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 player.addInput(keyboard);
 player.addInput(mouse);
 player.addInput(gamepad);
-player.setEnabled(false, engine.getHavokPlugin());
 
 const spaceshipController = new ShipController(scene);
 spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
@@ -62,7 +61,7 @@ scene.setActiveController(spaceshipController);
 engine.registerStarSystemUpdateCallback(() => {
     if (scene.getActiveController() != spaceshipController) return;
 
-    const shipPosition = spaceshipController.aggregate.transformNode.getAbsolutePosition();
+    const shipPosition = spaceshipController.getTransform().getAbsolutePosition();
     const nearestBody = engine.getStarSystem().getNearestObject(shipPosition);
     const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getBoundingRadius();
@@ -178,17 +177,15 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "g") {
         if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);
-            setRotationQuaternion(player.aggregate.transformNode, getRotationQuaternion(spaceshipController.aggregate.transformNode).clone());
+            setRotationQuaternion(player.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
             engine.getStarSystem().postProcessManager.rebuild(spaceshipController.getActiveCamera());
 
             spaceshipController.setEnabled(false, engine.getHavokPlugin());
-            player.setEnabled(true, engine.getHavokPlugin());
         } else {
             scene.setActiveController(spaceshipController);
-            setRotationQuaternion(spaceshipController.aggregate.transformNode, getRotationQuaternion(player.aggregate.transformNode).clone());
+            setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(player.getTransform()).clone());
             engine.getStarSystem().postProcessManager.rebuild(player.getActiveCamera());
 
-            player.setEnabled(false, engine.getHavokPlugin());
             spaceshipController.setEnabled(true, engine.getHavokPlugin());
         }
     }
