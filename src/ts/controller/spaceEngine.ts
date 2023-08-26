@@ -30,6 +30,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import { setMaxLinVel } from "../utils/havok";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
 enum EngineState {
     RUNNING,
@@ -190,6 +191,9 @@ export class SpaceEngine {
         this.starSystemScene = new UberScene(this.engine, ScenePerformancePriority.Intermediate);
         this.starSystemScene.clearColor = new Color4(0, 0, 0, 0);
         this.starSystemScene.useRightHandedSystem = true;
+
+        const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.starSystemScene);
+        ambientLight.intensity = 0.3;
 
         this.starSystemUI = new SystemUI(this.starSystemScene);
 
