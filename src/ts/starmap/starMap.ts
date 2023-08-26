@@ -423,7 +423,7 @@ export class StarMap {
     }
 
     public focusOnCurrentSystem() {
-        if (this.currentSystemSeed === null) throw new Error("No system selected!");
+        if (this.currentSystemSeed === null) return console.warn("No current system seed!");
 
         const instance = this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh;
 
