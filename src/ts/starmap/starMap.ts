@@ -112,6 +112,7 @@ export class StarMap {
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
             this.currentSystemSeed = this.selectedSystemSeed;
+            if (this.currentSystemSeed !== null) this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh);
             this.dispatchWarpCallbacks();
         });
 
@@ -268,7 +269,9 @@ export class StarMap {
 
     private updateCells() {
         // first remove all cells that are too far
+        const currentSystemInstance = this.currentSystemSeed === null ? null : this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh;
         for (const cell of this.loadedCells.values()) {
+            if(currentSystemInstance !== null && cell.starInstances.includes(currentSystemInstance)) continue; // don't remove the current system
             const position = cell.position;
             if (position.add(this.starMapCenterPosition).length() > StarMap.RENDER_RADIUS + 1) {
                 for (const starInstance of cell.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
@@ -355,13 +358,13 @@ export class StarMap {
 
                 initializedInstance.actionManager.registerAction(
                     new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
-                        this.starMapUI.setHoveredMesh(initializedInstance);
+                        this.starMapUI.setHoveredStarSystemMesh(initializedInstance);
                     })
                 );
 
                 initializedInstance.actionManager.registerAction(
                     new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
-                        this.starMapUI.setHoveredMesh(null);
+                        this.starMapUI.setHoveredStarSystemMesh(null);
                     })
                 );
             } else {
@@ -374,16 +377,16 @@ export class StarMap {
                     this.starMapUI.attachUIToMesh(initializedInstance);
                     this.starMapUI.setUIText(
                         "Name: " +
-                            starSystemModel.getName() +
-                            "\n" +
-                            "Seed: " +
-                            starSystemModel.seed +
-                            "\n" +
-                            "Type: " +
-                            getStellarTypeString(starModel.stellarType) +
-                            "\n" +
-                            "Planets: " +
-                            starSystemModel.getNbPlanets()
+                        starSystemModel.getName() +
+                        "\n" +
+                        "Seed: " +
+                        starSystemModel.seed +
+                        "\n" +
+                        "Type: " +
+                        getStellarTypeString(starModel.stellarType) +
+                        "\n" +
+                        "Planets: " +
+                        starSystemModel.getNbPlanets()
                     );
 
                     this.selectedSystemSeed = starSystemSeed;
@@ -419,7 +422,7 @@ export class StarMap {
             this.translationAnimation = new TransformTranslationAnimation(this.controller.aggregate.transformNode, targetPosition, 1);
         }
 
-        this.starMapUI.setHoveredMesh(null);
+        this.starMapUI.setHoveredStarSystemMesh(null);
     }
 
     public focusOnCurrentSystem() {
@@ -442,7 +445,7 @@ export class StarMap {
         instance.animations = [StarMap.FADE_OUT_ANIMATION];
         instance.getScene().beginAnimation(instance, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => {
             if (this.starMapUI.getCurrentPickedMesh() === instance) this.starMapUI.detachUIFromMesh();
-            if (this.starMapUI.getCurrentHoveredMesh() === instance) this.starMapUI.setHoveredMesh(null);
+            if (this.starMapUI.getCurrentHoveredMesh() === instance) this.starMapUI.setHoveredStarSystemMesh(null);
             instance.setEnabled(false);
 
             const seed = this.instanceToSeedMap.get(instance) as number;

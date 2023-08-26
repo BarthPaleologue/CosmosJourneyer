@@ -15,7 +15,8 @@ export class StarMapUI {
     readonly nameLabel: TextBlock;
     readonly warpButton: Button;
 
-    readonly hoveringImage: Image;
+    readonly hoveredSystemRing: Image;
+    readonly currentSystemRing: Image;
 
     readonly scene: Scene;
 
@@ -31,7 +32,7 @@ export class StarMapUI {
         this.namePlate.color = "white";
         this.namePlate.background = "black";
         this.namePlate.linkOffsetY = -200;
-        this.namePlate.zIndex = 5;
+        this.namePlate.zIndex = 6;
 
         this.nameLabel = new TextBlock();
         this.nameLabel.height = "100px";
@@ -48,26 +49,39 @@ export class StarMapUI {
         this.namePlate.addControl(this.nameLabel);
         this.namePlate.addControl(this.warpButton);
 
-        this.hoveringImage = new Image("hoverImage", hoveredCircle);
-        this.hoveringImage.width = 0.2;
-        this.hoveringImage.autoScale = true;
-        this.hoveringImage.alpha = 0.8;
-        this.hoveringImage.zIndex = 4;
+        this.hoveredSystemRing = new Image("hoverSystemRing", hoveredCircle);
+        this.hoveredSystemRing.width = 0.2;
+        this.hoveredSystemRing.autoScale = true;
+        this.hoveredSystemRing.alpha = 0.8;
+        this.hoveredSystemRing.zIndex = 4;
+
+        this.currentSystemRing = new Image("currentSystemRing", hoveredCircle);
+        this.currentSystemRing.width = 0.2;
+        this.currentSystemRing.autoScale = true;
+        this.currentSystemRing.alpha = 0.8;
+        this.currentSystemRing.zIndex = 5;
 
         StarMapUI.ALPHA_ANIMATION.setKeys([
             { frame: 0, value: 0.0 },
             { frame: 60, value: 0.8 }
         ]);
 
-        this.hoveringImage.animations = [StarMapUI.ALPHA_ANIMATION];
+        this.hoveredSystemRing.animations = [StarMapUI.ALPHA_ANIMATION];
     }
 
     update() {
         if (this.namePlate.linkedMesh === null) this.gui.removeControl(this.namePlate);
-        if (this.hoveringImage.linkedMesh !== null && this.hoveringImage.linkedMesh !== undefined) {
-            const distance = this.hoveringImage.linkedMesh.getAbsolutePosition().length();
-            this.hoveringImage.scaleX = this.hoveringImage.linkedMesh.scaling.x / distance;
-            this.hoveringImage.scaleY = this.hoveringImage.linkedMesh.scaling.x / distance;
+        if (this.hoveredSystemRing.linkedMesh !== null && this.hoveredSystemRing.linkedMesh !== undefined) {
+            const distance = this.hoveredSystemRing.linkedMesh.getAbsolutePosition().length();
+            const scale = this.hoveredSystemRing.linkedMesh.scaling.x / distance;
+            this.hoveredSystemRing.scaleX = scale;
+            this.hoveredSystemRing.scaleY = scale;
+        }
+        if (this.currentSystemRing.linkedMesh !== null && this.currentSystemRing.linkedMesh !== undefined) {
+            const distance = this.currentSystemRing.linkedMesh.getAbsolutePosition().length();
+            const scale = Math.max(0.5, this.currentSystemRing.linkedMesh.scaling.x / distance);
+            this.currentSystemRing.scaleX = scale;
+            this.currentSystemRing.scaleY = scale;
         }
     }
 
@@ -78,14 +92,22 @@ export class StarMapUI {
         this.namePlate.linkWithMesh(mesh);
     }
 
-    setHoveredMesh(mesh: AbstractMesh | null) {
+    setHoveredStarSystemMesh(mesh: AbstractMesh | null) {
         if (mesh !== null) {
-            this.scene.beginAnimation(this.hoveringImage, 0, 60, false, 2.0);
-            this.gui.addControl(this.hoveringImage);
+            this.scene.beginAnimation(this.hoveredSystemRing, 0, 60, false, 2.0);
+            this.gui.addControl(this.hoveredSystemRing);
         } else {
-            this.gui.removeControl(this.hoveringImage);
+            this.gui.removeControl(this.hoveredSystemRing);
         }
-        this.hoveringImage.linkWithMesh(mesh);
+        this.hoveredSystemRing.linkWithMesh(mesh);
+
+        //FIXME: this should not be here, probably a BabylonJS bug
+        this.currentSystemRing.linkWithMesh(this.currentSystemRing.linkedMesh);
+    }
+
+    setCurrentStarSystemMesh(mesh: AbstractMesh | null) {
+        this.gui.addControl(this.currentSystemRing);
+        this.currentSystemRing.linkWithMesh(mesh);
     }
 
     detachUIFromMesh() {
@@ -98,7 +120,7 @@ export class StarMapUI {
     }
 
     getCurrentHoveredMesh() {
-        return this.hoveringImage.linkedMesh;
+        return this.hoveredSystemRing.linkedMesh;
     }
 
     setUIText(text: string) {
