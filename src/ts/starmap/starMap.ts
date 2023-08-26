@@ -32,6 +32,7 @@ import { makeNoise3D } from "fast-simplex-noise";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { Settings } from "../settings";
 import { getForwardDirection, translate } from "../controller/uberCore/transforms/basicTransform";
+import { ThickLines } from "../utils/thickLines";
 
 export class StarMap {
     readonly scene: Scene;
@@ -70,6 +71,9 @@ export class StarMap {
 
     private readonly seedToInstanceMap: Map<number, InstancedMesh> = new Map<number, InstancedMesh>();
     private readonly instanceToSeedMap: Map<InstancedMesh, number> = new Map<InstancedMesh, number>();
+
+    private travelLine: ThickLines;
+    private readonly thickLines: ThickLines[];
 
     private warpCallbacks: ((seed: number) => void)[] = [];
 
@@ -194,6 +198,9 @@ export class StarMap {
             }
         ]);
 
+        this.travelLine = new ThickLines("travelLine", { points: [], thickness: 0.01, color: Color3.Red() }, this.scene);
+        this.thickLines = [this.travelLine];
+
         // then generate missing cells // TODO: make this in parralel
         for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
             for (let y = -StarMap.RENDER_RADIUS; y <= StarMap.RENDER_RADIUS; y++) {
@@ -217,7 +224,6 @@ export class StarMap {
             if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaTime);
 
             const playerDisplacementNegated = this.controller.update(deltaTime).negate();
-            //console.log(this.controller.getTransform().getAbsolutePosition());
 
             this.controller.getTransform().position = Vector3.Zero();
 
@@ -240,6 +246,8 @@ export class StarMap {
             this.currentCellPosition = new Vector3(Math.round(cameraPosition.x / Cell.SIZE), Math.round(cameraPosition.y / Cell.SIZE), Math.round(cameraPosition.z / Cell.SIZE));
 
             this.updateCells();
+
+            this.thickLines.forEach((bondingLine) => bondingLine.update());
         });
     }
 
@@ -380,11 +388,15 @@ export class StarMap {
                     text += `Seed: ${starSystemModel.seed}`;
 
                     this.starMapUI.attachUIToMesh(initializedInstance);
-                    this.starMapUI.setSelectedSystem({name: starSystemModel.getName(), text});
+                    this.starMapUI.setSelectedSystem({ name: starSystemModel.getName(), text });
 
                     this.selectedSystemSeed = starSystemSeed;
 
                     this.focusCameraOnStar(initializedInstance);
+
+                    if (this.currentSystemSeed !== null) {
+                        this.travelLine.setPoints([this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh, initializedInstance]);
+                    }
                 })
             );
 
