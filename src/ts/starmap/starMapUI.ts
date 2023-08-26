@@ -13,8 +13,9 @@ import { Scene } from "@babylonjs/core/scene";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;
-    readonly namePlate: StackPanel;
-    readonly nameLabel: TextBlock;
+    readonly systemUI: StackPanel;
+    readonly namePlate: TextBlock;
+    readonly descriptionPanel: TextBlock;
     readonly warpButton: Button;
 
     readonly hoveredSystemRing: Image;
@@ -28,28 +29,38 @@ export class StarMapUI {
         this.gui = AdvancedDynamicTexture.CreateFullscreenUI("StarMapUI", true, scene);
         this.scene = scene;
 
-        this.namePlate = new StackPanel();
-        this.namePlate.width = "300px";
-        //this.namePlate.height = "150px";
-        this.namePlate.color = "white";
-        this.namePlate.background = "black";
-        this.namePlate.linkOffsetY = -200;
-        this.namePlate.zIndex = 6;
+        this.systemUI = new StackPanel();
+        this.systemUI.width = "300px";
+        this.systemUI.height = "220px";
+        this.systemUI.color = "white";
+        this.systemUI.background = "black";
+        this.systemUI.linkOffsetY = -200;
+        this.systemUI.zIndex = 6;
+        this.systemUI.alpha = 0.95;
 
-        this.nameLabel = new TextBlock();
-        this.nameLabel.height = "100px";
-        this.nameLabel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
-        this.nameLabel.setPadding(10, 15, 10, 15);
+        this.namePlate = new TextBlock();
+        this.namePlate.text = "Vesperia Gamma";
+        this.namePlate.fontSize = 24;
+        this.namePlate.height = "50px";
+        this.namePlate.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
+        this.namePlate.setPadding(15, 15, 10, 15);
 
-        this.warpButton = Button.CreateSimpleButton("warpButton", "WARP");
+        this.descriptionPanel = new TextBlock();
+        this.descriptionPanel.height = "130px";
+        this.descriptionPanel.lineSpacing = 4.0;
+        this.descriptionPanel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
+        this.descriptionPanel.setPadding(0, 15, 10, 15);
+
+        this.warpButton = Button.CreateSimpleButton("warpButton", "Engage Warp Drive");
         //this.warpButton.width = "100px";
         this.warpButton.height = "40px";
-        this.warpButton.background = "darkgreen";
+        this.warpButton.background = "midnightblue";
         this.warpButton.fontWeight = "bold";
         //this.warpButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
 
-        this.namePlate.addControl(this.nameLabel);
-        this.namePlate.addControl(this.warpButton);
+        this.systemUI.addControl(this.namePlate);
+        this.systemUI.addControl(this.descriptionPanel);
+        this.systemUI.addControl(this.warpButton);
 
         this.hoveredSystemRing = new Image("hoverSystemRing", hoveredCircle);
         this.hoveredSystemRing.fixedRatio = 1;
@@ -72,7 +83,7 @@ export class StarMapUI {
     }
 
     update() {
-        if (this.namePlate.linkedMesh === null) this.gui.removeControl(this.namePlate);
+        if (this.systemUI.linkedMesh === null) this.gui.removeControl(this.systemUI);
         if (this.hoveredSystemRing.linkedMesh !== null && this.hoveredSystemRing.linkedMesh !== undefined) {
             const distance = this.hoveredSystemRing.linkedMesh.getAbsolutePosition().length();
             const scale = this.hoveredSystemRing.linkedMesh.scaling.x / distance;
@@ -89,9 +100,9 @@ export class StarMapUI {
 
     attachUIToMesh(mesh: AbstractMesh) {
         this.gui._linkedControls = [];
-        if (this.gui._linkedControls.length === 0) this.gui.addControl(this.namePlate);
+        if (this.gui._linkedControls.length === 0) this.gui.addControl(this.systemUI);
 
-        this.namePlate.linkWithMesh(mesh);
+        this.systemUI.linkWithMesh(mesh);
 
 
         //FIXME: this should not be here, probably a BabylonJS bug
@@ -114,19 +125,20 @@ export class StarMapUI {
     }
 
     detachUIFromMesh() {
-        this.namePlate.linkWithMesh(null);
-        this.gui.removeControl(this.namePlate);
+        this.systemUI.linkWithMesh(null);
+        this.gui.removeControl(this.systemUI);
     }
 
     getCurrentPickedMesh() {
-        return this.namePlate.linkedMesh;
+        return this.systemUI.linkedMesh;
     }
 
     getCurrentHoveredMesh() {
         return this.hoveredSystemRing.linkedMesh;
     }
 
-    setUIText(text: string) {
-        this.nameLabel.text = text;
+    setSelectedSystem({ name, text }: { name: string, text: string }) {
+        this.namePlate.text = name;
+        this.descriptionPanel.text = text;
     }
 }

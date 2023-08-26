@@ -266,7 +266,7 @@ export class StarMap {
         // first remove all cells that are too far
         const currentSystemInstance = this.currentSystemSeed === null ? null : this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh;
         for (const cell of this.loadedCells.values()) {
-            if(currentSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(currentSystemInstance)) continue; // don't remove the current system
+            if (currentSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(currentSystemInstance)) continue; // don't remove the current system
             const position = cell.position;
             if (position.add(this.starMapCenterPosition).length() > StarMap.RENDER_RADIUS + 1) {
                 for (const starInstance of cell.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
@@ -369,20 +369,18 @@ export class StarMap {
 
             initializedInstance.actionManager?.registerAction(
                 new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
+                    let text = `Seed: ${starSystemModel.seed}\n`;
+                    text += `Type: ${getStellarTypeString(starModel.stellarType)}\n`;
+                    text += `Planets: ${starSystemModel.getNbPlanets()}`;
+
+                    if (this.currentSystemSeed !== null) {
+                        const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh;
+                        const distance = 10 * currentInstance.getAbsolutePosition().subtract(initializedInstance.getAbsolutePosition()).length();
+                        text += `\nDistance: ${distance.toFixed(2)}ly`;
+                    }
+
                     this.starMapUI.attachUIToMesh(initializedInstance);
-                    this.starMapUI.setUIText(
-                        "Name: " +
-                        starSystemModel.getName() +
-                        "\n" +
-                        "Seed: " +
-                        starSystemModel.seed +
-                        "\n" +
-                        "Type: " +
-                        getStellarTypeString(starModel.stellarType) +
-                        "\n" +
-                        "Planets: " +
-                        starSystemModel.getNbPlanets()
-                    );
+                    this.starMapUI.setSelectedSystem({name: starSystemModel.getName(), text});
 
                     this.selectedSystemSeed = starSystemSeed;
 
