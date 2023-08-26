@@ -102,13 +102,13 @@ export class StarMapUI {
         }
         if (this.selectedSystemRing.linkedMesh !== null && this.selectedSystemRing.linkedMesh !== undefined) {
             const distance = this.selectedSystemRing.linkedMesh.getAbsolutePosition().length();
-            const scale = this.selectedSystemRing.linkedMesh.scaling.x / distance;
+            const scale = Math.max(0.3, this.selectedSystemRing.linkedMesh.scaling.x / distance);
             this.selectedSystemRing.scaleX = scale;
             this.selectedSystemRing.scaleY = scale;
         }
         if (this.currentSystemRing.linkedMesh !== null && this.currentSystemRing.linkedMesh !== undefined) {
             const distance = this.currentSystemRing.linkedMesh.getAbsolutePosition().length();
-            const scale = Math.max(0.5, this.currentSystemRing.linkedMesh.scaling.x / distance);
+            const scale = Math.max(0.3, this.currentSystemRing.linkedMesh.scaling.x / distance);
             this.currentSystemRing.scaleX = scale;
             this.currentSystemRing.scaleY = scale;
         }

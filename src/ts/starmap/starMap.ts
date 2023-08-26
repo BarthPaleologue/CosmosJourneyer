@@ -64,7 +64,6 @@ export class StarMap {
     private readonly starMapUI: StarMapUI;
 
     private selectedSystemSeed: number | null = null;
-
     private currentSystemSeed: number | null = null;
 
     private readonly loadedCells: Map<string, Cell> = new Map<string, Cell>();
@@ -273,8 +272,11 @@ export class StarMap {
     private updateCells() {
         // first remove all cells that are too far
         const currentSystemInstance = this.currentSystemSeed === null ? null : this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh;
+        const selectedSystemInstance = this.selectedSystemSeed === null ? null : this.seedToInstanceMap.get(this.selectedSystemSeed) as InstancedMesh;
         for (const cell of this.loadedCells.values()) {
-            if (currentSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(currentSystemInstance)) continue; // don't remove the current system
+            if (currentSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(currentSystemInstance)) continue; // don't remove cells that contain the current system
+            if (selectedSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove cells that contain the selected system
+
             const position = cell.position;
             if (position.add(this.starMapCenterPosition).length() > StarMap.RENDER_RADIUS + 1) {
                 for (const starInstance of cell.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
