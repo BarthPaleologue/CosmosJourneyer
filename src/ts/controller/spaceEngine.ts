@@ -156,7 +156,7 @@ export class SpaceEngine {
         } else {
             this.activeScene = this.getStarSystemScene();
             this.helmetOverlay.setVisibility(true);
-            this.bodyEditor.setVisibility(EditorVisibility.NAVBAR);
+            this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
         }
 
         this.onToggleStarMapObservable.notifyObservers(this.activeScene === this.getStarMap().scene);
