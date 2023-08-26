@@ -66,7 +66,12 @@ export class StarMap {
 
     private selectedSystemSeed: number | null = null;
 
+    private currentSystemSeed: number | null = null;
+
     private readonly loadedCells: Map<string, Cell> = new Map<string, Cell>();
+
+    private readonly seedToInstanceMap: Map<number, InstancedMesh> = new Map<number, InstancedMesh>();
+    private readonly instanceToSeedMap: Map<InstancedMesh, number> = new Map<InstancedMesh, number>();
 
     private warpCallbacks: ((seed: number) => void)[] = [];
 
@@ -106,8 +111,8 @@ export class StarMap {
         this.starMapUI = new StarMapUI(this.scene);
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
-            if (this.selectedSystemSeed === null) throw new Error("No system selected!");
-            for (const callback of this.warpCallbacks) callback(this.selectedSystemSeed);
+            this.currentSystemSeed = this.selectedSystemSeed;
+            this.dispatchWarpCallbacks();
         });
 
         const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controller.getActiveCamera()]);
@@ -246,6 +251,11 @@ export class StarMap {
         this.warpCallbacks.push(callback);
     }
 
+    public dispatchWarpCallbacks() {
+        if (this.selectedSystemSeed === null) throw new Error("No system selected!");
+        for (const callback of this.warpCallbacks) callback(this.selectedSystemSeed);
+    }
+
     /**
      * Register a cell at the given position, it will be added to the generation queue
      * @param position The position of the cell
@@ -326,6 +336,9 @@ export class StarMap {
 
             const initializedInstance = instance;
 
+            this.seedToInstanceMap.set(starSystemSeed, initializedInstance);
+            this.instanceToSeedMap.set(initializedInstance, starSystemSeed);
+
             initializedInstance.scaling = Vector3.One().scaleInPlace(data.scale);
             initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
@@ -375,26 +388,7 @@ export class StarMap {
 
                     this.selectedSystemSeed = starSystemSeed;
 
-                    const cameraDir = getForwardDirection(this.controller.aggregate.transformNode);
-                    const starDir = initializedInstance.position.subtract(this.controller.aggregate.transformNode.getAbsolutePosition()).normalize();
-
-                    const rotationAngle = Math.acos(Vector3.Dot(cameraDir, starDir));
-
-                    // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
-                    if (rotationAngle > 0.02) {
-                        const rotationAxis = Vector3.Cross(cameraDir, starDir).normalize();
-                        this.rotationAnimation = new TransformRotationAnimation(this.controller.aggregate.transformNode, rotationAxis, rotationAngle, 1);
-                    }
-
-                    const distance = initializedInstance.position.subtract(this.controller.aggregate.transformNode.getAbsolutePosition()).length();
-                    const targetPosition = this.controller.aggregate.transformNode.getAbsolutePosition().add(starDir.scaleInPlace(distance - 0.5));
-
-                    // if the transform is already in the right position, do not animate
-                    if (targetPosition.subtract(this.controller.aggregate.transformNode.getAbsolutePosition()).lengthSquared() > 0.1) {
-                        this.translationAnimation = new TransformTranslationAnimation(this.controller.aggregate.transformNode, targetPosition, 1);
-                    }
-
-                    this.starMapUI.setHoveredMesh(null);
+                    this.focusCameraOnStar(initializedInstance);
                 })
             );
 
@@ -403,6 +397,37 @@ export class StarMap {
             if (isStarBlackHole) this.loadedCells.get(data.cellString)?.blackHoleInstances.push(initializedInstance);
             else this.loadedCells.get(data.cellString)?.starInstances.push(initializedInstance);
         }
+    }
+
+    private focusCameraOnStar(starInstance: InstancedMesh) {
+        const cameraDir = getForwardDirection(this.controller.aggregate.transformNode);
+        const starDir = starInstance.position.subtract(this.controller.aggregate.transformNode.getAbsolutePosition()).normalize();
+
+        const rotationAngle = Math.acos(Vector3.Dot(cameraDir, starDir));
+
+        // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
+        if (rotationAngle > 0.02) {
+            const rotationAxis = Vector3.Cross(cameraDir, starDir).normalize();
+            this.rotationAnimation = new TransformRotationAnimation(this.controller.aggregate.transformNode, rotationAxis, rotationAngle, 1);
+        }
+
+        const distance = starInstance.position.subtract(this.controller.aggregate.transformNode.getAbsolutePosition()).length();
+        const targetPosition = this.controller.aggregate.transformNode.getAbsolutePosition().add(starDir.scaleInPlace(distance - 0.5));
+
+        // if the transform is already in the right position, do not animate
+        if (targetPosition.subtract(this.controller.aggregate.transformNode.getAbsolutePosition()).lengthSquared() > 0.1) {
+            this.translationAnimation = new TransformTranslationAnimation(this.controller.aggregate.transformNode, targetPosition, 1);
+        }
+
+        this.starMapUI.setHoveredMesh(null);
+    }
+
+    public focusOnCurrentSystem() {
+        if (this.currentSystemSeed === null) throw new Error("No system selected!");
+
+        const instance = this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh;
+
+        this.focusCameraOnStar(instance);
     }
 
     private fadeIn(instance: InstancedMesh) {
@@ -419,6 +444,11 @@ export class StarMap {
             if (this.starMapUI.getCurrentPickedMesh() === instance) this.starMapUI.detachUIFromMesh();
             if (this.starMapUI.getCurrentHoveredMesh() === instance) this.starMapUI.setHoveredMesh(null);
             instance.setEnabled(false);
+
+            const seed = this.instanceToSeedMap.get(instance) as number;
+            this.seedToInstanceMap.delete(seed);
+            this.instanceToSeedMap.delete(instance);
+
             recyclingList.push(instance);
         });
     }

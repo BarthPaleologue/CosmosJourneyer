@@ -8,13 +8,13 @@ import { randRange } from "extended-random";
 import { Settings } from "./settings";
 import { PlayerController } from "./spacelegs/playerController";
 import { positionNearObject } from "./utils/positionNearObject";
-import { PlanetEngine } from "./controller/planetEngine";
+import { SpaceEngine } from "./controller/spaceEngine";
 import { ShipController } from "./spaceship/shipController";
 import { EditorVisibility } from "./ui/bodyEditor/bodyEditor";
 import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 
-const engine = new PlanetEngine();
+const engine = new SpaceEngine();
 
 await engine.setup();
 

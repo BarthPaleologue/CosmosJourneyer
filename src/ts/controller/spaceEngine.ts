@@ -34,7 +34,7 @@ enum EngineState {
     PAUSED
 }
 
-export class PlanetEngine {
+export class SpaceEngine {
     // UI
     private readonly helmetOverlay: HelmetOverlay;
     readonly bodyEditor: BodyEditor;
@@ -116,6 +116,8 @@ export class PlanetEngine {
             this.activeScene = this.starMap.scene;
             this.helmetOverlay.setVisibility(false);
             this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
+
+            this.starMap.focusOnCurrentSystem();
         } else {
             this.activeScene = this.getStarSystemScene();
             this.helmetOverlay.setVisibility(true);

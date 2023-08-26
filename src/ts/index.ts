@@ -10,7 +10,7 @@ import { Settings } from "./settings";
 import { Assets } from "./controller/assets";
 import { PlayerController } from "./spacelegs/playerController";
 import { positionNearObject } from "./utils/positionNearObject";
-import { PlanetEngine } from "./controller/planetEngine";
+import { SpaceEngine } from "./controller/spaceEngine";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ShipController } from "./spaceship/shipController";
@@ -23,7 +23,7 @@ import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberC
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 
-const engine = new PlanetEngine();
+const engine = new SpaceEngine();
 
 await engine.setup();
 
