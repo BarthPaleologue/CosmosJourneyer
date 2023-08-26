@@ -39,6 +39,11 @@ export class UberOrbitCamera extends UberCamera {
         this.updatePosition();
     }
 
+    public setRadius(radius: number) {
+        this.radius = radius;
+        this.updatePosition();
+    }
+
     public setTarget(target: Vector3) {
         super.setTarget(target);
         this.cameraTarget = target;

@@ -59,7 +59,6 @@ export class SpaceEngine {
     private state = EngineState.RUNNING;
 
     private static readonly unZoomAnimation = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
-    private static readonly zoomAnimation = new Animation("zoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
     constructor() {
         this.helmetOverlay = new HelmetOverlay();
@@ -286,6 +285,11 @@ export class SpaceEngine {
     public getStarSystemScene(): UberScene {
         if (this.starSystemScene === null) throw new Error("Star system scene is null");
         return this.starSystemScene;
+    }
+
+    public getStarMap(): StarMap {
+        if (this.starMap === null) throw new Error("Star map is null");
+        return this.starMap;
     }
 
     /**

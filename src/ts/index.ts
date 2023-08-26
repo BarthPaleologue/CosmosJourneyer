@@ -76,6 +76,10 @@ engine.registerStarSystemUpdateCallback(() => {
     (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 });
 
+engine.getStarMap().registerWarpCallback(() => {
+    spaceshipController.thirdPersonCamera.setRadius(30);
+})
+
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
 const starSystemSeed = 0;
