@@ -28,6 +28,7 @@ import { BlackHole } from "../view/bodies/stellarObjects/blackHole";
 import { ShipController } from "../spaceship/shipController";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { setMaxLinVel } from "../utils/havok";
+import { Animation } from "@babylonjs/core/Animations/animation";
 
 enum EngineState {
     RUNNING,
@@ -57,6 +58,9 @@ export class SpaceEngine {
 
     private state = EngineState.RUNNING;
 
+    private static readonly unZoomAnimation = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    private static readonly zoomAnimation = new Animation("zoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+
     constructor() {
         this.helmetOverlay = new HelmetOverlay();
         this.bodyEditor = new BodyEditor();
@@ -66,6 +70,17 @@ export class SpaceEngine {
         this.canvas.height = window.innerHeight;
 
         this.bodyEditor.setCanvas(this.canvas);
+
+        SpaceEngine.unZoomAnimation.setKeys([
+            {
+                frame: 0,
+                value: 30
+            },
+            {
+                frame: 30,
+                value: 600
+            }
+        ]);
 
         //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
@@ -93,6 +108,18 @@ export class SpaceEngine {
 
             if (e.key === "m") this.toggleStarMap();
 
+            if (e.key === "t") {
+                if (this.getActiveScene() === this.starSystemScene) {
+                    if (this.bodyEditor.getVisibility() === EditorVisibility.NAVBAR && this.helmetOverlay.isVisible()) {
+                        this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
+                        this.helmetOverlay.setVisibility(false);
+                    } else if (this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN && !this.helmetOverlay.isVisible()) {
+                        this.bodyEditor.setVisibility(EditorVisibility.NAVBAR);
+                        this.helmetOverlay.setVisibility(true);
+                    }
+                }
+            }
+
             // when pressing f11, the ui is hidden when the browser is in fullscreen mode
             if (e.key === "F11") this.isFullscreen = !this.isFullscreen;
         });
@@ -112,12 +139,17 @@ export class SpaceEngine {
      */
     public toggleStarMap(): void {
         if (this.activeScene === this.getStarSystemScene()) {
-            if (this.starMap === null) throw new Error("Star map is null");
-            this.activeScene = this.starMap.scene;
-            this.helmetOverlay.setVisibility(false);
-            this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
 
-            this.starMap.focusOnCurrentSystem();
+            this.getStarSystemScene().getActiveController().getActiveCamera().animations = [SpaceEngine.unZoomAnimation];
+            this.getStarSystemScene().beginAnimation(this.getStarSystemScene().getActiveController().getActiveCamera(), 0, 60, false, 2.0, () => {
+                this.getStarSystemScene().getActiveController().getActiveCamera().animations = [];
+                if (this.starMap === null) throw new Error("Star map is null");
+                this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
+                this.helmetOverlay.setVisibility(false);
+
+                this.activeScene = this.starMap.scene;
+                this.starMap.focusOnCurrentSystem();
+            });
         } else {
             this.activeScene = this.getStarSystemScene();
             this.helmetOverlay.setVisibility(true);
@@ -162,8 +194,6 @@ export class SpaceEngine {
 
         setMaxLinVel(this.havokPlugin, 10000, 10000);
 
-        this.activeScene = this.starSystemScene;
-
         await Assets.Init(this.starSystemScene);
 
         this.starSystemScene.executeWhenReady(() => {
@@ -183,7 +213,6 @@ export class SpaceEngine {
 
             this.bodyEditor.update(nearestBody, starSystem.postProcessManager, starSystemScene);
             this.helmetOverlay.update(nearestBody);
-            this.helmetOverlay.setVisibility(!this.isFullscreen && this.bodyEditor.getVisibility() !== EditorVisibility.FULL);
 
             //FIXME: should address stars orbits
             for (const star of starSystem.stellarObjects) star.model.orbitalProperties.period = 0;
@@ -198,6 +227,11 @@ export class SpaceEngine {
         });
 
         this.bodyEditor.resize();
+
+        this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
+        this.helmetOverlay.setVisibility(false);
+
+        this.activeScene = this.starMap.scene;
     }
 
     /**

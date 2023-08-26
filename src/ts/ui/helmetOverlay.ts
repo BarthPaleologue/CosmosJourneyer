@@ -21,6 +21,10 @@ export class HelmetOverlay {
         this.parentNode.style.visibility = visible ? "visible" : "hidden";
     }
 
+    public isVisible(): boolean {
+        return this.parentNode.style.visibility === "visible";
+    }
+
     public update(currentBody: AbstractBody) {
         this.bodyNamePlate.innerText = currentBody.name;
         this.bodySeedPlate.innerText = `Seed: ${currentBody.model.seed.toString()}`;

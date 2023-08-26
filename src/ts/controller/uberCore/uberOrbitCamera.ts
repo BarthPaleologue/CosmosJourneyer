@@ -19,6 +19,8 @@ export class UberOrbitCamera extends UberCamera {
             this.increaseRadius(e.deltaY * Math.log(this.radius) * 0.01);
         });
 
+        this.onViewMatrixChangedObservable.add(() => this.updatePosition());
+
         this.updatePosition();
     }
 
