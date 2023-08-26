@@ -266,7 +266,7 @@ export class StarMap {
         // first remove all cells that are too far
         const currentSystemInstance = this.currentSystemSeed === null ? null : this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh;
         for (const cell of this.loadedCells.values()) {
-            if(currentSystemInstance !== null && cell.starInstances.includes(currentSystemInstance)) continue; // don't remove the current system
+            if(currentSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(currentSystemInstance)) continue; // don't remove the current system
             const position = cell.position;
             if (position.add(this.starMapCenterPosition).length() > StarMap.RENDER_RADIUS + 1) {
                 for (const starInstance of cell.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
