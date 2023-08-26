@@ -90,7 +90,10 @@ export class StarMapUI {
     }
 
     update() {
-        if (this.systemUI.linkedMesh === null) this.gui.removeControl(this.systemUI);
+        if (this.systemUI.linkedMesh === null || this.systemUI.linkedMesh === undefined) this.gui.removeControl(this.systemUI);
+        else {
+            this.systemUI.linkOffsetY = -150 - 50 / this.systemUI.linkedMesh.getAbsolutePosition().length();
+        }
         if (this.hoveredSystemRing.linkedMesh !== null && this.hoveredSystemRing.linkedMesh !== undefined) {
             const distance = this.hoveredSystemRing.linkedMesh.getAbsolutePosition().length();
             const scale = this.hoveredSystemRing.linkedMesh.scaling.x / distance;
@@ -136,7 +139,7 @@ export class StarMapUI {
     }
 
     setCurrentStarSystemMesh(mesh: AbstractMesh | null) {
-        if(mesh !== null) this.gui.addControl(this.currentSystemRing);
+        if (mesh !== null) this.gui.addControl(this.currentSystemRing);
         this.currentSystemRing.linkWithMesh(mesh);
     }
 

@@ -420,7 +420,7 @@ export class StarMap {
         }
 
         const distance = starInstance.position.subtract(this.controller.getTransform().getAbsolutePosition()).length();
-        const targetPosition = this.controller.getTransform().getAbsolutePosition().add(starDir.scaleInPlace(distance - 0.5));
+        const targetPosition = this.controller.getTransform().getAbsolutePosition().add(starDir.scaleInPlace(distance - 0.8));
 
         // if the transform is already in the right position, do not animate
         if (targetPosition.subtract(this.controller.getTransform().getAbsolutePosition()).lengthSquared() > 0.1) {
