@@ -28,6 +28,28 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { AbstractObject } from "../view/bodies/abstractObject";
 import { BaseObject } from "../model/orbits/iOrbitalObject";
 import { PostProcessType } from "../view/postProcesses/postProcessTypes";
+import { MandelbulbPostProcess } from "../view/postProcesses/mandelbulbPostProcess";
+import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
+
+const spaceRenderingOrder: PostProcessType[] = [
+    PostProcessType.VOLUMETRIC_LIGHT,
+    PostProcessType.OCEAN,
+    PostProcessType.CLOUDS,
+    PostProcessType.ATMOSPHERE,
+    PostProcessType.MANDELBULB,
+    PostProcessType.RING,
+    PostProcessType.BLACK_HOLE
+];
+
+const surfaceRenderingOrder: PostProcessType[] = [
+    PostProcessType.VOLUMETRIC_LIGHT,
+    PostProcessType.BLACK_HOLE,
+    PostProcessType.MANDELBULB,
+    PostProcessType.RING,
+    PostProcessType.OCEAN,
+    PostProcessType.CLOUDS,
+    PostProcessType.ATMOSPHERE
+];
 
 export class PostProcessManager {
     private readonly engine: Engine;
@@ -37,14 +59,7 @@ export class PostProcessManager {
     private readonly surfaceRenderingPipeline: UberRenderingPipeline;
     private currentRenderingPipeline: UberRenderingPipeline;
 
-    private renderingOrder: PostProcessType[] = [
-        PostProcessType.VOLUMETRIC_LIGHT,
-        PostProcessType.OCEAN,
-        PostProcessType.CLOUDS,
-        PostProcessType.ATMOSPHERE,
-        PostProcessType.RING,
-        PostProcessType.BLACK_HOLE
-    ];
+    private renderingOrder: PostProcessType[] = spaceRenderingOrder;
 
     private currentBody: AbstractBody | null = null;
 
@@ -54,6 +69,7 @@ export class PostProcessManager {
     private readonly clouds: CloudsPostProcess[] = [];
     private readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
     private readonly rings: RingsPostProcess[] = [];
+    private readonly mandelbulbs: MandelbulbPostProcess[] = [];
     private readonly blackHoles: BlackHolePostProcess[] = [];
     private readonly overlays: OverlayPostProcess[] = [];
 
@@ -72,6 +88,10 @@ export class PostProcessManager {
         this.engine = scene.getEngine();
 
         this.colorCorrection = new ColorCorrection("colorCorrection", scene.getEngine());
+        this.colorCorrection.exposure = 1.1;
+        this.colorCorrection.gamma = 1.2;
+        this.colorCorrection.saturation = 0.9;
+
         this.fxaa = new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine());
 
         this.colorCorrectionRenderEffect = new PostProcessRenderEffect(scene.getEngine(), "colorCorrectionRenderEffect", () => {
@@ -98,10 +118,6 @@ export class PostProcessManager {
         });
 
         this.bloomRenderEffect = new BloomEffect(scene, 1, 0.3, 32);
-
-        this.colorCorrection.exposure = 1.1;
-        this.colorCorrection.gamma = 1.2;
-        this.colorCorrection.saturation = 0.9;
     }
 
     /**
@@ -187,6 +203,26 @@ export class PostProcessManager {
     }
 
     /**
+     * Creates a new Mandelbulb postprocess for the given body and adds it to the manager.
+     * @param body A body
+     * @param stellarObjects An array of stars or black holes 
+     */
+    public addMandelbulb(body: Mandelbulb, stellarObjects: StellarObject[]) {
+        this.mandelbulbs.push(new MandelbulbPostProcess(body, this.scene, stellarObjects));
+    }
+
+    /**
+     * Returns the mandelbulb post process for the given body. Throws an error if no mandelbulb is found.
+     * @param body A body
+     * @returns
+     * @memberof PostProcessManager
+     */
+    public getMandelbulb(body: Mandelbulb): MandelbulbPostProcess | null {
+        for (const mandelbulb of this.mandelbulbs) if (mandelbulb.object === body) return mandelbulb;
+        return null;
+    }
+
+    /**
      * Creates a new Starfield postprocess and adds it to the manager.
      * @param stellarObjects An array of stars or black holes
      * @param planets An array of planets
@@ -265,10 +301,16 @@ export class PostProcessManager {
                     if (!(body instanceof Star)) throw new Error("Volumetric light post process can only be added to stars. Source:" + body.name);
                     this.addVolumetricLight(body as Star);
                     break;
+                case PostProcessType.MANDELBULB:
+                    if (!(body instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + body.name);
+                    this.addMandelbulb(body as Mandelbulb, stellarObjects);
+                    break;
                 case PostProcessType.BLACK_HOLE:
                     if (!(body instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + body.name);
                     this.addBlackHole(body as BlackHole);
                     break;
+                default:
+                    throw new Error("Invalid postprocess type: " + postProcess);
             }
         }
     }
@@ -285,14 +327,7 @@ export class PostProcessManager {
         if (this.currentRenderingPipeline === this.spaceRenderingPipeline) return;
         this.surfaceRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
         this.currentRenderingPipeline = this.spaceRenderingPipeline;
-        this.renderingOrder = [
-            PostProcessType.VOLUMETRIC_LIGHT,
-            PostProcessType.OCEAN,
-            PostProcessType.CLOUDS,
-            PostProcessType.ATMOSPHERE,
-            PostProcessType.RING,
-            PostProcessType.BLACK_HOLE
-        ];
+        this.renderingOrder = spaceRenderingOrder;
         this.init();
     }
 
@@ -300,14 +335,7 @@ export class PostProcessManager {
         if (this.currentRenderingPipeline === this.surfaceRenderingPipeline) return;
         this.spaceRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
         this.currentRenderingPipeline = this.surfaceRenderingPipeline;
-        this.renderingOrder = [
-            PostProcessType.VOLUMETRIC_LIGHT,
-            PostProcessType.BLACK_HOLE,
-            PostProcessType.RING,
-            PostProcessType.OCEAN,
-            PostProcessType.CLOUDS,
-            PostProcessType.ATMOSPHERE
-        ];
+        this.renderingOrder = surfaceRenderingOrder;
         this.init();
     }
 
@@ -383,6 +411,14 @@ export class PostProcessManager {
             return bodyRings;
         });
 
+        const [bodyMandelbulbs, otherMandelbulbs] = extractRelevantPostProcesses(this.mandelbulbs, this.getCurrentBody());
+        const otherMandelbulbsRenderEffect = new PostProcessRenderEffect(this.engine, "otherMandelbulbsRenderEffect", () => {
+            return otherMandelbulbs;
+        });
+        const bodyMandelbulbsRenderEffect = new PostProcessRenderEffect(this.engine, "bodyMandelbulbsRenderEffect", () => {
+            return bodyMandelbulbs;
+        });
+
         this.currentRenderingPipeline.addEffect(this.starFieldRenderEffect);
 
         for (const postProcessType of this.renderingOrder) {
@@ -404,6 +440,9 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.RING:
                     this.currentRenderingPipeline.addEffect(otherRingsRenderEffect);
+                    break;
+                case PostProcessType.MANDELBULB:
+                    this.currentRenderingPipeline.addEffect(otherMandelbulbsRenderEffect);
                     break;
                 default:
                     throw new Error("Invalid postprocess type: " + postProcessType);
@@ -429,6 +468,9 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.RING:
                     this.currentRenderingPipeline.addEffect(bodyRingsRenderEffect);
+                    break;
+                case PostProcessType.MANDELBULB:
+                    this.currentRenderingPipeline.addEffect(bodyMandelbulbsRenderEffect);
                     break;
                 default:
                     throw new Error("Invalid postprocess type: " + postProcessType);

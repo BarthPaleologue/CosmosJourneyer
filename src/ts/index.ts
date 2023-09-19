@@ -22,6 +22,7 @@ import { GasPlanetModel } from "./model/planemos/gasPlanetModel";
 import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
+import { MandelbulbModel } from "./model/planemos/mandelbulbModel";
 
 const engine = new SpaceEngine();
 
@@ -168,9 +169,15 @@ andromaqueModel.orbitalProperties.orientationQuaternion = Quaternion.Identity();
 
 const andromaque = starSystem.makeGasPlanet(andromaqueModel);
 
+const mandelbulbModel = new MandelbulbModel(0.5, [sunModel]);
+mandelbulbModel.orbitalProperties.period = 60 * 60 * 24 * 365.25;
+mandelbulbModel.orbitalProperties.periapsis = 3500 * ares.getRadius();
+mandelbulbModel.orbitalProperties.apoapsis = 3500 * ares.getRadius();
+const mandelbulb = starSystem.makeMandelbulb(mandelbulbModel);
+
 engine.init();
 
-positionNearObject(scene.getActiveController(), planet, starSystem, 2);
+positionNearObject(scene.getActiveController(), mandelbulb, starSystem, 2);
 
 const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
 if (aresAtmosphere) {

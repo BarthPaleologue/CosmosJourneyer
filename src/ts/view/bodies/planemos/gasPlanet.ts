@@ -2,7 +2,7 @@ import { AbstractController } from "../../../controller/uberCore/abstractControl
 import { GasPlanetMaterial } from "../../materials/gasPlanetMaterial";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../../controller/uberCore/uberScene";
-import { Planemo } from "./planemo";
+import { Planemo, PlanemoMaterial } from "./planemo";
 import { GasPlanetModel } from "../../../model/planemos/gasPlanetModel";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -12,7 +12,7 @@ import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { isSizeOnScreenEnough } from "../../../utils/isObjectVisibleOnScreen";
 
-export class GasPlanet extends AbstractBody implements Planemo {
+export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial {
     private readonly mesh: Mesh;
     readonly material: GasPlanetMaterial;
 

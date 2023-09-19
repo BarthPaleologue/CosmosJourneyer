@@ -3,7 +3,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractBody } from "../view/bodies/abstractBody";
 import { Star } from "../view/bodies/stellarObjects/star";
 import { UberScene } from "./uberCore/uberScene";
-import { Planemo } from "../view/bodies/planemos/planemo";
+import { Planemo, PlanemoMaterial } from "../view/bodies/planemos/planemo";
 import { TelluricPlanemo } from "../view/bodies/planemos/telluricPlanemo";
 import { GasPlanet } from "../view/bodies/planemos/gasPlanet";
 import { BlackHole } from "../view/bodies/stellarObjects/blackHole";
@@ -20,6 +20,8 @@ import { GasPlanetModel } from "../model/planemos/gasPlanetModel";
 import { BlackHoleModel } from "../model/stellarObjects/blackHoleModel";
 import { StarModel } from "../model/stellarObjects/starModel";
 import { rotateAround, translate } from "./uberCore/transforms/basicTransform";
+import { MandelbulbModel } from "../model/planemos/mandelbulbModel";
+import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -41,6 +43,7 @@ export class StarSystem {
      * The list of all planemos in the system (planets and satellites)
      */
     readonly planemos: Planemo[] = [];
+    readonly planemosWithMaterial: PlanemoMaterial[] = [];
 
     /**
      * The list of all planets in the system (telluric and gas)
@@ -56,6 +59,11 @@ export class StarSystem {
      * The list of all gas planets in the system
      */
     readonly gasPlanets: GasPlanet[] = [];
+
+    /**
+     * The list of all mandelbulbs in the system
+     */
+    readonly mandelbulbs: Mandelbulb[] = [];
 
     /**
      * The list of all satellites in the system
@@ -76,9 +84,15 @@ export class StarSystem {
      * @param planet The planet to add to the system
      */
     public addTelluricPlanet(planet: TelluricPlanemo): TelluricPlanemo {
+        if (this.planets.length >= this.model.getNbPlanets())
+            console.warn(`You are adding a telluric planet to the system.
+            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
+            This might cause issues, or not who knows.`);
+
         this.orbitalObjects.push(planet);
         this.celestialBodies.push(planet);
         this.planemos.push(planet);
+        this.planemosWithMaterial.push(planet);
         this.planets.push(planet);
         this.telluricPlanets.push(planet);
         return planet;
@@ -89,9 +103,15 @@ export class StarSystem {
      * @param planet The planet to add to the system
      */
     public addGasPlanet(planet: GasPlanet): GasPlanet {
+        if (this.planets.length >= this.model.getNbPlanets())
+            console.warn(`You are adding a gas planet to the system.
+            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
+            This might cause issues, or not who knows.`);
+
         this.orbitalObjects.push(planet);
         this.celestialBodies.push(planet);
         this.planemos.push(planet);
+        this.planemosWithMaterial.push(planet);
         this.planets.push(planet);
         this.gasPlanets.push(planet);
         return planet;
@@ -102,6 +122,11 @@ export class StarSystem {
      * @param satellite The satellite to add to the system
      */
     public addTelluricSatellite(satellite: TelluricPlanemo): TelluricPlanemo {
+        if (this.planets.length >= this.model.getNbPlanets())
+            console.warn(`You are adding a telluric planet to the system.
+            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
+            This might cause issues, or not who knows.`);
+
         this.orbitalObjects.push(satellite);
         this.celestialBodies.push(satellite);
         this.planemos.push(satellite);
@@ -109,11 +134,29 @@ export class StarSystem {
         return satellite;
     }
 
+    public addMandelbulb(mandelbulb: Mandelbulb): Mandelbulb {
+        if (this.planets.length >= this.model.getNbPlanets())
+            console.warn(`You are adding a mandelbulb to the system.
+            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
+            This might cause issues, or not who knows.`);
+
+        this.orbitalObjects.push(mandelbulb);
+        this.celestialBodies.push(mandelbulb);
+        this.planemos.push(mandelbulb);
+        this.mandelbulbs.push(mandelbulb);
+        return mandelbulb;
+    }
+
     /**
      * Adds a star or a blackhole to the system and returns it
      * @param stellarObject The star added to the system
      */
     public addStellarObject(stellarObject: StellarObject): StellarObject {
+        if (this.stellarObjects.length >= this.model.getNbStars())
+            console.warn(`You are adding a star 
+        to a system that already has ${this.stellarObjects.length} stars.
+        The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
+
         this.orbitalObjects.push(stellarObject);
         this.celestialBodies.push(stellarObject);
         this.stellarObjects.push(stellarObject);
@@ -131,26 +174,25 @@ export class StarSystem {
      * @param seed The seed to use for the star generation (by default, the next available seed planned by the system modell)
      */
     public makeStellarObject(seed: number = this.model.getStarSeed(this.stellarObjects.length)): StellarObject {
-        if (this.stellarObjects.length >= this.model.getNbStars())
-            console.warn(`You are adding a star 
-        to a system that already has ${this.stellarObjects.length} stars.
-        The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
-
         const isStellarObjectBlackHole = this.model.getBodyTypeOfStar(this.stellarObjects.length) === BODY_TYPE.BLACK_HOLE;
-
         if (isStellarObjectBlackHole) return this.makeBlackHole(seed);
         else return this.makeStar(seed);
     }
 
     public makeStar(model: number | StarModel = this.model.getStarSeed(this.stellarObjects.length)): Star {
-        if (this.stellarObjects.length >= this.model.getNbStars())
-            console.warn(`You are adding a star 
-        to a system that already has ${this.stellarObjects.length} stars.
-        The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
-
         const star = new Star(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, [], model);
         this.addStellarObject(star);
         return star;
+    }
+
+    public makeMandelbulb(model: number | MandelbulbModel = this.model.getPlanetSeed(this.planets.length)): Mandelbulb {
+        if (this.planets.length >= this.model.getNbPlanets())
+            console.warn(`You are adding a mandelbulb to the system.
+            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
+            This might cause issues, or not who knows.`);
+        const mandelbulb = new Mandelbulb(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, this.stellarObjects, model);
+        this.addMandelbulb(mandelbulb);
+        return mandelbulb;
     }
 
     /**
@@ -158,10 +200,6 @@ export class StarSystem {
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
     public makeBlackHole(model: number | BlackHoleModel = this.model.getStarSeed(this.stellarObjects.length)): BlackHole {
-        if (this.stellarObjects.length >= this.model.getNbStars())
-            console.warn(`You are adding a black hole
-        to a system that already has ${this.stellarObjects.length} stars.
-        The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
         const blackHole = new BlackHole(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, this.stellarObjects, model);
 
         this.addStellarObject(blackHole);
@@ -182,10 +220,6 @@ export class StarSystem {
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
     public makeTelluricPlanet(model: number | TelluricPlanemoModel = this.model.getPlanetSeed(this.planets.length)): TelluricPlanemo {
-        if (this.planets.length >= this.model.getNbPlanets())
-            console.warn(`You are adding a telluric planet to the system.
-            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
-            This might cause issues, or not who knows.`);
         const planet = new TelluricPlanemo(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, this.stellarObjects, model);
         this.addTelluricPlanet(planet);
         return planet;
@@ -196,10 +230,6 @@ export class StarSystem {
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
     public makeGasPlanet(model: number | GasPlanetModel = this.model.getPlanetSeed(this.planets.length)): GasPlanet {
-        if (this.planets.length >= this.model.getNbPlanets())
-            console.warn(`You are adding a gas planet to the system.
-            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
-            This might cause issues, or not who knows.`);
         const planet = new GasPlanet(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, this.stellarObjects, model);
         this.addGasPlanet(planet);
         return planet;
@@ -378,7 +408,7 @@ export class StarSystem {
 
         for (const object of this.orbitalObjects) object.computeCulling(controller.getActiveCamera().getAbsolutePosition());
 
-        for (const planet of this.planemos) planet.updateMaterial(controller, this.stellarObjects, deltaTime);
+        for (const planet of this.planemosWithMaterial) planet.updateMaterial(controller, this.stellarObjects, deltaTime);
 
         for (const stellarObject of this.stellarObjects) {
             if (stellarObject instanceof Star) stellarObject.updateMaterial();

@@ -9,14 +9,14 @@ import { TelluricPlanemoMaterial } from "../../materials/telluricPlanemoMaterial
 import { waterBoilingPointCelsius } from "../../../utils/waterMechanics";
 import { AbstractBody } from "../abstractBody";
 import { UberScene } from "../../../controller/uberCore/uberScene";
-import { Planemo } from "./planemo";
+import { Planemo, PlanemoMaterial } from "./planemo";
 import { TelluricPlanemoModel } from "../../../model/planemos/telluricPlanemoModel";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
-export class TelluricPlanemo extends AbstractBody implements Planemo {
+export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMaterial {
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
 
     readonly material: TelluricPlanemoMaterial;
