@@ -53,88 +53,88 @@ float angleBetweenVectors(vec3 a, vec3 b) {
     return acos(clamp(dot(normalize(a), normalize(b)), -1.0, 1.0));
 }
 
-float hash(float x) { return fract(sin(x) * 152754.742); }
-float hash(vec2 x) { return hash(x.x + hash(x.y)); }
 
-float valueNoise(vec2 p, float f) {
-    float bl = hash(floor(p*f + vec2(0.0, 0.0)));
-    float br = hash(floor(p*f + vec2(1.0, 0.0)));
-    float tl = hash(floor(p*f + vec2(0.0, 1.0)));
-    float tr = hash(floor(p*f + vec2(1.0, 1.0)));
+#define MARCHINGITERATIONS 64
 
-    vec2 fr = fract(p*f);
-    fr = (3. - 2.*fr)*fr*fr;
-    float b = mix(bl, br, fr.x);
-    float t = mix(tl, tr, fr.x);
-    return mix(b, t, fr.y);
+#define MARCHINGSTEP 0.5
+#define SMALLESTSTEP 0.1
+
+#define DISTANCE 3.0
+
+#define MAXMANDELBROTDIST 1.5
+#define MANDELBROTSTEPS 64
+
+// cosine based palette, 4 vec3 params
+vec3 cosineColor( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d )
+{
+    return a + b*cos( 6.28318*(c*t+d) );
+}
+vec3 palette (float t) {
+    return cosineColor( t, vec3(0.5,0.5,0.5),vec3(0.5,0.5,0.5),vec3(0.01,0.01,0.01),vec3(0.00, 0.15, 0.20) );
 }
 
-vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
-    if (!hasAccretionDisk) return vec4(0.0); // no disk
+// distance estimator to a mandelbulb set
+// returns the distance to the set on the x coordinate 
+// and the color on the y coordinate
+vec2 DE(vec3 pos) {
+    float Power = 8.0; //3.0+4.0*(sin(iTime/30.0)+1.0);
+	vec3 z = pos;
+	float dr = 1.0;
+	float r = 0.0;
+	for (int i = 0; i < MANDELBROTSTEPS ; i++) {
+		r = length(z);
+		if (r>MAXMANDELBROTDIST) break;
+		
+		// convert to polar coordinates
+		float theta = acos(z.z/r);
+		float phi = atan(z.y,z.x);
+		dr =  pow( r, Power-1.0)*Power*dr + 1.0;
+		
+		// scale and rotate the point
+		float zr = pow( r,Power);
+		theta = theta*Power;
+		phi = phi*Power;
+		
+		// convert back to cartesian coordinates
+		z = zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
+		z+=pos;
+	}
+	return vec2(0.5*log(r)*r/dr,50.0*pow(dr,0.128/float(MARCHINGITERATIONS)));
+}
 
-    vec3 samplePoint = initialPosition;
-    float distanceToCenter = length(samplePoint); // distance to the center of the disk
-    float relativeDistance = distanceToCenter / planetRadius;
-    float relativeDiskRadius = accretionDiskRadius / planetRadius;
+// MAPPING FUNCTION ... 
+// returns the distance of the nearest object in the direction p on the x coordinate 
+// and the color on the y coordinate
+vec2 map( in vec3 p )
+{
+    //p = fract(p);
+   	vec2 d = DE(p);
 
-    vec3 diskNormal = rotationAxis;
+  
 
-    vec3 projectedRayDir = projectOnPlane(rayDir, diskNormal);
-    vec3 projectedInitialPosition = projectOnPlane(initialPosition, diskNormal);
+   	return d;
+}
 
-    float projectionDistance = length(projectedRayDir - rayDir); // if the vector is parallel to the disk the the projection distance is near 0. We use it to increase the step size.
 
-    float stepSize = 0.02 * distanceToCenter / projectionDistance; //FIXME: this is not correct, but it works
-
-    samplePoint += stepSize * rayDir; //FIXME: somehow when I remove this line, the disk has no height.
-
-    // elementary rotation around the hole
-    vec3 deltaPos = rotateAround(projectedInitialPosition, diskNormal, 0.01);
-    deltaPos = normalize(deltaPos - projectedInitialPosition);
-
-    float parallel = dot(projectedRayDir, deltaPos);
-
-    float redShift = (1.0 + parallel) / 2.0;
-
-    float diskMix = smoothstep(0.6, 0.9, relativeDistance / relativeDiskRadius); // transition between inner and outer color
-    vec3 innerDiskColor = vec3(1.0, 0.8, 0.1);
-    vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
-    vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix);
-
-    vec3 redShiftMult = mix(vec3(0.4, 0.2, 0.1) * 0.5, vec3(1.6, 1.0, 2.0) * 3.0, redShift); //FIXME: need more realistic redshift
-    insideCol *= redShiftMult;
-
-    vec4 diskColor = vec4(0.0);
-    for (float i = 0.0; i < DISK_STEPS; i++) {
-        samplePoint -= stepSize * rayDir / DISK_STEPS;
-
-        vec3 projectedSamplePoint = projectOnPlane(samplePoint, diskNormal);
-
-        float intensity = 1.0 - (i / DISK_STEPS);
-        distanceToCenter = length(samplePoint);
-        relativeDistance = distanceToCenter / planetRadius;
-
-        float diskMask = 1.0;
-        diskMask *= clamp(relativeDistance - 1.2, 0.0, 1.0); // The 1.2 is only for aesthetics
-        diskMask *= smoothstep(0.0, 2.0, relativeDiskRadius - relativeDistance); // The 2.0 is only for aesthetics
-
-        // rotation of the disk
-        float theta = -2.0 * 3.1415 * time / rotationPeriod;
-        vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, diskNormal, theta);
-        
-        float angle = angleBetweenVectors(rotatedProjectedSamplePoint, forwardAxis);
-        float u = time + intensity + relativeDistance; // some kind of disk coordinate (spiral)
-        const float f = 1.0;
-        float noise = valueNoise(vec2(2.0 * angle, 5.0 * u), f);
-        noise = noise * 0.66 + 0.33 * valueNoise(vec2(2.0 * angle, 5.0 * u), f * 2.0);
-
-        float alpha = diskMask * noise * intensity;
-
-        // blending with current color in the disk
-        diskColor = mix(diskColor, vec4(insideCol * intensity, 1.0), alpha);
+// TRACING A PATH : 
+// measuring the distance to the nearest object on the x coordinate
+// and returning the color index on the y coordinate
+vec2 trace  (vec3 origin, vec3 ray) {
+	
+    //t is the point at which we are in the measuring of the distance
+    float t =0.0;
+    float c = 0.0;
+    
+    for (int i=0; i< MARCHINGITERATIONS; i++) {
+    	vec3 path = origin + ray * t;	
+    	vec2 dist = map(path);
+    	// we want t to be as large as possible at each step but not too big to induce artifacts
+        t += MARCHINGSTEP * dist.x;
+        c += dist.y;
+        if (dist.y < SMALLESTSTEP) break;
     }
-
-    return diskColor;
+    
+    return vec2(t,c);
 }
 
 void main() {
@@ -150,11 +150,30 @@ void main() {
 
     vec4 outColor;
 
+    vec3 planetPosition = vec3(15.0, 0.0, 0.0);
+    float planetRadius = 2.0;
+
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, impactPoint, escapePoint))) {
         outColor = screenColor;// if not intersecting with atmosphere, return original color
     } else {
-        outColor = vec4(1.0, 0.0, 0.0, 1.0);
+        vec3 rayOrigin = cameraPosition + impactPoint * rayDir; // the ray origin in world space
+        vec2 mandelDepth = trace(cameraPosition - planetPosition, rayDir);
+
+        // if mandelDepth is close to cameraFar, outColor is original color
+        //if(abs(mandelDepth - cameraFar) < 100.0) outColor = screenColor;
+        //else {
+
+            //rendering with a fog calculation (further is darker)
+            float fog = 1.0 / (1.0 + mandelDepth.x /* mandelDepth.x*/ * 0.1);
+            
+            //frag color
+            vec3 fc = vec3(fog);
+            
+            // Output to screen
+            outColor = vec4(palette(mandelDepth.y), 1.0);
+
+        //}
     }
 
     gl_FragColor = outColor;
