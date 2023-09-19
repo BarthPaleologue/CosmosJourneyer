@@ -18,6 +18,10 @@ const bool hasAccretionDisk = true;
 uniform vec3 rotationAxis;
 uniform vec3 forwardAxis;
 
+#define MAX_STARS 5
+uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
+uniform int nbStars; // number of stars
+
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
@@ -56,13 +60,11 @@ float angleBetweenVectors(vec3 a, vec3 b) {
 
 #define MARCHINGITERATIONS 64
 
-#define MARCHINGSTEP 0.5
-#define SMALLESTSTEP 0.1
+#define MARCHINGSTEP 0.9
+#define EPSILON 0.001
 
-#define DISTANCE 3.0
-
-#define MAXMANDELBROTDIST 1.5
-#define MANDELBROTSTEPS 64
+#define MAXMANDELBROTDIST 3.0
+#define MANDELBROTSTEPS 15
 
 // cosine based palette, 4 vec3 params
 vec3 cosineColor( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d )
@@ -70,71 +72,81 @@ vec3 cosineColor( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d )
     return a + b*cos( 6.28318*(c*t+d) );
 }
 vec3 palette (float t) {
-    return cosineColor( t, vec3(0.5,0.5,0.5),vec3(0.5,0.5,0.5),vec3(0.01,0.01,0.01),vec3(0.00, 0.15, 0.20) );
+    return cosineColor( t, vec3(0.5,0.5,0.5),vec3(0.5,0.5,0.5), vec3(0.01,0.01,0.01),vec3(0.00, 0.15, 0.20) );
 }
 
 // distance estimator to a mandelbulb set
 // returns the distance to the set on the x coordinate 
 // and the color on the y coordinate
-vec2 DE(vec3 pos) {
-    float Power = 8.0; //3.0+4.0*(sin(iTime/30.0)+1.0);
+vec2 sdf(vec3 pos) {
+    float Power = 3.0; //+ 4.0*(sin(time / 100.0) + 1.0);
 	vec3 z = pos;
 	float dr = 1.0;
 	float r = 0.0;
 	for (int i = 0; i < MANDELBROTSTEPS ; i++) {
 		r = length(z);
-		if (r>MAXMANDELBROTDIST) break;
+		if (r > MAXMANDELBROTDIST) break;
 		
 		// convert to polar coordinates
-		float theta = acos(z.z/r);
-		float phi = atan(z.y,z.x);
-		dr =  pow( r, Power-1.0)*Power*dr + 1.0;
+		float theta = acos(z.z / r);
+		float phi = atan(z.y, z.x);
+		dr = pow(r, Power - 1.0) * Power * dr + 1.0;
 		
 		// scale and rotate the point
 		float zr = pow( r,Power);
-		theta = theta*Power;
-		phi = phi*Power;
+		theta *= Power;
+		phi *= Power;
 		
 		// convert back to cartesian coordinates
-		z = zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
-		z+=pos;
+		z = zr * vec3(sin(theta) * cos(phi), sin(phi) * sin(theta), cos(theta));
+		z += pos;
 	}
-	return vec2(0.5*log(r)*r/dr,50.0*pow(dr,0.128/float(MARCHINGITERATIONS)));
+
+    float distance = 0.5 * log(r) * r / dr;
+    float colorIndex = 50.0 * pow(dr, 0.128 / float(MARCHINGITERATIONS));
+
+	return vec2(distance, colorIndex);
 }
-
-// MAPPING FUNCTION ... 
-// returns the distance of the nearest object in the direction p on the x coordinate 
-// and the color on the y coordinate
-vec2 map( in vec3 p )
-{
-    //p = fract(p);
-   	vec2 d = DE(p);
-
-  
-
-   	return d;
-}
-
 
 // TRACING A PATH : 
 // measuring the distance to the nearest object on the x coordinate
 // and returning the color index on the y coordinate
-vec2 trace  (vec3 origin, vec3 ray) {
-	
+vec2 rayMarch(vec3 origin, vec3 ray, out float steps) {
     //t is the point at which we are in the measuring of the distance
-    float t =0.0;
+    float depth = 0.0;
+    steps = 0.0;
     float c = 0.0;
     
-    for (int i=0; i< MARCHINGITERATIONS; i++) {
-    	vec3 path = origin + ray * t;	
-    	vec2 dist = map(path);
+    for (int i = 0; i < MARCHINGITERATIONS; i++) {
+    	vec3 path = origin + ray * depth;	
+    	vec2 dist = sdf(path);
     	// we want t to be as large as possible at each step but not too big to induce artifacts
-        t += MARCHINGSTEP * dist.x;
+        depth += MARCHINGSTEP * dist.x;
         c += dist.y;
-        if (dist.y < SMALLESTSTEP) break;
+        steps++;
+        if (dist.y < EPSILON) break;
     }
     
-    return vec2(t,c);
+    return vec2(depth, c);
+}
+
+vec4 lerp(vec4 v1, vec4 v2, float t) {
+    return t * v1 + (1.0 - t) * v2;
+}
+
+float contrast(float val, float contrast_offset, float contrast_mid_level)
+{
+	return clamp((val - contrast_mid_level) * (1. + contrast_offset) + contrast_mid_level, 0., 1.);
+}
+
+vec3 estimate_normal(const vec3 p, const float delta)
+{
+    vec3 normal = vec3(
+            sdf(vec3(p.x + delta, p.y, p.z)).x - sdf(vec3(p.x - delta, p.y, p.z)).x,
+            sdf(vec3(p.x, p.y + delta, p.z)).x - sdf(vec3(p.x, p.y - delta, p.z)).x,
+            sdf(vec3(p.x, p.y, p.z  + delta)).x - sdf(vec3(p.x, p.y, p.z - delta)).x
+    );
+    return normalize(normal);
 }
 
 void main() {
@@ -150,30 +162,40 @@ void main() {
 
     vec4 outColor;
 
-    vec3 planetPosition = vec3(15.0, 0.0, 0.0);
-    float planetRadius = 2.0;
+    //vec3 planetPosition = vec3(planetRadius * 3.0, 0.0, 0.0);
+    float planetRadius = planetRadius;
 
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, impactPoint, escapePoint))) {
         outColor = screenColor;// if not intersecting with atmosphere, return original color
     } else {
-        vec3 rayOrigin = cameraPosition + impactPoint * rayDir; // the ray origin in world space
-        vec2 mandelDepth = trace(cameraPosition - planetPosition, rayDir);
+        vec3 origin = cameraPosition + impactPoint * rayDir - planetPosition; // the ray origin in world space
+        origin /= 0.5 * planetRadius;
+        float steps;
+        vec2 mandelDepth = rayMarch(origin, rayDir, steps);
 
-        // if mandelDepth is close to cameraFar, outColor is original color
-        //if(abs(mandelDepth - cameraFar) < 100.0) outColor = screenColor;
-        //else {
+        vec3 intersectionPoint = origin + mandelDepth.x * rayDir;
+        float intersectionDistance = length(intersectionPoint);
 
-            //rendering with a fog calculation (further is darker)
-            float fog = 1.0 / (1.0 + mandelDepth.x /* mandelDepth.x*/ * 0.1);
-            
-            //frag color
-            vec3 fc = vec3(fog);
-            
-            // Output to screen
-            outColor = vec4(palette(mandelDepth.y), 1.0);
+        vec4 mandelbulbColor = vec4(palette(mandelDepth.y), 1.0);
 
-        //}
+        float ao = steps * 0.01;
+        ao = 1. - ao / (ao + 0.5);  // reinhard
+        const float contrast_offset = 0.3;
+        const float contrast_mid_level = 0.0;
+        ao = contrast(ao, contrast_offset, contrast_mid_level);
+
+        mandelbulbColor.xyz *= ao * 2.0;
+
+        outColor = lerp(screenColor, mandelbulbColor, smoothstep(2.0, 15.0, intersectionDistance));
+
+	    /*vec3 normal = estimate_normal(intersectionPoint, EPSILON * 0.5);
+        for(int i = 0; i < nbStars; i++) {
+            vec3 starDir = normalize(starPositions[i] - planetPosition);
+            float ndl = max(0.0, dot(normal, starDir));
+
+            outColor.xyz *= ndl;
+        }*/
     }
 
     gl_FragColor = outColor;

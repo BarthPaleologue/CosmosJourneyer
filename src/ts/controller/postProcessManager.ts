@@ -495,6 +495,7 @@ export class PostProcessManager {
         for (const clouds of this.clouds) clouds.update(deltaTime);
         for (const oceans of this.oceans) oceans.update(deltaTime);
         for (const blackhole of this.blackHoles) blackhole.update(deltaTime);
+        for (const mandelbulb of this.mandelbulbs) mandelbulb.update(deltaTime);
     }
 
     public dispose() {
@@ -504,6 +505,7 @@ export class PostProcessManager {
         for (const clouds of this.clouds) clouds.dispose();
         for (const oceans of this.oceans) oceans.dispose();
         for (const blackhole of this.blackHoles) blackhole.dispose();
+        for (const mandelbulb of this.mandelbulbs) mandelbulb.dispose();
 
         this.colorCorrection.dispose();
         this.fxaa.dispose();
