@@ -1,6 +1,6 @@
 precision highp float;
 
-// based on https://www.shadertoy.com/view/tsBXW3
+// based on https://www.shadertoy.com/view/tsc3Rj and https://www.shadertoy.com/view/wdjGWR
 
 #define DISK_STEPS 12.0 //disk texture layers
 
@@ -48,6 +48,8 @@ uniform float cameraFar;
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
+#pragma glslify: saturate = require(./utils/saturate.glsl)
+
 vec3 projectOnPlane(vec3 vector, vec3 planeNormal) {
     return vector - dot(vector, planeNormal) * planeNormal;
 }
@@ -61,7 +63,7 @@ float angleBetweenVectors(vec3 a, vec3 b) {
 #define MARCHINGITERATIONS 64
 
 #define MARCHINGSTEP 0.9
-#define EPSILON 0.001
+#define EPSILON 0.01
 
 #define MAXMANDELBROTDIST 3.0
 #define MANDELBROTSTEPS 15
@@ -160,43 +162,47 @@ void main() {
     vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
     float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
 
-    vec4 outColor;
-
     //vec3 planetPosition = vec3(planetRadius * 3.0, 0.0, 0.0);
     float planetRadius = planetRadius;
 
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, impactPoint, escapePoint))) {
-        outColor = screenColor;// if not intersecting with atmosphere, return original color
-    } else {
-        vec3 origin = cameraPosition + impactPoint * rayDir - planetPosition; // the ray origin in world space
-        origin /= 0.5 * planetRadius;
-        float steps;
-        vec2 mandelDepth = rayMarch(origin, rayDir, steps);
-
-        vec3 intersectionPoint = origin + mandelDepth.x * rayDir;
-        float intersectionDistance = length(intersectionPoint);
-
-        vec4 mandelbulbColor = vec4(palette(mandelDepth.y), 1.0);
-
-        float ao = steps * 0.01;
-        ao = 1. - ao / (ao + 0.5);  // reinhard
-        const float contrast_offset = 0.3;
-        const float contrast_mid_level = 0.0;
-        ao = contrast(ao, contrast_offset, contrast_mid_level);
-
-        mandelbulbColor.xyz *= ao * 2.0;
-
-        outColor = lerp(screenColor, mandelbulbColor, smoothstep(2.0, 15.0, intersectionDistance));
-
-	    /*vec3 normal = estimate_normal(intersectionPoint, EPSILON * 0.5);
-        for(int i = 0; i < nbStars; i++) {
-            vec3 starDir = normalize(starPositions[i] - planetPosition);
-            float ndl = max(0.0, dot(normal, starDir));
-
-            outColor.xyz *= ndl;
-        }*/
+        gl_FragColor = screenColor;// if not intersecting with atmosphere, return original color
+        return;
     }
 
-    gl_FragColor = outColor;
+    if(maximumDistance < impactPoint) {
+        gl_FragColor = screenColor;
+        return;
+    }
+
+    vec3 origin = cameraPosition + impactPoint * rayDir - planetPosition; // the ray origin in world space
+    origin /= 0.5 * planetRadius;
+    float steps;
+    vec2 mandelDepth = rayMarch(origin, rayDir, steps);
+
+    vec3 intersectionPoint = origin + mandelDepth.x * rayDir;
+    float intersectionDistance = length(intersectionPoint);
+
+    vec4 mandelbulbColor = vec4(palette(mandelDepth.y), 1.0);
+
+    float ao = steps * 0.01;
+    ao = 1.0 - ao / (ao + 0.5);  // reinhard
+    const float contrast_offset = 0.3;
+    const float contrast_mid_level = 0.5;
+    ao = contrast(ao, contrast_offset, contrast_mid_level);
+
+    mandelbulbColor.xyz *= ao * 2.0;
+
+    vec3 normal = estimate_normal(intersectionPoint, EPSILON * 2.0);
+    float ndl = 0.0;
+    for(int i = 0; i < nbStars; i++) {
+        vec3 starDir = normalize(starPositions[i] - planetPosition);
+        ndl += max(0.0, dot(normal, starDir));
+    }
+
+    mandelbulbColor.xyz *= clamp(ndl, 0.5, 1.0);
+
+    gl_FragColor = lerp(screenColor, mandelbulbColor, smoothstep(2.0, 15.0, intersectionDistance));
+
 }

@@ -169,10 +169,10 @@ andromaqueModel.orbitalProperties.orientationQuaternion = Quaternion.Identity();
 
 const andromaque = starSystem.makeGasPlanet(andromaqueModel);
 
-const mandelbulbModel = new MandelbulbModel(0.5, [sunModel]);
-mandelbulbModel.orbitalProperties.period = 60 * 60 * 24 * 365.25;
-mandelbulbModel.orbitalProperties.periapsis = 3500 * ares.getRadius();
-mandelbulbModel.orbitalProperties.apoapsis = 3500 * ares.getRadius();
+const mandelbulbModel = new MandelbulbModel(0.5, [planetModel]);
+mandelbulbModel.orbitalProperties.period = 60 * 60 * 24 * 365.24;
+mandelbulbModel.orbitalProperties.periapsis = 3990 * ares.getRadius();
+mandelbulbModel.orbitalProperties.apoapsis = 3990 * ares.getRadius();
 const mandelbulb = starSystem.makeMandelbulb(mandelbulbModel);
 
 engine.init();
