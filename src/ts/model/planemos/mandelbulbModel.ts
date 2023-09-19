@@ -3,11 +3,12 @@ import { BodyModel, BODY_TYPE, PlanemoModel, PlanetPhysicalProperties } from "..
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
-import { normalRandom } from "extended-random";
+import { normalRandom, randRange } from "extended-random";
 
 enum GENERATION_STEPS {
     ORBIT = 200,
-    AXIAL_TILT = 100
+    AXIAL_TILT = 100,
+    POWER = 300
 }
 
 export class MandelbulbModel implements PlanemoModel {
@@ -25,6 +26,8 @@ export class MandelbulbModel implements PlanemoModel {
 
     readonly childrenBodies: BodyModel[] = [];
 
+    readonly power: number;
+
     constructor(seed: number, parentBodies: BodyModel[]) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
@@ -32,6 +35,8 @@ export class MandelbulbModel implements PlanemoModel {
         this.radius = 1000e3;
 
         this.parentBodies = parentBodies;
+
+        this.power = randRange(1.0, 18.0, this.rng, GENERATION_STEPS.POWER);
 
         // TODO: do not hardcode
         const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
@@ -47,7 +52,7 @@ export class MandelbulbModel implements PlanemoModel {
 
         this.physicalProperties = {
             mass: 10,
-            rotationPeriod: 24 * 60 * 60,
+            rotationPeriod: 0,
             axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
             minTemperature: -180,
             maxTemperature: 100,

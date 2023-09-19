@@ -11,12 +11,7 @@ uniform float planetRadius;
 uniform float accretionDiskRadius;
 uniform float rotationPeriod;
 
-//TODO: make these uniforms
-const float accretionDiskHeight = 100.0;
-const bool hasAccretionDisk = true;
-
-uniform vec3 rotationAxis;
-uniform vec3 forwardAxis;
+uniform float power;
 
 #define MAX_STARS 5
 uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
@@ -25,13 +20,9 @@ uniform int nbStars; // number of stars
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
-uniform sampler2D starfieldTexture;
-
 uniform vec3 planetPosition;
 uniform vec3 cameraPosition;
 
-uniform mat4 view;
-uniform mat4 projection;
 uniform mat4 inverseView;
 uniform mat4 inverseProjection;
 
@@ -42,23 +33,9 @@ uniform float cameraFar;
 
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
 
-#pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=projection, view=view)
-
-#pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
-
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
 #pragma glslify: saturate = require(./utils/saturate.glsl)
-
-vec3 projectOnPlane(vec3 vector, vec3 planeNormal) {
-    return vector - dot(vector, planeNormal) * planeNormal;
-}
-
-float angleBetweenVectors(vec3 a, vec3 b) {
-    // the clamping is necessary to prevent undefined values when acos(x) has |x| > 1
-    return acos(clamp(dot(normalize(a), normalize(b)), -1.0, 1.0));
-}
-
 
 #define MARCHINGITERATIONS 64
 
@@ -69,19 +46,18 @@ float angleBetweenVectors(vec3 a, vec3 b) {
 #define MANDELBROTSTEPS 15
 
 // cosine based palette, 4 vec3 params
-vec3 cosineColor( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d )
-{
-    return a + b*cos( 6.28318*(c*t+d) );
+vec3 cosineColor( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
+    return a + b * cos(6.28318*(c*t+d));
 }
 vec3 palette (float t) {
-    return cosineColor( t, vec3(0.5,0.5,0.5),vec3(0.5,0.5,0.5), vec3(0.01,0.01,0.01),vec3(0.00, 0.15, 0.20) );
+    return cosineColor(t, vec3(0.5,0.5,0.5), vec3(0.5,0.5,0.5), vec3(0.01,0.01,0.01), vec3(0.00, 0.15, 0.20));
 }
 
 // distance estimator to a mandelbulb set
 // returns the distance to the set on the x coordinate 
 // and the color on the y coordinate
 vec2 sdf(vec3 pos) {
-    float Power = 3.0; //+ 4.0*(sin(time / 100.0) + 1.0);
+    float Power = power;
 	vec3 z = pos;
 	float dr = 1.0;
 	float r = 0.0;

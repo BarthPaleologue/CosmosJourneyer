@@ -21,7 +21,7 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
 
     constructor(mandelbulb: Mandelbulb, scene: UberScene, stellarObjects: StellarObject[]) {
         const settings: MandelbulbSettings = {
-            rotationPeriod: 1.5
+            rotationPeriod: 1.5,
         };
 
         const uniforms: ShaderUniforms = [
@@ -33,6 +33,13 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
                 type: ShaderDataType.Float,
                 get: () => {
                     return this.internalTime % (settings.rotationPeriod * 10000);
+                }
+            },
+            {
+                name: "power",
+                type: ShaderDataType.Float,
+                get: () => {
+                    return mandelbulb.model.power;
                 }
             },
             {
