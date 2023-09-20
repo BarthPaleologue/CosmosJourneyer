@@ -1,14 +1,10 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { BodyModel, BODY_TYPE, StellarObjectModel, BlackHolePhysicalProperties } from "../common";
+import { BodyModel, BODY_TYPE, StellarObjectModel, BlackHolePhysicalProperties, GENERATION_STEPS } from "../common";
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { normalRandom } from "extended-random";
 import { STELLAR_TYPE } from "./common";
-
-enum GENERATION_STEPS {
-    AXIAL_TILT = 100
-}
 
 export class BlackHoleModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.BLACK_HOLE;
@@ -51,10 +47,5 @@ export class BlackHoleModel implements StellarObjectModel {
             axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
             accretionDiskRadius: 8000e3
         };
-    }
-
-    get depth(): number {
-        if (this.parentBodies.length === 0) return 0;
-        return this.parentBodies[0].depth + 1;
     }
 }

@@ -1,14 +1,8 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { BaseModel, PhysicalProperties } from "./common";
+import { BaseModel, GENERATION_STEPS, PhysicalProperties } from "./common";
 import { IOrbitalProperties } from "./orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "./orbits/kepler";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
-
-enum GENERATION_STEPS {
-    AXIAL_TILT = 100,
-    ORBIT = 200,
-    RADIUS = 1000
-}
 
 export class SpaceStationModel implements BaseModel {
     readonly seed: number;
@@ -42,10 +36,5 @@ export class SpaceStationModel implements BaseModel {
             rotationPeriod: 60 * 2,
             axialTilt: 2 * this.rng(GENERATION_STEPS.AXIAL_TILT) * Math.PI
         };
-    }
-
-    get depth(): number {
-        if (this.parentBodies.length === 0) return 0;
-        return this.parentBodies[0].depth + 1;
     }
 }

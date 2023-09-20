@@ -1,17 +1,10 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { BodyModel, BODY_TYPE, PlanemoModel, PlanetPhysicalProperties } from "../common";
+import { BodyModel, BODY_TYPE, PlanemoModel, PlanetPhysicalProperties, GENERATION_STEPS } from "../common";
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
-import { normalRandom, randRange } from "extended-random";
+import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-
-enum GENERATION_STEPS {
-    ORBIT = 200,
-    AXIAL_TILT = 100,
-    POWER = 300,
-    ACCENNT_COLOR = 400
-}
 
 export class MandelbulbModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.FRACTAL;
@@ -27,6 +20,8 @@ export class MandelbulbModel implements PlanemoModel {
     readonly parentBodies: BodyModel[] = [];
 
     readonly childrenBodies: BodyModel[] = [];
+
+    readonly nbMoons: number;
 
     readonly power: number;
     readonly accentColor: Color3;
@@ -68,18 +63,11 @@ export class MandelbulbModel implements PlanemoModel {
             maxTemperature: 100,
             pressure: 0,
         };
-    }
 
-    get depth(): number {
-        if (this.parentBodies.length === 0) return 0;
-        return this.parentBodies[0].depth + 1;
+        this.nbMoons = this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);
     }
 
     getApparentRadius(): number {
         return this.radius;
-    }
-
-    getMoonSeed(index: number): number {
-        return this.rng(index);
     }
 }

@@ -4,18 +4,10 @@ import { normalRandom, randRange, uniformRandBool } from "extended-random";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
-import { BodyModel, BODY_TYPE, StellarObjectModel, StarPhysicalProperties } from "../common";
+import { BodyModel, BODY_TYPE, StellarObjectModel, StarPhysicalProperties, GENERATION_STEPS } from "../common";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { STELLAR_TYPE } from "./common";
-
-enum GENERATION_STEPS {
-    NAME,
-    ORBIT = 200,
-    TEMPERATURE = 1100,
-    RADIUS = 1000,
-    RINGS = 1200
-}
 
 export class StarModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.STAR;
@@ -85,10 +77,5 @@ export class StarModel implements StellarObjectModel {
         };
 
         this.hasRings = uniformRandBool(StarModel.RING_PROPORTION, this.rng, GENERATION_STEPS.RINGS);
-    }
-
-    get depth(): number {
-        if (this.parentBodies.length === 0) return 0;
-        return this.parentBodies[0].depth + 1;
     }
 }

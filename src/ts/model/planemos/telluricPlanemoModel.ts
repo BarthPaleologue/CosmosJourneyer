@@ -1,25 +1,12 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { BODY_TYPE, BodyModel, PlanemoModel, SolidPhysicalProperties } from "../common";
+import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, SolidPhysicalProperties } from "../common";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-
-enum GENERATION_STEPS {
-    AXIAL_TILT = 100,
-    ORBIT = 200,
-    RADIUS = 1000,
-    PRESSURE = 1100,
-    WATER_AMOUNT = 1200,
-    RINGS = 1400,
-    TERRAIN = 1500,
-    NB_MOONS = 10,
-    MOONS = 11,
-    ORBITAL_PLANE_ALIGNEMENT = 1600
-}
 
 export class TelluricPlanemoModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.TELLURIC;
@@ -128,16 +115,6 @@ export class TelluricPlanemoModel implements PlanemoModel {
         this.hasRings = uniformRandBool(0.6, this.rng, GENERATION_STEPS.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas;
 
         this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);
-    }
-
-    get depth(): number {
-        if (this.parentBodies.length === 0) return 0;
-        return this.parentBodies[0].depth + 1;
-    }
-
-    getMoonSeed(index: number) {
-        if (index > this.nbMoons) throw new Error("Moon out of bound! " + index);
-        return centeredRand(this.rng, GENERATION_STEPS.MOONS + index) * Settings.SEED_HALF_RANGE;
     }
 
     getApparentRadius(): number {

@@ -1,6 +1,27 @@
 import { IOrbitalProperties } from "./orbits/iOrbitalProperties";
 import { STELLAR_TYPE } from "./stellarObjects/common";
 
+export enum GENERATION_STEPS {
+    AXIAL_TILT = 100,
+    ORBIT = 200,
+    RADIUS = 1000,
+    ORBITAL_PLANE_ALIGNEMENT = 1600,
+
+    RINGS = 1200,
+
+    NB_MOONS = 10,
+    MOONS = 11,
+
+    POWER = 300,
+    ACCENNT_COLOR = 400,
+
+    TEMPERATURE = 1100,
+
+    PRESSURE = 1100,
+    WATER_AMOUNT = 1200,
+    TERRAIN = 1500,
+}
+
 export enum BODY_TYPE {
     STAR,
     TELLURIC,
@@ -43,8 +64,6 @@ export interface BaseModel {
 
     readonly parentBodies: BaseModel[];
     readonly childrenBodies: BaseModel[];
-
-    get depth(): number;
 }
 
 export interface BodyModel extends BaseModel {
@@ -60,7 +79,12 @@ export interface StellarObjectModel extends BodyModel {
 export interface PlanemoModel extends BodyModel {
     physicalProperties: PlanetPhysicalProperties;
 
-    getApparentRadius(): number;
+    nbMoons: number;
 
-    getMoonSeed(index: number): number;
+    getApparentRadius(): number;
+}
+
+export function depth(model: BaseModel): number {
+    if (model.parentBodies.length === 0) return 0;
+    return depth(model.parentBodies[0]) + 1;
 }

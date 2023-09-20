@@ -1,19 +1,10 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { BODY_TYPE, BodyModel, PlanemoModel, PlanetPhysicalProperties } from "../common";
+import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, PlanetPhysicalProperties } from "../common";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { getOrbitalPeriod } from "../orbits/kepler";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
-
-enum GENERATION_STEPS {
-    AXIAL_TILT = 100,
-    ORBIT = 200,
-    RADIUS = 1000,
-    RINGS = 1200,
-    NB_MOONS = 10,
-    MOONS = 11
-}
 
 export class GasPlanetModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.GAS;
@@ -70,17 +61,7 @@ export class GasPlanetModel implements PlanemoModel {
         this.nbMoons = randRangeInt(0, 3, this.rng, GENERATION_STEPS.NB_MOONS);
     }
 
-    getMoonSeed(index: number) {
-        if (index > this.nbMoons) throw new Error("Moon out of bound! " + index);
-        return centeredRand(this.rng, GENERATION_STEPS.MOONS + index) * Settings.SEED_HALF_RANGE;
-    }
-
     getApparentRadius(): number {
         return this.radius;
-    }
-
-    get depth(): number {
-        if (this.parentBodies.length === 0) return 0;
-        return this.parentBodies[0].depth + 1;
     }
 }

@@ -23,6 +23,7 @@ import { rotateAround, translate } from "./uberCore/transforms/basicTransform";
 import { MandelbulbModel } from "../model/planemos/mandelbulbModel";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
 import { uniformRandBool } from "extended-random";
+import { getMoonSeed } from "../model/planemos/common";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -257,8 +258,8 @@ export class StarSystem {
     }
 
     public makeSatellite(
-        planet: TelluricPlanemo | GasPlanet | Mandelbulb,
-        model: TelluricPlanemoModel | number = planet.model.getMoonSeed(planet.model.childrenBodies.length)
+        planet: Planemo,
+        model: TelluricPlanemoModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)
     ): TelluricPlanemo {
         const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, this.scene, [planet], model);
 
@@ -288,7 +289,7 @@ export class StarSystem {
             You can just leave this argument empty to make as many as the planet had planned.`
             );
 
-        for (let i = 0; i < n; i++) this.makeSatellite(planet, planet.model.getMoonSeed(planet.model.childrenBodies.length));
+        for (let i = 0; i < n; i++) this.makeSatellite(planet, getMoonSeed(planet.model, planet.model.childrenBodies.length));
     }
 
     /**

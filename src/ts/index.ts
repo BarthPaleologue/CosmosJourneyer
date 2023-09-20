@@ -23,6 +23,7 @@ import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberC
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 import { MandelbulbModel } from "./model/planemos/mandelbulbModel";
+import { getMoonSeed } from "./model/planemos/common";
 
 const engine = new SpaceEngine();
 
@@ -109,7 +110,7 @@ const planet = starSystem.makeTelluricPlanet(planetModel);
 const spacestation = new SpaceStation([planet], scene);
 engine.getStarSystem().addSpaceStation(spacestation);
 
-const moonModel = new TelluricPlanemoModel(planetModel.getMoonSeed(0), [planetModel]);
+const moonModel = new TelluricPlanemoModel(getMoonSeed(planetModel, 0), [planetModel]);
 moonModel.physicalProperties.mass = 2;
 moonModel.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moonModel.physicalProperties.minTemperature = -180;
