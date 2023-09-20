@@ -22,6 +22,7 @@ import { StarModel } from "../model/stellarObjects/starModel";
 import { rotateAround, translate } from "./uberCore/transforms/basicTransform";
 import { MandelbulbModel } from "../model/planemos/mandelbulbModel";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
+import { uniformRandBool } from "extended-random";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -185,7 +186,7 @@ export class StarSystem {
         return star;
     }
 
-    public makeMandelbulb(model: number | MandelbulbModel = this.model.getPlanetSeed(this.planets.length)): Mandelbulb {
+    public makeMandelbulb(model: number | MandelbulbModel = this.model.getPlanetSeed(this.mandelbulbs.length)): Mandelbulb {
         if (this.planets.length >= this.model.getNbPlanets())
             console.warn(`You are adding a mandelbulb to the system.
             The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
@@ -237,6 +238,7 @@ export class StarSystem {
 
     public makePlanets(n: number): void {
         console.assert(n >= 0, `Cannot make a negative amount of planets : ${n}`);
+
         for (let i = 0; i < n; i++) {
             switch (this.model.getBodyTypeOfPlanet(this.planets.length)) {
                 case BODY_TYPE.TELLURIC:
@@ -245,6 +247,9 @@ export class StarSystem {
                 case BODY_TYPE.GAS:
                     this.makeSatellites(this.makeGasPlanet());
                     break;
+                case BODY_TYPE.FRACTAL:
+                    this.makeMandelbulb();
+                    break;
                 default:
                     throw new Error(`Unknown body type ${this.model.getBodyTypeOfPlanet(this.planets.length)}`);
             }
@@ -252,7 +257,7 @@ export class StarSystem {
     }
 
     public makeSatellite(
-        planet: TelluricPlanemo | GasPlanet,
+        planet: TelluricPlanemo | GasPlanet | Mandelbulb,
         model: TelluricPlanemoModel | number = planet.model.getMoonSeed(planet.model.childrenBodies.length)
     ): TelluricPlanemo {
         const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, this.scene, [planet], model);

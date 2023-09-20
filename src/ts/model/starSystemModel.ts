@@ -53,6 +53,7 @@ export class StarSystemModel {
     }
 
     public getBodyTypeOfPlanet(index: number) {
+        if(uniformRandBool(0.05, this.rng, GENERATION_STEPS.CHOOSE_PLANET_TYPE + index + 10)) return BODY_TYPE.FRACTAL;
         if (uniformRandBool(0.5, this.rng, GENERATION_STEPS.CHOOSE_PLANET_TYPE + index)) return BODY_TYPE.TELLURIC;
         return BODY_TYPE.GAS;
     }

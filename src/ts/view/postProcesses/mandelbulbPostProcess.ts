@@ -4,7 +4,6 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { getForwardDirection } from "../../controller/uberCore/transforms/basicTransform";
 import { Mandelbulb } from "../bodies/planemos/mandelbulb";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 
@@ -43,24 +42,10 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
                 }
             },
             {
-                name: "rotationPeriod",
-                type: ShaderDataType.Float,
+                name: "accentColor",
+                type: ShaderDataType.Color3,
                 get: () => {
-                    return settings.rotationPeriod;
-                }
-            },
-            {
-                name: "rotationAxis",
-                type: ShaderDataType.Vector3,
-                get: () => {
-                    return mandelbulb.getRotationAxis();
-                }
-            },
-            {
-                name: "forwardAxis",
-                type: ShaderDataType.Vector3,
-                get: () => {
-                    return getForwardDirection(mandelbulb.transform);
+                    return mandelbulb.model.accentColor;
                 }
             }
         ];

@@ -12,6 +12,7 @@ uniform float accretionDiskRadius;
 uniform float rotationPeriod;
 
 uniform float power;
+uniform vec3 accentColor;
 
 #define MAX_STARS 5
 uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
@@ -50,7 +51,7 @@ vec3 cosineColor( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
     return a + b * cos(6.28318*(c*t+d));
 }
 vec3 palette (float t) {
-    return cosineColor(t, vec3(0.5,0.5,0.5), vec3(0.5,0.5,0.5), vec3(0.01,0.01,0.01), vec3(0.00, 0.15, 0.20));
+    return cosineColor(t, vec3(0.5,0.5,0.5), vec3(0.5,0.5,0.5), vec3(0.01,0.01,0.01), accentColor);
 }
 
 // distance estimator to a mandelbulb set
@@ -153,7 +154,7 @@ void main() {
     }
 
     vec3 origin = cameraPosition + impactPoint * rayDir - planetPosition; // the ray origin in world space
-    origin /= 0.5 * planetRadius;
+    origin /= 0.8 * planetRadius;
     float steps;
     vec2 mandelDepth = rayMarch(origin, rayDir, steps);
 
@@ -177,7 +178,7 @@ void main() {
         ndl += max(0.0, dot(normal, starDir));
     }
 
-    mandelbulbColor.xyz *= clamp(ndl, 0.5, 1.0);
+    mandelbulbColor.xyz *= clamp(ndl, 0.3, 1.0);
 
     gl_FragColor = lerp(screenColor, mandelbulbColor, smoothstep(2.0, 15.0, intersectionDistance));
 

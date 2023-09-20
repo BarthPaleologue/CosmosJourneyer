@@ -4,11 +4,13 @@ import { getOrbitalPeriod } from "../orbits/kepler";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
 import { normalRandom, randRange } from "extended-random";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 enum GENERATION_STEPS {
     ORBIT = 200,
     AXIAL_TILT = 100,
-    POWER = 300
+    POWER = 300,
+    ACCENNT_COLOR = 400
 }
 
 export class MandelbulbModel implements PlanemoModel {
@@ -27,6 +29,7 @@ export class MandelbulbModel implements PlanemoModel {
     readonly childrenBodies: BodyModel[] = [];
 
     readonly power: number;
+    readonly accentColor: Color3;
 
     constructor(seed: number, parentBodies: BodyModel[]) {
         this.seed = seed;
@@ -37,15 +40,22 @@ export class MandelbulbModel implements PlanemoModel {
         this.parentBodies = parentBodies;
 
         this.power = randRange(1.0, 18.0, this.rng, GENERATION_STEPS.POWER);
+        this.accentColor = new Color3(
+            this.rng(GENERATION_STEPS.ACCENNT_COLOR),
+            this.rng(GENERATION_STEPS.ACCENNT_COLOR + 10),
+            this.rng(GENERATION_STEPS.ACCENNT_COLOR + 20)
+        );
 
         // TODO: do not hardcode
         const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
         const apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
 
+        console.log(seed, apoapsis, periapsis);
+
         this.orbitalProperties = {
             periapsis: periapsis,
             apoapsis: apoapsis,
-            period: getOrbitalPeriod(periapsis, apoapsis, []),
+            period: getOrbitalPeriod(periapsis, apoapsis, parentBodies),
             orientationQuaternion: Quaternion.Identity(),
             isPlaneAlignedWithParent: true
         };
