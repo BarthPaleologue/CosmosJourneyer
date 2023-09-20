@@ -7,7 +7,7 @@ import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export class MandelbulbModel implements PlanemoModel {
-    readonly bodyType = BODY_TYPE.FRACTAL;
+    readonly bodyType = BODY_TYPE.MANDELBULB;
     readonly seed: number;
     readonly rng: (step: number) => number;
 

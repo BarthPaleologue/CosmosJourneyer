@@ -26,7 +26,7 @@ export enum BODY_TYPE {
     STAR,
     TELLURIC,
     GAS,
-    FRACTAL,
+    MANDELBULB,
     BLACK_HOLE
 }
 

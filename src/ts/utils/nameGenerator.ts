@@ -6,6 +6,7 @@ const constellationNames: string[] = [
     "Aquila",
     "Ara",
     "Aries",
+    "Ashton",
     "Auriga",
     "Boötes",
     "Barnard",
@@ -20,6 +21,7 @@ const constellationNames: string[] = [
     "Cancer",
     "Canes Venatici",
     "Canis",
+    "Carter",
     "Capricornus",
     "Cassiopeia",
     "Centaurus",
@@ -47,6 +49,7 @@ const constellationNames: string[] = [
     "Hydrus",
     "Indus",
     "Lacerta",
+    "Laval",
     "Leo",
     "Lepus",
     "Libra",
@@ -85,7 +88,8 @@ const constellationNames: string[] = [
     "Vela",
     "Virgo",
     "Volans",
-    "Vulpecula"
+    "Vulpecula",
+    "Zimmerman"
 ];
 
 const greekLetters: string[] = [

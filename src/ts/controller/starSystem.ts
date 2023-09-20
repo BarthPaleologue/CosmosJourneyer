@@ -22,7 +22,6 @@ import { StarModel } from "../model/stellarObjects/starModel";
 import { rotateAround, translate } from "./uberCore/transforms/basicTransform";
 import { MandelbulbModel } from "../model/planemos/mandelbulbModel";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
-import { uniformRandBool } from "extended-random";
 import { getMoonSeed } from "../model/planemos/common";
 
 export class StarSystem {
@@ -174,7 +173,7 @@ export class StarSystem {
 
     /**
      * Makes a star and adds it to the system. By default, it will use the next available seed planned by the system model
-     * @param seed The seed to use for the star generation (by default, the next available seed planned by the system modell)
+     * @param seed The seed to use for the star generation (by default, the next available seed planned by the system model)
      */
     public makeStellarObject(seed: number = this.model.getStarSeed(this.stellarObjects.length)): StellarObject {
         const isStellarObjectBlackHole = this.model.getBodyTypeOfStar(this.stellarObjects.length) === BODY_TYPE.BLACK_HOLE;
@@ -204,7 +203,6 @@ export class StarSystem {
      */
     public makeBlackHole(model: number | BlackHoleModel = this.model.getStarSeed(this.stellarObjects.length)): BlackHole {
         const blackHole = new BlackHole(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, this.stellarObjects, model);
-
         this.addStellarObject(blackHole);
         return blackHole;
     }
@@ -249,8 +247,8 @@ export class StarSystem {
                 case BODY_TYPE.GAS:
                     this.makeSatellites(this.makeGasPlanet());
                     break;
-                case BODY_TYPE.FRACTAL:
-                    this.makeMandelbulb();
+                case BODY_TYPE.MANDELBULB:
+                    this.makeSatellites(this.makeMandelbulb());
                     break;
                 default:
                     throw new Error(`Unknown body type ${this.model.getBodyTypeOfPlanet(this.planets.length)}`);
@@ -279,7 +277,7 @@ export class StarSystem {
      * @param planet The planet to make satellites for
      * @param n The number of satellites to make
      */
-    public makeSatellites(planet: TelluricPlanemo | GasPlanet, n = planet.model.nbMoons): void {
+    public makeSatellites(planet: Planemo, n = planet.model.nbMoons): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
         if (planet.model.childrenBodies.length + n > planet.model.nbMoons)
             console.warn(
