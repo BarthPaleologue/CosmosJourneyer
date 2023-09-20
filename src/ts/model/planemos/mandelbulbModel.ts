@@ -45,8 +45,6 @@ export class MandelbulbModel implements PlanemoModel {
         const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
         const apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
 
-        console.log(seed, apoapsis, periapsis);
-
         this.orbitalProperties = {
             periapsis: periapsis,
             apoapsis: apoapsis,
@@ -64,7 +62,7 @@ export class MandelbulbModel implements PlanemoModel {
             pressure: 0,
         };
 
-        this.nbMoons = this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);
+        this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);
     }
 
     getApparentRadius(): number {
