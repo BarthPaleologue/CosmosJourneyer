@@ -162,11 +162,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
     }
 
     public update(activeControllerPosition: Vector3, stellarObjectsPositions: Vector3[]) {
-        //this.planet.node.computeWorldMatrix(true);
-        //for (const object of this.planet.node.getChildMeshes()) object.computeWorldMatrix(true);
-
         this.setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
-
         this.setMatrix("planetInverseRotationMatrix", getInverseRotationMatrix(this.planet));
 
         this.setVector3("playerPosition", activeControllerPosition);

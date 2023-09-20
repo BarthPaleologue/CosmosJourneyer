@@ -132,6 +132,7 @@ export class StarSystem {
         this.orbitalObjects.push(satellite);
         this.celestialBodies.push(satellite);
         this.planemos.push(satellite);
+        this.planemosWithMaterial.push(satellite);
         this.satellites.push(satellite);
         return satellite;
     }
