@@ -30,6 +30,8 @@ import { BaseObject } from "../model/orbits/iOrbitalObject";
 import { PostProcessType } from "../view/postProcesses/postProcessTypes";
 import { MandelbulbPostProcess } from "../view/postProcesses/mandelbulbPostProcess";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
+import { ObjectPostProcess, UpdatablePostProcess } from "../view/postProcesses/objectPostProcess";
+import { UberPostProcess } from "./uberCore/postProcesses/uberPostProcess";
 
 const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.VOLUMETRIC_LIGHT,
@@ -72,6 +74,23 @@ export class PostProcessManager {
     private readonly mandelbulbs: MandelbulbPostProcess[] = [];
     private readonly blackHoles: BlackHolePostProcess[] = [];
     private readonly overlays: OverlayPostProcess[] = [];
+
+    private readonly objectPostProcesses: ObjectPostProcess[][] = [
+        this.oceans,
+        this.clouds,
+        this.atmospheres,
+        this.rings,
+        this.mandelbulbs,
+        this.blackHoles,
+        this.overlays,
+        this.volumetricLights
+    ];
+
+    private readonly updatablePostProcesses: UpdatablePostProcess[][] = [
+        this.starFields,
+        this.volumetricLights,
+        ...this.objectPostProcesses
+    ]
 
     readonly colorCorrection: ColorCorrection;
     readonly fxaa: FxaaPostProcess;
@@ -126,7 +145,8 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addOcean(planet: TelluricPlanemo, stellarObjects: StellarObject[]) {
-        this.oceans.push(new OceanPostProcess(`${planet.name}Ocean`, planet, this.scene, stellarObjects));
+        const ocean = new OceanPostProcess(`${planet.name}Ocean`, planet, this.scene, stellarObjects);
+        this.oceans.push(ocean);
     }
 
     /**
@@ -134,8 +154,7 @@ export class PostProcessManager {
      * @param planet A telluric planet
      */
     public getOcean(planet: TelluricPlanemo): OceanPostProcess | null {
-        for (const ocean of this.oceans) if (ocean.object === planet) return ocean;
-        return null;
+        return this.oceans.find((ocean) => ocean.object === planet) ?? null;
     }
 
     /**
@@ -144,9 +163,8 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addClouds(planet: TelluricPlanemo, stellarObjects: StellarObject[]) {
-        if (!Settings.ENABLE_VOLUMETRIC_CLOUDS)
-            this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stellarObjects));
-        else this.clouds.push(new VolumetricCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stellarObjects));
+        const clouds = !Settings.ENABLE_VOLUMETRIC_CLOUDS ? new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stellarObjects) : new VolumetricCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stellarObjects);
+        this.clouds.push(clouds);
     }
 
     /**
@@ -154,8 +172,7 @@ export class PostProcessManager {
      * @param planet A telluric planet
      */
     public getClouds(planet: TelluricPlanemo): CloudsPostProcess | null {
-        for (const clouds of this.clouds) if (clouds.object === planet) return clouds;
-        return null;
+        return this.clouds.find((clouds) => clouds.object === planet) ?? null;
     }
 
     /**
@@ -164,15 +181,14 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addAtmosphere(planet: GasPlanet | TelluricPlanemo, stellarObjects: StellarObject[]) {
-        this.atmospheres.push(
-            new AtmosphericScatteringPostProcess(
-                `${planet.name}Atmosphere`,
-                planet,
-                Settings.ATMOSPHERE_HEIGHT * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS),
-                this.scene,
-                stellarObjects
-            )
+        const atmosphere = new AtmosphericScatteringPostProcess(
+            `${planet.name}Atmosphere`,
+            planet,
+            Settings.ATMOSPHERE_HEIGHT * Math.max(1, planet.model.radius / Settings.EARTH_RADIUS),
+            this.scene,
+            stellarObjects
         );
+        this.atmospheres.push(atmosphere);
     }
 
     /**
@@ -180,8 +196,7 @@ export class PostProcessManager {
      * @param planet A gas or telluric planet
      */
     public getAtmosphere(planet: GasPlanet | TelluricPlanemo): AtmosphericScatteringPostProcess | null {
-        for (const atmosphere of this.atmospheres) if (atmosphere.object === planet) return atmosphere;
-        return null;
+        return this.atmospheres.find((atmosphere) => atmosphere.object === planet) ?? null;
     }
 
     /**
@@ -190,7 +205,8 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addRings(body: AbstractBody, stellarObjects: StellarObject[]) {
-        this.rings.push(new RingsPostProcess(body, this.scene, stellarObjects));
+        const rings = new RingsPostProcess(body, this.scene, stellarObjects);
+        this.rings.push(rings);
     }
 
     /**
@@ -198,8 +214,7 @@ export class PostProcessManager {
      * @param body A body
      */
     public getRings(body: AbstractBody): RingsPostProcess | null {
-        for (const rings of this.rings) if (rings.object === body) return rings;
-        return null;
+        return this.rings.find((rings) => rings.object === body) ?? null;
     }
 
     /**
@@ -208,18 +223,8 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes 
      */
     public addMandelbulb(body: Mandelbulb, stellarObjects: StellarObject[]) {
-        this.mandelbulbs.push(new MandelbulbPostProcess(body, this.scene, stellarObjects));
-    }
-
-    /**
-     * Returns the mandelbulb post process for the given body. Throws an error if no mandelbulb is found.
-     * @param body A body
-     * @returns
-     * @memberof PostProcessManager
-     */
-    public getMandelbulb(body: Mandelbulb): MandelbulbPostProcess | null {
-        for (const mandelbulb of this.mandelbulbs) if (mandelbulb.object === body) return mandelbulb;
-        return null;
+        const mandelbulb = new MandelbulbPostProcess(body, this.scene, stellarObjects);
+        this.mandelbulbs.push(mandelbulb);
     }
 
     /**
@@ -236,7 +241,8 @@ export class PostProcessManager {
      * @param body A body
      */
     public addOverlay(body: BaseObject) {
-        this.overlays.push(new OverlayPostProcess(body, this.scene));
+        const overlay = new OverlayPostProcess(body, this.scene);
+        this.overlays.push(overlay);
     }
 
     /**
@@ -252,8 +258,7 @@ export class PostProcessManager {
      * @param star A star
      */
     public getVolumetricLight(star: Star): VolumetricLight | null {
-        for (const volumetricLight of this.volumetricLights) if (volumetricLight.body === star) return volumetricLight;
-        return null;
+        return this.volumetricLights.find((vl) => vl.object === star) ?? null;
     }
 
     /**
@@ -261,12 +266,12 @@ export class PostProcessManager {
      * @param blackHole A black hole
      */
     public addBlackHole(blackHole: BlackHole) {
-        this.blackHoles.push(new BlackHolePostProcess(blackHole.name, blackHole, this.scene));
+        const blackhole = new BlackHolePostProcess(blackHole, this.scene);
+        this.blackHoles.push(blackhole);
     }
 
     public getBlackHole(blackHole: BlackHole): BlackHolePostProcess | null {
-        for (const bh of this.blackHoles) if (bh.object === blackHole) return bh;
-        return null;
+        return this.blackHoles.find((bh) => bh.object === blackHole) ?? null;
     }
 
     /**
@@ -339,13 +344,14 @@ export class PostProcessManager {
         this.init();
     }
 
-    public rebuild(oldCamera: Camera) {
+    public rebuild() {
         // rebuild all volumetric lights FIXME: bug of babylonjs
         for (const volumetricLight of this.volumetricLights) {
-            volumetricLight.dispose(oldCamera);
-            this.volumetricLights.splice(this.volumetricLights.indexOf(volumetricLight), 1);
+            volumetricLight.dispose();
+            const deletedLights = this.volumetricLights.splice(this.volumetricLights.indexOf(volumetricLight), 1);
+            for(const light of deletedLights) light.dispose();
 
-            const newVolumetricLight = new VolumetricLight(volumetricLight.body, this.scene);
+            const newVolumetricLight = new VolumetricLight(volumetricLight.object, this.scene);
             this.volumetricLights.push(newVolumetricLight);
         }
 
@@ -358,19 +364,7 @@ export class PostProcessManager {
     }
 
     private init() {
-        const bodyVolumetricLights: VolumetricLight[] = [];
-        const otherVolumetricLights: VolumetricLight[] = [];
-        for (const volumetricLight of this.volumetricLights) {
-            if (volumetricLight.body === this.getCurrentBody()) bodyVolumetricLights.push(volumetricLight);
-            else otherVolumetricLights.push(volumetricLight);
-        }
-        const otherVolumetricLightsRenderEffect = new PostProcessRenderEffect(this.engine, "otherVolumetricLightsRenderEffect", () => {
-            return otherVolumetricLights;
-        });
-        const bodyVolumetricLightsRenderEffect = new PostProcessRenderEffect(this.engine, "bodyVolumetricLightsRenderEffect", () => {
-            return bodyVolumetricLights;
-        });
-
+        const [otherVolumetricLightsRenderEffect, bodyVolumetricLightsRenderEffect] = makeSplitRenderEffects("VolumetricLights", this.getCurrentBody(), this.volumetricLights, this.engine);
         const [otherBlackHolesRenderEffect, bodyBlackHolesRenderEffect] = makeSplitRenderEffects("BlackHoles", this.getCurrentBody(), this.blackHoles, this.engine);
         const [otherOceansRenderEffect, bodyOceansRenderEffect] = makeSplitRenderEffects("Oceans", this.getCurrentBody(), this.oceans, this.engine);
         const [otherCloudsRenderEffect, bodyCloudsRenderEffect] = makeSplitRenderEffects("Clouds", this.getCurrentBody(), this.clouds, this.engine);
@@ -437,34 +431,19 @@ export class PostProcessManager {
         }
 
         this.currentRenderingPipeline.addEffect(this.overlayRenderEffect);
-
         this.currentRenderingPipeline.addEffect(this.fxaaRenderEffect);
-
         this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
-
         this.currentRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
         this.currentRenderingPipeline.attachToCamera(this.scene.getActiveUberCamera());
     }
 
     public update(deltaTime: number) {
-        for (const ring of this.rings) ring.update(deltaTime);
-        for (const volumetricLight of this.volumetricLights) volumetricLight.update(deltaTime);
-        for (const atmosphere of this.atmospheres) atmosphere.update(deltaTime);
-        for (const clouds of this.clouds) clouds.update(deltaTime);
-        for (const oceans of this.oceans) oceans.update(deltaTime);
-        for (const blackhole of this.blackHoles) blackhole.update(deltaTime);
-        for (const mandelbulb of this.mandelbulbs) mandelbulb.update(deltaTime);
+        for (const postProcess of this.updatablePostProcesses.flat()) postProcess.update(deltaTime);
     }
 
     public dispose() {
-        for (const ring of this.rings) ring.dispose();
-        for (const volumetricLight of this.volumetricLights) volumetricLight.dispose(this.scene.getActiveUberCamera());
-        for (const atmosphere of this.atmospheres) atmosphere.dispose();
-        for (const clouds of this.clouds) clouds.dispose();
-        for (const oceans of this.oceans) oceans.dispose();
-        for (const blackhole of this.blackHoles) blackhole.dispose();
-        for (const mandelbulb of this.mandelbulbs) mandelbulb.dispose();
+        for (const objectPostProcess of this.objectPostProcesses.flat()) objectPostProcess.dispose();
 
         this.colorCorrection.dispose();
         this.fxaa.dispose();

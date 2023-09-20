@@ -20,7 +20,7 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
     readonly settings: BlackHoleSettings;
     readonly object: BlackHole;
 
-    constructor(name: string, blackHole: BlackHole, scene: UberScene) {
+    constructor(blackHole: BlackHole, scene: UberScene) {
         const settings: BlackHoleSettings = {
             accretionDiskRadius: blackHole.model.physicalProperties.accretionDiskRadius,
             rotationPeriod: 1.5
@@ -77,7 +77,7 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             }
         ];
 
-        super(name, shaderName, uniforms, samplers, scene);
+        super(blackHole.name, shaderName, uniforms, samplers, scene);
 
         this.object = blackHole;
         this.settings = settings;

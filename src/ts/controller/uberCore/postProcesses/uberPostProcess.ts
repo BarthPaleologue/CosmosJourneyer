@@ -5,6 +5,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
+import { UpdatablePostProcess } from "../../../view/postProcesses/objectPostProcess";
 
 export enum ShaderDataType {
     Auto,
@@ -31,7 +32,7 @@ export interface ShaderData<shaderData> {
 export type ShaderUniforms = ShaderData<shaderData>[];
 export type ShaderSamplers = ShaderData<shaderData>[];
 
-export abstract class UberPostProcess extends PostProcess {
+export abstract class UberPostProcess extends PostProcess implements UpdatablePostProcess {
     protected readonly uniforms: ShaderUniforms = [];
     protected readonly samplers: ShaderSamplers = [];
 
