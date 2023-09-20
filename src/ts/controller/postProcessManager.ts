@@ -15,7 +15,7 @@ import { VolumetricLight } from "../view/postProcesses/volumetricLight";
 import { BlackHolePostProcess } from "../view/postProcesses/blackHolePostProcess";
 import { GasPlanet } from "../view/bodies/planemos/gasPlanet";
 import { ColorCorrection } from "./uberCore/postProcesses/colorCorrection";
-import { extractRelevantPostProcesses } from "../utils/extractRelevantPostProcesses";
+import { extractRelevantPostProcesses, makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess, VolumetricCloudsPostProcess } from "../view/postProcesses/volumetricCloudsPostProcess";
 import { StellarObject } from "../view/bodies/stellarObjects/stellarObject";
 import { Engine } from "@babylonjs/core/Engines/engine";
@@ -371,53 +371,12 @@ export class PostProcessManager {
             return bodyVolumetricLights;
         });
 
-        const [bodyBlackHoles, otherBlackHoles] = extractRelevantPostProcesses(this.blackHoles, this.getCurrentBody());
-        const otherBlackHolesRenderEffect = new PostProcessRenderEffect(this.engine, "otherBlackHolesRenderEffect", () => {
-            return otherBlackHoles;
-        });
-        const bodyBlackHolesRenderEffect = new PostProcessRenderEffect(this.engine, "bodyBlackHolesRenderEffect", () => {
-            return bodyBlackHoles;
-        });
-
-        const [bodyOceans, otherOceans] = extractRelevantPostProcesses(this.oceans, this.getCurrentBody());
-        const otherOceansRenderEffect = new PostProcessRenderEffect(this.engine, "otherOceansRenderEffect", () => {
-            return otherOceans;
-        });
-        const bodyOceansRenderEffect = new PostProcessRenderEffect(this.engine, "bodyOceansRenderEffect", () => {
-            return bodyOceans;
-        });
-
-        const [bodyClouds, otherClouds] = extractRelevantPostProcesses(this.clouds, this.getCurrentBody());
-        const otherCloudsRenderEffect = new PostProcessRenderEffect(this.engine, "otherCloudsRenderEffect", () => {
-            return otherClouds;
-        });
-        const bodyCloudsRenderEffect = new PostProcessRenderEffect(this.engine, "bodyCloudsRenderEffect", () => {
-            return bodyClouds;
-        });
-
-        const [bodyAtmospheres, otherAtmospheres] = extractRelevantPostProcesses(this.atmospheres, this.getCurrentBody());
-        const otherAtmospheresRenderEffect = new PostProcessRenderEffect(this.engine, "otherAtmospheresRenderEffect", () => {
-            return otherAtmospheres;
-        });
-        const bodyAtmospheresRenderEffect = new PostProcessRenderEffect(this.engine, "bodyAtmospheresRenderEffect", () => {
-            return bodyAtmospheres;
-        });
-
-        const [bodyRings, otherRings] = extractRelevantPostProcesses(this.rings, this.getCurrentBody());
-        const otherRingsRenderEffect = new PostProcessRenderEffect(this.engine, "otherRingsRenderEffect", () => {
-            return otherRings;
-        });
-        const bodyRingsRenderEffect = new PostProcessRenderEffect(this.engine, "bodyRingsHolesRenderEffect", () => {
-            return bodyRings;
-        });
-
-        const [bodyMandelbulbs, otherMandelbulbs] = extractRelevantPostProcesses(this.mandelbulbs, this.getCurrentBody());
-        const otherMandelbulbsRenderEffect = new PostProcessRenderEffect(this.engine, "otherMandelbulbsRenderEffect", () => {
-            return otherMandelbulbs;
-        });
-        const bodyMandelbulbsRenderEffect = new PostProcessRenderEffect(this.engine, "bodyMandelbulbsRenderEffect", () => {
-            return bodyMandelbulbs;
-        });
+        const [otherBlackHolesRenderEffect, bodyBlackHolesRenderEffect] = makeSplitRenderEffects("BlackHoles", this.getCurrentBody(), this.blackHoles, this.engine);
+        const [otherOceansRenderEffect, bodyOceansRenderEffect] = makeSplitRenderEffects("Oceans", this.getCurrentBody(), this.oceans, this.engine);
+        const [otherCloudsRenderEffect, bodyCloudsRenderEffect] = makeSplitRenderEffects("Clouds", this.getCurrentBody(), this.clouds, this.engine);
+        const [otherAtmospheresRenderEffect, bodyAtmospheresRenderEffect] = makeSplitRenderEffects("Atmospheres", this.getCurrentBody(), this.atmospheres, this.engine);
+        const [otherRingsRenderEffect, bodyRingsRenderEffect] = makeSplitRenderEffects("Rings", this.getCurrentBody(), this.rings, this.engine);
+        const [otherMandelbulbsRenderEffect, bodyMandelbulbsRenderEffect] = makeSplitRenderEffects("Mandelbulbs", this.getCurrentBody(), this.mandelbulbs, this.engine);
 
         this.currentRenderingPipeline.addEffect(this.starFieldRenderEffect);
 

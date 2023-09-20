@@ -34,6 +34,6 @@ export class Mandelbulb extends AbstractBody implements Planemo {
     }
 
     public override computeCulling(cameraPosition: Vector3): void {
-
+        // do nothing
     }
 }
