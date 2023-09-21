@@ -26,7 +26,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { AbstractObject } from "../view/bodies/abstractObject";
-import { BaseObject } from "../model/orbits/iOrbitalObject";
+import { BaseObject } from "../model/orbits/orbitalObject";
 import { PostProcessType } from "../view/postProcesses/postProcessTypes";
 import { MandelbulbPostProcess } from "../view/postProcesses/mandelbulbPostProcess";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";

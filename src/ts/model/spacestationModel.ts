@@ -1,33 +1,32 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BaseModel, GENERATION_STEPS, PhysicalProperties } from "./common";
-import { IOrbitalProperties } from "./orbits/iOrbitalProperties";
-import { getOrbitalPeriod } from "./orbits/kepler";
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { OrbitalProperties } from "./orbits/orbitalProperties";
+import { getOrbitalPeriod } from "./orbits/compute";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class SpaceStationModel implements BaseModel {
     readonly seed: number;
     readonly rng: (step: number) => number;
-    readonly orbitalProperties: IOrbitalProperties;
+    readonly orbitalProperties: OrbitalProperties;
     readonly physicalProperties: PhysicalProperties;
-    readonly parentBodies: BaseModel[] = [];
+    readonly parentBody: BaseModel | null;
     readonly childrenBodies: BaseModel[] = [];
 
-    constructor(seed: number, parentBodies: BaseModel[]) {
+    constructor(seed: number, parentBody?: BaseModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
-        this.parentBodies = parentBodies;
+        this.parentBody = parentBody ?? null;
         this.childrenBodies = [];
 
         //TODO: do not hardcode
-        const periapsis = 3000e3;
-        const apoapsis = 3000e3;
+        const orbitRadius = 3000e3;
 
         this.orbitalProperties = {
-            periapsis: periapsis,
-            apoapsis: apoapsis,
-            period: getOrbitalPeriod(periapsis, apoapsis, this.parentBodies),
-            orientationQuaternion: Quaternion.Identity(),
+            radius: orbitRadius,
+            p: 2,
+            period: getOrbitalPeriod(orbitRadius, this.parentBody),
+            normalToPlane: Vector3.Up(),
             isPlaneAlignedWithParent: false
         };
 

@@ -18,14 +18,14 @@ export class SpaceStation extends AbstractObject {
 
     readonly ringInstances: InstancedMesh[] = [];
 
-    constructor(parentBodies: AbstractObject[], scene: Scene) {
-        super("spaceStation", parentBodies, scene);
+    constructor(scene: Scene, parentBody?: AbstractObject) {
+        super("spaceStation", scene, parentBody);
         //TODO: do not hardcode seed
         const seed = 1;
 
         this.model = new SpaceStationModel(
             seed,
-            parentBodies.map((body) => body.model)
+            parentBody?.model
         );
 
         this.instance = Assets.CreateSpaceStationInstance();

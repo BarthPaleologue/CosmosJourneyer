@@ -1,8 +1,8 @@
 import { Vector3, Quaternion, Matrix } from "@babylonjs/core/Maths/math";
-import { BaseObject, IOrbitalObject } from "../../model/orbits/iOrbitalObject";
+import { BaseObject, OrbitalObject } from "../../model/orbits/orbitalObject";
 import { BaseModel } from "../../model/common";
 import { Scene } from "@babylonjs/core/scene";
-import { computeBarycenter, computePointOnOrbit } from "../../model/orbits/kepler";
+import { getPointOnOrbit } from "../../model/orbits/compute";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Cullable } from "./cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -13,7 +13,7 @@ export interface NextState {
     rotation: Quaternion;
 }
 
-export abstract class AbstractObject implements IOrbitalObject, BaseObject, Cullable {
+export abstract class AbstractObject implements OrbitalObject, BaseObject, Cullable {
     readonly transform: TransformNode;
 
     readonly nextState: NextState = {
@@ -33,30 +33,20 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject, Cull
 
     abstract readonly model: BaseModel;
 
-    readonly parentObjects: IOrbitalObject[];
-
-    depth: number;
+    readonly parentObject: OrbitalObject | null;
 
     /**
      * An abstract representation of a celestial body
      * @param name the name of the celestial body
-     * @param parentObjects the parent objects of this object
+     * @param parentObject the parent object of this object
      * @param scene
      */
-    protected constructor(name: string, parentObjects: AbstractObject[], scene: Scene) {
+    protected constructor(name: string, scene: Scene, parentObject?: OrbitalObject) {
         this.name = name;
 
-        this.parentObjects = parentObjects;
+        this.parentObject = parentObject ?? null;
 
         this.transform = new TransformNode(name, scene);
-
-        let minDepth = -1;
-        for (const parentBody of parentObjects) {
-            if (minDepth === -1) minDepth = parentBody.depth;
-            else minDepth = Math.min(minDepth, parentBody.depth);
-        }
-        if (minDepth === -1) this.depth = 0;
-        else this.depth = minDepth + 1;
     }
 
     public abstract getBoundingRadius(): number;
@@ -94,10 +84,13 @@ export abstract class AbstractObject implements IOrbitalObject, BaseObject, Cull
 
     public computeNextOrbitalPosition(): Vector3 {
         if (this.model.orbitalProperties.period > 0) {
-            const [barycenter, orientationQuaternion] = computeBarycenter(this, this.parentObjects);
-            if (this.model.orbitalProperties.isPlaneAlignedWithParent) this.model.orbitalProperties.orientationQuaternion = orientationQuaternion;
+            
+            const barycenter = this.parentObject?.transform.getAbsolutePosition() ?? Vector3.Zero();
+            const orbitalPlaneNormal = this.parentObject?.transform.up ?? Vector3.Up();
 
-            const newPosition = computePointOnOrbit(barycenter, this.model.orbitalProperties, this.internalClock);
+            if (this.model.orbitalProperties.isPlaneAlignedWithParent) this.model.orbitalProperties.normalToPlane = orbitalPlaneNormal;
+
+            const newPosition = getPointOnOrbit(barycenter, this.model.orbitalProperties, this.internalClock);
             this.nextState.position.copyFrom(newPosition);
         } else {
             this.nextState.position.copyFrom(this.transform.getAbsolutePosition());

@@ -12,8 +12,8 @@ export class BlackHole extends AbstractBody {
 
     readonly model: BlackHoleModel;
 
-    constructor(name: string, scene: Scene, parentBodies: AbstractBody[], model: BlackHoleModel | number) {
-        super(name, parentBodies, scene);
+    constructor(name: string, scene: Scene, model: BlackHoleModel | number, parentBody?: AbstractBody) {
+        super(name, scene, parentBody);
 
         this.model = model instanceof BlackHoleModel ? model : new BlackHoleModel(model);
 

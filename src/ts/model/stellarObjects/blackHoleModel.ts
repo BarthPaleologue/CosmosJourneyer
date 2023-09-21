@@ -1,8 +1,8 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BodyModel, BODY_TYPE, StellarObjectModel, BlackHolePhysicalProperties, GENERATION_STEPS } from "../common";
-import { getOrbitalPeriod } from "../orbits/kepler";
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
-import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
+import { getOrbitalPeriod } from "../orbits/compute";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { OrbitalProperties } from "../orbits/orbitalProperties";
 import { normalRandom } from "extended-random";
 import { STELLAR_TYPE } from "./common";
 
@@ -15,29 +15,30 @@ export class BlackHoleModel implements StellarObjectModel {
 
     readonly stellarType = STELLAR_TYPE.BLACK_HOLE;
 
-    readonly orbitalProperties: IOrbitalProperties;
+    readonly orbitalProperties: OrbitalProperties;
 
     readonly physicalProperties: BlackHolePhysicalProperties;
 
-    readonly parentBodies: BodyModel[] = [];
+    readonly parentBody: BodyModel | null;
 
     readonly childrenBodies: BodyModel[] = [];
 
-    constructor(seed: number) {
+    constructor(seed: number, parentBody?: BodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
         this.radius = 1000e3;
 
+        this.parentBody = parentBody ?? null;
+
         // TODO: do not hardcode
-        const periapsis = 0;
-        const apoapsis = 0;
+        const orbitRadius = this.parentBody === null ? 0 : 2 * (this.parentBody.radius + this.radius)
 
         this.orbitalProperties = {
-            periapsis: periapsis,
-            apoapsis: apoapsis,
-            period: getOrbitalPeriod(periapsis, apoapsis, []),
-            orientationQuaternion: Quaternion.Identity(),
+            radius: orbitRadius,
+            p: 2,
+            period: getOrbitalPeriod(orbitRadius, this.parentBody),
+            normalToPlane: Vector3.Up(),
             isPlaneAlignedWithParent: true
         };
 

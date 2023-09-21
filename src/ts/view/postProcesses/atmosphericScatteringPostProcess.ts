@@ -9,7 +9,7 @@ import { centeredRand } from "extended-random";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { GasPlanet } from "../bodies/planemos/gasPlanet";
 import { ObjectPostProcess } from "./objectPostProcess";
-import { IOrbitalObject } from "../../model/orbits/iOrbitalObject";
+import { OrbitalObject } from "../../model/orbits/orbitalObject";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
@@ -31,7 +31,7 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
     readonly settings: AtmosphereSettings;
     readonly object: TelluricPlanemo | GasPlanet;
 
-    constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: IOrbitalObject[]) {
+    constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: OrbitalObject[]) {
         const settings: AtmosphereSettings = {
             atmosphereRadius: planet.getBoundingRadius() + atmosphereHeight,
             falloffFactor: 10,

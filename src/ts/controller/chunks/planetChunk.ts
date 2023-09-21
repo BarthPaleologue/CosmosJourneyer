@@ -3,7 +3,7 @@ import { getChunkPlaneSpacePositionFromPath } from "../../utils/chunkUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Material } from "@babylonjs/core/Materials/material";
-import { ITransformable } from "../../model/orbits/iOrbitalObject";
+import { ITransformable } from "../../model/orbits/orbitalObject";
 import { Scene } from "@babylonjs/core/scene";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import "@babylonjs/core/Engines/Extensions/engine.query";

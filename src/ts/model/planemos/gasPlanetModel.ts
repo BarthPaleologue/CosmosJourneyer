@@ -2,9 +2,10 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, PlanetPhysicalProperties } from "../common";
-import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
-import { getOrbitalPeriod } from "../orbits/kepler";
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { OrbitalProperties } from "../orbits/orbitalProperties";
+import { getOrbitalPeriod, getPeriapsis } from "../orbits/compute";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { clamp } from "../../utils/math";
 
 export class GasPlanetModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.GAS;
@@ -13,7 +14,7 @@ export class GasPlanetModel implements PlanemoModel {
 
     readonly radius: number;
 
-    readonly orbitalProperties: IOrbitalProperties;
+    readonly orbitalProperties: OrbitalProperties;
 
     readonly physicalProperties: PlanetPhysicalProperties;
 
@@ -21,28 +22,30 @@ export class GasPlanetModel implements PlanemoModel {
 
     readonly nbMoons: number;
 
-    readonly parentBodies: BodyModel[];
+    readonly parentBody: BodyModel | null;
 
     readonly childrenBodies: BodyModel[] = [];
 
-    constructor(seed: number, parentBodies: BodyModel[]) {
+    constructor(seed: number, parentBody?: BodyModel) {
         this.seed = seed;
 
         this.rng = seededSquirrelNoise(this.seed);
 
-        this.parentBodies = parentBodies;
+        this.parentBody = parentBody ?? null;
 
         this.radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, this.rng, GENERATION_STEPS.RADIUS);
 
         // TODO: do not hardcode
-        const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
-        const apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
+        let orbitRadius = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
+
+        const orbitalP = clamp(0.7, 3.0, normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80));
+        orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
 
         this.orbitalProperties = {
-            periapsis: periapsis,
-            apoapsis: apoapsis,
-            period: getOrbitalPeriod(periapsis, apoapsis, parentBodies),
-            orientationQuaternion: Quaternion.Identity(),
+            radius: orbitRadius,
+            p: orbitalP,
+            period: getOrbitalPeriod(orbitRadius, this.parentBody),
+            normalToPlane: Vector3.Up(),
             isPlaneAlignedWithParent: true
         };
 

@@ -43,11 +43,13 @@ const constellationNames: string[] = [
     "Fornax",
     "Gemini",
     "Grus",
+    "Hades",
     "Hercules",
     "Horologium",
     "Hydra",
     "Hydrus",
     "Indus",
+    "Kozuch",
     "Lacerta",
     "Laval",
     "Leo",
@@ -89,6 +91,7 @@ const constellationNames: string[] = [
     "Virgo",
     "Volans",
     "Vulpecula",
+    "Weierstrass",
     "Zimmerman"
 ];
 
@@ -149,6 +152,5 @@ export function romanNumeral(n: number): string {
 export function generateName(rng: (step: number) => number, baseStep = 0): string {
     const constellation = constellationNames[Math.floor(rng(baseStep) * constellationNames.length)];
     const greekLetter = greekLetters[Math.floor(rng(baseStep + 1) * greekLetters.length)];
-    const number = Math.floor(rng(2) * 1000);
-    return `${constellation} ${greekLetter} ${number}`;
+    return `${constellation} ${greekLetter}`;
 }

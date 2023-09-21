@@ -88,8 +88,8 @@ capsule.material = Assets.DebugMaterial("capsule", true);
 capsule.visibility = 0.5;
 shadowGenerator.addShadowCaster(capsule);
 
-const newtonModel = new TelluricPlanemoModel(152, []);
-const newton = new TelluricPlanemo("newton", scene, [], newtonModel);
+const newtonModel = new TelluricPlanemoModel(152);
+const newton = new TelluricPlanemo("newton", scene, newtonModel);
 newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
 newton.updateLOD(camera.globalPosition);
 

@@ -1,6 +1,6 @@
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../../controller/uberCore/postProcesses/uberPostProcess";
-import { BaseObject, IOrbitalObject } from "../../model/orbits/iOrbitalObject";
+import { BaseObject, OrbitalObject } from "../../model/orbits/orbitalObject";
 
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     return [
@@ -56,7 +56,7 @@ export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     ];
 }
 
-export function getStellarObjectsUniforms(stars: IOrbitalObject[]): ShaderUniforms {
+export function getStellarObjectsUniforms(stars: OrbitalObject[]): ShaderUniforms {
     return [
         {
             name: "starPositions",

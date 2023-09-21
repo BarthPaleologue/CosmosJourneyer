@@ -323,7 +323,7 @@ export class StarMap {
             const starSeed = starSystemModel.getStarSeed(0);
             const isStarBlackHole = starSystemModel.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE;
 
-            const starModel = !isStarBlackHole ? new StarModel(starSeed, []) : new BlackHoleModel(starSeed);
+            const starModel = !isStarBlackHole ? new StarModel(starSeed) : new BlackHoleModel(starSeed);
 
             let instance: InstancedMesh | null = null;
             let recycled = false;

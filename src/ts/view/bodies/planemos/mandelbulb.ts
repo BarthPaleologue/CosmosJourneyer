@@ -14,18 +14,18 @@ export class Mandelbulb extends AbstractBody implements Planemo {
      * New Gas Planet
      * @param name The name of the planet
      * @param scene
-     * @param parentBodies The bodies the planet is orbiting
+     * @param parentBody The bodies the planet is orbiting
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, parentBodies: AbstractBody[], model: MandelbulbModel | number) {
-        super(name, parentBodies, scene);
+    constructor(name: string, scene: UberScene, model: MandelbulbModel | number, parentBody?: AbstractBody) {
+        super(name, scene, parentBody);
 
         this.model =
             model instanceof MandelbulbModel
                 ? model
                 : new MandelbulbModel(
                       model,
-                      parentBodies.map((body) => body.model)
+                      parentBody?.model
                   );
 
         this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.MANDELBULB);

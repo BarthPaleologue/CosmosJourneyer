@@ -5,8 +5,8 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
 import { BodyModel, BODY_TYPE, StellarObjectModel, StarPhysicalProperties, GENERATION_STEPS } from "../common";
-import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
-import { getOrbitalPeriod } from "../orbits/kepler";
+import { OrbitalProperties } from "../orbits/orbitalProperties";
+import { getOrbitalPeriod } from "../orbits/compute";
 import { STELLAR_TYPE } from "./common";
 
 export class StarModel implements StellarObjectModel {
@@ -24,25 +24,25 @@ export class StarModel implements StellarObjectModel {
     readonly mass = 1000;
     readonly rotationPeriod = 24 * 60 * 60;
 
-    readonly orbitalProperties: IOrbitalProperties;
+    readonly orbitalProperties: OrbitalProperties;
 
     readonly physicalProperties: StarPhysicalProperties;
 
     static RING_PROPORTION = 0.2;
     readonly hasRings: boolean;
 
-    readonly parentBodies: BodyModel[];
+    readonly parentBody: BodyModel | null;
 
     readonly childrenBodies: BodyModel[] = [];
 
-    constructor(seed: number, parentBodies: BodyModel[]) {
+    constructor(seed: number, parentBody?: BodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
         this.name = "Star";
         this.surfaceTemperature = clamp(normalRandom(5778, 2000, this.rng, GENERATION_STEPS.TEMPERATURE), 3000, 10000);
 
-        this.parentBodies = parentBodies;
+        this.parentBody = parentBody ?? null;
 
         this.physicalProperties = {
             mass: this.mass,
@@ -65,14 +65,13 @@ export class StarModel implements StellarObjectModel {
         this.radius = randRange(50, 200, this.rng, GENERATION_STEPS.RADIUS) * Settings.EARTH_RADIUS;
 
         // TODO: do not hardcode
-        const periapsis = this.rng(GENERATION_STEPS.ORBIT) * 5000000e3;
-        const apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
+        const orbitRadius = this.rng(GENERATION_STEPS.ORBIT) * 5000000e3;
 
         this.orbitalProperties = {
-            periapsis: periapsis,
-            apoapsis: apoapsis,
-            period: getOrbitalPeriod(periapsis, apoapsis, []),
-            orientationQuaternion: Quaternion.Identity(),
+            radius: orbitRadius,
+            p: 2,
+            period: getOrbitalPeriod(orbitRadius, this.parentBody),
+            normalToPlane: Vector3.Up(),
             isPlaneAlignedWithParent: true
         };
 

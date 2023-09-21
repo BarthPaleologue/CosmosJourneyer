@@ -1,12 +1,12 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { centeredRand, normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, SolidPhysicalProperties } from "../common";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
-import { IOrbitalProperties } from "../orbits/iOrbitalProperties";
-import { getOrbitalPeriod } from "../orbits/kepler";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { OrbitalProperties } from "../orbits/orbitalProperties";
+import { getOrbitalPeriod, getPeriapsis } from "../orbits/compute";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class TelluricPlanemoModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.TELLURIC;
@@ -15,7 +15,7 @@ export class TelluricPlanemoModel implements PlanemoModel {
 
     readonly radius: number;
 
-    readonly orbitalProperties: IOrbitalProperties;
+    readonly orbitalProperties: OrbitalProperties;
 
     readonly physicalProperties: SolidPhysicalProperties;
 
@@ -29,19 +29,17 @@ export class TelluricPlanemoModel implements PlanemoModel {
     private isSatelliteOfTelluric = false;
     private isSatelliteOfGas = false;
 
-    readonly parentBodies: BodyModel[];
+    readonly parentBody: BodyModel | null;
     readonly childrenBodies: BodyModel[] = [];
 
-    constructor(seed: number, parentBodies: BodyModel[]) {
+    constructor(seed: number, parentBody?: BodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
-        this.parentBodies = parentBodies;
+        this.parentBody = parentBody ?? null;
 
-        for (const parentBody of parentBodies) {
-            if (parentBody.bodyType === BODY_TYPE.TELLURIC) this.isSatelliteOfTelluric = true;
-            if (parentBody.bodyType === BODY_TYPE.GAS) this.isSatelliteOfGas = true;
-        }
+        if (this.parentBody?.bodyType === BODY_TYPE.TELLURIC) this.isSatelliteOfTelluric = true;
+        if (this.parentBody?.bodyType === BODY_TYPE.GAS) this.isSatelliteOfGas = true;
 
         if (this.isSatelliteOfTelluric) {
             this.radius = Math.max(0.03, normalRandom(0.06, 0.03, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
@@ -51,28 +49,30 @@ export class TelluricPlanemoModel implements PlanemoModel {
             this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
         }
 
-        // TODO: do not hardcode
-        let periapsis = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
-        let apoapsis = periapsis * (1 + this.rng(GENERATION_STEPS.ORBIT + 10) / 10);
-
-        const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.3, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
-        const orbitalQuaternion = isOrbitalPlaneAlignedWithParent
-            ? Quaternion.Identity()
-            : Quaternion.RotationAxis(Vector3.Random().normalize(), this.rng(GENERATION_STEPS.ORBIT + 20));
-
         const mass = this.isSatelliteOfTelluric ? 1 : 10;
 
+        const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.1, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
+        const orbitalPlaneNormal = isOrbitalPlaneAlignedWithParent
+            ? Vector3.Up()
+            : new Vector3(this.rng(GENERATION_STEPS.ORBIT + 20), this.rng(GENERATION_STEPS.ORBIT + 30), this.rng(GENERATION_STEPS.ORBIT + 40)).normalize();
+
+        // TODO: do not hardcode
+        let orbitRadius = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
+
+        const orbitalP = clamp(normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80), 0.7, 3.0);
+
         if (this.isSatelliteOfGas || this.isSatelliteOfTelluric) {
-            const maxRadius = this.parentBodies.map((b) => b.radius).reduce((a, b) => Math.max(a, b), 0);
-            periapsis = maxRadius + clamp(normalRandom(2, 1, this.rng, GENERATION_STEPS.ORBIT), 0, 20) * this.radius * 2;
-            apoapsis = periapsis * clamp(normalRandom(1, 0.05, this.rng, GENERATION_STEPS.ORBIT + 10), 1, 1.5);
+            const minRadius = this.parentBody?.radius ?? 0;
+            orbitRadius = minRadius * clamp(normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT), 1.2, 3.0);
+            orbitRadius += this.radius * clamp(normalRandom(2, 1, this.rng, GENERATION_STEPS.ORBIT), 1, 20);
+            orbitRadius += 2.0 * Math.max(0, minRadius - getPeriapsis(orbitRadius, orbitalP));
         }
 
         this.orbitalProperties = {
-            periapsis: periapsis,
-            apoapsis: apoapsis,
-            period: getOrbitalPeriod(periapsis, apoapsis, this.parentBodies),
-            orientationQuaternion: orbitalQuaternion,
+            radius: orbitRadius,
+            p: orbitalP,
+            period: getOrbitalPeriod(orbitRadius, this.parentBody),
+            normalToPlane: orbitalPlaneNormal,
             isPlaneAlignedWithParent: isOrbitalPlaneAlignedWithParent
         };
 

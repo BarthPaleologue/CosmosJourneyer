@@ -182,7 +182,7 @@ export class StarSystem {
     }
 
     public makeStar(model: number | StarModel = this.model.getStarSeed(this.stellarObjects.length)): Star {
-        const star = new Star(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, [], model);
+        const star = new Star(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, model);
         this.addStellarObject(star);
         return star;
     }
@@ -192,7 +192,7 @@ export class StarSystem {
             console.warn(`You are adding a mandelbulb to the system.
             The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
             This might cause issues, or not who knows.`);
-        const mandelbulb = new Mandelbulb(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, this.stellarObjects, model);
+        const mandelbulb = new Mandelbulb(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, model, this.stellarObjects[0]);
         this.addMandelbulb(mandelbulb);
         return mandelbulb;
     }
@@ -202,7 +202,7 @@ export class StarSystem {
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
     public makeBlackHole(model: number | BlackHoleModel = this.model.getStarSeed(this.stellarObjects.length)): BlackHole {
-        const blackHole = new BlackHole(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, this.stellarObjects, model);
+        const blackHole = new BlackHole(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, model, this.stellarObjects[0]);
         this.addStellarObject(blackHole);
         return blackHole;
     }
@@ -221,7 +221,7 @@ export class StarSystem {
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
     public makeTelluricPlanet(model: number | TelluricPlanemoModel = this.model.getPlanetSeed(this.planets.length)): TelluricPlanemo {
-        const planet = new TelluricPlanemo(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, this.stellarObjects, model);
+        const planet = new TelluricPlanemo(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, model, this.stellarObjects[0]);
         this.addTelluricPlanet(planet);
         return planet;
     }
@@ -231,7 +231,7 @@ export class StarSystem {
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
     public makeGasPlanet(model: number | GasPlanetModel = this.model.getPlanetSeed(this.planets.length)): GasPlanet {
-        const planet = new GasPlanet(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, this.stellarObjects, model);
+        const planet = new GasPlanet(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, model, this.stellarObjects[0]);
         this.addGasPlanet(planet);
         return planet;
     }
@@ -260,7 +260,7 @@ export class StarSystem {
         planet: Planemo,
         model: TelluricPlanemoModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)
     ): TelluricPlanemo {
-        const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, this.scene, [planet], model);
+        const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, this.scene, model, planet);
 
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
         satellite.material.updateConstants();
@@ -320,12 +320,12 @@ export class StarSystem {
     public getNearestBody(position = Vector3.Zero()): AbstractBody {
         if (this.celestialBodies.length === 0) throw new Error("There are no bodies in the solar system");
         let nearest = null;
-        let smallerDistance2 = -1;
+        let smallerDistance = -1;
         for (const body of this.celestialBodies) {
-            const distance2 = body.transform.getAbsolutePosition().subtract(position).lengthSquared();
-            if (nearest === null || distance2 < smallerDistance2) {
+            const distance = body.transform.getAbsolutePosition().subtract(position).length() - body.model.radius;
+            if (nearest === null || distance < smallerDistance) {
                 nearest = body;
-                smallerDistance2 = distance2;
+                smallerDistance = distance;
             }
         }
         if (nearest === null) throw new Error("There are no bodies in the solar system");

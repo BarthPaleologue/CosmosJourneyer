@@ -19,13 +19,8 @@ export interface BaseObject extends BoundingSphere {
     postProcesses: PostProcessType[];
 }
 
-export interface IOrbitalObject extends ITransformable {
-    /**
-     * The depth of the body in the orbital tree
-     */
-    depth: number;
-
-    parentObjects: IOrbitalObject[];
+export interface OrbitalObject extends ITransformable {
+    parentObject: OrbitalObject | null;
 
     model: BaseModel;
 

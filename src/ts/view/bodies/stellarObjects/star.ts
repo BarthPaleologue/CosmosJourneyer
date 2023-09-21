@@ -24,18 +24,18 @@ export class Star extends AbstractBody {
      * New Star
      * @param name The name of the star
      * @param scene
-     * @param parentBodies The bodies the star is orbiting
+     * @param parentBody The bodies the star is orbiting
      * @param model The seed of the star in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, parentBodies: AbstractBody[], model: StarModel | number) {
-        super(name, parentBodies, scene);
+    constructor(name: string, scene: UberScene, model: StarModel | number, parentBody?: AbstractBody) {
+        super(name, scene, parentBody);
 
         this.model =
             model instanceof StarModel
                 ? model
                 : new StarModel(
                       model,
-                      parentBodies.map((body) => body.model)
+                      parentBody?.model
                   );
 
         this.mesh =

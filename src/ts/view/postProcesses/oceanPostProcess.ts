@@ -7,7 +7,7 @@ import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from 
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
-import { IOrbitalObject } from "../../model/orbits/iOrbitalObject";
+import { OrbitalObject } from "../../model/orbits/orbitalObject";
 import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
 
 const shaderName = "ocean";
@@ -26,7 +26,7 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
     readonly settings: OceanSettings;
     readonly object: TelluricPlanemo;
 
-    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: IOrbitalObject[]) {
+    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: OrbitalObject[]) {
         const settings: OceanSettings = {
             oceanRadius: planet.getBoundingRadius(),
             depthModifier: 0.001,

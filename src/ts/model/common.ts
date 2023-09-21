@@ -1,9 +1,10 @@
-import { IOrbitalProperties } from "./orbits/iOrbitalProperties";
+import { OrbitalProperties } from "./orbits/orbitalProperties";
 import { STELLAR_TYPE } from "./stellarObjects/common";
 
 export enum GENERATION_STEPS {
     AXIAL_TILT = 100,
     ORBIT = 200,
+    ORBITAL_PERIOD = 500,
     RADIUS = 1000,
     ORBITAL_PLANE_ALIGNEMENT = 1600,
 
@@ -59,10 +60,10 @@ export interface BaseModel {
     rng: (step: number) => number;
     seed: number;
 
-    orbitalProperties: IOrbitalProperties;
+    orbitalProperties: OrbitalProperties;
     physicalProperties: PhysicalProperties;
 
-    readonly parentBodies: BaseModel[];
+    readonly parentBody: BaseModel | null;
     readonly childrenBodies: BaseModel[];
 }
 
@@ -85,6 +86,6 @@ export interface PlanemoModel extends BodyModel {
 }
 
 export function depth(model: BaseModel): number {
-    if (model.parentBodies.length === 0) return 0;
-    return depth(model.parentBodies[0]) + 1;
+    if (model.parentBody === null) return 0;
+    return depth(model.parentBody) + 1;
 }
