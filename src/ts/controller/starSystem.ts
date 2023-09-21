@@ -182,7 +182,7 @@ export class StarSystem {
     }
 
     public makeStar(model: number | StarModel = this.model.getStarSeed(this.stellarObjects.length)): Star {
-        const star = new Star(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, model);
+        const star = new Star(`${this.model.getName()} ${this.stellarObjects.length + 1}`, this.scene, model, this.stellarObjects[0]);
         this.addStellarObject(star);
         return star;
     }
@@ -202,7 +202,7 @@ export class StarSystem {
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
     public makeBlackHole(model: number | BlackHoleModel = this.model.getStarSeed(this.stellarObjects.length)): BlackHole {
-        const blackHole = new BlackHole(`${this.model.getName()} ${this.stellarObjects.length}`, this.scene, model, this.stellarObjects[0]);
+        const blackHole = new BlackHole(`${this.model.getName()} ${this.stellarObjects.length + 1}`, this.scene, model, this.stellarObjects[0]);
         this.addStellarObject(blackHole);
         return blackHole;
     }

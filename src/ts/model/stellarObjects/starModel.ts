@@ -1,7 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { clamp } from "terrain-generation";
 import { normalRandom, randRange, uniformRandBool } from "extended-random";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
 import { BodyModel, BODY_TYPE, StellarObjectModel, StarPhysicalProperties, GENERATION_STEPS } from "../common";
@@ -13,8 +13,6 @@ export class StarModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.STAR;
     readonly rng: (step: number) => number;
     readonly seed: number;
-
-    readonly name: string;
 
     readonly surfaceTemperature: number;
     readonly surfaceColor: Vector3;
@@ -39,7 +37,6 @@ export class StarModel implements StellarObjectModel {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
-        this.name = "Star";
         this.surfaceTemperature = clamp(normalRandom(5778, 2000, this.rng, GENERATION_STEPS.TEMPERATURE), 3000, 10000);
 
         this.parentBody = parentBody ?? null;

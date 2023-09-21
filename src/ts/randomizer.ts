@@ -58,6 +58,14 @@ engine.registerStarSystemUpdateCallback(() => {
     (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 });
 
+engine.getStarMap().onWarpObservable.add(() => {
+    spaceshipController.thirdPersonCamera.setRadius(30);
+})
+
+engine.onToggleStarMapObservable.add((isStarMapOpen) => {
+    if(!isStarMapOpen) spaceshipController.thirdPersonCamera.setRadius(30);
+});
+
 //check if url contains a seed
 const urlParams = new URLSearchParams(window.location.search);
 const seed = urlParams.get("seed");

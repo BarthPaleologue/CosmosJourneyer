@@ -11,7 +11,7 @@ import { Assets } from "./controller/assets";
 import { PlayerController } from "./spacelegs/playerController";
 import { positionNearObject } from "./utils/positionNearObject";
 import { SpaceEngine } from "./controller/spaceEngine";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ShipController } from "./spaceship/shipController";
 import { SpaceStation } from "./view/spacestation/spaceStation";
@@ -78,7 +78,7 @@ engine.registerStarSystemUpdateCallback(() => {
     (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 });
 
-engine.getStarMap().registerWarpCallback(() => {
+engine.getStarMap().onWarpObservable.add(() => {
     spaceshipController.thirdPersonCamera.setRadius(30);
 })
 
@@ -95,6 +95,11 @@ engine.setStarSystem(starSystem, false);
 const sunModel = new StarModel(0.51);
 const sun = starSystem.makeStar(sunModel);
 sun.model.orbitalProperties.period = 60 * 60 * 24;
+
+/*const secundaModel = new StarModel(-672446, sunModel);
+secundaModel.orbitalProperties.radius = 4 * sunModel.radius;
+secundaModel.orbitalProperties.period = 60 * 60 * 24 * 365.25;
+const secunda = starSystem.makeStar(secundaModel);*/
 
 const planetModel = new TelluricPlanemoModel(0.4233609183800225, sunModel);
 planetModel.physicalProperties.minTemperature = -37;
@@ -173,7 +178,7 @@ const mandelbulb = starSystem.makeMandelbulb(mandelbulbModel);
 
 engine.init();
 
-positionNearObject(scene.getActiveController(), mandelbulb, starSystem, 2);
+positionNearObject(scene.getActiveController(), planet, starSystem, 2);
 
 const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
 if (aresAtmosphere) {

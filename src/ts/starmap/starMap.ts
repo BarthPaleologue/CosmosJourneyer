@@ -33,6 +33,7 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { Settings } from "../settings";
 import { getForwardDirection, translate } from "../controller/uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class StarMap {
     readonly scene: Scene;
@@ -74,7 +75,7 @@ export class StarMap {
     private travelLine: ThickLines;
     private readonly thickLines: ThickLines[];
 
-    private warpCallbacks: ((seed: number) => void)[] = [];
+    public readonly onWarpObservable: Observable<number> = new Observable<number>();
 
     /**
      * The position of the cell the player is currently in (relative to the global node).
@@ -250,13 +251,9 @@ export class StarMap {
         });
     }
 
-    public registerWarpCallback(callback: (seed: number) => void) {
-        this.warpCallbacks.push(callback);
-    }
-
     public dispatchWarpCallbacks() {
         if (this.selectedSystemSeed === null) throw new Error("No system selected!");
-        for (const callback of this.warpCallbacks) callback(this.selectedSystemSeed);
+        this.onWarpObservable.notifyObservers(this.selectedSystemSeed);
     }
 
     /**
