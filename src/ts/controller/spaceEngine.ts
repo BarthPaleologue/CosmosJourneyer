@@ -4,10 +4,8 @@ import { Assets } from "./assets";
 import { AbstractController } from "./uberCore/abstractController";
 import { UberScene } from "./uberCore/uberScene";
 import { StarSystem } from "./starSystem";
-import { TelluricPlanemo } from "../view/bodies/planemos/telluricPlanemo";
 import { Settings } from "../settings";
 import { OverlayPostProcess } from "../view/postProcesses/overlayPostProcess";
-import { isOrbiting } from "../utils/nearestBody";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
@@ -31,6 +29,7 @@ import { setMaxLinVel } from "../utils/havok";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+import { OrbitRenderer } from "../view/orbitRenderer";
 
 enum EngineState {
     RUNNING,
@@ -48,6 +47,8 @@ export class SpaceEngine {
     // BabylonJS
     private engine: Engine | null = null;
     private starSystemScene: UberScene | null = null;
+
+    private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer();
 
     private havokPlugin: HavokPlugin | null = null;
 
@@ -87,7 +88,10 @@ export class SpaceEngine {
 
         //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
-            if (e.key === "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
+            if (e.key === "o") {
+                OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
+                this.orbitRenderer.setVisibility(OverlayPostProcess.ARE_ENABLED);
+            }
             if (e.key === "p") Tools.CreateScreenshot(this.getEngine(), this.getStarSystemScene().getActiveController().getActiveCamera(), { precision: 4 });
             if (e.key === "v") {
                 if (!VideoRecorder.IsSupported(this.getEngine())) console.warn("Your browser does not support video recording!");
@@ -176,9 +180,13 @@ export class SpaceEngine {
             this.init();
             const firstBody = this.getStarSystem().getBodies()[0];
             if (firstBody === undefined) throw new Error("No bodies in star system");
+
+            this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getBodies());
+            
             const activeController = this.getStarSystemScene().getActiveController();
             positionNearObject(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
             if (activeController instanceof ShipController) activeController.enableWarpDrive();
+
             this.toggleStarMap();
         });
 
@@ -215,6 +223,8 @@ export class SpaceEngine {
 
             this.bodyEditor.update(nearestBody, starSystem.postProcessManager, starSystemScene);
             this.helmetOverlay.update(nearestBody);
+
+            this.orbitRenderer.update();
 
             //FIXME: should address stars orbits
             for (const star of starSystem.stellarObjects) star.model.orbit.period = 0;

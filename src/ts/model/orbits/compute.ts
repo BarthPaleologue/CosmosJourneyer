@@ -3,14 +3,13 @@ import { OrbitalProperties } from "./orbitalProperties";
 import { BaseModel } from "../common";
 
 /**
- * Returns the point on the orbit of the body at time t. The orbit are circular for the p-norm.
- * @param centerOfMass 
+ * 
  * @param settings 
  * @param t 
  * @returns 
  * @see https://medium.com/@barth_29567/crazy-orbits-lets-make-squares-c91a427c6b26
  */
-export function getPointOnOrbit(centerOfMass: Vector3, settings: OrbitalProperties, t: number): Vector3 {
+export function getPointOnOrbitLocal(settings: OrbitalProperties, t: number): Vector3 {
     const theta = -(2 * Math.PI * t) / settings.period;
     const cosTheta = Math.cos(theta);
     const sinTheta = Math.sin(theta);
@@ -20,13 +19,22 @@ export function getPointOnOrbit(centerOfMass: Vector3, settings: OrbitalProperti
     const relativePosition = new Vector3(cosTheta, 0, sinTheta).scaleInPlace(settings.radius * LpFactor);
 
     // rotate orbital plane
-    const rotationAxis = Vector3.Cross(Vector3.Up(), settings.normalToPlane);
-    const angle = Math.asin(rotationAxis.length());
-    const rotationMatrix = Matrix.RotationAxis(rotationAxis.normalize(), angle);
+    const rotationAxis = Vector3.Cross(Vector3.Up(), settings.normalToPlane).normalize();
+    const angle = Vector3.GetAngleBetweenVectors(Vector3.Up(), settings.normalToPlane, rotationAxis);
+    const rotationMatrix = Matrix.RotationAxis(rotationAxis, angle);
 
-    const rotatedPosition = Vector3.TransformCoordinates(relativePosition, rotationMatrix);
+    return Vector3.TransformCoordinates(relativePosition, rotationMatrix);
+}
 
-    return rotatedPosition.addInPlace(centerOfMass);
+/**
+ * Returns the point on the orbit of the body at time t. The orbit are circular for the p-norm.
+ * @param centerOfMass 
+ * @param settings 
+ * @param t 
+ * @returns 
+ */
+export function getPointOnOrbit(centerOfMass: Vector3, settings: OrbitalProperties, t: number): Vector3 {
+    return getPointOnOrbitLocal(settings, t).addInPlace(centerOfMass);
 }
 
 export function computeLpFactor(theta: number, p: number) {

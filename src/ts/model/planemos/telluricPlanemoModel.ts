@@ -51,7 +51,18 @@ export class TelluricPlanemoModel implements PlanemoModel {
 
         const mass = this.isSatelliteOfTelluric ? 1 : 10;
 
-        const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.1, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
+        this.physicalProperties = {
+            mass: mass,
+            axialTilt: normalRandom(0, 0.2, this.rng, GENERATION_STEPS.AXIAL_TILT),
+            rotationPeriod: (60 * 60 * 24) / 10,
+            minTemperature: randRangeInt(-50, 5, this.rng, 80),
+            maxTemperature: randRangeInt(10, 50, this.rng, 81),
+            pressure: Math.max(normalRandom(0.9, 0.2, this.rng, GENERATION_STEPS.PRESSURE), 0),
+            waterAmount: Math.max(normalRandom(1.0, 0.3, this.rng, GENERATION_STEPS.WATER_AMOUNT), 0),
+            oceanLevel: 0
+        };
+
+        const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.05, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
         const orbitalPlaneNormal = isOrbitalPlaneAlignedWithParent
             ? Vector3.Up()
             : new Vector3(this.rng(GENERATION_STEPS.ORBIT + 20), this.rng(GENERATION_STEPS.ORBIT + 30), this.rng(GENERATION_STEPS.ORBIT + 40)).normalize();
@@ -74,17 +85,6 @@ export class TelluricPlanemoModel implements PlanemoModel {
             period: getOrbitalPeriod(orbitRadius, this.parentBody),
             normalToPlane: orbitalPlaneNormal,
             isPlaneAlignedWithParent: isOrbitalPlaneAlignedWithParent
-        };
-
-        this.physicalProperties = {
-            mass: mass,
-            axialTilt: normalRandom(0, 0.2, this.rng, GENERATION_STEPS.AXIAL_TILT),
-            rotationPeriod: (60 * 60 * 24) / 10,
-            minTemperature: randRangeInt(-50, 5, this.rng, 80),
-            maxTemperature: randRangeInt(10, 50, this.rng, 81),
-            pressure: Math.max(normalRandom(0.9, 0.2, this.rng, GENERATION_STEPS.PRESSURE), 0),
-            waterAmount: Math.max(normalRandom(1.0, 0.3, this.rng, GENERATION_STEPS.WATER_AMOUNT), 0),
-            oceanLevel: 0
         };
 
         if (this.isSatelliteOfTelluric) {
