@@ -22,7 +22,7 @@ export class StarModel implements StellarObjectModel {
     readonly mass = 1000;
     readonly rotationPeriod = 24 * 60 * 60;
 
-    readonly orbitalProperties: OrbitalProperties;
+    readonly orbit: OrbitalProperties;
 
     readonly physicalProperties: StarPhysicalProperties;
 
@@ -64,7 +64,7 @@ export class StarModel implements StellarObjectModel {
         // TODO: do not hardcode
         const orbitRadius = this.rng(GENERATION_STEPS.ORBIT) * 5000000e3;
 
-        this.orbitalProperties = {
+        this.orbit = {
             radius: orbitRadius,
             p: 2,
             period: getOrbitalPeriod(orbitRadius, this.parentBody),

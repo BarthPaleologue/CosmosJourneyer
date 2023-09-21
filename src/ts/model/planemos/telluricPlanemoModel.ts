@@ -15,7 +15,7 @@ export class TelluricPlanemoModel implements PlanemoModel {
 
     readonly radius: number;
 
-    readonly orbitalProperties: OrbitalProperties;
+    readonly orbit: OrbitalProperties;
 
     readonly physicalProperties: SolidPhysicalProperties;
 
@@ -68,7 +68,7 @@ export class TelluricPlanemoModel implements PlanemoModel {
             orbitRadius += 2.0 * Math.max(0, minRadius - getPeriapsis(orbitRadius, orbitalP));
         }
 
-        this.orbitalProperties = {
+        this.orbit = {
             radius: orbitRadius,
             p: orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody),

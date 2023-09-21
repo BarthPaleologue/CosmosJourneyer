@@ -15,7 +15,7 @@ export class BlackHoleModel implements StellarObjectModel {
 
     readonly stellarType = STELLAR_TYPE.BLACK_HOLE;
 
-    readonly orbitalProperties: OrbitalProperties;
+    readonly orbit: OrbitalProperties;
 
     readonly physicalProperties: BlackHolePhysicalProperties;
 
@@ -34,7 +34,7 @@ export class BlackHoleModel implements StellarObjectModel {
         // TODO: do not hardcode
         const orbitRadius = this.parentBody === null ? 0 : 2 * (this.parentBody.radius + this.radius)
 
-        this.orbitalProperties = {
+        this.orbit = {
             radius: orbitRadius,
             p: 2,
             period: getOrbitalPeriod(orbitRadius, this.parentBody),

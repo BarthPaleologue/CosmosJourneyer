@@ -94,7 +94,7 @@ engine.setStarSystem(starSystem, false);
 
 const sunModel = new StarModel(0.51);
 const sun = starSystem.makeStar(sunModel);
-sun.model.orbitalProperties.period = 60 * 60 * 24;
+sun.model.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
 secundaModel.orbitalProperties.radius = 4 * sunModel.radius;
@@ -105,9 +105,9 @@ const planetModel = new TelluricPlanemoModel(0.4233609183800225, sunModel);
 planetModel.physicalProperties.minTemperature = -37;
 planetModel.physicalProperties.maxTemperature = 30;
 
-planetModel.orbitalProperties.period = 60 * 60 * 24 * 365.25;
-planetModel.orbitalProperties.radius = 4000 * planetModel.radius;
-planetModel.orbitalProperties.normalToPlane = Vector3.Up();
+planetModel.orbit.period = 60 * 60 * 24 * 365.25;
+planetModel.orbit.radius = 4000 * planetModel.radius;
+planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = starSystem.makeTelluricPlanet(planetModel);
 
@@ -121,9 +121,9 @@ moonModel.physicalProperties.minTemperature = -180;
 moonModel.physicalProperties.maxTemperature = 200;
 moonModel.physicalProperties.waterAmount = 0.9;
 
-moonModel.orbitalProperties.period = moonModel.physicalProperties.rotationPeriod;
-moonModel.orbitalProperties.radius = 8 * planet.getRadius();
-moonModel.orbitalProperties.normalToPlane = Vector3.Up();
+moonModel.orbit.period = moonModel.physicalProperties.rotationPeriod;
+moonModel.orbit.radius = 8 * planet.getRadius();
+moonModel.orbit.normalToPlane = Vector3.Up();
 
 const moon = starSystem.makeSatellite(planet, moonModel);
 
@@ -144,9 +144,9 @@ aresModel.physicalProperties.pressure = 0.5;
 aresModel.physicalProperties.waterAmount = 0.2;
 aresModel.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * aresModel.physicalProperties.waterAmount * aresModel.physicalProperties.pressure;
 
-aresModel.orbitalProperties.period = 60 * 60 * 24 * 365.24;
-aresModel.orbitalProperties.radius = 4020 * planet.getRadius();
-aresModel.orbitalProperties.normalToPlane = Vector3.Up();
+aresModel.orbit.period = 60 * 60 * 24 * 365.24;
+aresModel.orbit.radius = 4020 * planet.getRadius();
+aresModel.orbit.normalToPlane = Vector3.Up();
 
 aresModel.terrainSettings.continents_fragmentation = 0.0;
 aresModel.terrainSettings.continent_base_height = 10e3;
@@ -165,15 +165,15 @@ ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);
 ares.material.updateConstants();
 
 const andromaqueModel = new GasPlanetModel(0.28711440474126226, sunModel);
-andromaqueModel.orbitalProperties.period = 60 * 60 * 24 * 365.25;
-andromaqueModel.orbitalProperties.radius = 4300 * ares.getRadius();
-andromaqueModel.orbitalProperties.normalToPlane = Vector3.Up();
+andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
+andromaqueModel.orbit.radius = 4300 * ares.getRadius();
+andromaqueModel.orbit.normalToPlane = Vector3.Up();
 
 const andromaque = starSystem.makeGasPlanet(andromaqueModel);
 
 const mandelbulbModel = new MandelbulbModel(0.5, planetModel);
-mandelbulbModel.orbitalProperties.period = 60 * 60 * 24 * 365.24;
-mandelbulbModel.orbitalProperties.radius = 3990 * ares.getRadius();
+mandelbulbModel.orbit.period = 60 * 60 * 24 * 365.24;
+mandelbulbModel.orbit.radius = 3990 * ares.getRadius();
 const mandelbulb = starSystem.makeMandelbulb(mandelbulbModel);
 
 engine.init();

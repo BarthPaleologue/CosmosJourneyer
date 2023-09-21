@@ -7,7 +7,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 export class SpaceStationModel implements BaseModel {
     readonly seed: number;
     readonly rng: (step: number) => number;
-    readonly orbitalProperties: OrbitalProperties;
+    readonly orbit: OrbitalProperties;
     readonly physicalProperties: PhysicalProperties;
     readonly parentBody: BaseModel | null;
     readonly childrenBodies: BaseModel[] = [];
@@ -22,7 +22,7 @@ export class SpaceStationModel implements BaseModel {
         //TODO: do not hardcode
         const orbitRadius = 3000e3;
 
-        this.orbitalProperties = {
+        this.orbit = {
             radius: orbitRadius,
             p: 2,
             period: getOrbitalPeriod(orbitRadius, this.parentBody),

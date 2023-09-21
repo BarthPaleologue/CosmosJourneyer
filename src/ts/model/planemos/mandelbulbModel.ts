@@ -14,7 +14,7 @@ export class MandelbulbModel implements PlanemoModel {
 
     readonly radius: number;
 
-    readonly orbitalProperties: OrbitalProperties;
+    readonly orbit: OrbitalProperties;
 
     readonly physicalProperties: PlanetPhysicalProperties;
 
@@ -48,7 +48,7 @@ export class MandelbulbModel implements PlanemoModel {
         const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80));
         orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
 
-        this.orbitalProperties = {
+        this.orbit = {
             radius: orbitRadius,
             p: orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody),

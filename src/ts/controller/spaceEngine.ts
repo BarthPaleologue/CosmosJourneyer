@@ -217,7 +217,7 @@ export class SpaceEngine {
             this.helmetOverlay.update(nearestBody);
 
             //FIXME: should address stars orbits
-            for (const star of starSystem.stellarObjects) star.model.orbitalProperties.period = 0;
+            for (const star of starSystem.stellarObjects) star.model.orbit.period = 0;
 
             Assets.ChunkForge.update();
             starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);

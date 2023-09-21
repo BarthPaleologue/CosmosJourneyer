@@ -83,14 +83,14 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
     }
 
     public computeNextOrbitalPosition(): Vector3 {
-        if (this.model.orbitalProperties.period > 0) {
+        if (this.model.orbit.period > 0) {
             
             const barycenter = this.parentObject?.transform.getAbsolutePosition() ?? Vector3.Zero();
             const orbitalPlaneNormal = this.parentObject?.transform.up ?? Vector3.Up();
 
-            if (this.model.orbitalProperties.isPlaneAlignedWithParent) this.model.orbitalProperties.normalToPlane = orbitalPlaneNormal;
+            if (this.model.orbit.isPlaneAlignedWithParent) this.model.orbit.normalToPlane = orbitalPlaneNormal;
 
-            const newPosition = getPointOnOrbit(barycenter, this.model.orbitalProperties, this.internalClock);
+            const newPosition = getPointOnOrbit(barycenter, this.model.orbit, this.internalClock);
             this.nextState.position.copyFrom(newPosition);
         } else {
             this.nextState.position.copyFrom(this.transform.getAbsolutePosition());

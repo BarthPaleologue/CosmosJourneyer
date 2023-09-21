@@ -61,10 +61,10 @@ const starSystem = new StarSystem(starSystemSeed, scene);
 engine.setStarSystem(starSystem, false);
 
 const BH = starSystem.makeBlackHole(0);
-BH.model.orbitalProperties.radius = BH.getRadius() * 4;
+BH.model.orbit.radius = BH.getRadius() * 4;
 
 const planet = starSystem.makeTelluricPlanet();
-planet.model.orbitalProperties.radius = 10000e3;
+planet.model.orbit.radius = 10000e3;
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "g") {

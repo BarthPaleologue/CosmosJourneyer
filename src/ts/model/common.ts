@@ -60,7 +60,7 @@ export interface BaseModel {
     rng: (step: number) => number;
     seed: number;
 
-    orbitalProperties: OrbitalProperties;
+    orbit: OrbitalProperties;
     physicalProperties: PhysicalProperties;
 
     readonly parentBody: BaseModel | null;
