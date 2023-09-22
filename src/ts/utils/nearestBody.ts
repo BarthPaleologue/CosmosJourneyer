@@ -1,6 +1,6 @@
 import { AbstractBody } from "../view/bodies/abstractBody";
 import { AbstractController } from "../controller/uberCore/abstractController";
-import { BaseObject } from "../model/orbits/orbitalObject";
+import { BaseObject } from "../view/common";
 import { TransformNode } from "@babylonjs/core/Meshes";
 
 export function nearestBody(object: TransformNode, bodies: AbstractBody[]): AbstractBody {

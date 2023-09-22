@@ -15,7 +15,7 @@ import { VolumetricLight } from "../view/postProcesses/volumetricLight";
 import { BlackHolePostProcess } from "../view/postProcesses/blackHolePostProcess";
 import { GasPlanet } from "../view/bodies/planemos/gasPlanet";
 import { ColorCorrection } from "./uberCore/postProcesses/colorCorrection";
-import { extractRelevantPostProcesses, makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
+import { makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess, VolumetricCloudsPostProcess } from "../view/postProcesses/volumetricCloudsPostProcess";
 import { StellarObject } from "../view/bodies/stellarObjects/stellarObject";
 import { Engine } from "@babylonjs/core/Engines/engine";
@@ -24,14 +24,12 @@ import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPip
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
-import { Camera } from "@babylonjs/core/Cameras/camera";
 import { AbstractObject } from "../view/bodies/abstractObject";
-import { BaseObject } from "../model/orbits/orbitalObject";
+import { BaseObject } from "../view/common";
 import { PostProcessType } from "../view/postProcesses/postProcessTypes";
 import { MandelbulbPostProcess } from "../view/postProcesses/mandelbulbPostProcess";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
 import { ObjectPostProcess, UpdatablePostProcess } from "../view/postProcesses/objectPostProcess";
-import { UberPostProcess } from "./uberCore/postProcesses/uberPostProcess";
 
 const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.VOLUMETRIC_LIGHT,
@@ -86,11 +84,7 @@ export class PostProcessManager {
         this.volumetricLights
     ];
 
-    private readonly updatablePostProcesses: UpdatablePostProcess[][] = [
-        this.starFields,
-        this.volumetricLights,
-        ...this.objectPostProcesses
-    ]
+    private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.starFields, this.volumetricLights, ...this.objectPostProcesses];
 
     readonly colorCorrection: ColorCorrection;
     readonly fxaa: FxaaPostProcess;
@@ -163,7 +157,9 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addClouds(planet: TelluricPlanemo, stellarObjects: StellarObject[]) {
-        const clouds = !Settings.ENABLE_VOLUMETRIC_CLOUDS ? new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stellarObjects) : new VolumetricCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stellarObjects);
+        const clouds = !Settings.ENABLE_VOLUMETRIC_CLOUDS
+            ? new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stellarObjects)
+            : new VolumetricCloudsPostProcess(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stellarObjects);
         this.clouds.push(clouds);
     }
 
@@ -220,7 +216,7 @@ export class PostProcessManager {
     /**
      * Creates a new Mandelbulb postprocess for the given body and adds it to the manager.
      * @param body A body
-     * @param stellarObjects An array of stars or black holes 
+     * @param stellarObjects An array of stars or black holes
      */
     public addMandelbulb(body: Mandelbulb, stellarObjects: StellarObject[]) {
         const mandelbulb = new MandelbulbPostProcess(body, this.scene, stellarObjects);
@@ -348,8 +344,8 @@ export class PostProcessManager {
         // rebuild all volumetric lights FIXME: bug of babylonjs (see commit 539f83f)
         for (const volumetricLight of this.volumetricLights) {
             volumetricLight.dispose();
-            const deletedLights = this.volumetricLights.splice(this.volumetricLights.indexOf(volumetricLight), 1);
-            for(const light of deletedLights) light.dispose();
+            this.volumetricLights.splice(this.volumetricLights.indexOf(volumetricLight), 1);
+            //for (const light of deletedLights) light.dispose();
 
             const newVolumetricLight = new VolumetricLight(volumetricLight.object, this.scene);
             this.volumetricLights.push(newVolumetricLight);
@@ -364,7 +360,12 @@ export class PostProcessManager {
     }
 
     private init() {
-        const [otherVolumetricLightsRenderEffect, bodyVolumetricLightsRenderEffect] = makeSplitRenderEffects("VolumetricLights", this.getCurrentBody(), this.volumetricLights, this.engine);
+        const [otherVolumetricLightsRenderEffect, bodyVolumetricLightsRenderEffect] = makeSplitRenderEffects(
+            "VolumetricLights",
+            this.getCurrentBody(),
+            this.volumetricLights,
+            this.engine
+        );
         const [otherBlackHolesRenderEffect, bodyBlackHolesRenderEffect] = makeSplitRenderEffects("BlackHoles", this.getCurrentBody(), this.blackHoles, this.engine);
         const [otherOceansRenderEffect, bodyOceansRenderEffect] = makeSplitRenderEffects("Oceans", this.getCurrentBody(), this.oceans, this.engine);
         const [otherCloudsRenderEffect, bodyCloudsRenderEffect] = makeSplitRenderEffects("Clouds", this.getCurrentBody(), this.clouds, this.engine);

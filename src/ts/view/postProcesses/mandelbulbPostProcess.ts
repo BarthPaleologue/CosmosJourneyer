@@ -20,7 +20,7 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
 
     constructor(mandelbulb: Mandelbulb, scene: UberScene, stellarObjects: StellarObject[]) {
         const settings: MandelbulbSettings = {
-            rotationPeriod: 1.5,
+            rotationPeriod: 1.5
         };
 
         const uniforms: ShaderUniforms = [
@@ -50,9 +50,7 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
             }
         ];
 
-        const samplers: ShaderSamplers = [
-            ...getSamplers(scene),
-        ];
+        const samplers: ShaderSamplers = [...getSamplers(scene)];
 
         super(mandelbulb.name, shaderName, uniforms, samplers, scene);
 

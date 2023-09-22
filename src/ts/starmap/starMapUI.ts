@@ -123,7 +123,6 @@ export class StarMapUI {
         this.gui.addControl(this.selectedSystemRing);
         this.selectedSystemRing.linkWithMesh(mesh);
 
-
         //FIXME: this should not be here, probably a BabylonJS bug
         this.currentSystemRing.linkWithMesh(this.currentSystemRing.linkedMesh);
     }
@@ -156,7 +155,7 @@ export class StarMapUI {
         return this.hoveredSystemRing.linkedMesh;
     }
 
-    setSelectedSystem({ name, text }: { name: string, text: string }) {
+    setSelectedSystem({ name, text }: { name: string; text: string }) {
         this.namePlate.text = name;
         this.descriptionPanel.text = text;
     }

@@ -60,12 +60,13 @@ export class Spaceship {
                 this.allThrusters.push(thruster);
                 console.log("found", child.name);
 
-                const helperLine = MeshBuilder.CreateLines("helperLine", {
-                    points: [
-                        Vector3.Zero(),
-                        new Vector3(0, -1, 0),
-                    ]
-                }, scene);
+                const helperLine = MeshBuilder.CreateLines(
+                    "helperLine",
+                    {
+                        points: [Vector3.Zero(), new Vector3(0, -1, 0)]
+                    },
+                    scene
+                );
                 helperLine.scaling.scaleInPlace(5);
                 helperLine.material = Assets.DebugMaterial(`helperLine${child.name}`, true);
 
@@ -76,12 +77,13 @@ export class Spaceship {
                 this.allThrusters.push(thruster);
                 console.log("found", child.name);
 
-                const helperLine = MeshBuilder.CreateLines("helperLine", {
-                    points: [
-                        Vector3.Zero(),
-                        new Vector3(0, -1, 0),
-                    ]
-                }, scene);
+                const helperLine = MeshBuilder.CreateLines(
+                    "helperLine",
+                    {
+                        points: [Vector3.Zero(), new Vector3(0, -1, 0)]
+                    },
+                    scene
+                );
                 helperLine.scaling.scaleInPlace(5);
                 helperLine.material = Assets.DebugMaterial(`helperLine${child.name}`, true);
 
@@ -101,8 +103,7 @@ export class Spaceship {
     }
 
     initPhysics(scene: Scene) {
-        this.aggregate = new PhysicsAggregate(this.instanceRoot
-            , PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
+        this.aggregate = new PhysicsAggregate(this.instanceRoot, PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
         for (const child of this.otherMeshes) {
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
@@ -194,12 +195,13 @@ export class Spaceship {
             targetTorqueLocal.addInPlace(targetTorque2Local).normalize();*/
 
             if (this.targetThrustHelper !== null) this.targetThrustHelper.dispose();
-            this.targetThrustHelper = MeshBuilder.CreateLines("targetThrustHelper", {
-                points: [
-                    this.instanceRoot.position,
-                    this.instanceRoot.position.add(targetThrustWorld.scale(5)),
-                ]
-            }, this.instanceRoot.getScene());
+            this.targetThrustHelper = MeshBuilder.CreateLines(
+                "targetThrustHelper",
+                {
+                    points: [this.instanceRoot.position, this.instanceRoot.position.add(targetThrustWorld.scale(5))]
+                },
+                this.instanceRoot.getScene()
+            );
             this.targetThrustHelper.material = Assets.DebugMaterial("targetThrustHelper", true);
 
             const thrusterConfiguration = getThrusterConfiguration(targetThrustLocal, targetTorqueLocal, this.inverseHoverThrusterMatrix);
@@ -216,9 +218,8 @@ export class Spaceship {
 
             const currentHeight = this.instanceRoot.position.y;
 
-            let heightFactor = (1 + clamp(targetHeight - currentHeight, -0.5, 0.5)); //* (1 + fallSpeed);
+            let heightFactor = 1 + clamp(targetHeight - currentHeight, -0.5, 0.5); //* (1 + fallSpeed);
             if (Math.abs(currentHeight - targetHeight) < 0.5) heightFactor = 1;
-
 
             const thrust = gravity.length() * heightFactor * this.getMass();
 

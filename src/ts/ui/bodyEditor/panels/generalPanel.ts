@@ -28,14 +28,20 @@ export class GeneralPanel extends EditorPanel {
                 const newAxialTilt = (val * Math.PI) / 180;
                 body.transform.rotate(Axis.X, newAxialTilt - axialTiltX);
                 if (isOrbiting(scene.getActiveController(), body))
-                    scene.getActiveController().getTransform().rotateAround(body.transform.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
+                    scene
+                        .getActiveController()
+                        .getTransform()
+                        .rotateAround(body.transform.getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
                 axialTiltX = newAxialTilt;
             }),
             new Slider("axialTiltZ", document.getElementById("axialTiltZ") as HTMLElement, -180, 180, Math.round((180 * axialTiltZ) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
                 body.transform.rotate(Axis.Z, newAxialTilt - axialTiltZ);
                 if (isOrbiting(scene.getActiveController(), body))
-                    scene.getActiveController().getTransform().rotateAround(body.transform.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
+                    scene
+                        .getActiveController()
+                        .getTransform()
+                        .rotateAround(body.transform.getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
                 axialTiltZ = newAxialTilt;
             }),
             new Slider(

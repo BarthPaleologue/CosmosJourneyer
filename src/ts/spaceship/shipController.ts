@@ -46,7 +46,7 @@ export class ShipController extends AbstractController {
     private closestObject = {
         distance: Infinity,
         radius: 1
-    }
+    };
 
     constructor(scene: Scene) {
         super();
@@ -60,9 +60,7 @@ export class ShipController extends AbstractController {
         this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 1.4);
         this.thirdPersonCamera.parent = this.instanceRoot;
 
-
-        this.aggregate = new PhysicsAggregate(this.instanceRoot
-            , PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
+        this.aggregate = new PhysicsAggregate(this.instanceRoot, PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
         for (const child of this.instanceRoot.getChildMeshes()) {
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
@@ -103,7 +101,7 @@ export class ShipController extends AbstractController {
             });
         }
     }
-    
+
     public override getTransform(): TransformNode {
         return this.aggregate.transformNode;
     }
@@ -136,8 +134,8 @@ export class ShipController extends AbstractController {
     }
 
     public enableWarpDrive() {
-        for(const thruster of this.mainThrusters) thruster.setThrottle(0);
-        for(const thruster of this.rcsThrusters) thruster.deactivate();
+        for (const thruster of this.mainThrusters) thruster.setThrottle(0);
+        for (const thruster of this.rcsThrusters) thruster.deactivate();
         this.warpDrive.enable();
     }
 
@@ -178,7 +176,7 @@ export class ShipController extends AbstractController {
                 thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
             }
 
-            if(input.type === InputType.MOUSE) {
+            if (input.type === InputType.MOUSE) {
                 const mouse = input as Mouse;
                 const roll = mouse.getRoll();
                 const pitch = mouse.getPitch();
@@ -191,7 +189,7 @@ export class ShipController extends AbstractController {
                     // rcs rotation contribution
                     if (roll < 0 && rcsThruster.getRollAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(roll));
                     else if (roll > 0 && rcsThruster.getRollAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(roll));
-                    
+
                     if (pitch < 0 && rcsThruster.getPitchAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(pitch));
                     else if (pitch > 0 && rcsThruster.getPitchAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(pitch));
 
@@ -199,16 +197,16 @@ export class ShipController extends AbstractController {
                 }
             }
         } else {
-            if(input.type === InputType.MOUSE) {
+            if (input.type === InputType.MOUSE) {
                 const mouse = input as Mouse;
                 const rollContribution = mouse.getRoll();
                 const pitchContribution = mouse.getPitch();
-                
+
                 roll(this.aggregate.transformNode, rollContribution * deltaTime);
                 pitch(this.aggregate.transformNode, pitchContribution * deltaTime);
             }
 
-            if(input.type === InputType.KEYBOARD) {
+            if (input.type === InputType.KEYBOARD) {
                 const keyboard = input as Keyboard;
                 const deltaThrottle = keyboard.getZAxis() * deltaTime;
                 this.warpDrive.increaseTargetThrottle(deltaThrottle);
@@ -239,8 +237,8 @@ export class ShipController extends AbstractController {
         for (const input of this.inputs) this.listenTo(input, deltaTime);
         //const displacement = this.transform.update(deltaTime).negate();
 
-        const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());//Vector3.Zero();
-        
+        const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed()); //Vector3.Zero();
+
         const speed = this.aggregate.body.getLinearVelocity();
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
@@ -249,9 +247,9 @@ export class ShipController extends AbstractController {
         for (const thruster of this.mainThrusters) thruster.update();
         for (const thruster of this.rcsThrusters) thruster.update();
 
-        if(this.warpDrive.isDisabled()) {
+        if (this.warpDrive.isDisabled()) {
             for (const thruster of this.mainThrusters) thruster.applyForce();
-            for (const thruster of this.rcsThrusters) thruster.applyForce();    
+            for (const thruster of this.rcsThrusters) thruster.applyForce();
         }
 
         if (this.flightAssistEnabled) {

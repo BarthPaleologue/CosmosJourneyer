@@ -1,12 +1,10 @@
 import { LinesMesh, MeshBuilder } from "@babylonjs/core/Meshes";
-import { OrbitalObject } from "../model/orbits/orbitalObject";
-import { getPointOnOrbitLocal } from "../model/orbits/compute";
+import { OrbitalObject } from "./common";
+import { getPointOnOrbitLocal } from "../model/orbit";
 import { Color3, Vector3 } from "@babylonjs/core/Maths/math";
-import { Assets } from "../controller/assets";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 export class OrbitRenderer {
-
     private orbitMeshes: LinesMesh[] = [];
 
     private orbitalObjects: OrbitalObject[] = [];
@@ -56,7 +54,7 @@ export class OrbitRenderer {
     }
 
     private reset() {
-        this.orbitMeshes.forEach(orbitMesh => orbitMesh.dispose());
+        this.orbitMeshes.forEach((orbitMesh) => orbitMesh.dispose());
         this.orbitMeshes = [];
         this.orbitalObjects = [];
 

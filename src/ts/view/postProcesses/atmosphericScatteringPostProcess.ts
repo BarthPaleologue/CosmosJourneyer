@@ -9,7 +9,7 @@ import { centeredRand } from "extended-random";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { GasPlanet } from "../bodies/planemos/gasPlanet";
 import { ObjectPostProcess } from "./objectPostProcess";
-import { OrbitalObject } from "../../model/orbits/orbitalObject";
+import { OrbitalObject } from "../common";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;

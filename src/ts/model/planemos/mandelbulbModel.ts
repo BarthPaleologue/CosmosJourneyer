@@ -1,8 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BodyModel, BODY_TYPE, PlanemoModel, PlanetPhysicalProperties, GENERATION_STEPS } from "../common";
-import { getOrbitalPeriod, getPeriapsis } from "../orbits/compute";
+import { getOrbitalPeriod, getPeriapsis, OrbitalProperties } from "../orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitalProperties } from "../orbits/orbitalProperties";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { clamp } from "../../utils/math";
@@ -36,11 +35,7 @@ export class MandelbulbModel implements PlanemoModel {
         this.parentBody = parentBody ?? null;
 
         this.power = randRange(1.0, 18.0, this.rng, GENERATION_STEPS.POWER);
-        this.accentColor = new Color3(
-            this.rng(GENERATION_STEPS.ACCENNT_COLOR),
-            this.rng(GENERATION_STEPS.ACCENNT_COLOR + 10),
-            this.rng(GENERATION_STEPS.ACCENNT_COLOR + 20)
-        );
+        this.accentColor = new Color3(this.rng(GENERATION_STEPS.ACCENNT_COLOR), this.rng(GENERATION_STEPS.ACCENNT_COLOR + 10), this.rng(GENERATION_STEPS.ACCENNT_COLOR + 20));
 
         // TODO: do not hardcode
         let orbitRadius = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
@@ -51,7 +46,7 @@ export class MandelbulbModel implements PlanemoModel {
         this.orbit = {
             radius: orbitRadius,
             p: orbitalP,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody),
+            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: Vector3.Up(),
             isPlaneAlignedWithParent: true
         };
@@ -62,7 +57,7 @@ export class MandelbulbModel implements PlanemoModel {
             axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
             minTemperature: -180,
             maxTemperature: 100,
-            pressure: 0,
+            pressure: 0
         };
 
         this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);

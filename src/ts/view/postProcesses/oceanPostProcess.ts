@@ -7,7 +7,7 @@ import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from 
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
-import { OrbitalObject } from "../../model/orbits/orbitalObject";
+import { OrbitalObject } from "../common";
 import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
 
 const shaderName = "ocean";

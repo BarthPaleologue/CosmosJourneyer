@@ -11,7 +11,7 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Scene } from "@babylonjs/core/scene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MaterialHelper } from "@babylonjs/core/Materials/materialHelper";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";

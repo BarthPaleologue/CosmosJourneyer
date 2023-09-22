@@ -3,7 +3,7 @@ import { getChunkPlaneSpacePositionFromPath } from "../../utils/chunkUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Material } from "@babylonjs/core/Materials/material";
-import { ITransformable } from "../../model/orbits/orbitalObject";
+import { ITransformable } from "../../view/common";
 import { Scene } from "@babylonjs/core/scene";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import "@babylonjs/core/Engines/Extensions/engine.query";
@@ -73,7 +73,7 @@ export class PlanetChunk implements ITransformable {
         this.mesh.freezeNormals();
         if (this.isMinDepth) this.setReady(true);
 
-        if(this.depth > 7) {
+        if (this.depth > 7) {
             //this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
             //this.aggregate.body.disablePreStep = false;
 

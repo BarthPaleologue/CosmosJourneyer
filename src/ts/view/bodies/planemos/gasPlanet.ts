@@ -28,13 +28,7 @@ export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial 
     constructor(name: string, scene: UberScene, model: GasPlanetModel | number, parentBody?: AbstractBody) {
         super(name, scene, parentBody);
 
-        this.model =
-            model instanceof GasPlanetModel
-                ? model
-                : new GasPlanetModel(
-                      model,
-                      parentBody?.model
-                  );
+        this.model = model instanceof GasPlanetModel ? model : new GasPlanetModel(model, parentBody?.model);
 
         this.mesh = MeshBuilder.CreateSphere(
             `${name}Mesh`,

@@ -13,15 +13,14 @@ export function extractRelevantPostProcesses(postProcesses: ObjectPostProcess[],
     return [relevant, notRelevant];
 }
 
-
 export function makeSplitRenderEffects(name: string, body: AbstractBody, postProcesses: ObjectPostProcess[], engine: Engine): [PostProcessRenderEffect, PostProcessRenderEffect] {
     const [bodyRings, otherRings] = extractRelevantPostProcesses(postProcesses, body);
-        const otherRingsRenderEffect = new PostProcessRenderEffect(engine, `other${name}RenderEffect`, () => {
-            return otherRings;
-        });
-        const bodyRingsRenderEffect = new PostProcessRenderEffect(engine, `body${name}RenderEffect`, () => {
-            return bodyRings;
-        });
+    const otherRingsRenderEffect = new PostProcessRenderEffect(engine, `other${name}RenderEffect`, () => {
+        return otherRings;
+    });
+    const bodyRingsRenderEffect = new PostProcessRenderEffect(engine, `body${name}RenderEffect`, () => {
+        return bodyRings;
+    });
 
     return [otherRingsRenderEffect, bodyRingsRenderEffect];
 }

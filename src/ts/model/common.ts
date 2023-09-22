@@ -1,4 +1,4 @@
-import { OrbitalProperties } from "./orbits/orbitalProperties";
+import { OrbitalProperties } from "./orbit";
 import { STELLAR_TYPE } from "./stellarObjects/common";
 
 export enum GENERATION_STEPS {
@@ -20,7 +20,7 @@ export enum GENERATION_STEPS {
 
     PRESSURE = 1100,
     WATER_AMOUNT = 1200,
-    TERRAIN = 1500,
+    TERRAIN = 1500
 }
 
 export enum BODY_TYPE {

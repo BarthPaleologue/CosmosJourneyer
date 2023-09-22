@@ -27,7 +27,6 @@ import { TelluricPlanemo } from "./view/bodies/planemos/telluricPlanemo";
 import { UberScene } from "./controller/uberCore/uberScene";
 import { Settings } from "./settings";
 
-
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -105,7 +104,7 @@ spaceship.initPhysics(scene);
 boxAggregate.body.applyImpulse(new Vector3(0, 0, -1), box.getAbsolutePosition());
 
 const aggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.getAggregate(), newton.aggregate];
-for(const aggregate of aggregates) {
+for (const aggregate of aggregates) {
     aggregate.body.disablePreStep = false;
 }
 const meshes = [sphere, box, capsule, spaceship.instanceRoot, newton.transform];
@@ -118,8 +117,7 @@ const gravity = -9.81;
 
 let clockSeconds = 0;
 
-function updateBeforeHavok() {    
-
+function updateBeforeHavok() {
     const deltaTime = engine.getDeltaTime() / 1000;
     clockSeconds += deltaTime;
 
@@ -132,7 +130,6 @@ function updateBeforeHavok() {
         aggregate.body.applyForce(gravityDirection.scaleInPlace(gravity * mass), aggregate.body.getObjectCenterWorld());
     }
 
-
     // planet thingy
     newton.updateInternalClock(-deltaTime / 10);
     /*newton.updateRotation(deltaTime / 10);
@@ -141,13 +138,12 @@ function updateBeforeHavok() {
     newton.updateLOD(camera.globalPosition);
     newton.material.update(camera.globalPosition, [light.getAbsolutePosition()]);
     Assets.ChunkForge.update();
-    
 }
 
 function updateAfterHavok() {
     const spaceshipPosition = spaceship.getAbsolutePosition();
 
-    for(const mesh of meshes) {
+    for (const mesh of meshes) {
         mesh.position.subtractInPlace(spaceshipPosition);
     }
 }

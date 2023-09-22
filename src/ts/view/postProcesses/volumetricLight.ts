@@ -7,12 +7,8 @@ import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 export class VolumetricLight extends VolumetricLightScatteringPostProcess implements UpdatablePostProcess, ObjectPostProcess {
     readonly object: Star;
 
-    private scene: UberScene;
-
     constructor(star: Star, scene: UberScene) {
         super(`${star.name}VolumetricLight`, 1, scene.getActiveUberCamera(), star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
-        
-        this.scene = scene;
 
         this.object = star;
 
@@ -27,6 +23,6 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess implem
     }
 
     public override dispose(): void {
-        super.dispose(this.scene.getActiveUberCamera());
+        super.dispose(this.getCamera());
     }
 }

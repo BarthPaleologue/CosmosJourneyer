@@ -268,8 +268,8 @@ export class StarMap {
 
     private updateCells() {
         // first remove all cells that are too far
-        const currentSystemInstance = this.currentSystemSeed === null ? null : this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh;
-        const selectedSystemInstance = this.selectedSystemSeed === null ? null : this.seedToInstanceMap.get(this.selectedSystemSeed) as InstancedMesh;
+        const currentSystemInstance = this.currentSystemSeed === null ? null : (this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh);
+        const selectedSystemInstance = this.selectedSystemSeed === null ? null : (this.seedToInstanceMap.get(this.selectedSystemSeed) as InstancedMesh);
         for (const cell of this.loadedCells.values()) {
             if (currentSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(currentSystemInstance)) continue; // don't remove cells that contain the current system
             if (selectedSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove cells that contain the selected system
@@ -419,7 +419,10 @@ export class StarMap {
         }
 
         const distance = starInstance.position.subtract(this.controller.getTransform().getAbsolutePosition()).length();
-        const targetPosition = this.controller.getTransform().getAbsolutePosition().add(starDir.scaleInPlace(distance - 0.8));
+        const targetPosition = this.controller
+            .getTransform()
+            .getAbsolutePosition()
+            .add(starDir.scaleInPlace(distance - 0.8));
 
         // if the transform is already in the right position, do not animate
         if (targetPosition.subtract(this.controller.getTransform().getAbsolutePosition()).lengthSquared() > 0.1) {

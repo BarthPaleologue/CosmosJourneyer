@@ -70,9 +70,9 @@ export abstract class AbstractThruster {
     public getAuthorityAroundAxisNormalized(rotationAxis: Vector3): number {
         const thrusterPosition = this.mesh.position;
         const thrusterPositionOnAxis = rotationAxis.scale(Vector3.Dot(thrusterPosition, rotationAxis));
-        
+
         const thrusterPositionToAxisNormalized = thrusterPosition.subtract(thrusterPositionOnAxis).normalize();
-        
+
         const thrusterRotationAxis = Vector3.Cross(this.localNozzleDown.negate(), thrusterPositionToAxisNormalized);
         return Vector3.Dot(thrusterRotationAxis, rotationAxis);
     }

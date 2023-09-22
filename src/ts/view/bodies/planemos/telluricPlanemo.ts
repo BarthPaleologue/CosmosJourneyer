@@ -35,13 +35,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
     constructor(name: string, scene: UberScene, model: TelluricPlanemoModel | number, parentBody?: AbstractBody) {
         super(name, scene, parentBody);
 
-        this.model =
-            model instanceof TelluricPlanemoModel
-                ? model
-                : new TelluricPlanemoModel(
-                    model,
-                    parentBody?.model,
-                );
+        this.model = model instanceof TelluricPlanemoModel ? model : new TelluricPlanemoModel(model, parentBody?.model);
 
         this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
 
@@ -96,7 +90,10 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
     }
 
     public updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
-        this.material.update(controller.getTransform().getAbsolutePosition(), stellarObjects.map((star) => star.transform.getAbsolutePosition()));
+        this.material.update(
+            controller.getTransform().getAbsolutePosition(),
+            stellarObjects.map((star) => star.transform.getAbsolutePosition())
+        );
     }
 
     public override getBoundingRadius(): number {

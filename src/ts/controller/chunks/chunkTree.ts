@@ -176,15 +176,7 @@ export class ChunkTree {
      * @returns The new Chunk
      */
     private createChunk(path: number[], isFiner: boolean): PlanetChunk {
-        const chunk = new PlanetChunk(
-            path,
-            this.direction,
-            this.parentAggregate,
-            this.material,
-            this.rootChunkLength,
-            this.minDepth === path.length,
-            this.scene
-        );
+        const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.rootChunkLength, this.minDepth === path.length, this.scene);
 
         const buildTask: BuildTask = {
             type: TaskType.Build,
@@ -223,7 +215,7 @@ export class ChunkTree {
     public getChunks(): PlanetChunk[] {
         const chunks: PlanetChunk[] = [];
         this.executeOnEveryChunk((chunk) => chunks.push(chunk));
-    
+
         return chunks;
     }
 

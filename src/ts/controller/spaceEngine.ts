@@ -140,7 +140,6 @@ export class SpaceEngine {
      */
     public toggleStarMap(): void {
         if (this.activeScene === this.getStarSystemScene()) {
-
             this.getStarSystemScene().getActiveController().getActiveCamera().animations = [SpaceEngine.unZoomAnimation];
             this.getStarSystemScene().beginAnimation(this.getStarSystemScene().getActiveController().getActiveCamera(), 0, 60, false, 2.0, () => {
                 this.getStarSystemScene().getActiveController().getActiveCamera().animations = [];
@@ -182,7 +181,7 @@ export class SpaceEngine {
             if (firstBody === undefined) throw new Error("No bodies in star system");
 
             this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getBodies());
-            
+
             const activeController = this.getStarSystemScene().getActiveController();
             positionNearObject(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
             if (activeController instanceof ShipController) activeController.enableWarpDrive();

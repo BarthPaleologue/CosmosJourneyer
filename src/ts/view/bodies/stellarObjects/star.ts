@@ -30,13 +30,7 @@ export class Star extends AbstractBody {
     constructor(name: string, scene: UberScene, model: StarModel | number, parentBody?: AbstractBody) {
         super(name, scene, parentBody);
 
-        this.model =
-            model instanceof StarModel
-                ? model
-                : new StarModel(
-                      model,
-                      parentBody?.model
-                  );
+        this.model = model instanceof StarModel ? model : new StarModel(model, parentBody?.model);
 
         this.mesh =
             this.model.rng(42) > 0.1

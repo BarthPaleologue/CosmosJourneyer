@@ -7,7 +7,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MandelbulbModel } from "../../../model/planemos/mandelbulbModel";
 
 export class Mandelbulb extends AbstractBody implements Planemo {
-
     readonly model: MandelbulbModel;
 
     /**
@@ -20,13 +19,7 @@ export class Mandelbulb extends AbstractBody implements Planemo {
     constructor(name: string, scene: UberScene, model: MandelbulbModel | number, parentBody?: AbstractBody) {
         super(name, scene, parentBody);
 
-        this.model =
-            model instanceof MandelbulbModel
-                ? model
-                : new MandelbulbModel(
-                      model,
-                      parentBody?.model
-                  );
+        this.model = model instanceof MandelbulbModel ? model : new MandelbulbModel(model, parentBody?.model);
 
         this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.MANDELBULB);
 

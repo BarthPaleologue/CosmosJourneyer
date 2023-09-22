@@ -2,8 +2,7 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, PlanetPhysicalProperties } from "../common";
-import { OrbitalProperties } from "../orbits/orbitalProperties";
-import { getOrbitalPeriod, getPeriapsis } from "../orbits/compute";
+import { OrbitalProperties, getOrbitalPeriod, getPeriapsis } from "../orbit";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { clamp } from "../../utils/math";
 
@@ -44,7 +43,7 @@ export class GasPlanetModel implements PlanemoModel {
         this.orbit = {
             radius: orbitRadius,
             p: orbitalP,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody),
+            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: Vector3.Up(),
             isPlaneAlignedWithParent: true
         };

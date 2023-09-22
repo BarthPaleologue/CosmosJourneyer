@@ -1,6 +1,6 @@
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../../controller/uberCore/postProcesses/uberPostProcess";
-import { BaseObject, OrbitalObject } from "../../model/orbits/orbitalObject";
+import { BaseObject, OrbitalObject } from "../common";
 
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     return [

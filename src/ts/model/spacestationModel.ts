@@ -1,7 +1,6 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BaseModel, GENERATION_STEPS, PhysicalProperties } from "./common";
-import { OrbitalProperties } from "./orbits/orbitalProperties";
-import { getOrbitalPeriod } from "./orbits/compute";
+import { OrbitalProperties, getOrbitalPeriod } from "./orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class SpaceStationModel implements BaseModel {
@@ -25,7 +24,7 @@ export class SpaceStationModel implements BaseModel {
         this.orbit = {
             radius: orbitRadius,
             p: 2,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody),
+            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: Vector3.Up(),
             isPlaneAlignedWithParent: false
         };

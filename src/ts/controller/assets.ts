@@ -25,7 +25,7 @@ import banana from "../../asset/banana/banana.glb";
 import endeavorSpaceship from "../../asset/spaceship/endeavour.glb";
 
 import ouchSound from "../../asset/sound/ouch.mp3";
-import engineRunningSound from "../../asset/sound/engineRunning.mp3"
+import engineRunningSound from "../../asset/sound/engineRunning.mp3";
 
 import { ChunkForge } from "./chunks/chunkForge";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -159,7 +159,7 @@ export class Assets {
             const engineRunningSoundTask = Assets.manager.addBinaryFileTask("engineRunningSoundTask", engineRunningSound);
             engineRunningSoundTask.onSuccess = function (task) {
                 Assets.EngineRunningSound = new Sound("EngineRunningSound", task.data, scene, null, {
-                    loop: true,
+                    loop: true
                 });
 
                 console.log("Engine running sound loaded");

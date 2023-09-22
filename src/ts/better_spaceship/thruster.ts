@@ -18,7 +18,7 @@ export class Thruster {
     constructor(mesh: Mesh) {
         this.mesh = mesh;
         this.particleSystem = new DirectionnalParticleSystem(mesh, this.getThrustDirection().negateInPlace());
-        
+
         const minY = this.mesh.getBoundingInfo().boundingBox.extendSize.y;
         this.particleSystem.minEmitBox = new Vector3(-0.8, -minY, -0.8);
         this.particleSystem.maxEmitBox = new Vector3(0.8, -minY, 0.8);

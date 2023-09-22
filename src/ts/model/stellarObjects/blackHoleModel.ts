@@ -1,8 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BodyModel, BODY_TYPE, StellarObjectModel, BlackHolePhysicalProperties, GENERATION_STEPS } from "../common";
-import { getOrbitalPeriod } from "../orbits/compute";
+import { getOrbitalPeriod, OrbitalProperties } from "../orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OrbitalProperties } from "../orbits/orbitalProperties";
 import { normalRandom } from "extended-random";
 import { STELLAR_TYPE } from "./common";
 
@@ -32,12 +31,12 @@ export class BlackHoleModel implements StellarObjectModel {
         this.parentBody = parentBody ?? null;
 
         // TODO: do not hardcode
-        const orbitRadius = this.parentBody === null ? 0 : 2 * (this.parentBody.radius + this.radius)
+        const orbitRadius = this.parentBody === null ? 0 : 2 * (this.parentBody.radius + this.radius);
 
         this.orbit = {
             radius: orbitRadius,
             p: 2,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody),
+            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: Vector3.Up(),
             isPlaneAlignedWithParent: true
         };

@@ -22,7 +22,7 @@ export class RCSThruster extends AbstractThruster {
     }
 
     public setThrottle(throttle: number): void {
-        if(throttle < 0 || throttle > 1) throw new Error("Throttle must be between 0 and 1");
+        if (throttle < 0 || throttle > 1) throw new Error("Throttle must be between 0 and 1");
         this.throttle = throttle;
     }
 

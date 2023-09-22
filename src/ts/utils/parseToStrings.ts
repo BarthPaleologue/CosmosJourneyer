@@ -13,7 +13,7 @@ export function parseSpeed(speed: number): string {
 }
 
 /**
- * Parse a number between 0 and 1 to a percentage string. 
+ * Parse a number between 0 and 1 to a percentage string.
  * Example: 0.5 -> "50%"
  * @param percentage01 A number between 0 and 1 representing a percentage.
  * @returns A string representing the percentage.

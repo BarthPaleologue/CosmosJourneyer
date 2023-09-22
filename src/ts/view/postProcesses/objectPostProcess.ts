@@ -1,4 +1,4 @@
-import { BaseObject } from "../../model/orbits/orbitalObject";
+import { BaseObject } from "../common";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 
 export interface UpdatablePostProcess extends PostProcess {

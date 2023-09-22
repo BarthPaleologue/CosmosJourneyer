@@ -121,6 +121,6 @@ export function yaw(transformNode: TransformNode, amount: number): void {
 
 /* #endregion directions */
 
-export function dispose(transformNode: TransformNode,): void {
+export function dispose(transformNode: TransformNode): void {
     transformNode.dispose();
 }

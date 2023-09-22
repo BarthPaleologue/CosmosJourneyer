@@ -6,7 +6,6 @@ import { AbstractObject } from "../bodies/abstractObject";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { Settings } from "../../settings";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 
 export class SpaceStation extends AbstractObject {
@@ -23,10 +22,7 @@ export class SpaceStation extends AbstractObject {
         //TODO: do not hardcode seed
         const seed = 1;
 
-        this.model = new SpaceStationModel(
-            seed,
-            parentBody?.model
-        );
+        this.model = new SpaceStationModel(seed, parentBody?.model);
 
         this.instance = Assets.CreateSpaceStationInstance();
         this.instance.parent = this.transform;

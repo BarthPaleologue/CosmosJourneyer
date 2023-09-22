@@ -17,16 +17,24 @@ export class ThickLines {
 
     private readonly scene: Scene;
 
-    constructor(name: string, { points, thickness, color }: {
-        points: TransformNode[],
-        thickness?: number,
-        color?: Color3,
-    }, scene: Scene) {
+    constructor(
+        name: string,
+        {
+            points,
+            thickness,
+            color
+        }: {
+            points: TransformNode[];
+            thickness?: number;
+            color?: Color3;
+        },
+        scene: Scene
+    ) {
         this.name = name;
 
         this.thickness = thickness ?? 0.1;
         this.scene = scene;
-        
+
         this.material = new StandardMaterial(`${name}Material`, scene);
         this.material.emissiveColor = color ?? Color3.White();
 
@@ -40,27 +48,31 @@ export class ThickLines {
         const currentNumberOfCylinders = this.cylinders.length;
 
         // delete useless cylinders
-        for(let i = targetNumberOfCylinders; i < currentNumberOfCylinders; i++) {
+        for (let i = targetNumberOfCylinders; i < currentNumberOfCylinders; i++) {
             this.cylinders[i].dispose();
         }
 
         // create new cylinders
-        for(let i = currentNumberOfCylinders; i < targetNumberOfCylinders; i++) {
-            const cylinder = CreateCylinder(`${this.name}Segment${i}`, {
-                height: 1,
-                diameter: this.thickness,
-            }, this.scene);
+        for (let i = currentNumberOfCylinders; i < targetNumberOfCylinders; i++) {
+            const cylinder = CreateCylinder(
+                `${this.name}Segment${i}`,
+                {
+                    height: 1,
+                    diameter: this.thickness
+                },
+                this.scene
+            );
             cylinder.material = this.material;
             this.cylinders.push(cylinder);
         }
     }
 
     public update() {
-        for(let i = 0; i < this.points.length - 1; i++) {
+        for (let i = 0; i < this.points.length - 1; i++) {
             const cylinder = this.cylinders[i];
             const start = this.points[i].getAbsolutePosition();
             const end = this.points[i + 1].getAbsolutePosition();
-            
+
             const middlePoint = start.add(end).scaleInPlace(0.5);
             const distance = end.subtract(start).length();
 

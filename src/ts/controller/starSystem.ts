@@ -256,10 +256,7 @@ export class StarSystem {
         }
     }
 
-    public makeSatellite(
-        planet: Planemo,
-        model: TelluricPlanemoModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)
-    ): TelluricPlanemo {
+    public makeSatellite(planet: Planemo, model: TelluricPlanemoModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)): TelluricPlanemo {
         const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, this.scene, model, planet);
 
         satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);

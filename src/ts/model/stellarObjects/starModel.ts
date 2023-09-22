@@ -5,8 +5,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
 import { BodyModel, BODY_TYPE, StellarObjectModel, StarPhysicalProperties, GENERATION_STEPS } from "../common";
-import { OrbitalProperties } from "../orbits/orbitalProperties";
-import { getOrbitalPeriod } from "../orbits/compute";
+import { OrbitalProperties, getOrbitalPeriod } from "../orbit";
 import { STELLAR_TYPE } from "./common";
 
 export class StarModel implements StellarObjectModel {
@@ -67,7 +66,7 @@ export class StarModel implements StellarObjectModel {
         this.orbit = {
             radius: orbitRadius,
             p: 2,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody),
+            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: Vector3.Up(),
             isPlaneAlignedWithParent: true
         };

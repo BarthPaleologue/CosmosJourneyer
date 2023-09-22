@@ -4,8 +4,7 @@ import { Settings } from "../../settings";
 import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, SolidPhysicalProperties } from "../common";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
-import { OrbitalProperties } from "../orbits/orbitalProperties";
-import { getOrbitalPeriod, getPeriapsis } from "../orbits/compute";
+import { OrbitalProperties, getOrbitalPeriod, getPeriapsis } from "../orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class TelluricPlanemoModel implements PlanemoModel {
@@ -82,7 +81,7 @@ export class TelluricPlanemoModel implements PlanemoModel {
         this.orbit = {
             radius: orbitRadius,
             p: orbitalP,
-            period: getOrbitalPeriod(orbitRadius, this.parentBody),
+            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: orbitalPlaneNormal,
             isPlaneAlignedWithParent: isOrbitalPlaneAlignedWithParent
         };
