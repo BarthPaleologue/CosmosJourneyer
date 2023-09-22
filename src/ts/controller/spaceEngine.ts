@@ -88,10 +88,8 @@ export class SpaceEngine {
 
         //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
-            if (e.key === "o") {
-                OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
-                this.orbitRenderer.setVisibility(OverlayPostProcess.ARE_ENABLED);
-            }
+            if (e.key === "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
+            if (e.key === "n") this.orbitRenderer.setVisibility(!this.orbitRenderer.isVisible());
             if (e.key === "p") Tools.CreateScreenshot(this.getEngine(), this.getStarSystemScene().getActiveController().getActiveCamera(), { precision: 4 });
             if (e.key === "v") {
                 if (!VideoRecorder.IsSupported(this.getEngine())) console.warn("Your browser does not support video recording!");

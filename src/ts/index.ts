@@ -14,7 +14,7 @@ import { SpaceEngine } from "./controller/spaceEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ShipController } from "./spaceship/shipController";
-import { SpaceStation } from "./view/spacestation/spaceStation";
+import { SpaceStation } from "./view/spaceStation";
 import { PostProcessType } from "./view/postProcesses/postProcessTypes";
 import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
 import { StarModel } from "./model/stellarObjects/starModel";

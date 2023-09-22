@@ -12,7 +12,7 @@ import { StarSystemModel } from "../model/starSystemModel";
 import { isOrbiting } from "../utils/nearestBody";
 import { BODY_TYPE } from "../model/common";
 import { StellarObject } from "../view/bodies/stellarObjects/stellarObject";
-import { SpaceStation } from "../view/spacestation/spaceStation";
+import { SpaceStation } from "../view/spaceStation";
 import { AbstractObject } from "../view/bodies/abstractObject";
 import { romanNumeral } from "../utils/nameGenerator";
 import { TelluricPlanemoModel } from "../model/planemos/telluricPlanemoModel";

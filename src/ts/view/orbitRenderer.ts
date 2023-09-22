@@ -11,6 +11,8 @@ export class OrbitRenderer {
 
     private orbitMaterial: StandardMaterial | null = null;
 
+    private isVisibile = false;
+
     setOrbitalObjects(orbitalObjects: OrbitalObject[]) {
         this.reset();
         this.orbitalObjects = orbitalObjects;
@@ -18,6 +20,8 @@ export class OrbitRenderer {
         for (const orbitalObject of orbitalObjects) {
             this.createOrbitMesh(orbitalObject);
         }
+
+        this.setVisibility(this.isVisibile);
     }
 
     private createOrbitMesh(orbitalObject: OrbitalObject) {
@@ -39,9 +43,14 @@ export class OrbitRenderer {
     }
 
     setVisibility(visible: boolean) {
+        this.isVisibile = visible;
         for (const orbitMesh of this.orbitMeshes) {
             orbitMesh.visibility = visible ? 1 : 0;
         }
+    }
+
+    isVisible(): boolean {
+        return this.isVisibile;
     }
 
     update() {

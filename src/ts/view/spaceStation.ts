@@ -1,12 +1,12 @@
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Scene } from "@babylonjs/core/scene";
-import { Assets } from "../../controller/assets";
-import { SpaceStationModel } from "../../model/spacestationModel";
-import { AbstractObject } from "../bodies/abstractObject";
+import { Assets } from "../controller/assets";
+import { SpaceStationModel } from "../model/spacestationModel";
+import { AbstractObject } from "./bodies/abstractObject";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { PostProcessType } from "../postProcesses/postProcessTypes";
+import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
+import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 
 export class SpaceStation extends AbstractObject {
     readonly model: SpaceStationModel;
