@@ -345,6 +345,16 @@ export class PostProcessManager {
     }
 
     public rebuild() {
+        // rebuild all volumetric lights FIXME: bug of babylonjs
+        for (const volumetricLight of this.volumetricLights) {
+            volumetricLight.dispose();
+            const deletedLights = this.volumetricLights.splice(this.volumetricLights.indexOf(volumetricLight), 1);
+            for(const light of deletedLights) light.dispose();
+
+            const newVolumetricLight = new VolumetricLight(volumetricLight.object, this.scene);
+            this.volumetricLights.push(newVolumetricLight);
+        }
+
         this.init();
     }
 

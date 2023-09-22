@@ -10,14 +10,16 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess implem
     private scene: UberScene;
 
     constructor(star: Star, scene: UberScene) {
-        super(`${star.name}VolumetricLight`, 1, null, star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
-
+        super(`${star.name}VolumetricLight`, 1, scene.getActiveUberCamera(), star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
+        
         this.scene = scene;
 
         this.object = star;
 
         this.exposure = 0.26;
         this.decay = 0.95;
+
+        this.getCamera().detachPostProcess(this);
     }
 
     public update(deltaTime: number): void {
