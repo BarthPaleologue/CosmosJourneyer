@@ -41,6 +41,7 @@ spaceshipController.addInput(gamepad);
 scene.setActiveController(spaceshipController);
 
 engine.registerStarSystemUpdateCallback(() => {
+    if (engine.isPaused()) return;
     if (scene.getActiveController() != spaceshipController) return;
 
     const shipPosition = spaceshipController.getTransform().getAbsolutePosition();
@@ -99,3 +100,5 @@ const nbRadius = starSystem.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE 
 positionNearObject(scene.getActiveController(), starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);
 
 engine.bodyEditor.setVisibility(EditorVisibility.NAVBAR);
+
+engine.toggleStarMap();

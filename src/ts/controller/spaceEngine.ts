@@ -30,6 +30,7 @@ import { Animation } from "@babylonjs/core/Animations/animation";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { OrbitRenderer } from "../view/orbitRenderer";
+import { PauseMenu } from "../ui/pauseMenu";
 
 enum EngineState {
     RUNNING,
@@ -40,6 +41,7 @@ export class SpaceEngine {
     // UI
     private readonly helmetOverlay: HelmetOverlay;
     readonly bodyEditor: BodyEditor;
+    private readonly pauseMenu: PauseMenu;
     readonly canvas: HTMLCanvasElement;
     private isFullscreen = false;
     private videoRecorder: VideoRecorder | null = null;
@@ -68,6 +70,15 @@ export class SpaceEngine {
     constructor() {
         this.helmetOverlay = new HelmetOverlay();
         this.bodyEditor = new BodyEditor();
+        this.pauseMenu = new PauseMenu();
+
+        this.pauseMenu.onResume.add(() => this.resume());
+        this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
+        this.pauseMenu.onShare.add(() => {
+            const seed = this.getStarSystem().model.seed;
+            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/dist/random.html?seed=${seed}`);
+            navigator.clipboard.writeText(url.toString());
+        });
 
         this.canvas = document.getElementById("renderer") as HTMLCanvasElement;
         this.canvas.width = window.innerWidth;
@@ -86,11 +97,15 @@ export class SpaceEngine {
             }
         ]);
 
+        window.addEventListener("blur", () => {
+            if (!this.isPaused()) this.pause();
+        });
+
         //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
             if (e.key === "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
             if (e.key === "n") this.orbitRenderer.setVisibility(!this.orbitRenderer.isVisible());
-            if (e.key === "p") Tools.CreateScreenshot(this.getEngine(), this.getStarSystemScene().getActiveController().getActiveCamera(), { precision: 4 });
+            if (e.key === "p") this.takeScreenshot();
             if (e.key === "v") {
                 if (!VideoRecorder.IsSupported(this.getEngine())) console.warn("Your browser does not support video recording!");
                 if (this.videoRecorder === null) {
@@ -121,15 +136,36 @@ export class SpaceEngine {
 
             // when pressing f11, the ui is hidden when the browser is in fullscreen mode
             if (e.key === "F11") this.isFullscreen = !this.isFullscreen;
+
+            if (e.key === "Escape") {
+                if (this.state === EngineState.RUNNING) this.pause();
+                else this.resume();
+            }
         });
+    }
+
+    takeScreenshot(): void {
+        const camera = this.getActiveScene().activeCamera;
+        if (camera === null) throw new Error("Cannot take screenshot: camera is null");
+        Tools.CreateScreenshot(this.getEngine(), camera, { precision: 4 });
     }
 
     pause(): void {
         this.state = EngineState.PAUSED;
+        this.pauseMenu.setVisibility(true);
+        this.getStarSystemScene().physicsEnabled = false;
+        this.getStarMap().setRunning(false);
     }
 
     resume(): void {
         this.state = EngineState.RUNNING;
+        this.pauseMenu.setVisibility(false);
+        this.getStarSystemScene().physicsEnabled = true;
+        this.getStarMap().setRunning(true);
+    }
+
+    isPaused(): boolean {
+        return this.state === EngineState.PAUSED;
     }
 
     /**
@@ -209,7 +245,7 @@ export class SpaceEngine {
         });
 
         this.starSystemScene.registerBeforeRender(() => {
-            if (this.state === EngineState.PAUSED) return;
+            if (this.isPaused()) return;
 
             const starSystemScene = this.getStarSystemScene();
             const starSystem = this.getStarSystem();

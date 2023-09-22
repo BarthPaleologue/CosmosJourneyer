@@ -1,3 +1,4 @@
+import { Observable } from "@babylonjs/core/Misc/observable";
 import { clamp } from "../../utils/math";
 import { Input, InputType } from "./input";
 
@@ -16,8 +17,8 @@ export class Mouse implements Input {
     deadAreaRadius = 100;
     private canvas: HTMLCanvasElement;
 
-    private onMouseEnterListeners: (() => void)[] = [];
-    private onMouseLeaveListeners: (() => void)[] = [];
+    readonly onMouseEnterObservable: Observable<void> = new Observable();
+    readonly onMouseLeaveObservable: Observable<void> = new Observable();
 
     constructor(canvas: HTMLCanvasElement, deadAreaRadius = 50) {
         this.deadAreaRadius = deadAreaRadius;
@@ -35,18 +36,11 @@ export class Mouse implements Input {
         });
 
         document.addEventListener("mouseenter", () => {
-            this.onMouseEnterListeners.forEach((listener) => listener());
+            this.onMouseEnterObservable.notifyObservers();
         });
         document.addEventListener("mouseleave", () => {
-            this.onMouseLeaveListeners.forEach((listener) => listener());
+            this.onMouseLeaveObservable.notifyObservers();
         });
-    }
-
-    addOnMouseEnterListener(listener: () => void) {
-        this.onMouseEnterListeners.push(listener);
-    }
-    addOnMouseLeaveListener(listener: () => void) {
-        this.onMouseLeaveListeners.push(listener);
     }
 
     getRoll() {

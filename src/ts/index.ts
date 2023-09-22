@@ -51,16 +51,14 @@ spaceshipController.addInput(mouse);
 const physicsViewer = new PhysicsViewer();
 //physicsViewer.showBody(spaceshipController.aggregate.body);
 
-mouse.addOnMouseEnterListener(() => {
-    if (scene.getActiveController() === spaceshipController) engine.resume();
-});
-mouse.addOnMouseLeaveListener(() => {
+mouse.onMouseLeaveObservable.add(() => {
     if (scene.getActiveController() === spaceshipController) engine.pause();
 });
 
 scene.setActiveController(spaceshipController);
 
 engine.registerStarSystemUpdateCallback(() => {
+    if (engine.isPaused()) return;
     if (scene.getActiveController() != spaceshipController) return;
 
     const shipPosition = spaceshipController.getTransform().getAbsolutePosition();

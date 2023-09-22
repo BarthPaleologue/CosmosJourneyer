@@ -39,6 +39,7 @@ spaceshipController.addInput(gamepad);
 scene.setActiveController(spaceshipController);
 
 engine.registerStarSystemUpdateCallback(() => {
+    if (engine.isPaused()) return;
     if (scene.getActiveController() != spaceshipController) return;
 
     const shipPosition = spaceshipController.getTransform().getAbsolutePosition();

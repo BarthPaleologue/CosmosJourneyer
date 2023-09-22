@@ -1,5 +1,5 @@
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Axis, Vector3 } from "@babylonjs/core/Maths/math";
+import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { AbstractMesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";

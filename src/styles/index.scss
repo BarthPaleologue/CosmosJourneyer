@@ -16,6 +16,8 @@ body {
 
   @import "helmetOverlay/helmetOverlay";
 
+  @import "pauseMenu/index.scss";
+
   #renderer {
     z-index: 1;
     float: left;
