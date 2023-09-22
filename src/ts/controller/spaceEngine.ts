@@ -103,6 +103,16 @@ export class SpaceEngine {
 
         //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
+            // when pressing f11, the ui is hidden when the browser is in fullscreen mode
+            if (e.key === "F11") this.isFullscreen = !this.isFullscreen;
+
+            if (e.key === "Escape") {
+                if (this.state === EngineState.RUNNING) this.pause();
+                else this.resume();
+            }
+
+            if (this.isPaused()) return;
+
             if (e.key === "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
             if (e.key === "n") this.orbitRenderer.setVisibility(!this.orbitRenderer.isVisible());
             if (e.key === "p") this.takeScreenshot();
@@ -132,14 +142,6 @@ export class SpaceEngine {
                 if (this.getActiveScene() === this.starSystemScene) {
                     this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
                 }
-            }
-
-            // when pressing f11, the ui is hidden when the browser is in fullscreen mode
-            if (e.key === "F11") this.isFullscreen = !this.isFullscreen;
-
-            if (e.key === "Escape") {
-                if (this.state === EngineState.RUNNING) this.pause();
-                else this.resume();
             }
         });
     }

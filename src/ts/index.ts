@@ -190,6 +190,7 @@ if (aresAtmosphere) {
 }
 
 document.addEventListener("keydown", (e) => {
+    if (engine.isPaused()) return;
     if (e.key === "g") {
         if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);

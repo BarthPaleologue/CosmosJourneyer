@@ -77,6 +77,7 @@ const starSystem = new StarSystem(seed ? Number(seed) : randRange(-1, 1, (step: 
 engine.setStarSystem(starSystem, true);
 
 document.addEventListener("keydown", (e) => {
+    if (engine.isPaused()) return;
     if (e.key === "g") {
         if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);

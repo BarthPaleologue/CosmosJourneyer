@@ -70,6 +70,7 @@ const planet = starSystem.makeTelluricPlanet();
 planet.model.orbit.radius = 10000e3;
 
 document.addEventListener("keydown", (e) => {
+    if (engine.isPaused()) return;
     if (e.key === "g") {
         if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);
