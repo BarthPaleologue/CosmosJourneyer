@@ -2,14 +2,10 @@ precision highp float;
 
 // based on https://www.shadertoy.com/view/tsc3Rj and https://www.shadertoy.com/view/wdjGWR
 
-#define DISK_STEPS 12.0 //disk texture layers
-
 varying vec2 vUV;
 
 uniform float time;
 uniform float planetRadius;
-uniform float accretionDiskRadius;
-uniform float rotationPeriod;
 
 uniform float power;
 uniform vec3 accentColor;
