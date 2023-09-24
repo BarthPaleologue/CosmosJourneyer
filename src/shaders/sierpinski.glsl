@@ -39,16 +39,7 @@ uniform float cameraFar;
 #define MARCHINGSTEP 1.0
 #define EPSILON 0.0002
 
-#define MAXMANDELBROTDIST 3.0
-#define MANDELBROTSTEPS 15
-
-// cosine based palette, 4 vec3 params
-vec3 cosineColor( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
-    return a + b * cos(6.28318*(c*t+d));
-}
-vec3 palette (float t) {
-    return cosineColor(t, vec3(0.5,0.5,0.5), vec3(0.5,0.5,0.5), vec3(0.01,0.01,0.01), accentColor);
-}
+#define MAX_DIST 3.0
 
 float sdf(vec3 z)
 {
@@ -84,32 +75,21 @@ float sdf(vec3 z)
 // TRACING A PATH : 
 // measuring the distance to the nearest object on the x coordinate
 // and returning the color index on the y coordinate
-float rayMarch(vec3 origin, vec3 ray, out float steps) {
+float rayMarch(vec3 origin, vec3 ray, float maxDist) {
     //t is the point at which we are in the measuring of the distance
     float depth = 0.0;
-    steps = 0.0;
     float c = 0.0;
-    float maxDistance = 5.0;
     
     for (int i = 0; i < MARCHINGITERATIONS; i++) {
     	vec3 path = origin + ray * depth;	
     	float dist = sdf(path);    	
         depth += MARCHINGSTEP * dist;
-        steps++;
 
-        if (dist < EPSILON || dist > maxDistance) break;
+        if (dist < EPSILON) return depth;
+        if (i != 0 && dist > maxDist) return 1e20;
     }
 
     return depth;
-}
-
-vec4 lerp(vec4 v1, vec4 v2, float t) {
-    return t * v1 + (1.0 - t) * v2;
-}
-
-float contrast(float val, float contrast_offset, float contrast_mid_level)
-{
-	return clamp((val - contrast_mid_level) * (1. + contrast_offset) + contrast_mid_level, 0., 1.);
 }
 
 float calcOcclusion( in vec3 pos, in vec3 nor )
@@ -147,34 +127,28 @@ void main() {
     vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
     float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
 
-    //vec3 planetPosition = vec3(planetRadius * 3.0, 0.0, 0.0);
-    float planetRadius = planetRadius;
-
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, impactPoint, escapePoint))) {
         gl_FragColor = screenColor;// if not intersecting with atmosphere, return original color
         return;
     }
 
-    vec3 origin = cameraPosition + impactPoint * rayDir - planetPosition; // the ray origin in world space
-    origin /= 0.6 * planetRadius;
-    float steps;
-    float mandelDepth = rayMarch(origin, rayDir, steps);
+    // we apply inverse scaling to make the situation roughly equivalent to a fractal of size 1
+    float inverseScaling = 1.0 / (0.6 * planetRadius);
 
-    //FIXME: make it dependent on rayDir
-    if(mandelDepth > 3.0) {
-        gl_FragColor = screenColor;
-        return;
-    }
+    vec3 origin = cameraPosition - planetPosition; // the ray origin in world space
+    origin *= inverseScaling;
 
-    float realDepth = mandelDepth * 0.6 * planetRadius + impactPoint;
+    float rayDepth = rayMarch(origin, rayDir, MAX_DIST + impactPoint * inverseScaling);
+
+    float realDepth = rayDepth / inverseScaling;
 
     if(maximumDistance < realDepth) {
         gl_FragColor = screenColor;
         return;
     }
 
-    vec3 intersectionPoint = origin + mandelDepth * rayDir;
+    vec3 intersectionPoint = origin + rayDepth * rayDir;
     float intersectionDistance = length(intersectionPoint);
 
     vec4 mandelbulbColor = vec4(accentColor, 1.0);
@@ -189,7 +163,7 @@ void main() {
         ndl += max(0.0, dot(normal, starDir));
     }
 
-    mandelbulbColor.xyz *= clamp(ndl, 0.2, 1.0) * occ * 2.0;
+    mandelbulbColor.xyz *= clamp(ndl, 0.5, 1.0) * occ * 2.0;
 
     gl_FragColor = vec4(mandelbulbColor.xyz, 1.0);
 
