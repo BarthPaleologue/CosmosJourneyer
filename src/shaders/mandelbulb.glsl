@@ -36,8 +36,8 @@ uniform float cameraFar;
 
 #define MARCHINGITERATIONS 64
 
-#define MARCHINGSTEP 0.9
-#define EPSILON 0.01
+#define MARCHINGSTEP 1.0
+#define EPSILON 0.001
 
 #define MAXMANDELBROTDIST 3.0
 #define MANDELBROTSTEPS 15
@@ -144,15 +144,18 @@ void main() {
         return;
     }
 
+    float inverseScaling = 1.0 / (0.8 * planetRadius);
+
+    vec3 origin = cameraPosition + impactPoint * rayDir - planetPosition; // the ray origin in world space
+    origin *= inverseScaling;
+
+    float steps;
+    vec2 mandelDepth = rayMarch(origin, rayDir, steps);
+
     if(maximumDistance < impactPoint) {
         gl_FragColor = screenColor;
         return;
     }
-
-    vec3 origin = cameraPosition + impactPoint * rayDir - planetPosition; // the ray origin in world space
-    origin /= 0.8 * planetRadius;
-    float steps;
-    vec2 mandelDepth = rayMarch(origin, rayDir, steps);
 
     vec3 intersectionPoint = origin + mandelDepth.x * rayDir;
     float intersectionDistance = length(intersectionPoint);
