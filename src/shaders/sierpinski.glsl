@@ -32,8 +32,6 @@ uniform float cameraFar;
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
-#pragma glslify: saturate = require(./utils/saturate.glsl)
-
 #define MARCHINGITERATIONS 100
 
 #define MARCHINGSTEP 1.0
@@ -86,7 +84,7 @@ float rayMarch(vec3 origin, vec3 ray, float maxDist) {
         depth += MARCHINGSTEP * dist;
 
         if (dist < EPSILON) return depth;
-        if (i != 0 && dist > maxDist) return 1e20;
+        if (dist > maxDist) return 1e20;
     }
 
     return depth;
