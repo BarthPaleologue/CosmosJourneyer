@@ -34,7 +34,7 @@ export class MandelbulbModel implements PlanemoModel {
 
         this.parentBody = parentBody ?? null;
 
-        this.power = randRange(1.0, 18.0, this.rng, GENERATION_STEPS.POWER);
+        this.power = randRange(1.5, 6.0, this.rng, GENERATION_STEPS.POWER);
         this.accentColor = new Color3(this.rng(GENERATION_STEPS.ACCENNT_COLOR), this.rng(GENERATION_STEPS.ACCENNT_COLOR + 10), this.rng(GENERATION_STEPS.ACCENNT_COLOR + 20));
 
         // TODO: do not hardcode

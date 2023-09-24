@@ -145,7 +145,8 @@ void main() {
         return;
     }
 
-    float inverseScaling = 1.0 / (0.8 * planetRadius);
+    // scale down so that everything happens in a sphere of radius 2
+    float inverseScaling = 1.0 / (0.5 * planetRadius);
 
     vec3 origin = cameraPosition + impactPoint * rayDir - planetPosition; // the ray origin in world space
     origin *= inverseScaling;
