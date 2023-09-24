@@ -61,6 +61,7 @@ vec2 sdf(vec3 pos) {
 	for (int i = 0; i < MANDELBROTSTEPS ; i++) {
 		r = length(z);
 		if (r > MAXMANDELBROTDIST) break;
+        if (r < EPSILON) break;
 		
 		// convert to polar coordinates
 		float theta = acos(z.z / r);
@@ -152,7 +153,9 @@ void main() {
     float steps;
     vec2 mandelDepth = rayMarch(origin, rayDir, steps);
 
-    if(maximumDistance < impactPoint) {
+    float realDepth = impactPoint + mandelDepth.x / inverseScaling;
+
+    if(maximumDistance < realDepth) {
         gl_FragColor = screenColor;
         return;
     }
