@@ -2,7 +2,7 @@ import { Vector3, Quaternion, Matrix } from "@babylonjs/core/Maths/math";
 import { BaseObject, OrbitalObject } from "../common";
 import { BaseModel } from "../../model/common";
 import { Scene } from "@babylonjs/core/scene";
-import { getPointOnOrbit } from "../../model/orbit";
+import { getPointOnOrbit } from "../../model/orbit/orbit";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Cullable } from "./cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -85,9 +85,9 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
     public computeNextOrbitalPosition(): Vector3 {
         if (this.model.orbit.period > 0) {
             const barycenter = this.parentObject?.transform.getAbsolutePosition() ?? Vector3.Zero();
-            const orbitalPlaneNormal = this.parentObject?.transform.up ?? Vector3.Up();
+            /*const orbitalPlaneNormal = this.parentObject?.transform.up ?? Vector3.Up();
 
-            if (this.model.orbit.isPlaneAlignedWithParent) this.model.orbit.normalToPlane = orbitalPlaneNormal;
+            if (this.model.orbit.isPlaneAlignedWithParent) this.model.orbit.normalToPlane = orbitalPlaneNormal;*/
 
             const newPosition = getPointOnOrbit(barycenter, this.model.orbit, this.internalClock);
             this.nextState.position.copyFrom(newPosition);

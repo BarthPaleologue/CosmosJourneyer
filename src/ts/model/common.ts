@@ -1,4 +1,4 @@
-import { OrbitalProperties } from "./orbit";
+import { OrbitProperties } from "./orbit/orbitProperties";
 import { STELLAR_TYPE } from "./stellarObjects/common";
 
 export enum GENERATION_STEPS {
@@ -60,7 +60,7 @@ export interface BaseModel {
     rng: (step: number) => number;
     seed: number;
 
-    orbit: OrbitalProperties;
+    orbit: OrbitProperties;
     physicalProperties: PhysicalProperties;
 
     readonly parentBody: BaseModel | null;

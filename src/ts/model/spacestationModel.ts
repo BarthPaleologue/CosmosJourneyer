@@ -1,12 +1,13 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BaseModel, GENERATION_STEPS, PhysicalProperties } from "./common";
-import { OrbitalProperties, getOrbitalPeriod } from "./orbit";
+import { getOrbitalPeriod } from "./orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { OrbitProperties } from "./orbit/orbitProperties";
 
 export class SpaceStationModel implements BaseModel {
     readonly seed: number;
     readonly rng: (step: number) => number;
-    readonly orbit: OrbitalProperties;
+    readonly orbit: OrbitProperties;
     readonly physicalProperties: PhysicalProperties;
     readonly parentBody: BaseModel | null;
     readonly childrenBodies: BaseModel[] = [];

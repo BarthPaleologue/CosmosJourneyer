@@ -5,8 +5,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
 import { BodyModel, BODY_TYPE, StellarObjectModel, StarPhysicalProperties, GENERATION_STEPS } from "../common";
-import { OrbitalProperties, getOrbitalPeriod } from "../orbit";
+import { getOrbitalPeriod } from "../orbit/orbit";
 import { STELLAR_TYPE } from "./common";
+import { OrbitProperties } from "../orbit/orbitProperties";
 
 export class StarModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.STAR;
@@ -21,7 +22,7 @@ export class StarModel implements StellarObjectModel {
     readonly mass = 1000;
     readonly rotationPeriod = 24 * 60 * 60;
 
-    readonly orbit: OrbitalProperties;
+    readonly orbit: OrbitProperties;
 
     readonly physicalProperties: StarPhysicalProperties;
 

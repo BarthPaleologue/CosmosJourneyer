@@ -1,10 +1,11 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BodyModel, BODY_TYPE, PlanemoModel, PlanetPhysicalProperties, GENERATION_STEPS } from "../common";
-import { getOrbitalPeriod, getPeriapsis, OrbitalProperties } from "../orbit";
+import { getOrbitalPeriod, getPeriapsis } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { clamp } from "../../utils/math";
+import { OrbitProperties } from "../orbit/orbitProperties";
 
 export class MandelbulbModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.MANDELBULB;
@@ -13,7 +14,7 @@ export class MandelbulbModel implements PlanemoModel {
 
     readonly radius: number;
 
-    readonly orbit: OrbitalProperties;
+    readonly orbit: OrbitProperties;
 
     readonly physicalProperties: PlanetPhysicalProperties;
 

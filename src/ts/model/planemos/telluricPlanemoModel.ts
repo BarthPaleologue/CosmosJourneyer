@@ -1,11 +1,12 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { centeredRand, normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, SolidPhysicalProperties } from "../common";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
-import { OrbitalProperties, getOrbitalPeriod, getPeriapsis } from "../orbit";
+import { getOrbitalPeriod, getPeriapsis } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { OrbitProperties } from "../orbit/orbitProperties";
 
 export class TelluricPlanemoModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.TELLURIC;
@@ -14,7 +15,7 @@ export class TelluricPlanemoModel implements PlanemoModel {
 
     readonly radius: number;
 
-    readonly orbit: OrbitalProperties;
+    readonly orbit: OrbitProperties;
 
     readonly physicalProperties: SolidPhysicalProperties;
 

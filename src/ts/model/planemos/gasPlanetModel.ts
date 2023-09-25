@@ -1,10 +1,11 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, PlanetPhysicalProperties } from "../common";
-import { OrbitalProperties, getOrbitalPeriod, getPeriapsis } from "../orbit";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { getOrbitalPeriod, getPeriapsis } from "../orbit/orbit";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { clamp } from "../../utils/math";
+import { OrbitProperties } from "../orbit/orbitProperties";
 
 export class GasPlanetModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.GAS;
@@ -13,7 +14,7 @@ export class GasPlanetModel implements PlanemoModel {
 
     readonly radius: number;
 
-    readonly orbit: OrbitalProperties;
+    readonly orbit: OrbitProperties;
 
     readonly physicalProperties: PlanetPhysicalProperties;
 
