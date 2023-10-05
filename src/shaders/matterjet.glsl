@@ -64,11 +64,11 @@ const float a=1.0;
 const float b=.1759;
 const float PI=3.14159265359;
 
-float spiralSDF(float u, float v) {
+float spiralSDF(float theta, float radius) {
 
-    float t=u;
+    float t=theta;
     // t=(t+PI)/(2.*PI);
-    float r=v;
+    float r=radius;
     
     float n=(log(r/a)/b-t)/(2.*PI);
 
@@ -83,8 +83,24 @@ float spiralSDF(float u, float v) {
     return min(abs(upper_r-r),abs(r-lower_r));
 }
 
-vec4 matterJets(vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
-    return vec4(0.0, 0.0, 0.0, 0.0);
+float spiralDensity(vec3 pointOnCone, vec3 coneAxis, float coneMaxHeight) {
+    // Then we rotate that point so that we eliminate the axial tilt of the star from the equation
+    vec3 targetAxis = vec3(0.0, 1.0, 0.0);
+    vec3 rotationRemovalAxis = cross(coneAxis, targetAxis);
+    vec3 pointOnYCone = rotateAround(pointOnCone, rotationRemovalAxis, -acos(dot(coneAxis, targetAxis)));
+
+    vec2 pointOnXZPlane = vec2(pointOnYCone.x, pointOnYCone.z);
+    float theta = atan(pointOnXZPlane.y, pointOnXZPlane.x);
+    float heightFraction = abs(pointOnYCone.y) / coneMaxHeight;
+
+    if(heightFraction > 1.0) {
+        return 0.0;
+    }
+    
+    float d = spiralSDF(theta, heightFraction);
+    if (d > 0.1) return 0.0;
+    
+    return 1.0;
 }
 
 void main() {
@@ -101,39 +117,19 @@ void main() {
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
     vec4 finalColor = screenColor;
+
+    const float jetHeight = 4000000e3;
+
     
     float t1, t2;
     if(rayIntersectCone(cameraPosition, rayDir, planetPosition, rotationAxis, 0.9, t1, t2)) {
         if(t1 < maximumDistance) {
             // Find the intersection point relative to the star
             vec3 jetPointPosition1 = cameraPosition + t1 * rayDir - planetPosition;
-            //vec3 jetPointPosition2 = cameraPosition + t2 * rayDir;
 
-            // Then we rotate that point so that we eliminate the axial tilt of the star from the equation
-            vec3 targetAxis = vec3(0.0, 1.0, 0.0);
-            vec3 rotationRemovalAxis = cross(rotationAxis, targetAxis);
-            jetPointPosition1 = rotateAround(jetPointPosition1, rotationRemovalAxis, -acos(dot(rotationAxis, targetAxis)));
+            float density1 = spiralDensity(jetPointPosition1, rotationAxis, jetHeight);
 
-            vec2 jetPointPositionPlane1 = vec2(jetPointPosition1.x, jetPointPosition1.z);
-            float theta1 = atan(jetPointPositionPlane1.y, jetPointPositionPlane1.x);
-            float h1 = abs(jetPointPosition1.y);
-
-            float maxHeight = 4000000e3;
-
-            float h1_01 = h1 / maxHeight;
-
-            if(h1_01 > 1.0) {
-                // cut cone at maxHeight
-                finalColor = screenColor;
-            } else {
-                // if u,v are on spiral color blue, else color white
-                float d = spiralSDF(theta1, h1_01);
-                if (d < 0.1) {
-                    finalColor = vec4(0.0, 0.0, 1.0, 1.0);
-                } else {
-                    finalColor = screenColor;
-                }
-            }
+            finalColor.rgb = mix(finalColor.rgb, vec3(0.0, 0.0, 1.0), density1);
         }
     }
 
