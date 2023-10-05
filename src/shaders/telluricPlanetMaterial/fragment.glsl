@@ -28,9 +28,6 @@ uniform vec3 planetPosition;
 uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
 uniform int nbStars; // number of stars
 
-uniform sampler2D textureSampler;
-uniform sampler2D depthSampler; // evaluate sceneDepth
-
 uniform int colorMode;
 
 uniform sampler2D bottomNormalMap;
@@ -250,12 +247,6 @@ void main() {
 	for(int i = 0; i < nbStars; i++) {
 		vec3 starLightRayW = normalize(starPositions[i] - vPositionW);
 		float ndl2part = max(0.0, dot(normalW, starLightRayW));
-		// removing light where light ray goes through the surface
-		float t0, t1;
-		//TODO: DO NOT HARDCODE
-		if(rayIntersectSphere(vPositionW, starLightRayW, planetPosition, planetRadius, t0, t1)) {
-			ndl2part *= smoothstep(3e5, 0.0, abs(t1 - t0));//1.0 / (1.0 + 1e-5 * (t1 - t0));
-		}
 		ndl2 += ndl2part;
 
 		vec3 angleW = normalize(viewRayW + starLightRayW);

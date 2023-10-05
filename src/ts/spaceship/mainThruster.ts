@@ -1,28 +1,14 @@
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { DirectionnalParticleSystem } from "../utils/particleSystem";
-import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
-import { Thruster } from "./thruster";
+import { AbstractThruster } from "./abstractThruster";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { getDownwardDirection, getForwardDirection, getUpwardDirection } from "../controller/uberCore/transforms/basicTransform";
 
-export class MainThruster implements Thruster {
-    readonly mesh: AbstractMesh;
+export class MainThruster extends AbstractThruster {
+    protected readonly maxAuthority = 3e3;
 
-    readonly plume: DirectionnalParticleSystem;
-
-    readonly maxAuthority = 2e3;
-
-    private throttle = 0;
-
-    private direction: Vector3;
-
-    readonly parent: NewtonianTransform;
-
-    constructor(mesh: AbstractMesh, direction: Vector3, parent: NewtonianTransform) {
-        this.mesh = mesh;
-
-        this.direction = direction;
-        this.plume = new DirectionnalParticleSystem(mesh, this.direction);
-        this.parent = parent;
+    constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
+        super(mesh, direction, parentAggregate);
     }
 
     public setThrottle(throttle: number): void {
@@ -33,21 +19,11 @@ export class MainThruster implements Thruster {
         this.throttle = Math.max(Math.min(1, this.throttle + delta), 0);
     }
 
-    public getThrottle(): number {
-        return this.throttle;
-    }
+    public applyForce(): void {
+        const thrustDirection = getDownwardDirection(this.mesh);
+        const force = thrustDirection.scale(200 * this.throttle);
 
-    public getAuthority(direction: Vector3): number {
-        return this.getAuthority01(direction) * this.maxAuthority * this.throttle;
-    }
-
-    public getAuthority01(direction: Vector3): number {
-        return Math.max(0, Vector3.Dot(this.direction, direction.negate()));
-    }
-
-    public update(): void {
-        this.plume.emitRate = this.throttle * 1000;
-        this.plume.setDirection(this.parent.getForwardDirection().negate());
-        this.plume.applyAcceleration(this.parent.acceleration.negate());
+        // make the ship spin (apply force at the position of the thruster then apply the same force at the center of mass in the opposite direction)
+        this.parentAggregate.body.applyForce(force, this.mesh.getAbsolutePosition());
     }
 }

@@ -1,5 +1,5 @@
 import overlayHTML from "../../html/helmetOverlay.html";
-import { AbstractBody } from "../bodies/abstractBody";
+import { AbstractBody } from "../view/bodies/abstractBody";
 
 export class HelmetOverlay {
     private readonly parentNode: HTMLElement;
@@ -21,8 +21,12 @@ export class HelmetOverlay {
         this.parentNode.style.visibility = visible ? "visible" : "hidden";
     }
 
+    public isVisible(): boolean {
+        return this.parentNode.style.visibility === "visible";
+    }
+
     public update(currentBody: AbstractBody) {
         this.bodyNamePlate.innerText = currentBody.name;
-        this.bodySeedPlate.innerText = `Seed: ${currentBody.descriptor.seed.toString()}`;
+        this.bodySeedPlate.innerText = `Seed: ${currentBody.model.seed.toString()}`;
     }
 }

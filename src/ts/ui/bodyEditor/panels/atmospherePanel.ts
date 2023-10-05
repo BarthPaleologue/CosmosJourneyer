@@ -1,21 +1,17 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanemo } from "../../../bodies/planemos/telluricPlanemo";
-import { GasPlanet } from "../../../bodies/planemos/gasPlanet";
+import { TelluricPlanemo } from "../../../view/bodies/planemos/telluricPlanemo";
+import { GasPlanet } from "../../../view/bodies/planemos/gasPlanet";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
-import { PostProcessManager } from "../../../postProcesses/postProcessManager";
-import { PostProcessType } from "../../../postProcesses/postProcessTypes";
+import { AtmosphericScatteringPostProcess } from "../../../view/postProcesses/atmosphericScatteringPostProcess";
 
 export class AtmospherePanel extends EditorPanel {
     constructor() {
         super("atmosphere");
     }
-    init(planet: TelluricPlanemo | GasPlanet, postProcessManager: PostProcessManager) {
+    init(planet: TelluricPlanemo | GasPlanet, atmosphere: AtmosphericScatteringPostProcess) {
         for (const slider of this.sliders) slider.remove();
-
-        if (!planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) return;
-        const atmosphere = postProcessManager.getAtmosphere(planet);
 
         const atmosphereToggler = clearAllEventListenersById("atmosphereToggler");
         atmosphereToggler.addEventListener("click", () => {

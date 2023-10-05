@@ -1,8 +1,8 @@
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Axis, Vector3 } from "@babylonjs/core/Maths/math";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
-import { Assets } from "../assets";
+import { Assets } from "../controller/assets";
 import { Particle } from "@babylonjs/core/Particles/particle";
 
 function randomNumber(min: number, max: number): number {
@@ -11,6 +11,8 @@ function randomNumber(min: number, max: number): number {
 
 export class DirectionnalParticleSystem extends ParticleSystem {
     private direction: Vector3;
+
+    readonly emitter: AbstractMesh;
 
     readonly nbParticles = 5000;
 
@@ -22,24 +24,28 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         super("particles", 5000, mesh.getScene());
 
         this.direction = direction;
+        this.emitter = mesh;
 
-        this.particleTexture = Assets.GrassNormalMap;
+        this.particleTexture = Assets.PlumeParticle;
+        this.particleTexture.hasAlpha = true;
+
         this.emitter = mesh;
         this.minSize = 0.6;
         this.maxSize = 0.7;
         this.useLogarithmicDepth = true;
-        this.emitRate = 100;
-        this.blendMode = ParticleSystem.BLENDMODE_ONEONE;
         this.minLifeTime = 0.5;
         this.maxLifeTime = 0.6;
         this.minEmitPower = 0;
         this.maxEmitPower = 0;
         this.updateSpeed = 0.005;
+        this.forceDepthWrite = true;
         this.color1 = new Color4(0.5, 0.5, 0.5, 1);
         this.color2 = new Color4(0.5, 0.5, 0.5, 1);
         this.colorDead = new Color4(0, 0, 0, 0);
         this.direction1 = direction;
         this.direction2 = direction;
+        this.minEmitBox = new Vector3(-0.1, -0.1, -0.1);
+        this.maxEmitBox = new Vector3(0.1, 0.1, 0.1);
         this.start();
 
         this.startPositionFunction = (worldMatrix, positionToUpdate, particle: Particle, isLocal): void => {
@@ -47,7 +53,7 @@ export class DirectionnalParticleSystem extends ParticleSystem {
             const randY = randomNumber(this.minEmitBox.y, this.maxEmitBox.y);
             const randZ = randomNumber(this.minEmitBox.z, this.maxEmitBox.z);
 
-            this.particleVelocities[particle.id] = Vector3.Zero(); //Vector3.TransformCoordinates(this.direction, worldMatrix).scale(3);
+            this.particleVelocities[particle.id] = this.emitter.getDirection(Axis.Y).scale(3);
 
             Vector3.TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
         };
@@ -69,20 +75,20 @@ export class DirectionnalParticleSystem extends ParticleSystem {
                     this.recycleParticle(particle);
                     i--;
                     continue;
-                } else {
-                    const velocity = this.particleVelocities[particle.id];
-                    velocity.addInPlace(scaledAcceleration);
-
-                    particle.colorStep.scaleToRef(scaledUpdateSpeed, scaledColorStep);
-                    particle.color.addInPlace(scaledColorStep);
-
-                    if (particle.color.a < 0) particle.color.a = 0;
-                    particle.angle += particle.angularSpeed * scaledUpdateSpeed;
-
-                    particle.direction.scaleToRef(scaledUpdateSpeed, scaledDirection);
-
-                    particle.position.addInPlace(velocity.scale(deltaTime));
                 }
+
+                const velocity = this.particleVelocities[particle.id];
+                velocity.addInPlace(scaledAcceleration);
+
+                particle.colorStep.scaleToRef(scaledUpdateSpeed, scaledColorStep);
+                particle.color.addInPlace(scaledColorStep);
+
+                if (particle.color.a < 0) particle.color.a = 0;
+                particle.angle += particle.angularSpeed * scaledUpdateSpeed;
+
+                particle.direction.scaleToRef(scaledUpdateSpeed, scaledDirection);
+
+                particle.position.addInPlace(velocity.scale(deltaTime));
             }
         };
     }

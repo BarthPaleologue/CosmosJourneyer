@@ -1,19 +1,15 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanemo } from "../../../bodies/planemos/telluricPlanemo";
-import { PostProcessManager } from "../../../postProcesses/postProcessManager";
+import { TelluricPlanemo } from "../../../view/bodies/planemos/telluricPlanemo";
 import { Slider } from "handle-sliderjs";
-import { PostProcessType } from "../../../postProcesses/postProcessTypes";
+import { OceanPostProcess } from "../../../view/postProcesses/oceanPostProcess";
 
 export class OceanPanel extends EditorPanel {
     constructor() {
         super("ocean");
     }
-    init(planet: TelluricPlanemo, postProcessManager: PostProcessManager) {
+    init(planet: TelluricPlanemo, ocean: OceanPostProcess) {
         for (const slider of this.sliders) slider.remove();
-
-        if (!planet.postProcesses.includes(PostProcessType.OCEAN)) return;
-        const ocean = postProcessManager.getOcean(planet);
 
         const oceanToggler = clearAllEventListenersById("oceanToggler");
         oceanToggler.addEventListener("click", () => {

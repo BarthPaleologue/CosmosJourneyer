@@ -1,29 +1,37 @@
 import "../styles/index.scss";
 
-import { Keyboard } from "./inputs/keyboard";
-import { Mouse } from "./inputs/mouse";
-import { Gamepad } from "./inputs/gamepad";
+import { Keyboard } from "./controller/inputs/keyboard";
+import { Mouse } from "./controller/inputs/mouse";
+import { Gamepad } from "./controller/inputs/gamepad";
 
-import { StarSystem } from "./bodies/starSystem";
+import { StarSystem } from "./controller/starSystem";
 
 import { Settings } from "./settings";
-import { Assets } from "./assets";
+import { Assets } from "./controller/assets";
 import { PlayerController } from "./spacelegs/playerController";
-import { positionNearBody } from "./utils/positionNearBody";
-import { PlanetEngine } from "./planetEngine";
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { positionNearObject } from "./utils/positionNearObject";
+import { SpaceEngine } from "./controller/spaceEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ShipController } from "./spaceship/shipController";
-import { SpaceStation } from "./spacestation/spaceStation";
-import { PostProcessType } from "./postProcesses/postProcessTypes";
+import { SpaceStation } from "./view/spaceStation";
+import { PostProcessType } from "./view/postProcesses/postProcessTypes";
+import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
+import { StarModel } from "./model/stellarObjects/starModel";
+import { GasPlanetModel } from "./model/planemos/gasPlanetModel";
+import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
+import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
+import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
+import { MandelbulbModel } from "./model/planemos/mandelbulbModel";
+import { getMoonSeed } from "./model/planemos/common";
 
-const engine = new PlanetEngine();
+const engine = new SpaceEngine();
 
 await engine.setup();
 
 const scene = engine.getStarSystemScene();
 
-const mouse = new Mouse(engine.canvas, 1e5);
+const mouse = new Mouse(engine.canvas, 100);
 const keyboard = new Keyboard();
 const gamepad = new Gamepad();
 
@@ -38,17 +46,44 @@ const spaceshipController = new ShipController(scene);
 spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 spaceshipController.addInput(keyboard);
 spaceshipController.addInput(gamepad);
+spaceshipController.addInput(mouse);
+
+const physicsViewer = new PhysicsViewer();
+//physicsViewer.showBody(spaceshipController.aggregate.body);
+
+mouse.onMouseLeaveObservable.add(() => {
+    if (scene.getActiveController() === spaceshipController) engine.pause();
+});
 
 scene.setActiveController(spaceshipController);
 
 engine.registerStarSystemUpdateCallback(() => {
+    if (engine.isPaused()) return;
     if (scene.getActiveController() != spaceshipController) return;
 
-    const shipPosition = spaceshipController.transform.getAbsolutePosition();
+    const shipPosition = spaceshipController.getTransform().getAbsolutePosition();
     const nearestBody = engine.getStarSystem().getNearestObject(shipPosition);
     const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getBoundingRadius();
-    spaceshipController.registerClosestDistanceToPlanet(distance - radius);
+    spaceshipController.registerClosestObject(distance, radius);
+
+    const warpDrive = spaceshipController.getWarpDrive();
+    const shipInternalThrottle = warpDrive.getInternalThrottle();
+    const shipTargetThrottle = warpDrive.getTargetThrottle();
+
+    const throttleString = warpDrive.isEnabled()
+        ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}`
+        : spaceshipController.getThrottle();
+
+    (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
+});
+
+engine.getStarMap().onWarpObservable.add(() => {
+    spaceshipController.thirdPersonCamera.setRadius(30);
+});
+
+engine.onToggleStarMapObservable.add((isStarMapOpen) => {
+    if (!isStarMapOpen) spaceshipController.thirdPersonCamera.setRadius(30);
 });
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
@@ -57,35 +92,40 @@ const starSystemSeed = 0;
 const starSystem = new StarSystem(starSystemSeed, scene);
 engine.setStarSystem(starSystem, false);
 
-const sun = starSystem.makeNeutronStar(0.51);
-sun.descriptor.orbitalProperties.period = 60 * 60 * 24;
+const sunModel = new StarModel(0.51);
+const sun = starSystem.makeNeutronStar(sunModel);
+sun.model.orbit.period = 60 * 60 * 24;
 
-const planet = starSystem.makeTelluricPlanet(0.4233609183800225);
+/*const secundaModel = new StarModel(-672446, sunModel);
+secundaModel.orbitalProperties.radius = 4 * sunModel.radius;
+secundaModel.orbitalProperties.period = 60 * 60 * 24 * 365.25;
+const secunda = starSystem.makeStar(secundaModel);*/
 
-planet.descriptor.physicalProperties.minTemperature = -37;
-planet.descriptor.physicalProperties.maxTemperature = 40;
-planet.material.updateConstants();
+const planetModel = new TelluricPlanemoModel(0.4233609183800225, sunModel);
+planetModel.physicalProperties.minTemperature = -37;
+planetModel.physicalProperties.maxTemperature = 30;
 
-planet.descriptor.orbitalProperties.period = 60 * 60 * 24 * 365.25;
-planet.descriptor.orbitalProperties.apoapsis = 4000 * planet.getRadius();
-planet.descriptor.orbitalProperties.periapsis = 4000 * planet.getRadius();
-planet.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
+planetModel.orbit.period = 60 * 60 * 24 * 365.25;
+planetModel.orbit.radius = 4000 * planetModel.radius;
+planetModel.orbit.normalToPlane = Vector3.Up();
 
-const spacestation = new SpaceStation([planet], scene);
+const planet = starSystem.makeTelluricPlanet(planetModel);
+
+const spacestation = new SpaceStation(scene, planet);
 engine.getStarSystem().addSpaceStation(spacestation);
 
-const moon = starSystem.makeSatellite(planet, 10);
+const moonModel = new TelluricPlanemoModel(getMoonSeed(planetModel, 0), planetModel);
+moonModel.physicalProperties.mass = 2;
+moonModel.physicalProperties.rotationPeriod = 7 * 60 * 60;
+moonModel.physicalProperties.minTemperature = -180;
+moonModel.physicalProperties.maxTemperature = 200;
+moonModel.physicalProperties.waterAmount = 0.9;
 
-moon.descriptor.physicalProperties.mass = 2;
-moon.descriptor.physicalProperties.rotationPeriod = 7 * 60 * 60;
-moon.descriptor.physicalProperties.minTemperature = -180;
-moon.descriptor.physicalProperties.maxTemperature = 200;
-moon.descriptor.physicalProperties.waterAmount = 0.9;
+moonModel.orbit.period = moonModel.physicalProperties.rotationPeriod;
+moonModel.orbit.radius = 8 * planet.getRadius();
+moonModel.orbit.normalToPlane = Vector3.Up();
 
-moon.descriptor.orbitalProperties.period = moon.descriptor.physicalProperties.rotationPeriod;
-moon.descriptor.orbitalProperties.apoapsis = 8 * planet.getRadius();
-moon.descriptor.orbitalProperties.periapsis = 8 * planet.getRadius();
-moon.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
+const moon = starSystem.makeSatellite(planet, moonModel);
 
 moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
 moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
@@ -95,26 +135,26 @@ moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap);
 moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap);
 moon.material.updateConstants();
 
-const ares = starSystem.makeTelluricPlanet(0.3725);
+const aresModel = new TelluricPlanemoModel(0.3725, sunModel);
+aresModel.physicalProperties.mass = 7;
+aresModel.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
+aresModel.physicalProperties.minTemperature = -48;
+aresModel.physicalProperties.maxTemperature = 20;
+aresModel.physicalProperties.pressure = 0.5;
+aresModel.physicalProperties.waterAmount = 0.2;
+aresModel.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * aresModel.physicalProperties.waterAmount * aresModel.physicalProperties.pressure;
+
+aresModel.orbit.period = 60 * 60 * 24 * 365.24;
+aresModel.orbit.radius = 4020 * planet.getRadius();
+aresModel.orbit.normalToPlane = Vector3.Up();
+
+aresModel.terrainSettings.continents_fragmentation = 0.0;
+aresModel.terrainSettings.continent_base_height = 10e3;
+aresModel.terrainSettings.max_mountain_height = 20e3;
+
+const ares = starSystem.makeTelluricPlanet(aresModel);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.OCEAN), 1);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.CLOUDS), 1);
-
-ares.descriptor.physicalProperties.mass = 7;
-ares.descriptor.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
-ares.descriptor.physicalProperties.minTemperature = -48;
-ares.descriptor.physicalProperties.maxTemperature = 20;
-ares.descriptor.physicalProperties.pressure = 0.5;
-ares.descriptor.physicalProperties.waterAmount = 0.2;
-ares.descriptor.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * ares.descriptor.physicalProperties.waterAmount * ares.descriptor.physicalProperties.pressure;
-
-ares.descriptor.orbitalProperties.period = 60 * 60 * 24 * 365.24;
-ares.descriptor.orbitalProperties.periapsis = 4020 * planet.getRadius();
-ares.descriptor.orbitalProperties.apoapsis = 4020 * planet.getRadius();
-ares.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
-
-ares.descriptor.terrainSettings.continents_fragmentation = 0.0;
-ares.descriptor.terrainSettings.continent_base_height = 10e3;
-ares.descriptor.terrainSettings.max_mountain_height = 20e3;
 
 ares.material.colorSettings.plainColor.copyFromFloats(0.4, 0.3, 0.3);
 ares.material.colorSettings.desertColor.copyFromFloats(178 / 255, 107 / 255, 42 / 255);
@@ -124,33 +164,45 @@ ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);
 
 ares.material.updateConstants();
 
-const andromaque = starSystem.makeGasPlanet(0.28711440474126226);
-andromaque.descriptor.orbitalProperties.period = 60 * 60 * 24 * 365.25;
-andromaque.descriptor.orbitalProperties.periapsis = 4300 * ares.getRadius();
-andromaque.descriptor.orbitalProperties.apoapsis = 4300 * ares.getRadius();
-andromaque.descriptor.orbitalProperties.orientationQuaternion = Quaternion.Identity();
+const andromaqueModel = new GasPlanetModel(0.28711440474126226, sunModel);
+andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
+andromaqueModel.orbit.radius = 4300 * ares.getRadius();
+andromaqueModel.orbit.normalToPlane = Vector3.Up();
+
+const andromaque = starSystem.makeGasPlanet(andromaqueModel);
+
+const mandelbulbModel = new MandelbulbModel(0.5, planetModel);
+mandelbulbModel.orbit.period = 60 * 60 * 24 * 365.24;
+mandelbulbModel.orbit.radius = 3990 * ares.getRadius();
+const mandelbulb = starSystem.makeMandelbulb(mandelbulbModel);
 
 engine.init();
 
-positionNearBody(scene.getActiveController(), planet, starSystem, 4);
+positionNearObject(scene.getActiveController(), planet, starSystem, 2);
 
 const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
-aresAtmosphere.settings.redWaveLength = 500;
-aresAtmosphere.settings.greenWaveLength = 680;
-aresAtmosphere.settings.blueWaveLength = 670;
+if (aresAtmosphere) {
+    aresAtmosphere.settings.redWaveLength = 500;
+    aresAtmosphere.settings.greenWaveLength = 680;
+    aresAtmosphere.settings.blueWaveLength = 670;
+} else {
+    console.warn("No atmosphere found for Ares");
+}
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "g") {
         if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);
-            player.transform.setRotationQuaternion(spaceshipController.transform.getRotationQuaternion().clone());
-            engine.getStarSystem().postProcessManager.rebuild(spaceshipController.getActiveCamera());
-            spaceshipController.setHidden(true);
+            setRotationQuaternion(player.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
+            engine.getStarSystem().postProcessManager.rebuild();
+
+            spaceshipController.setEnabled(false, engine.getHavokPlugin());
         } else {
             scene.setActiveController(spaceshipController);
-            spaceshipController.transform.setRotationQuaternion(player.transform.getRotationQuaternion().clone());
-            engine.getStarSystem().postProcessManager.rebuild(player.getActiveCamera());
-            spaceshipController.setHidden(false);
+            setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(player.getTransform()).clone());
+            engine.getStarSystem().postProcessManager.rebuild();
+
+            spaceshipController.setEnabled(true, engine.getHavokPlugin());
         }
     }
 });

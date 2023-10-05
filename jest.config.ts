@@ -1,4 +1,4 @@
-import type {Config} from '@jest/types';
+import type { Config } from '@jest/types';
 // Sync object
 const config: Config.InitialOptions = {
     roots: ["./tests"],
@@ -6,12 +6,6 @@ const config: Config.InitialOptions = {
     transform: {
         "^.+\\.ts$": "ts-jest",
         "^.+\\.(js|jsx)$": "babel-jest"
-    },
-    globals: {
-        'ts-jest': {
-            babelConfig: true,
-            useESM: true
-        },
     },
     transformIgnorePatterns: [
         "node_modules/(?!@babylonjs/core)/"
@@ -22,5 +16,5 @@ const config: Config.InitialOptions = {
     },
     testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-}
+};
 export default config;

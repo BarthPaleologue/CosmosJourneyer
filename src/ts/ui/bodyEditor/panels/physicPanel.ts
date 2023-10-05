@@ -1,6 +1,6 @@
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
-import { TelluricPlanemo } from "../../../bodies/planemos/telluricPlanemo";
+import { TelluricPlanemo } from "../../../view/bodies/planemos/telluricPlanemo";
 
 export class PhysicPanel extends EditorPanel {
     constructor() {
@@ -10,28 +10,14 @@ export class PhysicPanel extends EditorPanel {
         for (const slider of this.sliders) slider.remove();
 
         this.sliders = [
-            new Slider(
-                "minTemperature",
-                document.getElementById("minTemperature") as HTMLElement,
-                -273,
-                300,
-                planet.descriptor.physicalProperties.minTemperature,
-                (val: number) => {
-                    planet.descriptor.physicalProperties.minTemperature = val;
-                    planet.material.updateConstants();
-                }
-            ),
-            new Slider(
-                "maxTemperature",
-                document.getElementById("maxTemperature") as HTMLElement,
-                -273,
-                300,
-                planet.descriptor.physicalProperties.maxTemperature,
-                (val: number) => {
-                    planet.descriptor.physicalProperties.maxTemperature = val;
-                    planet.material.updateConstants();
-                }
-            )
+            new Slider("minTemperature", document.getElementById("minTemperature") as HTMLElement, -273, 300, planet.model.physicalProperties.minTemperature, (val: number) => {
+                planet.model.physicalProperties.minTemperature = val;
+                planet.material.updateConstants();
+            }),
+            new Slider("maxTemperature", document.getElementById("maxTemperature") as HTMLElement, -273, 300, planet.model.physicalProperties.maxTemperature, (val: number) => {
+                planet.model.physicalProperties.maxTemperature = val;
+                planet.material.updateConstants();
+            })
         ];
     }
 }

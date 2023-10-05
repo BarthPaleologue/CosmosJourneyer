@@ -13,6 +13,7 @@ const config = {
         showcase: "./src/ts/index.ts",
         random: "./src/ts/randomizer.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
+        playground: "./src/ts/playground.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist")
@@ -23,7 +24,7 @@ const config = {
         historyApiFallback: false,
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",
-            "Cross-Origin-Embedder-Policy": "require-corp"
+            "Cross-Origin-Embedder-Policy": "same-origin",
         }
     },
 
@@ -46,6 +47,12 @@ const config = {
             template: path.join(htmlPath, "index.html"),
             chunks: ["blackHole"]
         }),
+        new HtmlWebpackPlugin({
+            title: "Playground",
+            filename: "playground.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["playground"]
+        }),
         new MiniCssExtractPlugin()
     ],
 
@@ -67,7 +74,7 @@ const config = {
                 use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"]
             },
             {
-                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|glb|obj)$/i,
+                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|glb|obj|mp3)$/i,
                 type: "asset"
             },
 

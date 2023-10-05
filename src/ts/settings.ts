@@ -1,4 +1,5 @@
 export const Settings = {
+    UNIVERSE_SEED: Math.PI,
     EARTH_RADIUS: 1000e3, // target is 6000e3
     AU: 150e9, // target is 150e9
     VERTEX_RESOLUTION: 64,
@@ -6,7 +7,6 @@ export const Settings = {
     ATMOSPHERE_HEIGHT: 100e3,
     OCEAN_DEPTH: 7e3,
     TIME_MULTIPLIER: 1,
-    ENABLE_OCCLUSION: true,
     CHUNK_RENDER_DISTANCE_MULTIPLIER: 1.5,
     ENABLE_VOLUMETRIC_CLOUDS: false,
     SEED_HALF_RANGE: 1e6,

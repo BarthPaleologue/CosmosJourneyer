@@ -47,7 +47,8 @@ vec3 projectOnPlane(vec3 vector, vec3 planeNormal) {
 }
 
 float angleBetweenVectors(vec3 a, vec3 b) {
-    return acos(dot(a, b) / (length(a) * length(b)));
+    // the clamping is necessary to prevent undefined values when acos(x) has |x| > 1
+    return acos(clamp(dot(normalize(a), normalize(b)), -1.0, 1.0));
 }
 
 float hash(float x) { return fract(sin(x) * 152754.742); }
@@ -116,10 +117,10 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
         diskMask *= smoothstep(0.0, 2.0, relativeDiskRadius - relativeDistance); // The 2.0 is only for aesthetics
 
         // rotation of the disk
-        float theta = 2.0 * 3.1415 * time / rotationPeriod;
+        float theta = -2.0 * 3.1415 * time / rotationPeriod;
         vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, diskNormal, theta);
         
-        float angle = angleBetweenVectors(normalize(rotatedProjectedSamplePoint), forwardAxis);
+        float angle = angleBetweenVectors(rotatedProjectedSamplePoint, forwardAxis);
         float u = time + intensity + relativeDistance; // some kind of disk coordinate (spiral)
         const float f = 1.0;
         float noise = valueNoise(vec2(2.0 * angle, 5.0 * u), f);
@@ -149,73 +150,88 @@ void main() {
 
     vec3 positionBHS = cameraPosition - planetPosition;// position of the camera in blackhole space
 
-    if (maximumDistance < length(positionBHS)) {
-        glFragColor = screenColor;
-        return;
-    }
+    bool suckedInBH = false;
+    bool escapedBH = false;
+    bool occluded = false;
 
-    vec4 col = vec4(0.0);
+    if (maximumDistance < length(positionBHS)) occluded = true;
 
-    for (int disks = 0; disks < 15; disks++) {
-        float distanceToCenter = 0.0; //distance to BH
-        
-        vec3 projectedPosition = vec3(0.0);
-        float projectedDistance = 0.0;
+    vec4 col = vec4(0.0);    
 
-        vec3 projectedRayDir = vec3(0.0);
-        float rayDirProjectedDistance = 0.0;
-
-        for (int h = 0; h < 6; h++) {
-            //reduces tests for exit conditions (to minimise branching)
-            distanceToCenter = length(positionBHS); //distance to BH
-            vec3 blackholeDir = -positionBHS / distanceToCenter; //direction to BH
-            float distanceToCenter2 = distanceToCenter * distanceToCenter;
-
-            projectedPosition = projectOnPlane(positionBHS, rotationAxis);
-            projectedDistance = length(projectedPosition - positionBHS);
-
-            projectedRayDir = projectOnPlane(rayDir, rotationAxis);
-            rayDirProjectedDistance = length(projectedRayDir - rayDir);
+    if(!occluded) {
+        for (int disks = 0; disks < 15; disks++) {
+            float distanceToCenter = 0.0; //distance to BH
             
-            float stepSize = 0.92 * projectedDistance / rayDirProjectedDistance; //conservative distance to disk (y==0)
-            float farLimit = distanceToCenter * 0.5; //limit step size far from to BH
-            float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / planetRadius; //limit step size close to BH
-            stepSize = min(stepSize, min(farLimit, closeLimit));
+            vec3 projectedPosition = vec3(0.0);
+            float projectedDistance = 0.0;
 
-            float bendForce = stepSize * planetRadius / distanceToCenter2; //bending force
-            rayDir = normalize(rayDir + bendForce * blackholeDir); //bend ray towards BH
-            positionBHS += stepSize * rayDir;
+            vec3 projectedRayDir = vec3(0.0);
+            float rayDirProjectedDistance = 0.0;
 
-        }
+            for (int h = 0; h < 6; h++) {
+                //reduces tests for exit conditions (to minimise branching)
+                distanceToCenter = length(positionBHS); //distance to BH
+                vec3 blackholeDir = -positionBHS / distanceToCenter; //direction to BH
+                float distanceToCenter2 = distanceToCenter * distanceToCenter;
 
-        if (distanceToCenter < planetRadius) {
-            //ray sucked in to BH
-            glFragColor =  vec4(col.rgb * col.a, 1.0);
-            return;
-        } else if (distanceToCenter > planetRadius * 10000.0) {
-            //ray escaped BH
-            
-            /*vec2 uv = uvFromWorld(positionBHS);
-            vec4 bg = vec4(0.0);
+                projectedPosition = projectOnPlane(positionBHS, rotationAxis);
+                projectedDistance = length(projectedPosition - positionBHS);
 
-            if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) bg = texture2D(textureSampler, uv);
-            else {*/
-            vec2 starfieldUV = vec2(
-                sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
-                acos(rayDir.y) / 3.14159265359
-            );
-            vec4 bg = texture2D(starfieldTexture, starfieldUV);
-            //}
+                projectedRayDir = projectOnPlane(rayDir, rotationAxis);
+                rayDirProjectedDistance = length(projectedRayDir - rayDir);
+                
+                float stepSize = 0.92 * projectedDistance / rayDirProjectedDistance; //conservative distance to disk (y==0)
+                float farLimit = distanceToCenter * 0.5; //limit step size far from to BH
+                float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / planetRadius; //limit step size close to BH
+                stepSize = min(stepSize, min(farLimit, closeLimit));
 
-            glFragColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
-            return;
-        } else if (projectedDistance <= accretionDiskHeight) {
-            //ray hit accretion disk //FIXME: Break when rotate around edge of disk
-            vec4 diskCol = raymarchDisk(rayDir, positionBHS);//render disk
-            positionBHS += accretionDiskHeight * rayDir / rayDirProjectedDistance; // we get out of the disk
-            col += diskCol * (1.0 - col.a);
+                float bendForce = stepSize * planetRadius / distanceToCenter2; //bending force
+                rayDir = normalize(rayDir + bendForce * blackholeDir); //bend ray towards BH
+                positionBHS += stepSize * rayDir;
+
+            }
+
+            if (distanceToCenter < planetRadius) {
+                suckedInBH = true;
+                break;
+            } else if (distanceToCenter > planetRadius * 10000.0) {
+                escapedBH = true;
+                break;
+            } else if (projectedDistance <= accretionDiskHeight) {
+                //ray hit accretion disk //FIXME: Break when rotate around edge of disk
+                vec4 diskCol = raymarchDisk(rayDir, positionBHS);//render disk
+                positionBHS += accretionDiskHeight * rayDir / rayDirProjectedDistance; // we get out of the disk
+                col += diskCol * (1.0 - col.a);
+            }
+
+            if(suckedInBH || escapedBH) break;
         }
     }
 
-    gl_FragColor = vec4(col.rgb, 1.0);
+    //FIXME: when WebGPU supports texture2D inside if statements, move this to not compute it when occluded
+    /*vec2 uv = uvFromWorld(positionBHS);
+    vec4 bg = vec4(0.0);
+
+    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) bg = texture2D(textureSampler, uv);
+    else {*/
+    vec2 starfieldUV = vec2(
+        sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
+        acos(rayDir.y) / 3.14159265359
+    );
+    vec4 bg = texture2D(starfieldTexture, starfieldUV);
+    //}
+
+    vec4 finalColor = vec4(1.0, 0.0, 0.0, 1.0);
+
+    if (occluded) {
+        finalColor = screenColor;
+    } else if (suckedInBH) {
+        finalColor = vec4(col.rgb * col.a, 1.0);
+    } else if (escapedBH) {
+        finalColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
+    } else {
+        finalColor = vec4(col.rgb, 1.0);
+    }
+
+    gl_FragColor = finalColor;
 }

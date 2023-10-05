@@ -1,55 +1,84 @@
-import { NewtonianTransform } from "../uberCore/transforms/newtonianTransform";
-import { Input, InputType } from "../inputs/input";
-import { UberCamera } from "../uberCore/uberCamera";
-import { AbstractController } from "../uberCore/abstractController";
-import { Assets } from "../assets";
-import { Keyboard } from "../inputs/keyboard";
-import { UberOrbitCamera } from "../uberCore/uberOrbitCamera";
-import { Mouse } from "../inputs/mouse";
+import { Input, InputType } from "../controller/inputs/input";
+import { UberCamera } from "../controller/uberCore/uberCamera";
+import { AbstractController } from "../controller/uberCore/abstractController";
+import { Assets } from "../controller/assets";
+import { Keyboard } from "../controller/inputs/keyboard";
+import { UberOrbitCamera } from "../controller/uberCore/uberOrbitCamera";
+import { Mouse } from "../controller/inputs/mouse";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { MainThruster } from "./mainThruster";
-import { WarpDrive } from "./warpDrive";
-import { parseSpeed } from "../utils/parseSpeed";
-import { LOCAL_DIRECTION } from "../uberCore/localDirections";
+import { ReadonlyWarpDrive, WarpDrive } from "./warpDrive";
+import { LOCAL_DIRECTION } from "../controller/uberCore/localDirections";
 import { RCSThruster } from "./rcsThruster";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { IPhysicsCollisionEvent, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Observable } from "@babylonjs/core/Misc/observable";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { setEnabledBody } from "../utils/havok";
+import { getForwardDirection, pitch, roll, translate } from "../controller/uberCore/transforms/basicTransform";
+import { TransformNode } from "@babylonjs/core/Meshes";
 
 export class ShipController extends AbstractController {
-    readonly transform: NewtonianTransform;
+    readonly instanceRoot: AbstractMesh;
 
-    readonly rollAuthority = 1;
+    readonly rollAuthority = 0.1;
     readonly pitchAuthority = 1;
     readonly yawAuthority = 1;
 
     readonly thirdPersonCamera: UberOrbitCamera;
     readonly firstPersonCamera: UberCamera;
 
+    readonly aggregate: PhysicsAggregate;
+    private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
+
     private flightAssistEnabled = true;
 
     private readonly mainThrusters: MainThruster[] = [];
     private readonly rcsThrusters: RCSThruster[] = [];
 
-    private readonly warpDrive = new WarpDrive();
+    private readonly warpDrive = new WarpDrive(false);
 
-    private closestDistanceToPlanet = Infinity;
+    private closestObject = {
+        distance: Infinity,
+        radius: 1
+    };
 
     constructor(scene: Scene) {
-        super(scene);
+        super();
 
-        this.transform = new NewtonianTransform("shipTransform", scene);
+        this.instanceRoot = Assets.CreateSpaceShipInstance();
 
         this.firstPersonCamera = new UberCamera("firstPersonCamera", Vector3.Zero(), scene);
-        this.firstPersonCamera.parent = this.transform.node;
+        this.firstPersonCamera.parent = this.instanceRoot;
         this.firstPersonCamera.position = new Vector3(0, 1, 0);
 
         this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 1.4);
-        this.thirdPersonCamera.parent = this.transform.node;
+        this.thirdPersonCamera.parent = this.instanceRoot;
 
-        const spaceship = Assets.CreateSpaceShipInstance();
-        spaceship.parent = this.transform.node;
+        this.aggregate = new PhysicsAggregate(this.instanceRoot, PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
+        for (const child of this.instanceRoot.getChildMeshes()) {
+            const childShape = new PhysicsShapeMesh(child as Mesh, scene);
+            this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
+        }
+        this.aggregate.body.disablePreStep = false;
 
-        for (const child of spaceship.getChildMeshes()) {
+        this.aggregate.body.setCollisionCallbackEnabled(true);
+
+        this.collisionObservable = this.aggregate.body.getCollisionObservable();
+        this.collisionObservable.add((collisionEvent: IPhysicsCollisionEvent) => {
+            console.log("Collision", collisionEvent);
+            if (collisionEvent.impulse < 0.8) return;
+            Assets.OuchSound.play();
+        });
+
+        //if(this.warpDrive.isEnabled()) setEnabledBody(this.aggregate.body, false, )
+
+        for (const child of this.instanceRoot.getChildMeshes()) {
             if (child.name.includes("mainThruster")) {
                 console.log("Found main thruster");
                 this.addMainThruster(child);
@@ -73,132 +102,163 @@ export class ShipController extends AbstractController {
         }
     }
 
+    public override getTransform(): TransformNode {
+        return this.aggregate.transformNode;
+    }
+
     private addMainThruster(mesh: AbstractMesh) {
         const direction = mesh.getDirection(new Vector3(0, 1, 0));
-        this.mainThrusters.push(new MainThruster(mesh, direction, this.transform));
+        this.mainThrusters.push(new MainThruster(mesh, direction, this.aggregate));
     }
 
     private addRCSThruster(mesh: AbstractMesh) {
         const direction = mesh.getDirection(new Vector3(0, 1, 0));
-        this.rcsThrusters.push(new RCSThruster(mesh, direction, this.transform));
+        const thruster = new RCSThruster(mesh, direction, this.aggregate);
+        this.rcsThrusters.push(thruster);
+
+        //FIXME: this is temporary to balance rc thrust
+        thruster.setMaxAuthority(thruster.getMaxAuthority() / thruster.leverage);
     }
 
     public override getActiveCamera(): UberCamera {
         return this.thirdPersonCamera;
     }
 
-    public setHidden(hidden: boolean) {
-        this.transform.node.setEnabled(!hidden);
+    public setEnabled(enabled: boolean, havokPlugin: HavokPlugin) {
+        this.instanceRoot.setEnabled(enabled);
+        setEnabledBody(this.aggregate.body, enabled, havokPlugin);
     }
 
-    public registerClosestDistanceToPlanet(distance: number) {
-        this.closestDistanceToPlanet = distance;
+    public registerClosestObject(distance: number, radius: number) {
+        this.closestObject = { distance, radius };
+    }
+
+    public enableWarpDrive() {
+        for (const thruster of this.mainThrusters) thruster.setThrottle(0);
+        for (const thruster of this.rcsThrusters) thruster.deactivate();
+        this.warpDrive.enable();
     }
 
     public toggleWarpDrive() {
-        if (!this.warpDrive.isEnabled()) {
-            this.warpDrive.enable();
-            for (const thruster of this.mainThrusters) thruster.setThrottle(0);
-            for (const thruster of this.rcsThrusters) thruster.deactivate();
-        } else this.warpDrive.desengage();
+        if (!this.warpDrive.isEnabled()) this.enableWarpDrive();
+        else this.warpDrive.desengage();
     }
 
-    private getTotalAuthority(direction: Vector3) {
-        let totalAuthority = 0;
-        for (const thruster of this.mainThrusters) totalAuthority += thruster.getAuthority(direction);
-        for (const thruster of this.rcsThrusters) totalAuthority += thruster.getAuthority(direction);
-        return totalAuthority;
+    /**
+     * Returns a readonly interface to the warp drive of the ship.
+     * @returns A readonly interface to the warp drive of the ship.
+     */
+    public getWarpDrive(): ReadonlyWarpDrive {
+        return this.warpDrive;
     }
 
     protected override listenTo(input: Input, deltaTime: number): Vector3 {
         if (this.getActiveCamera() === this.thirdPersonCamera) {
             if (input.type === InputType.KEYBOARD) {
                 const keyboard = input as Keyboard;
-                if (keyboard.isPressed("1")) this.thirdPersonCamera.rotatePhi(0.8 * deltaTime);
-                if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-0.8 * deltaTime);
-                if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(-0.8 * deltaTime);
-                if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(0.8 * deltaTime);
-            } else if (input.type === InputType.MOUSE) {
-                const mouse = input as Mouse;
-                this.thirdPersonCamera.rotatePhi(mouse.getYaw() * deltaTime);
-                this.thirdPersonCamera.rotateTheta(mouse.getPitch() * deltaTime);
+                const cameraRotationSpeed = 0.8 * deltaTime;
+                if (keyboard.isPressed("1")) this.thirdPersonCamera.rotatePhi(cameraRotationSpeed);
+                if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-cameraRotationSpeed);
+                if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(-cameraRotationSpeed);
+                if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(cameraRotationSpeed);
             }
         }
 
-        this.transform.rotationAcceleration.x += this.rollAuthority * input.getRoll() * deltaTime;
-        this.transform.rotationAcceleration.y += this.pitchAuthority * input.getPitch() * deltaTime;
-        this.transform.rotationAcceleration.z += this.yawAuthority * input.getYaw() * deltaTime;
-
         if (this.warpDrive.isDisabled()) {
             for (const thruster of this.mainThrusters) {
-                thruster.updateThrottle(0.3 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
-                thruster.updateThrottle(0.3 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD));
+                thruster.updateThrottle(2 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
+                thruster.updateThrottle(2 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD));
 
-                thruster.updateThrottle(0.3 * deltaTime * input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.UP));
-                thruster.updateThrottle(0.3 * deltaTime * -input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.DOWN));
+                thruster.updateThrottle(2 * deltaTime * input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.UP));
+                thruster.updateThrottle(2 * deltaTime * -input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.DOWN));
 
-                thruster.updateThrottle(0.3 * deltaTime * input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.LEFT));
-                thruster.updateThrottle(0.3 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
+                thruster.updateThrottle(2 * deltaTime * input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.LEFT));
+                thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
             }
-            if (input.type === InputType.KEYBOARD) {
-                // if we are listenning to multiple inputs, the thrusters will be activated and deactivated multiple times
-                for (const thruster of this.rcsThrusters) {
-                    // rcs thrusters are either activated or not
-                    if (input.getZAxis() > 0 && thruster.getAuthority01(LOCAL_DIRECTION.FORWARD) > 0.5) thruster.activate();
-                    else if (input.getZAxis() < 0 && thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD) > 0.5) thruster.activate();
-                    else if (input.getYAxis() > 0 && thruster.getAuthority01(LOCAL_DIRECTION.UP) > 0.5) thruster.activate();
-                    else if (input.getYAxis() < 0 && thruster.getAuthority01(LOCAL_DIRECTION.DOWN) > 0.5) thruster.activate();
-                    else if (input.getXAxis() > 0 && thruster.getAuthority01(LOCAL_DIRECTION.RIGHT) > 0.5) thruster.activate();
-                    else if (input.getXAxis() < 0 && thruster.getAuthority01(LOCAL_DIRECTION.LEFT) > 0.5) thruster.activate();
-                    else thruster.deactivate();
+
+            if (input.type === InputType.MOUSE) {
+                const mouse = input as Mouse;
+                const roll = mouse.getRoll();
+                const pitch = mouse.getPitch();
+
+                //console.log(roll);
+
+                for (const rcsThruster of this.rcsThrusters) {
+                    let throttle = 0;
+
+                    // rcs rotation contribution
+                    if (roll < 0 && rcsThruster.getRollAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(roll));
+                    else if (roll > 0 && rcsThruster.getRollAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(roll));
+
+                    if (pitch < 0 && rcsThruster.getPitchAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(pitch));
+                    else if (pitch > 0 && rcsThruster.getPitchAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(pitch));
+
+                    rcsThruster.setThrottle(throttle);
                 }
             }
-
-            const forwardAcceleration = this.transform.getForwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.FORWARD) * deltaTime);
-            const backwardAcceleration = this.transform.getBackwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.BACKWARD) * deltaTime);
-
-            const upwardAcceleration = this.transform.getUpwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.UP) * deltaTime);
-            const downwardAcceleration = this.transform.getDownwardDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.DOWN) * deltaTime);
-
-            const rightAcceleration = this.transform.getRightDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.RIGHT) * deltaTime);
-            const leftAcceleration = this.transform.getLeftDirection().scale(this.getTotalAuthority(LOCAL_DIRECTION.LEFT) * deltaTime);
-
-            this.transform.acceleration.addInPlace(forwardAcceleration);
-            this.transform.acceleration.addInPlace(backwardAcceleration);
-
-            this.transform.acceleration.addInPlace(upwardAcceleration);
-            this.transform.acceleration.addInPlace(downwardAcceleration);
-
-            this.transform.acceleration.addInPlace(rightAcceleration);
-            this.transform.acceleration.addInPlace(leftAcceleration);
         } else {
-            const warpSpeed = this.transform.getForwardDirection().scale(this.warpDrive.getWarpSpeed());
-            this.transform.speed.copyFrom(warpSpeed);
+            if (input.type === InputType.MOUSE) {
+                const mouse = input as Mouse;
+                const rollContribution = mouse.getRoll();
+                const pitchContribution = mouse.getPitch();
+
+                roll(this.aggregate.transformNode, rollContribution * deltaTime);
+                pitch(this.aggregate.transformNode, pitchContribution * deltaTime);
+            }
+
+            if (input.type === InputType.KEYBOARD) {
+                const keyboard = input as Keyboard;
+                const deltaThrottle = keyboard.getZAxis() * deltaTime;
+                this.warpDrive.increaseTargetThrottle(deltaThrottle);
+            }
+
+            const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
+            //this.aggregate.body.setLinearVelocity(warpSpeed);
+            translate(this.aggregate.transformNode, warpSpeed.scale(deltaTime));
         }
         return Vector3.Zero();
     }
 
+    /**
+     * Returns the speed of the ship in m/s
+     * If warp drive is enabled, returns the warp speed
+     * If warp drive is disabled, returns the linear velocity of the ship
+     * @returns The speed of the ship in m/s
+     */
+    public getSpeed(): number {
+        return this.warpDrive.isEnabled() ? this.warpDrive.getWarpSpeed() : this.aggregate.body.getLinearVelocity().length();
+    }
+
+    public getThrottle(): number {
+        return this.warpDrive.isEnabled() ? this.warpDrive.getTargetThrottle() : this.mainThrusters[0].getThrottle();
+    }
+
     public override update(deltaTime: number): Vector3 {
-        this.transform.rotationAcceleration.copyFromFloats(0, 0, 0);
-        this.transform.acceleration.copyFromFloats(0, 0, 0);
-
         for (const input of this.inputs) this.listenTo(input, deltaTime);
-        const displacement = this.transform.update(deltaTime).negate();
+        //const displacement = this.transform.update(deltaTime).negate();
 
-        const currentForwardSpeed = Vector3.Dot(this.transform.speed, this.transform.getForwardDirection());
-        this.warpDrive.update(currentForwardSpeed, this.closestDistanceToPlanet, deltaTime);
+        const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed()); //Vector3.Zero();
+
+        const speed = this.aggregate.body.getLinearVelocity();
+
+        const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
+        this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
 
         for (const thruster of this.mainThrusters) thruster.update();
         for (const thruster of this.rcsThrusters) thruster.update();
 
-        if (this.flightAssistEnabled && this.transform.rotationAcceleration.length() === 0) {
-            this.transform.rotationSpeed.scaleInPlace(0.9);
+        if (this.warpDrive.isDisabled()) {
+            for (const thruster of this.mainThrusters) thruster.applyForce();
+            for (const thruster of this.rcsThrusters) thruster.applyForce();
         }
 
-        //TODO: should be separated from the ship
-        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${parseSpeed(this.transform.speed.length())}`;
+        if (this.flightAssistEnabled) {
+            this.aggregate.body.setAngularDamping(0.9);
+        } else {
+            this.aggregate.body.setAngularDamping(1);
+        }
 
-        this.transform.translate(displacement);
-        return displacement;
+        //this.transform.translate(displacement);
+        return this.aggregate.transformNode.getAbsolutePosition();
     }
 }

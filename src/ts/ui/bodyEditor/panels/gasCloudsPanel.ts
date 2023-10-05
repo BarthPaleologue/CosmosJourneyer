@@ -1,5 +1,5 @@
 import { EditorPanel } from "../editorPanel";
-import { GasPlanet } from "../../../bodies/planemos/gasPlanet";
+import { GasPlanet } from "../../../view/bodies/planemos/gasPlanet";
 import { clearAllEventListenersById } from "../../../utils/html";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -30,12 +30,6 @@ export class GasCloudsPanel extends EditorPanel {
         gazColor3Picker.value = colorSettings.color3.toHexString();
         gazColor3Picker.addEventListener("input", () => {
             colorSettings.color3.copyFrom(Color3.FromHexString(gazColor3Picker.value));
-        });
-
-        const gazColor4Picker = clearAllEventListenersById("gazColor4") as HTMLInputElement;
-        gazColor4Picker.value = colorSettings.color4.toHexString();
-        gazColor4Picker.addEventListener("input", () => {
-            colorSettings.color4.copyFrom(Color3.FromHexString(gazColor4Picker.value));
         });
 
         this.sliders = [

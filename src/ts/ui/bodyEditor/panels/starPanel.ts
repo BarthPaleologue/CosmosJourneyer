@@ -1,22 +1,18 @@
 import { EditorPanel } from "../editorPanel";
-import { Star } from "../../../bodies/stellarObjects/star";
+import { Star } from "../../../view/bodies/stellarObjects/star";
 import { Slider } from "handle-sliderjs";
-import { PostProcessManager } from "../../../postProcesses/postProcessManager";
-import { PostProcessType } from "../../../postProcesses/postProcessTypes";
+import { VolumetricLight } from "../../../view/postProcesses/volumetricLight";
 
 export class StarPanel extends EditorPanel {
     constructor() {
         super("starPhysic");
     }
-    init(star: Star, postProcessManager: PostProcessManager) {
+    init(star: Star, volumetricLight: VolumetricLight) {
         for (const slider of this.sliders) slider.remove();
 
-        if (!star.postProcesses.includes(PostProcessType.VOLUMETRIC_LIGHT)) return;
-        const volumetricLight = postProcessManager.getVolumetricLight(star);
-
         this.sliders = [
-            new Slider("temperature", document.getElementById("temperature") as HTMLElement, 3000, 15000, star.descriptor.physicalProperties.temperature, (val: number) => {
-                star.descriptor.physicalProperties.temperature = val;
+            new Slider("temperature", document.getElementById("temperature") as HTMLElement, 3000, 15000, star.model.physicalProperties.temperature, (val: number) => {
+                star.model.physicalProperties.temperature = val;
             }),
             new Slider("starExposure", document.getElementById("starExposure") as HTMLElement, 0, 200, volumetricLight.exposure * 100, (val: number) => {
                 volumetricLight.exposure = val / 100;
