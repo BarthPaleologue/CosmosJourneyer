@@ -90,17 +90,22 @@ float spiralDensity(vec3 pointOnCone, vec3 coneAxis, float coneMaxHeight) {
     vec3 pointOnYCone = rotateAround(pointOnCone, rotationRemovalAxis, -acos(dot(coneAxis, targetAxis)));
 
     vec2 pointOnXZPlane = vec2(pointOnYCone.x, pointOnYCone.z);
-    float theta = atan(pointOnXZPlane.y, pointOnXZPlane.x);
+    float theta = atan(pointOnXZPlane.y, pointOnXZPlane.x) + 3.14 * min(0.0, sign(dot(pointOnCone, coneAxis)));
     float heightFraction = abs(pointOnYCone.y) / coneMaxHeight;
 
-    if(heightFraction > 1.0) {
-        return 0.0;
-    }
+    float density = 1.0;
+
+    // smoothstep fadeout when the height is too much (outside of cone) or too low (too close to the star)
+    density *= smoothstep(0.0, 1.0, 1.0 - heightFraction);
     
-    float d = spiralSDF(theta, heightFraction);
-    if (d > 0.1) return 0.0;
+    float d = spiralSDF(theta + time, 0.2 + heightFraction) / (0.3 + heightFraction * 2.0);
+    //d = pow(d, 4.0);
+
+    density *= smoothstep(0.85, 1.0, 1.0 - d);
+
+    //density *= d * 500.0;
     
-    return 1.0;
+    return density;
 }
 
 void main() {
@@ -118,18 +123,25 @@ void main() {
 
     vec4 finalColor = screenColor;
 
-    const float jetHeight = 4000000e3;
+    const float jetHeight = 10000000e3;
+    const vec3 jetColor = vec3(0.2, 0.2, 1.0);
 
     
     float t1, t2;
     if(rayIntersectCone(cameraPosition, rayDir, planetPosition, rotationAxis, 0.9, t1, t2)) {
+        if(t2 < maximumDistance) {
+            vec3 jetPointPosition2 = cameraPosition + t2 * rayDir - planetPosition;
+
+            float density2 = spiralDensity(jetPointPosition2, rotationAxis, jetHeight);
+
+            finalColor.rgb = mix(finalColor.rgb, jetColor, density2);
+        }
         if(t1 < maximumDistance) {
-            // Find the intersection point relative to the star
             vec3 jetPointPosition1 = cameraPosition + t1 * rayDir - planetPosition;
 
             float density1 = spiralDensity(jetPointPosition1, rotationAxis, jetHeight);
 
-            finalColor.rgb = mix(finalColor.rgb, vec3(0.0, 0.0, 1.0), density1);
+            finalColor.rgb = mix(finalColor.rgb, jetColor, density1);
         }
     }
 

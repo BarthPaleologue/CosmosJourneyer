@@ -86,7 +86,8 @@ export class PostProcessManager {
         this.mandelbulbs,
         this.blackHoles,
         this.overlays,
-        this.volumetricLights
+        this.volumetricLights,
+        this.matterJets
     ];
 
     private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.starFields, this.volumetricLights, ...this.objectPostProcesses];
