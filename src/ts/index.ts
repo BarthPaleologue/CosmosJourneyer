@@ -24,6 +24,7 @@ import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 import { MandelbulbModel } from "./model/planemos/mandelbulbModel";
 import { getMoonSeed } from "./model/planemos/common";
+import { NeutronStarModel } from "./model/stellarObjects/neutronStarModel";
 
 const engine = new SpaceEngine();
 
@@ -92,7 +93,7 @@ const starSystemSeed = 0;
 const starSystem = new StarSystem(starSystemSeed, scene);
 engine.setStarSystem(starSystem, false);
 
-const sunModel = new StarModel(0.51);
+const sunModel = new NeutronStarModel(0.51);
 const sun = starSystem.makeNeutronStar(sunModel);
 sun.model.orbit.period = 60 * 60 * 24;
 

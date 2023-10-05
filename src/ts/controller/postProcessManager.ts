@@ -279,9 +279,8 @@ export class PostProcessManager {
         this.matterJets.push(new MatterJetPostProcess(neutronStar.name, neutronStar, this.scene));
     }
 
-    public getMatterJet(neutronStar: NeutronStar): MatterJetPostProcess {
-        for (const mj of this.matterJets) if (mj.body === neutronStar) return mj;
-        throw new Error("No matter jet found for: " + neutronStar.name);
+    public getMatterJet(neutronStar: NeutronStar): MatterJetPostProcess | null {
+        return this.matterJets.find((mj) => mj.object === neutronStar) ?? null;
     }
 
     /**

@@ -24,6 +24,7 @@ import { rotateAround, translate } from "./uberCore/transforms/basicTransform";
 import { MandelbulbModel } from "../model/planemos/mandelbulbModel";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
 import { getMoonSeed } from "../model/planemos/common";
+import { NeutronStarModel } from "../model/stellarObjects/neutronStarModel";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -208,12 +209,12 @@ export class StarSystem {
         return blackHole;
     }
 
-    public makeNeutronStar(seed = this.model.getStarSeed(this.stellarObjects.length)): NeutronStar {
+    public makeNeutronStar(model: number | NeutronStarModel = this.model.getStarSeed(this.stellarObjects.length)): NeutronStar {
         if (this.stellarObjects.length >= this.model.getNbStars())
             console.warn(`You are adding a neutron star
         to a system that already has ${this.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
-        const neutronStar = new NeutronStar(`neutronStar${this.stellarObjects.length}`, this.scene, seed, this.stellarObjects[0]);
+        const neutronStar = new NeutronStar(`neutronStar${this.stellarObjects.length}`, this.scene, model, this.stellarObjects[0]);
 
         this.addStellarObject(neutronStar);
         return neutronStar;
