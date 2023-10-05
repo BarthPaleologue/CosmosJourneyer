@@ -1,4 +1,4 @@
-import matterJetFragment from "../../shaders/matterjet.glsl";
+import matterJetFragment from "../../../shaders/matterjet.glsl";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
 import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
