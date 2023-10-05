@@ -29,7 +29,7 @@ uniform vec3 forwardAxis; // to compute the angle of the matter jet
 
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 
-#pragma glslify: applyQuaternion = require(./utils/applyQuaternion.glsl)
+#pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
 
 // from https://www.shadertoy.com/view/MtcXWr
 bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 tipPosition, vec3 orientation, float coneAngle, out float t1, out float t2) {
@@ -59,6 +59,30 @@ bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 tipPosition, vec3 orient
     return true;
 }
 
+// see https://www.shadertoy.com/view/tslcW4
+const float a=1.0;
+const float b=.1759;
+const float PI=3.14159265359;
+
+float spiralSDF(float u, float v) {
+
+    float t=u;
+    // t=(t+PI)/(2.*PI);
+    float r=v;
+    
+    float n=(log(r/a)/b-t)/(2.*PI);
+
+    // Cap the spiral
+    // float nm = (log(0.11)/b-t)/(2.0*PI);
+    // n = min(n,nm);
+    // return (n+1.0)/100.0;
+    float upper_r=a*exp(b*(t+2.*PI*ceil(n)));
+    float lower_r=a*exp(b*(t+2.*PI*floor(n)));
+    // float lower_r = 0.0;
+    
+    return min(abs(upper_r-r),abs(r-lower_r));
+}
+
 vec4 matterJets(vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     return vec4(0.0, 0.0, 0.0, 0.0);
 }
@@ -81,97 +105,35 @@ void main() {
     float t1, t2;
     if(rayIntersectCone(cameraPosition, rayDir, planetPosition, rotationAxis, 0.9, t1, t2)) {
         if(t1 < maximumDistance) {
-            vec3 jetPointPosition1 = cameraPosition + t1 * rayDir;
-            vec3 jetPointPosition2 = cameraPosition + t2 * rayDir;
+            // Find the intersection point relative to the star
+            vec3 jetPointPosition1 = cameraPosition + t1 * rayDir - planetPosition;
+            //vec3 jetPointPosition2 = cameraPosition + t2 * rayDir;
 
-            vec3 jetPositionOnAxis1 = planetPosition + dot(jetPointPosition1 - planetPosition, rotationAxis) * rotationAxis;
-            vec3 jetPositionOnAxis2 = planetPosition + dot(jetPointPosition2 - planetPosition, rotationAxis) * rotationAxis;
+            // Then we rotate that point so that we eliminate the axial tilt of the star from the equation
+            vec3 targetAxis = vec3(0.0, 1.0, 0.0);
+            vec3 rotationRemovalAxis = cross(rotationAxis, targetAxis);
+            jetPointPosition1 = rotateAround(jetPointPosition1, rotationRemovalAxis, -acos(dot(rotationAxis, targetAxis)));
 
-            vec3 jetPositionOnPlane1 = jetPointPosition1 - jetPositionOnAxis1;
-            vec3 jetPositionOnPlane2 = jetPointPosition2 - jetPositionOnAxis2;
+            vec2 jetPointPositionPlane1 = vec2(jetPointPosition1.x, jetPointPosition1.z);
+            float theta1 = atan(jetPointPositionPlane1.y, jetPointPositionPlane1.x);
+            float h1 = abs(jetPointPosition1.y);
 
-            float jetHeight1 = abs(dot(jetPointPosition1 - planetPosition, rotationAxis));
-            float jetHeight2 = abs(dot(jetPointPosition2 - planetPosition, rotationAxis));
+            float maxHeight = 4000000e3;
 
-            float maxHeight = 2000000e3;
-            float minHeight = 300000e3;
+            float h1_01 = h1 / maxHeight;
 
-            float jetHeight101 = min(jetHeight1 / maxHeight, 1.0);
-            float jetHeight201 = min(jetHeight2 / maxHeight, 1.0);
-
-            // theta is the accumulated angle of the jet (spiral)
-            float theta1 = 3.0 * jetHeight101 + acos(dot(normalize(jetPositionOnPlane1), forwardAxis));
-            float theta2 = 3.0 * jetHeight201 + acos(dot(normalize(jetPositionOnPlane2), forwardAxis));
-            
-            //float theta1 = acos(dot(normalize(jetPositionOnPlane1), forwardAxis));
-            //float theta2 = acos(dot(normalize(jetPositionOnPlane2), forwardAxis));
-
-            float jetPointRadius1 = length(jetPointPosition1 - jetPositionOnAxis1);
-            float jetPointRadius2 = length(jetPointPosition2 - jetPositionOnAxis2);
-
-            vec3 jetDirection1 = normalize(jetPointPosition1 - planetPosition);
-            vec3 jetDirection2 = normalize(jetPointPosition2 - planetPosition);
-
-
-            float colorFalloff1 = smoothstep(maxHeight, 0.6 * maxHeight, jetHeight1);
-            float colorFalloff2 = smoothstep(maxHeight, 0.6 * maxHeight, jetHeight2);
-
-            colorFalloff1 *= smoothstep(0.2 * minHeight, minHeight, jetHeight1);
-            colorFalloff2 *= smoothstep(0.2 * minHeight, minHeight, jetHeight2);
-
-            colorFalloff1 = 1.0;
-            colorFalloff2 = 1.0;
-
-            //float spiral1 = mod(jetHeight101 * theta1 * 50.0, 10.0) / 10.0;
-            //float spiral2 = mod(jetHeight102 * theta2 * 50.0, 10.0) / 10.0;
-
-            vec3 jetColor1 = vec3(0.0, 0.0, 1.0 + 0.5 * cos(theta1));
-            vec3 jetColor2 = vec3(0.0, 0.0, 1.0 + 0.5 * cos(theta2));
-
-            float r1 = jetPointRadius1;
-            float r2 = jetPointRadius2;
-
-            /*float x1 = r1 * cos(theta1);
-            float x2 = r2 * cos(theta2);
-
-            float y1 = r1 * sin(theta1);
-            float y2 = r2 * sin(theta2);
-
-            float z1 = jetHeight1;
-            float z2 = jetHeight2;*/
-
-            // Idea project the 3D point on the base of the cone and check the distance to the spiral on the base plane
-
-            float d1 = sqrt(pow(r1 - 200e6 * theta1, 2.0) + theta1 * theta1);
-            float d2 = sqrt(pow(r2 - 200e6 * theta2, 2.0) + theta2 * theta2);
-
-            if(d1 > 50e6) {
-                colorFalloff1 = 0.0;
+            if(h1_01 > 1.0) {
+                // cut cone at maxHeight
+                finalColor = screenColor;
+            } else {
+                // if u,v are on spiral color blue, else color white
+                float d = spiralSDF(theta1, h1_01);
+                if (d < 0.1) {
+                    finalColor = vec4(0.0, 0.0, 1.0, 1.0);
+                } else {
+                    finalColor = screenColor;
+                }
             }
-
-            if(d2 > 50e6) {
-                colorFalloff2 = 0.0;
-            }
-
-            /*float m1 = 0.5;
-            float m2 = 0.5;
-
-            float distanceToSpiral1 = abs(m1*m1*(x1 * x1 + y1 * y1) - z1 * z1);
-            float distanceToSpiral2 = abs(m2*m2*(x2 * x2 + y2 * y2) - z2 * z2);
-
-            if(distanceToSpiral1 > 1e18) {
-                colorFalloff1 = 0.0;
-            }
-
-            if(distanceToSpiral2 > 1e18) {
-                colorFalloff2 = 0.0;
-            }*/
-
-            jetColor1 *= colorFalloff1;
-            jetColor2 *= colorFalloff2;
-
-            finalColor.rgb = lerp(finalColor.rgb, jetColor1, 1.0 - colorFalloff1);
-            finalColor.rgb = lerp(finalColor.rgb, jetColor2, 1.0 - colorFalloff2);
         }
     }
 
