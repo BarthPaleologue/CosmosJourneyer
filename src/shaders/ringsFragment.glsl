@@ -20,16 +20,9 @@ uniform float cameraFar;// camera maxZ
 uniform vec3 planetPosition;// planet position in world space
 uniform float planetRadius;// planet radius
 
-struct RingsUniforms {
-    float start;// ring start
-    float end;// ring end
-    float frequency;// ring frequency
-    float opacity;// ring opacity
-    vec3 color;// ring color
-};
-uniform RingsUniforms rings;
-
 uniform vec3 planetRotationAxis;
+
+#pragma glslify: rings = require(./utils/rings.glsl)
 
 #pragma glslify: completeNoise = require(./utils/noise1D.glsl)
 
