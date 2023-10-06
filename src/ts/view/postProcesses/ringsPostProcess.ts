@@ -9,7 +9,7 @@ import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { clamp } from "terrain-generation";
-import { UniformEnumType, ShaderUniforms, UniformData } from "../../controller/uberCore/postProcesses/types";
+import { UniformEnumType, ShaderUniforms } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -39,48 +39,35 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
-                name: "ringsUniforms",
-                type: UniformEnumType.CUSTOM_STRUCT,
-                get: () => ringsUniforms,
-                customTransferHandler: (effect, uniform) => {
-                    const ringsUniforms = uniform.get() as RingsUniforms;
-                    effect.setFloat("ringsUniforms.ringStart", ringsUniforms.ringStart);
-                    effect.setFloat("ringsUniforms.ringEnd", ringsUniforms.ringEnd);
-                    effect.setFloat("ringsUniforms.ringFrequency", ringsUniforms.ringFrequency);
-                    effect.setFloat("ringsUniforms.ringOpacity", ringsUniforms.ringOpacity);
-                    effect.setColor3("ringsUniforms.ringColor", ringsUniforms.ringColor);
-                }
-            } as UniformData<RingsUniforms>,
-            {
-                name: "ringStart",
+                name: "rings.start",
                 type: UniformEnumType.Float,
                 get: () => {
                     return ringsUniforms.ringStart;
                 }
             },
             {
-                name: "ringEnd",
+                name: "rings.end",
                 type: UniformEnumType.Float,
                 get: () => {
                     return ringsUniforms.ringEnd;
                 }
             },
             {
-                name: "ringFrequency",
+                name: "rings.frequency",
                 type: UniformEnumType.Float,
                 get: () => {
                     return ringsUniforms.ringFrequency;
                 }
             },
             {
-                name: "ringOpacity",
+                name: "rings.opacity",
                 type: UniformEnumType.Float,
                 get: () => {
                     return ringsUniforms.ringOpacity;
                 }
             },
             {
-                name: "ringColor",
+                name: "rings.color",
                 type: UniformEnumType.Color3,
                 get: () => {
                     return ringsUniforms.ringColor;

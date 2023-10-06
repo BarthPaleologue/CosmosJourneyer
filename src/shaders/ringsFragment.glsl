@@ -20,11 +20,14 @@ uniform float cameraFar;// camera maxZ
 uniform vec3 planetPosition;// planet position in world space
 uniform float planetRadius;// planet radius
 
-uniform float ringStart;// ring start
-uniform float ringEnd;// ring end
-uniform float ringFrequency;// ring frequency
-uniform float ringOpacity;// ring opacity
-uniform vec3 ringColor;// ring color
+struct RingsUniforms {
+    float start;// ring start
+    float end;// ring end
+    float frequency;// ring frequency
+    float opacity;// ring opacity
+    vec3 color;// ring color
+};
+uniform RingsUniforms rings;
 
 uniform vec3 planetRotationAxis;
 
@@ -54,14 +57,14 @@ float ringDensityAtPoint(vec3 samplePoint) {
     float normalizedDistance = distanceToPlanet / planetRadius;
 
     // out if not intersecting with rings and interpolation area
-    if (normalizedDistance < ringStart || normalizedDistance > ringEnd) return 0.0;
+    if (normalizedDistance < rings.start || normalizedDistance > rings.end) return 0.0;
 
     // compute the actual density of the rings at the sample point
-    float macroRingDensity = completeNoise(normalizedDistance * ringFrequency / 10.0, 1, 2.0, 2.0);
-    float ringDensity = completeNoise(normalizedDistance * ringFrequency, 5, 2.0, 2.0);
+    float macroRingDensity = completeNoise(normalizedDistance * rings.frequency / 10.0, 1, 2.0, 2.0);
+    float ringDensity = completeNoise(normalizedDistance * rings.frequency, 5, 2.0, 2.0);
     ringDensity = mix(ringDensity, macroRingDensity, 0.5);
-    ringDensity *= smoothstep(ringStart, ringStart + 0.03, normalizedDistance);
-    ringDensity *= smoothstep(ringEnd, ringEnd - 0.03, normalizedDistance);
+    ringDensity *= smoothstep(rings.start, rings.start + 0.03, normalizedDistance);
+    ringDensity *= smoothstep(rings.end, rings.end - 0.03, normalizedDistance);
 
     ringDensity *= ringDensity;
 
@@ -92,7 +95,7 @@ void main() {
             float t2;
             if (rayIntersectPlane(samplePoint, towardLight, planetPosition, planetRotationAxis, 0.001, t2)) {
                 vec3 shadowSamplePoint = samplePoint + t2 * towardLight;
-                accDensity += ringDensityAtPoint(shadowSamplePoint) * ringOpacity;
+                accDensity += ringDensityAtPoint(shadowSamplePoint) * rings.opacity;
             }
         }
         finalColor.rgb *= pow(1.0 - accDensity, 4.0);
@@ -107,9 +110,9 @@ void main() {
             if (!rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, t0, t1) || t0 > impactPoint) {
                 // if the ray is impacting a solid object after the ring plane
                 vec3 samplePoint = cameraPosition + impactPoint * rayDir;
-                float ringDensity = ringDensityAtPoint(samplePoint) * ringOpacity;
+                float ringDensity = ringDensityAtPoint(samplePoint) * rings.opacity;
 
-                vec3 ringShadeColor = ringColor;
+                vec3 ringShadeColor = rings.color;
 
                 // hypothèse des rayons parallèles
                 int nbLightSources = nbStars;
@@ -122,7 +125,7 @@ void main() {
                 }
                 if (nbLightSources == 0) ringShadeColor *= 0.1;
 
-                finalColor = vec4(lerp(ringShadeColor, finalColor.rgb, ringDensity), 1.0);
+                finalColor = vec4(mix(finalColor.rgb, ringShadeColor, ringDensity), 1.0);
             }
         }
     }

@@ -43,12 +43,7 @@ export enum UniformEnumType {
     /**
      * An array of Vector4. Shader code: vec4[]
      */
-    Vector4Array,
-
-    /**
-     * A custom struct. Shader code: struct
-     */
-    CUSTOM_STRUCT
+    Vector4Array
 }
 
 export enum SamplerEnumType {
@@ -56,7 +51,7 @@ export enum SamplerEnumType {
     Texture
 }
 
-export type UniformType = number | boolean | Vector3 | Color3 | Matrix | Quaternion | Texture | Vector3[] | Vector4[] | any;
+export type UniformType = number | boolean | Vector3 | Color3 | Matrix | Quaternion | Texture | Vector3[] | Vector4[];
 
 export type SamplerType = Texture | undefined;
 
@@ -64,7 +59,6 @@ export type UniformData<T> = {
     name: string;
     type: UniformEnumType;
     get: () => T;
-    customTransferHandler?: (effect: Effect, data: UniformData<T>) => void;
 };
 
 export type SamplerData<T> = {
