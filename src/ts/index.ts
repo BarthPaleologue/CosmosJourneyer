@@ -184,9 +184,9 @@ positionNearObject(scene.getActiveController(), planet, starSystem, 2);
 
 const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
 if (aresAtmosphere) {
-    aresAtmosphere.settings.redWaveLength = 500;
-    aresAtmosphere.settings.greenWaveLength = 680;
-    aresAtmosphere.settings.blueWaveLength = 670;
+    aresAtmosphere.atmosphereUniforms.redWaveLength = 500;
+    aresAtmosphere.atmosphereUniforms.greenWaveLength = 680;
+    aresAtmosphere.atmosphereUniforms.blueWaveLength = 670;
 } else {
     console.warn("No atmosphere found for Ares");
 }

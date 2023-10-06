@@ -10,17 +10,12 @@ import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { GasPlanet } from "../bodies/planemos/gasPlanet";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { OrbitalObject } from "../common";
-import {
-    UniformEnumType,
-    ShaderSamplers,
-    ShaderUniforms,
-    SamplerEnumType
-} from "../../controller/uberCore/postProcesses/types";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
 
-export interface AtmosphereSettings {
+export interface AtmosphereUniforms {
     atmosphereRadius: number;
     falloffFactor: number;
     intensity: number;
@@ -34,11 +29,11 @@ export interface AtmosphereSettings {
 }
 
 export class AtmosphericScatteringPostProcess extends UberPostProcess implements ObjectPostProcess {
-    readonly settings: AtmosphereSettings;
+    readonly atmosphereUniforms: AtmosphereUniforms;
     readonly object: TelluricPlanemo | GasPlanet;
 
     constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: OrbitalObject[]) {
-        const settings: AtmosphereSettings = {
+        const atmosphereUniforms: AtmosphereUniforms = {
             atmosphereRadius: planet.getBoundingRadius() + atmosphereHeight,
             falloffFactor: 10,
             intensity: 11 * planet.model.physicalProperties.pressure,
@@ -56,73 +51,73 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
-                name: "atmosphereRadius",
+                name: "atmosphere.radius",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.atmosphereRadius;
+                    return atmosphereUniforms.atmosphereRadius;
                 }
             },
             {
-                name: "falloffFactor",
+                name: "atmosphere.falloff",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.falloffFactor;
+                    return atmosphereUniforms.falloffFactor;
                 }
             },
             {
-                name: "sunIntensity",
+                name: "atmosphere.sunIntensity",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.intensity;
+                    return atmosphereUniforms.intensity;
                 }
             },
             {
-                name: "rayleighStrength",
+                name: "atmosphere.rayleighStrength",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.rayleighStrength;
+                    return atmosphereUniforms.rayleighStrength;
                 }
             },
             {
-                name: "mieStrength",
+                name: "atmosphere.mieStrength",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.mieStrength;
+                    return atmosphereUniforms.mieStrength;
                 }
             },
             {
-                name: "densityModifier",
+                name: "atmosphere.densityModifier",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.densityModifier;
+                    return atmosphereUniforms.densityModifier;
                 }
             },
             {
-                name: "redWaveLength",
+                name: "atmosphere.redWaveLength",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.redWaveLength;
+                    return atmosphereUniforms.redWaveLength;
                 }
             },
             {
-                name: "greenWaveLength",
+                name: "atmosphere.greenWaveLength",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.greenWaveLength;
+                    return atmosphereUniforms.greenWaveLength;
                 }
             },
             {
-                name: "blueWaveLength",
+                name: "atmosphere.blueWaveLength",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.blueWaveLength;
+                    return atmosphereUniforms.blueWaveLength;
                 }
             },
             {
-                name: "mieHaloRadius",
+                name: "atmosphere.mieHaloRadius",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.mieHaloRadius;
+                    return atmosphereUniforms.mieHaloRadius;
                 }
             }
         ];
@@ -141,6 +136,6 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = planet;
-        this.settings = settings;
+        this.atmosphereUniforms = atmosphereUniforms;
     }
 }

@@ -27,19 +27,8 @@ uniform float cameraFar;// camera maxZ
 
 uniform vec3 planetPosition;// planet position in world space
 uniform float planetRadius;// planet radius for height calculations
-uniform float atmosphereRadius;// atmosphere radius (calculate from planet center)
 
-uniform float falloffFactor;// controls exponential opacity falloff
-uniform float sunIntensity;// controls atmosphere overall brightness
-uniform float rayleighStrength;// controls color dispersion
-uniform float mieStrength;
-uniform float densityModifier;// density of the atmosphere
-
-uniform float redWaveLength;// the wave length for the red part of the scattering
-uniform float greenWaveLength;// same with green
-uniform float blueWaveLength;// same with blue
-
-uniform float mieHaloRadius;
+#pragma glslify: atmosphere = require(./utils/atmosphere.glsl)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
@@ -50,13 +39,13 @@ uniform float mieHaloRadius;
 // based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
 vec2 densityAtPoint(vec3 samplePoint) {
     float heightAboveSurface = length(samplePoint - planetPosition) - planetRadius;
-    float height01 = heightAboveSurface / (atmosphereRadius - planetRadius);// normalized height between 0 and 1
-    
+    float height01 = heightAboveSurface / (atmosphere.radius - planetRadius);// normalized height between 0 and 1
+
     vec2 localDensity = vec2(
-        densityModifier * exp(-height01 * falloffFactor),
-        densityModifier * exp(-height01 * falloffFactor * 0.5)
+    atmosphere.densityModifier * exp(-height01 * atmosphere.falloff),
+    atmosphere.densityModifier * exp(-height01 * atmosphere.falloff * 0.5)
     );
-    
+
     localDensity *= (1.0 - height01);
 
     return localDensity;// density with exponential falloff
@@ -83,13 +72,13 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
 
     vec3 samplePoint = rayOrigin;// first sampling point coming from camera ray
 
-    vec3 wavelength = vec3(redWaveLength, greenWaveLength, blueWaveLength);// the wavelength that will be scattered (rgb so we get everything)
+    vec3 wavelength = vec3(atmosphere.redWaveLength, atmosphere.greenWaveLength, atmosphere.blueWaveLength);// the wavelength that will be scattered (rgb so we get everything)
 
     // Scattering Coeffs
-    vec3 rayleighCoeffs = pow(1063.0 / wavelength.xyz, vec3(4.0)) * rayleighStrength;// the scattering is inversely proportional to the fourth power of the wave length
+    vec3 rayleighCoeffs = pow(1063.0 / wavelength.xyz, vec3(4.0)) * atmosphere.rayleighStrength;// the scattering is inversely proportional to the fourth power of the wave length
     rayleighCoeffs /= planetRadius;
 
-    vec3 mieCoeffs = vec3(2.5e-2) * mieStrength;
+    vec3 mieCoeffs = vec3(2.5e-2) * atmosphere.mieStrength;
     mieCoeffs /= planetRadius;
 
     float stepSize = rayLength / float(POINTS_FROM_CAMERA - 1);// the ray length between sample points
@@ -103,12 +92,12 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
 
     for (int i = 0; i < POINTS_FROM_CAMERA; i++, samplePoint += rayDir * stepSize) {
         float _, t1;
-        rayIntersectSphere(samplePoint, starDir, planetPosition, atmosphereRadius, _, t1);
+        rayIntersectSphere(samplePoint, starDir, planetPosition, atmosphere.radius, _, t1);
         float sunRayLengthInAtm = t1;
 
         /*float height = length(samplePoint - planetPosition);
         float heightAboveSurface = height - planetRadius;
-        float height01 = heightAboveSurface / (atmosphereRadius - planetRadius); // normalized height between 0 and 1
+        float height01 = heightAboveSurface / (atmosphere.radius - planetRadius); // normalized height between 0 and 1
         vec3 planetNormal = normalize(samplePoint - planetPosition);
         float costheta = dot(starDir, planetNormal) * 0.99;
         float lutx = (costheta + 1.0) / 2.0;
@@ -133,7 +122,7 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     float costheta = dot(rayDir, starDir);
     float costheta2 = pow(costheta, 2.0);
 
-    float g = mieHaloRadius;//0.7
+    float g = atmosphere.mieHaloRadius;//0.7
     float g2 = g * g;
 
     float phaseMie = ((3.0 * (1.0 - g2)) / (2.0 * (2.0 + g2))) * ((1.0 + costheta2) / pow(1.0 + g2 - 2.0 * g * costheta, 1.5));
@@ -145,12 +134,12 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     inScatteredRayleigh *= phaseRayleigh;// apply rayleigh pahse
     inScatteredMie *= phaseMie;
 
-    return (inScatteredRayleigh + inScatteredMie) * sunIntensity;
+    return (inScatteredRayleigh + inScatteredMie) * atmosphere.sunIntensity;
 }
 
 vec4 scatter(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, atmosphereRadius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, atmosphere.radius, impactPoint, escapePoint))) {
         return originalColor;// if not intersecting with atmosphere, return original color
     }
 
