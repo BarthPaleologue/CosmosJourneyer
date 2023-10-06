@@ -32,16 +32,12 @@ uniform vec3 planetRotationAxis;
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
-#pragma glslify: lineIntersectSphere = require(./utils/lineIntersectSphere.glsl)
-
 bool rayIntersectPlane(vec3 rayOrigin, vec3 rayDir, vec3 planetPosition, vec3 planeNormal, float tolerance, out float t) {
     float denom = dot(rayDir, planeNormal);
     if (abs(denom) <= tolerance) return false;// ray is parallel to the plane
     t = dot(planeNormal, planetPosition - rayOrigin) / denom;
     return t >= 0.0;
 }
-
-#pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 
 float ringDensityAtPoint(vec3 samplePoint) {
     vec3 samplePointPlanetSpace = samplePoint - planetPosition;
