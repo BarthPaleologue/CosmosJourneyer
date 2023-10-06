@@ -9,25 +9,25 @@ import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { clamp } from "terrain-generation";
-import {ShaderDataType, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
+import { UniformEnumType, ShaderUniforms } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
 
-interface RingsSettings {
+type RingsUniforms = {
     ringStart: number;
     ringEnd: number;
     ringFrequency: number;
     ringOpacity: number;
     ringColor: Color3;
-}
+};
 
 export class RingsPostProcess extends UberPostProcess implements ObjectPostProcess {
-    readonly settings: RingsSettings;
+    readonly ringsUniforms: RingsUniforms;
     readonly object: AbstractBody;
 
     constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
-        const settings: RingsSettings = {
+        const ringsUniforms: RingsUniforms = {
             ringStart: randRange(1.8, 2.2, body.model.rng, 1400),
             ringEnd: randRange(2.1, 4.0, body.model.rng, 1410),
             ringFrequency: 30.0,
@@ -38,44 +38,51 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             ...getObjectUniforms(body),
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
+            /*{
+                name: "ringsUniforms",
+                type: UniformEnumType.CUSTOM_STRUCT,
+                get: () => {
+                    return ringsUniforms;
+                }
+            },*/
             {
                 name: "ringStart",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.ringStart;
+                    return ringsUniforms.ringStart;
                 }
             },
             {
                 name: "ringEnd",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.ringEnd;
+                    return ringsUniforms.ringEnd;
                 }
             },
             {
                 name: "ringFrequency",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.ringFrequency;
+                    return ringsUniforms.ringFrequency;
                 }
             },
             {
                 name: "ringOpacity",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.ringOpacity;
+                    return ringsUniforms.ringOpacity;
                 }
             },
             {
                 name: "ringColor",
-                type: ShaderDataType.Color3,
+                type: UniformEnumType.Color3,
                 get: () => {
-                    return settings.ringColor;
+                    return ringsUniforms.ringColor;
                 }
             },
             {
                 name: "planetRotationAxis",
-                type: ShaderDataType.Vector3,
+                type: UniformEnumType.Vector3,
                 get: () => {
                     return body.getRotationAxis();
                 }
@@ -85,6 +92,6 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
         super(body.name + "Rings", shaderName, uniforms, getSamplers(scene), scene);
 
         this.object = body;
-        this.settings = settings;
+        this.ringsUniforms = ringsUniforms;
     }
 }

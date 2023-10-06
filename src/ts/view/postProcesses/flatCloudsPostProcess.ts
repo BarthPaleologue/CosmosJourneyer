@@ -13,7 +13,12 @@ import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
-import {ShaderDataType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
+import {
+    UniformEnumType,
+    ShaderSamplers,
+    ShaderUniforms,
+    SamplerEnumType
+} from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -55,84 +60,84 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             ...getActiveCameraUniforms(scene),
             {
                 name: "cloudLayerRadius",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.cloudLayerRadius;
                 }
             },
             {
                 name: "cloudFrequency",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.cloudFrequency;
                 }
             },
             {
                 name: "cloudDetailFrequency",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.cloudDetailFrequency;
                 }
             },
             {
                 name: "cloudCoverage",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.cloudCoverage;
                 }
             },
             {
                 name: "cloudSharpness",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.cloudSharpness;
                 }
             },
             {
                 name: "cloudColor",
-                type: ShaderDataType.Color3,
+                type: UniformEnumType.Color3,
                 get: () => {
                     return settings.cloudColor;
                 }
             },
             {
                 name: "worleySpeed",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.worleySpeed;
                 }
             },
             {
                 name: "detailSpeed",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.detailSpeed;
                 }
             },
             {
                 name: "smoothness",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.smoothness;
                 }
             },
             {
                 name: "specularPower",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.specularPower;
                 }
             },
             {
                 name: "planetInverseRotationQuaternion",
-                type: ShaderDataType.Quaternion,
+                type: UniformEnumType.Quaternion,
                 get: () => {
                     return getInverseRotationQuaternion(planet.transform);
                 }
             },
             {
                 name: "time",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return -this.internalTime % ((2 * Math.PI * gcd(this.settings.worleySpeed * 10000, this.settings.detailSpeed * 10000)) / this.settings.worleySpeed);
                 }
@@ -143,7 +148,7 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             ...getSamplers(scene),
             {
                 name: "normalMap",
-                type: ShaderDataType.Texture,
+                type: SamplerEnumType.Texture,
                 get: () => {
                     return new Texture(normalMap, scene);
                 }

@@ -7,7 +7,7 @@ import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { BaseObject } from "../common";
 import { getForwardDirection } from "../../controller/uberCore/transforms/basicTransform";
-import {ShaderDataType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
+import {UniformEnumType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "matterjet";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
@@ -34,28 +34,28 @@ export class MatterJetPostProcess extends UberPostProcess implements ObjectPostP
             ...getActiveCameraUniforms(scene),
             {
                 name: "time",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return this.internalTime % (settings.rotationPeriod * 10000);
                 }
             },
             {
                 name: "rotationPeriod",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.rotationPeriod;
                 }
             },
             {
                 name: "rotationAxis",
-                type: ShaderDataType.Vector3,
+                type: UniformEnumType.Vector3,
                 get: () => {
                     return stellarObject.getRotationAxis();
                 }
             },
             {
                 name: "forwardAxis",
-                type: ShaderDataType.Vector3,
+                type: UniformEnumType.Vector3,
                 get: () => {
                     return getForwardDirection(stellarObject.transform);
                 }

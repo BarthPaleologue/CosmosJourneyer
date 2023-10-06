@@ -432,7 +432,7 @@ export class StarSystem {
         const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
         this.postProcessManager.setBody(nearestBody);
         const rings = this.postProcessManager.getRings(nearestBody);
-        const switchLimit = rings !== null ? rings.settings.ringStart : 2;
+        const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;
         if (isOrbiting(controller, nearestBody, switchLimit)) this.postProcessManager.setSurfaceOrder();
         else this.postProcessManager.setSpaceOrder();
         this.postProcessManager.update(deltaTime);

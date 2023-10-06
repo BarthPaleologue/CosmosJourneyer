@@ -13,7 +13,12 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcessTypes";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import {ShaderDataType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
+import {
+    UniformEnumType,
+    ShaderSamplers,
+    ShaderUniforms,
+    SamplerEnumType
+} from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -35,7 +40,7 @@ export class StarfieldPostProcess extends UberPostProcess {
             ...getStellarObjectsUniforms(stellarObjects),
             {
                 name: "visibility",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     //TODO: should be cleaned up
                     let vis = 1.0;
@@ -74,7 +79,7 @@ export class StarfieldPostProcess extends UberPostProcess {
             ...getSamplers(scene),
             {
                 name: "starfieldTexture",
-                type: ShaderDataType.Texture,
+                type: SamplerEnumType.Texture,
                 get: () => {
                     return Assets.Starfield;
                 }

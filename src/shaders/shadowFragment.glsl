@@ -53,7 +53,7 @@ void main() {
                 vec3 closestPointToPlanetCenter = cameraPosition + rayDir * maximumDistance + towardLight * (t0 + t1) * 0.5;
                 float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - planetPosition);
                 float r01 = remap(closestDistanceToPlanetCenter, 0.0, planetRadius, 0.0, 1.0);
-                finalColor.rgb *= 0.2 + 0.8 * smoothstep(0.9, 1.0, r01);
+                finalColor.rgb *= 0.2 + 0.8 * smoothstep(0.85, 1.0, r01);
             }
         }
     }

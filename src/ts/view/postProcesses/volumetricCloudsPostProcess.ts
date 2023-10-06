@@ -9,7 +9,7 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { CloudSettings, FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import {ShaderDataType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
+import {UniformEnumType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "volumetricClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
@@ -40,14 +40,14 @@ export class VolumetricCloudsPostProcess extends UberPostProcess implements Obje
             ...getActiveCameraUniforms(scene),
             {
                 name: "cloudLayerMinHeight",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return planet.getBoundingRadius();
                 }
             },
             {
                 name: "cloudLayerMaxHeight",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return planet.getBoundingRadius() + 30e3;
                 }

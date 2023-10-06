@@ -5,7 +5,8 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { UpdatablePostProcess } from "../../../view/postProcesses/objectPostProcess";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "./types";
+import { UniformType, UniformData, UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "./types";
+import { Effect } from "@babylonjs/core/Materials/effect";
 
 /**
  * A wrapper around BabylonJS post processes that allows more predictable and easier to use uniforms
@@ -35,51 +36,53 @@ export abstract class UberPostProcess extends PostProcess implements UpdatablePo
         const effect = this.getEffect();
         for (const uniform of this.uniforms) {
             switch (uniform.type) {
-                case ShaderDataType.Float:
+                case UniformEnumType.Float:
                     effect.setFloat(uniform.name, uniform.get() as number);
                     break;
-                case ShaderDataType.Int:
+                case UniformEnumType.Int:
                     effect.setInt(uniform.name, uniform.get() as number);
                     break;
-                case ShaderDataType.Bool:
+                case UniformEnumType.Bool:
                     effect.setBool(uniform.name, uniform.get() as boolean);
                     break;
-                case ShaderDataType.Vector3:
+                case UniformEnumType.Vector3:
                     effect.setVector3(uniform.name, uniform.get() as Vector3);
                     break;
-                case ShaderDataType.Color3:
+                case UniformEnumType.Color3:
                     effect.setColor3(uniform.name, uniform.get() as Color3);
                     break;
-                case ShaderDataType.Quaternion:
+                case UniformEnumType.Quaternion:
                     effect.setQuaternion(uniform.name, uniform.get() as Quaternion);
                     break;
-                case ShaderDataType.Matrix:
+                case UniformEnumType.Matrix:
                     effect.setMatrix(uniform.name, uniform.get() as Matrix);
                     break;
-                case ShaderDataType.Vector3Array:
+                case UniformEnumType.Vector3Array:
                     effect.setArray3(uniform.name, flattenVector3Array(uniform.get() as Vector3[]));
                     break;
-                case ShaderDataType.Vector4Array:
+                case UniformEnumType.Vector4Array:
                     effect.setArray4(uniform.name, flattenVector4Array(uniform.get() as Vector4[]));
                     break;
-                case ShaderDataType.Auto:
+                case UniformEnumType.CUSTOM_STRUCT:
+                    if (uniform.customTransferHandler) uniform.customTransferHandler(effect, uniform.get() as UniformType);
+                    else throw new Error(`Custom Struct was provided, yet no custom transfer handler for uniform ${uniform.name}`);
+                    break;
+                case UniformEnumType.Auto:
                     // BabylonJS already handles this
                     break;
-                default:
-                    throw new Error(`Unknown enum shader data type in uniform (not samplers): ${uniform.type}`);
             }
         }
 
         for (const sampler of this.samplers) {
             switch (sampler.type) {
-                case ShaderDataType.Texture:
+                case SamplerEnumType.Texture:
                     effect.setTexture(sampler.name, sampler.get() as Texture);
                     break;
-                case ShaderDataType.Auto:
+                case SamplerEnumType.Auto:
                     // BabylonJS already handles this
                     break;
                 default:
-                    throw new Error(`Unknown enum shader data type in uniform samplers: ${sampler.type}`);
+                    throw new Error(`Unsupported sampler type: ${sampler.type}`);
             }
         }
     }

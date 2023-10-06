@@ -1,8 +1,9 @@
-import {Matrix, Quaternion, Vector3, Vector4} from "@babylonjs/core/Maths/math.vector";
-import {Color3} from "@babylonjs/core/Maths/math.color";
-import {Texture} from "@babylonjs/core/Materials/Textures/texture";
+import { Matrix, Quaternion, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Effect } from "@babylonjs/core/Materials/effect";
 
-export enum ShaderDataType {
+export enum UniformEnumType {
     /**
      * The type to use when BabylonJS manages the uniform itself (like textureSampler)
      */
@@ -36,24 +37,53 @@ export enum ShaderDataType {
      */
     Quaternion,
     /**
-     * A texture. Shader code: sampler2D
-     */
-    Texture,
-    /**
      * An array of Vector3. Shader code: vec3[]
      */
     Vector3Array,
     /**
      * An array of Vector4. Shader code: vec4[]
      */
-    Vector4Array
+    Vector4Array,
+
+    /**
+     * A custom struct. Shader code: struct
+     */
+    CUSTOM_STRUCT
 }
 
-export type shaderData = number | boolean | Vector3 | Color3 | Matrix | Quaternion | Texture | Vector3[] | Vector4[];
-export type ShaderData<T> = {
-    name: string;
-    type: ShaderDataType;
-    get: () => T;
+export enum SamplerEnumType {
+    Auto,
+    Texture
 }
-export type ShaderUniforms = ShaderData<shaderData>[];
-export type ShaderSamplers = ShaderData<shaderData>[];
+
+export type UniformType =
+    | number
+    | boolean
+    | Vector3
+    | Color3
+    | Matrix
+    | Quaternion
+    | Texture
+    | Vector3[]
+    | Vector4[]
+    | {
+          [key: string]: UniformType;
+      };
+
+export type SamplerType = Texture | undefined;
+
+export type UniformData<T> = {
+    name: string;
+    type: UniformEnumType;
+    get: () => T;
+    customTransferHandler?: (effect: Effect, data: T) => void;
+};
+
+export type SamplerData<T> = {
+    name: string;
+    type: SamplerEnumType;
+    get: () => T;
+};
+
+export type ShaderUniforms = UniformData<UniformType>[];
+export type ShaderSamplers = SamplerData<SamplerType>[];
