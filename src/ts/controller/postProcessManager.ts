@@ -33,6 +33,9 @@ import { ObjectPostProcess, UpdatablePostProcess } from "../view/postProcesses/o
 import { MatterJetPostProcess } from "../view/postProcesses/matterJetPostProcess";
 import { NeutronStar } from "../view/bodies/stellarObjects/neutronStar";
 
+/**
+ * The order in which the post processes are rendered when away from a planet
+ */
 const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.VOLUMETRIC_LIGHT,
     PostProcessType.OCEAN,
@@ -44,6 +47,9 @@ const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.BLACK_HOLE
 ];
 
+/**
+ * The order in which the post processes are rendered when close to a planet
+ */
 const surfaceRenderingOrder: PostProcessType[] = [
     PostProcessType.VOLUMETRIC_LIGHT,
     PostProcessType.MATTER_JETS,
@@ -55,6 +61,11 @@ const surfaceRenderingOrder: PostProcessType[] = [
     PostProcessType.ATMOSPHERE
 ];
 
+/**
+ * Manages all post processes in the scene.
+ * The manager can dynamically create rendering pipelines depending on the current body.
+ * This is necessary so the effects are rendered in the correct order. (other objects -> body -> overlays)
+ */
 export class PostProcessManager {
     private readonly engine: Engine;
     private readonly scene: UberScene;
@@ -63,7 +74,7 @@ export class PostProcessManager {
     private readonly surfaceRenderingPipeline: UberRenderingPipeline;
     private currentRenderingPipeline: UberRenderingPipeline;
 
-    private renderingOrder: PostProcessType[] = spaceRenderingOrder;
+    private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
 
     private currentBody: AbstractBody | null = null;
 
@@ -78,6 +89,9 @@ export class PostProcessManager {
     private readonly overlays: OverlayPostProcess[] = [];
     private readonly matterJets: MatterJetPostProcess[] = [];
 
+    /**
+     * All post processes that are attached to an object.
+     */
     private readonly objectPostProcesses: ObjectPostProcess[][] = [
         this.oceans,
         this.clouds,
@@ -90,6 +104,9 @@ export class PostProcessManager {
         this.matterJets
     ];
 
+    /**
+     * All post processes that are updated every frame.
+     */
     private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.starFields, this.volumetricLights, ...this.objectPostProcesses];
 
     readonly colorCorrection: ColorCorrection;
@@ -347,7 +364,7 @@ export class PostProcessManager {
         if (this.currentRenderingPipeline === this.spaceRenderingPipeline) return;
         this.surfaceRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
         this.currentRenderingPipeline = this.spaceRenderingPipeline;
-        this.renderingOrder = spaceRenderingOrder;
+        this.currentRenderingOrder = spaceRenderingOrder;
         this.init();
     }
 
@@ -355,7 +372,7 @@ export class PostProcessManager {
         if (this.currentRenderingPipeline === this.surfaceRenderingPipeline) return;
         this.spaceRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
         this.currentRenderingPipeline = this.surfaceRenderingPipeline;
-        this.renderingOrder = surfaceRenderingOrder;
+        this.currentRenderingOrder = surfaceRenderingOrder;
         this.init();
     }
 
@@ -395,7 +412,7 @@ export class PostProcessManager {
 
         this.currentRenderingPipeline.addEffect(this.starFieldRenderEffect);
 
-        for (const postProcessType of this.renderingOrder) {
+        for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
                 case PostProcessType.VOLUMETRIC_LIGHT:
                     this.currentRenderingPipeline.addEffect(otherVolumetricLightsRenderEffect);
@@ -425,7 +442,7 @@ export class PostProcessManager {
             }
         }
 
-        for (const postProcessType of this.renderingOrder) {
+        for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
                 case PostProcessType.VOLUMETRIC_LIGHT:
                     this.currentRenderingPipeline.addEffect(bodyVolumetricLightsRenderEffect);

@@ -12,9 +12,13 @@ const shaderName = "matterjet";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
 
 export interface MatterJetSettings {
+    // the rotation period in seconds of the matter jet
     rotationPeriod: number;
 }
 
+/**
+ * Post process for rendering matter jets that are used by neutron stars for example
+ */
 export class MatterJetPostProcess extends UberPostProcess implements ObjectPostProcess {
     settings: MatterJetSettings;
     object: BaseObject;
