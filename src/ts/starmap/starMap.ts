@@ -39,7 +39,7 @@ export class StarMap {
     readonly scene: Scene;
     private readonly controller: PlayerController;
 
-    private isRunning: boolean = true;
+    private isRunning = true;
 
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;

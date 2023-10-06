@@ -35,4 +35,4 @@ export class OrbitProperties {
         this.normalToPlane = normalToPlane;
         this.isPlaneAlignedWithParent = isPlaneAlignedWithParent;
     }
-};
+}

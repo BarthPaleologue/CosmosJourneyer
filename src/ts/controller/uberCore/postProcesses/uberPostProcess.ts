@@ -64,7 +64,7 @@ export abstract class UberPostProcess extends PostProcess implements UpdatablePo
                     effect.setArray4(uniform.name, flattenVector4Array(uniform.get() as Vector4[]));
                     break;
                 case UniformEnumType.CUSTOM_STRUCT:
-                    if (uniform.customTransferHandler) uniform.customTransferHandler(effect, uniform.get() as UniformType);
+                    if (uniform.customTransferHandler) uniform.customTransferHandler(effect, uniform);
                     else throw new Error(`Custom Struct was provided, yet no custom transfer handler for uniform ${uniform.name}`);
                     break;
                 case UniformEnumType.Auto:
