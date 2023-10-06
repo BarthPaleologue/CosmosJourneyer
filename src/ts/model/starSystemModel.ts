@@ -17,13 +17,17 @@ export class StarSystemModel {
     readonly seed: number;
     readonly rng: (step: number) => number;
 
-    readonly name: string;
+    private name: string;
 
     constructor(seed: number) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
         this.name = generateName(this.rng, GENERATION_STEPS.NAME);
+    }
+
+    setName(name: string) {
+        this.name = name;
     }
 
     getName(): string {

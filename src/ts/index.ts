@@ -17,7 +17,6 @@ import { ShipController } from "./spaceship/shipController";
 import { SpaceStation } from "./view/spaceStation";
 import { PostProcessType } from "./view/postProcesses/postProcessTypes";
 import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
-import { StarModel } from "./model/stellarObjects/starModel";
 import { GasPlanetModel } from "./model/planemos/gasPlanetModel";
 import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
@@ -91,6 +90,7 @@ console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTI
 
 const starSystemSeed = 0;
 const starSystem = new StarSystem(starSystemSeed, scene);
+starSystem.model.setName("Alpha Testis");
 engine.setStarSystem(starSystem, false);
 
 const sunModel = new NeutronStarModel(0.51);
@@ -111,6 +111,7 @@ planetModel.orbit.radius = 4000 * planetModel.radius;
 planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = starSystem.makeTelluricPlanet(planetModel);
+planet.postProcesses.push(PostProcessType.RING);
 
 const spacestation = new SpaceStation(scene, planet);
 engine.getStarSystem().addSpaceStation(spacestation);
