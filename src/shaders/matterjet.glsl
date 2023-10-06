@@ -129,14 +129,14 @@ void main() {
     
     float t1, t2;
     if(rayIntersectCone(cameraPosition, rayDir, planetPosition, rotationAxis, 0.9, t1, t2)) {
-        if(t2 < maximumDistance) {
+        if(t2 > 0.0 && t2 < maximumDistance) {
             vec3 jetPointPosition2 = cameraPosition + t2 * rayDir - planetPosition;
 
             float density2 = spiralDensity(jetPointPosition2, rotationAxis, jetHeight);
 
             finalColor.rgb = mix(finalColor.rgb, jetColor, density2);
         }
-        if(t1 < maximumDistance) {
+        if(t1 > 0.0 && t1 < maximumDistance) {
             vec3 jetPointPosition1 = cameraPosition + t1 * rayDir - planetPosition;
 
             float density1 = spiralDensity(jetPointPosition1, rotationAxis, jetHeight);
