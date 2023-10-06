@@ -1,7 +1,7 @@
 import ringsFragment from "../../../shaders/ringsFragment.glsl";
 import { AbstractBody } from "../bodies/abstractBody";
 import { UberScene } from "../../controller/uberCore/uberScene";
-import { ShaderDataType, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
+import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { normalRandom, randRange } from "extended-random";
 import { ObjectPostProcess } from "./objectPostProcess";
@@ -9,6 +9,7 @@ import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { clamp } from "terrain-generation";
+import {ShaderDataType, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;

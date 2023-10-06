@@ -1,12 +1,13 @@
 import blackHoleFragment from "../../../shaders/blackhole.glsl";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
+import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Assets } from "../../controller/assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { getForwardDirection } from "../../controller/uberCore/transforms/basicTransform";
+import {ShaderDataType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "blackhole";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;

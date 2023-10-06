@@ -1,12 +1,13 @@
 import matterJetFragment from "../../../shaders/matterjet.glsl";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
+import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { BaseObject } from "../common";
 import { getForwardDirection } from "../../controller/uberCore/transforms/basicTransform";
+import {ShaderDataType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "matterjet";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;

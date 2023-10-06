@@ -1,11 +1,12 @@
 import mandelbulbFragment from "../../../shaders/mandelbulb.glsl";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
+import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Mandelbulb } from "../bodies/planemos/mandelbulb";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
+import {ShaderDataType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "mandelbulb";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelbulbFragment;
