@@ -7,5 +7,6 @@ export enum PostProcessType {
     MATTER_JETS,
     MANDELBULB,
     BLACK_HOLE,
+    SHADOW,
     OVERLAY
 }

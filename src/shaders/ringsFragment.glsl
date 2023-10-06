@@ -84,17 +84,6 @@ void main() {
     vec4 finalColor = screenColor;
 
     if (maximumDistance < cameraFar) {
-        // this planet occludes the pixel in the depth map
-        // maybe there is occlusion by the planet
-        // basic body shadowing
-        vec3 towardLight = normalize(starPositions[0] - (cameraPosition + rayDir * maximumDistance));
-        float t0, t1;
-        if (lineIntersectSphere(cameraPosition + rayDir * maximumDistance, towardLight, planetPosition, planetRadius, t0, t1)) {
-            if (t0 > planetRadius) {
-                finalColor.rgb *= 0.1;
-            }
-        }
-
         // if the point is in the shadow of the ring, darken it
         vec3 samplePoint = cameraPosition + maximumDistance * rayDir;
         float accDensity = 0.0;

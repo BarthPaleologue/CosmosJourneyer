@@ -32,6 +32,7 @@ import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
 import { ObjectPostProcess, UpdatablePostProcess } from "../view/postProcesses/objectPostProcess";
 import { MatterJetPostProcess } from "../view/postProcesses/matterJetPostProcess";
 import { NeutronStar } from "../view/bodies/stellarObjects/neutronStar";
+import { ShadowPostProcess } from "../view/postProcesses/shadowPostProcess";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -88,6 +89,7 @@ export class PostProcessManager {
     private readonly blackHoles: BlackHolePostProcess[] = [];
     private readonly overlays: OverlayPostProcess[] = [];
     private readonly matterJets: MatterJetPostProcess[] = [];
+    private readonly shadows: ShadowPostProcess[] = [];
 
     /**
      * All post processes that are attached to an object.
@@ -101,7 +103,8 @@ export class PostProcessManager {
         this.blackHoles,
         this.overlays,
         this.volumetricLights,
-        this.matterJets
+        this.matterJets,
+        this.shadows
     ];
 
     /**
@@ -301,6 +304,10 @@ export class PostProcessManager {
         return this.matterJets.find((mj) => mj.object === neutronStar) ?? null;
     }
 
+    public addShadowCaster(body: AbstractBody, stellarObjects: StellarObject[]) {
+        this.shadows.push(new ShadowPostProcess(body, this.scene, stellarObjects));
+    }
+
     /**
      * Adds all post processes for the given body.
      * @param body A body
@@ -345,9 +352,9 @@ export class PostProcessManager {
                     if (!(body instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + body.name);
                     this.addMatterJet(body as NeutronStar);
                     break;
-
-                default:
-                    throw new Error("Invalid postprocess type: " + postProcess);
+                case PostProcessType.SHADOW:
+                    this.addShadowCaster(body as AbstractBody, stellarObjects);
+                    break;
             }
         }
     }
@@ -409,6 +416,7 @@ export class PostProcessManager {
         const [otherRingsRenderEffect, bodyRingsRenderEffect] = makeSplitRenderEffects("Rings", this.getCurrentBody(), this.rings, this.engine);
         const [otherMandelbulbsRenderEffect, bodyMandelbulbsRenderEffect] = makeSplitRenderEffects("Mandelbulbs", this.getCurrentBody(), this.mandelbulbs, this.engine);
         const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = makeSplitRenderEffects("MatterJets", this.getCurrentBody(), this.matterJets, this.engine);
+        const shadowRenderEffect = new PostProcessRenderEffect(this.engine, "ShadowRenderEffect", () => this.shadows);
 
         this.currentRenderingPipeline.addEffect(this.starFieldRenderEffect);
 
@@ -434,11 +442,16 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.MATTER_JETS:
                     this.currentRenderingPipeline.addEffect(otherMatterJetsRenderEffect);
+                    break;
                 case PostProcessType.MANDELBULB:
                     this.currentRenderingPipeline.addEffect(otherMandelbulbsRenderEffect);
                     break;
-                default:
-                    throw new Error("Invalid postprocess type: " + postProcessType);
+                case PostProcessType.SHADOW:
+                    //this.currentRenderingPipeline.addEffect(otherShadowRenderEffect);
+                    break;
+                case PostProcessType.OVERLAY:
+                    // do nothing as they are added at the end of the function
+                    break;
             }
         }
 
@@ -464,14 +477,20 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.MATTER_JETS:
                     this.currentRenderingPipeline.addEffect(bodyMatterJetsRenderEffect);
+                    break;
                 case PostProcessType.MANDELBULB:
                     this.currentRenderingPipeline.addEffect(bodyMandelbulbsRenderEffect);
                     break;
-                default:
-                    throw new Error("Invalid postprocess type: " + postProcessType);
+                case PostProcessType.SHADOW:
+                    //this.currentRenderingPipeline.addEffect(bodyShadowRenderEffect);
+                    break;
+                case PostProcessType.OVERLAY:
+                    // do nothing as they are added at the end of the function
+                    break;
             }
         }
 
+        this.currentRenderingPipeline.addEffect(shadowRenderEffect);
         this.currentRenderingPipeline.addEffect(this.overlayRenderEffect);
         this.currentRenderingPipeline.addEffect(this.fxaaRenderEffect);
         this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
