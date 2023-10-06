@@ -38,12 +38,12 @@ import { NeutronStar } from "../view/bodies/stellarObjects/neutronStar";
  */
 const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.VOLUMETRIC_LIGHT,
+    PostProcessType.MATTER_JETS,
     PostProcessType.OCEAN,
     PostProcessType.CLOUDS,
     PostProcessType.ATMOSPHERE,
     PostProcessType.MANDELBULB,
     PostProcessType.RING,
-    PostProcessType.MATTER_JETS,
     PostProcessType.BLACK_HOLE
 ];
 
