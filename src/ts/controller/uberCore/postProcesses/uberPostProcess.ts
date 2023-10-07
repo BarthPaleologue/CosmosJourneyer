@@ -5,8 +5,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { UpdatablePostProcess } from "../../../view/postProcesses/objectPostProcess";
-import { UniformType, UniformData, UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "./types";
-import { Effect } from "@babylonjs/core/Materials/effect";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "./types";
 
 /**
  * A wrapper around BabylonJS post processes that allows more predictable and easier to use uniforms

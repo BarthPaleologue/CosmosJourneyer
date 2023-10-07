@@ -21,25 +21,26 @@ uniform float cameraNear; // camera minZ
 uniform float cameraFar; // camera maxZ
 
 uniform vec3 planetPosition; // planet position in world space
-uniform float cloudLayerRadius; // atmosphere radius (calculate from planet center)
 uniform float planetRadius; // planet radius
-
-uniform float cloudFrequency; // cloud frequency
-uniform float cloudDetailFrequency; // cloud detail frequency
-uniform float cloudCoverage; // cloud power
-uniform float cloudSharpness;
-
-uniform vec3 cloudColor;
-
-uniform float worleySpeed; // worley noise speed
-uniform float detailSpeed; // detail noise speed
-
-uniform float smoothness;
-uniform float specularPower;
-uniform float alphaModifier;
-uniform float depthModifier;
-
 uniform vec4 planetInverseRotationQuaternion;
+
+struct Clouds {
+    float layerRadius; // atmosphere radius (calculate from planet center)
+
+    float frequency; // cloud frequency
+    float detailFrequency; // cloud detail frequency
+    float coverage; // cloud power
+    float sharpness;
+
+    vec3 color;
+
+    float worleySpeed; // worley noise speed
+    float detailSpeed; // detail noise speed
+
+    float specularPower;
+    float smoothness;
+};
+uniform Clouds clouds;
 
 uniform float time;
 
@@ -71,20 +72,20 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     vec3 rotationAxisPlanetSpace = vec3(0.0, 1.0, 0.0);
 
-    vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, time * worleySpeed);
-    vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, time * detailSpeed);
+    vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds.worleySpeed);
+    vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds.detailSpeed);
 
-    float density = 1.0 - completeWorley(samplePointRotatedWorley * cloudFrequency, 1, 2.0, 2.0);
+    float density = 1.0 - completeWorley(samplePointRotatedWorley * clouds.frequency, 1, 2.0, 2.0);
 
-    density *= completeNoise(samplePointRotatedDetail * cloudDetailFrequency, 5, 2.0, 2.0);
+    density *= completeNoise(samplePointRotatedDetail * clouds.detailFrequency, 5, 2.0, 2.0);
 
     float cloudThickness = 2.0; //TODO: make this a uniform
 
     density = saturate(density * cloudThickness);
 
-    density = smoothstep(cloudCoverage, 1.0, density);
+    density = smoothstep(clouds.coverage, 1.0, density);
 
-    density = smoothSharpener(density, cloudSharpness);
+    density = smoothSharpener(density, clouds.sharpness);
 
     return density;
 }
@@ -92,7 +93,7 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 vec4 computeCloudCoverage(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
 
-    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, clouds.layerRadius, impactPoint, escapePoint))) {
         return originalColor; // if not intersecting with atmosphere, return original color
     }
 
@@ -129,11 +130,11 @@ vec4 computeCloudCoverage(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float
     vec3 normal = vec3(0.0);
     if(impactPoint > 0.0 && impactPoint < maximumDistance) {
         // first cloud is in front of the camera
-        vec3 normalRotatedSamplePoint1 = rotateAround(samplePoint1, vec3(0.0, 1.0, 0.0), time * detailSpeed);
+        vec3 normalRotatedSamplePoint1 = rotateAround(samplePoint1, vec3(0.0, 1.0, 0.0), time * clouds.detailSpeed);
         normal = triplanarNormal(normalRotatedSamplePoint1, planetSpacePoint1, normalMap, 10.0, 0.5, cloudDensity * cloudNormalStrength);
     } else if (escapePoint > 0.0 && escapePoint < maximumDistance) {
         // second cloud in front of the camera
-        vec3 normalRotatedSamplePoint2 = rotateAround(samplePoint2, vec3(0.0, 1.0, 0.0), time * detailSpeed);
+        vec3 normalRotatedSamplePoint2 = rotateAround(samplePoint2, vec3(0.0, 1.0, 0.0), time * clouds.detailSpeed);
         normal = triplanarNormal(normalRotatedSamplePoint2, planetSpacePoint2, normalMap, 10.0, 0.5, cloudDensity * cloudNormalStrength);
     }
 
@@ -144,15 +145,14 @@ vec4 computeCloudCoverage(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float
 
         ndl += max(dot(normal, sunDir), 0.0);
 
-        float smoothness = 0.7; //TODO : en faire un uniform
-        if(length(rayOrigin - planetPosition) > cloudLayerRadius) {
+        if(length(rayOrigin - planetPosition) > clouds.layerRadius) {
             // if above cloud coverage then specular highlight
-            specularHighlight += computeSpecularHighlight(sunDir, rayDir, normal, smoothness, 1.0);
+            specularHighlight += computeSpecularHighlight(sunDir, rayDir, normal, clouds.smoothness, clouds.specularPower);
         }
     }
     ndl = saturate(ndl);
 
-	vec3 ambiant = lerp(originalColor.rgb, sqrt(ndl) * cloudColor, 1.0 - cloudDensity);
+	vec3 ambiant = lerp(originalColor.rgb, sqrt(ndl) * clouds.color, 1.0 - cloudDensity);
 
     return vec4(ambiant + specularHighlight * cloudDensity, 1.0);
 }
@@ -160,19 +160,19 @@ vec4 computeCloudCoverage(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float
 vec4 shadows(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     if(maximumDistance >= cameraFar) return originalColor;
     float impactPoint, escapePoint;
-    if(!rayIntersectSphere(rayOrigin, rayDir, planetPosition, cloudLayerRadius, impactPoint, escapePoint)) return originalColor;
+    if(!rayIntersectSphere(rayOrigin, rayDir, planetPosition, clouds.layerRadius, impactPoint, escapePoint)) return originalColor;
     //hit the planet
     float maxDist = maximumDistance;
     if(rayIntersectSphere(rayOrigin, rayDir, planetPosition, planetRadius, impactPoint, escapePoint)) {
         maxDist = min(maxDist, impactPoint);
     }
     vec3 hitPoint = rayOrigin + maxDist * rayDir;
-    if(length(hitPoint - planetPosition) > cloudLayerRadius) return originalColor;
+    if(length(hitPoint - planetPosition) > clouds.layerRadius) return originalColor;
     float lightAmount = 0.0;
     for (int i = 0; i < nbStars; i++) {
         vec3 sunDir = normalize(starPositions[i] - hitPoint);
         float t0, t1;
-        if (rayIntersectSphere(hitPoint, sunDir, planetPosition, cloudLayerRadius, t0, t1)) {
+        if (rayIntersectSphere(hitPoint, sunDir, planetPosition, clouds.layerRadius, t0, t1)) {
             vec3 samplePoint = normalize(hitPoint + t1 * sunDir - planetPosition);
             if (dot(samplePoint, sunDir) < 0.0) continue;
             samplePoint = applyQuaternion(planetInverseRotationQuaternion, samplePoint);

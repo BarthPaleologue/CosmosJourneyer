@@ -14,7 +14,7 @@ import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
 
-export interface OceanSettings {
+export type OceanUniforms = {
     oceanRadius: number;
     smoothness: number;
     specularPower: number;
@@ -24,15 +24,15 @@ export interface OceanSettings {
 }
 
 export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess {
-    readonly settings: OceanSettings;
+    readonly oceanUniforms: OceanUniforms;
     readonly object: TelluricPlanemo;
 
     constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: OrbitalObject[]) {
-        const settings: OceanSettings = {
+        const oceanUniforms: OceanUniforms = {
             oceanRadius: planet.getBoundingRadius(),
             depthModifier: 0.001,
             alphaModifier: 0.001,
-            specularPower: 1.5,
+            specularPower: 1.0,
             smoothness: 0.9,
             waveBlendingSharpness: 0.1
         };
@@ -42,45 +42,45 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             ...getStellarObjectsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
-                name: "oceanRadius",
+                name: "ocean.radius",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.oceanRadius;
+                    return oceanUniforms.oceanRadius;
                 }
             },
             {
-                name: "smoothness",
+                name: "ocean.smoothness",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.smoothness;
+                    return oceanUniforms.smoothness;
                 }
             },
             {
-                name: "specularPower",
+                name: "ocean.specularPower",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.specularPower;
+                    return oceanUniforms.specularPower;
                 }
             },
             {
-                name: "alphaModifier",
+                name: "ocean.alphaModifier",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.alphaModifier;
+                    return oceanUniforms.alphaModifier;
                 }
             },
             {
-                name: "depthModifier",
+                name: "ocean.depthModifier",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.depthModifier;
+                    return oceanUniforms.depthModifier;
                 }
             },
             {
-                name: "waveBlendingSharpness",
+                name: "ocean.waveBlendingSharpness",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.waveBlendingSharpness;
+                    return oceanUniforms.waveBlendingSharpness;
                 }
             },
             {
@@ -122,6 +122,6 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = planet;
-        this.settings = settings;
+        this.oceanUniforms = oceanUniforms;
     }
 }

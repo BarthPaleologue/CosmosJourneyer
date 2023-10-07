@@ -6,7 +6,7 @@ import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { Star } from "../bodies/stellarObjects/star";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
-import { CloudSettings, FlatCloudsPostProcess } from "./flatCloudsPostProcess";
+import { CloudUniforms, FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import {UniformEnumType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
@@ -17,11 +17,11 @@ Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 
 export class VolumetricCloudsPostProcess extends UberPostProcess implements ObjectPostProcess {
-    readonly settings: CloudSettings;
+    readonly cloudUniforms: CloudUniforms;
     readonly object: TelluricPlanemo;
 
     constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
-        const settings: CloudSettings = {
+        const cloudUniforms: CloudUniforms = {
             cloudLayerRadius: planet.getBoundingRadius() + cloudLayerHeight,
             specularPower: 2,
             smoothness: 0.9,
@@ -59,6 +59,6 @@ export class VolumetricCloudsPostProcess extends UberPostProcess implements Obje
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = planet;
-        this.settings = settings;
+        this.cloudUniforms = cloudUniforms;
     }
 }

@@ -20,15 +20,17 @@ uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
 uniform int nbStars; // number of stars
 
 uniform vec3 planetPosition; // planet position in world space
-uniform float oceanRadius; // atmosphere radius (calculate from planet center)
-
-uniform float smoothness;
-uniform float specularPower;
-uniform float alphaModifier;
-uniform float depthModifier;
-uniform float waveBlendingSharpness;
-
 uniform vec4 planetInverseRotationQuaternion;
+
+struct Ocean {
+    float radius;
+    float smoothness;
+    float specularPower;
+    float alphaModifier;
+    float depthModifier;
+    float waveBlendingSharpness;
+};
+uniform Ocean ocean;
 
 uniform float time;
 
@@ -53,14 +55,14 @@ uniform float time;
 #pragma glslify: computeSpecularHighlight = require(./utils/computeSpecularHighlight.glsl)
 
 #define inline
-vec4 ocean(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
+vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
 
     float waveAmplitude = 20.0;
 
     float waveOmega = 1.0/7.0;
 
-    float actualRadius = oceanRadius + waveAmplitude * sin(time * waveOmega);
+    float actualRadius = ocean.radius + waveAmplitude * sin(time * waveOmega);
 
     if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, actualRadius, impactPoint, escapePoint))) {
         return originalColor; // if not intersecting with atmosphere, return original color
@@ -79,17 +81,17 @@ vec4 ocean(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
 
     vec3 planetNormal = normalize(samplePoint);
     
-    vec3 normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, time, -time) * 100.0, planetNormal, normalMap2, 0.00015, waveBlendingSharpness, 1.0);
-    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 100.0, normalWave, normalMap1, 0.0001, waveBlendingSharpness, 1.0);
+    vec3 normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, time, -time) * 100.0, planetNormal, normalMap2, 0.00015, ocean.waveBlendingSharpness, 1.0);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 100.0, normalWave, normalMap1, 0.0001, ocean.waveBlendingSharpness, 1.0);
 
-    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 300.0, normalWave, normalMap1, 0.000025, waveBlendingSharpness, 0.5);
-    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 300.0, normalWave, normalMap2, 0.00002, waveBlendingSharpness, 0.5);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 300.0, normalWave, normalMap1, 0.000025, ocean.waveBlendingSharpness, 0.5);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 300.0, normalWave, normalMap2, 0.00002, ocean.waveBlendingSharpness, 0.5);
 
-    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 500.0, normalWave, normalMap2, 0.000010, waveBlendingSharpness, 0.5);
-    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap1, 0.000005, waveBlendingSharpness, 0.5);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 500.0, normalWave, normalMap2, 0.000010, ocean.waveBlendingSharpness, 0.5);
+    normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap1, 0.000005, ocean.waveBlendingSharpness, 0.5);
     
-    //normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 500.0, normalWave, normalMap1, 0.000001, waveBlendingSharpness, 0.2);
-    //normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap2, 0.0000005, waveBlendingSharpness, 0.2);
+    //normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 500.0, normalWave, normalMap1, 0.000001, ocean.waveBlendingSharpness, 0.2);
+    //normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap2, 0.0000005, ocean.waveBlendingSharpness, 0.2);
 
     float ndl = 0.0;
     float specularHighlight = 0.0;
@@ -102,9 +104,9 @@ vec4 ocean(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
 
         ndl += sqrt(ndl1 * ndl2);
 
-        if(length(rayOrigin - planetPosition) > oceanRadius) {
+        if(length(rayOrigin - planetPosition) > ocean.radius) {
             // if above cloud coverage then specular highlight
-            specularHighlight += computeSpecularHighlight(sunDir, rayDir, normalWave, smoothness, 1.0);
+            specularHighlight += computeSpecularHighlight(sunDir, rayDir, normalWave, ocean.smoothness, ocean.specularPower);
         }
     }
 
@@ -112,8 +114,8 @@ vec4 ocean(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistanc
     specularHighlight = saturate(specularHighlight);
 
     if(distanceThroughOcean > 0.0) {
-        float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * depthModifier);
-        float alpha = exp(-distanceThroughOcean * alphaModifier);
+        float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * ocean.depthModifier);
+        float alpha = exp(-distanceThroughOcean * ocean.alphaModifier);
         
         //vec3 oceanColor = lerp(vec3(10.0, 100.0, 249.0)/255.0, vec3(15.0,94.0,156.0)/255.0, opticalDepth01);
         
@@ -151,7 +153,7 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition); // normalized direction of the ray
 
-    vec4 finalColor = ocean(screenColor, cameraPosition, rayDir, maximumDistance);
+    vec4 finalColor = oceanColor(screenColor, cameraPosition, rayDir, maximumDistance);
 
     gl_FragColor = finalColor; // displaying the final color
 }
