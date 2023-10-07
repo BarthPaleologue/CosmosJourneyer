@@ -106,7 +106,7 @@ void main() {
 	//float latitude = vUnitSamplePoint.y;
 	float absLatitude01 = abs(latitude);
 	
-	float elevation = length(vSamplePoint) - planetRadius;
+	float elevation = length(vPosition) - planetRadius;
 
 	float elevation01 = elevation / maxElevation;
 	float waterLevel01 = waterLevel / maxElevation;
