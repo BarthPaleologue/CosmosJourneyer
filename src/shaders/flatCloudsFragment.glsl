@@ -1,7 +1,6 @@
 precision lowp float;
 
-// varying
-varying vec2 vUV; // screen coordinates
+in vec2 vUV; // screen coordinates
 
 // uniforms
 uniform sampler2D textureSampler; // the original screen texture

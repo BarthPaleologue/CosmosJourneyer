@@ -1,5 +1,7 @@
 precision lowp float;
 
+in vec2 vUV;
+
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
@@ -11,7 +13,6 @@ uniform float planetRadius;
 uniform bool isEnabled;
 
 uniform float aspectRatio;
-varying vec2 vUV;
 
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView);
 #pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=camera.projection, view=camera.view);

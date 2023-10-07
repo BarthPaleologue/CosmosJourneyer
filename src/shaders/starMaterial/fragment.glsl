@@ -1,11 +1,11 @@
 precision lowp float;
 
-varying vec3 vPosition; // position of the vertex in sphere space
-varying vec3 vUnitSamplePoint;
+in vec3 vPosition; // position of the vertex in sphere space
+in vec3 vUnitSamplePoint;
 
 #ifdef LOGARITHMICDEPTH
 	uniform float logarithmicDepthConstant;
-	varying float vFragmentDepth;
+	in float vFragmentDepth;
 #endif
 
 uniform vec3 starColor;

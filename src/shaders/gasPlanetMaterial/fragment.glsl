@@ -2,15 +2,15 @@ precision lowp float;
 
 #ifdef LOGARITHMICDEPTH
 uniform float logarithmicDepthConstant;
-varying float vFragmentDepth;
+in float vFragmentDepth;
 #endif
 
-varying vec3 vPositionW;
-varying vec3 vNormalW;
-varying vec3 vUnitSamplePoint;
-varying vec3 vSphereNormalW;
+in vec3 vPositionW;
+in vec3 vNormalW;
+in vec3 vUnitSamplePoint;
+in vec3 vSphereNormalW;
 
-varying vec3 vPosition; // position of the vertex in sphere space
+in vec3 vPosition; // position of the vertex in sphere space
 
 uniform mat4 world;
 
