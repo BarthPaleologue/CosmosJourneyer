@@ -57,17 +57,22 @@ export function getStellarObjectsUniforms(stars: OrbitalObject[]): ShaderUniform
     ];
 }
 
-export function getObjectUniforms(body: BaseObject): ShaderUniforms {
+export function getObjectUniforms(object: BaseObject): ShaderUniforms {
     return [
         {
             name: "planetPosition",
             type: UniformEnumType.Vector3,
-            get: () => body.transform.getAbsolutePosition()
+            get: () => object.transform.getAbsolutePosition()
         },
         {
             name: "planetRadius",
             type: UniformEnumType.Float,
-            get: () => body.getBoundingRadius()
+            get: () => object.getBoundingRadius()
+        },
+        {
+            name: "object.rotationAxis",
+            type: UniformEnumType.Vector3,
+            get: () => object.transform.up
         }
     ];
 }

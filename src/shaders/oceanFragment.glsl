@@ -36,13 +36,7 @@ uniform float time;
 
 #pragma glslify: triplanarNormal = require(./utils/triplanarNormal.glsl)
 
-#pragma glslify: completeNoise = require(./utils/noise.glsl)
-
 #pragma glslify: saturate = require(./utils/saturate.glsl)
-
-#pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
-
-#pragma glslify: fastAcos = require(./utils/fastAcos.glsl)
 
 #pragma glslify: applyQuaternion = require(./utils/applyQuaternion.glsl)
 
@@ -115,14 +109,14 @@ vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDi
         
         vec3 deepColor = vec3(0.0, 22.0, 82.0)/255.0;
         vec3 shallowColor = vec3(32.0,193.0,180.0)/255.0;
-        vec3 oceanColor = lerp(deepColor, shallowColor, opticalDepth01);
+        vec3 oceanColor = mix(shallowColor, deepColor, opticalDepth01);
         
-        vec3 ambiant = lerp(originalColor.rgb, oceanColor, alpha);
+        vec3 ambiant = mix(oceanColor, originalColor.rgb, alpha);
 
         float foamSize = 30.0;
         float foamFactor = saturate((foamSize - distanceThroughOcean) / foamSize);
         vec3 foamColor = vec3(0.8);
-        ambiant = lerp(foamColor, ambiant, foamFactor);
+        ambiant = mix(ambiant, foamColor, foamFactor);
 
         vec3 finalColor = ambiant * ndl + specularHighlight;
 

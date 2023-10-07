@@ -53,13 +53,6 @@ export class MatterJetPostProcess extends UberPostProcess implements ObjectPostP
                     return stellarObject.getRotationAxis();
                 }
             },
-            {
-                name: "forwardAxis",
-                type: UniformEnumType.Vector3,
-                get: () => {
-                    return getForwardDirection(stellarObject.transform);
-                }
-            }
         ];
 
         const samplers: ShaderSamplers = [

@@ -71,7 +71,7 @@ void main() {
 
     if (maximumDistance < camera.far) {
         // if the point is in the shadow of the ring, darken it
-        vec3 samplePoint = camera.position + maximumDistance * rayDir;
+        vec3 samplePoint = closestPoint;
         float accDensity = 0.0;
         for (int i = 0; i < nbStars; i++) {
             vec3 towardLight = normalize(starPositions[0] - samplePoint);

@@ -15,8 +15,6 @@ uniform float time;
 
 uniform vec3 rotationAxis;
 
-uniform vec3 forwardAxis; // to compute the angle of the matter jet
-
 #pragma glslify: remap = require(./utils/remap.glsl)
 
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
