@@ -18,17 +18,12 @@ uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
 uniform vec3 planetPosition;
-uniform vec3 cameraPosition;
 
-uniform mat4 inverseView;
-uniform mat4 inverseProjection;
-
-uniform float cameraNear;
-uniform float cameraFar;
+#pragma glslify: camera = require(./utils/camera.glsl)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
+#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
@@ -129,18 +124,18 @@ void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
+    vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
+    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
     float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
 
     //vec3 planetPosition = vec3(planetRadius * 3.0, 0.0, 0.0);
     float planetRadius = planetRadius;
 
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(camera.position, rayDir, planetPosition, planetRadius, impactPoint, escapePoint))) {
         gl_FragColor = screenColor;// if not intersecting with atmosphere, return original color
         return;
     }
@@ -148,7 +143,7 @@ void main() {
     // scale down so that everything happens in a sphere of radius 2
     float inverseScaling = 1.0 / (0.5 * planetRadius);
 
-    vec3 origin = cameraPosition + impactPoint * rayDir - planetPosition; // the ray origin in world space
+    vec3 origin = camera.position + impactPoint * rayDir - planetPosition; // the ray origin in world space
     origin *= inverseScaling;
 
     float steps;

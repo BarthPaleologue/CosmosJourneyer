@@ -5,37 +5,37 @@ import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     return [
         {
-            name: "cameraPosition",
+            name: "camera.position",
             type: UniformEnumType.Vector3,
             get: () => scene.getActiveUberCamera().getAbsolutePosition()
         },
         {
-            name: "projection",
+            name: "camera.projection",
             type: UniformEnumType.Matrix,
             get: () => scene.getActiveUberCamera().getProjectionMatrix()
         },
         {
-            name: "inverseProjection",
+            name: "camera.inverseProjection",
             type: UniformEnumType.Matrix,
             get: () => scene.getActiveUberCamera().getInverseProjectionMatrix()
         },
         {
-            name: "view",
+            name: "camera.view",
             type: UniformEnumType.Matrix,
             get: () => scene.getActiveUberCamera().getViewMatrix()
         },
         {
-            name: "inverseView",
+            name: "camera.inverseView",
             type: UniformEnumType.Matrix,
             get: () => scene.getActiveUberCamera().getInverseViewMatrix()
         },
         {
-            name: "cameraNear",
+            name: "camera.near",
             type: UniformEnumType.Float,
             get: () => scene.getActiveUberCamera().minZ
         },
         {
-            name: "cameraFar",
+            name: "camera.far",
             type: UniformEnumType.Float,
             get: () => scene.getActiveUberCamera().maxZ
         }

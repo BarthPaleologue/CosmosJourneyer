@@ -24,14 +24,14 @@ const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
 
 export interface CloudUniforms {
-    cloudLayerRadius: number;
+    layerRadius: number;
     smoothness: number;
     specularPower: number;
-    cloudFrequency: number;
-    cloudDetailFrequency: number;
-    cloudCoverage: number;
-    cloudSharpness: number;
-    cloudColor: Color3;
+    frequency: number;
+    detailFrequency: number;
+    coverage: number;
+    sharpness: number;
+    color: Color3;
     worleySpeed: number;
     detailSpeed: number;
 }
@@ -42,14 +42,14 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
 
     constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
         const cloudUniforms: CloudUniforms = {
-            cloudLayerRadius: planet.getBoundingRadius() + cloudLayerHeight,
+            layerRadius: planet.getBoundingRadius() + cloudLayerHeight,
             specularPower: 2,
             smoothness: 0.7,
-            cloudFrequency: 4,
-            cloudDetailFrequency: 12,
-            cloudCoverage: 0.8 * Math.exp(-planet.model.physicalProperties.waterAmount * planet.model.physicalProperties.pressure),
-            cloudSharpness: 3.5,
-            cloudColor: new Color3(0.8, 0.8, 0.8),
+            frequency: 4,
+            detailFrequency: 12,
+            coverage: 0.8 * Math.exp(-planet.model.physicalProperties.waterAmount * planet.model.physicalProperties.pressure),
+            sharpness: 3.5,
+            color: new Color3(0.8, 0.8, 0.8),
             worleySpeed: 0.0005,
             detailSpeed: 0.003
         };
@@ -62,42 +62,42 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
                 name: "clouds.layerRadius",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return cloudUniforms.cloudLayerRadius;
+                    return cloudUniforms.layerRadius;
                 }
             },
             {
                 name: "clouds.frequency",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return cloudUniforms.cloudFrequency;
+                    return cloudUniforms.frequency;
                 }
             },
             {
                 name: "clouds.detailFrequency",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return cloudUniforms.cloudDetailFrequency;
+                    return cloudUniforms.detailFrequency;
                 }
             },
             {
                 name: "clouds.coverage",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return cloudUniforms.cloudCoverage;
+                    return cloudUniforms.coverage;
                 }
             },
             {
                 name: "clouds.sharpness",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return cloudUniforms.cloudSharpness;
+                    return cloudUniforms.sharpness;
                 }
             },
             {
                 name: "clouds.color",
                 type: UniformEnumType.Color3,
                 get: () => {
-                    return cloudUniforms.cloudColor;
+                    return cloudUniforms.color;
                 }
             },
             {

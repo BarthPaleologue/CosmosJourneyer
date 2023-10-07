@@ -22,14 +22,14 @@ export class VolumetricCloudsPostProcess extends UberPostProcess implements Obje
 
     constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stars: (Star | BlackHole)[]) {
         const cloudUniforms: CloudUniforms = {
-            cloudLayerRadius: planet.getBoundingRadius() + cloudLayerHeight,
+            layerRadius: planet.getBoundingRadius() + cloudLayerHeight,
             specularPower: 2,
             smoothness: 0.9,
-            cloudFrequency: 4,
-            cloudDetailFrequency: 20,
-            cloudCoverage: 0.8 * Math.exp(-planet.model.physicalProperties.waterAmount * planet.model.physicalProperties.pressure),
-            cloudSharpness: 3.5,
-            cloudColor: new Color3(0.8, 0.8, 0.8),
+            frequency: 4,
+            detailFrequency: 20,
+            coverage: 0.8 * Math.exp(-planet.model.physicalProperties.waterAmount * planet.model.physicalProperties.pressure),
+            sharpness: 3.5,
+            color: new Color3(0.8, 0.8, 0.8),
             worleySpeed: 0.0005,
             detailSpeed: 0.003
         };

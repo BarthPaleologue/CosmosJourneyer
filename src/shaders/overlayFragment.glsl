@@ -3,14 +3,7 @@ precision lowp float;
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
-uniform mat4 view;
-uniform mat4 inverseView;
-uniform mat4 projection;
-uniform mat4 inverseProjection;
-
-uniform float cameraNear;
-uniform float cameraFar;
-uniform vec3 cameraPosition;
+#pragma glslify: camera = require(./utils/camera.glsl)
 
 uniform vec3 planetPosition;
 uniform float planetRadius;
@@ -20,8 +13,8 @@ uniform bool isEnabled;
 uniform float aspectRatio;
 varying vec2 vUV;
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView);
-#pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=projection, view=view);
+#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView);
+#pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=camera.projection, view=camera.view);
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
@@ -36,18 +29,18 @@ void main() {
 
     vec3 pixelWorldPosition = worldFromUV(vUV); // the pixel position in world space (near plane)
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
+    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
     float maximumDistance = length(closestPoint); // the maxium ray length due to occlusion
 
-    if(maximumDistance < cameraFar) {
+    if(maximumDistance < camera.far) {
         gl_FragColor = screenColor;
         return;
     }
 
     vec4 overlayColor = vec4(0.0, 0.0, 0.0, screenColor.a);
 
-    float planetDistance = length(planetPosition - cameraPosition);
-    vec3 planetDirection = (planetPosition - cameraPosition) / planetDistance;
+    float planetDistance = length(planetPosition - camera.position);
+    vec3 planetDirection = (planetPosition - camera.position) / planetDistance;
 
     if(dot(planetDirection, normalize(closestPoint)) < 0.0) {
         gl_FragColor = screenColor;

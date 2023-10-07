@@ -24,21 +24,14 @@ uniform sampler2D depthSampler;
 uniform sampler2D starfieldTexture;
 
 uniform vec3 planetPosition;
-uniform vec3 cameraPosition;
 
-uniform mat4 view;
-uniform mat4 projection;
-uniform mat4 inverseView;
-uniform mat4 inverseProjection;
-
-uniform float cameraNear;
-uniform float cameraFar;
+#pragma glslify: camera = require(./utils/camera.glsl)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
+#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
 
-#pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=projection, view=view)
+#pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=camera.projection, view=camera.view)
 
 #pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
 
@@ -139,16 +132,16 @@ void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
+    vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
+    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
     float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
 
     vec4 colOut = vec4(0.0);
 
-    vec3 positionBHS = cameraPosition - planetPosition;// position of the camera in blackhole space
+    vec3 positionBHS = camera.position - planetPosition;// position of the camera in blackhole space
 
     bool suckedInBH = false;
     bool escapedBH = false;

@@ -17,13 +17,7 @@ uniform sampler2D atmosphereLUT;
 uniform vec3 starPositions[MAX_STARS];// positions of the stars in world space
 uniform int nbStars;// number of stars
 
-uniform vec3 cameraPosition;// position of the camera in world space
-
-uniform mat4 inverseProjection;// camera's projection matrix
-uniform mat4 inverseView;// camera's view matrix
-
-uniform float cameraNear;// camera minZ
-uniform float cameraFar;// camera maxZ
+#pragma glslify: camera = require(./utils/camera.glsl)
 
 uniform vec3 planetPosition;// planet position in world space
 uniform float planetRadius;// planet radius for height calculations
@@ -32,7 +26,7 @@ uniform float planetRadius;// planet radius for height calculations
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
+#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
@@ -167,19 +161,19 @@ void main() {
 
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
 
-    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
+    vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
+    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
     float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
 
     // Cohabitation avec le shader d'océan (un jour je merge)
     float waterImpact, waterEscape;
-    if (rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, waterImpact, waterEscape)) {
+    if (rayIntersectSphere(camera.position, rayDir, planetPosition, planetRadius, waterImpact, waterEscape)) {
         maximumDistance = min(maximumDistance, waterImpact);
     }
 
-    vec4 finalColor = scatter(screenColor, cameraPosition, rayDir, maximumDistance);// the color to be displayed on the screen
+    vec4 finalColor = scatter(screenColor, camera.position, rayDir, maximumDistance);// the color to be displayed on the screen
 
     gl_FragColor = finalColor;// displaying the final color
 }
