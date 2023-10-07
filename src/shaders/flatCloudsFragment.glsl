@@ -6,7 +6,6 @@ varying vec2 vUV; // screen coordinates
 // uniforms
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
-uniform sampler2D normalMap;
 
 #define MAX_STARS 5
 uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
@@ -50,8 +49,6 @@ uniform float time;
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
-#pragma glslify: triplanarNormal = require(./utils/triplanarNormal.glsl)
-
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 
 #pragma glslify: smoothSharpener = require(./utils/smoothSharpener.glsl)
@@ -63,7 +60,6 @@ uniform float time;
 #pragma glslify: computeSpecularHighlight = require(./utils/computeSpecularHighlight.glsl)
 
 float cloudDensityAtPoint(vec3 samplePoint) {
-
     vec3 rotationAxisPlanetSpace = vec3(0.0, 1.0, 0.0);
 
     vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds.worleySpeed);
@@ -106,27 +102,24 @@ float computeCloudCoverage(vec3 rayOrigin, vec3 rayDir, float maximumDistance, o
     vec3 samplePoint2 = applyQuaternion(planetInverseRotationQuaternion, planetSpacePoint2);
 
     float cloudDensity = 0.0;
+    float cloudDensity1 = 0.0;
+    float cloudDensity2 = 0.0;
 
     if(impactPoint > 0.0 && impactPoint < maximumDistance) {
-        float cloudDensity1 = cloudDensityAtPoint(samplePoint1);
+        cloudDensity1 += cloudDensityAtPoint(samplePoint1);
         cloudDensity1 *= saturate((maximumDistance - impactPoint) / 10000.0); // fade away when close to surface
         cloudDensity += cloudDensity1;
     }
 
     if(escapePoint > 0.0 && escapePoint < maximumDistance) {
-        float cloudDensity2 = cloudDensityAtPoint(samplePoint2);
+        cloudDensity2 += cloudDensityAtPoint(samplePoint2);
         cloudDensity2 *= saturate((maximumDistance - escapePoint) / 10000.0); // fade away when close to surface
         cloudDensity += cloudDensity2;
     }
 
-    vec3 normal = vec3(0.0);
-    if(impactPoint > 0.0 && impactPoint < maximumDistance) {
-        normal = planetSpacePoint1;
-    } else if (escapePoint > 0.0 && escapePoint < maximumDistance) {
-        normal = planetSpacePoint2;
-    }
-    cloudNormal = normal;
-
+    if(cloudDensity1 > cloudDensity2) cloudNormal = planetSpacePoint1;
+    else cloudNormal = planetSpacePoint2;
+    
     return cloudDensity;
 }
 
@@ -134,14 +127,15 @@ float cloudShadows(vec3 closestPoint) {
     float lightAmount = 1.0;
     for (int i = 0; i < nbStars; i++) {
         vec3 sunDir = normalize(starPositions[i] - closestPoint);
+        
         float t0, t1;
-        if (rayIntersectSphere(closestPoint, sunDir, planetPosition, clouds.layerRadius, t0, t1)) {
-            vec3 samplePoint = normalize(closestPoint + t1 * sunDir - planetPosition);
-            if (dot(samplePoint, sunDir) < 0.0) continue;
-            samplePoint = applyQuaternion(planetInverseRotationQuaternion, samplePoint);
-            float density = cloudDensityAtPoint(samplePoint);
-            lightAmount -= density;
-        }
+        if (!rayIntersectSphere(closestPoint, sunDir, planetPosition, clouds.layerRadius, t0, t1)) continue;
+        
+        vec3 samplePoint = normalize(closestPoint + t1 * sunDir - planetPosition);
+        if (dot(samplePoint, sunDir) < 0.0) continue;
+        samplePoint = applyQuaternion(planetInverseRotationQuaternion, samplePoint);
+        float density = cloudDensityAtPoint(samplePoint);
+        lightAmount -= density;
     }
 
     return 0.2 + saturate(lightAmount) / 0.8;
@@ -166,23 +160,25 @@ void main() {
     vec3 cloudNormal;
     float cloudDensity = computeCloudCoverage(camera.position, rayDir, maximumDistance, cloudNormal);
 
-    float ndl = 0.0; // dimming factor due to light inclination relative to vertex normal in world space
-    float specularHighlight = 0.0;
-    for(int i = 0; i < nbStars; i++) {
-        vec3 sunDir = normalize(starPositions[i] - planetPosition);
+    if(cloudDensity > 0.0) {
+        float ndl = 0.0; // dimming factor due to light inclination relative to vertex normal in world space
+        float specularHighlight = 0.0;
+        for(int i = 0; i < nbStars; i++) {
+            vec3 sunDir = normalize(starPositions[i] - planetPosition);
 
-        ndl += max(dot(cloudNormal, sunDir), -0.3) + 0.3;
+            ndl += max(dot(cloudNormal, sunDir), -0.3) + 0.3;
 
-        if(length(camera.position - planetPosition) > clouds.layerRadius) {
-            // if above cloud coverage then specular highlight
-            specularHighlight += computeSpecularHighlight(sunDir, rayDir, cloudNormal, clouds.smoothness, clouds.specularPower);
+            if(length(camera.position - planetPosition) > clouds.layerRadius) {
+                // if above cloud coverage then specular highlight
+                specularHighlight += computeSpecularHighlight(sunDir, rayDir, cloudNormal, clouds.smoothness, clouds.specularPower);
+            }
         }
+        ndl = saturate(ndl);
+
+        vec3 ambiant = mix(finalColor.rgb, ndl * clouds.color, cloudDensity);
+
+        finalColor.rgb = ambiant + specularHighlight * cloudDensity;
     }
-    ndl = saturate(ndl);
-
-	vec3 ambiant = mix(finalColor.rgb, ndl * clouds.color, cloudDensity);
-
-    finalColor.rgb = ambiant + specularHighlight * cloudDensity;
 
     gl_FragColor = finalColor; // displaying the final color
 }

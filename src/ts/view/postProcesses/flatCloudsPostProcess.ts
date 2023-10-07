@@ -1,7 +1,5 @@
-import normalMap from "../../../asset/textures/cloudNormalMap3.jpg";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
 import { gcd } from "terrain-generation";
 
@@ -17,7 +15,6 @@ import {
     UniformEnumType,
     ShaderSamplers,
     ShaderUniforms,
-    SamplerEnumType
 } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "flatClouds";
@@ -144,16 +141,7 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             }
         ];
 
-        const samplers: ShaderSamplers = [
-            ...getSamplers(scene),
-            {
-                name: "normalMap",
-                type: SamplerEnumType.Texture,
-                get: () => {
-                    return new Texture(normalMap, scene);
-                }
-            }
-        ];
+        const samplers: ShaderSamplers = getSamplers(scene);
 
         super(name, shaderName, uniforms, samplers, scene);
 
