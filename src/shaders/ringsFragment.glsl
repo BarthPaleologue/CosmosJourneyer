@@ -11,10 +11,7 @@ uniform int nbStars;// number of stars
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
-uniform vec3 planetPosition;// planet position in world space
-uniform float planetRadius;// planet radius
-
-uniform vec3 planetRotationAxis;
+#pragma glslify: object = require(./utils/object.glsl)
 
 #pragma glslify: rings = require(./utils/rings.glsl)
 
@@ -26,18 +23,18 @@ uniform vec3 planetRotationAxis;
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
-bool rayIntersectPlane(vec3 rayOrigin, vec3 rayDir, vec3 planetPosition, vec3 planeNormal, float tolerance, out float t) {
+bool rayIntersectPlane(vec3 rayOrigin, vec3 rayDir, vec3 planePosition, vec3 planeNormal, float tolerance, out float t) {
     float denom = dot(rayDir, planeNormal);
     if (abs(denom) <= tolerance) return false;// ray is parallel to the plane
-    t = dot(planeNormal, planetPosition - rayOrigin) / denom;
+    t = dot(planeNormal, planePosition - rayOrigin) / denom;
     return t >= 0.0;
 }
 
 float ringDensityAtPoint(vec3 samplePoint) {
-    vec3 samplePointPlanetSpace = samplePoint - planetPosition;
+    vec3 samplePointPlanetSpace = samplePoint - object.position;
 
     float distanceToPlanet = length(samplePointPlanetSpace);
-    float normalizedDistance = distanceToPlanet / planetRadius;
+    float normalizedDistance = distanceToPlanet / object.radius;
 
     // out if not intersecting with rings and interpolation area
     if (normalizedDistance < rings.start || normalizedDistance > rings.end) return 0.0;
@@ -76,7 +73,7 @@ void main() {
         for (int i = 0; i < nbStars; i++) {
             vec3 towardLight = normalize(starPositions[0] - samplePoint);
             float t2;
-            if (rayIntersectPlane(samplePoint, towardLight, planetPosition, planetRotationAxis, 0.001, t2)) {
+            if (rayIntersectPlane(samplePoint, towardLight, object.position, object.rotationAxis, 0.001, t2)) {
                 vec3 shadowSamplePoint = samplePoint + t2 * towardLight;
                 accDensity += ringDensityAtPoint(shadowSamplePoint) * rings.opacity;
             }
@@ -85,12 +82,12 @@ void main() {
     }
 
     float impactPoint;
-    if (rayIntersectPlane(camera.position, rayDir, planetPosition, planetRotationAxis, 0.001, impactPoint)) {
+    if (rayIntersectPlane(camera.position, rayDir, object.position, object.rotationAxis, 0.001, impactPoint)) {
         // if the ray intersect the ring plane
         if (impactPoint >= 0.0 && impactPoint < maximumDistance) {
             // if the ray intersects the ring before any other object
             float t0, t1;
-            if (!rayIntersectSphere(camera.position, rayDir, planetPosition, planetRadius, t0, t1) || t0 > impactPoint) {
+            if (!rayIntersectSphere(camera.position, rayDir, object.position, object.radius, t0, t1) || t0 > impactPoint) {
                 // if the ray is impacting a solid object after the ring plane
                 vec3 samplePoint = camera.position + impactPoint * rayDir;
                 float ringDensity = ringDensityAtPoint(samplePoint) * rings.opacity;
@@ -100,9 +97,9 @@ void main() {
                 // hypothèse des rayons parallèles
                 int nbLightSources = nbStars;
                 for (int i = 0; i < nbStars; i++) {
-                    vec3 rayToSun = normalize(starPositions[i] - planetPosition);
+                    vec3 rayToSun = normalize(starPositions[i] - object.position);
                     float t2, t3;
-                    if (rayIntersectSphere(samplePoint, rayToSun, planetPosition, planetRadius, t2, t3)) {
+                    if (rayIntersectSphere(samplePoint, rayToSun, object.position, object.radius, t2, t3)) {
                         nbLightSources -= 1;
                     }
                 }

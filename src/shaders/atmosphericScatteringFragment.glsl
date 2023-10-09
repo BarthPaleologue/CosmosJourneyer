@@ -18,8 +18,7 @@ uniform int nbStars;// number of stars
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
-uniform vec3 planetPosition;// planet position in world space
-uniform float planetRadius;// planet radius for height calculations
+#pragma glslify: object = require(./utils/object.glsl)
 
 #pragma glslify: atmosphere = require(./utils/atmosphere.glsl)
 
@@ -31,8 +30,8 @@ uniform float planetRadius;// planet radius for height calculations
 
 // based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
 vec2 densityAtPoint(vec3 samplePoint) {
-    float heightAboveSurface = length(samplePoint - planetPosition) - planetRadius;
-    float height01 = heightAboveSurface / (atmosphere.radius - planetRadius);// normalized height between 0 and 1
+    float heightAboveSurface = length(samplePoint - object.position) - object.radius;
+    float height01 = heightAboveSurface / (atmosphere.radius - object.radius);// normalized height between 0 and 1
 
     vec2 localDensity = vec2(
     atmosphere.densityModifier * exp(-height01 * atmosphere.falloff),
@@ -69,10 +68,10 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
 
     // Scattering Coeffs
     vec3 rayleighCoeffs = pow(1063.0 / wavelength.xyz, vec3(4.0)) * atmosphere.rayleighStrength;// the scattering is inversely proportional to the fourth power of the wave length
-    rayleighCoeffs /= planetRadius;
+    rayleighCoeffs /= object.radius;
 
     vec3 mieCoeffs = vec3(2.5e-2) * atmosphere.mieStrength;
-    mieCoeffs /= planetRadius;
+    mieCoeffs /= object.radius;
 
     float stepSize = rayLength / float(POINTS_FROM_CAMERA - 1);// the ray length between sample points
 
@@ -81,17 +80,17 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     vec3 inScatteredRayleigh = vec3(0.0);
     vec3 inScatteredMie = vec3(0.0);
 
-    vec3 starDir = normalize(starPosition - planetPosition);
+    vec3 starDir = normalize(starPosition - object.position);
 
     for (int i = 0; i < POINTS_FROM_CAMERA; i++, samplePoint += rayDir * stepSize) {
         float _, t1;
-        rayIntersectSphere(samplePoint, starDir, planetPosition, atmosphere.radius, _, t1);
+        rayIntersectSphere(samplePoint, starDir, object.position, atmosphere.radius, _, t1);
         float sunRayLengthInAtm = t1;
 
-        /*float height = length(samplePoint - planetPosition);
-        float heightAboveSurface = height - planetRadius;
-        float height01 = heightAboveSurface / (atmosphere.radius - planetRadius); // normalized height between 0 and 1
-        vec3 planetNormal = normalize(samplePoint - planetPosition);
+        /*float height = length(samplePoint - object.position);
+        float heightAboveSurface = height - object.radius;
+        float height01 = heightAboveSurface / (atmosphere.radius - object.radius); // normalized height between 0 and 1
+        vec3 planetNormal = normalize(samplePoint - object.position);
         float costheta = dot(starDir, planetNormal) * 0.99;
         float lutx = (costheta + 1.0) / 2.0;
         vec3 sunRayOpticalDepth = 89.0 * exp(texture2D(atmosphereLUT, vec2(lutx, height01)).rgb - 1.0);*/
@@ -132,7 +131,7 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
 
 vec4 scatter(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, atmosphere.radius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(rayOrigin, rayDir, object.position, atmosphere.radius, impactPoint, escapePoint))) {
         return originalColor;// if not intersecting with atmosphere, return original color
     }
 
@@ -168,7 +167,7 @@ void main() {
 
     // Cohabitation avec le shader d'océan (un jour je merge)
     float waterImpact, waterEscape;
-    if (rayIntersectSphere(camera.position, rayDir, planetPosition, planetRadius, waterImpact, waterEscape)) {
+    if (rayIntersectSphere(camera.position, rayDir, object.position, object.radius, waterImpact, waterEscape)) {
         maximumDistance = min(maximumDistance, waterImpact);
     }
 

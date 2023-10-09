@@ -11,8 +11,7 @@ uniform int nbStars;// number of stars
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
-uniform vec3 planetPosition;// planet position in world space
-uniform float planetRadius;// planet radius
+#pragma glslify: object = require(./utils/object.glsl)
 
 struct ShadowUniforms {
     bool hasRings;
@@ -48,12 +47,12 @@ void main() {
         // basic body shadowing
         vec3 towardLight = normalize(starPositions[0] - (camera.position + rayDir * maximumDistance));
         float t0, t1;
-        if (lineIntersectSphere(camera.position + rayDir * maximumDistance, towardLight, planetPosition, planetRadius, t0, t1)) {
-            if (t0 > planetRadius) {
+        if (lineIntersectSphere(camera.position + rayDir * maximumDistance, towardLight, object.position, object.radius, t0, t1)) {
+            if (t0 > object.radius) {
                 // there is occultation
                 vec3 closestPointToPlanetCenter = camera.position + rayDir * maximumDistance + towardLight * (t0 + t1) * 0.5;
-                float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - planetPosition);
-                float r01 = remap(closestDistanceToPlanetCenter, 0.0, planetRadius, 0.0, 1.0);
+                float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - object.position);
+                float r01 = remap(closestDistanceToPlanetCenter, 0.0, object.radius, 0.0, 1.0);
                 finalColor.rgb *= 0.2 + 0.8 * smoothstep(0.85, 1.0, r01);
             }
         }

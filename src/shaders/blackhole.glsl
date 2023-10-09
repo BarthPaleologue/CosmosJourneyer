@@ -2,12 +2,14 @@ precision highp float;
 
 // based on https://www.shadertoy.com/view/tsBXW3
 
-#define DISK_STEPS 12.0 //disk texture layers
+#define DISK_STEPS 12.0//disk texture layers
 
 in vec2 vUV;
 
 uniform float time;
-uniform float planetRadius;
+
+#pragma glslify: object = require(./utils/object.glsl)
+
 uniform float accretionDiskRadius;
 uniform float rotationPeriod;
 
@@ -15,15 +17,10 @@ uniform float rotationPeriod;
 const float accretionDiskHeight = 100.0;
 const bool hasAccretionDisk = true;
 
-uniform vec3 rotationAxis;
-uniform vec3 forwardAxis;
-
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
 uniform sampler2D starfieldTexture;
-
-uniform vec3 planetPosition;
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
@@ -61,23 +58,23 @@ float valueNoise(vec2 p, float f) {
 }
 
 vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
-    if (!hasAccretionDisk) return vec4(0.0); // no disk
+    if (!hasAccretionDisk) return vec4(0.0);// no disk
 
     vec3 samplePoint = initialPosition;
-    float distanceToCenter = length(samplePoint); // distance to the center of the disk
-    float relativeDistance = distanceToCenter / planetRadius;
-    float relativeDiskRadius = accretionDiskRadius / planetRadius;
+    float distanceToCenter = length(samplePoint);// distance to the center of the disk
+    float relativeDistance = distanceToCenter / object.radius;
+    float relativeDiskRadius = accretionDiskRadius / object.radius;
 
-    vec3 diskNormal = rotationAxis;
+    vec3 diskNormal = object.rotationAxis;
 
     vec3 projectedRayDir = projectOnPlane(rayDir, diskNormal);
     vec3 projectedInitialPosition = projectOnPlane(initialPosition, diskNormal);
 
-    float projectionDistance = length(projectedRayDir - rayDir); // if the vector is parallel to the disk the the projection distance is near 0. We use it to increase the step size.
+    float projectionDistance = length(projectedRayDir - rayDir);// if the vector is parallel to the disk the the projection distance is near 0. We use it to increase the step size.
 
-    float stepSize = 0.02 * distanceToCenter / projectionDistance; //FIXME: this is not correct, but it works
+    float stepSize = 0.02 * distanceToCenter / projectionDistance;//FIXME: this is not correct, but it works
 
-    samplePoint += stepSize * rayDir; //FIXME: somehow when I remove this line, the disk has no height.
+    samplePoint += stepSize * rayDir;//FIXME: somehow when I remove this line, the disk has no height.
 
     // elementary rotation around the hole
     vec3 deltaPos = rotateAround(projectedInitialPosition, diskNormal, 0.01);
@@ -87,12 +84,12 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
     float redShift = (1.0 + parallel) / 2.0;
 
-    float diskMix = smoothstep(0.6, 0.9, relativeDistance / relativeDiskRadius); // transition between inner and outer color
+    float diskMix = smoothstep(0.6, 0.9, relativeDistance / relativeDiskRadius);// transition between inner and outer color
     vec3 innerDiskColor = vec3(1.0, 0.8, 0.1);
     vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
     vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix);
 
-    vec3 redShiftMult = mix(vec3(0.4, 0.2, 0.1) * 0.5, vec3(1.6, 1.0, 2.0) * 3.0, redShift); //FIXME: need more realistic redshift
+    vec3 redShiftMult = mix(vec3(0.4, 0.2, 0.1) * 0.5, vec3(1.6, 1.0, 2.0) * 3.0, redShift);//FIXME: need more realistic redshift
     insideCol *= redShiftMult;
 
     vec4 diskColor = vec4(0.0);
@@ -103,18 +100,18 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
         float intensity = 1.0 - (i / DISK_STEPS);
         distanceToCenter = length(samplePoint);
-        relativeDistance = distanceToCenter / planetRadius;
+        relativeDistance = distanceToCenter / object.radius;
 
         float diskMask = 1.0;
-        diskMask *= clamp(relativeDistance - 1.2, 0.0, 1.0); // The 1.2 is only for aesthetics
-        diskMask *= smoothstep(0.0, 2.0, relativeDiskRadius - relativeDistance); // The 2.0 is only for aesthetics
+        diskMask *= clamp(relativeDistance - 1.2, 0.0, 1.0);// The 1.2 is only for aesthetics
+        diskMask *= smoothstep(0.0, 2.0, relativeDiskRadius - relativeDistance);// The 2.0 is only for aesthetics
 
         // rotation of the disk
         float theta = -2.0 * 3.1415 * time / rotationPeriod;
         vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, diskNormal, theta);
-        
-        float angle = angleBetweenVectors(rotatedProjectedSamplePoint, forwardAxis);
-        float u = time + intensity + relativeDistance; // some kind of disk coordinate (spiral)
+
+        float angle = angleBetweenVectors(rotatedProjectedSamplePoint, vec3(0.0, 0.0, 1.0));
+        float u = time + intensity + relativeDistance;// some kind of disk coordinate (spiral)
         const float f = 1.0;
         float noise = valueNoise(vec2(2.0 * angle, 5.0 * u), f);
         noise = noise * 0.66 + 0.33 * valueNoise(vec2(2.0 * angle, 5.0 * u), f * 2.0);
@@ -141,7 +138,7 @@ void main() {
 
     vec4 colOut = vec4(0.0);
 
-    vec3 positionBHS = camera.position - planetPosition;// position of the camera in blackhole space
+    vec3 positionBHS = camera.position - object.position;// position of the camera in blackhole space
 
     bool suckedInBH = false;
     bool escapedBH = false;
@@ -149,12 +146,12 @@ void main() {
 
     if (maximumDistance < length(positionBHS)) occluded = true;
 
-    vec4 col = vec4(0.0);    
+    vec4 col = vec4(0.0);
 
-    if(!occluded) {
+    if (!occluded) {
         for (int disks = 0; disks < 15; disks++) {
-            float distanceToCenter = 0.0; //distance to BH
-            
+            float distanceToCenter = 0.0;//distance to BH
+
             vec3 projectedPosition = vec3(0.0);
             float projectedDistance = 0.0;
 
@@ -163,41 +160,41 @@ void main() {
 
             for (int h = 0; h < 6; h++) {
                 //reduces tests for exit conditions (to minimise branching)
-                distanceToCenter = length(positionBHS); //distance to BH
-                vec3 blackholeDir = -positionBHS / distanceToCenter; //direction to BH
+                distanceToCenter = length(positionBHS);//distance to BH
+                vec3 blackholeDir = -positionBHS / distanceToCenter;//direction to BH
                 float distanceToCenter2 = distanceToCenter * distanceToCenter;
 
-                projectedPosition = projectOnPlane(positionBHS, rotationAxis);
+                projectedPosition = projectOnPlane(positionBHS, object.rotationAxis);
                 projectedDistance = length(projectedPosition - positionBHS);
 
-                projectedRayDir = projectOnPlane(rayDir, rotationAxis);
+                projectedRayDir = projectOnPlane(rayDir, object.rotationAxis);
                 rayDirProjectedDistance = length(projectedRayDir - rayDir);
-                
-                float stepSize = 0.92 * projectedDistance / rayDirProjectedDistance; //conservative distance to disk (y==0)
-                float farLimit = distanceToCenter * 0.5; //limit step size far from to BH
-                float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / planetRadius; //limit step size close to BH
+
+                float stepSize = 0.92 * projectedDistance / rayDirProjectedDistance;//conservative distance to disk (y==0)
+                float farLimit = distanceToCenter * 0.5;//limit step size far from to BH
+                float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / object.radius;//limit step size close to BH
                 stepSize = min(stepSize, min(farLimit, closeLimit));
 
-                float bendForce = stepSize * planetRadius / distanceToCenter2; //bending force
-                rayDir = normalize(rayDir + bendForce * blackholeDir); //bend ray towards BH
+                float bendForce = stepSize * object.radius / distanceToCenter2;//bending force
+                rayDir = normalize(rayDir + bendForce * blackholeDir);//bend ray towards BH
                 positionBHS += stepSize * rayDir;
 
             }
 
-            if (distanceToCenter < planetRadius) {
+            if (distanceToCenter < object.radius) {
                 suckedInBH = true;
                 break;
-            } else if (distanceToCenter > planetRadius * 10000.0) {
+            } else if (distanceToCenter > object.radius * 10000.0) {
                 escapedBH = true;
                 break;
             } else if (projectedDistance <= accretionDiskHeight) {
                 //ray hit accretion disk //FIXME: Break when rotate around edge of disk
                 vec4 diskCol = raymarchDisk(rayDir, positionBHS);//render disk
-                positionBHS += accretionDiskHeight * rayDir / rayDirProjectedDistance; // we get out of the disk
+                positionBHS += accretionDiskHeight * rayDir / rayDirProjectedDistance;// we get out of the disk
                 col += diskCol * (1.0 - col.a);
             }
 
-            if(suckedInBH || escapedBH) break;
+            if (suckedInBH || escapedBH) break;
         }
     }
 
@@ -208,8 +205,8 @@ void main() {
     if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) bg = texture2D(textureSampler, uv);
     else {*/
     vec2 starfieldUV = vec2(
-        sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
-        acos(rayDir.y) / 3.14159265359
+    sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
+    acos(rayDir.y) / 3.14159265359
     );
     vec4 bg = texture2D(starfieldTexture, starfieldUV);
     //}

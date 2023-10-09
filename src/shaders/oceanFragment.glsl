@@ -1,19 +1,20 @@
 precision lowp float;
 
-in vec2 vUV; // screen coordinates
+in vec2 vUV;// screen coordinates
 
-uniform sampler2D textureSampler; // the original screen texture
-uniform sampler2D depthSampler; // the depth map of the camera
+uniform sampler2D textureSampler;// the original screen texture
+uniform sampler2D depthSampler;// the depth map of the camera
 uniform sampler2D normalMap1;
 uniform sampler2D normalMap2;
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
 #define MAX_STARS 5
-uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
-uniform int nbStars; // number of stars
+uniform vec3 starPositions[MAX_STARS];// positions of the stars in world space
+uniform int nbStars;// number of stars
 
-uniform vec3 planetPosition; // planet position in world space
+#pragma glslify: object = require(./utils/object.glsl)
+
 uniform vec4 planetInverseRotationQuaternion;
 
 struct Ocean {
@@ -42,7 +43,6 @@ uniform float time;
 
 #pragma glslify: computeSpecularHighlight = require(./utils/computeSpecularHighlight.glsl)
 
-#define inline
 vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
 
@@ -52,23 +52,23 @@ vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDi
 
     float actualRadius = ocean.radius + waveAmplitude * sin(time * waveOmega);
 
-    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, actualRadius, impactPoint, escapePoint))) {
-        return originalColor; // if not intersecting with atmosphere, return original color
+    if (!(rayIntersectSphere(rayOrigin, rayDir, object.position, actualRadius, impactPoint, escapePoint))) {
+        return originalColor;// if not intersecting with atmosphere, return original color
     }
 
-    impactPoint = max(0.0, impactPoint); // cannot be negative (the ray starts where the camera is in such a case)
-    escapePoint = min(maximumDistance, escapePoint); // occlusion with other scene objects
+    impactPoint = max(0.0, impactPoint);// cannot be negative (the ray starts where the camera is in such a case)
+    escapePoint = min(maximumDistance, escapePoint);// occlusion with other scene objects
 
-    float distanceThroughOcean = max(0.0, escapePoint - impactPoint); // probably doesn't need the max but for the sake of coherence the distance cannot be negative
-    
-    vec3 samplePoint = rayOrigin + impactPoint * rayDir - planetPosition;
+    float distanceThroughOcean = max(0.0, escapePoint - impactPoint);// probably doesn't need the max but for the sake of coherence the distance cannot be negative
+
+    vec3 samplePoint = rayOrigin + impactPoint * rayDir - object.position;
 
     vec3 samplePointPlanetSpace = applyQuaternion(planetInverseRotationQuaternion, samplePoint);
-    
+
     vec3 unitSamplePoint = normalize(samplePointPlanetSpace);
 
     vec3 planetNormal = normalize(samplePoint);
-    
+
     vec3 normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, time, -time) * 100.0, planetNormal, normalMap2, 0.00015, ocean.waveBlendingSharpness, 1.0);
     normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 100.0, normalWave, normalMap1, 0.0001, ocean.waveBlendingSharpness, 1.0);
 
@@ -77,22 +77,22 @@ vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDi
 
     normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 500.0, normalWave, normalMap2, 0.000010, ocean.waveBlendingSharpness, 0.5);
     normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap1, 0.000005, ocean.waveBlendingSharpness, 0.5);
-    
+
     //normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 500.0, normalWave, normalMap1, 0.000001, ocean.waveBlendingSharpness, 0.2);
     //normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap2, 0.0000005, ocean.waveBlendingSharpness, 0.2);
 
     float ndl = 0.0;
     float specularHighlight = 0.0;
 
-    for(int i = 0; i < nbStars; i++) {
+    for (int i = 0; i < nbStars; i++) {
         vec3 sunDir = normalize(starPositions[i] - samplePoint);
 
-        float ndl1 = max(dot(normalWave, sunDir), 0.0); // dimming factor due to light inclination relative to vertex normal in world space
+        float ndl1 = max(dot(normalWave, sunDir), 0.0);// dimming factor due to light inclination relative to vertex normal in world space
         float ndl2 = max(dot(planetNormal, sunDir), 0.0);
 
         ndl += sqrt(ndl1 * ndl2);
 
-        if(length(rayOrigin - planetPosition) > ocean.radius) {
+        if (length(rayOrigin - object.position) > ocean.radius) {
             // if above cloud coverage then specular highlight
             specularHighlight += computeSpecularHighlight(sunDir, rayDir, normalWave, ocean.smoothness, ocean.specularPower);
         }
@@ -101,16 +101,16 @@ vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDi
     ndl = saturate(ndl);
     specularHighlight = saturate(specularHighlight);
 
-    if(distanceThroughOcean > 0.0) {
+    if (distanceThroughOcean > 0.0) {
         float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * ocean.depthModifier);
         float alpha = exp(-distanceThroughOcean * ocean.alphaModifier);
-        
+
         //vec3 oceanColor = lerp(vec3(10.0, 100.0, 249.0)/255.0, vec3(15.0,94.0,156.0)/255.0, opticalDepth01);
-        
+
         vec3 deepColor = vec3(0.0, 22.0, 82.0)/255.0;
-        vec3 shallowColor = vec3(32.0,193.0,180.0)/255.0;
+        vec3 shallowColor = vec3(32.0, 193.0, 180.0)/255.0;
         vec3 oceanColor = mix(shallowColor, deepColor, opticalDepth01);
-        
+
         vec3 ambiant = mix(oceanColor, originalColor.rgb, alpha);
 
         float foamSize = 30.0;
@@ -129,19 +129,19 @@ vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDi
 
 
 void main() {
-    vec4 screenColor = texture2D(textureSampler, vUV); // the current screen color
+    vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
-    float depth = texture2D(depthSampler, vUV).r; // the depth corresponding to the pixel in the depth map
-    
-    vec3 pixelWorldPosition = worldFromUV(vUV); // the pixel position in world space (near plane)
+    float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
+
+    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
 
     // closest physical point from the camera in the direction of the pixel (occlusion)
     vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
-    float maximumDistance = length(closestPoint); // the maxium ray length due to occlusion
+    float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
 
-    vec3 rayDir = normalize(pixelWorldPosition - camera.position); // normalized direction of the ray
+    vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 
     vec4 finalColor = oceanColor(screenColor, camera.position, rayDir, maximumDistance);
 
-    gl_FragColor = finalColor; // displaying the final color
+    gl_FragColor = finalColor;// displaying the final color
 }
