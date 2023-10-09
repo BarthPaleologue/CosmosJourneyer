@@ -12,7 +12,7 @@ import sandNormalMap2 from "../../asset/textures/sandNormalMap2.jpg";
 import waterNormal1 from "../../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../../asset/textures/waterNormalMap4.jpg";
 
-import atmosphereLUT from "../../asset/textures/LUT/atmosphere.png";
+//import atmosphereLUT from "../../asset/textures/LUT/atmosphere.png";
 
 import starfield from "../../asset/textures/milkyway.jpg";
 
@@ -40,6 +40,11 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 import { Sound } from "@babylonjs/core/Audio/sound";
+
+import atmosphereLUT from "../../shaders/utils/atmosphereLUT.glsl";
+
+import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+import { Effect } from "@babylonjs/core/Materials/effect";
 
 export class Assets {
     static IS_READY = false;
@@ -88,7 +93,9 @@ export class Assets {
             Assets.manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Assets.WaterNormalMap1 = task.texture);
             Assets.manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Assets.WaterNormalMap2 = task.texture);
 
-            Assets.manager.addTextureTask("AtmosphereLUT", atmosphereLUT).onSuccess = (task) => (Assets.AtmosphereLUT = task.texture);
+            //Assets.manager.addTextureTask("AtmosphereLUT", atmosphereLUT).onSuccess = (task) => (Assets.AtmosphereLUT = task.texture);
+
+            Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 1000, { fragmentSource: atmosphereLUT }, scene);
 
             Assets.manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.Starfield = task.texture);
 
