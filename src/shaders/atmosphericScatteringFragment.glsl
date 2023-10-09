@@ -89,13 +89,16 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
 
         /*float height = length(samplePoint - object.position);
         float heightAboveSurface = height - object.radius;
-        float height01 = heightAboveSurface / (atmosphere.radius - object.radius); // normalized height between 0 and 1
+        float height01 = heightAboveSurface / (atmosphere.radius - object.radius);// normalized height between 0 and 1
         vec3 planetNormal = normalize(samplePoint - object.position);
         float costheta = dot(starDir, planetNormal) * 0.99;
         float lutx = (costheta + 1.0) / 2.0;
-        vec3 sunRayOpticalDepth = 89.0 * exp(texture2D(atmosphereLUT, vec2(lutx, height01)).rgb - 1.0);*/
+        vec2 sunRayOpticalDepth = 89.0 * exp(texture2D(atmosphereLUT, vec2(lutx, height01)).rg - 1.0);*/
         vec2 sunRayOpticalDepth = opticalDepth(samplePoint, starDir, sunRayLengthInAtm);// scattered from the sun to the point
 
+        /*float costheta2 = dot(-rayDir, planetNormal) * 0.99;
+        float lutx2 = (costheta2 + 1.0) / 2.0;
+        vec2 viewRayOpticalDepth = 89.0 * exp(texture2D(atmosphereLUT, vec2(lutx2, height01)).rg - 1.0);*/
         vec2 viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, stepSize * float(i));// scattered from the point to the camera
 
         vec3 transmittance = exp(-(sunRayOpticalDepth.x + viewRayOpticalDepth.x) * rayleighCoeffs);

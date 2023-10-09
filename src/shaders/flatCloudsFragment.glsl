@@ -48,15 +48,13 @@ uniform float time;
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
-#pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
-
 #pragma glslify: smoothSharpener = require(./utils/smoothSharpener.glsl)
-
-#pragma glslify: applyQuaternion = require(./utils/applyQuaternion.glsl)
 
 #pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
 
 #pragma glslify: computeSpecularHighlight = require(./utils/computeSpecularHighlight.glsl)
+
+#pragma glslify: removeAxialTilt = require(./utils/removeAxialTilt.glsl)
 
 float cloudDensityAtPoint(vec3 samplePoint) {
     vec3 rotationAxisPlanetSpace = vec3(0.0, 1.0, 0.0);
@@ -97,8 +95,8 @@ float computeCloudCoverage(vec3 rayOrigin, vec3 rayDir, float maximumDistance, o
     vec3 planetSpacePoint1 = normalize(rayOrigin + impactPoint * rayDir - object.position);
     vec3 planetSpacePoint2 = normalize(rayOrigin + escapePoint * rayDir - object.position);
 
-    vec3 samplePoint1 = applyQuaternion(planetInverseRotationQuaternion, planetSpacePoint1);
-    vec3 samplePoint2 = applyQuaternion(planetInverseRotationQuaternion, planetSpacePoint2);
+    vec3 samplePoint1 = removeAxialTilt(planetSpacePoint1, object.rotationAxis);
+    vec3 samplePoint2 = removeAxialTilt(planetSpacePoint2, object.rotationAxis);
 
     float cloudDensity = 0.0;
     float cloudDensity1 = 0.0;
@@ -132,7 +130,7 @@ float cloudShadows(vec3 closestPoint) {
 
         vec3 samplePoint = normalize(closestPoint + t1 * sunDir - object.position);
         if (dot(samplePoint, sunDir) < 0.0) continue;
-        samplePoint = applyQuaternion(planetInverseRotationQuaternion, samplePoint);
+        samplePoint = removeAxialTilt(samplePoint, object.rotationAxis);
         float density = cloudDensityAtPoint(samplePoint);
         lightAmount -= density;
     }
