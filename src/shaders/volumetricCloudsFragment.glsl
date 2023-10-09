@@ -11,8 +11,11 @@ uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
 #define MAX_STARS 5
-uniform vec3 starPositions[MAX_STARS];// positions of the stars in world space
 uniform int nbStars;// number of stars
+struct Star {
+    vec3 position;
+};
+uniform Star stars[MAX_STARS];
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
@@ -64,7 +67,7 @@ const float lightAbsorptionTowardSun = 0.94;
 const float lightAbsorptionThroughClouds = 0.85;
 
 float lightMarch(vec3 position) {
-    vec3 sunDir = normalize(starPositions[0] - position);
+    vec3 sunDir = normalize(stars[i].position - position);
     float t0, t1;
     rayIntersectSphere(position, sunDir, object.position, cloudLayerMaxHeight, t0, t1);
 
@@ -90,7 +93,7 @@ vec3 clouds(vec3 rayOrigin, vec3 rayDir, float distance, vec3 originalColor, vec
     float transmittance = 1.0;
     vec3 lightEnergy = vec3(0.0);
 
-    float costheta = dot(rayDir, normalize(starPositions[0] - object.position));
+    float costheta = dot(rayDir, normalize(stars[0].position - object.position));
     float phaseCloud = HenyeyGreenstein(0.3, costheta);
 
     for (int i = 0; i < POINTS_FROM_CAMERA; i++) {
@@ -106,7 +109,7 @@ vec3 clouds(vec3 rayOrigin, vec3 rayDir, float distance, vec3 originalColor, vec
         samplePoint += rayDir * stepSize;// move sample point along view ray
     }
 
-    /*vec3 sunDir = normalize(starPositions[0] - geometryImpact);
+    /*vec3 sunDir = normalize(stars[0].position - geometryImpact);
     float t0, t1;
     rayIntersectSphere(geometryImpact, sunDir, object.position, cloudLayerMaxHeight, t0, t1);
 

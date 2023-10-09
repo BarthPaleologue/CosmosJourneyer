@@ -6,8 +6,11 @@ uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
 #define MAX_STARS 5
-uniform vec3 starPositions[MAX_STARS];// positions of the stars in world space
 uniform int nbStars;// number of stars
+struct Star {
+    vec3 position;
+};
+uniform Star stars[MAX_STARS];
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
@@ -71,7 +74,7 @@ void main() {
         vec3 samplePoint = closestPoint;
         float accDensity = 0.0;
         for (int i = 0; i < nbStars; i++) {
-            vec3 towardLight = normalize(starPositions[0] - samplePoint);
+            vec3 towardLight = normalize(stars[i].position - samplePoint);
             float t2;
             if (rayIntersectPlane(samplePoint, towardLight, object.position, object.rotationAxis, 0.001, t2)) {
                 vec3 shadowSamplePoint = samplePoint + t2 * towardLight;
@@ -97,7 +100,7 @@ void main() {
                 // hypothèse des rayons parallèles
                 int nbLightSources = nbStars;
                 for (int i = 0; i < nbStars; i++) {
-                    vec3 rayToSun = normalize(starPositions[i] - object.position);
+                    vec3 rayToSun = normalize(stars[i].position - object.position);
                     float t2, t3;
                     if (rayIntersectSphere(samplePoint, rayToSun, object.position, object.radius, t2, t3)) {
                         nbLightSources -= 1;

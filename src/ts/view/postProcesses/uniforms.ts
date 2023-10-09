@@ -1,6 +1,7 @@
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { BaseObject, OrbitalObject } from "../common";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     return [
@@ -44,6 +45,13 @@ export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
 
 export function getStellarObjectsUniforms(stars: OrbitalObject[]): ShaderUniforms {
     return [
+        ...stars.map((star, index) => {
+            return {
+                name: `stars[${index}].position`,
+                type: UniformEnumType.Vector3,
+                get: () => star.transform.getAbsolutePosition()
+            };
+        }),
         {
             name: "starPositions",
             type: UniformEnumType.Vector3Array,

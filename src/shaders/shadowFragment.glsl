@@ -6,8 +6,11 @@ uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
 #define MAX_STARS 5
-uniform vec3 starPositions[MAX_STARS];// positions of the stars in world space
 uniform int nbStars;// number of stars
+struct Star {
+    vec3 position;
+};
+uniform Star stars[MAX_STARS];
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
@@ -45,7 +48,7 @@ void main() {
         // this planet occludes the pixel in the depth map
         // maybe there is occlusion by the planet
         // basic body shadowing
-        vec3 towardLight = normalize(starPositions[0] - (camera.position + rayDir * maximumDistance));
+        vec3 towardLight = normalize(stars[0].position - (camera.position + rayDir * maximumDistance));
         float t0, t1;
         if (lineIntersectSphere(camera.position + rayDir * maximumDistance, towardLight, object.position, object.radius, t0, t1)) {
             if (t0 > object.radius) {

@@ -10,8 +10,11 @@ uniform sampler2D normalMap2;
 #pragma glslify: camera = require(./utils/camera.glsl)
 
 #define MAX_STARS 5
-uniform vec3 starPositions[MAX_STARS];// positions of the stars in world space
 uniform int nbStars;// number of stars
+struct Star {
+    vec3 position;
+};
+uniform Star stars[MAX_STARS];
 
 #pragma glslify: object = require(./utils/object.glsl)
 
@@ -85,7 +88,7 @@ vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDi
     float specularHighlight = 0.0;
 
     for (int i = 0; i < nbStars; i++) {
-        vec3 sunDir = normalize(starPositions[i] - samplePoint);
+        vec3 sunDir = normalize(stars[i].position - samplePoint);
 
         float ndl1 = max(dot(normalWave, sunDir), 0.0);// dimming factor due to light inclination relative to vertex normal in world space
         float ndl2 = max(dot(planetNormal, sunDir), 0.0);

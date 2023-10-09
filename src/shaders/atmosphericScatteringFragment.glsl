@@ -13,8 +13,11 @@ uniform sampler2D depthSampler;// the depth map of the camera
 uniform sampler2D atmosphereLUT;
 
 #define MAX_STARS 5
-uniform vec3 starPositions[MAX_STARS];// positions of the stars in world space
 uniform int nbStars;// number of stars
+struct Star {
+    vec3 position;
+};
+uniform Star stars[MAX_STARS];
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
@@ -147,7 +150,7 @@ vec4 scatter(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     vec3 light = vec3(0.0);
     for (int i = 0; i < nbStars; i++) {
-        light = max(light, calculateLight(firstPointInAtmosphere, starPositions[i], rayDir, distanceThroughAtmosphere, originalColor.rgb));// calculate scattering
+        light = max(light, calculateLight(firstPointInAtmosphere, stars[i].position, rayDir, distanceThroughAtmosphere, originalColor.rgb));// calculate scattering
     }
 
     float lightAlpha = max(light.r, max(light.g, light.b));

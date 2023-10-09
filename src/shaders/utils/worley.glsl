@@ -17,11 +17,11 @@ vec3 permuteWorley(vec3 x) {
 // F2 is often wrong and has sharp discontinuities.
 // If you need a good F2, use the slower 3x3x3 version.
 
-float K = 0.142857142857; // 1/7
-float Ko = 0.428571428571; // 1/2-K/2
-float K2 = 0.020408163265306; // 1/(7*7)
-float Kz = 0.166666666667; // 1/6
-float Kzo = 0.416666666667; // 1/2-1/6*2
+float K = 0.142857142857;// 1/7
+float Ko = 0.428571428571;// 1/2-K/2
+float K2 = 0.020408163265306;// 1/(7*7)
+float Kz = 0.166666666667;// 1/6
+float Kzo = 0.416666666667;// 1/2-1/6*2
 
 float worley(vec3 P) {
     vec3 Pi = mod(floor(P), 289.0);
@@ -30,11 +30,11 @@ float worley(vec3 P) {
     vec4 Pfy = Pf.y + vec4(0.0, 0.0, -1.0, -1.0);
     vec4 p = permuteWorley(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));
     p = permuteWorley(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));
-    vec4 p1 = permuteWorley(p + Pi.z); // z+0
-    vec4 p2 = permuteWorley(p + Pi.z + vec4(1.0)); // z+1
+    vec4 p1 = permuteWorley(p + Pi.z);// z+0
+    vec4 p2 = permuteWorley(p + Pi.z + vec4(1.0));// z+1
     vec4 ox1 = fract(p1*K) - Ko;
     vec4 oy1 = mod(floor(p1*K), 7.0)*K - Ko;
-    vec4 oz1 = floor(p1*K2)*Kz - Kzo; // p1 < 289 guaranteed
+    vec4 oz1 = floor(p1*K2)*Kz - Kzo;// p1 < 289 guaranteed
     vec4 ox2 = fract(p2*K) - Ko;
     vec4 oy2 = mod(floor(p2*K), 7.0)*K - Ko;
     vec4 oz2 = floor(p2*K2)*Kz - Kzo;
@@ -44,8 +44,8 @@ float worley(vec3 P) {
     vec4 dx2 = Pfx + ox2;
     vec4 dy2 = Pfy + oy2;
     vec4 dz2 = Pf.z - 1.0 + oz2;
-    vec4 d1 = dx1 * dx1 + dy1 * dy1 + dz1 * dz1; // z+0
-    vec4 d2 = dx2 * dx2 + dy2 * dy2 + dz2 * dz2; // z+1
+    vec4 d1 = dx1 * dx1 + dy1 * dy1 + dz1 * dz1;// z+0
+    vec4 d2 = dx2 * dx2 + dy2 * dy2 + dz2 * dz2;// z+1
 
     // Sort out the two smallest distances (F1, F2)
     // Cheat and sort out only F1
@@ -58,7 +58,7 @@ float worley(vec3 P) {
 float completeWorley(vec3 p, int nbOctaves, float decay, float lacunarity) {
     float totalAmplitude = 0.0;
     float value = 0.0;
-    for(int i = 0; i < nbOctaves; ++i) {
+    for (int i = 0; i < nbOctaves; ++i) {
         totalAmplitude += 1.0 / pow(decay, float(i));
         vec3 samplePoint = p * pow(lacunarity, float(i));
         value += worley(samplePoint) / pow(decay, float(i));

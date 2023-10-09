@@ -7,8 +7,11 @@ uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
 #define MAX_STARS 5
-uniform vec3 starPositions[MAX_STARS];// positions of the stars in world space
 uniform int nbStars;// number of stars
+struct Star {
+    vec3 position;
+};
+uniform Star stars[MAX_STARS];
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
@@ -123,7 +126,7 @@ float computeCloudCoverage(vec3 rayOrigin, vec3 rayDir, float maximumDistance, o
 float cloudShadows(vec3 closestPoint) {
     float lightAmount = 1.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 sunDir = normalize(starPositions[i] - closestPoint);
+        vec3 sunDir = normalize(stars[i].position - closestPoint);
 
         float t0, t1;
         if (!rayIntersectSphere(closestPoint, sunDir, object.position, clouds.layerRadius, t0, t1)) continue;
@@ -161,7 +164,7 @@ void main() {
         float ndl = 0.0;// dimming factor due to light inclination relative to vertex normal in world space
         float specularHighlight = 0.0;
         for (int i = 0; i < nbStars; i++) {
-            vec3 sunDir = normalize(starPositions[i] - object.position);
+            vec3 sunDir = normalize(stars[i].position - object.position);
 
             ndl += max(dot(cloudNormal, sunDir), -0.3) + 0.3;
 
