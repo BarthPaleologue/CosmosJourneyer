@@ -7,8 +7,6 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
-uniform vec4 planetInverseRotationQuaternion;
-
 uniform float time;
 
 #pragma glslify: object = require(./utils/object.glsl)
