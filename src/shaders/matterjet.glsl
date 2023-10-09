@@ -19,7 +19,7 @@ uniform float time;
 
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 
-#pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
+#pragma glslify: removeAxialTilt = require(./utils/removeAxialTilt.glsl)
 
 // from https://www.shadertoy.com/view/MtcXWr
 bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 tipPosition, vec3 orientation, float coneAngle, out float t1, out float t2) {
@@ -75,9 +75,7 @@ float spiralSDF(float theta, float radius) {
 
 float spiralDensity(vec3 pointOnCone, vec3 coneAxis, float coneMaxHeight) {
     // Then we rotate that point so that we eliminate the axial tilt of the star from the equation
-    vec3 targetAxis = vec3(0.0, 1.0, 0.0);
-    vec3 rotationRemovalAxis = cross(coneAxis, targetAxis);
-    vec3 pointOnYCone = rotateAround(pointOnCone, rotationRemovalAxis, -acos(dot(coneAxis, targetAxis)));
+    vec3 pointOnYCone = removeAxialTilt(pointOnCone, coneAxis);
 
     vec2 pointOnXZPlane = vec2(pointOnYCone.x, pointOnYCone.z);
     float theta = atan(pointOnXZPlane.y, pointOnXZPlane.x) + 3.14 * min(0.0, sign(dot(pointOnCone, coneAxis)));
