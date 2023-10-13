@@ -13,12 +13,7 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcessTypes";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import {
-    UniformEnumType,
-    ShaderSamplers,
-    ShaderUniforms,
-    SamplerEnumType
-} from "../../controller/uberCore/postProcesses/types";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
