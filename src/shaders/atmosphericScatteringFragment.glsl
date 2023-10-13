@@ -1,4 +1,4 @@
-precision lowp float;
+precision highp float;
 
 #define PI 3.1415926535897932
 #define POINTS_FROM_CAMERA 12// number sample points along camera ray
@@ -94,9 +94,9 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
         float heightAboveSurface = height - object.radius;
         float height01 = heightAboveSurface / (atmosphere.radius - object.radius);// normalized height between 0 and 1
         vec3 planetNormal = normalize(samplePoint - object.position);
-        float costheta = dot(starDir, planetNormal) * 0.99;
+        float costheta = -dot(starDir, planetNormal) * 0.99;
         float lutx = (costheta + 1.0) / 2.0;
-        vec2 sunRayOpticalDepth = exp(texture2D(atmosphereLUT, vec2(lutx, height01)).rg * 1e5 - 1.0) * 1e5;
+        vec2 sunRayOpticalDepth = 1e5 * ((1.0 / (texture2D(atmosphereLUT, vec2(lutx, height01)).rg)) - 1.0);
         //vec2 sunRayOpticalDepth = opticalDepth(samplePoint, starDir, sunRayLengthInAtm);// scattered from the sun to the point
 
         /*float costheta2 = dot(-rayDir, planetNormal) * 0.99;
@@ -178,6 +178,8 @@ void main() {
     }
 
     vec4 finalColor = scatter(screenColor, camera.position, rayDir, maximumDistance);// the color to be displayed on the screen
+
+    finalColor.rgb = texture2D(atmosphereLUT, vUV).rgb;
 
     gl_FragColor = finalColor;// displaying the final color
 }

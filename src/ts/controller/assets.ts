@@ -59,7 +59,7 @@ export class Assets {
     static WaterNormalMap1: Texture;
     static WaterNormalMap2: Texture;
 
-    static AtmosphereLUT: Texture;
+    static AtmosphereLUT: ProceduralTexture;
 
     static Starfield: Texture;
 
@@ -96,6 +96,7 @@ export class Assets {
             //Assets.manager.addTextureTask("AtmosphereLUT", atmosphereLUT).onSuccess = (task) => (Assets.AtmosphereLUT = task.texture);
 
             Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 1000, { fragmentSource: atmosphereLUT }, scene);
+            Assets.AtmosphereLUT.refreshRate = 0;
 
             Assets.manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.Starfield = task.texture);
 

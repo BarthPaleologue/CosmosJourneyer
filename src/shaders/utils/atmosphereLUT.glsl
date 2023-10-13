@@ -80,15 +80,12 @@ void main() {
     float t0, t1;
     rayIntersectSphere(atmospherePoint, SUN_DIR, vec3(0.0), EARTH_RADIUS + ATMOSPHERE_RADIUS, t0, t1);
 
-    float t2, t3;
-    if (rayIntersectSphere(atmospherePoint, SUN_DIR, vec3(0.0), EARTH_RADIUS, t2, t3)) {
-        gl_FragColor = vec4(vec3(0.0), 1.0);
-        return;
-    }
-
     vec2 sunRayOpticalDepth = opticalDepth(atmospherePoint, SUN_DIR, t1);
 
     vec3 color = vec3(sunRayOpticalDepth.x, sunRayOpticalDepth.y, 0.0);
-    color = log(1.0 + 1e-5 * color);
+    color = 1.0 / (1.0 + 1e-5 * color);
+
+    color = vec3(vUV, 1.0);
+
     gl_FragColor = vec4(color, 1.0);
 }
