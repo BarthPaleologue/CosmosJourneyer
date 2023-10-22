@@ -11,8 +11,11 @@ uniform float power;
 uniform vec3 accentColor;
 
 #define MAX_STARS 5
-uniform vec3 starPositions[MAX_STARS]; // positions of the stars in world space
-uniform int nbStars; // number of stars
+uniform int nbStars;// number of stars
+struct Star {
+    vec3 position;
+};
+uniform Star stars[MAX_STARS];
 
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
@@ -157,7 +160,7 @@ void main() {
     
     float ndl = 0.0;
     for(int i = 0; i < nbStars; i++) {
-        vec3 starDir = normalize(starPositions[i] - planetPosition);
+        vec3 starDir = normalize(stars[i].position - planetPosition);
         ndl += max(0.0, dot(normal, starDir));
     }
 

@@ -19,8 +19,6 @@ uniform sampler2D depthSampler;// the depth map of the camera
 uniform vec3 flareColor;// = vec3(0.643, 0.494, 0.867);
 uniform float aspectRatio;
 
-//#define CHEAP_FLARE //faster but cheap looking
-
 float getSun(vec2 uv){
     return length(uv) < 0.009 ? 1.0 : 0.0;
 }
@@ -116,11 +114,6 @@ void main() {
     float objectDistance = length(object.position - camera.position);
     vec3 objectDirection = (object.position - camera.position) / objectDistance;
 
-    if (dot(objectDirection, normalize(closestPoint)) < 0.0) {
-        gl_FragColor = screenColor;
-        return;
-    }
-
     vec2 objectScreenPos = uvFromWorld(object.position);
 
     //TODO: resample depth, and test if the object is occluded by something else, then do not render the lens flare
@@ -144,21 +137,14 @@ void main() {
     vec3 sun, sunflare, lensflare;
     vec3 flare = lensflares(uv*1.5, mouse*1.5, sunflare, lensflare);
 
-    /*#ifdef CHEAP_FLARE
-    vec3 anflare = pow(anflares(uv-mouse, 400.0, 0.5, 0.6), vec3(4.0));
-    anflare += smoothstep(0.0025, 1.0, anflare)*10.0;
-    anflare *= smoothstep(0.0, 1.0, anflare);
-    #else*/
     vec3 anflare = pow(anflares(uv-mouse, 0.5, 400.0, 0.9, 0.1), vec3(4.0));
-    //#endif
-
 
     sun += getSun(uv-mouse) + (flare + anflare)*flareColor*2.0;
+
+    // no lensflare when looking away from the sun
+    sun *= smoothstep(0.0, 0.1, dot(objectDirection, normalize(closestPoint)));
+
     col += sun;
-
-
-    //col = 1.0 - exp(-1.0 * col);
-    //col = pow(col, vec3(1.0/2.2));
 
     // Output to screen
     gl_FragColor = vec4(col, screenColor.a);

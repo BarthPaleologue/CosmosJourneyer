@@ -16,6 +16,8 @@ import { MaterialHelper } from "@babylonjs/core/Materials/materialHelper";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getInverseRotationMatrix } from "../../controller/uberCore/transforms/basicTransform";
+import {Star} from "../bodies/stellarObjects/star";
+import {StellarObject} from "../bodies/stellarObjects/stellarObject";
 
 const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -54,7 +56,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "planetPosition",
                 "planetRadius",
 
-                "starPositions",
+                "stars",
                 "nbStars",
 
                 "planetInverseRotationMatrix",
@@ -161,7 +163,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         this.setFloat("maxElevation", this.terrainSettings.continent_base_height + this.terrainSettings.max_mountain_height + this.terrainSettings.max_bump_height);
     }
 
-    public update(activeControllerPosition: Vector3, stellarObjectsPositions: Vector3[]) {
+    public update(activeControllerPosition: Vector3, stellarObjects: StellarObject[]) {
         this.planet.updateCache(true);
 
         this.setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
@@ -169,8 +171,12 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
 
         this.setVector3("playerPosition", activeControllerPosition);
 
-        this.setArray3("starPositions", flattenVector3Array(stellarObjectsPositions));
-        this.setInt("nbStars", stellarObjectsPositions.length);
+        for (let i = 0; i < stellarObjects.length; i++) {
+            const star = stellarObjects[i];
+            this.setVector3(`stars[${i}].position`, star.transform.getAbsolutePosition());
+            this.setVector3(`stars[${i}].color`, star instanceof Star ? star.model.surfaceColor : Vector3.One());
+        }
+        this.setInt("nbStars", stellarObjects.length);
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());
     }
