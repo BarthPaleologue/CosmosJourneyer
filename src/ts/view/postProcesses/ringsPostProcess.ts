@@ -26,41 +26,7 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             ...getObjectUniforms(body),
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
-            {
-                name: "rings.start",
-                type: UniformEnumType.Float,
-                get: () => {
-                    return ringsUniforms.ringStart;
-                }
-            },
-            {
-                name: "rings.end",
-                type: UniformEnumType.Float,
-                get: () => {
-                    return ringsUniforms.ringEnd;
-                }
-            },
-            {
-                name: "rings.frequency",
-                type: UniformEnumType.Float,
-                get: () => {
-                    return ringsUniforms.ringFrequency;
-                }
-            },
-            {
-                name: "rings.opacity",
-                type: UniformEnumType.Float,
-                get: () => {
-                    return ringsUniforms.ringOpacity;
-                }
-            },
-            {
-                name: "rings.color",
-                type: UniformEnumType.Color3,
-                get: () => {
-                    return ringsUniforms.ringColor;
-                }
-            },
+            ...ringsUniforms.getShaderUniforms(),
             {
                 name: "planetRotationAxis",
                 type: UniformEnumType.Vector3,

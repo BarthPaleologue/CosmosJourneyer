@@ -8,6 +8,7 @@ import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderUniforms, UniformEnumType } from "../../controller/uberCore/postProcesses/types";
 import { PostProcessType } from "./postProcessTypes";
+import { RingsUniforms } from "../../model/ringsUniform";
 
 const shaderName = "shadow";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
@@ -16,7 +17,7 @@ export type ShadowUniforms = {
     hasRings: boolean;
     hasClouds: boolean;
     hasOcean: boolean;
-}
+};
 
 export class ShadowPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly object: AbstractBody;
@@ -24,13 +25,13 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
 
     constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
         const shadowUniforms: ShadowUniforms = {
-            hasRings: body.postProcesses.includes(PostProcessType.RING),
+            hasRings: body.model.ringsUniforms !== null,
             hasClouds: body.postProcesses.includes(PostProcessType.CLOUDS),
             hasOcean: body.postProcesses.includes(PostProcessType.OCEAN)
         };
         const uniforms: ShaderUniforms = [
-            ...getObjectUniforms(body), 
-            ...getStellarObjectsUniforms(stellarObjects), 
+            ...getObjectUniforms(body),
+            ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
                 name: "shadow.hasRings",
@@ -54,6 +55,9 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
                 }
             }
         ];
+
+        const ringsUniforms = body.model.ringsUniforms as RingsUniforms;
+        if (shadowUniforms.hasRings) uniforms.push(...ringsUniforms.getShaderUniforms());
 
         super(body.name + "shadow", shaderName, uniforms, getSamplers(scene), scene);
 
