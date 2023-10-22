@@ -23,11 +23,45 @@ struct ShadowUniforms {
 };
 uniform ShadowUniforms shadowUniforms;
 
+#pragma glslify: rings = require(./rings/rings.glsl)
+
 #pragma glslify: remap = require(./utils/remap.glsl)
 
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
 
 #pragma glslify: lineIntersectSphere = require(./utils/lineIntersectSphere.glsl)
+
+#pragma glslify: rayIntersectsPlane = require(./utils/rayIntersectsPlane.glsl)
+
+#pragma glslify: ringDensityAtPoint = require(./rings/ringsDensity.glsl, object=object, rings=rings)
+
+float sphereOccultation(vec3 rayDir, float maximumDistance) {
+    vec3 towardLight = normalize(stars[0].position - (camera.position + rayDir * maximumDistance));
+    float t0, t1;
+    if (lineIntersectSphere(camera.position + rayDir * maximumDistance, towardLight, object.position, object.radius, t0, t1)) {
+        if (t0 > object.radius) {
+            // there is occultation
+            vec3 closestPointToPlanetCenter = camera.position + rayDir * maximumDistance + towardLight * (t0 + t1) * 0.5;
+            float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - object.position);
+            float r01 = remap(closestDistanceToPlanetCenter, 0.0, object.radius, 0.0, 1.0);
+            return 0.2 + 0.8 * smoothstep(0.85, 1.0, r01);
+        }
+    }
+    return 1.0;
+}
+
+float ringOccultation(vec3 samplePoint) {
+    float accDensity = 0.0;
+    for (int i = 0; i < nbStars; i++) {
+        vec3 towardLight = normalize(stars[i].position - samplePoint);
+        float t2;
+        if (rayIntersectsPlane(samplePoint, towardLight, object.position, object.rotationAxis, 0.001, t2)) {
+            vec3 shadowSamplePoint = samplePoint + t2 * towardLight;
+            accDensity += ringDensityAtPoint(shadowSamplePoint) * rings.opacity;
+        }
+    }
+    return pow(1.0 - accDensity, 4.0);
+}
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
@@ -45,20 +79,14 @@ void main() {
     vec4 finalColor = screenColor;
 
     if (maximumDistance < camera.far) {
-        // this planet occludes the pixel in the depth map
-        // maybe there is occlusion by the planet
-        // basic body shadowing
-        vec3 towardLight = normalize(stars[0].position - (camera.position + rayDir * maximumDistance));
-        float t0, t1;
-        if (lineIntersectSphere(camera.position + rayDir * maximumDistance, towardLight, object.position, object.radius, t0, t1)) {
-            if (t0 > object.radius) {
-                // there is occultation
-                vec3 closestPointToPlanetCenter = camera.position + rayDir * maximumDistance + towardLight * (t0 + t1) * 0.5;
-                float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - object.position);
-                float r01 = remap(closestDistanceToPlanetCenter, 0.0, object.radius, 0.0, 1.0);
-                finalColor.rgb *= 0.2 + 0.8 * smoothstep(0.85, 1.0, r01);
-            }
-        }
+        // There is a solid object in front of the camera
+        // maybe it is in this planet's shadow
+        float sphereShadow = sphereOccultation(rayDir, maximumDistance);
+
+        // maybe it is in the shadow of the rings
+        float ringShadow = ringOccultation(closestPoint);
+
+        finalColor.rgb *= min(sphereShadow, ringShadow);
     }
 
     gl_FragColor = finalColor;// displaying the final color

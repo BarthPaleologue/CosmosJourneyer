@@ -16,9 +16,7 @@ uniform Star stars[MAX_STARS];
 
 #pragma glslify: object = require(./utils/object.glsl)
 
-#pragma glslify: rings = require(./utils/rings.glsl)
-
-#pragma glslify: completeNoise = require(./utils/noise1D.glsl)
+#pragma glslify: rings = require(./rings/rings.glsl)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
@@ -26,33 +24,9 @@ uniform Star stars[MAX_STARS];
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
-bool rayIntersectPlane(vec3 rayOrigin, vec3 rayDir, vec3 planePosition, vec3 planeNormal, float tolerance, out float t) {
-    float denom = dot(rayDir, planeNormal);
-    if (abs(denom) <= tolerance) return false;// ray is parallel to the plane
-    t = dot(planeNormal, planePosition - rayOrigin) / denom;
-    return t >= 0.0;
-}
+#pragma glslify: rayIntersectsPlane = require(./utils/rayIntersectsPlane.glsl)
 
-float ringDensityAtPoint(vec3 samplePoint) {
-    vec3 samplePointPlanetSpace = samplePoint - object.position;
-
-    float distanceToPlanet = length(samplePointPlanetSpace);
-    float normalizedDistance = distanceToPlanet / object.radius;
-
-    // out if not intersecting with rings and interpolation area
-    if (normalizedDistance < rings.start || normalizedDistance > rings.end) return 0.0;
-
-    // compute the actual density of the rings at the sample point
-    float macroRingDensity = completeNoise(normalizedDistance * rings.frequency / 10.0, 1, 2.0, 2.0);
-    float ringDensity = completeNoise(normalizedDistance * rings.frequency, 5, 2.0, 2.0);
-    ringDensity = mix(ringDensity, macroRingDensity, 0.5);
-    ringDensity *= smoothstep(rings.start, rings.start + 0.03, normalizedDistance);
-    ringDensity *= smoothstep(rings.end, rings.end - 0.03, normalizedDistance);
-
-    ringDensity *= ringDensity;
-
-    return ringDensity;
-}
+#pragma glslify: ringDensityAtPoint = require(./rings/ringsDensity.glsl, object=object, rings=rings)
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
@@ -69,23 +43,8 @@ void main() {
 
     vec4 finalColor = screenColor;
 
-    if (maximumDistance < camera.far) {
-        // if the point is in the shadow of the ring, darken it
-        vec3 samplePoint = closestPoint;
-        float accDensity = 0.0;
-        for (int i = 0; i < nbStars; i++) {
-            vec3 towardLight = normalize(stars[i].position - samplePoint);
-            float t2;
-            if (rayIntersectPlane(samplePoint, towardLight, object.position, object.rotationAxis, 0.001, t2)) {
-                vec3 shadowSamplePoint = samplePoint + t2 * towardLight;
-                accDensity += ringDensityAtPoint(shadowSamplePoint) * rings.opacity;
-            }
-        }
-        finalColor.rgb *= pow(1.0 - accDensity, 4.0);
-    }
-
     float impactPoint;
-    if (rayIntersectPlane(camera.position, rayDir, object.position, object.rotationAxis, 0.001, impactPoint)) {
+    if (rayIntersectsPlane(camera.position, rayDir, object.position, object.rotationAxis, 0.001, impactPoint)) {
         // if the ray intersect the ring plane
         if (impactPoint >= 0.0 && impactPoint < maximumDistance) {
             // if the ray intersects the ring before any other object
