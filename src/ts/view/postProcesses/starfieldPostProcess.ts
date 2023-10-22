@@ -2,7 +2,7 @@ import starfieldFragment from "../../../shaders/starfieldFragment.glsl";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { getActiveCameraUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
+import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { Settings } from "../../settings";
 import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { nearestBody } from "../../utils/nearestBody";
@@ -13,6 +13,7 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcessTypes";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -34,7 +35,7 @@ export class StarfieldPostProcess extends UberPostProcess {
             ...getStellarObjectsUniforms(stellarObjects),
             {
                 name: "visibility",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     //TODO: should be cleaned up
                     let vis = 1.0;
@@ -73,7 +74,7 @@ export class StarfieldPostProcess extends UberPostProcess {
             ...getSamplers(scene),
             {
                 name: "starfieldTexture",
-                type: ShaderDataType.Texture,
+                type: SamplerEnumType.Texture,
                 get: () => {
                     return Assets.Starfield;
                 }

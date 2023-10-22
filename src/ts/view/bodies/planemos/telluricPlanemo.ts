@@ -39,7 +39,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
 
         this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
 
-        this.postProcesses.push(PostProcessType.OVERLAY);
+        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.SHADOW);
 
         const waterBoilingPoint = waterBoilingPointCelsius(this.model.physicalProperties.pressure);
         const waterFreezingPoint = 0.0;
@@ -56,11 +56,19 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
             this.model.physicalProperties.oceanLevel = 0;
         }
 
-        if (this.model.hasRings) this.postProcesses.push(PostProcessType.RING);
+        if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
 
         this.material = new TelluricPlanemoMaterial(this.name, this.transform, this.model, scene);
 
-        this.aggregate = new PhysicsAggregate(this.transform, PhysicsShapeType.CONTAINER, { mass: 1e10, restitution: 0.2 }, scene);
+        this.aggregate = new PhysicsAggregate(
+            this.transform,
+            PhysicsShapeType.CONTAINER,
+            {
+                mass: 1e10,
+                restitution: 0.2
+            },
+            scene
+        );
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 1e10 });
         this.aggregate.body.disablePreStep = false;
 
@@ -90,10 +98,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
     }
 
     public updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
-        this.material.update(
-            controller.getTransform().getAbsolutePosition(),
-            stellarObjects.map((star) => star.transform.getAbsolutePosition())
-        );
+        this.material.update(controller.getTransform().getAbsolutePosition(), stellarObjects);
     }
 
     public override getBoundingRadius(): number {

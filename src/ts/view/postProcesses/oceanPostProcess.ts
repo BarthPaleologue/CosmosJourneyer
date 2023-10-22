@@ -3,17 +3,18 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import oceanFragment from "../../../shaders/oceanFragment.glsl";
 import { Assets } from "../../controller/assets";
 import { UberScene } from "../../controller/uberCore/uberScene";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
+import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { OrbitalObject } from "../common";
 import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
 
-export interface OceanSettings {
+export type OceanUniforms = {
     oceanRadius: number;
     smoothness: number;
     specularPower: number;
@@ -23,15 +24,15 @@ export interface OceanSettings {
 }
 
 export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess {
-    readonly settings: OceanSettings;
+    readonly oceanUniforms: OceanUniforms;
     readonly object: TelluricPlanemo;
 
     constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: OrbitalObject[]) {
-        const settings: OceanSettings = {
+        const oceanUniforms: OceanUniforms = {
             oceanRadius: planet.getBoundingRadius(),
             depthModifier: 0.001,
             alphaModifier: 0.001,
-            specularPower: 1.5,
+            specularPower: 1.0,
             smoothness: 0.9,
             waveBlendingSharpness: 0.1
         };
@@ -41,57 +42,57 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             ...getStellarObjectsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
-                name: "oceanRadius",
-                type: ShaderDataType.Float,
+                name: "ocean.radius",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.oceanRadius;
+                    return oceanUniforms.oceanRadius;
                 }
             },
             {
-                name: "smoothness",
-                type: ShaderDataType.Float,
+                name: "ocean.smoothness",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.smoothness;
+                    return oceanUniforms.smoothness;
                 }
             },
             {
-                name: "specularPower",
-                type: ShaderDataType.Float,
+                name: "ocean.specularPower",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.specularPower;
+                    return oceanUniforms.specularPower;
                 }
             },
             {
-                name: "alphaModifier",
-                type: ShaderDataType.Float,
+                name: "ocean.alphaModifier",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.alphaModifier;
+                    return oceanUniforms.alphaModifier;
                 }
             },
             {
-                name: "depthModifier",
-                type: ShaderDataType.Float,
+                name: "ocean.depthModifier",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.depthModifier;
+                    return oceanUniforms.depthModifier;
                 }
             },
             {
-                name: "waveBlendingSharpness",
-                type: ShaderDataType.Float,
+                name: "ocean.waveBlendingSharpness",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.waveBlendingSharpness;
+                    return oceanUniforms.waveBlendingSharpness;
                 }
             },
             {
                 name: "planetInverseRotationQuaternion",
-                type: ShaderDataType.Quaternion,
+                type: UniformEnumType.Quaternion,
                 get: () => {
                     return getInverseRotationQuaternion(planet.transform);
                 }
             },
             {
                 name: "time",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     //TODO: do not hardcode the 100000
                     // use rotating time offset to prevent float imprecision and distant artifacts
@@ -104,14 +105,14 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             ...getSamplers(scene),
             {
                 name: "normalMap1",
-                type: ShaderDataType.Texture,
+                type: SamplerEnumType.Texture,
                 get: () => {
                     return Assets.WaterNormalMap1;
                 }
             },
             {
                 name: "normalMap2",
-                type: ShaderDataType.Texture,
+                type: SamplerEnumType.Texture,
                 get: () => {
                     return Assets.WaterNormalMap2;
                 }
@@ -121,6 +122,6 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = planet;
-        this.settings = settings;
+        this.oceanUniforms = oceanUniforms;
     }
 }

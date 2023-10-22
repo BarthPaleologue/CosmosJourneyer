@@ -1,10 +1,12 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { centeredRand, normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, PlanetPhysicalProperties } from "../common";
-import { OrbitalProperties, getOrbitalPeriod, getPeriapsis } from "../orbit";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { getOrbitalPeriod, getPeriapsis } from "../orbit/orbit";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { clamp } from "../../utils/math";
+import { OrbitProperties } from "../orbit/orbitProperties";
+import { RingsUniforms } from "../ringsUniform";
 
 export class GasPlanetModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.GAS;
@@ -13,11 +15,11 @@ export class GasPlanetModel implements PlanemoModel {
 
     readonly radius: number;
 
-    readonly orbit: OrbitalProperties;
+    readonly orbit: OrbitProperties;
 
     readonly physicalProperties: PlanetPhysicalProperties;
 
-    readonly hasRings: boolean;
+    readonly ringsUniforms;
 
     readonly nbMoons: number;
 
@@ -58,7 +60,11 @@ export class GasPlanetModel implements PlanemoModel {
             pressure: 1
         };
 
-        this.hasRings = uniformRandBool(0.8, this.rng, GENERATION_STEPS.RINGS);
+        if (uniformRandBool(0.8, this.rng, GENERATION_STEPS.RINGS)) {
+            this.ringsUniforms = new RingsUniforms(this.rng);
+        } else {
+            this.ringsUniforms = null;
+        }
 
         this.nbMoons = randRangeInt(0, 3, this.rng, GENERATION_STEPS.NB_MOONS);
     }

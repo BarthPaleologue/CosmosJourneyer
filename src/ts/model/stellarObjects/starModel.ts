@@ -5,8 +5,10 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
 import { BodyModel, BODY_TYPE, StellarObjectModel, StarPhysicalProperties, GENERATION_STEPS } from "../common";
-import { OrbitalProperties, getOrbitalPeriod } from "../orbit";
+import { getOrbitalPeriod } from "../orbit/orbit";
 import { STELLAR_TYPE } from "./common";
+import { OrbitProperties } from "../orbit/orbitProperties";
+import { RingsUniforms } from "../ringsUniform";
 
 export class StarModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.STAR;
@@ -21,12 +23,12 @@ export class StarModel implements StellarObjectModel {
     readonly mass = 1000;
     readonly rotationPeriod = 24 * 60 * 60;
 
-    readonly orbit: OrbitalProperties;
+    readonly orbit: OrbitProperties;
 
     readonly physicalProperties: StarPhysicalProperties;
 
     static RING_PROPORTION = 0.2;
-    readonly hasRings: boolean;
+    readonly ringsUniforms;
 
     readonly parentBody: BodyModel | null;
 
@@ -71,6 +73,10 @@ export class StarModel implements StellarObjectModel {
             isPlaneAlignedWithParent: true
         };
 
-        this.hasRings = uniformRandBool(StarModel.RING_PROPORTION, this.rng, GENERATION_STEPS.RINGS);
+        if (uniformRandBool(StarModel.RING_PROPORTION, this.rng, GENERATION_STEPS.RINGS)) {
+            this.ringsUniforms = new RingsUniforms(this.rng);
+        } else {
+            this.ringsUniforms = null;
+        }
     }
 }

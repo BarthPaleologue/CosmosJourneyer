@@ -10,6 +10,7 @@ import { BlackHole } from "../view/bodies/stellarObjects/blackHole";
 import { PostProcessManager } from "./postProcessManager";
 import { StarSystemModel } from "../model/starSystemModel";
 import { isOrbiting } from "../utils/nearestBody";
+import { NeutronStar } from "../view/bodies/stellarObjects/neutronStar";
 import { BODY_TYPE } from "../model/common";
 import { StellarObject } from "../view/bodies/stellarObjects/stellarObject";
 import { SpaceStation } from "../view/spaceStation";
@@ -23,6 +24,7 @@ import { rotateAround, translate } from "./uberCore/transforms/basicTransform";
 import { MandelbulbModel } from "../model/planemos/mandelbulbModel";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
 import { getMoonSeed } from "../model/planemos/common";
+import { NeutronStarModel } from "../model/stellarObjects/neutronStarModel";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -205,6 +207,17 @@ export class StarSystem {
         const blackHole = new BlackHole(`${this.model.getName()} ${this.stellarObjects.length + 1}`, this.scene, model, this.stellarObjects[0]);
         this.addStellarObject(blackHole);
         return blackHole;
+    }
+
+    public makeNeutronStar(model: number | NeutronStarModel = this.model.getStarSeed(this.stellarObjects.length)): NeutronStar {
+        if (this.stellarObjects.length >= this.model.getNbStars())
+            console.warn(`You are adding a neutron star
+        to a system that already has ${this.stellarObjects.length} stars.
+        The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
+        const neutronStar = new NeutronStar(`neutronStar${this.stellarObjects.length}`, this.scene, model, this.stellarObjects[0]);
+
+        this.addStellarObject(neutronStar);
+        return neutronStar;
     }
 
     /**
@@ -419,7 +432,7 @@ export class StarSystem {
         const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
         this.postProcessManager.setBody(nearestBody);
         const rings = this.postProcessManager.getRings(nearestBody);
-        const switchLimit = rings !== null ? rings.settings.ringStart : 2;
+        const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;
         if (isOrbiting(controller, nearestBody, switchLimit)) this.postProcessManager.setSurfaceOrder();
         else this.postProcessManager.setSpaceOrder();
         this.postProcessManager.update(deltaTime);

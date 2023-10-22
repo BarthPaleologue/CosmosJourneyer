@@ -1,11 +1,10 @@
-precision lowp float;
+precision highp float;
 
 #define PI 3.1415926535897932
 #define POINTS_FROM_CAMERA 12// number sample points along camera ray
 #define OPTICAL_DEPTH_POINTS 12// number sample points along light ray
 
-// varying
-varying vec2 vUV;// screen coordinates
+in vec2 vUV;// screen coordinates
 
 // uniforms
 uniform sampler2D textureSampler;// the original screen texture
@@ -14,49 +13,34 @@ uniform sampler2D depthSampler;// the depth map of the camera
 uniform sampler2D atmosphereLUT;
 
 #define MAX_STARS 5
-uniform vec3 starPositions[MAX_STARS];// positions of the stars in world space
 uniform int nbStars;// number of stars
+struct Star {
+    vec3 position;
+};
+uniform Star stars[MAX_STARS];
 
-uniform vec3 cameraPosition;// position of the camera in world space
+#pragma glslify: camera = require(./utils/camera.glsl)
 
-uniform mat4 inverseProjection;// camera's projection matrix
-uniform mat4 inverseView;// camera's view matrix
+#pragma glslify: object = require(./utils/object.glsl)
 
-uniform float cameraNear;// camera minZ
-uniform float cameraFar;// camera maxZ
-
-uniform vec3 planetPosition;// planet position in world space
-uniform float planetRadius;// planet radius for height calculations
-uniform float atmosphereRadius;// atmosphere radius (calculate from planet center)
-
-uniform float falloffFactor;// controls exponential opacity falloff
-uniform float sunIntensity;// controls atmosphere overall brightness
-uniform float rayleighStrength;// controls color dispersion
-uniform float mieStrength;
-uniform float densityModifier;// density of the atmosphere
-
-uniform float redWaveLength;// the wave length for the red part of the scattering
-uniform float greenWaveLength;// same with green
-uniform float blueWaveLength;// same with blue
-
-uniform float mieHaloRadius;
+#pragma glslify: atmosphere = require(./utils/atmosphere.glsl)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
+#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
 
 #pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
 // based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
 vec2 densityAtPoint(vec3 samplePoint) {
-    float heightAboveSurface = length(samplePoint - planetPosition) - planetRadius;
-    float height01 = heightAboveSurface / (atmosphereRadius - planetRadius);// normalized height between 0 and 1
-    
+    float heightAboveSurface = length(samplePoint - object.position) - object.radius;
+    float height01 = heightAboveSurface / (atmosphere.radius - object.radius);// normalized height between 0 and 1
+
     vec2 localDensity = vec2(
-        densityModifier * exp(-height01 * falloffFactor),
-        densityModifier * exp(-height01 * falloffFactor * 0.5)
+    atmosphere.densityModifier * exp(-height01 * atmosphere.falloff),
+    atmosphere.densityModifier * exp(-height01 * atmosphere.falloff * 0.5)
     );
-    
+
     localDensity *= (1.0 - height01);
 
     return localDensity;// density with exponential falloff
@@ -83,14 +67,14 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
 
     vec3 samplePoint = rayOrigin;// first sampling point coming from camera ray
 
-    vec3 wavelength = vec3(redWaveLength, greenWaveLength, blueWaveLength);// the wavelength that will be scattered (rgb so we get everything)
+    vec3 wavelength = vec3(atmosphere.redWaveLength, atmosphere.greenWaveLength, atmosphere.blueWaveLength);// the wavelength that will be scattered (rgb so we get everything)
 
     // Scattering Coeffs
-    vec3 rayleighCoeffs = pow(1063.0 / wavelength.xyz, vec3(4.0)) * rayleighStrength;// the scattering is inversely proportional to the fourth power of the wave length
-    rayleighCoeffs /= planetRadius;
+    vec3 rayleighCoeffs = pow(1063.0 / wavelength.xyz, vec3(4.0)) * atmosphere.rayleighStrength;// the scattering is inversely proportional to the fourth power of the wave length
+    rayleighCoeffs /= object.radius;
 
-    vec3 mieCoeffs = vec3(2.5e-2) * mieStrength;
-    mieCoeffs /= planetRadius;
+    vec3 mieCoeffs = vec3(2.5e-2) * atmosphere.mieStrength;
+    mieCoeffs /= object.radius;
 
     float stepSize = rayLength / float(POINTS_FROM_CAMERA - 1);// the ray length between sample points
 
@@ -99,22 +83,25 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     vec3 inScatteredRayleigh = vec3(0.0);
     vec3 inScatteredMie = vec3(0.0);
 
-    vec3 starDir = normalize(starPosition - planetPosition);
+    vec3 starDir = normalize(starPosition - object.position);
 
     for (int i = 0; i < POINTS_FROM_CAMERA; i++, samplePoint += rayDir * stepSize) {
         float _, t1;
-        rayIntersectSphere(samplePoint, starDir, planetPosition, atmosphereRadius, _, t1);
+        rayIntersectSphere(samplePoint, starDir, object.position, atmosphere.radius, _, t1);
         float sunRayLengthInAtm = t1;
 
-        /*float height = length(samplePoint - planetPosition);
-        float heightAboveSurface = height - planetRadius;
-        float height01 = heightAboveSurface / (atmosphereRadius - planetRadius); // normalized height between 0 and 1
-        vec3 planetNormal = normalize(samplePoint - planetPosition);
-        float costheta = dot(starDir, planetNormal) * 0.99;
+        /*float height = length(samplePoint - object.position);
+        float heightAboveSurface = height - object.radius;
+        float height01 = heightAboveSurface / (atmosphere.radius - object.radius);// normalized height between 0 and 1
+        vec3 planetNormal = normalize(samplePoint - object.position);
+        float costheta = -dot(starDir, planetNormal) * 0.99;
         float lutx = (costheta + 1.0) / 2.0;
-        vec3 sunRayOpticalDepth = 89.0 * exp(texture2D(atmosphereLUT, vec2(lutx, height01)).rgb - 1.0);*/
+        vec2 sunRayOpticalDepth = 1e5 * ((1.0 / (texture2D(atmosphereLUT, vec2(lutx, height01)).rg)) - 1.0);*/
         vec2 sunRayOpticalDepth = opticalDepth(samplePoint, starDir, sunRayLengthInAtm);// scattered from the sun to the point
 
+        /*float costheta2 = dot(-rayDir, planetNormal) * 0.99;
+        float lutx2 = (costheta2 + 1.0) / 2.0;
+        vec2 viewRayOpticalDepth = 1.0 * exp(texture2D(atmosphereLUT, vec2(lutx2, height01)).rg - 1.0);*/
         vec2 viewRayOpticalDepth = opticalDepth(samplePoint, -rayDir, stepSize * float(i));// scattered from the point to the camera
 
         vec3 transmittance = exp(-(sunRayOpticalDepth.x + viewRayOpticalDepth.x) * rayleighCoeffs);
@@ -133,7 +120,7 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     float costheta = dot(rayDir, starDir);
     float costheta2 = pow(costheta, 2.0);
 
-    float g = mieHaloRadius;//0.7
+    float g = atmosphere.mieHaloRadius;//0.7
     float g2 = g * g;
 
     float phaseMie = ((3.0 * (1.0 - g2)) / (2.0 * (2.0 + g2))) * ((1.0 + costheta2) / pow(1.0 + g2 - 2.0 * g * costheta, 1.5));
@@ -145,12 +132,12 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     inScatteredRayleigh *= phaseRayleigh;// apply rayleigh pahse
     inScatteredMie *= phaseMie;
 
-    return (inScatteredRayleigh + inScatteredMie) * sunIntensity;
+    return (inScatteredRayleigh + inScatteredMie) * atmosphere.sunIntensity;
 }
 
 vec4 scatter(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(rayOrigin, rayDir, planetPosition, atmosphereRadius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(rayOrigin, rayDir, object.position, atmosphere.radius, impactPoint, escapePoint))) {
         return originalColor;// if not intersecting with atmosphere, return original color
     }
 
@@ -163,7 +150,7 @@ vec4 scatter(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     vec3 light = vec3(0.0);
     for (int i = 0; i < nbStars; i++) {
-        light = max(light, calculateLight(firstPointInAtmosphere, starPositions[i], rayDir, distanceThroughAtmosphere, originalColor.rgb));// calculate scattering
+        light = max(light, calculateLight(firstPointInAtmosphere, stars[i].position, rayDir, distanceThroughAtmosphere, originalColor.rgb));// calculate scattering
     }
 
     float lightAlpha = max(light.r, max(light.g, light.b));
@@ -178,19 +165,19 @@ void main() {
 
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
 
-    vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
+    vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - cameraPosition) * remap(depth, 0.0, 1.0, cameraNear, cameraFar);
+    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
     float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
 
     // Cohabitation avec le shader d'océan (un jour je merge)
     float waterImpact, waterEscape;
-    if (rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, waterImpact, waterEscape)) {
+    if (rayIntersectSphere(camera.position, rayDir, object.position, object.radius, waterImpact, waterEscape)) {
         maximumDistance = min(maximumDistance, waterImpact);
     }
 
-    vec4 finalColor = scatter(screenColor, cameraPosition, rayDir, maximumDistance);// the color to be displayed on the screen
+    vec4 finalColor = scatter(screenColor, camera.position, rayDir, maximumDistance);// the color to be displayed on the screen
 
     gl_FragColor = finalColor;// displaying the final color
 }

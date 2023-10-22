@@ -1,49 +1,52 @@
-import normalMap from "../../../asset/textures/cloudNormalMap3.jpg";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
 import { gcd } from "terrain-generation";
 
 import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
 import { UberScene } from "../../controller/uberCore/uberScene";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
+import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
+import {
+    UniformEnumType,
+    ShaderSamplers,
+    ShaderUniforms,
+} from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
 
-export interface CloudSettings {
-    cloudLayerRadius: number;
+export interface CloudUniforms {
+    layerRadius: number;
     smoothness: number;
     specularPower: number;
-    cloudFrequency: number;
-    cloudDetailFrequency: number;
-    cloudCoverage: number;
-    cloudSharpness: number;
-    cloudColor: Color3;
+    frequency: number;
+    detailFrequency: number;
+    coverage: number;
+    sharpness: number;
+    color: Color3;
     worleySpeed: number;
     detailSpeed: number;
 }
 
 export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPostProcess {
-    readonly settings: CloudSettings;
+    readonly cloudUniforms: CloudUniforms;
     readonly object: TelluricPlanemo;
 
     constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
-        const settings: CloudSettings = {
-            cloudLayerRadius: planet.getBoundingRadius() + cloudLayerHeight,
+        const cloudUniforms: CloudUniforms = {
+            layerRadius: planet.getBoundingRadius() + cloudLayerHeight,
             specularPower: 2,
-            smoothness: 0.9,
-            cloudFrequency: 4,
-            cloudDetailFrequency: 12,
-            cloudCoverage: 0.8 * Math.exp(-planet.model.physicalProperties.waterAmount * planet.model.physicalProperties.pressure),
-            cloudSharpness: 3.5,
-            cloudColor: new Color3(0.8, 0.8, 0.8),
+            smoothness: 0.7,
+            frequency: 4,
+            detailFrequency: 12,
+            coverage: 0.8 * Math.exp(-planet.model.physicalProperties.waterAmount * planet.model.physicalProperties.pressure),
+            sharpness: 3.5,
+            color: new Color3(0.8, 0.8, 0.8),
             worleySpeed: 0.0005,
             detailSpeed: 0.003
         };
@@ -53,105 +56,96 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
-                name: "cloudLayerRadius",
-                type: ShaderDataType.Float,
+                name: "clouds.layerRadius",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.cloudLayerRadius;
+                    return cloudUniforms.layerRadius;
                 }
             },
             {
-                name: "cloudFrequency",
-                type: ShaderDataType.Float,
+                name: "clouds.frequency",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.cloudFrequency;
+                    return cloudUniforms.frequency;
                 }
             },
             {
-                name: "cloudDetailFrequency",
-                type: ShaderDataType.Float,
+                name: "clouds.detailFrequency",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.cloudDetailFrequency;
+                    return cloudUniforms.detailFrequency;
                 }
             },
             {
-                name: "cloudCoverage",
-                type: ShaderDataType.Float,
+                name: "clouds.coverage",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.cloudCoverage;
+                    return cloudUniforms.coverage;
                 }
             },
             {
-                name: "cloudSharpness",
-                type: ShaderDataType.Float,
+                name: "clouds.sharpness",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.cloudSharpness;
+                    return cloudUniforms.sharpness;
                 }
             },
             {
-                name: "cloudColor",
-                type: ShaderDataType.Color3,
+                name: "clouds.color",
+                type: UniformEnumType.Color3,
                 get: () => {
-                    return settings.cloudColor;
+                    return cloudUniforms.color;
                 }
             },
             {
-                name: "worleySpeed",
-                type: ShaderDataType.Float,
+                name: "clouds.worleySpeed",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.worleySpeed;
+                    return cloudUniforms.worleySpeed;
                 }
             },
             {
-                name: "detailSpeed",
-                type: ShaderDataType.Float,
+                name: "clouds.detailSpeed",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.detailSpeed;
+                    return cloudUniforms.detailSpeed;
                 }
             },
             {
-                name: "smoothness",
-                type: ShaderDataType.Float,
+                name: "clouds.smoothness",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.smoothness;
+                    return cloudUniforms.smoothness;
                 }
             },
             {
-                name: "specularPower",
-                type: ShaderDataType.Float,
+                name: "clouds.specularPower",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.specularPower;
+                    return cloudUniforms.specularPower;
                 }
             },
             {
                 name: "planetInverseRotationQuaternion",
-                type: ShaderDataType.Quaternion,
+                type: UniformEnumType.Quaternion,
                 get: () => {
                     return getInverseRotationQuaternion(planet.transform);
                 }
             },
             {
                 name: "time",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
-                    return -this.internalTime % ((2 * Math.PI * gcd(this.settings.worleySpeed * 10000, this.settings.detailSpeed * 10000)) / this.settings.worleySpeed);
+                    return -this.internalTime % ((2 * Math.PI * gcd(this.cloudUniforms.worleySpeed * 10000, this.cloudUniforms.detailSpeed * 10000)) / this.cloudUniforms.worleySpeed);
                 }
             }
         ];
 
-        const samplers: ShaderSamplers = [
-            ...getSamplers(scene),
-            {
-                name: "normalMap",
-                type: ShaderDataType.Texture,
-                get: () => {
-                    return new Texture(normalMap, scene);
-                }
-            }
-        ];
+        const samplers: ShaderSamplers = getSamplers(scene);
 
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = planet;
-        this.settings = settings;
+        this.cloudUniforms = cloudUniforms;
     }
 }

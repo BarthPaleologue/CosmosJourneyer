@@ -1,7 +1,6 @@
-// returns whether or not a ray hits a sphere, if yes out intersection points
-// a good explanation of how it works : https://viclw17.github.io/2018/07/16/raytracing-ray-sphere-intersection/
+// A narrower version of line intersect sphere. It will return true only when the intersection is at a positive distance from the ray origin.
 bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float sphereRadius, out float t0, out float t1) {
-    vec3 relativeOrigin = rayOrigin - spherePosition; // rayOrigin in sphere space
+    vec3 relativeOrigin = rayOrigin - spherePosition;// rayOrigin in sphere space
 
     float a = 1.0;
     float b = 2.0 * dot(relativeOrigin, rayDir);
@@ -9,7 +8,7 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
 
     float d = b*b - 4.0*a*c;
 
-    if(d < 0.0) return false; // no intersection
+    if (d < 0.0) return false;// no intersection
 
     float s = sqrt(d);
 
@@ -19,7 +18,8 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
     t0 = min(r0, r1);
     t1 = max(r0, r1);
 
-    return (t1 > 0.0);
+    //return true;
+    return t1 > 0.0;
 }
 
 #pragma glslify: export(rayIntersectSphere)

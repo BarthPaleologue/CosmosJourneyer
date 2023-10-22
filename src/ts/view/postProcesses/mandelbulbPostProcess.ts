@@ -1,11 +1,12 @@
 import mandelbulbFragment from "../../../shaders/mandelbulb.glsl";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
+import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Mandelbulb } from "../bodies/planemos/mandelbulb";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
+import {UniformEnumType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "mandelbulb";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelbulbFragment;
@@ -29,21 +30,21 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
             ...getActiveCameraUniforms(scene),
             {
                 name: "time",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return this.internalTime % (settings.rotationPeriod * 10000);
                 }
             },
             {
                 name: "power",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return mandelbulb.model.power;
                 }
             },
             {
                 name: "accentColor",
-                type: ShaderDataType.Color3,
+                type: UniformEnumType.Color3,
                 get: () => {
                     return mandelbulb.model.accentColor;
                 }

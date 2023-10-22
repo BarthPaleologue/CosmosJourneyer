@@ -1,9 +1,10 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { BodyModel, BODY_TYPE, StellarObjectModel, BlackHolePhysicalProperties, GENERATION_STEPS } from "../common";
-import { getOrbitalPeriod, OrbitalProperties } from "../orbit";
+import { getOrbitalPeriod } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom } from "extended-random";
 import { STELLAR_TYPE } from "./common";
+import { OrbitProperties } from "../orbit/orbitProperties";
 
 export class BlackHoleModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.BLACK_HOLE;
@@ -12,9 +13,11 @@ export class BlackHoleModel implements StellarObjectModel {
 
     readonly radius: number;
 
+    readonly ringsUniforms = null;
+
     readonly stellarType = STELLAR_TYPE.BLACK_HOLE;
 
-    readonly orbit: OrbitalProperties;
+    readonly orbit: OrbitProperties;
 
     readonly physicalProperties: BlackHolePhysicalProperties;
 

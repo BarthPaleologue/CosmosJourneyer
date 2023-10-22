@@ -4,17 +4,18 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { Assets } from "../../controller/assets";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
+import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { centeredRand } from "extended-random";
 import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { GasPlanet } from "../bodies/planemos/gasPlanet";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { OrbitalObject } from "../common";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "atmosphericScattering";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
 
-export interface AtmosphereSettings {
+export interface AtmosphereUniforms {
     atmosphereRadius: number;
     falloffFactor: number;
     intensity: number;
@@ -28,11 +29,11 @@ export interface AtmosphereSettings {
 }
 
 export class AtmosphericScatteringPostProcess extends UberPostProcess implements ObjectPostProcess {
-    readonly settings: AtmosphereSettings;
+    readonly atmosphereUniforms: AtmosphereUniforms;
     readonly object: TelluricPlanemo | GasPlanet;
 
     constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: OrbitalObject[]) {
-        const settings: AtmosphereSettings = {
+        const atmosphereUniforms: AtmosphereUniforms = {
             atmosphereRadius: planet.getBoundingRadius() + atmosphereHeight,
             falloffFactor: 10,
             intensity: 11 * planet.model.physicalProperties.pressure,
@@ -50,73 +51,73 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
-                name: "atmosphereRadius",
-                type: ShaderDataType.Float,
+                name: "atmosphere.radius",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.atmosphereRadius;
+                    return atmosphereUniforms.atmosphereRadius;
                 }
             },
             {
-                name: "falloffFactor",
-                type: ShaderDataType.Float,
+                name: "atmosphere.falloff",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.falloffFactor;
+                    return atmosphereUniforms.falloffFactor;
                 }
             },
             {
-                name: "sunIntensity",
-                type: ShaderDataType.Float,
+                name: "atmosphere.sunIntensity",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.intensity;
+                    return atmosphereUniforms.intensity;
                 }
             },
             {
-                name: "rayleighStrength",
-                type: ShaderDataType.Float,
+                name: "atmosphere.rayleighStrength",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.rayleighStrength;
+                    return atmosphereUniforms.rayleighStrength;
                 }
             },
             {
-                name: "mieStrength",
-                type: ShaderDataType.Float,
+                name: "atmosphere.mieStrength",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.mieStrength;
+                    return atmosphereUniforms.mieStrength;
                 }
             },
             {
-                name: "densityModifier",
-                type: ShaderDataType.Float,
+                name: "atmosphere.densityModifier",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.densityModifier;
+                    return atmosphereUniforms.densityModifier;
                 }
             },
             {
-                name: "redWaveLength",
-                type: ShaderDataType.Float,
+                name: "atmosphere.redWaveLength",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.redWaveLength;
+                    return atmosphereUniforms.redWaveLength;
                 }
             },
             {
-                name: "greenWaveLength",
-                type: ShaderDataType.Float,
+                name: "atmosphere.greenWaveLength",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.greenWaveLength;
+                    return atmosphereUniforms.greenWaveLength;
                 }
             },
             {
-                name: "blueWaveLength",
-                type: ShaderDataType.Float,
+                name: "atmosphere.blueWaveLength",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.blueWaveLength;
+                    return atmosphereUniforms.blueWaveLength;
                 }
             },
             {
-                name: "mieHaloRadius",
-                type: ShaderDataType.Float,
+                name: "atmosphere.mieHaloRadius",
+                type: UniformEnumType.Float,
                 get: () => {
-                    return settings.mieHaloRadius;
+                    return atmosphereUniforms.mieHaloRadius;
                 }
             }
         ];
@@ -125,7 +126,7 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
             ...getSamplers(scene),
             {
                 name: "atmosphereLUT",
-                type: ShaderDataType.Texture,
+                type: SamplerEnumType.Texture,
                 get: () => {
                     return Assets.AtmosphereLUT;
                 }
@@ -135,6 +136,6 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = planet;
-        this.settings = settings;
+        this.atmosphereUniforms = atmosphereUniforms;
     }
 }

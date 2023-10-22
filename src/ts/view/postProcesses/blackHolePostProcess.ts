@@ -1,20 +1,21 @@
 import blackHoleFragment from "../../../shaders/blackhole.glsl";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
+import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { BlackHole } from "../bodies/stellarObjects/blackHole";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Assets } from "../../controller/assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { getForwardDirection } from "../../controller/uberCore/transforms/basicTransform";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "blackhole";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
 
-export interface BlackHoleSettings {
+export type BlackHoleSettings = {
     accretionDiskRadius: number;
     rotationPeriod: number;
-}
+};
 
 export class BlackHolePostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly settings: BlackHoleSettings;
@@ -31,35 +32,35 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             ...getActiveCameraUniforms(scene),
             {
                 name: "time",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return this.internalTime % (settings.rotationPeriod * 10000);
                 }
             },
             {
                 name: "accretionDiskRadius",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.accretionDiskRadius;
                 }
             },
             {
                 name: "rotationPeriod",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return settings.rotationPeriod;
                 }
             },
             {
                 name: "rotationAxis",
-                type: ShaderDataType.Vector3,
+                type: UniformEnumType.Vector3,
                 get: () => {
                     return blackHole.getRotationAxis();
                 }
             },
             {
                 name: "forwardAxis",
-                type: ShaderDataType.Vector3,
+                type: UniformEnumType.Vector3,
                 get: () => {
                     return getForwardDirection(blackHole.transform);
                 }
@@ -70,7 +71,7 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             ...getSamplers(scene),
             {
                 name: "starfieldTexture",
-                type: ShaderDataType.Texture,
+                type: SamplerEnumType.Texture,
                 get: () => {
                     return Assets.Starfield;
                 }

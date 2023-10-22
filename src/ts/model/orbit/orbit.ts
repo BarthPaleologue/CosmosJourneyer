@@ -1,4 +1,5 @@
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { OrbitProperties } from "./orbitProperties";
 
 /**
  *
@@ -7,7 +8,7 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
  * @returns
  * @see https://medium.com/@barth_29567/crazy-orbits-lets-make-squares-c91a427c6b26
  */
-export function getPointOnOrbitLocal(settings: OrbitalProperties, t: number): Vector3 {
+export function getPointOnOrbitLocal(settings: OrbitProperties, t: number): Vector3 {
     const theta = -(2 * Math.PI * t) / settings.period;
     const cosTheta = Math.cos(theta);
     const sinTheta = Math.sin(theta);
@@ -31,7 +32,7 @@ export function getPointOnOrbitLocal(settings: OrbitalProperties, t: number): Ve
  * @param t
  * @returns
  */
-export function getPointOnOrbit(centerOfMass: Vector3, settings: OrbitalProperties, t: number): Vector3 {
+export function getPointOnOrbit(centerOfMass: Vector3, settings: OrbitProperties, t: number): Vector3 {
     return getPointOnOrbitLocal(settings, t).addInPlace(centerOfMass);
 }
 
@@ -59,24 +60,3 @@ export function getOrbitalPeriod(radius: number, parentMass: number) {
     const M = parentMass;
     return Math.sqrt((4 * Math.PI ** 2 * a ** 3) / (G * M));
 }
-
-export type OrbitalProperties = {
-    radius: number;
-
-    p: number;
-
-    /**
-     * The duration it takes for the body to make one orbit
-     */
-    period: number;
-
-    /**
-     * The orientation of the orbit (inclination + precession)
-     */
-    normalToPlane: Vector3;
-
-    /**
-     * Whether the orbital plane is aligned with the parent body or not (allows to see rings from satellites when false)
-     */
-    isPlaneAlignedWithParent: boolean;
-};

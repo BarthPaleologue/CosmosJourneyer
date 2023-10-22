@@ -17,13 +17,15 @@ import { ShipController } from "./spaceship/shipController";
 import { SpaceStation } from "./view/spaceStation";
 import { PostProcessType } from "./view/postProcesses/postProcessTypes";
 import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
-import { StarModel } from "./model/stellarObjects/starModel";
 import { GasPlanetModel } from "./model/planemos/gasPlanetModel";
 import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 import { MandelbulbModel } from "./model/planemos/mandelbulbModel";
 import { getMoonSeed } from "./model/planemos/common";
+import { NeutronStarModel } from "./model/stellarObjects/neutronStarModel";
+import { RingsUniforms } from "./model/ringsUniform";
+import { StarModel } from "./model/stellarObjects/starModel";
 
 const engine = new SpaceEngine();
 
@@ -90,6 +92,7 @@ console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTI
 
 const starSystemSeed = 0;
 const starSystem = new StarSystem(starSystemSeed, scene);
+starSystem.model.setName("Alpha Testis");
 engine.setStarSystem(starSystem, false);
 
 const sunModel = new StarModel(0.51);
@@ -110,6 +113,8 @@ planetModel.orbit.radius = 4000 * planetModel.radius;
 planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = starSystem.makeTelluricPlanet(planetModel);
+planet.model.ringsUniforms = new RingsUniforms(planet.model.rng);
+planet.postProcesses.push(PostProcessType.RING);
 
 const spacestation = new SpaceStation(scene, planet);
 engine.getStarSystem().addSpaceStation(spacestation);
@@ -182,9 +187,9 @@ positionNearObject(scene.getActiveController(), planet, starSystem, 2);
 
 const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
 if (aresAtmosphere) {
-    aresAtmosphere.settings.redWaveLength = 500;
-    aresAtmosphere.settings.greenWaveLength = 680;
-    aresAtmosphere.settings.blueWaveLength = 670;
+    aresAtmosphere.atmosphereUniforms.redWaveLength = 500;
+    aresAtmosphere.atmosphereUniforms.greenWaveLength = 680;
+    aresAtmosphere.atmosphereUniforms.blueWaveLength = 670;
 } else {
     console.warn("No atmosphere found for Ares");
 }

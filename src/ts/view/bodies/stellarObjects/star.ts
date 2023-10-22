@@ -56,9 +56,8 @@ export class Star extends AbstractBody {
         // TODO: remove when rotation is transmitted to children
         setRotationQuaternion(this.transform, Quaternion.Identity());
 
-        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.VOLUMETRIC_LIGHT);
-
-        if (this.model.hasRings) this.postProcesses.push(PostProcessType.RING);
+        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE);
+        if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
     }
 
     public updateMaterial(): void {

@@ -15,6 +15,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MaterialHelper } from "@babylonjs/core/Materials/materialHelper";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
+import { Star } from "../bodies/stellarObjects/star";
 
 const shaderName = "gazPlanetMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -36,7 +37,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
                 "planetPosition",
 
-                "starPositions",
+                "stars",
                 "nbStars",
 
                 "color1",
@@ -101,7 +102,11 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         this.setVector3("playerPosition", player.getTransform().getAbsolutePosition());
 
-        this.setArray3("starPositions", flattenVector3Array(stellarObjects.map((star) => star.transform.getAbsolutePosition())));
+        for (let i = 0; i < stellarObjects.length; i++) {
+            const star = stellarObjects[i];
+            this.setVector3(`stars[${i}].position`, star.transform.getAbsolutePosition());
+            this.setVector3(`stars[${i}].color`, star instanceof Star ? star.model.surfaceColor : Vector3.One());
+        }
         this.setInt("nbStars", stellarObjects.length);
 
         this.setVector3("planetPosition", this.planet.getAbsolutePosition());

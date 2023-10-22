@@ -1,6 +1,6 @@
 import { LinesMesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { OrbitalObject } from "./common";
-import { getPointOnOrbitLocal } from "../model/orbit";
+import { getPointOnOrbitLocal } from "../model/orbit/orbit";
 import { Color3, Vector3 } from "@babylonjs/core/Maths/math";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 

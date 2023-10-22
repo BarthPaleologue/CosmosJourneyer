@@ -136,7 +136,7 @@ function updateBeforeHavok() {
     newton.nextState.position = newton.transform.getAbsolutePosition();
     newton.applyNextState();*/
     newton.updateLOD(camera.globalPosition);
-    newton.material.update(camera.globalPosition, [light.getAbsolutePosition()]);
+    //newton.material.update(camera.globalPosition, [light]);
     Assets.ChunkForge.update();
 }
 

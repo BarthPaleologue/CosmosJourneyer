@@ -4,15 +4,15 @@ attribute vec3 position;
 
 #ifdef LOGARITHMICDEPTH
 	uniform float logarithmicDepthConstant;
-	varying float vFragmentDepth;
+	out float vFragmentDepth;
 #endif
 
 uniform mat4 world;
 uniform mat4 worldViewProjection;
 
-varying vec3 vPositionW;
-varying vec3 vPosition;
-varying vec3 vUnitSamplePoint;
+out vec3 vPositionW;
+out vec3 vPosition;
+out vec3 vUnitSamplePoint;
 
 uniform vec4 starInverseRotationQuaternion;
 uniform vec3 starPosition;

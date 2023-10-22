@@ -1,10 +1,11 @@
 import overlayFragment from "../../../shaders/overlayFragment.glsl";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
-import { ShaderDataType, ShaderUniforms, UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
+import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { BaseObject } from "../common";
+import {UniformEnumType, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "overlay";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = overlayFragment;
@@ -19,14 +20,14 @@ export class OverlayPostProcess extends UberPostProcess implements ObjectPostPro
             ...getObjectUniforms(object),
             {
                 name: "aspectRatio",
-                type: ShaderDataType.Float,
+                type: UniformEnumType.Float,
                 get: () => {
                     return scene.getEngine().getScreenAspectRatio();
                 }
             },
             {
                 name: "isEnabled",
-                type: ShaderDataType.Bool,
+                type: UniformEnumType.Bool,
                 get: () => {
                     return OverlayPostProcess.ARE_ENABLED;
                 }

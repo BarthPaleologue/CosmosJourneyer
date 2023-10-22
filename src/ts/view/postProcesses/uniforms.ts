@@ -1,95 +1,86 @@
 import { UberScene } from "../../controller/uberCore/uberScene";
-import { ShaderDataType, ShaderSamplers, ShaderUniforms } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { BaseObject, OrbitalObject } from "../common";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     return [
         {
-            name: "cameraPosition",
-            type: ShaderDataType.Vector3,
-            get: () => {
-                return scene.getActiveUberCamera().globalPosition;
-            }
+            name: "camera.position",
+            type: UniformEnumType.Vector3,
+            get: () => scene.getActiveUberCamera().getAbsolutePosition()
         },
         {
-            name: "projection",
-            type: ShaderDataType.Matrix,
-            get: () => {
-                return scene.getActiveUberCamera().getProjectionMatrix();
-            }
+            name: "camera.projection",
+            type: UniformEnumType.Matrix,
+            get: () => scene.getActiveUberCamera().getProjectionMatrix()
         },
         {
-            name: "inverseProjection",
-            type: ShaderDataType.Matrix,
-            get: () => {
-                return scene.getActiveUberCamera().getInverseProjectionMatrix();
-            }
+            name: "camera.inverseProjection",
+            type: UniformEnumType.Matrix,
+            get: () => scene.getActiveUberCamera().getInverseProjectionMatrix()
         },
         {
-            name: "view",
-            type: ShaderDataType.Matrix,
-            get: () => {
-                return scene.getActiveUberCamera().getViewMatrix();
-            }
+            name: "camera.view",
+            type: UniformEnumType.Matrix,
+            get: () => scene.getActiveUberCamera().getViewMatrix()
         },
         {
-            name: "inverseView",
-            type: ShaderDataType.Matrix,
-            get: () => {
-                return scene.getActiveUberCamera().getInverseViewMatrix();
-            }
+            name: "camera.inverseView",
+            type: UniformEnumType.Matrix,
+            get: () => scene.getActiveUberCamera().getInverseViewMatrix()
         },
         {
-            name: "cameraNear",
-            type: ShaderDataType.Float,
-            get: () => {
-                return scene.getActiveUberCamera().minZ;
-            }
+            name: "camera.near",
+            type: UniformEnumType.Float,
+            get: () => scene.getActiveUberCamera().minZ
         },
         {
-            name: "cameraFar",
-            type: ShaderDataType.Float,
-            get: () => {
-                return scene.getActiveUberCamera().maxZ;
-            }
+            name: "camera.far",
+            type: UniformEnumType.Float,
+            get: () => scene.getActiveUberCamera().maxZ
         }
     ];
 }
 
 export function getStellarObjectsUniforms(stars: OrbitalObject[]): ShaderUniforms {
     return [
+        ...stars.map((star, index) => {
+            return {
+                name: `stars[${index}].position`,
+                type: UniformEnumType.Vector3,
+                get: () => star.transform.getAbsolutePosition()
+            };
+        }),
         {
             name: "starPositions",
-            type: ShaderDataType.Vector3Array,
-            get: () => {
-                return stars.map((star) => star.transform.getAbsolutePosition());
-            }
+            type: UniformEnumType.Vector3Array,
+            get: () => stars.map((star) => star.transform.getAbsolutePosition())
         },
         {
             name: "nbStars",
-            type: ShaderDataType.Int,
-            get: () => {
-                return stars.length;
-            }
+            type: UniformEnumType.Int,
+            get: () => stars.length
         }
     ];
 }
 
-export function getObjectUniforms(body: BaseObject): ShaderUniforms {
+export function getObjectUniforms(object: BaseObject): ShaderUniforms {
     return [
         {
-            name: "planetPosition",
-            type: ShaderDataType.Vector3,
-            get: () => {
-                return body.transform.getAbsolutePosition();
-            }
+            name: "object.position",
+            type: UniformEnumType.Vector3,
+            get: () => object.transform.getAbsolutePosition()
         },
         {
-            name: "planetRadius",
-            type: ShaderDataType.Float,
-            get: () => {
-                return body.getBoundingRadius();
-            }
+            name: "object.radius",
+            type: UniformEnumType.Float,
+            get: () => object.getBoundingRadius()
+        },
+        {
+            name: "object.rotationAxis",
+            type: UniformEnumType.Vector3,
+            get: () => object.transform.up
         }
     ];
 }
@@ -98,17 +89,13 @@ export function getSamplers(scene: UberScene): ShaderSamplers {
     return [
         {
             name: "textureSampler",
-            type: ShaderDataType.Auto,
-            get: () => {
-                return 0;
-            }
+            type: SamplerEnumType.Auto,
+            get: () => undefined
         },
         {
             name: "depthSampler",
-            type: ShaderDataType.Texture,
-            get: () => {
-                return scene.getDepthRenderer().getDepthMap();
-            }
+            type: SamplerEnumType.Texture,
+            get: () => scene.getDepthRenderer().getDepthMap()
         }
     ];
 }

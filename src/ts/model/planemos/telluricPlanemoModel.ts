@@ -1,11 +1,13 @@
 import { seededSquirrelNoise } from "squirrel-noise";
-import { centeredRand, normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, SolidPhysicalProperties } from "../common";
 import { TerrainSettings } from "../terrain/terrainSettings";
 import { clamp } from "terrain-generation";
-import { OrbitalProperties, getOrbitalPeriod, getPeriapsis } from "../orbit";
+import { getOrbitalPeriod, getPeriapsis } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { OrbitProperties } from "../orbit/orbitProperties";
+import { RingsUniforms } from "../ringsUniform";
 
 export class TelluricPlanemoModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.TELLURIC;
@@ -14,14 +16,13 @@ export class TelluricPlanemoModel implements PlanemoModel {
 
     readonly radius: number;
 
-    readonly orbit: OrbitalProperties;
+    readonly orbit: OrbitProperties;
 
     readonly physicalProperties: SolidPhysicalProperties;
 
     readonly terrainSettings: TerrainSettings;
 
-    //TODO: replace by RingsSettings | null to use it to prevent satelittes from spawning in the rings of their parent
-    readonly hasRings: boolean;
+    ringsUniforms;
 
     readonly nbMoons: number;
 
@@ -111,7 +112,11 @@ export class TelluricPlanemoModel implements PlanemoModel {
             this.terrainSettings.max_mountain_height = 2e3;
         }
 
-        this.hasRings = uniformRandBool(0.6, this.rng, GENERATION_STEPS.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas;
+        if (uniformRandBool(0.6, this.rng, GENERATION_STEPS.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
+            this.ringsUniforms = new RingsUniforms(this.rng);
+        } else {
+            this.ringsUniforms = null;
+        }
 
         this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);
     }
