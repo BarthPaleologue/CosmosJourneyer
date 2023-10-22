@@ -60,7 +60,7 @@ float ringOccultation(vec3 samplePoint) {
             accDensity += ringDensityAtPoint(shadowSamplePoint) * rings.opacity;
         }
     }
-    return pow(1.0 - accDensity, 4.0);
+    return pow(1.0 - accDensity, 4.0) * 0.5 + 0.5;
 }
 
 void main() {
