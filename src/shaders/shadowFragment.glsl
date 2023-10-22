@@ -51,6 +51,10 @@ float sphereOccultation(vec3 rayDir, float maximumDistance) {
 }
 
 float ringOccultation(vec3 samplePoint) {
+    if (!shadowUniforms.hasRings) {
+        return 1.0;
+    }
+
     float accDensity = 0.0;
     for (int i = 0; i < nbStars; i++) {
         vec3 towardLight = normalize(stars[i].position - samplePoint);

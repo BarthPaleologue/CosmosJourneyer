@@ -7,20 +7,15 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { Assets } from "../../controller/assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { getForwardDirection } from "../../controller/uberCore/transforms/basicTransform";
-import {
-    UniformEnumType,
-    ShaderSamplers,
-    ShaderUniforms,
-    SamplerEnumType
-} from "../../controller/uberCore/postProcesses/types";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "blackhole";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
 
-export interface BlackHoleSettings {
+export type BlackHoleSettings = {
     accretionDiskRadius: number;
     rotationPeriod: number;
-}
+};
 
 export class BlackHolePostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly settings: BlackHoleSettings;

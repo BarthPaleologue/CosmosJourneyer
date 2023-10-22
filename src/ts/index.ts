@@ -25,6 +25,7 @@ import { MandelbulbModel } from "./model/planemos/mandelbulbModel";
 import { getMoonSeed } from "./model/planemos/common";
 import { NeutronStarModel } from "./model/stellarObjects/neutronStarModel";
 import { RingsUniforms } from "./model/ringsUniform";
+import { StarModel } from "./model/stellarObjects/starModel";
 
 const engine = new SpaceEngine();
 
@@ -94,8 +95,8 @@ const starSystem = new StarSystem(starSystemSeed, scene);
 starSystem.model.setName("Alpha Testis");
 engine.setStarSystem(starSystem, false);
 
-const sunModel = new NeutronStarModel(0.51);
-const sun = starSystem.makeNeutronStar(sunModel);
+const sunModel = new StarModel(0.51);
+const sun = starSystem.makeStar(sunModel);
 sun.model.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);

@@ -33,6 +33,7 @@ import { ObjectPostProcess, UpdatablePostProcess } from "../view/postProcesses/o
 import { MatterJetPostProcess } from "../view/postProcesses/matterJetPostProcess";
 import { NeutronStar } from "../view/bodies/stellarObjects/neutronStar";
 import { ShadowPostProcess } from "../view/postProcesses/shadowPostProcess";
+import { LensFlarePostProcess } from "../view/postProcesses/lensFlarePostProcess";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -45,7 +46,7 @@ const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.ATMOSPHERE,
     PostProcessType.MANDELBULB,
     PostProcessType.RING,
-    PostProcessType.BLACK_HOLE
+    PostProcessType.BLACK_HOLE,
 ];
 
 /**
@@ -59,7 +60,7 @@ const surfaceRenderingOrder: PostProcessType[] = [
     PostProcessType.RING,
     PostProcessType.OCEAN,
     PostProcessType.CLOUDS,
-    PostProcessType.ATMOSPHERE
+    PostProcessType.ATMOSPHERE,
 ];
 
 /**
@@ -90,6 +91,7 @@ export class PostProcessManager {
     private readonly overlays: OverlayPostProcess[] = [];
     private readonly matterJets: MatterJetPostProcess[] = [];
     private readonly shadows: ShadowPostProcess[] = [];
+    private readonly lensFlares: LensFlarePostProcess[] = [];
 
     /**
      * All post processes that are attached to an object.
@@ -104,7 +106,8 @@ export class PostProcessManager {
         this.overlays,
         this.volumetricLights,
         this.matterJets,
-        this.shadows
+        this.shadows,
+        this.lensFlares
     ];
 
     /**
@@ -308,6 +311,10 @@ export class PostProcessManager {
         this.shadows.push(new ShadowPostProcess(body, this.scene, stellarObjects));
     }
 
+    public addLensFlare(stellarObject: StellarObject) {
+        this.lensFlares.push(new LensFlarePostProcess(stellarObject, this.scene));
+    }
+
     /**
      * Adds all post processes for the given body.
      * @param body A body
@@ -354,6 +361,9 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.SHADOW:
                     this.addShadowCaster(body as AbstractBody, stellarObjects);
+                    break;
+                case PostProcessType.LENS_FLARE:
+                    this.addLensFlare(body as StellarObject);
                     break;
             }
         }
@@ -417,6 +427,7 @@ export class PostProcessManager {
         const [otherMandelbulbsRenderEffect, bodyMandelbulbsRenderEffect] = makeSplitRenderEffects("Mandelbulbs", this.getCurrentBody(), this.mandelbulbs, this.engine);
         const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = makeSplitRenderEffects("MatterJets", this.getCurrentBody(), this.matterJets, this.engine);
         const shadowRenderEffect = new PostProcessRenderEffect(this.engine, "ShadowRenderEffect", () => this.shadows);
+        const lensFlareRenderEffect = new PostProcessRenderEffect(this.engine, "LensFlareRenderEffect", () => this.lensFlares);
 
         this.currentRenderingPipeline.addEffect(this.starFieldRenderEffect);
 
@@ -448,6 +459,9 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.SHADOW:
                     //this.currentRenderingPipeline.addEffect(otherShadowRenderEffect);
+                    break;
+                case PostProcessType.LENS_FLARE:
+                    //this.currentRenderingPipeline.addEffect(otherLensFlaresRenderEffect);
                     break;
                 case PostProcessType.OVERLAY:
                     // do nothing as they are added at the end of the function
@@ -481,6 +495,9 @@ export class PostProcessManager {
                 case PostProcessType.MANDELBULB:
                     this.currentRenderingPipeline.addEffect(bodyMandelbulbsRenderEffect);
                     break;
+                case PostProcessType.LENS_FLARE:
+                    //this.currentRenderingPipeline.addEffect(bodyLensFlaresRenderEffect);
+                    break;
                 case PostProcessType.SHADOW:
                     //this.currentRenderingPipeline.addEffect(bodyShadowRenderEffect);
                     break;
@@ -491,6 +508,7 @@ export class PostProcessManager {
         }
 
         this.currentRenderingPipeline.addEffect(shadowRenderEffect);
+        this.currentRenderingPipeline.addEffect(lensFlareRenderEffect);
         this.currentRenderingPipeline.addEffect(this.overlayRenderEffect);
         this.currentRenderingPipeline.addEffect(this.fxaaRenderEffect);
         this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
