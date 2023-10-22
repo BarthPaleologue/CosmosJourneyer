@@ -24,6 +24,8 @@ export class MandelbulbModel implements PlanemoModel {
 
     readonly nbMoons: number;
 
+    readonly ringsUniforms = null;
+
     readonly power: number;
     readonly accentColor: Color3;
 

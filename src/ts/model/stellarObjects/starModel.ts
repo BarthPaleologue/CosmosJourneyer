@@ -8,6 +8,7 @@ import { BodyModel, BODY_TYPE, StellarObjectModel, StarPhysicalProperties, GENER
 import { getOrbitalPeriod } from "../orbit/orbit";
 import { STELLAR_TYPE } from "./common";
 import { OrbitProperties } from "../orbit/orbitProperties";
+import { RingsUniforms } from "../ringsUniform";
 
 export class StarModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.STAR;
@@ -27,7 +28,7 @@ export class StarModel implements StellarObjectModel {
     readonly physicalProperties: StarPhysicalProperties;
 
     static RING_PROPORTION = 0.2;
-    readonly hasRings: boolean;
+    readonly ringsUniforms;
 
     readonly parentBody: BodyModel | null;
 
@@ -72,6 +73,10 @@ export class StarModel implements StellarObjectModel {
             isPlaneAlignedWithParent: true
         };
 
-        this.hasRings = uniformRandBool(StarModel.RING_PROPORTION, this.rng, GENERATION_STEPS.RINGS);
+        if (uniformRandBool(StarModel.RING_PROPORTION, this.rng, GENERATION_STEPS.RINGS)) {
+            this.ringsUniforms = new RingsUniforms(this.rng);
+        } else {
+            this.ringsUniforms = null;
+        }
     }
 }

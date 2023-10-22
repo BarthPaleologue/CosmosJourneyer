@@ -56,7 +56,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
             this.model.physicalProperties.oceanLevel = 0;
         }
 
-        if (this.model.hasRings) this.postProcesses.push(PostProcessType.RING);
+        if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
 
         this.material = new TelluricPlanemoMaterial(this.name, this.transform, this.model, scene);
 

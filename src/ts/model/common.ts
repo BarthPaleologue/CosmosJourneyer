@@ -1,5 +1,6 @@
 import { OrbitProperties } from "./orbit/orbitProperties";
 import { STELLAR_TYPE } from "./stellarObjects/common";
+import { RingsUniforms } from "./ringsUniform";
 
 export enum GENERATION_STEPS {
     AXIAL_TILT = 100,
@@ -68,8 +69,10 @@ export interface BaseModel {
 }
 
 export interface BodyModel extends BaseModel {
-    bodyType: BODY_TYPE;
-    radius: number;
+    readonly bodyType: BODY_TYPE;
+    readonly radius: number;
+
+    readonly ringsUniforms: RingsUniforms | null;
 }
 
 export interface StellarObjectModel extends BodyModel {

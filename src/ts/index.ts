@@ -24,6 +24,7 @@ import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 import { MandelbulbModel } from "./model/planemos/mandelbulbModel";
 import { getMoonSeed } from "./model/planemos/common";
 import { NeutronStarModel } from "./model/stellarObjects/neutronStarModel";
+import { RingsUniforms } from "./model/ringsUniform";
 
 const engine = new SpaceEngine();
 
@@ -111,6 +112,7 @@ planetModel.orbit.radius = 4000 * planetModel.radius;
 planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = starSystem.makeTelluricPlanet(planetModel);
+planet.model.ringsUniforms = new RingsUniforms(planet.model.rng);
 planet.postProcesses.push(PostProcessType.RING);
 
 const spacestation = new SpaceStation(scene, planet);

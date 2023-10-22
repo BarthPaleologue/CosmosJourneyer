@@ -3,37 +3,25 @@ import { AbstractBody } from "../bodies/abstractBody";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { normalRandom, randRange } from "extended-random";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { clamp } from "terrain-generation";
 import { UniformEnumType, ShaderUniforms } from "../../controller/uberCore/postProcesses/types";
+import { RingsUniforms } from "../../model/ringsUniform";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
-
-type RingsUniforms = {
-    ringStart: number;
-    ringEnd: number;
-    ringFrequency: number;
-    ringOpacity: number;
-    ringColor: Color3;
-};
 
 export class RingsPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly ringsUniforms: RingsUniforms;
     readonly object: AbstractBody;
 
     constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
-        const ringsUniforms: RingsUniforms = {
-            ringStart: randRange(1.8, 2.2, body.model.rng, 1400),
-            ringEnd: randRange(2.1, 4.0, body.model.rng, 1410),
-            ringFrequency: 30.0,
-            ringOpacity: clamp(normalRandom(0.7, 0.1, body.model.rng, 1420), 0, 1),
-            ringColor: new Color3(214, 168, 122).scaleInPlace(randRange(1.0, 1.5, body.model.rng, 1430) / 255)
-        };
+        const ringsUniforms = body.model.ringsUniforms;
+        if (ringsUniforms === null)
+            throw new Error(
+                `RingsPostProcess: ringsUniforms are null. This should not be possible as the postprocess should not be created if the body has no rings. Body: ${body.name}`
+            );
         const uniforms: ShaderUniforms = [
             ...getObjectUniforms(body),
             ...getStellarObjectsUniforms(stellarObjects),

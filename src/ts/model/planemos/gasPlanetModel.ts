@@ -6,6 +6,7 @@ import { getOrbitalPeriod, getPeriapsis } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { clamp } from "../../utils/math";
 import { OrbitProperties } from "../orbit/orbitProperties";
+import { RingsUniforms } from "../ringsUniform";
 
 export class GasPlanetModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.GAS;
@@ -18,7 +19,7 @@ export class GasPlanetModel implements PlanemoModel {
 
     readonly physicalProperties: PlanetPhysicalProperties;
 
-    readonly hasRings: boolean;
+    readonly ringsUniforms;
 
     readonly nbMoons: number;
 
@@ -59,7 +60,11 @@ export class GasPlanetModel implements PlanemoModel {
             pressure: 1
         };
 
-        this.hasRings = uniformRandBool(0.8, this.rng, GENERATION_STEPS.RINGS);
+        if (uniformRandBool(0.8, this.rng, GENERATION_STEPS.RINGS)) {
+            this.ringsUniforms = new RingsUniforms(this.rng);
+        } else {
+            this.ringsUniforms = null;
+        }
 
         this.nbMoons = randRangeInt(0, 3, this.rng, GENERATION_STEPS.NB_MOONS);
     }

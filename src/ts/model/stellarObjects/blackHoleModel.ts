@@ -13,6 +13,8 @@ export class BlackHoleModel implements StellarObjectModel {
 
     readonly radius: number;
 
+    readonly ringsUniforms = null;
+
     readonly stellarType = STELLAR_TYPE.BLACK_HOLE;
 
     readonly orbit: OrbitProperties;

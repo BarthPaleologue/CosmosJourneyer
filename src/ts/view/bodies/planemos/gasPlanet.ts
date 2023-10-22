@@ -43,7 +43,8 @@ export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial 
         this.material = new GasPlanetMaterial(this.name, this.transform, this.model, scene);
         this.mesh.material = this.material;
 
-        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.ATMOSPHERE, PostProcessType.RING, PostProcessType.SHADOW);
+        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.ATMOSPHERE, PostProcessType.SHADOW);
+        if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
 
         this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
