@@ -85,7 +85,5 @@ void main() {
     vec3 color = vec3(sunRayOpticalDepth.x, sunRayOpticalDepth.y, 0.0);
     color = 1.0 / (1.0 + 1e-5 * color);
 
-    color = vec3(vUV, 1.0);
-
     gl_FragColor = vec4(color, 1.0);
 }

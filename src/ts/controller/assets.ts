@@ -41,7 +41,8 @@ import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 import { Sound } from "@babylonjs/core/Audio/sound";
 
-import atmosphereLUT from "../../shaders/utils/atmosphereLUT.glsl";
+//import atmosphereLUT from "../../shaders/utils/atmosphereLUT.glsl";
+import atmosphereLUT from "../../asset/textures/LUT/atmosphere.png";
 
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Effect } from "@babylonjs/core/Materials/effect";
@@ -59,7 +60,7 @@ export class Assets {
     static WaterNormalMap1: Texture;
     static WaterNormalMap2: Texture;
 
-    static AtmosphereLUT: ProceduralTexture;
+    static AtmosphereLUT: Texture;
 
     static Starfield: Texture;
 
@@ -93,10 +94,10 @@ export class Assets {
             Assets.manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Assets.WaterNormalMap1 = task.texture);
             Assets.manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Assets.WaterNormalMap2 = task.texture);
 
-            //Assets.manager.addTextureTask("AtmosphereLUT", atmosphereLUT).onSuccess = (task) => (Assets.AtmosphereLUT = task.texture);
+            Assets.manager.addTextureTask("AtmosphereLUT", atmosphereLUT).onSuccess = (task) => (Assets.AtmosphereLUT = task.texture);
 
-            Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 1000, { fragmentSource: atmosphereLUT }, scene);
-            Assets.AtmosphereLUT.refreshRate = 0;
+            /*Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
+            Assets.AtmosphereLUT.refreshRate = 1;*/
 
             Assets.manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.Starfield = task.texture);
 
