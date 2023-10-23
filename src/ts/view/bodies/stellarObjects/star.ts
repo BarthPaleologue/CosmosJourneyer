@@ -22,7 +22,7 @@ export class Star extends AbstractBody {
 
     readonly model: StarModel;
 
-    readonly aggregate: PhysicsAggregate;
+    //readonly aggregate: PhysicsAggregate;
 
     /**
      * New Star
@@ -49,9 +49,9 @@ export class Star extends AbstractBody {
                 : Assets.CreateBananaClone(this.model.radius * 2);
         this.mesh.parent = this.transform;
 
-        this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.SPHERE);
+        /*this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.SPHERE);
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-        this.aggregate.body.disablePreStep = false;
+        this.aggregate.body.disablePreStep = false;*/
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
         this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
