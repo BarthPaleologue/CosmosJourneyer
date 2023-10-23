@@ -184,7 +184,8 @@ export class StarSystem {
     }
 
     public makeStar(model: number | StarModel = this.model.getStarSeed(this.stellarObjects.length)): Star {
-        const star = new Star(`${this.model.getName()} ${this.stellarObjects.length + 1}`, this.scene, model, this.stellarObjects[0]);
+        const name = `${this.model.getName()} ${this.stellarObjects.length + 1}`;
+        const star = new Star(name, this.scene, model, this.stellarObjects[0]);
         this.addStellarObject(star);
         return star;
     }
@@ -384,8 +385,8 @@ export class StarSystem {
         const controller = this.scene.getActiveController();
 
         /*const displacementTranslation = controller.aggregate.transformNode.getAbsolutePosition().negate();
-        this.translateEverythingNow(displacementTranslation);
-        translate(controller.aggregate.transformNode, displacementTranslation);*/
+    this.translateEverythingNow(displacementTranslation);
+    translate(controller.aggregate.transformNode, displacementTranslation);*/
 
         for (const object of this.orbitalObjects) {
             object.updateInternalClock(deltaTime);
@@ -399,8 +400,8 @@ export class StarSystem {
                 translate(controller.getTransform(), newPosition.subtract(initialPosition));
 
                 /*const direction = controller.aggregate.transformNode.getAbsolutePosition().subtract(object.nextState.position).normalize();
-                const gravity = 9.81;
-                controller.aggregate.body.applyForce(direction.scale(gravity), controller.aggregate.body.getObjectCenterWorld());*/
+        const gravity = 9.81;
+        controller.aggregate.body.applyForce(direction.scale(gravity), controller.aggregate.body.getObjectCenterWorld());*/
             }
 
             const dtheta = object.updateRotation(deltaTime);
