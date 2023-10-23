@@ -64,12 +64,12 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
             this.transform,
             PhysicsShapeType.CONTAINER,
             {
-                mass: 1e10,
+                mass: 0,
                 restitution: 0.2
             },
             scene
         );
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 1e10 });
+        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
 
         this.sides = [
