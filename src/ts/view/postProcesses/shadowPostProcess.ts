@@ -34,21 +34,21 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
-                name: "shadow.hasRings",
+                name: "shadowUniforms.hasRings",
                 type: UniformEnumType.Bool,
                 get: () => {
                     return shadowUniforms.hasRings;
                 }
             },
             {
-                name: "shadow.hasClouds",
+                name: "shadowUniforms.hasClouds",
                 type: UniformEnumType.Bool,
                 get: () => {
                     return shadowUniforms.hasClouds;
                 }
             },
             {
-                name: "shadow.hasOcean",
+                name: "shadowUniforms.hasOcean",
                 type: UniformEnumType.Bool,
                 get: () => {
                     return shadowUniforms.hasOcean;
