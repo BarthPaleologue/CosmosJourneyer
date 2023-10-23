@@ -26,6 +26,8 @@ import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
 import { TelluricPlanemo } from "./view/bodies/planemos/telluricPlanemo";
 import { UberScene } from "./controller/uberCore/uberScene";
 import { Settings } from "./settings";
+import { StarModel } from "./model/stellarObjects/starModel";
+import { Star } from "./view/bodies/stellarObjects/star";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -87,6 +89,10 @@ capsule.material = Assets.DebugMaterial("capsule", true);
 capsule.visibility = 0.5;
 shadowGenerator.addShadowCaster(capsule);
 
+const auroraModel = new StarModel(984);
+const aurora = new Star("Aurora", scene, auroraModel);
+aurora.transform.setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10.0, 0));
+
 const newtonModel = new TelluricPlanemoModel(152);
 const newton = new TelluricPlanemo("newton", scene, newtonModel);
 newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
@@ -132,11 +138,12 @@ function updateBeforeHavok() {
 
     // planet thingy
     newton.updateInternalClock(-deltaTime / 10);
+    aurora.updateInternalClock(-deltaTime / 10);
     /*newton.updateRotation(deltaTime / 10);
-    newton.nextState.position = newton.transform.getAbsolutePosition();
-    newton.applyNextState();*/
+newton.nextState.position = newton.transform.getAbsolutePosition();
+newton.applyNextState();*/
     newton.updateLOD(camera.globalPosition);
-    //newton.material.update(camera.globalPosition, [light]);
+    newton.material.update(camera.globalPosition, [aurora]);
     Assets.ChunkForge.update();
 }
 
