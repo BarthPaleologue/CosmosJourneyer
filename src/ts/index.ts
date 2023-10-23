@@ -8,7 +8,7 @@ import { StarSystem } from "./controller/starSystem";
 
 import { Settings } from "./settings";
 import { Assets } from "./controller/assets";
-import { PlayerController } from "./spacelegs/playerController";
+import { DefaultController } from "./spacelegs/defaultController";
 import { positionNearObject } from "./utils/positionNearObject";
 import { SpaceEngine } from "./controller/spaceEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -37,7 +37,7 @@ const mouse = new Mouse(engine.canvas, 100);
 const keyboard = new Keyboard();
 const gamepad = new Gamepad();
 
-const player = new PlayerController(scene);
+const player = new DefaultController(scene);
 player.speed = 0.2 * Settings.EARTH_RADIUS;
 player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 player.addInput(keyboard);

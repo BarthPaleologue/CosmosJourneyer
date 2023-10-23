@@ -5,9 +5,9 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll, translate, yaw } from "../controller/uberCore/transforms/basicTransform";
-import { Settings } from "../settings";
+import { Mouse } from "../controller/inputs/mouse";
 
-export class PlayerController extends AbstractController {
+export class DefaultController extends AbstractController {
     private readonly transform: TransformNode;
     private readonly camera: UberCamera;
 
@@ -33,7 +33,19 @@ export class PlayerController extends AbstractController {
     }
 
     protected override listenTo(input: Input, deltaTime: number): Vector3 {
-        if (input.type !== InputType.KEYBOARD) return Vector3.Zero();
+        if (input.type === InputType.MOUSE) {
+            const mouse = input as Mouse;
+            if (mouse.isLeftButtonPressed()) {
+                const dx = mouse.getDxNormalized() * 70;
+                const dy = mouse.getDyNormalized() * 70;
+
+                console.log(dx, dy);
+
+                yaw(this.transform, -dx * this.rotationSpeed * deltaTime);
+                pitch(this.transform, dy * this.rotationSpeed * deltaTime);
+            }
+            return Vector3.Zero();
+        }
         roll(this.transform, input.getRoll() * this.rotationSpeed * deltaTime);
         pitch(this.transform, input.getPitch() * this.rotationSpeed * deltaTime);
         yaw(this.transform, input.getYaw() * this.rotationSpeed * deltaTime);

@@ -17,6 +17,8 @@ export class Mouse implements Input {
     deadAreaRadius = 100;
     private canvas: HTMLCanvasElement;
 
+    private isLeftButtonDown = false;
+
     readonly onMouseEnterObservable: Observable<void> = new Observable();
     readonly onMouseLeaveObservable: Observable<void> = new Observable();
 
@@ -25,8 +27,8 @@ export class Mouse implements Input {
         this.canvas = canvas;
 
         document.addEventListener("mousemove", (e) => {
-            this.dx = (e.x - this.x) / this.canvas.width;
-            this.dy = (e.y - this.y) / this.canvas.height;
+            this.dx = (e.x - this.x);
+            this.dy = (e.y - this.y);
 
             this.x = e.x;
             this.y = e.y;
@@ -41,6 +43,18 @@ export class Mouse implements Input {
         document.addEventListener("mouseleave", () => {
             this.onMouseLeaveObservable.notifyObservers();
         });
+
+        document.addEventListener("mousedown", (e) => {
+            if (e.button === 0) this.isLeftButtonDown = true;
+        });
+
+        document.addEventListener("mouseup", (e) => {
+            if (e.button === 0) this.isLeftButtonDown = false;
+        });
+    }
+
+    public isLeftButtonPressed(): boolean {
+        return this.isLeftButtonDown;
     }
 
     getRoll() {
@@ -81,7 +95,15 @@ export class Mouse implements Input {
         return this.dx;
     }
 
+    getDxNormalized(): number {
+        return this.dx / Math.max(this.canvas.width, this.canvas.height);
+    }
+
     getDy(): number {
         return this.dy;
+    }
+
+    getDyNormalized(): number {
+        return this.dy / Math.max(this.canvas.height, this.canvas.width);
     }
 }
