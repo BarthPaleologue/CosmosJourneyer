@@ -149,7 +149,7 @@ void main() {
     vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
     float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
 
-    float maxBendDistance = max(accretionDiskRadius * 3.0, object.radius * 4.0);
+    float maxBendDistance = max(accretionDiskRadius * 3.0, object.radius * 15.0);
 
     float t0, t1;
     if(!rayIntersectSphere(camera.position, rayDir, object.position, maxBendDistance, t0, t1)) {
@@ -220,17 +220,18 @@ void main() {
     }
 
     //FIXME: when WebGPU supports texture2D inside if statements, move this to not compute it when occluded
-    /*vec2 uv = uvFromWorld(positionBHS);
+    vec2 uv = uvFromWorld(positionBHS);
     vec4 bg = vec4(0.0);
 
-    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) bg = texture2D(textureSampler, uv);
-    else {*/
-    vec2 starfieldUV = vec2(
-    sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
-    acos(rayDir.y) / 3.14159265359
-    );
-    vec4 bg = texture2D(starfieldTexture, starfieldUV);
-    //}
+    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) {
+        bg = texture2D(textureSampler, uv);
+    } else {
+        vec2 starfieldUV = vec2(
+        sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
+        acos(rayDir.y) / 3.14159265359
+        );
+        bg = texture2D(starfieldTexture, starfieldUV);
+    }
 
     vec4 finalColor = vec4(1.0, 0.0, 0.0, 1.0);
 
