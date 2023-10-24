@@ -6,6 +6,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { Light } from "@babylonjs/core/Lights/light";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class BlackHole extends AbstractBody {
     readonly light: PointLight;
@@ -28,7 +29,7 @@ export class BlackHole extends AbstractBody {
         this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.BLACK_HOLE);
     }
 
-    public override computeCulling(cameraPosition: Vector3): void {
+    public override computeCulling(camera: Camera): void {
         // nothing to do
     }
 

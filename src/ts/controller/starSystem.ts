@@ -422,7 +422,7 @@ export class StarSystem {
 
         for (const body of this.telluricPlanets.concat(this.satellites)) body.updateLOD(controller.getTransform().getAbsolutePosition());
 
-        for (const object of this.orbitalObjects) object.computeCulling(controller.getActiveCamera().getAbsolutePosition());
+        for (const object of this.orbitalObjects) object.computeCulling(controller.getActiveCamera());
 
         for (const planet of this.planemosWithMaterial) planet.updateMaterial(controller, this.stellarObjects, deltaTime);
 

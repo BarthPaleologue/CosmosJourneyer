@@ -1,5 +1,5 @@
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export interface Cullable {
-    computeCulling(cameraPosition: Vector3): void;
+    computeCulling(camera: Camera): void;
 }

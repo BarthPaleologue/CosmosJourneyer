@@ -3,8 +3,8 @@ import { UberScene } from "../../../controller/uberCore/uberScene";
 import { Planemo } from "./planemo";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MandelbulbModel } from "../../../model/planemos/mandelbulbModel";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class Mandelbulb extends AbstractBody implements Planemo {
     readonly model: MandelbulbModel;
@@ -26,7 +26,7 @@ export class Mandelbulb extends AbstractBody implements Planemo {
         this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
 
-    public override computeCulling(cameraPosition: Vector3): void {
+    public override computeCulling(camera: Camera): void {
         // do nothing
     }
 }

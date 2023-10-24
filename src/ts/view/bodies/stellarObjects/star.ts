@@ -14,6 +14,7 @@ import { Assets } from "../../../controller/assets";
 import { setRotationQuaternion } from "../../../controller/uberCore/transforms/basicTransform";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
@@ -72,8 +73,8 @@ export class Star extends AbstractBody {
         this.material.update(this.getInternalClock());
     }
 
-    public override computeCulling(cameraPosition: Vector3): void {
-        this.mesh.isVisible = true;
+    public override computeCulling(camera: Camera): void {
+        //this.mesh.isVisible = true;
     }
 
     public override dispose(): void {
