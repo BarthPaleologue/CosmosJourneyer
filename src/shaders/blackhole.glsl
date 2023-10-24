@@ -32,6 +32,8 @@ uniform sampler2D starfieldTexture;
 
 #pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
 
+#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
+
 vec3 projectOnPlane(vec3 vector, vec3 planeNormal) {
     return vector - dot(vector, planeNormal) * planeNormal;
 }
@@ -125,6 +127,17 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
     return diskColor;
 }
 
+/**
+ * Bends the light ray toward the black hole according to its distance
+ * The bending is tweaked to reach 0 when far enough so that we can skip some calculations
+ */
+vec3 bendRay(vec3 rayDir, vec3 blackholeDir, float distanceToCenter2, float maxBendDistance, float stepSize) {
+    float bendForce = object.radius / distanceToCenter2; //bending force
+    bendForce -= object.radius / (maxBendDistance * maxBendDistance); // bend force is 0 at maxBendDistance
+    bendForce = stepSize * max(0.0, bendForce); // multiply by step size, and clamp negative values
+    return normalize(rayDir + bendForce * blackholeDir); //bend ray towards BH
+}
+
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
@@ -135,6 +148,15 @@ void main() {
     // closest physical point from the camera in the direction of the pixel (occlusion)
     vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
     float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
+
+    float maxBendDistance = max(accretionDiskRadius * 3.0, object.radius * 4.0);
+
+    float t0, t1;
+    if(!rayIntersectSphere(camera.position, rayDir, object.position, maxBendDistance, t0, t1)) {
+        // the light ray will not be affected by the black hole, we can skip the calculations
+        gl_FragColor = screenColor;
+        return;
+    }
 
     vec4 colOut = vec4(0.0);
 
@@ -175,8 +197,7 @@ void main() {
                 float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / object.radius;//limit step size close to BH
                 stepSize = min(stepSize, min(farLimit, closeLimit));
 
-                float bendForce = stepSize * object.radius / distanceToCenter2;//bending force
-                rayDir = normalize(rayDir + bendForce * blackholeDir);//bend ray towards BH
+                rayDir = bendRay(rayDir, blackholeDir, distanceToCenter2, maxBendDistance, stepSize);
                 positionBHS += stepSize * rayDir;
 
             }
