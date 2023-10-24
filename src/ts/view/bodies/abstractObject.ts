@@ -7,6 +7,7 @@ import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Cullable } from "./cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getRotationQuaternion, setRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export interface NextState {
     position: Vector3;
@@ -128,7 +129,7 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
         setRotationQuaternion(this.transform, this.nextState.rotation);
     }
 
-    public abstract computeCulling(cameraPosition: Vector3): void;
+    public abstract computeCulling(camera: Camera): void;
 
     public dispose(): void {
         this.transform.dispose();

@@ -1,4 +1,4 @@
-import { PlayerController } from "../spacelegs/playerController";
+import { DefaultController } from "../spacelegs/defaultController";
 import { Keyboard } from "../controller/inputs/keyboard";
 
 import starTexture from "../../asset/textures/starParticle.png";
@@ -34,10 +34,11 @@ import { Settings } from "../settings";
 import { getForwardDirection, translate } from "../controller/uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { Mouse } from "../controller/inputs/mouse";
 
 export class StarMap {
     readonly scene: Scene;
-    private readonly controller: PlayerController;
+    private readonly controller: DefaultController;
 
     private isRunning = true;
 
@@ -60,7 +61,6 @@ export class StarMap {
     private readonly recycledBlackHoles: InstancedMesh[] = [];
 
     static readonly GENERATION_CADENCE = 100;
-    static readonly DELETION_CADENCE = 100;
 
     static readonly RENDER_RADIUS = 6;
 
@@ -102,12 +102,13 @@ export class StarMap {
         this.scene.skipPointerMovePicking = false;
         this.scene.useRightHandedSystem = true;
 
-        this.controller = new PlayerController(this.scene);
+        this.controller = new DefaultController(this.scene);
         this.controller.speed /= 10;
         this.controller.getActiveCamera().minZ = 0.01;
 
         this.scene.activeCamera = this.controller.getActiveCamera();
         this.controller.addInput(new Keyboard());
+        this.controller.addInput(new Mouse(engine.getRenderingCanvas() as HTMLCanvasElement, 0));
 
         this.starMapUI = new StarMapUI(this.scene);
 
@@ -221,15 +222,13 @@ export class StarMap {
         this.densityRNG = (x: number, y: number, z: number) => (1.0 - Math.abs(perlinRNG(x * 0.2, y * 0.2, z * 0.2))) ** 8;
 
         this.scene.onBeforeRenderObservable.add(() => {
-            if(!this.isRunning) return;
+            if (!this.isRunning) return;
 
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
             if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaTime);
 
             const playerDisplacementNegated = this.controller.update(deltaTime).negate();
-
-            this.controller.getTransform().position = Vector3.Zero();
 
             if (this.translationAnimation !== null) {
                 const oldPosition = this.controller.getTransform().getAbsolutePosition().clone();
@@ -238,10 +237,10 @@ export class StarMap {
 
                 const displacementNegated = oldPosition.subtractInPlace(newPosition);
 
-                translate(this.controller.getTransform(), displacementNegated);
                 playerDisplacementNegated.addInPlace(displacementNegated);
             }
 
+            translate(this.controller.getTransform(), playerDisplacementNegated);
             this.starMapCenterPosition.addInPlace(playerDisplacementNegated);
             for (const mesh of this.scene.meshes) mesh.position.addInPlace(playerDisplacementNegated);
 

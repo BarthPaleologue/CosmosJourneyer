@@ -13,6 +13,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getRotationQuaternion } from "../uberCore/transforms/basicTransform";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { getAngularSize, isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 
 /**
  * A quadTree is defined recursively
@@ -136,10 +138,10 @@ export class ChunkTree {
 
                 // if view ray goes through planet then we don't need to load more chunks
                 /*const direction = tree.mesh.getAbsolutePosition().subtract(observerPositionW);
-                const rayDir = direction.normalizeToNew();
+const rayDir = direction.normalizeToNew();
 
-                const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.parent.getAbsolutePosition(), this.rootChunkLength / 2);
-                if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
+const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.parent.getAbsolutePosition(), this.rootChunkLength / 2);
+if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
 
                 const newTree = [
                     this.createChunk(walked.concat([0]), true),
@@ -196,19 +198,14 @@ export class ChunkTree {
         return chunk;
     }
 
-    public computeCulling(cameraPosition: Vector3): void {
+    public computeCulling(camera: Camera): void {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             if (!chunk.isReady()) return;
 
-            chunk.mesh.setEnabled(true);
+            chunk.mesh.setEnabled(true); // this is needed to update the world matrix
             chunk.transform.computeWorldMatrix(true);
 
-            const distance = Vector3.Distance(cameraPosition, chunk.transform.getAbsolutePosition());
-            const angularSize = (chunk.getBoundingRadius() * 2) / distance;
-
-            const chunkIsTooSmall = angularSize / Settings.FOV < 0.002;
-
-            chunk.mesh.setEnabled(!chunkIsTooSmall);
+            chunk.mesh.setEnabled(isSizeOnScreenEnough(chunk, camera));
         });
     }
 

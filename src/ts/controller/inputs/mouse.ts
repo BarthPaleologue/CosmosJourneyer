@@ -17,6 +17,8 @@ export class Mouse implements Input {
     deadAreaRadius = 100;
     private canvas: HTMLCanvasElement;
 
+    private isLeftButtonDown = false;
+
     readonly onMouseEnterObservable: Observable<void> = new Observable();
     readonly onMouseLeaveObservable: Observable<void> = new Observable();
 
@@ -24,23 +26,40 @@ export class Mouse implements Input {
         this.deadAreaRadius = deadAreaRadius;
         this.canvas = canvas;
 
-        document.addEventListener("mousemove", (e) => {
-            this.dx = (e.x - this.x) / this.canvas.width;
-            this.dy = (e.y - this.y) / this.canvas.height;
-
-            this.x = e.x;
-            this.y = e.y;
+        document.addEventListener("pointermove", (e) => {
+            this.dx = e.x - this.x;
+            this.dy = e.y - this.y;
 
             this.dxToCenter = e.x - this.canvas.width / 2;
             this.dyToCenter = e.y - this.canvas.height / 2;
         });
 
-        document.addEventListener("mouseenter", () => {
+        window.addEventListener("mouseenter", () => {
             this.onMouseEnterObservable.notifyObservers();
         });
-        document.addEventListener("mouseleave", () => {
+        window.addEventListener("mouseleave", () => {
             this.onMouseLeaveObservable.notifyObservers();
         });
+
+        window.addEventListener("pointerdown", (e) => {
+            if (e.button === 0) this.isLeftButtonDown = true;
+        });
+
+        window.addEventListener("pointerup", (e) => {
+            if (e.button === 0) this.isLeftButtonDown = false;
+        });
+    }
+
+    public isLeftButtonPressed(): boolean {
+        return this.isLeftButtonDown;
+    }
+
+    public reset() {
+        this.x += this.dx;
+        this.y += this.dy;
+
+        this.dx = 0;
+        this.dy = 0;
     }
 
     getRoll() {
@@ -81,7 +100,15 @@ export class Mouse implements Input {
         return this.dx;
     }
 
+    getDxNormalized(): number {
+        return this.dx / Math.max(this.canvas.width, this.canvas.height);
+    }
+
     getDy(): number {
         return this.dy;
+    }
+
+    getDyNormalized(): number {
+        return this.dy / Math.max(this.canvas.height, this.canvas.width);
     }
 }

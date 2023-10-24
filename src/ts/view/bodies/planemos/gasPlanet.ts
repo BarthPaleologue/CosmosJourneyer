@@ -11,6 +11,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { isSizeOnScreenEnough } from "../../../utils/isObjectVisibleOnScreen";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial {
     private readonly mesh: Mesh;
@@ -53,8 +54,8 @@ export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial 
         this.material.update(controller, stellarObjects, deltaTime);
     }
 
-    public override computeCulling(cameraPosition: Vector3): void {
-        this.mesh.isVisible = isSizeOnScreenEnough(this, cameraPosition);
+    public override computeCulling(camera: Camera): void {
+        this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
     public override dispose(): void {

@@ -15,6 +15,7 @@ import { StellarObject } from "../stellarObjects/stellarObject";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMaterial {
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
@@ -64,12 +65,12 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
             this.transform,
             PhysicsShapeType.CONTAINER,
             {
-                mass: 1e10,
+                mass: 0,
                 restitution: 0.2
             },
             scene
         );
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 1e10 });
+        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
 
         this.sides = [
@@ -105,8 +106,8 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
         return super.getRadius() + this.model.physicalProperties.oceanLevel;
     }
 
-    public override computeCulling(cameraPosition: Vector3): void {
-        for (const side of this.sides) side.computeCulling(cameraPosition);
+    public override computeCulling(camera: Camera): void {
+        for (const side of this.sides) side.computeCulling(camera);
     }
 
     public override dispose(): void {

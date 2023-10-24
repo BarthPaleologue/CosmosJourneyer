@@ -12,6 +12,9 @@ import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Assets } from "../../../controller/assets";
 import { setRotationQuaternion } from "../../../controller/uberCore/transforms/basicTransform";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeType } from "@babylonjs/core";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
@@ -19,6 +22,8 @@ export class Star extends AbstractBody {
     private readonly material: StarMaterial;
 
     readonly model: StarModel;
+
+    //readonly aggregate: PhysicsAggregate;
 
     /**
      * New Star
@@ -45,6 +50,10 @@ export class Star extends AbstractBody {
                 : Assets.CreateBananaClone(this.model.radius * 2);
         this.mesh.parent = this.transform;
 
+        /*this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.SPHERE);
+        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
+        this.aggregate.body.disablePreStep = false;*/
+
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
         this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
@@ -64,8 +73,8 @@ export class Star extends AbstractBody {
         this.material.update(this.getInternalClock());
     }
 
-    public override computeCulling(cameraPosition: Vector3): void {
-        this.mesh.isVisible = true;
+    public override computeCulling(camera: Camera): void {
+        //this.mesh.isVisible = true;
     }
 
     public override dispose(): void {

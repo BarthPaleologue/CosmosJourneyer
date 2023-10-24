@@ -57,7 +57,7 @@ export class ShipController extends AbstractController {
         this.firstPersonCamera.parent = this.instanceRoot;
         this.firstPersonCamera.position = new Vector3(0, 1, 0);
 
-        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 1.4);
+        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 3.14/2);
         this.thirdPersonCamera.parent = this.instanceRoot;
 
         this.aggregate = new PhysicsAggregate(this.instanceRoot, PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
@@ -195,6 +195,8 @@ export class ShipController extends AbstractController {
 
                     rcsThruster.setThrottle(throttle);
                 }
+
+                mouse.reset();
             }
         } else {
             if (input.type === InputType.MOUSE) {
@@ -204,6 +206,8 @@ export class ShipController extends AbstractController {
 
                 roll(this.aggregate.transformNode, rollContribution * deltaTime);
                 pitch(this.aggregate.transformNode, pitchContribution * deltaTime);
+
+                mouse.reset();
             }
 
             if (input.type === InputType.KEYBOARD) {
