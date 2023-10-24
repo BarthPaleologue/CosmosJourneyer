@@ -195,6 +195,8 @@ export class ShipController extends AbstractController {
 
                     rcsThruster.setThrottle(throttle);
                 }
+
+                mouse.reset();
             }
         } else {
             if (input.type === InputType.MOUSE) {
@@ -204,6 +206,8 @@ export class ShipController extends AbstractController {
 
                 roll(this.aggregate.transformNode, rollContribution * deltaTime);
                 pitch(this.aggregate.transformNode, pitchContribution * deltaTime);
+
+                mouse.reset();
             }
 
             if (input.type === InputType.KEYBOARD) {

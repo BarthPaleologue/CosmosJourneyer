@@ -26,35 +26,40 @@ export class Mouse implements Input {
         this.deadAreaRadius = deadAreaRadius;
         this.canvas = canvas;
 
-        document.addEventListener("mousemove", (e) => {
-            this.dx = (e.x - this.x);
-            this.dy = (e.y - this.y);
-
-            this.x = e.x;
-            this.y = e.y;
+        document.addEventListener("pointermove", (e) => {
+            this.dx = e.x - this.x;
+            this.dy = e.y - this.y;
 
             this.dxToCenter = e.x - this.canvas.width / 2;
             this.dyToCenter = e.y - this.canvas.height / 2;
         });
 
-        document.addEventListener("mouseenter", () => {
+        window.addEventListener("mouseenter", () => {
             this.onMouseEnterObservable.notifyObservers();
         });
-        document.addEventListener("mouseleave", () => {
+        window.addEventListener("mouseleave", () => {
             this.onMouseLeaveObservable.notifyObservers();
         });
 
-        document.addEventListener("mousedown", (e) => {
+        window.addEventListener("pointerdown", (e) => {
             if (e.button === 0) this.isLeftButtonDown = true;
         });
 
-        document.addEventListener("mouseup", (e) => {
+        window.addEventListener("pointerup", (e) => {
             if (e.button === 0) this.isLeftButtonDown = false;
         });
     }
 
     public isLeftButtonPressed(): boolean {
         return this.isLeftButtonDown;
+    }
+
+    public reset() {
+        this.x += this.dx;
+        this.y += this.dy;
+
+        this.dx = 0;
+        this.dy = 0;
     }
 
     getRoll() {

@@ -36,14 +36,13 @@ export class DefaultController extends AbstractController {
         if (input.type === InputType.MOUSE) {
             const mouse = input as Mouse;
             if (mouse.isLeftButtonPressed()) {
-                const dx = mouse.getDxNormalized() * 70;
-                const dy = mouse.getDyNormalized() * 70;
-
-                console.log(dx, dy);
+                const dx = mouse.getDxNormalized() * 100;
+                const dy = mouse.getDyNormalized() * 100;
 
                 yaw(this.transform, -dx * this.rotationSpeed * deltaTime);
                 pitch(this.transform, dy * this.rotationSpeed * deltaTime);
             }
+            mouse.reset();
             return Vector3.Zero();
         }
         roll(this.transform, input.getRoll() * this.rotationSpeed * deltaTime);
