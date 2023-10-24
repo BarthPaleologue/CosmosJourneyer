@@ -83,7 +83,7 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
         this.internalClock += deltaTime;
     }
 
-    public computeNextOrbitalPosition(): Vector3 {
+    public updateOrbitalPosition() {
         if (this.model.orbit.period > 0) {
             const barycenter = this.parentObject?.transform.getAbsolutePosition() ?? Vector3.Zero();
             /*const orbitalPlaneNormal = this.parentObject?.transform.up ?? Vector3.Up();
@@ -92,11 +92,8 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
 
             const newPosition = getPointOnOrbit(barycenter, this.model.orbit, this.internalClock);
             this.nextState.position.copyFrom(newPosition);
-        } else {
-            this.nextState.position.copyFrom(this.transform.getAbsolutePosition());
+            this.transform.setAbsolutePosition(newPosition);
         }
-
-        return this.nextState.position;
     }
 
     /**
@@ -119,14 +116,9 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
         const elementaryRotationQuaternion = Quaternion.FromRotationMatrix(elementaryRotationMatrix);
         const newQuaternion = elementaryRotationQuaternion.multiply(getRotationQuaternion(this.transform));
 
-        this.nextState.rotation.copyFrom(newQuaternion);
+        setRotationQuaternion(this.transform, newQuaternion);
 
         return dtheta;
-    }
-
-    public applyNextState(): void {
-        this.transform.setAbsolutePosition(this.nextState.position);
-        setRotationQuaternion(this.transform, this.nextState.rotation);
     }
 
     public abstract computeCulling(camera: Camera): void;

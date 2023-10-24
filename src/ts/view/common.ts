@@ -8,7 +8,7 @@ export interface OrbitalObject extends ITransformable {
 
     model: BaseModel;
 
-    computeNextOrbitalPosition(): Vector3;
+    updateOrbitalPosition(): void;
 }
 
 export interface BaseObject extends BoundingSphere {

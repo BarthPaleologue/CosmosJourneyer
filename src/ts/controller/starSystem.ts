@@ -384,15 +384,12 @@ export class StarSystem {
     public update(deltaTime: number): void {
         const controller = this.scene.getActiveController();
 
-        /*const displacementTranslation = controller.aggregate.transformNode.getAbsolutePosition().negate();
-    this.translateEverythingNow(displacementTranslation);
-    translate(controller.aggregate.transformNode, displacementTranslation);*/
-
         for (const object of this.orbitalObjects) {
             object.updateInternalClock(deltaTime);
 
             const initialPosition = object.transform.getAbsolutePosition().clone();
-            const newPosition = object.computeNextOrbitalPosition().clone();
+            object.updateOrbitalPosition();
+            const newPosition = object.transform.getAbsolutePosition().clone();
 
             // if the controller is close to the body, it will follow its movement
             const orbitLimit = object instanceof SpaceStation ? 200 : 10;
@@ -417,8 +414,6 @@ export class StarSystem {
         const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
         this.registerTranslateAllBodies(displacementTranslation);
         translate(controller.getTransform(), displacementTranslation);
-
-        for (const object of this.orbitalObjects) object.applyNextState();
 
         for (const body of this.telluricPlanets.concat(this.satellites)) body.updateLOD(controller.getTransform().getAbsolutePosition());
 
