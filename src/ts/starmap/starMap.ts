@@ -31,7 +31,7 @@ import { TransformTranslationAnimation } from "../controller/uberCore/transforms
 import { makeNoise3D } from "fast-simplex-noise";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { Settings } from "../settings";
-import { getForwardDirection, translate } from "../controller/uberCore/transforms/basicTransform";
+import { getForwardDirection } from "../controller/uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Mouse } from "../controller/inputs/mouse";
@@ -246,14 +246,18 @@ export class StarMap {
             this.updateCells();
 
             if (this.controller.getActiveCamera().getAbsolutePosition().length() > StarMap.FLOATING_ORIGIN_MAX_DISTANCE) {
-                const translationToOrigin = this.controller.getTransform().getAbsolutePosition().negate();
-                this.controller.getTransform().position = Vector3.Zero();
-                this.starMapCenterPosition.addInPlace(translationToOrigin);
-                for (const mesh of this.scene.meshes) mesh.position.addInPlace(translationToOrigin);
+                this.translateCameraBackToOrigin();
             }
 
             this.thickLines.forEach((bondingLine) => bondingLine.update());
         });
+    }
+
+    public translateCameraBackToOrigin() {
+        const translationToOrigin = this.controller.getTransform().getAbsolutePosition().negate();
+        this.controller.getTransform().position = Vector3.Zero();
+        this.starMapCenterPosition.addInPlace(translationToOrigin);
+        for (const mesh of this.scene.meshes) mesh.position.addInPlace(translationToOrigin);
     }
 
     public setRunning(running: boolean): void {
