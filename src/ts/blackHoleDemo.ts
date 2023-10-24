@@ -67,7 +67,7 @@ const BH = starSystem.makeBlackHole(0);
 BH.model.orbit.radius = BH.getRadius() * 4;
 
 const planet = starSystem.makeTelluricPlanet();
-planet.model.orbit.radius = 50000e3;
+planet.model.orbit.radius = 45000e3;
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "g") {

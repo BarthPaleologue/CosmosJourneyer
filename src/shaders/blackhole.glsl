@@ -219,11 +219,25 @@ void main() {
         }
     }
 
-    //FIXME: when WebGPU supports texture2D inside if statements, move this to not compute it when occluded
+    // getting the screen coordinate of the end of the bended ray
     vec2 uv = uvFromWorld(positionBHS);
-    vec4 bg = vec4(0.0);
+    // check if there is an object occlusion
+    vec3 pixelWorldPositionEndRay = worldFromUV(uv);// the pixel position in world space (near plane)
+    vec3 rayDirToEndRay = normalize(pixelWorldPositionEndRay - camera.position);// normalized direction of the ray
 
-    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) {
+    float epsilon = 0.01;
+    float depthEndRay1 = texture2D(depthSampler, uv + vec2(epsilon, 0.0)).r;// the depth corresponding to the pixel in the depth map
+    float depthEndRay2 = texture2D(depthSampler, uv + vec2(-epsilon, 0.0)).r;// the depth corresponding to the pixel in the depth map
+    float depthEndRay3 = texture2D(depthSampler, uv + vec2(0.0, epsilon)).r;// the depth corresponding to the pixel in the depth map
+    float depthEndRay4 = texture2D(depthSampler, uv + vec2(0.0 -epsilon)).r;// the depth corresponding to the pixel in the depth map
+    float depthEndRay = min(min(depthEndRay1, depthEndRay2), min(depthEndRay3, depthEndRay4));
+    // closest physical point from the camera in the direction of the pixel (occlusion)
+    vec3 closestPointEndRay = (pixelWorldPositionEndRay - camera.position) * remap(depthEndRay, 0.0, 1.0, camera.near, camera.far);
+    float maximumDistanceEndRay = length(closestPointEndRay);// the maxium ray length due to occlusion
+    float BHDistance = length(camera.position - object.position);
+
+    vec4 bg = vec4(0.0);
+    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0 && maximumDistanceEndRay > BHDistance - object.radius) {
         bg = texture2D(textureSampler, uv);
     } else {
         vec2 starfieldUV = vec2(
