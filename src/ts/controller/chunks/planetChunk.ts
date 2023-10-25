@@ -40,7 +40,6 @@ export class PlanetChunk implements Transformable {
 
         this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
-        this.mesh.isBlocker = true;
         this.mesh.material = material;
         /*this.mesh.material = Assets.DebugMaterial(id); //material;
         (this.mesh.material as StandardMaterial).disableLighting = true;

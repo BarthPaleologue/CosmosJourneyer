@@ -3,7 +3,6 @@ import { ColorMode, ColorSettings } from "./colorSettingsInterface";
 import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../../controller/assets";
-import { flattenVector3Array } from "../../utils/algebra";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { TerrainSettings } from "../../model/terrain/terrainSettings";
 import { SolidPhysicalProperties } from "../../model/common";
@@ -164,8 +163,6 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
     }
 
     public update(activeControllerPosition: Vector3, stellarObjects: StellarObject[]) {
-        this.planet.updateCache(true);
-
         this.setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
         this.setMatrix("planetInverseRotationMatrix", getInverseRotationMatrix(this.planet));
 

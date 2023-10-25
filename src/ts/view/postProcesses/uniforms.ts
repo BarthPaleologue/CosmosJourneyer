@@ -1,7 +1,6 @@
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { BaseObject, OrbitalObject } from "../common";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     return [
