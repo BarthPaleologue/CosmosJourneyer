@@ -6,7 +6,11 @@ import { getPointOnOrbit } from "../../model/orbit/orbit";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Cullable } from "./cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { getRotationQuaternion, setRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
+import {
+    getRotationQuaternion,
+    setRotationQuaternion,
+    translate
+} from "../../controller/uberCore/transforms/basicTransform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export abstract class AbstractObject implements OrbitalObject, BaseObject, Cullable {
@@ -16,9 +20,6 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
 
     //TODO: make an universal clock ?? or not it could be funny
     private internalClock = 0;
-
-    private theta = 0;
-    readonly rotationMatrixAroundAxis = new Matrix();
 
     readonly name: string;
 
@@ -54,14 +55,6 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
     }
 
     /**
-     * Returns the rotation angle of the body around its axis
-     * @returns the rotation angle of the body around its axis
-     */
-    public getRotationAngle(): number {
-        return this.theta;
-    }
-
-    /**
      * Returns the internal clock of the body (in seconds)
      * @returns the internal clock of the body (in seconds)
      */
@@ -77,15 +70,17 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
         this.internalClock += deltaTime;
     }
 
-    public updateOrbitalPosition() {
-        if (this.model.orbit.period > 0) {
-            const barycenter = this.parentObject?.getTransform().getAbsolutePosition() ?? Vector3.Zero();
+    public updateOrbitalPosition(deltaTime: number) {
+        if (this.model.orbit.period > 0 && this.parentObject !== null) {
+            this.parentObject.getTransform().computeWorldMatrix(true);
+            const barycenter = this.parentObject.getTransform().getAbsolutePosition();
             /*const orbitalPlaneNormal = this.parentObject?.transform.up ?? Vector3.Up();
-
-      if (this.model.orbit.isPlaneAlignedWithParent) this.model.orbit.normalToPlane = orbitalPlaneNormal;*/
+if (this.model.orbit.isPlaneAlignedWithParent) this.model.orbit.normalToPlane = orbitalPlaneNormal;*/
 
             const newPosition = getPointOnOrbit(barycenter, this.model.orbit, this.internalClock);
-            this.transform.setAbsolutePosition(newPosition);
+            const oldPosition = getPointOnOrbit(barycenter, this.model.orbit, this.internalClock - deltaTime);
+            const translation = newPosition.subtract(oldPosition);
+            translate(this.transform, translation);
         }
     }
 
@@ -100,12 +95,8 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
         }
 
         const dtheta = (2 * Math.PI * deltaTime) / this.model.physicalProperties.rotationPeriod;
-        this.theta += dtheta;
 
-        this.rotationMatrixAroundAxis.copyFrom(Matrix.RotationAxis(new Vector3(0, 1, 0), this.theta));
-
-        const elementaryRotationMatrix = Matrix.RotationAxis(this.getRotationAxis(), dtheta);
-        const elementaryRotationQuaternion = Quaternion.FromRotationMatrix(elementaryRotationMatrix);
+        const elementaryRotationQuaternion = Quaternion.RotationAxis(this.getRotationAxis(), dtheta);
         const newQuaternion = elementaryRotationQuaternion.multiply(getRotationQuaternion(this.transform));
 
         setRotationQuaternion(this.transform, newQuaternion);

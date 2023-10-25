@@ -7,7 +7,7 @@ export interface OrbitalObject extends Transformable {
 
     model: BaseModel;
 
-    updateOrbitalPosition(): void;
+    updateOrbitalPosition(deltaTime: number): void;
 }
 
 export interface BaseObject extends BoundingSphere {

@@ -25,6 +25,7 @@ import { MandelbulbModel } from "../model/planemos/mandelbulbModel";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
 import { getMoonSeed } from "../model/planemos/common";
 import { NeutronStarModel } from "../model/stellarObjects/neutronStarModel";
+import { ShipController } from "../spaceship/shipController";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -377,45 +378,54 @@ export class StarSystem {
         const controller = this.scene.getActiveController();
         const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
 
+        nearestBody.updateInternalClock(deltaTime);
+        const initialPosition = nearestBody.getTransform().getAbsolutePosition().clone();
+        nearestBody.updateOrbitalPosition(deltaTime);
+        const newPosition = nearestBody.getTransform().getAbsolutePosition().clone();
+        const nearestBodyDisplacement = newPosition.subtract(initialPosition);
+        translate(nearestBody.getTransform(), nearestBodyDisplacement.negate());
+
+        const dthetaNearest = nearestBody.updateRotation(deltaTime);
+        nearestBody.updateRotation(-deltaTime);
+
+        // As the nearest object is kept in place, we need to transfer its movement to other bodies
         for (const object of this.orbitalObjects) {
+            if (object === nearestBody) continue;
+            translate(object.getTransform(), nearestBodyDisplacement.negate());
+            rotateAround(object.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
+        }
+
+        for (const object of this.orbitalObjects) {
+            if(object === nearestBody) continue;
+
             object.updateInternalClock(deltaTime);
-
-            const initialPosition = object.getTransform().getAbsolutePosition().clone();
-            object.updateOrbitalPosition();
-            const newPosition = object.getTransform().getAbsolutePosition().clone();
-
-            // if the controller is close to the body, it will follow its movement
-            const orbitLimit = object instanceof SpaceStation ? 200 : 10;
-            if (isOrbiting(controller, object, orbitLimit) && this.getNearestObject() === object) {
-                translate(controller.getTransform(), newPosition.subtract(initialPosition));
-            }
-
-            const dtheta = object.updateRotation(deltaTime);
-
-            // if the controller is close to the object and it is a body, it will follow its rotation
-            if (isOrbiting(controller, object) && this.getNearestBody() === object) {
-                rotateAround(controller.getTransform(), object.getTransform().getAbsolutePosition(), object.getRotationAxis(), dtheta);
-            }
+            object.updateOrbitalPosition(deltaTime);
+            object.updateRotation(deltaTime);
         }
 
         controller.update(deltaTime);
-
-        /*const direction = controller.aggregate.transformNode.getAbsolutePosition().subtract(object.nextState.position).normalize();
-        const gravity = 9.81;
-        controller.aggregate.body.applyForce(direction.scale(gravity), controller.aggregate.body.getObjectCenterWorld());*/
-
-        // floating origin
-        if(controller.getActiveCamera().getAbsolutePosition().length() > 100) {
-            const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
-            this.translateEverythingNow(displacementTranslation);
-            translate(controller.getTransform(), displacementTranslation);
-        }
 
         for (const body of this.telluricPlanets.concat(this.satellites)) body.updateLOD(controller.getTransform().getAbsolutePosition());
 
         for (const object of this.orbitalObjects) object.computeCulling(controller.getActiveCamera());
 
-        for (const planet of this.planemosWithMaterial) planet.updateMaterial(controller, this.stellarObjects, deltaTime);
+        // floating origin
+        if (controller.getActiveCamera().getAbsolutePosition().length() > 0) {
+            const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
+            this.translateEverythingNow(displacementTranslation);
+            translate(controller.getTransform(), displacementTranslation);
+        }
+
+        this.updateShaders(deltaTime);
+    }
+
+    public updateShaders(deltaTime: number) {
+        const controller = this.scene.getActiveController();
+        const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
+
+        for (const planet of this.planemosWithMaterial) {
+            planet.updateMaterial(controller, this.stellarObjects, deltaTime);
+        }
 
         for (const stellarObject of this.stellarObjects) {
             if (stellarObject instanceof Star) stellarObject.updateMaterial();
