@@ -72,10 +72,10 @@ export class GasPlanetMaterial extends ShaderMaterial {
             colorSharpness: randRangeInt(40, 80, model.rng, 80) / 10
         };
 
-        /*this.onBindObservable.add(() => {
+        this.onBindObservable.add(() => {
             const effect = this.getEffect();
             MaterialHelper.BindLogDepth(null, effect, scene);
-        });*/
+        });
 
         this.setFloat("seed", model.seed);
 

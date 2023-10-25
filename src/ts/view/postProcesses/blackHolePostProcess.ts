@@ -37,7 +37,6 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
                 get: () => {
                     const rotationMatrix = new Matrix();
                     starfieldRotation.toRotationMatrix(rotationMatrix);
-                    console.log(starfieldRotation);
                     return rotationMatrix;
                 }
             },
