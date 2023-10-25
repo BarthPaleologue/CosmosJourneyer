@@ -129,9 +129,8 @@ void main() {
     vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
-    // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
-    float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
+    // actual depth of the scene
+    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
 
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(camera.position, rayDir, object.position, object.radius, impactPoint, escapePoint))) {
