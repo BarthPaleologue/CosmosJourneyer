@@ -26,6 +26,7 @@ import { getMoonSeed } from "./model/planemos/common";
 import { NeutronStarModel } from "./model/stellarObjects/neutronStarModel";
 import { RingsUniforms } from "./model/ringsUniform";
 import { StarModel } from "./model/stellarObjects/starModel";
+import { BlackHoleModel } from "./model/stellarObjects/blackHoleModel";
 
 const engine = new SpaceEngine();
 
@@ -175,6 +176,11 @@ andromaqueModel.orbit.radius = 4300 * ares.getRadius();
 andromaqueModel.orbit.normalToPlane = Vector3.Up();
 
 const andromaque = starSystem.makeGasPlanet(andromaqueModel);
+
+/*const blackHoleModel = new BlackHoleModel(0.5, sunModel);
+blackHoleModel.orbit.period = 60 * 60 * 24 * 365.25;
+blackHoleModel.orbit.radius = 100 * ares.getRadius();
+const blackHole = starSystem.makeBlackHole(blackHoleModel);*/
 
 engine.init();
 
