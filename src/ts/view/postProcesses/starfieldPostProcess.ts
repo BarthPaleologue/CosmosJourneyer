@@ -36,7 +36,6 @@ export class StarfieldPostProcess extends UberPostProcess {
                 get: () => {
                     const rotationMatrix = new Matrix();
                     starfieldRotation.toRotationMatrix(rotationMatrix);
-                    console.log(starfieldRotation);
                     return rotationMatrix;
                 }
             },
