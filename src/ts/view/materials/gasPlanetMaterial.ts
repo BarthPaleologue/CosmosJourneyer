@@ -51,7 +51,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
                 "logarithmicDepthConstant"
             ],
-            //defines: ["#define LOGARITHMICDEPTH"]
+            defines: ["#define LOGARITHMICDEPTH"]
         });
 
         this.planet = planet;
