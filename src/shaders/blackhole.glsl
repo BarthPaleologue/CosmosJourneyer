@@ -169,6 +169,7 @@ void main() {
     if (maximumDistance < length(positionBHS)) occluded = true;
 
     vec4 col = vec4(0.0);
+    vec4 glow = vec4(0.0);
 
     if (!occluded) {
         for (int disks = 0; disks < 15; disks++) {
@@ -200,12 +201,14 @@ void main() {
                 rayDir = bendRay(rayDir, blackholeDir, distanceToCenter2, maxBendDistance, stepSize);
                 positionBHS += stepSize * rayDir;
 
+                //TODO: improve glow
+                //glow += vec4(1.2,1.1,1, 1.0) * (0.2 * (object.radius / distanceToCenter2) * stepSize * clamp(distanceToCenter / object.radius - 1.2, 0.0, 1.0)); //adds fairly cheap glow
             }
 
             if (distanceToCenter < object.radius) {
                 suckedInBH = true;
                 break;
-            } else if (distanceToCenter > object.radius * 10000.0) {
+            } else if (distanceToCenter > object.radius * 5000.0) {
                 escapedBH = true;
                 break;
             } else if (projectedDistance <= accretionDiskHeight) {
@@ -254,9 +257,9 @@ void main() {
     } else if (suckedInBH) {
         finalColor = vec4(col.rgb * col.a, 1.0);
     } else if (escapedBH) {
-        finalColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
+        finalColor = vec4(mix(bg.rgb, col.rgb + glow.rgb *(col.a +  glow.a), col.a), 1.0);
     } else {
-        finalColor = vec4(col.rgb, 1.0);
+        finalColor = vec4(col.rgb + glow.rgb *(col.a +  glow.a), 1.0);
     }
 
     gl_FragColor = finalColor;
