@@ -429,6 +429,9 @@ export class StarSystem {
         const controller = this.scene.getActiveController();
         const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
 
+        const shouldCompensateRotation =
+            Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().getAbsolutePosition()) < nearestBody.getRadius() * 4;
+
         nearestBody.updateInternalClock(deltaTime);
         const initialPosition = nearestBody.getTransform().getAbsolutePosition().clone();
         nearestBody.updateOrbitalPosition(deltaTime);
@@ -437,17 +440,19 @@ export class StarSystem {
         translate(nearestBody.getTransform(), nearestBodyDisplacement.negate());
 
         const dthetaNearest = nearestBody.updateRotation(deltaTime);
-        nearestBody.updateRotation(-deltaTime);
+        if (shouldCompensateRotation) nearestBody.updateRotation(-deltaTime);
 
         // As the nearest object is kept in place, we need to transfer its movement to other bodies
         for (const object of this.orbitalObjects) {
             if (object === nearestBody) continue;
             translate(object.getTransform(), nearestBodyDisplacement.negate());
-            rotateAround(object.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
+            if (shouldCompensateRotation) rotateAround(object.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
         }
 
-        const starfieldAdditionalRotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), dthetaNearest);
-        this.starfieldRotation.copyFrom(starfieldAdditionalRotation.multiply(this.starfieldRotation));
+        if (shouldCompensateRotation) {
+            const starfieldAdditionalRotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), dthetaNearest);
+            this.starfieldRotation.copyFrom(starfieldAdditionalRotation.multiply(this.starfieldRotation));
+        }
 
         for (const object of this.orbitalObjects) {
             if (object === nearestBody) continue;
