@@ -26,11 +26,14 @@ import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
 import { getMoonSeed } from "../model/planemos/common";
 import { NeutronStarModel } from "../model/stellarObjects/neutronStarModel";
 import { ShipController } from "../spaceship/shipController";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export class StarSystem {
     private readonly scene: UberScene;
 
     readonly postProcessManager: PostProcessManager;
+
+    private readonly starfieldRotation: Quaternion = Quaternion.Identity();
 
     private readonly orbitalObjects: AbstractObject[] = [];
 
@@ -365,7 +368,7 @@ export class StarSystem {
      * @private
      */
     private initPostProcesses() {
-        this.postProcessManager.addStarField(this.stellarObjects, this.celestialBodies);
+        this.postProcessManager.addStarField(this.stellarObjects, this.celestialBodies, this.starfieldRotation);
         for (const object of this.orbitalObjects) this.postProcessManager.addObject(object, this.stellarObjects);
         this.postProcessManager.setBody(this.getNearestBody(this.scene.getActiveUberCamera().position));
     }
@@ -394,6 +397,9 @@ export class StarSystem {
             translate(object.getTransform(), nearestBodyDisplacement.negate());
             rotateAround(object.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
         }
+        
+        const starfieldAdditionalRotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), dthetaNearest);
+        this.starfieldRotation.copyFrom(starfieldAdditionalRotation.multiply(this.starfieldRotation));
 
         for (const object of this.orbitalObjects) {
             if(object === nearestBody) continue;

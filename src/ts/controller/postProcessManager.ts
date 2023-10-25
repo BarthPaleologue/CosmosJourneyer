@@ -34,6 +34,7 @@ import { MatterJetPostProcess } from "../view/postProcesses/matterJetPostProcess
 import { NeutronStar } from "../view/bodies/stellarObjects/neutronStar";
 import { ShadowPostProcess } from "../view/postProcesses/shadowPostProcess";
 import { LensFlarePostProcess } from "../view/postProcesses/lensFlarePostProcess";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -257,8 +258,8 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      * @param planets An array of planets
      */
-    public addStarField(stellarObjects: StellarObject[], planets: AbstractBody[]) {
-        this.starFields.push(new StarfieldPostProcess(this.scene, stellarObjects, planets));
+    public addStarField(stellarObjects: StellarObject[], planets: AbstractBody[], starfieldRotation: Quaternion) {
+        this.starFields.push(new StarfieldPostProcess(this.scene, stellarObjects, planets, starfieldRotation));
     }
 
     /**

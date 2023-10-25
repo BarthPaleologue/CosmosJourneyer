@@ -13,26 +13,33 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcessTypes";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
+import {
+    SamplerEnumType,
+    ShaderSamplers,
+    ShaderUniforms,
+    UniformEnumType
+} from "../../controller/uberCore/postProcesses/types";
+import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 
 const shaderName = "starfield";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
 
-export interface StarfieldSettings {
-    foo: number;
-}
-
 export class StarfieldPostProcess extends UberPostProcess {
-    settings: StarfieldSettings;
-
-    constructor(scene: UberScene, stellarObjects: StellarObject[], bodies: AbstractBody[]) {
-        const settings: StarfieldSettings = {
-            foo: 1
-        };
+    constructor(scene: UberScene, stellarObjects: StellarObject[], bodies: AbstractBody[], starfieldRotation: Quaternion) {
 
         const uniforms: ShaderUniforms = [
             ...getActiveCameraUniforms(scene),
             ...getStellarObjectsUniforms(stellarObjects),
+            {
+                name: "starfieldRotation",
+                type: UniformEnumType.Matrix,
+                get: () => {
+                    const rotationMatrix = new Matrix();
+                    starfieldRotation.toRotationMatrix(rotationMatrix);
+                    console.log(starfieldRotation);
+                    return rotationMatrix;
+                }
+            },
             {
                 name: "visibility",
                 type: UniformEnumType.Float,
@@ -82,7 +89,5 @@ export class StarfieldPostProcess extends UberPostProcess {
         ];
 
         super("starfield", shaderName, uniforms, samplers, scene);
-
-        this.settings = settings;
     }
 }
