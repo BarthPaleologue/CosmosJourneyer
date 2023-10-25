@@ -35,7 +35,7 @@ export class GasCloudsPanel extends EditorPanel {
         this.sliders = [
             new Slider("colorSharpness", document.getElementById("colorSharpness") as HTMLElement, 0, 100, planet.material.colorSettings.colorSharpness * 10, (val: number) => {
                 colorSettings.colorSharpness = val / 10;
-                material.updateManual();
+                material.updateConstants();
             })
         ];
     }
