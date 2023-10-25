@@ -8,6 +8,7 @@ import { Assets } from "../../controller/assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { getForwardDirection } from "../../controller/uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
+import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 
 const shaderName = "blackhole";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
@@ -21,7 +22,7 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
     readonly settings: BlackHoleSettings;
     readonly object: BlackHole;
 
-    constructor(blackHole: BlackHole, scene: UberScene) {
+    constructor(blackHole: BlackHole, scene: UberScene, starfieldRotation: Quaternion) {
         const settings: BlackHoleSettings = {
             accretionDiskRadius: blackHole.model.physicalProperties.accretionDiskRadius,
             rotationPeriod: 1.5
@@ -30,6 +31,16 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
         const uniforms: ShaderUniforms = [
             ...getObjectUniforms(blackHole),
             ...getActiveCameraUniforms(scene),
+            {
+                name: "starfieldRotation",
+                type: UniformEnumType.Matrix,
+                get: () => {
+                    const rotationMatrix = new Matrix();
+                    starfieldRotation.toRotationMatrix(rotationMatrix);
+                    console.log(starfieldRotation);
+                    return rotationMatrix;
+                }
+            },
             {
                 name: "time",
                 type: UniformEnumType.Float,

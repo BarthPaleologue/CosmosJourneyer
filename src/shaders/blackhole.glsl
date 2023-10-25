@@ -22,6 +22,8 @@ uniform sampler2D depthSampler;
 
 uniform sampler2D starfieldTexture;
 
+uniform mat4 starfieldRotation;
+
 #pragma glslify: camera = require(./utils/camera.glsl)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
@@ -198,6 +200,8 @@ void main() {
         }
     }
 
+    rayDir = vec3(starfieldRotation * vec4(rayDir, 1.0));
+
     //FIXME: when WebGPU supports texture2D inside if statements, move this to not compute it when occluded
     /*vec2 uv = uvFromWorld(positionBHS);
     vec4 bg = vec4(0.0);
@@ -208,6 +212,7 @@ void main() {
     sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
     acos(rayDir.y) / 3.14159265359
     );
+
     vec4 bg = texture2D(starfieldTexture, starfieldUV);
     //}
 
