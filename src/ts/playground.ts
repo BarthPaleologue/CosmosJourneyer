@@ -28,6 +28,7 @@ import { UberScene } from "./controller/uberCore/uberScene";
 import { Settings } from "./settings";
 import { StarModel } from "./model/stellarObjects/starModel";
 import { Star } from "./view/bodies/stellarObjects/star";
+import { translate } from "./controller/uberCore/transforms/basicTransform";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -136,6 +137,13 @@ function updateBeforeHavok() {
         aggregate.body.applyForce(gravityDirection.scaleInPlace(gravity * mass), aggregate.body.getObjectCenterWorld());
     }
 
+    if(spaceship.getAggregate().transformNode.getAbsolutePosition().length() > 100) {
+        const displacement = spaceship.getAggregate().transformNode.getAbsolutePosition().negate();
+        for(const mesh of meshes) {
+            translate(mesh, displacement);
+        }
+    }
+
     // planet thingy
     newton.updateInternalClock(-deltaTime / 10);
     aurora.updateInternalClock(-deltaTime / 10);
@@ -147,17 +155,8 @@ newton.applyNextState();*/
     Assets.ChunkForge.update();
 }
 
-function updateAfterHavok() {
-    const spaceshipPosition = spaceship.getAbsolutePosition();
-
-    for (const mesh of meshes) {
-        mesh.position.subtractInPlace(spaceshipPosition);
-    }
-}
-
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
-    scene.onAfterPhysicsObservable.add(updateAfterHavok);
     scene.onBeforePhysicsObservable.add(updateBeforeHavok);
     engine.runRenderLoop(() => scene.render());
 });
