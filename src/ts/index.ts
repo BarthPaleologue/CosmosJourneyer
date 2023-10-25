@@ -51,7 +51,7 @@ spaceshipController.addInput(gamepad);
 spaceshipController.addInput(mouse);
 
 const physicsViewer = new PhysicsViewer();
-//physicsViewer.showBody(spaceshipController.aggregate.body);
+physicsViewer.showBody(spaceshipController.aggregate.body);
 
 mouse.onMouseLeaveObservable.add(() => {
     if (scene.getActiveController() === spaceshipController) engine.pause();

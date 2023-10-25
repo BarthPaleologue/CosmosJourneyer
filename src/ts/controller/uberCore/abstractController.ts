@@ -3,6 +3,7 @@ import { Input } from "../inputs/input";
 import { UberCamera } from "./uberCamera";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import { ITransformable } from "../../view/common";
 
 export abstract class AbstractController {
     /**

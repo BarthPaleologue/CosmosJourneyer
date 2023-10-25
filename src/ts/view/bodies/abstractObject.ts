@@ -9,18 +9,8 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { getRotationQuaternion, setRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
-export interface NextState {
-    position: Vector3;
-    rotation: Quaternion;
-}
-
 export abstract class AbstractObject implements OrbitalObject, BaseObject, Cullable {
     readonly transform: TransformNode;
-
-    readonly nextState: NextState = {
-        position: Vector3.Zero(),
-        rotation: Quaternion.Identity()
-    };
 
     readonly postProcesses: PostProcessType[] = [];
 
@@ -88,10 +78,9 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
             const barycenter = this.parentObject?.transform.getAbsolutePosition() ?? Vector3.Zero();
             /*const orbitalPlaneNormal = this.parentObject?.transform.up ?? Vector3.Up();
 
-            if (this.model.orbit.isPlaneAlignedWithParent) this.model.orbit.normalToPlane = orbitalPlaneNormal;*/
+      if (this.model.orbit.isPlaneAlignedWithParent) this.model.orbit.normalToPlane = orbitalPlaneNormal;*/
 
             const newPosition = getPointOnOrbit(barycenter, this.model.orbit, this.internalClock);
-            this.nextState.position.copyFrom(newPosition);
             this.transform.setAbsolutePosition(newPosition);
         }
     }
@@ -103,7 +92,6 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
      */
     public updateRotation(deltaTime: number): number {
         if (this.model.physicalProperties.rotationPeriod === 0) {
-            this.nextState.rotation.copyFrom(getRotationQuaternion(this.transform));
             return 0;
         }
 

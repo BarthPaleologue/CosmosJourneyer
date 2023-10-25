@@ -311,14 +311,6 @@ export class StarSystem {
     }
 
     /**
-     * Translates all celestial bodies and spacestations in the system by the given displacement
-     * @param displacement The displacement applied to all bodies
-     */
-    public registerTranslateAllBodies(displacement: Vector3): void {
-        for (const object of this.orbitalObjects) object.nextState.position.addInPlace(displacement);
-    }
-
-    /**
      * Returns the list of all celestial bodies managed by the star system
      */
     public getBodies(): AbstractBody[] {
@@ -383,6 +375,7 @@ export class StarSystem {
      */
     public update(deltaTime: number): void {
         const controller = this.scene.getActiveController();
+        const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
 
         for (const object of this.orbitalObjects) {
             object.updateInternalClock(deltaTime);
@@ -395,25 +388,28 @@ export class StarSystem {
             const orbitLimit = object instanceof SpaceStation ? 200 : 10;
             if (isOrbiting(controller, object, orbitLimit) && this.getNearestObject() === object) {
                 translate(controller.getTransform(), newPosition.subtract(initialPosition));
-
-                /*const direction = controller.aggregate.transformNode.getAbsolutePosition().subtract(object.nextState.position).normalize();
-        const gravity = 9.81;
-        controller.aggregate.body.applyForce(direction.scale(gravity), controller.aggregate.body.getObjectCenterWorld());*/
             }
 
             const dtheta = object.updateRotation(deltaTime);
 
             // if the controller is close to the object and it is a body, it will follow its rotation
             if (isOrbiting(controller, object) && this.getNearestBody() === object) {
-                rotateAround(controller.getTransform(), object.nextState.position, object.getRotationAxis(), dtheta);
+                rotateAround(controller.getTransform(), object.transform.getAbsolutePosition(), object.getRotationAxis(), dtheta);
             }
         }
 
         controller.update(deltaTime);
 
-        const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
-        this.registerTranslateAllBodies(displacementTranslation);
-        translate(controller.getTransform(), displacementTranslation);
+        /*const direction = controller.aggregate.transformNode.getAbsolutePosition().subtract(object.nextState.position).normalize();
+        const gravity = 9.81;
+        controller.aggregate.body.applyForce(direction.scale(gravity), controller.aggregate.body.getObjectCenterWorld());*/
+
+        // floating origin
+        if(controller.getActiveCamera().getAbsolutePosition().length() > 1000) {
+            const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
+            this.translateEverythingNow(displacementTranslation);
+            translate(controller.getTransform(), displacementTranslation);
+        }
 
         for (const body of this.telluricPlanets.concat(this.satellites)) body.updateLOD(controller.getTransform().getAbsolutePosition());
 
@@ -425,7 +421,6 @@ export class StarSystem {
             if (stellarObject instanceof Star) stellarObject.updateMaterial();
         }
 
-        const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
         this.postProcessManager.setBody(nearestBody);
         const rings = this.postProcessManager.getRings(nearestBody);
         const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;

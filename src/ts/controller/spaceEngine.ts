@@ -244,7 +244,7 @@ export class SpaceEngine {
             this.getEngine().runRenderLoop(() => this.getActiveScene().render());
         });
 
-        this.starSystemScene.registerBeforeRender(() => {
+        this.starSystemScene.onBeforePhysicsObservable.add(() => {
             if (this.isPaused()) return;
 
             const starSystemScene = this.getStarSystemScene();
