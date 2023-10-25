@@ -38,7 +38,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
 
         this.model = model instanceof TelluricPlanemoModel ? model : new TelluricPlanemoModel(model, parentBody?.model);
 
-        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
 
         this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.SHADOW);
 
@@ -59,10 +59,10 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
 
         if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
 
-        this.material = new TelluricPlanemoMaterial(this.name, this.transform, this.model, scene);
+        this.material = new TelluricPlanemoMaterial(this.name, this.getTransform(), this.model, scene);
 
         this.aggregate = new PhysicsAggregate(
-            this.transform,
+            this.getTransform(),
             PhysicsShapeType.CONTAINER,
             {
                 mass: 0,

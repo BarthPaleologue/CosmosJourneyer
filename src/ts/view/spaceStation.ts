@@ -26,7 +26,7 @@ export class SpaceStation extends AbstractObject {
         this.model = new SpaceStationModel(seed, parentBody?.model);
 
         this.instance = Assets.CreateSpaceStationInstance();
-        this.instance.parent = this.transform;
+        this.instance.parent = this.getTransform();
 
         for (const mesh of this.instance.getChildMeshes()) {
             if (mesh.name.includes("ring")) {
@@ -34,8 +34,8 @@ export class SpaceStation extends AbstractObject {
             }
         }
 
-        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
-        this.transform.rotate(Axis.Y, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.Y, this.model.physicalProperties.axialTilt);
 
         this.postProcesses.push(PostProcessType.OVERLAY);
     }

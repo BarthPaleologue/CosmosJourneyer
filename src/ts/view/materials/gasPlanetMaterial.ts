@@ -4,7 +4,6 @@ import surfaceMaterialFragment from "../../../shaders/gasPlanetMaterial/fragment
 import surfaceMaterialVertex from "../../../shaders/gasPlanetMaterial/vertex.glsl";
 import { GazColorSettings } from "./colorSettingsInterface";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
-import { flattenVector3Array } from "../../utils/algebra";
 import { GasPlanetModel } from "../../model/planemos/gasPlanetModel";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
@@ -104,7 +103,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         for (let i = 0; i < stellarObjects.length; i++) {
             const star = stellarObjects[i];
-            this.setVector3(`stars[${i}].position`, star.transform.getAbsolutePosition());
+            this.setVector3(`stars[${i}].position`, star.getTransform().getAbsolutePosition());
             this.setVector3(`stars[${i}].color`, star instanceof Star ? star.model.surfaceColor : Vector3.One());
         }
         this.setInt("nbStars", stellarObjects.length);

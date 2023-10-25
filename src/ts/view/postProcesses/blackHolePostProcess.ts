@@ -62,7 +62,7 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
                 name: "forwardAxis",
                 type: UniformEnumType.Vector3,
                 get: () => {
-                    return getForwardDirection(blackHole.transform);
+                    return getForwardDirection(blackHole.getTransform());
                 }
             }
         ];

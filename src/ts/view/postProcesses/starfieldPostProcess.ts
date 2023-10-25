@@ -43,7 +43,7 @@ export class StarfieldPostProcess extends UberPostProcess {
                         if (star instanceof BlackHole) return 1;
                         vis = Math.min(
                             vis,
-                            1.0 + Vector3.Dot(star.transform.getAbsolutePosition().normalizeToNew(), scene.getActiveController().getActiveCamera().getDirection(Axis.Z))
+                            1.0 + Vector3.Dot(star.getTransform().getAbsolutePosition().normalizeToNew(), scene.getActiveController().getActiveCamera().getDirection(Axis.Z))
                         );
                     }
                     vis = 0.5 + vis * 0.5;
@@ -52,14 +52,14 @@ export class StarfieldPostProcess extends UberPostProcess {
                     if (nearest instanceof TelluricPlanemo) {
                         const planet = nearest as TelluricPlanemo;
                         if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {
-                            const height = planet.transform.getAbsolutePosition().length();
+                            const height = planet.getTransform().getAbsolutePosition().length();
                             //FIXME: has to be dynamic
                             const maxHeight = Settings.ATMOSPHERE_HEIGHT;
                             for (const star of stellarObjects) {
-                                const sunDir = planet.transform.getAbsolutePosition().subtract(star.transform.getAbsolutePosition()).normalize();
+                                const sunDir = planet.getTransform().getAbsolutePosition().subtract(star.getTransform().getAbsolutePosition()).normalize();
                                 vis2 = Math.min(
                                     vis2,
-                                    (height / maxHeight) ** 128 + Math.max(Vector3.Dot(sunDir, planet.transform.getAbsolutePosition().negate().normalize()), 0.0) ** 0.5
+                                    (height / maxHeight) ** 128 + Math.max(Vector3.Dot(sunDir, planet.getTransform().getAbsolutePosition().negate().normalize()), 0.0) ** 0.5
                                 );
                             }
                         }

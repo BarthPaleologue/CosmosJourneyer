@@ -36,7 +36,7 @@ export class OrbitRenderer {
         }
         points.push(points[0]);
 
-        const orbitMesh = MeshBuilder.CreateLines("orbit", { points: points }, orbitalObject.transform.getScene());
+        const orbitMesh = MeshBuilder.CreateLines("orbit", { points: points }, orbitalObject.getTransform().getScene());
         if (this.orbitMaterial === null) throw new Error("Orbit material is null");
         orbitMesh.material = this.orbitMaterial;
         this.orbitMeshes.push(orbitMesh);
@@ -58,7 +58,7 @@ export class OrbitRenderer {
             const orbitalObject = this.orbitalObjects[i];
             const orbitMesh = this.orbitMeshes[i];
 
-            orbitMesh.position = orbitalObject.parentObject?.transform.position ?? Vector3.Zero();
+            orbitMesh.position = orbitalObject.parentObject?.getTransform().position ?? Vector3.Zero();
         }
     }
 

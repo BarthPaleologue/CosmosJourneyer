@@ -48,7 +48,7 @@ export class Star extends AbstractBody {
                       scene
                   )
                 : Assets.CreateBananaClone(this.model.radius * 2);
-        this.mesh.parent = this.transform;
+        this.mesh.parent = this.getTransform();
 
         /*this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.SPHERE);
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
@@ -57,13 +57,13 @@ export class Star extends AbstractBody {
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
         this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
-        this.light.parent = this.transform;
+        this.light.parent = this.getTransform();
 
-        this.material = new StarMaterial(this.transform, this.model, scene);
+        this.material = new StarMaterial(this.getTransform(), this.model, scene);
         this.mesh.material = this.material;
 
         // TODO: remove when rotation is transmitted to children
-        setRotationQuaternion(this.transform, Quaternion.Identity());
+        setRotationQuaternion(this.getTransform(), Quaternion.Identity());
 
         this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE);
         if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);

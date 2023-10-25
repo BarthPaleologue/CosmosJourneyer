@@ -307,7 +307,7 @@ export class StarSystem {
      * @param displacement The displacement applied to all bodies
      */
     public translateEverythingNow(displacement: Vector3): void {
-        for (const object of this.orbitalObjects) translate(object.transform, displacement);
+        for (const object of this.orbitalObjects) translate(object.getTransform(), displacement);
     }
 
     /**
@@ -325,7 +325,7 @@ export class StarSystem {
         let nearest = null;
         let smallerDistance = -1;
         for (const body of this.celestialBodies) {
-            const distance = body.transform.getAbsolutePosition().subtract(position).length() - body.model.radius;
+            const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.model.radius;
             if (nearest === null || distance < smallerDistance) {
                 nearest = body;
                 smallerDistance = distance;
@@ -340,7 +340,7 @@ export class StarSystem {
         let nearest = null;
         let smallerDistance2 = -1;
         for (const object of this.orbitalObjects) {
-            const distance2 = object.transform.getAbsolutePosition().subtract(position).lengthSquared();
+            const distance2 = object.getTransform().getAbsolutePosition().subtract(position).lengthSquared();
             if (nearest === null || distance2 < smallerDistance2) {
                 nearest = object;
                 smallerDistance2 = distance2;
@@ -380,9 +380,9 @@ export class StarSystem {
         for (const object of this.orbitalObjects) {
             object.updateInternalClock(deltaTime);
 
-            const initialPosition = object.transform.getAbsolutePosition().clone();
+            const initialPosition = object.getTransform().getAbsolutePosition().clone();
             object.updateOrbitalPosition();
-            const newPosition = object.transform.getAbsolutePosition().clone();
+            const newPosition = object.getTransform().getAbsolutePosition().clone();
 
             // if the controller is close to the body, it will follow its movement
             const orbitLimit = object instanceof SpaceStation ? 200 : 10;
@@ -394,7 +394,7 @@ export class StarSystem {
 
             // if the controller is close to the object and it is a body, it will follow its rotation
             if (isOrbiting(controller, object) && this.getNearestBody() === object) {
-                rotateAround(controller.getTransform(), object.transform.getAbsolutePosition(), object.getRotationAxis(), dtheta);
+                rotateAround(controller.getTransform(), object.getTransform().getAbsolutePosition(), object.getRotationAxis(), dtheta);
             }
         }
 
@@ -405,7 +405,7 @@ export class StarSystem {
         controller.aggregate.body.applyForce(direction.scale(gravity), controller.aggregate.body.getObjectCenterWorld());*/
 
         // floating origin
-        if(controller.getActiveCamera().getAbsolutePosition().length() > 1000) {
+        if(controller.getActiveCamera().getAbsolutePosition().length() > 100) {
             const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
             this.translateEverythingNow(displacementTranslation);
             translate(controller.getTransform(), displacementTranslation);

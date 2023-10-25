@@ -203,7 +203,7 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
             if (!chunk.isReady()) return;
 
             chunk.mesh.setEnabled(true); // this is needed to update the world matrix
-            chunk.transform.computeWorldMatrix(true);
+            chunk.getTransform().computeWorldMatrix(true);
 
             chunk.mesh.setEnabled(isSizeOnScreenEnough(chunk, camera));
         });

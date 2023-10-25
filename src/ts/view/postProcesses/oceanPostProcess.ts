@@ -87,7 +87,7 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
                 name: "planetInverseRotationQuaternion",
                 type: UniformEnumType.Quaternion,
                 get: () => {
-                    return getInverseRotationQuaternion(planet.transform);
+                    return getInverseRotationQuaternion(planet.getTransform());
                 }
             },
             {

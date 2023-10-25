@@ -18,12 +18,12 @@ export class BlackHole extends AbstractBody {
 
         this.model = model instanceof BlackHoleModel ? model : new BlackHoleModel(model);
 
-        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
-        this.light.parent = this.transform;
+        this.light.parent = this.getTransform();
         if (this.model.physicalProperties.accretionDiskRadius === 0) this.light.intensity = 0;
 
         this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.BLACK_HOLE);

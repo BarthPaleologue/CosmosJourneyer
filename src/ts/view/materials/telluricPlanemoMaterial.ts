@@ -173,7 +173,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
 
         for (let i = 0; i < stellarObjects.length; i++) {
             const star = stellarObjects[i];
-            this.setVector3(`stars[${i}].position`, star.transform.getAbsolutePosition());
+            this.setVector3(`stars[${i}].position`, star.getTransform().getAbsolutePosition());
             this.setVector3(`stars[${i}].color`, star instanceof Star ? star.model.surfaceColor : Vector3.One());
         }
         this.setInt("nbStars", stellarObjects.length);

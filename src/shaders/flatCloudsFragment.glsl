@@ -17,8 +17,6 @@ uniform Star stars[MAX_STARS];
 
 #pragma glslify: object = require(./utils/object.glsl)
 
-uniform vec4 planetInverseRotationQuaternion;
-
 struct Clouds {
     float layerRadius;// atmosphere radius (calculate from planet center)
 

@@ -126,13 +126,6 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
                 }
             },
             {
-                name: "planetInverseRotationQuaternion",
-                type: UniformEnumType.Quaternion,
-                get: () => {
-                    return getInverseRotationQuaternion(planet.transform);
-                }
-            },
-            {
                 name: "time",
                 type: UniformEnumType.Float,
                 get: () => {

@@ -1,6 +1,6 @@
 import { AbstractBody } from "../view/bodies/abstractBody";
 import { AbstractController } from "../controller/uberCore/abstractController";
-import { BaseObject } from "../view/common";
+import { BoundingSphere, Transformable } from "../view/common";
 import { TransformNode } from "@babylonjs/core/Meshes";
 
 export function nearestBody(object: TransformNode, bodies: AbstractBody[]): AbstractBody {
@@ -8,7 +8,7 @@ export function nearestBody(object: TransformNode, bodies: AbstractBody[]): Abst
     if (bodies.length === 0) throw new Error("no bodieees !");
     let nearest = bodies[0];
     for (const body of bodies) {
-        const newDistance = object.getAbsolutePosition().subtract(body.transform.getAbsolutePosition()).length();
+        const newDistance = object.getAbsolutePosition().subtract(body.getTransform().getAbsolutePosition()).length();
         if (distance === -1 || newDistance < distance) {
             nearest = body;
             distance = newDistance;
@@ -23,6 +23,6 @@ export function nearestBody(object: TransformNode, bodies: AbstractBody[]): Abst
  * @param body the body to check whereas the player is orbiting
  * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
  */
-export function isOrbiting(controller: AbstractController, body: BaseObject, orbitLimitFactor = 2.5): boolean {
-    return body.transform.getAbsolutePosition().subtract(controller.getTransform().getAbsolutePosition()).lengthSquared() < (orbitLimitFactor * body.getBoundingRadius()) ** 2;
+export function isOrbiting(controller: AbstractController, body: Transformable & BoundingSphere, orbitLimitFactor = 2.5): boolean {
+    return body.getTransform().getAbsolutePosition().subtract(controller.getTransform().getAbsolutePosition()).lengthSquared() < (orbitLimitFactor * body.getBoundingRadius()) ** 2;
 }

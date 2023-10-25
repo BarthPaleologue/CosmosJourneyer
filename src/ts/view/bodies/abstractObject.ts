@@ -10,7 +10,7 @@ import { getRotationQuaternion, setRotationQuaternion } from "../../controller/u
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export abstract class AbstractObject implements OrbitalObject, BaseObject, Cullable {
-    readonly transform: TransformNode;
+    private readonly transform: TransformNode;
 
     readonly postProcesses: PostProcessType[] = [];
 
@@ -38,6 +38,10 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
         this.parentObject = parentObject ?? null;
 
         this.transform = new TransformNode(name, scene);
+    }
+
+    public getTransform(): TransformNode {
+        return this.transform;
     }
 
     public abstract getBoundingRadius(): number;
@@ -75,7 +79,7 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
 
     public updateOrbitalPosition() {
         if (this.model.orbit.period > 0) {
-            const barycenter = this.parentObject?.transform.getAbsolutePosition() ?? Vector3.Zero();
+            const barycenter = this.parentObject?.getTransform().getAbsolutePosition() ?? Vector3.Zero();
             /*const orbitalPlaneNormal = this.parentObject?.transform.up ?? Vector3.Up();
 
       if (this.model.orbit.isPlaneAlignedWithParent) this.model.orbit.normalToPlane = orbitalPlaneNormal;*/

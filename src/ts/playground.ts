@@ -91,11 +91,11 @@ shadowGenerator.addShadowCaster(capsule);
 
 const auroraModel = new StarModel(984);
 const aurora = new Star("Aurora", scene, auroraModel);
-aurora.transform.setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10.0, 0));
+aurora.getTransform().setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10.0, 0));
 
 const newtonModel = new TelluricPlanemoModel(152);
 const newton = new TelluricPlanemo("newton", scene, newtonModel);
-newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
+newton.getTransform().setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
 newton.updateLOD(camera.globalPosition);
 
 const viewer = new PhysicsViewer();
@@ -113,12 +113,12 @@ const aggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.g
 for (const aggregate of aggregates) {
     aggregate.body.disablePreStep = false;
 }
-const meshes = [sphere, box, capsule, spaceship.instanceRoot, newton.transform];
+const meshes = [sphere, box, capsule, spaceship.instanceRoot, newton.getTransform()];
 
 const fallingAggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.getAggregate()];
 viewer.showBody(spaceship.getAggregate().body);
 
-const gravityOrigin = newton.transform.getAbsolutePosition();
+const gravityOrigin = newton.getTransform().getAbsolutePosition();
 const gravity = -9.81;
 
 let clockSeconds = 0;
