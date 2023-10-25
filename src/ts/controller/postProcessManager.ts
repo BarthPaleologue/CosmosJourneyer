@@ -34,6 +34,7 @@ import { MatterJetPostProcess } from "../view/postProcesses/matterJetPostProcess
 import { NeutronStar } from "../view/bodies/stellarObjects/neutronStar";
 import { ShadowPostProcess } from "../view/postProcesses/shadowPostProcess";
 import { LensFlarePostProcess } from "../view/postProcesses/lensFlarePostProcess";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -46,7 +47,7 @@ const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.ATMOSPHERE,
     PostProcessType.MANDELBULB,
     PostProcessType.RING,
-    PostProcessType.BLACK_HOLE,
+    PostProcessType.BLACK_HOLE
 ];
 
 /**
@@ -60,7 +61,7 @@ const surfaceRenderingOrder: PostProcessType[] = [
     PostProcessType.RING,
     PostProcessType.OCEAN,
     PostProcessType.CLOUDS,
-    PostProcessType.ATMOSPHERE,
+    PostProcessType.ATMOSPHERE
 ];
 
 /**
@@ -257,8 +258,8 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      * @param planets An array of planets
      */
-    public addStarField(stellarObjects: StellarObject[], planets: AbstractBody[]) {
-        this.starFields.push(new StarfieldPostProcess(this.scene, stellarObjects, planets));
+    public addStarField(stellarObjects: StellarObject[], planets: AbstractBody[], starfieldRotation: Quaternion) {
+        this.starFields.push(new StarfieldPostProcess(this.scene, stellarObjects, planets, starfieldRotation));
     }
 
     /**
@@ -290,8 +291,8 @@ export class PostProcessManager {
      * Creates a new BlackHole postprocess for the given black hole and adds it to the manager.
      * @param blackHole A black hole
      */
-    public addBlackHole(blackHole: BlackHole) {
-        const blackhole = new BlackHolePostProcess(blackHole, this.scene);
+    public addBlackHole(blackHole: BlackHole, starfieldRotation: Quaternion) {
+        const blackhole = new BlackHolePostProcess(blackHole, this.scene, starfieldRotation);
         this.blackHoles.push(blackhole);
     }
 
@@ -313,60 +314,6 @@ export class PostProcessManager {
 
     public addLensFlare(stellarObject: StellarObject) {
         this.lensFlares.push(new LensFlarePostProcess(stellarObject, this.scene));
-    }
-
-    /**
-     * Adds all post processes for the given body.
-     * @param body A body
-     * @param stellarObjects An array of stars or black holes lighting the body
-     */
-    public addObject(body: AbstractObject, stellarObjects: StellarObject[]) {
-        for (const postProcess of body.postProcesses) {
-            switch (postProcess) {
-                case PostProcessType.RING:
-                    if (!(body instanceof AbstractBody)) throw new Error("Rings post process can only be added to bodies. Source:" + body.name);
-                    this.addRings(body, stellarObjects);
-                    break;
-                case PostProcessType.OVERLAY:
-                    this.addOverlay(body);
-                    break;
-                case PostProcessType.ATMOSPHERE:
-                    if (!(body instanceof GasPlanet) && !(body instanceof TelluricPlanemo))
-                        throw new Error("Atmosphere post process can only be added to gas or telluric planets. Source:" + body.name);
-                    this.addAtmosphere(body as GasPlanet | TelluricPlanemo, stellarObjects);
-                    break;
-                case PostProcessType.CLOUDS:
-                    if (!(body instanceof TelluricPlanemo)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + body.name);
-                    this.addClouds(body as TelluricPlanemo, stellarObjects);
-                    break;
-                case PostProcessType.OCEAN:
-                    if (!(body instanceof TelluricPlanemo)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + body.name);
-                    this.addOcean(body as TelluricPlanemo, stellarObjects);
-                    break;
-                case PostProcessType.VOLUMETRIC_LIGHT:
-                    if (!(body instanceof Star)) throw new Error("Volumetric light post process can only be added to stars. Source:" + body.name);
-                    this.addVolumetricLight(body as Star);
-                    break;
-                case PostProcessType.MANDELBULB:
-                    if (!(body instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + body.name);
-                    this.addMandelbulb(body as Mandelbulb, stellarObjects);
-                    break;
-                case PostProcessType.BLACK_HOLE:
-                    if (!(body instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + body.name);
-                    this.addBlackHole(body as BlackHole);
-                    break;
-                case PostProcessType.MATTER_JETS:
-                    if (!(body instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + body.name);
-                    this.addMatterJet(body as NeutronStar);
-                    break;
-                case PostProcessType.SHADOW:
-                    this.addShadowCaster(body as AbstractBody, stellarObjects);
-                    break;
-                case PostProcessType.LENS_FLARE:
-                    this.addLensFlare(body as StellarObject);
-                    break;
-            }
-        }
     }
 
     public setBody(body: AbstractBody) {

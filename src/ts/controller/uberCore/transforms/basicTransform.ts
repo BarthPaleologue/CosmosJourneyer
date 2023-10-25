@@ -8,6 +8,7 @@ export function getPosition(transformNode: TransformNode): Vector3 {
 
 export function translate(transformNode: TransformNode, displacement: Vector3): void {
     transformNode.setAbsolutePosition(transformNode.getAbsolutePosition().add(displacement));
+    transformNode.computeWorldMatrix(true);
 }
 
 export function rotateAround(transformNode: TransformNode, pivot: Vector3, axis: Vector3, amount: number): void {
@@ -31,6 +32,7 @@ export function getInverseRotationQuaternion(transformNode: TransformNode): Quat
 
 export function setRotationQuaternion(transformNode: TransformNode, newRotation: Quaternion): void {
     transformNode.rotationQuaternion = newRotation;
+    transformNode.computeWorldMatrix(true);
 }
 
 export function getRotationMatrix(transformNode: TransformNode): Matrix {

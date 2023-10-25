@@ -50,17 +50,17 @@ float sphereOccultation(vec3 rayDir, float maximumDistance) {
     return 1.0;
 }
 
-float ringOccultation(vec3 samplePoint) {
+float ringOccultation(vec3 rayDir, float maximumDistance) {
     if (!shadowUniforms.hasRings) {
         return 1.0;
     }
 
     float accDensity = 0.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 towardLight = normalize(stars[i].position - samplePoint);
+        vec3 towardLight = normalize(stars[i].position - (camera.position + rayDir * maximumDistance));
         float t2;
-        if (rayIntersectsPlane(samplePoint, towardLight, object.position, object.rotationAxis, 0.001, t2)) {
-            vec3 shadowSamplePoint = samplePoint + t2 * towardLight;
+        if (rayIntersectsPlane(camera.position + rayDir * maximumDistance, towardLight, object.position, object.rotationAxis, 0.001, t2)) {
+            vec3 shadowSamplePoint = camera.position + rayDir * maximumDistance + t2 * towardLight;
             accDensity += ringDensityAtPoint(shadowSamplePoint) * rings.opacity;
         }
     }
@@ -75,8 +75,7 @@ void main() {
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
 
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
-    float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
+    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
 
     vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 
@@ -88,7 +87,7 @@ void main() {
         float sphereShadow = sphereOccultation(rayDir, maximumDistance);
 
         // maybe it is in the shadow of the rings
-        float ringShadow = ringOccultation(closestPoint);
+        float ringShadow = ringOccultation(rayDir, maximumDistance);
 
         finalColor.rgb *= min(sphereShadow, ringShadow);
     }

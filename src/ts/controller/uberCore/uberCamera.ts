@@ -27,6 +27,7 @@ export class UberCamera extends FreeCamera {
     }
 
     getAbsolutePosition(): Vector3 {
+        this.computeWorldMatrix();
         return this.globalPosition;
     }
 }

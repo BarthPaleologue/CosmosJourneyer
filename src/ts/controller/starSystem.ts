@@ -25,11 +25,16 @@ import { MandelbulbModel } from "../model/planemos/mandelbulbModel";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
 import { getMoonSeed } from "../model/planemos/common";
 import { NeutronStarModel } from "../model/stellarObjects/neutronStarModel";
+import { ShipController } from "../spaceship/shipController";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { PostProcessType } from "../view/postProcesses/postProcessTypes";
 
 export class StarSystem {
     private readonly scene: UberScene;
 
     readonly postProcessManager: PostProcessManager;
+
+    private readonly starfieldRotation: Quaternion = Quaternion.Identity();
 
     private readonly orbitalObjects: AbstractObject[] = [];
 
@@ -307,15 +312,7 @@ export class StarSystem {
      * @param displacement The displacement applied to all bodies
      */
     public translateEverythingNow(displacement: Vector3): void {
-        for (const object of this.orbitalObjects) translate(object.transform, displacement);
-    }
-
-    /**
-     * Translates all celestial bodies and spacestations in the system by the given displacement
-     * @param displacement The displacement applied to all bodies
-     */
-    public registerTranslateAllBodies(displacement: Vector3): void {
-        for (const object of this.orbitalObjects) object.nextState.position.addInPlace(displacement);
+        for (const object of this.orbitalObjects) translate(object.getTransform(), displacement);
     }
 
     /**
@@ -333,7 +330,7 @@ export class StarSystem {
         let nearest = null;
         let smallerDistance = -1;
         for (const body of this.celestialBodies) {
-            const distance = body.transform.getAbsolutePosition().subtract(position).length() - body.model.radius;
+            const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.model.radius;
             if (nearest === null || distance < smallerDistance) {
                 nearest = body;
                 smallerDistance = distance;
@@ -348,7 +345,7 @@ export class StarSystem {
         let nearest = null;
         let smallerDistance2 = -1;
         for (const object of this.orbitalObjects) {
-            const distance2 = object.transform.getAbsolutePosition().subtract(position).lengthSquared();
+            const distance2 = object.getTransform().getAbsolutePosition().subtract(position).lengthSquared();
             if (nearest === null || distance2 < smallerDistance2) {
                 nearest = object;
                 smallerDistance2 = distance2;
@@ -372,8 +369,55 @@ export class StarSystem {
      * @private
      */
     private initPostProcesses() {
-        this.postProcessManager.addStarField(this.stellarObjects, this.celestialBodies);
-        for (const object of this.orbitalObjects) this.postProcessManager.addObject(object, this.stellarObjects);
+        this.postProcessManager.addStarField(this.stellarObjects, this.celestialBodies, this.starfieldRotation);
+        for (const object of this.orbitalObjects) {
+            for (const postProcess of object.postProcesses) {
+                switch (postProcess) {
+                    case PostProcessType.RING:
+                        if (!(object instanceof AbstractBody)) throw new Error("Rings post process can only be added to bodies. Source:" + object.name);
+                        this.postProcessManager.addRings(object, this.stellarObjects);
+                        break;
+                    case PostProcessType.OVERLAY:
+                        this.postProcessManager.addOverlay(object);
+                        break;
+                    case PostProcessType.ATMOSPHERE:
+                        if (!(object instanceof GasPlanet) && !(object instanceof TelluricPlanemo))
+                            throw new Error("Atmosphere post process can only be added to gas or telluric planets. Source:" + object.name);
+                        this.postProcessManager.addAtmosphere(object as GasPlanet | TelluricPlanemo, this.stellarObjects);
+                        break;
+                    case PostProcessType.CLOUDS:
+                        if (!(object instanceof TelluricPlanemo)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + object.name);
+                        this.postProcessManager.addClouds(object as TelluricPlanemo, this.stellarObjects);
+                        break;
+                    case PostProcessType.OCEAN:
+                        if (!(object instanceof TelluricPlanemo)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + object.name);
+                        this.postProcessManager.addOcean(object as TelluricPlanemo, this.stellarObjects);
+                        break;
+                    case PostProcessType.VOLUMETRIC_LIGHT:
+                        if (!(object instanceof Star)) throw new Error("Volumetric light post process can only be added to stars. Source:" + object.name);
+                        this.postProcessManager.addVolumetricLight(object as Star);
+                        break;
+                    case PostProcessType.MANDELBULB:
+                        if (!(object instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + object.name);
+                        this.postProcessManager.addMandelbulb(object as Mandelbulb, this.stellarObjects);
+                        break;
+                    case PostProcessType.BLACK_HOLE:
+                        if (!(object instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + object.name);
+                        this.postProcessManager.addBlackHole(object as BlackHole, this.starfieldRotation);
+                        break;
+                    case PostProcessType.MATTER_JETS:
+                        if (!(object instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + object.name);
+                        this.postProcessManager.addMatterJet(object as NeutronStar);
+                        break;
+                    case PostProcessType.SHADOW:
+                        this.postProcessManager.addShadowCaster(object as AbstractBody, this.stellarObjects);
+                        break;
+                    case PostProcessType.LENS_FLARE:
+                        this.postProcessManager.addLensFlare(object as StellarObject);
+                        break;
+                }
+            }
+        }
         this.postProcessManager.setBody(this.getNearestBody(this.scene.getActiveUberCamera().position));
     }
 
@@ -383,54 +427,64 @@ export class StarSystem {
      */
     public update(deltaTime: number): void {
         const controller = this.scene.getActiveController();
+        const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
 
-        /*const displacementTranslation = controller.aggregate.transformNode.getAbsolutePosition().negate();
-    this.translateEverythingNow(displacementTranslation);
-    translate(controller.aggregate.transformNode, displacementTranslation);*/
+        nearestBody.updateInternalClock(deltaTime);
+        const initialPosition = nearestBody.getTransform().getAbsolutePosition().clone();
+        nearestBody.updateOrbitalPosition(deltaTime);
+        const newPosition = nearestBody.getTransform().getAbsolutePosition().clone();
+        const nearestBodyDisplacement = newPosition.subtract(initialPosition);
+        translate(nearestBody.getTransform(), nearestBodyDisplacement.negate());
+
+        const dthetaNearest = nearestBody.updateRotation(deltaTime);
+        nearestBody.updateRotation(-deltaTime);
+
+        // As the nearest object is kept in place, we need to transfer its movement to other bodies
+        for (const object of this.orbitalObjects) {
+            if (object === nearestBody) continue;
+            translate(object.getTransform(), nearestBodyDisplacement.negate());
+            rotateAround(object.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
+        }
+
+        const starfieldAdditionalRotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), dthetaNearest);
+        this.starfieldRotation.copyFrom(starfieldAdditionalRotation.multiply(this.starfieldRotation));
 
         for (const object of this.orbitalObjects) {
+            if (object === nearestBody) continue;
+
             object.updateInternalClock(deltaTime);
-
-            const initialPosition = object.transform.getAbsolutePosition().clone();
-            const newPosition = object.computeNextOrbitalPosition().clone();
-
-            // if the controller is close to the body, it will follow its movement
-            const orbitLimit = object instanceof SpaceStation ? 200 : 10;
-            if (isOrbiting(controller, object, orbitLimit) && this.getNearestObject() === object) {
-                translate(controller.getTransform(), newPosition.subtract(initialPosition));
-
-                /*const direction = controller.aggregate.transformNode.getAbsolutePosition().subtract(object.nextState.position).normalize();
-        const gravity = 9.81;
-        controller.aggregate.body.applyForce(direction.scale(gravity), controller.aggregate.body.getObjectCenterWorld());*/
-            }
-
-            const dtheta = object.updateRotation(deltaTime);
-
-            // if the controller is close to the object and it is a body, it will follow its rotation
-            if (isOrbiting(controller, object) && this.getNearestBody() === object) {
-                rotateAround(controller.getTransform(), object.nextState.position, object.getRotationAxis(), dtheta);
-            }
+            object.updateOrbitalPosition(deltaTime);
+            object.updateRotation(deltaTime);
         }
 
         controller.update(deltaTime);
-
-        const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
-        this.registerTranslateAllBodies(displacementTranslation);
-        translate(controller.getTransform(), displacementTranslation);
-
-        for (const object of this.orbitalObjects) object.applyNextState();
 
         for (const body of this.telluricPlanets.concat(this.satellites)) body.updateLOD(controller.getTransform().getAbsolutePosition());
 
         for (const object of this.orbitalObjects) object.computeCulling(controller.getActiveCamera());
 
-        for (const planet of this.planemosWithMaterial) planet.updateMaterial(controller, this.stellarObjects, deltaTime);
+        // floating origin
+        if (controller.getActiveCamera().getAbsolutePosition().length() > 0) {
+            const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
+            this.translateEverythingNow(displacementTranslation);
+            translate(controller.getTransform(), displacementTranslation);
+        }
+
+        this.updateShaders(deltaTime);
+    }
+
+    public updateShaders(deltaTime: number) {
+        const controller = this.scene.getActiveController();
+        const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
+
+        for (const planet of this.planemosWithMaterial) {
+            planet.updateMaterial(controller, this.stellarObjects, deltaTime);
+        }
 
         for (const stellarObject of this.stellarObjects) {
             if (stellarObject instanceof Star) stellarObject.updateMaterial();
         }
 
-        const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
         this.postProcessManager.setBody(nearestBody);
         const rings = this.postProcessManager.getRings(nearestBody);
         const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;

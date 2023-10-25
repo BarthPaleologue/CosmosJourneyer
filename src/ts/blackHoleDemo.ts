@@ -44,7 +44,7 @@ engine.registerStarSystemUpdateCallback(() => {
 
     const shipPosition = spaceshipController.getTransform().getAbsolutePosition();
     const nearestBody = engine.getStarSystem().getNearestBody(shipPosition);
-    const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
+    const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getRadius();
     spaceshipController.registerClosestObject(distance, radius);
 
@@ -64,10 +64,10 @@ const starSystem = new StarSystem(starSystemSeed, scene);
 engine.setStarSystem(starSystem, false);
 
 const BH = starSystem.makeBlackHole(0);
-BH.model.orbit.radius = BH.getRadius() * 4;
+BH.model.orbit.radius = 0;
 
 const planet = starSystem.makeTelluricPlanet();
-planet.model.orbit.radius = 45000e3;
+planet.model.orbit.radius = 45 * planet.getRadius();
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "g") {

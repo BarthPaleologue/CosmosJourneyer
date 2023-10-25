@@ -3,7 +3,6 @@ import { ColorMode, ColorSettings } from "./colorSettingsInterface";
 import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../../controller/assets";
-import { flattenVector3Array } from "../../utils/algebra";
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { TerrainSettings } from "../../model/terrain/terrainSettings";
 import { SolidPhysicalProperties } from "../../model/common";
@@ -164,8 +163,6 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
     }
 
     public update(activeControllerPosition: Vector3, stellarObjects: StellarObject[]) {
-        this.planet.updateCache(true);
-
         this.setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
         this.setMatrix("planetInverseRotationMatrix", getInverseRotationMatrix(this.planet));
 
@@ -173,7 +170,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
 
         for (let i = 0; i < stellarObjects.length; i++) {
             const star = stellarObjects[i];
-            this.setVector3(`stars[${i}].position`, star.transform.getAbsolutePosition());
+            this.setVector3(`stars[${i}].position`, star.getTransform().getAbsolutePosition());
             this.setVector3(`stars[${i}].color`, star instanceof Star ? star.model.surfaceColor : Vector3.One());
         }
         this.setInt("nbStars", stellarObjects.length);

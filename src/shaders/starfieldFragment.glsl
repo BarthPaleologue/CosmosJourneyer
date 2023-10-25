@@ -7,6 +7,8 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform sampler2D starfieldTexture;// the starfield texture
 
+uniform mat4 starfieldRotation;
+
 #pragma glslify: camera = require(./utils/camera.glsl)
 
 uniform float visibility;// visibility of the starfield
@@ -21,6 +23,8 @@ void main() {
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
 
     vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
+
+    rayDir = vec3(starfieldRotation * vec4(rayDir, 1.0));
 
     vec4 finalColor = screenColor;
 

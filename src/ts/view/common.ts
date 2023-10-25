@@ -1,14 +1,13 @@
-import { Vector3 } from "@babylonjs/core/Maths/math";
 import { BaseModel } from "../model/common";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TransformNode } from "@babylonjs/core/Meshes";
 
-export interface OrbitalObject extends ITransformable {
+export interface OrbitalObject extends Transformable {
     parentObject: OrbitalObject | null;
 
     model: BaseModel;
 
-    computeNextOrbitalPosition(): Vector3;
+    updateOrbitalPosition(deltaTime: number): void;
 }
 
 export interface BaseObject extends BoundingSphere {
@@ -16,11 +15,11 @@ export interface BaseObject extends BoundingSphere {
     postProcesses: PostProcessType[];
 }
 
-export interface ITransformable {
-    transform: TransformNode;
+export interface Transformable {
+    getTransform(): TransformNode;
 }
 
-export interface BoundingSphere extends ITransformable {
+export interface BoundingSphere extends Transformable {
     /**
      * Returns apparent radius of the celestial body (can be greater than the actual radius for example : ocean)
      */

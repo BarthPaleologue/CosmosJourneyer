@@ -28,6 +28,7 @@ import { UberScene } from "./controller/uberCore/uberScene";
 import { Settings } from "./settings";
 import { StarModel } from "./model/stellarObjects/starModel";
 import { Star } from "./view/bodies/stellarObjects/star";
+import { translate } from "./controller/uberCore/transforms/basicTransform";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -91,11 +92,11 @@ shadowGenerator.addShadowCaster(capsule);
 
 const auroraModel = new StarModel(984);
 const aurora = new Star("Aurora", scene, auroraModel);
-aurora.transform.setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10.0, 0));
+aurora.getTransform().setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10.0, 0));
 
 const newtonModel = new TelluricPlanemoModel(152);
 const newton = new TelluricPlanemo("newton", scene, newtonModel);
-newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
+newton.getTransform().setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
 newton.updateLOD(camera.globalPosition);
 
 const viewer = new PhysicsViewer();
@@ -113,12 +114,12 @@ const aggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.g
 for (const aggregate of aggregates) {
     aggregate.body.disablePreStep = false;
 }
-const meshes = [sphere, box, capsule, spaceship.instanceRoot, newton.transform];
+const meshes = [sphere, box, capsule, spaceship.instanceRoot, newton.getTransform()];
 
 const fallingAggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.getAggregate()];
 viewer.showBody(spaceship.getAggregate().body);
 
-const gravityOrigin = newton.transform.getAbsolutePosition();
+const gravityOrigin = newton.getTransform().getAbsolutePosition();
 const gravity = -9.81;
 
 let clockSeconds = 0;
@@ -136,6 +137,13 @@ function updateBeforeHavok() {
         aggregate.body.applyForce(gravityDirection.scaleInPlace(gravity * mass), aggregate.body.getObjectCenterWorld());
     }
 
+    if(spaceship.getAggregate().transformNode.getAbsolutePosition().length() > 100) {
+        const displacement = spaceship.getAggregate().transformNode.getAbsolutePosition().negate();
+        for(const mesh of meshes) {
+            translate(mesh, displacement);
+        }
+    }
+
     // planet thingy
     newton.updateInternalClock(-deltaTime / 10);
     aurora.updateInternalClock(-deltaTime / 10);
@@ -147,17 +155,8 @@ newton.applyNextState();*/
     Assets.ChunkForge.update();
 }
 
-function updateAfterHavok() {
-    const spaceshipPosition = spaceship.getAbsolutePosition();
-
-    for (const mesh of meshes) {
-        mesh.position.subtractInPlace(spaceshipPosition);
-    }
-}
-
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
-    scene.onAfterPhysicsObservable.add(updateAfterHavok);
     scene.onBeforePhysicsObservable.add(updateBeforeHavok);
     engine.runRenderLoop(() => scene.render());
 });

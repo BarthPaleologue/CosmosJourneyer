@@ -9,6 +9,7 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
+import { MaterialHelper } from "@babylonjs/core/Materials/materialHelper";
 
 const shaderName = "starMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;
@@ -22,11 +23,17 @@ export class StarMaterial extends ShaderMaterial {
     constructor(star: TransformNode, model: StarModel, scene: Scene) {
         super("starColor", scene, shaderName, {
             attributes: ["position"],
-            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time", "logarithmicDepthConstant"]
+            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time", "logarithmicDepthConstant"],
+            //defines: ["#define LOGARITHMICDEPTH"]
         });
         this.star = star;
         this.physicalProperties = model.physicalProperties;
         this.starSeed = model.seed;
+
+        /*this.onBindObservable.add(() => {
+            const effect = this.getEffect();
+            MaterialHelper.BindLogDepth(null, effect, scene);
+        });*/
     }
 
     public update(internalTime: number) {

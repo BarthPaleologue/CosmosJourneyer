@@ -22,6 +22,8 @@ uniform sampler2D depthSampler;
 
 uniform sampler2D starfieldTexture;
 
+uniform mat4 starfieldRotation;
+
 #pragma glslify: camera = require(./utils/camera.glsl)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
@@ -145,9 +147,9 @@ void main() {
     vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
-    // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
-    float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
+
+    // actual depth of the scene
+    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
 
     float maxBendDistance = max(accretionDiskRadius * 3.0, object.radius * 15.0);
 
@@ -243,6 +245,7 @@ void main() {
     if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0 && maximumDistanceEndRay > BHDistance - object.radius) {
         bg = texture2D(textureSampler, uv);
     } else {
+        rayDir = vec3(starfieldRotation * vec4(rayDir, 1.0));
         vec2 starfieldUV = vec2(
         sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
         acos(rayDir.y) / 3.14159265359

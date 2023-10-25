@@ -3,7 +3,7 @@ import { getChunkPlaneSpacePositionFromPath } from "../../utils/chunkUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Material } from "@babylonjs/core/Materials/material";
-import { ITransformable } from "../../view/common";
+import { Transformable } from "../../view/common";
 import { Scene } from "@babylonjs/core/scene";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import "@babylonjs/core/Engines/Extensions/engine.query";
@@ -11,14 +11,14 @@ import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 
-export class PlanetChunk implements ITransformable {
+export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
     private ready = false;
     readonly isMinDepth;
 
-    public readonly transform: TransformNode;
+    private readonly transform: TransformNode;
 
     readonly chunkSideLength: number;
 
@@ -40,7 +40,6 @@ export class PlanetChunk implements ITransformable {
 
         this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
-        this.mesh.isBlocker = true;
         this.mesh.material = material;
         /*this.mesh.material = Assets.DebugMaterial(id); //material;
         (this.mesh.material as StandardMaterial).disableLighting = true;
@@ -66,6 +65,10 @@ export class PlanetChunk implements ITransformable {
         position.normalize().scaleInPlace(rootLength / 2);
 
         this.transform.position = position;
+    }
+
+    public getTransform(): TransformNode {
+        return this.transform;
     }
 
     public init(vertexData: VertexData) {

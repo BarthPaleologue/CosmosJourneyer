@@ -23,7 +23,7 @@ export class Mandelbulb extends AbstractBody implements Planemo {
 
         this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.MANDELBULB);
 
-        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
 
     public override computeCulling(camera: Camera): void {
