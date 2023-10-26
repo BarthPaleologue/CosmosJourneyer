@@ -257,13 +257,13 @@ export class SpaceEngine {
             this.bodyEditor.update(nearestBody, starSystem.postProcessManager, starSystemScene);
             this.helmetOverlay.update(nearestBody);
 
-            this.orbitRenderer.update();
-
             //FIXME: should address stars orbits
             for (const star of starSystem.stellarObjects) star.model.orbit.period = 0;
 
             Assets.ChunkForge.update();
             starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
+
+            this.orbitRenderer.update();
         });
 
         window.addEventListener("resize", () => {
