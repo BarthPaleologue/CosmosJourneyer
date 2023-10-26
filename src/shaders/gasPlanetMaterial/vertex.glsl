@@ -12,8 +12,6 @@ uniform mat4 world;
 uniform mat4 worldViewProjection;
 uniform mat4 normalMatrix;
 
-uniform mat4 planetInverseRotationMatrix;
-
 out vec3 vPositionW;
 out vec3 vNormalW;
 
@@ -36,5 +34,5 @@ void main() {
 
     vPosition = position;
 
-    vUnitSamplePoint = mat3(planetInverseRotationMatrix) * normalize(vPosition);
+    vUnitSamplePoint = normalize(vPosition);
 }

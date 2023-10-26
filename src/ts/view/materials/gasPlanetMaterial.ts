@@ -45,8 +45,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
                 "time",
 
-                "planetInverseRotationMatrix",
-
                 "playerPosition",
 
                 "logarithmicDepthConstant"
@@ -94,7 +92,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.clock += deltaTime;
 
         this.setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
-        this.setMatrix("planetInverseRotationMatrix", getInverseRotationMatrix(this.planet));
 
         this.setVector3("playerPosition", player.getActiveCamera().getAbsolutePosition());
 
