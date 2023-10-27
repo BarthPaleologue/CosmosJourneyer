@@ -10,6 +10,7 @@ uniform sampler2D depthSampler;// the depth map of the camera
 uniform int nbStars;// number of stars
 struct Star {
     vec3 position;
+    float radius;
 };
 uniform Star stars[MAX_STARS];
 

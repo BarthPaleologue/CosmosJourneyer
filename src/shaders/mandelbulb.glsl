@@ -13,6 +13,7 @@ uniform vec3 accentColor;
 uniform int nbStars;// number of stars
 struct Star {
     vec3 position;
+    float radius;
 };
 uniform Star stars[MAX_STARS];
 

@@ -9,6 +9,7 @@ uniform sampler2D depthSampler;// the depth map of the camera
 uniform int nbStars;// number of stars
 struct Star {
     vec3 position;
+    float radius;
 };
 uniform Star stars[MAX_STARS];
 
@@ -36,6 +37,10 @@ uniform ShadowUniforms shadowUniforms;
 #pragma glslify: ringDensityAtPoint = require(./rings/ringsDensity.glsl, object=object, rings=rings)
 
 float sphereOccultation(vec3 rayDir, float maximumDistance) {
+    if(length(camera.position + rayDir * maximumDistance - stars[0].position) <= stars[0].radius + 1.0) {
+        // The point is on the surface of the star
+        return 1.0;
+    }
     vec3 towardLight = normalize(stars[0].position - (camera.position + rayDir * maximumDistance));
     float t0, t1;
     if (lineIntersectSphere(camera.position + rayDir * maximumDistance, towardLight, object.position, object.radius, t0, t1)) {

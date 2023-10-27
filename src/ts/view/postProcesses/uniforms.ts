@@ -1,6 +1,7 @@
 import { UberScene } from "../../controller/uberCore/uberScene";
 import { BaseObject, OrbitalObject } from "../common";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     return [
@@ -42,20 +43,19 @@ export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     ];
 }
 
-export function getStellarObjectsUniforms(stars: OrbitalObject[]): ShaderUniforms {
+export function getStellarObjectsUniforms(stars: StellarObject[]): ShaderUniforms {
     return [
-        ...stars.map((star, index) => {
-            return {
+        ...stars.flatMap((star, index) => {
+            return [{
                 name: `stars[${index}].position`,
                 type: UniformEnumType.Vector3,
                 get: () => star.getTransform().getAbsolutePosition()
-            };
+            }, {
+                name: `stars[${index}].radius`,
+                type: UniformEnumType.Float,
+                get: () => star.getRadius()
+            }];
         }),
-        {
-            name: "starPositions",
-            type: UniformEnumType.Vector3Array,
-            get: () => stars.map((star) => star.getTransform().getAbsolutePosition())
-        },
         {
             name: "nbStars",
             type: UniformEnumType.Int,
