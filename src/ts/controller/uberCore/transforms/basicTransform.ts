@@ -35,6 +35,15 @@ export function setRotationQuaternion(transformNode: TransformNode, newRotation:
     transformNode.computeWorldMatrix(true);
 }
 
+export function setUpVector(transformNode: TransformNode, newUp: Vector3): void {
+    if(newUp.equalsWithEpsilon(transformNode.up, 1e-7)) return;
+    const currentUp = transformNode.up;
+    const rotationAxis = Vector3.Cross(newUp, currentUp);
+    const angle = -Math.acos(Vector3.Dot(newUp, currentUp));
+    const rotation = Quaternion.RotationAxis(rotationAxis, angle);
+    setRotationQuaternion(transformNode, rotation.multiply(transformNode.rotationQuaternion ?? Quaternion.Identity()));
+}
+
 export function getRotationMatrix(transformNode: TransformNode): Matrix {
     const rotationMatrix = new Matrix();
     getRotationQuaternion(transformNode).toRotationMatrix(rotationMatrix);

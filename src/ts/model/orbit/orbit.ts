@@ -15,14 +15,7 @@ export function getPointOnOrbitLocal(settings: OrbitProperties, t: number): Vect
 
     const LpFactor = computeLpFactor(theta, settings.p);
 
-    const relativePosition = new Vector3(cosTheta, 0, sinTheta).scaleInPlace(settings.radius * LpFactor);
-
-    // rotate orbital plane
-    const rotationAxis = Vector3.Cross(Vector3.Up(), settings.normalToPlane).normalize();
-    const angle = Vector3.GetAngleBetweenVectors(Vector3.Up(), settings.normalToPlane, rotationAxis);
-    const rotationMatrix = Matrix.RotationAxis(rotationAxis, angle);
-
-    return Vector3.TransformCoordinates(relativePosition, rotationMatrix);
+    return new Vector3(cosTheta, 0, sinTheta).scaleInPlace(settings.radius * LpFactor);
 }
 
 /**
@@ -33,7 +26,14 @@ export function getPointOnOrbitLocal(settings: OrbitProperties, t: number): Vect
  * @returns
  */
 export function getPointOnOrbit(centerOfMass: Vector3, settings: OrbitProperties, t: number): Vector3 {
-    return getPointOnOrbitLocal(settings, t).addInPlace(centerOfMass);
+    const localPosition = getPointOnOrbitLocal(settings, t);
+
+    // rotate orbital plane
+    const rotationAxis = Vector3.Cross(Vector3.Up(), settings.normalToPlane).normalize();
+    const angle = Vector3.GetAngleBetweenVectors(Vector3.Up(), settings.normalToPlane, rotationAxis);
+    const rotationMatrix = Matrix.RotationAxis(rotationAxis, angle);
+
+    return Vector3.TransformCoordinates(localPosition, rotationMatrix).addInPlace(centerOfMass);
 }
 
 export function computeLpFactor(theta: number, p: number) {
