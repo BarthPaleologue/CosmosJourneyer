@@ -31,6 +31,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { OrbitRenderer } from "../view/orbitRenderer";
 import { PauseMenu } from "../ui/pauseMenu";
+import { AxisRenderer } from "../view/axisRenderer";
 
 enum EngineState {
     RUNNING,
@@ -51,6 +52,7 @@ export class SpaceEngine {
     private starSystemScene: UberScene | null = null;
 
     private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer();
+    private readonly axisRenderer: AxisRenderer = new AxisRenderer();
 
     private havokPlugin: HavokPlugin | null = null;
 
@@ -104,7 +106,10 @@ export class SpaceEngine {
         //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
             if (e.key === "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
-            if (e.key === "n") this.orbitRenderer.setVisibility(!this.orbitRenderer.isVisible());
+            if (e.key === "n") {
+                this.orbitRenderer.setVisibility(!this.orbitRenderer.isVisible());
+                this.axisRenderer.setVisibility(!this.axisRenderer.isVisible());
+            }
             if (e.key === "p") this.takeScreenshot();
             if (e.key === "v") {
                 if (!VideoRecorder.IsSupported(this.getEngine())) console.warn("Your browser does not support video recording!");
@@ -215,6 +220,7 @@ export class SpaceEngine {
             if (firstBody === undefined) throw new Error("No bodies in star system");
 
             this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getBodies());
+            this.axisRenderer.setObjects(this.getStarSystem().getBodies());
 
             const activeController = this.getStarSystemScene().getActiveController();
             positionNearObject(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
