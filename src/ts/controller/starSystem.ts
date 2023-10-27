@@ -20,7 +20,7 @@ import { TelluricPlanemoModel } from "../model/planemos/telluricPlanemoModel";
 import { GasPlanetModel } from "../model/planemos/gasPlanetModel";
 import { BlackHoleModel } from "../model/stellarObjects/blackHoleModel";
 import { StarModel } from "../model/stellarObjects/starModel";
-import { rotateAround, translate } from "./uberCore/transforms/basicTransform";
+import { rotateAround, setUpVector, translate } from "./uberCore/transforms/basicTransform";
 import { MandelbulbModel } from "../model/planemos/mandelbulbModel";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
 import { getMoonSeed } from "../model/planemos/common";
@@ -360,6 +360,15 @@ export class StarSystem {
      */
     public init(nbWarmUpUpdates = 100): void {
         this.initPostProcesses();
+
+        for (const object of this.orbitalObjects) {
+            const displacement = new Vector3(object.model.orbit.radius, 0, 0);
+            if (object.parentObject !== null) {
+                translate(object.getTransform(), object.parentObject.getTransform().getAbsolutePosition());
+            }
+            translate(object.getTransform(), displacement);
+        }
+
         this.update(Date.now() / 1000);
         for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1);
     }
@@ -439,14 +448,35 @@ export class StarSystem {
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         translate(nearestBody.getTransform(), nearestBodyDisplacement.negate());
 
-        const dthetaNearest = nearestBody.updateRotation(deltaTime);
-        if (shouldCompensateRotation) nearestBody.updateRotation(-deltaTime);
+        const dthetaNearest = nearestBody.getDeltaTheta(deltaTime);
+
+        // if we don't compensate the rotation of the nearest body, we must rotate it accordingly
+        if (!shouldCompensateRotation) nearestBody.updateRotation(deltaTime);
 
         // As the nearest object is kept in place, we need to transfer its movement to other bodies
         for (const object of this.orbitalObjects) {
+            const oldNormal = object.model.orbit.normalToPlane.clone();
+            if (shouldCompensateRotation) {
+                // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
+                const rotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), -dthetaNearest);
+                object.model.orbit.normalToPlane.applyRotationQuaternionInPlace(rotation);
+            }
             if (object === nearestBody) continue;
             translate(object.getTransform(), nearestBodyDisplacement.negate());
-            if (shouldCompensateRotation) rotateAround(object.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
+            if (shouldCompensateRotation) {
+                // if the nearest body does not rotate, all other bodies must revolve around it for consistency
+                rotateAround(object.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
+
+                // we must as well rotate their rotation axis to keep consistency
+                const newNormal = object.model.orbit.normalToPlane.clone();
+                const angle = Math.acos(Vector3.Dot(oldNormal, newNormal));
+                if(angle > 0.02) {
+                    const axis = Vector3.Cross(oldNormal, newNormal);
+                    const quaternion = Quaternion.RotationAxis(axis, angle);
+                    const newRotationAxis = object.getRotationAxis().applyRotationQuaternion(quaternion);
+                    setUpVector(object.getTransform(), newRotationAxis);
+                }
+            }
         }
 
         if (shouldCompensateRotation) {

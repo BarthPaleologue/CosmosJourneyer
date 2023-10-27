@@ -62,15 +62,15 @@ export class TelluricPlanemoModel implements PlanemoModel {
             oceanLevel: 0
         };
 
-        const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.05, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
+        const isOrbitalPlaneAlignedWithParent = true; //this.isSatelliteOfGas && uniformRandBool(0.05, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
         const orbitalPlaneNormal = isOrbitalPlaneAlignedWithParent
             ? Vector3.Up()
-            : new Vector3(this.rng(GENERATION_STEPS.ORBIT + 20), this.rng(GENERATION_STEPS.ORBIT + 30), this.rng(GENERATION_STEPS.ORBIT + 40)).normalize();
+            : new Vector3(this.rng(GENERATION_STEPS.ORBIT + 20), this.rng(GENERATION_STEPS.ORBIT + 30), this.rng(GENERATION_STEPS.ORBIT + 40)).normalize().scaleInPlace(0.1);
 
         // TODO: do not hardcode
         let orbitRadius = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
 
-        const orbitalP = clamp(normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80), 0.7, 3.0);
+        const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80), 0.7, 3.0);
 
         if (this.isSatelliteOfGas || this.isSatelliteOfTelluric) {
             const minRadius = this.parentBody?.radius ?? 0;

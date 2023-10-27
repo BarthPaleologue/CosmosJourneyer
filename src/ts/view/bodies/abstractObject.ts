@@ -5,13 +5,11 @@ import { Scene } from "@babylonjs/core/scene";
 import { getPointOnOrbit } from "../../model/orbit/orbit";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Cullable } from "./cullable";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import {
-    getRotationQuaternion,
-    setRotationQuaternion,
-    translate
-} from "../../controller/uberCore/transforms/basicTransform";
+import { LinesMesh, TransformNode } from "@babylonjs/core/Meshes";
+import { getRotationQuaternion, rotateAround, setRotationQuaternion, translate } from "../../controller/uberCore/transforms/basicTransform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Settings } from "../../settings";
 
 export abstract class AbstractObject implements OrbitalObject, BaseObject, Cullable {
     private readonly transform: TransformNode;
@@ -74,14 +72,18 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
         if (this.model.orbit.period > 0 && this.parentObject !== null) {
             this.parentObject.getTransform().computeWorldMatrix(true);
             const barycenter = this.parentObject.getTransform().getAbsolutePosition();
-            /*const orbitalPlaneNormal = this.parentObject?.transform.up ?? Vector3.Up();
-if (this.model.orbit.isPlaneAlignedWithParent) this.model.orbit.normalToPlane = orbitalPlaneNormal;*/
 
-            const newPosition = getPointOnOrbit(barycenter, this.model.orbit, this.internalClock);
-            const oldPosition = getPointOnOrbit(barycenter, this.model.orbit, this.internalClock - deltaTime);
-            const translation = newPosition.subtract(oldPosition);
-            translate(this.transform, translation);
+            const dtheta = (2 * Math.PI * deltaTime) / this.model.orbit.period;
+            rotateAround(this.transform, barycenter, this.model.orbit.normalToPlane, dtheta);
+            const oldPosition = this.transform.getAbsolutePosition().subtract(barycenter);
+            const newPosition = oldPosition.normalizeToNew().scaleInPlace(this.model.orbit.radius);
+            translate(this.transform, newPosition.subtract(oldPosition));
         }
+    }
+
+    public getDeltaTheta(deltaTime: number) {
+        if (this.model.physicalProperties.rotationPeriod === 0) return 0;
+        return (2 * Math.PI * deltaTime) / this.model.physicalProperties.rotationPeriod;
     }
 
     /**
@@ -89,19 +91,14 @@ if (this.model.orbit.isPlaneAlignedWithParent) this.model.orbit.normalToPlane = 
      * @param deltaTime The time elapsed since the last update
      * @returns The elapsed angle of rotation around the axis
      */
-    public updateRotation(deltaTime: number): number {
-        if (this.model.physicalProperties.rotationPeriod === 0) {
-            return 0;
-        }
-
-        const dtheta = (2 * Math.PI * deltaTime) / this.model.physicalProperties.rotationPeriod;
+    public updateRotation(deltaTime: number) {
+        const dtheta = this.getDeltaTheta(deltaTime);
+        if (dtheta === 0) return;
 
         const elementaryRotationQuaternion = Quaternion.RotationAxis(this.getRotationAxis(), dtheta);
         const newQuaternion = elementaryRotationQuaternion.multiply(getRotationQuaternion(this.transform));
 
         setRotationQuaternion(this.transform, newQuaternion);
-
-        return dtheta;
     }
 
     public abstract computeCulling(camera: Camera): void;

@@ -44,16 +44,16 @@ export class GasPlanetModel implements PlanemoModel {
 
         this.orbit = {
             radius: orbitRadius,
-            p: orbitalP,
+            p: 2, //orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
             normalToPlane: Vector3.Up(),
             isPlaneAlignedWithParent: true
         };
 
         this.physicalProperties = {
-            // FIXME: choose physically accurates values
+            // FIXME: choose physically accurate values
             mass: 10,
-            axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
+            axialTilt:  normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
             rotationPeriod: (24 * 60 * 60) / 10,
             minTemperature: -180,
             maxTemperature: 200,
