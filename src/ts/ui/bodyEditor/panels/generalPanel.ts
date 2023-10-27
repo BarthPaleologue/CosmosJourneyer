@@ -1,12 +1,12 @@
 import { EditorPanel } from "../editorPanel";
 import { stripAxisFromQuaternion } from "../../../utils/algebra";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Slider } from "handle-sliderjs";
 import { Settings } from "../../../settings";
 import { UberScene } from "../../../controller/uberCore/uberScene";
 import { isOrbiting } from "../../../utils/nearestBody";
 import { ColorCorrection } from "../../../controller/uberCore/postProcesses/colorCorrection";
-import { getRotationQuaternion } from "../../../controller/uberCore/transforms/basicTransform";
+import { getRotationQuaternion, rotate } from "../../../controller/uberCore/transforms/basicTransform";
 import { BoundingSphere, Transformable } from "../../../view/common";
 
 export class GeneralPanel extends EditorPanel {
@@ -22,27 +22,17 @@ export class GeneralPanel extends EditorPanel {
         let axialTiltX = stripAxisFromQuaternion(getRotationQuaternion(body.getTransform()), Axis.Y).toEulerAngles().x;
         let axialTiltZ = stripAxisFromQuaternion(getRotationQuaternion(body.getTransform()), Axis.Y).toEulerAngles().z;
         //TODO: do not hardcode here
-        const power = 1.4;
+        const power = 3;
 
         this.sliders = [
             new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
-                body.getTransform().rotate(Axis.X, newAxialTilt - axialTiltX);
-                if (isOrbiting(scene.getActiveController(), body))
-                    scene
-                        .getActiveController()
-                        .getTransform()
-                        .rotateAround(body.getTransform().getAbsolutePosition(), Axis.X, newAxialTilt - axialTiltX);
+                rotate(body.getTransform(), Axis.X, newAxialTilt - axialTiltX);
                 axialTiltX = newAxialTilt;
             }),
             new Slider("axialTiltZ", document.getElementById("axialTiltZ") as HTMLElement, -180, 180, Math.round((180 * axialTiltZ) / Math.PI), (val: number) => {
                 const newAxialTilt = (val * Math.PI) / 180;
-                body.getTransform().rotate(Axis.Z, newAxialTilt - axialTiltZ);
-                if (isOrbiting(scene.getActiveController(), body))
-                    scene
-                        .getActiveController()
-                        .getTransform()
-                        .rotateAround(body.getTransform().getAbsolutePosition(), Axis.Z, newAxialTilt - axialTiltZ);
+                rotate(body.getTransform(), Axis.Z, newAxialTilt - axialTiltZ);
                 axialTiltZ = newAxialTilt;
             }),
             new Slider(
