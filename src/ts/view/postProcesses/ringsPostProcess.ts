@@ -6,7 +6,7 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { ObjectPostProcess } from "./objectPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { UniformEnumType, ShaderUniforms } from "../../controller/uberCore/postProcesses/types";
+import { ShaderUniforms } from "../../controller/uberCore/postProcesses/types";
 import { RingsUniforms } from "../../model/ringsUniform";
 
 const shaderName = "rings";
@@ -27,13 +27,6 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             ...ringsUniforms.getShaderUniforms(),
-            {
-                name: "planetRotationAxis",
-                type: UniformEnumType.Vector3,
-                get: () => {
-                    return body.getRotationAxis();
-                }
-            }
         ];
 
         super(body.name + "Rings", shaderName, uniforms, getSamplers(scene), scene);
