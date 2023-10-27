@@ -81,7 +81,7 @@ vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDi
     //normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap2, 0.0000005, ocean.waveBlendingSharpness, 0.2);
 
     float ndl = 0.0;
-    float specularHighlight = 0.0;
+    vec3 specularHighlight = vec3(0.0);
 
     for (int i = 0; i < nbStars; i++) {
         vec3 sunDir = normalize(stars[i].position - samplePoint);
@@ -93,12 +93,12 @@ vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDi
 
         if (length(rayOrigin - object.position) > ocean.radius) {
             // if above cloud coverage then specular highlight
-            specularHighlight += computeSpecularHighlight(sunDir, rayDir, normalWave, ocean.smoothness, ocean.specularPower);
+            specularHighlight += computeSpecularHighlight(sunDir, rayDir, normalWave, ocean.smoothness, ocean.specularPower) * stars[i].color;
         }
     }
 
     ndl = saturate(ndl);
-    specularHighlight = saturate(specularHighlight);
+    specularHighlight = clamp(specularHighlight, vec3(0.0), vec3(1.0));
 
     if (distanceThroughOcean > 0.0) {
         float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * ocean.depthModifier);
@@ -108,7 +108,7 @@ vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDi
 
         vec3 deepColor = vec3(0.0, 22.0, 82.0)/255.0;
         vec3 shallowColor = vec3(32.0, 193.0, 180.0)/255.0;
-        vec3 oceanColor = mix(shallowColor, deepColor, opticalDepth01);
+        vec3 oceanColor = mix(shallowColor, deepColor, opticalDepth01) * stars[0].color;
 
         vec3 ambiant = mix(oceanColor, originalColor.rgb, alpha);
 
