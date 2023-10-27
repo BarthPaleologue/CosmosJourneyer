@@ -9,7 +9,6 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { isSizeOnScreenEnough } from "../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
