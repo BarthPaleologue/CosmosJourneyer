@@ -1,15 +1,12 @@
-import { Vector3, Quaternion, Matrix } from "@babylonjs/core/Maths/math";
+import { Vector3, Quaternion } from "@babylonjs/core/Maths/math";
 import { BaseObject, OrbitalObject } from "../common";
 import { BaseModel } from "../../model/common";
 import { Scene } from "@babylonjs/core/scene";
-import { getPointOnOrbit } from "../../model/orbit/orbit";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Cullable } from "./cullable";
-import { LinesMesh, TransformNode } from "@babylonjs/core/Meshes";
+import { TransformNode } from "@babylonjs/core/Meshes";
 import { getRotationQuaternion, rotateAround, setRotationQuaternion, translate } from "../../controller/uberCore/transforms/basicTransform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Settings } from "../../settings";
 
 export abstract class AbstractObject implements OrbitalObject, BaseObject, Cullable {
     private readonly transform: TransformNode;
