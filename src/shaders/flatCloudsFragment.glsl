@@ -6,13 +6,8 @@ in vec2 vUV;// screen coordinates
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
-#define MAX_STARS 5
 uniform int nbStars;// number of stars
-struct Star {
-    vec3 position;
-    float radius;
-};
-uniform Star stars[MAX_STARS];
+#pragma glslify: stars = require(./utils/stars.glsl)
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 

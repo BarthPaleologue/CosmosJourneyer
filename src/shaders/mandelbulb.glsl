@@ -9,13 +9,8 @@ uniform float time;
 uniform float power;
 uniform vec3 accentColor;
 
-#define MAX_STARS 5
 uniform int nbStars;// number of stars
-struct Star {
-    vec3 position;
-    float radius;
-};
-uniform Star stars[MAX_STARS];
+#pragma glslify: stars = require(./utils/stars.glsl)
 
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;

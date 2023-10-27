@@ -9,13 +9,8 @@ uniform sampler2D normalMap2;
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
-#define MAX_STARS 5
 uniform int nbStars;// number of stars
-struct Star {
-    vec3 position;
-    float radius;
-};
-uniform Star stars[MAX_STARS];
+#pragma glslify: stars = require(./utils/stars.glsl)
 
 #pragma glslify: object = require(./utils/object.glsl)
 
