@@ -8,6 +8,8 @@ import { getOrbitalPeriod, getPeriapsis } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { RingsUniforms } from "../ringsUniform";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export class TelluricPlanemoModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.TELLURIC;
@@ -62,13 +64,13 @@ export class TelluricPlanemoModel implements PlanemoModel {
             oceanLevel: 0
         };
 
-        const isOrbitalPlaneAlignedWithParent = true; //this.isSatelliteOfGas && uniformRandBool(0.05, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
+        const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.05, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
         const orbitalPlaneNormal = isOrbitalPlaneAlignedWithParent
             ? Vector3.Up()
-            : new Vector3(this.rng(GENERATION_STEPS.ORBIT + 20), this.rng(GENERATION_STEPS.ORBIT + 30), this.rng(GENERATION_STEPS.ORBIT + 40)).normalize().scaleInPlace(0.1);
+            : Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (this.rng(GENERATION_STEPS.ORBIT + 20) - 0.5) * 0.2));
 
         // TODO: do not hardcode
-        let orbitRadius = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
+        let orbitRadius = 2e9 + this.rng(GENERATION_STEPS.ORBIT) * 15e9;
 
         const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80), 0.7, 3.0);
 
