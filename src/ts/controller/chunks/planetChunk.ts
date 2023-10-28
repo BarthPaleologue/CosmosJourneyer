@@ -5,7 +5,6 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Material } from "@babylonjs/core/Materials/material";
 import { Transformable } from "../../view/common";
 import { Scene } from "@babylonjs/core/scene";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import "@babylonjs/core/Engines/Extensions/engine.query";
 import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -47,8 +46,8 @@ export class PlanetChunk implements Transformable {
         this.transform.parent = parentAggregate.transformNode;
         this.mesh.parent = this.transform;
 
-        this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
-        this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_STRICT;
+        //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+        //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_STRICT;
 
         this.parent = parentAggregate.transformNode;
         this.parentAggregate = parentAggregate;
