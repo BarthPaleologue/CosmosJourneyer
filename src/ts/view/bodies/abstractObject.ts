@@ -70,11 +70,22 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
             this.parentObject.getTransform().computeWorldMatrix(true);
             const barycenter = this.parentObject.getTransform().getAbsolutePosition();
 
+            // rotate the object around the barycenter of the orbit, around the normal to the orbital plane
             const dtheta = (2 * Math.PI * deltaTime) / this.model.orbit.period;
             rotateAround(this.transform, barycenter, this.model.orbit.normalToPlane, dtheta);
+
+            // enforce distance to orbit center
             const oldPosition = this.transform.getAbsolutePosition().subtract(barycenter);
             const newPosition = oldPosition.normalizeToNew().scaleInPlace(this.model.orbit.radius);
+
+            // enforce orbital plane
+            const correctionAxis = Vector3.Cross(this.model.orbit.normalToPlane, newPosition.normalizeToNew());
+            const correctionAngle = 0.5 * Math.PI - Vector3.GetAngleBetweenVectors(this.model.orbit.normalToPlane, newPosition.normalizeToNew(), correctionAxis);
+            newPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(correctionAxis, correctionAngle));
+
+            // apply corrections
             translate(this.transform, newPosition.subtract(oldPosition));
+
         }
     }
 
