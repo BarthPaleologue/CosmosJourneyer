@@ -7,6 +7,8 @@ in vec2 vUV;
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
+uniform float visibility;
+
 #pragma glslify: camera = require(./utils/camera.glsl)
 
 #pragma glslify: object = require(./utils/object.glsl)
@@ -119,11 +121,7 @@ void main() {
 
     vec2 objectScreenPos = uvFromWorld(object.position);
 
-    //TODO: resample depth, and test if the object is occluded by something else, then do not render the lens flare
-    float depth2 = texture2D(depthSampler, objectScreenPos).r;
-    vec3 pixelWorldPosition2 = worldFromUV(objectScreenPos);
-    float depthDistance = length((pixelWorldPosition2 - camera.position) * remap(depth2, 0.0, 1.0, camera.near, camera.far));
-    if (depthDistance < objectDistance - object.radius) {
+    if (visibility == 0.0) {
         gl_FragColor = screenColor;
         return;
     }
@@ -147,7 +145,7 @@ void main() {
     // no lensflare when looking away from the sun
     sun *= smoothstep(0.0, 0.1, dot(objectDirection, normalize(closestPoint)));
 
-    col += sun;
+    col += sun * visibility;
 
     // Output to screen
     gl_FragColor = vec4(col, screenColor.a);
