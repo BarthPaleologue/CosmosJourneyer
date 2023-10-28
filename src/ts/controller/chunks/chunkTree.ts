@@ -14,7 +14,8 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { getAngularSize, isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
+import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 /**
  * A quadTree is defined recursively
@@ -37,12 +38,16 @@ export class ChunkTree {
     private readonly chunkForge: ChunkForge;
     private readonly scene: UberScene;
 
+    private readonly trashCan: PlanetChunk[] = [];
+
     readonly planetName: string;
     readonly planetSeed: number;
     readonly terrainSettings: TerrainSettings;
 
     readonly parent: TransformNode;
     readonly parentAggregate: PhysicsAggregate;
+
+    readonly onChunkPhysicsShapeDeletedObservable = new Observable<number>();
 
     readonly material: Material;
 
@@ -51,7 +56,7 @@ export class ChunkTree {
      * @param direction
      * @param planetName
      * @param planetModel
-     * @param parent
+     * @param parentAggregate
      * @param material
      * @param scene
      */
@@ -103,6 +108,8 @@ export class ChunkTree {
                 isFiner: isFiner
             };
             this.chunkForge?.addTask(deleteTask);
+
+            this.trashCan.push(chunk);
         }, tree);
     }
 
@@ -180,6 +187,10 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
     private createChunk(path: number[], isFiner: boolean): PlanetChunk {
         const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.rootChunkLength, this.minDepth === path.length, this.scene);
 
+        chunk.onDestroyPhysicsShapeObservable.add((index) => {
+            if (chunk.physicsShapeIndex !== null) this.onChunkPhysicsShapeDeletedObservable.notifyObservers(index);
+        });
+
         const buildTask: BuildTask = {
             type: TaskType.Build,
             planetName: this.planetName,
@@ -198,6 +209,15 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
         return chunk;
     }
 
+    public registerPhysicsShapeDeletion(index: number): void {
+        this.executeOnEveryChunk((chunk) => {
+            chunk.registerPhysicsShapeDeletion(index);
+        });
+        for(const trash of this.trashCan) {
+            trash.registerPhysicsShapeDeletion(index);
+        }
+    }
+
     public computeCulling(camera: Camera): void {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             if (!chunk.isReady()) return;
@@ -207,13 +227,6 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
 
             chunk.mesh.setEnabled(isSizeOnScreenEnough(chunk, camera));
         });
-    }
-
-    public getChunks(): PlanetChunk[] {
-        const chunks: PlanetChunk[] = [];
-        this.executeOnEveryChunk((chunk) => chunks.push(chunk));
-
-        return chunks;
     }
 
     /**

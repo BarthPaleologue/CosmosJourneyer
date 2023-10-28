@@ -8,7 +8,8 @@ import { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/core/Engines/Extensions/engine.query";
 import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
@@ -23,7 +24,10 @@ export class PlanetChunk implements Transformable {
 
     private readonly parent: TransformNode;
 
-    private physicsShape: PhysicsShapeMesh | null = null;
+    readonly onDestroyPhysicsShapeObservable = new Observable<number>();
+
+    private physicsShape: PhysicsShape | null = null;
+    physicsShapeIndex: number | null = null;
     private readonly parentAggregate: PhysicsAggregate;
 
     constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, isMinDepth: boolean, scene: Scene) {
@@ -39,10 +43,12 @@ export class PlanetChunk implements Transformable {
 
         this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
+
         this.mesh.material = material;
-        /*this.mesh.material = Assets.DebugMaterial(id); //material;
-        (this.mesh.material as StandardMaterial).disableLighting = true;
-        this.mesh.material.wireframe = true;*/
+        //this.mesh.material = Assets.DebugMaterial(id); //material;
+        //(this.mesh.material as StandardMaterial).disableLighting = true;
+        //this.mesh.material.wireframe = true;
+
         this.transform.parent = parentAggregate.transformNode;
         this.mesh.parent = this.transform;
 
@@ -64,6 +70,8 @@ export class PlanetChunk implements Transformable {
         position.normalize().scaleInPlace(rootLength / 2);
 
         this.transform.position = position;
+
+        //console.log(this.mesh.name + " created")
     }
 
     public getTransform(): TransformNode {
@@ -75,15 +83,38 @@ export class PlanetChunk implements Transformable {
         this.mesh.freezeNormals();
         if (this.isMinDepth) this.setReady(true);
 
-        if (this.depth > 7) {
-            //this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
-            //this.aggregate.body.disablePreStep = false;
-
+        //if (this.depth > 7) {
             this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
-
             this.parentAggregate.shape.addChildFromParent(this.parent, this.physicsShape, this.mesh);
-            //this.aggregate.shape.addChildFromParent(this.parent.node, this.aggregate.shape, this.mesh);
+            this.physicsShapeIndex = this.parentAggregate.shape.getNumChildren();
+            //console.log("Created with index: " + this.physicsShapeIndex);
+        //}
+
+        //console.log(this.mesh.name + " physicsed", this.physicsShapeIndex);
+    }
+
+    public destroyPhysicsShape() {
+        if (this.physicsShapeIndex === null) {
+            //console.error(this.mesh.name + " INDEX NULL");
+            return;
         }
+        if(this.physicsShapeIndex > this.parentAggregate.shape.getNumChildren()) {
+            //console.error(this.mesh.name + " ERROR", this.physicsShapeIndex, this.parentAggregate.shape.getNumChildren());
+            return;
+        }
+
+        //console.log(this.physicsShapeIndex, this.parentAggregate.shape.getNumChildren());
+        this.parentAggregate.shape.removeChild(this.physicsShapeIndex);
+        this.physicsShape?.dispose();
+
+        //console.log(this.mesh.name + " unphysicsed", this.physicsShapeIndex);
+
+        this.onDestroyPhysicsShapeObservable.notifyObservers(this.physicsShapeIndex);
+    }
+
+    public registerPhysicsShapeDeletion(shapeIndex: number) {
+        if (this.physicsShapeIndex === null) return;
+        if (this.physicsShapeIndex > shapeIndex) this.physicsShapeIndex--;
     }
 
     public getBoundingRadius(): number {
@@ -108,7 +139,9 @@ export class PlanetChunk implements Transformable {
     }
 
     public dispose() {
-        this.transform.dispose();
+        this.destroyPhysicsShape();
         this.mesh.dispose();
+        this.transform.dispose();
+        //console.log(this.mesh.name + " disposed");
     }
 }
