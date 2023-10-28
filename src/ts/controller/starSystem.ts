@@ -28,6 +28,7 @@ import { NeutronStarModel } from "../model/stellarObjects/neutronStarModel";
 import { ShipController } from "../spaceship/shipController";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../view/postProcesses/postProcessTypes";
+import { starName } from "../utils/parseToStrings";
 
 export class StarSystem {
     private readonly scene: UberScene;
@@ -189,7 +190,7 @@ export class StarSystem {
     }
 
     public makeStar(model: number | StarModel = this.model.getStarSeed(this.stellarObjects.length)): Star {
-        const name = `${this.model.getName()} ${this.stellarObjects.length + 1}`;
+        const name = starName(this.model.getName(), this.stellarObjects.length);
         const star = new Star(name, this.scene, model, this.stellarObjects[0]);
         this.addStellarObject(star);
         return star;

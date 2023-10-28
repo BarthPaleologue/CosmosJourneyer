@@ -21,3 +21,8 @@ export function parseSpeed(speed: number): string {
 export function parsePercentageFrom01(percentage01: number): string {
     return `${(percentage01 * 100).toFixed(0)}%`;
 }
+
+export const alphabet = "abcdefghijklmnopqrstuvwxyz"
+export function starName(baseName: string, index: number): string {
+    return `${baseName} ${alphabet[index].toUpperCase()}`
+}
