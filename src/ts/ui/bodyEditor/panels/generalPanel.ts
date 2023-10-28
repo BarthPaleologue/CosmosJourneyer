@@ -22,7 +22,7 @@ export class GeneralPanel extends EditorPanel {
         let axialTiltX = stripAxisFromQuaternion(getRotationQuaternion(body.getTransform()), Axis.Y).toEulerAngles().x;
         let axialTiltZ = stripAxisFromQuaternion(getRotationQuaternion(body.getTransform()), Axis.Y).toEulerAngles().z;
         //TODO: do not hardcode here
-        const power = 3;
+        const power = 1.4;
 
         this.sliders = [
             new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {

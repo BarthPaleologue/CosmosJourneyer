@@ -443,15 +443,16 @@ export class StarSystem {
         const controller = this.scene.getActiveController();
         const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
 
-        const shouldCompensateRotation =
-            Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().getAbsolutePosition()) < nearestBody.getRadius() * 4;
+        const distanceOfNearestToCamera = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().getAbsolutePosition());
+        const shouldCompensateTranslation = distanceOfNearestToCamera < nearestBody.getRadius() * 10;
+        const shouldCompensateRotation = distanceOfNearestToCamera < nearestBody.getRadius() * 4;
 
         nearestBody.updateInternalClock(deltaTime);
         const initialPosition = nearestBody.getTransform().getAbsolutePosition().clone();
         nearestBody.updateOrbitalPosition(deltaTime);
         const newPosition = nearestBody.getTransform().getAbsolutePosition().clone();
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
-        translate(nearestBody.getTransform(), nearestBodyDisplacement.negate());
+        if (shouldCompensateTranslation) translate(nearestBody.getTransform(), nearestBodyDisplacement.negate());
 
         const dthetaNearest = nearestBody.getDeltaTheta(deltaTime);
 
@@ -460,23 +461,29 @@ export class StarSystem {
 
         // As the nearest object is kept in place, we need to transfer its movement to other bodies
         for (const object of this.orbitalObjects) {
-            const oldNormal = object.model.orbit.normalToPlane.clone();
+            const oldOrbitNormal = object.model.orbit.normalToPlane.clone();
             if (shouldCompensateRotation) {
                 // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
                 const rotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), -dthetaNearest);
                 object.model.orbit.normalToPlane.applyRotationQuaternionInPlace(rotation);
             }
             if (object === nearestBody) continue;
-            translate(object.getTransform(), nearestBodyDisplacement.negate());
+
+            if (shouldCompensateTranslation) {
+                // the body is translated so that the nearest body can stay in place
+                translate(object.getTransform(), nearestBodyDisplacement.negate());
+            }
+
             if (shouldCompensateRotation) {
                 // if the nearest body does not rotate, all other bodies must revolve around it for consistency
                 rotateAround(object.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
 
                 // we must as well rotate their rotation axis to keep consistency
                 const newNormal = object.model.orbit.normalToPlane.clone();
-                const angle = Math.acos(Vector3.Dot(oldNormal, newNormal));
-                if(angle > 0.02) {
-                    const axis = Vector3.Cross(oldNormal, newNormal);
+                const angle = Math.acos(Vector3.Dot(oldOrbitNormal, newNormal));
+                if (angle > 0.02) {
+                    // FIXME: when time goes very fast, this will get wrongfully executed
+                    const axis = Vector3.Cross(oldOrbitNormal, newNormal);
                     const quaternion = Quaternion.RotationAxis(axis, angle);
                     const newRotationAxis = object.getRotationAxis().applyRotationQuaternion(quaternion);
                     setUpVector(object.getTransform(), newRotationAxis);
@@ -485,10 +492,12 @@ export class StarSystem {
         }
 
         if (shouldCompensateRotation) {
+            // the starfield is rotated to give the impression the nearest body is rotating, which is not the case
             const starfieldAdditionalRotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), dthetaNearest);
             this.starfieldRotation.copyFrom(starfieldAdditionalRotation.multiply(this.starfieldRotation));
         }
 
+        // finally, all other objects are updated normally
         for (const object of this.orbitalObjects) {
             if (object === nearestBody) continue;
 
@@ -499,9 +508,15 @@ export class StarSystem {
 
         controller.update(deltaTime);
 
-        for (const body of this.telluricPlanets.concat(this.satellites)) body.updateLOD(controller.getTransform().getAbsolutePosition());
+        for (const body of this.telluricPlanets.concat(this.satellites)) {
+            // Meshes with LOD are updated (surface quadtrees)
+            body.updateLOD(controller.getTransform().getAbsolutePosition());
+        }
 
-        for (const object of this.orbitalObjects) object.computeCulling(controller.getActiveCamera());
+        for (const object of this.orbitalObjects) {
+            // We disable objects that are too small on the screen
+            object.computeCulling(controller.getActiveCamera());
+        }
 
         // floating origin
         if (controller.getActiveCamera().getAbsolutePosition().length() > 0) {

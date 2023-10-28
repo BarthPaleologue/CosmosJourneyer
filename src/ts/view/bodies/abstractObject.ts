@@ -67,7 +67,6 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
 
     public updateOrbitalPosition(deltaTime: number) {
         if (this.model.orbit.period > 0 && this.parentObject !== null) {
-            this.parentObject.getTransform().computeWorldMatrix(true);
             const barycenter = this.parentObject.getTransform().getAbsolutePosition();
 
             // rotate the object around the barycenter of the orbit, around the normal to the orbital plane
