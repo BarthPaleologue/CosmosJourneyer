@@ -16,6 +16,7 @@ import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { PhysicsShapeSphere } from "@babylonjs/core";
 
 export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMaterial {
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
@@ -72,6 +73,9 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
         );
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
+
+        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
+        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
 
         this.sides = [
             new ChunkTree(Direction.Up, this.name, this.model, this.aggregate, this.material, scene),
