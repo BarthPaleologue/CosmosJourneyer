@@ -1,5 +1,6 @@
 import overlayHTML from "../../html/helmetOverlay.html";
 import { AbstractBody } from "../view/bodies/abstractBody";
+import { AbstractObject } from "../view/bodies/abstractObject";
 
 export class HelmetOverlay {
     private readonly parentNode: HTMLElement;
@@ -25,7 +26,7 @@ export class HelmetOverlay {
         return this.parentNode.style.visibility === "visible";
     }
 
-    public update(currentBody: AbstractBody) {
+    public update(currentBody: AbstractObject) {
         this.bodyNamePlate.innerText = currentBody.name;
         this.bodySeedPlate.innerText = `Seed: ${currentBody.model.seed.toString()}`;
     }

@@ -62,7 +62,7 @@ engine.registerStarSystemUpdateCallback(() => {
     if (scene.getActiveController() != spaceshipController) return;
 
     const shipPosition = spaceshipController.getTransform().getAbsolutePosition();
-    const nearestBody = engine.getStarSystem().getNearestObject(shipPosition);
+    const nearestBody = engine.getStarSystem().getNearestOrbitalObject(shipPosition);
     const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getBoundingRadius();
     spaceshipController.registerClosestObject(distance, radius);

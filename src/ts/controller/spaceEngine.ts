@@ -32,6 +32,7 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { OrbitRenderer } from "../view/orbitRenderer";
 import { PauseMenu } from "../ui/pauseMenu";
 import { AxisRenderer } from "../view/axisRenderer";
+import { AbstractBody } from "../view/bodies/abstractBody";
 
 enum EngineState {
     RUNNING,
@@ -258,9 +259,11 @@ export class SpaceEngine {
 
             const deltaTime = this.getEngine().getDeltaTime() / 1000;
 
-            const nearestBody = starSystem.getNearestBody(starSystemScene.getActiveUberCamera().position);
+            const nearestBody = starSystem.getNearestOrbitalObject(starSystemScene.getActiveUberCamera().position);
 
-            this.bodyEditor.update(nearestBody, starSystem.postProcessManager, starSystemScene);
+            if(nearestBody instanceof AbstractBody) {
+                this.bodyEditor.update(nearestBody, starSystem.postProcessManager, starSystemScene);
+            }
             this.helmetOverlay.update(nearestBody);
 
             //FIXME: should address stars orbits

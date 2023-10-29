@@ -79,7 +79,7 @@ export class PostProcessManager {
 
     private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
 
-    private currentBody: AbstractBody | null = null;
+    private currentBody: AbstractObject | null = null;
 
     private readonly starFields: StarfieldPostProcess[] = [];
     private readonly volumetricLights: VolumetricLight[] = [];
@@ -239,7 +239,7 @@ export class PostProcessManager {
      * Returns the rings post process for the given body. Throws an error if no rings are found.
      * @param body A body
      */
-    public getRings(body: AbstractBody): RingsPostProcess | null {
+    public getRings(body: AbstractObject): RingsPostProcess | null {
         return this.rings.find((rings) => rings.object === body) ?? null;
     }
 

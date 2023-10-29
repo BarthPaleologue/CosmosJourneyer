@@ -324,10 +324,10 @@ export class StarSystem {
     }
 
     /**
-     * Returns the nearest body to the origin
+     * Returns the nearest orbital object to the origin
      */
-    public getNearestBody(position = Vector3.Zero()): AbstractBody {
-        if (this.celestialBodies.length === 0) throw new Error("There are no bodies in the solar system");
+    public getNearestOrbitalObject(position = Vector3.Zero()): AbstractObject {
+        if (this.celestialBodies.length + this.spaceStations.length === 0) throw new Error("There are no bodies or spacestation in the solar system");
         let nearest = null;
         let smallerDistance = -1;
         for (const body of this.celestialBodies) {
@@ -337,22 +337,35 @@ export class StarSystem {
                 smallerDistance = distance;
             }
         }
+
+        smallerDistance = -1;
+        for (const spacestation of this.spaceStations) {
+            const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length() - spacestation.getBoundingRadius() * 50;
+            if (distance < smallerDistance && distance < 0) {
+                nearest = spacestation;
+                smallerDistance = distance;
+            }
+        }
         if (nearest === null) throw new Error("There are no bodies in the solar system");
         return nearest;
     }
 
-    public getNearestObject(position = Vector3.Zero()): AbstractObject {
-        if (this.orbitalObjects.length === 0) throw new Error("There are no objects in the solar system");
+    /**
+     * Returns the nearest body to the origin
+     */
+    public getNearestCelestialBody(position = Vector3.Zero()): AbstractBody {
+        if (this.celestialBodies.length === 0) throw new Error("There are no bodies or spacestation in the solar system");
         let nearest = null;
-        let smallerDistance2 = -1;
-        for (const object of this.orbitalObjects) {
-            const distance2 = object.getTransform().getAbsolutePosition().subtract(position).lengthSquared();
-            if (nearest === null || distance2 < smallerDistance2) {
-                nearest = object;
-                smallerDistance2 = distance2;
+        let smallerDistance = -1;
+        for (const body of this.celestialBodies) {
+            const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.model.radius;
+            if (nearest === null || distance < smallerDistance) {
+                nearest = body;
+                smallerDistance = distance;
             }
         }
-        if (nearest === null) throw new Error("There are no objects in the solar system");
+
+        if (nearest === null) throw new Error("There are no bodies in the solar system");
         return nearest;
     }
 
@@ -433,7 +446,7 @@ export class StarSystem {
                 }
             }
         }
-        this.postProcessManager.setBody(this.getNearestBody(this.scene.getActiveUberCamera().position));
+        this.postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveUberCamera().position));
     }
 
     /**
@@ -442,11 +455,11 @@ export class StarSystem {
      */
     public update(deltaTime: number): void {
         const controller = this.scene.getActiveController();
-        const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
+        const nearestBody = this.getNearestOrbitalObject(this.scene.getActiveUberCamera().position);
 
         const distanceOfNearestToCamera = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().getAbsolutePosition());
-        const shouldCompensateTranslation = distanceOfNearestToCamera < nearestBody.getRadius() * 10;
-        const shouldCompensateRotation = distanceOfNearestToCamera < nearestBody.getRadius() * 4;
+        const shouldCompensateTranslation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * 10;
+        const shouldCompensateRotation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * 4;
 
         nearestBody.updateInternalClock(deltaTime);
         const initialPosition = nearestBody.getTransform().getAbsolutePosition().clone();
@@ -531,7 +544,7 @@ export class StarSystem {
 
     public updateShaders(deltaTime: number) {
         const controller = this.scene.getActiveController();
-        const nearestBody = this.getNearestBody(this.scene.getActiveUberCamera().position);
+        const nearestBody = this.getNearestCelestialBody(this.scene.getActiveUberCamera().position);
 
         for (const planet of this.planemosWithMaterial) {
             planet.updateMaterial(controller, this.stellarObjects, deltaTime);
