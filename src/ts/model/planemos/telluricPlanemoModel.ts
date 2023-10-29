@@ -79,7 +79,7 @@ export class TelluricPlanemoModel implements PlanemoModel {
             orbitRadius = minRadius * clamp(normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT), 1.2, 3.0);
             orbitRadius += this.radius * clamp(normalRandom(2, 1, this.rng, GENERATION_STEPS.ORBIT), 1, 20);
             orbitRadius += 2.0 * Math.max(0, minRadius - getPeriapsis(orbitRadius, orbitalP));
-        }
+        } else if (parentBody) orbitRadius += parentBody.radius * 1.5;
 
         this.orbit = {
             radius: orbitRadius,
@@ -113,7 +113,7 @@ export class TelluricPlanemoModel implements PlanemoModel {
             this.terrainSettings.continents_fragmentation = 0;
             this.terrainSettings.max_mountain_height = 2e3;
         }
-        if(this.isSatelliteOfGas && this.physicalProperties.pressure === 0) {
+        if (this.isSatelliteOfGas && this.physicalProperties.pressure === 0) {
             this.terrainSettings.continents_fragmentation = 0;
         }
 
