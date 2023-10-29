@@ -101,11 +101,7 @@ export class ChunkTree {
      */
     private requestDeletion(tree: quadTree, newChunks: PlanetChunk[]): void {
         const chunksToDelete = this.getChunkList(tree);
-        const deleteMutex = new DeleteMutex(newChunks.length, chunksToDelete);
-        for (const chunk of newChunks) {
-            chunk.onRecieveVertexDataObservable.add(() => deleteMutex.countdown());
-        }
-        this.deleteMutexes.push(deleteMutex);
+        this.deleteMutexes.push(new DeleteMutex(newChunks, chunksToDelete));
     }
 
     public getChunkList(tree: quadTree): PlanetChunk[] {
@@ -121,10 +117,10 @@ export class ChunkTree {
     public update(observerPosition: Vector3): void {
         // remove delete mutexes that have been resolved
         /*const deleteMutexes: DeleteMutex[] = [];
-        for (const deleteMutex of this.deleteMutexes) {
-            if (!deleteMutex.isResolved()) deleteMutexes.push(deleteMutex);
-        }
-        this.deleteMutexes = deleteMutexes;
+    for (const deleteMutex of this.deleteMutexes) {
+        if (!deleteMutex.isResolved()) deleteMutexes.push(deleteMutex);
+    }
+    this.deleteMutexes = deleteMutexes;
 */
         this.tree = this.updateLODRecursively(observerPosition);
     }
@@ -219,8 +215,8 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
         this.executeOnEveryChunk((chunk) => {
             chunk.registerPhysicsShapeDeletion(index);
         });
-        for(const mutex of this.deleteMutexes) {
-            for(const chunk of mutex.chunksToDelete) {
+        for (const mutex of this.deleteMutexes) {
+            for (const chunk of mutex.chunksToDelete) {
                 chunk.registerPhysicsShapeDeletion(index);
             }
         }
@@ -250,8 +246,8 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             chunk.dispose();
         });
-        for(const mutex of this.deleteMutexes) {
-            for(const chunk of mutex.chunksToDelete) {
+        for (const mutex of this.deleteMutexes) {
+            for (const chunk of mutex.chunksToDelete) {
                 chunk.dispose();
             }
         }

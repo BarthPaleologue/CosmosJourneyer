@@ -91,15 +91,15 @@ export class PlanetChunk implements Transformable {
     }
 
     private destroyPhysicsShape() {
-        if (this.physicsShapeIndex === null) {
-            throw new Error("index is null");
-        }
+        if (this.physicsShapeIndex === null) return;
         if (this.physicsShapeIndex > this.parentAggregate.shape.getNumChildren() - 1) {
-            throw new Error(
+            console.error(
                 `Tried to delete ${this.mesh.name} PhysicsShape. However its shape index was out of bound: ${
                     this.physicsShapeIndex
                 } / range 0 : ${this.parentAggregate.shape.getNumChildren() - 1}`
             );
+            this.physicsShape?.dispose();
+            return;
         }
 
         this.parentAggregate.shape.removeChild(this.physicsShapeIndex);
