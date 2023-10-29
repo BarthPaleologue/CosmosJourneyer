@@ -5,7 +5,6 @@ import { SpaceStationModel } from "../model/spacestationModel";
 import { AbstractObject } from "./bodies/abstractObject";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
-import { Vector3 } from "@babylonjs/core/Maths/math";
 import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
