@@ -20,6 +20,8 @@ export class PlanetChunk implements Transformable {
 
     readonly chunkSideLength: number;
 
+    private loaded = false;
+
     private readonly parent: TransformNode;
 
     readonly onDestroyPhysicsShapeObservable = new Observable<number>();
@@ -86,6 +88,7 @@ export class PlanetChunk implements Transformable {
         this.physicsShapeIndex = this.parentAggregate.shape.getNumChildren();
 
         this.mesh.setEnabled(true);
+        this.loaded = true;
 
         this.onRecieveVertexDataObservable.notifyObservers();
     }
@@ -124,7 +127,7 @@ export class PlanetChunk implements Transformable {
      * @returns true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
      */
     public isReady() {
-        return this.mesh.isEnabled();
+        return this.loaded;
     }
 
     public hasBeenDisposed() {
