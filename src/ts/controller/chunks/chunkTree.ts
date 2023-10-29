@@ -248,5 +248,10 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             chunk.dispose();
         });
+        for(const mutex of this.deleteMutexes) {
+            for(const chunk of mutex.chunksToDelete) {
+                chunk.dispose();
+            }
+        }
     }
 }

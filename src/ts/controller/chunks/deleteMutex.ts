@@ -2,7 +2,7 @@ import { PlanetChunk } from "./planetChunk";
 
 export class DeleteMutex {
     private flag: number;
-    private chunksToDelete: PlanetChunk[];
+    readonly chunksToDelete: PlanetChunk[];
 
     constructor(countdown: number, chunksToDelete: PlanetChunk[]) {
         this.flag = countdown;

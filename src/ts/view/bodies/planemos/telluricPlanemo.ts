@@ -125,6 +125,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
     public override dispose(): void {
         this.material.dispose();
         for (const side of this.sides) side.dispose();
+        this.aggregate.dispose();
         super.dispose();
     }
 }

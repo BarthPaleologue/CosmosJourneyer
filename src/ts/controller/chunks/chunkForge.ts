@@ -96,7 +96,11 @@ export class ChunkForge {
      * Apply generated vertexData to waiting chunks
      */
     private executeNextApplyTask() {
-        const task = this.applyTasks.shift();
+        let task = this.applyTasks.shift();
+        while(task && task.chunk.hasBeenDisposed()) {
+            // if the chunk has been disposed, we skip it
+            task = this.applyTasks.shift();
+        }
         if (task) {
             task.chunk.init(task.vertexData);
             task.chunk.setReady(true);

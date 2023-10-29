@@ -30,7 +30,9 @@ export class PlanetChunk implements Transformable {
 
     private physicsShape: PhysicsShape | null = null;
     physicsShapeIndex: number | null = null;
-    private readonly parentAggregate: PhysicsAggregate;
+    readonly parentAggregate: PhysicsAggregate;
+
+    private disposed = false;
 
     constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, isMinDepth: boolean, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
@@ -81,6 +83,7 @@ export class PlanetChunk implements Transformable {
     }
 
     public init(vertexData: VertexData) {
+        if(this.disposed) return;
         vertexData.applyToMesh(this.mesh, false);
         this.mesh.freezeNormals();
         if (this.isMinDepth) this.setReady(true);
@@ -141,10 +144,16 @@ export class PlanetChunk implements Transformable {
         this.mesh.setEnabled(ready);
     }
 
+    public hasBeenDisposed() {
+        return this.disposed;
+    }
+
     public dispose() {
         this.destroyPhysicsShape();
         this.mesh.dispose();
         this.transform.dispose();
+
+        this.disposed = true;
         //console.log(this.mesh.name + " disposed");
     }
 }
