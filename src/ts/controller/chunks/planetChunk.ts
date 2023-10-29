@@ -15,8 +15,6 @@ export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
-    private ready = false;
-    readonly isMinDepth;
 
     private readonly transform: TransformNode;
 
@@ -34,14 +32,12 @@ export class PlanetChunk implements Transformable {
 
     private disposed = false;
 
-    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, isMinDepth: boolean, scene: Scene) {
+    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;
 
         this.chunkSideLength = rootLength / 2 ** this.depth;
-
-        this.isMinDepth = isMinDepth;
 
         this.transform = new TransformNode(`${id}Transform`, scene);
 
@@ -74,8 +70,6 @@ export class PlanetChunk implements Transformable {
         position.normalize().scaleInPlace(rootLength / 2);
 
         this.transform.position = position;
-
-        //console.log(this.mesh.name + " created")
     }
 
     public getTransform(): TransformNode {
@@ -83,44 +77,42 @@ export class PlanetChunk implements Transformable {
     }
 
     public init(vertexData: VertexData) {
-        if(this.disposed) return;
+        if (this.disposed) return;
         vertexData.applyToMesh(this.mesh, false);
         this.mesh.freezeNormals();
-        if (this.isMinDepth) this.setReady(true);
 
-        //if (this.depth > 7) {
-            this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
-            this.parentAggregate.shape.addChildFromParent(this.parent, this.physicsShape, this.mesh);
-            this.physicsShapeIndex = this.parentAggregate.shape.getNumChildren();
-            //console.log("Created with index: " + this.physicsShapeIndex);
-        //}
+        this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
+        this.parentAggregate.shape.addChildFromParent(this.parent, this.physicsShape, this.mesh);
+        this.physicsShapeIndex = this.parentAggregate.shape.getNumChildren();
+
+        this.mesh.setEnabled(true);
 
         this.onRecieveVertexDataObservable.notifyObservers();
-        //console.log(this.mesh.name + " physicsed", this.physicsShapeIndex);
     }
 
-    public destroyPhysicsShape() {
+    private destroyPhysicsShape() {
         if (this.physicsShapeIndex === null) {
-            //console.error(this.mesh.name + " INDEX NULL");
-            return;
+            throw new Error("index is null");
         }
-        if(this.physicsShapeIndex > this.parentAggregate.shape.getNumChildren()) {
-            //console.error(this.mesh.name + " ERROR", this.physicsShapeIndex, this.parentAggregate.shape.getNumChildren());
-            return;
+        if (this.physicsShapeIndex > this.parentAggregate.shape.getNumChildren() - 1) {
+            throw new Error(
+                `Tried to delete ${this.mesh.name} PhysicsShape. However its shape index was out of bound: ${
+                    this.physicsShapeIndex
+                } / range 0 : ${this.parentAggregate.shape.getNumChildren() - 1}`
+            );
         }
 
-        //console.log(this.physicsShapeIndex, this.parentAggregate.shape.getNumChildren());
         this.parentAggregate.shape.removeChild(this.physicsShapeIndex);
         this.physicsShape?.dispose();
-
-        //console.log(this.mesh.name + " unphysicsed", this.physicsShapeIndex);
 
         this.onDestroyPhysicsShapeObservable.notifyObservers(this.physicsShapeIndex);
     }
 
     public registerPhysicsShapeDeletion(shapeIndex: number) {
         if (this.physicsShapeIndex === null) return;
-        if (this.physicsShapeIndex > shapeIndex) this.physicsShapeIndex--;
+        if (this.physicsShapeIndex > shapeIndex) {
+            this.physicsShapeIndex--;
+        }
     }
 
     public getBoundingRadius(): number {
@@ -132,16 +124,7 @@ export class PlanetChunk implements Transformable {
      * @returns true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
      */
     public isReady() {
-        return this.ready;
-    }
-
-    /**
-     * Sets the chunk readiness. Call it with true when it recieves its vertex data and call it with false when it has to be deleted
-     * @param ready true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
-     */
-    public setReady(ready: boolean) {
-        this.ready = ready;
-        this.mesh.setEnabled(ready);
+        return this.mesh.isEnabled();
     }
 
     public hasBeenDisposed() {
@@ -154,6 +137,5 @@ export class PlanetChunk implements Transformable {
         this.transform.dispose();
 
         this.disposed = true;
-        //console.log(this.mesh.name + " disposed");
     }
 }

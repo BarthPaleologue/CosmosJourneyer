@@ -82,14 +82,7 @@ export class ChunkForge {
     }
 
     private dispatchTask(task: BuildTask, worker: Worker) {
-        switch (task.type) {
-            case TaskType.Build:
-                this.executeBuildTask(task as BuildTask, worker);
-                break;
-            default:
-                console.error(`Illegal task received ! TaskType : ${task.type}`);
-                this.workerPool.finishedWorkers.push(worker);
-        }
+        this.executeBuildTask(task, worker);
     }
 
     /**
@@ -97,14 +90,11 @@ export class ChunkForge {
      */
     private executeNextApplyTask() {
         let task = this.applyTasks.shift();
-        while(task && task.chunk.hasBeenDisposed()) {
+        while (task && task.chunk.hasBeenDisposed()) {
             // if the chunk has been disposed, we skip it
             task = this.applyTasks.shift();
         }
-        if (task) {
-            task.chunk.init(task.vertexData);
-            task.chunk.setReady(true);
-        }
+        if (task) task.chunk.init(task.vertexData);
     }
 
     /**

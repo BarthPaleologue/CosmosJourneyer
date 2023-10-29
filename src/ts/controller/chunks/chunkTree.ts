@@ -39,7 +39,6 @@ export class ChunkTree {
     private readonly chunkForge: ChunkForge;
     private readonly scene: UberScene;
 
-    private readonly trashCan: PlanetChunk[] = [];
     private deleteMutexes: DeleteMutex[] = [];
 
     readonly planetName: string;
@@ -106,6 +105,7 @@ export class ChunkTree {
         for (const chunk of newChunks) {
             chunk.onRecieveVertexDataObservable.add(() => deleteMutex.countdown());
         }
+        this.deleteMutexes.push(deleteMutex);
     }
 
     public getChunkList(tree: quadTree): PlanetChunk[] {
@@ -120,12 +120,12 @@ export class ChunkTree {
      */
     public update(observerPosition: Vector3): void {
         // remove delete mutexes that have been resolved
-        const deleteMutexes: DeleteMutex[] = [];
+        /*const deleteMutexes: DeleteMutex[] = [];
         for (const deleteMutex of this.deleteMutexes) {
             if (!deleteMutex.isResolved()) deleteMutexes.push(deleteMutex);
         }
         this.deleteMutexes = deleteMutexes;
-
+*/
         this.tree = this.updateLODRecursively(observerPosition);
     }
 
@@ -192,10 +192,10 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
      * @returns The new Chunk
      */
     private createChunk(path: number[]): PlanetChunk {
-        const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.rootChunkLength, this.minDepth === path.length, this.scene);
+        const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.rootChunkLength, this.scene);
 
         chunk.onDestroyPhysicsShapeObservable.add((index) => {
-            if (chunk.physicsShapeIndex !== null) this.onChunkPhysicsShapeDeletedObservable.notifyObservers(index);
+            this.onChunkPhysicsShapeDeletedObservable.notifyObservers(index);
         });
 
         const buildTask: BuildTask = {
@@ -219,8 +219,10 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
         this.executeOnEveryChunk((chunk) => {
             chunk.registerPhysicsShapeDeletion(index);
         });
-        for (const trash of this.trashCan) {
-            trash.registerPhysicsShapeDeletion(index);
+        for(const mutex of this.deleteMutexes) {
+            for(const chunk of mutex.chunksToDelete) {
+                chunk.registerPhysicsShapeDeletion(index);
+            }
         }
     }
 
