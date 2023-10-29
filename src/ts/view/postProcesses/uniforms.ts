@@ -1,5 +1,5 @@
 import { UberScene } from "../../controller/uberCore/uberScene";
-import { BaseObject, OrbitalObject } from "../common";
+import { BaseObject } from "../common";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Star } from "../bodies/stellarObjects/star";

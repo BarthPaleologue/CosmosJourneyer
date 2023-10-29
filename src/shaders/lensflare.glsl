@@ -18,7 +18,7 @@ uniform float visibility;
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
-uniform vec3 flareColor;// = vec3(0.643, 0.494, 0.867);
+uniform vec3 flareColor;
 uniform float aspectRatio;
 
 float getSun(vec2 uv){
@@ -107,24 +107,17 @@ vec3 anflares(vec2 uv, float intensity, float stretch, float brightness)
 void main() {
     vec4 screenColor = texture(textureSampler, vUV);
 
-    float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
-
-    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
-    // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
-    vec3 rayDir = normalize(pixelWorldPosition - camera.position);
-    // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = camera.position + rayDir * maximumDistance;
-
-    float objectDistance = length(object.position - camera.position);
-    vec3 objectDirection = (object.position - camera.position) / objectDistance;
-
-    vec2 objectScreenPos = uvFromWorld(object.position);
-
     if (visibility == 0.0) {
         gl_FragColor = screenColor;
         return;
     }
+
+    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
+    vec3 rayDir = normalize(pixelWorldPosition - camera.position);
+
+    vec3 objectDirection = normalize(object.position - camera.position);
+
+    vec2 objectScreenPos = uvFromWorld(object.position);
 
     // Normalized pixel coordinates (from 0 to 1)
     vec2 uv = vUV - 0.5;
@@ -143,7 +136,7 @@ void main() {
     sun += getSun(uv-mouse) + (flare + anflare)*flareColor*2.0;
 
     // no lensflare when looking away from the sun
-    sun *= smoothstep(0.0, 0.1, dot(objectDirection, normalize(closestPoint)));
+    sun *= smoothstep(0.0, 0.1, dot(objectDirection, rayDir));
 
     col += sun * visibility;
 
