@@ -1,5 +1,5 @@
 import { TransferBuildData } from "./workerDataTypes";
-import { ApplyTask, BuildTask, DeleteTask, ReturnedChunkData, TaskType } from "./taskTypes";
+import { ApplyTask, BuildTask, ReturnedChunkData, TaskType } from "./taskTypes";
 import { WorkerPool } from "./workerPool";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
@@ -19,18 +19,13 @@ export class ChunkForge {
      */
     applyTasks: ApplyTask[] = [];
 
-    /**
-     * Contains deletion task grouped together in sublist
-     */
-    deleteTasks: DeleteTask[][] = [];
-
     constructor(nbVerticesPerSide: number) {
         this.nbVerticesPerSide = nbVerticesPerSide;
         const nbMaxWorkers = navigator.hardwareConcurrency - 1; // -1 because the main thread is also used
         this.workerPool = new WorkerPool(nbMaxWorkers);
     }
 
-    public addTask(task: BuildTask | DeleteTask) {
+    public addTask(task: BuildTask) {
         this.workerPool.submitTask(task);
     }
 
@@ -44,12 +39,6 @@ export class ChunkForge {
     }
 
     private executeBuildTask(task: BuildTask, worker: Worker): void {
-        // delete tasks always follow build task, they are stored to be executed as callbacks of the build task
-        const callbackTasks: DeleteTask[] = [];
-        while (this.workerPool.taskQueue.length > 0 && this.workerPool.taskQueue[0].type === TaskType.Deletion) {
-            callbackTasks.push(this.workerPool.nextTask() as DeleteTask);
-        }
-
         const buildData: TransferBuildData = {
             taskType: TaskType.Build,
             planetName: task.planetName,
@@ -83,9 +72,7 @@ export class ChunkForge {
             const applyTask: ApplyTask = {
                 type: TaskType.Apply,
                 vertexData: vertexData,
-                chunk: task.chunk,
-                callbackTasks: callbackTasks,
-                isFiner: task.isFiner
+                chunk: task.chunk
             };
             this.applyTasks.push(applyTask);
 
@@ -94,36 +81,15 @@ export class ChunkForge {
         };
     }
 
-    private dispatchTask(task: DeleteTask | BuildTask, worker: Worker) {
+    private dispatchTask(task: BuildTask, worker: Worker) {
         switch (task.type) {
             case TaskType.Build:
                 this.executeBuildTask(task as BuildTask, worker);
-                break;
-            case TaskType.Deletion:
-                console.error("Solitary Delete Task received, this cannot happen !");
-                this.workerPool.finishedWorkers.push(worker);
                 break;
             default:
                 console.error(`Illegal task received ! TaskType : ${task.type}`);
                 this.workerPool.finishedWorkers.push(worker);
         }
-    }
-
-    /**
-     * Removes all useless chunks
-     */
-    private executeDeleteTasks() {
-        for (const deleteTask of this.deleteTasks) {
-            for (let i = 0; i < deleteTask.length; i++) {
-                const task = deleteTask[i];
-                // disabling old chunk
-                task.chunk.setReady(false);
-                // if we are removing the last old chunk, enabling new chunks
-                if (i === deleteTask.length - 1) for (const chunk of task.newChunks) chunk.setReady(true);
-                task.chunk.dispose();
-            }
-        }
-        this.deleteTasks = [];
     }
 
     /**
@@ -133,8 +99,7 @@ export class ChunkForge {
         const task = this.applyTasks.shift();
         if (task) {
             task.chunk.init(task.vertexData);
-            this.deleteTasks.push(task.callbackTasks);
-            if (task.callbackTasks.length === 0) task.chunk.setReady(true);
+            task.chunk.setReady(true);
         }
     }
 
@@ -147,7 +112,6 @@ export class ChunkForge {
         }
         this.workerPool.availableWorkers = this.workerPool.availableWorkers.concat(this.workerPool.finishedWorkers);
         this.workerPool.finishedWorkers = [];
-        this.executeDeleteTasks();
 
         this.executeNextApplyTask();
     }

@@ -1,4 +1,4 @@
-import { BuildTask, DeleteTask } from "./taskTypes";
+import { BuildTask } from "./taskTypes";
 
 /*export class BuildTaskQueue {
     array: ArrayBuffer
@@ -10,7 +10,7 @@ import { BuildTask, DeleteTask } from "./taskTypes";
 export class WorkerPool {
     availableWorkers: Worker[] = []; // liste des workers disponibles pour exécuter des tâches
     finishedWorkers: Worker[] = []; // liste des workers ayant terminé leur tâche (prêts à être réintégré dans la liste des workers disponibles)
-    taskQueue: (BuildTask | DeleteTask)[] = [];
+    taskQueue: BuildTask[] = [];
 
     //TODO: continuer à expérimenter avec le SharedArrayBuffer
     //sharedMemoryBuffer: SharedArrayBuffer;
@@ -26,7 +26,7 @@ export class WorkerPool {
         }
     }
 
-    public submitTask(task: BuildTask | DeleteTask) {
+    public submitTask(task: BuildTask) {
         this.taskQueue.push(task);
     }
 
@@ -34,8 +34,8 @@ export class WorkerPool {
         return this.taskQueue.length > 0;
     }
 
-    public nextTask(): DeleteTask | BuildTask {
-        if (this.hasTask()) return this.taskQueue.shift() as DeleteTask | BuildTask;
+    public nextTask(): BuildTask {
+        if (this.hasTask()) return this.taskQueue.shift() as BuildTask;
         throw new Error("The workerpool has no task to dispatch");
     }
 }

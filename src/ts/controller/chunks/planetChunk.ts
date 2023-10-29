@@ -26,6 +26,8 @@ export class PlanetChunk implements Transformable {
 
     readonly onDestroyPhysicsShapeObservable = new Observable<number>();
 
+    readonly onRecieveVertexDataObservable = new Observable<void>();
+
     private physicsShape: PhysicsShape | null = null;
     physicsShapeIndex: number | null = null;
     private readonly parentAggregate: PhysicsAggregate;
@@ -90,6 +92,7 @@ export class PlanetChunk implements Transformable {
             //console.log("Created with index: " + this.physicsShapeIndex);
         //}
 
+        this.onRecieveVertexDataObservable.notifyObservers();
         //console.log(this.mesh.name + " physicsed", this.physicsShapeIndex);
     }
 

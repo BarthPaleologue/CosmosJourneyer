@@ -5,7 +5,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
 export enum TaskType {
-    Deletion,
     Build,
     Apply,
     Collision
@@ -13,7 +12,6 @@ export enum TaskType {
 
 export type Task = {
     type: TaskType;
-    isFiner: boolean;
     chunk: PlanetChunk;
 };
 
@@ -29,11 +27,6 @@ export type BuildTask = Task & {
 
 export type ApplyTask = Task & {
     vertexData: VertexData;
-    callbackTasks: DeleteTask[];
-};
-
-export type DeleteTask = Task & {
-    newChunks: PlanetChunk[];
 };
 
 export type ReturnedChunkData = {
