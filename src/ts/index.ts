@@ -21,12 +21,9 @@ import { GasPlanetModel } from "./model/planemos/gasPlanetModel";
 import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
-import { MandelbulbModel } from "./model/planemos/mandelbulbModel";
 import { getMoonSeed } from "./model/planemos/common";
-import { NeutronStarModel } from "./model/stellarObjects/neutronStarModel";
 import { RingsUniforms } from "./model/ringsUniform";
 import { StarModel } from "./model/stellarObjects/starModel";
-import { BlackHoleModel } from "./model/stellarObjects/blackHoleModel";
 
 const engine = new SpaceEngine();
 
@@ -51,7 +48,7 @@ spaceshipController.addInput(keyboard);
 spaceshipController.addInput(gamepad);
 spaceshipController.addInput(mouse);
 
-const physicsViewer = new PhysicsViewer();
+//const physicsViewer = new PhysicsViewer();
 //physicsViewer.showBody(spaceshipController.aggregate.body);
 
 mouse.onMouseLeaveObservable.add(() => {
