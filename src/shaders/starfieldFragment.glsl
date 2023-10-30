@@ -36,7 +36,7 @@ void main() {
         acos(rayDir.y) / 3.14159265359
         );
         vec4 starfieldColor = texture2D(starfieldTexture, starfieldUV);
-        starfieldColor.rgb = pow(starfieldColor.rgb, vec3(2.0)); // deeper blacks
+        starfieldColor.rgb = pow(starfieldColor.rgb, vec3(2.2)); // deeper blacks
         finalColor = vec4(starfieldColor.rgb * visibility, starfieldColor.a);
     }
 
