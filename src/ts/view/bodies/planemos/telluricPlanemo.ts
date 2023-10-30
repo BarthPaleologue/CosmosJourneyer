@@ -31,8 +31,8 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
      * New Telluric Planet
      * @param name The name of the planet
      * @param scene
-     * @param parentBodies The bodies the planet is orbiting
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
+     * @param parentBody
      */
     constructor(name: string, scene: UberScene, model: TelluricPlanemoModel | number, parentBody?: AbstractBody) {
         super(name, scene, parentBody);

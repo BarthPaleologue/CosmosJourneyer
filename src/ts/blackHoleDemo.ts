@@ -12,6 +12,7 @@ import { SpaceEngine } from "./controller/spaceEngine";
 import { ShipController } from "./spaceship/shipController";
 import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
+import { StarSystemHelper } from "./controller/starSystemHelper";
 
 const engine = new SpaceEngine();
 
@@ -63,10 +64,10 @@ const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
 const starSystem = new StarSystem(starSystemSeed, scene);
 engine.setStarSystem(starSystem, false);
 
-const BH = starSystem.makeBlackHole(0);
+const BH = StarSystemHelper.makeBlackHole(starSystem, 0);
 BH.model.orbit.radius = 0;
 
-const planet = starSystem.makeTelluricPlanet();
+const planet = StarSystemHelper.makeTelluricPlanet(starSystem);
 planet.model.orbit.radius = 45 * planet.getRadius();
 
 document.addEventListener("keydown", (e) => {

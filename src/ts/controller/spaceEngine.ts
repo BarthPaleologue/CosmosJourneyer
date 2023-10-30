@@ -33,6 +33,7 @@ import { OrbitRenderer } from "../view/orbitRenderer";
 import { PauseMenu } from "../ui/pauseMenu";
 import { AxisRenderer } from "../view/axisRenderer";
 import { AbstractBody } from "../view/bodies/abstractBody";
+import { StarSystemHelper } from "./starSystemHelper";
 
 enum EngineState {
     RUNNING,
@@ -311,7 +312,7 @@ export class SpaceEngine {
     public setStarSystem(starSystem: StarSystem, needsGenerating: boolean): void {
         this.starSystem?.dispose();
         this.starSystem = starSystem;
-        if (needsGenerating) this.starSystem.generate();
+        if (needsGenerating) StarSystemHelper.generate(this.starSystem);
     }
 
     /**

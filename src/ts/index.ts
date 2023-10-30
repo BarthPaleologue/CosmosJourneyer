@@ -24,6 +24,7 @@ import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 import { getMoonSeed } from "./model/planemos/common";
 import { RingsUniforms } from "./model/ringsUniform";
 import { StarModel } from "./model/stellarObjects/starModel";
+import { StarSystemHelper } from "./controller/starSystemHelper";
 
 const engine = new SpaceEngine();
 
@@ -94,7 +95,7 @@ starSystem.model.setName("Alpha Testis");
 engine.setStarSystem(starSystem, false);
 
 const sunModel = new StarModel(0.51);
-const sun = starSystem.makeStar(sunModel);
+const sun = StarSystemHelper.makeStar(starSystem, sunModel);
 sun.model.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
@@ -110,7 +111,7 @@ planetModel.orbit.period = 60 * 60 * 24 * 365.25;
 planetModel.orbit.radius = 4000 * planetModel.radius;
 planetModel.orbit.normalToPlane = Vector3.Up();
 
-const planet = starSystem.makeTelluricPlanet(planetModel);
+const planet = StarSystemHelper.makeTelluricPlanet(starSystem, planetModel);
 planet.model.ringsUniforms = new RingsUniforms(planet.model.rng);
 planet.postProcesses.push(PostProcessType.RING);
 
@@ -128,7 +129,7 @@ moonModel.orbit.period = moonModel.physicalProperties.rotationPeriod;
 moonModel.orbit.radius = 8 * planet.getRadius();
 moonModel.orbit.normalToPlane = Vector3.Up();
 
-const moon = starSystem.makeSatellite(planet, moonModel);
+const moon = StarSystemHelper.makeSatellite(starSystem, planet, moonModel);
 
 moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
 moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
@@ -155,7 +156,7 @@ aresModel.terrainSettings.continents_fragmentation = 0.0;
 aresModel.terrainSettings.continent_base_height = 10e3;
 aresModel.terrainSettings.max_mountain_height = 20e3;
 
-const ares = starSystem.makeTelluricPlanet(aresModel);
+const ares = StarSystemHelper.makeTelluricPlanet(starSystem, aresModel);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.OCEAN), 1);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.CLOUDS), 1);
 
@@ -172,7 +173,7 @@ andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
 andromaqueModel.orbit.radius = 4300 * ares.getRadius();
 andromaqueModel.orbit.normalToPlane = Vector3.Up();
 
-const andromaque = starSystem.makeGasPlanet(andromaqueModel);
+const andromaque = StarSystemHelper.makeGasPlanet(starSystem, andromaqueModel);
 
 /*const blackHoleModel = new BlackHoleModel(0.5, sunModel);
 blackHoleModel.orbit.period = 60 * 60 * 24 * 365.25;

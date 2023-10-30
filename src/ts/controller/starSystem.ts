@@ -11,31 +11,20 @@ import { PostProcessManager } from "./postProcessManager";
 import { StarSystemModel } from "../model/starSystemModel";
 import { isOrbiting } from "../utils/nearestBody";
 import { NeutronStar } from "../view/bodies/stellarObjects/neutronStar";
-import { BODY_TYPE } from "../model/common";
 import { StellarObject } from "../view/bodies/stellarObjects/stellarObject";
 import { SpaceStation } from "../view/spaceStation";
 import { AbstractObject } from "../view/bodies/abstractObject";
-import { romanNumeral } from "../utils/nameGenerator";
-import { TelluricPlanemoModel } from "../model/planemos/telluricPlanemoModel";
-import { GasPlanetModel } from "../model/planemos/gasPlanetModel";
-import { BlackHoleModel } from "../model/stellarObjects/blackHoleModel";
-import { StarModel } from "../model/stellarObjects/starModel";
 import { rotateAround, setUpVector, translate } from "./uberCore/transforms/basicTransform";
-import { MandelbulbModel } from "../model/planemos/mandelbulbModel";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
-import { getMoonSeed } from "../model/planemos/common";
-import { NeutronStarModel } from "../model/stellarObjects/neutronStarModel";
-import { ShipController } from "../spaceship/shipController";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../view/postProcesses/postProcessTypes";
-import { starName } from "../utils/parseToStrings";
 
 export class StarSystem {
-    private readonly scene: UberScene;
+    readonly scene: UberScene;
 
     readonly postProcessManager: PostProcessManager;
 
-    private readonly starfieldRotation: Quaternion = Quaternion.Identity();
+    private readonly universeRotation: Quaternion = Quaternion.Identity();
 
     private readonly orbitalObjects: AbstractObject[] = [];
 
@@ -51,7 +40,6 @@ export class StarSystem {
     /**
      * The list of all planemos in the system (planets and satellites)
      */
-    readonly planemos: Planemo[] = [];
     readonly planemosWithMaterial: PlanemoMaterial[] = [];
 
     /**
@@ -62,7 +50,7 @@ export class StarSystem {
     /**
      * The list of all telluric planets in the system
      */
-    readonly telluricPlanets: TelluricPlanemo[] = [];
+    readonly telluricPlanemos: TelluricPlanemo[] = [];
 
     /**
      * The list of all gas planets in the system
@@ -73,11 +61,6 @@ export class StarSystem {
      * The list of all mandelbulbs in the system
      */
     readonly mandelbulbs: Mandelbulb[] = [];
-
-    /**
-     * The list of all satellites in the system
-     */
-    readonly satellites: TelluricPlanemo[] = [];
 
     readonly model: StarSystemModel;
 
@@ -100,10 +83,9 @@ export class StarSystem {
 
         this.orbitalObjects.push(planet);
         this.celestialBodies.push(planet);
-        this.planemos.push(planet);
         this.planemosWithMaterial.push(planet);
         this.planets.push(planet);
-        this.telluricPlanets.push(planet);
+        this.telluricPlanemos.push(planet);
         return planet;
     }
 
@@ -119,7 +101,6 @@ export class StarSystem {
 
         this.orbitalObjects.push(planet);
         this.celestialBodies.push(planet);
-        this.planemos.push(planet);
         this.planemosWithMaterial.push(planet);
         this.planets.push(planet);
         this.gasPlanets.push(planet);
@@ -138,9 +119,8 @@ export class StarSystem {
 
         this.orbitalObjects.push(satellite);
         this.celestialBodies.push(satellite);
-        this.planemos.push(satellite);
         this.planemosWithMaterial.push(satellite);
-        this.satellites.push(satellite);
+        this.telluricPlanemos.push(satellite);
         return satellite;
     }
 
@@ -152,7 +132,6 @@ export class StarSystem {
 
         this.orbitalObjects.push(mandelbulb);
         this.celestialBodies.push(mandelbulb);
-        this.planemos.push(mandelbulb);
         this.mandelbulbs.push(mandelbulb);
         return mandelbulb;
     }
@@ -177,135 +156,6 @@ export class StarSystem {
         this.orbitalObjects.push(spaceStation);
         this.spaceStations.push(spaceStation);
         return spaceStation;
-    }
-
-    /**
-     * Makes a star and adds it to the system. By default, it will use the next available seed planned by the system model
-     * @param seed The seed to use for the star generation (by default, the next available seed planned by the system model)
-     */
-    public makeStellarObject(seed: number = this.model.getStarSeed(this.stellarObjects.length)): StellarObject {
-        const isStellarObjectBlackHole = this.model.getBodyTypeOfStar(this.stellarObjects.length) === BODY_TYPE.BLACK_HOLE;
-        if (isStellarObjectBlackHole) return this.makeBlackHole(seed);
-        else return this.makeStar(seed);
-    }
-
-    public makeStar(model: number | StarModel = this.model.getStarSeed(this.stellarObjects.length)): Star {
-        const name = starName(this.model.getName(), this.stellarObjects.length);
-        const star = new Star(name, this.scene, model, this.stellarObjects[0]);
-        this.addStellarObject(star);
-        return star;
-    }
-
-    public makeMandelbulb(model: number | MandelbulbModel = this.model.getPlanetSeed(this.mandelbulbs.length)): Mandelbulb {
-        if (this.planets.length >= this.model.getNbPlanets())
-            console.warn(`You are adding a mandelbulb to the system.
-            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
-            This might cause issues, or not who knows.`);
-        const mandelbulb = new Mandelbulb(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, model, this.stellarObjects[0]);
-        this.addMandelbulb(mandelbulb);
-        return mandelbulb;
-    }
-
-    /**
-     * Makes a black hole and adds it to the system. By default, it will use the next available model planned by the system
-     * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
-     */
-    public makeBlackHole(model: number | BlackHoleModel = this.model.getStarSeed(this.stellarObjects.length)): BlackHole {
-        const blackHole = new BlackHole(`${this.model.getName()} ${this.stellarObjects.length + 1}`, this.scene, model, this.stellarObjects[0]);
-        this.addStellarObject(blackHole);
-        return blackHole;
-    }
-
-    public makeNeutronStar(model: number | NeutronStarModel = this.model.getStarSeed(this.stellarObjects.length)): NeutronStar {
-        if (this.stellarObjects.length >= this.model.getNbStars())
-            console.warn(`You are adding a neutron star
-        to a system that already has ${this.stellarObjects.length} stars.
-        The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
-        const neutronStar = new NeutronStar(`neutronStar${this.stellarObjects.length}`, this.scene, model, this.stellarObjects[0]);
-
-        this.addStellarObject(neutronStar);
-        return neutronStar;
-    }
-
-    /**
-     * Makes n stars and adds them to the system. By default, it will use the next available seeds planned by the system model
-     * @param n The number of stars to make (by default, the number of stars planned by the system model)
-     */
-    public makeStellarObjects(n = this.model.getNbStars()): void {
-        if (n < 1) throw new Error("Cannot make less than 1 star");
-        for (let i = 0; i < n; i++) this.makeStellarObject();
-    }
-
-    /**
-     * Makes a telluric planet and adds it to the system. By default, it will use the next available model planned by the system model
-     * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
-     */
-    public makeTelluricPlanet(model: number | TelluricPlanemoModel = this.model.getPlanetSeed(this.planets.length)): TelluricPlanemo {
-        const planet = new TelluricPlanemo(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, model, this.stellarObjects[0]);
-        this.addTelluricPlanet(planet);
-        return planet;
-    }
-
-    /**
-     * Makes a gas planet and adds it to the system. By default, it will use the next available model planned by the system model
-     * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
-     */
-    public makeGasPlanet(model: number | GasPlanetModel = this.model.getPlanetSeed(this.planets.length)): GasPlanet {
-        const planet = new GasPlanet(`${this.model.getName()} ${romanNumeral(this.planets.length + 1)}`, this.scene, model, this.stellarObjects[0]);
-        this.addGasPlanet(planet);
-        return planet;
-    }
-
-    public makePlanets(n: number): void {
-        console.assert(n >= 0, `Cannot make a negative amount of planets : ${n}`);
-
-        for (let i = 0; i < n; i++) {
-            switch (this.model.getBodyTypeOfPlanet(this.planets.length)) {
-                case BODY_TYPE.TELLURIC:
-                    this.makeSatellites(this.makeTelluricPlanet());
-                    break;
-                case BODY_TYPE.GAS:
-                    this.makeSatellites(this.makeGasPlanet());
-                    break;
-                case BODY_TYPE.MANDELBULB:
-                    this.makeSatellites(this.makeMandelbulb());
-                    break;
-                default:
-                    throw new Error(`Unknown body type ${this.model.getBodyTypeOfPlanet(this.planets.length)}`);
-            }
-        }
-    }
-
-    public makeSatellite(planet: Planemo, model: TelluricPlanemoModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)): TelluricPlanemo {
-        const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, this.scene, model, planet);
-
-        satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
-        satellite.material.updateConstants();
-
-        planet.model.childrenBodies.push(satellite.model);
-
-        this.addTelluricSatellite(satellite);
-        return satellite;
-    }
-
-    /**
-     * Makes n more satellites for the given planet. By default, it will make as many as the planet has in the generation.
-     * You can make more, but it will generate warnings and might cause issues.
-     * @param planet The planet to make satellites for
-     * @param n The number of satellites to make
-     */
-    public makeSatellites(planet: Planemo, n = planet.model.nbMoons): void {
-        if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
-        if (planet.model.childrenBodies.length + n > planet.model.nbMoons)
-            console.warn(
-                `You are making more satellites than the planet had planned in its the generation: 
-            You want ${n} more which will amount to a total ${planet.model.childrenBodies.length + n}. 
-            The generator had planned ${planet.model.nbMoons}.
-            This might cause issues, or not who knows. 
-            You can just leave this argument empty to make as many as the planet had planned.`
-            );
-
-        for (let i = 0; i < n; i++) this.makeSatellite(planet, getMoonSeed(planet.model, planet.model.childrenBodies.length));
     }
 
     /**
@@ -397,7 +247,7 @@ export class StarSystem {
      * @private
      */
     private initPostProcesses() {
-        this.postProcessManager.addStarField(this.stellarObjects, this.celestialBodies, this.starfieldRotation);
+        this.postProcessManager.addStarField(this.stellarObjects, this.celestialBodies, this.universeRotation);
         for (const object of this.orbitalObjects) {
             for (const postProcess of object.postProcesses) {
                 switch (postProcess) {
@@ -431,7 +281,7 @@ export class StarSystem {
                         break;
                     case PostProcessType.BLACK_HOLE:
                         if (!(object instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + object.name);
-                        this.postProcessManager.addBlackHole(object as BlackHole, this.starfieldRotation);
+                        this.postProcessManager.addBlackHole(object as BlackHole, this.universeRotation);
                         break;
                     case PostProcessType.MATTER_JETS:
                         if (!(object instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + object.name);
@@ -508,7 +358,7 @@ export class StarSystem {
         if (shouldCompensateRotation) {
             // the starfield is rotated to give the impression the nearest body is rotating, which is not the case
             const starfieldAdditionalRotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), dthetaNearest);
-            this.starfieldRotation.copyFrom(starfieldAdditionalRotation.multiply(this.starfieldRotation));
+            this.universeRotation.copyFrom(starfieldAdditionalRotation.multiply(this.universeRotation));
         }
 
         // finally, all other objects are updated normally
@@ -522,7 +372,7 @@ export class StarSystem {
 
         controller.update(deltaTime);
 
-        for (const body of this.telluricPlanets.concat(this.satellites)) {
+        for (const body of this.telluricPlanemos) {
             // Meshes with LOD are updated (surface quadtrees)
             body.updateLOD(controller.getTransform().getAbsolutePosition());
         }
@@ -560,14 +410,6 @@ export class StarSystem {
         if (isOrbiting(controller, nearestBody, switchLimit)) this.postProcessManager.setSurfaceOrder();
         else this.postProcessManager.setSpaceOrder();
         this.postProcessManager.update(deltaTime);
-    }
-
-    /**
-     * Generates the system using the seed provided in the constructor
-     */
-    public generate() {
-        this.makeStellarObjects(this.model.getNbStars());
-        this.makePlanets(this.model.getNbPlanets());
     }
 
     public dispose() {
