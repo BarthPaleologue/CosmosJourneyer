@@ -251,6 +251,7 @@ void main() {
         acos(rayDir.y) / 3.14159265359
         );
         bg = texture2D(starfieldTexture, starfieldUV);
+        bg.rgb = pow(bg.rgb, vec3(2.2));
     }
 
     vec4 finalColor = vec4(1.0, 0.0, 0.0, 1.0);
