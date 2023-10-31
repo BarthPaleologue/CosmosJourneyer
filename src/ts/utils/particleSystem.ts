@@ -32,7 +32,6 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.emitter = mesh;
         this.minSize = 0.6;
         this.maxSize = 0.7;
-        this.useLogarithmicDepth = true;
         this.minLifeTime = 0.5;
         this.maxLifeTime = 0.6;
         this.minEmitPower = 0;

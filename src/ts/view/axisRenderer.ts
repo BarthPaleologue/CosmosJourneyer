@@ -52,6 +52,5 @@ export class AxisRenderer {
     this.axisMaterial = new StandardMaterial("axisMaterial");
     this.axisMaterial.emissiveColor = Color3.White();
     this.axisMaterial.disableLighting = true;
-    this.axisMaterial.useLogarithmicDepth = true;
   }
 }

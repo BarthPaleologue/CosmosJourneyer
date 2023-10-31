@@ -109,8 +109,6 @@ export class Assets {
 
                 for (const mesh of Assets.Spaceship.getChildMeshes()) {
                     mesh.isVisible = false;
-                    const pbr = mesh.material as PBRBaseMaterial;
-                    pbr.useLogarithmicDepth = true;
                 }
 
                 console.log("Spaceship loaded");
@@ -122,8 +120,6 @@ export class Assets {
 
                 for (const mesh of Assets.EndeavorSpaceship.getChildMeshes()) {
                     mesh.isVisible = false;
-                    const pbr = mesh.material as PBRBaseMaterial;
-                    pbr.useLogarithmicDepth = true;
                 }
 
                 console.log("Endeavor Spaceship loaded");
@@ -135,8 +131,6 @@ export class Assets {
 
                 for (const mesh of Assets.Spacestation.getChildMeshes()) {
                     mesh.isVisible = false;
-                    const pbr = mesh.material as PBRBaseMaterial;
-                    pbr.useLogarithmicDepth = true;
                     //pbr._reflectionTexture = new Texture(starfield, scene);
                     //pbr._reflectionTexture.coordinatesMode = Texture.SPHERICAL_MODE;
                 }
@@ -151,8 +145,6 @@ export class Assets {
 
                 for (const mesh of Assets.Banana.getChildMeshes()) {
                     mesh.isVisible = false;
-                    const pbr = mesh.material as PBRBaseMaterial;
-                    pbr.useLogarithmicDepth = true;
                 }
 
                 console.log("Banana loaded");
@@ -222,7 +214,6 @@ export class Assets {
         if (!diffuse) mat.emissiveColor = Color3.Random();
         else mat.diffuseColor = Color3.Random();
         mat.wireframe = wireframe;
-        mat.useLogarithmicDepth = true;
         return mat;
     }
 }

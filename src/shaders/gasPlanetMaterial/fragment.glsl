@@ -1,10 +1,5 @@
 precision highp float;
 
-#ifdef LOGARITHMICDEPTH
-uniform float logarithmicDepthConstant;
-in float vFragmentDepth;
-#endif
-
 #define MAX_STARS 5
 uniform int nbStars;// number of stars
 struct Star {
@@ -84,7 +79,4 @@ void main() {
     vec3 screenColor = color.rgb * (ndl + specComp * ndl);
 
     gl_FragColor = vec4(screenColor, 1.0);// apply color and lighting
-    #ifdef LOGARITHMICDEPTH
-    gl_FragDepthEXT = log2(vFragmentDepth) * logarithmicDepthConstant * 0.5;
-    #endif
 }

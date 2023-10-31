@@ -76,6 +76,5 @@ export class OrbitRenderer {
         this.orbitMaterial = new StandardMaterial("orbitMaterial");
         this.orbitMaterial.emissiveColor = Color3.White();
         this.orbitMaterial.disableLighting = true;
-        this.orbitMaterial.useLogarithmicDepth = true;
     }
 }

@@ -45,11 +45,8 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
                 "time",
 
-                "playerPosition",
-
-                "logarithmicDepthConstant"
+                "playerPosition"
             ],
-            defines: ["#define LOGARITHMICDEPTH"]
         });
 
         this.planet = planet;
@@ -69,11 +66,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
             color3: color3,
             colorSharpness: randRangeInt(40, 80, model.rng, 80) / 10
         };
-
-        this.onBindObservable.add(() => {
-            const effect = this.getEffect();
-            MaterialHelper.BindLogDepth(null, effect, scene);
-        });
 
         this.setFloat("seed", model.seed);
 

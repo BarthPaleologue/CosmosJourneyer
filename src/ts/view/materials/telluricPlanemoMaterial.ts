@@ -81,10 +81,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "pressure",
 
                 "waterAmount",
-
-                "logarithmicDepthConstant"
             ],
-            defines: ["#define LOGARITHMICDEPTH"]
         });
 
         this.planet = planet;
@@ -114,11 +111,6 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         if (model.physicalProperties.oceanLevel === 0) {
             this.colorSettings.plainColor = this.colorSettings.desertColor.scale(0.7);
         }
-
-        this.onBindObservable.add(() => {
-            const effect = this.getEffect();
-            MaterialHelper.BindLogDepth(null, effect, scene);
-        });
 
         this.setFloat("seed", model.seed);
 

@@ -3,11 +3,6 @@ precision highp float;
 in vec3 vPosition;// position of the vertex in sphere space
 in vec3 vUnitSamplePoint;
 
-#ifdef LOGARITHMICDEPTH
-uniform float logarithmicDepthConstant;
-in float vFragmentDepth;
-#endif
-
 uniform vec3 starColor;
 uniform float time;
 
@@ -28,7 +23,4 @@ void main() {
     finalColor -= vec3(pow(noiseValue, 4.0));
 
     gl_FragColor = vec4(finalColor, 1.0);// apply color and lighting
-    #ifdef LOGARITHMICDEPTH
-    gl_FragDepthEXT = log2(vFragmentDepth) * logarithmicDepthConstant * 0.5;
-    #endif
 } 

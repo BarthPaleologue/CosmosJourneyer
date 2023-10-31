@@ -1,10 +1,5 @@
 precision highp float;
 
-#ifdef LOGARITHMICDEPTH
-uniform float logarithmicDepthConstant;
-in float vFragmentDepth;
-#endif
-
 in vec3 vPositionW;
 in vec3 vNormalW;
 in vec3 vUnitSamplePoint;
@@ -283,7 +278,4 @@ void main() {
 
 
     gl_FragColor = vec4(screenColor, 1.0);// apply color and lighting
-    #ifdef LOGARITHMICDEPTH
-    gl_FragDepthEXT = log2(vFragmentDepth) * logarithmicDepthConstant * 0.5;
-    #endif
 } 

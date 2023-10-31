@@ -206,6 +206,7 @@ export class SpaceEngine {
      */
     public async setup(): Promise<void> {
         this.engine = new Engine(this.canvas); //await EngineFactory.CreateAsync(this.canvas, { enableAllFeatures: true });
+        this.engine.useReverseDepthBuffer = true;
 
         this.engine.loadingScreen.displayLoadingUI();
 

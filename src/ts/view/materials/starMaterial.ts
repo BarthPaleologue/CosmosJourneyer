@@ -19,17 +19,11 @@ export class StarMaterial extends ShaderMaterial {
     constructor(star: TransformNode, model: StarModel, scene: Scene) {
         super("starColor", scene, shaderName, {
             attributes: ["position"],
-            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time", "logarithmicDepthConstant"],
-            //defines: ["#define LOGARITHMICDEPTH"]
+            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time"],
         });
         this.star = star;
         this.starModel = model;
         this.starSeed = model.seed;
-
-        /*this.onBindObservable.add(() => {
-            const effect = this.getEffect();
-            MaterialHelper.BindLogDepth(null, effect, scene);
-        });*/
     }
 
     public update(internalTime: number) {
