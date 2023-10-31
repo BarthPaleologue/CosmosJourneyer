@@ -2,6 +2,7 @@
 
 [![NodeJS with Webpack](https://github.com/BarthPaleologue/planetEngine/actions/workflows/webpack.yml/badge.svg)](https://github.com/BarthPaleologue/planetEngine/actions/workflows/webpack.yml)
 [![pages-build-deployment](https://github.com/BarthPaleologue/planetEngine/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/BarthPaleologue/planetEngine/actions/workflows/pages/pages-build-deployment)
+[![Jest Coverage](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/tests.yml/badge.svg)](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/tests.yml)
 [![License](https://img.shields.io/github/license/BarthPaleologue/planetEngine)](./LICENSE.md)
 
 CosmosJourneyer is an open-source procedural universe running in the browser that makes space exploration accessible for everyone.
