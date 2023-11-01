@@ -83,10 +83,11 @@ export class PlanetChunk implements Transformable {
         vertexData.applyToMesh(this.mesh, false);
         this.mesh.freezeNormals();
 
-        this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
-        this.parentAggregate.shape.addChildFromParent(this.parent, this.physicsShape, this.mesh);
-        this.physicsShapeIndex = this.parentAggregate.shape.getNumChildren();
-
+	if(this.depth > 3) {
+        	this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
+        	this.parentAggregate.shape.addChildFromParent(this.parent, this.physicsShape, this.mesh);
+        	this.physicsShapeIndex = this.parentAggregate.shape.getNumChildren();
+	}
         this.mesh.setEnabled(true);
         this.loaded = true;
 
