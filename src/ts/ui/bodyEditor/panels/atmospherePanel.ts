@@ -36,9 +36,16 @@ export class AtmospherePanel extends EditorPanel {
                     atmosphere.atmosphereUniforms.atmosphereRadius = planet.getRadius() + val * 10000;
                 }
             ),
-            new Slider("rayleighStrength", document.getElementById("rayleighStrength") as HTMLElement, 0, 40, atmosphere.atmosphereUniforms.rayleighStrength * 10, (val: number) => {
-                atmosphere.atmosphereUniforms.rayleighStrength = val / 10;
-            }),
+            new Slider(
+                "rayleighStrength",
+                document.getElementById("rayleighStrength") as HTMLElement,
+                0,
+                40,
+                atmosphere.atmosphereUniforms.rayleighStrength * 10,
+                (val: number) => {
+                    atmosphere.atmosphereUniforms.rayleighStrength = val / 10;
+                }
+            ),
             new Slider("mieStrength", document.getElementById("mieStrength") as HTMLElement, 0, 40, atmosphere.atmosphereUniforms.mieStrength * 10, (val: number) => {
                 atmosphere.atmosphereUniforms.mieStrength = val / 10;
             }),

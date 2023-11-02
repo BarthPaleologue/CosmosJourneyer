@@ -43,7 +43,7 @@ export class GasPlanetModel implements PlanemoModel {
 
         const orbitalP = clamp(0.7, 3.0, normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80));
         orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
-        if(parentBody) orbitRadius += parentBody.radius * 1.5;
+        if (parentBody) orbitRadius += parentBody.radius * 1.5;
 
         const orbitalPlaneNormal = Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (this.rng(GENERATION_STEPS.ORBIT + 20) - 0.5) * 0.2));
 
@@ -58,7 +58,7 @@ export class GasPlanetModel implements PlanemoModel {
         this.physicalProperties = {
             // FIXME: choose physically accurate values
             mass: 10,
-            axialTilt:  normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
+            axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
             rotationPeriod: (24 * 60 * 60) / 10,
             minTemperature: -180,
             maxTemperature: 200,

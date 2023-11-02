@@ -80,12 +80,12 @@ export class StarModel implements StellarObjectModel {
     }
 
     static getStellarTypeFromTemperature(temperature: number) {
-        if (temperature < 3500) return  STELLAR_TYPE.M;
-        else if (temperature < 5000) return  STELLAR_TYPE.K;
-        else if (temperature < 6000) return  STELLAR_TYPE.G;
-        else if (temperature < 7500) return  STELLAR_TYPE.F;
-        else if (temperature < 10000) return  STELLAR_TYPE.A;
-        else if (temperature < 30000) return  STELLAR_TYPE.B;
-        else return  STELLAR_TYPE.O;
+        if (temperature < 3500) return STELLAR_TYPE.M;
+        else if (temperature < 5000) return STELLAR_TYPE.K;
+        else if (temperature < 6000) return STELLAR_TYPE.G;
+        else if (temperature < 7500) return STELLAR_TYPE.F;
+        else if (temperature < 10000) return STELLAR_TYPE.A;
+        else if (temperature < 30000) return STELLAR_TYPE.B;
+        else return STELLAR_TYPE.O;
     }
 }

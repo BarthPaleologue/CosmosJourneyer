@@ -13,12 +13,7 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcessTypes";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import {
-    SamplerEnumType,
-    ShaderSamplers,
-    ShaderUniforms,
-    UniformEnumType
-} from "../../controller/uberCore/postProcesses/types";
+import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../../controller/uberCore/postProcesses/types";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 
 const shaderName = "starfield";
@@ -26,7 +21,6 @@ Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
 
 export class StarfieldPostProcess extends UberPostProcess {
     constructor(scene: UberScene, stellarObjects: StellarObject[], bodies: AbstractBody[], starfieldRotation: Quaternion) {
-
         const uniforms: ShaderUniforms = [
             ...getActiveCameraUniforms(scene),
             ...getStellarObjectsUniforms(stellarObjects),

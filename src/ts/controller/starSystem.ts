@@ -9,7 +9,6 @@ import { GasPlanet } from "../view/bodies/planemos/gasPlanet";
 import { BlackHole } from "../view/bodies/stellarObjects/blackHole";
 import { PostProcessManager } from "./postProcessManager";
 import { StarSystemModel } from "../model/starSystemModel";
-import { isOrbiting } from "../utils/nearestBody";
 import { NeutronStar } from "../view/bodies/stellarObjects/neutronStar";
 import { StellarObject } from "../view/bodies/stellarObjects/stellarObject";
 import { SpaceStation } from "../view/spaceStation";
@@ -62,6 +61,9 @@ export class StarSystem {
      */
     readonly mandelbulbs: Mandelbulb[] = [];
 
+    /**
+     * The model of the star system that describes it and generates the randomness
+     */
     readonly model: StarSystemModel;
 
     constructor(model: StarSystemModel | number, scene: UberScene) {
@@ -76,11 +78,6 @@ export class StarSystem {
      * @param planet The planet to add to the system
      */
     public addTelluricPlanet(planet: TelluricPlanemo): TelluricPlanemo {
-        if (this.planets.length >= this.model.getNbPlanets())
-            console.warn(`You are adding a telluric planet to the system.
-            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
-            This might cause issues, or not who knows.`);
-
         this.orbitalObjects.push(planet);
         this.celestialBodies.push(planet);
         this.planemosWithMaterial.push(planet);
@@ -94,11 +91,6 @@ export class StarSystem {
      * @param planet The planet to add to the system
      */
     public addGasPlanet(planet: GasPlanet): GasPlanet {
-        if (this.planets.length >= this.model.getNbPlanets())
-            console.warn(`You are adding a gas planet to the system.
-            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
-            This might cause issues, or not who knows.`);
-
         this.orbitalObjects.push(planet);
         this.celestialBodies.push(planet);
         this.planemosWithMaterial.push(planet);
@@ -110,13 +102,9 @@ export class StarSystem {
     /**
      * Adds a satellite to the system and returns it
      * @param satellite The satellite to add to the system
+     * @returns The satellite added to the system
      */
     public addTelluricSatellite(satellite: TelluricPlanemo): TelluricPlanemo {
-        if (this.planets.length >= this.model.getNbPlanets())
-            console.warn(`You are adding a telluric planet to the system.
-            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
-            This might cause issues, or not who knows.`);
-
         this.orbitalObjects.push(satellite);
         this.celestialBodies.push(satellite);
         this.planemosWithMaterial.push(satellite);
@@ -124,12 +112,12 @@ export class StarSystem {
         return satellite;
     }
 
+    /**
+     * Adds a Mandelbulb to the system and returns it
+     * @param mandelbulb The mandelbulb to add to the system
+     * @returns The mandelbulb added to the system
+     */
     public addMandelbulb(mandelbulb: Mandelbulb): Mandelbulb {
-        if (this.planets.length >= this.model.getNbPlanets())
-            console.warn(`You are adding a mandelbulb to the system.
-            The system generator had planned for ${this.model.getNbPlanets()} planets, but you are adding the ${this.planets.length + 1}th planet.
-            This might cause issues, or not who knows.`);
-
         this.orbitalObjects.push(mandelbulb);
         this.celestialBodies.push(mandelbulb);
         this.mandelbulbs.push(mandelbulb);
@@ -139,19 +127,20 @@ export class StarSystem {
     /**
      * Adds a star or a blackhole to the system and returns it
      * @param stellarObject The star added to the system
+     * @returns The star added to the system
      */
     public addStellarObject(stellarObject: StellarObject): StellarObject {
-        if (this.stellarObjects.length >= this.model.getNbStars())
-            console.warn(`You are adding a star 
-        to a system that already has ${this.stellarObjects.length} stars.
-        The capacity of the generator was supposed to be ${this.model.getNbStars()} This is not a problem, but it may be.`);
-
         this.orbitalObjects.push(stellarObject);
         this.celestialBodies.push(stellarObject);
         this.stellarObjects.push(stellarObject);
         return stellarObject;
     }
 
+    /**
+     * Adds a spacestation to the system and returns it
+     * @param spaceStation The spacestation added to the system
+     * @returns The spacestation added to the system
+     */
     public addSpaceStation(spaceStation: SpaceStation): SpaceStation {
         this.orbitalObjects.push(spaceStation);
         this.spaceStations.push(spaceStation);
@@ -176,7 +165,7 @@ export class StarSystem {
     /**
      * Returns the nearest orbital object to the origin
      */
-    public getNearestOrbitalObject(position = Vector3.Zero()): AbstractObject {
+    public getNearestOrbitalObject(position: Vector3): AbstractObject {
         if (this.celestialBodies.length + this.spaceStations.length === 0) throw new Error("There are no bodies or spacestation in the solar system");
         let nearest = null;
         let smallerDistance = -1;
@@ -201,9 +190,9 @@ export class StarSystem {
     }
 
     /**
-     * Returns the nearest body to the origin
+     * Returns the nearest body to the the given position
      */
-    public getNearestCelestialBody(position = Vector3.Zero()): AbstractBody {
+    public getNearestCelestialBody(position: Vector3): AbstractBody {
         if (this.celestialBodies.length === 0) throw new Error("There are no bodies or spacestation in the solar system");
         let nearest = null;
         let smallerDistance = -1;
@@ -392,6 +381,10 @@ export class StarSystem {
         this.updateShaders(deltaTime);
     }
 
+    /**
+     * Updates the shaders of all the bodies in the system with the given delta time
+     * @param deltaTime The time elapsed in seconds since the last update
+     */
     public updateShaders(deltaTime: number) {
         const controller = this.scene.getActiveController();
         const nearestBody = this.getNearestCelestialBody(this.scene.getActiveUberCamera().position);
@@ -405,13 +398,12 @@ export class StarSystem {
         }
 
         this.postProcessManager.setBody(nearestBody);
-        const rings = this.postProcessManager.getRings(nearestBody);
-        const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;
-        if (isOrbiting(controller, nearestBody, switchLimit)) this.postProcessManager.setSurfaceOrder();
-        else this.postProcessManager.setSpaceOrder();
         this.postProcessManager.update(deltaTime);
     }
 
+    /**
+     * Disposes all the bodies in the system
+     */
     public dispose() {
         this.postProcessManager.dispose();
         for (const spacestation of this.spaceStations) spacestation.dispose();

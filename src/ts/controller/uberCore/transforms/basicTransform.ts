@@ -36,7 +36,7 @@ export function setRotationQuaternion(transformNode: TransformNode, newRotation:
 }
 
 export function setUpVector(transformNode: TransformNode, newUp: Vector3): void {
-    if(newUp.equalsWithEpsilon(transformNode.up, 1e-7)) return;
+    if (newUp.equalsWithEpsilon(transformNode.up, 1e-7)) return;
     const currentUp = transformNode.up;
     const rotationAxis = Vector3.Cross(newUp, currentUp);
     const angle = -Math.acos(Vector3.Dot(newUp, currentUp));

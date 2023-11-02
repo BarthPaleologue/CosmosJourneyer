@@ -86,9 +86,9 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
             new ChunkTree(Direction.Left, this.name, this.model, this.aggregate, this.material, scene)
         ];
 
-        for(const side of this.sides) {
+        for (const side of this.sides) {
             side.onChunkPhysicsShapeDeletedObservable.add((index) => {
-                for(const side2 of this.sides) {
+                for (const side2 of this.sides) {
                     side2.registerPhysicsShapeDeletion(index);
                 }
             });

@@ -9,5 +9,5 @@ export enum PostProcessType {
     BLACK_HOLE,
     SHADOW,
     OVERLAY,
-    LENS_FLARE,
+    LENS_FLARE
 }

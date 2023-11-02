@@ -26,7 +26,7 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             ...getObjectUniforms(body),
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
-            ...ringsUniforms.getShaderUniforms(),
+            ...ringsUniforms.getShaderUniforms()
         ];
 
         super(body.name + "Rings", shaderName, uniforms, getSamplers(scene), scene);

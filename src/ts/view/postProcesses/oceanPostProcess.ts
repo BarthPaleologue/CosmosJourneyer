@@ -22,7 +22,7 @@ export type OceanUniforms = {
     depthModifier: number;
     alphaModifier: number;
     waveBlendingSharpness: number;
-}
+};
 
 export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly oceanUniforms: OceanUniforms;

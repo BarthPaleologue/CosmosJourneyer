@@ -84,7 +84,6 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
 
             // apply corrections
             translate(this.transform, newPosition.subtract(oldPosition));
-
         }
     }
 

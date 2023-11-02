@@ -28,7 +28,7 @@ export class OrbitProperties {
      */
     readonly isPlaneAlignedWithParent: boolean;
 
-    constructor({radius, p, period, normalToPlane, isPlaneAlignedWithParent}: OrbitProps) {
+    constructor({ radius, p, period, normalToPlane, isPlaneAlignedWithParent }: OrbitProps) {
         this.radius = radius;
         this.p = p;
         this.period = period;

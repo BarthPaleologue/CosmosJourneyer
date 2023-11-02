@@ -15,7 +15,7 @@ const shaderName = "lensflare";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = lensFlareFragment;
 
 export type LensFlareSettings = {
-    visibility: number
+    visibility: number;
 };
 
 export class LensFlarePostProcess extends UberPostProcess implements ObjectPostProcess {
@@ -49,9 +49,9 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
                     (scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, raycastResult);
                     const occulted = raycastResult.hasHit && raycastResult.body?.transformNode.name !== object.name;
 
-                    if(occulted && settings.visibility > 0) {
+                    if (occulted && settings.visibility > 0) {
                         settings.visibility = moveTowards(settings.visibility, 0, 0.5);
-                    } else if(!occulted && settings.visibility < 1) {
+                    } else if (!occulted && settings.visibility < 1) {
                         settings.visibility = moveTowards(settings.visibility, 1, 0.5);
                     }
 

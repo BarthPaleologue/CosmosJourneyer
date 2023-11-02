@@ -137,9 +137,9 @@ function updateBeforeHavok() {
         aggregate.body.applyForce(gravityDirection.scaleInPlace(gravity * mass), aggregate.body.getObjectCenterWorld());
     }
 
-    if(spaceship.getAggregate().transformNode.getAbsolutePosition().length() > 100) {
+    if (spaceship.getAggregate().transformNode.getAbsolutePosition().length() > 100) {
         const displacement = spaceship.getAggregate().transformNode.getAbsolutePosition().negate();
-        for(const mesh of meshes) {
+        for (const mesh of meshes) {
             translate(mesh, displacement);
         }
     }

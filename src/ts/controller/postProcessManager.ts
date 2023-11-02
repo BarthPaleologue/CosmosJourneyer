@@ -35,6 +35,7 @@ import { NeutronStar } from "../view/bodies/stellarObjects/neutronStar";
 import { ShadowPostProcess } from "../view/postProcesses/shadowPostProcess";
 import { LensFlarePostProcess } from "../view/postProcesses/lensFlarePostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";
+import { isOrbiting } from "../utils/nearestBody";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -321,6 +322,12 @@ export class PostProcessManager {
         this.currentBody = body;
 
         this.currentRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
+
+        const rings = this.getRings(body);
+        const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;
+        if (isOrbiting(this.scene.getActiveController(), body, switchLimit)) this.setSurfaceOrder();
+        else this.setSpaceOrder();
+
         this.init();
     }
 
@@ -464,10 +471,17 @@ export class PostProcessManager {
         this.currentRenderingPipeline.attachToCamera(this.scene.getActiveUberCamera());
     }
 
+    /**
+     * Updates all updatable post processes with the given delta time.
+     * @param deltaTime The time in seconds since the last frame
+     */
     public update(deltaTime: number) {
         for (const postProcess of this.updatablePostProcesses.flat()) postProcess.update(deltaTime);
     }
 
+    /**
+     * Disposes all post processes and rendering pipelines.
+     */
     public dispose() {
         for (const objectPostProcess of this.objectPostProcesses.flat()) objectPostProcess.dispose();
 

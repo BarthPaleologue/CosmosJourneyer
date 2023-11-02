@@ -9,7 +9,7 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { CloudUniforms, FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import {UniformEnumType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "volumetricClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;

@@ -10,13 +10,21 @@ export function positionNearObject(controller: AbstractController, object: Trans
 
     if (nearestStar === object) {
         // the object is the nearest star
-        controller.getTransform().setAbsolutePosition(object.getTransform().getAbsolutePosition().add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius)));
+        controller.getTransform().setAbsolutePosition(
+            object
+                .getTransform()
+                .getAbsolutePosition()
+                .add(new Vector3(0, 0.2, 1).scaleInPlace(object.getBoundingRadius() * nRadius))
+        );
     } else {
         const dirBodyToStar = object.getTransform().getAbsolutePosition().subtract(nearestStar.getTransform().getAbsolutePosition());
         const distBodyToStar = dirBodyToStar.length();
 
         dirBodyToStar.scaleInPlace(1 / distBodyToStar);
-        const displacement = nearestStar.getTransform().getAbsolutePosition().add(dirBodyToStar.scale(distBodyToStar - nRadius * object.getBoundingRadius()));
+        const displacement = nearestStar
+            .getTransform()
+            .getAbsolutePosition()
+            .add(dirBodyToStar.scale(distBodyToStar - nRadius * object.getBoundingRadius()));
         controller.getTransform().setAbsolutePosition(displacement);
     }
 

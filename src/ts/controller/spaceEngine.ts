@@ -263,7 +263,7 @@ export class SpaceEngine {
 
             const nearestBody = starSystem.getNearestOrbitalObject(starSystemScene.getActiveUberCamera().position);
 
-            if(nearestBody instanceof AbstractBody) {
+            if (nearestBody instanceof AbstractBody) {
                 this.bodyEditor.update(nearestBody, starSystem.postProcessManager, starSystemScene);
             }
             this.helmetOverlay.update(nearestBody);

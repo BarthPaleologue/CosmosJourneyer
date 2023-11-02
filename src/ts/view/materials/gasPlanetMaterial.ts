@@ -28,25 +28,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
     constructor(planetName: string, planet: TransformNode, model: GasPlanetModel, scene: Scene) {
         super(`${planetName}GasSurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
-            uniforms: [
-                "world",
-                "worldViewProjection",
-                "normalMatrix",
-
-                "seed",
-
-                "stars",
-                "nbStars",
-
-                "color1",
-                "color2",
-                "color3",
-                "colorSharpness",
-
-                "time",
-
-                "playerPosition"
-            ],
+            uniforms: ["world", "worldViewProjection", "normalMatrix", "seed", "stars", "nbStars", "color1", "color2", "color3", "colorSharpness", "time", "playerPosition"]
         });
 
         this.planet = planet;

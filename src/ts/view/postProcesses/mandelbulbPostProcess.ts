@@ -6,7 +6,7 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Mandelbulb } from "../bodies/planemos/mandelbulb";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
-import {UniformEnumType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "mandelbulb";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelbulbFragment;

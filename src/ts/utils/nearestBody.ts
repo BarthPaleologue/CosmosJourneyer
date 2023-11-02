@@ -23,6 +23,6 @@ export function nearestBody(object: TransformNode, bodies: AbstractBody[]): Abst
  * @param body the body to check whereas the player is orbiting
  * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
  */
-export function isOrbiting(controller: AbstractController, body: Transformable & BoundingSphere, orbitLimitFactor = 2.5): boolean {
+export function isOrbiting(controller: Transformable, body: Transformable & BoundingSphere, orbitLimitFactor = 2.5): boolean {
     return body.getTransform().getAbsolutePosition().subtract(controller.getTransform().getAbsolutePosition()).lengthSquared() < (orbitLimitFactor * body.getBoundingRadius()) ** 2;
 }

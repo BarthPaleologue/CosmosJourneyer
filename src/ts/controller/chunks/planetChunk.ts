@@ -83,11 +83,11 @@ export class PlanetChunk implements Transformable {
         vertexData.applyToMesh(this.mesh, false);
         this.mesh.freezeNormals();
 
-	if(this.depth > 3) {
-        	this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
-        	this.parentAggregate.shape.addChildFromParent(this.parent, this.physicsShape, this.mesh);
-        	this.physicsShapeIndex = this.parentAggregate.shape.getNumChildren();
-	}
+        if (this.depth > 3) {
+            this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
+            this.parentAggregate.shape.addChildFromParent(this.parent, this.physicsShape, this.mesh);
+            this.physicsShapeIndex = this.parentAggregate.shape.getNumChildren();
+        }
         this.mesh.setEnabled(true);
         this.loaded = true;
 
@@ -98,9 +98,9 @@ export class PlanetChunk implements Transformable {
         if (this.physicsShapeIndex === null) return;
         if (this.physicsShapeIndex > this.parentAggregate.shape.getNumChildren() - 1) {
             console.error(
-                `Tried to delete ${this.mesh.name} PhysicsShape. However its shape index was out of bound: ${
-                    this.physicsShapeIndex
-                } / range 0 : ${this.parentAggregate.shape.getNumChildren() - 1}`
+                `Tried to delete ${this.mesh.name} PhysicsShape. However its shape index was out of bound: ${this.physicsShapeIndex} / range 0 : ${
+                    this.parentAggregate.shape.getNumChildren() - 1
+                }`
             );
             this.physicsShape?.dispose();
             return;

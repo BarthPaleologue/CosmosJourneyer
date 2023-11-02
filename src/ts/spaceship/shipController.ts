@@ -57,7 +57,7 @@ export class ShipController extends AbstractController {
         this.firstPersonCamera.parent = this.instanceRoot;
         this.firstPersonCamera.position = new Vector3(0, 1, 0);
 
-        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 3.14/2);
+        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 3.14 / 2);
         this.thirdPersonCamera.parent = this.instanceRoot;
 
         this.aggregate = new PhysicsAggregate(this.instanceRoot, PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);

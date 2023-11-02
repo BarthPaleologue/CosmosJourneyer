@@ -5,7 +5,7 @@ import { UberPostProcess } from "../../controller/uberCore/postProcesses/uberPos
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { BaseObject } from "../common";
-import {UniformEnumType, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
+import { UniformEnumType, ShaderUniforms } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "overlay";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = overlayFragment;
