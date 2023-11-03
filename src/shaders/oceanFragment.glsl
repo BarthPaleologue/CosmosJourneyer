@@ -60,6 +60,8 @@ vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDi
 
     float distanceThroughOcean = max(0.0, escapePoint - impactPoint);// probably doesn't need the max but for the sake of coherence the distance cannot be negative
 
+    if (distanceThroughOcean <= 0.0) return originalColor;
+
     vec3 samplePoint = rayOrigin + impactPoint * rayDir - object.position;
 
     vec3 samplePointPlanetSpace = applyQuaternion(planetInverseRotationQuaternion, samplePoint);
@@ -77,55 +79,37 @@ vec4 oceanColor(vec4 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDi
     normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 500.0, normalWave, normalMap2, 0.000010, ocean.waveBlendingSharpness, 0.5);
     normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap1, 0.000005, ocean.waveBlendingSharpness, 0.5);
 
-    //normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 500.0, normalWave, normalMap1, 0.000001, ocean.waveBlendingSharpness, 0.2);
-    //normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap2, 0.0000005, ocean.waveBlendingSharpness, 0.2);
+    float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * ocean.depthModifier);
+    float alpha = exp(-distanceThroughOcean * ocean.alphaModifier);
 
-    float ndl = 0.0;
-    vec3 specularHighlight = vec3(0.0);
+    //vec3 oceanColor = lerp(vec3(10.0, 100.0, 249.0)/255.0, vec3(15.0,94.0,156.0)/255.0, opticalDepth01);
 
+    vec3 deepColor = vec3(0.0, 22.0, 82.0)/255.0;
+    vec3 shallowColor = vec3(32.0, 193.0, 180.0)/255.0;
+    vec3 oceanColor = mix(shallowColor, deepColor, opticalDepth01) * stars[0].color;
+
+    vec3 ambiant = mix(oceanColor, originalColor.rgb, alpha);
+
+    float foamSize = 30.0;
+    float foamFactor = saturate((foamSize - distanceThroughOcean) / foamSize);
+    vec3 foamColor = vec3(0.8);
+    ambiant = mix(ambiant, foamColor, foamFactor);
+
+    vec3 finalColor = vec3(0.0);
     for (int i = 0; i < nbStars; i++) {
         vec3 sunDir = normalize(stars[i].position - samplePoint);
 
-        float ndl1 = max(dot(normalWave, sunDir), 0.0);// dimming factor due to light inclination relative to vertex normal in world space
-        float ndl2 = max(dot(planetNormal, sunDir), 0.0);
-
-        ndl += sqrt(ndl1 * ndl2);
+        float ndl = max(dot(planetNormal, sunDir), 0.0);
+        finalColor += ambiant * ndl;
 
         if (length(rayOrigin - object.position) > ocean.radius) {
-            // if above cloud coverage then specular highlight
-            specularHighlight += computeSpecularHighlight(sunDir, rayDir, normalWave, ocean.smoothness, ocean.specularPower) * stars[i].color;
+            // if above ocean surface then specular highlight
+            finalColor += computeSpecularHighlight(sunDir, rayDir, normalWave, ocean.smoothness, ocean.specularPower) * stars[i].color;
         }
     }
 
-    ndl = saturate(ndl);
-    specularHighlight = clamp(specularHighlight, vec3(0.0), vec3(1.0));
-
-    if (distanceThroughOcean > 0.0) {
-        float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * ocean.depthModifier);
-        float alpha = exp(-distanceThroughOcean * ocean.alphaModifier);
-
-        //vec3 oceanColor = lerp(vec3(10.0, 100.0, 249.0)/255.0, vec3(15.0,94.0,156.0)/255.0, opticalDepth01);
-
-        vec3 deepColor = vec3(0.0, 22.0, 82.0)/255.0;
-        vec3 shallowColor = vec3(32.0, 193.0, 180.0)/255.0;
-        vec3 oceanColor = mix(shallowColor, deepColor, opticalDepth01) * stars[0].color;
-
-        vec3 ambiant = mix(oceanColor, originalColor.rgb, alpha);
-
-        float foamSize = 30.0;
-        float foamFactor = saturate((foamSize - distanceThroughOcean) / foamSize);
-        vec3 foamColor = vec3(0.8);
-        ambiant = mix(ambiant, foamColor, foamFactor);
-
-        vec3 finalColor = ambiant * ndl + specularHighlight;
-
-        return vec4(finalColor, 1.0);
-    }
-
-    return originalColor;
+    return vec4(finalColor, 1.0);
 }
-
-
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color

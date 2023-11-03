@@ -99,9 +99,14 @@ const sun = StarSystemHelper.makeStar(starSystem, sunModel);
 sun.model.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
-secundaModel.orbitalProperties.radius = 4 * sunModel.radius;
-secundaModel.orbitalProperties.period = 60 * 60 * 24 * 365.25;
-const secunda = starSystem.makeStar(secundaModel);*/
+secundaModel.orbit.radius = 30 * sunModel.radius;
+secundaModel.orbit.period = 60;
+const secunda = StarSystemHelper.makeStar(starSystem, secundaModel);
+
+const terminaModel = new StarModel(756263, sunModel);
+terminaModel.orbit.radius = 50 * sunModel.radius;
+terminaModel.orbit.period = 60 * 10;
+const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
 const planetModel = new TelluricPlanemoModel(0.4233609183800225, sunModel);
 planetModel.physicalProperties.minTemperature = -37;
