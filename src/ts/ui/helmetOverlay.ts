@@ -1,5 +1,4 @@
 import overlayHTML from "../../html/helmetOverlay.html";
-import { AbstractBody } from "../view/bodies/abstractBody";
 import { AbstractObject } from "../view/bodies/abstractObject";
 
 export class HelmetOverlay {

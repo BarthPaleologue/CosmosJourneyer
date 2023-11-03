@@ -74,7 +74,7 @@ engine.registerStarSystemUpdateCallback(() => {
 
     const throttleString = warpDrive.isEnabled()
         ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}`
-        : spaceshipController.getThrottle();
+        : `${parsePercentageFrom01(spaceshipController.getThrottle())}/100%`;
 
     (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 });
