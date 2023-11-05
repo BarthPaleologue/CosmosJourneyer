@@ -17,6 +17,7 @@ import { rotateAround, setUpVector, translate } from "./uberCore/transforms/basi
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../view/postProcesses/postProcessTypes";
+import { getTransformationQuaternion } from "../utils/algebra";
 
 export class StarSystem {
     readonly scene: UberScene;
@@ -204,7 +205,7 @@ export class StarSystem {
     }
 
     /**
-     * Returns the nearest body to the the given position
+     * Returns the nearest body to the given position
      */
     public getNearestCelestialBody(position: Vector3): AbstractBody {
         if (this.celestialBodies.length === 0) throw new Error("There are no bodies or spacestation in the solar system");
@@ -230,10 +231,7 @@ export class StarSystem {
 
         for (const object of this.orbitalObjects) {
             const displacement = new Vector3(object.model.orbit.radius, 0, 0);
-            const targetNormal = object.model.orbit.normalToPlane;
-            const rotationAxis = Vector3.Cross(Vector3.Up(), targetNormal);
-            const angle = Math.acos(Vector3.Dot(Vector3.Up(), targetNormal));
-            const quaternion = Quaternion.RotationAxis(rotationAxis, angle);
+            const quaternion = getTransformationQuaternion(Vector3.Up(), object.model.orbit.normalToPlane);
             displacement.applyRotationQuaternionInPlace(quaternion);
             if (object.parentObject !== null) {
                 translate(object.getTransform(), object.parentObject.getTransform().getAbsolutePosition());
