@@ -239,8 +239,6 @@ export class SpaceEngine {
         const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.starSystemScene);
         ambientLight.intensity = 0.3;
 
-        this.starSystemUI = new SystemUI(this.starSystemScene);
-
         this.havokPlugin = new HavokPlugin(true, havokInstance);
         this.starSystemScene.enablePhysics(Vector3.Zero(), this.havokPlugin);
 
@@ -286,6 +284,8 @@ export class SpaceEngine {
 
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
         this.helmetOverlay.setVisibility(false);
+
+        this.starSystemUI = new SystemUI(this.getStarSystemScene());
 
         this.activeScene = this.starMap.scene;
     }
