@@ -74,7 +74,6 @@ export class StarSystemView {
         ambientLight.intensity = 0.3;
 
         this.scene.onBeforePhysicsObservable.add(() => {
-            const starSystemScene = this.scene;
             const starSystem = this.getStarSystem();
 
             const deltaTime = engine.getDeltaTime() / 1000;
@@ -82,10 +81,12 @@ export class StarSystemView {
             Assets.ChunkForge.update();
             starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
 
+            this.ui.update(this.scene.getActiveUberCamera().getAbsolutePosition());
+
             const nearestBody = starSystem.getNearestOrbitalObject();
 
             if (nearestBody instanceof AbstractBody) {
-                this.bodyEditor.update(nearestBody, starSystem.postProcessManager, starSystemScene);
+                this.bodyEditor.update(nearestBody, starSystem.postProcessManager, this.scene);
             }
             this.helmetOverlay.update(nearestBody);
 
