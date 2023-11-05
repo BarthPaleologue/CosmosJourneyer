@@ -81,6 +81,10 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
         }
     }
 
+    getTypeName(): string {
+        return "Telluric Planemo";
+    }
+
     /**
      * Update terrain of the sphere relative to the observer position
      * @param observerPosition

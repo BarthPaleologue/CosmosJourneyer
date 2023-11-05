@@ -29,6 +29,10 @@ export class BlackHole extends AbstractBody {
         this.postProcesses.push(PostProcessType.BLACK_HOLE);
     }
 
+    getTypeName(): string {
+        return "Black Hole";
+    }
+
     public override computeCulling(camera: Camera): void {
         // nothing to do
     }

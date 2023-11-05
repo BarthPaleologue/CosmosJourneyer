@@ -12,6 +12,7 @@ export class ObjectOverlay {
     readonly textRoot: StackPanel;
     readonly cursor: Image;
     readonly namePlate: TextBlock;
+    readonly typeText: TextBlock;
     readonly distanceText: TextBlock;
     readonly object: AbstractObject;
 
@@ -20,8 +21,8 @@ export class ObjectOverlay {
 
         this.textRoot = new StackPanel(object.name + "OverlayTextRoot");
         this.textRoot.width = "150px";
-        this.textRoot.height = "70px";
-        this.textRoot.background = "darkred";
+        this.textRoot.height = "90px";
+        this.textRoot.background = "transparent";
         this.textRoot.zIndex = 6;
         this.textRoot.alpha = 0.95;
 
@@ -34,6 +35,16 @@ export class ObjectOverlay {
         this.namePlate.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.namePlate.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.namePlate);
+
+        this.typeText = new TextBlock(object.name + "OverlayTypeText");
+        this.typeText.text = object.getTypeName();
+        this.typeText.color = "white";
+        this.typeText.zIndex = 6;
+        this.typeText.height = "20px";
+        this.typeText.fontSize = 16;
+        this.typeText.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
+        this.typeText.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
+        this.textRoot.addControl(this.typeText);
 
         this.distanceText = new TextBlock(object.name + "OverlayDistanceText");
         this.distanceText.color = "white";
@@ -78,10 +89,10 @@ export class ObjectOverlay {
         this.cursor.scaleX = Math.max(scale, screenRatio);
         this.cursor.scaleY = Math.max(scale, screenRatio);
 
-        const alphaCursor = Math.max(0, (1e-3 * (distance - this.object.getBoundingRadius() * 3)) / this.object.getBoundingRadius());
+        const alphaCursor = 100 * Math.max(scale - screenRatio, 0.0);
         this.cursor.alpha = Math.min(alphaCursor, 0.5);
 
-        const alphaText = distance < 10 * this.object.getBoundingRadius() ? 0 : 0.95;
+        const alphaText = Math.max(0, (distance / (3 * this.object.getBoundingRadius())) - 1.0);
         this.textRoot.alpha = alphaText;
 
         this.textRoot.linkOffsetXInPixels = 0.5 * Math.max(scale, screenRatio) * window.innerWidth + 75 + 20;

@@ -58,6 +58,8 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
 
     public abstract getBoundingRadius(): number;
 
+    public abstract getTypeName(): string;
+
     /**
      * Returns the axis of rotation of the body
      */

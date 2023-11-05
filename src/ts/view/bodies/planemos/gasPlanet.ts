@@ -58,6 +58,10 @@ export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial 
         this.material.update(controller, stellarObjects, deltaTime);
     }
 
+    getTypeName(): string {
+        return "Gas Planet";
+    }
+
     public override computeCulling(camera: Camera): void {
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }

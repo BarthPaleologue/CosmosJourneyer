@@ -22,4 +22,8 @@ export class NeutronStar extends Star {
 
         this.postProcesses.push(PostProcessType.MATTER_JETS);
     }
+
+    getTypeName(): string {
+        return "Neutron Star";
+    }
 }

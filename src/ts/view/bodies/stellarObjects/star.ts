@@ -15,6 +15,7 @@ import { setRotationQuaternion } from "../../../controller/uberCore/transforms/b
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere, PhysicsShapeType } from "@babylonjs/core";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { getStellarTypeString } from "../../../model/stellarObjects/common";
 
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
@@ -64,6 +65,10 @@ export class Star extends AbstractBody {
 
         this.postProcesses.push(PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE);
         if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
+    }
+
+    getTypeName(): string {
+        return `${getStellarTypeString(this.model.stellarType)} star`;
     }
 
     public updateMaterial(): void {

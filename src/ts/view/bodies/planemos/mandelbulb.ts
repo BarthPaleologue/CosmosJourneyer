@@ -26,6 +26,10 @@ export class Mandelbulb extends AbstractBody implements Planemo {
         this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
 
+    getTypeName(): string {
+        return "Anomaly";
+    }
+
     public override computeCulling(camera: Camera): void {
         // do nothing
     }

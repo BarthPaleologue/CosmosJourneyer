@@ -15,11 +15,11 @@ export class SystemUI {
     }
 
     public setEnabled(enabled: boolean) {
-        this.gui.rootContainer.isEnabled = enabled;
+        this.gui.rootContainer.alpha = enabled ? 1 : 0;
     }
 
     public isEnabled() {
-        return this.gui.rootContainer.isEnabled;
+        return this.gui.rootContainer.alpha === 1;
     }
 
     public createObjectOverlays(objects: AbstractObject[]) {
@@ -51,6 +51,10 @@ export class SystemUI {
     }
 
     setTarget(object: AbstractObject | null) {
+        if (this.target === object) {
+            this.target = null;
+            return;
+        }
         this.target = object;
     }
 }

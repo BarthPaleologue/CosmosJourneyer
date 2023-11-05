@@ -338,7 +338,7 @@ export class StarSystem {
         const nearestBody = this.getNearestOrbitalObject();
 
         const distanceOfNearestToCamera = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().getAbsolutePosition());
-        const shouldCompensateTranslation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * 10;
+        const shouldCompensateTranslation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * (nearestBody instanceof SpaceStation ? 80 : 10);
         const shouldCompensateRotation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * 4;
 
         nearestBody.updateInternalClock(deltaTime);

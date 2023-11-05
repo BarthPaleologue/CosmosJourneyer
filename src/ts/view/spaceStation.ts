@@ -38,7 +38,11 @@ export class SpaceStation extends AbstractObject {
     }
 
     public override getBoundingRadius(): number {
-        return 2e3;
+        return 1e3;
+    }
+
+    getTypeName(): string {
+        return "Space Station";
     }
 
     public override computeCulling(camera: Camera): void {
