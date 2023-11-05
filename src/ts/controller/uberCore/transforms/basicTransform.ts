@@ -59,8 +59,8 @@ export function getInverseRotationMatrix(transformNode: TransformNode): Matrix {
 /* #region directions */
 
 /**
- *
- * @returns the unit vector pointing forward the player controler in world space
+ * This is not equivalent to transform.forward as CosmosJourneyer uses the right-handed coordinate system
+ * @returns the forward vector of the given transform in world space
  */
 export function getForwardDirection(transformNode: TransformNode): Vector3 {
     return transformNode.getDirection(Axis.Z);
@@ -68,7 +68,7 @@ export function getForwardDirection(transformNode: TransformNode): Vector3 {
 
 /**
  *
- * @returns the unit vector pointing backward the player controler in world space
+ * @returns the unit vector pointing backward the player controller in world space
  */
 export function getBackwardDirection(transformNode: TransformNode): Vector3 {
     return getForwardDirection(transformNode).negate();
@@ -76,7 +76,7 @@ export function getBackwardDirection(transformNode: TransformNode): Vector3 {
 
 /**
  *
- * @returns the unit vector pointing upward the player controler in world space
+ * @returns the unit vector pointing upward the player controller in world space
  */
 export function getUpwardDirection(transformNode: TransformNode): Vector3 {
     return transformNode.getDirection(Axis.Y);

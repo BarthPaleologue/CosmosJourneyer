@@ -34,9 +34,7 @@ import { AssetsManager, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager
 import { Scene } from "@babylonjs/core/scene";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { PBRBaseMaterial } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { TransformNode } from "@babylonjs/core/Meshes";
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 import { Sound } from "@babylonjs/core/Audio/sound";
