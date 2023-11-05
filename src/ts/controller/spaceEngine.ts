@@ -203,6 +203,11 @@ export class SpaceEngine {
         return this.engine;
     }
 
+    /**
+     * Returns the Havok plugin
+     * @returns the Havok plugin
+     * @throws Error if the Havok plugin is null
+     */
     public getHavokPlugin(): HavokPlugin {
         if (this.havokPlugin === null) throw new Error("Havok plugin is null");
         return this.havokPlugin;
