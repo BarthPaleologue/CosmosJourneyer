@@ -29,7 +29,7 @@ export class StarSystemView {
     private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer();
     private readonly axisRenderer: AxisRenderer = new AxisRenderer();
 
-    private ui: SystemUI | null = null;
+    private readonly ui: SystemUI;
 
     private static readonly unZoomAnimation = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
@@ -128,6 +128,7 @@ export class StarSystemView {
 
     init() {
         this.getStarSystem().init();
+        this.ui.createObjectOverlays(this.getStarSystem().getBodies());
 
         const firstBody = this.getStarSystem().getBodies()[0];
         if (firstBody === undefined) throw new Error("No bodies in star system");
