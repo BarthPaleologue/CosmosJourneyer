@@ -63,7 +63,7 @@ engine.registerStarSystemUpdateCallback(() => {
     if (scene.getActiveController() != spaceshipController) return;
 
     const shipPosition = spaceshipController.getTransform().getAbsolutePosition();
-    const nearestBody = engine.getStarSystem().getNearestOrbitalObject(shipPosition);
+    const nearestBody = engine.getStarSystem().getNearestOrbitalObject();
     const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getBoundingRadius();
     spaceshipController.registerClosestObject(distance, radius);
@@ -100,12 +100,12 @@ sun.model.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
 secundaModel.orbit.radius = 30 * sunModel.radius;
-secundaModel.orbit.period = 60;
+secundaModel.orbit.period = 60 * 60;
 const secunda = StarSystemHelper.makeStar(starSystem, secundaModel);
 
 const terminaModel = new StarModel(756263, sunModel);
 terminaModel.orbit.radius = 50 * sunModel.radius;
-terminaModel.orbit.period = 60 * 10;
+terminaModel.orbit.period = 60 * 60;
 const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
 const planetModel = new TelluricPlanemoModel(0.4233609183800225, sunModel);

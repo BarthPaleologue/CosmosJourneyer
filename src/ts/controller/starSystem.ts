@@ -66,6 +66,8 @@ export class StarSystem {
      */
     readonly model: StarSystemModel;
 
+    private nearestOrbitalObject: AbstractObject | null = null;
+
     constructor(model: StarSystemModel | number, scene: UberScene) {
         this.scene = scene;
         this.postProcessManager = new PostProcessManager(this.scene);
@@ -162,10 +164,7 @@ export class StarSystem {
         return this.celestialBodies;
     }
 
-    /**
-     * Returns the nearest orbital object to the origin
-     */
-    public getNearestOrbitalObject(position: Vector3): AbstractObject {
+    public computeNearestOrbitalObject(position: Vector3): void {
         if (this.celestialBodies.length + this.spaceStations.length === 0) throw new Error("There are no bodies or spacestation in the solar system");
         let nearest = null;
         let smallerDistance = -1;
@@ -185,6 +184,14 @@ export class StarSystem {
                 smallerDistance = distance;
             }
         }
+        this.nearestOrbitalObject = nearest;
+    }
+
+    /**
+     * Returns the nearest orbital object to the origin
+     */
+    public getNearestOrbitalObject(): AbstractObject {
+        const nearest = this.nearestOrbitalObject;
         if (nearest === null) throw new Error("There are no bodies in the solar system");
         return nearest;
     }
@@ -294,7 +301,8 @@ export class StarSystem {
      */
     public update(deltaTime: number): void {
         const controller = this.scene.getActiveController();
-        const nearestBody = this.getNearestOrbitalObject(this.scene.getActiveUberCamera().position);
+        this.computeNearestOrbitalObject(controller.getActiveCamera().getAbsolutePosition());
+        const nearestBody = this.getNearestOrbitalObject();
 
         const distanceOfNearestToCamera = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().getAbsolutePosition());
         const shouldCompensateTranslation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * 10;

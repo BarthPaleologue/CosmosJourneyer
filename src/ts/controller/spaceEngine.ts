@@ -259,18 +259,15 @@ export class SpaceEngine {
 
             const deltaTime = this.getEngine().getDeltaTime() / 1000;
 
-            const nearestBody = starSystem.getNearestOrbitalObject(starSystemScene.getActiveUberCamera().position);
+            Assets.ChunkForge.update();
+            starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
+
+            const nearestBody = starSystem.getNearestOrbitalObject();
 
             if (nearestBody instanceof AbstractBody) {
                 this.bodyEditor.update(nearestBody, starSystem.postProcessManager, starSystemScene);
             }
             this.helmetOverlay.update(nearestBody);
-
-            //FIXME: should address stars orbits
-            for (const star of starSystem.stellarObjects) star.model.orbit.period = 0;
-
-            Assets.ChunkForge.update();
-            starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
 
             this.orbitRenderer.update();
         });
