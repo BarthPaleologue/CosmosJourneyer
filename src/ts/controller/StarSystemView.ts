@@ -36,10 +36,10 @@ export class StarSystemView {
 
     constructor(engine: Engine, havokPlugin: HavokPlugin) {
         this.helmetOverlay = new HelmetOverlay();
-        this.bodyEditor = new BodyEditor();
+        this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
 
         const canvas = engine.getRenderingCanvas();
-        if(canvas === null) throw new Error("Canvas is null");
+        if (canvas === null) throw new Error("Canvas is null");
         this.bodyEditor.setCanvas(canvas);
 
         StarSystemView.unZoomAnimation.setKeys([
@@ -64,7 +64,7 @@ export class StarSystemView {
             if (e.key === "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
             if (e.key === "b") this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
 
-            if(e.key === "t") {
+            if (e.key === "t") {
                 this.ui.setTarget(this.getStarSystem().getClosestToScreenCenterOrbitalObject());
             }
         });
@@ -103,8 +103,6 @@ export class StarSystemView {
         });
 
         this.bodyEditor.resize();
-
-        this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
         this.helmetOverlay.setVisibility(false);
 
         this.ui = new SystemUI(this.scene);
