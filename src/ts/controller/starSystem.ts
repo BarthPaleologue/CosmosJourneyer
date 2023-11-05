@@ -29,7 +29,7 @@ export class StarSystem {
 
     private readonly spaceStations: SpaceStation[] = [];
 
-    private readonly celestialBodies: AbstractBody[] = [];
+    readonly celestialBodies: AbstractBody[] = [];
 
     /**
      * The list of all stellar objects in the system (stars, black holes, pulsars)

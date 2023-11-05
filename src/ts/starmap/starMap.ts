@@ -40,8 +40,6 @@ export class StarMap {
     readonly scene: Scene;
     private readonly controller: DefaultController;
 
-    private isRunning = true;
-
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
 
@@ -226,8 +224,6 @@ export class StarMap {
         this.densityRNG = (x: number, y: number, z: number) => (1.0 - Math.abs(perlinRNG(x * 0.2, y * 0.2, z * 0.2))) ** 8;
 
         this.scene.onBeforeRenderObservable.add(() => {
-            if (!this.isRunning) return;
-
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
             if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaTime);
@@ -258,10 +254,6 @@ export class StarMap {
         this.controller.getTransform().position = Vector3.Zero();
         this.starMapCenterPosition.addInPlace(translationToOrigin);
         for (const mesh of this.scene.meshes) mesh.position.addInPlace(translationToOrigin);
-    }
-
-    public setRunning(running: boolean): void {
-        this.isRunning = running;
     }
 
     private dispatchWarpCallbacks() {

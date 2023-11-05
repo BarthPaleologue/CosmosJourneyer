@@ -1,105 +1,62 @@
-import { HelmetOverlay } from "../ui/helmetOverlay";
-import { BodyEditor, EditorVisibility } from "../ui/bodyEditor/bodyEditor";
 import { Assets } from "./assets";
-import { AbstractController } from "./uberCore/abstractController";
-import { UberScene } from "./uberCore/uberScene";
 import { StarSystem } from "./starSystem";
-import { Settings } from "../settings";
-import { OverlayPostProcess } from "../view/postProcesses/overlayPostProcess";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
-import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
-import { Color4 } from "@babylonjs/core/Maths/math.color";
 import "@babylonjs/core/Misc/screenshotTools";
 import { StarMap } from "../starmap/starMap";
-import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
-import { positionNearObject } from "../utils/positionNearObject";
+import { Scene } from "@babylonjs/core/scene";
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
 
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
-import { SystemUI } from "../ui/systemUI";
-import { BlackHole } from "../view/bodies/stellarObjects/blackHole";
-import { ShipController } from "../spaceship/shipController";
-import { Vector3 } from "@babylonjs/core/Maths/math";
 import { setMaxLinVel } from "../utils/havok";
-import { Animation } from "@babylonjs/core/Animations/animation";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { OrbitRenderer } from "../view/orbitRenderer";
 import { PauseMenu } from "../ui/pauseMenu";
-import { AxisRenderer } from "../view/axisRenderer";
-import { AbstractBody } from "../view/bodies/abstractBody";
-import { StarSystemHelper } from "./starSystemHelper";
+import { StarSystemView } from "./StarSystemView";
 
 enum EngineState {
     RUNNING,
     PAUSED
 }
 
+/**
+ * Main class of CosmosJourneyer. It handles the underlying BabylonJS engine, and the communication between
+ * the starmap view and the star system view. It also provides utility methods to take screenshots and record videos.
+ * It also handles the pause menu.
+ */
 export class SpaceEngine {
-    // UI
-    private readonly helmetOverlay: HelmetOverlay;
-    readonly bodyEditor: BodyEditor;
     private readonly pauseMenu: PauseMenu;
-    readonly canvas: HTMLCanvasElement;
-    private isFullscreen = false;
     private videoRecorder: VideoRecorder | null = null;
 
-    // BabylonJS
+    readonly canvas: HTMLCanvasElement;
     private engine: Engine | null = null;
-    private starSystemScene: UberScene | null = null;
-
-    private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer();
-    private readonly axisRenderer: AxisRenderer = new AxisRenderer();
-
     private havokPlugin: HavokPlugin | null = null;
 
-    private starSystemUI: SystemUI | null = null;
-
-    private starSystem: StarSystem | null = null;
+    private starSystemView: StarSystemView | null = null;
     private starMap: StarMap | null = null;
 
     private activeScene: Scene | null = null;
 
     private state = EngineState.RUNNING;
 
-    private static readonly unZoomAnimation = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
-
     readonly onToggleStarMapObservable = new Observable<boolean>();
 
     constructor() {
-        this.helmetOverlay = new HelmetOverlay();
-        this.bodyEditor = new BodyEditor();
         this.pauseMenu = new PauseMenu();
-
         this.pauseMenu.onResume.add(() => this.resume());
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
-            const seed = this.getStarSystem().model.seed;
+            const seed = this.getStarSystemView().getStarSystem().model.seed;
             const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/dist/random.html?seed=${seed}`);
-            navigator.clipboard.writeText(url.toString());
+            navigator.clipboard.writeText(url.toString()).then(() => console.log("Copied to clipboard"));
         });
 
         this.canvas = document.getElementById("renderer") as HTMLCanvasElement;
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-
-        this.bodyEditor.setCanvas(this.canvas);
-
-        SpaceEngine.unZoomAnimation.setKeys([
-            {
-                frame: 0,
-                value: 30
-            },
-            {
-                frame: 30,
-                value: 600
-            }
-        ]);
 
         window.addEventListener("blur", () => {
             if (!this.isPaused()) this.pause();
@@ -107,97 +64,15 @@ export class SpaceEngine {
 
         //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
-            if (e.key === "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
-            if (e.key === "n") {
-                this.orbitRenderer.setVisibility(!this.orbitRenderer.isVisible());
-                this.axisRenderer.setVisibility(!this.axisRenderer.isVisible());
-            }
             if (e.key === "p") this.takeScreenshot();
-            if (e.key === "v") {
-                if (!VideoRecorder.IsSupported(this.getEngine())) console.warn("Your browser does not support video recording!");
-                if (this.videoRecorder === null) {
-                    this.videoRecorder = new VideoRecorder(this.getEngine(), {
-                        fps: 60,
-                        recordChunckSize: 3000000,
-                        mimeType: "video/webm;codecs=h264"
-                    });
-                    this.videoRecorder.startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10")));
-                } else if (this.videoRecorder.isRecording) {
-                    this.videoRecorder.stopRecording();
-                } else {
-                    this.videoRecorder.startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10")));
-                }
-            }
-            if (e.key === "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
-            //if (e.key === "m") mouse.deadAreaRadius === 50 ? (mouse.deadAreaRadius = 1e5) : (mouse.deadAreaRadius = 50);
-            //if (e.key === "w" && isOrbiting(this.getStarSystemScene().getActiveController(), this.getStarSystem().getNearestBody()))
-            //    (this.getStarSystem().getNearestBody() as TelluricPlanemo).material.wireframe = !(this.getStarSystem().getNearestBody() as TelluricPlanemo).material.wireframe;
-
+            if (e.key === "v") this.takeVideoCapture();
             if (e.key === "m") this.toggleStarMap();
 
-            if (e.key === "t") {
-                if (this.getActiveScene() === this.starSystemScene) {
-                    this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
-                }
-            }
-
-            // when pressing f11, the ui is hidden when the browser is in fullscreen mode
-            if (e.key === "F11") this.isFullscreen = !this.isFullscreen;
-
             if (e.key === "Escape") {
-                if (this.state === EngineState.RUNNING) this.pause();
+                if (!this.isPaused()) this.pause();
                 else this.resume();
             }
         });
-    }
-
-    takeScreenshot(): void {
-        const camera = this.getActiveScene().activeCamera;
-        if (camera === null) throw new Error("Cannot take screenshot: camera is null");
-        Tools.CreateScreenshot(this.getEngine(), camera, { precision: 4 });
-    }
-
-    pause(): void {
-        this.state = EngineState.PAUSED;
-        this.pauseMenu.setVisibility(true);
-        this.getStarSystemScene().physicsEnabled = false;
-        this.getStarMap().setRunning(false);
-    }
-
-    resume(): void {
-        this.state = EngineState.RUNNING;
-        this.pauseMenu.setVisibility(false);
-        this.getStarSystemScene().physicsEnabled = true;
-        this.getStarMap().setRunning(true);
-    }
-
-    isPaused(): boolean {
-        return this.state === EngineState.PAUSED;
-    }
-
-    /**
-     * Toggles the star map
-     * @throws Error if the star map is null
-     */
-    public toggleStarMap(): void {
-        if (this.activeScene === this.getStarSystemScene()) {
-            this.getStarSystemScene().getActiveController().getActiveCamera().animations = [SpaceEngine.unZoomAnimation];
-            this.getStarSystemScene().beginAnimation(this.getStarSystemScene().getActiveController().getActiveCamera(), 0, 60, false, 2.0, () => {
-                this.getStarSystemScene().getActiveController().getActiveCamera().animations = [];
-                this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
-                this.helmetOverlay.setVisibility(false);
-
-                const starMap = this.getStarMap();
-                this.activeScene = starMap.scene;
-                starMap.focusOnCurrentSystem();
-            });
-        } else {
-            this.activeScene = this.getStarSystemScene();
-            this.helmetOverlay.setVisibility(true);
-            this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
-        }
-
-        this.onToggleStarMapObservable.notifyObservers(this.activeScene === this.getStarMap().scene);
     }
 
     /**
@@ -205,122 +80,70 @@ export class SpaceEngine {
      * @returns A promise that resolves when the engine and the scenes are created and the assets are loaded
      */
     public async setup(): Promise<void> {
+        // Init BabylonJS engine
         this.engine = new Engine(this.canvas); //await EngineFactory.CreateAsync(this.canvas, { enableAllFeatures: true });
         this.engine.useReverseDepthBuffer = true;
-
         this.engine.loadingScreen.displayLoadingUI();
-
-        console.log(`API: ${this.engine instanceof WebGPUEngine ? "WebGPU" : "WebGL" + this.engine.webGLVersion}`);
-        console.log(`GPU detected: ${this.engine.getGlInfo().renderer}`);
-
-        const havokInstance = await HavokPhysics();
-
-        this.starMap = new StarMap(this.engine);
-        this.starMap.onWarpObservable.add((seed: number) => {
-            this.setStarSystem(new StarSystem(seed, this.getStarSystemScene()), true);
-            this.init();
-            const firstBody = this.getStarSystem().getBodies()[0];
-            if (firstBody === undefined) throw new Error("No bodies in star system");
-
-            this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getBodies());
-            this.axisRenderer.setObjects(this.getStarSystem().getBodies());
-
-            const activeController = this.getStarSystemScene().getActiveController();
-            positionNearObject(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
-            if (activeController instanceof ShipController) activeController.enableWarpDrive();
-
-            this.toggleStarMap();
-        });
-
-        this.starSystemScene = new UberScene(this.engine, ScenePerformancePriority.Intermediate);
-        this.starSystemScene.clearColor = new Color4(0, 0, 0, 0);
-        this.starSystemScene.useRightHandedSystem = true;
-
-        const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.starSystemScene);
-        ambientLight.intensity = 0.3;
-
-        this.havokPlugin = new HavokPlugin(true, havokInstance);
-        this.starSystemScene.enablePhysics(Vector3.Zero(), this.havokPlugin);
-
-        setMaxLinVel(this.havokPlugin, 10000, 10000);
-
-        await Assets.Init(this.starSystemScene);
-
-        this.starSystemScene.executeWhenReady(() => {
-            this.getEngine().loadingScreen.hideLoadingUI();
-            this.getEngine().runRenderLoop(() => this.getActiveScene().render());
-        });
-
-        this.starSystemScene.onBeforePhysicsObservable.add(() => {
-            if (this.isPaused()) return;
-
-            const starSystemScene = this.getStarSystemScene();
-            const starSystem = this.getStarSystem();
-
-            const deltaTime = this.getEngine().getDeltaTime() / 1000;
-
-            Assets.ChunkForge.update();
-            starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
-
-            const nearestBody = starSystem.getNearestOrbitalObject();
-
-            if (nearestBody instanceof AbstractBody) {
-                this.bodyEditor.update(nearestBody, starSystem.postProcessManager, starSystemScene);
-            }
-            this.helmetOverlay.update(nearestBody);
-
-            this.orbitRenderer.update();
-        });
-
         window.addEventListener("resize", () => {
-            this.bodyEditor.resize();
             this.getEngine().resize(true);
         });
 
-        this.bodyEditor.resize();
+        // Log informations about the gpu and the api used
+        console.log(`API: ${this.engine.isWebGPU ? "WebGPU" : "WebGL" + this.engine.webGLVersion}`);
+        console.log(`GPU detected: ${this.engine.getGlInfo().renderer}`);
 
-        this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
-        this.helmetOverlay.setVisibility(false);
+        // Init Havok physics engine
+        const havokInstance = await HavokPhysics();
+        this.havokPlugin = new HavokPlugin(true, havokInstance);
+        setMaxLinVel(this.havokPlugin, 10000, 10000);
+        console.log(`Havok initialized`);
 
-        this.starSystemUI = new SystemUI(this.getStarSystemScene());
+        // Init starmap view
+        this.starMap = new StarMap(this.engine);
+        this.starMap.onWarpObservable.add((seed: number) => {
+            this.getStarSystemView().setStarSystem(new StarSystem(seed, this.getStarSystemView().scene), true);
+            this.getStarSystemView().init();
+            this.toggleStarMap();
+        });
 
+        // Init star system view
+        this.starSystemView = new StarSystemView(this.engine, this.havokPlugin);
+
+        // Init assets used in star system view
+        await Assets.Init(this.getStarSystemView().scene);
+
+        // Starmap is the active scene by default
         this.activeScene = this.starMap.scene;
+
+        // When everything is ready, hide the loading screen and start the render loop
+        this.starSystemView.scene.executeWhenReady(() => {
+            this.getEngine().loadingScreen.hideLoadingUI();
+            this.getEngine().runRenderLoop(() => {
+                if (this.isPaused()) return;
+                this.getActiveScene().render();
+            });
+        });
+    }
+
+    public pause(): void {
+        this.state = EngineState.PAUSED;
+        this.pauseMenu.setVisibility(true);
+    }
+
+    public resume(): void {
+        this.state = EngineState.RUNNING;
+        this.pauseMenu.setVisibility(false);
+    }
+
+    public isPaused(): boolean {
+        return this.state === EngineState.PAUSED;
     }
 
     /**
      * Inits the current star system
      */
     public init(): void {
-        this.getStarSystem().init();
-    }
-
-    /**
-     * Sets the active controller of the star system scene
-     * @param controller the controller to be set as active
-     */
-    public setActiveController(controller: AbstractController): void {
-        this.getStarSystemScene().setActiveController(controller);
-    }
-
-    /**
-     * Sets the star system and generates it if needed and disposes the old one. Does not perform the init method
-     * @param starSystem the star system to be set
-     * @param needsGenerating whether the star system needs to be generated or not
-     */
-    public setStarSystem(starSystem: StarSystem, needsGenerating: boolean): void {
-        this.starSystem?.dispose();
-        this.starSystem = starSystem;
-        if (needsGenerating) StarSystemHelper.generate(this.starSystem);
-    }
-
-    /**
-     * Returns the star system
-     * @returns the star system
-     * @throws Error if the star system is null
-     */
-    public getStarSystem(): StarSystem {
-        if (this.starSystem === null) throw new Error("Star system is null");
-        return this.starSystem;
+        this.getStarSystemView().init();
     }
 
     /**
@@ -328,22 +151,36 @@ export class SpaceEngine {
      * @param callback the callback to be called before the star system scene is rendered
      */
     public registerStarSystemUpdateCallback(callback: () => void): void {
-        this.getStarSystemScene().registerBeforeRender(callback);
+        this.getStarSystemView().scene.onBeforeRenderObservable.add(callback);
     }
 
-    /**
-     * Returns the star system scene
-     * @returns the star system scene
-     * @throws Error if the star system scene is null
-     */
-    public getStarSystemScene(): UberScene {
-        if (this.starSystemScene === null) throw new Error("Star system scene is null");
-        return this.starSystemScene;
+    public getStarSystemView(): StarSystemView {
+        if (this.starSystemView === null) throw new Error("Star system view is null");
+        return this.starSystemView;
     }
 
     public getStarMap(): StarMap {
         if (this.starMap === null) throw new Error("Star map is null");
         return this.starMap;
+    }
+
+    /**
+     * Toggles the star map
+     * @throws Error if the star map is null
+     */
+    public toggleStarMap(): void {
+        if (this.activeScene === this.getStarSystemView().scene) {
+            this.getStarSystemView().unZoom(() => {
+                const starMap = this.getStarMap();
+                this.activeScene = starMap.scene;
+                starMap.focusOnCurrentSystem();
+            });
+        } else {
+            this.activeScene = this.getStarSystemView().scene;
+            this.getStarSystemView().showUI();
+        }
+
+        this.onToggleStarMapObservable.notifyObservers(this.activeScene === this.getStarMap().scene);
     }
 
     /**
@@ -369,5 +206,36 @@ export class SpaceEngine {
     public getHavokPlugin(): HavokPlugin {
         if (this.havokPlugin === null) throw new Error("Havok plugin is null");
         return this.havokPlugin;
+    }
+
+    /**
+     * Takes a screenshot of the current scene. By default, the screenshot is taken at a 4x the resolution of the canvas
+     * @param precision The resolution multiplier of the screenshot
+     */
+    public takeScreenshot(precision = 4): void {
+        const camera = this.getActiveScene().activeCamera;
+        if (camera === null) throw new Error("Cannot take screenshot: camera is null");
+        Tools.CreateScreenshot(this.getEngine(), camera, { precision: precision });
+    }
+
+    public takeVideoCapture(): void {
+        if (!VideoRecorder.IsSupported(this.getEngine())) {
+            console.warn("Your browser does not support video recording!");
+            return;
+        }
+
+        if (this.videoRecorder === null) {
+            this.videoRecorder = new VideoRecorder(this.getEngine(), {
+                fps: 60,
+                recordChunckSize: 3000000,
+                mimeType: "video/webm;codecs=h264"
+            });
+        }
+
+        if (this.videoRecorder.isRecording) {
+            this.videoRecorder.stopRecording();
+        } else {
+            this.videoRecorder.startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10"))).then();
+        }
     }
 }

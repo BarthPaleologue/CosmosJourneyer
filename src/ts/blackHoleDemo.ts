@@ -18,7 +18,9 @@ const engine = new SpaceEngine();
 
 await engine.setup();
 
-const scene = engine.getStarSystemScene();
+const starSystemView = engine.getStarSystemView();
+
+const scene = starSystemView.scene;
 
 const mouse = new Mouse(engine.canvas, 100);
 const keyboard = new Keyboard();
@@ -40,11 +42,10 @@ spaceshipController.addInput(gamepad);
 scene.setActiveController(spaceshipController);
 
 engine.registerStarSystemUpdateCallback(() => {
-    if (engine.isPaused()) return;
     if (scene.getActiveController() != spaceshipController) return;
 
     const shipPosition = spaceshipController.getTransform().getAbsolutePosition();
-    const nearestBody = engine.getStarSystem().getNearestOrbitalObject();
+    const nearestBody = starSystemView.getStarSystem().getNearestOrbitalObject();
     const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getBoundingRadius();
     spaceshipController.registerClosestObject(distance, radius);
@@ -62,7 +63,7 @@ engine.registerStarSystemUpdateCallback(() => {
 
 const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
 const starSystem = new StarSystem(starSystemSeed, scene);
-engine.setStarSystem(starSystem, false);
+starSystemView.setStarSystem(starSystem, false);
 
 const BH = StarSystemHelper.makeBlackHole(starSystem, 0);
 BH.model.orbit.radius = 0;
@@ -75,13 +76,13 @@ document.addEventListener("keydown", (e) => {
         if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);
             setRotationQuaternion(player.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
-            engine.getStarSystem().postProcessManager.rebuild();
+            starSystemView.getStarSystem().postProcessManager.rebuild();
 
             spaceshipController.setEnabled(false, engine.getHavokPlugin());
         } else {
             scene.setActiveController(spaceshipController);
             setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(player.getTransform()).clone());
-            engine.getStarSystem().postProcessManager.rebuild();
+            starSystemView.getStarSystem().postProcessManager.rebuild();
 
             spaceshipController.setEnabled(true, engine.getHavokPlugin());
         }
