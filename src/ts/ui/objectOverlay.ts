@@ -3,12 +3,16 @@ import { AbstractObject } from "../view/bodies/abstractObject";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import cursorImage from "../../asset/textures/hoveredCircle.png";
+import { parseDistance } from "../utils/parseToStrings";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class ObjectOverlay {
     readonly textRoot: StackPanel;
     readonly cursor: Image;
     readonly namePlate: TextBlock;
+    readonly distanceText: TextBlock;
     readonly object: AbstractObject;
 
     constructor(object: AbstractObject) {
@@ -27,8 +31,19 @@ export class ObjectOverlay {
         this.namePlate.color = "white";
         this.namePlate.zIndex = 6;
         this.namePlate.height = "50px";
+        this.namePlate.fontSize = 20;
         this.namePlate.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
+        this.namePlate.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.namePlate);
+
+        this.distanceText = new TextBlock(object.name + "OverlayDistanceText");
+        this.distanceText.color = "white";
+        this.distanceText.zIndex = 6;
+        this.distanceText.height = "20px";
+        this.distanceText.fontSize = 16;
+        this.distanceText.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
+        this.distanceText.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
+        this.textRoot.addControl(this.distanceText);
 
         this.cursor = new Image(object.name + "Cursor", cursorImage);
         this.cursor.fixedRatio = 1;
@@ -38,20 +53,35 @@ export class ObjectOverlay {
     }
 
     init() {
-        console.log(this.object.getTransform());
         this.textRoot.linkWithMesh(this.object.getTransform());
         this.cursor.linkWithMesh(this.object.getTransform());
     }
 
-    update(cameraPosition: Vector3) {
-        if (this.cursor.linkedMesh === null) return;
-        const distance = this.cursor.linkedMesh.getAbsolutePosition().subtract(cameraPosition).length();
+    update(camera: Camera) {
+        const viewRay = camera.getDirection(new Vector3(0, 0, -1));
+        const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
+        const distance = objectRay.length();
+        objectRay.scaleInPlace(1 / distance);
+
+        if(Vector3.Dot(viewRay, objectRay) < 0) {
+            this.cursor.isVisible = false;
+            this.textRoot.isVisible = false;
+            return;
+        }
+
+        this.cursor.isVisible = true;
+        this.textRoot.isVisible = true;
+
         const scale = Math.max(0.02, 0.03 * Math.pow(this.object.getBoundingRadius() / 1e6, 0.2));
         this.cursor.scaleX = scale;
         this.cursor.scaleY = scale;
 
-        const alpha = 1e-3 * distance / this.object.getBoundingRadius();
-        this.textRoot.alpha = alpha;
-        this.cursor.alpha = Math.min(alpha, 0.5);
+        const alphaCursor = 1e-3 * distance / this.object.getBoundingRadius();
+        this.cursor.alpha = Math.min(alphaCursor, 0.5);
+
+        const alphaText = distance < 10 * this.object.getBoundingRadius() ? 0 : 0.95;
+        this.textRoot.alpha = alphaText;
+
+        this.distanceText.text = parseDistance(distance);
     }
 }

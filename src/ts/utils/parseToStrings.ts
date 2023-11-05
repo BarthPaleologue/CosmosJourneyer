@@ -12,6 +12,18 @@ export function parseSpeed(speed: number): string {
     }
 }
 
+export function parseDistance(distance: number): string {
+    if (distance < 1000) {
+        return `${distance.toFixed(0)} m`;
+    } else if (distance < 1000000) {
+        return `${(distance / 1000).toFixed(2)} km`;
+    } else if (distance < 20000000) {
+        return `${(distance / 1000000).toFixed(2)} Mm`;
+    } else {
+        return `${(distance / Settings.C).toFixed(2)} ls`;
+    }
+}
+
 /**
  * Parse a number between 0 and 1 to a percentage string.
  * Example: 0.5 -> "50%"

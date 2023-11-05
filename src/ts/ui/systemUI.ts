@@ -2,7 +2,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { AbstractObject } from "../view/bodies/abstractObject";
 import { ObjectOverlay } from "./objectOverlay";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class SystemUI {
     private readonly gui: AdvancedDynamicTexture;
@@ -13,11 +13,11 @@ export class SystemUI {
     }
 
     public setEnabled(enabled: boolean) {
-        this.gui.rootContainer.alpha = enabled ? 1 : 0;
+        this.gui.rootContainer.isEnabled = enabled;
     }
 
     public isEnabled() {
-        return this.gui.rootContainer.alpha > 0;
+        return this.gui.rootContainer.isEnabled;
     }
 
     public createObjectOverlays(objects: AbstractObject[]) {
@@ -33,9 +33,9 @@ export class SystemUI {
         }
     }
 
-    public update(cameraPosition: Vector3) {
+    public update(camera: Camera) {
         for (const overlay of this.objectOverlays) {
-            overlay.update(cameraPosition);
+            overlay.update(camera);
         }
     }
 }

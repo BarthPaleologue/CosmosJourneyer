@@ -82,7 +82,7 @@ export class StarSystemView {
             Assets.ChunkForge.update();
             starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
 
-            this.ui.update(this.scene.getActiveUberCamera().getAbsolutePosition());
+            this.ui.update(this.scene.getActiveUberCamera());
 
             const nearestBody = starSystem.getNearestOrbitalObject();
 
