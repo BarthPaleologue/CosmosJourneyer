@@ -6,6 +6,7 @@ import cursorImage from "../../asset/textures/hoveredCircle.png";
 import { parseDistance } from "../utils/parseToStrings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { UberCamera } from "../controller/uberCore/uberCamera";
+import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 
 export class ObjectOverlay {
     readonly textRoot: StackPanel;
@@ -21,7 +22,6 @@ export class ObjectOverlay {
         this.textRoot.width = "150px";
         this.textRoot.height = "70px";
         this.textRoot.background = "darkred";
-        this.textRoot.linkOffsetX = 130;
         this.textRoot.zIndex = 6;
         this.textRoot.alpha = 0.95;
 
@@ -71,15 +71,20 @@ export class ObjectOverlay {
         this.cursor.isVisible = true;
         this.textRoot.isVisible = this.object === target;
 
-        const scale = Math.max(0.02, 0.03 * Math.pow(this.object.getBoundingRadius() / 1e6, 0.2));
-        this.cursor.scaleX = scale;
-        this.cursor.scaleY = scale;
+        const angularSize = getAngularSize(this.object.getTransform().getAbsolutePosition(), this.object.getBoundingRadius(), camera.getAbsolutePosition());
+        const screenRatio = angularSize / camera.fov;
 
-        const alphaCursor = 1e-3 * distance / this.object.getBoundingRadius();
+        const scale = Math.max(0.02, 0.03 * Math.pow(this.object.getBoundingRadius() / 1e6, 0.2));
+        this.cursor.scaleX = Math.max(scale, screenRatio);
+        this.cursor.scaleY = Math.max(scale, screenRatio);
+
+        const alphaCursor = Math.max(0, (1e-3 * (distance - this.object.getBoundingRadius() * 3)) / this.object.getBoundingRadius());
         this.cursor.alpha = Math.min(alphaCursor, 0.5);
 
         const alphaText = distance < 10 * this.object.getBoundingRadius() ? 0 : 0.95;
         this.textRoot.alpha = alphaText;
+
+        this.textRoot.linkOffsetXInPixels = 0.5 * Math.max(scale, screenRatio) * window.innerWidth + 75 + 20;
 
         this.distanceText.text = parseDistance(distance);
     }
