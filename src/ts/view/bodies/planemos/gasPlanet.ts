@@ -11,15 +11,12 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { isSizeOnScreenEnough } from "../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeSphere, PhysicsShapeType } from "@babylonjs/core";
+import { PhysicsShapeSphere } from "@babylonjs/core";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial {
     private readonly mesh: Mesh;
     readonly material: GasPlanetMaterial;
-
-    readonly aggregate: PhysicsAggregate;
 
     readonly model: GasPlanetModel;
 
@@ -44,18 +41,6 @@ export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial 
             scene
         );
         this.mesh.parent = this.getTransform();
-
-        this.aggregate = new PhysicsAggregate(
-            this.getTransform(),
-            PhysicsShapeType.CONTAINER,
-            {
-                mass: 0,
-                restitution: 0.2
-            },
-            scene
-        );
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-        this.aggregate.body.disablePreStep = false;
 
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);

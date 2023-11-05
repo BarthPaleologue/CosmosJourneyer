@@ -23,8 +23,6 @@ export class Star extends AbstractBody {
 
     readonly model: StarModel;
 
-    readonly aggregate: PhysicsAggregate;
-
     /**
      * New Star
      * @param name The name of the star
@@ -49,18 +47,6 @@ export class Star extends AbstractBody {
                   )
                 : Assets.CreateBananaClone(this.model.radius * 2);
         this.mesh.parent = this.getTransform();
-
-        this.aggregate = new PhysicsAggregate(
-            this.getTransform(),
-            PhysicsShapeType.CONTAINER,
-            {
-                mass: 0,
-                restitution: 0.2
-            },
-            scene
-        );
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-        this.aggregate.body.disablePreStep = false;
 
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);

@@ -25,8 +25,6 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
 
     readonly model: TelluricPlanemoModel;
 
-    readonly aggregate: PhysicsAggregate;
-
     /**
      * New Telluric Planet
      * @param name The name of the planet
@@ -61,18 +59,6 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
         if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
 
         this.material = new TelluricPlanemoMaterial(this.name, this.getTransform(), this.model, scene);
-
-        this.aggregate = new PhysicsAggregate(
-            this.getTransform(),
-            PhysicsShapeType.CONTAINER,
-            {
-                mass: 0,
-                restitution: 0.2
-            },
-            scene
-        );
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-        this.aggregate.body.disablePreStep = false;
 
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());

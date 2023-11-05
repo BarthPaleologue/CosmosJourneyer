@@ -7,9 +7,13 @@ import { Cullable } from "./cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getRotationQuaternion, rotateAround, setRotationQuaternion, translate } from "../../controller/uberCore/transforms/basicTransform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeType } from "@babylonjs/core";
 
 export abstract class AbstractObject implements OrbitalObject, BaseObject, Cullable {
     private readonly transform: TransformNode;
+
+    readonly aggregate: PhysicsAggregate;
 
     readonly postProcesses: PostProcessType[] = [];
 
@@ -34,6 +38,18 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Culla
         this.parentObject = parentObject ?? null;
 
         this.transform = new TransformNode(name, scene);
+
+        this.aggregate = new PhysicsAggregate(
+          this.getTransform(),
+          PhysicsShapeType.CONTAINER,
+          {
+              mass: 0,
+              restitution: 0.2
+          },
+          scene
+        );
+        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
+        this.aggregate.body.disablePreStep = false;
     }
 
     public getTransform(): TransformNode {
