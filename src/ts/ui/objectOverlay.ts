@@ -56,7 +56,7 @@ export class ObjectOverlay {
         this.cursor.linkWithMesh(this.object.getTransform());
     }
 
-    update(camera: UberCamera) {
+    update(camera: UberCamera, target: AbstractObject | null) {
         const viewRay = camera.forward();
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
@@ -69,7 +69,7 @@ export class ObjectOverlay {
         }
 
         this.cursor.isVisible = true;
-        this.textRoot.isVisible = true;
+        this.textRoot.isVisible = this.object === target;
 
         const scale = Math.max(0.02, 0.03 * Math.pow(this.object.getBoundingRadius() / 1e6, 0.2));
         this.cursor.scaleX = scale;

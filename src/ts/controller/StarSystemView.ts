@@ -62,7 +62,11 @@ export class StarSystemView {
                 this.axisRenderer.setVisibility(!this.axisRenderer.isVisible());
             }
             if (e.key === "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
-            if (e.key === "t") this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
+            if (e.key === "b") this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
+
+            if(e.key === "t") {
+                this.ui.setTarget(this.getStarSystem().getClosestToScreenCenterOrbitalObject());
+            }
         });
 
         this.scene = new UberScene(engine, ScenePerformancePriority.Intermediate);

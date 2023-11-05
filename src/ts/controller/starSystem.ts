@@ -15,7 +15,7 @@ import { SpaceStation } from "../view/spaceStation";
 import { AbstractObject } from "../view/bodies/abstractObject";
 import { rotateAround, setUpVector, translate } from "./uberCore/transforms/basicTransform";
 import { Mandelbulb } from "../view/bodies/planemos/mandelbulb";
-import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../view/postProcesses/postProcessTypes";
 import { getTransformationQuaternion } from "../utils/algebra";
 
@@ -68,6 +68,8 @@ export class StarSystem {
     readonly model: StarSystemModel;
 
     private nearestOrbitalObject: AbstractObject | null = null;
+
+    private closestToScreenCenterOrbitalObject: AbstractObject | null = null;
 
     constructor(model: StarSystemModel | number, scene: UberScene) {
         this.scene = scene;
@@ -195,6 +197,34 @@ export class StarSystem {
         this.nearestOrbitalObject = nearest;
     }
 
+    public computeClosestToScreenCenterOrbitalObject() {
+        let nearest = null;
+        let closestDistance = Number.POSITIVE_INFINITY;
+        for (const object of this.orbitalObjects) {
+            const screenCoordinates = Vector3.Project(
+                object.getTransform().getAbsolutePosition(),
+                Matrix.IdentityReadOnly,
+                this.scene.getTransformMatrix(),
+                this.scene.getActiveUberCamera().viewport
+            );
+
+            if (screenCoordinates.z < 0) continue;
+
+            const distance = screenCoordinates.subtract(new Vector3(0.5, 0.5, 0)).length();
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                nearest = object;
+            }
+        }
+
+        this.closestToScreenCenterOrbitalObject = nearest;
+    }
+
+    public getClosestToScreenCenterOrbitalObject(): AbstractObject | null {
+        return this.closestToScreenCenterOrbitalObject;
+    }
+
     /**
      * Returns the nearest orbital object to the origin
      */
@@ -304,6 +334,7 @@ export class StarSystem {
     public update(deltaTime: number): void {
         const controller = this.scene.getActiveController();
         this.computeNearestOrbitalObject(controller.getActiveCamera().getAbsolutePosition());
+        this.computeClosestToScreenCenterOrbitalObject();
         const nearestBody = this.getNearestOrbitalObject();
 
         const distanceOfNearestToCamera = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().getAbsolutePosition());

@@ -8,6 +8,8 @@ export class SystemUI {
     private readonly gui: AdvancedDynamicTexture;
     private objectOverlays: ObjectOverlay[] = [];
 
+    private target: AbstractObject | null = null;
+
     constructor(scene: Scene) {
         this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, scene);
     }
@@ -44,7 +46,11 @@ export class SystemUI {
 
     public update(camera: UberCamera) {
         for (const overlay of this.objectOverlays) {
-            overlay.update(camera);
+            overlay.update(camera, this.target);
         }
+    }
+
+    setTarget(object: AbstractObject | null) {
+        this.target = object;
     }
 }
