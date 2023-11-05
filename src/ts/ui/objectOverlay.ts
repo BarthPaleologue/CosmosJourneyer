@@ -4,9 +4,8 @@ import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import cursorImage from "../../asset/textures/hoveredCircle.png";
 import { parseDistance } from "../utils/parseToStrings";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { UberCamera } from "../controller/uberCore/uberCamera";
 
 export class ObjectOverlay {
     readonly textRoot: StackPanel;
@@ -57,8 +56,8 @@ export class ObjectOverlay {
         this.cursor.linkWithMesh(this.object.getTransform());
     }
 
-    update(camera: Camera) {
-        const viewRay = camera.getDirection(new Vector3(0, 0, -1));
+    update(camera: UberCamera) {
+        const viewRay = camera.forward();
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
         objectRay.scaleInPlace(1 / distance);
@@ -83,5 +82,10 @@ export class ObjectOverlay {
         this.textRoot.alpha = alphaText;
 
         this.distanceText.text = parseDistance(distance);
+    }
+
+    dispose() {
+        this.textRoot.dispose();
+        this.cursor.dispose();
     }
 }

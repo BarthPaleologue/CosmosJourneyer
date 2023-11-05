@@ -2,7 +2,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { AbstractObject } from "../view/bodies/abstractObject";
 import { ObjectOverlay } from "./objectOverlay";
-import { Camera } from "@babylonjs/core/Cameras/camera";
+import { UberCamera } from "../controller/uberCore/uberCamera";
 
 export class SystemUI {
     private readonly gui: AdvancedDynamicTexture;
@@ -21,6 +21,8 @@ export class SystemUI {
     }
 
     public createObjectOverlays(objects: AbstractObject[]) {
+        this.removeObjectOverlays();
+
         for (const object of objects) {
             const overlay = new ObjectOverlay(object);
             this.gui.addControl(overlay.textRoot);
@@ -33,7 +35,14 @@ export class SystemUI {
         }
     }
 
-    public update(camera: Camera) {
+    public removeObjectOverlays() {
+        for (const overlay of this.objectOverlays) {
+            overlay.dispose();
+        }
+        this.objectOverlays = [];
+    }
+
+    public update(camera: UberCamera) {
         for (const overlay of this.objectOverlays) {
             overlay.update(camera);
         }

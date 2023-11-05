@@ -11,19 +11,20 @@ export class UberCamera extends FreeCamera {
 
         this.inverseProjectionMatrix = Matrix.Invert(this.getProjectionMatrix());
         this.inverseViewMatrix = Matrix.Invert(this.getViewMatrix());
-
-        this.onProjectionMatrixChangedObservable.add(() => {
-            this.inverseProjectionMatrix = Matrix.Invert(this.getProjectionMatrix());
-        });
     }
 
     getInverseProjectionMatrix(): Matrix {
+        this.inverseProjectionMatrix = Matrix.Invert(this.getProjectionMatrix());
         return this.inverseProjectionMatrix;
     }
 
     getInverseViewMatrix(): Matrix {
         this.inverseViewMatrix = Matrix.Invert(this.getViewMatrix());
         return this.inverseViewMatrix;
+    }
+
+    forward(): Vector3 {
+        return this.getDirection(new Vector3(0, 0, -1));
     }
 
     getAbsolutePosition(): Vector3 {
