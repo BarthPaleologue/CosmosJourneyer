@@ -8,6 +8,5 @@ export enum PostProcessType {
     MANDELBULB,
     BLACK_HOLE,
     SHADOW,
-    OVERLAY,
     LENS_FLARE
 }

@@ -12,6 +12,14 @@ export class SystemUI {
         this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, scene);
     }
 
+    public setEnabled(enabled: boolean) {
+        this.gui.rootContainer.alpha = enabled ? 1 : 0;
+    }
+
+    public isEnabled() {
+        return this.gui.rootContainer.alpha > 0;
+    }
+
     public createObjectOverlays(objects: AbstractObject[]) {
         for (const object of objects) {
             const overlay = new ObjectOverlay(object);

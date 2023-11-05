@@ -164,6 +164,13 @@ export class StarSystem {
         return this.celestialBodies;
     }
 
+    public getObjects(): AbstractObject[] {
+        const objects = [];
+        for (const body of this.celestialBodies) objects.push(body);
+        for (const spacestation of this.spaceStations) objects.push(spacestation);
+        return objects;
+    }
+
     public computeNearestOrbitalObject(position: Vector3): void {
         if (this.celestialBodies.length + this.spaceStations.length === 0) throw new Error("There are no bodies or spacestation in the solar system");
         let nearest = null;
@@ -250,9 +257,6 @@ export class StarSystem {
                     case PostProcessType.RING:
                         if (!(object instanceof AbstractBody)) throw new Error("Rings post process can only be added to bodies. Source:" + object.name);
                         this.postProcessManager.addRings(object, this.stellarObjects);
-                        break;
-                    case PostProcessType.OVERLAY:
-                        this.postProcessManager.addOverlay(object);
                         break;
                     case PostProcessType.ATMOSPHERE:
                         if (!(object instanceof GasPlanet) && !(object instanceof TelluricPlanemo))

@@ -6,7 +6,6 @@ import { AxisRenderer } from "../view/axisRenderer";
 import { SystemUI } from "../ui/systemUI";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { StarSystem } from "./starSystem";
-import { OverlayPostProcess } from "../view/postProcesses/overlayPostProcess";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { ScenePerformancePriority } from "@babylonjs/core/scene";
@@ -55,7 +54,9 @@ export class StarSystemView {
         ]);
 
         document.addEventListener("keydown", (e) => {
-            if (e.key === "o") OverlayPostProcess.ARE_ENABLED = !OverlayPostProcess.ARE_ENABLED;
+            if (e.key === "o") {
+                this.ui.setEnabled(!this.ui.isEnabled());
+            }
             if (e.key === "n") {
                 this.orbitRenderer.setVisibility(!this.orbitRenderer.isVisible());
                 this.axisRenderer.setVisibility(!this.axisRenderer.isVisible());
@@ -129,7 +130,7 @@ export class StarSystemView {
 
     init() {
         this.getStarSystem().init();
-        this.ui.createObjectOverlays(this.getStarSystem().getBodies());
+        this.ui.createObjectOverlays(this.getStarSystem().getObjects());
 
         const firstBody = this.getStarSystem().getBodies()[0];
         if (firstBody === undefined) throw new Error("No bodies in star system");

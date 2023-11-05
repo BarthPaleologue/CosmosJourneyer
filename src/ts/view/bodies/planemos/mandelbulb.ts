@@ -21,7 +21,7 @@ export class Mandelbulb extends AbstractBody implements Planemo {
 
         this.model = model instanceof MandelbulbModel ? model : new MandelbulbModel(model, parentBody?.model);
 
-        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.MANDELBULB);
+        this.postProcesses.push(PostProcessType.MANDELBULB);
 
         this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }

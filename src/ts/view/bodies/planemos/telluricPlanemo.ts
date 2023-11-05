@@ -39,7 +39,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
 
         this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
 
-        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.SHADOW);
+        this.postProcesses.push(PostProcessType.SHADOW);
 
         const waterBoilingPoint = waterBoilingPointCelsius(this.model.physicalProperties.pressure);
         const waterFreezingPoint = 0.0;

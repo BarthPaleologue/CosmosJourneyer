@@ -35,8 +35,6 @@ export class SpaceStation extends AbstractObject {
 
         this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
         this.getTransform().rotate(Axis.Y, this.model.physicalProperties.axialTilt);
-
-        this.postProcesses.push(PostProcessType.OVERLAY);
     }
 
     public override getBoundingRadius(): number {

@@ -26,7 +26,7 @@ export class BlackHole extends AbstractBody {
         this.light.parent = this.getTransform();
         if (this.model.physicalProperties.accretionDiskRadius === 0) this.light.intensity = 0;
 
-        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.BLACK_HOLE);
+        this.postProcesses.push(PostProcessType.BLACK_HOLE);
     }
 
     public override computeCulling(camera: Camera): void {

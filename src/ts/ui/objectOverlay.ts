@@ -46,7 +46,7 @@ export class ObjectOverlay {
     update(cameraPosition: Vector3) {
         if (this.cursor.linkedMesh === null) return;
         const distance = this.cursor.linkedMesh.getAbsolutePosition().subtract(cameraPosition).length();
-        const scale = 0.03 * Math.pow(this.object.getBoundingRadius() / 1e6, 0.2);
+        const scale = Math.max(0.02, 0.03 * Math.pow(this.object.getBoundingRadius() / 1e6, 0.2));
         this.cursor.scaleX = scale;
         this.cursor.scaleY = scale;
 

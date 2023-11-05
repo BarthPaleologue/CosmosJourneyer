@@ -10,7 +10,6 @@ import { AtmosphericScatteringPostProcess } from "../view/postProcesses/atmosphe
 import { AbstractBody } from "../view/bodies/abstractBody";
 import { RingsPostProcess } from "../view/postProcesses/ringsPostProcess";
 import { StarfieldPostProcess } from "../view/postProcesses/starfieldPostProcess";
-import { OverlayPostProcess } from "../view/postProcesses/overlayPostProcess";
 import { VolumetricLight } from "../view/postProcesses/volumetricLight";
 import { BlackHolePostProcess } from "../view/postProcesses/blackHolePostProcess";
 import { GasPlanet } from "../view/bodies/planemos/gasPlanet";
@@ -90,7 +89,6 @@ export class PostProcessManager {
     private readonly rings: RingsPostProcess[] = [];
     private readonly mandelbulbs: MandelbulbPostProcess[] = [];
     private readonly blackHoles: BlackHolePostProcess[] = [];
-    private readonly overlays: OverlayPostProcess[] = [];
     private readonly matterJets: MatterJetPostProcess[] = [];
     private readonly shadows: ShadowPostProcess[] = [];
     private readonly lensFlares: LensFlarePostProcess[] = [];
@@ -105,7 +103,6 @@ export class PostProcessManager {
         this.rings,
         this.mandelbulbs,
         this.blackHoles,
-        this.overlays,
         this.volumetricLights,
         this.matterJets,
         this.shadows,
@@ -121,7 +118,6 @@ export class PostProcessManager {
     readonly fxaa: FxaaPostProcess;
 
     private readonly starFieldRenderEffect: PostProcessRenderEffect;
-    private readonly overlayRenderEffect: PostProcessRenderEffect;
 
     private readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
     private readonly fxaaRenderEffect: PostProcessRenderEffect;
@@ -155,10 +151,6 @@ export class PostProcessManager {
 
         this.starFieldRenderEffect = new PostProcessRenderEffect(this.engine, "starFieldRenderEffect", () => {
             return this.starFields;
-        });
-
-        this.overlayRenderEffect = new PostProcessRenderEffect(this.engine, "overlayRenderEffect", () => {
-            return this.overlays;
         });
 
         this.bloomRenderEffect = new BloomEffect(scene, 1, 0.3, 32);
@@ -261,15 +253,6 @@ export class PostProcessManager {
      */
     public addStarField(stellarObjects: StellarObject[], planets: AbstractBody[], starfieldRotation: Quaternion) {
         this.starFields.push(new StarfieldPostProcess(this.scene, stellarObjects, planets, starfieldRotation));
-    }
-
-    /**
-     * Creates a new Overlay postprocess for the given body and adds it to the manager.
-     * @param body A body
-     */
-    public addOverlay(body: BaseObject) {
-        const overlay = new OverlayPostProcess(body, this.scene);
-        this.overlays.push(overlay);
     }
 
     /**
@@ -417,9 +400,6 @@ export class PostProcessManager {
                 case PostProcessType.LENS_FLARE:
                     //this.currentRenderingPipeline.addEffect(otherLensFlaresRenderEffect);
                     break;
-                case PostProcessType.OVERLAY:
-                    // do nothing as they are added at the end of the function
-                    break;
             }
         }
 
@@ -455,15 +435,11 @@ export class PostProcessManager {
                 case PostProcessType.SHADOW:
                     //this.currentRenderingPipeline.addEffect(bodyShadowRenderEffect);
                     break;
-                case PostProcessType.OVERLAY:
-                    // do nothing as they are added at the end of the function
-                    break;
             }
         }
 
         this.currentRenderingPipeline.addEffect(shadowRenderEffect);
         this.currentRenderingPipeline.addEffect(lensFlareRenderEffect);
-        this.currentRenderingPipeline.addEffect(this.overlayRenderEffect);
         this.currentRenderingPipeline.addEffect(this.fxaaRenderEffect);
         this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
         this.currentRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
