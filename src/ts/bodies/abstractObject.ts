@@ -40,13 +40,13 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Commo
         this.transform = new TransformNode(name, scene);
 
         this.aggregate = new PhysicsAggregate(
-          this.getTransform(),
-          PhysicsShapeType.CONTAINER,
-          {
-              mass: 0,
-              restitution: 0.2
-          },
-          scene
+            this.getTransform(),
+            PhysicsShapeType.CONTAINER,
+            {
+                mass: 0,
+                restitution: 0.2
+            },
+            scene
         );
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;

@@ -4,7 +4,6 @@ import { UberScene } from "../../uberCore/uberScene";
 import { AbstractBody } from "../../bodies/abstractBody";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 
-
 export class NeutronStar extends Star {
     readonly descriptor: NeutronStarModel;
 

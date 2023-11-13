@@ -1,4 +1,3 @@
-
 import { StarSystem } from "./starSystem";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { StarModel } from "../stellarObjects/star/starModel";

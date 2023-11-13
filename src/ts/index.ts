@@ -1,6 +1,5 @@
 import "../styles/index.scss";
 
-
 import { StarSystem } from "./starSystem/starSystem";
 
 import { Settings } from "./settings";

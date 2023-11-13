@@ -16,7 +16,6 @@ import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { getStellarTypeString } from "../common";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
-
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
     readonly light: PointLight;

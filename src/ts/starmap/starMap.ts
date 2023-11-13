@@ -36,7 +36,6 @@ import { Mouse } from "../inputs/mouse";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 
-
 export class StarMap {
     readonly scene: Scene;
     private readonly controller: DefaultController;

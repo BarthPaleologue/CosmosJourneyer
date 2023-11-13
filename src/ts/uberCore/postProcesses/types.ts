@@ -1,7 +1,6 @@
 import { Matrix, Quaternion, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Effect } from "@babylonjs/core/Materials/effect";
 
 export enum UniformEnumType {
     /**

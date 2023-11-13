@@ -73,7 +73,7 @@ export class ObjectOverlay {
         const distance = objectRay.length();
         objectRay.scaleInPlace(1 / distance);
 
-        if(Vector3.Dot(viewRay, objectRay) < 0) {
+        if (Vector3.Dot(viewRay, objectRay) < 0) {
             this.cursor.isVisible = false;
             this.textRoot.isVisible = false;
             return;
@@ -92,7 +92,7 @@ export class ObjectOverlay {
         const alphaCursor = 100 * Math.max(scale - screenRatio, 0.0);
         this.cursor.alpha = Math.min(alphaCursor, 0.5);
 
-        const alphaText = Math.max(0, (distance / (3 * this.object.getBoundingRadius())) - 1.0);
+        const alphaText = Math.max(0, distance / (3 * this.object.getBoundingRadius()) - 1.0);
         this.textRoot.alpha = alphaText;
 
         this.textRoot.linkOffsetXInPixels = 0.5 * Math.max(scale, screenRatio) * window.innerWidth + 75 + 20;

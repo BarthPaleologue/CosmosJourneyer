@@ -7,7 +7,6 @@ import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll
 import { Input, InputType } from "../inputs/input";
 import { Mouse } from "../inputs/mouse";
 
-
 export class DefaultController extends AbstractController {
     private readonly transform: TransformNode;
     private readonly camera: UberCamera;

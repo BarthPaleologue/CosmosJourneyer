@@ -4,13 +4,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom } from "extended-random";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { STELLAR_TYPE } from "../common";
-import {
-    BlackHolePhysicalProperties,
-    BODY_TYPE,
-    BodyModel,
-    GENERATION_STEPS,
-    StellarObjectModel
-} from "../../model/common";
+import { BlackHolePhysicalProperties, BODY_TYPE, BodyModel, GENERATION_STEPS, StellarObjectModel } from "../../model/common";
 
 export class BlackHoleModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.BLACK_HOLE;

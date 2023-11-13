@@ -1,4 +1,3 @@
-
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { MandelbulbModel } from "./mandelbulbModel";
 import { AbstractBody } from "../bodies/abstractBody";

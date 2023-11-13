@@ -1,5 +1,4 @@
 import { AbstractBody } from "../bodies/abstractBody";
-import { AbstractController } from "../uberCore/abstractController";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Transformable } from "../uberCore/transforms/basicTransform";
 import { BoundingSphere } from "../bodies/common";

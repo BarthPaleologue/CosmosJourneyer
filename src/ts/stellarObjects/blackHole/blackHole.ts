@@ -1,4 +1,3 @@
-
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
