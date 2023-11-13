@@ -7,6 +7,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { clamp } from "../../utils/math";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { RingsUniforms } from "../ringsUniform";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export class GasPlanetModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.GAS;
@@ -41,17 +43,20 @@ export class GasPlanetModel implements PlanemoModel {
 
         const orbitalP = clamp(0.7, 3.0, normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80));
         orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
+        if (parentBody) orbitRadius += parentBody.radius * 1.5;
+
+        const orbitalPlaneNormal = Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (this.rng(GENERATION_STEPS.ORBIT + 20) - 0.5) * 0.2));
 
         this.orbit = {
             radius: orbitRadius,
-            p: orbitalP,
+            p: 2, //orbitalP,
             period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
-            normalToPlane: Vector3.Up(),
+            normalToPlane: orbitalPlaneNormal,
             isPlaneAlignedWithParent: true
         };
 
         this.physicalProperties = {
-            // FIXME: choose physically accurates values
+            // FIXME: choose physically accurate values
             mass: 10,
             axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
             rotationPeriod: (24 * 60 * 60) / 10,

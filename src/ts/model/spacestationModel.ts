@@ -3,6 +3,7 @@ import { BaseModel, GENERATION_STEPS, PhysicalProperties } from "./common";
 import { getOrbitalPeriod } from "./orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitProperties } from "./orbit/orbitProperties";
+import { Settings } from "../settings";
 
 export class SpaceStationModel implements BaseModel {
     readonly seed: number;
@@ -20,7 +21,7 @@ export class SpaceStationModel implements BaseModel {
         this.childrenBodies = [];
 
         //TODO: do not hardcode
-        const orbitRadius = 3000e3;
+        const orbitRadius = 3 * Settings.EARTH_RADIUS;
 
         this.orbit = {
             radius: orbitRadius,

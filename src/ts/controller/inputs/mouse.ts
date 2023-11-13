@@ -26,7 +26,10 @@ export class Mouse implements Input {
         this.deadAreaRadius = deadAreaRadius;
         this.canvas = canvas;
 
-        document.addEventListener("pointermove", (e) => {
+        window.addEventListener("pointermove", (e) => {
+            const canvasRect = this.canvas.getBoundingClientRect();
+            if (e.x < canvasRect.x || e.y < canvasRect.y || e.x > canvasRect.x + canvasRect.width || e.y > canvasRect.y + canvasRect.height) return;
+
             this.dx = e.x - this.x;
             this.dy = e.y - this.y;
 

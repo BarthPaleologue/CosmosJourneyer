@@ -1,20 +1,4 @@
-precision lowp float;
-
-#ifdef LOGARITHMICDEPTH
-uniform float logarithmicDepthConstant;
-in float vFragmentDepth;
-#endif
-
-in vec3 vPositionW;
-in vec3 vNormalW;
-in vec3 vUnitSamplePoint;
-in vec3 vSphereNormalW;
-
-in vec3 vPosition;// position of the vertex in sphere space
-
-uniform mat4 world;
-
-uniform vec3 playerPosition;// camera position in world space
+precision highp float;
 
 #define MAX_STARS 5
 uniform int nbStars;// number of stars
@@ -23,6 +7,14 @@ struct Star {
     vec3 color;
 };
 uniform Star stars[MAX_STARS];
+
+in vec3 vPositionW;
+in vec3 vNormalW;
+in vec3 vUnitSamplePoint;
+
+in vec3 vPosition;// position of the vertex in sphere space
+
+uniform vec3 playerPosition;// camera position in world space
 
 uniform vec3 color1;
 uniform vec3 color2;
@@ -44,14 +36,13 @@ uniform float seed;
 void main() {
     vec3 viewRayW = normalize(playerPosition - vPositionW);// view direction in world space
 
-    vec3 sphereNormalW = vSphereNormalW;
     vec3 normalW = vNormalW;
 
     vec3 ndl = vec3(0.0);
     float specComp = 0.0;
     for (int i = 0; i < nbStars; i++) {
         vec3 starLightRayW = normalize(stars[i].position - vPositionW);// light ray direction in world space
-        ndl += max(0.0, dot(sphereNormalW, starLightRayW)) * stars[i].color;// diffuse lighting
+        ndl += max(0.0, dot(normalW, starLightRayW)) * stars[i].color;// diffuse lighting
 
         vec3 angleW = normalize(viewRayW + starLightRayW);
         specComp += max(0.0, dot(normalW, angleW));
@@ -88,7 +79,4 @@ void main() {
     vec3 screenColor = color.rgb * (ndl + specComp * ndl);
 
     gl_FragColor = vec4(screenColor, 1.0);// apply color and lighting
-    #ifdef LOGARITHMICDEPTH
-    gl_FragDepthEXT = log2(vFragmentDepth) * logarithmicDepthConstant * 0.5;
-    #endif
 }

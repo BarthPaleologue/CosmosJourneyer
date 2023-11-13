@@ -1,8 +1,10 @@
 import { LinesMesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { OrbitalObject } from "./common";
 import { getPointOnOrbitLocal } from "../model/orbit/orbit";
-import { Color3, Vector3 } from "@babylonjs/core/Maths/math";
+import { Color3, Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Matrix } from "ml-matrix";
+import { setRotationQuaternion, setUpVector } from "../controller/uberCore/transforms/basicTransform";
 
 export class OrbitRenderer {
     private orbitMeshes: LinesMesh[] = [];
@@ -36,7 +38,7 @@ export class OrbitRenderer {
         }
         points.push(points[0]);
 
-        const orbitMesh = MeshBuilder.CreateLines("orbit", { points: points }, orbitalObject.transform.getScene());
+        const orbitMesh = MeshBuilder.CreateLines("orbit", { points: points }, orbitalObject.getTransform().getScene());
         if (this.orbitMaterial === null) throw new Error("Orbit material is null");
         orbitMesh.material = this.orbitMaterial;
         this.orbitMeshes.push(orbitMesh);
@@ -58,7 +60,11 @@ export class OrbitRenderer {
             const orbitalObject = this.orbitalObjects[i];
             const orbitMesh = this.orbitMeshes[i];
 
-            orbitMesh.position = orbitalObject.parentObject?.transform.position ?? Vector3.Zero();
+            orbitMesh.position = orbitalObject.parentObject?.getTransform().position ?? Vector3.Zero();
+            orbitMesh.computeWorldMatrix(true);
+
+            const normalToPlane = orbitalObject.model.orbit.normalToPlane;
+            setUpVector(orbitMesh, normalToPlane);
         }
     }
 
@@ -70,6 +76,5 @@ export class OrbitRenderer {
         this.orbitMaterial = new StandardMaterial("orbitMaterial");
         this.orbitMaterial.emissiveColor = Color3.White();
         this.orbitMaterial.disableLighting = true;
-        this.orbitMaterial.useLogarithmicDepth = true;
     }
 }

@@ -10,6 +10,7 @@ import selectedCircle from "../../asset/textures/selectedCircle.png";
 
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;
@@ -89,25 +90,25 @@ export class StarMapUI {
         this.hoveredSystemRing.animations = [StarMapUI.ALPHA_ANIMATION];
     }
 
-    update() {
+    update(activeCamera: Camera) {
         if (this.systemUI.linkedMesh === null || this.systemUI.linkedMesh === undefined) this.gui.removeControl(this.systemUI);
         else {
             this.systemUI.linkOffsetY = -150 - 50 / this.systemUI.linkedMesh.getAbsolutePosition().length();
         }
         if (this.hoveredSystemRing.linkedMesh !== null && this.hoveredSystemRing.linkedMesh !== undefined) {
-            const distance = this.hoveredSystemRing.linkedMesh.getAbsolutePosition().length();
+            const distance = this.hoveredSystemRing.linkedMesh.getAbsolutePosition().subtract(activeCamera.globalPosition).length();
             const scale = this.hoveredSystemRing.linkedMesh.scaling.x / distance;
             this.hoveredSystemRing.scaleX = scale;
             this.hoveredSystemRing.scaleY = scale;
         }
         if (this.selectedSystemRing.linkedMesh !== null && this.selectedSystemRing.linkedMesh !== undefined) {
-            const distance = this.selectedSystemRing.linkedMesh.getAbsolutePosition().length();
+            const distance = this.selectedSystemRing.linkedMesh.getAbsolutePosition().subtract(activeCamera.globalPosition).length();
             const scale = Math.max(0.3, this.selectedSystemRing.linkedMesh.scaling.x / distance);
             this.selectedSystemRing.scaleX = scale;
             this.selectedSystemRing.scaleY = scale;
         }
         if (this.currentSystemRing.linkedMesh !== null && this.currentSystemRing.linkedMesh !== undefined) {
-            const distance = this.currentSystemRing.linkedMesh.getAbsolutePosition().length();
+            const distance = this.currentSystemRing.linkedMesh.getAbsolutePosition().subtract(activeCamera.globalPosition).length();
             const scale = Math.max(0.3, this.currentSystemRing.linkedMesh.scaling.x / distance);
             this.currentSystemRing.scaleX = scale;
             this.currentSystemRing.scaleY = scale;

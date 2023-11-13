@@ -8,14 +8,14 @@ import { ShaderSamplers, ShaderUniforms, UniformEnumType } from "../../controlle
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { Star } from "../bodies/stellarObjects/star";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsEngineV2, PhysicsRaycastResult, Ray, RayHelper } from "@babylonjs/core";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { PhysicsEngineV2, PhysicsRaycastResult } from "@babylonjs/core";
+import { moveTowards } from "../../utils/moveTowards";
 
 const shaderName = "lensflare";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = lensFlareFragment;
 
 export type LensFlareSettings = {
-    // empty for now
+    visibility: number;
 };
 
 export class LensFlarePostProcess extends UberPostProcess implements ObjectPostProcess {
@@ -23,7 +23,9 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
     readonly object: StellarObject;
 
     constructor(object: StellarObject, scene: UberScene) {
-        const settings: LensFlareSettings = {};
+        const settings: LensFlareSettings = {
+            visibility: 1
+        };
 
         const uniforms: ShaderUniforms = [
             ...getObjectUniforms(object),
@@ -36,29 +38,26 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
                     else return new Vector3(1, 1, 1);
                 }
             },
-            /*{
-          name: "occulted",
-          type: UniformEnumType.Bool,
-          get: () => {
-              // send raycast from camera to object and check early intersections
-              const raycastResult = new PhysicsRaycastResult();
-              const start = scene.getActiveUberCamera().getAbsolutePosition();
-              const end = object.transform.getAbsolutePosition();
-              (scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, raycastResult);
-              if (raycastResult.hasHit) {
-                  //console.log(Vector3.Distance(raycastResult.body!.getObjectCenterWorld(), object.transform.getAbsolutePosition()));
-                  //console.log(raycastResult.body?.transformNode.name);
+            {
+                name: "visibility",
+                type: UniformEnumType.Float,
+                get: () => {
+                    // send raycast from camera to object and check early intersections
+                    const raycastResult = new PhysicsRaycastResult();
+                    const start = scene.getActiveUberCamera().getAbsolutePosition();
+                    const end = object.getTransform().getAbsolutePosition();
+                    (scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, raycastResult);
+                    const occulted = raycastResult.hasHit && raycastResult.body?.transformNode.name !== object.name;
 
-                  const ray1 = new Ray(start, end.subtract(start).normalize(), Vector3.Distance(start, end));
-      const ray1Helper = new RayHelper(ray1);
-      ray1Helper.show(scene, new Color3(1, 1, 0));
+                    if (occulted && settings.visibility > 0) {
+                        settings.visibility = moveTowards(settings.visibility, 0, 0.5);
+                    } else if (!occulted && settings.visibility < 1) {
+                        settings.visibility = moveTowards(settings.visibility, 1, 0.5);
+                    }
 
-                  return true;
-              }
-
-              return false;
-          }
-      },*/
+                    return settings.visibility;
+                }
+            },
             {
                 name: "aspectRatio",
                 type: UniformEnumType.Float,

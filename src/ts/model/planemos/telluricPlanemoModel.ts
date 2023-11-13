@@ -8,6 +8,8 @@ import { getOrbitalPeriod, getPeriapsis } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { RingsUniforms } from "../ringsUniform";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export class TelluricPlanemoModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.TELLURIC;
@@ -65,19 +67,19 @@ export class TelluricPlanemoModel implements PlanemoModel {
         const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.05, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
         const orbitalPlaneNormal = isOrbitalPlaneAlignedWithParent
             ? Vector3.Up()
-            : new Vector3(this.rng(GENERATION_STEPS.ORBIT + 20), this.rng(GENERATION_STEPS.ORBIT + 30), this.rng(GENERATION_STEPS.ORBIT + 40)).normalize();
+            : Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (this.rng(GENERATION_STEPS.ORBIT + 20) - 0.5) * 0.2));
 
         // TODO: do not hardcode
-        let orbitRadius = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
+        let orbitRadius = 2e9 + this.rng(GENERATION_STEPS.ORBIT) * 15e9;
 
-        const orbitalP = clamp(normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80), 0.7, 3.0);
+        const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80), 0.7, 3.0);
 
         if (this.isSatelliteOfGas || this.isSatelliteOfTelluric) {
             const minRadius = this.parentBody?.radius ?? 0;
             orbitRadius = minRadius * clamp(normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT), 1.2, 3.0);
             orbitRadius += this.radius * clamp(normalRandom(2, 1, this.rng, GENERATION_STEPS.ORBIT), 1, 20);
             orbitRadius += 2.0 * Math.max(0, minRadius - getPeriapsis(orbitRadius, orbitalP));
-        }
+        } else if (parentBody) orbitRadius += parentBody.radius * 1.5;
 
         this.orbit = {
             radius: orbitRadius,
@@ -104,12 +106,15 @@ export class TelluricPlanemoModel implements PlanemoModel {
             max_mountain_height: 10e3,
             continent_base_height: this.physicalProperties.oceanLevel * 1.9,
 
-            mountains_frequency: (20 * this.radius) / Settings.EARTH_RADIUS
+            mountains_frequency: (20 * this.radius) / 1000e3
         };
 
         if (this.isSatelliteOfTelluric) {
             this.terrainSettings.continents_fragmentation = 0;
             this.terrainSettings.max_mountain_height = 2e3;
+        }
+        if (this.isSatelliteOfGas && this.physicalProperties.pressure === 0) {
+            this.terrainSettings.continents_fragmentation = 0;
         }
 
         if (uniformRandBool(0.6, this.rng, GENERATION_STEPS.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {

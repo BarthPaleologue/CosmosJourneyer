@@ -6,18 +6,12 @@ in vec2 vUV;// screen coordinates
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
-#define MAX_STARS 5
 uniform int nbStars;// number of stars
-struct Star {
-    vec3 position;
-};
-uniform Star stars[MAX_STARS];
+#pragma glslify: stars = require(./utils/stars.glsl)
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
 #pragma glslify: object = require(./utils/object.glsl)
-
-uniform vec4 planetInverseRotationQuaternion;
 
 struct Clouds {
     float layerRadius;// atmosphere radius (calculate from planet center)
@@ -149,10 +143,11 @@ void main() {
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
 
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
-    float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
+    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
 
     vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
+
+    vec3 closestPoint = camera.position + rayDir * maximumDistance;
 
     vec4 finalColor = screenColor;
     if (length(closestPoint - object.position) < clouds.layerRadius) finalColor.rgb *= cloudShadows(closestPoint);

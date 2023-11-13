@@ -19,7 +19,9 @@ const engine = new SpaceEngine();
 
 await engine.setup();
 
-const scene = engine.getStarSystemScene();
+const starSystemView = engine.getStarSystemView();
+
+const scene = starSystemView.scene;
 
 const mouse = new Mouse(engine.canvas, 100);
 const keyboard = new Keyboard();
@@ -41,13 +43,12 @@ spaceshipController.addInput(gamepad);
 scene.setActiveController(spaceshipController);
 
 engine.registerStarSystemUpdateCallback(() => {
-    if (engine.isPaused()) return;
     if (scene.getActiveController() != spaceshipController) return;
 
     const shipPosition = spaceshipController.getTransform().getAbsolutePosition();
-    const nearestBody = engine.getStarSystem().getNearestBody(shipPosition);
-    const distance = nearestBody.transform.getAbsolutePosition().subtract(shipPosition).length();
-    const radius = nearestBody.getRadius();
+    const nearestBody = starSystemView.getStarSystem().getNearestOrbitalObject();
+    const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
+    const radius = nearestBody.getBoundingRadius();
     spaceshipController.registerClosestObject(distance, radius);
 
     const warpDrive = spaceshipController.getWarpDrive();
@@ -56,7 +57,7 @@ engine.registerStarSystemUpdateCallback(() => {
 
     const throttleString = warpDrive.isEnabled()
         ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}`
-        : spaceshipController.getThrottle();
+        : `${parsePercentageFrom01(spaceshipController.getThrottle())}/100%`;
 
     (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 });
@@ -74,7 +75,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const seed = urlParams.get("seed");
 
 const starSystem = new StarSystem(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0) * Number.MAX_SAFE_INTEGER, scene);
-engine.setStarSystem(starSystem, true);
+starSystemView.setStarSystem(starSystem, true);
 
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
@@ -82,13 +83,13 @@ document.addEventListener("keydown", (e) => {
         if (scene.getActiveController() === spaceshipController) {
             scene.setActiveController(player);
             setRotationQuaternion(player.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
-            engine.getStarSystem().postProcessManager.rebuild();
+            starSystemView.getStarSystem().postProcessManager.rebuild();
 
             spaceshipController.setEnabled(false, engine.getHavokPlugin());
         } else {
             scene.setActiveController(spaceshipController);
             setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(player.getTransform()).clone());
-            engine.getStarSystem().postProcessManager.rebuild();
+            starSystemView.getStarSystem().postProcessManager.rebuild();
 
             spaceshipController.setEnabled(true, engine.getHavokPlugin());
         }
@@ -100,6 +101,6 @@ engine.init();
 const nbRadius = starSystem.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 3;
 positionNearObject(scene.getActiveController(), starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);
 
-engine.bodyEditor.setVisibility(EditorVisibility.NAVBAR);
+engine.getStarSystemView().bodyEditor.setVisibility(EditorVisibility.NAVBAR);
 
 engine.toggleStarMap();

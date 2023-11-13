@@ -5,7 +5,6 @@ import { SpaceStationModel } from "../model/spacestationModel";
 import { AbstractObject } from "./bodies/abstractObject";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
-import { Vector3 } from "@babylonjs/core/Maths/math";
 import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
@@ -26,7 +25,7 @@ export class SpaceStation extends AbstractObject {
         this.model = new SpaceStationModel(seed, parentBody?.model);
 
         this.instance = Assets.CreateSpaceStationInstance();
-        this.instance.parent = this.transform;
+        this.instance.parent = this.getTransform();
 
         for (const mesh of this.instance.getChildMeshes()) {
             if (mesh.name.includes("ring")) {
@@ -34,14 +33,16 @@ export class SpaceStation extends AbstractObject {
             }
         }
 
-        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
-        this.transform.rotate(Axis.Y, this.model.physicalProperties.axialTilt);
-
-        this.postProcesses.push(PostProcessType.OVERLAY);
+        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.Y, this.model.physicalProperties.axialTilt);
     }
 
     public override getBoundingRadius(): number {
-        return 2e3;
+        return 1e3;
+    }
+
+    getTypeName(): string {
+        return "Space Station";
     }
 
     public override computeCulling(camera: Camera): void {

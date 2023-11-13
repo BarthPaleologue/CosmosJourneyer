@@ -9,9 +9,10 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { isSizeOnScreenEnough } from "../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { PhysicsShapeSphere } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial {
     private readonly mesh: Mesh;
@@ -35,23 +36,30 @@ export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial 
             `${name}Mesh`,
             {
                 diameter: this.model.radius * 2,
-                segments: 64
+                segments: 32
             },
             scene
         );
-        this.mesh.parent = this.transform;
+        this.mesh.parent = this.getTransform();
 
-        this.material = new GasPlanetMaterial(this.name, this.transform, this.model, scene);
+        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
+        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
+
+        this.material = new GasPlanetMaterial(this.name, this.getTransform(), this.model, scene);
         this.mesh.material = this.material;
 
-        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.ATMOSPHERE, PostProcessType.SHADOW);
+        this.postProcesses.push(PostProcessType.ATMOSPHERE, PostProcessType.SHADOW);
         if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
 
-        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
 
     updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
         this.material.update(controller, stellarObjects, deltaTime);
+    }
+
+    getTypeName(): string {
+        return "Gas Planet";
     }
 
     public override computeCulling(camera: Camera): void {
@@ -59,6 +67,7 @@ export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial 
     }
 
     public override dispose(): void {
+        this.aggregate.dispose();
         this.mesh.dispose();
         this.material.dispose();
         super.dispose();

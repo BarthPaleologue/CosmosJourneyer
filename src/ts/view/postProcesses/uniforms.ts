@@ -1,6 +1,8 @@
 import { UberScene } from "../../controller/uberCore/uberScene";
-import { BaseObject, OrbitalObject } from "../common";
+import { BaseObject } from "../common";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
+import { Star } from "../bodies/stellarObjects/star";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
@@ -43,20 +45,27 @@ export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     ];
 }
 
-export function getStellarObjectsUniforms(stars: OrbitalObject[]): ShaderUniforms {
+export function getStellarObjectsUniforms(stars: StellarObject[]): ShaderUniforms {
     return [
-        ...stars.map((star, index) => {
-            return {
-                name: `stars[${index}].position`,
-                type: UniformEnumType.Vector3,
-                get: () => star.transform.getAbsolutePosition()
-            };
+        ...stars.flatMap((star, index) => {
+            return [
+                {
+                    name: `stars[${index}].position`,
+                    type: UniformEnumType.Vector3,
+                    get: () => star.getTransform().getAbsolutePosition()
+                },
+                {
+                    name: `stars[${index}].radius`,
+                    type: UniformEnumType.Float,
+                    get: () => star.getRadius()
+                },
+                {
+                    name: `stars[${index}].color`,
+                    type: UniformEnumType.Vector3,
+                    get: () => (star instanceof Star ? star.model.surfaceColor : Vector3.One())
+                }
+            ];
         }),
-        {
-            name: "starPositions",
-            type: UniformEnumType.Vector3Array,
-            get: () => stars.map((star) => star.transform.getAbsolutePosition())
-        },
         {
             name: "nbStars",
             type: UniformEnumType.Int,
@@ -70,7 +79,7 @@ export function getObjectUniforms(object: BaseObject): ShaderUniforms {
         {
             name: "object.position",
             type: UniformEnumType.Vector3,
-            get: () => object.transform.getAbsolutePosition()
+            get: () => object.getTransform().getAbsolutePosition()
         },
         {
             name: "object.radius",
@@ -80,7 +89,7 @@ export function getObjectUniforms(object: BaseObject): ShaderUniforms {
         {
             name: "object.rotationAxis",
             type: UniformEnumType.Vector3,
-            get: () => object.transform.up
+            get: () => object.getTransform().up
         }
     ];
 }

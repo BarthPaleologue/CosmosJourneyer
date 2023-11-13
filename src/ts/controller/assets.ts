@@ -34,9 +34,7 @@ import { AssetsManager, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager
 import { Scene } from "@babylonjs/core/scene";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { PBRBaseMaterial } from "@babylonjs/core/Materials/PBR/pbrBaseMaterial";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { TransformNode } from "@babylonjs/core/Meshes";
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 import { Sound } from "@babylonjs/core/Audio/sound";
@@ -109,8 +107,6 @@ export class Assets {
 
                 for (const mesh of Assets.Spaceship.getChildMeshes()) {
                     mesh.isVisible = false;
-                    const pbr = mesh.material as PBRBaseMaterial;
-                    pbr.useLogarithmicDepth = true;
                 }
 
                 console.log("Spaceship loaded");
@@ -122,8 +118,6 @@ export class Assets {
 
                 for (const mesh of Assets.EndeavorSpaceship.getChildMeshes()) {
                     mesh.isVisible = false;
-                    const pbr = mesh.material as PBRBaseMaterial;
-                    pbr.useLogarithmicDepth = true;
                 }
 
                 console.log("Endeavor Spaceship loaded");
@@ -135,8 +129,6 @@ export class Assets {
 
                 for (const mesh of Assets.Spacestation.getChildMeshes()) {
                     mesh.isVisible = false;
-                    const pbr = mesh.material as PBRBaseMaterial;
-                    pbr.useLogarithmicDepth = true;
                     //pbr._reflectionTexture = new Texture(starfield, scene);
                     //pbr._reflectionTexture.coordinatesMode = Texture.SPHERICAL_MODE;
                 }
@@ -151,8 +143,6 @@ export class Assets {
 
                 for (const mesh of Assets.Banana.getChildMeshes()) {
                     mesh.isVisible = false;
-                    const pbr = mesh.material as PBRBaseMaterial;
-                    pbr.useLogarithmicDepth = true;
                 }
 
                 console.log("Banana loaded");
@@ -222,7 +212,6 @@ export class Assets {
         if (!diffuse) mat.emissiveColor = Color3.Random();
         else mat.diffuseColor = Color3.Random();
         mat.wireframe = wireframe;
-        mat.useLogarithmicDepth = true;
         return mat;
     }
 }

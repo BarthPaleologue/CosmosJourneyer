@@ -1,5 +1,5 @@
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { BoundingSphere, ITransformable } from "../view/common";
+import { BoundingSphere, Transformable } from "../view/common";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
 /**
@@ -21,8 +21,8 @@ export function getAngularSize(objectPosition: Vector3, objectRadius: number, ca
  * @param threshold The size threshold
  * @returns Whether the object is bigger than the threshold
  */
-export function isSizeOnScreenEnough(object: BoundingSphere & ITransformable, camera: Camera, threshold = 0.002) {
-    const angularSize = getAngularSize(object.transform.getAbsolutePosition(), object.getBoundingRadius(), camera.globalPosition);
+export function isSizeOnScreenEnough(object: BoundingSphere & Transformable, camera: Camera, threshold = 0.002) {
+    const angularSize = getAngularSize(object.getTransform().getAbsolutePosition(), object.getBoundingRadius(), camera.globalPosition);
 
     return angularSize / camera.fov > threshold;
 }

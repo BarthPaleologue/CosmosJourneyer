@@ -22,6 +22,12 @@ export function getAxisComponentFromQuaternion(quaternion: Quaternion, axisToGet
     return twist.normalize().conjugate();
 }
 
+export function getTransformationQuaternion(from: Vector3, to: Vector3): Quaternion {
+    const rotationAxis = Vector3.Cross(from, to);
+    const angle = Math.acos(Vector3.Dot(from, to));
+    return Quaternion.RotationAxis(rotationAxis, angle);
+}
+
 export function flattenVector3Array(vector3Array: Vector3[]): number[] {
     const result: number[] = [];
     for (const vector3 of vector3Array) {

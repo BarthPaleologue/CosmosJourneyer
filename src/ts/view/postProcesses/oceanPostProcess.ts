@@ -10,6 +10,7 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { OrbitalObject } from "../common";
 import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../../controller/uberCore/postProcesses/types";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 
 const shaderName = "ocean";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -21,13 +22,13 @@ export type OceanUniforms = {
     depthModifier: number;
     alphaModifier: number;
     waveBlendingSharpness: number;
-}
+};
 
 export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly oceanUniforms: OceanUniforms;
     readonly object: TelluricPlanemo;
 
-    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: OrbitalObject[]) {
+    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: StellarObject[]) {
         const oceanUniforms: OceanUniforms = {
             oceanRadius: planet.getBoundingRadius(),
             depthModifier: 0.001,
@@ -87,7 +88,7 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
                 name: "planetInverseRotationQuaternion",
                 type: UniformEnumType.Quaternion,
                 get: () => {
-                    return getInverseRotationQuaternion(planet.transform);
+                    return getInverseRotationQuaternion(planet.getTransform());
                 }
             },
             {

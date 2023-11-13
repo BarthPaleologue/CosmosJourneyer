@@ -3,11 +3,6 @@ precision highp float;
 attribute vec3 position;
 attribute vec3 normal;
 
-#ifdef LOGARITHMICDEPTH
-	uniform float logarithmicDepthConstant;
-	out float vFragmentDepth;
-#endif
-
 uniform mat4 world;
 uniform mat4 worldViewProjection;
 uniform mat4 normalMatrix;
@@ -33,10 +28,6 @@ void main() {
 
     vec4 outPosition = worldViewProjection * vec4(position, 1.0);
     gl_Position = outPosition;
-    #ifdef LOGARITHMICDEPTH
-    	vFragmentDepth = 1.0 + gl_Position.w;
-    	gl_Position.z = log2(max(0.000001, vFragmentDepth)) * logarithmicDepthConstant;
-    #endif
     
     vPositionW = vec3(world * vec4(position, 1.0));
     vNormalW = normalize(mat3(normalMatrix) * normal);

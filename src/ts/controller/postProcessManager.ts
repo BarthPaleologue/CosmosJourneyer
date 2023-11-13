@@ -10,7 +10,6 @@ import { AtmosphericScatteringPostProcess } from "../view/postProcesses/atmosphe
 import { AbstractBody } from "../view/bodies/abstractBody";
 import { RingsPostProcess } from "../view/postProcesses/ringsPostProcess";
 import { StarfieldPostProcess } from "../view/postProcesses/starfieldPostProcess";
-import { OverlayPostProcess } from "../view/postProcesses/overlayPostProcess";
 import { VolumetricLight } from "../view/postProcesses/volumetricLight";
 import { BlackHolePostProcess } from "../view/postProcesses/blackHolePostProcess";
 import { GasPlanet } from "../view/bodies/planemos/gasPlanet";
@@ -34,6 +33,8 @@ import { MatterJetPostProcess } from "../view/postProcesses/matterJetPostProcess
 import { NeutronStar } from "../view/bodies/stellarObjects/neutronStar";
 import { ShadowPostProcess } from "../view/postProcesses/shadowPostProcess";
 import { LensFlarePostProcess } from "../view/postProcesses/lensFlarePostProcess";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { isOrbiting } from "../utils/nearestBody";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -46,7 +47,7 @@ const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.ATMOSPHERE,
     PostProcessType.MANDELBULB,
     PostProcessType.RING,
-    PostProcessType.BLACK_HOLE,
+    PostProcessType.BLACK_HOLE
 ];
 
 /**
@@ -60,7 +61,7 @@ const surfaceRenderingOrder: PostProcessType[] = [
     PostProcessType.RING,
     PostProcessType.OCEAN,
     PostProcessType.CLOUDS,
-    PostProcessType.ATMOSPHERE,
+    PostProcessType.ATMOSPHERE
 ];
 
 /**
@@ -78,7 +79,7 @@ export class PostProcessManager {
 
     private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
 
-    private currentBody: AbstractBody | null = null;
+    private currentBody: AbstractObject | null = null;
 
     private readonly starFields: StarfieldPostProcess[] = [];
     private readonly volumetricLights: VolumetricLight[] = [];
@@ -88,7 +89,6 @@ export class PostProcessManager {
     private readonly rings: RingsPostProcess[] = [];
     private readonly mandelbulbs: MandelbulbPostProcess[] = [];
     private readonly blackHoles: BlackHolePostProcess[] = [];
-    private readonly overlays: OverlayPostProcess[] = [];
     private readonly matterJets: MatterJetPostProcess[] = [];
     private readonly shadows: ShadowPostProcess[] = [];
     private readonly lensFlares: LensFlarePostProcess[] = [];
@@ -103,7 +103,6 @@ export class PostProcessManager {
         this.rings,
         this.mandelbulbs,
         this.blackHoles,
-        this.overlays,
         this.volumetricLights,
         this.matterJets,
         this.shadows,
@@ -119,7 +118,6 @@ export class PostProcessManager {
     readonly fxaa: FxaaPostProcess;
 
     private readonly starFieldRenderEffect: PostProcessRenderEffect;
-    private readonly overlayRenderEffect: PostProcessRenderEffect;
 
     private readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
     private readonly fxaaRenderEffect: PostProcessRenderEffect;
@@ -131,8 +129,8 @@ export class PostProcessManager {
 
         this.colorCorrection = new ColorCorrection("colorCorrection", scene.getEngine());
         this.colorCorrection.exposure = 1.1;
-        this.colorCorrection.gamma = 1.2;
-        this.colorCorrection.saturation = 0.9;
+        this.colorCorrection.gamma = 1.0;
+        this.colorCorrection.saturation = 1.0;
 
         this.fxaa = new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine());
 
@@ -153,10 +151,6 @@ export class PostProcessManager {
 
         this.starFieldRenderEffect = new PostProcessRenderEffect(this.engine, "starFieldRenderEffect", () => {
             return this.starFields;
-        });
-
-        this.overlayRenderEffect = new PostProcessRenderEffect(this.engine, "overlayRenderEffect", () => {
-            return this.overlays;
         });
 
         this.bloomRenderEffect = new BloomEffect(scene, 1, 0.3, 32);
@@ -238,7 +232,7 @@ export class PostProcessManager {
      * Returns the rings post process for the given body. Throws an error if no rings are found.
      * @param body A body
      */
-    public getRings(body: AbstractBody): RingsPostProcess | null {
+    public getRings(body: AbstractObject): RingsPostProcess | null {
         return this.rings.find((rings) => rings.object === body) ?? null;
     }
 
@@ -257,17 +251,8 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      * @param planets An array of planets
      */
-    public addStarField(stellarObjects: StellarObject[], planets: AbstractBody[]) {
-        this.starFields.push(new StarfieldPostProcess(this.scene, stellarObjects, planets));
-    }
-
-    /**
-     * Creates a new Overlay postprocess for the given body and adds it to the manager.
-     * @param body A body
-     */
-    public addOverlay(body: BaseObject) {
-        const overlay = new OverlayPostProcess(body, this.scene);
-        this.overlays.push(overlay);
+    public addStarField(stellarObjects: StellarObject[], planets: AbstractBody[], starfieldRotation: Quaternion) {
+        this.starFields.push(new StarfieldPostProcess(this.scene, stellarObjects, planets, starfieldRotation));
     }
 
     /**
@@ -290,8 +275,8 @@ export class PostProcessManager {
      * Creates a new BlackHole postprocess for the given black hole and adds it to the manager.
      * @param blackHole A black hole
      */
-    public addBlackHole(blackHole: BlackHole) {
-        const blackhole = new BlackHolePostProcess(blackHole, this.scene);
+    public addBlackHole(blackHole: BlackHole, starfieldRotation: Quaternion) {
+        const blackhole = new BlackHolePostProcess(blackHole, this.scene, starfieldRotation);
         this.blackHoles.push(blackhole);
     }
 
@@ -315,65 +300,17 @@ export class PostProcessManager {
         this.lensFlares.push(new LensFlarePostProcess(stellarObject, this.scene));
     }
 
-    /**
-     * Adds all post processes for the given body.
-     * @param body A body
-     * @param stellarObjects An array of stars or black holes lighting the body
-     */
-    public addObject(body: AbstractObject, stellarObjects: StellarObject[]) {
-        for (const postProcess of body.postProcesses) {
-            switch (postProcess) {
-                case PostProcessType.RING:
-                    if (!(body instanceof AbstractBody)) throw new Error("Rings post process can only be added to bodies. Source:" + body.name);
-                    this.addRings(body, stellarObjects);
-                    break;
-                case PostProcessType.OVERLAY:
-                    this.addOverlay(body);
-                    break;
-                case PostProcessType.ATMOSPHERE:
-                    if (!(body instanceof GasPlanet) && !(body instanceof TelluricPlanemo))
-                        throw new Error("Atmosphere post process can only be added to gas or telluric planets. Source:" + body.name);
-                    this.addAtmosphere(body as GasPlanet | TelluricPlanemo, stellarObjects);
-                    break;
-                case PostProcessType.CLOUDS:
-                    if (!(body instanceof TelluricPlanemo)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + body.name);
-                    this.addClouds(body as TelluricPlanemo, stellarObjects);
-                    break;
-                case PostProcessType.OCEAN:
-                    if (!(body instanceof TelluricPlanemo)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + body.name);
-                    this.addOcean(body as TelluricPlanemo, stellarObjects);
-                    break;
-                case PostProcessType.VOLUMETRIC_LIGHT:
-                    if (!(body instanceof Star)) throw new Error("Volumetric light post process can only be added to stars. Source:" + body.name);
-                    this.addVolumetricLight(body as Star);
-                    break;
-                case PostProcessType.MANDELBULB:
-                    if (!(body instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + body.name);
-                    this.addMandelbulb(body as Mandelbulb, stellarObjects);
-                    break;
-                case PostProcessType.BLACK_HOLE:
-                    if (!(body instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + body.name);
-                    this.addBlackHole(body as BlackHole);
-                    break;
-                case PostProcessType.MATTER_JETS:
-                    if (!(body instanceof NeutronStar)) throw new Error("Matter jets post process can only be added to neutron stars. Source:" + body.name);
-                    this.addMatterJet(body as NeutronStar);
-                    break;
-                case PostProcessType.SHADOW:
-                    this.addShadowCaster(body as AbstractBody, stellarObjects);
-                    break;
-                case PostProcessType.LENS_FLARE:
-                    this.addLensFlare(body as StellarObject);
-                    break;
-            }
-        }
-    }
-
     public setBody(body: AbstractBody) {
         if (this.currentBody === body) return;
         this.currentBody = body;
 
         this.currentRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
+
+        const rings = this.getRings(body);
+        const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;
+        if (isOrbiting(this.scene.getActiveController(), body, switchLimit)) this.setSurfaceOrder();
+        else this.setSpaceOrder();
+
         this.init();
     }
 
@@ -463,9 +400,6 @@ export class PostProcessManager {
                 case PostProcessType.LENS_FLARE:
                     //this.currentRenderingPipeline.addEffect(otherLensFlaresRenderEffect);
                     break;
-                case PostProcessType.OVERLAY:
-                    // do nothing as they are added at the end of the function
-                    break;
             }
         }
 
@@ -501,15 +435,11 @@ export class PostProcessManager {
                 case PostProcessType.SHADOW:
                     //this.currentRenderingPipeline.addEffect(bodyShadowRenderEffect);
                     break;
-                case PostProcessType.OVERLAY:
-                    // do nothing as they are added at the end of the function
-                    break;
             }
         }
 
         this.currentRenderingPipeline.addEffect(shadowRenderEffect);
         this.currentRenderingPipeline.addEffect(lensFlareRenderEffect);
-        this.currentRenderingPipeline.addEffect(this.overlayRenderEffect);
         this.currentRenderingPipeline.addEffect(this.fxaaRenderEffect);
         this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
         this.currentRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
@@ -517,10 +447,17 @@ export class PostProcessManager {
         this.currentRenderingPipeline.attachToCamera(this.scene.getActiveUberCamera());
     }
 
+    /**
+     * Updates all updatable post processes with the given delta time.
+     * @param deltaTime The time in seconds since the last frame
+     */
     public update(deltaTime: number) {
         for (const postProcess of this.updatablePostProcesses.flat()) postProcess.update(deltaTime);
     }
 
+    /**
+     * Disposes all post processes and rendering pipelines.
+     */
     public dispose() {
         for (const objectPostProcess of this.objectPostProcesses.flat()) objectPostProcess.dispose();
 

@@ -3,33 +3,46 @@ import { ColorMode, ColorSettings } from "./colorSettingsInterface";
 import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../../controller/assets";
-import { flattenVector3Array } from "../../utils/algebra";
 import { UberScene } from "../../controller/uberCore/uberScene";
-import { TerrainSettings } from "../../model/terrain/terrainSettings";
-import { SolidPhysicalProperties } from "../../model/common";
 import { centeredRand } from "extended-random";
 import { TelluricPlanemoModel } from "../../model/planemos/telluricPlanemoModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { MaterialHelper } from "@babylonjs/core/Materials/materialHelper";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getInverseRotationMatrix } from "../../controller/uberCore/transforms/basicTransform";
-import {Star} from "../bodies/stellarObjects/star";
-import {StellarObject} from "../bodies/stellarObjects/stellarObject";
+import { Star } from "../bodies/stellarObjects/star";
+import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 
 const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 
+/**
+ * The material for telluric planemos.
+ * It is responsible for the shading of the surface of the planet (biome blending, normal mapping and color)
+ */
 export class TelluricPlanemoMaterial extends ShaderMaterial {
-    readonly planet: TransformNode;
-    colorSettings: ColorSettings;
-    terrainSettings: TerrainSettings;
-    physicalProperties: SolidPhysicalProperties;
-    planetRadius: number;
+    /**
+     * The transform node of the planemo associated with this material
+     */
+    private readonly planemoTransform: TransformNode;
 
+    readonly colorSettings: ColorSettings;
+
+    /**
+     * The model of the planemo associated with this material
+     */
+    private readonly planemoModel: TelluricPlanemoModel;
+
+    /**
+     * Creates a new telluric planemo material
+     * @param planetName The name of the planemo
+     * @param planet The transform node of the planemo
+     * @param model The model of the planemo associated with this material
+     * @param scene
+     */
     constructor(planetName: string, planet: TransformNode, model: TelluricPlanemoModel, scene: UberScene) {
         super(`${planetName}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
@@ -81,17 +94,13 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "maxTemperature",
                 "pressure",
 
-                "waterAmount",
-
-                "logarithmicDepthConstant"
-            ],
-            defines: ["#define LOGARITHMICDEPTH"]
+                "waterAmount"
+            ]
         });
 
-        this.planet = planet;
-        this.planetRadius = model.radius;
-        this.terrainSettings = model.terrainSettings;
-        this.physicalProperties = model.physicalProperties;
+        this.planemoModel = model;
+        this.planemoTransform = planet;
+
         this.colorSettings = {
             mode: ColorMode.DEFAULT,
 
@@ -116,11 +125,6 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
             this.colorSettings.plainColor = this.colorSettings.desertColor.scale(0.7);
         }
 
-        this.onBindObservable.add(() => {
-            const effect = this.getEffect();
-            MaterialHelper.BindLogDepth(null, effect, scene);
-        });
-
         this.setFloat("seed", model.seed);
 
         if (!Assets.IS_READY) throw new Error("You must initialize your assets using the AssetsManager");
@@ -132,17 +136,17 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         this.setColor3("desertColor", this.colorSettings.desertColor);
         this.setColor3("bottomColor", this.colorSettings.bottomColor);
 
-        this.setVector3("planetPosition", this.planet.getAbsolutePosition());
+        this.setVector3("planetPosition", this.planemoTransform.getAbsolutePosition());
 
         this.updateConstants();
     }
 
     public updateConstants(): void {
-        this.setFloat("planetRadius", this.planetRadius);
+        this.setFloat("planetRadius", this.planemoModel.radius);
 
         this.setInt("colorMode", this.colorSettings.mode);
 
-        this.setFloat("waterLevel", this.physicalProperties.oceanLevel);
+        this.setFloat("waterLevel", this.planemoModel.physicalProperties.oceanLevel);
         this.setFloat("beachSize", this.colorSettings.beachSize);
         this.setFloat("steepSharpness", this.colorSettings.steepSharpness);
 
@@ -155,29 +159,30 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         this.setTexture("beachNormalMap", Assets.SandNormalMap1);
         this.setTexture("desertNormalMap", Assets.SandNormalMap2);
 
-        this.setFloat("minTemperature", this.physicalProperties.minTemperature);
-        this.setFloat("maxTemperature", this.physicalProperties.maxTemperature);
-        this.setFloat("pressure", this.physicalProperties.pressure);
-        this.setFloat("waterAmount", this.physicalProperties.waterAmount);
+        this.setFloat("minTemperature", this.planemoModel.physicalProperties.minTemperature);
+        this.setFloat("maxTemperature", this.planemoModel.physicalProperties.maxTemperature);
+        this.setFloat("pressure", this.planemoModel.physicalProperties.pressure);
+        this.setFloat("waterAmount", this.planemoModel.physicalProperties.waterAmount);
 
-        this.setFloat("maxElevation", this.terrainSettings.continent_base_height + this.terrainSettings.max_mountain_height + this.terrainSettings.max_bump_height);
+        this.setFloat(
+            "maxElevation",
+            this.planemoModel.terrainSettings.continent_base_height + this.planemoModel.terrainSettings.max_mountain_height + this.planemoModel.terrainSettings.max_bump_height
+        );
     }
 
     public update(activeControllerPosition: Vector3, stellarObjects: StellarObject[]) {
-        this.planet.updateCache(true);
-
-        this.setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
-        this.setMatrix("planetInverseRotationMatrix", getInverseRotationMatrix(this.planet));
+        this.setMatrix("normalMatrix", this.planemoTransform.getWorldMatrix().clone().invert().transpose());
+        this.setMatrix("planetInverseRotationMatrix", getInverseRotationMatrix(this.planemoTransform));
 
         this.setVector3("playerPosition", activeControllerPosition);
 
         for (let i = 0; i < stellarObjects.length; i++) {
             const star = stellarObjects[i];
-            this.setVector3(`stars[${i}].position`, star.transform.getAbsolutePosition());
+            this.setVector3(`stars[${i}].position`, star.getTransform().getAbsolutePosition());
             this.setVector3(`stars[${i}].color`, star instanceof Star ? star.model.surfaceColor : Vector3.One());
         }
         this.setInt("nbStars", stellarObjects.length);
 
-        this.setVector3("planetPosition", this.planet.getAbsolutePosition());
+        this.setVector3("planetPosition", this.planemoTransform.getAbsolutePosition());
     }
 }

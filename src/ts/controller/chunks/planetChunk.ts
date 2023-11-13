@@ -3,53 +3,59 @@ import { getChunkPlaneSpacePositionFromPath } from "../../utils/chunkUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Material } from "@babylonjs/core/Materials/material";
-import { ITransformable } from "../../view/common";
+import { Transformable } from "../../view/common";
 import { Scene } from "@babylonjs/core/scene";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import "@babylonjs/core/Engines/Extensions/engine.query";
 import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
-export class PlanetChunk implements ITransformable {
+export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
-    private ready = false;
-    readonly isMinDepth;
 
-    public readonly transform: TransformNode;
+    private readonly transform: TransformNode;
 
     readonly chunkSideLength: number;
 
+    private loaded = false;
+
     private readonly parent: TransformNode;
 
-    private physicsShape: PhysicsShapeMesh | null = null;
-    private readonly parentAggregate: PhysicsAggregate;
+    readonly onDestroyPhysicsShapeObservable = new Observable<number>();
 
-    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, isMinDepth: boolean, scene: Scene) {
+    readonly onRecieveVertexDataObservable = new Observable<void>();
+
+    private physicsShape: PhysicsShape | null = null;
+    physicsShapeIndex: number | null = null;
+    readonly parentAggregate: PhysicsAggregate;
+
+    private disposed = false;
+
+    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;
 
         this.chunkSideLength = rootLength / 2 ** this.depth;
 
-        this.isMinDepth = isMinDepth;
-
         this.transform = new TransformNode(`${id}Transform`, scene);
 
         this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
-        this.mesh.isBlocker = true;
+
         this.mesh.material = material;
-        /*this.mesh.material = Assets.DebugMaterial(id); //material;
-        (this.mesh.material as StandardMaterial).disableLighting = true;
-        this.mesh.material.wireframe = true;*/
+        //this.mesh.material = Assets.DebugMaterial(id); //material;
+        //(this.mesh.material as StandardMaterial).disableLighting = true;
+        //this.mesh.material.wireframe = true;
+
         this.transform.parent = parentAggregate.transformNode;
         this.mesh.parent = this.transform;
 
-        this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
-        this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_STRICT;
+        //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+        //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_STRICT;
 
         this.parent = parentAggregate.transformNode;
         this.parentAggregate = parentAggregate;
@@ -68,19 +74,48 @@ export class PlanetChunk implements ITransformable {
         this.transform.position = position;
     }
 
+    public getTransform(): TransformNode {
+        return this.transform;
+    }
+
     public init(vertexData: VertexData) {
+        if (this.disposed) return;
         vertexData.applyToMesh(this.mesh, false);
         this.mesh.freezeNormals();
-        if (this.isMinDepth) this.setReady(true);
 
-        if (this.depth > 7) {
-            //this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
-            //this.aggregate.body.disablePreStep = false;
-
+        if (this.depth > 3) {
             this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
-
             this.parentAggregate.shape.addChildFromParent(this.parent, this.physicsShape, this.mesh);
-            //this.aggregate.shape.addChildFromParent(this.parent.node, this.aggregate.shape, this.mesh);
+            this.physicsShapeIndex = this.parentAggregate.shape.getNumChildren();
+        }
+        this.mesh.setEnabled(true);
+        this.loaded = true;
+
+        this.onRecieveVertexDataObservable.notifyObservers();
+    }
+
+    private destroyPhysicsShape() {
+        if (this.physicsShapeIndex === null) return;
+        if (this.physicsShapeIndex > this.parentAggregate.shape.getNumChildren() - 1) {
+            console.error(
+                `Tried to delete ${this.mesh.name} PhysicsShape. However its shape index was out of bound: ${this.physicsShapeIndex} / range 0 : ${
+                    this.parentAggregate.shape.getNumChildren() - 1
+                }`
+            );
+            this.physicsShape?.dispose();
+            return;
+        }
+
+        this.parentAggregate.shape.removeChild(this.physicsShapeIndex);
+        this.physicsShape?.dispose();
+
+        this.onDestroyPhysicsShapeObservable.notifyObservers(this.physicsShapeIndex);
+    }
+
+    public registerPhysicsShapeDeletion(shapeIndex: number) {
+        if (this.physicsShapeIndex === null) return;
+        if (this.physicsShapeIndex > shapeIndex) {
+            this.physicsShapeIndex--;
         }
     }
 
@@ -93,20 +128,18 @@ export class PlanetChunk implements ITransformable {
      * @returns true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
      */
     public isReady() {
-        return this.ready;
+        return this.loaded;
     }
 
-    /**
-     * Sets the chunk readiness. Call it with true when it recieves its vertex data and call it with false when it has to be deleted
-     * @param ready true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
-     */
-    public setReady(ready: boolean) {
-        this.ready = ready;
-        this.mesh.setEnabled(ready);
+    public hasBeenDisposed() {
+        return this.disposed;
     }
 
     public dispose() {
-        this.transform.dispose();
+        this.destroyPhysicsShape();
         this.mesh.dispose();
+        this.transform.dispose();
+
+        this.disposed = true;
     }
 }

@@ -16,6 +16,7 @@ import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { PhysicsShapeSphere } from "@babylonjs/core";
 
 export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMaterial {
     readonly sides: ChunkTree[] = new Array(6); // stores the 6 sides of the sphere
@@ -24,23 +25,21 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
 
     readonly model: TelluricPlanemoModel;
 
-    readonly aggregate: PhysicsAggregate;
-
     /**
      * New Telluric Planet
      * @param name The name of the planet
      * @param scene
-     * @param parentBodies The bodies the planet is orbiting
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
+     * @param parentBody
      */
     constructor(name: string, scene: UberScene, model: TelluricPlanemoModel | number, parentBody?: AbstractBody) {
         super(name, scene, parentBody);
 
         this.model = model instanceof TelluricPlanemoModel ? model : new TelluricPlanemoModel(model, parentBody?.model);
 
-        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
 
-        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.SHADOW);
+        this.postProcesses.push(PostProcessType.SHADOW);
 
         const waterBoilingPoint = waterBoilingPointCelsius(this.model.physicalProperties.pressure);
         const waterFreezingPoint = 0.0;
@@ -59,19 +58,10 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
 
         if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
 
-        this.material = new TelluricPlanemoMaterial(this.name, this.transform, this.model, scene);
+        this.material = new TelluricPlanemoMaterial(this.name, this.getTransform(), this.model, scene);
 
-        this.aggregate = new PhysicsAggregate(
-            this.transform,
-            PhysicsShapeType.CONTAINER,
-            {
-                mass: 0,
-                restitution: 0.2
-            },
-            scene
-        );
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-        this.aggregate.body.disablePreStep = false;
+        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
+        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
 
         this.sides = [
             new ChunkTree(Direction.Up, this.name, this.model, this.aggregate, this.material, scene),
@@ -81,6 +71,18 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
             new ChunkTree(Direction.Right, this.name, this.model, this.aggregate, this.material, scene),
             new ChunkTree(Direction.Left, this.name, this.model, this.aggregate, this.material, scene)
         ];
+
+        for (const side of this.sides) {
+            side.onChunkPhysicsShapeDeletedObservable.add((index) => {
+                for (const side2 of this.sides) {
+                    side2.registerPhysicsShapeDeletion(index);
+                }
+            });
+        }
+    }
+
+    getTypeName(): string {
+        return "Telluric Planemo";
     }
 
     /**
@@ -113,6 +115,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
     public override dispose(): void {
         this.material.dispose();
         for (const side of this.sides) side.dispose();
+        this.aggregate.dispose();
         super.dispose();
     }
 }

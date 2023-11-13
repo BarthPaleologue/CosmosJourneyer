@@ -13,8 +13,9 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Assets } from "../../../controller/assets";
 import { setRotationQuaternion } from "../../../controller/uberCore/transforms/basicTransform";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeType } from "@babylonjs/core";
+import { PhysicsShapeSphere, PhysicsShapeType } from "@babylonjs/core";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { getStellarTypeString } from "../../../model/stellarObjects/common";
 
 export class Star extends AbstractBody {
     readonly mesh: Mesh;
@@ -22,8 +23,6 @@ export class Star extends AbstractBody {
     private readonly material: StarMaterial;
 
     readonly model: StarModel;
-
-    //readonly aggregate: PhysicsAggregate;
 
     /**
      * New Star
@@ -48,25 +47,28 @@ export class Star extends AbstractBody {
                       scene
                   )
                 : Assets.CreateBananaClone(this.model.radius * 2);
-        this.mesh.parent = this.transform;
+        this.mesh.parent = this.getTransform();
 
-        /*this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.SPHERE);
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-        this.aggregate.body.disablePreStep = false;*/
+        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
+        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
         this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
         this.light.falloffType = Light.FALLOFF_STANDARD;
-        this.light.parent = this.transform;
+        this.light.parent = this.getTransform();
 
-        this.material = new StarMaterial(this.transform, this.model, scene);
+        this.material = new StarMaterial(this.getTransform(), this.model, scene);
         this.mesh.material = this.material;
 
         // TODO: remove when rotation is transmitted to children
-        setRotationQuaternion(this.transform, Quaternion.Identity());
+        setRotationQuaternion(this.getTransform(), Quaternion.Identity());
 
-        this.postProcesses.push(PostProcessType.OVERLAY, PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE);
+        this.postProcesses.push(PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE);
         if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
+    }
+
+    getTypeName(): string {
+        return `${getStellarTypeString(this.model.stellarType)} star`;
     }
 
     public updateMaterial(): void {
@@ -78,6 +80,7 @@ export class Star extends AbstractBody {
     }
 
     public override dispose(): void {
+        this.aggregate.dispose();
         this.mesh.dispose();
         this.light.dispose();
         this.material.dispose();

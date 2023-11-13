@@ -7,7 +7,7 @@ import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { BaseObject } from "../common";
 import { getForwardDirection } from "../../controller/uberCore/transforms/basicTransform";
-import {UniformEnumType, ShaderSamplers, ShaderUniforms} from "../../controller/uberCore/postProcesses/types";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "matterjet";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
@@ -52,12 +52,10 @@ export class MatterJetPostProcess extends UberPostProcess implements ObjectPostP
                 get: () => {
                     return stellarObject.getRotationAxis();
                 }
-            },
+            }
         ];
 
-        const samplers: ShaderSamplers = [
-            ...getSamplers(scene)
-        ];
+        const samplers: ShaderSamplers = [...getSamplers(scene)];
 
         super(name, shaderName, uniforms, samplers, scene);
 

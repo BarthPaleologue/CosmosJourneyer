@@ -1,8 +1,5 @@
-import { getRgbFromTemperature } from "../../utils/specrend";
-
 import starMaterialFragment from "../../../shaders/starMaterial/fragment.glsl";
 import starMaterialVertex from "../../../shaders/starMaterial/vertex.glsl";
-import { StarPhysicalProperties } from "../../model/common";
 import { StarModel } from "../../model/stellarObjects/starModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
@@ -16,22 +13,22 @@ Effect.ShadersStore[`${shaderName}VertexShader`] = starMaterialVertex;
 
 export class StarMaterial extends ShaderMaterial {
     star: TransformNode;
-    physicalProperties: StarPhysicalProperties;
+    starModel: StarModel;
     starSeed: number;
 
     constructor(star: TransformNode, model: StarModel, scene: Scene) {
         super("starColor", scene, shaderName, {
             attributes: ["position"],
-            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time", "logarithmicDepthConstant"]
+            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time"]
         });
         this.star = star;
-        this.physicalProperties = model.physicalProperties;
+        this.starModel = model;
         this.starSeed = model.seed;
     }
 
     public update(internalTime: number) {
-        this.setFloat("time", internalTime % 100000); //FIXME: does this work??
-        this.setVector3("starColor", getRgbFromTemperature(this.physicalProperties.temperature));
+        this.setFloat("time", internalTime % 100000);
+        this.setVector3("starColor", this.starModel.surfaceColor);
         this.setQuaternion("starInverseRotationQuaternion", getInverseRotationQuaternion(this.star));
         this.setFloat("seed", this.starSeed);
         this.setVector3("starPosition", this.star.getAbsolutePosition());

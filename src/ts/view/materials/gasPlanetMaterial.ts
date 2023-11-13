@@ -4,7 +4,6 @@ import surfaceMaterialFragment from "../../../shaders/gasPlanetMaterial/fragment
 import surfaceMaterialVertex from "../../../shaders/gasPlanetMaterial/vertex.glsl";
 import { GazColorSettings } from "./colorSettingsInterface";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
-import { flattenVector3Array } from "../../utils/algebra";
 import { GasPlanetModel } from "../../model/planemos/gasPlanetModel";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
@@ -14,10 +13,10 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MaterialHelper } from "@babylonjs/core/Materials/materialHelper";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
+import { getInverseRotationMatrix } from "../../controller/uberCore/transforms/basicTransform";
 import { Star } from "../bodies/stellarObjects/star";
 
-const shaderName = "gazPlanetMaterial";
+const shaderName = "gasPlanetMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 
@@ -27,33 +26,9 @@ export class GasPlanetMaterial extends ShaderMaterial {
     private clock = 0;
 
     constructor(planetName: string, planet: TransformNode, model: GasPlanetModel, scene: Scene) {
-        super(`${planetName}SurfaceColor`, scene, shaderName, {
+        super(`${planetName}GasSurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
-            uniforms: [
-                "world",
-                "worldViewProjection",
-
-                "seed",
-
-                "planetPosition",
-
-                "stars",
-                "nbStars",
-
-                "color1",
-                "color2",
-                "color3",
-                "colorSharpness",
-
-                "time",
-
-                "planetInverseRotationQuaternion",
-
-                "playerPosition",
-
-                "logarithmicDepthConstant"
-            ],
-            defines: ["#define LOGARITHMICDEPTH"]
+            uniforms: ["world", "worldViewProjection", "normalMatrix", "seed", "stars", "nbStars", "color1", "color2", "color3", "colorSharpness", "time", "playerPosition"]
         });
 
         this.planet = planet;
@@ -74,42 +49,32 @@ export class GasPlanetMaterial extends ShaderMaterial {
             colorSharpness: randRangeInt(40, 80, model.rng, 80) / 10
         };
 
-        this.onBindObservable.add(() => {
-            const effect = this.getEffect();
-            MaterialHelper.BindLogDepth(null, effect, scene);
-        });
-
         this.setFloat("seed", model.seed);
-
-        this.setVector3("playerPosition", Vector3.Zero());
-        this.setVector3("planetPosition", this.planet.getAbsolutePosition());
 
         this.setColor3("color1", this.colorSettings.color1);
         this.setColor3("color2", this.colorSettings.color2);
         this.setColor3("color3", this.colorSettings.color3);
 
-        this.updateManual();
+        this.updateConstants();
     }
 
-    public updateManual(): void {
+    public updateConstants(): void {
         this.setFloat("colorSharpness", this.colorSettings.colorSharpness);
     }
 
     public update(player: AbstractController, stellarObjects: StellarObject[], deltaTime: number) {
         this.clock += deltaTime;
 
-        this.setQuaternion("planetInverseRotationQuaternion", getInverseRotationQuaternion(this.planet));
+        this.setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
 
-        this.setVector3("playerPosition", player.getTransform().getAbsolutePosition());
+        this.setVector3("playerPosition", player.getActiveCamera().getAbsolutePosition());
 
         for (let i = 0; i < stellarObjects.length; i++) {
             const star = stellarObjects[i];
-            this.setVector3(`stars[${i}].position`, star.transform.getAbsolutePosition());
+            this.setVector3(`stars[${i}].position`, star.getTransform().getAbsolutePosition());
             this.setVector3(`stars[${i}].color`, star instanceof Star ? star.model.surfaceColor : Vector3.One());
         }
         this.setInt("nbStars", stellarObjects.length);
-
-        this.setVector3("planetPosition", this.planet.getAbsolutePosition());
 
         this.setFloat("time", this.clock % 100000);
     }

@@ -101,9 +101,8 @@ void main() {
 
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
 
-    // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
-    float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
+    // actual depth of the scene
+    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
 
     vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 

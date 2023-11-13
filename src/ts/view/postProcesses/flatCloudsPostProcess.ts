@@ -11,11 +11,7 @@ import { TelluricPlanemo } from "../bodies/planemos/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { StellarObject } from "../bodies/stellarObjects/stellarObject";
 import { getInverseRotationQuaternion } from "../../controller/uberCore/transforms/basicTransform";
-import {
-    UniformEnumType,
-    ShaderSamplers,
-    ShaderUniforms,
-} from "../../controller/uberCore/postProcesses/types";
+import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../../controller/uberCore/postProcesses/types";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -126,17 +122,12 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
                 }
             },
             {
-                name: "planetInverseRotationQuaternion",
-                type: UniformEnumType.Quaternion,
-                get: () => {
-                    return getInverseRotationQuaternion(planet.transform);
-                }
-            },
-            {
                 name: "time",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return -this.internalTime % ((2 * Math.PI * gcd(this.cloudUniforms.worleySpeed * 10000, this.cloudUniforms.detailSpeed * 10000)) / this.cloudUniforms.worleySpeed);
+                    return (
+                        -this.internalTime % ((2 * Math.PI * gcd(this.cloudUniforms.worleySpeed * 10000, this.cloudUniforms.detailSpeed * 10000)) / this.cloudUniforms.worleySpeed)
+                    );
                 }
             }
         ];

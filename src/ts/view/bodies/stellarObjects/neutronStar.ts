@@ -13,7 +13,7 @@ export class NeutronStar extends Star {
      * @param name The name of the star
      * @param scene
      * @param model The seed of the star in [-1, 1]
-     * @param parentBodies The bodies the star is orbiting
+     * @param parentBody
      */
     constructor(name: string, scene: UberScene, model: number | NeutronStarModel, parentBody?: AbstractBody) {
         super(name, scene, model, parentBody);
@@ -21,5 +21,9 @@ export class NeutronStar extends Star {
         this.descriptor = model instanceof NeutronStarModel ? model : new NeutronStarModel(model, parentBody?.model);
 
         this.postProcesses.push(PostProcessType.MATTER_JETS);
+    }
+
+    getTypeName(): string {
+        return "Neutron Star";
     }
 }

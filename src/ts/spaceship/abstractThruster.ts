@@ -38,7 +38,6 @@ export abstract class AbstractThruster {
         const cubeMaterial = new StandardMaterial("cubeMat", mesh.getScene());
         cubeMaterial.diffuseColor = Color3.White();
         cubeMaterial.emissiveColor = Color3.White();
-        cubeMaterial.useLogarithmicDepth = true;
         thrusterHelper.material = cubeMaterial;
         thrusterHelper.parent = mesh;
 

@@ -7,6 +7,8 @@ in vec2 vUV;
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
+uniform float visibility;
+
 #pragma glslify: camera = require(./utils/camera.glsl)
 
 #pragma glslify: object = require(./utils/object.glsl)
@@ -16,7 +18,7 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 #pragma glslify: remap = require(./utils/remap.glsl)
 
-uniform vec3 flareColor;// = vec3(0.643, 0.494, 0.867);
+uniform vec3 flareColor;
 uniform float aspectRatio;
 
 float getSun(vec2 uv){
@@ -105,25 +107,17 @@ vec3 anflares(vec2 uv, float intensity, float stretch, float brightness)
 void main() {
     vec4 screenColor = texture(textureSampler, vUV);
 
-    float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
-
-    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
-    // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
-
-    float objectDistance = length(object.position - camera.position);
-    vec3 objectDirection = (object.position - camera.position) / objectDistance;
-
-    vec2 objectScreenPos = uvFromWorld(object.position);
-
-    //TODO: resample depth, and test if the object is occluded by something else, then do not render the lens flare
-    float depth2 = texture2D(depthSampler, objectScreenPos).r;
-    vec3 pixelWorldPosition2 = worldFromUV(objectScreenPos);
-    float depthDistance = length((pixelWorldPosition2 - camera.position) * remap(depth2, 0.0, 1.0, camera.near, camera.far));
-    if (depthDistance < objectDistance - object.radius) {
+    if (visibility == 0.0) {
         gl_FragColor = screenColor;
         return;
     }
+
+    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
+    vec3 rayDir = normalize(pixelWorldPosition - camera.position);
+
+    vec3 objectDirection = normalize(object.position - camera.position);
+
+    vec2 objectScreenPos = uvFromWorld(object.position);
 
     // Normalized pixel coordinates (from 0 to 1)
     vec2 uv = vUV - 0.5;
@@ -142,9 +136,9 @@ void main() {
     sun += getSun(uv-mouse) + (flare + anflare)*flareColor*2.0;
 
     // no lensflare when looking away from the sun
-    sun *= smoothstep(0.0, 0.1, dot(objectDirection, normalize(closestPoint)));
+    sun *= smoothstep(0.0, 0.1, dot(objectDirection, rayDir));
 
-    col += sun;
+    col += sun * visibility;
 
     // Output to screen
     gl_FragColor = vec4(col, screenColor.a);

@@ -8,6 +8,7 @@ export function getPosition(transformNode: TransformNode): Vector3 {
 
 export function translate(transformNode: TransformNode, displacement: Vector3): void {
     transformNode.setAbsolutePosition(transformNode.getAbsolutePosition().add(displacement));
+    transformNode.computeWorldMatrix(true);
 }
 
 export function rotateAround(transformNode: TransformNode, pivot: Vector3, axis: Vector3, amount: number): void {
@@ -31,6 +32,16 @@ export function getInverseRotationQuaternion(transformNode: TransformNode): Quat
 
 export function setRotationQuaternion(transformNode: TransformNode, newRotation: Quaternion): void {
     transformNode.rotationQuaternion = newRotation;
+    transformNode.computeWorldMatrix(true);
+}
+
+export function setUpVector(transformNode: TransformNode, newUp: Vector3): void {
+    if (newUp.equalsWithEpsilon(transformNode.up, 1e-7)) return;
+    const currentUp = transformNode.up;
+    const rotationAxis = Vector3.Cross(newUp, currentUp);
+    const angle = -Math.acos(Vector3.Dot(newUp, currentUp));
+    const rotation = Quaternion.RotationAxis(rotationAxis, angle);
+    setRotationQuaternion(transformNode, rotation.multiply(transformNode.rotationQuaternion ?? Quaternion.Identity()));
 }
 
 export function getRotationMatrix(transformNode: TransformNode): Matrix {
@@ -48,8 +59,8 @@ export function getInverseRotationMatrix(transformNode: TransformNode): Matrix {
 /* #region directions */
 
 /**
- *
- * @returns the unit vector pointing forward the player controler in world space
+ * This is not equivalent to transform.forward as CosmosJourneyer uses the right-handed coordinate system
+ * @returns the forward vector of the given transform in world space
  */
 export function getForwardDirection(transformNode: TransformNode): Vector3 {
     return transformNode.getDirection(Axis.Z);
@@ -57,7 +68,7 @@ export function getForwardDirection(transformNode: TransformNode): Vector3 {
 
 /**
  *
- * @returns the unit vector pointing backward the player controler in world space
+ * @returns the unit vector pointing backward the player controller in world space
  */
 export function getBackwardDirection(transformNode: TransformNode): Vector3 {
     return getForwardDirection(transformNode).negate();
@@ -65,7 +76,7 @@ export function getBackwardDirection(transformNode: TransformNode): Vector3 {
 
 /**
  *
- * @returns the unit vector pointing upward the player controler in world space
+ * @returns the unit vector pointing upward the player controller in world space
  */
 export function getUpwardDirection(transformNode: TransformNode): Vector3 {
     return transformNode.getDirection(Axis.Y);

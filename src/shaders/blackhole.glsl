@@ -22,6 +22,8 @@ uniform sampler2D depthSampler;
 
 uniform sampler2D starfieldTexture;
 
+uniform mat4 starfieldRotation;
+
 #pragma glslify: camera = require(./utils/camera.glsl)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
@@ -31,6 +33,8 @@ uniform sampler2D starfieldTexture;
 #pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=camera.projection, view=camera.view)
 
 #pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
+
+#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
 
 vec3 projectOnPlane(vec3 vector, vec3 planeNormal) {
     return vector - dot(vector, planeNormal) * planeNormal;
@@ -125,6 +129,17 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
     return diskColor;
 }
 
+/**
+ * Bends the light ray toward the black hole according to its distance
+ * The bending is tweaked to reach 0 when far enough so that we can skip some calculations
+ */
+vec3 bendRay(vec3 rayDir, vec3 blackholeDir, float distanceToCenter2, float maxBendDistance, float stepSize) {
+    float bendForce = object.radius / distanceToCenter2; //bending force
+    bendForce -= object.radius / (maxBendDistance * maxBendDistance); // bend force is 0 at maxBendDistance
+    bendForce = stepSize * max(0.0, bendForce); // multiply by step size, and clamp negative values
+    return normalize(rayDir + bendForce * blackholeDir); //bend ray towards BH
+}
+
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
@@ -132,9 +147,18 @@ void main() {
     vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
-    // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
-    float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
+
+    // actual depth of the scene
+    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
+
+    float maxBendDistance = max(accretionDiskRadius * 3.0, object.radius * 15.0);
+
+    float t0, t1;
+    if(!rayIntersectSphere(camera.position, rayDir, object.position, maxBendDistance, t0, t1)) {
+        // the light ray will not be affected by the black hole, we can skip the calculations
+        gl_FragColor = screenColor;
+        return;
+    }
 
     vec4 colOut = vec4(0.0);
 
@@ -147,6 +171,7 @@ void main() {
     if (maximumDistance < length(positionBHS)) occluded = true;
 
     vec4 col = vec4(0.0);
+    vec4 glow = vec4(0.0);
 
     if (!occluded) {
         for (int disks = 0; disks < 15; disks++) {
@@ -175,16 +200,17 @@ void main() {
                 float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / object.radius;//limit step size close to BH
                 stepSize = min(stepSize, min(farLimit, closeLimit));
 
-                float bendForce = stepSize * object.radius / distanceToCenter2;//bending force
-                rayDir = normalize(rayDir + bendForce * blackholeDir);//bend ray towards BH
+                rayDir = bendRay(rayDir, blackholeDir, distanceToCenter2, maxBendDistance, stepSize);
                 positionBHS += stepSize * rayDir;
 
+                //TODO: improve glow
+                //glow += vec4(1.2,1.1,1, 1.0) * (0.2 * (object.radius / distanceToCenter2) * stepSize * clamp(distanceToCenter / object.radius - 1.2, 0.0, 1.0)); //adds fairly cheap glow
             }
 
             if (distanceToCenter < object.radius) {
                 suckedInBH = true;
                 break;
-            } else if (distanceToCenter > object.radius * 10000.0) {
+            } else if (distanceToCenter > object.radius * 5000.0) {
                 escapedBH = true;
                 break;
             } else if (projectedDistance <= accretionDiskHeight) {
@@ -198,18 +224,35 @@ void main() {
         }
     }
 
-    //FIXME: when WebGPU supports texture2D inside if statements, move this to not compute it when occluded
-    /*vec2 uv = uvFromWorld(positionBHS);
-    vec4 bg = vec4(0.0);
+    // getting the screen coordinate of the end of the bended ray
+    vec2 uv = uvFromWorld(positionBHS);
+    // check if there is an object occlusion
+    vec3 pixelWorldPositionEndRay = worldFromUV(uv);// the pixel position in world space (near plane)
+    vec3 rayDirToEndRay = normalize(pixelWorldPositionEndRay - camera.position);// normalized direction of the ray
 
-    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) bg = texture2D(textureSampler, uv);
-    else {*/
-    vec2 starfieldUV = vec2(
-    sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
-    acos(rayDir.y) / 3.14159265359
-    );
-    vec4 bg = texture2D(starfieldTexture, starfieldUV);
-    //}
+    float epsilon = 0.01;
+    float depthEndRay1 = texture2D(depthSampler, uv + vec2(epsilon, 0.0)).r;// the depth corresponding to the pixel in the depth map
+    float depthEndRay2 = texture2D(depthSampler, uv + vec2(-epsilon, 0.0)).r;// the depth corresponding to the pixel in the depth map
+    float depthEndRay3 = texture2D(depthSampler, uv + vec2(0.0, epsilon)).r;// the depth corresponding to the pixel in the depth map
+    float depthEndRay4 = texture2D(depthSampler, uv + vec2(0.0 -epsilon)).r;// the depth corresponding to the pixel in the depth map
+    float depthEndRay = min(min(depthEndRay1, depthEndRay2), min(depthEndRay3, depthEndRay4));
+    // closest physical point from the camera in the direction of the pixel (occlusion)
+    vec3 closestPointEndRay = (pixelWorldPositionEndRay - camera.position) * remap(depthEndRay, 0.0, 1.0, camera.near, camera.far);
+    float maximumDistanceEndRay = length(closestPointEndRay);// the maxium ray length due to occlusion
+    float BHDistance = length(camera.position - object.position);
+
+    vec4 bg = vec4(0.0);
+    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0 && maximumDistanceEndRay > BHDistance - object.radius) {
+        bg = texture2D(textureSampler, uv);
+    } else {
+        rayDir = vec3(starfieldRotation * vec4(rayDir, 1.0));
+        vec2 starfieldUV = vec2(
+        sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
+        acos(rayDir.y) / 3.14159265359
+        );
+        bg = texture2D(starfieldTexture, starfieldUV);
+        bg.rgb = pow(bg.rgb, vec3(2.2));
+    }
 
     vec4 finalColor = vec4(1.0, 0.0, 0.0, 1.0);
 
@@ -218,9 +261,9 @@ void main() {
     } else if (suckedInBH) {
         finalColor = vec4(col.rgb * col.a, 1.0);
     } else if (escapedBH) {
-        finalColor = vec4(mix(bg.rgb, col.rgb, col.a), 1.0);
+        finalColor = vec4(mix(bg.rgb, col.rgb + glow.rgb *(col.a +  glow.a), col.a), 1.0);
     } else {
-        finalColor = vec4(col.rgb, 1.0);
+        finalColor = vec4(col.rgb + glow.rgb *(col.a +  glow.a), 1.0);
     }
 
     gl_FragColor = finalColor;
