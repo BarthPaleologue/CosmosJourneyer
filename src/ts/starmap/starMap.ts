@@ -1,15 +1,12 @@
-import { DefaultController } from "../spacelegs/defaultController";
-import { Keyboard } from "../controller/inputs/keyboard";
+import { DefaultController } from "../defaultController/defaultController";
 
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
-import { StarSystemModel } from "../model/starSystemModel";
-import { StarModel } from "../model/stellarObjects/starModel";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 import { BuildData, Cell, Vector3ToString } from "./cell";
-import { BlackHoleModel } from "../model/stellarObjects/blackHoleModel";
 import { StarMapUI } from "./starMapUI";
-import { getStellarTypeString } from "../model/stellarObjects/common";
+import { getStellarTypeString } from "../stellarObjects/common";
 import { BODY_TYPE } from "../model/common";
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -26,15 +23,19 @@ import { Animation } from "@babylonjs/core/Animations/animation";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Culling/ray";
-import { TransformRotationAnimation } from "../controller/uberCore/transforms/animations/rotation";
-import { TransformTranslationAnimation } from "../controller/uberCore/transforms/animations/translation";
+import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
+import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { makeNoise3D } from "fast-simplex-noise";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { Settings } from "../settings";
-import { getForwardDirection } from "../controller/uberCore/transforms/basicTransform";
+import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { Mouse } from "../controller/inputs/mouse";
+import { Keyboard } from "../inputs/keyboard";
+import { Mouse } from "../inputs/mouse";
+import { StarModel } from "../stellarObjects/star/starModel";
+import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+
 
 export class StarMap {
     readonly scene: Scene;

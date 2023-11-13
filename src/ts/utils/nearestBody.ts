@@ -1,7 +1,8 @@
-import { AbstractBody } from "../view/bodies/abstractBody";
-import { AbstractController } from "../controller/uberCore/abstractController";
-import { BoundingSphere, Transformable } from "../view/common";
+import { AbstractBody } from "../bodies/abstractBody";
+import { AbstractController } from "../uberCore/abstractController";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import { Transformable } from "../uberCore/transforms/basicTransform";
+import { BoundingSphere } from "../bodies/common";
 
 export function nearestBody(object: TransformNode, bodies: AbstractBody[]): AbstractBody {
     let distance = -1;

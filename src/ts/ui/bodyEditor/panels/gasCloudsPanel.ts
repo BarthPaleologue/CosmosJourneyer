@@ -1,5 +1,5 @@
 import { EditorPanel } from "../editorPanel";
-import { GasPlanet } from "../../../view/bodies/planemos/gasPlanet";
+import { GasPlanet } from "../../../planemos/gasPlanet/gasPlanet";
 import { clearAllEventListenersById } from "../../../utils/html";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";

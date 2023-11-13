@@ -18,17 +18,17 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import "../styles/index.scss";
-import { Assets } from "./controller/assets";
+import { Assets } from "./assets";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
-import { Spaceship } from "./better_spaceship/spaceship";
-import { Keyboard } from "./controller/inputs/keyboard";
-import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
-import { TelluricPlanemo } from "./view/bodies/planemos/telluricPlanemo";
-import { UberScene } from "./controller/uberCore/uberScene";
+import { Spaceship } from "./spaceshipExtended/spaceship";
+import { TelluricPlanemoModel } from "./planemos/telluricPlanemo/telluricPlanemoModel";
+import { TelluricPlanemo } from "./planemos/telluricPlanemo/telluricPlanemo";
+import { UberScene } from "./uberCore/uberScene";
 import { Settings } from "./settings";
-import { StarModel } from "./model/stellarObjects/starModel";
-import { Star } from "./view/bodies/stellarObjects/star";
-import { translate } from "./controller/uberCore/transforms/basicTransform";
+import { translate } from "./uberCore/transforms/basicTransform";
+import { StarModel } from "./stellarObjects/star/starModel";
+import { Keyboard } from "./inputs/keyboard";
+import { Star } from "./stellarObjects/star/star";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;

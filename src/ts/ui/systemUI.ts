@@ -1,8 +1,8 @@
 import { Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { AbstractObject } from "../view/bodies/abstractObject";
+import { AbstractObject } from "../bodies/abstractObject";
 import { ObjectOverlay } from "./objectOverlay";
-import { UberCamera } from "../controller/uberCore/uberCamera";
+import { UberCamera } from "../uberCore/uberCamera";
 
 export class SystemUI {
     private readonly gui: AdvancedDynamicTexture;

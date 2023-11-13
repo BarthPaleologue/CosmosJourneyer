@@ -1,6 +1,6 @@
-import { OrbitProperties } from "./orbit/orbitProperties";
-import { STELLAR_TYPE } from "./stellarObjects/common";
-import { RingsUniforms } from "./ringsUniform";
+import { STELLAR_TYPE } from "../stellarObjects/common";
+import { RingsUniforms } from "../postProcesses/rings/ringsUniform";
+import { OrbitProperties } from "../orbit/orbitProperties";
 
 export enum GENERATION_STEPS {
     AXIAL_TILT = 100,

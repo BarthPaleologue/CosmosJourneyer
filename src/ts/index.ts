@@ -1,31 +1,33 @@
 import "../styles/index.scss";
 
-import { Keyboard } from "./controller/inputs/keyboard";
-import { Mouse } from "./controller/inputs/mouse";
-import { Gamepad } from "./controller/inputs/gamepad";
 
-import { StarSystem } from "./controller/starSystem";
+import { StarSystem } from "./starSystem/starSystem";
 
 import { Settings } from "./settings";
-import { Assets } from "./controller/assets";
-import { DefaultController } from "./spacelegs/defaultController";
+import { Assets } from "./assets";
+import { DefaultController } from "./defaultController/defaultController";
 import { positionNearObject } from "./utils/positionNearObject";
-import { SpaceEngine } from "./controller/spaceEngine";
+import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ShipController } from "./spaceship/shipController";
-import { SpaceStation } from "./view/spaceStation";
-import { PostProcessType } from "./view/postProcesses/postProcessTypes";
-import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
-import { GasPlanetModel } from "./model/planemos/gasPlanetModel";
-import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
+import { PostProcessType } from "./postProcesses/postProcessTypes";
+import { TelluricPlanemoModel } from "./planemos/telluricPlanemo/telluricPlanemoModel";
+import { GasPlanetModel } from "./planemos/gasPlanet/gasPlanetModel";
+import { getRotationQuaternion, setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
-import { getMoonSeed } from "./model/planemos/common";
-import { RingsUniforms } from "./model/ringsUniform";
-import { StarModel } from "./model/stellarObjects/starModel";
-import { StarSystemHelper } from "./controller/starSystemHelper";
 
-const engine = new SpaceEngine();
+import { StarSystemHelper } from "./starSystem/starSystemHelper";
+import { Mouse } from "./inputs/mouse";
+import { Keyboard } from "./inputs/keyboard";
+import { StarModel } from "./stellarObjects/star/starModel";
+import { RingsUniforms } from "./postProcesses/rings/ringsUniform";
+import { SpaceStation } from "./spacestation/spaceStation";
+import { getMoonSeed } from "./planemos/common";
+
+import { Gamepad } from "./inputs/gamepad";
+
+const engine = new CosmosJourneyer();
 
 await engine.setup();
 

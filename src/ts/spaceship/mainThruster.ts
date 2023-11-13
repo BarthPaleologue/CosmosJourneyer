@@ -2,7 +2,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AbstractThruster } from "./abstractThruster";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { getDownwardDirection } from "../controller/uberCore/transforms/basicTransform";
+import { getDownwardDirection } from "../uberCore/transforms/basicTransform";
 
 export class MainThruster extends AbstractThruster {
     protected readonly maxAuthority = 3e3;

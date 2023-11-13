@@ -1,11 +1,11 @@
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { AbstractObject } from "../view/bodies/abstractObject";
+import { AbstractObject } from "../bodies/abstractObject";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import cursorImage from "../../asset/textures/hoveredCircle.png";
 import { parseDistance } from "../utils/parseToStrings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { UberCamera } from "../controller/uberCore/uberCamera";
+import { UberCamera } from "../uberCore/uberCamera";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 
 export class ObjectOverlay {

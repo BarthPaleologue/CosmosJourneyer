@@ -2,7 +2,7 @@ import { Axis, Vector3 } from "@babylonjs/core/Maths/math";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
-import { Assets } from "../controller/assets";
+import { Assets } from "../assets";
 import { Particle } from "@babylonjs/core/Particles/particle";
 
 function randomNumber(min: number, max: number): number {
