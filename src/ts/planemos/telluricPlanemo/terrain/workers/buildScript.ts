@@ -12,13 +12,13 @@ function handle_build(data: TransferBuildData): void {
 
     const size = data.planetDiameter / 2 ** data.depth;
     const space_between_vertices = size / nbSubdivisions;
-    const scatter_per_square_meter = space_between_vertices < 15.0 ? 0.1 : 0;
+    const scatter_per_square_meter = space_between_vertices < 5.0 ? 0.4 : 0;
 
     const flat_area = size * size;
     const max_nb_instances = Math.floor(flat_area * scatter_per_square_meter * 2.0);
-    console.log(scatter_per_square_meter, data.depth, space_between_vertices, max_nb_instances);
-    const instances_matrix_buffer = new Float32Array(16 * max_nb_instances);
-    const aligned_instances_matrix_buffer = new Float32Array(16 * max_nb_instances);
+
+    let instances_matrix_buffer = new Float32Array(16 * max_nb_instances);
+    let aligned_instances_matrix_buffer = new Float32Array(16 * max_nb_instances);
 
     const terrain_settings = new TerrainSettings();
     terrain_settings.continent_base_height = data.terrainSettings.continent_base_height;
@@ -43,9 +43,10 @@ function handle_build(data: TransferBuildData): void {
         terrain_settings
     );
 
-    build_chunk_vertex_data(buildData, verticesPositions, indices, normals, instances_matrix_buffer, aligned_instances_matrix_buffer, scatter_per_square_meter);
+    const nbCreatedInstances = build_chunk_vertex_data(buildData, verticesPositions, indices, normals, instances_matrix_buffer, aligned_instances_matrix_buffer, scatter_per_square_meter);
 
-    console.log(aligned_instances_matrix_buffer);
+    instances_matrix_buffer = instances_matrix_buffer.subarray(0, nbCreatedInstances * 16);
+    aligned_instances_matrix_buffer = aligned_instances_matrix_buffer.subarray(0, nbCreatedInstances * 16);
 
     self.postMessage(
         {
