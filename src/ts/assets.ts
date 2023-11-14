@@ -209,7 +209,10 @@ export class Assets {
 
     static DebugMaterial(name: string, diffuse = false, wireframe = false) {
         const mat = new StandardMaterial(`${name}DebugMaterial`);
-        if (!diffuse) mat.emissiveColor = Color3.Random();
+        if (!diffuse) {
+            mat.emissiveColor = Color3.Random();
+            mat.disableLighting = true;
+        }
         else mat.diffuseColor = Color3.Random();
         mat.wireframe = wireframe;
         return mat;

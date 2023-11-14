@@ -30,8 +30,9 @@ export type ApplyTask = Task & {
 };
 
 export type ReturnedChunkData = {
-    p: Float32Array;
-    n: Float32Array;
-    i: Uint16Array;
-    g: Float32Array;
+    positions: Float32Array;
+    normals: Float32Array;
+    indices: Uint16Array;
+    instancesMatrixBuffer: Float32Array;
+    alignedInstancesMatrixBuffer: Float32Array;
 };

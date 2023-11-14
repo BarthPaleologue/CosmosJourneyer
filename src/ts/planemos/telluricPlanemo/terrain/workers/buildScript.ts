@@ -1,5 +1,6 @@
 import { TransferBuildData } from "../chunks/workerDataTypes";
 import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-generation";
+import { ReturnedChunkData } from "../chunks/taskTypes";
 
 function handle_build(data: TransferBuildData): void {
     const nbVerticesPerSide = data.nbVerticesPerSide;
@@ -48,12 +49,12 @@ function handle_build(data: TransferBuildData): void {
 
     self.postMessage(
         {
-            p: verticesPositions,
-            i: indices,
-            n: normals,
-            m: instances_matrix_buffer,
-            am: aligned_instances_matrix_buffer
-        },
+            positions: verticesPositions,
+            indices: indices,
+            normals: normals,
+            instancesMatrixBuffer: instances_matrix_buffer,
+            alignedInstancesMatrixBuffer: aligned_instances_matrix_buffer
+        } as ReturnedChunkData,
         {
             transfer: [verticesPositions.buffer, indices.buffer, normals.buffer, instances_matrix_buffer.buffer, aligned_instances_matrix_buffer.buffer]
         }

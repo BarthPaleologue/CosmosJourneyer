@@ -47,9 +47,7 @@ export class PlanetChunk implements Transformable {
         this.mesh.setEnabled(false);
 
         this.mesh.material = material;
-        //this.mesh.material = Assets.DebugMaterial(id); //material;
-        //(this.mesh.material as StandardMaterial).disableLighting = true;
-        //this.mesh.material.wireframe = true;
+        //this.mesh.material = Assets.DebugMaterial(id, false, false);
 
         this.transform.parent = parentAggregate.transformNode;
         this.mesh.parent = this.transform;

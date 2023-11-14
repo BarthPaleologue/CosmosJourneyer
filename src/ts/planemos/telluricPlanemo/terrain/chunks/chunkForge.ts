@@ -65,9 +65,9 @@ export class ChunkForge {
             const data: ReturnedChunkData = e.data;
 
             const vertexData = new VertexData();
-            vertexData.positions = data.p;
-            vertexData.normals = data.n;
-            vertexData.indices = data.i;
+            vertexData.positions = data.positions;
+            vertexData.normals = data.normals;
+            vertexData.indices = data.indices;
 
             const applyTask: ApplyTask = {
                 type: TaskType.Apply,
