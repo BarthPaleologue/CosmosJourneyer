@@ -350,6 +350,8 @@ export class PostProcessManager {
     }
 
     private init() {
+        return;
+
         const [otherVolumetricLightsRenderEffect, bodyVolumetricLightsRenderEffect] = makeSplitRenderEffects(
             "VolumetricLights",
             this.getCurrentBody(),

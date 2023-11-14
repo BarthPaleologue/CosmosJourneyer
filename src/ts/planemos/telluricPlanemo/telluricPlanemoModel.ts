@@ -103,8 +103,8 @@ export class TelluricPlanemoModel implements PlanemoModel {
             bumps_frequency: (30 * this.radius) / Settings.EARTH_RADIUS,
 
             max_bump_height: 1.5e3,
-            max_mountain_height: 10e3,
-            continent_base_height: this.physicalProperties.oceanLevel * 1.9,
+            max_mountain_height: 10e3 * 0,
+            continent_base_height: this.physicalProperties.oceanLevel * 1.9 * 0.1,
 
             mountains_frequency: (20 * this.radius) / 1000e3
         };

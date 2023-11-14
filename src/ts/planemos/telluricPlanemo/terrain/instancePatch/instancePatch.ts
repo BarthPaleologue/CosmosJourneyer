@@ -2,7 +2,7 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { IPatch } from "./iPatch";
-import { createSquareMatrixBuffer, decomposeModelMatrix } from "../utils/matrixBuffer";
+import { createSquareMatrixBuffer, decomposeModelMatrix } from "./matrixBuffer";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export class InstancePatch implements IPatch {

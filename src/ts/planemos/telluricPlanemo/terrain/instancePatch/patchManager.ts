@@ -1,11 +1,11 @@
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { ThinInstancePatch } from "./thinInstancePatch";
-import { createSquareMatrixBuffer } from "../utils/matrixBuffer";
+import { createSquareMatrixBuffer } from "./matrixBuffer";
 import { IPatch } from "./iPatch";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-export class PatchManager {
+/*export class PatchManager {
     private readonly meshesFromLod: TransformNode[];
     private readonly nbVertexFromLod: number[];
     private readonly patches: [IPatch, number][] = [];
@@ -121,3 +121,4 @@ export class PatchManager {
         return count;
     }
 }
+*/

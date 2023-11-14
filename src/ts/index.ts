@@ -120,8 +120,8 @@ const planet = StarSystemHelper.makeTelluricPlanet(starSystem, planetModel);
 planet.model.ringsUniforms = new RingsUniforms(planet.model.rng);
 planet.postProcesses.push(PostProcessType.RING);
 
-const spacestation = new SpaceStation(starSystemView.scene, planet);
-starSystemView.getStarSystem().addSpaceStation(spacestation);
+//const spacestation = new SpaceStation(starSystemView.scene, planet);
+//starSystemView.getStarSystem().addSpaceStation(spacestation);
 
 const moonModel = new TelluricPlanemoModel(getMoonSeed(planetModel, 0), planetModel);
 moonModel.physicalProperties.mass = 2;
