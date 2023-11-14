@@ -67,10 +67,10 @@ export class ChunkTree {
         this.planetSeed = planetModel.seed;
         this.terrainSettings = planetModel.terrainSettings;
 
-        this.minDepth = 0; //Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 19), 0);
-        this.maxDepth = Math.max(Math.round(Math.log2(this.rootChunkLength / 2) - 12), 0);
-        //let spaceBetweenVertex = this.rootChunkLength / (64 * 2 ** this.maxDepth);
-        //console.log(spaceBetweenVertex);
+        this.minDepth = 0;
+
+        // max depth is minimal depth to get a certain minimum space between vertices
+        this.maxDepth = Math.ceil(Math.log2(this.rootChunkLength / (Settings.MIN_DISTANCE_BETWEEN_VERTICES * Settings.VERTEX_RESOLUTION)));
 
         this.scene = scene;
 
