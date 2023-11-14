@@ -27,6 +27,8 @@ export type BuildTask = Task & {
 
 export type ApplyTask = Task & {
     vertexData: VertexData;
+    instancesMatrixBuffer: Float32Array;
+    alignedInstancesMatrixBuffer: Float32Array;
 };
 
 export type ReturnedChunkData = {

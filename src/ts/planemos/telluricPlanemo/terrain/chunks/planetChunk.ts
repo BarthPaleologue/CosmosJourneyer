@@ -76,8 +76,17 @@ export class PlanetChunk implements Transformable {
         return this.transform;
     }
 
-    public init(vertexData: VertexData) {
-        if (this.disposed) return;
+    /**
+     * Initializes the chunk with the given vertex data. Scatters instances on the chunk based on the given instancesMatrixBuffer and alignedInstancesMatrixBuffer
+     * @param vertexData the vertex data to apply to the chunk
+     * @param instancesMatrixBuffer the matrix buffer containing the instances matrix
+     * @param alignedInstancesMatrixBuffer the matrix buffer containing the vertically aligned instances matrix
+     */
+    public init(vertexData: VertexData, instancesMatrixBuffer: Float32Array, alignedInstancesMatrixBuffer: Float32Array) {
+        if (this.hasBeenDisposed()) {
+            throw new Error(`Tried to init ${this.mesh.name} but it has been disposed`);
+        }
+
         vertexData.applyToMesh(this.mesh, false);
         this.mesh.freezeNormals();
 
