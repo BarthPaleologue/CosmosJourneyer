@@ -19,6 +19,7 @@ import { rotateAround, setUpVector, translate } from "../uberCore/transforms/bas
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
 
 export class StarSystem {
     readonly scene: UberScene;
@@ -257,7 +258,7 @@ export class StarSystem {
     /**
      * Inits the post processes and moves the system forward in time to the current time (it is additive)
      */
-    public init(nbWarmUpUpdates = 100): void {
+    public init(nbWarmUpUpdates: number, chunkForge: ChunkForge): void {
         this.initPostProcesses();
 
         for (const object of this.orbitalObjects) {
@@ -270,8 +271,8 @@ export class StarSystem {
             translate(object.getTransform(), displacement);
         }
 
-        this.update(Date.now() / 1000);
-        for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1);
+        this.update(Date.now() / 1000, chunkForge);
+        for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1, chunkForge);
     }
 
     /**
@@ -332,7 +333,7 @@ export class StarSystem {
      * Updates the system and all its bodies forward in time by the given delta time
      * @param deltaTime The time elapsed since the last update
      */
-    public update(deltaTime: number): void {
+    public update(deltaTime: number, chunkForge: ChunkForge): void {
         const controller = this.scene.getActiveController();
         this.computeNearestOrbitalObject(controller.getActiveCamera().getAbsolutePosition());
         this.computeClosestToScreenCenterOrbitalObject();
@@ -405,7 +406,7 @@ export class StarSystem {
 
         for (const body of this.telluricPlanemos) {
             // Meshes with LOD are updated (surface quadtrees)
-            body.updateLOD(controller.getTransform().getAbsolutePosition());
+            body.updateLOD(controller.getTransform().getAbsolutePosition(), chunkForge);
         }
 
         for (const object of this.orbitalObjects) {

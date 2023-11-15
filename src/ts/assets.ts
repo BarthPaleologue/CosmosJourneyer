@@ -19,7 +19,7 @@ import starfield from "../asset/textures/milkyway.jpg";
 import plumeParticle from "../asset/textures/plume.png";
 
 import spaceship from "../asset/spaceship/spaceship2.glb";
-import spacestation from "../asset/spacestation/spacestation.glb";
+//import spacestation from "../asset/spacestation/spacestation.glb";
 import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
 import endeavorSpaceship from "../asset/spaceship/endeavour.glb";
@@ -41,9 +41,6 @@ import { Sound } from "@babylonjs/core/Audio/sound";
 //import atmosphereLUT from "../../shaders/utils/atmosphereLUT.glsl";
 import atmosphereLUT from "../asset/textures/LUT/atmosphere.png";
 
-import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { ChunkForge } from "./planemos/telluricPlanemo/terrain/chunks/chunkForge";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export class Assets {
@@ -74,8 +71,6 @@ export class Assets {
 
     public static OuchSound: Sound;
     public static EngineRunningSound: Sound;
-
-    static ChunkForge = new ChunkForge(64);
 
     private static manager: AssetsManager;
 

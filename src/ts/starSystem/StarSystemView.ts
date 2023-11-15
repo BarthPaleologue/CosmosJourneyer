@@ -11,7 +11,6 @@ import { ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { Assets } from "../assets";
 import { Settings } from "../settings";
 import { AbstractBody } from "../bodies/abstractBody";
 import { StarSystemHelper } from "./starSystemHelper";
@@ -19,6 +18,7 @@ import { positionNearObject } from "../utils/positionNearObject";
 import { ShipController } from "../spaceship/shipController";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
+import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
@@ -33,6 +33,8 @@ export class StarSystemView {
     private static readonly unZoomAnimation = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
     private starSystem: StarSystem | null = null;
+
+    private readonly chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
 
     constructor(engine: Engine, havokPlugin: HavokPlugin) {
         this.helmetOverlay = new HelmetOverlay();
@@ -83,8 +85,8 @@ export class StarSystemView {
 
             const deltaTime = engine.getDeltaTime() / 1000;
 
-            Assets.ChunkForge.update();
-            starSystem.update(deltaTime * Settings.TIME_MULTIPLIER);
+            this.chunkForge.update();
+            starSystem.update(deltaTime * Settings.TIME_MULTIPLIER, this.chunkForge);
 
             this.ui.update(this.scene.getActiveUberCamera());
 
@@ -131,7 +133,7 @@ export class StarSystemView {
     }
 
     init() {
-        this.getStarSystem().init();
+        this.getStarSystem().init(100, this.chunkForge);
         this.ui.createObjectOverlays(this.getStarSystem().getObjects());
 
         const firstBody = this.getStarSystem().getBodies()[0];

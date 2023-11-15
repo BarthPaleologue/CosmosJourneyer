@@ -29,6 +29,7 @@ import { translate } from "./uberCore/transforms/basicTransform";
 import { StarModel } from "./stellarObjects/star/starModel";
 import { Keyboard } from "./inputs/keyboard";
 import { Star } from "./stellarObjects/star/star";
+import { ChunkForge } from "./planemos/telluricPlanemo/terrain/chunks/chunkForge";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -61,6 +62,8 @@ hemiLight.intensity = 0.2;
 
 const shadowGenerator = new ShadowGenerator(1024, light);
 shadowGenerator.useBlurExponentialShadowMap = true;
+
+const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
 
 const keyboard = new Keyboard();
 
@@ -97,7 +100,7 @@ aurora.getTransform().setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10
 const newtonModel = new TelluricPlanemoModel(152);
 const newton = new TelluricPlanemo("newton", scene, newtonModel);
 newton.getTransform().setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
-newton.updateLOD(camera.globalPosition);
+newton.updateLOD(camera.globalPosition, chunkForge);
 
 const viewer = new PhysicsViewer();
 
@@ -150,9 +153,9 @@ function updateBeforeHavok() {
     /*newton.updateRotation(deltaTime / 10);
 newton.nextState.position = newton.transform.getAbsolutePosition();
 newton.applyNextState();*/
-    newton.updateLOD(camera.globalPosition);
+    newton.updateLOD(camera.globalPosition, chunkForge);
     newton.material.update(camera.globalPosition, [aurora]);
-    Assets.ChunkForge.update();
+    chunkForge.update();
 }
 
 scene.executeWhenReady(() => {

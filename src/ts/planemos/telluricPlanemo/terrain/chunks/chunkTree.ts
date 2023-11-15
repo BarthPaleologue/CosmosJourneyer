@@ -36,7 +36,6 @@ export class ChunkTree {
 
     private readonly direction: Direction;
 
-    private readonly chunkForge: ChunkForge;
     private readonly scene: UberScene;
 
     private deleteMutexes: DeleteMutex[] = [];
@@ -75,8 +74,6 @@ export class ChunkTree {
 
         this.scene = scene;
 
-        this.chunkForge = Assets.ChunkForge;
-
         this.direction = direction;
 
         this.parent = parentAggregate.transformNode;
@@ -114,8 +111,9 @@ export class ChunkTree {
     /**
      * Update tree to create matching LOD relative to the observer's position
      * @param observerPosition The observer position
+     * @param chunkForge
      */
-    public update(observerPosition: Vector3): void {
+    public update(observerPosition: Vector3, chunkForge: ChunkForge): void {
         // remove delete mutexes that have been resolved
         /*const deleteMutexes: DeleteMutex[] = [];
     for (const deleteMutex of this.deleteMutexes) {
@@ -123,17 +121,18 @@ export class ChunkTree {
     }
     this.deleteMutexes = deleteMutexes;
 */
-        this.tree = this.updateLODRecursively(observerPosition);
+        this.tree = this.updateLODRecursively(observerPosition, chunkForge);
     }
 
     /**
      * Recursive function used internaly to update LOD
      * @param observerPositionW The observer position in world space
+     * @param chunkForge
      * @param tree The tree to update recursively
      * @param walked The position of the current root relative to the absolute root
      * @returns The updated tree
      */
-    private updateLODRecursively(observerPositionW: Vector3, tree: quadTree = this.tree, walked: number[] = []): quadTree {
+    private updateLODRecursively(observerPositionW: Vector3, chunkForge: ChunkForge, tree: quadTree = this.tree, walked: number[] = []): quadTree {
         const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, getRotationQuaternion(this.parent));
         const nodePositionW = nodeRelativePosition.add(this.parent.getAbsolutePosition());
 
@@ -157,26 +156,26 @@ const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.p
 if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
 
                 const newTree = [
-                    this.createChunk(walked.concat([0])),
-                    this.createChunk(walked.concat([1])),
-                    this.createChunk(walked.concat([2])),
-                    this.createChunk(walked.concat([3]))
+                    this.createChunk(walked.concat([0]), chunkForge),
+                    this.createChunk(walked.concat([1]), chunkForge),
+                    this.createChunk(walked.concat([2]), chunkForge),
+                    this.createChunk(walked.concat([3]), chunkForge)
                 ];
                 this.requestDeletion(tree, newTree);
                 return newTree;
             }
             return [
-                this.updateLODRecursively(observerPositionW, tree[0], walked.concat([0])),
-                this.updateLODRecursively(observerPositionW, tree[1], walked.concat([1])),
-                this.updateLODRecursively(observerPositionW, tree[2], walked.concat([2])),
-                this.updateLODRecursively(observerPositionW, tree[3], walked.concat([3]))
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
             ];
         } else {
             // if we are far from the node
             if (tree instanceof PlanetChunk) return tree;
 
             if (walked.length >= this.minDepth) {
-                const newChunk = this.createChunk(walked);
+                const newChunk = this.createChunk(walked, chunkForge);
                 this.requestDeletion(tree, [newChunk]);
                 return newChunk;
             }
@@ -189,7 +188,7 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
      * @param path The path leading to the location where to add the new chunk
      * @returns The new Chunk
      */
-    private createChunk(path: number[]): PlanetChunk {
+    private createChunk(path: number[], chunkForge: ChunkForge): PlanetChunk {
         const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.rootChunkLength, this.scene);
 
         chunk.onDestroyPhysicsShapeObservable.add((index) => {
@@ -208,7 +207,7 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
             chunk: chunk
         };
 
-        this.chunkForge.addTask(buildTask);
+        chunkForge.addTask(buildTask);
 
         return chunk;
     }
@@ -233,15 +232,6 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
 
             chunk.mesh.setEnabled(isSizeOnScreenEnough(chunk, camera));
         });
-    }
-
-    /**
-     * Regenerate planet chunks
-     */
-    public reset(): void {
-        const newTree = this.createChunk([]);
-        this.requestDeletion(this.tree, [newTree]);
-        this.tree = newTree;
     }
 
     public dispose(): void {

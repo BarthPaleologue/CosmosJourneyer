@@ -15,6 +15,7 @@ import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { PhysicsShapeSphere } from "@babylonjs/core";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
+import { ChunkForge } from "./terrain/chunks/chunkForge";
 
 export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMaterial {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
@@ -86,16 +87,10 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
     /**
      * Update terrain of the sphere relative to the observer position
      * @param observerPosition
+     * @param chunkForge
      */
-    public updateLOD(observerPosition: Vector3): void {
-        for (const side of this.sides) side.update(observerPosition);
-    }
-
-    /**
-     * Regenerates the chunks
-     */
-    public reset(): void {
-        for (const side of this.sides) side.reset();
+    public updateLOD(observerPosition: Vector3, chunkForge: ChunkForge): void {
+        for (const side of this.sides) side.update(observerPosition, chunkForge);
     }
 
     public updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
