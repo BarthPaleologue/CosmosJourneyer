@@ -44,6 +44,7 @@ import atmosphereLUT from "../asset/textures/LUT/atmosphere.png";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ChunkForge } from "./planemos/telluricPlanemo/terrain/chunks/chunkForge";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export class Assets {
     static IS_READY = false;
@@ -68,6 +69,8 @@ export class Assets {
     private static EndeavorSpaceship: Mesh;
     private static Spacestation: Mesh;
     private static Banana: Mesh;
+
+    public static ScatterCube: Mesh;
 
     public static OuchSound: Sound;
     public static EngineRunningSound: Sound;
@@ -167,6 +170,11 @@ export class Assets {
             Assets.manager.onProgress = (remainingCount, totalCount) => {
                 scene.getEngine().loadingUIText = `Loading assets... ${totalCount - remainingCount}/${totalCount}`;
             };
+
+            Assets.ScatterCube = MeshBuilder.CreateBox("cube", {size:1}, scene);
+            Assets.ScatterCube.position.y = 0.5;
+            Assets.ScatterCube.bakeCurrentTransformIntoVertices();
+
             Assets.manager.load();
 
             Assets.manager.onFinish = () => {

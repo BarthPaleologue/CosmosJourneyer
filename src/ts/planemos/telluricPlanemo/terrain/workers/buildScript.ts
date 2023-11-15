@@ -1,6 +1,7 @@
 import { TransferBuildData } from "../chunks/workerDataTypes";
 import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-generation";
 import { ReturnedChunkData } from "../chunks/taskTypes";
+import { Settings } from "../../../../settings";
 
 function handle_build(data: TransferBuildData): void {
     const nbVerticesPerSide = data.nbVerticesPerSide;
@@ -12,7 +13,8 @@ function handle_build(data: TransferBuildData): void {
 
     const size = data.planetDiameter / 2 ** data.depth;
     const space_between_vertices = size / nbSubdivisions;
-    const scatter_per_square_meter = space_between_vertices < 5.0 ? 0.4 : 0;
+    console.log(data.depth, space_between_vertices);
+    const scatter_per_square_meter = space_between_vertices < Settings.MIN_DISTANCE_BETWEEN_VERTICES ? 0.4 : 0;
 
     const flat_area = size * size;
     const max_nb_instances = Math.floor(flat_area * scatter_per_square_meter * 2.0);

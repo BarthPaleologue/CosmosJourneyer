@@ -31,7 +31,11 @@ export class ThinInstancePatch {
         }
         this.baseMesh = baseMesh.clone();
         this.baseMesh.makeGeometryUnique();
+
         this.baseMesh.parent = this.parent;
+        //this.baseMesh.computeWorldMatrix(true);
+        //this.baseMesh.parent = null;
+
         this.baseMesh.isVisible = true;
         this.baseMesh.thinInstanceSetBuffer("matrix", this.matrixBuffer, 16);
     }

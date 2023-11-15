@@ -15,6 +15,7 @@ import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { downSample, randomDownSample } from "../instancePatch/matrixBuffer";
 import { IPatch } from "../instancePatch/iPatch";
+import { Assets } from "../../../../assets";
 
 export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
@@ -53,8 +54,8 @@ export class PlanetChunk implements Transformable {
         this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
 
-        this.mesh.material = material;
-        //this.mesh.material = Assets.DebugMaterial(id, false, false);
+        //this.mesh.material = material;
+        this.mesh.material = Assets.DebugMaterial(id, false, false);
 
         this.transform.parent = parentAggregate.transformNode;
         this.mesh.parent = this.transform;
@@ -107,12 +108,8 @@ export class PlanetChunk implements Transformable {
 
         this.onRecieveVertexDataObservable.notifyObservers();
 
-        const cube = MeshBuilder.CreateBox("cube", {size:10}, this.mesh.getScene());
-        cube.position.y = 5;
-        cube.bakeCurrentTransformIntoVertices();
-        //cube.material = this.mesh.material;
         const cubePatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 300));
-        cubePatch.createInstances(cube);
+        cubePatch.createInstances(Assets.ScatterCube);
 
         this.instancePatches.push(cubePatch);
     }

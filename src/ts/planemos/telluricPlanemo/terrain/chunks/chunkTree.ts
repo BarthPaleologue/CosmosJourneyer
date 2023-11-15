@@ -71,6 +71,7 @@ export class ChunkTree {
 
         // max depth is minimal depth to get a certain minimum space between vertices
         this.maxDepth = Math.ceil(Math.log2(this.rootChunkLength / (Settings.MIN_DISTANCE_BETWEEN_VERTICES * Settings.VERTEX_RESOLUTION)));
+        console.log(this.maxDepth);
 
         this.scene = scene;
 
@@ -136,10 +137,11 @@ export class ChunkTree {
         const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, getRotationQuaternion(this.parent));
         const nodePositionW = nodeRelativePosition.add(this.parent.getAbsolutePosition());
 
-        const direction = nodePositionW.subtract(observerPositionW);
-        const distanceToNodeSquared = direction.lengthSquared();
+        const direction = nodePositionW.subtract(observerPositionW).normalizeToNew();
+        const chunkApproxPosition = nodePositionW;//.add(direction.scale(this.terrainSettings.max_mountain_height + this.terrainSettings.continent_base_height + this.terrainSettings.max_bump_height));
+        const distanceToNodeSquared = chunkApproxPosition.subtract(observerPositionW).lengthSquared();
 
-        const distanceThreshold = (Settings.CHUNK_RENDER_DISTANCE_MULTIPLIER * this.rootChunkLength) / 2 ** walked.length;
+        const distanceThreshold = Settings.CHUNK_RENDER_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** walked.length);
 
         if ((distanceToNodeSquared < distanceThreshold ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
             // if the node is near the camera or if we are loading minimal LOD
