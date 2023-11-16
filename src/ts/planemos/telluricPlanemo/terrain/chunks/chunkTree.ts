@@ -139,6 +139,13 @@ export class ChunkTree {
         else return 0;
     }
 
+    private getMaxAverageHeight(tree: quadTree): number {
+        if (tree instanceof PlanetChunk) return tree.getAverageHeight();
+        else if (tree.length > 0)
+            return Math.max(this.getMaxAverageHeight(tree[0]), this.getMaxAverageHeight(tree[1]), this.getMaxAverageHeight(tree[2]), this.getMaxAverageHeight(tree[3]));
+        else return 0;
+    }
+
     /**
      * Recursive function used internaly to update LOD
      * @param observerPositionW The observer position in world space
@@ -152,7 +159,7 @@ export class ChunkTree {
         const nodePositionW = nodeRelativePosition.add(this.parent.getAbsolutePosition());
 
         const direction = nodePositionW.subtract(this.parent.getAbsolutePosition()).normalize();
-        const additionalHeight = this.getMinAverageHeight(tree); //this.terrainSettings.max_mountain_height / 2 + this.terrainSettings.continent_base_height + this.terrainSettings.max_bump_height / 2;
+        const additionalHeight = this.getAverageHeight(tree);
         const chunkApproxPosition = nodePositionW.add(direction.scale(additionalHeight));
         const distanceToNodeSquared = Vector3.DistanceSquared(chunkApproxPosition, observerPositionW);
 
@@ -187,7 +194,7 @@ export class ChunkTree {
         if (tree instanceof PlanetChunk) return tree;
 
         // the 1.5 is to avoid creation/deletion oscillations
-        if (distanceToNodeSquared > 2.0 * distanceThreshold ** 2 && walked.length >= this.minDepth) {
+        if (distanceToNodeSquared > (10e3 + 1.1 * distanceThreshold) ** 2 && walked.length >= this.minDepth) {
             const newChunk = this.createChunk(walked, chunkForge);
             if (tree.length === 0 && walked.length === 0) {
                 return newChunk;
