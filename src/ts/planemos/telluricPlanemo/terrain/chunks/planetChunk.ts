@@ -59,8 +59,8 @@ export class PlanetChunk implements Transformable {
         this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
 
-        //this.mesh.material = material;
-        this.mesh.material = Assets.DebugMaterial(id, false, false);
+        this.mesh.material = material;
+        //this.mesh.material = Assets.DebugMaterial(id, false, false);
 
         this.transform.parent = parentAggregate.transformNode;
         this.mesh.parent = this.transform;
@@ -83,11 +83,6 @@ export class PlanetChunk implements Transformable {
         position.normalize().scaleInPlace(rootLength / 2);
 
         this.transform.position = position;
-
-        const helper = MeshBuilder.CreateBox(`helper${id}`, { size: this.chunkSideLength / 4 }, scene);
-        helper.parent = this.transform;
-
-        this.helpers.push(helper);
     }
 
     public getTransform(): TransformNode {
@@ -118,7 +113,6 @@ export class PlanetChunk implements Transformable {
         this.loaded = true;
 
         this.averageHeight = averageHeight;
-        this.helpers[0].position.addInPlace(this.transform.position.normalizeToNew().scaleInPlace(averageHeight));
 
         this.onRecieveVertexDataObservable.notifyObservers();
 

@@ -194,7 +194,7 @@ export class ChunkTree {
         if (tree instanceof PlanetChunk) return tree;
 
         // the 1.5 is to avoid creation/deletion oscillations
-        if (distanceToNodeSquared > (10e3 + 1.1 * distanceThreshold) ** 2 && walked.length >= this.minDepth) {
+        if (distanceToNodeSquared > (20e3 + 1.1 * distanceThreshold) ** 2 && walked.length >= this.minDepth) {
             const newChunk = this.createChunk(walked, chunkForge);
             if (tree.length === 0 && walked.length === 0) {
                 return newChunk;
