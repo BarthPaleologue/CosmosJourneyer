@@ -17,6 +17,7 @@ import { DeleteMutex } from "./deleteMutex";
 import { UberScene } from "../../../../uberCore/uberScene";
 import { Assets } from "../../../../assets";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
+import { depth } from "../../../../model/common";
 
 /**
  * A quadTree is defined recursively
@@ -99,6 +100,9 @@ export class ChunkTree {
      */
     private requestDeletion(tree: quadTree, newChunks: PlanetChunk[]): void {
         const chunksToDelete = this.getChunkList(tree);
+        if (chunksToDelete.length === 0) {
+            throw new Error("Trying to delete empty chunk list");
+        }
         this.deleteMutexes.push(new DeleteMutex(newChunks, chunksToDelete));
     }
 
@@ -114,14 +118,25 @@ export class ChunkTree {
      * @param chunkForge
      */
     public update(observerPosition: Vector3, chunkForge: ChunkForge): void {
+        // remove zombie mutexes
+        this.deleteMutexes.forEach(mutex => mutex.resolveIfZombie());
         // remove delete mutexes that have been resolved
-        /*const deleteMutexes: DeleteMutex[] = [];
-    for (const deleteMutex of this.deleteMutexes) {
-        if (!deleteMutex.isResolved()) deleteMutexes.push(deleteMutex);
-    }
-    this.deleteMutexes = deleteMutexes;
-*/
+        this.deleteMutexes = this.deleteMutexes.filter((mutex) => !mutex.isResolved());
+
         this.tree = this.updateLODRecursively(observerPosition, chunkForge);
+    }
+
+    private getAverageHeight(tree: quadTree): number {
+        if (tree instanceof PlanetChunk) return tree.getAverageHeight();
+        else if (tree.length > 0) return 0.25 * (this.getAverageHeight(tree[0]) + this.getAverageHeight(tree[1]) + this.getAverageHeight(tree[2]) + this.getAverageHeight(tree[3]));
+        else return 0;
+    }
+
+    private getMinAverageHeight(tree: quadTree): number {
+        if (tree instanceof PlanetChunk) return tree.getAverageHeight();
+        else if (tree.length > 0)
+            return Math.min(this.getMinAverageHeight(tree[0]), this.getMinAverageHeight(tree[1]), this.getMinAverageHeight(tree[2]), this.getMinAverageHeight(tree[3]));
+        else return 0;
     }
 
     /**
@@ -136,9 +151,10 @@ export class ChunkTree {
         const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, getRotationQuaternion(this.parent));
         const nodePositionW = nodeRelativePosition.add(this.parent.getAbsolutePosition());
 
-        const direction = nodePositionW.subtract(observerPositionW).normalizeToNew();
-        const chunkApproxPosition = nodePositionW;//.add(direction.scale(this.terrainSettings.max_mountain_height + this.terrainSettings.continent_base_height + this.terrainSettings.max_bump_height));
-        const distanceToNodeSquared = chunkApproxPosition.subtract(observerPositionW).lengthSquared();
+        const direction = nodePositionW.subtract(this.parent.getAbsolutePosition()).normalize();
+        const additionalHeight = this.getMinAverageHeight(tree); //this.terrainSettings.max_mountain_height / 2 + this.terrainSettings.continent_base_height + this.terrainSettings.max_bump_height / 2;
+        const chunkApproxPosition = nodePositionW.add(direction.scale(additionalHeight));
+        const distanceToNodeSquared = Vector3.DistanceSquared(chunkApproxPosition, observerPositionW);
 
         const distanceThreshold = Settings.CHUNK_RENDER_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** walked.length);
 
@@ -149,11 +165,6 @@ export class ChunkTree {
                 if (!tree.mesh.isVisible) return tree;
 
                 // if view ray goes through planet then we don't need to load more chunks
-                /*const direction = tree.mesh.getAbsolutePosition().subtract(observerPositionW);
-const rayDir = direction.normalizeToNew();
-
-const [intersect, t0, t1] = rayIntersectSphere(observerPositionW, rayDir, this.parent.getAbsolutePosition(), this.rootChunkLength / 2);
-if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
 
                 const newTree = [
                     this.createChunk(walked.concat([0]), chunkForge),
@@ -164,23 +175,28 @@ if (intersect && t0 ** 2 > direction.lengthSquared()) return tree;*/
                 this.requestDeletion(tree, newTree);
                 return newTree;
             }
+
             return [
                 this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
                 this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
                 this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
                 this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
             ];
-        } else {
-            // if we are far from the node
-            if (tree instanceof PlanetChunk) return tree;
+        }
 
-            if (walked.length >= this.minDepth) {
-                const newChunk = this.createChunk(walked, chunkForge);
-                this.requestDeletion(tree, [newChunk]);
+        if (tree instanceof PlanetChunk) return tree;
+
+        // the 1.5 is to avoid creation/deletion oscillations
+        if (distanceToNodeSquared > 1.5 * distanceThreshold ** 2 && walked.length >= this.minDepth) {
+            const newChunk = this.createChunk(walked, chunkForge);
+            if (tree.length === 0 && walked.length === 0) {
                 return newChunk;
             }
-            return tree;
+            this.requestDeletion(tree, [newChunk]);
+            return newChunk;
         }
+
+        return tree;
     }
 
     /**

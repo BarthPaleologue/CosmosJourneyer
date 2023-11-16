@@ -29,6 +29,7 @@ export type ApplyTask = Task & {
     vertexData: VertexData;
     instancesMatrixBuffer: Float32Array;
     alignedInstancesMatrixBuffer: Float32Array;
+    averageHeight: number;
 };
 
 export type ReturnedChunkData = {
@@ -37,4 +38,5 @@ export type ReturnedChunkData = {
     indices: Uint16Array;
     instancesMatrixBuffer: Float32Array;
     alignedInstancesMatrixBuffer: Float32Array;
+    averageHeight: number;
 };

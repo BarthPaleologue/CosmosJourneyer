@@ -16,6 +16,7 @@ import { InstancePatch } from "../instancePatch/instancePatch";
 import { downSample, randomDownSample } from "../instancePatch/matrixBuffer";
 import { IPatch } from "../instancePatch/iPatch";
 import { Assets } from "../../../../assets";
+import { Settings } from "../../../../settings";
 
 export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
@@ -39,6 +40,10 @@ export class PlanetChunk implements Transformable {
     private physicsShape: PhysicsShape | null = null;
     physicsShapeIndex: number | null = null;
     readonly parentAggregate: PhysicsAggregate;
+
+    private averageHeight = 0;
+
+    readonly helpers: Mesh[] = [];
 
     private disposed = false;
 
@@ -78,6 +83,11 @@ export class PlanetChunk implements Transformable {
         position.normalize().scaleInPlace(rootLength / 2);
 
         this.transform.position = position;
+
+        const helper = MeshBuilder.CreateBox(`helper${id}`, { size: this.chunkSideLength / 4 }, scene);
+        helper.parent = this.transform;
+
+        this.helpers.push(helper);
     }
 
     public getTransform(): TransformNode {
@@ -89,8 +99,9 @@ export class PlanetChunk implements Transformable {
      * @param vertexData the vertex data to apply to the chunk
      * @param instancesMatrixBuffer the matrix buffer containing the instances matrix
      * @param alignedInstancesMatrixBuffer the matrix buffer containing the vertically aligned instances matrix
+     * @param averageHeight
      */
-    public init(vertexData: VertexData, instancesMatrixBuffer: Float32Array, alignedInstancesMatrixBuffer: Float32Array) {
+    public init(vertexData: VertexData, instancesMatrixBuffer: Float32Array, alignedInstancesMatrixBuffer: Float32Array, averageHeight: number) {
         if (this.hasBeenDisposed()) {
             throw new Error(`Tried to init ${this.mesh.name} but it has been disposed`);
         }
@@ -106,12 +117,19 @@ export class PlanetChunk implements Transformable {
         this.mesh.setEnabled(true);
         this.loaded = true;
 
+        this.averageHeight = averageHeight;
+        this.helpers[0].position.addInPlace(this.transform.position.normalizeToNew().scaleInPlace(averageHeight));
+
         this.onRecieveVertexDataObservable.notifyObservers();
 
         const cubePatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 300));
         cubePatch.createInstances(Assets.ScatterCube);
 
         this.instancePatches.push(cubePatch);
+    }
+
+    public getAverageHeight(): number {
+        return this.averageHeight;
     }
 
     private destroyPhysicsShape() {
@@ -122,8 +140,6 @@ export class PlanetChunk implements Transformable {
                     this.parentAggregate.shape.getNumChildren() - 1
                 }`
             );
-            this.physicsShape?.dispose();
-            return;
         }
 
         this.parentAggregate.shape.removeChild(this.physicsShapeIndex);
@@ -157,9 +173,11 @@ export class PlanetChunk implements Transformable {
 
     public dispose() {
         this.destroyPhysicsShape();
+        this.helpers.forEach((helper) => helper.dispose());
         this.instancePatches.forEach((patch) => patch.dispose());
         this.mesh.dispose();
         this.transform.dispose();
+        this.onRecieveVertexDataObservable.clear();
 
         this.disposed = true;
     }

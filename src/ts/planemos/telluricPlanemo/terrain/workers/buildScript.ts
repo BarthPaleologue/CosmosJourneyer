@@ -13,7 +13,7 @@ function handle_build(data: TransferBuildData): void {
 
     const size = data.planetDiameter / 2 ** data.depth;
     const space_between_vertices = size / nbSubdivisions;
-    console.log(data.depth, space_between_vertices);
+    //console.log(data.depth, space_between_vertices);
     const scatter_per_square_meter = space_between_vertices < Settings.MIN_DISTANCE_BETWEEN_VERTICES ? 0.4 : 0;
 
     const flat_area = size * size;
@@ -45,10 +45,10 @@ function handle_build(data: TransferBuildData): void {
         terrain_settings
     );
 
-    const nbCreatedInstances = build_chunk_vertex_data(buildData, verticesPositions, indices, normals, instances_matrix_buffer, aligned_instances_matrix_buffer, scatter_per_square_meter);
+    const result = build_chunk_vertex_data(buildData, verticesPositions, indices, normals, instances_matrix_buffer, aligned_instances_matrix_buffer, scatter_per_square_meter);
 
-    instances_matrix_buffer = instances_matrix_buffer.subarray(0, nbCreatedInstances * 16);
-    aligned_instances_matrix_buffer = aligned_instances_matrix_buffer.subarray(0, nbCreatedInstances * 16);
+    instances_matrix_buffer = instances_matrix_buffer.subarray(0, result.nb_instances_created * 16);
+    aligned_instances_matrix_buffer = aligned_instances_matrix_buffer.subarray(0, result.nb_instances_created * 16);
 
     self.postMessage(
         {
@@ -56,7 +56,8 @@ function handle_build(data: TransferBuildData): void {
             indices: indices,
             normals: normals,
             instancesMatrixBuffer: instances_matrix_buffer,
-            alignedInstancesMatrixBuffer: aligned_instances_matrix_buffer
+            alignedInstancesMatrixBuffer: aligned_instances_matrix_buffer,
+            averageHeight: result.average_height,
         } as ReturnedChunkData,
         {
             transfer: [verticesPositions.buffer, indices.buffer, normals.buffer, instances_matrix_buffer.buffer, aligned_instances_matrix_buffer.buffer]

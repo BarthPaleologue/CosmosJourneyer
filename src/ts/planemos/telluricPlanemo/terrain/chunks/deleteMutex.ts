@@ -7,9 +7,11 @@ import { PlanetChunk } from "./planetChunk";
 export class DeleteMutex {
     private flag: number;
     readonly chunksToDelete: PlanetChunk[];
+    readonly newChunks: PlanetChunk[];
 
     constructor(newChunks: PlanetChunk[], chunksToDelete: PlanetChunk[]) {
         this.flag = newChunks.length;
+        this.newChunks = newChunks;
         this.chunksToDelete = chunksToDelete;
 
         for (const chunk of newChunks) {
@@ -20,10 +22,33 @@ export class DeleteMutex {
     private countdown() {
         this.flag--;
         if (this.flag === 0) {
-            for (const chunk of this.chunksToDelete) {
-                chunk.dispose();
+            this.resolve();
+        }
+    }
+
+    private resolve() {
+        for (const chunk of this.chunksToDelete) {
+            chunk.dispose();
+        }
+    }
+
+    /**
+     * Checks if the mutex is a zombie (it can't be resolved anymore).
+     * This happens when one of the new chunks has been disposed before receiving its vertex data.
+     * If this is the case, we resolve the mutex immediately
+     */
+    public resolveIfZombie() {
+        let anyNewChunkDisposed = false;
+        for (const chunk of this.newChunks) {
+            if (chunk.hasBeenDisposed()) {
+                anyNewChunkDisposed = true;
+                break;
             }
         }
+        if(!anyNewChunkDisposed) return;
+
+        this.flag = 0;
+        this.resolve();
     }
 
     public isResolved() {

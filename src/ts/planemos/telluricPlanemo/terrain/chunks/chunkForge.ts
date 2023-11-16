@@ -75,7 +75,8 @@ export class ChunkForge {
                 vertexData: vertexData,
                 chunk: task.chunk,
                 instancesMatrixBuffer: data.instancesMatrixBuffer,
-                alignedInstancesMatrixBuffer: data.alignedInstancesMatrixBuffer
+                alignedInstancesMatrixBuffer: data.alignedInstancesMatrixBuffer,
+                averageHeight: data.averageHeight
             };
             this.applyTaskQueue.push(applyTask);
 
@@ -93,7 +94,7 @@ export class ChunkForge {
             // if the chunk has been disposed, we skip it
             task = this.applyTaskQueue.shift();
         }
-        if (task) task.chunk.init(task.vertexData, task.instancesMatrixBuffer, task.alignedInstancesMatrixBuffer);
+        if (task) task.chunk.init(task.vertexData, task.instancesMatrixBuffer, task.alignedInstancesMatrixBuffer, task.averageHeight);
     }
 
     /**
