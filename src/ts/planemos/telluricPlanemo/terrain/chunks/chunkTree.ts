@@ -187,7 +187,7 @@ export class ChunkTree {
         if (tree instanceof PlanetChunk) return tree;
 
         // the 1.5 is to avoid creation/deletion oscillations
-        if (distanceToNodeSquared > 1.5 * distanceThreshold ** 2 && walked.length >= this.minDepth) {
+        if (distanceToNodeSquared > 2.0 * distanceThreshold ** 2 && walked.length >= this.minDepth) {
             const newChunk = this.createChunk(walked, chunkForge);
             if (tree.length === 0 && walked.length === 0) {
                 return newChunk;
@@ -196,7 +196,12 @@ export class ChunkTree {
             return newChunk;
         }
 
-        return tree;
+        return [
+            this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
+            this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
+            this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
+            this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
+        ];
     }
 
     /**
