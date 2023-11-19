@@ -11,12 +11,15 @@ import { moveTowards } from "../utils/moveTowards";
 import { Star } from "../stellarObjects/star/star";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { Matrix } from "@babylonjs/core/Maths/math";
 
 const shaderName = "lensflare";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = lensFlareFragment;
 
 export type LensFlareSettings = {
     visibility: number;
+    behindCamera: boolean;
+    clipPosition: Vector3;
 };
 
 export class LensFlarePostProcess extends UberPostProcess implements ObjectPostProcess {
@@ -25,7 +28,9 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
 
     constructor(object: StellarObject, scene: UberScene) {
         const settings: LensFlareSettings = {
-            visibility: 1
+            visibility: 1,
+            behindCamera: false,
+            clipPosition: new Vector3()
         };
 
         const uniforms: ShaderUniforms = [
@@ -40,6 +45,21 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
                 }
             },
             {
+                name: "clipPosition",
+                type: UniformEnumType.Vector3,
+                get: () => {
+                    const clipPosition = Vector3.Project(
+                      object.getTransform().getAbsolutePosition(),
+                      Matrix.IdentityReadOnly,
+                      scene.getTransformMatrix(),
+                      scene.getActiveUberCamera().viewport
+                    );
+                    settings.behindCamera = clipPosition.z < 0;
+                    console.log(clipPosition);
+                    return clipPosition;
+                }
+            },
+            {
                 name: "visibility",
                 type: UniformEnumType.Float,
                 get: () => {
@@ -50,9 +70,11 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
                     (scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, raycastResult);
                     const occulted = raycastResult.hasHit && raycastResult.body?.transformNode.name !== object.name;
 
-                    if (occulted && settings.visibility > 0) {
+                    const isNotVisible = occulted || settings.behindCamera;
+
+                    if (isNotVisible && settings.visibility > 0) {
                         settings.visibility = moveTowards(settings.visibility, 0, 0.5);
-                    } else if (!occulted && settings.visibility < 1) {
+                    } else if (!isNotVisible && settings.visibility < 1) {
                         settings.visibility = moveTowards(settings.visibility, 1, 0.5);
                     }
 

@@ -8,12 +8,12 @@ uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform float visibility;
+uniform vec3 clipPosition;
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
 #pragma glslify: object = require(./utils/object.glsl)
 
-#pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=camera.projection, view=camera.view);
 #pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView);
 
 #pragma glslify: remap = require(./utils/remap.glsl)
@@ -117,7 +117,8 @@ void main() {
 
     vec3 objectDirection = normalize(object.position - camera.position);
 
-    vec2 objectScreenPos = uvFromWorld(object.position);
+    vec2 objectScreenPos = clipPosition.xy;
+    objectScreenPos.y = 1.0 - objectScreenPos.y;
 
     // Normalized pixel coordinates (from 0 to 1)
     vec2 uv = vUV - 0.5;
