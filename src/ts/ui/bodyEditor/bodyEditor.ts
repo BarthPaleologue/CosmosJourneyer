@@ -166,6 +166,8 @@ export class BodyEditor {
             }
 
             if (body instanceof TelluricPlanemo) {
+                this.initToolbar(body);
+                
                 this.surfacePanel.enable();
                 this.surfacePanel.setVisibility(this.currentPanel === this.surfacePanel);
                 this.surfacePanel.init(body);

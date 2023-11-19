@@ -28,7 +28,6 @@ import { ShadowPostProcess } from "./shadowPostProcess";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { isOrbiting } from "../utils/nearestBody";
-import { BaseObject } from "../bodies/common";
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { MatterJetPostProcess } from "./matterJetPostProcess";
 import { Mandelbulb } from "../mandelbulb/mandelbulb";
@@ -301,17 +300,12 @@ export class PostProcessManager {
     }
 
     public setBody(body: AbstractBody) {
-        if (this.currentBody === body) return;
         this.currentBody = body;
-
-        this.currentRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
 
         const rings = this.getRings(body);
         const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;
         if (isOrbiting(this.scene.getActiveController(), body, switchLimit)) this.setSurfaceOrder();
         else this.setSpaceOrder();
-
-        this.init();
     }
 
     public setSpaceOrder() {
@@ -350,8 +344,6 @@ export class PostProcessManager {
     }
 
     private init() {
-        return;
-
         const [otherVolumetricLightsRenderEffect, bodyVolumetricLightsRenderEffect] = makeSplitRenderEffects(
             "VolumetricLights",
             this.getCurrentBody(),

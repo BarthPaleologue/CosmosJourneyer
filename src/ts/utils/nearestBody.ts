@@ -2,6 +2,7 @@ import { AbstractBody } from "../bodies/abstractBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Transformable } from "../uberCore/transforms/basicTransform";
 import { BoundingSphere } from "../bodies/common";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export function nearestBody(object: TransformNode, bodies: AbstractBody[]): AbstractBody {
     let distance = -1;
@@ -24,5 +25,5 @@ export function nearestBody(object: TransformNode, bodies: AbstractBody[]): Abst
  * @param orbitLimitFactor the boundary of the orbit detection (multiplied by planet radius)
  */
 export function isOrbiting(controller: Transformable, body: Transformable & BoundingSphere, orbitLimitFactor = 2.5): boolean {
-    return body.getTransform().getAbsolutePosition().subtract(controller.getTransform().getAbsolutePosition()).lengthSquared() < (orbitLimitFactor * body.getBoundingRadius()) ** 2;
+    return Vector3.DistanceSquared(body.getTransform().getAbsolutePosition(), controller.getTransform().getAbsolutePosition()) < (orbitLimitFactor * body.getBoundingRadius()) ** 2;
 }
