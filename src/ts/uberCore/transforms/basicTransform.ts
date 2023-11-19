@@ -40,8 +40,7 @@ export function setUpVector(transformNode: TransformNode, newUp: Vector3): void 
     const currentUp = transformNode.up;
     const rotationAxis = Vector3.Cross(newUp, currentUp);
     const angle = -Math.acos(Vector3.Dot(newUp, currentUp));
-    const rotation = Quaternion.RotationAxis(rotationAxis, angle);
-    setRotationQuaternion(transformNode, rotation.multiply(transformNode.rotationQuaternion ?? Quaternion.Identity()));
+    rotate(transformNode, rotationAxis, angle);
 }
 
 export function getRotationMatrix(transformNode: TransformNode): Matrix {
