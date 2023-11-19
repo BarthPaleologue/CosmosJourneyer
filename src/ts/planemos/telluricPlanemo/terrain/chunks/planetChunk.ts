@@ -10,13 +10,9 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Transformable } from "../../../../uberCore/transforms/basicTransform";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
-import { InstancePatch } from "../instancePatch/instancePatch";
-import { downSample, randomDownSample } from "../instancePatch/matrixBuffer";
-import { IPatch } from "../instancePatch/iPatch";
+import { randomDownSample } from "../instancePatch/matrixBuffer";
 import { Assets } from "../../../../assets";
-import { Settings } from "../../../../settings";
 
 export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
@@ -102,6 +98,17 @@ export class PlanetChunk implements Transformable {
         }
 
         vertexData.applyToMesh(this.mesh, false);
+        // The following is a code snippet to use the approximate normals of the mesh instead of
+        // the analytic normals. This is useful for debugging purposes
+        /*if(!analyticNormal) {
+            this.mesh.createNormals(true);
+            const normals = this.mesh.getVerticesData(VertexBuffer.NormalKind);
+            if (normals === null) throw new Error("Mesh has no normals");
+            for(let i = 0; i < normals.length; i++) {
+                normals[i] = -normals[i];
+            }
+            this.mesh.setVerticesData(VertexBuffer.NormalKind, normals);
+        }*/
         this.mesh.freezeNormals();
 
         if (this.depth > 3) {

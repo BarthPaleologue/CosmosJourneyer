@@ -34,7 +34,7 @@
     "sass-loader": "^13.3.2",
     "squirrel-noise": "^1.0.0",
     "style-loader": "^3.3.3",
-    "terrain-generation": "^1.7.3",
+    "terrain-generation": "^1.7.12",
     "ts-jest": "^29.1.1",
     "ts-loader": "^9.5.0",
     "ts-node": "^10.9.1",
