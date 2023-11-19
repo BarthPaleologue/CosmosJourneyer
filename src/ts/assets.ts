@@ -1,5 +1,6 @@
 import "@babylonjs/loaders/glTF/2.0";
 import "@babylonjs/core/Loading/loadingScreen";
+import "@babylonjs/core/Animations/animatable";
 
 import rockNormalMap from "../asset/textures/rockn.png";
 import dirtNormalMap from "../asset/textures/dirt/Ground_Dirt_008_normal.jpg";
@@ -23,6 +24,7 @@ import spaceship from "../asset/spaceship/spaceship2.glb";
 import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
 import endeavorSpaceship from "../asset/spaceship/endeavour.glb";
+import character from "../asset/character.glb";
 
 import ouchSound from "../asset/sound/ouch.mp3";
 import engineRunningSound from "../asset/sound/engineRunning.mp3";
@@ -66,6 +68,7 @@ export class Assets {
     private static EndeavorSpaceship: Mesh;
     private static Spacestation: Mesh;
     private static Banana: Mesh;
+    private static Character: Mesh;
 
     public static ScatterCube: Mesh;
 
@@ -146,6 +149,18 @@ export class Assets {
                 console.log("Banana loaded");
             };
 
+            const characterTask = Assets.manager.addMeshTask("characterTask", "", "", character);
+            characterTask.onSuccess = function (task: MeshAssetTask) {
+                Assets.Character = task.loadedMeshes[0] as Mesh;
+                Assets.Character.isVisible = false;
+
+                for (const mesh of Assets.Character.getChildMeshes()) {
+                    mesh.isVisible = false;
+                }
+
+                console.log("Character loaded");
+            };
+
             const ouchSoundTask = Assets.manager.addBinaryFileTask("ouchSoundTask", ouchSound);
             ouchSoundTask.onSuccess = function (task) {
                 Assets.OuchSound = new Sound("OuchSound", task.data, scene);
@@ -208,6 +223,10 @@ export class Assets {
         mesh.scaling.scaleInPlace(5 * sizeInMeters);
 
         return mesh;
+    }
+
+    static CreateCharacterInstance(): InstancedMesh {
+        return Assets.Character.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static DebugMaterial(name: string, diffuse = false, wireframe = false) {
