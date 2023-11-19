@@ -184,6 +184,7 @@ export class Assets {
             Assets.ScatterCube = MeshBuilder.CreateBox("cube", {size:1}, scene);
             Assets.ScatterCube.position.y = 0.5;
             Assets.ScatterCube.bakeCurrentTransformIntoVertices();
+            Assets.ScatterCube.isVisible = false;
 
             Assets.manager.load();
 

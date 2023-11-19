@@ -26,9 +26,6 @@ import { StarModel } from "./stellarObjects/star/starModel";
 import { Keyboard } from "./inputs/keyboard";
 import { Star } from "./stellarObjects/star/star";
 import { ChunkForge } from "./planemos/telluricPlanemo/terrain/chunks/chunkForge";
-import { ActionManager } from "@babylonjs/core/Actions/actionManager";
-import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
-import '@babylonjs/core/Collisions/collisionCoordinator';
 import { CharacterController } from "./spacelegs/characterController";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;

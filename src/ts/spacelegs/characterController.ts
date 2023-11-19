@@ -3,7 +3,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { UberCamera } from "../uberCore/uberCamera";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Input, InputType } from "../inputs/input";
+import { Input } from "../inputs/input";
 import { rotate, setRotationQuaternion, setUpVector, translate } from "../uberCore/transforms/basicTransform";
 import { Assets } from "../assets";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
@@ -15,6 +15,7 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { AbstractObject } from "../bodies/abstractObject";
 import { Quaternion } from "@babylonjs/core/Maths/math";
+import '@babylonjs/core/Collisions/collisionCoordinator';
 
 export class CharacterController extends AbstractController {
     private readonly character: AbstractMesh;
@@ -25,9 +26,9 @@ export class CharacterController extends AbstractController {
     private readonly idleAnim: AnimationGroup;
     private readonly sambaAnim: AnimationGroup;
 
-    private readonly characterSpeed = 0.03;
-    private readonly characterSpeedBackwards = 0.02;
-    private readonly characterRotationSpeed = 0.1;
+    private readonly characterSpeed = 1.8;
+    private readonly characterSpeedBackwards = 1.2;
+    private readonly characterRotationSpeed = 6;
 
     private animating = false;
 
@@ -60,9 +61,10 @@ export class CharacterController extends AbstractController {
         if (sambaAnim === null) throw new Error("'Samba' animation not found");
         this.sambaAnim = sambaAnim;
 
-        this.thirdPersonCamera = new UberOrbitCamera("camera", Vector3.Zero(), scene, 40, -Math.PI / 4, 1.0);
+        this.thirdPersonCamera = new UberOrbitCamera("camera", new Vector3(0, 1.5, 0), scene, 40, -Math.PI / 4, 1.0);
         this.thirdPersonCamera.minZ = 1;
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
+        this.thirdPersonCamera.parent = this.getTransform();
     }
 
     public setClosestWalkableObject(object: AbstractObject) {
@@ -84,19 +86,19 @@ export class CharacterController extends AbstractController {
             const character = this.character;
             let keydown = false;
             if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
-                character.moveWithCollisions(character.forward.scaleInPlace(-this.characterSpeed));
+                character.moveWithCollisions(character.forward.scaleInPlace(-this.characterSpeed * deltaTime));
                 keydown = true;
             }
             if (keyboard.isPressed("s")) {
-                character.moveWithCollisions(character.forward.scaleInPlace(this.characterSpeedBackwards));
+                character.moveWithCollisions(character.forward.scaleInPlace(this.characterSpeedBackwards * deltaTime));
                 keydown = true;
             }
             if (keyboard.isPressed("q") || keyboard.isPressed("a")) {
-                rotate(character, character.up, this.characterRotationSpeed);
+                rotate(character, character.up, this.characterRotationSpeed * deltaTime);
                 keydown = true;
             }
             if (keyboard.isPressed("d")) {
-                rotate(character, character.up, -this.characterRotationSpeed);
+                rotate(character, character.up, -this.characterRotationSpeed * deltaTime);
                 keydown = true;
             }
             if (keyboard.isPressed("b")) {
@@ -159,8 +161,6 @@ export class CharacterController extends AbstractController {
         //FIXME: the division by Settings.TIME_MULTIPLIER is a hack to make the player move at the same speed regardless of the time multiplier
         for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.getTransform().getScene().getEngine().getDeltaTime() / 1000));
         translate(this.getTransform(), playerMovement);
-
-        this.thirdPersonCamera.setTarget(this.getTransform().getAbsolutePosition().add(character.up.scale(1.5)));
 
         return playerMovement;
     }
