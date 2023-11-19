@@ -1,11 +1,11 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractController } from "../uberCore/abstractController";
-import { StarSystem } from "../starSystem/starSystem";
+import { StarSystemController } from "../starSystem/starSystemController";
 import { nearestBody } from "./nearestBody";
 import { Transformable } from "../uberCore/transforms/basicTransform";
 import { BoundingSphere } from "../bodies/common";
 
-export function positionNearObject(controller: AbstractController, object: Transformable & BoundingSphere, starSystem: StarSystem, nRadius = 3): void {
+export function positionNearObject(controller: AbstractController, object: Transformable & BoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object
     const nearestStar = nearestBody(object.getTransform(), starSystem.stellarObjects);
 

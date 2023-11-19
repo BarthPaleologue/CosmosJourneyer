@@ -1,4 +1,4 @@
-import { StarSystem } from "./starSystem";
+import { StarSystemController } from "./starSystemController";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { Star } from "../stellarObjects/star/star";
@@ -19,7 +19,7 @@ import { Planemo } from "../planemos/planemo";
 import { getMoonSeed } from "../planemos/common";
 
 export class StarSystemHelper {
-    public static makeStar(starsystem: StarSystem, model?: number | StarModel): Star {
+    public static makeStar(starsystem: StarSystemController, model?: number | StarModel): Star {
         if (model === undefined) {
             model = starsystem.model.getStarSeed(starsystem.stellarObjects.length);
         }
@@ -29,7 +29,7 @@ export class StarSystemHelper {
         return star;
     }
 
-    public static makeMandelbulb(starsystem: StarSystem, model: number | MandelbulbModel = starsystem.model.getPlanetSeed(starsystem.mandelbulbs.length)): Mandelbulb {
+    public static makeMandelbulb(starsystem: StarSystemController, model: number | MandelbulbModel = starsystem.model.getPlanetSeed(starsystem.mandelbulbs.length)): Mandelbulb {
         if (starsystem.planets.length >= starsystem.model.getNbPlanets())
             console.warn(`You are adding a mandelbulb to the system.
             The system generator had planned for ${starsystem.model.getNbPlanets()} planets, but you are adding the ${starsystem.planets.length + 1}th planet.
@@ -44,14 +44,14 @@ export class StarSystemHelper {
      * @param starsystem
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public static makeBlackHole(starsystem: StarSystem, model: number | BlackHoleModel = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): BlackHole {
+    public static makeBlackHole(starsystem: StarSystemController, model: number | BlackHoleModel = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): BlackHole {
         const name = starName(starsystem.model.getName(), starsystem.stellarObjects.length);
         const blackHole = new BlackHole(name, starsystem.scene, model, starsystem.stellarObjects[0]);
         starsystem.addStellarObject(blackHole);
         return blackHole;
     }
 
-    public static makeNeutronStar(starsystem: StarSystem, model: number | NeutronStarModel = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): NeutronStar {
+    public static makeNeutronStar(starsystem: StarSystemController, model: number | NeutronStarModel = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): NeutronStar {
         if (starsystem.stellarObjects.length >= starsystem.model.getNbStars())
             console.warn(`You are adding a neutron star
         to a system that already has ${starsystem.stellarObjects.length} stars.
@@ -68,7 +68,7 @@ export class StarSystemHelper {
      * @param starsystem
      * @param seed The seed to use for the star generation (by default, the next available seed planned by the system model)
      */
-    public static makeStellarObject(starsystem: StarSystem, seed: number = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): StellarObject {
+    public static makeStellarObject(starsystem: StarSystemController, seed: number = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): StellarObject {
         const isStellarObjectBlackHole = starsystem.model.getBodyTypeOfStar(starsystem.stellarObjects.length) === BODY_TYPE.BLACK_HOLE;
         if (isStellarObjectBlackHole) return StarSystemHelper.makeBlackHole(starsystem, seed);
         else return this.makeStar(starsystem, seed);
@@ -79,7 +79,7 @@ export class StarSystemHelper {
      * @param starsystem
      * @param n The number of stars to make (by default, the number of stars planned by the system model)
      */
-    public static makeStellarObjects(starsystem: StarSystem, n = starsystem.model.getNbStars()): void {
+    public static makeStellarObjects(starsystem: StarSystemController, n = starsystem.model.getNbStars()): void {
         if (n < 1) throw new Error("Cannot make less than 1 star");
         for (let i = 0; i < n; i++) StarSystemHelper.makeStellarObject(starsystem);
     }
@@ -89,7 +89,7 @@ export class StarSystemHelper {
      * @param starsystem
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public static makeTelluricPlanet(starsystem: StarSystem, model: number | TelluricPlanemoModel = starsystem.model.getPlanetSeed(starsystem.planets.length)): TelluricPlanemo {
+    public static makeTelluricPlanet(starsystem: StarSystemController, model: number | TelluricPlanemoModel = starsystem.model.getPlanetSeed(starsystem.planets.length)): TelluricPlanemo {
         const planet = new TelluricPlanemo(`${starsystem.model.getName()} ${romanNumeral(starsystem.planets.length + 1)}`, starsystem.scene, model, starsystem.stellarObjects[0]);
         starsystem.addTelluricPlanet(planet);
         return planet;
@@ -100,13 +100,13 @@ export class StarSystemHelper {
      * @param starsystem
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public static makeGasPlanet(starsystem: StarSystem, model: number | GasPlanetModel = starsystem.model.getPlanetSeed(starsystem.planets.length)): GasPlanet {
+    public static makeGasPlanet(starsystem: StarSystemController, model: number | GasPlanetModel = starsystem.model.getPlanetSeed(starsystem.planets.length)): GasPlanet {
         const planet = new GasPlanet(`${starsystem.model.getName()} ${romanNumeral(starsystem.planets.length + 1)}`, starsystem.scene, model, starsystem.stellarObjects[0]);
         starsystem.addGasPlanet(planet);
         return planet;
     }
 
-    public static makePlanets(starsystem: StarSystem, n: number): void {
+    public static makePlanets(starsystem: StarSystemController, n: number): void {
         console.assert(n >= 0, `Cannot make a negative amount of planets : ${n}`);
 
         for (let i = 0; i < n; i++) {
@@ -127,7 +127,7 @@ export class StarSystemHelper {
     }
 
     public static makeSatellite(
-        starsystem: StarSystem,
+        starsystem: StarSystemController,
         planet: Planemo,
         model: TelluricPlanemoModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)
     ): TelluricPlanemo {
@@ -149,7 +149,7 @@ export class StarSystemHelper {
      * @param planet The planet to make satellites for
      * @param n The number of satellites to make
      */
-    public static makeSatellites(starsystem: StarSystem, planet: Planemo, n = planet.model.nbMoons): void {
+    public static makeSatellites(starsystem: StarSystemController, planet: Planemo, n = planet.model.nbMoons): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
         if (planet.model.childrenBodies.length + n > planet.model.nbMoons)
             console.warn(
@@ -166,7 +166,7 @@ export class StarSystemHelper {
     /**
      * Generates the system using the seed provided in the constructor
      */
-    public static generate(starsystem: StarSystem) {
+    public static generate(starsystem: StarSystemController) {
         StarSystemHelper.makeStellarObjects(starsystem, starsystem.model.getNbStars());
         StarSystemHelper.makePlanets(starsystem, starsystem.model.getNbPlanets());
     }

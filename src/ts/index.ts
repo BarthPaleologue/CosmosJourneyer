@@ -1,6 +1,6 @@
 import "../styles/index.scss";
 
-import { StarSystem } from "./starSystem/starSystem";
+import { StarSystemController } from "./starSystem/starSystemController";
 
 import { Settings } from "./settings";
 import { Assets } from "./assets";
@@ -98,7 +98,7 @@ engine.onToggleStarMapObservable.add((isStarMapOpen) => {
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
 const starSystemSeed = 0;
-const starSystem = new StarSystem(starSystemSeed, starSystemView.scene);
+const starSystem = new StarSystemController(starSystemSeed, starSystemView.scene);
 starSystem.model.setName("Alpha Testis");
 
 engine.getStarSystemView().setStarSystem(starSystem, false);

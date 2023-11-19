@@ -1,6 +1,6 @@
 import "../styles/index.scss";
 
-import { StarSystem } from "./starSystem/starSystem";
+import { StarSystemController } from "./starSystem/starSystemController";
 
 import { randRange } from "extended-random";
 import { Settings } from "./settings";
@@ -63,7 +63,7 @@ engine.registerStarSystemUpdateCallback(() => {
 });
 
 const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
-const starSystem = new StarSystem(starSystemSeed, scene);
+const starSystem = new StarSystemController(starSystemSeed, scene);
 starSystemView.setStarSystem(starSystem, false);
 
 const BH = StarSystemHelper.makeBlackHole(starSystem, 0);

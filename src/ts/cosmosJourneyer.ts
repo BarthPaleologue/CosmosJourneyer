@@ -1,5 +1,5 @@
 import { Assets } from "./assets";
-import { StarSystem } from "./starSystem/starSystem";
+import { StarSystemController } from "./starSystem/starSystemController";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
@@ -101,7 +101,7 @@ export class CosmosJourneyer {
         // Init starmap view
         this.starMap = new StarMap(this.engine);
         this.starMap.onWarpObservable.add((seed: number) => {
-            this.getStarSystemView().setStarSystem(new StarSystem(seed, this.getStarSystemView().scene), true);
+            this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
             this.getStarSystemView().init();
             this.toggleStarMap();
         });

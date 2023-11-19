@@ -4,7 +4,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { AxisRenderer } from "../orbit/axisRenderer";
 import { SystemUI } from "../ui/systemUI";
 import { Animation } from "@babylonjs/core/Animations/animation";
-import { StarSystem } from "./starSystem";
+import { StarSystemController } from "./starSystemController";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { ScenePerformancePriority } from "@babylonjs/core/scene";
@@ -32,7 +32,7 @@ export class StarSystemView {
 
     private static readonly unZoomAnimation = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
-    private starSystem: StarSystem | null = null;
+    private starSystem: StarSystemController | null = null;
 
     private readonly chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
 
@@ -125,7 +125,7 @@ export class StarSystemView {
      * @param starSystem the star system to be set
      * @param needsGenerating whether the star system needs to be generated or not
      */
-    setStarSystem(starSystem: StarSystem, needsGenerating = true) {
+    setStarSystem(starSystem: StarSystemController, needsGenerating = true) {
         if (this.starSystem !== null) this.starSystem.dispose();
         this.starSystem = starSystem;
 

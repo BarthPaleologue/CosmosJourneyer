@@ -21,7 +21,7 @@ import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
 
-export class StarSystem {
+export class StarSystemController {
     readonly scene: UberScene;
 
     readonly postProcessManager: PostProcessManager;

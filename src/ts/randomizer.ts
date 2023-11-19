@@ -1,6 +1,6 @@
 import "../styles/index.scss";
 
-import { StarSystem } from "./starSystem/starSystem";
+import { StarSystemController } from "./starSystem/starSystemController";
 
 import { randRange } from "extended-random";
 import { Settings } from "./settings";
@@ -75,7 +75,7 @@ engine.onToggleStarMapObservable.add((isStarMapOpen) => {
 const urlParams = new URLSearchParams(window.location.search);
 const seed = urlParams.get("seed");
 
-const starSystem = new StarSystem(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0) * Number.MAX_SAFE_INTEGER, scene);
+const starSystem = new StarSystemController(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0) * Number.MAX_SAFE_INTEGER, scene);
 starSystemView.setStarSystem(starSystem, true);
 
 document.addEventListener("keydown", (e) => {
