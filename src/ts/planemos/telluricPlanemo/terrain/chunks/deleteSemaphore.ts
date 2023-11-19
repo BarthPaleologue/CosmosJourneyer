@@ -1,10 +1,10 @@
 import { PlanetChunk } from "./planetChunk";
 
 /**
- * The DeleteMutex is responsible to delete chunk only when replacements are created to avoid holes in the surface of planets
+ * The DeleteSemaphore is responsible to delete chunk only when replacements are created to avoid holes in the surface of planets
  * Each time a replacement chunk is set ready, we decrement the countdown. When it reaches 0 the old chunks can be deleted
  */
-export class DeleteMutex {
+export class DeleteSemaphore {
     private flag: number;
     readonly chunksToDelete: PlanetChunk[];
     readonly newChunks: PlanetChunk[];
@@ -33,7 +33,7 @@ export class DeleteMutex {
     }
 
     /**
-     * Checks if the mutex is a zombie (it can't be resolved anymore).
+     * Checks if the semaphore is a zombie (it can't be resolved anymore).
      * This happens when one of the new chunks has been disposed before receiving its vertex data.
      * If this is the case, we resolve the mutex immediately
      */

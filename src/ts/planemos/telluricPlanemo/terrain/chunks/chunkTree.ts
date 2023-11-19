@@ -13,11 +13,9 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { DeleteMutex } from "./deleteMutex";
+import { DeleteSemaphore } from "./deleteSemaphore";
 import { UberScene } from "../../../../uberCore/uberScene";
-import { Assets } from "../../../../assets";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
-import { depth } from "../../../../model/common";
 
 /**
  * A quadTree is defined recursively
@@ -39,7 +37,7 @@ export class ChunkTree {
 
     private readonly scene: UberScene;
 
-    private deleteMutexes: DeleteMutex[] = [];
+    private deleteSemaphores: DeleteSemaphore[] = [];
 
     readonly planetName: string;
     readonly planetSeed: number;
@@ -100,7 +98,7 @@ export class ChunkTree {
      */
     private requestDeletion(tree: quadTree, newChunks: PlanetChunk[]): void {
         const chunksToDelete = this.getChunkList(tree);
-        this.deleteMutexes.push(new DeleteMutex(newChunks, chunksToDelete));
+        this.deleteSemaphores.push(new DeleteSemaphore(newChunks, chunksToDelete));
     }
 
     public getChunkList(tree: quadTree): PlanetChunk[] {
@@ -116,9 +114,9 @@ export class ChunkTree {
      */
     public update(observerPosition: Vector3, chunkForge: ChunkForge): void {
         // remove zombie mutexes
-        this.deleteMutexes.forEach((mutex) => mutex.resolveIfZombie());
+        this.deleteSemaphores.forEach((mutex) => mutex.resolveIfZombie());
         // remove delete mutexes that have been resolved
-        this.deleteMutexes = this.deleteMutexes.filter((mutex) => !mutex.isResolved());
+        this.deleteSemaphores = this.deleteSemaphores.filter((mutex) => !mutex.isResolved());
 
         this.tree = this.updateLODRecursively(observerPosition, chunkForge);
     }
@@ -241,7 +239,7 @@ export class ChunkTree {
         this.executeOnEveryChunk((chunk) => {
             chunk.registerPhysicsShapeDeletion(index);
         });
-        for (const mutex of this.deleteMutexes) {
+        for (const mutex of this.deleteSemaphores) {
             for (const chunk of mutex.chunksToDelete) {
                 chunk.registerPhysicsShapeDeletion(index);
             }
@@ -263,7 +261,7 @@ export class ChunkTree {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
             chunk.dispose();
         });
-        for (const mutex of this.deleteMutexes) {
+        for (const mutex of this.deleteSemaphores) {
             for (const chunk of mutex.chunksToDelete) {
                 chunk.dispose();
             }
