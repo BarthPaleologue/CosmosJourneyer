@@ -7,9 +7,10 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsEngineV2, PhysicsRaycastResult } from "@babylonjs/core";
 import { moveTowards } from "../utils/moveTowards";
 import { Star } from "../stellarObjects/star/star";
+import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
+import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 
 const shaderName = "lensflare";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = lensFlareFragment;

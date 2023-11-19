@@ -7,8 +7,9 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { getRotationQuaternion, rotateAround, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeType } from "@babylonjs/core";
+
 import { OrbitalObject } from "../orbit/orbit";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export abstract class AbstractObject implements OrbitalObject, BaseObject, Common {
     private readonly transform: TransformNode;

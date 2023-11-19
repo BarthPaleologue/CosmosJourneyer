@@ -11,8 +11,8 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { PhysicsShapeSphere } from "@babylonjs/core";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 
 export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial {
     private readonly mesh: Mesh;

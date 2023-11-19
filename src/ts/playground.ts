@@ -95,11 +95,11 @@ shadowGenerator.addShadowCaster(capsule);
 
 const auroraModel = new StarModel(984);
 const aurora = new Star("Aurora", scene, auroraModel);
-aurora.getTransform().setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10.0, 0));
+aurora.getTransform().setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10.0, aurora.getRadius() * 40.0));
 
 const newtonModel = new TelluricPlanemoModel(152);
 const newton = new TelluricPlanemo("newton", scene, newtonModel);
-newton.getTransform().setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
+newton.getTransform().setAbsolutePosition(new Vector3(0, -newtonModel.radius - 10e3, 0));
 newton.updateLOD(camera.globalPosition, chunkForge);
 
 const viewer = new PhysicsViewer();
@@ -131,6 +131,8 @@ function updateBeforeHavok() {
     const deltaTime = engine.getDeltaTime() / 1000;
     clockSeconds += deltaTime;
 
+    chunkForge.update();
+
     spaceship.update();
 
     for (const aggregate of fallingAggregates) {
@@ -150,12 +152,9 @@ function updateBeforeHavok() {
     // planet thingy
     newton.updateInternalClock(-deltaTime / 10);
     aurora.updateInternalClock(-deltaTime / 10);
-    /*newton.updateRotation(deltaTime / 10);
-newton.nextState.position = newton.transform.getAbsolutePosition();
-newton.applyNextState();*/
+
     newton.updateLOD(camera.globalPosition, chunkForge);
     newton.material.update(camera.globalPosition, [aurora]);
-    chunkForge.update();
 }
 
 scene.executeWhenReady(() => {

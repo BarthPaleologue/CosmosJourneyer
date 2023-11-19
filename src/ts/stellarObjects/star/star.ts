@@ -6,7 +6,6 @@ import { StarModel } from "./starModel";
 import { UberScene } from "../../uberCore/uberScene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Assets } from "../../assets";
-import { PhysicsShapeSphere } from "@babylonjs/core";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Light } from "@babylonjs/core/Lights/light";
@@ -15,6 +14,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { getStellarTypeString } from "../common";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 
 export class Star extends AbstractBody {
     readonly mesh: Mesh;

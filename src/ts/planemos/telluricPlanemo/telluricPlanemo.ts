@@ -13,9 +13,9 @@ import { TelluricPlanemoModel } from "./telluricPlanemoModel";
 import { StellarObject } from "../../stellarObjects/stellarObject";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { PhysicsShapeSphere } from "@babylonjs/core";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
+import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 
 export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMaterial {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere

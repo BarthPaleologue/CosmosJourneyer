@@ -100,9 +100,6 @@ export class ChunkTree {
      */
     private requestDeletion(tree: quadTree, newChunks: PlanetChunk[]): void {
         const chunksToDelete = this.getChunkList(tree);
-        if (chunksToDelete.length === 0) {
-            throw new Error("Trying to delete empty chunk list");
-        }
         this.deleteMutexes.push(new DeleteMutex(newChunks, chunksToDelete));
     }
 
@@ -119,7 +116,7 @@ export class ChunkTree {
      */
     public update(observerPosition: Vector3, chunkForge: ChunkForge): void {
         // remove zombie mutexes
-        this.deleteMutexes.forEach(mutex => mutex.resolveIfZombie());
+        this.deleteMutexes.forEach((mutex) => mutex.resolveIfZombie());
         // remove delete mutexes that have been resolved
         this.deleteMutexes = this.deleteMutexes.filter((mutex) => !mutex.isResolved());
 
@@ -167,28 +164,28 @@ export class ChunkTree {
 
         if ((distanceToNodeSquared < distanceThreshold ** 2 && walked.length < this.maxDepth) || walked.length < this.minDepth) {
             // if the node is near the camera or if we are loading minimal LOD
+            if (tree instanceof Array && tree.length === 4) {
+                return [
+                    this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
+                    this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
+                    this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
+                    this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
+                ];
+            }
+
             if (tree instanceof PlanetChunk) {
                 if (!tree.isReady()) return tree;
                 if (!tree.mesh.isVisible) return tree;
-
-                // if view ray goes through planet then we don't need to load more chunks
-
-                const newTree = [
-                    this.createChunk(walked.concat([0]), chunkForge),
-                    this.createChunk(walked.concat([1]), chunkForge),
-                    this.createChunk(walked.concat([2]), chunkForge),
-                    this.createChunk(walked.concat([3]), chunkForge)
-                ];
-                this.requestDeletion(tree, newTree);
-                return newTree;
             }
 
-            return [
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
+            const newTree = [
+                this.createChunk(walked.concat([0]), chunkForge),
+                this.createChunk(walked.concat([1]), chunkForge),
+                this.createChunk(walked.concat([2]), chunkForge),
+                this.createChunk(walked.concat([3]), chunkForge)
             ];
+            this.requestDeletion(tree, newTree);
+            return newTree;
         }
 
         if (tree instanceof PlanetChunk) return tree;
