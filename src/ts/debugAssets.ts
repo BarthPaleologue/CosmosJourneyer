@@ -9,6 +9,7 @@ import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { BaseTexture } from "@babylonjs/core/Materials/Textures/baseTexture";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -21,7 +22,9 @@ const camera = new FreeCamera("camera", new Vector3(0, 1, -1).scale(15), scene);
 camera.setTarget(Vector3.Zero());
 camera.attachControl(canvas, true);
 
-const light = new DirectionalLight("light", new Vector3(0, -1, 1), scene);
+new DirectionalLight("light", new Vector3(0, -1, 1), scene);
+const hemi = new HemisphericLight("hemisphericLight", new Vector3(0, 1, 0), scene);
+hemi.intensity = 0.5;
 
 await Assets.Init(scene);
 

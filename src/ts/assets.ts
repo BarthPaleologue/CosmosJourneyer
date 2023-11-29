@@ -13,11 +13,12 @@ import sandNormalMap2 from "../asset/textures/sandNormalMap2.jpg";
 import waterNormal1 from "../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../asset/textures/waterNormalMap4.jpg";
 
-//import atmosphereLUT from "../../asset/textures/LUT/atmosphere.png";
-
 import starfield from "../asset/textures/milkyway.jpg";
-
 import plumeParticle from "../asset/textures/plume.png";
+
+import proceduralTest from "../shaders/textures/test.glsl";
+import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
+//import atmosphereLUT from "../asset/textures/LUT/atmosphere.png";
 
 import spaceship from "../asset/spaceship/spaceship2.glb";
 //import spacestation from "../asset/spacestation/spacestation.glb";
@@ -40,10 +41,8 @@ import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 import { Sound } from "@babylonjs/core/Audio/sound";
 
-//import atmosphereLUT from "../../shaders/utils/atmosphereLUT.glsl";
-import atmosphereLUT from "../asset/textures/LUT/atmosphere.png";
-
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 
 export class Assets {
     static IS_READY = false;
@@ -60,9 +59,11 @@ export class Assets {
     static WaterNormalMap1: Texture;
     static WaterNormalMap2: Texture;
 
-    static AtmosphereLUT: Texture;
     static Starfield: Texture;
     static PlumeParticle: Texture;
+
+    static ProceduralTest: ProceduralTexture;
+    static AtmosphereLUT: ProceduralTexture;
 
     private static Spaceship: Mesh;
     private static EndeavorSpaceship: Mesh;
@@ -93,14 +94,16 @@ export class Assets {
             Assets.manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Assets.WaterNormalMap1 = task.texture);
             Assets.manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Assets.WaterNormalMap2 = task.texture);
 
-            Assets.manager.addTextureTask("AtmosphereLUT", atmosphereLUT).onSuccess = (task) => (Assets.AtmosphereLUT = task.texture);
-
-            /*Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
-      Assets.AtmosphereLUT.refreshRate = 1;*/
-
             Assets.manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.Starfield = task.texture);
 
             Assets.manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Assets.PlumeParticle = task.texture);
+
+            Assets.ProceduralTest = new ProceduralTexture("proceduralTest", 100, { fragmentSource: proceduralTest }, scene, undefined, false, false);
+            Assets.ProceduralTest.refreshRate = 0;
+
+            Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
+            Assets.AtmosphereLUT.refreshRate = 0;
+
 
             const spaceshipTask = Assets.manager.addMeshTask("spaceshipTask", "", "", spaceship);
             spaceshipTask.onSuccess = function (task: MeshAssetTask) {
