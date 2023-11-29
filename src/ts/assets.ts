@@ -47,6 +47,8 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export class Assets {
     static IS_READY = false;
+
+    // Textures
     static RockNormalMap: Texture;
     static DirtNormalMap: Texture;
     static BottomNormalMap: Texture;
@@ -59,9 +61,7 @@ export class Assets {
     static WaterNormalMap2: Texture;
 
     static AtmosphereLUT: Texture;
-
     static Starfield: Texture;
-
     static PlumeParticle: Texture;
 
     private static Spaceship: Mesh;
@@ -96,7 +96,7 @@ export class Assets {
             Assets.manager.addTextureTask("AtmosphereLUT", atmosphereLUT).onSuccess = (task) => (Assets.AtmosphereLUT = task.texture);
 
             /*Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
-            Assets.AtmosphereLUT.refreshRate = 1;*/
+      Assets.AtmosphereLUT.refreshRate = 1;*/
 
             Assets.manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.Starfield = task.texture);
 
@@ -181,7 +181,7 @@ export class Assets {
                 scene.getEngine().loadingUIText = `Loading assets... ${totalCount - remainingCount}/${totalCount}`;
             };
 
-            Assets.ScatterCube = MeshBuilder.CreateBox("cube", {size:1}, scene);
+            Assets.ScatterCube = MeshBuilder.CreateBox("cube", { size: 1 }, scene);
             Assets.ScatterCube.position.y = 0.5;
             Assets.ScatterCube.bakeCurrentTransformIntoVertices();
             Assets.ScatterCube.isVisible = false;
@@ -235,8 +235,7 @@ export class Assets {
         if (!diffuse) {
             mat.emissiveColor = Color3.Random();
             mat.disableLighting = true;
-        }
-        else mat.diffuseColor = Color3.Random();
+        } else mat.diffuseColor = Color3.Random();
         mat.wireframe = wireframe;
         return mat;
     }
