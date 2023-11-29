@@ -69,7 +69,6 @@ export class ChunkTree {
 
         // max depth is minimal depth to get a certain minimum space between vertices
         this.maxDepth = Math.ceil(Math.log2(this.rootChunkLength / (Settings.MIN_DISTANCE_BETWEEN_VERTICES * Settings.VERTEX_RESOLUTION)));
-        console.log(this.maxDepth);
 
         this.scene = scene;
 

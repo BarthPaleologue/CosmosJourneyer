@@ -55,7 +55,6 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
                       scene.getActiveUberCamera().viewport
                     );
                     settings.behindCamera = clipPosition.z < 0;
-                    console.log(clipPosition);
                     return clipPosition;
                 }
             },
