@@ -2,7 +2,7 @@ precision highp float;
 
 // based on https://www.shadertoy.com/view/wlcyzj
 
-in vec2 vUV;
+varying vec2 vUV;
 
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera

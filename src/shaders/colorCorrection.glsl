@@ -8,7 +8,7 @@ uniform float brightness;
 
 uniform sampler2D textureSampler;
 
-in vec2 vUV;
+varying vec2 vUV;
 
 #pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
 

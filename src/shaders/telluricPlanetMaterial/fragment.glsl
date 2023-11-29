@@ -1,15 +1,15 @@
 precision highp float;
 
-in vec3 vPositionW;
-in vec3 vNormalW;
-in vec3 vUnitSamplePoint;
-in vec3 vSphereNormalW;
-in vec3 vSamplePoint;
-in vec3 vSamplePointScaled;
+varying vec3 vPositionW;
+varying vec3 vNormalW;
+varying vec3 vUnitSamplePoint;
+varying vec3 vSphereNormalW;
+varying vec3 vSamplePoint;
+varying vec3 vSamplePointScaled;
 
-in vec3 vPosition;// position of the vertex in chunk
-in vec3 vNormal;// normal of the vertex in sphere space
-in vec3 vLocalPosition;
+varying vec3 vPosition;// position of the vertex varyingchunk
+varying vec3 vNormal;// normal of the vertex varyingsphere space
+varying vec3 vLocalPosition;
 
 uniform mat4 normalMatrix;
 

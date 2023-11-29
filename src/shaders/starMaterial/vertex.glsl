@@ -5,9 +5,9 @@ attribute vec3 position;
 uniform mat4 world;
 uniform mat4 worldViewProjection;
 
-out vec3 vPositionW;
-out vec3 vPosition;
-out vec3 vUnitSamplePoint;
+varying vec3 vPositionW;
+varying vec3 vPosition;
+varying vec3 vUnitSamplePoint;
 
 uniform vec4 starInverseRotationQuaternion;
 uniform vec3 starPosition;

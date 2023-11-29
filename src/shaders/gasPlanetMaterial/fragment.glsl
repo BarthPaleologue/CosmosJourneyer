@@ -8,11 +8,11 @@ struct Star {
 };
 uniform Star stars[MAX_STARS];
 
-in vec3 vPositionW;
-in vec3 vNormalW;
-in vec3 vUnitSamplePoint;
+varying vec3 vPositionW;
+varying vec3 vNormalW;
+varying vec3 vUnitSamplePoint;
 
-in vec3 vPosition;// position of the vertex in sphere space
+varying vec3 vPosition;// position of the vertex varyingsphere space
 
 uniform vec3 playerPosition;// camera position in world space
 

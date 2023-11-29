@@ -1,7 +1,7 @@
 precision highp float;
 
-in vec3 vPosition;// position of the vertex in sphere space
-in vec3 vUnitSamplePoint;
+varying vec3 vPosition;// position of the vertex varyingsphere space
+varying vec3 vUnitSamplePoint;
 
 uniform vec3 starColor;
 uniform float time;

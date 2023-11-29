@@ -4,7 +4,7 @@ precision highp float;
 #define POINTS_FROM_CAMERA 120// number sample points along camera ray
 #define OPTICAL_DEPTH_POINTS 120// number sample points along light ray
 
-in vec2 vUV;
+varying vec2 vUV;
 
 #pragma glslify: rotateAround = require('./rotateAround.glsl');
 
