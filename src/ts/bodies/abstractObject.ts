@@ -4,12 +4,13 @@ import { Scene } from "@babylonjs/core/scene";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { BaseObject, Common } from "./common";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { getRotationQuaternion, rotateAround, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
+import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import { OrbitalObject } from "../orbit/orbit";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { rotateVector3AroundInPlace } from "../utils/algebra";
 
 export abstract class AbstractObject implements OrbitalObject, BaseObject, Common {
     private readonly transform: TransformNode;
@@ -84,26 +85,35 @@ export abstract class AbstractObject implements OrbitalObject, BaseObject, Commo
         this.internalClock += deltaTime;
     }
 
+    public computeNextOrbitalPosition(deltaTime: number) {
+        if (this.model.orbit.period === 0 || this.parentObject === null) return this.transform.getAbsolutePosition();
+
+        const barycenter = this.parentObject.getTransform().getAbsolutePosition();
+
+        // enforce distance to orbit center
+        const oldPosition = this.transform.getAbsolutePosition().subtract(barycenter);
+        const newPosition = oldPosition.clone();
+
+        // rotate the object around the barycenter of the orbit, around the normal to the orbital plane
+        const dtheta = (2 * Math.PI * deltaTime) / this.model.orbit.period;
+        rotateVector3AroundInPlace(newPosition, barycenter, this.model.orbit.normalToPlane, dtheta);
+
+        newPosition.normalize().scaleInPlace(this.model.orbit.radius);
+
+        // enforce orbital plane
+        const correctionAxis = Vector3.Cross(this.model.orbit.normalToPlane, newPosition.normalizeToNew());
+        const correctionAngle = 0.5 * Math.PI - Vector3.GetAngleBetweenVectors(this.model.orbit.normalToPlane, newPosition.normalizeToNew(), correctionAxis);
+        newPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(correctionAxis, correctionAngle));
+
+        return newPosition.addInPlace(barycenter);
+    }
+
     public updateOrbitalPosition(deltaTime: number) {
-        if (this.model.orbit.period > 0 && this.parentObject !== null) {
-            const barycenter = this.parentObject.getTransform().getAbsolutePosition();
+        if (this.model.orbit.period === 0 || this.parentObject === null) return;
 
-            // rotate the object around the barycenter of the orbit, around the normal to the orbital plane
-            const dtheta = (2 * Math.PI * deltaTime) / this.model.orbit.period;
-            rotateAround(this.transform, barycenter, this.model.orbit.normalToPlane, dtheta);
-
-            // enforce distance to orbit center
-            const oldPosition = this.transform.getAbsolutePosition().subtract(barycenter);
-            const newPosition = oldPosition.normalizeToNew().scaleInPlace(this.model.orbit.radius);
-
-            // enforce orbital plane
-            const correctionAxis = Vector3.Cross(this.model.orbit.normalToPlane, newPosition.normalizeToNew());
-            const correctionAngle = 0.5 * Math.PI - Vector3.GetAngleBetweenVectors(this.model.orbit.normalToPlane, newPosition.normalizeToNew(), correctionAxis);
-            newPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(correctionAxis, correctionAngle));
-
-            // apply corrections
-            translate(this.transform, newPosition.subtract(oldPosition));
-        }
+        const oldPosition = this.transform.getAbsolutePosition();
+        const newPosition = this.computeNextOrbitalPosition(deltaTime);
+        translate(this.transform, newPosition.subtractInPlace(oldPosition));
     }
 
     public getDeltaTheta(deltaTime: number) {

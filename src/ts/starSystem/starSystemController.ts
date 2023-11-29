@@ -332,6 +332,7 @@ export class StarSystemController {
     /**
      * Updates the system and all its bodies forward in time by the given delta time
      * @param deltaTime The time elapsed since the last update
+     * @param chunkForge
      */
     public update(deltaTime: number, chunkForge: ChunkForge): void {
         const controller = this.scene.getActiveController();
@@ -344,11 +345,10 @@ export class StarSystemController {
         const shouldCompensateRotation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * 4;
 
         nearestBody.updateInternalClock(deltaTime);
-        const initialPosition = nearestBody.getTransform().getAbsolutePosition().clone();
-        nearestBody.updateOrbitalPosition(deltaTime);
-        const newPosition = nearestBody.getTransform().getAbsolutePosition().clone();
+        const initialPosition = nearestBody.getTransform().getAbsolutePosition();
+        const newPosition = nearestBody.computeNextOrbitalPosition(deltaTime);
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
-        if (shouldCompensateTranslation) translate(nearestBody.getTransform(), nearestBodyDisplacement.negate());
+        if (!shouldCompensateTranslation) translate(nearestBody.getTransform(), nearestBodyDisplacement);
 
         const dthetaNearest = nearestBody.getDeltaTheta(deltaTime);
 
