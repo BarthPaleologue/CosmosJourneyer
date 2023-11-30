@@ -1,9 +1,9 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { AbstractBody } from "../../../view/bodies/abstractBody";
+import { AbstractBody } from "../../../bodies/abstractBody";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { RingsPostProcess } from "../../../view/postProcesses/ringsPostProcess";
+import { RingsPostProcess } from "../../../postProcesses/rings/ringsPostProcess";
 
 export class RingsPanel extends EditorPanel {
     constructor() {

@@ -18,17 +18,18 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import "../styles/index.scss";
-import { Assets } from "./controller/assets";
+import { Assets } from "./assets";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
-import { Spaceship } from "./better_spaceship/spaceship";
-import { Keyboard } from "./controller/inputs/keyboard";
-import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
-import { TelluricPlanemo } from "./view/bodies/planemos/telluricPlanemo";
-import { UberScene } from "./controller/uberCore/uberScene";
+import { Spaceship } from "./spaceshipExtended/spaceship";
+import { TelluricPlanemoModel } from "./planemos/telluricPlanemo/telluricPlanemoModel";
+import { TelluricPlanemo } from "./planemos/telluricPlanemo/telluricPlanemo";
+import { UberScene } from "./uberCore/uberScene";
 import { Settings } from "./settings";
-import { StarModel } from "./model/stellarObjects/starModel";
-import { Star } from "./view/bodies/stellarObjects/star";
-import { translate } from "./controller/uberCore/transforms/basicTransform";
+import { translate } from "./uberCore/transforms/basicTransform";
+import { StarModel } from "./stellarObjects/star/starModel";
+import { Keyboard } from "./inputs/keyboard";
+import { Star } from "./stellarObjects/star/star";
+import { ChunkForge } from "./planemos/telluricPlanemo/terrain/chunks/chunkForge";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -62,6 +63,8 @@ hemiLight.intensity = 0.2;
 const shadowGenerator = new ShadowGenerator(1024, light);
 shadowGenerator.useBlurExponentialShadowMap = true;
 
+const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
+
 const keyboard = new Keyboard();
 
 const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, scene);
@@ -92,12 +95,12 @@ shadowGenerator.addShadowCaster(capsule);
 
 const auroraModel = new StarModel(984);
 const aurora = new Star("Aurora", scene, auroraModel);
-aurora.getTransform().setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10.0, 0));
+aurora.getTransform().setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10.0, aurora.getRadius() * 40.0));
 
 const newtonModel = new TelluricPlanemoModel(152);
 const newton = new TelluricPlanemo("newton", scene, newtonModel);
-newton.getTransform().setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
-newton.updateLOD(camera.globalPosition);
+newton.getTransform().setAbsolutePosition(new Vector3(0, -newtonModel.radius - 10e3, 0));
+newton.updateLOD(camera.globalPosition, chunkForge);
 
 const viewer = new PhysicsViewer();
 
@@ -128,6 +131,8 @@ function updateBeforeHavok() {
     const deltaTime = engine.getDeltaTime() / 1000;
     clockSeconds += deltaTime;
 
+    chunkForge.update();
+
     spaceship.update();
 
     for (const aggregate of fallingAggregates) {
@@ -147,12 +152,9 @@ function updateBeforeHavok() {
     // planet thingy
     newton.updateInternalClock(-deltaTime / 10);
     aurora.updateInternalClock(-deltaTime / 10);
-    /*newton.updateRotation(deltaTime / 10);
-newton.nextState.position = newton.transform.getAbsolutePosition();
-newton.applyNextState();*/
-    newton.updateLOD(camera.globalPosition);
+
+    newton.updateLOD(camera.globalPosition, chunkForge);
     newton.material.update(camera.globalPosition, [aurora]);
-    Assets.ChunkForge.update();
 }
 
 scene.executeWhenReady(() => {

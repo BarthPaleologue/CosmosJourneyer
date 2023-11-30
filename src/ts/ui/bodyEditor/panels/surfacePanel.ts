@@ -1,5 +1,5 @@
 import { EditorPanel } from "../editorPanel";
-import { TelluricPlanemo } from "../../../view/bodies/planemos/telluricPlanemo";
+import { TelluricPlanemo } from "../../../planemos/telluricPlanemo/telluricPlanemo";
 import { clearAllEventListenersById } from "../../../utils/html";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Slider } from "handle-sliderjs";

@@ -2,7 +2,7 @@ precision highp float;
 
 // based on https://www.shadertoy.com/view/tsc3Rj and https://www.shadertoy.com/view/wdjGWR
 
-in vec2 vUV;
+varying vec2 vUV;
 
 uniform float time;
 

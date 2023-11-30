@@ -1,11 +1,11 @@
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { AbstractObject } from "../view/bodies/abstractObject";
+import { AbstractObject } from "../bodies/abstractObject";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import cursorImage from "../../asset/textures/hoveredCircle.png";
 import { parseDistance } from "../utils/parseToStrings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { UberCamera } from "../controller/uberCore/uberCamera";
+import { UberCamera } from "../uberCore/uberCamera";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 
 export class ObjectOverlay {
@@ -73,7 +73,7 @@ export class ObjectOverlay {
         const distance = objectRay.length();
         objectRay.scaleInPlace(1 / distance);
 
-        if(Vector3.Dot(viewRay, objectRay) < 0) {
+        if (Vector3.Dot(viewRay, objectRay) < 0) {
             this.cursor.isVisible = false;
             this.textRoot.isVisible = false;
             return;
@@ -92,7 +92,7 @@ export class ObjectOverlay {
         const alphaCursor = 100 * Math.max(scale - screenRatio, 0.0);
         this.cursor.alpha = Math.min(alphaCursor, 0.5);
 
-        const alphaText = Math.max(0, (distance / (3 * this.object.getBoundingRadius())) - 1.0);
+        const alphaText = Math.max(0, distance / (3 * this.object.getBoundingRadius()) - 1.0);
         this.textRoot.alpha = alphaText;
 
         this.textRoot.linkOffsetXInPixels = 0.5 * Math.max(scale, screenRatio) * window.innerWidth + 75 + 20;

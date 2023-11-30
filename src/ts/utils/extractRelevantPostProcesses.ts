@@ -1,7 +1,7 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { ObjectPostProcess } from "../view/postProcesses/objectPostProcess";
+import { ObjectPostProcess } from "../postProcesses/objectPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
-import { AbstractObject } from "../view/bodies/abstractObject";
+import { AbstractObject } from "../bodies/abstractObject";
 
 export function extractRelevantPostProcesses(postProcesses: ObjectPostProcess[], body: AbstractObject): [ObjectPostProcess[], ObjectPostProcess[]] {
     const relevant = [];

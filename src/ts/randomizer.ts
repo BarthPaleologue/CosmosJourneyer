@@ -1,21 +1,22 @@
 import "../styles/index.scss";
-import { Keyboard } from "./controller/inputs/keyboard";
-import { Mouse } from "./controller/inputs/mouse";
-import { Gamepad } from "./controller/inputs/gamepad";
-import { StarSystem } from "./controller/starSystem";
+
+import { StarSystemController } from "./starSystem/starSystemController";
 
 import { randRange } from "extended-random";
 import { Settings } from "./settings";
-import { DefaultController } from "./spacelegs/defaultController";
+import { DefaultController } from "./defaultController/defaultController";
 import { positionNearObject } from "./utils/positionNearObject";
-import { SpaceEngine } from "./controller/spaceEngine";
+import { CosmosJourneyer } from "./cosmosJourneyer";
 import { BODY_TYPE } from "./model/common";
 import { ShipController } from "./spaceship/shipController";
 import { EditorVisibility } from "./ui/bodyEditor/bodyEditor";
-import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
+import { getRotationQuaternion, setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
+import { Mouse } from "./inputs/mouse";
+import { Keyboard } from "./inputs/keyboard";
+import { Gamepad } from "./inputs/gamepad";
 
-const engine = new SpaceEngine();
+const engine = new CosmosJourneyer();
 
 await engine.setup();
 
@@ -74,7 +75,7 @@ engine.onToggleStarMapObservable.add((isStarMapOpen) => {
 const urlParams = new URLSearchParams(window.location.search);
 const seed = urlParams.get("seed");
 
-const starSystem = new StarSystem(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0) * Number.MAX_SAFE_INTEGER, scene);
+const starSystem = new StarSystemController(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0) * Number.MAX_SAFE_INTEGER, scene);
 starSystemView.setStarSystem(starSystem, true);
 
 document.addEventListener("keydown", (e) => {

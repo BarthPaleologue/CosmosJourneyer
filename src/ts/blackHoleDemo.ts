@@ -1,20 +1,21 @@
 import "../styles/index.scss";
-import { Keyboard } from "./controller/inputs/keyboard";
-import { Mouse } from "./controller/inputs/mouse";
-import { Gamepad } from "./controller/inputs/gamepad";
-import { StarSystem } from "./controller/starSystem";
+
+import { StarSystemController } from "./starSystem/starSystemController";
 
 import { randRange } from "extended-random";
 import { Settings } from "./settings";
-import { DefaultController } from "./spacelegs/defaultController";
+import { DefaultController } from "./defaultController/defaultController";
 import { positionNearObject } from "./utils/positionNearObject";
-import { SpaceEngine } from "./controller/spaceEngine";
+import { CosmosJourneyer } from "./cosmosJourneyer";
 import { ShipController } from "./spaceship/shipController";
-import { getRotationQuaternion, setRotationQuaternion } from "./controller/uberCore/transforms/basicTransform";
+import { getRotationQuaternion, setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
-import { StarSystemHelper } from "./controller/starSystemHelper";
+import { StarSystemHelper } from "./starSystem/starSystemHelper";
+import { Mouse } from "./inputs/mouse";
+import { Keyboard } from "./inputs/keyboard";
+import { Gamepad } from "./inputs/gamepad";
 
-const engine = new SpaceEngine();
+const engine = new CosmosJourneyer();
 
 await engine.setup();
 
@@ -62,7 +63,7 @@ engine.registerStarSystemUpdateCallback(() => {
 });
 
 const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
-const starSystem = new StarSystem(starSystemSeed, scene);
+const starSystem = new StarSystemController(starSystemSeed, scene);
 starSystemView.setStarSystem(starSystem, false);
 
 const BH = StarSystemHelper.makeBlackHole(starSystem, 0);

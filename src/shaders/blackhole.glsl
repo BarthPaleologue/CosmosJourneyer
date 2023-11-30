@@ -4,7 +4,7 @@ precision highp float;
 
 #define DISK_STEPS 12.0//disk texture layers
 
-in vec2 vUV;
+varying vec2 vUV;
 
 uniform float time;
 

@@ -8,11 +8,11 @@ struct Star {
 };
 uniform Star stars[MAX_STARS];
 
-in vec3 vPositionW;
-in vec3 vNormalW;
-in vec3 vUnitSamplePoint;
+varying vec3 vPositionW;
+varying vec3 vNormalW;
+varying vec3 vUnitSamplePoint;
 
-in vec3 vPosition;// position of the vertex in sphere space
+varying vec3 vPosition;// position of the vertex varyingsphere space
 
 uniform vec3 playerPosition;// camera position in world space
 
@@ -76,7 +76,7 @@ void main() {
 
     specComp /= 2.0;
 
-    vec3 screenColor = color.rgb * (ndl + specComp * ndl);
+    vec3 finalColor = color.rgb * (ndl + specComp * ndl);
 
-    gl_FragColor = vec4(screenColor, 1.0);// apply color and lighting
+    gl_FragColor = vec4(finalColor, 1.0);
 }

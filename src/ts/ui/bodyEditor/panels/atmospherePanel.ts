@@ -1,10 +1,10 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanemo } from "../../../view/bodies/planemos/telluricPlanemo";
-import { GasPlanet } from "../../../view/bodies/planemos/gasPlanet";
+import { TelluricPlanemo } from "../../../planemos/telluricPlanemo/telluricPlanemo";
+import { GasPlanet } from "../../../planemos/gasPlanet/gasPlanet";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
-import { AtmosphericScatteringPostProcess } from "../../../view/postProcesses/atmosphericScatteringPostProcess";
+import { AtmosphericScatteringPostProcess } from "../../../postProcesses/atmosphericScatteringPostProcess";
 
 export class AtmospherePanel extends EditorPanel {
     constructor() {

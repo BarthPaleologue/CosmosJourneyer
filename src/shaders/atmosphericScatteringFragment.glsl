@@ -4,7 +4,7 @@ precision highp float;
 #define POINTS_FROM_CAMERA 12// number sample points along camera ray
 #define OPTICAL_DEPTH_POINTS 12// number sample points along light ray
 
-in vec2 vUV;// screen coordinates
+varying vec2 vUV;// screen coordinates
 
 // uniforms
 uniform sampler2D textureSampler;// the original screen texture

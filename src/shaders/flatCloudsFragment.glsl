@@ -1,10 +1,12 @@
 precision lowp float;
 
-in vec2 vUV;// screen coordinates
+varying vec2 vUV;// screen coordinates
 
 // uniforms
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
+
+uniform sampler2D lut;
 
 uniform int nbStars;// number of stars
 #pragma glslify: stars = require(./utils/stars.glsl)
@@ -33,10 +35,6 @@ uniform Clouds clouds;
 
 uniform float time;
 
-#pragma glslify: completeWorley = require(./utils/worley.glsl)
-
-#pragma glslify: completeNoise = require(./utils/noise.glsl)
-
 #pragma glslify: saturate = require(./utils/saturate.glsl)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
@@ -53,15 +51,17 @@ uniform float time;
 
 #pragma glslify: removeAxialTilt = require(./utils/removeAxialTilt.glsl)
 
+#pragma glslify: toUV = require(./utils/toUV.glsl)
+
 float cloudDensityAtPoint(vec3 samplePoint) {
     vec3 rotationAxisPlanetSpace = vec3(0.0, 1.0, 0.0);
 
     vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds.worleySpeed);
     vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds.detailSpeed);
 
-    float density = 1.0 - completeWorley(samplePointRotatedWorley * clouds.frequency, 1, 2.0, 2.0);
+    float density = 1.0 - texture2D(lut, toUV(samplePointRotatedWorley)).r;
 
-    density *= completeNoise(samplePointRotatedDetail * clouds.detailFrequency, 5, 2.0, 2.0);
+    density *= texture2D(lut, toUV(samplePointRotatedDetail)).g;
 
     float cloudThickness = 2.0;//TODO: make this a uniform
 
