@@ -1,8 +1,8 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanemo } from "../../../view/bodies/planemos/telluricPlanemo";
+import { TelluricPlanemo } from "../../../planemos/telluricPlanemo/telluricPlanemo";
 import { Slider } from "handle-sliderjs";
-import { OceanPostProcess } from "../../../view/postProcesses/oceanPostProcess";
+import { OceanPostProcess } from "../../../postProcesses/oceanPostProcess";
 
 export class OceanPanel extends EditorPanel {
     constructor() {

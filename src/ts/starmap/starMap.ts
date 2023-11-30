@@ -1,15 +1,12 @@
-import { PlayerController } from "../spacelegs/playerController";
-import { Keyboard } from "../controller/inputs/keyboard";
+import { DefaultController } from "../defaultController/defaultController";
 
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
-import { StarSystemModel } from "../model/starSystemModel";
-import { StarModel } from "../model/stellarObjects/starModel";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 import { BuildData, Cell, Vector3ToString } from "./cell";
-import { BlackHoleModel } from "../model/stellarObjects/blackHoleModel";
 import { StarMapUI } from "./starMapUI";
-import { getStellarTypeString } from "../model/stellarObjects/common";
+import { getStellarTypeString } from "../stellarObjects/common";
 import { BODY_TYPE } from "../model/common";
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -26,20 +23,22 @@ import { Animation } from "@babylonjs/core/Animations/animation";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Culling/ray";
-import { TransformRotationAnimation } from "../controller/uberCore/transforms/animations/rotation";
-import { TransformTranslationAnimation } from "../controller/uberCore/transforms/animations/translation";
+import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
+import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { makeNoise3D } from "fast-simplex-noise";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { Settings } from "../settings";
-import { getForwardDirection, translate } from "../controller/uberCore/transforms/basicTransform";
+import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { Keyboard } from "../inputs/keyboard";
+import { Mouse } from "../inputs/mouse";
+import { StarModel } from "../stellarObjects/star/starModel";
+import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 
 export class StarMap {
     readonly scene: Scene;
-    private readonly controller: PlayerController;
-
-    private isRunning = true;
+    private readonly controller: DefaultController;
 
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
@@ -60,7 +59,6 @@ export class StarMap {
     private readonly recycledBlackHoles: InstancedMesh[] = [];
 
     static readonly GENERATION_CADENCE = 100;
-    static readonly DELETION_CADENCE = 100;
 
     static readonly RENDER_RADIUS = 6;
 
@@ -84,6 +82,10 @@ export class StarMap {
      */
     private currentCellPosition = Vector3.Zero();
 
+    private cameraPositionToCenter = Vector3.Zero();
+
+    private static readonly FLOATING_ORIGIN_MAX_DISTANCE = 1000;
+
     private static readonly FADE_OUT_ANIMATION = new Animation("fadeIn", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
     private static readonly FADE_OUT_DURATION = 1000;
 
@@ -102,12 +104,13 @@ export class StarMap {
         this.scene.skipPointerMovePicking = false;
         this.scene.useRightHandedSystem = true;
 
-        this.controller = new PlayerController(this.scene);
+        this.controller = new DefaultController(this.scene);
         this.controller.speed /= 10;
         this.controller.getActiveCamera().minZ = 0.01;
 
         this.scene.activeCamera = this.controller.getActiveCamera();
         this.controller.addInput(new Keyboard());
+        this.controller.addInput(new Mouse(engine.getRenderingCanvas() as HTMLCanvasElement, 0));
 
         this.starMapUI = new StarMapUI(this.scene);
 
@@ -203,7 +206,7 @@ export class StarMap {
         this.travelLine = new ThickLines("travelLine", { points: [], thickness: 0.01, color: Color3.Red() }, this.scene);
         this.thickLines = [this.travelLine];
 
-        // then generate missing cells // TODO: make this in parralel
+        // then generate missing cells // TODO: make this in parallel
         for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
             for (let y = -StarMap.RENDER_RADIUS; y <= StarMap.RENDER_RADIUS; y++) {
                 for (let z = -StarMap.RENDER_RADIUS; z <= StarMap.RENDER_RADIUS; z++) {
@@ -221,42 +224,36 @@ export class StarMap {
         this.densityRNG = (x: number, y: number, z: number) => (1.0 - Math.abs(perlinRNG(x * 0.2, y * 0.2, z * 0.2))) ** 8;
 
         this.scene.onBeforeRenderObservable.add(() => {
-            if(!this.isRunning) return;
-
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
             if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaTime);
+            if (this.translationAnimation !== null) this.translationAnimation.update(deltaTime);
 
-            const playerDisplacementNegated = this.controller.update(deltaTime).negate();
+            this.controller.update(deltaTime);
 
-            this.controller.getTransform().position = Vector3.Zero();
+            this.cameraPositionToCenter = this.controller.getActiveCamera().getAbsolutePosition().subtract(this.starMapCenterPosition);
 
-            if (this.translationAnimation !== null) {
-                const oldPosition = this.controller.getTransform().getAbsolutePosition().clone();
-                this.translationAnimation.update(deltaTime);
-                const newPosition = this.controller.getTransform().getAbsolutePosition().clone();
-
-                const displacementNegated = oldPosition.subtractInPlace(newPosition);
-
-                translate(this.controller.getTransform(), displacementNegated);
-                playerDisplacementNegated.addInPlace(displacementNegated);
-            }
-
-            this.starMapCenterPosition.addInPlace(playerDisplacementNegated);
-            for (const mesh of this.scene.meshes) mesh.position.addInPlace(playerDisplacementNegated);
-
-            const cameraPosition = this.starMapCenterPosition.negate();
-
-            this.currentCellPosition = new Vector3(Math.round(cameraPosition.x / Cell.SIZE), Math.round(cameraPosition.y / Cell.SIZE), Math.round(cameraPosition.z / Cell.SIZE));
+            this.currentCellPosition = new Vector3(
+                Math.round(this.cameraPositionToCenter.x / Cell.SIZE),
+                Math.round(this.cameraPositionToCenter.y / Cell.SIZE),
+                Math.round(this.cameraPositionToCenter.z / Cell.SIZE)
+            );
 
             this.updateCells();
+
+            if (this.controller.getActiveCamera().getAbsolutePosition().length() > StarMap.FLOATING_ORIGIN_MAX_DISTANCE) {
+                this.translateCameraBackToOrigin();
+            }
 
             this.thickLines.forEach((bondingLine) => bondingLine.update());
         });
     }
 
-    public setRunning(running: boolean): void {
-        this.isRunning = running;
+    public translateCameraBackToOrigin() {
+        const translationToOrigin = this.controller.getTransform().getAbsolutePosition().negate();
+        this.controller.getTransform().position = Vector3.Zero();
+        this.starMapCenterPosition.addInPlace(translationToOrigin);
+        for (const mesh of this.scene.meshes) mesh.position.addInPlace(translationToOrigin);
     }
 
     private dispatchWarpCallbacks() {
@@ -283,7 +280,7 @@ export class StarMap {
             if (selectedSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove cells that contain the selected system
 
             const position = cell.position;
-            if (position.add(this.starMapCenterPosition).length() > StarMap.RENDER_RADIUS + 1) {
+            if (position.subtract(this.cameraPositionToCenter).length() > StarMap.RENDER_RADIUS + 1) {
                 for (const starInstance of cell.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
                 for (const blackHoleInstance of cell.blackHoleInstances) this.fadeOutThenRecycle(blackHoleInstance, this.recycledBlackHoles);
 
@@ -307,7 +304,7 @@ export class StarMap {
 
         this.buildNextStars(Math.min(2000, StarMap.GENERATION_CADENCE * this.controller.speed));
 
-        this.starMapUI.update();
+        this.starMapUI.update(this.controller.getActiveCamera());
     }
 
     private buildNextStars(n: number): void {

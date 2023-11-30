@@ -1,16 +1,9 @@
-import { Input, InputType } from "../controller/inputs/input";
-import { UberCamera } from "../controller/uberCore/uberCamera";
-import { AbstractController } from "../controller/uberCore/abstractController";
-import { Assets } from "../controller/assets";
-import { Keyboard } from "../controller/inputs/keyboard";
-import { UberOrbitCamera } from "../controller/uberCore/uberOrbitCamera";
-import { Mouse } from "../controller/inputs/mouse";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { MainThruster } from "./mainThruster";
 import { ReadonlyWarpDrive, WarpDrive } from "./warpDrive";
-import { LOCAL_DIRECTION } from "../controller/uberCore/localDirections";
+import { LOCAL_DIRECTION } from "../uberCore/localDirections";
 import { RCSThruster } from "./rcsThruster";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { IPhysicsCollisionEvent, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
@@ -20,8 +13,15 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
-import { getForwardDirection, pitch, roll, translate } from "../controller/uberCore/transforms/basicTransform";
+import { getForwardDirection, pitch, roll, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import { AbstractController } from "../uberCore/abstractController";
+import { UberOrbitCamera } from "../uberCore/uberOrbitCamera";
+import { UberCamera } from "../uberCore/uberCamera";
+import { Assets } from "../assets";
+import { Input, InputType } from "../inputs/input";
+import { Keyboard } from "../inputs/keyboard";
+import { Mouse } from "../inputs/mouse";
 
 export class ShipController extends AbstractController {
     readonly instanceRoot: AbstractMesh;
@@ -57,7 +57,7 @@ export class ShipController extends AbstractController {
         this.firstPersonCamera.parent = this.instanceRoot;
         this.firstPersonCamera.position = new Vector3(0, 1, 0);
 
-        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 1.4);
+        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 3.14 / 2);
         this.thirdPersonCamera.parent = this.instanceRoot;
 
         this.aggregate = new PhysicsAggregate(this.instanceRoot, PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
@@ -195,6 +195,8 @@ export class ShipController extends AbstractController {
 
                     rcsThruster.setThrottle(throttle);
                 }
+
+                mouse.reset();
             }
         } else {
             if (input.type === InputType.MOUSE) {
@@ -204,6 +206,8 @@ export class ShipController extends AbstractController {
 
                 roll(this.aggregate.transformNode, rollContribution * deltaTime);
                 pitch(this.aggregate.transformNode, pitchContribution * deltaTime);
+
+                mouse.reset();
             }
 
             if (input.type === InputType.KEYBOARD) {

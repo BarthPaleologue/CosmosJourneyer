@@ -13,7 +13,9 @@ const config = {
         showcase: "./src/ts/index.ts",
         random: "./src/ts/randomizer.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
-        playground: "./src/ts/playground.ts"
+        playground: "./src/ts/playground.ts",
+        planetWalk: "./src/ts/planetWalk.ts",
+        debugAssets: "./src/ts/debugAssets.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist")
@@ -52,6 +54,18 @@ const config = {
             filename: "playground.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["playground"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "Planet Walk",
+            filename: "planetwalk.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["planetWalk"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "Debug Texture",
+            filename: "debugassets.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["debugAssets"]
         }),
         new MiniCssExtractPlugin()
     ],

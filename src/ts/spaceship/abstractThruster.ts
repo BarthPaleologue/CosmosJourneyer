@@ -4,8 +4,8 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { AbstractMesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { getDownwardDirection } from "../controller/uberCore/transforms/basicTransform";
-import { LOCAL_DIRECTION } from "../controller/uberCore/localDirections";
+import { getDownwardDirection } from "../uberCore/transforms/basicTransform";
+import { LOCAL_DIRECTION } from "../uberCore/localDirections";
 
 export abstract class AbstractThruster {
     readonly mesh: AbstractMesh;
@@ -38,7 +38,6 @@ export abstract class AbstractThruster {
         const cubeMaterial = new StandardMaterial("cubeMat", mesh.getScene());
         cubeMaterial.diffuseColor = Color3.White();
         cubeMaterial.emissiveColor = Color3.White();
-        cubeMaterial.useLogarithmicDepth = true;
         thrusterHelper.material = cubeMaterial;
         thrusterHelper.parent = mesh;
 

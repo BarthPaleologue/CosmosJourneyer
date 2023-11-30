@@ -18,14 +18,18 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import "../styles/index.scss";
-import { Assets } from "./controller/assets";
+import { Assets } from "./assets";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
-import { Spaceship } from "./better_spaceship/spaceship";
-import { Keyboard } from "./controller/inputs/keyboard";
-import { TelluricPlanemoModel } from "./model/planemos/telluricPlanemoModel";
-import { TelluricPlanemo } from "./view/bodies/planemos/telluricPlanemo";
-import { UberScene } from "./controller/uberCore/uberScene";
+import { Spaceship } from "./spaceshipExtended/spaceship";
+import { TelluricPlanemoModel } from "./planemos/telluricPlanemo/telluricPlanemoModel";
+import { TelluricPlanemo } from "./planemos/telluricPlanemo/telluricPlanemo";
+import { UberScene } from "./uberCore/uberScene";
 import { Settings } from "./settings";
+import { translate } from "./uberCore/transforms/basicTransform";
+import { StarModel } from "./stellarObjects/star/starModel";
+import { Keyboard } from "./inputs/keyboard";
+import { Star } from "./stellarObjects/star/star";
+import { ChunkForge } from "./planemos/telluricPlanemo/terrain/chunks/chunkForge";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -59,6 +63,8 @@ hemiLight.intensity = 0.2;
 const shadowGenerator = new ShadowGenerator(1024, light);
 shadowGenerator.useBlurExponentialShadowMap = true;
 
+const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
+
 const keyboard = new Keyboard();
 
 const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, scene);
@@ -87,10 +93,14 @@ capsule.material = Assets.DebugMaterial("capsule", true);
 capsule.visibility = 0.5;
 shadowGenerator.addShadowCaster(capsule);
 
+const auroraModel = new StarModel(984);
+const aurora = new Star("Aurora", scene, auroraModel);
+aurora.getTransform().setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10.0, aurora.getRadius() * 40.0));
+
 const newtonModel = new TelluricPlanemoModel(152);
 const newton = new TelluricPlanemo("newton", scene, newtonModel);
-newton.transform.setAbsolutePosition(new Vector3(0, -newtonModel.radius - 11.18e3, 0));
-newton.updateLOD(camera.globalPosition);
+newton.getTransform().setAbsolutePosition(new Vector3(0, -newtonModel.radius - 10e3, 0));
+newton.updateLOD(camera.globalPosition, chunkForge);
 
 const viewer = new PhysicsViewer();
 
@@ -107,12 +117,12 @@ const aggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.g
 for (const aggregate of aggregates) {
     aggregate.body.disablePreStep = false;
 }
-const meshes = [sphere, box, capsule, spaceship.instanceRoot, newton.transform];
+const meshes = [sphere, box, capsule, spaceship.instanceRoot, newton.getTransform()];
 
 const fallingAggregates = [sphereAggregate, boxAggregate, capsuleAggregate, spaceship.getAggregate()];
 viewer.showBody(spaceship.getAggregate().body);
 
-const gravityOrigin = newton.transform.getAbsolutePosition();
+const gravityOrigin = newton.getTransform().getAbsolutePosition();
 const gravity = -9.81;
 
 let clockSeconds = 0;
@@ -120,6 +130,8 @@ let clockSeconds = 0;
 function updateBeforeHavok() {
     const deltaTime = engine.getDeltaTime() / 1000;
     clockSeconds += deltaTime;
+
+    chunkForge.update();
 
     spaceship.update();
 
@@ -130,27 +142,23 @@ function updateBeforeHavok() {
         aggregate.body.applyForce(gravityDirection.scaleInPlace(gravity * mass), aggregate.body.getObjectCenterWorld());
     }
 
+    if (spaceship.getAggregate().transformNode.getAbsolutePosition().length() > 100) {
+        const displacement = spaceship.getAggregate().transformNode.getAbsolutePosition().negate();
+        for (const mesh of meshes) {
+            translate(mesh, displacement);
+        }
+    }
+
     // planet thingy
     newton.updateInternalClock(-deltaTime / 10);
-    /*newton.updateRotation(deltaTime / 10);
-    newton.nextState.position = newton.transform.getAbsolutePosition();
-    newton.applyNextState();*/
-    newton.updateLOD(camera.globalPosition);
-    newton.material.update(camera.globalPosition, [light.getAbsolutePosition()]);
-    Assets.ChunkForge.update();
-}
+    aurora.updateInternalClock(-deltaTime / 10);
 
-function updateAfterHavok() {
-    const spaceshipPosition = spaceship.getAbsolutePosition();
-
-    for (const mesh of meshes) {
-        mesh.position.subtractInPlace(spaceshipPosition);
-    }
+    newton.updateLOD(camera.globalPosition, chunkForge);
+    newton.material.update(camera.globalPosition, [aurora]);
 }
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
-    scene.onAfterPhysicsObservable.add(updateAfterHavok);
     scene.onBeforePhysicsObservable.add(updateBeforeHavok);
     engine.runRenderLoop(() => scene.render());
 });

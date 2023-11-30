@@ -1,6 +1,6 @@
 import { Slider } from "handle-sliderjs";
-import { AbstractBody } from "../../view/bodies/abstractBody";
-import { UberScene } from "../../controller/uberCore/uberScene";
+import { AbstractBody } from "../../bodies/abstractBody";
+import { UberScene } from "../../uberCore/uberScene";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 
 export abstract class EditorPanel {

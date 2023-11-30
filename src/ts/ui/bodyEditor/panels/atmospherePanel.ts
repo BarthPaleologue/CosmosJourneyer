@@ -1,10 +1,10 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanemo } from "../../../view/bodies/planemos/telluricPlanemo";
-import { GasPlanet } from "../../../view/bodies/planemos/gasPlanet";
+import { TelluricPlanemo } from "../../../planemos/telluricPlanemo/telluricPlanemo";
+import { GasPlanet } from "../../../planemos/gasPlanet/gasPlanet";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
-import { AtmosphericScatteringPostProcess } from "../../../view/postProcesses/atmosphericScatteringPostProcess";
+import { AtmosphericScatteringPostProcess } from "../../../postProcesses/atmosphericScatteringPostProcess";
 
 export class AtmospherePanel extends EditorPanel {
     constructor() {
@@ -36,9 +36,16 @@ export class AtmospherePanel extends EditorPanel {
                     atmosphere.atmosphereUniforms.atmosphereRadius = planet.getRadius() + val * 10000;
                 }
             ),
-            new Slider("rayleighStrength", document.getElementById("rayleighStrength") as HTMLElement, 0, 40, atmosphere.atmosphereUniforms.rayleighStrength * 10, (val: number) => {
-                atmosphere.atmosphereUniforms.rayleighStrength = val / 10;
-            }),
+            new Slider(
+                "rayleighStrength",
+                document.getElementById("rayleighStrength") as HTMLElement,
+                0,
+                40,
+                atmosphere.atmosphereUniforms.rayleighStrength * 10,
+                (val: number) => {
+                    atmosphere.atmosphereUniforms.rayleighStrength = val / 10;
+                }
+            ),
             new Slider("mieStrength", document.getElementById("mieStrength") as HTMLElement, 0, 40, atmosphere.atmosphereUniforms.mieStrength * 10, (val: number) => {
                 atmosphere.atmosphereUniforms.mieStrength = val / 10;
             }),

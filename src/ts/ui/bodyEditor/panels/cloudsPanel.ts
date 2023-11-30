@@ -1,10 +1,10 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanemo } from "../../../view/bodies/planemos/telluricPlanemo";
+import { TelluricPlanemo } from "../../../planemos/telluricPlanemo/telluricPlanemo";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { CloudsPostProcess } from "../../../view/postProcesses/volumetricCloudsPostProcess";
+import { CloudsPostProcess } from "../../../postProcesses/volumetricCloudsPostProcess";
 
 export class CloudsPanel extends EditorPanel {
     constructor() {

@@ -1,23 +1,19 @@
 precision lowp float;
 
-in vec2 vUV;// screen coordinates
+varying vec2 vUV;// screen coordinates
 
 // uniforms
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
-#define MAX_STARS 5
+uniform sampler2D lut;
+
 uniform int nbStars;// number of stars
-struct Star {
-    vec3 position;
-};
-uniform Star stars[MAX_STARS];
+#pragma glslify: stars = require(./utils/stars.glsl)
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
 #pragma glslify: object = require(./utils/object.glsl)
-
-uniform vec4 planetInverseRotationQuaternion;
 
 struct Clouds {
     float layerRadius;// atmosphere radius (calculate from planet center)
@@ -39,10 +35,6 @@ uniform Clouds clouds;
 
 uniform float time;
 
-#pragma glslify: completeWorley = require(./utils/worley.glsl)
-
-#pragma glslify: completeNoise = require(./utils/noise.glsl)
-
 #pragma glslify: saturate = require(./utils/saturate.glsl)
 
 #pragma glslify: remap = require(./utils/remap.glsl)
@@ -59,15 +51,17 @@ uniform float time;
 
 #pragma glslify: removeAxialTilt = require(./utils/removeAxialTilt.glsl)
 
+#pragma glslify: toUV = require(./utils/toUV.glsl)
+
 float cloudDensityAtPoint(vec3 samplePoint) {
     vec3 rotationAxisPlanetSpace = vec3(0.0, 1.0, 0.0);
 
     vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds.worleySpeed);
     vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds.detailSpeed);
 
-    float density = 1.0 - completeWorley(samplePointRotatedWorley * clouds.frequency, 1, 2.0, 2.0);
+    float density = 1.0 - texture2D(lut, toUV(samplePointRotatedWorley)).r;
 
-    density *= completeNoise(samplePointRotatedDetail * clouds.detailFrequency, 5, 2.0, 2.0);
+    density *= texture2D(lut, toUV(samplePointRotatedDetail)).g;
 
     float cloudThickness = 2.0;//TODO: make this a uniform
 
@@ -149,10 +143,11 @@ void main() {
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
 
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
-    float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
+    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
 
     vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
+
+    vec3 closestPoint = camera.position + rayDir * maximumDistance;
 
     vec4 finalColor = screenColor;
     if (length(closestPoint - object.position) < clouds.layerRadius) finalColor.rgb *= cloudShadows(closestPoint);

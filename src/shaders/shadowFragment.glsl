@@ -1,16 +1,14 @@
 precision lowp float;
 
-in vec2 vUV;// screen coordinates
+varying vec2 vUV;// screen coordinates
 
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
-#define MAX_STARS 5
+uniform sampler2D ringsLUT;
+
 uniform int nbStars;// number of stars
-struct Star {
-    vec3 position;
-};
-uniform Star stars[MAX_STARS];
+#pragma glslify: stars = require(./utils/stars.glsl)
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
@@ -33,9 +31,13 @@ uniform ShadowUniforms shadowUniforms;
 
 #pragma glslify: rayIntersectsPlane = require(./utils/rayIntersectsPlane.glsl)
 
-#pragma glslify: ringDensityAtPoint = require(./rings/ringsDensity.glsl, object=object, rings=rings)
+#pragma glslify: ringDensityAtPoint = require(./rings/ringsDensity.glsl, object=object, rings=rings, ringsLUT=ringsLUT)
 
 float sphereOccultation(vec3 rayDir, float maximumDistance) {
+    if(length(camera.position + rayDir * maximumDistance - stars[0].position) <= stars[0].radius + 1.0) {
+        // The point is on the surface of the star
+        return 1.0;
+    }
     vec3 towardLight = normalize(stars[0].position - (camera.position + rayDir * maximumDistance));
     float t0, t1;
     if (lineIntersectSphere(camera.position + rayDir * maximumDistance, towardLight, object.position, object.radius, t0, t1)) {
@@ -50,13 +52,17 @@ float sphereOccultation(vec3 rayDir, float maximumDistance) {
     return 1.0;
 }
 
-float ringOccultation(vec3 samplePoint) {
+float ringOccultation(vec3 rayDir, float maximumDistance) {
+    if (!shadowUniforms.hasRings) {
+        return 1.0;
+    }
+
     float accDensity = 0.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 towardLight = normalize(stars[i].position - samplePoint);
+        vec3 towardLight = normalize(stars[i].position - (camera.position + rayDir * maximumDistance));
         float t2;
-        if (rayIntersectsPlane(samplePoint, towardLight, object.position, object.rotationAxis, 0.001, t2)) {
-            vec3 shadowSamplePoint = samplePoint + t2 * towardLight;
+        if (rayIntersectsPlane(camera.position + rayDir * maximumDistance, towardLight, object.position, object.rotationAxis, 0.001, t2)) {
+            vec3 shadowSamplePoint = camera.position + rayDir * maximumDistance + t2 * towardLight;
             accDensity += ringDensityAtPoint(shadowSamplePoint) * rings.opacity;
         }
     }
@@ -71,8 +77,7 @@ void main() {
     vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
 
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPoint = (pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
-    float maximumDistance = length(closestPoint);// the maxium ray length due to occlusion
+    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
 
     vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 
@@ -84,10 +89,12 @@ void main() {
         float sphereShadow = sphereOccultation(rayDir, maximumDistance);
 
         // maybe it is in the shadow of the rings
-        float ringShadow = ringOccultation(closestPoint);
+        float ringShadow = ringOccultation(rayDir, maximumDistance);
 
         finalColor.rgb *= min(sphereShadow, ringShadow);
     }
+
+    //finalColor.rgb = vec3(texture2D(ringsLUT, vUV).r);
 
     gl_FragColor = finalColor;// displaying the final color
 }

@@ -1,11 +1,13 @@
 precision lowp float;
 
-in vec2 vUV;// screen coordinates
+varying vec2 vUV;// screen coordinates
 
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform sampler2D starfieldTexture;// the starfield texture
+
+uniform mat4 starfieldRotation;
 
 #pragma glslify: camera = require(./utils/camera.glsl)
 
@@ -22,6 +24,8 @@ void main() {
 
     vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
 
+    rayDir = vec3(starfieldRotation * vec4(rayDir, 1.0));
+
     vec4 finalColor = screenColor;
 
     if (screenColor == vec4(0.0)) {
@@ -32,6 +36,7 @@ void main() {
         acos(rayDir.y) / 3.14159265359
         );
         vec4 starfieldColor = texture2D(starfieldTexture, starfieldUV);
+        starfieldColor.rgb = pow(starfieldColor.rgb, vec3(2.2)); // deeper blacks
         finalColor = vec4(starfieldColor.rgb * visibility, starfieldColor.a);
     }
 

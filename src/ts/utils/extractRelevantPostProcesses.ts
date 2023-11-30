@@ -1,9 +1,9 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { AbstractBody } from "../view/bodies/abstractBody";
-import { ObjectPostProcess } from "../view/postProcesses/objectPostProcess";
+import { ObjectPostProcess } from "../postProcesses/objectPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
+import { AbstractObject } from "../bodies/abstractObject";
 
-export function extractRelevantPostProcesses(postProcesses: ObjectPostProcess[], body: AbstractBody): [ObjectPostProcess[], ObjectPostProcess[]] {
+export function extractRelevantPostProcesses(postProcesses: ObjectPostProcess[], body: AbstractObject): [ObjectPostProcess[], ObjectPostProcess[]] {
     const relevant = [];
     const notRelevant = [];
     for (const postProcess of postProcesses) {
@@ -13,7 +13,7 @@ export function extractRelevantPostProcesses(postProcesses: ObjectPostProcess[],
     return [relevant, notRelevant];
 }
 
-export function makeSplitRenderEffects(name: string, body: AbstractBody, postProcesses: ObjectPostProcess[], engine: Engine): [PostProcessRenderEffect, PostProcessRenderEffect] {
+export function makeSplitRenderEffects(name: string, body: AbstractObject, postProcesses: ObjectPostProcess[], engine: Engine): [PostProcessRenderEffect, PostProcessRenderEffect] {
     const [bodyRings, otherRings] = extractRelevantPostProcesses(postProcesses, body);
     const otherRingsRenderEffect = new PostProcessRenderEffect(engine, `other${name}RenderEffect`, () => {
         return otherRings;
