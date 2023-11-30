@@ -90,14 +90,14 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
         rayIntersectSphere(samplePoint, starDir, object.position, atmosphere.radius, _, t1);
         float sunRayLengthInAtm = t1;
 
-        /*float height = length(samplePoint - object.position);
+        float height = length(samplePoint - object.position);
         float heightAboveSurface = height - object.radius;
         float height01 = heightAboveSurface / (atmosphere.radius - object.radius);// normalized height between 0 and 1
         vec3 planetNormal = normalize(samplePoint - object.position);
-        float costheta = -dot(starDir, planetNormal) * 0.99;
-        float lutx = (costheta + 1.0) / 2.0;
-        vec2 sunRayOpticalDepth = 1e5 * ((1.0 / (texture2D(atmosphereLUT, vec2(lutx, height01)).rg)) - 1.0);*/
-        vec2 sunRayOpticalDepth = opticalDepth(samplePoint, starDir, sunRayLengthInAtm);// scattered from the sun to the point
+        float costheta = dot(starDir, planetNormal) * 0.99;
+        float lutx = costheta * 0.5 + 0.5;
+        vec2 sunRayOpticalDepth = 1e5 * ((1.0 / texture2D(atmosphereLUT, vec2(lutx, height01)).rg) - 1.0);
+        //vec2 sunRayOpticalDepth = opticalDepth(samplePoint, starDir, sunRayLengthInAtm);// scattered from the sun to the point
 
         /*float costheta2 = dot(-rayDir, planetNormal) * 0.99;
         float lutx2 = (costheta2 + 1.0) / 2.0;

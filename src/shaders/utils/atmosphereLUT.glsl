@@ -13,7 +13,7 @@ in vec2 vUV;
 
 const float EARTH_RADIUS = 1000e3;
 const float ATMOSPHERE_RADIUS = 100e3;
-const vec3 SUN_DIR = vec3(0.0, -1.0, 0.0);
+const vec3 SUN_DIR = vec3(0.0, 1.0, 0.0);
 
 struct Object {
     float radius;
