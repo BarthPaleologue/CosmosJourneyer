@@ -77,6 +77,6 @@ void main() {
     specComp /= 2.0;
 
     vec3 finalColor = color.rgb * (ndl + specComp * ndl);
-    
+
     gl_FragColor = vec4(finalColor, 1.0);
 }

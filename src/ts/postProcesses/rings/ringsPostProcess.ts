@@ -6,8 +6,11 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { ObjectPostProcess } from "../objectPostProcess";
 import { StellarObject } from "../../stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { ShaderUniforms } from "../../uberCore/postProcesses/types";
+import { SamplerEnumType, ShaderSamplers, ShaderUniforms } from "../../uberCore/postProcesses/types";
 import { RingsUniforms } from "./ringsUniform";
+import { Scene } from "@babylonjs/core/scene";
+import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+import ringsLUT from "../../../shaders/textures/ringsLUT.glsl";
 
 const shaderName = "rings";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -15,6 +18,7 @@ Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
 export class RingsPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly ringsUniforms: RingsUniforms;
     readonly object: AbstractBody;
+    readonly lut: ProceduralTexture;
 
     constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
         const ringsUniforms = body.model.ringsUniforms;
@@ -29,9 +33,50 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             ...ringsUniforms.getShaderUniforms()
         ];
 
-        super(body.name + "Rings", shaderName, uniforms, getSamplers(scene), scene);
+        const lut = RingsPostProcess.CreateLUT(body.model.seed, ringsUniforms.ringStart, ringsUniforms.ringEnd, ringsUniforms.ringFrequency, scene);
+
+        const samplers: ShaderSamplers = [
+            ...getSamplers(scene),
+            {
+                name: "ringsLUT",
+                type: SamplerEnumType.Texture,
+                get: () => {
+                    //console.log(scene.isReady());
+                    return this.lut;
+                }
+            }
+        ];
+
+        super(body.name + "Rings", shaderName, uniforms, samplers, scene);
 
         this.object = body;
         this.ringsUniforms = ringsUniforms;
+        this.lut = lut;
+    }
+
+    static CreateLUT(seed: number, ringStart: number, ringEnd: number, frequency: number, scene: Scene): ProceduralTexture {
+        const lut = new ProceduralTexture(
+            "ringsLUT",
+            {
+                width: 4096,
+                height: 1
+            },
+            { fragmentSource: ringsLUT },
+            scene,
+            undefined,
+            false,
+            false
+        );
+        lut.setFloat("seed", seed);
+        lut.setFloat("frequency", frequency);
+        lut.setFloat("ringStart", ringStart);
+        lut.setFloat("ringEnd", ringEnd);
+        lut.refreshRate = 0;
+
+        lut.onBeforeGenerationObservable.add(() => {
+           console.log("ringsLUT");
+        });
+
+        return lut;
     }
 }

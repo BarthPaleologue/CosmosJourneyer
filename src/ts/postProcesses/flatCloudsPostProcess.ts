@@ -157,7 +157,7 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
     }
 
     static CreateLUT(worleyFrequency: number, detailFrequency: number, scene: Scene): ProceduralTexture {
-        const lut = new ProceduralTexture("flatCloudLUT", 1000, { fragmentSource: flatCloudLUT }, scene, undefined, false, false);
+        const lut = new ProceduralTexture("flatCloudLUT", 2048, { fragmentSource: flatCloudLUT }, scene, undefined, false, false);
         lut.setFloat("worleyFrequency", worleyFrequency);
         lut.setFloat("detailFrequency", detailFrequency);
         lut.refreshRate = 0;

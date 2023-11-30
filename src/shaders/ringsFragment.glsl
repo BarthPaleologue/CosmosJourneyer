@@ -5,6 +5,8 @@ varying vec2 vUV;// screen coordinates
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
+uniform sampler2D ringsLUT;
+
 uniform int nbStars;// number of stars
 #pragma glslify: stars = require(./utils/stars.glsl)
 
@@ -22,7 +24,7 @@ uniform int nbStars;// number of stars
 
 #pragma glslify: rayIntersectsPlane = require(./utils/rayIntersectsPlane.glsl)
 
-#pragma glslify: ringDensityAtPoint = require(./rings/ringsDensity.glsl, object=object, rings=rings)
+#pragma glslify: ringDensityAtPoint = require(./rings/ringsDensity.glsl, object=object, rings=rings, ringsLUT=ringsLUT)
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
@@ -66,6 +68,8 @@ void main() {
             }
         }
     }
+
+    //finalColor.rgb = vec3(texture2D(ringsLUT, vUV).r);
 
     gl_FragColor = finalColor;// displaying the final color
 }

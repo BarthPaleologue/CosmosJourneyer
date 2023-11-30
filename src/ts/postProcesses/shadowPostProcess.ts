@@ -6,9 +6,10 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { ObjectPostProcess } from "./objectPostProcess";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
+import { SamplerEnumType, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { PostProcessType } from "./postProcessTypes";
 import { RingsUniforms } from "./rings/ringsUniform";
+import { RingsPostProcess } from "./rings/ringsPostProcess";
 
 const shaderName = "shadow";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
@@ -56,10 +57,23 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
             }
         ];
 
-        const ringsUniforms = body.model.ringsUniforms as RingsUniforms;
-        if (shadowUniforms.hasRings) uniforms.push(...ringsUniforms.getShaderUniforms());
+        const samplers = getSamplers(scene);
 
-        super(body.name + "shadow", shaderName, uniforms, getSamplers(scene), scene);
+        const ringsUniforms = body.model.ringsUniforms as RingsUniforms;
+        if (shadowUniforms.hasRings) {
+            uniforms.push(...ringsUniforms.getShaderUniforms());
+
+            const ringsLUT = RingsPostProcess.CreateLUT(body.model.seed, ringsUniforms.ringStart, ringsUniforms.ringEnd, ringsUniforms.ringFrequency, scene);
+            samplers.push({
+                name: "ringsLUT",
+                type: SamplerEnumType.Texture,
+                get: () => {
+                    return ringsLUT;
+                }
+            });
+        }
+
+        super(body.name + "shadow", shaderName, uniforms, samplers, scene);
 
         this.object = body;
         this.shadowUniforms = shadowUniforms;
