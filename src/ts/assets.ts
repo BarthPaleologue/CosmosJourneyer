@@ -18,7 +18,6 @@ import plumeParticle from "../asset/textures/plume.png";
 
 import proceduralTest from "../shaders/textures/test.glsl";
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
-//import atmosphereLUT from "../asset/textures/LUT/atmosphere.png";
 
 import spaceship from "../asset/spaceship/spaceship2.glb";
 //import spacestation from "../asset/spacestation/spacestation.glb";

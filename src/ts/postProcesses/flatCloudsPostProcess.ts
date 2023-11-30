@@ -10,7 +10,10 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { StellarObject } from "../stellarObjects/stellarObject";
-import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
+import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
+import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+import { Scene } from "@babylonjs/core/scene";
+import flatCloudLUT from "../../shaders/textures/flatCloudLUT.glsl";
 
 const shaderName = "flatClouds";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -32,6 +35,8 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
     readonly cloudUniforms: CloudUniforms;
     readonly object: TelluricPlanemo;
 
+    readonly lut: ProceduralTexture;
+
     constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
         const cloudUniforms: CloudUniforms = {
             layerRadius: planet.getBoundingRadius() + cloudLayerHeight,
@@ -45,6 +50,8 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             worleySpeed: 0.0005,
             detailSpeed: 0.003
         };
+
+        const lut = FlatCloudsPostProcess.CreateLUT(cloudUniforms.frequency, cloudUniforms.detailFrequency, scene);
 
         const uniforms: ShaderUniforms = [
             ...getObjectUniforms(planet),
@@ -131,11 +138,30 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             }
         ];
 
-        const samplers: ShaderSamplers = getSamplers(scene);
+        const samplers: ShaderSamplers = [
+            ...getSamplers(scene),
+            {
+                name: "lut",
+                type: SamplerEnumType.Texture,
+                get: () => {
+                    return lut;
+                }
+            }
+        ];
 
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = planet;
         this.cloudUniforms = cloudUniforms;
+        this.lut = lut;
+    }
+
+    static CreateLUT(worleyFrequency: number, detailFrequency: number, scene: Scene): ProceduralTexture {
+        const lut = new ProceduralTexture("flatCloudLUT", 1000, { fragmentSource: flatCloudLUT }, scene, undefined, false, false);
+        lut.setFloat("worleyFrequency", worleyFrequency);
+        lut.setFloat("detailFrequency", detailFrequency);
+        lut.refreshRate = 0;
+
+        return lut;
     }
 }
