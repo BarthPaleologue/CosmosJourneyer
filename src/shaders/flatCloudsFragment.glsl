@@ -58,7 +58,7 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 
     vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds.worleySpeed);
     vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds.detailSpeed);
-    
+
     float density = 1.0 - texture2D(lut, toUV(samplePointRotatedWorley)).r;
 
     density *= texture2D(lut, toUV(samplePointRotatedDetail)).g;

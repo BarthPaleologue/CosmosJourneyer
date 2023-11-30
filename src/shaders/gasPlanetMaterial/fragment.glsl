@@ -76,7 +76,7 @@ void main() {
 
     specComp /= 2.0;
 
-    vec3 screenColor = color.rgb * (ndl + specComp * ndl);
-
-    gl_FragColor = vec4(screenColor, 1.0);// apply color and lighting
+    vec3 finalColor = color.rgb * (ndl + specComp * ndl);
+    
+    gl_FragColor = vec4(finalColor, 1.0);
 }
