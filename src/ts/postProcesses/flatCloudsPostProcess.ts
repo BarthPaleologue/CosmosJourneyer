@@ -15,9 +15,6 @@ import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedural
 import { Scene } from "@babylonjs/core/scene";
 import flatCloudLUT from "../../shaders/textures/flatCloudLUT.glsl";
 
-const shaderName = "flatClouds";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
-
 export interface CloudUniforms {
     layerRadius: number;
     smoothness: number;
@@ -38,6 +35,12 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
     readonly lut: ProceduralTexture;
 
     constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
+
+        const shaderName = "flatClouds";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
+        }
+
         const cloudUniforms: CloudUniforms = {
             layerRadius: planet.getBoundingRadius() + cloudLayerHeight,
             specularPower: 2,

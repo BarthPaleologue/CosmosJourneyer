@@ -12,15 +12,18 @@ import { Scene } from "@babylonjs/core/scene";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import ringsLUT from "../../../shaders/textures/ringsLUT.glsl";
 
-const shaderName = "rings";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
-
 export class RingsPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly ringsUniforms: RingsUniforms;
     readonly object: AbstractBody;
     readonly lut: ProceduralTexture;
 
     constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
+
+        const shaderName = "rings";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
+        }
+
         const ringsUniforms = body.model.ringsUniforms;
         if (ringsUniforms === null)
             throw new Error(

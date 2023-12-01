@@ -16,11 +16,14 @@ import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 
-const shaderName = "starfield";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
-
 export class StarfieldPostProcess extends UberPostProcess {
     constructor(scene: UberScene, stellarObjects: StellarObject[], bodies: AbstractBody[], starfieldRotation: Quaternion) {
+
+        const shaderName = "starfield";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
+        }
+
         const uniforms: ShaderUniforms = [
             ...getActiveCameraUniforms(scene),
             ...getStellarObjectsUniforms(stellarObjects),

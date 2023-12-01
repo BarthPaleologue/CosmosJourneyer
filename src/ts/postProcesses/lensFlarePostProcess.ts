@@ -13,9 +13,6 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { Matrix } from "@babylonjs/core/Maths/math";
 
-const shaderName = "lensflare";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = lensFlareFragment;
-
 export type LensFlareSettings = {
     visibility: number;
     behindCamera: boolean;
@@ -27,6 +24,12 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
     readonly object: StellarObject;
 
     constructor(object: StellarObject, scene: UberScene) {
+
+        const shaderName = "lensflare";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = lensFlareFragment;
+        }
+
         const settings: LensFlareSettings = {
             visibility: 1,
             behindCamera: false,

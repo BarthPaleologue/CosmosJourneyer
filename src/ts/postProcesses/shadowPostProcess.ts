@@ -11,9 +11,6 @@ import { PostProcessType } from "./postProcessTypes";
 import { RingsUniforms } from "./rings/ringsUniform";
 import { RingsPostProcess } from "./rings/ringsPostProcess";
 
-const shaderName = "shadow";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
-
 export type ShadowUniforms = {
     hasRings: boolean;
     hasClouds: boolean;
@@ -25,6 +22,12 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
     readonly shadowUniforms: ShadowUniforms;
 
     constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
+
+        const shaderName = "shadow";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
+        }
+
         const shadowUniforms: ShadowUniforms = {
             hasRings: body.model.ringsUniforms !== null,
             hasClouds: body.postProcesses.includes(PostProcessType.CLOUDS),

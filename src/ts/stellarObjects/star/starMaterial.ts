@@ -7,16 +7,20 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StarModel } from "./starModel";
 import { getInverseRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 
-const shaderName = "starMaterial";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;
-Effect.ShadersStore[`${shaderName}VertexShader`] = starMaterialVertex;
-
 export class StarMaterial extends ShaderMaterial {
     star: TransformNode;
     starModel: StarModel;
     starSeed: number;
 
     constructor(star: TransformNode, model: StarModel, scene: Scene) {
+        const shaderName = "starMaterial";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;
+        }
+        if(Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}VertexShader`] = starMaterialVertex;
+        }
+
         super("starColor", scene, shaderName, {
             attributes: ["position"],
             uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time"]

@@ -14,10 +14,6 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { getInverseRotationMatrix } from "../../uberCore/transforms/basicTransform";
 import { StellarObject } from "../../stellarObjects/stellarObject";
 import { Star } from "../../stellarObjects/star/star";
-
-const shaderName = "surfaceMaterial";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
-Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 import { flattenVector3Array } from "../../utils/algebra";
 
 /**
@@ -45,6 +41,14 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
      * @param scene
      */
     constructor(planetName: string, planet: TransformNode, model: TelluricPlanemoModel, scene: UberScene) {
+        const shaderName = "surfaceMaterial";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
+        }
+        if(Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
+        }
+
         super(`${planetName}SurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
             uniforms: [

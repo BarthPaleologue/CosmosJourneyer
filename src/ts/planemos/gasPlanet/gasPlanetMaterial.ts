@@ -13,10 +13,6 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Star } from "../../stellarObjects/star/star";
-
-const shaderName = "gasPlanetMaterial";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
-Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
 import { flattenVector3Array } from "../../utils/algebra";
 
 export class GasPlanetMaterial extends ShaderMaterial {
@@ -25,6 +21,14 @@ export class GasPlanetMaterial extends ShaderMaterial {
     private clock = 0;
 
     constructor(planetName: string, planet: TransformNode, model: GasPlanetModel, scene: Scene) {
+        const shaderName = "gasPlanetMaterial";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
+        }
+        if(Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
+        }
+
         super(`${planetName}GasSurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
             uniforms: ["world", "worldViewProjection", "normalMatrix", "seed", "star_positions", "star_colors", "nbStars", "color1", "color2", "color3", "colorSharpness", "time", "playerPosition"]

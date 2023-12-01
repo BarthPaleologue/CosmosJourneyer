@@ -8,9 +8,6 @@ import { StellarObject } from "../stellarObjects/stellarObject";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { Mandelbulb } from "../mandelbulb/mandelbulb";
 
-const shaderName = "mandelbulb";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelbulbFragment;
-
 export interface MandelbulbSettings {
     rotationPeriod: number;
 }
@@ -20,6 +17,12 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
     readonly object: Mandelbulb;
 
     constructor(mandelbulb: Mandelbulb, scene: UberScene, stellarObjects: StellarObject[]) {
+
+        const shaderName = "mandelbulb";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelbulbFragment;
+        }
+
         const settings: MandelbulbSettings = {
             rotationPeriod: 1.5
         };

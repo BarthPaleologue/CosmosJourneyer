@@ -11,9 +11,6 @@ import { getInverseRotationQuaternion } from "../uberCore/transforms/basicTransf
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
 import { StellarObject } from "../stellarObjects/stellarObject";
 
-const shaderName = "ocean";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
-
 export type OceanUniforms = {
     oceanRadius: number;
     smoothness: number;
@@ -28,6 +25,12 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
     readonly object: TelluricPlanemo;
 
     constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: StellarObject[]) {
+
+        const shaderName = "ocean";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
+        }
+
         const oceanUniforms: OceanUniforms = {
             oceanRadius: planet.getBoundingRadius(),
             depthModifier: 0.001,
