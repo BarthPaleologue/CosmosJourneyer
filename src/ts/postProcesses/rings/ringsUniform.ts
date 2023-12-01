@@ -21,35 +21,35 @@ export class RingsUniforms {
     getShaderUniforms(): ShaderUniforms {
         return [
             {
-                name: "rings.start",
+                name: "rings_start",
                 type: UniformEnumType.Float,
                 get: () => {
                     return this.ringStart;
                 }
             },
             {
-                name: "rings.end",
+                name: "rings_end",
                 type: UniformEnumType.Float,
                 get: () => {
                     return this.ringEnd;
                 }
             },
             {
-                name: "rings.frequency",
+                name: "rings_frequency",
                 type: UniformEnumType.Float,
                 get: () => {
                     return this.ringFrequency;
                 }
             },
             {
-                name: "rings.opacity",
+                name: "rings_opacity",
                 type: UniformEnumType.Float,
                 get: () => {
                     return this.ringOpacity;
                 }
             },
             {
-                name: "rings.color",
+                name: "rings_color",
                 type: UniformEnumType.Color3,
                 get: () => {
                     return this.ringColor;

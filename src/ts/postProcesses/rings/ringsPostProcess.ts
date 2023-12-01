@@ -73,10 +73,6 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
         lut.setFloat("ringEnd", ringEnd);
         lut.refreshRate = 0;
 
-        lut.onBeforeGenerationObservable.add(() => {
-           console.log("ringsLUT");
-        });
-
         return lut;
     }
 }
