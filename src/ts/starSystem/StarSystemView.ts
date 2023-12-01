@@ -102,6 +102,7 @@ export class StarSystemView {
 
         window.addEventListener("resize", () => {
             this.bodyEditor.resize();
+            this.scene.getEngine().resize(true);
         });
 
         this.bodyEditor.resize();
