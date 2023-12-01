@@ -18,6 +18,7 @@ import { Star } from "../../stellarObjects/star/star";
 const shaderName = "surfaceMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
+import { flattenVector3Array } from "../../utils/algebra";
 
 /**
  * The material for telluric planemos.
@@ -69,7 +70,8 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "planetPosition",
                 "planetRadius",
 
-                "stars",
+                "star_positions",
+                "star_colors",
                 "nbStars",
 
                 "planetInverseRotationMatrix",
@@ -176,11 +178,8 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
 
         this.setVector3("playerPosition", activeControllerPosition);
 
-        for (let i = 0; i < stellarObjects.length; i++) {
-            const star = stellarObjects[i];
-            this.setVector3(`star_positions[${i}]`, star.getTransform().getAbsolutePosition());
-            this.setVector3(`star_colors[${i}]`, star instanceof Star ? star.model.surfaceColor : Vector3.One());
-        }
+        this.setArray3("star_positions", flattenVector3Array(stellarObjects.map(star => star.getTransform().getAbsolutePosition())));
+        this.setArray3("star_colors", flattenVector3Array(stellarObjects.map(star => star instanceof Star ? star.model.surfaceColor : Vector3.One())))
         this.setInt("nbStars", stellarObjects.length);
 
         this.setVector3("planetPosition", this.planemoTransform.getAbsolutePosition());

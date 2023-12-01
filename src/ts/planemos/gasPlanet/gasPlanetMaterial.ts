@@ -17,6 +17,7 @@ import { Star } from "../../stellarObjects/star/star";
 const shaderName = "gasPlanetMaterial";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
 Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
+import { flattenVector3Array } from "../../utils/algebra";
 
 export class GasPlanetMaterial extends ShaderMaterial {
     readonly planet: TransformNode;
@@ -26,7 +27,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
     constructor(planetName: string, planet: TransformNode, model: GasPlanetModel, scene: Scene) {
         super(`${planetName}GasSurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
-            uniforms: ["world", "worldViewProjection", "normalMatrix", "seed", "stars", "nbStars", "color1", "color2", "color3", "colorSharpness", "time", "playerPosition"]
+            uniforms: ["world", "worldViewProjection", "normalMatrix", "seed", "star_positions", "star_colors", "nbStars", "color1", "color2", "color3", "colorSharpness", "time", "playerPosition"]
         });
 
         this.planet = planet;
@@ -67,11 +68,8 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         this.setVector3("playerPosition", player.getActiveCamera().getAbsolutePosition());
 
-        for (let i = 0; i < stellarObjects.length; i++) {
-            const star = stellarObjects[i];
-            this.setVector3(`star_positions[${i}]`, star.getTransform().getAbsolutePosition());
-            this.setVector3(`star_colors[${i}]`, star instanceof Star ? star.model.surfaceColor : Vector3.One());
-        }
+        this.setArray3("star_positions", flattenVector3Array(stellarObjects.map(star => star.getTransform().getAbsolutePosition())));
+        this.setArray3("star_colors", flattenVector3Array(stellarObjects.map(star => star instanceof Star ? star.model.surfaceColor : Vector3.One())))
         this.setInt("nbStars", stellarObjects.length);
 
         this.setFloat("time", this.clock % 100000);

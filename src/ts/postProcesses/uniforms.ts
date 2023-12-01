@@ -1,5 +1,5 @@
 import { UberScene } from "../uberCore/uberScene";
-import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
+import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { BaseObject } from "../bodies/common";
@@ -47,25 +47,21 @@ export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
 
 export function getStellarObjectsUniforms(stars: StellarObject[]): ShaderUniforms {
     return [
-        ...stars.flatMap((star, index) => {
-            return [
-                {
-                    name: `star_positions[${index}]`,
-                    type: UniformEnumType.Vector3,
-                    get: () => star.getTransform().getAbsolutePosition()
-                },
-                {
-                    name: `star_radiuses[${index}]`,
-                    type: UniformEnumType.Float,
-                    get: () => star.getRadius()
-                },
-                {
-                    name: `star_colors[${index}]`,
-                    type: UniformEnumType.Vector3,
-                    get: () => (star instanceof Star ? star.model.surfaceColor : Vector3.One())
-                }
-            ];
-        }),
+        {
+            name: "star_positions",
+            type: UniformEnumType.Vector3Array,
+            get: () => stars.map(star => star.getTransform().getAbsolutePosition())
+        },
+        {
+            name: "star_radiuses",
+            type: UniformEnumType.FloatArray,
+            get: () => stars.map(star => star.getRadius())
+        },
+        {
+            name: "star_colors",
+            type: UniformEnumType.Vector3Array,
+            get: () => stars.map(star =>star instanceof Star ? star.model.surfaceColor : Vector3.One())
+        },
         {
             name: "nbStars",
             type: UniformEnumType.Int,

@@ -57,10 +57,13 @@ export abstract class UberPostProcess extends PostProcess implements UpdatablePo
                     effect.setMatrix(uniform.name, uniform.get() as Matrix);
                     break;
                 case UniformEnumType.Vector3Array:
-                    effect.setArray3(uniform.name, flattenVector3Array(uniform.get() as Vector3[]));
+                    effect.setFloatArray3(uniform.name, flattenVector3Array(uniform.get() as Vector3[]));
                     break;
                 case UniformEnumType.Vector4Array:
-                    effect.setArray4(uniform.name, flattenVector4Array(uniform.get() as Vector4[]));
+                    effect.setFloatArray4(uniform.name, flattenVector4Array(uniform.get() as Vector4[]));
+                    break;
+                case UniformEnumType.FloatArray:
+                    effect.setFloatArray(uniform.name, uniform.get() as number[]);
                     break;
                 case UniformEnumType.Auto:
                     // BabylonJS already handles this
