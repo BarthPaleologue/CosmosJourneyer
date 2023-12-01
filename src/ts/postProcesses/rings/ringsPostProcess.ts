@@ -44,8 +44,7 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
                 name: "ringsLUT",
                 type: SamplerEnumType.Texture,
                 get: () => {
-                    //console.log(scene.isReady());
-                    return this.lut;
+                    return lut;
                 }
             }
         ];
@@ -58,13 +57,17 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
     }
 
     static CreateLUT(seed: number, ringStart: number, ringEnd: number, frequency: number, scene: Scene): ProceduralTexture {
+        if(Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
+            Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
+        }
+
         const lut = new ProceduralTexture(
             "ringsLUT",
             {
                 width: 4096,
                 height: 1
             },
-            { fragmentSource: ringsLUT },
+            "ringsLUT",
             scene,
             undefined,
             false,
@@ -75,6 +78,9 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
         lut.setFloat("ringStart", ringStart);
         lut.setFloat("ringEnd", ringEnd);
         lut.refreshRate = 0;
+
+        // This is necessary to make sure the texture is not empty at runtime (see: https://forum.babylonjs.com/t/webgl-warning-when-binding-procedural-texture-to-postprocess/46047)
+        scene.render();
 
         return lut;
     }

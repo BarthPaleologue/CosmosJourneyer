@@ -160,10 +160,17 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
     }
 
     static CreateLUT(worleyFrequency: number, detailFrequency: number, scene: Scene): ProceduralTexture {
-        const lut = new ProceduralTexture("flatCloudLUT", 2048, { fragmentSource: flatCloudLUT }, scene, undefined, false, false);
+        if(Effect.ShadersStore[`flatCloudsLUTFragmentShader`] === undefined) {
+            Effect.ShadersStore[`flatCloudsLUTFragmentShader`] = flatCloudLUT;
+        }
+
+        const lut = new ProceduralTexture("flatCloudLUT", 2048, "flatCloudsLUT", scene, undefined, false, false);
         lut.setFloat("worleyFrequency", worleyFrequency);
         lut.setFloat("detailFrequency", detailFrequency);
         lut.refreshRate = 0;
+
+        // This is necessary to make sure the texture is not empty at runtime (see: https://forum.babylonjs.com/t/webgl-warning-when-binding-procedural-texture-to-postprocess/46047)
+        scene.render();
 
         return lut;
     }
