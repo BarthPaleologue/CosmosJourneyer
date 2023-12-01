@@ -47,7 +47,6 @@ float sphereOccultation(vec3 rayDir, float maximumDistance) {
     return 1.0;
 }
 
-#define inline
 float ringOccultation(vec3 rayDir, float maximumDistance) {
     if (!shadowUniforms_hasRings) {
         return 1.0;

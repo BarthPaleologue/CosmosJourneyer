@@ -68,7 +68,5 @@ void main() {
         }
     }
 
-    //finalColor.rgb = vec3(texture2D(ringsLUT, vUV).r);
-
     gl_FragColor = finalColor;// displaying the final color
 }

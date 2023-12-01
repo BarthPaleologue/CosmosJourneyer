@@ -21,11 +21,8 @@ uniform vec3 planetPosition;
 
 #define MAX_STARS 5
 uniform int nbStars;// number of stars
-struct Star {
-    vec3 position;
-    vec3 color;
-};
-uniform Star stars[MAX_STARS];
+uniform vec3 star_positions[MAX_STARS];
+uniform vec3 star_colors[MAX_STARS];
 
 uniform int colorMode;
 
@@ -91,7 +88,7 @@ void main() {
     // diffuse lighting extinction
     float ndl1 = 0.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 starLightRayW = normalize(stars[i].position - vPositionW);// light ray direction in world space
+        vec3 starLightRayW = normalize(star_positions[i] - vPositionW);// light ray direction in world space
         ndl1 += max(dot(sphereNormalW, starLightRayW), 0.0);
     }
     ndl1 = clamp(ndl1, 0.0, 1.0);
@@ -240,12 +237,12 @@ void main() {
     vec3 ndl2 = vec3(0.0);// dimming factor due to light inclination relative to vertex normal in world space
     vec3 specComp = vec3(0.0);
     for (int i = 0; i < nbStars; i++) {
-        vec3 starLightRayW = normalize(stars[i].position - vPositionW);
-        vec3 ndl2part = max(0.0, dot(normalW, starLightRayW)) * stars[i].color;
+        vec3 starLightRayW = normalize(star_positions[i] - vPositionW);
+        vec3 ndl2part = max(0.0, dot(normalW, starLightRayW)) * star_colors[i];
         ndl2 += ndl2part;
 
         vec3 angleW = normalize(viewRayW + starLightRayW);
-        specComp += max(0.0, dot(normalW, angleW)) * stars[i].color;
+        specComp += max(0.0, dot(normalW, angleW)) * star_colors[i];
     }
     ndl2 = saturate(ndl2);
     specComp = saturate(specComp);

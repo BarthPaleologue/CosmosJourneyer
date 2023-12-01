@@ -69,8 +69,8 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
         for (let i = 0; i < stellarObjects.length; i++) {
             const star = stellarObjects[i];
-            this.setVector3(`stars[${i}].position`, star.getTransform().getAbsolutePosition());
-            this.setVector3(`stars[${i}].color`, star instanceof Star ? star.model.surfaceColor : Vector3.One());
+            this.setVector3(`star_positions[${i}]`, star.getTransform().getAbsolutePosition());
+            this.setVector3(`star_colors[${i}]`, star instanceof Star ? star.model.surfaceColor : Vector3.One());
         }
         this.setInt("nbStars", stellarObjects.length);
 

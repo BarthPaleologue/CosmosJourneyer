@@ -2,11 +2,8 @@ precision highp float;
 
 #define MAX_STARS 5
 uniform int nbStars;// number of stars
-struct Star {
-    vec3 position;
-    vec3 color;
-};
-uniform Star stars[MAX_STARS];
+uniform vec3 star_positions[MAX_STARS];
+uniform vec3 star_colors[MAX_STARS];
 
 varying vec3 vPositionW;
 varying vec3 vNormalW;
@@ -39,8 +36,8 @@ void main() {
     vec3 ndl = vec3(0.0);
     float specComp = 0.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 starLightRayW = normalize(stars[i].position - vPositionW);// light ray direction in world space
-        ndl += max(0.0, dot(normalW, starLightRayW)) * stars[i].color;// diffuse lighting
+        vec3 starLightRayW = normalize(star_positions[i] - vPositionW);// light ray direction in world space
+        ndl += max(0.0, dot(normalW, starLightRayW)) * star_colors[i];// diffuse lighting
 
         vec3 angleW = normalize(viewRayW + starLightRayW);
         specComp += max(0.0, dot(normalW, angleW));
