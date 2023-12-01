@@ -1,5 +1,7 @@
 precision lowp float;
 
+/* disable_uniformity_analysis */
+
 varying vec2 vUV;// screen coordinates
 
 uniform sampler2D textureSampler;// the original screen texture

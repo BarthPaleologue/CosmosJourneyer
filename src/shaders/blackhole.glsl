@@ -1,5 +1,7 @@
 precision highp float;
 
+/* disable_uniformity_analysis */
+
 // based on https://www.shadertoy.com/view/tsBXW3
 
 #define DISK_STEPS 12.0//disk texture layers
@@ -225,9 +227,9 @@ void main() {
     }
 
     // getting the screen coordinate of the end of the bended ray
-    vec2 uv = uvFromWorld(positionBHS);
+    vec2 uv = uvFromWorld(positionBHS, camera_projection, camera_view);
     // check if there is an object occlusion
-    vec3 pixelWorldPositionEndRay = worldFromUV(uv);// the pixel position in world space (near plane)
+    vec3 pixelWorldPositionEndRay = worldFromUV(uv, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
     vec3 rayDirToEndRay = normalize(pixelWorldPositionEndRay - camera_position);// normalized direction of the ray
 
     float epsilon = 0.01;
