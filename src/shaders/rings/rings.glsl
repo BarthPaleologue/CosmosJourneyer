@@ -1,10 +1,5 @@
-struct Rings {
-    float start;// ring start
-    float end;// ring end
-    float frequency;// ring frequency
-    float opacity;// ring opacity
-    vec3 color;// ring color
-};
-uniform Rings rings;
-
-#pragma glslify: export(rings)
+uniform float rings_start;
+uniform float rings_end;
+uniform float rings_frequency;
+uniform float rings_opacity;
+uniform vec3 rings_color;

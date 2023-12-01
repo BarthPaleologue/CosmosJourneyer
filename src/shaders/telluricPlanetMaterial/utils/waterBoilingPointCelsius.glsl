@@ -10,5 +10,3 @@ float waterBoilingPointCelsius(float pressure) {
     if(P2 > 0.0) return (1.0 / ((1.0 / T1) + log(P1 / P2) * (R / DH))) - 273.15;
     return -273.15;
 }
-
-#pragma glslify: export(waterBoilingPointCelsius)

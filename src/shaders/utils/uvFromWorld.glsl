@@ -5,5 +5,3 @@ vec2 uvFromWorld(vec3 pos) {
     uv /= 2.0;
     return uv;
 }
-
-#pragma glslify: export(uvFromWorld)

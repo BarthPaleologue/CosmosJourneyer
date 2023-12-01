@@ -14,5 +14,3 @@ float fastAcos(float x) {
     ret = ret - 2.0 * negate * ret;
     return negate * 3.14159265358979 + ret;
 }
-
-#pragma glslify: export(fastAcos)

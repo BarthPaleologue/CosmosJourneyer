@@ -6,9 +6,9 @@ precision highp float;
 
 varying vec2 vUV;
 
-#pragma glslify: rotateAround = require('../utils/rotateAround.glsl');
+#include "../utils/rotateAround.glsl";
 
-#pragma glslify: rayIntersectSphere = require('../utils/rayIntersectSphere.glsl');
+#include "../utils/rayIntersectSphere.glsl";
 
 
 const float EARTH_RADIUS = 1000e3;

@@ -32,5 +32,3 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, flo
         surfaceNormal
     );
 }
-
-#pragma glslify: export(triplanarNormal)

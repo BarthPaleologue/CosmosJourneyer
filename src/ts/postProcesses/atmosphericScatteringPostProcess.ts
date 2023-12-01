@@ -51,70 +51,70 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
-                name: "atmosphere.radius",
+                name: "atmosphere_radius",
                 type: UniformEnumType.Float,
                 get: () => {
                     return atmosphereUniforms.atmosphereRadius;
                 }
             },
             {
-                name: "atmosphere.falloff",
+                name: "atmosphere_falloff",
                 type: UniformEnumType.Float,
                 get: () => {
                     return atmosphereUniforms.falloffFactor;
                 }
             },
             {
-                name: "atmosphere.sunIntensity",
+                name: "atmosphere_sunIntensity",
                 type: UniformEnumType.Float,
                 get: () => {
                     return atmosphereUniforms.intensity;
                 }
             },
             {
-                name: "atmosphere.rayleighStrength",
+                name: "atmosphere_rayleighStrength",
                 type: UniformEnumType.Float,
                 get: () => {
                     return atmosphereUniforms.rayleighStrength;
                 }
             },
             {
-                name: "atmosphere.mieStrength",
+                name: "atmosphere_mieStrength",
                 type: UniformEnumType.Float,
                 get: () => {
                     return atmosphereUniforms.mieStrength;
                 }
             },
             {
-                name: "atmosphere.densityModifier",
+                name: "atmosphere_densityModifier",
                 type: UniformEnumType.Float,
                 get: () => {
                     return atmosphereUniforms.densityModifier;
                 }
             },
             {
-                name: "atmosphere.redWaveLength",
+                name: "atmosphere_redWaveLength",
                 type: UniformEnumType.Float,
                 get: () => {
                     return atmosphereUniforms.redWaveLength;
                 }
             },
             {
-                name: "atmosphere.greenWaveLength",
+                name: "atmosphere_greenWaveLength",
                 type: UniformEnumType.Float,
                 get: () => {
                     return atmosphereUniforms.greenWaveLength;
                 }
             },
             {
-                name: "atmosphere.blueWaveLength",
+                name: "atmosphere_blueWaveLength",
                 type: UniformEnumType.Float,
                 get: () => {
                     return atmosphereUniforms.blueWaveLength;
                 }
             },
             {
-                name: "atmosphere.mieHaloRadius",
+                name: "atmosphere_mieHaloRadius",
                 type: UniformEnumType.Float,
                 get: () => {
                     return atmosphereUniforms.mieHaloRadius;

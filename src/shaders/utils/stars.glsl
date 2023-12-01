@@ -1,9 +1,5 @@
 #define MAX_STARS 5
-struct Star {
-    vec3 position;
-    float radius;
-    vec3 color;
-};
-uniform Star stars[MAX_STARS];
 
-#pragma glslify: export(stars)
+uniform vec3 star_positions[MAX_STARS];
+uniform float star_radiuses[MAX_STARS];
+uniform vec3 star_colors[MAX_STARS];

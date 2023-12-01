@@ -42,42 +42,42 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             ...getStellarObjectsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
-                name: "ocean.radius",
+                name: "ocean_radius",
                 type: UniformEnumType.Float,
                 get: () => {
                     return oceanUniforms.oceanRadius;
                 }
             },
             {
-                name: "ocean.smoothness",
+                name: "ocean_smoothness",
                 type: UniformEnumType.Float,
                 get: () => {
                     return oceanUniforms.smoothness;
                 }
             },
             {
-                name: "ocean.specularPower",
+                name: "ocean_specularPower",
                 type: UniformEnumType.Float,
                 get: () => {
                     return oceanUniforms.specularPower;
                 }
             },
             {
-                name: "ocean.alphaModifier",
+                name: "ocean_alphaModifier",
                 type: UniformEnumType.Float,
                 get: () => {
                     return oceanUniforms.alphaModifier;
                 }
             },
             {
-                name: "ocean.depthModifier",
+                name: "ocean_depthModifier",
                 type: UniformEnumType.Float,
                 get: () => {
                     return oceanUniforms.depthModifier;
                 }
             },
             {
-                name: "ocean.waveBlendingSharpness",
+                name: "ocean_waveBlendingSharpness",
                 type: UniformEnumType.Float,
                 get: () => {
                     return oceanUniforms.waveBlendingSharpness;

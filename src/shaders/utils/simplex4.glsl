@@ -142,5 +142,3 @@ float fractalSimplex4(vec4 p, int nbOctaves, float decay, float lacunarity) {
     }
     return value / totalAmplitude;
 }
-
-#pragma glslify: export(fractalSimplex4)

@@ -11,31 +11,31 @@ uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform int nbStars;// number of stars
-#pragma glslify: stars = require(./utils/stars.glsl)
+#include "./utils/stars.glsl";
 
-#pragma glslify: camera = require(./utils/camera.glsl)
+#include "./utils/camera.glsl";
 
-#pragma glslify: object = require(./utils/object.glsl)
+#include "./utils/object.glsl";
 
 uniform float cloudLayerMaxHeight;// atmosphere radius (calculate from planet center)
 uniform float cloudLayerMinHeight;
 
-#pragma glslify: remap = require(./utils/remap.glsl)
+#include "./utils/remap.glsl";
 
-#pragma glslify: saturate = require(./utils/saturate.glsl)
+#include "./utils/saturate.glsl";
 
-#pragma glslify: completeNoise = require(./utils/noise.glsl)
+#include "./utils/noise.glsl";
 
-#pragma glslify: smoothSharpener = require(./utils/smoothSharpener.glsl)
+#include "./utils/smoothSharpener.glsl";
 
-#pragma glslify: completeWorley = require(./utils/worley.glsl)
+#include "./utils/worley.glsl";
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
+#include "./utils/worldFromUV.glsl";
 
-#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
+#include "./utils/rayIntersectSphere.glsl";
 
 float densityAtPoint(vec3 densitySamplePoint) {
-    vec3 samplePoint = densitySamplePoint - object.position;
+    vec3 samplePoint = densitySamplePoint - object_position;
     vec3 unitSamplePoint = normalize(samplePoint);
     float height = length(samplePoint);
     float height01 = (height - cloudLayerMinHeight) / (cloudLayerMaxHeight - cloudLayerMinHeight);
@@ -63,9 +63,9 @@ const float lightAbsorptionTowardSun = 0.94;
 const float lightAbsorptionThroughClouds = 0.85;
 
 float lightMarch(vec3 position) {
-    vec3 sunDir = normalize(stars[i].position - position);
+    vec3 sunDir = normalize(star_positions[i] - position);
     float t0, t1;
-    rayIntersectSphere(position, sunDir, object.position, cloudLayerMaxHeight, t0, t1);
+    rayIntersectSphere(position, sunDir, object_position, cloudLayerMaxHeight, t0, t1);
 
     float stepSize = t0 / float(OPTICAL_DEPTH_POINTS - 1);
     float totalDensity = 0.0;
@@ -80,7 +80,7 @@ float lightMarch(vec3 position) {
 
 vec3 clouds(vec3 rayOrigin, vec3 rayDir, float distance, vec3 originalColor, vec3 geometryImpact) {
     vec3 samplePoint = rayOrigin;// first sampling point coming from camera ray
-    vec3 samplePointPlanetSpace = rayOrigin - object.position;
+    vec3 samplePointPlanetSpace = rayOrigin - object_position;
 
     float stepSize = distance / float(POINTS_FROM_CAMERA - 1);// the ray length between sample points
 
@@ -89,7 +89,7 @@ vec3 clouds(vec3 rayOrigin, vec3 rayDir, float distance, vec3 originalColor, vec
     float transmittance = 1.0;
     vec3 lightEnergy = vec3(0.0);
 
-    float costheta = dot(rayDir, normalize(stars[0].position - object.position));
+    float costheta = dot(rayDir, normalize(star_positions[0] - object_position));
     float phaseCloud = HenyeyGreenstein(0.3, costheta);
 
     for (int i = 0; i < POINTS_FROM_CAMERA; i++) {
@@ -107,7 +107,7 @@ vec3 clouds(vec3 rayOrigin, vec3 rayDir, float distance, vec3 originalColor, vec
 
     /*vec3 sunDir = normalize(stars[0].position - geometryImpact);
     float t0, t1;
-    rayIntersectSphere(geometryImpact, sunDir, object.position, cloudLayerMaxHeight, t0, t1);
+    rayIntersectSphere(geometryImpact, sunDir, object_position, cloudLayerMaxHeight, t0, t1);
 
     stepSize = t1 / float(OPTICAL_DEPTH_POINTS - 1);
     samplePoint = geometryImpact;
@@ -126,10 +126,10 @@ vec3 clouds(vec3 rayOrigin, vec3 rayDir, float distance, vec3 originalColor, vec
 }
 
 vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDistance) {
-    float height = length(rayOrigin - object.position);
+    float height = length(rayOrigin - object_position);
 
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(rayOrigin, rayDir, object.position, cloudLayerMaxHeight, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(rayOrigin, rayDir, object_position, cloudLayerMaxHeight, impactPoint, escapePoint))) {
         return originalColor;// if not intersecting with atmosphere, return original color
     }
 
@@ -137,7 +137,7 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
     escapePoint = min(maximumDistance, escapePoint);// occlusion with other scene objects
 
     float impactPoint2, escapePoint2;
-    if (rayIntersectSphere(rayOrigin, rayDir, object.position, cloudLayerMinHeight, impactPoint2, escapePoint2)) {
+    if (rayIntersectSphere(rayOrigin, rayDir, object_position, cloudLayerMinHeight, impactPoint2, escapePoint2)) {
         escapePoint = min(maximumDistance, impactPoint2);
     }
 
@@ -149,7 +149,7 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     vec3 firstPointInCloudLayer = rayOrigin + rayDir * impactPoint;// the first atmosphere point to be hit by the ray
 
-    vec3 firstPointPlanetSpace = firstPointInCloudLayer - object.position;
+    vec3 firstPointPlanetSpace = firstPointInCloudLayer - object_position;
 
     return clouds(firstPointInCloudLayer, rayDir, distanceThroughClouds, originalColor, rayOrigin + rayDir * maximumDistance);
 }
@@ -159,14 +159,14 @@ void main() {
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
 
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
+    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
 
-    vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
+    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
-    vec3 finalColor = scatter(screenColor, camera.position, rayDir, maximumDistance);// the color to be displayed on the screen
+    vec3 finalColor = scatter(screenColor, camera_position, rayDir, maximumDistance);// the color to be displayed on the screen
 
     gl_FragColor = vec4(finalColor, 1.0);// displaying the final color
 }

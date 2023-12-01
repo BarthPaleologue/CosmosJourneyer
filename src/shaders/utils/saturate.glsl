@@ -3,5 +3,3 @@ float saturate(float value) {
     if(value > 1.0) return 1.0;
     return value;
 }
-
-#pragma glslify: export(saturate)
