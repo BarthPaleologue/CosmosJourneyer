@@ -15,7 +15,7 @@ uniform int nbStars;// number of stars
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
-#include "./utils/object.glsl"
+#include "./utils/object.glsl";
 
 #include "./utils/camera.glsl";
 
