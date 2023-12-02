@@ -38,5 +38,3 @@ float completeNoise(float r, int nbOctaves, float decay, float lacunarity) {
     }
     return value / totalAmplitude;
 }
-
-#pragma glslify: export(completeNoise)

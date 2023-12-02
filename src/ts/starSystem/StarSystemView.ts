@@ -102,6 +102,7 @@ export class StarSystemView {
 
         window.addEventListener("resize", () => {
             this.bodyEditor.resize();
+            this.scene.getEngine().resize(true);
         });
 
         this.bodyEditor.resize();
@@ -145,6 +146,8 @@ export class StarSystemView {
         const activeController = this.scene.getActiveController();
         positionNearObject(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
         if (activeController instanceof ShipController) activeController.enableWarpDrive();
+
+        this.getStarSystem().initPostProcesses();
     }
 
     hideUI() {

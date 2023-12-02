@@ -7,9 +7,9 @@ uniform float frequency;
 uniform float ringStart;
 uniform float ringEnd;
 
-#pragma glslify: completeNoise = require(../utils/noise1D.glsl)
+#include "../utils/noise1D.glsl";
 
-#pragma glslify: remap = require(../utils/remap.glsl)
+#include "../utils/remap.glsl";
 
 void main() {
     float normalizedDistance = remap(vUV.x, 0.0, 1.0, ringStart, ringEnd);

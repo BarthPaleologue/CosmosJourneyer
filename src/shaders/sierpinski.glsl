@@ -11,7 +11,7 @@ uniform float power;
 uniform vec3 accentColor;
 
 uniform int nbStars;// number of stars
-#pragma glslify: stars = require(./utils/stars.glsl)
+#include "./utils/stars.glsl";
 
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
@@ -25,11 +25,11 @@ uniform mat4 inverseProjection;
 uniform float cameraNear;
 uniform float cameraFar;
 
-#pragma glslify: remap = require(./utils/remap.glsl)
+#include "./utils/remap.glsl";
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=inverseProjection, inverseView=inverseView)
+#include "./utils/worldFromUV.glsl";
 
-#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
+#include "./utils/rayIntersectSphere.glsl";
 
 #define MARCHINGITERATIONS 100
 
@@ -116,12 +116,12 @@ vec3 estimate_normal(const vec3 p, const float delta)
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
-    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
     vec3 rayDir = normalize(pixelWorldPosition - cameraPosition);// normalized direction of the ray
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
+    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
     
     float impactPoint, escapePoint;
     if (!(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, impactPoint, escapePoint))) {
@@ -155,7 +155,7 @@ void main() {
     
     float ndl = 0.0;
     for(int i = 0; i < nbStars; i++) {
-        vec3 starDir = normalize(stars[i].position - planetPosition);
+        vec3 starDir = normalize(star_positions[i] - planetPosition);
         ndl += max(0.0, dot(normal, starDir));
     }
 

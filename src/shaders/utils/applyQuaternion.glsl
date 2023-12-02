@@ -18,5 +18,3 @@ vec3 applyQuaternion(vec4 quaternion, vec3 vector) {
 
     return vec3(nX, nY, nZ);
 }
-
-#pragma glslify: export(applyQuaternion)

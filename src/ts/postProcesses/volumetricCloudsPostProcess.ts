@@ -10,9 +10,6 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { StellarObject } from "../stellarObjects/stellarObject";
 
-const shaderName = "volumetricClouds";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
-
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 
 export class VolumetricCloudsPostProcess extends UberPostProcess implements ObjectPostProcess {
@@ -20,6 +17,12 @@ export class VolumetricCloudsPostProcess extends UberPostProcess implements Obje
     readonly object: TelluricPlanemo;
 
     constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stars: StellarObject[]) {
+
+        const shaderName = "volumetricClouds";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
+        }
+
         const cloudUniforms: CloudUniforms = {
             layerRadius: planet.getBoundingRadius() + cloudLayerHeight,
             specularPower: 2,

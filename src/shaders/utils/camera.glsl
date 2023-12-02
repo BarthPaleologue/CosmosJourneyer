@@ -1,12 +1,7 @@
-struct Camera {
-    vec3 position;
-    mat4 projection;
-    mat4 view;
-    mat4 inverseProjection;
-    mat4 inverseView;
-    float near;
-    float far;
-};
-uniform Camera camera;
-
-#pragma glslify: export(camera)
+uniform vec3  camera_position;
+uniform mat4  camera_projection;
+uniform mat4  camera_view;
+uniform mat4  camera_inverseProjection;
+uniform mat4  camera_inverseView;
+uniform float camera_near;
+uniform float camera_far;

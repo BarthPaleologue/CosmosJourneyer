@@ -7,17 +7,15 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform float time;
 
-#pragma glslify: camera = require(./utils/camera.glsl)
+#include "./utils/camera.glsl"
 
-#pragma glslify: object = require(./utils/object.glsl)
+#include "./utils/object.glsl";
 
-#pragma glslify: remap = require(./utils/remap.glsl)
+#include "./utils/remap.glsl";
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
+#include "./utils/worldFromUV.glsl";
 
-#pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
-
-#pragma glslify: removeAxialTilt = require(./utils/removeAxialTilt.glsl)
+#include "./utils/removeAxialTilt.glsl";
 
 // from https://www.shadertoy.com/view/MtcXWr
 bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 tipPosition, vec3 orientation, float coneAngle, out float t1, out float t2) {
@@ -99,12 +97,12 @@ void main() {
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
 
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
+    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
 
-    vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
+    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
     vec4 finalColor = screenColor;
 
@@ -113,18 +111,18 @@ void main() {
 
 
     float t1, t2;
-    if (rayIntersectCone(camera.position, rayDir, object.position, object.rotationAxis, 0.9, t1, t2)) {
+    if (rayIntersectCone(camera_position, rayDir, object_position, object_rotationAxis, 0.9, t1, t2)) {
         if (t2 > 0.0 && t2 < maximumDistance) {
-            vec3 jetPointPosition2 = camera.position + t2 * rayDir - object.position;
+            vec3 jetPointPosition2 = camera_position + t2 * rayDir - object_position;
 
-            float density2 = spiralDensity(jetPointPosition2, object.rotationAxis, jetHeight);
+            float density2 = spiralDensity(jetPointPosition2, object_rotationAxis, jetHeight);
 
             finalColor.rgb = mix(finalColor.rgb, jetColor, density2);
         }
         if (t1 > 0.0 && t1 < maximumDistance) {
-            vec3 jetPointPosition1 = camera.position + t1 * rayDir - object.position;
+            vec3 jetPointPosition1 = camera_position + t1 * rayDir - object_position;
 
-            float density1 = spiralDensity(jetPointPosition1, object.rotationAxis, jetHeight);
+            float density1 = spiralDensity(jetPointPosition1, object_rotationAxis, jetHeight);
 
             finalColor.rgb = mix(finalColor.rgb, jetColor, density1);
         }

@@ -10,9 +10,6 @@ import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 
-const shaderName = "blackhole";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
-
 export type BlackHoleSettings = {
     accretionDiskRadius: number;
     rotationPeriod: number;
@@ -23,6 +20,12 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
     readonly object: BlackHole;
 
     constructor(blackHole: BlackHole, scene: UberScene, starfieldRotation: Quaternion) {
+
+        const shaderName = "blackhole";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
+        }
+
         const settings: BlackHoleSettings = {
             accretionDiskRadius: blackHole.model.physicalProperties.accretionDiskRadius,
             rotationPeriod: 1.5

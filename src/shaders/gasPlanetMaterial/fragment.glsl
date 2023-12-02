@@ -2,11 +2,8 @@ precision highp float;
 
 #define MAX_STARS 5
 uniform int nbStars;// number of stars
-struct Star {
-    vec3 position;
-    vec3 color;
-};
-uniform Star stars[MAX_STARS];
+uniform vec3 star_positions[MAX_STARS];
+uniform vec3 star_colors[MAX_STARS];
 
 varying vec3 vPositionW;
 varying vec3 vNormalW;
@@ -25,13 +22,11 @@ uniform float time;
 
 uniform float seed;
 
-#pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl)
+#include "../utils/simplex4.glsl";
 
-#pragma glslify: lerp = require(../utils/vec3Lerp.glsl)
+#include "../utils/saturate.glsl";
 
-#pragma glslify: saturate = require(../utils/saturate.glsl)
-
-#pragma glslify: smoothSharpener = require(../utils/smoothSharpener.glsl)
+#include "../utils/smoothSharpener.glsl";
 
 void main() {
     vec3 viewRayW = normalize(playerPosition - vPositionW);// view direction in world space
@@ -41,8 +36,8 @@ void main() {
     vec3 ndl = vec3(0.0);
     float specComp = 0.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 starLightRayW = normalize(stars[i].position - vPositionW);// light ray direction in world space
-        ndl += max(0.0, dot(normalW, starLightRayW)) * stars[i].color;// diffuse lighting
+        vec3 starLightRayW = normalize(star_positions[i] - vPositionW);// light ray direction in world space
+        ndl += max(0.0, dot(normalW, starLightRayW)) * star_colors[i];// diffuse lighting
 
         vec3 angleW = normalize(viewRayW + starLightRayW);
         specComp += max(0.0, dot(normalW, angleW));
@@ -69,9 +64,9 @@ void main() {
 
         float colorDecision2 = fractalSimplex4(vec4(latitude - warping, seedImpact, -seedImpact, seedImpact), 3, 2.0, 2.0);
 
-        color = lerp(color1, color2, smoothstep(0.4, 0.6, colorDecision1));
+        color = mix(color2, color1, smoothstep(0.4, 0.6, colorDecision1));
 
-        color = lerp(color, color3, smoothSharpener(colorDecision2, colorSharpness));
+        color = mix(color3, color, smoothSharpener(colorDecision2, colorSharpness));
     }
 
     specComp /= 2.0;

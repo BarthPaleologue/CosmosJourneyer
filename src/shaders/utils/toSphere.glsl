@@ -12,5 +12,3 @@ vec3 toSphere(in vec2 uv)
         sin(theta) * sin(phi)
     );
 }
-
-#pragma glslify: export(toSphere)

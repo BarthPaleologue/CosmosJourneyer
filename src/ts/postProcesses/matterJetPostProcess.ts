@@ -8,9 +8,6 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { BaseObject } from "../bodies/common";
 
-const shaderName = "matterjet";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
-
 export interface MatterJetSettings {
     // the rotation period in seconds of the matter jet
     rotationPeriod: number;
@@ -24,6 +21,12 @@ export class MatterJetPostProcess extends UberPostProcess implements ObjectPostP
     object: BaseObject;
 
     constructor(name: string, stellarObject: StellarObject, scene: UberScene) {
+
+        const shaderName = "matterjet";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
+        }
+
         const settings: MatterJetSettings = {
             rotationPeriod: 1.5
         };

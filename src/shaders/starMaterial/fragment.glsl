@@ -8,9 +8,9 @@ uniform float time;
 
 uniform float seed;
 
-#pragma glslify: rotateAround = require(../utils/rotateAround.glsl)
+#include "../utils/rotateAround.glsl";
 
-#pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl)
+#include "../utils/simplex4.glsl";
 
 void main() {
     float plasmaSpeed = 0.005;

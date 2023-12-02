@@ -54,5 +54,3 @@ bool rayIntersectCube(vec3 rayOrigin, vec3 rayDir, out float tmax, out float tmi
 
     return true;
 }
-
-#pragma glslify: export(rayIntersectCube)

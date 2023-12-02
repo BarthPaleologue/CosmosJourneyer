@@ -1,8 +1,3 @@
-struct Object {
-    vec3 position;
-    float radius;
-    vec3 rotationAxis;
-};
-uniform Object object;
-
-#pragma glslify: export(object)
+uniform vec3 object_position;
+uniform float object_radius;
+uniform vec3 object_rotationAxis;

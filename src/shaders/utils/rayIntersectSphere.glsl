@@ -21,5 +21,3 @@ bool rayIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float 
     //return true;
     return t1 > 0.0;
 }
-
-#pragma glslify: export(rayIntersectSphere)

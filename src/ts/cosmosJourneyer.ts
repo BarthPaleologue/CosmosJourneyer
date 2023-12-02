@@ -114,15 +114,6 @@ export class CosmosJourneyer {
 
         // Starmap is the active scene by default
         this.activeScene = this.starMap.scene;
-
-        // When everything is ready, hide the loading screen and start the render loop
-        this.starSystemView.scene.executeWhenReady(() => {
-            this.getEngine().loadingScreen.hideLoadingUI();
-            this.getEngine().runRenderLoop(() => {
-                if (this.isPaused()) return;
-                this.getActiveScene().render();
-            });
-        });
     }
 
     public pause(): void {
@@ -144,6 +135,12 @@ export class CosmosJourneyer {
      */
     public init(): void {
         this.getStarSystemView().init();
+
+        this.getEngine().loadingScreen.hideLoadingUI();
+        this.getEngine().runRenderLoop(() => {
+            if (this.isPaused()) return;
+            this.getActiveScene().render();
+        });
     }
 
     /**

@@ -11,9 +11,6 @@ import { PostProcessType } from "./postProcessTypes";
 import { RingsUniforms } from "./rings/ringsUniform";
 import { RingsPostProcess } from "./rings/ringsPostProcess";
 
-const shaderName = "shadow";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
-
 export type ShadowUniforms = {
     hasRings: boolean;
     hasClouds: boolean;
@@ -25,6 +22,12 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
     readonly shadowUniforms: ShadowUniforms;
 
     constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
+
+        const shaderName = "shadow";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
+        }
+
         const shadowUniforms: ShadowUniforms = {
             hasRings: body.model.ringsUniforms !== null,
             hasClouds: body.postProcesses.includes(PostProcessType.CLOUDS),
@@ -35,21 +38,21 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
-                name: "shadowUniforms.hasRings",
+                name: "shadowUniforms_hasRings",
                 type: UniformEnumType.Bool,
                 get: () => {
                     return shadowUniforms.hasRings;
                 }
             },
             {
-                name: "shadowUniforms.hasClouds",
+                name: "shadowUniforms_hasClouds",
                 type: UniformEnumType.Bool,
                 get: () => {
                     return shadowUniforms.hasClouds;
                 }
             },
             {
-                name: "shadowUniforms.hasOcean",
+                name: "shadowUniforms_hasOcean",
                 type: UniformEnumType.Bool,
                 get: () => {
                     return shadowUniforms.hasOcean;

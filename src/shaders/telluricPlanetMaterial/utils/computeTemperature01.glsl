@@ -24,5 +24,3 @@ float computeTemperature01(float elevation01, float absLatitude01, float ndl, fl
 
     return temperature01;
 }
-
-#pragma glslify: export(computeTemperature01)

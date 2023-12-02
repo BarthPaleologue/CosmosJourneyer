@@ -10,13 +10,13 @@ uniform sampler2D depthSampler;// the depth map of the camera
 uniform float visibility;
 uniform vec3 clipPosition;
 
-#pragma glslify: camera = require(./utils/camera.glsl)
+#include "./utils/camera.glsl";
 
-#pragma glslify: object = require(./utils/object.glsl)
+#include "./utils/object.glsl";
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView);
+#include "./utils/worldFromUV.glsl";
 
-#pragma glslify: remap = require(./utils/remap.glsl)
+#include "./utils/remap.glsl";
 
 uniform vec3 flareColor;
 uniform float aspectRatio;
@@ -112,10 +112,10 @@ void main() {
         return;
     }
 
-    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(pixelWorldPosition - camera.position);
+    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 rayDir = normalize(pixelWorldPosition - camera_position);
 
-    vec3 objectDirection = normalize(object.position - camera.position);
+    vec3 objectDirection = normalize(object_position - camera_position);
 
     vec2 objectScreenPos = clipPosition.xy;
     objectScreenPos.y = 1.0 - objectScreenPos.y;

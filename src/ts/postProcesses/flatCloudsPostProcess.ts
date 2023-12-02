@@ -15,9 +15,6 @@ import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedural
 import { Scene } from "@babylonjs/core/scene";
 import flatCloudLUT from "../../shaders/textures/flatCloudLUT.glsl";
 
-const shaderName = "flatClouds";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
-
 export interface CloudUniforms {
     layerRadius: number;
     smoothness: number;
@@ -38,6 +35,12 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
     readonly lut: ProceduralTexture;
 
     constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
+
+        const shaderName = "flatClouds";
+        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
+        }
+
         const cloudUniforms: CloudUniforms = {
             layerRadius: planet.getBoundingRadius() + cloudLayerHeight,
             specularPower: 2,
@@ -58,70 +61,70 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
-                name: "clouds.layerRadius",
+                name: "clouds_layerRadius",
                 type: UniformEnumType.Float,
                 get: () => {
                     return cloudUniforms.layerRadius;
                 }
             },
             {
-                name: "clouds.frequency",
+                name: "clouds_frequency",
                 type: UniformEnumType.Float,
                 get: () => {
                     return cloudUniforms.frequency;
                 }
             },
             {
-                name: "clouds.detailFrequency",
+                name: "clouds_detailFrequency",
                 type: UniformEnumType.Float,
                 get: () => {
                     return cloudUniforms.detailFrequency;
                 }
             },
             {
-                name: "clouds.coverage",
+                name: "clouds_coverage",
                 type: UniformEnumType.Float,
                 get: () => {
                     return cloudUniforms.coverage;
                 }
             },
             {
-                name: "clouds.sharpness",
+                name: "clouds_sharpness",
                 type: UniformEnumType.Float,
                 get: () => {
                     return cloudUniforms.sharpness;
                 }
             },
             {
-                name: "clouds.color",
+                name: "clouds_color",
                 type: UniformEnumType.Color3,
                 get: () => {
                     return cloudUniforms.color;
                 }
             },
             {
-                name: "clouds.worleySpeed",
+                name: "clouds_worleySpeed",
                 type: UniformEnumType.Float,
                 get: () => {
                     return cloudUniforms.worleySpeed;
                 }
             },
             {
-                name: "clouds.detailSpeed",
+                name: "clouds_detailSpeed",
                 type: UniformEnumType.Float,
                 get: () => {
                     return cloudUniforms.detailSpeed;
                 }
             },
             {
-                name: "clouds.smoothness",
+                name: "clouds_smoothness",
                 type: UniformEnumType.Float,
                 get: () => {
                     return cloudUniforms.smoothness;
                 }
             },
             {
-                name: "clouds.specularPower",
+                name: "clouds_specularPower",
                 type: UniformEnumType.Float,
                 get: () => {
                     return cloudUniforms.specularPower;
@@ -157,10 +160,17 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
     }
 
     static CreateLUT(worleyFrequency: number, detailFrequency: number, scene: Scene): ProceduralTexture {
-        const lut = new ProceduralTexture("flatCloudLUT", 2048, { fragmentSource: flatCloudLUT }, scene, undefined, false, false);
+        if(Effect.ShadersStore[`flatCloudsLUTFragmentShader`] === undefined) {
+            Effect.ShadersStore[`flatCloudsLUTFragmentShader`] = flatCloudLUT;
+        }
+
+        const lut = new ProceduralTexture("flatCloudLUT", 2048, "flatCloudsLUT", scene, undefined, false, false);
         lut.setFloat("worleyFrequency", worleyFrequency);
         lut.setFloat("detailFrequency", detailFrequency);
         lut.refreshRate = 0;
+
+        // This is necessary to make sure the texture is not empty at runtime (see: https://forum.babylonjs.com/t/webgl-warning-when-binding-procedural-texture-to-postprocess/46047)
+        scene.render();
 
         return lut;
     }

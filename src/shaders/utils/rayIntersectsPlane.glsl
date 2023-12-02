@@ -4,5 +4,3 @@ bool rayIntersectsPlane(vec3 rayOrigin, vec3 rayDir, vec3 planePosition, vec3 pl
     t = dot(planeNormal, planePosition - rayOrigin) / denom;
     return t >= 0.0;
 }
-
-#pragma glslify: export(rayIntersectsPlane)

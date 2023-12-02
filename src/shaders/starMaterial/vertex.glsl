@@ -12,7 +12,7 @@ varying vec3 vUnitSamplePoint;
 uniform vec4 starInverseRotationQuaternion;
 uniform vec3 starPosition;
 
-#pragma glslify: applyQuaternion = require(../utils/applyQuaternion.glsl)
+#include "../utils/applyQuaternion.glsl";
 
 void main() {
 

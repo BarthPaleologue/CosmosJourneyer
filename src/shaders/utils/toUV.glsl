@@ -11,5 +11,3 @@ vec2 toUV(in vec3 n)
 
     return uv;
 }
-
-#pragma glslify: export(toUV)

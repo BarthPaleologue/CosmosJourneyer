@@ -21,11 +21,8 @@ uniform vec3 planetPosition;
 
 #define MAX_STARS 5
 uniform int nbStars;// number of stars
-struct Star {
-    vec3 position;
-    vec3 color;
-};
-uniform Star stars[MAX_STARS];
+uniform vec3 star_positions[MAX_STARS];
+uniform vec3 star_colors[MAX_STARS];
 
 uniform int colorMode;
 
@@ -63,31 +60,25 @@ uniform float maxTemperature;
 
 uniform float waterAmount;
 
-#pragma glslify: perlin3 = require(../utils/perlin3.glsl)
+#include "../utils/perlin3.glsl";
 
-#pragma glslify: remap = require(../utils/remap.glsl)
+#include "../utils/remap.glsl";
 
-#pragma glslify: lerp = require(../utils/vec3Lerp.glsl)
-
-float lerp(float value1, float value2, float x) {
-    return x * value1 + (1.0 - x) * value2;
-}
-
-#pragma glslify: triplanarNormal = require(../utils/triplanarNormal.glsl)
+#include "../utils/triplanarNormal.glsl";
 
 //https://www.desmos.com/calculator/8etk6vdfzi
 
-#pragma glslify: smoothSharpener = require(../utils/smoothSharpener.glsl)
+#include "../utils/smoothSharpener.glsl";
 
-#pragma glslify: rayIntersectSphere = require(../utils/rayIntersectSphere.glsl)
+#include "../utils/rayIntersectSphere.glsl";
 
 vec3 saturate(vec3 color) {
     return clamp(color, 0.0, 1.0);
 }
 
-#pragma glslify: waterBoilingPointCelsius = require(./utils/waterBoilingPointCelsius.glsl)
+#include "./utils/waterBoilingPointCelsius.glsl";
 
-#pragma glslify: computeTemperature01 = require(./utils/computeTemperature01.glsl)
+#include "./utils/computeTemperature01.glsl";
 
 void main() {
     vec3 viewRayW = normalize(playerPosition - vPositionW);// view direction in world space
@@ -97,7 +88,7 @@ void main() {
     // diffuse lighting extinction
     float ndl1 = 0.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 starLightRayW = normalize(stars[i].position - vPositionW);// light ray direction in world space
+        vec3 starLightRayW = normalize(star_positions[i] - vPositionW);// light ray direction in world space
         ndl1 += max(dot(sphereNormalW, starLightRayW), 0.0);
     }
     ndl1 = clamp(ndl1, 0.0, 1.0);
@@ -134,7 +125,7 @@ void main() {
 
     float temperature01 = computeTemperature01(elevation01, absLatitude01, ndl1, dayDuration);
 
-    float temperature = lerp(maxTemperature, minTemperature, temperature01);
+    float temperature = mix(minTemperature, maxTemperature, temperature01);
 
     // moisture
     float moisture01 = 0.0;// 0.0 = sec, 1.0 = humid : sec par défaut
@@ -246,12 +237,12 @@ void main() {
     vec3 ndl2 = vec3(0.0);// dimming factor due to light inclination relative to vertex normal in world space
     vec3 specComp = vec3(0.0);
     for (int i = 0; i < nbStars; i++) {
-        vec3 starLightRayW = normalize(stars[i].position - vPositionW);
-        vec3 ndl2part = max(0.0, dot(normalW, starLightRayW)) * stars[i].color;
+        vec3 starLightRayW = normalize(star_positions[i] - vPositionW);
+        vec3 ndl2part = max(0.0, dot(normalW, starLightRayW)) * star_colors[i];
         ndl2 += ndl2part;
 
         vec3 angleW = normalize(viewRayW + starLightRayW);
-        specComp += max(0.0, dot(normalW, angleW)) * stars[i].color;
+        specComp += max(0.0, dot(normalW, angleW)) * star_colors[i];
     }
     ndl2 = saturate(ndl2);
     specComp = saturate(specComp);
@@ -269,8 +260,8 @@ void main() {
 
     vec3 screenColor = color.rgb * (ndl2 + specComp*ndl1);
 
-    if (colorMode == 1) screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
-    if (colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.1, 0.2, 1.0), temperature01);
+    if (colorMode == 1) screenColor = mix(vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), moisture01);
+    if (colorMode == 2) screenColor = mix(vec3(0.1, 0.2, 1.0), vec3(1.0, 0.0, 0.0), temperature01);
     if (colorMode == 3) screenColor = normal * 0.5 + 0.5;
     if (colorMode == 4) screenColor = vec3(elevation01);
     if (colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vSamplePoint)));

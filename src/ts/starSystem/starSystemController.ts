@@ -259,8 +259,6 @@ export class StarSystemController {
      * Inits the post processes and moves the system forward in time to the current time (it is additive)
      */
     public init(nbWarmUpUpdates: number, chunkForge: ChunkForge): void {
-        this.initPostProcesses();
-
         for (const object of this.orbitalObjects) {
             const displacement = new Vector3(object.model.orbit.radius, 0, 0);
             const quaternion = getTransformationQuaternion(Vector3.Up(), object.model.orbit.normalToPlane);
@@ -277,9 +275,8 @@ export class StarSystemController {
 
     /**
      * Inits the post processes of all the bodies in the system
-     * @private
      */
-    private initPostProcesses() {
+    public initPostProcesses() {
         this.postProcessManager.addStarField(this.stellarObjects, this.celestialBodies, this.universeRotation);
         for (const object of this.orbitalObjects) {
             for (const postProcess of object.postProcesses) {
@@ -327,6 +324,7 @@ export class StarSystemController {
             }
         }
         this.postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveUberCamera().position));
+        this.postProcessManager.init();
     }
 
     /**

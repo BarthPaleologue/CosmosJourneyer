@@ -21,5 +21,3 @@ bool lineIntersectSphere(vec3 rayOrigin, vec3 rayDir, vec3 spherePosition, float
 
     return true;
 }
-
-#pragma glslify: export(lineIntersectSphere)

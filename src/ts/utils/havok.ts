@@ -23,7 +23,7 @@ export function setEnabledBody(body: PhysicsBody, enabled: boolean, havokPlugin:
 export function setMaxLinVel(havokPlugin: HavokPlugin, maxLinVel: number, maxAngVel: number) {
     const heap = havokPlugin._hknp.HEAP8.buffer;
     const world1 = new Int32Array(heap, Number(havokPlugin.world), 100);
-    const world2 = new Int32Array(heap, world1[9], 500);
+    const world2 = new Int32Array(heap, world1[8], 500);
     const mplib = new Int32Array(heap, world2[428], 100);
     const tsbuf = new Float32Array(heap, mplib[8], 300);
 

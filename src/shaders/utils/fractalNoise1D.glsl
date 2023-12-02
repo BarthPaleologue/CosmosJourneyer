@@ -33,5 +33,3 @@ float completeNoise(float pos, int octaves, float decay, float persistence) {
     }
     return total / maxValue;
 }
-
-#pragma glslify: export(completeNoise)
