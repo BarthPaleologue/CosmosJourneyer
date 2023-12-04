@@ -202,7 +202,7 @@ void main() {
     const float normalStrengthNear = 0.5;
     const float normalStrengthFar = 0.2;
 
-    const float nearScale = 0.005 * 1000e3;
+    const float nearScale = 0.1 * 1000e3;
     const float farScale = 0.00001 * 1000e3;
 
     normal = triplanarNormal(vSamplePointScaled, normal, bottomNormalMap, nearScale, normalSharpness, bottomFactor * normalStrengthNear);
@@ -223,6 +223,7 @@ void main() {
     normal = triplanarNormal(vSamplePointScaled, normal, steepNormalMap, nearScale, normalSharpness, steepFactor * normalStrengthNear);
     normal = triplanarNormal(vSamplePointScaled, normal, steepNormalMap, farScale, normalSharpness, steepFactor * normalStrengthFar);
 
+    normal = normalize(normal);
 
     vec3 color = steepFactor * steepColor
     + beachFactor * beachColor
