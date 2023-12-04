@@ -16,6 +16,7 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { AbstractObject } from "../bodies/abstractObject";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import '@babylonjs/core/Collisions/collisionCoordinator';
+import { Mouse } from "../inputs/mouse";
 
 export class CharacterController extends AbstractController {
     private readonly character: AbstractMesh;
@@ -81,6 +82,13 @@ export class CharacterController extends AbstractController {
 
     protected override listenTo(input: Input, deltaTime: number): Vector3 {
         const displacement = Vector3.Zero();
+        if (input instanceof Mouse) {
+            if(input.isLeftButtonPressed()) {
+                this.thirdPersonCamera.rotatePhi(-input.getDxNormalized() * 300 * deltaTime);
+                this.thirdPersonCamera.rotateTheta(-input.getDyNormalized() * 300 * deltaTime);
+            }
+            input.reset();
+        }
         if (input instanceof Keyboard) {
             const keyboard = input as Keyboard;
             const character = this.character;
