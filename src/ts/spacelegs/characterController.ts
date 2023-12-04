@@ -18,20 +18,43 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import '@babylonjs/core/Collisions/collisionCoordinator';
 import { Mouse } from "../inputs/mouse";
 
+class AnimationGroupWrapper {
+    name: string;
+    group: AnimationGroup;
+    weight: number;
+
+    constructor(name: string, group: AnimationGroup, startingWeight: number) {
+        this.name = name;
+        this.weight = startingWeight;
+
+        this.group = group;
+        this.group.play(true);
+        this.group.setWeightForAllAnimatables(startingWeight);
+    }
+
+    moveTowardsWeight(targetWeight: number, deltaTime: number) {
+        this.weight = Math.min(Math.max(this.weight + deltaTime * Math.sign(targetWeight - this.weight), 0), 1);
+        this.group.setWeightForAllAnimatables(this.weight);
+    }
+}
+
 export class CharacterController extends AbstractController {
     private readonly character: AbstractMesh;
     private readonly thirdPersonCamera: UberOrbitCamera;
-
-    private readonly walkAnim: AnimationGroup;
-    private readonly walkBackAnim: AnimationGroup;
-    private readonly idleAnim: AnimationGroup;
-    private readonly sambaAnim: AnimationGroup;
 
     private readonly characterSpeed = 1.8;
     private readonly characterSpeedBackwards = 1.2;
     private readonly characterRotationSpeed = 6;
 
     private animating = false;
+
+    private readonly idleAnim: AnimationGroupWrapper;
+    private readonly walkAnim: AnimationGroupWrapper;
+    private readonly walkBackAnim: AnimationGroupWrapper;
+    private readonly sambaAnim: AnimationGroupWrapper;
+    private readonly nonIdleAnimations: AnimationGroupWrapper[];
+
+    private targetAnim: AnimationGroupWrapper | null = null;
 
     private closestWalkableObject: AbstractObject | null = null;
 
@@ -48,19 +71,27 @@ export class CharacterController extends AbstractController {
 
         const walkAnim = scene.getAnimationGroupByName("Walking");
         if (walkAnim === null) throw new Error("'Walking' animation not found");
-        this.walkAnim = walkAnim;
 
         const walkBackAnim = scene.getAnimationGroupByName("WalkingBackwards");
         if (walkBackAnim === null) throw new Error("'WalkingBackwards' animation not found");
-        this.walkBackAnim = walkBackAnim;
 
         const idleAnim = scene.getAnimationGroupByName("Idle");
         if (idleAnim === null) throw new Error("'Idle' animation not found");
-        this.idleAnim = idleAnim;
 
         const sambaAnim = scene.getAnimationGroupByName("SambaDancing");
         if (sambaAnim === null) throw new Error("'Samba' animation not found");
-        this.sambaAnim = sambaAnim;
+
+        this.idleAnim = new AnimationGroupWrapper("idle", idleAnim, 1);
+        this.walkAnim = new AnimationGroupWrapper("walk", walkAnim, 0);
+        this.walkBackAnim = new AnimationGroupWrapper("walkBack", walkBackAnim, 0);
+        this.sambaAnim = new AnimationGroupWrapper("samba", sambaAnim, 0);
+        this.nonIdleAnimations = [
+            this.walkAnim,
+            this.walkBackAnim,
+            this.sambaAnim
+        ]
+
+        this.targetAnim = this.idleAnim;
 
         this.thirdPersonCamera = new UberOrbitCamera("camera", new Vector3(0, 1.5, 0), scene, 40, -Math.PI / 4, 1.0);
         this.thirdPersonCamera.minZ = 1;
@@ -91,58 +122,59 @@ export class CharacterController extends AbstractController {
         }
         if (input instanceof Keyboard) {
             const keyboard = input as Keyboard;
-            const character = this.character;
             let keydown = false;
+
+            if (this.walkAnim.weight > 0.0) {
+                this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterSpeed * deltaTime * this.walkAnim.weight));
+            }
+
+            if (this.walkBackAnim.weight > 0.0) {
+                this.character.moveWithCollisions(this.character.forward.scaleInPlace(this.characterSpeedBackwards * deltaTime * this.walkBackAnim.weight));
+            }
+
+            const isWalking = this.walkAnim.weight > 0.0 || this.walkBackAnim.weight > 0.0;
+
+            // Translation
             if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
-                character.moveWithCollisions(character.forward.scaleInPlace(-this.characterSpeed * deltaTime));
+                this.targetAnim = this.walkAnim;
+                keydown = true;
+            } else if (keyboard.isPressed("s")) {
+                this.targetAnim = this.walkBackAnim;
                 keydown = true;
             }
-            if (keyboard.isPressed("s")) {
-                character.moveWithCollisions(character.forward.scaleInPlace(this.characterSpeedBackwards * deltaTime));
+
+            // Rotation
+            if ((keyboard.isPressed("q") || keyboard.isPressed("a")) && isWalking) {
+                this.character.rotate(Vector3.Up(), this.characterRotationSpeed * deltaTime);
+                keydown = true;
+            } else if (keyboard.isPressed("d") && isWalking) {
+                this.character.rotate(Vector3.Up(), -this.characterRotationSpeed * deltaTime);
                 keydown = true;
             }
-            if (keyboard.isPressed("q") || keyboard.isPressed("a")) {
-                rotate(character, character.up, this.characterRotationSpeed * deltaTime);
-                keydown = true;
-            }
-            if (keyboard.isPressed("d")) {
-                rotate(character, character.up, -this.characterRotationSpeed * deltaTime);
-                keydown = true;
-            }
+
+            // Samba!
             if (keyboard.isPressed("b")) {
+                this.targetAnim = this.sambaAnim;
                 keydown = true;
             }
-            character.computeWorldMatrix(true);
 
-            //Manage animations to be played
-            if (keydown) {
-                if (!this.animating) {
-                    this.animating = true;
-                    if (keyboard.isPressed("s")) {
-                        //Walk backwards
-                        this.walkBackAnim.start(true, 1, this.walkBackAnim.from, this.walkBackAnim.to, false);
-                    } else if (keyboard.isPressed("b")) {
-                        //Samba!
-                        this.sambaAnim.start(true, 1, this.sambaAnim.from, this.sambaAnim.to, false);
-                    } else {
-                        //Walk
-                        this.walkAnim.start(true, 1, this.walkAnim.from, this.walkAnim.to, true);
-                    }
-                }
-            } else {
-                if (this.animating) {
-                    //Default animation is idle when no key is down
-                    this.idleAnim.start(true, 1, this.idleAnim.from, this.idleAnim.to, false);
-
-                    //Stop all animations besides Idle Anim when no key is down
-                    this.sambaAnim.stop();
-                    this.walkAnim.stop();
-                    this.walkBackAnim.stop();
-
-                    //Ensure animation are played only once per rendering loop
-                    this.animating = false;
-                }
+            if (!keydown) {
+                this.targetAnim = this.idleAnim;
             }
+
+            let weightSum = 0;
+            for (const animation of this.nonIdleAnimations) {
+                if (animation === this.targetAnim) {
+                    animation.moveTowardsWeight(1, deltaTime);
+                } else {
+                    animation.moveTowardsWeight(0, deltaTime);
+                }
+                weightSum += animation.weight;
+            }
+
+            this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaTime);
+
+            this.character.computeWorldMatrix(true);
 
             const cameraRotationSpeed = 0.8 * deltaTime;
             if (keyboard.isPressed("1")) this.thirdPersonCamera.rotatePhi(cameraRotationSpeed);
