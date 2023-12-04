@@ -122,7 +122,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
             desertColor: new Color3(178, 107, 42).scaleInPlace(1 / 255),
             bottomColor: new Color3(0.5, 0.5, 0.5),
 
-            beachSize: 250 + 100 * centeredRand(model.rng, 85),
+            beachSize: 100 + 50 * centeredRand(model.rng, 85),
             steepSharpness: 2,
             normalSharpness: 0.5
         };
