@@ -19,6 +19,7 @@ import { ShipController } from "../spaceship/shipController";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
+import "@babylonjs/core/Loading/loadingScreen";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
