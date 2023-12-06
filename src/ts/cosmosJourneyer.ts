@@ -136,7 +136,6 @@ export class CosmosJourneyer {
     public init(): void {
         this.getStarSystemView().init();
 
-        this.getEngine().loadingScreen.hideLoadingUI();
         this.getEngine().runRenderLoop(() => {
             if (this.isPaused()) return;
             this.getActiveScene().render();

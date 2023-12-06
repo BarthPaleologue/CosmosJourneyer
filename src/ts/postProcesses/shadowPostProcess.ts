@@ -6,7 +6,7 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { ObjectPostProcess } from "./objectPostProcess";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { SamplerEnumType, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
+import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { PostProcessType } from "./postProcessTypes";
 import { RingsUniforms } from "./rings/ringsUniform";
 import { RingsPostProcess } from "./rings/ringsPostProcess";
@@ -21,8 +21,7 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
     readonly object: AbstractBody;
     readonly shadowUniforms: ShadowUniforms;
 
-    constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
-
+    public static async CreateAsync(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]): Promise<ShadowPostProcess> {
         const shaderName = "shadow";
         if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
@@ -76,7 +75,12 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
             });
         }
 
-        super(body.name + "shadow", shaderName, uniforms, samplers, scene);
+        return new ShadowPostProcess(body.name + "Shadow", body, scene, shaderName, uniforms, samplers, shadowUniforms);
+    }
+
+    private constructor(name: string, body: AbstractBody, scene: UberScene, shaderName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, shadowUniforms: ShadowUniforms) {
+
+        super(name, shaderName, uniforms, samplers, scene);
 
         this.object = body;
         this.shadowUniforms = shadowUniforms;

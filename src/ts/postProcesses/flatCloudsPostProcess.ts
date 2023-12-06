@@ -26,18 +26,22 @@ export interface CloudUniforms {
     color: Color3;
     worleySpeed: number;
     detailSpeed: number;
+    internalTime: number;
 }
 
 export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly cloudUniforms: CloudUniforms;
     readonly object: TelluricPlanemo;
 
-    readonly lut: ProceduralTexture;
-
-    constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
-
+    public static async CreateAsync(
+        name: string,
+        planet: TelluricPlanemo,
+        cloudLayerHeight: number,
+        scene: UberScene,
+        stellarObjects: StellarObject[]
+    ): Promise<FlatCloudsPostProcess> {
         const shaderName = "flatClouds";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
         }
 
@@ -51,7 +55,8 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             sharpness: 3.5,
             color: new Color3(0.8, 0.8, 0.8),
             worleySpeed: 0.0005,
-            detailSpeed: 0.003
+            detailSpeed: 0.003,
+            internalTime: 0
         };
 
         const lut = FlatCloudsPostProcess.CreateLUT(cloudUniforms.frequency, cloudUniforms.detailFrequency, scene);
@@ -134,9 +139,7 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
                 name: "time",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return (
-                        -this.internalTime % ((2 * Math.PI * gcd(this.cloudUniforms.worleySpeed * 10000, this.cloudUniforms.detailSpeed * 10000)) / this.cloudUniforms.worleySpeed)
-                    );
+                    return -cloudUniforms.internalTime % ((2 * Math.PI * gcd(cloudUniforms.worleySpeed * 10000, cloudUniforms.detailSpeed * 10000)) / cloudUniforms.worleySpeed);
                 }
             }
         ];
@@ -152,15 +155,31 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             }
         ];
 
+        const postProcess = new FlatCloudsPostProcess(name, shaderName, planet, cloudUniforms, uniforms, samplers, scene);
+        postProcess.onApplyObservable.add(() => {
+            cloudUniforms.internalTime += scene.deltaTime * 0.001;
+        });
+
+        return postProcess;
+    }
+
+    private constructor(
+        name: string,
+        shaderName: string,
+        planet: TelluricPlanemo,
+        cloudUniforms: CloudUniforms,
+        uniforms: ShaderUniforms,
+        samplers: ShaderSamplers,
+        scene: UberScene
+    ) {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = planet;
         this.cloudUniforms = cloudUniforms;
-        this.lut = lut;
     }
 
     static CreateLUT(worleyFrequency: number, detailFrequency: number, scene: Scene): ProceduralTexture {
-        if(Effect.ShadersStore[`flatCloudsLUTFragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`flatCloudsLUTFragmentShader`] === undefined) {
             Effect.ShadersStore[`flatCloudsLUTFragmentShader`] = flatCloudLUT;
         }
 

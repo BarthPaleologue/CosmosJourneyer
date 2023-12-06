@@ -33,7 +33,8 @@ export class VolumetricCloudsPostProcess extends UberPostProcess implements Obje
             sharpness: 3.5,
             color: new Color3(0.8, 0.8, 0.8),
             worleySpeed: 0.0005,
-            detailSpeed: 0.003
+            detailSpeed: 0.003,
+            internalTime: 0
         };
 
         const uniforms: ShaderUniforms = [

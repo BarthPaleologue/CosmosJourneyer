@@ -258,7 +258,7 @@ export class StarSystemController {
     /**
      * Inits the post processes and moves the system forward in time to the current time (it is additive)
      */
-    public init(nbWarmUpUpdates: number, chunkForge: ChunkForge): void {
+    public initPositions(nbWarmUpUpdates: number, chunkForge: ChunkForge): void {
         for (const object of this.orbitalObjects) {
             const displacement = new Vector3(object.model.orbit.radius, 0, 0);
             const quaternion = getTransformationQuaternion(Vector3.Up(), object.model.orbit.normalToPlane);
@@ -276,14 +276,16 @@ export class StarSystemController {
     /**
      * Inits the post processes of all the bodies in the system
      */
-    public initPostProcesses() {
+    public async initPostProcesses() {
+        const promises: Promise<void>[] = [];
+
         this.postProcessManager.addStarField(this.stellarObjects, this.celestialBodies, this.universeRotation);
         for (const object of this.orbitalObjects) {
             for (const postProcess of object.postProcesses) {
                 switch (postProcess) {
                     case PostProcessType.RING:
                         if (!(object instanceof AbstractBody)) throw new Error("Rings post process can only be added to bodies. Source:" + object.name);
-                        this.postProcessManager.addRings(object, this.stellarObjects);
+                        promises.push(this.postProcessManager.addRings(object, this.stellarObjects));
                         break;
                     case PostProcessType.ATMOSPHERE:
                         if (!(object instanceof GasPlanet) && !(object instanceof TelluricPlanemo))
@@ -292,7 +294,7 @@ export class StarSystemController {
                         break;
                     case PostProcessType.CLOUDS:
                         if (!(object instanceof TelluricPlanemo)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + object.name);
-                        this.postProcessManager.addClouds(object as TelluricPlanemo, this.stellarObjects);
+                        promises.push(this.postProcessManager.addClouds(object as TelluricPlanemo, this.stellarObjects));
                         break;
                     case PostProcessType.OCEAN:
                         if (!(object instanceof TelluricPlanemo)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + object.name);
@@ -315,7 +317,7 @@ export class StarSystemController {
                         this.postProcessManager.addMatterJet(object as NeutronStar);
                         break;
                     case PostProcessType.SHADOW:
-                        this.postProcessManager.addShadowCaster(object as AbstractBody, this.stellarObjects);
+                        promises.push(this.postProcessManager.addShadowCaster(object as AbstractBody, this.stellarObjects));
                         break;
                     case PostProcessType.LENS_FLARE:
                         this.postProcessManager.addLensFlare(object as StellarObject);
@@ -323,8 +325,11 @@ export class StarSystemController {
                 }
             }
         }
-        this.postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveUberCamera().position));
-        this.postProcessManager.init();
+
+        return Promise.all(promises).then(() => {
+            this.postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveUberCamera().position));
+            this.postProcessManager.init();
+        });
     }
 
     /**

@@ -17,8 +17,7 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
     readonly object: AbstractBody;
     readonly lut: ProceduralTexture;
 
-    constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
-
+    public static async CreateAsync(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]): Promise<RingsPostProcess> {
         const shaderName = "rings";
         if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
@@ -49,7 +48,11 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             }
         ];
 
-        super(body.name + "Rings", shaderName, uniforms, samplers, scene);
+        return new RingsPostProcess(body.name + "Rings", shaderName, uniforms, samplers, scene, body, ringsUniforms, lut);
+    }
+
+    private constructor(name: string, shaderName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: UberScene, body: AbstractBody, ringsUniforms: RingsUniforms, lut: ProceduralTexture) {
+        super(name, shaderName, uniforms, samplers, scene);
 
         this.object = body;
         this.ringsUniforms = ringsUniforms;
