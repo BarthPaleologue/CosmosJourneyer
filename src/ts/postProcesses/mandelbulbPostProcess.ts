@@ -32,13 +32,6 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
             {
-                name: "time",
-                type: UniformEnumType.Float,
-                get: () => {
-                    return this.internalTime % (settings.rotationPeriod * 10000);
-                }
-            },
-            {
                 name: "power",
                 type: UniformEnumType.Float,
                 get: () => {

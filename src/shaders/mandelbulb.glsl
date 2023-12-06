@@ -4,8 +4,6 @@ precision highp float;
 
 varying vec2 vUV;
 
-uniform float time;
-
 uniform float power;
 uniform vec3 accentColor;
 
