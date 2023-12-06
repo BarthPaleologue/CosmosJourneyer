@@ -18,6 +18,7 @@ export type OceanUniforms = {
     depthModifier: number;
     alphaModifier: number;
     waveBlendingSharpness: number;
+    time: number;
 };
 
 export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess {
@@ -37,7 +38,8 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             alphaModifier: 0.001,
             specularPower: 1.0,
             smoothness: 0.9,
-            waveBlendingSharpness: 0.1
+            waveBlendingSharpness: 0.1,
+            time: 0
         };
 
         const uniforms: ShaderUniforms = [
@@ -99,7 +101,7 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
                 get: () => {
                     //TODO: do not hardcode the 100000
                     // use rotating time offset to prevent float imprecision and distant artifacts
-                    return this.internalTime % 100000;
+                    return oceanUniforms.time % 100000;
                 }
             }
         ];
@@ -126,5 +128,9 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
 
         this.object = planet;
         this.oceanUniforms = oceanUniforms;
+
+        this.onUpdatedObservable.add((deltaTime: number) => {
+            this.oceanUniforms.time += deltaTime;
+        });
     }
 }

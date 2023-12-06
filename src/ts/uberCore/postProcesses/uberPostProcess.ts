@@ -6,6 +6,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { UpdatablePostProcess } from "../../postProcesses/objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "./types";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 /**
  * A wrapper around BabylonJS post processes that allows more predictable and easier to use uniforms
@@ -14,7 +15,7 @@ export abstract class UberPostProcess extends PostProcess implements UpdatablePo
     private readonly uniforms: ShaderUniforms = [];
     private readonly samplers: ShaderSamplers = [];
 
-    protected internalTime = 0;
+    readonly onUpdatedObservable = new Observable<number>();
 
     protected constructor(name: string, fragmentName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: UberScene) {
         const uniformNames = uniforms.map((uniform) => uniform.name);
@@ -86,6 +87,6 @@ export abstract class UberPostProcess extends PostProcess implements UpdatablePo
     }
 
     public update(deltaTime: number) {
-        this.internalTime += deltaTime;
+        this.onUpdatedObservable.notifyObservers(deltaTime);
     }
 }

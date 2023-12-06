@@ -26,7 +26,7 @@ export interface CloudUniforms {
     color: Color3;
     worleySpeed: number;
     detailSpeed: number;
-    internalTime: number;
+    time: number;
 }
 
 export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPostProcess {
@@ -56,7 +56,7 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             color: new Color3(0.8, 0.8, 0.8),
             worleySpeed: 0.0005,
             detailSpeed: 0.003,
-            internalTime: 0
+            time: 0
         };
 
         const lut = FlatCloudsPostProcess.CreateLUT(cloudUniforms.frequency, cloudUniforms.detailFrequency, scene);
@@ -139,7 +139,7 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
                 name: "time",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return -cloudUniforms.internalTime % ((2 * Math.PI * gcd(cloudUniforms.worleySpeed * 10000, cloudUniforms.detailSpeed * 10000)) / cloudUniforms.worleySpeed);
+                    return -cloudUniforms.time % ((2 * Math.PI * gcd(cloudUniforms.worleySpeed * 10000, cloudUniforms.detailSpeed * 10000)) / cloudUniforms.worleySpeed);
                 }
             }
         ];
@@ -156,8 +156,8 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
         ];
 
         const postProcess = new FlatCloudsPostProcess(name, shaderName, planet, cloudUniforms, uniforms, samplers, scene);
-        postProcess.onApplyObservable.add(() => {
-            cloudUniforms.internalTime += scene.deltaTime * 0.001;
+        postProcess.onUpdatedObservable.add((deltaTime: number) => {
+            cloudUniforms.time += deltaTime;
         });
 
         return postProcess;
