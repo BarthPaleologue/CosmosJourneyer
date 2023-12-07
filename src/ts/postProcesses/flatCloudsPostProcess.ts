@@ -155,12 +155,16 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             }
         ];
 
-        const postProcess = new FlatCloudsPostProcess(name, shaderName, planet, cloudUniforms, uniforms, samplers, scene);
-        postProcess.onUpdatedObservable.add((deltaTime: number) => {
-            cloudUniforms.time += deltaTime;
-        });
+        return new Promise((resolve, reject) => {
+            lut.executeWhenReady(() => {
+                const postProcess = new FlatCloudsPostProcess(name, shaderName, planet, cloudUniforms, uniforms, samplers, scene);
+                postProcess.onUpdatedObservable.add((deltaTime: number) => {
+                    cloudUniforms.time += deltaTime;
+                });
 
-        return postProcess;
+                resolve(postProcess);
+            });
+        });
     }
 
     private constructor(
@@ -187,9 +191,6 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
         lut.setFloat("worleyFrequency", worleyFrequency);
         lut.setFloat("detailFrequency", detailFrequency);
         lut.refreshRate = 0;
-
-        // This is necessary to make sure the texture is not empty at runtime (see: https://forum.babylonjs.com/t/webgl-warning-when-binding-procedural-texture-to-postprocess/46047)
-        scene.render();
 
         return lut;
     }

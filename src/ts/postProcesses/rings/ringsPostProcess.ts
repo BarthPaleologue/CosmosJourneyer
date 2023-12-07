@@ -48,7 +48,11 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             }
         ];
 
-        return new RingsPostProcess(body.name + "Rings", shaderName, uniforms, samplers, scene, body, ringsUniforms, lut);
+        return new Promise((resolve, reject) => {
+            lut.executeWhenReady(() => {
+                resolve(new RingsPostProcess(body.name + "Rings", shaderName, uniforms, samplers, scene, body, ringsUniforms, lut));
+            });
+        });
     }
 
     private constructor(name: string, shaderName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: UberScene, body: AbstractBody, ringsUniforms: RingsUniforms, lut: ProceduralTexture) {
@@ -70,7 +74,7 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
                 width: 4096,
                 height: 1
             },
-            "ringsLUT",
+          "ringsLUT",
             scene,
             undefined,
             false,
@@ -81,9 +85,6 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
         lut.setFloat("ringStart", ringStart);
         lut.setFloat("ringEnd", ringEnd);
         lut.refreshRate = 0;
-
-        // This is necessary to make sure the texture is not empty at runtime (see: https://forum.babylonjs.com/t/webgl-warning-when-binding-procedural-texture-to-postprocess/46047)
-        scene.render();
 
         return lut;
     }

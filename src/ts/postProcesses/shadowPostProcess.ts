@@ -23,7 +23,7 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
 
     public static async CreateAsync(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]): Promise<ShadowPostProcess> {
         const shaderName = "shadow";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
         }
 
@@ -36,6 +36,11 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
             ...getObjectUniforms(body),
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
+            {
+                name: "star_radiuses",
+                type: UniformEnumType.FloatArray,
+                get: () => stellarObjects.map((star) => star.getBoundingRadius())
+            },
             {
                 name: "shadowUniforms_hasRings",
                 type: UniformEnumType.Bool,
@@ -73,13 +78,26 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
                     return ringsLUT;
                 }
             });
-        }
 
-        return new ShadowPostProcess(body.name + "Shadow", body, scene, shaderName, uniforms, samplers, shadowUniforms);
+            return new Promise((resolve, reject) => {
+                ringsLUT.executeWhenReady(() => {
+                    resolve(new ShadowPostProcess(body.name + "Shadow", body, scene, shaderName, uniforms, samplers, shadowUniforms));
+                });
+            });
+        } else {
+            return new ShadowPostProcess(body.name + "Shadow", body, scene, shaderName, uniforms, samplers, shadowUniforms);
+        }
     }
 
-    private constructor(name: string, body: AbstractBody, scene: UberScene, shaderName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, shadowUniforms: ShadowUniforms) {
-
+    private constructor(
+        name: string,
+        body: AbstractBody,
+        scene: UberScene,
+        shaderName: string,
+        uniforms: ShaderUniforms,
+        samplers: ShaderSamplers,
+        shadowUniforms: ShadowUniforms
+    ) {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = body;
