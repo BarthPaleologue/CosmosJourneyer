@@ -7,7 +7,6 @@ varying vec2 vUV;
 uniform float power;
 uniform vec3 accentColor;
 
-uniform int nbStars;// number of stars
 #include "./utils/stars.glsl";
 
 uniform sampler2D textureSampler;

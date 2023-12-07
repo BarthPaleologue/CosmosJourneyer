@@ -14,8 +14,6 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform sampler2D atmosphereLUT;
 
-uniform int nbStars;// number of stars
-
 #include "./utils/stars.glsl";
 
 #include "./utils/camera.glsl";

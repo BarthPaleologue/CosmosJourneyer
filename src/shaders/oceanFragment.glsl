@@ -11,7 +11,6 @@ uniform sampler2D normalMap2;
 
 #include "./utils/camera.glsl";
 
-uniform int nbStars;// number of stars
 #include "./utils/stars.glsl";
 
 #include "./utils/object.glsl";
