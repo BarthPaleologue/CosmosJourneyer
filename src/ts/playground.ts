@@ -12,7 +12,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { UberScene } from "./uberCore/uberScene";
 import { DefaultController } from "./defaultController/defaultController";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { Transformable } from "./uberCore/transforms/basicTransform";
+import { Transformable, translate } from "./uberCore/transforms/basicTransform";
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
 import { EngineFactory } from "@babylonjs/core";
@@ -38,7 +38,7 @@ scene.setActiveController(defaultController);
 
 const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
 
-const sphereRadius = 200;
+const sphereRadius = 1000e3;
 const sphere = MeshBuilder.CreateSphere("sphere", { diameter: sphereRadius * 2 }, scene);
 sphere.rotationQuaternion = Quaternion.Identity();
 sphere.position.z = sphereRadius * 4;
@@ -46,38 +46,39 @@ sphere.position.z = sphereRadius * 4;
 defaultController.getActiveCamera().maxZ = sphereRadius * 10;
 
 class MeshWrapper implements BaseObject {
-  readonly mesh: Mesh;
-  readonly radius: number;
-  readonly name: string;
-  postProcesses: PostProcessType[] = [];
+    readonly mesh: Mesh;
+    readonly radius: number;
+    readonly name: string;
+    postProcesses: PostProcessType[] = [];
 
-  constructor(mesh: Mesh, radius: number) {
-    this.name = mesh.name;
-    this.mesh = mesh;
-    this.radius = radius;
-  }
-  getBoundingRadius(): number {
-    return this.radius;
-  }
+    constructor(mesh: Mesh, radius: number) {
+        this.name = mesh.name;
+        this.mesh = mesh;
+        this.radius = radius;
+    }
 
-  getTransform(): TransformNode {
-    return this.mesh;
-  }
+    getBoundingRadius(): number {
+        return this.radius;
+    }
+
+    getTransform(): TransformNode {
+        return this.mesh;
+    }
 }
 
 class LightWrapper implements Transformable {
-  readonly light: DirectionalLight;
-  readonly transform: TransformNode;
+    readonly light: DirectionalLight;
+    readonly transform: TransformNode;
 
-  constructor(light: DirectionalLight) {
-    this.light = light;
-    this.transform = new TransformNode("lightTransform");
-    this.transform.position = light.direction.scale(-sphereRadius * 4);
-  }
+    constructor(light: DirectionalLight) {
+        this.light = light;
+        this.transform = new TransformNode("lightTransform");
+        this.transform.position = light.direction.scale(-sphereRadius * 4);
+    }
 
-  getTransform(): TransformNode {
-    return this.transform;
-  }
+    getTransform(): TransformNode {
+        return this.transform;
+    }
 }
 
 const wrappedSphere = new MeshWrapper(sphere, sphereRadius);
@@ -88,7 +89,11 @@ ocean.oceanUniforms.oceanRadius *= 1.2;
 defaultController.getActiveCamera().attachPostProcess(ocean);
 
 scene.onBeforeRenderObservable.add(() => {
-  defaultController.update(scene.deltaTime / 1000);
+    defaultController.update(scene.deltaTime / 1000);
+    if (defaultController.getActiveCamera().getAbsolutePosition().length() > 100) {
+        sphere.position.subtractInPlace(defaultController.getActiveCamera().getAbsolutePosition());
+        translate(defaultController.getTransform(), defaultController.getActiveCamera().getAbsolutePosition().negate());
+    }
 });
 
 scene.executeWhenReady(() => {
