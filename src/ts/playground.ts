@@ -1,11 +1,8 @@
 import "../styles/index.scss";
 
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { Assets } from "./assets";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Scene } from "@babylonjs/core/scene";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -13,10 +10,6 @@ import { BaseObject } from "./bodies/common";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { UberScene } from "./uberCore/uberScene";
-import { AbstractController } from "./uberCore/abstractController";
-import { UberCamera } from "./uberCore/uberCamera";
-import { Input } from "./inputs/input";
-import { Camera } from "@babylonjs/core/Cameras/camera";
 import { DefaultController } from "./defaultController/defaultController";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Transformable } from "./uberCore/transforms/basicTransform";
@@ -39,15 +32,18 @@ await Assets.Init(scene);
 const defaultController = new DefaultController(scene);
 defaultController.addInput(new Keyboard());
 defaultController.addInput(new Mouse(canvas));
-defaultController.getTransform().setAbsolutePosition(new Vector3(0, 0, -10));
 defaultController.getActiveCamera().maxZ = 1e3;
 defaultController.speed *= 10;
 scene.setActiveController(defaultController);
 
 const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
 
-const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 4 }, scene);
+const sphereRadius = 200;
+const sphere = MeshBuilder.CreateSphere("sphere", { diameter: sphereRadius * 2 }, scene);
 sphere.rotationQuaternion = Quaternion.Identity();
+sphere.position.z = sphereRadius * 4;
+
+defaultController.getActiveCamera().maxZ = sphereRadius * 10;
 
 class MeshWrapper implements BaseObject {
   readonly mesh: Mesh;
@@ -76,7 +72,7 @@ class LightWrapper implements Transformable {
   constructor(light: DirectionalLight) {
     this.light = light;
     this.transform = new TransformNode("lightTransform");
-    this.transform.position = light.direction.scale(-10);
+    this.transform.position = light.direction.scale(-sphereRadius * 4);
   }
 
   getTransform(): TransformNode {
@@ -84,13 +80,11 @@ class LightWrapper implements Transformable {
   }
 }
 
-const wrappedSphere = new MeshWrapper(sphere, 2);
+const wrappedSphere = new MeshWrapper(sphere, sphereRadius);
 const wrappedLight = new LightWrapper(light);
 
 const ocean = new OceanPostProcess("ocean", wrappedSphere, scene, [wrappedLight]);
-ocean.oceanUniforms.oceanRadius += 0.2;
-ocean.oceanUniforms.alphaModifier = 1;
-ocean.oceanUniforms.depthModifier = 1;
+ocean.oceanUniforms.oceanRadius *= 1.2;
 defaultController.getActiveCamera().attachPostProcess(ocean);
 
 scene.onBeforeRenderObservable.add(() => {
