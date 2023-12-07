@@ -10,6 +10,7 @@ uniform sampler2D depthSampler;// the depth map of the camera
 uniform sampler2D ringsLUT;
 
 #include "./utils/stars.glsl";
+float star_radiuses[MAX_STARS];
 
 #include "./utils/camera.glsl";
 
