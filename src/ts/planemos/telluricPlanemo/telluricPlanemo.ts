@@ -16,6 +16,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
+import { Transformable } from "../../uberCore/transforms/basicTransform";
 
 export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMaterial {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
@@ -93,7 +94,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
         for (const side of this.sides) side.update(observerPosition, chunkForge);
     }
 
-    public updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
+    public updateMaterial(controller: AbstractController, stellarObjects: Transformable[], deltaTime: number): void {
         this.material.update(controller.getTransform().getAbsolutePosition(), stellarObjects);
     }
 

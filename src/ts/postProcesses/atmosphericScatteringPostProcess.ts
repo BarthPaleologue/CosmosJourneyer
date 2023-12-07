@@ -11,6 +11,8 @@ import { GasPlanet } from "../planemos/gasPlanet/gasPlanet";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
 import { StellarObject } from "../stellarObjects/stellarObject";
+import { BaseObject } from "../bodies/common";
+import { Transformable } from "../uberCore/transforms/basicTransform";
 
 export interface AtmosphereUniforms {
     atmosphereRadius: number;
@@ -29,7 +31,7 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
     readonly atmosphereUniforms: AtmosphereUniforms;
     readonly object: TelluricPlanemo | GasPlanet;
 
-    constructor(name: string, planet: TelluricPlanemo | GasPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: StellarObject[]) {
+    constructor(name: string, planet: GasPlanet | TelluricPlanemo, atmosphereHeight: number, scene: UberScene, stellarObjects: Transformable[]) {
 
         const shaderName = "atmosphericScattering";
         if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

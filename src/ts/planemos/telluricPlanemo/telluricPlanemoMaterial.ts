@@ -11,7 +11,7 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { getInverseRotationMatrix } from "../../uberCore/transforms/basicTransform";
+import { getInverseRotationMatrix, Transformable } from "../../uberCore/transforms/basicTransform";
 import { StellarObject } from "../../stellarObjects/stellarObject";
 import { Star } from "../../stellarObjects/star/star";
 import { flattenVector3Array } from "../../utils/algebra";
@@ -176,7 +176,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         );
     }
 
-    public update(activeControllerPosition: Vector3, stellarObjects: StellarObject[]) {
+    public update(activeControllerPosition: Vector3, stellarObjects: Transformable[]) {
         this.setMatrix("normalMatrix", this.planemoTransform.getWorldMatrix().clone().invert().transpose());
         this.setMatrix("planetInverseRotationMatrix", getInverseRotationMatrix(this.planemoTransform));
 

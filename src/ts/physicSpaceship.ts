@@ -164,7 +164,7 @@ scene.executeWhenReady(() => {
 });
 
 window.addEventListener("resize", () => {
-    engine.resize();
+    engine.resize(true);
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 });
