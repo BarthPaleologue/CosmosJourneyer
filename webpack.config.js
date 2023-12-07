@@ -13,8 +13,9 @@ const config = {
         showcase: "./src/ts/index.ts",
         random: "./src/ts/randomizer.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
-        playground: "./src/ts/playground.ts",
+        physicSpaceship: "./src/ts/physicSpaceship.ts",
         planetWalk: "./src/ts/planetWalk.ts",
+        playground: "./src/ts/playground.ts",
         debugAssets: "./src/ts/debugAssets.ts"
     },
     output: {
@@ -51,15 +52,21 @@ const config = {
         }),
         new HtmlWebpackPlugin({
             title: "Playground",
-            filename: "playground.html",
+            filename: "physicSpaceship.html",
             template: path.join(htmlPath, "index.html"),
-            chunks: ["playground"]
+            chunks: ["physicSpaceship"]
         }),
         new HtmlWebpackPlugin({
             title: "Planet Walk",
             filename: "planetwalk.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["planetWalk"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "Playground",
+            filename: "playground.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["playground"]
         }),
         new HtmlWebpackPlugin({
             title: "Debug Texture",

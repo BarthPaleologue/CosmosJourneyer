@@ -2,8 +2,9 @@ import { UberScene } from "../uberCore/uberScene";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { BaseObject } from "../bodies/common";
+import { BaseObject, BoundingSphere } from "../bodies/common";
 import { Star } from "../stellarObjects/star/star";
+import { Transformable } from "../uberCore/transforms/basicTransform";
 
 export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     return [
@@ -45,7 +46,7 @@ export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
     ];
 }
 
-export function getStellarObjectsUniforms(stars: StellarObject[]): ShaderUniforms {
+export function getStellarObjectsUniforms(stars: Transformable[]): ShaderUniforms {
     return [
         {
             name: "star_positions",
@@ -53,14 +54,9 @@ export function getStellarObjectsUniforms(stars: StellarObject[]): ShaderUniform
             get: () => stars.map(star => star.getTransform().getAbsolutePosition())
         },
         {
-            name: "star_radiuses",
-            type: UniformEnumType.FloatArray,
-            get: () => stars.map(star => star.getRadius())
-        },
-        {
             name: "star_colors",
             type: UniformEnumType.Vector3Array,
-            get: () => stars.map(star =>star instanceof Star ? star.model.surfaceColor : Vector3.One())
+            get: () => stars.map(star => star instanceof Star ? star.model.surfaceColor : Vector3.One())
         },
         {
             name: "nbStars",
@@ -70,7 +66,7 @@ export function getStellarObjectsUniforms(stars: StellarObject[]): ShaderUniform
     ];
 }
 
-export function getObjectUniforms(object: BaseObject): ShaderUniforms {
+export function getObjectUniforms(object: Transformable & BoundingSphere): ShaderUniforms {
     return [
         {
             name: "object_position",

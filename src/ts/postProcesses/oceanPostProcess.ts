@@ -5,11 +5,10 @@ import { Assets } from "../assets";
 import { UberScene } from "../uberCore/uberScene";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
-import { getInverseRotationQuaternion } from "../uberCore/transforms/basicTransform";
+import { getInverseRotationQuaternion, Transformable } from "../uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { StellarObject } from "../stellarObjects/stellarObject";
+import { BaseObject } from "../bodies/common";
 
 export type OceanUniforms = {
     oceanRadius: number;
@@ -23,9 +22,9 @@ export type OceanUniforms = {
 
 export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly oceanUniforms: OceanUniforms;
-    readonly object: TelluricPlanemo;
+    readonly object: BaseObject;
 
-    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: StellarObject[]) {
+    constructor(name: string, planet: BaseObject, scene: UberScene, stars: Transformable[]) {
 
         const shaderName = "ocean";
         if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

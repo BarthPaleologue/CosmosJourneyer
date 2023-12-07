@@ -4,6 +4,7 @@ import { UberCamera } from "./uberCamera";
 import { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class UberScene extends Scene {
     activeController: AbstractController | null = null;
@@ -22,7 +23,11 @@ export class UberScene extends Scene {
 
     public setActiveController(controller: AbstractController) {
         this.activeController = controller;
-        this.activeCamera = controller.getActiveCamera();
+        this.setActiveCamera(controller.getActiveCamera());
+    }
+
+    public setActiveCamera(camera: Camera) {
+        this.activeCamera = camera;
 
         if (this.depthRenderer !== null) {
             // Remove old depth renderer
