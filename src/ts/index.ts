@@ -37,21 +37,23 @@ const mouse = new Mouse(engine.canvas, 100);
 const keyboard = new Keyboard();
 const gamepad = new Gamepad();
 
+const maxZ = Settings.EARTH_RADIUS * 1e5;
+
 const defaultController = new DefaultController(starSystemView.scene);
 defaultController.speed = 0.2 * Settings.EARTH_RADIUS;
-defaultController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 1e5;
+defaultController.getActiveCamera().maxZ = maxZ;
 defaultController.addInput(keyboard);
 defaultController.addInput(mouse);
 defaultController.addInput(gamepad);
 
 const spaceshipController = new ShipController(starSystemView.scene);
-spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 1e5;
+spaceshipController.getActiveCamera().maxZ = maxZ;
 spaceshipController.addInput(keyboard);
 spaceshipController.addInput(gamepad);
 spaceshipController.addInput(mouse);
 
 const characterController = new CharacterController(starSystemView.scene);
-characterController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 1e5;
+characterController.getActiveCamera().maxZ = maxZ;
 characterController.addInput(keyboard);
 characterController.addInput(gamepad);
 characterController.addInput(mouse);
