@@ -1,7 +1,7 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 import { clamp } from "terrain-generation";
-import { ShaderUniforms, UniformEnumType } from "../../uberCore/postProcesses/types";
+import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../../uberCore/postProcesses/types";
 import { Scene } from "@babylonjs/core/scene";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Effect } from "@babylonjs/core/Materials/effect";
@@ -107,23 +107,37 @@ export class RingsUniforms {
         ];
     }
 
+    getShaderSamplers(scene: Scene): Promise<ShaderSamplers> {
+        return this.getLUT(scene).then((lut) => {
+            return [
+                {
+                    name: "rings_lut",
+                    type: SamplerEnumType.Texture,
+                    get: () => {
+                        return lut;
+                    }
+                }
+            ];
+        });
+    }
+
     public getLUT(scene: Scene): Promise<ProceduralTexture> {
-        if(Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
             Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
         }
 
-        if(this.ringLut === null) {
+        if (this.ringLut === null) {
             const lut = new ProceduralTexture(
-              "ringsLUT",
-              {
-                  width: 4096,
-                  height: 1
-              },
-              "ringsLUT",
-              scene,
-              undefined,
-              true,
-              false
+                "ringsLUT",
+                {
+                    width: 4096,
+                    height: 1
+                },
+                "ringsLUT",
+                scene,
+                undefined,
+                true,
+                false
             );
             lut.setFloat("seed", this.offset);
             lut.setFloat("frequency", this.ringFrequency);
@@ -136,7 +150,7 @@ export class RingsUniforms {
 
         return new Promise((resolve, reject) => {
             this.ringLut?.executeWhenReady(() => {
-                if(this.ringLut === null) throw new Error("Ring LUT was null when executing when ready");
+                if (this.ringLut === null) throw new Error("Ring LUT was null when executing when ready");
                 resolve(this.ringLut);
             });
         });

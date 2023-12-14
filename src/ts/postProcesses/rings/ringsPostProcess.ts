@@ -5,17 +5,13 @@ import { UberPostProcess } from "../../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "../uniforms";
 import { ObjectPostProcess } from "../objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { SamplerEnumType, ShaderSamplers, ShaderUniforms } from "../../uberCore/postProcesses/types";
+import { ShaderSamplers, ShaderUniforms } from "../../uberCore/postProcesses/types";
 import { RingsUniforms } from "./ringsUniform";
-import { Scene } from "@babylonjs/core/scene";
-import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
-import ringsLUT from "../../../shaders/textures/ringsLUT.glsl";
 import { Transformable } from "../../uberCore/transforms/basicTransform";
 
 export class RingsPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly ringsUniforms: RingsUniforms;
     readonly object: AbstractBody;
-    readonly lut: ProceduralTexture;
 
     public static async CreateAsync(body: AbstractBody, scene: UberScene, stellarObjects: Transformable[]): Promise<RingsPostProcess> {
         const shaderName = "rings";
@@ -35,26 +31,19 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             ...ringsUniforms.getShaderUniforms()
         ];
 
-        return ringsUniforms.getLUT(scene).then((lut) => {
+        return ringsUniforms.getShaderSamplers(scene).then((ringSamplers) => {
             const samplers: ShaderSamplers = [
                 ...getSamplers(scene),
-                {
-                    name: "ringsLUT",
-                    type: SamplerEnumType.Texture,
-                    get: () => {
-                        return lut;
-                    }
-                }
+                ...ringSamplers
             ];
-            return new RingsPostProcess(body.name + "Rings", shaderName, uniforms, samplers, scene, body, ringsUniforms, lut);
+            return new RingsPostProcess(body.name + "Rings", shaderName, uniforms, samplers, scene, body, ringsUniforms);
         });
     }
 
-    private constructor(name: string, shaderName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: UberScene, body: AbstractBody, ringsUniforms: RingsUniforms, lut: ProceduralTexture) {
+    private constructor(name: string, shaderName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: UberScene, body: AbstractBody, ringsUniforms: RingsUniforms) {
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = body;
         this.ringsUniforms = ringsUniforms;
-        this.lut = lut;
     }
 }
