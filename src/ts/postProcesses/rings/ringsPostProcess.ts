@@ -4,20 +4,20 @@ import { UberScene } from "../../uberCore/uberScene";
 import { UberPostProcess } from "../../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "../uniforms";
 import { ObjectPostProcess } from "../objectPostProcess";
-import { StellarObject } from "../../stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms } from "../../uberCore/postProcesses/types";
 import { RingsUniforms } from "./ringsUniform";
 import { Scene } from "@babylonjs/core/scene";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import ringsLUT from "../../../shaders/textures/ringsLUT.glsl";
+import { Transformable } from "../../uberCore/transforms/basicTransform";
 
 export class RingsPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly ringsUniforms: RingsUniforms;
     readonly object: AbstractBody;
     readonly lut: ProceduralTexture;
 
-    public static async CreateAsync(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]): Promise<RingsPostProcess> {
+    public static async CreateAsync(body: AbstractBody, scene: UberScene, stellarObjects: Transformable[]): Promise<RingsPostProcess> {
         const shaderName = "rings";
         if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
