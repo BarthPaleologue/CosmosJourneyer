@@ -29,14 +29,10 @@ export class UberScene extends Scene {
     public setActiveCamera(camera: Camera) {
         this.activeCamera = camera;
 
-        if (this.depthRenderer !== null) {
-            // Remove old depth renderer
-            this.customRenderTargets.splice(this.customRenderTargets.indexOf(this.depthRenderer.getDepthMap()), 1);
-            this.depthRenderer.dispose();
-        }
+        if (this.depthRenderer !== null) this.depthRenderer.dispose();
+
 
         this.depthRenderer = this.enableDepthRenderer(null, false, true);
-        this.customRenderTargets.push(this.depthRenderer.getDepthMap());
     }
 
     public getActiveController(): AbstractController {
