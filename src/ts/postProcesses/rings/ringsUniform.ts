@@ -18,6 +18,46 @@ export class RingsUniforms {
         this.ringColor = new Color3(214, 168, 122).scaleInPlace(randRange(1.0, 1.5, rng, 1430) / 255);
     }
 
+    static getEmptyShaderUniforms(): ShaderUniforms {
+        return [
+            {
+                name: "rings_start",
+                type: UniformEnumType.Float,
+                get: () => {
+                    return 0;
+                }
+            },
+            {
+                name: "rings_end",
+                type: UniformEnumType.Float,
+                get: () => {
+                    return 0;
+                }
+            },
+            {
+                name: "rings_frequency",
+                type: UniformEnumType.Float,
+                get: () => {
+                    return 0;
+                }
+            },
+            {
+                name: "rings_opacity",
+                type: UniformEnumType.Float,
+                get: () => {
+                    return 0;
+                }
+            },
+            {
+                name: "rings_color",
+                type: UniformEnumType.Color3,
+                get: () => {
+                    return new Color3(0, 0, 0);
+                }
+            }
+        ];
+    }
+
     getShaderUniforms(): ShaderUniforms {
         return [
             {

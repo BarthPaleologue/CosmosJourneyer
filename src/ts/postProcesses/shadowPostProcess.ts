@@ -10,6 +10,7 @@ import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from
 import { PostProcessType } from "./postProcessTypes";
 import { RingsUniforms } from "./rings/ringsUniform";
 import { RingsPostProcess } from "./rings/ringsPostProcess";
+import { Assets } from "../assets";
 
 export type ShadowUniforms = {
     hasRings: boolean;
@@ -85,6 +86,14 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
                 });
             });
         } else {
+            uniforms.push(...RingsUniforms.getEmptyShaderUniforms());
+            samplers.push({
+                name: "ringsLUT",
+                type: SamplerEnumType.Texture,
+                get: () => {
+                    return Assets.EmptyTexture;
+                }
+            });
             return new ShadowPostProcess(body.name + "Shadow", body, scene, shaderName, uniforms, samplers, shadowUniforms);
         }
     }

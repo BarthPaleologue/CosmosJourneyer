@@ -2,7 +2,6 @@
 
 #include "../utils/remap.glsl";
 
-#define inline
 float ringDensityAtPoint(vec3 samplePoint) {
     vec3 samplePointPlanetSpace = samplePoint - object_position;
 
