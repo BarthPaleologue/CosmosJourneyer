@@ -72,8 +72,7 @@ export class DefaultController extends AbstractController {
 
     public override update(deltaTime: number): Vector3 {
         const playerMovement = Vector3.Zero();
-        //FIXME: the division by Settings.TIME_MULTIPLIER is a hack to make the player move at the same speed regardless of the time multiplier
-        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.transform.getScene().getEngine().getDeltaTime() / 1000));
+        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.transform.getScene().deltaTime / 1000));
         translate(this.transform, playerMovement);
         return playerMovement;
     }

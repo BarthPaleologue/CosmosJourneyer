@@ -11,13 +11,13 @@ import { Scene } from "@babylonjs/core/scene";
 /**
  * A wrapper around BabylonJS post processes that allows more predictable and easier to use uniforms
  */
-export abstract class UberPostProcess extends PostProcess implements UpdatablePostProcess {
+export class UberPostProcess extends PostProcess implements UpdatablePostProcess {
     private readonly uniforms: ShaderUniforms = [];
     private readonly samplers: ShaderSamplers = [];
 
     readonly onUpdatedObservable = new Observable<number>();
 
-    protected constructor(name: string, fragmentName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: Scene) {
+    constructor(name: string, fragmentName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: Scene) {
         const uniformNames = uniforms.map((uniform) => uniform.name);
         const samplerNames = samplers.map((sampler) => sampler.name);
 
