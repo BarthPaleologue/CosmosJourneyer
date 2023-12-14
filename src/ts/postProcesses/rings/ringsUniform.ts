@@ -15,6 +15,7 @@ export class RingsUniforms {
     ringColor: Color3;
 
     private ringLut: ProceduralTexture | null = null;
+    private offset: number;
 
     constructor(rng: (step: number) => number) {
         this.ringStart = randRange(1.8, 2.2, rng, 1400);
@@ -22,6 +23,8 @@ export class RingsUniforms {
         this.ringFrequency = 30.0;
         this.ringOpacity = clamp(normalRandom(0.7, 0.1, rng, 1420), 0, 1);
         this.ringColor = new Color3(214, 168, 122).scaleInPlace(randRange(1.0, 1.5, rng, 1430) / 255);
+
+        this.offset = randRange(-100, 100, rng, 1440);
     }
 
     static getEmptyShaderUniforms(): ShaderUniforms {
@@ -104,33 +107,38 @@ export class RingsUniforms {
         ];
     }
 
-    public getLUT(seed: number, ringStart: number, ringEnd: number, frequency: number, scene: Scene): ProceduralTexture {
+    public getLUT(scene: Scene): Promise<ProceduralTexture> {
         if(Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
             Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
         }
 
-        if(this.ringLut !== null) return this.ringLut;
+        if(this.ringLut === null) {
+            const lut = new ProceduralTexture(
+              "ringsLUT",
+              {
+                  width: 4096,
+                  height: 1
+              },
+              "ringsLUT",
+              scene,
+              undefined,
+              true,
+              false
+            );
+            lut.setFloat("seed", this.offset);
+            lut.setFloat("frequency", this.ringFrequency);
+            lut.setFloat("ringStart", this.ringStart);
+            lut.setFloat("ringEnd", this.ringEnd);
+            lut.refreshRate = 0;
 
-        const lut = new ProceduralTexture(
-          "ringsLUT",
-          {
-              width: 4096,
-              height: 1
-          },
-          "ringsLUT",
-          scene,
-          undefined,
-          true,
-          false
-        );
-        lut.setFloat("seed", seed);
-        lut.setFloat("frequency", frequency);
-        lut.setFloat("ringStart", ringStart);
-        lut.setFloat("ringEnd", ringEnd);
-        lut.refreshRate = 0;
+            this.ringLut = lut;
+        }
 
-        this.ringLut = lut;
-
-        return lut;
+        return new Promise((resolve, reject) => {
+            this.ringLut?.executeWhenReady(() => {
+                if(this.ringLut === null) throw new Error("Ring LUT was null when executing when ready");
+                resolve(this.ringLut);
+            });
+        });
     }
 }

@@ -35,23 +35,18 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             ...ringsUniforms.getShaderUniforms()
         ];
 
-        const lut = ringsUniforms.getLUT(body.model.seed, ringsUniforms.ringStart, ringsUniforms.ringEnd, ringsUniforms.ringFrequency, scene);
-
-        const samplers: ShaderSamplers = [
-            ...getSamplers(scene),
-            {
-                name: "ringsLUT",
-                type: SamplerEnumType.Texture,
-                get: () => {
-                    return lut;
+        return ringsUniforms.getLUT(scene).then((lut) => {
+            const samplers: ShaderSamplers = [
+                ...getSamplers(scene),
+                {
+                    name: "ringsLUT",
+                    type: SamplerEnumType.Texture,
+                    get: () => {
+                        return lut;
+                    }
                 }
-            }
-        ];
-
-        return new Promise((resolve, reject) => {
-            lut.executeWhenReady(() => {
-                resolve(new RingsPostProcess(body.name + "Rings", shaderName, uniforms, samplers, scene, body, ringsUniforms, lut));
-            });
+            ];
+            return new RingsPostProcess(body.name + "Rings", shaderName, uniforms, samplers, scene, body, ringsUniforms, lut);
         });
     }
 

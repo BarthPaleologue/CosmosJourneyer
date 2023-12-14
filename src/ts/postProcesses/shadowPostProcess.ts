@@ -71,20 +71,17 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
         if (shadowUniforms.hasRings) {
             uniforms.push(...ringsUniforms.getShaderUniforms());
 
-            const ringsLUT = ringsUniforms.getLUT(body.model.seed, ringsUniforms.ringStart, ringsUniforms.ringEnd, ringsUniforms.ringFrequency, scene);
-            samplers.push({
-                name: "ringsLUT",
-                type: SamplerEnumType.Texture,
-                get: () => {
-                    return ringsLUT;
-                }
+            return ringsUniforms.getLUT(scene).then((ringsLut) => {
+                samplers.push({
+                    name: "ringsLUT",
+                    type: SamplerEnumType.Texture,
+                    get: () => {
+                        return ringsLut;
+                    }
+                });
+                return new ShadowPostProcess(body.name + "Shadow", body, scene, shaderName, uniforms, samplers, shadowUniforms);
             });
 
-            return new Promise((resolve, reject) => {
-                ringsLUT.executeWhenReady(() => {
-                    resolve(new ShadowPostProcess(body.name + "Shadow", body, scene, shaderName, uniforms, samplers, shadowUniforms));
-                });
-            });
         } else {
             uniforms.push(...RingsUniforms.getEmptyShaderUniforms());
             samplers.push({
