@@ -77,7 +77,7 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
           "ringsLUT",
             scene,
             undefined,
-            false,
+            true,
             false
         );
         lut.setFloat("seed", seed);
