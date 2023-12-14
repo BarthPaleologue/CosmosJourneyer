@@ -35,7 +35,7 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             ...ringsUniforms.getShaderUniforms()
         ];
 
-        const lut = RingsPostProcess.CreateLUT(body.model.seed, ringsUniforms.ringStart, ringsUniforms.ringEnd, ringsUniforms.ringFrequency, scene);
+        const lut = ringsUniforms.getLUT(body.model.seed, ringsUniforms.ringStart, ringsUniforms.ringEnd, ringsUniforms.ringFrequency, scene);
 
         const samplers: ShaderSamplers = [
             ...getSamplers(scene),
@@ -61,31 +61,5 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
         this.object = body;
         this.ringsUniforms = ringsUniforms;
         this.lut = lut;
-    }
-
-    static CreateLUT(seed: number, ringStart: number, ringEnd: number, frequency: number, scene: Scene): ProceduralTexture {
-        if(Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
-            Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
-        }
-
-        const lut = new ProceduralTexture(
-            "ringsLUT",
-            {
-                width: 4096,
-                height: 1
-            },
-          "ringsLUT",
-            scene,
-            undefined,
-            true,
-            false
-        );
-        lut.setFloat("seed", seed);
-        lut.setFloat("frequency", frequency);
-        lut.setFloat("ringStart", ringStart);
-        lut.setFloat("ringEnd", ringEnd);
-        lut.refreshRate = 0;
-
-        return lut;
     }
 }

@@ -71,7 +71,7 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
         if (shadowUniforms.hasRings) {
             uniforms.push(...ringsUniforms.getShaderUniforms());
 
-            const ringsLUT = RingsPostProcess.CreateLUT(body.model.seed, ringsUniforms.ringStart, ringsUniforms.ringEnd, ringsUniforms.ringFrequency, scene);
+            const ringsLUT = ringsUniforms.getLUT(body.model.seed, ringsUniforms.ringStart, ringsUniforms.ringEnd, ringsUniforms.ringFrequency, scene);
             samplers.push({
                 name: "ringsLUT",
                 type: SamplerEnumType.Texture,

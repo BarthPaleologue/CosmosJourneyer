@@ -2,6 +2,10 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 import { clamp } from "terrain-generation";
 import { ShaderUniforms, UniformEnumType } from "../../uberCore/postProcesses/types";
+import { Scene } from "@babylonjs/core/scene";
+import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+import { Effect } from "@babylonjs/core/Materials/effect";
+import ringsLUT from "../../../shaders/textures/ringsLUT.glsl";
 
 export class RingsUniforms {
     ringStart: number;
@@ -9,6 +13,8 @@ export class RingsUniforms {
     ringFrequency: number;
     ringOpacity: number;
     ringColor: Color3;
+
+    private ringLut: ProceduralTexture | null = null;
 
     constructor(rng: (step: number) => number) {
         this.ringStart = randRange(1.8, 2.2, rng, 1400);
@@ -96,5 +102,35 @@ export class RingsUniforms {
                 }
             }
         ];
+    }
+
+    public getLUT(seed: number, ringStart: number, ringEnd: number, frequency: number, scene: Scene): ProceduralTexture {
+        if(Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
+            Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
+        }
+
+        if(this.ringLut !== null) return this.ringLut;
+
+        const lut = new ProceduralTexture(
+          "ringsLUT",
+          {
+              width: 4096,
+              height: 1
+          },
+          "ringsLUT",
+          scene,
+          undefined,
+          true,
+          false
+        );
+        lut.setFloat("seed", seed);
+        lut.setFloat("frequency", frequency);
+        lut.setFloat("ringStart", ringStart);
+        lut.setFloat("ringEnd", ringEnd);
+        lut.refreshRate = 0;
+
+        this.ringLut = lut;
+
+        return lut;
     }
 }
