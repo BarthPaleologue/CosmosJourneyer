@@ -16,6 +16,7 @@ import { setMaxLinVel } from "./utils/havok";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/StarSystemView";
+import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 
 enum EngineState {
     RUNNING,
@@ -80,8 +81,17 @@ export class CosmosJourneyer {
      * @returns A promise that resolves when the engine and the scenes are created and the assets are loaded
      */
     public async setup(): Promise<void> {
-        // Init BabylonJS engine
-        this.engine = new Engine(this.canvas); //await EngineFactory.CreateAsync(this.canvas, { enableAllFeatures: true });
+        // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
+        this.engine = window.location.search.includes("webgpu")
+            ? await EngineFactory.CreateAsync(this.canvas, {
+                  twgslOptions: {
+                      wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
+                      jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
+                  }
+              })
+            : new Engine(this.canvas);
+
+        //this.engine = new Engine(this.canvas); //await EngineFactory.CreateAsync(this.canvas, { enableAllFeatures: true });
         this.engine.useReverseDepthBuffer = true;
         this.engine.loadingScreen.displayLoadingUI();
         window.addEventListener("resize", () => {
