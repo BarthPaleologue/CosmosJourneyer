@@ -1,62 +1,70 @@
 import "../styles/index.scss";
 
+import { Assets } from "./assets";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
 import { UberScene } from "./uberCore/uberScene";
 import { translate } from "./uberCore/transforms/basicTransform";
-import { EngineFactory } from "@babylonjs/core";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { DirectionalLightWrapper, TransformNodeWrapper } from "./utils/wrappers";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
-import { DefaultController } from "./defaultController/defaultController";
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
-
-// target alignment with https://www.babylonjs-playground.com/#1PHYB0#366
+import { EngineFactory } from "@babylonjs/core";
+import { DefaultController } from "./defaultController/defaultController"
+import { PointLightWrapper, TransformNodeWrapper } from "./utils/wrappers";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const engine = await EngineFactory.CreateAsync(canvas, {});
-engine.useReverseDepthBuffer = true;
+const wasmPath = new URL("./utils/TWGSL/twgsl.wasm", import.meta.url);
+const jsPath = new URL("./utils/TWGSL/twgsl.js", import.meta.url);
 
-console.log(engine.getCaps());
-console.log(engine.getCaps().textureFloatRender);
+const engine = await EngineFactory.CreateAsync(canvas, {
+    twgslOptions: {
+        wasmPath: wasmPath.href,
+        jsPath: jsPath.href
+    }
+});
+
+engine.useReverseDepthBuffer = true;
 
 const scene = new UberScene(engine);
 scene.useRightHandedSystem = true;
 
+await Assets.Init(scene);
+
 const sphereRadius = 1e3;
 
-const controller = new DefaultController(scene);
-controller.addInput(new Keyboard());
-controller.addInput(new Mouse(canvas));
-controller.speed *= sphereRadius;
-const camera = controller.getActiveCamera();
-camera.maxZ = sphereRadius * 1000;
+const defaultController = new DefaultController(scene);
+defaultController.addInput(new Keyboard());
+defaultController.addInput(new Mouse(canvas));
+defaultController.getActiveCamera().maxZ = 1e6;
+defaultController.speed *= sphereRadius;
+scene.setActiveController(defaultController);
 
-scene.setActiveController(controller);
+const sphere = new TransformNodeWrapper(MeshBuilder.CreateSphere("sphere", {diameter: sphereRadius*2}, scene), sphereRadius);
+translate(sphere.getTransform(), new Vector3(0, 0, sphereRadius * 4));
 
-const light = new DirectionalLight("dir01", new Vector3(1, 1, 1).normalize(), scene);
+const star = new PointLightWrapper(new PointLight("dir01", new Vector3(0, 1, 0), scene));
+translate(star.getTransform(), new Vector3(0, 0, -sphereRadius * 4));
 
-const planet = new TransformNodeWrapper(MeshBuilder.CreateSphere("sphere", { diameter: sphereRadius * 2 }, scene), sphereRadius);
-translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
 
-const wrappedLight = new DirectionalLightWrapper(light);
-translate(wrappedLight.getTransform(),light.direction.scale(-sphereRadius * 4));
-
-const ocean = new OceanPostProcess("ocean", planet, scene, [wrappedLight]);
-ocean.oceanUniforms.oceanRadius = sphereRadius * 1.2;
-camera.attachPostProcess(ocean);
+const ocean = new OceanPostProcess("ocean", sphere, scene, [star]);
+ocean.oceanUniforms.oceanRadius = sphereRadius * 1.1;
+defaultController.getActiveCamera().attachPostProcess(ocean);
 
 scene.onBeforeRenderObservable.add(() => {
-    controller.update(scene.deltaTime / 1000);
+    const deltaTime = scene.deltaTime / 1000;
 
-    if (controller.getTransform().getAbsolutePosition().length() > 100) {
-        translate(planet.getTransform(), controller.getTransform().getAbsolutePosition().negate());
-        translate(controller.getTransform(), controller.getTransform().getAbsolutePosition().negate());
+    ocean.update(deltaTime);
+
+    defaultController.update(scene.deltaTime);
+    if (defaultController.getActiveCamera().getAbsolutePosition().length() > 100) {
+        translate(sphere.getTransform(), defaultController.getActiveCamera().getAbsolutePosition().negate());
+        translate(star.getTransform(), defaultController.getActiveCamera().getAbsolutePosition().negate());
+        translate(defaultController.getTransform(), defaultController.getActiveCamera().getAbsolutePosition().negate());
     }
 });
 

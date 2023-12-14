@@ -1,14 +1,14 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 
 import oceanFragment from "../../shaders/oceanFragment.glsl";
-import { Assets } from "../assets";
 import { UberScene } from "../uberCore/uberScene";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { getInverseRotationQuaternion, Transformable } from "../uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { BaseObject } from "../bodies/common";
+import { BoundingSphere } from "../bodies/common";
+import { Assets } from "../assets";
 
 export type OceanUniforms = {
     oceanRadius: number;
@@ -22,9 +22,9 @@ export type OceanUniforms = {
 
 export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly oceanUniforms: OceanUniforms;
-    readonly object: BaseObject;
+    readonly object: Transformable;
 
-    constructor(name: string, planet: BaseObject, scene: UberScene, stars: Transformable[]) {
+    constructor(name: string, planet: Transformable & BoundingSphere, scene: UberScene, stars: Transformable[]) {
 
         const shaderName = "ocean";
         if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
