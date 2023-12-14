@@ -48,7 +48,7 @@ const sphere = new TransformNodeWrapper(MeshBuilder.CreateSphere("sphere", {diam
 translate(sphere.getTransform(), new Vector3(0, 0, sphereRadius * 4));
 
 const star = new PointLightWrapper(new PointLight("dir01", new Vector3(0, 1, 0), scene));
-translate(star.getTransform(), new Vector3(0, 0, -sphereRadius * 4));
+translate(star.getTransform(), new Vector3(0, 0, -sphereRadius * 4e3));
 
 
 const ocean = new OceanPostProcess("ocean", sphere, scene, [star]);
