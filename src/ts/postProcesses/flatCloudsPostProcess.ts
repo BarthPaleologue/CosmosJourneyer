@@ -187,7 +187,7 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
             Effect.ShadersStore[`flatCloudsLUTFragmentShader`] = flatCloudLUT;
         }
 
-        const lut = new ProceduralTexture("flatCloudLUT", 4096, "flatCloudsLUT", scene, undefined, false, false);
+        const lut = new ProceduralTexture("flatCloudLUT", 4096, "flatCloudsLUT", scene, undefined, true, false);
         lut.setFloat("worleyFrequency", worleyFrequency);
         lut.setFloat("detailFrequency", detailFrequency);
         lut.refreshRate = 0;
