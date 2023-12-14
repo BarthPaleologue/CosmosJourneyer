@@ -17,12 +17,26 @@ import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setMaxLinVel } from "./utils/havok";
 import { DefaultController } from "./defaultController/defaultController";
+import { FlatCloudsPostProcess } from "./postProcesses/flatCloudsPostProcess";
+import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const engine = await EngineFactory.CreateAsync(canvas, {});
+const wasmPath = new URL("./utils/TWGSL/twgsl.wasm", import.meta.url);
+const jsPath = new URL("./utils/TWGSL/twgsl.js", import.meta.url);
+
+console.log(wasmPath, jsPath);
+
+const engine = await EngineFactory.CreateAsync(canvas, {
+    twgslOptions: {
+        wasmPath: wasmPath.href,
+        jsPath: jsPath.href
+    }
+});
+
 engine.useReverseDepthBuffer = true;
 
 const scene = new UberScene(engine);
@@ -72,19 +86,29 @@ class LightWrapper implements Transformable {
 
 const wrappedLight = new LightWrapper(light);
 
-//const ocean = new OceanPostProcess("ocean", sphere, scene, [wrappedLight]);
-//defaultController.getActiveCamera().attachPostProcess(ocean);
+const starfield = new StarfieldPostProcess(scene, [wrappedLight], [sphere], Quaternion.Identity());
+defaultController.getActiveCamera().attachPostProcess(starfield);
 
-const atmosphere = new AtmosphericScatteringPostProcess("atmosphere", sphere, 100e3, scene, [wrappedLight]);
-defaultController.getActiveCamera().attachPostProcess(atmosphere);
+const ocean = new OceanPostProcess("ocean", sphere, scene, [wrappedLight]);
+defaultController.getActiveCamera().attachPostProcess(ocean);
 
-scene.onBeforeRenderObservable.add(() => {
+FlatCloudsPostProcess.CreateAsync("clouds", sphere, 10e3, scene, [wrappedLight]).then((clouds) => {
+    defaultController.getActiveCamera().attachPostProcess(clouds);
+
+    const atmosphere = new AtmosphericScatteringPostProcess("atmosphere", sphere, 100e3, scene, [wrappedLight]);
+    defaultController.getActiveCamera().attachPostProcess(atmosphere);
+});
+
+scene.onBeforePhysicsObservable.add(() => {
     const deltaTime = scene.deltaTime / 1000;
     sphere.updateInternalClock(deltaTime);
     sphere.computeCulling(defaultController.getActiveCamera());
     sphere.updateLOD(defaultController.getActiveCamera().getAbsolutePosition(), chunkForge);
     chunkForge.update();
     sphere.updateMaterial(defaultController, [wrappedLight], deltaTime);
+
+    starfield.update(deltaTime);
+    ocean.update(deltaTime);
 
     defaultController.update(scene.deltaTime);
     if (defaultController.getActiveCamera().getAbsolutePosition().length() > 100) {

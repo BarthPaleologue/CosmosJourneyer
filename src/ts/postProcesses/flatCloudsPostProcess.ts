@@ -9,11 +9,11 @@ import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
 import flatCloudLUT from "../../shaders/textures/flatCloudLUT.glsl";
+import { Transformable } from "../uberCore/transforms/basicTransform";
 
 export interface CloudUniforms {
     layerRadius: number;
@@ -38,7 +38,7 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
         planet: TelluricPlanemo,
         cloudLayerHeight: number,
         scene: UberScene,
-        stellarObjects: StellarObject[]
+        stellarObjects: Transformable[]
     ): Promise<FlatCloudsPostProcess> {
         const shaderName = "flatClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
