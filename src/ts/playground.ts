@@ -20,6 +20,8 @@ import { DefaultController } from "./defaultController/defaultController";
 import { FlatCloudsPostProcess } from "./postProcesses/flatCloudsPostProcess";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";
+import { RingsPostProcess } from "./postProcesses/rings/ringsPostProcess";
+import { RingsUniforms } from "./postProcesses/rings/ringsUniform";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -65,6 +67,7 @@ const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
 
 const sphereRadius = 1000e3;
 const sphere = new TelluricPlanemo("sphere", scene, 0.5);
+sphere.model.ringsUniforms = new RingsUniforms(sphere.model.rng);
 translate(sphere.getTransform(), new Vector3(0, 0, sphereRadius * 4));
 
 defaultController.getActiveCamera().maxZ = sphereRadius * 10;
@@ -94,9 +97,14 @@ defaultController.getActiveCamera().attachPostProcess(ocean);
 
 FlatCloudsPostProcess.CreateAsync("clouds", sphere, 10e3, scene, [wrappedLight]).then((clouds) => {
     defaultController.getActiveCamera().attachPostProcess(clouds);
+    scene.onBeforeRenderObservable.add(() => clouds.update(scene.deltaTime * 0.001));
 
     const atmosphere = new AtmosphericScatteringPostProcess("atmosphere", sphere, 100e3, scene, [wrappedLight]);
     defaultController.getActiveCamera().attachPostProcess(atmosphere);
+
+    RingsPostProcess.CreateAsync(sphere, scene, [wrappedLight]).then((rings) => {
+        defaultController.getActiveCamera().attachPostProcess(rings);
+    });
 });
 
 scene.onBeforePhysicsObservable.add(() => {
