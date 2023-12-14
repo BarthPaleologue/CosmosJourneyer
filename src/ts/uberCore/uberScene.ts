@@ -27,11 +27,11 @@ export class UberScene extends Scene {
     }
 
     public setActiveCamera(camera: Camera) {
+        if (this.activeCamera !== null) this.activeCamera.detachControl(this.getEngine().getRenderingCanvas());
         this.activeCamera = camera;
+        camera.attachControl(this.getEngine().getRenderingCanvas(), true);
 
         if (this.depthRenderer !== null) this.depthRenderer.dispose();
-
-
         this.depthRenderer = this.enableDepthRenderer(null, false, true);
     }
 

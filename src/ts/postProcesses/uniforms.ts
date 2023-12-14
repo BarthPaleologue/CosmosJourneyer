@@ -1,47 +1,68 @@
 import { UberScene } from "../uberCore/uberScene";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { BaseObject, BoundingSphere } from "../bodies/common";
+import { BoundingSphere } from "../bodies/common";
 import { Star } from "../stellarObjects/star/star";
 import { Transformable } from "../uberCore/transforms/basicTransform";
+import { Scene } from "@babylonjs/core/scene";
 
-export function getActiveCameraUniforms(scene: UberScene): ShaderUniforms {
+export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
     return [
         {
             name: "camera_position",
             type: UniformEnumType.Vector3,
-            get: () => scene.getActiveUberCamera().getAbsolutePosition()
+            get: () => {
+                if (scene.activeCamera === null) throw new Error("No active camera");
+                return scene.activeCamera.globalPosition;
+            }
         },
         {
             name: "camera_projection",
             type: UniformEnumType.Matrix,
-            get: () => scene.getActiveUberCamera().getProjectionMatrix()
+            get: () => {
+                if(scene.activeCamera === null) throw new Error("No active camera");
+                return scene.activeCamera.getProjectionMatrix();
+            }
         },
         {
             name: "camera_inverseProjection",
             type: UniformEnumType.Matrix,
-            get: () => scene.getActiveUberCamera().getInverseProjectionMatrix()
+            get: () => {
+                if(scene.activeCamera === null) throw new Error("No active camera");
+                return scene.activeCamera.getProjectionMatrix().clone().invert();
+            }
         },
         {
             name: "camera_view",
             type: UniformEnumType.Matrix,
-            get: () => scene.getActiveUberCamera().getViewMatrix()
+            get: () => {
+                if(scene.activeCamera === null) throw new Error("No active camera");
+                return scene.activeCamera.getViewMatrix();
+            }
         },
         {
             name: "camera_inverseView",
             type: UniformEnumType.Matrix,
-            get: () => scene.getActiveUberCamera().getInverseViewMatrix()
+            get: () => {
+                if(scene.activeCamera === null) throw new Error("No active camera");
+                return scene.activeCamera.getViewMatrix().clone().invert();
+            }
         },
         {
             name: "camera_near",
             type: UniformEnumType.Float,
-            get: () => scene.getActiveUberCamera().minZ
+            get: () => {
+                if(scene.activeCamera === null) throw new Error("No active camera");
+                return scene.activeCamera.minZ;
+            }
         },
         {
             name: "camera_far",
             type: UniformEnumType.Float,
-            get: () => scene.getActiveUberCamera().maxZ
+            get: () => {
+                if(scene.activeCamera === null) throw new Error("No active camera");
+                return scene.activeCamera.maxZ;
+            }
         }
     ];
 }
