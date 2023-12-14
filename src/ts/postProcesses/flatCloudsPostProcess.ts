@@ -8,7 +8,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
-import { ObjectPostProcess } from "./objectPostProcess";
+import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Scene } from "@babylonjs/core/scene";
@@ -29,7 +29,7 @@ export interface CloudUniforms {
     time: number;
 }
 
-export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPostProcess {
+export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly cloudUniforms: CloudUniforms;
     readonly object: TelluricPlanemo;
 
@@ -158,9 +158,6 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
         return new Promise((resolve, reject) => {
             lut.executeWhenReady(() => {
                 const postProcess = new FlatCloudsPostProcess(name, shaderName, planet, cloudUniforms, uniforms, samplers, scene);
-                postProcess.onUpdatedObservable.add((deltaTime: number) => {
-                    cloudUniforms.time += deltaTime;
-                });
 
                 resolve(postProcess);
             });
@@ -193,5 +190,9 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
         lut.refreshRate = 0;
 
         return lut;
+    }
+
+    public update(deltaTime: number): void {
+        this.cloudUniforms.time += deltaTime;
     }
 }

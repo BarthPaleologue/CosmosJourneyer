@@ -98,4 +98,8 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
         this.object = blackHole;
         this.blackHoleUniforms = blackHoleUniforms;
     }
+
+    public update(deltaTime: number): void {
+        this.blackHoleUniforms.time += deltaTime;
+    }
 }

@@ -4,7 +4,7 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./unifo
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { StellarObject } from "../stellarObjects/stellarObject";
-import { ObjectPostProcess } from "./objectPostProcess";
+import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { BaseObject } from "../bodies/common";
 
@@ -17,7 +17,7 @@ export interface MatterJetUniforms {
 /**
  * Post process for rendering matter jets that are used by neutron stars for example
  */
-export class MatterJetPostProcess extends UberPostProcess implements ObjectPostProcess {
+export class MatterJetPostProcess extends UberPostProcess implements ObjectPostProcess, UpdatablePostProcess {
     matterJetUniforms: MatterJetUniforms;
     object: BaseObject;
 
@@ -65,5 +65,9 @@ export class MatterJetPostProcess extends UberPostProcess implements ObjectPostP
 
         this.object = stellarObject;
         this.matterJetUniforms = settings;
+    }
+
+    public update(deltaTime: number): void {
+        this.matterJetUniforms.time += deltaTime;
     }
 }

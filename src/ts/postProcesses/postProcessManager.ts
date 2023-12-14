@@ -83,7 +83,7 @@ export class PostProcessManager {
     private readonly starFields: StarfieldPostProcess[] = [];
     private readonly volumetricLights: VolumetricLight[] = [];
     private readonly oceans: OceanPostProcess[] = [];
-    private readonly clouds: CloudsPostProcess[] = [];
+    private readonly clouds: FlatCloudsPostProcess[] = [];
     private readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
     private readonly rings: RingsPostProcess[] = [];
     private readonly mandelbulbs: MandelbulbPostProcess[] = [];
@@ -111,7 +111,7 @@ export class PostProcessManager {
     /**
      * All post processes that are updated every frame.
      */
-    private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.starFields, this.volumetricLights, ...this.objectPostProcesses];
+    private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.oceans, this.clouds, this.blackHoles, this.matterJets];
 
     readonly colorCorrection: ColorCorrection;
     readonly fxaa: FxaaPostProcess;

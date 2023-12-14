@@ -4,7 +4,7 @@ import oceanFragment from "../../shaders/oceanFragment.glsl";
 import { UberScene } from "../uberCore/uberScene";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { ObjectPostProcess } from "./objectPostProcess";
+import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { getInverseRotationQuaternion, Transformable } from "../uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
 import { BoundingSphere } from "../bodies/common";
@@ -20,14 +20,13 @@ export type OceanUniforms = {
     time: number;
 };
 
-export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess {
+export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly oceanUniforms: OceanUniforms;
     readonly object: Transformable;
 
     constructor(name: string, planet: Transformable & BoundingSphere, scene: UberScene, stars: Transformable[]) {
-
         const shaderName = "ocean";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
         }
 
@@ -127,9 +126,9 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
 
         this.object = planet;
         this.oceanUniforms = oceanUniforms;
+    }
 
-        this.onUpdatedObservable.add((deltaTime: number) => {
-            this.oceanUniforms.time += deltaTime;
-        });
+    public update(deltaTime: number) {
+        this.oceanUniforms.time += deltaTime;
     }
 }
