@@ -3,6 +3,7 @@ import { BoundingSphere } from "../bodies/common";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 export class TransformNodeWrapper implements Transformable, BoundingSphere {
   readonly transform: TransformNode;
@@ -29,6 +30,22 @@ export class DirectionalLightWrapper implements Transformable {
   constructor(light: DirectionalLight) {
     this.light = light;
     this.transform = new TransformNode("lightTransform");
+    this.light.parent = this.transform;
+  }
+
+  getTransform(): TransformNode {
+    return this.transform;
+  }
+}
+
+export class PointLightWrapper implements Transformable {
+  readonly light: PointLight;
+  readonly transform: TransformNode;
+
+  constructor(light: PointLight) {
+    this.light = light;
+    this.transform = new TransformNode("lightTransform");
+    this.light.parent = this.transform;
   }
 
   getTransform(): TransformNode {

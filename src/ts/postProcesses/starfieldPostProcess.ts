@@ -18,9 +18,8 @@ import { Transformable } from "../uberCore/transforms/basicTransform";
 
 export class StarfieldPostProcess extends UberPostProcess {
     constructor(scene: UberScene, stellarObjects: Transformable[], bodies: AbstractBody[], starfieldRotation: Quaternion) {
-
         const shaderName = "starfield";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
         }
 
@@ -40,6 +39,8 @@ export class StarfieldPostProcess extends UberPostProcess {
                 name: "visibility",
                 type: UniformEnumType.Float,
                 get: () => {
+                    if (bodies.length === 0) return 1;
+
                     //TODO: should be cleaned up
                     let vis = 1.0;
                     for (const star of stellarObjects) {
