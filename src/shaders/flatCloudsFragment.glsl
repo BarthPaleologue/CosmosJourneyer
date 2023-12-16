@@ -52,9 +52,18 @@ float cloudDensityAtPoint(vec3 samplePoint) {
     vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds_worleySpeed);
     vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds_detailSpeed);
 
-    float density = 1.0 - texture2D(clouds_lut, toUV(samplePointRotatedWorley)).r;
+    vec2 uvWorley = toUV(samplePointRotatedWorley);
+    vec2 uvDetail = toUV(samplePointRotatedDetail);
 
-    density *= texture2D(clouds_lut, toUV(samplePointRotatedDetail)).g;
+    // trick from https://www.shadertoy.com/view/3dVSzm to avoid Greenwich artifacts
+    vec2 dfWorley = fwidth(uvWorley);
+    if(dfWorley.x > 0.5) dfWorley.x = 0.0;
+
+    vec2 dfDetail = fwidth(uvDetail);
+    if(dfDetail.x > 0.5) dfDetail.x = 0.0;
+
+    float density = 1.0 - textureLod(clouds_lut, uvWorley, log2(max(dfWorley.x, dfWorley.y) * 1024.0)).r;
+    density *= textureLod(clouds_lut, uvDetail, log2(max(dfDetail.x, dfDetail.y) * 1024.0)).g;
 
     float cloudThickness = 2.0;//TODO: make this a uniform
 
