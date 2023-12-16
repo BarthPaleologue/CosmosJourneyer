@@ -8,7 +8,6 @@ const isProduction = process.env.NODE_ENV === "production";
 const htmlPath = path.join(__dirname, "/src/html/");
 
 const config = {
-
     entry: {
         showcase: "./src/ts/index.ts",
         random: "./src/ts/randomizer.ts",
@@ -16,6 +15,7 @@ const config = {
         physicSpaceship: "./src/ts/physicSpaceship.ts",
         planetWalk: "./src/ts/planetWalk.ts",
         playground: "./src/ts/playground.ts",
+        xr: "./src/ts/xr.ts",
         debugAssets: "./src/ts/debugAssets.ts"
     },
     output: {
@@ -27,7 +27,7 @@ const config = {
         historyApiFallback: false,
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",
-            "Cross-Origin-Embedder-Policy": "same-origin",
+            "Cross-Origin-Embedder-Policy": "same-origin"
         }
     },
 
@@ -69,6 +69,12 @@ const config = {
             chunks: ["playground"]
         }),
         new HtmlWebpackPlugin({
+            title: "XR",
+            filename: "xr.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["xr"]
+        }),
+        new HtmlWebpackPlugin({
             title: "Debug Texture",
             filename: "debugassets.html",
             template: path.join(htmlPath, "index.html"),
@@ -76,7 +82,6 @@ const config = {
         }),
         new MiniCssExtractPlugin()
     ],
-
 
     module: {
         rules: [
@@ -110,7 +115,6 @@ const config = {
                 exclude: /node_modules/,
                 use: ["ts-shader-loader"]
             }
-
 
             // Add your rules for custom modules here
             // Learn more about loaders from https://webpack.js.org/loaders/
