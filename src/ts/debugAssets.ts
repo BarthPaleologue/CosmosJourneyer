@@ -39,12 +39,11 @@ function showTexture(texture: BaseTexture, position: Vector3) {
     plane.material = material;
 }
 
-
 const sideLength = 10;
 let meshCounter = 0;
-for(const rootMesh of scene.meshes) {
+for (const rootMesh of scene.meshes) {
     rootMesh.isVisible = true;
-    if(rootMesh.parent !== null) continue;
+    if (rootMesh.parent !== null) continue;
     meshCounter++;
     const extent = rootMesh.getHierarchyBoundingVectors();
     const maxDimension = Math.max(extent.max.x - extent.min.x, extent.max.y - extent.min.y, extent.max.z - extent.min.z);
@@ -53,7 +52,7 @@ for(const rootMesh of scene.meshes) {
 }
 
 const transformNodes = scene.transformNodes.slice();
-for(const transform of transformNodes) {
+for (const transform of transformNodes) {
     transform.instantiateHierarchy();
 }
 

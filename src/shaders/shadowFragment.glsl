@@ -7,10 +7,9 @@ varying vec2 vUV;// screen coordinates
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
-uniform sampler2D ringsLUT;
 
-uniform int nbStars;// number of stars
 #include "./utils/stars.glsl";
+float star_radiuses[MAX_STARS];
 
 #include "./utils/camera.glsl";
 
@@ -63,7 +62,7 @@ float ringOccultation(vec3 rayDir, float maximumDistance) {
             accDensity += ringDensityAtPoint(shadowSamplePoint) * rings_opacity;
         }
     }
-    return pow(1.0 - accDensity, 4.0) * 0.5 + 0.5;
+    return pow(1.0 - accDensity, 4.0) * 0.8 + 0.2;
 }
 
 void main() {

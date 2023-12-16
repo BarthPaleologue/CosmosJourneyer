@@ -60,9 +60,9 @@ uniform float maxTemperature;
 
 uniform float waterAmount;
 
-#include "../utils/perlin3.glsl";
+uniform sampler2D lut;
 
-#include "../utils/remap.glsl";
+#include "../utils/toUV.glsl";
 
 #include "../utils/triplanarNormal.glsl";
 
@@ -127,14 +127,20 @@ void main() {
 
     float temperature = mix(minTemperature, maxTemperature, temperature01);
 
+    vec2 uv = toUV(vUnitSamplePoint);
+    // trick from https://www.shadertoy.com/view/3dVSzm to avoid Greenwich artifacts
+    vec2 df = fwidth(uv);
+    if(df.x > 0.5) df.x = 0.0;
+    vec4 lutResult = textureLod(lut, uv, log2(max(df.x, df.y) * 1024.0));
+
     // moisture
     float moisture01 = 0.0;// 0.0 = sec, 1.0 = humid : sec par défaut
     if (waterMeltingPoint01 < 1.0) {
         // if there is liquid water on the surface
-        moisture01 += 0.5 * (1.0 + perlin3(vUnitSamplePoint * 2.0)) * sqrt(1.0-waterMeltingPoint01) * waterBoilingPoint01;
+        moisture01 += lutResult.x;
     }
     if (pressure == 0.0) {
-        moisture01 += 0.5 * (1.0 + perlin3(vUnitSamplePoint * 5.0));
+        moisture01 += lutResult.y;
     }
     moisture01 = clamp(moisture01, 0.0, 1.0);
 
@@ -173,18 +179,18 @@ void main() {
     plainFactor *= 1.0 - beachFactor;
     beachFactor *= 1.0 - steepFactor;
 
-    // blend with snow factor when above water
-    snowFactor = smoothstep(0.0, -2.0, temperature - abs(blendingNormal.y) * 5.0);
-    snowFactor = smoothSharpener(snowFactor, 2.0);
-    plainFactor *= 1.0 - snowFactor;
-    beachFactor *= 1.0 - snowFactor;
-
     // blend with desert factor when above water
     desertFactor = smoothstep(0.5, 0.3, moisture01);
     desertFactor = smoothSharpener(desertFactor, 2.0);
     plainFactor *= 1.0 - desertFactor;
     beachFactor *= 1.0 - desertFactor;
 
+    // blend with snow factor when above water
+    snowFactor = smoothstep(0.0, -2.0, temperature - abs(0.3 * (blendingNormal.z + blendingNormal.x + blendingNormal.y)) * 5.0);
+    snowFactor = smoothSharpener(snowFactor, 2.0);
+    plainFactor *= 1.0 - snowFactor;
+    beachFactor *= 1.0 - snowFactor;
+    desertFactor *= 1.0 - snowFactor;
 
     // blend with bottom factor when under water
     bottomFactor = smoothstep(waterLevel01, waterLevel01 - 1e-2, elevation01);
@@ -202,7 +208,7 @@ void main() {
     const float normalStrengthNear = 0.5;
     const float normalStrengthFar = 0.2;
 
-    const float nearScale = 0.005 * 1000e3;
+    const float nearScale = 0.1 * 1000e3;
     const float farScale = 0.00001 * 1000e3;
 
     normal = triplanarNormal(vSamplePointScaled, normal, bottomNormalMap, nearScale, normalSharpness, bottomFactor * normalStrengthNear);
@@ -223,6 +229,7 @@ void main() {
     normal = triplanarNormal(vSamplePointScaled, normal, steepNormalMap, nearScale, normalSharpness, steepFactor * normalStrengthNear);
     normal = triplanarNormal(vSamplePointScaled, normal, steepNormalMap, farScale, normalSharpness, steepFactor * normalStrengthFar);
 
+    normal = normalize(normal);
 
     vec3 color = steepFactor * steepColor
     + beachFactor * beachColor
@@ -266,7 +273,6 @@ void main() {
     if (colorMode == 4) screenColor = vec3(elevation01);
     if (colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vSamplePoint)));
     if (colorMode == 6) screenColor = vec3(1.0 - slope);
-
 
     gl_FragColor = vec4(screenColor, 1.0);// apply color and lighting
 } 

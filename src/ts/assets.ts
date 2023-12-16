@@ -61,6 +61,8 @@ export class Assets {
     static Starfield: Texture;
     static PlumeParticle: Texture;
 
+    static EmptyTexture: Texture;
+
     static ProceduralTest: ProceduralTexture;
     static AtmosphereLUT: ProceduralTexture;
 
@@ -101,6 +103,8 @@ export class Assets {
 
         Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Assets.AtmosphereLUT.refreshRate = 0;
+
+        Assets.EmptyTexture = new Texture(null, scene);
 
         const spaceshipTask = Assets.manager.addMeshTask("spaceshipTask", "", "", spaceship);
         spaceshipTask.onSuccess = function (task: MeshAssetTask) {

@@ -1,10 +1,10 @@
 import { VolumetricLightScatteringPostProcess } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
 import { UberScene } from "../uberCore/uberScene";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
+import { ObjectPostProcess } from "./objectPostProcess";
 import { Star } from "../stellarObjects/star/star";
 
-export class VolumetricLight extends VolumetricLightScatteringPostProcess implements UpdatablePostProcess, ObjectPostProcess {
+export class VolumetricLight extends VolumetricLightScatteringPostProcess implements ObjectPostProcess {
     readonly object: Star;
 
     constructor(star: Star, scene: UberScene) {
@@ -16,10 +16,6 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess implem
         this.decay = 0.95;
 
         this.getCamera().detachPostProcess(this);
-    }
-
-    public update(deltaTime: number): void {
-        return;
     }
 
     public override dispose(): void {

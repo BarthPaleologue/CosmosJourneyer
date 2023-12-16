@@ -10,25 +10,26 @@ import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 
-export type BlackHoleSettings = {
+export type BlackHoleUniforms = {
     accretionDiskRadius: number;
     rotationPeriod: number;
+    time: number;
 };
 
 export class BlackHolePostProcess extends UberPostProcess implements ObjectPostProcess {
-    readonly settings: BlackHoleSettings;
+    readonly blackHoleUniforms: BlackHoleUniforms;
     readonly object: BlackHole;
 
     constructor(blackHole: BlackHole, scene: UberScene, starfieldRotation: Quaternion) {
-
         const shaderName = "blackhole";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
         }
 
-        const settings: BlackHoleSettings = {
+        const blackHoleUniforms: BlackHoleUniforms = {
             accretionDiskRadius: blackHole.model.physicalProperties.accretionDiskRadius,
-            rotationPeriod: 1.5
+            rotationPeriod: 1.5,
+            time: 0
         };
 
         const uniforms: ShaderUniforms = [
@@ -47,21 +48,21 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
                 name: "time",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return this.internalTime % (settings.rotationPeriod * 10000);
+                    return blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000);
                 }
             },
             {
                 name: "accretionDiskRadius",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.accretionDiskRadius;
+                    return blackHoleUniforms.accretionDiskRadius;
                 }
             },
             {
                 name: "rotationPeriod",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return settings.rotationPeriod;
+                    return blackHoleUniforms.rotationPeriod;
                 }
             },
             {
@@ -94,6 +95,10 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
         super(blackHole.name, shaderName, uniforms, samplers, scene);
 
         this.object = blackHole;
-        this.settings = settings;
+        this.blackHoleUniforms = blackHoleUniforms;
+    }
+
+    public update(deltaTime: number): void {
+        this.blackHoleUniforms.time += deltaTime;
     }
 }

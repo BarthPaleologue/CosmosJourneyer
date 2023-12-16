@@ -17,9 +17,8 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
     readonly object: Mandelbulb;
 
     constructor(mandelbulb: Mandelbulb, scene: UberScene, stellarObjects: StellarObject[]) {
-
         const shaderName = "mandelbulb";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelbulbFragment;
         }
 
@@ -31,13 +30,6 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
             ...getObjectUniforms(mandelbulb),
             ...getStellarObjectsUniforms(stellarObjects),
             ...getActiveCameraUniforms(scene),
-            {
-                name: "time",
-                type: UniformEnumType.Float,
-                get: () => {
-                    return this.internalTime % (settings.rotationPeriod * 10000);
-                }
-            },
             {
                 name: "power",
                 type: UniformEnumType.Float,

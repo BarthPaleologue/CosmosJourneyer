@@ -2,39 +2,26 @@ import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.gls
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
 import { ObjectPostProcess } from "./objectPostProcess";
-import { CloudUniforms, FlatCloudsPostProcess } from "./flatCloudsPostProcess";
+import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { StellarObject } from "../stellarObjects/stellarObject";
+import { CloudsUniforms } from "./clouds/cloudsUniforms";
+import { Transformable } from "../uberCore/transforms/basicTransform";
+import { BoundingSphere } from "../bodies/common";
 
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 
 export class VolumetricCloudsPostProcess extends UberPostProcess implements ObjectPostProcess {
-    readonly cloudUniforms: CloudUniforms;
-    readonly object: TelluricPlanemo;
+    readonly cloudUniforms: CloudsUniforms;
+    readonly object: Transformable;
 
-    constructor(name: string, planet: TelluricPlanemo, cloudLayerHeight: number, scene: UberScene, stars: StellarObject[]) {
-
+    constructor(name: string, planet: Transformable & BoundingSphere, cloudsUniforms: CloudsUniforms, scene: UberScene, stars: StellarObject[]) {
         const shaderName = "volumetricClouds";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
         }
-
-        const cloudUniforms: CloudUniforms = {
-            layerRadius: planet.getBoundingRadius() + cloudLayerHeight,
-            specularPower: 2,
-            smoothness: 0.9,
-            frequency: 4,
-            detailFrequency: 20,
-            coverage: 0.8 * Math.exp(-planet.model.physicalProperties.waterAmount * planet.model.physicalProperties.pressure),
-            sharpness: 3.5,
-            color: new Color3(0.8, 0.8, 0.8),
-            worleySpeed: 0.0005,
-            detailSpeed: 0.003
-        };
 
         const uniforms: ShaderUniforms = [
             ...getObjectUniforms(planet),
@@ -61,6 +48,6 @@ export class VolumetricCloudsPostProcess extends UberPostProcess implements Obje
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = planet;
-        this.cloudUniforms = cloudUniforms;
+        this.cloudUniforms = cloudsUniforms;
     }
 }

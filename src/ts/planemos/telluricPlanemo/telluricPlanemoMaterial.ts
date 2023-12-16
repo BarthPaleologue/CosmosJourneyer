@@ -11,10 +11,12 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { getInverseRotationMatrix } from "../../uberCore/transforms/basicTransform";
-import { StellarObject } from "../../stellarObjects/stellarObject";
+import { getInverseRotationMatrix, Transformable } from "../../uberCore/transforms/basicTransform";
 import { Star } from "../../stellarObjects/star/star";
 import { flattenVector3Array } from "../../utils/algebra";
+
+import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
+import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 
 /**
  * The material for telluric planemos.
@@ -42,10 +44,10 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
      */
     constructor(planetName: string, planet: TransformNode, model: TelluricPlanemoModel, scene: UberScene) {
         const shaderName = "surfaceMaterial";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
         }
-        if(Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
         }
 
@@ -59,13 +61,6 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "normalMatrix",
 
                 "colorMode",
-
-                "bottomNormalMap",
-                "plainNormalMap",
-                "beachNormalMap",
-                "desertNormalMap",
-                "snowNormalMap",
-                "steepNormalMap",
 
                 "seed",
 
@@ -101,7 +96,8 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "pressure",
 
                 "waterAmount"
-            ]
+            ],
+            samplers: ["lut", "bottomNormalMap", "plainNormalMap", "beachNormalMap", "desertNormalMap", "snowNormalMap", "steepNormalMap"]
         });
 
         this.planemoModel = model;
@@ -122,7 +118,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
             desertColor: new Color3(178, 107, 42).scaleInPlace(1 / 255),
             bottomColor: new Color3(0.5, 0.5, 0.5),
 
-            beachSize: 250 + 100 * centeredRand(model.rng, 85),
+            beachSize: 100 + 50 * centeredRand(model.rng, 85),
             steepSharpness: 2,
             normalSharpness: 0.5
         };
@@ -143,6 +139,20 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         this.setColor3("bottomColor", this.colorSettings.bottomColor);
 
         this.setVector3("planetPosition", this.planemoTransform.getAbsolutePosition());
+
+        if (Effect.ShadersStore["telluricPlanemoLutFragmentShader"] === undefined) {
+            Effect.ShadersStore["telluricPlanemoLutFragmentShader"] = lutFragment;
+        }
+
+        this.setTexture("lut", Assets.EmptyTexture);
+        const lut = new ProceduralTexture("lut", 4096, "telluricPlanemoLut", scene, null, true, false);
+        lut.setFloat("minTemperature", this.planemoModel.physicalProperties.minTemperature);
+        lut.setFloat("maxTemperature", this.planemoModel.physicalProperties.maxTemperature);
+        lut.setFloat("pressure", this.planemoModel.physicalProperties.pressure);
+        lut.refreshRate = 0;
+        lut.executeWhenReady(() => {
+            this.setTexture("lut", lut);
+        });
 
         this.updateConstants();
     }
@@ -176,14 +186,14 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         );
     }
 
-    public update(activeControllerPosition: Vector3, stellarObjects: StellarObject[]) {
+    public update(activeControllerPosition: Vector3, stellarObjects: Transformable[]) {
         this.setMatrix("normalMatrix", this.planemoTransform.getWorldMatrix().clone().invert().transpose());
         this.setMatrix("planetInverseRotationMatrix", getInverseRotationMatrix(this.planemoTransform));
 
         this.setVector3("playerPosition", activeControllerPosition);
 
-        this.setArray3("star_positions", flattenVector3Array(stellarObjects.map(star => star.getTransform().getAbsolutePosition())));
-        this.setArray3("star_colors", flattenVector3Array(stellarObjects.map(star => star instanceof Star ? star.model.surfaceColor : Vector3.One())))
+        this.setArray3("star_positions", flattenVector3Array(stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
+        this.setArray3("star_colors", flattenVector3Array(stellarObjects.map((star) => (star instanceof Star ? star.model.surfaceColor : Vector3.One()))));
         this.setInt("nbStars", stellarObjects.length);
 
         this.setVector3("planetPosition", this.planemoTransform.getAbsolutePosition());

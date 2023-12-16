@@ -1,22 +1,19 @@
 import { Matrix, Quaternion, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 import { flattenVector3Array, flattenVector4Array } from "../../utils/algebra";
-import { UberScene } from "../uberScene";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { UpdatablePostProcess } from "../../postProcesses/objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "./types";
+import { Scene } from "@babylonjs/core/scene";
 
 /**
  * A wrapper around BabylonJS post processes that allows more predictable and easier to use uniforms
  */
-export abstract class UberPostProcess extends PostProcess implements UpdatablePostProcess {
+export class UberPostProcess extends PostProcess {
     private readonly uniforms: ShaderUniforms = [];
     private readonly samplers: ShaderSamplers = [];
 
-    protected internalTime = 0;
-
-    protected constructor(name: string, fragmentName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: UberScene) {
+    constructor(name: string, fragmentName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: Scene) {
         const uniformNames = uniforms.map((uniform) => uniform.name);
         const samplerNames = samplers.map((sampler) => sampler.name);
 
@@ -83,9 +80,5 @@ export abstract class UberPostProcess extends PostProcess implements UpdatablePo
                     throw new Error(`Unsupported sampler type: ${sampler.type}`);
             }
         }
-    }
-
-    public update(deltaTime: number) {
-        this.internalTime += deltaTime;
     }
 }

@@ -4,31 +4,32 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./unifo
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { StellarObject } from "../stellarObjects/stellarObject";
-import { ObjectPostProcess } from "./objectPostProcess";
+import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { BaseObject } from "../bodies/common";
 
-export interface MatterJetSettings {
+export interface MatterJetUniforms {
     // the rotation period in seconds of the matter jet
     rotationPeriod: number;
+    time: number;
 }
 
 /**
  * Post process for rendering matter jets that are used by neutron stars for example
  */
-export class MatterJetPostProcess extends UberPostProcess implements ObjectPostProcess {
-    settings: MatterJetSettings;
+export class MatterJetPostProcess extends UberPostProcess implements ObjectPostProcess, UpdatablePostProcess {
+    matterJetUniforms: MatterJetUniforms;
     object: BaseObject;
 
     constructor(name: string, stellarObject: StellarObject, scene: UberScene) {
-
         const shaderName = "matterjet";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
         }
 
-        const settings: MatterJetSettings = {
-            rotationPeriod: 1.5
+        const settings: MatterJetUniforms = {
+            rotationPeriod: 1.5,
+            time: 0
         };
 
         const uniforms: ShaderUniforms = [
@@ -38,7 +39,7 @@ export class MatterJetPostProcess extends UberPostProcess implements ObjectPostP
                 name: "time",
                 type: UniformEnumType.Float,
                 get: () => {
-                    return this.internalTime % (settings.rotationPeriod * 10000);
+                    return settings.time % (settings.rotationPeriod * 10000);
                 }
             },
             {
@@ -62,6 +63,10 @@ export class MatterJetPostProcess extends UberPostProcess implements ObjectPostP
         super(name, shaderName, uniforms, samplers, scene);
 
         this.object = stellarObject;
-        this.settings = settings;
+        this.matterJetUniforms = settings;
+    }
+
+    public update(deltaTime: number): void {
+        this.matterJetUniforms.time += deltaTime;
     }
 }

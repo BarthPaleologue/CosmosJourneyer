@@ -1,15 +1,14 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 
 import oceanFragment from "../../shaders/oceanFragment.glsl";
-import { Assets } from "../assets";
 import { UberScene } from "../uberCore/uberScene";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
-import { ObjectPostProcess } from "./objectPostProcess";
-import { getInverseRotationQuaternion } from "../uberCore/transforms/basicTransform";
+import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
+import { getInverseRotationQuaternion, Transformable } from "../uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { StellarObject } from "../stellarObjects/stellarObject";
+import { BoundingSphere } from "../bodies/common";
+import { Assets } from "../assets";
 
 export type OceanUniforms = {
     oceanRadius: number;
@@ -18,16 +17,16 @@ export type OceanUniforms = {
     depthModifier: number;
     alphaModifier: number;
     waveBlendingSharpness: number;
+    time: number;
 };
 
-export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess {
+export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly oceanUniforms: OceanUniforms;
-    readonly object: TelluricPlanemo;
+    readonly object: Transformable;
 
-    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: StellarObject[]) {
-
+    constructor(name: string, planet: Transformable & BoundingSphere, scene: UberScene, stars: Transformable[]) {
         const shaderName = "ocean";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
         }
 
@@ -37,7 +36,8 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             alphaModifier: 0.001,
             specularPower: 1.0,
             smoothness: 0.9,
-            waveBlendingSharpness: 0.1
+            waveBlendingSharpness: 0.1,
+            time: 0
         };
 
         const uniforms: ShaderUniforms = [
@@ -99,7 +99,7 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
                 get: () => {
                     //TODO: do not hardcode the 100000
                     // use rotating time offset to prevent float imprecision and distant artifacts
-                    return this.internalTime % 100000;
+                    return oceanUniforms.time % 100000;
                 }
             }
         ];
@@ -126,5 +126,9 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
 
         this.object = planet;
         this.oceanUniforms = oceanUniforms;
+    }
+
+    public update(deltaTime: number) {
+        this.oceanUniforms.time += deltaTime;
     }
 }

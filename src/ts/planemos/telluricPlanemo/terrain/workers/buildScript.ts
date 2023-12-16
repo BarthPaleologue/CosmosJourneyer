@@ -57,7 +57,7 @@ function handle_build(data: TransferBuildData): void {
             normals: normals,
             instancesMatrixBuffer: instances_matrix_buffer,
             alignedInstancesMatrixBuffer: aligned_instances_matrix_buffer,
-            averageHeight: result.average_height,
+            averageHeight: result.average_height
         } as ReturnedChunkData,
         {
             transfer: [verticesPositions.buffer, indices.buffer, normals.buffer, instances_matrix_buffer.buffer, aligned_instances_matrix_buffer.buffer]

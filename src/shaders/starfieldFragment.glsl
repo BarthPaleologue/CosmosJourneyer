@@ -1,5 +1,7 @@
 precision highp float;
 
+/* disable_uniformity_analysis */
+
 varying vec2 vUV;// screen coordinates
 
 uniform sampler2D textureSampler;// the original screen texture
@@ -37,12 +39,10 @@ void main() {
             sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
             acos(rayDir.y) / 3.14159265359
         );
-    }
 
-    vec4 starfieldColor = texture2D(starfieldTexture, starfieldUV);
-    starfieldColor.rgb = pow(starfieldColor.rgb, vec3(2.2)); // deeper blacks
+        vec4 starfieldColor = texture2D(starfieldTexture, starfieldUV);
+        starfieldColor.rgb = pow(starfieldColor.rgb, vec3(2.2)); // deeper blacks
 
-    if (screenColor == vec4(0.0)) {
         finalColor = vec4(starfieldColor.rgb * visibility, starfieldColor.a);
     }
 

@@ -19,6 +19,7 @@ import { ShipController } from "../spaceship/shipController";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
+import "@babylonjs/core/Loading/loadingScreen";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
@@ -134,7 +135,10 @@ export class StarSystemView {
     }
 
     init() {
-        this.getStarSystem().init(100, this.chunkForge);
+        this.scene.getEngine().loadingScreen.displayLoadingUI();
+        this.scene.getEngine().loadingScreen.loadingUIText = `Warping to ${this.getStarSystem().model.getName()}`;
+
+        this.getStarSystem().initPositions(100, this.chunkForge);
         this.ui.createObjectOverlays(this.getStarSystem().getObjects());
 
         const firstBody = this.getStarSystem().getBodies()[0];
@@ -147,7 +151,11 @@ export class StarSystemView {
         positionNearObject(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
         if (activeController instanceof ShipController) activeController.enableWarpDrive();
 
-        this.getStarSystem().initPostProcesses();
+        this.getStarSystem()
+            .initPostProcesses()
+            .then(() => {
+                this.scene.getEngine().loadingScreen.hideLoadingUI();
+            });
     }
 
     hideUI() {

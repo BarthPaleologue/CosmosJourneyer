@@ -4,23 +4,18 @@ import { UberScene } from "../../uberCore/uberScene";
 import { UberPostProcess } from "../../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "../uniforms";
 import { ObjectPostProcess } from "../objectPostProcess";
-import { StellarObject } from "../../stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { SamplerEnumType, ShaderSamplers, ShaderUniforms } from "../../uberCore/postProcesses/types";
+import { ShaderSamplers, ShaderUniforms } from "../../uberCore/postProcesses/types";
 import { RingsUniforms } from "./ringsUniform";
-import { Scene } from "@babylonjs/core/scene";
-import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
-import ringsLUT from "../../../shaders/textures/ringsLUT.glsl";
+import { Transformable } from "../../uberCore/transforms/basicTransform";
 
 export class RingsPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly ringsUniforms: RingsUniforms;
     readonly object: AbstractBody;
-    readonly lut: ProceduralTexture;
 
-    constructor(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]) {
-
+    public static async CreateAsync(body: AbstractBody, scene: UberScene, stellarObjects: Transformable[]): Promise<RingsPostProcess> {
         const shaderName = "rings";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
         }
 
@@ -36,52 +31,16 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
             ...ringsUniforms.getShaderUniforms()
         ];
 
-        const lut = RingsPostProcess.CreateLUT(body.model.seed, ringsUniforms.ringStart, ringsUniforms.ringEnd, ringsUniforms.ringFrequency, scene);
+        return ringsUniforms.getShaderSamplers(scene).then((ringSamplers) => {
+            const samplers: ShaderSamplers = [...getSamplers(scene), ...ringSamplers];
+            return new RingsPostProcess(body.name + "Rings", shaderName, uniforms, samplers, scene, body, ringsUniforms);
+        });
+    }
 
-        const samplers: ShaderSamplers = [
-            ...getSamplers(scene),
-            {
-                name: "ringsLUT",
-                type: SamplerEnumType.Texture,
-                get: () => {
-                    return lut;
-                }
-            }
-        ];
-
-        super(body.name + "Rings", shaderName, uniforms, samplers, scene);
+    private constructor(name: string, shaderName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: UberScene, body: AbstractBody, ringsUniforms: RingsUniforms) {
+        super(name, shaderName, uniforms, samplers, scene);
 
         this.object = body;
         this.ringsUniforms = ringsUniforms;
-        this.lut = lut;
-    }
-
-    static CreateLUT(seed: number, ringStart: number, ringEnd: number, frequency: number, scene: Scene): ProceduralTexture {
-        if(Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
-            Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
-        }
-
-        const lut = new ProceduralTexture(
-            "ringsLUT",
-            {
-                width: 4096,
-                height: 1
-            },
-            "ringsLUT",
-            scene,
-            undefined,
-            false,
-            false
-        );
-        lut.setFloat("seed", seed);
-        lut.setFloat("frequency", frequency);
-        lut.setFloat("ringStart", ringStart);
-        lut.setFloat("ringEnd", ringEnd);
-        lut.refreshRate = 0;
-
-        // This is necessary to make sure the texture is not empty at runtime (see: https://forum.babylonjs.com/t/webgl-warning-when-binding-procedural-texture-to-postprocess/46047)
-        scene.render();
-
-        return lut;
     }
 }

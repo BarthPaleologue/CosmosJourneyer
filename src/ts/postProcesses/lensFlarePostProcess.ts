@@ -24,9 +24,8 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
     readonly object: StellarObject;
 
     constructor(object: StellarObject, scene: UberScene) {
-
         const shaderName = "lensflare";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = lensFlareFragment;
         }
 
@@ -52,10 +51,10 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
                 type: UniformEnumType.Vector3,
                 get: () => {
                     const clipPosition = Vector3.Project(
-                      object.getTransform().getAbsolutePosition(),
-                      Matrix.IdentityReadOnly,
-                      scene.getTransformMatrix(),
-                      scene.getActiveUberCamera().viewport
+                        object.getTransform().getAbsolutePosition(),
+                        Matrix.IdentityReadOnly,
+                        scene.getTransformMatrix(),
+                        scene.getActiveUberCamera().viewport
                     );
                     settings.behindCamera = clipPosition.z < 0;
                     return clipPosition;

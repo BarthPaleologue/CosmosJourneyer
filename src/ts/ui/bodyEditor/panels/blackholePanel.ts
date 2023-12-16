@@ -11,8 +11,8 @@ export class BlackholePanel extends EditorPanel {
         for (const slider of this.sliders) slider.remove();
 
         this.sliders = [
-            new Slider("diskRadius", document.getElementById("diskRadius") as HTMLElement, 0e3, 1000, blackHole.settings.accretionDiskRadius / 1e5, (val: number) => {
-                blackHole.settings.accretionDiskRadius = val * 1e5;
+            new Slider("diskRadius", document.getElementById("diskRadius") as HTMLElement, 0e3, 1000, blackHole.blackHoleUniforms.accretionDiskRadius / 1e5, (val: number) => {
+                blackHole.blackHoleUniforms.accretionDiskRadius = val * 1e5;
             })
         ];
     }

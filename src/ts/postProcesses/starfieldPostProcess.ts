@@ -7,7 +7,6 @@ import { Settings } from "../settings";
 import { nearestBody } from "../utils/nearestBody";
 import { AbstractBody } from "../bodies/abstractBody";
 import { Assets } from "../assets";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcessTypes";
@@ -15,12 +14,12 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
+import { Transformable } from "../uberCore/transforms/basicTransform";
 
 export class StarfieldPostProcess extends UberPostProcess {
-    constructor(scene: UberScene, stellarObjects: StellarObject[], bodies: AbstractBody[], starfieldRotation: Quaternion) {
-
+    constructor(scene: UberScene, stellarObjects: Transformable[], bodies: AbstractBody[], starfieldRotation: Quaternion) {
         const shaderName = "starfield";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
         }
 
@@ -40,6 +39,8 @@ export class StarfieldPostProcess extends UberPostProcess {
                 name: "visibility",
                 type: UniformEnumType.Float,
                 get: () => {
+                    if (bodies.length === 0) return 1;
+
                     //TODO: should be cleaned up
                     let vis = 1.0;
                     for (const star of stellarObjects) {
