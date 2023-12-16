@@ -1,5 +1,3 @@
-import { AbstractController } from "../../uberCore/abstractController";
-
 import surfaceMaterialFragment from "../../../shaders/gasPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/gasPlanetMaterial/vertex.glsl";
 import { GazColorSettings } from "../telluricPlanemo/colorSettingsInterface";
@@ -14,6 +12,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Star } from "../../stellarObjects/star/star";
 import { flattenVector3Array } from "../../utils/algebra";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class GasPlanetMaterial extends ShaderMaterial {
     readonly planet: TransformNode;
@@ -79,12 +78,12 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setFloat("colorSharpness", this.colorSettings.colorSharpness);
     }
 
-    public update(player: AbstractController, stellarObjects: StellarObject[], deltaTime: number) {
+    public update(player: Camera, stellarObjects: StellarObject[], deltaTime: number) {
         this.clock += deltaTime;
 
         this.setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
 
-        this.setVector3("playerPosition", player.getActiveCamera().getAbsolutePosition());
+        this.setVector3("playerPosition", player.globalPosition);
 
         this.setArray3("star_positions", flattenVector3Array(stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
         this.setArray3("star_colors", flattenVector3Array(stellarObjects.map((star) => (star instanceof Star ? star.model.surfaceColor : Vector3.One()))));

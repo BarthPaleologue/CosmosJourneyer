@@ -50,11 +50,12 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
                 name: "clipPosition",
                 type: UniformEnumType.Vector3,
                 get: () => {
+                    if (scene.activeCamera === null) throw new Error("no camera");
                     const clipPosition = Vector3.Project(
                         object.getTransform().getAbsolutePosition(),
                         Matrix.IdentityReadOnly,
                         scene.getTransformMatrix(),
-                        scene.getActiveUberCamera().viewport
+                        scene.activeCamera.viewport
                     );
                     settings.behindCamera = clipPosition.z < 0;
                     return clipPosition;
@@ -64,9 +65,10 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
                 name: "visibility",
                 type: UniformEnumType.Float,
                 get: () => {
+                    if (scene.activeCamera === null) throw new Error("no camera");
                     // send raycast from camera to object and check early intersections
                     const raycastResult = new PhysicsRaycastResult();
-                    const start = scene.getActiveUberCamera().getAbsolutePosition();
+                    const start = scene.activeCamera.globalPosition;
                     const end = object.getTransform().getAbsolutePosition();
                     (scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, raycastResult);
                     const occulted = raycastResult.hasHit && raycastResult.body?.transformNode.name !== object.name;

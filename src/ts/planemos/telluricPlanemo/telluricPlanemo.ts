@@ -93,8 +93,8 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
         for (const side of this.sides) side.update(observerPosition, chunkForge);
     }
 
-    public updateMaterial(controller: AbstractController, stellarObjects: Transformable[], deltaTime: number): void {
-        this.material.update(controller.getTransform().getAbsolutePosition(), stellarObjects);
+    public updateMaterial(controller: Camera, stellarObjects: Transformable[], deltaTime: number): void {
+        this.material.update(controller.globalPosition, stellarObjects);
     }
 
     public override getBoundingRadius(): number {

@@ -8,7 +8,8 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess implem
     readonly object: Star;
 
     constructor(star: Star, scene: UberScene) {
-        super(`${star.name}VolumetricLight`, 1, scene.getActiveUberCamera(), star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
+        if (scene.activeCamera === null) throw new Error("no camera");
+        super(`${star.name}VolumetricLight`, 1, scene.activeCamera, star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
 
         this.object = star;
 

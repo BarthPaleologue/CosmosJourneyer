@@ -41,18 +41,18 @@ export class StarfieldPostProcess extends UberPostProcess {
                 get: () => {
                     if (bodies.length === 0) return 1;
 
+                    const camera = scene.activeCamera;
+                    if (camera === null) throw new Error("no camera");
+
                     //TODO: should be cleaned up
                     let vis = 1.0;
                     for (const star of stellarObjects) {
                         if (star instanceof BlackHole) return 1;
-                        vis = Math.min(
-                            vis,
-                            1.0 + Vector3.Dot(star.getTransform().getAbsolutePosition().normalizeToNew(), scene.getActiveController().getActiveCamera().getDirection(Axis.Z))
-                        );
+                        vis = Math.min(vis, 1.0 + Vector3.Dot(star.getTransform().getAbsolutePosition().normalizeToNew(), camera.getDirection(Axis.Z)));
                     }
                     vis = 0.5 + vis * 0.5;
                     let vis2 = 1.0;
-                    const nearest = nearestBody(scene.getActiveController().getTransform(), bodies);
+                    const nearest = nearestBody(camera.globalPosition, bodies);
                     if (nearest instanceof TelluricPlanemo) {
                         const planet = nearest as TelluricPlanemo;
                         if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {
