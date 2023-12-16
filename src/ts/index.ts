@@ -53,6 +53,7 @@ spaceshipController.addInput(gamepad);
 spaceshipController.addInput(mouse);
 
 const characterController = new CharacterController(starSystemView.scene);
+characterController.getTransform().setEnabled(false);
 characterController.getActiveCamera().maxZ = maxZ;
 characterController.addInput(keyboard);
 characterController.addInput(gamepad);
@@ -221,6 +222,7 @@ document.addEventListener("keydown", (e) => {
 
             spaceshipController.setEnabled(false, engine.getHavokPlugin());
         } else if(starSystemView.scene.getActiveController() === defaultController) {
+            characterController.getTransform().setEnabled(true);
             starSystemView.scene.setActiveController(characterController);
             setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(defaultController.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
@@ -228,6 +230,7 @@ document.addEventListener("keydown", (e) => {
             spaceshipController.setEnabled(false, engine.getHavokPlugin());
 
         } else if(starSystemView.scene.getActiveController() === characterController) {
+            characterController.getTransform().setEnabled(false);
             starSystemView.scene.setActiveController(spaceshipController);
             setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(defaultController.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
