@@ -15,7 +15,7 @@ export class RingsUniforms {
     ringColor: Color3;
 
     private ringLut: ProceduralTexture | null = null;
-    private offset: number;
+    offset: number;
 
     constructor(rng: (step: number) => number) {
         this.ringStart = randRange(1.8, 2.2, rng, 1400);
@@ -107,7 +107,12 @@ export class RingsUniforms {
         ];
     }
 
-    getShaderSamplers(scene: Scene): Promise<ShaderSamplers> {
+    /**
+     * Returns the samplers for the shader when the LUT is ready
+     * You cannot await this function as it would block the main thread and cause a deadlock as the LUT is created on the main thread
+     * @param scene
+     */
+    public async getShaderSamplers(scene: Scene): Promise<ShaderSamplers> {
         return this.getLUT(scene).then((lut) => {
             return [
                 {
@@ -121,7 +126,13 @@ export class RingsUniforms {
         });
     }
 
-    public getLUT(scene: Scene): Promise<ProceduralTexture> {
+    /**
+     * Returns the LUT for the rings
+     * You cannot await this function as it would block the main thread and cause a deadlock as the LUT is created on the main thread
+     * @param scene
+     * @private
+     */
+    private getLUT(scene: Scene): Promise<ProceduralTexture> {
         if (Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
             Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
         }
@@ -149,7 +160,8 @@ export class RingsUniforms {
         }
 
         return new Promise((resolve, reject) => {
-            this.ringLut?.executeWhenReady(() => {
+            if(this.ringLut === null) throw new Error("Ring LUT was null when creating promise");
+            this.ringLut.executeWhenReady(() => {
                 if (this.ringLut === null) throw new Error("Ring LUT was null when executing when ready");
                 resolve(this.ringLut);
             });

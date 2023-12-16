@@ -10,6 +10,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
 import { OrbitProperties } from "../../orbit/orbitProperties";
+import { CloudsUniforms } from "../../postProcesses/clouds/cloudsUniforms";
 
 export class TelluricPlanemoModel implements PlanemoModel {
     readonly bodyType = BODY_TYPE.TELLURIC;
@@ -24,7 +25,8 @@ export class TelluricPlanemoModel implements PlanemoModel {
 
     readonly terrainSettings: TerrainSettings;
 
-    ringsUniforms;
+    ringsUniforms: RingsUniforms | null = null;
+    cloudsUniforms: CloudsUniforms | null = null;
 
     readonly nbMoons: number;
 
@@ -119,8 +121,11 @@ export class TelluricPlanemoModel implements PlanemoModel {
 
         if (uniformRandBool(0.6, this.rng, GENERATION_STEPS.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
             this.ringsUniforms = new RingsUniforms(this.rng);
-        } else {
-            this.ringsUniforms = null;
+        }
+
+        const waterFreezingPoint = 0.0;
+        if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature) {
+            this.cloudsUniforms = new CloudsUniforms(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
         }
 
         this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);

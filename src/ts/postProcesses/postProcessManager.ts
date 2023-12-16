@@ -2,7 +2,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { UberRenderingPipeline } from "../uberCore/uberRenderingPipeline";
 import { OceanPostProcess } from "./oceanPostProcess";
 import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
-import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
+import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
 import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";
 import { AbstractBody } from "../bodies/abstractBody";
@@ -179,7 +179,9 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public async addClouds(planet: TelluricPlanemo, stellarObjects: StellarObject[]) {
-        return FlatCloudsPostProcess.CreateAsync(`${planet.name}Clouds`, planet, Settings.CLOUD_LAYER_HEIGHT, this.scene, stellarObjects).then((clouds) => {
+        const uniforms = planet.model.cloudsUniforms;
+        if(uniforms === null) throw new Error(`PostProcessManager: addClouds: uniforms are null. This should not be possible as the postprocess should not be created if the body has no clouds. Body: ${planet.name}`);
+        return FlatCloudsPostProcess.CreateAsync(`${planet.name}Clouds`, planet, uniforms, this.scene, stellarObjects).then((clouds) => {
             this.clouds.push(clouds);
         });
     }

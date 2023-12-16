@@ -10,7 +10,6 @@ import { AbstractBody } from "../../bodies/abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { Planemo, PlanemoMaterial } from "../planemo";
 import { TelluricPlanemoModel } from "./telluricPlanemoModel";
-import { StellarObject } from "../../stellarObjects/stellarObject";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
@@ -47,7 +46,6 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
         if (this.model.physicalProperties.pressure > epsilon) {
             if (waterFreezingPoint > this.model.physicalProperties.minTemperature && waterFreezingPoint < this.model.physicalProperties.maxTemperature) {
                 this.postProcesses.push(PostProcessType.OCEAN);
-                this.postProcesses.push(PostProcessType.CLOUDS);
             } else {
                 this.model.physicalProperties.oceanLevel = 0;
             }
@@ -57,6 +55,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
         }
 
         if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
+        if (this.model.cloudsUniforms !== null) this.postProcesses.push(PostProcessType.CLOUDS);
 
         this.material = new TelluricPlanemoMaterial(this.name, this.getTransform(), this.model, scene);
 

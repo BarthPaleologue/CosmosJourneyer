@@ -8,8 +8,6 @@ varying vec2 vUV;// screen coordinates
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
-uniform sampler2D lut;
-
 #include "./utils/stars.glsl";
 
 #include "./utils/camera.glsl";
@@ -26,6 +24,7 @@ uniform float clouds_worleySpeed;
 uniform float clouds_detailSpeed;
 uniform float clouds_specularPower;
 uniform float clouds_smoothness;
+uniform sampler2D clouds_lut;
 
 uniform float time;
 
@@ -47,16 +46,15 @@ uniform float time;
 
 #include "./utils/toUV.glsl";
 
-#define inline
 float cloudDensityAtPoint(vec3 samplePoint) {
     vec3 rotationAxisPlanetSpace = vec3(0.0, 1.0, 0.0);
 
     vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds_worleySpeed);
     vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds_detailSpeed);
 
-    float density = 1.0 - texture2D(lut, toUV(samplePointRotatedWorley)).r;
+    float density = 1.0 - texture2D(clouds_lut, toUV(samplePointRotatedWorley)).r;
 
-    density *= texture2D(lut, toUV(samplePointRotatedDetail)).g;
+    density *= texture2D(clouds_lut, toUV(samplePointRotatedDetail)).g;
 
     float cloudThickness = 2.0;//TODO: make this a uniform
 
@@ -69,7 +67,6 @@ float cloudDensityAtPoint(vec3 samplePoint) {
     return density;
 }
 
-#define inline
 float computeCloudCoverage(vec3 rayOrigin, vec3 rayDir, float maximumDistance, out vec3 cloudNormal) {
     float impactPoint, escapePoint;
 
@@ -113,7 +110,6 @@ float computeCloudCoverage(vec3 rayOrigin, vec3 rayDir, float maximumDistance, o
     return cloudDensity;
 }
 
-#define inline
 float cloudShadows(vec3 closestPoint) {
     float lightAmount = 1.0;
     for (int i = 0; i < nbStars; i++) {
