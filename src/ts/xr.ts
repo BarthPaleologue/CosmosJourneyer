@@ -29,6 +29,8 @@ canvas.height = window.innerHeight;
 const engine = new Engine(canvas, true);
 engine.useReverseDepthBuffer = true;
 
+Settings.VERTEX_RESOLUTION = 32;
+
 // Init Havok physics engine
 const havokInstance = await HavokPhysics();
 const havokPlugin = new HavokPlugin(true, havokInstance);
@@ -41,13 +43,46 @@ scene.enablePhysics(Vector3.Zero(), havokPlugin);
 
 await Assets.Init(scene);
 
-const sphereRadius = 1000e3;
+const sphereRadius = Settings.EARTH_RADIUS;
 
 const camera = new FreeCamera("camera", new Vector3(0, 0, 0), scene);
 camera.maxZ = 1e9;
 camera.speed *= sphereRadius * 0.1;
 scene.setActiveCamera(camera);
 camera.attachControl(canvas, true);
+
+const xr = await scene.createDefaultXRExperienceAsync();
+if (!xr.baseExperience) {
+  // no xr support
+  throw new Error("No XR support");
+} else {
+  // all good, ready to go
+  console.log("XR support");
+}
+
+const webXRInput = xr.input; // if using the experience helper, otherwise, an instance of WebXRInput
+webXRInput.onControllerAddedObservable.add((xrController) => {
+  console.log("Controller added");
+  xrController.onMotionControllerInitObservable.add((motionController) => {
+    console.log("Motion controller initialized");
+
+    const mainComponent = motionController.getMainComponent();
+
+    mainComponent.onButtonStateChangedObservable.add((component) => {
+      if (component.changes.pressed) {
+        if (component.changes.pressed.current) {
+          console.log("Pressed");
+        }
+        if (component.pressed) {
+          console.log("Pressed");
+        }
+      }
+    });
+  });
+});
+
+const xrCamera = xr.baseExperience.camera;
+xrCamera.setTransformationFromNonVRCamera(camera);
 
 const planet = new TelluricPlanemo("xrPlanet", scene, 0.51, undefined);
 translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
@@ -57,52 +92,57 @@ translate(star.getTransform(), new Vector3(0, 0, -sphereRadius * 5000));
 
 const starfield = new StarfieldPostProcess(scene, [star], [planet], Quaternion.Identity());
 camera.attachPostProcess(starfield);
+xrCamera.attachPostProcess(starfield);
 
 const ocean = new OceanPostProcess("ocean", planet, scene, [star]);
 camera.attachPostProcess(ocean);
+xrCamera.attachPostProcess(ocean);
 
 if (planet.model.cloudsUniforms === null) throw new Error("Clouds uniforms are null");
 FlatCloudsPostProcess.CreateAsync("clouds", planet, planet.model.cloudsUniforms, scene, [star]).then((clouds) => {
-    camera.attachPostProcess(clouds);
+  camera.attachPostProcess(clouds);
+  xrCamera.attachPostProcess(clouds);
 
-    const atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, 100e3, scene, [star]);
-    camera.attachPostProcess(atmosphere);
+  const atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, 100e3, scene, [star]);
+  camera.attachPostProcess(atmosphere);
+  xrCamera.attachPostProcess(atmosphere);
 
-    const lensflare = new LensFlarePostProcess(star, scene);
-    camera.attachPostProcess(lensflare);
+  const lensflare = new LensFlarePostProcess(star, scene);
+  camera.attachPostProcess(lensflare);
+  xrCamera.attachPostProcess(lensflare);
 });
 
 const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
 
 scene.onBeforeRenderObservable.add(() => {
-    const deltaTime = scene.deltaTime / 1000;
+  const deltaTime = scene.deltaTime / 1000;
 
-    if (scene.activeCamera === null) throw new Error("Active camera is null");
+  if (scene.activeCamera === null) throw new Error("Active camera is null");
 
-    if (camera.globalPosition.length() > 0) {
-        translate(planet.getTransform(), camera.globalPosition.negate());
-        translate(star.getTransform(), camera.globalPosition.negate());
-        camera.position.set(0, 0, 0);
-    }
+  if (camera.globalPosition.length() > 0) {
+    translate(planet.getTransform(), camera.globalPosition.negate());
+    translate(star.getTransform(), camera.globalPosition.negate());
+    camera.position.set(0, 0, 0);
+  }
 
-    planet.updateLOD(scene.activeCamera.globalPosition, chunkForge);
-    planet.updateMaterial(camera, [star], deltaTime);
+  planet.updateLOD(scene.activeCamera.globalPosition, chunkForge);
+  planet.updateMaterial(camera, [star], deltaTime);
 
-    chunkForge.update();
+  chunkForge.update();
 
-    star.updateMaterial();
+  star.updateMaterial();
 
-    ocean.update(deltaTime);
+  ocean.update(deltaTime);
 });
 
 scene.executeWhenReady(() => {
-    engine.runRenderLoop(() => {
-        scene.render();
-    });
+  engine.runRenderLoop(() => {
+    scene.render();
+  });
 });
 
 window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    engine.resize(true);
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  engine.resize(true);
 });
