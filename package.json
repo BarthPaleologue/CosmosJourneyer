@@ -59,7 +59,7 @@
     "format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "test": "jest --coverage",
     "doc": "typedoc src/ts/**/*.ts --out docs",
-    "lint:check": "eslint src/ts",
-    "lint:fix": "eslint src/ts --fix"
+    "lint:check": "eslint src/ts/**/*.ts",
+    "lint:fix": "eslint src/ts/**/*.ts --fix"
   }
 }
