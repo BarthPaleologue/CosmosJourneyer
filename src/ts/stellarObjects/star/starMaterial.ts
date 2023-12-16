@@ -6,6 +6,9 @@ import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { StarModel } from "./starModel";
 import { getInverseRotationQuaternion } from "../../uberCore/transforms/basicTransform";
+import { Assets } from "../../assets";
+import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+import lutFragment from "../../../shaders/starMaterial/utils/lut.glsl";
 
 export class StarMaterial extends ShaderMaterial {
     star: TransformNode;
@@ -23,8 +26,22 @@ export class StarMaterial extends ShaderMaterial {
 
         super("starColor", scene, shaderName, {
             attributes: ["position"],
-            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time"]
+            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time"],
+            samplers: ["lut"]
         });
+
+        if(Effect.ShadersStore["starLutFragmentShader"] === undefined) {
+            Effect.ShadersStore["starLutFragmentShader"] = lutFragment;
+        }
+
+
+        this.setTexture("lut", Assets.EmptyTexture);
+        const lut = new ProceduralTexture("lut", 4096, "starLut", scene, null, true, false);
+        lut.refreshRate = 0;
+        lut.executeWhenReady(() => {
+            this.setTexture("lut", lut);
+        });
+
         this.star = star;
         this.starModel = model;
         this.starSeed = model.seed;
