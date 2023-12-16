@@ -8,6 +8,9 @@ export class UberOrbitCamera extends UberCamera {
     private phi: number;
     private theta: number;
 
+    minRadius = 10;
+    maxRadius = 1000;
+
     constructor(name: string, target: Vector3, scene: Scene, radius = 1, phi = 0, theta = 0) {
         super(name, Vector3.Zero(), scene);
         this.cameraTarget = target;
@@ -35,7 +38,7 @@ export class UberOrbitCamera extends UberCamera {
     }
 
     public increaseRadius(deltaRadius: number) {
-        this.radius = Math.min(Math.max(this.radius + deltaRadius, 10), 1000);
+        this.radius = Math.min(Math.max(this.radius + deltaRadius, this.minRadius), this.maxRadius);
         this.updatePosition();
     }
 

@@ -94,6 +94,7 @@ export class CharacterController extends AbstractController {
         this.targetAnim = this.idleAnim;
 
         this.thirdPersonCamera = new UberOrbitCamera("camera", new Vector3(0, 1.5, 0), scene, 40, -Math.PI / 4, 1.0);
+        this.thirdPersonCamera.minRadius = 5;
         this.thirdPersonCamera.minZ = 1;
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
         this.thirdPersonCamera.parent = this.getTransform();
