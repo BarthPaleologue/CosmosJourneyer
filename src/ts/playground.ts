@@ -5,9 +5,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
 import { UberScene } from "./uberCore/uberScene";
 import { translate } from "./uberCore/transforms/basicTransform";
-import { PointLightWrapper, TransformNodeWrapper } from "./utils/wrappers";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Engine } from "@babylonjs/core/Engines/engine";
 
@@ -22,8 +19,9 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { FlatCloudsPostProcess } from "./postProcesses/clouds/flatCloudsPostProcess";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
 import { Star } from "./stellarObjects/star/star";
-import { VolumetricLight } from "./postProcesses/volumetricLight";
 import { LensFlarePostProcess } from "./postProcesses/lensFlarePostProcess";
+import { Settings } from "./settings";
+import { ScenePerformancePriority } from "@babylonjs/core";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -32,13 +30,15 @@ canvas.height = window.innerHeight;
 const engine = new Engine(canvas, true);
 engine.useReverseDepthBuffer = true;
 
+Settings.VERTEX_RESOLUTION = 32;
+
 // Init Havok physics engine
 const havokInstance = await HavokPhysics();
 const havokPlugin = new HavokPlugin(true, havokInstance);
 setMaxLinVel(havokPlugin, 10000, 10000);
 console.log(`Havok initialized`);
 
-const scene = new UberScene(engine);
+const scene = new UberScene(engine, ScenePerformancePriority.Intermediate);
 scene.useRightHandedSystem = true;
 scene.enablePhysics(Vector3.Zero(), havokPlugin);
 
@@ -89,7 +89,7 @@ const planet = new TelluricPlanemo("xrPlanet", scene, 0.51, undefined);
 translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
 
 const star = new Star("star", scene, 0.2); //PointLightWrapper(new PointLight("dir01", new Vector3(0, 1, 0), scene));
-translate(star.getTransform(), new Vector3(0, 0, -sphereRadius * 1000));
+translate(star.getTransform(), new Vector3(0, 0, -sphereRadius * 5000));
 
 const starfield = new StarfieldPostProcess(scene, [star], [planet], Quaternion.Identity());
 camera.attachPostProcess(starfield);
@@ -107,19 +107,15 @@ FlatCloudsPostProcess.CreateAsync("clouds", planet, planet.model.cloudsUniforms,
     const atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, 100e3, scene, [star]);
     camera.attachPostProcess(atmosphere);
     xrCamera.attachPostProcess(atmosphere);
+
+    const lensflare = new LensFlarePostProcess(star, scene);
+    camera.attachPostProcess(lensflare);
+    xrCamera.attachPostProcess(lensflare);
 });
 
-const volumetricLight = new VolumetricLight(star, scene);
-camera.attachPostProcess(volumetricLight);
-xrCamera.attachPostProcess(volumetricLight);
+const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
 
-const lensflare = new LensFlarePostProcess(star, scene);
-camera.attachPostProcess(lensflare);
-xrCamera.attachPostProcess(lensflare);
-
-const chunkForge = new ChunkForge(64);
-
-scene.onBeforePhysicsObservable.add(() => {
+scene.onBeforeRenderObservable.add(() => {
     const deltaTime = scene.deltaTime / 1000;
 
     if (scene.activeCamera === null) throw new Error("Active camera is null");
@@ -131,7 +127,6 @@ scene.onBeforePhysicsObservable.add(() => {
     }
 
     planet.updateLOD(scene.activeCamera.globalPosition, chunkForge);
-    planet.computeCulling(camera);
     planet.updateMaterial(camera, [star], deltaTime);
 
     chunkForge.update();
