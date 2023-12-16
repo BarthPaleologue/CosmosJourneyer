@@ -146,7 +146,6 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
 
         this.setTexture("lut", Assets.EmptyTexture);
         const lut = new ProceduralTexture("lut", 4096, "telluricPlanemoLut", scene, null, true, false);
-        lut.wrapU = 1.1;
         lut.setFloat("minTemperature", this.planemoModel.physicalProperties.minTemperature);
         lut.setFloat("maxTemperature", this.planemoModel.physicalProperties.maxTemperature);
         lut.setFloat("pressure", this.planemoModel.physicalProperties.pressure);
