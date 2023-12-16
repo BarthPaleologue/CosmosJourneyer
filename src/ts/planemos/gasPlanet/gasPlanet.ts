@@ -1,4 +1,3 @@
-import { AbstractController } from "../../uberCore/abstractController";
 import { GasPlanetMaterial } from "./gasPlanetMaterial";
 import { AbstractBody } from "../../bodies/abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
@@ -54,7 +53,7 @@ export class GasPlanet extends AbstractBody implements Planemo, PlanemoMaterial 
         this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
 
-    updateMaterial(controller: AbstractController, stellarObjects: StellarObject[], deltaTime: number): void {
+    updateMaterial(controller: Camera, stellarObjects: StellarObject[], deltaTime: number): void {
         this.material.update(controller, stellarObjects, deltaTime);
     }
 

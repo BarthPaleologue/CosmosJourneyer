@@ -436,7 +436,7 @@ export class StarSystemController {
         const nearestBody = this.getNearestCelestialBody(this.scene.getActiveUberCamera().position);
 
         for (const planet of this.planemosWithMaterial) {
-            planet.updateMaterial(controller, this.stellarObjects, deltaTime);
+            planet.updateMaterial(controller.getActiveCamera(), this.stellarObjects, deltaTime);
         }
 
         for (const stellarObject of this.stellarObjects) {
