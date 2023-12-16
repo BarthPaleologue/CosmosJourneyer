@@ -12,9 +12,11 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getInverseRotationMatrix, Transformable } from "../../uberCore/transforms/basicTransform";
-import { StellarObject } from "../../stellarObjects/stellarObject";
 import { Star } from "../../stellarObjects/star/star";
 import { flattenVector3Array } from "../../utils/algebra";
+
+import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
+import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 
 /**
  * The material for telluric planemos.
@@ -42,10 +44,10 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
      */
     constructor(planetName: string, planet: TransformNode, model: TelluricPlanemoModel, scene: UberScene) {
         const shaderName = "surfaceMaterial";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
         }
-        if(Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
         }
 
@@ -59,13 +61,6 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "normalMatrix",
 
                 "colorMode",
-
-                "bottomNormalMap",
-                "plainNormalMap",
-                "beachNormalMap",
-                "desertNormalMap",
-                "snowNormalMap",
-                "steepNormalMap",
 
                 "seed",
 
@@ -100,8 +95,9 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "maxTemperature",
                 "pressure",
 
-                "waterAmount"
-            ]
+                "waterAmount",
+            ],
+            samplers: ["lut", "bottomNormalMap", "plainNormalMap", "beachNormalMap", "desertNormalMap", "snowNormalMap", "steepNormalMap"]
         });
 
         this.planemoModel = model;
@@ -144,6 +140,21 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
 
         this.setVector3("planetPosition", this.planemoTransform.getAbsolutePosition());
 
+        if(Effect.ShadersStore["telluricPlanemoLutFragmentShader"] === undefined) {
+            Effect.ShadersStore["telluricPlanemoLutFragmentShader"] = lutFragment;
+        }
+
+        this.setTexture("lut", Assets.EmptyTexture);
+        const lut = new ProceduralTexture("lut", 4096, "telluricPlanemoLut", scene, null, true, false);
+        lut.wrapU = 1.1;
+        lut.setFloat("minTemperature", this.planemoModel.physicalProperties.minTemperature);
+        lut.setFloat("maxTemperature", this.planemoModel.physicalProperties.maxTemperature);
+        lut.setFloat("pressure", this.planemoModel.physicalProperties.pressure);
+        lut.refreshRate = 0;
+        lut.executeWhenReady(() => {
+            this.setTexture("lut", lut);
+        });
+
         this.updateConstants();
     }
 
@@ -182,8 +193,8 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
 
         this.setVector3("playerPosition", activeControllerPosition);
 
-        this.setArray3("star_positions", flattenVector3Array(stellarObjects.map(star => star.getTransform().getAbsolutePosition())));
-        this.setArray3("star_colors", flattenVector3Array(stellarObjects.map(star => star instanceof Star ? star.model.surfaceColor : Vector3.One())))
+        this.setArray3("star_positions", flattenVector3Array(stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
+        this.setArray3("star_colors", flattenVector3Array(stellarObjects.map((star) => (star instanceof Star ? star.model.surfaceColor : Vector3.One()))));
         this.setInt("nbStars", stellarObjects.length);
 
         this.setVector3("planetPosition", this.planemoTransform.getAbsolutePosition());
