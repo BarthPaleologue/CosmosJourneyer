@@ -15,7 +15,7 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { AbstractObject } from "../bodies/abstractObject";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import '@babylonjs/core/Collisions/collisionCoordinator';
+import "@babylonjs/core/Collisions/collisionCoordinator";
 import { Mouse } from "../inputs/mouse";
 
 class AnimationGroupWrapper {
@@ -85,11 +85,7 @@ export class CharacterController extends AbstractController {
         this.walkAnim = new AnimationGroupWrapper("walk", walkAnim, 0);
         this.walkBackAnim = new AnimationGroupWrapper("walkBack", walkBackAnim, 0);
         this.sambaAnim = new AnimationGroupWrapper("samba", sambaAnim, 0);
-        this.nonIdleAnimations = [
-            this.walkAnim,
-            this.walkBackAnim,
-            this.sambaAnim
-        ]
+        this.nonIdleAnimations = [this.walkAnim, this.walkBackAnim, this.sambaAnim];
 
         this.targetAnim = this.idleAnim;
 
@@ -115,7 +111,7 @@ export class CharacterController extends AbstractController {
     protected override listenTo(input: Input, deltaTime: number): Vector3 {
         const displacement = Vector3.Zero();
         if (input instanceof Mouse) {
-            if(input.isLeftButtonPressed()) {
+            if (input.isLeftButtonPressed()) {
                 this.thirdPersonCamera.rotatePhi(-input.getDxNormalized() * 300 * deltaTime);
                 this.thirdPersonCamera.rotateTheta(-input.getDyNormalized() * 300 * deltaTime);
             }

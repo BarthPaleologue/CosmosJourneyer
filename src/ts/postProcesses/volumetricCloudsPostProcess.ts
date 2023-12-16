@@ -18,9 +18,8 @@ export class VolumetricCloudsPostProcess extends UberPostProcess implements Obje
     readonly object: Transformable;
 
     constructor(name: string, planet: Transformable & BoundingSphere, cloudsUniforms: CloudsUniforms, scene: UberScene, stars: StellarObject[]) {
-
         const shaderName = "volumetricClouds";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
         }
 

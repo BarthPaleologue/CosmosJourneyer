@@ -15,7 +15,7 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
 
     public static async CreateAsync(body: AbstractBody, scene: UberScene, stellarObjects: Transformable[]): Promise<RingsPostProcess> {
         const shaderName = "rings";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
         }
 
@@ -32,10 +32,7 @@ export class RingsPostProcess extends UberPostProcess implements ObjectPostProce
         ];
 
         return ringsUniforms.getShaderSamplers(scene).then((ringSamplers) => {
-            const samplers: ShaderSamplers = [
-                ...getSamplers(scene),
-                ...ringSamplers
-            ];
+            const samplers: ShaderSamplers = [...getSamplers(scene), ...ringSamplers];
             return new RingsPostProcess(body.name + "Rings", shaderName, uniforms, samplers, scene, body, ringsUniforms);
         });
     }

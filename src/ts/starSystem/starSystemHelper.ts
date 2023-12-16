@@ -51,7 +51,10 @@ export class StarSystemHelper {
         return blackHole;
     }
 
-    public static makeNeutronStar(starsystem: StarSystemController, model: number | NeutronStarModel = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): NeutronStar {
+    public static makeNeutronStar(
+        starsystem: StarSystemController,
+        model: number | NeutronStarModel = starsystem.model.getStarSeed(starsystem.stellarObjects.length)
+    ): NeutronStar {
         if (starsystem.stellarObjects.length >= starsystem.model.getNbStars())
             console.warn(`You are adding a neutron star
         to a system that already has ${starsystem.stellarObjects.length} stars.
@@ -89,7 +92,10 @@ export class StarSystemHelper {
      * @param starsystem
      * @param model The model or seed to use for the planet generation (by default, the next available seed planned by the system model)
      */
-    public static makeTelluricPlanet(starsystem: StarSystemController, model: number | TelluricPlanemoModel = starsystem.model.getPlanetSeed(starsystem.planets.length)): TelluricPlanemo {
+    public static makeTelluricPlanet(
+        starsystem: StarSystemController,
+        model: number | TelluricPlanemoModel = starsystem.model.getPlanetSeed(starsystem.planets.length)
+    ): TelluricPlanemo {
         const planet = new TelluricPlanemo(`${starsystem.model.getName()} ${romanNumeral(starsystem.planets.length + 1)}`, starsystem.scene, model, starsystem.stellarObjects[0]);
         starsystem.addTelluricPlanet(planet);
         return planet;

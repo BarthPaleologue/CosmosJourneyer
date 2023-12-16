@@ -34,10 +34,7 @@ export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPost
         ];
 
         return cloudsUniforms.getShaderSamplers(scene).then((cloudSamplers) => {
-            const samplers: ShaderSamplers = [
-                ...getSamplers(scene),
-                ...cloudSamplers,
-            ];
+            const samplers: ShaderSamplers = [...getSamplers(scene), ...cloudSamplers];
             return new FlatCloudsPostProcess(name, shaderName, planet, cloudsUniforms, uniforms, samplers, scene);
         });
     }

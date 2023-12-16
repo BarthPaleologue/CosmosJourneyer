@@ -221,15 +221,14 @@ document.addEventListener("keydown", (e) => {
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
             spaceshipController.setEnabled(false, engine.getHavokPlugin());
-        } else if(starSystemView.scene.getActiveController() === defaultController) {
+        } else if (starSystemView.scene.getActiveController() === defaultController) {
             characterController.getTransform().setEnabled(true);
             starSystemView.scene.setActiveController(characterController);
             setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(defaultController.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
             spaceshipController.setEnabled(false, engine.getHavokPlugin());
-
-        } else if(starSystemView.scene.getActiveController() === characterController) {
+        } else if (starSystemView.scene.getActiveController() === characterController) {
             characterController.getTransform().setEnabled(false);
             starSystemView.scene.setActiveController(spaceshipController);
             setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(defaultController.getTransform()).clone());

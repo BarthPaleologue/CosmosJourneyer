@@ -17,10 +17,10 @@ export class StarMaterial extends ShaderMaterial {
 
     constructor(star: TransformNode, model: StarModel, scene: Scene) {
         const shaderName = "starMaterial";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;
         }
-        if(Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}VertexShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}VertexShader`] = starMaterialVertex;
         }
 
@@ -30,10 +30,9 @@ export class StarMaterial extends ShaderMaterial {
             samplers: ["lut"]
         });
 
-        if(Effect.ShadersStore["starLutFragmentShader"] === undefined) {
+        if (Effect.ShadersStore["starLutFragmentShader"] === undefined) {
             Effect.ShadersStore["starLutFragmentShader"] = lutFragment;
         }
-
 
         this.setTexture("lut", Assets.EmptyTexture);
         const lut = new ProceduralTexture("lut", 4096, "starLut", scene, null, true, false);

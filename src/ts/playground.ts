@@ -60,7 +60,6 @@ webXRInput.onControllerAddedObservable.add((xrController) => {
                     console.log("Pressed");
                 }
             }
-
         });
     });
 });

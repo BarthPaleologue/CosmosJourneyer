@@ -45,7 +45,7 @@ export class DeleteSemaphore {
                 break;
             }
         }
-        if(!anyNewChunkDisposed) return;
+        if (!anyNewChunkDisposed) return;
 
         this.flag = 0;
         this.resolve();

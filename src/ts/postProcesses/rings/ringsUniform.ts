@@ -160,7 +160,7 @@ export class RingsUniforms {
         }
 
         return new Promise((resolve, reject) => {
-            if(this.ringLut === null) throw new Error("Ring LUT was null when creating promise");
+            if (this.ringLut === null) throw new Error("Ring LUT was null when creating promise");
             this.ringLut.executeWhenReady(() => {
                 if (this.ringLut === null) throw new Error("Ring LUT was null when executing when ready");
                 resolve(this.ringLut);

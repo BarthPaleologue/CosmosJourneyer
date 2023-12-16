@@ -70,13 +70,9 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
             uniforms.push(...ringsUniforms.getShaderUniforms());
 
             return ringsUniforms.getShaderSamplers(scene).then((ringSamplers) => {
-                const samplers: ShaderSamplers = [
-                    ...getSamplers(scene),
-                    ...ringSamplers
-                ];
+                const samplers: ShaderSamplers = [...getSamplers(scene), ...ringSamplers];
                 return new ShadowPostProcess(body.name + "Shadow", body, scene, shaderName, uniforms, samplers, shadowUniforms);
             });
-
         } else {
             uniforms.push(...RingsUniforms.getEmptyShaderUniforms());
             const samplers: ShaderSamplers = [

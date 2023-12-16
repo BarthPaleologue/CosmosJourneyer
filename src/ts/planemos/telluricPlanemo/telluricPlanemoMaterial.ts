@@ -95,7 +95,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "maxTemperature",
                 "pressure",
 
-                "waterAmount",
+                "waterAmount"
             ],
             samplers: ["lut", "bottomNormalMap", "plainNormalMap", "beachNormalMap", "desertNormalMap", "snowNormalMap", "steepNormalMap"]
         });
@@ -140,7 +140,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
 
         this.setVector3("planetPosition", this.planemoTransform.getAbsolutePosition());
 
-        if(Effect.ShadersStore["telluricPlanemoLutFragmentShader"] === undefined) {
+        if (Effect.ShadersStore["telluricPlanemoLutFragmentShader"] === undefined) {
             Effect.ShadersStore["telluricPlanemoLutFragmentShader"] = lutFragment;
         }
 

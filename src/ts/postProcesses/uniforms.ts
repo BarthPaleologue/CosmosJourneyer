@@ -20,7 +20,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
             name: "camera_projection",
             type: UniformEnumType.Matrix,
             get: () => {
-                if(scene.activeCamera === null) throw new Error("No active camera");
+                if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.getProjectionMatrix();
             }
         },
@@ -28,7 +28,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
             name: "camera_inverseProjection",
             type: UniformEnumType.Matrix,
             get: () => {
-                if(scene.activeCamera === null) throw new Error("No active camera");
+                if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.getProjectionMatrix().clone().invert();
             }
         },
@@ -36,7 +36,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
             name: "camera_view",
             type: UniformEnumType.Matrix,
             get: () => {
-                if(scene.activeCamera === null) throw new Error("No active camera");
+                if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.getViewMatrix();
             }
         },
@@ -44,7 +44,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
             name: "camera_inverseView",
             type: UniformEnumType.Matrix,
             get: () => {
-                if(scene.activeCamera === null) throw new Error("No active camera");
+                if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.getViewMatrix().clone().invert();
             }
         },
@@ -52,7 +52,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
             name: "camera_near",
             type: UniformEnumType.Float,
             get: () => {
-                if(scene.activeCamera === null) throw new Error("No active camera");
+                if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.minZ;
             }
         },
@@ -60,7 +60,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
             name: "camera_far",
             type: UniformEnumType.Float,
             get: () => {
-                if(scene.activeCamera === null) throw new Error("No active camera");
+                if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.maxZ;
             }
         }
@@ -72,12 +72,12 @@ export function getStellarObjectsUniforms(stars: Transformable[]): ShaderUniform
         {
             name: "star_positions",
             type: UniformEnumType.Vector3Array,
-            get: () => stars.map(star => star.getTransform().getAbsolutePosition())
+            get: () => stars.map((star) => star.getTransform().getAbsolutePosition())
         },
         {
             name: "star_colors",
             type: UniformEnumType.Vector3Array,
-            get: () => stars.map(star => star instanceof Star ? star.model.surfaceColor : Vector3.One())
+            get: () => stars.map((star) => (star instanceof Star ? star.model.surfaceColor : Vector3.One()))
         },
         {
             name: "nbStars",

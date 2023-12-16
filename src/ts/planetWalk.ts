@@ -89,7 +89,7 @@ capsuleAggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 1 });
 
 const aggregates = [sphereAggregate, capsuleAggregate, newton.aggregate];
 for (const aggregate of aggregates) {
-  aggregate.body.disablePreStep = false;
+    aggregate.body.disablePreStep = false;
 }
 
 const fallingAggregates = [sphereAggregate, capsuleAggregate];
@@ -100,36 +100,36 @@ const gravity = -9.81;
 let clockSeconds = 0;
 
 function updateBeforeHavok() {
-  const deltaTime = engine.getDeltaTime() / 1000;
-  clockSeconds += deltaTime;
+    const deltaTime = engine.getDeltaTime() / 1000;
+    clockSeconds += deltaTime;
 
-  chunkForge.update();
+    chunkForge.update();
 
-  for (const aggregate of fallingAggregates) {
-    const mass = aggregate.body.getMassProperties().mass;
-    if (mass === undefined) throw new Error(`Mass is undefined for ${aggregate.body}`);
-    const gravityDirection = aggregate.body.getObjectCenterWorld().subtract(gravityOrigin).normalize();
-    aggregate.body.applyForce(gravityDirection.scaleInPlace(gravity * mass), aggregate.body.getObjectCenterWorld());
-  }
+    for (const aggregate of fallingAggregates) {
+        const mass = aggregate.body.getMassProperties().mass;
+        if (mass === undefined) throw new Error(`Mass is undefined for ${aggregate.body}`);
+        const gravityDirection = aggregate.body.getObjectCenterWorld().subtract(gravityOrigin).normalize();
+        aggregate.body.applyForce(gravityDirection.scaleInPlace(gravity * mass), aggregate.body.getObjectCenterWorld());
+    }
 
-  characterController.update(deltaTime);
+    characterController.update(deltaTime);
 
-  // planet thingy
-  newton.updateInternalClock(-deltaTime / 10);
-  aurora.updateInternalClock(-deltaTime / 10);
+    // planet thingy
+    newton.updateInternalClock(-deltaTime / 10);
+    aurora.updateInternalClock(-deltaTime / 10);
 
-  newton.updateLOD(characterController.getActiveCamera().getAbsolutePosition(), chunkForge);
-  newton.material.update(characterController.getActiveCamera().getAbsolutePosition(), [aurora]);
+    newton.updateLOD(characterController.getActiveCamera().getAbsolutePosition(), chunkForge);
+    newton.material.update(characterController.getActiveCamera().getAbsolutePosition(), [aurora]);
 }
 
 scene.executeWhenReady(() => {
-  engine.loadingScreen.hideLoadingUI();
-  scene.onBeforePhysicsObservable.add(updateBeforeHavok);
-  engine.runRenderLoop(() => scene.render());
+    engine.loadingScreen.hideLoadingUI();
+    scene.onBeforePhysicsObservable.add(updateBeforeHavok);
+    engine.runRenderLoop(() => scene.render());
 });
 
 window.addEventListener("resize", () => {
-  engine.resize();
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+    engine.resize();
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 });

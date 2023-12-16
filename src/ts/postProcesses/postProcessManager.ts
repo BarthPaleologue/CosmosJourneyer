@@ -180,7 +180,10 @@ export class PostProcessManager {
      */
     public async addClouds(planet: TelluricPlanemo, stellarObjects: StellarObject[]) {
         const uniforms = planet.model.cloudsUniforms;
-        if(uniforms === null) throw new Error(`PostProcessManager: addClouds: uniforms are null. This should not be possible as the postprocess should not be created if the body has no clouds. Body: ${planet.name}`);
+        if (uniforms === null)
+            throw new Error(
+                `PostProcessManager: addClouds: uniforms are null. This should not be possible as the postprocess should not be created if the body has no clouds. Body: ${planet.name}`
+            );
         return FlatCloudsPostProcess.CreateAsync(`${planet.name}Clouds`, planet, uniforms, this.scene, stellarObjects).then((clouds) => {
             this.clouds.push(clouds);
         });

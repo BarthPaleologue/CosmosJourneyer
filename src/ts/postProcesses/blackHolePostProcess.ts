@@ -21,9 +21,8 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
     readonly object: BlackHole;
 
     constructor(blackHole: BlackHole, scene: UberScene, starfieldRotation: Quaternion) {
-
         const shaderName = "blackhole";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
         }
 

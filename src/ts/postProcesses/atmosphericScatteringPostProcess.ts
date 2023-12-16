@@ -32,9 +32,8 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
     readonly object: TelluricPlanemo | GasPlanet;
 
     constructor(name: string, planet: GasPlanet | TelluricPlanemo, atmosphereHeight: number, scene: UberScene, stellarObjects: Transformable[]) {
-
         const shaderName = "atmosphericScattering";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;
         }
 

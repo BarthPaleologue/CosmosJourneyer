@@ -136,7 +136,7 @@ export class StarSystemView {
 
     init() {
         this.scene.getEngine().loadingScreen.displayLoadingUI();
-        this.scene.getEngine().loadingScreen.loadingUIText = `Warping to ${this.getStarSystem().model.getName()}`
+        this.scene.getEngine().loadingScreen.loadingUIText = `Warping to ${this.getStarSystem().model.getName()}`;
 
         this.getStarSystem().initPositions(100, this.chunkForge);
         this.ui.createObjectOverlays(this.getStarSystem().getObjects());
@@ -151,9 +151,11 @@ export class StarSystemView {
         positionNearObject(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
         if (activeController instanceof ShipController) activeController.enableWarpDrive();
 
-        this.getStarSystem().initPostProcesses().then(() => {
-            this.scene.getEngine().loadingScreen.hideLoadingUI();
-        });
+        this.getStarSystem()
+            .initPostProcesses()
+            .then(() => {
+                this.scene.getEngine().loadingScreen.hideLoadingUI();
+            });
     }
 
     hideUI() {

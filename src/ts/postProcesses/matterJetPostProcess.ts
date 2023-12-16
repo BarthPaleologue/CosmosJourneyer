@@ -22,9 +22,8 @@ export class MatterJetPostProcess extends UberPostProcess implements ObjectPostP
     object: BaseObject;
 
     constructor(name: string, stellarObject: StellarObject, scene: UberScene) {
-
         const shaderName = "matterjet";
-        if(Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;
         }
 
