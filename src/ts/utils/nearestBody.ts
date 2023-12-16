@@ -1,15 +1,14 @@
 import { AbstractBody } from "../bodies/abstractBody";
-import { TransformNode } from "@babylonjs/core/Meshes";
 import { Transformable } from "../uberCore/transforms/basicTransform";
 import { BoundingSphere } from "../bodies/common";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-export function nearestBody(object: TransformNode, bodies: AbstractBody[]): AbstractBody {
+export function nearestBody(objectPosition: Vector3, bodies: AbstractBody[]): AbstractBody {
     let distance = -1;
     if (bodies.length === 0) throw new Error("no bodieees !");
     let nearest = bodies[0];
     for (const body of bodies) {
-        const newDistance = object.getAbsolutePosition().subtract(body.getTransform().getAbsolutePosition()).length();
+        const newDistance = objectPosition.subtract(body.getTransform().getAbsolutePosition()).length();
         if (distance === -1 || newDistance < distance) {
             nearest = body;
             distance = newDistance;

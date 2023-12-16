@@ -7,7 +7,7 @@ import { BoundingSphere } from "../bodies/common";
 
 export function positionNearObject(controller: AbstractController, object: Transformable & BoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object
-    const nearestStar = nearestBody(object.getTransform(), starSystem.stellarObjects);
+    const nearestStar = nearestBody(object.getTransform().getAbsolutePosition(), starSystem.stellarObjects);
 
     if (nearestStar === object) {
         // the object is the nearest star
