@@ -99,8 +99,8 @@ const ocean = new OceanPostProcess("ocean", planet, scene, [star]);
 camera.attachPostProcess(ocean);
 xrCamera.attachPostProcess(ocean);
 
-if(planet.model.cloudsUniforms === null) throw new Error("Clouds uniforms are null");
-FlatCloudsPostProcess.CreateAsync("clouds", planet, planet.model.cloudsUniforms, scene,  [star]).then((clouds) => {
+if (planet.model.cloudsUniforms === null) throw new Error("Clouds uniforms are null");
+FlatCloudsPostProcess.CreateAsync("clouds", planet, planet.model.cloudsUniforms, scene, [star]).then((clouds) => {
     camera.attachPostProcess(clouds);
     xrCamera.attachPostProcess(clouds);
 
