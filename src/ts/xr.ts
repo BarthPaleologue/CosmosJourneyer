@@ -83,6 +83,7 @@ webXRInput.onControllerAddedObservable.add((xrController) => {
 
 const xrCamera = xr.baseExperience.camera;
 xrCamera.setTransformationFromNonVRCamera(camera);
+xrCamera.maxZ = camera.maxZ;
 
 const planet = new TelluricPlanemo("xrPlanet", scene, 0.51, undefined);
 translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
