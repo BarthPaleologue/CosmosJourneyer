@@ -23,12 +23,12 @@ class AnimationGroupWrapper {
     group: AnimationGroup;
     weight: number;
 
-    constructor(name: string, group: AnimationGroup, startingWeight: number) {
+    constructor(name: string, group: AnimationGroup, startingWeight: number, loop: boolean) {
         this.name = name;
         this.weight = startingWeight;
 
         this.group = group;
-        this.group.play(true);
+        this.group.play(loop);
         this.group.setWeightForAllAnimatables(startingWeight);
     }
 
@@ -42,8 +42,9 @@ export class CharacterController extends AbstractController {
     private readonly character: AbstractMesh;
     private readonly thirdPersonCamera: UberOrbitCamera;
 
-    private readonly characterSpeed = 1.8;
-    private readonly characterSpeedBackwards = 1.2;
+    private readonly characterWalkSpeed = 1.8;
+    private readonly characterWalkSpeedBackwards = 1.2;
+    private readonly characterRunSpeed = 3.6;
     private readonly characterRotationSpeed = 6;
 
     private animating = false;
@@ -52,6 +53,9 @@ export class CharacterController extends AbstractController {
     private readonly walkAnim: AnimationGroupWrapper;
     private readonly walkBackAnim: AnimationGroupWrapper;
     private readonly sambaAnim: AnimationGroupWrapper;
+    private readonly runningAnim: AnimationGroupWrapper;
+    private readonly fallingIdleAnim: AnimationGroupWrapper;
+    private readonly jumpingAnim: AnimationGroupWrapper;
     private readonly nonIdleAnimations: AnimationGroupWrapper[];
 
     private targetAnim: AnimationGroupWrapper | null = null;
@@ -60,6 +64,9 @@ export class CharacterController extends AbstractController {
 
     private readonly raycastResult = new PhysicsRaycastResult();
     private readonly scene: Scene;
+
+    private isGrounded = false;
+    private jumpVelocity = Vector3.Zero();
 
     constructor(scene: Scene) {
         super();
@@ -81,11 +88,23 @@ export class CharacterController extends AbstractController {
         const sambaAnim = scene.getAnimationGroupByName("SambaDancing");
         if (sambaAnim === null) throw new Error("'Samba' animation not found");
 
-        this.idleAnim = new AnimationGroupWrapper("idle", idleAnim, 1);
-        this.walkAnim = new AnimationGroupWrapper("walk", walkAnim, 0);
-        this.walkBackAnim = new AnimationGroupWrapper("walkBack", walkBackAnim, 0);
-        this.sambaAnim = new AnimationGroupWrapper("samba", sambaAnim, 0);
-        this.nonIdleAnimations = [this.walkAnim, this.walkBackAnim, this.sambaAnim];
+        const runningAnim = scene.getAnimationGroupByName("Running");
+        if (runningAnim === null) throw new Error("'Running' animation not found");
+
+        const fallingIdleAnim = scene.getAnimationGroupByName("FallingIdle");
+        if (fallingIdleAnim === null) throw new Error("'FallingIdle' animation not found");
+
+        const jumpingAnim = scene.getAnimationGroupByName("Jumping");
+        if (jumpingAnim === null) throw new Error("'Jumping' animation not found");
+
+        this.idleAnim = new AnimationGroupWrapper("idle", idleAnim, 1, true);
+        this.walkAnim = new AnimationGroupWrapper("walk", walkAnim, 0, true);
+        this.walkBackAnim = new AnimationGroupWrapper("walkBack", walkBackAnim, 0, true);
+        this.sambaAnim = new AnimationGroupWrapper("samba", sambaAnim, 0, true);
+        this.runningAnim = new AnimationGroupWrapper("running", runningAnim, 0, true);
+        this.fallingIdleAnim = new AnimationGroupWrapper("fallingIdle", fallingIdleAnim, 0, true);
+        this.jumpingAnim = new AnimationGroupWrapper("jumping", jumpingAnim, 0, false);
+        this.nonIdleAnimations = [this.walkAnim, this.walkBackAnim, this.sambaAnim, this.runningAnim, this.fallingIdleAnim, this.jumpingAnim];
 
         this.targetAnim = this.idleAnim;
 
@@ -122,11 +141,15 @@ export class CharacterController extends AbstractController {
             let keydown = false;
 
             if (this.walkAnim.weight > 0.0) {
-                this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterSpeed * deltaTime * this.walkAnim.weight));
+                this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaTime * this.walkAnim.weight));
             }
 
             if (this.walkBackAnim.weight > 0.0) {
-                this.character.moveWithCollisions(this.character.forward.scaleInPlace(this.characterSpeedBackwards * deltaTime * this.walkBackAnim.weight));
+                this.character.moveWithCollisions(this.character.forward.scaleInPlace(this.characterWalkSpeedBackwards * deltaTime * this.walkBackAnim.weight));
+            }
+
+            if(this.runningAnim.weight > 0.0) {
+                this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight));
             }
 
             const isWalking = this.walkAnim.weight > 0.0 || this.walkBackAnim.weight > 0.0;
@@ -137,6 +160,14 @@ export class CharacterController extends AbstractController {
                 keydown = true;
             } else if (keyboard.isPressed("s")) {
                 this.targetAnim = this.walkBackAnim;
+                keydown = true;
+            } else if (keyboard.isPressed("e")) {
+                this.targetAnim = this.runningAnim;
+                keydown = true;
+            }
+
+            if(!this.isGrounded) {
+                this.targetAnim = this.fallingIdleAnim;
                 keydown = true;
             }
 
@@ -153,6 +184,19 @@ export class CharacterController extends AbstractController {
             if (keyboard.isPressed("b")) {
                 this.targetAnim = this.sambaAnim;
                 keydown = true;
+            }
+
+            if (keyboard.isPressed(" ")) {
+                if (this.isGrounded) {
+                    this.targetAnim = this.jumpingAnim;
+                    this.jumpingAnim.weight = 1;
+                    this.jumpingAnim.group.stop();
+                    this.jumpingAnim.group.play();
+                    this.character.moveWithCollisions(Vector3.Up().scale(3.0));
+                    this.isGrounded = false;
+                    this.jumpVelocity = this.character.up.scale(10.0).add(this.character.forward.scale(-5.0));
+                    keydown = true;
+                }
             }
 
             if (!keydown) {
@@ -190,8 +234,21 @@ export class CharacterController extends AbstractController {
         if (this.raycastResult.hasHit && this.closestWalkableObject !== null) {
             const up = character.getAbsolutePosition().subtract(this.closestWalkableObject.getTransform().getAbsolutePosition()).normalize();
             const distance = Vector3.Dot(character.getAbsolutePosition().subtract(this.raycastResult.hitPointWorld), up);
-            translate(character, up.scale(-distance));
+            if (distance <= 0.2) {
+                // push the character up if it's below the surface
+                translate(character, up.scale(-distance));
+                this.isGrounded = true;
+                this.jumpVelocity = Vector3.Zero();
+            } else {
+                this.isGrounded = false;
+            }
             setUpVector(character, up);
+        }
+
+        if (!this.isGrounded) {
+            // apply gravity
+            this.jumpVelocity.addInPlace(character.up.scale(-9.8 * deltaTime));
+            translate(character, this.jumpVelocity.scale(deltaTime));
         }
 
         const playerMovement = Vector3.Zero();
