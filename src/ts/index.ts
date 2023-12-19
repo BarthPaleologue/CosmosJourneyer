@@ -223,6 +223,7 @@ document.addEventListener("keydown", (e) => {
             spaceshipController.setEnabled(false, engine.getHavokPlugin());
         } else if (starSystemView.scene.getActiveController() === defaultController) {
             characterController.getTransform().setEnabled(true);
+            characterController.getTransform().setAbsolutePosition(defaultController.getTransform().absolutePosition);
             starSystemView.scene.setActiveController(characterController);
             setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(defaultController.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
