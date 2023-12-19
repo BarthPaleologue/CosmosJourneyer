@@ -192,7 +192,7 @@ export class CharacterController extends AbstractController {
                     this.jumpingAnim.weight = 1;
                     this.jumpingAnim.group.stop();
                     this.jumpingAnim.group.play();
-                    this.character.moveWithCollisions(Vector3.Up().scale(3.0));
+                    //this.character.moveWithCollisions(Vector3.Up().scale(3.0));
                     this.isGrounded = false;
                     this.jumpVelocity = this.character.up.scale(10.0).add(this.character.forward.scale(-5.0));
                     keydown = true;
@@ -230,6 +230,13 @@ export class CharacterController extends AbstractController {
         const character = this.getTransform();
         const start = character.getAbsolutePosition().add(character.up.scale(50e3));
         const end = character.position.add(character.up.scale(-50e3));
+
+        if (!this.isGrounded) {
+            // apply gravity
+            this.jumpVelocity.addInPlace(character.up.scale(-9.8 * deltaTime));
+            translate(character, this.jumpVelocity.scale(deltaTime));
+        }
+
         (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult);
         if (this.raycastResult.hasHit && this.closestWalkableObject !== null) {
             const up = character.getAbsolutePosition().subtract(this.closestWalkableObject.getTransform().getAbsolutePosition()).normalize();
@@ -243,12 +250,6 @@ export class CharacterController extends AbstractController {
                 this.isGrounded = false;
             }
             setUpVector(character, up);
-        }
-
-        if (!this.isGrounded) {
-            // apply gravity
-            this.jumpVelocity.addInPlace(character.up.scale(-9.8 * deltaTime));
-            translate(character, this.jumpVelocity.scale(deltaTime));
         }
 
         const playerMovement = Vector3.Zero();
