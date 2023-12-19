@@ -4,7 +4,13 @@ import { UberCamera } from "../uberCore/uberCamera";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Input } from "../inputs/input";
-import { rotate, setRotationQuaternion, setUpVector, translate } from "../uberCore/transforms/basicTransform";
+import {
+    rotate,
+    setRotationQuaternion,
+    setUpVector,
+    Transformable,
+    translate
+} from "../uberCore/transforms/basicTransform";
 import { Assets } from "../assets";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { Keyboard } from "../inputs/keyboard";
@@ -39,15 +45,13 @@ class AnimationGroupWrapper {
 }
 
 export class CharacterController extends AbstractController {
-    private readonly character: AbstractMesh;
+    readonly character: AbstractMesh;
     private readonly thirdPersonCamera: UberOrbitCamera;
 
     private readonly characterWalkSpeed = 1.8;
     private readonly characterWalkSpeedBackwards = 1.2;
     private readonly characterRunSpeed = 3.6;
     private readonly characterRotationSpeed = 6;
-
-    private animating = false;
 
     private readonly idleAnim: AnimationGroupWrapper;
     private readonly walkAnim: AnimationGroupWrapper;
@@ -60,7 +64,7 @@ export class CharacterController extends AbstractController {
 
     private targetAnim: AnimationGroupWrapper | null = null;
 
-    private closestWalkableObject: AbstractObject | null = null;
+    private closestWalkableObject: Transformable | null = null;
 
     private readonly raycastResult = new PhysicsRaycastResult();
     private readonly scene: Scene;
@@ -115,7 +119,7 @@ export class CharacterController extends AbstractController {
         this.thirdPersonCamera.parent = this.getTransform();
     }
 
-    public setClosestWalkableObject(object: AbstractObject) {
+    public setClosestWalkableObject(object: Transformable) {
         this.closestWalkableObject = object;
     }
 
@@ -192,7 +196,6 @@ export class CharacterController extends AbstractController {
                     this.jumpingAnim.weight = 1;
                     this.jumpingAnim.group.stop();
                     this.jumpingAnim.group.play();
-                    //this.character.moveWithCollisions(Vector3.Up().scale(3.0));
                     this.isGrounded = false;
                     this.jumpVelocity = this.character.up.scale(10.0).add(this.character.forward.scale(-5.0));
                     keydown = true;
@@ -237,9 +240,14 @@ export class CharacterController extends AbstractController {
             translate(character, this.jumpVelocity.scale(deltaTime));
         }
 
-        (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult);
-        if (this.raycastResult.hasHit && this.closestWalkableObject !== null) {
+        if(this.closestWalkableObject !== null) {
             const up = character.getAbsolutePosition().subtract(this.closestWalkableObject.getTransform().getAbsolutePosition()).normalize();
+            setUpVector(character, up);
+        }
+
+        (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult);
+        if (this.raycastResult.hasHit) {
+            const up = character.up;
             const distance = Vector3.Dot(character.getAbsolutePosition().subtract(this.raycastResult.hitPointWorld), up);
             if (distance <= 0.2) {
                 // push the character up if it's below the surface
@@ -249,7 +257,6 @@ export class CharacterController extends AbstractController {
             } else {
                 this.isGrounded = false;
             }
-            setUpVector(character, up);
         }
 
         const playerMovement = Vector3.Zero();
