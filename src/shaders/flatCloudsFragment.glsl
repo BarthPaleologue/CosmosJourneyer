@@ -172,7 +172,7 @@ void main() {
         }
         ndl = saturate(ndl);
 
-        vec3 ambiant = mix(finalColor.rgb, ndl * clouds_color, cloudDensity);
+        vec3 ambiant = mix(finalColor.rgb * (1.0 - cloudDensity), ndl * clouds_color, cloudDensity);
 
         finalColor.rgb = ambiant + specularHighlight * cloudDensity;
     }

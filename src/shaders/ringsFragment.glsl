@@ -61,7 +61,7 @@ void main() {
                 }
                 if (nbLightSources == 0) ringShadeColor *= 0.1;
 
-                finalColor = vec4(mix(finalColor.rgb, ringShadeColor, ringDensity), 1.0);
+                finalColor = vec4(mix(finalColor.rgb * (1.0 - ringDensity), ringShadeColor, ringDensity), 1.0);
             }
         }
     }
