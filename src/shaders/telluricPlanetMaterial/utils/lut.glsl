@@ -29,7 +29,7 @@ void main() {
     moisture01 = smoothSharpener(moisture01, 2.0);
     moisture01 = clamp(moisture01, 0.0, 1.0);
 
-    vec3 domainWarping = 0.5 * vec3(
+    vec3 domainWarping = 2.0 * vec3(
         completeNoise(sphere + vec3(23.0, 57.0, -18.0), 5, 2.0, 2.0),
         completeNoise(sphere + vec3(57.0, -18.0, 23.0), 5, 2.0, 2.0),
         completeNoise(sphere + vec3(-18.0, 23.0, 57.0), 5, 2.0, 2.0)
