@@ -317,7 +317,7 @@ export class PostProcessManager {
 
     public setSpaceOrder() {
         if (this.currentRenderingPipeline === this.spaceRenderingPipeline) return;
-        this.surfaceRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
+        this.surfaceRenderingPipeline.detachCamera(this.scene.getActiveCamera());
         this.currentRenderingPipeline = this.spaceRenderingPipeline;
         this.currentRenderingOrder = spaceRenderingOrder;
         this.init();
@@ -325,7 +325,7 @@ export class PostProcessManager {
 
     public setSurfaceOrder() {
         if (this.currentRenderingPipeline === this.surfaceRenderingPipeline) return;
-        this.spaceRenderingPipeline.detachCamera(this.scene.getActiveUberCamera());
+        this.spaceRenderingPipeline.detachCamera(this.scene.getActiveCamera());
         this.currentRenderingPipeline = this.surfaceRenderingPipeline;
         this.currentRenderingOrder = surfaceRenderingOrder;
         this.init();
@@ -445,7 +445,7 @@ export class PostProcessManager {
         this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
         this.currentRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
-        this.currentRenderingPipeline.attachToCamera(this.scene.getActiveUberCamera());
+        this.currentRenderingPipeline.attachToCamera(this.scene.getActiveCamera());
     }
 
     /**

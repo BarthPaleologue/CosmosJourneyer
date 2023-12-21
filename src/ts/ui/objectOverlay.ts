@@ -7,6 +7,8 @@ import { parseDistance } from "../utils/parseToStrings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { UberCamera } from "../uberCore/uberCamera";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { LOCAL_DIRECTION } from "../uberCore/localDirections";
 
 export class ObjectOverlay {
     readonly textRoot: StackPanel;
@@ -67,8 +69,8 @@ export class ObjectOverlay {
         this.cursor.linkWithMesh(this.object.getTransform());
     }
 
-    update(camera: UberCamera, target: AbstractObject | null) {
-        const viewRay = camera.forward();
+    update(camera: Camera, target: AbstractObject | null) {
+        const viewRay = camera.getDirection(LOCAL_DIRECTION.BACKWARD);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
         objectRay.scaleInPlace(1 / distance);
@@ -82,7 +84,7 @@ export class ObjectOverlay {
         this.cursor.isVisible = true;
         this.textRoot.isVisible = this.object === target;
 
-        const angularSize = getAngularSize(this.object.getTransform().getAbsolutePosition(), this.object.getBoundingRadius(), camera.getAbsolutePosition());
+        const angularSize = getAngularSize(this.object.getTransform().getAbsolutePosition(), this.object.getBoundingRadius(), camera.globalPosition);
         const screenRatio = angularSize / camera.fov;
 
         const scale = Math.max(0.02, 0.03 * Math.pow(this.object.getBoundingRadius() / 1e6, 0.2));

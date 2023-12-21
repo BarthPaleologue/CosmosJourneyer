@@ -207,7 +207,7 @@ export class StarSystemController {
                 object.getTransform().getAbsolutePosition(),
                 Matrix.IdentityReadOnly,
                 this.scene.getTransformMatrix(),
-                this.scene.getActiveUberCamera().viewport
+                this.scene.getActiveCamera().viewport
             );
 
             if (screenCoordinates.z < 0) continue;
@@ -327,7 +327,7 @@ export class StarSystemController {
         }
 
         return Promise.all(promises).then(() => {
-            this.postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveUberCamera().position));
+            this.postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition));
             this.postProcessManager.init();
         });
     }
@@ -433,7 +433,7 @@ export class StarSystemController {
      */
     public updateShaders(deltaTime: number) {
         const controller = this.scene.getActiveController();
-        const nearestBody = this.getNearestCelestialBody(this.scene.getActiveUberCamera().position);
+        const nearestBody = this.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition);
 
         for (const planet of this.planemosWithMaterial) {
             planet.updateMaterial(controller.getActiveCamera(), this.stellarObjects, deltaTime);

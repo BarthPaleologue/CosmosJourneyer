@@ -1,6 +1,5 @@
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { AbstractController } from "./abstractController";
-import { UberCamera } from "./uberCamera";
 import { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
@@ -8,8 +7,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 
 export class UberScene extends Scene {
-    activeController: AbstractController | null = null;
-
+    private activeController: AbstractController | null = null;
     private depthRenderer: DepthRenderer | null = null;
 
     constructor(engine: Engine, performancePriority = ScenePerformancePriority.BackwardCompatible) {
@@ -40,8 +38,8 @@ export class UberScene extends Scene {
         return this.activeController;
     }
 
-    public getActiveUberCamera(): UberCamera {
-        if (this.getActiveController().getActiveCamera() === null) throw new Error("No active Uber Camera");
-        return this.getActiveController().getActiveCamera();
+    public getActiveCamera(): Camera {
+        if (this.activeCamera === null) throw new Error("Camera not set");
+        return this.activeCamera;
     }
 }
