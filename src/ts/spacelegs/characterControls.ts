@@ -13,7 +13,6 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import "@babylonjs/core/Collisions/collisionCoordinator";
-import { Mouse } from "../inputs/mouse";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 
@@ -130,13 +129,6 @@ export class CharacterControls implements Controls {
 
     private listenTo(input: Input, deltaTime: number): Vector3 {
         const displacement = Vector3.Zero();
-        if (input instanceof Mouse) {
-            if (input.isLeftButtonPressed()) {
-                this.thirdPersonCamera.alpha -= input.getDxNormalized() * 300 * deltaTime;
-                this.thirdPersonCamera.beta -= input.getDyNormalized() * 300 * deltaTime;
-            }
-            input.reset();
-        }
         if (input instanceof Keyboard) {
             const keyboard = input as Keyboard;
             let keydown = false;

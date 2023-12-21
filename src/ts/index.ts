@@ -43,7 +43,6 @@ const defaultController = new DefaultControls(starSystemView.scene);
 defaultController.speed = 0.2 * Settings.EARTH_RADIUS;
 defaultController.getActiveCamera().maxZ = maxZ;
 defaultController.addInput(keyboard);
-defaultController.addInput(mouse);
 defaultController.addInput(gamepad);
 
 const spaceshipController = new ShipControls(starSystemView.scene);
@@ -57,7 +56,6 @@ characterController.getTransform().setEnabled(false);
 characterController.getActiveCamera().maxZ = maxZ;
 characterController.addInput(keyboard);
 characterController.addInput(gamepad);
-characterController.addInput(mouse);
 
 //const physicsViewer = new PhysicsViewer();
 //physicsViewer.showBody(spaceshipController.aggregate.body);

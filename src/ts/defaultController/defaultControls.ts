@@ -3,10 +3,12 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll, translate, yaw } from "../uberCore/transforms/basicTransform";
-import { Input, InputType } from "../inputs/input";
-import { Mouse } from "../inputs/mouse";
+import { Input } from "../inputs/input";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { LOCAL_DIRECTION } from "../uberCore/localDirections";
+import { getTransformationQuaternion } from "../utils/algebra";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 export class DefaultControls implements Controls {
     private readonly transform: TransformNode;
@@ -22,6 +24,7 @@ export class DefaultControls implements Controls {
 
         this.camera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.transform;
+        this.camera.speed = 0;
         this.camera.fov = (80 / 360) * Math.PI;
     }
 
@@ -41,21 +44,18 @@ export class DefaultControls implements Controls {
      * @internal
      */
     private listenTo(input: Input, deltaTime: number): Vector3 {
-        if (input.type === InputType.MOUSE) {
-            const mouse = input as Mouse;
-            if (mouse.isLeftButtonPressed()) {
-                const dx = mouse.getDxNormalized() * 100;
-                const dy = mouse.getDyNormalized() * 100;
-
-                yaw(this.transform, -dx * this.rotationSpeed * deltaTime);
-                pitch(this.transform, dy * this.rotationSpeed * deltaTime);
-            }
-            mouse.reset();
-            return Vector3.Zero();
-        }
         roll(this.transform, input.getRoll() * this.rotationSpeed * deltaTime);
         pitch(this.transform, input.getPitch() * this.rotationSpeed * deltaTime);
         yaw(this.transform, input.getYaw() * this.rotationSpeed * deltaTime);
+
+        const cameraForward = this.camera.getDirection(LOCAL_DIRECTION.BACKWARD);
+        const transformForward = getForwardDirection(this.transform);
+
+        if (!cameraForward.equalsWithEpsilon(transformForward)) {
+            const rotation = getTransformationQuaternion(transformForward, cameraForward);
+            this.transform.rotationQuaternion = rotation.multiply(this.transform.rotationQuaternion ?? Quaternion.Identity());
+            this.camera.rotationQuaternion = Quaternion.Identity();
+        }
 
         const displacement = Vector3.Zero();
 
