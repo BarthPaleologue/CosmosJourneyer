@@ -249,7 +249,7 @@ export class CharacterControls implements Controls {
         }
 
         const playerMovement = Vector3.Zero();
-        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.getTransform().getScene().deltaTime / 1000));
+        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.getTransform().getScene().getEngine().getDeltaTime() / 1000));
         translate(this.getTransform(), playerMovement);
 
 

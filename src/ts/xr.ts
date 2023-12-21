@@ -116,7 +116,7 @@ FlatCloudsPostProcess.CreateAsync("clouds", planet, planet.model.cloudsUniforms,
 const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
 
 scene.onBeforeRenderObservable.add(() => {
-  const deltaTime = scene.deltaTime / 1000;
+  const deltaTime = engine.getDeltaTime() / 1000;
 
   if (scene.activeCamera === null) throw new Error("Active camera is null");
 

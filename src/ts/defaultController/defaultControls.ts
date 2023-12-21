@@ -80,7 +80,8 @@ export class DefaultControls implements Controls {
 
     public update(deltaTime: number): Vector3 {
         const playerMovement = Vector3.Zero();
-        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.transform.getScene().deltaTime / 1000));
+
+        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.transform.getScene().getEngine().getDeltaTime() / 1000));
         translate(this.transform, playerMovement);
         this.getActiveCamera().getViewMatrix();
         return playerMovement;
