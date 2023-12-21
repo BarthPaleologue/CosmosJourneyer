@@ -51,7 +51,7 @@ export class CosmosJourneyer {
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
             const seed = this.getStarSystemView().getStarSystem().model.seed;
-            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/dist/random.html?seed=${seed}`);
+            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/random.html?seed=${seed}`);
             navigator.clipboard.writeText(url.toString()).then(() => console.log("Copied to clipboard"));
         });
 
