@@ -1,11 +1,10 @@
-import { AbstractController } from "../uberCore/abstractController";
+import { Controls } from "../uberCore/controls";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { UberCamera } from "../uberCore/uberCamera";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Input } from "../inputs/input";
 import {
-    rotate,
     setRotationQuaternion,
     setUpVector,
     Transformable,
@@ -19,10 +18,10 @@ import { Settings } from "../settings";
 import { UberOrbitCamera } from "../uberCore/uberOrbitCamera";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { AbstractObject } from "../bodies/abstractObject";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import "@babylonjs/core/Collisions/collisionCoordinator";
 import { Mouse } from "../inputs/mouse";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 class AnimationGroupWrapper {
     name: string;
@@ -44,7 +43,7 @@ class AnimationGroupWrapper {
     }
 }
 
-export class CharacterController extends AbstractController {
+export class CharacterControls implements Controls {
     readonly character: AbstractMesh;
     private readonly thirdPersonCamera: UberOrbitCamera;
 
@@ -72,9 +71,9 @@ export class CharacterController extends AbstractController {
     private isGrounded = false;
     private jumpVelocity = Vector3.Zero();
 
-    constructor(scene: Scene) {
-        super();
+    readonly inputs: Input[] = [];
 
+    constructor(scene: Scene) {
         this.scene = scene;
 
         this.character = Assets.CreateCharacterInstance();
@@ -123,15 +122,19 @@ export class CharacterController extends AbstractController {
         this.closestWalkableObject = object;
     }
 
-    public override getActiveCamera(): UberCamera {
+    public getActiveCamera(): Camera {
         return this.thirdPersonCamera;
     }
 
-    public override getTransform(): TransformNode {
+    public getTransform(): TransformNode {
         return this.character;
     }
 
-    protected override listenTo(input: Input, deltaTime: number): Vector3 {
+    public addInput(input: Input) {
+        this.inputs.push(input);
+    }
+
+    private listenTo(input: Input, deltaTime: number): Vector3 {
         const displacement = Vector3.Zero();
         if (input instanceof Mouse) {
             if (input.isLeftButtonPressed()) {
@@ -152,7 +155,7 @@ export class CharacterController extends AbstractController {
                 this.character.moveWithCollisions(this.character.forward.scaleInPlace(this.characterWalkSpeedBackwards * deltaTime * this.walkBackAnim.weight));
             }
 
-            if(this.runningAnim.weight > 0.0) {
+            if (this.runningAnim.weight > 0.0) {
                 this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight));
             }
 
@@ -170,7 +173,7 @@ export class CharacterController extends AbstractController {
                 keydown = true;
             }
 
-            if(!this.isGrounded) {
+            if (!this.isGrounded) {
                 this.targetAnim = this.fallingIdleAnim;
                 keydown = true;
             }
@@ -229,7 +232,7 @@ export class CharacterController extends AbstractController {
         return displacement;
     }
 
-    public override update(deltaTime: number): Vector3 {
+    public update(deltaTime: number): Vector3 {
         const character = this.getTransform();
         const start = character.getAbsolutePosition().add(character.up.scale(50e3));
         const end = character.position.add(character.up.scale(-50e3));
@@ -240,7 +243,7 @@ export class CharacterController extends AbstractController {
             translate(character, this.jumpVelocity.scale(deltaTime));
         }
 
-        if(this.closestWalkableObject !== null) {
+        if (this.closestWalkableObject !== null) {
             const up = character.getAbsolutePosition().subtract(this.closestWalkableObject.getTransform().getAbsolutePosition()).normalize();
             setUpVector(character, up);
         }
@@ -249,7 +252,7 @@ export class CharacterController extends AbstractController {
         if (this.raycastResult.hasHit) {
             const up = character.up;
             const distance = Vector3.Dot(character.getAbsolutePosition().subtract(this.raycastResult.hitPointWorld), up);
-            if (distance <= 0.2) {
+            if (distance <= 0.1) {
                 // push the character up if it's below the surface
                 translate(character, up.scale(-distance));
                 this.isGrounded = true;

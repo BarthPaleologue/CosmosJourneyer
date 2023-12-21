@@ -15,20 +15,17 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
 import { getForwardDirection, pitch, roll, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { AbstractController } from "../uberCore/abstractController";
+import { Controls } from "../uberCore/controls";
 import { UberOrbitCamera } from "../uberCore/uberOrbitCamera";
 import { UberCamera } from "../uberCore/uberCamera";
 import { Assets } from "../assets";
 import { Input, InputType } from "../inputs/input";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
-export class ShipController extends AbstractController {
+export class ShipControls implements Controls {
     readonly instanceRoot: AbstractMesh;
-
-    readonly rollAuthority = 0.1;
-    readonly pitchAuthority = 1;
-    readonly yawAuthority = 1;
 
     readonly thirdPersonCamera: UberOrbitCamera;
     readonly firstPersonCamera: UberCamera;
@@ -48,9 +45,9 @@ export class ShipController extends AbstractController {
         radius: 1
     };
 
-    constructor(scene: Scene) {
-        super();
+    private inputs: Input[] = [];
 
+    constructor(scene: Scene) {
         this.instanceRoot = Assets.CreateSpaceShipInstance();
 
         this.firstPersonCamera = new UberCamera("firstPersonCamera", Vector3.Zero(), scene);
@@ -60,7 +57,15 @@ export class ShipController extends AbstractController {
         this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 3.14 / 2);
         this.thirdPersonCamera.parent = this.instanceRoot;
 
-        this.aggregate = new PhysicsAggregate(this.instanceRoot, PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
+        this.aggregate = new PhysicsAggregate(
+            this.instanceRoot,
+            PhysicsShapeType.CONTAINER,
+            {
+                mass: 10,
+                restitution: 0.2
+            },
+            scene
+        );
         for (const child of this.instanceRoot.getChildMeshes()) {
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
@@ -89,8 +94,8 @@ export class ShipController extends AbstractController {
         }
     }
 
-    public override addInput(input: Input): void {
-        super.addInput(input);
+    public addInput(input: Input): void {
+        this.inputs.push(input);
         if (input.type === InputType.KEYBOARD) {
             const keyboard = input as Keyboard;
             keyboard.addPressedOnceListener("f", () => {
@@ -102,7 +107,7 @@ export class ShipController extends AbstractController {
         }
     }
 
-    public override getTransform(): TransformNode {
+    public getTransform(): TransformNode {
         return this.aggregate.transformNode;
     }
 
@@ -120,7 +125,7 @@ export class ShipController extends AbstractController {
         thruster.setMaxAuthority(thruster.getMaxAuthority() / thruster.leverage);
     }
 
-    public override getActiveCamera(): UberCamera {
+    public getActiveCamera(): Camera {
         return this.thirdPersonCamera;
     }
 
@@ -152,7 +157,7 @@ export class ShipController extends AbstractController {
         return this.warpDrive;
     }
 
-    protected override listenTo(input: Input, deltaTime: number): Vector3 {
+    private listenTo(input: Input, deltaTime: number): Vector3 {
         if (this.getActiveCamera() === this.thirdPersonCamera) {
             if (input.type === InputType.KEYBOARD) {
                 const keyboard = input as Keyboard;
@@ -237,13 +242,11 @@ export class ShipController extends AbstractController {
         return this.warpDrive.isEnabled() ? this.warpDrive.getTargetThrottle() : this.mainThrusters[0].getThrottle();
     }
 
-    public override update(deltaTime: number): Vector3 {
+    public update(deltaTime: number): Vector3 {
         for (const input of this.inputs) this.listenTo(input, deltaTime);
         //const displacement = this.transform.update(deltaTime).negate();
 
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed()); //Vector3.Zero();
-
-        const speed = this.aggregate.body.getLinearVelocity();
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
         this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);

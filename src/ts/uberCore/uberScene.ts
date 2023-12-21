@@ -1,5 +1,5 @@
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
-import { AbstractController } from "./abstractController";
+import { Controls } from "./controls";
 import { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
@@ -7,7 +7,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 
 export class UberScene extends Scene {
-    private activeController: AbstractController | null = null;
+    private activeController: Controls | null = null;
     private depthRenderer: DepthRenderer | null = null;
 
     constructor(engine: Engine, performancePriority = ScenePerformancePriority.BackwardCompatible) {
@@ -21,7 +21,7 @@ export class UberScene extends Scene {
         return this.depthRenderer;
     }
 
-    public setActiveController(controller: AbstractController) {
+    public setActiveController(controller: Controls) {
         this.activeController = controller;
         this.setActiveCamera(controller.getActiveCamera());
     }
@@ -33,7 +33,7 @@ export class UberScene extends Scene {
         this.depthRenderer = this.enableDepthRenderer(null, false, true);
     }
 
-    public getActiveController(): AbstractController {
+    public getActiveController(): Controls {
         if (this.activeController === null) throw new Error("Controller not set");
         return this.activeController;
     }

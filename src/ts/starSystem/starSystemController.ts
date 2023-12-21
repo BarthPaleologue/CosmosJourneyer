@@ -339,11 +339,11 @@ export class StarSystemController {
      */
     public update(deltaTime: number, chunkForge: ChunkForge): void {
         const controller = this.scene.getActiveController();
-        this.computeNearestOrbitalObject(controller.getActiveCamera().getAbsolutePosition());
+        this.computeNearestOrbitalObject(controller.getActiveCamera().globalPosition);
         this.computeClosestToScreenCenterOrbitalObject();
         const nearestBody = this.getNearestOrbitalObject();
 
-        const distanceOfNearestToCamera = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().getAbsolutePosition());
+        const distanceOfNearestToCamera = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().globalPosition);
         const shouldCompensateTranslation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * (nearestBody instanceof SpaceStation ? 80 : 10);
         const shouldCompensateRotation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * 4;
 
@@ -418,7 +418,7 @@ export class StarSystemController {
         }
 
         // floating origin
-        if (controller.getActiveCamera().getAbsolutePosition().length() > 0) {
+        if (controller.getActiveCamera().globalPosition.length() > 0) {
             const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
             this.translateEverythingNow(displacementTranslation);
             translate(controller.getTransform(), displacementTranslation);

@@ -4,12 +4,12 @@ import { StarSystemController } from "./starSystem/starSystemController";
 
 import { Settings } from "./settings";
 import { Assets } from "./assets";
-import { DefaultController } from "./defaultController/defaultController";
+import { DefaultControls } from "./defaultController/defaultControls";
 import { positionNearObject } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { ShipController } from "./spaceship/shipController";
+import { ShipControls } from "./spaceship/shipControls";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TelluricPlanemoModel } from "./planemos/telluricPlanemo/telluricPlanemoModel";
 import { GasPlanetModel } from "./planemos/gasPlanet/gasPlanetModel";
@@ -25,7 +25,7 @@ import { SpaceStation } from "./spacestation/spaceStation";
 import { getMoonSeed } from "./planemos/common";
 
 import { Gamepad } from "./inputs/gamepad";
-import { CharacterController } from "./spacelegs/characterController";
+import { CharacterControls } from "./spacelegs/characterControls";
 
 const engine = new CosmosJourneyer();
 
@@ -39,20 +39,20 @@ const gamepad = new Gamepad();
 
 const maxZ = Settings.EARTH_RADIUS * 1e5;
 
-const defaultController = new DefaultController(starSystemView.scene);
+const defaultController = new DefaultControls(starSystemView.scene);
 defaultController.speed = 0.2 * Settings.EARTH_RADIUS;
 defaultController.getActiveCamera().maxZ = maxZ;
 defaultController.addInput(keyboard);
 defaultController.addInput(mouse);
 defaultController.addInput(gamepad);
 
-const spaceshipController = new ShipController(starSystemView.scene);
+const spaceshipController = new ShipControls(starSystemView.scene);
 spaceshipController.getActiveCamera().maxZ = maxZ;
 spaceshipController.addInput(keyboard);
 spaceshipController.addInput(gamepad);
 spaceshipController.addInput(mouse);
 
-const characterController = new CharacterController(starSystemView.scene);
+const characterController = new CharacterControls(starSystemView.scene);
 characterController.getTransform().setEnabled(false);
 characterController.getActiveCamera().maxZ = maxZ;
 characterController.addInput(keyboard);

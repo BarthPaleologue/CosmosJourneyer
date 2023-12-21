@@ -20,7 +20,7 @@ import "../styles/index.scss";
 import { Assets } from "./assets";
 import { UberScene } from "./uberCore/uberScene";
 import { Keyboard } from "./inputs/keyboard";
-import { CharacterController } from "./spacelegs/characterController";
+import { CharacterControls } from "./spacelegs/characterControls";
 import { Mouse } from "./inputs/mouse";
 import { TransformNodeWrapper } from "./utils/wrappers";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -35,19 +35,6 @@ const engine = new Engine(canvas);
 const scene = new UberScene(engine);
 scene.useRightHandedSystem = true;
 
-await Assets.Init(scene);
-
-const havokInstance = await HavokPhysics();
-const havokPlugin = new HavokPlugin(true, havokInstance);
-scene.enablePhysics(Vector3.Zero(), havokPlugin);
-
-const characterController = new CharacterController(scene);
-characterController.addInput(new Keyboard());
-characterController.addInput(new Mouse(canvas));
-characterController.getTransform().setAbsolutePosition(new Vector3(0, 2, 0));
-
-scene.setActiveController(characterController);
-
 const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
 light.position = new Vector3(5, 5, 5).scaleInPlace(10);
 
@@ -59,6 +46,19 @@ shadowGenerator.useBlurExponentialShadowMap = true;
 
 const ground = new TransformNodeWrapper(MeshBuilder.CreateGround("ground", { width: 10, height: 10 }, scene), 10);
 (ground.getTransform() as Mesh).receiveShadows = true;
+
+await Assets.Init(scene);
+
+const havokInstance = await HavokPhysics();
+const havokPlugin = new HavokPlugin(true, havokInstance);
+scene.enablePhysics(Vector3.Zero(), havokPlugin);
+
+const characterController = new CharacterControls(scene);
+characterController.addInput(new Keyboard());
+characterController.addInput(new Mouse(canvas));
+characterController.getTransform().setAbsolutePosition(new Vector3(0, 2, 0));
+
+scene.setActiveController(characterController);
 
 const centerOfPlanet = new TransformNodeWrapper(new TransformNode("centerOfPlanet", scene), 1000e3);
 centerOfPlanet.getTransform().position.y = -1000e3;

@@ -1,4 +1,4 @@
-import { DefaultController } from "../defaultController/defaultController";
+import { DefaultControls } from "../defaultController/defaultControls";
 
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
@@ -38,7 +38,7 @@ import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 
 export class StarMap {
     readonly scene: Scene;
-    private readonly controller: DefaultController;
+    private readonly controller: DefaultControls;
 
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
@@ -104,7 +104,7 @@ export class StarMap {
         this.scene.skipPointerMovePicking = false;
         this.scene.useRightHandedSystem = true;
 
-        this.controller = new DefaultController(this.scene);
+        this.controller = new DefaultControls(this.scene);
         this.controller.speed /= 10;
         this.controller.getActiveCamera().minZ = 0.01;
 
@@ -231,7 +231,7 @@ export class StarMap {
 
             this.controller.update(deltaTime);
 
-            this.cameraPositionToCenter = this.controller.getActiveCamera().getAbsolutePosition().subtract(this.starMapCenterPosition);
+            this.cameraPositionToCenter = this.controller.getActiveCamera().globalPosition.subtract(this.starMapCenterPosition);
 
             this.currentCellPosition = new Vector3(
                 Math.round(this.cameraPositionToCenter.x / Cell.SIZE),
@@ -241,7 +241,7 @@ export class StarMap {
 
             this.updateCells();
 
-            if (this.controller.getActiveCamera().getAbsolutePosition().length() > StarMap.FLOATING_ORIGIN_MAX_DISTANCE) {
+            if (this.controller.getActiveCamera().globalPosition.length() > StarMap.FLOATING_ORIGIN_MAX_DISTANCE) {
                 this.translateCameraBackToOrigin();
             }
 
