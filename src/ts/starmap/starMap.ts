@@ -105,12 +105,12 @@ export class StarMap {
         this.scene.useRightHandedSystem = true;
 
         this.controller = new DefaultControls(this.scene);
-        this.controller.speed /= 10;
+        this.controller.speed /= 5;
         this.controller.getActiveCamera().minZ = 0.01;
 
-        this.scene.activeCamera = this.controller.getActiveCamera();
+        this.controller.getActiveCamera().attachControl();
+
         this.controller.addInput(new Keyboard());
-        this.controller.addInput(new Mouse(engine.getRenderingCanvas() as HTMLCanvasElement, 0));
 
         this.starMapUI = new StarMapUI(this.scene);
 
