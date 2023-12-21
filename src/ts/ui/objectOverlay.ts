@@ -5,7 +5,6 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 import cursorImage from "../../asset/textures/hoveredCircle.png";
 import { parseDistance } from "../utils/parseToStrings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { UberCamera } from "../uberCore/uberCamera";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";

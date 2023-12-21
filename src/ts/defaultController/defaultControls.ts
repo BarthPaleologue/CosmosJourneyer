@@ -1,5 +1,4 @@
 import { Controls } from "../uberCore/controls";
-import { UberCamera } from "../uberCore/uberCamera";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -7,10 +6,11 @@ import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll
 import { Input, InputType } from "../inputs/input";
 import { Mouse } from "../inputs/mouse";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 
 export class DefaultControls implements Controls {
     private readonly transform: TransformNode;
-    private readonly camera: UberCamera;
+    private readonly camera: FreeCamera;
 
     speed = 1;
     rotationSpeed = Math.PI / 4;
@@ -20,7 +20,7 @@ export class DefaultControls implements Controls {
     constructor(scene: Scene) {
         this.transform = new TransformNode("playerController", scene);
 
-        this.camera = new UberCamera("firstPersonCamera", Vector3.Zero(), scene);
+        this.camera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.transform;
         this.camera.fov = (80 / 360) * Math.PI;
     }
@@ -82,6 +82,7 @@ export class DefaultControls implements Controls {
         const playerMovement = Vector3.Zero();
         for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.transform.getScene().deltaTime / 1000));
         translate(this.transform, playerMovement);
+        this.getActiveCamera().getViewMatrix();
         return playerMovement;
     }
 

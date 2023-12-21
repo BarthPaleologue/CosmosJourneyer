@@ -1,27 +1,21 @@
 import { Controls } from "../uberCore/controls";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { UberCamera } from "../uberCore/uberCamera";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Input } from "../inputs/input";
-import {
-    setRotationQuaternion,
-    setUpVector,
-    Transformable,
-    translate
-} from "../uberCore/transforms/basicTransform";
+import { setRotationQuaternion, setUpVector, Transformable, translate } from "../uberCore/transforms/basicTransform";
 import { Assets } from "../assets";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { Keyboard } from "../inputs/keyboard";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Settings } from "../settings";
-import { UberOrbitCamera } from "../uberCore/uberOrbitCamera";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import "@babylonjs/core/Collisions/collisionCoordinator";
 import { Mouse } from "../inputs/mouse";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 
 class AnimationGroupWrapper {
     name: string;
@@ -45,7 +39,7 @@ class AnimationGroupWrapper {
 
 export class CharacterControls implements Controls {
     readonly character: AbstractMesh;
-    private readonly thirdPersonCamera: UberOrbitCamera;
+    private readonly thirdPersonCamera: ArcRotateCamera;
 
     private readonly characterWalkSpeed = 1.8;
     private readonly characterWalkSpeedBackwards = 1.2;
@@ -111,8 +105,8 @@ export class CharacterControls implements Controls {
 
         this.targetAnim = this.idleAnim;
 
-        this.thirdPersonCamera = new UberOrbitCamera("camera", new Vector3(0, 1.5, 0), scene, 40, -Math.PI / 4, 1.0);
-        this.thirdPersonCamera.minRadius = 5;
+        this.thirdPersonCamera = new ArcRotateCamera("camera", 1.0, -Math.PI / 4, 40, new Vector3(0, 1.5, 0), scene);
+        this.thirdPersonCamera.lowerRadiusLimit = 5;
         this.thirdPersonCamera.minZ = 1;
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
         this.thirdPersonCamera.parent = this.getTransform();
@@ -138,8 +132,8 @@ export class CharacterControls implements Controls {
         const displacement = Vector3.Zero();
         if (input instanceof Mouse) {
             if (input.isLeftButtonPressed()) {
-                this.thirdPersonCamera.rotatePhi(-input.getDxNormalized() * 300 * deltaTime);
-                this.thirdPersonCamera.rotateTheta(-input.getDyNormalized() * 300 * deltaTime);
+                this.thirdPersonCamera.alpha -= input.getDxNormalized() * 300 * deltaTime;
+                this.thirdPersonCamera.beta -= input.getDyNormalized() * 300 * deltaTime;
             }
             input.reset();
         }
@@ -224,10 +218,10 @@ export class CharacterControls implements Controls {
             this.character.computeWorldMatrix(true);
 
             const cameraRotationSpeed = 0.8 * deltaTime;
-            if (keyboard.isPressed("1")) this.thirdPersonCamera.rotatePhi(cameraRotationSpeed);
-            if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-cameraRotationSpeed);
-            if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(-cameraRotationSpeed);
-            if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(cameraRotationSpeed);
+            if (keyboard.isPressed("1")) this.thirdPersonCamera.alpha += cameraRotationSpeed;
+            if (keyboard.isPressed("3")) this.thirdPersonCamera.alpha -= cameraRotationSpeed;
+            if (keyboard.isPressed("2")) this.thirdPersonCamera.beta -= cameraRotationSpeed;
+            if (keyboard.isPressed("5")) this.thirdPersonCamera.beta += cameraRotationSpeed;
         }
         return displacement;
     }
@@ -263,10 +257,11 @@ export class CharacterControls implements Controls {
         }
 
         const playerMovement = Vector3.Zero();
-        //FIXME: the division by Settings.TIME_MULTIPLIER is a hack to make the player move at the same speed regardless of the time multiplier
-        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.getTransform().getScene().getEngine().getDeltaTime() / 1000));
+        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.getTransform().getScene().deltaTime / 1000));
         translate(this.getTransform(), playerMovement);
 
+
+        this.getActiveCamera().getViewMatrix();
         return playerMovement;
     }
 }

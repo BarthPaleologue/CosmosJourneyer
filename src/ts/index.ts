@@ -91,11 +91,11 @@ engine.registerStarSystemUpdateCallback(() => {
 });
 
 engine.getStarMap().onWarpObservable.add(() => {
-    spaceshipController.thirdPersonCamera.setRadius(30);
+    spaceshipController.thirdPersonCamera.radius = 30;
 });
 
 engine.onToggleStarMapObservable.add((isStarMapOpen) => {
-    if (!isStarMapOpen) spaceshipController.thirdPersonCamera.setRadius(30);
+    if (!isStarMapOpen) spaceshipController.thirdPersonCamera.radius = 30;
 });
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);

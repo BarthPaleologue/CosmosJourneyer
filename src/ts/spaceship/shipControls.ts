@@ -16,19 +16,19 @@ import { setEnabledBody } from "../utils/havok";
 import { getForwardDirection, pitch, roll, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
-import { UberOrbitCamera } from "../uberCore/uberOrbitCamera";
-import { UberCamera } from "../uberCore/uberCamera";
 import { Assets } from "../assets";
 import { Input, InputType } from "../inputs/input";
 import { Keyboard } from "../inputs/keyboard";
 import { Mouse } from "../inputs/mouse";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 
 export class ShipControls implements Controls {
     readonly instanceRoot: AbstractMesh;
 
-    readonly thirdPersonCamera: UberOrbitCamera;
-    readonly firstPersonCamera: UberCamera;
+    readonly thirdPersonCamera: ArcRotateCamera;
+    readonly firstPersonCamera: FreeCamera;
 
     readonly aggregate: PhysicsAggregate;
     private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
@@ -50,11 +50,11 @@ export class ShipControls implements Controls {
     constructor(scene: Scene) {
         this.instanceRoot = Assets.CreateSpaceShipInstance();
 
-        this.firstPersonCamera = new UberCamera("firstPersonCamera", Vector3.Zero(), scene);
+        this.firstPersonCamera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.instanceRoot;
         this.firstPersonCamera.position = new Vector3(0, 1, 0);
 
-        this.thirdPersonCamera = new UberOrbitCamera("thirdPersonCamera", Vector3.Zero(), scene, 30, 3.14, 3.14 / 2);
+        this.thirdPersonCamera = new ArcRotateCamera("thirdPersonCamera", -3.14/2, 3.14 / 2, 30, Vector3.Zero(), scene);
         this.thirdPersonCamera.parent = this.instanceRoot;
 
         this.aggregate = new PhysicsAggregate(
@@ -162,10 +162,10 @@ export class ShipControls implements Controls {
             if (input.type === InputType.KEYBOARD) {
                 const keyboard = input as Keyboard;
                 const cameraRotationSpeed = 0.8 * deltaTime;
-                if (keyboard.isPressed("1")) this.thirdPersonCamera.rotatePhi(cameraRotationSpeed);
-                if (keyboard.isPressed("3")) this.thirdPersonCamera.rotatePhi(-cameraRotationSpeed);
-                if (keyboard.isPressed("2")) this.thirdPersonCamera.rotateTheta(-cameraRotationSpeed);
-                if (keyboard.isPressed("5")) this.thirdPersonCamera.rotateTheta(cameraRotationSpeed);
+                if (keyboard.isPressed("1")) this.thirdPersonCamera.alpha += cameraRotationSpeed;
+                if (keyboard.isPressed("3")) this.thirdPersonCamera.alpha -= cameraRotationSpeed;
+                if (keyboard.isPressed("2")) this.thirdPersonCamera.beta -= cameraRotationSpeed;
+                if (keyboard.isPressed("5")) this.thirdPersonCamera.beta += cameraRotationSpeed;
             }
         }
 
@@ -266,6 +266,8 @@ export class ShipControls implements Controls {
         }
 
         //this.transform.translate(displacement);
+
+        this.getActiveCamera().getViewMatrix();
         return this.aggregate.transformNode.getAbsolutePosition();
     }
 }
