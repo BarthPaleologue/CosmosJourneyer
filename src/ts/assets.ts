@@ -16,7 +16,6 @@ import waterNormal2 from "../asset/textures/waterNormalMap4.jpg";
 import starfield from "../asset/textures/milkyway.jpg";
 import plumeParticle from "../asset/textures/plume.png";
 
-import proceduralTest from "../shaders/textures/test.glsl";
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 
 import spaceship from "../asset/spaceship/spaceship2.glb";
@@ -63,7 +62,6 @@ export class Assets {
 
     static EmptyTexture: Texture;
 
-    static ProceduralTest: ProceduralTexture;
     static AtmosphereLUT: ProceduralTexture;
 
     private static Spaceship: Mesh;
@@ -97,9 +95,6 @@ export class Assets {
         Assets.manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.Starfield = task.texture);
 
         Assets.manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Assets.PlumeParticle = task.texture);
-
-        Assets.ProceduralTest = new ProceduralTexture("proceduralTest", 100, { fragmentSource: proceduralTest }, scene, undefined, false, false);
-        Assets.ProceduralTest.refreshRate = 0;
 
         Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Assets.AtmosphereLUT.refreshRate = 0;
@@ -195,7 +190,7 @@ export class Assets {
             Assets.IS_READY = true;
         };
 
-        return Assets.manager.loadAsync();
+        await Assets.manager.loadAsync();
     }
 
     static CreateSpaceShipInstance(): InstancedMesh {
