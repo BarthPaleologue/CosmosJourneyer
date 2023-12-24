@@ -136,7 +136,7 @@ export class StarMap {
 
         this.starMapCenterPosition = new Vector3(initialStarMapX ?? 0, initialStarMapY ?? 0, initialStarMapZ ?? 0);
 
-        this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.2 }, this.scene);
+        this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.15 }, this.scene);
         this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
         this.starTemplate.isPickable = true;
         this.starTemplate.isVisible = false;
