@@ -208,12 +208,6 @@ export class CharacterControls implements Controls {
             this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaTime);
 
             this.character.computeWorldMatrix(true);
-
-            const cameraRotationSpeed = 0.8 * deltaTime;
-            if (keyboard.isPressed("1")) this.thirdPersonCamera.alpha += cameraRotationSpeed;
-            if (keyboard.isPressed("3")) this.thirdPersonCamera.alpha -= cameraRotationSpeed;
-            if (keyboard.isPressed("2")) this.thirdPersonCamera.beta -= cameraRotationSpeed;
-            if (keyboard.isPressed("5")) this.thirdPersonCamera.beta += cameraRotationSpeed;
         }
         return displacement;
     }

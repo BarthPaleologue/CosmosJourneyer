@@ -158,17 +158,6 @@ export class ShipControls implements Controls {
     }
 
     private listenTo(input: Input, deltaTime: number): Vector3 {
-        if (this.getActiveCamera() === this.thirdPersonCamera) {
-            if (input.type === InputType.KEYBOARD) {
-                const keyboard = input as Keyboard;
-                const cameraRotationSpeed = 0.8 * deltaTime;
-                if (keyboard.isPressed("1")) this.thirdPersonCamera.alpha += cameraRotationSpeed;
-                if (keyboard.isPressed("3")) this.thirdPersonCamera.alpha -= cameraRotationSpeed;
-                if (keyboard.isPressed("2")) this.thirdPersonCamera.beta -= cameraRotationSpeed;
-                if (keyboard.isPressed("5")) this.thirdPersonCamera.beta += cameraRotationSpeed;
-            }
-        }
-
         if (this.warpDrive.isDisabled()) {
             for (const thruster of this.mainThrusters) {
                 thruster.updateThrottle(2 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
@@ -185,8 +174,6 @@ export class ShipControls implements Controls {
                 const mouse = input as Mouse;
                 const roll = mouse.getRoll();
                 const pitch = mouse.getPitch();
-
-                //console.log(roll);
 
                 for (const rcsThruster of this.rcsThrusters) {
                     let throttle = 0;
