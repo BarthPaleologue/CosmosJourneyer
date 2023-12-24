@@ -105,7 +105,8 @@ export class CharacterControls implements Controls {
         this.targetAnim = this.idleAnim;
 
         this.thirdPersonCamera = new ArcRotateCamera("camera", 1.0, -Math.PI / 4, 40, new Vector3(0, 1.5, 0), scene);
-        this.thirdPersonCamera.lowerRadiusLimit = 5;
+        this.thirdPersonCamera.lowerRadiusLimit = 2;
+        this.thirdPersonCamera.upperRadiusLimit = 500;
         this.thirdPersonCamera.minZ = 1;
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
         this.thirdPersonCamera.parent = this.getTransform();

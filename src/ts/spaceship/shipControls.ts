@@ -56,6 +56,8 @@ export class ShipControls implements Controls {
 
         this.thirdPersonCamera = new ArcRotateCamera("thirdPersonCamera", -3.14/2, 3.14 / 2, 30, Vector3.Zero(), scene);
         this.thirdPersonCamera.parent = this.instanceRoot;
+        this.thirdPersonCamera.lowerRadiusLimit = 10;
+        this.thirdPersonCamera.upperRadiusLimit = 500;
 
         this.aggregate = new PhysicsAggregate(
             this.instanceRoot,
