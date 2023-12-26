@@ -231,6 +231,12 @@ document.addEventListener("keydown", (e) => {
 
             starSystemView.scene.setActiveController(characterController);
             starSystemView.getStarSystem().postProcessManager.rebuild();
+        } else if(starSystemView.scene.getActiveController() === characterController) {
+            console.log("embark");
+
+            characterController.getTransform().setEnabled(false);
+            starSystemView.scene.setActiveController(spaceshipController);
+            starSystemView.getStarSystem().postProcessManager.rebuild();
         }
     }
 
