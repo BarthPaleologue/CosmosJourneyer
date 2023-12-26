@@ -6,14 +6,22 @@ import { ReadonlyWarpDrive, WarpDrive } from "./warpDrive";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";
 import { RCSThruster } from "./rcsThruster";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { IPhysicsCollisionEvent, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { IPhysicsCollisionEvent, PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
-import { getForwardDirection, pitch, roll, translate } from "../uberCore/transforms/basicTransform";
+import {
+    getForwardDirection,
+    getUpwardDirection,
+    pitch,
+    roll,
+    rotate,
+    Transformable,
+    translate
+} from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
 import { Assets } from "../assets";
@@ -23,6 +31,15 @@ import { Mouse } from "../inputs/mouse";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
+import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { CollisionMask } from "../settings";
+
+enum ShipState {
+    FLYING,
+    LANDING,
+    LANDED
+}
 
 export class ShipControls implements Controls {
     readonly instanceRoot: AbstractMesh;
@@ -40,12 +57,19 @@ export class ShipControls implements Controls {
 
     private readonly warpDrive = new WarpDrive(false);
 
+    private closestWalkableObject: Transformable | null = null;
+    private readonly raycastResult = new PhysicsRaycastResult();
+
+    private state = ShipState.FLYING;
+
     private closestObject = {
         distance: Infinity,
         radius: 1
     };
 
     private inputs: Input[] = [];
+
+    private readonly scene: Scene;
 
     constructor(scene: Scene) {
         this.instanceRoot = Assets.CreateSpaceShipInstance();
@@ -54,7 +78,7 @@ export class ShipControls implements Controls {
         this.firstPersonCamera.parent = this.instanceRoot;
         this.firstPersonCamera.position = new Vector3(0, 1, 0);
 
-        this.thirdPersonCamera = new ArcRotateCamera("thirdPersonCamera", -3.14/2, 3.14 / 2, 30, Vector3.Zero(), scene);
+        this.thirdPersonCamera = new ArcRotateCamera("thirdPersonCamera", -3.14 / 2, 3.14 / 2, 30, Vector3.Zero(), scene);
         this.thirdPersonCamera.parent = this.instanceRoot;
         this.thirdPersonCamera.lowerRadiusLimit = 10;
         this.thirdPersonCamera.upperRadiusLimit = 500;
@@ -70,6 +94,7 @@ export class ShipControls implements Controls {
         );
         for (const child of this.instanceRoot.getChildMeshes()) {
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
+            childShape.filterMembershipMask = CollisionMask.SPACESHIP;
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
         }
         this.aggregate.body.disablePreStep = false;
@@ -78,12 +103,11 @@ export class ShipControls implements Controls {
 
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
         this.collisionObservable.add((collisionEvent: IPhysicsCollisionEvent) => {
-            console.log("Collision", collisionEvent);
+            console.log("Collision");
             if (collisionEvent.impulse < 0.8) return;
-            Assets.OuchSound.play();
+            console.log(collisionEvent);
+            //Assets.OuchSound.play();
         });
-
-        //if(this.warpDrive.isEnabled()) setEnabledBody(this.aggregate.body, false, )
 
         for (const child of this.instanceRoot.getChildMeshes()) {
             if (child.name.includes("mainThruster")) {
@@ -94,6 +118,8 @@ export class ShipControls implements Controls {
                 this.addRCSThruster(child);
             }
         }
+
+        this.scene = scene;
     }
 
     public addInput(input: Input): void {
@@ -107,6 +133,10 @@ export class ShipControls implements Controls {
                 this.toggleWarpDrive();
             });
         }
+    }
+
+    public setClosestWalkableObject(object: Transformable) {
+        this.closestWalkableObject = object;
     }
 
     public getTransform(): TransformNode {
@@ -159,7 +189,7 @@ export class ShipControls implements Controls {
         return this.warpDrive;
     }
 
-    private listenTo(input: Input, deltaTime: number): Vector3 {
+    private listenTo(input: Input, deltaTime: number) {
         if (this.warpDrive.isDisabled()) {
             for (const thruster of this.mainThrusters) {
                 thruster.updateThrottle(2 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
@@ -170,6 +200,22 @@ export class ShipControls implements Controls {
 
                 thruster.updateThrottle(2 * deltaTime * input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.LEFT));
                 thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
+            }
+
+            if (input.type === InputType.KEYBOARD) {
+                const keyboard = input as Keyboard;
+                if (keyboard.isPressed("r")) {
+                    this.aggregate.body.applyForce(getUpwardDirection(this.getTransform()).scale(9.8 * 10), this.aggregate.body.getObjectCenterWorld());
+                }
+
+                if (keyboard.isPressed("l")) {
+                    if (this.closestWalkableObject === null) return;
+
+                    console.log("Landing sequence engaged");
+                    this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
+
+                    this.state = ShipState.LANDING;
+                }
             }
 
             if (input.type === InputType.MOUSE) {
@@ -191,6 +237,11 @@ export class ShipControls implements Controls {
                 }
 
                 mouse.reset();
+            }
+
+            if (this.closestWalkableObject) {
+                const gravityDir = this.closestWalkableObject.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
+                this.aggregate.body.applyForce(gravityDir.scale(9.8), this.aggregate.body.getObjectCenterWorld());
             }
         } else {
             if (input.type === InputType.MOUSE) {
@@ -214,7 +265,6 @@ export class ShipControls implements Controls {
             //this.aggregate.body.setLinearVelocity(warpSpeed);
             translate(this.aggregate.transformNode, warpSpeed.scale(deltaTime));
         }
-        return Vector3.Zero();
     }
 
     /**
@@ -254,7 +304,37 @@ export class ShipControls implements Controls {
             this.aggregate.body.setAngularDamping(1);
         }
 
-        //this.transform.translate(displacement);
+        if (this.state == ShipState.LANDING) {
+            if (this.closestWalkableObject === null) {
+                throw new Error("Closest walkable object is null");
+            }
+
+            const gravityDir = this.closestWalkableObject.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
+            const start = this.getTransform().getAbsolutePosition().add(gravityDir.scale(-50e3));
+            const end = this.getTransform().getAbsolutePosition().add(gravityDir.scale(50e3));
+
+            (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.GROUND });
+            if (this.raycastResult.hasHit) {
+                const landingSpotNormal = this.raycastResult.hitNormalWorld;
+                const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(2));
+
+                const distance = landingSpot.subtract(this.getTransform().getAbsolutePosition()).dot(gravityDir);
+                console.log(distance);
+                translate(this.getTransform(), gravityDir.scale(Math.min(500 * deltaTime, distance)));
+
+
+                const currentUp = getUpwardDirection(this.aggregate.transformNode);
+                const targetUp = landingSpotNormal;
+                const axis = Vector3.Cross(currentUp, targetUp);
+                const theta = Math.acos(Vector3.Dot(currentUp, targetUp));
+                rotate(this.getTransform(), axis, Math.min(0.1 * deltaTime, theta));
+
+                if(Math.abs(distance) < 0.3 && Math.abs(theta) < 0.01) {
+                    this.state = ShipState.LANDED;
+                    this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+                }
+            }
+        }
 
         this.getActiveCamera().getViewMatrix();
         return this.aggregate.transformNode.getAbsolutePosition();

@@ -13,7 +13,12 @@ import { ShipControls } from "./spaceship/shipControls";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TelluricPlanemoModel } from "./planemos/telluricPlanemo/telluricPlanemoModel";
 import { GasPlanetModel } from "./planemos/gasPlanet/gasPlanetModel";
-import { getRotationQuaternion, setRotationQuaternion } from "./uberCore/transforms/basicTransform";
+import {
+    getForwardDirection,
+    getRotationQuaternion,
+    setRotationQuaternion,
+    translate
+} from "./uberCore/transforms/basicTransform";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 
 import { StarSystemHelper } from "./starSystem/starSystemHelper";
@@ -86,6 +91,7 @@ engine.registerStarSystemUpdateCallback(() => {
     (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 
     characterController.setClosestWalkableObject(nearestBody);
+    spaceshipController.setClosestWalkableObject(nearestBody);
 });
 
 engine.getStarMap().onWarpObservable.add(() => {
@@ -212,6 +218,22 @@ if (aresAtmosphere) {
 
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
+
+    if(e.key === "y") {
+        if(starSystemView.scene.getActiveController() === spaceshipController) {
+            console.log("disembark");
+
+            characterController.getTransform().setEnabled(true);
+            characterController.getTransform().setAbsolutePosition(spaceshipController.getTransform().absolutePosition);
+            translate(characterController.getTransform(), getForwardDirection(spaceshipController.getTransform()).scale(10));
+
+            setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
+
+            starSystemView.scene.setActiveController(characterController);
+            starSystemView.getStarSystem().postProcessManager.rebuild();
+        }
+    }
+
     if (e.key === "g") {
         if (starSystemView.scene.getActiveController() === spaceshipController) {
             starSystemView.scene.setActiveController(defaultController);

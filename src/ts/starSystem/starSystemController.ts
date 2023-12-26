@@ -418,8 +418,13 @@ export class StarSystemController {
         }
 
         // floating origin
-        if (controller.getActiveCamera().globalPosition.length() > 0) {
+        if (controller.getActiveCamera().globalPosition.length() > 500) {
             const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
+            this.translateEverythingNow(displacementTranslation);
+            translate(controller.getTransform(), displacementTranslation);
+        } else {
+            // FIXME: this is necessary to update every world matrix, it could be done better
+            const displacementTranslation = Vector3.Zero();
             this.translateEverythingNow(displacementTranslation);
             translate(controller.getTransform(), displacementTranslation);
         }
