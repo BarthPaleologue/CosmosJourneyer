@@ -5,7 +5,7 @@ import { translate } from "../basicTransform";
 
 export class TransformTranslationAnimation {
     private clock = 0;
-    private duration: number;
+    private readonly duration: number;
     private distanceAcc = 0;
     private readonly totalDistance;
     private readonly direction: Vector3;

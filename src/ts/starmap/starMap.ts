@@ -32,7 +32,6 @@ import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Keyboard } from "../inputs/keyboard";
-import { Mouse } from "../inputs/mouse";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 
