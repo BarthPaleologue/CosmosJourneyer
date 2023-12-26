@@ -8,7 +8,7 @@ import { Assets } from "../assets";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { Keyboard } from "../inputs/keyboard";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Settings } from "../settings";
+import { CollisionMask, Settings } from "../settings";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { Quaternion } from "@babylonjs/core/Maths/math";
@@ -229,7 +229,7 @@ export class CharacterControls implements Controls {
             setUpVector(character, up);
         }
 
-        (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult);
+        (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.GROUND });
         if (this.raycastResult.hasHit) {
             const up = character.up;
             const distance = Vector3.Dot(character.getAbsolutePosition().subtract(this.raycastResult.hitPointWorld), up);
@@ -246,7 +246,6 @@ export class CharacterControls implements Controls {
         const playerMovement = Vector3.Zero();
         for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.getTransform().getScene().getEngine().getDeltaTime() / 1000));
         translate(this.getTransform(), playerMovement);
-
 
         this.getActiveCamera().getViewMatrix();
         return playerMovement;
