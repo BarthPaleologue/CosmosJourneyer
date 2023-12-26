@@ -319,11 +319,11 @@ export class ShipControls implements Controls {
                 const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(2));
 
                 const distance = landingSpot.subtract(this.getTransform().getAbsolutePosition()).dot(gravityDir);
-                console.log(distance);
-                translate(this.getTransform(), gravityDir.scale(Math.min(500 * deltaTime, distance)));
+                console.log(500 * deltaTime * Math.sign(distance), distance);
+                translate(this.getTransform(), gravityDir.scale(Math.min(500 * deltaTime * Math.sign(distance), distance)));
 
 
-                const currentUp = getUpwardDirection(this.aggregate.transformNode);
+                const currentUp = getUpwardDirection(this.getTransform());
                 const targetUp = landingSpotNormal;
                 const axis = Vector3.Cross(currentUp, targetUp);
                 const theta = Math.acos(Vector3.Dot(currentUp, targetUp));
@@ -337,6 +337,6 @@ export class ShipControls implements Controls {
         }
 
         this.getActiveCamera().getViewMatrix();
-        return this.aggregate.transformNode.getAbsolutePosition();
+        return this.getTransform().getAbsolutePosition();
     }
 }
