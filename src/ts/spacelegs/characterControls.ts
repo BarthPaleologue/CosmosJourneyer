@@ -146,7 +146,7 @@ export class CharacterControls implements Controls {
                 this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight));
             }
 
-            const isWalking = this.walkAnim.weight > 0.0 || this.walkBackAnim.weight > 0.0;
+            const isWalking = this.walkAnim.weight > 0.0 || this.walkBackAnim.weight > 0.0 || this.runningAnim.weight > 0.0;
 
             // Translation
             if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
@@ -168,9 +168,11 @@ export class CharacterControls implements Controls {
             // Rotation
             if ((keyboard.isPressed("q") || keyboard.isPressed("a")) && isWalking) {
                 this.character.rotate(Vector3.Up(), this.characterRotationSpeed * deltaTime);
+                this.thirdPersonCamera.alpha += this.characterRotationSpeed * deltaTime;
                 keydown = true;
             } else if (keyboard.isPressed("d") && isWalking) {
                 this.character.rotate(Vector3.Up(), -this.characterRotationSpeed * deltaTime);
+                this.thirdPersonCamera.alpha -= this.characterRotationSpeed * deltaTime;
                 keydown = true;
             }
 
