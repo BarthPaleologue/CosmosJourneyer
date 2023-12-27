@@ -177,11 +177,15 @@ export class CosmosJourneyer {
     public toggleStarMap(): void {
         if (this.activeScene === this.getStarSystemView().scene) {
             this.getStarSystemView().unZoom(() => {
+                this.getStarSystemView().scene.detachControl();
+                this.getStarMap().scene.attachControl();
                 const starMap = this.getStarMap();
                 this.activeScene = starMap.scene;
                 starMap.focusOnCurrentSystem();
             });
         } else {
+            this.getStarMap().scene.detachControl();
+            this.getStarSystemView().scene.attachControl();
             this.activeScene = this.getStarSystemView().scene;
             this.getStarSystemView().showUI();
         }
