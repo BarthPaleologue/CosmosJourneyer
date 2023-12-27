@@ -139,9 +139,6 @@ export class StarSystemHelper {
     ): TelluricPlanemo {
         const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, starsystem.scene, model, planet);
 
-        satellite.material.colorSettings.desertColor.copyFromFloats(92 / 255, 92 / 255, 92 / 255);
-        satellite.material.updateConstants();
-
         planet.model.childrenBodies.push(satellite.model);
 
         starsystem.addTelluricSatellite(satellite);

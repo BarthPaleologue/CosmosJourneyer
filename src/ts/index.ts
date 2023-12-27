@@ -62,8 +62,8 @@ characterController.getActiveCamera().maxZ = maxZ;
 characterController.addInput(keyboard);
 characterController.addInput(gamepad);
 
-//const physicsViewer = new PhysicsViewer();
-//physicsViewer.showBody(spaceshipController.aggregate.body);
+// const physicsViewer = new PhysicsViewer();
+// physicsViewer.showBody(spaceshipController.aggregate.body);
 
 mouse.onMouseLeaveObservable.add(() => {
     if (starSystemView.scene.getActiveController() === spaceshipController) engine.pause();
@@ -163,7 +163,7 @@ moon.material.updateConstants();
 const aresModel = new TelluricPlanemoModel(0.3725, sunModel);
 aresModel.physicalProperties.mass = 7;
 aresModel.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
-aresModel.physicalProperties.minTemperature = -48;
+aresModel.physicalProperties.minTemperature = -30;
 aresModel.physicalProperties.maxTemperature = 20;
 aresModel.physicalProperties.pressure = 0.5;
 aresModel.physicalProperties.waterAmount = 0.2;
@@ -173,19 +173,18 @@ aresModel.orbit.period = 60 * 60 * 24 * 365.24;
 aresModel.orbit.radius = 4020 * planet.getRadius();
 aresModel.orbit.normalToPlane = Vector3.Up();
 
-aresModel.terrainSettings.continents_fragmentation = 0.0;
-aresModel.terrainSettings.continent_base_height = 10e3;
-aresModel.terrainSettings.max_mountain_height = 20e3;
+//aresModel.terrainSettings.continents_fragmentation = 0.0;
+//aresModel.terrainSettings.continent_base_height = 10e3;
+//aresModel.terrainSettings.max_mountain_height = 20e3;
 
 const ares = StarSystemHelper.makeTelluricPlanet(starSystem, aresModel);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.OCEAN), 1);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.CLOUDS), 1);
 
-ares.material.colorSettings.plainColor.copyFromFloats(0.4, 0.3, 0.3);
+ares.material.colorSettings.plainColor.copyFromFloats(143 / 255, 45 / 255, 45 / 255);
 ares.material.colorSettings.desertColor.copyFromFloats(178 / 255, 107 / 255, 42 / 255);
-ares.material.colorSettings.steepColor.copyFrom(ares.material.colorSettings.desertColor.scale(0.9));
-ares.material.colorSettings.beachColor.copyFromFloats(0.3, 0.15, 0.1);
-ares.material.colorSettings.bottomColor.copyFromFloats(0.05, 0.1, 0.15);
+ares.material.colorSettings.beachColor.copyFrom(ares.material.colorSettings.plainColor);
+ares.material.colorSettings.bottomColor.copyFrom(ares.material.colorSettings.plainColor.scale(0.9));
 
 ares.material.updateConstants();
 

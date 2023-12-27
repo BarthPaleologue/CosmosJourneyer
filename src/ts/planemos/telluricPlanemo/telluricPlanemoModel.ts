@@ -113,7 +113,6 @@ export class TelluricPlanemoModel implements PlanemoModel {
 
         if (this.isSatelliteOfTelluric) {
             this.terrainSettings.continents_fragmentation = 0;
-            this.terrainSettings.max_mountain_height = 2e3;
         }
         if (this.isSatelliteOfGas && this.physicalProperties.pressure === 0) {
             this.terrainSettings.continents_fragmentation = 0;
