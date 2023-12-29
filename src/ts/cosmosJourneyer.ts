@@ -8,15 +8,14 @@ import { StarMap } from "./starmap/starMap";
 import { Scene } from "@babylonjs/core/scene";
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
-import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
 
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
-import { setMaxLinVel } from "./utils/havok";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/StarSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
+import { MainMenu } from "./mainMenu/mainMenu";
 
 enum EngineState {
     RUNNING,
@@ -34,8 +33,8 @@ export class CosmosJourneyer {
 
     readonly canvas: HTMLCanvasElement;
     private engine: Engine | null = null;
-    private havokPlugin: HavokPlugin | null = null;
 
+    private mainMenu: MainMenu | null = null;
     private starSystemView: StarSystemView | null = null;
     private starMap: StarMap | null = null;
 
@@ -104,9 +103,9 @@ export class CosmosJourneyer {
 
         // Init Havok physics engine
         const havokInstance = await HavokPhysics();
-        this.havokPlugin = new HavokPlugin(true, havokInstance);
-        setMaxLinVel(this.havokPlugin, 10000, 10000);
         console.log(`Havok initialized`);
+
+        this.mainMenu = new MainMenu(this.engine, havokInstance);
 
         // Init starmap view
         this.starMap = new StarMap(this.engine);
@@ -117,13 +116,13 @@ export class CosmosJourneyer {
         });
 
         // Init star system view
-        this.starSystemView = new StarSystemView(this.engine, this.havokPlugin);
+        this.starSystemView = new StarSystemView(this.engine, havokInstance);
 
         // Init assets used in star system view
         await Assets.Init(this.getStarSystemView().scene);
 
         // Starmap is the active scene by default
-        this.activeScene = this.starMap.scene;
+        this.activeScene = this.starSystemView.scene;
     }
 
     public pause(): void {
@@ -144,6 +143,7 @@ export class CosmosJourneyer {
      * Inits the current star system
      */
     public init(): void {
+        this.getMainMenu().init();
         this.getStarSystemView().init();
 
         this.getEngine().runRenderLoop(() => {
@@ -158,6 +158,11 @@ export class CosmosJourneyer {
      */
     public registerStarSystemUpdateCallback(callback: () => void): void {
         this.getStarSystemView().scene.onBeforeRenderObservable.add(callback);
+    }
+
+    public getMainMenu(): MainMenu {
+        if (this.mainMenu === null) throw new Error("Main menu is null");
+        return this.mainMenu;
     }
 
     public getStarSystemView(): StarSystemView {
@@ -211,16 +216,6 @@ export class CosmosJourneyer {
     public getEngine(): Engine {
         if (this.engine === null) throw new Error("Engine is null");
         return this.engine;
-    }
-
-    /**
-     * Returns the Havok plugin
-     * @returns the Havok plugin
-     * @throws Error if the Havok plugin is null
-     */
-    public getHavokPlugin(): HavokPlugin {
-        if (this.havokPlugin === null) throw new Error("Havok plugin is null");
-        return this.havokPlugin;
     }
 
     /**

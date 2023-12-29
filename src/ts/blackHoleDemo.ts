@@ -80,13 +80,13 @@ document.addEventListener("keydown", (e) => {
             setRotationQuaternion(player.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
-            spaceshipController.setEnabled(false, engine.getHavokPlugin());
+            spaceshipController.setEnabled(false, starSystemView.havokPlugin);
         } else {
             scene.setActiveController(spaceshipController);
             setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(player.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
-            spaceshipController.setEnabled(true, engine.getHavokPlugin());
+            spaceshipController.setEnabled(true, starSystemView.havokPlugin);
         }
     }
 });

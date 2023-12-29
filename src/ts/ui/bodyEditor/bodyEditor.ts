@@ -50,6 +50,16 @@ export class BodyEditor {
     private readonly panels: EditorPanel[];
 
     constructor(visibility: EditorVisibility = EditorVisibility.FULL) {
+        if(document.querySelector("#editorPanelContainer") !== null) {
+            document.querySelector("#editorPanelContainer")?.remove();
+        }
+        if(document.querySelector("#toolbar") !== null) {
+            document.querySelector("#toolbar")?.remove();
+        }
+        if(document.querySelector("#navBar") !== null) {
+            document.querySelector("#navBar")?.remove();
+        }
+
         document.body.insertAdjacentHTML("beforeend", editorHTML);
         this.navBar = document.getElementById("navBar") as HTMLElement;
 

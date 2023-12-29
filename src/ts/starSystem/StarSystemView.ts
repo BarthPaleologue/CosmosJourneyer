@@ -20,16 +20,20 @@ import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
 import "@babylonjs/core/Loading/loadingScreen";
+import { setMaxLinVel } from "../utils/havok";
+import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
     readonly bodyEditor: BodyEditor;
     readonly scene: UberScene;
 
+    readonly havokPlugin: HavokPlugin;
+
     private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer();
     private readonly axisRenderer: AxisRenderer = new AxisRenderer();
 
-    private readonly ui: SystemUI;
+    readonly ui: SystemUI;
 
     private static readonly unZoomAnimation = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
@@ -37,7 +41,7 @@ export class StarSystemView {
 
     private readonly chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
 
-    constructor(engine: Engine, havokPlugin: HavokPlugin) {
+    constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
         this.helmetOverlay = new HelmetOverlay();
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
 
@@ -76,7 +80,9 @@ export class StarSystemView {
         this.scene.clearColor = new Color4(0, 0, 0, 0);
         this.scene.useRightHandedSystem = true;
 
-        this.scene.enablePhysics(Vector3.Zero(), havokPlugin);
+        this.havokPlugin = new HavokPlugin(true, havokInstance);
+        setMaxLinVel(this.havokPlugin, 10000, 10000);
+        this.scene.enablePhysics(Vector3.Zero(), this.havokPlugin);
 
         const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
         ambientLight.intensity = 0.3;

@@ -2,12 +2,14 @@ import overlayHTML from "../../html/helmetOverlay.html";
 import { AbstractObject } from "../bodies/abstractObject";
 
 export class HelmetOverlay {
-    private readonly parentNode: HTMLElement;
-    private readonly bodyNamePlate: HTMLElement;
-    private readonly bodySeedPlate: HTMLElement;
+    private parentNode: HTMLElement;
+    private bodyNamePlate: HTMLElement;
+    private bodySeedPlate: HTMLElement;
 
     constructor() {
-        document.body.insertAdjacentHTML("beforeend", overlayHTML);
+        if (document.querySelector("#helmetOverlay") === null) {
+            document.body.insertAdjacentHTML("beforeend", overlayHTML);
+        }
         this.parentNode = document.getElementById("helmetOverlay") as HTMLElement;
         this.bodyNamePlate = document.getElementById("bodyName") as HTMLElement;
         this.bodySeedPlate = document.getElementById("bodySeed") as HTMLElement;

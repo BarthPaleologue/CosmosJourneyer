@@ -240,27 +240,28 @@ document.addEventListener("keydown", (e) => {
     }
 
     if (e.key === "g") {
-        if (starSystemView.scene.getActiveController() === spaceshipController) {
-            starSystemView.scene.setActiveController(defaultController);
+        const scene = starSystemView.scene;
+        if (scene.getActiveController() === spaceshipController) {
+            scene.setActiveController(defaultController);
             setRotationQuaternion(defaultController.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
-            spaceshipController.setEnabled(false, engine.getHavokPlugin());
-        } else if (starSystemView.scene.getActiveController() === defaultController) {
+            spaceshipController.setEnabled(false, starSystemView.havokPlugin);
+        } else if (scene.getActiveController() === defaultController) {
             characterController.getTransform().setEnabled(true);
             characterController.getTransform().setAbsolutePosition(defaultController.getTransform().absolutePosition);
-            starSystemView.scene.setActiveController(characterController);
+            scene.setActiveController(characterController);
             setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(defaultController.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
-            spaceshipController.setEnabled(false, engine.getHavokPlugin());
-        } else if (starSystemView.scene.getActiveController() === characterController) {
+            spaceshipController.setEnabled(false, starSystemView.havokPlugin);
+        } else if(scene.getActiveController() === characterController) {
             characterController.getTransform().setEnabled(false);
-            starSystemView.scene.setActiveController(spaceshipController);
+            scene.setActiveController(spaceshipController);
             setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(defaultController.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
-            spaceshipController.setEnabled(true, engine.getHavokPlugin());
+            spaceshipController.setEnabled(true, starSystemView.havokPlugin);
         }
     }
 });

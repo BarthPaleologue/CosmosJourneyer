@@ -85,13 +85,13 @@ document.addEventListener("keydown", (e) => {
             setRotationQuaternion(player.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
-            spaceshipController.setEnabled(false, engine.getHavokPlugin());
+            spaceshipController.setEnabled(false, starSystemView.havokPlugin);
         } else {
             scene.setActiveController(spaceshipController);
             setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(player.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
-            spaceshipController.setEnabled(true, engine.getHavokPlugin());
+            spaceshipController.setEnabled(true, starSystemView.havokPlugin);
         }
     }
 });
@@ -101,6 +101,6 @@ engine.init();
 const nbRadius = starSystem.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 3;
 positionNearObject(scene.getActiveController(), starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);
 
-engine.getStarSystemView().bodyEditor.setVisibility(EditorVisibility.NAVBAR);
+engine.getStarSystemView().bodyEditor.setVisibility(EditorVisibility.HIDDEN);
 
 engine.toggleStarMap();
