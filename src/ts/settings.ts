@@ -17,3 +17,8 @@ export const Settings = {
     C: 299792458,
     FOV: (92 * Math.PI) / 180
 };
+
+export const CollisionMask = {
+    GROUND: 0b00000001,
+    SPACESHIP: 0b00000010,
+}

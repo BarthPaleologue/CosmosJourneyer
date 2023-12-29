@@ -1,4 +1,4 @@
-import { DefaultController } from "../defaultController/defaultController";
+import { DefaultControls } from "../defaultController/defaultControls";
 
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
@@ -32,13 +32,12 @@ import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Keyboard } from "../inputs/keyboard";
-import { Mouse } from "../inputs/mouse";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 
 export class StarMap {
     readonly scene: Scene;
-    private readonly controller: DefaultController;
+    private readonly controller: DefaultControls;
 
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
@@ -104,13 +103,13 @@ export class StarMap {
         this.scene.skipPointerMovePicking = false;
         this.scene.useRightHandedSystem = true;
 
-        this.controller = new DefaultController(this.scene);
-        this.controller.speed /= 10;
+        this.controller = new DefaultControls(this.scene);
+        this.controller.speed /= 5;
         this.controller.getActiveCamera().minZ = 0.01;
 
-        this.scene.activeCamera = this.controller.getActiveCamera();
+        this.controller.getActiveCamera().attachControl();
+
         this.controller.addInput(new Keyboard());
-        this.controller.addInput(new Mouse(engine.getRenderingCanvas() as HTMLCanvasElement, 0));
 
         this.starMapUI = new StarMapUI(this.scene);
 
@@ -136,7 +135,7 @@ export class StarMap {
 
         this.starMapCenterPosition = new Vector3(initialStarMapX ?? 0, initialStarMapY ?? 0, initialStarMapZ ?? 0);
 
-        this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.2 }, this.scene);
+        this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.15 }, this.scene);
         this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
         this.starTemplate.isPickable = true;
         this.starTemplate.isVisible = false;
@@ -231,7 +230,7 @@ export class StarMap {
 
             this.controller.update(deltaTime);
 
-            this.cameraPositionToCenter = this.controller.getActiveCamera().getAbsolutePosition().subtract(this.starMapCenterPosition);
+            this.cameraPositionToCenter = this.controller.getActiveCamera().globalPosition.subtract(this.starMapCenterPosition);
 
             this.currentCellPosition = new Vector3(
                 Math.round(this.cameraPositionToCenter.x / Cell.SIZE),
@@ -241,7 +240,7 @@ export class StarMap {
 
             this.updateCells();
 
-            if (this.controller.getActiveCamera().getAbsolutePosition().length() > StarMap.FLOATING_ORIGIN_MAX_DISTANCE) {
+            if (this.controller.getActiveCamera().globalPosition.length() > StarMap.FLOATING_ORIGIN_MAX_DISTANCE) {
                 this.translateCameraBackToOrigin();
             }
 

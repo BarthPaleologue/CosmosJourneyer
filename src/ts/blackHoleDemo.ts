@@ -4,10 +4,10 @@ import { StarSystemController } from "./starSystem/starSystemController";
 
 import { randRange } from "extended-random";
 import { Settings } from "./settings";
-import { DefaultController } from "./defaultController/defaultController";
+import { DefaultControls } from "./defaultController/defaultControls";
 import { positionNearObject } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { ShipController } from "./spaceship/shipController";
+import { ShipControls } from "./spaceship/shipControls";
 import { getRotationQuaternion, setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 import { StarSystemHelper } from "./starSystem/starSystemHelper";
@@ -27,14 +27,14 @@ const mouse = new Mouse(engine.canvas, 100);
 const keyboard = new Keyboard();
 const gamepad = new Gamepad();
 
-const player = new DefaultController(scene);
+const player = new DefaultControls(scene);
 player.speed = 0.2 * Settings.EARTH_RADIUS;
 player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 player.addInput(keyboard);
 player.addInput(mouse);
 player.addInput(gamepad);
 
-const spaceshipController = new ShipController(scene);
+const spaceshipController = new ShipControls(scene);
 spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 spaceshipController.addInput(keyboard);
 spaceshipController.addInput(mouse);

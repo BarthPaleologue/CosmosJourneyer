@@ -207,7 +207,7 @@ export class StarSystemController {
                 object.getTransform().getAbsolutePosition(),
                 Matrix.IdentityReadOnly,
                 this.scene.getTransformMatrix(),
-                this.scene.getActiveUberCamera().viewport
+                this.scene.getActiveCamera().viewport
             );
 
             if (screenCoordinates.z < 0) continue;
@@ -327,7 +327,7 @@ export class StarSystemController {
         }
 
         return Promise.all(promises).then(() => {
-            this.postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveUberCamera().position));
+            this.postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition));
             this.postProcessManager.init();
         });
     }
@@ -339,11 +339,11 @@ export class StarSystemController {
      */
     public update(deltaTime: number, chunkForge: ChunkForge): void {
         const controller = this.scene.getActiveController();
-        this.computeNearestOrbitalObject(controller.getActiveCamera().getAbsolutePosition());
+        this.computeNearestOrbitalObject(controller.getActiveCamera().globalPosition);
         this.computeClosestToScreenCenterOrbitalObject();
         const nearestBody = this.getNearestOrbitalObject();
 
-        const distanceOfNearestToCamera = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().getAbsolutePosition());
+        const distanceOfNearestToCamera = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().globalPosition);
         const shouldCompensateTranslation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * (nearestBody instanceof SpaceStation ? 80 : 10);
         const shouldCompensateRotation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * 4;
 
@@ -418,8 +418,13 @@ export class StarSystemController {
         }
 
         // floating origin
-        if (controller.getActiveCamera().getAbsolutePosition().length() > 0) {
+        if (controller.getActiveCamera().globalPosition.length() > 500) {
             const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
+            this.translateEverythingNow(displacementTranslation);
+            translate(controller.getTransform(), displacementTranslation);
+        } else {
+            // FIXME: this is necessary to update every world matrix, it could be done better
+            const displacementTranslation = Vector3.Zero();
             this.translateEverythingNow(displacementTranslation);
             translate(controller.getTransform(), displacementTranslation);
         }
@@ -433,7 +438,7 @@ export class StarSystemController {
      */
     public updateShaders(deltaTime: number) {
         const controller = this.scene.getActiveController();
-        const nearestBody = this.getNearestCelestialBody(this.scene.getActiveUberCamera().position);
+        const nearestBody = this.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition);
 
         for (const planet of this.planemosWithMaterial) {
             planet.updateMaterial(controller.getActiveCamera(), this.stellarObjects, deltaTime);

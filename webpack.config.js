@@ -13,7 +13,7 @@ const config = {
         random: "./src/ts/randomizer.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
         physicSpaceship: "./src/ts/physicSpaceship.ts",
-        planetWalk: "./src/ts/planetWalk.ts",
+        characterDemo: "./src/ts/characterDemo.ts",
         playground: "./src/ts/playground.ts",
         xr: "./src/ts/xr.ts",
         debugAssets: "./src/ts/debugAssets.ts"
@@ -57,10 +57,10 @@ const config = {
             chunks: ["physicSpaceship"]
         }),
         new HtmlWebpackPlugin({
-            title: "Planet Walk",
-            filename: "planetwalk.html",
+            title: "Character demo",
+            filename: "characterdemo.html",
             template: path.join(htmlPath, "index.html"),
-            chunks: ["planetWalk"]
+            chunks: ["characterDemo"]
         }),
         new HtmlWebpackPlugin({
             title: "Playground",

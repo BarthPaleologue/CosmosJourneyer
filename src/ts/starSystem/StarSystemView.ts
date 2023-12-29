@@ -15,7 +15,7 @@ import { Settings } from "../settings";
 import { AbstractBody } from "../bodies/abstractBody";
 import { StarSystemHelper } from "./starSystemHelper";
 import { positionNearObject } from "../utils/positionNearObject";
-import { ShipController } from "../spaceship/shipController";
+import { ShipControls } from "../spaceship/shipControls";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
@@ -89,7 +89,7 @@ export class StarSystemView {
             this.chunkForge.update();
             starSystem.update(deltaTime * Settings.TIME_MULTIPLIER, this.chunkForge);
 
-            this.ui.update(this.scene.getActiveUberCamera());
+            this.ui.update(this.scene.getActiveCamera());
 
             const nearestBody = starSystem.getNearestOrbitalObject();
 
@@ -149,7 +149,7 @@ export class StarSystemView {
 
         const activeController = this.scene.getActiveController();
         positionNearObject(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
-        if (activeController instanceof ShipController) activeController.enableWarpDrive();
+        if (activeController instanceof ShipControls) activeController.enableWarpDrive();
 
         this.getStarSystem()
             .initPostProcesses()

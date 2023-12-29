@@ -1,6 +1,5 @@
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
-import { AbstractController } from "./abstractController";
-import { UberCamera } from "./uberCamera";
+import { Controls } from "./controls";
 import { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
@@ -8,8 +7,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 
 export class UberScene extends Scene {
-    activeController: AbstractController | null = null;
-
+    private activeController: Controls | null = null;
     private depthRenderer: DepthRenderer | null = null;
 
     constructor(engine: Engine, performancePriority = ScenePerformancePriority.BackwardCompatible) {
@@ -23,25 +21,27 @@ export class UberScene extends Scene {
         return this.depthRenderer;
     }
 
-    public setActiveController(controller: AbstractController) {
+    public setActiveController(controller: Controls) {
         this.activeController = controller;
         this.setActiveCamera(controller.getActiveCamera());
     }
 
     public setActiveCamera(camera: Camera) {
+        if(this.activeCamera !== null) this.activeCamera.detachControl();
         this.activeCamera = camera;
+        camera.attachControl(true);
 
         if (this.depthRenderer !== null) this.depthRenderer.dispose();
         this.depthRenderer = this.enableDepthRenderer(null, false, true);
     }
 
-    public getActiveController(): AbstractController {
+    public getActiveController(): Controls {
         if (this.activeController === null) throw new Error("Controller not set");
         return this.activeController;
     }
 
-    public getActiveUberCamera(): UberCamera {
-        if (this.getActiveController().getActiveCamera() === null) throw new Error("No active Uber Camera");
-        return this.getActiveController().getActiveCamera();
+    public getActiveCamera(): Camera {
+        if (this.activeCamera === null) throw new Error("Camera not set");
+        return this.activeCamera;
     }
 }

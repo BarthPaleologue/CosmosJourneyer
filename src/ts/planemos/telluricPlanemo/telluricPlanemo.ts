@@ -3,7 +3,6 @@ import { Direction } from "../../utils/direction";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
-import { AbstractController } from "../../uberCore/abstractController";
 import { TelluricPlanemoMaterial } from "./telluricPlanemoMaterial";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { AbstractBody } from "../../bodies/abstractBody";

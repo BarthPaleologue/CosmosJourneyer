@@ -62,7 +62,7 @@ float cloudDensityAtPoint(vec3 samplePoint) {
     vec2 dfDetail = fwidth(uvDetail);
     if(dfDetail.x > 0.5) dfDetail.x = 0.0;
 
-    float density = 1.0 - textureLod(clouds_lut, uvWorley, log2(max(dfWorley.x, dfWorley.y) * 1024.0)).r;
+    float density = textureLod(clouds_lut, uvWorley, log2(max(dfWorley.x, dfWorley.y) * 1024.0)).r;
     density *= textureLod(clouds_lut, uvDetail, log2(max(dfDetail.x, dfDetail.y) * 1024.0)).g;
 
     float cloudThickness = 2.0;//TODO: make this a uniform
@@ -172,7 +172,7 @@ void main() {
         }
         ndl = saturate(ndl);
 
-        vec3 ambiant = mix(finalColor.rgb, ndl * clouds_color, cloudDensity);
+        vec3 ambiant = mix(finalColor.rgb * (1.0 - cloudDensity), ndl * clouds_color, cloudDensity);
 
         finalColor.rgb = ambiant + specularHighlight * cloudDensity;
     }

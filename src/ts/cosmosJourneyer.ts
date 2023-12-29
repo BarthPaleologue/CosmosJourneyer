@@ -51,7 +51,7 @@ export class CosmosJourneyer {
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
             const seed = this.getStarSystemView().getStarSystem().model.seed;
-            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/dist/random.html?seed=${seed}`);
+            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/random.html?seed=${seed}`);
             navigator.clipboard.writeText(url.toString()).then(() => console.log("Copied to clipboard"));
         });
 
@@ -177,11 +177,15 @@ export class CosmosJourneyer {
     public toggleStarMap(): void {
         if (this.activeScene === this.getStarSystemView().scene) {
             this.getStarSystemView().unZoom(() => {
+                this.getStarSystemView().scene.detachControl();
+                this.getStarMap().scene.attachControl();
                 const starMap = this.getStarMap();
                 this.activeScene = starMap.scene;
                 starMap.focusOnCurrentSystem();
             });
         } else {
+            this.getStarMap().scene.detachControl();
+            this.getStarSystemView().scene.attachControl();
             this.activeScene = this.getStarSystemView().scene;
             this.getStarSystemView().showUI();
         }

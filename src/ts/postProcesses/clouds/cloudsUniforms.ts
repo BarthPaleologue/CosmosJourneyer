@@ -27,8 +27,8 @@ export class CloudsUniforms {
         this.smoothness = 0.7;
         this.frequency = 4;
         this.detailFrequency = 12;
-        this.coverage = 0.8 * Math.exp(-waterAmount * pressure);
-        this.sharpness = 3.5;
+        this.coverage = 0.75 * Math.exp(-waterAmount * pressure);
+        this.sharpness = 2.5;
         this.color = new Color3(0.8, 0.8, 0.8);
         this.worleySpeed = 0.0005;
         this.detailSpeed = 0.003;

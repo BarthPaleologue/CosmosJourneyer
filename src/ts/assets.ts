@@ -16,7 +16,6 @@ import waterNormal2 from "../asset/textures/waterNormalMap4.jpg";
 import starfield from "../asset/textures/milkyway.jpg";
 import plumeParticle from "../asset/textures/plume.png";
 
-import proceduralTest from "../shaders/textures/test.glsl";
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 
 import spaceship from "../asset/spaceship/spaceship2.glb";
@@ -25,6 +24,7 @@ import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
 import endeavorSpaceship from "../asset/spaceship/endeavour.glb";
 import character from "../asset/character.glb";
+import rock from "../asset/rock.glb";
 
 import ouchSound from "../asset/sound/ouch.mp3";
 import engineRunningSound from "../asset/sound/engineRunning.mp3";
@@ -63,7 +63,6 @@ export class Assets {
 
     static EmptyTexture: Texture;
 
-    static ProceduralTest: ProceduralTexture;
     static AtmosphereLUT: ProceduralTexture;
 
     private static Spaceship: Mesh;
@@ -71,6 +70,7 @@ export class Assets {
     private static Spacestation: Mesh;
     private static Banana: Mesh;
     private static Character: Mesh;
+    static Rock: Mesh;
 
     public static ScatterCube: Mesh;
 
@@ -97,9 +97,6 @@ export class Assets {
         Assets.manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.Starfield = task.texture);
 
         Assets.manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Assets.PlumeParticle = task.texture);
-
-        Assets.ProceduralTest = new ProceduralTexture("proceduralTest", 100, { fragmentSource: proceduralTest }, scene, undefined, false, false);
-        Assets.ProceduralTest.refreshRate = 0;
 
         Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Assets.AtmosphereLUT.refreshRate = 0;
@@ -165,6 +162,18 @@ export class Assets {
             console.log("Character loaded");
         };
 
+        const rockTask = Assets.manager.addMeshTask("rockTask", "", "", rock);
+        rockTask.onSuccess = function (task: MeshAssetTask) {
+            Assets.Rock = task.loadedMeshes[0] as Mesh;
+            Assets.Rock.isVisible = false;
+
+            for (const mesh of Assets.Rock.getChildMeshes()) {
+                mesh.isVisible = false;
+            }
+
+            console.log("Rock loaded");
+        };
+
         const ouchSoundTask = Assets.manager.addBinaryFileTask("ouchSoundTask", ouchSound);
         ouchSoundTask.onSuccess = function (task) {
             Assets.OuchSound = new Sound("OuchSound", task.data, scene);
@@ -195,14 +204,11 @@ export class Assets {
             Assets.IS_READY = true;
         };
 
-        return Assets.manager.loadAsync();
+        await Assets.manager.loadAsync();
     }
 
     static CreateSpaceShipInstance(): InstancedMesh {
-        const instance = Assets.Spaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
-        for (const child of instance.getChildMeshes()) child.isVisible = true;
-
-        return instance;
+        return Assets.Spaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static CreateEndeavorSpaceShipInstance(): InstancedMesh {
@@ -230,6 +236,10 @@ export class Assets {
 
     static CreateCharacterInstance(): InstancedMesh {
         return Assets.Character.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+    }
+
+    static CreateRockInstance(): InstancedMesh {
+        return Assets.Rock.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static DebugMaterial(name: string, diffuse = false, wireframe = false) {

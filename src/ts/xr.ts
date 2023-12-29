@@ -48,6 +48,7 @@ const sphereRadius = Settings.EARTH_RADIUS;
 const camera = new FreeCamera("camera", new Vector3(0, 0, 0), scene);
 camera.maxZ = 1e9;
 camera.speed *= sphereRadius * 0.1;
+camera.angularSensibility /= 10;
 scene.setActiveCamera(camera);
 camera.attachControl(canvas, true);
 
@@ -116,7 +117,7 @@ FlatCloudsPostProcess.CreateAsync("clouds", planet, planet.model.cloudsUniforms,
 const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
 
 scene.onBeforeRenderObservable.add(() => {
-  const deltaTime = scene.deltaTime / 1000;
+  const deltaTime = engine.getDeltaTime() / 1000;
 
   if (scene.activeCamera === null) throw new Error("Active camera is null");
 

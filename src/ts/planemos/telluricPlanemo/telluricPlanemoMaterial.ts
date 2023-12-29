@@ -4,7 +4,7 @@ import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fra
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../../assets";
 import { UberScene } from "../../uberCore/uberScene";
-import { centeredRand } from "extended-random";
+import { centeredRand, normalRandom } from "extended-random";
 import { TelluricPlanemoModel } from "./telluricPlanemoModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
@@ -124,7 +124,11 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         };
 
         if (model.physicalProperties.oceanLevel === 0) {
-            this.colorSettings.plainColor = this.colorSettings.desertColor.scale(0.7);
+            // sterile world
+            this.colorSettings.plainColor = Color3.FromHSV(model.rng(666) * 360, 0.2, normalRandom(0.3, 0.1, model.rng, 86) * 0.5 + 0.5);
+            this.colorSettings.beachColor = this.colorSettings.plainColor.scale(0.9);
+            this.colorSettings.desertColor = this.colorSettings.plainColor.clone();
+            this.colorSettings.bottomColor = this.colorSettings.plainColor.scale(0.8);
         }
 
         this.setFloat("seed", model.seed);

@@ -13,6 +13,7 @@ import { Transformable } from "../../../../uberCore/transforms/basicTransform";
 import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";
 import { Assets } from "../../../../assets";
+import { CollisionMask } from "../../../../settings";
 
 export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
@@ -113,6 +114,7 @@ export class PlanetChunk implements Transformable {
 
         if (this.depth > 3) {
             this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
+            this.physicsShape.filterMembershipMask = CollisionMask.GROUND;
             this.parentAggregate.shape.addChildFromParent(this.parent, this.physicsShape, this.mesh);
             this.physicsShapeIndex = this.parentAggregate.shape.getNumChildren();
         }

@@ -46,6 +46,7 @@ const sphereRadius = 1000e3;
 const camera = new FreeCamera("camera", new Vector3(0, 0, 0), scene);
 camera.maxZ = 1e9;
 camera.speed *= sphereRadius * 0.1;
+camera.angularSensibility /= 10;
 scene.setActiveCamera(camera);
 camera.attachControl(canvas, true);
 
@@ -61,16 +62,11 @@ camera.attachPostProcess(starfield);
 const ocean = new OceanPostProcess("ocean", planet, scene, [star]);
 camera.attachPostProcess(ocean);
 
-if (planet.model.cloudsUniforms === null) throw new Error("Clouds uniforms are null");
-FlatCloudsPostProcess.CreateAsync("clouds", planet, planet.model.cloudsUniforms, scene, [star]).then((clouds) => {
-    camera.attachPostProcess(clouds);
+const atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, 100e3, scene, [star]);
+camera.attachPostProcess(atmosphere);
 
-    const atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, 100e3, scene, [star]);
-    camera.attachPostProcess(atmosphere);
-
-    const lensflare = new LensFlarePostProcess(star, scene);
-    camera.attachPostProcess(lensflare);
-});
+const lensflare = new LensFlarePostProcess(star, scene);
+camera.attachPostProcess(lensflare);
 
 const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
 
