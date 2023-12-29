@@ -103,7 +103,6 @@ vec3 anflares(vec2 uv, float intensity, float stretch, float brightness)
 }
 
 
-
 void main() {
     vec4 screenColor = texture(textureSampler, vUV);
 
@@ -132,7 +131,13 @@ void main() {
     vec3 sun, sunflare, lensflare;
     vec3 flare = lensflares(uv*1.5, mouse*1.5, sunflare, lensflare);
 
+    #ifdef CHEAP_FLARE
+    vec3 anflare = pow(anflares(uv-mouse, 400.0, 0.5, 0.6), vec3(4.0));
+    anflare += smoothstep(0.0025, 1.0, anflare)*10.0;
+    anflare *= smoothstep(0.0, 1.0, anflare);
+    #else
     vec3 anflare = pow(anflares(uv-mouse, 0.5, 400.0, 0.9, 0.1), vec3(4.0));
+    #endif
 
     sun += getSun(uv-mouse) + (flare + anflare)*flareColor*2.0;
 
