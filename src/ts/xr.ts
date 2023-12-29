@@ -84,6 +84,7 @@ webXRInput.onControllerAddedObservable.add((xrController) => {
 
 const xrCamera = xr.baseExperience.camera;
 xrCamera.setTransformationFromNonVRCamera(camera);
+xrCamera.maxZ = camera.maxZ;
 
 const planet = new TelluricPlanemo("xrPlanet", scene, 0.51, undefined);
 translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
@@ -91,7 +92,7 @@ translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
 const star = new Star("star", scene, 0.2); //PointLightWrapper(new PointLight("dir01", new Vector3(0, 1, 0), scene));
 translate(star.getTransform(), new Vector3(0, 0, -sphereRadius * 5000));
 
-const starfield = new StarfieldPostProcess(scene, [star], [planet], Quaternion.Identity());
+/*const starfield = new StarfieldPostProcess(scene, [star], [planet], Quaternion.Identity());
 camera.attachPostProcess(starfield);
 xrCamera.attachPostProcess(starfield);
 
@@ -111,7 +112,7 @@ FlatCloudsPostProcess.CreateAsync("clouds", planet, planet.model.cloudsUniforms,
   const lensflare = new LensFlarePostProcess(star, scene);
   camera.attachPostProcess(lensflare);
   xrCamera.attachPostProcess(lensflare);
-});
+});*/
 
 const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
 
@@ -133,7 +134,7 @@ scene.onBeforeRenderObservable.add(() => {
 
   star.updateMaterial();
 
-  ocean.update(deltaTime);
+  //ocean.update(deltaTime);
 });
 
 scene.executeWhenReady(() => {
