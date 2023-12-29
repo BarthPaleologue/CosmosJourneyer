@@ -5,7 +5,7 @@ import { StarSystemController } from "./starSystem/starSystemController";
 import { Settings } from "./settings";
 import { Assets } from "./assets";
 import { DefaultControls } from "./defaultController/defaultControls";
-import { positionNearObject } from "./utils/positionNearObject";
+import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -202,7 +202,7 @@ const blackHole = starSystem.makeBlackHole(blackHoleModel);*/
 
 engine.init();
 
-positionNearObject(starSystemView.scene.getActiveController(), planet, starSystem, 2);
+positionNearObjectBrightSide(starSystemView.scene.getActiveController(), planet, starSystem, 2);
 
 spaceshipController.toggleWarpDrive();
 

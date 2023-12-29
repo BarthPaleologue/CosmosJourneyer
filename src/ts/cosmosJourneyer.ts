@@ -122,7 +122,7 @@ export class CosmosJourneyer {
         await Assets.Init(this.getStarSystemView().scene);
 
         // Starmap is the active scene by default
-        this.activeScene = this.starSystemView.scene;
+        this.activeScene = this.mainMenu.scene;
     }
 
     public pause(): void {

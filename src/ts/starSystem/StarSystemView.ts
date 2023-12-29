@@ -14,7 +14,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Settings } from "../settings";
 import { AbstractBody } from "../bodies/abstractBody";
 import { StarSystemHelper } from "./starSystemHelper";
-import { positionNearObject } from "../utils/positionNearObject";
+import { positionNearObjectBrightSide } from "../utils/positionNearObject";
 import { ShipControls } from "../spaceship/shipControls";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
@@ -154,7 +154,7 @@ export class StarSystemView {
         this.axisRenderer.setObjects(this.getStarSystem().getBodies());
 
         const activeController = this.scene.getActiveController();
-        positionNearObject(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
+        positionNearObjectBrightSide(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
         if (activeController instanceof ShipControls) activeController.enableWarpDrive();
 
         this.getStarSystem()

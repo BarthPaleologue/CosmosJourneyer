@@ -5,7 +5,7 @@ import { StarSystemController } from "./starSystem/starSystemController";
 import { randRange } from "extended-random";
 import { Settings } from "./settings";
 import { DefaultControls } from "./defaultController/defaultControls";
-import { positionNearObject } from "./utils/positionNearObject";
+import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { ShipControls } from "./spaceship/shipControls";
 import { getRotationQuaternion, setRotationQuaternion } from "./uberCore/transforms/basicTransform";
@@ -93,6 +93,6 @@ document.addEventListener("keydown", (e) => {
 
 engine.init();
 
-positionNearObject(scene.getActiveController(), BH, starSystem, 20);
+positionNearObjectBrightSide(scene.getActiveController(), BH, starSystem, 20);
 
 engine.toggleStarMap();

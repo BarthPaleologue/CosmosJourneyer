@@ -5,7 +5,7 @@ import { StarSystemController } from "./starSystem/starSystemController";
 import { randRange } from "extended-random";
 import { Settings } from "./settings";
 import { DefaultControls } from "./defaultController/defaultControls";
-import { positionNearObject } from "./utils/positionNearObject";
+import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { BODY_TYPE } from "./model/common";
 import { ShipControls } from "./spaceship/shipControls";
@@ -99,7 +99,7 @@ document.addEventListener("keydown", (e) => {
 engine.init();
 
 const nbRadius = starSystem.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 3;
-positionNearObject(scene.getActiveController(), starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);
+positionNearObjectBrightSide(scene.getActiveController(), starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);
 
 engine.getStarSystemView().bodyEditor.setVisibility(EditorVisibility.HIDDEN);
 

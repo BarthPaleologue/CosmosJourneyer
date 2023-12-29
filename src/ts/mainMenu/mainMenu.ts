@@ -3,7 +3,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { DefaultControls } from "../defaultController/defaultControls";
 import { StarSystemView } from "../starSystem/StarSystemView";
 import { StarSystemController } from "../starSystem/starSystemController";
-import { positionNearObject } from "../utils/positionNearObject";
+import { positionNearObjectBrightSide, positionNearObjectWithStarVisible } from "../utils/positionNearObject";
 import { BODY_TYPE } from "../model/common";
 import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { EditorVisibility } from "../ui/bodyEditor/bodyEditor";
@@ -34,8 +34,8 @@ export class MainMenu {
 
     this.starSystemView.ui.setEnabled(false);
 
-    const nbRadius = this.starSystemController.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 3;
-    positionNearObject(this.controls, this.starSystemController.planets.length > 0 ? this.starSystemController.getBodies()[1] : this.starSystemController.stellarObjects[0], this.starSystemController, nbRadius);
+    const nbRadius = this.starSystemController.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 2;
+    positionNearObjectWithStarVisible(this.controls, this.starSystemController.planets.length > 0 ? this.starSystemController.getBodies()[1] : this.starSystemController.stellarObjects[0], this.starSystemController, nbRadius);
 
     this.starSystemView.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
   }
