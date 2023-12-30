@@ -59,7 +59,7 @@ export class CosmosJourneyer {
         this.canvas.height = window.innerHeight;
 
         window.addEventListener("blur", () => {
-            if (!this.isPaused()) this.pause();
+            if (!this.isPaused() && this.activeScene !== this.mainMenu?.scene) this.pause();
         });
 
         //TODO: use the keyboard class
