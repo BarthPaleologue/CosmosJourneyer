@@ -24,7 +24,7 @@ export class MainMenu {
     this.controls.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 1e5;
     this.scene.setActiveController(this.controls);
 
-    this.starSystemController = new StarSystemController(2e3, this.scene);
+    this.starSystemController = new StarSystemController(Math.random() * 1000, this.scene);
   }
 
   init() {
