@@ -3,7 +3,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { DefaultControls } from "../defaultController/defaultControls";
 import { StarSystemView } from "../starSystem/StarSystemView";
 import { StarSystemController } from "../starSystem/starSystemController";
-import { positionNearObjectBrightSide, positionNearObjectWithStarVisible } from "../utils/positionNearObject";
+import { positionNearObjectWithStarVisible } from "../utils/positionNearObject";
 import { BODY_TYPE } from "../model/common";
 import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { EditorVisibility } from "../ui/bodyEditor/bodyEditor";
@@ -24,7 +24,31 @@ export class MainMenu {
     this.controls.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 1e5;
     this.scene.setActiveController(this.controls);
 
-    this.starSystemController = new StarSystemController(Math.random() * 1000, this.scene);
+    this.controls.getActiveCamera().detachControl();
+
+    const allowedSeeds = [
+      339.71738141753696,
+      699.6298526409856,
+      636.5370404923914,
+      905.9022866058482,
+      131.2407412548735,
+      496.18890481597776,
+      540.7112951378157,
+      796.7959333496561,
+      296.7276774698002,
+      523.9123323780545,
+      993.179364592667,
+      649.2861236690691,
+      28.197193558682887,
+      742.8403332894349,
+      226.71622361745025,
+      115.8460802506951,
+      709.7364687709704,
+      482.3140197875797
+    ]
+
+    const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)]
+    this.starSystemController = new StarSystemController(seed, this.scene);
   }
 
   init() {

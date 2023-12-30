@@ -1,7 +1,13 @@
 import { Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { nearestBody } from "./nearestBody";
-import { getForwardDirection, getUpwardDirection, roll, Transformable } from "../uberCore/transforms/basicTransform";
+import {
+    getForwardDirection,
+    getUpwardDirection,
+    roll,
+    rotateAround,
+    Transformable
+} from "../uberCore/transforms/basicTransform";
 import { BoundingSphere } from "../bodies/common";
 import { Controls } from "../uberCore/controls";
 import { Matrix } from "@babylonjs/core/Maths/math";
@@ -68,6 +74,8 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
             .add(lateralDirection.scale(3 * object.getBoundingRadius()));
         //.add(upDirection.scale(1 * object.getBoundingRadius()));
         transformable.getTransform().setAbsolutePosition(displacement);
+
+        rotateAround(transformable.getTransform(), object.getTransform().getAbsolutePosition(), dirBodyToStar, -Math.PI / 16);
     }
 
     starSystem.translateEverythingNow(transformable.getTransform().getAbsolutePosition().negate());
