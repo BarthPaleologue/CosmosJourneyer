@@ -8,6 +8,7 @@ import { BODY_TYPE } from "../model/common";
 import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { EditorVisibility } from "../ui/bodyEditor/bodyEditor";
 import { Settings } from "../settings";
+import mainMenuHTML from "../../html/mainMenu.html";
 
 export class MainMenu {
   readonly controls: DefaultControls;
@@ -17,6 +18,9 @@ export class MainMenu {
   readonly starSystemController: StarSystemController;
 
   constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
+
+    document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
+
     this.starSystemView = new StarSystemView(engine, havokInstance);
 
     this.scene = this.starSystemView.scene;

@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'Nasalization';
+  src: url('./nasalization/nasalization-rg.otf');
+}
+
 *,
 *::before,
 *::after {
@@ -17,6 +22,8 @@ body {
   @import "helmetOverlay/helmetOverlay";
 
   @import "pauseMenu/index.scss";
+
+  @import "mainMenu.scss";
 
   #renderer {
     z-index: 1;

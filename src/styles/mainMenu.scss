@@ -1,0 +1,38 @@
+#mainMenu {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  h1 {
+    font-family: 'Nasalization', sans-serif;
+    font-size: 8em;
+    text-align: center;
+    color: white;
+  }
+
+  ul#menuItems {
+    list-style-type: none;
+    padding: 0;
+    row-gap: 10px;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    position: absolute;
+    top: 65%;
+    left: 5%;
+    transform: translateY(-50%);
+
+    li {
+      color: white;
+      font-family: Nasalization, sans-serif;
+      font-size: 2em;
+      line-height: 1.5em;
+      cursor: pointer;
+      padding: 5px 20px;
+      transition: 0.1s;
+
+      &:hover {
+        background: #002b6a;
+      }
+    }
+  }
+}
