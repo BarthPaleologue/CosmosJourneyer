@@ -19,8 +19,6 @@ export class MainMenu {
 
   constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
 
-    document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
-
     this.starSystemView = new StarSystemView(engine, havokInstance);
 
     this.scene = this.starSystemView.scene;
@@ -66,5 +64,7 @@ export class MainMenu {
     positionNearObjectWithStarVisible(this.controls, this.starSystemController.planets.length > 0 ? this.starSystemController.getBodies()[1] : this.starSystemController.stellarObjects[0], this.starSystemController, nbRadius);
 
     this.starSystemView.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
+
+    document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
   }
 }
