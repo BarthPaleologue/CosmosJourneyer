@@ -61,21 +61,22 @@ export class MainMenu {
         document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
         document.getElementById("startButton")?.addEventListener("click", () => {
             const currentForward = getForwardDirection(this.controls.getTransform());
-            const newForward = this.starSystemController.planets[0].getTransform().getAbsolutePosition().subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
+
+            const planet = this.starSystemController.planets[0];
+            const newForward = planet.getTransform().getAbsolutePosition().subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
             const axis = Vector3.Cross(currentForward, newForward);
             const angle = Vector3.GetAngleBetweenVectors(currentForward, newForward, axis);
             const duration = 2;
 
             const rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), axis, angle, duration);
-            const translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), this.controls.getTransform().getAbsolutePosition().add(newForward.scale(-this.starSystemController.planets[0].model.radius * 2)), duration);
+            const translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), this.controls.getTransform().getAbsolutePosition().add(newForward.scale(-planet.model.radius * 2)), duration);
 
             const animationCallback = () => {
               const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
-              translationAnimation.update(deltaTime);
+              if(!translationAnimation.isFinished()) translationAnimation.update(deltaTime);
               if (!rotationAnimation.isFinished()) rotationAnimation.update(deltaTime);
               else this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
-
 
               this.controls.getActiveCamera().getViewMatrix();
 
@@ -84,6 +85,10 @@ export class MainMenu {
             }
 
             this.scene.onBeforePhysicsObservable.add(animationCallback);
+
+            const menuItems = document.getElementById("menuItems");
+            if(menuItems === null) throw new Error("#menuItems does not exist!");
+            menuItems.style.left = "-20%";
         });
     }
 }
