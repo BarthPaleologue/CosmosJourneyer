@@ -2,7 +2,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { MainThruster } from "./mainThruster";
-import { ReadonlyWarpDrive, WarpDrive } from "./warpDrive";
+import { WarpDrive } from "./warpDrive";
 import { RCSThruster } from "./rcsThruster";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { IPhysicsCollisionEvent, PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
@@ -39,6 +39,8 @@ export class Spaceship {
     private readonly warpDrive = new WarpDrive(false);
 
     private closestWalkableObject: Transformable | null = null;
+
+    private landingTarget: Transformable | null = null;
     private readonly raycastResult = new PhysicsRaycastResult();
 
     private state = ShipState.FLYING;
@@ -127,11 +129,17 @@ export class Spaceship {
         for (const thruster of this.mainThrusters) thruster.setThrottle(0);
         for (const thruster of this.rcsThrusters) thruster.deactivate();
         this.warpDrive.enable();
+        this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
+    }
+
+    public disableWarpDrive() {
+        this.warpDrive.desengage();
+        this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
     }
 
     public toggleWarpDrive() {
         if (!this.warpDrive.isEnabled()) this.enableWarpDrive();
-        else this.warpDrive.desengage();
+        else this.disableWarpDrive();
     }
 
     /**
@@ -172,6 +180,14 @@ export class Spaceship {
         console.log("Landing sequence engaged");
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
         this.state = ShipState.LANDING;
+        this.landingTarget = this.closestWalkableObject;
+    }
+
+    private completeLanding() {
+        console.log("Landing sequence complete");
+        this.state = ShipState.LANDED;
+        this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+        this.landingTarget = null;
     }
 
     public update(deltaTime: number): Vector3 {
@@ -200,18 +216,18 @@ export class Spaceship {
         }
 
         if (this.state == ShipState.LANDING) {
-            if (this.closestWalkableObject === null) {
-                throw new Error("Closest walkable object is null");
+            if (this.landingTarget === null) {
+                throw new Error("Closest walkable object is null while landing");
             }
 
-            const gravityDir = this.closestWalkableObject.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
+            const gravityDir = this.landingTarget.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
             const start = this.getTransform().getAbsolutePosition().add(gravityDir.scale(-50e3));
             const end = this.getTransform().getAbsolutePosition().add(gravityDir.scale(50e3));
 
             (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.GROUND });
             if (this.raycastResult.hasHit) {
                 const landingSpotNormal = this.raycastResult.hitNormalWorld;
-                const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(2));
+                const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(0));
 
                 const distance = landingSpot.subtract(this.getTransform().getAbsolutePosition()).dot(gravityDir);
                 console.log(500 * deltaTime * Math.sign(distance), distance);
@@ -224,8 +240,7 @@ export class Spaceship {
                 rotate(this.getTransform(), axis, Math.min(0.1 * deltaTime, theta));
 
                 if (Math.abs(distance) < 0.3 && Math.abs(theta) < 0.01) {
-                    this.state = ShipState.LANDED;
-                    this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+                    this.completeLanding();
                 }
             }
         }
