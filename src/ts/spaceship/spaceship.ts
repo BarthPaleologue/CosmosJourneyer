@@ -194,7 +194,7 @@ export class Spaceship {
         this.landingTarget = null;
     }
 
-    public update(deltaTime: number): Vector3 {
+    public update(deltaTime: number) {
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
@@ -254,7 +254,5 @@ export class Spaceship {
                 }
             }
         }
-
-        return this.getTransform().getAbsolutePosition();
     }
 }
