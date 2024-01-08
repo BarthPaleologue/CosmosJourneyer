@@ -25,6 +25,7 @@ import banana from "../asset/banana/banana.glb";
 import endeavorSpaceship from "../asset/spaceship/endeavour.glb";
 import character from "../asset/character.glb";
 import rock from "../asset/rock.glb";
+import landingPad from "../asset/landingpad.glb";
 
 import ouchSound from "../asset/sound/ouch.mp3";
 import engineRunningSound from "../asset/sound/engineRunning.mp3";
@@ -71,6 +72,7 @@ export class Assets {
     private static Banana: Mesh;
     private static Character: Mesh;
     static Rock: Mesh;
+    private static LandingPad: Mesh;
 
     public static ScatterCube: Mesh;
 
@@ -174,6 +176,18 @@ export class Assets {
             console.log("Rock loaded");
         };
 
+        const landingPadTask = Assets.manager.addMeshTask("landingPadTask", "", "", landingPad);
+        landingPadTask.onSuccess = function (task: MeshAssetTask) {
+            Assets.LandingPad = task.loadedMeshes[0] as Mesh;
+            Assets.LandingPad.isVisible = false;
+
+            for (const mesh of Assets.LandingPad.getChildMeshes()) {
+                mesh.isVisible = false;
+            }
+
+            console.log("LandingPad loaded");
+        };
+
         const ouchSoundTask = Assets.manager.addBinaryFileTask("ouchSoundTask", ouchSound);
         ouchSoundTask.onSuccess = function (task) {
             Assets.OuchSound = new Sound("OuchSound", task.data, scene);
@@ -240,6 +254,10 @@ export class Assets {
 
     static CreateRockInstance(): InstancedMesh {
         return Assets.Rock.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+    }
+
+    static CreateLandingPadInstance(): InstancedMesh {
+        return Assets.LandingPad.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static DebugMaterial(name: string, diffuse = false, wireframe = false) {
