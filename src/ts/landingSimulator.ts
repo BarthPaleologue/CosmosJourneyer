@@ -16,6 +16,7 @@ import "@babylonjs/core/Physics/physicsEngineComponent";
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
 import { LandingPad } from "./landingPad/landingPad";
+import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -39,13 +40,19 @@ const light = new DirectionalLight("light", new Vector3(0, -1, 1).normalize(), s
 
 await Assets.Init(scene);
 
-const spaceship = new ShipControls(scene);
-spaceship.addInput(new Keyboard());
-spaceship.addInput(new Mouse(canvas));
-scene.setActiveController(spaceship);
+const physicsViewer = new PhysicsViewer();
 
-const landingPad = new LandingPad();
+const shipControls = new ShipControls(scene);
+shipControls.addInput(new Keyboard());
+shipControls.addInput(new Mouse(canvas));
+scene.setActiveController(shipControls);
+
+physicsViewer.showBody(shipControls.spaceship.aggregate.body)
+
+const landingPad = new LandingPad(scene);
 landingPad.getTransform().position = new Vector3(0, -20, 50);
+
+physicsViewer.showBody(landingPad.aggregate.body);
 
 scene.onBeforeRenderObservable.add(() => {
   const deltaTime = scene.deltaTime / 1000;
