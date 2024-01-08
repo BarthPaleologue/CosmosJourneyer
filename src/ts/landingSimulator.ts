@@ -15,6 +15,7 @@ import { Color4 } from "@babylonjs/core/Maths/math.color";
 import "@babylonjs/core/Physics/physicsEngineComponent";
 import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
+import { LandingPad } from "./landingPad/landingPad";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -43,8 +44,8 @@ spaceship.addInput(new Keyboard());
 spaceship.addInput(new Mouse(canvas));
 scene.setActiveController(spaceship);
 
-const landingPad = Assets.CreateLandingPadInstance();
-landingPad.position = new Vector3(0, -20, 50);
+const landingPad = new LandingPad();
+landingPad.getTransform().position = new Vector3(0, -20, 50);
 
 scene.onBeforeRenderObservable.add(() => {
   const deltaTime = scene.deltaTime / 1000;
