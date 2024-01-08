@@ -228,20 +228,26 @@ export class Spaceship {
             const start = this.getTransform().getAbsolutePosition().add(gravityDir.scale(-50e3));
             const end = this.getTransform().getAbsolutePosition().add(gravityDir.scale(50e3));
 
-            (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.GROUND });
+            (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.GROUND | CollisionMask.LANDING_PADS });
             if (this.raycastResult.hasHit) {
                 const landingSpotNormal = this.raycastResult.hitNormalWorld;
-                const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(0));
+                const extent = this.instanceRoot.getHierarchyBoundingVectors();
+                const shipYExtend = extent.max.y - extent.min.y;
+
+                const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(shipYExtend / 2));
 
                 const distance = landingSpot.subtract(this.getTransform().getAbsolutePosition()).dot(gravityDir);
                 console.log(500 * deltaTime * Math.sign(distance), distance);
-                translate(this.getTransform(), gravityDir.scale(Math.min(500 * deltaTime * Math.sign(distance), distance)));
+                translate(this.getTransform(), gravityDir.scale(Math.min(10 * deltaTime * Math.sign(distance), distance)));
 
                 const currentUp = getUpwardDirection(this.getTransform());
                 const targetUp = landingSpotNormal;
-                const axis = Vector3.Cross(currentUp, targetUp);
-                const theta = Math.acos(Vector3.Dot(currentUp, targetUp));
-                rotate(this.getTransform(), axis, Math.min(0.1 * deltaTime, theta));
+                let theta = 0.0;
+                if(Vector3.Distance(currentUp, targetUp) > 0.01) {
+                    const axis = Vector3.Cross(currentUp, targetUp);
+                    theta = Math.acos(Vector3.Dot(currentUp, targetUp));
+                    rotate(this.getTransform(), axis, Math.min(0.4 * deltaTime, theta));
+                }
 
                 if (Math.abs(distance) < 0.3 && Math.abs(theta) < 0.01) {
                     this.completeLanding();
