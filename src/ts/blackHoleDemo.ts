@@ -34,32 +34,32 @@ player.addInput(keyboard);
 player.addInput(mouse);
 player.addInput(gamepad);
 
-const spaceshipController = new ShipControls(scene);
-spaceshipController.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
-spaceshipController.addInput(keyboard);
-spaceshipController.addInput(mouse);
-spaceshipController.addInput(gamepad);
+const shipControls = new ShipControls(scene);
+shipControls.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
+shipControls.addInput(keyboard);
+shipControls.addInput(mouse);
+shipControls.addInput(gamepad);
 
-scene.setActiveController(spaceshipController);
+scene.setActiveController(shipControls);
 
 engine.registerStarSystemUpdateCallback(() => {
-    if (scene.getActiveController() != spaceshipController) return;
+    if (scene.getActiveController() != shipControls) return;
 
-    const shipPosition = spaceshipController.getTransform().getAbsolutePosition();
+    const shipPosition = shipControls.getTransform().getAbsolutePosition();
     const nearestBody = starSystemView.getStarSystem().getNearestOrbitalObject();
     const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
     const radius = nearestBody.getBoundingRadius();
-    spaceshipController.registerClosestObject(distance, radius);
+    shipControls.spaceship.registerClosestObject(distance, radius);
 
-    const warpDrive = spaceshipController.getWarpDrive();
+    const warpDrive = shipControls.spaceship.getWarpDrive();
     const shipInternalThrottle = warpDrive.getInternalThrottle();
     const shipTargetThrottle = warpDrive.getTargetThrottle();
 
     const throttleString = warpDrive.isEnabled()
         ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}`
-        : `${parsePercentageFrom01(spaceshipController.getThrottle())}/100%`;
+        : `${parsePercentageFrom01(shipControls.spaceship.getThrottle())}/100%`;
 
-    (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
+    (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(shipControls.spaceship.getSpeed())}`;
 });
 
 const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
@@ -75,18 +75,18 @@ planet.model.orbit.radius = 45 * planet.getRadius();
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
     if (e.key === "g") {
-        if (scene.getActiveController() === spaceshipController) {
+        if (scene.getActiveController() === shipControls) {
             scene.setActiveController(player);
-            setRotationQuaternion(player.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
+            setRotationQuaternion(player.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
-            spaceshipController.setEnabled(false, engine.getHavokPlugin());
+            shipControls.spaceship.setEnabled(false, engine.getHavokPlugin());
         } else {
-            scene.setActiveController(spaceshipController);
-            setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(player.getTransform()).clone());
+            scene.setActiveController(shipControls);
+            setRotationQuaternion(shipControls.getTransform(), getRotationQuaternion(player.getTransform()).clone());
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
-            spaceshipController.setEnabled(true, engine.getHavokPlugin());
+            shipControls.spaceship.setEnabled(true, engine.getHavokPlugin());
         }
     }
 });
