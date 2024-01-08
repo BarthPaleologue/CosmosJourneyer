@@ -6,7 +6,7 @@ import { clamp } from "../../../utils/math";
 
 export class TransformRotationAnimation {
     private clock = 0;
-    private duration: number;
+    private readonly duration: number;
     private thetaAcc = 0;
     private readonly totalTheta;
     private readonly axis;

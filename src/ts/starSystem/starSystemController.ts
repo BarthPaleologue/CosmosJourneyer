@@ -20,6 +20,7 @@ import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
+import { SystemSeed } from "../utils/systemSeed";
 
 export class StarSystemController {
     readonly scene: UberScene;
@@ -73,7 +74,7 @@ export class StarSystemController {
 
     private closestToScreenCenterOrbitalObject: AbstractObject | null = null;
 
-    constructor(model: StarSystemModel | number, scene: UberScene) {
+    constructor(model: StarSystemModel | SystemSeed, scene: UberScene) {
         this.scene = scene;
         this.postProcessManager = new PostProcessManager(this.scene);
 

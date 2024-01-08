@@ -31,6 +31,7 @@ import { getMoonSeed } from "./planemos/common";
 
 import { Gamepad } from "./inputs/gamepad";
 import { CharacterControls } from "./spacelegs/characterControls";
+import { SystemSeed } from "./utils/systemSeed";
 
 const engine = new CosmosJourneyer();
 
@@ -104,7 +105,7 @@ engine.onToggleStarMapObservable.add((isStarMapOpen) => {
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
-const starSystemSeed = 0;
+const starSystemSeed = new SystemSeed(Vector3.Zero(), 0);
 const starSystem = new StarSystemController(starSystemSeed, starSystemView.scene);
 starSystem.model.setName("Alpha Testis");
 

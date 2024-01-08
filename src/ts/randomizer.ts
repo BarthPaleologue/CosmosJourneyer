@@ -2,7 +2,7 @@ import "../styles/index.scss";
 
 import { StarSystemController } from "./starSystem/starSystemController";
 
-import { randRange } from "extended-random";
+import { centeredRand, randRange } from "extended-random";
 import { Settings } from "./settings";
 import { DefaultControls } from "./defaultController/defaultControls";
 import { positionNearObject } from "./utils/positionNearObject";
@@ -15,6 +15,8 @@ import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 import { Mouse } from "./inputs/mouse";
 import { Keyboard } from "./inputs/keyboard";
 import { Gamepad } from "./inputs/gamepad";
+import { SystemSeed } from "./utils/systemSeed";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 const engine = new CosmosJourneyer();
 
@@ -72,10 +74,24 @@ engine.onToggleStarMapObservable.add((isStarMapOpen) => {
 
 //check if url contains a seed
 const urlParams = new URLSearchParams(window.location.search);
-const seed = urlParams.get("seed");
+const urlStarMapX = urlParams.get("starMapX");
+const urlStarMapY = urlParams.get("starMapY");
+const urlStarMapZ = urlParams.get("starMapZ");
+const urlIndex = urlParams.get("index");
+const urlBodyIndex = urlParams.get("bodyIndex");
 
-const starSystem = new StarSystemController(seed ? Number(seed) : randRange(-1, 1, (step: number) => Math.random(), 0) * Number.MAX_SAFE_INTEGER, scene);
+const starMapX = urlStarMapX !== null ? Number(urlStarMapX) : Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER * 0.1);
+const starMapY = urlStarMapY !== null ? Number(urlStarMapY) : Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER * 0.1);
+const starMapZ = urlStarMapZ !== null ? Number(urlStarMapZ) : Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER * 0.1);
+const index = urlIndex !== null ? Number(urlIndex) : 0;
+const bodyIndex = urlBodyIndex !== null ? Number(urlBodyIndex) : 0;
+
+const seed = new SystemSeed(new Vector3(starMapX, starMapY, starMapZ), index);
+
+const starSystem = new StarSystemController(seed, scene);
 starSystemView.setStarSystem(starSystem, true);
+
+engine.getStarMap().setCurrentStarSystem(seed);
 
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
@@ -99,7 +115,8 @@ document.addEventListener("keydown", (e) => {
 engine.init();
 
 const nbRadius = starSystem.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 3;
-positionNearObject(scene.getActiveController(), starSystem.planets.length > 0 ? starSystem.getBodies()[1] : starSystem.stellarObjects[0], starSystem, nbRadius);
+if(bodyIndex >= starSystem.getBodies().length) throw new Error(`Body index (${bodyIndex}) out of bound (0 - ${starSystem.getBodies().length - 1})!`);
+positionNearObject(scene.getActiveController(), starSystem.planets.length > 0 ? starSystem.getBodies()[bodyIndex] : starSystem.stellarObjects[0], starSystem, nbRadius);
 
 engine.getStarSystemView().bodyEditor.setVisibility(EditorVisibility.NAVBAR);
 

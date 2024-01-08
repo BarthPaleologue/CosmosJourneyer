@@ -3,6 +3,7 @@ import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
 import { BODY_TYPE } from "../model/common";
 import { generateName } from "../utils/nameGenerator";
+import { SystemSeed } from "../utils/systemSeed";
 
 enum GENERATION_STEPS {
     NAME,
@@ -14,14 +15,14 @@ enum GENERATION_STEPS {
 }
 
 export class StarSystemModel {
-    readonly seed: number;
+    readonly seed: SystemSeed;
     readonly rng: (step: number) => number;
 
     private name: string;
 
-    constructor(seed: number) {
+    constructor(seed: SystemSeed) {
         this.seed = seed;
-        this.rng = seededSquirrelNoise(this.seed);
+        this.rng = seededSquirrelNoise(this.seed.hash);
 
         this.name = generateName(this.rng, GENERATION_STEPS.NAME);
     }
