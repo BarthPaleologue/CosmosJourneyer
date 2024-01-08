@@ -69,7 +69,7 @@ export class CosmosJourneyer {
             if (e.key === "m") this.toggleStarMap();
 
             if (e.key === "Escape") {
-                if (!this.isPaused()) this.pause();
+                if (!this.isPaused() && this.activeScene !== this.mainMenu?.scene) this.pause();
                 else this.resume();
             }
         });
@@ -106,13 +106,18 @@ export class CosmosJourneyer {
         console.log(`Havok initialized`);
 
         this.mainMenu = new MainMenu(this.engine, havokInstance);
+        this.mainMenu.onStartObservable.add(() => {
+            this.getStarSystemView().setStarSystem(new StarSystemController(0.0, this.getStarSystemView().scene), true);
+            this.getStarSystemView().init();
+            this.toggleStarMap();
+        });
 
         // Init starmap view
         this.starMap = new StarMap(this.engine);
         this.starMap.onWarpObservable.add((seed: number) => {
+            this.toggleStarMap();
             this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
             this.getStarSystemView().init();
-            this.toggleStarMap();
         });
 
         // Init star system view

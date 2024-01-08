@@ -9,10 +9,11 @@ import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { EditorVisibility } from "../ui/bodyEditor/bodyEditor";
 import { Settings } from "../settings";
 import mainMenuHTML from "../../html/mainMenu.html";
-import { getForwardDirection, roll, rotate, translate } from "../uberCore/transforms/basicTransform";
+import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class MainMenu {
     readonly controls: DefaultControls;
@@ -20,6 +21,10 @@ export class MainMenu {
 
     readonly starSystemView: StarSystemView;
     readonly starSystemController: StarSystemController;
+
+    readonly onStartObservable = new Observable<void>();
+
+    private title: HTMLElement | null = null;
 
     constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
         this.starSystemView = new StarSystemView(engine, havokInstance);
@@ -59,36 +64,76 @@ export class MainMenu {
         this.starSystemView.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
 
         document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
+
+        const title = document.querySelector("#mainMenu h1");
+        if (title === null) throw new Error("#mainMenu h1 does not exist!");
+        this.title = title as HTMLElement;
+
         document.getElementById("startButton")?.addEventListener("click", () => {
-            const currentForward = getForwardDirection(this.controls.getTransform());
+            this.startAnimation();
+        });
+    }
 
-            const planet = this.starSystemController.planets[0];
-            const newForward = planet.getTransform().getAbsolutePosition().subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
-            const axis = Vector3.Cross(currentForward, newForward);
-            const angle = Vector3.GetAngleBetweenVectors(currentForward, newForward, axis);
-            const duration = 2;
+    private startAnimation() {
+        const currentForward = getForwardDirection(this.controls.getTransform());
 
-            const rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), axis, angle, duration);
-            const translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), this.controls.getTransform().getAbsolutePosition().add(newForward.scale(-planet.model.radius * 2)), duration);
+        const planet = this.starSystemController.planets[0];
+        const newForward = planet.getTransform().getAbsolutePosition().subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
+        const axis = Vector3.Cross(currentForward, newForward);
+        const angle = Vector3.GetAngleBetweenVectors(currentForward, newForward, axis);
+        const duration = 2;
 
-            const animationCallback = () => {
-              const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
+        const rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), axis, angle, duration);
+        const translationAnimation = new TransformTranslationAnimation(
+            this.controls.getTransform(),
+            this.controls
+                .getTransform()
+                .getAbsolutePosition()
+                .add(newForward.scale(-planet.model.radius * 2)),
+            duration
+        );
 
-              if(!translationAnimation.isFinished()) translationAnimation.update(deltaTime);
-              if (!rotationAnimation.isFinished()) rotationAnimation.update(deltaTime);
-              else this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
+        if (this.title === null) throw new Error("Title is null");
 
-              this.controls.getActiveCamera().getViewMatrix();
+        this.title.animate([
+            {
+                marginTop: this.title.style.marginTop
+            },
+            {
+                marginTop: "30vh"
+            }
+        ], {
+            duration: duration * 1000,
+            easing: "ease-in-out",
+            fill: "forwards"
+        });
 
-              this.starSystemController.applyFloatingOrigin();
-              this.starSystemController.updateShaders(0.0);
+        const animationCallback = () => {
+            const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
+
+            if (!translationAnimation.isFinished()) translationAnimation.update(deltaTime);
+            if (!rotationAnimation.isFinished()) rotationAnimation.update(deltaTime);
+            else {
+                this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
+                if(this.title === null) throw new Error("Title is null");
+                this.title.style.opacity = "0";
+                this.onStartObservable.notifyObservers();
             }
 
-            this.scene.onBeforePhysicsObservable.add(animationCallback);
+            this.controls.getActiveCamera().getViewMatrix();
 
-            const menuItems = document.getElementById("menuItems");
-            if(menuItems === null) throw new Error("#menuItems does not exist!");
-            menuItems.style.left = "-20%";
-        });
+            this.starSystemController.applyFloatingOrigin();
+            this.starSystemController.updateShaders(0.0);
+        };
+
+        this.scene.onBeforePhysicsObservable.add(animationCallback);
+
+        this.hideMenu();
+    }
+
+    private hideMenu() {
+        const menuItems = document.getElementById("menuItems");
+        if (menuItems === null) throw new Error("#menuItems does not exist!");
+        menuItems.style.left = "-20%";
     }
 }
