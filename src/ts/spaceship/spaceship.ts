@@ -176,11 +176,15 @@ export class Spaceship {
         return this.closestWalkableObject;
     }
 
-    public engageLanding() {
+    public engageLanding(landingTarget: Transformable | null) {
         console.log("Landing sequence engaged");
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
         this.state = ShipState.LANDING;
-        this.landingTarget = this.closestWalkableObject;
+        this.landingTarget = landingTarget !== null ? landingTarget : this.closestWalkableObject;
+        if(this.landingTarget === null) {
+            throw new Error("Landing target is null");
+        }
+        console.log("landing on", this.landingTarget.getTransform().name);
     }
 
     private completeLanding() {

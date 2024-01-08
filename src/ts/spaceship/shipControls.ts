@@ -84,7 +84,7 @@ export class ShipControls implements Controls {
 
                 if (keyboard.isPressed("l")) {
                     if (this.spaceship.getClosestWalkableObject() === null) return;
-                    this.spaceship.engageLanding();
+                    this.spaceship.engageLanding(null);
                 }
             }
 

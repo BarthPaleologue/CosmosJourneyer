@@ -17,6 +17,8 @@ import { Keyboard } from "./inputs/keyboard";
 import { Mouse } from "./inputs/mouse";
 import { LandingPad } from "./landingPad/landingPad";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
+import { DefaultControls } from "./defaultController/defaultControls";
+import { Spaceship } from "./spaceship/spaceship";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -42,32 +44,45 @@ await Assets.Init(scene);
 
 const physicsViewer = new PhysicsViewer();
 
-const shipControls = new ShipControls(scene);
-shipControls.addInput(new Keyboard());
-shipControls.addInput(new Mouse(canvas));
-scene.setActiveController(shipControls);
+const spaceship = new Spaceship(scene);
 
-physicsViewer.showBody(shipControls.spaceship.aggregate.body)
+physicsViewer.showBody(spaceship.aggregate.body);
 
 const landingPad = new LandingPad(scene);
 landingPad.getTransform().position = new Vector3(0, -20, 50);
 
 physicsViewer.showBody(landingPad.aggregate.body);
 
+const defaultControls = new DefaultControls(scene);
+defaultControls.speed *= 15;
+defaultControls.addInput(new Keyboard());
+scene.setActiveController(defaultControls);
+
+translate(defaultControls.getTransform(), new Vector3(50, 0, 0));
+
+defaultControls.getTransform().lookAt(Vector3.Lerp(spaceship.getTransform().position, landingPad.getTransform().position, 0.5));
+
+
 scene.onBeforeRenderObservable.add(() => {
-  const deltaTime = scene.deltaTime / 1000;
-  scene.getActiveController().update(deltaTime);
+    const deltaTime = scene.deltaTime / 1000;
+    scene.getActiveController().update(deltaTime);
+    spaceship.update(deltaTime);
 });
 
-
 scene.executeWhenReady(() => {
-  engine.runRenderLoop(() => {
-    scene.render();
-  });
+    engine.runRenderLoop(() => {
+        scene.render();
+    });
+});
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "o") {
+        spaceship.engageLanding(landingPad);
+    }
 });
 
 window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  engine.resize(true);
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    engine.resize(true);
 });

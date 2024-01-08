@@ -3,7 +3,7 @@ import { Transformable } from "../uberCore/transforms/basicTransform";
 import { Assets } from "../assets";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { CollisionMask } from "../settings";
 import { Scene } from "@babylonjs/core/scene";
