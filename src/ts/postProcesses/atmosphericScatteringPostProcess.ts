@@ -10,8 +10,6 @@ import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
 import { GasPlanet } from "../planemos/gasPlanet/gasPlanet";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { StellarObject } from "../stellarObjects/stellarObject";
-import { BaseObject } from "../bodies/common";
 import { Transformable } from "../uberCore/transforms/basicTransform";
 
 export interface AtmosphereUniforms {

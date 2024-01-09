@@ -2,6 +2,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { easeInOutInterpolation } from "./interpolations";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { translate } from "../basicTransform";
+import { clamp } from "../../../utils/math";
 
 export class TransformTranslationAnimation {
     private clock = 0;
@@ -23,7 +24,9 @@ export class TransformTranslationAnimation {
 
         this.clock += deltaTime;
 
-        const dDistance = this.totalDistance * easeInOutInterpolation(this.clock / this.duration) - this.distanceAcc;
+        const t = clamp(this.clock / this.duration, 0, 1);
+
+        const dDistance = this.totalDistance * easeInOutInterpolation(t) - this.distanceAcc;
         this.distanceAcc += dDistance;
 
         translate(this.transform, this.direction.scale(dDistance));

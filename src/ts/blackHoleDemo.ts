@@ -14,6 +14,8 @@ import { StarSystemHelper } from "./starSystem/starSystemHelper";
 import { Mouse } from "./inputs/mouse";
 import { Keyboard } from "./inputs/keyboard";
 import { Gamepad } from "./inputs/gamepad";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { SystemSeed } from "./utils/systemSeed";
 
 const engine = new CosmosJourneyer();
 
@@ -62,7 +64,7 @@ engine.registerStarSystemUpdateCallback(() => {
     (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 });
 
-const starSystemSeed = randRange(-1, 1, (step: number) => Math.random(), 0);
+const starSystemSeed = new SystemSeed(Vector3.Zero(), 0);
 const starSystem = new StarSystemController(starSystemSeed, scene);
 starSystemView.setStarSystem(starSystem, false);
 

@@ -16,6 +16,8 @@ import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/StarSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./mainMenu/mainMenu";
+import { SystemSeed } from "./utils/systemSeed";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 enum EngineState {
     RUNNING,
@@ -50,7 +52,8 @@ export class CosmosJourneyer {
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
             const seed = this.getStarSystemView().getStarSystem().model.seed;
-            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/random.html?seed=${seed}`);
+            const payload = `starMapX=${seed.starSectorCoordinates.x}&starMapY=${seed.starSectorCoordinates.y}&starMapZ=${seed.starSectorCoordinates.z}&index=${seed.index}`;
+            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/random.html?${payload}`);
             navigator.clipboard.writeText(url.toString()).then(() => console.log("Copied to clipboard"));
         });
 
@@ -107,17 +110,17 @@ export class CosmosJourneyer {
 
         this.mainMenu = new MainMenu(this.engine, havokInstance);
         this.mainMenu.onStartObservable.add(() => {
-            this.getStarSystemView().setStarSystem(new StarSystemController(0.0, this.getStarSystemView().scene), true);
+            this.getStarSystemView().setStarSystem(new StarSystemController(new SystemSeed(Vector3.Zero(), 0), this.getStarSystemView().scene), true);
             this.getStarSystemView().init();
             this.toggleStarMap();
         });
 
         // Init starmap view
         this.starMap = new StarMap(this.engine);
-        this.starMap.onWarpObservable.add((seed: number) => {
-            this.toggleStarMap();
+        this.starMap.onWarpObservable.add((seed: SystemSeed) => {
             this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
             this.getStarSystemView().init();
+            this.toggleStarMap();
         });
 
         // Init star system view
