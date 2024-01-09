@@ -54,32 +54,32 @@ camera.attachControl(canvas, true);
 
 const xr = await scene.createDefaultXRExperienceAsync();
 if (!xr.baseExperience) {
-  // no xr support
-  throw new Error("No XR support");
+    // no xr support
+    throw new Error("No XR support");
 } else {
-  // all good, ready to go
-  console.log("XR support");
+    // all good, ready to go
+    console.log("XR support");
 }
 
 const webXRInput = xr.input; // if using the experience helper, otherwise, an instance of WebXRInput
 webXRInput.onControllerAddedObservable.add((xrController) => {
-  console.log("Controller added");
-  xrController.onMotionControllerInitObservable.add((motionController) => {
-    console.log("Motion controller initialized");
+    console.log("Controller added");
+    xrController.onMotionControllerInitObservable.add((motionController) => {
+        console.log("Motion controller initialized");
 
-    const mainComponent = motionController.getMainComponent();
+        const mainComponent = motionController.getMainComponent();
 
-    mainComponent.onButtonStateChangedObservable.add((component) => {
-      if (component.changes.pressed) {
-        if (component.changes.pressed.current) {
-          console.log("Pressed");
-        }
-        if (component.pressed) {
-          console.log("Pressed");
-        }
-      }
+        mainComponent.onButtonStateChangedObservable.add((component) => {
+            if (component.changes.pressed) {
+                if (component.changes.pressed.current) {
+                    console.log("Pressed");
+                }
+                if (component.pressed) {
+                    console.log("Pressed");
+                }
+            }
+        });
     });
-  });
 });
 
 const xrCamera = xr.baseExperience.camera;
@@ -117,34 +117,34 @@ FlatCloudsPostProcess.CreateAsync("clouds", planet, planet.model.cloudsUniforms,
 const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
 
 scene.onBeforeRenderObservable.add(() => {
-  const deltaTime = engine.getDeltaTime() / 1000;
+    const deltaTime = engine.getDeltaTime() / 1000;
 
-  if (scene.activeCamera === null) throw new Error("Active camera is null");
+    if (scene.activeCamera === null) throw new Error("Active camera is null");
 
-  if (camera.globalPosition.length() > 0) {
-    translate(planet.getTransform(), camera.globalPosition.negate());
-    translate(star.getTransform(), camera.globalPosition.negate());
-    camera.position.set(0, 0, 0);
-  }
+    if (camera.globalPosition.length() > 0) {
+        translate(planet.getTransform(), camera.globalPosition.negate());
+        translate(star.getTransform(), camera.globalPosition.negate());
+        camera.position.set(0, 0, 0);
+    }
 
-  planet.updateLOD(scene.activeCamera.globalPosition, chunkForge);
-  planet.updateMaterial(camera, [star], deltaTime);
+    planet.updateLOD(scene.activeCamera.globalPosition, chunkForge);
+    planet.updateMaterial(camera, [star], deltaTime);
 
-  chunkForge.update();
+    chunkForge.update();
 
-  star.updateMaterial();
+    star.updateMaterial();
 
-  //ocean.update(deltaTime);
+    //ocean.update(deltaTime);
 });
 
 scene.executeWhenReady(() => {
-  engine.runRenderLoop(() => {
-    scene.render();
-  });
+    engine.runRenderLoop(() => {
+        scene.render();
+    });
 });
 
 window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  engine.resize(true);
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    engine.resize(true);
 });

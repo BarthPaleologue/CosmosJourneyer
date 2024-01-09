@@ -14,9 +14,9 @@ export class SystemSeed {
         this.starMapCellPosition = starMapCellPosition;
         this.index = index;
 
-        if(!Number.isSafeInteger(this.starMapCellPosition.x)) throw new Error("x position of cell in starmap is not a safe integer");
-        if(!Number.isSafeInteger(this.starMapCellPosition.y)) throw new Error("y position of cell in starmap is not a safe integer");
-        if(!Number.isSafeInteger(this.starMapCellPosition.z)) throw new Error("z position of cell in starmap is not a safe integer");
+        if (!Number.isSafeInteger(this.starMapCellPosition.x)) throw new Error("x position of cell in starmap is not a safe integer");
+        if (!Number.isSafeInteger(this.starMapCellPosition.y)) throw new Error("y position of cell in starmap is not a safe integer");
+        if (!Number.isSafeInteger(this.starMapCellPosition.z)) throw new Error("z position of cell in starmap is not a safe integer");
 
         const cellRNG = seededSquirrelNoise(hashVec3(starMapCellPosition));
         this.hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;

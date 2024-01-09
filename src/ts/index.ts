@@ -13,12 +13,7 @@ import { ShipControls } from "./spaceship/shipControls";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TelluricPlanemoModel } from "./planemos/telluricPlanemo/telluricPlanemoModel";
 import { GasPlanetModel } from "./planemos/gasPlanet/gasPlanetModel";
-import {
-    getForwardDirection,
-    getRotationQuaternion,
-    setRotationQuaternion,
-    translate
-} from "./uberCore/transforms/basicTransform";
+import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 
 import { StarSystemHelper } from "./starSystem/starSystemHelper";
@@ -219,8 +214,8 @@ if (aresAtmosphere) {
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
-    if(e.key === "y") {
-        if(starSystemView.scene.getActiveController() === spaceshipController) {
+    if (e.key === "y") {
+        if (starSystemView.scene.getActiveController() === spaceshipController) {
             console.log("disembark");
 
             characterController.getTransform().setEnabled(true);
@@ -231,7 +226,7 @@ document.addEventListener("keydown", (e) => {
 
             starSystemView.scene.setActiveController(characterController);
             starSystemView.getStarSystem().postProcessManager.rebuild();
-        } else if(starSystemView.scene.getActiveController() === characterController) {
+        } else if (starSystemView.scene.getActiveController() === characterController) {
             console.log("embark");
 
             characterController.getTransform().setEnabled(false);

@@ -115,7 +115,7 @@ document.addEventListener("keydown", (e) => {
 engine.init();
 
 const nbRadius = starSystem.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 3;
-if(bodyIndex >= starSystem.getBodies().length) throw new Error(`Body index (${bodyIndex}) out of bound (0 - ${starSystem.getBodies().length - 1})!`);
+if (bodyIndex >= starSystem.getBodies().length) throw new Error(`Body index (${bodyIndex}) out of bound (0 - ${starSystem.getBodies().length - 1})!`);
 positionNearObject(scene.getActiveController(), starSystem.planets.length > 0 ? starSystem.getBodies()[bodyIndex] : starSystem.stellarObjects[0], starSystem, nbRadius);
 
 engine.getStarSystemView().bodyEditor.setVisibility(EditorVisibility.NAVBAR);
