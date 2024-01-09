@@ -1,7 +1,7 @@
 import { hashVec3 } from "../utils/hashVec3";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand } from "extended-random";
-import { Settings, UniverseDensity } from "../settings";
+import { UniverseDensity } from "../settings";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";

@@ -1,4 +1,3 @@
-import { Vector3 } from "@babylonjs/havok";
 import { Settings } from "../settings";
 import { clamp } from "../utils/math";
 
