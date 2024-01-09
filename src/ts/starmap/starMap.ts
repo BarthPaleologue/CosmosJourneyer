@@ -4,7 +4,7 @@ import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
 import { StarSystemModel } from "../starSystem/starSystemModel";
-import { BuildData, Cell, Vector3ToString } from "./cell";
+import { BuildData, StarSector, Vector3ToString } from "./starSector";
 import { StarMapUI } from "./starMapUI";
 import { getStellarTypeString } from "../stellarObjects/common";
 import { BODY_TYPE } from "../model/common";
@@ -45,7 +45,7 @@ export class StarMap {
      */
     private readonly starMapCenterPosition: Vector3;
 
-    private readonly allowedCellRelativeCoordinates: Vector3[] = [];
+    private readonly allowedStarSectorRelativeCoordinates: Vector3[] = [];
 
     private readonly starTemplate: Mesh;
     private readonly blackHoleTemplate: Mesh;
@@ -64,7 +64,7 @@ export class StarMap {
     private selectedSystemSeed: SystemSeed | null = null;
     private currentSystemSeed: SystemSeed | null = null;
 
-    private readonly loadedCells: Map<string, Cell> = new Map<string, Cell>();
+    private readonly loadedStarSectors: Map<string, StarSector> = new Map<string, StarSector>();
 
     private readonly seedToInstanceMap: Map<string, InstancedMesh> = new Map();
     private readonly instanceToSeedMap: Map<InstancedMesh, string> = new Map();
@@ -75,9 +75,9 @@ export class StarMap {
     public readonly onWarpObservable: Observable<SystemSeed> = new Observable();
 
     /**
-     * The position of the cell the player is currently in (relative to the global node).
+     * The position of the star sector the player is currently in (relative to the global node).
      */
-    private currentCellPosition = Vector3.Zero();
+    private currentStarSectorPosition = Vector3.Zero();
 
     private cameraPositionToCenter = Vector3.Zero();
 
@@ -200,12 +200,12 @@ export class StarMap {
         this.travelLine = new ThickLines("travelLine", { points: [], thickness: 0.01, color: Color3.Red() }, this.scene);
         this.thickLines = [this.travelLine];
 
-        // then generate missing cells // TODO: make this in parallel
+        // then generate missing star sectors
         for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
             for (let y = -StarMap.RENDER_RADIUS; y <= StarMap.RENDER_RADIUS; y++) {
                 for (let z = -StarMap.RENDER_RADIUS; z <= StarMap.RENDER_RADIUS; z++) {
                     if (x * x + y * y + z * z > StarMap.RENDER_RADIUS * StarMap.RENDER_RADIUS) continue;
-                    this.allowedCellRelativeCoordinates.push(new Vector3(x, y, z));
+                    this.allowedStarSectorRelativeCoordinates.push(new Vector3(x, y, z));
                 }
             }
         }
@@ -220,7 +220,7 @@ export class StarMap {
 
             this.acknowledgeCameraMovement();
 
-            this.updateCells();
+            this.updateStarSectors();
 
             this.thickLines.forEach((bondingLine) => bondingLine.update());
         });
@@ -233,10 +233,10 @@ export class StarMap {
         }
 
         this.cameraPositionToCenter = this.controls.getActiveCamera().globalPosition.subtract(this.starMapCenterPosition);
-        this.currentCellPosition = new Vector3(
-            Math.round(this.cameraPositionToCenter.x / Cell.SIZE),
-            Math.round(this.cameraPositionToCenter.y / Cell.SIZE),
-            Math.round(this.cameraPositionToCenter.z / Cell.SIZE)
+        this.currentStarSectorPosition = new Vector3(
+            Math.round(this.cameraPositionToCenter.x / StarSector.SIZE),
+            Math.round(this.cameraPositionToCenter.y / StarSector.SIZE),
+            Math.round(this.cameraPositionToCenter.z / StarSector.SIZE)
         );
     }
 
@@ -254,37 +254,37 @@ export class StarMap {
     }
 
     /**
-     * Register a cell at the given position, it will be added to the generation queue
-     * @param position The position of the cell
+     * Register a star sector at the given position, it will be added to the generation queue
+     * @param position The position of the sector
      * @param generateNow
      */
-    private registerCell(position: Vector3, generateNow = false): Cell {
-        const cell = new Cell(position);
-        this.loadedCells.set(cell.getKey(), cell);
+    private registerStarSector(position: Vector3, generateNow = false): StarSector {
+        const starSector = new StarSector(position);
+        this.loadedStarSectors.set(starSector.getKey(), starSector);
 
-        if (!generateNow) this.starBuildStack.push(...cell.generate());
+        if (!generateNow) this.starBuildStack.push(...starSector.generate());
         else {
-            const data = cell.generate();
+            const data = starSector.generate();
             for (const d of data) this.createInstance(d);
         }
 
-        return cell;
+        return starSector;
     }
 
     public setCurrentStarSystem(starSystemSeed: SystemSeed) {
         this.currentSystemSeed = starSystemSeed;
         this.selectedSystemSeed = starSystemSeed;
 
-        if (this.loadedCells.has(Vector3ToString(starSystemSeed.starMapCellPosition))) {
+        if (this.loadedStarSectors.has(Vector3ToString(starSystemSeed.starSectorCoordinates))) {
             this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
             this.focusOnCurrentSystem();
             return;
         }
 
-        this.registerCell(starSystemSeed.starMapCellPosition, true);
+        this.registerStarSector(starSystemSeed.starSectorCoordinates, true);
         this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
 
-        const translation = starSystemSeed.starMapCellPosition.subtract(this.currentCellPosition).scaleInPlace(Cell.SIZE);
+        const translation = starSystemSeed.starSectorCoordinates.subtract(this.currentStarSectorPosition).scaleInPlace(StarSector.SIZE);
         translate(this.controls.getTransform(), translation);
         this.controls.getActiveCamera().getViewMatrix(true);
         this.acknowledgeCameraMovement();
@@ -292,35 +292,35 @@ export class StarMap {
         this.focusOnCurrentSystem(true);
     }
 
-    private updateCells() {
-        // first remove all cells that are too far
+    private updateStarSectors() {
+        // first remove all star sectors that are too far
         const currentSystemInstance = this.currentSystemSeed === null ? null : (this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
         const selectedSystemInstance = this.selectedSystemSeed === null ? null : (this.seedToInstanceMap.get(this.selectedSystemSeed.toString()) as InstancedMesh);
-        for (const cell of this.loadedCells.values()) {
-            if (currentSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(currentSystemInstance)) continue; // don't remove cells that contain the current system
-            if (selectedSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove cells that contain the selected system
+        for (const starSector of this.loadedStarSectors.values()) {
+            if (currentSystemInstance !== null && starSector.starInstances.concat(starSector.blackHoleInstances).includes(currentSystemInstance)) continue; // don't remove star sector that contains the current system
+            if (selectedSystemInstance !== null && starSector.starInstances.concat(starSector.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove star sector that contains the selected system
 
-            const position = cell.position;
+            const position = starSector.position;
             if (position.subtract(this.cameraPositionToCenter).length() > StarMap.RENDER_RADIUS + 1) {
-                for (const starInstance of cell.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
-                for (const blackHoleInstance of cell.blackHoleInstances) this.fadeOutThenRecycle(blackHoleInstance, this.recycledBlackHoles);
+                for (const starInstance of starSector.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
+                for (const blackHoleInstance of starSector.blackHoleInstances) this.fadeOutThenRecycle(blackHoleInstance, this.recycledBlackHoles);
 
-                this.loadedCells.delete(cell.getKey());
+                this.loadedStarSectors.delete(starSector.getKey());
             }
         }
 
-        // then generate missing cells
-        for (const relativeCoordinate of this.allowedCellRelativeCoordinates) {
-            const position = this.currentCellPosition.add(relativeCoordinate);
-            const cellKey = Vector3ToString(position);
+        // then generate missing sectors
+        for (const relativeCoordinate of this.allowedStarSectorRelativeCoordinates) {
+            const position = this.currentStarSectorPosition.add(relativeCoordinate);
+            const sectorKey = Vector3ToString(position);
 
-            if (this.loadedCells.has(cellKey)) continue; // already generated
+            if (this.loadedStarSectors.has(sectorKey)) continue; // already generated
 
-            // don't generate cells that are not in the frustum
-            const bb = Cell.getBoundingBox(position, this.starMapCenterPosition);
+            // don't generate star sectors that are not in the frustum
+            const bb = StarSector.getBoundingBox(position, this.starMapCenterPosition);
             if (!this.controls.getActiveCamera().isInFrustum(bb)) continue;
 
-            this.registerCell(position);
+            this.registerStarSector(position);
         }
 
         this.buildNextStars(Math.min(2000, StarMap.GENERATION_CADENCE * this.controls.speed));
@@ -333,8 +333,8 @@ export class StarMap {
             const data = this.starBuildStack.pop();
             if (data === undefined) return;
 
-            if (!this.loadedCells.has(data.cellString)) {
-                // if cell was removed in the meantime we build another star
+            if (!this.loadedStarSectors.has(data.sectorString)) {
+                // if star sector was removed in the meantime we build another star
                 n++;
                 continue;
             }
@@ -430,8 +430,8 @@ export class StarMap {
 
         this.fadeIn(initializedInstance);
 
-        if (isStarBlackHole) this.loadedCells.get(data.cellString)?.blackHoleInstances.push(initializedInstance);
-        else this.loadedCells.get(data.cellString)?.starInstances.push(initializedInstance);
+        if (isStarBlackHole) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
+        else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
     }
 
     private focusCameraOnStar(starInstance: InstancedMesh, skipAnimation = false) {

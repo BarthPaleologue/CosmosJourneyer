@@ -52,7 +52,7 @@ export class CosmosJourneyer {
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
             const seed = this.getStarSystemView().getStarSystem().model.seed;
-            const payload = `starMapX=${seed.starMapCellPosition.x}&starMapY=${seed.starMapCellPosition.y}&starMapZ=${seed.starMapCellPosition.z}&index=${seed.index}`;
+            const payload = `starMapX=${seed.starSectorCoordinates.x}&starMapY=${seed.starSectorCoordinates.y}&starMapZ=${seed.starSectorCoordinates.z}&index=${seed.index}`;
             const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/random.html?${payload}`);
             navigator.clipboard.writeText(url.toString()).then(() => console.log("Copied to clipboard"));
         });

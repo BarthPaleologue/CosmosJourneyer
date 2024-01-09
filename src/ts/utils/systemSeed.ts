@@ -5,24 +5,24 @@ import { centeredRand } from "extended-random";
 import { Settings } from "../settings";
 
 export class SystemSeed {
-    readonly starMapCellPosition: Vector3;
+    readonly starSectorCoordinates: Vector3;
     readonly index: number;
 
     readonly hash: number;
 
-    constructor(starMapCellPosition: Vector3, index: number) {
-        this.starMapCellPosition = starMapCellPosition;
+    constructor(starSectorCoordinates: Vector3, index: number) {
+        this.starSectorCoordinates = starSectorCoordinates;
         this.index = index;
 
-        if (!Number.isSafeInteger(this.starMapCellPosition.x)) throw new Error("x position of cell in starmap is not a safe integer");
-        if (!Number.isSafeInteger(this.starMapCellPosition.y)) throw new Error("y position of cell in starmap is not a safe integer");
-        if (!Number.isSafeInteger(this.starMapCellPosition.z)) throw new Error("z position of cell in starmap is not a safe integer");
+        if (!Number.isSafeInteger(this.starSectorCoordinates.x)) throw new Error("x coordinate of star sector is not a safe integer");
+        if (!Number.isSafeInteger(this.starSectorCoordinates.y)) throw new Error("y coordinate of star sector is not a safe integer");
+        if (!Number.isSafeInteger(this.starSectorCoordinates.z)) throw new Error("z coordinate of star sector is not a safe integer");
 
-        const cellRNG = seededSquirrelNoise(hashVec3(starMapCellPosition));
+        const cellRNG = seededSquirrelNoise(hashVec3(starSectorCoordinates));
         this.hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
     }
 
     toString(): string {
-        return `${this.starMapCellPosition.x},${this.starMapCellPosition.y},${this.starMapCellPosition.z},${this.index}`;
+        return `${this.starSectorCoordinates.x},${this.starSectorCoordinates.y},${this.starSectorCoordinates.z},${this.index}`;
     }
 }
