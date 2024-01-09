@@ -9,7 +9,6 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { PostProcessType } from "./postProcessTypes";
 import { RingsUniforms } from "./rings/ringsUniform";
-import { RingsPostProcess } from "./rings/ringsPostProcess";
 import { Assets } from "../assets";
 
 export type ShadowUniforms = {

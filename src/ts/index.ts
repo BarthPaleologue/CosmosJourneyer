@@ -13,12 +13,7 @@ import { ShipControls } from "./spaceship/shipControls";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TelluricPlanemoModel } from "./planemos/telluricPlanemo/telluricPlanemoModel";
 import { GasPlanetModel } from "./planemos/gasPlanet/gasPlanetModel";
-import {
-    getForwardDirection,
-    getRotationQuaternion,
-    setRotationQuaternion,
-    translate
-} from "./uberCore/transforms/basicTransform";
+import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 
 import { StarSystemHelper } from "./starSystem/starSystemHelper";
@@ -31,6 +26,7 @@ import { getMoonSeed } from "./planemos/common";
 
 import { Gamepad } from "./inputs/gamepad";
 import { CharacterControls } from "./spacelegs/characterControls";
+import { SystemSeed } from "./utils/systemSeed";
 
 const engine = new CosmosJourneyer();
 
@@ -104,7 +100,7 @@ engine.onToggleStarMapObservable.add((isStarMapOpen) => {
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
-const starSystemSeed = 0;
+const starSystemSeed = new SystemSeed(Vector3.Zero(), 0);
 const starSystem = new StarSystemController(starSystemSeed, starSystemView.scene);
 starSystem.model.setName("Alpha Testis");
 
@@ -218,8 +214,8 @@ if (aresAtmosphere) {
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
-    if(e.key === "y") {
-        if(starSystemView.scene.getActiveController() === spaceshipController) {
+    if (e.key === "y") {
+        if (starSystemView.scene.getActiveController() === spaceshipController) {
             console.log("disembark");
 
             characterController.getTransform().setEnabled(true);
@@ -230,7 +226,7 @@ document.addEventListener("keydown", (e) => {
 
             starSystemView.scene.setActiveController(characterController);
             starSystemView.getStarSystem().postProcessManager.rebuild();
-        } else if(starSystemView.scene.getActiveController() === characterController) {
+        } else if (starSystemView.scene.getActiveController() === characterController) {
             console.log("embark");
 
             characterController.getTransform().setEnabled(false);

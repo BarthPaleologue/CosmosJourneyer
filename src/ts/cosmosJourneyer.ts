@@ -17,6 +17,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/StarSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
+import { SystemSeed } from "./utils/systemSeed";
 
 enum EngineState {
     RUNNING,
@@ -51,7 +52,8 @@ export class CosmosJourneyer {
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
             const seed = this.getStarSystemView().getStarSystem().model.seed;
-            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/random.html?seed=${seed}`);
+            const payload = `starMapX=${seed.starSectorCoordinates.x}&starMapY=${seed.starSectorCoordinates.y}&starMapZ=${seed.starSectorCoordinates.z}&index=${seed.index}`;
+            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/random.html?${payload}`);
             navigator.clipboard.writeText(url.toString()).then(() => console.log("Copied to clipboard"));
         });
 
@@ -110,7 +112,7 @@ export class CosmosJourneyer {
 
         // Init starmap view
         this.starMap = new StarMap(this.engine);
-        this.starMap.onWarpObservable.add((seed: number) => {
+        this.starMap.onWarpObservable.add((seed: SystemSeed) => {
             this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
             this.getStarSystemView().init();
             this.toggleStarMap();

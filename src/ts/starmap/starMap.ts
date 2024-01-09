@@ -4,7 +4,7 @@ import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
 
 import { StarSystemModel } from "../starSystem/starSystemModel";
-import { BuildData, Cell, Vector3ToString } from "./cell";
+import { BuildData, StarSector, Vector3ToString } from "./starSector";
 import { StarMapUI } from "./starMapUI";
 import { getStellarTypeString } from "../stellarObjects/common";
 import { BODY_TYPE } from "../model/common";
@@ -25,19 +25,17 @@ import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Culling/ray";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
-import { makeNoise3D } from "fast-simplex-noise";
-import { seededSquirrelNoise } from "squirrel-noise";
-import { Settings } from "../settings";
-import { getForwardDirection } from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, translate } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Keyboard } from "../inputs/keyboard";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
+import { SystemSeed } from "../utils/systemSeed";
 
 export class StarMap {
     readonly scene: Scene;
-    private readonly controller: DefaultControls;
+    private readonly controls: DefaultControls;
 
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
@@ -47,7 +45,7 @@ export class StarMap {
      */
     private readonly starMapCenterPosition: Vector3;
 
-    private readonly allowedCellRelativeCoordinates: Vector3[] = [];
+    private readonly allowedStarSectorRelativeCoordinates: Vector3[] = [];
 
     private readonly starTemplate: Mesh;
     private readonly blackHoleTemplate: Mesh;
@@ -63,23 +61,23 @@ export class StarMap {
 
     private readonly starMapUI: StarMapUI;
 
-    private selectedSystemSeed: number | null = null;
-    private currentSystemSeed: number | null = null;
+    private selectedSystemSeed: SystemSeed | null = null;
+    private currentSystemSeed: SystemSeed | null = null;
 
-    private readonly loadedCells: Map<string, Cell> = new Map<string, Cell>();
+    private readonly loadedStarSectors: Map<string, StarSector> = new Map<string, StarSector>();
 
-    private readonly seedToInstanceMap: Map<number, InstancedMesh> = new Map<number, InstancedMesh>();
-    private readonly instanceToSeedMap: Map<InstancedMesh, number> = new Map<InstancedMesh, number>();
+    private readonly seedToInstanceMap: Map<string, InstancedMesh> = new Map();
+    private readonly instanceToSeedMap: Map<InstancedMesh, string> = new Map();
 
     private travelLine: ThickLines;
     private readonly thickLines: ThickLines[];
 
-    public readonly onWarpObservable: Observable<number> = new Observable<number>();
+    public readonly onWarpObservable: Observable<SystemSeed> = new Observable();
 
     /**
-     * The position of the cell the player is currently in (relative to the global node).
+     * The position of the star sector the player is currently in (relative to the global node).
      */
-    private currentCellPosition = Vector3.Zero();
+    private currentStarSectorPosition = Vector3.Zero();
 
     private cameraPositionToCenter = Vector3.Zero();
 
@@ -94,8 +92,6 @@ export class StarMap {
     private static readonly SHIMMER_ANIMATION = new Animation("shimmer", "instancedBuffers.color.a", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
     private static readonly SHIMMER_DURATION = 1000;
 
-    private readonly densityRNG;
-
     constructor(engine: Engine) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
@@ -103,23 +99,27 @@ export class StarMap {
         this.scene.skipPointerMovePicking = false;
         this.scene.useRightHandedSystem = true;
 
-        this.controller = new DefaultControls(this.scene);
-        this.controller.speed /= 5;
-        this.controller.getActiveCamera().minZ = 0.01;
+        this.controls = new DefaultControls(this.scene);
+        this.controls.speed /= 5;
+        this.controls.getActiveCamera().minZ = 0.01;
 
-        this.controller.getActiveCamera().attachControl();
+        this.controls.getActiveCamera().attachControl();
 
-        this.controller.addInput(new Keyboard());
+        this.controls.addInput(new Keyboard());
 
         this.starMapUI = new StarMapUI(this.scene);
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
             this.currentSystemSeed = this.selectedSystemSeed;
-            if (this.currentSystemSeed !== null) this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh);
+            if (this.currentSystemSeed !== null) this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
             this.dispatchWarpCallbacks();
         });
 
-        const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controller.getActiveCamera()]);
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "f") this.focusOnCurrentSystem();
+        });
+
+        const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controls.getActiveCamera()]);
         pipeline.fxaaEnabled = true;
         pipeline.bloomEnabled = true;
         pipeline.bloomThreshold = 0.0;
@@ -128,12 +128,7 @@ export class StarMap {
         pipeline.imageProcessing.exposure = 1.1;
         pipeline.imageProcessing.contrast = 1.0;
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const initialStarMapX = Number(urlParams.get("smx"));
-        const initialStarMapY = Number(urlParams.get("smy"));
-        const initialStarMapZ = Number(urlParams.get("smz"));
-
-        this.starMapCenterPosition = new Vector3(initialStarMapX ?? 0, initialStarMapY ?? 0, initialStarMapZ ?? 0);
+        this.starMapCenterPosition = Vector3.Zero();
 
         this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.15 }, this.scene);
         this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
@@ -205,22 +200,15 @@ export class StarMap {
         this.travelLine = new ThickLines("travelLine", { points: [], thickness: 0.01, color: Color3.Red() }, this.scene);
         this.thickLines = [this.travelLine];
 
-        // then generate missing cells // TODO: make this in parallel
+        // then generate missing star sectors
         for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
             for (let y = -StarMap.RENDER_RADIUS; y <= StarMap.RENDER_RADIUS; y++) {
                 for (let z = -StarMap.RENDER_RADIUS; z <= StarMap.RENDER_RADIUS; z++) {
                     if (x * x + y * y + z * z > StarMap.RENDER_RADIUS * StarMap.RENDER_RADIUS) continue;
-                    this.allowedCellRelativeCoordinates.push(new Vector3(x, y, z));
+                    this.allowedStarSectorRelativeCoordinates.push(new Vector3(x, y, z));
                 }
             }
         }
-
-        const seedableRNG = seededSquirrelNoise(Settings.UNIVERSE_SEED);
-        let step = 0;
-        const perlinRNG = makeNoise3D(() => {
-            return seedableRNG(step++);
-        });
-        this.densityRNG = (x: number, y: number, z: number) => (1.0 - Math.abs(perlinRNG(x * 0.2, y * 0.2, z * 0.2))) ** 8;
 
         this.scene.onBeforeRenderObservable.add(() => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
@@ -228,29 +216,34 @@ export class StarMap {
             if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaTime);
             if (this.translationAnimation !== null) this.translationAnimation.update(deltaTime);
 
-            this.controller.update(deltaTime);
+            this.controls.update(deltaTime);
 
-            this.cameraPositionToCenter = this.controller.getActiveCamera().globalPosition.subtract(this.starMapCenterPosition);
+            this.acknowledgeCameraMovement();
 
-            this.currentCellPosition = new Vector3(
-                Math.round(this.cameraPositionToCenter.x / Cell.SIZE),
-                Math.round(this.cameraPositionToCenter.y / Cell.SIZE),
-                Math.round(this.cameraPositionToCenter.z / Cell.SIZE)
-            );
-
-            this.updateCells();
-
-            if (this.controller.getActiveCamera().globalPosition.length() > StarMap.FLOATING_ORIGIN_MAX_DISTANCE) {
-                this.translateCameraBackToOrigin();
-            }
+            this.updateStarSectors();
 
             this.thickLines.forEach((bondingLine) => bondingLine.update());
         });
     }
 
+    private acknowledgeCameraMovement() {
+        // floating origin
+        if (this.controls.getActiveCamera().globalPosition.length() > StarMap.FLOATING_ORIGIN_MAX_DISTANCE) {
+            this.translateCameraBackToOrigin();
+        }
+
+        this.cameraPositionToCenter = this.controls.getActiveCamera().globalPosition.subtract(this.starMapCenterPosition);
+        this.currentStarSectorPosition = new Vector3(
+            Math.round(this.cameraPositionToCenter.x / StarSector.SIZE),
+            Math.round(this.cameraPositionToCenter.y / StarSector.SIZE),
+            Math.round(this.cameraPositionToCenter.z / StarSector.SIZE)
+        );
+    }
+
     public translateCameraBackToOrigin() {
-        const translationToOrigin = this.controller.getTransform().getAbsolutePosition().negate();
-        this.controller.getTransform().position = Vector3.Zero();
+        const translationToOrigin = this.controls.getTransform().getAbsolutePosition().negate();
+        this.controls.getTransform().position = Vector3.Zero();
+        this.controls.getActiveCamera().getViewMatrix(true);
         this.starMapCenterPosition.addInPlace(translationToOrigin);
         for (const mesh of this.scene.meshes) mesh.position.addInPlace(translationToOrigin);
     }
@@ -261,187 +254,224 @@ export class StarMap {
     }
 
     /**
-     * Register a cell at the given position, it will be added to the generation queue
-     * @param position The position of the cell
+     * Register a star sector at the given position, it will be added to the generation queue
+     * @param position The position of the sector
+     * @param generateNow
      */
-    private registerCell(position: Vector3) {
-        const cell = new Cell(position, this.densityRNG(position.x, position.y, position.z));
-        this.loadedCells.set(cell.getKey(), cell);
-        this.starBuildStack.push(...cell.generate());
+    private registerStarSector(position: Vector3, generateNow = false): StarSector {
+        const starSector = new StarSector(position);
+        this.loadedStarSectors.set(starSector.getKey(), starSector);
+
+        if (!generateNow) this.starBuildStack.push(...starSector.generate());
+        else {
+            const data = starSector.generate();
+            for (const d of data) this.createInstance(d);
+        }
+
+        return starSector;
     }
 
-    private updateCells() {
-        // first remove all cells that are too far
-        const currentSystemInstance = this.currentSystemSeed === null ? null : (this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh);
-        const selectedSystemInstance = this.selectedSystemSeed === null ? null : (this.seedToInstanceMap.get(this.selectedSystemSeed) as InstancedMesh);
-        for (const cell of this.loadedCells.values()) {
-            if (currentSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(currentSystemInstance)) continue; // don't remove cells that contain the current system
-            if (selectedSystemInstance !== null && cell.starInstances.concat(cell.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove cells that contain the selected system
+    public setCurrentStarSystem(starSystemSeed: SystemSeed) {
+        this.currentSystemSeed = starSystemSeed;
+        this.selectedSystemSeed = starSystemSeed;
 
-            const position = cell.position;
+        if (this.loadedStarSectors.has(Vector3ToString(starSystemSeed.starSectorCoordinates))) {
+            this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
+            this.focusOnCurrentSystem();
+            return;
+        }
+
+        this.registerStarSector(starSystemSeed.starSectorCoordinates, true);
+        this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
+
+        const translation = starSystemSeed.starSectorCoordinates.subtract(this.currentStarSectorPosition).scaleInPlace(StarSector.SIZE);
+        translate(this.controls.getTransform(), translation);
+        this.controls.getActiveCamera().getViewMatrix(true);
+        this.acknowledgeCameraMovement();
+
+        this.focusOnCurrentSystem(true);
+    }
+
+    private updateStarSectors() {
+        // first remove all star sectors that are too far
+        const currentSystemInstance = this.currentSystemSeed === null ? null : (this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
+        const selectedSystemInstance = this.selectedSystemSeed === null ? null : (this.seedToInstanceMap.get(this.selectedSystemSeed.toString()) as InstancedMesh);
+        for (const starSector of this.loadedStarSectors.values()) {
+            if (currentSystemInstance !== null && starSector.starInstances.concat(starSector.blackHoleInstances).includes(currentSystemInstance)) continue; // don't remove star sector that contains the current system
+            if (selectedSystemInstance !== null && starSector.starInstances.concat(starSector.blackHoleInstances).includes(selectedSystemInstance)) continue; // don't remove star sector that contains the selected system
+
+            const position = starSector.position;
             if (position.subtract(this.cameraPositionToCenter).length() > StarMap.RENDER_RADIUS + 1) {
-                for (const starInstance of cell.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
-                for (const blackHoleInstance of cell.blackHoleInstances) this.fadeOutThenRecycle(blackHoleInstance, this.recycledBlackHoles);
+                for (const starInstance of starSector.starInstances) this.fadeOutThenRecycle(starInstance, this.recycledStars);
+                for (const blackHoleInstance of starSector.blackHoleInstances) this.fadeOutThenRecycle(blackHoleInstance, this.recycledBlackHoles);
 
-                this.loadedCells.delete(cell.getKey());
+                this.loadedStarSectors.delete(starSector.getKey());
             }
         }
 
-        // then generate missing cells
-        for (const relativeCoordinate of this.allowedCellRelativeCoordinates) {
-            const position = this.currentCellPosition.add(relativeCoordinate);
-            const cellKey = Vector3ToString(position);
+        // then generate missing sectors
+        for (const relativeCoordinate of this.allowedStarSectorRelativeCoordinates) {
+            const position = this.currentStarSectorPosition.add(relativeCoordinate);
+            const sectorKey = Vector3ToString(position);
 
-            if (this.loadedCells.has(cellKey)) continue; // already generated
+            if (this.loadedStarSectors.has(sectorKey)) continue; // already generated
 
-            // don't generate cells that are not in the frustum
-            const bb = Cell.getBoundingBox(position, this.starMapCenterPosition);
-            if (!this.controller.getActiveCamera().isInFrustum(bb)) continue;
+            // don't generate star sectors that are not in the frustum
+            const bb = StarSector.getBoundingBox(position, this.starMapCenterPosition);
+            if (!this.controls.getActiveCamera().isInFrustum(bb)) continue;
 
-            this.registerCell(position);
+            this.registerStarSector(position);
         }
 
-        this.buildNextStars(Math.min(2000, StarMap.GENERATION_CADENCE * this.controller.speed));
+        this.buildNextStars(Math.min(2000, StarMap.GENERATION_CADENCE * this.controls.speed));
 
-        this.starMapUI.update(this.controller.getActiveCamera());
+        this.starMapUI.update(this.controls.getActiveCamera());
     }
 
     private buildNextStars(n: number): void {
         for (let i = 0; i < n; i++) {
-            if (this.starBuildStack.length === 0) return;
+            const data = this.starBuildStack.pop();
+            if (data === undefined) return;
 
-            const data = this.starBuildStack.pop() as BuildData;
-
-            if (!this.loadedCells.has(data.cellString)) {
-                // if cell was removed in the meantime we build another star
+            if (!this.loadedStarSectors.has(data.sectorString)) {
+                // if star sector was removed in the meantime we build another star
                 n++;
                 continue;
             }
 
-            const starSystemSeed = data.seed;
-            const starSystemModel = new StarSystemModel(starSystemSeed);
-
-            const starSeed = starSystemModel.getStarSeed(0);
-            const isStarBlackHole = starSystemModel.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE;
-
-            const starModel = !isStarBlackHole ? new StarModel(starSeed) : new BlackHoleModel(starSeed);
-
-            let instance: InstancedMesh | null = null;
-            let recycled = false;
-
-            if (!isStarBlackHole) {
-                if (this.recycledStars.length > 0) {
-                    instance = this.recycledStars[0];
-                    this.recycledStars.shift();
-                    recycled = true;
-                } else instance = this.starTemplate.createInstance(data.name);
-            } else {
-                if (this.recycledBlackHoles.length > 0) {
-                    instance = this.recycledBlackHoles[0];
-                    this.recycledBlackHoles.shift();
-                    recycled = true;
-                } else instance = this.blackHoleTemplate.createInstance(data.name);
-            }
-
-            const initializedInstance = instance;
-
-            this.seedToInstanceMap.set(starSystemSeed, initializedInstance);
-            this.instanceToSeedMap.set(initializedInstance, starSystemSeed);
-
-            initializedInstance.scaling = Vector3.One().scaleInPlace(data.scale);
-            initializedInstance.position = data.position.add(this.starMapCenterPosition);
-
-            if (starModel instanceof StarModel) {
-                const starColor = starModel.surfaceColor;
-                initializedInstance.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
-            } else {
-                initializedInstance.instancedBuffers.color = new Color4(1.0, 0.6, 0.3, 0.0);
-            }
-
-            if (!recycled) {
-                initializedInstance.isPickable = true;
-                initializedInstance.actionManager = new ActionManager(this.scene);
-
-                initializedInstance.actionManager.registerAction(
-                    new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
-                        this.starMapUI.setHoveredStarSystemMesh(initializedInstance);
-                    })
-                );
-
-                initializedInstance.actionManager.registerAction(
-                    new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
-                        this.starMapUI.setHoveredStarSystemMesh(null);
-                    })
-                );
-            } else {
-                initializedInstance.setEnabled(true);
-                initializedInstance.actionManager?.unregisterAction(initializedInstance.actionManager.actions[2]);
-            }
-
-            initializedInstance.actionManager?.registerAction(
-                new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
-                    let text = "";
-                    if (this.currentSystemSeed !== null) {
-                        const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh;
-                        const distance = 10 * currentInstance.getAbsolutePosition().subtract(initializedInstance.getAbsolutePosition()).length();
-                        text += `Distance: ${distance.toFixed(2)}ly\n`;
-                    }
-                    text += `Planets: ${starSystemModel.getNbPlanets()}\n`;
-                    text += `Type: ${getStellarTypeString(starModel.stellarType)}\n`;
-                    text += `Seed: ${starSystemModel.seed}`;
-
-                    this.starMapUI.attachUIToMesh(initializedInstance);
-                    this.starMapUI.setSelectedSystem({ name: starSystemModel.getName(), text });
-
-                    this.selectedSystemSeed = starSystemSeed;
-
-                    this.focusCameraOnStar(initializedInstance);
-
-                    if (this.currentSystemSeed !== null) {
-                        this.travelLine.setPoints([this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh, initializedInstance]);
-                    }
-                })
-            );
-
-            this.fadeIn(initializedInstance);
-
-            if (isStarBlackHole) this.loadedCells.get(data.cellString)?.blackHoleInstances.push(initializedInstance);
-            else this.loadedCells.get(data.cellString)?.starInstances.push(initializedInstance);
+            this.createInstance(data);
         }
     }
 
-    private focusCameraOnStar(starInstance: InstancedMesh) {
-        const cameraDir = getForwardDirection(this.controller.getTransform());
-        const starDir = starInstance.position.subtract(this.controller.getTransform().getAbsolutePosition()).normalize();
+    private createInstance(data: BuildData) {
+        const starSystemSeed = data.seed;
+        const starSystemModel = new StarSystemModel(starSystemSeed);
+
+        const starSeed = starSystemModel.getStarSeed(0);
+        const isStarBlackHole = starSystemModel.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE;
+
+        const starModel = !isStarBlackHole ? new StarModel(starSeed) : new BlackHoleModel(starSeed);
+
+        let instance: InstancedMesh | null = null;
+        let recycled = false;
+
+        if (!isStarBlackHole) {
+            if (this.recycledStars.length > 0) {
+                instance = this.recycledStars[0];
+                this.recycledStars.shift();
+                recycled = true;
+            } else instance = this.starTemplate.createInstance(data.name);
+        } else {
+            if (this.recycledBlackHoles.length > 0) {
+                instance = this.recycledBlackHoles[0];
+                this.recycledBlackHoles.shift();
+                recycled = true;
+            } else instance = this.blackHoleTemplate.createInstance(data.name);
+        }
+
+        const initializedInstance = instance;
+
+        this.seedToInstanceMap.set(starSystemSeed.toString(), initializedInstance);
+        this.instanceToSeedMap.set(initializedInstance, starSystemSeed.toString());
+
+        initializedInstance.scaling = Vector3.One().scaleInPlace(data.scale);
+        initializedInstance.position = data.position.add(this.starMapCenterPosition);
+
+        if (starModel instanceof StarModel) {
+            const starColor = starModel.surfaceColor;
+            initializedInstance.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
+        } else {
+            initializedInstance.instancedBuffers.color = new Color4(1.0, 0.6, 0.3, 0.0);
+        }
+
+        if (!recycled) {
+            initializedInstance.isPickable = true;
+            initializedInstance.actionManager = new ActionManager(this.scene);
+
+            initializedInstance.actionManager.registerAction(
+                new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
+                    this.starMapUI.setHoveredStarSystemMesh(initializedInstance);
+                })
+            );
+
+            initializedInstance.actionManager.registerAction(
+                new ExecuteCodeAction(ActionManager.OnPointerOutTrigger, () => {
+                    this.starMapUI.setHoveredStarSystemMesh(null);
+                })
+            );
+        } else {
+            initializedInstance.setEnabled(true);
+            initializedInstance.actionManager?.unregisterAction(initializedInstance.actionManager.actions[2]);
+        }
+
+        initializedInstance.actionManager?.registerAction(
+            new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
+                let text = "";
+                if (this.currentSystemSeed !== null) {
+                    const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh;
+                    const distance = 15 * currentInstance.getAbsolutePosition().subtract(initializedInstance.getAbsolutePosition()).length();
+                    text += `Distance: ${distance.toFixed(2)}ly\n`;
+                }
+                text += `Type: ${getStellarTypeString(starModel.stellarType)}\n`;
+                text += `Planets: ${starSystemModel.getNbPlanets()}\n`;
+
+                this.starMapUI.attachUIToMesh(initializedInstance);
+                this.starMapUI.setSelectedSystem({ name: starSystemModel.getName(), text });
+
+                this.selectedSystemSeed = starSystemSeed;
+
+                this.focusCameraOnStar(initializedInstance);
+
+                if (this.currentSystemSeed !== null) {
+                    this.travelLine.setPoints([this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh, initializedInstance]);
+                }
+            })
+        );
+
+        this.fadeIn(initializedInstance);
+
+        if (isStarBlackHole) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
+        else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
+    }
+
+    private focusCameraOnStar(starInstance: InstancedMesh, skipAnimation = false) {
+        const cameraDir = getForwardDirection(this.controls.getTransform());
+        const starDir = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).normalize();
 
         const rotationAngle = Math.acos(Vector3.Dot(cameraDir, starDir));
 
         // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
-        if (rotationAngle > 0.02) {
+        if (skipAnimation) {
+            this.controls.getTransform().lookAt(starInstance.position);
+            this.controls.getTransform().computeWorldMatrix(true);
+        } else if (rotationAngle > 0.02) {
             const rotationAxis = Vector3.Cross(cameraDir, starDir).normalize();
-            this.rotationAnimation = new TransformRotationAnimation(this.controller.getTransform(), rotationAxis, rotationAngle, 1);
+            this.rotationAnimation = new TransformRotationAnimation(this.controls.getTransform(), rotationAxis, rotationAngle, 1);
         }
 
-        const distance = starInstance.position.subtract(this.controller.getTransform().getAbsolutePosition()).length();
-        const targetPosition = this.controller
+        const distance = starInstance.position.subtract(this.controls.getTransform().getAbsolutePosition()).length();
+        const targetPosition = this.controls
             .getTransform()
             .getAbsolutePosition()
             .add(starDir.scaleInPlace(distance - 0.8));
 
         // if the transform is already in the right position, do not animate
-        if (targetPosition.subtract(this.controller.getTransform().getAbsolutePosition()).lengthSquared() > 0.1) {
-            this.translationAnimation = new TransformTranslationAnimation(this.controller.getTransform(), targetPosition, 1);
+        if (skipAnimation) this.controls.getTransform().position = targetPosition;
+        else if (targetPosition.subtract(this.controls.getTransform().getAbsolutePosition()).lengthSquared() > 0.1) {
+            this.translationAnimation = new TransformTranslationAnimation(this.controls.getTransform(), targetPosition, 1);
         }
 
         this.starMapUI.setHoveredStarSystemMesh(null);
     }
 
-    public focusOnCurrentSystem() {
+    public focusOnCurrentSystem(skipAnimation = false) {
+        console.log("focus on current system");
         if (this.currentSystemSeed === null) return console.warn("No current system seed!");
 
-        const instance = this.seedToInstanceMap.get(this.currentSystemSeed) as InstancedMesh;
+        const instance = this.seedToInstanceMap.get(this.currentSystemSeed.toString());
+        if (instance === undefined) throw new Error("The current system has no instance!");
 
-        this.focusCameraOnStar(instance);
+        this.focusCameraOnStar(instance, skipAnimation);
     }
 
     private fadeIn(instance: InstancedMesh) {
@@ -459,7 +489,8 @@ export class StarMap {
             if (this.starMapUI.getCurrentHoveredMesh() === instance) this.starMapUI.setHoveredStarSystemMesh(null);
             instance.setEnabled(false);
 
-            const seed = this.instanceToSeedMap.get(instance) as number;
+            const seed = this.instanceToSeedMap.get(instance);
+            if (seed === undefined) throw new Error("No seed for instance!");
             this.seedToInstanceMap.delete(seed);
             this.instanceToSeedMap.delete(instance);
 

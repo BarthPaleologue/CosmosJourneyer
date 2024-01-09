@@ -13,15 +13,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
-import {
-    getForwardDirection,
-    getUpwardDirection,
-    pitch,
-    roll,
-    rotate,
-    Transformable,
-    translate
-} from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getUpwardDirection, pitch, roll, rotate, Transformable, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
 import { Assets } from "../assets";
@@ -322,14 +314,13 @@ export class ShipControls implements Controls {
                 console.log(500 * deltaTime * Math.sign(distance), distance);
                 translate(this.getTransform(), gravityDir.scale(Math.min(500 * deltaTime * Math.sign(distance), distance)));
 
-
                 const currentUp = getUpwardDirection(this.getTransform());
                 const targetUp = landingSpotNormal;
                 const axis = Vector3.Cross(currentUp, targetUp);
                 const theta = Math.acos(Vector3.Dot(currentUp, targetUp));
                 rotate(this.getTransform(), axis, Math.min(0.1 * deltaTime, theta));
 
-                if(Math.abs(distance) < 0.3 && Math.abs(theta) < 0.01) {
+                if (Math.abs(distance) < 0.3 && Math.abs(theta) < 0.01) {
                     this.state = ShipState.LANDED;
                     this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
                 }
