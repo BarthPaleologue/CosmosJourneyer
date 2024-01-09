@@ -14,6 +14,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { SystemSeed } from "../utils/systemSeed";
 
 export class MainMenu {
     readonly controls: DefaultControls;
@@ -37,10 +38,35 @@ export class MainMenu {
         this.controls.getActiveCamera().detachControl();
 
         const allowedSeeds = [
-            339.71738141753696, 699.6298526409856, 636.5370404923914, 905.9022866058482, 131.2407412548735, 496.18890481597776, 540.7112951378157, 796.7959333496561,
-            296.7276774698002, 523.9123323780545, 993.179364592667, 649.2861236690691, 28.197193558682887, 742.8403332894349, 226.71622361745025, 115.8460802506951,
-            709.7364687709704, 482.3140197875797
+          new SystemSeed(new Vector3(-4030557626489595, -5311991039371311, 6300166560550159), 0),
+          new SystemSeed(new Vector3(-2580282252593743, -688526648963167, 464658922001219), 0),
+          new SystemSeed(new Vector3(3935150661125235, 4680257902545175, 4968241436399943), 0),
+          new SystemSeed(new Vector3(1942125733379075, -3862794543036899, 2212860146496827), 0),
+          new SystemSeed(new Vector3(3641602661119511, 91206409140523, 1081626828903715), 0),
+          new SystemSeed(new Vector3(6987489365968175, 5899214087953411, -482678543564899), 0),
+          new SystemSeed(new Vector3(-5117383081251883, 4942502095020231, -8855350792299879), 0),
+          new SystemSeed(new Vector3(-1628959327636315, 38204247336039, 7047545368534403), 0),
+          new SystemSeed(new Vector3(1129053200580283, 6028754782535763, 562090442882903), 0),
+          new SystemSeed(new Vector3(8775426616432815, -969201051835051, 1718356477669207), 0),
+          new SystemSeed(new Vector3(6934195322427891, 3329119907117327, -114138322638523), 0),
+          new SystemSeed(new Vector3(-5408989890290555, -5686219213385011, 6555487514235607), 0),
+          new SystemSeed(new Vector3(3132497034982239, 7543003914077319, -6084670653643795), 0),
+          new SystemSeed(new Vector3(-7292809030413071, -3635511197742219, -2218904218845895), 0),
+          new SystemSeed(new Vector3(2542436462572791, 7347121178237787, 4238060996268067), 0),
+          new SystemSeed(new Vector3(5428493874753067, -8923724700575275, 7237046022809219), 0),
+          new SystemSeed(new Vector3(-3899216056009119, -7848080162041851, 8925190396180339), 0)
         ];
+
+        /*const randomSeed = new SystemSeed(
+            new Vector3(
+                Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
+                Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
+                Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER)
+            ),
+            0
+        );
+
+        console.log(randomSeed.starSectorCoordinates.x, randomSeed.starSectorCoordinates.y, randomSeed.starSectorCoordinates.z, randomSeed.index);*/
 
         const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)];
         this.starSystemController = new StarSystemController(seed, this.scene);
@@ -95,18 +121,21 @@ export class MainMenu {
 
         if (this.title === null) throw new Error("Title is null");
 
-        this.title.animate([
+        this.title.animate(
+            [
+                {
+                    marginTop: this.title.style.marginTop
+                },
+                {
+                    marginTop: "30vh"
+                }
+            ],
             {
-                marginTop: this.title.style.marginTop
-            },
-            {
-                marginTop: "30vh"
+                duration: duration * 1000,
+                easing: "ease-in-out",
+                fill: "forwards"
             }
-        ], {
-            duration: duration * 1000,
-            easing: "ease-in-out",
-            fill: "forwards"
-        });
+        );
 
         const animationCallback = () => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
@@ -115,7 +144,7 @@ export class MainMenu {
             if (!rotationAnimation.isFinished()) rotationAnimation.update(deltaTime);
             else {
                 this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
-                if(this.title === null) throw new Error("Title is null");
+                if (this.title === null) throw new Error("Title is null");
                 this.title.style.opacity = "0";
                 this.onStartObservable.notifyObservers();
             }
