@@ -35,8 +35,10 @@ export class Star extends AbstractBody {
 
         this.model = model instanceof StarModel ? model : new StarModel(model, parentBody?.model);
 
+        const isSphere = this.model.rng(42) > 0.1;
+
         this.mesh =
-            this.model.rng(42) > 0.1
+            isSphere
                 ? MeshBuilder.CreateSphere(
                       `${name}Mesh`,
                       {
@@ -45,10 +47,11 @@ export class Star extends AbstractBody {
                       },
                       scene
                   )
-                : Assets.CreateBananaClone(this.model.radius * 2);
+                : Assets.CreateBananaClone(2 * this.model.radius);
         this.mesh.parent = this.getTransform();
 
-        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
+        //FIXME: the radius here is a dirty fix because bakeTransformIntoVertexData does not work for reasons unknown
+        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), isSphere ? this.model.radius : 0.1, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
@@ -59,7 +62,6 @@ export class Star extends AbstractBody {
         this.material = new StarMaterial(this.getTransform(), this.model, scene);
         this.mesh.material = this.material;
 
-        // TODO: remove when rotation is transmitted to children
         setRotationQuaternion(this.getTransform(), Quaternion.Identity());
 
         this.postProcesses.push(PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE);
