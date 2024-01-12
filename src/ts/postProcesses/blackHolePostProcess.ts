@@ -13,6 +13,7 @@ import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 export type BlackHoleUniforms = {
     accretionDiskRadius: number;
     rotationPeriod: number;
+    warpingMinkowskiFactor: number;
     time: number;
 };
 
@@ -29,6 +30,7 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
         const blackHoleUniforms: BlackHoleUniforms = {
             accretionDiskRadius: blackHole.model.physicalProperties.accretionDiskRadius,
             rotationPeriod: 1.5,
+            warpingMinkowskiFactor: 2.0,
             time: 0
         };
 
@@ -56,6 +58,13 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
                 type: UniformEnumType.Float,
                 get: () => {
                     return blackHoleUniforms.accretionDiskRadius;
+                }
+            },
+            {
+                name: "warpingMinkowskiFactor",
+                type: UniformEnumType.Float,
+                get: () => {
+                    return blackHoleUniforms.warpingMinkowskiFactor;
                 }
             },
             {
