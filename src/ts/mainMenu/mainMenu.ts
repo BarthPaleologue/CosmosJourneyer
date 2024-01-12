@@ -135,6 +135,8 @@ export class MainMenu {
     }
 
     private startAnimation() {
+        this.hideActivePanel();
+
         const currentForward = getForwardDirection(this.controls.getTransform());
 
         const planet = this.starSystemController.planets[0];
@@ -196,17 +198,23 @@ export class MainMenu {
 
     private toggleActivePanel(newPanel: HTMLElement) {
         if(this.activeRightPanel === newPanel) {
-            this.activeRightPanel = null;
-            newPanel.classList.remove("visible");
+            this.hideActivePanel();
             return;
         }
 
         if(this.activeRightPanel !== null) {
-            this.activeRightPanel.classList.remove("visible");
+            this.hideActivePanel();
         }
 
         this.activeRightPanel = newPanel;
         newPanel.classList.add("visible");
+    }
+
+    private hideActivePanel() {
+        if(this.activeRightPanel !== null) {
+            this.activeRightPanel.classList.remove("visible");
+            this.activeRightPanel = null;
+        }
     }
 
     private hideMenu() {
