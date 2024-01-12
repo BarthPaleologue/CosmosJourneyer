@@ -130,7 +130,7 @@ void main() {
     vec2 uv = toUV(vUnitSamplePoint);
     // trick from https://www.shadertoy.com/view/3dVSzm to avoid Greenwich artifacts
     vec2 df = fwidth(uv);
-    if(df.x > 0.5) df.x = 0.0;
+    if (df.x > 0.5) df.x = 0.0;
     vec4 lutResult = textureLod(lut, uv, log2(max(df.x, df.y) * 1024.0));
 
     // moisture
@@ -169,7 +169,7 @@ void main() {
     );
     beachFactor = smoothSharpener(beachFactor, 2.0);
 
-    plainFactor = 1.0; //- steepFactor;
+    plainFactor = 1.0;//- steepFactor;
 
     // apply beach factor
     plainFactor *= 1.0 - beachFactor;
@@ -189,7 +189,8 @@ void main() {
     desertFactor *= 1.0 - snowFactor;
 
     float steepFactor = slope;
-    steepFactor = smoothstep(0.0, 0.1, steepFactor);
+    steepFactor = smoothstep(0.05, 0.3, steepFactor);
+    steepFactor = smoothSharpener(steepFactor, steepSharpness);
     snowFactor *= 1.0 - steepFactor;
     plainFactor *= 1.0 - steepFactor;
     beachFactor *= 1.0 - steepFactor;

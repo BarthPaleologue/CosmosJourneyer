@@ -108,7 +108,7 @@ export class TelluricPlanemoModel implements PlanemoModel {
             max_mountain_height: 10e3,
             continent_base_height: this.physicalProperties.oceanLevel * 1.9,
 
-            mountains_frequency: (20 * this.radius) / 1000e3
+            mountains_frequency: (60 * this.radius) / 1000e3
         };
 
         if (this.isSatelliteOfTelluric) {
