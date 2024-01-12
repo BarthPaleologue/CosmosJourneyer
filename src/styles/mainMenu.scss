@@ -49,7 +49,7 @@
     }
   }
 
-  #credits {
+  .rightPanel {
     position: absolute;
     width: 75vw;
     right: 2.5vw;
@@ -71,6 +71,13 @@
       text-align: center;
       font-family: Nasalization, sans-serif;
       font-size: 3em;
+    }
+
+    h3 {
+      color: white;
+      text-align: center;
+      font-family: Nasalization, sans-serif;
+      font-size: 1.5em;
     }
 
     p {

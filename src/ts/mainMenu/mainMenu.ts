@@ -24,10 +24,15 @@ export class MainMenu {
     readonly starSystemController: StarSystemController;
 
     readonly onStartObservable = new Observable<void>();
+    readonly onContributeObservable = new Observable<void>();
     readonly onCreditsObservable = new Observable<void>();
 
     private htmlRoot: HTMLElement | null = null;
     private title: HTMLElement | null = null;
+
+    private activeRightPanel: HTMLElement | null = null;
+    private contributePanel: HTMLElement | null = null;
+    private creditsPanel: HTMLElement | null = null;
 
     constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
         this.starSystemView = new StarSystemView(engine, havokInstance);
@@ -105,10 +110,26 @@ export class MainMenu {
             this.startAnimation();
         });
 
+        const contributeButton = document.getElementById("contributeButton");
+        if (contributeButton === null) throw new Error("#contributeButton does not exist!");
+
+        const contributePanel = document.getElementById("contribute");
+        if(contributePanel === null) throw new Error("#contribute does not exist!");
+        this.contributePanel = contributePanel;
+
+        contributeButton.addEventListener("click", () => {
+            this.toggleActivePanel(contributePanel);
+            this.onContributeObservable.notifyObservers();
+        });
+
         const creditsButton = document.getElementById("creditsButton");
         if (creditsButton === null) throw new Error("#creditsButton does not exist!");
+        const creditsPanel = document.getElementById("credits");
+        if(creditsPanel === null) throw new Error("#credits does not exist!");
+        this.creditsPanel = creditsPanel;
+
         creditsButton.addEventListener("click", () => {
-            document.getElementById("credits")?.classList.toggle("visible");
+            this.toggleActivePanel(creditsPanel);
             this.onCreditsObservable.notifyObservers();
         });
     }
@@ -171,6 +192,21 @@ export class MainMenu {
         this.scene.onBeforePhysicsObservable.add(animationCallback);
 
         this.hideMenu();
+    }
+
+    private toggleActivePanel(newPanel: HTMLElement) {
+        if(this.activeRightPanel === newPanel) {
+            this.activeRightPanel = null;
+            newPanel.classList.remove("visible");
+            return;
+        }
+
+        if(this.activeRightPanel !== null) {
+            this.activeRightPanel.classList.remove("visible");
+        }
+
+        this.activeRightPanel = newPanel;
+        newPanel.classList.add("visible");
     }
 
     private hideMenu() {
