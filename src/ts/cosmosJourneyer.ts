@@ -110,7 +110,9 @@ export class CosmosJourneyer {
 
         this.mainMenu = new MainMenu(this.engine, havokInstance);
         this.mainMenu.onStartObservable.add(() => {
-            this.getStarSystemView().setStarSystem(new StarSystemController(new SystemSeed(Vector3.Zero(), 0), this.getStarSystemView().scene), true);
+            const seed = new SystemSeed(Vector3.Zero(), 0);
+            this.getStarMap().setCurrentStarSystem(seed);
+            this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
             this.getStarSystemView().init();
             this.toggleStarMap();
         });
