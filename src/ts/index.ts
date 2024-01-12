@@ -121,7 +121,7 @@ terminaModel.orbit.period = 60 * 60;
 const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
 const planetModel = new TelluricPlanemoModel(0.4233609183800225, sunModel);
-planetModel.physicalProperties.minTemperature = -37;
+planetModel.physicalProperties.minTemperature = -55;
 planetModel.physicalProperties.maxTemperature = 30;
 
 planetModel.orbit.period = 60 * 60 * 24 * 365.25;
