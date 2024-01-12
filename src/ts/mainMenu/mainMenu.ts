@@ -26,6 +26,7 @@ export class MainMenu {
     readonly onStartObservable = new Observable<void>();
     readonly onContributeObservable = new Observable<void>();
     readonly onCreditsObservable = new Observable<void>();
+    readonly onAboutObservable = new Observable<void>();
 
     private htmlRoot: HTMLElement | null = null;
     private title: HTMLElement | null = null;
@@ -33,6 +34,7 @@ export class MainMenu {
     private activeRightPanel: HTMLElement | null = null;
     private contributePanel: HTMLElement | null = null;
     private creditsPanel: HTMLElement | null = null;
+    private aboutPanel: HTMLElement | null = null;
 
     constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
         this.starSystemView = new StarSystemView(engine, havokInstance);
@@ -131,6 +133,17 @@ export class MainMenu {
         creditsButton.addEventListener("click", () => {
             this.toggleActivePanel(creditsPanel);
             this.onCreditsObservable.notifyObservers();
+        });
+
+        const aboutButton = document.getElementById("aboutButton");
+        if (aboutButton === null) throw new Error("#aboutButton does not exist!");
+        const aboutPanel = document.getElementById("about");
+        if(aboutPanel === null) throw new Error("#about does not exist!");
+        this.aboutPanel = aboutPanel;
+
+        aboutButton.addEventListener("click", () => {
+            this.toggleActivePanel(aboutPanel);
+            this.onAboutObservable.notifyObservers();
         });
     }
 
