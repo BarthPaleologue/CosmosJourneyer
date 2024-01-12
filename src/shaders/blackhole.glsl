@@ -14,6 +14,7 @@ uniform float time;
 
 uniform float accretionDiskRadius;
 uniform float rotationPeriod;
+uniform float warpingMinkowskiFactor;
 
 //TODO: make these uniforms
 const float accretionDiskHeight = 100.0;
@@ -80,7 +81,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
     float stepSize = 0.02 * distanceToCenter / projectionDistance;//FIXME: this is not correct, but it works
 
-    samplePoint += stepSize * rayDir;//FIXME: somehow when I remove this line, the disk has no height.
+    samplePoint += stepSize * rayDir;//FIXME: somehow when I remove this line, the disk has no thickness
 
     // elementary rotation around the hole
     vec3 deltaPos = rotateAround(projectedInitialPosition, diskNormal, 0.01);
@@ -95,7 +96,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
     vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
     vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix);
 
-    vec3 redShiftMult = mix(vec3(0.4, 0.2, 0.1) * 0.5, vec3(1.6, 1.0, 2.0) * 3.0, redShift);//FIXME: need more realistic redshift
+    vec3 redShiftMult = mix(vec3(1.6, 1.0, 2.0) * 3.0, vec3(0.4, 0.2, 0.1) * 0.5, redShift);//FIXME: need more realistic redshift
     insideCol *= redShiftMult;
 
     vec4 diskColor = vec4(0.0);
@@ -140,6 +141,11 @@ vec3 bendRay(vec3 rayDir, vec3 blackholeDir, float distanceToCenter2, float maxB
     bendForce -= object_radius / (maxBendDistance * maxBendDistance); // bend force is 0 at maxBendDistance
     bendForce = stepSize * max(0.0, bendForce); // multiply by step size, and clamp negative values
     return normalize(rayDir + bendForce * blackholeDir); //bend ray towards BH
+}
+
+float customLength(vec3 v) {
+    float p = warpingMinkowskiFactor;
+    return pow(pow(abs(v.x), p) + pow(abs(v.y), p) + pow(abs(v.z), p), 1.0 / p);
 }
 
 void main() {
@@ -187,7 +193,7 @@ void main() {
 
             for (int h = 0; h < 6; h++) {
                 //reduces tests for exit conditions (to minimise branching)
-                distanceToCenter = length(positionBHS);//distance to BH
+                distanceToCenter = customLength(positionBHS);//distance to BH
                 vec3 blackholeDir = -positionBHS / distanceToCenter;//direction to BH
                 float distanceToCenter2 = distanceToCenter * distanceToCenter;
 

@@ -226,10 +226,11 @@ export class Assets {
         return Assets.Banana.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
-    static CreateBananaClone(sizeInMeters = 0.2): Mesh {
-        const mesh = Assets.Banana.clone("bananaClone").getChildMeshes()[0] as Mesh;
-        mesh.isVisible = true;
+    static CreateBananaClone(sizeInMeters: number): Mesh {
+        const mesh = Assets.Banana.getChildMeshes()[0]?.clone("bananaClone" + Math.random(), null) as Mesh;
         mesh.scaling.scaleInPlace(5 * sizeInMeters);
+
+        mesh.isVisible = true;
 
         return mesh;
     }

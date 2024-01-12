@@ -33,7 +33,6 @@ const player = new DefaultControls(scene);
 player.speed = 0.2 * Settings.EARTH_RADIUS;
 player.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 100000;
 player.addInput(keyboard);
-player.addInput(mouse);
 player.addInput(gamepad);
 
 const spaceshipController = new ShipControls(scene);
