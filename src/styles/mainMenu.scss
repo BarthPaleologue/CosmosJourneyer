@@ -2,6 +2,7 @@
   position: absolute;
   width: 100vw;
   height: 100vh;
+
   h1 {
     font-family: 'Nasalization', sans-serif;
     font-size: 8em;
@@ -44,6 +45,47 @@
 
       &.disabled:hover {
         background: black;
+      }
+    }
+  }
+
+  #credits {
+    position: absolute;
+    width: 75vw;
+    right: 2.5vw;
+    height: 65vh;
+    bottom: 2.5vh;
+    transition: 0.1s;
+
+    opacity: 0;
+
+    &.visible {
+      opacity: 1;
+    }
+
+    box-shadow: 0 0 20px black;
+    background: rgba(0, 0, 0, 0.8);
+
+    h2 {
+      color: white;
+      text-align: center;
+      font-family: Nasalization, sans-serif;
+      font-size: 3em;
+    }
+
+    p {
+      color: white;
+      font-family: Nasalization, sans-serif;
+      text-align: center;
+    }
+
+    a {
+      color: white;
+      transition: 0.1s;
+      text-decoration: underline solid rgba(255, 255, 255, 0.5);
+
+      &:hover {
+        text-decoration: underline solid white;
       }
     }
   }

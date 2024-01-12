@@ -24,6 +24,7 @@ export class MainMenu {
     readonly starSystemController: StarSystemController;
 
     readonly onStartObservable = new Observable<void>();
+    readonly onCreditsObservable = new Observable<void>();
 
     private htmlRoot: HTMLElement | null = null;
     private title: HTMLElement | null = null;
@@ -102,6 +103,13 @@ export class MainMenu {
 
         document.getElementById("startButton")?.addEventListener("click", () => {
             this.startAnimation();
+        });
+
+        const creditsButton = document.getElementById("creditsButton");
+        if (creditsButton === null) throw new Error("#creditsButton does not exist!");
+        creditsButton.addEventListener("click", () => {
+            document.getElementById("credits")?.classList.toggle("visible");
+            this.onCreditsObservable.notifyObservers();
         });
     }
 
