@@ -14,6 +14,7 @@ uniform float time;
 
 uniform float accretionDiskRadius;
 uniform float rotationPeriod;
+uniform float warpingMinkowskiFactor;
 
 //TODO: make these uniforms
 const float accretionDiskHeight = 100.0;
@@ -142,6 +143,11 @@ vec3 bendRay(vec3 rayDir, vec3 blackholeDir, float distanceToCenter2, float maxB
     return normalize(rayDir + bendForce * blackholeDir); //bend ray towards BH
 }
 
+float customLength(vec3 v) {
+    float p = warpingMinkowskiFactor;
+    return pow(pow(abs(v.x), p) + pow(abs(v.y), p) + pow(abs(v.z), p), 1.0 / p);
+}
+
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
@@ -187,7 +193,7 @@ void main() {
 
             for (int h = 0; h < 6; h++) {
                 //reduces tests for exit conditions (to minimise branching)
-                distanceToCenter = length(positionBHS);//distance to BH
+                distanceToCenter = customLength(positionBHS);//distance to BH
                 vec3 blackholeDir = -positionBHS / distanceToCenter;//direction to BH
                 float distanceToCenter2 = distanceToCenter * distanceToCenter;
 
