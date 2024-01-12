@@ -25,6 +25,7 @@ export class MainMenu {
 
     readonly onStartObservable = new Observable<void>();
 
+    private htmlRoot: HTMLElement | null = null;
     private title: HTMLElement | null = null;
 
     constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
@@ -91,6 +92,10 @@ export class MainMenu {
 
         document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
 
+        const htmlRoot = document.getElementById("mainMenu");
+        if (htmlRoot === null) throw new Error("#mainMenu does not exist!");
+        this.htmlRoot = htmlRoot;
+
         const title = document.querySelector("#mainMenu h1");
         if (title === null) throw new Error("#mainMenu h1 does not exist!");
         this.title = title as HTMLElement;
@@ -144,8 +149,8 @@ export class MainMenu {
             if (!rotationAnimation.isFinished()) rotationAnimation.update(deltaTime);
             else {
                 this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
-                if (this.title === null) throw new Error("Title is null");
-                this.title.style.opacity = "0";
+                if (this.htmlRoot === null) throw new Error("MainMenu is null");
+                this.htmlRoot.style.display = "none";
                 this.onStartObservable.notifyObservers();
             }
 
