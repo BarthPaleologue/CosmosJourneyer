@@ -18,11 +18,7 @@ varying vec3 vPosition;
 varying mat4 normalMatrix;
 varying vec3 vNormal;
 
-// rotation using https://www.wikiwand.com/en/Rodrigues%27_rotation_formula
-vec3 rotateAround(vec3 vector, vec3 axis, float theta) {
-    // Please note that unit vector are required, i did not divided by the norms
-    return cos(theta) * vector + cross(axis, vector) * sin(theta) + axis * dot(axis, vector) * (1.0 - cos(theta));
-}
+#include "../utils/rotateAround.glsl";
 
 float easeOut(float t, float a) {
     return 1.0 - pow(1.0 - t, a);
@@ -32,7 +28,7 @@ float easeIn(float t, float alpha) {
     return pow(t, alpha);
 }
 
-#pragma glslify: remap = require(./remap.glsl)
+#include "../utils/remap.glsl";
 
 #include<instancesDeclaration>
 

@@ -2,6 +2,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { createGrassMaterial } from "./grassMaterial";
 
 // rotation using https://www.wikiwand.com/en/Rodrigues%27_rotation_formula
 function rotateAround(vector: Vector3, axis: Vector3, theta: number) {
@@ -81,6 +82,8 @@ export function createGrassBlade(scene: Scene, nbStacks: number) {
 
   const grassBlade = new Mesh("grassBlade", scene);
   vertexData.applyToMesh(grassBlade);
+
+  grassBlade.material = createGrassMaterial(scene);
 
   return grassBlade;
 }
