@@ -22,10 +22,7 @@ export interface IPatch {
      */
     getNbInstances(): number;
 
-    /**
-     * Returns the position of the patch.
-     */
-    getPosition(): Vector3;
+    setEnabled(enabled: boolean): void;
 
     /**
      * Disposes the patch and all its instances and buffers.

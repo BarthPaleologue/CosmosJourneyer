@@ -6,15 +6,15 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export class HierarchyInstancePatch implements IPatch {
     private baseRoot: TransformNode | null = null;
-    readonly position: Vector3;
 
     readonly instances: TransformNode[] = [];
     private positions: Vector3[] = [];
     private rotations: Quaternion[] = [];
     private scalings: Vector3[] = [];
+    readonly parent: TransformNode;
 
-    constructor(position: Vector3, matrixBuffer: Float32Array) {
-        this.position = position;
+    constructor(parent: TransformNode, matrixBuffer: Float32Array) {
+        this.parent = parent;
 
         // decompose matrix buffer into position, rotation and scaling
         for (let i = 0; i < matrixBuffer.length; i += 16) {
@@ -40,9 +40,9 @@ export class HierarchyInstancePatch implements IPatch {
         this.baseRoot = null;
     }
 
-    public static CreateSquare(position: Vector3, size: number, resolution: number) {
+    public static CreateSquare(parent: TransformNode, position: Vector3, size: number, resolution: number) {
         const buffer = createSquareMatrixBuffer(position, size, resolution);
-        return new HierarchyInstancePatch(position, buffer);
+        return new HierarchyInstancePatch(parent, buffer);
     }
 
     public createInstances(baseRoot: TransformNode): void {
@@ -67,13 +67,14 @@ export class HierarchyInstancePatch implements IPatch {
         }
     }
 
+    public setEnabled(enabled: boolean) {
+        if (this.baseRoot === null) return;
+        this.baseRoot.setEnabled(enabled);
+    }
+
     public getNbInstances(): number {
         if (this.baseRoot === null) return 0;
         return this.instances.length;
-    }
-
-    public getPosition(): Vector3 {
-        return this.position;
     }
 
     public dispose() {

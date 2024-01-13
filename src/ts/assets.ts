@@ -164,12 +164,11 @@ export class Assets {
 
         const rockTask = Assets.manager.addMeshTask("rockTask", "", "", rock);
         rockTask.onSuccess = function (task: MeshAssetTask) {
-            Assets.Rock = task.loadedMeshes[0] as Mesh;
+            Assets.Rock = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
+            Assets.Rock.position.y = 0.1;
+            Assets.Rock.scaling.scaleInPlace(0.2);
+            Assets.Rock.bakeCurrentTransformIntoVertices();
             Assets.Rock.isVisible = false;
-
-            for (const mesh of Assets.Rock.getChildMeshes()) {
-                mesh.isVisible = false;
-            }
 
             console.log("Rock loaded");
         };

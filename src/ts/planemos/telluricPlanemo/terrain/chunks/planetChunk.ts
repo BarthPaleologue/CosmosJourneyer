@@ -16,6 +16,8 @@ import { Assets } from "../../../../assets";
 import { CollisionMask } from "../../../../settings";
 import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { IPatch } from "../instancePatch/iPatch";
+import { HierarchyInstancePatch } from "../instancePatch/hierarchyInstancePatch";
 
 export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
@@ -30,7 +32,7 @@ export class PlanetChunk implements Transformable {
 
     private readonly parent: TransformNode;
 
-    private readonly instancePatches: ThinInstancePatch[] = [];
+    private readonly instancePatches: IPatch[] = [];
 
     readonly onDestroyPhysicsShapeObservable = new Observable<number>();
 
@@ -127,8 +129,8 @@ export class PlanetChunk implements Transformable {
 
         this.onRecieveVertexDataObservable.notifyObservers();
 
-        const cubePatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 300));
-        cubePatch.createInstances(Assets.ScatterCube);
+        const cubePatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 100));
+        cubePatch.createInstances(Assets.Rock);
 
         this.instancePatches.push(cubePatch);
     }
