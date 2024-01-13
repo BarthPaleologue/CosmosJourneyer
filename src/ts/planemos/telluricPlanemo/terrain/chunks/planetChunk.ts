@@ -19,6 +19,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
 import { createGrassBlade } from "../../../../proceduralAssets/grass/grassBlade";
 import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
+import { createButterfly } from "../../../../proceduralAssets/butterfly/butterfly";
 
 export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
@@ -134,14 +135,18 @@ export class PlanetChunk implements Transformable {
 
         this.onRecieveVertexDataObservable.notifyObservers();
 
-        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 2));
+        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 4));
         rockPatch.createInstances(Assets.Rock);
         this.instancePatches.push(rockPatch);
 
         if(this.planetModel.physicalProperties.pressure > 0 && this.planetModel.physicalProperties.oceanLevel > 0) {
-            const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 3));
+            const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 6));
             treePatch.createInstances(Assets.Tree);
             this.instancePatches.push(treePatch);
+
+            const butterflyPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
+            butterflyPatch.createInstances(createButterfly(this.mesh.getScene()));
+            this.instancePatches.push(butterflyPatch);
 
             /*const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
             grassPatch.createInstances(createGrassBlade(this.mesh.getScene(), 3));
