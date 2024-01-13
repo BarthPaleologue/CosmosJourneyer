@@ -39,6 +39,8 @@ export class ChunkTree {
 
     private deleteSemaphores: DeleteSemaphore[] = [];
 
+    readonly planetModel: TelluricPlanemoModel;
+
     readonly planetName: string;
     readonly planetSeed: number;
     readonly terrainSettings: TerrainSettings;
@@ -64,6 +66,8 @@ export class ChunkTree {
         this.planetName = planetName;
         this.planetSeed = planetModel.seed;
         this.terrainSettings = planetModel.terrainSettings;
+
+        this.planetModel = planetModel;
 
         this.minDepth = 0;
 
@@ -172,7 +176,7 @@ export class ChunkTree {
             return newChunk;
         }
 
-        if(tree instanceof Array) {
+        if (tree instanceof Array) {
             return [
                 this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
                 this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
@@ -209,7 +213,7 @@ export class ChunkTree {
      * @returns The new Chunk
      */
     private createChunk(path: number[], chunkForge: ChunkForge): PlanetChunk {
-        const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.rootChunkLength, this.scene);
+        const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.planetModel, this.rootChunkLength, this.scene);
 
         chunk.onDestroyPhysicsShapeObservable.add((index) => {
             this.onChunkPhysicsShapeDeletedObservable.notifyObservers(index);

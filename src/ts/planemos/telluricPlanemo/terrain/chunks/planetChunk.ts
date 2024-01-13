@@ -17,8 +17,8 @@ import { CollisionMask } from "../../../../settings";
 import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
-import { HierarchyInstancePatch } from "../instancePatch/hierarchyInstancePatch";
 import { createGrassBlade } from "../../../../proceduralAssets/grass/grassBlade";
+import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
 
 export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
@@ -26,6 +26,8 @@ export class PlanetChunk implements Transformable {
     public readonly cubePosition: Vector3;
 
     private readonly transform: TransformNode;
+
+    readonly planetModel: TelluricPlanemoModel;
 
     readonly chunkSideLength: number;
 
@@ -49,7 +51,7 @@ export class PlanetChunk implements Transformable {
 
     private disposed = false;
 
-    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, scene: Scene) {
+    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanemoModel, rootLength: number, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;
@@ -57,6 +59,8 @@ export class PlanetChunk implements Transformable {
         this.chunkSideLength = rootLength / 2 ** this.depth;
 
         this.transform = new TransformNode(`${id}Transform`, scene);
+
+        this.planetModel = planetModel;
 
         this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
@@ -130,17 +134,19 @@ export class PlanetChunk implements Transformable {
 
         this.onRecieveVertexDataObservable.notifyObservers();
 
-        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 100));
+        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 1000));
         rockPatch.createInstances(Assets.Rock);
         this.instancePatches.push(rockPatch);
 
-        const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 150));
-        treePatch.createInstances(Assets.Tree);
-        this.instancePatches.push(treePatch);
+        if(this.planetModel.physicalProperties.pressure > 0 && this.planetModel.physicalProperties.oceanLevel > 0) {
+            const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 1500));
+            treePatch.createInstances(Assets.Tree);
+            this.instancePatches.push(treePatch);
 
-        const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
-        grassPatch.createInstances(createGrassBlade(this.mesh.getScene(), 1));
-        this.instancePatches.push(grassPatch);
+            const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
+            grassPatch.createInstances(createGrassBlade(this.mesh.getScene(), 3));
+            this.instancePatches.push(grassPatch);
+        }
     }
 
     public getAverageHeight(): number {
