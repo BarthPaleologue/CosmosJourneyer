@@ -107,7 +107,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
             mode: ColorMode.DEFAULT,
 
             snowColor: new Color3(0.7, 0.7, 0.7),
-            steepColor: new Color3(115, 100, 100).scaleInPlace(1 / 255),
+            steepColor: new Color3(60, 60, 60).scaleInPlace(1 / 255),
             plainColor: new Color3(
                 //TODO: make this better
                 Math.max(0.22 + centeredRand(model.rng, 82) / 20, 0),

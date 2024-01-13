@@ -121,7 +121,7 @@ terminaModel.orbit.period = 60 * 60;
 const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
 const planetModel = new TelluricPlanemoModel(0.4233609183800225, sunModel);
-planetModel.physicalProperties.minTemperature = -37;
+planetModel.physicalProperties.minTemperature = -55;
 planetModel.physicalProperties.maxTemperature = 30;
 
 planetModel.orbit.period = 60 * 60 * 24 * 365.25;
@@ -163,7 +163,7 @@ aresModel.physicalProperties.minTemperature = -30;
 aresModel.physicalProperties.maxTemperature = 20;
 aresModel.physicalProperties.pressure = 0.5;
 aresModel.physicalProperties.waterAmount = 0.2;
-aresModel.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * aresModel.physicalProperties.waterAmount * aresModel.physicalProperties.pressure;
+aresModel.physicalProperties.oceanLevel = 0;
 
 aresModel.orbit.period = 60 * 60 * 24 * 365.24;
 aresModel.orbit.radius = 4020 * planet.getRadius();
@@ -177,7 +177,7 @@ const ares = StarSystemHelper.makeTelluricPlanet(starSystem, aresModel);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.OCEAN), 1);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.CLOUDS), 1);
 
-ares.material.colorSettings.plainColor.copyFromFloats(143 / 255, 45 / 255, 45 / 255);
+ares.material.colorSettings.plainColor.copyFromFloats(139 / 255, 59 / 255, 24 / 255);
 ares.material.colorSettings.desertColor.copyFromFloats(178 / 255, 107 / 255, 42 / 255);
 ares.material.colorSettings.beachColor.copyFrom(ares.material.colorSettings.plainColor);
 ares.material.colorSettings.bottomColor.copyFrom(ares.material.colorSettings.plainColor.scale(0.9));

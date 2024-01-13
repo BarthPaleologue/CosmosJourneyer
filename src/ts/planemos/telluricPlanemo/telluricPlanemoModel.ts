@@ -59,7 +59,7 @@ export class TelluricPlanemoModel implements PlanemoModel {
             mass: mass,
             axialTilt: normalRandom(0, 0.2, this.rng, GENERATION_STEPS.AXIAL_TILT),
             rotationPeriod: (60 * 60 * 24) / 10,
-            minTemperature: randRangeInt(-50, 5, this.rng, 80),
+            minTemperature: randRangeInt(-60, 5, this.rng, 80),
             maxTemperature: randRangeInt(10, 50, this.rng, 81),
             pressure: Math.max(normalRandom(0.9, 0.2, this.rng, GENERATION_STEPS.PRESSURE), 0),
             waterAmount: Math.max(normalRandom(1.0, 0.3, this.rng, GENERATION_STEPS.WATER_AMOUNT), 0),
@@ -108,7 +108,7 @@ export class TelluricPlanemoModel implements PlanemoModel {
             max_mountain_height: 10e3,
             continent_base_height: this.physicalProperties.oceanLevel * 1.9,
 
-            mountains_frequency: (20 * this.radius) / 1000e3
+            mountains_frequency: (60 * this.radius) / 1000e3
         };
 
         if (this.isSatelliteOfTelluric) {

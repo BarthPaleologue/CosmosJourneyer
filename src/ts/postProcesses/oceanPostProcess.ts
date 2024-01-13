@@ -32,8 +32,8 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
 
         const oceanUniforms: OceanUniforms = {
             oceanRadius: planet.getBoundingRadius(),
-            depthModifier: 0.001,
-            alphaModifier: 0.001,
+            depthModifier: 0.0015,
+            alphaModifier: 0.0025,
             specularPower: 1.0,
             smoothness: 0.9,
             waveBlendingSharpness: 0.1,

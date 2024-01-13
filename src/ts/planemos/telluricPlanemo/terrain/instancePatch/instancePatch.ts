@@ -66,6 +66,11 @@ export class InstancePatch implements IPatch {
         }
     }
 
+    public setEnabled(enabled: boolean) {
+        if (this.baseMesh === null) return;
+        this.baseMesh.setEnabled(enabled);
+    }
+
     public getNbInstances(): number {
         if (this.baseMesh === null) return 0;
         return this.baseMesh.instances.length;

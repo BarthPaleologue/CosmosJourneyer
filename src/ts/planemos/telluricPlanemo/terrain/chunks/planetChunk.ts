@@ -14,6 +14,12 @@ import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";
 import { Assets } from "../../../../assets";
 import { CollisionMask } from "../../../../settings";
+import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { IPatch } from "../instancePatch/iPatch";
+import { createGrassBlade } from "../../../../proceduralAssets/grass/grassBlade";
+import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
+import { createButterfly } from "../../../../proceduralAssets/butterfly/butterfly";
 
 export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
@@ -22,13 +28,15 @@ export class PlanetChunk implements Transformable {
 
     private readonly transform: TransformNode;
 
+    readonly planetModel: TelluricPlanemoModel;
+
     readonly chunkSideLength: number;
 
     private loaded = false;
 
     private readonly parent: TransformNode;
 
-    private readonly instancePatches: ThinInstancePatch[] = [];
+    private readonly instancePatches: IPatch[] = [];
 
     readonly onDestroyPhysicsShapeObservable = new Observable<number>();
 
@@ -44,7 +52,7 @@ export class PlanetChunk implements Transformable {
 
     private disposed = false;
 
-    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, rootLength: number, scene: Scene) {
+    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanemoModel, rootLength: number, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;
@@ -52,6 +60,8 @@ export class PlanetChunk implements Transformable {
         this.chunkSideLength = rootLength / 2 ** this.depth;
 
         this.transform = new TransformNode(`${id}Transform`, scene);
+
+        this.planetModel = planetModel;
 
         this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
@@ -102,14 +112,14 @@ export class PlanetChunk implements Transformable {
         // The following is a code snippet to use the approximate normals of the mesh instead of
         // the analytic normals. This is useful for debugging purposes
         /*if(!analyticNormal) {
-            this.mesh.createNormals(true);
-            const normals = this.mesh.getVerticesData(VertexBuffer.NormalKind);
-            if (normals === null) throw new Error("Mesh has no normals");
-            for(let i = 0; i < normals.length; i++) {
-                normals[i] = -normals[i];
-            }
-            this.mesh.setVerticesData(VertexBuffer.NormalKind, normals);
-        }*/
+        this.mesh.createNormals(true);
+        const normals = this.mesh.getVerticesData(VertexBuffer.NormalKind);
+        if (normals === null) throw new Error("Mesh has no normals");
+        for(let i = 0; i < normals.length; i++) {
+            normals[i] = -normals[i];
+        }
+        this.mesh.setVerticesData(VertexBuffer.NormalKind, normals);
+    }*/
         this.mesh.freezeNormals();
 
         if (this.depth > 3) {
@@ -125,10 +135,23 @@ export class PlanetChunk implements Transformable {
 
         this.onRecieveVertexDataObservable.notifyObservers();
 
-        const cubePatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 300));
-        cubePatch.createInstances(Assets.ScatterCube);
+        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 4));
+        rockPatch.createInstances(Assets.Rock);
+        this.instancePatches.push(rockPatch);
 
-        this.instancePatches.push(cubePatch);
+        if(this.planetModel.physicalProperties.pressure > 0 && this.planetModel.physicalProperties.oceanLevel > 0) {
+            const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 6));
+            treePatch.createInstances(Assets.Tree);
+            this.instancePatches.push(treePatch);
+
+            const butterflyPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
+            butterflyPatch.createInstances(createButterfly(this.mesh.getScene()));
+            this.instancePatches.push(butterflyPatch);
+
+            /*const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
+            grassPatch.createInstances(createGrassBlade(this.mesh.getScene(), 3));
+            this.instancePatches.push(grassPatch);*/
+        }
     }
 
     public getAverageHeight(): number {
@@ -183,5 +206,25 @@ export class PlanetChunk implements Transformable {
         this.onRecieveVertexDataObservable.clear();
 
         this.disposed = true;
+    }
+
+    computeCulling(camera: Camera) {
+        if (!this.isReady()) return;
+
+        this.mesh.setEnabled(true); // this is needed to update the world matrix
+        this.getTransform().computeWorldMatrix(true);
+
+        const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
+        const dirToCenterOfPlanet = this.getTransform().getAbsolutePosition().subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+
+        const normalComponent = dirToCenterOfPlanet.scale(distanceVector.dot(dirToCenterOfPlanet));
+
+        const tangentialDistance = distanceVector.subtract(normalComponent).length();
+
+        this.instancePatches.forEach((patch) => {
+            patch.setEnabled(tangentialDistance < 200);
+        });
+
+        this.mesh.setEnabled(isSizeOnScreenEnough(this, camera));
     }
 }
