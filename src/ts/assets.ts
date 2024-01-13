@@ -1,4 +1,5 @@
-import "@babylonjs/loaders/glTF/2.0";
+import "@babylonjs/loaders";
+import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Animations/animatable";
 
@@ -19,12 +20,14 @@ import plumeParticle from "../asset/textures/plume.png";
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 
 import spaceship from "../asset/spaceship/spaceship2.glb";
-//import spacestation from "../asset/spacestation/spacestation.glb";
 import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
 import endeavorSpaceship from "../asset/spaceship/endeavour.glb";
 import character from "../asset/character.glb";
 import rock from "../asset/rock.glb";
+
+import tree from "../asset/tree/tree.babylon";
+import treeTexturePath from "../asset/tree/Tree.png";
 
 import ouchSound from "../asset/sound/ouch.mp3";
 import engineRunningSound from "../asset/sound/engineRunning.mp3";
@@ -70,8 +73,9 @@ export class Assets {
     private static Spacestation: Mesh;
     private static Banana: Mesh;
     private static Character: Mesh;
-    static Rock: Mesh;
 
+    public static Rock: Mesh;
+    public static Tree: Mesh;
     public static ScatterCube: Mesh;
 
     public static OuchSound: Sound;
@@ -172,6 +176,30 @@ export class Assets {
 
             console.log("Rock loaded");
         };
+
+        const treeTask = Assets.manager.addMeshTask("treeTask", "", "", tree);
+        treeTask.onSuccess = function (task: MeshAssetTask) {
+            Assets.Tree = task.loadedMeshes[0] as Mesh;
+            Assets.Tree.position.y = -1;
+            Assets.Tree.scaling.scaleInPlace(3);
+            Assets.Tree.bakeCurrentTransformIntoVertices();
+            Assets.Tree.isVisible = false;
+
+            const treeMaterial = new StandardMaterial("treeMaterial", scene);
+
+            treeMaterial.opacityTexture = null;
+            treeMaterial.backFaceCulling = false;
+
+            const treeTexture = new Texture(treeTexturePath, scene);
+            treeTexture.hasAlpha = true;
+
+            treeMaterial.diffuseTexture = treeTexture;
+            treeMaterial.specularColor.set(0, 0, 0);
+
+            Assets.Tree.material = treeMaterial;
+
+            console.log("Tree loaded");
+        }
 
         const ouchSoundTask = Assets.manager.addBinaryFileTask("ouchSoundTask", ouchSound);
         ouchSoundTask.onSuccess = function (task) {

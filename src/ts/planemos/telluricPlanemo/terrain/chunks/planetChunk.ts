@@ -130,7 +130,7 @@ export class PlanetChunk implements Transformable {
         this.onRecieveVertexDataObservable.notifyObservers();
 
         const cubePatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 100));
-        cubePatch.createInstances(Assets.Rock);
+        cubePatch.createInstances(Math.random() < 0.5 ? Assets.Rock : Assets.Tree);
 
         this.instancePatches.push(cubePatch);
     }
