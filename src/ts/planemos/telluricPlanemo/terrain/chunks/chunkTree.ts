@@ -149,6 +149,8 @@ export class ChunkTree {
      * @returns The updated tree
      */
     private updateLODRecursively(observerPositionW: Vector3, chunkForge: ChunkForge, tree: quadTree = this.tree, walked: number[] = []): quadTree {
+        if (walked.length == this.maxDepth) return tree;
+
         const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, getRotationQuaternion(this.parent));
         const nodePositionW = nodeRelativePosition.add(this.parent.getAbsolutePosition());
 
@@ -157,21 +159,29 @@ export class ChunkTree {
         const chunkApproxPosition = nodePositionW.add(direction.scale(additionalHeight));
         const distanceToNodeSquared = Vector3.DistanceSquared(chunkApproxPosition, observerPositionW);
 
-        if (walked.length >= this.maxDepth) return tree;
+        const subdivisionDistanceThreshold = Settings.CHUNK_RENDER_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** walked.length);
+        const deletionDistanceThreshold = 20e3 + 1.5 * subdivisionDistanceThreshold;
 
-        const distanceThreshold = Settings.CHUNK_RENDER_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** walked.length);
-
-        if (distanceToNodeSquared < distanceThreshold ** 2 || walked.length < this.minDepth) {
-            // if the node is near the camera or if we are loading minimal LOD
-            if (tree instanceof Array && tree.length === 4) {
-                return [
-                    this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
-                    this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
-                    this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
-                    this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
-                ];
+        // the 1.5 is to avoid creation/deletion oscillations
+        if (distanceToNodeSquared > deletionDistanceThreshold ** 2 && walked.length >= this.minDepth && tree instanceof Array) {
+            const newChunk = this.createChunk(walked, chunkForge);
+            if (tree.length === 0 && walked.length === 0) {
+                return newChunk;
             }
+            this.requestDeletion(tree, [newChunk]);
+            return newChunk;
+        }
 
+        if(tree instanceof Array) {
+            return [
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
+            ];
+        }
+
+        if (distanceToNodeSquared < subdivisionDistanceThreshold ** 2 || walked.length < this.minDepth) {
             if (tree instanceof PlanetChunk) {
                 if (!tree.isReady()) return tree;
                 if (!tree.mesh.isVisible) return tree;
@@ -189,22 +199,7 @@ export class ChunkTree {
 
         if (tree instanceof PlanetChunk) return tree;
 
-        // the 1.5 is to avoid creation/deletion oscillations
-        if (distanceToNodeSquared > (20e3 + 1.1 * distanceThreshold) ** 2 && walked.length >= this.minDepth) {
-            const newChunk = this.createChunk(walked, chunkForge);
-            if (tree.length === 0 && walked.length === 0) {
-                return newChunk;
-            }
-            this.requestDeletion(tree, [newChunk]);
-            return newChunk;
-        }
-
-        return [
-            this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
-            this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
-            this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
-            this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
-        ];
+        throw new Error("This should never happen");
     }
 
     /**
@@ -241,8 +236,8 @@ export class ChunkTree {
         this.executeOnEveryChunk((chunk) => {
             chunk.registerPhysicsShapeDeletion(index);
         });
-        for (const mutex of this.deleteSemaphores) {
-            for (const chunk of mutex.chunksToDelete) {
+        for (const deleteSemaphore of this.deleteSemaphores) {
+            for (const chunk of deleteSemaphore.chunksToDelete) {
                 chunk.registerPhysicsShapeDeletion(index);
             }
         }
