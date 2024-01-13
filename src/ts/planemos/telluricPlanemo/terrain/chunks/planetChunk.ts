@@ -129,10 +129,13 @@ export class PlanetChunk implements Transformable {
 
         this.onRecieveVertexDataObservable.notifyObservers();
 
-        const cubePatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 100));
-        cubePatch.createInstances(Math.random() < 0.5 ? Assets.Rock : Assets.Tree);
+        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 100));
+        rockPatch.createInstances(Assets.Rock);
+        this.instancePatches.push(rockPatch);
 
-        this.instancePatches.push(cubePatch);
+        const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 150));
+        treePatch.createInstances(Assets.Tree);
+        this.instancePatches.push(treePatch);
     }
 
     public getAverageHeight(): number {
