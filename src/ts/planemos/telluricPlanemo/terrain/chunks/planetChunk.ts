@@ -199,14 +199,14 @@ export class PlanetChunk implements Transformable {
         this.getTransform().computeWorldMatrix(true);
 
         const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
-        const dirToCenterOfPlanet = this.getTransform().getAbsolutePosition().normalizeToNew();
+        const dirToCenterOfPlanet = this.getTransform().getAbsolutePosition().subtract(this.parent.getAbsolutePosition()).normalizeToNew();
 
         const normalComponent = dirToCenterOfPlanet.scale(distanceVector.dot(dirToCenterOfPlanet));
 
         const tangentialDistance = distanceVector.subtract(normalComponent).length();
 
         this.instancePatches.forEach((patch) => {
-            patch.setEnabled(tangentialDistance < 500);
+            patch.setEnabled(tangentialDistance < 200);
         });
 
         this.mesh.setEnabled(isSizeOnScreenEnough(this, camera));
