@@ -134,18 +134,18 @@ export class PlanetChunk implements Transformable {
 
         this.onRecieveVertexDataObservable.notifyObservers();
 
-        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 1000));
+        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 2));
         rockPatch.createInstances(Assets.Rock);
         this.instancePatches.push(rockPatch);
 
         if(this.planetModel.physicalProperties.pressure > 0 && this.planetModel.physicalProperties.oceanLevel > 0) {
-            const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 1500));
+            const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 3));
             treePatch.createInstances(Assets.Tree);
             this.instancePatches.push(treePatch);
 
-            const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
+            /*const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
             grassPatch.createInstances(createGrassBlade(this.mesh.getScene(), 3));
-            this.instancePatches.push(grassPatch);
+            this.instancePatches.push(grassPatch);*/
         }
     }
 

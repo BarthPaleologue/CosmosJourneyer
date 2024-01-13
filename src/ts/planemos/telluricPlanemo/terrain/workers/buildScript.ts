@@ -14,7 +14,7 @@ function handle_build(data: TransferBuildData): void {
     const size = data.planetDiameter / 2 ** data.depth;
     const space_between_vertices = size / nbSubdivisions;
     //console.log(data.depth, space_between_vertices);
-    const scatter_per_square_meter = space_between_vertices < Settings.MIN_DISTANCE_BETWEEN_VERTICES ? 4.0 : 0;
+    const scatter_per_square_meter = space_between_vertices < Settings.MIN_DISTANCE_BETWEEN_VERTICES ? 0.01 : 0;
 
     const flat_area = size * size;
     const max_nb_instances = Math.floor(flat_area * scatter_per_square_meter * 2.0);
