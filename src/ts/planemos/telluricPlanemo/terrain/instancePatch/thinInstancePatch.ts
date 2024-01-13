@@ -13,9 +13,9 @@ export class ThinInstancePatch {
     }
 
     /*public static CreateSquare(position: Vector3, size: number, resolution: number) {
-        const buffer = createSquareMatrixBuffer(position, size, resolution);
-        return new ThinInstancePatch(position, buffer);
-    }*/
+      const buffer = createSquareMatrixBuffer(position, size, resolution);
+      return new ThinInstancePatch(position, buffer);
+  }*/
 
     public clearInstances(): void {
         if (this.baseMesh === null) return;
@@ -43,6 +43,15 @@ export class ThinInstancePatch {
     public getNbInstances(): number {
         if (this.baseMesh === null) return 0;
         return this.baseMesh.thinInstanceCount;
+    }
+
+    public setEnabled(enabled: boolean) {
+        if (this.baseMesh === null) return;
+        if (enabled) {
+            this.baseMesh.thinInstanceCount = this.matrixBuffer.length / 16;
+        } else {
+            this.baseMesh.thinInstanceCount = 0;
+        }
     }
 
     public dispose() {

@@ -245,12 +245,7 @@ export class ChunkTree {
 
     public computeCulling(camera: Camera): void {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
-            if (!chunk.isReady()) return;
-
-            chunk.mesh.setEnabled(true); // this is needed to update the world matrix
-            chunk.getTransform().computeWorldMatrix(true);
-
-            chunk.mesh.setEnabled(isSizeOnScreenEnough(chunk, camera));
+            chunk.computeCulling(camera);
         });
     }
 

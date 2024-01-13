@@ -14,6 +14,8 @@ import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";
 import { Assets } from "../../../../assets";
 import { CollisionMask } from "../../../../settings";
+import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
@@ -102,14 +104,14 @@ export class PlanetChunk implements Transformable {
         // The following is a code snippet to use the approximate normals of the mesh instead of
         // the analytic normals. This is useful for debugging purposes
         /*if(!analyticNormal) {
-            this.mesh.createNormals(true);
-            const normals = this.mesh.getVerticesData(VertexBuffer.NormalKind);
-            if (normals === null) throw new Error("Mesh has no normals");
-            for(let i = 0; i < normals.length; i++) {
-                normals[i] = -normals[i];
-            }
-            this.mesh.setVerticesData(VertexBuffer.NormalKind, normals);
-        }*/
+        this.mesh.createNormals(true);
+        const normals = this.mesh.getVerticesData(VertexBuffer.NormalKind);
+        if (normals === null) throw new Error("Mesh has no normals");
+        for(let i = 0; i < normals.length; i++) {
+            normals[i] = -normals[i];
+        }
+        this.mesh.setVerticesData(VertexBuffer.NormalKind, normals);
+    }*/
         this.mesh.freezeNormals();
 
         if (this.depth > 3) {
@@ -183,5 +185,25 @@ export class PlanetChunk implements Transformable {
         this.onRecieveVertexDataObservable.clear();
 
         this.disposed = true;
+    }
+
+    computeCulling(camera: Camera) {
+        if (!this.isReady()) return;
+
+        this.mesh.setEnabled(true); // this is needed to update the world matrix
+        this.getTransform().computeWorldMatrix(true);
+
+        const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
+        const dirToCenterOfPlanet = this.getTransform().getAbsolutePosition().normalizeToNew();
+
+        const normalComponent = dirToCenterOfPlanet.scale(distanceVector.dot(dirToCenterOfPlanet));
+
+        const tangentialDistance = distanceVector.subtract(normalComponent).length();
+
+        this.instancePatches.forEach((patch) => {
+            patch.setEnabled(tangentialDistance < 500);
+        });
+
+        this.mesh.setEnabled(isSizeOnScreenEnough(this, camera));
     }
 }
