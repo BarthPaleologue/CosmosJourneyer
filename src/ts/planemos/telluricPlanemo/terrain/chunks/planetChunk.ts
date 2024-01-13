@@ -18,6 +18,7 @@ import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen"
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
 import { HierarchyInstancePatch } from "../instancePatch/hierarchyInstancePatch";
+import { createGrassBlade } from "../../../../proceduralAssets/grass/grassBlade";
 
 export class PlanetChunk implements Transformable {
     public readonly mesh: Mesh;
@@ -136,6 +137,10 @@ export class PlanetChunk implements Transformable {
         const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 150));
         treePatch.createInstances(Assets.Tree);
         this.instancePatches.push(treePatch);
+
+        const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
+        grassPatch.createInstances(createGrassBlade(this.mesh.getScene(), 1));
+        this.instancePatches.push(grassPatch);
     }
 
     public getAverageHeight(): number {
