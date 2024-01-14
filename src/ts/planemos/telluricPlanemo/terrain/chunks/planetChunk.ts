@@ -38,7 +38,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
     private readonly parent: TransformNode;
 
-    private readonly instancePatches: IPatch[] = [];
+    readonly instancePatches: IPatch[] = [];
 
     readonly onDestroyPhysicsShapeObservable = new Observable<number>();
 

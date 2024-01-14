@@ -214,6 +214,20 @@ if (aresAtmosphere) {
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
+    if(e.key === "x") {
+        let nbVertices = 0;
+        let nbInstances = 0;
+        planet.sides.forEach(side => {
+            side.executeOnEveryChunk((chunk) => {
+                nbVertices += Settings.VERTEX_RESOLUTION * Settings.VERTEX_RESOLUTION;
+                chunk.instancePatches.forEach(patch => {
+                    nbInstances += patch.getNbInstances();
+                });
+            });
+        });
+        console.log("Vertices", nbVertices, "Instances", nbInstances);
+    }
+
     if (e.key === "y") {
         if (starSystemView.scene.getActiveController() === spaceshipController) {
             console.log("disembark");
