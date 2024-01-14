@@ -114,14 +114,14 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         // The following is a code snippet to use the approximate normals of the mesh instead of
         // the analytic normals. This is useful for debugging purposes
         /*if(!analyticNormal) {
-        this.mesh.createNormals(true);
-        const normals = this.mesh.getVerticesData(VertexBuffer.NormalKind);
-        if (normals === null) throw new Error("Mesh has no normals");
-        for(let i = 0; i < normals.length; i++) {
-            normals[i] = -normals[i];
-        }
-        this.mesh.setVerticesData(VertexBuffer.NormalKind, normals);
-    }*/
+    this.mesh.createNormals(true);
+    const normals = this.mesh.getVerticesData(VertexBuffer.NormalKind);
+    if (normals === null) throw new Error("Mesh has no normals");
+    for(let i = 0; i < normals.length; i++) {
+        normals[i] = -normals[i];
+    }
+    this.mesh.setVerticesData(VertexBuffer.NormalKind, normals);
+}*/
         this.mesh.freezeNormals();
 
         if (this.depth > 3) {
@@ -137,11 +137,13 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         this.onRecieveVertexDataObservable.notifyObservers();
 
+        if (instancesMatrixBuffer.length === 0) return;
+
         const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
         rockPatch.createInstances(Assets.Rock);
         this.instancePatches.push(rockPatch);
 
-        if(this.planetModel.physicalProperties.pressure > 0 && this.planetModel.physicalProperties.oceanLevel > 0) {
+        if (this.planetModel.physicalProperties.pressure > 0 && this.planetModel.physicalProperties.oceanLevel > 0) {
             const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
             treePatch.createInstances(Assets.Tree);
             this.instancePatches.push(treePatch);
@@ -231,7 +233,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         const closestPointToCamera = this.getTransform().getAbsolutePosition().add(chunkToCameraDir.scale(this.getBoundingRadius()));
         const conservativeSphereNormal = closestPointToCamera.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
         const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
-        if(Vector3.Dot(observerToCenter, conservativeSphereNormal) < 0) {
+        if (Vector3.Dot(observerToCenter, conservativeSphereNormal) < 0) {
             this.mesh.setEnabled(false);
             return;
         }
