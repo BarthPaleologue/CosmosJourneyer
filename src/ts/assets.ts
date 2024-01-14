@@ -183,7 +183,6 @@ export class Assets {
             Assets.Tree.position.y = -1;
             Assets.Tree.scaling.scaleInPlace(3);
             Assets.Tree.bakeCurrentTransformIntoVertices();
-            Assets.Tree.isVisible = false;
 
             const treeMaterial = new StandardMaterial("treeMaterial", scene);
 
@@ -197,6 +196,8 @@ export class Assets {
             treeMaterial.specularColor.set(0, 0, 0);
 
             Assets.Tree.material = treeMaterial;
+
+            Assets.Tree.isVisible = false;
 
             console.log("Tree loaded");
         }
