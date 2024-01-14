@@ -20,8 +20,9 @@ import { IPatch } from "../instancePatch/iPatch";
 import { createGrassBlade } from "../../../../proceduralAssets/grass/grassBlade";
 import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
 import { createButterfly } from "../../../../proceduralAssets/butterfly/butterfly";
+import { BoundingSphere } from "../../../../bodies/common";
 
-export class PlanetChunk implements Transformable {
+export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
@@ -211,20 +212,30 @@ export class PlanetChunk implements Transformable {
     computeCulling(camera: Camera) {
         if (!this.isReady()) return;
 
-        this.mesh.setEnabled(true); // this is needed to update the world matrix
-        this.getTransform().computeWorldMatrix(true);
-
         const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
-        const dirToCenterOfPlanet = this.getTransform().getAbsolutePosition().subtract(this.parent.getAbsolutePosition()).normalizeToNew();
 
-        const normalComponent = dirToCenterOfPlanet.scale(distanceVector.dot(dirToCenterOfPlanet));
+        // instance patches are not rendered when the chunk is too far
+        const sphereNormal = this.getTransform().getAbsolutePosition().subtract(this.parent.getAbsolutePosition()).normalizeToNew();
 
+        const normalComponent = sphereNormal.scale(distanceVector.dot(sphereNormal));
         const tangentialDistance = distanceVector.subtract(normalComponent).length();
 
         this.instancePatches.forEach((patch) => {
             patch.setEnabled(tangentialDistance < 200);
         });
 
+        // chunks on the other side of the planet are culled
+        // as chunks have dimensions, we use the bounding sphere to do conservative culling
+        const chunkToCameraDir = distanceVector.normalizeToNew();
+        const closestPointToCamera = this.getTransform().getAbsolutePosition().add(chunkToCameraDir.scale(this.getBoundingRadius()));
+        const conservativeSphereNormal = closestPointToCamera.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+        const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+        if(Vector3.Dot(observerToCenter, conservativeSphereNormal) < 0) {
+            this.mesh.setEnabled(false);
+            return;
+        }
+
+        // chunks are only rendered if they are big enough on screen
         this.mesh.setEnabled(isSizeOnScreenEnough(this, camera));
     }
 }
