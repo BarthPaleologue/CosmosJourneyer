@@ -135,22 +135,22 @@ export class PlanetChunk implements Transformable {
 
         this.onRecieveVertexDataObservable.notifyObservers();
 
-        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 4));
+        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
         rockPatch.createInstances(Assets.Rock);
         this.instancePatches.push(rockPatch);
 
         if(this.planetModel.physicalProperties.pressure > 0 && this.planetModel.physicalProperties.oceanLevel > 0) {
-            const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 6));
+            const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
             treePatch.createInstances(Assets.Tree);
             this.instancePatches.push(treePatch);
 
-            const butterflyPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
+            const butterflyPatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 800));
             butterflyPatch.createInstances(createButterfly(this.mesh.getScene()));
             this.instancePatches.push(butterflyPatch);
 
-            /*const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
+            const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
             grassPatch.createInstances(createGrassBlade(this.mesh.getScene(), 3));
-            this.instancePatches.push(grassPatch);*/
+            this.instancePatches.push(grassPatch);
         }
     }
 
