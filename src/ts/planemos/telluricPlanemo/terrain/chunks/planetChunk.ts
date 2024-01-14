@@ -20,8 +20,10 @@ import { IPatch } from "../instancePatch/iPatch";
 import { createGrassBlade } from "../../../../proceduralAssets/grass/grassBlade";
 import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
 import { createButterfly } from "../../../../proceduralAssets/butterfly/butterfly";
+import { BoundingSphere } from "../../../../bodies/common";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
-export class PlanetChunk implements Transformable {
+export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
@@ -72,8 +74,8 @@ export class PlanetChunk implements Transformable {
         this.transform.parent = parentAggregate.transformNode;
         this.mesh.parent = this.transform;
 
-        //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
-        //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_STRICT;
+        this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+        this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
 
         this.parent = parentAggregate.transformNode;
         this.parentAggregate = parentAggregate;
@@ -135,22 +137,22 @@ export class PlanetChunk implements Transformable {
 
         this.onRecieveVertexDataObservable.notifyObservers();
 
-        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 4));
+        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
         rockPatch.createInstances(Assets.Rock);
         this.instancePatches.push(rockPatch);
 
         if(this.planetModel.physicalProperties.pressure > 0 && this.planetModel.physicalProperties.oceanLevel > 0) {
-            const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 6));
+            const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
             treePatch.createInstances(Assets.Tree);
             this.instancePatches.push(treePatch);
 
-            const butterflyPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
+            const butterflyPatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 800));
             butterflyPatch.createInstances(createButterfly(this.mesh.getScene()));
             this.instancePatches.push(butterflyPatch);
 
-            /*const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
+            const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
             grassPatch.createInstances(createGrassBlade(this.mesh.getScene(), 3));
-            this.instancePatches.push(grassPatch);*/
+            this.instancePatches.push(grassPatch);
         }
     }
 
@@ -211,20 +213,30 @@ export class PlanetChunk implements Transformable {
     computeCulling(camera: Camera) {
         if (!this.isReady()) return;
 
-        this.mesh.setEnabled(true); // this is needed to update the world matrix
-        this.getTransform().computeWorldMatrix(true);
-
         const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
-        const dirToCenterOfPlanet = this.getTransform().getAbsolutePosition().subtract(this.parent.getAbsolutePosition()).normalizeToNew();
 
-        const normalComponent = dirToCenterOfPlanet.scale(distanceVector.dot(dirToCenterOfPlanet));
+        // instance patches are not rendered when the chunk is too far
+        const sphereNormal = this.getTransform().getAbsolutePosition().subtract(this.parent.getAbsolutePosition()).normalizeToNew();
 
+        const normalComponent = sphereNormal.scale(distanceVector.dot(sphereNormal));
         const tangentialDistance = distanceVector.subtract(normalComponent).length();
 
         this.instancePatches.forEach((patch) => {
             patch.setEnabled(tangentialDistance < 200);
         });
 
+        // chunks on the other side of the planet are culled
+        // as chunks have dimensions, we use the bounding sphere to do conservative culling
+        const chunkToCameraDir = distanceVector.normalizeToNew();
+        const closestPointToCamera = this.getTransform().getAbsolutePosition().add(chunkToCameraDir.scale(this.getBoundingRadius()));
+        const conservativeSphereNormal = closestPointToCamera.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+        const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+        if(Vector3.Dot(observerToCenter, conservativeSphereNormal) < 0) {
+            this.mesh.setEnabled(false);
+            return;
+        }
+
+        // chunks are only rendered if they are big enough on screen
         this.mesh.setEnabled(isSizeOnScreenEnough(this, camera));
     }
 }
