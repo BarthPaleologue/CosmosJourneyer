@@ -21,6 +21,7 @@ import { createGrassBlade } from "../../../../proceduralAssets/grass/grassBlade"
 import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
 import { createButterfly } from "../../../../proceduralAssets/butterfly/butterfly";
 import { BoundingSphere } from "../../../../bodies/common";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
 export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
@@ -73,8 +74,8 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.transform.parent = parentAggregate.transformNode;
         this.mesh.parent = this.transform;
 
-        //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
-        //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_STRICT;
+        this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+        this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
 
         this.parent = parentAggregate.transformNode;
         this.parentAggregate = parentAggregate;
