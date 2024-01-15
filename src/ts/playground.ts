@@ -12,7 +12,7 @@ import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setMaxLinVel } from "./utils/havok";
 import { TelluricPlanemo } from "./planemos/telluricPlanemo/telluricPlanemo";
-import { ChunkForge } from "./planemos/telluricPlanemo/terrain/chunks/chunkForge";
+import { ChunkForgeWorkers } from "./planemos/telluricPlanemo/terrain/chunks/chunkForgeWorkers";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
@@ -69,7 +69,7 @@ camera.attachPostProcess(atmosphere);
 const lensflare = new LensFlarePostProcess(star, scene);
 camera.attachPostProcess(lensflare);
 
-const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
+const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
 
 scene.onBeforeRenderObservable.add(() => {
     const deltaTime = scene.deltaTime / 1000;

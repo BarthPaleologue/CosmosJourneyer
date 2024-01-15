@@ -1,6 +1,5 @@
 import { PlanetChunk } from "./planetChunk";
 import { Direction } from "../../../../utils/direction";
-import { ChunkForge } from "./chunkForge";
 import { BuildTask, TaskType } from "./taskTypes";
 import { Settings } from "../../../../settings";
 import { getChunkSphereSpacePositionFromPath } from "../../../../utils/chunkUtils";
@@ -11,11 +10,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { DeleteSemaphore } from "./deleteSemaphore";
 import { UberScene } from "../../../../uberCore/uberScene";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
+import { ChunkForge } from "./chunkForge";
 
 /**
  * A quadTree is defined recursively
