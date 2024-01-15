@@ -4,6 +4,7 @@ import { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
 
 export class UberScene extends Scene {
     private activeController: Controls | null = null;
@@ -12,6 +13,7 @@ export class UberScene extends Scene {
     constructor(engine: Engine, performancePriority = ScenePerformancePriority.BackwardCompatible) {
         super(engine);
         this.performancePriority = performancePriority;
+        this.clearColor = new Color4(0, 0, 0, 0);
     }
 
     public getDepthRenderer(): DepthRenderer {
