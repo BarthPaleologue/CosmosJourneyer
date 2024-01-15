@@ -32,7 +32,7 @@ void main() {
 
     vec2 starfieldUV = vec2(0.0);
 
-    if (screenColor == vec4(0.0)) {
+    if (depth == 1.0) {
         // get the starfield color
         // get spherical coordinates uv for the starfield texture
         starfieldUV = vec2(
