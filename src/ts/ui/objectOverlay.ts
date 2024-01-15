@@ -84,8 +84,8 @@ export class ObjectOverlay {
         const viewRay = camera.getDirection(LOCAL_DIRECTION.BACKWARD);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
-        const deltaDistance = Math.abs(distance - this.lastDistance);
-        const speed = deltaDistance > 0 ? deltaDistance / (camera.getScene().getEngine().getDeltaTime() / 1000) : 0;
+        const deltaDistance = this.lastDistance - distance;
+        const speed = deltaDistance != 0 ? deltaDistance / (camera.getScene().getEngine().getDeltaTime() / 1000) : 0;
         objectRay.scaleInPlace(1 / distance);
 
         if (Vector3.Dot(viewRay, objectRay) < 0) {
@@ -114,7 +114,8 @@ export class ObjectOverlay {
 
         this.distanceText.text = parseDistance(distance);
 
-        this.etaText.text = speed > 0 ? parseSeconds(distance / speed) : "∞";
+        const nbSeconds = distance / speed;
+        this.etaText.text = speed > 0 && nbSeconds < 60 * 60 * 24 ? parseSeconds(nbSeconds) : "∞";
 
         this.lastDistance = distance;
     }
