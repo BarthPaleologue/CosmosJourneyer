@@ -189,6 +189,7 @@ export class ChunkTree {
             if (tree instanceof PlanetChunk) {
                 if (!tree.isReady()) return tree;
                 if (!tree.mesh.isVisible) return tree;
+                if (!tree.mesh.isEnabled()) return tree;
             }
 
             const newTree = [
