@@ -15,12 +15,12 @@ import { TelluricPlanemo } from "./planemos/telluricPlanemo/telluricPlanemo";
 import { ChunkForge } from "./planemos/telluricPlanemo/terrain/chunks/chunkForge";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { FlatCloudsPostProcess } from "./postProcesses/clouds/flatCloudsPostProcess";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
 import { Star } from "./stellarObjects/star/star";
 import { LensFlarePostProcess } from "./postProcesses/lensFlarePostProcess";
 import { Settings } from "./settings";
 import { ScenePerformancePriority } from "@babylonjs/core";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -53,6 +53,7 @@ camera.attachControl(canvas, true);
 const planet = new TelluricPlanemo("xrPlanet", scene, 0.51, undefined);
 translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
 
+const hemiLight = new HemisphericLight("hemiLight", new Vector3(0, 1, 0), scene);
 const star = new Star("star", scene, 0.2); //PointLightWrapper(new PointLight("dir01", new Vector3(0, 1, 0), scene));
 translate(star.getTransform(), new Vector3(0, 0, -sphereRadius * 5000));
 
