@@ -17,9 +17,7 @@ import { CollisionMask } from "../../../../settings";
 import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
-import { createGrassBlade } from "../../../../proceduralAssets/grass/grassBlade";
 import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
-import { createButterfly } from "../../../../proceduralAssets/butterfly/butterfly";
 import { BoundingSphere } from "../../../../bodies/common";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
@@ -149,11 +147,11 @@ export class PlanetChunk implements Transformable, BoundingSphere {
             this.instancePatches.push(treePatch);
 
             const butterflyPatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 800));
-            butterflyPatch.createInstances(createButterfly(this.mesh.getScene()));
+            butterflyPatch.createInstances(Assets.Butterfly);
             this.instancePatches.push(butterflyPatch);
 
             const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
-            grassPatch.createInstances(createGrassBlade(this.mesh.getScene(), 3));
+            grassPatch.createInstances(Assets.GrassBlade);
             this.instancePatches.push(grassPatch);
         }
     }

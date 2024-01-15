@@ -45,6 +45,8 @@ import { Sound } from "@babylonjs/core/Audio/sound";
 
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
+import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
 
 export class Assets {
     static IS_READY = false;
@@ -77,6 +79,9 @@ export class Assets {
     public static Rock: Mesh;
     public static Tree: Mesh;
     public static ScatterCube: Mesh;
+
+    public static Butterfly: Mesh;
+    public static GrassBlade: Mesh;
 
     public static OuchSound: Sound;
     public static EngineRunningSound: Sound;
@@ -200,7 +205,11 @@ export class Assets {
             Assets.Tree.isVisible = false;
 
             console.log("Tree loaded");
-        }
+        };
+
+        Assets.Butterfly = createButterfly(scene);
+
+        Assets.GrassBlade = createGrassBlade(scene, 3);
 
         const ouchSoundTask = Assets.manager.addBinaryFileTask("ouchSoundTask", ouchSound);
         ouchSoundTask.onSuccess = function (task) {
