@@ -164,7 +164,7 @@ export class ChunkTree {
         const distanceToNodeSquared = Vector3.DistanceSquared(chunkApproxPosition, observerPositionW);
 
         const subdivisionDistanceThreshold = Settings.CHUNK_RENDER_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** walked.length);
-        const deletionDistanceThreshold = 20e3 + 1.5 * subdivisionDistanceThreshold;
+        const deletionDistanceThreshold = 10e3 + Settings.CHUNK_RENDER_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** (walked.length - 1));
 
         // the 1.5 is to avoid creation/deletion oscillations
         if (distanceToNodeSquared > deletionDistanceThreshold ** 2 && walked.length >= this.minDepth && tree instanceof Array) {

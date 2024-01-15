@@ -2,17 +2,22 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IPatch } from "./iPatch";
-import { createSquareMatrixBuffer } from "./matrixBuffer";
+import { applyTransformationToBuffer, createSquareMatrixBuffer } from "./matrixBuffer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Observer } from "@babylonjs/core";
 
 export class ThinInstancePatch implements IPatch {
     private baseMesh: Mesh | null = null;
     readonly matrixBuffer: Float32Array;
+    readonly rawMatrixBuffer: Float32Array;
+
     readonly parent: TransformNode;
+    private parentObserver: Observer<TransformNode> | null = null;
 
     constructor(parent: TransformNode, matrixBuffer: Float32Array) {
         this.parent = parent;
-        this.matrixBuffer = matrixBuffer;
+        this.rawMatrixBuffer = matrixBuffer;
+        this.matrixBuffer = applyTransformationToBuffer(parent.computeWorldMatrix(), this.rawMatrixBuffer);
     }
 
     public static CreateSquare(parent: TransformNode, position: Vector3, size: number, resolution: number) {
@@ -22,6 +27,7 @@ export class ThinInstancePatch implements IPatch {
 
     public clearInstances(): void {
         if (this.baseMesh === null) return;
+        this.parent.onAfterWorldMatrixUpdateObservable.remove(this.parentObserver);
         this.baseMesh.thinInstanceCount = 0;
         this.baseMesh.dispose();
         this.baseMesh = null;
@@ -35,12 +41,22 @@ export class ThinInstancePatch implements IPatch {
         this.baseMesh = baseMesh.clone();
         this.baseMesh.makeGeometryUnique();
 
-        this.baseMesh.parent = this.parent;
-        //this.baseMesh.computeWorldMatrix(true);
-        //this.baseMesh.parent = null;
+        let oldPosition = this.parent.getAbsolutePosition().clone();
+        this.parentObserver = this.parent.onAfterWorldMatrixUpdateObservable.add(() => {
+            const newPosition = this.parent.getAbsolutePosition();
+            if (newPosition.equals(oldPosition)) return;
+            oldPosition = newPosition.clone();
+            this.syncWithParent();
+        });
 
         this.baseMesh.isVisible = true;
         this.baseMesh.thinInstanceSetBuffer("matrix", this.matrixBuffer, 16);
+    }
+
+    public syncWithParent(): void {
+        if(this.baseMesh === null) throw new Error("Tried to sync with parent but no base mesh was set.");
+        this.matrixBuffer.set(applyTransformationToBuffer(this.parent.computeWorldMatrix(), this.rawMatrixBuffer));
+        this.baseMesh.thinInstanceBufferUpdated("matrix");
     }
 
     public getNbInstances(): number {
