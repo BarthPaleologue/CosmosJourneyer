@@ -1,6 +1,5 @@
 import { PlanetChunk } from "./planetChunk";
 import { Direction } from "../../../../utils/direction";
-import { ChunkForge } from "./chunkForge";
 import { BuildTask, TaskType } from "./taskTypes";
 import { Settings } from "../../../../settings";
 import { getChunkSphereSpacePositionFromPath } from "../../../../utils/chunkUtils";
@@ -11,11 +10,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { DeleteSemaphore } from "./deleteSemaphore";
 import { UberScene } from "../../../../uberCore/uberScene";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
+import { ChunkForge } from "./chunkForge";
 
 /**
  * A quadTree is defined recursively
@@ -48,7 +47,7 @@ export class ChunkTree {
     readonly parent: TransformNode;
     readonly parentAggregate: PhysicsAggregate;
 
-    readonly onChunkPhysicsShapeDeletedObservable = new Observable<number>();
+    readonly onChunkCreatedObservable = new Observable<PlanetChunk>();
 
     readonly material: Material;
 
@@ -61,7 +60,7 @@ export class ChunkTree {
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanemoModel, parentAggregate: PhysicsAggregate, material: Material, scene: UberScene) {
+    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanemoModel, parentAggregate: PhysicsAggregate,  material: Material, scene: UberScene) {
         this.rootChunkLength = planetModel.radius * 2;
         this.planetName = planetName;
         this.planetSeed = planetModel.seed;
@@ -189,6 +188,7 @@ export class ChunkTree {
             if (tree instanceof PlanetChunk) {
                 if (!tree.isReady()) return tree;
                 if (!tree.mesh.isVisible) return tree;
+                if (!tree.mesh.isEnabled()) return tree;
             }
 
             const newTree = [
@@ -215,8 +215,8 @@ export class ChunkTree {
     private createChunk(path: number[], chunkForge: ChunkForge): PlanetChunk {
         const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.planetModel, this.rootChunkLength, this.scene);
 
-        chunk.onDestroyPhysicsShapeObservable.add((index) => {
-            this.onChunkPhysicsShapeDeletedObservable.notifyObservers(index);
+        chunk.onRecieveVertexDataObservable.add(() => {
+            this.onChunkCreatedObservable.notifyObservers(chunk);
         });
 
         const buildTask: BuildTask = {
@@ -234,17 +234,6 @@ export class ChunkTree {
         chunkForge.addTask(buildTask);
 
         return chunk;
-    }
-
-    public registerPhysicsShapeDeletion(index: number): void {
-        this.executeOnEveryChunk((chunk) => {
-            chunk.registerPhysicsShapeDeletion(index);
-        });
-        for (const deleteSemaphore of this.deleteSemaphores) {
-            for (const chunk of deleteSemaphore.chunksToDelete) {
-                chunk.registerPhysicsShapeDeletion(index);
-            }
-        }
     }
 
     public computeCulling(camera: Camera): void {

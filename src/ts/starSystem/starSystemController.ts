@@ -19,8 +19,8 @@ import { rotateAround, setUpVector, translate } from "../uberCore/transforms/bas
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
 import { SystemSeed } from "../utils/systemSeed";
+import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
 
 export class StarSystemController {
     readonly scene: UberScene;

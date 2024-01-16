@@ -7,18 +7,18 @@ import { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/core/Engines/Extensions/engine.query";
 import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShape, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Transformable } from "../../../../uberCore/transforms/basicTransform";
 import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";
 import { Assets } from "../../../../assets";
-import { CollisionMask } from "../../../../settings";
 import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
 import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
 import { BoundingSphere } from "../../../../bodies/common";
+import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
 export class PlanetChunk implements Transformable, BoundingSphere {
@@ -38,12 +38,10 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
     readonly instancePatches: IPatch[] = [];
 
-    readonly onDestroyPhysicsShapeObservable = new Observable<number>();
-
     readonly onRecieveVertexDataObservable = new Observable<void>();
+    readonly onDisposeObservable = new Observable<void>();
 
-    private physicsShape: PhysicsShape | null = null;
-    physicsShapeIndex: number | null = null;
+    aggregate: PhysicsAggregate | null = null;
     readonly parentAggregate: PhysicsAggregate;
 
     private averageHeight = 0;
@@ -123,11 +121,13 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.mesh.freezeNormals();
 
         if (this.depth > 3) {
-            this.physicsShape = new PhysicsShapeMesh(this.mesh, this.mesh.getScene());
-            this.physicsShape.filterMembershipMask = CollisionMask.GROUND;
-            this.parentAggregate.shape.addChildFromParent(this.parent, this.physicsShape, this.mesh);
-            this.physicsShapeIndex = this.parentAggregate.shape.getNumChildren();
+            this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
+            this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+            this.aggregate.body.disablePreStep = false;
+            const constraint = new LockConstraint(Vector3.Zero(), this.getTransform().position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), this.mesh.getScene());
+            this.parentAggregate.body.addConstraint(this.aggregate.body, constraint);
         }
+
         this.mesh.setEnabled(true);
         this.loaded = true;
 
@@ -160,29 +160,6 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         return this.averageHeight;
     }
 
-    private destroyPhysicsShape() {
-        if (this.physicsShapeIndex === null) return;
-        if (this.physicsShapeIndex > this.parentAggregate.shape.getNumChildren() - 1) {
-            console.error(
-                `Tried to delete ${this.mesh.name} PhysicsShape. However its shape index was out of bound: ${this.physicsShapeIndex} / range 0 : ${
-                    this.parentAggregate.shape.getNumChildren() - 1
-                }`
-            );
-        }
-
-        this.parentAggregate.shape.removeChild(this.physicsShapeIndex);
-        this.physicsShape?.dispose();
-
-        this.onDestroyPhysicsShapeObservable.notifyObservers(this.physicsShapeIndex);
-    }
-
-    public registerPhysicsShapeDeletion(shapeIndex: number) {
-        if (this.physicsShapeIndex === null) return;
-        if (this.physicsShapeIndex > shapeIndex) {
-            this.physicsShapeIndex--;
-        }
-    }
-
     public getBoundingRadius(): number {
         return this.chunkSideLength / 2;
     }
@@ -200,12 +177,15 @@ export class PlanetChunk implements Transformable, BoundingSphere {
     }
 
     public dispose() {
-        this.destroyPhysicsShape();
+        this.onDisposeObservable.notifyObservers();
+
+        this.aggregate?.dispose();
         this.helpers.forEach((helper) => helper.dispose());
         this.instancePatches.forEach((patch) => patch.dispose());
         this.mesh.dispose();
         this.transform.dispose();
         this.onRecieveVertexDataObservable.clear();
+        this.onDisposeObservable.clear();
 
         this.disposed = true;
     }

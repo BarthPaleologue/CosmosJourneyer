@@ -12,9 +12,11 @@ import { TelluricPlanemoModel } from "./telluricPlanemoModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
-import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Transformable } from "../../uberCore/transforms/basicTransform";
+import { ChunkForge } from "./terrain/chunks/chunkForge";
+import { Observable } from "@babylonjs/core/Misc/observable";
+import { PlanetChunk } from "./terrain/chunks/planetChunk";
 
 export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMaterial {
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
@@ -22,6 +24,8 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
     readonly material: TelluricPlanemoMaterial;
 
     readonly model: TelluricPlanemoModel;
+
+    readonly onChunkCreatedObservable = new Observable<PlanetChunk>();
 
     /**
      * New Telluric Planet
@@ -70,13 +74,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
             new ChunkTree(Direction.Left, this.name, this.model, this.aggregate, this.material, scene)
         ];
 
-        for (const side of this.sides) {
-            side.onChunkPhysicsShapeDeletedObservable.add((index) => {
-                for (const side2 of this.sides) {
-                    side2.registerPhysicsShapeDeletion(index);
-                }
-            });
-        }
+        this.sides.forEach((side) => side.onChunkCreatedObservable.add((chunk) => this.onChunkCreatedObservable.notifyObservers(chunk)));
     }
 
     getTypeName(): string {

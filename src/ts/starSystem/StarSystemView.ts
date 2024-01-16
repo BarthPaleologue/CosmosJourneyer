@@ -18,8 +18,9 @@ import { positionNearObject } from "../utils/positionNearObject";
 import { ShipControls } from "../spaceship/shipControls";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
+import { ChunkForgeWorkers } from "../planemos/telluricPlanemo/terrain/chunks/chunkForgeWorkers";
 import "@babylonjs/core/Loading/loadingScreen";
+import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
@@ -29,13 +30,13 @@ export class StarSystemView {
     private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer();
     private readonly axisRenderer: AxisRenderer = new AxisRenderer();
 
-    private readonly ui: SystemUI;
+    readonly ui: SystemUI;
 
     private static readonly unZoomAnimation = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
     private starSystem: StarSystemController | null = null;
 
-    private readonly chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
+    private readonly chunkForge: ChunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
 
     constructor(engine: Engine, havokPlugin: HavokPlugin) {
         this.helmetOverlay = new HelmetOverlay();

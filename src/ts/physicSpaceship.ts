@@ -29,7 +29,7 @@ import { translate } from "./uberCore/transforms/basicTransform";
 import { StarModel } from "./stellarObjects/star/starModel";
 import { Keyboard } from "./inputs/keyboard";
 import { Star } from "./stellarObjects/star/star";
-import { ChunkForge } from "./planemos/telluricPlanemo/terrain/chunks/chunkForge";
+import { ChunkForgeWorkers } from "./planemos/telluricPlanemo/terrain/chunks/chunkForgeWorkers";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -63,7 +63,7 @@ hemiLight.intensity = 0.2;
 const shadowGenerator = new ShadowGenerator(1024, light);
 shadowGenerator.useBlurExponentialShadowMap = true;
 
-const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
+const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
 
 const keyboard = new Keyboard();
 

@@ -5,7 +5,7 @@ import { ObjectOverlay } from "./objectOverlay";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class SystemUI {
-    private readonly gui: AdvancedDynamicTexture;
+    readonly gui: AdvancedDynamicTexture;
     private objectOverlays: ObjectOverlay[] = [];
 
     private target: AbstractObject | null = null;
