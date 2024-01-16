@@ -19,6 +19,7 @@ import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
 import { BoundingSphere } from "../../../../bodies/common";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
 export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
@@ -69,8 +70,8 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.transform.parent = parentAggregate.transformNode;
         this.mesh.parent = this.transform;
 
-        //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
-        //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
+        this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+        this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
 
         this.parent = parentAggregate.transformNode;
         this.parentAggregate = parentAggregate;
