@@ -152,6 +152,8 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
             const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
             grassPatch.createInstances(Assets.GrassBlade);
+            //TODO: figure out how to pass the depthrenderer here
+            //this.depthRenderer.setMaterialForRendering([grassPatch.getBaseMesh()], Assets.GrassDepthMaterial);
             this.instancePatches.push(grassPatch);
         }
     }
