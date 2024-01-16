@@ -83,7 +83,7 @@ export function createGrassBlade(scene: Scene, nbStacks: number) {
   const grassBlade = new Mesh("grassBlade", scene);
   vertexData.applyToMesh(grassBlade);
 
-  grassBlade.material = createGrassMaterial(scene);
+  grassBlade.material = createGrassMaterial(scene, false);
 
   return grassBlade;
 }

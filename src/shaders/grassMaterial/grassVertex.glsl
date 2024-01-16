@@ -18,6 +18,13 @@ varying vec3 vPosition;
 varying mat4 normalMatrix;
 varying vec3 vNormal;
 
+// This is used to render the grass blade to the depth buffer properly
+// (see https://forum.babylonjs.com/t/how-to-write-shadermaterial-to-depthrenderer/47227/3 and https://playground.babylonjs.com/#6GFJNR#161)
+#ifdef FORDEPTH
+uniform vec2 depthValues;
+varying float vDepthMetric;
+#endif
+
 #include "../utils/rotateAround.glsl";
 
 float easeOut(float t, float a) {
@@ -84,4 +91,8 @@ void main() {
     normalMatrix = transpose(inverse(finalWorld));
 
     vNormal = leaningNormal;
+
+    #ifdef FORDEPTH
+    vDepthMetric = ((-gl_Position.z + depthValues.x) / (depthValues.y));
+    #endif
 }

@@ -47,6 +47,8 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
+import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import { createGrassMaterial } from "./proceduralAssets/grass/grassMaterial";
 
 export class Assets {
     static IS_READY = false;
@@ -81,7 +83,10 @@ export class Assets {
     public static ScatterCube: Mesh;
 
     public static Butterfly: Mesh;
+
     public static GrassBlade: Mesh;
+    public static GrassMaterial: ShaderMaterial;
+    public static GrassDepthMaterial: ShaderMaterial;
 
     public static OuchSound: Sound;
     public static EngineRunningSound: Sound;
@@ -210,6 +215,8 @@ export class Assets {
         Assets.Butterfly = createButterfly(scene);
 
         Assets.GrassBlade = createGrassBlade(scene, 3);
+        Assets.GrassMaterial = createGrassMaterial(scene, false);
+        Assets.GrassDepthMaterial = createGrassMaterial(scene, true);
 
         const ouchSoundTask = Assets.manager.addBinaryFileTask("ouchSoundTask", ouchSound);
         ouchSoundTask.onSuccess = function (task) {
