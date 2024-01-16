@@ -21,7 +21,6 @@ import { Mouse } from "./inputs/mouse";
 import { Keyboard } from "./inputs/keyboard";
 import { StarModel } from "./stellarObjects/star/starModel";
 import { RingsUniforms } from "./postProcesses/rings/ringsUniform";
-import { SpaceStation } from "./spacestation/spaceStation";
 import { getMoonSeed } from "./planemos/common";
 
 import { Gamepad } from "./inputs/gamepad";
@@ -131,6 +130,7 @@ planetModel.orbit.normalToPlane = Vector3.Up();
 const planet = StarSystemHelper.makeTelluricPlanet(starSystem, planetModel);
 planet.model.ringsUniforms = new RingsUniforms(planet.model.rng);
 planet.postProcesses.push(PostProcessType.RING);
+
 
 //const spacestation = new SpaceStation(starSystemView.scene, planet);
 //starSystemView.getStarSystem().addSpaceStation(spacestation);

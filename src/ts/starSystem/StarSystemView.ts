@@ -30,7 +30,7 @@ export class StarSystemView {
     private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer();
     private readonly axisRenderer: AxisRenderer = new AxisRenderer();
 
-    private readonly ui: SystemUI;
+    readonly ui: SystemUI;
 
     private static readonly unZoomAnimation = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 

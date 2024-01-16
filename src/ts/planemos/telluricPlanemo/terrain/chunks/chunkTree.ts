@@ -47,7 +47,7 @@ export class ChunkTree {
     readonly parent: TransformNode;
     readonly parentAggregate: PhysicsAggregate;
 
-    readonly onChunkPhysicsShapeDeletedObservable = new Observable<number>();
+    readonly onChunkCreatedObservable = new Observable<PlanetChunk>();
 
     readonly material: Material;
 
@@ -60,7 +60,7 @@ export class ChunkTree {
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanemoModel, parentAggregate: PhysicsAggregate, material: Material, scene: UberScene) {
+    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanemoModel, parentAggregate: PhysicsAggregate,  material: Material, scene: UberScene) {
         this.rootChunkLength = planetModel.radius * 2;
         this.planetName = planetName;
         this.planetSeed = planetModel.seed;
@@ -215,8 +215,8 @@ export class ChunkTree {
     private createChunk(path: number[], chunkForge: ChunkForge): PlanetChunk {
         const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.planetModel, this.rootChunkLength, this.scene);
 
-        chunk.onDestroyPhysicsShapeObservable.add((index) => {
-            this.onChunkPhysicsShapeDeletedObservable.notifyObservers(index);
+        chunk.onRecieveVertexDataObservable.add(() => {
+            this.onChunkCreatedObservable.notifyObservers(chunk);
         });
 
         const buildTask: BuildTask = {
@@ -234,17 +234,6 @@ export class ChunkTree {
         chunkForge.addTask(buildTask);
 
         return chunk;
-    }
-
-    public registerPhysicsShapeDeletion(index: number): void {
-        this.executeOnEveryChunk((chunk) => {
-            chunk.registerPhysicsShapeDeletion(index);
-        });
-        for (const deleteSemaphore of this.deleteSemaphores) {
-            for (const chunk of deleteSemaphore.chunksToDelete) {
-                chunk.registerPhysicsShapeDeletion(index);
-            }
-        }
     }
 
     public computeCulling(camera: Camera): void {
