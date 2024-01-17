@@ -152,7 +152,8 @@ export class PostProcessManager {
             return this.starFields;
         });
 
-        this.bloomRenderEffect = new BloomEffect(scene, 1, 0.3, 32);
+        this.bloomRenderEffect = new BloomEffect(scene, 1.0, 1.0, 32);
+        this.bloomRenderEffect.threshold = 0.7;
     }
 
     /**
