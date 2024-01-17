@@ -79,6 +79,7 @@ export class WarpTunnel implements Transformable {
         );
 
         this.spaceLines = rain;
+        this.spaceLines.setEnabled(false);
         this.warpCone = MeshBuilder.CreateCylinder(
             "cone",
             {
@@ -105,7 +106,7 @@ export class WarpTunnel implements Transformable {
         warpConeMaterial.setTexture("warpNoise", Assets.WarpNoise);
 
         this.warpCone.material = warpConeMaterial;
-        //this.warpCone.setEnabled(false);
+        this.warpCone.setEnabled(false);
 
         let clock = 0.0;
         scene.registerBeforeRender(() => {

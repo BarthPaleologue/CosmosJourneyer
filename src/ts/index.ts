@@ -28,6 +28,8 @@ import { CharacterControls } from "./spacelegs/characterControls";
 import { SystemSeed } from "./utils/systemSeed";
 import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
 import { WarpTunnel } from "./utils/warpTunnel";
+import { Particle } from "@babylonjs/core/Particles/particle";
+import { TransformNode } from "@babylonjs/core/Meshes";
 
 const engine = new CosmosJourneyer();
 
@@ -59,20 +61,44 @@ characterController.getActiveCamera().maxZ = maxZ;
 characterController.addInput(keyboard);
 characterController.addInput(gamepad);
 
-/*const particleSystem = new ParticleSystem("hyperspace", 10000, starSystemView.scene);
+const particleSystem = new ParticleSystem("hyperspace", 20_000, starSystemView.scene);
 particleSystem.particleTexture = Assets.PlumeParticle;
 particleSystem.emitter = spaceshipController.instanceRoot;
-particleSystem.isLocal = true;
-particleSystem.minEmitPower = 400;
-particleSystem.maxEmitPower = 400;
-particleSystem.emitRate = 100;
-particleSystem.color1 = new Color4(0.8, 0.8, 0.3, 1.0);
-particleSystem.color2.copyFrom(particleSystem.color1);
-particleSystem.colorDead.copyFrom(particleSystem.color1);
-particleSystem.minLifeTime = 5;
-particleSystem.maxLifeTime = 5;
-particleSystem.minScaleX = 10;
-particleSystem.startPositionFunction = (worldMatrix, positionToUpdate, particle) => {
+particleSystem.minLifeTime = 15;
+particleSystem.maxLifeTime = 15;
+particleSystem.blendMode = ParticleSystem.BLENDMODE_ADD;
+particleSystem.minEmitPower = 10;
+particleSystem.maxEmitPower = 10;
+particleSystem.updateSpeed = 0.05;
+particleSystem.preWarmCycles = 100;
+particleSystem.preWarmStepOffset = 5;
+particleSystem.minSize = 0.2;
+particleSystem.maxSize = 0.2;
+particleSystem.minScaleY = particleSystem.maxScaleY = 10;
+//particleSystem.isLocal = true;
+particleSystem.emitRate = 1000;
+particleSystem.billboardMode = ParticleSystem.BILLBOARDMODE_STRETCHED;
+
+particleSystem.addColorGradient(0, new Color4(0, 0, 1, 0.5));
+particleSystem.addColorGradient(0.25, new Color4(0, 1, 1, 1));
+particleSystem.addColorGradient(1, new Color4(1, 0, 1, 0));
+
+particleSystem.createDirectedCylinderEmitter(20, 5, 3, new Vector3(0, 1, 0), new Vector3(0, 1, 0));
+const anchor = new TransformNode('');
+anchor.position = new Vector3(0, 0, 100)
+anchor.rotation.x = -Math.PI / 2;
+particleSystem.emitter = anchor as any;
+anchor.parent = spaceshipController.getTransform();
+
+
+/*const oldFunc = Particle.prototype._inheritParticleInfoToSubEmitters.bind(Particle.prototype._inheritParticleInfoToSubEmitters);
+
+Particle.prototype._inheritParticleInfoToSubEmitters = function() {
+    oldFunc();
+    this.angle = Math.atan2(this.position.x, this.position.y); //Math.atan2(this.position.y, this.position.x);
+}*/
+
+/*particleSystem.startPositionFunction = (worldMatrix, positionToUpdate, particle) => {
     const basicPosition = new Vector3(0, 0, 100);
     positionToUpdate.copyFrom(basicPosition);
 }
@@ -82,8 +108,8 @@ particleSystem.startDirectionFunction = (worldMatrix, directionToUpdate, particl
     const offset = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale(0.2);
     const direction = basicDirection.add(offset).normalize();
     directionToUpdate.copyFrom(direction);
-}
-particleSystem.start();*/
+}*/
+particleSystem.start();
 
 // const physicsViewer = new PhysicsViewer();
 // physicsViewer.showBody(spaceshipController.aggregate.body);

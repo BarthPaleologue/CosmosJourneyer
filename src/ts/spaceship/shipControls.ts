@@ -173,14 +173,14 @@ export class ShipControls implements Controls {
         for (const thruster of this.mainThrusters) thruster.setThrottle(0);
         for (const thruster of this.rcsThrusters) thruster.deactivate();
         this.warpDrive.enable();
-        this.warpTunnel.spaceLines.setEnabled(true);
+        //this.warpTunnel.spaceLines.setEnabled(true);
     }
 
     public toggleWarpDrive() {
         if (!this.warpDrive.isEnabled()) this.enableWarpDrive();
         else {
             this.warpDrive.desengage();
-            this.warpTunnel.spaceLines.setEnabled(false);
+            //this.warpTunnel.spaceLines.setEnabled(false);
         }
     }
 
