@@ -26,8 +26,6 @@ export class PlanetChunk implements Transformable, BoundingSphere {
     private readonly depth: number;
     public readonly cubePosition: Vector3;
 
-    private readonly transform: TransformNode;
-
     readonly planetModel: TelluricPlanemoModel;
 
     readonly chunkSideLength: number;
@@ -57,8 +55,6 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         this.chunkSideLength = rootLength / 2 ** this.depth;
 
-        this.transform = new TransformNode(`${id}Transform`, scene);
-
         this.planetModel = planetModel;
 
         this.mesh = new Mesh(`Chunk${id}`, scene);
@@ -67,8 +63,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.mesh.material = material;
         //this.mesh.material = Assets.DebugMaterial(id, false, false);
 
-        this.transform.parent = parentAggregate.transformNode;
-        this.mesh.parent = this.transform;
+        this.mesh.parent = parentAggregate.transformNode;
 
         this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
         this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
@@ -87,11 +82,11 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         position.normalize().scaleInPlace(rootLength / 2);
 
-        this.transform.position = position;
+        this.getTransform().position = position;
     }
 
     public getTransform(): TransformNode {
-        return this.transform;
+        return this.mesh;
     }
 
     /**
@@ -183,7 +178,6 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.helpers.forEach((helper) => helper.dispose());
         this.instancePatches.forEach((patch) => patch.dispose());
         this.mesh.dispose();
-        this.transform.dispose();
         this.onRecieveVertexDataObservable.clear();
         this.onDisposeObservable.clear();
 
