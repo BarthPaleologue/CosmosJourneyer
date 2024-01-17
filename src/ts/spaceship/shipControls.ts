@@ -26,6 +26,7 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { CollisionMask } from "../settings";
+import { WarpTunnel } from "../utils/warpTunnel";
 
 enum ShipState {
     FLYING,
@@ -60,6 +61,8 @@ export class ShipControls implements Controls {
     };
 
     private inputs: Input[] = [];
+
+    private readonly warpTunnel: WarpTunnel;
 
     private readonly scene: Scene;
 
@@ -110,6 +113,10 @@ export class ShipControls implements Controls {
                 this.addRCSThruster(child);
             }
         }
+
+
+        this.warpTunnel = new WarpTunnel(new Vector3(0, 0, 1), scene);
+        this.warpTunnel.setParent(this.getTransform());
 
         this.scene = scene;
     }
@@ -166,11 +173,15 @@ export class ShipControls implements Controls {
         for (const thruster of this.mainThrusters) thruster.setThrottle(0);
         for (const thruster of this.rcsThrusters) thruster.deactivate();
         this.warpDrive.enable();
+        this.warpTunnel.spaceLines.setEnabled(true);
     }
 
     public toggleWarpDrive() {
         if (!this.warpDrive.isEnabled()) this.enableWarpDrive();
-        else this.warpDrive.desengage();
+        else {
+            this.warpDrive.desengage();
+            this.warpTunnel.spaceLines.setEnabled(false);
+        }
     }
 
     /**

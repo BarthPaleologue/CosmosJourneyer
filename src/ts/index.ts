@@ -8,7 +8,7 @@ import { DefaultControls } from "./defaultController/defaultControls";
 import { positionNearObject } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { ShipControls } from "./spaceship/shipControls";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TelluricPlanemoModel } from "./planemos/telluricPlanemo/telluricPlanemoModel";
@@ -26,6 +26,8 @@ import { getMoonSeed } from "./planemos/common";
 import { Gamepad } from "./inputs/gamepad";
 import { CharacterControls } from "./spacelegs/characterControls";
 import { SystemSeed } from "./utils/systemSeed";
+import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
+import { WarpTunnel } from "./utils/warpTunnel";
 
 const engine = new CosmosJourneyer();
 
@@ -56,6 +58,32 @@ characterController.getTransform().setEnabled(false);
 characterController.getActiveCamera().maxZ = maxZ;
 characterController.addInput(keyboard);
 characterController.addInput(gamepad);
+
+/*const particleSystem = new ParticleSystem("hyperspace", 10000, starSystemView.scene);
+particleSystem.particleTexture = Assets.PlumeParticle;
+particleSystem.emitter = spaceshipController.instanceRoot;
+particleSystem.isLocal = true;
+particleSystem.minEmitPower = 400;
+particleSystem.maxEmitPower = 400;
+particleSystem.emitRate = 100;
+particleSystem.color1 = new Color4(0.8, 0.8, 0.3, 1.0);
+particleSystem.color2.copyFrom(particleSystem.color1);
+particleSystem.colorDead.copyFrom(particleSystem.color1);
+particleSystem.minLifeTime = 5;
+particleSystem.maxLifeTime = 5;
+particleSystem.minScaleX = 10;
+particleSystem.startPositionFunction = (worldMatrix, positionToUpdate, particle) => {
+    const basicPosition = new Vector3(0, 0, 100);
+    positionToUpdate.copyFrom(basicPosition);
+}
+particleSystem.startDirectionFunction = (worldMatrix, directionToUpdate, particle) => {
+    const basicDirection = new Vector3(0, 0, -1);
+    const theta = Math.random() * Math.PI * 2;
+    const offset = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale(0.2);
+    const direction = basicDirection.add(offset).normalize();
+    directionToUpdate.copyFrom(direction);
+}
+particleSystem.start();*/
 
 // const physicsViewer = new PhysicsViewer();
 // physicsViewer.showBody(spaceshipController.aggregate.body);
