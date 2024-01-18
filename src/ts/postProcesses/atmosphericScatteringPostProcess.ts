@@ -10,7 +10,7 @@ import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { Transformable } from "../uberCore/transforms/basicTransform";
+import { Transformable } from "../architecture/transformable";
 
 export interface AtmosphereUniforms {
     atmosphereRadius: number;

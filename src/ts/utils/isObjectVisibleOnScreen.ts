@@ -1,7 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Transformable } from "../uberCore/transforms/basicTransform";
 import { BoundingSphere } from "../bodies/cullable";
+import { Transformable } from "../architecture/transformable";
 
 /**
  * Computes the angular size in radians of an object viewed by a camera

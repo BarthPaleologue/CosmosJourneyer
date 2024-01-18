@@ -1,5 +1,5 @@
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { Transformable } from "../uberCore/transforms/basicTransform";
+import { Transformable } from "../architecture/transformable";
 
 export interface UpdatablePostProcess extends PostProcess {
     /**

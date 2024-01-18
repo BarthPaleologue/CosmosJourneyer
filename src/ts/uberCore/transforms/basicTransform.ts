@@ -2,10 +2,6 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
-export function getPosition(transformNode: TransformNode): Vector3 {
-    return transformNode.position;
-}
-
 export function translate(transformNode: TransformNode, displacement: Vector3): void {
     transformNode.setAbsolutePosition(transformNode.getAbsolutePosition().add(displacement));
     transformNode.computeWorldMatrix(true);
@@ -130,11 +126,3 @@ export function yaw(transformNode: TransformNode, amount: number): void {
 }
 
 /* #endregion directions */
-
-export function dispose(transformNode: TransformNode): void {
-    transformNode.dispose();
-}
-
-export interface Transformable {
-    getTransform(): TransformNode;
-}

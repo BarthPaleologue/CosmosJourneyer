@@ -1,9 +1,9 @@
-import { Transformable } from "../uberCore/transforms/basicTransform";
 import { BoundingSphere } from "../bodies/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Transformable } from "../architecture/transformable";
 
 export class TransformNodeWrapper implements Transformable, BoundingSphere {
     readonly transform: TransformNode;
@@ -21,6 +21,10 @@ export class TransformNodeWrapper implements Transformable, BoundingSphere {
     getTransform(): TransformNode {
         return this.transform;
     }
+
+    dispose(): void {
+        this.transform.dispose();
+    }
 }
 
 export class DirectionalLightWrapper implements Transformable {
@@ -36,6 +40,11 @@ export class DirectionalLightWrapper implements Transformable {
     getTransform(): TransformNode {
         return this.transform;
     }
+
+    dispose() {
+        this.light.dispose();
+        this.transform.dispose();
+    }
 }
 
 export class PointLightWrapper implements Transformable {
@@ -50,5 +59,10 @@ export class PointLightWrapper implements Transformable {
 
     getTransform(): TransformNode {
         return this.transform;
+    }
+
+    dispose() {
+        this.light.dispose();
+        this.transform.dispose();
     }
 }

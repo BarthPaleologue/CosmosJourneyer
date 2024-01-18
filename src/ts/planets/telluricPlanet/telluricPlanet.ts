@@ -11,7 +11,7 @@ import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Transformable } from "../../uberCore/transforms/basicTransform";
+import { Transformable } from "../../architecture/transformable";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PlanetChunk } from "./terrain/chunks/planetChunk";

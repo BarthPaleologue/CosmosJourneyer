@@ -13,7 +13,7 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { Transformable } from "../uberCore/transforms/basicTransform";
+import { Transformable } from "../architecture/transformable";
 import { CelestialBody } from "../architecture/celestialBody";
 
 export class StarfieldPostProcess extends UberPostProcess {

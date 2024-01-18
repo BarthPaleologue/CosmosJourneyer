@@ -1,8 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Input } from "../inputs/input";
-
-import { Transformable } from "./transforms/basicTransform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Transformable } from "../architecture/transformable";
 
 export interface Controls extends Transformable {
     /**

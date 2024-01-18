@@ -3,7 +3,7 @@ import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { BoundingSphere } from "../bodies/cullable";
 import { Star } from "../stellarObjects/star/star";
-import { Transformable } from "../uberCore/transforms/basicTransform";
+import { Transformable } from "../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 
 export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
