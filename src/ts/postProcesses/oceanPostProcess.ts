@@ -7,7 +7,7 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { getInverseRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { BoundingSphere } from "../bodies/cullable";
+import { BoundingSphere } from "../architecture/boundingSphere";
 import { Assets } from "../assets";
 import { Transformable } from "../architecture/transformable";
 

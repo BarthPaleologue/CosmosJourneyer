@@ -2,7 +2,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { nearestBody } from "./nearestBody";
 import { Transformable } from "../architecture/transformable";
-import { BoundingSphere } from "../bodies/cullable";
+import { BoundingSphere } from "../architecture/boundingSphere";
 
 export function positionNearObject(transformable: Transformable, object: Transformable & BoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object

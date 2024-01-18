@@ -1,4 +1,4 @@
-import { BoundingSphere } from "../bodies/cullable";
+import { BoundingSphere } from "../architecture/boundingSphere";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CelestialBody } from "../architecture/celestialBody";
 import { Transformable } from "../architecture/transformable";
