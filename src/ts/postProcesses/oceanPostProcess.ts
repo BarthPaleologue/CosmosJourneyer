@@ -7,7 +7,7 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { getInverseRotationQuaternion, Transformable } from "../uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { BoundingSphere } from "../bodies/common";
+import { BoundingSphere } from "../bodies/cullable";
 import { Assets } from "../assets";
 
 export type OceanUniforms = {

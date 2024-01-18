@@ -68,11 +68,13 @@ export interface BaseModel {
     readonly childrenBodies: BaseModel[];
 }
 
+export interface HasBaseModel {
+    model: BaseModel;
+}
+
 export interface BodyModel extends BaseModel {
     readonly bodyType: BODY_TYPE;
     readonly radius: number;
-
-    readonly ringsUniforms: RingsUniforms | null;
 }
 
 export interface StellarObjectModel extends BodyModel {
@@ -86,6 +88,14 @@ export interface PlanemoModel extends BodyModel {
     nbMoons: number;
 
     getApparentRadius(): number;
+}
+
+export interface HasBodyModel extends HasBaseModel {
+    model: BodyModel;
+}
+
+export interface HasPlanemoModel extends HasBodyModel {
+    model: PlanemoModel;
 }
 
 export function depth(model: BaseModel): number {

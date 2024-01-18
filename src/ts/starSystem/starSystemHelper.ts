@@ -1,5 +1,4 @@
 import { StarSystemController } from "./starSystemController";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { Star } from "../stellarObjects/star/star";
 import { starName } from "../utils/parseToStrings";
@@ -10,13 +9,14 @@ import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { BODY_TYPE } from "../model/common";
+import { BODY_TYPE, HasPlanemoModel } from "../model/common";
 import { TelluricPlanemoModel } from "../planemos/telluricPlanemo/telluricPlanemoModel";
 import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
 import { GasPlanetModel } from "../planemos/gasPlanet/gasPlanetModel";
 import { GasPlanet } from "../planemos/gasPlanet/gasPlanet";
-import { Planemo } from "../planemos/planemo";
 import { getMoonSeed } from "../planemos/common";
+import { Planemo } from "../architecture/planemo";
+import { StellarObject } from "../architecture/stellarObject";
 
 export class StarSystemHelper {
     public static makeStar(starsystem: StarSystemController, model?: number | StarModel): Star {
@@ -124,7 +124,7 @@ export class StarSystemHelper {
                     StarSystemHelper.makeSatellites(starsystem, StarSystemHelper.makeGasPlanet(starsystem));
                     break;
                 case BODY_TYPE.MANDELBULB:
-                    StarSystemHelper.makeSatellites(starsystem, StarSystemHelper.makeMandelbulb(starsystem));
+                    StarSystemHelper.makeMandelbulb(starsystem);
                     break;
                 default:
                     throw new Error(`Unknown body type ${starsystem.model.getBodyTypeOfPlanet(starsystem.planets.length)}`);
@@ -134,7 +134,7 @@ export class StarSystemHelper {
 
     public static makeSatellite(
         starsystem: StarSystemController,
-        planet: Planemo,
+        planet: Planemo & HasPlanemoModel,
         model: TelluricPlanemoModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)
     ): TelluricPlanemo {
         const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, starsystem.scene, model, planet);
@@ -152,7 +152,7 @@ export class StarSystemHelper {
      * @param planet The planet to make satellites for
      * @param n The number of satellites to make
      */
-    public static makeSatellites(starsystem: StarSystemController, planet: Planemo, n = planet.model.nbMoons): void {
+    public static makeSatellites(starsystem: StarSystemController, planet: Planemo & HasPlanemoModel, n = planet.model.nbMoons): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
         if (planet.model.childrenBodies.length + n > planet.model.nbMoons)
             console.warn(

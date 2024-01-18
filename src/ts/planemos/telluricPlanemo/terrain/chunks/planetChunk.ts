@@ -16,7 +16,7 @@ import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen"
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
 import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
-import { BoundingSphere } from "../../../../bodies/common";
+import { BoundingSphere } from "../../../../bodies/cullable";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";

@@ -1,5 +1,5 @@
 import { Transformable } from "../uberCore/transforms/basicTransform";
-import { BoundingSphere } from "../bodies/common";
+import { BoundingSphere } from "../bodies/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";

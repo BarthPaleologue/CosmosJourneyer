@@ -1,5 +1,4 @@
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { AbstractObject } from "../bodies/abstractObject";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import cursorImage from "../../asset/textures/hoveredCircle.png";
@@ -8,6 +7,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";
+import { OrbitalObject } from "../architecture/orbitalObject";
 
 export class ObjectOverlay {
     readonly textRoot: StackPanel;
@@ -16,11 +16,11 @@ export class ObjectOverlay {
     readonly typeText: TextBlock;
     readonly distanceText: TextBlock;
     readonly etaText: TextBlock;
-    readonly object: AbstractObject;
+    readonly object: OrbitalObject;
 
     private lastDistance: number = 0;
 
-    constructor(object: AbstractObject) {
+    constructor(object: OrbitalObject) {
         this.object = object;
 
         this.textRoot = new StackPanel(object.name + "OverlayTextRoot");
@@ -41,7 +41,7 @@ export class ObjectOverlay {
         this.textRoot.addControl(this.namePlate);
 
         this.typeText = new TextBlock(object.name + "OverlayTypeText");
-        this.typeText.text = object.getTypeName();
+        this.typeText.text = object.constructor.name; //FIXME: define an interface with a method for this
         this.typeText.color = "white";
         this.typeText.zIndex = 6;
         this.typeText.height = "20px";
@@ -80,7 +80,7 @@ export class ObjectOverlay {
         this.cursor.linkWithMesh(this.object.getTransform());
     }
 
-    update(camera: Camera, target: AbstractObject | null) {
+    update(camera: Camera, target: OrbitalObject | null) {
         const viewRay = camera.getDirection(LOCAL_DIRECTION.BACKWARD);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();

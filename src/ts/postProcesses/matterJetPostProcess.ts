@@ -6,7 +6,6 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
-import { BaseObject } from "../bodies/common";
 
 export interface MatterJetUniforms {
     // the rotation period in seconds of the matter jet
@@ -19,7 +18,7 @@ export interface MatterJetUniforms {
  */
 export class MatterJetPostProcess extends UberPostProcess implements ObjectPostProcess, UpdatablePostProcess {
     matterJetUniforms: MatterJetUniforms;
-    object: BaseObject;
+    object: StellarObject;
 
     constructor(name: string, stellarObject: StellarObject, scene: UberScene) {
         const shaderName = "matterjet";

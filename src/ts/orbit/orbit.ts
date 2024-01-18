@@ -1,7 +1,5 @@
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitProperties } from "./orbitProperties";
-import { Transformable } from "../uberCore/transforms/basicTransform";
-import { BaseModel } from "../model/common";
 
 /**
  *
@@ -50,10 +48,9 @@ export function getPeriapsis(radius: number, p: number) {
 
 /**
  *
- * @param periapsis
- * @param apoapsis
- * @param otherBodies
  * @see https://www.wikiwand.com/fr/Lois_de_Kepler#/Troisi%C3%A8me_loi_%E2%80%93_Loi_des_p%C3%A9riodes
+ * @param radius
+ * @param parentMass
  */
 export function getOrbitalPeriod(radius: number, parentMass: number) {
     if (parentMass === 0) return 0;
@@ -63,10 +60,3 @@ export function getOrbitalPeriod(radius: number, parentMass: number) {
     return Math.sqrt((4 * Math.PI ** 2 * a ** 3) / (G * M));
 }
 
-export interface OrbitalObject extends Transformable {
-    parentObject: OrbitalObject | null;
-
-    model: BaseModel;
-
-    updateOrbitalPosition(deltaTime: number): void;
-}

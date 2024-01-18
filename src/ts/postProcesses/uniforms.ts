@@ -1,7 +1,7 @@
 import { UberScene } from "../uberCore/uberScene";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { BoundingSphere } from "../bodies/common";
+import { BoundingSphere } from "../bodies/cullable";
 import { Star } from "../stellarObjects/star/star";
 import { Transformable } from "../uberCore/transforms/basicTransform";
 import { Scene } from "@babylonjs/core/scene";

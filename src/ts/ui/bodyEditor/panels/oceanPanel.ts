@@ -1,14 +1,14 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanemo } from "../../../planemos/telluricPlanemo/telluricPlanemo";
 import { Slider } from "handle-sliderjs";
 import { OceanPostProcess } from "../../../postProcesses/oceanPostProcess";
+import { CelestialBody } from "../../../architecture/celestialBody";
 
 export class OceanPanel extends EditorPanel {
     constructor() {
         super("ocean");
     }
-    init(planet: TelluricPlanemo, ocean: OceanPostProcess) {
+    init(planet: CelestialBody, ocean: OceanPostProcess) {
         for (const slider of this.sliders) slider.remove();
 
         const oceanToggler = clearAllEventListenersById("oceanToggler");

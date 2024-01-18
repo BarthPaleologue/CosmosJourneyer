@@ -80,7 +80,7 @@ const xrCamera = xr.baseExperience.camera;
 xrCamera.setTransformationFromNonVRCamera(camera);
 xrCamera.maxZ = camera.maxZ;
 
-const planet = new TelluricPlanemo("xrPlanet", scene, 0.51, undefined);
+const planet = new TelluricPlanemo("xrPlanet", scene, 0.51, null);
 translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
 
 const star = new Star("star", scene, 0.2); //PointLightWrapper(new PointLight("dir01", new Vector3(0, 1, 0), scene));
@@ -126,7 +126,7 @@ scene.onBeforeRenderObservable.add(() => {
 
     chunkForge.update();
 
-    star.updateMaterial();
+    star.updateMaterial(deltaTime);
 
     //ocean.update(deltaTime);
 });

@@ -7,7 +7,7 @@ import { UberScene } from "../../../uberCore/uberScene";
 import { ColorCorrection } from "../../../uberCore/postProcesses/colorCorrection";
 import { getRotationQuaternion, rotate, Transformable } from "../../../uberCore/transforms/basicTransform";
 
-import { BoundingSphere } from "../../../bodies/common";
+import { BoundingSphere } from "../../../bodies/cullable";
 
 export class GeneralPanel extends EditorPanel {
     constructor() {

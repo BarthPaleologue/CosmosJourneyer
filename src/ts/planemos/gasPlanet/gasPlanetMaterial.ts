@@ -3,7 +3,6 @@ import surfaceMaterialVertex from "../../../shaders/gasPlanetMaterial/vertex.gls
 import { GazColorSettings } from "../telluricPlanemo/colorSettingsInterface";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { GasPlanetModel } from "./gasPlanetModel";
-import { StellarObject } from "../../stellarObjects/stellarObject";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Scene } from "@babylonjs/core/scene";
@@ -13,6 +12,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Star } from "../../stellarObjects/star/star";
 import { flattenVector3Array } from "../../utils/algebra";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Transformable } from "../../uberCore/transforms/basicTransform";
 
 export class GasPlanetMaterial extends ShaderMaterial {
     readonly planet: TransformNode;
@@ -78,7 +78,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setFloat("colorSharpness", this.colorSettings.colorSharpness);
     }
 
-    public update(player: Camera, stellarObjects: StellarObject[], deltaTime: number) {
+    public update(player: Camera, stellarObjects: Transformable[], deltaTime: number) {
         this.clock += deltaTime;
 
         this.setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());

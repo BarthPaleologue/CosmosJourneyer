@@ -5,7 +5,6 @@ import { getActiveCameraUniforms, getSamplers, getStellarObjectsUniforms } from 
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Settings } from "../settings";
 import { nearestBody } from "../utils/nearestBody";
-import { AbstractBody } from "../bodies/abstractBody";
 import { Assets } from "../assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -15,9 +14,10 @@ import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { Transformable } from "../uberCore/transforms/basicTransform";
+import { CelestialBody } from "../architecture/celestialBody";
 
 export class StarfieldPostProcess extends UberPostProcess {
-    constructor(scene: UberScene, stellarObjects: Transformable[], bodies: AbstractBody[], starfieldRotation: Quaternion) {
+    constructor(scene: UberScene, stellarObjects: Transformable[], bodies: CelestialBody[], starfieldRotation: Quaternion) {
         const shaderName = "starfield";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;

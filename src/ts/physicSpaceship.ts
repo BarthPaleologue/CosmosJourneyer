@@ -150,8 +150,8 @@ function updateBeforeHavok() {
     }
 
     // planet thingy
-    newton.updateInternalClock(-deltaTime / 10);
-    aurora.updateInternalClock(-deltaTime / 10);
+    //newton.updateInternalClock(-deltaTime / 10);
+    //aurora.updateInternalClock(-deltaTime / 10);
 
     newton.updateLOD(camera.globalPosition, chunkForge);
     newton.material.update(camera.globalPosition, [aurora]);

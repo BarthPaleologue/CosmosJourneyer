@@ -87,7 +87,7 @@ scene.onBeforeRenderObservable.add(() => {
 
     chunkForge.update();
 
-    star.updateMaterial();
+    star.updateMaterial(deltaTime);
 
     ocean.update(deltaTime);
 });

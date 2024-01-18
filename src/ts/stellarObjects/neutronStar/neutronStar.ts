@@ -1,8 +1,9 @@
 import { Star } from "../star/star";
 import { NeutronStarModel } from "./neutronStarModel";
 import { UberScene } from "../../uberCore/uberScene";
-import { AbstractBody } from "../../bodies/abstractBody";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
+import { HasBodyModel } from "../../model/common";
+import { CelestialBody } from "../../architecture/celestialBody";
 
 export class NeutronStar extends Star {
     readonly descriptor: NeutronStarModel;
@@ -14,7 +15,7 @@ export class NeutronStar extends Star {
      * @param model The seed of the star in [-1, 1]
      * @param parentBody
      */
-    constructor(name: string, scene: UberScene, model: number | NeutronStarModel, parentBody?: AbstractBody) {
+    constructor(name: string, scene: UberScene, model: number | NeutronStarModel, parentBody: CelestialBody & HasBodyModel | null = null) {
         super(name, scene, model, parentBody);
 
         this.descriptor = model instanceof NeutronStarModel ? model : new NeutronStarModel(model, parentBody?.model);

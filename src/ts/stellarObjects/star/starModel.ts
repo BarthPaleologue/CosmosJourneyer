@@ -33,13 +33,13 @@ export class StarModel implements StellarObjectModel {
 
     readonly childrenBodies: BodyModel[] = [];
 
-    constructor(seed: number, parentBody?: BodyModel) {
+    constructor(seed: number, parentBody: BodyModel | null = null) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
         const surfaceTemperature = clamp(normalRandom(5778, 2000, this.rng, GENERATION_STEPS.TEMPERATURE), 3000, 10000);
 
-        this.parentBody = parentBody ?? null;
+        this.parentBody = parentBody;
 
         this.physicalProperties = {
             mass: this.mass,

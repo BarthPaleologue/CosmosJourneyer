@@ -5,7 +5,6 @@ import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
 import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
 import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";
-import { AbstractBody } from "../bodies/abstractBody";
 import { RingsPostProcess } from "./rings/ringsPostProcess";
 import { StarfieldPostProcess } from "./starfieldPostProcess";
 import { VolumetricLight } from "./volumetricLight";
@@ -14,14 +13,12 @@ import { GasPlanet } from "../planemos/gasPlanet/gasPlanet";
 import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
 import { makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess } from "./volumetricCloudsPostProcess";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
-import { AbstractObject } from "../bodies/abstractObject";
 import { PostProcessType } from "./postProcessTypes";
 import { MandelbulbPostProcess } from "./mandelbulbPostProcess";
 import { ShadowPostProcess } from "./shadowPostProcess";
@@ -34,6 +31,8 @@ import { Mandelbulb } from "../mandelbulb/mandelbulb";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+import { CelestialBody } from "../architecture/celestialBody";
+import { StellarObject } from "../architecture/stellarObject";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -78,7 +77,7 @@ export class PostProcessManager {
 
     private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
 
-    private currentBody: AbstractObject | null = null;
+    private currentBody: CelestialBody | null = null;
 
     private readonly starFields: StarfieldPostProcess[] = [];
     private readonly volumetricLights: VolumetricLight[] = [];
@@ -227,7 +226,7 @@ export class PostProcessManager {
      * @param body A body
      * @param stellarObjects An array of stars or black holes
      */
-    public async addRings(body: AbstractBody, stellarObjects: StellarObject[]) {
+    public async addRings(body: CelestialBody, stellarObjects: StellarObject[]) {
         return RingsPostProcess.CreateAsync(body, this.scene, stellarObjects).then((rings) => {
             this.rings.push(rings);
         });
@@ -237,7 +236,7 @@ export class PostProcessManager {
      * Returns the rings post process for the given body. Throws an error if no rings are found.
      * @param body A body
      */
-    public getRings(body: AbstractObject): RingsPostProcess | null {
+    public getRings(body: CelestialBody): RingsPostProcess | null {
         return this.rings.find((rings) => rings.object === body) ?? null;
     }
 
@@ -255,8 +254,9 @@ export class PostProcessManager {
      * Creates a new Starfield postprocess and adds it to the manager.
      * @param stellarObjects An array of stars or black holes
      * @param planets An array of planets
+     * @param starfieldRotation
      */
-    public addStarField(stellarObjects: StellarObject[], planets: AbstractBody[], starfieldRotation: Quaternion) {
+    public addStarField(stellarObjects: StellarObject[], planets: CelestialBody[], starfieldRotation: Quaternion) {
         this.starFields.push(new StarfieldPostProcess(this.scene, stellarObjects, planets, starfieldRotation));
     }
 
@@ -297,7 +297,7 @@ export class PostProcessManager {
         return this.matterJets.find((mj) => mj.object === neutronStar) ?? null;
     }
 
-    public async addShadowCaster(body: AbstractBody, stellarObjects: StellarObject[]) {
+    public async addShadowCaster(body: CelestialBody, stellarObjects: StellarObject[]) {
         return ShadowPostProcess.CreateAsync(body, this.scene, stellarObjects).then((shadow) => {
             this.shadows.push(shadow);
         });
@@ -307,7 +307,7 @@ export class PostProcessManager {
         this.lensFlares.push(new LensFlarePostProcess(stellarObject, this.scene));
     }
 
-    public setBody(body: AbstractBody) {
+    public setBody(body: CelestialBody) {
         this.currentBody = body;
 
         const rings = this.getRings(body);

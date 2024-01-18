@@ -2,7 +2,7 @@ import { LinesMesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { Color3, Vector3 } from "@babylonjs/core/Maths/math";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Transformable } from "../uberCore/transforms/basicTransform";
-import { BoundingSphere } from "../bodies/common";
+import { BoundingSphere } from "../bodies/cullable";
 
 export class AxisRenderer {
     private axisMeshes: LinesMesh[] = [];
