@@ -2,7 +2,6 @@ import "../styles/index.scss";
 
 import { Assets } from "./assets";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
 import { UberScene } from "./uberCore/uberScene";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
@@ -11,14 +10,9 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setMaxLinVel } from "./utils/havok";
-import { TelluricPlanemo } from "./planemos/telluricPlanemo/telluricPlanemo";
-import { ChunkForge } from "./planemos/telluricPlanemo/terrain/chunks/chunkForge";
-import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Quaternion } from "@babylonjs/core/Maths/math";
-import { FlatCloudsPostProcess } from "./postProcesses/clouds/flatCloudsPostProcess";
-import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
+import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
+import { ChunkForgeWorkers } from "./planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { Star } from "./stellarObjects/star/star";
-import { LensFlarePostProcess } from "./postProcesses/lensFlarePostProcess";
 import { Settings } from "./settings";
 import { ScenePerformancePriority } from "@babylonjs/core";
 
@@ -86,7 +80,7 @@ const xrCamera = xr.baseExperience.camera;
 xrCamera.setTransformationFromNonVRCamera(camera);
 xrCamera.maxZ = camera.maxZ;
 
-const planet = new TelluricPlanemo("xrPlanet", scene, 0.51, undefined);
+const planet = new TelluricPlanet("xrPlanet", scene, 0.51, null);
 translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
 
 const star = new Star("star", scene, 0.2); //PointLightWrapper(new PointLight("dir01", new Vector3(0, 1, 0), scene));
@@ -114,7 +108,7 @@ FlatCloudsPostProcess.CreateAsync("clouds", planet, planet.model.cloudsUniforms,
   xrCamera.attachPostProcess(lensflare);
 });*/
 
-const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
+const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
 
 scene.onBeforeRenderObservable.add(() => {
     const deltaTime = engine.getDeltaTime() / 1000;
@@ -132,7 +126,7 @@ scene.onBeforeRenderObservable.add(() => {
 
     chunkForge.update();
 
-    star.updateMaterial();
+    star.updateMaterial(deltaTime);
 
     //ocean.update(deltaTime);
 });

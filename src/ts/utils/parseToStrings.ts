@@ -24,6 +24,18 @@ export function parseDistance(distance: number): string {
     }
 }
 
+export function parseSeconds(seconds: number): string {
+    if (seconds < 60) {
+        return `${seconds.toFixed(0)} s`;
+    } else if (seconds < 3600) {
+        return `${(seconds / 60).toFixed(0)} min`;
+    } else if (seconds < 86400) {
+        return `${(seconds / 3600).toFixed(0)} h`;
+    } else {
+        return `${(seconds / 86400).toFixed(0)} d`;
+    }
+}
+
 /**
  * Parse a number between 0 and 1 to a percentage string.
  * Example: 0.5 -> "50%"

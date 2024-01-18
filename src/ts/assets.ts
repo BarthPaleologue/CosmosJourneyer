@@ -1,4 +1,5 @@
-import "@babylonjs/loaders/glTF/2.0";
+import "@babylonjs/loaders";
+import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Animations/animatable";
 
@@ -18,13 +19,16 @@ import plumeParticle from "../asset/textures/plume.png";
 
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 
+import seamlessPerlin from "../asset/perlin.png";
 import spaceship from "../asset/spaceship/spaceship2.glb";
-//import spacestation from "../asset/spacestation/spacestation.glb";
 import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
 import endeavorSpaceship from "../asset/spaceship/endeavour.glb";
 import character from "../asset/character.glb";
 import rock from "../asset/rock.glb";
+
+import tree from "../asset/tree/tree.babylon";
+import treeTexturePath from "../asset/tree/Tree.png";
 
 import ouchSound from "../asset/sound/ouch.mp3";
 import engineRunningSound from "../asset/sound/engineRunning.mp3";
@@ -42,6 +46,8 @@ import { Sound } from "@babylonjs/core/Audio/sound";
 
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
+import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
 
 export class Assets {
     static IS_READY = false;
@@ -65,14 +71,19 @@ export class Assets {
 
     static AtmosphereLUT: ProceduralTexture;
 
+    static SeamlessPerlin: Texture;
     private static Spaceship: Mesh;
     private static EndeavorSpaceship: Mesh;
     private static Spacestation: Mesh;
     private static Banana: Mesh;
     private static Character: Mesh;
-    static Rock: Mesh;
 
+    public static Rock: Mesh;
+    public static Tree: Mesh;
     public static ScatterCube: Mesh;
+
+    public static Butterfly: Mesh;
+    public static GrassBlade: Mesh;
 
     public static OuchSound: Sound;
     public static EngineRunningSound: Sound;
@@ -98,6 +109,7 @@ export class Assets {
 
         Assets.manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Assets.PlumeParticle = task.texture);
 
+        Assets.manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Assets.SeamlessPerlin = task.texture);
         Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Assets.AtmosphereLUT.refreshRate = 0;
 
@@ -164,15 +176,43 @@ export class Assets {
 
         const rockTask = Assets.manager.addMeshTask("rockTask", "", "", rock);
         rockTask.onSuccess = function (task: MeshAssetTask) {
-            Assets.Rock = task.loadedMeshes[0] as Mesh;
+            Assets.Rock = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
+            Assets.Rock.position.y = 0.1;
+            Assets.Rock.scaling.scaleInPlace(0.2);
+            Assets.Rock.bakeCurrentTransformIntoVertices();
             Assets.Rock.isVisible = false;
-
-            for (const mesh of Assets.Rock.getChildMeshes()) {
-                mesh.isVisible = false;
-            }
 
             console.log("Rock loaded");
         };
+
+        const treeTask = Assets.manager.addMeshTask("treeTask", "", "", tree);
+        treeTask.onSuccess = function (task: MeshAssetTask) {
+            Assets.Tree = task.loadedMeshes[0] as Mesh;
+            Assets.Tree.position.y = -1;
+            Assets.Tree.scaling.scaleInPlace(3);
+            Assets.Tree.bakeCurrentTransformIntoVertices();
+
+            const treeMaterial = new StandardMaterial("treeMaterial", scene);
+
+            treeMaterial.opacityTexture = null;
+            treeMaterial.backFaceCulling = false;
+
+            const treeTexture = new Texture(treeTexturePath, scene);
+            treeTexture.hasAlpha = true;
+
+            treeMaterial.diffuseTexture = treeTexture;
+            treeMaterial.specularColor.set(0, 0, 0);
+
+            Assets.Tree.material = treeMaterial;
+
+            Assets.Tree.isVisible = false;
+
+            console.log("Tree loaded");
+        };
+
+        Assets.Butterfly = createButterfly(scene);
+
+        Assets.GrassBlade = createGrassBlade(scene, 3);
 
         const ouchSoundTask = Assets.manager.addBinaryFileTask("ouchSoundTask", ouchSound);
         ouchSoundTask.onSuccess = function (task) {

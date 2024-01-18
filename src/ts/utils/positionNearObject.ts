@@ -1,21 +1,10 @@
-import { Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { nearestBody } from "./nearestBody";
-import {
-    getForwardDirection,
-    getUpwardDirection,
-    roll,
-    rotateAround,
-    Transformable
-} from "../uberCore/transforms/basicTransform";
-import { BoundingSphere } from "../bodies/common";
+import { Transformable } from "../architecture/transformable";
+import { BoundingSphere } from "../architecture/boundingSphere";
 import { Controls } from "../uberCore/controls";
-import { Matrix } from "@babylonjs/core/Maths/math";
-import { Scene } from "@babylonjs/core/scene";
-import { MapVector3 } from "./algebra";
-import { clamp } from "./math";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Assets } from "../assets";
+import { getUpwardDirection, roll, rotateAround } from "../uberCore/transforms/basicTransform";
 
 export function positionNearObjectBrightSide(transformable: Transformable, object: Transformable & BoundingSphere, starSystem: StarSystemController, nRadius = 3): void {
     // go from the nearest star to be on the sunny side of the object

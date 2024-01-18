@@ -4,9 +4,9 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { Mandelbulb } from "../mandelbulb/mandelbulb";
+import { StellarObject } from "../architecture/stellarObject";
 
 export interface MandelbulbSettings {
     rotationPeriod: number;

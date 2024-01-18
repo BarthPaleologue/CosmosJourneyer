@@ -11,8 +11,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ShipControls } from "./spaceship/shipControls";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
-import { TelluricPlanemoModel } from "./planemos/telluricPlanemo/telluricPlanemoModel";
-import { GasPlanetModel } from "./planemos/gasPlanet/gasPlanetModel";
+import { TelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
+import { GasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
 import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
 import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
 
@@ -21,8 +21,7 @@ import { Mouse } from "./inputs/mouse";
 import { Keyboard } from "./inputs/keyboard";
 import { StarModel } from "./stellarObjects/star/starModel";
 import { RingsUniforms } from "./postProcesses/rings/ringsUniform";
-import { SpaceStation } from "./spacestation/spaceStation";
-import { getMoonSeed } from "./planemos/common";
+import { getMoonSeed } from "./planets/common";
 
 import { Gamepad } from "./inputs/gamepad";
 import { CharacterControls } from "./spacelegs/characterControls";
@@ -120,8 +119,8 @@ terminaModel.orbit.radius = 50 * sunModel.radius;
 terminaModel.orbit.period = 60 * 60;
 const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
-const planetModel = new TelluricPlanemoModel(0.4233609183800225, sunModel);
-planetModel.physicalProperties.minTemperature = -37;
+const planetModel = new TelluricPlanetModel(0.4233609183800225, sunModel);
+planetModel.physicalProperties.minTemperature = -55;
 planetModel.physicalProperties.maxTemperature = 30;
 
 planetModel.orbit.period = 60 * 60 * 24 * 365.25;
@@ -135,7 +134,7 @@ planet.postProcesses.push(PostProcessType.RING);
 //const spacestation = new SpaceStation(starSystemView.scene, planet);
 //starSystemView.getStarSystem().addSpaceStation(spacestation);
 
-const moonModel = new TelluricPlanemoModel(getMoonSeed(planetModel, 0), planetModel);
+const moonModel = new TelluricPlanetModel(getMoonSeed(planetModel, 0), planetModel);
 moonModel.physicalProperties.mass = 2;
 moonModel.physicalProperties.rotationPeriod = 7 * 60 * 60;
 moonModel.physicalProperties.minTemperature = -180;
@@ -156,14 +155,14 @@ moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap);
 moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap);
 moon.material.updateConstants();
 
-const aresModel = new TelluricPlanemoModel(0.3725, sunModel);
+const aresModel = new TelluricPlanetModel(0.3725, sunModel);
 aresModel.physicalProperties.mass = 7;
 aresModel.physicalProperties.rotationPeriod = (24 * 60 * 60) / 30;
 aresModel.physicalProperties.minTemperature = -30;
 aresModel.physicalProperties.maxTemperature = 20;
 aresModel.physicalProperties.pressure = 0.5;
 aresModel.physicalProperties.waterAmount = 0.2;
-aresModel.physicalProperties.oceanLevel = Settings.OCEAN_DEPTH * aresModel.physicalProperties.waterAmount * aresModel.physicalProperties.pressure;
+aresModel.physicalProperties.oceanLevel = 0;
 
 aresModel.orbit.period = 60 * 60 * 24 * 365.24;
 aresModel.orbit.radius = 4020 * planet.getRadius();
@@ -177,7 +176,7 @@ const ares = StarSystemHelper.makeTelluricPlanet(starSystem, aresModel);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.OCEAN), 1);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.CLOUDS), 1);
 
-ares.material.colorSettings.plainColor.copyFromFloats(143 / 255, 45 / 255, 45 / 255);
+ares.material.colorSettings.plainColor.copyFromFloats(139 / 255, 59 / 255, 24 / 255);
 ares.material.colorSettings.desertColor.copyFromFloats(178 / 255, 107 / 255, 42 / 255);
 ares.material.colorSettings.beachColor.copyFrom(ares.material.colorSettings.plainColor);
 ares.material.colorSettings.bottomColor.copyFrom(ares.material.colorSettings.plainColor.scale(0.9));
@@ -213,6 +212,20 @@ if (aresAtmosphere) {
 
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
+
+    if (e.key === "x") {
+        let nbVertices = 0;
+        let nbInstances = 0;
+        planet.sides.forEach((side) => {
+            side.executeOnEveryChunk((chunk) => {
+                nbVertices += Settings.VERTEX_RESOLUTION * Settings.VERTEX_RESOLUTION;
+                chunk.instancePatches.forEach((patch) => {
+                    nbInstances += patch.getNbInstances();
+                });
+            });
+        });
+        console.log("Vertices", nbVertices, "Instances", nbInstances);
+    }
 
     if (e.key === "y") {
         if (starSystemView.scene.getActiveController() === spaceshipController) {

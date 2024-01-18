@@ -15,6 +15,8 @@ export class StarMaterial extends ShaderMaterial {
     starModel: StarModel;
     starSeed: number;
 
+    private internalClock = 0;
+
     constructor(star: TransformNode, model: StarModel, scene: Scene) {
         const shaderName = "starMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -46,8 +48,10 @@ export class StarMaterial extends ShaderMaterial {
         this.starSeed = model.seed;
     }
 
-    public update(internalTime: number) {
-        this.setFloat("time", internalTime % 100000);
+    public update(deltaTime: number) {
+        this.internalClock += deltaTime;
+
+        this.setFloat("time", this.internalClock % 100000);
         this.setVector3("starColor", this.starModel.surfaceColor);
         this.setQuaternion("starInverseRotationQuaternion", getInverseRotationQuaternion(this.star));
         this.setFloat("seed", this.starSeed);

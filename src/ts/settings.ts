@@ -7,7 +7,7 @@ export const Settings = {
     AU: 150e9, // target is 150e9
 
     VERTEX_RESOLUTION: 64,
-    MIN_DISTANCE_BETWEEN_VERTICES: 6,
+    MIN_DISTANCE_BETWEEN_VERTICES: 1.5,
 
     CLOUD_LAYER_HEIGHT: 15e3,
     ATMOSPHERE_HEIGHT: 100e3,
@@ -16,7 +16,7 @@ export const Settings = {
     TIME_MULTIPLIER: 1,
     CHUNK_RENDER_DISTANCE_MULTIPLIER: 2,
     ENABLE_VOLUMETRIC_CLOUDS: false,
-    SEED_HALF_RANGE: 1e6,
+    SEED_HALF_RANGE: 1e4,
     C: 299792458,
     FOV: (92 * Math.PI) / 180
 };

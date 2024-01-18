@@ -8,7 +8,7 @@ import { ObjectPostProcess, UpdatablePostProcess } from "../objectPostProcess";
 import { ShaderSamplers, ShaderUniforms } from "../../uberCore/postProcesses/types";
 import { Transformable } from "../../uberCore/transforms/basicTransform";
 import { CloudsUniforms } from "./cloudsUniforms";
-import { BoundingSphere } from "../../bodies/common";
+import { BoundingSphere } from "../../bodies/cullable";
 
 export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly cloudUniforms: CloudsUniforms;

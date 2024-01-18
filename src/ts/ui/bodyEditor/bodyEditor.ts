@@ -1,10 +1,9 @@
 import editorHTML from "../../../html/bodyEditor.html";
-import { TelluricPlanemo } from "../../planemos/telluricPlanemo/telluricPlanemo";
-import { AbstractBody } from "../../bodies/abstractBody";
+import { TelluricPlanet } from "../../planets/telluricPlanet/telluricPlanet";
 import "handle-sliderjs/dist/css/style2.css";
-import { ColorMode } from "../../planemos/telluricPlanemo/colorSettingsInterface";
+import { ColorMode } from "../../planets/telluricPlanet/colorSettingsInterface";
 import { hide, show } from "../../utils/html";
-import { GasPlanet } from "../../planemos/gasPlanet/gasPlanet";
+import { GasPlanet } from "../../planets/gasPlanet/gasPlanet";
 import { EditorPanel } from "./editorPanel";
 import { GeneralPanel } from "./panels/generalPanel";
 import { PhysicPanel } from "./panels/physicPanel";
@@ -20,6 +19,7 @@ import { UberScene } from "../../uberCore/uberScene";
 import { BlackholePanel } from "./panels/blackholePanel";
 import { Star } from "../../stellarObjects/star/star";
 import { BlackHole } from "../../stellarObjects/blackHole/blackHole";
+import { CelestialBody } from "../../architecture/celestialBody";
 
 export enum EditorVisibility {
     HIDDEN,
@@ -151,7 +151,7 @@ export class BodyEditor {
         return this.visibility;
     }
 
-    public setBody(body: AbstractBody, postProcessManager: PostProcessManager, scene: UberScene) {
+    public setBody(body: CelestialBody, postProcessManager: PostProcessManager, scene: UberScene) {
         this.currentBodyId = body.name;
 
         for (const panel of this.panels) panel.disable();
@@ -160,22 +160,22 @@ export class BodyEditor {
         this.generalPanel.setVisibility(this.currentPanel === this.generalPanel);
         this.generalPanel.init(body, postProcessManager.colorCorrection, scene);
 
-        const rings = postProcessManager.getRings(body as AbstractBody);
+        const rings = postProcessManager.getRings(body);
         if (rings) {
             this.ringsPanel.enable();
             this.ringsPanel.setVisibility(this.currentPanel === this.ringsPanel);
             this.ringsPanel.init(body, rings);
         }
 
-        if (body instanceof TelluricPlanemo || body instanceof GasPlanet) {
-            const atmosphere = postProcessManager.getAtmosphere(body as TelluricPlanemo);
+        if (body instanceof TelluricPlanet || body instanceof GasPlanet) {
+            const atmosphere = postProcessManager.getAtmosphere(body as TelluricPlanet);
             if (atmosphere) {
                 this.atmospherePanel.enable();
                 this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel);
                 this.atmospherePanel.init(body, atmosphere);
             }
 
-            if (body instanceof TelluricPlanemo) {
+            if (body instanceof TelluricPlanet) {
                 this.initToolbar(body);
 
                 this.surfacePanel.enable();
@@ -186,14 +186,14 @@ export class BodyEditor {
                 this.physicPanel.setVisibility(this.currentPanel === this.physicPanel);
                 this.physicPanel.init(body);
 
-                const clouds = postProcessManager.getClouds(body as TelluricPlanemo);
+                const clouds = postProcessManager.getClouds(body as TelluricPlanet);
                 if (clouds) {
                     this.cloudsPanel.enable();
                     this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel);
                     this.cloudsPanel.init(body, clouds);
                 }
 
-                const ocean = postProcessManager.getOcean(body as TelluricPlanemo);
+                const ocean = postProcessManager.getOcean(body as TelluricPlanet);
                 if (ocean) {
                     this.oceanPanel.enable();
                     this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel);
@@ -227,7 +227,7 @@ export class BodyEditor {
         }
     }
 
-    public initToolbar(planet: TelluricPlanemo) {
+    public initToolbar(planet: TelluricPlanet) {
         const material = planet.material;
         const colorSettings = material.colorSettings;
         document.getElementById("defaultMapButton")?.addEventListener("click", () => {
@@ -256,7 +256,7 @@ export class BodyEditor {
         for (const panel of this.panels) panel.updateAllSliders();
     }
 
-    public update(nearestBody: AbstractBody, postProcessManager: PostProcessManager, scene: UberScene) {
+    public update(nearestBody: CelestialBody, postProcessManager: PostProcessManager, scene: UberScene) {
         if (nearestBody.name !== this.currentBodyId) this.setBody(nearestBody, postProcessManager, scene);
     }
 }

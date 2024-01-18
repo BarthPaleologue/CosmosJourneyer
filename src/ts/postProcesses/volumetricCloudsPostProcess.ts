@@ -9,7 +9,7 @@ import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/pos
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { CloudsUniforms } from "./clouds/cloudsUniforms";
 import { Transformable } from "../uberCore/transforms/basicTransform";
-import { BoundingSphere } from "../bodies/common";
+import { BoundingSphere } from "../bodies/cullable";
 
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 

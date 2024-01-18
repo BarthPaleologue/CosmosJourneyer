@@ -1,12 +1,12 @@
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
-import { TelluricPlanemo } from "../../../planemos/telluricPlanemo/telluricPlanemo";
+import { TelluricPlanet } from "../../../planets/telluricPlanet/telluricPlanet";
 
 export class PhysicPanel extends EditorPanel {
     constructor() {
         super("physic");
     }
-    init(planet: TelluricPlanemo) {
+    init(planet: TelluricPlanet) {
         for (const slider of this.sliders) slider.remove();
 
         this.sliders = [

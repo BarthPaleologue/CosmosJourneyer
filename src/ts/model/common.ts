@@ -1,7 +1,3 @@
-import { STELLAR_TYPE } from "../stellarObjects/common";
-import { RingsUniforms } from "../postProcesses/rings/ringsUniform";
-import { OrbitProperties } from "../orbit/orbitProperties";
-
 export enum GENERATION_STEPS {
     AXIAL_TILT = 100,
     ORBIT = 200,
@@ -26,69 +22,8 @@ export enum GENERATION_STEPS {
 
 export enum BODY_TYPE {
     STAR,
-    TELLURIC,
-    GAS,
+    TELLURIC_PLANET,
+    GAS_PLANET,
     MANDELBULB,
     BLACK_HOLE
-}
-
-export type PhysicalProperties = {
-    mass: number;
-    rotationPeriod: number;
-    axialTilt: number;
-};
-
-export type StarPhysicalProperties = PhysicalProperties & {
-    temperature: number;
-};
-
-export type BlackHolePhysicalProperties = PhysicalProperties & {
-    accretionDiskRadius: number;
-};
-
-export type PlanetPhysicalProperties = PhysicalProperties & {
-    minTemperature: number;
-    maxTemperature: number;
-    pressure: number;
-};
-
-export type SolidPhysicalProperties = PlanetPhysicalProperties & {
-    waterAmount: number;
-    oceanLevel: number;
-};
-
-export interface BaseModel {
-    rng: (step: number) => number;
-    seed: number;
-
-    orbit: OrbitProperties;
-    physicalProperties: PhysicalProperties;
-
-    readonly parentBody: BaseModel | null;
-    readonly childrenBodies: BaseModel[];
-}
-
-export interface BodyModel extends BaseModel {
-    readonly bodyType: BODY_TYPE;
-    readonly radius: number;
-
-    readonly ringsUniforms: RingsUniforms | null;
-}
-
-export interface StellarObjectModel extends BodyModel {
-    stellarType: STELLAR_TYPE;
-}
-
-//https://en.wiktionary.org/wiki/planemo#English
-export interface PlanemoModel extends BodyModel {
-    physicalProperties: PlanetPhysicalProperties;
-
-    nbMoons: number;
-
-    getApparentRadius(): number;
-}
-
-export function depth(model: BaseModel): number {
-    if (model.parentBody === null) return 0;
-    return depth(model.parentBody) + 1;
 }

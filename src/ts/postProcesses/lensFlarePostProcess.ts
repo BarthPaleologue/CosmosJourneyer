@@ -5,13 +5,13 @@ import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { moveTowards } from "../utils/moveTowards";
 import { Star } from "../stellarObjects/star/star";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { Matrix } from "@babylonjs/core/Maths/math";
+import { StellarObject } from "../architecture/stellarObject";
 
 export type LensFlareSettings = {
     visibility: number;
@@ -71,7 +71,7 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
                     const start = scene.activeCamera.globalPosition;
                     const end = object.getTransform().getAbsolutePosition();
                     (scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, raycastResult);
-                    const occulted = raycastResult.hasHit && raycastResult.body?.transformNode.name !== object.name;
+                    const occulted = raycastResult.hasHit && raycastResult.body?.transformNode !== object.getTransform();
 
                     const isNotVisible = occulted || settings.behindCamera;
 

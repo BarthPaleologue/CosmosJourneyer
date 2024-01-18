@@ -7,7 +7,7 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { getInverseRotationQuaternion, Transformable } from "../uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { BoundingSphere } from "../bodies/common";
+import { BoundingSphere } from "../bodies/cullable";
 import { Assets } from "../assets";
 
 export type OceanUniforms = {
@@ -32,8 +32,8 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
 
         const oceanUniforms: OceanUniforms = {
             oceanRadius: planet.getBoundingRadius(),
-            depthModifier: 0.001,
-            alphaModifier: 0.001,
+            depthModifier: 0.0015,
+            alphaModifier: 0.0025,
             specularPower: 1.0,
             smoothness: 0.9,
             waveBlendingSharpness: 0.1,

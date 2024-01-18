@@ -2,7 +2,8 @@ import { LinesMesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { Color3, Vector3 } from "@babylonjs/core/Maths/math";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
-import { getPointOnOrbitLocal, OrbitalObject } from "./orbit";
+import { getPointOnOrbitLocal } from "./orbit";
+import { OrbitalObject } from "../architecture/orbitalObject";
 
 export class OrbitRenderer {
     private orbitMeshes: LinesMesh[] = [];
@@ -25,7 +26,7 @@ export class OrbitRenderer {
     }
 
     private createOrbitMesh(orbitalObject: OrbitalObject) {
-        const orbit = orbitalObject.model.orbit;
+        const orbit = orbitalObject.getOrbitProperties();
         const nbSteps = 1000;
         const timestep = orbit.period / nbSteps;
         const points: Vector3[] = [];
@@ -58,10 +59,10 @@ export class OrbitRenderer {
             const orbitalObject = this.orbitalObjects[i];
             const orbitMesh = this.orbitMeshes[i];
 
-            orbitMesh.position = orbitalObject.parentObject?.getTransform().position ?? Vector3.Zero();
+            orbitMesh.position = orbitalObject.parent?.getTransform().position ?? Vector3.Zero();
             orbitMesh.computeWorldMatrix(true);
 
-            const normalToPlane = orbitalObject.model.orbit.normalToPlane;
+            const normalToPlane = orbitalObject.getOrbitProperties().normalToPlane;
             setUpVector(orbitMesh, normalToPlane);
         }
     }
