@@ -5,10 +5,11 @@ import { UberScene } from "../uberCore/uberScene";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
-import { getInverseRotationQuaternion, Transformable } from "../uberCore/transforms/basicTransform";
+import { getInverseRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
 import { BoundingSphere } from "../bodies/cullable";
 import { Assets } from "../assets";
+import { Transformable } from "../architecture/transformable";
 
 export type OceanUniforms = {
     oceanRadius: number;

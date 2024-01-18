@@ -13,7 +13,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
-import { getForwardDirection, getUpwardDirection, pitch, roll, rotate, Transformable, translate } from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getUpwardDirection, pitch, roll, rotate, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
 import { Assets } from "../assets";
@@ -26,6 +26,7 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { CollisionMask } from "../settings";
+import { Transformable } from "../architecture/transformable";
 
 enum ShipState {
     FLYING,
@@ -329,5 +330,12 @@ export class ShipControls implements Controls {
 
         this.getActiveCamera().getViewMatrix();
         return this.getTransform().getAbsolutePosition();
+    }
+
+    dispose() {
+        this.instanceRoot.dispose();
+        this.aggregate.dispose();
+        this.thirdPersonCamera.dispose();
+        this.firstPersonCamera.dispose();
     }
 }

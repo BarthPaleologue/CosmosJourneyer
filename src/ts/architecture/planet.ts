@@ -1,7 +1,7 @@
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Transformable } from "../uberCore/transforms/basicTransform";
 import { CelestialBody, CelestialBodyModel } from "./celestialBody";
 import { PlanetPhysicalProperties } from "./physicalProperties";
+import { Transformable } from "./transformable";
 
 export interface Planet extends CelestialBody {
     model: PlanetModel;

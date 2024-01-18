@@ -11,12 +11,13 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { getInverseRotationMatrix, Transformable } from "../../uberCore/transforms/basicTransform";
+import { getInverseRotationMatrix } from "../../uberCore/transforms/basicTransform";
 import { Star } from "../../stellarObjects/star/star";
 import { flattenVector3Array } from "../../utils/algebra";
 
 import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+import { Transformable } from "../../architecture/transformable";
 
 /**
  * The material for telluric planets.

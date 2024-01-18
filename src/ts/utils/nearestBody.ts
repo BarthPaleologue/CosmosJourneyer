@@ -1,7 +1,7 @@
-import { Transformable } from "../uberCore/transforms/basicTransform";
 import { BoundingSphere } from "../bodies/cullable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CelestialBody } from "../architecture/celestialBody";
+import { Transformable } from "../architecture/transformable";
 
 export function nearestBody(objectPosition: Vector3, bodies: CelestialBody[]): CelestialBody {
     let distance = -1;

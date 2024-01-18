@@ -6,8 +6,8 @@ import { ObjectPostProcess } from "../objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderSamplers, ShaderUniforms } from "../../uberCore/postProcesses/types";
 import { RingsUniforms } from "./ringsUniform";
-import { Transformable } from "../../uberCore/transforms/basicTransform";
 import { CelestialBody } from "../../architecture/celestialBody";
+import { Transformable } from "../../architecture/transformable";
 
 export class RingsPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly ringsUniforms: RingsUniforms;

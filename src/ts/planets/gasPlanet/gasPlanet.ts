@@ -9,7 +9,6 @@ import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Transformable } from "../../uberCore/transforms/basicTransform";
 import { Planet } from "../../architecture/planet";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -20,6 +19,7 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { Cullable } from "../../bodies/cullable";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
+import { Transformable } from "../../architecture/transformable";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;

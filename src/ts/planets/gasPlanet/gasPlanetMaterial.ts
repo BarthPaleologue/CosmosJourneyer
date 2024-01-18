@@ -12,7 +12,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Star } from "../../stellarObjects/star/star";
 import { flattenVector3Array } from "../../utils/algebra";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Transformable } from "../../uberCore/transforms/basicTransform";
+import { Transformable } from "../../architecture/transformable";
 
 export class GasPlanetMaterial extends ShaderMaterial {
     readonly planet: TransformNode;
