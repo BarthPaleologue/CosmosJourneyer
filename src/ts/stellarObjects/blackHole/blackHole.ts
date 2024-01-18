@@ -8,7 +8,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { BlackHoleModel } from "./blackHoleModel";
 import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../bodies/cullable";
-import { CelestialBody, HasCelestialBodyModel } from "../../architecture/celestialBody";
+import { CelestialBody } from "../../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
@@ -25,9 +25,9 @@ export class BlackHole implements StellarObject, Cullable {
 
     readonly postProcesses: PostProcessType[] = [];
 
-    readonly parent: (CelestialBody & HasCelestialBodyModel) | null;
+    readonly parent: CelestialBody | null;
 
-    constructor(name: string, scene: Scene, model: BlackHoleModel | number, parentBody: (CelestialBody & HasCelestialBodyModel) | null = null) {
+    constructor(name: string, scene: Scene, model: BlackHoleModel | number, parentBody: CelestialBody | null = null) {
         this.name = name;
 
         this.model = model instanceof BlackHoleModel ? model : new BlackHoleModel(model);

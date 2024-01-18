@@ -3,6 +3,8 @@ import { CelestialBody, CelestialBodyModel } from "./celestialBody";
 import { STELLAR_TYPE } from "../stellarObjects/common";
 
 export interface StellarObject extends CelestialBody {
+    model: StellarObjectModel;
+
     getLight(): PointLight;
 }
 

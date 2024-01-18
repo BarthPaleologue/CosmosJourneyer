@@ -9,6 +9,8 @@ import { OrbitalObjectPhysicalProperties } from "./physicalProperties";
 export interface OrbitalObject extends Transformable, BoundingSphere {
     name: string;
 
+    model: OrbitalObjectModel;
+
     getRotationAxis(): Vector3;
 
     getOrbitProperties(): OrbitProperties;
@@ -90,8 +92,4 @@ export interface OrbitalObjectModel {
 
     readonly parentBody: OrbitalObjectModel | null;
     readonly childrenBodies: OrbitalObjectModel[];
-}
-
-export interface HasOrbitalObjectModel {
-    model: OrbitalObjectModel;
 }

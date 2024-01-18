@@ -15,18 +15,18 @@ import { Transformable } from "../../uberCore/transforms/basicTransform";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PlanetChunk } from "./terrain/chunks/planetChunk";
-import { HasPlanetModel, Planet } from "../../architecture/planet";
+import { Planet } from "../../architecture/planet";
 import { Cullable } from "../../bodies/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { OrbitalObject } from "../../architecture/orbitalObject";
-import { CelestialBody, HasCelestialBodyModel } from "../../architecture/celestialBody";
+import { CelestialBody } from "../../architecture/celestialBody";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 
-export class TelluricPlanet implements Planet, Cullable, HasPlanetModel {
+export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
 
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
@@ -51,7 +51,7 @@ export class TelluricPlanet implements Planet, Cullable, HasPlanetModel {
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
      * @param parentBody
      */
-    constructor(name: string, scene: UberScene, model: TelluricPlanetModel | number, parentBody: (CelestialBody & HasCelestialBodyModel) | null = null) {
+    constructor(name: string, scene: UberScene, model: TelluricPlanetModel | number, parentBody: CelestialBody | null = null) {
         this.name = name;
 
         this.parent = parentBody;

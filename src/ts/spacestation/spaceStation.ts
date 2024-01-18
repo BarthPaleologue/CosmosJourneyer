@@ -6,7 +6,7 @@ import { SpaceStationModel } from "./spacestationModel";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Assets } from "../assets";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { HasOrbitalObjectModel, OrbitalObject } from "../architecture/orbitalObject";
+import { OrbitalObject } from "../architecture/orbitalObject";
 import { Cullable } from "../bodies/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../orbit/orbitProperties";
@@ -24,9 +24,9 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     readonly ringInstances: InstancedMesh[] = [];
 
-    readonly parent: OrbitalObject & HasOrbitalObjectModel | null = null;
+    readonly parent: OrbitalObject | null = null;
 
-    constructor(scene: Scene, parentBody: OrbitalObject & HasOrbitalObjectModel | null = null) {
+    constructor(scene: Scene, parentBody: OrbitalObject | null = null) {
         //TODO: do not hardcode name
         this.name = "Spacestation";
 

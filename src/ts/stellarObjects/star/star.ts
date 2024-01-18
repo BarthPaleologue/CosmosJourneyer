@@ -15,7 +15,7 @@ import { getStellarTypeString } from "../common";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
-import { CelestialBody, HasCelestialBodyModel } from "../../architecture/celestialBody";
+import { CelestialBody } from "../../architecture/celestialBody";
 import { OrbitalObject } from "../../architecture/orbitalObject";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -26,7 +26,7 @@ import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 
-export class Star implements StellarObject, HasCelestialBodyModel, Cullable {
+export class Star implements StellarObject, Cullable {
     readonly name: string;
 
     readonly mesh: Mesh;
@@ -48,7 +48,7 @@ export class Star implements StellarObject, HasCelestialBodyModel, Cullable {
      * @param parentBody The bodies the star is orbiting
      * @param model The seed of the star in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, model: StarModel | number, parentBody: (CelestialBody & HasCelestialBodyModel) | null = null) {
+    constructor(name: string, scene: UberScene, model: StarModel | number, parentBody: CelestialBody | null = null) {
         this.name = name;
 
         this.parent = parentBody;

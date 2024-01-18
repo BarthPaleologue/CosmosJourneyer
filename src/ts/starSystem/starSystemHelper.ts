@@ -14,7 +14,7 @@ import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { getMoonSeed } from "../planets/common";
-import { HasPlanetModel, Planet } from "../architecture/planet";
+import { Planet } from "../architecture/planet";
 import { StellarObject } from "../architecture/stellarObject";
 import { BODY_TYPE } from "../model/common";
 
@@ -134,7 +134,7 @@ export class StarSystemHelper {
 
     public static makeSatellite(
         starsystem: StarSystemController,
-        planet: Planet & HasPlanetModel,
+        planet: Planet,
         model: TelluricPlanetModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)
     ): TelluricPlanet {
         const satellite = new TelluricPlanet(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, starsystem.scene, model, planet);
@@ -152,7 +152,7 @@ export class StarSystemHelper {
      * @param planet The planet to make satellites for
      * @param n The number of satellites to make
      */
-    public static makeSatellites(starsystem: StarSystemController, planet: Planet & HasPlanetModel, n = planet.model.nbMoons): void {
+    public static makeSatellites(starsystem: StarSystemController, planet: Planet, n = planet.model.nbMoons): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
         if (planet.model.childrenBodies.length + n > planet.model.nbMoons)
             console.warn(

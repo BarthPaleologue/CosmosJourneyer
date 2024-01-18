@@ -10,10 +10,10 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Transformable } from "../../uberCore/transforms/basicTransform";
-import { HasPlanetModel, Planet } from "../../architecture/planet";
+import { Planet } from "../../architecture/planet";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { CelestialBody, HasCelestialBodyModel } from "../../architecture/celestialBody";
+import { CelestialBody } from "../../architecture/celestialBody";
 import { OrbitalObject } from "../../architecture/orbitalObject";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
@@ -21,7 +21,7 @@ import { Cullable } from "../../bodies/cullable";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 
-export class GasPlanet implements Planet, Cullable, HasPlanetModel {
+export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
     readonly material: GasPlanetMaterial;
 
@@ -39,7 +39,7 @@ export class GasPlanet implements Planet, Cullable, HasPlanetModel {
      * @param parentBody The bodies the planet is orbiting
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, model: GasPlanetModel | number, parentBody: (CelestialBody & HasCelestialBodyModel) | null = null) {
+    constructor(name: string, scene: UberScene, model: GasPlanetModel | number, parentBody: CelestialBody | null = null) {
         this.name = name;
 
         this.parent = parentBody;
