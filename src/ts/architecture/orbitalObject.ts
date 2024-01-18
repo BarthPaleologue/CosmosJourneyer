@@ -82,7 +82,6 @@ export class OrbitalObject {
     }
 }
 
-
 export interface OrbitalObjectModel {
     rng: (step: number) => number;
     seed: number;

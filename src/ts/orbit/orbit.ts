@@ -59,4 +59,3 @@ export function getOrbitalPeriod(radius: number, parentMass: number) {
     const M = parentMass;
     return Math.sqrt((4 * Math.PI ** 2 * a ** 3) / (G * M));
 }
-

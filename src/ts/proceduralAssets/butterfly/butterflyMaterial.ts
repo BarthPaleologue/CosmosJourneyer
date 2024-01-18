@@ -29,10 +29,10 @@ export function createButterflyMaterial(scene: Scene, player?: TransformNode) {
     scene.onBeforeRenderObservable.add(() => {
         elapsedSeconds += scene.getEngine().getDeltaTime() / 1000;
 
-        if(scene.activeCamera === null) throw new Error("Active camera is null");
+        if (scene.activeCamera === null) throw new Error("Active camera is null");
 
         const star = scene.lights[1];
-        if(!(star instanceof PointLight)) throw new Error("Could not find star light");
+        if (!(star instanceof PointLight)) throw new Error("Could not find star light");
 
         const lightDirection = star.position.subtract(scene.activeCamera.globalPosition).normalize();
         butterflyMaterial.setVector3("lightDirection", lightDirection);

@@ -131,7 +131,6 @@ const planet = StarSystemHelper.makeTelluricPlanet(starSystem, planetModel);
 planet.model.ringsUniforms = new RingsUniforms(planet.model.rng);
 planet.postProcesses.push(PostProcessType.RING);
 
-
 //const spacestation = new SpaceStation(starSystemView.scene, planet);
 //starSystemView.getStarSystem().addSpaceStation(spacestation);
 
@@ -214,13 +213,13 @@ if (aresAtmosphere) {
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
-    if(e.key === "x") {
+    if (e.key === "x") {
         let nbVertices = 0;
         let nbInstances = 0;
-        planet.sides.forEach(side => {
+        planet.sides.forEach((side) => {
             side.executeOnEveryChunk((chunk) => {
                 nbVertices += Settings.VERTEX_RESOLUTION * Settings.VERTEX_RESOLUTION;
-                chunk.instancePatches.forEach(patch => {
+                chunk.instancePatches.forEach((patch) => {
                     nbInstances += patch.getNbInstances();
                 });
             });

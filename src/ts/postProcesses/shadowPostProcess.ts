@@ -66,7 +66,7 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
 
         if (shadowUniforms.hasRings) {
             const ringsUniforms = body.getRingsUniforms();
-            if(ringsUniforms === null) throw new Error("shadowUniforms.hasRings is true and yet body.getRingsUniforms() returned null!");
+            if (ringsUniforms === null) throw new Error("shadowUniforms.hasRings is true and yet body.getRingsUniforms() returned null!");
             uniforms.push(...ringsUniforms.getShaderUniforms());
 
             return ringsUniforms.getShaderSamplers(scene).then((ringSamplers) => {
