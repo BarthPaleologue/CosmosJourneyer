@@ -1,6 +1,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { BoundingSphere } from "../bodies/cullable";
+import { BoundingSphere } from "../architecture/boundingSphere";
 import { Transformable } from "../architecture/transformable";
 
 /**

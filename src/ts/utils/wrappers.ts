@@ -1,9 +1,10 @@
-import { BoundingSphere } from "../bodies/cullable";
+
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Transformable } from "../architecture/transformable";
+import { BoundingSphere } from "../architecture/boundingSphere";
 
 export class TransformNodeWrapper implements Transformable, BoundingSphere {
     readonly transform: TransformNode;

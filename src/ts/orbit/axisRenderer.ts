@@ -1,7 +1,7 @@
 import { LinesMesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { Color3, Vector3 } from "@babylonjs/core/Maths/math";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { BoundingSphere } from "../bodies/cullable";
+import { BoundingSphere } from "../architecture/boundingSphere";
 import { Transformable } from "../architecture/transformable";
 
 export class AxisRenderer {
