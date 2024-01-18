@@ -2,14 +2,14 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { MandelbulbModel } from "./mandelbulbModel";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { CelestialBody } from "../architecture/celestialBody";
-import { HasBodyModel, PhysicalProperties } from "../model/common";
+import { CelestialBody, HasCelestialBodyModel } from "../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { RingsUniforms } from "../postProcesses/rings/ringsUniform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Cullable } from "../bodies/cullable";
+import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 
 export class Mandelbulb implements CelestialBody, Cullable {
     readonly name: string;
@@ -20,7 +20,7 @@ export class Mandelbulb implements CelestialBody, Cullable {
 
     readonly postProcesses: PostProcessType[] = [];
 
-    readonly parent: (CelestialBody & HasBodyModel) | null = null;
+    readonly parent: (CelestialBody & HasCelestialBodyModel) | null = null;
 
     /**
      * New Gas Planet
@@ -29,7 +29,7 @@ export class Mandelbulb implements CelestialBody, Cullable {
      * @param parentBody The bodies the planet is orbiting
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      */
-    constructor(name: string, scene: Scene, model: MandelbulbModel | number, parentBody: (CelestialBody & HasBodyModel) | null = null) {
+    constructor(name: string, scene: Scene, model: MandelbulbModel | number, parentBody: (CelestialBody & HasCelestialBodyModel) | null = null) {
         this.name = name;
 
         this.model = model instanceof MandelbulbModel ? model : new MandelbulbModel(model, parentBody?.model);
@@ -55,7 +55,7 @@ export class Mandelbulb implements CelestialBody, Cullable {
         return this.model.orbit;
     }
 
-    getPhysicalProperties(): PhysicalProperties {
+    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
         return this.model.physicalProperties;
     }
 

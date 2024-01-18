@@ -6,12 +6,12 @@ import { SpaceStationModel } from "./spacestationModel";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Assets } from "../assets";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { OrbitalObject } from "../architecture/orbitalObject";
+import { HasOrbitalObjectModel, OrbitalObject } from "../architecture/orbitalObject";
 import { Cullable } from "../bodies/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../orbit/orbitProperties";
-import { HasBaseModel, PhysicalProperties } from "../model/common";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -24,9 +24,9 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     readonly ringInstances: InstancedMesh[] = [];
 
-    readonly parent: OrbitalObject & HasBaseModel | null = null;
+    readonly parent: OrbitalObject & HasOrbitalObjectModel | null = null;
 
-    constructor(scene: Scene, parentBody: OrbitalObject & HasBaseModel | null = null) {
+    constructor(scene: Scene, parentBody: OrbitalObject & HasOrbitalObjectModel | null = null) {
         //TODO: do not hardcode name
         this.name = "Spacestation";
 
@@ -62,7 +62,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
         return this.model.orbit;
     }
 
-    getPhysicalProperties(): PhysicalProperties {
+    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
         return this.model.physicalProperties;
     }
 

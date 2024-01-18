@@ -17,10 +17,9 @@ import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { SystemSeed } from "../utils/systemSeed";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 import { OrbitalObject } from "../architecture/orbitalObject";
-import { CelestialBody } from "../architecture/celestialBody";
+import { CelestialBody, HasCelestialBodyModel } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
 import { Planet } from "../architecture/planet";
-import { HasBodyModel } from "../model/common";
 
 export class StarSystemController {
     readonly scene: UberScene;
@@ -38,7 +37,7 @@ export class StarSystemController {
     /**
      * The list of all stellar objects in the system (stars, black holes, pulsars)
      */
-    readonly stellarObjects: (StellarObject & HasBodyModel)[] = [];
+    readonly stellarObjects: (StellarObject & HasCelestialBodyModel)[] = [];
 
     /**
      * The list of all planets in the system (telluric and gas)
@@ -129,7 +128,7 @@ export class StarSystemController {
      * @param stellarObject The star added to the system
      * @returns The star added to the system
      */
-    public addStellarObject(stellarObject: StellarObject & HasBodyModel): StellarObject {
+    public addStellarObject(stellarObject: StellarObject & HasCelestialBodyModel): StellarObject {
         this.orbitalObjects.push(stellarObject);
         this.celestialBodies.push(stellarObject);
         this.stellarObjects.push(stellarObject);

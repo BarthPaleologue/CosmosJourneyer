@@ -15,8 +15,7 @@ import { getStellarTypeString } from "../common";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
-import { CelestialBody } from "../../architecture/celestialBody";
-import { HasBodyModel, PhysicalProperties } from "../../model/common";
+import { CelestialBody, HasCelestialBodyModel } from "../../architecture/celestialBody";
 import { OrbitalObject } from "../../architecture/orbitalObject";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -25,8 +24,9 @@ import { StellarObject } from "../../architecture/stellarObject";
 import { Cullable } from "../../bodies/cullable";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 
-export class Star implements StellarObject, HasBodyModel, Cullable {
+export class Star implements StellarObject, HasCelestialBodyModel, Cullable {
     readonly name: string;
 
     readonly mesh: Mesh;
@@ -48,7 +48,7 @@ export class Star implements StellarObject, HasBodyModel, Cullable {
      * @param parentBody The bodies the star is orbiting
      * @param model The seed of the star in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, model: StarModel | number, parentBody: (CelestialBody & HasBodyModel) | null = null) {
+    constructor(name: string, scene: UberScene, model: StarModel | number, parentBody: (CelestialBody & HasCelestialBodyModel) | null = null) {
         this.name = name;
 
         this.parent = parentBody;
@@ -113,7 +113,7 @@ export class Star implements StellarObject, HasBodyModel, Cullable {
         return this.model.orbit;
     }
 
-    getPhysicalProperties(): PhysicalProperties {
+    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
         return this.model.physicalProperties;
     }
 

@@ -4,7 +4,7 @@ import { OrbitProperties } from "../orbit/orbitProperties";
 import { rotateVector3AroundInPlace } from "../utils/algebra";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
-import { PhysicalProperties } from "../model/common";
+import { OrbitalObjectPhysicalProperties } from "./physicalProperties";
 
 export interface OrbitalObject extends Transformable, BoundingSphere {
     name: string;
@@ -13,7 +13,9 @@ export interface OrbitalObject extends Transformable, BoundingSphere {
 
     getOrbitProperties(): OrbitProperties;
 
-    getPhysicalProperties(): PhysicalProperties;
+    getPhysicalProperties(): OrbitalObjectPhysicalProperties;
+
+    getTypeName(): string;
 
     parent: OrbitalObject | null;
 }
@@ -76,4 +78,20 @@ export class OrbitalObject {
 
         setRotationQuaternion(object.getTransform(), newQuaternion);
     }
+}
+
+
+export interface OrbitalObjectModel {
+    rng: (step: number) => number;
+    seed: number;
+
+    orbit: OrbitProperties;
+    physicalProperties: OrbitalObjectPhysicalProperties;
+
+    readonly parentBody: OrbitalObjectModel | null;
+    readonly childrenBodies: OrbitalObjectModel[];
+}
+
+export interface HasOrbitalObjectModel {
+    model: OrbitalObjectModel;
 }

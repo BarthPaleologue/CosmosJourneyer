@@ -9,14 +9,14 @@ import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { BODY_TYPE, HasPlanetModel } from "../model/common";
 import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { getMoonSeed } from "../planets/common";
-import { Planet } from "../architecture/planet";
+import { HasPlanetModel, Planet } from "../architecture/planet";
 import { StellarObject } from "../architecture/stellarObject";
+import { BODY_TYPE } from "../model/common";
 
 export class StarSystemHelper {
     public static makeStar(starsystem: StarSystemController, model?: number | StarModel): Star {

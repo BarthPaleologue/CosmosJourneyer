@@ -41,7 +41,7 @@ export class ObjectOverlay {
         this.textRoot.addControl(this.namePlate);
 
         this.typeText = new TextBlock(object.name + "OverlayTypeText");
-        this.typeText.text = object.constructor.name; //FIXME: define an interface with a method for this
+        this.typeText.text = object.getTypeName();
         this.typeText.color = "white";
         this.typeText.zIndex = 6;
         this.typeText.height = "20px";

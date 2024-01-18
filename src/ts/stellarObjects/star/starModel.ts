@@ -6,9 +6,12 @@ import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
 import { getOrbitalPeriod } from "../../orbit/orbit";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { BODY_TYPE, CelestialBodyModel, GENERATION_STEPS, StarPhysicalProperties, StellarObjectModel } from "../../model/common";
+import { BODY_TYPE, GENERATION_STEPS } from "../../model/common";
 import { STELLAR_TYPE } from "../common";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { StarPhysicalProperties } from "../../architecture/physicalProperties";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { StellarObjectModel } from "../../architecture/stellarObject";
 
 export class StarModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.STAR;

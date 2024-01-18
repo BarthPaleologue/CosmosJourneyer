@@ -1,7 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { BODY_TYPE, CelestialBodyModel, GENERATION_STEPS, PlanetModel, TelluricPlanetPhysicalProperties } from "../../model/common";
+import { BODY_TYPE, GENERATION_STEPS } from "../../model/common";
 import { TerrainSettings } from "./terrain/terrainSettings";
 import { clamp } from "terrain-generation";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
@@ -11,6 +11,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { CloudsUniforms } from "../../postProcesses/clouds/cloudsUniforms";
+import { PlanetModel } from "../../architecture/planet";
+import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalProperties";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
 
 export class TelluricPlanetModel implements PlanetModel {
     readonly bodyType = BODY_TYPE.TELLURIC_PLANET;
