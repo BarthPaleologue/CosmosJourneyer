@@ -15,7 +15,7 @@ import { Assets } from "../../../../assets";
 import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
-import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
+import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { BoundingSphere } from "../../../../bodies/cullable";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
@@ -26,7 +26,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
     private readonly depth: number;
     public readonly cubePosition: Vector3;
 
-    readonly planetModel: TelluricPlanemoModel;
+    readonly planetModel: TelluricPlanetModel;
 
     readonly chunkSideLength: number;
 
@@ -48,7 +48,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
     private disposed = false;
 
-    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanemoModel, rootLength: number, scene: Scene) {
+    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanetModel, rootLength: number, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;

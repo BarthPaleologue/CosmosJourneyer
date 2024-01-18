@@ -6,8 +6,8 @@ import { getTransformationQuaternion } from "../utils/algebra";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { UberScene } from "../uberCore/uberScene";
 import { SpaceStation } from "../spacestation/spaceStation";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
-import { GasPlanet } from "../planemos/gasPlanet/gasPlanet";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { Mandelbulb } from "../mandelbulb/mandelbulb";
 import { StarSystemModel } from "./starSystemModel";
 import { rotateAround, setUpVector, translate } from "../uberCore/transforms/basicTransform";
@@ -15,11 +15,11 @@ import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { SystemSeed } from "../utils/systemSeed";
-import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
+import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
-import { Planemo } from "../architecture/planemo";
+import { Planet } from "../architecture/planet";
 import { HasBodyModel } from "../model/common";
 
 export class StarSystemController {
@@ -43,12 +43,12 @@ export class StarSystemController {
     /**
      * The list of all planets in the system (telluric and gas)
      */
-    readonly planets: Planemo[] = [];
+    readonly planets: Planet[] = [];
 
     /**
      * The list of all telluric planets in the system
      */
-    readonly telluricPlanemos: TelluricPlanemo[] = [];
+    readonly telluricPlanets: TelluricPlanet[] = [];
 
     /**
      * The list of all gas planets in the system
@@ -80,11 +80,11 @@ export class StarSystemController {
      * Adds a telluric planet to the system and returns it
      * @param planet The planet to add to the system
      */
-    public addTelluricPlanet(planet: TelluricPlanemo): TelluricPlanemo {
+    public addTelluricPlanet(planet: TelluricPlanet): TelluricPlanet {
         this.orbitalObjects.push(planet);
         this.celestialBodies.push(planet);
         this.planets.push(planet);
-        this.telluricPlanemos.push(planet);
+        this.telluricPlanets.push(planet);
         return planet;
     }
 
@@ -105,10 +105,10 @@ export class StarSystemController {
      * @param satellite The satellite to add to the system
      * @returns The satellite added to the system
      */
-    public addTelluricSatellite(satellite: TelluricPlanemo): TelluricPlanemo {
+    public addTelluricSatellite(satellite: TelluricPlanet): TelluricPlanet {
         this.orbitalObjects.push(satellite);
         this.celestialBodies.push(satellite);
-        this.telluricPlanemos.push(satellite);
+        this.telluricPlanets.push(satellite);
         return satellite;
     }
 
@@ -281,17 +281,17 @@ export class StarSystemController {
                         promises.push(this.postProcessManager.addRings(object, this.stellarObjects));
                         break;
                     case PostProcessType.ATMOSPHERE:
-                        if (!(object instanceof GasPlanet) && !(object instanceof TelluricPlanemo))
+                        if (!(object instanceof GasPlanet) && !(object instanceof TelluricPlanet))
                             throw new Error("Atmosphere post process can only be added to gas or telluric planets. Source:" + object.name);
-                        this.postProcessManager.addAtmosphere(object as GasPlanet | TelluricPlanemo, this.stellarObjects);
+                        this.postProcessManager.addAtmosphere(object as GasPlanet | TelluricPlanet, this.stellarObjects);
                         break;
                     case PostProcessType.CLOUDS:
-                        if (!(object instanceof TelluricPlanemo)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + object.name);
-                        promises.push(this.postProcessManager.addClouds(object as TelluricPlanemo, this.stellarObjects));
+                        if (!(object instanceof TelluricPlanet)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + object.name);
+                        promises.push(this.postProcessManager.addClouds(object as TelluricPlanet, this.stellarObjects));
                         break;
                     case PostProcessType.OCEAN:
-                        if (!(object instanceof TelluricPlanemo)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + object.name);
-                        this.postProcessManager.addOcean(object as TelluricPlanemo, this.stellarObjects);
+                        if (!(object instanceof TelluricPlanet)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + object.name);
+                        this.postProcessManager.addOcean(object as TelluricPlanet, this.stellarObjects);
                         break;
                     case PostProcessType.VOLUMETRIC_LIGHT:
                         if (!(object instanceof Star)) throw new Error("Volumetric light post process can only be added to stars. Source:" + object.name);
@@ -401,12 +401,12 @@ export class StarSystemController {
 
         controller.update(deltaTime);
 
-        for (const body of this.telluricPlanemos) {
+        for (const body of this.telluricPlanets) {
             // Meshes with LOD are updated (surface quadtrees)
             body.updateLOD(controller.getTransform().getAbsolutePosition(), chunkForge);
         }
 
-        for (const object of this.telluricPlanemos) {
+        for (const object of this.telluricPlanets) {
             object.computeCulling(controller.getActiveCamera());
         }
 

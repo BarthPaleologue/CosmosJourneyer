@@ -6,7 +6,7 @@ import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
 import { getOrbitalPeriod } from "../../orbit/orbit";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { BODY_TYPE, BodyModel, GENERATION_STEPS, StarPhysicalProperties, StellarObjectModel } from "../../model/common";
+import { BODY_TYPE, CelestialBodyModel, GENERATION_STEPS, StarPhysicalProperties, StellarObjectModel } from "../../model/common";
 import { STELLAR_TYPE } from "../common";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 
@@ -29,11 +29,11 @@ export class StarModel implements StellarObjectModel {
     static RING_PROPORTION = 0.2;
     readonly ringsUniforms;
 
-    readonly parentBody: BodyModel | null;
+    readonly parentBody: CelestialBodyModel | null;
 
-    readonly childrenBodies: BodyModel[] = [];
+    readonly childrenBodies: CelestialBodyModel[] = [];
 
-    constructor(seed: number, parentBody: BodyModel | null = null) {
+    constructor(seed: number, parentBody: CelestialBodyModel | null = null) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 

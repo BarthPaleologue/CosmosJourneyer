@@ -1,7 +1,7 @@
 import { UberScene } from "../uberCore/uberScene";
 import { UberRenderingPipeline } from "../uberCore/uberRenderingPipeline";
 import { OceanPostProcess } from "./oceanPostProcess";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
 import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";
@@ -9,7 +9,7 @@ import { RingsPostProcess } from "./rings/ringsPostProcess";
 import { StarfieldPostProcess } from "./starfieldPostProcess";
 import { VolumetricLight } from "./volumetricLight";
 import { BlackHolePostProcess } from "./blackHolePostProcess";
-import { GasPlanet } from "../planemos/gasPlanet/gasPlanet";
+import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
 import { makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess } from "./volumetricCloudsPostProcess";
@@ -160,7 +160,7 @@ export class PostProcessManager {
      * @param planet A telluric planet
      * @param stellarObjects An array of stars or black holes
      */
-    public addOcean(planet: TelluricPlanemo, stellarObjects: StellarObject[]) {
+    public addOcean(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
         const ocean = new OceanPostProcess(`${planet.name}Ocean`, planet, this.scene, stellarObjects);
         this.oceans.push(ocean);
     }
@@ -169,7 +169,7 @@ export class PostProcessManager {
      * Returns the ocean post process for the given planet. Throws an error if no ocean is found.
      * @param planet A telluric planet
      */
-    public getOcean(planet: TelluricPlanemo): OceanPostProcess | null {
+    public getOcean(planet: TelluricPlanet): OceanPostProcess | null {
         return this.oceans.find((ocean) => ocean.object === planet) ?? null;
     }
 
@@ -178,7 +178,7 @@ export class PostProcessManager {
      * @param planet A telluric planet
      * @param stellarObjects An array of stars or black holes
      */
-    public async addClouds(planet: TelluricPlanemo, stellarObjects: StellarObject[]) {
+    public async addClouds(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
         const uniforms = planet.model.cloudsUniforms;
         if (uniforms === null)
             throw new Error(
@@ -193,7 +193,7 @@ export class PostProcessManager {
      * Returns the clouds post process for the given planet. Throws an error if no clouds are found.
      * @param planet A telluric planet
      */
-    public getClouds(planet: TelluricPlanemo): CloudsPostProcess | null {
+    public getClouds(planet: TelluricPlanet): CloudsPostProcess | null {
         return this.clouds.find((clouds) => clouds.object === planet) ?? null;
     }
 
@@ -202,7 +202,7 @@ export class PostProcessManager {
      * @param planet A gas or telluric planet
      * @param stellarObjects An array of stars or black holes
      */
-    public addAtmosphere(planet: GasPlanet | TelluricPlanemo, stellarObjects: StellarObject[]) {
+    public addAtmosphere(planet: GasPlanet | TelluricPlanet, stellarObjects: StellarObject[]) {
         const atmosphere = new AtmosphericScatteringPostProcess(
             `${planet.name}Atmosphere`,
             planet,
@@ -217,7 +217,7 @@ export class PostProcessManager {
      * Returns the atmosphere post process for the given planet. Throws an error if no atmosphere is found.
      * @param planet A gas or telluric planet
      */
-    public getAtmosphere(planet: GasPlanet | TelluricPlanemo): AtmosphericScatteringPostProcess | null {
+    public getAtmosphere(planet: GasPlanet | TelluricPlanet): AtmosphericScatteringPostProcess | null {
         return this.atmospheres.find((atmosphere) => atmosphere.object === planet) ?? null;
     }
 

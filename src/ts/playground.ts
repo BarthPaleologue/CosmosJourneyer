@@ -11,8 +11,8 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setMaxLinVel } from "./utils/havok";
-import { TelluricPlanemo } from "./planemos/telluricPlanemo/telluricPlanemo";
-import { ChunkForgeWorkers } from "./planemos/telluricPlanemo/terrain/chunks/chunkForgeWorkers";
+import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
+import { ChunkForgeWorkers } from "./planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
@@ -50,7 +50,7 @@ camera.angularSensibility /= 10;
 scene.setActiveCamera(camera);
 camera.attachControl(canvas, true);
 
-const planet = new TelluricPlanemo("xrPlanet", scene, 0.51, undefined);
+const planet = new TelluricPlanet("xrPlanet", scene, 0.51, undefined);
 translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
 
 const hemiLight = new HemisphericLight("hemiLight", new Vector3(0, 1, 0), scene);

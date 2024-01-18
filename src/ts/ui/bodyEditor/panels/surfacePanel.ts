@@ -1,5 +1,5 @@
 import { EditorPanel } from "../editorPanel";
-import { TelluricPlanemo } from "../../../planemos/telluricPlanemo/telluricPlanemo";
+import { TelluricPlanet } from "../../../planets/telluricPlanet/telluricPlanet";
 import { clearAllEventListenersById } from "../../../utils/html";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Slider } from "handle-sliderjs";
@@ -8,7 +8,7 @@ export class SurfacePanel extends EditorPanel {
     constructor() {
         super("surface");
     }
-    init(planet: TelluricPlanemo) {
+    init(planet: TelluricPlanet) {
         for (const slider of this.sliders) slider.remove();
 
         const material = planet.material;

@@ -4,7 +4,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom } from "extended-random";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { STELLAR_TYPE } from "../common";
-import { BlackHolePhysicalProperties, BODY_TYPE, BodyModel, GENERATION_STEPS, StellarObjectModel } from "../../model/common";
+import { BlackHolePhysicalProperties, BODY_TYPE, CelestialBodyModel, GENERATION_STEPS, StellarObjectModel } from "../../model/common";
 
 export class BlackHoleModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.BLACK_HOLE;
@@ -19,11 +19,11 @@ export class BlackHoleModel implements StellarObjectModel {
 
     readonly physicalProperties: BlackHolePhysicalProperties;
 
-    readonly parentBody: BodyModel | null;
+    readonly parentBody: CelestialBodyModel | null;
 
-    readonly childrenBodies: BodyModel[] = [];
+    readonly childrenBodies: CelestialBodyModel[] = [];
 
-    constructor(seed: number, parentBody?: BodyModel) {
+    constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 

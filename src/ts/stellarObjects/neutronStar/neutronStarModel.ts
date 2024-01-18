@@ -1,8 +1,8 @@
 import { StarModel } from "../star/starModel";
-import { BodyModel } from "../../model/common";
+import { CelestialBodyModel } from "../../model/common";
 
 export class NeutronStarModel extends StarModel {
-    constructor(seed: number, parentBody?: BodyModel) {
+    constructor(seed: number, parentBody?: CelestialBodyModel) {
         super(seed, parentBody);
     }
 }

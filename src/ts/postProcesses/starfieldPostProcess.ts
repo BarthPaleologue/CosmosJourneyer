@@ -1,5 +1,5 @@
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
@@ -53,8 +53,8 @@ export class StarfieldPostProcess extends UberPostProcess {
                     vis = 0.5 + vis * 0.5;
                     let vis2 = 1.0;
                     const nearest = nearestBody(camera.globalPosition, bodies);
-                    if (nearest instanceof TelluricPlanemo) {
-                        const planet = nearest as TelluricPlanemo;
+                    if (nearest instanceof TelluricPlanet) {
+                        const planet = nearest as TelluricPlanet;
                         if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {
                             const height = planet.getTransform().getAbsolutePosition().length();
                             //FIXME: has to be dynamic

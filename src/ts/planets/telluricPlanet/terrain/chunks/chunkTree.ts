@@ -4,7 +4,7 @@ import { BuildTask, TaskType } from "./taskTypes";
 import { Settings } from "../../../../settings";
 import { getChunkSphereSpacePositionFromPath } from "../../../../utils/chunkUtils";
 import { TerrainSettings } from "../terrainSettings";
-import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
+import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -38,7 +38,7 @@ export class ChunkTree {
 
     private deleteSemaphores: DeleteSemaphore[] = [];
 
-    readonly planetModel: TelluricPlanemoModel;
+    readonly planetModel: TelluricPlanetModel;
 
     readonly planetName: string;
     readonly planetSeed: number;
@@ -60,7 +60,7 @@ export class ChunkTree {
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanemoModel, parentAggregate: PhysicsAggregate,  material: Material, scene: UberScene) {
+    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanetModel, parentAggregate: PhysicsAggregate, material: Material, scene: UberScene) {
         this.rootChunkLength = planetModel.radius * 2;
         this.planetName = planetName;
         this.planetSeed = planetModel.seed;

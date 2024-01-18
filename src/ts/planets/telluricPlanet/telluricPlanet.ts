@@ -3,10 +3,10 @@ import { Direction } from "../../utils/direction";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
-import { TelluricPlanemoMaterial } from "./telluricPlanemoMaterial";
+import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
 import { UberScene } from "../../uberCore/uberScene";
-import { TelluricPlanemoModel } from "./telluricPlanemoModel";
+import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
@@ -15,7 +15,7 @@ import { Transformable } from "../../uberCore/transforms/basicTransform";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PlanetChunk } from "./terrain/chunks/planetChunk";
-import { Planemo } from "../../architecture/planemo";
+import { Planet } from "../../architecture/planet";
 import { Cullable } from "../../bodies/cullable";
 import { HasBodyModel, PhysicalProperties } from "../../model/common";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -26,14 +26,14 @@ import { OrbitalObject } from "../../architecture/orbitalObject";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 
-export class TelluricPlanemo implements Planemo, Cullable, HasBodyModel {
+export class TelluricPlanet implements Planet, Cullable, HasBodyModel {
     readonly name: string;
 
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
 
-    readonly material: TelluricPlanemoMaterial;
+    readonly material: TelluricPlanetMaterial;
 
-    readonly model: TelluricPlanemoModel;
+    readonly model: TelluricPlanetModel;
 
     readonly onChunkCreatedObservable = new Observable<PlanetChunk>();
 
@@ -51,12 +51,12 @@ export class TelluricPlanemo implements Planemo, Cullable, HasBodyModel {
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
      * @param parentBody
      */
-    constructor(name: string, scene: UberScene, model: TelluricPlanemoModel | number, parentBody: (CelestialBody & HasBodyModel) | null = null) {
+    constructor(name: string, scene: UberScene, model: TelluricPlanetModel | number, parentBody: (CelestialBody & HasBodyModel) | null = null) {
         this.name = name;
 
         this.parent = parentBody;
 
-        this.model = model instanceof TelluricPlanemoModel ? model : new TelluricPlanemoModel(model, parentBody?.model);
+        this.model = model instanceof TelluricPlanetModel ? model : new TelluricPlanetModel(model, parentBody?.model);
 
         this.transform = new TransformNode(`${name}Transform`, scene);
         this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
@@ -80,7 +80,7 @@ export class TelluricPlanemo implements Planemo, Cullable, HasBodyModel {
         if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
         if (this.model.cloudsUniforms !== null) this.postProcesses.push(PostProcessType.CLOUDS);
 
-        this.material = new TelluricPlanemoMaterial(this.name, this.getTransform(), this.model, scene);
+        this.material = new TelluricPlanetMaterial(this.name, this.getTransform(), this.model, scene);
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
@@ -129,7 +129,7 @@ export class TelluricPlanemo implements Planemo, Cullable, HasBodyModel {
     }
 
     getTypeName(): string {
-        return "Telluric Planemo";
+        return "Telluric Planet";
     }
 
     /**

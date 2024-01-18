@@ -1,9 +1,9 @@
 import editorHTML from "../../../html/bodyEditor.html";
-import { TelluricPlanemo } from "../../planemos/telluricPlanemo/telluricPlanemo";
+import { TelluricPlanet } from "../../planets/telluricPlanet/telluricPlanet";
 import "handle-sliderjs/dist/css/style2.css";
-import { ColorMode } from "../../planemos/telluricPlanemo/colorSettingsInterface";
+import { ColorMode } from "../../planets/telluricPlanet/colorSettingsInterface";
 import { hide, show } from "../../utils/html";
-import { GasPlanet } from "../../planemos/gasPlanet/gasPlanet";
+import { GasPlanet } from "../../planets/gasPlanet/gasPlanet";
 import { EditorPanel } from "./editorPanel";
 import { GeneralPanel } from "./panels/generalPanel";
 import { PhysicPanel } from "./panels/physicPanel";
@@ -157,15 +157,15 @@ export class BodyEditor {
             this.ringsPanel.init(body, rings);
         }
 
-        if (body instanceof TelluricPlanemo || body instanceof GasPlanet) {
-            const atmosphere = postProcessManager.getAtmosphere(body as TelluricPlanemo);
+        if (body instanceof TelluricPlanet || body instanceof GasPlanet) {
+            const atmosphere = postProcessManager.getAtmosphere(body as TelluricPlanet);
             if (atmosphere) {
                 this.atmospherePanel.enable();
                 this.atmospherePanel.setVisibility(this.currentPanel === this.atmospherePanel);
                 this.atmospherePanel.init(body, atmosphere);
             }
 
-            if (body instanceof TelluricPlanemo) {
+            if (body instanceof TelluricPlanet) {
                 this.initToolbar(body);
 
                 this.surfacePanel.enable();
@@ -176,14 +176,14 @@ export class BodyEditor {
                 this.physicPanel.setVisibility(this.currentPanel === this.physicPanel);
                 this.physicPanel.init(body);
 
-                const clouds = postProcessManager.getClouds(body as TelluricPlanemo);
+                const clouds = postProcessManager.getClouds(body as TelluricPlanet);
                 if (clouds) {
                     this.cloudsPanel.enable();
                     this.cloudsPanel.setVisibility(this.currentPanel === this.cloudsPanel);
                     this.cloudsPanel.init(body, clouds);
                 }
 
-                const ocean = postProcessManager.getOcean(body as TelluricPlanemo);
+                const ocean = postProcessManager.getOcean(body as TelluricPlanet);
                 if (ocean) {
                     this.oceanPanel.enable();
                     this.oceanPanel.setVisibility(this.currentPanel === this.oceanPanel);
@@ -217,7 +217,7 @@ export class BodyEditor {
         }
     }
 
-    public initToolbar(planet: TelluricPlanemo) {
+    public initToolbar(planet: TelluricPlanet) {
         const material = planet.material;
         const colorSettings = material.colorSettings;
         document.getElementById("defaultMapButton")?.addEventListener("click", () => {

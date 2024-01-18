@@ -1,6 +1,6 @@
 import surfaceMaterialFragment from "../../../shaders/gasPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/gasPlanetMaterial/vertex.glsl";
-import { GazColorSettings } from "../telluricPlanemo/colorSettingsInterface";
+import { GazColorSettings } from "../telluricPlanet/colorSettingsInterface";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { GasPlanetModel } from "./gasPlanetModel";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";

@@ -59,8 +59,8 @@ export class StarSystemModel {
 
     public getBodyTypeOfPlanet(index: number) {
         if (uniformRandBool(0.01, this.rng, GENERATION_STEPS.CHOOSE_PLANET_TYPE + (index + 20) * 500)) return BODY_TYPE.MANDELBULB;
-        if (uniformRandBool(0.5, this.rng, GENERATION_STEPS.CHOOSE_PLANET_TYPE + index)) return BODY_TYPE.TELLURIC;
-        return BODY_TYPE.GAS;
+        if (uniformRandBool(0.5, this.rng, GENERATION_STEPS.CHOOSE_PLANET_TYPE + index)) return BODY_TYPE.TELLURIC_PLANET;
+        return BODY_TYPE.GAS_PLANET;
     }
 
     public getPlanetSeed(index: number) {

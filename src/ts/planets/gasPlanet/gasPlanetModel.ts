@@ -1,7 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, PlanetPhysicalProperties } from "../../model/common";
+import { BODY_TYPE, CelestialBodyModel, GENERATION_STEPS, PlanetModel, PlanetPhysicalProperties } from "../../model/common";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
@@ -10,8 +10,8 @@ import { clamp } from "../../utils/math";
 import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-export class GasPlanetModel implements PlanemoModel {
-    readonly bodyType = BODY_TYPE.GAS;
+export class GasPlanetModel implements PlanetModel {
+    readonly bodyType = BODY_TYPE.GAS_PLANET;
     readonly seed: number;
     readonly rng: (step: number) => number;
 
@@ -25,11 +25,11 @@ export class GasPlanetModel implements PlanemoModel {
 
     readonly nbMoons: number;
 
-    readonly parentBody: BodyModel | null;
+    readonly parentBody: CelestialBodyModel | null;
 
-    readonly childrenBodies: BodyModel[] = [];
+    readonly childrenBodies: CelestialBodyModel[] = [];
 
-    constructor(seed: number, parentBody?: BodyModel) {
+    constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
 
         this.rng = seededSquirrelNoise(this.seed);

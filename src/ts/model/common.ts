@@ -1,5 +1,4 @@
 import { STELLAR_TYPE } from "../stellarObjects/common";
-import { RingsUniforms } from "../postProcesses/rings/ringsUniform";
 import { OrbitProperties } from "../orbit/orbitProperties";
 
 export enum GENERATION_STEPS {
@@ -26,8 +25,8 @@ export enum GENERATION_STEPS {
 
 export enum BODY_TYPE {
     STAR,
-    TELLURIC,
-    GAS,
+    TELLURIC_PLANET,
+    GAS_PLANET,
     MANDELBULB,
     BLACK_HOLE
 }
@@ -52,37 +51,36 @@ export type PlanetPhysicalProperties = PhysicalProperties & {
     pressure: number;
 };
 
-export type SolidPhysicalProperties = PlanetPhysicalProperties & {
+export type TelluricPlanetPhysicalProperties = PlanetPhysicalProperties & {
     waterAmount: number;
     oceanLevel: number;
 };
 
-export interface BaseModel {
+export interface OrbitalObjectModel {
     rng: (step: number) => number;
     seed: number;
 
     orbit: OrbitProperties;
     physicalProperties: PhysicalProperties;
 
-    readonly parentBody: BaseModel | null;
-    readonly childrenBodies: BaseModel[];
+    readonly parentBody: OrbitalObjectModel | null;
+    readonly childrenBodies: OrbitalObjectModel[];
 }
 
 export interface HasBaseModel {
-    model: BaseModel;
+    model: OrbitalObjectModel;
 }
 
-export interface BodyModel extends BaseModel {
+export interface CelestialBodyModel extends OrbitalObjectModel {
     readonly bodyType: BODY_TYPE;
     readonly radius: number;
 }
 
-export interface StellarObjectModel extends BodyModel {
+export interface StellarObjectModel extends CelestialBodyModel {
     stellarType: STELLAR_TYPE;
 }
 
-//https://en.wiktionary.org/wiki/planemo#English
-export interface PlanemoModel extends BodyModel {
+export interface PlanetModel extends CelestialBodyModel {
     physicalProperties: PlanetPhysicalProperties;
 
     nbMoons: number;
@@ -91,14 +89,14 @@ export interface PlanemoModel extends BodyModel {
 }
 
 export interface HasBodyModel extends HasBaseModel {
-    model: BodyModel;
+    model: CelestialBodyModel;
 }
 
-export interface HasPlanemoModel extends HasBodyModel {
-    model: PlanemoModel;
+export interface HasPlanetModel extends HasBodyModel {
+    model: PlanetModel;
 }
 
-export function depth(model: BaseModel): number {
+export function depth(model: OrbitalObjectModel): number {
     if (model.parentBody === null) return 0;
     return depth(model.parentBody) + 1;
 }

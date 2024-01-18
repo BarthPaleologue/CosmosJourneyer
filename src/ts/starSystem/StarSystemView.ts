@@ -17,9 +17,9 @@ import { positionNearObject } from "../utils/positionNearObject";
 import { ShipControls } from "../spaceship/shipControls";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { ChunkForgeWorkers } from "../planemos/telluricPlanemo/terrain/chunks/chunkForgeWorkers";
+import { ChunkForgeWorkers } from "../planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import "@babylonjs/core/Loading/loadingScreen";
-import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
+import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
