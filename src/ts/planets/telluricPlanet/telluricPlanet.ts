@@ -25,6 +25,7 @@ import { OrbitalObject } from "../../architecture/orbitalObject";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
+import { rotate } from "../../uberCore/transforms/basicTransform";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -59,7 +60,23 @@ export class TelluricPlanet implements Planet, Cullable {
         this.model = model instanceof TelluricPlanetModel ? model : new TelluricPlanetModel(model, parentBody?.model);
 
         this.transform = new TransformNode(`${name}Transform`, scene);
-        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
+
+        rotate(this.transform, Axis.X, this.model.physicalProperties.axialTilt);
+        this.transform.computeWorldMatrix(true);
+
+        this.aggregate = new PhysicsAggregate(
+          this.getTransform(),
+          PhysicsShapeType.CONTAINER,
+          {
+              mass: 0,
+              restitution: 0.2
+          },
+          scene
+        );
+        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
+        this.aggregate.body.disablePreStep = false;
+        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
+        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
 
         this.postProcesses.push(PostProcessType.SHADOW);
 
@@ -81,20 +98,6 @@ export class TelluricPlanet implements Planet, Cullable {
         if (this.model.cloudsUniforms !== null) this.postProcesses.push(PostProcessType.CLOUDS);
 
         this.material = new TelluricPlanetMaterial(this.name, this.getTransform(), this.model, scene);
-
-        this.aggregate = new PhysicsAggregate(
-            this.getTransform(),
-            PhysicsShapeType.CONTAINER,
-            {
-                mass: 0,
-                restitution: 0.2
-            },
-            scene
-        );
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-        this.aggregate.body.disablePreStep = false;
-        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
-        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
 
         this.sides = [
             new ChunkTree(Direction.Up, this.name, this.model, this.aggregate, this.material, scene),

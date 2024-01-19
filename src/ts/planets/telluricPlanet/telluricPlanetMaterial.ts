@@ -74,7 +74,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
                 "star_colors",
                 "nbStars",
 
-                "planetInverseRotationMatrix",
+                "inversePlanetWorldMatrix",
 
                 "playerPosition",
 
@@ -191,11 +191,12 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         );
     }
 
-    public update(activeControllerPosition: Vector3, stellarObjects: Transformable[]) {
-        this.setMatrix("normalMatrix", this.planetTransform.getWorldMatrix().clone().invert().transpose());
-        this.setMatrix("planetInverseRotationMatrix", getInverseRotationMatrix(this.planetTransform));
+    public update(cameraPosition: Vector3, stellarObjects: Transformable[]) {
+        const inversePlanetWorldMatrix = this.planetTransform.getWorldMatrix().clone().invert();
+        this.setMatrix("normalMatrix", inversePlanetWorldMatrix.transpose());
+        this.setMatrix("inversePlanetWorldMatrix", inversePlanetWorldMatrix);
 
-        this.setVector3("playerPosition", activeControllerPosition);
+        this.setVector3("playerPosition", cameraPosition);
 
         this.setArray3("star_positions", flattenVector3Array(stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
         this.setArray3("star_colors", flattenVector3Array(stellarObjects.map((star) => (star instanceof Star ? star.model.surfaceColor : Vector3.One()))));
