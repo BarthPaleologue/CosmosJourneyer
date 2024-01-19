@@ -47,8 +47,8 @@
     "webpack-dev-server": "^4.15.1"
   },
   "version": "1.0.0",
-  "description": "Planet Engine",
-  "name": "planet-engine",
+  "description": "CosmosJourneyer",
+  "name": "cosmos-journeyer",
   "scripts": {
     "build": "webpack --mode=production --node-env=production",
     "build:dev": "webpack --mode=development",

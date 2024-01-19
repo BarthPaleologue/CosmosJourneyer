@@ -19,7 +19,7 @@ export class AxisRenderer {
      * @param objects
      */
     setObjects(objects: (Transformable & BoundingSphere)[]) {
-        if(this.axisMaterial === null) {
+        if (this.axisMaterial === null) {
             this.axisMaterial = new StandardMaterial("axisMaterial");
             this.axisMaterial.emissiveColor = Color3.White();
             this.axisMaterial.disableLighting = true;
@@ -33,7 +33,6 @@ export class AxisRenderer {
 
         this.setVisibility(this._isVisible);
     }
-
 
     private createAxisMesh(orbitalObject: Transformable & BoundingSphere) {
         const rotationAxisHelper = MeshBuilder.CreateLines(
