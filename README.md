@@ -9,13 +9,17 @@ CosmosJourneyer is an open-source procedural universe running in the browser tha
 
 The main website of the project is online at https://cosmosjourneyer.com/
 
-The main deployment of the procedural universe can be accessed [here](https://barthpaleologue.github.io/CosmosJourneyer/dist/)
+The main deployment of the procedural universe can be accessed https://barthpaleologue.github.io/CosmosJourneyer/
+
+The documentation is online at https://barthpaleologue.github.io/CosmosJourneyer/docs/
 
 ![From Space](./coverImages/space.png)
 
 ![A little bit closer](./coverImages/moon.png)
 
 ![On the surface](./coverImages/ground.png)
+
+![Star map](./coverImages/starmap.png)
 
 ## Special Thanks
 
