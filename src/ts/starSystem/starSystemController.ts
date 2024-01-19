@@ -108,6 +108,7 @@ export class StarSystemController {
         this.orbitalObjects.push(satellite);
         this.celestialBodies.push(satellite);
         this.telluricPlanets.push(satellite);
+        this.planets.push(satellite);
         return satellite;
     }
 
