@@ -47,37 +47,38 @@ export class MainMenu {
         this.controls.getActiveCamera().detachControl();
 
         const allowedSeeds = [
-          new SystemSeed(new Vector3(-4030557626489595, -5311991039371311, 6300166560550159), 0),
-          new SystemSeed(new Vector3(-2580282252593743, -688526648963167, 464658922001219), 0),
-          new SystemSeed(new Vector3(3935150661125235, 4680257902545175, 4968241436399943), 0),
-          new SystemSeed(new Vector3(1942125733379075, -3862794543036899, 2212860146496827), 0),
-          new SystemSeed(new Vector3(3641602661119511, 91206409140523, 1081626828903715), 0),
-          new SystemSeed(new Vector3(6987489365968175, 5899214087953411, -482678543564899), 0),
-          new SystemSeed(new Vector3(-5117383081251883, 4942502095020231, -8855350792299879), 0),
-          new SystemSeed(new Vector3(-1628959327636315, 38204247336039, 7047545368534403), 0),
-          new SystemSeed(new Vector3(1129053200580283, 6028754782535763, 562090442882903), 0),
-          new SystemSeed(new Vector3(8775426616432815, -969201051835051, 1718356477669207), 0),
-          new SystemSeed(new Vector3(6934195322427891, 3329119907117327, -114138322638523), 0),
-          new SystemSeed(new Vector3(-5408989890290555, -5686219213385011, 6555487514235607), 0),
-          new SystemSeed(new Vector3(3132497034982239, 7543003914077319, -6084670653643795), 0),
-          new SystemSeed(new Vector3(-7292809030413071, -3635511197742219, -2218904218845895), 0),
-          new SystemSeed(new Vector3(2542436462572791, 7347121178237787, 4238060996268067), 0),
-          new SystemSeed(new Vector3(5428493874753067, -8923724700575275, 7237046022809219), 0),
-          new SystemSeed(new Vector3(-3899216056009119, -7848080162041851, 8925190396180339), 0)
+            new SystemSeed(-2580282252593743, -688526648963167, 464658922001219, 0),
+            new SystemSeed(3935150661125235, 4680257902545175, 4968241436399943, 0),
+            new SystemSeed(1942125733379075, -3862794543036899, 2212860146496827, 0),
+            new SystemSeed(3641602661119511, 91206409140523, 1081626828903715, 0),
+            new SystemSeed(6987489365968175, 5899214087953411, -482678543564899, 0),
+            new SystemSeed(-1628959327636315, 38204247336039, 7047545368534403, 0),
+            new SystemSeed(3132497034982239, 7543003914077319, -6084670653643795, 0),
+            new SystemSeed(-7292809030413071, -3635511197742219, -2218904218845895, 0),
+            new SystemSeed(2542436462572791, 7347121178237787, 4238060996268067, 0),
+            new SystemSeed(5428493874753067, -8923724700575275, 7237046022809219, 0),
+            new SystemSeed(-3899216056009119, -7848080162041851, 8925190396180339, 0),
+            new SystemSeed(-202807696914171, 8512184958570967, 4097489530118163, 0),
+            new SystemSeed(-885543021563071, -1739658304181095, -8196004220949627, 0),
+            new SystemSeed(-3831994119404563, 290653719847023, -1503550685041827, 0),
+            new SystemSeed(4935006642582931, 385848138478679, 8147709060574067, 0),
+            new SystemSeed(-8122625535230955, -296218998945099, 2938478904818683, 0),
+            new SystemSeed(5259620563645687, -7556311036542487, -4580825548740931, 0)
         ];
 
         /*const randomSeed = new SystemSeed(
-            new Vector3(
-                Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
-                Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
-                Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER)
-            ),
-            0
-        );
+        new Vector3(
+            Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
+            Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
+            Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER)
+        ),
+        0
+    );
 
-        console.log(randomSeed.starSectorCoordinates.x, randomSeed.starSectorCoordinates.y, randomSeed.starSectorCoordinates.z, randomSeed.index);*/
+    console.log(randomSeed.starSectorCoordinates.x, randomSeed.starSectorCoordinates.y, randomSeed.starSectorCoordinates.z, randomSeed.index);*/
 
         const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)];
+        //console.log(seed.starSectorCoordinates.x, seed.starSectorCoordinates.y, seed.starSectorCoordinates.z, seed.index);
         this.starSystemController = new StarSystemController(seed, this.scene);
     }
 
@@ -116,7 +117,7 @@ export class MainMenu {
         if (contributeButton === null) throw new Error("#contributeButton does not exist!");
 
         const contributePanel = document.getElementById("contribute");
-        if(contributePanel === null) throw new Error("#contribute does not exist!");
+        if (contributePanel === null) throw new Error("#contribute does not exist!");
         this.contributePanel = contributePanel;
 
         contributeButton.addEventListener("click", () => {
@@ -127,7 +128,7 @@ export class MainMenu {
         const creditsButton = document.getElementById("creditsButton");
         if (creditsButton === null) throw new Error("#creditsButton does not exist!");
         const creditsPanel = document.getElementById("credits");
-        if(creditsPanel === null) throw new Error("#credits does not exist!");
+        if (creditsPanel === null) throw new Error("#credits does not exist!");
         this.creditsPanel = creditsPanel;
 
         creditsButton.addEventListener("click", () => {
@@ -138,7 +139,7 @@ export class MainMenu {
         const aboutButton = document.getElementById("aboutButton");
         if (aboutButton === null) throw new Error("#aboutButton does not exist!");
         const aboutPanel = document.getElementById("about");
-        if(aboutPanel === null) throw new Error("#about does not exist!");
+        if (aboutPanel === null) throw new Error("#about does not exist!");
         this.aboutPanel = aboutPanel;
 
         aboutButton.addEventListener("click", () => {
@@ -210,12 +211,12 @@ export class MainMenu {
     }
 
     private toggleActivePanel(newPanel: HTMLElement) {
-        if(this.activeRightPanel === newPanel) {
+        if (this.activeRightPanel === newPanel) {
             this.hideActivePanel();
             return;
         }
 
-        if(this.activeRightPanel !== null) {
+        if (this.activeRightPanel !== null) {
             this.hideActivePanel();
         }
 
@@ -224,7 +225,7 @@ export class MainMenu {
     }
 
     private hideActivePanel() {
-        if(this.activeRightPanel !== null) {
+        if (this.activeRightPanel !== null) {
             this.activeRightPanel.classList.remove("visible");
             this.activeRightPanel = null;
         }

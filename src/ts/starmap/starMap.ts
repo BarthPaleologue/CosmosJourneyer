@@ -275,16 +275,18 @@ export class StarMap {
         this.currentSystemSeed = starSystemSeed;
         this.selectedSystemSeed = starSystemSeed;
 
-        if (this.loadedStarSectors.has(Vector3ToString(starSystemSeed.starSectorCoordinates))) {
+        const sectorCoordinates = new Vector3(starSystemSeed.starSectorX, starSystemSeed.starSectorY, starSystemSeed.starSectorZ);
+
+        if (this.loadedStarSectors.has(Vector3ToString(sectorCoordinates))) {
             this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
             this.focusOnCurrentSystem();
             return;
         }
 
-        this.registerStarSector(starSystemSeed.starSectorCoordinates, true);
+        this.registerStarSector(sectorCoordinates, true);
         this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
 
-        const translation = starSystemSeed.starSectorCoordinates.subtract(this.currentStarSectorPosition).scaleInPlace(StarSector.SIZE);
+        const translation = sectorCoordinates.subtract(this.currentStarSectorPosition).scaleInPlace(StarSector.SIZE);
         translate(this.controls.getTransform(), translation);
         this.controls.getActiveCamera().getViewMatrix(true);
         this.acknowledgeCameraMovement();

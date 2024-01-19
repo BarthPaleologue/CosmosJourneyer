@@ -63,7 +63,7 @@ engine.registerStarSystemUpdateCallback(() => {
     (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
 });
 
-const starSystemSeed = new SystemSeed(Vector3.Zero(), 0);
+const starSystemSeed = new SystemSeed(0, 0, 0, 0);
 const starSystem = new StarSystemController(starSystemSeed, scene);
 starSystemView.setStarSystem(starSystem, false);
 

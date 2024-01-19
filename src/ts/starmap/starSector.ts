@@ -53,7 +53,7 @@ export class StarSector {
 
     constructor(positionInStarMap: Vector3) {
         this.position = positionInStarMap;
-        this.rng = seededSquirrelNoise(hashVec3(positionInStarMap));
+        this.rng = seededSquirrelNoise(hashVec3(positionInStarMap.x, positionInStarMap.y, positionInStarMap.z));
 
         this.density = UniverseDensity(positionInStarMap.x, positionInStarMap.y, positionInStarMap.z);
 
@@ -64,7 +64,7 @@ export class StarSector {
         const sectorString = this.getKey();
         const data: BuildData[] = [];
         for (let i = 0; i < this.nbStars; i++) {
-            const systemSeed = new SystemSeed(this.position, i);
+            const systemSeed = new SystemSeed(this.position.x, this.position.y, this.position.z, i);
             data.push({
                 name: `starInstance|${this.position.x}|${this.position.y}|${this.position.z}|${i}`,
                 seed: systemSeed,

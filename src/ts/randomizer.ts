@@ -85,7 +85,7 @@ const starMapZ = urlStarMapZ !== null ? Number(urlStarMapZ) : Math.trunc((Math.r
 const index = urlIndex !== null ? Number(urlIndex) : 0;
 const bodyIndex = urlBodyIndex !== null ? Number(urlBodyIndex) : 0;
 
-const seed = new SystemSeed(new Vector3(starMapX, starMapY, starMapZ), index);
+const seed = new SystemSeed(starMapX, starMapY, starMapZ, index);
 
 const starSystem = new StarSystemController(seed, scene);
 starSystemView.setStarSystem(starSystem, true);
