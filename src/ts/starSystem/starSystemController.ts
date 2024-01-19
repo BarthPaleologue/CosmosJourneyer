@@ -329,14 +329,14 @@ export class StarSystemController {
 
         //nearestBody.updateInternalClock(deltaTime);
         const initialPosition = nearestBody.getTransform().getAbsolutePosition();
-        const newPosition = OrbitalObject.computeNextOrbitalPosition(nearestBody, deltaTime);
+        const newPosition = OrbitalObject.GetNextOrbitalPosition(nearestBody, deltaTime);
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         if (!shouldCompensateTranslation) translate(nearestBody.getTransform(), nearestBodyDisplacement);
 
-        const dthetaNearest = OrbitalObject.getDeltaTheta(nearestBody, deltaTime);
+        const dthetaNearest = OrbitalObject.GetRotationAngle(nearestBody, deltaTime);
 
         // if we don't compensate the rotation of the nearest body, we must rotate it accordingly
-        if (!shouldCompensateRotation) OrbitalObject.updateRotation(nearestBody, deltaTime);
+        if (!shouldCompensateRotation) OrbitalObject.UpdateRotation(nearestBody, deltaTime);
 
         // As the nearest object is kept in place, we need to transfer its movement to other bodies
         for (const object of this.orbitalObjects) {
@@ -382,8 +382,8 @@ export class StarSystemController {
             if (object === nearestBody) continue;
 
             //object.updateInternalClock(deltaTime);
-            OrbitalObject.updateOrbitalPosition(object, deltaTime);
-            OrbitalObject.updateRotation(object, deltaTime);
+            OrbitalObject.UpdateOrbitalPosition(object, deltaTime);
+            OrbitalObject.UpdateRotation(object, deltaTime);
         }
 
         controller.update(deltaTime);

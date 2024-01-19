@@ -6,28 +6,54 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectPhysicalProperties } from "./physicalProperties";
 
+/**
+ * Describes all objects that can have an orbital trajectory and rotate on themselves
+ */
 export interface OrbitalObject extends Transformable, BoundingSphere {
-    name: string;
+    /**
+     * The name of the object
+     */
+    readonly name: string;
 
-    model: OrbitalObjectModel;
+    /**
+     * The underlying model describing the data of the orbital object
+     */
+    readonly model: OrbitalObjectModel;
 
+    /**
+     * The rotation axis around which the object rotates on itself
+     */
     getRotationAxis(): Vector3;
 
+    /**
+     * Returns the orbital properties of the object
+     */
     getOrbitProperties(): OrbitProperties;
 
+    /**
+     * Returns the physical properties of the object
+     */
     getPhysicalProperties(): OrbitalObjectPhysicalProperties;
 
+    /**
+     * Returns the type name of the object. This is used as a short identifier in the UI Overlay of the object
+     */
     getTypeName(): string;
 
+    /**
+     * Returns the parent of the object
+     */
     parent: OrbitalObject | null;
 }
 
 export class OrbitalObject {
-    static getRotationAxis(object: OrbitalObject) {
-        return object.getTransform().up;
-    }
-
-    static computeNextOrbitalPosition(object: OrbitalObject, deltaTime: number) {
+    /**
+     * Returns the next position of the object on its orbit. This does not update the position of the object (see UpdateOrbitalPosition)
+     * @param object The object we want to compute the next position of
+     * @param deltaTime The time elapsed since the last update
+     * @constructor
+     */
+    static GetNextOrbitalPosition(object: OrbitalObject, deltaTime: number): Vector3 {
         const orbit = object.getOrbitProperties();
         if (orbit.period === 0 || object.parent === null) return object.getTransform().getAbsolutePosition();
 
@@ -51,16 +77,28 @@ export class OrbitalObject {
         return newPosition.addInPlace(barycenter);
     }
 
-    static updateOrbitalPosition(object: OrbitalObject, deltaTime: number) {
+    /**
+     * Updates the position of the object on its orbit (under the hood calls GetNextOrbitalPosition)
+     * @param object The object we want to update the position of
+     * @param deltaTime The time elapsed since the last update
+     * @constructor
+     */
+    static UpdateOrbitalPosition(object: OrbitalObject, deltaTime: number): void {
         const orbit = object.getOrbitProperties();
         if (orbit.period === 0 || object.parent === null) return;
 
         const oldPosition = object.getTransform().getAbsolutePosition();
-        const newPosition = OrbitalObject.computeNextOrbitalPosition(object, deltaTime);
+        const newPosition = OrbitalObject.GetNextOrbitalPosition(object, deltaTime);
         translate(object.getTransform(), newPosition.subtractInPlace(oldPosition));
     }
 
-    static getDeltaTheta(object: OrbitalObject, deltaTime: number) {
+    /**
+     * Computes the rotation to apply in the current frame to the object around its axis. This does not update the rotation of the object (see UpdateRotation)
+     * @param object The object we want to compute the rotation of
+     * @param deltaTime The time elapsed since the last update
+     * @constructor
+     */
+    static GetRotationAngle(object: OrbitalObject, deltaTime: number): number {
         if (object.getPhysicalProperties().rotationPeriod === 0) return 0;
         return (2 * Math.PI * deltaTime) / object.getPhysicalProperties().rotationPeriod;
     }
@@ -69,13 +107,13 @@ export class OrbitalObject {
      * Updates the rotation of the body around its axis
      * @param object
      * @param deltaTime The time elapsed since the last update
-     * @returns The elapsed angle of rotation around the axis
+     * @constructor
      */
-    static updateRotation(object: OrbitalObject, deltaTime: number) {
-        const dtheta = OrbitalObject.getDeltaTheta(object, deltaTime);
+    static UpdateRotation(object: OrbitalObject, deltaTime: number): void {
+        const dtheta = OrbitalObject.GetRotationAngle(object, deltaTime);
         if (dtheta === 0) return;
 
-        const elementaryRotationQuaternion = Quaternion.RotationAxis(OrbitalObject.getRotationAxis(object), dtheta);
+        const elementaryRotationQuaternion = Quaternion.RotationAxis(object.getRotationAxis(), dtheta);
         const newQuaternion = elementaryRotationQuaternion.multiply(getRotationQuaternion(object.getTransform()));
 
         setRotationQuaternion(object.getTransform(), newQuaternion);
@@ -83,11 +121,19 @@ export class OrbitalObject {
 }
 
 export interface OrbitalObjectModel {
-    rng: (step: number) => number;
-    seed: number;
+    /**
+     * The random number generator used by the model to generate internal values
+     * @param step The sample step of the random number generator (use squirrel noise for example)
+     */
+    readonly rng: (step: number) => number;
 
-    orbit: OrbitProperties;
-    physicalProperties: OrbitalObjectPhysicalProperties;
+    /**
+     * The seed used by the random number generator
+     */
+    readonly seed: number;
+
+    readonly orbit: OrbitProperties;
+    readonly physicalProperties: OrbitalObjectPhysicalProperties;
 
     readonly parentBody: OrbitalObjectModel | null;
     readonly childrenBodies: OrbitalObjectModel[];
