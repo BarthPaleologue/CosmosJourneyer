@@ -3,7 +3,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Input } from "../inputs/input";
-import { setRotationQuaternion, setUpVector, Transformable, translate } from "../uberCore/transforms/basicTransform";
+import { setRotationQuaternion, setUpVector, translate } from "../uberCore/transforms/basicTransform";
 import { Assets } from "../assets";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { Keyboard } from "../inputs/keyboard";
@@ -15,6 +15,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import "@babylonjs/core/Collisions/collisionCoordinator";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { Transformable } from "../architecture/transformable";
 
 class AnimationGroupWrapper {
     name: string;
@@ -251,5 +252,10 @@ export class CharacterControls implements Controls {
 
         this.getActiveCamera().getViewMatrix();
         return playerMovement;
+    }
+
+    dispose() {
+        this.character.dispose();
+        this.thirdPersonCamera.dispose();
     }
 }

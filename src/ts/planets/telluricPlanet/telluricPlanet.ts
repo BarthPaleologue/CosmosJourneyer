@@ -3,29 +3,47 @@ import { Direction } from "../../utils/direction";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
-import { TelluricPlanemoMaterial } from "./telluricPlanemoMaterial";
+import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
-import { AbstractBody } from "../../bodies/abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
-import { Planemo, PlanemoMaterial } from "../planemo";
-import { TelluricPlanemoModel } from "./telluricPlanemoModel";
+import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Transformable } from "../../uberCore/transforms/basicTransform";
+import { Transformable } from "../../architecture/transformable";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PlanetChunk } from "./terrain/chunks/planetChunk";
+import { Planet } from "../../architecture/planet";
+import { Cullable } from "../../bodies/cullable";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { OrbitProperties } from "../../orbit/orbitProperties";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { OrbitalObject } from "../../architecture/orbitalObject";
+import { CelestialBody } from "../../architecture/celestialBody";
+import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
+import { rotate } from "../../uberCore/transforms/basicTransform";
 
-export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMaterial {
+export class TelluricPlanet implements Planet, Cullable {
+    readonly name: string;
+
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
 
-    readonly material: TelluricPlanemoMaterial;
+    readonly material: TelluricPlanetMaterial;
 
-    readonly model: TelluricPlanemoModel;
+    readonly model: TelluricPlanetModel;
 
     readonly onChunkCreatedObservable = new Observable<PlanetChunk>();
+
+    private readonly transform: TransformNode;
+    readonly aggregate: PhysicsAggregate;
+
+    readonly postProcesses: PostProcessType[] = [];
+
+    readonly parent: OrbitalObject | null;
 
     /**
      * New Telluric Planet
@@ -34,12 +52,31 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
      * @param parentBody
      */
-    constructor(name: string, scene: UberScene, model: TelluricPlanemoModel | number, parentBody?: AbstractBody) {
-        super(name, scene, parentBody);
+    constructor(name: string, scene: UberScene, model: TelluricPlanetModel | number, parentBody: CelestialBody | null = null) {
+        this.name = name;
 
-        this.model = model instanceof TelluricPlanemoModel ? model : new TelluricPlanemoModel(model, parentBody?.model);
+        this.parent = parentBody;
 
-        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.model = model instanceof TelluricPlanetModel ? model : new TelluricPlanetModel(model, parentBody?.model);
+
+        this.transform = new TransformNode(`${name}Transform`, scene);
+
+        rotate(this.transform, Axis.X, this.model.physicalProperties.axialTilt);
+        this.transform.computeWorldMatrix(true);
+
+        this.aggregate = new PhysicsAggregate(
+          this.getTransform(),
+          PhysicsShapeType.CONTAINER,
+          {
+              mass: 0,
+              restitution: 0.2
+          },
+          scene
+        );
+        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
+        this.aggregate.body.disablePreStep = false;
+        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
+        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
 
         this.postProcesses.push(PostProcessType.SHADOW);
 
@@ -60,10 +97,7 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
         if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
         if (this.model.cloudsUniforms !== null) this.postProcesses.push(PostProcessType.CLOUDS);
 
-        this.material = new TelluricPlanemoMaterial(this.name, this.getTransform(), this.model, scene);
-
-        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
-        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
+        this.material = new TelluricPlanetMaterial(this.name, this.getTransform(), this.model, scene);
 
         this.sides = [
             new ChunkTree(Direction.Up, this.name, this.model, this.aggregate, this.material, scene),
@@ -77,8 +111,28 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
         this.sides.forEach((side) => side.onChunkCreatedObservable.add((chunk) => this.onChunkCreatedObservable.notifyObservers(chunk)));
     }
 
+    getTransform(): TransformNode {
+        return this.transform;
+    }
+
+    getRotationAxis(): Vector3 {
+        return this.getTransform().up;
+    }
+
+    getOrbitProperties(): OrbitProperties {
+        return this.model.orbit;
+    }
+
+    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
+        return this.model.physicalProperties;
+    }
+
+    getRingsUniforms(): RingsUniforms | null {
+        return this.model.ringsUniforms;
+    }
+
     getTypeName(): string {
-        return "Telluric Planemo";
+        return "Telluric Planet";
     }
 
     /**
@@ -94,18 +148,22 @@ export class TelluricPlanemo extends AbstractBody implements Planemo, PlanemoMat
         this.material.update(controller.globalPosition, stellarObjects);
     }
 
-    public override getBoundingRadius(): number {
-        return super.getRadius() + this.model.physicalProperties.oceanLevel;
+    public getRadius(): number {
+        return this.model.radius;
     }
 
-    public override computeCulling(camera: Camera): void {
+    public getBoundingRadius(): number {
+        return this.getRadius() + this.model.physicalProperties.oceanLevel;
+    }
+
+    public computeCulling(camera: Camera): void {
         for (const side of this.sides) side.computeCulling(camera);
     }
 
-    public override dispose(): void {
-        this.material.dispose();
+    public dispose(): void {
         for (const side of this.sides) side.dispose();
+        this.material.dispose();
         this.aggregate.dispose();
-        super.dispose();
+        this.transform.dispose();
     }
 }

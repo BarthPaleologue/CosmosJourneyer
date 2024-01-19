@@ -1,7 +1,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, SolidPhysicalProperties } from "../../model/common";
+import { BODY_TYPE, GENERATION_STEPS } from "../../model/common";
 import { TerrainSettings } from "./terrain/terrainSettings";
 import { clamp } from "terrain-generation";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
@@ -11,9 +11,12 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { CloudsUniforms } from "../../postProcesses/clouds/cloudsUniforms";
+import { PlanetModel } from "../../architecture/planet";
+import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalProperties";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
 
-export class TelluricPlanemoModel implements PlanemoModel {
-    readonly bodyType = BODY_TYPE.TELLURIC;
+export class TelluricPlanetModel implements PlanetModel {
+    readonly bodyType = BODY_TYPE.TELLURIC_PLANET;
     readonly seed: number;
     readonly rng: (step: number) => number;
 
@@ -21,7 +24,7 @@ export class TelluricPlanemoModel implements PlanemoModel {
 
     readonly orbit: OrbitProperties;
 
-    readonly physicalProperties: SolidPhysicalProperties;
+    readonly physicalProperties: TelluricPlanetPhysicalProperties;
 
     readonly terrainSettings: TerrainSettings;
 
@@ -33,17 +36,17 @@ export class TelluricPlanemoModel implements PlanemoModel {
     private isSatelliteOfTelluric = false;
     private isSatelliteOfGas = false;
 
-    readonly parentBody: BodyModel | null;
-    readonly childrenBodies: BodyModel[] = [];
+    readonly parentBody: CelestialBodyModel | null;
+    readonly childrenBodies: CelestialBodyModel[] = [];
 
-    constructor(seed: number, parentBody?: BodyModel) {
+    constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
         this.parentBody = parentBody ?? null;
 
-        if (this.parentBody?.bodyType === BODY_TYPE.TELLURIC) this.isSatelliteOfTelluric = true;
-        if (this.parentBody?.bodyType === BODY_TYPE.GAS) this.isSatelliteOfGas = true;
+        if (this.parentBody?.bodyType === BODY_TYPE.TELLURIC_PLANET) this.isSatelliteOfTelluric = true;
+        if (this.parentBody?.bodyType === BODY_TYPE.GAS_PLANET) this.isSatelliteOfGas = true;
 
         if (this.isSatelliteOfTelluric) {
             this.radius = Math.max(0.03, normalRandom(0.06, 0.03, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;

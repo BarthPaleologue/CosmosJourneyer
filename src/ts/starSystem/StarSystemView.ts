@@ -12,15 +12,14 @@ import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Settings } from "../settings";
-import { AbstractBody } from "../bodies/abstractBody";
 import { StarSystemHelper } from "./starSystemHelper";
 import { positionNearObject } from "../utils/positionNearObject";
 import { ShipControls } from "../spaceship/shipControls";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { ChunkForgeWorkers } from "../planemos/telluricPlanemo/terrain/chunks/chunkForgeWorkers";
+import { ChunkForgeWorkers } from "../planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import "@babylonjs/core/Loading/loadingScreen";
-import { ChunkForge } from "../planemos/telluricPlanemo/terrain/chunks/chunkForge";
+import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
@@ -92,12 +91,12 @@ export class StarSystemView {
 
             this.ui.update(this.scene.getActiveCamera());
 
-            const nearestBody = starSystem.getNearestOrbitalObject();
+            const nearestOrbitalObject = starSystem.getNearestOrbitalObject();
+            const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition);
 
-            if (nearestBody instanceof AbstractBody) {
-                this.bodyEditor.update(nearestBody, starSystem.postProcessManager, this.scene);
-            }
-            this.helmetOverlay.update(nearestBody);
+            this.bodyEditor.update(nearestCelestialBody, starSystem.postProcessManager, this.scene);
+
+            this.helmetOverlay.update(nearestOrbitalObject);
 
             this.orbitRenderer.update();
         });
@@ -140,7 +139,7 @@ export class StarSystemView {
         this.scene.getEngine().loadingScreen.loadingUIText = `Warping to ${this.getStarSystem().model.getName()}`;
 
         this.getStarSystem().initPositions(100, this.chunkForge);
-        this.ui.createObjectOverlays(this.getStarSystem().getObjects());
+        this.ui.createObjectOverlays(this.getStarSystem().getOrbitalObjects());
 
         const firstBody = this.getStarSystem().getBodies()[0];
         if (firstBody === undefined) throw new Error("No bodies in star system");

@@ -1,11 +1,10 @@
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Settings } from "../settings";
 import { nearestBody } from "../utils/nearestBody";
-import { AbstractBody } from "../bodies/abstractBody";
 import { Assets } from "../assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -14,10 +13,11 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { Transformable } from "../uberCore/transforms/basicTransform";
+import { Transformable } from "../architecture/transformable";
+import { CelestialBody } from "../architecture/celestialBody";
 
 export class StarfieldPostProcess extends UberPostProcess {
-    constructor(scene: UberScene, stellarObjects: Transformable[], bodies: AbstractBody[], starfieldRotation: Quaternion) {
+    constructor(scene: UberScene, stellarObjects: Transformable[], bodies: CelestialBody[], starfieldRotation: Quaternion) {
         const shaderName = "starfield";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -53,8 +53,8 @@ export class StarfieldPostProcess extends UberPostProcess {
                     vis = 0.5 + vis * 0.5;
                     let vis2 = 1.0;
                     const nearest = nearestBody(camera.globalPosition, bodies);
-                    if (nearest instanceof TelluricPlanemo) {
-                        const planet = nearest as TelluricPlanemo;
+                    if (nearest instanceof TelluricPlanet) {
+                        const planet = nearest as TelluricPlanet;
                         if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {
                             const height = planet.getTransform().getAbsolutePosition().length();
                             //FIXME: has to be dynamic

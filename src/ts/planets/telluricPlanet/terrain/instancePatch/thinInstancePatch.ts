@@ -21,8 +21,8 @@ export class ThinInstancePatch implements IPatch {
     }
 
     public static CreateSquare(parent: TransformNode, position: Vector3, size: number, resolution: number) {
-      const buffer = createSquareMatrixBuffer(position, size, resolution);
-      return new ThinInstancePatch(parent, buffer);
+        const buffer = createSquareMatrixBuffer(position, size, resolution);
+        return new ThinInstancePatch(parent, buffer);
     }
 
     public clearInstances(): void {
@@ -54,7 +54,7 @@ export class ThinInstancePatch implements IPatch {
     }
 
     public syncWithParent(): void {
-        if(this.baseMesh === null) throw new Error("Tried to sync with parent but no base mesh was set.");
+        if (this.baseMesh === null) throw new Error("Tried to sync with parent but no base mesh was set.");
         this.matrixBuffer.set(applyTransformationToBuffer(this.parent.computeWorldMatrix(), this.rawMatrixBuffer));
         this.baseMesh.thinInstanceBufferUpdated("matrix");
     }

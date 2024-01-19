@@ -8,27 +8,25 @@ import "@babylonjs/core/Engines/Extensions/engine.query";
 import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { Transformable } from "../../../../uberCore/transforms/basicTransform";
 import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";
 import { Assets } from "../../../../assets";
 import { isSizeOnScreenEnough } from "../../../../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { IPatch } from "../instancePatch/iPatch";
-import { TelluricPlanemoModel } from "../../telluricPlanemoModel";
-import { BoundingSphere } from "../../../../bodies/common";
+import { TelluricPlanetModel } from "../../telluricPlanetModel";
+import { BoundingSphere } from "../../../../architecture/boundingSphere";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { Transformable } from "../../../../architecture/transformable";
 
 export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
 
-    private readonly transform: TransformNode;
-
-    readonly planetModel: TelluricPlanemoModel;
+    readonly planetModel: TelluricPlanetModel;
 
     readonly chunkSideLength: number;
 
@@ -50,14 +48,12 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
     private disposed = false;
 
-    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanemoModel, rootLength: number, scene: Scene) {
+    constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanetModel, rootLength: number, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
         this.depth = path.length;
 
         this.chunkSideLength = rootLength / 2 ** this.depth;
-
-        this.transform = new TransformNode(`${id}Transform`, scene);
 
         this.planetModel = planetModel;
 
@@ -67,8 +63,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.mesh.material = material;
         //this.mesh.material = Assets.DebugMaterial(id, false, false);
 
-        this.transform.parent = parentAggregate.transformNode;
-        this.mesh.parent = this.transform;
+        this.mesh.parent = parentAggregate.transformNode;
 
         this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
         this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
@@ -87,11 +82,11 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         position.normalize().scaleInPlace(rootLength / 2);
 
-        this.transform.position = position;
+        this.getTransform().position = position;
     }
 
     public getTransform(): TransformNode {
-        return this.transform;
+        return this.mesh;
     }
 
     /**
@@ -183,7 +178,6 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.helpers.forEach((helper) => helper.dispose());
         this.instancePatches.forEach((patch) => patch.dispose());
         this.mesh.dispose();
-        this.transform.dispose();
         this.onRecieveVertexDataObservable.clear();
         this.onDisposeObservable.clear();
 

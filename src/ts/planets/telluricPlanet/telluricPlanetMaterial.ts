@@ -5,44 +5,45 @@ import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/verte
 import { Assets } from "../../assets";
 import { UberScene } from "../../uberCore/uberScene";
 import { centeredRand, normalRandom } from "extended-random";
-import { TelluricPlanemoModel } from "./telluricPlanemoModel";
+import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { getInverseRotationMatrix, Transformable } from "../../uberCore/transforms/basicTransform";
+import { getInverseRotationMatrix } from "../../uberCore/transforms/basicTransform";
 import { Star } from "../../stellarObjects/star/star";
 import { flattenVector3Array } from "../../utils/algebra";
 
 import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+import { Transformable } from "../../architecture/transformable";
 
 /**
- * The material for telluric planemos.
+ * The material for telluric planets.
  * It is responsible for the shading of the surface of the planet (biome blending, normal mapping and color)
  */
-export class TelluricPlanemoMaterial extends ShaderMaterial {
+export class TelluricPlanetMaterial extends ShaderMaterial {
     /**
-     * The transform node of the planemo associated with this material
+     * The transform node of the planet associated with this material
      */
-    private readonly planemoTransform: TransformNode;
+    private readonly planetTransform: TransformNode;
 
     readonly colorSettings: ColorSettings;
 
     /**
-     * The model of the planemo associated with this material
+     * The model of the planet associated with this material
      */
-    private readonly planemoModel: TelluricPlanemoModel;
+    private readonly planetModel: TelluricPlanetModel;
 
     /**
-     * Creates a new telluric planemo material
-     * @param planetName The name of the planemo
-     * @param planet The transform node of the planemo
-     * @param model The model of the planemo associated with this material
+     * Creates a new telluric planet material
+     * @param planetName The name of the planet
+     * @param planet The transform node of the planet
+     * @param model The model of the planet associated with this material
      * @param scene
      */
-    constructor(planetName: string, planet: TransformNode, model: TelluricPlanemoModel, scene: UberScene) {
+    constructor(planetName: string, planet: TransformNode, model: TelluricPlanetModel, scene: UberScene) {
         const shaderName = "surfaceMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -73,7 +74,7 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
                 "star_colors",
                 "nbStars",
 
-                "planetInverseRotationMatrix",
+                "inversePlanetWorldMatrix",
 
                 "playerPosition",
 
@@ -100,8 +101,8 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
             samplers: ["lut", "bottomNormalMap", "plainNormalMap", "beachNormalMap", "desertNormalMap", "snowNormalMap", "steepNormalMap"]
         });
 
-        this.planemoModel = model;
-        this.planemoTransform = planet;
+        this.planetModel = model;
+        this.planetTransform = planet;
 
         this.colorSettings = {
             mode: ColorMode.DEFAULT,
@@ -142,17 +143,17 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         this.setColor3("desertColor", this.colorSettings.desertColor);
         this.setColor3("bottomColor", this.colorSettings.bottomColor);
 
-        this.setVector3("planetPosition", this.planemoTransform.getAbsolutePosition());
+        this.setVector3("planetPosition", this.planetTransform.getAbsolutePosition());
 
-        if (Effect.ShadersStore["telluricPlanemoLutFragmentShader"] === undefined) {
-            Effect.ShadersStore["telluricPlanemoLutFragmentShader"] = lutFragment;
+        if (Effect.ShadersStore["telluricPlanetLutFragmentShader"] === undefined) {
+            Effect.ShadersStore["telluricPlanetLutFragmentShader"] = lutFragment;
         }
 
         this.setTexture("lut", Assets.EmptyTexture);
-        const lut = new ProceduralTexture("lut", 4096, "telluricPlanemoLut", scene, null, true, false);
-        lut.setFloat("minTemperature", this.planemoModel.physicalProperties.minTemperature);
-        lut.setFloat("maxTemperature", this.planemoModel.physicalProperties.maxTemperature);
-        lut.setFloat("pressure", this.planemoModel.physicalProperties.pressure);
+        const lut = new ProceduralTexture("lut", 4096, "telluricPlanetLut", scene, null, true, false);
+        lut.setFloat("minTemperature", this.planetModel.physicalProperties.minTemperature);
+        lut.setFloat("maxTemperature", this.planetModel.physicalProperties.maxTemperature);
+        lut.setFloat("pressure", this.planetModel.physicalProperties.pressure);
         lut.refreshRate = 0;
         lut.executeWhenReady(() => {
             this.setTexture("lut", lut);
@@ -162,11 +163,11 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
     }
 
     public updateConstants(): void {
-        this.setFloat("planetRadius", this.planemoModel.radius);
+        this.setFloat("planetRadius", this.planetModel.radius);
 
         this.setInt("colorMode", this.colorSettings.mode);
 
-        this.setFloat("waterLevel", this.planemoModel.physicalProperties.oceanLevel);
+        this.setFloat("waterLevel", this.planetModel.physicalProperties.oceanLevel);
         this.setFloat("beachSize", this.colorSettings.beachSize);
         this.setFloat("steepSharpness", this.colorSettings.steepSharpness);
 
@@ -179,27 +180,28 @@ export class TelluricPlanemoMaterial extends ShaderMaterial {
         this.setTexture("beachNormalMap", Assets.SandNormalMap1);
         this.setTexture("desertNormalMap", Assets.SandNormalMap2);
 
-        this.setFloat("minTemperature", this.planemoModel.physicalProperties.minTemperature);
-        this.setFloat("maxTemperature", this.planemoModel.physicalProperties.maxTemperature);
-        this.setFloat("pressure", this.planemoModel.physicalProperties.pressure);
-        this.setFloat("waterAmount", this.planemoModel.physicalProperties.waterAmount);
+        this.setFloat("minTemperature", this.planetModel.physicalProperties.minTemperature);
+        this.setFloat("maxTemperature", this.planetModel.physicalProperties.maxTemperature);
+        this.setFloat("pressure", this.planetModel.physicalProperties.pressure);
+        this.setFloat("waterAmount", this.planetModel.physicalProperties.waterAmount);
 
         this.setFloat(
             "maxElevation",
-            this.planemoModel.terrainSettings.continent_base_height + this.planemoModel.terrainSettings.max_mountain_height + this.planemoModel.terrainSettings.max_bump_height
+            this.planetModel.terrainSettings.continent_base_height + this.planetModel.terrainSettings.max_mountain_height + this.planetModel.terrainSettings.max_bump_height
         );
     }
 
-    public update(activeControllerPosition: Vector3, stellarObjects: Transformable[]) {
-        this.setMatrix("normalMatrix", this.planemoTransform.getWorldMatrix().clone().invert().transpose());
-        this.setMatrix("planetInverseRotationMatrix", getInverseRotationMatrix(this.planemoTransform));
+    public update(cameraPosition: Vector3, stellarObjects: Transformable[]) {
+        const inversePlanetWorldMatrix = this.planetTransform.getWorldMatrix().clone().invert();
+        this.setMatrix("normalMatrix", inversePlanetWorldMatrix.transpose());
+        this.setMatrix("inversePlanetWorldMatrix", inversePlanetWorldMatrix);
 
-        this.setVector3("playerPosition", activeControllerPosition);
+        this.setVector3("playerPosition", cameraPosition);
 
         this.setArray3("star_positions", flattenVector3Array(stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
         this.setArray3("star_colors", flattenVector3Array(stellarObjects.map((star) => (star instanceof Star ? star.model.surfaceColor : Vector3.One()))));
         this.setInt("nbStars", stellarObjects.length);
 
-        this.setVector3("planetPosition", this.planemoTransform.getAbsolutePosition());
+        this.setVector3("planetPosition", this.planetTransform.getAbsolutePosition());
     }
 }

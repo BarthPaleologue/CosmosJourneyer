@@ -1,15 +1,15 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { AbstractBody } from "../../../bodies/abstractBody";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { RingsPostProcess } from "../../../postProcesses/rings/ringsPostProcess";
+import { CelestialBody } from "../../../architecture/celestialBody";
 
 export class RingsPanel extends EditorPanel {
     constructor() {
         super("rings");
     }
-    init(body: AbstractBody, rings: RingsPostProcess) {
+    init(body: CelestialBody, rings: RingsPostProcess) {
         for (const slider of this.sliders) slider.remove();
 
         const ringsToggler = clearAllEventListenersById("ringsToggler");

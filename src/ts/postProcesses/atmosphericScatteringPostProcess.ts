@@ -6,11 +6,11 @@ import { Assets } from "../assets";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { centeredRand } from "extended-random";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
-import { GasPlanet } from "../planemos/gasPlanet/gasPlanet";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { Transformable } from "../uberCore/transforms/basicTransform";
+import { Transformable } from "../architecture/transformable";
 
 export interface AtmosphereUniforms {
     atmosphereRadius: number;
@@ -27,9 +27,9 @@ export interface AtmosphereUniforms {
 
 export class AtmosphericScatteringPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly atmosphereUniforms: AtmosphereUniforms;
-    readonly object: TelluricPlanemo | GasPlanet;
+    readonly object: TelluricPlanet | GasPlanet;
 
-    constructor(name: string, planet: GasPlanet | TelluricPlanemo, atmosphereHeight: number, scene: UberScene, stellarObjects: Transformable[]) {
+    constructor(name: string, planet: GasPlanet | TelluricPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: Transformable[]) {
         const shaderName = "atmosphericScattering";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;

@@ -90,4 +90,9 @@ export class DefaultControls implements Controls {
     public addInput(input: Input): void {
         this.inputs.push(input);
     }
+
+    dispose() {
+        this.transform.dispose();
+        this.camera.dispose();
+    }
 }

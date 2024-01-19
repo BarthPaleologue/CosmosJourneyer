@@ -5,9 +5,10 @@ import { Slider } from "handle-sliderjs";
 import { Settings } from "../../../settings";
 import { UberScene } from "../../../uberCore/uberScene";
 import { ColorCorrection } from "../../../uberCore/postProcesses/colorCorrection";
-import { getRotationQuaternion, rotate, Transformable } from "../../../uberCore/transforms/basicTransform";
+import { getRotationQuaternion, rotate } from "../../../uberCore/transforms/basicTransform";
 
-import { BoundingSphere } from "../../../bodies/common";
+import { BoundingSphere } from "../../../architecture/boundingSphere";
+import { Transformable } from "../../../architecture/transformable";
 
 export class GeneralPanel extends EditorPanel {
     constructor() {

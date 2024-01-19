@@ -9,7 +9,7 @@ uniform mat4 normalMatrix;
 
 uniform vec3 planetPosition;
 
-uniform mat4 planetInverseRotationMatrix;
+uniform mat4 inversePlanetWorldMatrix;
 
 varying vec3 vPositionW;
 varying vec3 vNormalW;
@@ -32,13 +32,13 @@ void main() {
     vPositionW = vec3(world * vec4(position, 1.0));
     vNormalW = normalize(mat3(normalMatrix) * normal);
 
-	vPosition = vPositionW - planetPosition;
+	vPosition = vec3(inversePlanetWorldMatrix * vec4(vPositionW, 1.0));
 	vLocalPosition = position;
 
-	vUnitSamplePoint = mat3(planetInverseRotationMatrix) * normalize(vPosition);
-	vSamplePointScaled = mat3(planetInverseRotationMatrix) * vPosition / 1000e3;
-    vSphereNormalW = mat3(normalMatrix) * vUnitSamplePoint;
-	vSamplePoint = mat3(planetInverseRotationMatrix) * vPosition;
+	vUnitSamplePoint = normalize(vPosition);
+	vSamplePointScaled = vPosition / 1000e3;
+    vSphereNormalW = normalize(vPosition);
+	vSamplePoint = vPosition;
 
 	vNormal = normal;
 }

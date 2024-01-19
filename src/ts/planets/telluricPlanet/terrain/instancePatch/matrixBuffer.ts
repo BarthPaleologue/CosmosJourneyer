@@ -68,7 +68,6 @@ export function decomposeModelMatrix(matrix: Float32Array, position: Vector3, ro
     rotation.copyFrom(Quaternion.FromRotationMatrix(rotationMatrix));
 }
 
-
 export function applyTransformationToBuffer(transformation: Matrix, matrixBuffer: Float32Array): Float32Array {
     const nbMatrices = Math.floor(matrixBuffer.length / 16);
     const result = new Float32Array(matrixBuffer.length);

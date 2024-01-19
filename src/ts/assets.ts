@@ -19,6 +19,7 @@ import plumeParticle from "../asset/textures/plume.png";
 
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 
+import seamlessPerlin from "../asset/perlin.png";
 import spaceship from "../asset/spaceship/spaceship2.glb";
 import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
@@ -70,6 +71,7 @@ export class Assets {
 
     static AtmosphereLUT: ProceduralTexture;
 
+    static SeamlessPerlin: Texture;
     private static Spaceship: Mesh;
     private static EndeavorSpaceship: Mesh;
     private static Spacestation: Mesh;
@@ -107,6 +109,7 @@ export class Assets {
 
         Assets.manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Assets.PlumeParticle = task.texture);
 
+        Assets.manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Assets.SeamlessPerlin = task.texture);
         Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Assets.AtmosphereLUT.refreshRate = 0;
 

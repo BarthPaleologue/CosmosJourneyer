@@ -8,8 +8,9 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { CloudsUniforms } from "./clouds/cloudsUniforms";
-import { Transformable } from "../uberCore/transforms/basicTransform";
-import { BoundingSphere } from "../bodies/common";
+
+import { BoundingSphere } from "../architecture/boundingSphere";
+import { Transformable } from "../architecture/transformable";
 
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 

@@ -1,16 +1,16 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanemo } from "../../../planemos/telluricPlanemo/telluricPlanemo";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { CloudsPostProcess } from "../../../postProcesses/volumetricCloudsPostProcess";
+import { CelestialBody } from "../../../architecture/celestialBody";
 
 export class CloudsPanel extends EditorPanel {
     constructor() {
         super("clouds");
     }
-    init(planet: TelluricPlanemo, flatClouds: CloudsPostProcess) {
+    init(planet: CelestialBody, flatClouds: CloudsPostProcess) {
         for (const slider of this.sliders) slider.remove();
 
         const cloudsToggler = clearAllEventListenersById("cloudsToggler");

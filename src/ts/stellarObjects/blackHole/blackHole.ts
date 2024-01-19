@@ -6,19 +6,36 @@ import { Light } from "@babylonjs/core/Lights/light";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { BlackHoleModel } from "./blackHoleModel";
-import { AbstractBody } from "../../bodies/abstractBody";
+import { StellarObject } from "../../architecture/stellarObject";
+import { Cullable } from "../../bodies/cullable";
+import { CelestialBody } from "../../architecture/celestialBody";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { OrbitProperties } from "../../orbit/orbitProperties";
+import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 
-export class BlackHole extends AbstractBody {
+export class BlackHole implements StellarObject, Cullable {
+    readonly name: string;
+
+    private readonly transform: TransformNode;
+
     readonly light: PointLight;
 
     readonly model: BlackHoleModel;
 
-    constructor(name: string, scene: Scene, model: BlackHoleModel | number, parentBody?: AbstractBody) {
-        super(name, scene, parentBody);
+    readonly postProcesses: PostProcessType[] = [];
+
+    readonly parent: CelestialBody | null;
+
+    constructor(name: string, scene: Scene, model: BlackHoleModel | number, parentBody: CelestialBody | null = null) {
+        this.name = name;
 
         this.model = model instanceof BlackHoleModel ? model : new BlackHoleModel(model);
 
-        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        this.parent = parentBody;
+
+        this.transform = new TransformNode(`${name}Transform`, scene);
+        this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);
         //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
@@ -29,16 +46,48 @@ export class BlackHole extends AbstractBody {
         this.postProcesses.push(PostProcessType.BLACK_HOLE);
     }
 
+    getTransform(): TransformNode {
+        return this.transform;
+    }
+
+    getRotationAxis(): Vector3 {
+        return this.getTransform().up;
+    }
+
+    getLight(): PointLight {
+        return this.light;
+    }
+
+    getOrbitProperties(): OrbitProperties {
+        return this.model.orbit;
+    }
+
+    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
+        return this.model.physicalProperties;
+    }
+
+    getRingsUniforms(): RingsUniforms | null {
+        return null;
+    }
+
     getTypeName(): string {
         return "Black Hole";
     }
 
-    public override computeCulling(camera: Camera): void {
-        // nothing to do
+    public computeCulling(camera: Camera): void {
+        return;
     }
 
-    public override dispose(): void {
+    public getRadius(): number {
+        return this.model.radius;
+    }
+
+    public getBoundingRadius(): number {
+        return this.getRadius() + this.model.physicalProperties.accretionDiskRadius;
+    }
+
+    public dispose(): void {
         this.light.dispose();
-        super.dispose();
+        this.transform.dispose();
     }
 }

@@ -1,14 +1,14 @@
 import { Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { AbstractObject } from "../bodies/abstractObject";
 import { ObjectOverlay } from "./objectOverlay";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { OrbitalObject } from "../architecture/orbitalObject";
 
 export class SystemUI {
     readonly gui: AdvancedDynamicTexture;
     private objectOverlays: ObjectOverlay[] = [];
 
-    private target: AbstractObject | null = null;
+    private target: OrbitalObject | null = null;
 
     constructor(scene: Scene) {
         this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, scene);
@@ -22,7 +22,7 @@ export class SystemUI {
         return this.gui.rootContainer.alpha === 1;
     }
 
-    public createObjectOverlays(objects: AbstractObject[]) {
+    public createObjectOverlays(objects: OrbitalObject[]) {
         this.removeObjectOverlays();
 
         for (const object of objects) {
@@ -50,7 +50,7 @@ export class SystemUI {
         }
     }
 
-    setTarget(object: AbstractObject | null) {
+    setTarget(object: OrbitalObject | null) {
         if (this.target === object) {
             this.target = null;
             return;

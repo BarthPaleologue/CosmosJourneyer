@@ -1,16 +1,15 @@
 import { EditorPanel } from "../editorPanel";
 import { clearAllEventListenersById } from "../../../utils/html";
-import { TelluricPlanemo } from "../../../planemos/telluricPlanemo/telluricPlanemo";
-import { GasPlanet } from "../../../planemos/gasPlanet/gasPlanet";
 import { Settings } from "../../../settings";
 import { Slider } from "handle-sliderjs";
 import { AtmosphericScatteringPostProcess } from "../../../postProcesses/atmosphericScatteringPostProcess";
+import { CelestialBody } from "../../../architecture/celestialBody";
 
 export class AtmospherePanel extends EditorPanel {
     constructor() {
         super("atmosphere");
     }
-    init(planet: TelluricPlanemo | GasPlanet, atmosphere: AtmosphericScatteringPostProcess) {
+    init(planet: CelestialBody, atmosphere: AtmosphericScatteringPostProcess) {
         for (const slider of this.sliders) slider.remove();
 
         const atmosphereToggler = clearAllEventListenersById("atmosphereToggler");

@@ -1,9 +1,9 @@
-import { AbstractBody } from "../bodies/abstractBody";
-import { Transformable } from "../uberCore/transforms/basicTransform";
-import { BoundingSphere } from "../bodies/common";
+import { BoundingSphere } from "../architecture/boundingSphere";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { CelestialBody } from "../architecture/celestialBody";
+import { Transformable } from "../architecture/transformable";
 
-export function nearestBody(objectPosition: Vector3, bodies: AbstractBody[]): AbstractBody {
+export function nearestBody(objectPosition: Vector3, bodies: CelestialBody[]): CelestialBody {
     let distance = -1;
     if (bodies.length === 0) throw new Error("no bodieees !");
     let nearest = bodies[0];

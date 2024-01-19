@@ -1,14 +1,17 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 
 import { OrbitProperties } from "../orbit/orbitProperties";
-import { BODY_TYPE, BodyModel, GENERATION_STEPS, PlanemoModel, PlanetPhysicalProperties } from "../model/common";
+import { BODY_TYPE, GENERATION_STEPS } from "../model/common";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { clamp } from "../utils/math";
 import { getOrbitalPeriod, getPeriapsis } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { PlanetModel } from "../architecture/planet";
+import { PlanetPhysicalProperties } from "../architecture/physicalProperties";
+import { CelestialBodyModel } from "../architecture/celestialBody";
 
-export class MandelbulbModel implements PlanemoModel {
+export class MandelbulbModel implements PlanetModel {
     readonly bodyType = BODY_TYPE.MANDELBULB;
     readonly seed: number;
     readonly rng: (step: number) => number;
@@ -19,9 +22,9 @@ export class MandelbulbModel implements PlanemoModel {
 
     readonly physicalProperties: PlanetPhysicalProperties;
 
-    readonly parentBody: BodyModel | null;
+    readonly parentBody: CelestialBodyModel | null;
 
-    readonly childrenBodies: BodyModel[] = [];
+    readonly childrenBodies: CelestialBodyModel[] = [];
 
     readonly nbMoons: number;
 
@@ -30,7 +33,7 @@ export class MandelbulbModel implements PlanemoModel {
     readonly power: number;
     readonly accentColor: Color3;
 
-    constructor(seed: number, parentBody?: BodyModel) {
+    constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 

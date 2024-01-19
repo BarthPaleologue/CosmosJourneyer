@@ -1,5 +1,4 @@
 import { StarSystemController } from "./starSystemController";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { Star } from "../stellarObjects/star/star";
 import { starName } from "../utils/parseToStrings";
@@ -10,13 +9,14 @@ import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetModel";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
+import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
+import { getMoonSeed } from "../planets/common";
+import { Planet } from "../architecture/planet";
+import { StellarObject } from "../architecture/stellarObject";
 import { BODY_TYPE } from "../model/common";
-import { TelluricPlanemoModel } from "../planemos/telluricPlanemo/telluricPlanemoModel";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
-import { GasPlanetModel } from "../planemos/gasPlanet/gasPlanetModel";
-import { GasPlanet } from "../planemos/gasPlanet/gasPlanet";
-import { Planemo } from "../planemos/planemo";
-import { getMoonSeed } from "../planemos/common";
 
 export class StarSystemHelper {
     public static makeStar(starsystem: StarSystemController, model?: number | StarModel): Star {
@@ -94,9 +94,9 @@ export class StarSystemHelper {
      */
     public static makeTelluricPlanet(
         starsystem: StarSystemController,
-        model: number | TelluricPlanemoModel = starsystem.model.getPlanetSeed(starsystem.planets.length)
-    ): TelluricPlanemo {
-        const planet = new TelluricPlanemo(`${starsystem.model.getName()} ${romanNumeral(starsystem.planets.length + 1)}`, starsystem.scene, model, starsystem.stellarObjects[0]);
+        model: number | TelluricPlanetModel = starsystem.model.getPlanetSeed(starsystem.planets.length)
+    ): TelluricPlanet {
+        const planet = new TelluricPlanet(`${starsystem.model.getName()} ${romanNumeral(starsystem.planets.length + 1)}`, starsystem.scene, model, starsystem.stellarObjects[0]);
         starsystem.addTelluricPlanet(planet);
         return planet;
     }
@@ -117,14 +117,14 @@ export class StarSystemHelper {
 
         for (let i = 0; i < n; i++) {
             switch (starsystem.model.getBodyTypeOfPlanet(starsystem.planets.length)) {
-                case BODY_TYPE.TELLURIC:
+                case BODY_TYPE.TELLURIC_PLANET:
                     StarSystemHelper.makeSatellites(starsystem, StarSystemHelper.makeTelluricPlanet(starsystem));
                     break;
-                case BODY_TYPE.GAS:
+                case BODY_TYPE.GAS_PLANET:
                     StarSystemHelper.makeSatellites(starsystem, StarSystemHelper.makeGasPlanet(starsystem));
                     break;
                 case BODY_TYPE.MANDELBULB:
-                    StarSystemHelper.makeSatellites(starsystem, StarSystemHelper.makeMandelbulb(starsystem));
+                    StarSystemHelper.makeMandelbulb(starsystem);
                     break;
                 default:
                     throw new Error(`Unknown body type ${starsystem.model.getBodyTypeOfPlanet(starsystem.planets.length)}`);
@@ -134,14 +134,14 @@ export class StarSystemHelper {
 
     public static makeSatellite(
         starsystem: StarSystemController,
-        planet: Planemo,
-        model: TelluricPlanemoModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)
-    ): TelluricPlanemo {
-        const satellite = new TelluricPlanemo(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, starsystem.scene, model, planet);
+        planet: Planet,
+        model: TelluricPlanetModel | number = getMoonSeed(planet.model, planet.model.childrenBodies.length)
+    ): TelluricPlanet {
+        const satellite = new TelluricPlanet(`${planet.name} ${romanNumeral(planet.model.childrenBodies.length + 1)}`, starsystem.scene, model, planet);
 
         planet.model.childrenBodies.push(satellite.model);
 
-        starsystem.addTelluricSatellite(satellite);
+        starsystem.addTelluricPlanet(satellite);
         return satellite;
     }
 
@@ -152,7 +152,7 @@ export class StarSystemHelper {
      * @param planet The planet to make satellites for
      * @param n The number of satellites to make
      */
-    public static makeSatellites(starsystem: StarSystemController, planet: Planemo, n = planet.model.nbMoons): void {
+    public static makeSatellites(starsystem: StarSystemController, planet: Planet, n = planet.model.nbMoons): void {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
         if (planet.model.childrenBodies.length + n > planet.model.nbMoons)
             console.warn(
