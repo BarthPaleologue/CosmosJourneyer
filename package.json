@@ -58,7 +58,8 @@
     "serve:prod": "http-server dist -p 8080",
     "format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "test": "jest --coverage",
-    "doc": "typedoc src/ts/**/*.ts --out docs",
+    "doc": "typedoc --options typedoc.json",
+    "serve:doc": "http-server docs -p 8081",
     "lint:check": "eslint src/ts/**/*.ts",
     "lint:fix": "eslint src/ts/**/*.ts --fix"
   }
