@@ -100,19 +100,6 @@ export class StarSystemController {
     }
 
     /**
-     * Adds a satellite to the system and returns it
-     * @param satellite The satellite to add to the system
-     * @returns The satellite added to the system
-     */
-    public addTelluricSatellite(satellite: TelluricPlanet): TelluricPlanet {
-        this.orbitalObjects.push(satellite);
-        this.celestialBodies.push(satellite);
-        this.telluricPlanets.push(satellite);
-        this.planets.push(satellite);
-        return satellite;
-    }
-
-    /**
      * Adds a Mandelbulb to the system and returns it
      * @param mandelbulb The mandelbulb to add to the system
      * @returns The mandelbulb added to the system

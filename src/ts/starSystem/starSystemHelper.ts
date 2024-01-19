@@ -141,7 +141,7 @@ export class StarSystemHelper {
 
         planet.model.childrenBodies.push(satellite.model);
 
-        starsystem.addTelluricSatellite(satellite);
+        starsystem.addTelluricPlanet(satellite);
         return satellite;
     }
 

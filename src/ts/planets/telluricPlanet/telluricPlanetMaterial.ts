@@ -192,8 +192,9 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     }
 
     public update(cameraPosition: Vector3, stellarObjects: Transformable[]) {
-        this.setMatrix("normalMatrix", this.planetTransform.getWorldMatrix().clone().invert().transpose());
-        this.setMatrix("inversePlanetWorldMatrix", this.planetTransform.getWorldMatrix().clone().invert());
+        const inversePlanetWorldMatrix = this.planetTransform.getWorldMatrix().clone().invert();
+        this.setMatrix("normalMatrix", inversePlanetWorldMatrix.transpose());
+        this.setMatrix("inversePlanetWorldMatrix", inversePlanetWorldMatrix);
 
         this.setVector3("playerPosition", cameraPosition);
 
