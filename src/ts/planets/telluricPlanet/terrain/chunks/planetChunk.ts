@@ -20,6 +20,7 @@ import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/
 import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Transformable } from "../../../../architecture/transformable";
+import { CollisionMask } from "../../../../settings";
 
 export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
@@ -119,6 +120,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
             this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
             this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
             this.aggregate.body.disablePreStep = false;
+            this.aggregate.shape.filterMembershipMask = CollisionMask.GROUND;
             const constraint = new LockConstraint(Vector3.Zero(), this.getTransform().position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), this.mesh.getScene());
             this.parentAggregate.body.addConstraint(this.aggregate.body, constraint);
         }

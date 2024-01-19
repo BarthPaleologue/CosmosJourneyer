@@ -36,12 +36,22 @@ export function getPointOnOrbit(centerOfMass: Vector3, settings: OrbitProperties
     return Vector3.TransformCoordinates(localPosition, rotationMatrix).addInPlace(centerOfMass);
 }
 
+/**
+ * Returns the multiplicative factor to transform the Euclidean orbit into a p-norm orbit for a given theta angle and p-norm
+ * @param theta
+ * @param p
+ */
 export function computeLpFactor(theta: number, p: number) {
     const cosTheta = Math.cos(theta);
     const sinTheta = Math.sin(theta);
     return 1 / (Math.abs(cosTheta) ** p + Math.abs(sinTheta) ** p) ** (1 / p);
 }
 
+/**
+ * Returns the Euclidean periapsis of an orbit of a given radius and using the given p-norm
+ * @param radius
+ * @param p
+ */
 export function getPeriapsis(radius: number, p: number) {
     return radius * computeLpFactor(Math.PI / 4, p);
 }
