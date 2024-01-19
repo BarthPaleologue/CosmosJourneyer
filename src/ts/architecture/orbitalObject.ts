@@ -120,6 +120,9 @@ export class OrbitalObject {
     }
 }
 
+/**
+ * Describes the model of an orbital object
+ */
 export interface OrbitalObjectModel {
     /**
      * The random number generator used by the model to generate internal values
@@ -132,9 +135,23 @@ export interface OrbitalObjectModel {
      */
     readonly seed: number;
 
+    /**
+     * Orbit properties of the object
+     */
     readonly orbit: OrbitProperties;
+
+    /**
+     * Physical properties of the object
+     */
     readonly physicalProperties: OrbitalObjectPhysicalProperties;
 
+    /**
+     * The model of the parent object if the object is to have a parent, null otherwise
+     */
     readonly parentBody: OrbitalObjectModel | null;
+
+    /**
+     * The models of the children objects of the object
+     */
     readonly childrenBodies: OrbitalObjectModel[];
 }
