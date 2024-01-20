@@ -39,6 +39,7 @@ import { SaveFileData } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
+import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 
 enum EngineState {
     RUNNING,
@@ -134,8 +135,10 @@ export class CosmosJourneyer {
         this.mainMenu.onStartObservable.add(() => {
             const seed = new SystemSeed(0, 0, 0, 0);
             this.getStarMap().setCurrentStarSystem(seed);
-            this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
+            const starSystem = new StarSystemController(seed, this.getStarSystemView().scene);
+            this.getStarSystemView().setStarSystem(starSystem, true);
             this.getStarSystemView().init();
+            positionNearObjectBrightSide(this.getStarSystemView().scene.getActiveController(), starSystem.getOrbitalObjects()[2], starSystem, 10);
             this.toggleStarMap();
         });
 
