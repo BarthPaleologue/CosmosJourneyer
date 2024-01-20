@@ -1,4 +1,3 @@
-/**Translated to Typescript by Barthélemy Paléologue */
 /*
                 Colour Rendering of Spectra
 
@@ -33,6 +32,8 @@
     versions of Netpbm.)
 
 */
+
+// Translated to Typescript by Barthélemy Paléologue
 
 /* A colour system is defined by the CIE x and y coordinates of
    its three primary illuminants and the x and y coordinates of
