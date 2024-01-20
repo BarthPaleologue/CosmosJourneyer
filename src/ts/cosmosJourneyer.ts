@@ -37,6 +37,8 @@ import { MainMenu } from "./mainMenu/mainMenu";
 import { SystemSeed } from "./utils/systemSeed";
 import { SaveFileData } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 
 enum EngineState {
     RUNNING,
@@ -300,6 +302,11 @@ export class CosmosJourneyer {
         const nearestOrbitalObjectInverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
         const currentLocalPosition = Vector3.TransformCoordinates(currentWorldPosition, nearestOrbitalObjectInverseWorld);
 
+        // Finding the rotation of the player in the nearest orbital object's frame of reference
+        const currentWorldRotation = this.getStarSystemView().scene.getActiveController().getTransform().absoluteRotationQuaternion;
+        const nearestOrbitalObjectInverseRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion.clone().invert();
+        const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
+
         return {
             version: projectInfo.version,
             starSystem: {
@@ -311,7 +318,11 @@ export class CosmosJourneyer {
             nearestOrbitalObjectIndex: nearestOrbitalObjectIndex,
             positionX: currentLocalPosition.x,
             positionY: currentLocalPosition.y,
-            positionZ: currentLocalPosition.z
+            positionZ: currentLocalPosition.z,
+            rotationQuaternionX: currentLocalRotation.x,
+            rotationQuaternionY: currentLocalRotation.y,
+            rotationQuaternionZ: currentLocalRotation.z,
+            rotationQuaternionW: currentLocalRotation.w
         };
     }
 
@@ -339,11 +350,23 @@ export class CosmosJourneyer {
         this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
         this.getStarSystemView().init();
 
+        const playerTransform = this.getStarSystemView().scene.getActiveController().getTransform();
+
         const nearestOrbitalObject = this.getStarSystemView().getStarSystem().getOrbitalObjects()[saveData.nearestOrbitalObjectIndex];
         const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
         const currentLocalPosition = new Vector3(saveData.positionX, saveData.positionY, saveData.positionZ);
         const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
-        this.getStarSystemView().scene.getActiveController().getTransform().setAbsolutePosition(currentWorldPosition);
+        playerTransform.setAbsolutePosition(currentWorldPosition);
+
+        const nearestOrbitalObjectWorldRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion;
+        const currentLocalRotationQuaternion = new Quaternion(
+            saveData.rotationQuaternionX,
+            saveData.rotationQuaternionY,
+            saveData.rotationQuaternionZ,
+            saveData.rotationQuaternionW
+        );
+        const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(nearestOrbitalObjectWorldRotation);
+        setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
 
         this.toggleStarMap();
     }

@@ -36,6 +36,26 @@ export type SaveFileData = {
      * The z coordinate of the player's position in the nearest orbital object's frame of reference.
      */
     positionZ: number;
+
+    /**
+     * The x component of the player's rotation quaternion in the nearest orbital object's frame of reference.
+     */
+    rotationQuaternionX: number;
+
+    /**
+     * The y component of the player's rotation quaternion in the nearest orbital object's frame of reference.
+     */
+    rotationQuaternionY: number;
+
+    /**
+     * The z component of the player's rotation quaternion in the nearest orbital object's frame of reference.
+     */
+    rotationQuaternionZ: number;
+
+    /**
+     * The w component of the player's rotation quaternion in the nearest orbital object's frame of reference.
+     */
+    rotationQuaternionW: number;
 };
 
 /**
@@ -60,6 +80,10 @@ export function isJsonStringValidSaveFileData(jsonString: string): boolean {
         if (typeof data.positionX !== "number") return false;
         if (typeof data.positionY !== "number") return false;
         if (typeof data.positionZ !== "number") return false;
+
+        if (typeof data.rotationQuaternionX !== "number") return false;
+        if (typeof data.rotationQuaternionY !== "number") return false;
+        if (typeof data.rotationQuaternionZ !== "number") return false;
 
         return true;
     } catch (e) {
@@ -89,5 +113,9 @@ export function parseSaveFileData(jsonString: string): SaveFileData {
         positionX: data.positionX,
         positionY: data.positionY,
         positionZ: data.positionZ,
+        rotationQuaternionX: data.rotationQuaternionX,
+        rotationQuaternionY: data.rotationQuaternionY,
+        rotationQuaternionZ: data.rotationQuaternionZ,
+        rotationQuaternionW: data.rotationQuaternionW,
     };
 }
