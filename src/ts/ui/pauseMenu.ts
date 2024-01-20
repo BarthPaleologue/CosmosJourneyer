@@ -24,10 +24,12 @@ export class PauseMenu {
 
     private readonly screenshotButton: HTMLElement;
     private readonly shareButton: HTMLElement;
+    private readonly saveButton: HTMLElement;
     private readonly resumeButton: HTMLElement;
 
     readonly onScreenshot = new Observable<void>();
     readonly onShare = new Observable<void>();
+    readonly onSave = new Observable<void>();
     readonly onResume = new Observable<void>();
 
     constructor() {
@@ -40,6 +42,9 @@ export class PauseMenu {
 
         this.shareButton = document.getElementById("shareButton") as HTMLElement;
         this.shareButton.addEventListener("click", () => this.onShare.notifyObservers());
+
+        this.saveButton = document.getElementById("saveButton") as HTMLElement;
+        this.saveButton.addEventListener("click", () => this.onSave.notifyObservers());
 
         this.resumeButton = document.getElementById("resumeButton") as HTMLElement;
         this.resumeButton.addEventListener("click", () => this.onResume.notifyObservers());

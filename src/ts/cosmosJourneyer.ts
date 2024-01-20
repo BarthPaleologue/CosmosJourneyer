@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import projectInfo from "../../package.json";
 import { Assets } from "./assets";
 import { StarSystemController } from "./starSystem/starSystemController";
 import { Engine } from "@babylonjs/core/Engines/engine";
@@ -34,6 +35,7 @@ import { StarSystemView } from "./starSystem/StarSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./mainMenu/mainMenu";
 import { SystemSeed } from "./utils/systemSeed";
+import { SaveFileData } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 enum EngineState {
@@ -73,6 +75,7 @@ export class CosmosJourneyer {
             const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/random.html?${payload}`);
             navigator.clipboard.writeText(url.toString()).then(() => console.log("Copied to clipboard"));
         });
+        this.pauseMenu.onSave.add(() => this.downloadSaveFile());
 
         this.canvas = document.getElementById("renderer") as HTMLCanvasElement;
         this.canvas.width = window.innerWidth;
@@ -209,14 +212,14 @@ export class CosmosJourneyer {
     public toggleStarMap(): void {
         if (this.activeScene === this.getStarSystemView().scene) {
             this.getStarSystemView().unZoom(() => {
-                if(this.activeScene !== null) this.activeScene.detachControl();
+                if (this.activeScene !== null) this.activeScene.detachControl();
                 this.getStarMap().scene.attachControl();
                 const starMap = this.getStarMap();
                 this.activeScene = starMap.scene;
                 starMap.focusOnCurrentSystem();
             });
         } else {
-            if(this.activeScene !== null) this.activeScene.detachControl();
+            if (this.activeScene !== null) this.activeScene.detachControl();
             this.getStarSystemView().scene.attachControl();
             this.activeScene = this.getStarSystemView().scene;
             this.getStarSystemView().showUI();
@@ -274,5 +277,70 @@ export class CosmosJourneyer {
         } else {
             this.videoRecorder.startRecording("planetEngine.webm", Number(prompt("Enter video duration in seconds", "10"))).then();
         }
+    }
+
+    /**
+     * Generates a save file data object from the current star system and the player's position
+     */
+    public generateSaveData(): SaveFileData {
+        const currentStarSystem = this.getStarSystemView().getStarSystem();
+        const seed = currentStarSystem.model.seed;
+
+        // Finding the index of the nearest orbital object
+        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject();
+        const nearestOrbitalObjectIndex = currentStarSystem.getOrbitalObjects().indexOf(nearestOrbitalObject);
+        if (nearestOrbitalObjectIndex === -1) throw new Error("Nearest orbital object not found");
+
+        // Finding the position of the player in the nearest orbital object's frame of reference
+        const currentWorldPosition = this.getStarSystemView().scene.getActiveController().getTransform().getAbsolutePosition();
+        const nearestOrbitalObjectInverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
+        const currentLocalPosition = Vector3.TransformCoordinates(currentWorldPosition, nearestOrbitalObjectInverseWorld);
+
+        return {
+            version: projectInfo.version,
+            starSystem: {
+                starSectorX: seed.starSectorX,
+                starSectorY: seed.starSectorY,
+                starSectorZ: seed.starSectorZ,
+                starSectorIndex: seed.index
+            },
+            nearestOrbitalObjectIndex: nearestOrbitalObjectIndex,
+            positionX: currentLocalPosition.x,
+            positionY: currentLocalPosition.y,
+            positionZ: currentLocalPosition.z
+        };
+    }
+
+    /**
+     * Generates save file data and downloads it as a json file
+     */
+    public downloadSaveFile(): void {
+        const saveData = this.generateSaveData();
+        const blob = new Blob([JSON.stringify(saveData)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "save.json";
+        link.click();
+    }
+
+    /**
+     * Loads a save file and apply it. This will generate the requested star system and position the player at the requested position around the requested orbital object.
+     * @param saveData The save file data to load
+     */
+    public loadSaveData(saveData: SaveFileData): void {
+        const seed = new SystemSeed(saveData.starSystem.starSectorX, saveData.starSystem.starSectorY, saveData.starSystem.starSectorZ, saveData.starSystem.starSectorIndex);
+
+        this.getStarMap().setCurrentStarSystem(seed);
+        this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
+        this.getStarSystemView().init();
+
+        const nearestOrbitalObject = this.getStarSystemView().getStarSystem().getOrbitalObjects()[saveData.nearestOrbitalObjectIndex];
+        const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
+        const currentLocalPosition = new Vector3(saveData.positionX, saveData.positionY, saveData.positionZ);
+        const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
+        this.getStarSystemView().scene.getActiveController().getTransform().setAbsolutePosition(currentWorldPosition);
+
+        this.toggleStarMap();
     }
 }
