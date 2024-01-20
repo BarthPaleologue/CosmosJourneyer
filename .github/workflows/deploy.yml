@@ -50,8 +50,12 @@ jobs:
         run: pnpm install
       - name: Build with Webpack
         run: pnpm run build
+      - name: Generate documentation
+        run: pnpm run docs
       - name: debug
         run: ls -la
+      - name: Move docs to dist
+        run: mv docs dist/docs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:

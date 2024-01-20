@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
@@ -329,14 +346,14 @@ export class StarSystemController {
 
         //nearestBody.updateInternalClock(deltaTime);
         const initialPosition = nearestBody.getTransform().getAbsolutePosition();
-        const newPosition = OrbitalObject.computeNextOrbitalPosition(nearestBody, deltaTime);
+        const newPosition = OrbitalObject.GetNextOrbitalPosition(nearestBody, deltaTime);
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         if (!shouldCompensateTranslation) translate(nearestBody.getTransform(), nearestBodyDisplacement);
 
-        const dthetaNearest = OrbitalObject.getDeltaTheta(nearestBody, deltaTime);
+        const dthetaNearest = OrbitalObject.GetRotationAngle(nearestBody, deltaTime);
 
         // if we don't compensate the rotation of the nearest body, we must rotate it accordingly
-        if (!shouldCompensateRotation) OrbitalObject.updateRotation(nearestBody, deltaTime);
+        if (!shouldCompensateRotation) OrbitalObject.UpdateRotation(nearestBody, deltaTime);
 
         // As the nearest object is kept in place, we need to transfer its movement to other bodies
         for (const object of this.orbitalObjects) {
@@ -382,8 +399,8 @@ export class StarSystemController {
             if (object === nearestBody) continue;
 
             //object.updateInternalClock(deltaTime);
-            OrbitalObject.updateOrbitalPosition(object, deltaTime);
-            OrbitalObject.updateRotation(object, deltaTime);
+            OrbitalObject.UpdateOrbitalPosition(object, deltaTime);
+            OrbitalObject.UpdateRotation(object, deltaTime);
         }
 
         controller.update(deltaTime);

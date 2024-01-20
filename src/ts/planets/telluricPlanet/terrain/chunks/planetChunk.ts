@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Direction, getQuaternionFromDirection } from "../../../../utils/direction";
 import { getChunkPlaneSpacePositionFromPath } from "../../../../utils/chunkUtils";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -20,6 +37,7 @@ import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/
 import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Transformable } from "../../../../architecture/transformable";
+import { CollisionMask } from "../../../../settings";
 
 export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
@@ -119,6 +137,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
             this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
             this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
             this.aggregate.body.disablePreStep = false;
+            this.aggregate.shape.filterMembershipMask = CollisionMask.GROUND;
             const constraint = new LockConstraint(Vector3.Zero(), this.getTransform().position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), this.mesh.getScene());
             this.parentAggregate.body.addConstraint(this.aggregate.body, constraint);
         }
