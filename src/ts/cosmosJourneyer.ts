@@ -90,12 +90,13 @@ export class CosmosJourneyer {
 
         //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
+            if (this.activeScene === this.mainMenu?.scene) return;
             if (e.key === "p") this.takeScreenshot();
             if (e.key === "v") this.takeVideoCapture();
             if (e.key === "m") this.toggleStarMap();
 
             if (e.key === "Escape") {
-                if (!this.isPaused() && this.activeScene !== this.mainMenu?.scene) this.pause();
+                if (!this.isPaused()) this.pause();
                 else this.resume();
             }
         });
