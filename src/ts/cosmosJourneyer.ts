@@ -137,6 +137,10 @@ export class CosmosJourneyer {
             this.toggleStarMap();
         });
 
+        this.mainMenu.onLoadSaveObservable.add((saveData: SaveFileData) => {
+            this.loadSaveData(saveData);
+        });
+
         // Init starmap view
         this.starMap = new StarMap(this.engine);
         this.starMap.onWarpObservable.add((seed: SystemSeed) => {

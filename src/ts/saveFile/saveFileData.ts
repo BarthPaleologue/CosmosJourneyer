@@ -37,3 +37,57 @@ export type SaveFileData = {
      */
     positionZ: number;
 };
+
+/**
+ * Checks if a string is a valid save file json data.
+ * @param jsonString The string to check.
+ */
+export function isJsonStringValidSaveFileData(jsonString: string): boolean {
+    try {
+        const data = JSON.parse(jsonString);
+        if (typeof data !== "object") return false;
+
+        if (typeof data.version !== "string") return false;
+
+        if (typeof data.starSystem !== "object") return false;
+        if (typeof data.starSystem.starSectorX !== "number") return false;
+        if (typeof data.starSystem.starSectorY !== "number") return false;
+        if (typeof data.starSystem.starSectorZ !== "number") return false;
+        if (typeof data.starSystem.starSectorIndex !== "number") return false;
+
+        if (typeof data.nearestOrbitalObjectIndex !== "number") return false;
+
+        if (typeof data.positionX !== "number") return false;
+        if (typeof data.positionY !== "number") return false;
+        if (typeof data.positionZ !== "number") return false;
+
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+/**
+ * Parses a string into a SaveFileData object. Throws an error if the string is not a valid save file data.
+ * @param jsonString The string to parse.
+ * @throws Error if the string is not a valid save file data.
+ */
+export function parseSaveFileData(jsonString: string): SaveFileData {
+    if (!isJsonStringValidSaveFileData(jsonString)) throw new Error("Invalid save file data");
+
+    const data = JSON.parse(jsonString);
+
+    return {
+        version: data.version,
+        starSystem: {
+            starSectorX: data.starSystem.starSectorX,
+            starSectorY: data.starSystem.starSectorY,
+            starSectorZ: data.starSystem.starSectorZ,
+            starSectorIndex: data.starSystem.starSectorIndex,
+        },
+        nearestOrbitalObjectIndex: data.nearestOrbitalObjectIndex,
+        positionX: data.positionX,
+        positionY: data.positionY,
+        positionZ: data.positionZ,
+    };
+}

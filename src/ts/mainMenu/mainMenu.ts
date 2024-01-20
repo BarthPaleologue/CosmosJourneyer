@@ -15,6 +15,7 @@ import { TransformRotationAnimation } from "../uberCore/transforms/animations/ro
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { SystemSeed } from "../utils/systemSeed";
+import { isJsonStringValidSaveFileData, parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 
 export class MainMenu {
     readonly controls: DefaultControls;
@@ -24,6 +25,7 @@ export class MainMenu {
     readonly starSystemController: StarSystemController;
 
     readonly onStartObservable = new Observable<void>();
+    readonly onLoadSaveObservable = new Observable<SaveFileData>();
     readonly onContributeObservable = new Observable<void>();
     readonly onCreditsObservable = new Observable<void>();
     readonly onAboutObservable = new Observable<void>();
@@ -32,6 +34,7 @@ export class MainMenu {
     private title: HTMLElement | null = null;
 
     private activeRightPanel: HTMLElement | null = null;
+    private loadSavePanel: HTMLElement | null = null;
     private contributePanel: HTMLElement | null = null;
     private creditsPanel: HTMLElement | null = null;
     private aboutPanel: HTMLElement | null = null;
@@ -67,15 +70,15 @@ export class MainMenu {
         ];
 
         /*const randomSeed = new SystemSeed(
-        new Vector3(
-            Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
-            Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
-            Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER)
-        ),
-        0
-    );
+    new Vector3(
+        Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
+        Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
+        Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER)
+    ),
+    0
+);
 
-    console.log(randomSeed.starSectorCoordinates.x, randomSeed.starSectorCoordinates.y, randomSeed.starSectorCoordinates.z, randomSeed.index);*/
+console.log(randomSeed.starSectorCoordinates.x, randomSeed.starSectorCoordinates.y, randomSeed.starSectorCoordinates.z, randomSeed.index);*/
 
         const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)];
         //console.log(seed.starSectorCoordinates.x, seed.starSectorCoordinates.y, seed.starSectorCoordinates.z, seed.index);
@@ -110,7 +113,86 @@ export class MainMenu {
         this.title = title as HTMLElement;
 
         document.getElementById("startButton")?.addEventListener("click", () => {
-            this.startAnimation();
+            this.startAnimation(() => this.onStartObservable.notifyObservers());
+        });
+
+        const loadSaveButton = document.getElementById("loadSaveButton");
+        if (loadSaveButton === null) throw new Error("#loadSaveButton does not exist!");
+
+        const loadSavePanel = document.getElementById("loadSavePanel");
+        if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
+        this.loadSavePanel = loadSavePanel;
+
+        const dropFileZone = document.getElementById("dropFileZone");
+        if (dropFileZone === null) throw new Error("#dropFileZone does not exist!");
+
+        dropFileZone.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dropFileZone.classList.add("dragover");
+            dropFileZone.classList.remove("invalid");
+            if (event.dataTransfer === null) throw new Error("event.dataTransfer is null");
+            event.dataTransfer.dropEffect = "copy";
+        });
+
+        dropFileZone.addEventListener("dragleave", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dropFileZone.classList.remove("dragover");
+        });
+
+        dropFileZone.addEventListener("drop", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dropFileZone.classList.remove("dragover");
+
+            if (event.dataTransfer === null) throw new Error("event.dataTransfer is null");
+            if (event.dataTransfer.files.length === 0) throw new Error("event.dataTransfer.files is empty");
+
+            const file = event.dataTransfer.files[0];
+            if (file.type !== "application/json") {
+                dropFileZone.classList.add("invalid");
+                alert("File is not a JSON file");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target === null) throw new Error("event.target is null");
+                const data = event.target.result as string;
+                try {
+                    const saveFileData = parseSaveFileData(data);
+                    this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
+                } catch (e) {
+                    dropFileZone.classList.add("invalid");
+                    alert("Invalid save file");
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        dropFileZone.addEventListener("click", () => {
+            const fileInput = document.createElement("input");
+            fileInput.type = "file";
+            fileInput.accept = "application/json";
+            fileInput.onchange = () => {
+                if (fileInput.files === null) throw new Error("fileInput.files is null");
+                if (fileInput.files.length === 0) throw new Error("fileInput.files is empty");
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    if (event.target === null) throw new Error("event.target is null");
+                    const data = event.target.result as string;
+                    const saveFileData = parseSaveFileData(data);
+                    this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
+                };
+                reader.readAsText(file);
+            };
+            fileInput.click();
+        });
+
+        loadSaveButton.addEventListener("click", () => {
+            this.toggleActivePanel(loadSavePanel);
         });
 
         const contributeButton = document.getElementById("contributeButton");
@@ -148,7 +230,7 @@ export class MainMenu {
         });
     }
 
-    private startAnimation() {
+    private startAnimation(onAnimationFinished: () => void) {
         this.hideActivePanel();
 
         const currentForward = getForwardDirection(this.controls.getTransform());
@@ -196,7 +278,7 @@ export class MainMenu {
                 this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
                 if (this.htmlRoot === null) throw new Error("MainMenu is null");
                 this.htmlRoot.style.display = "none";
-                this.onStartObservable.notifyObservers();
+                onAnimationFinished();
             }
 
             this.controls.getActiveCamera().getViewMatrix();
