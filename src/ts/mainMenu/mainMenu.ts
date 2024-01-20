@@ -15,7 +15,7 @@ import { TransformRotationAnimation } from "../uberCore/transforms/animations/ro
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { SystemSeed } from "../utils/systemSeed";
-import { isJsonStringValidSaveFileData, parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
+import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 
 export class MainMenu {
     readonly controls: DefaultControls;
@@ -66,7 +66,6 @@ export class MainMenu {
             new SystemSeed(-3831994119404563, 290653719847023, -1503550685041827, 0),
             new SystemSeed(4935006642582931, 385848138478679, 8147709060574067, 0),
             new SystemSeed(-8122625535230955, -296218998945099, 2938478904818683, 0),
-            new SystemSeed(5259620563645687, -7556311036542487, -4580825548740931, 0)
         ];
 
         /*const randomSeed = new SystemSeed(
@@ -81,7 +80,7 @@ export class MainMenu {
 console.log(randomSeed.starSectorCoordinates.x, randomSeed.starSectorCoordinates.y, randomSeed.starSectorCoordinates.z, randomSeed.index);*/
 
         const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)];
-        //console.log(seed.starSectorCoordinates.x, seed.starSectorCoordinates.y, seed.starSectorCoordinates.z, seed.index);
+        console.log(seed.starSectorX, seed.starSectorY, seed.starSectorZ, seed.index);
         this.starSystemController = new StarSystemController(seed, this.scene);
     }
 
