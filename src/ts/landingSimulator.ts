@@ -19,6 +19,8 @@ import { Spaceship } from "./spaceship/spaceship";
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -38,7 +40,10 @@ scene.useRightHandedSystem = true;
 scene.enablePhysics(Vector3.Zero(), havokPlugin);
 scene.clearColor = new Color4(0.2, 0.2, 0.6, 1);
 
+const hemi = new HemisphericLight("hemi", new Vector3(0, 1, 0), scene);
 const light = new DirectionalLight("light", new Vector3(-2, -5, 1).normalize(), scene);
+const pointLight = new PointLight("pointLight", new Vector3(0, 0, 0), scene);
+pointLight.intensity = 0;
 const shadowGenerator = new ShadowGenerator(2048, light);
 
 await Assets.Init(scene);
