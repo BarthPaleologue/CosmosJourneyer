@@ -48,4 +48,4 @@ positionNearObjectBrightSide(scene.getActiveController(), BH, starSystem, 20);
 
 starSystemView.ui.setEnabled(true);
 starSystemView.showUI();
-starSystemView.getSpaceshipControls().enableWarpDrive();
+starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();

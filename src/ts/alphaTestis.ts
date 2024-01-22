@@ -150,8 +150,6 @@ engine.init(true);
 
 positionNearObjectBrightSide(starSystemView.scene.getActiveController(), planet, starSystem, 2);
 
-spaceshipController.toggleWarpDrive();
-
 const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
 if (aresAtmosphere) {
     aresAtmosphere.atmosphereUniforms.redWaveLength = 500;
@@ -202,4 +200,4 @@ document.addEventListener("keydown", (e) => {
 
 starSystemView.ui.setEnabled(true);
 starSystemView.showUI();
-starSystemView.getSpaceshipControls().enableWarpDrive();
+starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();

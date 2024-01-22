@@ -49,8 +49,9 @@ export function createGrassMaterial(scene: Scene) {
 
         if (scene.activeCamera === null) throw new Error("Active camera is null");
 
-        const star = scene.lights[1];
-        if (!(star instanceof PointLight)) throw new Error("Could not find star light");
+        const starIndex = scene.lights.findIndex((light) => light instanceof PointLight);
+        if (starIndex === -1) throw new Error("Could not find star light");
+        const star = scene.lights[starIndex] as PointLight;
 
         const lightDirection = star.position.subtract(scene.activeCamera.globalPosition).normalize();
         grassMaterial.setVector3("lightDirection", lightDirection);

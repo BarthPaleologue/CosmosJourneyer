@@ -61,4 +61,4 @@ positionNearObjectBrightSide(scene.getActiveController(), starSystem.planets.len
 
 starSystemView.ui.setEnabled(true);
 starSystemView.showUI();
-starSystemView.getSpaceshipControls().enableWarpDrive();
+starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();

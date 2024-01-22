@@ -43,6 +43,7 @@ import banana from "../asset/banana/banana.glb";
 import endeavorSpaceship from "../asset/spaceship/endeavour.glb";
 import character from "../asset/character.glb";
 import rock from "../asset/rock.glb";
+import landingPad from "../asset/landingpad.glb";
 
 import tree from "../asset/tree/tree.babylon";
 import treeTexturePath from "../asset/tree/Tree.png";
@@ -94,6 +95,8 @@ export class Assets {
     private static Spacestation: Mesh;
     private static Banana: Mesh;
     private static Character: Mesh;
+
+    private static LandingPad: Mesh;
 
     public static Rock: Mesh;
     public static Tree: Mesh;
@@ -202,6 +205,18 @@ export class Assets {
             console.log("Rock loaded");
         };
 
+        const landingPadTask = Assets.manager.addMeshTask("landingPadTask", "", "", landingPad);
+        landingPadTask.onSuccess = function (task: MeshAssetTask) {
+            Assets.LandingPad = task.loadedMeshes[0] as Mesh;
+            Assets.LandingPad.isVisible = false;
+
+            for (const mesh of Assets.LandingPad.getChildMeshes()) {
+                mesh.isVisible = false;
+            }
+
+            console.log("LandingPad loaded");
+        };
+
         const treeTask = Assets.manager.addMeshTask("treeTask", "", "", tree);
         treeTask.onSuccess = function (task: MeshAssetTask) {
             Assets.Tree = task.loadedMeshes[0] as Mesh;
@@ -298,6 +313,10 @@ export class Assets {
 
     static CreateRockInstance(): InstancedMesh {
         return Assets.Rock.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+    }
+
+    static CreateLandingPadInstance(): InstancedMesh {
+        return Assets.LandingPad.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static DebugMaterial(name: string, diffuse = false, wireframe = false) {

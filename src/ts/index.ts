@@ -19,8 +19,6 @@ import "../styles/index.scss";
 
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
-import { StarSystemController } from "./starSystem/starSystemController";
-import { SystemSeed } from "./utils/systemSeed";
 
 const engine = new CosmosJourneyer();
 
@@ -28,12 +26,9 @@ await engine.setup();
 
 const starSystemView = engine.getStarSystemView();
 
-//const starSystem = new StarSystemController(new SystemSeed(0, 0, 0, 0), starSystemView.scene);
-//starSystemView.setStarSystem(starSystem, true);
-
 engine.init();
 
-const spaceshipController = starSystemView.getSpaceshipControls();
+const shipControls = starSystemView.getSpaceshipControls();
 const characterController = starSystemView.getCharacterControls();
 const defaultController = starSystemView.getDefaultControls();
 
@@ -41,14 +36,15 @@ document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
     if (e.key === "y") {
-        if (starSystemView.scene.getActiveController() === spaceshipController) {
+        if (starSystemView.scene.getActiveController() === shipControls) {
+
             console.log("disembark");
 
             characterController.getTransform().setEnabled(true);
-            characterController.getTransform().setAbsolutePosition(spaceshipController.getTransform().absolutePosition);
-            translate(characterController.getTransform(), getForwardDirection(spaceshipController.getTransform()).scale(10));
+            characterController.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
+            translate(characterController.getTransform(), getForwardDirection(shipControls.getTransform()).scale(10));
 
-            setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
+            setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
 
             starSystemView.scene.setActiveController(characterController);
             starSystemView.getStarSystem().postProcessManager.rebuild();
@@ -56,7 +52,7 @@ document.addEventListener("keydown", (e) => {
             console.log("embark");
 
             characterController.getTransform().setEnabled(false);
-            starSystemView.scene.setActiveController(spaceshipController);
+            starSystemView.scene.setActiveController(shipControls);
             starSystemView.getStarSystem().postProcessManager.rebuild();
         }
     }

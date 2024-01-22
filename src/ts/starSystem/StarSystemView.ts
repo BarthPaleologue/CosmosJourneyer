@@ -215,20 +215,20 @@ export class StarSystemView {
         const nearestBody = starSystem.getNearestOrbitalObject();
         const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
         const radius = nearestBody.getBoundingRadius();
-        this.spaceshipControls.registerClosestObject(distance, radius);
+        this.spaceshipControls.spaceship.registerClosestObject(distance, radius);
 
-        const warpDrive = this.spaceshipControls.getWarpDrive();
+        const warpDrive = this.spaceshipControls.spaceship.getWarpDrive();
         const shipInternalThrottle = warpDrive.getInternalThrottle();
         const shipTargetThrottle = warpDrive.getTargetThrottle();
 
         const throttleString = warpDrive.isEnabled()
             ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}`
-            : `${parsePercentageFrom01(this.spaceshipControls.getThrottle())}/100%`;
+            : `${parsePercentageFrom01(this.spaceshipControls.spaceship.getThrottle())}/100%`;
 
-        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(this.spaceshipControls.getSpeed())}`;
+        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(this.spaceshipControls.spaceship.getSpeed())}`;
 
         this.characterControls.setClosestWalkableObject(nearestBody);
-        this.spaceshipControls.setClosestWalkableObject(nearestBody);
+        this.spaceshipControls.spaceship.setClosestWalkableObject(nearestBody);
 
         this.ui.update(this.scene.getActiveCamera());
 
@@ -267,7 +267,7 @@ export class StarSystemView {
         setRotationQuaternion(shipControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
         this.getStarSystem().postProcessManager.rebuild();
 
-        shipControls.setEnabled(true, this.havokPlugin);
+        shipControls.spaceship.setEnabled(true, this.havokPlugin);
     }
 
     switchToCharacterControls() {
@@ -281,7 +281,7 @@ export class StarSystemView {
         setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
         this.getStarSystem().postProcessManager.rebuild();
 
-        shipControls.setEnabled(false, this.havokPlugin);
+        shipControls.spaceship.setEnabled(false, this.havokPlugin);
     }
 
     switchToDefaultControls() {
@@ -290,7 +290,7 @@ export class StarSystemView {
         const defaultControls = this.getDefaultControls();
 
         characterControls.getTransform().setEnabled(false);
-        shipControls.setEnabled(false, this.havokPlugin);
+        shipControls.spaceship.setEnabled(false, this.havokPlugin);
 
         this.scene.setActiveController(defaultControls);
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
