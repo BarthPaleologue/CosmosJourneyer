@@ -96,7 +96,7 @@ export class Spaceship implements Transformable {
         }
 
         this.warpTunnel = new WarpTunnel(new Vector3(0, 0, 1), scene);
-        this.warpTunnel.setParent(this.getTransform());
+        this.warpTunnel.getTransform().parent = this.getTransform();
 
         this.scene = scene;
     }
@@ -206,6 +206,8 @@ export class Spaceship implements Transformable {
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
         this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
+
+        this.warpTunnel.setThrottle(this.warpDrive.getInternalThrottle());
 
         for (const thruster of this.mainThrusters) thruster.update();
         for (const thruster of this.rcsThrusters) thruster.update();

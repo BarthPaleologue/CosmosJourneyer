@@ -1,190 +1,144 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { getForwardDirection, rotate } from "../uberCore/transforms/basicTransform";
-import { LinesMesh, TransformNode } from "@babylonjs/core/Meshes";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-
-import warpConeFragment from "../../shaders/warpConeMaterial/fragment.glsl";
-import warpConeVertex from "../../shaders/warpConeMaterial/vertex.glsl";
-import { Effect } from "@babylonjs/core/Materials/effect";
+import { getForwardDirection } from "../uberCore/transforms/basicTransform";
+import { TransformNode } from "@babylonjs/core/Meshes";
 import { Assets } from "../assets";
 import { Transformable } from "../architecture/transformable";
+import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { Nullable } from "@babylonjs/core";
 
 /**
+ * @see https://playground.babylonjs.com/#EAZYXZ#83
  * @see https://playground.babylonjs.com/#W9LE0U#28
  */
 export class WarpTunnel implements Transformable {
-    maxNbDrops = 1000;
-    maxLineSize = 12.0;
-    positiveDepth = 600.0;
-    negativeDepth = 100.0;
-    radius = 50;
-    minSpeed = 200.0;
-    maxSpeed = 400.0;
+    readonly anchor: TransformNode;
+    readonly particleSystem: ParticleSystem;
 
-    drops: [Vector3, Vector3][] = [];
-    speeds: number[] = [];
-    colors: [Color4, Color4][] = [];
-    deltaSpeed: number;
-
-    private parent: TransformNode | null = null;
-
-    readonly direction: Vector3;
-    readonly v1: Vector3;
-    readonly v2: Vector3;
-
-    readonly spaceLines: LinesMesh;
-    readonly warpCone: Mesh;
-
-    private throttle = 1;
-
-    private diameterTop = 20;
-    private diameterBottom = 100;
+    static MAX_EMIT_RATE = 500;
 
     constructor(direction: Vector3, scene: Scene) {
-        this.deltaSpeed = this.maxSpeed - this.minSpeed;
+        this.anchor = new TransformNode("anchor", scene);
+        this.anchor.position = new Vector3(0, 0, 300);
+        this.anchor.rotation.x = -Math.PI / 2;
 
-        this.direction = direction;
+        const ps = new ParticleSystem("WarpSpeed", 10_000, scene);
+        ps.particleTexture = Assets.FlareTexture;
+        ps.minLifeTime = 4;
+        ps.maxLifeTime = 4;
+        ps.blendMode = ParticleSystem.BLENDMODE_ADD;
+        ps.forceDepthWrite = true;
+        ps.minEmitPower = 100;
+        ps.maxEmitPower = 100;
+        ps.updateSpeed = 1 / 60; //0.005;
+        ps.emitRate = 0;
+        ps.billboardMode = ParticleSystem.BILLBOARDMODE_STRETCHED;
+        ps.minSize = 0.5;
+        ps.maxSize = 0.5;
+        ps.minScaleY = ps.maxScaleY = 10;
 
-        // find two orthogonal vectors to the direction vector (see  https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process)
-        const v1 = new Vector3(Math.random(), Math.random(), Math.random()).normalize();
-        v1.subtractInPlace(this.direction.scale(this.direction.dot(v1))).normalize();
+        ps.emitter = this.anchor as AbstractMesh;
+        ps.start();
 
-        const v2 = Vector3.Cross(this.direction, v1).normalize();
+        ps.startPositionFunction = (worldMatrix, positionToUpdate, particle) => {
+            const theta = Math.random() * Math.PI * 2;
+            const r = 25 + (Math.random() - 0.5) * 2 * 10;
 
-        this.v1 = v1;
-        this.v2 = v2;
+            const x = Math.cos(theta) * r;
+            const y = Math.random();
+            const z = Math.sin(theta) * r;
 
-        for (let d = 0; d < this.maxNbDrops; d++) {
-            this.drops.push(this.getRandomStartingPositions());
+            Vector3.TransformCoordinatesFromFloatsToRef(x, y, z, worldMatrix, positionToUpdate);
+        };
 
-            const color0 = new Color4(1.0, 1.0, 0.7, 1.0);
-            const color1 = new Color4(1.0, 1.0, 0.7, 1.0);
-            this.colors.push([color0, color1]);
+        ps.startDirectionFunction = (worldMatrix, directionToUpdate, particle) => {
+            const parent = this.getTransform().parent as Nullable<TransformNode>;
+            if (parent === null) throw new Error("WarpTunnel anchor has no parent");
+            const direction = parent.getAbsolutePosition().subtract(this.anchor.getAbsolutePosition()).normalize();
+            directionToUpdate.copyFrom(direction);
+        };
 
-            this.speeds.push(this.minSpeed + this.deltaSpeed * Math.random());
+        function computeColor(t: number) {
+            const t0 = -0.7;
+            const t1 = 0.7;
+            if(t < -1) {
+                return new Color4(2, 2, 2, 0);
+            }
+            if(t < t0) {
+                return new Color4(2, 2, 2, 1 - (t0 - t) / (t0 - -1));
+            }
+            if(t < t1) {
+                return new Color4(2, 2, 2, 1);
+            }
+            if(t < 1) {
+                return new Color4(2, 2, 2, 1 - (t - t1) / (1 - t1));
+            }
+            if(t > 1) {
+                return new Color4(2, 2, 2, 0);
+            }
+            throw new Error("Invalid t: " + t);
         }
 
-        const rain = MeshBuilder.CreateLineSystem(
-            "rain",
-            {
-                lines: this.drops,
-                updatable: true,
-                //useVertexAlpha: true,
-                colors: this.colors
-            },
-            scene
-        );
+        ps.updateFunction = (particles) => {
+            const parent = this.getTransform().parent as Nullable<TransformNode>;
+            if (parent === null) throw new Error("WarpTunnel anchor has no parent");
+            const parentForward = getForwardDirection(parent);
+            for (let index = 0; index < particles.length; index++) {
+                const deltaTime = scene.getEngine().getDeltaTime() / 1000;
+                const scaledUpdateSpeed = deltaTime * ps.updateSpeed * 60;
 
-        this.spaceLines = rain;
-        //this.spaceLines.setEnabled(false);
-        this.warpCone = MeshBuilder.CreateCylinder(
-            "cone",
-            {
-                diameterTop: this.diameterTop,
-                diameterBottom: this.diameterBottom,
-                height: this.positiveDepth + this.negativeDepth,
-                cap: Mesh.NO_CAP,
-                sideOrientation: Mesh.BACKSIDE
-            },
-            scene
-        );
-        this.warpCone.rotation.x = Math.PI / 2;
-        this.warpCone.position.z = this.positiveDepth / 2;
-        this.warpCone.bakeCurrentTransformIntoVertices();
-        this.warpCone.visibility = 0.5;
+                const particle = particles[index];
+                particle.age += scaledUpdateSpeed;
 
-        Effect.ShadersStore["warpConeMaterialFragmentShader"] = warpConeFragment;
-        Effect.ShadersStore["warpConeMaterialVertexShader"] = warpConeVertex;
-        const warpConeMaterial = new ShaderMaterial("warpConeMaterial", scene, "warpConeMaterial", {
-            attributes: ["position", "uv"],
-            uniforms: ["worldViewProjection", "time"],
-            samplers: ["warpNoise"]
-        });
-        warpConeMaterial.setTexture("warpNoise", Assets.WarpNoise);
+                const scaledDirection = particle.direction.scale(scaledUpdateSpeed);
 
-        this.warpCone.material = warpConeMaterial;
-        this.warpCone.setEnabled(false);
+                if (particle.age >= particle.lifeTime) {
+                    // Recycle
+                    particles.splice(index, 1);
+                    //@ts-ignore
+                    ps._stockParticles.push(particle);
+                    index--;
+                    continue;
+                }
 
-        let clock = 0.0;
-        scene.registerBeforeRender(() => {
-            const deltaTime = scene.getEngine().getDeltaTime() / 1000;
-            clock += deltaTime;
+                const distanceAlongForward = particle.position.dot(parentForward);
 
-            warpConeMaterial.setFloat("time", clock);
-            this.rainFalls(deltaTime);
+                const distanceAlongForward11 = distanceAlongForward / 300;
 
-            MeshBuilder.CreateLineSystem("rain", { lines: this.drops, instance: rain });
+                particle.color = computeColor(distanceAlongForward11);
 
-            if (this.parent === null) return;
+                particle.direction.scaleToRef(scaledUpdateSpeed, scaledDirection);
+                particle.position.addInPlace(scaledDirection);
 
-            this.spaceLines.position = this.parent.getAbsolutePosition();
-            this.warpCone.position = this.parent.getAbsolutePosition();
+                particle.position.addInPlace(scaledDirection);
+            }
+        };
 
-            const targetForward = getForwardDirection(this.parent);
-            const currentForward = getForwardDirection(this.getTransform());
+        /*let lastEmitterPosition = this.anchor.getAbsolutePosition().clone();
+        scene.onBeforeParticlesRenderingObservable.add(() => {
+            const newEmitterPosition = this.anchor.getAbsolutePosition().clone();
+            ps.particles.forEach(particle => {
+                particle.position.addInPlace(newEmitterPosition.subtract(lastEmitterPosition));
 
-            if (targetForward.equalsWithEpsilon(currentForward, 0.001)) return;
+            });
+            lastEmitterPosition = newEmitterPosition.clone();
+        });*/
 
-            const rotationAxis = Vector3.Cross(currentForward, targetForward);
-            const angle = Math.acos(Vector3.Dot(currentForward, targetForward));
-
-            const theta = angle; //Math.min(0.3 * deltaTime, angle);
-
-            rotate(this.spaceLines, rotationAxis, theta);
-            rotate(this.warpCone, rotationAxis, theta);
-        });
+        this.particleSystem = ps;
     }
 
-    private getRandomStartingPositions(): [Vector3, Vector3] {
-        const theta = Math.random() * Math.PI * 2;
-        const radiusScaling = 1 + (Math.random() * 2 - 1) * 0.5;
-
-        const p0 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterTop) / 2);
-        const p1 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterBottom) / 2);
-        p0.addInPlace(this.direction.scale(this.positiveDepth));
-        p1.subtractInPlace(this.direction.scale(this.negativeDepth));
-
-        const direction = p1.subtract(p0).normalize();
-
-        const lineSize = this.maxLineSize * Math.random();
-
-        const point0 = p0;
-        const point1 = point0.add(direction.scale(lineSize));
-
-        return [point0, point1];
-    }
-
-    setParent(parent: TransformNode) {
-        this.parent = parent;
+    setThrottle(throttle: number) {
+        this.particleSystem.emitRate = throttle * WarpTunnel.MAX_EMIT_RATE;
     }
 
     getTransform(): TransformNode {
-        return this.spaceLines;
-    }
-
-    rainFalls(deltaTime: number) {
-        for (let d = 0; d < this.maxNbDrops; d++) {
-            const drop = this.drops[d];
-            const speed = this.speeds[d] * this.throttle;
-            const direction = drop[0].subtract(drop[1]).normalize();
-            drop[0].subtractInPlace(direction.scale(speed * deltaTime));
-            drop[1].subtractInPlace(direction.scale(speed * deltaTime));
-
-            if (drop[0].dot(this.direction) < -this.negativeDepth) {
-                const [point0, point1] = this.getRandomStartingPositions();
-
-                drop[0].copyFrom(point0);
-                drop[1].copyFrom(point1);
-            }
-        }
+        return this.anchor;
     }
 
     dispose() {
-        this.spaceLines.dispose();
-        this.warpCone.dispose();
+        this.particleSystem.dispose();
+        this.anchor.dispose();
     }
 }

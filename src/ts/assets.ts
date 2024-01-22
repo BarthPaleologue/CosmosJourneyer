@@ -33,6 +33,7 @@ import waterNormal2 from "../asset/textures/waterNormalMap4.jpg";
 
 import starfield from "../asset/textures/milkyway.jpg";
 import plumeParticle from "../asset/textures/plume.png";
+import flareParticle from "../asset/flare.png";
 
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 
@@ -87,6 +88,8 @@ export class Assets {
     static Starfield: Texture;
     static PlumeParticle: Texture;
 
+    static FlareTexture: Texture;
+
     static EmptyTexture: Texture;
 
     static AtmosphereLUT: ProceduralTexture;
@@ -132,6 +135,7 @@ export class Assets {
         Assets.manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.Starfield = task.texture);
 
         Assets.manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Assets.PlumeParticle = task.texture);
+        Assets.manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Assets.FlareTexture = task.texture);
 
         Assets.manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Assets.SeamlessPerlin = task.texture);
         Assets.manager.addTextureTask("WarpNoise", warpNoise).onSuccess = (task) => (Assets.WarpNoise = task.texture);
