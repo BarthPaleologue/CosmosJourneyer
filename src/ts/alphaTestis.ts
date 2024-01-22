@@ -21,27 +21,18 @@ import { StarSystemController } from "./starSystem/starSystemController";
 
 import { Settings } from "./settings";
 import { Assets } from "./assets";
-import { DefaultControls } from "./defaultController/defaultControls";
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { ShipControls } from "./spaceship/shipControls";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
 import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
-import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
-
-import { StarSystemHelper } from "./starSystem/starSystemHelper";
-import { Mouse } from "./inputs/mouse";
-import { Keyboard } from "./inputs/keyboard";
+import { StarSystemHelper } from "./starSystem/starSystemHelper"
 import { StarModel } from "./stellarObjects/star/starModel";
 import { RingsUniforms } from "./postProcesses/rings/ringsUniform";
 import { getMoonSeed } from "./planets/common";
-
-import { Gamepad } from "./inputs/gamepad";
-import { CharacterControls } from "./spacelegs/characterControls";
 import { SystemSeed } from "./utils/systemSeed";
 
 const engine = new CosmosJourneyer();
@@ -50,69 +41,12 @@ await engine.setup();
 
 const starSystemView = engine.getStarSystemView();
 
-const mouse = new Mouse(engine.canvas, 100);
-const keyboard = new Keyboard();
-const gamepad = new Gamepad();
+const spaceshipController = starSystemView.getSpaceshipControls();
 
-const maxZ = Settings.EARTH_RADIUS * 1e5;
-
-const defaultController = new DefaultControls(starSystemView.scene);
-defaultController.speed = 0.2 * Settings.EARTH_RADIUS;
-defaultController.getActiveCamera().maxZ = maxZ;
-defaultController.addInput(keyboard);
-defaultController.addInput(gamepad);
-
-const spaceshipController = new ShipControls(starSystemView.scene);
-spaceshipController.getActiveCamera().maxZ = maxZ;
-spaceshipController.addInput(keyboard);
-spaceshipController.addInput(gamepad);
-spaceshipController.addInput(mouse);
-
-const characterController = new CharacterControls(starSystemView.scene);
-characterController.getTransform().setEnabled(false);
-characterController.getActiveCamera().maxZ = maxZ;
-characterController.addInput(keyboard);
-characterController.addInput(gamepad);
+const characterController = starSystemView.getCharacterControls();
 
 // const physicsViewer = new PhysicsViewer();
 // physicsViewer.showBody(spaceshipController.aggregate.body);
-
-mouse.onMouseLeaveObservable.add(() => {
-  if (starSystemView.scene.getActiveController() === spaceshipController) engine.pause();
-});
-
-starSystemView.scene.setActiveController(spaceshipController);
-
-engine.registerStarSystemUpdateCallback(() => {
-  if (starSystemView.scene.getActiveController() != spaceshipController) return;
-
-  const shipPosition = spaceshipController.getTransform().getAbsolutePosition();
-  const nearestBody = starSystemView.getStarSystem().getNearestOrbitalObject();
-  const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
-  const radius = nearestBody.getBoundingRadius();
-  spaceshipController.registerClosestObject(distance, radius);
-
-  const warpDrive = spaceshipController.getWarpDrive();
-  const shipInternalThrottle = warpDrive.getInternalThrottle();
-  const shipTargetThrottle = warpDrive.getTargetThrottle();
-
-  const throttleString = warpDrive.isEnabled()
-    ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}`
-    : `${parsePercentageFrom01(spaceshipController.getThrottle())}/100%`;
-
-  (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
-
-  characterController.setClosestWalkableObject(nearestBody);
-  spaceshipController.setClosestWalkableObject(nearestBody);
-});
-
-engine.getStarMap().onWarpObservable.add(() => {
-  spaceshipController.thirdPersonCamera.radius = 30;
-});
-
-engine.onToggleStarMapObservable.add((isStarMapOpen) => {
-  if (!isStarMapOpen) spaceshipController.thirdPersonCamera.radius = 30;
-});
 
 console.log(`Time is going ${Settings.TIME_MULTIPLIER} time${Settings.TIME_MULTIPLIER > 1 ? "s" : ""} faster than in reality`);
 
@@ -212,7 +146,7 @@ blackHoleModel.orbit.period = 60 * 60 * 24 * 365.25;
 blackHoleModel.orbit.radius = 100 * ares.getRadius();
 const blackHole = starSystem.makeBlackHole(blackHoleModel);*/
 
-engine.init();
+engine.init(true);
 
 positionNearObjectBrightSide(starSystemView.scene.getActiveController(), planet, starSystem, 2);
 
@@ -264,30 +198,8 @@ document.addEventListener("keydown", (e) => {
       starSystemView.getStarSystem().postProcessManager.rebuild();
     }
   }
-
-  if (e.key === "g") {
-    const scene = starSystemView.scene;
-    if (scene.getActiveController() === spaceshipController) {
-      scene.setActiveController(defaultController);
-      setRotationQuaternion(defaultController.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
-      starSystemView.getStarSystem().postProcessManager.rebuild();
-
-      spaceshipController.setEnabled(false, starSystemView.havokPlugin);
-    } else if (scene.getActiveController() === defaultController) {
-      characterController.getTransform().setEnabled(true);
-      characterController.getTransform().setAbsolutePosition(defaultController.getTransform().absolutePosition);
-      scene.setActiveController(characterController);
-      setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(defaultController.getTransform()).clone());
-      starSystemView.getStarSystem().postProcessManager.rebuild();
-
-      spaceshipController.setEnabled(false, starSystemView.havokPlugin);
-    } else if(scene.getActiveController() === characterController) {
-      characterController.getTransform().setEnabled(false);
-      scene.setActiveController(spaceshipController);
-      setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(defaultController.getTransform()).clone());
-      starSystemView.getStarSystem().postProcessManager.rebuild();
-
-      spaceshipController.setEnabled(true, starSystemView.havokPlugin);
-    }
-  }
 });
+
+starSystemView.ui.setEnabled(true);
+starSystemView.showUI();
+starSystemView.getSpaceshipControls().enableWarpDrive();
