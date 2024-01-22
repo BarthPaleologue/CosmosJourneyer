@@ -26,18 +26,22 @@ export class WarpTunnel implements Transformable {
 
         const ps = new ParticleSystem("WarpSpeed", 10_000, scene);
         ps.particleTexture = Assets.FlareTexture;
-        ps.minLifeTime = 4;
-        ps.maxLifeTime = 4;
+        ps.minLifeTime = 2;
+        ps.maxLifeTime = 2;
         ps.blendMode = ParticleSystem.BLENDMODE_ADD;
         ps.forceDepthWrite = true;
-        ps.minEmitPower = 100;
-        ps.maxEmitPower = 100;
-        ps.updateSpeed = 1 / 60; //0.005;
+        ps.minEmitPower = 200;
+        ps.maxEmitPower = 200;
+        ps.updateSpeed = 1 / 60;
         ps.emitRate = 0;
         ps.billboardMode = ParticleSystem.BILLBOARDMODE_STRETCHED;
         ps.minSize = 0.5;
         ps.maxSize = 0.5;
         ps.minScaleY = ps.maxScaleY = 10;
+
+        ps.addColorGradient(0, new Color4(0, 0, 1, 0.0));
+        ps.addColorGradient(0.25, new Color4(0, 1, 1, 1));
+        ps.addColorGradient(1, new Color4(1, 0, 1, 0));
 
         ps.emitter = this.anchor as AbstractMesh;
         ps.start();
@@ -60,71 +64,23 @@ export class WarpTunnel implements Transformable {
             directionToUpdate.copyFrom(direction);
         };
 
-        function computeColor(t: number) {
-            const t0 = -0.7;
-            const t1 = 0.7;
-            if(t < -1) {
-                return new Color4(2, 2, 2, 0);
-            }
-            if(t < t0) {
-                return new Color4(2, 2, 2, 1 - (t0 - t) / (t0 - -1));
-            }
-            if(t < t1) {
-                return new Color4(2, 2, 2, 1);
-            }
-            if(t < 1) {
-                return new Color4(2, 2, 2, 1 - (t - t1) / (1 - t1));
-            }
-            if(t > 1) {
-                return new Color4(2, 2, 2, 0);
-            }
-            throw new Error("Invalid t: " + t);
-        }
+        const lastParentPosition = Vector3.Zero();
 
-        ps.updateFunction = (particles) => {
+        scene.onBeforeParticlesRenderingObservable.add(() => {
             const parent = this.getTransform().parent as Nullable<TransformNode>;
             if (parent === null) throw new Error("WarpTunnel anchor has no parent");
-            const parentForward = getForwardDirection(parent);
-            for (let index = 0; index < particles.length; index++) {
-                const deltaTime = scene.getEngine().getDeltaTime() / 1000;
-                const scaledUpdateSpeed = deltaTime * ps.updateSpeed * 60;
 
-                const particle = particles[index];
-                particle.age += scaledUpdateSpeed;
+            const newParentPosition = parent.getAbsolutePosition().clone();
+            const parentDisplacement = newParentPosition.subtract(lastParentPosition);
 
-                const scaledDirection = particle.direction.scale(scaledUpdateSpeed);
-
-                if (particle.age >= particle.lifeTime) {
-                    // Recycle
-                    particles.splice(index, 1);
-                    //@ts-ignore
-                    ps._stockParticles.push(particle);
-                    index--;
-                    continue;
-                }
-
-                const distanceAlongForward = particle.position.dot(parentForward);
-
-                const distanceAlongForward11 = distanceAlongForward / 300;
-
-                particle.color = computeColor(distanceAlongForward11);
-
-                particle.direction.scaleToRef(scaledUpdateSpeed, scaledDirection);
-                particle.position.addInPlace(scaledDirection);
-
-                particle.position.addInPlace(scaledDirection);
+            if(parentDisplacement.length() > 0) {
+                console.log(parentDisplacement.length());
             }
-        };
-
-        /*let lastEmitterPosition = this.anchor.getAbsolutePosition().clone();
-        scene.onBeforeParticlesRenderingObservable.add(() => {
-            const newEmitterPosition = this.anchor.getAbsolutePosition().clone();
             ps.particles.forEach(particle => {
-                particle.position.addInPlace(newEmitterPosition.subtract(lastEmitterPosition));
-
+                particle.position.addInPlace(parentDisplacement);
             });
-            lastEmitterPosition = newEmitterPosition.clone();
-        });*/
+            lastParentPosition.copyFrom(newParentPosition);
+        });
 
         this.particleSystem = ps;
     }
