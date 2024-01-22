@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -21,15 +38,15 @@ import "../styles/index.scss";
 import { Assets } from "./assets";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { Spaceship } from "./spaceshipExtended/spaceship";
-import { TelluricPlanemoModel } from "./planemos/telluricPlanemo/telluricPlanemoModel";
-import { TelluricPlanemo } from "./planemos/telluricPlanemo/telluricPlanemo";
+import { TelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
+import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
 import { UberScene } from "./uberCore/uberScene";
 import { Settings } from "./settings";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { StarModel } from "./stellarObjects/star/starModel";
 import { Keyboard } from "./inputs/keyboard";
 import { Star } from "./stellarObjects/star/star";
-import { ChunkForge } from "./planemos/telluricPlanemo/terrain/chunks/chunkForge";
+import { ChunkForgeWorkers } from "./planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -63,7 +80,7 @@ hemiLight.intensity = 0.2;
 const shadowGenerator = new ShadowGenerator(1024, light);
 shadowGenerator.useBlurExponentialShadowMap = true;
 
-const chunkForge = new ChunkForge(Settings.VERTEX_RESOLUTION);
+const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
 
 const keyboard = new Keyboard();
 
@@ -97,8 +114,8 @@ const auroraModel = new StarModel(984);
 const aurora = new Star("Aurora", scene, auroraModel);
 aurora.getTransform().setAbsolutePosition(new Vector3(0, aurora.getRadius() * 10.0, aurora.getRadius() * 40.0));
 
-const newtonModel = new TelluricPlanemoModel(152);
-const newton = new TelluricPlanemo("newton", scene, newtonModel);
+const newtonModel = new TelluricPlanetModel(152);
+const newton = new TelluricPlanet("newton", scene, newtonModel);
 newton.getTransform().setAbsolutePosition(new Vector3(0, -newtonModel.radius - 10e3, 0));
 newton.updateLOD(camera.globalPosition, chunkForge);
 
@@ -150,8 +167,8 @@ function updateBeforeHavok() {
     }
 
     // planet thingy
-    newton.updateInternalClock(-deltaTime / 10);
-    aurora.updateInternalClock(-deltaTime / 10);
+    //newton.updateInternalClock(-deltaTime / 10);
+    //aurora.updateInternalClock(-deltaTime / 10);
 
     newton.updateLOD(camera.globalPosition, chunkForge);
     newton.material.update(camera.globalPosition, [aurora]);

@@ -1,13 +1,30 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { AbstractObject } from "../bodies/abstractObject";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import cursorImage from "../../asset/textures/hoveredCircle.png";
-import { parseDistance } from "../utils/parseToStrings";
+import { parseDistance, parseSeconds } from "../utils/parseToStrings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";
+import { OrbitalObject } from "../architecture/orbitalObject";
 
 export class ObjectOverlay {
     readonly textRoot: StackPanel;
@@ -15,14 +32,19 @@ export class ObjectOverlay {
     readonly namePlate: TextBlock;
     readonly typeText: TextBlock;
     readonly distanceText: TextBlock;
-    readonly object: AbstractObject;
+    readonly etaText: TextBlock;
+    readonly object: OrbitalObject;
 
-    constructor(object: AbstractObject) {
+    private lastDistance: number = 0;
+
+    static WIDTH = 300;
+
+    constructor(object: OrbitalObject) {
         this.object = object;
 
         this.textRoot = new StackPanel(object.name + "OverlayTextRoot");
-        this.textRoot.width = "150px";
-        this.textRoot.height = "90px";
+        this.textRoot.width = `${ObjectOverlay.WIDTH}px`;
+        this.textRoot.height = "130px";
         this.textRoot.background = "transparent";
         this.textRoot.zIndex = 6;
         this.textRoot.alpha = 0.95;
@@ -56,6 +78,15 @@ export class ObjectOverlay {
         this.distanceText.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.distanceText);
 
+        this.etaText = new TextBlock(object.name + "OverlayEtaText");
+        this.etaText.color = "white";
+        this.etaText.zIndex = 6;
+        this.etaText.height = "20px";
+        this.etaText.fontSize = 16;
+        this.etaText.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
+        this.etaText.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
+        this.textRoot.addControl(this.etaText);
+
         this.cursor = new Image(object.name + "Cursor", cursorImage);
         this.cursor.fixedRatio = 1;
         this.cursor.width = 1;
@@ -68,10 +99,12 @@ export class ObjectOverlay {
         this.cursor.linkWithMesh(this.object.getTransform());
     }
 
-    update(camera: Camera, target: AbstractObject | null) {
+    update(camera: Camera, target: OrbitalObject | null) {
         const viewRay = camera.getDirection(LOCAL_DIRECTION.BACKWARD);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
+        const deltaDistance = this.lastDistance - distance;
+        const speed = deltaDistance != 0 ? deltaDistance / (camera.getScene().getEngine().getDeltaTime() / 1000) : 0;
         objectRay.scaleInPlace(1 / distance);
 
         if (Vector3.Dot(viewRay, objectRay) < 0) {
@@ -96,9 +129,14 @@ export class ObjectOverlay {
         const alphaText = Math.max(0, distance / (3 * this.object.getBoundingRadius()) - 1.0);
         this.textRoot.alpha = alphaText;
 
-        this.textRoot.linkOffsetXInPixels = 0.5 * Math.max(scale, screenRatio) * window.innerWidth + 75 + 20;
+        this.textRoot.linkOffsetXInPixels = 0.5 * Math.max(scale, screenRatio) * window.innerWidth + ObjectOverlay.WIDTH / 2 + 20;
 
         this.distanceText.text = parseDistance(distance);
+
+        const nbSeconds = distance / speed;
+        this.etaText.text = speed > 0 && nbSeconds < 60 * 60 * 24 ? parseSeconds(nbSeconds) : "∞";
+
+        this.lastDistance = distance;
     }
 
     dispose() {

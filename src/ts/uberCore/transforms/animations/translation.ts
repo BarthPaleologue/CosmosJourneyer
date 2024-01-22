@@ -1,7 +1,25 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { easeInOutInterpolation } from "./interpolations";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { translate } from "../basicTransform";
+import { clamp } from "../../../utils/math";
 
 export class TransformTranslationAnimation {
     private clock = 0;
@@ -23,7 +41,9 @@ export class TransformTranslationAnimation {
 
         this.clock += deltaTime;
 
-        const dDistance = this.totalDistance * easeInOutInterpolation(this.clock / this.duration) - this.distanceAcc;
+        const t = clamp(this.clock / this.duration, 0, 1);
+
+        const dDistance = this.totalDistance * easeInOutInterpolation(t) - this.distanceAcc;
         this.distanceAcc += dDistance;
 
         translate(this.transform, this.direction.scale(dDistance));

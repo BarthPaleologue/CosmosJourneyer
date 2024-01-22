@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
@@ -8,8 +25,9 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { StellarObject } from "../stellarObjects/stellarObject";
 import { CloudsUniforms } from "./clouds/cloudsUniforms";
-import { Transformable } from "../uberCore/transforms/basicTransform";
-import { BoundingSphere } from "../bodies/common";
+
+import { BoundingSphere } from "../architecture/boundingSphere";
+import { Transformable } from "../architecture/transformable";
 
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 

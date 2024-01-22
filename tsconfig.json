@@ -11,6 +11,7 @@
         "name": "typescript-plugin-css-modules"
       }
     ],
+    "resolveJsonModule": true,
     "noImplicitReturns": true,
     //"allowJs": true,                       /* Allow javascript files to be compiled. */
     // "checkJs": true,                       /* Report errors in .js files. */

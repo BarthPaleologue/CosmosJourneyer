@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Quaternion, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 
 /**
@@ -47,4 +64,8 @@ export function flattenVector4Array(vector4Array: Vector4[]): number[] {
         result.push(vector4.x, vector4.y, vector4.z, vector4.w);
     }
     return result;
+}
+
+export function MapVector3(v: Vector3, f: (x: number) => number): Vector3 {
+    return new Vector3(f(v.x), f(v.y), f(v.z));
 }

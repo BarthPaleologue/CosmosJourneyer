@@ -1,0 +1,149 @@
+#mainMenu {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+
+  h1 {
+    font-family: 'Nasalization', sans-serif;
+    font-size: 8em;
+    text-align: center;
+    color: white;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    transition: 0.1s;
+  }
+
+  ul#menuItems {
+    list-style-type: none;
+    padding: 0;
+    row-gap: 10px;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    position: absolute;
+    top: 65vh;
+    left: 5%;
+    transform: translateY(-50%);
+    transition: 0.2s ease-in-out;
+
+    li {
+      color: white;
+      font-family: Nasalization, sans-serif;
+      font-size: 2em;
+      line-height: 1.5em;
+      cursor: pointer;
+      padding: 5px 20px;
+      transition: 0.1s;
+
+      &:hover {
+        background: #002b6a;
+      }
+
+      &.disabled {
+        color: grey;
+        cursor: not-allowed;
+      }
+
+      &.disabled:hover {
+        background: black;
+      }
+    }
+  }
+
+  .rightPanel {
+    position: absolute;
+    max-width: 1400px;
+    width: 72%;
+    right: 2.5vw;
+    height: 65vh;
+    bottom: 2.5vh;
+    transition: 0.2s ease-in-out;
+
+    transform: scale(0);
+    opacity: 0;
+
+    &.visible {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    box-shadow: 0 0 20px black;
+    background: rgba(0, 0, 0, 0.8);
+
+    h2 {
+      color: white;
+      text-align: center;
+      font-family: Nasalization, sans-serif;
+      font-size: 3em;
+      margin-block: 0.6em;
+    }
+
+    h3 {
+      color: white;
+      padding: 0 20px;
+      font-family: Nasalization, sans-serif;
+      font-size: 1.5em;
+    }
+
+    #dropFileZone {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: 0.1s;
+
+      &.dragover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      &.invalid {
+        background: rgba(255, 0, 0, 0.1);
+      }
+
+      p {
+        color: white;
+        font-family: Nasalization, sans-serif;
+        font-size: 1.5em;
+        text-align: center;
+        line-height: 1.5em;
+        padding: 0 20px;
+      }
+    }
+
+    &#credits {
+      p {
+        text-align: center;
+      }
+    }
+
+    p {
+      color: white;
+      font-family: Nasalization, sans-serif;
+      line-height: 1.5em;
+      font-size: 1.25em;
+      padding: 0 20px;
+
+      &.signature {
+        text-align: right;
+        font-style: italic;
+        padding-right: 60px;
+      }
+    }
+
+    a {
+      color: white;
+      transition: 0.1s;
+      text-decoration: underline solid rgba(255, 255, 255, 0.5);
+
+      &:hover {
+        text-decoration: underline solid white;
+      }
+    }
+  }
+}

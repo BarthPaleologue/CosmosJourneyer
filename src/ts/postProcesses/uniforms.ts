@@ -1,9 +1,26 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { UberScene } from "../uberCore/uberScene";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { BoundingSphere } from "../bodies/common";
+import { BoundingSphere } from "../architecture/boundingSphere";
 import { Star } from "../stellarObjects/star/star";
-import { Transformable } from "../uberCore/transforms/basicTransform";
+import { Transformable } from "../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
 
 export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {

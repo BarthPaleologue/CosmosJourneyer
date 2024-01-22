@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";
@@ -17,6 +34,12 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Spaceship } from "./spaceship";
+
+enum ShipState {
+    FLYING,
+    LANDING,
+    LANDED
+}
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -139,5 +162,11 @@ export class ShipControls implements Controls {
 
         this.getActiveCamera().getViewMatrix();
         return this.getTransform().getAbsolutePosition();
+    }
+
+    dispose() {
+        this.spaceship.dispose();
+        this.thirdPersonCamera.dispose();
+        this.firstPersonCamera.dispose();
     }
 }

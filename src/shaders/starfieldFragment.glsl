@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 precision highp float;
 
 /* disable_uniformity_analysis */
@@ -32,6 +49,10 @@ void main() {
 
     vec2 starfieldUV = vec2(0.0);
 
+    // Here, a color test is used and not a depth test
+    // You may wonder why. The answer is that using a depth test wouldn't account for the 2D UI and the starfield would be drawn on top of it.
+    // In fact the UI has no depth information, so we need to use something else. I chose this color test as it works in practice but it could break.
+    // If you have a better idea, please let me know or make a pull request.
     if (screenColor == vec4(0.0)) {
         // get the starfield color
         // get spherical coordinates uv for the starfield texture

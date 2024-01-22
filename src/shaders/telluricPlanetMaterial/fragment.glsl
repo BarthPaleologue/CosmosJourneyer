@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 precision highp float;
 
 varying vec3 vPositionW;
@@ -130,7 +147,7 @@ void main() {
     vec2 uv = toUV(vUnitSamplePoint);
     // trick from https://www.shadertoy.com/view/3dVSzm to avoid Greenwich artifacts
     vec2 df = fwidth(uv);
-    if(df.x > 0.5) df.x = 0.0;
+    if (df.x > 0.5) df.x = 0.0;
     vec4 lutResult = textureLod(lut, uv, log2(max(df.x, df.y) * 1024.0));
 
     // moisture
@@ -169,15 +186,11 @@ void main() {
     );
     beachFactor = smoothSharpener(beachFactor, 2.0);
 
-    float steepFactor = slope;//smoothSharpener(slope, steepSharpness);
-    steepFactor = smoothstep(0.3, 0.7, steepFactor);
-    steepFactor = smoothSharpener(steepFactor, steepSharpness);
-
-    plainFactor = 1.0 - steepFactor;
+    plainFactor = 1.0;//- steepFactor;
 
     // apply beach factor
     plainFactor *= 1.0 - beachFactor;
-    beachFactor *= 1.0 - steepFactor;
+    //beachFactor *= 1.0 - steepFactor;
 
     // blend with desert factor when above water
     desertFactor = smoothstep(0.5, 0.3, moisture01);
@@ -191,6 +204,14 @@ void main() {
     plainFactor *= 1.0 - snowFactor;
     beachFactor *= 1.0 - snowFactor;
     desertFactor *= 1.0 - snowFactor;
+
+    float steepFactor = slope;
+    steepFactor = smoothstep(0.05, 0.3, steepFactor);
+    steepFactor = smoothSharpener(steepFactor, steepSharpness);
+    snowFactor *= 1.0 - steepFactor;
+    plainFactor *= 1.0 - steepFactor;
+    beachFactor *= 1.0 - steepFactor;
+    desertFactor *= 1.0 - steepFactor;
 
     // blend with bottom factor when under water
     bottomFactor = smoothstep(waterLevel01, waterLevel01 - 1e-2, elevation01);

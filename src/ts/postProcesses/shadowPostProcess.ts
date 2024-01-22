@@ -1,16 +1,32 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import shadowFragment from "../../shaders/shadowFragment.glsl";
-import { AbstractBody } from "../bodies/abstractBody";
 import { UberScene } from "../uberCore/uberScene";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { ObjectPostProcess } from "./objectPostProcess";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { PostProcessType } from "./postProcessTypes";
 import { RingsUniforms } from "./rings/ringsUniform";
-import { RingsPostProcess } from "./rings/ringsPostProcess";
 import { Assets } from "../assets";
+import { CelestialBody } from "../architecture/celestialBody";
+import { StellarObject } from "../architecture/stellarObject";
 
 export type ShadowUniforms = {
     hasRings: boolean;
@@ -19,17 +35,17 @@ export type ShadowUniforms = {
 };
 
 export class ShadowPostProcess extends UberPostProcess implements ObjectPostProcess {
-    readonly object: AbstractBody;
+    readonly object: CelestialBody;
     readonly shadowUniforms: ShadowUniforms;
 
-    public static async CreateAsync(body: AbstractBody, scene: UberScene, stellarObjects: StellarObject[]): Promise<ShadowPostProcess> {
+    public static async CreateAsync(body: CelestialBody, scene: UberScene, stellarObjects: StellarObject[]): Promise<ShadowPostProcess> {
         const shaderName = "shadow";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
         }
 
         const shadowUniforms: ShadowUniforms = {
-            hasRings: body.model.ringsUniforms !== null,
+            hasRings: body.getRingsUniforms() !== null,
             hasClouds: body.postProcesses.includes(PostProcessType.CLOUDS),
             hasOcean: body.postProcesses.includes(PostProcessType.OCEAN)
         };
@@ -65,8 +81,9 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
             }
         ];
 
-        const ringsUniforms = body.model.ringsUniforms as RingsUniforms;
         if (shadowUniforms.hasRings) {
+            const ringsUniforms = body.getRingsUniforms();
+            if (ringsUniforms === null) throw new Error("shadowUniforms.hasRings is true and yet body.getRingsUniforms() returned null!");
             uniforms.push(...ringsUniforms.getShaderUniforms());
 
             return ringsUniforms.getShaderSamplers(scene).then((ringSamplers) => {
@@ -91,7 +108,7 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
 
     private constructor(
         name: string,
-        body: AbstractBody,
+        body: CelestialBody,
         scene: UberScene,
         shaderName: string,
         uniforms: ShaderUniforms,

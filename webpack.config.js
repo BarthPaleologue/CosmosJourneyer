@@ -9,7 +9,8 @@ const htmlPath = path.join(__dirname, "/src/html/");
 
 const config = {
     entry: {
-        showcase: "./src/ts/index.ts",
+        main: "./src/ts/index.ts",
+        alphaTestis: "./src/ts/alphaTestis.ts",
         random: "./src/ts/randomizer.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
         physicSpaceship: "./src/ts/physicSpaceship.ts",
@@ -37,7 +38,13 @@ const config = {
             title: "Planet Engine",
             filename: "index.html",
             template: path.join(htmlPath, "index.html"),
-            chunks: ["showcase"]
+            chunks: ["main"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "Alpha Testis",
+            filename: "alphaTestis.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["alphaTestis"]
         }),
         new HtmlWebpackPlugin({
             title: "Randomizer",
@@ -107,7 +114,7 @@ const config = {
                 use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"]
             },
             {
-                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|glb|obj|mp3)$/i,
+                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|glb|obj|mp3|babylon)$/i,
                 type: "asset"
             },
 

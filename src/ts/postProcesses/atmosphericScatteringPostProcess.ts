@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
 
 import { Effect } from "@babylonjs/core/Materials/effect";
@@ -6,13 +23,11 @@ import { Assets } from "../assets";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { centeredRand } from "extended-random";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
-import { GasPlanet } from "../planemos/gasPlanet/gasPlanet";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { StellarObject } from "../stellarObjects/stellarObject";
-import { BaseObject } from "../bodies/common";
-import { Transformable } from "../uberCore/transforms/basicTransform";
+import { Transformable } from "../architecture/transformable";
 
 export interface AtmosphereUniforms {
     atmosphereRadius: number;
@@ -29,9 +44,9 @@ export interface AtmosphereUniforms {
 
 export class AtmosphericScatteringPostProcess extends UberPostProcess implements ObjectPostProcess {
     readonly atmosphereUniforms: AtmosphereUniforms;
-    readonly object: TelluricPlanemo | GasPlanet;
+    readonly object: TelluricPlanet | GasPlanet;
 
-    constructor(name: string, planet: GasPlanet | TelluricPlanemo, atmosphereHeight: number, scene: UberScene, stellarObjects: Transformable[]) {
+    constructor(name: string, planet: GasPlanet | TelluricPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: Transformable[]) {
         const shaderName = "atmosphericScattering";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;

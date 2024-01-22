@@ -1,14 +1,38 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { isSizeOnScreenEnough } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { AbstractObject } from "../bodies/abstractObject";
 import { SpaceStationModel } from "./spacestationModel";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Assets } from "../assets";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { OrbitalObject } from "../architecture/orbitalObject";
+import { Cullable } from "../bodies/cullable";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { OrbitProperties } from "../orbit/orbitProperties";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 
-export class SpaceStation extends AbstractObject {
+export class SpaceStation implements OrbitalObject, Cullable {
+    readonly name: string;
+
     readonly model: SpaceStationModel;
 
     readonly postProcesses: PostProcessType[] = [];
@@ -17,12 +41,18 @@ export class SpaceStation extends AbstractObject {
 
     readonly ringInstances: InstancedMesh[] = [];
 
-    constructor(scene: Scene, parentBody?: AbstractObject) {
-        super("spaceStation", scene, parentBody);
+    readonly parent: OrbitalObject | null = null;
+
+    constructor(scene: Scene, parentBody: OrbitalObject | null = null) {
+        //TODO: do not hardcode name
+        this.name = "Spacestation";
+
         //TODO: do not hardcode seed
         const seed = 1;
 
         this.model = new SpaceStationModel(seed, parentBody?.model);
+
+        this.parent = parentBody;
 
         this.instance = Assets.CreateSpaceStationInstance();
         this.instance.parent = this.getTransform();
@@ -37,7 +67,23 @@ export class SpaceStation extends AbstractObject {
         this.getTransform().rotate(Axis.Y, this.model.physicalProperties.axialTilt);
     }
 
-    public override getBoundingRadius(): number {
+    getTransform(): TransformNode {
+        return this.instance;
+    }
+
+    getRotationAxis(): Vector3 {
+        return this.getTransform().up;
+    }
+
+    getOrbitProperties(): OrbitProperties {
+        return this.model.orbit;
+    }
+
+    getPhysicalProperties(): OrbitalObjectPhysicalProperties {
+        return this.model.physicalProperties;
+    }
+
+    public getBoundingRadius(): number {
         return 1e3;
     }
 
@@ -45,14 +91,14 @@ export class SpaceStation extends AbstractObject {
         return "Space Station";
     }
 
-    public override computeCulling(camera: Camera): void {
+    public computeCulling(camera: Camera): void {
         const isVisible = isSizeOnScreenEnough(this, camera);
         for (const mesh of this.instance.getChildMeshes()) {
             mesh.isVisible = isVisible;
         }
     }
 
-    public override updateRotation(deltaTime: number): number {
+    public updateRotation(deltaTime: number): number {
         const dtheta = deltaTime / this.model.physicalProperties.rotationPeriod;
 
         if (this.ringInstances.length === 0) this.instance.rotate(Axis.Z, dtheta);
@@ -64,7 +110,7 @@ export class SpaceStation extends AbstractObject {
         return dtheta;
     }
 
-    public override dispose(): void {
+    public dispose(): void {
         this.instance.dispose();
     }
 }
