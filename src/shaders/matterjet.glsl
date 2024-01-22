@@ -24,9 +24,11 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform float time;
 
-#include "./utils/camera.glsl"
+#include "./utils/camera.glsl";
 
 #include "./utils/object.glsl";
+
+#include "./utils/rotateAround.glsl";
 
 #include "./utils/remap.glsl";
 
@@ -97,12 +99,12 @@ float spiralDensity(vec3 pointOnCone, vec3 coneAxis, float coneMaxHeight) {
     float density = 1.0;
 
     // smoothstep fadeout when the height is too much (outside of cone) or too low (too close to the star)
-    density *= smoothstep(0.0, 1.0, 1.0 - heightFraction) * smoothstep(0.0, 0.05, heightFraction);
+    density *= smoothstep(1.0, 0.0, heightFraction) * smoothstep(0.0, 0.05, heightFraction);
 
-    float d = spiralSDF(theta + time, 0.2 + heightFraction) / (0.3 + heightFraction * 2.0);
+    float d = spiralSDF(theta + time, 0.2 + heightFraction / 2.0) / (0.3 + heightFraction * 2.0);
     //d = pow(d, 4.0);
 
-    density *= smoothstep(0.85, 1.0, 1.0 - d);
+    density *= smoothstep(0.6, 1.0, pow(1.0 - d, 8.0)) * 2.0; //smoothstep(0.85, 1.0, 1.0 - d) * 2.0;
 
     //density *= d * 500.0;
 
@@ -124,11 +126,11 @@ void main() {
     vec4 finalColor = screenColor;
 
     const float jetHeight = 10000000e3;
-    const vec3 jetColor = vec3(0.2, 0.2, 1.0);
+    const vec3 jetColor = vec3(0.5, 0.5, 1.0);
 
 
     float t1, t2;
-    if (rayIntersectCone(camera_position, rayDir, object_position, object_rotationAxis, 0.9, t1, t2)) {
+    if (rayIntersectCone(camera_position, rayDir, object_position, object_rotationAxis, 0.95, t1, t2)) {
         if (t2 > 0.0 && t2 < maximumDistance) {
             vec3 jetPointPosition2 = camera_position + t2 * rayDir - object_position;
 
