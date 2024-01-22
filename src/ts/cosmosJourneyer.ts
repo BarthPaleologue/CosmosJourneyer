@@ -189,8 +189,8 @@ export class CosmosJourneyer {
     /**
      * Inits the current star system
      */
-    public init(): void {
-        this.getMainMenu().init();
+    public init(skipMainMenu = false): void {
+        if(!skipMainMenu) this.getMainMenu().init();
         this.getStarSystemView().initStarSystem();
 
         this.getEngine().runRenderLoop(() => {
