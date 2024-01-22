@@ -39,6 +39,15 @@ import "@babylonjs/core/Loading/loadingScreen";
 import { setMaxLinVel } from "../utils/havok";
 import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
+import { Mouse } from "../inputs/mouse";
+import { Keyboard } from "../inputs/keyboard";
+import { Gamepad } from "../inputs/gamepad";
+import { DefaultControls } from "../defaultController/defaultControls";
+import { CharacterControls } from "../spacelegs/characterControls";
+import { parsePercentageFrom01, parseSpeed } from "../utils/parseToStrings";
+import { Assets } from "../assets";
+import { getRotationQuaternion, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
@@ -46,6 +55,10 @@ export class StarSystemView {
     readonly scene: UberScene;
 
     readonly havokPlugin: HavokPlugin;
+
+    private defaultControls: DefaultControls | null = null;
+    private spaceshipControls: ShipControls | null = null;
+    private characterControls: CharacterControls | null = null;
 
     private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer();
     private readonly axisRenderer: AxisRenderer = new AxisRenderer();
@@ -57,6 +70,8 @@ export class StarSystemView {
     private starSystem: StarSystemController | null = null;
 
     private readonly chunkForge: ChunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
+
+    readonly onInitStarSystem = new Observable<void>();
 
     constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
         this.helmetOverlay = new HelmetOverlay();
@@ -105,23 +120,8 @@ export class StarSystemView {
         ambientLight.intensity = 0.3;
 
         this.scene.onBeforePhysicsObservable.add(() => {
-            const starSystem = this.getStarSystem();
-
             const deltaTime = engine.getDeltaTime() / 1000;
-
-            this.chunkForge.update();
-            starSystem.update(deltaTime * Settings.TIME_MULTIPLIER, this.chunkForge);
-
-            this.ui.update(this.scene.getActiveCamera());
-
-            const nearestOrbitalObject = starSystem.getNearestOrbitalObject();
-            const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition);
-
-            this.bodyEditor.update(nearestCelestialBody, starSystem.postProcessManager, this.scene);
-
-            this.helmetOverlay.update(nearestOrbitalObject);
-
-            this.orbitRenderer.update();
+            this.update(deltaTime);
         });
 
         window.addEventListener("resize", () => {
@@ -133,6 +133,159 @@ export class StarSystemView {
         this.helmetOverlay.setVisibility(false);
 
         this.ui = new SystemUI(this.scene);
+    }
+
+
+    initStarSystem() {
+        this.scene.getEngine().loadingScreen.displayLoadingUI();
+        this.scene.getEngine().loadingScreen.loadingUIText = `Warping to ${this.getStarSystem().model.getName()}`;
+
+        this.getStarSystem().initPositions(100, this.chunkForge);
+        this.ui.createObjectOverlays(this.getStarSystem().getOrbitalObjects());
+
+        const firstBody = this.getStarSystem().getBodies()[0];
+        if (firstBody === undefined) throw new Error("No bodies in star system");
+
+        this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getBodies());
+        this.axisRenderer.setObjects(this.getStarSystem().getBodies());
+
+        const activeController = this.scene.getActiveController();
+        positionNearObjectBrightSide(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
+
+        this.getStarSystem()
+          .initPostProcesses()
+          .then(() => {
+              this.scene.getEngine().loadingScreen.hideLoadingUI();
+              this.onInitStarSystem.notifyObservers();
+          });
+    }
+
+    async initAssets() {
+        await Assets.Init(this.scene);
+
+        const canvas = this.scene.getEngine().getRenderingCanvas();
+        if (canvas === null) throw new Error("Canvas is null");
+
+        const mouse = new Mouse(canvas, 100);
+        const keyboard = new Keyboard();
+        const gamepad = new Gamepad();
+
+        const maxZ = Settings.EARTH_RADIUS * 1e5;
+
+        this.defaultControls = new DefaultControls(this.scene);
+        this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
+        this.defaultControls.getActiveCamera().maxZ = maxZ;
+        this.defaultControls.addInput(keyboard);
+        this.defaultControls.addInput(gamepad);
+
+        this.spaceshipControls = new ShipControls(this.scene);
+        this.spaceshipControls.getActiveCamera().maxZ = maxZ;
+        this.spaceshipControls.addInput(keyboard);
+        this.spaceshipControls.addInput(gamepad);
+        this.spaceshipControls.addInput(mouse);
+
+        this.characterControls = new CharacterControls(this.scene);
+        this.characterControls.getTransform().setEnabled(false);
+        this.characterControls.getActiveCamera().maxZ = maxZ;
+        this.characterControls.addInput(keyboard);
+        this.characterControls.addInput(gamepad);
+
+        this.scene.setActiveController(this.spaceshipControls);
+    }
+
+    update(deltaTime: number) {
+        const starSystem = this.getStarSystem();
+
+        this.chunkForge.update();
+        starSystem.update(deltaTime * Settings.TIME_MULTIPLIER, this.chunkForge);
+
+        if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
+        if (this.characterControls === null) throw new Error("Character controls is null");
+
+        const shipPosition = this.spaceshipControls.getTransform().getAbsolutePosition();
+        const nearestBody = starSystem.getNearestOrbitalObject();
+        const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
+        const radius = nearestBody.getBoundingRadius();
+        this.spaceshipControls.registerClosestObject(distance, radius);
+
+        const warpDrive = this.spaceshipControls.getWarpDrive();
+        const shipInternalThrottle = warpDrive.getInternalThrottle();
+        const shipTargetThrottle = warpDrive.getTargetThrottle();
+
+        const throttleString = warpDrive.isEnabled()
+            ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}`
+            : `${parsePercentageFrom01(this.spaceshipControls.getThrottle())}/100%`;
+
+        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(this.spaceshipControls.getSpeed())}`;
+
+        this.characterControls.setClosestWalkableObject(nearestBody);
+        this.spaceshipControls.setClosestWalkableObject(nearestBody);
+
+        this.ui.update(this.scene.getActiveCamera());
+
+        const nearestOrbitalObject = starSystem.getNearestOrbitalObject();
+        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition);
+
+        this.bodyEditor.update(nearestCelestialBody, starSystem.postProcessManager, this.scene);
+
+        this.helmetOverlay.update(nearestOrbitalObject);
+
+        this.orbitRenderer.update();
+    }
+
+    getSpaceshipControls() {
+        if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
+        return this.spaceshipControls;
+    }
+
+    getCharacterControls() {
+        if (this.characterControls === null) throw new Error("Character controls is null");
+        return this.characterControls;
+    }
+
+    getDefaultControls() {
+        if (this.defaultControls === null) throw new Error("Default controls is null");
+        return this.defaultControls;
+    }
+
+    switchToSpaceshipControls() {
+        const shipControls = this.getSpaceshipControls();
+        const characterControls = this.getCharacterControls();
+        const defaultControls = this.getDefaultControls();
+
+        characterControls.getTransform().setEnabled(false);
+        this.scene.setActiveController(shipControls);
+        setRotationQuaternion(shipControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
+        this.getStarSystem().postProcessManager.rebuild();
+
+        shipControls.setEnabled(true, this.havokPlugin);
+    }
+
+    switchToCharacterControls() {
+        const shipControls = this.getSpaceshipControls();
+        const characterControls = this.getCharacterControls();
+        const defaultControls = this.getDefaultControls();
+
+        characterControls.getTransform().setEnabled(true);
+        characterControls.getTransform().setAbsolutePosition(defaultControls.getTransform().absolutePosition);
+        this.scene.setActiveController(characterControls);
+        setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
+        this.getStarSystem().postProcessManager.rebuild();
+
+        shipControls.setEnabled(false, this.havokPlugin);
+    }
+
+    switchToDefaultControls() {
+        const shipControls = this.getSpaceshipControls();
+        const characterControls = this.getCharacterControls();
+        const defaultControls = this.getDefaultControls();
+
+        characterControls.getTransform().setEnabled(false);
+        shipControls.setEnabled(false, this.havokPlugin);
+
+        this.scene.setActiveController(defaultControls);
+        setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
+        this.getStarSystem().postProcessManager.rebuild();
     }
 
     /**
@@ -157,30 +310,6 @@ export class StarSystemView {
         if (needsGenerating) StarSystemHelper.generate(this.starSystem);
     }
 
-    init() {
-        this.scene.getEngine().loadingScreen.displayLoadingUI();
-        this.scene.getEngine().loadingScreen.loadingUIText = `Warping to ${this.getStarSystem().model.getName()}`;
-
-        this.getStarSystem().initPositions(100, this.chunkForge);
-        this.ui.createObjectOverlays(this.getStarSystem().getOrbitalObjects());
-
-        const firstBody = this.getStarSystem().getBodies()[0];
-        if (firstBody === undefined) throw new Error("No bodies in star system");
-
-        this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getBodies());
-        this.axisRenderer.setObjects(this.getStarSystem().getBodies());
-
-        const activeController = this.scene.getActiveController();
-        positionNearObjectBrightSide(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
-        if (activeController instanceof ShipControls) activeController.enableWarpDrive();
-
-        this.getStarSystem()
-            .initPostProcesses()
-            .then(() => {
-                this.scene.getEngine().loadingScreen.hideLoadingUI();
-            });
-    }
-
     hideUI() {
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
         this.helmetOverlay.setVisibility(false);
@@ -192,11 +321,19 @@ export class StarSystemView {
     }
 
     unZoom(callback: () => void) {
-        this.scene.getActiveController().getActiveCamera().animations = [StarSystemView.unZoomAnimation];
+        const activeControls = this.scene.getActiveController();
+        if(activeControls != this.getSpaceshipControls()) {
+            callback();
+            return;
+        }
+        activeControls.getActiveCamera().animations = [StarSystemView.unZoomAnimation];
         this.scene.beginAnimation(this.scene.getActiveController().getActiveCamera(), 0, 60, false, 2.0, () => {
             this.scene.getActiveController().getActiveCamera().animations = [];
             this.hideUI();
             callback();
+            this.scene.onAfterRenderObservable.addOnce(() => {
+                (activeControls as ShipControls).thirdPersonCamera.radius = 30;
+            });
         });
     }
 }

@@ -1,13 +1,10 @@
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { UberScene } from "../uberCore/uberScene";
 import { DefaultControls } from "../defaultController/defaultControls";
 import { StarSystemView } from "../starSystem/StarSystemView";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { positionNearObjectWithStarVisible } from "../utils/positionNearObject";
 import { BODY_TYPE } from "../model/common";
-import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { EditorVisibility } from "../ui/bodyEditor/bodyEditor";
-import { Settings } from "../settings";
 import mainMenuHTML from "../../html/mainMenu.html";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -18,8 +15,8 @@ import { SystemSeed } from "../utils/systemSeed";
 import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 
 export class MainMenu {
-    readonly controls: DefaultControls;
     readonly scene: UberScene;
+    readonly controls: DefaultControls;
 
     readonly starSystemView: StarSystemView;
     readonly starSystemController: StarSystemController;
@@ -39,15 +36,11 @@ export class MainMenu {
     private creditsPanel: HTMLElement | null = null;
     private aboutPanel: HTMLElement | null = null;
 
-    constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
-        this.starSystemView = new StarSystemView(engine, havokInstance);
+    constructor(starSystemView: StarSystemView) {
+        this.starSystemView = starSystemView;
 
         this.scene = this.starSystemView.scene;
-        this.controls = new DefaultControls(this.scene);
-        this.controls.getActiveCamera().maxZ = Settings.EARTH_RADIUS * 1e5;
-        this.scene.setActiveController(this.controls);
-
-        this.controls.getActiveCamera().detachControl();
+        this.controls = this.starSystemView.getDefaultControls();
 
         const allowedSeeds = [
             new SystemSeed(-2580282252593743, -688526648963167, 464658922001219, 0),
@@ -65,16 +58,16 @@ export class MainMenu {
             new SystemSeed(-885543021563071, -1739658304181095, -8196004220949627, 0),
             new SystemSeed(-3831994119404563, 290653719847023, -1503550685041827, 0),
             new SystemSeed(4935006642582931, 385848138478679, 8147709060574067, 0),
-            new SystemSeed(-8122625535230955, -296218998945099, 2938478904818683, 0),
+            new SystemSeed(-8122625535230955, -296218998945099, 2938478904818683, 0)
         ];
 
         /*const randomSeed = new SystemSeed(
-    new Vector3(
-        Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
-        Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
-        Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER)
-    ),
-    0
+new Vector3(
+    Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
+    Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER),
+    Math.trunc((Math.random() * 2 - 1) * Number.MAX_SAFE_INTEGER)
+),
+0
 );
 
 console.log(randomSeed.starSectorCoordinates.x, randomSeed.starSectorCoordinates.y, randomSeed.starSectorCoordinates.z, randomSeed.index);*/
@@ -87,17 +80,18 @@ console.log(randomSeed.starSectorCoordinates.x, randomSeed.starSectorCoordinates
     init() {
         this.starSystemView.setStarSystem(this.starSystemController, true);
 
-        this.starSystemView.init();
+        this.starSystemView.onInitStarSystem.addOnce(() => {
+            this.starSystemView.switchToDefaultControls();
+            const nbRadius = this.starSystemController.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 2;
+            positionNearObjectWithStarVisible(
+                this.controls,
+                this.starSystemController.planets.length > 0 ? this.starSystemController.getBodies()[1] : this.starSystemController.stellarObjects[0],
+                this.starSystemController,
+                nbRadius
+            );
+        });
 
         this.starSystemView.ui.setEnabled(false);
-
-        const nbRadius = this.starSystemController.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 2;
-        positionNearObjectWithStarVisible(
-            this.controls,
-            this.starSystemController.planets.length > 0 ? this.starSystemController.getBodies()[1] : this.starSystemController.stellarObjects[0],
-            this.starSystemController,
-            nbRadius
-        );
 
         this.starSystemView.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
 
@@ -316,5 +310,9 @@ console.log(randomSeed.starSectorCoordinates.x, randomSeed.starSectorCoordinates
         const menuItems = document.getElementById("menuItems");
         if (menuItems === null) throw new Error("#menuItems does not exist!");
         menuItems.style.left = "-20%";
+    }
+
+    public isVisible() {
+        return this.htmlRoot !== null && this.htmlRoot.style.display !== "none";
     }
 }

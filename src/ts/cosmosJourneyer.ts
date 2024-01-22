@@ -40,6 +40,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
+import { ShipControls } from "./spaceship/shipControls";
 
 enum EngineState {
     RUNNING,
@@ -88,9 +89,13 @@ export class CosmosJourneyer {
             if (!this.isPaused() && this.activeScene !== this.mainMenu?.scene) this.pause();
         });
 
+        window.addEventListener("mouseleave", () => {
+            if(!this.mainMenu?.isVisible()) this.pause();
+        });
+
         //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
-            if (this.activeScene === this.mainMenu?.scene) return;
+            if (this.mainMenu?.isVisible()) return;
             if (e.key === "p") this.takeScreenshot();
             if (e.key === "v") this.takeVideoCapture();
             if (e.key === "m") this.toggleStarMap();
@@ -132,34 +137,36 @@ export class CosmosJourneyer {
         const havokInstance = await HavokPhysics();
         console.log(`Havok initialized`);
 
-        this.mainMenu = new MainMenu(this.engine, havokInstance);
-        this.mainMenu.onStartObservable.add(() => {
-            const seed = new SystemSeed(0, 0, 0, 0);
-            this.getStarMap().setCurrentStarSystem(seed);
-            const starSystem = new StarSystemController(seed, this.getStarSystemView().scene);
-            this.getStarSystemView().setStarSystem(starSystem, true);
-            this.getStarSystemView().init();
-            positionNearObjectBrightSide(this.getStarSystemView().scene.getActiveController(), starSystem.getOrbitalObjects()[2], starSystem, 10);
+        // Init starmap view
+        this.starMap = new StarMap(this.engine);
+        this.starMap.onWarpObservable.add((seed: SystemSeed) => {
+            this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
+            this.getStarSystemView().initStarSystem();
             this.toggleStarMap();
+
+            const activeControls = this.getStarSystemView().scene.getActiveController();
+            if (activeControls instanceof ShipControls) {
+                activeControls.enableWarpDrive();
+                activeControls.thirdPersonCamera.radius = 30;
+            }
+        });
+
+        // Init star system view
+        this.starSystemView = new StarSystemView(this.engine, havokInstance);
+        await this.starSystemView.initAssets();
+
+        this.mainMenu = new MainMenu(this.starSystemView);
+        this.mainMenu.onStartObservable.add(() => {
+            this.getStarMap().setCurrentStarSystem(this.getStarSystemView().getStarSystem().model.seed);
+            this.getStarSystemView().switchToSpaceshipControls();
+            this.getStarSystemView().getSpaceshipControls().enableWarpDrive();
+            this.getStarSystemView().showUI();
+            this.getStarSystemView().ui.setEnabled(true);
         });
 
         this.mainMenu.onLoadSaveObservable.add((saveData: SaveFileData) => {
             this.loadSaveData(saveData);
         });
-
-        // Init starmap view
-        this.starMap = new StarMap(this.engine);
-        this.starMap.onWarpObservable.add((seed: SystemSeed) => {
-            this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
-            this.getStarSystemView().init();
-            this.toggleStarMap();
-        });
-
-        // Init star system view
-        this.starSystemView = new StarSystemView(this.engine, havokInstance);
-
-        // Init assets used in star system view
-        await Assets.Init(this.getStarSystemView().scene);
 
         // Starmap is the active scene by default
         this.activeScene = this.mainMenu.scene;
@@ -184,7 +191,7 @@ export class CosmosJourneyer {
      */
     public init(): void {
         this.getMainMenu().init();
-        this.getStarSystemView().init();
+        this.getStarSystemView().initStarSystem();
 
         this.getEngine().runRenderLoop(() => {
             if (this.isPaused()) return;
@@ -352,26 +359,32 @@ export class CosmosJourneyer {
 
         this.getStarMap().setCurrentStarSystem(seed);
         this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
-        this.getStarSystemView().init();
 
-        const playerTransform = this.getStarSystemView().scene.getActiveController().getTransform();
+        this.getStarSystemView().onInitStarSystem.addOnce(() => {
+            this.getStarSystemView().switchToSpaceshipControls();
 
-        const nearestOrbitalObject = this.getStarSystemView().getStarSystem().getOrbitalObjects()[saveData.nearestOrbitalObjectIndex];
-        const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
-        const currentLocalPosition = new Vector3(saveData.positionX, saveData.positionY, saveData.positionZ);
-        const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
-        playerTransform.setAbsolutePosition(currentWorldPosition);
+            this.getStarSystemView().ui.setEnabled(true);
+            this.getStarSystemView().showUI();
 
-        const nearestOrbitalObjectWorldRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion;
-        const currentLocalRotationQuaternion = new Quaternion(
-            saveData.rotationQuaternionX,
-            saveData.rotationQuaternionY,
-            saveData.rotationQuaternionZ,
-            saveData.rotationQuaternionW
-        );
-        const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(nearestOrbitalObjectWorldRotation);
-        setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
+            const playerTransform = this.getStarSystemView().scene.getActiveController().getTransform();
 
-        this.toggleStarMap();
+            const nearestOrbitalObject = this.getStarSystemView().getStarSystem().getOrbitalObjects()[saveData.nearestOrbitalObjectIndex];
+            const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
+            const currentLocalPosition = new Vector3(saveData.positionX, saveData.positionY, saveData.positionZ);
+            const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
+            playerTransform.setAbsolutePosition(currentWorldPosition);
+
+            const nearestOrbitalObjectWorldRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion;
+            const currentLocalRotationQuaternion = new Quaternion(
+                saveData.rotationQuaternionX,
+                saveData.rotationQuaternionY,
+                saveData.rotationQuaternionZ,
+                saveData.rotationQuaternionW
+            );
+            const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(nearestOrbitalObjectWorldRotation);
+            setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
+        });
+
+        this.getStarSystemView().initStarSystem();
     }
 }

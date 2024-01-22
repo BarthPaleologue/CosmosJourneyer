@@ -89,7 +89,7 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
 
     const starDirection = nearestStar.getTransform().getAbsolutePosition().subtract(object.getTransform().getAbsolutePosition()).normalize();
 
-    const halfway = object.getTransform().getAbsolutePosition().add(starDirection.scale(object.getBoundingRadius() * 4)); //Vector3.Lerp(object.getTransform().getAbsolutePosition(), nearestStar.getTransform().getAbsolutePosition(), 0.0005);
+    const halfway = object.getTransform().getAbsolutePosition().add(starDirection.scale(object.getBoundingRadius() * 4));
     transformable.getTransform().lookAt(halfway);
 
     transformable.getTransform().computeWorldMatrix(true);
@@ -98,55 +98,4 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
 
     transformable.getActiveCamera().getViewMatrix(true);
     transformable.getActiveCamera().getProjectionMatrix(true);
-
-    /*const objectScreenCoordinates = Vector3.Project(
-        Vector3.Zero(),
-        object.getTransform().computeWorldMatrix(true),
-        transformable.getActiveCamera().getTransformationMatrix(),
-        transformable.getActiveCamera().viewport
-    );
-
-    const starScreenCoordinates = Vector3.Project(
-        Vector3.Zero(),
-        nearestStar.getTransform().computeWorldMatrix(true),
-        transformable.getActiveCamera().getTransformationMatrix(),
-        transformable.getActiveCamera().viewport
-    );
-
-    // make both object and star visible on screen
-    const midUV = Vector3.Lerp(objectScreenCoordinates, starScreenCoordinates, -200.0); // ??????????
-    console.log(midUV);
-    const midPoint = MapVector3(midUV, (x) => x * 2 - 1); //Vector3.Lerp(objectScreenCoordinates, starScreenCoordinates, 0.5);
-    midPoint.z = midPoint.z * 0.5 + 0.5;
-    midPoint.y *= -1;
-    //midPoint.x *= -1;
-    console.log(midPoint);
-
-    const midPointUnProjected = Vector3.TransformCoordinates(midPoint, transformable.getActiveCamera().getProjectionMatrix().clone().invert());
-    const midPointWorld = Vector3.TransformCoordinates(midPointUnProjected, transformable.getActiveCamera().getViewMatrix().clone().invert());
-
-    transformable.getTransform().lookAt(midPointWorld);
-
-    transformable.getTransform().computeWorldMatrix(true);
-    transformable.getActiveCamera().getViewMatrix(true);
-    transformable.getActiveCamera().getProjectionMatrix(true);
-
-    const newScreenSpacePosition = Vector3.Project(
-        midPointWorld,
-        Matrix.IdentityReadOnly,
-        transformable.getActiveCamera().getTransformationMatrix(),
-        transformable.getActiveCamera().viewport
-    );
-
-    console.log(newScreenSpacePosition);
-
-    console.log(getForwardDirection(transformable.getTransform()).dot(midPointWorld.subtract(transformable.getTransform().getAbsolutePosition()).normalize()));
-    if (midUV.z < 0.0) {
-        console.log("Object is behind camera");
-        transformable.getTransform().lookAt(midPointWorld.negate());
-
-        transformable.getTransform().computeWorldMatrix(true);
-        transformable.getActiveCamera().getViewMatrix(true);
-        transformable.getActiveCamera().getProjectionMatrix(true);
-    }*/
 }

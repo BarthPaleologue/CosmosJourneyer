@@ -17,16 +17,8 @@
 
 import "../styles/index.scss";
 
-import { Settings } from "./settings";
-import { DefaultControls } from "./defaultController/defaultControls";
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { ShipControls } from "./spaceship/shipControls";
 import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
-import { parsePercentageFrom01, parseSpeed } from "./utils/parseToStrings";
-import { Mouse } from "./inputs/mouse";
-import { Keyboard } from "./inputs/keyboard";
-import { Gamepad } from "./inputs/gamepad";
-import { CharacterControls } from "./spacelegs/characterControls";
 import { StarSystemController } from "./starSystem/starSystemController";
 import { SystemSeed } from "./utils/systemSeed";
 
@@ -36,74 +28,14 @@ await engine.setup();
 
 const starSystemView = engine.getStarSystemView();
 
-const mouse = new Mouse(engine.canvas, 100);
-const keyboard = new Keyboard();
-const gamepad = new Gamepad();
-
-const maxZ = Settings.EARTH_RADIUS * 1e5;
-
-const defaultController = new DefaultControls(starSystemView.scene);
-defaultController.speed = 0.2 * Settings.EARTH_RADIUS;
-defaultController.getActiveCamera().maxZ = maxZ;
-defaultController.addInput(keyboard);
-defaultController.addInput(gamepad);
-
-const spaceshipController = new ShipControls(starSystemView.scene);
-spaceshipController.getActiveCamera().maxZ = maxZ;
-spaceshipController.addInput(keyboard);
-spaceshipController.addInput(gamepad);
-spaceshipController.addInput(mouse);
-
-const characterController = new CharacterControls(starSystemView.scene);
-characterController.getTransform().setEnabled(false);
-characterController.getActiveCamera().maxZ = maxZ;
-characterController.addInput(keyboard);
-characterController.addInput(gamepad);
-
-// const physicsViewer = new PhysicsViewer();
-// physicsViewer.showBody(spaceshipController.aggregate.body);
-
-mouse.onMouseLeaveObservable.add(() => {
-    if (starSystemView.scene.getActiveController() === spaceshipController) engine.pause();
-});
-
-starSystemView.scene.setActiveController(spaceshipController);
-
-engine.registerStarSystemUpdateCallback(() => {
-    if (starSystemView.scene.getActiveController() != spaceshipController) return;
-
-    const shipPosition = spaceshipController.getTransform().getAbsolutePosition();
-    const nearestBody = starSystemView.getStarSystem().getNearestOrbitalObject();
-    const distance = nearestBody.getTransform().getAbsolutePosition().subtract(shipPosition).length();
-    const radius = nearestBody.getBoundingRadius();
-    spaceshipController.registerClosestObject(distance, radius);
-
-    const warpDrive = spaceshipController.getWarpDrive();
-    const shipInternalThrottle = warpDrive.getInternalThrottle();
-    const shipTargetThrottle = warpDrive.getTargetThrottle();
-
-    const throttleString = warpDrive.isEnabled()
-        ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}`
-        : `${parsePercentageFrom01(spaceshipController.getThrottle())}/100%`;
-
-    (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(spaceshipController.getSpeed())}`;
-
-    characterController.setClosestWalkableObject(nearestBody);
-    spaceshipController.setClosestWalkableObject(nearestBody);
-});
-
-engine.getStarMap().onWarpObservable.add(() => {
-    spaceshipController.thirdPersonCamera.radius = 30;
-});
-
-engine.onToggleStarMapObservable.add((isStarMapOpen) => {
-    if (!isStarMapOpen) spaceshipController.thirdPersonCamera.radius = 30;
-});
-
-const starSystem = new StarSystemController(new SystemSeed(0, 0, 0, 0), starSystemView.scene);
-starSystemView.setStarSystem(starSystem, true);
+//const starSystem = new StarSystemController(new SystemSeed(0, 0, 0, 0), starSystemView.scene);
+//starSystemView.setStarSystem(starSystem, true);
 
 engine.init();
+
+const spaceshipController = starSystemView.getSpaceshipControls();
+const characterController = starSystemView.getCharacterControls();
+const defaultController = starSystemView.getDefaultControls();
 
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
@@ -132,26 +64,11 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "g") {
         const scene = starSystemView.scene;
         if (scene.getActiveController() === spaceshipController) {
-            scene.setActiveController(defaultController);
-            setRotationQuaternion(defaultController.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
-            starSystemView.getStarSystem().postProcessManager.rebuild();
-
-            spaceshipController.setEnabled(false, starSystemView.havokPlugin);
+            starSystemView.switchToDefaultControls();
         } else if (scene.getActiveController() === defaultController) {
-            characterController.getTransform().setEnabled(true);
-            characterController.getTransform().setAbsolutePosition(defaultController.getTransform().absolutePosition);
-            scene.setActiveController(characterController);
-            setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(defaultController.getTransform()).clone());
-            starSystemView.getStarSystem().postProcessManager.rebuild();
-
-            spaceshipController.setEnabled(false, starSystemView.havokPlugin);
+            starSystemView.switchToSpaceshipControls();
         } else if (scene.getActiveController() === characterController) {
-            characterController.getTransform().setEnabled(false);
-            scene.setActiveController(spaceshipController);
-            setRotationQuaternion(spaceshipController.getTransform(), getRotationQuaternion(defaultController.getTransform()).clone());
-            starSystemView.getStarSystem().postProcessManager.rebuild();
-
-            spaceshipController.setEnabled(true, starSystemView.havokPlugin);
+            starSystemView.switchToCharacterControls();
         }
     }
 });
