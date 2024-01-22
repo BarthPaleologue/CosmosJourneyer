@@ -60,15 +60,4 @@ document.addEventListener("keydown", (e) => {
             starSystemView.getStarSystem().postProcessManager.rebuild();
         }
     }
-
-    if (e.key === "g") {
-        const scene = starSystemView.scene;
-        if (scene.getActiveController() === spaceshipController) {
-            starSystemView.switchToDefaultControls();
-        } else if (scene.getActiveController() === defaultController) {
-            starSystemView.switchToSpaceshipControls();
-        } else if (scene.getActiveController() === characterController) {
-            starSystemView.switchToCharacterControls();
-        }
-    }
 });

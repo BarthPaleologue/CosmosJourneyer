@@ -106,6 +106,16 @@ export class StarSystemView {
             if (e.key === "t") {
                 this.ui.setTarget(this.getStarSystem().getClosestToScreenCenterOrbitalObject());
             }
+
+            if (e.key === "g") {
+                if (this.scene.getActiveController() === this.getSpaceshipControls()) {
+                    this.switchToDefaultControls();
+                } else if (this.scene.getActiveController() === this.getDefaultControls()) {
+                    this.switchToCharacterControls();
+                } else if (this.scene.getActiveController() === this.getCharacterControls()) {
+                    this.switchToSpaceshipControls();
+                }
+            }
         });
 
         this.scene = new UberScene(engine, ScenePerformancePriority.Intermediate);
