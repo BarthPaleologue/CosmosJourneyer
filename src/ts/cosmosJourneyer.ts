@@ -40,6 +40,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { ShipControls } from "./spaceship/shipControls";
+import { PhysicsMotionType } from "@babylonjs/core";
+import { setMaxLinVel } from "./utils/havok";
 
 enum EngineState {
     RUNNING,
@@ -382,6 +384,12 @@ export class CosmosJourneyer {
             );
             const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(nearestOrbitalObjectWorldRotation);
             setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
+
+            // updates camera position
+            this.getStarSystemView().getSpaceshipControls().getActiveCamera().getViewMatrix(true);
+
+            // re-centers the star system
+            this.getStarSystemView().getStarSystem().applyFloatingOrigin();
         });
 
         this.getStarSystemView().initStarSystem();

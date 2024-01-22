@@ -160,7 +160,7 @@ export class ShipControls implements Controls {
 
         for (const input of this.inputs) this.listenTo(input, deltaTime);
 
-        this.getActiveCamera().getViewMatrix();
+        this.getActiveCamera().getViewMatrix(true);
         return this.getTransform().getAbsolutePosition();
     }
 
