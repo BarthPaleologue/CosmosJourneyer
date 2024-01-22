@@ -2,7 +2,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { getForwardDirection, rotate, Transformable } from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, rotate } from "../uberCore/transforms/basicTransform";
 import { LinesMesh, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
@@ -11,6 +11,7 @@ import warpConeFragment from "../../shaders/warpConeMaterial/fragment.glsl";
 import warpConeVertex from "../../shaders/warpConeMaterial/vertex.glsl";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Assets } from "../assets";
+import { Transformable } from "../architecture/transformable";
 
 /**
  * @see https://playground.babylonjs.com/#W9LE0U#28
@@ -79,7 +80,7 @@ export class WarpTunnel implements Transformable {
         );
 
         this.spaceLines = rain;
-        this.spaceLines.setEnabled(false);
+        //this.spaceLines.setEnabled(false);
         this.warpCone = MeshBuilder.CreateCylinder(
             "cone",
             {
@@ -102,7 +103,7 @@ export class WarpTunnel implements Transformable {
             attributes: ["position", "uv"],
             uniforms: ["worldViewProjection", "time"],
             samplers: ["warpNoise"]
-        })
+        });
         warpConeMaterial.setTexture("warpNoise", Assets.WarpNoise);
 
         this.warpCone.material = warpConeMaterial;
@@ -135,7 +136,6 @@ export class WarpTunnel implements Transformable {
 
             rotate(this.spaceLines, rotationAxis, theta);
             rotate(this.warpCone, rotationAxis, theta);
-
         });
     }
 
@@ -143,8 +143,8 @@ export class WarpTunnel implements Transformable {
         const theta = Math.random() * Math.PI * 2;
         const radiusScaling = 1 + (Math.random() * 2 - 1) * 0.5;
 
-        const p0 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale(radiusScaling * this.diameterTop / 2);
-        const p1 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale(radiusScaling * this.diameterBottom / 2);
+        const p0 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterTop) / 2);
+        const p1 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterBottom) / 2);
         p0.addInPlace(this.direction.scale(this.positiveDepth));
         p1.subtractInPlace(this.direction.scale(this.negativeDepth));
 
@@ -181,5 +181,10 @@ export class WarpTunnel implements Transformable {
                 drop[1].copyFrom(point1);
             }
         }
+    }
+
+    dispose() {
+        this.spaceLines.dispose();
+        this.warpCone.dispose();
     }
 }

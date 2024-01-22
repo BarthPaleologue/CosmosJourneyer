@@ -19,6 +19,7 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { CollisionMask } from "../settings";
 import { Transformable } from "../architecture/transformable";
+import { WarpTunnel } from "../utils/warpTunnel";
 
 enum ShipState {
     FLYING,
@@ -50,6 +51,8 @@ export class Spaceship implements Transformable {
         distance: Infinity,
         radius: 1
     };
+
+    private readonly warpTunnel: WarpTunnel;
 
     private readonly scene: Scene;
 
@@ -91,6 +94,9 @@ export class Spaceship implements Transformable {
                 this.addRCSThruster(child);
             }
         }
+
+        this.warpTunnel = new WarpTunnel(new Vector3(0, 0, 1), scene);
+        this.warpTunnel.setParent(this.getTransform());
 
         this.scene = scene;
     }
