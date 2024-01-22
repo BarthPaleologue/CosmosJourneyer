@@ -1,7 +1,6 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Assets } from "../assets";
 import { Transformable } from "../architecture/transformable";
@@ -39,8 +38,8 @@ export class WarpTunnel implements Transformable {
         ps.maxSize = 0.5;
         ps.minScaleY = ps.maxScaleY = 10;
 
-        ps.addColorGradient(0, new Color4(0, 0, 1, 0.0));
-        ps.addColorGradient(0.25, new Color4(0, 1, 1, 1));
+        ps.addColorGradient(0, new Color4(0, 0, 1, 0));
+        ps.addColorGradient(0.5, new Color4(0, 1, 1, 1));
         ps.addColorGradient(1, new Color4(1, 0, 1, 0));
 
         ps.emitter = this.anchor as AbstractMesh;
@@ -51,7 +50,7 @@ export class WarpTunnel implements Transformable {
             const r = 25 + (Math.random() - 0.5) * 2 * 10;
 
             const x = Math.cos(theta) * r;
-            const y = Math.random();
+            const y = Math.random() * 2;
             const z = Math.sin(theta) * r;
 
             Vector3.TransformCoordinatesFromFloatsToRef(x, y, z, worldMatrix, positionToUpdate);
