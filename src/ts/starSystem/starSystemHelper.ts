@@ -63,7 +63,7 @@ export class StarSystemHelper {
      */
     public static makeBlackHole(starsystem: StarSystemController, model: number | BlackHoleModel = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): BlackHole {
         const name = starName(starsystem.model.getName(), starsystem.stellarObjects.length);
-        const blackHole = new BlackHole(name, starsystem.scene, model, starsystem.stellarObjects[0]);
+        const blackHole = new BlackHole(name, starsystem.scene, model, starsystem.stellarObjects.length > 0 ? starsystem.stellarObjects[0] : null);
         starsystem.addStellarObject(blackHole);
         return blackHole;
     }
@@ -91,7 +91,11 @@ export class StarSystemHelper {
     public static makeStellarObject(starsystem: StarSystemController, seed: number = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): StellarObject {
         const isStellarObjectBlackHole = starsystem.model.getBodyTypeOfStar(starsystem.stellarObjects.length) === BODY_TYPE.BLACK_HOLE;
         if (isStellarObjectBlackHole) return StarSystemHelper.makeBlackHole(starsystem, seed);
-        else return this.makeStar(starsystem, seed);
+
+        const isStellarObjectNeutronStar = starsystem.model.getBodyTypeOfStar(starsystem.stellarObjects.length) === BODY_TYPE.NEUTRON_STAR;
+        if (isStellarObjectNeutronStar) return StarSystemHelper.makeNeutronStar(starsystem, seed);
+
+        return this.makeStar(starsystem, seed);
     }
 
     /**

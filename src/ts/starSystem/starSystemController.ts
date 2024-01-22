@@ -423,13 +423,18 @@ export class StarSystemController {
         }
 
         // floating origin
+        this.applyFloatingOrigin();
+
+        this.updateShaders(deltaTime);
+    }
+
+    public applyFloatingOrigin() {
+        const controller = this.scene.getActiveController();
         if (controller.getActiveCamera().globalPosition.length() > 500) {
             const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
             this.translateEverythingNow(displacementTranslation);
             translate(controller.getTransform(), displacementTranslation);
         }
-
-        this.updateShaders(deltaTime);
     }
 
     /**

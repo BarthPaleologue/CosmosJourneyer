@@ -37,11 +37,13 @@ export class ObjectOverlay {
 
     private lastDistance: number = 0;
 
+    static WIDTH = 300;
+
     constructor(object: OrbitalObject) {
         this.object = object;
 
         this.textRoot = new StackPanel(object.name + "OverlayTextRoot");
-        this.textRoot.width = "150px";
+        this.textRoot.width = `${ObjectOverlay.WIDTH}px`;
         this.textRoot.height = "130px";
         this.textRoot.background = "transparent";
         this.textRoot.zIndex = 6;
@@ -127,7 +129,7 @@ export class ObjectOverlay {
         const alphaText = Math.max(0, distance / (3 * this.object.getBoundingRadius()) - 1.0);
         this.textRoot.alpha = alphaText;
 
-        this.textRoot.linkOffsetXInPixels = 0.5 * Math.max(scale, screenRatio) * window.innerWidth + 75 + 20;
+        this.textRoot.linkOffsetXInPixels = 0.5 * Math.max(scale, screenRatio) * window.innerWidth + ObjectOverlay.WIDTH / 2 + 20;
 
         this.distanceText.text = parseDistance(distance);
 

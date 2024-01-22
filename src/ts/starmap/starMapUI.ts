@@ -58,7 +58,7 @@ export class StarMapUI {
         this.systemUI.alpha = 0.95;
 
         this.namePlate = new TextBlock();
-        this.namePlate.text = "Vesperia Gamma";
+        this.namePlate.text = "";
         this.namePlate.fontSize = 24;
         this.namePlate.height = "50px";
         this.namePlate.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;

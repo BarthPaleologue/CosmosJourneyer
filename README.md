@@ -53,5 +53,5 @@ Thank you to all the people who have contributed to CosmosJourneyer!
 
 ## Special Thanks
 
-- Bilal Molli for his fearless refactoring of the messy code base in its early days
+- Martin Molli for his fearless refactoring of the messy code base in its early days
 - The people from [BabylonJS](https://www.babylonjs.com/) for their amazing work on the BabylonJS framework and their help on the forum
