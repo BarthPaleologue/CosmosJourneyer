@@ -71,6 +71,8 @@ export class StarSystemModel {
         if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
         if (uniformRandBool(0.002, this.rng, GENERATION_STEPS.GENERATE_STARS + index)) return BODY_TYPE.BLACK_HOLE;
 
+        if (uniformRandBool(0.01, this.rng, GENERATION_STEPS.GENERATE_STARS + index)) return BODY_TYPE.NEUTRON_STAR;
+
         return BODY_TYPE.STAR;
     }
 

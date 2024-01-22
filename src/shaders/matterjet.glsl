@@ -101,7 +101,7 @@ float spiralDensity(vec3 pointOnCone, vec3 coneAxis, float coneMaxHeight) {
     // smoothstep fadeout when the height is too much (outside of cone) or too low (too close to the star)
     density *= smoothstep(1.0, 0.0, heightFraction) * smoothstep(0.0, 0.05, heightFraction);
 
-    float d = spiralSDF(theta + time, 0.2 + heightFraction / 2.0) / (0.3 + heightFraction * 2.0);
+    float d = spiralSDF(theta + time, 0.2 + sqrt(heightFraction) / 2.0) / (0.3 + heightFraction * 2.0);
     //d = pow(d, 4.0);
 
     density *= smoothstep(0.6, 1.0, pow(1.0 - d, 8.0)) * 2.0; //smoothstep(0.85, 1.0, 1.0 - d) * 2.0;
