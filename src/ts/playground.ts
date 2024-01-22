@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import "../styles/index.scss";
 
 import { Assets } from "./assets";
@@ -11,8 +28,8 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setMaxLinVel } from "./utils/havok";
-import { TelluricPlanemo } from "./planemos/telluricPlanemo/telluricPlanemo";
-import { ChunkForgeWorkers } from "./planemos/telluricPlanemo/terrain/chunks/chunkForgeWorkers";
+import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
+import { ChunkForgeWorkers } from "./planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
@@ -50,7 +67,7 @@ camera.angularSensibility /= 10;
 scene.setActiveCamera(camera);
 camera.attachControl(canvas, true);
 
-const planet = new TelluricPlanemo("xrPlanet", scene, 0.51, undefined);
+const planet = new TelluricPlanet("xrPlanet", scene, 0.51, undefined);
 translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
 
 const hemiLight = new HemisphericLight("hemiLight", new Vector3(0, 1, 0), scene);
@@ -87,7 +104,7 @@ scene.onBeforeRenderObservable.add(() => {
 
     chunkForge.update();
 
-    star.updateMaterial();
+    star.updateMaterial(deltaTime);
 
     ocean.update(deltaTime);
 });

@@ -1,27 +1,41 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { UberScene } from "../uberCore/uberScene";
 import { UberRenderingPipeline } from "../uberCore/uberRenderingPipeline";
 import { OceanPostProcess } from "./oceanPostProcess";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
 import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";
-import { AbstractBody } from "../bodies/abstractBody";
 import { RingsPostProcess } from "./rings/ringsPostProcess";
 import { StarfieldPostProcess } from "./starfieldPostProcess";
 import { VolumetricLight } from "./volumetricLight";
 import { BlackHolePostProcess } from "./blackHolePostProcess";
-import { GasPlanet } from "../planemos/gasPlanet/gasPlanet";
+import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
 import { makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess } from "./volumetricCloudsPostProcess";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
-import { AbstractObject } from "../bodies/abstractObject";
 import { PostProcessType } from "./postProcessTypes";
 import { MandelbulbPostProcess } from "./mandelbulbPostProcess";
 import { ShadowPostProcess } from "./shadowPostProcess";
@@ -34,6 +48,8 @@ import { Mandelbulb } from "../mandelbulb/mandelbulb";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+import { CelestialBody } from "../architecture/celestialBody";
+import { StellarObject } from "../architecture/stellarObject";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -78,7 +94,7 @@ export class PostProcessManager {
 
     private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
 
-    private currentBody: AbstractObject | null = null;
+    private currentBody: CelestialBody | null = null;
 
     private readonly starFields: StarfieldPostProcess[] = [];
     private readonly volumetricLights: VolumetricLight[] = [];
@@ -161,7 +177,7 @@ export class PostProcessManager {
      * @param planet A telluric planet
      * @param stellarObjects An array of stars or black holes
      */
-    public addOcean(planet: TelluricPlanemo, stellarObjects: StellarObject[]) {
+    public addOcean(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
         const ocean = new OceanPostProcess(`${planet.name}Ocean`, planet, this.scene, stellarObjects);
         this.oceans.push(ocean);
     }
@@ -170,7 +186,7 @@ export class PostProcessManager {
      * Returns the ocean post process for the given planet. Throws an error if no ocean is found.
      * @param planet A telluric planet
      */
-    public getOcean(planet: TelluricPlanemo): OceanPostProcess | null {
+    public getOcean(planet: TelluricPlanet): OceanPostProcess | null {
         return this.oceans.find((ocean) => ocean.object === planet) ?? null;
     }
 
@@ -179,7 +195,7 @@ export class PostProcessManager {
      * @param planet A telluric planet
      * @param stellarObjects An array of stars or black holes
      */
-    public async addClouds(planet: TelluricPlanemo, stellarObjects: StellarObject[]) {
+    public async addClouds(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
         const uniforms = planet.model.cloudsUniforms;
         if (uniforms === null)
             throw new Error(
@@ -194,7 +210,7 @@ export class PostProcessManager {
      * Returns the clouds post process for the given planet. Throws an error if no clouds are found.
      * @param planet A telluric planet
      */
-    public getClouds(planet: TelluricPlanemo): CloudsPostProcess | null {
+    public getClouds(planet: TelluricPlanet): CloudsPostProcess | null {
         return this.clouds.find((clouds) => clouds.object === planet) ?? null;
     }
 
@@ -203,7 +219,7 @@ export class PostProcessManager {
      * @param planet A gas or telluric planet
      * @param stellarObjects An array of stars or black holes
      */
-    public addAtmosphere(planet: GasPlanet | TelluricPlanemo, stellarObjects: StellarObject[]) {
+    public addAtmosphere(planet: GasPlanet | TelluricPlanet, stellarObjects: StellarObject[]) {
         const atmosphere = new AtmosphericScatteringPostProcess(
             `${planet.name}Atmosphere`,
             planet,
@@ -218,7 +234,7 @@ export class PostProcessManager {
      * Returns the atmosphere post process for the given planet. Throws an error if no atmosphere is found.
      * @param planet A gas or telluric planet
      */
-    public getAtmosphere(planet: GasPlanet | TelluricPlanemo): AtmosphericScatteringPostProcess | null {
+    public getAtmosphere(planet: GasPlanet | TelluricPlanet): AtmosphericScatteringPostProcess | null {
         return this.atmospheres.find((atmosphere) => atmosphere.object === planet) ?? null;
     }
 
@@ -227,7 +243,7 @@ export class PostProcessManager {
      * @param body A body
      * @param stellarObjects An array of stars or black holes
      */
-    public async addRings(body: AbstractBody, stellarObjects: StellarObject[]) {
+    public async addRings(body: CelestialBody, stellarObjects: StellarObject[]) {
         return RingsPostProcess.CreateAsync(body, this.scene, stellarObjects).then((rings) => {
             this.rings.push(rings);
         });
@@ -237,7 +253,7 @@ export class PostProcessManager {
      * Returns the rings post process for the given body. Throws an error if no rings are found.
      * @param body A body
      */
-    public getRings(body: AbstractObject): RingsPostProcess | null {
+    public getRings(body: CelestialBody): RingsPostProcess | null {
         return this.rings.find((rings) => rings.object === body) ?? null;
     }
 
@@ -255,8 +271,9 @@ export class PostProcessManager {
      * Creates a new Starfield postprocess and adds it to the manager.
      * @param stellarObjects An array of stars or black holes
      * @param planets An array of planets
+     * @param starfieldRotation
      */
-    public addStarField(stellarObjects: StellarObject[], planets: AbstractBody[], starfieldRotation: Quaternion) {
+    public addStarField(stellarObjects: StellarObject[], planets: CelestialBody[], starfieldRotation: Quaternion) {
         this.starFields.push(new StarfieldPostProcess(this.scene, stellarObjects, planets, starfieldRotation));
     }
 
@@ -297,7 +314,7 @@ export class PostProcessManager {
         return this.matterJets.find((mj) => mj.object === neutronStar) ?? null;
     }
 
-    public async addShadowCaster(body: AbstractBody, stellarObjects: StellarObject[]) {
+    public async addShadowCaster(body: CelestialBody, stellarObjects: StellarObject[]) {
         return ShadowPostProcess.CreateAsync(body, this.scene, stellarObjects).then((shadow) => {
             this.shadows.push(shadow);
         });
@@ -307,7 +324,7 @@ export class PostProcessManager {
         this.lensFlares.push(new LensFlarePostProcess(stellarObject, this.scene));
     }
 
-    public setBody(body: AbstractBody) {
+    public setBody(body: CelestialBody) {
         this.currentBody = body;
 
         const rings = this.getRings(body);

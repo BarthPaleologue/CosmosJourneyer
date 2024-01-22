@@ -9,10 +9,12 @@ const htmlPath = path.join(__dirname, "/src/html/");
 
 const config = {
     entry: {
-        showcase: "./src/ts/index.ts",
+        main: "./src/ts/index.ts",
+        alphaTestis: "./src/ts/alphaTestis.ts",
         random: "./src/ts/randomizer.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
         physicSpaceship: "./src/ts/physicSpaceship.ts",
+        landingSimulator: "./src/ts/landingSimulator.ts",
         characterDemo: "./src/ts/characterDemo.ts",
         playground: "./src/ts/playground.ts",
         xr: "./src/ts/xr.ts",
@@ -36,7 +38,13 @@ const config = {
             title: "Planet Engine",
             filename: "index.html",
             template: path.join(htmlPath, "index.html"),
-            chunks: ["showcase"]
+            chunks: ["main"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "Alpha Testis",
+            filename: "alphaTestis.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["alphaTestis"]
         }),
         new HtmlWebpackPlugin({
             title: "Randomizer",
@@ -51,10 +59,16 @@ const config = {
             chunks: ["blackHole"]
         }),
         new HtmlWebpackPlugin({
-            title: "Playground",
+            title: "Physics Spaceship",
             filename: "physicSpaceship.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["physicSpaceship"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "Landing Simulator",
+            filename: "landingSimulator.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["landingSimulator"]
         }),
         new HtmlWebpackPlugin({
             title: "Character demo",

@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { DefaultControls } from "../defaultController/defaultControls";
 
 import starTexture from "../../asset/textures/starParticle.png";
@@ -275,16 +292,18 @@ export class StarMap {
         this.currentSystemSeed = starSystemSeed;
         this.selectedSystemSeed = starSystemSeed;
 
-        if (this.loadedStarSectors.has(Vector3ToString(starSystemSeed.starSectorCoordinates))) {
+        const sectorCoordinates = new Vector3(starSystemSeed.starSectorX, starSystemSeed.starSectorY, starSystemSeed.starSectorZ);
+
+        if (this.loadedStarSectors.has(Vector3ToString(sectorCoordinates))) {
             this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
             this.focusOnCurrentSystem();
             return;
         }
 
-        this.registerStarSector(starSystemSeed.starSectorCoordinates, true);
+        this.registerStarSector(sectorCoordinates, true);
         this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
 
-        const translation = starSystemSeed.starSectorCoordinates.subtract(this.currentStarSectorPosition).scaleInPlace(StarSector.SIZE);
+        const translation = sectorCoordinates.subtract(this.currentStarSectorPosition).scaleInPlace(StarSector.SIZE);
         translate(this.controls.getTransform(), translation);
         this.controls.getActiveCamera().getViewMatrix(true);
         this.acknowledgeCameraMovement();

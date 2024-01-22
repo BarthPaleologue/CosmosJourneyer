@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Loading/loadingScreen";
@@ -28,6 +45,7 @@ import banana from "../asset/banana/banana.glb";
 import endeavorSpaceship from "../asset/spaceship/endeavour.glb";
 import character from "../asset/character.glb";
 import rock from "../asset/rock.glb";
+import landingPad from "../asset/landingpad.glb";
 
 import tree from "../asset/tree/tree.babylon";
 import treeTexturePath from "../asset/tree/Tree.png";
@@ -81,6 +99,8 @@ export class Assets {
     private static Spacestation: Mesh;
     private static Banana: Mesh;
     private static Character: Mesh;
+
+    private static LandingPad: Mesh;
 
     public static Rock: Mesh;
     public static Tree: Mesh;
@@ -191,6 +211,18 @@ export class Assets {
             console.log("Rock loaded");
         };
 
+        const landingPadTask = Assets.manager.addMeshTask("landingPadTask", "", "", landingPad);
+        landingPadTask.onSuccess = function (task: MeshAssetTask) {
+            Assets.LandingPad = task.loadedMeshes[0] as Mesh;
+            Assets.LandingPad.isVisible = false;
+
+            for (const mesh of Assets.LandingPad.getChildMeshes()) {
+                mesh.isVisible = false;
+            }
+
+            console.log("LandingPad loaded");
+        };
+
         const treeTask = Assets.manager.addMeshTask("treeTask", "", "", tree);
         treeTask.onSuccess = function (task: MeshAssetTask) {
             Assets.Tree = task.loadedMeshes[0] as Mesh;
@@ -287,6 +319,10 @@ export class Assets {
 
     static CreateRockInstance(): InstancedMesh {
         return Assets.Rock.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+    }
+
+    static CreateLandingPadInstance(): InstancedMesh {
+        return Assets.LandingPad.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static DebugMaterial(name: string, diffuse = false, wireframe = false) {

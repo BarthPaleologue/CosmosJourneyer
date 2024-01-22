@@ -1,0 +1,20 @@
+{
+  "name": "CosmosJourneyer API Documentation",
+  "out": "docs",
+  "theme": "default",
+  "exclude": [
+    "**/node_modules/**/*.*",
+    "**/test/**/*.*"
+  ],
+  "entryPoints": [
+    "src/ts/**/*.ts"
+  ],
+  "visibilityFilters": {
+    "protected": false,
+    "private": false,
+    "inherited": true,
+    "external": false,
+    "@alpha": false,
+    "@beta": false
+  }
+}

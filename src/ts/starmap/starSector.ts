@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { hashVec3 } from "../utils/hashVec3";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand } from "extended-random";
@@ -53,7 +70,7 @@ export class StarSector {
 
     constructor(positionInStarMap: Vector3) {
         this.position = positionInStarMap;
-        this.rng = seededSquirrelNoise(hashVec3(positionInStarMap));
+        this.rng = seededSquirrelNoise(hashVec3(positionInStarMap.x, positionInStarMap.y, positionInStarMap.z));
 
         this.density = UniverseDensity(positionInStarMap.x, positionInStarMap.y, positionInStarMap.z);
 
@@ -64,7 +81,7 @@ export class StarSector {
         const sectorString = this.getKey();
         const data: BuildData[] = [];
         for (let i = 0; i < this.nbStars; i++) {
-            const systemSeed = new SystemSeed(this.position, i);
+            const systemSeed = new SystemSeed(this.position.x, this.position.y, this.position.z, i);
             data.push({
                 name: `starInstance|${this.position.x}|${this.position.y}|${this.position.z}|${i}`,
                 seed: systemSeed,

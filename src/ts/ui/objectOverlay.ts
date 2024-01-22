@@ -1,5 +1,21 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { AbstractObject } from "../bodies/abstractObject";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import cursorImage from "../../asset/textures/hoveredCircle.png";
@@ -8,6 +24,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";
+import { OrbitalObject } from "../architecture/orbitalObject";
 
 export class ObjectOverlay {
     readonly textRoot: StackPanel;
@@ -16,15 +33,17 @@ export class ObjectOverlay {
     readonly typeText: TextBlock;
     readonly distanceText: TextBlock;
     readonly etaText: TextBlock;
-    readonly object: AbstractObject;
+    readonly object: OrbitalObject;
 
     private lastDistance: number = 0;
 
-    constructor(object: AbstractObject) {
+    static WIDTH = 300;
+
+    constructor(object: OrbitalObject) {
         this.object = object;
 
         this.textRoot = new StackPanel(object.name + "OverlayTextRoot");
-        this.textRoot.width = "150px";
+        this.textRoot.width = `${ObjectOverlay.WIDTH}px`;
         this.textRoot.height = "130px";
         this.textRoot.background = "transparent";
         this.textRoot.zIndex = 6;
@@ -80,7 +99,7 @@ export class ObjectOverlay {
         this.cursor.linkWithMesh(this.object.getTransform());
     }
 
-    update(camera: Camera, target: AbstractObject | null) {
+    update(camera: Camera, target: OrbitalObject | null) {
         const viewRay = camera.getDirection(LOCAL_DIRECTION.BACKWARD);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
@@ -110,7 +129,7 @@ export class ObjectOverlay {
         const alphaText = Math.max(0, distance / (3 * this.object.getBoundingRadius()) - 1.0);
         this.textRoot.alpha = alphaText;
 
-        this.textRoot.linkOffsetXInPixels = 0.5 * Math.max(scale, screenRatio) * window.innerWidth + 75 + 20;
+        this.textRoot.linkOffsetXInPixels = 0.5 * Math.max(scale, screenRatio) * window.innerWidth + ObjectOverlay.WIDTH / 2 + 20;
 
         this.distanceText.text = parseDistance(distance);
 

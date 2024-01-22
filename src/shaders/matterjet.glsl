@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 precision lowp float;
 
 varying vec2 vUV;// screen coordinates
@@ -7,9 +24,11 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform float time;
 
-#include "./utils/camera.glsl"
+#include "./utils/camera.glsl";
 
 #include "./utils/object.glsl";
+
+#include "./utils/rotateAround.glsl";
 
 #include "./utils/remap.glsl";
 
@@ -80,12 +99,12 @@ float spiralDensity(vec3 pointOnCone, vec3 coneAxis, float coneMaxHeight) {
     float density = 1.0;
 
     // smoothstep fadeout when the height is too much (outside of cone) or too low (too close to the star)
-    density *= smoothstep(0.0, 1.0, 1.0 - heightFraction) * smoothstep(0.0, 0.05, heightFraction);
+    density *= smoothstep(1.0, 0.0, heightFraction) * smoothstep(0.0, 0.05, heightFraction);
 
-    float d = spiralSDF(theta + time, 0.2 + heightFraction) / (0.3 + heightFraction * 2.0);
+    float d = spiralSDF(theta + time, 0.2 + sqrt(heightFraction) / 2.0) / (0.3 + heightFraction * 2.0);
     //d = pow(d, 4.0);
 
-    density *= smoothstep(0.85, 1.0, 1.0 - d);
+    density *= smoothstep(0.6, 1.0, pow(1.0 - d, 8.0)) * 2.0; //smoothstep(0.85, 1.0, 1.0 - d) * 2.0;
 
     //density *= d * 500.0;
 
@@ -107,11 +126,11 @@ void main() {
     vec4 finalColor = screenColor;
 
     const float jetHeight = 10000000e3;
-    const vec3 jetColor = vec3(0.2, 0.2, 1.0);
+    const vec3 jetColor = vec3(0.5, 0.5, 1.0);
 
 
     float t1, t2;
-    if (rayIntersectCone(camera_position, rayDir, object_position, object_rotationAxis, 0.9, t1, t2)) {
+    if (rayIntersectCone(camera_position, rayDir, object_position, object_rotationAxis, 0.95, t1, t2)) {
         if (t2 > 0.0 && t2 < maximumDistance) {
             vec3 jetPointPosition2 = camera_position + t2 * rayDir - object_position;
 

@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
@@ -54,13 +71,15 @@ export class StarSystemModel {
         if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
         if (uniformRandBool(0.002, this.rng, GENERATION_STEPS.GENERATE_STARS + index)) return BODY_TYPE.BLACK_HOLE;
 
+        if (uniformRandBool(0.05, this.rng, GENERATION_STEPS.GENERATE_STARS + index)) return BODY_TYPE.NEUTRON_STAR;
+
         return BODY_TYPE.STAR;
     }
 
     public getBodyTypeOfPlanet(index: number) {
         if (uniformRandBool(0.01, this.rng, GENERATION_STEPS.CHOOSE_PLANET_TYPE + (index + 20) * 500)) return BODY_TYPE.MANDELBULB;
-        if (uniformRandBool(0.5, this.rng, GENERATION_STEPS.CHOOSE_PLANET_TYPE + index)) return BODY_TYPE.TELLURIC;
-        return BODY_TYPE.GAS;
+        if (uniformRandBool(0.5, this.rng, GENERATION_STEPS.CHOOSE_PLANET_TYPE + index)) return BODY_TYPE.TELLURIC_PLANET;
+        return BODY_TYPE.GAS_PLANET;
     }
 
     public getPlanetSeed(index: number) {
