@@ -89,7 +89,10 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
 
     const starDirection = nearestStar.getTransform().getAbsolutePosition().subtract(object.getTransform().getAbsolutePosition()).normalize();
 
-    const halfway = object.getTransform().getAbsolutePosition().add(starDirection.scale(object.getBoundingRadius() * 4));
+    const halfway = object
+        .getTransform()
+        .getAbsolutePosition()
+        .add(starDirection.scale(object.getBoundingRadius() * 4));
     transformable.getTransform().lookAt(halfway);
 
     transformable.getTransform().computeWorldMatrix(true);

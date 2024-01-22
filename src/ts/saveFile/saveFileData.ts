@@ -107,7 +107,7 @@ export function parseSaveFileData(jsonString: string): SaveFileData {
             starSectorX: data.starSystem.starSectorX,
             starSectorY: data.starSystem.starSectorY,
             starSectorZ: data.starSystem.starSectorZ,
-            starSectorIndex: data.starSystem.starSectorIndex,
+            starSectorIndex: data.starSystem.starSectorIndex
         },
         nearestOrbitalObjectIndex: data.nearestOrbitalObjectIndex,
         positionX: data.positionX,
@@ -116,6 +116,6 @@ export function parseSaveFileData(jsonString: string): SaveFileData {
         rotationQuaternionX: data.rotationQuaternionX,
         rotationQuaternionY: data.rotationQuaternionY,
         rotationQuaternionZ: data.rotationQuaternionZ,
-        rotationQuaternionW: data.rotationQuaternionW,
+        rotationQuaternionW: data.rotationQuaternionW
     };
 }

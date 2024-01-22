@@ -43,5 +43,5 @@ export enum BODY_TYPE {
     GAS_PLANET,
     MANDELBULB,
     BLACK_HOLE,
-    NEUTRON_STAR,
+    NEUTRON_STAR
 }

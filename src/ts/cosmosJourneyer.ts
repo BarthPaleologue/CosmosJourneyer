@@ -90,7 +90,7 @@ export class CosmosJourneyer {
         });
 
         window.addEventListener("mouseleave", () => {
-            if(!this.mainMenu?.isVisible()) this.pause();
+            if (!this.mainMenu?.isVisible()) this.pause();
         });
 
         //TODO: use the keyboard class
@@ -190,7 +190,7 @@ export class CosmosJourneyer {
      * Inits the current star system
      */
     public init(skipMainMenu = false): void {
-        if(!skipMainMenu) this.getMainMenu().init();
+        if (!skipMainMenu) this.getMainMenu().init();
         this.getStarSystemView().initStarSystem();
 
         this.getEngine().runRenderLoop(() => {

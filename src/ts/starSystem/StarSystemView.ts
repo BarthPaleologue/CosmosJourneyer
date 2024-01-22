@@ -145,7 +145,6 @@ export class StarSystemView {
         this.ui = new SystemUI(this.scene);
     }
 
-
     initStarSystem() {
         this.scene.getEngine().loadingScreen.displayLoadingUI();
         this.scene.getEngine().loadingScreen.loadingUIText = `Warping to ${this.getStarSystem().model.getName()}`;
@@ -163,11 +162,11 @@ export class StarSystemView {
         positionNearObjectBrightSide(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
 
         this.getStarSystem()
-          .initPostProcesses()
-          .then(() => {
-              this.scene.getEngine().loadingScreen.hideLoadingUI();
-              this.onInitStarSystem.notifyObservers();
-          });
+            .initPostProcesses()
+            .then(() => {
+                this.scene.getEngine().loadingScreen.hideLoadingUI();
+                this.onInitStarSystem.notifyObservers();
+            });
     }
 
     async initAssets() {
@@ -332,7 +331,7 @@ export class StarSystemView {
 
     unZoom(callback: () => void) {
         const activeControls = this.scene.getActiveController();
-        if(activeControls != this.getSpaceshipControls()) {
+        if (activeControls != this.getSpaceshipControls()) {
             callback();
             return;
         }

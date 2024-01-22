@@ -67,13 +67,13 @@ export class BodyEditor {
     private readonly panels: EditorPanel[];
 
     constructor(visibility: EditorVisibility = EditorVisibility.FULL) {
-        if(document.querySelector("#editorPanelContainer") !== null) {
+        if (document.querySelector("#editorPanelContainer") !== null) {
             document.querySelector("#editorPanelContainer")?.remove();
         }
-        if(document.querySelector("#toolbar") !== null) {
+        if (document.querySelector("#toolbar") !== null) {
             document.querySelector("#toolbar")?.remove();
         }
-        if(document.querySelector("#navBar") !== null) {
+        if (document.querySelector("#navBar") !== null) {
             document.querySelector("#navBar")?.remove();
         }
 

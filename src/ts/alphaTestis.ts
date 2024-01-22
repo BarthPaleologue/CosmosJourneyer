@@ -29,7 +29,7 @@ import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
 import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
-import { StarSystemHelper } from "./starSystem/starSystemHelper"
+import { StarSystemHelper } from "./starSystem/starSystemHelper";
 import { StarModel } from "./stellarObjects/star/starModel";
 import { RingsUniforms } from "./postProcesses/rings/ringsUniform";
 import { getMoonSeed } from "./planets/common";
@@ -154,50 +154,50 @@ spaceshipController.toggleWarpDrive();
 
 const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
 if (aresAtmosphere) {
-  aresAtmosphere.atmosphereUniforms.redWaveLength = 500;
-  aresAtmosphere.atmosphereUniforms.greenWaveLength = 680;
-  aresAtmosphere.atmosphereUniforms.blueWaveLength = 670;
+    aresAtmosphere.atmosphereUniforms.redWaveLength = 500;
+    aresAtmosphere.atmosphereUniforms.greenWaveLength = 680;
+    aresAtmosphere.atmosphereUniforms.blueWaveLength = 670;
 } else {
-  console.warn("No atmosphere found for Ares");
+    console.warn("No atmosphere found for Ares");
 }
 
 document.addEventListener("keydown", (e) => {
-  if (engine.isPaused()) return;
+    if (engine.isPaused()) return;
 
-  if (e.key === "x") {
-    let nbVertices = 0;
-    let nbInstances = 0;
-    planet.sides.forEach((side) => {
-      side.executeOnEveryChunk((chunk) => {
-        nbVertices += Settings.VERTEX_RESOLUTION * Settings.VERTEX_RESOLUTION;
-        chunk.instancePatches.forEach((patch) => {
-          nbInstances += patch.getNbInstances();
+    if (e.key === "x") {
+        let nbVertices = 0;
+        let nbInstances = 0;
+        planet.sides.forEach((side) => {
+            side.executeOnEveryChunk((chunk) => {
+                nbVertices += Settings.VERTEX_RESOLUTION * Settings.VERTEX_RESOLUTION;
+                chunk.instancePatches.forEach((patch) => {
+                    nbInstances += patch.getNbInstances();
+                });
+            });
         });
-      });
-    });
-    console.log("Vertices", nbVertices, "Instances", nbInstances);
-  }
-
-  if (e.key === "y") {
-    if (starSystemView.scene.getActiveController() === spaceshipController) {
-      console.log("disembark");
-
-      characterController.getTransform().setEnabled(true);
-      characterController.getTransform().setAbsolutePosition(spaceshipController.getTransform().absolutePosition);
-      translate(characterController.getTransform(), getForwardDirection(spaceshipController.getTransform()).scale(10));
-
-      setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
-
-      starSystemView.scene.setActiveController(characterController);
-      starSystemView.getStarSystem().postProcessManager.rebuild();
-    } else if (starSystemView.scene.getActiveController() === characterController) {
-      console.log("embark");
-
-      characterController.getTransform().setEnabled(false);
-      starSystemView.scene.setActiveController(spaceshipController);
-      starSystemView.getStarSystem().postProcessManager.rebuild();
+        console.log("Vertices", nbVertices, "Instances", nbInstances);
     }
-  }
+
+    if (e.key === "y") {
+        if (starSystemView.scene.getActiveController() === spaceshipController) {
+            console.log("disembark");
+
+            characterController.getTransform().setEnabled(true);
+            characterController.getTransform().setAbsolutePosition(spaceshipController.getTransform().absolutePosition);
+            translate(characterController.getTransform(), getForwardDirection(spaceshipController.getTransform()).scale(10));
+
+            setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
+
+            starSystemView.scene.setActiveController(characterController);
+            starSystemView.getStarSystem().postProcessManager.rebuild();
+        } else if (starSystemView.scene.getActiveController() === characterController) {
+            console.log("embark");
+
+            characterController.getTransform().setEnabled(false);
+            starSystemView.scene.setActiveController(spaceshipController);
+            starSystemView.getStarSystem().postProcessManager.rebuild();
+        }
+    }
 });
 
 starSystemView.ui.setEnabled(true);
