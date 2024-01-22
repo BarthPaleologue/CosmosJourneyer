@@ -63,7 +63,7 @@ export class StarSystemHelper {
      */
     public static makeBlackHole(starsystem: StarSystemController, model: number | BlackHoleModel = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): BlackHole {
         const name = starName(starsystem.model.getName(), starsystem.stellarObjects.length);
-        const blackHole = new BlackHole(name, starsystem.scene, model, starsystem.stellarObjects[0]);
+        const blackHole = new BlackHole(name, starsystem.scene, model, starsystem.stellarObjects.length > 0 ? starsystem.stellarObjects[0] : null);
         starsystem.addStellarObject(blackHole);
         return blackHole;
     }
