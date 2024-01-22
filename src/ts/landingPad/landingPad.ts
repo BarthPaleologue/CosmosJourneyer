@@ -1,5 +1,4 @@
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Transformable } from "../uberCore/transforms/basicTransform";
 import { Assets } from "../assets";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
@@ -8,6 +7,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { CollisionMask } from "../settings";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Transformable } from "../architecture/transformable";
 
 export class LandingPad implements Transformable {
     readonly instanceRoot: TransformNode;
@@ -38,5 +38,10 @@ export class LandingPad implements Transformable {
 
     getTransform(): TransformNode {
         return this.aggregate.transformNode;
+    }
+
+    dispose() {
+        this.aggregate.dispose();
+        this.instanceRoot.dispose();
     }
 }

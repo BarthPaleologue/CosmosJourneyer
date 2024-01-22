@@ -39,7 +39,6 @@ import { SaveFileData } from "./saveFile/saveFileData";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
-import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { ShipControls } from "./spaceship/shipControls";
 
 enum EngineState {
@@ -146,7 +145,7 @@ export class CosmosJourneyer {
 
             const activeControls = this.getStarSystemView().scene.getActiveController();
             if (activeControls instanceof ShipControls) {
-                activeControls.enableWarpDrive();
+                activeControls.spaceship.enableWarpDrive();
                 activeControls.thirdPersonCamera.radius = 30;
             }
         });
@@ -159,7 +158,7 @@ export class CosmosJourneyer {
         this.mainMenu.onStartObservable.add(() => {
             this.getStarMap().setCurrentStarSystem(this.getStarSystemView().getStarSystem().model.seed);
             this.getStarSystemView().switchToSpaceshipControls();
-            this.getStarSystemView().getSpaceshipControls().enableWarpDrive();
+            this.getStarSystemView().getSpaceshipControls().spaceship.enableWarpDrive();
             this.getStarSystemView().showUI();
             this.getStarSystemView().ui.setEnabled(true);
         });

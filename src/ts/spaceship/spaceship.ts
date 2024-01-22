@@ -12,12 +12,13 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
-import { getForwardDirection, getUpwardDirection, rotate, Transformable, translate } from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getUpwardDirection, rotate, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Assets } from "../assets";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { CollisionMask } from "../settings";
+import { Transformable } from "../architecture/transformable";
 
 enum ShipState {
     FLYING,
@@ -25,7 +26,7 @@ enum ShipState {
     LANDED
 }
 
-export class Spaceship {
+export class Spaceship implements Transformable {
     readonly instanceRoot: AbstractMesh;
 
     readonly aggregate: PhysicsAggregate;
@@ -181,7 +182,7 @@ export class Spaceship {
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
         this.state = ShipState.LANDING;
         this.landingTarget = landingTarget !== null ? landingTarget : this.closestWalkableObject;
-        if(this.landingTarget === null) {
+        if (this.landingTarget === null) {
             throw new Error("Landing target is null");
         }
         console.log("landing on", this.landingTarget.getTransform().name);
@@ -243,7 +244,7 @@ export class Spaceship {
                 const currentUp = getUpwardDirection(this.getTransform());
                 const targetUp = landingSpotNormal;
                 let theta = 0.0;
-                if(Vector3.Distance(currentUp, targetUp) > 0.01) {
+                if (Vector3.Distance(currentUp, targetUp) > 0.01) {
                     const axis = Vector3.Cross(currentUp, targetUp);
                     theta = Math.acos(Vector3.Dot(currentUp, targetUp));
                     rotate(this.getTransform(), axis, Math.min(0.4 * deltaTime, theta));
@@ -254,5 +255,10 @@ export class Spaceship {
                 }
             }
         }
+    }
+
+    public dispose() {
+        this.aggregate.dispose();
+        this.instanceRoot.dispose();
     }
 }
