@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import projectInfo from "../../package.json";
-import { Assets } from "./assets";
+
 import { StarSystemController } from "./starSystem/starSystemController";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Tools } from "@babylonjs/core/Misc/tools";
