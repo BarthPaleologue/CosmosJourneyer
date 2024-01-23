@@ -43,6 +43,7 @@ export class WarpTunnel implements Transformable {
         const SPS = new SolidParticleSystem("SPS", scene);
         const poly = MeshBuilder.CreatePolyhedron("p", { type: 1 });
         SPS.addShape(poly, WarpTunnel.MAX_NB_PARTICLES);
+        poly.setEnabled(false);
         poly.dispose(); //dispose of original model poly
 
         SPS.buildMesh(); // finally builds and displays the SPS mesh
@@ -53,7 +54,7 @@ export class WarpTunnel implements Transformable {
         const direction = Vector3.Zero();
         const v0 = Vector3.Zero();
         const v1 = Vector3.Zero();
-        const scaling = new Vector3(0.05, 0.05, 3);
+        const scaling = new Vector3(0.1, 0.1, 4);
         const rotationQuaternion = this.anchor.absoluteRotationQuaternion;
         const spaceshipForward = getForwardDirection(this.parent);
         const spaceshipDisplacement = Vector3.Zero();
@@ -77,18 +78,33 @@ export class WarpTunnel implements Transformable {
             const r = 30 + (Math.random() - 0.5) * 10;
             const theta = Math.random() * 2 * Math.PI;
 
-            const position = Vector3.Zero();
-            position.addInPlace(v0.scale(r * Math.cos(theta)));
-            position.addInPlace(v1.scale(r * Math.sin(theta)));
-
-            particle.position.copyFrom(position);
+            particle.position.setAll(0);
+            particle.position.addInPlace(v0.scale(r * Math.cos(theta)));
+            particle.position.addInPlace(v1.scale(r * Math.sin(theta)));
+            particle.position.addInPlace(direction.scale(Math.random() * 10));
             particle.position.addInPlace(this.anchor.getAbsolutePosition());
 
-            particle.velocity.copyFrom(direction.scale(2));
+            particle.velocity.copyFrom(direction.scale(200));
 
             particle.rotationQuaternion = rotationQuaternion;
 
             particle.scaling = scaling;
+        }
+
+        const recycle = (particle: SolidParticle) => {
+            particle.color = new Color4(1,1,0, 1);
+            particle.scaling = Vector3.Zero();
+            this.recycledParticles.push(particle);
+            particle.alive = false;
+        }
+
+        const instanceFromStock = () => {
+            const particle = this.recycledParticles.shift();
+            if(particle === undefined) {
+                throw new Error("particle is undefined");
+            }
+            particle.alive = true;
+            initParticle(particle);
         }
 
         // initiate particles function
@@ -98,8 +114,7 @@ export class WarpTunnel implements Transformable {
 
                 initParticle(particle);
                 if(this.nbParticlesAlive >= this.targetNbParticles) {
-                    particle.alive = false;
-                    this.recycledParticles.push(particle);
+                    recycle(particle);
                 } else {
                     this.nbParticlesAlive++;
                 }
@@ -119,7 +134,7 @@ export class WarpTunnel implements Transformable {
         SPS.updateParticle = (particle) => {
             if(!particle.alive) return particle;
 
-            particle.position.addInPlace(particle.velocity.scale(2));
+            particle.position.addInPlace(particle.velocity.scale(scene.getEngine().getDeltaTime() / 1000));
             particle.position.addInPlace(spaceshipDisplacement);
 
             const relativePosition = particle.position.subtract(this.parent.position);
@@ -129,8 +144,7 @@ export class WarpTunnel implements Transformable {
                 if(this.nbParticlesAlive <= this.targetNbParticles) {
                     initParticle(particle);
                 } else {
-                    this.recycledParticles.push(particle);
-                    particle.alive = false;
+                    recycle(particle);
                     this.nbParticlesAlive--;
 
                     return particle;
@@ -151,7 +165,6 @@ export class WarpTunnel implements Transformable {
         }
 
         const oldShipPosition = Vector3.Zero();
-        let clock = 0;
         scene.onBeforeRenderObservable.add(() => {
             const newShipPosition = this.parent.getAbsolutePosition().clone();
 
@@ -161,25 +174,24 @@ export class WarpTunnel implements Transformable {
 
             spaceshipForward.copyFrom(getForwardDirection(parent));
 
-            clock += scene.getEngine().getDeltaTime() / 1000;
-            
             updateGlobals();
 
             if(this.nbParticlesAlive < this.targetNbParticles) {
-                const nbNewParticles = Math.min(10, Math.min(this.recycledParticles.length, this.targetNbParticles - this.nbParticlesAlive));
+                const nbNewParticles = Math.min(1, Math.min(this.recycledParticles.length, this.targetNbParticles - this.nbParticlesAlive));
 
                 for(let i = 0; i < nbNewParticles; i++) {
-                    const particle = this.recycledParticles.shift();
-                    if(particle === undefined) {
-                        throw new Error("particle is undefined");
-                    }
-                    particle.alive = true;
-                    initParticle(particle);
+                    instanceFromStock();
                     this.nbParticlesAlive++;
                 }
             }
 
-            SPS.setParticles();
+            if(this.nbParticlesAlive === 0 && SPS.mesh.isEnabled()) {
+                SPS.mesh.setEnabled(false);
+            } else if(this.nbParticlesAlive > 0 && !SPS.mesh.isEnabled()) {
+                SPS.mesh.setEnabled(true);
+            }
+
+            if(this.nbParticlesAlive > 0) SPS.setParticles();
         });
     }
 
