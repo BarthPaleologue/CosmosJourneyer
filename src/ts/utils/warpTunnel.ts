@@ -92,8 +92,6 @@ export class WarpTunnel implements Transformable {
         }
 
         const recycle = (particle: SolidParticle) => {
-            particle.color = new Color4(1,1,0, 1);
-            particle.scaling = Vector3.Zero();
             this.recycledParticles.push(particle);
             particle.alive = false;
         }
@@ -156,9 +154,11 @@ export class WarpTunnel implements Transformable {
             if(progression < 0.5) {
                 const t = progression / 0.5;
                 particle.color = Color4.Lerp(new Color4(0,0,1, 1), new Color4(0,1,1, 1), t);
+                particle.scaling = Vector3.Lerp(Vector3.Zero(), scaling, Math.min(t * 2, 1));
             } else {
                 const t = (progression - 0.5) / 0.5;
                 particle.color = Color4.Lerp(new Color4(0,1,1, 1), new Color4(1,0,1, 1), t);
+                particle.scaling = Vector3.Lerp(scaling, Vector3.Zero(), t*t);
             }
 
             return particle;
