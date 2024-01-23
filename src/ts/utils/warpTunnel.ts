@@ -1,91 +1,190 @@
 import { Scene } from "@babylonjs/core/scene";
-import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Assets } from "../assets";
 import { Transformable } from "../architecture/transformable";
-import { ParticleSystem } from "@babylonjs/core/Particles/particleSystem";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Nullable } from "@babylonjs/core";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
+import { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSystem";
+import { Scalar } from "@babylonjs/core/Maths/math.scalar";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { getForwardDirection } from "../uberCore/transforms/basicTransform";
 
 /**
- * @see https://playground.babylonjs.com/#EAZYXZ#83
+ * @see https://playground.babylonjs.com/#GLZ1PX#1241 (SPS)
+ * @see https://playground.babylonjs.com/#EAZYXZ#83 (Particle system)
  * @see https://playground.babylonjs.com/#W9LE0U#28
  */
 export class WarpTunnel implements Transformable {
     readonly anchor: TransformNode;
-    readonly particleSystem: ParticleSystem;
+    readonly parent: TransformNode;
 
-    static MAX_EMIT_RATE = 500;
+    readonly solidParticleSystem: SolidParticleSystem;
 
-    constructor(direction: Vector3, scene: Scene) {
+    static TUNNEL_LENGTH = 300;
+
+    static MAX_NB_PARTICLES = 3000;
+
+    private nbParticlesAlive = 0;
+    private targetNbParticles = 0;
+
+    private recycledParticles: SolidParticle[] = [];
+
+    constructor(parent: TransformNode, scene: Scene) {
         this.anchor = new TransformNode("anchor", scene);
-        this.anchor.position = new Vector3(0, 0, 300);
-        this.anchor.rotation.x = -Math.PI / 2;
+        this.anchor.position = new Vector3(0, 0, WarpTunnel.TUNNEL_LENGTH);
+        this.anchor.rotationQuaternion = Quaternion.Identity();
+        this.anchor.computeWorldMatrix(true);
 
-        const ps = new ParticleSystem("WarpSpeed", 10_000, scene);
-        ps.particleTexture = Assets.FlareTexture;
-        ps.minLifeTime = 2;
-        ps.maxLifeTime = 2;
-        ps.blendMode = ParticleSystem.BLENDMODE_ADD;
-        ps.forceDepthWrite = true;
-        ps.minEmitPower = 200;
-        ps.maxEmitPower = 200;
-        ps.updateSpeed = 1 / 60;
-        ps.emitRate = 0;
-        ps.billboardMode = ParticleSystem.BILLBOARDMODE_STRETCHED;
-        ps.minSize = 0.5;
-        ps.maxSize = 0.5;
-        ps.minScaleY = ps.maxScaleY = 10;
+        this.anchor.parent = parent;
+        this.parent = parent;
 
-        ps.addColorGradient(0, new Color4(0, 0, 1, 0));
-        ps.addColorGradient(0.5, new Color4(0, 1, 1, 1));
-        ps.addColorGradient(1, new Color4(1, 0, 1, 0));
+        const SPS = new SolidParticleSystem("SPS", scene);
+        const poly = MeshBuilder.CreatePolyhedron("p", { type: 1 });
+        SPS.addShape(poly, WarpTunnel.MAX_NB_PARTICLES);
+        poly.dispose(); //dispose of original model poly
 
-        ps.emitter = this.anchor as AbstractMesh;
-        ps.start();
+        SPS.buildMesh(); // finally builds and displays the SPS mesh
+        SPS.isAlwaysVisible = true;
 
-        ps.startPositionFunction = (worldMatrix, positionToUpdate, particle) => {
-            const theta = Math.random() * Math.PI * 2;
-            const r = 25 + (Math.random() - 0.5) * 2 * 10;
+        this.solidParticleSystem = SPS;
 
-            const x = Math.cos(theta) * r;
-            const y = Math.random() * 2;
-            const z = Math.sin(theta) * r;
+        const direction = Vector3.Zero();
+        const v0 = Vector3.Zero();
+        const v1 = Vector3.Zero();
+        const scaling = new Vector3(0.05, 0.05, 3);
+        const rotationQuaternion = this.anchor.absoluteRotationQuaternion;
+        const spaceshipForward = getForwardDirection(this.parent);
+        const spaceshipDisplacement = Vector3.Zero();
 
-            Vector3.TransformCoordinatesFromFloatsToRef(x, y, z, worldMatrix, positionToUpdate);
-        };
+        const updateGlobals = () => {
+            direction.copyFrom(this.parent.getAbsolutePosition().subtract(this.anchor.getAbsolutePosition()).normalize());
 
-        ps.startDirectionFunction = (worldMatrix, directionToUpdate, particle) => {
-            const parent = this.getTransform().parent as Nullable<TransformNode>;
-            if (parent === null) throw new Error("WarpTunnel anchor has no parent");
-            const direction = parent.getAbsolutePosition().subtract(this.anchor.getAbsolutePosition()).normalize();
-            directionToUpdate.copyFrom(direction);
-        };
+            v0.copyFrom(direction.add(new Vector3(Math.random(), Math.random(), Math.random())));
+            v0.subtractInPlace(direction.scale(v0.dot(direction)));
+            v0.normalize();
 
-        const lastParentPosition = Vector3.Zero();
+            v1.copyFrom(Vector3.Cross(direction, v0));
+            v1.normalize();
 
-        scene.onBeforeParticlesRenderingObservable.add(() => {
-            const parent = this.getTransform().parent as Nullable<TransformNode>;
-            if (parent === null) throw new Error("WarpTunnel anchor has no parent");
+            rotationQuaternion.copyFrom(this.anchor.absoluteRotationQuaternion);
+        }
 
-            const newParentPosition = parent.getAbsolutePosition().clone();
-            const parentDisplacement = newParentPosition.subtract(lastParentPosition);
+        updateGlobals();
 
-            if(parentDisplacement.length() > 0) {
-                console.log(parentDisplacement.length());
+        const initParticle = (particle: SolidParticle) => {
+            const r = 30 + (Math.random() - 0.5) * 10;
+            const theta = Math.random() * 2 * Math.PI;
+
+            const position = Vector3.Zero();
+            position.addInPlace(v0.scale(r * Math.cos(theta)));
+            position.addInPlace(v1.scale(r * Math.sin(theta)));
+
+            particle.position.copyFrom(position);
+            particle.position.addInPlace(this.anchor.getAbsolutePosition());
+
+            particle.velocity.copyFrom(direction.scale(2));
+
+            particle.rotationQuaternion = rotationQuaternion;
+
+            particle.scaling = scaling;
+        }
+
+        // initiate particles function
+        SPS.initParticles = () => {
+            for (let p = 0; p < SPS.nbParticles; p++) {
+                const particle = SPS.particles[p];
+
+                initParticle(particle);
+                if(this.nbParticlesAlive >= this.targetNbParticles) {
+                    particle.alive = false;
+                    this.recycledParticles.push(particle);
+                } else {
+                    this.nbParticlesAlive++;
+                }
+                particle.position.z = Scalar.RandomRange(-WarpTunnel.TUNNEL_LENGTH / 2, WarpTunnel.TUNNEL_LENGTH);
             }
-            ps.particles.forEach(particle => {
-                particle.position.addInPlace(parentDisplacement);
-            });
-            lastParentPosition.copyFrom(newParentPosition);
-        });
+        };
 
-        this.particleSystem = ps;
+        //Update SPS mesh
+        SPS.initParticles();
+        SPS.setParticles();
+
+        const mat = new StandardMaterial("mat", scene);
+        mat.emissiveColor = new Color3(1, 1,1);
+        mat.disableLighting = true;
+        SPS.mesh.material = mat;
+
+        SPS.updateParticle = (particle) => {
+            if(!particle.alive) return particle;
+
+            particle.position.addInPlace(particle.velocity.scale(2));
+            particle.position.addInPlace(spaceshipDisplacement);
+
+            const relativePosition = particle.position.subtract(this.parent.position);
+            const localZ = relativePosition.dot(spaceshipForward);
+
+            if(localZ < -WarpTunnel.TUNNEL_LENGTH / 2 || relativePosition.length() > WarpTunnel.TUNNEL_LENGTH) {
+                if(this.nbParticlesAlive <= this.targetNbParticles) {
+                    initParticle(particle);
+                } else {
+                    this.recycledParticles.push(particle);
+                    particle.alive = false;
+                    this.nbParticlesAlive--;
+
+                    return particle;
+                }
+            }
+
+            const progression = 1.0 - Scalar.RangeToPercent(localZ, -WarpTunnel.TUNNEL_LENGTH / 2, WarpTunnel.TUNNEL_LENGTH);
+
+            if(progression < 0.5) {
+                const t = progression / 0.5;
+                particle.color = Color4.Lerp(new Color4(0,0,1, 1), new Color4(0,1,1, 1), t);
+            } else {
+                const t = (progression - 0.5) / 0.5;
+                particle.color = Color4.Lerp(new Color4(0,1,1, 1), new Color4(1,0,1, 1), t);
+            }
+
+            return particle;
+        }
+
+        const oldShipPosition = Vector3.Zero();
+        let clock = 0;
+        scene.onBeforeRenderObservable.add(() => {
+            const newShipPosition = this.parent.getAbsolutePosition().clone();
+
+            spaceshipDisplacement.copyFrom(newShipPosition.subtract(oldShipPosition));
+
+            oldShipPosition.copyFrom(newShipPosition);
+
+            spaceshipForward.copyFrom(getForwardDirection(parent));
+
+            clock += scene.getEngine().getDeltaTime() / 1000;
+            
+            updateGlobals();
+
+            if(this.nbParticlesAlive < this.targetNbParticles) {
+                const nbNewParticles = Math.min(10, Math.min(this.recycledParticles.length, this.targetNbParticles - this.nbParticlesAlive));
+
+                for(let i = 0; i < nbNewParticles; i++) {
+                    const particle = this.recycledParticles.shift();
+                    if(particle === undefined) {
+                        throw new Error("particle is undefined");
+                    }
+                    particle.alive = true;
+                    initParticle(particle);
+                    this.nbParticlesAlive++;
+                }
+            }
+
+            SPS.setParticles();
+        });
     }
 
     setThrottle(throttle: number) {
-        this.particleSystem.emitRate = throttle * WarpTunnel.MAX_EMIT_RATE;
+        this.targetNbParticles = Math.floor(throttle * WarpTunnel.MAX_NB_PARTICLES);
     }
 
     getTransform(): TransformNode {
@@ -93,7 +192,7 @@ export class WarpTunnel implements Transformable {
     }
 
     dispose() {
-        this.particleSystem.dispose();
+        this.solidParticleSystem.dispose();
         this.anchor.dispose();
     }
 }

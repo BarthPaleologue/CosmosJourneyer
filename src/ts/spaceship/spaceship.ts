@@ -95,8 +95,7 @@ export class Spaceship implements Transformable {
             }
         }
 
-        this.warpTunnel = new WarpTunnel(new Vector3(0, 0, 1), scene);
-        this.warpTunnel.getTransform().parent = this.getTransform();
+        this.warpTunnel = new WarpTunnel(this.getTransform(), scene);
 
         this.scene = scene;
     }
