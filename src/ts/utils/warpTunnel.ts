@@ -91,9 +91,11 @@ export class WarpTunnel implements Transformable {
             particle.scaling = scaling;
         };
 
-        const recycle = (particle: SolidParticle) => {
+        SPS.recycleParticle = (particle: SolidParticle) => {
             this.recycledParticles.push(particle);
             particle.alive = false;
+
+            return particle;
         };
 
         const instanceFromStock = () => {
@@ -112,7 +114,7 @@ export class WarpTunnel implements Transformable {
 
                 initParticle(particle);
                 if (this.nbParticlesAlive >= this.targetNbParticles) {
-                    recycle(particle);
+                    SPS.recycleParticle(particle);
                 } else {
                     this.nbParticlesAlive++;
                 }
@@ -142,7 +144,7 @@ export class WarpTunnel implements Transformable {
                 if (this.nbParticlesAlive <= this.targetNbParticles) {
                     initParticle(particle);
                 } else {
-                    recycle(particle);
+                    SPS.recycleParticle(particle);
                     this.nbParticlesAlive--;
 
                     return particle;
