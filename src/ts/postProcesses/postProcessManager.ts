@@ -169,7 +169,7 @@ export class PostProcessManager {
         });
 
         this.bloomRenderEffect = new BloomEffect(scene, 1.0, 1.0, 32);
-        this.bloomRenderEffect.threshold = 0.7;
+        this.bloomRenderEffect.threshold = 0.6;
     }
 
     /**
