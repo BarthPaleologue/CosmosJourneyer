@@ -19,6 +19,7 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { CollisionMask } from "../settings";
 import { Transformable } from "../architecture/transformable";
+import { WarpTunnel } from "../utils/warpTunnel";
 
 enum ShipState {
     FLYING,
@@ -50,6 +51,8 @@ export class Spaceship implements Transformable {
         distance: Infinity,
         radius: 1
     };
+
+    private readonly warpTunnel: WarpTunnel;
 
     private readonly scene: Scene;
 
@@ -91,6 +94,8 @@ export class Spaceship implements Transformable {
                 this.addRCSThruster(child);
             }
         }
+
+        this.warpTunnel = new WarpTunnel(this.getTransform(), scene);
 
         this.scene = scene;
     }
@@ -200,6 +205,10 @@ export class Spaceship implements Transformable {
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
         this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
+
+        // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
+        if(this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-6 * this.warpDrive.getWarpSpeed())));
+        else this.warpTunnel.setThrottle(0);
 
         for (const thruster of this.mainThrusters) thruster.update();
         for (const thruster of this.rcsThrusters) thruster.update();

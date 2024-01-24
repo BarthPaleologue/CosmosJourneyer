@@ -25,7 +25,6 @@ const engine = new CosmosJourneyer();
 await engine.setup();
 
 const starSystemView = engine.getStarSystemView();
-
 engine.init();
 
 const shipControls = starSystemView.getSpaceshipControls();
