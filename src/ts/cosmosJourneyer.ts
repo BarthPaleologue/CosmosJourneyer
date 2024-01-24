@@ -87,7 +87,7 @@ export class CosmosJourneyer {
         this.canvas.height = window.innerHeight;
 
         window.addEventListener("blur", () => {
-            if (!this.isPaused() && this.activeScene !== this.mainMenu?.scene) this.pause();
+            if (!this.mainMenu?.isVisible()) this.pause();
         });
 
         window.addEventListener("mouseleave", () => {
@@ -169,8 +169,8 @@ export class CosmosJourneyer {
             this.loadSaveData(saveData);
         });
 
-        // Starmap is the active scene by default
-        this.activeScene = this.mainMenu.scene;
+        // Init the active scene
+        this.activeScene = this.starSystemView.scene;
     }
 
     public pause(): void {
