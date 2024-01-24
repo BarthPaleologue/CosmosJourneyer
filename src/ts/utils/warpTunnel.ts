@@ -93,7 +93,7 @@ export class WarpTunnel implements Transformable {
 
         SPS.recycleParticle = (particle: SolidParticle) => {
             this.recycledParticles.push(particle);
-            particle.alive = false;
+            particle.isVisible = false;
 
             return particle;
         };
@@ -103,7 +103,7 @@ export class WarpTunnel implements Transformable {
             if (particle === undefined) {
                 throw new Error("particle is undefined");
             }
-            particle.alive = true;
+            particle.isVisible = true;
             initParticle(particle);
         };
 
@@ -132,7 +132,7 @@ export class WarpTunnel implements Transformable {
         SPS.mesh.material = mat;
 
         SPS.updateParticle = (particle) => {
-            if (!particle.alive) return particle;
+            if (!particle.isVisible) return particle;
 
             particle.position.addInPlace(particle.velocity.scale(scene.getEngine().getDeltaTime() / 1000));
             particle.position.addInPlace(spaceshipDisplacement);
