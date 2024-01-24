@@ -70,7 +70,7 @@ export class WarpTunnel implements Transformable {
             v1.normalize();
 
             rotationQuaternion.copyFrom(this.anchor.absoluteRotationQuaternion);
-        }
+        };
 
         updateGlobals();
 
@@ -89,21 +89,21 @@ export class WarpTunnel implements Transformable {
             particle.rotationQuaternion = rotationQuaternion;
 
             particle.scaling = scaling;
-        }
+        };
 
         const recycle = (particle: SolidParticle) => {
             this.recycledParticles.push(particle);
             particle.alive = false;
-        }
+        };
 
         const instanceFromStock = () => {
             const particle = this.recycledParticles.shift();
-            if(particle === undefined) {
+            if (particle === undefined) {
                 throw new Error("particle is undefined");
             }
             particle.alive = true;
             initParticle(particle);
-        }
+        };
 
         // initiate particles function
         SPS.initParticles = () => {
@@ -111,7 +111,7 @@ export class WarpTunnel implements Transformable {
                 const particle = SPS.particles[p];
 
                 initParticle(particle);
-                if(this.nbParticlesAlive >= this.targetNbParticles) {
+                if (this.nbParticlesAlive >= this.targetNbParticles) {
                     recycle(particle);
                 } else {
                     this.nbParticlesAlive++;
@@ -125,12 +125,12 @@ export class WarpTunnel implements Transformable {
         SPS.setParticles();
 
         const mat = new StandardMaterial("mat", scene);
-        mat.emissiveColor = new Color3(1, 1,1);
+        mat.emissiveColor = new Color3(1, 1, 1);
         mat.disableLighting = true;
         SPS.mesh.material = mat;
 
         SPS.updateParticle = (particle) => {
-            if(!particle.alive) return particle;
+            if (!particle.alive) return particle;
 
             particle.position.addInPlace(particle.velocity.scale(scene.getEngine().getDeltaTime() / 1000));
             particle.position.addInPlace(spaceshipDisplacement);
@@ -138,8 +138,8 @@ export class WarpTunnel implements Transformable {
             const relativePosition = particle.position.subtract(this.parent.position);
             const localZ = relativePosition.dot(spaceshipForward);
 
-            if(localZ < -WarpTunnel.TUNNEL_LENGTH / 2 || relativePosition.length() > WarpTunnel.TUNNEL_LENGTH) {
-                if(this.nbParticlesAlive <= this.targetNbParticles) {
+            if (localZ < -WarpTunnel.TUNNEL_LENGTH / 2 || relativePosition.length() > WarpTunnel.TUNNEL_LENGTH) {
+                if (this.nbParticlesAlive <= this.targetNbParticles) {
                     initParticle(particle);
                 } else {
                     recycle(particle);
@@ -151,18 +151,18 @@ export class WarpTunnel implements Transformable {
 
             const progression = 1.0 - Scalar.RangeToPercent(localZ, -WarpTunnel.TUNNEL_LENGTH / 2, WarpTunnel.TUNNEL_LENGTH);
 
-            if(progression < 0.5) {
+            if (progression < 0.5) {
                 const t = progression / 0.5;
-                particle.color = Color4.Lerp(new Color4(0,0,1, 1), new Color4(0,1,1, 1), t);
+                particle.color = Color4.Lerp(new Color4(0, 0, 1, 1), new Color4(0, 1, 1, 1), t);
                 particle.scaling = Vector3.Lerp(Vector3.Zero(), scaling, Math.min(t * 2, 1));
             } else {
                 const t = (progression - 0.5) / 0.5;
-                particle.color = Color4.Lerp(new Color4(0,1,1, 1), new Color4(1,0,1, 1), t);
-                particle.scaling = Vector3.Lerp(scaling, Vector3.Zero(), t*t);
+                particle.color = Color4.Lerp(new Color4(0, 1, 1, 1), new Color4(1, 0, 1, 1), t);
+                particle.scaling = Vector3.Lerp(scaling, Vector3.Zero(), t * t);
             }
 
             return particle;
-        }
+        };
 
         const oldShipPosition = Vector3.Zero();
         scene.onBeforeRenderObservable.add(() => {
@@ -176,22 +176,18 @@ export class WarpTunnel implements Transformable {
 
             updateGlobals();
 
-            if(this.nbParticlesAlive < this.targetNbParticles) {
-                const nbNewParticles = Math.min(1, Math.min(this.recycledParticles.length, this.targetNbParticles - this.nbParticlesAlive));
-
-                for(let i = 0; i < nbNewParticles; i++) {
-                    instanceFromStock();
-                    this.nbParticlesAlive++;
-                }
+            if (this.nbParticlesAlive < this.targetNbParticles && this.recycledParticles.length > 0) {
+                instanceFromStock();
+                this.nbParticlesAlive++;
             }
 
-            if(this.nbParticlesAlive === 0 && SPS.mesh.isEnabled()) {
+            if (this.nbParticlesAlive === 0 && SPS.mesh.isEnabled()) {
                 SPS.mesh.setEnabled(false);
-            } else if(this.nbParticlesAlive > 0 && !SPS.mesh.isEnabled()) {
+            } else if (this.nbParticlesAlive > 0 && !SPS.mesh.isEnabled()) {
                 SPS.mesh.setEnabled(true);
             }
 
-            if(this.nbParticlesAlive > 0) SPS.setParticles();
+            if (this.nbParticlesAlive > 0) SPS.setParticles();
         });
     }
 
