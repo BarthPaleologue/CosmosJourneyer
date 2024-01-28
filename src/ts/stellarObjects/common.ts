@@ -29,7 +29,7 @@ export enum STELLAR_TYPE {
     /** 3,500 - 5,000 K */
     K,
     /** 2,700 - 3,500 K */
-    M,
+    M
 }
 
 export function getStellarTypeString(type: STELLAR_TYPE): string {

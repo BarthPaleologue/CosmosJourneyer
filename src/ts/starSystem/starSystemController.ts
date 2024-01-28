@@ -298,7 +298,8 @@ export class StarSystemController {
                         this.postProcessManager.addOcean(object as TelluricPlanet, this.stellarObjects);
                         break;
                     case PostProcessType.VOLUMETRIC_LIGHT:
-                        if (!(object instanceof Star) && !(object instanceof NeutronStar)) throw new Error("Volumetric light post process can only be added to stars and neutron stars. Source:" + object.name);
+                        if (!(object instanceof Star) && !(object instanceof NeutronStar))
+                            throw new Error("Volumetric light post process can only be added to stars and neutron stars. Source:" + object.name);
                         this.postProcessManager.addVolumetricLight(object);
                         break;
                     case PostProcessType.MANDELBULB:

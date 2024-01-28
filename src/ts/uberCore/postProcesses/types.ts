@@ -67,7 +67,7 @@ export enum UniformEnumType {
     /**
      * An array of Color3. Shader code: vec3[]
      */
-    Color3Array,
+    Color3Array
 }
 
 export enum SamplerEnumType {

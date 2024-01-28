@@ -83,6 +83,5 @@ export class NeutronStarModel implements StellarObjectModel {
         } else {
             this.ringsUniforms = null;
         }
-
     }
 }

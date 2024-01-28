@@ -115,7 +115,6 @@ export class NeutronStar implements StellarObject, Cullable {
         return "Neutron Star";
     }
 
-
     getRotationAxis(): Vector3 {
         return this.getTransform().up;
     }

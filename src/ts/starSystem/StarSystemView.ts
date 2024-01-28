@@ -161,8 +161,8 @@ export class StarSystemView {
 
         const activeController = this.scene.getActiveController();
         let controllerDistanceFactor = 5;
-        if(firstBody instanceof BlackHole) controllerDistanceFactor = 7;
-        else if(firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
+        if (firstBody instanceof BlackHole) controllerDistanceFactor = 7;
+        else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
         positionNearObjectBrightSide(activeController, firstBody, this.getStarSystem(), controllerDistanceFactor);
 
         this.getStarSystem()

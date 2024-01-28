@@ -18,13 +18,7 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";
-import {
-    getForwardDirection,
-    getUpwardDirection,
-    pitch,
-    roll,
-    translate
-} from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getUpwardDirection, pitch, roll, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
 import { Input, InputType } from "../inputs/input";

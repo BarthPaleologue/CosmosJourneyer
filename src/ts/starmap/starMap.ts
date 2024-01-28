@@ -384,7 +384,7 @@ export class StarMap {
             default:
                 throw new Error("Unknown stellar object type!");
         }
-        if(starModel === null) throw new Error("Star model is null!");
+        if (starModel === null) throw new Error("Star model is null!");
 
         let instance: InstancedMesh | null = null;
         let recycled = false;
@@ -447,11 +447,11 @@ export class StarMap {
                     text += `Distance: ${distance.toFixed(2)}ly\n`;
                 }
 
-                if(starModel === null) throw new Error("Star model is null!");
+                if (starModel === null) throw new Error("Star model is null!");
 
                 let typeString = "";
-                if(starModel.bodyType === BODY_TYPE.BLACK_HOLE) typeString = "Black hole";
-                else if(starModel.bodyType === BODY_TYPE.NEUTRON_STAR) typeString = "Neutron star";
+                if (starModel.bodyType === BODY_TYPE.BLACK_HOLE) typeString = "Black hole";
+                else if (starModel.bodyType === BODY_TYPE.NEUTRON_STAR) typeString = "Neutron star";
                 else typeString = getStellarTypeString(starModel.stellarType);
                 text += `Type: ${typeString}\n`;
 
