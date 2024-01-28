@@ -389,6 +389,8 @@ export class PostProcessManager {
 
         this.currentRenderingPipeline.addEffect(this.starFieldRenderEffect);
 
+        this.currentRenderingPipeline.addEffect(shadowRenderEffect);
+
         for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
                 case PostProcessType.VOLUMETRIC_LIGHT:
@@ -459,7 +461,6 @@ export class PostProcessManager {
             }
         }
 
-        this.currentRenderingPipeline.addEffect(shadowRenderEffect);
         this.currentRenderingPipeline.addEffect(lensFlareRenderEffect);
         this.currentRenderingPipeline.addEffect(this.fxaaRenderEffect);
         //this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
