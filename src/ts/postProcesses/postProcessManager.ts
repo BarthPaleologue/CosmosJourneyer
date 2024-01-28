@@ -281,7 +281,7 @@ export class PostProcessManager {
      * Creates a new VolumetricLight postprocess for the given star and adds it to the manager.
      * @param star A star
      */
-    public addVolumetricLight(star: Star) {
+    public addVolumetricLight(star: Star | NeutronStar) {
         this.volumetricLights.push(new VolumetricLight(star, this.scene));
     }
 
@@ -289,13 +289,14 @@ export class PostProcessManager {
      * Returns the volumetric light post process for the given star. Throws an error if no volumetric light is found.
      * @param star A star
      */
-    public getVolumetricLight(star: Star): VolumetricLight | null {
+    public getVolumetricLight(star: Star | NeutronStar): VolumetricLight | null {
         return this.volumetricLights.find((vl) => vl.object === star) ?? null;
     }
 
     /**
      * Creates a new BlackHole postprocess for the given black hole and adds it to the manager.
      * @param blackHole A black hole
+     * @param starfieldRotation
      */
     public addBlackHole(blackHole: BlackHole, starfieldRotation: Quaternion) {
         const blackhole = new BlackHolePostProcess(blackHole, this.scene, starfieldRotation);
@@ -307,6 +308,7 @@ export class PostProcessManager {
     }
 
     public addMatterJet(neutronStar: NeutronStar) {
+        console.log("add matter jet");
         this.matterJets.push(new MatterJetPostProcess(neutronStar.name, neutronStar, this.scene));
     }
 

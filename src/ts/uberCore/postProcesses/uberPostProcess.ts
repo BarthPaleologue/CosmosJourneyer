@@ -16,11 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Matrix, Quaternion, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
-import { flattenVector3Array, flattenVector4Array } from "../../utils/algebra";
+import { flattenColor3Array, flattenVector3Array, flattenVector4Array } from "../../utils/algebra";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "./types";
+import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "./types";
 import { Scene } from "@babylonjs/core/scene";
 
 /**
@@ -78,6 +78,9 @@ export class UberPostProcess extends PostProcess {
                     break;
                 case UniformEnumType.FloatArray:
                     effect.setFloatArray(uniform.name, uniform.get() as number[]);
+                    break;
+                case UniformEnumType.Color3Array:
+                    effect.setFloatArray3(uniform.name, flattenColor3Array(uniform.get() as Color3[]));
                     break;
                 case UniformEnumType.Auto:
                     // BabylonJS already handles this

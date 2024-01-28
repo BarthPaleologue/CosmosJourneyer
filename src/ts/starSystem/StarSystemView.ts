@@ -48,6 +48,7 @@ import { parsePercentageFrom01, parseSpeed } from "../utils/parseToStrings";
 import { Assets } from "../assets";
 import { getRotationQuaternion, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
@@ -159,7 +160,10 @@ export class StarSystemView {
         this.axisRenderer.setObjects(this.getStarSystem().getBodies());
 
         const activeController = this.scene.getActiveController();
-        positionNearObjectBrightSide(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
+        let controllerDistanceFactor = 5;
+        if(firstBody instanceof BlackHole) controllerDistanceFactor = 7;
+        else if(firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
+        positionNearObjectBrightSide(activeController, firstBody, this.getStarSystem(), controllerDistanceFactor);
 
         this.getStarSystem()
             .initPostProcesses()

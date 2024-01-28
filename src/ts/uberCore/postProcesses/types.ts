@@ -63,7 +63,11 @@ export enum UniformEnumType {
     /**
      * An array of floats. Shader code: float[]
      */
-    FloatArray
+    FloatArray,
+    /**
+     * An array of Color3. Shader code: vec3[]
+     */
+    Color3Array,
 }
 
 export enum SamplerEnumType {
@@ -71,7 +75,7 @@ export enum SamplerEnumType {
     Texture
 }
 
-export type UniformType = number | boolean | Vector3 | Color3 | Matrix | Quaternion | Texture | Vector3[] | Vector4[] | number[];
+export type UniformType = number | boolean | Vector3 | Color3 | Matrix | Quaternion | Texture | Vector3[] | Vector4[] | number[] | Color3[];
 
 export type SamplerType = Texture | undefined;
 

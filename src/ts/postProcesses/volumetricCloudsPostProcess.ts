@@ -23,11 +23,11 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { CloudsUniforms } from "./clouds/cloudsUniforms";
 
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { Transformable } from "../architecture/transformable";
+import { StellarObject } from "../architecture/stellarObject";
 
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 

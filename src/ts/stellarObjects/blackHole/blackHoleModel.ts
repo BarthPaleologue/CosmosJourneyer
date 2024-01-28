@@ -20,11 +20,11 @@ import { getOrbitalPeriod } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom } from "extended-random";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { STELLAR_TYPE } from "../common";
 import { BODY_TYPE, GENERATION_STEPS } from "../../model/common";
-import { StellarObjectModel } from "../../architecture/stellarObject";
 import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { StellarObjectModel } from "../../architecture/stellarObject";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export class BlackHoleModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.BLACK_HOLE;
@@ -33,11 +33,13 @@ export class BlackHoleModel implements StellarObjectModel {
 
     readonly radius: number;
 
-    readonly stellarType = STELLAR_TYPE.BLACK_HOLE;
-
     readonly orbit: OrbitProperties;
 
     readonly physicalProperties: BlackHolePhysicalProperties;
+
+    //TODO: compute temperature of accretion disk (function of rotation speed)
+    readonly temperature = 0;
+    readonly color = Color3.Black();
 
     readonly parentBody: CelestialBodyModel | null;
 

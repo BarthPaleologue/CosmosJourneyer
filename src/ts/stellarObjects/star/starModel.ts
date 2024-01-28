@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { seededSquirrelNoise } from "squirrel-noise";
-import { clamp } from "terrain-generation";
-import { normalRandom, randRange, uniformRandBool } from "extended-random";
+import { randRange, randRangeInt, uniformRandBool } from "extended-random";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { Settings } from "../../settings";
@@ -28,19 +27,19 @@ import { STELLAR_TYPE } from "../common";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { wheelOfFortune } from "../../utils/wheelOfFortune";
 import { StellarObjectModel } from "../../architecture/stellarObject";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export class StarModel implements StellarObjectModel {
     readonly bodyType = BODY_TYPE.STAR;
     readonly rng: (step: number) => number;
     readonly seed: number;
 
-    readonly surfaceColor: Vector3;
+    readonly temperature: number;
+    readonly color: Color3;
     stellarType: STELLAR_TYPE;
     readonly radius: number;
-
-    readonly mass = 1000;
-    readonly rotationPeriod = 24 * 60 * 60;
 
     readonly orbit: OrbitProperties;
 
@@ -57,23 +56,21 @@ export class StarModel implements StellarObjectModel {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
-        const surfaceTemperature = clamp(normalRandom(5778, 2000, this.rng, GENERATION_STEPS.TEMPERATURE), 3000, 10000);
+        this.stellarType = StarModel.GetRandomStellarType(this.rng);
+
+        this.temperature = StarModel.GetRandomTemperatureFromStellarType(this.stellarType, this.rng);
+        this.color = getRgbFromTemperature(this.temperature);
 
         this.parentBody = parentBody;
 
         this.physicalProperties = {
-            mass: this.mass,
-            rotationPeriod: this.rotationPeriod,
-            temperature: surfaceTemperature,
+            mass: 1000,
+            rotationPeriod: 24 * 60 * 60,
+            temperature: this.temperature,
             axialTilt: 0
         };
 
-        this.surfaceColor = getRgbFromTemperature(surfaceTemperature);
-
-        this.stellarType = StarModel.getStellarTypeFromTemperature(surfaceTemperature);
-
-        //TODO: make it dependent on star type
-        this.radius = randRange(50, 200, this.rng, GENERATION_STEPS.RADIUS) * Settings.EARTH_RADIUS;
+        this.radius = StarModel.GetRandomRadiusFromStellarType(this.stellarType, this.rng);
 
         // TODO: do not hardcode
         const orbitRadius = this.rng(GENERATION_STEPS.ORBIT) * 5000000e3;
@@ -96,7 +93,7 @@ export class StarModel implements StellarObjectModel {
     public setSurfaceTemperature(temperature: number) {
         this.physicalProperties.temperature = temperature;
         this.stellarType = StarModel.getStellarTypeFromTemperature(temperature);
-        this.surfaceColor.copyFrom(getRgbFromTemperature(temperature));
+        this.color.copyFrom(getRgbFromTemperature(temperature));
     }
 
     static getStellarTypeFromTemperature(temperature: number) {
@@ -107,5 +104,61 @@ export class StarModel implements StellarObjectModel {
         else if (temperature < 10000) return STELLAR_TYPE.A;
         else if (temperature < 30000) return STELLAR_TYPE.B;
         else return STELLAR_TYPE.O;
+    }
+
+    static GetRandomStellarType(rng: (step: number) => number) {
+        // use wheel of fortune
+        const wheel: [STELLAR_TYPE, number][] = [
+            [STELLAR_TYPE.M, 0.765],
+            [STELLAR_TYPE.K, 0.121],
+            [STELLAR_TYPE.G, 0.076],
+            [STELLAR_TYPE.F, 0.03],
+            [STELLAR_TYPE.A, 0.006],
+            [STELLAR_TYPE.B, 0.0013],
+            [STELLAR_TYPE.O, 0.0000003]
+        ];
+
+        const r = rng(GENERATION_STEPS.STELLAR_TYPE);
+
+        return wheelOfFortune<STELLAR_TYPE>(wheel, r);
+    }
+
+    static GetRandomTemperatureFromStellarType(stellarType: STELLAR_TYPE, rng: (step: number) => number) {
+        switch (stellarType) {
+            case STELLAR_TYPE.M:
+                return randRangeInt(2100, 3400, rng, GENERATION_STEPS.TEMPERATURE);
+            case STELLAR_TYPE.K:
+                return randRangeInt(3400, 4900, rng, GENERATION_STEPS.TEMPERATURE);
+            case STELLAR_TYPE.G:
+                return randRangeInt(4900, 5700, rng, GENERATION_STEPS.TEMPERATURE);
+            case STELLAR_TYPE.F:
+                return randRangeInt(5700, 7200, rng, GENERATION_STEPS.TEMPERATURE);
+            case STELLAR_TYPE.A:
+                return randRangeInt(7200, 9700, rng, GENERATION_STEPS.TEMPERATURE);
+            case STELLAR_TYPE.B:
+                return randRangeInt(9700, 30000, rng, GENERATION_STEPS.TEMPERATURE);
+            case STELLAR_TYPE.O:
+                return randRangeInt(30000, 52000, rng, GENERATION_STEPS.TEMPERATURE);
+        }
+    }
+
+    static GetRandomRadiusFromStellarType(stellarType: STELLAR_TYPE, rng: (step: number) => number) {
+        const solarSize = 109 * Settings.EARTH_RADIUS;
+        switch (stellarType) {
+            case STELLAR_TYPE.M:
+                return randRange(0.5, 0.7, rng, GENERATION_STEPS.RADIUS) * solarSize;
+            case STELLAR_TYPE.K:
+                return randRange(0.7, 0.9, rng, GENERATION_STEPS.RADIUS) * solarSize;
+            case STELLAR_TYPE.G:
+                return randRange(0.9, 1.1, rng, GENERATION_STEPS.RADIUS) * solarSize;
+            case STELLAR_TYPE.F:
+                return randRange(1.1, 1.4, rng, GENERATION_STEPS.RADIUS) * solarSize;
+            case STELLAR_TYPE.A:
+                return randRange(1.4, 1.8, rng, GENERATION_STEPS.RADIUS) * solarSize;
+            case STELLAR_TYPE.B:
+                return randRange(1.8, 6.6, rng, GENERATION_STEPS.RADIUS) * solarSize;
+            case STELLAR_TYPE.O:
+                return randRange(6.6, 15.0, rng, GENERATION_STEPS.RADIUS) * solarSize;
+        }
     }
 }

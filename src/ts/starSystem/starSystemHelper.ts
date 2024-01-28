@@ -77,7 +77,7 @@ export class StarSystemHelper {
         to a system that already has ${starsystem.stellarObjects.length} stars.
         The capacity of the generator was supposed to be ${starsystem.model.getNbStars()} starsystem is not a problem, but it may be.`);
         const name = starName(starsystem.model.getName(), starsystem.stellarObjects.length);
-        const neutronStar = new NeutronStar(name, starsystem.scene, model, starsystem.stellarObjects[0]);
+        const neutronStar = new NeutronStar(name, starsystem.scene, model, starsystem.stellarObjects.length > 0 ? starsystem.stellarObjects[0] : null);
 
         starsystem.addStellarObject(neutronStar);
         return neutronStar;
@@ -89,13 +89,17 @@ export class StarSystemHelper {
      * @param seed The seed to use for the star generation (by default, the next available seed planned by the system model)
      */
     public static makeStellarObject(starsystem: StarSystemController, seed: number = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): StellarObject {
-        const isStellarObjectBlackHole = starsystem.model.getBodyTypeOfStar(starsystem.stellarObjects.length) === BODY_TYPE.BLACK_HOLE;
-        if (isStellarObjectBlackHole) return StarSystemHelper.makeBlackHole(starsystem, seed);
-
-        const isStellarObjectNeutronStar = starsystem.model.getBodyTypeOfStar(starsystem.stellarObjects.length) === BODY_TYPE.NEUTRON_STAR;
-        if (isStellarObjectNeutronStar) return StarSystemHelper.makeNeutronStar(starsystem, seed);
-
-        return this.makeStar(starsystem, seed);
+        const stellarObjectType = starsystem.model.getBodyTypeOfStar(starsystem.stellarObjects.length);
+        switch (stellarObjectType) {
+            case BODY_TYPE.BLACK_HOLE:
+                return StarSystemHelper.makeBlackHole(starsystem, seed);
+            case BODY_TYPE.NEUTRON_STAR:
+                return StarSystemHelper.makeNeutronStar(starsystem, seed);
+            case BODY_TYPE.STAR:
+                return StarSystemHelper.makeStar(starsystem, seed);
+            default:
+                throw new Error(`Unknown stellar object type ${stellarObjectType}`);
+        }
     }
 
     /**

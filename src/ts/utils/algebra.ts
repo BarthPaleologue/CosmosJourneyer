@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 /**
  * Removes the rotation around an axis from the quaternion
@@ -54,6 +55,14 @@ export function flattenVector3Array(vector3Array: Vector3[]): number[] {
     const result: number[] = [];
     for (const vector3 of vector3Array) {
         result.push(vector3.x, vector3.y, vector3.z);
+    }
+    return result;
+}
+
+export function flattenColor3Array(color3Array: Color3[]): number[] {
+    const result: number[] = [];
+    for (const color3 of color3Array) {
+        result.push(color3.r, color3.g, color3.b);
     }
     return result;
 }

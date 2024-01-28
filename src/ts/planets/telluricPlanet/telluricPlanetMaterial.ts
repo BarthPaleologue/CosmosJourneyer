@@ -28,9 +28,8 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { getInverseRotationMatrix } from "../../uberCore/transforms/basicTransform";
 import { Star } from "../../stellarObjects/star/star";
-import { flattenVector3Array } from "../../utils/algebra";
+import { flattenColor3Array, flattenVector3Array } from "../../utils/algebra";
 
 import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
@@ -216,7 +215,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.setVector3("playerPosition", cameraPosition);
 
         this.setArray3("star_positions", flattenVector3Array(stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
-        this.setArray3("star_colors", flattenVector3Array(stellarObjects.map((star) => (star instanceof Star ? star.model.surfaceColor : Vector3.One()))));
+        this.setArray3("star_colors", flattenColor3Array(stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));
         this.setInt("nbStars", stellarObjects.length);
 
         this.setVector3("planetPosition", this.planetTransform.getAbsolutePosition());
