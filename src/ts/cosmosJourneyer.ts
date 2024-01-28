@@ -75,8 +75,10 @@ export class CosmosJourneyer {
         this.pauseMenu.onResume.add(() => this.resume());
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
-            const seed = this.getStarSystemView().getStarSystem().model.seed;
-            const payload = `starMapX=${seed.starSectorX}&starMapY=${seed.starSectorY}&starMapZ=${seed.starSectorZ}&index=${seed.index}`;
+            const saveData = this.generateSaveData();
+            const starSystem = saveData.starSystem;
+
+            const payload = `starMapX=${starSystem.starSectorX}&starMapY=${starSystem.starSectorY}&starMapZ=${starSystem.starSectorZ}&index=${starSystem.starSectorIndex}&objectIndex=${saveData.nearestOrbitalObjectIndex}&positionX=${saveData.positionX}&positionY=${saveData.positionY}&positionZ=${saveData.positionZ}&rotationQuaternionX=${saveData.rotationQuaternionX}&rotationQuaternionY=${saveData.rotationQuaternionY}&rotationQuaternionZ=${saveData.rotationQuaternionZ}&rotationQuaternionW=${saveData.rotationQuaternionW}`;
             const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/random.html?${payload}`);
             navigator.clipboard.writeText(url.toString()).then(() => console.log("Copied to clipboard"));
         });
