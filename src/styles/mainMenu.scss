@@ -41,43 +41,6 @@
     transition: 0.2s ease-in-out;
   }
 
-  ul#menuItems {
-    list-style-type: none;
-    padding: 0;
-    row-gap: 10px;
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    position: absolute;
-    top: 65vh;
-    left: 5%;
-    transform: translateY(-50%);
-    transition: 0.2s ease-in-out;
-
-    li {
-      color: white;
-      font-family: Nasalization, sans-serif;
-      font-size: 2em;
-      line-height: 1.5em;
-      cursor: pointer;
-      padding: 5px 20px;
-      transition: 0.1s;
-
-      &:hover {
-        background: #002b6a;
-      }
-
-      &.disabled {
-        color: grey;
-        cursor: not-allowed;
-      }
-
-      &.disabled:hover {
-        background: black;
-      }
-    }
-  }
-
   .rightPanel {
     position: absolute;
     max-width: 1400px;
