@@ -281,6 +281,7 @@ export class StarSystemView {
         setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
         this.getStarSystem().postProcessManager.rebuild();
 
+        shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
     }
 
@@ -290,6 +291,7 @@ export class StarSystemView {
         const defaultControls = this.getDefaultControls();
 
         characterControls.getTransform().setEnabled(false);
+        shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
 
         this.scene.setActiveController(defaultControls);

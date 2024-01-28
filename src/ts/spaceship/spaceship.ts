@@ -52,7 +52,7 @@ export class Spaceship implements Transformable {
         radius: 1
     };
 
-    private readonly warpTunnel: WarpTunnel;
+    readonly warpTunnel: WarpTunnel;
 
     private readonly scene: Scene;
 
