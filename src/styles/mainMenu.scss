@@ -12,6 +12,18 @@
     transition: 0.1s;
   }
 
+  #version {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin-block: 0;
+    color: white;
+    font-family: Nasalization, sans-serif;
+    font-size: 1.5em;
+    padding: 10px;
+    transition: 0.2s ease-in-out;
+  }
+
   ul#menuItems {
     list-style-type: none;
     padding: 0;
