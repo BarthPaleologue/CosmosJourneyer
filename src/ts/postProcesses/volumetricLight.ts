@@ -20,11 +20,12 @@ import { UberScene } from "../uberCore/uberScene";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Star } from "../stellarObjects/star/star";
+import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 
 export class VolumetricLight extends VolumetricLightScatteringPostProcess implements ObjectPostProcess {
-    readonly object: Star;
+    readonly object: Star | NeutronStar;
 
-    constructor(star: Star, scene: UberScene) {
+    constructor(star: Star | NeutronStar, scene: UberScene) {
         if (scene.activeCamera === null) throw new Error("no camera");
         super(`${star.name}VolumetricLight`, 1, scene.activeCamera, star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
 

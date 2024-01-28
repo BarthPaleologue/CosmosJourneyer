@@ -29,6 +29,7 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { StellarObject } from "../architecture/stellarObject";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export type LensFlareSettings = {
     visibility: number;
@@ -57,10 +58,10 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
             ...getActiveCameraUniforms(scene),
             {
                 name: "flareColor",
-                type: UniformEnumType.Vector3,
+                type: UniformEnumType.Color3,
                 get: () => {
-                    if (object instanceof Star) return object.model.surfaceColor;
-                    else return new Vector3(1, 1, 1);
+                    if (object instanceof Star) return object.model.color;
+                    else return new Color3(1, 1, 1);
                 }
             },
             {

@@ -29,9 +29,7 @@ export enum STELLAR_TYPE {
     /** 3,500 - 5,000 K */
     K,
     /** 2,700 - 3,500 K */
-    M,
-    /** Black hole */
-    BLACK_HOLE
+    M
 }
 
 export function getStellarTypeString(type: STELLAR_TYPE): string {
@@ -50,7 +48,5 @@ export function getStellarTypeString(type: STELLAR_TYPE): string {
             return "K";
         case STELLAR_TYPE.M:
             return "M";
-        case STELLAR_TYPE.BLACK_HOLE:
-            return "Black hole";
     }
 }

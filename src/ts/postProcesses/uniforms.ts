@@ -22,6 +22,7 @@ import { BoundingSphere } from "../architecture/boundingSphere";
 import { Star } from "../stellarObjects/star/star";
 import { Transformable } from "../architecture/transformable";
 import { Scene } from "@babylonjs/core/scene";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
     return [
@@ -93,8 +94,8 @@ export function getStellarObjectsUniforms(stars: Transformable[]): ShaderUniform
         },
         {
             name: "star_colors",
-            type: UniformEnumType.Vector3Array,
-            get: () => stars.map((star) => (star instanceof Star ? star.model.surfaceColor : Vector3.One()))
+            type: UniformEnumType.Color3Array,
+            get: () => stars.map((star) => (star instanceof Star ? star.model.color : Color3.White()))
         },
         {
             name: "nbStars",

@@ -26,7 +26,7 @@ export const Settings = {
     VERTEX_RESOLUTION: 64,
     MIN_DISTANCE_BETWEEN_VERTICES: 1.5,
 
-    CLOUD_LAYER_HEIGHT: 15e3,
+    CLOUD_LAYER_HEIGHT: 7e3,
     ATMOSPHERE_HEIGHT: 100e3,
     OCEAN_DEPTH: 7e3,
 
@@ -41,7 +41,7 @@ export const Settings = {
 export const CollisionMask = {
     GROUND: 0b00000001,
     SPACESHIP: 0b00000010,
-    LANDING_PADS: 0b00000100,
+    LANDING_PADS: 0b00000100
 };
 
 const seedableRNG = seededSquirrelNoise(Settings.UNIVERSE_SEED);

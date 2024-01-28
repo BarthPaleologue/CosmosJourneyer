@@ -20,9 +20,9 @@ import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { StellarObject } from "../stellarObjects/stellarObject";
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
+import { StellarObject } from "../architecture/stellarObject";
 
 export interface MatterJetUniforms {
     // the rotation period in seconds of the matter jet

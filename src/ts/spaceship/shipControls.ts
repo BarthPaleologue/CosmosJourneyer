@@ -18,13 +18,7 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";
-import {
-    getForwardDirection,
-    getUpwardDirection,
-    pitch,
-    roll,
-    translate
-} from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getUpwardDirection, pitch, roll, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
 import { Input, InputType } from "../inputs/input";
@@ -34,12 +28,6 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Spaceship } from "./spaceship";
-
-enum ShipState {
-    FLYING,
-    LANDING,
-    LANDED
-}
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -159,6 +147,10 @@ export class ShipControls implements Controls {
         this.spaceship.update(deltaTime);
 
         for (const input of this.inputs) this.listenTo(input, deltaTime);
+
+        // camera shake
+        // this.thirdPersonCamera.alpha += (Math.random() - 0.5) / 500;
+        // this.thirdPersonCamera.beta += (Math.random() - 0.5) / 500;
 
         this.getActiveCamera().getViewMatrix(true);
         return this.getTransform().getAbsolutePosition();

@@ -48,6 +48,7 @@ import { parsePercentageFrom01, parseSpeed } from "../utils/parseToStrings";
 import { Assets } from "../assets";
 import { getRotationQuaternion, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
@@ -159,7 +160,10 @@ export class StarSystemView {
         this.axisRenderer.setObjects(this.getStarSystem().getBodies());
 
         const activeController = this.scene.getActiveController();
-        positionNearObjectBrightSide(activeController, firstBody, this.getStarSystem(), firstBody instanceof BlackHole ? 7 : 5);
+        let controllerDistanceFactor = 5;
+        if (firstBody instanceof BlackHole) controllerDistanceFactor = 7;
+        else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
+        positionNearObjectBrightSide(activeController, firstBody, this.getStarSystem(), controllerDistanceFactor);
 
         this.getStarSystem()
             .initPostProcesses()
@@ -281,6 +285,7 @@ export class StarSystemView {
         setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
         this.getStarSystem().postProcessManager.rebuild();
 
+        shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
     }
 
@@ -290,6 +295,7 @@ export class StarSystemView {
         const defaultControls = this.getDefaultControls();
 
         characterControls.getTransform().setEnabled(false);
+        shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
 
         this.scene.setActiveController(defaultControls);
@@ -331,7 +337,7 @@ export class StarSystemView {
 
     unZoom(callback: () => void) {
         const activeControls = this.scene.getActiveController();
-        if (activeControls != this.getSpaceshipControls()) {
+        if (activeControls !== this.getSpaceshipControls()) {
             callback();
             return;
         }

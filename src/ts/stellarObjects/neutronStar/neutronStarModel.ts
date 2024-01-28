@@ -15,11 +15,73 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarModel } from "../star/starModel";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { BODY_TYPE, GENERATION_STEPS } from "../../model/common";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { OrbitProperties } from "../../orbit/orbitProperties";
+import { StarPhysicalProperties } from "../../architecture/physicalProperties";
+import { StellarObjectModel } from "../../architecture/stellarObject";
+import { seededSquirrelNoise } from "squirrel-noise";
+import { getRgbFromTemperature } from "../../utils/specrend";
+import { getOrbitalPeriod } from "../../orbit/orbit";
+import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { clamp } from "../../utils/math";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
-export class NeutronStarModel extends StarModel {
+export class NeutronStarModel implements StellarObjectModel {
+    readonly bodyType = BODY_TYPE.NEUTRON_STAR;
+    readonly rng: (step: number) => number;
+    readonly seed: number;
+
+    readonly temperature: number;
+    readonly color: Color3;
+    readonly radius: number;
+
+    readonly orbit: OrbitProperties;
+
+    readonly physicalProperties: StarPhysicalProperties;
+
+    static RING_PROPORTION = 0.02;
+    readonly ringsUniforms;
+
+    readonly parentBody: CelestialBodyModel | null;
+
+    readonly childrenBodies: CelestialBodyModel[] = [];
+
     constructor(seed: number, parentBody: CelestialBodyModel | null = null) {
-        super(seed, parentBody);
+        this.seed = seed;
+        this.rng = seededSquirrelNoise(this.seed);
+
+        this.temperature = randRangeInt(200_000, 5_000_000_000, this.rng, GENERATION_STEPS.TEMPERATURE);
+        this.color = getRgbFromTemperature(this.temperature);
+
+        this.parentBody = parentBody;
+
+        this.physicalProperties = {
+            mass: 1000,
+            rotationPeriod: 24 * 60 * 60,
+            temperature: this.temperature,
+            axialTilt: 0
+        };
+
+        this.radius = clamp(normalRandom(10e3, 1e3, this.rng, GENERATION_STEPS.RADIUS), 2e3, 50e3);
+
+        // TODO: do not hardcode
+        const orbitRadius = this.rng(GENERATION_STEPS.ORBIT) * 5000000e3;
+
+        this.orbit = {
+            radius: orbitRadius,
+            p: 2,
+            period: getOrbitalPeriod(orbitRadius, this.parentBody?.physicalProperties.mass ?? 0),
+            normalToPlane: Vector3.Up(),
+            isPlaneAlignedWithParent: true
+        };
+
+        if (uniformRandBool(NeutronStarModel.RING_PROPORTION, this.rng, GENERATION_STEPS.RINGS)) {
+            this.ringsUniforms = new RingsUniforms(this.rng);
+        } else {
+            this.ringsUniforms = null;
+        }
     }
 }

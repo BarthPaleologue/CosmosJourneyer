@@ -90,7 +90,7 @@ export class DefaultControls implements Controls {
         displacement.addInPlace(upwardDisplacement);
         displacement.addInPlace(rightDisplacement);
 
-        if (input.getAcceleration() != 0) this.speed *= 1 + input.getAcceleration() / 10;
+        if (input.getAcceleration() !== 0) this.speed *= 1 + input.getAcceleration() / 10;
 
         return displacement;
     }

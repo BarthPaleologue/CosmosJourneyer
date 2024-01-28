@@ -67,11 +67,17 @@ export class StarSystemModel {
         return centeredRand(this.rng, GENERATION_STEPS.GENERATE_STARS + index) * Settings.SEED_HALF_RANGE;
     }
 
+    /**
+     * Get the body type of the star
+     * @param index
+     * @see https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
+     */
     public getBodyTypeOfStar(index: number) {
         if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
-        if (uniformRandBool(0.002, this.rng, GENERATION_STEPS.GENERATE_STARS + index)) return BODY_TYPE.BLACK_HOLE;
 
-        if (uniformRandBool(0.05, this.rng, GENERATION_STEPS.GENERATE_STARS + index)) return BODY_TYPE.NEUTRON_STAR;
+        // percentages are taken from https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
+        if (uniformRandBool(0.0006, this.rng, GENERATION_STEPS.GENERATE_STARS + index)) return BODY_TYPE.BLACK_HOLE;
+        if (uniformRandBool(0.0026, this.rng, GENERATION_STEPS.GENERATE_STARS + index)) return BODY_TYPE.NEUTRON_STAR;
 
         return BODY_TYPE.STAR;
     }

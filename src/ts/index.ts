@@ -36,7 +36,6 @@ document.addEventListener("keydown", (e) => {
 
     if (e.key === "y") {
         if (starSystemView.scene.getActiveController() === shipControls) {
-
             console.log("disembark");
 
             characterController.getTransform().setEnabled(true);

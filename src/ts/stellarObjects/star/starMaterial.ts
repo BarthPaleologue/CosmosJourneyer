@@ -21,20 +21,20 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { StarModel } from "./starModel";
 import { getInverseRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { Assets } from "../../assets";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import lutFragment from "../../../shaders/starMaterial/utils/lut.glsl";
+import { StellarObjectModel } from "../../architecture/stellarObject";
 
 export class StarMaterial extends ShaderMaterial {
     star: TransformNode;
-    starModel: StarModel;
+    starModel: StellarObjectModel;
     starSeed: number;
 
     private internalClock = 0;
 
-    constructor(star: TransformNode, model: StarModel, scene: Scene) {
+    constructor(star: TransformNode, model: StellarObjectModel, scene: Scene) {
         const shaderName = "starMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = starMaterialFragment;
@@ -69,7 +69,7 @@ export class StarMaterial extends ShaderMaterial {
         this.internalClock += deltaTime;
 
         this.setFloat("time", this.internalClock % 100000);
-        this.setVector3("starColor", this.starModel.surfaceColor);
+        this.setColor3("starColor", this.starModel.color);
         this.setQuaternion("starInverseRotationQuaternion", getInverseRotationQuaternion(this.star));
         this.setFloat("seed", this.starSeed);
         this.setVector3("starPosition", this.star.getAbsolutePosition());

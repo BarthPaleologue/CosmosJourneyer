@@ -49,6 +49,7 @@ import { Keyboard } from "../inputs/keyboard";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { SystemSeed } from "../utils/systemSeed";
+import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 
 export class StarMap {
     readonly scene: Scene;
@@ -140,9 +141,9 @@ export class StarMap {
         pipeline.fxaaEnabled = true;
         pipeline.bloomEnabled = true;
         pipeline.bloomThreshold = 0.0;
-        pipeline.bloomWeight = 1.2;
+        pipeline.bloomWeight = 1.5;
         pipeline.bloomKernel = 128;
-        pipeline.imageProcessing.exposure = 1.1;
+        pipeline.imageProcessing.exposure = 1.5;
         pipeline.imageProcessing.contrast = 1.0;
 
         this.starMapCenterPosition = Vector3.Zero();
@@ -367,14 +368,28 @@ export class StarMap {
         const starSystemModel = new StarSystemModel(starSystemSeed);
 
         const starSeed = starSystemModel.getStarSeed(0);
-        const isStarBlackHole = starSystemModel.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE;
+        const stellarObjectType = starSystemModel.getBodyTypeOfStar(0);
 
-        const starModel = !isStarBlackHole ? new StarModel(starSeed) : new BlackHoleModel(starSeed);
+        let starModel: StarModel | BlackHoleModel | NeutronStarModel | null = null;
+        switch (stellarObjectType) {
+            case BODY_TYPE.STAR:
+                starModel = new StarModel(starSeed);
+                break;
+            case BODY_TYPE.BLACK_HOLE:
+                starModel = new BlackHoleModel(starSeed);
+                break;
+            case BODY_TYPE.NEUTRON_STAR:
+                starModel = new NeutronStarModel(starSeed);
+                break;
+            default:
+                throw new Error("Unknown stellar object type!");
+        }
+        if (starModel === null) throw new Error("Star model is null!");
 
         let instance: InstancedMesh | null = null;
         let recycled = false;
 
-        if (!isStarBlackHole) {
+        if (stellarObjectType === BODY_TYPE.STAR || stellarObjectType === BODY_TYPE.NEUTRON_STAR) {
             if (this.recycledStars.length > 0) {
                 instance = this.recycledStars[0];
                 this.recycledStars.shift();
@@ -396,9 +411,9 @@ export class StarMap {
         initializedInstance.scaling = Vector3.One().scaleInPlace(data.scale);
         initializedInstance.position = data.position.add(this.starMapCenterPosition);
 
-        if (starModel instanceof StarModel) {
-            const starColor = starModel.surfaceColor;
-            initializedInstance.instancedBuffers.color = new Color4(starColor.x, starColor.y, starColor.z, 0.0);
+        if (starModel.bodyType === BODY_TYPE.STAR || starModel.bodyType === BODY_TYPE.NEUTRON_STAR) {
+            const starColor = starModel.color;
+            initializedInstance.instancedBuffers.color = new Color4(starColor.r, starColor.g, starColor.b, 0.0);
         } else {
             initializedInstance.instancedBuffers.color = new Color4(1.0, 0.6, 0.3, 0.0);
         }
@@ -431,7 +446,15 @@ export class StarMap {
                     const distance = 15 * currentInstance.getAbsolutePosition().subtract(initializedInstance.getAbsolutePosition()).length();
                     text += `Distance: ${distance.toFixed(2)}ly\n`;
                 }
-                text += `Type: ${getStellarTypeString(starModel.stellarType)}\n`;
+
+                if (starModel === null) throw new Error("Star model is null!");
+
+                let typeString = "";
+                if (starModel.bodyType === BODY_TYPE.BLACK_HOLE) typeString = "Black hole";
+                else if (starModel.bodyType === BODY_TYPE.NEUTRON_STAR) typeString = "Neutron star";
+                else typeString = getStellarTypeString(starModel.stellarType);
+                text += `Type: ${typeString}\n`;
+
                 text += `Planets: ${starSystemModel.getNbPlanets()}\n`;
 
                 this.starMapUI.attachUIToMesh(initializedInstance);
@@ -449,7 +472,7 @@ export class StarMap {
 
         this.fadeIn(initializedInstance);
 
-        if (isStarBlackHole) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
+        if (starModel.bodyType === BODY_TYPE.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
     }
 

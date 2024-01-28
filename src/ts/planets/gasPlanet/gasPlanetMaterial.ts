@@ -27,7 +27,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Star } from "../../stellarObjects/star/star";
-import { flattenVector3Array } from "../../utils/algebra";
+import { flattenColor3Array, flattenVector3Array } from "../../utils/algebra";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Transformable } from "../../architecture/transformable";
 
@@ -103,7 +103,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setVector3("playerPosition", player.globalPosition);
 
         this.setArray3("star_positions", flattenVector3Array(stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
-        this.setArray3("star_colors", flattenVector3Array(stellarObjects.map((star) => (star instanceof Star ? star.model.surfaceColor : Vector3.One()))));
+        this.setArray3("star_colors", flattenColor3Array(stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));
         this.setInt("nbStars", stellarObjects.length);
 
         this.setFloat("time", this.clock % 100000);

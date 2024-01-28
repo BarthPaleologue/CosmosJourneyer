@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
@@ -52,7 +69,7 @@ export class Spaceship implements Transformable {
         radius: 1
     };
 
-    private readonly warpTunnel: WarpTunnel;
+    readonly warpTunnel: WarpTunnel;
 
     private readonly scene: Scene;
 
@@ -207,7 +224,7 @@ export class Spaceship implements Transformable {
         this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
 
         // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
-        if(this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-6 * this.warpDrive.getWarpSpeed())));
+        if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-6 * this.warpDrive.getWarpSpeed())));
         else this.warpTunnel.setThrottle(0);
 
         for (const thruster of this.mainThrusters) thruster.update();
@@ -229,7 +246,7 @@ export class Spaceship implements Transformable {
             this.aggregate.body.setAngularDamping(1);
         }
 
-        if (this.state == ShipState.LANDING) {
+        if (this.state === ShipState.LANDING) {
             if (this.landingTarget === null) {
                 throw new Error("Closest walkable object is null while landing");
             }

@@ -45,7 +45,7 @@ export function buildThrusterMatrix(hoverThrusters: Thruster[]) {
 }
 
 export function getThrustAndTorque(thrusterConfiguration: number[], thrusterMatrix: Matrix): [Vector3, Vector3] {
-    if (thrusterMatrix.rows != 6) throw new Error("Thruster matrix must have 6 rows!");
+    if (thrusterMatrix.rows !== 6) throw new Error("Thruster matrix must have 6 rows!");
     const thrustAndTorque: [number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0];
     for (let i = 0; i < thrusterMatrix.rows; i++) {
         const row = thrusterMatrix.getRow(i);
@@ -57,7 +57,7 @@ export function getThrustAndTorque(thrusterConfiguration: number[], thrusterMatr
 }
 
 export function getThrusterConfiguration(targetThrust: Vector3, targetTorque: Vector3, inverseThrusterMatrix: Matrix): number[] {
-    if (inverseThrusterMatrix.columns != 6) throw new Error("Inverse thruster matrix must have 6 columns!");
+    if (inverseThrusterMatrix.columns !== 6) throw new Error("Inverse thruster matrix must have 6 columns!");
     const targetThrustAndTorque = [targetThrust.x, targetThrust.y, targetThrust.z, targetTorque.x, targetTorque.y, targetTorque.z];
     const nbThrusters = inverseThrusterMatrix.rows;
     const thrusterConfiguration = new Array(nbThrusters).fill(0);
