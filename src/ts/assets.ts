@@ -40,6 +40,8 @@ import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 import seamlessPerlin from "../asset/perlin.png";
 import warpNoise from "../asset/warpNoise.png";
 
+import empty from "../asset/oneBlackPixel.png";
+
 import spaceship from "../asset/spaceship/spaceship2.glb";
 import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
@@ -143,7 +145,7 @@ export class Assets {
         Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Assets.AtmosphereLUT.refreshRate = 0;
 
-        Assets.EmptyTexture = new Texture(null, scene);
+        Assets.manager.addTextureTask("EmptyTexture", empty).onSuccess = (task) => (Assets.EmptyTexture = task.texture);
 
         const spaceshipTask = Assets.manager.addMeshTask("spaceshipTask", "", "", spaceship);
         spaceshipTask.onSuccess = function (task: MeshAssetTask) {
