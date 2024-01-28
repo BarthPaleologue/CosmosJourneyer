@@ -35,12 +35,6 @@ import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Spaceship } from "./spaceship";
 
-enum ShipState {
-    FLYING,
-    LANDING,
-    LANDED
-}
-
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
 
