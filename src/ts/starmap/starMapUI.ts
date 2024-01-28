@@ -28,6 +28,7 @@ import selectedCircle from "../../asset/textures/selectedCircle.png";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Settings } from "../settings";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;
@@ -61,12 +62,14 @@ export class StarMapUI {
         this.namePlate.text = "";
         this.namePlate.fontSize = 24;
         this.namePlate.height = "50px";
+        this.namePlate.fontFamily = Settings.MAIN_FONT;
         this.namePlate.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.namePlate.setPadding(15, 15, 10, 15);
 
         this.descriptionPanel = new TextBlock();
         this.descriptionPanel.height = "130px";
         this.descriptionPanel.lineSpacing = 4.0;
+        this.descriptionPanel.fontFamily = Settings.MAIN_FONT;
         this.descriptionPanel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.descriptionPanel.setPadding(0, 15, 10, 15);
 
@@ -75,6 +78,7 @@ export class StarMapUI {
         this.warpButton.height = "40px";
         this.warpButton.background = "midnightblue";
         this.warpButton.fontWeight = "bold";
+        this.warpButton.fontFamily = Settings.MAIN_FONT;
         //this.warpButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
 
         this.systemUI.addControl(this.namePlate);

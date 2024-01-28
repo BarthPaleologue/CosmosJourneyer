@@ -35,7 +35,9 @@ export const Settings = {
     ENABLE_VOLUMETRIC_CLOUDS: false,
     SEED_HALF_RANGE: 1e4,
     C: 299792458,
-    FOV: (92 * Math.PI) / 180
+    FOV: (92 * Math.PI) / 180,
+
+    MAIN_FONT: "Nasalization",
 };
 
 export const CollisionMask = {
