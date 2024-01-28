@@ -1,3 +1,20 @@
+//  This file is part of CosmosJourneyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 #mainMenu {
   position: absolute;
   width: 100vw;
@@ -12,41 +29,16 @@
     transition: 0.1s;
   }
 
-  ul#menuItems {
-    list-style-type: none;
-    padding: 0;
-    row-gap: 10px;
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
+  #version {
     position: absolute;
-    top: 65vh;
-    left: 5%;
-    transform: translateY(-50%);
+    bottom: 0;
+    right: 0;
+    margin-block: 0;
+    color: white;
+    font-family: Nasalization, sans-serif;
+    font-size: 1.5em;
+    padding: 10px;
     transition: 0.2s ease-in-out;
-
-    li {
-      color: white;
-      font-family: Nasalization, sans-serif;
-      font-size: 2em;
-      line-height: 1.5em;
-      cursor: pointer;
-      padding: 5px 20px;
-      transition: 0.1s;
-
-      &:hover {
-        background: #002b6a;
-      }
-
-      &.disabled {
-        color: grey;
-        cursor: not-allowed;
-      }
-
-      &.disabled:hover {
-        background: black;
-      }
-    }
   }
 
   .rightPanel {

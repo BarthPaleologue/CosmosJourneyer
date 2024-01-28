@@ -25,6 +25,7 @@ import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { LOCAL_DIRECTION } from "../uberCore/localDirections";
 import { OrbitalObject } from "../architecture/orbitalObject";
+import { Settings } from "../settings";
 
 export class ObjectOverlay {
     readonly textRoot: StackPanel;
@@ -55,6 +56,7 @@ export class ObjectOverlay {
         this.namePlate.zIndex = 6;
         this.namePlate.height = "50px";
         this.namePlate.fontSize = 20;
+        this.namePlate.fontFamily = Settings.MAIN_FONT;
         this.namePlate.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.namePlate.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.namePlate);
@@ -65,6 +67,7 @@ export class ObjectOverlay {
         this.typeText.zIndex = 6;
         this.typeText.height = "20px";
         this.typeText.fontSize = 16;
+        this.typeText.fontFamily = Settings.MAIN_FONT;
         this.typeText.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.typeText.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.typeText);
@@ -74,6 +77,7 @@ export class ObjectOverlay {
         this.distanceText.zIndex = 6;
         this.distanceText.height = "20px";
         this.distanceText.fontSize = 16;
+        this.distanceText.fontFamily = Settings.MAIN_FONT;
         this.distanceText.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.distanceText.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.distanceText);
@@ -83,6 +87,7 @@ export class ObjectOverlay {
         this.etaText.zIndex = 6;
         this.etaText.height = "20px";
         this.etaText.fontSize = 16;
+        this.etaText.fontFamily = Settings.MAIN_FONT;
         this.etaText.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.etaText.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.etaText);

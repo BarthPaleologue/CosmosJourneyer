@@ -495,7 +495,7 @@ export class StarMap {
         const targetPosition = this.controls
             .getTransform()
             .getAbsolutePosition()
-            .add(starDir.scaleInPlace(distance - 0.8));
+            .add(starDir.scaleInPlace(distance - 1.5));
 
         // if the transform is already in the right position, do not animate
         if (skipAnimation) this.controls.getTransform().position = targetPosition;

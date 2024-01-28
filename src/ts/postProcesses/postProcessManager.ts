@@ -134,18 +134,18 @@ export class PostProcessManager {
 
     private readonly starFieldRenderEffect: PostProcessRenderEffect;
 
-    private readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
-    private readonly fxaaRenderEffect: PostProcessRenderEffect;
-    private readonly bloomRenderEffect: BloomEffect;
+    readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
+    readonly fxaaRenderEffect: PostProcessRenderEffect;
+    //readonly bloomRenderEffect: BloomEffect;
 
     constructor(scene: UberScene) {
         this.scene = scene;
         this.engine = scene.getEngine();
 
         this.colorCorrection = new ColorCorrection("colorCorrection", scene.getEngine());
-        this.colorCorrection.exposure = 1.1;
+        this.colorCorrection.exposure = 1.5;
         this.colorCorrection.gamma = 1.0;
-        this.colorCorrection.saturation = 1.0;
+        this.colorCorrection.saturation = 1.2;
 
         this.fxaa = new FxaaPostProcess("fxaa", 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine());
 
@@ -168,8 +168,8 @@ export class PostProcessManager {
             return this.starFields;
         });
 
-        this.bloomRenderEffect = new BloomEffect(scene, 1.0, 1.0, 32);
-        this.bloomRenderEffect.threshold = 0.6;
+        //this.bloomRenderEffect = new BloomEffect(scene, 1.0, 2.0, 32);
+        //this.bloomRenderEffect.threshold = 0.5;
     }
 
     /**
@@ -389,6 +389,8 @@ export class PostProcessManager {
 
         this.currentRenderingPipeline.addEffect(this.starFieldRenderEffect);
 
+        this.currentRenderingPipeline.addEffect(shadowRenderEffect);
+
         for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
                 case PostProcessType.VOLUMETRIC_LIGHT:
@@ -459,10 +461,9 @@ export class PostProcessManager {
             }
         }
 
-        this.currentRenderingPipeline.addEffect(shadowRenderEffect);
         this.currentRenderingPipeline.addEffect(lensFlareRenderEffect);
         this.currentRenderingPipeline.addEffect(this.fxaaRenderEffect);
-        this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
+        //this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
         this.currentRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
         this.currentRenderingPipeline.attachToCamera(this.scene.getActiveCamera());

@@ -13,6 +13,7 @@ import { TransformTranslationAnimation } from "../uberCore/transforms/animations
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { SystemSeed } from "../utils/systemSeed";
 import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
+import packageInfo from "../../../package.json";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -29,6 +30,7 @@ export class MainMenu {
 
     private htmlRoot: HTMLElement | null = null;
     private title: HTMLElement | null = null;
+    private version: HTMLElement | null = null;
 
     private activeRightPanel: HTMLElement | null = null;
     private loadSavePanel: HTMLElement | null = null;
@@ -104,6 +106,11 @@ export class MainMenu {
         const title = document.querySelector("#mainMenu h1");
         if (title === null) throw new Error("#mainMenu h1 does not exist!");
         this.title = title as HTMLElement;
+
+        const version = document.getElementById("version");
+        if (version === null) throw new Error("#version does not exist!");
+        version.textContent = `Alpha ${packageInfo.version}`;
+        this.version = version;
 
         document.getElementById("startButton")?.addEventListener("click", () => {
             this.startAnimation(() => this.onStartObservable.notifyObservers());
@@ -285,6 +292,7 @@ export class MainMenu {
         this.scene.onBeforePhysicsObservable.add(animationCallback);
 
         this.hideMenu();
+        this.hideVersion();
     }
 
     private toggleActivePanel(newPanel: HTMLElement) {
@@ -306,6 +314,11 @@ export class MainMenu {
             this.activeRightPanel.classList.remove("visible");
             this.activeRightPanel = null;
         }
+    }
+
+    private hideVersion() {
+        if (this.version === null) throw new Error("Version is null");
+        this.version.style.transform = "translateY(100%)";
     }
 
     private hideMenu() {

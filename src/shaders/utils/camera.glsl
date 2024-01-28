@@ -22,3 +22,4 @@ uniform mat4  camera_inverseProjection;
 uniform mat4  camera_inverseView;
 uniform float camera_near;
 uniform float camera_far;
+uniform float camera_fov;

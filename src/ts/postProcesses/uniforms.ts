@@ -81,6 +81,14 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
                 if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.maxZ;
             }
+        },
+        {
+            name: "camera_fov",
+            type: UniformEnumType.Float,
+            get: () => {
+                if (scene.activeCamera === null) throw new Error("No active camera");
+                return scene.activeCamera.fov;
+            }
         }
     ];
 }

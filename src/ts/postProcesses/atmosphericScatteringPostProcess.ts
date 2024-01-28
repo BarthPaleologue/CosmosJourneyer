@@ -62,7 +62,7 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
             redWaveLength: 700 * (1 + centeredRand(planet.model.rng, 1300) / 6),
             greenWaveLength: 530 * (1 + centeredRand(planet.model.rng, 1310) / 6),
             blueWaveLength: 440 * (1 + centeredRand(planet.model.rng, 1320) / 6),
-            mieHaloRadius: 0.6
+            mieHaloRadius: 0.65
         };
 
         const uniforms: ShaderUniforms = [
