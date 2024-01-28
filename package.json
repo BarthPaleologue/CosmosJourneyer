@@ -60,7 +60,7 @@
     "test": "jest --coverage",
     "docs": "typedoc --options typedoc.json",
     "serve:docs": "http-server docs -p 8081",
-    "lint:check": "eslint src/ts/**/*.ts",
+    "lint:check": "eslint 'src/ts/**/**/*.ts'",
     "lint:fix": "eslint src/ts/**/*.ts --fix"
   }
 }

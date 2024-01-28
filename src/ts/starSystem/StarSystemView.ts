@@ -337,7 +337,7 @@ export class StarSystemView {
 
     unZoom(callback: () => void) {
         const activeControls = this.scene.getActiveController();
-        if (activeControls != this.getSpaceshipControls()) {
+        if (activeControls !== this.getSpaceshipControls()) {
             callback();
             return;
         }

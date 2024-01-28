@@ -176,14 +176,14 @@ export class Spaceship {
                 const spacePressed = keyboard.isPressed(" ");
                 const forwardPressed = keyboard.isAnyPressed(["w", "z"]);
 
-                if (spacePressed != this.hoverThrustersRunning) {
+                if (spacePressed !== this.hoverThrustersRunning) {
                     if (spacePressed) Assets.EngineRunningSound.play();
                     else Assets.EngineRunningSound.stop();
 
                     this.hoverThrustersRunning = spacePressed;
                 }
 
-                if (forwardPressed != this.mainThrustersRunning) {
+                if (forwardPressed !== this.mainThrustersRunning) {
                     if (forwardPressed) Assets.EngineRunningSound.play();
                     else Assets.EngineRunningSound.stop();
 

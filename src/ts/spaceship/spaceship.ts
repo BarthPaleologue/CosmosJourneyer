@@ -246,7 +246,7 @@ export class Spaceship implements Transformable {
             this.aggregate.body.setAngularDamping(1);
         }
 
-        if (this.state == ShipState.LANDING) {
+        if (this.state === ShipState.LANDING) {
             if (this.landingTarget === null) {
                 throw new Error("Closest walkable object is null while landing");
             }

@@ -154,6 +154,10 @@ export class ShipControls implements Controls {
 
         for (const input of this.inputs) this.listenTo(input, deltaTime);
 
+        // camera shake
+        // this.thirdPersonCamera.alpha += (Math.random() - 0.5) / 500;
+        // this.thirdPersonCamera.beta += (Math.random() - 0.5) / 500;
+
         this.getActiveCamera().getViewMatrix(true);
         return this.getTransform().getAbsolutePosition();
     }
