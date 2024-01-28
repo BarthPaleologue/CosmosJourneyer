@@ -151,7 +151,7 @@ float cloudShadows(vec3 closestPoint) {
         lightAmount -= density;
     }
 
-    return 0.2 + saturate(lightAmount) / 0.8;
+    return 0.4 + saturate(lightAmount) / 0.6;
 }
 
 void main() {
