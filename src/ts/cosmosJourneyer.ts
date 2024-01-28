@@ -121,7 +121,10 @@ export class CosmosJourneyer {
                       jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
                   }
               })
-            : new Engine(this.canvas);
+            : new Engine(this.canvas, true, {
+                // the preserveDrawingBuffer option is required for the screenshot feature to work
+                preserveDrawingBuffer: true
+            });
 
         //this.engine = new Engine(this.canvas); //await EngineFactory.CreateAsync(this.canvas, { enableAllFeatures: true });
         this.engine.useReverseDepthBuffer = true;
