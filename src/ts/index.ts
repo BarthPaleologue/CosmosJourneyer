@@ -19,17 +19,30 @@ import "../styles/index.scss";
 
 import { CosmosJourneyer } from "./cosmosJourneyer";
 import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
+import { decodeBase64 } from "./utils/base64";
+import { isJsonStringValidUniverseCoordinates } from "./saveFile/universeCoordinates";
 
 const engine = new CosmosJourneyer();
 
 await engine.setup();
 
 const starSystemView = engine.getStarSystemView();
-engine.init();
+
+const urlParams = new URLSearchParams(window.location.search);
+const universeCoordinatesString = urlParams.get("universeCoordinates");
+
+if(universeCoordinatesString !== null) {
+    const jsonString = decodeBase64(universeCoordinatesString);
+    if(!isJsonStringValidUniverseCoordinates(jsonString)) {
+        alert("Invalid universe coordinates");
+    }
+    engine.loadUniverseCoordinates(JSON.parse(jsonString));
+} else {
+    engine.init(false);
+}
 
 const shipControls = starSystemView.getSpaceshipControls();
 const characterController = starSystemView.getCharacterControls();
-const defaultController = starSystemView.getDefaultControls();
 
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;

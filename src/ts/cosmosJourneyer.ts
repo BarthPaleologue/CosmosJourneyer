@@ -40,10 +40,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { ShipControls } from "./spaceship/shipControls";
-import { PhysicsMotionType } from "@babylonjs/core";
-import { setMaxLinVel } from "./utils/havok";
+import { encodeBase64 } from "./utils/base64";
+import { UniverseCoordinates } from "./saveFile/universeCoordinates";
 
 enum EngineState {
+    UNINITIALIZED,
     RUNNING,
     PAUSED
 }
@@ -66,7 +67,7 @@ export class CosmosJourneyer {
 
     private activeScene: Scene | null = null;
 
-    private state = EngineState.RUNNING;
+    private state = EngineState.UNINITIALIZED;
 
     readonly onToggleStarMapObservable = new Observable<boolean>();
 
@@ -76,10 +77,11 @@ export class CosmosJourneyer {
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
             const saveData = this.generateSaveData();
-            const starSystem = saveData.starSystem;
 
-            const payload = `starMapX=${starSystem.starSectorX}&starMapY=${starSystem.starSectorY}&starMapZ=${starSystem.starSectorZ}&index=${starSystem.starSectorIndex}&objectIndex=${saveData.nearestOrbitalObjectIndex}&positionX=${saveData.positionX}&positionY=${saveData.positionY}&positionZ=${saveData.positionZ}&rotationQuaternionX=${saveData.rotationQuaternionX}&rotationQuaternionY=${saveData.rotationQuaternionY}&rotationQuaternionZ=${saveData.rotationQuaternionZ}&rotationQuaternionW=${saveData.rotationQuaternionW}`;
-            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/random.html?${payload}`);
+            const urlData = encodeBase64(JSON.stringify(saveData.universeCoordinates));
+
+            const payload = `universeCoordinates=${urlData}`;
+            const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/?${payload}`);
             navigator.clipboard.writeText(url.toString()).then(() => console.log("Copied to clipboard"));
         });
         this.pauseMenu.onSave.add(() => this.downloadSaveFile());
@@ -124,9 +126,9 @@ export class CosmosJourneyer {
                   }
               })
             : new Engine(this.canvas, true, {
-                // the preserveDrawingBuffer option is required for the screenshot feature to work
-                preserveDrawingBuffer: true
-            });
+                  // the preserveDrawingBuffer option is required for the screenshot feature to work
+                  preserveDrawingBuffer: true
+              });
 
         //this.engine = new Engine(this.canvas); //await EngineFactory.CreateAsync(this.canvas, { enableAllFeatures: true });
         this.engine.useReverseDepthBuffer = true;
@@ -203,6 +205,7 @@ export class CosmosJourneyer {
             if (this.isPaused()) return;
             this.getActiveScene().render();
         });
+        this.state = EngineState.RUNNING;
     }
 
     /**
@@ -326,20 +329,17 @@ export class CosmosJourneyer {
 
         return {
             version: projectInfo.version,
-            starSystem: {
-                starSectorX: seed.starSectorX,
-                starSectorY: seed.starSectorY,
-                starSectorZ: seed.starSectorZ,
-                starSectorIndex: seed.index
-            },
-            nearestOrbitalObjectIndex: nearestOrbitalObjectIndex,
-            positionX: currentLocalPosition.x,
-            positionY: currentLocalPosition.y,
-            positionZ: currentLocalPosition.z,
-            rotationQuaternionX: currentLocalRotation.x,
-            rotationQuaternionY: currentLocalRotation.y,
-            rotationQuaternionZ: currentLocalRotation.z,
-            rotationQuaternionW: currentLocalRotation.w
+            universeCoordinates: {
+                starSystem: seed.serialize(),
+                nearestOrbitalObjectIndex: nearestOrbitalObjectIndex,
+                positionX: currentLocalPosition.x,
+                positionY: currentLocalPosition.y,
+                positionZ: currentLocalPosition.z,
+                rotationQuaternionX: currentLocalRotation.x,
+                rotationQuaternionY: currentLocalRotation.y,
+                rotationQuaternionZ: currentLocalRotation.z,
+                rotationQuaternionW: currentLocalRotation.w
+            }
         };
     }
 
@@ -358,10 +358,20 @@ export class CosmosJourneyer {
 
     /**
      * Loads a save file and apply it. This will generate the requested star system and position the player at the requested position around the requested orbital object.
+     * This will perform engine initialization if the engine is not initialized.
      * @param saveData The save file data to load
      */
     public loadSaveData(saveData: SaveFileData): void {
-        const seed = new SystemSeed(saveData.starSystem.starSectorX, saveData.starSystem.starSectorY, saveData.starSystem.starSectorZ, saveData.starSystem.starSectorIndex);
+        this.loadUniverseCoordinates(saveData.universeCoordinates);
+    }
+
+    /**
+     * Loads universe coordinates and apply them. This will generate the requested star system and position the player at the requested position around the requested orbital object.
+     * This will perform engine initialization if the engine is not initialized.
+     * @param universeCoordinates The universe coordinates to load
+     */
+    public loadUniverseCoordinates(universeCoordinates: UniverseCoordinates): void {
+        const seed = SystemSeed.Deserialize(universeCoordinates.starSystem);
 
         this.getStarMap().setCurrentStarSystem(seed);
         this.getStarSystemView().setStarSystem(new StarSystemController(seed, this.getStarSystemView().scene), true);
@@ -374,18 +384,18 @@ export class CosmosJourneyer {
 
             const playerTransform = this.getStarSystemView().scene.getActiveController().getTransform();
 
-            const nearestOrbitalObject = this.getStarSystemView().getStarSystem().getOrbitalObjects()[saveData.nearestOrbitalObjectIndex];
+            const nearestOrbitalObject = this.getStarSystemView().getStarSystem().getOrbitalObjects()[universeCoordinates.nearestOrbitalObjectIndex];
             const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();
-            const currentLocalPosition = new Vector3(saveData.positionX, saveData.positionY, saveData.positionZ);
+            const currentLocalPosition = new Vector3(universeCoordinates.positionX, universeCoordinates.positionY, universeCoordinates.positionZ);
             const currentWorldPosition = Vector3.TransformCoordinates(currentLocalPosition, nearestOrbitalObjectWorld);
             playerTransform.setAbsolutePosition(currentWorldPosition);
 
             const nearestOrbitalObjectWorldRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion;
             const currentLocalRotationQuaternion = new Quaternion(
-                saveData.rotationQuaternionX,
-                saveData.rotationQuaternionY,
-                saveData.rotationQuaternionZ,
-                saveData.rotationQuaternionW
+              universeCoordinates.rotationQuaternionX,
+              universeCoordinates.rotationQuaternionY,
+              universeCoordinates.rotationQuaternionZ,
+              universeCoordinates.rotationQuaternionW
             );
             const currentWorldRotationQuaternion = currentLocalRotationQuaternion.multiply(nearestOrbitalObjectWorldRotation);
             setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
@@ -397,6 +407,7 @@ export class CosmosJourneyer {
             this.getStarSystemView().getStarSystem().applyFloatingOrigin();
         });
 
-        this.getStarSystemView().initStarSystem();
+        if(this.state === EngineState.UNINITIALIZED) this.init(true);
+        else this.getStarSystemView().initStarSystem();
     }
 }

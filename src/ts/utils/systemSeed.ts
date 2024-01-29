@@ -20,6 +20,13 @@ import { hashVec3 } from "./hashVec3";
 import { centeredRand } from "extended-random";
 import { Settings } from "../settings";
 
+export type SystemSeedSerialized = {
+    starSectorX: number;
+    starSectorY: number;
+    starSectorZ: number;
+    index: number;
+};
+
 export class SystemSeed {
     readonly starSectorX: number;
     readonly starSectorY: number;
@@ -44,5 +51,18 @@ export class SystemSeed {
 
     toString(): string {
         return `${this.starSectorX},${this.starSectorY},${this.starSectorZ},${this.index}`;
+    }
+
+    serialize(): SystemSeedSerialized {
+        return {
+            starSectorX: this.starSectorX,
+            starSectorY: this.starSectorY,
+            starSectorZ: this.starSectorZ,
+            index: this.index
+        };
+    }
+
+    static Deserialize(data: SystemSeedSerialized): SystemSeed {
+        return new SystemSeed(data.starSectorX, data.starSectorY, data.starSectorZ, data.index);
     }
 }
