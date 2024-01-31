@@ -27,6 +27,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
+import { uniformRandBool } from "extended-random";
 
 /**
  * @see https://playground.babylonjs.com/#GLZ1PX#1241 (SPS)
@@ -101,7 +102,7 @@ export class WarpTunnel implements Transformable {
             particle.position.addInPlace(direction.scale(Math.random() * 10));
             particle.position.addInPlace(this.anchor.getAbsolutePosition());
 
-            particle.velocity.copyFrom(direction.scale(200));
+            particle.velocity.copyFrom(direction.scale(300));
 
             particle.rotationQuaternion = rotationQuaternion;
 
@@ -196,8 +197,10 @@ export class WarpTunnel implements Transformable {
             updateGlobals();
 
             if (this.nbParticlesAlive < this.targetNbParticles && this.recycledParticles.length > 0) {
-                instanceFromStock();
-                this.nbParticlesAlive++;
+                if(Math.random() < this.targetNbParticles / WarpTunnel.MAX_NB_PARTICLES) {
+                    instanceFromStock();
+                    this.nbParticlesAlive++;
+                }
             }
 
             if (this.nbParticlesAlive === 0 && SPS.mesh.isEnabled()) {
