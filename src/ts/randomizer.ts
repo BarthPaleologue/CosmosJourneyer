@@ -46,10 +46,7 @@ engine.getStarMap().setCurrentStarSystem(seed);
 
 engine.init(true);
 
-const planetIndex = 0;
-
 const nbRadius = starSystem.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 3;
-if (planetIndex >= starSystem.planets.length) throw new Error(`Planet index (${planetIndex}) out of bound (0 - ${starSystem.planets.length - 1})!`);
 const planet = starSystem.planets.length > 0 ? starSystem.planets[0] : starSystem.stellarObjects[0];
 positionNearObjectBrightSide(scene.getActiveController(), planet, starSystem, nbRadius);
 
