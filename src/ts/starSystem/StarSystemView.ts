@@ -209,6 +209,9 @@ export class StarSystemView {
     update(deltaTime: number) {
         const starSystem = this.getStarSystem();
 
+        Assets.ButterflyMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaTime);
+        Assets.GrassMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaTime);
+
         this.chunkForge.update();
         starSystem.update(deltaTime * Settings.TIME_MULTIPLIER, this.chunkForge);
 

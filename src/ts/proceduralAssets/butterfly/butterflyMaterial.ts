@@ -23,42 +23,38 @@ import butterflyVertex from "../../../shaders/butterflyMaterial/butterflyVertex.
 
 import butterflyTexture from "../../../asset/butterfly.png";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Transformable } from "../../architecture/transformable";
 
-export function createButterflyMaterial(scene: Scene, player?: TransformNode) {
-    const shaderName = "butterflyMaterial";
-    Effect.ShadersStore[`${shaderName}FragmentShader`] = butterflyFragment;
-    Effect.ShadersStore[`${shaderName}VertexShader`] = butterflyVertex;
+export class ButterflyMaterial extends ShaderMaterial {
+    private elapsedSeconds = 0;
+    constructor(scene: Scene) {
+        const shaderName = "butterflyMaterial";
+        Effect.ShadersStore[`${shaderName}FragmentShader`] = butterflyFragment;
+        Effect.ShadersStore[`${shaderName}VertexShader`] = butterflyVertex;
 
-    const butterflyMaterial = new ShaderMaterial(shaderName, scene, shaderName, {
-        attributes: ["position", "normal", "uv"],
-        uniforms: ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "playerPosition"],
-        defines: ["#define INSTANCES"],
-        samplers: ["butterflyTexture"]
-    });
+        super(shaderName, scene, shaderName, {
+            attributes: ["position", "normal", "uv"],
+            uniforms: ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "playerPosition"],
+            defines: ["#define INSTANCES"],
+            samplers: ["butterflyTexture"]
+        });
 
-    butterflyMaterial.setTexture("butterflyTexture", new Texture(butterflyTexture, scene));
-    butterflyMaterial.backFaceCulling = false;
+        this.setVector3("lightDirection", new Vector3(0, 0, 0));
+        this.setVector3("playerPosition", new Vector3(0, 0, 0));
+        this.setFloat("time", 0);
+        this.setTexture("butterflyTexture", new Texture(butterflyTexture, scene));
+        this.backFaceCulling = false;
+    }
 
-    let elapsedSeconds = 0;
-    scene.onBeforeRenderObservable.add(() => {
-        elapsedSeconds += scene.getEngine().getDeltaTime() / 1000;
+    update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
+        this.elapsedSeconds += deltaSeconds;
 
-        if (scene.activeCamera === null) throw new Error("Active camera is null");
+        const star = stars[0];
+        const lightDirection = star.getTransform().getAbsolutePosition().subtract(playerPosition).normalize();
+        this.setVector3("lightDirection", lightDirection);
 
-        const starIndex = scene.lights.findIndex((light) => light instanceof PointLight);
-        if (starIndex === -1) throw new Error("Could not find star light");
-        const star = scene.lights[starIndex] as PointLight;
-
-        const lightDirection = star.position.subtract(scene.activeCamera.globalPosition).normalize();
-        butterflyMaterial.setVector3("lightDirection", lightDirection);
-
-        const playerPosition = player?.position ?? new Vector3(0, 0, 0);
-        butterflyMaterial.setVector3("playerPosition", playerPosition);
-        butterflyMaterial.setFloat("time", elapsedSeconds);
-    });
-
-    return butterflyMaterial;
+        this.setVector3("playerPosition", playerPosition);
+        this.setFloat("time", this.elapsedSeconds);
+    }
 }
