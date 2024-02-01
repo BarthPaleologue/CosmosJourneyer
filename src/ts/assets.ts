@@ -185,9 +185,6 @@ export class Assets {
                 //pbr._reflectionTexture.coordinatesMode = Texture.SPHERICAL_MODE;
             }
 
-            Assets.Spacestation.rotate(Axis.X, -Math.PI / 2);
-            Assets.Spacestation.bakeCurrentTransformIntoVertices();
-
             console.log("Spacestation loaded");
         };
 

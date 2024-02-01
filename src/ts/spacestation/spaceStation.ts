@@ -29,17 +29,29 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeType } from "@babylonjs/core";
+import { LandingPad } from "../landingPad/landingPad";
+import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
+import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
 
     readonly model: SpaceStationModel;
 
+    readonly aggregate: PhysicsAggregate;
+
     readonly postProcesses: PostProcessType[] = [];
 
     readonly instance: InstancedMesh;
 
     readonly ringInstances: InstancedMesh[] = [];
+    readonly ringAggregates: PhysicsAggregate[] = [];
+
+    readonly landingPads: LandingPad[] = [];
 
     readonly parent: OrbitalObject | null = null;
 
@@ -56,11 +68,49 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
         this.instance = Assets.CreateSpaceStationInstance();
 
+        this.aggregate = new PhysicsAggregate(
+            this.getTransform(),
+            PhysicsShapeType.CONTAINER,
+            {
+                mass: 0,
+                restitution: 0.2
+            },
+            scene
+        );
+
+        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
+
         for (const mesh of this.instance.getChildMeshes()) {
+            if (mesh.name.toLowerCase().includes("landingpad")) {
+                const landingPad = new LandingPad(scene, mesh);
+                this.landingPads.push(landingPad);
+
+                const constraint = new LockConstraint(Vector3.Zero(), landingPad.getTransform().position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), scene);
+                this.aggregate.body.addConstraint(landingPad.aggregate.body, constraint);
+
+                continue;
+            }
+
             if (mesh.name.includes("ring")) {
                 this.ringInstances.push(mesh as InstancedMesh);
+
+                const ringAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, {mass:0, restitution:0.2}, scene);
+                ringAggregate.body.disablePreStep = false;
+                this.ringAggregates.push(ringAggregate);
+
+                const constraint = new LockConstraint(Vector3.Zero(), mesh.position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), scene);
+                this.aggregate.body.addConstraint(ringAggregate.body, constraint);
+
+                continue;
             }
+
+            const childShape = new PhysicsShapeMesh(mesh as Mesh, scene);
+            this.aggregate.shape.addChildFromParent(this.getTransform(), childShape, mesh);
         }
+
+        this.aggregate.body.disablePreStep = false;
+
+        console.log("found", this.landingPads.length, "landing pads");
 
         this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
         this.getTransform().rotate(Axis.Y, this.model.physicalProperties.axialTilt);
@@ -95,18 +145,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
         for (const mesh of this.instance.getChildMeshes()) {
             mesh.isVisible = isVisible;
         }
-    }
-
-    public updateRotation(deltaTime: number): number {
-        const dtheta = deltaTime / this.model.physicalProperties.rotationPeriod;
-
-        if (this.ringInstances.length === 0) this.instance.rotate(Axis.Z, dtheta);
-        else {
-            for (const ring of this.ringInstances) {
-                ring.rotate(Axis.Y, dtheta);
-            }
-        }
-        return dtheta;
     }
 
     public dispose(): void {

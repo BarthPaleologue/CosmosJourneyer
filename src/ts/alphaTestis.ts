@@ -35,6 +35,7 @@ import { RingsUniforms } from "./postProcesses/rings/ringsUniform";
 import { getMoonSeed } from "./planets/common";
 import { SystemSeed } from "./utils/systemSeed";
 import { SpaceStation } from "./spacestation/spaceStation";
+import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 
 const engine = new CosmosJourneyer();
 
@@ -85,6 +86,11 @@ planet.postProcesses.push(PostProcessType.RING);
 
 const spacestation = new SpaceStation(starSystemView.scene, planet);
 starSystemView.getStarSystem().addSpaceStation(spacestation);
+
+//physicsViewer.showBody(spacestation.aggregate.body);
+/*for(const landingpad of spacestation.landingPads) {
+    physicsViewer.showBody(landingpad.aggregate.body);
+}*/
 
 const moonModel = new TelluricPlanetModel(getMoonSeed(planetModel, 0), planetModel);
 moonModel.physicalProperties.mass = 2;

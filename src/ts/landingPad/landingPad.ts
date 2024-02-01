@@ -8,13 +8,20 @@ import { CollisionMask } from "../settings";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Transformable } from "../architecture/transformable";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
 export class LandingPad implements Transformable {
     readonly instanceRoot: TransformNode;
     readonly aggregate: PhysicsAggregate;
 
-    constructor(scene: Scene) {
-        this.instanceRoot = Assets.CreateLandingPadInstance();
+    constructor(scene: Scene, existingMesh: AbstractMesh | null = null) {
+        if(existingMesh === null) {
+            this.instanceRoot = Assets.CreateLandingPadInstance();
+        } else {
+            this.instanceRoot = new TransformNode(existingMesh.name + "root", scene);
+            this.instanceRoot.parent = existingMesh.parent;
+            existingMesh.parent = this.instanceRoot;
+        }
 
         this.aggregate = new PhysicsAggregate(
             this.instanceRoot,

@@ -7,7 +7,7 @@ import { setMaxLinVel } from "./utils/havok";
 import { UberScene } from "./uberCore/uberScene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Assets } from "./assets";
-import { roll, translate } from "./uberCore/transforms/basicTransform";
+import { roll, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import "@babylonjs/core/Physics/physicsEngineComponent";
@@ -21,6 +21,9 @@ import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator"
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { SpaceStation } from "./spacestation/spaceStation";
+import { Quaternion } from "@babylonjs/core/Maths/math";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -59,13 +62,27 @@ landingPad.instanceRoot.getChildMeshes().forEach((mesh) => {
     mesh.receiveShadows = true;
 });
 
+const physicsViewer = new PhysicsViewer();
+physicsViewer.showBody(spaceship.aggregate.body);
+physicsViewer.showBody(landingPad.aggregate.body);
+
+const spacestation = new SpaceStation(scene);
+setRotationQuaternion(spacestation.getTransform(), Quaternion.RotationAxis(Axis.X, Math.PI / 2));
+translate(spacestation.getTransform(), new Vector3(0, -100, 0));
+
+//physicsViewer.showBody(spacestation.aggregate.body);
+spacestation.landingPads.forEach(stationLandingPad => {
+   physicsViewer.showBody(stationLandingPad.aggregate.body);
+});
+
+/*spacestation.ringAggregates.forEach(ring => {
+    physicsViewer.showBody(ring.body);
+});*/
+
 /*const ground = MeshBuilder.CreateGround("ground", { width: 50, height: 50 });
 ground.position.y = -40;
 ground.receiveShadows = true;*/
 
-/*const physicsViewer = new PhysicsViewer();
-physicsViewer.showBody(spaceship.aggregate.body);
-physicsViewer.showBody(landingPad.aggregate.body);*/
 
 const defaultControls = new DefaultControls(scene);
 defaultControls.speed *= 15;
@@ -80,6 +97,10 @@ scene.onBeforeRenderObservable.add(() => {
     const deltaTime = scene.deltaTime / 1000;
     scene.getActiveController().update(deltaTime);
     spaceship.update(deltaTime);
+
+    spacestation.ringInstances.forEach(mesh => {
+       mesh.rotate(Axis.Y, 0.01 * deltaTime);
+    });
 });
 
 scene.executeWhenReady(() => {
