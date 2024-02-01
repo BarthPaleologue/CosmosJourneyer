@@ -24,6 +24,7 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { SpaceStation } from "./spacestation/spaceStation";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { OrbitalObject } from "./architecture/orbitalObject";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -56,24 +57,24 @@ shadowGenerator.addShadowCaster(spaceship.instanceRoot, true);
 spaceship.getTransform().position = new Vector3(0, 0, -10);
 roll(spaceship.getTransform(), Math.random() * 6.28);
 
-const landingPad = new LandingPad(scene);
+/*const landingPad = new LandingPad(scene);
 landingPad.getTransform().position = new Vector3(0, -20, 0);
 landingPad.instanceRoot.getChildMeshes().forEach((mesh) => {
     mesh.receiveShadows = true;
-});
+});*/
 
 const physicsViewer = new PhysicsViewer();
-physicsViewer.showBody(spaceship.aggregate.body);
-physicsViewer.showBody(landingPad.aggregate.body);
+/*physicsViewer.showBody(spaceship.aggregate.body);
+physicsViewer.showBody(landingPad.aggregate.body);*/
 
 const spacestation = new SpaceStation(scene);
 setRotationQuaternion(spacestation.getTransform(), Quaternion.RotationAxis(Axis.X, Math.PI / 2));
 translate(spacestation.getTransform(), new Vector3(0, -100, 0));
 
 //physicsViewer.showBody(spacestation.aggregate.body);
-spacestation.landingPads.forEach(stationLandingPad => {
+/*spacestation.landingPads.forEach(stationLandingPad => {
    physicsViewer.showBody(stationLandingPad.aggregate.body);
-});
+});*/
 
 /*spacestation.ringAggregates.forEach(ring => {
     physicsViewer.showBody(ring.body);
@@ -91,12 +92,14 @@ scene.setActiveController(defaultControls);
 
 translate(defaultControls.getTransform(), new Vector3(50, 0, 0));
 
-defaultControls.getTransform().lookAt(Vector3.Lerp(spaceship.getTransform().position, landingPad.getTransform().position, 0.5));
+//defaultControls.getTransform().lookAt(Vector3.Lerp(spaceship.getTransform().position, landingPad.getTransform().position, 0.5));
 
 scene.onBeforeRenderObservable.add(() => {
     const deltaTime = scene.deltaTime / 1000;
     scene.getActiveController().update(deltaTime);
     spaceship.update(deltaTime);
+
+    //OrbitalObject.UpdateRotation(spacestation, deltaTime);
 
     spacestation.ringInstances.forEach(mesh => {
        mesh.rotate(Axis.Y, 0.01 * deltaTime);
@@ -109,9 +112,12 @@ scene.executeWhenReady(() => {
     });
 });
 
+const landingPad = spacestation.handleDockingRequest();
+if(landingPad === null) throw new Error("Docking request denied");
+
 document.addEventListener("keydown", (event) => {
     if (event.key === "o") {
-        spaceship.engageLanding(landingPad);
+        spaceship.engageLandingOnPad(landingPad);
     }
 });
 

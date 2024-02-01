@@ -30,12 +30,13 @@ import { OrbitProperties } from "../orbit/orbitProperties";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeType } from "@babylonjs/core";
+import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core";
 import { LandingPad } from "../landingPad/landingPad";
-import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
-import { setRotationQuaternion } from "../uberCore/transforms/basicTransform";
+import { CollisionMask, Settings } from "../settings";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -78,23 +79,36 @@ export class SpaceStation implements OrbitalObject, Cullable {
             scene
         );
 
+        this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+        this.aggregate.shape.filterCollideMask = CollisionMask.SPACESHIP;
+
+        this.aggregate.body.setCollisionCallbackEnabled(true);
+        this.aggregate.body.getCollisionObservable().add(() => {
+            console.log("collision!");
+        });
+
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
 
         for (const mesh of this.instance.getChildMeshes()) {
             if (mesh.name.toLowerCase().includes("landingpad")) {
+                const childShape = new PhysicsShapeConvexHull(mesh as Mesh, scene);
+                //childShape.filterMembershipMask = CollisionMask.LANDING_PADS;
+                childShape.filterCollideMask = CollisionMask.SPACESHIP;
+                this.aggregate.shape.addChildFromParent(this.getTransform(), childShape, mesh);
+
                 const landingPad = new LandingPad(scene, mesh);
                 this.landingPads.push(landingPad);
 
-                const constraint = new LockConstraint(Vector3.Zero(), landingPad.getTransform().position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), scene);
-                this.aggregate.body.addConstraint(landingPad.aggregate.body, constraint);
+                /*const constraint = new LockConstraint(Vector3.Zero(), landingPad.getTransform().position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), scene);
+        this.aggregate.body.addConstraint(landingPad.aggregate.body, constraint);*/
 
                 continue;
             }
 
-            if (mesh.name.includes("ring")) {
+            if (mesh.name.toLowerCase().includes("ring")) {
                 this.ringInstances.push(mesh as InstancedMesh);
 
-                const ringAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, {mass:0, restitution:0.2}, scene);
+                const ringAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, { mass: 0, restitution: 0.2 }, scene);
                 ringAggregate.body.disablePreStep = false;
                 this.ringAggregates.push(ringAggregate);
 
@@ -105,6 +119,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
             }
 
             const childShape = new PhysicsShapeMesh(mesh as Mesh, scene);
+            childShape.filterMembershipMask = CollisionMask.SPACE_STATION;
             this.aggregate.shape.addChildFromParent(this.getTransform(), childShape, mesh);
         }
 
@@ -112,8 +127,17 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
         console.log("found", this.landingPads.length, "landing pads");
 
-        this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
-        this.getTransform().rotate(Axis.Y, this.model.physicalProperties.axialTilt);
+        //this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
+        //this.getTransform().rotate(Axis.Y, this.model.physicalProperties.axialTilt);
+    }
+
+    handleDockingRequest(): LandingPad | null {
+        const availableLandingPads = this.landingPads;
+        const nbPads = availableLandingPads.length;
+
+        if (nbPads === 0) return null;
+
+        return availableLandingPads[Math.floor(Math.random() * nbPads)];
     }
 
     getTransform(): TransformNode {
