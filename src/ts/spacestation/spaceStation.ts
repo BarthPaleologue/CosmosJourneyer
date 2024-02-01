@@ -80,7 +80,8 @@ export class SpaceStation implements OrbitalObject, Cullable {
         );
 
         this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
-        this.aggregate.shape.filterCollideMask = CollisionMask.SPACESHIP;
+        this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
         this.aggregate.body.setCollisionCallbackEnabled(true);
         this.aggregate.body.getCollisionObservable().add(() => {
@@ -92,8 +93,8 @@ export class SpaceStation implements OrbitalObject, Cullable {
         for (const mesh of this.instance.getChildMeshes()) {
             if (mesh.name.toLowerCase().includes("landingpad")) {
                 const childShape = new PhysicsShapeConvexHull(mesh as Mesh, scene);
-                //childShape.filterMembershipMask = CollisionMask.LANDING_PADS;
-                childShape.filterCollideMask = CollisionMask.SPACESHIP;
+                childShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+                childShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
                 this.aggregate.shape.addChildFromParent(this.getTransform(), childShape, mesh);
 
                 const landingPad = new LandingPad(scene, mesh);
@@ -119,7 +120,8 @@ export class SpaceStation implements OrbitalObject, Cullable {
             }
 
             const childShape = new PhysicsShapeMesh(mesh as Mesh, scene);
-            childShape.filterMembershipMask = CollisionMask.SPACE_STATION;
+            childShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+            childShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
             this.aggregate.shape.addChildFromParent(this.getTransform(), childShape, mesh);
         }
 

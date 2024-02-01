@@ -41,10 +41,8 @@ export const Settings = {
 };
 
 export const CollisionMask = {
-    GROUND: 0b00000001,
-    SPACESHIP: 0b00000010,
-    LANDING_PADS: 0b00000100,
-    SPACE_STATION: 0b00001000,
+    ENVIRONMENT: 0b00000001,
+    DYNAMIC_OBJECTS: 0b00000010
 };
 
 const seedableRNG = seededSquirrelNoise(Settings.UNIVERSE_SEED);

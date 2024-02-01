@@ -34,6 +34,7 @@ import { getMoonSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
 import { StellarObject } from "../architecture/stellarObject";
 import { BODY_TYPE } from "../model/common";
+import { SpaceStation } from "../spacestation/spaceStation";
 
 export class StarSystemHelper {
     public static makeStar(starsystem: StarSystemController, model?: number | StarModel): Star {
@@ -123,6 +124,10 @@ export class StarSystemHelper {
     ): TelluricPlanet {
         const planet = new TelluricPlanet(`${starsystem.model.getName()} ${romanNumeral(starsystem.planets.length + 1)}`, starsystem.scene, model, starsystem.stellarObjects[0]);
         starsystem.addTelluricPlanet(planet);
+
+        //const spacestation = new SpaceStation(starsystem.scene, planet);
+        //starsystem.addSpaceStation(spacestation);
+
         return planet;
     }
 

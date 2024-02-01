@@ -97,7 +97,8 @@ export class Spaceship implements Transformable {
         );
         for (const child of this.instanceRoot.getChildMeshes()) {
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
-            childShape.filterMembershipMask = CollisionMask.SPACESHIP;
+            childShape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
+            childShape.filterCollideMask = CollisionMask.ENVIRONMENT;
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
         }
         this.aggregate.body.disablePreStep = false;
@@ -244,7 +245,7 @@ export class Spaceship implements Transformable {
             const start = this.getTransform().getAbsolutePosition().add(gravityDir.scale(-50e3));
             const end = this.getTransform().getAbsolutePosition().add(gravityDir.scale(50e3));
 
-            (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { membership: CollisionMask.LANDING_PADS });
+            (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.ENVIRONMENT });
             if (this.raycastResult.hasHit) {
                 const landingSpotNormal = this.raycastResult.hitNormalWorld;
                 const extent = this.instanceRoot.getHierarchyBoundingVectors();
@@ -315,6 +316,8 @@ export class Spaceship implements Transformable {
                 const gravityDir = this.closestWalkableObject.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
                 this.aggregate.body.applyForce(gravityDir.scale(9.8), this.aggregate.body.getObjectCenterWorld());
             }
+        } else {
+            translate(this.getTransform(), warpSpeed.scale(deltaTime));
         }
 
         if (this.flightAssistEnabled) {
