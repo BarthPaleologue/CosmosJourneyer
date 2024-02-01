@@ -73,6 +73,7 @@ import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
 import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export class Assets {
     static IS_READY = false;
@@ -183,6 +184,9 @@ export class Assets {
                 //pbr._reflectionTexture = new Texture(starfield, scene);
                 //pbr._reflectionTexture.coordinatesMode = Texture.SPHERICAL_MODE;
             }
+
+            Assets.Spacestation.rotate(Axis.X, -Math.PI / 2);
+            Assets.Spacestation.bakeCurrentTransformIntoVertices();
 
             console.log("Spacestation loaded");
         };

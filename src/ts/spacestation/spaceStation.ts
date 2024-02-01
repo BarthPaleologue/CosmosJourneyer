@@ -55,7 +55,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
         this.parent = parentBody;
 
         this.instance = Assets.CreateSpaceStationInstance();
-        this.instance.parent = this.getTransform();
 
         for (const mesh of this.instance.getChildMeshes()) {
             if (mesh.name.includes("ring")) {
