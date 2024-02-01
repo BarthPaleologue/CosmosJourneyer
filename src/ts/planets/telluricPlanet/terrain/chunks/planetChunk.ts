@@ -83,8 +83,8 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         this.mesh.parent = parentAggregate.transformNode;
 
-        this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
-        this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
+        //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+        //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
 
         this.parent = parentAggregate.transformNode;
         this.parentAggregate = parentAggregate;
