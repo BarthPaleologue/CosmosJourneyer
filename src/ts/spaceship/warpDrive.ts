@@ -159,12 +159,13 @@ export class WarpDrive implements ReadonlyWarpDrive {
     /**
      * Computes the target speed of the warp drive based on the distance to the closest body and the user throttle.
      * @param closestObjectDistance The distance to the closest body in m.
+     * @param closestObjectRadius
      * @returns The computed target speed in m/s.
      */
     public updateTargetSpeed(closestObjectDistance: number, closestObjectRadius: number): number {
         const speedThreshold = 10e3;
-        const closeSpeed = (speedThreshold * 0.025 * (closestObjectDistance - closestObjectRadius)) / speedThreshold;
-        const deepSpaceSpeed = speedThreshold * ((0.025 * (closestObjectDistance - closestObjectRadius)) / speedThreshold) ** 1.1;
+        const closeSpeed = (speedThreshold * 0.025 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold;
+        const deepSpaceSpeed = speedThreshold * ((0.025 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold) ** 1.1;
         this.targetSpeed = Math.min(this.maxWarpSpeed, Math.max(closeSpeed, deepSpaceSpeed));
         return this.targetThrottle * this.targetSpeed;
     }
@@ -208,7 +209,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
         const deltaThrottle = this.internalThrottleAcceleration * deltaTime;
         this.increaseInternalThrottle(deltaThrottle * sign);
 
-        this.currentSpeed = this.internalThrottle * this.targetSpeed;
+        this.currentSpeed = Math.max(500, this.internalThrottle * this.targetSpeed);
     }
 
     /**
