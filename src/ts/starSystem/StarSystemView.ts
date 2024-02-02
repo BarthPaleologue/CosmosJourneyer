@@ -150,7 +150,7 @@ export class StarSystemView {
         this.scene.getEngine().loadingScreen.displayLoadingUI();
         this.scene.getEngine().loadingScreen.loadingUIText = `Warping to ${this.getStarSystem().model.getName()}`;
 
-        this.getStarSystem().initPositions(100, this.chunkForge);
+        this.getStarSystem().initPositions(10, this.chunkForge);
         this.ui.createObjectOverlays(this.getStarSystem().getOrbitalObjects());
 
         const firstBody = this.getStarSystem().getBodies()[0];
