@@ -490,6 +490,9 @@ export class PostProcessManager {
         this.colorCorrection.dispose();
         this.fxaa.dispose();
 
+        this.surfaceRenderingPipeline._detachCameras(this.surfaceRenderingPipeline.cameras);
+        this.spaceRenderingPipeline._detachCameras(this.spaceRenderingPipeline.cameras);
+
         this.surfaceRenderingPipeline.dispose();
         this.spaceRenderingPipeline.dispose();
     }
