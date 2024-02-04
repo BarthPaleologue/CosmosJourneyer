@@ -178,6 +178,8 @@ export class CosmosJourneyer {
 
         // Init the active scene
         this.activeScene = this.starSystemView.scene;
+        this.starMap.scene.detachControl();
+        this.starSystemView.scene.attachControl();
     }
 
     public pause(): void {
