@@ -225,14 +225,11 @@ export class StarSystemView {
         this.spaceshipControls.spaceship.registerClosestObject(distance, radius);
 
         const warpDrive = this.spaceshipControls.spaceship.getWarpDrive();
-        const shipInternalThrottle = warpDrive.getInternalThrottle();
-        const shipTargetThrottle = warpDrive.getTargetThrottle();
-
-        const throttleString = warpDrive.isEnabled()
-            ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}`
-            : `${parsePercentageFrom01(this.spaceshipControls.spaceship.getThrottle())}/100%`;
-
-        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(this.spaceshipControls.spaceship.getSpeed())}`;
+        if(warpDrive.isEnabled()) {
+            this.helmetOverlay.displaySpeed(warpDrive.getInternalThrottle(), warpDrive.getTargetThrottle(), this.spaceshipControls.spaceship.getSpeed());
+        } else {
+            this.helmetOverlay.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), 100, this.spaceshipControls.spaceship.getSpeed());
+        }
 
         this.characterControls.setClosestWalkableObject(nearestBody);
         this.spaceshipControls.spaceship.setClosestWalkableObject(nearestBody);
