@@ -40,6 +40,8 @@ export class WarpTunnel implements Transformable {
 
     readonly solidParticleSystem: SolidParticleSystem;
 
+    private throttle: number = 0;
+
     static TUNNEL_LENGTH = 300;
 
     static MAX_NB_PARTICLES = 3000;
@@ -102,7 +104,9 @@ export class WarpTunnel implements Transformable {
             particle.position.addInPlace(direction.scale(Math.random() * 10));
             particle.position.addInPlace(this.anchor.getAbsolutePosition());
 
-            particle.velocity.copyFrom(direction.scale(600));
+            particle.props = {
+                direction: direction.clone()
+            };
 
             particle.rotationQuaternion = rotationQuaternion;
 
@@ -151,6 +155,8 @@ export class WarpTunnel implements Transformable {
 
         SPS.updateParticle = (particle) => {
             if (!particle.isVisible) return particle;
+
+            particle.velocity.copyFrom(particle.props.direction.scale(400 + 400 * this.throttle));
 
             particle.position.addInPlace(particle.velocity.scale(scene.getEngine().getDeltaTime() / 1000));
             particle.position.addInPlace(spaceshipDisplacement);
@@ -214,7 +220,8 @@ export class WarpTunnel implements Transformable {
     }
 
     setThrottle(throttle: number) {
-        this.targetNbParticles = Math.floor(throttle * WarpTunnel.MAX_NB_PARTICLES);
+        this.throttle = throttle;
+        this.targetNbParticles = Math.floor(this.throttle * WarpTunnel.MAX_NB_PARTICLES);
     }
 
     getTransform(): TransformNode {
