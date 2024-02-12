@@ -73,6 +73,7 @@ import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
 import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export class Assets {
     static IS_READY = false;

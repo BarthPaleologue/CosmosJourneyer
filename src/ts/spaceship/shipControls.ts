@@ -136,10 +136,6 @@ export class ShipControls implements Controls {
                 const deltaThrottle = keyboard.getZAxis() * deltaTime;
                 this.spaceship.getWarpDrive().increaseTargetThrottle(deltaThrottle);
             }
-
-            const warpSpeed = getForwardDirection(this.getTransform()).scale(this.spaceship.getWarpDrive().getWarpSpeed());
-            //this.aggregate.body.setLinearVelocity(warpSpeed);
-            translate(this.getTransform(), warpSpeed.scale(deltaTime));
         }
     }
 

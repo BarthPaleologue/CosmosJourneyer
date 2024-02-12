@@ -97,4 +97,10 @@ export class GasPlanetModel implements PlanetModel {
     getApparentRadius(): number {
         return this.radius;
     }
+
+    public getNbSpaceStations(): number {
+        if(uniformRandBool(0.2, this.rng, GENERATION_STEPS.SPACE_STATION)) return 1;
+        if(uniformRandBool(0.1, this.rng, GENERATION_STEPS.SPACE_STATION + 10)) return 2;
+        return 0;
+    }
 }

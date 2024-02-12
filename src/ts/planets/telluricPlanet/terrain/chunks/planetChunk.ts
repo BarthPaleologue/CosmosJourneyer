@@ -84,8 +84,8 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         this.mesh.parent = parentAggregate.transformNode;
 
-        this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
-        this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
+        //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+        //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
 
         this.parent = parentAggregate.transformNode;
         this.parentAggregate = parentAggregate;
@@ -138,7 +138,8 @@ export class PlanetChunk implements Transformable, BoundingSphere {
             this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
             this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
             this.aggregate.body.disablePreStep = false;
-            this.aggregate.shape.filterMembershipMask = CollisionMask.GROUND;
+            this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+            this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
             const constraint = new LockConstraint(Vector3.Zero(), this.getTransform().position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), this.mesh.getScene());
             this.parentAggregate.body.addConstraint(this.aggregate.body, constraint);
         }

@@ -116,6 +116,8 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     private state = WARPDRIVE_STATE.DISABLED;
 
+    private static MIN_SPEED = 500;
+
     constructor(enabledByDefault = false) {
         this.state = enabledByDefault ? WARPDRIVE_STATE.ENABLED : WARPDRIVE_STATE.DISABLED;
     }
@@ -159,12 +161,13 @@ export class WarpDrive implements ReadonlyWarpDrive {
     /**
      * Computes the target speed of the warp drive based on the distance to the closest body and the user throttle.
      * @param closestObjectDistance The distance to the closest body in m.
+     * @param closestObjectRadius
      * @returns The computed target speed in m/s.
      */
     public updateTargetSpeed(closestObjectDistance: number, closestObjectRadius: number): number {
         const speedThreshold = 10e3;
-        const closeSpeed = (speedThreshold * 0.025 * (closestObjectDistance - closestObjectRadius)) / speedThreshold;
-        const deepSpaceSpeed = speedThreshold * ((0.025 * (closestObjectDistance - closestObjectRadius)) / speedThreshold) ** 1.1;
+        const closeSpeed = (speedThreshold * 0.025 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold;
+        const deepSpaceSpeed = speedThreshold * ((0.025 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold) ** 1.1;
         this.targetSpeed = Math.min(this.maxWarpSpeed, Math.max(closeSpeed, deepSpaceSpeed));
         return this.targetThrottle * this.targetSpeed;
     }
@@ -208,13 +211,14 @@ export class WarpDrive implements ReadonlyWarpDrive {
         const deltaThrottle = this.internalThrottleAcceleration * deltaTime;
         this.increaseInternalThrottle(deltaThrottle * sign);
 
-        this.currentSpeed = this.internalThrottle * this.targetSpeed;
+        this.currentSpeed = Math.max(WarpDrive.MIN_SPEED, this.internalThrottle * this.targetSpeed);
     }
 
     /**
      * Updates the warp drive based on the current speed of the ship, the distance to the closest body and the time elapsed since the last update.
      * @param currentForwardSpeed The current speed of the warp drive projected on the forward direction of the ship.
-     * @param closestObjectPosition The distance to the closest body in m.
+     * @param closestObjectDistance
+     * @param clostestObjectRadius
      * @param deltaTime The time elapsed since the last update in seconds.
      */
     public update(currentForwardSpeed: number, closestObjectDistance: number, clostestObjectRadius: number, deltaTime: number): void {
@@ -222,7 +226,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
             case WARPDRIVE_STATE.DESENGAGING:
                 this.targetSpeed *= 0.9;
                 this.updateWarpDriveSpeed(currentForwardSpeed, deltaTime);
-                if (this.targetSpeed < 1e2 && this.currentSpeed < 1e2) this.disable();
+                if (this.targetSpeed <= WarpDrive.MIN_SPEED && this.currentSpeed <= WarpDrive.MIN_SPEED) this.disable();
                 break;
             case WARPDRIVE_STATE.ENABLED:
                 this.updateTargetSpeed(closestObjectDistance, clostestObjectRadius);

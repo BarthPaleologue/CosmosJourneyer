@@ -18,7 +18,6 @@
 import { Transformable } from "./transformable";
 import { BoundingSphere } from "./boundingSphere";
 import { OrbitProperties } from "../orbit/orbitProperties";
-import { rotateVector3AroundInPlace } from "../utils/algebra";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectPhysicalProperties } from "./physicalProperties";
@@ -82,8 +81,8 @@ export class OrbitalObject {
 
         // rotate the object around the barycenter of the orbit, around the normal to the orbital plane
         const dtheta = (2 * Math.PI * deltaTime) / orbit.period;
-        rotateVector3AroundInPlace(newPosition, barycenter, orbit.normalToPlane, dtheta);
-
+        const rotationQuaternion = Quaternion.RotationAxis(orbit.normalToPlane, dtheta);
+        newPosition.applyRotationQuaternionInPlace(rotationQuaternion);
         newPosition.normalize().scaleInPlace(orbit.radius);
 
         // enforce orbital plane

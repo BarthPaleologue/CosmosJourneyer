@@ -102,7 +102,7 @@ export class WarpTunnel implements Transformable {
             particle.position.addInPlace(direction.scale(Math.random() * 10));
             particle.position.addInPlace(this.anchor.getAbsolutePosition());
 
-            particle.velocity.copyFrom(direction.scale(300));
+            particle.velocity.copyFrom(direction.scale(600));
 
             particle.rotationQuaternion = rotationQuaternion;
 

@@ -30,20 +30,20 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
 import {
-    getForwardDirection,
-    getUpwardDirection,
-    rotate,
+    getForwardDirection, getRotationQuaternion, getUpwardDirection, rotate,
     setRotationQuaternion,
     translate
 } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Assets } from "../assets";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { CollisionMask } from "../settings";
 import { Transformable } from "../architecture/transformable";
 import { WarpTunnel } from "../utils/warpTunnel";
 import { Quaternion } from "@babylonjs/core/Maths/math";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { LandingPad } from "../landingPad/landingPad";
+import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 
 enum ShipState {
     FLYING,
@@ -80,6 +80,8 @@ export class Spaceship implements Transformable {
 
     private readonly scene: Scene;
 
+    private targetLandingPad: LandingPad | null = null;
+
     constructor(scene: Scene) {
         this.instanceRoot = Assets.CreateSpaceShipInstance();
         setRotationQuaternion(this.instanceRoot, Quaternion.Identity());
@@ -95,7 +97,8 @@ export class Spaceship implements Transformable {
         );
         for (const child of this.instanceRoot.getChildMeshes()) {
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
-            childShape.filterMembershipMask = CollisionMask.SPACESHIP;
+            childShape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
+            childShape.filterCollideMask = CollisionMask.ENVIRONMENT;
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
         }
         this.aggregate.body.disablePreStep = false;
@@ -218,6 +221,13 @@ export class Spaceship implements Transformable {
         console.log("landing on", this.landingTarget.getTransform().name);
     }
 
+    public engageLandingOnPad(landingPad: LandingPad) {
+        console.log("Landing on pad", landingPad.getTransform().name);
+        this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
+        this.state = ShipState.LANDING;
+        this.targetLandingPad = landingPad;
+    }
+
     private completeLanding() {
         console.log("Landing sequence complete");
         this.state = ShipState.LANDED;
@@ -225,45 +235,17 @@ export class Spaceship implements Transformable {
         this.landingTarget = null;
     }
 
-    public update(deltaTime: number) {
-        const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
-
-        const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
-        this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
-
-        // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
-        if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
-        else this.warpTunnel.setThrottle(0);
-
-        for (const thruster of this.mainThrusters) thruster.update();
-        for (const thruster of this.rcsThrusters) thruster.update();
-
-        if (this.warpDrive.isDisabled()) {
-            for (const thruster of this.mainThrusters) thruster.applyForce();
-            for (const thruster of this.rcsThrusters) thruster.applyForce();
-
-            if (this.closestWalkableObject !== null) {
-                const gravityDir = this.closestWalkableObject.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
-                this.aggregate.body.applyForce(gravityDir.scale(9.8), this.aggregate.body.getObjectCenterWorld());
-            }
+    private land(deltaTime: number) {
+        if(this.targetLandingPad !== null) {
+            this.landOnPad(this.targetLandingPad, deltaTime);
         }
 
-        if (this.flightAssistEnabled) {
-            this.aggregate.body.setAngularDamping(0.9);
-        } else {
-            this.aggregate.body.setAngularDamping(1);
-        }
-
-        if (this.state === ShipState.LANDING) {
-            if (this.landingTarget === null) {
-                throw new Error("Closest walkable object is null while landing");
-            }
-
+        if(this.landingTarget !== null) {
             const gravityDir = this.landingTarget.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
             const start = this.getTransform().getAbsolutePosition().add(gravityDir.scale(-50e3));
             const end = this.getTransform().getAbsolutePosition().add(gravityDir.scale(50e3));
 
-            (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.GROUND | CollisionMask.LANDING_PADS });
+            (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.ENVIRONMENT });
             if (this.raycastResult.hasHit) {
                 const landingSpotNormal = this.raycastResult.hitNormalWorld;
                 const extent = this.instanceRoot.getHierarchyBoundingVectors();
@@ -288,6 +270,64 @@ export class Spaceship implements Transformable {
                     this.completeLanding();
                 }
             }
+        }
+    }
+
+    private landOnPad(landingPad: LandingPad, deltaTime: number) {
+        const padUp = landingPad.getTransform().up;
+
+        const targetPosition = landingPad.getTransform().getAbsolutePosition();
+        targetPosition.addInPlace(padUp.scale(2));
+        const currentPosition = this.getTransform().getAbsolutePosition();
+
+        const distance = Vector3.Distance(targetPosition, currentPosition);
+
+        if(distance < 0.01) {
+            this.completeLanding();
+            return;
+        }
+
+        const targetOrientation = landingPad.getTransform().absoluteRotationQuaternion;
+        const currentOrientation = getRotationQuaternion(this.getTransform());
+
+        translate(this.getTransform(), targetPosition.subtract(currentPosition).normalize().scaleInPlace(Math.min(distance, 20 * deltaTime)));
+
+        this.getTransform().rotationQuaternion = Quaternion.Slerp(currentOrientation, targetOrientation, deltaTime);
+    }
+
+    public update(deltaTime: number) {
+        const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
+
+        const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
+        this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
+
+        // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
+        if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
+        else this.warpTunnel.setThrottle(0);
+
+        for (const thruster of this.mainThrusters) thruster.update();
+        for (const thruster of this.rcsThrusters) thruster.update();
+
+        if (this.warpDrive.isDisabled()) {
+            for (const thruster of this.mainThrusters) thruster.applyForce();
+            for (const thruster of this.rcsThrusters) thruster.applyForce();
+
+            if (this.closestWalkableObject !== null) {
+                const gravityDir = this.closestWalkableObject.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
+                this.aggregate.body.applyForce(gravityDir.scale(9.8), this.aggregate.body.getObjectCenterWorld());
+            }
+        } else {
+            translate(this.getTransform(), warpSpeed.scale(deltaTime));
+        }
+
+        if (this.flightAssistEnabled) {
+            this.aggregate.body.setAngularDamping(0.9);
+        } else {
+            this.aggregate.body.setAngularDamping(1);
+        }
+
+        if (this.state === ShipState.LANDING) {
+            this.land(deltaTime);
         }
     }
 

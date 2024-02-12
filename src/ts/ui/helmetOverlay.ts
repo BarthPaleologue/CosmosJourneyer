@@ -17,6 +17,7 @@
 
 import overlayHTML from "../../html/helmetOverlay.html";
 import { OrbitalObject } from "../architecture/orbitalObject";
+import { parseSpeed } from "../utils/parseToStrings";
 
 export class HelmetOverlay {
     private parentNode: HTMLElement;
@@ -40,5 +41,10 @@ export class HelmetOverlay {
 
     public update(currentBody: OrbitalObject) {
         this.bodyNamePlate.innerText = currentBody.name;
+    }
+
+    displaySpeed(shipInternalThrottle: number, shipTargetThrottle: number, speed: number) {
+        const throttleString = `${shipInternalThrottle.toFixed(0)}% | ${shipTargetThrottle.toFixed(0)}%`;
+        (document.querySelector("#speedometer") as HTMLElement).innerText = `${throttleString} | ${parseSpeed(speed)}`;
     }
 }

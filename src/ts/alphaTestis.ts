@@ -34,6 +34,8 @@ import { StarModel } from "./stellarObjects/star/starModel";
 import { RingsUniforms } from "./postProcesses/rings/ringsUniform";
 import { getMoonSeed } from "./planets/common";
 import { SystemSeed } from "./utils/systemSeed";
+import { SpaceStation } from "./spacestation/spaceStation";
+import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -80,8 +82,13 @@ const planet = StarSystemHelper.makeTelluricPlanet(starSystem, planetModel);
 planet.model.ringsUniforms = new RingsUniforms(planet.model.rng);
 planet.postProcesses.push(PostProcessType.RING);
 
-//const spacestation = new SpaceStation(starSystemView.scene, planet);
-//starSystemView.getStarSystem().addSpaceStation(spacestation);
+const spacestation = new SpaceStation(starSystemView.scene, planet);
+starSystemView.getStarSystem().addSpaceStation(spacestation);
+
+//physicsViewer.showBody(spacestation.aggregate.body);
+/*for(const landingpad of spacestation.landingPads) {
+    physicsViewer.showBody(landingpad.aggregate.body);
+}*/
 
 const moonModel = new TelluricPlanetModel(getMoonSeed(planetModel, 0), planetModel);
 moonModel.physicalProperties.mass = 2;
@@ -159,6 +166,13 @@ if (aresAtmosphere) {
 
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
+
+    if(e.key === "o") {
+        const landingPad = spacestation.handleDockingRequest();
+        if(landingPad !== null && starSystemView.scene.getActiveController() === spaceshipController) {
+            spaceshipController.spaceship.engageLandingOnPad(landingPad);
+        }
+    }
 
     if (e.key === "x") {
         let nbVertices = 0;

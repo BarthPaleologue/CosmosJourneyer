@@ -35,7 +35,9 @@ export enum GENERATION_STEPS {
 
     PRESSURE = 1100,
     WATER_AMOUNT = 1200,
-    TERRAIN = 1500
+    TERRAIN = 1500,
+
+    SPACE_STATION = 2000
 }
 
 export enum BODY_TYPE {

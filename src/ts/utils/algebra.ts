@@ -46,11 +46,6 @@ export function getTransformationQuaternion(from: Vector3, to: Vector3): Quatern
     return Quaternion.RotationAxis(rotationAxis, angle);
 }
 
-export function rotateVector3AroundInPlace(vector: Vector3, center: Vector3, axis: Vector3, angle: number): Vector3 {
-    const rotationQuaternion = Quaternion.RotationAxis(axis, angle);
-    return vector.subtractInPlace(center).applyRotationQuaternionInPlace(rotationQuaternion).addInPlace(center);
-}
-
 export function flattenVector3Array(vector3Array: Vector3[]): number[] {
     const result: number[] = [];
     for (const vector3 of vector3Array) {

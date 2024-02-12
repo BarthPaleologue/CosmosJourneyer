@@ -131,8 +131,8 @@ export class StarSystemView {
         ambientLight.intensity = 0.3;
 
         this.scene.onBeforePhysicsObservable.add(() => {
-            const deltaTime = engine.getDeltaTime() / 1000;
-            this.update(deltaTime);
+            const deltaSeconds = engine.getDeltaTime() / 1000;
+            this.update(deltaSeconds * Settings.TIME_MULTIPLIER);
         });
 
         window.addEventListener("resize", () => {
@@ -156,8 +156,8 @@ export class StarSystemView {
         const firstBody = this.getStarSystem().getBodies()[0];
         if (firstBody === undefined) throw new Error("No bodies in star system");
 
-        this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getBodies());
-        this.axisRenderer.setObjects(this.getStarSystem().getBodies());
+        this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getOrbitalObjects());
+        this.axisRenderer.setObjects(this.getStarSystem().getOrbitalObjects());
 
         const activeController = this.scene.getActiveController();
         let controllerDistanceFactor = 5;
@@ -206,14 +206,18 @@ export class StarSystemView {
         this.scene.setActiveController(this.spaceshipControls);
     }
 
-    update(deltaTime: number) {
+    /**
+     * Updates the system view. It updates the underlying star system, the UI, the chunk forge and the controls
+     * @param deltaSeconds the time elapsed since the last update in seconds
+     */
+    update(deltaSeconds: number) {
         const starSystem = this.getStarSystem();
 
-        Assets.ButterflyMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaTime);
-        Assets.GrassMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaTime);
+        Assets.ButterflyMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
+        Assets.GrassMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
 
         this.chunkForge.update();
-        starSystem.update(deltaTime * Settings.TIME_MULTIPLIER, this.chunkForge);
+        starSystem.update(deltaSeconds, this.chunkForge);
 
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
@@ -225,14 +229,11 @@ export class StarSystemView {
         this.spaceshipControls.spaceship.registerClosestObject(distance, radius);
 
         const warpDrive = this.spaceshipControls.spaceship.getWarpDrive();
-        const shipInternalThrottle = warpDrive.getInternalThrottle();
-        const shipTargetThrottle = warpDrive.getTargetThrottle();
-
-        const throttleString = warpDrive.isEnabled()
-            ? `${parsePercentageFrom01(shipInternalThrottle)}/${parsePercentageFrom01(shipTargetThrottle)}`
-            : `${parsePercentageFrom01(this.spaceshipControls.spaceship.getThrottle())}/100%`;
-
-        (document.querySelector("#speedometer") as HTMLElement).innerHTML = `${throttleString} | ${parseSpeed(this.spaceshipControls.spaceship.getSpeed())}`;
+        if(warpDrive.isEnabled()) {
+            this.helmetOverlay.displaySpeed(warpDrive.getInternalThrottle(), warpDrive.getTargetThrottle(), this.spaceshipControls.spaceship.getSpeed());
+        } else {
+            this.helmetOverlay.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), 100, this.spaceshipControls.spaceship.getSpeed());
+        }
 
         this.characterControls.setClosestWalkableObject(nearestBody);
         this.spaceshipControls.spaceship.setClosestWalkableObject(nearestBody);
