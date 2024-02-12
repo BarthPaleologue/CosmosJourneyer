@@ -166,8 +166,8 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     public updateTargetSpeed(closestObjectDistance: number, closestObjectRadius: number): number {
         const speedThreshold = 10e3;
-        const closeSpeed = (speedThreshold * 0.025 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold;
-        const deepSpaceSpeed = speedThreshold * ((0.025 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold) ** 1.1;
+        const closeSpeed = (speedThreshold * 0.05 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold;
+        const deepSpaceSpeed = speedThreshold * ((0.05 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold) ** 1.2;
         this.targetSpeed = Math.min(this.maxWarpSpeed, Math.max(closeSpeed, deepSpaceSpeed));
         return this.targetThrottle * this.targetSpeed;
     }
