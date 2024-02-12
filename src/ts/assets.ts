@@ -217,6 +217,7 @@ export class Assets {
             Assets.Rock.position.y = 0.1;
             Assets.Rock.scaling.scaleInPlace(0.2);
             Assets.Rock.bakeCurrentTransformIntoVertices();
+            Assets.Rock.checkCollisions = true;
             Assets.Rock.isVisible = false;
 
             console.log("Rock loaded");
@@ -240,6 +241,7 @@ export class Assets {
             Assets.Tree.position.y = -1;
             Assets.Tree.scaling.scaleInPlace(3);
             Assets.Tree.bakeCurrentTransformIntoVertices();
+            Assets.Tree.checkCollisions = true;
 
             const treeMaterial = new StandardMaterial("treeMaterial", scene);
 

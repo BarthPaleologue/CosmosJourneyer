@@ -24,15 +24,16 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export class InstancePatch implements IPatch {
     private baseMesh: Mesh | null = null;
-    readonly position: Vector3;
+
+    readonly parent: TransformNode;
 
     readonly instances: InstancedMesh[] = [];
     private positions: Vector3[] = [];
     private rotations: Quaternion[] = [];
     private scalings: Vector3[] = [];
 
-    constructor(position: Vector3, matrixBuffer: Float32Array) {
-        this.position = position;
+    constructor(parent: TransformNode, matrixBuffer: Float32Array) {
+        this.parent = parent;
 
         // decompose matrix buffer into position, rotation and scaling
         for (let i = 0; i < matrixBuffer.length; i += 16) {
@@ -58,9 +59,9 @@ export class InstancePatch implements IPatch {
         this.baseMesh = null;
     }
 
-    public static CreateSquare(position: Vector3, size: number, resolution: number) {
+    public static CreateSquare(parent: TransformNode, position: Vector3, size: number, resolution: number) {
         const buffer = createSquareMatrixBuffer(position, size, resolution);
-        return new InstancePatch(position, buffer);
+        return new InstancePatch(parent, buffer);
     }
 
     public createInstances(baseMesh: TransformNode): void {
@@ -79,6 +80,8 @@ export class InstancePatch implements IPatch {
             instance.scaling.copyFrom(this.scalings[i]);
             this.instances.push(instance);
 
+            instance.parent = this.parent;
+
             instance.checkCollisions = baseMesh.checkCollisions;
         }
     }
@@ -91,10 +94,6 @@ export class InstancePatch implements IPatch {
     public getNbInstances(): number {
         if (this.baseMesh === null) return 0;
         return this.baseMesh.instances.length;
-    }
-
-    public getPosition(): Vector3 {
-        return this.position;
     }
 
     public dispose() {
