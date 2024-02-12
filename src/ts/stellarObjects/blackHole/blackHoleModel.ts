@@ -18,7 +18,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { getOrbitalPeriod } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { normalRandom } from "extended-random";
+import { normalRandom, uniformRandBool } from "extended-random";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { BODY_TYPE, GENERATION_STEPS } from "../../model/common";
 import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
@@ -70,5 +70,10 @@ export class BlackHoleModel implements StellarObjectModel {
             axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
             accretionDiskRadius: 8000e3
         };
+    }
+
+    public getNbSpaceStations(): number {
+        if(uniformRandBool(0.1, this.rng, GENERATION_STEPS.SPACE_STATION)) return 1;
+        return 0;
     }
 }

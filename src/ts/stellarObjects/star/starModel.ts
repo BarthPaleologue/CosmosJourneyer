@@ -96,6 +96,11 @@ export class StarModel implements StellarObjectModel {
         this.color.copyFrom(getRgbFromTemperature(temperature));
     }
 
+    public getNbSpaceStations(): number {
+        if(uniformRandBool(0.001, this.rng, GENERATION_STEPS.SPACE_STATION)) return 1;
+        return 0;
+    }
+
     static getStellarTypeFromTemperature(temperature: number) {
         if (temperature < 3500) return STELLAR_TYPE.M;
         else if (temperature < 5000) return STELLAR_TYPE.K;

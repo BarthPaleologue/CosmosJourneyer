@@ -22,7 +22,6 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { SpaceStationModel } from "./spacestationModel";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Assets } from "../assets";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { Cullable } from "../bodies/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -35,8 +34,8 @@ import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
-import { CollisionMask, Settings } from "../settings";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CollisionMask } from "../settings";
+import { CelestialBody } from "../architecture/celestialBody";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -56,7 +55,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     readonly parent: OrbitalObject | null = null;
 
-    constructor(scene: Scene, parentBody: OrbitalObject | null = null) {
+    constructor(scene: Scene, parentBody: CelestialBody | null = null) {
         //TODO: do not hardcode name
         this.name = "Spacestation";
 
@@ -128,9 +127,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
         this.aggregate.body.disablePreStep = false;
 
         console.log("found", this.landingPads.length, "landing pads");
-
-        //this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
-        //this.getTransform().rotate(Axis.Y, this.model.physicalProperties.axialTilt);
     }
 
     handleDockingRequest(): LandingPad | null {

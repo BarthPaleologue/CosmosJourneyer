@@ -156,8 +156,8 @@ export class StarSystemView {
         const firstBody = this.getStarSystem().getBodies()[0];
         if (firstBody === undefined) throw new Error("No bodies in star system");
 
-        this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getBodies());
-        this.axisRenderer.setObjects(this.getStarSystem().getBodies());
+        this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getOrbitalObjects());
+        this.axisRenderer.setObjects(this.getStarSystem().getOrbitalObjects());
 
         const activeController = this.scene.getActiveController();
         let controllerDistanceFactor = 5;

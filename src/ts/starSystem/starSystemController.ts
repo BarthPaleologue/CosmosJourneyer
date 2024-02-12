@@ -343,7 +343,7 @@ export class StarSystemController {
 
         const distanceOfNearestToCamera = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().globalPosition);
         const shouldCompensateTranslation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * (nearestBody instanceof SpaceStation ? 80 : 10);
-        const shouldCompensateRotation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * 4;
+        const shouldCompensateRotation = !(nearestBody instanceof SpaceStation) && distanceOfNearestToCamera < nearestBody.getBoundingRadius() * 4;
 
         //nearestBody.updateInternalClock(deltaTime);
         const initialPosition = nearestBody.getTransform().getAbsolutePosition();

@@ -16,13 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { seededSquirrelNoise } from "squirrel-noise";
-import { Settings } from "../settings";
 import { GENERATION_STEPS } from "../model/common";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { getOrbitalPeriod } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectModel } from "../architecture/orbitalObject";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
+import { CelestialBodyModel } from "../architecture/celestialBody";
 
 export class SpaceStationModel implements OrbitalObjectModel {
     readonly seed: number;
@@ -32,15 +32,14 @@ export class SpaceStationModel implements OrbitalObjectModel {
     readonly parentBody: OrbitalObjectModel | null;
     readonly childrenBodies: OrbitalObjectModel[] = [];
 
-    constructor(seed: number, parentBody?: OrbitalObjectModel) {
+    constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
         this.parentBody = parentBody ?? null;
         this.childrenBodies = [];
 
-        //TODO: do not hardcode
-        const orbitRadius = 3 * Settings.EARTH_RADIUS;
+        const orbitRadius = 3 * (parentBody?.radius ?? 0);
 
         this.orbit = {
             radius: orbitRadius,

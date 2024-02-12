@@ -35,6 +35,7 @@ import { Planet } from "../architecture/planet";
 import { StellarObject } from "../architecture/stellarObject";
 import { BODY_TYPE } from "../model/common";
 import { SpaceStation } from "../spacestation/spaceStation";
+import { CelestialBody } from "../architecture/celestialBody";
 
 export class StarSystemHelper {
     public static makeStar(starsystem: StarSystemController, model?: number | StarModel): Star {
@@ -91,15 +92,20 @@ export class StarSystemHelper {
      */
     public static makeStellarObject(starsystem: StarSystemController, seed: number = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): StellarObject {
         const stellarObjectType = starsystem.model.getBodyTypeOfStar(starsystem.stellarObjects.length);
-        switch (stellarObjectType) {
-            case BODY_TYPE.BLACK_HOLE:
-                return StarSystemHelper.makeBlackHole(starsystem, seed);
-            case BODY_TYPE.NEUTRON_STAR:
-                return StarSystemHelper.makeNeutronStar(starsystem, seed);
-            case BODY_TYPE.STAR:
-                return StarSystemHelper.makeStar(starsystem, seed);
-            default:
-                throw new Error(`Unknown stellar object type ${stellarObjectType}`);
+        if(stellarObjectType === BODY_TYPE.BLACK_HOLE) {
+            const blackHole = StarSystemHelper.makeBlackHole(starsystem, seed);
+            StarSystemHelper.makeSpaceStations(starsystem, blackHole);
+            return blackHole;
+        } else if(stellarObjectType === BODY_TYPE.NEUTRON_STAR) {
+            const neutronStar = StarSystemHelper.makeNeutronStar(starsystem, seed);
+            StarSystemHelper.makeSpaceStations(starsystem, neutronStar);
+            return neutronStar;
+        } else if(stellarObjectType === BODY_TYPE.STAR) {
+            const star = StarSystemHelper.makeStar(starsystem, seed);
+            StarSystemHelper.makeSpaceStations(starsystem, star);
+            return star;
+        } else {
+            throw new Error(`Unknown stellar object type ${stellarObjectType}`);
         }
     }
 
@@ -125,9 +131,6 @@ export class StarSystemHelper {
         const planet = new TelluricPlanet(`${starsystem.model.getName()} ${romanNumeral(starsystem.planets.length + 1)}`, starsystem.scene, model, starsystem.stellarObjects[0]);
         starsystem.addTelluricPlanet(planet);
 
-        //const spacestation = new SpaceStation(starsystem.scene, planet);
-        //starsystem.addSpaceStation(spacestation);
-
         return planet;
     }
 
@@ -146,19 +149,26 @@ export class StarSystemHelper {
         console.assert(n >= 0, `Cannot make a negative amount of planets : ${n}`);
 
         for (let i = 0; i < n; i++) {
-            switch (starsystem.model.getBodyTypeOfPlanet(starsystem.planets.length)) {
-                case BODY_TYPE.TELLURIC_PLANET:
-                    StarSystemHelper.makeSatellites(starsystem, StarSystemHelper.makeTelluricPlanet(starsystem));
-                    break;
-                case BODY_TYPE.GAS_PLANET:
-                    StarSystemHelper.makeSatellites(starsystem, StarSystemHelper.makeGasPlanet(starsystem));
-                    break;
-                case BODY_TYPE.MANDELBULB:
-                    StarSystemHelper.makeMandelbulb(starsystem);
-                    break;
-                default:
-                    throw new Error(`Unknown body type ${starsystem.model.getBodyTypeOfPlanet(starsystem.planets.length)}`);
+            const bodyType = starsystem.model.getBodyTypeOfPlanet(starsystem.planets.length);
+            if(bodyType === BODY_TYPE.TELLURIC_PLANET) {
+                const planet = StarSystemHelper.makeTelluricPlanet(starsystem);
+                StarSystemHelper.makeSatellites(starsystem, planet);
+                StarSystemHelper.makeSpaceStations(starsystem, planet);
+            } else if(bodyType === BODY_TYPE.GAS_PLANET) {
+                const planet = StarSystemHelper.makeGasPlanet(starsystem);
+                StarSystemHelper.makeSatellites(starsystem, planet);
+                StarSystemHelper.makeSpaceStations(starsystem, planet);
+            } else {
+                throw new Error(`Unknown body type ${bodyType}`);
             }
+        }
+    }
+
+    public static makeSpaceStations(starsystem: StarSystemController, body: CelestialBody, n = body.model.getNbSpaceStations()): void {
+        console.assert(n >= 0, `Cannot make a negative amount of space stations : ${n}`);
+        for (let i = 0; i < n; i++) {
+            const spacestation = new SpaceStation(starsystem.scene, body);
+            starsystem.addSpaceStation(spacestation);
         }
     }
 
