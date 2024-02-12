@@ -38,6 +38,7 @@ import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
+import { InstancePatch } from "../instancePatch/instancePatch";
 
 export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
@@ -152,12 +153,12 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         if (instancesMatrixBuffer.length === 0) return;
 
-        const rockPatch = new ThinInstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
+        const rockPatch = new InstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
         rockPatch.createInstances(Assets.Rock);
         this.instancePatches.push(rockPatch);
 
         if (this.planetModel.physicalProperties.pressure > 0 && this.planetModel.physicalProperties.oceanLevel > 0) {
-            const treePatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
+            const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
             treePatch.createInstances(Assets.Tree);
             this.instancePatches.push(treePatch);
 

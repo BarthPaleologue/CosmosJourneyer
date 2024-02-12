@@ -67,7 +67,7 @@ export class ThinInstancePatch implements IPatch {
         });
 
         this.baseMesh.isVisible = true;
-        this.baseMesh.thinInstanceSetBuffer("matrix", this.matrixBuffer, 16);
+        this.baseMesh.thinInstanceSetBuffer("matrix", this.matrixBuffer, 16, false);
     }
 
     public syncWithParent(): void {

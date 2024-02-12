@@ -24,11 +24,9 @@ import { CosmosJourneyer } from "./cosmosJourneyer";
 import { StarSystemHelper } from "./starSystem/starSystemHelper";
 import { SystemSeed } from "./utils/systemSeed";
 
-const engine = new CosmosJourneyer();
+const engine = await CosmosJourneyer.CreateAsync();
 
-await engine.setup();
-
-const starSystemView = engine.getStarSystemView();
+const starSystemView = engine.starSystemView;
 
 const scene = starSystemView.scene;
 

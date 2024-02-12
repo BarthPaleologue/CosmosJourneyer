@@ -22,11 +22,9 @@ import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, tran
 import { decodeBase64 } from "./utils/base64";
 import { isJsonStringValidUniverseCoordinates } from "./saveFile/universeCoordinates";
 
-const engine = new CosmosJourneyer();
+const engine = await CosmosJourneyer.CreateAsync();
 
-await engine.setup();
-
-const starSystemView = engine.getStarSystemView();
+const starSystemView = engine.starSystemView;
 
 const urlParams = new URLSearchParams(window.location.search);
 const universeCoordinatesString = urlParams.get("universeCoordinates");

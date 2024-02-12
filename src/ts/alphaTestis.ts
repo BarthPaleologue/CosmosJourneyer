@@ -37,11 +37,9 @@ import { SystemSeed } from "./utils/systemSeed";
 import { SpaceStation } from "./spacestation/spaceStation";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 
-const engine = new CosmosJourneyer();
+const engine = await CosmosJourneyer.CreateAsync();
 
-await engine.setup();
-
-const starSystemView = engine.getStarSystemView();
+const starSystemView = engine.starSystemView;
 
 const spaceshipController = starSystemView.getSpaceshipControls();
 
@@ -56,7 +54,7 @@ const starSystemSeed = new SystemSeed(0, 0, 0, 0);
 const starSystem = new StarSystemController(starSystemSeed, starSystemView.scene);
 starSystem.model.setName("Alpha Testis");
 
-engine.getStarSystemView().setStarSystem(starSystem, false);
+starSystemView.setStarSystem(starSystem, false);
 
 const sunModel = new StarModel(0.51);
 const sun = StarSystemHelper.makeStar(starSystem, sunModel);
