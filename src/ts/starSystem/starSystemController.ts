@@ -187,7 +187,7 @@ export class StarSystemController {
 
         smallerDistance = -1;
         for (const spacestation of this.spaceStations) {
-            const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length() - spacestation.getBoundingRadius() * 50;
+            const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length() - spacestation.getBoundingRadius() * 10;
             if (distance < smallerDistance && distance < 0) {
                 nearest = spacestation;
                 smallerDistance = distance;
