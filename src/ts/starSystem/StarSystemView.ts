@@ -131,8 +131,8 @@ export class StarSystemView {
         ambientLight.intensity = 0.3;
 
         this.scene.onBeforePhysicsObservable.add(() => {
-            const deltaTime = engine.getDeltaTime() / 1000;
-            this.update(deltaTime);
+            const deltaSeconds = engine.getDeltaTime() / 1000;
+            this.update(deltaSeconds * Settings.TIME_MULTIPLIER);
         });
 
         window.addEventListener("resize", () => {
@@ -206,14 +206,18 @@ export class StarSystemView {
         this.scene.setActiveController(this.spaceshipControls);
     }
 
-    update(deltaTime: number) {
+    /**
+     * Updates the system view. It updates the underlying star system, the UI, the chunk forge and the controls
+     * @param deltaSeconds the time elapsed since the last update in seconds
+     */
+    update(deltaSeconds: number) {
         const starSystem = this.getStarSystem();
 
-        Assets.ButterflyMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaTime);
-        Assets.GrassMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaTime);
+        Assets.ButterflyMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
+        Assets.GrassMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
 
         this.chunkForge.update();
-        starSystem.update(deltaTime * Settings.TIME_MULTIPLIER, this.chunkForge);
+        starSystem.update(deltaSeconds, this.chunkForge);
 
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
