@@ -24,11 +24,9 @@ import { CosmosJourneyer } from "./cosmosJourneyer";
 import { BODY_TYPE } from "./model/common";
 import { SystemSeed } from "./utils/systemSeed";
 
-const engine = new CosmosJourneyer();
+const engine = await CosmosJourneyer.CreateAsync();
 
-await engine.setup();
-
-const starSystemView = engine.getStarSystemView();
+const starSystemView = engine.starSystemView;
 
 const scene = starSystemView.scene;
 
@@ -42,7 +40,7 @@ const seed = new SystemSeed(starMapX, starMapY, starMapZ, index);
 const starSystem = new StarSystemController(seed, scene);
 starSystemView.setStarSystem(starSystem, true);
 
-engine.getStarMap().setCurrentStarSystem(seed);
+engine.starMap.setCurrentStarSystem(seed);
 
 engine.init(true);
 
