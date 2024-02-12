@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { UberScene } from "../uberCore/uberScene";
-import { UberRenderingPipeline } from "../uberCore/uberRenderingPipeline";
 import { OceanPostProcess } from "./oceanPostProcess";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
@@ -33,7 +32,6 @@ import { CloudsPostProcess } from "./volumetricCloudsPostProcess";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
-import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { PostProcessType } from "./postProcessTypes";
@@ -50,6 +48,8 @@ import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
+import { PostProcessRenderPipelineManager } from "@babylonjs/core";
+import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -88,9 +88,11 @@ export class PostProcessManager {
     private readonly engine: Engine;
     private readonly scene: UberScene;
 
-    private readonly spaceRenderingPipeline: UberRenderingPipeline;
-    private readonly surfaceRenderingPipeline: UberRenderingPipeline;
-    private currentRenderingPipeline: UberRenderingPipeline;
+    private readonly renderingPipelineManager: PostProcessRenderPipelineManager;
+
+    private readonly spaceRenderingPipeline: PostProcessRenderPipeline;
+    private readonly surfaceRenderingPipeline: PostProcessRenderPipeline;
+    private currentRenderingPipeline: PostProcessRenderPipeline;
 
     private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
 
@@ -142,6 +144,8 @@ export class PostProcessManager {
         this.scene = scene;
         this.engine = scene.getEngine();
 
+        this.renderingPipelineManager = scene.postProcessRenderPipelineManager;
+
         this.colorCorrection = new ColorCorrection("colorCorrection", scene.getEngine());
         this.colorCorrection.exposure = 1.5;
         this.colorCorrection.gamma = 1.0;
@@ -156,11 +160,11 @@ export class PostProcessManager {
             return [this.fxaa];
         });
 
-        this.spaceRenderingPipeline = new UberRenderingPipeline("space", scene.getEngine());
-        scene.postProcessRenderPipelineManager.addPipeline(this.spaceRenderingPipeline);
+        this.spaceRenderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "spaceRenderingPipeline");
+        this.renderingPipelineManager.addPipeline(this.spaceRenderingPipeline);
 
-        this.surfaceRenderingPipeline = new UberRenderingPipeline("surface", scene.getEngine());
-        scene.postProcessRenderPipelineManager.addPipeline(this.surfaceRenderingPipeline);
+        this.surfaceRenderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "surfaceRenderingPipeline");
+        this.renderingPipelineManager.addPipeline(this.surfaceRenderingPipeline);
 
         this.currentRenderingPipeline = this.spaceRenderingPipeline;
 
@@ -337,7 +341,7 @@ export class PostProcessManager {
 
     public setSpaceOrder() {
         if (this.currentRenderingPipeline === this.spaceRenderingPipeline) return;
-        this.surfaceRenderingPipeline.detachCamera(this.scene.getActiveCamera());
+        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.surfaceRenderingPipeline.name, [this.scene.getActiveCamera()]);
         this.currentRenderingPipeline = this.spaceRenderingPipeline;
         this.currentRenderingOrder = spaceRenderingOrder;
         this.init();
@@ -345,7 +349,7 @@ export class PostProcessManager {
 
     public setSurfaceOrder() {
         if (this.currentRenderingPipeline === this.surfaceRenderingPipeline) return;
-        this.spaceRenderingPipeline.detachCamera(this.scene.getActiveCamera());
+        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.spaceRenderingPipeline.name, [this.scene.getActiveCamera()]);
         this.currentRenderingPipeline = this.surfaceRenderingPipeline;
         this.currentRenderingOrder = surfaceRenderingOrder;
         this.init();
@@ -466,7 +470,7 @@ export class PostProcessManager {
         //this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
         this.currentRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
-        this.currentRenderingPipeline.attachToCamera(this.scene.getActiveCamera());
+        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.currentRenderingPipeline.name, [this.scene.getActiveCamera()]);
     }
 
     /**
@@ -485,6 +489,9 @@ export class PostProcessManager {
 
         this.colorCorrection.dispose();
         this.fxaa.dispose();
+
+        this.surfaceRenderingPipeline._detachCameras(this.surfaceRenderingPipeline.cameras);
+        this.spaceRenderingPipeline._detachCameras(this.spaceRenderingPipeline.cameras);
 
         this.surfaceRenderingPipeline.dispose();
         this.spaceRenderingPipeline.dispose();

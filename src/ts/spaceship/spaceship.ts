@@ -29,7 +29,13 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
-import { getForwardDirection, getUpwardDirection, rotate, translate } from "../uberCore/transforms/basicTransform";
+import {
+    getForwardDirection,
+    getUpwardDirection,
+    rotate,
+    setRotationQuaternion,
+    translate
+} from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Assets } from "../assets";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
@@ -37,6 +43,7 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { CollisionMask } from "../settings";
 import { Transformable } from "../architecture/transformable";
 import { WarpTunnel } from "../utils/warpTunnel";
+import { Quaternion } from "@babylonjs/core/Maths/math";
 
 enum ShipState {
     FLYING,
@@ -75,6 +82,7 @@ export class Spaceship implements Transformable {
 
     constructor(scene: Scene) {
         this.instanceRoot = Assets.CreateSpaceShipInstance();
+        setRotationQuaternion(this.instanceRoot, Quaternion.Identity());
 
         this.aggregate = new PhysicsAggregate(
             this.instanceRoot,
@@ -224,7 +232,7 @@ export class Spaceship implements Transformable {
         this.warpDrive.update(currentForwardSpeed, this.closestObject.distance, this.closestObject.radius, deltaTime);
 
         // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
-        if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-6 * this.warpDrive.getWarpSpeed())));
+        if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
         else this.warpTunnel.setThrottle(0);
 
         for (const thruster of this.mainThrusters) thruster.update();

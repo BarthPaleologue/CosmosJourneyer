@@ -150,7 +150,7 @@ export class StarSystemView {
         this.scene.getEngine().loadingScreen.displayLoadingUI();
         this.scene.getEngine().loadingScreen.loadingUIText = `Warping to ${this.getStarSystem().model.getName()}`;
 
-        this.getStarSystem().initPositions(100, this.chunkForge);
+        this.getStarSystem().initPositions(10, this.chunkForge);
         this.ui.createObjectOverlays(this.getStarSystem().getOrbitalObjects());
 
         const firstBody = this.getStarSystem().getBodies()[0];
@@ -208,6 +208,9 @@ export class StarSystemView {
 
     update(deltaTime: number) {
         const starSystem = this.getStarSystem();
+
+        Assets.ButterflyMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaTime);
+        Assets.GrassMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaTime);
 
         this.chunkForge.update();
         starSystem.update(deltaTime * Settings.TIME_MULTIPLIER, this.chunkForge);

@@ -170,13 +170,13 @@ void main() {
 
     vec4 colOut = vec4(0.0);
 
-    vec3 positionBHS = camera_position - object_position;// position of the camera in blackhole space
+    vec3 rayPositionBlackHoleSpace = camera_position - object_position;// position of the camera in blackhole space
 
     bool suckedInBH = false;
     bool escapedBH = false;
     bool occluded = false;
 
-    if (maximumDistance < length(positionBHS)) occluded = true;
+    if (maximumDistance < length(rayPositionBlackHoleSpace)) occluded = true;
 
     vec4 col = vec4(0.0);
     vec4 glow = vec4(0.0);
@@ -193,12 +193,12 @@ void main() {
 
             for (int h = 0; h < 6; h++) {
                 //reduces tests for exit conditions (to minimise branching)
-                distanceToCenter = customLength(positionBHS);//distance to BH
-                vec3 blackholeDir = -positionBHS / distanceToCenter;//direction to BH
+                distanceToCenter = customLength(rayPositionBlackHoleSpace);//distance to BH
+                vec3 blackholeDir = -rayPositionBlackHoleSpace / distanceToCenter;//direction to BH
                 float distanceToCenter2 = distanceToCenter * distanceToCenter;
 
-                projectedPosition = projectOnPlane(positionBHS, object_rotationAxis);
-                projectedDistance = length(projectedPosition - positionBHS);
+                projectedPosition = projectOnPlane(rayPositionBlackHoleSpace, object_rotationAxis);
+                projectedDistance = length(projectedPosition - rayPositionBlackHoleSpace);
 
                 projectedRayDir = projectOnPlane(rayDir, object_rotationAxis);
                 rayDirProjectedDistance = length(projectedRayDir - rayDir);
@@ -209,7 +209,7 @@ void main() {
                 stepSize = min(stepSize, min(farLimit, closeLimit));
 
                 rayDir = bendRay(rayDir, blackholeDir, distanceToCenter2, maxBendDistance, stepSize);
-                positionBHS += stepSize * rayDir;
+                rayPositionBlackHoleSpace += stepSize * rayDir;
 
                 //TODO: improve glow
                 //glow += vec4(1.2,1.1,1, 1.0) * (0.2 * (object_radius / distanceToCenter2) * stepSize * clamp(distanceToCenter / object_radius - 1.2, 0.0, 1.0)); //adds fairly cheap glow
@@ -223,8 +223,8 @@ void main() {
                 break;
             } else if (projectedDistance <= accretionDiskHeight) {
                 //ray hit accretion disk //FIXME: Break when rotate around edge of disk
-                vec4 diskCol = raymarchDisk(rayDir, positionBHS);//render disk
-                positionBHS += accretionDiskHeight * rayDir / rayDirProjectedDistance;// we get out of the disk
+                vec4 diskCol = raymarchDisk(rayDir, rayPositionBlackHoleSpace);//render disk
+                rayPositionBlackHoleSpace += accretionDiskHeight * rayDir / rayDirProjectedDistance;// we get out of the disk
                 col += diskCol * (1.0 - col.a);
             }
 
@@ -233,7 +233,7 @@ void main() {
     }
 
     // getting the screen coordinate of the end of the bended ray
-    vec2 uv = uvFromWorld(positionBHS, camera_projection, camera_view);
+    vec2 uv = uvFromWorld(rayPositionBlackHoleSpace, camera_projection, camera_view);
     // check if there is an object occlusion
     vec3 pixelWorldPositionEndRay = worldFromUV(uv, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
     vec3 rayDirToEndRay = normalize(pixelWorldPositionEndRay - camera_position);// normalized direction of the ray
@@ -249,8 +249,10 @@ void main() {
     float maximumDistanceEndRay = length(closestPointEndRay);// the maxium ray length due to occlusion
     float BHDistance = length(camera_position - object_position);
 
+    bool behindBH = dot(closestPointEndRay - camera_position, closestPointEndRay - object_position) >= 0.0;
+
     vec4 bg = vec4(0.0);
-    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0 && maximumDistanceEndRay > BHDistance - object_radius) {
+    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0 && behindBH) {
         bg = texture2D(textureSampler, uv);
     } else {
         rayDir = vec3(starfieldRotation * vec4(rayDir, 1.0));

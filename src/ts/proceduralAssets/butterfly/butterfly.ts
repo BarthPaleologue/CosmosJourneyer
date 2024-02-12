@@ -18,7 +18,6 @@
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
-import { createButterflyMaterial } from "./butterflyMaterial";
 
 export function createButterfly(scene: Scene) {
     const positions = new Float32Array(6 * 3);
@@ -102,8 +101,6 @@ export function createButterfly(scene: Scene) {
 
     mesh.scaling.scaleInPlace(0.2);
     mesh.bakeCurrentTransformIntoVertices();
-
-    mesh.material = createButterflyMaterial(scene);
 
     return mesh;
 }

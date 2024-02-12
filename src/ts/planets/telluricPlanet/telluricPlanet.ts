@@ -38,11 +38,11 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { OrbitalObject } from "../../architecture/orbitalObject";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { rotate } from "../../uberCore/transforms/basicTransform";
+import { BODY_TYPE } from "../../model/common";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -60,7 +60,7 @@ export class TelluricPlanet implements Planet, Cullable {
 
     readonly postProcesses: PostProcessType[] = [];
 
-    readonly parent: OrbitalObject | null;
+    readonly parent: CelestialBody | null;
 
     /**
      * New Telluric Planet
@@ -149,6 +149,9 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     getTypeName(): string {
+        if (this.parent?.model.bodyType === BODY_TYPE.TELLURIC_PLANET || this.parent?.model.bodyType === BODY_TYPE.GAS_PLANET) {
+            return "Telluric Moon";
+        }
         return "Telluric Planet";
     }
 
