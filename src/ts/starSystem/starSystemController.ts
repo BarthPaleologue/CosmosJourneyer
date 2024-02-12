@@ -331,21 +331,24 @@ export class StarSystemController {
     }
 
     /**
-     * Updates the system and all its bodies forward in time by the given delta time
+     * Updates the system and all its orbital objects forward in time by the given delta time.
+     * The nearest object is kept in place and the other objects are updated accordingly.
      * @param deltaTime The time elapsed since the last update
-     * @param chunkForge
+     * @param chunkForge The chunk forge used to update the LOD of the telluric planets
      */
     public update(deltaTime: number, chunkForge: ChunkForge): void {
         const controller = this.scene.getActiveController();
         this.computeNearestOrbitalObject(controller.getActiveCamera().globalPosition);
         this.computeClosestToScreenCenterOrbitalObject();
+
+        // First, we update the nearest body separately
+
         const nearestBody = this.getNearestOrbitalObject();
 
-        const distanceOfNearestToCamera = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getActiveCamera().globalPosition);
-        const shouldCompensateTranslation = distanceOfNearestToCamera < nearestBody.getBoundingRadius() * (nearestBody instanceof SpaceStation ? 80 : 10);
-        const shouldCompensateRotation = !(nearestBody instanceof SpaceStation) && distanceOfNearestToCamera < nearestBody.getBoundingRadius() * 4;
+        const distanceOfNearestToControls = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getTransform().getAbsolutePosition());
+        const shouldCompensateTranslation = distanceOfNearestToControls < nearestBody.getBoundingRadius() * (nearestBody instanceof SpaceStation ? 80 : 10);
+        const shouldCompensateRotation = !(nearestBody instanceof SpaceStation) && distanceOfNearestToControls < nearestBody.getBoundingRadius() * 4;
 
-        //nearestBody.updateInternalClock(deltaTime);
         const initialPosition = nearestBody.getTransform().getAbsolutePosition();
         const newPosition = OrbitalObject.GetNextOrbitalPosition(nearestBody, deltaTime);
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
@@ -356,15 +359,11 @@ export class StarSystemController {
         // if we don't compensate the rotation of the nearest body, we must rotate it accordingly
         if (!shouldCompensateRotation) OrbitalObject.UpdateRotation(nearestBody, deltaTime);
 
-        // As the nearest object is kept in place, we need to transfer its movement to other bodies
+        // Now we update the rest of the bodies
+        // As the nearest object can be kept in place, we need to transfer its movement to other bodies
         for (const object of this.orbitalObjects) {
-            const orbit = object.getOrbitProperties();
-            const oldOrbitNormal = orbit.normalToPlane.clone();
-            if (shouldCompensateRotation) {
-                // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
-                const rotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), -dthetaNearest);
-                orbit.normalToPlane.applyRotationQuaternionInPlace(rotation);
-            }
+
+            // as we already updated the nearest body, we skip it
             if (object === nearestBody) continue;
 
             if (shouldCompensateTranslation) {
@@ -373,6 +372,13 @@ export class StarSystemController {
             }
 
             if (shouldCompensateRotation) {
+                const orbit = object.getOrbitProperties();
+                const oldOrbitNormal = orbit.normalToPlane.clone();
+
+                // the normal to the orbit planes must be rotated as well (even the one of the nearest body)
+                const rotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), -dthetaNearest);
+                orbit.normalToPlane.applyRotationQuaternionInPlace(rotation);
+
                 // if the nearest body does not rotate, all other bodies must revolve around it for consistency
                 rotateAround(object.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
 
