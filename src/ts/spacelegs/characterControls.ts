@@ -304,7 +304,7 @@ export class CharacterControls implements Controls {
             if (this.closestWalkableObject !== null && this.closestWalkableObject instanceof TelluricPlanet) {
                 const waterLevel = this.closestWalkableObject.model.physicalProperties.oceanLevel + this.closestWalkableObject.getRadius();
                 const distanceToWater = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.closestWalkableObject.getTransform().getAbsolutePosition()) - waterLevel;
-                distance = Math.min(distance, distanceToWater + 0.2);
+                distance = Math.min(distance, distanceToWater + 0.8);
             }
 
             if (distance <= 0.1) {
