@@ -33,6 +33,7 @@ import "@babylonjs/core/Collisions/collisionCoordinator";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Transformable } from "../architecture/transformable";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 
 class AnimationGroupWrapper {
     name: string;
@@ -62,6 +63,7 @@ export class CharacterControls implements Controls {
     private readonly characterWalkSpeedBackwards = 1.2;
     private readonly characterRunSpeed = 3.6;
     private readonly characterRotationSpeed = 6;
+    private readonly characterSwimSpeed = 1.5;
 
     private readonly idleAnim: AnimationGroupWrapper;
     private readonly walkAnim: AnimationGroupWrapper;
@@ -69,12 +71,15 @@ export class CharacterControls implements Controls {
     private readonly sambaAnim: AnimationGroupWrapper;
     private readonly runningAnim: AnimationGroupWrapper;
     private readonly fallingIdleAnim: AnimationGroupWrapper;
+    private readonly skyDivingAnim: AnimationGroupWrapper;
+    private readonly swimmingAnim: AnimationGroupWrapper;
     private readonly jumpingAnim: AnimationGroupWrapper;
     private readonly nonIdleAnimations: AnimationGroupWrapper[];
 
     private targetAnim: AnimationGroupWrapper | null = null;
 
     private closestWalkableObject: Transformable | null = null;
+    private distanceToGround = 0;
 
     private readonly raycastResult = new PhysicsRaycastResult();
     private readonly scene: Scene;
@@ -108,6 +113,12 @@ export class CharacterControls implements Controls {
         const fallingIdleAnim = scene.getAnimationGroupByName("FallingIdle");
         if (fallingIdleAnim === null) throw new Error("'FallingIdle' animation not found");
 
+        const skyDivingAnim = scene.getAnimationGroupByName("Skydiving");
+        if (skyDivingAnim === null) throw new Error("'Skydiving' animation not found");
+
+        const swimmingAnim = scene.getAnimationGroupByName("Swimming");
+        if (swimmingAnim === null) throw new Error("'Swimming' animation not found");
+
         const jumpingAnim = scene.getAnimationGroupByName("Jumping");
         if (jumpingAnim === null) throw new Error("'Jumping' animation not found");
 
@@ -117,8 +128,20 @@ export class CharacterControls implements Controls {
         this.sambaAnim = new AnimationGroupWrapper("samba", sambaAnim, 0, true);
         this.runningAnim = new AnimationGroupWrapper("running", runningAnim, 0, true);
         this.fallingIdleAnim = new AnimationGroupWrapper("fallingIdle", fallingIdleAnim, 0, true);
+        this.skyDivingAnim = new AnimationGroupWrapper("skydiving", skyDivingAnim, 0, true);
+        this.skyDivingAnim.group.speedRatio = 1.5;
+        this.swimmingAnim = new AnimationGroupWrapper("swimming", swimmingAnim, 0, true);
         this.jumpingAnim = new AnimationGroupWrapper("jumping", jumpingAnim, 0, false);
-        this.nonIdleAnimations = [this.walkAnim, this.walkBackAnim, this.sambaAnim, this.runningAnim, this.fallingIdleAnim, this.jumpingAnim];
+        this.nonIdleAnimations = [
+            this.walkAnim,
+            this.walkBackAnim,
+            this.sambaAnim,
+            this.runningAnim,
+            this.fallingIdleAnim,
+            this.jumpingAnim,
+            this.skyDivingAnim,
+            this.swimmingAnim
+        ];
 
         this.targetAnim = this.idleAnim;
 
@@ -152,6 +175,17 @@ export class CharacterControls implements Controls {
             const keyboard = input as Keyboard;
             let keydown = false;
 
+            let isSwimming = false;
+            if (this.closestWalkableObject !== null && this.closestWalkableObject instanceof TelluricPlanet) {
+                const distanceToPlanetCenter = Vector3.Distance(this.closestWalkableObject.getTransform().getAbsolutePosition(), this.getTransform().getAbsolutePosition());
+
+                const waterLevel = this.closestWalkableObject.model.physicalProperties.oceanLevel + this.closestWalkableObject.getRadius();
+
+                if (distanceToPlanetCenter < waterLevel) {
+                    isSwimming = true;
+                }
+            }
+
             if (this.walkAnim.weight > 0.0) {
                 this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaTime * this.walkAnim.weight));
             }
@@ -164,52 +198,64 @@ export class CharacterControls implements Controls {
                 this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight));
             }
 
-            const isWalking = this.walkAnim.weight > 0.0 || this.walkBackAnim.weight > 0.0 || this.runningAnim.weight > 0.0;
+            const isMoving = this.walkAnim.weight > 0.0 || this.walkBackAnim.weight > 0.0 || this.runningAnim.weight > 0.0;
 
             // Translation
-            if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
-                this.targetAnim = this.walkAnim;
+            if (isSwimming) {
+                this.targetAnim = this.swimmingAnim;
+                if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
+                    this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterSwimSpeed * deltaTime));
+                }
                 keydown = true;
-            } else if (keyboard.isPressed("s")) {
-                this.targetAnim = this.walkBackAnim;
-                keydown = true;
-            } else if (keyboard.isPressed("e")) {
-                this.targetAnim = this.runningAnim;
-                keydown = true;
-            }
+            } else {
+                if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
+                    this.targetAnim = this.walkAnim;
+                    keydown = true;
+                } else if (keyboard.isPressed("s")) {
+                    this.targetAnim = this.walkBackAnim;
+                    keydown = true;
+                } else if (keyboard.isPressed("e")) {
+                    this.targetAnim = this.runningAnim;
+                    keydown = true;
+                }
 
-            if (!this.isGrounded) {
-                this.targetAnim = this.fallingIdleAnim;
-                keydown = true;
+                if (!this.isGrounded) {
+                    if (this.distanceToGround < 30) {
+                        this.targetAnim = this.fallingIdleAnim;
+                    } else {
+                        this.targetAnim = this.skyDivingAnim;
+                    }
+                    keydown = true;
+                }
+
+                // Samba!
+                if (keyboard.isPressed("b")) {
+                    this.targetAnim = this.sambaAnim;
+                    keydown = true;
+                }
+
+                if (keyboard.isPressed(" ")) {
+                    if (this.isGrounded) {
+                        this.targetAnim = this.jumpingAnim;
+                        this.jumpingAnim.weight = 1;
+                        this.jumpingAnim.group.stop();
+                        this.jumpingAnim.group.play();
+                        this.isGrounded = false;
+                        this.jumpVelocity = this.character.up.scale(10.0).add(this.character.forward.scale(-5.0));
+                        keydown = true;
+                    }
+                }
             }
 
             // Rotation
-            if ((keyboard.isPressed("q") || keyboard.isPressed("a")) && isWalking) {
+            if ((keyboard.isPressed("q") || keyboard.isPressed("a")) && (isMoving || isSwimming)) {
                 this.character.rotate(Vector3.Up(), this.characterRotationSpeed * deltaTime);
                 this.thirdPersonCamera.alpha += this.characterRotationSpeed * deltaTime;
                 keydown = true;
-            } else if (keyboard.isPressed("d") && isWalking) {
+            } else if (keyboard.isPressed("d") && (isMoving || isSwimming)) {
                 this.character.rotate(Vector3.Up(), -this.characterRotationSpeed * deltaTime);
                 this.thirdPersonCamera.alpha -= this.characterRotationSpeed * deltaTime;
                 keydown = true;
-            }
-
-            // Samba!
-            if (keyboard.isPressed("b")) {
-                this.targetAnim = this.sambaAnim;
-                keydown = true;
-            }
-
-            if (keyboard.isPressed(" ")) {
-                if (this.isGrounded) {
-                    this.targetAnim = this.jumpingAnim;
-                    this.jumpingAnim.weight = 1;
-                    this.jumpingAnim.group.stop();
-                    this.jumpingAnim.group.play();
-                    this.isGrounded = false;
-                    this.jumpVelocity = this.character.up.scale(10.0).add(this.character.forward.scale(-5.0));
-                    keydown = true;
-                }
             }
 
             if (!keydown) {
@@ -252,15 +298,40 @@ export class CharacterControls implements Controls {
         (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.ENVIRONMENT });
         if (this.raycastResult.hasHit) {
             const up = character.up;
-            const distance = Vector3.Dot(character.getAbsolutePosition().subtract(this.raycastResult.hitPointWorld), up);
+            let distance = Vector3.Dot(character.getAbsolutePosition().subtract(this.raycastResult.hitPointWorld), up);
+
+            // if closestWalkableObject is a telluric planet, the distance is the min between the distance to the ground and the distance to the water level
+            if (this.closestWalkableObject !== null && this.closestWalkableObject instanceof TelluricPlanet) {
+                const waterLevel = this.closestWalkableObject.model.physicalProperties.oceanLevel + this.closestWalkableObject.getRadius();
+                const distanceToWater = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.closestWalkableObject.getTransform().getAbsolutePosition()) - waterLevel;
+                distance = Math.min(distance, distanceToWater + 0.2);
+            }
+
             if (distance <= 0.1) {
                 // push the character up if it's below the surface
                 translate(character, up.scale(-distance));
-                this.isGrounded = true;
+
+                if (this.closestWalkableObject !== null && this.closestWalkableObject instanceof TelluricPlanet) {
+                    const waterLevel = this.closestWalkableObject.model.physicalProperties.oceanLevel + this.closestWalkableObject.getRadius();
+                    const distanceToWater =
+                        Vector3.Distance(this.getTransform().getAbsolutePosition(), this.closestWalkableObject.getTransform().getAbsolutePosition()) - waterLevel;
+                    if (distanceToWater < 0) {
+                        this.isGrounded = false;
+                    } else {
+                        this.isGrounded = true;
+                    }
+                } else {
+                    this.isGrounded = true;
+                }
+                this.distanceToGround = 0;
                 this.jumpVelocity = Vector3.Zero();
             } else {
                 this.isGrounded = false;
+                this.distanceToGround = distance;
             }
+        } else {
+            this.isGrounded = false;
+            this.distanceToGround = 50e3;
         }
 
         const playerMovement = Vector3.Zero();
@@ -268,6 +339,7 @@ export class CharacterControls implements Controls {
         translate(this.getTransform(), playerMovement);
 
         this.getActiveCamera().getViewMatrix();
+
         return playerMovement;
     }
 

@@ -72,9 +72,7 @@ void main() {
 
     vec4 finalColor = screenColor;
 
-    float waveAmplitude = 20.0;
-    float waveOmega = 1.0/7.0;
-    float actualRadius = ocean_radius + waveAmplitude * sin(time * waveOmega);
+    float actualRadius = ocean_radius;
 
     float impactPoint, escapePoint;
     if (rayIntersectSphere(camera_position, rayDir, object_position, actualRadius, impactPoint, escapePoint) && impactPoint < maximumDistance) {

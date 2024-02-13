@@ -24,12 +24,11 @@ import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObje
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { getInverseRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { BoundingSphere } from "../architecture/boundingSphere";
 import { Assets } from "../assets";
 import { Transformable } from "../architecture/transformable";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 
 export type OceanUniforms = {
-    oceanRadius: number;
     smoothness: number;
     specularPower: number;
     depthModifier: number;
@@ -42,14 +41,13 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
     readonly oceanUniforms: OceanUniforms;
     readonly object: Transformable;
 
-    constructor(name: string, planet: Transformable & BoundingSphere, scene: UberScene, stars: Transformable[]) {
+    constructor(name: string, planet: TelluricPlanet, scene: UberScene, stars: Transformable[]) {
         const shaderName = "ocean";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
         }
 
         const oceanUniforms: OceanUniforms = {
-            oceanRadius: planet.getBoundingRadius(),
             depthModifier: 0.0015,
             alphaModifier: 0.0025,
             specularPower: 1.0,
@@ -66,7 +64,7 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
                 name: "ocean_radius",
                 type: UniformEnumType.FLOAT,
                 get: () => {
-                    return oceanUniforms.oceanRadius;
+                    return planet.getRadius() + planet.model.physicalProperties.oceanLevel;
                 }
             },
             {
