@@ -87,28 +87,29 @@ void main() {
         vec3 unitSamplePoint = normalize(samplePointPlanetSpace);
         vec3 planetNormal = normalize(samplePoint);
 
-        vec3 normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, time, -time) * 100.0, planetNormal, normalMap2, 0.00015, ocean_waveBlendingSharpness, 1.0);
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 100.0, normalWave, normalMap1, 0.0001, ocean_waveBlendingSharpness, 1.0);
+        vec3 normalWave = planetNormal;
+        /*normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, time, -time) * 0.2, normalWave, normalMap2, 0.15, ocean_waveBlendingSharpness, 1.0);
+        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, time, -time) * 0.2, normalWave, normalMap1, 0.1, ocean_waveBlendingSharpness, 1.0);
 
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 300.0, normalWave, normalMap1, 0.000025, ocean_waveBlendingSharpness, 0.5);
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 300.0, normalWave, normalMap2, 0.00002, ocean_waveBlendingSharpness, 0.5);
+        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 0.6, normalWave, normalMap1, 0.025, ocean_waveBlendingSharpness, 0.5);
+        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 0.6, normalWave, normalMap2, 0.02, ocean_waveBlendingSharpness, 0.5);*/
 
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 500.0, normalWave, normalMap2, 0.000010, ocean_waveBlendingSharpness, 0.5);
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 500.0, normalWave, normalMap1, 0.000005, ocean_waveBlendingSharpness, 0.5);
+        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 1.0, normalWave, normalMap2, 0.010, ocean_waveBlendingSharpness, 0.5);
+        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 1.0, normalWave, normalMap1, 0.005, ocean_waveBlendingSharpness, 0.5);
 
         float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * ocean_depthModifier);
         float alpha = exp(-distanceThroughOcean * ocean_alphaModifier);
 
         vec3 deepColor = vec3(0.0, 22.0, 82.0)/255.0;
         vec3 shallowColor = vec3(32.0, 193.0, 180.0)/255.0;
-        vec3 oceanColor = mix(shallowColor, deepColor, opticalDepth01) * star_colors[0];
+        vec3 oceanColor = mix(shallowColor, deepColor, opticalDepth01);
 
         vec3 reflectedColor = vec3(0.6, 0.8, 0.95) * 0.7;
 
         float fresnel = 1.0 - dot(-rayDir, planetNormal);
         fresnel = pow(fresnel, 8.0);
 
-        vec3 ambiant = mix(oceanColor, screenColor.rgb * (1.0 - alpha), alpha);
+        vec3 ambiant = mix(oceanColor, screenColor.rgb, alpha);
 
         ambiant = mix(ambiant, reflectedColor, fresnel);
 
@@ -122,7 +123,7 @@ void main() {
             vec3 sunDir = normalize(star_positions[i] - samplePoint);
 
             float ndl = max(dot(planetNormal, sunDir), 0.0);
-            finalColor.rgb += ambiant * ndl;
+            finalColor.rgb += ambiant * ndl * star_colors[i];
 
             if (length(camera_position - object_position) > ocean_radius) {
                 // if above ocean surface then specular highlight
