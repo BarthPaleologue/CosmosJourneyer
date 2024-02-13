@@ -1,6 +1,6 @@
 import { UberScene } from "../uberCore/uberScene";
 import { DefaultControls } from "../defaultController/defaultControls";
-import { StarSystemView } from "../starSystem/StarSystemView";
+import { StarSystemView } from "../starSystem/starSystemView";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { positionNearObjectWithStarVisible } from "../utils/positionNearObject";
 import { BODY_TYPE } from "../model/common";

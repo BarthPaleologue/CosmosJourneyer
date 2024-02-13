@@ -7,7 +7,9 @@
     "**/test/**/*.*"
   ],
   "entryPoints": [
-    "src/ts/**/*.ts"
+    "src/ts/cosmosJourneyer.ts",
+    "src/ts/starmap/starMap.ts",
+    "src/ts/starSystem/starSystemView.ts"
   ],
   "visibilityFilters": {
     "protected": false,
@@ -16,5 +18,7 @@
     "external": false,
     "@alpha": false,
     "@beta": false
-  }
+  },
+  "plugin": ["typedoc-material-theme", "typedoc-plugin-missing-exports"],
+  "themeColor": "#cb9820"
 }
