@@ -44,39 +44,39 @@ export class RingsUniforms {
         this.offset = randRange(-100, 100, rng, 1440);
     }
 
-    static getEmptyShaderUniforms(): ShaderUniforms {
+    static GetEmptyShaderUniforms(): ShaderUniforms {
         return [
             {
                 name: "rings_start",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return 0;
                 }
             },
             {
                 name: "rings_end",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return 0;
                 }
             },
             {
                 name: "rings_frequency",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return 0;
                 }
             },
             {
                 name: "rings_opacity",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return 0;
                 }
             },
             {
                 name: "rings_color",
-                type: UniformEnumType.Color3,
+                type: UniformEnumType.COLOR_3,
                 get: () => {
                     return new Color3(0, 0, 0);
                 }
@@ -88,35 +88,35 @@ export class RingsUniforms {
         return [
             {
                 name: "rings_start",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.ringStart;
                 }
             },
             {
                 name: "rings_end",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.ringEnd;
                 }
             },
             {
                 name: "rings_frequency",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.ringFrequency;
                 }
             },
             {
                 name: "rings_opacity",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.ringOpacity;
                 }
             },
             {
                 name: "rings_color",
-                type: UniformEnumType.Color3,
+                type: UniformEnumType.COLOR_3,
                 get: () => {
                     return this.ringColor;
                 }
@@ -134,7 +134,7 @@ export class RingsUniforms {
             return [
                 {
                     name: "rings_lut",
-                    type: SamplerEnumType.Texture,
+                    type: SamplerEnumType.TEXTURE,
                     get: () => {
                         return lut;
                     }

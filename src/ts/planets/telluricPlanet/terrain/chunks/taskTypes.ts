@@ -22,9 +22,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
 export enum TaskType {
-    Build,
-    Apply,
-    Collision
+    BUILD,
+    APPLY
 }
 
 export type Task = {

@@ -136,7 +136,7 @@ export class Spaceship {
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
         this.collisionObservable.add((collisionEvent: IPhysicsCollisionEvent) => {
             if (collisionEvent.impulse < 0.8) return;
-            Assets.OuchSound.play();
+            Assets.OUCH_SOUND.play();
         });
     }
 
@@ -177,15 +177,15 @@ export class Spaceship {
                 const forwardPressed = keyboard.isAnyPressed(["w", "z"]);
 
                 if (spacePressed !== this.hoverThrustersRunning) {
-                    if (spacePressed) Assets.EngineRunningSound.play();
-                    else Assets.EngineRunningSound.stop();
+                    if (spacePressed) Assets.ENGINE_RUNNING_SOUND.play();
+                    else Assets.ENGINE_RUNNING_SOUND.stop();
 
                     this.hoverThrustersRunning = spacePressed;
                 }
 
                 if (forwardPressed !== this.mainThrustersRunning) {
-                    if (forwardPressed) Assets.EngineRunningSound.play();
-                    else Assets.EngineRunningSound.stop();
+                    if (forwardPressed) Assets.ENGINE_RUNNING_SOUND.play();
+                    else Assets.ENGINE_RUNNING_SOUND.stop();
 
                     this.mainThrustersRunning = forwardPressed;
                 }

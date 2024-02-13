@@ -49,14 +49,14 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
             ...getActiveCameraUniforms(scene),
             {
                 name: "power",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return mandelbulb.model.power;
                 }
             },
             {
                 name: "accentColor",
-                type: UniformEnumType.Color3,
+                type: UniformEnumType.COLOR_3,
                 get: () => {
                     return mandelbulb.model.accentColor;
                 }

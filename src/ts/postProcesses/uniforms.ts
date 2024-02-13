@@ -28,7 +28,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
     return [
         {
             name: "camera_position",
-            type: UniformEnumType.Vector3,
+            type: UniformEnumType.VECTOR_3,
             get: () => {
                 if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.globalPosition;
@@ -36,7 +36,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
         },
         {
             name: "camera_projection",
-            type: UniformEnumType.Matrix,
+            type: UniformEnumType.MATRIX,
             get: () => {
                 if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.getProjectionMatrix();
@@ -44,7 +44,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
         },
         {
             name: "camera_inverseProjection",
-            type: UniformEnumType.Matrix,
+            type: UniformEnumType.MATRIX,
             get: () => {
                 if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.getProjectionMatrix().clone().invert();
@@ -52,7 +52,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
         },
         {
             name: "camera_view",
-            type: UniformEnumType.Matrix,
+            type: UniformEnumType.MATRIX,
             get: () => {
                 if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.getViewMatrix();
@@ -60,7 +60,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
         },
         {
             name: "camera_inverseView",
-            type: UniformEnumType.Matrix,
+            type: UniformEnumType.MATRIX,
             get: () => {
                 if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.getViewMatrix().clone().invert();
@@ -68,7 +68,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
         },
         {
             name: "camera_near",
-            type: UniformEnumType.Float,
+            type: UniformEnumType.FLOAT,
             get: () => {
                 if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.minZ;
@@ -76,7 +76,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
         },
         {
             name: "camera_far",
-            type: UniformEnumType.Float,
+            type: UniformEnumType.FLOAT,
             get: () => {
                 if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.maxZ;
@@ -84,7 +84,7 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
         },
         {
             name: "camera_fov",
-            type: UniformEnumType.Float,
+            type: UniformEnumType.FLOAT,
             get: () => {
                 if (scene.activeCamera === null) throw new Error("No active camera");
                 return scene.activeCamera.fov;
@@ -97,17 +97,17 @@ export function getStellarObjectsUniforms(stars: Transformable[]): ShaderUniform
     return [
         {
             name: "star_positions",
-            type: UniformEnumType.Vector3Array,
+            type: UniformEnumType.VECTOR_3_ARRAY,
             get: () => stars.map((star) => star.getTransform().getAbsolutePosition())
         },
         {
             name: "star_colors",
-            type: UniformEnumType.Color3Array,
+            type: UniformEnumType.COLOR_3_ARRAY,
             get: () => stars.map((star) => (star instanceof Star ? star.model.color : Color3.White()))
         },
         {
             name: "nbStars",
-            type: UniformEnumType.Int,
+            type: UniformEnumType.INT,
             get: () => stars.length
         }
     ];
@@ -117,17 +117,17 @@ export function getObjectUniforms(object: Transformable & BoundingSphere): Shade
     return [
         {
             name: "object_position",
-            type: UniformEnumType.Vector3,
+            type: UniformEnumType.VECTOR_3,
             get: () => object.getTransform().getAbsolutePosition()
         },
         {
             name: "object_radius",
-            type: UniformEnumType.Float,
+            type: UniformEnumType.FLOAT,
             get: () => object.getBoundingRadius()
         },
         {
             name: "object_rotationAxis",
-            type: UniformEnumType.Vector3,
+            type: UniformEnumType.VECTOR_3,
             get: () => object.getTransform().up
         }
     ];
@@ -137,12 +137,12 @@ export function getSamplers(scene: UberScene): ShaderSamplers {
     return [
         {
             name: "textureSampler",
-            type: SamplerEnumType.Auto,
+            type: SamplerEnumType.AUTO,
             get: () => undefined
         },
         {
             name: "depthSampler",
-            type: SamplerEnumType.Texture,
+            type: SamplerEnumType.TEXTURE,
             get: () => scene.getDepthRenderer().getDepthMap()
         }
     ];

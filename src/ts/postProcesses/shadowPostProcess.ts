@@ -55,26 +55,26 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
             ...getActiveCameraUniforms(scene),
             {
                 name: "star_radiuses",
-                type: UniformEnumType.FloatArray,
+                type: UniformEnumType.FLOAT_ARRAY,
                 get: () => stellarObjects.map((star) => star.getBoundingRadius())
             },
             {
                 name: "shadowUniforms_hasRings",
-                type: UniformEnumType.Bool,
+                type: UniformEnumType.BOOL,
                 get: () => {
                     return shadowUniforms.hasRings;
                 }
             },
             {
                 name: "shadowUniforms_hasClouds",
-                type: UniformEnumType.Bool,
+                type: UniformEnumType.BOOL,
                 get: () => {
                     return shadowUniforms.hasClouds;
                 }
             },
             {
                 name: "shadowUniforms_hasOcean",
-                type: UniformEnumType.Bool,
+                type: UniformEnumType.BOOL,
                 get: () => {
                     return shadowUniforms.hasOcean;
                 }
@@ -91,14 +91,14 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
                 return new ShadowPostProcess(body.name + "Shadow", body, scene, shaderName, uniforms, samplers, shadowUniforms);
             });
         } else {
-            uniforms.push(...RingsUniforms.getEmptyShaderUniforms());
+            uniforms.push(...RingsUniforms.GetEmptyShaderUniforms());
             const samplers: ShaderSamplers = [
                 ...getSamplers(scene),
                 {
                     name: "rings_lut",
-                    type: SamplerEnumType.Texture,
+                    type: SamplerEnumType.TEXTURE,
                     get: () => {
-                        return Assets.EmptyTexture;
+                        return Assets.EMPTY_TEXTURE;
                     }
                 }
             ];

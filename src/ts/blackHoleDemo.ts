@@ -34,10 +34,10 @@ const starSystemSeed = new SystemSeed(0, 0, 0, 0);
 const starSystem = new StarSystemController(starSystemSeed, scene);
 starSystemView.setStarSystem(starSystem, false);
 
-const BH = StarSystemHelper.makeBlackHole(starSystem, 0);
+const BH = StarSystemHelper.MakeBlackHole(starSystem, 0);
 BH.model.orbit.radius = 0;
 
-const planet = StarSystemHelper.makeTelluricPlanet(starSystem);
+const planet = StarSystemHelper.MakeTelluricPlanet(starSystem);
 planet.model.orbit.radius = 45 * planet.getRadius();
 
 engine.init(true);

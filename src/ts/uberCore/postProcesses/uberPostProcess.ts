@@ -49,40 +49,40 @@ export class UberPostProcess extends PostProcess {
         const effect = this.getEffect();
         for (const uniform of this.uniforms) {
             switch (uniform.type) {
-                case UniformEnumType.Float:
+                case UniformEnumType.FLOAT:
                     effect.setFloat(uniform.name, uniform.get() as number);
                     break;
-                case UniformEnumType.Int:
+                case UniformEnumType.INT:
                     effect.setInt(uniform.name, uniform.get() as number);
                     break;
-                case UniformEnumType.Bool:
+                case UniformEnumType.BOOL:
                     effect.setBool(uniform.name, uniform.get() as boolean);
                     break;
-                case UniformEnumType.Vector3:
+                case UniformEnumType.VECTOR_3:
                     effect.setVector3(uniform.name, uniform.get() as Vector3);
                     break;
-                case UniformEnumType.Color3:
+                case UniformEnumType.COLOR_3:
                     effect.setColor3(uniform.name, uniform.get() as Color3);
                     break;
-                case UniformEnumType.Quaternion:
+                case UniformEnumType.QUATERNION:
                     effect.setQuaternion(uniform.name, uniform.get() as Quaternion);
                     break;
-                case UniformEnumType.Matrix:
+                case UniformEnumType.MATRIX:
                     effect.setMatrix(uniform.name, uniform.get() as Matrix);
                     break;
-                case UniformEnumType.Vector3Array:
+                case UniformEnumType.VECTOR_3_ARRAY:
                     effect.setFloatArray3(uniform.name, flattenVector3Array(uniform.get() as Vector3[]));
                     break;
-                case UniformEnumType.Vector4Array:
+                case UniformEnumType.VECTOR_4_ARRAY:
                     effect.setFloatArray4(uniform.name, flattenVector4Array(uniform.get() as Vector4[]));
                     break;
-                case UniformEnumType.FloatArray:
+                case UniformEnumType.FLOAT_ARRAY:
                     effect.setFloatArray(uniform.name, uniform.get() as number[]);
                     break;
-                case UniformEnumType.Color3Array:
+                case UniformEnumType.COLOR_3_ARRAY:
                     effect.setFloatArray3(uniform.name, flattenColor3Array(uniform.get() as Color3[]));
                     break;
-                case UniformEnumType.Auto:
+                case UniformEnumType.AUTO:
                     // BabylonJS already handles this
                     break;
             }
@@ -90,10 +90,10 @@ export class UberPostProcess extends PostProcess {
 
         for (const sampler of this.samplers) {
             switch (sampler.type) {
-                case SamplerEnumType.Texture:
+                case SamplerEnumType.TEXTURE:
                     effect.setTexture(sampler.name, sampler.get() as Texture);
                     break;
-                case SamplerEnumType.Auto:
+                case SamplerEnumType.AUTO:
                     // BabylonJS already handles this
                     break;
                 default:

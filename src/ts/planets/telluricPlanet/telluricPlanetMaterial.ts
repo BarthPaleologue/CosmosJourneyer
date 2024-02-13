@@ -165,7 +165,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             Effect.ShadersStore["telluricPlanetLutFragmentShader"] = lutFragment;
         }
 
-        this.setTexture("lut", Assets.EmptyTexture);
+        this.setTexture("lut", Assets.EMPTY_TEXTURE);
         const lut = new ProceduralTexture("lut", 4096, "telluricPlanetLut", scene, null, true, false);
         lut.setFloat("minTemperature", this.planetModel.physicalProperties.minTemperature);
         lut.setFloat("maxTemperature", this.planetModel.physicalProperties.maxTemperature);
@@ -189,12 +189,12 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         this.setFloat("normalSharpness", this.colorSettings.normalSharpness);
 
-        this.setTexture("bottomNormalMap", Assets.BottomNormalMap);
-        this.setTexture("steepNormalMap", Assets.RockNormalMap);
-        this.setTexture("plainNormalMap", Assets.GrassNormalMap);
-        this.setTexture("snowNormalMap", Assets.SnowNormalMap1);
-        this.setTexture("beachNormalMap", Assets.SandNormalMap1);
-        this.setTexture("desertNormalMap", Assets.SandNormalMap2);
+        this.setTexture("bottomNormalMap", Assets.BOTTOM_NORMAL_MAP);
+        this.setTexture("steepNormalMap", Assets.ROCK_NORMAL_MAP);
+        this.setTexture("plainNormalMap", Assets.GRASS_NORMAL_MAP);
+        this.setTexture("snowNormalMap", Assets.SNOW_NORMAL_MAP_1);
+        this.setTexture("beachNormalMap", Assets.SAND_NORMAL_MAP_1);
+        this.setTexture("desertNormalMap", Assets.SAND_NORMAL_MAP_2);
 
         this.setFloat("minTemperature", this.planetModel.physicalProperties.minTemperature);
         this.setFloat("maxTemperature", this.planetModel.physicalProperties.maxTemperature);

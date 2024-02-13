@@ -41,7 +41,6 @@ import { CollisionMask } from "../settings";
 import { Transformable } from "../architecture/transformable";
 import { WarpTunnel } from "../utils/warpTunnel";
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 

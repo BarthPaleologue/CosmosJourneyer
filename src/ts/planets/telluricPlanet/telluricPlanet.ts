@@ -42,7 +42,7 @@ import { CelestialBody } from "../../architecture/celestialBody";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { rotate } from "../../uberCore/transforms/basicTransform";
-import { BODY_TYPE } from "../../model/common";
+import { BodyType } from "../../model/common";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -117,12 +117,12 @@ export class TelluricPlanet implements Planet, Cullable {
         this.material = new TelluricPlanetMaterial(this.name, this.getTransform(), this.model, scene);
 
         this.sides = [
-            new ChunkTree(Direction.Up, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.Down, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.Forward, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.Backward, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.Right, this.name, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.Left, this.name, this.model, this.aggregate, this.material, scene)
+            new ChunkTree(Direction.UP, this.name, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.DOWN, this.name, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.FORWARD, this.name, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.BACKWARD, this.name, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.RIGHT, this.name, this.model, this.aggregate, this.material, scene),
+            new ChunkTree(Direction.LEFT, this.name, this.model, this.aggregate, this.material, scene)
         ];
 
         this.sides.forEach((side) => side.onChunkCreatedObservable.add((chunk) => this.onChunkCreatedObservable.notifyObservers(chunk)));
@@ -149,7 +149,7 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     getTypeName(): string {
-        if (this.parent?.model.bodyType === BODY_TYPE.TELLURIC_PLANET || this.parent?.model.bodyType === BODY_TYPE.GAS_PLANET) {
+        if (this.parent?.model.bodyType === BodyType.TELLURIC_PLANET || this.parent?.model.bodyType === BodyType.GAS_PLANET) {
             return "Telluric Moon";
         }
         return "Telluric Planet";

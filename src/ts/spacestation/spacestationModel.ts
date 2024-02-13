@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { seededSquirrelNoise } from "squirrel-noise";
-import { GENERATION_STEPS } from "../model/common";
+import { GenerationSteps } from "../model/common";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { getOrbitalPeriod } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -52,7 +52,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
         this.physicalProperties = {
             mass: 1,
             rotationPeriod: 60 * 2,
-            axialTilt: 2 * this.rng(GENERATION_STEPS.AXIAL_TILT) * Math.PI
+            axialTilt: 2 * this.rng(GenerationSteps.AXIAL_TILT) * Math.PI
         };
     }
 }

@@ -22,7 +22,7 @@ import { AbstractMesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { DirectionnalParticleSystem } from "../utils/particleSystem";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { getDownwardDirection } from "../uberCore/transforms/basicTransform";
-import { LOCAL_DIRECTION } from "../uberCore/localDirections";
+import { LocalDirection } from "../uberCore/localDirections";
 
 export abstract class AbstractThruster {
     readonly mesh: AbstractMesh;
@@ -94,11 +94,11 @@ export abstract class AbstractThruster {
     }
 
     public getRollAuthorityNormalized(): number {
-        return this.getAuthorityAroundAxisNormalized(LOCAL_DIRECTION.FORWARD);
+        return this.getAuthorityAroundAxisNormalized(LocalDirection.FORWARD);
     }
 
     public getPitchAuthorityNormalized(): number {
-        return this.getAuthorityAroundAxisNormalized(LOCAL_DIRECTION.RIGHT);
+        return this.getAuthorityAroundAxisNormalized(LocalDirection.RIGHT);
     }
 
     public update(): void {

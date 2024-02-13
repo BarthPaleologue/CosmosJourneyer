@@ -32,9 +32,9 @@ import {
 import { Input } from "../inputs/input";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { LOCAL_DIRECTION } from "../uberCore/localDirections";
 import { getTransformationQuaternion } from "../utils/algebra";
 import { Quaternion } from "@babylonjs/core/Maths/math";
+import { LocalDirection } from "../uberCore/localDirections";
 
 export class DefaultControls implements Controls {
     private readonly transform: TransformNode;
@@ -75,7 +75,7 @@ export class DefaultControls implements Controls {
         pitch(this.transform, input.getPitch() * this.rotationSpeed * deltaTime);
         yaw(this.transform, input.getYaw() * this.rotationSpeed * deltaTime);
 
-        const cameraForward = this.camera.getDirection(LOCAL_DIRECTION.BACKWARD);
+        const cameraForward = this.camera.getDirection(LocalDirection.BACKWARD);
         const transformForward = getForwardDirection(this.transform);
 
         if (!cameraForward.equalsWithEpsilon(transformForward)) {

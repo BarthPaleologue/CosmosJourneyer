@@ -53,7 +53,7 @@ export class StarMaterial extends ShaderMaterial {
             Effect.ShadersStore["starLutFragmentShader"] = lutFragment;
         }
 
-        this.setTexture("lut", Assets.EmptyTexture);
+        this.setTexture("lut", Assets.EMPTY_TEXTURE);
         const lut = new ProceduralTexture("lut", 4096, "starLut", scene, null, true, false);
         lut.refreshRate = 0;
         lut.executeWhenReady(() => {

@@ -59,7 +59,7 @@ export class ChunkForgeWorkers implements ChunkForge {
 
     private dispatchBuildTask(task: BuildTask, worker: Worker): void {
         const buildData: TransferBuildData = {
-            taskType: TaskType.Build,
+            taskType: TaskType.BUILD,
             planetName: task.planetName,
             planetDiameter: task.planetDiameter,
             nbVerticesPerSide: this.nbVerticesPerRow,
@@ -89,7 +89,7 @@ export class ChunkForgeWorkers implements ChunkForge {
             vertexData.indices = data.indices;
 
             const applyTask: ApplyTask = {
-                type: TaskType.Apply,
+                type: TaskType.APPLY,
                 vertexData: vertexData,
                 chunk: task.chunk,
                 instancesMatrixBuffer: data.instancesMatrixBuffer,

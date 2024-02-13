@@ -47,14 +47,14 @@ export class VolumetricCloudsPostProcess extends UberPostProcess implements Obje
             ...getActiveCameraUniforms(scene),
             {
                 name: "cloudLayerMinHeight",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return planet.getBoundingRadius();
                 }
             },
             {
                 name: "cloudLayerMaxHeight",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return planet.getBoundingRadius() + 30e3;
                 }

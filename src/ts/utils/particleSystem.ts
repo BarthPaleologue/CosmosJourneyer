@@ -43,7 +43,7 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.direction = direction;
         this.emitter = mesh;
 
-        this.particleTexture = Assets.PlumeParticle;
+        this.particleTexture = Assets.PLUME_PARTICLE;
         this.particleTexture.hasAlpha = true;
 
         this.emitter = mesh;

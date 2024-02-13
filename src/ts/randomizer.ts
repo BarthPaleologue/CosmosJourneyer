@@ -21,7 +21,7 @@ import { StarSystemController } from "./starSystem/starSystemController";
 
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { BODY_TYPE } from "./model/common";
+import { BodyType } from "./model/common";
 import { SystemSeed } from "./utils/systemSeed";
 
 const engine = await CosmosJourneyer.CreateAsync();
@@ -44,7 +44,7 @@ engine.starMap.setCurrentStarSystem(seed);
 
 engine.init(true);
 
-const nbRadius = starSystem.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 3;
+const nbRadius = starSystem.model.getBodyTypeOfStar(0) === BodyType.BLACK_HOLE ? 8 : 3;
 const planet = starSystem.planets.length > 0 ? starSystem.planets[0] : starSystem.stellarObjects[0];
 positionNearObjectBrightSide(scene.getActiveController(), planet, starSystem, nbRadius);
 

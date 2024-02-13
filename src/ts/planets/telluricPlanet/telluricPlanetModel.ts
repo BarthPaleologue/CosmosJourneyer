@@ -18,7 +18,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { BODY_TYPE, GENERATION_STEPS } from "../../model/common";
+import { BodyType, GenerationSteps } from "../../model/common";
 import { TerrainSettings } from "./terrain/terrainSettings";
 import { clamp } from "terrain-generation";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
@@ -33,7 +33,7 @@ import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalPro
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 
 export class TelluricPlanetModel implements PlanetModel {
-    readonly bodyType = BODY_TYPE.TELLURIC_PLANET;
+    readonly bodyType = BodyType.TELLURIC_PLANET;
     readonly seed: number;
     readonly rng: (step: number) => number;
 
@@ -62,44 +62,44 @@ export class TelluricPlanetModel implements PlanetModel {
 
         this.parentBody = parentBody ?? null;
 
-        if (this.parentBody?.bodyType === BODY_TYPE.TELLURIC_PLANET) this.isSatelliteOfTelluric = true;
-        if (this.parentBody?.bodyType === BODY_TYPE.GAS_PLANET) this.isSatelliteOfGas = true;
+        if (this.parentBody?.bodyType === BodyType.TELLURIC_PLANET) this.isSatelliteOfTelluric = true;
+        if (this.parentBody?.bodyType === BodyType.GAS_PLANET) this.isSatelliteOfGas = true;
 
         if (this.isSatelliteOfTelluric) {
-            this.radius = Math.max(0.03, normalRandom(0.06, 0.03, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
+            this.radius = Math.max(0.03, normalRandom(0.06, 0.03, this.rng, GenerationSteps.RADIUS)) * Settings.EARTH_RADIUS;
         } else if (this.isSatelliteOfGas) {
-            this.radius = Math.max(0.03, normalRandom(0.25, 0.15, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
+            this.radius = Math.max(0.03, normalRandom(0.25, 0.15, this.rng, GenerationSteps.RADIUS)) * Settings.EARTH_RADIUS;
         } else {
-            this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, GENERATION_STEPS.RADIUS)) * Settings.EARTH_RADIUS;
+            this.radius = Math.max(0.3, normalRandom(1.0, 0.1, this.rng, GenerationSteps.RADIUS)) * Settings.EARTH_RADIUS;
         }
 
         const mass = this.isSatelliteOfTelluric ? 1 : 10;
 
         this.physicalProperties = {
             mass: mass,
-            axialTilt: normalRandom(0, 0.2, this.rng, GENERATION_STEPS.AXIAL_TILT),
+            axialTilt: normalRandom(0, 0.2, this.rng, GenerationSteps.AXIAL_TILT),
             rotationPeriod: (60 * 60 * 24) / 10,
             minTemperature: randRangeInt(-60, 5, this.rng, 80),
             maxTemperature: randRangeInt(10, 50, this.rng, 81),
-            pressure: Math.max(normalRandom(0.9, 0.2, this.rng, GENERATION_STEPS.PRESSURE), 0),
-            waterAmount: Math.max(normalRandom(1.0, 0.3, this.rng, GENERATION_STEPS.WATER_AMOUNT), 0),
+            pressure: Math.max(normalRandom(0.9, 0.2, this.rng, GenerationSteps.PRESSURE), 0),
+            waterAmount: Math.max(normalRandom(1.0, 0.3, this.rng, GenerationSteps.WATER_AMOUNT), 0),
             oceanLevel: 0
         };
 
-        const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.05, this.rng, GENERATION_STEPS.ORBITAL_PLANE_ALIGNEMENT);
+        const isOrbitalPlaneAlignedWithParent = this.isSatelliteOfGas && uniformRandBool(0.05, this.rng, GenerationSteps.ORBITAL_PLANE_ALIGNMENT);
         const orbitalPlaneNormal = isOrbitalPlaneAlignedWithParent
             ? Vector3.Up()
-            : Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (this.rng(GENERATION_STEPS.ORBIT + 20) - 0.5) * 0.2));
+            : Vector3.Up().applyRotationQuaternionInPlace(Quaternion.RotationAxis(Axis.X, (this.rng(GenerationSteps.ORBIT + 20) - 0.5) * 0.2));
 
-        // TODO: do not hardcode
-        let orbitRadius = 2e9 + this.rng(GENERATION_STEPS.ORBIT) * 15e9;
+        // Todo: do not hardcode
+        let orbitRadius = 2e9 + this.rng(GenerationSteps.ORBIT) * 15e9;
 
-        const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80), 0.7, 3.0);
+        const orbitalP = 2; //clamp(normalRandom(2.0, 0.3, this.rng, GenerationSteps.Orbit + 80), 0.7, 3.0);
 
         if (this.isSatelliteOfGas || this.isSatelliteOfTelluric) {
             const minRadius = this.parentBody?.radius ?? 0;
-            orbitRadius = minRadius * clamp(normalRandom(2.0, 0.3, this.rng, GENERATION_STEPS.ORBIT), 1.2, 3.0);
-            orbitRadius += this.radius * clamp(normalRandom(2, 1, this.rng, GENERATION_STEPS.ORBIT), 1, 20);
+            orbitRadius = minRadius * clamp(normalRandom(2.0, 0.3, this.rng, GenerationSteps.ORBIT), 1.2, 3.0);
+            orbitRadius += this.radius * clamp(normalRandom(2, 1, this.rng, GenerationSteps.ORBIT), 1, 20);
             orbitRadius += 2.0 * Math.max(0, minRadius - getPeriapsis(orbitRadius, orbitalP));
         } else if (parentBody) orbitRadius += parentBody.radius * 1.5;
 
@@ -112,7 +112,7 @@ export class TelluricPlanetModel implements PlanetModel {
         };
 
         if (this.isSatelliteOfTelluric) {
-            this.physicalProperties.pressure = Math.max(normalRandom(0.01, 0.01, this.rng, GENERATION_STEPS.PRESSURE), 0);
+            this.physicalProperties.pressure = Math.max(normalRandom(0.01, 0.01, this.rng, GenerationSteps.PRESSURE), 0);
         }
         if (this.radius <= 0.3 * Settings.EARTH_RADIUS) this.physicalProperties.pressure = 0;
 
@@ -120,7 +120,7 @@ export class TelluricPlanetModel implements PlanetModel {
 
         this.terrainSettings = {
             continents_frequency: this.radius / Settings.EARTH_RADIUS,
-            continents_fragmentation: clamp(normalRandom(0.65, 0.03, this.rng, GENERATION_STEPS.TERRAIN), 0, 0.95),
+            continents_fragmentation: clamp(normalRandom(0.65, 0.03, this.rng, GenerationSteps.TERRAIN), 0, 0.95),
 
             bumps_frequency: (30 * this.radius) / Settings.EARTH_RADIUS,
 
@@ -138,7 +138,7 @@ export class TelluricPlanetModel implements PlanetModel {
             this.terrainSettings.continents_fragmentation = 0;
         }
 
-        if (uniformRandBool(0.6, this.rng, GENERATION_STEPS.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
+        if (uniformRandBool(0.6, this.rng, GenerationSteps.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
             this.ringsUniforms = new RingsUniforms(this.rng);
         }
 
@@ -147,7 +147,7 @@ export class TelluricPlanetModel implements PlanetModel {
             this.cloudsUniforms = new CloudsUniforms(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
         }
 
-        this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);
+        this.nbMoons = randRangeInt(0, 2, this.rng, GenerationSteps.NB_MOONS);
     }
 
     getApparentRadius(): number {
@@ -155,8 +155,8 @@ export class TelluricPlanetModel implements PlanetModel {
     }
 
     public getNbSpaceStations(): number {
-        if(uniformRandBool(0.2, this.rng, GENERATION_STEPS.SPACE_STATION)) return 1;
-        if(uniformRandBool(0.1, this.rng, GENERATION_STEPS.SPACE_STATION + 10)) return 2;
+        if(uniformRandBool(0.2, this.rng, GenerationSteps.SPACE_STATION)) return 1;
+        if(uniformRandBool(0.1, this.rng, GenerationSteps.SPACE_STATION + 10)) return 2;
         return 0;
     }
 }

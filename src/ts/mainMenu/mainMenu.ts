@@ -3,7 +3,7 @@ import { DefaultControls } from "../defaultController/defaultControls";
 import { StarSystemView } from "../starSystem/starSystemView";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { positionNearObjectWithStarVisible } from "../utils/positionNearObject";
-import { BODY_TYPE } from "../model/common";
+import { BodyType } from "../model/common";
 import { EditorVisibility } from "../ui/bodyEditor/bodyEditor";
 import mainMenuHTML from "../../html/mainMenu.html";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
@@ -84,7 +84,7 @@ export class MainMenu {
 
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToDefaultControls();
-            const nbRadius = this.starSystemController.model.getBodyTypeOfStar(0) === BODY_TYPE.BLACK_HOLE ? 8 : 2;
+            const nbRadius = this.starSystemController.model.getBodyTypeOfStar(0) === BodyType.BLACK_HOLE ? 8 : 2;
             positionNearObjectWithStarVisible(
                 this.controls,
                 this.starSystemController.planets.length > 0 ? this.starSystemController.getBodies()[1] : this.starSystemController.stellarObjects[0],

@@ -64,56 +64,56 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             ...getActiveCameraUniforms(scene),
             {
                 name: "ocean_radius",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return oceanUniforms.oceanRadius;
                 }
             },
             {
                 name: "ocean_smoothness",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return oceanUniforms.smoothness;
                 }
             },
             {
                 name: "ocean_specularPower",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return oceanUniforms.specularPower;
                 }
             },
             {
                 name: "ocean_alphaModifier",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return oceanUniforms.alphaModifier;
                 }
             },
             {
                 name: "ocean_depthModifier",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return oceanUniforms.depthModifier;
                 }
             },
             {
                 name: "ocean_waveBlendingSharpness",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return oceanUniforms.waveBlendingSharpness;
                 }
             },
             {
                 name: "planetInverseRotationQuaternion",
-                type: UniformEnumType.Quaternion,
+                type: UniformEnumType.QUATERNION,
                 get: () => {
                     return getInverseRotationQuaternion(planet.getTransform());
                 }
             },
             {
                 name: "time",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     //TODO: do not hardcode the 100000
                     // use rotating time offset to prevent float imprecision and distant artifacts
@@ -126,16 +126,16 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             ...getSamplers(scene),
             {
                 name: "normalMap1",
-                type: SamplerEnumType.Texture,
+                type: SamplerEnumType.TEXTURE,
                 get: () => {
-                    return Assets.WaterNormalMap1;
+                    return Assets.WATER_NORMAL_MAP_1;
                 }
             },
             {
                 name: "normalMap2",
-                type: SamplerEnumType.Texture,
+                type: SamplerEnumType.TEXTURE,
                 get: () => {
-                    return Assets.WaterNormalMap2;
+                    return Assets.WATER_NORMAL_MAP_2;
                 }
             }
         ];

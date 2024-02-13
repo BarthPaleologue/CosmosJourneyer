@@ -27,7 +27,6 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
-import { uniformRandBool } from "extended-random";
 
 /**
  * @see https://playground.babylonjs.com/#GLZ1PX#1241 (SPS)

@@ -19,27 +19,27 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 
 export enum Direction {
-    Up,
-    Down,
-    Left,
-    Right,
-    Forward,
-    Backward
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    FORWARD,
+    BACKWARD
 }
 
 export function getQuaternionFromDirection(direction: Direction): Quaternion {
     switch (direction) {
-        case Direction.Up:
+        case Direction.UP:
             return Quaternion.RotationAxis(Axis.X, Math.PI / 2);
-        case Direction.Down:
+        case Direction.DOWN:
             return Quaternion.RotationAxis(Axis.X, -Math.PI / 2);
-        case Direction.Forward:
+        case Direction.FORWARD:
             return Quaternion.Identity();
-        case Direction.Backward:
+        case Direction.BACKWARD:
             return Quaternion.RotationAxis(Axis.Y, Math.PI);
-        case Direction.Left:
+        case Direction.LEFT:
             return Quaternion.RotationAxis(Axis.Y, Math.PI / 2);
-        case Direction.Right:
+        case Direction.RIGHT:
             return Quaternion.RotationAxis(Axis.Y, -Math.PI / 2);
     }
 }
