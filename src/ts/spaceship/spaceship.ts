@@ -243,10 +243,8 @@ export class Spaceship implements Transformable {
             (this.scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, this.raycastResult, { collideWith: CollisionMask.ENVIRONMENT });
             if (this.raycastResult.hasHit) {
                 const landingSpotNormal = this.raycastResult.hitNormalWorld;
-                const extent = this.instanceRoot.getHierarchyBoundingVectors();
-                const shipYExtend = extent.max.y - extent.min.y;
 
-                const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(shipYExtend / 2));
+                const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(1.0));
 
                 const distance = landingSpot.subtract(this.getTransform().getAbsolutePosition()).dot(gravityDir);
                 console.log(500 * deltaTime * Math.sign(distance), distance);
