@@ -202,7 +202,7 @@ export class WarpTunnel implements Transformable {
             updateGlobals();
 
             if (this.nbParticlesAlive < this.targetNbParticles && this.recycledParticles.length > 0) {
-                if(Math.random() < this.targetNbParticles / WarpTunnel.MAX_NB_PARTICLES) {
+                if (Math.random() < this.targetNbParticles / WarpTunnel.MAX_NB_PARTICLES) {
                     instanceFromStock();
                     this.nbParticlesAlive++;
                 }

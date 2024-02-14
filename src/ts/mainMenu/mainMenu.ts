@@ -165,7 +165,9 @@ export class MainMenu {
                     this.startAnimation(() => this.onLoadSaveObservable.notifyObservers(saveFileData));
                 } catch (e) {
                     dropFileZone.classList.add("invalid");
-                    alert("Invalid save file. Please check your save file against the current format at https://barthpaleologue.github.io/CosmosJourneyer/docs/types/saveFile_saveFileData.SaveFileData.html\nYou can open an issue here if the issue persists: https://github.com/BarthPaleologue/CosmosJourneyer");
+                    alert(
+                        "Invalid save file. Please check your save file against the current format at https://barthpaleologue.github.io/CosmosJourneyer/docs/types/saveFile_saveFileData.SaveFileData.html\nYou can open an issue here if the issue persists: https://github.com/BarthPaleologue/CosmosJourneyer"
+                    );
                 }
             };
             reader.readAsText(file);

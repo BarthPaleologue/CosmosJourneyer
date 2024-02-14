@@ -92,15 +92,15 @@ export class StarSystemHelper {
      */
     public static MakeStellarObject(starsystem: StarSystemController, seed: number = starsystem.model.getStarSeed(starsystem.stellarObjects.length)): StellarObject {
         const stellarObjectType = starsystem.model.getBodyTypeOfStar(starsystem.stellarObjects.length);
-        if(stellarObjectType === BodyType.BLACK_HOLE) {
+        if (stellarObjectType === BodyType.BLACK_HOLE) {
             const blackHole = StarSystemHelper.MakeBlackHole(starsystem, seed);
             StarSystemHelper.MakeSpaceStations(starsystem, blackHole);
             return blackHole;
-        } else if(stellarObjectType === BodyType.NEUTRON_STAR) {
+        } else if (stellarObjectType === BodyType.NEUTRON_STAR) {
             const neutronStar = StarSystemHelper.MakeNeutronStar(starsystem, seed);
             StarSystemHelper.MakeSpaceStations(starsystem, neutronStar);
             return neutronStar;
-        } else if(stellarObjectType === BodyType.STAR) {
+        } else if (stellarObjectType === BodyType.STAR) {
             const star = StarSystemHelper.MakeStar(starsystem, seed);
             StarSystemHelper.MakeSpaceStations(starsystem, star);
             return star;
@@ -150,11 +150,11 @@ export class StarSystemHelper {
 
         for (let i = 0; i < n; i++) {
             const bodyType = starsystem.model.getBodyTypeOfPlanet(starsystem.planets.length);
-            if(bodyType === BodyType.TELLURIC_PLANET) {
+            if (bodyType === BodyType.TELLURIC_PLANET) {
                 const planet = StarSystemHelper.MakeTelluricPlanet(starsystem);
                 StarSystemHelper.MakeSatellites(starsystem, planet);
                 StarSystemHelper.MakeSpaceStations(starsystem, planet);
-            } else if(bodyType === BodyType.GAS_PLANET) {
+            } else if (bodyType === BodyType.GAS_PLANET) {
                 const planet = StarSystemHelper.MakeGasPlanet(starsystem);
                 StarSystemHelper.MakeSatellites(starsystem, planet);
                 StarSystemHelper.MakeSpaceStations(starsystem, planet);

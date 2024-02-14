@@ -19,16 +19,7 @@ import { Controls } from "../uberCore/controls";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import {
-    getForwardDirection,
-    getRightDirection,
-    getUpwardDirection,
-    pitch,
-    roll,
-    setRotationQuaternion,
-    translate,
-    yaw
-} from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll, setRotationQuaternion, translate, yaw } from "../uberCore/transforms/basicTransform";
 import { Input } from "../inputs/input";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";

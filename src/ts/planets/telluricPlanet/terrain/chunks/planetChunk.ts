@@ -156,7 +156,11 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         rockPatch.createInstances(Assets.ROCK);
         this.instancePatches.push(rockPatch);
 
-        if (this.planetModel.physicalProperties.pressure > 0 && this.planetModel.physicalProperties.oceanLevel > 0 && this.getAverageHeight() > this.planetModel.physicalProperties.oceanLevel + 50) {
+        if (
+            this.planetModel.physicalProperties.pressure > 0 &&
+            this.planetModel.physicalProperties.oceanLevel > 0 &&
+            this.getAverageHeight() > this.planetModel.physicalProperties.oceanLevel + 50
+        ) {
             const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
             treePatch.createInstances(Assets.TREE);
             this.instancePatches.push(treePatch);

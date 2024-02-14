@@ -166,9 +166,9 @@ if (aresAtmosphere) {
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
-    if(e.key === "o") {
+    if (e.key === "o") {
         const landingPad = spacestation.handleDockingRequest();
-        if(landingPad !== null && starSystemView.scene.getActiveController() === spaceshipController) {
+        if (landingPad !== null && starSystemView.scene.getActiveController() === spaceshipController) {
             spaceshipController.spaceship.engageLandingOnPad(landingPad);
         }
     }

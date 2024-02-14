@@ -29,11 +29,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { setEnabledBody } from "../utils/havok";
-import {
-    getForwardDirection, getRotationQuaternion, getUpwardDirection, rotate,
-    setRotationQuaternion,
-    translate
-} from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getRotationQuaternion, getUpwardDirection, rotate, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Assets } from "../assets";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
@@ -235,11 +231,11 @@ export class Spaceship implements Transformable {
     }
 
     private land(deltaTime: number) {
-        if(this.targetLandingPad !== null) {
+        if (this.targetLandingPad !== null) {
             this.landOnPad(this.targetLandingPad, deltaTime);
         }
 
-        if(this.landingTarget !== null) {
+        if (this.landingTarget !== null) {
             const gravityDir = this.landingTarget.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
             const start = this.getTransform().getAbsolutePosition().add(gravityDir.scale(-50e3));
             const end = this.getTransform().getAbsolutePosition().add(gravityDir.scale(50e3));
@@ -281,7 +277,7 @@ export class Spaceship implements Transformable {
 
         const distance = Vector3.Distance(targetPosition, currentPosition);
 
-        if(distance < 0.01) {
+        if (distance < 0.01) {
             this.completeLanding();
             return;
         }
@@ -289,7 +285,13 @@ export class Spaceship implements Transformable {
         const targetOrientation = landingPad.getTransform().absoluteRotationQuaternion;
         const currentOrientation = getRotationQuaternion(this.getTransform());
 
-        translate(this.getTransform(), targetPosition.subtract(currentPosition).normalize().scaleInPlace(Math.min(distance, 20 * deltaTime)));
+        translate(
+            this.getTransform(),
+            targetPosition
+                .subtract(currentPosition)
+                .normalize()
+                .scaleInPlace(Math.min(distance, 20 * deltaTime))
+        );
 
         this.getTransform().rotationQuaternion = Quaternion.Slerp(currentOrientation, targetOrientation, deltaTime);
     }

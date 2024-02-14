@@ -228,7 +228,7 @@ export class StarSystemView {
         this.spaceshipControls.spaceship.registerClosestObject(distance, radius);
 
         const warpDrive = this.spaceshipControls.spaceship.getWarpDrive();
-        if(warpDrive.isEnabled()) {
+        if (warpDrive.isEnabled()) {
             this.helmetOverlay.displaySpeed(warpDrive.getInternalThrottle(), warpDrive.getTargetThrottle(), this.spaceshipControls.spaceship.getSpeed());
         } else {
             this.helmetOverlay.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), 1, this.spaceshipControls.spaceship.getSpeed());

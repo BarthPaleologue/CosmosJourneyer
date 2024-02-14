@@ -84,7 +84,6 @@ translate(spacestation.getTransform(), new Vector3(0, -100, 0));
 ground.position.y = -40;
 ground.receiveShadows = true;*/
 
-
 const defaultControls = new DefaultControls(scene);
 defaultControls.speed *= 15;
 defaultControls.addInput(new Keyboard());
@@ -101,8 +100,8 @@ scene.onBeforeRenderObservable.add(() => {
 
     //OrbitalObject.UpdateRotation(spacestation, deltaTime);
 
-    spacestation.ringInstances.forEach(mesh => {
-       mesh.rotate(Axis.Y, 0.01 * deltaTime);
+    spacestation.ringInstances.forEach((mesh) => {
+        mesh.rotate(Axis.Y, 0.01 * deltaTime);
     });
 });
 
@@ -113,7 +112,7 @@ scene.executeWhenReady(() => {
 });
 
 const landingPad = spacestation.handleDockingRequest();
-if(landingPad === null) throw new Error("Docking request denied");
+if (landingPad === null) throw new Error("Docking request denied");
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "o") {

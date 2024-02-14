@@ -98,7 +98,7 @@ export class StarModel implements StellarObjectModel {
     }
 
     public getNbSpaceStations(): number {
-        if(uniformRandBool(0.001, this.rng, GenerationSteps.SPACE_STATION)) return 1;
+        if (uniformRandBool(0.001, this.rng, GenerationSteps.SPACE_STATION)) return 1;
         return 0;
     }
 

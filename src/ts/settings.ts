@@ -37,7 +37,7 @@ export const Settings = {
     C: 299792458,
     FOV: (92 * Math.PI) / 180,
 
-    MAIN_FONT: "Nasalization",
+    MAIN_FONT: "Nasalization"
 };
 
 export const CollisionMask = {
