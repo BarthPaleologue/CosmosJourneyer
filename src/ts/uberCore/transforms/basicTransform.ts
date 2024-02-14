@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export function translate(transformNode: TransformNode, displacement: Vector3): void {
@@ -104,6 +104,7 @@ export function getLeftDirection(transformNode: TransformNode): Vector3 {
 
 /**
  *
+ * @param transformNode
  * @param amount
  */
 export function roll(transformNode: TransformNode, amount: number): void {
@@ -112,6 +113,7 @@ export function roll(transformNode: TransformNode, amount: number): void {
 
 /**
  *
+ * @param transformNode
  * @param amount
  */
 export function pitch(transformNode: TransformNode, amount: number): void {
@@ -120,6 +122,7 @@ export function pitch(transformNode: TransformNode, amount: number): void {
 
 /**
  *
+ * @param transformNode
  * @param amount
  */
 export function yaw(transformNode: TransformNode, amount: number): void {

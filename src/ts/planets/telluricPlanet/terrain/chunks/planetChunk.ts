@@ -35,7 +35,6 @@ import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { BoundingSphere } from "../../../../architecture/boundingSphere";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";

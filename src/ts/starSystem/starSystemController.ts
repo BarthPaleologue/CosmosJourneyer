@@ -27,7 +27,7 @@ import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { Mandelbulb } from "../mandelbulb/mandelbulb";
 import { StarSystemModel } from "./starSystemModel";
-import { rotateAround, setUpVector, translate } from "../uberCore/transforms/basicTransform";
+import { rotateAround, translate } from "../uberCore/transforms/basicTransform";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
