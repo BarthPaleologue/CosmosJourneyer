@@ -262,10 +262,12 @@ export class Assets {
         };
 
         Assets.BUTTERFLY = createButterfly(scene);
+        Assets.BUTTERFLY.isVisible = false;
         Assets.BUTTERFLY_MATERIAL = new ButterflyMaterial(scene);
         Assets.BUTTERFLY.material = Assets.BUTTERFLY_MATERIAL;
 
         Assets.GRASS_BLADE = createGrassBlade(scene, 3);
+        Assets.GRASS_BLADE.isVisible = false;
         Assets.GRASS_MATERIAL = new GrassMaterial(scene);
         Assets.GRASS_BLADE.material = Assets.GRASS_MATERIAL;
 
