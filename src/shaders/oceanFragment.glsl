@@ -106,7 +106,7 @@ void main() {
         vec3 shallowColor = vec3(32.0, 193.0, 180.0)/255.0;
         vec3 oceanColor = mix(shallowColor, deepColor, opticalDepth01);
 
-        vec3 ambiant = mix(oceanColor, screenColor.rgb * alpha, alpha);
+        vec3 ambiant = mix(oceanColor, screenColor.rgb, alpha);
 
         // if the camera is not inside the ocean
         if(impactPoint > 0.0) {
