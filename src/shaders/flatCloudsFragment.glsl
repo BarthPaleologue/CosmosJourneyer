@@ -139,11 +139,14 @@ float computeCloudCoverage(vec3 rayOrigin, vec3 rayDir, float maximumDistance, o
 float cloudShadows(vec3 closestPoint) {
     float lightAmount = 1.0;
     for (int i = 0; i < nbStars; i++) {
+        // direction to sun from point
         vec3 sunDir = normalize(star_positions[i] - closestPoint);
 
+        // if ray toward sun does not intersect the cloud layer, then there can't be any cloud shadow
         float t0, t1;
         if (!rayIntersectSphere(closestPoint, sunDir, object_position, clouds_layerRadius, t0, t1)) continue;
 
+        // get the point of intersection with the cloud layer
         vec3 samplePoint = normalize(closestPoint + t1 * sunDir - object_position);
         if (dot(samplePoint, sunDir) < 0.0) continue;
         samplePoint = removeAxialTilt(samplePoint, object_rotationAxis);
@@ -151,7 +154,7 @@ float cloudShadows(vec3 closestPoint) {
         lightAmount -= density;
     }
 
-    return 0.4 + saturate(lightAmount) / 0.6;
+    return 0.4 + saturate(lightAmount) * 0.6;
 }
 
 void main() {
@@ -167,8 +170,14 @@ void main() {
     vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
     vec3 closestPoint = camera_position + rayDir * maximumDistance;
+    float t0, t1;
+    if (rayIntersectSphere(camera_position, rayDir, object_position, object_radius, t0, t1)) {
+        closestPoint = camera_position + rayDir * min(t0, maximumDistance);
+    }
 
     vec4 finalColor = screenColor;
+
+    // if the closest point is below the cloud layer, we must account for shadows
     if (length(closestPoint - object_position) < clouds_layerRadius) finalColor.rgb *= cloudShadows(closestPoint);
 
     vec3 cloudNormal;
