@@ -153,7 +153,6 @@ export class CharacterControls implements Controls {
         this.runningAnim = new AnimationGroupWrapper("running", runningAnim, 0, true);
         this.fallingIdleAnim = new AnimationGroupWrapper("fallingIdle", fallingIdleAnim, 0, true);
         this.skyDivingAnim = new AnimationGroupWrapper("skydiving", skyDivingAnim, 0, true);
-        this.skyDivingAnim.group.speedRatio = 1.5;
         this.swimmingIdleAnim = new AnimationGroupWrapper("swimming", swimmingIdleAnim, 0, true);
         this.swimmingForwardAnim = new AnimationGroupWrapper("swimmingForward", swimmingForwardAnim, 0, true);
         this.jumpingAnim = new AnimationGroupWrapper("jumping", jumpingAnim, 0, false);
