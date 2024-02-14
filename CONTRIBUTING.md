@@ -1,6 +1,6 @@
-# Contributing to CosmosJourneyer
+# Contributing to Cosmos Journeyer
 
-CosmosJourneyer is an open source project and contributions are welcome! There is too much to do for one person alone. If you want to contribute, please read the following guidelines first.
+Cosmos Journeyer is an open source project and contributions are welcome! There is too much to do for one person alone. If you want to contribute, please read the following guidelines first.
 
 ## How to contribute
 
@@ -31,7 +31,7 @@ Code that does not pass the linter or the unit tests will not be merged.
 
 ## Contribution ideas
 
-There is still plenty to do on CosmosJourneyer. Here are some ideas of contributions you can make (with stars indicating the difficulty of the task):
+There is still plenty to do on Cosmos Journeyer. Here are some ideas of contributions you can make (with stars indicating the difficulty of the task):
 
 ### Visuals
 

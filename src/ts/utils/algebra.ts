@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //

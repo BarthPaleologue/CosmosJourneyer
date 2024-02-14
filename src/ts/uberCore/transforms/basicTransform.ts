@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -71,7 +71,7 @@ export function getInverseRotationMatrix(transformNode: TransformNode): Matrix {
 /* #region directions */
 
 /**
- * This is not equivalent to transform.forward as CosmosJourneyer uses the right-handed coordinate system
+ * This is not equivalent to `transform.forward` as Cosmos Journeyer uses the right-handed coordinate system
  * @returns the forward vector of the given transform in world space
  */
 export function getForwardDirection(transformNode: TransformNode): Vector3 {
