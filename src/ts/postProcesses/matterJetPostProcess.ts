@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -53,21 +53,21 @@ export class MatterJetPostProcess extends UberPostProcess implements ObjectPostP
             ...getActiveCameraUniforms(scene),
             {
                 name: "time",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return settings.time % (settings.rotationPeriod * 10000);
                 }
             },
             {
                 name: "rotationPeriod",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return settings.rotationPeriod;
                 }
             },
             {
                 name: "rotationAxis",
-                type: UniformEnumType.Vector3,
+                type: UniformEnumType.VECTOR_3,
                 get: () => {
                     return stellarObject.getRotationAxis();
                 }

@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -44,7 +44,7 @@ export class HelmetOverlay {
     }
 
     displaySpeed(shipInternalThrottle: number, shipTargetThrottle: number, speed: number) {
-        const throttleString = `${shipInternalThrottle.toFixed(0)}% | ${shipTargetThrottle.toFixed(0)}%`;
+        const throttleString = `${(100 * shipInternalThrottle).toFixed(0)}% | ${(100 * shipTargetThrottle).toFixed(0)}%`;
         (document.querySelector("#speedometer") as HTMLElement).innerText = `${throttleString} | ${parseSpeed(speed)}`;
     }
 }

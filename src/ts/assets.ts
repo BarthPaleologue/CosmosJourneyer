@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -73,113 +73,112 @@ import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
 import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export class Assets {
     static IS_READY = false;
 
     // Textures
-    static RockNormalMap: Texture;
-    static DirtNormalMap: Texture;
-    static BottomNormalMap: Texture;
-    static GrassNormalMap: Texture;
-    static SnowNormalMap1: Texture;
-    static SnowNormalMap2: Texture;
-    static SandNormalMap1: Texture;
-    static SandNormalMap2: Texture;
-    static WaterNormalMap1: Texture;
-    static WaterNormalMap2: Texture;
+    static ROCK_NORMAL_MAP: Texture;
+    static DIRT_NORMAL_MAP: Texture;
+    static BOTTOM_NORMAL_MAP: Texture;
+    static GRASS_NORMAL_MAP: Texture;
+    static SNOW_NORMAL_MAP_1: Texture;
+    static SNOW_NORMAL_MAP_2: Texture;
+    static SAND_NORMAL_MAP_1: Texture;
+    static SAND_NORMAL_MAP_2: Texture;
+    static WATER_NORMAL_MAP_1: Texture;
+    static WATER_NORMAL_MAP_2: Texture;
 
-    static Starfield: Texture;
-    static PlumeParticle: Texture;
+    static STAR_FIELD: Texture;
+    static PLUME_PARTICLE: Texture;
 
-    static FlareTexture: Texture;
+    static FLARE_TEXTURE: Texture;
 
-    static EmptyTexture: Texture;
+    static EMPTY_TEXTURE: Texture;
 
-    static AtmosphereLUT: ProceduralTexture;
+    static ATMOSPHERE_LUT: ProceduralTexture;
 
-    static WarpNoise: Texture;
-    static SeamlessPerlin: Texture;
+    static WARP_NOISE: Texture;
+    static SEAMLESS_PERLIN: Texture;
 
-    private static Spaceship: Mesh;
-    private static EndeavorSpaceship: Mesh;
-    private static Spacestation: Mesh;
-    private static Banana: Mesh;
-    private static Character: Mesh;
+    private static SPACESHIP: Mesh;
+    private static ENDEAVOR_SPACESHIP: Mesh;
+    private static SPACE_STATION: Mesh;
+    private static BANANA: Mesh;
+    private static CHARACTER: Mesh;
 
-    private static LandingPad: Mesh;
+    private static LANDING_PAD: Mesh;
 
-    public static Rock: Mesh;
-    public static Tree: Mesh;
-    public static ScatterCube: Mesh;
+    public static ROCK: Mesh;
+    public static TREE: Mesh;
+    public static SCATTER_CUBE: Mesh;
 
-    public static Butterfly: Mesh;
-    public static GrassBlade: Mesh;
+    public static BUTTERFLY: Mesh;
+    public static GRASS_BLADE: Mesh;
 
-    public static ButterflyMaterial: ButterflyMaterial;
-    public static GrassMaterial: GrassMaterial;
+    public static BUTTERFLY_MATERIAL: ButterflyMaterial;
+    public static GRASS_MATERIAL: GrassMaterial;
 
-    public static OuchSound: Sound;
-    public static EngineRunningSound: Sound;
+    public static OUCH_SOUND: Sound;
+    public static ENGINE_RUNNING_SOUND: Sound;
 
-    private static manager: AssetsManager;
+    private static MANAGER: AssetsManager;
 
     static async Init(scene: Scene): Promise<void> {
-        Assets.manager = new AssetsManager(scene);
+        Assets.MANAGER = new AssetsManager(scene);
         console.log("Initializing assets...");
 
-        Assets.manager.addTextureTask("RockNormalMap", rockNormalMap).onSuccess = (task) => (Assets.RockNormalMap = task.texture);
-        Assets.manager.addTextureTask("DirtNormalMap", dirtNormalMap).onSuccess = (task) => (Assets.DirtNormalMap = task.texture);
-        Assets.manager.addTextureTask("BottomNormalMap", bottomNormalMap).onSuccess = (task) => (Assets.BottomNormalMap = task.texture);
-        Assets.manager.addTextureTask("GrassNormalMap", grassNormalMap).onSuccess = (task) => (Assets.GrassNormalMap = task.texture);
-        Assets.manager.addTextureTask("SnowNormalMap1", snowNormalMap1).onSuccess = (task) => (Assets.SnowNormalMap1 = task.texture);
-        Assets.manager.addTextureTask("SnowNormalMap2", snowNormalMap2).onSuccess = (task) => (Assets.SnowNormalMap2 = task.texture);
-        Assets.manager.addTextureTask("SandNormalMap1", sandNormalMap1).onSuccess = (task) => (Assets.SandNormalMap1 = task.texture);
-        Assets.manager.addTextureTask("SandNormalMap2", sandNormalMap2).onSuccess = (task) => (Assets.SandNormalMap2 = task.texture);
-        Assets.manager.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Assets.WaterNormalMap1 = task.texture);
-        Assets.manager.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Assets.WaterNormalMap2 = task.texture);
+        Assets.MANAGER.addTextureTask("RockNormalMap", rockNormalMap).onSuccess = (task) => (Assets.ROCK_NORMAL_MAP = task.texture);
+        Assets.MANAGER.addTextureTask("DirtNormalMap", dirtNormalMap).onSuccess = (task) => (Assets.DIRT_NORMAL_MAP = task.texture);
+        Assets.MANAGER.addTextureTask("BottomNormalMap", bottomNormalMap).onSuccess = (task) => (Assets.BOTTOM_NORMAL_MAP = task.texture);
+        Assets.MANAGER.addTextureTask("GrassNormalMap", grassNormalMap).onSuccess = (task) => (Assets.GRASS_NORMAL_MAP = task.texture);
+        Assets.MANAGER.addTextureTask("SnowNormalMap1", snowNormalMap1).onSuccess = (task) => (Assets.SNOW_NORMAL_MAP_1 = task.texture);
+        Assets.MANAGER.addTextureTask("SnowNormalMap2", snowNormalMap2).onSuccess = (task) => (Assets.SNOW_NORMAL_MAP_2 = task.texture);
+        Assets.MANAGER.addTextureTask("SandNormalMap1", sandNormalMap1).onSuccess = (task) => (Assets.SAND_NORMAL_MAP_1 = task.texture);
+        Assets.MANAGER.addTextureTask("SandNormalMap2", sandNormalMap2).onSuccess = (task) => (Assets.SAND_NORMAL_MAP_2 = task.texture);
+        Assets.MANAGER.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Assets.WATER_NORMAL_MAP_1 = task.texture);
+        Assets.MANAGER.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Assets.WATER_NORMAL_MAP_2 = task.texture);
 
-        Assets.manager.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.Starfield = task.texture);
+        Assets.MANAGER.addTextureTask("Starfield", starfield).onSuccess = (task) => (Assets.STAR_FIELD = task.texture);
 
-        Assets.manager.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Assets.PlumeParticle = task.texture);
-        Assets.manager.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Assets.FlareTexture = task.texture);
+        Assets.MANAGER.addTextureTask("PlumeParticle", plumeParticle).onSuccess = (task) => (Assets.PLUME_PARTICLE = task.texture);
+        Assets.MANAGER.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Assets.FLARE_TEXTURE = task.texture);
 
-        Assets.manager.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Assets.SeamlessPerlin = task.texture);
-        Assets.manager.addTextureTask("WarpNoise", warpNoise).onSuccess = (task) => (Assets.WarpNoise = task.texture);
+        Assets.MANAGER.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Assets.SEAMLESS_PERLIN = task.texture);
+        Assets.MANAGER.addTextureTask("WarpNoise", warpNoise).onSuccess = (task) => (Assets.WARP_NOISE = task.texture);
 
-        Assets.AtmosphereLUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
-        Assets.AtmosphereLUT.refreshRate = 0;
+        Assets.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
+        Assets.ATMOSPHERE_LUT.refreshRate = 0;
 
-        Assets.manager.addTextureTask("EmptyTexture", empty).onSuccess = (task) => (Assets.EmptyTexture = task.texture);
+        Assets.MANAGER.addTextureTask("EmptyTexture", empty).onSuccess = (task) => (Assets.EMPTY_TEXTURE = task.texture);
 
-        const spaceshipTask = Assets.manager.addMeshTask("spaceshipTask", "", "", spaceship);
+        const spaceshipTask = Assets.MANAGER.addMeshTask("spaceshipTask", "", "", spaceship);
         spaceshipTask.onSuccess = function (task: MeshAssetTask) {
-            Assets.Spaceship = task.loadedMeshes[0] as Mesh;
+            Assets.SPACESHIP = task.loadedMeshes[0] as Mesh;
 
-            for (const mesh of Assets.Spaceship.getChildMeshes()) {
+            for (const mesh of Assets.SPACESHIP.getChildMeshes()) {
                 mesh.isVisible = false;
             }
 
             console.log("Spaceship loaded");
         };
 
-        const endeavorSpaceshipTask = Assets.manager.addMeshTask("endeavorSpaceshipTask", "", "", endeavorSpaceship);
+        const endeavorSpaceshipTask = Assets.MANAGER.addMeshTask("endeavorSpaceshipTask", "", "", endeavorSpaceship);
         endeavorSpaceshipTask.onSuccess = function (task: MeshAssetTask) {
-            Assets.EndeavorSpaceship = task.loadedMeshes[0] as Mesh;
+            Assets.ENDEAVOR_SPACESHIP = task.loadedMeshes[0] as Mesh;
 
-            for (const mesh of Assets.EndeavorSpaceship.getChildMeshes()) {
+            for (const mesh of Assets.ENDEAVOR_SPACESHIP.getChildMeshes()) {
                 mesh.isVisible = false;
             }
 
             console.log("Endeavor Spaceship loaded");
         };
 
-        const spacestationTask = Assets.manager.addMeshTask("spacestationTask", "", "", shipCarrier);
+        const spacestationTask = Assets.MANAGER.addMeshTask("spacestationTask", "", "", shipCarrier);
         spacestationTask.onSuccess = function (task: MeshAssetTask) {
-            Assets.Spacestation = task.loadedMeshes[0] as Mesh;
+            Assets.SPACE_STATION = task.loadedMeshes[0] as Mesh;
 
-            for (const mesh of Assets.Spacestation.getChildMeshes()) {
+            for (const mesh of Assets.SPACE_STATION.getChildMeshes()) {
                 mesh.isVisible = false;
                 //pbr._reflectionTexture = new Texture(starfield, scene);
                 //pbr._reflectionTexture.coordinatesMode = Texture.SPHERICAL_MODE;
@@ -188,61 +187,61 @@ export class Assets {
             console.log("Spacestation loaded");
         };
 
-        const bananaTask = Assets.manager.addMeshTask("bananaTask", "", "", banana);
+        const bananaTask = Assets.MANAGER.addMeshTask("bananaTask", "", "", banana);
         bananaTask.onSuccess = function (task: MeshAssetTask) {
-            Assets.Banana = task.loadedMeshes[0] as Mesh;
-            Assets.Banana.isVisible = false;
+            Assets.BANANA = task.loadedMeshes[0] as Mesh;
+            Assets.BANANA.isVisible = false;
 
-            for (const mesh of Assets.Banana.getChildMeshes()) {
+            for (const mesh of Assets.BANANA.getChildMeshes()) {
                 mesh.isVisible = false;
             }
 
             console.log("Banana loaded");
         };
 
-        const characterTask = Assets.manager.addMeshTask("characterTask", "", "", character);
+        const characterTask = Assets.MANAGER.addMeshTask("characterTask", "", "", character);
         characterTask.onSuccess = function (task: MeshAssetTask) {
-            Assets.Character = task.loadedMeshes[0] as Mesh;
-            Assets.Character.isVisible = false;
+            Assets.CHARACTER = task.loadedMeshes[0] as Mesh;
+            Assets.CHARACTER.isVisible = false;
 
-            for (const mesh of Assets.Character.getChildMeshes()) {
+            for (const mesh of Assets.CHARACTER.getChildMeshes()) {
                 mesh.isVisible = false;
             }
 
             console.log("Character loaded");
         };
 
-        const rockTask = Assets.manager.addMeshTask("rockTask", "", "", rock);
+        const rockTask = Assets.MANAGER.addMeshTask("rockTask", "", "", rock);
         rockTask.onSuccess = function (task: MeshAssetTask) {
-            Assets.Rock = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
-            Assets.Rock.position.y = 0.1;
-            Assets.Rock.scaling.scaleInPlace(0.2);
-            Assets.Rock.bakeCurrentTransformIntoVertices();
-            Assets.Rock.checkCollisions = true;
-            Assets.Rock.isVisible = false;
+            Assets.ROCK = task.loadedMeshes[0].getChildMeshes()[0] as Mesh;
+            Assets.ROCK.position.y = 0.1;
+            Assets.ROCK.scaling.scaleInPlace(0.2);
+            Assets.ROCK.bakeCurrentTransformIntoVertices();
+            Assets.ROCK.checkCollisions = true;
+            Assets.ROCK.isVisible = false;
 
             console.log("Rock loaded");
         };
 
-        const landingPadTask = Assets.manager.addMeshTask("landingPadTask", "", "", landingPad);
+        const landingPadTask = Assets.MANAGER.addMeshTask("landingPadTask", "", "", landingPad);
         landingPadTask.onSuccess = function (task: MeshAssetTask) {
-            Assets.LandingPad = task.loadedMeshes[0] as Mesh;
-            Assets.LandingPad.isVisible = false;
+            Assets.LANDING_PAD = task.loadedMeshes[0] as Mesh;
+            Assets.LANDING_PAD.isVisible = false;
 
-            for (const mesh of Assets.LandingPad.getChildMeshes()) {
+            for (const mesh of Assets.LANDING_PAD.getChildMeshes()) {
                 mesh.isVisible = false;
             }
 
             console.log("LandingPad loaded");
         };
 
-        const treeTask = Assets.manager.addMeshTask("treeTask", "", "", tree);
+        const treeTask = Assets.MANAGER.addMeshTask("treeTask", "", "", tree);
         treeTask.onSuccess = function (task: MeshAssetTask) {
-            Assets.Tree = task.loadedMeshes[0] as Mesh;
-            Assets.Tree.position.y = -1;
-            Assets.Tree.scaling.scaleInPlace(3);
-            Assets.Tree.bakeCurrentTransformIntoVertices();
-            Assets.Tree.checkCollisions = true;
+            Assets.TREE = task.loadedMeshes[0] as Mesh;
+            Assets.TREE.position.y = -1;
+            Assets.TREE.scaling.scaleInPlace(3);
+            Assets.TREE.bakeCurrentTransformIntoVertices();
+            Assets.TREE.checkCollisions = true;
 
             const treeMaterial = new StandardMaterial("treeMaterial", scene);
 
@@ -255,75 +254,77 @@ export class Assets {
             treeMaterial.diffuseTexture = treeTexture;
             treeMaterial.specularColor.set(0, 0, 0);
 
-            Assets.Tree.material = treeMaterial;
+            Assets.TREE.material = treeMaterial;
 
-            Assets.Tree.isVisible = false;
+            Assets.TREE.isVisible = false;
 
             console.log("Tree loaded");
         };
 
-        Assets.Butterfly = createButterfly(scene);
-        Assets.ButterflyMaterial = new ButterflyMaterial(scene);
-        Assets.Butterfly.material = Assets.ButterflyMaterial;
+        Assets.BUTTERFLY = createButterfly(scene);
+        Assets.BUTTERFLY.isVisible = false;
+        Assets.BUTTERFLY_MATERIAL = new ButterflyMaterial(scene);
+        Assets.BUTTERFLY.material = Assets.BUTTERFLY_MATERIAL;
 
-        Assets.GrassBlade = createGrassBlade(scene, 3);
-        Assets.GrassMaterial = new GrassMaterial(scene);
-        Assets.GrassBlade.material = Assets.GrassMaterial;
+        Assets.GRASS_BLADE = createGrassBlade(scene, 3);
+        Assets.GRASS_BLADE.isVisible = false;
+        Assets.GRASS_MATERIAL = new GrassMaterial(scene);
+        Assets.GRASS_BLADE.material = Assets.GRASS_MATERIAL;
 
-        const ouchSoundTask = Assets.manager.addBinaryFileTask("ouchSoundTask", ouchSound);
+        const ouchSoundTask = Assets.MANAGER.addBinaryFileTask("ouchSoundTask", ouchSound);
         ouchSoundTask.onSuccess = function (task) {
-            Assets.OuchSound = new Sound("OuchSound", task.data, scene);
+            Assets.OUCH_SOUND = new Sound("OuchSound", task.data, scene);
 
             console.log("Ouch sound loaded");
         };
 
-        const engineRunningSoundTask = Assets.manager.addBinaryFileTask("engineRunningSoundTask", engineRunningSound);
+        const engineRunningSoundTask = Assets.MANAGER.addBinaryFileTask("engineRunningSoundTask", engineRunningSound);
         engineRunningSoundTask.onSuccess = function (task) {
-            Assets.EngineRunningSound = new Sound("EngineRunningSound", task.data, scene, null, {
+            Assets.ENGINE_RUNNING_SOUND = new Sound("EngineRunningSound", task.data, scene, null, {
                 loop: true
             });
 
             console.log("Engine running sound loaded");
         };
 
-        Assets.manager.onProgress = (remainingCount, totalCount) => {
+        Assets.MANAGER.onProgress = (remainingCount, totalCount) => {
             scene.getEngine().loadingScreen.loadingUIText = `Loading assets... ${totalCount - remainingCount}/${totalCount}`;
         };
 
-        Assets.ScatterCube = MeshBuilder.CreateBox("cube", { size: 1 }, scene);
-        Assets.ScatterCube.position.y = 0.5;
-        Assets.ScatterCube.bakeCurrentTransformIntoVertices();
-        Assets.ScatterCube.isVisible = false;
+        Assets.SCATTER_CUBE = MeshBuilder.CreateBox("cube", { size: 1 }, scene);
+        Assets.SCATTER_CUBE.position.y = 0.5;
+        Assets.SCATTER_CUBE.bakeCurrentTransformIntoVertices();
+        Assets.SCATTER_CUBE.isVisible = false;
 
-        Assets.manager.onFinish = () => {
+        Assets.MANAGER.onFinish = () => {
             console.log("Assets loaded");
             Assets.IS_READY = true;
         };
 
-        await Assets.manager.loadAsync();
+        await Assets.MANAGER.loadAsync();
     }
 
     static CreateSpaceShipInstance(): InstancedMesh {
-        return Assets.Spaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        return Assets.SPACESHIP.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static CreateEndeavorSpaceShipInstance(): InstancedMesh {
-        const instance = Assets.EndeavorSpaceship.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        const instance = Assets.ENDEAVOR_SPACESHIP.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
         for (const child of instance.getChildMeshes()) child.isVisible = true;
 
         return instance;
     }
 
     static CreateSpaceStationInstance(): InstancedMesh {
-        return Assets.Spacestation.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        return Assets.SPACE_STATION.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static CreateBananaInstance(): InstancedMesh {
-        return Assets.Banana.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        return Assets.BANANA.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static CreateBananaClone(sizeInMeters: number): Mesh {
-        const mesh = Assets.Banana.getChildMeshes()[0]?.clone("bananaClone" + Math.random(), null) as Mesh;
+        const mesh = Assets.BANANA.getChildMeshes()[0]?.clone("bananaClone" + Math.random(), null) as Mesh;
         mesh.scaling.scaleInPlace(5 * sizeInMeters);
 
         mesh.isVisible = true;
@@ -332,15 +333,15 @@ export class Assets {
     }
 
     static CreateCharacterInstance(): InstancedMesh {
-        return Assets.Character.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        return Assets.CHARACTER.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static CreateRockInstance(): InstancedMesh {
-        return Assets.Rock.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        return Assets.ROCK.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static CreateLandingPadInstance(): InstancedMesh {
-        return Assets.LandingPad.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
+        return Assets.LANDING_PAD.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static DebugMaterial(name: string, diffuse = false, wireframe = false) {

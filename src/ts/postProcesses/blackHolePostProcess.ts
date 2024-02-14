@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -56,7 +56,7 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             ...getActiveCameraUniforms(scene),
             {
                 name: "starfieldRotation",
-                type: UniformEnumType.Matrix,
+                type: UniformEnumType.MATRIX,
                 get: () => {
                     const rotationMatrix = new Matrix();
                     starfieldRotation.toRotationMatrix(rotationMatrix);
@@ -65,42 +65,42 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             },
             {
                 name: "time",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000);
                 }
             },
             {
                 name: "accretionDiskRadius",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return blackHoleUniforms.accretionDiskRadius;
                 }
             },
             {
                 name: "warpingMinkowskiFactor",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return blackHoleUniforms.warpingMinkowskiFactor;
                 }
             },
             {
                 name: "rotationPeriod",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return blackHoleUniforms.rotationPeriod;
                 }
             },
             {
                 name: "rotationAxis",
-                type: UniformEnumType.Vector3,
+                type: UniformEnumType.VECTOR_3,
                 get: () => {
                     return blackHole.getRotationAxis();
                 }
             },
             {
                 name: "forwardAxis",
-                type: UniformEnumType.Vector3,
+                type: UniformEnumType.VECTOR_3,
                 get: () => {
                     return getForwardDirection(blackHole.getTransform());
                 }
@@ -111,9 +111,9 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             ...getSamplers(scene),
             {
                 name: "starfieldTexture",
-                type: SamplerEnumType.Texture,
+                type: SamplerEnumType.TEXTURE,
                 get: () => {
-                    return Assets.Starfield;
+                    return Assets.STAR_FIELD;
                 }
             }
         ];

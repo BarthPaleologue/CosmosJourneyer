@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export enum STELLAR_TYPE {
+export enum StellarType {
     /** 30,000 - 50,000 K */
     O,
     /** 10,000 - 30,000 K */
@@ -32,21 +32,21 @@ export enum STELLAR_TYPE {
     M
 }
 
-export function getStellarTypeString(type: STELLAR_TYPE): string {
+export function getStellarTypeString(type: StellarType): string {
     switch (type) {
-        case STELLAR_TYPE.O:
+        case StellarType.O:
             return "O";
-        case STELLAR_TYPE.B:
+        case StellarType.B:
             return "B";
-        case STELLAR_TYPE.A:
+        case StellarType.A:
             return "A";
-        case STELLAR_TYPE.F:
+        case StellarType.F:
             return "F";
-        case STELLAR_TYPE.G:
+        case StellarType.G:
             return "G";
-        case STELLAR_TYPE.K:
+        case StellarType.K:
             return "K";
-        case STELLAR_TYPE.M:
+        case StellarType.M:
             return "M";
     }
 }

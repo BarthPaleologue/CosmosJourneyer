@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -45,7 +45,7 @@ export class StarfieldPostProcess extends UberPostProcess {
             ...getStellarObjectsUniforms(stellarObjects),
             {
                 name: "starfieldRotation",
-                type: UniformEnumType.Matrix,
+                type: UniformEnumType.MATRIX,
                 get: () => {
                     const rotationMatrix = new Matrix();
                     starfieldRotation.toRotationMatrix(rotationMatrix);
@@ -54,7 +54,7 @@ export class StarfieldPostProcess extends UberPostProcess {
             },
             {
                 name: "visibility",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     if (bodies.length === 0) return 1;
 
@@ -95,9 +95,9 @@ export class StarfieldPostProcess extends UberPostProcess {
             ...getSamplers(scene),
             {
                 name: "starfieldTexture",
-                type: SamplerEnumType.Texture,
+                type: SamplerEnumType.TEXTURE,
                 get: () => {
-                    return Assets.Starfield;
+                    return Assets.STAR_FIELD;
                 }
             }
         ];

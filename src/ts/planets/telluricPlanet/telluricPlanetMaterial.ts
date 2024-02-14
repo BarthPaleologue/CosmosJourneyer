@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -123,16 +123,16 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.colorSettings = {
             mode: ColorMode.DEFAULT,
 
-            snowColor: new Color3(0.7, 0.7, 0.7),
-            steepColor: new Color3(60, 60, 60).scaleInPlace(1 / 255),
+            snowColor: new Color3(0.9, 0.9, 0.9),
+            steepColor: new Color3(60, 60, 60).scaleInPlace(1.5 / 255),
             plainColor: new Color3(
                 //TODO: make this better
-                Math.max(0.22 + centeredRand(model.rng, 82) / 20, 0),
-                Math.max(0.37 + centeredRand(model.rng, 83) / 20, 0),
-                Math.max(0.024 + centeredRand(model.rng, 84) / 20, 0)
+                1.5*Math.max(0.22 + centeredRand(model.rng, 82) / 20, 0),
+                1.5*Math.max(0.37 + centeredRand(model.rng, 83) / 20, 0),
+                1.5*Math.max(0.024 + centeredRand(model.rng, 84) / 20, 0)
             ),
             beachColor: new Color3(132, 114, 46).scaleInPlace(1 / 255),
-            desertColor: new Color3(178, 107, 42).scaleInPlace(1 / 255),
+            desertColor: new Color3(232, 142, 59).scaleInPlace(1 / 255),
             bottomColor: new Color3(0.5, 0.5, 0.5),
 
             beachSize: 100 + 50 * centeredRand(model.rng, 85),
@@ -165,7 +165,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             Effect.ShadersStore["telluricPlanetLutFragmentShader"] = lutFragment;
         }
 
-        this.setTexture("lut", Assets.EmptyTexture);
+        this.setTexture("lut", Assets.EMPTY_TEXTURE);
         const lut = new ProceduralTexture("lut", 4096, "telluricPlanetLut", scene, null, true, false);
         lut.setFloat("minTemperature", this.planetModel.physicalProperties.minTemperature);
         lut.setFloat("maxTemperature", this.planetModel.physicalProperties.maxTemperature);
@@ -189,12 +189,12 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         this.setFloat("normalSharpness", this.colorSettings.normalSharpness);
 
-        this.setTexture("bottomNormalMap", Assets.BottomNormalMap);
-        this.setTexture("steepNormalMap", Assets.RockNormalMap);
-        this.setTexture("plainNormalMap", Assets.GrassNormalMap);
-        this.setTexture("snowNormalMap", Assets.SnowNormalMap1);
-        this.setTexture("beachNormalMap", Assets.SandNormalMap1);
-        this.setTexture("desertNormalMap", Assets.SandNormalMap2);
+        this.setTexture("bottomNormalMap", Assets.BOTTOM_NORMAL_MAP);
+        this.setTexture("steepNormalMap", Assets.ROCK_NORMAL_MAP);
+        this.setTexture("plainNormalMap", Assets.GRASS_NORMAL_MAP);
+        this.setTexture("snowNormalMap", Assets.SNOW_NORMAL_MAP_1);
+        this.setTexture("beachNormalMap", Assets.SAND_NORMAL_MAP_1);
+        this.setTexture("desertNormalMap", Assets.SAND_NORMAL_MAP_2);
 
         this.setFloat("minTemperature", this.planetModel.physicalProperties.minTemperature);
         this.setFloat("maxTemperature", this.planetModel.physicalProperties.maxTemperature);

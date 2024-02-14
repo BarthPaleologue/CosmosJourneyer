@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -24,11 +24,11 @@ import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
 import { SystemSeed } from "../utils/systemSeed";
 
-export function Vector3ToString(v: Vector3): string {
+export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
 }
 
-export function StringToVector3(s: string): Vector3 {
+export function stringToVector3(s: string): Vector3 {
     const [x, y, z] = s.split(",").map(Number);
     return new Vector3(x, y, z);
 }
@@ -100,10 +100,10 @@ export class StarSector {
      * @returns a string that uniquely identifies this sector
      */
     getKey(): string {
-        return Vector3ToString(this.position);
+        return vector3ToString(this.position);
     }
 
-    static getBoundingBox(position: Vector3, globalNodePosition: Vector3): BoundingBox {
+    static GetBoundingBox(position: Vector3, globalNodePosition: Vector3): BoundingBox {
         return new BoundingBox(
             new Vector3(-1, -1, -1).scaleInPlace(StarSector.SIZE / 2),
             new Vector3(1, 1, 1).scaleInPlace(StarSector.SIZE / 2),

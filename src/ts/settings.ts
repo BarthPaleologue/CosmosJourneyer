@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -31,13 +31,13 @@ export const Settings = {
     OCEAN_DEPTH: 7e3,
 
     TIME_MULTIPLIER: 1,
-    CHUNK_RENDER_DISTANCE_MULTIPLIER: 2,
+    CHUNK_RENDERING_DISTANCE_MULTIPLIER: 2,
     ENABLE_VOLUMETRIC_CLOUDS: false,
     SEED_HALF_RANGE: 1e4,
     C: 299792458,
     FOV: (92 * Math.PI) / 180,
 
-    MAIN_FONT: "Nasalization",
+    MAIN_FONT: "Nasalization"
 };
 
 export const CollisionMask = {
@@ -45,9 +45,9 @@ export const CollisionMask = {
     DYNAMIC_OBJECTS: 0b00000010
 };
 
-const seedableRNG = seededSquirrelNoise(Settings.UNIVERSE_SEED);
+const seedableRng = seededSquirrelNoise(Settings.UNIVERSE_SEED);
 let step = 0;
-const perlinRNG = makeNoise3D(() => {
-    return seedableRNG(step++);
+const perlinRng = makeNoise3D(() => {
+    return seedableRng(step++);
 });
-export const UniverseDensity = (x: number, y: number, z: number) => (1.0 - Math.abs(perlinRNG(x * 0.2, y * 0.2, z * 0.2))) ** 8;
+export const UniverseDensity = (x: number, y: number, z: number) => (1.0 - Math.abs(perlinRng(x * 0.2, y * 0.2, z * 0.2))) ** 8;

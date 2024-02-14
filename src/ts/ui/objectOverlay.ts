@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -23,7 +23,7 @@ import { parseDistance, parseSeconds } from "../utils/parseToStrings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { LOCAL_DIRECTION } from "../uberCore/localDirections";
+import { LocalDirection } from "../uberCore/localDirections";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { Settings } from "../settings";
 
@@ -38,7 +38,7 @@ export class ObjectOverlay {
 
     private lastDistance: number = 0;
 
-    static WIDTH = 300;
+    static readonly WIDTH = 300;
 
     constructor(object: OrbitalObject) {
         this.object = object;
@@ -105,7 +105,7 @@ export class ObjectOverlay {
     }
 
     update(camera: Camera, target: OrbitalObject | null) {
-        const viewRay = camera.getDirection(LOCAL_DIRECTION.BACKWARD);
+        const viewRay = camera.getDirection(LocalDirection.BACKWARD);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
         const deltaDistance = this.lastDistance - distance;

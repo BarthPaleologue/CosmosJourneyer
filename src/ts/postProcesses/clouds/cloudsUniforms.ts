@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -56,77 +56,77 @@ export class CloudsUniforms {
         return [
             {
                 name: "clouds_layerRadius",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.layerRadius;
                 }
             },
             {
                 name: "clouds_frequency",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.frequency;
                 }
             },
             {
                 name: "clouds_detailFrequency",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.detailFrequency;
                 }
             },
             {
                 name: "clouds_coverage",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.coverage;
                 }
             },
             {
                 name: "clouds_sharpness",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.sharpness;
                 }
             },
             {
                 name: "clouds_color",
-                type: UniformEnumType.Color3,
+                type: UniformEnumType.COLOR_3,
                 get: () => {
                     return this.color;
                 }
             },
             {
                 name: "clouds_worleySpeed",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.worleySpeed;
                 }
             },
             {
                 name: "clouds_detailSpeed",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.detailSpeed;
                 }
             },
             {
                 name: "clouds_smoothness",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.smoothness;
                 }
             },
             {
                 name: "clouds_specularPower",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.specularPower;
                 }
             },
             {
                 name: "time",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return -this.time % ((2 * Math.PI * gcd(this.worleySpeed * 10000, this.detailSpeed * 10000)) / this.worleySpeed);
                 }
@@ -144,7 +144,7 @@ export class CloudsUniforms {
             return [
                 {
                     name: "clouds_lut",
-                    type: SamplerEnumType.Texture,
+                    type: SamplerEnumType.TEXTURE,
                     get: () => {
                         return lut;
                     }

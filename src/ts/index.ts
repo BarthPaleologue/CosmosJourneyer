@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -29,9 +29,9 @@ const starSystemView = engine.starSystemView;
 const urlParams = new URLSearchParams(window.location.search);
 const universeCoordinatesString = urlParams.get("universeCoordinates");
 
-if(universeCoordinatesString !== null) {
+if (universeCoordinatesString !== null) {
     const jsonString = decodeBase64(universeCoordinatesString);
-    if(!isJsonStringValidUniverseCoordinates(jsonString)) {
+    if (!isJsonStringValidUniverseCoordinates(jsonString)) {
         alert("Invalid universe coordinates");
     }
     engine.loadUniverseCoordinates(JSON.parse(jsonString));

@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -32,8 +32,6 @@ import { DeleteSemaphore } from "./deleteSemaphore";
 import { UberScene } from "../../../../uberCore/uberScene";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { ChunkForge } from "./chunkForge";
-import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 
 /**
  * A quadTree is defined recursively
@@ -181,8 +179,8 @@ export class ChunkTree {
         const chunkApproxPosition = nodePositionW.add(direction.scale(additionalHeight));
         const distanceToNodeSquared = Vector3.DistanceSquared(chunkApproxPosition, observerPositionW);
 
-        const subdivisionDistanceThreshold = Settings.CHUNK_RENDER_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** walked.length);
-        const deletionDistanceThreshold = 15e3 + 1.1 * Settings.CHUNK_RENDER_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** (walked.length - 1));
+        const subdivisionDistanceThreshold = Settings.CHUNK_RENDERING_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** walked.length);
+        const deletionDistanceThreshold = 15e3 + 1.1 * Settings.CHUNK_RENDERING_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** (walked.length - 1));
 
         // the 1.5 is to avoid creation/deletion oscillations
         if (distanceToNodeSquared > deletionDistanceThreshold ** 2 && walked.length >= this.minDepth && tree instanceof Array) {
@@ -239,7 +237,7 @@ export class ChunkTree {
         });
 
         const buildTask: BuildTask = {
-            type: TaskType.Build,
+            type: TaskType.BUILD,
             planetName: this.planetName,
             planetSeed: this.planetSeed,
             planetDiameter: this.rootChunkLength,

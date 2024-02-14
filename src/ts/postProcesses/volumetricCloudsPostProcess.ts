@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -47,14 +47,14 @@ export class VolumetricCloudsPostProcess extends UberPostProcess implements Obje
             ...getActiveCameraUniforms(scene),
             {
                 name: "cloudLayerMinHeight",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return planet.getBoundingRadius();
                 }
             },
             {
                 name: "cloudLayerMaxHeight",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return planet.getBoundingRadius() + 30e3;
                 }

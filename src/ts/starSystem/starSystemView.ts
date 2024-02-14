@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -44,7 +44,6 @@ import { Keyboard } from "../inputs/keyboard";
 import { Gamepad } from "../inputs/gamepad";
 import { DefaultControls } from "../defaultController/defaultControls";
 import { CharacterControls } from "../spacelegs/characterControls";
-import { parsePercentageFrom01, parseSpeed } from "../utils/parseToStrings";
 import { Assets } from "../assets";
 import { getRotationQuaternion, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
@@ -66,7 +65,7 @@ export class StarSystemView {
 
     readonly ui: SystemUI;
 
-    private static readonly unZoomAnimation = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    private static readonly UN_ZOOM_ANIMATION = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
     private starSystem: StarSystemController | null = null;
 
@@ -82,7 +81,7 @@ export class StarSystemView {
         if (canvas === null) throw new Error("Canvas is null");
         this.bodyEditor.setCanvas(canvas);
 
-        StarSystemView.unZoomAnimation.setKeys([
+        StarSystemView.UN_ZOOM_ANIMATION.setKeys([
             {
                 frame: 0,
                 value: 30
@@ -213,8 +212,8 @@ export class StarSystemView {
     update(deltaSeconds: number) {
         const starSystem = this.getStarSystem();
 
-        Assets.ButterflyMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
-        Assets.GrassMaterial.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
+        Assets.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
+        Assets.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
 
         this.chunkForge.update();
         starSystem.update(deltaSeconds, this.chunkForge);
@@ -229,10 +228,10 @@ export class StarSystemView {
         this.spaceshipControls.spaceship.registerClosestObject(distance, radius);
 
         const warpDrive = this.spaceshipControls.spaceship.getWarpDrive();
-        if(warpDrive.isEnabled()) {
+        if (warpDrive.isEnabled()) {
             this.helmetOverlay.displaySpeed(warpDrive.getInternalThrottle(), warpDrive.getTargetThrottle(), this.spaceshipControls.spaceship.getSpeed());
         } else {
-            this.helmetOverlay.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), 100, this.spaceshipControls.spaceship.getSpeed());
+            this.helmetOverlay.displaySpeed(this.spaceshipControls.spaceship.getThrottle(), 1, this.spaceshipControls.spaceship.getSpeed());
         }
 
         this.characterControls.setClosestWalkableObject(nearestBody);
@@ -326,7 +325,7 @@ export class StarSystemView {
         if (this.starSystem !== null) this.starSystem.dispose();
         this.starSystem = starSystem;
 
-        if (needsGenerating) StarSystemHelper.generate(this.starSystem);
+        if (needsGenerating) StarSystemHelper.Generate(this.starSystem);
     }
 
     hideUI() {
@@ -345,7 +344,7 @@ export class StarSystemView {
             callback();
             return;
         }
-        activeControls.getActiveCamera().animations = [StarSystemView.unZoomAnimation];
+        activeControls.getActiveCamera().animations = [StarSystemView.UN_ZOOM_ANIMATION];
         this.scene.beginAnimation(this.scene.getActiveController().getActiveCamera(), 0, 60, false, 2.0, () => {
             this.scene.getActiveController().getActiveCamera().animations = [];
             this.hideUI();

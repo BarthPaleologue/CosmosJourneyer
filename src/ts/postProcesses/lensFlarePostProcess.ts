@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -58,7 +58,7 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
             ...getActiveCameraUniforms(scene),
             {
                 name: "flareColor",
-                type: UniformEnumType.Color3,
+                type: UniformEnumType.COLOR_3,
                 get: () => {
                     if (object instanceof Star) return object.model.color;
                     else return new Color3(1, 1, 1);
@@ -66,7 +66,7 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
             },
             {
                 name: "clipPosition",
-                type: UniformEnumType.Vector3,
+                type: UniformEnumType.VECTOR_3,
                 get: () => {
                     if (scene.activeCamera === null) throw new Error("no camera");
                     const clipPosition = Vector3.Project(
@@ -81,7 +81,7 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
             },
             {
                 name: "visibility",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     if (scene.activeCamera === null) throw new Error("no camera");
                     // send raycast from camera to object and check early intersections
@@ -104,7 +104,7 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
             },
             {
                 name: "aspectRatio",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return scene.getEngine().getScreenAspectRatio();
                 }

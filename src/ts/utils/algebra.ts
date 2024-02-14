@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -70,6 +70,6 @@ export function flattenVector4Array(vector4Array: Vector4[]): number[] {
     return result;
 }
 
-export function MapVector3(v: Vector3, f: (x: number) => number): Vector3 {
+export function mapVector3(v: Vector3, f: (x: number) => number): Vector3 {
     return new Vector3(f(v.x), f(v.y), f(v.z));
 }

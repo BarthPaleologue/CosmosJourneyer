@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -18,7 +18,7 @@
 import { Settings } from "../settings";
 import { clamp } from "../utils/math";
 
-enum WARPDRIVE_STATE {
+enum WarpDriveState {
     /**
      * The warp drive is disabled. It can be enabled by the user.
      */
@@ -114,48 +114,48 @@ export class WarpDrive implements ReadonlyWarpDrive {
     /**
      * Current state of the warp drive.
      */
-    private state = WARPDRIVE_STATE.DISABLED;
+    private state = WarpDriveState.DISABLED;
 
     private static MIN_SPEED = 500;
 
     constructor(enabledByDefault = false) {
-        this.state = enabledByDefault ? WARPDRIVE_STATE.ENABLED : WARPDRIVE_STATE.DISABLED;
+        this.state = enabledByDefault ? WarpDriveState.ENABLED : WarpDriveState.DISABLED;
     }
 
     /**
      * Enables the warp drive: the ship will start to accelerate towards the target speed.
      */
     public enable(): void {
-        this.state = WARPDRIVE_STATE.ENABLED;
+        this.state = WarpDriveState.ENABLED;
     }
 
     /**
      * Desengages the warp drive: the ship will start to decelerate towards 0. The warp drive will be disabled when the ship reaches 0 speed.
      */
     public desengage(): void {
-        this.state = WARPDRIVE_STATE.DESENGAGING;
+        this.state = WarpDriveState.DESENGAGING;
     }
 
     /**
      * Disables the warp drive: the target speed, the current speed and the internal throttle are set to 0.
      */
     private disable(): void {
-        this.state = WARPDRIVE_STATE.DISABLED;
+        this.state = WarpDriveState.DISABLED;
         this.targetSpeed = 0;
         this.internalThrottle = 0;
         this.currentSpeed = 0;
     }
 
     public isEnabled(): boolean {
-        return this.state === WARPDRIVE_STATE.ENABLED;
+        return this.state === WarpDriveState.ENABLED;
     }
 
     public isDisabled(): boolean {
-        return this.state === WARPDRIVE_STATE.DISABLED;
+        return this.state === WarpDriveState.DISABLED;
     }
 
     public isDesengaging(): boolean {
-        return this.state === WARPDRIVE_STATE.DESENGAGING;
+        return this.state === WarpDriveState.DESENGAGING;
     }
 
     /**
@@ -166,8 +166,8 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     public updateTargetSpeed(closestObjectDistance: number, closestObjectRadius: number): number {
         const speedThreshold = 10e3;
-        const closeSpeed = (speedThreshold * 0.025 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold;
-        const deepSpaceSpeed = speedThreshold * ((0.025 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold) ** 1.1;
+        const closeSpeed = (speedThreshold * 0.05 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold;
+        const deepSpaceSpeed = speedThreshold * ((0.05 * Math.max(0, closestObjectDistance - closestObjectRadius)) / speedThreshold) ** 1.2;
         this.targetSpeed = Math.min(this.maxWarpSpeed, Math.max(closeSpeed, deepSpaceSpeed));
         return this.targetThrottle * this.targetSpeed;
     }
@@ -223,16 +223,16 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     public update(currentForwardSpeed: number, closestObjectDistance: number, clostestObjectRadius: number, deltaTime: number): void {
         switch (this.state) {
-            case WARPDRIVE_STATE.DESENGAGING:
+            case WarpDriveState.DESENGAGING:
                 this.targetSpeed *= 0.9;
                 this.updateWarpDriveSpeed(currentForwardSpeed, deltaTime);
                 if (this.targetSpeed <= WarpDrive.MIN_SPEED && this.currentSpeed <= WarpDrive.MIN_SPEED) this.disable();
                 break;
-            case WARPDRIVE_STATE.ENABLED:
+            case WarpDriveState.ENABLED:
                 this.updateTargetSpeed(closestObjectDistance, clostestObjectRadius);
                 this.updateWarpDriveSpeed(currentForwardSpeed, deltaTime);
                 break;
-            case WARPDRIVE_STATE.DISABLED:
+            case WarpDriveState.DISABLED:
                 this.targetSpeed = 0;
                 this.currentSpeed = 0;
                 this.internalThrottle = 0;

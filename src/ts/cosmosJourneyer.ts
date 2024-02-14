@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -29,9 +29,8 @@ import "@babylonjs/core/Physics/physicsEngineComponent";
 import HavokPhysics from "@babylonjs/havok";
 
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
-import { Observable } from "@babylonjs/core/Misc/observable";
 import { PauseMenu } from "./ui/pauseMenu";
-import { StarSystemView } from "./starSystem/StarSystemView";
+import { StarSystemView } from "./starSystem/starSystemView";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./mainMenu/mainMenu";
 import { SystemSeed } from "./utils/systemSeed";
@@ -68,8 +67,6 @@ export class CosmosJourneyer {
     private state = EngineState.UNINITIALIZED;
 
     private videoRecorder: VideoRecorder | null = null;
-
-    readonly onToggleStarMapObservable = new Observable<boolean>();
 
     private constructor(engine: Engine, starSystemView: StarSystemView, starMap: StarMap) {
         this.engine = engine;
@@ -235,8 +232,6 @@ export class CosmosJourneyer {
             this.activeScene = this.starSystemView.scene;
             this.starSystemView.showUI();
         }
-
-        this.onToggleStarMapObservable.notifyObservers(this.activeScene === this.starMap.scene);
     }
 
     /**

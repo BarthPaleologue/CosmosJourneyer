@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -43,7 +43,7 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.direction = direction;
         this.emitter = mesh;
 
-        this.particleTexture = Assets.PlumeParticle;
+        this.particleTexture = Assets.PLUME_PARTICLE;
         this.particleTexture.hasAlpha = true;
 
         this.emitter = mesh;

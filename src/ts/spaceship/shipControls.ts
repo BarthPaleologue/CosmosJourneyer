@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -17,8 +17,8 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { LOCAL_DIRECTION } from "../uberCore/localDirections";
-import { getForwardDirection, getUpwardDirection, pitch, roll, translate } from "../uberCore/transforms/basicTransform";
+import { LocalDirection } from "../uberCore/localDirections";
+import { getUpwardDirection, pitch, roll } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
 import { Input, InputType } from "../inputs/input";
@@ -77,14 +77,14 @@ export class ShipControls implements Controls {
     private listenTo(input: Input, deltaTime: number) {
         if (this.spaceship.getWarpDrive().isDisabled()) {
             for (const thruster of this.spaceship.mainThrusters) {
-                thruster.updateThrottle(2 * deltaTime * input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.FORWARD));
-                thruster.updateThrottle(2 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LOCAL_DIRECTION.BACKWARD));
+                thruster.updateThrottle(2 * deltaTime * input.getZAxis() * thruster.getAuthority01(LocalDirection.FORWARD));
+                thruster.updateThrottle(2 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LocalDirection.BACKWARD));
 
-                thruster.updateThrottle(2 * deltaTime * input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.UP));
-                thruster.updateThrottle(2 * deltaTime * -input.getYAxis() * thruster.getAuthority01(LOCAL_DIRECTION.DOWN));
+                thruster.updateThrottle(2 * deltaTime * input.getYAxis() * thruster.getAuthority01(LocalDirection.UP));
+                thruster.updateThrottle(2 * deltaTime * -input.getYAxis() * thruster.getAuthority01(LocalDirection.DOWN));
 
-                thruster.updateThrottle(2 * deltaTime * input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.LEFT));
-                thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LOCAL_DIRECTION.RIGHT));
+                thruster.updateThrottle(2 * deltaTime * input.getXAxis() * thruster.getAuthority01(LocalDirection.LEFT));
+                thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LocalDirection.RIGHT));
             }
 
             if (input.type === InputType.KEYBOARD) {

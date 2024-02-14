@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -27,7 +27,6 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
-import { uniformRandBool } from "extended-random";
 
 /**
  * @see https://playground.babylonjs.com/#GLZ1PX#1241 (SPS)
@@ -39,6 +38,8 @@ export class WarpTunnel implements Transformable {
     readonly parent: TransformNode;
 
     readonly solidParticleSystem: SolidParticleSystem;
+
+    private throttle: number = 0;
 
     static TUNNEL_LENGTH = 300;
 
@@ -102,7 +103,9 @@ export class WarpTunnel implements Transformable {
             particle.position.addInPlace(direction.scale(Math.random() * 10));
             particle.position.addInPlace(this.anchor.getAbsolutePosition());
 
-            particle.velocity.copyFrom(direction.scale(600));
+            particle.props = {
+                direction: direction.clone()
+            };
 
             particle.rotationQuaternion = rotationQuaternion;
 
@@ -152,6 +155,8 @@ export class WarpTunnel implements Transformable {
         SPS.updateParticle = (particle) => {
             if (!particle.isVisible) return particle;
 
+            particle.velocity.copyFrom(particle.props.direction.scale(400 + 400 * this.throttle));
+
             particle.position.addInPlace(particle.velocity.scale(scene.getEngine().getDeltaTime() / 1000));
             particle.position.addInPlace(spaceshipDisplacement);
 
@@ -197,7 +202,7 @@ export class WarpTunnel implements Transformable {
             updateGlobals();
 
             if (this.nbParticlesAlive < this.targetNbParticles && this.recycledParticles.length > 0) {
-                if(Math.random() < this.targetNbParticles / WarpTunnel.MAX_NB_PARTICLES) {
+                if (Math.random() < this.targetNbParticles / WarpTunnel.MAX_NB_PARTICLES) {
                     instanceFromStock();
                     this.nbParticlesAlive++;
                 }
@@ -214,7 +219,8 @@ export class WarpTunnel implements Transformable {
     }
 
     setThrottle(throttle: number) {
-        this.targetNbParticles = Math.floor(throttle * WarpTunnel.MAX_NB_PARTICLES);
+        this.throttle = throttle;
+        this.targetNbParticles = Math.floor(this.throttle * WarpTunnel.MAX_NB_PARTICLES);
     }
 
     getTransform(): TransformNode {

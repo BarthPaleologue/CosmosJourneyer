@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -35,7 +35,6 @@ import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { BoundingSphere } from "../../../../architecture/boundingSphere";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
@@ -154,20 +153,24 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         if (instancesMatrixBuffer.length === 0) return;
 
         const rockPatch = new InstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
-        rockPatch.createInstances(Assets.Rock);
+        rockPatch.createInstances(Assets.ROCK);
         this.instancePatches.push(rockPatch);
 
-        if (this.planetModel.physicalProperties.pressure > 0 && this.planetModel.physicalProperties.oceanLevel > 0) {
+        if (
+            this.planetModel.physicalProperties.pressure > 0 &&
+            this.planetModel.physicalProperties.oceanLevel > 0 &&
+            this.getAverageHeight() > this.planetModel.physicalProperties.oceanLevel + 50
+        ) {
             const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
-            treePatch.createInstances(Assets.Tree);
+            treePatch.createInstances(Assets.TREE);
             this.instancePatches.push(treePatch);
 
             const butterflyPatch = new ThinInstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 800));
-            butterflyPatch.createInstances(Assets.Butterfly);
+            butterflyPatch.createInstances(Assets.BUTTERFLY);
             this.instancePatches.push(butterflyPatch);
 
             const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
-            grassPatch.createInstances(Assets.GrassBlade);
+            grassPatch.createInstances(Assets.GRASS_BLADE);
             this.instancePatches.push(grassPatch);
         }
     }

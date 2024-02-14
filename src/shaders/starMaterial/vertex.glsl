@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -26,7 +26,6 @@ varying vec3 vPositionW;
 varying vec3 vPosition;
 varying vec3 vUnitSamplePoint;
 
-uniform vec4 starInverseRotationQuaternion;
 uniform vec3 starPosition;
 
 #include "../utils/applyQuaternion.glsl";
@@ -40,5 +39,5 @@ void main() {
 
     vPosition = vPositionW - starPosition;
 
-    vUnitSamplePoint = applyQuaternion(starInverseRotationQuaternion, normalize(vPosition));
+    vUnitSamplePoint = normalize(position);
 }

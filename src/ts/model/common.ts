@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export enum GENERATION_STEPS {
+export enum GenerationSteps {
     AXIAL_TILT = 100,
     ORBIT = 200,
     ORBITAL_PERIOD = 500,
     RADIUS = 1000,
-    ORBITAL_PLANE_ALIGNEMENT = 1600,
+    ORBITAL_PLANE_ALIGNMENT = 1600,
 
     RINGS = 1200,
 
@@ -28,7 +28,7 @@ export enum GENERATION_STEPS {
     MOONS = 11,
 
     POWER = 300,
-    ACCENNT_COLOR = 400,
+    ACCENT_COLOR = 400,
 
     TEMPERATURE = 1100,
     STELLAR_TYPE = 1900,
@@ -40,7 +40,7 @@ export enum GENERATION_STEPS {
     SPACE_STATION = 2000
 }
 
-export enum BODY_TYPE {
+export enum BodyType {
     STAR,
     TELLURIC_PLANET,
     GAS_PLANET,

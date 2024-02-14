@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -18,7 +18,7 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 
 import { OrbitProperties } from "../orbit/orbitProperties";
-import { BODY_TYPE, GENERATION_STEPS } from "../model/common";
+import { BodyType, GenerationSteps } from "../model/common";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { clamp } from "../utils/math";
@@ -29,7 +29,7 @@ import { PlanetPhysicalProperties } from "../architecture/physicalProperties";
 import { CelestialBodyModel } from "../architecture/celestialBody";
 
 export class MandelbulbModel implements PlanetModel {
-    readonly bodyType = BODY_TYPE.MANDELBULB;
+    readonly bodyType = BodyType.MANDELBULB;
     readonly seed: number;
     readonly rng: (step: number) => number;
 
@@ -58,13 +58,13 @@ export class MandelbulbModel implements PlanetModel {
 
         this.parentBody = parentBody ?? null;
 
-        this.power = randRange(1.5, 6.0, this.rng, GENERATION_STEPS.POWER);
-        this.accentColor = new Color3(this.rng(GENERATION_STEPS.ACCENNT_COLOR), this.rng(GENERATION_STEPS.ACCENNT_COLOR + 10), this.rng(GENERATION_STEPS.ACCENNT_COLOR + 20));
+        this.power = randRange(1.5, 6.0, this.rng, GenerationSteps.POWER);
+        this.accentColor = new Color3(this.rng(GenerationSteps.ACCENT_COLOR), this.rng(GenerationSteps.ACCENT_COLOR + 10), this.rng(GenerationSteps.ACCENT_COLOR + 20));
 
-        // TODO: do not hardcode
-        let orbitRadius = this.rng(GENERATION_STEPS.ORBIT) * 15e9;
+        // Todo: do not hardcode
+        let orbitRadius = this.rng(GenerationSteps.ORBIT) * 15e9;
 
-        const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, this.rng, GENERATION_STEPS.ORBIT + 80));
+        const orbitalP = clamp(0.5, 3.0, normalRandom(1.0, 0.3, this.rng, GenerationSteps.ORBIT + 80));
         orbitRadius += orbitRadius - getPeriapsis(orbitRadius, orbitalP);
 
         this.orbit = {
@@ -78,13 +78,13 @@ export class MandelbulbModel implements PlanetModel {
         this.physicalProperties = {
             mass: 10,
             rotationPeriod: 0,
-            axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
+            axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
             minTemperature: -180,
             maxTemperature: 100,
             pressure: 0
         };
 
-        this.nbMoons = randRangeInt(0, 2, this.rng, GENERATION_STEPS.NB_MOONS);
+        this.nbMoons = randRangeInt(0, 2, this.rng, GenerationSteps.NB_MOONS);
     }
 
     getApparentRadius(): number {

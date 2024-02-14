@@ -1,11 +1,11 @@
-# CosmosJourneyer
+# Cosmos Journeyer
 
 [![NodeJS with Webpack](https://github.com/BarthPaleologue/planetEngine/actions/workflows/webpack.yml/badge.svg)](https://github.com/BarthPaleologue/planetEngine/actions/workflows/webpack.yml)
 [![pages-build-deployment](https://github.com/BarthPaleologue/planetEngine/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/BarthPaleologue/planetEngine/actions/workflows/pages/pages-build-deployment)
 [![Jest Coverage](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/tests.yml/badge.svg)](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/tests.yml)
 [![License](https://img.shields.io/github/license/BarthPaleologue/planetEngine)](./LICENSE.md)
 
-CosmosJourneyer is the procedural universe running inside a web page that makes space exploration accessible for everyone.
+Cosmos Journeyer is the procedural universe running inside a web page that makes space exploration accessible for everyone.
 
 The main website of the project is online at https://cosmosjourneyer.com/
 
@@ -33,7 +33,7 @@ Every telluric planet and moon has a surface that can be explored by the player 
 
 ![From Space](./coverImages/space.png)
 
-CosmosJourneyer allows to travel from one celestial body to another without any loading screen, giving the player a seamless experience while exploring.
+Cosmos Journeyer allows to travel from one celestial body to another without any loading screen, giving the player a seamless experience while exploring.
 
 ![A little bit closer](./coverImages/moon.png)
 
@@ -41,13 +41,13 @@ Planet surfaces are filled with procedural vegetation and rocks and butterflies 
 
 ![On the surface](./coverImages/ground.png)
 
-CosmosJourneyer generates a virtually infinite amount of star systems that all have a star, often planets, and sometimes moons.
+Cosmos Journeyer generates a virtually infinite amount of star systems that all have a star, often planets, and sometimes moons.
 
 ![Star map](./coverImages/starmap.png)
 
 ## Contributors
 
-Thank you to all the people who have contributed to CosmosJourneyer!
+Thank you to all the people who have contributed to Cosmos Journeyer!
 
 ![Contributors](https://contrib.rocks/image?repo=BarthPaleologue/CosmosJourneyer)
 

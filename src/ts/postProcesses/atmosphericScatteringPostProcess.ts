@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -71,70 +71,70 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
             ...getActiveCameraUniforms(scene),
             {
                 name: "atmosphere_radius",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return atmosphereUniforms.atmosphereRadius;
                 }
             },
             {
                 name: "atmosphere_falloff",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return atmosphereUniforms.falloffFactor;
                 }
             },
             {
                 name: "atmosphere_sunIntensity",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return atmosphereUniforms.intensity;
                 }
             },
             {
                 name: "atmosphere_rayleighStrength",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return atmosphereUniforms.rayleighStrength;
                 }
             },
             {
                 name: "atmosphere_mieStrength",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return atmosphereUniforms.mieStrength;
                 }
             },
             {
                 name: "atmosphere_densityModifier",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return atmosphereUniforms.densityModifier;
                 }
             },
             {
                 name: "atmosphere_redWaveLength",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return atmosphereUniforms.redWaveLength;
                 }
             },
             {
                 name: "atmosphere_greenWaveLength",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return atmosphereUniforms.greenWaveLength;
                 }
             },
             {
                 name: "atmosphere_blueWaveLength",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return atmosphereUniforms.blueWaveLength;
                 }
             },
             {
                 name: "atmosphere_mieHaloRadius",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return atmosphereUniforms.mieHaloRadius;
                 }
@@ -145,9 +145,9 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
             ...getSamplers(scene),
             {
                 name: "atmosphereLUT",
-                type: SamplerEnumType.Texture,
+                type: SamplerEnumType.TEXTURE,
                 get: () => {
-                    return Assets.AtmosphereLUT;
+                    return Assets.ATMOSPHERE_LUT;
                 }
             }
         ];

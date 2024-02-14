@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -53,7 +53,7 @@ function handle_build(data: TransferBuildData): void {
     const buildData: BuildData = new BuildData(
         data.planetDiameter,
         data.depth,
-        data.direction,
+        data.direction as number,
         data.position[0],
         data.position[1],
         data.position[2],

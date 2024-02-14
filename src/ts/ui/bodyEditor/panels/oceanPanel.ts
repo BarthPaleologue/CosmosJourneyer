@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { EditorPanel } from "../editorPanel";
-import { clearAllEventListenersById } from "../../../utils/html";
 import { Slider } from "handle-sliderjs";
 import { OceanPostProcess } from "../../../postProcesses/oceanPostProcess";
 import { CelestialBody } from "../../../architecture/celestialBody";
@@ -28,12 +27,6 @@ export class OceanPanel extends EditorPanel {
     init(planet: CelestialBody, ocean: OceanPostProcess) {
         for (const slider of this.sliders) slider.remove();
 
-        const oceanToggler = clearAllEventListenersById("oceanToggler");
-        oceanToggler.addEventListener("click", () => {
-            const checkbox = document.querySelectorAll("input[type='checkbox']")[0] as HTMLInputElement;
-            checkbox.checked = !checkbox.checked;
-            ocean.oceanUniforms.oceanRadius = checkbox.checked ? planet.getBoundingRadius() : 0;
-        });
         this.sliders = [
             new Slider("alphaModifier", document.getElementById("alphaModifier") as HTMLElement, 0, 200, ocean.oceanUniforms.alphaModifier * 10000, (val: number) => {
                 ocean.oceanUniforms.alphaModifier = val / 10000;

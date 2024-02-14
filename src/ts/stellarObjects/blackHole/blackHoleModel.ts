@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -20,14 +20,14 @@ import { getOrbitalPeriod } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { BODY_TYPE, GENERATION_STEPS } from "../../model/common";
+import { BodyType, GenerationSteps } from "../../model/common";
 import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export class BlackHoleModel implements StellarObjectModel {
-    readonly bodyType = BODY_TYPE.BLACK_HOLE;
+    readonly bodyType = BodyType.BLACK_HOLE;
     readonly seed: number;
     readonly rng: (step: number) => number;
 
@@ -67,13 +67,13 @@ export class BlackHoleModel implements StellarObjectModel {
         this.physicalProperties = {
             mass: 10,
             rotationPeriod: 24 * 60 * 60,
-            axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
+            axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
             accretionDiskRadius: 8000e3
         };
     }
 
     public getNbSpaceStations(): number {
-        if(uniformRandBool(0.1, this.rng, GENERATION_STEPS.SPACE_STATION)) return 1;
+        if (uniformRandBool(0.1, this.rng, GenerationSteps.SPACE_STATION)) return 1;
         return 0;
     }
 }

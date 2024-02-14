@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -35,7 +35,6 @@ import { RingsUniforms } from "./postProcesses/rings/ringsUniform";
 import { getMoonSeed } from "./planets/common";
 import { SystemSeed } from "./utils/systemSeed";
 import { SpaceStation } from "./spacestation/spaceStation";
-import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -57,7 +56,7 @@ starSystem.model.setName("Alpha Testis");
 starSystemView.setStarSystem(starSystem, false);
 
 const sunModel = new StarModel(0.51);
-const sun = StarSystemHelper.makeStar(starSystem, sunModel);
+const sun = StarSystemHelper.MakeStar(starSystem, sunModel);
 sun.model.orbit.period = 60 * 60 * 24;
 
 /*const secundaModel = new StarModel(-672446, sunModel);
@@ -71,14 +70,14 @@ terminaModel.orbit.period = 60 * 60;
 const termina = StarSystemHelper.makeStar(starSystem, terminaModel);*/
 
 const planetModel = new TelluricPlanetModel(0.4233609183800225, sunModel);
-planetModel.physicalProperties.minTemperature = -55;
+planetModel.physicalProperties.minTemperature = -40;
 planetModel.physicalProperties.maxTemperature = 30;
 
 planetModel.orbit.period = 60 * 60 * 24 * 365.25;
 planetModel.orbit.radius = 4000 * planetModel.radius;
 planetModel.orbit.normalToPlane = Vector3.Up();
 
-const planet = StarSystemHelper.makeTelluricPlanet(starSystem, planetModel);
+const planet = StarSystemHelper.MakeTelluricPlanet(starSystem, planetModel);
 planet.model.ringsUniforms = new RingsUniforms(planet.model.rng);
 planet.postProcesses.push(PostProcessType.RING);
 
@@ -101,14 +100,14 @@ moonModel.orbit.period = moonModel.physicalProperties.rotationPeriod;
 moonModel.orbit.radius = 8 * planet.getRadius();
 moonModel.orbit.normalToPlane = Vector3.Up();
 
-const moon = StarSystemHelper.makeSatellite(starSystem, planet, moonModel);
+const moon = StarSystemHelper.MakeSatellite(starSystem, planet, moonModel);
 
 moon.material.colorSettings.plainColor.copyFromFloats(0.67, 0.67, 0.67);
 moon.material.colorSettings.desertColor.copyFrom(new Color3(116, 134, 121).scale(1 / 255));
 moon.material.colorSettings.steepColor.copyFrom(new Color3(92, 92, 92).scale(1 / 255));
 
-moon.material.setTexture("plainNormalMap", Assets.DirtNormalMap);
-moon.material.setTexture("bottomNormalMap", Assets.DirtNormalMap);
+moon.material.setTexture("plainNormalMap", Assets.DIRT_NORMAL_MAP);
+moon.material.setTexture("bottomNormalMap", Assets.DIRT_NORMAL_MAP);
 moon.material.updateConstants();
 
 const aresModel = new TelluricPlanetModel(0.3725, sunModel);
@@ -128,7 +127,7 @@ aresModel.orbit.normalToPlane = Vector3.Up();
 //aresModel.terrainSettings.continent_base_height = 10e3;
 //aresModel.terrainSettings.max_mountain_height = 20e3;
 
-const ares = StarSystemHelper.makeTelluricPlanet(starSystem, aresModel);
+const ares = StarSystemHelper.MakeTelluricPlanet(starSystem, aresModel);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.OCEAN), 1);
 ares.postProcesses.splice(ares.postProcesses.indexOf(PostProcessType.CLOUDS), 1);
 
@@ -144,7 +143,7 @@ andromaqueModel.orbit.period = 60 * 60 * 24 * 365.25;
 andromaqueModel.orbit.radius = 4300 * ares.getRadius();
 andromaqueModel.orbit.normalToPlane = Vector3.Up();
 
-const andromaque = StarSystemHelper.makeGasPlanet(starSystem, andromaqueModel);
+const andromaque = StarSystemHelper.MakeGasPlanet(starSystem, andromaqueModel);
 
 /*const blackHoleModel = new BlackHoleModel(0.5, sunModel);
 blackHoleModel.orbit.period = 60 * 60 * 24 * 365.25;
@@ -167,9 +166,9 @@ if (aresAtmosphere) {
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
-    if(e.key === "o") {
+    if (e.key === "o") {
         const landingPad = spacestation.handleDockingRequest();
-        if(landingPad !== null && starSystemView.scene.getActiveController() === spaceshipController) {
+        if (landingPad !== null && starSystemView.scene.getActiveController() === spaceshipController) {
             spaceshipController.spaceship.engageLandingOnPad(landingPad);
         }
     }

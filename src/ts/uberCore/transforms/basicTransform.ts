@@ -1,4 +1,4 @@
-//  This file is part of CosmosJourneyer
+//  This file is part of Cosmos Journeyer
 //
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 
 export function translate(transformNode: TransformNode, displacement: Vector3): void {
@@ -39,10 +39,6 @@ export function getRotationQuaternion(transformNode: TransformNode): Quaternion 
     return transformNode.rotationQuaternion;
 }
 
-export function getInverseRotationQuaternion(transformNode: TransformNode): Quaternion {
-    return getRotationQuaternion(transformNode).invert();
-}
-
 export function setRotationQuaternion(transformNode: TransformNode, newRotation: Quaternion): void {
     transformNode.rotationQuaternion = newRotation;
     transformNode.computeWorldMatrix(true);
@@ -56,22 +52,10 @@ export function setUpVector(transformNode: TransformNode, newUp: Vector3): void 
     rotate(transformNode, rotationAxis, angle);
 }
 
-export function getRotationMatrix(transformNode: TransformNode): Matrix {
-    const rotationMatrix = new Matrix();
-    getRotationQuaternion(transformNode).toRotationMatrix(rotationMatrix);
-    return rotationMatrix;
-}
-
-export function getInverseRotationMatrix(transformNode: TransformNode): Matrix {
-    const inverseRotationMatrix = new Matrix();
-    getInverseRotationQuaternion(transformNode).toRotationMatrix(inverseRotationMatrix);
-    return inverseRotationMatrix;
-}
-
 /* #region directions */
 
 /**
- * This is not equivalent to transform.forward as CosmosJourneyer uses the right-handed coordinate system
+ * This is not equivalent to `transform.forward` as Cosmos Journeyer uses the right-handed coordinate system
  * @returns the forward vector of the given transform in world space
  */
 export function getForwardDirection(transformNode: TransformNode): Vector3 {
@@ -120,6 +104,7 @@ export function getLeftDirection(transformNode: TransformNode): Vector3 {
 
 /**
  *
+ * @param transformNode
  * @param amount
  */
 export function roll(transformNode: TransformNode, amount: number): void {
@@ -128,6 +113,7 @@ export function roll(transformNode: TransformNode, amount: number): void {
 
 /**
  *
+ * @param transformNode
  * @param amount
  */
 export function pitch(transformNode: TransformNode, amount: number): void {
@@ -136,6 +122,7 @@ export function pitch(transformNode: TransformNode, amount: number): void {
 
 /**
  *
+ * @param transformNode
  * @param amount
  */
 export function yaw(transformNode: TransformNode, amount: number): void {
