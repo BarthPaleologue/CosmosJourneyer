@@ -57,6 +57,8 @@ uniform float time;
 
 #include "./utils/computeSpecularHighlight.glsl";
 
+#include "./utils/refraction.glsl";
+
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
@@ -104,14 +106,24 @@ void main() {
         vec3 shallowColor = vec3(32.0, 193.0, 180.0)/255.0;
         vec3 oceanColor = mix(shallowColor, deepColor, opticalDepth01);
 
-        vec3 reflectedColor = vec3(0.6, 0.8, 0.95) * 0.7;
+        vec3 reflectedColor = vec3(0.6, 0.8, 0.95);
 
-        float fresnel = 1.0 - dot(-rayDir, planetNormal);
-        fresnel = pow(fresnel, 8.0);
+        // replace fresnel with
+        // see https://farside.ph.utexas.edu/teaching/em/lectures/node104.html
+        float nAir = 1.0;
+        float nWater = 1.33;
+        float eta = nAir / nWater;
+        vec3 incidentRay = rayDir;
+        vec3 refractedRay = refract(incidentRay, normalWave, eta);
+
+        float cosThetaI = dot(-incidentRay, normalWave);
+        float cosThetaT = dot(refractedRay, -normalWave);
+
+        float amountReflected = fractionReflected(cosThetaI, cosThetaT, nAir, nWater);
 
         vec3 ambiant = mix(oceanColor, screenColor.rgb, alpha);
 
-        ambiant = mix(ambiant, reflectedColor, fresnel);
+        ambiant = mix(ambiant, reflectedColor, amountReflected);
 
         float foamSize = 30.0;
         float foamFactor = saturate((foamSize - distanceThroughOcean) / foamSize);
