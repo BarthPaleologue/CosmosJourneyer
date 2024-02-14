@@ -55,6 +55,18 @@ class AnimationGroupWrapper {
     }
 }
 
+class AnimationState {
+    readonly idleAnimation: AnimationGroupWrapper;
+    readonly nonIdleAnimations: AnimationGroupWrapper[];
+    currentAnimation: AnimationGroupWrapper;
+
+    constructor(idleAnimation: AnimationGroupWrapper, nonIdleAnimations: AnimationGroupWrapper[]) {
+        this.idleAnimation = idleAnimation;
+        this.nonIdleAnimations = nonIdleAnimations;
+        this.currentAnimation = idleAnimation;
+    }
+}
+
 export class CharacterControls implements Controls {
     readonly character: AbstractMesh;
     private readonly thirdPersonCamera: ArcRotateCamera;
@@ -70,13 +82,23 @@ export class CharacterControls implements Controls {
     private readonly walkBackAnim: AnimationGroupWrapper;
     private readonly sambaAnim: AnimationGroupWrapper;
     private readonly runningAnim: AnimationGroupWrapper;
+
+    private readonly swimmingIdleAnim: AnimationGroupWrapper;
+    private readonly swimmingForwardAnim: AnimationGroupWrapper;
+
+    private readonly jumpingAnim: AnimationGroupWrapper;
+
     private readonly fallingIdleAnim: AnimationGroupWrapper;
     private readonly skyDivingAnim: AnimationGroupWrapper;
-    private readonly swimmingAnim: AnimationGroupWrapper;
-    private readonly jumpingAnim: AnimationGroupWrapper;
+
     private readonly nonIdleAnimations: AnimationGroupWrapper[];
 
     private targetAnim: AnimationGroupWrapper | null = null;
+
+    private readonly groundedState: AnimationState;
+    private readonly fallingState: AnimationState;
+    private readonly swimmingState: AnimationState;
+    private currentAnimationState: AnimationState;
 
     private closestWalkableObject: Transformable | null = null;
     private distanceToGround = 0;
@@ -84,7 +106,6 @@ export class CharacterControls implements Controls {
     private readonly raycastResult = new PhysicsRaycastResult();
     private readonly scene: Scene;
 
-    private isGrounded = false;
     private jumpVelocity = Vector3.Zero();
 
     readonly inputs: Input[] = [];
@@ -116,8 +137,11 @@ export class CharacterControls implements Controls {
         const skyDivingAnim = scene.getAnimationGroupByName("Skydiving");
         if (skyDivingAnim === null) throw new Error("'Skydiving' animation not found");
 
-        const swimmingAnim = scene.getAnimationGroupByName("Swimming");
-        if (swimmingAnim === null) throw new Error("'Swimming' animation not found");
+        const swimmingIdleAnim = scene.getAnimationGroupByName("SwimmingIdle");
+        if (swimmingIdleAnim === null) throw new Error("'SwimmingIdle' animation not found");
+
+        const swimmingForwardAnim = scene.getAnimationGroupByName("SwimmingForward");
+        if (swimmingForwardAnim === null) throw new Error("'SwimmingForward' animation not found");
 
         const jumpingAnim = scene.getAnimationGroupByName("Jumping");
         if (jumpingAnim === null) throw new Error("'Jumping' animation not found");
@@ -130,7 +154,8 @@ export class CharacterControls implements Controls {
         this.fallingIdleAnim = new AnimationGroupWrapper("fallingIdle", fallingIdleAnim, 0, true);
         this.skyDivingAnim = new AnimationGroupWrapper("skydiving", skyDivingAnim, 0, true);
         this.skyDivingAnim.group.speedRatio = 1.5;
-        this.swimmingAnim = new AnimationGroupWrapper("swimming", swimmingAnim, 0, true);
+        this.swimmingIdleAnim = new AnimationGroupWrapper("swimming", swimmingIdleAnim, 0, true);
+        this.swimmingForwardAnim = new AnimationGroupWrapper("swimmingForward", swimmingForwardAnim, 0, true);
         this.jumpingAnim = new AnimationGroupWrapper("jumping", jumpingAnim, 0, false);
         this.nonIdleAnimations = [
             this.walkAnim,
@@ -140,8 +165,14 @@ export class CharacterControls implements Controls {
             this.fallingIdleAnim,
             this.jumpingAnim,
             this.skyDivingAnim,
-            this.swimmingAnim
+            this.swimmingIdleAnim,
+            this.swimmingForwardAnim
         ];
+
+        this.groundedState = new AnimationState(this.idleAnim, [this.walkAnim, this.walkBackAnim, this.sambaAnim, this.runningAnim]);
+        this.fallingState = new AnimationState(this.fallingIdleAnim, [this.skyDivingAnim]);
+        this.swimmingState = new AnimationState(this.swimmingIdleAnim, [this.swimmingForwardAnim]);
+        this.currentAnimationState = this.groundedState;
 
         this.targetAnim = this.idleAnim;
 
@@ -173,18 +204,6 @@ export class CharacterControls implements Controls {
         const displacement = Vector3.Zero();
         if (input instanceof Keyboard) {
             const keyboard = input as Keyboard;
-            let keydown = false;
-
-            let isSwimming = false;
-            if (this.closestWalkableObject !== null && this.closestWalkableObject instanceof TelluricPlanet) {
-                const distanceToPlanetCenter = Vector3.Distance(this.closestWalkableObject.getTransform().getAbsolutePosition(), this.getTransform().getAbsolutePosition());
-
-                const waterLevel = this.closestWalkableObject.model.physicalProperties.oceanLevel + this.closestWalkableObject.getRadius();
-
-                if (distanceToPlanetCenter < waterLevel) {
-                    isSwimming = true;
-                }
-            }
 
             if (this.walkAnim.weight > 0.0) {
                 this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaTime * this.walkAnim.weight));
@@ -198,68 +217,56 @@ export class CharacterControls implements Controls {
                 this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight));
             }
 
-            const isMoving = this.walkAnim.weight > 0.0 || this.walkBackAnim.weight > 0.0 || this.runningAnim.weight > 0.0;
-
             // Translation
-            if (isSwimming) {
-                this.targetAnim = this.swimmingAnim;
+            if (this.currentAnimationState === this.swimmingState) {
+                this.swimmingState.currentAnimation = this.swimmingIdleAnim;
                 if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
+                    this.swimmingState.currentAnimation = this.swimmingForwardAnim;
                     this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterSwimSpeed * deltaTime));
                 }
-                keydown = true;
-            } else {
+            } else if (this.currentAnimationState === this.groundedState) {
+                this.groundedState.currentAnimation = this.idleAnim;
                 if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
-                    this.targetAnim = this.walkAnim;
-                    keydown = true;
+                    this.groundedState.currentAnimation = this.walkAnim;
                 } else if (keyboard.isPressed("s")) {
-                    this.targetAnim = this.walkBackAnim;
-                    keydown = true;
+                    this.groundedState.currentAnimation = this.walkBackAnim;
                 } else if (keyboard.isPressed("e")) {
-                    this.targetAnim = this.runningAnim;
-                    keydown = true;
-                }
-
-                if (!this.isGrounded) {
-                    if (this.distanceToGround < 30) {
-                        this.targetAnim = this.fallingIdleAnim;
-                    } else {
-                        this.targetAnim = this.skyDivingAnim;
-                    }
-                    keydown = true;
+                    this.groundedState.currentAnimation = this.runningAnim;
                 }
 
                 // Samba!
                 if (keyboard.isPressed("b")) {
-                    this.targetAnim = this.sambaAnim;
-                    keydown = true;
+                    this.groundedState.currentAnimation = this.sambaAnim;
                 }
 
                 if (keyboard.isPressed(" ")) {
-                    if (this.isGrounded) {
-                        this.targetAnim = this.jumpingAnim;
-                        this.jumpingAnim.weight = 1;
-                        this.jumpingAnim.group.stop();
-                        this.jumpingAnim.group.play();
-                        this.isGrounded = false;
-                        this.jumpVelocity = this.character.up.scale(10.0).add(this.character.forward.scale(-5.0));
-                        keydown = true;
-                    }
+                    this.targetAnim = this.jumpingAnim;
+                    this.jumpingAnim.weight = 1;
+                    this.jumpingAnim.group.stop();
+                    this.jumpingAnim.group.play();
+                    this.currentAnimationState = this.fallingState;
+                    this.jumpVelocity = this.character.up.scale(10.0).add(this.character.forward.scale(-5.0));
+                }
+
+            } else if (this.currentAnimationState === this.fallingState) {
+                if (this.distanceToGround < 30) {
+                    this.fallingState.currentAnimation = this.fallingIdleAnim;
+                } else {
+                    this.fallingState.currentAnimation = this.skyDivingAnim;
                 }
             }
 
+            this.targetAnim = this.currentAnimationState.currentAnimation;
+
+            const isMoving = this.currentAnimationState.currentAnimation !== this.currentAnimationState.idleAnimation;
+
             // Rotation
-            if ((keyboard.isPressed("q") || keyboard.isPressed("a")) && (isMoving || isSwimming)) {
+            if ((keyboard.isPressed("q") || keyboard.isPressed("a")) && (isMoving)) {
                 this.character.rotate(Vector3.Up(), this.characterRotationSpeed * deltaTime);
                 this.thirdPersonCamera.alpha += this.characterRotationSpeed * deltaTime;
-                keydown = true;
-            } else if (keyboard.isPressed("d") && (isMoving || isSwimming)) {
+            } else if (keyboard.isPressed("d") && (isMoving)) {
                 this.character.rotate(Vector3.Up(), -this.characterRotationSpeed * deltaTime);
                 this.thirdPersonCamera.alpha -= this.characterRotationSpeed * deltaTime;
-                keydown = true;
-            }
-
-            if (!keydown) {
-                this.targetAnim = this.idleAnim;
             }
 
             let weightSum = 0;
@@ -284,7 +291,7 @@ export class CharacterControls implements Controls {
         const start = character.getAbsolutePosition().add(character.up.scale(50e3));
         const end = character.position.add(character.up.scale(-50e3));
 
-        if (!this.isGrounded) {
+        if (this.currentAnimationState === this.fallingState) {
             // apply gravity
             this.jumpVelocity.addInPlace(character.up.scale(-9.8 * deltaTime));
             translate(character, this.jumpVelocity.scale(deltaTime));
@@ -304,7 +311,7 @@ export class CharacterControls implements Controls {
             if (this.closestWalkableObject !== null && this.closestWalkableObject instanceof TelluricPlanet) {
                 const waterLevel = this.closestWalkableObject.model.physicalProperties.oceanLevel + this.closestWalkableObject.getRadius();
                 const distanceToWater = Vector3.Distance(this.getTransform().getAbsolutePosition(), this.closestWalkableObject.getTransform().getAbsolutePosition()) - waterLevel;
-                distance = Math.min(distance, distanceToWater + 0.8);
+                distance = Math.min(distance, distanceToWater + 1.3);
             }
 
             if (distance <= 0.1) {
@@ -316,21 +323,21 @@ export class CharacterControls implements Controls {
                     const distanceToWater =
                         Vector3.Distance(this.getTransform().getAbsolutePosition(), this.closestWalkableObject.getTransform().getAbsolutePosition()) - waterLevel;
                     if (distanceToWater < 0) {
-                        this.isGrounded = false;
+                        this.currentAnimationState = this.swimmingState;
                     } else {
-                        this.isGrounded = true;
+                        this.currentAnimationState = this.groundedState;
                     }
                 } else {
-                    this.isGrounded = true;
+                    this.currentAnimationState = this.groundedState;
                 }
                 this.distanceToGround = 0;
                 this.jumpVelocity = Vector3.Zero();
             } else {
-                this.isGrounded = false;
+                this.currentAnimationState = this.fallingState;
                 this.distanceToGround = distance;
             }
         } else {
-            this.isGrounded = false;
+            this.currentAnimationState = this.fallingState;
             this.distanceToGround = 50e3;
         }
 
