@@ -21,7 +21,6 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { getInverseRotationQuaternion } from "../../uberCore/transforms/basicTransform";
 import { Assets } from "../../assets";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import lutFragment from "../../../shaders/starMaterial/utils/lut.glsl";
@@ -45,7 +44,7 @@ export class StarMaterial extends ShaderMaterial {
 
         super("starColor", scene, shaderName, {
             attributes: ["position"],
-            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "starInverseRotationQuaternion", "time"],
+            uniforms: ["world", "worldViewProjection", "seed", "starColor", "starPosition", "time"],
             samplers: ["lut"]
         });
 
@@ -70,7 +69,6 @@ export class StarMaterial extends ShaderMaterial {
 
         this.setFloat("time", this.internalClock % 100000);
         this.setColor3("starColor", this.starModel.color);
-        this.setQuaternion("starInverseRotationQuaternion", getInverseRotationQuaternion(this.star));
         this.setFloat("seed", this.starSeed);
         this.setVector3("starPosition", this.star.getAbsolutePosition());
     }

@@ -32,7 +32,7 @@ uniform sampler2D normalMap2;
 
 #include "./utils/object.glsl";
 
-uniform vec4 planetInverseRotationQuaternion;
+uniform mat4 planetInverseRotationMatrix;
 
 uniform float ocean_radius;
 uniform float ocean_smoothness;
@@ -85,7 +85,7 @@ void main() {
 
         vec3 samplePoint = camera_position + impactPoint * rayDir - object_position;
 
-        vec3 samplePointPlanetSpace = applyQuaternion(planetInverseRotationQuaternion, samplePoint);
+        vec3 samplePointPlanetSpace = mat3(planetInverseRotationMatrix) * samplePoint;
         vec3 unitSamplePoint = normalize(samplePointPlanetSpace);
         vec3 planetNormal = normalize(samplePoint);
 
@@ -121,12 +121,13 @@ void main() {
 
         float amountReflected = fractionReflected(cosThetaI, cosThetaT, nAir, nWater);
 
-        vec3 ambiant = mix(oceanColor, screenColor.rgb, alpha);
+        vec3 ambiant = mix(oceanColor, screenColor.rgb * alpha, alpha);
 
         ambiant = mix(ambiant, reflectedColor, amountReflected);
 
-        float foamSize = 30.0;
+        float foamSize = 10.0;
         float foamFactor = saturate((foamSize - distanceThroughOcean) / foamSize);
+        foamFactor = smoothstep(0.01, 1.0, foamFactor);
         vec3 foamColor = vec3(0.8);
         ambiant = mix(ambiant, foamColor, foamFactor);
 

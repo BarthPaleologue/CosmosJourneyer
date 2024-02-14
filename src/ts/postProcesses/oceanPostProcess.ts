@@ -22,7 +22,6 @@ import { UberScene } from "../uberCore/uberScene";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
-import { getInverseRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
 import { Assets } from "../assets";
 import { Transformable } from "../architecture/transformable";
@@ -103,10 +102,10 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
                 }
             },
             {
-                name: "planetInverseRotationQuaternion",
-                type: UniformEnumType.QUATERNION,
+                name: "planetInverseRotationMatrix",
+                type: UniformEnumType.MATRIX,
                 get: () => {
-                    return getInverseRotationQuaternion(planet.getTransform());
+                    return planet.getTransform().getWorldMatrix().getRotationMatrix().transpose();
                 }
             },
             {

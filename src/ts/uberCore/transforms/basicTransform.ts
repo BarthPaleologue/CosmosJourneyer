@@ -39,10 +39,6 @@ export function getRotationQuaternion(transformNode: TransformNode): Quaternion 
     return transformNode.rotationQuaternion;
 }
 
-export function getInverseRotationQuaternion(transformNode: TransformNode): Quaternion {
-    return getRotationQuaternion(transformNode).invert();
-}
-
 export function setRotationQuaternion(transformNode: TransformNode, newRotation: Quaternion): void {
     transformNode.rotationQuaternion = newRotation;
     transformNode.computeWorldMatrix(true);
@@ -54,18 +50,6 @@ export function setUpVector(transformNode: TransformNode, newUp: Vector3): void 
     const rotationAxis = Vector3.Cross(newUp, currentUp);
     const angle = -Math.acos(Vector3.Dot(newUp, currentUp));
     rotate(transformNode, rotationAxis, angle);
-}
-
-export function getRotationMatrix(transformNode: TransformNode): Matrix {
-    const rotationMatrix = new Matrix();
-    getRotationQuaternion(transformNode).toRotationMatrix(rotationMatrix);
-    return rotationMatrix;
-}
-
-export function getInverseRotationMatrix(transformNode: TransformNode): Matrix {
-    const inverseRotationMatrix = new Matrix();
-    getInverseRotationQuaternion(transformNode).toRotationMatrix(inverseRotationMatrix);
-    return inverseRotationMatrix;
 }
 
 /* #region directions */
