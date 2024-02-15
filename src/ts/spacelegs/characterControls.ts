@@ -261,11 +261,22 @@ export class CharacterControls implements Controls {
 
             // Rotation
             if ((keyboard.isPressed("q") || keyboard.isPressed("a")) && (isMoving)) {
-                this.character.rotate(Vector3.Up(), this.characterRotationSpeed * deltaTime);
-                this.thirdPersonCamera.alpha += this.characterRotationSpeed * deltaTime;
+                const dtheta = this.characterRotationSpeed * deltaTime;
+                this.character.rotate(Vector3.Up(), dtheta);
+                this.thirdPersonCamera.alpha += dtheta;
+
+                const cameraPosition = this.thirdPersonCamera.target;
+                cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), -dtheta));
+                this.thirdPersonCamera.target = cameraPosition;
+
             } else if (keyboard.isPressed("d") && (isMoving)) {
-                this.character.rotate(Vector3.Up(), -this.characterRotationSpeed * deltaTime);
-                this.thirdPersonCamera.alpha -= this.characterRotationSpeed * deltaTime;
+                const dtheta = this.characterRotationSpeed * deltaTime;
+                this.character.rotate(Vector3.Up(), -dtheta);
+                this.thirdPersonCamera.alpha -= dtheta;
+
+                const cameraPosition = this.thirdPersonCamera.target;
+                cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), dtheta));
+                this.thirdPersonCamera.target = cameraPosition;
             }
 
             let weightSum = 0;
