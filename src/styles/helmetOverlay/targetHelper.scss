@@ -1,0 +1,23 @@
+#targetHelper {
+  position: absolute;
+  bottom: 50px;
+  right: 10px;
+  border: 1px solid white;
+  width: 70px;
+  height: 70px;
+  border-radius: 100%;
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.7);
+
+  #targetDot {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    background: white;
+    border: 1px solid white;
+  }
+}

@@ -26,6 +26,8 @@
 
   font-family: Nasalization, sans-serif;
 
+  @import "targetHelper.scss";
+
   #bodyData {
     position: absolute;
     bottom: 0;
