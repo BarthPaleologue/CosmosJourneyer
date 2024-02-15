@@ -50,8 +50,8 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             depthModifier: 0.0015,
             alphaModifier: 0.0025,
             specularPower: 1.0,
-            smoothness: 0.9,
-            waveBlendingSharpness: 0.1,
+            smoothness: 0.8,
+            waveBlendingSharpness: 0.5,
             time: 0
         };
 
