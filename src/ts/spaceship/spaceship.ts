@@ -39,6 +39,7 @@ import { WarpTunnel } from "../utils/warpTunnel";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
 
 enum ShipState {
     FLYING,
@@ -72,6 +73,7 @@ export class Spaceship implements Transformable {
     };
 
     readonly warpTunnel: WarpTunnel;
+    readonly hyperSpaceTunnel: HyperSpaceTunnel;
 
     private readonly scene: Scene;
 
@@ -119,6 +121,9 @@ export class Spaceship implements Transformable {
         }
 
         this.warpTunnel = new WarpTunnel(this.getTransform(), scene);
+        this.hyperSpaceTunnel = new HyperSpaceTunnel(this.getTransform().getDirection(Axis.Z), scene);
+        this.hyperSpaceTunnel.setParent(this.getTransform());
+        this.hyperSpaceTunnel.setEnabled(false);
 
         this.scene = scene;
     }
