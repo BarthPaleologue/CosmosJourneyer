@@ -8,6 +8,7 @@
   border-radius: 100%;
   backdrop-filter: blur(10px);
   background: rgba(0, 0, 0, 0.7);
+  display: none;
 
   #targetDot {
     position: relative;
@@ -19,5 +20,10 @@
     border-radius: 100%;
     background: white;
     border: 1px solid white;
+    box-shadow: 0 0 10px white;
+
+    &.behind {
+        background: rgba(255, 255, 255, 0.1);
+    }
   }
 }
