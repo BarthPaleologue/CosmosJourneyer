@@ -50,8 +50,9 @@ import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { SystemSeed } from "../utils/systemSeed";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { View } from "../utils/view";
 
-export class StarMap {
+export class StarMap implements View {
     readonly scene: Scene;
     private readonly controls: DefaultControls;
 
@@ -537,5 +538,21 @@ export class StarMap {
 
             recyclingList.push(instance);
         });
+    }
+
+    public render() {
+        this.scene.render();
+    }
+
+    public attachControl() {
+        this.scene.attachControl();
+    }
+
+    public detachControl() {
+        this.scene.detachControl();
+    }
+
+    public getMainScene(): Scene {
+        return this.scene;
     }
 }

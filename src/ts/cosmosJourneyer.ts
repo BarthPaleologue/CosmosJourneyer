@@ -41,6 +41,7 @@ import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { ShipControls } from "./spaceship/shipControls";
 import { encodeBase64 } from "./utils/base64";
 import { UniverseCoordinates } from "./saveFile/universeCoordinates";
+import { View } from "./utils/view";
 
 enum EngineState {
     UNINITIALIZED,
@@ -53,7 +54,7 @@ enum EngineState {
  * the starmap view and the star system view. It also provides utility methods to take screenshots and record videos.
  * It also handles the pause menu.
  */
-export class CosmosJourneyer {
+export class CosmosJourneyer{
     readonly engine: Engine;
 
     readonly starSystemView: StarSystemView;
@@ -62,7 +63,7 @@ export class CosmosJourneyer {
     readonly mainMenu: MainMenu;
     readonly pauseMenu: PauseMenu;
 
-    private activeScene: Scene;
+    private activeView: View;
 
     private state = EngineState.UNINITIALIZED;
 
@@ -88,7 +89,7 @@ export class CosmosJourneyer {
         // Init the active scene
         this.starMap.scene.detachControl();
         this.starSystemView.scene.attachControl();
-        this.activeScene = this.starSystemView.scene;
+        this.activeView = this.starSystemView;
 
         this.mainMenu = new MainMenu(starSystemView);
         this.mainMenu.onStartObservable.add(() => {
@@ -209,7 +210,7 @@ export class CosmosJourneyer {
 
         this.engine.runRenderLoop(() => {
             if (this.isPaused()) return;
-            this.getActiveScene().render();
+            this.activeView.render();
         });
         this.state = EngineState.RUNNING;
     }
@@ -218,28 +219,20 @@ export class CosmosJourneyer {
      * Toggles the star map
      */
     public toggleStarMap(): void {
-        if (this.activeScene === this.starSystemView.scene) {
+        if (this.activeView === this.starSystemView) {
             this.starSystemView.unZoom(() => {
-                this.activeScene.detachControl();
+                this.activeView.detachControl();
                 this.starMap.scene.attachControl();
                 const starMap = this.starMap;
-                this.activeScene = starMap.scene;
+                this.activeView = starMap;
                 starMap.focusOnCurrentSystem();
             });
         } else {
-            this.activeScene.detachControl();
+            this.activeView.detachControl();
             this.starSystemView.scene.attachControl();
-            this.activeScene = this.starSystemView.scene;
+            this.activeView = this.starSystemView;
             this.starSystemView.showUI();
         }
-    }
-
-    /**
-     * Returns the active scene (star system or star map)
-     * @returns the active scene (star system or star map)
-     */
-    public getActiveScene(): Scene {
-        return this.activeScene;
     }
 
     /**
@@ -247,7 +240,7 @@ export class CosmosJourneyer {
      * @param precision The resolution multiplier of the screenshot
      */
     public takeScreenshot(precision = 4): void {
-        const camera = this.getActiveScene().activeCamera;
+        const camera = this.activeView.getMainScene().activeCamera;
         if (camera === null) throw new Error("Cannot take screenshot: camera is null");
         Tools.CreateScreenshot(this.engine, camera, { precision: precision });
     }

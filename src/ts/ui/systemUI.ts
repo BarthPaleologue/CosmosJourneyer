@@ -20,15 +20,26 @@ import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture
 import { ObjectOverlay } from "./objectOverlay";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { OrbitalObject } from "../architecture/orbitalObject";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class SystemUI {
+    readonly scene: Scene;
+    readonly camera: FreeCamera;
     readonly gui: AdvancedDynamicTexture;
     private objectOverlays: ObjectOverlay[] = [];
 
     private target: OrbitalObject | null = null;
 
-    constructor(scene: Scene) {
-        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, scene);
+    constructor(engine: Engine) {
+        this.scene = new Scene(engine);
+        this.scene.useRightHandedSystem = true;
+        this.scene.autoClear = false;
+
+        this.camera = new FreeCamera("UiCamera", Vector3.Zero(), this.scene);
+
+        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, this.scene);
     }
 
     public setEnabled(enabled: boolean) {
@@ -67,11 +78,19 @@ export class SystemUI {
         }
     }
 
-    setTarget(object: OrbitalObject | null) {
+    public setTarget(object: OrbitalObject | null) {
         if (this.target === object) {
             this.target = null;
             return;
         }
         this.target = object;
+    }
+
+    public syncCamera(camera: Camera) {
+        this.camera.position = camera.globalPosition;
+        this.camera.rotationQuaternion = camera.absoluteRotation;
+        this.camera.fov = camera.fov;
+        this.camera.minZ = camera.minZ;
+        this.camera.maxZ = camera.maxZ;
     }
 }

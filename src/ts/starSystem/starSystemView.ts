@@ -48,8 +48,9 @@ import { Assets } from "../assets";
 import { getRotationQuaternion, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+import { View } from "../utils/view";
 
-export class StarSystemView {
+export class StarSystemView implements View {
     private readonly helmetOverlay: HelmetOverlay;
     readonly bodyEditor: BodyEditor;
     readonly scene: UberScene;
@@ -106,7 +107,7 @@ export class StarSystemView {
             if (e.key === "t") {
                 const closestObjectToCenter = this.getStarSystem().getClosestToScreenCenterOrbitalObject();
                 this.ui.setTarget(closestObjectToCenter);
-                if(closestObjectToCenter !== null) this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
+                if (closestObjectToCenter !== null) this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
                 else {
                     this.helmetOverlay.setTarget(null);
                 }
@@ -147,7 +148,7 @@ export class StarSystemView {
         this.bodyEditor.resize();
         this.helmetOverlay.setVisibility(false);
 
-        this.ui = new SystemUI(this.scene);
+        this.ui = new SystemUI(engine);
     }
 
     initStarSystem() {
@@ -358,5 +359,26 @@ export class StarSystemView {
                 (activeControls as ShipControls).thirdPersonCamera.radius = 30;
             });
         });
+    }
+
+    public render() {
+        this.scene.render();
+
+        this.ui.syncCamera(this.scene.getActiveCamera());
+        this.ui.scene.render();
+    }
+
+    public attachControl() {
+        this.scene.attachControl();
+        this.ui.scene.attachControl();
+    }
+
+    public detachControl() {
+        this.scene.detachControl();
+        this.ui.scene.detachControl();
+    }
+
+    public getMainScene() {
+        return this.scene;
     }
 }
