@@ -125,7 +125,7 @@ export class StarMap implements View {
 
         this.controls.addInput(new Keyboard());
 
-        this.starMapUI = new StarMapUI(this.scene);
+        this.starMapUI = new StarMapUI(engine);
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
             this.currentSystemSeed = this.selectedSystemSeed;
@@ -542,14 +542,18 @@ export class StarMap implements View {
 
     public render() {
         this.scene.render();
+        this.starMapUI.syncCamera(this.controls.getActiveCamera());
+        this.starMapUI.scene.render();
     }
 
     public attachControl() {
         this.scene.attachControl();
+        this.starMapUI.scene.attachControl();
     }
 
     public detachControl() {
         this.scene.detachControl();
+        this.starMapUI.scene.detachControl();
     }
 
     public getMainScene(): Scene {

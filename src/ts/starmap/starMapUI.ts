@@ -29,6 +29,9 @@ import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Settings } from "../settings";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;
@@ -42,12 +45,18 @@ export class StarMapUI {
     readonly currentSystemRing: Image;
 
     readonly scene: Scene;
+    readonly uiCamera: FreeCamera;
 
     static ALPHA_ANIMATION = new Animation("alphaAnimation", "alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
-    constructor(scene: Scene) {
-        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("StarMapUI", true, scene);
-        this.scene = scene;
+    constructor(engine: Engine) {
+        this.scene = new Scene(engine);
+        this.scene.useRightHandedSystem = true;
+        this.scene.autoClear = false;
+
+        this.uiCamera = new FreeCamera("UiCamera", Vector3.Zero(), this.scene);
+
+        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("StarMapUI", true, this.scene);
 
         this.systemUI = new StackPanel();
         this.systemUI.width = "300px";
@@ -180,5 +189,13 @@ export class StarMapUI {
     setSelectedSystem({ name, text }: { name: string; text: string }) {
         this.namePlate.text = name;
         this.descriptionPanel.text = text;
+    }
+
+    public syncCamera(camera: Camera) {
+        this.uiCamera.position = camera.globalPosition;
+        this.uiCamera.rotationQuaternion = camera.absoluteRotation;
+        this.uiCamera.fov = camera.fov;
+        this.uiCamera.minZ = camera.minZ;
+        this.uiCamera.maxZ = camera.maxZ;
     }
 }
