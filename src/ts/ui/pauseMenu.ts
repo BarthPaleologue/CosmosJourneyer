@@ -17,6 +17,7 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 import pauseMenuHTML from "../../html/pauseMenu.html";
+import { Assets } from "../assets";
 
 export class PauseMenu {
     private readonly rootNode: HTMLElement;
@@ -48,6 +49,18 @@ export class PauseMenu {
 
         this.resumeButton = document.getElementById("resumeButton") as HTMLElement;
         this.resumeButton.addEventListener("click", () => this.onResume.notifyObservers());
+
+        document.querySelectorAll("#pauseMenu li").forEach((li) => {
+            // play a sound when hovering over a button
+            li.addEventListener("mouseenter", () => {
+                Assets.MENU_HOVER_SOUND.play();
+            });
+
+            // play a sound when clicking on a button
+            li.addEventListener("click", () => {
+                Assets.MENU_SELECT_SOUND.play();
+            });
+        });
 
         this.setVisibility(false);
     }

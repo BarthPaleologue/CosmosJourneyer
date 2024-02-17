@@ -41,6 +41,7 @@ import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { ShipControls } from "./spaceship/shipControls";
 import { encodeBase64 } from "./utils/base64";
 import { UniverseCoordinates } from "./saveFile/universeCoordinates";
+import { Assets } from "./assets";
 
 enum EngineState {
     UNINITIALIZED,
@@ -188,11 +189,13 @@ export class CosmosJourneyer {
 
     public pause(): void {
         this.state = EngineState.PAUSED;
+        Assets.OPEN_PAUSE_MENU_SOUND.play();
         this.pauseMenu.setVisibility(true);
     }
 
     public resume(): void {
         this.state = EngineState.RUNNING;
+        Assets.MENU_SELECT_SOUND.play();
         this.pauseMenu.setVisibility(false);
     }
 

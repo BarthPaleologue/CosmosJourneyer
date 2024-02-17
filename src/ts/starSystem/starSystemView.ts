@@ -105,11 +105,18 @@ export class StarSystemView {
 
             if (e.key === "t") {
                 const closestObjectToCenter = this.getStarSystem().getClosestToScreenCenterOrbitalObject();
-                this.ui.setTarget(closestObjectToCenter);
-                if(closestObjectToCenter !== null) this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
-                else {
+                if (this.ui.getTarget() === closestObjectToCenter) {
                     this.helmetOverlay.setTarget(null);
+                    this.ui.setTarget(null);
+                    Assets.TARGET_UNLOCK_SOUND.play();
+                    return;
                 }
+
+                if (closestObjectToCenter === null) return;
+
+                this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
+                this.ui.setTarget(closestObjectToCenter);
+                Assets.TARGET_LOCK_SOUND.play();
             }
 
             if (e.key === "g") {

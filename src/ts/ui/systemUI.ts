@@ -74,4 +74,8 @@ export class SystemUI {
         }
         this.target = object;
     }
+
+    getTarget() {
+        return this.target;
+    }
 }

@@ -124,6 +124,9 @@ export class Assets {
     public static ENGINE_RUNNING_SOUND: Sound;
     public static MENU_HOVER_SOUND: Sound;
     public static MENU_SELECT_SOUND: Sound;
+    public static OPEN_PAUSE_MENU_SOUND: Sound;
+    public static TARGET_LOCK_SOUND: Sound;
+    public static TARGET_UNLOCK_SOUND: Sound;
 
     private static MANAGER: AssetsManager;
 
@@ -293,12 +296,36 @@ export class Assets {
         const menuHoverSoundTask = Assets.MANAGER.addBinaryFileTask("menuHoverSoundTask", menuHoverSound);
         menuHoverSoundTask.onSuccess = function (task) {
             Assets.MENU_HOVER_SOUND = new Sound("MenuHoverSound", task.data, scene);
+            Assets.MENU_HOVER_SOUND.updateOptions({
+                playbackRate: 0.5
+            });
 
             const clonedSound = Assets.MENU_HOVER_SOUND.clone();
             if(clonedSound === null) throw new Error("clonedSound is null");
             Assets.MENU_SELECT_SOUND = clonedSound;
             Assets.MENU_SELECT_SOUND.updateOptions({
+                playbackRate: 1.0
+            });
+
+            const clonedSound2 = Assets.MENU_HOVER_SOUND.clone();
+            if(clonedSound2 === null) throw new Error("clonedSound2 is null");
+            Assets.OPEN_PAUSE_MENU_SOUND = clonedSound2;
+            Assets.OPEN_PAUSE_MENU_SOUND.updateOptions({
+                playbackRate: 0.75
+            });
+
+            const clonedSound3 = Assets.MENU_HOVER_SOUND.clone();
+            if(clonedSound3 === null) throw new Error("clonedSound3 is null");
+            Assets.TARGET_LOCK_SOUND = clonedSound3;
+            Assets.TARGET_LOCK_SOUND.updateOptions({
                 playbackRate: 1.5
+            });
+
+            const clonedSound4 = Assets.MENU_HOVER_SOUND.clone();
+            if(clonedSound4 === null) throw new Error("clonedSound4 is null");
+            Assets.TARGET_UNLOCK_SOUND = clonedSound4;
+            Assets.TARGET_UNLOCK_SOUND.updateOptions({
+                playbackRate: 0.5
             });
 
             console.log("Menu hover sound loaded");
