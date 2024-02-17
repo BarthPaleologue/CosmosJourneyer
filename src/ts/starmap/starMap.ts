@@ -50,6 +50,7 @@ import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { SystemSeed } from "../utils/systemSeed";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { Assets } from "../assets";
 
 export class StarMap {
     readonly scene: Scene;
@@ -439,6 +440,8 @@ export class StarMap {
 
         initializedInstance.actionManager?.registerAction(
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
+                Assets.STAR_MAP_CLICK_SOUND.play();
+
                 let text = "";
                 if (this.currentSystemSeed !== null) {
                     const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh;

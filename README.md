@@ -59,6 +59,8 @@ Thank you to all the people who have contributed to Cosmos Journeyer!
 
 [Large Engine](https://freesound.org/people/NHumphrey/sounds/204418/) by NHumphrey
 
+[Futuristic Inspect Sound, UI, or In-Game Notification](https://freesound.org/people/MATRIXXX_/sounds/702805/) by MATRIXXX_
+
 ## Special Thanks
 
 - Martin Molli for his fearless refactoring of the messy code base in its early days

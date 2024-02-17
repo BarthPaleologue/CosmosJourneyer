@@ -56,6 +56,9 @@ import treeTexturePath from "../asset/tree/Tree.png";
 import ouchSound from "../asset/sound/ouch.mp3";
 import engineRunningSound from "../asset/sound/engineRunning.mp3";
 import menuHoverSound from "../asset/sound/166186__drminky__menu-screen-mouse-over.mp3";
+
+import targetSound from "../asset/sound/702805__matrixxx__futuristic-inspect-sound-ui-or-in-game-notification.mp3";
+
 import enableWarpDriveSound from "../asset/sound/386992__lollosound__17-distorzione.mp3";
 import disableWarpDriveSound from "../asset/sound/204418__nhumphrey__large-engine.mp3";
 
@@ -124,9 +127,13 @@ export class Assets {
 
     public static OUCH_SOUND: Sound;
     public static ENGINE_RUNNING_SOUND: Sound;
+
     public static MENU_HOVER_SOUND: Sound;
     public static MENU_SELECT_SOUND: Sound;
     public static OPEN_PAUSE_MENU_SOUND: Sound;
+
+    public static STAR_MAP_CLICK_SOUND: Sound;
+
     public static TARGET_LOCK_SOUND: Sound;
     public static TARGET_UNLOCK_SOUND: Sound;
     public static ENABLE_WARP_DRIVE_SOUND: Sound;
@@ -318,21 +325,25 @@ export class Assets {
                 playbackRate: 0.75
             });
 
-            const clonedSound3 = Assets.MENU_HOVER_SOUND.clone();
-            if(clonedSound3 === null) throw new Error("clonedSound3 is null");
-            Assets.TARGET_LOCK_SOUND = clonedSound3;
-            Assets.TARGET_LOCK_SOUND.updateOptions({
-                playbackRate: 1.5
-            });
+            console.log("Menu hover sound loaded");
+        };
 
-            const clonedSound4 = Assets.MENU_HOVER_SOUND.clone();
-            if(clonedSound4 === null) throw new Error("clonedSound4 is null");
-            Assets.TARGET_UNLOCK_SOUND = clonedSound4;
+        const targetSoundTask = Assets.MANAGER.addBinaryFileTask("targetSoundTask", targetSound);
+        targetSoundTask.onSuccess = function (task) {
+            Assets.TARGET_LOCK_SOUND = new Sound("StarMapClickSound", task.data, scene);
+
+            const clonedSound = Assets.TARGET_LOCK_SOUND.clone();
+            if(clonedSound === null) throw new Error("clonedSound is null");
+            Assets.TARGET_UNLOCK_SOUND = clonedSound;
             Assets.TARGET_UNLOCK_SOUND.updateOptions({
                 playbackRate: 0.5
             });
 
-            console.log("Menu hover sound loaded");
+            const clonedSound2 = Assets.TARGET_LOCK_SOUND.clone();
+            if(clonedSound2 === null) throw new Error("clonedSound2 is null");
+            Assets.STAR_MAP_CLICK_SOUND = clonedSound2;
+
+            console.log("Target sound loaded");
         };
 
         const enableWarpDriveSoundTask = Assets.MANAGER.addBinaryFileTask("enableWarpDriveSoundTask", enableWarpDriveSound);
