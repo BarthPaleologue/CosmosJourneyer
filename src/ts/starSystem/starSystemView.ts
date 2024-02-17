@@ -94,7 +94,10 @@ export class StarSystemView {
 
         document.addEventListener("keydown", (e) => {
             if (e.key === "o") {
-                this.ui.setEnabled(!this.ui.isEnabled());
+                const enabled = !this.ui.isEnabled()
+                if(enabled) Assets.MENU_HOVER_SOUND.play();
+                else Assets.MENU_HOVER_SOUND.play();
+                this.ui.setEnabled(enabled);
             }
             if (e.key === "n") {
                 this.orbitRenderer.setVisibility(!this.orbitRenderer.isVisible());

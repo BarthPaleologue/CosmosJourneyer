@@ -20,6 +20,7 @@ import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture
 import { ObjectOverlay } from "./objectOverlay";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { OrbitalObject } from "../architecture/orbitalObject";
+import { Assets } from "../assets";
 
 export class SystemUI {
     readonly gui: AdvancedDynamicTexture;
