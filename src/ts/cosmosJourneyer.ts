@@ -189,6 +189,9 @@ export class CosmosJourneyer {
 
     public pause(): void {
         this.state = EngineState.PAUSED;
+
+        if(this.activeScene === this.starSystemView.scene) this.starSystemView.stopBackgroundSounds();
+
         Assets.OPEN_PAUSE_MENU_SOUND.play();
         this.pauseMenu.setVisibility(true);
     }
@@ -223,6 +226,8 @@ export class CosmosJourneyer {
     public toggleStarMap(): void {
         if (this.activeScene === this.starSystemView.scene) {
             this.starSystemView.unZoom(() => {
+                this.starSystemView.stopBackgroundSounds();
+
                 this.activeScene.detachControl();
                 this.starMap.scene.attachControl();
                 const starMap = this.starMap;

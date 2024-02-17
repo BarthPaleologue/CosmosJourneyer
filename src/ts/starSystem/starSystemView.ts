@@ -48,6 +48,7 @@ import { Assets } from "../assets";
 import { getRotationQuaternion, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+import { Sound } from "@babylonjs/core/Audio/sound";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
@@ -70,6 +71,8 @@ export class StarSystemView {
     private starSystem: StarSystemController | null = null;
 
     private readonly chunkForge: ChunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
+
+    private backgroundSounds: Sound[] = [];
 
     readonly onInitStarSystem = new Observable<void>();
 
@@ -218,6 +221,8 @@ export class StarSystemView {
         this.characterControls.addInput(gamepad);
 
         this.scene.setActiveController(this.spaceshipControls);
+
+        this.backgroundSounds = [Assets.ACCELERATING_WARP_DRIVE_SOUND, Assets.DECELERATING_WARP_DRIVE_SOUND];
     }
 
     /**
@@ -319,6 +324,12 @@ export class StarSystemView {
         this.scene.setActiveController(defaultControls);
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
         this.getStarSystem().postProcessManager.rebuild();
+    }
+
+    stopBackgroundSounds() {
+        for (const sound of this.backgroundSounds) {
+            sound.stop();
+        }
     }
 
     /**

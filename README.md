@@ -61,6 +61,8 @@ Thank you to all the people who have contributed to Cosmos Journeyer!
 
 [Futuristic Inspect Sound, UI, or In-Game Notification](https://freesound.org/people/MATRIXXX_/sounds/702805/) by MATRIXXX_
 
+[endless acceleration](https://freesound.org/people/Timbre/sounds/539503/) by Timbre
+
 ## Special Thanks
 
 - Martin Molli for his fearless refactoring of the messy code base in its early days

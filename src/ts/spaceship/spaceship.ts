@@ -327,8 +327,19 @@ export class Spaceship implements Transformable {
                 const gravityDir = this.closestWalkableObject.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
                 this.aggregate.body.applyForce(gravityDir.scale(9.8), this.aggregate.body.getObjectCenterWorld());
             }
+
+            if (Assets.ACCELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.ACCELERATING_WARP_DRIVE_SOUND.stop();
+            if (Assets.DECELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.DECELERATING_WARP_DRIVE_SOUND.stop();
         } else {
             translate(this.getTransform(), warpSpeed.scale(deltaTime));
+
+            if (currentForwardSpeed < this.warpDrive.getWarpSpeed()) {
+                if (!Assets.ACCELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.ACCELERATING_WARP_DRIVE_SOUND.play();
+                if (Assets.DECELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.DECELERATING_WARP_DRIVE_SOUND.stop();
+            } else {
+                if (!Assets.DECELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.DECELERATING_WARP_DRIVE_SOUND.play();
+                if (Assets.ACCELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.ACCELERATING_WARP_DRIVE_SOUND.stop();
+            }
         }
 
         if (this.flightAssistEnabled) {

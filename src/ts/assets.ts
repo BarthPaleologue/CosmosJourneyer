@@ -62,6 +62,9 @@ import targetSound from "../asset/sound/702805__matrixxx__futuristic-inspect-sou
 import enableWarpDriveSound from "../asset/sound/386992__lollosound__17-distorzione.mp3";
 import disableWarpDriveSound from "../asset/sound/204418__nhumphrey__large-engine.mp3";
 
+import acceleratingWarpDriveSound from "../asset/sound/539503__timbre__endless-acceleration.mp3";
+import deceleratingWarpDriveSound from "../asset/sound/539503__timbre_endless-deceleration.mp3";
+
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { AssetsManager, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
@@ -136,8 +139,12 @@ export class Assets {
 
     public static TARGET_LOCK_SOUND: Sound;
     public static TARGET_UNLOCK_SOUND: Sound;
+
     public static ENABLE_WARP_DRIVE_SOUND: Sound;
     public static DISABLE_WARP_DRIVE_SOUND: Sound;
+
+    public static ACCELERATING_WARP_DRIVE_SOUND: Sound;
+    public static DECELERATING_WARP_DRIVE_SOUND: Sound;
 
     private static MANAGER: AssetsManager;
 
@@ -361,6 +368,28 @@ export class Assets {
             Assets.DISABLE_WARP_DRIVE_SOUND = new Sound("DisableWarpDriveSound", task.data, scene);
 
             console.log("Disable warp drive sound loaded");
+        };
+
+        const acceleratingWarpDriveSoundTask = Assets.MANAGER.addBinaryFileTask("acceleratingWarpDriveSoundTask", acceleratingWarpDriveSound);
+        acceleratingWarpDriveSoundTask.onSuccess = function (task) {
+            Assets.ACCELERATING_WARP_DRIVE_SOUND = new Sound("AcceleratingWarpDriveSound", task.data, scene);
+            Assets.ACCELERATING_WARP_DRIVE_SOUND.updateOptions({
+                playbackRate: 1.0,
+                volume: 0.005
+            });
+
+            console.log("Accelerating warp drive sound loaded");
+        };
+
+        const deceleratingWarpDriveSoundTask = Assets.MANAGER.addBinaryFileTask("deceleratingWarpDriveSoundTask", deceleratingWarpDriveSound);
+        deceleratingWarpDriveSoundTask.onSuccess = function (task) {
+            Assets.DECELERATING_WARP_DRIVE_SOUND = new Sound("DeceleratingWarpDriveSound", task.data, scene);
+            Assets.DECELERATING_WARP_DRIVE_SOUND.updateOptions({
+                playbackRate: 1.0,
+                volume: 0.005
+            });
+
+            console.log("Decelerating warp drive sound loaded");
         };
 
         Assets.MANAGER.onProgress = (remainingCount, totalCount) => {
