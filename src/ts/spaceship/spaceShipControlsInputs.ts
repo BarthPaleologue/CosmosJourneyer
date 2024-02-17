@@ -45,9 +45,18 @@ const rollPitch = new Action({
             pointerX = pointerX * 2 - 1;
             pointerY = pointerY * 2 - 1;
 
-            // dead area and logarithmic scale
-            pointerX = Math.sign(pointerX) * Math.max(0, Math.log(0.9 + Math.abs(pointerX)));
-            pointerY = Math.sign(pointerY) * Math.max(0, Math.log(0.9 + Math.abs(pointerY)));
+            // dead zone
+            const deadZone = 0.1;
+            if (Math.abs(pointerX) < deadZone) {
+                pointerX = 0;
+            }
+            if (Math.abs(pointerY) < deadZone) {
+                pointerY = 0;
+            }
+
+            // logarithmic scale
+            pointerX = Math.sign(pointerX) * Math.log(1 + Math.abs(pointerX));
+            pointerY = Math.sign(pointerY) * Math.log(1 + Math.abs(pointerY));
 
             return [pointerX, pointerY];
         }
@@ -55,9 +64,7 @@ const rollPitch = new Action({
 });
 
 const toggleFlightAssist = new Action({
-    bindings: [{
-        control: keyboard.getControl("KeyF"),
-    }]
+    bindings: [keyboard.getControl("KeyF")]
 });
 
 const toggleFlightAssistInteraction = new PressInteraction(toggleFlightAssist);
