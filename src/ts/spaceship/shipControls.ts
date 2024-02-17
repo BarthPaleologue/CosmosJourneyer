@@ -69,35 +69,17 @@ export class ShipControls implements Controls {
     public update(deltaTime: number): Vector3 {
         this.spaceship.update(deltaTime);
 
-        // pointer position
-        let [pointerX, pointerY] = SpaceShipControlsInputs.pointerPosition.value;
-
-        // to range [0, 1]
-        pointerX /= window.innerWidth;
-        pointerY /= window.innerHeight;
-
-        // to range [-1, 1]
-        pointerX = pointerX * 2 - 1;
-        pointerY = pointerY * 2 - 1;
-
-        // dead area and logarithmic scale
-        pointerX = Math.sign(pointerX) * Math.max(0, Math.log(0.9 + Math.abs(pointerX)));
-        pointerY = Math.sign(pointerY) * Math.max(0, Math.log(0.9 + Math.abs(pointerY)));
-
-        /*if(SpaceShipControlsInputs.toggleFlightAssist.state === "complete") {
-            console.log("!");
-            this.spaceship.setFlightAssistEnabled(!this.spaceship.getFlightAssistEnabled());
-        }*/
+        const [inputRoll, inputPitch] = SpaceShipControlsInputs.rollPitch.value;
 
         if (this.spaceship.getWarpDrive().isDisabled()) {
             for (const thruster of this.spaceship.mainThrusters) {
                 thruster.updateThrottle(2 * deltaTime * SpaceShipControlsInputs.throttle.value * thruster.getAuthority01(LocalDirection.FORWARD));
                 thruster.updateThrottle(2 * deltaTime * -SpaceShipControlsInputs.throttle.value * thruster.getAuthority01(LocalDirection.BACKWARD));
 
-                /*thruster.updateThrottle(2 * deltaTime * input.getYAxis() * thruster.getAuthority01(LocalDirection.UP));
-                thruster.updateThrottle(2 * deltaTime * -input.getYAxis() * thruster.getAuthority01(LocalDirection.DOWN));
+                thruster.updateThrottle(2 * deltaTime * SpaceShipControlsInputs.upDown.value * thruster.getAuthority01(LocalDirection.UP));
+                thruster.updateThrottle(2 * deltaTime * -SpaceShipControlsInputs.upDown.value * thruster.getAuthority01(LocalDirection.DOWN));
 
-                thruster.updateThrottle(2 * deltaTime * input.getXAxis() * thruster.getAuthority01(LocalDirection.LEFT));
+                /*thruster.updateThrottle(2 * deltaTime * input.getXAxis() * thruster.getAuthority01(LocalDirection.LEFT));
                 thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LocalDirection.RIGHT));*/
             }
 
@@ -116,17 +98,17 @@ export class ShipControls implements Controls {
                 let throttle = 0;
 
                 // rcs rotation contribution
-                if (pointerX < 0 && rcsThruster.getRollAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(pointerX));
-                else if (pointerX > 0 && rcsThruster.getRollAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(pointerX));
+                if (inputRoll < 0 && rcsThruster.getRollAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(inputRoll));
+                else if (inputRoll > 0 && rcsThruster.getRollAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(inputRoll));
 
-                if (pointerY < 0 && rcsThruster.getPitchAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(pointerY));
-                else if (pointerY > 0 && rcsThruster.getPitchAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(pointerY));
+                if (inputPitch < 0 && rcsThruster.getPitchAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(inputPitch));
+                else if (inputPitch > 0 && rcsThruster.getPitchAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(inputPitch));
 
                 rcsThruster.setThrottle(throttle);
             }
         } else {
-            roll(this.getTransform(), pointerX * deltaTime);
-            pitch(this.getTransform(), pointerY * deltaTime);
+            roll(this.getTransform(), inputRoll * deltaTime);
+            pitch(this.getTransform(), inputPitch * deltaTime);
 
             this.spaceship.getWarpDrive().increaseTargetThrottle(deltaTime * SpaceShipControlsInputs.throttle.value);
         }

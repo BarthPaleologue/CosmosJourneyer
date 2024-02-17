@@ -31,12 +31,33 @@ const throttleAction = new Action({
     bindings: [throttle]
 });
 
-const pointerPosition = new Action({
-    bindings: [pointer.getControl("position")]
+const rollPitch = new Action({
+    bindings: [pointer.getControl("position")],
+    processors: [
+        (value: [number, number]): [number, number] => {
+            let [pointerX, pointerY] = value;
+
+            // to range [0, 1]
+            pointerX /= window.innerWidth;
+            pointerY /= window.innerHeight;
+
+            // to range [-1, 1]
+            pointerX = pointerX * 2 - 1;
+            pointerY = pointerY * 2 - 1;
+
+            // dead area and logarithmic scale
+            pointerX = Math.sign(pointerX) * Math.max(0, Math.log(0.9 + Math.abs(pointerX)));
+            pointerY = Math.sign(pointerY) * Math.max(0, Math.log(0.9 + Math.abs(pointerY)));
+
+            return [pointerX, pointerY];
+        }
+    ]
 });
 
 const toggleFlightAssist = new Action({
-    bindings: [keyboard.getControl("KeyF")]
+    bindings: [{
+        control: keyboard.getControl("KeyF"),
+    }]
 });
 
 const toggleFlightAssistInteraction = new PressInteraction(toggleFlightAssist);
@@ -51,7 +72,7 @@ export const SpaceShipControlsInputs = {
     landing: landingInteraction,
     upDown: upDownAction,
     throttle: throttleAction,
-    pointerPosition: pointerPosition,
+    rollPitch: rollPitch,
     toggleFlightAssist: toggleFlightAssistInteraction,
     toggleWarpDrive: toggleWarpDriveInteraction
 };
