@@ -116,16 +116,16 @@ export class CharacterControls implements Controls {
         this.character = Assets.CreateCharacterInstance();
         setRotationQuaternion(this.character, Quaternion.Identity());
 
-        const walkAnim = scene.getAnimationGroupByName("Walking");
-        if (walkAnim === null) throw new Error("'Walking' animation not found");
+        const walkAnim = scene.getAnimationGroupByName("WalkingForward");
+        if (walkAnim === null) throw new Error("'WalkingForward' animation not found");
 
         const walkBackAnim = scene.getAnimationGroupByName("WalkingBackwards");
         if (walkBackAnim === null) throw new Error("'WalkingBackwards' animation not found");
 
-        const idleAnim = scene.getAnimationGroupByName("Idle");
-        if (idleAnim === null) throw new Error("'Idle' animation not found");
+        const idleAnim = scene.getAnimationGroupByName("WalkingIdle");
+        if (idleAnim === null) throw new Error("'WalkingIdle' animation not found");
 
-        const sambaAnim = scene.getAnimationGroupByName("SambaDancing");
+        const sambaAnim = scene.getAnimationGroupByName("Samba");
         if (sambaAnim === null) throw new Error("'Samba' animation not found");
 
         const runningAnim = scene.getAnimationGroupByName("Running");
@@ -134,8 +134,8 @@ export class CharacterControls implements Controls {
         const fallingIdleAnim = scene.getAnimationGroupByName("FallingIdle");
         if (fallingIdleAnim === null) throw new Error("'FallingIdle' animation not found");
 
-        const skyDivingAnim = scene.getAnimationGroupByName("Skydiving");
-        if (skyDivingAnim === null) throw new Error("'Skydiving' animation not found");
+        const skyDivingAnim = scene.getAnimationGroupByName("SkyDiving");
+        if (skyDivingAnim === null) throw new Error("'SkyDiving' animation not found");
 
         const swimmingIdleAnim = scene.getAnimationGroupByName("SwimmingIdle");
         if (swimmingIdleAnim === null) throw new Error("'SwimmingIdle' animation not found");
@@ -153,7 +153,6 @@ export class CharacterControls implements Controls {
         this.runningAnim = new AnimationGroupWrapper("running", runningAnim, 0, true);
         this.fallingIdleAnim = new AnimationGroupWrapper("fallingIdle", fallingIdleAnim, 0, true);
         this.skyDivingAnim = new AnimationGroupWrapper("skydiving", skyDivingAnim, 0, true);
-        this.skyDivingAnim.group.speedRatio = 1.5;
         this.swimmingIdleAnim = new AnimationGroupWrapper("swimming", swimmingIdleAnim, 0, true);
         this.swimmingForwardAnim = new AnimationGroupWrapper("swimmingForward", swimmingForwardAnim, 0, true);
         this.jumpingAnim = new AnimationGroupWrapper("jumping", jumpingAnim, 0, false);
@@ -262,11 +261,22 @@ export class CharacterControls implements Controls {
 
             // Rotation
             if ((keyboard.isPressed("q") || keyboard.isPressed("a")) && (isMoving)) {
-                this.character.rotate(Vector3.Up(), this.characterRotationSpeed * deltaTime);
-                this.thirdPersonCamera.alpha += this.characterRotationSpeed * deltaTime;
+                const dtheta = this.characterRotationSpeed * deltaTime;
+                this.character.rotate(Vector3.Up(), dtheta);
+                this.thirdPersonCamera.alpha += dtheta;
+
+                const cameraPosition = this.thirdPersonCamera.target;
+                cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), -dtheta));
+                this.thirdPersonCamera.target = cameraPosition;
+
             } else if (keyboard.isPressed("d") && (isMoving)) {
-                this.character.rotate(Vector3.Up(), -this.characterRotationSpeed * deltaTime);
-                this.thirdPersonCamera.alpha -= this.characterRotationSpeed * deltaTime;
+                const dtheta = this.characterRotationSpeed * deltaTime;
+                this.character.rotate(Vector3.Up(), -dtheta);
+                this.thirdPersonCamera.alpha -= dtheta;
+
+                const cameraPosition = this.thirdPersonCamera.target;
+                cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), dtheta));
+                this.thirdPersonCamera.target = cameraPosition;
             }
 
             let weightSum = 0;

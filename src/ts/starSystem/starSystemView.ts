@@ -104,7 +104,12 @@ export class StarSystemView {
             if (e.key === "b") this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
 
             if (e.key === "t") {
-                this.ui.setTarget(this.getStarSystem().getClosestToScreenCenterOrbitalObject());
+                const closestObjectToCenter = this.getStarSystem().getClosestToScreenCenterOrbitalObject();
+                this.ui.setTarget(closestObjectToCenter);
+                if(closestObjectToCenter !== null) this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
+                else {
+                    this.helmetOverlay.setTarget(null);
+                }
             }
 
             if (e.key === "g") {
@@ -244,7 +249,7 @@ export class StarSystemView {
 
         this.bodyEditor.update(nearestCelestialBody, starSystem.postProcessManager, this.scene);
 
-        this.helmetOverlay.update(nearestOrbitalObject);
+        this.helmetOverlay.update(nearestOrbitalObject, this.scene.getActiveController().getTransform());
 
         this.orbitRenderer.update();
     }

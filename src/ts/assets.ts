@@ -46,7 +46,7 @@ import spaceship from "../asset/spaceship/spaceship2.glb";
 import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
 import endeavorSpaceship from "../asset/spaceship/endeavour.glb";
-import character from "../asset/character.glb";
+import character from "../asset/character/character.glb";
 import rock from "../asset/rock.glb";
 import landingPad from "../asset/landingpad.glb";
 

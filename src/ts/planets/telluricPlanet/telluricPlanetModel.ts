@@ -99,7 +99,7 @@ export class TelluricPlanetModel implements PlanetModel {
         if (this.isSatelliteOfGas || this.isSatelliteOfTelluric) {
             const minRadius = this.parentBody?.radius ?? 0;
             orbitRadius = minRadius * clamp(normalRandom(2.0, 0.3, this.rng, GenerationSteps.ORBIT), 1.2, 3.0);
-            orbitRadius += this.radius * clamp(normalRandom(2, 1, this.rng, GenerationSteps.ORBIT), 1, 20);
+            orbitRadius += minRadius * clamp(normalRandom(10, 4, this.rng, GenerationSteps.ORBIT), 1, 50);
             orbitRadius += 2.0 * Math.max(0, minRadius - getPeriapsis(orbitRadius, orbitalP));
         } else if (parentBody) orbitRadius += parentBody.radius * 1.5;
 
@@ -110,6 +110,11 @@ export class TelluricPlanetModel implements PlanetModel {
             normalToPlane: orbitalPlaneNormal,
             isPlaneAlignedWithParent: isOrbitalPlaneAlignedWithParent
         };
+
+        if(this.isSatelliteOfTelluric || this.isSatelliteOfGas) {
+            // Tidal locking for moons
+            this.physicalProperties.rotationPeriod = this.orbit.period;
+        }
 
         if (this.isSatelliteOfTelluric) {
             this.physicalProperties.pressure = Math.max(normalRandom(0.01, 0.01, this.rng, GenerationSteps.PRESSURE), 0);

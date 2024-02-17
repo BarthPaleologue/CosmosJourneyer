@@ -18,10 +18,17 @@
 import overlayHTML from "../../html/helmetOverlay.html";
 import { OrbitalObject } from "../architecture/orbitalObject";
 import { parseSpeed } from "../utils/parseToStrings";
+import { TransformNode } from "@babylonjs/core/Meshes";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix } from "@babylonjs/core/Maths/math";
 
 export class HelmetOverlay {
     private parentNode: HTMLElement;
     private bodyNamePlate: HTMLElement;
+
+    private targetHelper: HTMLElement;
+    private targetDot: HTMLElement;
+    private currentTarget: TransformNode | null = null;
 
     constructor() {
         if (document.querySelector("#helmetOverlay") === null) {
@@ -29,6 +36,9 @@ export class HelmetOverlay {
         }
         this.parentNode = document.getElementById("helmetOverlay") as HTMLElement;
         this.bodyNamePlate = document.getElementById("bodyName") as HTMLElement;
+
+        this.targetHelper = document.getElementById("targetHelper") as HTMLElement;
+        this.targetDot = document.getElementById("targetDot") as HTMLElement;
     }
 
     public setVisibility(visible: boolean) {
@@ -39,8 +49,35 @@ export class HelmetOverlay {
         return this.parentNode.style.visibility === "visible";
     }
 
-    public update(currentBody: OrbitalObject) {
+    public setTarget(target: TransformNode | null) {
+        if (target === null || this.currentTarget === target) {
+            this.targetHelper.style.display = "none";
+        } else {
+            this.targetHelper.style.display = "block";
+        }
+
+        if(this.currentTarget === target) {
+            this.currentTarget = null;
+            return;
+        }
+
+        this.currentTarget = target;
+    }
+
+    public update(currentBody: OrbitalObject, currentControls: TransformNode) {
         this.bodyNamePlate.innerText = currentBody.name;
+
+        if (this.currentTarget !== null) {
+            const directionWorld = this.currentTarget.getAbsolutePosition().subtract(currentControls.getAbsolutePosition()).normalize();
+            const directionLocal = Vector3.TransformNormal(directionWorld, Matrix.Invert(currentControls.getWorldMatrix()));
+
+            // set class of targetDot based on sign of directionLocal.z
+            this.targetDot.className = directionLocal.z > 0 ? "targetDot" : "targetDot behind";
+
+            // set top and left of targetDot based on direction2D (use %)
+            this.targetDot.style.top = `${50 - 50 * directionLocal.y}%`;
+            this.targetDot.style.left = `${50 - 50 * directionLocal.x}%`;
+        }
     }
 
     displaySpeed(shipInternalThrottle: number, shipTargetThrottle: number, speed: number) {

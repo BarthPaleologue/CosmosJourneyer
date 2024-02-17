@@ -19,8 +19,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IPatch } from "./iPatch";
-import { applyTransformationToBuffer, createSquareMatrixBuffer } from "./matrixBuffer";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { applyTransformationToBuffer } from "./matrixBuffer";
 import { Observer } from "@babylonjs/core";
 
 export class ThinInstancePatch implements IPatch {
@@ -35,11 +34,6 @@ export class ThinInstancePatch implements IPatch {
         this.parent = parent;
         this.rawMatrixBuffer = matrixBuffer;
         this.matrixBuffer = applyTransformationToBuffer(parent.computeWorldMatrix(), this.rawMatrixBuffer);
-    }
-
-    public static CreateSquare(parent: TransformNode, position: Vector3, size: number, resolution: number) {
-        const buffer = createSquareMatrixBuffer(position, size, resolution);
-        return new ThinInstancePatch(parent, buffer);
     }
 
     public clearInstances(): void {
@@ -83,11 +77,7 @@ export class ThinInstancePatch implements IPatch {
 
     public setEnabled(enabled: boolean) {
         if (this.baseMesh === null) return;
-        if (enabled) {
-            this.baseMesh.thinInstanceCount = this.matrixBuffer.length / 16;
-        } else {
-            this.baseMesh.thinInstanceCount = 0;
-        }
+        this.baseMesh.setEnabled(enabled);
     }
 
     public dispose() {
