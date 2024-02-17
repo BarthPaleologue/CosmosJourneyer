@@ -45,7 +45,6 @@ import { TransformTranslationAnimation } from "../uberCore/transforms/animations
 import { getForwardDirection, translate } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { Keyboard } from "../inputs/keyboard";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { SystemSeed } from "../utils/systemSeed";
@@ -121,8 +120,6 @@ export class StarMap {
         this.controls.getActiveCamera().minZ = 0.01;
 
         this.controls.getActiveCamera().attachControl();
-
-        this.controls.addInput(new Keyboard());
 
         this.starMapUI = new StarMapUI(this.scene);
 

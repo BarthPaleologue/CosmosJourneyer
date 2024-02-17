@@ -192,8 +192,6 @@ export class StarSystemView {
         this.defaultControls = new DefaultControls(this.scene);
         this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
         this.defaultControls.getActiveCamera().maxZ = maxZ;
-        this.defaultControls.addInput(keyboard);
-        this.defaultControls.addInput(gamepad);
 
         this.spaceshipControls = new ShipControls(this.scene);
         this.spaceshipControls.getActiveCamera().maxZ = maxZ;

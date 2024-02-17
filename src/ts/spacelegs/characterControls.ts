@@ -34,6 +34,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Transformable } from "../architecture/transformable";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { CharacterInputs } from "../input";
 
 class AnimationGroupWrapper {
     name: string;
@@ -204,6 +205,8 @@ export class CharacterControls implements Controls {
         if (input instanceof Keyboard) {
             const keyboard = input as Keyboard;
 
+            const [xMove, yMove] = CharacterInputs.move.value;
+
             if (this.walkAnim.weight > 0.0) {
                 this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaTime * this.walkAnim.weight));
             }
@@ -219,15 +222,15 @@ export class CharacterControls implements Controls {
             // Translation
             if (this.currentAnimationState === this.swimmingState) {
                 this.swimmingState.currentAnimation = this.swimmingIdleAnim;
-                if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
+                if (yMove > 0) {
                     this.swimmingState.currentAnimation = this.swimmingForwardAnim;
                     this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterSwimSpeed * deltaTime));
                 }
             } else if (this.currentAnimationState === this.groundedState) {
                 this.groundedState.currentAnimation = this.idleAnim;
-                if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
+                if (yMove > 0) {
                     this.groundedState.currentAnimation = this.walkAnim;
-                } else if (keyboard.isPressed("s")) {
+                } else if (yMove < 0) {
                     this.groundedState.currentAnimation = this.walkBackAnim;
                 } else if (keyboard.isPressed("e")) {
                     this.groundedState.currentAnimation = this.runningAnim;
@@ -246,7 +249,6 @@ export class CharacterControls implements Controls {
                     this.currentAnimationState = this.fallingState;
                     this.jumpVelocity = this.character.up.scale(10.0).add(this.character.forward.scale(-5.0));
                 }
-
             } else if (this.currentAnimationState === this.fallingState) {
                 if (this.distanceToGround < 30) {
                     this.fallingState.currentAnimation = this.fallingIdleAnim;
@@ -260,7 +262,7 @@ export class CharacterControls implements Controls {
             const isMoving = this.currentAnimationState.currentAnimation !== this.currentAnimationState.idleAnimation;
 
             // Rotation
-            if ((keyboard.isPressed("q") || keyboard.isPressed("a")) && (isMoving)) {
+            if (xMove < 0 && isMoving) {
                 const dtheta = this.characterRotationSpeed * deltaTime;
                 this.character.rotate(Vector3.Up(), dtheta);
                 this.thirdPersonCamera.alpha += dtheta;
@@ -268,8 +270,7 @@ export class CharacterControls implements Controls {
                 const cameraPosition = this.thirdPersonCamera.target;
                 cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), -dtheta));
                 this.thirdPersonCamera.target = cameraPosition;
-
-            } else if (keyboard.isPressed("d") && (isMoving)) {
+            } else if (xMove > 0 && isMoving) {
                 const dtheta = this.characterRotationSpeed * deltaTime;
                 this.character.rotate(Vector3.Up(), -dtheta);
                 this.thirdPersonCamera.alpha -= dtheta;

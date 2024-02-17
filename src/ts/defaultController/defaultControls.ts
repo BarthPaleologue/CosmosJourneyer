@@ -20,12 +20,12 @@ import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { getForwardDirection, getRightDirection, getUpwardDirection, pitch, roll, setRotationQuaternion, translate, yaw } from "../uberCore/transforms/basicTransform";
-import { Input } from "../inputs/input";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { getTransformationQuaternion } from "../utils/algebra";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { LocalDirection } from "../uberCore/localDirections";
+import { DefaultControlsInput } from "./defaultControlsInput";
 
 export class DefaultControls implements Controls {
     private readonly transform: TransformNode;
@@ -33,8 +33,6 @@ export class DefaultControls implements Controls {
 
     speed = 1;
     rotationSpeed = Math.PI / 4;
-
-    private readonly inputs: Input[] = [];
 
     constructor(scene: Scene) {
         this.transform = new TransformNode("playerController", scene);
@@ -54,17 +52,10 @@ export class DefaultControls implements Controls {
         return this.transform;
     }
 
-    /**
-     * Listens to input, rotate the controller accordingly and computes equivalent displacement (the player is fixed at the origin)
-     * @param input the input to listen to
-     * @param deltaTime the time between 2 frames
-     * @returns the negative displacement of the player to apply to every other mesh given the inputs
-     * @internal
-     */
-    private listenTo(input: Input, deltaTime: number): Vector3 {
-        roll(this.transform, input.getRoll() * this.rotationSpeed * deltaTime);
-        pitch(this.transform, input.getPitch() * this.rotationSpeed * deltaTime);
-        yaw(this.transform, input.getYaw() * this.rotationSpeed * deltaTime);
+    public update(deltaTime: number): Vector3 {
+        roll(this.transform, DefaultControlsInput.roll.value * this.rotationSpeed * deltaTime);
+        pitch(this.transform, DefaultControlsInput.pitch.value * this.rotationSpeed * deltaTime);
+        yaw(this.transform, DefaultControlsInput.yaw.value * this.rotationSpeed * deltaTime);
 
         const cameraForward = this.camera.getDirection(LocalDirection.BACKWARD);
         const transformForward = getForwardDirection(this.transform);
@@ -75,38 +66,28 @@ export class DefaultControls implements Controls {
             this.camera.rotationQuaternion = Quaternion.Identity();
         }
 
+        this.speed *= 1 + DefaultControlsInput.changeSpeed.value / 20;
+
         const displacement = Vector3.Zero();
 
         const forwardDisplacement = getForwardDirection(this.transform)
-            .scale(this.speed * deltaTime)
-            .scaleInPlace(input.getZAxis());
+          .scale(this.speed * deltaTime)
+          .scaleInPlace(DefaultControlsInput.move.value[1]);
         const upwardDisplacement = getUpwardDirection(this.transform)
-            .scale(this.speed * deltaTime)
-            .scaleInPlace(input.getYAxis());
+          .scale(this.speed * deltaTime)
+          .scaleInPlace(DefaultControlsInput.upDown.value);
         const rightDisplacement = getRightDirection(this.transform)
-            .scale(this.speed * deltaTime)
-            .scaleInPlace(input.getXAxis());
+          .scale(this.speed * deltaTime)
+          .scaleInPlace(DefaultControlsInput.move.value[0]);
 
         displacement.addInPlace(forwardDisplacement);
         displacement.addInPlace(upwardDisplacement);
         displacement.addInPlace(rightDisplacement);
 
-        if (input.getAcceleration() !== 0) this.speed *= 1 + input.getAcceleration() / 10;
+        translate(this.transform, displacement);
+        this.getActiveCamera().getViewMatrix();
 
         return displacement;
-    }
-
-    public update(deltaTime: number): Vector3 {
-        const playerMovement = Vector3.Zero();
-
-        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.transform.getScene().getEngine().getDeltaTime() / 1000));
-        translate(this.transform, playerMovement);
-        this.getActiveCamera().getViewMatrix();
-        return playerMovement;
-    }
-
-    public addInput(input: Input): void {
-        this.inputs.push(input);
     }
 
     dispose() {

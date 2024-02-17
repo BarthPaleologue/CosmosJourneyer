@@ -31,6 +31,4 @@ export interface Controls extends Transformable {
      * @param deltaTime the time between 2 frames
      */
     update(deltaTime: number): Vector3;
-
-    addInput(input: Input): void;
 }
