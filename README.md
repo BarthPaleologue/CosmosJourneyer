@@ -51,6 +51,10 @@ Thank you to all the people who have contributed to Cosmos Journeyer!
 
 ![Contributors](https://contrib.rocks/image?repo=BarthPaleologue/CosmosJourneyer)
 
+## Sounds used
+
+[Menu screen mouse over](https://freesound.org/people/DrMinky/sounds/166186/) by DrMinky
+
 ## Special Thanks
 
 - Martin Molli for his fearless refactoring of the messy code base in its early days

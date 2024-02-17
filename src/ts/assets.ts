@@ -55,6 +55,7 @@ import treeTexturePath from "../asset/tree/Tree.png";
 
 import ouchSound from "../asset/sound/ouch.mp3";
 import engineRunningSound from "../asset/sound/engineRunning.mp3";
+import menuHoverSound from "../asset/sound/166186__drminky__menu-screen-mouse-over.mp3";
 
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -121,6 +122,8 @@ export class Assets {
 
     public static OUCH_SOUND: Sound;
     public static ENGINE_RUNNING_SOUND: Sound;
+    public static MENU_HOVER_SOUND: Sound;
+    public static MENU_SELECT_SOUND: Sound;
 
     private static MANAGER: AssetsManager;
 
@@ -285,6 +288,20 @@ export class Assets {
             });
 
             console.log("Engine running sound loaded");
+        };
+
+        const menuHoverSoundTask = Assets.MANAGER.addBinaryFileTask("menuHoverSoundTask", menuHoverSound);
+        menuHoverSoundTask.onSuccess = function (task) {
+            Assets.MENU_HOVER_SOUND = new Sound("MenuHoverSound", task.data, scene);
+
+            const clonedSound = Assets.MENU_HOVER_SOUND.clone();
+            if(clonedSound === null) throw new Error("clonedSound is null");
+            Assets.MENU_SELECT_SOUND = clonedSound;
+            Assets.MENU_SELECT_SOUND.updateOptions({
+                playbackRate: 1.5
+            });
+
+            console.log("Menu hover sound loaded");
         };
 
         Assets.MANAGER.onProgress = (remainingCount, totalCount) => {

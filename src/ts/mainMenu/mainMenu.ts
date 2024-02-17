@@ -14,6 +14,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { SystemSeed } from "../utils/systemSeed";
 import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import packageInfo from "../../../package.json";
+import { Assets } from "../assets";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -111,6 +112,18 @@ export class MainMenu {
         if (version === null) throw new Error("#version does not exist!");
         version.textContent = `Alpha ${packageInfo.version}`;
         this.version = version;
+
+        document.querySelectorAll("#menuItems li").forEach((li) => {
+            // on mouse hover, play a sound
+            li.addEventListener("mouseenter", () => {
+                Assets.MENU_HOVER_SOUND.play();
+            });
+
+            // on click, play a sound
+            li.addEventListener("click", () => {
+                Assets.MENU_SELECT_SOUND.play();
+            });
+        });
 
         document.getElementById("startButton")?.addEventListener("click", () => {
             this.startAnimation(() => this.onStartObservable.notifyObservers());
