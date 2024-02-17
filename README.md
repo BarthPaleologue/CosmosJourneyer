@@ -63,6 +63,8 @@ Thank you to all the people who have contributed to Cosmos Journeyer!
 
 [endless acceleration](https://freesound.org/people/Timbre/sounds/539503/) by Timbre
 
+[Wandering](https://freesound.org/people/Andrewkn/sounds/455855/) by Andrewkn
+
 ## Special Thanks
 
 - Martin Molli for his fearless refactoring of the messy code base in its early days

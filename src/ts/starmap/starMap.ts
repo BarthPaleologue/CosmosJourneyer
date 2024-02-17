@@ -510,6 +510,14 @@ export class StarMap {
         this.starMapUI.setHoveredStarSystemMesh(null);
     }
 
+    startBackgroundMusic() {
+        Assets.STAR_MAP_BACKGROUND_MUSIC.play();
+    }
+
+    stopBackgroundMusic() {
+        Assets.STAR_MAP_BACKGROUND_MUSIC.stop();
+    }
+
     public focusOnCurrentSystem(skipAnimation = false) {
         console.log("focus on current system");
         if (this.currentSystemSeed === null) return console.warn("No current system seed!");

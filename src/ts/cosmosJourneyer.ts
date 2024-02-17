@@ -227,6 +227,7 @@ export class CosmosJourneyer {
         if (this.activeScene === this.starSystemView.scene) {
             this.starSystemView.unZoom(() => {
                 this.starSystemView.stopBackgroundSounds();
+                this.starMap.startBackgroundMusic();
 
                 this.activeScene.detachControl();
                 this.starMap.scene.attachControl();
@@ -235,6 +236,7 @@ export class CosmosJourneyer {
                 starMap.focusOnCurrentSystem();
             });
         } else {
+            this.starMap.stopBackgroundMusic();
             this.activeScene.detachControl();
             this.starSystemView.scene.attachControl();
             this.activeScene = this.starSystemView.scene;

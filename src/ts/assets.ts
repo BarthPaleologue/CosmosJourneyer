@@ -65,6 +65,8 @@ import disableWarpDriveSound from "../asset/sound/204418__nhumphrey__large-engin
 import acceleratingWarpDriveSound from "../asset/sound/539503__timbre__endless-acceleration.mp3";
 import deceleratingWarpDriveSound from "../asset/sound/539503__timbre_endless-deceleration.mp3";
 
+import starMapBackgroundMusic from "../asset/sound/455855__andrewkn__wandering.mp3";
+
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { AssetsManager, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager";
@@ -145,6 +147,8 @@ export class Assets {
 
     public static ACCELERATING_WARP_DRIVE_SOUND: Sound;
     public static DECELERATING_WARP_DRIVE_SOUND: Sound;
+
+    public static STAR_MAP_BACKGROUND_MUSIC: Sound;
 
     private static MANAGER: AssetsManager;
 
@@ -390,6 +394,15 @@ export class Assets {
             });
 
             console.log("Decelerating warp drive sound loaded");
+        };
+
+        const starMapBackgroundMusicTask = Assets.MANAGER.addBinaryFileTask("starMapBackgroundMusicTask", starMapBackgroundMusic);
+        starMapBackgroundMusicTask.onSuccess = function (task) {
+            Assets.STAR_MAP_BACKGROUND_MUSIC = new Sound("StarMapBackgroundMusic", task.data, scene, null, {
+                loop: true
+            });
+
+            console.log("Star map background music loaded");
         };
 
         Assets.MANAGER.onProgress = (remainingCount, totalCount) => {
