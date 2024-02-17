@@ -55,6 +55,10 @@ Thank you to all the people who have contributed to Cosmos Journeyer!
 
 [Menu screen mouse over](https://freesound.org/people/DrMinky/sounds/166186/) by DrMinky
 
+[DISTORZIONE](https://freesound.org/people/lollosound/sounds/386992/) by lollosound
+
+[Large Engine](https://freesound.org/people/NHumphrey/sounds/204418/) by NHumphrey
+
 ## Special Thanks
 
 - Martin Molli for his fearless refactoring of the messy code base in its early days

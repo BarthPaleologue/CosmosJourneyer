@@ -56,6 +56,8 @@ import treeTexturePath from "../asset/tree/Tree.png";
 import ouchSound from "../asset/sound/ouch.mp3";
 import engineRunningSound from "../asset/sound/engineRunning.mp3";
 import menuHoverSound from "../asset/sound/166186__drminky__menu-screen-mouse-over.mp3";
+import enableWarpDriveSound from "../asset/sound/386992__lollosound__17-distorzione.mp3";
+import disableWarpDriveSound from "../asset/sound/204418__nhumphrey__large-engine.mp3";
 
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -127,6 +129,8 @@ export class Assets {
     public static OPEN_PAUSE_MENU_SOUND: Sound;
     public static TARGET_LOCK_SOUND: Sound;
     public static TARGET_UNLOCK_SOUND: Sound;
+    public static ENABLE_WARP_DRIVE_SOUND: Sound;
+    public static DISABLE_WARP_DRIVE_SOUND: Sound;
 
     private static MANAGER: AssetsManager;
 
@@ -329,6 +333,23 @@ export class Assets {
             });
 
             console.log("Menu hover sound loaded");
+        };
+
+        const enableWarpDriveSoundTask = Assets.MANAGER.addBinaryFileTask("enableWarpDriveSoundTask", enableWarpDriveSound);
+        enableWarpDriveSoundTask.onSuccess = function (task) {
+            Assets.ENABLE_WARP_DRIVE_SOUND = new Sound("EnableWarpDriveSound", task.data, scene);
+            Assets.ENABLE_WARP_DRIVE_SOUND.updateOptions({
+                playbackRate: 2
+            });
+
+            console.log("Enable warp drive sound loaded");
+        };
+
+        const disableWarpDriveSoundTask = Assets.MANAGER.addBinaryFileTask("disableWarpDriveSoundTask", disableWarpDriveSound);
+        disableWarpDriveSoundTask.onSuccess = function (task) {
+            Assets.DISABLE_WARP_DRIVE_SOUND = new Sound("DisableWarpDriveSound", task.data, scene);
+
+            console.log("Disable warp drive sound loaded");
         };
 
         Assets.MANAGER.onProgress = (remainingCount, totalCount) => {

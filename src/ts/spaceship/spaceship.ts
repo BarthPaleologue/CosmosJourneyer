@@ -79,6 +79,9 @@ export class Spaceship implements Transformable {
 
     private targetLandingPad: LandingPad | null = null;
 
+    readonly onWarpDriveEnabled = new Observable<void>();
+    readonly onWarpDriveDisabled = new Observable<void>();
+
     constructor(scene: Scene) {
         this.instanceRoot = Assets.CreateSpaceShipInstance();
         setRotationQuaternion(this.instanceRoot, Quaternion.Identity());
@@ -164,11 +167,15 @@ export class Spaceship implements Transformable {
         for (const thruster of this.rcsThrusters) thruster.deactivate();
         this.warpDrive.enable();
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
+        Assets.ENABLE_WARP_DRIVE_SOUND.play();
+        this.onWarpDriveEnabled.notifyObservers();
     }
 
     public disableWarpDrive() {
         this.warpDrive.desengage();
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
+        Assets.DISABLE_WARP_DRIVE_SOUND.play();
+        this.onWarpDriveDisabled.notifyObservers();
     }
 
     public toggleWarpDrive() {

@@ -37,7 +37,7 @@ export class ShipControls implements Controls {
 
     private inputs: Input[] = [];
 
-    private readonly scene: Scene;
+    private isCameraShaking = false;
 
     constructor(scene: Scene) {
         this.spaceship = new Spaceship(scene);
@@ -51,7 +51,18 @@ export class ShipControls implements Controls {
         this.thirdPersonCamera.lowerRadiusLimit = 10;
         this.thirdPersonCamera.upperRadiusLimit = 500;
 
-        this.scene = scene;
+        this.spaceship.onWarpDriveEnabled.add(() => {
+            this.shakeCamera(2500);
+        });
+
+        this.spaceship.onWarpDriveDisabled.add(() => {
+            this.shakeCamera(2500);
+        });
+    }
+
+    private shakeCamera(duration: number) {
+        this.isCameraShaking = true;
+        setTimeout(() => this.isCameraShaking = false, duration);
     }
 
     public addInput(input: Input): void {
@@ -145,8 +156,10 @@ export class ShipControls implements Controls {
         for (const input of this.inputs) this.listenTo(input, deltaTime);
 
         // camera shake
-        // this.thirdPersonCamera.alpha += (Math.random() - 0.5) / 500;
-        // this.thirdPersonCamera.beta += (Math.random() - 0.5) / 500;
+        if(this.isCameraShaking) {
+            this.thirdPersonCamera.alpha += (Math.random() - 0.5) / 100;
+            this.thirdPersonCamera.beta += (Math.random() - 0.5) / 100;
+        }
 
         this.getActiveCamera().getViewMatrix(true);
         return this.getTransform().getAbsolutePosition();
