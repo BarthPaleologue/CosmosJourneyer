@@ -128,6 +128,7 @@ export class StarMap {
         this.starMapUI = new StarMapUI(this.scene);
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
+            Assets.MENU_SELECT_SOUND.play();
             this.currentSystemSeed = this.selectedSystemSeed;
             if (this.currentSystemSeed !== null) this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
             this.dispatchWarpCallbacks();
@@ -425,6 +426,7 @@ export class StarMap {
             initializedInstance.actionManager.registerAction(
                 new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
                     this.starMapUI.setHoveredStarSystemMesh(initializedInstance);
+                    Assets.MENU_HOVER_SOUND.play();
                 })
             );
 
