@@ -1,7 +1,7 @@
 import Action from "@brianchirls/game-input/Action";
-import { InputDevices } from "../input";
+import { InputDevices } from "../inputs/devices";
 
-const keyboard = InputDevices.keyboard;
+const keyboard = InputDevices.KEYBOARD;
 
 const upAction = new Action({
   bindings: [keyboard.getControl("Space")]

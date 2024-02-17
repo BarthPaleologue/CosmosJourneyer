@@ -1,0 +1,32 @@
+.map {
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+
+
+  .action {
+    font-family: Nasalization, sans-serif;
+
+    border-bottom: 1px solid white;
+
+    // the name if on the left, the input is on the right
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+
+    padding-right: 10px;
+
+    .valuesContainer {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      column-gap: 10px;
+
+      p {
+        border: 1px solid white;
+      }
+    }
+  }
+}

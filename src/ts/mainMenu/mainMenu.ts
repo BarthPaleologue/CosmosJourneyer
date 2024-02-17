@@ -14,6 +14,9 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { SystemSeed } from "../utils/systemSeed";
 import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import packageInfo from "../../../package.json";
+import { InputMaps } from "../inputs/inputMaps";
+import Action from "@brianchirls/game-input/Action";
+import Interaction from "@brianchirls/game-input/interactions/Interaction";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -34,6 +37,7 @@ export class MainMenu {
 
     private activeRightPanel: HTMLElement | null = null;
     private loadSavePanel: HTMLElement | null = null;
+    private settingsPanel: HTMLElement | null = null;
     private contributePanel: HTMLElement | null = null;
     private creditsPanel: HTMLElement | null = null;
     private aboutPanel: HTMLElement | null = null;
@@ -195,6 +199,64 @@ export class MainMenu {
 
         loadSaveButton.addEventListener("click", () => {
             this.toggleActivePanel(loadSavePanel);
+        });
+
+        const settingsButton = document.getElementById("settingsButton");
+        if (settingsButton === null) throw new Error("#settingsButton does not exist!");
+
+        const settingsPanel = document.getElementById("settingsPanel");
+        if (settingsPanel === null) throw new Error("#settings does not exist!");
+        this.settingsPanel = settingsPanel;
+
+        InputMaps.forEach((inputMap) => {
+           // create a div
+           // the name of the map will be an h3
+           // each action will be a div with the name of the action and the bindings
+            const mapDiv = document.createElement("div");
+            mapDiv.classList.add("map");
+            const mapName = document.createElement("h3");
+            mapName.textContent = inputMap.name;
+
+            mapDiv.appendChild(mapName);
+
+            for (const [actionName, action] of Object.entries(inputMap.map)) {
+                const actionDiv = document.createElement("div");
+                actionDiv.classList.add("action");
+
+                const label = document.createElement("p");
+                label.textContent = actionName;
+
+                const valuesContainer = document.createElement("div");
+                valuesContainer.classList.add("valuesContainer");
+
+                const keyboardValueContainer = document.createElement("p");
+                const gamepadValueContainer = document.createElement("p");
+
+                const actionOrInteraction = action as Action | Interaction;
+                if(actionOrInteraction instanceof Action) {
+                    keyboardValueContainer.textContent = actionOrInteraction.bindings[0].control.name;
+                    gamepadValueContainer.textContent = actionOrInteraction.bindings[1]?.control.name;
+                } else if(actionOrInteraction instanceof Interaction) {
+                    keyboardValueContainer.textContent = actionOrInteraction.action.bindings[0].control.name;
+                    gamepadValueContainer.textContent = actionOrInteraction.action.bindings[1]?.control.name;
+                } else {
+                    throw new Error("Unknown type of action or interaction in inputMap.map." + inputMap.name + " for action " + actionName + " : " + actionOrInteraction);
+                }
+
+                valuesContainer.appendChild(keyboardValueContainer);
+                valuesContainer.appendChild(gamepadValueContainer);
+
+                actionDiv.appendChild(label);
+                actionDiv.appendChild(valuesContainer);
+
+                mapDiv.appendChild(actionDiv);
+            }
+
+            settingsPanel.appendChild(mapDiv);
+        });
+
+        settingsButton.addEventListener("click", () => {
+            this.toggleActivePanel(settingsPanel);
         });
 
         const contributeButton = document.getElementById("contributeButton");

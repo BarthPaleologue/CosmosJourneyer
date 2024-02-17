@@ -1,11 +1,13 @@
 import Action from "@brianchirls/game-input/Action";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
-import { InputDevices } from "../input";
+import { InputDevices } from "../inputs/devices";
 import { AxisComposite } from "@brianchirls/game-input/browser";
+import { InputMaps } from "../inputs/inputMaps";
+import { InputMap } from "../inputs/inputMap";
 
-const gamepad = InputDevices.gamepad;
-const keyboard = InputDevices.keyboard;
-const pointer = InputDevices.pointer;
+const gamepad = InputDevices.GAMEPAD;
+const keyboard = InputDevices.KEYBOARD;
+const pointer = InputDevices.POINTER;
 
 const landingAction = new Action({
     bindings: [keyboard.getControl("Space"), gamepad.getControl("A")]
@@ -19,7 +21,7 @@ const upDown = new AxisComposite({
 });
 
 const upDownAction = new Action({
-    bindings: [upDown]
+    bindings: [upDown],
 });
 
 const throttle = new AxisComposite({
@@ -70,16 +72,25 @@ const toggleFlightAssist = new Action({
 const toggleFlightAssistInteraction = new PressInteraction(toggleFlightAssist);
 
 const toggleWarpDrive = new Action({
-    bindings: [keyboard.getControl("KeyH")]
+    bindings: [keyboard.getControl("KeyH")],
 });
 
 const toggleWarpDriveInteraction = new PressInteraction(toggleWarpDrive);
 
-export const SpaceShipControlsInputs = {
+export const SpaceShipControlsInputs = new InputMap<{
+    landing: PressInteraction,
+    upDown: Action<number>,
+    throttle: Action<number>,
+    rollPitch: Action<[number, number]>,
+    toggleFlightAssist: PressInteraction,
+    toggleWarpDrive: PressInteraction
+}>("SpaceShipInputs", {
     landing: landingInteraction,
     upDown: upDownAction,
     throttle: throttleAction,
     rollPitch: rollPitch,
     toggleFlightAssist: toggleFlightAssistInteraction,
     toggleWarpDrive: toggleWarpDriveInteraction
-};
+});
+
+InputMaps.push(SpaceShipControlsInputs);

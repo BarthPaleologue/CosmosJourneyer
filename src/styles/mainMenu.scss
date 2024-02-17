@@ -50,6 +50,8 @@
     bottom: 2.5vh;
     transition: 0.2s ease-in-out;
 
+    backdrop-filter: blur(3px);
+
     transform: scale(0);
     opacity: 0;
 
@@ -106,6 +108,10 @@
         line-height: 1.5em;
         padding: 0 20px;
       }
+    }
+
+    &#settingsPanel {
+      overflow-y: auto;
     }
 
     &#credits {

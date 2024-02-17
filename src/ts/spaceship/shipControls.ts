@@ -49,11 +49,11 @@ export class ShipControls implements Controls {
 
         this.scene = scene;
 
-        SpaceShipControlsInputs.toggleFlightAssist.on("complete", () => {
+        SpaceShipControlsInputs.map.toggleFlightAssist.on("complete", () => {
             this.spaceship.setFlightAssistEnabled(!this.spaceship.getFlightAssistEnabled());
         });
 
-        SpaceShipControlsInputs.toggleWarpDrive.on("complete", () => {
+        SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
             this.spaceship.toggleWarpDrive();
         });
     }
@@ -69,26 +69,26 @@ export class ShipControls implements Controls {
     public update(deltaTime: number): Vector3 {
         this.spaceship.update(deltaTime);
 
-        const [inputRoll, inputPitch] = SpaceShipControlsInputs.rollPitch.value;
+        const [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
 
         if (this.spaceship.getWarpDrive().isDisabled()) {
             for (const thruster of this.spaceship.mainThrusters) {
-                thruster.updateThrottle(2 * deltaTime * SpaceShipControlsInputs.throttle.value * thruster.getAuthority01(LocalDirection.FORWARD));
-                thruster.updateThrottle(2 * deltaTime * -SpaceShipControlsInputs.throttle.value * thruster.getAuthority01(LocalDirection.BACKWARD));
+                thruster.updateThrottle(2 * deltaTime * SpaceShipControlsInputs.map.throttle.value * thruster.getAuthority01(LocalDirection.FORWARD));
+                thruster.updateThrottle(2 * deltaTime * -SpaceShipControlsInputs.map.throttle.value * thruster.getAuthority01(LocalDirection.BACKWARD));
 
-                thruster.updateThrottle(2 * deltaTime * SpaceShipControlsInputs.upDown.value * thruster.getAuthority01(LocalDirection.UP));
-                thruster.updateThrottle(2 * deltaTime * -SpaceShipControlsInputs.upDown.value * thruster.getAuthority01(LocalDirection.DOWN));
+                thruster.updateThrottle(2 * deltaTime * SpaceShipControlsInputs.map.upDown.value * thruster.getAuthority01(LocalDirection.UP));
+                thruster.updateThrottle(2 * deltaTime * -SpaceShipControlsInputs.map.upDown.value * thruster.getAuthority01(LocalDirection.DOWN));
 
                 /*thruster.updateThrottle(2 * deltaTime * input.getXAxis() * thruster.getAuthority01(LocalDirection.LEFT));
                 thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LocalDirection.RIGHT));*/
             }
 
             this.spaceship.aggregate.body.applyForce(
-              getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.upDown.value),
+              getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
               this.spaceship.aggregate.body.getObjectCenterWorld()
             );
 
-            if (SpaceShipControlsInputs.landing.state === "complete") {
+            if (SpaceShipControlsInputs.map.landing.state === "complete") {
                 if (this.spaceship.getClosestWalkableObject() !== null) {
                     this.spaceship.engageLanding(null);
                 }
@@ -110,7 +110,7 @@ export class ShipControls implements Controls {
             roll(this.getTransform(), inputRoll * deltaTime);
             pitch(this.getTransform(), inputPitch * deltaTime);
 
-            this.spaceship.getWarpDrive().increaseTargetThrottle(deltaTime * SpaceShipControlsInputs.throttle.value);
+            this.spaceship.getWarpDrive().increaseTargetThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
         }
 
         // camera shake

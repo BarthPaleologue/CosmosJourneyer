@@ -1,20 +1,21 @@
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import Action from "@brianchirls/game-input/Action";
-import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
-import { InputDevices } from "../input";
+import { InputDevices } from "../inputs/devices";
 import { AxisComposite } from "@brianchirls/game-input/browser";
+import { InputMap } from "../inputs/inputMap";
+import { InputMaps } from "../inputs/inputMaps";
 
-const gamepad = InputDevices.gamepad;
-const keyboard = InputDevices.keyboard;
+const gamepad = InputDevices.GAMEPAD;
+const keyboard = InputDevices.KEYBOARD;
 
 const leftStick = gamepad.getControl("leftStick");
 
 // It takes four keys to go in four directions
 const kbdWASD = new DPadComposite({
-  up: keyboard.getControl("KeyW"),
-  left: keyboard.getControl("KeyA"),
-  down: keyboard.getControl("KeyS"),
-  right: keyboard.getControl("KeyD")
+    up: keyboard.getControl("KeyW"),
+    left: keyboard.getControl("KeyA"),
+    down: keyboard.getControl("KeyS"),
+    right: keyboard.getControl("KeyD")
 });
 
 /**
@@ -22,59 +23,68 @@ const kbdWASD = new DPadComposite({
  * The action will respond to whichever control is used.
  */
 const moveAction = new Action({
-  bindings: [leftStick, kbdWASD]
+    bindings: [leftStick, kbdWASD]
 });
 
 const keyboardSpeed = new AxisComposite({
-  positive: keyboard.getControl('NumpadAdd'), // '+'
-  negative: keyboard.getControl("NumpadSubtract") // '-'
+    positive: keyboard.getControl("NumpadAdd"), // '+'
+    negative: keyboard.getControl("NumpadSubtract") // '-'
 });
 
 const changeSpeedAction = new Action({
-  bindings: [keyboardSpeed]
+    bindings: [keyboardSpeed]
 });
 
 const upDown = new AxisComposite({
-  positive: keyboard.getControl('Space'),
-  negative: keyboard.getControl('ShiftLeft')
+    positive: keyboard.getControl("Space"),
+    negative: keyboard.getControl("ShiftLeft")
 });
 
 const upDownAction = new Action({
-  bindings: [upDown]
+    bindings: [upDown]
 });
 
 const roll = new AxisComposite({
-  positive: keyboard.getControl('KeyE'),
-  negative: keyboard.getControl('KeyQ')
+    positive: keyboard.getControl("KeyE"),
+    negative: keyboard.getControl("KeyQ")
 });
 
 const rollAction = new Action({
-  bindings: [roll]
+    bindings: [roll]
 });
 
 const pitch = new AxisComposite({
-  positive: keyboard.getControl('KeyK'),
-  negative: keyboard.getControl('KeyI')
+    positive: keyboard.getControl("KeyK"),
+    negative: keyboard.getControl("KeyI")
 });
 
 const pitchAction = new Action({
-  bindings: [pitch]
+    bindings: [pitch]
 });
 
 const yaw = new AxisComposite({
-  positive: keyboard.getControl('KeyJ'),
-  negative: keyboard.getControl('KeyL'),
+    positive: keyboard.getControl("KeyJ"),
+    negative: keyboard.getControl("KeyL")
 });
 
 const yawAction = new Action({
-  bindings: [yaw]
+    bindings: [yaw]
 });
 
-export const DefaultControlsInput = {
-  move: moveAction,
-  upDown: upDownAction,
-  changeSpeed: changeSpeedAction,
-  roll: rollAction,
-  pitch: pitchAction,
-  yaw: yawAction
-};
+export const DefaultControlsInput = new InputMap<{
+    move: Action<[number, number]>;
+    upDown: Action<number>;
+    changeSpeed: Action<number>;
+    roll: Action<number>;
+    pitch: Action<number>;
+    yaw: Action<number>;
+}>("DefaultControlsInput", {
+    move: moveAction,
+    upDown: upDownAction,
+    changeSpeed: changeSpeedAction,
+    roll: rollAction,
+    pitch: pitchAction,
+    yaw: yawAction
+});
+
+InputMaps.push(DefaultControlsInput);

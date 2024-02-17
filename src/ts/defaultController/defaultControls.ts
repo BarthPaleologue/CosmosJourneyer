@@ -53,9 +53,9 @@ export class DefaultControls implements Controls {
     }
 
     public update(deltaTime: number): Vector3 {
-        roll(this.transform, DefaultControlsInput.roll.value * this.rotationSpeed * deltaTime);
-        pitch(this.transform, DefaultControlsInput.pitch.value * this.rotationSpeed * deltaTime);
-        yaw(this.transform, DefaultControlsInput.yaw.value * this.rotationSpeed * deltaTime);
+        roll(this.transform, DefaultControlsInput.map.roll.value * this.rotationSpeed * deltaTime);
+        pitch(this.transform, DefaultControlsInput.map.pitch.value * this.rotationSpeed * deltaTime);
+        yaw(this.transform, DefaultControlsInput.map.yaw.value * this.rotationSpeed * deltaTime);
 
         const cameraForward = this.camera.getDirection(LocalDirection.BACKWARD);
         const transformForward = getForwardDirection(this.transform);
@@ -66,19 +66,19 @@ export class DefaultControls implements Controls {
             this.camera.rotationQuaternion = Quaternion.Identity();
         }
 
-        this.speed *= 1 + DefaultControlsInput.changeSpeed.value / 20;
+        this.speed *= 1 + DefaultControlsInput.map.changeSpeed.value / 20;
 
         const displacement = Vector3.Zero();
 
         const forwardDisplacement = getForwardDirection(this.transform)
           .scale(this.speed * deltaTime)
-          .scaleInPlace(DefaultControlsInput.move.value[1]);
+          .scaleInPlace(DefaultControlsInput.map.move.value[1]);
         const upwardDisplacement = getUpwardDirection(this.transform)
           .scale(this.speed * deltaTime)
-          .scaleInPlace(DefaultControlsInput.upDown.value);
+          .scaleInPlace(DefaultControlsInput.map.upDown.value);
         const rightDisplacement = getRightDirection(this.transform)
           .scale(this.speed * deltaTime)
-          .scaleInPlace(DefaultControlsInput.move.value[0]);
+          .scaleInPlace(DefaultControlsInput.map.move.value[0]);
 
         displacement.addInPlace(forwardDisplacement);
         displacement.addInPlace(upwardDisplacement);

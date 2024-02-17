@@ -261,7 +261,7 @@ export class CharacterControls implements Controls {
             this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight));
         }
 
-        const [xMove, yMove] = CharacterInputs.move.value;
+        const [xMove, yMove] = CharacterInputs.map.move.value;
 
         // Translation
         if (this.currentAnimationState === this.swimmingState) {
@@ -276,16 +276,16 @@ export class CharacterControls implements Controls {
                 this.groundedState.currentAnimation = this.walkAnim;
             } else if (yMove < 0) {
                 this.groundedState.currentAnimation = this.walkBackAnim;
-            } else if (CharacterInputs.run.value > 0) {
+            } else if (CharacterInputs.map.run.value > 0) {
                 this.groundedState.currentAnimation = this.runningAnim;
             }
 
             // Samba!
-            if (CharacterInputs.samba.value > 0) {
+            if (CharacterInputs.map.samba.value > 0) {
                 this.groundedState.currentAnimation = this.sambaAnim;
             }
 
-            if (CharacterInputs.jump.state === "complete") {
+            if (CharacterInputs.map.jump.state === "complete") {
                 this.targetAnim = this.jumpingAnim;
                 this.jumpingAnim.weight = 1;
                 this.jumpingAnim.group.stop();

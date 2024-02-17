@@ -9,9 +9,9 @@ const keyboard = new Keyboard({
 const pointer = new Pointer();
 
 export const InputDevices = {
-    gamepad: gamepad,
-    keyboard: keyboard,
-    pointer: pointer
+    GAMEPAD: gamepad,
+    KEYBOARD: keyboard,
+    POINTER: pointer
 };
 
 export function updateInputDevices() {
