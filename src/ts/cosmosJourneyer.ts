@@ -41,6 +41,7 @@ import { setRotationQuaternion } from "./uberCore/transforms/basicTransform";
 import { ShipControls } from "./spaceship/shipControls";
 import { encodeBase64 } from "./utils/base64";
 import { UniverseCoordinates } from "./saveFile/universeCoordinates";
+import { updateInputDevices } from "./input";
 
 enum EngineState {
     UNINITIALIZED,
@@ -208,6 +209,8 @@ export class CosmosJourneyer {
         this.starSystemView.initStarSystem();
 
         this.engine.runRenderLoop(() => {
+            updateInputDevices();
+
             if (this.isPaused()) return;
             this.getActiveScene().render();
         });

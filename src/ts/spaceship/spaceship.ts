@@ -164,6 +164,8 @@ export class Spaceship implements Transformable {
         for (const thruster of this.rcsThrusters) thruster.deactivate();
         this.warpDrive.enable();
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
+        this.aggregate.body.setLinearVelocity(Vector3.Zero());
+        this.aggregate.body.setAngularVelocity(Vector3.Zero());
     }
 
     public disableWarpDrive() {
@@ -327,6 +329,7 @@ export class Spaceship implements Transformable {
         if (this.flightAssistEnabled) {
             this.aggregate.body.setAngularDamping(0.9);
         } else {
+            //FIXME: for some reason, the angular damping is not working
             this.aggregate.body.setAngularDamping(1);
         }
 

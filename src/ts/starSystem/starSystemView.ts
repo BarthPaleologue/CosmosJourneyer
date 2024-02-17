@@ -39,9 +39,6 @@ import "@babylonjs/core/Loading/loadingScreen";
 import { setMaxLinVel } from "../utils/havok";
 import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { Mouse } from "../inputs/mouse";
-import { Keyboard } from "../inputs/keyboard";
-import { Gamepad } from "../inputs/gamepad";
 import { DefaultControls } from "../defaultController/defaultControls";
 import { CharacterControls } from "../spacelegs/characterControls";
 import { Assets } from "../assets";
@@ -183,10 +180,6 @@ export class StarSystemView {
         const canvas = this.scene.getEngine().getRenderingCanvas();
         if (canvas === null) throw new Error("Canvas is null");
 
-        const mouse = new Mouse(canvas, 100);
-        const keyboard = new Keyboard();
-        const gamepad = new Gamepad();
-
         const maxZ = Settings.EARTH_RADIUS * 1e5;
 
         this.defaultControls = new DefaultControls(this.scene);
@@ -195,15 +188,10 @@ export class StarSystemView {
 
         this.spaceshipControls = new ShipControls(this.scene);
         this.spaceshipControls.getActiveCamera().maxZ = maxZ;
-        this.spaceshipControls.addInput(keyboard);
-        this.spaceshipControls.addInput(gamepad);
-        this.spaceshipControls.addInput(mouse);
 
         this.characterControls = new CharacterControls(this.scene);
         this.characterControls.getTransform().setEnabled(false);
         this.characterControls.getActiveCamera().maxZ = maxZ;
-        this.characterControls.addInput(keyboard);
-        this.characterControls.addInput(gamepad);
 
         this.scene.setActiveController(this.spaceshipControls);
     }
