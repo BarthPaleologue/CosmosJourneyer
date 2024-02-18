@@ -26,6 +26,7 @@ import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
+import { moveTowards } from "../utils/moveTowards";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -34,6 +35,11 @@ export class ShipControls implements Controls {
     readonly firstPersonCamera: FreeCamera;
 
     private readonly scene: Scene;
+
+    private isCameraShaking = false;
+
+    private baseFov: number;
+    private targetFov: number;
 
     constructor(scene: Scene) {
         this.spaceship = new Spaceship(scene);
@@ -56,6 +62,27 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
             this.spaceship.toggleWarpDrive();
         });
+
+        this.baseFov = this.thirdPersonCamera.fov;
+        this.targetFov = this.baseFov;
+
+        this.spaceship.onWarpDriveEnabled.add(() => {
+            this.shakeCamera(2000);
+            this.targetFov = this.baseFov * 3.0;
+        });
+
+        this.spaceship.onWarpDriveDisabled.add(() => {
+            this.shakeCamera(2500);
+            this.targetFov = this.baseFov * 0.5;
+        });
+    }
+
+    private shakeCamera(duration: number) {
+        this.isCameraShaking = true;
+        setTimeout(() => {
+            this.isCameraShaking = false;
+            this.targetFov = this.baseFov;
+        }, duration);
     }
 
     public getTransform(): TransformNode {
@@ -114,8 +141,13 @@ export class ShipControls implements Controls {
         }
 
         // camera shake
-        // this.thirdPersonCamera.alpha += (Math.random() - 0.5) / 500;
-        // this.thirdPersonCamera.beta += (Math.random() - 0.5) / 500;
+        if (this.isCameraShaking) {
+            this.thirdPersonCamera.alpha += (Math.random() - 0.5) / 100;
+            this.thirdPersonCamera.beta += (Math.random() - 0.5) / 100;
+            this.thirdPersonCamera.radius += (Math.random() - 0.5) / 100;
+        }
+
+        this.thirdPersonCamera.fov = moveTowards(this.thirdPersonCamera.fov, this.targetFov, this.targetFov === this.baseFov ? 2.0 * deltaTime : 0.3 * deltaTime);
 
         this.getActiveCamera().getViewMatrix(true);
 

@@ -45,6 +45,7 @@ import { Assets } from "../assets";
 import { getRotationQuaternion, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+import { Sound } from "@babylonjs/core/Audio/sound";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
@@ -67,6 +68,8 @@ export class StarSystemView {
     private starSystem: StarSystemController | null = null;
 
     private readonly chunkForge: ChunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
+
+    private backgroundSounds: Sound[] = [];
 
     readonly onInitStarSystem = new Observable<void>();
 
@@ -91,7 +94,10 @@ export class StarSystemView {
 
         document.addEventListener("keydown", (e) => {
             if (e.key === "o") {
-                this.ui.setEnabled(!this.ui.isEnabled());
+                const enabled = !this.ui.isEnabled()
+                if(enabled) Assets.MENU_HOVER_SOUND.play();
+                else Assets.MENU_HOVER_SOUND.play();
+                this.ui.setEnabled(enabled);
             }
             if (e.key === "n") {
                 this.orbitRenderer.setVisibility(!this.orbitRenderer.isVisible());
@@ -102,11 +108,18 @@ export class StarSystemView {
 
             if (e.key === "t") {
                 const closestObjectToCenter = this.getStarSystem().getClosestToScreenCenterOrbitalObject();
-                this.ui.setTarget(closestObjectToCenter);
-                if(closestObjectToCenter !== null) this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
-                else {
+                if (this.ui.getTarget() === closestObjectToCenter) {
                     this.helmetOverlay.setTarget(null);
+                    this.ui.setTarget(null);
+                    Assets.TARGET_UNLOCK_SOUND.play();
+                    return;
                 }
+
+                if (closestObjectToCenter === null) return;
+
+                this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
+                this.ui.setTarget(closestObjectToCenter);
+                Assets.TARGET_LOCK_SOUND.play();
             }
 
             if (e.key === "g") {
@@ -169,8 +182,8 @@ export class StarSystemView {
         this.getStarSystem()
             .initPostProcesses()
             .then(() => {
-                this.scene.getEngine().loadingScreen.hideLoadingUI();
                 this.onInitStarSystem.notifyObservers();
+                this.scene.getEngine().loadingScreen.hideLoadingUI();
             });
     }
 
@@ -194,6 +207,8 @@ export class StarSystemView {
         this.characterControls.getActiveCamera().maxZ = maxZ;
 
         this.scene.setActiveController(this.spaceshipControls);
+
+        this.backgroundSounds = [Assets.ACCELERATING_WARP_DRIVE_SOUND, Assets.DECELERATING_WARP_DRIVE_SOUND];
     }
 
     /**
@@ -295,6 +310,12 @@ export class StarSystemView {
         this.scene.setActiveController(defaultControls);
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
         this.getStarSystem().postProcessManager.rebuild();
+    }
+
+    stopBackgroundSounds() {
+        for (const sound of this.backgroundSounds) {
+            sound.stop();
+        }
     }
 
     /**

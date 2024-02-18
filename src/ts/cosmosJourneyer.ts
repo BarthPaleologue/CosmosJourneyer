@@ -42,6 +42,8 @@ import { ShipControls } from "./spaceship/shipControls";
 import { encodeBase64 } from "./utils/base64";
 import { UniverseCoordinates } from "./saveFile/universeCoordinates";
 import { updateInputDevices } from "./inputs/devices";
+import { Assets } from "./assets";
+
 
 enum EngineState {
     UNINITIALIZED,
@@ -189,11 +191,16 @@ export class CosmosJourneyer {
 
     public pause(): void {
         this.state = EngineState.PAUSED;
+
+        if(this.activeScene === this.starSystemView.scene) this.starSystemView.stopBackgroundSounds();
+
+        Assets.OPEN_PAUSE_MENU_SOUND.play();
         this.pauseMenu.setVisibility(true);
     }
 
     public resume(): void {
         this.state = EngineState.RUNNING;
+        Assets.MENU_SELECT_SOUND.play();
         this.pauseMenu.setVisibility(false);
     }
 
@@ -223,6 +230,9 @@ export class CosmosJourneyer {
     public toggleStarMap(): void {
         if (this.activeScene === this.starSystemView.scene) {
             this.starSystemView.unZoom(() => {
+                this.starSystemView.stopBackgroundSounds();
+                this.starMap.startBackgroundMusic();
+
                 this.activeScene.detachControl();
                 this.starMap.scene.attachControl();
                 const starMap = this.starMap;
@@ -230,6 +240,7 @@ export class CosmosJourneyer {
                 starMap.focusOnCurrentSystem();
             });
         } else {
+            this.starMap.stopBackgroundMusic();
             this.activeScene.detachControl();
             this.starSystemView.scene.attachControl();
             this.activeScene = this.starSystemView.scene;

@@ -51,6 +51,20 @@ Thank you to all the people who have contributed to Cosmos Journeyer!
 
 ![Contributors](https://contrib.rocks/image?repo=BarthPaleologue/CosmosJourneyer)
 
+## Sounds used
+
+[Menu screen mouse over](https://freesound.org/people/DrMinky/sounds/166186/) by DrMinky
+
+[DISTORZIONE](https://freesound.org/people/lollosound/sounds/386992/) by lollosound
+
+[Large Engine](https://freesound.org/people/NHumphrey/sounds/204418/) by NHumphrey
+
+[Futuristic Inspect Sound, UI, or In-Game Notification](https://freesound.org/people/MATRIXXX_/sounds/702805/) by MATRIXXX_
+
+[endless acceleration](https://freesound.org/people/Timbre/sounds/539503/) by Timbre
+
+[Wandering](https://freesound.org/people/Andrewkn/sounds/455855/) by Andrewkn
+
 ## Special Thanks
 
 - Martin Molli for his fearless refactoring of the messy code base in its early days

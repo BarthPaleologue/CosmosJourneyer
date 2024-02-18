@@ -55,6 +55,17 @@ import treeTexturePath from "../asset/tree/Tree.png";
 
 import ouchSound from "../asset/sound/ouch.mp3";
 import engineRunningSound from "../asset/sound/engineRunning.mp3";
+import menuHoverSound from "../asset/sound/166186__drminky__menu-screen-mouse-over.mp3";
+
+import targetSound from "../asset/sound/702805__matrixxx__futuristic-inspect-sound-ui-or-in-game-notification.mp3";
+
+import enableWarpDriveSound from "../asset/sound/386992__lollosound__17-distorzione.mp3";
+import disableWarpDriveSound from "../asset/sound/204418__nhumphrey__large-engine.mp3";
+
+import acceleratingWarpDriveSound from "../asset/sound/539503__timbre__endless-acceleration.mp3";
+import deceleratingWarpDriveSound from "../asset/sound/539503__timbre_endless-deceleration.mp3";
+
+import starMapBackgroundMusic from "../asset/sound/455855__andrewkn__wandering.mp3";
 
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -73,6 +84,7 @@ import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
 import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class Assets {
     static IS_READY = false;
@@ -122,10 +134,29 @@ export class Assets {
     public static OUCH_SOUND: Sound;
     public static ENGINE_RUNNING_SOUND: Sound;
 
+    public static MENU_HOVER_SOUND: Sound;
+    public static MENU_SELECT_SOUND: Sound;
+    public static OPEN_PAUSE_MENU_SOUND: Sound;
+
+    public static STAR_MAP_CLICK_SOUND: Sound;
+
+    public static TARGET_LOCK_SOUND: Sound;
+    public static TARGET_UNLOCK_SOUND: Sound;
+
+    public static ENABLE_WARP_DRIVE_SOUND: Sound;
+    public static DISABLE_WARP_DRIVE_SOUND: Sound;
+
+    public static ACCELERATING_WARP_DRIVE_SOUND: Sound;
+    public static DECELERATING_WARP_DRIVE_SOUND: Sound;
+
+    public static STAR_MAP_BACKGROUND_MUSIC: Sound;
+    public static MAIN_MENU_BACKGROUND_MUSIC: Sound;
+
     private static MANAGER: AssetsManager;
 
     static async Init(scene: Scene): Promise<void> {
         Assets.MANAGER = new AssetsManager(scene);
+        Assets.MANAGER.autoHideLoadingUI = false;
         console.log("Initializing assets...");
 
         Assets.MANAGER.addTextureTask("RockNormalMap", rockNormalMap).onSuccess = (task) => (Assets.ROCK_NORMAL_MAP = task.texture);
@@ -287,6 +318,109 @@ export class Assets {
             console.log("Engine running sound loaded");
         };
 
+        const menuHoverSoundTask = Assets.MANAGER.addBinaryFileTask("menuHoverSoundTask", menuHoverSound);
+        menuHoverSoundTask.onSuccess = function (task) {
+            Assets.MENU_HOVER_SOUND = new Sound("MenuHoverSound", task.data, scene);
+            Assets.MENU_HOVER_SOUND.updateOptions({
+                playbackRate: 0.5
+            });
+
+            const clonedSound = Assets.MENU_HOVER_SOUND.clone();
+            if(clonedSound === null) throw new Error("clonedSound is null");
+            Assets.MENU_SELECT_SOUND = clonedSound;
+            Assets.MENU_SELECT_SOUND.updateOptions({
+                playbackRate: 1.0
+            });
+
+            const clonedSound2 = Assets.MENU_HOVER_SOUND.clone();
+            if(clonedSound2 === null) throw new Error("clonedSound2 is null");
+            Assets.OPEN_PAUSE_MENU_SOUND = clonedSound2;
+            Assets.OPEN_PAUSE_MENU_SOUND.updateOptions({
+                playbackRate: 0.75
+            });
+
+            console.log("Menu hover sound loaded");
+        };
+
+        const targetSoundTask = Assets.MANAGER.addBinaryFileTask("targetSoundTask", targetSound);
+        targetSoundTask.onSuccess = function (task) {
+            Assets.TARGET_LOCK_SOUND = new Sound("StarMapClickSound", task.data, scene);
+
+            const clonedSound = Assets.TARGET_LOCK_SOUND.clone();
+            if(clonedSound === null) throw new Error("clonedSound is null");
+            Assets.TARGET_UNLOCK_SOUND = clonedSound;
+            Assets.TARGET_UNLOCK_SOUND.updateOptions({
+                playbackRate: 0.5
+            });
+
+            const clonedSound2 = Assets.TARGET_LOCK_SOUND.clone();
+            if(clonedSound2 === null) throw new Error("clonedSound2 is null");
+            Assets.STAR_MAP_CLICK_SOUND = clonedSound2;
+
+            console.log("Target sound loaded");
+        };
+
+        const enableWarpDriveSoundTask = Assets.MANAGER.addBinaryFileTask("enableWarpDriveSoundTask", enableWarpDriveSound);
+        enableWarpDriveSoundTask.onSuccess = function (task) {
+            Assets.ENABLE_WARP_DRIVE_SOUND = new Sound("EnableWarpDriveSound", task.data, scene);
+            Assets.ENABLE_WARP_DRIVE_SOUND.updateOptions({
+                playbackRate: 2
+            });
+
+            console.log("Enable warp drive sound loaded");
+        };
+
+        const disableWarpDriveSoundTask = Assets.MANAGER.addBinaryFileTask("disableWarpDriveSoundTask", disableWarpDriveSound);
+        disableWarpDriveSoundTask.onSuccess = function (task) {
+            Assets.DISABLE_WARP_DRIVE_SOUND = new Sound("DisableWarpDriveSound", task.data, scene);
+
+            console.log("Disable warp drive sound loaded");
+        };
+
+        const acceleratingWarpDriveSoundTask = Assets.MANAGER.addBinaryFileTask("acceleratingWarpDriveSoundTask", acceleratingWarpDriveSound);
+        acceleratingWarpDriveSoundTask.onSuccess = function (task) {
+            Assets.ACCELERATING_WARP_DRIVE_SOUND = new Sound("AcceleratingWarpDriveSound", task.data, scene);
+            Assets.ACCELERATING_WARP_DRIVE_SOUND.updateOptions({
+                playbackRate: 1.0,
+                volume: 0.005
+            });
+
+            console.log("Accelerating warp drive sound loaded");
+        };
+
+        const deceleratingWarpDriveSoundTask = Assets.MANAGER.addBinaryFileTask("deceleratingWarpDriveSoundTask", deceleratingWarpDriveSound);
+        deceleratingWarpDriveSoundTask.onSuccess = function (task) {
+            Assets.DECELERATING_WARP_DRIVE_SOUND = new Sound("DeceleratingWarpDriveSound", task.data, scene);
+            Assets.DECELERATING_WARP_DRIVE_SOUND.updateOptions({
+                playbackRate: 1.0,
+                volume: 0.005
+            });
+
+            console.log("Decelerating warp drive sound loaded");
+        };
+
+        const starMapBackgroundMusicTask = Assets.MANAGER.addBinaryFileTask("starMapBackgroundMusicTask", starMapBackgroundMusic);
+        starMapBackgroundMusicTask.onSuccess = function (task) {
+            Assets.STAR_MAP_BACKGROUND_MUSIC = new Sound("StarMapBackgroundMusic", task.data, scene, null, {
+                loop: true
+            });
+
+            console.log("Star map background music loaded");
+        };
+
+        const mainMenuBackgroundMusicTask = Assets.MANAGER.addBinaryFileTask("mainMenuBackgroundMusicTask", starMapBackgroundMusic);
+        const mainMenuBackgroundMusicLoaded = new Promise<void>((resolve) => {
+            mainMenuBackgroundMusicTask.onSuccess = function(task) {
+                Assets.MAIN_MENU_BACKGROUND_MUSIC = new Sound("MainMenuBackgroundMusic", task.data, scene, () => {
+                    resolve();
+                }, {
+                    loop: true
+                });
+
+                console.log("Main menu background music loaded");
+            };
+        });
+
         Assets.MANAGER.onProgress = (remainingCount, totalCount) => {
             scene.getEngine().loadingScreen.loadingUIText = `Loading assets... ${totalCount - remainingCount}/${totalCount}`;
         };
@@ -298,10 +432,13 @@ export class Assets {
 
         Assets.MANAGER.onFinish = () => {
             console.log("Assets loaded");
+            scene.getEngine().loadingScreen.loadingUIText = "Press F11 to go fullscreen";
             Assets.IS_READY = true;
         };
 
         await Assets.MANAGER.loadAsync();
+
+        await mainMenuBackgroundMusicLoaded;
     }
 
     static CreateSpaceShipInstance(): InstancedMesh {

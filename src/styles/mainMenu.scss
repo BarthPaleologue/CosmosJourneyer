@@ -46,11 +46,12 @@
     max-width: 1400px;
     width: 72%;
     right: 2.5vw;
-    height: 65vh;
-    bottom: 2.5vh;
+    height: 60vh;
+    bottom: 7.5vh;
     transition: 0.2s ease-in-out;
 
     backdrop-filter: blur(3px);
+    overflow-y: auto;
 
     transform: scale(0);
     opacity: 0;
@@ -107,16 +108,6 @@
         text-align: center;
         line-height: 1.5em;
         padding: 0 20px;
-      }
-    }
-
-    &#settingsPanel {
-      overflow-y: auto;
-    }
-
-    &#credits {
-      p {
-        text-align: center;
       }
     }
 

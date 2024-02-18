@@ -26,6 +26,25 @@
   box-sizing: content-box;
 }
 
+// scroll bar
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: darken(#888, 50%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  //border-radius: 5px;
+  transition: 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 body {
   margin: 0;
   overflow: hidden;

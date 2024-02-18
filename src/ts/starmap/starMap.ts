@@ -49,6 +49,7 @@ import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { SystemSeed } from "../utils/systemSeed";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
+import { Assets } from "../assets";
 
 export class StarMap {
     readonly scene: Scene;
@@ -124,6 +125,7 @@ export class StarMap {
         this.starMapUI = new StarMapUI(this.scene);
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
+            Assets.MENU_SELECT_SOUND.play();
             this.currentSystemSeed = this.selectedSystemSeed;
             if (this.currentSystemSeed !== null) this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
             this.dispatchWarpCallbacks();
@@ -421,6 +423,7 @@ export class StarMap {
             initializedInstance.actionManager.registerAction(
                 new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
                     this.starMapUI.setHoveredStarSystemMesh(initializedInstance);
+                    Assets.MENU_HOVER_SOUND.play();
                 })
             );
 
@@ -436,6 +439,8 @@ export class StarMap {
 
         initializedInstance.actionManager?.registerAction(
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
+                Assets.STAR_MAP_CLICK_SOUND.play();
+
                 let text = "";
                 if (this.currentSystemSeed !== null) {
                     const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh;
@@ -500,6 +505,14 @@ export class StarMap {
         }
 
         this.starMapUI.setHoveredStarSystemMesh(null);
+    }
+
+    startBackgroundMusic() {
+        Assets.STAR_MAP_BACKGROUND_MUSIC.play();
+    }
+
+    stopBackgroundMusic() {
+        Assets.STAR_MAP_BACKGROUND_MUSIC.stop();
     }
 
     public focusOnCurrentSystem(skipAnimation = false) {

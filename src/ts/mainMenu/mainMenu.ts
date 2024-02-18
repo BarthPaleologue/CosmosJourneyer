@@ -17,6 +17,7 @@ import packageInfo from "../../../package.json";
 import { InputMaps } from "../inputs/inputMaps";
 import Action from "@brianchirls/game-input/Action";
 import Interaction from "@brianchirls/game-input/interactions/Interaction";
+import { Assets } from "../assets";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -72,11 +73,11 @@ export class MainMenu {
         ];
 
         /*const randomSeed = new SystemSeed(
-      Math.trunc((Math.random() * 2 - 1) * 1000),
-      Math.trunc((Math.random() * 2 - 1) * 1000),
-      Math.trunc((Math.random() * 2 - 1) * 1000),
-      0
-    );*/
+Math.trunc((Math.random() * 2 - 1) * 1000),
+Math.trunc((Math.random() * 2 - 1) * 1000),
+Math.trunc((Math.random() * 2 - 1) * 1000),
+0
+);*/
 
         const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)];
         console.log(seed.starSectorX + ", " + seed.starSectorY + ", " + seed.starSectorZ + ", " + seed.index);
@@ -95,6 +96,8 @@ export class MainMenu {
                 this.starSystemController,
                 nbRadius
             );
+
+            Assets.MAIN_MENU_BACKGROUND_MUSIC.play();
         });
 
         this.starSystemView.ui.setEnabled(false);
@@ -115,6 +118,18 @@ export class MainMenu {
         if (version === null) throw new Error("#version does not exist!");
         version.textContent = `Alpha ${packageInfo.version}`;
         this.version = version;
+
+        document.querySelectorAll("#menuItems li").forEach((li) => {
+            // on mouse hover, play a sound
+            li.addEventListener("mouseenter", () => {
+                Assets.MENU_HOVER_SOUND.play();
+            });
+
+            // on click, play a sound
+            li.addEventListener("click", () => {
+                Assets.MENU_SELECT_SOUND.play();
+            });
+        });
 
         document.getElementById("startButton")?.addEventListener("click", () => {
             this.startAnimation(() => this.onStartObservable.notifyObservers());
@@ -344,8 +359,12 @@ export class MainMenu {
                 this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
                 if (this.htmlRoot === null) throw new Error("MainMenu is null");
                 this.htmlRoot.style.display = "none";
+                Assets.MAIN_MENU_BACKGROUND_MUSIC.stop();
                 onAnimationFinished();
             }
+
+            const currentProgress = translationAnimation.getProgress();
+            Assets.MAIN_MENU_BACKGROUND_MUSIC.setVolume(1 - currentProgress);
 
             this.controls.getActiveCamera().getViewMatrix();
 
