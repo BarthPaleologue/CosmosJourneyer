@@ -1,3 +1,9 @@
+#settingsPanel {
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+}
+
 .map {
   color: white;
 
@@ -11,7 +17,7 @@
   .actionMultiple,
   .actionSingle {
     font-family: Nasalization, sans-serif;
-    border-bottom: 1px solid white;
+    border-top: 1px solid white;
 
     & > p {
       text-transform: capitalize;
@@ -40,7 +46,7 @@
     display: flex;
     flex-direction: column;
 
-    &>p {
+    & > p {
       margin-bottom: 0.5em;
     }
 
@@ -51,7 +57,7 @@
 
       padding-left: 30px;
 
-      &>p {
+      & > p {
         text-transform: capitalize;
         border-left: 1px solid white;
       }

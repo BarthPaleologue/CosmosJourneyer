@@ -234,7 +234,8 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             const mapDiv = document.createElement("div");
             mapDiv.classList.add("map");
             const mapName = document.createElement("h3");
-            mapName.textContent = inputMap.name;
+            // break camelCase with a space
+            mapName.textContent = inputMap.name.replace(/([A-Z])/g, " $1").trim();
 
             mapDiv.appendChild(mapName);
 
@@ -290,7 +291,8 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                 const actionDiv = document.createElement("div");
 
                 const label = document.createElement("p");
-                label.textContent = actionName;
+                // break camelCase with a space
+                label.textContent = actionName.replace(/([A-Z])/g, " $1").trim();
 
                 actionDiv.appendChild(label);
 

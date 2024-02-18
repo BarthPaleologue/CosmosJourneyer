@@ -71,14 +71,14 @@ const yawAction = new Action({
     bindings: [yaw]
 });
 
-export const DefaultControlsInput = new InputMap<{
+export const DefaultControlsInputs = new InputMap<{
     move: Action<[number, number]>;
     upDown: Action<number>;
     changeSpeed: Action<number>;
     roll: Action<number>;
     pitch: Action<number>;
     yaw: Action<number>;
-}>("DefaultControlsInput", {
+}>("DefaultControlsInputs", {
     move: moveAction,
     upDown: upDownAction,
     changeSpeed: changeSpeedAction,
@@ -87,4 +87,4 @@ export const DefaultControlsInput = new InputMap<{
     yaw: yawAction
 });
 
-InputMaps.push(DefaultControlsInput);
+InputMaps.push(DefaultControlsInputs);
