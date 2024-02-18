@@ -173,6 +173,8 @@ export class StarSystemView {
         this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getOrbitalObjects());
         this.axisRenderer.setObjects(this.getStarSystem().getOrbitalObjects());
 
+        this.helmetOverlay.setTarget(null);
+
         const activeController = this.scene.getActiveController();
         let controllerDistanceFactor = 5;
         if (firstBody instanceof BlackHole) controllerDistanceFactor = 7;
