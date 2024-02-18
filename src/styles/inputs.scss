@@ -4,6 +4,10 @@
   display: flex;
   flex-direction: column;
 
+  h3 {
+    margin-bottom: 0.5em;
+  }
+
   .actionMultiple,
   .actionSingle {
     font-family: Nasalization, sans-serif;
@@ -36,12 +40,21 @@
     display: flex;
     flex-direction: column;
 
+    &>p {
+      margin-bottom: 0.5em;
+    }
+
     .subAction {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
 
       padding-left: 30px;
+
+      &>p {
+        text-transform: capitalize;
+        border-left: 1px solid white;
+      }
     }
   }
 
