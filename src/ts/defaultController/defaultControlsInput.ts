@@ -23,7 +23,7 @@ const kbdWASD = new DPadComposite({
  * The action will respond to whichever control is used.
  */
 const moveAction = new Action({
-    bindings: [leftStick, kbdWASD]
+    bindings: [kbdWASD, leftStick]
 });
 
 const keyboardSpeed = new AxisComposite({

@@ -18,8 +18,11 @@ import { InputMaps } from "../inputs/inputMaps";
 import Action from "@brianchirls/game-input/Action";
 import Interaction from "@brianchirls/game-input/interactions/Interaction";
 import { Assets } from "../assets";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+import { AxisComposite, ButtonInputControl } from "@brianchirls/game-input/browser";
 import { Settings } from "../settings";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
+import { axisCompositeToString, buttonInputToString, dPadCompositeToString } from "../utils/inputControlsString";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -93,14 +96,9 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             this.starSystemView.switchToDefaultControls();
             const nbRadius = this.starSystemController.model.getBodyTypeOfStar(0) === BodyType.BLACK_HOLE ? 8 : 2;
             const targetObject = this.starSystemController.planets.length > 0 ? this.starSystemController.planets[0] : this.starSystemController.stellarObjects[0];
-            positionNearObjectWithStarVisible(
-                this.controls,
-                targetObject,
-                this.starSystemController,
-                nbRadius
-            );
+            positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
 
-            if(targetObject instanceof GasPlanet) Settings.TIME_MULTIPLIER = 30;
+            if (targetObject instanceof GasPlanet) Settings.TIME_MULTIPLIER = 30;
             else Settings.TIME_MULTIPLIER = 3;
 
             Assets.MAIN_MENU_BACKGROUND_MUSIC.play();
@@ -230,9 +228,9 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         this.settingsPanel = settingsPanel;
 
         InputMaps.forEach((inputMap) => {
-           // create a div
-           // the name of the map will be an h3
-           // each action will be a div with the name of the action and the bindings
+            // create a div
+            // the name of the map will be an h3
+            // each action will be a div with the name of the action and the bindings
             const mapDiv = document.createElement("div");
             mapDiv.classList.add("map");
             const mapName = document.createElement("h3");
@@ -250,22 +248,27 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                 const valuesContainer = document.createElement("div");
                 valuesContainer.classList.add("valuesContainer");
 
-                const keyboardValueContainer = document.createElement("p");
-                const gamepadValueContainer = document.createElement("p");
-
                 const actionOrInteraction = action as Action | Interaction;
-                if(actionOrInteraction instanceof Action) {
-                    keyboardValueContainer.textContent = actionOrInteraction.bindings[0].control.name;
-                    gamepadValueContainer.textContent = actionOrInteraction.bindings[1]?.control.name;
-                } else if(actionOrInteraction instanceof Interaction) {
-                    keyboardValueContainer.textContent = actionOrInteraction.action.bindings[0].control.name;
-                    gamepadValueContainer.textContent = actionOrInteraction.action.bindings[1]?.control.name;
-                } else {
-                    throw new Error("Unknown type of action or interaction in inputMap.map." + inputMap.name + " for action " + actionName + " : " + actionOrInteraction);
-                }
+                const bindings = actionOrInteraction instanceof Action ? actionOrInteraction.bindings : actionOrInteraction.action.bindings;
+                bindings.forEach((binding) => {
+                    const valueContainer = document.createElement("p");
 
-                valuesContainer.appendChild(keyboardValueContainer);
-                valuesContainer.appendChild(gamepadValueContainer);
+                    let text: string;
+
+                    if (binding.control instanceof DPadComposite) {
+                        text = dPadCompositeToString(binding.control);
+                    } else if (binding.control instanceof ButtonInputControl) {
+                        text = buttonInputToString(binding.control);
+                    } else if (binding.control instanceof AxisComposite) {
+                        text = axisCompositeToString(binding.control);
+                    } else {
+                        text = binding.control.name;
+                    }
+
+                    valueContainer.innerText = text;
+
+                    valuesContainer.appendChild(valueContainer);
+                });
 
                 actionDiv.appendChild(label);
                 actionDiv.appendChild(valuesContainer);
