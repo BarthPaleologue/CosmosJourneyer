@@ -6,17 +6,18 @@ export function stickInputToString(input: StickInputControl): string {
     return input.name;
 }
 
-export function dPadCompositeToString(input: DPadComposite): string {
-    const keys: string[] = [];
-    input.children.forEach((child) => {
+export function dPadCompositeToString(input: DPadComposite): [string, string][] {
+    const keys: [string, string][] = [];
+    input.children.forEach((child, key) => {
+        if (key === "x" || key === "y") return;
         let name = child.name;
         // remove the "key:" prefix
         name = name.replace("key:", "");
         // remove the occasional Key
         name = name.replace("Key", "");
-        keys.push(name);
+        keys.push([key, name]);
     });
-    return keys.join(" ");
+    return keys;
 }
 
 export function buttonInputToString(input: ButtonInputControl): string {
@@ -28,16 +29,16 @@ export function buttonInputToString(input: ButtonInputControl): string {
     return name;
 }
 
-export function axisCompositeToString(input: AxisComposite): string {
-    const keys: string[] = [];
-    input.children.forEach((child) => {
+export function axisCompositeToString(input: AxisComposite): [string, string][] {
+    const keys: [string, string][] = [];
+    input.children.forEach((child, key) => {
         let name = child.name;
 
         // remove the "key:" prefix
         name = name.replace("key:", "");
         // remove the occasional Key
         name = name.replace("Key", "");
-        keys.push(name);
+        keys.push([key, name]);
     });
-    return keys.join(" ");
+    return keys;
 }

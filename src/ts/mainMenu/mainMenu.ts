@@ -256,11 +256,11 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                     let text: string;
 
                     if (binding.control instanceof DPadComposite) {
-                        text = dPadCompositeToString(binding.control);
+                        text = dPadCompositeToString(binding.control).join(", ");
                     } else if (binding.control instanceof ButtonInputControl) {
                         text = buttonInputToString(binding.control);
                     } else if (binding.control instanceof AxisComposite) {
-                        text = axisCompositeToString(binding.control);
+                        text = axisCompositeToString(binding.control).join(", ");
                     } else {
                         text = binding.control.name;
                     }
