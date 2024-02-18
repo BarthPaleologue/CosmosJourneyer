@@ -286,6 +286,8 @@ export class StarSystemView {
     }
 
     switchToCharacterControls() {
+        this.stopBackgroundSounds();
+
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -301,6 +303,8 @@ export class StarSystemView {
     }
 
     switchToDefaultControls() {
+        this.stopBackgroundSounds();
+
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
