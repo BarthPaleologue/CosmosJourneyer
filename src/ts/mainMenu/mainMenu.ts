@@ -260,7 +260,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                         text = strings.join(", ");
                     } else if (binding.control instanceof ButtonInputControl) {
                         text = buttonInputToString(binding.control);
-                        subActionMap.set(text, [text]);
+                        subActionMap.set("BUTTON", [text]);
                     } else if (binding.control instanceof AxisComposite) {
                         const strings = axisCompositeToString(binding.control);
                         strings.forEach((string) => {
