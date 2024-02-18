@@ -47,6 +47,10 @@ const rollPitch = new Action({
             pointerX = pointerX * 2 - 1;
             pointerY = pointerY * 2 - 1;
 
+            // normalize
+            pointerX *= window.innerWidth / Math.max(window.innerWidth, window.innerHeight);
+            pointerY *= window.innerHeight / Math.max(window.innerWidth, window.innerHeight);
+
             // dead zone
             const deadZone = 0.1;
             if (Math.abs(pointerX) < deadZone) {
