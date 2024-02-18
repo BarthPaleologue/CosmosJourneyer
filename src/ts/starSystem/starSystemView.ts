@@ -45,7 +45,6 @@ import { Assets } from "../assets";
 import { getRotationQuaternion, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { Sound } from "@babylonjs/core/Audio/sound";
 
 export class StarSystemView {
     private readonly helmetOverlay: HelmetOverlay;
@@ -68,8 +67,6 @@ export class StarSystemView {
     private starSystem: StarSystemController | null = null;
 
     private readonly chunkForge: ChunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
-
-    private backgroundSounds: Sound[] = [];
 
     readonly onInitStarSystem = new Observable<void>();
 
@@ -94,14 +91,14 @@ export class StarSystemView {
 
         document.addEventListener("keydown", (e) => {
             if (e.key === "o") {
-                const enabled = !this.ui.isEnabled()
-                if(enabled) Assets.MENU_HOVER_SOUND.play();
+                const enabled = !this.ui.isEnabled();
+                if (enabled) Assets.MENU_HOVER_SOUND.play();
                 else Assets.MENU_HOVER_SOUND.play();
                 this.ui.setEnabled(enabled);
             }
             if (e.key === "n") {
                 const enabled = !this.orbitRenderer.isVisible();
-                if(enabled) Assets.MENU_HOVER_SOUND.play();
+                if (enabled) Assets.MENU_HOVER_SOUND.play();
                 else Assets.MENU_HOVER_SOUND.play();
                 this.orbitRenderer.setVisibility(enabled);
                 this.axisRenderer.setVisibility(enabled);
@@ -212,8 +209,6 @@ export class StarSystemView {
         this.characterControls.getActiveCamera().maxZ = maxZ;
 
         this.scene.setActiveController(this.spaceshipControls);
-
-        this.backgroundSounds = [Assets.ACCELERATING_WARP_DRIVE_SOUND, Assets.DECELERATING_WARP_DRIVE_SOUND];
     }
 
     /**
@@ -289,8 +284,6 @@ export class StarSystemView {
     }
 
     switchToCharacterControls() {
-        this.stopBackgroundSounds();
-
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -303,11 +296,11 @@ export class StarSystemView {
 
         shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
+        shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
+        shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
     }
 
     switchToDefaultControls() {
-        this.stopBackgroundSounds();
-
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -315,6 +308,8 @@ export class StarSystemView {
         characterControls.getTransform().setEnabled(false);
         shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
+        shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
+        shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
 
         this.scene.setActiveController(defaultControls);
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
@@ -322,9 +317,8 @@ export class StarSystemView {
     }
 
     stopBackgroundSounds() {
-        for (const sound of this.backgroundSounds) {
-            sound.stop();
-        }
+        this.spaceshipControls?.spaceship.acceleratingWarpDriveSound.muteInstantly();
+        this.spaceshipControls?.spaceship.deceleratingWarpDriveSound.muteInstantly();
     }
 
     /**

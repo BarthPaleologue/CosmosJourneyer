@@ -40,6 +40,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
+import { AudioInstance } from "../utils/audioInstance";
 
 enum ShipState {
     FLYING,
@@ -78,6 +79,11 @@ export class Spaceship implements Transformable {
     private readonly scene: Scene;
 
     private targetLandingPad: LandingPad | null = null;
+
+    readonly enableWarpDriveSound: AudioInstance;
+    readonly disableWarpDriveSound: AudioInstance;
+    readonly acceleratingWarpDriveSound: AudioInstance;
+    readonly deceleratingWarpDriveSound: AudioInstance;
 
     readonly onWarpDriveEnabled = new Observable<void>();
     readonly onWarpDriveDisabled = new Observable<void>();
@@ -128,6 +134,14 @@ export class Spaceship implements Transformable {
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
 
+        this.enableWarpDriveSound = new AudioInstance(Assets.ENABLE_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
+        this.disableWarpDriveSound = new AudioInstance(Assets.DISABLE_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
+        this.acceleratingWarpDriveSound = new AudioInstance(Assets.ACCELERATING_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
+        this.deceleratingWarpDriveSound = new AudioInstance(Assets.DECELERATING_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
+
+        this.acceleratingWarpDriveSound.setTargetVolume(0);
+        this.deceleratingWarpDriveSound.setTargetVolume(0);
+
         this.scene = scene;
     }
 
@@ -171,14 +185,18 @@ export class Spaceship implements Transformable {
         this.aggregate.body.setLinearVelocity(Vector3.Zero());
         this.aggregate.body.setAngularVelocity(Vector3.Zero());
 
-        Assets.ENABLE_WARP_DRIVE_SOUND.play();
+        if(!this.acceleratingWarpDriveSound.sound.isPlaying) this.acceleratingWarpDriveSound.sound.play();
+        if(!this.deceleratingWarpDriveSound.sound.isPlaying) this.deceleratingWarpDriveSound.sound.play();
+
+        this.enableWarpDriveSound.sound.play();
         this.onWarpDriveEnabled.notifyObservers();
     }
 
     public disableWarpDrive() {
         this.warpDrive.desengage();
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
-        Assets.DISABLE_WARP_DRIVE_SOUND.play();
+
+        this.disableWarpDriveSound.sound.play();
         this.onWarpDriveDisabled.notifyObservers();
     }
 
@@ -263,7 +281,6 @@ export class Spaceship implements Transformable {
                 const landingSpot = this.raycastResult.hitPointWorld.add(this.raycastResult.hitNormalWorld.scale(1.0));
 
                 const distance = landingSpot.subtract(this.getTransform().getAbsolutePosition()).dot(gravityDir);
-                console.log(500 * deltaTime * Math.sign(distance), distance);
                 translate(this.getTransform(), gravityDir.scale(Math.min(10 * deltaTime * Math.sign(distance), distance)));
 
                 const currentUp = getUpwardDirection(this.getTransform());
@@ -332,19 +349,25 @@ export class Spaceship implements Transformable {
                 this.aggregate.body.applyForce(gravityDir.scale(9.8), this.aggregate.body.getObjectCenterWorld());
             }
 
-            if (Assets.ACCELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.ACCELERATING_WARP_DRIVE_SOUND.stop();
-            if (Assets.DECELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.DECELERATING_WARP_DRIVE_SOUND.stop();
+            this.acceleratingWarpDriveSound.setTargetVolume(0);
+            this.deceleratingWarpDriveSound.setTargetVolume(0);
         } else {
             translate(this.getTransform(), warpSpeed.scale(deltaTime));
 
             if (currentForwardSpeed < this.warpDrive.getWarpSpeed()) {
-                if (!Assets.ACCELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.ACCELERATING_WARP_DRIVE_SOUND.play();
-                if (Assets.DECELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.DECELERATING_WARP_DRIVE_SOUND.stop();
+                this.acceleratingWarpDriveSound.setTargetVolume(1);
+                this.deceleratingWarpDriveSound.setTargetVolume(0);
+                console.log(this.acceleratingWarpDriveSound.sound.getVolume());
             } else {
-                if (!Assets.DECELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.DECELERATING_WARP_DRIVE_SOUND.play();
-                if (Assets.ACCELERATING_WARP_DRIVE_SOUND.isPlaying) Assets.ACCELERATING_WARP_DRIVE_SOUND.stop();
+                this.deceleratingWarpDriveSound.setTargetVolume(1);
+                this.acceleratingWarpDriveSound.setTargetVolume(0);
             }
         }
+
+        this.enableWarpDriveSound.update(deltaTime);
+        this.disableWarpDriveSound.update(deltaTime);
+        this.acceleratingWarpDriveSound.update(deltaTime);
+        this.deceleratingWarpDriveSound.update(deltaTime);
 
         if (this.flightAssistEnabled) {
             this.aggregate.body.setAngularDamping(0.9);
