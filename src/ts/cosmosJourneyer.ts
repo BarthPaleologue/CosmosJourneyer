@@ -190,6 +190,7 @@ export class CosmosJourneyer {
     }
 
     public pause(): void {
+        if(this.isPaused()) return;
         this.state = EngineState.PAUSED;
 
         if(this.activeScene === this.starSystemView.scene) this.starSystemView.stopBackgroundSounds();
