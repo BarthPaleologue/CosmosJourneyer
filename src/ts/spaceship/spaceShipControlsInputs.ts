@@ -81,20 +81,26 @@ const toggleWarpDrive = new Action({
 
 const toggleWarpDriveInteraction = new PressInteraction(toggleWarpDrive);
 
+const ignorePointer = new Action({
+    bindings: [keyboard.getControl("AltLeft")]
+});
+
 export const SpaceShipControlsInputs = new InputMap<{
     landing: PressInteraction,
     upDown: Action<number>,
     throttle: Action<number>,
     rollPitch: Action<[number, number]>,
     toggleFlightAssist: PressInteraction,
-    toggleWarpDrive: PressInteraction
+    toggleWarpDrive: PressInteraction,
+    ignorePointer: Action<number>
 }>("SpaceShipInputs", {
     landing: landingInteraction,
     upDown: upDownAction,
     throttle: throttleAction,
     rollPitch: rollPitch,
     toggleFlightAssist: toggleFlightAssistInteraction,
-    toggleWarpDrive: toggleWarpDriveInteraction
+    toggleWarpDrive: toggleWarpDriveInteraction,
+    ignorePointer: ignorePointer
 });
 
 InputMaps.push(SpaceShipControlsInputs);

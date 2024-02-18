@@ -96,7 +96,11 @@ export class ShipControls implements Controls {
     public update(deltaTime: number): Vector3 {
         this.spaceship.update(deltaTime);
 
-        const [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
+        let [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
+        if(SpaceShipControlsInputs.map.ignorePointer.value > 0) {
+            inputRoll *= 0;
+            inputPitch *= 0;
+        }
 
         if (this.spaceship.getWarpDrive().isDisabled()) {
             for (const thruster of this.spaceship.mainThrusters) {
