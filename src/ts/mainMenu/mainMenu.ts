@@ -19,10 +19,21 @@ import Action from "@brianchirls/game-input/Action";
 import Interaction from "@brianchirls/game-input/interactions/Interaction";
 import { Assets } from "../assets";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import { AxisComposite, ButtonInputControl, StickInputControl } from "@brianchirls/game-input/browser";
+import {
+    AxisComposite,
+    ButtonInputControl,
+    StickInputControl,
+    Vector2InputControl
+} from "@brianchirls/game-input/browser";
 import { Settings } from "../settings";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { axisCompositeToString, buttonInputToString, dPadCompositeToString, stickInputToString } from "../utils/inputControlsString";
+import {
+    axisCompositeToString,
+    buttonInputToString,
+    dPadCompositeToString,
+    stickInputToString,
+    vector2ToString
+} from "../utils/inputControlsString";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -244,11 +255,8 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                 const subActionMap: Map<string, string[]> = new Map();
 
                 const actionOrInteraction = action as Action | Interaction;
-                console.log(actionOrInteraction);
                 const bindings = actionOrInteraction instanceof Action ? actionOrInteraction.bindings : actionOrInteraction.action.bindings;
                 bindings.forEach((binding) => {
-                    let text: string;
-
                     if (binding.control instanceof DPadComposite) {
                         const strings = dPadCompositeToString(binding.control);
                         strings.forEach((string) => {
@@ -258,9 +266,8 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                             }
                             subActionMap.get(key)?.push(name);
                         });
-                        text = strings.join(", ");
                     } else if (binding.control instanceof ButtonInputControl) {
-                        text = buttonInputToString(binding.control);
+                        const text = buttonInputToString(binding.control);
                         subActionMap.set("BUTTON", [text]);
                     } else if (binding.control instanceof AxisComposite) {
                         const strings = axisCompositeToString(binding.control);
@@ -271,7 +278,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                             }
                             subActionMap.get(key)?.push(name);
                         });
-                        text = strings.join(", ");
                     } else if (binding.control instanceof StickInputControl) {
                         const strings = stickInputToString(binding.control);
                         strings.forEach((string) => {
@@ -281,10 +287,17 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                             }
                             subActionMap.get(key)?.push(name);
                         });
-                        text = strings.join(", ");
+                    } else if(binding.control instanceof Vector2InputControl) {
+                        const strings = vector2ToString(binding.control);
+                        strings.forEach((string) => {
+                            const [key, name] = string;
+                            if (!subActionMap.has(key)) {
+                                subActionMap.set(key, []);
+                            }
+                            subActionMap.get(key)?.push(name);
+                        });
                     } else {
-                        //throw new Error("Unknown control type");
-                        text = "Unknown control type";
+                        throw new Error("Unknown control type");
                     }
                 });
 
@@ -336,8 +349,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                         actionDiv.appendChild(subActionDiv);
                     });
                 }
-
-                console.log(subActionMap);
 
                 mapDiv.appendChild(actionDiv);
             }
