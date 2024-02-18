@@ -100,8 +100,11 @@ export class StarSystemView {
                 this.ui.setEnabled(enabled);
             }
             if (e.key === "n") {
-                this.orbitRenderer.setVisibility(!this.orbitRenderer.isVisible());
-                this.axisRenderer.setVisibility(!this.axisRenderer.isVisible());
+                const enabled = !this.orbitRenderer.isVisible();
+                if(enabled) Assets.MENU_HOVER_SOUND.play();
+                else Assets.MENU_HOVER_SOUND.play();
+                this.orbitRenderer.setVisibility(enabled);
+                this.axisRenderer.setVisibility(enabled);
             }
             if (e.key === "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
             if (e.key === "b") this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
