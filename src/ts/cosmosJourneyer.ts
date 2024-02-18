@@ -210,6 +210,9 @@ export class CosmosJourneyer {
      * Inits the current star system
      */
     public init(skipMainMenu = false): void {
+        // request full screen for the entire page
+        document.documentElement.requestFullscreen();
+
         if (!skipMainMenu) this.mainMenu.init();
         this.starSystemView.initStarSystem();
 
