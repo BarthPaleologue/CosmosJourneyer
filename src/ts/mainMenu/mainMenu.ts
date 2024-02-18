@@ -18,6 +18,8 @@ import { InputMaps } from "../inputs/inputMaps";
 import Action from "@brianchirls/game-input/Action";
 import Interaction from "@brianchirls/game-input/interactions/Interaction";
 import { Assets } from "../assets";
+import { Settings } from "../settings";
+import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -90,9 +92,10 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToDefaultControls();
             const nbRadius = this.starSystemController.model.getBodyTypeOfStar(0) === BodyType.BLACK_HOLE ? 8 : 2;
+            const targetObject = this.starSystemController.planets.length > 0 ? this.starSystemController.planets[0] : this.starSystemController.stellarObjects[0];
             positionNearObjectWithStarVisible(
                 this.controls,
-                this.starSystemController.planets.length > 0 ? this.starSystemController.getBodies()[1] : this.starSystemController.stellarObjects[0],
+                targetObject,
                 this.starSystemController,
                 nbRadius
             );
@@ -311,6 +314,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
 
     private startAnimation(onAnimationFinished: () => void) {
         this.hideActivePanel();
+        Settings.TIME_MULTIPLIER = 1;
 
         const currentForward = getForwardDirection(this.controls.getTransform());
 
