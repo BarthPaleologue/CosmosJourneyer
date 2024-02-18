@@ -382,7 +382,7 @@ export class Assets {
             Assets.ACCELERATING_WARP_DRIVE_SOUND = new Sound("AcceleratingWarpDriveSound", task.data, scene);
             Assets.ACCELERATING_WARP_DRIVE_SOUND.updateOptions({
                 playbackRate: 1.0,
-                volume: 0.01,
+                volume: 0.1,
                 loop: true
             });
 
@@ -394,7 +394,7 @@ export class Assets {
             Assets.DECELERATING_WARP_DRIVE_SOUND = new Sound("DeceleratingWarpDriveSound", task.data, scene);
             Assets.DECELERATING_WARP_DRIVE_SOUND.updateOptions({
                 playbackRate: 1.0,
-                volume: 0.01,
+                volume: 0.1,
                 loop: true
             });
 
