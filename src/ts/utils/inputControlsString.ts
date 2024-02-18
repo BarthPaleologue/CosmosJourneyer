@@ -1,9 +1,13 @@
 import { AxisComposite, ButtonInputControl, StickInputControl } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import Keyboard from "@brianchirls/game-input/devices/Keyboard";
 
-export function stickInputToString(input: StickInputControl): string {
-    return input.name;
+export function stickInputToString(input: StickInputControl): [string, string][] {
+    const keys: [string, string][] = [];
+    input.children.forEach((child, key) => {
+        if (key === "x" || key === "y") return;
+        keys.push([key, input.name]);
+    });
+    return keys;
 }
 
 export function dPadCompositeToString(input: DPadComposite): [string, string][] {

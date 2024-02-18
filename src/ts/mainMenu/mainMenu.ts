@@ -19,10 +19,10 @@ import Action from "@brianchirls/game-input/Action";
 import Interaction from "@brianchirls/game-input/interactions/Interaction";
 import { Assets } from "../assets";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import { AxisComposite, ButtonInputControl } from "@brianchirls/game-input/browser";
+import { AxisComposite, ButtonInputControl, StickInputControl } from "@brianchirls/game-input/browser";
 import { Settings } from "../settings";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { axisCompositeToString, buttonInputToString, dPadCompositeToString } from "../utils/inputControlsString";
+import { axisCompositeToString, buttonInputToString, dPadCompositeToString, stickInputToString } from "../utils/inputControlsString";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -239,39 +239,103 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             mapDiv.appendChild(mapName);
 
             for (const [actionName, action] of Object.entries(inputMap.map)) {
+
+                const subActionMap: Map<string, string[]> = new Map();
+
+                const actionOrInteraction = action as Action | Interaction;
+                console.log(actionOrInteraction);
+                const bindings = actionOrInteraction instanceof Action ? actionOrInteraction.bindings : actionOrInteraction.action.bindings;
+                bindings.forEach((binding) => {
+                    let text: string;
+
+                    if (binding.control instanceof DPadComposite) {
+                        const strings = dPadCompositeToString(binding.control);
+                        strings.forEach((string) => {
+                            const [key, name] = string;
+                            if (!subActionMap.has(key)) {
+                                subActionMap.set(key, []);
+                            }
+                            subActionMap.get(key)?.push(name);
+                        });
+                        text = strings.join(", ");
+                    } else if (binding.control instanceof ButtonInputControl) {
+                        text = buttonInputToString(binding.control);
+                        subActionMap.set(text, [text]);
+                    } else if (binding.control instanceof AxisComposite) {
+                        const strings = axisCompositeToString(binding.control);
+                        strings.forEach((string) => {
+                            const [key, name] = string;
+                            if (!subActionMap.has(key)) {
+                                subActionMap.set(key, []);
+                            }
+                            subActionMap.get(key)?.push(name);
+                        });
+                        text = strings.join(", ");
+                    } else if (binding.control instanceof StickInputControl) {
+                        const strings = stickInputToString(binding.control);
+                        strings.forEach((string) => {
+                            const [key, name] = string;
+                            if (!subActionMap.has(key)) {
+                                subActionMap.set(key, []);
+                            }
+                            subActionMap.get(key)?.push(name);
+                        });
+                        text = strings.join(", ");
+                    } else {
+                        //throw new Error("Unknown control type");
+                        text = "Unknown control type";
+                    }
+                });
+
                 const actionDiv = document.createElement("div");
-                actionDiv.classList.add("action");
 
                 const label = document.createElement("p");
                 label.textContent = actionName;
 
-                const valuesContainer = document.createElement("div");
-                valuesContainer.classList.add("valuesContainer");
-
-                const actionOrInteraction = action as Action | Interaction;
-                const bindings = actionOrInteraction instanceof Action ? actionOrInteraction.bindings : actionOrInteraction.action.bindings;
-                bindings.forEach((binding) => {
-                    const valueContainer = document.createElement("p");
-
-                    let text: string;
-
-                    if (binding.control instanceof DPadComposite) {
-                        text = dPadCompositeToString(binding.control).join(", ");
-                    } else if (binding.control instanceof ButtonInputControl) {
-                        text = buttonInputToString(binding.control);
-                    } else if (binding.control instanceof AxisComposite) {
-                        text = axisCompositeToString(binding.control).join(", ");
-                    } else {
-                        text = binding.control.name;
-                    }
-
-                    valueContainer.innerText = text;
-
-                    valuesContainer.appendChild(valueContainer);
-                });
-
                 actionDiv.appendChild(label);
-                actionDiv.appendChild(valuesContainer);
+
+                if (subActionMap.size === 1) {
+                    actionDiv.classList.add("actionSingle");
+
+                    const valuesContainer = document.createElement("div");
+                    valuesContainer.classList.add("valuesContainer");
+
+                    subActionMap.forEach((value, key) => {
+                        value.forEach((v) => {
+                            const valueContainer = document.createElement("p");
+                            valueContainer.innerText = v;
+                            valuesContainer.appendChild(valueContainer);
+                        });
+                    });
+
+                    actionDiv.appendChild(valuesContainer);
+                } else {
+                    actionDiv.classList.add("actionMultiple");
+
+                    subActionMap.forEach((value, key) => {
+                        const subActionDiv = document.createElement("div");
+                        subActionDiv.classList.add("subAction");
+
+                        const subActionLabel = document.createElement("p");
+                        subActionLabel.textContent = key;
+
+                        const valuesContainer = document.createElement("div");
+                        valuesContainer.classList.add("valuesContainer");
+
+                        value.forEach((v) => {
+                            const valueContainer = document.createElement("p");
+                            valueContainer.innerText = v;
+                            valuesContainer.appendChild(valueContainer);
+                        });
+
+                        subActionDiv.appendChild(subActionLabel);
+                        subActionDiv.appendChild(valuesContainer);
+
+                        actionDiv.appendChild(subActionDiv);
+                    });
+                }
+
+                console.log(subActionMap);
 
                 mapDiv.appendChild(actionDiv);
             }

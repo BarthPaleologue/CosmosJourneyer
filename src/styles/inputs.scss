@@ -4,29 +4,58 @@
   display: flex;
   flex-direction: column;
 
-
-  .action {
+  .actionMultiple,
+  .actionSingle {
     font-family: Nasalization, sans-serif;
-
     border-bottom: 1px solid white;
 
-    // the name if on the left, the input is on the right
+    & > p {
+      text-transform: capitalize;
+    }
+  }
+
+  .actionSingle,
+  .subAction {
+    transition: .2s;
+    padding-right: 10px;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+
+  .actionSingle {
     display: flex;
     justify-content: space-between;
     flex-direction: row;
+  }
 
-    padding-right: 10px;
+  .actionMultiple {
 
-    .valuesContainer {
+    display: flex;
+    flex-direction: column;
+
+    .subAction {
       display: flex;
       flex-direction: row;
-      align-items: center;
       justify-content: space-between;
-      column-gap: 10px;
 
-      p {
-        border: 1px solid white;
-      }
+      padding-left: 30px;
+    }
+  }
+
+  .valuesContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 10px;
+
+    p {
+      border: 1px solid white;
+      min-width: 50px;
+      text-align: center;
     }
   }
 }
