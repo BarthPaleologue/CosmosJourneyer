@@ -52,4 +52,8 @@ export class TransformRotationAnimation {
     isFinished(): boolean {
         return this.clock >= this.duration;
     }
+
+    getProgress(): number {
+        return this.clock / this.duration;
+    }
 }

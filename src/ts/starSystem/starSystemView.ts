@@ -185,8 +185,8 @@ export class StarSystemView {
         this.getStarSystem()
             .initPostProcesses()
             .then(() => {
-                this.scene.getEngine().loadingScreen.hideLoadingUI();
                 this.onInitStarSystem.notifyObservers();
+                this.scene.getEngine().loadingScreen.hideLoadingUI();
             });
     }
 

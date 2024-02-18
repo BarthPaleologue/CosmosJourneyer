@@ -84,6 +84,7 @@ import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
 import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
+import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class Assets {
     static IS_READY = false;
@@ -149,11 +150,13 @@ export class Assets {
     public static DECELERATING_WARP_DRIVE_SOUND: Sound;
 
     public static STAR_MAP_BACKGROUND_MUSIC: Sound;
+    public static MAIN_MENU_BACKGROUND_MUSIC: Sound;
 
     private static MANAGER: AssetsManager;
 
     static async Init(scene: Scene): Promise<void> {
         Assets.MANAGER = new AssetsManager(scene);
+        Assets.MANAGER.autoHideLoadingUI = false;
         console.log("Initializing assets...");
 
         Assets.MANAGER.addTextureTask("RockNormalMap", rockNormalMap).onSuccess = (task) => (Assets.ROCK_NORMAL_MAP = task.texture);
@@ -405,6 +408,19 @@ export class Assets {
             console.log("Star map background music loaded");
         };
 
+        const mainMenuBackgroundMusicTask = Assets.MANAGER.addBinaryFileTask("mainMenuBackgroundMusicTask", starMapBackgroundMusic);
+        const mainMenuBackgroundMusicLoaded = new Promise<void>((resolve) => {
+            mainMenuBackgroundMusicTask.onSuccess = function(task) {
+                Assets.MAIN_MENU_BACKGROUND_MUSIC = new Sound("MainMenuBackgroundMusic", task.data, scene, () => {
+                    resolve();
+                }, {
+                    loop: true
+                });
+
+                console.log("Main menu background music loaded");
+            };
+        });
+
         Assets.MANAGER.onProgress = (remainingCount, totalCount) => {
             scene.getEngine().loadingScreen.loadingUIText = `Loading assets... ${totalCount - remainingCount}/${totalCount}`;
         };
@@ -416,10 +432,13 @@ export class Assets {
 
         Assets.MANAGER.onFinish = () => {
             console.log("Assets loaded");
+            scene.getEngine().loadingScreen.loadingUIText = "Press F11 to go fullscreen";
             Assets.IS_READY = true;
         };
 
         await Assets.MANAGER.loadAsync();
+
+        await mainMenuBackgroundMusicLoaded;
     }
 
     static CreateSpaceShipInstance(): InstancedMesh {

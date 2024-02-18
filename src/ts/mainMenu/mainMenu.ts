@@ -69,11 +69,11 @@ export class MainMenu {
         ];
 
         /*const randomSeed = new SystemSeed(
-      Math.trunc((Math.random() * 2 - 1) * 1000),
-      Math.trunc((Math.random() * 2 - 1) * 1000),
-      Math.trunc((Math.random() * 2 - 1) * 1000),
-      0
-    );*/
+Math.trunc((Math.random() * 2 - 1) * 1000),
+Math.trunc((Math.random() * 2 - 1) * 1000),
+Math.trunc((Math.random() * 2 - 1) * 1000),
+0
+);*/
 
         const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)];
         console.log(seed.starSectorX + ", " + seed.starSectorY + ", " + seed.starSectorZ + ", " + seed.index);
@@ -92,6 +92,8 @@ export class MainMenu {
                 this.starSystemController,
                 nbRadius
             );
+
+            Assets.MAIN_MENU_BACKGROUND_MUSIC.play();
         });
 
         this.starSystemView.ui.setEnabled(false);
@@ -295,8 +297,12 @@ export class MainMenu {
                 this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
                 if (this.htmlRoot === null) throw new Error("MainMenu is null");
                 this.htmlRoot.style.display = "none";
+                Assets.MAIN_MENU_BACKGROUND_MUSIC.stop();
                 onAnimationFinished();
             }
+
+            const currentProgress = translationAnimation.getProgress();
+            Assets.MAIN_MENU_BACKGROUND_MUSIC.setVolume(1 - currentProgress);
 
             this.controls.getActiveCamera().getViewMatrix();
 
