@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "cosmos-journeyer",
-    "version": "0.1.0"
+    "version": "../package.json"
   },
   "tauri": {
     "allowlist": {
@@ -16,8 +16,8 @@
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
-      "copyright": "",
+      "category": "SimulationGame",
+      "copyright": "Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>",
       "deb": {
         "depends": []
       },
