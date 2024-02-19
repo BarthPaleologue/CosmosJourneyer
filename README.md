@@ -45,6 +45,26 @@ Cosmos Journeyer generates a virtually infinite amount of star systems that all 
 
 ![Star map](./coverImages/starmap.png)
 
+## Build
+
+First, clone the repository and install the dependencies with `pnpm install`.
+
+### Web
+
+To build the web version of Cosmos Journeyer, run `pnpm build`. Everything will be built in the `dist` folder.
+
+### Tauri
+
+Cosmos Journeyer can be built as a desktop application using Tauri!
+
+First you will need a bazillion dependencies, here is a list of some of them if you are using a Debian base OS:
+
+```bash
+sudo apt install -y libwebkit2gtk-4.0-dev libgtk-3-dev libsoup2.4-dev libjavascriptcoregtk-4.0-dev librsvg2-dev
+```
+
+Then you can build the application with `pnpm tauri build`.
+
 ## Contributors
 
 Thank you to all the people who have contributed to Cosmos Journeyer!
