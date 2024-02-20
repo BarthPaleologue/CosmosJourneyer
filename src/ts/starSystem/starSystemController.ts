@@ -350,7 +350,7 @@ export class StarSystemController {
         // When we are a bit further, we only need to compensate the translation as it would be unnatural not to see the body rotating
         const distanceOfNearestToControls = Vector3.Distance(nearestBody.getTransform().getAbsolutePosition(), controller.getTransform().getAbsolutePosition());
         const shouldCompensateTranslation = distanceOfNearestToControls < nearestBody.getBoundingRadius() * (nearestBody instanceof SpaceStation ? 80 : 10);
-        const shouldCompensateRotation = !(nearestBody instanceof SpaceStation) && distanceOfNearestToControls < nearestBody.getBoundingRadius() * 4;
+        const shouldCompensateRotation = !(nearestBody instanceof SpaceStation) && distanceOfNearestToControls < nearestBody.getBoundingRadius() * 3;
 
         // ROTATION COMPENSATION
         // If we have to compensate the rotation of the nearest body, there are multiple things to take into account

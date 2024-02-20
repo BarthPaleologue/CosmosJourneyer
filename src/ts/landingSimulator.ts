@@ -11,8 +11,6 @@ import { roll, setRotationQuaternion, translate } from "./uberCore/transforms/ba
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import "@babylonjs/core/Physics/physicsEngineComponent";
-import { Keyboard } from "./inputs/keyboard";
-import { LandingPad } from "./landingPad/landingPad";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
 import { DefaultControls } from "./defaultController/defaultControls";
 import { Spaceship } from "./spaceship/spaceship";
@@ -86,7 +84,6 @@ ground.receiveShadows = true;*/
 
 const defaultControls = new DefaultControls(scene);
 defaultControls.speed *= 15;
-defaultControls.addInput(new Keyboard());
 scene.setActiveController(defaultControls);
 
 translate(defaultControls.getTransform(), new Vector3(50, 0, 0));

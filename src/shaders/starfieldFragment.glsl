@@ -17,8 +17,6 @@
 
 precision highp float;
 
-/* disable_uniformity_analysis */
-
 varying vec2 vUV;// screen coordinates
 
 uniform sampler2D textureSampler;// the original screen texture
@@ -49,21 +47,20 @@ void main() {
 
     vec2 starfieldUV = vec2(0.0);
 
-    // Here, a color test is used and not a depth test
-    // You may wonder why. The answer is that using a depth test wouldn't account for the 2D UI and the starfield would be drawn on top of it.
-    // In fact the UI has no depth information, so we need to use something else. I chose this color test as it works in practice but it could break.
-    // If you have a better idea, please let me know or make a pull request.
-    if (screenColor == vec4(0.0)) {
+    // if the pixel is at the far plane
+    if (depth == 1.0) {
         // get the starfield color
         // get spherical coordinates uv for the starfield texture
         starfieldUV = vec2(
-            sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
-            acos(rayDir.y) / 3.14159265359
+        sign(rayDir.z) * acos(rayDir.x / length(vec2(rayDir.x, rayDir.z))) / 6.28318530718,
+        acos(rayDir.y) / 3.14159265359
         );
+    }
 
-        vec4 starfieldColor = texture2D(starfieldTexture, starfieldUV);
-        starfieldColor.rgb = pow(starfieldColor.rgb, vec3(2.2)); // deeper blacks
+    vec4 starfieldColor = texture2D(starfieldTexture, starfieldUV);
+    starfieldColor.rgb = pow(starfieldColor.rgb, vec3(2.2));// deeper blacks
 
+    if (depth == 1.0) {
         finalColor = vec4(starfieldColor.rgb * visibility, starfieldColor.a);
     }
 

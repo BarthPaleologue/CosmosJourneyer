@@ -27,8 +27,7 @@ import { Thruster } from "./thruster";
 import { Matrix, inverse } from "ml-matrix";
 import { buildThrusterMatrix, getThrusterConfiguration } from "./thrusterMatrix";
 import { clamp } from "terrain-generation";
-import { Input, InputType } from "../inputs/input";
-import { Keyboard } from "../inputs/keyboard";
+import { PhysicsSpaceShipControlsInputs } from "./physicsSpaceshipInputs";
 
 export class Spaceship {
     readonly instanceRoot: InstancedMesh;
@@ -36,8 +35,6 @@ export class Spaceship {
     private aggregate: PhysicsAggregate | null = null;
 
     private collisionObservable: Observable<IPhysicsCollisionEvent> | null = null;
-
-    private inputs: Input[] = [];
 
     private mainThrustersRunning = false;
     private hoverThrustersRunning = false;
@@ -56,19 +53,18 @@ export class Spaceship {
     private readonly hoverThrusterMatrix: Matrix;
     private readonly inverseHoverThrusterMatrix: Matrix;
 
-    constructor(scene: Scene, inputs: Input[]) {
+    constructor(scene: Scene) {
         if (!Assets.IS_READY) throw new Error("Assets are not ready yet!");
         this.instanceRoot = Assets.CreateEndeavorSpaceShipInstance();
-        this.inputs = inputs;
 
         /*const centerHelper = MeshBuilder.CreateBox("centerHelper", { size: 0.5 }, scene);
-        centerHelper.parent = this.instanceRoot;
-        centerHelper.renderingGroupId = 1;
+centerHelper.parent = this.instanceRoot;
+centerHelper.renderingGroupId = 1;
 
-        this.centerOfMassHelper = MeshBuilder.CreateSphere("centerOfMassHelper", { diameter: 0.25 }, scene);
-        this.centerOfMassHelper.parent = this.instanceRoot;
-        this.centerOfMassHelper.renderingGroupId = 1;
-        this.centerOfMassHelper.material = Assets.DebugMaterial("centerOfMassHelper", true);*/
+this.centerOfMassHelper = MeshBuilder.CreateSphere("centerOfMassHelper", { diameter: 0.25 }, scene);
+this.centerOfMassHelper.parent = this.instanceRoot;
+this.centerOfMassHelper.renderingGroupId = 1;
+this.centerOfMassHelper.material = Assets.DebugMaterial("centerOfMassHelper", true);*/
 
         for (const child of this.instanceRoot.getChildMeshes()) {
             if (child.name.includes("hoverThruster")) {
@@ -120,7 +116,15 @@ export class Spaceship {
     }
 
     initPhysics(scene: Scene) {
-        this.aggregate = new PhysicsAggregate(this.instanceRoot, PhysicsShapeType.CONTAINER, { mass: 10, restitution: 0.2 }, scene);
+        this.aggregate = new PhysicsAggregate(
+            this.instanceRoot,
+            PhysicsShapeType.CONTAINER,
+            {
+                mass: 10,
+                restitution: 0.2
+            },
+            scene
+        );
         for (const child of this.otherMeshes) {
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
@@ -169,27 +173,21 @@ export class Spaceship {
     }
 
     update() {
-        for (const input of this.inputs) {
-            if (input.type === InputType.KEYBOARD) {
-                const keyboard = input as Keyboard;
+        const spacePressed = PhysicsSpaceShipControlsInputs.up.value > 0;
+        const forwardPressed = PhysicsSpaceShipControlsInputs.forward.value > 0;
 
-                const spacePressed = keyboard.isPressed(" ");
-                const forwardPressed = keyboard.isAnyPressed(["w", "z"]);
+        if (spacePressed !== this.hoverThrustersRunning) {
+            if (spacePressed) Assets.ENGINE_RUNNING_SOUND.play();
+            else Assets.ENGINE_RUNNING_SOUND.stop();
 
-                if (spacePressed !== this.hoverThrustersRunning) {
-                    if (spacePressed) Assets.ENGINE_RUNNING_SOUND.play();
-                    else Assets.ENGINE_RUNNING_SOUND.stop();
+            this.hoverThrustersRunning = spacePressed;
+        }
 
-                    this.hoverThrustersRunning = spacePressed;
-                }
+        if (forwardPressed !== this.mainThrustersRunning) {
+            if (forwardPressed) Assets.ENGINE_RUNNING_SOUND.play();
+            else Assets.ENGINE_RUNNING_SOUND.stop();
 
-                if (forwardPressed !== this.mainThrustersRunning) {
-                    if (forwardPressed) Assets.ENGINE_RUNNING_SOUND.play();
-                    else Assets.ENGINE_RUNNING_SOUND.stop();
-
-                    this.mainThrustersRunning = forwardPressed;
-                }
-            }
+            this.mainThrustersRunning = forwardPressed;
         }
 
         if (this.hoverThrustersRunning) {
@@ -204,12 +202,12 @@ export class Spaceship {
             const targetTorqueLocal = Vector3.TransformCoordinates(targetTorqueWorld, worldToSpaceShip);
 
             /*const angularSpeed = Vector3.Zero();
-            this.aggregate?.body.getAngularVelocityToRef(angularSpeed);
+this.aggregate?.body.getAngularVelocityToRef(angularSpeed);
 
-            const targetTorque2 = angularSpeed.negate();
-            const targetTorque2Local = Vector3.TransformCoordinates(targetTorque2, worldToSpaceShip);
+const targetTorque2 = angularSpeed.negate();
+const targetTorque2Local = Vector3.TransformCoordinates(targetTorque2, worldToSpaceShip);
 
-            targetTorqueLocal.addInPlace(targetTorque2Local).normalize();*/
+targetTorqueLocal.addInPlace(targetTorque2Local).normalize();*/
 
             if (this.targetThrustHelper !== null) this.targetThrustHelper.dispose();
             this.targetThrustHelper = MeshBuilder.CreateLines(

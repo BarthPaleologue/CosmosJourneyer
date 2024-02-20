@@ -17,7 +17,8 @@
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { Space } from "@babylonjs/core/Maths/math.axis";
+import { LocalDirection } from "../localDirections";
 
 export function translate(transformNode: TransformNode, displacement: Vector3): void {
     transformNode.setAbsolutePosition(transformNode.getAbsolutePosition().add(displacement));
@@ -59,7 +60,7 @@ export function setUpVector(transformNode: TransformNode, newUp: Vector3): void 
  * @returns the forward vector of the given transform in world space
  */
 export function getForwardDirection(transformNode: TransformNode): Vector3 {
-    return transformNode.getDirection(Axis.Z);
+    return transformNode.getDirection(LocalDirection.FORWARD);
 }
 
 /**
@@ -75,7 +76,7 @@ export function getBackwardDirection(transformNode: TransformNode): Vector3 {
  * @returns the unit vector pointing upward the player controller in world space
  */
 export function getUpwardDirection(transformNode: TransformNode): Vector3 {
-    return transformNode.getDirection(Axis.Y);
+    return transformNode.getDirection(LocalDirection.UP);
 }
 
 /**
@@ -99,7 +100,7 @@ export function getRightDirection(transformNode: TransformNode): Vector3 {
  * @returns the unit vector pointing to the left of the player controler in world space
  */
 export function getLeftDirection(transformNode: TransformNode): Vector3 {
-    return transformNode.getDirection(Axis.X);
+    return transformNode.getDirection(LocalDirection.LEFT);
 }
 
 /**

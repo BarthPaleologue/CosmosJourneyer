@@ -16,28 +16,31 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { VolumetricLightScatteringPostProcess } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
-import { UberScene } from "../uberCore/uberScene";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Star } from "../stellarObjects/star/star";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
+import { Scene } from "@babylonjs/core/scene";
 
 export class VolumetricLight extends VolumetricLightScatteringPostProcess implements ObjectPostProcess {
     readonly object: Star | NeutronStar;
+    private readonly scene: Scene;
 
-    constructor(star: Star | NeutronStar, scene: UberScene) {
+    constructor(star: Star | NeutronStar, scene: Scene) {
         if (scene.activeCamera === null) throw new Error("no camera");
-        super(`${star.name}VolumetricLight`, 1, scene.activeCamera, star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
+        super(`${star.name}VolumetricLight`, 1, null, star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
 
         this.object = star;
 
         this.exposure = 0.26;
         this.decay = 0.95;
 
-        this.getCamera().detachPostProcess(this);
+        this.scene = scene;
     }
 
     public override dispose(): void {
-        super.dispose(this.getCamera());
+        const activeCamera = this.scene.activeCamera;
+        if (activeCamera === null) throw new Error("no camera available to dispose volumetric light post process of star " + this.object.name);
+        super.dispose(activeCamera);
     }
 }

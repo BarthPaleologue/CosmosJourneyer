@@ -24,7 +24,7 @@ const config = {
         path: path.resolve(__dirname, "dist")
     },
     devServer: {
-        open: true,
+        open: false,
         host: "localhost",
         historyApiFallback: false,
         headers: {
