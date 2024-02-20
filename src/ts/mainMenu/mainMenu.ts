@@ -14,6 +14,26 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { SystemSeed } from "../utils/systemSeed";
 import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import packageInfo from "../../../package.json";
+import { InputMaps } from "../inputs/inputMaps";
+import Action from "@brianchirls/game-input/Action";
+import Interaction from "@brianchirls/game-input/interactions/Interaction";
+import { Assets } from "../assets";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+import {
+    AxisComposite,
+    ButtonInputControl,
+    StickInputControl,
+    Vector2InputControl
+} from "@brianchirls/game-input/browser";
+import { Settings } from "../settings";
+import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
+import {
+    axisCompositeToString,
+    buttonInputToString,
+    dPadCompositeToString,
+    stickInputToString,
+    vector2ToString
+} from "../utils/inputControlsString";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -34,6 +54,7 @@ export class MainMenu {
 
     private activeRightPanel: HTMLElement | null = null;
     private loadSavePanel: HTMLElement | null = null;
+    private settingsPanel: HTMLElement | null = null;
     private contributePanel: HTMLElement | null = null;
     private creditsPanel: HTMLElement | null = null;
     private aboutPanel: HTMLElement | null = null;
@@ -68,11 +89,11 @@ export class MainMenu {
         ];
 
         /*const randomSeed = new SystemSeed(
-      Math.trunc((Math.random() * 2 - 1) * 1000),
-      Math.trunc((Math.random() * 2 - 1) * 1000),
-      Math.trunc((Math.random() * 2 - 1) * 1000),
-      0
-    );*/
+Math.trunc((Math.random() * 2 - 1) * 1000),
+Math.trunc((Math.random() * 2 - 1) * 1000),
+Math.trunc((Math.random() * 2 - 1) * 1000),
+0
+);*/
 
         const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)];
         console.log(seed.starSectorX + ", " + seed.starSectorY + ", " + seed.starSectorZ + ", " + seed.index);
@@ -85,12 +106,13 @@ export class MainMenu {
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToDefaultControls();
             const nbRadius = this.starSystemController.model.getBodyTypeOfStar(0) === BodyType.BLACK_HOLE ? 8 : 2;
-            positionNearObjectWithStarVisible(
-                this.controls,
-                this.starSystemController.planets.length > 0 ? this.starSystemController.getBodies()[1] : this.starSystemController.stellarObjects[0],
-                this.starSystemController,
-                nbRadius
-            );
+            const targetObject = this.starSystemController.planets.length > 0 ? this.starSystemController.planets[0] : this.starSystemController.stellarObjects[0];
+            positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
+
+            if (targetObject instanceof GasPlanet) Settings.TIME_MULTIPLIER = 30;
+            else Settings.TIME_MULTIPLIER = 3;
+
+            Assets.MAIN_MENU_BACKGROUND_MUSIC.play();
         });
 
         this.starSystemView.ui.setEnabled(false);
@@ -111,6 +133,18 @@ export class MainMenu {
         if (version === null) throw new Error("#version does not exist!");
         version.textContent = `Alpha ${packageInfo.version}`;
         this.version = version;
+
+        document.querySelectorAll("#menuItems li").forEach((li) => {
+            // on mouse hover, play a sound
+            li.addEventListener("mouseenter", () => {
+                Assets.MENU_HOVER_SOUND.play();
+            });
+
+            // on click, play a sound
+            li.addEventListener("click", () => {
+                Assets.MENU_SELECT_SOUND.play();
+            });
+        });
 
         document.getElementById("startButton")?.addEventListener("click", () => {
             this.startAnimation(() => this.onStartObservable.notifyObservers());
@@ -197,6 +231,135 @@ export class MainMenu {
             this.toggleActivePanel(loadSavePanel);
         });
 
+        const settingsButton = document.getElementById("settingsButton");
+        if (settingsButton === null) throw new Error("#settingsButton does not exist!");
+
+        const settingsPanel = document.getElementById("settingsPanel");
+        if (settingsPanel === null) throw new Error("#settings does not exist!");
+        this.settingsPanel = settingsPanel;
+
+        InputMaps.forEach((inputMap) => {
+            // create a div
+            // the name of the map will be an h3
+            // each action will be a div with the name of the action and the bindings
+            const mapDiv = document.createElement("div");
+            mapDiv.classList.add("map");
+            const mapName = document.createElement("h3");
+            // break camelCase with a space
+            mapName.textContent = inputMap.name.replace(/([A-Z])/g, " $1").trim();
+
+            mapDiv.appendChild(mapName);
+
+            for (const [actionName, action] of Object.entries(inputMap.map)) {
+
+                const subActionMap: Map<string, string[]> = new Map();
+
+                const actionOrInteraction = action as Action | Interaction;
+                const bindings = actionOrInteraction instanceof Action ? actionOrInteraction.bindings : actionOrInteraction.action.bindings;
+                bindings.forEach((binding) => {
+                    if (binding.control instanceof DPadComposite) {
+                        const strings = dPadCompositeToString(binding.control);
+                        strings.forEach((string) => {
+                            const [key, name] = string;
+                            if (!subActionMap.has(key)) {
+                                subActionMap.set(key, []);
+                            }
+                            subActionMap.get(key)?.push(name);
+                        });
+                    } else if (binding.control instanceof ButtonInputControl) {
+                        const text = buttonInputToString(binding.control);
+                        subActionMap.set("BUTTON", [text]);
+                    } else if (binding.control instanceof AxisComposite) {
+                        const strings = axisCompositeToString(binding.control);
+                        strings.forEach((string) => {
+                            const [key, name] = string;
+                            if (!subActionMap.has(key)) {
+                                subActionMap.set(key, []);
+                            }
+                            subActionMap.get(key)?.push(name);
+                        });
+                    } else if (binding.control instanceof StickInputControl) {
+                        const strings = stickInputToString(binding.control);
+                        strings.forEach((string) => {
+                            const [key, name] = string;
+                            if (!subActionMap.has(key)) {
+                                subActionMap.set(key, []);
+                            }
+                            subActionMap.get(key)?.push(name);
+                        });
+                    } else if(binding.control instanceof Vector2InputControl) {
+                        const strings = vector2ToString(binding.control);
+                        strings.forEach((string) => {
+                            const [key, name] = string;
+                            if (!subActionMap.has(key)) {
+                                subActionMap.set(key, []);
+                            }
+                            subActionMap.get(key)?.push(name);
+                        });
+                    } else {
+                        throw new Error("Unknown control type");
+                    }
+                });
+
+                const actionDiv = document.createElement("div");
+
+                const label = document.createElement("p");
+                // break camelCase with a space
+                label.textContent = actionName.replace(/([A-Z])/g, " $1").trim();
+
+                actionDiv.appendChild(label);
+
+                if (subActionMap.size === 1) {
+                    actionDiv.classList.add("actionSingle");
+
+                    const valuesContainer = document.createElement("div");
+                    valuesContainer.classList.add("valuesContainer");
+
+                    subActionMap.forEach((value, key) => {
+                        value.forEach((v) => {
+                            const valueContainer = document.createElement("p");
+                            valueContainer.innerText = v;
+                            valuesContainer.appendChild(valueContainer);
+                        });
+                    });
+
+                    actionDiv.appendChild(valuesContainer);
+                } else {
+                    actionDiv.classList.add("actionMultiple");
+
+                    subActionMap.forEach((value, key) => {
+                        const subActionDiv = document.createElement("div");
+                        subActionDiv.classList.add("subAction");
+
+                        const subActionLabel = document.createElement("p");
+                        subActionLabel.textContent = key;
+
+                        const valuesContainer = document.createElement("div");
+                        valuesContainer.classList.add("valuesContainer");
+
+                        value.forEach((v) => {
+                            const valueContainer = document.createElement("p");
+                            valueContainer.innerText = v;
+                            valuesContainer.appendChild(valueContainer);
+                        });
+
+                        subActionDiv.appendChild(subActionLabel);
+                        subActionDiv.appendChild(valuesContainer);
+
+                        actionDiv.appendChild(subActionDiv);
+                    });
+                }
+
+                mapDiv.appendChild(actionDiv);
+            }
+
+            settingsPanel.appendChild(mapDiv);
+        });
+
+        settingsButton.addEventListener("click", () => {
+            this.toggleActivePanel(settingsPanel);
+        });
+
         const contributeButton = document.getElementById("contributeButton");
         if (contributeButton === null) throw new Error("#contributeButton does not exist!");
 
@@ -234,6 +397,7 @@ export class MainMenu {
 
     private startAnimation(onAnimationFinished: () => void) {
         this.hideActivePanel();
+        Settings.TIME_MULTIPLIER = 1;
 
         const currentForward = getForwardDirection(this.controls.getTransform());
 
@@ -282,8 +446,12 @@ export class MainMenu {
                 this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
                 if (this.htmlRoot === null) throw new Error("MainMenu is null");
                 this.htmlRoot.style.display = "none";
+                Assets.MAIN_MENU_BACKGROUND_MUSIC.stop();
                 onAnimationFinished();
             }
+
+            const currentProgress = translationAnimation.getProgress();
+            Assets.MAIN_MENU_BACKGROUND_MUSIC.setVolume(1 - currentProgress);
 
             this.controls.getActiveCamera().getViewMatrix();
 

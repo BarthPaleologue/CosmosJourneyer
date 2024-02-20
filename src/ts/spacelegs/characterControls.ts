@@ -19,11 +19,9 @@ import { Controls } from "../uberCore/controls";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Input } from "../inputs/input";
 import { setRotationQuaternion, setUpVector, translate } from "../uberCore/transforms/basicTransform";
 import { Assets } from "../assets";
 import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
-import { Keyboard } from "../inputs/keyboard";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { CollisionMask, Settings } from "../settings";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
@@ -34,6 +32,7 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Transformable } from "../architecture/transformable";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { CharacterInputs } from "./characterControlsInputs";
 
 class AnimationGroupWrapper {
     name: string;
@@ -107,8 +106,6 @@ export class CharacterControls implements Controls {
     private readonly scene: Scene;
 
     private jumpVelocity = Vector3.Zero();
-
-    readonly inputs: Input[] = [];
 
     constructor(scene: Scene) {
         this.scene = scene;
@@ -195,107 +192,6 @@ export class CharacterControls implements Controls {
         return this.character;
     }
 
-    public addInput(input: Input) {
-        this.inputs.push(input);
-    }
-
-    private listenTo(input: Input, deltaTime: number): Vector3 {
-        const displacement = Vector3.Zero();
-        if (input instanceof Keyboard) {
-            const keyboard = input as Keyboard;
-
-            if (this.walkAnim.weight > 0.0) {
-                this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaTime * this.walkAnim.weight));
-            }
-
-            if (this.walkBackAnim.weight > 0.0) {
-                this.character.moveWithCollisions(this.character.forward.scaleInPlace(this.characterWalkSpeedBackwards * deltaTime * this.walkBackAnim.weight));
-            }
-
-            if (this.runningAnim.weight > 0.0) {
-                this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight));
-            }
-
-            // Translation
-            if (this.currentAnimationState === this.swimmingState) {
-                this.swimmingState.currentAnimation = this.swimmingIdleAnim;
-                if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
-                    this.swimmingState.currentAnimation = this.swimmingForwardAnim;
-                    this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterSwimSpeed * deltaTime));
-                }
-            } else if (this.currentAnimationState === this.groundedState) {
-                this.groundedState.currentAnimation = this.idleAnim;
-                if (keyboard.isPressed("z") || keyboard.isPressed("w")) {
-                    this.groundedState.currentAnimation = this.walkAnim;
-                } else if (keyboard.isPressed("s")) {
-                    this.groundedState.currentAnimation = this.walkBackAnim;
-                } else if (keyboard.isPressed("e")) {
-                    this.groundedState.currentAnimation = this.runningAnim;
-                }
-
-                // Samba!
-                if (keyboard.isPressed("b")) {
-                    this.groundedState.currentAnimation = this.sambaAnim;
-                }
-
-                if (keyboard.isPressed(" ")) {
-                    this.targetAnim = this.jumpingAnim;
-                    this.jumpingAnim.weight = 1;
-                    this.jumpingAnim.group.stop();
-                    this.jumpingAnim.group.play();
-                    this.currentAnimationState = this.fallingState;
-                    this.jumpVelocity = this.character.up.scale(10.0).add(this.character.forward.scale(-5.0));
-                }
-
-            } else if (this.currentAnimationState === this.fallingState) {
-                if (this.distanceToGround < 30) {
-                    this.fallingState.currentAnimation = this.fallingIdleAnim;
-                } else {
-                    this.fallingState.currentAnimation = this.skyDivingAnim;
-                }
-            }
-
-            this.targetAnim = this.currentAnimationState.currentAnimation;
-
-            const isMoving = this.currentAnimationState.currentAnimation !== this.currentAnimationState.idleAnimation;
-
-            // Rotation
-            if ((keyboard.isPressed("q") || keyboard.isPressed("a")) && (isMoving)) {
-                const dtheta = this.characterRotationSpeed * deltaTime;
-                this.character.rotate(Vector3.Up(), dtheta);
-                this.thirdPersonCamera.alpha += dtheta;
-
-                const cameraPosition = this.thirdPersonCamera.target;
-                cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), -dtheta));
-                this.thirdPersonCamera.target = cameraPosition;
-
-            } else if (keyboard.isPressed("d") && (isMoving)) {
-                const dtheta = this.characterRotationSpeed * deltaTime;
-                this.character.rotate(Vector3.Up(), -dtheta);
-                this.thirdPersonCamera.alpha -= dtheta;
-
-                const cameraPosition = this.thirdPersonCamera.target;
-                cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), dtheta));
-                this.thirdPersonCamera.target = cameraPosition;
-            }
-
-            let weightSum = 0;
-            for (const animation of this.nonIdleAnimations) {
-                if (animation === this.targetAnim) {
-                    animation.moveTowardsWeight(1, deltaTime);
-                } else {
-                    animation.moveTowardsWeight(0, deltaTime);
-                }
-                weightSum += animation.weight;
-            }
-
-            this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaTime);
-
-            this.character.computeWorldMatrix(true);
-        }
-        return displacement;
-    }
-
     public update(deltaTime: number): Vector3 {
         const character = this.getTransform();
         const start = character.getAbsolutePosition().add(character.up.scale(50e3));
@@ -351,13 +247,102 @@ export class CharacterControls implements Controls {
             this.distanceToGround = 50e3;
         }
 
-        const playerMovement = Vector3.Zero();
-        for (const input of this.inputs) playerMovement.addInPlace(this.listenTo(input, this.getTransform().getScene().getEngine().getDeltaTime() / 1000));
-        translate(this.getTransform(), playerMovement);
+        const displacement = Vector3.Zero();
+
+        if (this.walkAnim.weight > 0.0) {
+            this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterWalkSpeed * deltaTime * this.walkAnim.weight));
+        }
+
+        if (this.walkBackAnim.weight > 0.0) {
+            this.character.moveWithCollisions(this.character.forward.scaleInPlace(this.characterWalkSpeedBackwards * deltaTime * this.walkBackAnim.weight));
+        }
+
+        if (this.runningAnim.weight > 0.0) {
+            this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterRunSpeed * deltaTime * this.runningAnim.weight));
+        }
+
+        const [xMove, yMove] = CharacterInputs.map.move.value;
+
+        // Translation
+        if (this.currentAnimationState === this.swimmingState) {
+            this.swimmingState.currentAnimation = this.swimmingIdleAnim;
+            if (yMove > 0) {
+                this.swimmingState.currentAnimation = this.swimmingForwardAnim;
+                this.character.moveWithCollisions(this.character.forward.scaleInPlace(-this.characterSwimSpeed * deltaTime));
+            }
+        } else if (this.currentAnimationState === this.groundedState) {
+            this.groundedState.currentAnimation = this.idleAnim;
+            if (yMove > 0) {
+                this.groundedState.currentAnimation = this.walkAnim;
+            } else if (yMove < 0) {
+                this.groundedState.currentAnimation = this.walkBackAnim;
+            } else if (CharacterInputs.map.run.value > 0) {
+                this.groundedState.currentAnimation = this.runningAnim;
+            }
+
+            // Samba!
+            if (CharacterInputs.map.samba.value > 0) {
+                this.groundedState.currentAnimation = this.sambaAnim;
+            }
+
+            if (CharacterInputs.map.jump.state === "complete") {
+                this.targetAnim = this.jumpingAnim;
+                this.jumpingAnim.weight = 1;
+                this.jumpingAnim.group.stop();
+                this.jumpingAnim.group.play();
+                this.currentAnimationState = this.fallingState;
+                this.jumpVelocity = this.character.up.scale(10.0).add(this.character.forward.scale(-5.0));
+            }
+        } else if (this.currentAnimationState === this.fallingState) {
+            if (this.distanceToGround < 30) {
+                this.fallingState.currentAnimation = this.fallingIdleAnim;
+            } else {
+                this.fallingState.currentAnimation = this.skyDivingAnim;
+            }
+        }
+
+        this.targetAnim = this.currentAnimationState.currentAnimation;
+
+        const isMoving = this.currentAnimationState.currentAnimation !== this.currentAnimationState.idleAnimation;
+
+        // Rotation
+        if (xMove < 0 && isMoving) {
+            const dtheta = this.characterRotationSpeed * deltaTime;
+            this.character.rotate(Vector3.Up(), dtheta);
+            this.thirdPersonCamera.alpha += dtheta;
+
+            const cameraPosition = this.thirdPersonCamera.target;
+            cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), -dtheta));
+            this.thirdPersonCamera.target = cameraPosition;
+        } else if (xMove > 0 && isMoving) {
+            const dtheta = this.characterRotationSpeed * deltaTime;
+            this.character.rotate(Vector3.Up(), -dtheta);
+            this.thirdPersonCamera.alpha -= dtheta;
+
+            const cameraPosition = this.thirdPersonCamera.target;
+            cameraPosition.applyRotationQuaternionInPlace(Quaternion.RotationAxis(Vector3.Up(), dtheta));
+            this.thirdPersonCamera.target = cameraPosition;
+        }
+
+        let weightSum = 0;
+        for (const animation of this.nonIdleAnimations) {
+            if (animation === this.targetAnim) {
+                animation.moveTowardsWeight(1, deltaTime);
+            } else {
+                animation.moveTowardsWeight(0, deltaTime);
+            }
+            weightSum += animation.weight;
+        }
+
+        this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaTime);
+
+        this.character.computeWorldMatrix(true);
+
+        translate(this.getTransform(), displacement);
 
         this.getActiveCamera().getViewMatrix();
 
-        return playerMovement;
+        return displacement;
     }
 
     dispose() {

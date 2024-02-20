@@ -45,7 +45,7 @@ const characterController = starSystemView.getCharacterControls();
 document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
-    if (e.key === "y") {
+    if (e.key === "e") {
         if (starSystemView.scene.getActiveController() === shipControls) {
             console.log("disembark");
 
@@ -57,6 +57,9 @@ document.addEventListener("keydown", (e) => {
 
             starSystemView.scene.setActiveController(characterController);
             starSystemView.getStarSystem().postProcessManager.rebuild();
+
+            shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
+            shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
         } else if (starSystemView.scene.getActiveController() === characterController) {
             console.log("embark");
 

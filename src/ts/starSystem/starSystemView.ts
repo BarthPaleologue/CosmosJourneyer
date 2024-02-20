@@ -39,9 +39,6 @@ import "@babylonjs/core/Loading/loadingScreen";
 import { setMaxLinVel } from "../utils/havok";
 import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { Mouse } from "../inputs/mouse";
-import { Keyboard } from "../inputs/keyboard";
-import { Gamepad } from "../inputs/gamepad";
 import { DefaultControls } from "../defaultController/defaultControls";
 import { CharacterControls } from "../spacelegs/characterControls";
 import { Assets } from "../assets";
@@ -95,22 +92,36 @@ export class StarSystemView implements View {
 
         document.addEventListener("keydown", (e) => {
             if (e.key === "o") {
-                this.ui.setEnabled(!this.ui.isEnabled());
+                const enabled = !this.ui.isEnabled();
+                if (enabled) Assets.MENU_HOVER_SOUND.play();
+                else Assets.MENU_HOVER_SOUND.play();
+                this.ui.setEnabled(enabled);
             }
             if (e.key === "n") {
-                this.orbitRenderer.setVisibility(!this.orbitRenderer.isVisible());
-                this.axisRenderer.setVisibility(!this.axisRenderer.isVisible());
+                const enabled = !this.orbitRenderer.isVisible();
+                if (enabled) Assets.MENU_HOVER_SOUND.play();
+                else Assets.MENU_HOVER_SOUND.play();
+                this.orbitRenderer.setVisibility(enabled);
+                this.axisRenderer.setVisibility(enabled);
             }
             if (e.key === "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
             if (e.key === "b") this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
 
             if (e.key === "t") {
                 const closestObjectToCenter = this.getStarSystem().getClosestToScreenCenterOrbitalObject();
-                this.ui.setTarget(closestObjectToCenter);
-                if (closestObjectToCenter !== null) this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
-                else {
+
+                if (this.ui.getTarget() === closestObjectToCenter) {
                     this.helmetOverlay.setTarget(null);
+                    this.ui.setTarget(null);
+                    Assets.TARGET_UNLOCK_SOUND.play();
+                    return;
                 }
+
+                if (closestObjectToCenter === null) return;
+
+                this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
+                this.ui.setTarget(closestObjectToCenter);
+                Assets.TARGET_LOCK_SOUND.play();
             }
 
             if (e.key === "g") {
@@ -164,6 +175,8 @@ export class StarSystemView implements View {
         this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getOrbitalObjects());
         this.axisRenderer.setObjects(this.getStarSystem().getOrbitalObjects());
 
+        this.helmetOverlay.setTarget(null);
+
         const activeController = this.scene.getActiveController();
         let controllerDistanceFactor = 5;
         if (firstBody instanceof BlackHole) controllerDistanceFactor = 7;
@@ -173,8 +186,8 @@ export class StarSystemView implements View {
         this.getStarSystem()
             .initPostProcesses()
             .then(() => {
-                this.scene.getEngine().loadingScreen.hideLoadingUI();
                 this.onInitStarSystem.notifyObservers();
+                this.scene.getEngine().loadingScreen.hideLoadingUI();
             });
     }
 
@@ -184,29 +197,18 @@ export class StarSystemView implements View {
         const canvas = this.scene.getEngine().getRenderingCanvas();
         if (canvas === null) throw new Error("Canvas is null");
 
-        const mouse = new Mouse(canvas, 100);
-        const keyboard = new Keyboard();
-        const gamepad = new Gamepad();
-
         const maxZ = Settings.EARTH_RADIUS * 1e5;
 
         this.defaultControls = new DefaultControls(this.scene);
         this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
         this.defaultControls.getActiveCamera().maxZ = maxZ;
-        this.defaultControls.addInput(keyboard);
-        this.defaultControls.addInput(gamepad);
 
         this.spaceshipControls = new ShipControls(this.scene);
         this.spaceshipControls.getActiveCamera().maxZ = maxZ;
-        this.spaceshipControls.addInput(keyboard);
-        this.spaceshipControls.addInput(gamepad);
-        this.spaceshipControls.addInput(mouse);
 
         this.characterControls = new CharacterControls(this.scene);
         this.characterControls.getTransform().setEnabled(false);
         this.characterControls.getActiveCamera().maxZ = maxZ;
-        this.characterControls.addInput(keyboard);
-        this.characterControls.addInput(gamepad);
 
         this.scene.setActiveController(this.spaceshipControls);
     }
@@ -296,6 +298,8 @@ export class StarSystemView implements View {
 
         shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
+        shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
+        shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
     }
 
     switchToDefaultControls() {
@@ -306,10 +310,17 @@ export class StarSystemView implements View {
         characterControls.getTransform().setEnabled(false);
         shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
+        shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
+        shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
 
         this.scene.setActiveController(defaultControls);
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
         this.getStarSystem().postProcessManager.rebuild();
+    }
+
+    stopBackgroundSounds() {
+        this.spaceshipControls?.spaceship.acceleratingWarpDriveSound.muteInstantly();
+        this.spaceshipControls?.spaceship.deceleratingWarpDriveSound.muteInstantly();
     }
 
     /**

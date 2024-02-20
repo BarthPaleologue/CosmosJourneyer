@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Input } from "../inputs/input";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Transformable } from "../architecture/transformable";
 
@@ -31,6 +30,4 @@ export interface Controls extends Transformable {
      * @param deltaTime the time between 2 frames
      */
     update(deltaTime: number): Vector3;
-
-    addInput(input: Input): void;
 }

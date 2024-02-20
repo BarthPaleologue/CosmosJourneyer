@@ -36,9 +36,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import "../styles/index.scss";
 import { Assets } from "./assets";
 import { UberScene } from "./uberCore/uberScene";
-import { Keyboard } from "./inputs/keyboard";
 import { CharacterControls } from "./spacelegs/characterControls";
-import { Mouse } from "./inputs/mouse";
 import { TransformNodeWrapper } from "./utils/wrappers";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -71,8 +69,6 @@ const havokPlugin = new HavokPlugin(true, havokInstance);
 scene.enablePhysics(Vector3.Zero(), havokPlugin);
 
 const characterController = new CharacterControls(scene);
-characterController.addInput(new Keyboard());
-characterController.addInput(new Mouse(canvas));
 characterController.getTransform().setAbsolutePosition(new Vector3(0, 2, 0));
 
 scene.setActiveController(characterController);

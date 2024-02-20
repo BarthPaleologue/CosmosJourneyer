@@ -23,6 +23,7 @@ import { OrbitalObject } from "../architecture/orbitalObject";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Assets } from "../assets";
 
 export class SystemUI {
     readonly scene: Scene;
@@ -95,5 +96,9 @@ export class SystemUI {
         this.camera.fov = camera.fov;
         this.camera.minZ = camera.minZ;
         this.camera.maxZ = camera.maxZ;
+    }
+
+    getTarget() {
+        return this.target;
     }
 }

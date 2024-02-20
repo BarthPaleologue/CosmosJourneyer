@@ -220,7 +220,7 @@ export class WarpTunnel implements Transformable {
 
     setThrottle(throttle: number) {
         this.throttle = throttle;
-        this.targetNbParticles = Math.floor(this.throttle * WarpTunnel.MAX_NB_PARTICLES);
+        this.targetNbParticles = throttle === 0 ? 0 : Math.floor(Math.max(this.throttle, 0.1) * WarpTunnel.MAX_NB_PARTICLES);
     }
 
     getTransform(): TransformNode {

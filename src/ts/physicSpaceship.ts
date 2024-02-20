@@ -44,7 +44,6 @@ import { UberScene } from "./uberCore/uberScene";
 import { Settings } from "./settings";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { StarModel } from "./stellarObjects/star/starModel";
-import { Keyboard } from "./inputs/keyboard";
 import { Star } from "./stellarObjects/star/star";
 import { ChunkForgeWorkers } from "./planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 
@@ -82,8 +81,6 @@ shadowGenerator.useBlurExponentialShadowMap = true;
 
 const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
 
-const keyboard = new Keyboard();
-
 const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, scene);
 sphere.position.y = 4;
 sphere.position.x = 4;
@@ -96,7 +93,7 @@ box.position.x = -4;
 box.material = Assets.DebugMaterial("box", true);
 shadowGenerator.addShadowCaster(box);
 
-const spaceship = new Spaceship(scene, [keyboard]);
+const spaceship = new Spaceship(scene);
 spaceship.instanceRoot.position.y = 8;
 shadowGenerator.addShadowCaster(spaceship.instanceRoot);
 

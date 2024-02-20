@@ -21,13 +21,12 @@ import { LocalDirection } from "../uberCore/localDirections";
 import { getUpwardDirection, pitch, roll } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
-import { Input, InputType } from "../inputs/input";
-import { Keyboard } from "../inputs/keyboard";
-import { Mouse } from "../inputs/mouse";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Spaceship } from "./spaceship";
+import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
+import { moveTowards } from "../utils/moveTowards";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -35,9 +34,12 @@ export class ShipControls implements Controls {
     readonly thirdPersonCamera: ArcRotateCamera;
     readonly firstPersonCamera: FreeCamera;
 
-    private inputs: Input[] = [];
-
     private readonly scene: Scene;
+
+    private isCameraShaking = false;
+
+    private baseFov: number;
+    private targetFov: number;
 
     constructor(scene: Scene) {
         this.spaceship = new Spaceship(scene);
@@ -52,20 +54,37 @@ export class ShipControls implements Controls {
         this.thirdPersonCamera.upperRadiusLimit = 500;
 
         this.scene = scene;
+
+        SpaceShipControlsInputs.map.toggleFlightAssist.on("complete", () => {
+            this.spaceship.setFlightAssistEnabled(!this.spaceship.getFlightAssistEnabled());
+        });
+
+        SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
+            this.spaceship.toggleWarpDrive();
+        });
+
+        this.baseFov = this.thirdPersonCamera.fov;
+        this.targetFov = this.baseFov;
+
+        this.spaceship.onWarpDriveEnabled.add(() => {
+            this.shakeCamera(2000);
+            this.targetFov = this.baseFov * 3.0;
+        });
+
+        this.spaceship.onWarpDriveDisabled.add(() => {
+            this.shakeCamera(2500);
+            this.targetFov = this.baseFov * 0.5;
+        });
     }
 
-    public addInput(input: Input): void {
-        this.inputs.push(input);
-        if (input.type === InputType.KEYBOARD) {
-            const keyboard = input as Keyboard;
-            keyboard.addPressedOnceListener("f", () => {
-                this.spaceship.setFlightAssistEnabled(!this.spaceship.getFlightAssistEnabled());
-            });
-            keyboard.addPressedOnceListener("h", () => {
-                this.spaceship.toggleWarpDrive();
-            });
-        }
+    private shakeCamera(duration: number) {
+        this.isCameraShaking = true;
+        setTimeout(() => {
+            this.isCameraShaking = false;
+            this.targetFov = this.baseFov;
+        }, duration);
     }
+
     public getTransform(): TransformNode {
         return this.spaceship.getTransform();
     }
@@ -74,81 +93,68 @@ export class ShipControls implements Controls {
         return this.thirdPersonCamera;
     }
 
-    private listenTo(input: Input, deltaTime: number) {
+    public update(deltaTime: number): Vector3 {
+        this.spaceship.update(deltaTime);
+
+        let [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
+        if(SpaceShipControlsInputs.map.ignorePointer.value > 0) {
+            inputRoll *= 0;
+            inputPitch *= 0;
+        }
+
         if (this.spaceship.getWarpDrive().isDisabled()) {
             for (const thruster of this.spaceship.mainThrusters) {
-                thruster.updateThrottle(2 * deltaTime * input.getZAxis() * thruster.getAuthority01(LocalDirection.FORWARD));
-                thruster.updateThrottle(2 * deltaTime * -input.getZAxis() * thruster.getAuthority01(LocalDirection.BACKWARD));
+                thruster.updateThrottle(2 * deltaTime * SpaceShipControlsInputs.map.throttle.value * thruster.getAuthority01(LocalDirection.FORWARD));
+                thruster.updateThrottle(2 * deltaTime * -SpaceShipControlsInputs.map.throttle.value * thruster.getAuthority01(LocalDirection.BACKWARD));
 
-                thruster.updateThrottle(2 * deltaTime * input.getYAxis() * thruster.getAuthority01(LocalDirection.UP));
-                thruster.updateThrottle(2 * deltaTime * -input.getYAxis() * thruster.getAuthority01(LocalDirection.DOWN));
+                thruster.updateThrottle(2 * deltaTime * SpaceShipControlsInputs.map.upDown.value * thruster.getAuthority01(LocalDirection.UP));
+                thruster.updateThrottle(2 * deltaTime * -SpaceShipControlsInputs.map.upDown.value * thruster.getAuthority01(LocalDirection.DOWN));
 
-                thruster.updateThrottle(2 * deltaTime * input.getXAxis() * thruster.getAuthority01(LocalDirection.LEFT));
-                thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LocalDirection.RIGHT));
+                /*thruster.updateThrottle(2 * deltaTime * input.getXAxis() * thruster.getAuthority01(LocalDirection.LEFT));
+                thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LocalDirection.RIGHT));*/
             }
 
-            if (input.type === InputType.KEYBOARD) {
-                const keyboard = input as Keyboard;
-                if (keyboard.isPressed("r")) {
-                    this.spaceship.aggregate.body.applyForce(getUpwardDirection(this.getTransform()).scale(9.8 * 10), this.spaceship.aggregate.body.getObjectCenterWorld());
-                }
+            this.spaceship.aggregate.body.applyForce(
+              getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
+              this.spaceship.aggregate.body.getObjectCenterWorld()
+            );
 
-                if (keyboard.isPressed("l")) {
-                    if (this.spaceship.getClosestWalkableObject() === null) return;
+            if (SpaceShipControlsInputs.map.landing.state === "complete") {
+                if (this.spaceship.getClosestWalkableObject() !== null) {
                     this.spaceship.engageLanding(null);
                 }
             }
 
-            if (input.type === InputType.MOUSE) {
-                const mouse = input as Mouse;
-                const roll = mouse.getRoll();
-                const pitch = mouse.getPitch();
+            for (const rcsThruster of this.spaceship.rcsThrusters) {
+                let throttle = 0;
 
-                for (const rcsThruster of this.spaceship.rcsThrusters) {
-                    let throttle = 0;
+                // rcs rotation contribution
+                if (inputRoll < 0 && rcsThruster.getRollAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(inputRoll));
+                else if (inputRoll > 0 && rcsThruster.getRollAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(inputRoll));
 
-                    // rcs rotation contribution
-                    if (roll < 0 && rcsThruster.getRollAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(roll));
-                    else if (roll > 0 && rcsThruster.getRollAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(roll));
+                if (inputPitch < 0 && rcsThruster.getPitchAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(inputPitch));
+                else if (inputPitch > 0 && rcsThruster.getPitchAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(inputPitch));
 
-                    if (pitch < 0 && rcsThruster.getPitchAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(pitch));
-                    else if (pitch > 0 && rcsThruster.getPitchAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(pitch));
-
-                    rcsThruster.setThrottle(throttle);
-                }
-
-                mouse.reset();
+                rcsThruster.setThrottle(throttle);
             }
         } else {
-            if (input.type === InputType.MOUSE) {
-                const mouse = input as Mouse;
-                const rollContribution = mouse.getRoll();
-                const pitchContribution = mouse.getPitch();
+            roll(this.getTransform(), inputRoll * deltaTime);
+            pitch(this.getTransform(), inputPitch * deltaTime);
 
-                roll(this.getTransform(), rollContribution * deltaTime);
-                pitch(this.getTransform(), pitchContribution * deltaTime);
-
-                mouse.reset();
-            }
-
-            if (input.type === InputType.KEYBOARD) {
-                const keyboard = input as Keyboard;
-                const deltaThrottle = keyboard.getZAxis() * deltaTime;
-                this.spaceship.getWarpDrive().increaseTargetThrottle(deltaThrottle);
-            }
+            this.spaceship.getWarpDrive().increaseTargetThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
         }
-    }
-
-    public update(deltaTime: number): Vector3 {
-        this.spaceship.update(deltaTime);
-
-        for (const input of this.inputs) this.listenTo(input, deltaTime);
 
         // camera shake
-        // this.thirdPersonCamera.alpha += (Math.random() - 0.5) / 500;
-        // this.thirdPersonCamera.beta += (Math.random() - 0.5) / 500;
+        if (this.isCameraShaking) {
+            this.thirdPersonCamera.alpha += (Math.random() - 0.5) / 100;
+            this.thirdPersonCamera.beta += (Math.random() - 0.5) / 100;
+            this.thirdPersonCamera.radius += (Math.random() - 0.5) / 100;
+        }
+
+        this.thirdPersonCamera.fov = moveTowards(this.thirdPersonCamera.fov, this.targetFov, this.targetFov === this.baseFov ? 2.0 * deltaTime : 0.3 * deltaTime);
 
         this.getActiveCamera().getViewMatrix(true);
+
         return this.getTransform().getAbsolutePosition();
     }
 

@@ -45,12 +45,12 @@ import { TransformTranslationAnimation } from "../uberCore/transforms/animations
 import { getForwardDirection, translate } from "../uberCore/transforms/basicTransform";
 import { ThickLines } from "../utils/thickLines";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { Keyboard } from "../inputs/keyboard";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { SystemSeed } from "../utils/systemSeed";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { View } from "../utils/view";
+import { Assets } from "../assets";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -123,11 +123,10 @@ export class StarMap implements View {
 
         this.controls.getActiveCamera().attachControl();
 
-        this.controls.addInput(new Keyboard());
-
         this.starMapUI = new StarMapUI(engine);
 
         this.starMapUI.warpButton.onPointerClickObservable.add(() => {
+            Assets.MENU_SELECT_SOUND.play();
             this.currentSystemSeed = this.selectedSystemSeed;
             if (this.currentSystemSeed !== null) this.starMapUI.setCurrentStarSystemMesh(this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh);
             this.dispatchWarpCallbacks();
@@ -425,6 +424,7 @@ export class StarMap implements View {
             initializedInstance.actionManager.registerAction(
                 new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
                     this.starMapUI.setHoveredStarSystemMesh(initializedInstance);
+                    Assets.MENU_HOVER_SOUND.play();
                 })
             );
 
@@ -440,6 +440,8 @@ export class StarMap implements View {
 
         initializedInstance.actionManager?.registerAction(
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
+                Assets.STAR_MAP_CLICK_SOUND.play();
+
                 let text = "";
                 if (this.currentSystemSeed !== null) {
                     const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh;
@@ -504,6 +506,14 @@ export class StarMap implements View {
         }
 
         this.starMapUI.setHoveredStarSystemMesh(null);
+    }
+
+    startBackgroundMusic() {
+        Assets.STAR_MAP_BACKGROUND_MUSIC.play();
+    }
+
+    stopBackgroundMusic() {
+        Assets.STAR_MAP_BACKGROUND_MUSIC.stop();
     }
 
     public focusOnCurrentSystem(skipAnimation = false) {
