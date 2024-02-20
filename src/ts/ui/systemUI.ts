@@ -89,6 +89,9 @@ export class SystemUI {
     public syncCamera(camera: Camera) {
         this.camera.position = camera.globalPosition;
         this.camera.rotationQuaternion = camera.absoluteRotation;
+        this.camera.onViewMatrixChangedObservable.add(() => {
+            this.camera.getViewMatrix().copyFrom(camera.getViewMatrix())
+        })
         this.camera.fov = camera.fov;
         this.camera.minZ = camera.minZ;
         this.camera.maxZ = camera.maxZ;
