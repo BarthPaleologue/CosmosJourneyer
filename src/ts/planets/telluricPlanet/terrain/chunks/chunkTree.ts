@@ -36,7 +36,7 @@ import { ChunkForge } from "./chunkForge";
 /**
  * A quadTree is defined recursively
  */
-type quadTree = quadTree[] | PlanetChunk;
+type QuadTree = QuadTree[] | PlanetChunk;
 
 /**
  * A ChunkTree is a structure designed to manage LOD using a quadtree
@@ -45,7 +45,7 @@ export class ChunkTree {
     readonly minDepth: number; // minimum depth of the tree
     readonly maxDepth: number; // maximum depth of the tree
 
-    private tree: quadTree = [];
+    private tree: QuadTree = [];
 
     private readonly rootChunkLength: number;
 
@@ -105,7 +105,7 @@ export class ChunkTree {
      * @param tree the tree to explore
      * @param f the function to apply on every chunk
      */
-    public executeOnEveryChunk(f: (chunk: PlanetChunk) => void, tree: quadTree = this.tree): void {
+    public executeOnEveryChunk(f: (chunk: PlanetChunk) => void, tree: QuadTree = this.tree): void {
         if (tree instanceof PlanetChunk) f(tree);
         else for (const stem of tree) this.executeOnEveryChunk(f, stem);
     }
@@ -115,12 +115,12 @@ export class ChunkTree {
      * @param tree The tree to delete
      * @param newChunks
      */
-    private requestDeletion(tree: quadTree, newChunks: PlanetChunk[]): void {
+    private requestDeletion(tree: QuadTree, newChunks: PlanetChunk[]): void {
         const chunksToDelete = this.getChunkList(tree);
         this.deleteSemaphores.push(new DeleteSemaphore(newChunks, chunksToDelete));
     }
 
-    public getChunkList(tree: quadTree): PlanetChunk[] {
+    public getChunkList(tree: QuadTree): PlanetChunk[] {
         const result: PlanetChunk[] = [];
         this.executeOnEveryChunk((chunk) => result.push(chunk), tree);
         return result;
@@ -140,20 +140,20 @@ export class ChunkTree {
         this.tree = this.updateLODRecursively(observerPosition, chunkForge);
     }
 
-    private getAverageHeight(tree: quadTree): number {
+    private getAverageHeight(tree: QuadTree): number {
         if (tree instanceof PlanetChunk) return tree.getAverageHeight();
         else if (tree.length > 0) return 0.25 * (this.getAverageHeight(tree[0]) + this.getAverageHeight(tree[1]) + this.getAverageHeight(tree[2]) + this.getAverageHeight(tree[3]));
         else return 0;
     }
 
-    private getMinAverageHeight(tree: quadTree): number {
+    private getMinAverageHeight(tree: QuadTree): number {
         if (tree instanceof PlanetChunk) return tree.getAverageHeight();
         else if (tree.length > 0)
             return Math.min(this.getMinAverageHeight(tree[0]), this.getMinAverageHeight(tree[1]), this.getMinAverageHeight(tree[2]), this.getMinAverageHeight(tree[3]));
         else return 0;
     }
 
-    private getMaxAverageHeight(tree: quadTree): number {
+    private getMaxAverageHeight(tree: QuadTree): number {
         if (tree instanceof PlanetChunk) return tree.getAverageHeight();
         else if (tree.length > 0)
             return Math.max(this.getMaxAverageHeight(tree[0]), this.getMaxAverageHeight(tree[1]), this.getMaxAverageHeight(tree[2]), this.getMaxAverageHeight(tree[3]));
@@ -168,7 +168,7 @@ export class ChunkTree {
      * @param walked The position of the current root relative to the absolute root
      * @returns The updated tree
      */
-    private updateLODRecursively(observerPositionW: Vector3, chunkForge: ChunkForge, tree: quadTree = this.tree, walked: number[] = []): quadTree {
+    private updateLODRecursively(observerPositionW: Vector3, chunkForge: ChunkForge, tree: QuadTree = this.tree, walked: number[] = []): QuadTree {
         if (walked.length === this.maxDepth) return tree;
 
         const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, getRotationQuaternion(this.parent));
