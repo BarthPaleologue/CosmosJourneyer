@@ -89,7 +89,7 @@ export class Spaceship implements Transformable {
     readonly onWarpDriveDisabled = new Observable<void>();
 
     constructor(scene: Scene) {
-        this.instanceRoot = Assets.CreateSpaceShipInstance();
+        this.instanceRoot = Assets.CreateWandererInstance();
         setRotationQuaternion(this.instanceRoot, Quaternion.Identity());
 
         this.aggregate = new PhysicsAggregate(
@@ -232,7 +232,7 @@ export class Spaceship implements Transformable {
     }
 
     public getThrottle(): number {
-        return this.warpDrive.isEnabled() ? this.warpDrive.getTargetThrottle() : this.mainThrusters[0].getThrottle();
+        return this.warpDrive.isEnabled() ? this.warpDrive.getTargetThrottle() : 1; //: this.mainThrusters[0].getThrottle();
     }
 
     public getClosestWalkableObject(): Transformable | null {

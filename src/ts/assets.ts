@@ -46,6 +46,7 @@ import spaceship from "../asset/spaceship/spaceship2.glb";
 import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
 import endeavorSpaceship from "../asset/spaceship/endeavour.glb";
+import wanderer from "../asset/spaceship/wanderer.glb";
 import character from "../asset/character/character.glb";
 import rock from "../asset/rock.glb";
 import landingPad from "../asset/landingpad.glb";
@@ -114,6 +115,7 @@ export class Assets {
 
     private static SPACESHIP: Mesh;
     private static ENDEAVOR_SPACESHIP: Mesh;
+    private static WANDERER: Mesh;
     private static SPACE_STATION: Mesh;
     private static BANANA: Mesh;
     private static CHARACTER: Mesh;
@@ -202,6 +204,17 @@ export class Assets {
             }
 
             console.log("Endeavor Spaceship loaded");
+        };
+
+        const wandererTask = Assets.MANAGER.addMeshTask("wandererTask", "", "", wanderer);
+        wandererTask.onSuccess = function (task: MeshAssetTask) {
+            Assets.WANDERER = task.loadedMeshes[0] as Mesh;
+
+            for (const mesh of Assets.WANDERER.getChildMeshes()) {
+                mesh.isVisible = false;
+            }
+
+            console.log("Wanderer loaded");
         };
 
         const spacestationTask = Assets.MANAGER.addMeshTask("spacestationTask", "", "", shipCarrier);
@@ -451,6 +464,10 @@ export class Assets {
         for (const child of instance.getChildMeshes()) child.isVisible = true;
 
         return instance;
+    }
+
+    static CreateWandererInstance(): InstancedMesh {
+        return Assets.WANDERER.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static CreateSpaceStationInstance(): InstancedMesh {
