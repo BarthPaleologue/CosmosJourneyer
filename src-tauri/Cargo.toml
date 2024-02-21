@@ -1,11 +1,11 @@
 [package]
-name = "app"
+name = "cosmos_journeyer"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
-default-run = "app"
+description = "Cosmos Journeyer"
+authors = ["Barthélemy Paléologue"]
+license = "GPL-3.0"
+repository = "https://github.com/BarthPaleologue/CosmosJourneyer"
+default-run = "cosmos_journeyer"
 edition = "2021"
 rust-version = "1.60"
 
