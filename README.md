@@ -1,7 +1,8 @@
 # Cosmos Journeyer
 
-[![NodeJS with Webpack](https://github.com/BarthPaleologue/planetEngine/actions/workflows/webpack.yml/badge.svg)](https://github.com/BarthPaleologue/planetEngine/actions/workflows/webpack.yml)
 [![pages-build-deployment](https://github.com/BarthPaleologue/planetEngine/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/BarthPaleologue/planetEngine/actions/workflows/pages/pages-build-deployment)
+[![tauri build and release](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/tauri-release.yml/badge.svg)](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/tauri-release.yml)
+[![ESLint Check](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/eslint.yml/badge.svg)](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/eslint.yml)
 [![Jest Coverage](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/tests.yml/badge.svg)](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/tests.yml)
 [![License](https://img.shields.io/github/license/BarthPaleologue/planetEngine)](./LICENSE.md)
 
