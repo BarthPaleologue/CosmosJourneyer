@@ -60,7 +60,7 @@ Cosmos Journeyer can be built as a desktop application using Tauri!
 First you will need a bazillion dependencies, here is a list of some of them if you are using a Debian base OS:
 
 ```bash
-sudo apt install -y libwebkit2gtk-4.0-dev libgtk-3-dev libsoup2.4-dev libjavascriptcoregtk-4.0-dev librsvg2-dev
+sudo apt install -y libwebkit2gtk-4.0-dev libgtk-3-dev libsoup2.4-dev libjavascriptcoregtk-4.0-dev librsvg2-dev libwebkit2gtk-4.0-dev libappindicator3-dev patchelf
 ```
 
 Then you can build the application with `pnpm tauri build`.
