@@ -7,7 +7,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "cosmos-journeyer",
+    "productName": "Cosmos Journeyer",
     "version": "../package.json"
   },
   "tauri": {
