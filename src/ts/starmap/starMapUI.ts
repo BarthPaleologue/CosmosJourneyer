@@ -190,15 +190,4 @@ export class StarMapUI {
         this.namePlate.text = name;
         this.descriptionPanel.text = text;
     }
-
-    public syncCamera(camera: Camera) {
-        this.uiCamera.position = camera.globalPosition;
-        this.uiCamera.rotationQuaternion = camera.absoluteRotation;
-        this.uiCamera.onViewMatrixChangedObservable.add(() => {
-            this.uiCamera.getViewMatrix().copyFrom(camera.getViewMatrix())
-        })
-        this.uiCamera.fov = camera.fov;
-        this.uiCamera.minZ = camera.minZ;
-        this.uiCamera.maxZ = camera.maxZ;
-    }
 }

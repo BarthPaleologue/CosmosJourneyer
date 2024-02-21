@@ -46,6 +46,7 @@ import { getRotationQuaternion, setRotationQuaternion } from "../uberCore/transf
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
+import { syncCamera } from "../utils/cameraSyncing";
 
 export class StarSystemView implements View {
     private readonly helmetOverlay: HelmetOverlay;
@@ -375,7 +376,7 @@ export class StarSystemView implements View {
     public render() {
         this.scene.render();
 
-        this.ui.syncCamera(this.scene.getActiveCamera());
+        syncCamera(this.scene.getActiveCamera(), this.ui.camera);
         this.ui.scene.render();
     }
 

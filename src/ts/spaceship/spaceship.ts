@@ -357,7 +357,6 @@ export class Spaceship implements Transformable {
             if (currentForwardSpeed < this.warpDrive.getWarpSpeed()) {
                 this.acceleratingWarpDriveSound.setTargetVolume(1);
                 this.deceleratingWarpDriveSound.setTargetVolume(0);
-                console.log(this.acceleratingWarpDriveSound.sound.getVolume());
             } else {
                 this.deceleratingWarpDriveSound.setTargetVolume(1);
                 this.acceleratingWarpDriveSound.setTargetVolume(0);

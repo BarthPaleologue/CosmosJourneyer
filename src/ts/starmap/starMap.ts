@@ -51,6 +51,7 @@ import { SystemSeed } from "../utils/systemSeed";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
 import { View } from "../utils/view";
 import { Assets } from "../assets";
+import { syncCamera } from "../utils/cameraSyncing";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -552,7 +553,7 @@ export class StarMap implements View {
 
     public render() {
         this.scene.render();
-        this.starMapUI.syncCamera(this.controls.getActiveCamera());
+        syncCamera(this.controls.getActiveCamera(), this.starMapUI.uiCamera);
         this.starMapUI.scene.render();
     }
 
