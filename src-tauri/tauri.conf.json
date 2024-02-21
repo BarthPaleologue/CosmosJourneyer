@@ -7,7 +7,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "cosmos-journeyer",
+    "productName": "Cosmos Journeyer",
     "version": "../package.json"
   },
   "tauri": {
@@ -55,7 +55,7 @@
     },
     "windows": [
       {
-        "fullscreen": false,
+        "fullscreen": true,
         "height": 600,
         "resizable": true,
         "title": "Cosmos Journeyer",

@@ -25,5 +25,5 @@ jobs:
         cache: 'pnpm'
     - name: Install dependencies
       run: pnpm install
-    - name: Lint
+    - name: Test
       run: pnpm run test
