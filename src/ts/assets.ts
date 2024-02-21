@@ -84,7 +84,6 @@ import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
 import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
-import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class Assets {
     static IS_READY = false;
