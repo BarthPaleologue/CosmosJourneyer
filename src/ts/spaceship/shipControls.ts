@@ -69,6 +69,11 @@ export class ShipControls implements Controls {
             }
         });
 
+        SpaceShipControlsInputs.map.throttleToZero.on("complete", () => {
+            this.spaceship.setMainEngineThrottle(0);
+            this.spaceship.getWarpDrive().increaseTargetThrottle(-this.spaceship.getWarpDrive().getTargetThrottle());
+        });
+
         this.baseFov = this.thirdPersonCamera.fov;
         this.targetFov = this.baseFov;
 

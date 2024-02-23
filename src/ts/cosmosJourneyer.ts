@@ -44,6 +44,7 @@ import { UniverseCoordinates } from "./saveFile/universeCoordinates";
 import { View } from "./utils/view";
 import { updateInputDevices } from "./inputs/devices";
 import { Assets } from "./assets";
+import { AudioManager, AudioMasks } from "./audioManager";
 
 enum EngineState {
     UNINITIALIZED,
@@ -56,7 +57,7 @@ enum EngineState {
  * the starmap view and the star system view. It also provides utility methods to take screenshots and record videos.
  * It also handles the pause menu.
  */
-export class CosmosJourneyer{
+export class CosmosJourneyer {
     readonly engine: Engine;
 
     readonly starSystemView: StarSystemView;
@@ -92,6 +93,8 @@ export class CosmosJourneyer{
         this.starMap.scene.detachControl();
         this.starSystemView.scene.attachControl();
         this.activeView = this.starSystemView;
+        AudioManager.SetMaskEnabled(AudioMasks.STAR_SYSTEM_VIEW, true);
+        AudioManager.SetMaskEnabled(AudioMasks.STAR_MAP_VIEW, false);
 
         this.mainMenu = new MainMenu(starSystemView);
         this.mainMenu.onStartObservable.add(() => {
@@ -179,22 +182,22 @@ export class CosmosJourneyer{
         const havokInstance = await HavokPhysics();
         console.log(`Havok initialized`);
 
-        // Init starmap view
-        const starMap = new StarMap(engine);
-
         // Init star system view
         const starSystemView = new StarSystemView(engine, havokInstance);
 
         await starSystemView.initAssets();
 
+        // Init starmap view
+        const starMap = new StarMap(engine);
+
         return new CosmosJourneyer(engine, starSystemView, starMap);
     }
 
     public pause(): void {
-        if(this.isPaused()) return;
+        if (this.isPaused()) return;
         this.state = EngineState.PAUSED;
 
-        if(this.activeView === this.starSystemView) this.starSystemView.stopBackgroundSounds();
+        if (this.activeView === this.starSystemView) this.starSystemView.stopBackgroundSounds();
 
         Assets.OPEN_PAUSE_MENU_SOUND.play();
         this.pauseMenu.setVisibility(true);
@@ -219,6 +222,7 @@ export class CosmosJourneyer{
 
         this.engine.runRenderLoop(() => {
             updateInputDevices();
+            AudioManager.Update(this.engine.getDeltaTime() / 1000);
 
             if (this.isPaused()) return;
             this.activeView.render();
@@ -232,8 +236,8 @@ export class CosmosJourneyer{
     public toggleStarMap(): void {
         if (this.activeView === this.starSystemView) {
             this.starSystemView.unZoom(() => {
-                this.starSystemView.stopBackgroundSounds();
-                this.starMap.startBackgroundMusic();
+                AudioManager.SetMaskEnabled(AudioMasks.STAR_SYSTEM_VIEW, false);
+                AudioManager.SetMaskEnabled(AudioMasks.STAR_MAP_VIEW, true);
 
                 this.activeView.detachControl();
 
@@ -243,8 +247,10 @@ export class CosmosJourneyer{
                 starMap.focusOnCurrentSystem();
             });
         } else {
-  this.starMap.stopBackgroundMusic();
             this.activeView.detachControl();
+
+            AudioManager.SetMaskEnabled(AudioMasks.STAR_SYSTEM_VIEW, true);
+            AudioManager.SetMaskEnabled(AudioMasks.STAR_MAP_VIEW, false);
 
             this.starSystemView.scene.attachControl();
             this.activeView = this.starSystemView;

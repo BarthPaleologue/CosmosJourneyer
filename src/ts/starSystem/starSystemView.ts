@@ -225,6 +225,7 @@ export class StarSystemView implements View {
         Assets.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
 
         this.chunkForge.update();
+
         starSystem.update(deltaSeconds, this.chunkForge);
 
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
@@ -299,8 +300,7 @@ export class StarSystemView implements View {
 
         shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
-        shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
-        shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
+        this.stopBackgroundSounds();
     }
 
     switchToDefaultControls() {
@@ -311,8 +311,7 @@ export class StarSystemView implements View {
         characterControls.getTransform().setEnabled(false);
         shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
-        shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
-        shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
+        this.stopBackgroundSounds();
 
         this.scene.setActiveController(defaultControls);
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
@@ -320,8 +319,9 @@ export class StarSystemView implements View {
     }
 
     stopBackgroundSounds() {
-        this.spaceshipControls?.spaceship.acceleratingWarpDriveSound.muteInstantly();
-        this.spaceshipControls?.spaceship.deceleratingWarpDriveSound.muteInstantly();
+        this.spaceshipControls?.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
+        this.spaceshipControls?.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
+        this.spaceshipControls?.spaceship.thrusterSound.setTargetVolume(0);
     }
 
     /**

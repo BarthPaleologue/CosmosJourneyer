@@ -18,9 +18,7 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { MainThruster } from "./mainThruster";
 import { WarpDrive } from "./warpDrive";
-import { RCSThruster } from "./rcsThruster";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { IPhysicsCollisionEvent, PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
@@ -41,6 +39,7 @@ import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
 import { AudioInstance } from "../utils/audioInstance";
+import { AudioMasks, AudioManager } from "../audioManager";
 
 enum ShipState {
     FLYING,
@@ -84,6 +83,7 @@ export class Spaceship implements Transformable {
     readonly disableWarpDriveSound: AudioInstance;
     readonly acceleratingWarpDriveSound: AudioInstance;
     readonly deceleratingWarpDriveSound: AudioInstance;
+    readonly thrusterSound: AudioInstance;
 
     readonly onWarpDriveEnabled = new Observable<void>();
     readonly onWarpDriveDisabled = new Observable<void>();
@@ -116,7 +116,6 @@ export class Spaceship implements Transformable {
             console.log("Collision");
             if (collisionEvent.impulse < 0.8) return;
             console.log(collisionEvent);
-            //Assets.OuchSound.play();
         });
 
         this.warpTunnel = new WarpTunnel(this.getTransform(), scene);
@@ -124,13 +123,21 @@ export class Spaceship implements Transformable {
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
 
-        this.enableWarpDriveSound = new AudioInstance(Assets.ENABLE_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
-        this.disableWarpDriveSound = new AudioInstance(Assets.DISABLE_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
-        this.acceleratingWarpDriveSound = new AudioInstance(Assets.ACCELERATING_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
-        this.deceleratingWarpDriveSound = new AudioInstance(Assets.DECELERATING_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
+        this.enableWarpDriveSound = new AudioInstance(Assets.ENABLE_WARP_DRIVE_SOUND, 1, true, this.getTransform());
+        this.disableWarpDriveSound = new AudioInstance(Assets.DISABLE_WARP_DRIVE_SOUND, 1, true, this.getTransform());
+        this.acceleratingWarpDriveSound = new AudioInstance(Assets.ACCELERATING_WARP_DRIVE_SOUND, 0, false, this.getTransform());
+        this.deceleratingWarpDriveSound = new AudioInstance(Assets.DECELERATING_WARP_DRIVE_SOUND, 0, false, this.getTransform());
+        this.thrusterSound = new AudioInstance(Assets.THRUSTER_SOUND, 0, false, this.getTransform());
 
-        this.acceleratingWarpDriveSound.setTargetVolume(0);
-        this.deceleratingWarpDriveSound.setTargetVolume(0);
+        AudioManager.RegisterSound(this.enableWarpDriveSound, AudioMasks.STAR_SYSTEM_VIEW);
+        AudioManager.RegisterSound(this.disableWarpDriveSound, AudioMasks.STAR_SYSTEM_VIEW);
+        AudioManager.RegisterSound(this.acceleratingWarpDriveSound, AudioMasks.STAR_SYSTEM_VIEW);
+        AudioManager.RegisterSound(this.deceleratingWarpDriveSound, AudioMasks.STAR_SYSTEM_VIEW);
+        AudioManager.RegisterSound(this.thrusterSound, AudioMasks.STAR_SYSTEM_VIEW);
+
+        this.thrusterSound.sound.play();
+        this.acceleratingWarpDriveSound.sound.play();
+        this.deceleratingWarpDriveSound.sound.play();
 
         this.scene = scene;
     }
@@ -159,8 +166,7 @@ export class Spaceship implements Transformable {
         this.aggregate.body.setLinearVelocity(Vector3.Zero());
         this.aggregate.body.setAngularVelocity(Vector3.Zero());
 
-        if(!this.acceleratingWarpDriveSound.sound.isPlaying) this.acceleratingWarpDriveSound.sound.play();
-        if(!this.deceleratingWarpDriveSound.sound.isPlaying) this.deceleratingWarpDriveSound.sound.play();
+        this.thrusterSound.setTargetVolume(0);
 
         this.enableWarpDriveSound.sound.play();
         this.onWarpDriveEnabled.notifyObservers();
@@ -177,6 +183,10 @@ export class Spaceship implements Transformable {
     public toggleWarpDrive() {
         if (!this.warpDrive.isEnabled()) this.enableWarpDrive();
         else this.disableWarpDrive();
+    }
+
+    public setMainEngineThrottle(throttle: number) {
+        this.mainEngineThrottle = throttle;
     }
 
     /**
@@ -324,6 +334,9 @@ export class Spaceship implements Transformable {
 
             const otherSpeed = linearVelocity.subtract(forwardDirection.scale(forwardSpeed));
 
+            if(this.mainEngineThrottle !== 0) this.thrusterSound.setTargetVolume(1);
+            else this.thrusterSound.setTargetVolume(0);
+
             if(forwardSpeed < this.mainEngineTargetSpeed) {
                 this.aggregate.body.applyForce(forwardDirection.scale(3000), this.aggregate.body.getObjectCenterWorld());
             } else {
@@ -343,6 +356,8 @@ export class Spaceship implements Transformable {
         } else {
             translate(this.getTransform(), warpSpeed.scale(deltaTime));
 
+            this.thrusterSound.setTargetVolume(0);
+
             if (currentForwardSpeed < this.warpDrive.getWarpSpeed()) {
                 this.acceleratingWarpDriveSound.setTargetVolume(1);
                 this.deceleratingWarpDriveSound.setTargetVolume(0);
@@ -351,11 +366,6 @@ export class Spaceship implements Transformable {
                 this.acceleratingWarpDriveSound.setTargetVolume(0);
             }
         }
-
-        this.enableWarpDriveSound.update(deltaTime);
-        this.disableWarpDriveSound.update(deltaTime);
-        this.acceleratingWarpDriveSound.update(deltaTime);
-        this.deceleratingWarpDriveSound.update(deltaTime);
 
         if (this.flightAssistEnabled) {
             this.aggregate.body.setAngularDamping(0.9);

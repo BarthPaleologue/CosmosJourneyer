@@ -52,10 +52,14 @@ import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel
 import { View } from "../utils/view";
 import { Assets } from "../assets";
 import { syncCamera } from "../utils/cameraSyncing";
+import { AudioInstance } from "../utils/audioInstance";
+import { AudioManager, AudioMasks } from "../audioManager";
 
 export class StarMap implements View {
     readonly scene: Scene;
     private readonly controls: DefaultControls;
+
+    private readonly backgroundMusic: AudioInstance;
 
     private rotationAnimation: TransformRotationAnimation | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
@@ -123,6 +127,10 @@ export class StarMap implements View {
         this.controls.getActiveCamera().minZ = 0.01;
 
         this.controls.getActiveCamera().attachControl();
+
+        this.backgroundMusic = new AudioInstance(Assets.STAR_MAP_BACKGROUND_MUSIC, 1, false, null);
+        AudioManager.RegisterSound(this.backgroundMusic, AudioMasks.STAR_MAP_VIEW);
+        this.backgroundMusic.sound.play();
 
         this.starMapUI = new StarMapUI(engine);
 
@@ -507,14 +515,6 @@ export class StarMap implements View {
         }
 
         this.starMapUI.setHoveredStarSystemMesh(null);
-    }
-
-    startBackgroundMusic() {
-        Assets.STAR_MAP_BACKGROUND_MUSIC.play();
-    }
-
-    stopBackgroundMusic() {
-        Assets.STAR_MAP_BACKGROUND_MUSIC.stop();
     }
 
     public focusOnCurrentSystem(skipAnimation = false) {

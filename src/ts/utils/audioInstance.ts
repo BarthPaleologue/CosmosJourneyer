@@ -6,7 +6,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 export class AudioInstance {
     readonly sound: Sound;
 
-    private targetVolume = 1;
+    private targetVolume;
     private targetPlaybackSpeed = 1;
 
     private blendSpeed = 0.5;
@@ -20,19 +20,30 @@ export class AudioInstance {
 
     private parent: TransformNode | null;
 
-    constructor(baseSound: Sound, localPosition: Vector3, parent: TransformNode | null) {
+    private maskFactor = 1;
+
+    private targetMaskFactor = 1;
+
+    private readonly isPonctual: boolean;
+
+    constructor(baseSound: Sound, initialTargetVolume: number, isPonctual: boolean, parent: TransformNode | null) {
         const clonedSound = baseSound.clone();
         if (clonedSound === null) throw new Error("Cloned sound was null!");
         this.sound = clonedSound;
+
+        this.targetVolume = initialTargetVolume;
 
         this.volumeMultiplier = baseSound.getVolume();
         this.playbackSpeedMultiplier = baseSound.getPlaybackRate();
 
         this.sound.updateOptions({
-            playbackRate: this.playbackSpeedMultiplier
+            playbackRate: this.playbackSpeedMultiplier * this.targetPlaybackSpeed,
+            volume: this.targetVolume * this.volumeMultiplier * this.maskFactor
         });
 
-        this.localPosition = localPosition;
+        this.isPonctual = isPonctual;
+
+        this.localPosition = Vector3.Zero();
         this.parent = parent;
     }
 
@@ -53,26 +64,31 @@ export class AudioInstance {
         this.blendSpeed = speed;
     }
 
-    muteInstantly() {
-        this.sound.setVolume(0);
+    setMaskFactor(factor: number) {
+        this.targetMaskFactor = factor;
     }
 
     update(deltaSeconds: number) {
-        if (this.blendSpeed === 0) {
-            this.sound.setVolume(this.targetVolume * this.volumeMultiplier);
-            this.sound.setPlaybackRate(this.targetPlaybackSpeed);
-        } else {
-            this.sound.setVolume(moveTowards(this.sound.getVolume(), this.targetVolume * this.volumeMultiplier * this.spatialVolumeMultiplier, this.blendSpeed * deltaSeconds));
-            this.sound.setPlaybackRate(moveTowards(this.sound.getPlaybackRate(), this.targetPlaybackSpeed * this.playbackSpeedMultiplier, this.blendSpeed * deltaSeconds));
+        this.maskFactor = moveTowards(this.maskFactor, this.targetMaskFactor, this.blendSpeed * deltaSeconds);
+        if (this.maskFactor === 0) {
+            this.sound.stop();
+        } else if (!this.sound.isPlaying && !this.isPonctual) {
+            this.sound.play();
         }
 
-        if (this.parent !== null) {
+        this.sound.setVolume(
+            moveTowards(this.sound.getVolume(), this.targetVolume * this.volumeMultiplier * this.spatialVolumeMultiplier * this.maskFactor, this.blendSpeed * deltaSeconds)
+        );
+        this.sound.setPlaybackRate(moveTowards(this.sound.getPlaybackRate(), this.targetPlaybackSpeed * this.playbackSpeedMultiplier, this.blendSpeed * deltaSeconds));
+
+
+        /*if (this.parent !== null) {
             const worldPosition = Vector3.TransformCoordinates(this.localPosition, this.parent.getWorldMatrix());
             const camera = this.parent.getScene().activeCamera;
-            if(camera === null) throw new Error("No active camera");
+            if (camera === null) throw new Error("No active camera");
             const worldCameraPosition = Vector3.TransformCoordinates(camera.position, this.parent.getWorldMatrix());
             const distance = Vector3.Distance(worldCameraPosition, worldPosition);
             this.spatialVolumeMultiplier = 1 / (1 + 0.01 * distance);
-        }
+        }*/
     }
 }

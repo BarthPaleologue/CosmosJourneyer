@@ -155,7 +155,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
     }
 
     public getBoundingRadius(): number {
-        return 1e3;
+        return 2e3;
     }
 
     getTypeName(): string {

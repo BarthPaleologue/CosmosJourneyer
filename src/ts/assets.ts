@@ -66,6 +66,8 @@ import disableWarpDriveSound from "../asset/sound/204418__nhumphrey__large-engin
 import acceleratingWarpDriveSound from "../asset/sound/539503__timbre__endless-acceleration.mp3";
 import deceleratingWarpDriveSound from "../asset/sound/539503__timbre_endless-deceleration.mp3";
 
+import thrusterSound from "../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
+
 import starMapBackgroundMusic from "../asset/sound/455855__andrewkn__wandering.mp3";
 
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -149,6 +151,8 @@ export class Assets {
 
     public static ACCELERATING_WARP_DRIVE_SOUND: Sound;
     public static DECELERATING_WARP_DRIVE_SOUND: Sound;
+
+    public static THRUSTER_SOUND: Sound;
 
     public static STAR_MAP_BACKGROUND_MUSIC: Sound;
     public static MAIN_MENU_BACKGROUND_MUSIC: Sound;
@@ -411,6 +415,18 @@ export class Assets {
             });
 
             console.log("Decelerating warp drive sound loaded");
+        };
+
+        const thrusterSoundTask = Assets.MANAGER.addBinaryFileTask("thrusterSoundTask", thrusterSound);
+        thrusterSoundTask.onSuccess = function (task) {
+            Assets.THRUSTER_SOUND = new Sound("ThrusterSound", task.data, scene);
+            Assets.THRUSTER_SOUND.updateOptions({
+                playbackRate: 1.0,
+                volume: 0.5,
+                loop: true
+            });
+
+            console.log("Thruster sound loaded");
         };
 
         const starMapBackgroundMusicTask = Assets.MANAGER.addBinaryFileTask("starMapBackgroundMusicTask", starMapBackgroundMusic);
