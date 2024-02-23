@@ -56,7 +56,7 @@ enum EngineState {
  * the starmap view and the star system view. It also provides utility methods to take screenshots and record videos.
  * It also handles the pause menu.
  */
-export class CosmosJourneyer{
+export class CosmosJourneyer {
     readonly engine: Engine;
 
     readonly starSystemView: StarSystemView;
@@ -89,8 +89,8 @@ export class CosmosJourneyer{
         });
 
         // Init the active scene
-        this.starMap.scene.detachControl();
-        this.starSystemView.scene.attachControl();
+        this.starMap.detachControl();
+        this.starSystemView.attachControl();
         this.activeView = this.starSystemView;
 
         this.mainMenu = new MainMenu(starSystemView);
@@ -190,10 +190,10 @@ export class CosmosJourneyer{
     }
 
     public pause(): void {
-        if(this.isPaused()) return;
+        if (this.isPaused()) return;
         this.state = EngineState.PAUSED;
 
-        if(this.activeView === this.starSystemView) this.starSystemView.stopBackgroundSounds();
+        if (this.activeView === this.starSystemView) this.starSystemView.stopBackgroundSounds();
 
         Assets.OPEN_PAUSE_MENU_SOUND.play();
         this.pauseMenu.setVisibility(true);
@@ -235,17 +235,16 @@ export class CosmosJourneyer{
                 this.starMap.startBackgroundMusic();
 
                 this.activeView.detachControl();
+                this.starMap.attachControl();
 
-                this.starMap.scene.attachControl();
                 const starMap = this.starMap;
                 this.activeView = starMap;
                 starMap.focusOnCurrentSystem();
             });
         } else {
-  this.starMap.stopBackgroundMusic();
+            this.starMap.stopBackgroundMusic();
             this.activeView.detachControl();
-
-            this.starSystemView.scene.attachControl();
+            this.starSystemView.attachControl();
             this.activeView = this.starSystemView;
             this.starSystemView.showUI();
         }
