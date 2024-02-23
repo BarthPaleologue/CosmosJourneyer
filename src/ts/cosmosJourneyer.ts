@@ -100,6 +100,7 @@ export class CosmosJourneyer{
             this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
             this.starSystemView.showUI();
             this.starSystemView.ui.setEnabled(true);
+            this.starSystemView.ui.setTarget(this.starSystemView.getStarSystem().getClosestToScreenCenterOrbitalObject());
         });
 
         this.mainMenu.onLoadSaveObservable.add((saveData: SaveFileData) => {
