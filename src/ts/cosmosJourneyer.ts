@@ -90,8 +90,8 @@ export class CosmosJourneyer {
         });
 
         // Init the active scene
-        this.starMap.scene.detachControl();
-        this.starSystemView.scene.attachControl();
+        this.starMap.detachControl();
+        this.starSystemView.attachControl();
         this.activeView = this.starSystemView;
         AudioManager.SetMaskEnabled(AudioMasks.STAR_SYSTEM_VIEW, true);
         AudioManager.SetMaskEnabled(AudioMasks.STAR_MAP_VIEW, false);
@@ -240,8 +240,8 @@ export class CosmosJourneyer {
                 AudioManager.SetMaskEnabled(AudioMasks.STAR_MAP_VIEW, true);
 
                 this.activeView.detachControl();
+                this.starMap.attachControl();
 
-                this.starMap.scene.attachControl();
                 const starMap = this.starMap;
                 this.activeView = starMap;
                 starMap.focusOnCurrentSystem();
@@ -252,7 +252,7 @@ export class CosmosJourneyer {
             AudioManager.SetMaskEnabled(AudioMasks.STAR_SYSTEM_VIEW, true);
             AudioManager.SetMaskEnabled(AudioMasks.STAR_MAP_VIEW, false);
 
-            this.starSystemView.scene.attachControl();
+            this.starSystemView.attachControl();
             this.activeView = this.starSystemView;
             this.starSystemView.showUI();
         }
