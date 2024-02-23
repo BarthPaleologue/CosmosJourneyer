@@ -56,10 +56,10 @@ export class Spaceship implements Transformable {
 
     private flightAssistEnabled = true;
 
-    readonly mainThrusters: MainThruster[] = [];
-    readonly rcsThrusters: RCSThruster[] = [];
-
     private readonly warpDrive = new WarpDrive(false);
+
+    private mainEngineThrottle = 0;
+    private mainEngineTargetSpeed = 0;
 
     private closestWalkableObject: Transformable | null = null;
 
@@ -119,16 +119,6 @@ export class Spaceship implements Transformable {
             //Assets.OuchSound.play();
         });
 
-        for (const child of this.instanceRoot.getChildMeshes()) {
-            if (child.name.includes("mainThruster")) {
-                console.log("Found main thruster");
-                this.addMainThruster(child);
-            } else if (child.name.includes("rcsThruster")) {
-                console.log("Found rcs thruster");
-                this.addRCSThruster(child);
-            }
-        }
-
         this.warpTunnel = new WarpTunnel(this.getTransform(), scene);
         this.hyperSpaceTunnel = new HyperSpaceTunnel(this.getTransform().getDirection(Axis.Z), scene);
         this.hyperSpaceTunnel.setParent(this.getTransform());
@@ -153,20 +143,6 @@ export class Spaceship implements Transformable {
         return this.aggregate.transformNode;
     }
 
-    private addMainThruster(mesh: AbstractMesh) {
-        const direction = mesh.getDirection(new Vector3(0, 1, 0));
-        this.mainThrusters.push(new MainThruster(mesh, direction, this.aggregate));
-    }
-
-    private addRCSThruster(mesh: AbstractMesh) {
-        const direction = mesh.getDirection(new Vector3(0, 1, 0));
-        const thruster = new RCSThruster(mesh, direction, this.aggregate);
-        this.rcsThrusters.push(thruster);
-
-        //FIXME: this is temporary to balance rc thrust
-        thruster.setMaxAuthority(thruster.getMaxAuthority() / thruster.leverage);
-    }
-
     public setEnabled(enabled: boolean, havokPlugin: HavokPlugin) {
         this.instanceRoot.setEnabled(enabled);
         setEnabledBody(this.aggregate.body, enabled, havokPlugin);
@@ -177,8 +153,6 @@ export class Spaceship implements Transformable {
     }
 
     public enableWarpDrive() {
-        for (const thruster of this.mainThrusters) thruster.setThrottle(0);
-        for (const thruster of this.rcsThrusters) thruster.deactivate();
         this.warpDrive.enable();
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
 
@@ -232,7 +206,11 @@ export class Spaceship implements Transformable {
     }
 
     public getThrottle(): number {
-        return this.warpDrive.isEnabled() ? this.warpDrive.getTargetThrottle() : 1; //: this.mainThrusters[0].getThrottle();
+        return this.warpDrive.isEnabled() ? this.warpDrive.getTargetThrottle() : this.mainEngineThrottle;
+    }
+
+    public increaseMainEngineThrottle(delta: number) {
+        this.mainEngineThrottle = Math.max(-1, Math.min(1, this.mainEngineThrottle + delta));
     }
 
     public getClosestWalkableObject(): Transformable | null {
@@ -328,6 +306,8 @@ export class Spaceship implements Transformable {
     }
 
     public update(deltaTime: number) {
+        this.mainEngineTargetSpeed = this.mainEngineThrottle * 500;
+
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
@@ -337,12 +317,21 @@ export class Spaceship implements Transformable {
         if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
         else this.warpTunnel.setThrottle(0);
 
-        for (const thruster of this.mainThrusters) thruster.update();
-        for (const thruster of this.rcsThrusters) thruster.update();
-
         if (this.warpDrive.isDisabled()) {
-            for (const thruster of this.mainThrusters) thruster.applyForce();
-            for (const thruster of this.rcsThrusters) thruster.applyForce();
+            const linearVelocity = this.aggregate.body.getLinearVelocity();
+            const forwardDirection = getForwardDirection(this.getTransform());
+            const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
+
+            const otherSpeed = linearVelocity.subtract(forwardDirection.scale(forwardSpeed));
+
+            if(forwardSpeed < this.mainEngineTargetSpeed) {
+                this.aggregate.body.applyForce(forwardDirection.scale(3000), this.aggregate.body.getObjectCenterWorld());
+            } else {
+                this.aggregate.body.applyForce(forwardDirection.scale(-3000), this.aggregate.body.getObjectCenterWorld());
+            }
+
+            // damp other speed
+            this.aggregate.body.applyForce(otherSpeed.scale(-100), this.aggregate.body.getObjectCenterWorld());
 
             if (this.closestWalkableObject !== null) {
                 const gravityDir = this.closestWalkableObject.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();

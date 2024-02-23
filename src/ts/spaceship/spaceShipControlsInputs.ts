@@ -10,7 +10,7 @@ const keyboard = InputDevices.KEYBOARD;
 const pointer = InputDevices.POINTER;
 
 const landingAction = new Action({
-    bindings: [keyboard.getControl("Space"), gamepad.getControl("A")]
+    bindings: [keyboard.getControl("KeyL"), gamepad.getControl("A")]
 });
 
 const landingInteraction = new PressInteraction(landingAction);
