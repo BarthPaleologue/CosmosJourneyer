@@ -83,7 +83,7 @@ export class StarSystemView implements View {
         StarSystemView.UN_ZOOM_ANIMATION.setKeys([
             {
                 frame: 0,
-                value: 30
+                value: ShipControls.BASE_CAMERA_RADIUS
             },
             {
                 frame: 30,

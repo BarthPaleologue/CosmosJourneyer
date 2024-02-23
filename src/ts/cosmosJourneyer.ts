@@ -85,7 +85,7 @@ export class CosmosJourneyer {
             const activeControls = this.starSystemView.scene.getActiveController();
             if (activeControls instanceof ShipControls) {
                 activeControls.spaceship.enableWarpDrive();
-                activeControls.thirdPersonCamera.radius = 30;
+                activeControls.thirdPersonCamera.radius = ShipControls.BASE_CAMERA_RADIUS;
             }
         });
 
