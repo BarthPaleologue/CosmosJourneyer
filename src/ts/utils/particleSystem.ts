@@ -47,14 +47,13 @@ export class DirectionnalParticleSystem extends ParticleSystem {
         this.particleTexture.hasAlpha = true;
 
         this.emitter = mesh;
-        this.minSize = 0.6;
-        this.maxSize = 0.7;
+        this.minSize = 1.6;
+        this.maxSize = 1.7;
         this.minLifeTime = 0.5;
         this.maxLifeTime = 0.6;
         this.minEmitPower = 0;
         this.maxEmitPower = 0;
         this.updateSpeed = 0.005;
-        this.forceDepthWrite = true;
         this.color1 = new Color4(0.5, 0.5, 0.5, 1);
         this.color2 = new Color4(0.5, 0.5, 0.5, 1);
         this.colorDead = new Color4(0, 0, 0, 0);

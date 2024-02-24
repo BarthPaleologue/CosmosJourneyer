@@ -40,6 +40,7 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioMasks, AudioManager } from "../audioManager";
+import { MainThruster } from "./mainThruster";
 
 enum ShipState {
     FLYING,
@@ -79,6 +80,8 @@ export class Spaceship implements Transformable {
 
     private targetLandingPad: LandingPad | null = null;
 
+    private mainThrusters: MainThruster[] = [];
+
     readonly enableWarpDriveSound: AudioInstance;
     readonly disableWarpDriveSound: AudioInstance;
     readonly acceleratingWarpDriveSound: AudioInstance;
@@ -102,6 +105,11 @@ export class Spaceship implements Transformable {
             scene
         );
         for (const child of this.instanceRoot.getChildMeshes()) {
+            if(child.name.includes("mainThruster")) {
+                const mainThruster = new MainThruster(child, getForwardDirection(this.instanceRoot).negate(), this.aggregate);
+                this.mainThrusters.push(mainThruster);
+                continue;
+            }
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
             childShape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
             childShape.filterCollideMask = CollisionMask.ENVIRONMENT;
@@ -339,8 +347,14 @@ export class Spaceship implements Transformable {
 
             if(forwardSpeed < this.mainEngineTargetSpeed) {
                 this.aggregate.body.applyForce(forwardDirection.scale(3000), this.aggregate.body.getObjectCenterWorld());
+                this.mainThrusters.forEach(thruster => {
+                    thruster.setThrottle(this.mainEngineThrottle);
+                });
             } else {
                 this.aggregate.body.applyForce(forwardDirection.scale(-3000), this.aggregate.body.getObjectCenterWorld());
+                this.mainThrusters.forEach(thruster => {
+                    thruster.setThrottle(0);
+                });
             }
 
             // damp other speed
@@ -354,6 +368,10 @@ export class Spaceship implements Transformable {
             this.acceleratingWarpDriveSound.setTargetVolume(0);
             this.deceleratingWarpDriveSound.setTargetVolume(0);
         } else {
+            this.mainThrusters.forEach(thruster => {
+                thruster.setThrottle(0);
+            });
+
             translate(this.getTransform(), warpSpeed.scale(deltaTime));
 
             this.thrusterSound.setTargetVolume(0);
@@ -366,6 +384,10 @@ export class Spaceship implements Transformable {
                 this.acceleratingWarpDriveSound.setTargetVolume(0);
             }
         }
+
+        this.mainThrusters.forEach(thruster => {
+            thruster.update();
+        });
 
         if (this.flightAssistEnabled) {
             this.aggregate.body.setAngularDamping(0.9);
