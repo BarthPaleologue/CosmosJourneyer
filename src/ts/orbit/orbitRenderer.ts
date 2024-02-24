@@ -29,7 +29,7 @@ export class OrbitRenderer {
 
     private orbitMaterial: StandardMaterial | null = null;
 
-    private isVisibile = false;
+    private _isVisible = false;
 
     setOrbitalObjects(orbitalObjects: OrbitalObject[]) {
         this.reset();
@@ -39,7 +39,7 @@ export class OrbitRenderer {
             this.createOrbitMesh(orbitalObject);
         }
 
-        this.setVisibility(this.isVisibile);
+        this.setVisibility(this.isVisible());
     }
 
     private createOrbitMesh(orbitalObject: OrbitalObject) {
@@ -61,17 +61,18 @@ export class OrbitRenderer {
     }
 
     setVisibility(visible: boolean) {
-        this.isVisibile = visible;
+        this._isVisible = visible;
         for (const orbitMesh of this.orbitMeshes) {
-            orbitMesh.visibility = visible ? 1 : 0;
+            orbitMesh.setEnabled(visible);
         }
     }
 
     isVisible(): boolean {
-        return this.isVisibile;
+        return this._isVisible;
     }
 
     update() {
+        if(!this._isVisible) return;
         for (let i = 0; i < this.orbitalObjects.length; i++) {
             const orbitalObject = this.orbitalObjects[i];
             const orbitMesh = this.orbitMeshes[i];
@@ -89,8 +90,10 @@ export class OrbitRenderer {
         this.orbitMeshes = [];
         this.orbitalObjects = [];
 
-        this.orbitMaterial = new StandardMaterial("orbitMaterial");
-        this.orbitMaterial.emissiveColor = Color3.White();
-        this.orbitMaterial.disableLighting = true;
+        if(this.orbitMaterial === null) {
+            this.orbitMaterial = new StandardMaterial("orbitMaterial");
+            this.orbitMaterial.emissiveColor = Color3.White();
+            this.orbitMaterial.disableLighting = true;
+        }
     }
 }
