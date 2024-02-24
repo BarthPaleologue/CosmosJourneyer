@@ -23,7 +23,6 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import "@babylonjs/core/Misc/screenshotTools";
 import { StarMap } from "./starmap/starMap";
-import { Scene } from "@babylonjs/core/scene";
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
 import HavokPhysics from "@babylonjs/havok";
@@ -44,7 +43,8 @@ import { UniverseCoordinates } from "./saveFile/universeCoordinates";
 import { View } from "./utils/view";
 import { updateInputDevices } from "./inputs/devices";
 import { Assets } from "./assets";
-import { AudioManager, AudioMasks } from "./audioManager";
+import { AudioManager } from "./audio/audioManager";
+import { AudioMasks } from "./audio/audioMasks";
 
 enum EngineState {
     UNINITIALIZED,
@@ -93,8 +93,7 @@ export class CosmosJourneyer {
         this.starMap.detachControl();
         this.starSystemView.attachControl();
         this.activeView = this.starSystemView;
-        AudioManager.SetMaskEnabled(AudioMasks.STAR_SYSTEM_VIEW, true);
-        AudioManager.SetMaskEnabled(AudioMasks.STAR_MAP_VIEW, false);
+        AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
 
         this.mainMenu = new MainMenu(starSystemView);
         this.mainMenu.onStartObservable.add(() => {
@@ -236,8 +235,7 @@ export class CosmosJourneyer {
     public toggleStarMap(): void {
         if (this.activeView === this.starSystemView) {
             this.starSystemView.unZoom(() => {
-                AudioManager.SetMaskEnabled(AudioMasks.STAR_SYSTEM_VIEW, false);
-                AudioManager.SetMaskEnabled(AudioMasks.STAR_MAP_VIEW, true);
+                AudioManager.SetMask(AudioMasks.STAR_MAP_VIEW);
 
                 this.activeView.detachControl();
                 this.starMap.attachControl();
@@ -249,8 +247,7 @@ export class CosmosJourneyer {
         } else {
             this.activeView.detachControl();
 
-            AudioManager.SetMaskEnabled(AudioMasks.STAR_SYSTEM_VIEW, true);
-            AudioManager.SetMaskEnabled(AudioMasks.STAR_MAP_VIEW, false);
+            AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
 
             this.starSystemView.attachControl();
             this.activeView = this.starSystemView;

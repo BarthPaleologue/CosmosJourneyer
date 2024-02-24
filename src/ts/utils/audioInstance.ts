@@ -26,10 +26,14 @@ export class AudioInstance {
 
     private readonly isPonctual: boolean;
 
-    constructor(baseSound: Sound, initialTargetVolume: number, isPonctual: boolean, parent: TransformNode | null) {
+    readonly mask: number;
+
+    constructor(baseSound: Sound, mask: number, initialTargetVolume: number, isPonctual: boolean, parent: TransformNode | null) {
         const clonedSound = baseSound.clone();
         if (clonedSound === null) throw new Error("Cloned sound was null!");
         this.sound = clonedSound;
+
+        this.mask = mask;
 
         this.targetVolume = initialTargetVolume;
 

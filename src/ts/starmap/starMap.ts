@@ -53,7 +53,8 @@ import { View } from "../utils/view";
 import { Assets } from "../assets";
 import { syncCamera } from "../utils/cameraSyncing";
 import { AudioInstance } from "../utils/audioInstance";
-import { AudioManager, AudioMasks } from "../audioManager";
+import { AudioManager } from "../audio/audioManager";
+import { AudioMasks } from "../audio/audioMasks";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -128,8 +129,8 @@ export class StarMap implements View {
 
         this.controls.getActiveCamera().attachControl();
 
-        this.backgroundMusic = new AudioInstance(Assets.STAR_MAP_BACKGROUND_MUSIC, 1, false, null);
-        AudioManager.RegisterSound(this.backgroundMusic, AudioMasks.STAR_MAP_VIEW);
+        this.backgroundMusic = new AudioInstance(Assets.STAR_MAP_BACKGROUND_MUSIC, AudioMasks.STAR_MAP_VIEW, 1, false, null);
+        AudioManager.RegisterSound(this.backgroundMusic);
         this.backgroundMusic.sound.play();
 
         this.starMapUI = new StarMapUI(engine);

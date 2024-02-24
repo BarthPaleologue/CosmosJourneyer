@@ -116,7 +116,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     private state = WarpDriveState.DISABLED;
 
-    private static MIN_SPEED = 500;
+    private static MIN_SPEED = 2000;
 
     constructor(enabledByDefault = false) {
         this.state = enabledByDefault ? WarpDriveState.ENABLED : WarpDriveState.DISABLED;

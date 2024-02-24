@@ -39,8 +39,9 @@ import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
 import { AudioInstance } from "../utils/audioInstance";
-import { AudioMasks, AudioManager } from "../audioManager";
+import { AudioManager } from "../audio/audioManager";
 import { MainThruster } from "./mainThruster";
+import { AudioMasks } from "../audio/audioMasks";
 
 enum ShipState {
     FLYING,
@@ -131,17 +132,17 @@ export class Spaceship implements Transformable {
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
 
-        this.enableWarpDriveSound = new AudioInstance(Assets.ENABLE_WARP_DRIVE_SOUND, 1, true, this.getTransform());
-        this.disableWarpDriveSound = new AudioInstance(Assets.DISABLE_WARP_DRIVE_SOUND, 1, true, this.getTransform());
-        this.acceleratingWarpDriveSound = new AudioInstance(Assets.ACCELERATING_WARP_DRIVE_SOUND, 0, false, this.getTransform());
-        this.deceleratingWarpDriveSound = new AudioInstance(Assets.DECELERATING_WARP_DRIVE_SOUND, 0, false, this.getTransform());
-        this.thrusterSound = new AudioInstance(Assets.THRUSTER_SOUND, 0, false, this.getTransform());
+        this.enableWarpDriveSound = new AudioInstance(Assets.ENABLE_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 1, true, this.getTransform());
+        this.disableWarpDriveSound = new AudioInstance(Assets.DISABLE_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 1, true, this.getTransform());
+        this.acceleratingWarpDriveSound = new AudioInstance(Assets.ACCELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
+        this.deceleratingWarpDriveSound = new AudioInstance(Assets.DECELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
+        this.thrusterSound = new AudioInstance(Assets.THRUSTER_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
 
-        AudioManager.RegisterSound(this.enableWarpDriveSound, AudioMasks.STAR_SYSTEM_VIEW);
-        AudioManager.RegisterSound(this.disableWarpDriveSound, AudioMasks.STAR_SYSTEM_VIEW);
-        AudioManager.RegisterSound(this.acceleratingWarpDriveSound, AudioMasks.STAR_SYSTEM_VIEW);
-        AudioManager.RegisterSound(this.deceleratingWarpDriveSound, AudioMasks.STAR_SYSTEM_VIEW);
-        AudioManager.RegisterSound(this.thrusterSound, AudioMasks.STAR_SYSTEM_VIEW);
+        AudioManager.RegisterSound(this.enableWarpDriveSound);
+        AudioManager.RegisterSound(this.disableWarpDriveSound);
+        AudioManager.RegisterSound(this.acceleratingWarpDriveSound);
+        AudioManager.RegisterSound(this.deceleratingWarpDriveSound);
+        AudioManager.RegisterSound(this.thrusterSound);
 
         this.thrusterSound.sound.play();
         this.acceleratingWarpDriveSound.sound.play();
