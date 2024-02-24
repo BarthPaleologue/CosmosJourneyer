@@ -362,9 +362,6 @@ export class Spaceship implements Transformable {
                 });
             } else {
                 this.aggregate.body.applyForce(forwardDirection.scale(-3000), this.aggregate.body.getObjectCenterWorld());
-                this.mainThrusters.forEach(thruster => {
-                    thruster.setThrottle(0);
-                });
             }
 
             // damp other speed
