@@ -109,7 +109,7 @@ export class ShipControls implements Controls {
         this.spaceship.update(deltaTime);
 
         let [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
-        if(SpaceShipControlsInputs.map.ignorePointer.value > 0) {
+        if (SpaceShipControlsInputs.map.ignorePointer.value > 0) {
             inputRoll *= 0;
             inputPitch *= 0;
         }
@@ -118,16 +118,18 @@ export class ShipControls implements Controls {
             this.spaceship.increaseMainEngineThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
 
             this.spaceship.aggregate.body.applyForce(
-              getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
-              this.spaceship.aggregate.body.getObjectCenterWorld()
+                getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
+                this.spaceship.aggregate.body.getObjectCenterWorld()
             );
         } else {
             this.spaceship.getWarpDrive().increaseTargetThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
         }
 
-        roll(this.getTransform(), inputRoll * deltaTime);
-        pitch(this.getTransform(), inputPitch * deltaTime);
-
+        if (!this.spaceship.isLanded()) {
+            roll(this.getTransform(), inputRoll * deltaTime);
+            pitch(this.getTransform(), inputPitch * deltaTime);
+        }
+        
         // camera shake
         if (this.isCameraShaking) {
             this.thirdPersonCamera.alpha += (Math.random() - 0.5) / 100;

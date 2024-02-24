@@ -260,6 +260,10 @@ export class Spaceship implements Transformable {
         this.landingTarget = null;
     }
 
+    public isLanded(): boolean {
+        return this.state === ShipState.LANDED;
+    }
+
     private land(deltaTime: number) {
         if (this.targetLandingPad !== null) {
             this.landOnPad(this.targetLandingPad, deltaTime);
