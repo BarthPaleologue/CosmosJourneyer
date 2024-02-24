@@ -47,8 +47,8 @@ export class ShipControls implements Controls {
 
         this.firstPersonCamera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.getTransform();
-        this.firstPersonCamera.position = new Vector3(0, 1.2, 3.5);
-
+        this.firstPersonCamera.position = new Vector3(0, 1.2, 4);
+        
         this.thirdPersonCamera = new ArcRotateCamera("thirdPersonCamera", -3.14 / 2, 3.14 / 2.2, ShipControls.BASE_CAMERA_RADIUS, Vector3.Zero(), scene);
         this.thirdPersonCamera.parent = this.getTransform();
         this.thirdPersonCamera.lowerRadiusLimit = 10;
