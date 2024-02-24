@@ -358,7 +358,7 @@ export class Spaceship implements Transformable {
             }
 
             // damp other speed
-            this.aggregate.body.applyForce(otherSpeed.scale(-100), this.aggregate.body.getObjectCenterWorld());
+            this.aggregate.body.applyForce(otherSpeed.scale(-10), this.aggregate.body.getObjectCenterWorld());
 
             if (this.closestWalkableObject !== null) {
                 const gravityDir = this.closestWalkableObject.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
