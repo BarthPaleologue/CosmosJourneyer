@@ -53,7 +53,7 @@ export class SystemUI {
     }
 
     public createObjectOverlays(objects: (Transformable & BoundingSphere & TypedObject)[]) {
-        this.removeObjectOverlays();
+        this.disposeObjectOverlays();
 
         for (const object of objects) {
             this.addObjectOverlay(object);
@@ -68,7 +68,7 @@ export class SystemUI {
         overlay.init();
     }
 
-    public removeObjectOverlays() {
+    public disposeObjectOverlays() {
         for (const overlay of this.objectOverlays) {
             overlay.dispose();
         }

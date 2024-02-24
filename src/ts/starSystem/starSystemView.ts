@@ -360,7 +360,10 @@ export class StarSystemView implements View {
      * @param needsGenerating whether the star system needs to be generated or not
      */
     async setStarSystem(starSystem: StarSystemController, needsGenerating = true) {
-        if (this.starSystem !== null) this.starSystem.dispose();
+        if (this.starSystem !== null) {
+            this.starSystem.dispose();
+            this.ui.disposeObjectOverlays();
+        }
         this.starSystem = starSystem;
 
         if (needsGenerating) {
