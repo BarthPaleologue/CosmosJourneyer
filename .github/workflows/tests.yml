@@ -6,9 +6,9 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "NextRelease", "PatchCurrentRelease" ]
 jobs:
-  build:
+  jest:
     runs-on: ubuntu-latest
     strategy:
       matrix:

@@ -246,10 +246,9 @@ export class CosmosJourneyer {
             });
         } else {
             this.activeView.detachControl();
+            this.starSystemView.attachControl();
 
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
-
-            this.starSystemView.attachControl();
             this.activeView = this.starSystemView;
             this.starSystemView.showUI();
         }

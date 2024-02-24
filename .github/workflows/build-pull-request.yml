@@ -1,11 +1,9 @@
-name: ESLint Check
+name: Build Pull Request
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main", "NextRelease", "PatchCurrentRelease" ]
+    branches: [ "main" ]
 jobs:
-  eslint:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -22,5 +20,5 @@ jobs:
         cache: 'pnpm'
     - name: Install dependencies
       run: pnpm install
-    - name: Lint
-      run: pnpm run lint:check
+    - name: Build
+      run: pnpm run build
