@@ -367,6 +367,14 @@ export class StarSystemView implements View {
             const model = starSystem.model;
             const targetNbStellarObjects = model.getNbStellarObjects();
 
+            const waitPromise = new Promise<void>(resolve => {
+                setTimeout(() => {
+                    resolve();
+                }, 3000);
+            });
+
+            await waitPromise;
+
             const stellarObjectPromises: Promise<void>[] = [];
             for (let i = 0; i < targetNbStellarObjects; i++) {
                 stellarObjectPromises.push(new Promise<void>(resolve => {
