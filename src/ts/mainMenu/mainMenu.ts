@@ -131,7 +131,10 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
 
         const version = document.getElementById("version");
         if (version === null) throw new Error("#version does not exist!");
-        version.textContent = `Alpha ${packageInfo.version}`;
+        // children a elements has the version number as textContent
+        const childLink = version.querySelector("a");
+        if (childLink === null) throw new Error("version link does not exist!");
+        childLink.textContent = `Alpha ${packageInfo.version}`;
         this.version = version;
 
         document.querySelectorAll("#menuItems li").forEach((li) => {
