@@ -53,7 +53,7 @@ export class Mandelbulb implements CelestialBody, Cullable {
 
         this.parent = parentBody;
 
-        this.transform = new TransformNode(`${name}Transform`, scene);
+        this.transform = new TransformNode(name, scene);
 
         this.postProcesses.push(PostProcessType.MANDELBULB);
 

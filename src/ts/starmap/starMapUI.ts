@@ -82,7 +82,7 @@ export class StarMapUI {
         this.descriptionPanel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.descriptionPanel.setPadding(0, 15, 10, 15);
 
-        this.warpButton = Button.CreateSimpleButton("warpButton", "Engage Warp Drive");
+        this.warpButton = Button.CreateSimpleButton("warpButton", "Set Warp Destination");
         //this.warpButton.width = "100px";
         this.warpButton.height = "40px";
         this.warpButton.background = "midnightblue";

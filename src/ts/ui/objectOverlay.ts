@@ -24,8 +24,10 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getAngularSize } from "../utils/isObjectVisibleOnScreen";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { LocalDirection } from "../uberCore/localDirections";
-import { OrbitalObject } from "../architecture/orbitalObject";
 import { Settings } from "../settings";
+import { Transformable } from "../architecture/transformable";
+import { BoundingSphere } from "../architecture/boundingSphere";
+import { TypedObject } from "../architecture/typedObject";
 
 export class ObjectOverlay {
     readonly textRoot: StackPanel;
@@ -34,24 +36,24 @@ export class ObjectOverlay {
     readonly typeText: TextBlock;
     readonly distanceText: TextBlock;
     readonly etaText: TextBlock;
-    readonly object: OrbitalObject;
+    readonly object: Transformable & BoundingSphere & TypedObject;
 
     private lastDistance = 0;
 
     static readonly WIDTH = 300;
 
-    constructor(object: OrbitalObject) {
+    constructor(object: Transformable & BoundingSphere & TypedObject) {
         this.object = object;
 
-        this.textRoot = new StackPanel(object.name + "OverlayTextRoot");
+        this.textRoot = new StackPanel(object.getTransform().name + "OverlayTextRoot");
         this.textRoot.width = `${ObjectOverlay.WIDTH}px`;
         this.textRoot.height = "130px";
         this.textRoot.background = "transparent";
         this.textRoot.zIndex = 6;
         this.textRoot.alpha = 0.95;
 
-        this.namePlate = new TextBlock(object.name + "OverlayNamePlate");
-        this.namePlate.text = object.name;
+        this.namePlate = new TextBlock(object.getTransform().name + "OverlayNamePlate");
+        this.namePlate.text = object.getTransform().name;
         this.namePlate.color = "white";
         this.namePlate.zIndex = 6;
         this.namePlate.height = "50px";
@@ -61,7 +63,7 @@ export class ObjectOverlay {
         this.namePlate.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.namePlate);
 
-        this.typeText = new TextBlock(object.name + "OverlayTypeText");
+        this.typeText = new TextBlock(object.getTransform().name + "OverlayTypeText");
         this.typeText.text = object.getTypeName();
         this.typeText.color = "white";
         this.typeText.zIndex = 6;
@@ -72,7 +74,7 @@ export class ObjectOverlay {
         this.typeText.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.typeText);
 
-        this.distanceText = new TextBlock(object.name + "OverlayDistanceText");
+        this.distanceText = new TextBlock(object.getTransform().name + "OverlayDistanceText");
         this.distanceText.color = "white";
         this.distanceText.zIndex = 6;
         this.distanceText.height = "20px";
@@ -82,7 +84,7 @@ export class ObjectOverlay {
         this.distanceText.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.distanceText);
 
-        this.etaText = new TextBlock(object.name + "OverlayEtaText");
+        this.etaText = new TextBlock(object.getTransform().name + "OverlayEtaText");
         this.etaText.color = "white";
         this.etaText.zIndex = 6;
         this.etaText.height = "20px";
@@ -92,7 +94,7 @@ export class ObjectOverlay {
         this.etaText.textVerticalAlignment = TextBlock.VERTICAL_ALIGNMENT_CENTER;
         this.textRoot.addControl(this.etaText);
 
-        this.cursor = new Image(object.name + "Cursor", cursorImage);
+        this.cursor = new Image(object.getTransform().name + "Cursor", cursorImage);
         this.cursor.fixedRatio = 1;
         this.cursor.width = 1;
         this.cursor.alpha = 0.8;
@@ -104,7 +106,7 @@ export class ObjectOverlay {
         this.cursor.linkWithMesh(this.object.getTransform());
     }
 
-    update(camera: Camera, target: OrbitalObject | null) {
+    update(camera: Camera, target: (Transformable & BoundingSphere & TypedObject) | null) {
         const viewRay = camera.getDirection(LocalDirection.BACKWARD);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
@@ -139,7 +141,7 @@ export class ObjectOverlay {
         this.distanceText.text = parseDistance(distance);
 
         const nbSeconds = distance / speed;
-        this.etaText.text = speed > 0 && nbSeconds < 60 * 60 * 24 ? parseSeconds(nbSeconds) : "∞";
+        this.etaText.text = speed > 0 ? parseSeconds(nbSeconds) : "∞";
 
         this.lastDistance = distance;
     }

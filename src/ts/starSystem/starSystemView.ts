@@ -47,9 +47,12 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
 import { syncCamera } from "../utils/cameraSyncing";
+import { SystemSeed } from "../utils/systemSeed";
+import { StarSector } from "../starmap/starSector";
+import { StarMap } from "../starmap/starMap";
 
 export class StarSystemView implements View {
-    private readonly helmetOverlay: HelmetOverlay;
+    readonly helmetOverlay: HelmetOverlay;
     readonly bodyEditor: BodyEditor;
     readonly scene: UberScene;
 
@@ -371,6 +374,36 @@ export class StarSystemView implements View {
                 (activeControls as ShipControls).thirdPersonCamera.radius = 30;
             });
         });
+    }
+
+    setSystemAsTarget(targetSeed: SystemSeed) {
+        const currentSystem = this.getStarSystem();
+        const currentSeed = currentSystem.model.seed;
+
+        const currentSystemStarSector = new StarSector(new Vector3(
+            currentSeed.starSectorX,
+            currentSeed.starSectorY,
+            currentSeed.starSectorZ
+        ));
+
+        const targetSystemStarSector = new StarSector(new Vector3(
+            targetSeed.starSectorX,
+            targetSeed.starSectorY,
+            targetSeed.starSectorZ
+        ));
+
+        const currentSystemUniversePosition = currentSystemStarSector.getPositionOfStar(currentSeed.index);
+        const targetSystemUniversePosition = targetSystemStarSector.getPositionOfStar(targetSeed.index);
+
+        const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
+        direction.applyRotationQuaternionInPlace(currentSystem.universeRotation);
+
+        const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition));
+
+        const target = currentSystem.addSystemTarget(targetSeed, direction, distance);
+        this.ui.addObjectOverlay(target);
+        this.ui.setTarget(target);
+        this.helmetOverlay.setTarget(target.getTransform());
     }
 
     public render() {

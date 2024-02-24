@@ -55,6 +55,8 @@ import { syncCamera } from "../utils/cameraSyncing";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
+import { Settings } from "../settings";
+import { parseDistance } from "../utils/parseToStrings";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -455,8 +457,8 @@ export class StarMap implements View {
                 let text = "";
                 if (this.currentSystemSeed !== null) {
                     const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh;
-                    const distance = 15 * currentInstance.getAbsolutePosition().subtract(initializedInstance.getAbsolutePosition()).length();
-                    text += `Distance: ${distance.toFixed(2)}ly\n`;
+                    const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentInstance.getAbsolutePosition(), initializedInstance.getAbsolutePosition()));
+                    text += `Distance: ${parseDistance(distance)}\n`;
                 }
 
                 if (starModel === null) throw new Error("Star model is null!");
@@ -486,6 +488,10 @@ export class StarMap implements View {
 
         if (starModel.bodyType === BodyType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
+    }
+
+    public static StarMapDistanceToLy(distance: number): number {
+        return distance * 15 * Settings.LIGHT_YEAR;
     }
 
     private focusCameraOnStar(starInstance: InstancedMesh, skipAnimation = false) {

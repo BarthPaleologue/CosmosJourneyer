@@ -37,13 +37,14 @@ import { OrbitalObject } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
 import { Planet } from "../architecture/planet";
+import { SystemTarget } from "../utils/systemTarget";
 
 export class StarSystemController {
     readonly scene: UberScene;
 
     readonly postProcessManager: PostProcessManager;
 
-    private readonly universeRotation: Quaternion = Quaternion.Identity();
+    readonly universeRotation: Quaternion = Quaternion.Identity();
 
     private readonly orbitalObjects: OrbitalObject[] = [];
 
@@ -75,6 +76,11 @@ export class StarSystemController {
      * The list of all mandelbulbs in the system
      */
     readonly mandelbulbs: Mandelbulb[] = [];
+
+    /**
+     * The list of all system targets in the system
+     */
+    private systemTargets: SystemTarget[] = [];
 
     /**
      * The model of the star system that describes it and generates the randomness
@@ -157,6 +163,7 @@ export class StarSystemController {
      */
     public translateEverythingNow(displacement: Vector3): void {
         for (const object of this.orbitalObjects) translate(object.getTransform(), displacement);
+        this.systemTargets.forEach((target) => translate(target.getTransform(), displacement));
     }
 
     /**
@@ -187,7 +194,7 @@ export class StarSystemController {
 
         smallerDistance = -1;
         for (const spacestation of this.spaceStations) {
-            const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length() - spacestation.getBoundingRadius() * 10;
+            const distance = spacestation.getTransform().getAbsolutePosition().subtract(position).length() - spacestation.getBoundingRadius() * 100;
             if (distance < smallerDistance && distance < 0) {
                 nearest = spacestation;
                 smallerDistance = distance;
@@ -377,6 +384,10 @@ export class StarSystemController {
                 rotateAround(object.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
             }
 
+            this.systemTargets.forEach((target) => {
+                rotateAround(target.getTransform(), nearestBody.getTransform().getAbsolutePosition(), nearestBody.getRotationAxis(), -dthetaNearest);
+            });
+
             // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
             const starfieldAdditionalRotation = Quaternion.RotationAxis(nearestBody.getRotationAxis(), dthetaNearest);
             this.universeRotation.copyFrom(starfieldAdditionalRotation.multiply(this.universeRotation));
@@ -400,6 +411,10 @@ export class StarSystemController {
                 // the body is translated so that the nearest body can stay in place
                 translate(object.getTransform(), negatedDisplacement);
             }
+
+            this.systemTargets.forEach((target) => {
+                translate(target.getTransform(), negatedDisplacement);
+            });
         } else {
             // if we don't compensate the translation of the nearest body, we must simply update its position
             translate(nearestBody.getTransform(), nearestBodyDisplacement);
@@ -467,12 +482,24 @@ export class StarSystemController {
         this.postProcessManager.update(deltaTime);
     }
 
+    addSystemTarget(seed: SystemSeed, systemDirection: Vector3, distance: number): SystemTarget {
+        const systemModel = new StarSystemModel(seed);
+        const placeholderTransform = new SystemTarget(systemModel.getName(), this.scene);
+        placeholderTransform.getTransform().position.copyFrom(systemDirection.scale(distance));
+
+        this.systemTargets.forEach((target) => {
+            target.dispose();
+        });
+        this.systemTargets = [placeholderTransform];
+
+        return placeholderTransform;
+    }
+
     /**
      * Disposes all the bodies in the system
      */
     public dispose() {
         this.postProcessManager.dispose();
-        for (const spacestation of this.spaceStations) spacestation.dispose();
-        for (const body of this.celestialBodies) body.dispose();
+        for (const object of this.orbitalObjects) object.dispose();
     }
 }

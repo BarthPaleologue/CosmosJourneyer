@@ -78,8 +78,8 @@ export class CosmosJourneyer {
         this.starSystemView = starSystemView;
         this.starMap = starMap;
         this.starMap.onWarpObservable.add((seed: SystemSeed) => {
-            this.starSystemView.setStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
-            this.starSystemView.initStarSystem();
+            //this.starSystemView.setStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
+            //this.starSystemView.initStarSystem();
             this.toggleStarMap();
 
             const activeControls = this.starSystemView.scene.getActiveController();
@@ -87,6 +87,8 @@ export class CosmosJourneyer {
                 activeControls.spaceship.enableWarpDrive();
                 activeControls.thirdPersonCamera.radius = ShipControls.BASE_CAMERA_RADIUS;
             }
+
+            this.starSystemView.setSystemAsTarget(seed);
         });
 
         // Init the active scene
@@ -102,7 +104,11 @@ export class CosmosJourneyer {
             this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
             this.starSystemView.showUI();
             this.starSystemView.ui.setEnabled(true);
-            this.starSystemView.ui.setTarget(this.starSystemView.getStarSystem().getClosestToScreenCenterOrbitalObject());
+            const target = this.starSystemView.getStarSystem().getClosestToScreenCenterOrbitalObject();
+            if(target !== null) {
+                this.starSystemView.ui.setTarget(target);
+                this.starSystemView.helmetOverlay.setTarget(target.getTransform());
+            }
         });
 
         this.mainMenu.onLoadSaveObservable.add((saveData: SaveFileData) => {

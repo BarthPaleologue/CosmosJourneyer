@@ -71,7 +71,7 @@ export class NeutronStar implements StellarObject, Cullable {
         this.parent = parentBody;
 
         this.mesh = MeshBuilder.CreateSphere(
-            `${name}Mesh`,
+            name,
             {
                 diameter: this.model.radius * 2,
                 segments: 32

@@ -36,8 +36,10 @@ export function parseDistance(distance: number): string {
         return `${(distance / 1000).toFixed(2)} km`;
     } else if (distance < 20000000) {
         return `${(distance / 1000000).toFixed(2)} Mm`;
-    } else {
+    } else if(distance < 0.3 * Settings.LIGHT_YEAR) {
         return `${(distance / Settings.C).toFixed(2)} ls`;
+    } else {
+        return `${(distance / Settings.LIGHT_YEAR).toFixed(2)} ly`;
     }
 }
 
@@ -48,8 +50,10 @@ export function parseSeconds(seconds: number): string {
         return `${(seconds / 60).toFixed(0)} min`;
     } else if (seconds < 86400) {
         return `${(seconds / 3600).toFixed(0)} h`;
+    } else if (seconds < 604800) {
+        return `${(seconds / (60 * 60 * 24)).toFixed(0)} d`;
     } else {
-        return `${(seconds / 86400).toFixed(0)} d`;
+        return `${(seconds / (60 * 60 * 24 * 365.25)).toFixed(0)} y`;
     }
 }
 

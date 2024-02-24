@@ -76,7 +76,7 @@ export class TelluricPlanet implements Planet, Cullable {
 
         this.model = model instanceof TelluricPlanetModel ? model : new TelluricPlanetModel(model, parentBody?.model);
 
-        this.transform = new TransformNode(`${name}Transform`, scene);
+        this.transform = new TransformNode(name, scene);
 
         rotate(this.transform, Axis.X, this.model.physicalProperties.axialTilt);
         this.transform.computeWorldMatrix(true);

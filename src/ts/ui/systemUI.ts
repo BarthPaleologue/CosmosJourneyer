@@ -19,10 +19,12 @@ import { Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { ObjectOverlay } from "./objectOverlay";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { OrbitalObject } from "../architecture/orbitalObject";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Transformable } from "../architecture/transformable";
+import { BoundingSphere } from "../architecture/boundingSphere";
+import { TypedObject } from "../architecture/typedObject";
 
 export class SystemUI {
     readonly scene: Scene;
@@ -30,7 +32,7 @@ export class SystemUI {
     readonly gui: AdvancedDynamicTexture;
     private objectOverlays: ObjectOverlay[] = [];
 
-    private target: OrbitalObject | null = null;
+    private target: (Transformable & BoundingSphere & TypedObject) | null = null;
 
     constructor(engine: Engine) {
         this.scene = new Scene(engine);
@@ -50,19 +52,20 @@ export class SystemUI {
         return this.gui.rootContainer.alpha === 1;
     }
 
-    public createObjectOverlays(objects: OrbitalObject[]) {
+    public createObjectOverlays(objects: (Transformable & BoundingSphere & TypedObject)[]) {
         this.removeObjectOverlays();
 
         for (const object of objects) {
-            const overlay = new ObjectOverlay(object);
-            this.gui.addControl(overlay.textRoot);
-            this.gui.addControl(overlay.cursor);
-            this.objectOverlays.push(overlay);
+            this.addObjectOverlay(object);
         }
+    }
 
-        for (const overlay of this.objectOverlays) {
-            overlay.init();
-        }
+    public addObjectOverlay(object: Transformable & BoundingSphere & TypedObject) {
+        const overlay = new ObjectOverlay(object);
+        this.gui.addControl(overlay.textRoot);
+        this.gui.addControl(overlay.cursor);
+        this.objectOverlays.push(overlay);
+        overlay.init();
     }
 
     public removeObjectOverlays() {
@@ -78,7 +81,7 @@ export class SystemUI {
         }
     }
 
-    public setTarget(object: OrbitalObject | null) {
+    public setTarget(object: (Transformable & BoundingSphere & TypedObject) | null) {
         if (this.target === object) {
             this.target = null;
             return;
