@@ -117,10 +117,15 @@ export class ShipControls implements Controls {
         if (this.spaceship.getWarpDrive().isDisabled()) {
             this.spaceship.increaseMainEngineThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
 
-            this.spaceship.aggregate.body.applyForce(
-                getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
-                this.spaceship.aggregate.body.getObjectCenterWorld()
-            );
+            if(SpaceShipControlsInputs.map.upDown.value !== 0) {
+                if(this.spaceship.isLanded()) {
+                    this.spaceship.takeOff();
+                }
+                this.spaceship.aggregate.body.applyForce(
+                    getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
+                    this.spaceship.aggregate.body.getObjectCenterWorld()
+                );
+            }
         } else {
             this.spaceship.getWarpDrive().increaseTargetThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
         }
