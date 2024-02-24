@@ -60,7 +60,7 @@ void main() {
     vec4 starfieldColor = texture2D(starfieldTexture, starfieldUV);
     starfieldColor.rgb = pow(starfieldColor.rgb, vec3(2.2));// deeper blacks
 
-    if (depth == 1.0) {
+    if (screenColor == vec4(0.0) && depth == 1.0) {
         finalColor = vec4(starfieldColor.rgb * visibility, starfieldColor.a);
     }
 
