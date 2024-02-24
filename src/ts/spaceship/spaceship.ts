@@ -386,7 +386,7 @@ export class Spaceship implements Transformable {
         }
 
         this.mainThrusters.forEach(thruster => {
-            thruster.update();
+            thruster.update(deltaTime);
         });
 
         if (this.flightAssistEnabled) {

@@ -19,9 +19,8 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { AbstractMesh, MeshBuilder } from "@babylonjs/core/Meshes";
-import { DirectionnalParticleSystem } from "../utils/particleSystem";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { getDownwardDirection } from "../uberCore/transforms/basicTransform";
+import { SolidPlume } from "../utils/solidPlume";
 
 export abstract class AbstractThruster {
     readonly mesh: AbstractMesh;
@@ -32,7 +31,7 @@ export abstract class AbstractThruster {
 
     readonly localNozzleDown: Vector3;
 
-    readonly plume: DirectionnalParticleSystem;
+    readonly plume: SolidPlume;
 
     readonly parentAggregate: PhysicsAggregate;
 
@@ -40,7 +39,7 @@ export abstract class AbstractThruster {
         this.mesh = mesh;
 
         this.localNozzleDown = direction;
-        this.plume = new DirectionnalParticleSystem(mesh, this.localNozzleDown);
+        this.plume = new SolidPlume(mesh, mesh.getScene());
 
         this.parentAggregate = parentAggregate;
 
@@ -59,9 +58,10 @@ export abstract class AbstractThruster {
         return this.throttle;
     }
 
-    public update(): void {
-        this.plume.emitRate = this.throttle * 1000;
-        this.plume.setDirection(getDownwardDirection(this.parentAggregate.transformNode));
+    public update(deltaSeconds: number): void {
+        this.plume.update(deltaSeconds);
+
+        this.plume.setThrottle(this.throttle);
 
         if (this.throttle > 0) {
             this.helperMesh.scaling = new Vector3(0.8, 0.8, 0.8);

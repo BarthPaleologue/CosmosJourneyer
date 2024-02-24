@@ -20,13 +20,13 @@ import { Mesh, TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeBox } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
-import { DirectionnalParticleSystem } from "../utils/particleSystem";
+import { DirectionalParticleSystem } from "../utils/particleSystem";
 
 export class Thruster {
     private mesh: Mesh;
     private torque: Vector3;
 
-    private particleSystem: DirectionnalParticleSystem;
+    private particleSystem: DirectionalParticleSystem;
 
     private throttle = 0;
 
@@ -34,7 +34,7 @@ export class Thruster {
 
     constructor(mesh: Mesh) {
         this.mesh = mesh;
-        this.particleSystem = new DirectionnalParticleSystem(mesh, this.getThrustDirection().negateInPlace());
+        this.particleSystem = new DirectionalParticleSystem(mesh, this.getThrustDirection().negateInPlace());
 
         const minY = this.mesh.getBoundingInfo().boundingBox.extendSize.y;
         this.particleSystem.minEmitBox = new Vector3(-0.8, -minY, -0.8);

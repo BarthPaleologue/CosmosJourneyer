@@ -26,7 +26,7 @@ function randomNumber(min: number, max: number): number {
     return Math.random() * (max - min) + min;
 }
 
-export class DirectionnalParticleSystem extends ParticleSystem {
+export class DirectionalParticleSystem extends ParticleSystem {
     private direction: Vector3;
 
     readonly emitter: AbstractMesh;
