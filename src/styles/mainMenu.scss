@@ -39,6 +39,16 @@
     font-size: 1.5em;
     padding: 10px;
     transition: 0.2s ease-in-out;
+
+    a {
+        color: white;
+        transition: 0.1s;
+        text-decoration: underline solid rgba(255, 255, 255, 0.5);
+
+        &:hover {
+            text-decoration: underline solid white;
+        }
+    }
   }
 
   .rightPanel {

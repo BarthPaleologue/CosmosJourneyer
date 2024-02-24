@@ -39,7 +39,7 @@ export class WarpTunnel implements Transformable {
 
     readonly solidParticleSystem: SolidParticleSystem;
 
-    private throttle: number = 0;
+    private throttle = 0;
 
     static TUNNEL_LENGTH = 300;
 

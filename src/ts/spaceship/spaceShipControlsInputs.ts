@@ -10,7 +10,7 @@ const keyboard = InputDevices.KEYBOARD;
 const pointer = InputDevices.POINTER;
 
 const landingAction = new Action({
-    bindings: [keyboard.getControl("Space"), gamepad.getControl("A")]
+    bindings: [keyboard.getControl("KeyL"), gamepad.getControl("A")]
 });
 
 const landingInteraction = new PressInteraction(landingAction);
@@ -85,6 +85,12 @@ const ignorePointer = new Action({
     bindings: [keyboard.getControl("AltLeft")]
 });
 
+const throttleToZero = new Action({
+    bindings: [keyboard.getControl("KeyX")]
+});
+
+const throttleToZeroInteraction = new PressInteraction(throttleToZero);
+
 export const SpaceShipControlsInputs = new InputMap<{
     landing: PressInteraction,
     upDown: Action<number>,
@@ -92,7 +98,8 @@ export const SpaceShipControlsInputs = new InputMap<{
     rollPitch: Action<[number, number]>,
     toggleFlightAssist: PressInteraction,
     toggleWarpDrive: PressInteraction,
-    ignorePointer: Action<number>
+    ignorePointer: Action<number>,
+    throttleToZero: PressInteraction
 }>("SpaceShipInputs", {
     landing: landingInteraction,
     upDown: upDownAction,
@@ -100,7 +107,8 @@ export const SpaceShipControlsInputs = new InputMap<{
     rollPitch: rollPitch,
     toggleFlightAssist: toggleFlightAssistInteraction,
     toggleWarpDrive: toggleWarpDriveInteraction,
-    ignorePointer: ignorePointer
+    ignorePointer: ignorePointer,
+    throttleToZero: throttleToZeroInteraction
 });
 
 InputMaps.push(SpaceShipControlsInputs);

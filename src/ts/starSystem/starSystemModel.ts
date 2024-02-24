@@ -23,12 +23,12 @@ import { generateName } from "../utils/nameGenerator";
 import { SystemSeed } from "../utils/systemSeed";
 
 enum GenerationSteps {
-    Name,
-    NbStars = 20,
-    GenerateStars = 21,
-    NbPlanets = 30,
-    GeneratePlanets = 200,
-    ChoosePlanetType = 200
+    NAME,
+    NB_STARS = 20,
+    GENERATE_STARS = 21,
+    NB_PLANETS = 30,
+    GENERATE_PLANETS = 200,
+    CHOOSE_PLANET_TYPE = 200
 }
 
 export class StarSystemModel {
@@ -41,7 +41,7 @@ export class StarSystemModel {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed.hash);
 
-        this.name = generateName(this.rng, GenerationSteps.Name);
+        this.name = generateName(this.rng, GenerationSteps.NAME);
     }
 
     setName(name: string) {
@@ -59,12 +59,12 @@ export class StarSystemModel {
 
     getNbPlanets(): number {
         if (this.getBodyTypeOfStar(0) === BodyType.BLACK_HOLE) return 0; //Fixme: will not apply when more than one star
-        return randRangeInt(0, 7, this.rng, GenerationSteps.NbPlanets);
+        return randRangeInt(0, 7, this.rng, GenerationSteps.NB_PLANETS);
     }
 
     public getStarSeed(index: number) {
         if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
-        return centeredRand(this.rng, GenerationSteps.GenerateStars + index) * Settings.SEED_HALF_RANGE;
+        return centeredRand(this.rng, GenerationSteps.GENERATE_STARS + index) * Settings.SEED_HALF_RANGE;
     }
 
     /**
@@ -76,18 +76,18 @@ export class StarSystemModel {
         if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
 
         // percentages are taken from https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
-        if (uniformRandBool(0.0006, this.rng, GenerationSteps.GenerateStars + index)) return BodyType.BLACK_HOLE;
-        if (uniformRandBool(0.0026, this.rng, GenerationSteps.GenerateStars + index)) return BodyType.NEUTRON_STAR;
+        if (uniformRandBool(0.0006, this.rng, GenerationSteps.GENERATE_STARS + index)) return BodyType.BLACK_HOLE;
+        if (uniformRandBool(0.0026, this.rng, GenerationSteps.GENERATE_STARS + index)) return BodyType.NEUTRON_STAR;
 
         return BodyType.STAR;
     }
 
     public getBodyTypeOfPlanet(index: number) {
-        if (uniformRandBool(0.5, this.rng, GenerationSteps.ChoosePlanetType + index)) return BodyType.TELLURIC_PLANET;
+        if (uniformRandBool(0.5, this.rng, GenerationSteps.CHOOSE_PLANET_TYPE + index)) return BodyType.TELLURIC_PLANET;
         return BodyType.GAS_PLANET;
     }
 
     public getPlanetSeed(index: number) {
-        return centeredRand(this.rng, GenerationSteps.GeneratePlanets + index) * Settings.SEED_HALF_RANGE;
+        return centeredRand(this.rng, GenerationSteps.GENERATE_PLANETS + index) * Settings.SEED_HALF_RANGE;
     }
 }

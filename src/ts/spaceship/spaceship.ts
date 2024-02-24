@@ -18,9 +18,7 @@
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { MainThruster } from "./mainThruster";
 import { WarpDrive } from "./warpDrive";
-import { RCSThruster } from "./rcsThruster";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { IPhysicsCollisionEvent, PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
@@ -41,6 +39,9 @@ import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
 import { AudioInstance } from "../utils/audioInstance";
+import { AudioManager } from "../audio/audioManager";
+import { MainThruster } from "./mainThruster";
+import { AudioMasks } from "../audio/audioMasks";
 
 enum ShipState {
     FLYING,
@@ -56,10 +57,10 @@ export class Spaceship implements Transformable {
 
     private flightAssistEnabled = true;
 
-    readonly mainThrusters: MainThruster[] = [];
-    readonly rcsThrusters: RCSThruster[] = [];
-
     private readonly warpDrive = new WarpDrive(false);
+
+    private mainEngineThrottle = 0;
+    private mainEngineTargetSpeed = 0;
 
     private closestWalkableObject: Transformable | null = null;
 
@@ -80,16 +81,19 @@ export class Spaceship implements Transformable {
 
     private targetLandingPad: LandingPad | null = null;
 
+    private mainThrusters: MainThruster[] = [];
+
     readonly enableWarpDriveSound: AudioInstance;
     readonly disableWarpDriveSound: AudioInstance;
     readonly acceleratingWarpDriveSound: AudioInstance;
     readonly deceleratingWarpDriveSound: AudioInstance;
+    readonly thrusterSound: AudioInstance;
 
     readonly onWarpDriveEnabled = new Observable<void>();
     readonly onWarpDriveDisabled = new Observable<void>();
 
     constructor(scene: Scene) {
-        this.instanceRoot = Assets.CreateSpaceShipInstance();
+        this.instanceRoot = Assets.CreateWandererInstance();
         setRotationQuaternion(this.instanceRoot, Quaternion.Identity());
 
         this.aggregate = new PhysicsAggregate(
@@ -102,6 +106,11 @@ export class Spaceship implements Transformable {
             scene
         );
         for (const child of this.instanceRoot.getChildMeshes()) {
+            if(child.name.includes("mainThruster")) {
+                const mainThruster = new MainThruster(child, getForwardDirection(this.instanceRoot).negate(), this.aggregate);
+                this.mainThrusters.push(mainThruster);
+                continue;
+            }
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
             childShape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
             childShape.filterCollideMask = CollisionMask.ENVIRONMENT;
@@ -116,31 +125,28 @@ export class Spaceship implements Transformable {
             console.log("Collision");
             if (collisionEvent.impulse < 0.8) return;
             console.log(collisionEvent);
-            //Assets.OuchSound.play();
         });
-
-        for (const child of this.instanceRoot.getChildMeshes()) {
-            if (child.name.includes("mainThruster")) {
-                console.log("Found main thruster");
-                this.addMainThruster(child);
-            } else if (child.name.includes("rcsThruster")) {
-                console.log("Found rcs thruster");
-                this.addRCSThruster(child);
-            }
-        }
 
         this.warpTunnel = new WarpTunnel(this.getTransform(), scene);
         this.hyperSpaceTunnel = new HyperSpaceTunnel(this.getTransform().getDirection(Axis.Z), scene);
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
 
-        this.enableWarpDriveSound = new AudioInstance(Assets.ENABLE_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
-        this.disableWarpDriveSound = new AudioInstance(Assets.DISABLE_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
-        this.acceleratingWarpDriveSound = new AudioInstance(Assets.ACCELERATING_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
-        this.deceleratingWarpDriveSound = new AudioInstance(Assets.DECELERATING_WARP_DRIVE_SOUND, Vector3.Zero(), this.getTransform());
+        this.enableWarpDriveSound = new AudioInstance(Assets.ENABLE_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 1, true, this.getTransform());
+        this.disableWarpDriveSound = new AudioInstance(Assets.DISABLE_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 1, true, this.getTransform());
+        this.acceleratingWarpDriveSound = new AudioInstance(Assets.ACCELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
+        this.deceleratingWarpDriveSound = new AudioInstance(Assets.DECELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
+        this.thrusterSound = new AudioInstance(Assets.THRUSTER_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
 
-        this.acceleratingWarpDriveSound.setTargetVolume(0);
-        this.deceleratingWarpDriveSound.setTargetVolume(0);
+        AudioManager.RegisterSound(this.enableWarpDriveSound);
+        AudioManager.RegisterSound(this.disableWarpDriveSound);
+        AudioManager.RegisterSound(this.acceleratingWarpDriveSound);
+        AudioManager.RegisterSound(this.deceleratingWarpDriveSound);
+        AudioManager.RegisterSound(this.thrusterSound);
+
+        this.thrusterSound.sound.play();
+        this.acceleratingWarpDriveSound.sound.play();
+        this.deceleratingWarpDriveSound.sound.play();
 
         this.scene = scene;
     }
@@ -153,20 +159,6 @@ export class Spaceship implements Transformable {
         return this.aggregate.transformNode;
     }
 
-    private addMainThruster(mesh: AbstractMesh) {
-        const direction = mesh.getDirection(new Vector3(0, 1, 0));
-        this.mainThrusters.push(new MainThruster(mesh, direction, this.aggregate));
-    }
-
-    private addRCSThruster(mesh: AbstractMesh) {
-        const direction = mesh.getDirection(new Vector3(0, 1, 0));
-        const thruster = new RCSThruster(mesh, direction, this.aggregate);
-        this.rcsThrusters.push(thruster);
-
-        //FIXME: this is temporary to balance rc thrust
-        thruster.setMaxAuthority(thruster.getMaxAuthority() / thruster.leverage);
-    }
-
     public setEnabled(enabled: boolean, havokPlugin: HavokPlugin) {
         this.instanceRoot.setEnabled(enabled);
         setEnabledBody(this.aggregate.body, enabled, havokPlugin);
@@ -177,16 +169,13 @@ export class Spaceship implements Transformable {
     }
 
     public enableWarpDrive() {
-        for (const thruster of this.mainThrusters) thruster.setThrottle(0);
-        for (const thruster of this.rcsThrusters) thruster.deactivate();
         this.warpDrive.enable();
         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
 
         this.aggregate.body.setLinearVelocity(Vector3.Zero());
         this.aggregate.body.setAngularVelocity(Vector3.Zero());
 
-        if(!this.acceleratingWarpDriveSound.sound.isPlaying) this.acceleratingWarpDriveSound.sound.play();
-        if(!this.deceleratingWarpDriveSound.sound.isPlaying) this.deceleratingWarpDriveSound.sound.play();
+        this.thrusterSound.setTargetVolume(0);
 
         this.enableWarpDriveSound.sound.play();
         this.onWarpDriveEnabled.notifyObservers();
@@ -203,6 +192,10 @@ export class Spaceship implements Transformable {
     public toggleWarpDrive() {
         if (!this.warpDrive.isEnabled()) this.enableWarpDrive();
         else this.disableWarpDrive();
+    }
+
+    public setMainEngineThrottle(throttle: number) {
+        this.mainEngineThrottle = throttle;
     }
 
     /**
@@ -232,7 +225,11 @@ export class Spaceship implements Transformable {
     }
 
     public getThrottle(): number {
-        return this.warpDrive.isEnabled() ? this.warpDrive.getTargetThrottle() : this.mainThrusters[0].getThrottle();
+        return this.warpDrive.isEnabled() ? this.warpDrive.getTargetThrottle() : this.mainEngineThrottle;
+    }
+
+    public increaseMainEngineThrottle(delta: number) {
+        this.mainEngineThrottle = Math.max(-1, Math.min(1, this.mainEngineThrottle + delta));
     }
 
     public getClosestWalkableObject(): Transformable | null {
@@ -262,6 +259,10 @@ export class Spaceship implements Transformable {
         this.state = ShipState.LANDED;
         this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
         this.landingTarget = null;
+    }
+
+    public isLanded(): boolean {
+        return this.state === ShipState.LANDED;
     }
 
     private land(deltaTime: number) {
@@ -328,6 +329,8 @@ export class Spaceship implements Transformable {
     }
 
     public update(deltaTime: number) {
+        this.mainEngineTargetSpeed = this.mainEngineThrottle * 500;
+
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
 
         const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.getDirection(Axis.Z));
@@ -337,12 +340,30 @@ export class Spaceship implements Transformable {
         if (this.warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * this.warpDrive.getWarpSpeed())));
         else this.warpTunnel.setThrottle(0);
 
-        for (const thruster of this.mainThrusters) thruster.update();
-        for (const thruster of this.rcsThrusters) thruster.update();
-
         if (this.warpDrive.isDisabled()) {
-            for (const thruster of this.mainThrusters) thruster.applyForce();
-            for (const thruster of this.rcsThrusters) thruster.applyForce();
+            const linearVelocity = this.aggregate.body.getLinearVelocity();
+            const forwardDirection = getForwardDirection(this.getTransform());
+            const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
+
+            const otherSpeed = linearVelocity.subtract(forwardDirection.scale(forwardSpeed));
+
+            if(this.mainEngineThrottle !== 0) this.thrusterSound.setTargetVolume(1);
+            else this.thrusterSound.setTargetVolume(0);
+
+            if(forwardSpeed < this.mainEngineTargetSpeed) {
+                this.aggregate.body.applyForce(forwardDirection.scale(3000), this.aggregate.body.getObjectCenterWorld());
+                this.mainThrusters.forEach(thruster => {
+                    thruster.setThrottle(this.mainEngineThrottle);
+                });
+            } else {
+                this.aggregate.body.applyForce(forwardDirection.scale(-3000), this.aggregate.body.getObjectCenterWorld());
+                this.mainThrusters.forEach(thruster => {
+                    thruster.setThrottle(0);
+                });
+            }
+
+            // damp other speed
+            this.aggregate.body.applyForce(otherSpeed.scale(-10), this.aggregate.body.getObjectCenterWorld());
 
             if (this.closestWalkableObject !== null) {
                 const gravityDir = this.closestWalkableObject.getTransform().getAbsolutePosition().subtract(this.getTransform().getAbsolutePosition()).normalize();
@@ -352,7 +373,13 @@ export class Spaceship implements Transformable {
             this.acceleratingWarpDriveSound.setTargetVolume(0);
             this.deceleratingWarpDriveSound.setTargetVolume(0);
         } else {
+            this.mainThrusters.forEach(thruster => {
+                thruster.setThrottle(0);
+            });
+
             translate(this.getTransform(), warpSpeed.scale(deltaTime));
+
+            this.thrusterSound.setTargetVolume(0);
 
             if (currentForwardSpeed < this.warpDrive.getWarpSpeed()) {
                 this.acceleratingWarpDriveSound.setTargetVolume(1);
@@ -363,10 +390,9 @@ export class Spaceship implements Transformable {
             }
         }
 
-        this.enableWarpDriveSound.update(deltaTime);
-        this.disableWarpDriveSound.update(deltaTime);
-        this.acceleratingWarpDriveSound.update(deltaTime);
-        this.deceleratingWarpDriveSound.update(deltaTime);
+        this.mainThrusters.forEach(thruster => {
+            thruster.update(deltaTime);
+        });
 
         if (this.flightAssistEnabled) {
             this.aggregate.body.setAngularDamping(0.9);

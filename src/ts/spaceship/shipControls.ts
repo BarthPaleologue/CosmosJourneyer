@@ -17,7 +17,6 @@
 
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { LocalDirection } from "../uberCore/localDirections";
 import { getUpwardDirection, pitch, roll } from "../uberCore/transforms/basicTransform";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Controls } from "../uberCore/controls";
@@ -38,6 +37,8 @@ export class ShipControls implements Controls {
 
     private isCameraShaking = false;
 
+    static BASE_CAMERA_RADIUS = 60;
+
     private baseFov: number;
     private targetFov: number;
 
@@ -46,9 +47,9 @@ export class ShipControls implements Controls {
 
         this.firstPersonCamera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.getTransform();
-        this.firstPersonCamera.position = new Vector3(0, 1, 0);
+        this.firstPersonCamera.position = new Vector3(0, 1.2, 3.5);
 
-        this.thirdPersonCamera = new ArcRotateCamera("thirdPersonCamera", -3.14 / 2, 3.14 / 2, 30, Vector3.Zero(), scene);
+        this.thirdPersonCamera = new ArcRotateCamera("thirdPersonCamera", -3.14 / 2, 3.14 / 2.2, ShipControls.BASE_CAMERA_RADIUS, Vector3.Zero(), scene);
         this.thirdPersonCamera.parent = this.getTransform();
         this.thirdPersonCamera.lowerRadiusLimit = 10;
         this.thirdPersonCamera.upperRadiusLimit = 500;
@@ -61,6 +62,17 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
             this.spaceship.toggleWarpDrive();
+        });
+
+        SpaceShipControlsInputs.map.landing.on("complete", () => {
+            if (this.spaceship.getClosestWalkableObject() !== null) {
+                this.spaceship.engageLanding(null);
+            }
+        });
+
+        SpaceShipControlsInputs.map.throttleToZero.on("complete", () => {
+            this.spaceship.setMainEngineThrottle(0);
+            this.spaceship.getWarpDrive().increaseTargetThrottle(-this.spaceship.getWarpDrive().getTargetThrottle());
         });
 
         this.baseFov = this.thirdPersonCamera.fov;
@@ -97,51 +109,25 @@ export class ShipControls implements Controls {
         this.spaceship.update(deltaTime);
 
         let [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
-        if(SpaceShipControlsInputs.map.ignorePointer.value > 0) {
+        if (SpaceShipControlsInputs.map.ignorePointer.value > 0) {
             inputRoll *= 0;
             inputPitch *= 0;
         }
 
         if (this.spaceship.getWarpDrive().isDisabled()) {
-            for (const thruster of this.spaceship.mainThrusters) {
-                thruster.updateThrottle(2 * deltaTime * SpaceShipControlsInputs.map.throttle.value * thruster.getAuthority01(LocalDirection.FORWARD));
-                thruster.updateThrottle(2 * deltaTime * -SpaceShipControlsInputs.map.throttle.value * thruster.getAuthority01(LocalDirection.BACKWARD));
-
-                thruster.updateThrottle(2 * deltaTime * SpaceShipControlsInputs.map.upDown.value * thruster.getAuthority01(LocalDirection.UP));
-                thruster.updateThrottle(2 * deltaTime * -SpaceShipControlsInputs.map.upDown.value * thruster.getAuthority01(LocalDirection.DOWN));
-
-                /*thruster.updateThrottle(2 * deltaTime * input.getXAxis() * thruster.getAuthority01(LocalDirection.LEFT));
-                thruster.updateThrottle(2 * deltaTime * -input.getXAxis() * thruster.getAuthority01(LocalDirection.RIGHT));*/
-            }
+            this.spaceship.increaseMainEngineThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
 
             this.spaceship.aggregate.body.applyForce(
-              getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
-              this.spaceship.aggregate.body.getObjectCenterWorld()
+                getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
+                this.spaceship.aggregate.body.getObjectCenterWorld()
             );
-
-            if (SpaceShipControlsInputs.map.landing.state === "complete") {
-                if (this.spaceship.getClosestWalkableObject() !== null) {
-                    this.spaceship.engageLanding(null);
-                }
-            }
-
-            for (const rcsThruster of this.spaceship.rcsThrusters) {
-                let throttle = 0;
-
-                // rcs rotation contribution
-                if (inputRoll < 0 && rcsThruster.getRollAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(inputRoll));
-                else if (inputRoll > 0 && rcsThruster.getRollAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(inputRoll));
-
-                if (inputPitch < 0 && rcsThruster.getPitchAuthorityNormalized() > 0.2) throttle = Math.max(throttle, Math.abs(inputPitch));
-                else if (inputPitch > 0 && rcsThruster.getPitchAuthorityNormalized() < -0.2) throttle = Math.max(throttle, Math.abs(inputPitch));
-
-                rcsThruster.setThrottle(throttle);
-            }
         } else {
+            this.spaceship.getWarpDrive().increaseTargetThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
+        }
+
+        if (!this.spaceship.isLanded()) {
             roll(this.getTransform(), inputRoll * deltaTime);
             pitch(this.getTransform(), inputPitch * deltaTime);
-
-            this.spaceship.getWarpDrive().increaseTargetThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
         }
 
         // camera shake

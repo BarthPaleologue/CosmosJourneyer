@@ -46,6 +46,7 @@ import spaceship from "../asset/spaceship/spaceship2.glb";
 import shipCarrier from "../asset/spacestation/shipcarrier.glb";
 import banana from "../asset/banana/banana.glb";
 import endeavorSpaceship from "../asset/spaceship/endeavour.glb";
+import wanderer from "../asset/spaceship/wanderer.glb";
 import character from "../asset/character/character.glb";
 import rock from "../asset/rock.glb";
 import landingPad from "../asset/landingpad.glb";
@@ -64,6 +65,8 @@ import disableWarpDriveSound from "../asset/sound/204418__nhumphrey__large-engin
 
 import acceleratingWarpDriveSound from "../asset/sound/539503__timbre__endless-acceleration.mp3";
 import deceleratingWarpDriveSound from "../asset/sound/539503__timbre_endless-deceleration.mp3";
+
+import thrusterSound from "../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
 
 import starMapBackgroundMusic from "../asset/sound/455855__andrewkn__wandering.mp3";
 
@@ -84,7 +87,6 @@ import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
 import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
-import { Observable } from "@babylonjs/core/Misc/observable";
 
 export class Assets {
     static IS_READY = false;
@@ -115,6 +117,7 @@ export class Assets {
 
     private static SPACESHIP: Mesh;
     private static ENDEAVOR_SPACESHIP: Mesh;
+    private static WANDERER: Mesh;
     private static SPACE_STATION: Mesh;
     private static BANANA: Mesh;
     private static CHARACTER: Mesh;
@@ -148,6 +151,8 @@ export class Assets {
 
     public static ACCELERATING_WARP_DRIVE_SOUND: Sound;
     public static DECELERATING_WARP_DRIVE_SOUND: Sound;
+
+    public static THRUSTER_SOUND: Sound;
 
     public static STAR_MAP_BACKGROUND_MUSIC: Sound;
     public static MAIN_MENU_BACKGROUND_MUSIC: Sound;
@@ -203,6 +208,17 @@ export class Assets {
             }
 
             console.log("Endeavor Spaceship loaded");
+        };
+
+        const wandererTask = Assets.MANAGER.addMeshTask("wandererTask", "", "", wanderer);
+        wandererTask.onSuccess = function (task: MeshAssetTask) {
+            Assets.WANDERER = task.loadedMeshes[0] as Mesh;
+
+            for (const mesh of Assets.WANDERER.getChildMeshes()) {
+                mesh.isVisible = false;
+            }
+
+            console.log("Wanderer loaded");
         };
 
         const spacestationTask = Assets.MANAGER.addMeshTask("spacestationTask", "", "", shipCarrier);
@@ -401,6 +417,18 @@ export class Assets {
             console.log("Decelerating warp drive sound loaded");
         };
 
+        const thrusterSoundTask = Assets.MANAGER.addBinaryFileTask("thrusterSoundTask", thrusterSound);
+        thrusterSoundTask.onSuccess = function (task) {
+            Assets.THRUSTER_SOUND = new Sound("ThrusterSound", task.data, scene);
+            Assets.THRUSTER_SOUND.updateOptions({
+                playbackRate: 1.0,
+                volume: 0.5,
+                loop: true
+            });
+
+            console.log("Thruster sound loaded");
+        };
+
         const starMapBackgroundMusicTask = Assets.MANAGER.addBinaryFileTask("starMapBackgroundMusicTask", starMapBackgroundMusic);
         starMapBackgroundMusicTask.onSuccess = function (task) {
             Assets.STAR_MAP_BACKGROUND_MUSIC = new Sound("StarMapBackgroundMusic", task.data, scene, null, {
@@ -452,6 +480,10 @@ export class Assets {
         for (const child of instance.getChildMeshes()) child.isVisible = true;
 
         return instance;
+    }
+
+    static CreateWandererInstance(): InstancedMesh {
+        return Assets.WANDERER.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
     static CreateSpaceStationInstance(): InstancedMesh {

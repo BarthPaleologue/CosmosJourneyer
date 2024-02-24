@@ -36,7 +36,7 @@ export class ObjectOverlay {
     readonly etaText: TextBlock;
     readonly object: OrbitalObject;
 
-    private lastDistance: number = 0;
+    private lastDistance = 0;
 
     static readonly WIDTH = 300;
 

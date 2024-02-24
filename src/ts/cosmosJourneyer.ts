@@ -23,7 +23,6 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import "@babylonjs/core/Misc/screenshotTools";
 import { StarMap } from "./starmap/starMap";
-import { Scene } from "@babylonjs/core/scene";
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
 import HavokPhysics from "@babylonjs/havok";
@@ -44,6 +43,8 @@ import { UniverseCoordinates } from "./saveFile/universeCoordinates";
 import { View } from "./utils/view";
 import { updateInputDevices } from "./inputs/devices";
 import { Assets } from "./assets";
+import { AudioManager } from "./audio/audioManager";
+import { AudioMasks } from "./audio/audioMasks";
 
 enum EngineState {
     UNINITIALIZED,
@@ -84,7 +85,7 @@ export class CosmosJourneyer {
             const activeControls = this.starSystemView.scene.getActiveController();
             if (activeControls instanceof ShipControls) {
                 activeControls.spaceship.enableWarpDrive();
-                activeControls.thirdPersonCamera.radius = 30;
+                activeControls.thirdPersonCamera.radius = ShipControls.BASE_CAMERA_RADIUS;
             }
         });
 
@@ -92,6 +93,7 @@ export class CosmosJourneyer {
         this.starMap.detachControl();
         this.starSystemView.attachControl();
         this.activeView = this.starSystemView;
+        AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
 
         this.mainMenu = new MainMenu(starSystemView);
         this.mainMenu.onStartObservable.add(() => {
@@ -100,6 +102,7 @@ export class CosmosJourneyer {
             this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
             this.starSystemView.showUI();
             this.starSystemView.ui.setEnabled(true);
+            this.starSystemView.ui.setTarget(this.starSystemView.getStarSystem().getClosestToScreenCenterOrbitalObject());
         });
 
         this.mainMenu.onLoadSaveObservable.add((saveData: SaveFileData) => {
@@ -178,13 +181,13 @@ export class CosmosJourneyer {
         const havokInstance = await HavokPhysics();
         console.log(`Havok initialized`);
 
-        // Init starmap view
-        const starMap = new StarMap(engine);
-
         // Init star system view
         const starSystemView = new StarSystemView(engine, havokInstance);
 
         await starSystemView.initAssets();
+
+        // Init starmap view
+        const starMap = new StarMap(engine);
 
         return new CosmosJourneyer(engine, starSystemView, starMap);
     }
@@ -218,6 +221,7 @@ export class CosmosJourneyer {
 
         this.engine.runRenderLoop(() => {
             updateInputDevices();
+            AudioManager.Update(this.engine.getDeltaTime() / 1000);
 
             if (this.isPaused()) return;
             this.activeView.render();
@@ -231,8 +235,7 @@ export class CosmosJourneyer {
     public toggleStarMap(): void {
         if (this.activeView === this.starSystemView) {
             this.starSystemView.unZoom(() => {
-                this.starSystemView.stopBackgroundSounds();
-                this.starMap.startBackgroundMusic();
+                AudioManager.SetMask(AudioMasks.STAR_MAP_VIEW);
 
                 this.activeView.detachControl();
                 this.starMap.attachControl();
@@ -242,9 +245,10 @@ export class CosmosJourneyer {
                 starMap.focusOnCurrentSystem();
             });
         } else {
-            this.starMap.stopBackgroundMusic();
             this.activeView.detachControl();
             this.starSystemView.attachControl();
+
+            AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             this.activeView = this.starSystemView;
             this.starSystemView.showUI();
         }

@@ -23,7 +23,6 @@ import { OrbitalObject } from "../architecture/orbitalObject";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Assets } from "../assets";
 
 export class SystemUI {
     readonly scene: Scene;
