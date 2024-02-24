@@ -3,16 +3,23 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Transformable } from "../architecture/transformable";
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { TypedObject } from "../architecture/typedObject";
+import { SystemSeed } from "./systemSeed";
+import { StarSystemModel } from "../starSystem/starSystemModel";
 
 export class SystemTarget implements Transformable, BoundingSphere, TypedObject {
     readonly name: string;
     private readonly transform: TransformNode;
     private readonly scene: Scene;
 
-    constructor(name: string, scene: Scene) {
-        this.name = name;
-        this.transform = new TransformNode(name, scene);
+    readonly seed: SystemSeed;
+
+    constructor(seed: SystemSeed, scene: Scene) {
+        const systemModel = new StarSystemModel(seed);
+        this.name = systemModel.getName();
+        this.transform = new TransformNode(this.name, scene);
         this.scene = scene;
+
+        this.seed = seed;
     }
 
     getTransform(): TransformNode {

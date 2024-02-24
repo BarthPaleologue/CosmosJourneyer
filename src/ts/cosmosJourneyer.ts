@@ -78,8 +78,6 @@ export class CosmosJourneyer {
         this.starSystemView = starSystemView;
         this.starMap = starMap;
         this.starMap.onWarpObservable.add((seed: SystemSeed) => {
-            //this.starSystemView.setStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
-            //this.starSystemView.initStarSystem();
             this.toggleStarMap();
 
             const activeControls = this.starSystemView.scene.getActiveController();
@@ -111,8 +109,8 @@ export class CosmosJourneyer {
             }
         });
 
-        this.mainMenu.onLoadSaveObservable.add((saveData: SaveFileData) => {
-            this.loadSaveData(saveData);
+        this.mainMenu.onLoadSaveObservable.add(async (saveData: SaveFileData) => {
+            await this.loadSaveData(saveData);
         });
 
         this.pauseMenu = new PauseMenu();
@@ -221,8 +219,8 @@ export class CosmosJourneyer {
     /**
      * Inits the current star system
      */
-    public init(skipMainMenu = false): void {
-        if (!skipMainMenu) this.mainMenu.init();
+    public async init(skipMainMenu = false): Promise<void> {
+        if (!skipMainMenu) await this.mainMenu.init();
         this.starSystemView.initStarSystem();
 
         this.engine.runRenderLoop(() => {
@@ -347,8 +345,8 @@ export class CosmosJourneyer {
      * This will perform engine initialization if the engine is not initialized.
      * @param saveData The save file data to load
      */
-    public loadSaveData(saveData: SaveFileData): void {
-        this.loadUniverseCoordinates(saveData.universeCoordinates);
+    public async loadSaveData(saveData: SaveFileData): Promise<void> {
+        await this.loadUniverseCoordinates(saveData.universeCoordinates);
     }
 
     /**
@@ -356,11 +354,11 @@ export class CosmosJourneyer {
      * This will perform engine initialization if the engine is not initialized.
      * @param universeCoordinates The universe coordinates to load
      */
-    public loadUniverseCoordinates(universeCoordinates: UniverseCoordinates): void {
+    public async loadUniverseCoordinates(universeCoordinates: UniverseCoordinates): Promise<void> {
         const seed = SystemSeed.Deserialize(universeCoordinates.starSystem);
 
         this.starMap.setCurrentStarSystem(seed);
-        this.starSystemView.setStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
+        await this.starSystemView.setStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
 
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToSpaceshipControls();

@@ -50,6 +50,7 @@ import { syncCamera } from "../utils/cameraSyncing";
 import { SystemSeed } from "../utils/systemSeed";
 import { StarSector } from "../starmap/starSector";
 import { StarMap } from "../starmap/starMap";
+import { SystemTarget } from "../utils/systemTarget";
 
 export class StarSystemView implements View {
     readonly helmetOverlay: HelmetOverlay;
@@ -75,6 +76,8 @@ export class StarSystemView implements View {
 
     readonly onInitStarSystem = new Observable<void>();
 
+    private isLoadingSystem = false;
+
     constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
         this.helmetOverlay = new HelmetOverlay();
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
@@ -94,7 +97,7 @@ export class StarSystemView implements View {
             }
         ]);
 
-        document.addEventListener("keydown", (e) => {
+        document.addEventListener("keydown", async (e) => {
             if (e.key === "o") {
                 const enabled = !this.ui.isEnabled();
                 if (enabled) Assets.MENU_HOVER_SOUND.play();
@@ -111,6 +114,29 @@ export class StarSystemView implements View {
             if (e.key === "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
             if (e.key === "b") this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
 
+            if (e.key === "g") {
+                if (this.scene.getActiveController() === this.getSpaceshipControls()) {
+                    this.switchToDefaultControls();
+                } else if (this.scene.getActiveController() === this.getDefaultControls()) {
+                    this.switchToCharacterControls();
+                } else if (this.scene.getActiveController() === this.getCharacterControls()) {
+                    this.switchToSpaceshipControls();
+                }
+            }
+
+            if (e.key === " ") {
+                const target = this.ui.getTarget();
+                if (target instanceof SystemTarget) {
+                    this.isLoadingSystem = true;
+                    this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(true);
+                    const systemSeed = target.seed;
+                    await this.setStarSystem(new StarSystemController(systemSeed, this.scene), true);
+                    await this.initStarSystem();
+                    this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
+                    this.isLoadingSystem = false;
+                }
+            }
+
             if (e.key === "t") {
                 const closestObjectToCenter = this.getStarSystem().getClosestToScreenCenterOrbitalObject();
 
@@ -126,16 +152,6 @@ export class StarSystemView implements View {
                 this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
                 this.ui.setTarget(closestObjectToCenter);
                 Assets.TARGET_LOCK_SOUND.play();
-            }
-
-            if (e.key === "g") {
-                if (this.scene.getActiveController() === this.getSpaceshipControls()) {
-                    this.switchToDefaultControls();
-                } else if (this.scene.getActiveController() === this.getDefaultControls()) {
-                    this.switchToCharacterControls();
-                } else if (this.scene.getActiveController() === this.getCharacterControls()) {
-                    this.switchToSpaceshipControls();
-                }
             }
         });
 
@@ -166,10 +182,7 @@ export class StarSystemView implements View {
         this.ui = new SystemUI(engine);
     }
 
-    initStarSystem() {
-        this.scene.getEngine().loadingScreen.displayLoadingUI();
-        this.scene.getEngine().loadingScreen.loadingUIText = `Warping to ${this.getStarSystem().model.getName()}`;
-
+    initStarSystem(): Promise<void> {
         this.getStarSystem().initPositions(10, this.chunkForge);
         this.ui.createObjectOverlays(this.getStarSystem().getOrbitalObjects());
 
@@ -187,12 +200,14 @@ export class StarSystemView implements View {
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
         positionNearObjectBrightSide(activeController, firstBody, this.getStarSystem(), controllerDistanceFactor);
 
-        this.getStarSystem()
-            .initPostProcesses()
-            .then(() => {
-                this.onInitStarSystem.notifyObservers();
-                this.scene.getEngine().loadingScreen.hideLoadingUI();
-            });
+        const promise = this.getStarSystem().initPostProcesses();
+
+        promise.then(() => {
+            this.onInitStarSystem.notifyObservers();
+            this.scene.getEngine().loadingScreen.hideLoadingUI();
+        });
+
+        return promise;
     }
 
     async initAssets() {
@@ -222,10 +237,9 @@ export class StarSystemView implements View {
      * @param deltaSeconds the time elapsed since the last update in seconds
      */
     update(deltaSeconds: number) {
-        const starSystem = this.getStarSystem();
+        if(this.isLoadingSystem) return;
 
-        Assets.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
-        Assets.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
+        const starSystem = this.getStarSystem();
 
         this.chunkForge.update();
 
@@ -260,6 +274,9 @@ export class StarSystemView implements View {
         this.helmetOverlay.update(nearestOrbitalObject, this.scene.getActiveController().getTransform());
 
         this.orbitRenderer.update();
+
+        Assets.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
+        Assets.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
     }
 
     getSpaceshipControls() {
@@ -342,11 +359,40 @@ export class StarSystemView implements View {
      * @param starSystem the star system to be set
      * @param needsGenerating whether the star system needs to be generated or not
      */
-    setStarSystem(starSystem: StarSystemController, needsGenerating = true) {
+    async setStarSystem(starSystem: StarSystemController, needsGenerating = true) {
         if (this.starSystem !== null) this.starSystem.dispose();
         this.starSystem = starSystem;
 
-        if (needsGenerating) StarSystemHelper.Generate(this.starSystem);
+        if (needsGenerating) {
+            const model = starSystem.model;
+            const targetNbStellarObjects = model.getNbStellarObjects();
+
+            const stellarObjectPromises: Promise<void>[] = [];
+            for (let i = 0; i < targetNbStellarObjects; i++) {
+                stellarObjectPromises.push(new Promise<void>(resolve => {
+                    setTimeout(() => {
+                        console.log("Stellar:", i, "of", targetNbStellarObjects);
+                        StarSystemHelper.MakeStellarObject(starSystem);
+                        resolve();
+                    }, 1000 * i)
+                }));
+            }
+
+            await Promise.all(stellarObjectPromises);
+
+            const planetPromises: Promise<void>[] = [];
+            for (let i = 0; i < model.getNbPlanets(); i++) {
+                planetPromises.push(new Promise<void>(resolve => {
+                    setTimeout(() => {
+                        console.log("Planet:", i, "of", model.getNbPlanets());
+                        StarSystemHelper.MakePlanet(starSystem);
+                        resolve();
+                    }, 1000 * i)
+                }));
+            }
+
+            await Promise.all(planetPromises);
+        }
     }
 
     hideUI() {
@@ -380,17 +426,9 @@ export class StarSystemView implements View {
         const currentSystem = this.getStarSystem();
         const currentSeed = currentSystem.model.seed;
 
-        const currentSystemStarSector = new StarSector(new Vector3(
-            currentSeed.starSectorX,
-            currentSeed.starSectorY,
-            currentSeed.starSectorZ
-        ));
+        const currentSystemStarSector = new StarSector(new Vector3(currentSeed.starSectorX, currentSeed.starSectorY, currentSeed.starSectorZ));
 
-        const targetSystemStarSector = new StarSector(new Vector3(
-            targetSeed.starSectorX,
-            targetSeed.starSectorY,
-            targetSeed.starSectorZ
-        ));
+        const targetSystemStarSector = new StarSector(new Vector3(targetSeed.starSectorX, targetSeed.starSectorY, targetSeed.starSectorZ));
 
         const currentSystemUniversePosition = currentSystemStarSector.getPositionOfStar(currentSeed.index);
         const targetSystemUniversePosition = targetSystemStarSector.getPositionOfStar(targetSeed.index);

@@ -378,8 +378,8 @@ export class StarMap implements View {
         const starSystemSeed = data.seed;
         const starSystemModel = new StarSystemModel(starSystemSeed);
 
-        const starSeed = starSystemModel.getStarSeed(0);
-        const stellarObjectType = starSystemModel.getBodyTypeOfStar(0);
+        const starSeed = starSystemModel.getStellarObjectSeed(0);
+        const stellarObjectType = starSystemModel.getBodyTypeOfStellarObject(0);
 
         let starModel: StarModel | BlackHoleModel | NeutronStarModel | null = null;
         switch (stellarObjectType) {

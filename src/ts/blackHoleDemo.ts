@@ -32,7 +32,7 @@ const scene = starSystemView.scene;
 
 const starSystemSeed = new SystemSeed(0, 0, 0, 0);
 const starSystem = new StarSystemController(starSystemSeed, scene);
-starSystemView.setStarSystem(starSystem, false);
+await starSystemView.setStarSystem(starSystem, false);
 
 const BH = StarSystemHelper.MakeBlackHole(starSystem, 0);
 BH.model.orbit.radius = 0;

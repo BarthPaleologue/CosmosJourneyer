@@ -483,8 +483,7 @@ export class StarSystemController {
     }
 
     addSystemTarget(seed: SystemSeed, systemDirection: Vector3, distance: number): SystemTarget {
-        const systemModel = new StarSystemModel(seed);
-        const placeholderTransform = new SystemTarget(systemModel.getName(), this.scene);
+        const placeholderTransform = new SystemTarget(seed, this.scene);
         placeholderTransform.getTransform().position.copyFrom(systemDirection.scale(distance));
 
         this.systemTargets.forEach((target) => {
@@ -501,5 +500,6 @@ export class StarSystemController {
     public dispose() {
         this.postProcessManager.dispose();
         for (const object of this.orbitalObjects) object.dispose();
+        this.systemTargets.forEach((target) => target.dispose());
     }
 }

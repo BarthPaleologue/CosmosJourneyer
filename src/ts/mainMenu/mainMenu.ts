@@ -100,12 +100,12 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         this.starSystemController = new StarSystemController(seed, this.scene);
     }
 
-    init() {
-        this.starSystemView.setStarSystem(this.starSystemController, true);
+    async init() {
+        await this.starSystemView.setStarSystem(this.starSystemController, true);
 
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToDefaultControls();
-            const nbRadius = this.starSystemController.model.getBodyTypeOfStar(0) === BodyType.BLACK_HOLE ? 8 : 2;
+            const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE ? 8 : 2;
             const targetObject = this.starSystemController.planets.length > 0 ? this.starSystemController.planets[0] : this.starSystemController.stellarObjects[0];
             positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
 

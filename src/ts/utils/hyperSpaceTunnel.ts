@@ -42,7 +42,7 @@ export class HyperSpaceTunnel implements Transformable {
   private throttle = 1;
 
   private diameterTop = 20;
-  private diameterBottom = 100;
+  private diameterBottom = 40;
 
   constructor(direction: Vector3, scene: Scene) {
     this.deltaSpeed = this.maxSpeed - this.minSpeed;
@@ -142,8 +142,8 @@ export class HyperSpaceTunnel implements Transformable {
     const theta = Math.random() * Math.PI * 2;
     const radiusScaling = 1 + (Math.random() * 2 - 1) * 0.5;
 
-    const p0 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterTop) / 2);
-    const p1 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterBottom) / 2);
+    const p0 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterTop) / 5);
+    const p1 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterBottom) / 5);
     p0.addInPlace(this.direction.scale(this.positiveDepth));
     p1.subtractInPlace(this.direction.scale(this.negativeDepth));
 
