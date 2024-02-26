@@ -210,5 +210,5 @@ document.addEventListener("keydown", (e) => {
 });
 
 starSystemView.ui.setEnabled(true);
-starSystemView.showUI();
+starSystemView.showHtmlUI();
 starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();

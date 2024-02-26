@@ -255,7 +255,6 @@ export class StarSystemView implements View {
         this.ui = new SystemUI(engine);
     }
 
-
     /**
      * Dispose the previous star system and incrementally loads the new star system. All the assets are instantiated but the system still need to be initialized
      * @param starSystem the star system to be set
@@ -268,36 +267,44 @@ export class StarSystemView implements View {
         }
         this.starSystem = starSystem;
 
-        if (needsGenerating) {
-            const model = starSystem.model;
-            const targetNbStellarObjects = model.getNbStellarObjects();
+        if (!needsGenerating) return;
 
-            const stellarObjectPromises: Promise<void>[] = [];
-            for (let i = 0; i < targetNbStellarObjects; i++) {
-                stellarObjectPromises.push(new Promise<void>(resolve => {
+        // Incrementally generate the star system
+
+        const systemModel = starSystem.model;
+        const targetNbStellarObjects = systemModel.getNbStellarObjects();
+
+        // Stellar objects
+        const stellarObjectPromises: Promise<void>[] = [];
+        for (let i = 0; i < targetNbStellarObjects; i++) {
+            stellarObjectPromises.push(
+                new Promise<void>((resolve) => {
                     setTimeout(() => {
                         console.log("Stellar:", i + 1, "of", targetNbStellarObjects);
                         StarSystemHelper.MakeStellarObject(starSystem);
                         resolve();
-                    }, 1000 * i)
-                }));
-            }
+                    }, 1000 * i);
+                })
+            );
+        }
 
-            await Promise.all(stellarObjectPromises);
+        await Promise.all(stellarObjectPromises);
 
-            const planetPromises: Promise<void>[] = [];
-            for (let i = 0; i < model.getNbPlanets(); i++) {
-                planetPromises.push(new Promise<void>(resolve => {
+        // Planets
+        const planetPromises: Promise<void>[] = [];
+        for (let i = 0; i < systemModel.getNbPlanets(); i++) {
+            planetPromises.push(
+                new Promise<void>((resolve) => {
                     setTimeout(() => {
-                        console.log("Planet:", i + 1, "of", model.getNbPlanets());
+                        console.log("Planet:", i + 1, "of", systemModel.getNbPlanets());
                         StarSystemHelper.MakePlanet(starSystem);
                         resolve();
-                    }, 1000 * i)
-                }));
-            }
-
-            await Promise.all(planetPromises);
+                    }, 1000 * i);
+                })
+            );
         }
+
+        await Promise.all(planetPromises);
     }
 
     /**
@@ -306,31 +313,32 @@ export class StarSystemView implements View {
      * The post processes are initialized when BabylonJS is done loading some textures, therefore this method CANNOT BE AWAITED in the main thread.
      */
     initStarSystem(): Promise<void> {
-        this.getStarSystem().initPositions(2, this.chunkForge);
-        this.ui.createObjectOverlays(this.getStarSystem().getOrbitalObjects());
+        const starSystem = this.getStarSystem();
+        starSystem.initPositions(2, this.chunkForge);
+        this.ui.createObjectOverlays(starSystem.getOrbitalObjects());
 
-        const firstBody = this.getStarSystem().getBodies()[0];
-        if (firstBody === undefined) throw new Error("No bodies in star system");
-
-        this.orbitRenderer.setOrbitalObjects(this.getStarSystem().getOrbitalObjects());
-        this.axisRenderer.setObjects(this.getStarSystem().getOrbitalObjects());
+        this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects());
+        this.axisRenderer.setObjects(starSystem.getOrbitalObjects());
 
         this.helmetOverlay.setTarget(null);
+
+        const firstBody = starSystem.getBodies()[0];
+        if (firstBody === undefined) throw new Error("No bodies in star system");
 
         const activeController = this.scene.getActiveController();
         let controllerDistanceFactor = 5;
         if (firstBody instanceof BlackHole) controllerDistanceFactor = 7;
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
-        positionNearObjectBrightSide(activeController, firstBody, this.getStarSystem(), controllerDistanceFactor);
+        positionNearObjectBrightSide(activeController, firstBody, starSystem, controllerDistanceFactor);
 
-        const promise = this.getStarSystem().initPostProcesses();
+        const initPostProcessesPromise = starSystem.initPostProcesses();
 
-        promise.then(() => {
+        initPostProcessesPromise.then(() => {
             this.onInitStarSystem.notifyObservers();
             this.scene.getEngine().loadingScreen.hideLoadingUI();
         });
 
-        return promise;
+        return initPostProcessesPromise;
     }
 
     /**
@@ -362,7 +370,7 @@ export class StarSystemView implements View {
      * @param deltaSeconds the time elapsed since the last update in seconds
      */
     update(deltaSeconds: number) {
-        if(this.isLoadingSystem) return;
+        if (this.isLoadingSystem) return;
 
         const starSystem = this.getStarSystem();
 
@@ -404,21 +412,39 @@ export class StarSystemView implements View {
         Assets.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
     }
 
+    /**
+     * Returns the spaceship controls
+     * @returns the spaceship controls
+     * @throws Error if the spaceship controls is null (the assets are not initialized, you must call `initAssets` before)
+     */
     getSpaceshipControls() {
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         return this.spaceshipControls;
     }
 
+    /**
+     * Returns the character controls
+     * @returns the character controls
+     * @throws Error if the character controls is null (the assets are not initialized, you must call `initAssets` before)
+     */
     getCharacterControls() {
         if (this.characterControls === null) throw new Error("Character controls is null");
         return this.characterControls;
     }
 
+    /**
+     * Returns the default controls
+     * @returns the default controls
+     * @throws Error if the default controls is null (the assets are not initialized, you must call `initAssets` before)
+     */
     getDefaultControls() {
         if (this.defaultControls === null) throw new Error("Default controls is null");
         return this.defaultControls;
     }
 
+    /**
+     * Switches the active controller to the spaceship controls
+     */
     switchToSpaceshipControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
@@ -432,6 +458,9 @@ export class StarSystemView implements View {
         shipControls.spaceship.setEnabled(true, this.havokPlugin);
     }
 
+    /**
+     * Switches the active controller to the character controls
+     */
     switchToCharacterControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
@@ -448,6 +477,9 @@ export class StarSystemView implements View {
         this.stopBackgroundSounds();
     }
 
+    /**
+     * Switches the active controller to the default controls
+     */
     switchToDefaultControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
@@ -479,12 +511,12 @@ export class StarSystemView implements View {
         return this.starSystem;
     }
 
-    hideUI() {
+    hideHtmlUI() {
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
         this.helmetOverlay.setVisibility(false);
     }
 
-    showUI() {
+    showHtmlUI() {
         this.helmetOverlay.setVisibility(true);
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
     }
@@ -498,7 +530,7 @@ export class StarSystemView implements View {
         activeControls.getActiveCamera().animations = [StarSystemView.UN_ZOOM_ANIMATION];
         this.scene.beginAnimation(this.scene.getActiveController().getActiveCamera(), 0, 60, false, 2.0, () => {
             this.scene.getActiveController().getActiveCamera().animations = [];
-            this.hideUI();
+            this.hideHtmlUI();
             callback();
             this.scene.onAfterRenderObservable.addOnce(() => {
                 (activeControls as ShipControls).thirdPersonCamera.radius = 30;
@@ -506,6 +538,11 @@ export class StarSystemView implements View {
         });
     }
 
+    /**
+     * Creates a visible target inside the current star system to aim for another star system.
+     * This target will display the name of the target system and its distance.
+     * @param targetSeed the seed of the target system
+     */
     setSystemAsTarget(targetSeed: SystemSeed) {
         const currentSystem = this.getStarSystem();
         const currentSeed = currentSystem.model.seed;
@@ -534,6 +571,7 @@ export class StarSystemView implements View {
         syncCamera(this.scene.getActiveCamera(), this.ui.camera);
         this.ui.scene.render();
     }
+
 
     public attachControl() {
         this.scene.attachControl();

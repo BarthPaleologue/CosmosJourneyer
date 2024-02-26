@@ -99,7 +99,7 @@ export class CosmosJourneyer {
             this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
             this.starSystemView.switchToSpaceshipControls();
             this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
-            this.starSystemView.showUI();
+            this.starSystemView.showHtmlUI();
             this.starSystemView.ui.setEnabled(true);
             const target = this.starSystemView.getStarSystem().getClosestToScreenCenterOrbitalObject();
             if(target !== null) {
@@ -257,7 +257,7 @@ export class CosmosJourneyer {
 
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             this.activeView = this.starSystemView;
-            this.starSystemView.showUI();
+            this.starSystemView.showHtmlUI();
         }
     }
 
@@ -366,7 +366,7 @@ export class CosmosJourneyer {
             this.starSystemView.switchToSpaceshipControls();
 
             this.starSystemView.ui.setEnabled(true);
-            this.starSystemView.showUI();
+            this.starSystemView.showHtmlUI();
 
             const playerTransform = this.starSystemView.scene.getActiveController().getTransform();
 

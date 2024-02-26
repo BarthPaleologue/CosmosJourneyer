@@ -49,4 +49,4 @@ const planet = starSystem.planets.length > 0 ? starSystem.planets[0] : starSyste
 positionNearObjectBrightSide(scene.getActiveController(), planet, starSystem, nbRadius);
 
 starSystemView.ui.setEnabled(true);
-starSystemView.showUI();
+starSystemView.showHtmlUI();
