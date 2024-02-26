@@ -95,4 +95,8 @@ export class AudioInstance {
             this.spatialVolumeMultiplier = 1 / (1 + 0.01 * distance);
         }*/
     }
+
+    dispose() {
+        this.sound.dispose();
+    }
 }

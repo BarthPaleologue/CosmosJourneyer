@@ -21,4 +21,13 @@ export class AudioManager {
             sound.update(deltaSeconds);
         });
     }
+
+    static DisposeSound(audioInstance: AudioInstance) {
+        const index = this.SOUNDS.indexOf(audioInstance);
+        if (index === -1) {
+            throw new Error("Sound not found");
+        }
+        this.SOUNDS.splice(index, 1);
+        audioInstance.dispose();
+    }
 }

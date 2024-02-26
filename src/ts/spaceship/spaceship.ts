@@ -409,6 +409,14 @@ export class Spaceship implements Transformable {
     }
 
     public dispose() {
+        AudioManager.DisposeSound(this.enableWarpDriveSound);
+        AudioManager.DisposeSound(this.disableWarpDriveSound);
+        AudioManager.DisposeSound(this.acceleratingWarpDriveSound);
+        AudioManager.DisposeSound(this.deceleratingWarpDriveSound);
+        AudioManager.DisposeSound(this.thrusterSound);
+
+        this.warpTunnel.dispose();
+        this.hyperSpaceTunnel.dispose();
         this.aggregate.dispose();
         this.instanceRoot.dispose();
     }
