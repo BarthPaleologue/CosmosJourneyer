@@ -43,7 +43,7 @@ await starSystemView.loadStarSystem(starSystem, false);
 
 engine.init(true);
 
-positionNearObjectBrightSide(scene.getActiveController(), BH, starSystem, 20);
+positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, 20);
 
 starSystemView.ui.setEnabled(true);
 starSystemView.showHtmlUI();

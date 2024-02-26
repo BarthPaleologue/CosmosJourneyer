@@ -186,11 +186,11 @@ export class StarSystemView implements View {
             if (e.key === "b") this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
 
             if (e.key === "g") {
-                if (this.scene.getActiveController() === this.getSpaceshipControls()) {
+                if (this.scene.getActiveControls() === this.getSpaceshipControls()) {
                     this.switchToDefaultControls();
-                } else if (this.scene.getActiveController() === this.getDefaultControls()) {
+                } else if (this.scene.getActiveControls() === this.getDefaultControls()) {
                     this.switchToCharacterControls();
-                } else if (this.scene.getActiveController() === this.getCharacterControls()) {
+                } else if (this.scene.getActiveControls() === this.getCharacterControls()) {
                     this.switchToSpaceshipControls();
                 }
             }
@@ -324,7 +324,7 @@ export class StarSystemView implements View {
         const firstBody = starSystem.getBodies()[0];
         if (firstBody === undefined) throw new Error("No bodies in star system");
 
-        const activeController = this.scene.getActiveController();
+        const activeController = this.scene.getActiveControls();
         let controllerDistanceFactor = 5;
         if (firstBody instanceof BlackHole) controllerDistanceFactor = 7;
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
@@ -361,7 +361,7 @@ export class StarSystemView implements View {
         this.characterControls.getTransform().setEnabled(false);
         this.characterControls.getActiveCamera().maxZ = maxZ;
 
-        this.scene.setActiveController(this.spaceshipControls);
+        this.scene.setActiveControls(this.spaceshipControls);
     }
 
     /**
@@ -403,12 +403,12 @@ export class StarSystemView implements View {
 
         this.bodyEditor.update(nearestCelestialBody, starSystem.postProcessManager, this.scene);
 
-        this.helmetOverlay.update(nearestOrbitalObject, this.scene.getActiveController().getTransform());
+        this.helmetOverlay.update(nearestOrbitalObject, this.scene.getActiveControls().getTransform());
 
         this.orbitRenderer.update();
 
-        Assets.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
-        Assets.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveController().getTransform().getAbsolutePosition(), deltaSeconds);
+        Assets.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Assets.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
     }
 
     /**
@@ -450,7 +450,7 @@ export class StarSystemView implements View {
         const defaultControls = this.getDefaultControls();
 
         characterControls.getTransform().setEnabled(false);
-        this.scene.setActiveController(shipControls);
+        this.scene.setActiveControls(shipControls);
         setRotationQuaternion(shipControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
         this.getStarSystem().postProcessManager.rebuild();
 
@@ -467,7 +467,7 @@ export class StarSystemView implements View {
 
         characterControls.getTransform().setEnabled(true);
         characterControls.getTransform().setAbsolutePosition(defaultControls.getTransform().absolutePosition);
-        this.scene.setActiveController(characterControls);
+        this.scene.setActiveControls(characterControls);
         setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
         this.getStarSystem().postProcessManager.rebuild();
 
@@ -489,7 +489,7 @@ export class StarSystemView implements View {
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
         this.stopBackgroundSounds();
 
-        this.scene.setActiveController(defaultControls);
+        this.scene.setActiveControls(defaultControls);
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
         this.getStarSystem().postProcessManager.rebuild();
     }
@@ -524,14 +524,14 @@ export class StarSystemView implements View {
     }
 
     public unZoom(callback: () => void) {
-        const activeControls = this.scene.getActiveController();
+        const activeControls = this.scene.getActiveControls();
         if (activeControls !== this.getSpaceshipControls()) {
             callback();
             return;
         }
         activeControls.getActiveCamera().animations = [StarSystemView.UN_ZOOM_ANIMATION];
-        this.scene.beginAnimation(this.scene.getActiveController().getActiveCamera(), 0, 60, false, 2.0, () => {
-            this.scene.getActiveController().getActiveCamera().animations = [];
+        this.scene.beginAnimation(this.scene.getActiveControls().getActiveCamera(), 0, 60, false, 2.0, () => {
+            this.scene.getActiveControls().getActiveCamera().animations = [];
             this.hideHtmlUI();
             callback();
             this.scene.onAfterRenderObservable.addOnce(() => {

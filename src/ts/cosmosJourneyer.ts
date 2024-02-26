@@ -80,7 +80,7 @@ export class CosmosJourneyer {
         this.starMap.onWarpObservable.add((seed: SystemSeed) => {
             this.toggleStarMap();
 
-            const activeControls = this.starSystemView.scene.getActiveController();
+            const activeControls = this.starSystemView.scene.getActiveControls();
             if (activeControls instanceof ShipControls) {
                 activeControls.thirdPersonCamera.radius = ShipControls.BASE_CAMERA_RADIUS;
             }
@@ -305,12 +305,12 @@ export class CosmosJourneyer {
         if (nearestOrbitalObjectIndex === -1) throw new Error("Nearest orbital object not found");
 
         // Finding the position of the player in the nearest orbital object's frame of reference
-        const currentWorldPosition = this.starSystemView.scene.getActiveController().getTransform().getAbsolutePosition();
+        const currentWorldPosition = this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition();
         const nearestOrbitalObjectInverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
         const currentLocalPosition = Vector3.TransformCoordinates(currentWorldPosition, nearestOrbitalObjectInverseWorld);
 
         // Finding the rotation of the player in the nearest orbital object's frame of reference
-        const currentWorldRotation = this.starSystemView.scene.getActiveController().getTransform().absoluteRotationQuaternion;
+        const currentWorldRotation = this.starSystemView.scene.getActiveControls().getTransform().absoluteRotationQuaternion;
         const nearestOrbitalObjectInverseRotation = nearestOrbitalObject.getTransform().absoluteRotationQuaternion.clone().invert();
         const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
 
@@ -368,7 +368,7 @@ export class CosmosJourneyer {
             this.starSystemView.ui.setEnabled(true);
             this.starSystemView.showHtmlUI();
 
-            const playerTransform = this.starSystemView.scene.getActiveController().getTransform();
+            const playerTransform = this.starSystemView.scene.getActiveControls().getTransform();
 
             const nearestOrbitalObject = this.starSystemView.getStarSystem().getOrbitalObjects()[universeCoordinates.nearestOrbitalObjectIndex];
             const nearestOrbitalObjectWorld = nearestOrbitalObject.getTransform().getWorldMatrix();

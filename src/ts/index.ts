@@ -46,7 +46,7 @@ document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
     if (e.key === "e") {
-        if (starSystemView.scene.getActiveController() === shipControls) {
+        if (starSystemView.scene.getActiveControls() === shipControls) {
             console.log("disembark");
 
             characterController.getTransform().setEnabled(true);
@@ -55,16 +55,16 @@ document.addEventListener("keydown", (e) => {
 
             setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
 
-            starSystemView.scene.setActiveController(characterController);
+            starSystemView.scene.setActiveControls(characterController);
             starSystemView.getStarSystem().postProcessManager.rebuild();
 
             shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
             shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
-        } else if (starSystemView.scene.getActiveController() === characterController) {
+        } else if (starSystemView.scene.getActiveControls() === characterController) {
             console.log("embark");
 
             characterController.getTransform().setEnabled(false);
-            starSystemView.scene.setActiveController(shipControls);
+            starSystemView.scene.setActiveControls(shipControls);
             starSystemView.getStarSystem().postProcessManager.rebuild();
         }
     }

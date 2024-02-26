@@ -345,7 +345,7 @@ export class StarSystemController {
      * @param chunkForge The chunk forge used to update the LOD of the telluric planets
      */
     public update(deltaTime: number, chunkForge: ChunkForge): void {
-        const controller = this.scene.getActiveController();
+        const controller = this.scene.getActiveControls();
         this.computeNearestOrbitalObject(controller.getActiveCamera().globalPosition);
         this.computeClosestToScreenCenterOrbitalObject();
 
@@ -455,7 +455,7 @@ export class StarSystemController {
     }
 
     public applyFloatingOrigin() {
-        const controller = this.scene.getActiveController();
+        const controller = this.scene.getActiveControls();
         if (controller.getActiveCamera().globalPosition.length() > 500) {
             const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
             this.translateEverythingNow(displacementTranslation);
@@ -468,7 +468,7 @@ export class StarSystemController {
      * @param deltaTime The time elapsed in seconds since the last update
      */
     public updateShaders(deltaTime: number) {
-        const controller = this.scene.getActiveController();
+        const controller = this.scene.getActiveControls();
         const nearestBody = this.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition);
 
         for (const planet of this.planets) {

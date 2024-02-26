@@ -335,7 +335,7 @@ export class PostProcessManager {
 
         const rings = this.getRings(body);
         const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;
-        if (isOrbiting(this.scene.getActiveController(), body, switchLimit)) this.setSurfaceOrder();
+        if (isOrbiting(this.scene.getActiveControls(), body, switchLimit)) this.setSurfaceOrder();
         else this.setSpaceOrder();
     }
 

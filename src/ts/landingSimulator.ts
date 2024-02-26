@@ -84,7 +84,7 @@ ground.receiveShadows = true;*/
 
 const defaultControls = new DefaultControls(scene);
 defaultControls.speed *= 15;
-scene.setActiveController(defaultControls);
+scene.setActiveControls(defaultControls);
 
 translate(defaultControls.getTransform(), new Vector3(50, 0, 0));
 
@@ -92,7 +92,7 @@ translate(defaultControls.getTransform(), new Vector3(50, 0, 0));
 
 scene.onBeforeRenderObservable.add(() => {
     const deltaTime = scene.deltaTime / 1000;
-    scene.getActiveController().update(deltaTime);
+    scene.getActiveControls().update(deltaTime);
     spaceship.update(deltaTime);
 
     //OrbitalObject.UpdateRotation(spacestation, deltaTime);

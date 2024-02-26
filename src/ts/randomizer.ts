@@ -46,7 +46,7 @@ await engine.init(true);
 
 const nbRadius = starSystem.model.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE ? 8 : 3;
 const planet = starSystem.planets.length > 0 ? starSystem.planets[0] : starSystem.stellarObjects[0];
-positionNearObjectBrightSide(scene.getActiveController(), planet, starSystem, nbRadius);
+positionNearObjectBrightSide(scene.getActiveControls(), planet, starSystem, nbRadius);
 
 starSystemView.ui.setEnabled(true);
 starSystemView.showHtmlUI();
