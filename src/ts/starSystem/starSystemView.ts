@@ -130,7 +130,7 @@ export class StarSystemView implements View {
                     this.isLoadingSystem = true;
                     this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(true);
                     const systemSeed = target.seed;
-                    await this.setStarSystem(new StarSystemController(systemSeed, this.scene), true);
+                    await this.loadStarSystem(new StarSystemController(systemSeed, this.scene), true);
                     await this.initStarSystem();
                     this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
                     this.isLoadingSystem = false;
@@ -182,8 +182,58 @@ export class StarSystemView implements View {
         this.ui = new SystemUI(engine);
     }
 
+
+    /**
+     * Dispose the previous star system and incrementally loads the new star system. All the assets are instantiated but the system still need to be initialized
+     * @param starSystem the star system to be set
+     * @param needsGenerating whether the star system needs to be generated or not
+     */
+    async loadStarSystem(starSystem: StarSystemController, needsGenerating = true) {
+        if (this.starSystem !== null) {
+            this.starSystem.dispose();
+            this.ui.disposeObjectOverlays();
+        }
+        this.starSystem = starSystem;
+
+        if (needsGenerating) {
+            const model = starSystem.model;
+            const targetNbStellarObjects = model.getNbStellarObjects();
+
+            const stellarObjectPromises: Promise<void>[] = [];
+            for (let i = 0; i < targetNbStellarObjects; i++) {
+                stellarObjectPromises.push(new Promise<void>(resolve => {
+                    setTimeout(() => {
+                        console.log("Stellar:", i + 1, "of", targetNbStellarObjects);
+                        StarSystemHelper.MakeStellarObject(starSystem);
+                        resolve();
+                    }, 1000 * i)
+                }));
+            }
+
+            await Promise.all(stellarObjectPromises);
+
+            const planetPromises: Promise<void>[] = [];
+            for (let i = 0; i < model.getNbPlanets(); i++) {
+                planetPromises.push(new Promise<void>(resolve => {
+                    setTimeout(() => {
+                        console.log("Planet:", i + 1, "of", model.getNbPlanets());
+                        StarSystemHelper.MakePlanet(starSystem);
+                        resolve();
+                    }, 1000 * i)
+                }));
+            }
+
+            await Promise.all(planetPromises);
+        }
+    }
+
+    /**
+     * Initializes the star system. It initializes the positions of the orbital objects, the UI, the chunk forge and the post processes
+     * As it initializes the post processes using `initPostProcesses`, it returns a promise that resolves when the post processes are initialized.
+     * The post processes are initialized when BabylonJS is done loading some textures, therefore this method CANNOT BE AWAITED in the main thread.
+     */
     initStarSystem(): Promise<void> {
-        this.getStarSystem().initPositions(10, this.chunkForge);
+        this.getStarSystem().initPositions(2, this.chunkForge);
         this.ui.createObjectOverlays(this.getStarSystem().getOrbitalObjects());
 
         const firstBody = this.getStarSystem().getBodies()[0];
@@ -210,11 +260,12 @@ export class StarSystemView implements View {
         return promise;
     }
 
+    /**
+     * Initializes the assets using the scene of the star system view.
+     * It then initializes the default controls, the spaceship controls and the character controls with the associated 3D models and cameras.
+     */
     async initAssets() {
         await Assets.Init(this.scene);
-
-        const canvas = this.scene.getEngine().getRenderingCanvas();
-        if (canvas === null) throw new Error("Canvas is null");
 
         const maxZ = Settings.EARTH_RADIUS * 1e5;
 
@@ -352,58 +403,6 @@ export class StarSystemView implements View {
     getStarSystem() {
         if (this.starSystem === null) throw new Error("Star system not initialized");
         return this.starSystem;
-    }
-
-    /**
-     * Sets the star system and generates it if needed and disposes the old one. Does not perform the init method
-     * @param starSystem the star system to be set
-     * @param needsGenerating whether the star system needs to be generated or not
-     */
-    async setStarSystem(starSystem: StarSystemController, needsGenerating = true) {
-        if (this.starSystem !== null) {
-            this.starSystem.dispose();
-            this.ui.disposeObjectOverlays();
-        }
-        this.starSystem = starSystem;
-
-        if (needsGenerating) {
-            const model = starSystem.model;
-            const targetNbStellarObjects = model.getNbStellarObjects();
-
-            const waitPromise = new Promise<void>(resolve => {
-                setTimeout(() => {
-                    resolve();
-                }, 3000);
-            });
-
-            await waitPromise;
-
-            const stellarObjectPromises: Promise<void>[] = [];
-            for (let i = 0; i < targetNbStellarObjects; i++) {
-                stellarObjectPromises.push(new Promise<void>(resolve => {
-                    setTimeout(() => {
-                        console.log("Stellar:", i, "of", targetNbStellarObjects);
-                        StarSystemHelper.MakeStellarObject(starSystem);
-                        resolve();
-                    }, 1000 * i)
-                }));
-            }
-
-            await Promise.all(stellarObjectPromises);
-
-            const planetPromises: Promise<void>[] = [];
-            for (let i = 0; i < model.getNbPlanets(); i++) {
-                planetPromises.push(new Promise<void>(resolve => {
-                    setTimeout(() => {
-                        console.log("Planet:", i, "of", model.getNbPlanets());
-                        StarSystemHelper.MakePlanet(starSystem);
-                        resolve();
-                    }, 1000 * i)
-                }));
-            }
-
-            await Promise.all(planetPromises);
-        }
     }
 
     hideUI() {

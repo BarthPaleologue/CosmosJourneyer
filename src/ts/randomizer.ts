@@ -38,7 +38,7 @@ const index = 0;
 const seed = new SystemSeed(starMapX, starMapY, starMapZ, index);
 
 const starSystem = new StarSystemController(seed, scene);
-await starSystemView.setStarSystem(starSystem, true);
+await starSystemView.loadStarSystem(starSystem, true);
 
 engine.starMap.setCurrentStarSystem(seed);
 

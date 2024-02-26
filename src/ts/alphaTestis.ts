@@ -53,7 +53,7 @@ const starSystemSeed = new SystemSeed(0, 0, 0, 0);
 const starSystem = new StarSystemController(starSystemSeed, starSystemView.scene);
 starSystem.model.setName("Alpha Testis");
 
-await starSystemView.setStarSystem(starSystem, false);
+await starSystemView.loadStarSystem(starSystem, false);
 
 const sunModel = new StarModel(0.51);
 const sun = StarSystemHelper.MakeStar(starSystem, sunModel);

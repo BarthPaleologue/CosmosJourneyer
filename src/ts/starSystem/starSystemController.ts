@@ -280,6 +280,7 @@ export class StarSystemController {
 
     /**
      * Inits the post processes of all the bodies in the system
+     * This method cannot be awaited as its completion depends on the execution of BabylonJS that happens afterward.
      */
     public async initPostProcesses() {
         const promises: Promise<void>[] = [];

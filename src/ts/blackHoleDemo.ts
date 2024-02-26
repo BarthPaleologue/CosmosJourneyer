@@ -32,13 +32,14 @@ const scene = starSystemView.scene;
 
 const starSystemSeed = new SystemSeed(0, 0, 0, 0);
 const starSystem = new StarSystemController(starSystemSeed, scene);
-await starSystemView.setStarSystem(starSystem, false);
 
 const BH = StarSystemHelper.MakeBlackHole(starSystem, 0);
 BH.model.orbit.radius = 0;
 
 const planet = StarSystemHelper.MakeTelluricPlanet(starSystem);
 planet.model.orbit.radius = 45 * planet.getRadius();
+
+await starSystemView.loadStarSystem(starSystem, false);
 
 engine.init(true);
 

@@ -357,7 +357,6 @@ export class CosmosJourneyer {
         const seed = SystemSeed.Deserialize(universeCoordinates.starSystem);
 
         this.starMap.setCurrentStarSystem(seed);
-        await this.starSystemView.setStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
 
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToSpaceshipControls();
@@ -389,6 +388,8 @@ export class CosmosJourneyer {
             // re-centers the star system
             this.starSystemView.getStarSystem().applyFloatingOrigin();
         });
+
+        await this.starSystemView.loadStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
 
         if (this.state === EngineState.UNINITIALIZED) this.init(true);
         else this.starSystemView.initStarSystem();
