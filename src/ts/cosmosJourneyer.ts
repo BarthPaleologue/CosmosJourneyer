@@ -224,7 +224,7 @@ export class CosmosJourneyer {
      */
     public async init(skipMainMenu = false): Promise<void> {
         if (!skipMainMenu) await this.mainMenu.init();
-        this.starSystemView.initStarSystem();
+        await this.starSystemView.initStarSystem();
 
         this.engine.runRenderLoop(() => {
             updateInputDevices();
@@ -395,7 +395,7 @@ export class CosmosJourneyer {
 
         await this.starSystemView.loadStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
 
-        if (this.state === EngineState.UNINITIALIZED) this.init(true);
-        else this.starSystemView.initStarSystem();
+        if (this.state === EngineState.UNINITIALIZED) await this.init(true);
+        else await this.starSystemView.initStarSystem();
     }
 }

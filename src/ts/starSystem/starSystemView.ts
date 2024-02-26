@@ -260,7 +260,7 @@ export class StarSystemView implements View {
      * @param starSystem the star system to be set
      * @param needsGenerating whether the star system needs to be generated or not
      */
-    async loadStarSystem(starSystem: StarSystemController, needsGenerating = true) {
+    public async loadStarSystem(starSystem: StarSystemController, needsGenerating = true) {
         if (this.starSystem !== null) {
             this.starSystem.dispose();
             this.ui.disposeObjectOverlays();
@@ -310,9 +310,8 @@ export class StarSystemView implements View {
     /**
      * Initializes the star system. It initializes the positions of the orbital objects, the UI, the chunk forge and the post processes
      * As it initializes the post processes using `initPostProcesses`, it returns a promise that resolves when the post processes are initialized.
-     * The post processes are initialized when BabylonJS is done loading some textures, therefore this method CANNOT BE AWAITED in the main thread.
      */
-    initStarSystem(): Promise<void> {
+    public initStarSystem(): Promise<void> {
         const starSystem = this.getStarSystem();
         starSystem.initPositions(2, this.chunkForge);
         this.ui.createObjectOverlays(starSystem.getOrbitalObjects());
@@ -346,7 +345,7 @@ export class StarSystemView implements View {
      * It then initializes the default controls, the spaceship controls and the character controls with the associated 3D models and cameras.
      * This method must be awaited before doing anything that requires the assets or the controls to be initialized.
      */
-    async initAssets() {
+    public async initAssets() {
         await Assets.Init(this.scene);
 
         const maxZ = Settings.EARTH_RADIUS * 1e5;
@@ -369,7 +368,7 @@ export class StarSystemView implements View {
      * Updates the system view. It updates the underlying star system, the UI, the chunk forge and the controls
      * @param deltaSeconds the time elapsed since the last update in seconds
      */
-    update(deltaSeconds: number) {
+    public update(deltaSeconds: number) {
         if (this.isLoadingSystem) return;
 
         const starSystem = this.getStarSystem();
@@ -417,7 +416,7 @@ export class StarSystemView implements View {
      * @returns the spaceship controls
      * @throws Error if the spaceship controls is null (the assets are not initialized, you must call `initAssets` before)
      */
-    getSpaceshipControls() {
+    public getSpaceshipControls() {
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         return this.spaceshipControls;
     }
@@ -427,7 +426,7 @@ export class StarSystemView implements View {
      * @returns the character controls
      * @throws Error if the character controls is null (the assets are not initialized, you must call `initAssets` before)
      */
-    getCharacterControls() {
+    public getCharacterControls() {
         if (this.characterControls === null) throw new Error("Character controls is null");
         return this.characterControls;
     }
@@ -437,7 +436,7 @@ export class StarSystemView implements View {
      * @returns the default controls
      * @throws Error if the default controls is null (the assets are not initialized, you must call `initAssets` before)
      */
-    getDefaultControls() {
+    public getDefaultControls() {
         if (this.defaultControls === null) throw new Error("Default controls is null");
         return this.defaultControls;
     }
@@ -445,7 +444,7 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the spaceship controls
      */
-    switchToSpaceshipControls() {
+    public switchToSpaceshipControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -461,7 +460,7 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the character controls
      */
-    switchToCharacterControls() {
+    public switchToCharacterControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -480,7 +479,7 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the default controls
      */
-    switchToDefaultControls() {
+    public switchToDefaultControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -495,7 +494,10 @@ export class StarSystemView implements View {
         this.getStarSystem().postProcessManager.rebuild();
     }
 
-    stopBackgroundSounds() {
+    /**
+     * Stops the background sounds of the spaceship
+     */
+    public stopBackgroundSounds() {
         this.spaceshipControls?.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
         this.spaceshipControls?.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
         this.spaceshipControls?.spaceship.thrusterSound.setTargetVolume(0);
@@ -506,22 +508,22 @@ export class StarSystemView implements View {
      * @returns the star system
      * @throws Error if the star system is null
      */
-    getStarSystem() {
+    public getStarSystem() {
         if (this.starSystem === null) throw new Error("Star system not initialized");
         return this.starSystem;
     }
 
-    hideHtmlUI() {
+    public hideHtmlUI() {
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
         this.helmetOverlay.setVisibility(false);
     }
 
-    showHtmlUI() {
+    public showHtmlUI() {
         this.helmetOverlay.setVisibility(true);
         this.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
     }
 
-    unZoom(callback: () => void) {
+    public unZoom(callback: () => void) {
         const activeControls = this.scene.getActiveController();
         if (activeControls !== this.getSpaceshipControls()) {
             callback();
@@ -543,7 +545,7 @@ export class StarSystemView implements View {
      * This target will display the name of the target system and its distance.
      * @param targetSeed the seed of the target system
      */
-    setSystemAsTarget(targetSeed: SystemSeed) {
+    public setSystemAsTarget(targetSeed: SystemSeed) {
         const currentSystem = this.getStarSystem();
         const currentSeed = currentSystem.model.seed;
 
