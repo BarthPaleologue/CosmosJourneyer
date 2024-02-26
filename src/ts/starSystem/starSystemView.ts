@@ -52,32 +52,103 @@ import { StarSector } from "../starmap/starSector";
 import { StarMap } from "../starmap/starMap";
 import { SystemTarget } from "../utils/systemTarget";
 
+/**
+ * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
+ * player's spaceship, character and GUI. It also handles the loading of the star system and its initialization.
+ * While the player may travel to another star system, the star system view stays the same, only the star system controller changes.
+ */
 export class StarSystemView implements View {
+    /**
+     * The HTML UI responsible for the name of the closest orbital object, the velocity of the spaceship and the target helper radar.
+     */
     readonly helmetOverlay: HelmetOverlay;
+
+    /**
+     * A debug HTML UI to change the properties of the closest celestial body
+     */
     readonly bodyEditor: BodyEditor;
+
+    /**
+     * The BabylonJS scene, upgraded with some helper methods and properties
+     */
     readonly scene: UberScene;
 
+    /**
+     * The Havok physics plugin used inside the scene
+     */
     readonly havokPlugin: HavokPlugin;
 
+    /**
+     * The default controls are used for debug purposes. They allow to move freely between orbital objects without speed limitations.
+     * @private
+     */
     private defaultControls: DefaultControls | null = null;
+
+    /**
+     * The spaceship controls are used to control the spaceship. They allow to move the spaceship and to enable the warp drive.
+     * @private
+     */
     private spaceshipControls: ShipControls | null = null;
+
+    /**
+     * The character controls are used to control the character when out of the spaceship. They allow to move the character.
+     * @private
+     */
     private characterControls: CharacterControls | null = null;
 
+    /**
+     * A debug helper to display the orbits of the orbital objects
+     * @private
+     */
     private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer();
+
+    /**
+     * A debug helper to display the axes of the orbital objects
+     * @private
+     */
     private readonly axisRenderer: AxisRenderer = new AxisRenderer();
 
+    /**
+     * The GPU accelerated GUI used to display orbital objects overlays and information when targeted.
+     */
     readonly ui: SystemUI;
 
+    /**
+     * An animation to unzoom the camera when opening the star map
+     * @private
+     */
     private static readonly UN_ZOOM_ANIMATION = new Animation("unZoom", "radius", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
+    /**
+     * The controller of the current star system. This controller is unique per star system and is destroyed when the star system is changed.
+     * @private
+     */
     private starSystem: StarSystemController | null = null;
 
+    /**
+     * The chunk forge used to generate surface chunks for telluric planets. It is constant for the whole game.
+     * @private
+     */
     private readonly chunkForge: ChunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
 
+    /**
+     * An observable that notifies when the star system is initialized.
+     * This is when the current star system becomes playable and the post processes are initialized.
+     */
     readonly onInitStarSystem = new Observable<void>();
 
+    /**
+     * Whether the star system is currently loading or not
+     * @private
+     */
     private isLoadingSystem = false;
 
+    /**
+     * Creates an empty star system view with a scene, a gui and a havok plugin
+     * To fill it with a star system, use `loadStarSystem` and then `initStarSystem`
+     * @param engine The BabylonJS engine
+     * @param havokInstance The Havok physics instance
+     */
     constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
         this.helmetOverlay = new HelmetOverlay();
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
@@ -263,6 +334,7 @@ export class StarSystemView implements View {
     /**
      * Initializes the assets using the scene of the star system view.
      * It then initializes the default controls, the spaceship controls and the character controls with the associated 3D models and cameras.
+     * This method must be awaited before doing anything that requires the assets or the controls to be initialized.
      */
     async initAssets() {
         await Assets.Init(this.scene);
