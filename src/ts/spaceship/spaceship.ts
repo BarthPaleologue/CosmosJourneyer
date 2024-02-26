@@ -265,6 +265,11 @@ export class Spaceship implements Transformable {
         return this.state === ShipState.LANDED;
     }
 
+    public takeOff() {
+        this.state = ShipState.FLYING;
+        this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
+    }
+
     private land(deltaTime: number) {
         if (this.targetLandingPad !== null) {
             this.landOnPad(this.targetLandingPad, deltaTime);
@@ -357,9 +362,6 @@ export class Spaceship implements Transformable {
                 });
             } else {
                 this.aggregate.body.applyForce(forwardDirection.scale(-3000), this.aggregate.body.getObjectCenterWorld());
-                this.mainThrusters.forEach(thruster => {
-                    thruster.setThrottle(0);
-                });
             }
 
             // damp other speed

@@ -47,8 +47,8 @@ export class ShipControls implements Controls {
 
         this.firstPersonCamera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.getTransform();
-        this.firstPersonCamera.position = new Vector3(0, 1.2, 3.5);
-
+        this.firstPersonCamera.position = new Vector3(0, 1.2, 4);
+        
         this.thirdPersonCamera = new ArcRotateCamera("thirdPersonCamera", -3.14 / 2, 3.14 / 2.2, ShipControls.BASE_CAMERA_RADIUS, Vector3.Zero(), scene);
         this.thirdPersonCamera.parent = this.getTransform();
         this.thirdPersonCamera.lowerRadiusLimit = 10;
@@ -117,10 +117,15 @@ export class ShipControls implements Controls {
         if (this.spaceship.getWarpDrive().isDisabled()) {
             this.spaceship.increaseMainEngineThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
 
-            this.spaceship.aggregate.body.applyForce(
-                getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
-                this.spaceship.aggregate.body.getObjectCenterWorld()
-            );
+            if(SpaceShipControlsInputs.map.upDown.value !== 0) {
+                if(this.spaceship.isLanded()) {
+                    this.spaceship.takeOff();
+                }
+                this.spaceship.aggregate.body.applyForce(
+                    getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
+                    this.spaceship.aggregate.body.getObjectCenterWorld()
+                );
+            }
         } else {
             this.spaceship.getWarpDrive().increaseTargetThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
         }

@@ -11,7 +11,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 
 export class SolidPlume {
     static TUNNEL_LENGTH = 3;
-    static MAX_NB_PARTICLES = 3000;
+    static MAX_NB_PARTICLES = 2000;
 
     targetNbParticles = 0;
     nbParticles = 0;

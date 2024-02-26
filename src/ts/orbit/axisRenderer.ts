@@ -72,7 +72,7 @@ export class AxisRenderer {
     setVisibility(visible: boolean) {
         this._isVisible = visible;
         for (const axisMesh of this.axisMeshes) {
-            axisMesh.visibility = visible ? 1 : 0;
+            axisMesh.setEnabled(visible);
         }
     }
 

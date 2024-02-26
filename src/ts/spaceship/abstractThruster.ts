@@ -29,8 +29,6 @@ export abstract class AbstractThruster {
 
     protected throttle = 0;
 
-    readonly localNozzleDown: Vector3;
-
     readonly plume: SolidPlume;
 
     readonly parentAggregate: PhysicsAggregate;
@@ -38,7 +36,6 @@ export abstract class AbstractThruster {
     protected constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
         this.mesh = mesh;
 
-        this.localNozzleDown = direction;
         this.plume = new SolidPlume(mesh, mesh.getScene());
 
         this.parentAggregate = parentAggregate;
