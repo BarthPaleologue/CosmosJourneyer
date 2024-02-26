@@ -134,6 +134,10 @@ export class CosmosJourneyer {
             if (!this.mainMenu?.isVisible()) this.pause();
         });
 
+        window.addEventListener("resize", () => {
+            this.engine.resize(true);
+        });
+
         //TODO: use the keyboard class
         document.addEventListener("keydown", (e) => {
             if (this.mainMenu?.isVisible()) return;

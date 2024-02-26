@@ -228,15 +228,18 @@ export class StarSystemView implements View {
 
         this.scene = new UberScene(engine, ScenePerformancePriority.Intermediate);
         this.scene.clearColor = new Color4(0, 0, 0, 0);
+        // The right-handed system allows to use directly GLTF models without having to flip them with a transform
         this.scene.useRightHandedSystem = true;
 
         this.havokPlugin = new HavokPlugin(true, havokInstance);
         setMaxLinVel(this.havokPlugin, 10000, 10000);
         this.scene.enablePhysics(Vector3.Zero(), this.havokPlugin);
 
+        // small ambient light helps with seeing dark objects. This is unrealistic but I feel it is better.
         const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
         ambientLight.intensity = 0.3;
 
+        // main update loop for the star system
         this.scene.onBeforePhysicsObservable.add(() => {
             const deltaSeconds = engine.getDeltaTime() / 1000;
             this.update(deltaSeconds * Settings.TIME_MULTIPLIER);
@@ -244,7 +247,6 @@ export class StarSystemView implements View {
 
         window.addEventListener("resize", () => {
             this.bodyEditor.resize();
-            this.scene.getEngine().resize(true);
         });
 
         this.bodyEditor.resize();
