@@ -49,7 +49,10 @@ export function initSettingsPanel(): HTMLElement {
                     });
                 } else if (binding.control instanceof ButtonInputControl) {
                     const text = buttonInputToString(binding.control);
-                    subActionMap.set("BUTTON", [text]);
+                    if(!subActionMap.has("BUTTON")) {
+                        subActionMap.set("BUTTON", []);
+                    }
+                    subActionMap.get("BUTTON")?.push(text);
                 } else if (binding.control instanceof AxisComposite) {
                     const strings = axisCompositeToString(binding.control);
                     strings.forEach((string) => {
