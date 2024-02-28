@@ -3,7 +3,6 @@ import Action from "@brianchirls/game-input/Action";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 import { InputDevices } from "../inputs/devices";
 import { InputMap } from "../inputs/inputMap";
-import { InputMaps } from "../inputs/inputMaps";
 
 const gamepad = InputDevices.GAMEPAD;
 const keyboard = InputDevices.KEYBOARD;
@@ -60,5 +59,3 @@ export const CharacterInputs = new InputMap<{
     samba: sambaAction,
     run: runAction
 });
-
-InputMaps.push(CharacterInputs);
