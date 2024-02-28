@@ -271,6 +271,8 @@ export class StarSystemView implements View {
 
         // Incrementally generate the star system
 
+        const timeOut = 100;
+
         const systemModel = starSystem.model;
         const targetNbStellarObjects = systemModel.getNbStellarObjects();
 
@@ -283,7 +285,7 @@ export class StarSystemView implements View {
                         console.log("Stellar:", i + 1, "of", targetNbStellarObjects);
                         StarSystemHelper.MakeStellarObject(starSystem);
                         resolve();
-                    }, 1000 * i);
+                    }, timeOut * i);
                 })
             );
         }
@@ -299,7 +301,7 @@ export class StarSystemView implements View {
                         console.log("Planet:", i + 1, "of", systemModel.getNbPlanets());
                         StarSystemHelper.MakePlanet(starSystem);
                         resolve();
-                    }, 1000 * i);
+                    }, timeOut * i);
                 })
             );
         }
