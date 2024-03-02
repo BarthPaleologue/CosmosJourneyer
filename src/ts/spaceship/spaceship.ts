@@ -212,7 +212,7 @@ export class Spaceship implements Transformable {
      * @returns The speed of the ship in m/s
      */
     public getSpeed(): number {
-        return this.warpDrive.isEnabled() ? this.warpDrive.getWarpSpeed() : this.aggregate.body.getLinearVelocity().length();
+        return this.warpDrive.isEnabled() ? this.warpDrive.getWarpSpeed() : this.aggregate.body.getLinearVelocity().dot(getForwardDirection(this.getTransform()));
     }
 
     public getThrottle(): number {

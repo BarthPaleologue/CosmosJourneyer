@@ -72,10 +72,10 @@
     #throttleStripes {
       border-top: 1px solid rgba(255, 255, 255, 0.5);
       background: repeating-linear-gradient(to top,
-        transparent,
-        transparent 4px,
-        black 4px,
-        black 8px
+              transparent,
+              transparent 4px,
+              black 4px,
+              black 8px
       );
       height: 100%;
       width: 100%;
@@ -83,7 +83,6 @@
       position: absolute;
       bottom: inherit;
       left: inherit;
-
     }
   }
 
