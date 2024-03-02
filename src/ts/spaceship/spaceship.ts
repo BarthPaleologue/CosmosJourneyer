@@ -216,7 +216,7 @@ export class Spaceship implements Transformable {
     }
 
     public getThrottle(): number {
-        return this.warpDrive.isEnabled() ? this.warpDrive.getTargetThrottle() : this.mainEngineThrottle;
+        return this.warpDrive.isEnabled() ? this.warpDrive.getThrottle() : this.mainEngineThrottle;
     }
 
     public increaseMainEngineThrottle(delta: number) {

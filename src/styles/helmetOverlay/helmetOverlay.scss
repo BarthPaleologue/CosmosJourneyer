@@ -50,12 +50,49 @@
     }
   }
 
-  #speedometer {
+  #throttle {
+    margin-bottom: 5px;
+    width: 50px;
+    height: 400px;
+
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: 25px;
+    right: 5px;
+
+    #throttleBar {
+      background: white;
+      height: 100%;
+      width: 100%;
+
+      position: absolute;
+      bottom: inherit;
+      left: inherit;
+    }
+
+    #throttleStripes {
+      border-top: 1px solid rgba(255, 255, 255, 0.5);
+      background: repeating-linear-gradient(to top,
+        transparent,
+        transparent 4px,
+        black 4px,
+        black 8px
+      );
+      height: 100%;
+      width: 100%;
+
+      position: absolute;
+      bottom: inherit;
+      left: inherit;
+
+    }
+  }
+
+  #speed {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
     color: white;
-    font-size: 200%;
-    text-shadow: white 0 0 3px;
+    font-family: Nasalization, sans-serif;
+    font-size: 2em;
   }
 }
