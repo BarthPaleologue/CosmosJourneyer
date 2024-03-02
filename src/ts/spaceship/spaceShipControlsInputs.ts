@@ -68,12 +68,6 @@ const rollPitch = new Action({
     ]
 });
 
-const toggleFlightAssist = new Action({
-    bindings: [keyboard.getControl("KeyF")]
-});
-
-const toggleFlightAssistInteraction = new PressInteraction(toggleFlightAssist);
-
 const toggleWarpDrive = new Action({
     bindings: [keyboard.getControl("KeyH")],
 });
@@ -95,7 +89,6 @@ export const SpaceShipControlsInputs = new InputMap<{
     upDown: Action<number>,
     throttle: Action<number>,
     rollPitch: Action<[number, number]>,
-    toggleFlightAssist: PressInteraction,
     toggleWarpDrive: PressInteraction,
     ignorePointer: Action<number>,
     throttleToZero: PressInteraction
@@ -104,7 +97,6 @@ export const SpaceShipControlsInputs = new InputMap<{
     upDown: upDownAction,
     throttle: throttleAction,
     rollPitch: rollPitch,
-    toggleFlightAssist: toggleFlightAssistInteraction,
     toggleWarpDrive: toggleWarpDriveInteraction,
     ignorePointer: ignorePointer,
     throttleToZero: throttleToZeroInteraction

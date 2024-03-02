@@ -56,10 +56,6 @@ export class ShipControls implements Controls {
 
         this.scene = scene;
 
-        SpaceShipControlsInputs.map.toggleFlightAssist.on("complete", () => {
-            this.spaceship.setFlightAssistEnabled(!this.spaceship.getFlightAssistEnabled());
-        });
-
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
             this.spaceship.toggleWarpDrive();
         });

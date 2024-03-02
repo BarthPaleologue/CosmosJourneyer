@@ -55,8 +55,6 @@ export class Spaceship implements Transformable {
     readonly aggregate: PhysicsAggregate;
     private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
 
-    private flightAssistEnabled = true;
-
     private readonly warpDrive = new WarpDrive(false);
 
     private mainEngineThrottle = 0;
@@ -117,6 +115,7 @@ export class Spaceship implements Transformable {
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
         }
         this.aggregate.body.disablePreStep = false;
+        this.aggregate.body.setAngularDamping(0.9);
 
         this.aggregate.body.setCollisionCallbackEnabled(true);
 
@@ -204,14 +203,6 @@ export class Spaceship implements Transformable {
      */
     public getWarpDrive(): WarpDrive {
         return this.warpDrive;
-    }
-
-    public setFlightAssistEnabled(enabled: boolean) {
-        this.flightAssistEnabled = enabled;
-    }
-
-    public getFlightAssistEnabled(): boolean {
-        return this.flightAssistEnabled;
     }
 
     /**
@@ -395,13 +386,6 @@ export class Spaceship implements Transformable {
         this.mainThrusters.forEach(thruster => {
             thruster.update(deltaTime);
         });
-
-        if (this.flightAssistEnabled) {
-            this.aggregate.body.setAngularDamping(0.9);
-        } else {
-            //FIXME: for some reason, the angular damping is not working
-            this.aggregate.body.setAngularDamping(1);
-        }
 
         if (this.state === ShipState.LANDING) {
             this.land(deltaTime);
