@@ -26,6 +26,10 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
 import { moveTowards } from "../utils/moveTowards";
+import { createNotification } from "../utils/notification";
+import { StarSystemInputs } from "../inputs/starSystemInputs";
+import { buttonInputToString, pressInteractionToStrings } from "../utils/inputControlsString";
+import { ButtonInputControl } from "@brianchirls/game-input/browser";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -82,6 +86,11 @@ export class ShipControls implements Controls {
         this.spaceship.onWarpDriveDisabled.add(() => {
             this.shakeCamera(2500);
             this.targetFov = this.baseFov * 0.5;
+        });
+
+        this.spaceship.onLandingObservable.add(() => {
+            const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter).join(", ");
+            createNotification(`Landing complete! Use ${bindingsString} to disembark.`, 5000);
         });
     }
 

@@ -14,26 +14,9 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { SystemSeed } from "../utils/systemSeed";
 import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import packageInfo from "../../../package.json";
-import { InputMaps } from "../inputs/inputMaps";
-import Action from "@brianchirls/game-input/Action";
-import Interaction from "@brianchirls/game-input/interactions/Interaction";
 import { Assets } from "../assets";
-import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import {
-    AxisComposite,
-    ButtonInputControl,
-    StickInputControl,
-    Vector2InputControl
-} from "@brianchirls/game-input/browser";
 import { Settings } from "../settings";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import {
-    axisCompositeToString,
-    buttonInputToString,
-    dPadCompositeToString,
-    stickInputToString,
-    vector2ToString
-} from "../utils/inputControlsString";
 import { initSettingsPanel } from "./settingsPanel";
 
 export class MainMenu {

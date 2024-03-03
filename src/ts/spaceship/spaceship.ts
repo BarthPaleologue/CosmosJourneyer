@@ -90,6 +90,8 @@ export class Spaceship implements Transformable {
     readonly onWarpDriveEnabled = new Observable<void>();
     readonly onWarpDriveDisabled = new Observable<void>();
 
+    readonly onLandingObservable = new Observable<void>();
+
     constructor(scene: Scene) {
         this.instanceRoot = Assets.CreateWandererInstance();
         setRotationQuaternion(this.instanceRoot, Quaternion.Identity());
@@ -250,6 +252,8 @@ export class Spaceship implements Transformable {
         this.state = ShipState.LANDED;
         this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
         this.landingTarget = null;
+
+        this.onLandingObservable.notifyObservers();
     }
 
     public isLanded(): boolean {
