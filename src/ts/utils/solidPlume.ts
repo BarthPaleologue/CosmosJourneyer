@@ -22,7 +22,7 @@ export class SolidPlume {
 
     SPS: SolidParticleSystem;
 
-    private nbSubTimeSteps = 5;
+    private nbSubTimeSteps = 1;
     private subTimeStep = 0;
 
     constructor(engineAnchor: TransformNode, scene: Scene) {
@@ -114,7 +114,7 @@ export class SolidPlume {
         const r = Math.sqrt(Math.random());
         const theta = Math.random() * 2 * Math.PI;
 
-        const position = new Vector3(r * Math.cos(theta), r * Math.sin(theta), 0);
+        const position = new Vector3(r * Math.cos(theta), r * Math.sin(theta), Math.random() * SolidPlume.TUNNEL_LENGTH);
 
         particle.position.copyFrom(position);
 
