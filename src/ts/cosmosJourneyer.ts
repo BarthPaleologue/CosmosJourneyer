@@ -45,6 +45,7 @@ import { updateInputDevices } from "./inputs/devices";
 import { Assets } from "./assets";
 import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
+import { GeneralInputs } from "./inputs/generalInputs";
 
 enum EngineState {
     UNINITIALIZED,
@@ -138,17 +139,25 @@ export class CosmosJourneyer {
             this.engine.resize(true);
         });
 
-        //TODO: use the keyboard class
-        document.addEventListener("keydown", (e) => {
+        GeneralInputs.map.toggleStarMap.on("complete", () => {
             if (this.mainMenu?.isVisible()) return;
-            if (e.key === "p") this.takeScreenshot();
-            if (e.key === "v") this.takeVideoCapture();
-            if (e.key === "m") this.toggleStarMap();
+            this.toggleStarMap();
+        });
 
-            if (e.key === "Escape") {
-                if (!this.isPaused()) this.pause();
-                else this.resume();
-            }
+        GeneralInputs.map.screenshot.on("complete", () => {
+            if (this.mainMenu?.isVisible()) return;
+            this.takeScreenshot();
+        });
+
+        GeneralInputs.map.videoCapture.on("complete", () => {
+            if (this.mainMenu?.isVisible()) return;
+            this.takeVideoCapture();
+        });
+
+        GeneralInputs.map.togglePause.on("complete", () => {
+            if (this.mainMenu?.isVisible()) return;
+            if (!this.isPaused()) this.pause();
+            else this.resume();
         });
     }
 

@@ -186,27 +186,6 @@ document.addEventListener("keydown", (e) => {
         });
         console.log("Vertices", nbVertices, "Instances", nbInstances);
     }
-
-    if (e.key === "y") {
-        if (starSystemView.scene.getActiveControls() === spaceshipController) {
-            console.log("disembark");
-
-            characterController.getTransform().setEnabled(true);
-            characterController.getTransform().setAbsolutePosition(spaceshipController.getTransform().absolutePosition);
-            translate(characterController.getTransform(), getForwardDirection(spaceshipController.getTransform()).scale(10));
-
-            setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
-
-            starSystemView.scene.setActiveControls(characterController);
-            starSystemView.getStarSystem().postProcessManager.rebuild();
-        } else if (starSystemView.scene.getActiveControls() === characterController) {
-            console.log("embark");
-
-            characterController.getTransform().setEnabled(false);
-            starSystemView.scene.setActiveControls(spaceshipController);
-            starSystemView.getStarSystem().postProcessManager.rebuild();
-        }
-    }
 });
 
 starSystemView.ui.setEnabled(true);

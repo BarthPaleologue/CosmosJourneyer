@@ -42,7 +42,12 @@ import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge"
 import { DefaultControls } from "../defaultController/defaultControls";
 import { CharacterControls } from "../spacelegs/characterControls";
 import { Assets } from "../assets";
-import { getRotationQuaternion, setRotationQuaternion } from "../uberCore/transforms/basicTransform";
+import {
+    getForwardDirection,
+    getRotationQuaternion,
+    setRotationQuaternion,
+    translate
+} from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
@@ -51,6 +56,7 @@ import { SystemSeed } from "../utils/systemSeed";
 import { StarSector } from "../starmap/starSector";
 import { StarMap } from "../starmap/starMap";
 import { SystemTarget } from "../utils/systemTarget";
+import { StarSystemInputs } from "../inputs/starSystemInputs";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -168,61 +174,90 @@ export class StarSystemView implements View {
             }
         ]);
 
-        document.addEventListener("keydown", async (e) => {
-            if (e.key === "o") {
-                const enabled = !this.ui.isEnabled();
-                if (enabled) Assets.MENU_HOVER_SOUND.play();
-                else Assets.MENU_HOVER_SOUND.play();
-                this.ui.setEnabled(enabled);
+        StarSystemInputs.map.toggleOverlay.on("complete", () => {
+            const enabled = !this.ui.isEnabled();
+            if (enabled) Assets.MENU_HOVER_SOUND.play();
+            else Assets.MENU_HOVER_SOUND.play();
+            this.ui.setEnabled(enabled);
+            this.helmetOverlay.setVisibility(enabled);
+        });
+
+        StarSystemInputs.map.toggleOrbitsAndAxis.on("complete", () => {
+            const enabled = !this.orbitRenderer.isVisible();
+            if (enabled) Assets.MENU_HOVER_SOUND.play();
+            else Assets.MENU_HOVER_SOUND.play();
+            this.orbitRenderer.setVisibility(enabled);
+            this.axisRenderer.setVisibility(enabled);
+        });
+
+        StarSystemInputs.map.toggleDebugUi.on("complete", () => {
+            this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
+        });
+
+        StarSystemInputs.map.cycleViews.on("complete", () => {
+            if (this.scene.getActiveControls() === this.getSpaceshipControls()) {
+                this.switchToDefaultControls();
+            } else if (this.scene.getActiveControls() === this.getDefaultControls()) {
+                this.switchToCharacterControls();
+            } else if (this.scene.getActiveControls() === this.getCharacterControls()) {
+                this.switchToSpaceshipControls();
             }
-            if (e.key === "n") {
-                const enabled = !this.orbitRenderer.isVisible();
-                if (enabled) Assets.MENU_HOVER_SOUND.play();
-                else Assets.MENU_HOVER_SOUND.play();
-                this.orbitRenderer.setVisibility(enabled);
-                this.axisRenderer.setVisibility(enabled);
-            }
-            if (e.key === "u") this.bodyEditor.setVisibility(this.bodyEditor.getVisibility() === EditorVisibility.HIDDEN ? EditorVisibility.NAVBAR : EditorVisibility.HIDDEN);
-            if (e.key === "b") this.helmetOverlay.setVisibility(!this.helmetOverlay.isVisible());
+        });
 
-            if (e.key === "g") {
-                if (this.scene.getActiveControls() === this.getSpaceshipControls()) {
-                    this.switchToDefaultControls();
-                } else if (this.scene.getActiveControls() === this.getDefaultControls()) {
-                    this.switchToCharacterControls();
-                } else if (this.scene.getActiveControls() === this.getCharacterControls()) {
-                    this.switchToSpaceshipControls();
-                }
+        StarSystemInputs.map.setTarget.on("complete", () => {
+            const closestObjectToCenter = this.getStarSystem().getClosestToScreenCenterOrbitalObject();
+
+            if (this.ui.getTarget() === closestObjectToCenter) {
+                this.helmetOverlay.setTarget(null);
+                this.ui.setTarget(null);
+                Assets.TARGET_UNLOCK_SOUND.play();
+                return;
             }
 
-            if (e.key === " ") {
-                const target = this.ui.getTarget();
-                if (target instanceof SystemTarget) {
-                    this.isLoadingSystem = true;
-                    this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(true);
-                    const systemSeed = target.seed;
-                    await this.loadStarSystem(new StarSystemController(systemSeed, this.scene), true);
-                    await this.initStarSystem();
-                    this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
-                    this.isLoadingSystem = false;
-                }
+            if (closestObjectToCenter === null) return;
+
+            this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
+            this.ui.setTarget(closestObjectToCenter);
+            Assets.TARGET_LOCK_SOUND.play();
+        });
+
+        StarSystemInputs.map.jumpToSystem.on("complete", async () => {
+            const target = this.ui.getTarget();
+            if (target instanceof SystemTarget) {
+                this.isLoadingSystem = true;
+                this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(true);
+                const systemSeed = target.seed;
+                await this.loadStarSystem(new StarSystemController(systemSeed, this.scene), true);
+                await this.initStarSystem();
+                this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
+                this.isLoadingSystem = false;
             }
+        });
 
-            if (e.key === "t") {
-                const closestObjectToCenter = this.getStarSystem().getClosestToScreenCenterOrbitalObject();
+        StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", () => {
+            const characterControls = this.getCharacterControls();
+            const shipControls = this.getSpaceshipControls();
 
-                if (this.ui.getTarget() === closestObjectToCenter) {
-                    this.helmetOverlay.setTarget(null);
-                    this.ui.setTarget(null);
-                    Assets.TARGET_UNLOCK_SOUND.play();
-                    return;
-                }
+            if (this.scene.getActiveControls() === shipControls) {
+                console.log("disembark");
 
-                if (closestObjectToCenter === null) return;
+                characterControls.getTransform().setEnabled(true);
+                characterControls.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
+                translate(characterControls.getTransform(), getForwardDirection(shipControls.getTransform()).scale(10));
 
-                this.helmetOverlay.setTarget(closestObjectToCenter.getTransform());
-                this.ui.setTarget(closestObjectToCenter);
-                Assets.TARGET_LOCK_SOUND.play();
+                setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
+
+                this.scene.setActiveControls(characterControls);
+                this.getStarSystem().postProcessManager.rebuild();
+
+                shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
+                shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
+            } else if (this.scene.getActiveControls() === characterControls) {
+                console.log("embark");
+
+                characterControls.getTransform().setEnabled(false);
+                this.scene.setActiveControls(shipControls);
+                this.getStarSystem().postProcessManager.rebuild();
             }
         });
 

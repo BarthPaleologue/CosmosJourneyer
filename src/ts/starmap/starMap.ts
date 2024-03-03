@@ -57,6 +57,7 @@ import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
 import { Settings } from "../settings";
 import { parseDistance } from "../utils/parseToStrings";
+import { StarMapInputs } from "../inputs/starMapInputs";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -144,8 +145,8 @@ export class StarMap implements View {
             this.dispatchWarpCallbacks();
         });
 
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "f") this.focusOnCurrentSystem();
+        StarMapInputs.map.focusOnCurrentSystem.on("complete", () => {
+            this.focusOnCurrentSystem();
         });
 
         const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controls.getActiveCamera()]);
