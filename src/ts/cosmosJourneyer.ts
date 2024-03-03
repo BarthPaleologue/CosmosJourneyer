@@ -46,6 +46,7 @@ import { Assets } from "./assets";
 import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
+import { createNotification } from "./utils/notification";
 
 enum EngineState {
     UNINITIALIZED,
@@ -97,6 +98,7 @@ export class CosmosJourneyer {
 
         this.mainMenu = new MainMenu(starSystemView);
         this.mainMenu.onStartObservable.add(() => {
+            createNotification("Your pointer controls the pitch and roll of your spaceship. The neutral position is at the center of the screen.", 20000);
             this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
             this.starSystemView.switchToSpaceshipControls();
             this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
@@ -123,7 +125,9 @@ export class CosmosJourneyer {
 
             const payload = `universeCoordinates=${urlData}`;
             const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/?${payload}`);
-            navigator.clipboard.writeText(url.toString()).then(() => console.log("Copied to clipboard"));
+            navigator.clipboard.writeText(url.toString()).then(() => {
+                createNotification("Copied to clipboard", 2000);
+            });
         });
         this.pauseMenu.onSave.add(() => this.downloadSaveFile());
 
