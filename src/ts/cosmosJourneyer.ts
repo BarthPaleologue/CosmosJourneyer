@@ -92,7 +92,7 @@ export class CosmosJourneyer {
             this.starSystemView.setSystemAsTarget(seed);
 
             const bindingsString = pressInteractionToStrings(StarSystemInputs.map.jumpToSystem).join(" or ");
-            createNotification(`Align your ship with the system target and press ${bindingsString} to make a hyperspace jump.`, 20000);
+            createNotification(`Align your ship with the system target using the target helper on the bottom right of your screen then press ${bindingsString} to make a hyperspace jump.`, 20000);
         });
 
         // Init the active scene
