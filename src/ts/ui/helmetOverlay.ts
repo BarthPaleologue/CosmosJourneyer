@@ -83,14 +83,15 @@ export class HelmetOverlay {
     displaySpeed(shipThrottle: number, speed: number) {
         const throttleContainer = document.getElementById("throttle");
         if (throttleContainer === null) throw new Error("Throttle container not found");
+        throttleContainer.style.alignItems = shipThrottle < 0 ? "flex-start" : "flex-end";
 
-        const throttleBar = document.getElementById("throttleBar");
-        if(throttleBar === null) throw new Error("Throttle bar not found");
-        throttleBar.style.height = `${(100 * Math.abs(shipThrottle)).toFixed(0)}%`;
-        throttleBar.style.backgroundColor = shipThrottle < 0 ? "rgba(255, 128, 128, 1)" : "rgba(128, 255, 128, 1)";
+        const throttleStripes = document.getElementById("throttleStripes");
+        if (throttleStripes === null) throw new Error("Throttle bar not found");
+        throttleStripes.style.height = `${(100 * Math.abs(shipThrottle)).toFixed(0)}%`;
+        throttleStripes.classList.toggle("reversed", shipThrottle < 0);
 
         const speedIndicator = document.getElementById("speed");
-        if(speedIndicator === null) throw new Error("Speed indicator not found");
+        if (speedIndicator === null) throw new Error("Speed indicator not found");
         speedIndicator.innerText = parseSpeed(speed);
     }
 }

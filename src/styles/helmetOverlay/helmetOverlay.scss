@@ -56,33 +56,32 @@
     height: 400px;
 
     position: absolute;
-    bottom: 25px;
+    bottom: 50px;
     right: 5px;
 
-    #throttleBar {
-      background: white;
-      height: 100%;
-      width: 100%;
+    border-top: 1px solid white;
 
-      position: absolute;
-      bottom: inherit;
-      left: inherit;
-    }
+    display: flex;
+    align-items: flex-end;
 
     #throttleStripes {
-      border-top: 1px solid rgba(255, 255, 255, 0.5);
       background: repeating-linear-gradient(to top,
-              transparent,
+              rgba(128, 255, 128, 1.0),
+              rgba(128, 255, 128, 1.0) 4px,
               transparent 4px,
-              black 4px,
-              black 8px
+              transparent 8px
       );
       height: 100%;
       width: 100%;
 
-      position: absolute;
-      bottom: inherit;
-      left: inherit;
+      &.reversed {
+        background: repeating-linear-gradient(to bottom,
+                rgba(255, 128, 128, 1.0),
+                rgba(255, 128, 128, 1.0) 4px,
+                transparent 4px,
+                transparent 8px
+        );
+      }
     }
   }
 
