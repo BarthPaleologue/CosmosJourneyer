@@ -47,6 +47,8 @@ import { AudioManager } from "./audio/audioManager";
 import { AudioMasks } from "./audio/audioMasks";
 import { GeneralInputs } from "./inputs/generalInputs";
 import { createNotification } from "./utils/notification";
+import { StarSystemInputs } from "./inputs/starSystemInputs";
+import { pressInteractionToStrings } from "./utils/inputControlsString";
 
 enum EngineState {
     UNINITIALIZED,
@@ -79,7 +81,7 @@ export class CosmosJourneyer {
 
         this.starSystemView = starSystemView;
         this.starMap = starMap;
-        this.starMap.onWarpObservable.add((seed: SystemSeed) => {
+        this.starMap.onTargetSetObservable.add((seed: SystemSeed) => {
             this.toggleStarMap();
 
             const activeControls = this.starSystemView.scene.getActiveControls();
@@ -88,6 +90,9 @@ export class CosmosJourneyer {
             }
 
             this.starSystemView.setSystemAsTarget(seed);
+
+            const bindingsString = pressInteractionToStrings(StarSystemInputs.map.jumpToSystem).join(" or ");
+            createNotification(`Align your ship with the system target and press ${bindingsString} to make a hyperspace jump.`, 20000);
         });
 
         // Init the active scene
@@ -105,7 +110,7 @@ export class CosmosJourneyer {
             this.starSystemView.showHtmlUI();
             this.starSystemView.ui.setEnabled(true);
             const target = this.starSystemView.getStarSystem().getClosestToScreenCenterOrbitalObject();
-            if(target !== null) {
+            if (target !== null) {
                 this.starSystemView.ui.setTarget(target);
                 this.starSystemView.helmetOverlay.setTarget(target.getTransform());
             }

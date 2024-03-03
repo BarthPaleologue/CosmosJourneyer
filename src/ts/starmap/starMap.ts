@@ -99,7 +99,7 @@ export class StarMap implements View {
     private readonly travelLine: ThickLines;
     private readonly thickLines: ThickLines[];
 
-    public readonly onWarpObservable: Observable<SystemSeed> = new Observable();
+    public readonly onTargetSetObservable: Observable<SystemSeed> = new Observable();
 
     /**
      * The position of the star sector the player is currently in (relative to the global node).
@@ -280,7 +280,7 @@ export class StarMap implements View {
 
     private dispatchWarpCallbacks() {
         if (this.selectedSystemSeed === null) throw new Error("No system selected!");
-        this.onWarpObservable.notifyObservers(this.selectedSystemSeed);
+        this.onTargetSetObservable.notifyObservers(this.selectedSystemSeed);
     }
 
     /**

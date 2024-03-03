@@ -42,6 +42,7 @@ import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
 import { MainThruster } from "./mainThruster";
 import { AudioMasks } from "../audio/audioMasks";
+import { createNotification } from "../utils/notification";
 
 enum ShipState {
     FLYING,
@@ -90,6 +91,7 @@ export class Spaceship implements Transformable {
     readonly onWarpDriveEnabled = new Observable<void>();
     readonly onWarpDriveDisabled = new Observable<void>();
 
+    readonly onLandingEngaged = new Observable<void>();
     readonly onLandingObservable = new Observable<void>();
 
     constructor(scene: Scene) {
@@ -237,7 +239,8 @@ export class Spaceship implements Transformable {
         if (this.landingTarget === null) {
             throw new Error("Landing target is null");
         }
-        console.log("landing on", this.landingTarget.getTransform().name);
+
+        this.onLandingEngaged.notifyObservers();
     }
 
     public engageLandingOnPad(landingPad: LandingPad) {

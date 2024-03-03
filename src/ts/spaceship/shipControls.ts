@@ -81,16 +81,22 @@ export class ShipControls implements Controls {
         this.spaceship.onWarpDriveEnabled.add(() => {
             this.shakeCamera(2000);
             this.targetFov = this.baseFov * 3.0;
+            createNotification("Warp drive enabled!", 5000);
         });
 
         this.spaceship.onWarpDriveDisabled.add(() => {
             this.shakeCamera(2500);
             this.targetFov = this.baseFov * 0.5;
+            createNotification("Warp drive disabled!", 5000);
         });
 
         this.spaceship.onLandingObservable.add(() => {
             const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter).join(", ");
             createNotification(`Landing complete! Use ${bindingsString} to disembark.`, 5000);
+        });
+
+        this.spaceship.onLandingEngaged.add(() => {
+            createNotification(`Landing sequence engaged.`, 5000);
         });
     }
 
