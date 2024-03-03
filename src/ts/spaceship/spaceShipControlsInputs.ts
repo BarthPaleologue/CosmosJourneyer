@@ -52,16 +52,9 @@ const rollPitch = new Action({
 
             // dead zone
             const deadZone = 0.1;
-            if (Math.abs(pointerX) < deadZone) {
-                pointerX = 0;
-            }
-            if (Math.abs(pointerY) < deadZone) {
-                pointerY = 0;
-            }
 
-            // logarithmic scale
-            pointerX = Math.sign(pointerX) * Math.log(1 + Math.abs(pointerX));
-            pointerY = Math.sign(pointerY) * Math.log(1 + Math.abs(pointerY));
+            pointerX = Math.sign(pointerX) * Math.max(0, Math.abs(pointerX) - deadZone) ** 2;
+            pointerY = Math.sign(pointerY) * Math.max(0, Math.abs(pointerY) - deadZone) ** 2;
 
             return [pointerX, pointerY];
         }

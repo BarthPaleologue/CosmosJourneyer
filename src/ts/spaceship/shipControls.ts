@@ -127,8 +127,8 @@ export class ShipControls implements Controls {
         }
 
         if (!this.spaceship.isLanded()) {
-            roll(this.getTransform(), inputRoll * deltaTime);
-            pitch(this.getTransform(), inputPitch * deltaTime);
+            roll(this.getTransform(), 2.0 * inputRoll * deltaTime);
+            pitch(this.getTransform(), 2.0 * inputPitch * deltaTime);
         }
 
         // camera shake
