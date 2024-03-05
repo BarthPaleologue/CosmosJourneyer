@@ -32,6 +32,7 @@ import { CloudsPostProcess } from "./volumetricCloudsPostProcess";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
+//import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { PostProcessType } from "./postProcessTypes";
@@ -173,7 +174,7 @@ export class PostProcessManager {
         });
 
         //this.bloomRenderEffect = new BloomEffect(scene, 1.0, 2.0, 32);
-        //this.bloomRenderEffect.threshold = 0.5;
+        //this.bloomRenderEffect.threshold = 0.7;
     }
 
     /**
