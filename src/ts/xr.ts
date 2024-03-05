@@ -33,6 +33,8 @@ import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
 import { ScenePerformancePriority } from "@babylonjs/core/scene";
 
+import "@babylonjs/core";
+
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
