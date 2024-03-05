@@ -57,6 +57,10 @@ import { StarSector } from "../starmap/starSector";
 import { StarMap } from "../starmap/starMap";
 import { SystemTarget } from "../utils/systemTarget";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
+import { createNotification } from "../utils/notification";
+import { axisCompositeToString, pressInteractionToStrings } from "../utils/inputControlsString";
+import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
+import { AxisComposite } from "@brianchirls/game-input/browser";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -258,6 +262,15 @@ export class StarSystemView implements View {
                 characterControls.getTransform().setEnabled(false);
                 this.scene.setActiveControls(shipControls);
                 this.getStarSystem().postProcessManager.rebuild();
+
+                if(shipControls.spaceship.isLanded()) {
+                    const bindings = SpaceShipControlsInputs.map.upDown.bindings;
+                    const control = bindings[0].control;
+                    if(!(control instanceof AxisComposite)) {
+                        throw new Error("Up down is not an axis composite");
+                    }
+                    createNotification(`Hold ${axisCompositeToString(control)[1][1]} to lift off.`, 5000);
+                }
             }
         });
 
