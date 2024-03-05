@@ -22,6 +22,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "./types";
 import { Scene } from "@babylonjs/core/scene";
+import { Constants } from "@babylonjs/core/Engines/constants";
 
 /**
  * A wrapper around BabylonJS post processes that allows more predictable and easier to use uniforms
@@ -34,7 +35,7 @@ export class UberPostProcess extends PostProcess {
         const uniformNames = uniforms.map((uniform) => uniform.name);
         const samplerNames = samplers.map((sampler) => sampler.name);
 
-        super(name, fragmentName, uniformNames, samplerNames, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false);
+        super(name, fragmentName, uniformNames, samplerNames, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.uniforms.push(...uniforms);
         this.samplers.push(...samplers);
