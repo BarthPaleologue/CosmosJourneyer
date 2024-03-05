@@ -25,8 +25,14 @@ export class PauseMenu {
 
     private readonly screenshotButton: HTMLElement;
     private readonly shareButton: HTMLElement;
+    private readonly contributeButton: HTMLElement;
+    private readonly settingsButton: HTMLElement;
     private readonly saveButton: HTMLElement;
     private readonly resumeButton: HTMLElement;
+
+    private readonly settingsPanel: HTMLElement;
+    private readonly contibutePanel: HTMLElement;
+    private activePanel: HTMLElement | null = null;
 
     readonly onScreenshot = new Observable<void>();
     readonly onShare = new Observable<void>();
@@ -43,6 +49,20 @@ export class PauseMenu {
 
         this.shareButton = document.getElementById("shareButton") as HTMLElement;
         this.shareButton.addEventListener("click", () => this.onShare.notifyObservers());
+
+        this.contributeButton = document.getElementById("pauseContributeButton") as HTMLElement;
+        this.contributeButton.addEventListener("click", () => {
+            Assets.MENU_SELECT_SOUND.play();
+
+            this.setActivePanel(this.activePanel === this.contibutePanel ? null : this.contibutePanel);
+        });
+
+        this.settingsButton = document.getElementById("pauseSettingsButton") as HTMLElement;
+        this.settingsButton.addEventListener("click", () => {
+            Assets.MENU_SELECT_SOUND.play();
+
+            this.setActivePanel(this.activePanel === this.settingsPanel ? null : this.settingsPanel);
+        });
 
         this.saveButton = document.getElementById("saveButton") as HTMLElement;
         this.saveButton.addEventListener("click", () => this.onSave.notifyObservers());
@@ -62,12 +82,34 @@ export class PauseMenu {
             });
         });
 
+        const settingsPanel = document.getElementById("settingsPanel");
+        if (settingsPanel === null) throw new Error("#settingsPanel not found");
+        this.settingsPanel = settingsPanel;
+
+        const contributePanel = document.getElementById("contribute");
+        if (contributePanel === null) throw new Error("#contribute not found");
+        this.contibutePanel = contributePanel;
+
         this.setVisibility(false);
+    }
+
+    private setActivePanel(panel: HTMLElement | null) {
+        if (this.activePanel !== null) {
+            this.activePanel.classList.remove("visible");
+        }
+
+        this.activePanel = panel;
+
+        if (this.activePanel !== null) {
+            this.activePanel.classList.add("visible");
+        }
     }
 
     public setVisibility(visible: boolean) {
         this.rootNode.style.display = visible ? "grid" : "none";
         this.mask.style.display = visible ? "block" : "none";
+
+        this.activePanel?.classList.remove("visible");
     }
 
     public isVisible(): boolean {

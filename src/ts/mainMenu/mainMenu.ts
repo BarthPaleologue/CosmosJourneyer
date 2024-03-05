@@ -32,16 +32,16 @@ export class MainMenu {
     readonly onCreditsObservable = new Observable<void>();
     readonly onAboutObservable = new Observable<void>();
 
-    private htmlRoot: HTMLElement | null = null;
-    private title: HTMLElement | null = null;
-    private version: HTMLElement | null = null;
+    private readonly htmlRoot: HTMLElement;
+    private readonly title: HTMLElement;
+    private readonly version: HTMLElement;
 
     private activeRightPanel: HTMLElement | null = null;
-    private loadSavePanel: HTMLElement | null = null;
-    private settingsPanel: HTMLElement | null = null;
-    private contributePanel: HTMLElement | null = null;
-    private creditsPanel: HTMLElement | null = null;
-    private aboutPanel: HTMLElement | null = null;
+    private readonly loadSavePanel: HTMLElement;
+    private readonly settingsPanel: HTMLElement;
+    private readonly contributePanel: HTMLElement;
+    private readonly creditsPanel: HTMLElement;
+    private readonly aboutPanel: HTMLElement;
 
     constructor(starSystemView: StarSystemView) {
         this.starSystemView = starSystemView;
@@ -82,32 +82,13 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)];
         console.log(seed.starSectorX + ", " + seed.starSectorY + ", " + seed.starSectorZ + ", " + seed.index);
         this.starSystemController = new StarSystemController(seed, this.scene);
-    }
-
-    async init() {
-        await this.starSystemView.loadStarSystem(this.starSystemController, true);
-
-        this.starSystemView.onInitStarSystem.addOnce(() => {
-            this.starSystemView.switchToDefaultControls();
-            const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE ? 8 : 2;
-            const targetObject = this.starSystemController.planets.length > 0 ? this.starSystemController.planets[0] : this.starSystemController.stellarObjects[0];
-            positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
-
-            if (targetObject instanceof GasPlanet) Settings.TIME_MULTIPLIER = 30;
-            else Settings.TIME_MULTIPLIER = 3;
-
-            Assets.MAIN_MENU_BACKGROUND_MUSIC.play();
-        });
-
-        this.starSystemView.ui.setEnabled(false);
-
-        this.starSystemView.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
 
         document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
 
         const htmlRoot = document.getElementById("mainMenu");
         if (htmlRoot === null) throw new Error("#mainMenu does not exist!");
         this.htmlRoot = htmlRoot;
+        this.htmlRoot.style.display = "none";
 
         const title = document.querySelector("#mainMenu h1");
         if (title === null) throw new Error("#mainMenu h1 does not exist!");
@@ -133,6 +114,24 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             });
         });
 
+        const loadSavePanel = document.getElementById("loadSavePanel");
+        if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
+        this.loadSavePanel = loadSavePanel;
+
+        this.settingsPanel = initSettingsPanel();
+
+        const contributePanel = document.getElementById("contribute");
+        if (contributePanel === null) throw new Error("#contribute does not exist!");
+        this.contributePanel = contributePanel;
+
+        const creditsPanel = document.getElementById("credits");
+        if (creditsPanel === null) throw new Error("#credits does not exist!");
+        this.creditsPanel = creditsPanel;
+
+        const aboutPanel = document.getElementById("about");
+        if (aboutPanel === null) throw new Error("#about does not exist!");
+        this.aboutPanel = aboutPanel;
+
         document.getElementById("startButton")?.addEventListener("click", () => {
             this.startAnimation(() => this.onStartObservable.notifyObservers());
         });
@@ -140,10 +139,72 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         const loadSaveButton = document.getElementById("loadSaveButton");
         if (loadSaveButton === null) throw new Error("#loadSaveButton does not exist!");
 
-        const loadSavePanel = document.getElementById("loadSavePanel");
-        if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
-        this.loadSavePanel = loadSavePanel;
+        this.initLoadSavePanel();
 
+        loadSaveButton.addEventListener("click", () => {
+            this.toggleActivePanel(this.loadSavePanel);
+        });
+
+        const settingsButton = document.getElementById("settingsButton");
+        if (settingsButton === null) throw new Error("#settingsButton does not exist!");
+
+        settingsButton.addEventListener("click", () => {
+            this.toggleActivePanel(this.settingsPanel);
+        });
+
+        const contributeButton = document.getElementById("contributeButton");
+        if (contributeButton === null) throw new Error("#contributeButton does not exist!");
+
+        contributeButton.addEventListener("click", () => {
+            this.toggleActivePanel(this.contributePanel);
+            this.onContributeObservable.notifyObservers();
+        });
+
+        const creditsButton = document.getElementById("creditsButton");
+        if (creditsButton === null) throw new Error("#creditsButton does not exist!");
+
+        creditsButton.addEventListener("click", () => {
+            this.toggleActivePanel(this.creditsPanel);
+            this.onCreditsObservable.notifyObservers();
+        });
+
+        const aboutButton = document.getElementById("aboutButton");
+        if (aboutButton === null) throw new Error("#aboutButton does not exist!");
+
+        aboutButton.addEventListener("click", () => {
+            this.toggleActivePanel(this.aboutPanel);
+            this.onAboutObservable.notifyObservers();
+        });
+
+    }
+
+    async init() {
+        await this.starSystemView.loadStarSystem(this.starSystemController, true);
+
+        this.starSystemView.onInitStarSystem.addOnce(() => {
+            this.starSystemView.switchToDefaultControls();
+            const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE ? 8 : 2;
+            const targetObject = this.starSystemController.planets.length > 0 ? this.starSystemController.planets[0] : this.starSystemController.stellarObjects[0];
+            positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
+
+            if (targetObject instanceof GasPlanet) Settings.TIME_MULTIPLIER = 30;
+            else Settings.TIME_MULTIPLIER = 3;
+
+            Assets.MAIN_MENU_BACKGROUND_MUSIC.play();
+        });
+
+        this.starSystemView.ui.setEnabled(false);
+
+        this.starSystemView.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
+
+        this.htmlRoot.style.display = "block";
+    }
+
+    /**
+     * Initializes the load save panel to be able to drop a file or click on the drop zone to load a save file
+     * @private
+     */
+    private initLoadSavePanel() {
         const dropFileZone = document.getElementById("dropFileZone");
         if (dropFileZone === null) throw new Error("#dropFileZone does not exist!");
 
@@ -212,53 +273,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                 reader.readAsText(file);
             };
             fileInput.click();
-        });
-
-        loadSaveButton.addEventListener("click", () => {
-            this.toggleActivePanel(loadSavePanel);
-        });
-
-        const settingsButton = document.getElementById("settingsButton");
-        if (settingsButton === null) throw new Error("#settingsButton does not exist!");
-
-        const settingsPanel = initSettingsPanel();
-
-        settingsButton.addEventListener("click", () => {
-            this.toggleActivePanel(settingsPanel);
-        });
-
-        const contributeButton = document.getElementById("contributeButton");
-        if (contributeButton === null) throw new Error("#contributeButton does not exist!");
-
-        const contributePanel = document.getElementById("contribute");
-        if (contributePanel === null) throw new Error("#contribute does not exist!");
-        this.contributePanel = contributePanel;
-
-        contributeButton.addEventListener("click", () => {
-            this.toggleActivePanel(contributePanel);
-            this.onContributeObservable.notifyObservers();
-        });
-
-        const creditsButton = document.getElementById("creditsButton");
-        if (creditsButton === null) throw new Error("#creditsButton does not exist!");
-        const creditsPanel = document.getElementById("credits");
-        if (creditsPanel === null) throw new Error("#credits does not exist!");
-        this.creditsPanel = creditsPanel;
-
-        creditsButton.addEventListener("click", () => {
-            this.toggleActivePanel(creditsPanel);
-            this.onCreditsObservable.notifyObservers();
-        });
-
-        const aboutButton = document.getElementById("aboutButton");
-        if (aboutButton === null) throw new Error("#aboutButton does not exist!");
-        const aboutPanel = document.getElementById("about");
-        if (aboutPanel === null) throw new Error("#about does not exist!");
-        this.aboutPanel = aboutPanel;
-
-        aboutButton.addEventListener("click", () => {
-            this.toggleActivePanel(aboutPanel);
-            this.onAboutObservable.notifyObservers();
         });
     }
 
