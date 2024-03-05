@@ -54,7 +54,7 @@ First, clone the repository and install the dependencies with `pnpm install`.
 
 ### Web
 
-To build the web version of Cosmos Journeyer, run `pnpm build`. Everything will be built in the `dist` folder.
+To build the web version of Cosmos Journeyer, run `pnpm run build`. Everything will be built in the `dist` folder.
 
 ### Tauri
 
