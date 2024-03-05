@@ -42,12 +42,7 @@ import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge"
 import { DefaultControls } from "../defaultController/defaultControls";
 import { CharacterControls } from "../spacelegs/characterControls";
 import { Assets } from "../assets";
-import {
-    getForwardDirection,
-    getRotationQuaternion,
-    setRotationQuaternion,
-    translate
-} from "../uberCore/transforms/basicTransform";
+import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { View } from "../utils/view";
@@ -62,6 +57,8 @@ import { axisCompositeToString, pressInteractionToStrings } from "../utils/input
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { BodyType } from "../model/common";
+import { getMoonSeed } from "../planets/common";
+import { Planet } from "../architecture/planet";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -264,10 +261,10 @@ export class StarSystemView implements View {
                 this.scene.setActiveControls(shipControls);
                 this.getStarSystem().postProcessManager.rebuild();
 
-                if(shipControls.spaceship.isLanded()) {
+                if (shipControls.spaceship.isLanded()) {
                     const bindings = SpaceShipControlsInputs.map.upDown.bindings;
                     const control = bindings[0].control;
-                    if(!(control instanceof AxisComposite)) {
+                    if (!(control instanceof AxisComposite)) {
                         throw new Error("Up down is not an axis composite");
                     }
                     createNotification(`Hold ${axisCompositeToString(control)[1][1]} to lift off.`, 5000);
@@ -329,50 +326,63 @@ export class StarSystemView implements View {
         // Stellar objects
         let objectIndex = 0;
         for (let i = 0; i < targetNbStellarObjects; i++) {
-                await new Promise<void>((resolve) => {
-                    setTimeout(() => {
-                        console.log("Stellar:", i + 1, "of", targetNbStellarObjects);
-                        const stellarObject = StarSystemHelper.MakeStellarObject(starSystem);
-                        stellarObject.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-                        resolve();
-                    }, timeOut);
-                });
+            await new Promise<void>((resolve) => {
+                setTimeout(() => {
+                    console.log("Stellar:", i + 1, "of", targetNbStellarObjects);
+                    const stellarObject = StarSystemHelper.MakeStellarObject(starSystem);
+                    stellarObject.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+                    resolve();
+                }, timeOut);
+            });
         }
+
+        const planets: Planet[] = [];
 
         // Planets
         for (let i = 0; i < systemModel.getNbPlanets(); i++) {
+            await new Promise<void>((resolve) => {
+                setTimeout(() => {
+                    console.log("Planet:", i + 1, "of", systemModel.getNbPlanets());
+                    const bodyType = starSystem.model.getBodyTypeOfPlanet(starSystem.planets.length);
+
+                    const planet = bodyType === BodyType.TELLURIC_PLANET ? StarSystemHelper.MakeTelluricPlanet(starSystem) : StarSystemHelper.MakeGasPlanet(starSystem);
+                    planet.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+
+                    planets.push(planet);
+
+                    resolve();
+                }, timeOut);
+            });
+        }
+
+        // Satellites
+        for (let i = 0; i < planets.length; i++) {
+            const planet = planets[i];
+            for (let j = 0; j < planet.model.nbMoons; j++) {
                 await new Promise<void>((resolve) => {
                     setTimeout(() => {
-                        console.log("Planet:", i + 1, "of", systemModel.getNbPlanets());
-                        const bodyType = starSystem.model.getBodyTypeOfPlanet(starSystem.planets.length);
-                        if (bodyType === BodyType.TELLURIC_PLANET) {
-                            const planet = StarSystemHelper.MakeTelluricPlanet(starSystem);
-                            planet.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-                            const satellites = StarSystemHelper.MakeSatellites(starSystem, planet);
-                            satellites.forEach((satellite) => {
-                                satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-                            });
-                            const spaceStations = StarSystemHelper.MakeSpaceStations(starSystem, planet);
-                            spaceStations.forEach((spaceStation) => {
-                                spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-                            });
-                        } else if (bodyType === BodyType.GAS_PLANET) {
-                            const planet = StarSystemHelper.MakeGasPlanet(starSystem);
-                            planet.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-                            const satellites = StarSystemHelper.MakeSatellites(starSystem, planet);
-                            satellites.forEach((satellite) => {
-                                satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-                            });
-                            const spaceStations = StarSystemHelper.MakeSpaceStations(starSystem, planet);
-                            spaceStations.forEach((spaceStation) => {
-                                spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-                            });
-                        } else {
-                            throw new Error(`Unknown body type ${bodyType}`);
-                        }
+                        console.log("Satellite:", j + 1, "of", planet.model.nbMoons);
+                        const satellite = StarSystemHelper.MakeSatellite(starSystem, planet, getMoonSeed(planet.model, j));
+                        satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
                         resolve();
-                    }, timeOut * i);
+                    }, timeOut);
                 });
+            }
+        }
+
+        // Space stations
+        for (let i = 0; i < planets.length; i++) {
+            const planet = planets[i];
+            for (let j = 0; j < planet.model.getNbSpaceStations(); j++) {
+                await new Promise<void>((resolve) => {
+                    setTimeout(() => {
+                        console.log("Space station:", j + 1, "of", planet.model.getNbSpaceStations());
+                        const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, planet);
+                        spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+                        resolve();
+                    }, timeOut);
+                });
+            }
         }
     }
 
@@ -642,7 +652,6 @@ export class StarSystemView implements View {
         syncCamera(this.scene.getActiveCamera(), this.ui.camera);
         this.ui.scene.render();
     }
-
 
     public attachControl() {
         this.scene.attachControl();

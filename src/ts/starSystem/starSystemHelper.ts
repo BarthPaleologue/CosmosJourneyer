@@ -171,12 +171,17 @@ export class StarSystemHelper {
         }
     }
 
+    public static MakeSpaceStation(starsystem: StarSystemController, body: CelestialBody): SpaceStation {
+        const spacestation = new SpaceStation(starsystem.scene, body);
+        starsystem.addSpaceStation(spacestation);
+        return spacestation;
+    }
+
     public static MakeSpaceStations(starsystem: StarSystemController, body: CelestialBody, n = body.model.getNbSpaceStations()): SpaceStation[] {
         console.assert(n >= 0, `Cannot make a negative amount of space stations : ${n}`);
         const spaceStations = [];
         for (let i = 0; i < n; i++) {
-            const spacestation = new SpaceStation(starsystem.scene, body);
-            starsystem.addSpaceStation(spacestation);
+            const spacestation = StarSystemHelper.MakeSpaceStation(starsystem, body);
             spaceStations.push(spacestation);
         }
 
