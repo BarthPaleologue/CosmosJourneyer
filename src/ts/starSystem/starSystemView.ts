@@ -235,6 +235,7 @@ export class StarSystemView implements View {
                 await this.initStarSystem();
                 this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
                 this.isLoadingSystem = false;
+                this.ui.setTarget(null);
             }
         });
 
