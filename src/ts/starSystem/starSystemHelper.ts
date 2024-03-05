@@ -171,12 +171,16 @@ export class StarSystemHelper {
         }
     }
 
-    public static MakeSpaceStations(starsystem: StarSystemController, body: CelestialBody, n = body.model.getNbSpaceStations()): void {
+    public static MakeSpaceStations(starsystem: StarSystemController, body: CelestialBody, n = body.model.getNbSpaceStations()): SpaceStation[] {
         console.assert(n >= 0, `Cannot make a negative amount of space stations : ${n}`);
+        const spaceStations = [];
         for (let i = 0; i < n; i++) {
             const spacestation = new SpaceStation(starsystem.scene, body);
             starsystem.addSpaceStation(spacestation);
+            spaceStations.push(spacestation);
         }
+
+        return spaceStations;
     }
 
     public static MakeSatellite(
@@ -199,7 +203,7 @@ export class StarSystemHelper {
      * @param planet The planet to make satellites for
      * @param n The number of satellites to make
      */
-    public static MakeSatellites(starsystem: StarSystemController, planet: Planet, n = planet.model.nbMoons): void {
+    public static MakeSatellites(starsystem: StarSystemController, planet: Planet, n = planet.model.nbMoons): TelluricPlanet[] {
         if (n < 0) throw new Error(`Cannot make a negative amount of satellites : ${n}`);
         if (planet.model.childrenBodies.length + n > planet.model.nbMoons)
             console.warn(
@@ -210,7 +214,12 @@ export class StarSystemHelper {
             You can just leave starsystem argument empty to make as many as the planet had planned.`
             );
 
-        for (let i = 0; i < n; i++) StarSystemHelper.MakeSatellite(starsystem, planet, getMoonSeed(planet.model, planet.model.childrenBodies.length));
+        const satellites = [];
+        for (let i = 0; i < n; i++) {
+            satellites.push(StarSystemHelper.MakeSatellite(starsystem, planet, getMoonSeed(planet.model, planet.model.childrenBodies.length)));
+        }
+
+        return satellites;
     }
 
     /**

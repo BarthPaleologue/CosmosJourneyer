@@ -61,6 +61,7 @@ import { createNotification } from "../utils/notification";
 import { axisCompositeToString, pressInteractionToStrings } from "../utils/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
+import { BodyType } from "../model/common";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -320,41 +321,59 @@ export class StarSystemView implements View {
         // Incrementally generate the star system
 
         const timeOut = 100;
+        const offset = 1e10;
 
         const systemModel = starSystem.model;
         const targetNbStellarObjects = systemModel.getNbStellarObjects();
 
         // Stellar objects
-        const stellarObjectPromises: Promise<void>[] = [];
+        let objectIndex = 0;
         for (let i = 0; i < targetNbStellarObjects; i++) {
-            stellarObjectPromises.push(
-                new Promise<void>((resolve) => {
+                await new Promise<void>((resolve) => {
                     setTimeout(() => {
                         console.log("Stellar:", i + 1, "of", targetNbStellarObjects);
-                        StarSystemHelper.MakeStellarObject(starSystem);
+                        const stellarObject = StarSystemHelper.MakeStellarObject(starSystem);
+                        stellarObject.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
                         resolve();
-                    }, timeOut * i);
-                })
-            );
+                    }, timeOut);
+                });
         }
-
-        await Promise.all(stellarObjectPromises);
 
         // Planets
-        const planetPromises: Promise<void>[] = [];
         for (let i = 0; i < systemModel.getNbPlanets(); i++) {
-            planetPromises.push(
-                new Promise<void>((resolve) => {
+                await new Promise<void>((resolve) => {
                     setTimeout(() => {
                         console.log("Planet:", i + 1, "of", systemModel.getNbPlanets());
-                        StarSystemHelper.MakePlanet(starSystem);
+                        const bodyType = starSystem.model.getBodyTypeOfPlanet(starSystem.planets.length);
+                        if (bodyType === BodyType.TELLURIC_PLANET) {
+                            const planet = StarSystemHelper.MakeTelluricPlanet(starSystem);
+                            planet.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+                            const satellites = StarSystemHelper.MakeSatellites(starSystem, planet);
+                            satellites.forEach((satellite) => {
+                                satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+                            });
+                            const spaceStations = StarSystemHelper.MakeSpaceStations(starSystem, planet);
+                            spaceStations.forEach((spaceStation) => {
+                                spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+                            });
+                        } else if (bodyType === BodyType.GAS_PLANET) {
+                            const planet = StarSystemHelper.MakeGasPlanet(starSystem);
+                            planet.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+                            const satellites = StarSystemHelper.MakeSatellites(starSystem, planet);
+                            satellites.forEach((satellite) => {
+                                satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+                            });
+                            const spaceStations = StarSystemHelper.MakeSpaceStations(starSystem, planet);
+                            spaceStations.forEach((spaceStation) => {
+                                spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+                            });
+                        } else {
+                            throw new Error(`Unknown body type ${bodyType}`);
+                        }
                         resolve();
                     }, timeOut * i);
-                })
-            );
+                });
         }
-
-        await Promise.all(planetPromises);
     }
 
     /**
