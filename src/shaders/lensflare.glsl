@@ -1,4 +1,4 @@
-precision highp float;
+precision lowp float;
 
 // based on https://www.shadertoy.com/view/wlcyzj
 
