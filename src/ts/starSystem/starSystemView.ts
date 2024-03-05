@@ -305,8 +305,9 @@ export class StarSystemView implements View {
      * Dispose the previous star system and incrementally loads the new star system. All the assets are instantiated but the system still need to be initialized
      * @param starSystem the star system to be set
      * @param needsGenerating whether the star system needs to be generated or not
+     * @param timeOut
      */
-    public async loadStarSystem(starSystem: StarSystemController, needsGenerating = true) {
+    public async loadStarSystem(starSystem: StarSystemController, needsGenerating = true, timeOut = 200) {
         if (this.starSystem !== null) {
             this.starSystem.dispose();
             this.ui.disposeObjectOverlays();
@@ -317,7 +318,6 @@ export class StarSystemView implements View {
 
         // Incrementally generate the star system
 
-        const timeOut = 100;
         const offset = 1e10;
 
         const systemModel = starSystem.model;

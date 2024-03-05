@@ -179,7 +179,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
     }
 
     async init() {
-        await this.starSystemView.loadStarSystem(this.starSystemController, true);
+        await this.starSystemView.loadStarSystem(this.starSystemController, true, 0);
 
         this.starSystemView.onInitStarSystem.addOnce(() => {
             this.starSystemView.switchToDefaultControls();
