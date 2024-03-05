@@ -95,7 +95,6 @@ export class HyperSpaceTunnel implements Transformable {
     this.warpCone.rotation.x = Math.PI / 2;
     this.warpCone.position.z = this.positiveDepth / 2;
     this.warpCone.bakeCurrentTransformIntoVertices();
-    this.warpCone.visibility = 0.5;
 
     Effect.ShadersStore["warpConeMaterialFragmentShader"] = warpConeFragment;
     Effect.ShadersStore["warpConeMaterialVertexShader"] = warpConeVertex;
@@ -142,8 +141,8 @@ export class HyperSpaceTunnel implements Transformable {
     const theta = Math.random() * Math.PI * 2;
     const radiusScaling = 1 + (Math.random() * 2 - 1) * 0.5;
 
-    const p0 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterTop) / 5);
-    const p1 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterBottom) / 5);
+    const p0 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterTop) / 2);
+    const p1 = new Vector3(Math.cos(theta), Math.sin(theta), 0).scale((radiusScaling * this.diameterBottom) / 2);
     p0.addInPlace(this.direction.scale(this.positiveDepth));
     p1.subtractInPlace(this.direction.scale(this.negativeDepth));
 
