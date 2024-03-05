@@ -224,9 +224,11 @@ export class StarSystemView implements View {
         });
 
         StarSystemInputs.map.jumpToSystem.on("complete", async () => {
+            if (this.isLoadingSystem) return;
             const target = this.ui.getTarget();
             if (target instanceof SystemTarget) {
                 this.isLoadingSystem = true;
+                if (!this.spaceshipControls?.spaceship.getWarpDrive().isEnabled()) this.spaceshipControls?.spaceship.enableWarpDrive();
                 this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(true);
                 const systemSeed = target.seed;
                 await this.loadStarSystem(new StarSystemController(systemSeed, this.scene), true);
@@ -307,7 +309,7 @@ export class StarSystemView implements View {
      * @param needsGenerating whether the star system needs to be generated or not
      * @param timeOut
      */
-    public async loadStarSystem(starSystem: StarSystemController, needsGenerating = true, timeOut = 200) {
+    public async loadStarSystem(starSystem: StarSystemController, needsGenerating = true, timeOut = 700) {
         if (this.starSystem !== null) {
             this.starSystem.dispose();
             this.ui.disposeObjectOverlays();

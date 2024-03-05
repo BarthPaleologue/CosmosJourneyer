@@ -41,8 +41,8 @@ export class HyperSpaceTunnel implements Transformable {
 
   private throttle = 1;
 
-  private diameterTop = 20;
-  private diameterBottom = 40;
+  private diameterTop = 40;
+  private diameterBottom = 160;
 
   constructor(direction: Vector3, scene: Scene) {
     this.deltaSpeed = this.maxSpeed - this.minSpeed;
