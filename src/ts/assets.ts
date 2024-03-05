@@ -66,6 +66,8 @@ import disableWarpDriveSound from "../asset/sound/204418__nhumphrey__large-engin
 import acceleratingWarpDriveSound from "../asset/sound/539503__timbre__endless-acceleration.mp3";
 import deceleratingWarpDriveSound from "../asset/sound/539503__timbre_endless-deceleration.mp3";
 
+import hyperSpaceSound from "../asset/sound/539503__timbre_endless-deceleration-hyperspace.mp3";
+
 import thrusterSound from "../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
 
 import starMapBackgroundMusic from "../asset/sound/455855__andrewkn__wandering.mp3";
@@ -151,6 +153,8 @@ export class Assets {
 
     public static ACCELERATING_WARP_DRIVE_SOUND: Sound;
     public static DECELERATING_WARP_DRIVE_SOUND: Sound;
+
+    public static HYPER_SPACE_SOUND: Sound;
 
     public static THRUSTER_SOUND: Sound;
 
@@ -415,6 +419,18 @@ export class Assets {
             });
 
             console.log("Decelerating warp drive sound loaded");
+        };
+
+        const hyperSpaceSoundTask = Assets.MANAGER.addBinaryFileTask("hyperSpaceSoundTask", hyperSpaceSound);
+        hyperSpaceSoundTask.onSuccess = function (task) {
+            Assets.HYPER_SPACE_SOUND = new Sound("HyperSpaceSound", task.data, scene);
+            Assets.HYPER_SPACE_SOUND.updateOptions({
+                playbackRate: 1.5,
+                volume: 0.25,
+                loop: true
+            });
+
+            console.log("Hyper space sound loaded");
         };
 
         const thrusterSoundTask = Assets.MANAGER.addBinaryFileTask("thrusterSoundTask", thrusterSound);

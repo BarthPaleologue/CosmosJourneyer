@@ -59,6 +59,8 @@ import { AxisComposite } from "@brianchirls/game-input/browser";
 import { BodyType } from "../model/common";
 import { getMoonSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
+import { AudioManager } from "../audio/audioManager";
+import { AudioMasks } from "../audio/audioMasks";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -228,13 +230,27 @@ export class StarSystemView implements View {
             const target = this.ui.getTarget();
             if (target instanceof SystemTarget) {
                 this.isLoadingSystem = true;
+
                 if (!this.spaceshipControls?.spaceship.getWarpDrive().isEnabled()) this.spaceshipControls?.spaceship.enableWarpDrive();
                 this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(true);
+                this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(false);
+                this.spaceshipControls?.spaceship.hyperSpaceSound.setTargetVolume(1);
+                AudioManager.SetMask(AudioMasks.HYPER_SPACE);
+                const observer = this.scene.onBeforeRenderObservable.add(() => {
+                    const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
+                    this.spaceshipControls?.spaceship.hyperSpaceTunnel.update(deltaSeconds);
+                });
+
                 const systemSeed = target.seed;
                 await this.loadStarSystem(new StarSystemController(systemSeed, this.scene), true);
                 await this.initStarSystem();
+
                 this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
+                this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(true);
+                this.spaceshipControls?.spaceship.hyperSpaceSound.setTargetVolume(0);
                 this.isLoadingSystem = false;
+                AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
+                observer.remove();
                 this.ui.setTarget(null);
             }
         });

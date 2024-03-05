@@ -17,7 +17,7 @@ import { Transformable } from "../architecture/transformable";
  * @see https://playground.babylonjs.com/#W9LE0U#28
  */
 export class HyperSpaceTunnel implements Transformable {
-  maxNbDrops = 1000;
+  maxNbDrops = 500;
   maxLineSize = 12.0;
   positiveDepth = 600.0;
   negativeDepth = 100.0;
@@ -39,10 +39,14 @@ export class HyperSpaceTunnel implements Transformable {
   readonly spaceLines: LinesMesh;
   readonly warpCone: Mesh;
 
+  readonly warpConeMaterial: ShaderMaterial;
+
   private throttle = 1;
 
-  private diameterTop = 40;
+  private diameterTop = 4;
   private diameterBottom = 160;
+
+  private elapsedSeconds = 0;
 
   constructor(direction: Vector3, scene: Scene) {
     this.deltaSpeed = this.maxSpeed - this.minSpeed;
@@ -68,25 +72,22 @@ export class HyperSpaceTunnel implements Transformable {
       this.speeds.push(this.minSpeed + this.deltaSpeed * Math.random());
     }
 
-    const rain = MeshBuilder.CreateLineSystem(
+    this.spaceLines = MeshBuilder.CreateLineSystem(
       "rain",
       {
         lines: this.drops,
         updatable: true,
-        //useVertexAlpha: true,
         colors: this.colors
       },
       scene
     );
 
-    this.spaceLines = rain;
     this.warpCone = MeshBuilder.CreateCylinder(
       "cone",
       {
         diameterTop: this.diameterTop,
         diameterBottom: this.diameterBottom,
         height: this.positiveDepth + this.negativeDepth,
-        cap: Mesh.NO_CAP,
         sideOrientation: Mesh.BACKSIDE
       },
       scene
@@ -98,43 +99,14 @@ export class HyperSpaceTunnel implements Transformable {
 
     Effect.ShadersStore["warpConeMaterialFragmentShader"] = warpConeFragment;
     Effect.ShadersStore["warpConeMaterialVertexShader"] = warpConeVertex;
-    const warpConeMaterial = new ShaderMaterial("warpConeMaterial", scene, "warpConeMaterial", {
+    this.warpConeMaterial = new ShaderMaterial("warpConeMaterial", scene, "warpConeMaterial", {
       attributes: ["position", "uv"],
       uniforms: ["worldViewProjection", "time"],
       samplers: ["warpNoise"]
     });
-    warpConeMaterial.setTexture("warpNoise", Assets.WARP_NOISE);
+    this.warpConeMaterial.setTexture("warpNoise", Assets.WARP_NOISE);
 
-    this.warpCone.material = warpConeMaterial;
-
-    let clock = 0.0;
-    scene.registerBeforeRender(() => {
-      const deltaTime = scene.getEngine().getDeltaTime() / 1000;
-      clock += deltaTime;
-
-      warpConeMaterial.setFloat("time", clock);
-      this.rainFalls(deltaTime);
-
-      MeshBuilder.CreateLineSystem("rain", { lines: this.drops, instance: rain });
-
-      if (this.parent === null) return;
-
-      this.spaceLines.position = this.parent.getAbsolutePosition();
-      this.warpCone.position = this.parent.getAbsolutePosition();
-
-      const targetForward = getForwardDirection(this.parent);
-      const currentForward = getForwardDirection(this.getTransform());
-
-      if (targetForward.equalsWithEpsilon(currentForward, 0.001)) return;
-
-      const rotationAxis = Vector3.Cross(currentForward, targetForward);
-      const angle = Math.acos(Vector3.Dot(currentForward, targetForward));
-
-      const theta = angle; //Math.min(0.3 * deltaTime, angle);
-
-      rotate(this.spaceLines, rotationAxis, theta);
-      rotate(this.warpCone, rotationAxis, theta);
-    });
+    this.warpCone.material = this.warpConeMaterial;
   }
 
   private getRandomStartingPositions(): [Vector3, Vector3] {
@@ -184,6 +156,31 @@ export class HyperSpaceTunnel implements Transformable {
         drop[1].copyFrom(point1);
       }
     }
+  }
+
+  update(deltaSeconds: number) {
+    this.elapsedSeconds += deltaSeconds;
+
+    this.warpConeMaterial.setFloat("time", this.elapsedSeconds);
+    this.rainFalls(deltaSeconds);
+
+    MeshBuilder.CreateLineSystem("rain", { lines: this.drops, instance: this.spaceLines });
+
+    if (this.parent === null) return;
+
+    this.spaceLines.position = this.parent.getAbsolutePosition();
+    this.warpCone.position = this.parent.getAbsolutePosition();
+
+    const targetForward = getForwardDirection(this.parent);
+    const currentForward = getForwardDirection(this.getTransform());
+
+    if (targetForward.equalsWithEpsilon(currentForward, 0.001)) return;
+
+    const rotationAxis = Vector3.Cross(currentForward, targetForward);
+    const theta = Math.acos(Vector3.Dot(currentForward, targetForward));
+
+    rotate(this.spaceLines, rotationAxis, theta);
+    rotate(this.warpCone, rotationAxis, theta);
   }
 
   dispose() {

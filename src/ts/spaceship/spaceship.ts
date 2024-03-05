@@ -42,7 +42,6 @@ import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
 import { MainThruster } from "./mainThruster";
 import { AudioMasks } from "../audio/audioMasks";
-import { createNotification } from "../utils/notification";
 
 enum ShipState {
     FLYING,
@@ -86,6 +85,7 @@ export class Spaceship implements Transformable {
     readonly disableWarpDriveSound: AudioInstance;
     readonly acceleratingWarpDriveSound: AudioInstance;
     readonly deceleratingWarpDriveSound: AudioInstance;
+    readonly hyperSpaceSound: AudioInstance;
     readonly thrusterSound: AudioInstance;
 
     readonly onWarpDriveEnabled = new Observable<void>();
@@ -139,17 +139,20 @@ export class Spaceship implements Transformable {
         this.disableWarpDriveSound = new AudioInstance(Assets.DISABLE_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 1, true, this.getTransform());
         this.acceleratingWarpDriveSound = new AudioInstance(Assets.ACCELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
         this.deceleratingWarpDriveSound = new AudioInstance(Assets.DECELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
+        this.hyperSpaceSound = new AudioInstance(Assets.HYPER_SPACE_SOUND, AudioMasks.HYPER_SPACE, 0.0, false, this.getTransform());
         this.thrusterSound = new AudioInstance(Assets.THRUSTER_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
 
         AudioManager.RegisterSound(this.enableWarpDriveSound);
         AudioManager.RegisterSound(this.disableWarpDriveSound);
         AudioManager.RegisterSound(this.acceleratingWarpDriveSound);
         AudioManager.RegisterSound(this.deceleratingWarpDriveSound);
+        AudioManager.RegisterSound(this.hyperSpaceSound);
         AudioManager.RegisterSound(this.thrusterSound);
 
         this.thrusterSound.sound.play();
         this.acceleratingWarpDriveSound.sound.play();
         this.deceleratingWarpDriveSound.sound.play();
+        this.hyperSpaceSound.sound.play();
 
         this.scene = scene;
     }
