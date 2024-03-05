@@ -61,6 +61,7 @@ import { getMoonSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
+import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -228,31 +229,52 @@ export class StarSystemView implements View {
         StarSystemInputs.map.jumpToSystem.on("complete", async () => {
             if (this.isLoadingSystem) return;
             const target = this.ui.getTarget();
-            if (target instanceof SystemTarget) {
-                this.isLoadingSystem = true;
+            if (!(target instanceof SystemTarget)) return;
 
-                if (!this.spaceshipControls?.spaceship.getWarpDrive().isEnabled()) this.spaceshipControls?.spaceship.enableWarpDrive();
-                this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(true);
-                this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(false);
-                this.spaceshipControls?.spaceship.hyperSpaceSound.setTargetVolume(1);
-                AudioManager.SetMask(AudioMasks.HYPER_SPACE);
-                const observer = this.scene.onBeforeRenderObservable.add(() => {
-                    const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
-                    this.spaceshipControls?.spaceship.hyperSpaceTunnel.update(deltaSeconds);
+            const shipControls = this.getSpaceshipControls();
+
+            // first, align spaceship with target
+            const currentForward = getForwardDirection(shipControls.getTransform());
+            const targetForward = target.getTransform().getAbsolutePosition().subtract(shipControls.getTransform().getAbsolutePosition()).normalize();
+
+            const rotationAxis = Vector3.Cross(currentForward, targetForward);
+            const rotationAngle = Vector3.GetAngleBetweenVectors(currentForward, targetForward, rotationAxis);
+
+            const rotationAnimation = new TransformRotationAnimation(shipControls.getTransform(), rotationAxis, rotationAngle, rotationAngle * 2);
+            await new Promise<void>((resolve) => {
+                const observer = this.scene.onBeforePhysicsObservable.add(() => {
+                    rotationAnimation.update(this.scene.getEngine().getDeltaTime() / 1000);
+                    if (rotationAnimation.isFinished()) {
+                        observer.remove();
+                        resolve();
+                    }
                 });
+            });
 
-                const systemSeed = target.seed;
-                await this.loadStarSystem(new StarSystemController(systemSeed, this.scene), true);
-                await this.initStarSystem();
+            // then, initiate hyper space jump
 
-                this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
-                this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(true);
-                this.spaceshipControls?.spaceship.hyperSpaceSound.setTargetVolume(0);
-                this.isLoadingSystem = false;
-                AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
-                observer.remove();
-                this.ui.setTarget(null);
-            }
+            if (!this.spaceshipControls?.spaceship.getWarpDrive().isEnabled()) this.spaceshipControls?.spaceship.enableWarpDrive();
+            this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(true);
+            this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(false);
+            this.spaceshipControls?.spaceship.hyperSpaceSound.setTargetVolume(1);
+            AudioManager.SetMask(AudioMasks.HYPER_SPACE);
+            const observer = this.scene.onBeforeRenderObservable.add(() => {
+                const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
+                this.spaceshipControls?.spaceship.hyperSpaceTunnel.update(deltaSeconds);
+            });
+
+            const systemSeed = target.seed;
+            this.isLoadingSystem = true;
+            await this.loadStarSystem(new StarSystemController(systemSeed, this.scene), true);
+            await this.initStarSystem();
+
+            this.spaceshipControls?.spaceship.hyperSpaceTunnel.setEnabled(false);
+            this.spaceshipControls?.spaceship.warpTunnel.getTransform().setEnabled(true);
+            this.spaceshipControls?.spaceship.hyperSpaceSound.setTargetVolume(0);
+            this.isLoadingSystem = false;
+            AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
+            observer.remove();
+            this.ui.setTarget(null);
         });
 
         StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", () => {
