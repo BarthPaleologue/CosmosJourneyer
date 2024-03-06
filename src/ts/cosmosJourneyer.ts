@@ -49,6 +49,7 @@ import { GeneralInputs } from "./inputs/generalInputs";
 import { createNotification } from "./utils/notification";
 import { StarSystemInputs } from "./inputs/starSystemInputs";
 import { pressInteractionToStrings } from "./utils/inputControlsString";
+import { DefaultControlsInputs } from "./defaultController/defaultControlsInputs";
 
 enum EngineState {
     UNINITIALIZED,
@@ -265,7 +266,9 @@ export class CosmosJourneyer {
             this.starSystemView.unZoom(() => {
                 AudioManager.SetMask(AudioMasks.STAR_MAP_VIEW);
 
-                this.activeView.detachControl();
+                this.starSystemView.ui.setEnabled(false);
+
+                this.starSystemView.detachControl();
                 this.starMap.attachControl();
 
                 const starMap = this.starMap;
@@ -273,8 +276,10 @@ export class CosmosJourneyer {
                 starMap.focusOnCurrentSystem();
             });
         } else {
-            this.activeView.detachControl();
+            this.starMap.detachControl();
             this.starSystemView.attachControl();
+
+            this.starSystemView.ui.setEnabled(true);
 
             AudioManager.SetMask(AudioMasks.STAR_SYSTEM_VIEW);
             this.activeView = this.starSystemView;

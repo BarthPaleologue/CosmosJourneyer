@@ -94,3 +94,5 @@ export const SpaceShipControlsInputs = new InputMap<{
     ignorePointer: ignorePointer,
     throttleToZero: throttleToZeroInteraction
 });
+
+SpaceShipControlsInputs.setEnabled(false);

@@ -59,3 +59,5 @@ export const CharacterInputs = new InputMap<{
     samba: sambaAction,
     run: runAction
 });
+
+CharacterInputs.setEnabled(false);

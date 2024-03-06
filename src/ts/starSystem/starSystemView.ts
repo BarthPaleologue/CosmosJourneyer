@@ -64,6 +64,8 @@ import { AudioMasks } from "../audio/audioMasks";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { wait } from "../utils/wait";
+import { CharacterInputs } from "../spacelegs/characterControlsInputs";
+import { DefaultControlsInputs } from "../defaultController/defaultControlsInputs";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -289,10 +291,12 @@ export class StarSystemView implements View {
                 console.log("disembark");
 
                 characterControls.getTransform().setEnabled(true);
+                CharacterInputs.setEnabled(true);
                 characterControls.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
                 translate(characterControls.getTransform(), getForwardDirection(shipControls.getTransform()).scale(10));
 
                 setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
+                SpaceShipControlsInputs.setEnabled(false);
 
                 this.scene.setActiveControls(characterControls);
                 this.postProcessManager.rebuild();
@@ -303,7 +307,11 @@ export class StarSystemView implements View {
                 console.log("embark");
 
                 characterControls.getTransform().setEnabled(false);
+                CharacterInputs.setEnabled(false);
+
                 this.scene.setActiveControls(shipControls);
+                SpaceShipControlsInputs.setEnabled(true);
+
                 this.postProcessManager.rebuild();
 
                 if (shipControls.spaceship.isLanded()) {
@@ -565,11 +573,13 @@ export class StarSystemView implements View {
         const defaultControls = this.getDefaultControls();
 
         characterControls.getTransform().setEnabled(false);
+        CharacterInputs.setEnabled(false);
         this.scene.setActiveControls(shipControls);
         setRotationQuaternion(shipControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
         this.postProcessManager.rebuild();
 
         shipControls.spaceship.setEnabled(true, this.havokPlugin);
+        SpaceShipControlsInputs.setEnabled(true);
     }
 
     /**
@@ -581,6 +591,7 @@ export class StarSystemView implements View {
         const defaultControls = this.getDefaultControls();
 
         characterControls.getTransform().setEnabled(true);
+        CharacterInputs.setEnabled(true);
         characterControls.getTransform().setAbsolutePosition(defaultControls.getTransform().absolutePosition);
         this.scene.setActiveControls(characterControls);
         setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
@@ -588,6 +599,7 @@ export class StarSystemView implements View {
 
         shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
+        SpaceShipControlsInputs.setEnabled(false);
         this.stopBackgroundSounds();
     }
 
@@ -600,8 +612,12 @@ export class StarSystemView implements View {
         const defaultControls = this.getDefaultControls();
 
         characterControls.getTransform().setEnabled(false);
+        CharacterInputs.setEnabled(false);
+
         shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
+        SpaceShipControlsInputs.setEnabled(false);
+
         this.stopBackgroundSounds();
 
         this.scene.setActiveControls(defaultControls);
