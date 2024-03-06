@@ -126,8 +126,8 @@ export class ShipControls implements Controls {
         if (this.spaceship.getWarpDrive().isDisabled()) {
             this.spaceship.increaseMainEngineThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
 
-            if(SpaceShipControlsInputs.map.upDown.value !== 0) {
-                if(this.spaceship.isLanded()) {
+            if (SpaceShipControlsInputs.map.upDown.value !== 0) {
+                if (this.spaceship.isLanded()) {
                     this.spaceship.takeOff();
                 }
                 this.spaceship.aggregate.body.applyForce(

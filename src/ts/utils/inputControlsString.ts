@@ -1,9 +1,4 @@
-import {
-    AxisComposite,
-    ButtonInputControl,
-    StickInputControl,
-    Vector2InputControl
-} from "@brianchirls/game-input/browser";
+import { AxisComposite, ButtonInputControl, StickInputControl, Vector2InputControl } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 
@@ -29,7 +24,10 @@ export function dPadCompositeToString(input: DPadComposite): [string, string][] 
 }
 
 export function vector2ToString(input: Vector2InputControl): [string, string][] {
-    return [["x", "pointerX"], ["y", "pointerY"]];
+    return [
+        ["x", "pointerX"],
+        ["y", "pointerY"]
+    ];
 }
 
 export function buttonInputToString(input: ButtonInputControl): string {

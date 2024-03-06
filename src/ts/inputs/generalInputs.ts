@@ -3,7 +3,6 @@ import { InputDevices } from "./devices";
 import Action from "@brianchirls/game-input/Action";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 
-
 const gamepad = InputDevices.GAMEPAD;
 const keyboard = InputDevices.KEYBOARD;
 

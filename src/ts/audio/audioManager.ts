@@ -1,6 +1,5 @@
 import { AudioInstance } from "../utils/audioInstance";
 
-
 export class AudioManager {
     private static ENABLED_MASK = 0b1111;
 
@@ -15,7 +14,7 @@ export class AudioManager {
     }
 
     public static Update(deltaSeconds: number) {
-        this.SOUNDS.forEach(sound => {
+        this.SOUNDS.forEach((sound) => {
             const isSoundEnabled = (sound.mask & this.ENABLED_MASK) !== 0;
             sound.setMaskFactor(isSoundEnabled ? 1 : 0);
             sound.update(deltaSeconds);

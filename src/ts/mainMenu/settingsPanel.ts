@@ -2,18 +2,8 @@ import { InputMaps } from "../inputs/inputMaps";
 import Action from "@brianchirls/game-input/Action";
 import Interaction from "@brianchirls/game-input/interactions/Interaction";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import {
-    axisCompositeToString,
-    buttonInputToString,
-    dPadCompositeToString,
-    stickInputToString, vector2ToString
-} from "../utils/inputControlsString";
-import {
-    AxisComposite,
-    ButtonInputControl,
-    StickInputControl,
-    Vector2InputControl
-} from "@brianchirls/game-input/browser";
+import { axisCompositeToString, buttonInputToString, dPadCompositeToString, stickInputToString, vector2ToString } from "../utils/inputControlsString";
+import { AxisComposite, ButtonInputControl, StickInputControl, Vector2InputControl } from "@brianchirls/game-input/browser";
 
 export function initSettingsPanel(): HTMLElement {
     const settingsPanel = document.getElementById("settingsPanel");
@@ -32,7 +22,6 @@ export function initSettingsPanel(): HTMLElement {
         mapDiv.appendChild(mapName);
 
         for (const [actionName, action] of Object.entries(inputMap.map)) {
-
             const subActionMap: Map<string, string[]> = new Map();
 
             const actionOrInteraction = action as Action | Interaction;
@@ -49,7 +38,7 @@ export function initSettingsPanel(): HTMLElement {
                     });
                 } else if (binding.control instanceof ButtonInputControl) {
                     const text = buttonInputToString(binding.control);
-                    if(!subActionMap.has("BUTTON")) {
+                    if (!subActionMap.has("BUTTON")) {
                         subActionMap.set("BUTTON", []);
                     }
                     subActionMap.get("BUTTON")?.push(text);
@@ -71,7 +60,7 @@ export function initSettingsPanel(): HTMLElement {
                         }
                         subActionMap.get(key)?.push(name);
                     });
-                } else if(binding.control instanceof Vector2InputControl) {
+                } else if (binding.control instanceof Vector2InputControl) {
                     const strings = vector2ToString(binding.control);
                     strings.forEach((string) => {
                         const [key, name] = string;

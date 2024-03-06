@@ -6,11 +6,4 @@ import { GeneralInputs } from "./generalInputs";
 import { StarSystemInputs } from "./starSystemInputs";
 import { StarMapInputs } from "./starMapInputs";
 
-export const InputMaps: InputMap<any>[] = [
-    GeneralInputs,
-    StarSystemInputs,
-    StarMapInputs,
-    SpaceShipControlsInputs,
-    CharacterInputs,
-    DefaultControlsInputs
-];
+export const InputMaps: InputMap<any>[] = [GeneralInputs, StarSystemInputs, StarMapInputs, SpaceShipControlsInputs, CharacterInputs, DefaultControlsInputs];

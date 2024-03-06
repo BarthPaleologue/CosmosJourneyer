@@ -20,7 +20,7 @@ const upDown = new AxisComposite({
 });
 
 const upDownAction = new Action({
-    bindings: [upDown],
+    bindings: [upDown]
 });
 
 const throttle = new AxisComposite({
@@ -62,7 +62,7 @@ const rollPitch = new Action({
 });
 
 const toggleWarpDrive = new Action({
-    bindings: [keyboard.getControl("KeyH")],
+    bindings: [keyboard.getControl("KeyH")]
 });
 
 const toggleWarpDriveInteraction = new PressInteraction(toggleWarpDrive);
@@ -78,13 +78,13 @@ const throttleToZero = new Action({
 const throttleToZeroInteraction = new PressInteraction(throttleToZero);
 
 export const SpaceShipControlsInputs = new InputMap<{
-    landing: PressInteraction,
-    upDown: Action<number>,
-    throttle: Action<number>,
-    rollPitch: Action<[number, number]>,
-    toggleWarpDrive: PressInteraction,
-    ignorePointer: Action<number>,
-    throttleToZero: PressInteraction
+    landing: PressInteraction;
+    upDown: Action<number>;
+    throttle: Action<number>;
+    rollPitch: Action<[number, number]>;
+    toggleWarpDrive: PressInteraction;
+    ignorePointer: Action<number>;
+    throttleToZero: PressInteraction;
 }>("SpaceShipInputs", {
     landing: landingInteraction,
     upDown: upDownAction,

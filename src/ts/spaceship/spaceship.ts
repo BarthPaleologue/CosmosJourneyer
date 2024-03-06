@@ -108,7 +108,7 @@ export class Spaceship implements Transformable {
             scene
         );
         for (const child of this.instanceRoot.getChildMeshes()) {
-            if(child.name.includes("mainThruster")) {
+            if (child.name.includes("mainThruster")) {
                 const mainThruster = new MainThruster(child, getForwardDirection(this.instanceRoot).negate(), this.aggregate);
                 this.mainThrusters.push(mainThruster);
                 continue;
@@ -353,12 +353,12 @@ export class Spaceship implements Transformable {
 
             const otherSpeed = linearVelocity.subtract(forwardDirection.scale(forwardSpeed));
 
-            if(this.mainEngineThrottle !== 0) this.thrusterSound.setTargetVolume(1);
+            if (this.mainEngineThrottle !== 0) this.thrusterSound.setTargetVolume(1);
             else this.thrusterSound.setTargetVolume(0);
 
-            if(forwardSpeed < this.mainEngineTargetSpeed) {
+            if (forwardSpeed < this.mainEngineTargetSpeed) {
                 this.aggregate.body.applyForce(forwardDirection.scale(3000), this.aggregate.body.getObjectCenterWorld());
-                this.mainThrusters.forEach(thruster => {
+                this.mainThrusters.forEach((thruster) => {
                     thruster.setThrottle(this.mainEngineThrottle);
                 });
             } else {
@@ -376,7 +376,7 @@ export class Spaceship implements Transformable {
             this.acceleratingWarpDriveSound.setTargetVolume(0);
             this.deceleratingWarpDriveSound.setTargetVolume(0);
         } else {
-            this.mainThrusters.forEach(thruster => {
+            this.mainThrusters.forEach((thruster) => {
                 thruster.setThrottle(0);
             });
 
@@ -393,7 +393,7 @@ export class Spaceship implements Transformable {
             }
         }
 
-        this.mainThrusters.forEach(thruster => {
+        this.mainThrusters.forEach((thruster) => {
             thruster.update(deltaTime);
         });
 

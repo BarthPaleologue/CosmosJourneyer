@@ -36,7 +36,7 @@ export function parseDistance(distance: number): string {
         return `${(distance / 1000).toFixed(2)} km`;
     } else if (distance < 20000000) {
         return `${(distance / 1000000).toFixed(2)} Mm`;
-    } else if(distance < 0.3 * Settings.LIGHT_YEAR) {
+    } else if (distance < 0.3 * Settings.LIGHT_YEAR) {
         return `${(distance / Settings.C).toFixed(2)} ls`;
     } else {
         return `${(distance / Settings.LIGHT_YEAR).toFixed(2)} ly`;

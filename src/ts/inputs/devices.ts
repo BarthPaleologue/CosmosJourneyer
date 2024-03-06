@@ -4,7 +4,7 @@ import Pointer from "@brianchirls/game-input/devices/Pointer";
 
 const gamepad = new Gamepad();
 const keyboard = new Keyboard({
-    keyCode: true,
+    keyCode: true
 });
 const pointer = new Pointer();
 

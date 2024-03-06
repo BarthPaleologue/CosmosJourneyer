@@ -346,14 +346,14 @@ export class Assets {
             });
 
             const clonedSound = Assets.MENU_HOVER_SOUND.clone();
-            if(clonedSound === null) throw new Error("clonedSound is null");
+            if (clonedSound === null) throw new Error("clonedSound is null");
             Assets.MENU_SELECT_SOUND = clonedSound;
             Assets.MENU_SELECT_SOUND.updateOptions({
                 playbackRate: 1.0
             });
 
             const clonedSound2 = Assets.MENU_HOVER_SOUND.clone();
-            if(clonedSound2 === null) throw new Error("clonedSound2 is null");
+            if (clonedSound2 === null) throw new Error("clonedSound2 is null");
             Assets.OPEN_PAUSE_MENU_SOUND = clonedSound2;
             Assets.OPEN_PAUSE_MENU_SOUND.updateOptions({
                 playbackRate: 0.75
@@ -367,14 +367,14 @@ export class Assets {
             Assets.TARGET_LOCK_SOUND = new Sound("StarMapClickSound", task.data, scene);
 
             const clonedSound = Assets.TARGET_LOCK_SOUND.clone();
-            if(clonedSound === null) throw new Error("clonedSound is null");
+            if (clonedSound === null) throw new Error("clonedSound is null");
             Assets.TARGET_UNLOCK_SOUND = clonedSound;
             Assets.TARGET_UNLOCK_SOUND.updateOptions({
                 playbackRate: 0.5
             });
 
             const clonedSound2 = Assets.TARGET_LOCK_SOUND.clone();
-            if(clonedSound2 === null) throw new Error("clonedSound2 is null");
+            if (clonedSound2 === null) throw new Error("clonedSound2 is null");
             Assets.STAR_MAP_CLICK_SOUND = clonedSound2;
 
             console.log("Target sound loaded");
@@ -456,12 +456,18 @@ export class Assets {
 
         const mainMenuBackgroundMusicTask = Assets.MANAGER.addBinaryFileTask("mainMenuBackgroundMusicTask", starMapBackgroundMusic);
         const mainMenuBackgroundMusicLoaded = new Promise<void>((resolve) => {
-            mainMenuBackgroundMusicTask.onSuccess = function(task) {
-                Assets.MAIN_MENU_BACKGROUND_MUSIC = new Sound("MainMenuBackgroundMusic", task.data, scene, () => {
-                    resolve();
-                }, {
-                    loop: true
-                });
+            mainMenuBackgroundMusicTask.onSuccess = function (task) {
+                Assets.MAIN_MENU_BACKGROUND_MUSIC = new Sound(
+                    "MainMenuBackgroundMusic",
+                    task.data,
+                    scene,
+                    () => {
+                        resolve();
+                    },
+                    {
+                        loop: true
+                    }
+                );
 
                 console.log("Main menu background music loaded");
             };

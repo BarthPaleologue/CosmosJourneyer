@@ -59,7 +59,7 @@ export class WorkerPool {
     public reset() {
         this.availableWorkers = this.availableWorkers.concat(this.finishedWorkers);
         this.finishedWorkers = [];
-        this.availableWorkers.forEach((worker) => worker.onmessage = null);
+        this.availableWorkers.forEach((worker) => (worker.onmessage = null));
 
         this.taskQueue.length = 0;
     }

@@ -82,17 +82,19 @@ export class StarSector {
                 seed: systemSeed,
                 sectorString: sectorString,
                 scale: 0.5 + this.rng(100 * i) / 2,
-                position: this.getPositionOfStar(i),
+                position: this.getPositionOfStar(i)
             });
         }
         return data;
     }
 
     getPositionOfStar(starIndex: number): Vector3 {
-        if(starIndex >= this.nbStars) throw new Error(`Star index ${starIndex} is out of bounds for sector ${this.position}`);
-        return new Vector3(centeredRand(this.rng, 10 * starIndex + 1) / 2, centeredRand(this.rng, 10 * starIndex + 2) / 2, centeredRand(this.rng, 10 * starIndex + 3) / 2).addInPlace(
-            this.position
-        );
+        if (starIndex >= this.nbStars) throw new Error(`Star index ${starIndex} is out of bounds for sector ${this.position}`);
+        return new Vector3(
+            centeredRand(this.rng, 10 * starIndex + 1) / 2,
+            centeredRand(this.rng, 10 * starIndex + 2) / 2,
+            centeredRand(this.rng, 10 * starIndex + 3) / 2
+        ).addInPlace(this.position);
     }
 
     /**

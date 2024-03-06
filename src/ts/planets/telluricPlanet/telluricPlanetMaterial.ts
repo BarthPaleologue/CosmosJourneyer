@@ -127,9 +127,9 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             steepColor: new Color3(60, 60, 60).scaleInPlace(1.5 / 255),
             plainColor: new Color3(
                 //TODO: make this better
-                1.5*Math.max(0.22 + centeredRand(model.rng, 82) / 20, 0),
-                1.5*Math.max(0.37 + centeredRand(model.rng, 83) / 20, 0),
-                1.5*Math.max(0.024 + centeredRand(model.rng, 84) / 20, 0)
+                1.5 * Math.max(0.22 + centeredRand(model.rng, 82) / 20, 0),
+                1.5 * Math.max(0.37 + centeredRand(model.rng, 83) / 20, 0),
+                1.5 * Math.max(0.024 + centeredRand(model.rng, 84) / 20, 0)
             ),
             beachColor: new Color3(132, 114, 46).scaleInPlace(1 / 255),
             desertColor: new Color3(232, 142, 59).scaleInPlace(1 / 255),

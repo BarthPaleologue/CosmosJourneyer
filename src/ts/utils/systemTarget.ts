@@ -37,5 +37,4 @@ export class SystemTarget implements Transformable, BoundingSphere, TypedObject 
     getTypeName(): string {
         return "Star system";
     }
-
 }

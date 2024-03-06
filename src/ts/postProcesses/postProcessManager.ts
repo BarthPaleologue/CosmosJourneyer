@@ -144,7 +144,6 @@ export class PostProcessManager {
             return [this.fxaa];
         });
 
-
         this.renderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "renderingPipeline");
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
 

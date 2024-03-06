@@ -175,7 +175,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             this.toggleActivePanel(this.aboutPanel);
             this.onAboutObservable.notifyObservers();
         });
-
     }
 
     async init() {

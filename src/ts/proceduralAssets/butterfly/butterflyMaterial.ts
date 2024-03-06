@@ -50,7 +50,7 @@ export class ButterflyMaterial extends ShaderMaterial {
     update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
 
-        if(stars.length > 0) {
+        if (stars.length > 0) {
             const star = stars[0];
             const lightDirection = star.getTransform().getAbsolutePosition().subtract(playerPosition).normalize();
             this.setVector3("lightDirection", lightDirection);

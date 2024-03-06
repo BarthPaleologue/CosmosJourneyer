@@ -1,6 +1,6 @@
 export function createNotification(text: string, duration: number) {
     const container = document.getElementById("notificationContainer");
-    if(container === null) throw new Error("No notification container found");
+    if (container === null) throw new Error("No notification container found");
 
     const newNotification = document.createElement("div");
     newNotification.classList.add("notification");

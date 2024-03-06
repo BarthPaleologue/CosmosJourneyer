@@ -111,7 +111,7 @@ export class TelluricPlanetModel implements PlanetModel {
             isPlaneAlignedWithParent: isOrbitalPlaneAlignedWithParent
         };
 
-        if(this.isSatelliteOfTelluric || this.isSatelliteOfGas) {
+        if (this.isSatelliteOfTelluric || this.isSatelliteOfGas) {
             // Tidal locking for moons
             this.physicalProperties.rotationPeriod = this.orbit.period;
         }
