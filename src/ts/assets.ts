@@ -38,7 +38,6 @@ import flareParticle from "../asset/flare.png";
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 
 import seamlessPerlin from "../asset/perlin.png";
-import warpNoise from "../asset/warpNoise.png";
 
 import empty from "../asset/oneBlackPixel.png";
 
@@ -114,7 +113,6 @@ export class Assets {
 
     static ATMOSPHERE_LUT: ProceduralTexture;
 
-    static WARP_NOISE: Texture;
     static SEAMLESS_PERLIN: Texture;
 
     private static SPACESHIP: Mesh;
@@ -185,7 +183,6 @@ export class Assets {
         Assets.MANAGER.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Assets.FLARE_TEXTURE = task.texture);
 
         Assets.MANAGER.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Assets.SEAMLESS_PERLIN = task.texture);
-        Assets.MANAGER.addTextureTask("WarpNoise", warpNoise).onSuccess = (task) => (Assets.WARP_NOISE = task.texture);
 
         Assets.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Assets.ATMOSPHERE_LUT.refreshRate = 0;
