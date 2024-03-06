@@ -233,23 +233,24 @@ void main() {
     }
 
     // getting the screen coordinate of the end of the bended ray
-    vec2 uv = uvFromWorld(rayPositionBlackHoleSpace, camera_projection, camera_view);
+    vec2 uv = uvFromWorld(rayPositionBlackHoleSpace + object_position, camera_projection, camera_view);
     // check if there is an object occlusion
     vec3 pixelWorldPositionEndRay = worldFromUV(uv, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
     vec3 rayDirToEndRay = normalize(pixelWorldPositionEndRay - camera_position);// normalized direction of the ray
 
-    float epsilon = 0.01;
-    float depthEndRay1 = texture2D(depthSampler, uv + vec2(epsilon, 0.0)).r;// the depth corresponding to the pixel in the depth map
-    float depthEndRay2 = texture2D(depthSampler, uv + vec2(-epsilon, 0.0)).r;// the depth corresponding to the pixel in the depth map
-    float depthEndRay3 = texture2D(depthSampler, uv + vec2(0.0, epsilon)).r;// the depth corresponding to the pixel in the depth map
-    float depthEndRay4 = texture2D(depthSampler, uv + vec2(0.0 -epsilon)).r;// the depth corresponding to the pixel in the depth map
-    float depthEndRay = min(min(depthEndRay1, depthEndRay2), min(depthEndRay3, depthEndRay4));
+    float depthEndRay = texture2D(depthSampler, uv).r;// the depth corresponding to the pixel in the depth map
+    for(int i = 0; i < 10; i++) {
+        vec2 offset = (vec2(hash(float(i)), hash(float(i + 1))) - 0.5) * 0.01;
+        depthEndRay = min(depthEndRay, texture2D(depthSampler, uv + offset).r);
+    }
     // closest physical point from the camera in the direction of the pixel (occlusion)
     vec3 closestPointEndRay = (pixelWorldPositionEndRay - camera_position) * remap(depthEndRay, 0.0, 1.0, camera_near, camera_far);
     float maximumDistanceEndRay = length(closestPointEndRay);// the maxium ray length due to occlusion
     float BHDistance = length(camera_position - object_position);
 
     bool behindBH = dot(closestPointEndRay - camera_position, closestPointEndRay - object_position) >= 0.0;
+    // checking for alignment: camera, object, blackhole in this order
+    behindBH = behindBH && dot(closestPointEndRay - camera_position, object_position - camera_position) >= 0.0;
 
     vec4 bg = vec4(0.0);
     if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0 && behindBH) {
