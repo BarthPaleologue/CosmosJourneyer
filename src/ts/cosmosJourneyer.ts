@@ -379,6 +379,8 @@ export class CosmosJourneyer {
      * @param universeCoordinates The universe coordinates to load
      */
     public async loadUniverseCoordinates(universeCoordinates: UniverseCoordinates): Promise<void> {
+        this.engine.loadingScreen.displayLoadingUI();
+
         const seed = SystemSeed.Deserialize(universeCoordinates.starSystem);
 
         this.starMap.setCurrentStarSystem(seed);
@@ -418,5 +420,7 @@ export class CosmosJourneyer {
 
         if (this.state === EngineState.UNINITIALIZED) await this.init(true);
         else await this.starSystemView.initStarSystem();
+
+        this.engine.loadingScreen.hideLoadingUI();
     }
 }
