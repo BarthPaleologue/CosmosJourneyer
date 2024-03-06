@@ -163,7 +163,6 @@ export class PostProcessManager {
 
         this.renderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "renderingPipeline");
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
-        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, [scene.getActiveCamera()]);
 
         this.starFieldRenderEffect = new PostProcessRenderEffect(this.engine, "starFieldRenderEffect", () => {
             return this.starFields;
