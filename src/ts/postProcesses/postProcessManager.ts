@@ -41,7 +41,7 @@ import { ShadowPostProcess } from "./shadowPostProcess";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { isOrbiting } from "../utils/nearestBody";
-import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
+import { UpdatablePostProcess } from "./objectPostProcess";
 import { MatterJetPostProcess } from "./matterJetPostProcess";
 import { Mandelbulb } from "../mandelbulb/mandelbulb";
 import { Star } from "../stellarObjects/star/star";

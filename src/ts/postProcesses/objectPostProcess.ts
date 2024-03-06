@@ -33,5 +33,5 @@ export interface ObjectPostProcess extends PostProcess {
      * This makes sense for raymarching and raytracing shaders that need to know the position of the object.
      */
     readonly object: Transformable;
-    dispose(camera?: Camera): void;
+    dispose(camera: Camera): void;
 }
