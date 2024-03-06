@@ -55,4 +55,12 @@ export class WorkerPool {
         if (this.hasTask()) return this.taskQueue.shift() as BuildTask;
         throw new Error("The workerpool has no task to dispatch");
     }
+
+    public reset() {
+        this.availableWorkers = this.availableWorkers.concat(this.finishedWorkers);
+        this.finishedWorkers = [];
+        this.availableWorkers.forEach((worker) => worker.terminate());
+
+        this.taskQueue.length = 0;
+    }
 }

@@ -127,4 +127,9 @@ export class ChunkForgeWorkers implements ChunkForge {
 
         this.executeNextApplyTask();
     }
+
+    public reset() {
+        this.applyTaskQueue.length = 0;
+        this.workerPool.reset();
+    }
 }
