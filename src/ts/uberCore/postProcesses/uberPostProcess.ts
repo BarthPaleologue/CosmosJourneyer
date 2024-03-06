@@ -23,6 +23,7 @@ import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "./types";
 import { Scene } from "@babylonjs/core/scene";
 import { Constants } from "@babylonjs/core/Engines/constants";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 /**
  * A wrapper around BabylonJS post processes that allows more predictable and easier to use uniforms
@@ -101,5 +102,9 @@ export class UberPostProcess extends PostProcess {
                     throw new Error(`Unsupported sampler type: ${sampler.type}`);
             }
         }
+    }
+
+    public override dispose(camera: Camera) {
+        super.dispose(camera);
     }
 }

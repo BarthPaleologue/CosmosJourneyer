@@ -21,6 +21,7 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { Star } from "../stellarObjects/star/star";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { Scene } from "@babylonjs/core/scene";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class VolumetricLight extends VolumetricLightScatteringPostProcess implements ObjectPostProcess {
     readonly object: Star | NeutronStar;
@@ -38,9 +39,7 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess implem
         this.scene = scene;
     }
 
-    public override dispose(): void {
-        const activeCamera = this.scene.activeCamera;
-        if (activeCamera === null) throw new Error("no camera available to dispose volumetric light post process of star " + this.object.name);
-        super.dispose(activeCamera);
+    public override dispose(camera: Camera): void {
+        super.dispose(camera);
     }
 }

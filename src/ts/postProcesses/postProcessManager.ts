@@ -91,9 +91,7 @@ export class PostProcessManager {
 
     private readonly renderingPipelineManager: PostProcessRenderPipelineManager;
 
-    private spaceRenderingPipeline: PostProcessRenderPipeline;
-    private surfaceRenderingPipeline: PostProcessRenderPipeline;
-    private currentRenderingPipeline: PostProcessRenderPipeline;
+    private renderingPipeline: PostProcessRenderPipeline;
 
     private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
 
@@ -162,13 +160,10 @@ export class PostProcessManager {
             return [this.fxaa];
         });
 
-        this.spaceRenderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "spaceRenderingPipeline");
-        this.renderingPipelineManager.addPipeline(this.spaceRenderingPipeline);
 
-        this.surfaceRenderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "surfaceRenderingPipeline");
-        this.renderingPipelineManager.addPipeline(this.surfaceRenderingPipeline);
-
-        this.currentRenderingPipeline = this.spaceRenderingPipeline;
+        this.renderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "renderingPipeline");
+        this.renderingPipelineManager.addPipeline(this.renderingPipeline);
+        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, [scene.getActiveCamera()]);
 
         this.starFieldRenderEffect = new PostProcessRenderEffect(this.engine, "starFieldRenderEffect", () => {
             return this.starFields;
@@ -342,17 +337,13 @@ export class PostProcessManager {
     }
 
     public setSpaceOrder() {
-        if (this.currentRenderingPipeline === this.spaceRenderingPipeline) return;
-        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.surfaceRenderingPipeline.name, [this.scene.getActiveCamera()]);
-        this.currentRenderingPipeline = this.spaceRenderingPipeline;
+        if (this.currentRenderingOrder === spaceRenderingOrder) return;
         this.currentRenderingOrder = spaceRenderingOrder;
         this.init();
     }
 
     public setSurfaceOrder() {
-        if (this.currentRenderingPipeline === this.surfaceRenderingPipeline) return;
-        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.spaceRenderingPipeline.name, [this.scene.getActiveCamera()]);
-        this.currentRenderingPipeline = this.surfaceRenderingPipeline;
+        if (this.currentRenderingOrder === surfaceRenderingOrder) return;
         this.currentRenderingOrder = surfaceRenderingOrder;
         this.init();
     }
@@ -367,6 +358,12 @@ export class PostProcessManager {
     }
 
     init() {
+        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
+        this.renderingPipelineManager.removePipeline(this.renderingPipeline.name);
+        this.renderingPipeline.dispose();
+
+        this.renderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "renderingPipeline");
+
         const [otherVolumetricLightsRenderEffect, bodyVolumetricLightsRenderEffect] = makeSplitRenderEffects(
             "VolumetricLights",
             this.getCurrentBody(),
@@ -383,41 +380,41 @@ export class PostProcessManager {
         const shadowRenderEffect = new PostProcessRenderEffect(this.engine, "ShadowRenderEffect", () => this.shadows);
         const lensFlareRenderEffect = new PostProcessRenderEffect(this.engine, "LensFlareRenderEffect", () => this.lensFlares);
 
-        this.currentRenderingPipeline.addEffect(this.starFieldRenderEffect);
+        this.renderingPipeline.addEffect(this.starFieldRenderEffect);
 
-        this.currentRenderingPipeline.addEffect(shadowRenderEffect);
+        this.renderingPipeline.addEffect(shadowRenderEffect);
 
         for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
                 case PostProcessType.VOLUMETRIC_LIGHT:
-                    this.currentRenderingPipeline.addEffect(otherVolumetricLightsRenderEffect);
+                    this.renderingPipeline.addEffect(otherVolumetricLightsRenderEffect);
                     break;
                 case PostProcessType.BLACK_HOLE:
-                    this.currentRenderingPipeline.addEffect(otherBlackHolesRenderEffect);
+                    this.renderingPipeline.addEffect(otherBlackHolesRenderEffect);
                     break;
                 case PostProcessType.OCEAN:
-                    this.currentRenderingPipeline.addEffect(otherOceansRenderEffect);
+                    this.renderingPipeline.addEffect(otherOceansRenderEffect);
                     break;
                 case PostProcessType.CLOUDS:
-                    this.currentRenderingPipeline.addEffect(otherCloudsRenderEffect);
+                    this.renderingPipeline.addEffect(otherCloudsRenderEffect);
                     break;
                 case PostProcessType.ATMOSPHERE:
-                    this.currentRenderingPipeline.addEffect(otherAtmospheresRenderEffect);
+                    this.renderingPipeline.addEffect(otherAtmospheresRenderEffect);
                     break;
                 case PostProcessType.RING:
-                    this.currentRenderingPipeline.addEffect(otherRingsRenderEffect);
+                    this.renderingPipeline.addEffect(otherRingsRenderEffect);
                     break;
                 case PostProcessType.MATTER_JETS:
-                    this.currentRenderingPipeline.addEffect(otherMatterJetsRenderEffect);
+                    this.renderingPipeline.addEffect(otherMatterJetsRenderEffect);
                     break;
                 case PostProcessType.MANDELBULB:
-                    this.currentRenderingPipeline.addEffect(otherMandelbulbsRenderEffect);
+                    this.renderingPipeline.addEffect(otherMandelbulbsRenderEffect);
                     break;
                 case PostProcessType.SHADOW:
-                    //this.currentRenderingPipeline.addEffect(otherShadowRenderEffect);
+                    //this.renderingPipeline.addEffect(otherShadowRenderEffect);
                     break;
                 case PostProcessType.LENS_FLARE:
-                    //this.currentRenderingPipeline.addEffect(otherLensFlaresRenderEffect);
+                    //this.renderingPipeline.addEffect(otherLensFlaresRenderEffect);
                     break;
             }
         }
@@ -425,44 +422,45 @@ export class PostProcessManager {
         for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
                 case PostProcessType.VOLUMETRIC_LIGHT:
-                    this.currentRenderingPipeline.addEffect(bodyVolumetricLightsRenderEffect);
+                    this.renderingPipeline.addEffect(bodyVolumetricLightsRenderEffect);
                     break;
                 case PostProcessType.BLACK_HOLE:
-                    this.currentRenderingPipeline.addEffect(bodyBlackHolesRenderEffect);
+                    this.renderingPipeline.addEffect(bodyBlackHolesRenderEffect);
                     break;
                 case PostProcessType.OCEAN:
-                    this.currentRenderingPipeline.addEffect(bodyOceansRenderEffect);
+                    this.renderingPipeline.addEffect(bodyOceansRenderEffect);
                     break;
                 case PostProcessType.CLOUDS:
-                    this.currentRenderingPipeline.addEffect(bodyCloudsRenderEffect);
+                    this.renderingPipeline.addEffect(bodyCloudsRenderEffect);
                     break;
                 case PostProcessType.ATMOSPHERE:
-                    this.currentRenderingPipeline.addEffect(bodyAtmospheresRenderEffect);
+                    this.renderingPipeline.addEffect(bodyAtmospheresRenderEffect);
                     break;
                 case PostProcessType.RING:
-                    this.currentRenderingPipeline.addEffect(bodyRingsRenderEffect);
+                    this.renderingPipeline.addEffect(bodyRingsRenderEffect);
                     break;
                 case PostProcessType.MATTER_JETS:
-                    this.currentRenderingPipeline.addEffect(bodyMatterJetsRenderEffect);
+                    this.renderingPipeline.addEffect(bodyMatterJetsRenderEffect);
                     break;
                 case PostProcessType.MANDELBULB:
-                    this.currentRenderingPipeline.addEffect(bodyMandelbulbsRenderEffect);
+                    this.renderingPipeline.addEffect(bodyMandelbulbsRenderEffect);
                     break;
                 case PostProcessType.LENS_FLARE:
-                    //this.currentRenderingPipeline.addEffect(bodyLensFlaresRenderEffect);
+                    //this.renderingPipeline.addEffect(bodyLensFlaresRenderEffect);
                     break;
                 case PostProcessType.SHADOW:
-                    //this.currentRenderingPipeline.addEffect(bodyShadowRenderEffect);
+                    //this.renderingPipeline.addEffect(bodyShadowRenderEffect);
                     break;
             }
         }
 
-        this.currentRenderingPipeline.addEffect(lensFlareRenderEffect);
-        this.currentRenderingPipeline.addEffect(this.fxaaRenderEffect);
-        //this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
-        this.currentRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
+        this.renderingPipeline.addEffect(lensFlareRenderEffect);
+        this.renderingPipeline.addEffect(this.fxaaRenderEffect);
+        //this.renderingPipeline.addEffect(this.bloomRenderEffect);
+        this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
-        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.currentRenderingPipeline.name, [this.scene.getActiveCamera()]);
+        this.renderingPipelineManager.addPipeline(this.renderingPipeline);
+        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, [this.scene.getActiveCamera()]);
     }
 
     /**
@@ -474,55 +472,42 @@ export class PostProcessManager {
     }
 
     public reset() {
-        for (const objectPostProcess of this.objectPostProcesses.flat()) objectPostProcess.dispose();
+        const camera = this.scene.getActiveCamera();
+
+        for (const objectPostProcess of this.objectPostProcesses.flat()) objectPostProcess.dispose(camera);
         this.objectPostProcesses.length = 0;
 
-        this.starFields.forEach((starField) => starField.dispose());
+        this.starFields.forEach((starField) => starField.dispose(camera));
         this.starFields.length = 0;
 
-        this.volumetricLights.forEach((volumetricLight) => volumetricLight.dispose());
+        this.volumetricLights.forEach((volumetricLight) => volumetricLight.dispose(camera));
         this.volumetricLights.length = 0;
 
-        this.oceans.forEach((ocean) => ocean.dispose());
+        this.oceans.forEach((ocean) => ocean.dispose(camera));
         this.oceans.length = 0;
 
-        this.clouds.forEach((clouds) => clouds.dispose());
+        this.clouds.forEach((clouds) => clouds.dispose(camera));
         this.clouds.length = 0;
 
-        this.atmospheres.forEach((atmosphere) => atmosphere.dispose());
+        this.atmospheres.forEach((atmosphere) => atmosphere.dispose(camera));
         this.atmospheres.length = 0;
 
-        this.rings.forEach((rings) => rings.dispose());
+        this.rings.forEach((rings) => rings.dispose(camera));
         this.rings.length = 0;
 
-        this.mandelbulbs.forEach((mandelbulb) => mandelbulb.dispose());
+        this.mandelbulbs.forEach((mandelbulb) => mandelbulb.dispose(camera));
         this.mandelbulbs.length = 0;
 
-        this.blackHoles.forEach((blackHole) => blackHole.dispose());
+        this.blackHoles.forEach((blackHole) => blackHole.dispose(camera));
         this.blackHoles.length = 0;
 
-        this.matterJets.forEach((matterJet) => matterJet.dispose());
+        this.matterJets.forEach((matterJet) => matterJet.dispose(camera));
         this.matterJets.length = 0;
 
-        this.shadows.forEach((shadow) => shadow.dispose());
+        this.shadows.forEach((shadow) => shadow.dispose(camera));
         this.shadows.length = 0;
 
-        this.lensFlares.forEach((lensFlare) => lensFlare.dispose());
+        this.lensFlares.forEach((lensFlare) => lensFlare.dispose(camera));
         this.lensFlares.length = 0;
-
-        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.spaceRenderingPipeline.name, this.scene.cameras);
-        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.surfaceRenderingPipeline.name, this.scene.cameras);
-
-        this.renderingPipelineManager.removePipeline(this.surfaceRenderingPipeline.name);
-        this.renderingPipelineManager.removePipeline(this.spaceRenderingPipeline.name);
-
-        this.surfaceRenderingPipeline.dispose();
-        this.spaceRenderingPipeline.dispose();
-
-        this.spaceRenderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "spaceRenderingPipeline");
-        this.renderingPipelineManager.addPipeline(this.spaceRenderingPipeline);
-
-        this.surfaceRenderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "surfaceRenderingPipeline");
-        this.renderingPipelineManager.addPipeline(this.surfaceRenderingPipeline);
     }
 }

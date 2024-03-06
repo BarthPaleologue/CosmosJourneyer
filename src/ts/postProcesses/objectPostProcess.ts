@@ -17,6 +17,7 @@
 
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Transformable } from "../architecture/transformable";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export interface UpdatablePostProcess extends PostProcess {
     /**
@@ -32,5 +33,5 @@ export interface ObjectPostProcess extends PostProcess {
      * This makes sense for raymarching and raytracing shaders that need to know the position of the object.
      */
     readonly object: Transformable;
-    dispose(): void;
+    dispose(camera?: Camera): void;
 }
