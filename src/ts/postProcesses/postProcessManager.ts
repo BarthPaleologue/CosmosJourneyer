@@ -82,19 +82,43 @@ const surfaceRenderingOrder: PostProcessType[] = [
 
 /**
  * Manages all post processes in the scene.
- * The manager can dynamically create rendering pipelines depending on the current body.
+ * The manager dynamically creates the rendering pipeline depending on the current body.
  * This is necessary so the effects are rendered in the correct order. (other objects -> body -> overlays)
  */
 export class PostProcessManager {
-    private readonly engine: Engine;
-    private readonly scene: UberScene;
+    /**
+     * The BabylonJS engine
+     */
+    readonly engine: Engine;
 
-    private readonly renderingPipelineManager: PostProcessRenderPipelineManager;
+    /**
+     * The scene where the solar system is rendered.
+     * It needs to use the wrapper as the post-processes need the depth renderer of the scene.
+     */
+    readonly scene: UberScene;
 
+    /**
+     * The BabylonJS rendering pipeline manager of the scene
+     */
+    readonly renderingPipelineManager: PostProcessRenderPipelineManager;
+
+    /**
+     * The current rendering pipeline. It is destroyed and recreated every time the closest orbital object changes or when the camera changes.
+     * @private
+     */
     private renderingPipeline: PostProcessRenderPipeline;
 
+    /**
+     * The order in which to add the post-processes to the rendering pipeline. This is important as this order determines the rendering order.
+     * For now, there are 2 different orders: one when in space, and one when close to a planet.
+     * @private
+     */
     private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
 
+    /**
+     * The closest celestial body to the active camera. This is useful to split post-processes that are specific to a body from the others.
+     * @private
+     */
     private currentBody: CelestialBody | null = null;
 
     private readonly starFields: StarfieldPostProcess[] = [];
@@ -114,12 +138,30 @@ export class PostProcessManager {
      */
     private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.oceans, this.clouds, this.blackHoles, this.matterJets];
 
+    /**
+     * The color correction post process responsible for tone mapping, saturation, contrast, brightness and gamma.
+     */
     readonly colorCorrection: ColorCorrection;
+
+    /**
+     * The FXAA post process responsible for antialiasing.
+     */
     readonly fxaa: FxaaPostProcess;
 
+    /**
+     * The effect storing the star field post process.
+     * @private
+     */
     private readonly starFieldRenderEffect: PostProcessRenderEffect;
 
+    /**
+     * The effect storing the color correction post process.
+     */
     readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
+
+    /**
+     * The effect storing the FXAA post process.
+     */
     readonly fxaaRenderEffect: PostProcessRenderEffect;
 
     //readonly bloomRenderEffect: BloomEffect;
@@ -286,29 +328,56 @@ export class PostProcessManager {
         this.blackHoles.push(blackhole);
     }
 
+    /**
+     * Returns the black hole post process for the given black hole. Throws an error if no black hole is found.
+     * @param blackHole A black hole
+     */
     public getBlackHole(blackHole: BlackHole): BlackHolePostProcess | null {
         return this.blackHoles.find((bh) => bh.object === blackHole) ?? null;
     }
 
+    /**
+     * Creates a new MatterJet postprocess for the given neutron star and adds it to the manager.
+     * @param neutronStar A neutron star
+     */
     public addMatterJet(neutronStar: NeutronStar) {
         console.log("add matter jet");
         this.matterJets.push(new MatterJetPostProcess(neutronStar.name, neutronStar, this.scene));
     }
 
+    /**
+     * Returns the matter jet post process for the given neutron star. Throws an error if no matter jet is found.
+     * @param neutronStar A neutron star
+     */
     public getMatterJet(neutronStar: NeutronStar): MatterJetPostProcess | null {
         return this.matterJets.find((mj) => mj.object === neutronStar) ?? null;
     }
 
+    /**
+     * Creates a new Shadow postprocess for the given body and adds it to the manager.
+     * @param body A celestial body
+     * @param stellarObjects An array of stellar objects
+     */
     public async addShadowCaster(body: CelestialBody, stellarObjects: StellarObject[]) {
         return ShadowPostProcess.CreateAsync(body, this.scene, stellarObjects).then((shadow) => {
             this.shadows.push(shadow);
         });
     }
 
+    /**
+     * Creates a new LensFlare postprocess for the given stellar object and adds it to the manager.
+     * @param stellarObject A stellar object (usually a star or a neutron star)
+     */
     public addLensFlare(stellarObject: StellarObject) {
         this.lensFlares.push(new LensFlarePostProcess(stellarObject, this.scene));
     }
 
+    /**
+     * Sets the current celestial body of the post process manager.
+     * It should be the closest body to the active camera, in order to split the post processes that are specific to this body from the others.
+     * This method will also choose the appropriate rendering order and rebuild the pipeline.
+     * @param body The closest celestial body to the active camera
+     */
     public setBody(body: CelestialBody) {
         this.currentBody = body;
 
@@ -318,23 +387,36 @@ export class PostProcessManager {
         else this.setSpaceOrder();
     }
 
+    /**
+     * Sets the rendering order to the space rendering order and rebuilds the pipeline.
+     */
     public setSpaceOrder() {
         if (this.currentRenderingOrder === spaceRenderingOrder) return;
         this.currentRenderingOrder = spaceRenderingOrder;
         this.rebuild();
     }
 
+    /**
+     * Sets the rendering order to the surface rendering order and rebuilds the pipeline.
+     */
     public setSurfaceOrder() {
         if (this.currentRenderingOrder === surfaceRenderingOrder) return;
         this.currentRenderingOrder = surfaceRenderingOrder;
         this.rebuild();
     }
 
+    /**
+     * Returns the current celestial body, or throws an error if it is null.
+     * @private
+     */
     private getCurrentBody() {
         if (this.currentBody === null) throw new Error("No body set to the postProcessManager");
         return this.currentBody;
     }
 
+    /**
+     * Rebuilds the rendering pipeline with the current rendering order.
+     */
     public rebuild() {
         this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
         this.renderingPipelineManager.removePipeline(this.renderingPipeline.name);
@@ -449,6 +531,10 @@ export class PostProcessManager {
         for (const postProcess of this.updatablePostProcesses.flat()) postProcess.update(deltaTime);
     }
 
+    /**
+     * Disposes of all post-processes tied to a star system (everything except color correction and FXAA).
+     * The pipeline is not destroyed as it is always destroyed and recreated when the closest orbital object changes.
+     */
     public reset() {
         const camera = this.scene.getActiveCamera();
 
