@@ -49,6 +49,8 @@ export class StarMapUI {
 
     static ALPHA_ANIMATION = new Animation("alphaAnimation", "alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
+    private _isHovered = false;
+
     constructor(engine: Engine) {
         this.scene = new Scene(engine);
         this.scene.useRightHandedSystem = true;
@@ -66,6 +68,14 @@ export class StarMapUI {
         this.systemUI.linkOffsetY = -200;
         this.systemUI.zIndex = 6;
         this.systemUI.alpha = 0.95;
+
+        this.systemUI.onPointerEnterObservable.add(() => {
+            this._isHovered = true;
+        });
+
+        this.systemUI.onPointerOutObservable.add(() => {
+            this._isHovered = false;
+        });
 
         this.namePlate = new TextBlock();
         this.namePlate.text = "";
@@ -88,6 +98,7 @@ export class StarMapUI {
         this.warpButton.background = "midnightblue";
         this.warpButton.fontWeight = "bold";
         this.warpButton.fontFamily = Settings.MAIN_FONT;
+        this.warpButton.isPointerBlocker = false;
         //this.warpButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
 
         this.systemUI.addControl(this.namePlate);
@@ -118,6 +129,10 @@ export class StarMapUI {
         ]);
 
         this.hoveredSystemRing.animations = [StarMapUI.ALPHA_ANIMATION];
+    }
+
+    isHovered() {
+        return this._isHovered;
     }
 
     update(activeCamera: Camera) {

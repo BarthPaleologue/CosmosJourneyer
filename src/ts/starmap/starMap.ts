@@ -227,7 +227,15 @@ export class StarMap implements View {
             }
         ]);
 
-        this.travelLine = new ThickLines("travelLine", { points: [], thickness: 0.01, color: Color3.Red() }, this.scene);
+        this.travelLine = new ThickLines(
+            "travelLine",
+            {
+                points: [],
+                thickness: 0.01,
+                color: Color3.Red()
+            },
+            this.scene
+        );
         this.thickLines = [this.travelLine];
 
         // then generate missing star sectors
@@ -436,6 +444,7 @@ export class StarMap implements View {
 
             initializedInstance.actionManager.registerAction(
                 new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
+                    if (this.starMapUI.isHovered()) return;
                     this.starMapUI.setHoveredStarSystemMesh(initializedInstance);
                     Assets.MENU_HOVER_SOUND.play();
                 })
@@ -453,6 +462,8 @@ export class StarMap implements View {
 
         initializedInstance.actionManager?.registerAction(
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
+                if (this.starMapUI.isHovered()) return;
+
                 Assets.STAR_MAP_CLICK_SOUND.play();
 
                 let text = "";
