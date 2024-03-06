@@ -43,7 +43,7 @@ export class HyperSpaceTunnel implements Transformable {
 
     private throttle = 1;
 
-    private diameterTop = 4;
+    private diameterTop = 0;
     private diameterBottom = 160;
 
     private elapsedSeconds = 0;
@@ -88,7 +88,8 @@ export class HyperSpaceTunnel implements Transformable {
                 diameterTop: this.diameterTop,
                 diameterBottom: this.diameterBottom,
                 height: this.positiveDepth + this.negativeDepth,
-                sideOrientation: Mesh.BACKSIDE
+                sideOrientation: Mesh.BACKSIDE,
+                subdivisions: 64
             },
             scene
         );
@@ -104,7 +105,7 @@ export class HyperSpaceTunnel implements Transformable {
             uniforms: ["worldViewProjection", "time"],
             samplers: ["warpNoise"]
         });
-        this.warpConeMaterial.setTexture("warpNoise", Assets.WARP_NOISE);
+        this.warpConeMaterial.setTexture("warpNoise", Assets.SEAMLESS_PERLIN);
 
         this.warpCone.material = this.warpConeMaterial;
     }
