@@ -71,7 +71,7 @@ scene.enablePhysics(Vector3.Zero(), havokPlugin);
 const characterController = new CharacterControls(scene);
 characterController.getTransform().setAbsolutePosition(new Vector3(0, 2, 0));
 
-scene.setActiveController(characterController);
+scene.setActiveControls(characterController);
 
 const centerOfPlanet = new TransformNodeWrapper(new TransformNode("centerOfPlanet", scene), 1000e3);
 centerOfPlanet.getTransform().position.y = -1000e3;

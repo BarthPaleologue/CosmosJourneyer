@@ -21,20 +21,16 @@ import { OrbitProperties } from "../orbit/orbitProperties";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectPhysicalProperties } from "./physicalProperties";
+import { TypedObject } from "./typedObject";
 
 /**
  * Describes all objects that can have an orbital trajectory and rotate on themselves
  */
-export interface OrbitalObject extends Transformable, BoundingSphere {
+export interface OrbitalObject extends Transformable, BoundingSphere, TypedObject {
     /**
      * The name of the object
      */
     readonly name: string;
-
-    /**
-     * The underlying model describing the data of the orbital object
-     */
-    readonly model: OrbitalObjectModel;
 
     /**
      * The rotation axis around which the object rotates on itself
@@ -50,11 +46,6 @@ export interface OrbitalObject extends Transformable, BoundingSphere {
      * Returns the physical properties of the object
      */
     getPhysicalProperties(): OrbitalObjectPhysicalProperties;
-
-    /**
-     * Returns the type name of the object. This is used as a short identifier in the UI Overlay of the object
-     */
-    getTypeName(): string;
 
     /**
      * Returns the parent of the object

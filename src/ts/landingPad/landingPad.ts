@@ -1,15 +1,8 @@
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Assets } from "../assets";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { CollisionMask } from "../settings";
 import { Scene } from "@babylonjs/core/scene";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { Transformable } from "../architecture/transformable";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { PhysicsMotionType } from "@babylonjs/core";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 export class LandingPad implements Transformable {

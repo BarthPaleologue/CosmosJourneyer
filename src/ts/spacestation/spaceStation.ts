@@ -29,13 +29,13 @@ import { OrbitProperties } from "../orbit/orbitProperties";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core";
 import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { CollisionMask } from "../settings";
 import { CelestialBody } from "../architecture/celestialBody";
+import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;

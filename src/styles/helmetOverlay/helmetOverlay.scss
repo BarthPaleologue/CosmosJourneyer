@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+@import "notifications.scss";
+
 #helmetOverlay {
   position: absolute;
   top: 0;
@@ -50,12 +52,48 @@
     }
   }
 
-  #speedometer {
+  #throttle {
+    margin-bottom: 5px;
+    width: 50px;
+    height: 400px;
+
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: 50px;
+    right: 5px;
+
+    border-top: 1px solid white;
+
+    display: flex;
+    align-items: flex-end;
+
+    #throttleStripes {
+      background: repeating-linear-gradient(to top,
+              rgba(128, 255, 128, 1.0),
+              rgba(128, 255, 128, 1.0) 4px,
+              transparent 4px,
+              transparent 8px
+      );
+      backdrop-filter: blur(5px) brightness(0.8);
+      height: 100%;
+      width: 100%;
+
+      &.reversed {
+        background: repeating-linear-gradient(to bottom,
+                rgba(255, 128, 128, 1.0),
+                rgba(255, 128, 128, 1.0) 4px,
+                transparent 4px,
+                transparent 8px
+        );
+      }
+    }
+  }
+
+  #speed {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
     color: white;
-    font-size: 200%;
-    text-shadow: white 0 0 3px;
+    font-family: Nasalization, sans-serif;
+    font-size: 2em;
   }
 }

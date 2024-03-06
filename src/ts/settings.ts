@@ -23,6 +23,11 @@ export const Settings = {
     EARTH_RADIUS: 1000e3, // target is 6000e3
     AU: 150e9, // target is 150e9
 
+    /**
+     * The distance light travels in one year.
+     */
+    LIGHT_YEAR: 3e8 * 60 * 60 * 24 * 365.25,
+
     VERTEX_RESOLUTION: 64,
     MIN_DISTANCE_BETWEEN_VERTICES: 1.5,
 

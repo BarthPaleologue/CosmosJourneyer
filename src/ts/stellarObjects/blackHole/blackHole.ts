@@ -51,7 +51,7 @@ export class BlackHole implements StellarObject, Cullable {
 
         this.parent = parentBody;
 
-        this.transform = new TransformNode(`${name}Transform`, scene);
+        this.transform = new TransformNode(name, scene);
         this.transform.rotate(Axis.X, this.model.physicalProperties.axialTilt);
 
         this.light = new PointLight(`${name}Light`, Vector3.Zero(), scene);

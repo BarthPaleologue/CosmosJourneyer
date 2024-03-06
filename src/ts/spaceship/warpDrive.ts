@@ -17,6 +17,7 @@
 
 import { Settings } from "../settings";
 import { clamp } from "../utils/math";
+import { moveTowards } from "../utils/moveTowards";
 
 enum WarpDriveState {
     /**
@@ -69,21 +70,14 @@ export interface ReadonlyWarpDrive {
      * Returns the current target throttle of the warp drive.
      * @returns The current target throttle of the warp drive.
      */
-    getTargetThrottle(): number;
-
-    /**
-     * Returns the current internal throttle of the warp drive.
-     * @returns The current internal throttle of the warp drive.
-     */
-    getInternalThrottle(): number;
+    getThrottle(): number;
 }
 
 export class WarpDrive implements ReadonlyWarpDrive {
     /**
-     * Internal throttle of the warp drive. It is a value between 0 and 1. It defines the current speed ratio with the target speed.
-     * (0 means that the ship is not moving, 1 means that the ship is moving at the target speed)
+     * The throttle lags behind the target throttle. Hence, the current throttle is not equal to the target throttle.
      */
-    private internalThrottle = 0;
+    private currentThrottle = 0;
 
     /**
      * User throttle of the warp drive. It is a value between 0 and 1. It constrains the target speed of the warp drive.
@@ -92,9 +86,9 @@ export class WarpDrive implements ReadonlyWarpDrive {
     private targetThrottle = 1;
 
     /**
-     * Acceleration of the internal throtle.
+     * Speed at which the throttle catches up to the target throttle.
      */
-    private readonly internalThrottleAcceleration = 0.04;
+    private readonly throttleUpdateSpeed = 0.2;
 
     /**
      * Maximum speed of the warp drive in m/s. It can be reached when the ship is far from any body and the user throttle is set to 1.
@@ -142,7 +136,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
     private disable(): void {
         this.state = WarpDriveState.DISABLED;
         this.targetSpeed = 0;
-        this.internalThrottle = 0;
+        this.currentThrottle = 0;
         this.currentSpeed = 0;
     }
 
@@ -180,24 +174,12 @@ export class WarpDrive implements ReadonlyWarpDrive {
         this.targetThrottle = clamp(this.targetThrottle + delta, 0, 1);
     }
 
-    /**
-     * Increases the internal throttle by the given delta and clamps it between 0 and 1.
-     * @param delta The delta to apply to the internal throttle.
-     */
-    private increaseInternalThrottle(delta: number): void {
-        this.internalThrottle = clamp(this.internalThrottle + delta, 0, this.targetThrottle);
-    }
-
     public getWarpSpeed(): number {
         return this.currentSpeed;
     }
 
-    public getTargetThrottle(): number {
+    public getThrottle(): number {
         return this.targetThrottle;
-    }
-
-    public getInternalThrottle(): number {
-        return this.internalThrottle;
     }
 
     /**
@@ -206,12 +188,11 @@ export class WarpDrive implements ReadonlyWarpDrive {
      * @param deltaTime The time elapsed since the last update in seconds.
      */
     private updateWarpDriveSpeed(currentForwardSpeed: number, deltaTime: number): void {
-        const sign = Math.sign(this.targetSpeed - currentForwardSpeed);
+        const deltaThrottle = this.throttleUpdateSpeed * deltaTime;
 
-        const deltaThrottle = this.internalThrottleAcceleration * deltaTime;
-        this.increaseInternalThrottle(deltaThrottle * sign);
+        this.currentThrottle = moveTowards(this.currentThrottle, this.targetThrottle, deltaThrottle);
 
-        this.currentSpeed = Math.max(WarpDrive.MIN_SPEED, this.internalThrottle * this.targetSpeed);
+        this.currentSpeed = Math.max(WarpDrive.MIN_SPEED, this.currentThrottle * this.targetSpeed);
     }
 
     /**
@@ -235,7 +216,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
             case WarpDriveState.DISABLED:
                 this.targetSpeed = 0;
                 this.currentSpeed = 0;
-                this.internalThrottle = 0;
+                this.currentThrottle = 0;
                 break;
         }
     }

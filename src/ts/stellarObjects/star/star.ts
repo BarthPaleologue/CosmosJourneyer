@@ -76,7 +76,7 @@ export class Star implements StellarObject, Cullable {
 
         this.mesh = isSphere
             ? MeshBuilder.CreateSphere(
-                  `${name}Mesh`,
+                  name,
                   {
                       diameter: this.model.radius * 2,
                       segments: 32

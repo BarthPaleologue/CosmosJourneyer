@@ -113,7 +113,7 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
 
         const samplers: ShaderSamplers = [...getSamplers(scene)];
 
-        super(object.name, shaderName, uniforms, samplers, scene);
+        super(object.name + "LensFlare", shaderName, uniforms, samplers, scene);
 
         this.object = object;
         this.settings = settings;

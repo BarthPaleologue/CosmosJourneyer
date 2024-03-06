@@ -20,7 +20,7 @@ import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IPatch } from "./iPatch";
 import { applyTransformationToBuffer } from "./matrixBuffer";
-import { Observer } from "@babylonjs/core";
+import { Observer } from "@babylonjs/core/Misc/observable";
 
 export class ThinInstancePatch implements IPatch {
     private baseMesh: Mesh | null = null;

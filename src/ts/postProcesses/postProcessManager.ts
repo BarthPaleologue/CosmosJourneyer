@@ -32,6 +32,7 @@ import { CloudsPostProcess } from "./volumetricCloudsPostProcess";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
+//import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { PostProcessType } from "./postProcessTypes";
@@ -40,7 +41,7 @@ import { ShadowPostProcess } from "./shadowPostProcess";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { isOrbiting } from "../utils/nearestBody";
-import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
+import { UpdatablePostProcess } from "./objectPostProcess";
 import { MatterJetPostProcess } from "./matterJetPostProcess";
 import { Mandelbulb } from "../mandelbulb/mandelbulb";
 import { Star } from "../stellarObjects/star/star";
@@ -48,8 +49,8 @@ import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
-import { PostProcessRenderPipelineManager } from "@babylonjs/core";
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
+import { PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -81,21 +82,43 @@ const surfaceRenderingOrder: PostProcessType[] = [
 
 /**
  * Manages all post processes in the scene.
- * The manager can dynamically create rendering pipelines depending on the current body.
+ * The manager dynamically creates the rendering pipeline depending on the current body.
  * This is necessary so the effects are rendered in the correct order. (other objects -> body -> overlays)
  */
 export class PostProcessManager {
-    private readonly engine: Engine;
-    private readonly scene: UberScene;
+    /**
+     * The BabylonJS engine
+     */
+    readonly engine: Engine;
 
-    private readonly renderingPipelineManager: PostProcessRenderPipelineManager;
+    /**
+     * The scene where the solar system is rendered.
+     * It needs to use the wrapper as the post-processes need the depth renderer of the scene.
+     */
+    readonly scene: UberScene;
 
-    private readonly spaceRenderingPipeline: PostProcessRenderPipeline;
-    private readonly surfaceRenderingPipeline: PostProcessRenderPipeline;
-    private currentRenderingPipeline: PostProcessRenderPipeline;
+    /**
+     * The BabylonJS rendering pipeline manager of the scene
+     */
+    readonly renderingPipelineManager: PostProcessRenderPipelineManager;
 
+    /**
+     * The current rendering pipeline. It is destroyed and recreated every time the closest orbital object changes or when the camera changes.
+     * @private
+     */
+    private renderingPipeline: PostProcessRenderPipeline;
+
+    /**
+     * The order in which to add the post-processes to the rendering pipeline. This is important as this order determines the rendering order.
+     * For now, there are 2 different orders: one when in space, and one when close to a planet.
+     * @private
+     */
     private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
 
+    /**
+     * The closest celestial body to the active camera. This is useful to split post-processes that are specific to a body from the others.
+     * @private
+     */
     private currentBody: CelestialBody | null = null;
 
     private readonly starFields: StarfieldPostProcess[] = [];
@@ -111,33 +134,36 @@ export class PostProcessManager {
     private readonly lensFlares: LensFlarePostProcess[] = [];
 
     /**
-     * All post processes that are attached to an object.
-     */
-    private readonly objectPostProcesses: ObjectPostProcess[][] = [
-        this.oceans,
-        this.clouds,
-        this.atmospheres,
-        this.rings,
-        this.mandelbulbs,
-        this.blackHoles,
-        this.volumetricLights,
-        this.matterJets,
-        this.shadows,
-        this.lensFlares
-    ];
-
-    /**
      * All post processes that are updated every frame.
      */
     private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.oceans, this.clouds, this.blackHoles, this.matterJets];
 
+    /**
+     * The color correction post process responsible for tone mapping, saturation, contrast, brightness and gamma.
+     */
     readonly colorCorrection: ColorCorrection;
+
+    /**
+     * The FXAA post process responsible for antialiasing.
+     */
     readonly fxaa: FxaaPostProcess;
 
+    /**
+     * The effect storing the star field post process.
+     * @private
+     */
     private readonly starFieldRenderEffect: PostProcessRenderEffect;
 
+    /**
+     * The effect storing the color correction post process.
+     */
     readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
+
+    /**
+     * The effect storing the FXAA post process.
+     */
     readonly fxaaRenderEffect: PostProcessRenderEffect;
+
     //readonly bloomRenderEffect: BloomEffect;
 
     constructor(scene: UberScene) {
@@ -160,20 +186,15 @@ export class PostProcessManager {
             return [this.fxaa];
         });
 
-        this.spaceRenderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "spaceRenderingPipeline");
-        this.renderingPipelineManager.addPipeline(this.spaceRenderingPipeline);
-
-        this.surfaceRenderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "surfaceRenderingPipeline");
-        this.renderingPipelineManager.addPipeline(this.surfaceRenderingPipeline);
-
-        this.currentRenderingPipeline = this.spaceRenderingPipeline;
+        this.renderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "renderingPipeline");
+        this.renderingPipelineManager.addPipeline(this.renderingPipeline);
 
         this.starFieldRenderEffect = new PostProcessRenderEffect(this.engine, "starFieldRenderEffect", () => {
             return this.starFields;
         });
 
         //this.bloomRenderEffect = new BloomEffect(scene, 1.0, 2.0, 32);
-        //this.bloomRenderEffect.threshold = 0.5;
+        //this.bloomRenderEffect.threshold = 0.7;
     }
 
     /**
@@ -307,64 +328,102 @@ export class PostProcessManager {
         this.blackHoles.push(blackhole);
     }
 
+    /**
+     * Returns the black hole post process for the given black hole. Throws an error if no black hole is found.
+     * @param blackHole A black hole
+     */
     public getBlackHole(blackHole: BlackHole): BlackHolePostProcess | null {
         return this.blackHoles.find((bh) => bh.object === blackHole) ?? null;
     }
 
+    /**
+     * Creates a new MatterJet postprocess for the given neutron star and adds it to the manager.
+     * @param neutronStar A neutron star
+     */
     public addMatterJet(neutronStar: NeutronStar) {
         console.log("add matter jet");
         this.matterJets.push(new MatterJetPostProcess(neutronStar.name, neutronStar, this.scene));
     }
 
+    /**
+     * Returns the matter jet post process for the given neutron star. Throws an error if no matter jet is found.
+     * @param neutronStar A neutron star
+     */
     public getMatterJet(neutronStar: NeutronStar): MatterJetPostProcess | null {
         return this.matterJets.find((mj) => mj.object === neutronStar) ?? null;
     }
 
+    /**
+     * Creates a new Shadow postprocess for the given body and adds it to the manager.
+     * @param body A celestial body
+     * @param stellarObjects An array of stellar objects
+     */
     public async addShadowCaster(body: CelestialBody, stellarObjects: StellarObject[]) {
         return ShadowPostProcess.CreateAsync(body, this.scene, stellarObjects).then((shadow) => {
             this.shadows.push(shadow);
         });
     }
 
+    /**
+     * Creates a new LensFlare postprocess for the given stellar object and adds it to the manager.
+     * @param stellarObject A stellar object (usually a star or a neutron star)
+     */
     public addLensFlare(stellarObject: StellarObject) {
         this.lensFlares.push(new LensFlarePostProcess(stellarObject, this.scene));
     }
 
+    /**
+     * Sets the current celestial body of the post process manager.
+     * It should be the closest body to the active camera, in order to split the post processes that are specific to this body from the others.
+     * This method will also choose the appropriate rendering order and rebuild the pipeline.
+     * @param body The closest celestial body to the active camera
+     */
     public setBody(body: CelestialBody) {
         this.currentBody = body;
 
         const rings = this.getRings(body);
         const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;
-        if (isOrbiting(this.scene.getActiveController(), body, switchLimit)) this.setSurfaceOrder();
+        if (isOrbiting(this.scene.getActiveControls(), body, switchLimit)) this.setSurfaceOrder();
         else this.setSpaceOrder();
     }
 
+    /**
+     * Sets the rendering order to the space rendering order and rebuilds the pipeline.
+     */
     public setSpaceOrder() {
-        if (this.currentRenderingPipeline === this.spaceRenderingPipeline) return;
-        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.surfaceRenderingPipeline.name, [this.scene.getActiveCamera()]);
-        this.currentRenderingPipeline = this.spaceRenderingPipeline;
+        if (this.currentRenderingOrder === spaceRenderingOrder) return;
         this.currentRenderingOrder = spaceRenderingOrder;
-        this.init();
+        this.rebuild();
     }
 
+    /**
+     * Sets the rendering order to the surface rendering order and rebuilds the pipeline.
+     */
     public setSurfaceOrder() {
-        if (this.currentRenderingPipeline === this.surfaceRenderingPipeline) return;
-        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.spaceRenderingPipeline.name, [this.scene.getActiveCamera()]);
-        this.currentRenderingPipeline = this.surfaceRenderingPipeline;
+        if (this.currentRenderingOrder === surfaceRenderingOrder) return;
         this.currentRenderingOrder = surfaceRenderingOrder;
-        this.init();
+        this.rebuild();
     }
 
-    public rebuild() {
-        this.init();
-    }
-
+    /**
+     * Returns the current celestial body, or throws an error if it is null.
+     * @private
+     */
     private getCurrentBody() {
         if (this.currentBody === null) throw new Error("No body set to the postProcessManager");
         return this.currentBody;
     }
 
-    init() {
+    /**
+     * Rebuilds the rendering pipeline with the current rendering order.
+     */
+    public rebuild() {
+        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
+        this.renderingPipelineManager.removePipeline(this.renderingPipeline.name);
+        this.renderingPipeline.dispose();
+
+        this.renderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "renderingPipeline");
+
         const [otherVolumetricLightsRenderEffect, bodyVolumetricLightsRenderEffect] = makeSplitRenderEffects(
             "VolumetricLights",
             this.getCurrentBody(),
@@ -381,41 +440,41 @@ export class PostProcessManager {
         const shadowRenderEffect = new PostProcessRenderEffect(this.engine, "ShadowRenderEffect", () => this.shadows);
         const lensFlareRenderEffect = new PostProcessRenderEffect(this.engine, "LensFlareRenderEffect", () => this.lensFlares);
 
-        this.currentRenderingPipeline.addEffect(this.starFieldRenderEffect);
+        this.renderingPipeline.addEffect(this.starFieldRenderEffect);
 
-        this.currentRenderingPipeline.addEffect(shadowRenderEffect);
+        this.renderingPipeline.addEffect(shadowRenderEffect);
 
         for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
                 case PostProcessType.VOLUMETRIC_LIGHT:
-                    this.currentRenderingPipeline.addEffect(otherVolumetricLightsRenderEffect);
+                    this.renderingPipeline.addEffect(otherVolumetricLightsRenderEffect);
                     break;
                 case PostProcessType.BLACK_HOLE:
-                    this.currentRenderingPipeline.addEffect(otherBlackHolesRenderEffect);
+                    this.renderingPipeline.addEffect(otherBlackHolesRenderEffect);
                     break;
                 case PostProcessType.OCEAN:
-                    this.currentRenderingPipeline.addEffect(otherOceansRenderEffect);
+                    this.renderingPipeline.addEffect(otherOceansRenderEffect);
                     break;
                 case PostProcessType.CLOUDS:
-                    this.currentRenderingPipeline.addEffect(otherCloudsRenderEffect);
+                    this.renderingPipeline.addEffect(otherCloudsRenderEffect);
                     break;
                 case PostProcessType.ATMOSPHERE:
-                    this.currentRenderingPipeline.addEffect(otherAtmospheresRenderEffect);
+                    this.renderingPipeline.addEffect(otherAtmospheresRenderEffect);
                     break;
                 case PostProcessType.RING:
-                    this.currentRenderingPipeline.addEffect(otherRingsRenderEffect);
+                    this.renderingPipeline.addEffect(otherRingsRenderEffect);
                     break;
                 case PostProcessType.MATTER_JETS:
-                    this.currentRenderingPipeline.addEffect(otherMatterJetsRenderEffect);
+                    this.renderingPipeline.addEffect(otherMatterJetsRenderEffect);
                     break;
                 case PostProcessType.MANDELBULB:
-                    this.currentRenderingPipeline.addEffect(otherMandelbulbsRenderEffect);
+                    this.renderingPipeline.addEffect(otherMandelbulbsRenderEffect);
                     break;
                 case PostProcessType.SHADOW:
-                    //this.currentRenderingPipeline.addEffect(otherShadowRenderEffect);
+                    //this.renderingPipeline.addEffect(otherShadowRenderEffect);
                     break;
                 case PostProcessType.LENS_FLARE:
-                    //this.currentRenderingPipeline.addEffect(otherLensFlaresRenderEffect);
+                    //this.renderingPipeline.addEffect(otherLensFlaresRenderEffect);
                     break;
             }
         }
@@ -423,44 +482,45 @@ export class PostProcessManager {
         for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
                 case PostProcessType.VOLUMETRIC_LIGHT:
-                    this.currentRenderingPipeline.addEffect(bodyVolumetricLightsRenderEffect);
+                    this.renderingPipeline.addEffect(bodyVolumetricLightsRenderEffect);
                     break;
                 case PostProcessType.BLACK_HOLE:
-                    this.currentRenderingPipeline.addEffect(bodyBlackHolesRenderEffect);
+                    this.renderingPipeline.addEffect(bodyBlackHolesRenderEffect);
                     break;
                 case PostProcessType.OCEAN:
-                    this.currentRenderingPipeline.addEffect(bodyOceansRenderEffect);
+                    this.renderingPipeline.addEffect(bodyOceansRenderEffect);
                     break;
                 case PostProcessType.CLOUDS:
-                    this.currentRenderingPipeline.addEffect(bodyCloudsRenderEffect);
+                    this.renderingPipeline.addEffect(bodyCloudsRenderEffect);
                     break;
                 case PostProcessType.ATMOSPHERE:
-                    this.currentRenderingPipeline.addEffect(bodyAtmospheresRenderEffect);
+                    this.renderingPipeline.addEffect(bodyAtmospheresRenderEffect);
                     break;
                 case PostProcessType.RING:
-                    this.currentRenderingPipeline.addEffect(bodyRingsRenderEffect);
+                    this.renderingPipeline.addEffect(bodyRingsRenderEffect);
                     break;
                 case PostProcessType.MATTER_JETS:
-                    this.currentRenderingPipeline.addEffect(bodyMatterJetsRenderEffect);
+                    this.renderingPipeline.addEffect(bodyMatterJetsRenderEffect);
                     break;
                 case PostProcessType.MANDELBULB:
-                    this.currentRenderingPipeline.addEffect(bodyMandelbulbsRenderEffect);
+                    this.renderingPipeline.addEffect(bodyMandelbulbsRenderEffect);
                     break;
                 case PostProcessType.LENS_FLARE:
-                    //this.currentRenderingPipeline.addEffect(bodyLensFlaresRenderEffect);
+                    //this.renderingPipeline.addEffect(bodyLensFlaresRenderEffect);
                     break;
                 case PostProcessType.SHADOW:
-                    //this.currentRenderingPipeline.addEffect(bodyShadowRenderEffect);
+                    //this.renderingPipeline.addEffect(bodyShadowRenderEffect);
                     break;
             }
         }
 
-        this.currentRenderingPipeline.addEffect(lensFlareRenderEffect);
-        this.currentRenderingPipeline.addEffect(this.fxaaRenderEffect);
-        //this.currentRenderingPipeline.addEffect(this.bloomRenderEffect);
-        this.currentRenderingPipeline.addEffect(this.colorCorrectionRenderEffect);
+        this.renderingPipeline.addEffect(lensFlareRenderEffect);
+        this.renderingPipeline.addEffect(this.fxaaRenderEffect);
+        //this.renderingPipeline.addEffect(this.bloomRenderEffect);
+        this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
-        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.currentRenderingPipeline.name, [this.scene.getActiveCamera()]);
+        this.renderingPipelineManager.addPipeline(this.renderingPipeline);
+        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, [this.scene.getActiveCamera()]);
     }
 
     /**
@@ -472,18 +532,43 @@ export class PostProcessManager {
     }
 
     /**
-     * Disposes all post processes and rendering pipelines.
+     * Disposes of all post-processes tied to a star system (everything except color correction and FXAA).
+     * The pipeline is not destroyed as it is always destroyed and recreated when the closest orbital object changes.
      */
-    public dispose() {
-        for (const objectPostProcess of this.objectPostProcesses.flat()) objectPostProcess.dispose();
+    public reset() {
+        const camera = this.scene.getActiveCamera();
 
-        this.colorCorrection.dispose();
-        this.fxaa.dispose();
+        this.starFields.forEach((starField) => starField.dispose(camera));
+        this.starFields.length = 0;
 
-        this.surfaceRenderingPipeline._detachCameras(this.surfaceRenderingPipeline.cameras);
-        this.spaceRenderingPipeline._detachCameras(this.spaceRenderingPipeline.cameras);
+        this.volumetricLights.forEach((volumetricLight) => volumetricLight.dispose(camera));
+        this.volumetricLights.length = 0;
 
-        this.surfaceRenderingPipeline.dispose();
-        this.spaceRenderingPipeline.dispose();
+        this.oceans.forEach((ocean) => ocean.dispose(camera));
+        this.oceans.length = 0;
+
+        this.clouds.forEach((clouds) => clouds.dispose(camera));
+        this.clouds.length = 0;
+
+        this.atmospheres.forEach((atmosphere) => atmosphere.dispose(camera));
+        this.atmospheres.length = 0;
+
+        this.rings.forEach((rings) => rings.dispose(camera));
+        this.rings.length = 0;
+
+        this.mandelbulbs.forEach((mandelbulb) => mandelbulb.dispose(camera));
+        this.mandelbulbs.length = 0;
+
+        this.blackHoles.forEach((blackHole) => blackHole.dispose(camera));
+        this.blackHoles.length = 0;
+
+        this.matterJets.forEach((matterJet) => matterJet.dispose(camera));
+        this.matterJets.length = 0;
+
+        this.shadows.forEach((shadow) => shadow.dispose(camera));
+        this.shadows.length = 0;
+
+        this.lensFlares.forEach((lensFlare) => lensFlare.dispose(camera));
+        this.lensFlares.length = 0;
     }
 }

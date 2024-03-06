@@ -31,7 +31,9 @@ import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
 import { ChunkForgeWorkers } from "./planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { Star } from "./stellarObjects/star/star";
 import { Settings } from "./settings";
-import { ScenePerformancePriority } from "@babylonjs/core";
+import { ScenePerformancePriority } from "@babylonjs/core/scene";
+
+import "@babylonjs/core";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;

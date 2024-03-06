@@ -18,13 +18,10 @@
 import "../styles/index.scss";
 
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
 import { decodeBase64 } from "./utils/base64";
 import { isJsonStringValidUniverseCoordinates } from "./saveFile/universeCoordinates";
 
 const engine = await CosmosJourneyer.CreateAsync();
-
-const starSystemView = engine.starSystemView;
 
 const urlParams = new URLSearchParams(window.location.search);
 const universeCoordinatesString = urlParams.get("universeCoordinates");
@@ -38,34 +35,3 @@ if (universeCoordinatesString !== null) {
 } else {
     engine.init(false);
 }
-
-const shipControls = starSystemView.getSpaceshipControls();
-const characterController = starSystemView.getCharacterControls();
-
-document.addEventListener("keydown", (e) => {
-    if (engine.isPaused()) return;
-
-    if (e.key === "e") {
-        if (starSystemView.scene.getActiveController() === shipControls) {
-            console.log("disembark");
-
-            characterController.getTransform().setEnabled(true);
-            characterController.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
-            translate(characterController.getTransform(), getForwardDirection(shipControls.getTransform()).scale(10));
-
-            setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
-
-            starSystemView.scene.setActiveController(characterController);
-            starSystemView.getStarSystem().postProcessManager.rebuild();
-
-            shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
-            shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
-        } else if (starSystemView.scene.getActiveController() === characterController) {
-            console.log("embark");
-
-            characterController.getTransform().setEnabled(false);
-            starSystemView.scene.setActiveController(shipControls);
-            starSystemView.getStarSystem().postProcessManager.rebuild();
-        }
-    }
-});

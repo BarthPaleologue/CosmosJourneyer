@@ -64,7 +64,7 @@ export class GasPlanet implements Planet, Cullable {
         this.model = model instanceof GasPlanetModel ? model : new GasPlanetModel(model, parentBody?.model);
 
         this.mesh = MeshBuilder.CreateSphere(
-            `${name}Mesh`,
+            name,
             {
                 diameter: this.model.radius * 2,
                 segments: 32

@@ -1,4 +1,4 @@
-precision highp float;
+precision lowp float;
 
 // based on https://www.shadertoy.com/view/wlcyzj
 
@@ -102,28 +102,10 @@ vec3 anflares(vec2 uv, float intensity, float stretch, float brightness)
     return vec3(smoothstep(0.009, 0.0, length(uv)))*brightness;
 }
 
-vec3 aces_tonemap(vec3 color){
-    mat3 m1 = mat3(
-    0.59719, 0.07600, 0.02840,
-    0.35458, 0.90834, 0.13383,
-    0.04823, 0.01566, 0.83777
-    );
-    mat3 m2 = mat3(
-    1.60475, -0.10208, -0.00327,
-    -0.53108,  1.10813, -0.07276,
-    -0.07367, -0.00605,  1.07602
-    );
-    vec3 v = m1 * color;
-    vec3 a = v * (v + 0.0245786) - 0.000090537;
-    vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081;
-    return clamp(m2 * (a / b), 0.0, 1.0);
-}
-
 void main() {
     vec4 screenColor = texture(textureSampler, vUV);
 
     if (visibility == 0.0) {
-        screenColor.rgb = aces_tonemap(screenColor.rgb);
         gl_FragColor = screenColor;
         return;
     }
@@ -168,8 +150,6 @@ void main() {
     sun *= smoothstep(0.08, 0.0, angularRadius);
 
     col += sun * visibility;
-
-    col = aces_tonemap(col);
 
     // Output to screen
     gl_FragColor = vec4(col, screenColor.a);

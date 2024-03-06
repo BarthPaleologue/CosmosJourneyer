@@ -85,7 +85,6 @@ export class AudioInstance {
         );
         this.sound.setPlaybackRate(moveTowards(this.sound.getPlaybackRate(), this.targetPlaybackSpeed * this.playbackSpeedMultiplier, this.blendSpeed * deltaSeconds));
 
-
         /*if (this.parent !== null) {
             const worldPosition = Vector3.TransformCoordinates(this.localPosition, this.parent.getWorldMatrix());
             const camera = this.parent.getScene().activeCamera;
@@ -94,5 +93,9 @@ export class AudioInstance {
             const distance = Vector3.Distance(worldCameraPosition, worldPosition);
             this.spatialVolumeMultiplier = 1 / (1 + 0.01 * distance);
         }*/
+    }
+
+    dispose() {
+        this.sound.dispose();
     }
 }

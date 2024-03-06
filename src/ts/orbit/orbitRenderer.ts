@@ -72,7 +72,7 @@ export class OrbitRenderer {
     }
 
     update() {
-        if(!this._isVisible) return;
+        if (!this._isVisible) return;
         for (let i = 0; i < this.orbitalObjects.length; i++) {
             const orbitalObject = this.orbitalObjects[i];
             const orbitMesh = this.orbitMeshes[i];
@@ -90,7 +90,7 @@ export class OrbitRenderer {
         this.orbitMeshes = [];
         this.orbitalObjects = [];
 
-        if(this.orbitMaterial === null) {
+        if (this.orbitMaterial === null) {
             this.orbitMaterial = new StandardMaterial("orbitMaterial");
             this.orbitMaterial.emissiveColor = Color3.White();
             this.orbitMaterial.disableLighting = true;

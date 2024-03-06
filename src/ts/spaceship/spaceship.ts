@@ -55,8 +55,6 @@ export class Spaceship implements Transformable {
     readonly aggregate: PhysicsAggregate;
     private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
 
-    private flightAssistEnabled = true;
-
     private readonly warpDrive = new WarpDrive(false);
 
     private mainEngineThrottle = 0;
@@ -87,10 +85,14 @@ export class Spaceship implements Transformable {
     readonly disableWarpDriveSound: AudioInstance;
     readonly acceleratingWarpDriveSound: AudioInstance;
     readonly deceleratingWarpDriveSound: AudioInstance;
+    readonly hyperSpaceSound: AudioInstance;
     readonly thrusterSound: AudioInstance;
 
     readonly onWarpDriveEnabled = new Observable<void>();
     readonly onWarpDriveDisabled = new Observable<void>();
+
+    readonly onLandingEngaged = new Observable<void>();
+    readonly onLandingObservable = new Observable<void>();
 
     constructor(scene: Scene) {
         this.instanceRoot = Assets.CreateWandererInstance();
@@ -106,7 +108,7 @@ export class Spaceship implements Transformable {
             scene
         );
         for (const child of this.instanceRoot.getChildMeshes()) {
-            if(child.name.includes("mainThruster")) {
+            if (child.name.includes("mainThruster")) {
                 const mainThruster = new MainThruster(child, getForwardDirection(this.instanceRoot).negate(), this.aggregate);
                 this.mainThrusters.push(mainThruster);
                 continue;
@@ -117,6 +119,7 @@ export class Spaceship implements Transformable {
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
         }
         this.aggregate.body.disablePreStep = false;
+        this.aggregate.body.setAngularDamping(0.9);
 
         this.aggregate.body.setCollisionCallbackEnabled(true);
 
@@ -136,17 +139,20 @@ export class Spaceship implements Transformable {
         this.disableWarpDriveSound = new AudioInstance(Assets.DISABLE_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 1, true, this.getTransform());
         this.acceleratingWarpDriveSound = new AudioInstance(Assets.ACCELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
         this.deceleratingWarpDriveSound = new AudioInstance(Assets.DECELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
+        this.hyperSpaceSound = new AudioInstance(Assets.HYPER_SPACE_SOUND, AudioMasks.HYPER_SPACE, 0.0, false, this.getTransform());
         this.thrusterSound = new AudioInstance(Assets.THRUSTER_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
 
         AudioManager.RegisterSound(this.enableWarpDriveSound);
         AudioManager.RegisterSound(this.disableWarpDriveSound);
         AudioManager.RegisterSound(this.acceleratingWarpDriveSound);
         AudioManager.RegisterSound(this.deceleratingWarpDriveSound);
+        AudioManager.RegisterSound(this.hyperSpaceSound);
         AudioManager.RegisterSound(this.thrusterSound);
 
         this.thrusterSound.sound.play();
         this.acceleratingWarpDriveSound.sound.play();
         this.deceleratingWarpDriveSound.sound.play();
+        this.hyperSpaceSound.sound.play();
 
         this.scene = scene;
     }
@@ -206,14 +212,6 @@ export class Spaceship implements Transformable {
         return this.warpDrive;
     }
 
-    public setFlightAssistEnabled(enabled: boolean) {
-        this.flightAssistEnabled = enabled;
-    }
-
-    public getFlightAssistEnabled(): boolean {
-        return this.flightAssistEnabled;
-    }
-
     /**
      * Returns the speed of the ship in m/s
      * If warp drive is enabled, returns the warp speed
@@ -221,11 +219,11 @@ export class Spaceship implements Transformable {
      * @returns The speed of the ship in m/s
      */
     public getSpeed(): number {
-        return this.warpDrive.isEnabled() ? this.warpDrive.getWarpSpeed() : this.aggregate.body.getLinearVelocity().length();
+        return this.warpDrive.isEnabled() ? this.warpDrive.getWarpSpeed() : this.aggregate.body.getLinearVelocity().dot(getForwardDirection(this.getTransform()));
     }
 
     public getThrottle(): number {
-        return this.warpDrive.isEnabled() ? this.warpDrive.getTargetThrottle() : this.mainEngineThrottle;
+        return this.warpDrive.isEnabled() ? this.warpDrive.getThrottle() : this.mainEngineThrottle;
     }
 
     public increaseMainEngineThrottle(delta: number) {
@@ -244,7 +242,8 @@ export class Spaceship implements Transformable {
         if (this.landingTarget === null) {
             throw new Error("Landing target is null");
         }
-        console.log("landing on", this.landingTarget.getTransform().name);
+
+        this.onLandingEngaged.notifyObservers();
     }
 
     public engageLandingOnPad(landingPad: LandingPad) {
@@ -259,6 +258,8 @@ export class Spaceship implements Transformable {
         this.state = ShipState.LANDED;
         this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
         this.landingTarget = null;
+
+        this.onLandingObservable.notifyObservers();
     }
 
     public isLanded(): boolean {
@@ -352,12 +353,12 @@ export class Spaceship implements Transformable {
 
             const otherSpeed = linearVelocity.subtract(forwardDirection.scale(forwardSpeed));
 
-            if(this.mainEngineThrottle !== 0) this.thrusterSound.setTargetVolume(1);
+            if (this.mainEngineThrottle !== 0) this.thrusterSound.setTargetVolume(1);
             else this.thrusterSound.setTargetVolume(0);
 
-            if(forwardSpeed < this.mainEngineTargetSpeed) {
+            if (forwardSpeed < this.mainEngineTargetSpeed) {
                 this.aggregate.body.applyForce(forwardDirection.scale(3000), this.aggregate.body.getObjectCenterWorld());
-                this.mainThrusters.forEach(thruster => {
+                this.mainThrusters.forEach((thruster) => {
                     thruster.setThrottle(this.mainEngineThrottle);
                 });
             } else {
@@ -375,7 +376,7 @@ export class Spaceship implements Transformable {
             this.acceleratingWarpDriveSound.setTargetVolume(0);
             this.deceleratingWarpDriveSound.setTargetVolume(0);
         } else {
-            this.mainThrusters.forEach(thruster => {
+            this.mainThrusters.forEach((thruster) => {
                 thruster.setThrottle(0);
             });
 
@@ -392,16 +393,9 @@ export class Spaceship implements Transformable {
             }
         }
 
-        this.mainThrusters.forEach(thruster => {
+        this.mainThrusters.forEach((thruster) => {
             thruster.update(deltaTime);
         });
-
-        if (this.flightAssistEnabled) {
-            this.aggregate.body.setAngularDamping(0.9);
-        } else {
-            //FIXME: for some reason, the angular damping is not working
-            this.aggregate.body.setAngularDamping(1);
-        }
 
         if (this.state === ShipState.LANDING) {
             this.land(deltaTime);
@@ -409,6 +403,14 @@ export class Spaceship implements Transformable {
     }
 
     public dispose() {
+        AudioManager.DisposeSound(this.enableWarpDriveSound);
+        AudioManager.DisposeSound(this.disableWarpDriveSound);
+        AudioManager.DisposeSound(this.acceleratingWarpDriveSound);
+        AudioManager.DisposeSound(this.deceleratingWarpDriveSound);
+        AudioManager.DisposeSound(this.thrusterSound);
+
+        this.warpTunnel.dispose();
+        this.hyperSpaceTunnel.dispose();
         this.aggregate.dispose();
         this.instanceRoot.dispose();
     }

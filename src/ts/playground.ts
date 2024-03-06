@@ -36,8 +36,8 @@ import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericSca
 import { Star } from "./stellarObjects/star/star";
 import { LensFlarePostProcess } from "./postProcesses/lensFlarePostProcess";
 import { Settings } from "./settings";
-import { ScenePerformancePriority } from "@babylonjs/core";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+import { ScenePerformancePriority } from "@babylonjs/core/scene";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;

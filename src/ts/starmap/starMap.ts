@@ -55,6 +55,9 @@ import { syncCamera } from "../utils/cameraSyncing";
 import { AudioInstance } from "../utils/audioInstance";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
+import { Settings } from "../settings";
+import { parseDistance } from "../utils/parseToStrings";
+import { StarMapInputs } from "../inputs/starMapInputs";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -96,7 +99,7 @@ export class StarMap implements View {
     private readonly travelLine: ThickLines;
     private readonly thickLines: ThickLines[];
 
-    public readonly onWarpObservable: Observable<SystemSeed> = new Observable();
+    public readonly onTargetSetObservable: Observable<SystemSeed> = new Observable();
 
     /**
      * The position of the star sector the player is currently in (relative to the global node).
@@ -142,8 +145,8 @@ export class StarMap implements View {
             this.dispatchWarpCallbacks();
         });
 
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "f") this.focusOnCurrentSystem();
+        StarMapInputs.map.focusOnCurrentSystem.on("complete", () => {
+            this.focusOnCurrentSystem();
         });
 
         const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controls.getActiveCamera()]);
@@ -224,7 +227,15 @@ export class StarMap implements View {
             }
         ]);
 
-        this.travelLine = new ThickLines("travelLine", { points: [], thickness: 0.01, color: Color3.Red() }, this.scene);
+        this.travelLine = new ThickLines(
+            "travelLine",
+            {
+                points: [],
+                thickness: 0.01,
+                color: Color3.Red()
+            },
+            this.scene
+        );
         this.thickLines = [this.travelLine];
 
         // then generate missing star sectors
@@ -277,7 +288,7 @@ export class StarMap implements View {
 
     private dispatchWarpCallbacks() {
         if (this.selectedSystemSeed === null) throw new Error("No system selected!");
-        this.onWarpObservable.notifyObservers(this.selectedSystemSeed);
+        this.onTargetSetObservable.notifyObservers(this.selectedSystemSeed);
     }
 
     /**
@@ -376,8 +387,8 @@ export class StarMap implements View {
         const starSystemSeed = data.seed;
         const starSystemModel = new StarSystemModel(starSystemSeed);
 
-        const starSeed = starSystemModel.getStarSeed(0);
-        const stellarObjectType = starSystemModel.getBodyTypeOfStar(0);
+        const starSeed = starSystemModel.getStellarObjectSeed(0);
+        const stellarObjectType = starSystemModel.getBodyTypeOfStellarObject(0);
 
         let starModel: StarModel | BlackHoleModel | NeutronStarModel | null = null;
         switch (stellarObjectType) {
@@ -433,6 +444,7 @@ export class StarMap implements View {
 
             initializedInstance.actionManager.registerAction(
                 new ExecuteCodeAction(ActionManager.OnPointerOverTrigger, () => {
+                    if (this.starMapUI.isHovered()) return;
                     this.starMapUI.setHoveredStarSystemMesh(initializedInstance);
                     Assets.MENU_HOVER_SOUND.play();
                 })
@@ -450,13 +462,15 @@ export class StarMap implements View {
 
         initializedInstance.actionManager?.registerAction(
             new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
+                if (this.starMapUI.isHovered()) return;
+
                 Assets.STAR_MAP_CLICK_SOUND.play();
 
                 let text = "";
                 if (this.currentSystemSeed !== null) {
                     const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh;
-                    const distance = 15 * currentInstance.getAbsolutePosition().subtract(initializedInstance.getAbsolutePosition()).length();
-                    text += `Distance: ${distance.toFixed(2)}ly\n`;
+                    const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentInstance.getAbsolutePosition(), initializedInstance.getAbsolutePosition()));
+                    text += `Distance: ${parseDistance(distance)}\n`;
                 }
 
                 if (starModel === null) throw new Error("Star model is null!");
@@ -486,6 +500,10 @@ export class StarMap implements View {
 
         if (starModel.bodyType === BodyType.BLACK_HOLE) this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
+    }
+
+    public static StarMapDistanceToLy(distance: number): number {
+        return distance * 15 * Settings.LIGHT_YEAR;
     }
 
     private focusCameraOnStar(starInstance: InstancedMesh, skipAnimation = false) {

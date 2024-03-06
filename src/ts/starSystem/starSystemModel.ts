@@ -52,18 +52,18 @@ export class StarSystemModel {
         return this.name;
     }
 
-    getNbStars(): number {
+    getNbStellarObjects(): number {
         //return 1 + Math.floor(2 * this.rng(GenerationSteps.NbStars));
         return 1;
     }
 
     getNbPlanets(): number {
-        if (this.getBodyTypeOfStar(0) === BodyType.BLACK_HOLE) return 0; //Fixme: will not apply when more than one star
+        if (this.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE) return 0; //Fixme: will not apply when more than one star
         return randRangeInt(0, 7, this.rng, GenerationSteps.NB_PLANETS);
     }
 
-    public getStarSeed(index: number) {
-        if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
+    public getStellarObjectSeed(index: number) {
+        if (index > this.getNbStellarObjects()) throw new Error("Star out of bound! " + index);
         return centeredRand(this.rng, GenerationSteps.GENERATE_STARS + index) * Settings.SEED_HALF_RANGE;
     }
 
@@ -72,8 +72,8 @@ export class StarSystemModel {
      * @param index
      * @see https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
      */
-    public getBodyTypeOfStar(index: number) {
-        if (index > this.getNbStars()) throw new Error("Star out of bound! " + index);
+    public getBodyTypeOfStellarObject(index: number) {
+        if (index > this.getNbStellarObjects()) throw new Error("Star out of bound! " + index);
 
         // percentages are taken from https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
         if (uniformRandBool(0.0006, this.rng, GenerationSteps.GENERATE_STARS + index)) return BodyType.BLACK_HOLE;

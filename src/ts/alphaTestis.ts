@@ -53,7 +53,7 @@ const starSystemSeed = new SystemSeed(0, 0, 0, 0);
 const starSystem = new StarSystemController(starSystemSeed, starSystemView.scene);
 starSystem.model.setName("Alpha Testis");
 
-starSystemView.setStarSystem(starSystem, false);
+await starSystemView.loadStarSystem(starSystem, false);
 
 const sunModel = new StarModel(0.51);
 const sun = StarSystemHelper.MakeStar(starSystem, sunModel);
@@ -152,9 +152,9 @@ const blackHole = starSystem.makeBlackHole(blackHoleModel);*/
 
 engine.init(true);
 
-positionNearObjectBrightSide(starSystemView.scene.getActiveController(), planet, starSystem, 2);
+positionNearObjectBrightSide(starSystemView.scene.getActiveControls(), planet, starSystem, 2);
 
-const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
+const aresAtmosphere = starSystemView.postProcessManager.getAtmosphere(ares);
 if (aresAtmosphere) {
     aresAtmosphere.atmosphereUniforms.redWaveLength = 500;
     aresAtmosphere.atmosphereUniforms.greenWaveLength = 680;
@@ -168,7 +168,7 @@ document.addEventListener("keydown", (e) => {
 
     if (e.key === "o") {
         const landingPad = spacestation.handleDockingRequest();
-        if (landingPad !== null && starSystemView.scene.getActiveController() === spaceshipController) {
+        if (landingPad !== null && starSystemView.scene.getActiveControls() === spaceshipController) {
             spaceshipController.spaceship.engageLandingOnPad(landingPad);
         }
     }
@@ -186,29 +186,8 @@ document.addEventListener("keydown", (e) => {
         });
         console.log("Vertices", nbVertices, "Instances", nbInstances);
     }
-
-    if (e.key === "y") {
-        if (starSystemView.scene.getActiveController() === spaceshipController) {
-            console.log("disembark");
-
-            characterController.getTransform().setEnabled(true);
-            characterController.getTransform().setAbsolutePosition(spaceshipController.getTransform().absolutePosition);
-            translate(characterController.getTransform(), getForwardDirection(spaceshipController.getTransform()).scale(10));
-
-            setRotationQuaternion(characterController.getTransform(), getRotationQuaternion(spaceshipController.getTransform()).clone());
-
-            starSystemView.scene.setActiveController(characterController);
-            starSystemView.getStarSystem().postProcessManager.rebuild();
-        } else if (starSystemView.scene.getActiveController() === characterController) {
-            console.log("embark");
-
-            characterController.getTransform().setEnabled(false);
-            starSystemView.scene.setActiveController(spaceshipController);
-            starSystemView.getStarSystem().postProcessManager.rebuild();
-        }
-    }
 });
 
 starSystemView.ui.setEnabled(true);
-starSystemView.showUI();
+starSystemView.showHtmlUI();
 starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();

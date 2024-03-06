@@ -26,6 +26,10 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
 import { moveTowards } from "../utils/moveTowards";
+import { createNotification } from "../utils/notification";
+import { StarSystemInputs } from "../inputs/starSystemInputs";
+import { buttonInputToString, pressInteractionToStrings } from "../utils/inputControlsString";
+import { ButtonInputControl } from "@brianchirls/game-input/browser";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -48,17 +52,13 @@ export class ShipControls implements Controls {
         this.firstPersonCamera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.getTransform();
         this.firstPersonCamera.position = new Vector3(0, 1.2, 4);
-        
+
         this.thirdPersonCamera = new ArcRotateCamera("thirdPersonCamera", -3.14 / 2, 3.14 / 2.2, ShipControls.BASE_CAMERA_RADIUS, Vector3.Zero(), scene);
         this.thirdPersonCamera.parent = this.getTransform();
         this.thirdPersonCamera.lowerRadiusLimit = 10;
         this.thirdPersonCamera.upperRadiusLimit = 500;
 
         this.scene = scene;
-
-        SpaceShipControlsInputs.map.toggleFlightAssist.on("complete", () => {
-            this.spaceship.setFlightAssistEnabled(!this.spaceship.getFlightAssistEnabled());
-        });
 
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", () => {
             this.spaceship.toggleWarpDrive();
@@ -72,7 +72,7 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.throttleToZero.on("complete", () => {
             this.spaceship.setMainEngineThrottle(0);
-            this.spaceship.getWarpDrive().increaseTargetThrottle(-this.spaceship.getWarpDrive().getTargetThrottle());
+            this.spaceship.getWarpDrive().increaseTargetThrottle(-this.spaceship.getWarpDrive().getThrottle());
         });
 
         this.baseFov = this.thirdPersonCamera.fov;
@@ -86,6 +86,15 @@ export class ShipControls implements Controls {
         this.spaceship.onWarpDriveDisabled.add(() => {
             this.shakeCamera(2500);
             this.targetFov = this.baseFov * 0.5;
+        });
+
+        this.spaceship.onLandingObservable.add(() => {
+            const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter).join(", ");
+            createNotification(`Landing complete! Use ${bindingsString} to disembark.`, 5000);
+        });
+
+        this.spaceship.onLandingEngaged.add(() => {
+            createNotification(`Landing sequence engaged.`, 5000);
         });
     }
 
@@ -117,8 +126,8 @@ export class ShipControls implements Controls {
         if (this.spaceship.getWarpDrive().isDisabled()) {
             this.spaceship.increaseMainEngineThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
 
-            if(SpaceShipControlsInputs.map.upDown.value !== 0) {
-                if(this.spaceship.isLanded()) {
+            if (SpaceShipControlsInputs.map.upDown.value !== 0) {
+                if (this.spaceship.isLanded()) {
                     this.spaceship.takeOff();
                 }
                 this.spaceship.aggregate.body.applyForce(
@@ -127,12 +136,12 @@ export class ShipControls implements Controls {
                 );
             }
         } else {
-            this.spaceship.getWarpDrive().increaseTargetThrottle(deltaTime * SpaceShipControlsInputs.map.throttle.value);
+            this.spaceship.getWarpDrive().increaseTargetThrottle(0.5 * deltaTime * SpaceShipControlsInputs.map.throttle.value);
         }
 
         if (!this.spaceship.isLanded()) {
-            roll(this.getTransform(), inputRoll * deltaTime);
-            pitch(this.getTransform(), inputPitch * deltaTime);
+            roll(this.getTransform(), 2.0 * inputRoll * deltaTime);
+            pitch(this.getTransform(), 2.0 * inputPitch * deltaTime);
         }
 
         // camera shake

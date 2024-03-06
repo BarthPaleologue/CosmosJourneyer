@@ -38,7 +38,6 @@ import flareParticle from "../asset/flare.png";
 import atmosphereLUT from "../shaders/textures/atmosphereLUT.glsl";
 
 import seamlessPerlin from "../asset/perlin.png";
-import warpNoise from "../asset/warpNoise.png";
 
 import empty from "../asset/oneBlackPixel.png";
 
@@ -65,6 +64,8 @@ import disableWarpDriveSound from "../asset/sound/204418__nhumphrey__large-engin
 
 import acceleratingWarpDriveSound from "../asset/sound/539503__timbre__endless-acceleration.mp3";
 import deceleratingWarpDriveSound from "../asset/sound/539503__timbre_endless-deceleration.mp3";
+
+import hyperSpaceSound from "../asset/sound/539503__timbre_endless-deceleration-hyperspace.mp3";
 
 import thrusterSound from "../asset/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
 
@@ -112,7 +113,6 @@ export class Assets {
 
     static ATMOSPHERE_LUT: ProceduralTexture;
 
-    static WARP_NOISE: Texture;
     static SEAMLESS_PERLIN: Texture;
 
     private static SPACESHIP: Mesh;
@@ -152,6 +152,8 @@ export class Assets {
     public static ACCELERATING_WARP_DRIVE_SOUND: Sound;
     public static DECELERATING_WARP_DRIVE_SOUND: Sound;
 
+    public static HYPER_SPACE_SOUND: Sound;
+
     public static THRUSTER_SOUND: Sound;
 
     public static STAR_MAP_BACKGROUND_MUSIC: Sound;
@@ -181,7 +183,6 @@ export class Assets {
         Assets.MANAGER.addTextureTask("FlareTexture", flareParticle).onSuccess = (task) => (Assets.FLARE_TEXTURE = task.texture);
 
         Assets.MANAGER.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Assets.SEAMLESS_PERLIN = task.texture);
-        Assets.MANAGER.addTextureTask("WarpNoise", warpNoise).onSuccess = (task) => (Assets.WARP_NOISE = task.texture);
 
         Assets.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
         Assets.ATMOSPHERE_LUT.refreshRate = 0;
@@ -342,14 +343,14 @@ export class Assets {
             });
 
             const clonedSound = Assets.MENU_HOVER_SOUND.clone();
-            if(clonedSound === null) throw new Error("clonedSound is null");
+            if (clonedSound === null) throw new Error("clonedSound is null");
             Assets.MENU_SELECT_SOUND = clonedSound;
             Assets.MENU_SELECT_SOUND.updateOptions({
                 playbackRate: 1.0
             });
 
             const clonedSound2 = Assets.MENU_HOVER_SOUND.clone();
-            if(clonedSound2 === null) throw new Error("clonedSound2 is null");
+            if (clonedSound2 === null) throw new Error("clonedSound2 is null");
             Assets.OPEN_PAUSE_MENU_SOUND = clonedSound2;
             Assets.OPEN_PAUSE_MENU_SOUND.updateOptions({
                 playbackRate: 0.75
@@ -363,14 +364,14 @@ export class Assets {
             Assets.TARGET_LOCK_SOUND = new Sound("StarMapClickSound", task.data, scene);
 
             const clonedSound = Assets.TARGET_LOCK_SOUND.clone();
-            if(clonedSound === null) throw new Error("clonedSound is null");
+            if (clonedSound === null) throw new Error("clonedSound is null");
             Assets.TARGET_UNLOCK_SOUND = clonedSound;
             Assets.TARGET_UNLOCK_SOUND.updateOptions({
                 playbackRate: 0.5
             });
 
             const clonedSound2 = Assets.TARGET_LOCK_SOUND.clone();
-            if(clonedSound2 === null) throw new Error("clonedSound2 is null");
+            if (clonedSound2 === null) throw new Error("clonedSound2 is null");
             Assets.STAR_MAP_CLICK_SOUND = clonedSound2;
 
             console.log("Target sound loaded");
@@ -417,6 +418,18 @@ export class Assets {
             console.log("Decelerating warp drive sound loaded");
         };
 
+        const hyperSpaceSoundTask = Assets.MANAGER.addBinaryFileTask("hyperSpaceSoundTask", hyperSpaceSound);
+        hyperSpaceSoundTask.onSuccess = function (task) {
+            Assets.HYPER_SPACE_SOUND = new Sound("HyperSpaceSound", task.data, scene);
+            Assets.HYPER_SPACE_SOUND.updateOptions({
+                playbackRate: 1.5,
+                volume: 0.25,
+                loop: true
+            });
+
+            console.log("Hyper space sound loaded");
+        };
+
         const thrusterSoundTask = Assets.MANAGER.addBinaryFileTask("thrusterSoundTask", thrusterSound);
         thrusterSoundTask.onSuccess = function (task) {
             Assets.THRUSTER_SOUND = new Sound("ThrusterSound", task.data, scene);
@@ -440,12 +453,18 @@ export class Assets {
 
         const mainMenuBackgroundMusicTask = Assets.MANAGER.addBinaryFileTask("mainMenuBackgroundMusicTask", starMapBackgroundMusic);
         const mainMenuBackgroundMusicLoaded = new Promise<void>((resolve) => {
-            mainMenuBackgroundMusicTask.onSuccess = function(task) {
-                Assets.MAIN_MENU_BACKGROUND_MUSIC = new Sound("MainMenuBackgroundMusic", task.data, scene, () => {
-                    resolve();
-                }, {
-                    loop: true
-                });
+            mainMenuBackgroundMusicTask.onSuccess = function (task) {
+                Assets.MAIN_MENU_BACKGROUND_MUSIC = new Sound(
+                    "MainMenuBackgroundMusic",
+                    task.data,
+                    scene,
+                    () => {
+                        resolve();
+                    },
+                    {
+                        loop: true
+                    }
+                );
 
                 console.log("Main menu background music loaded");
             };

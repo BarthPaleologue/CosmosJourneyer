@@ -6,6 +6,8 @@
 [![Jest Coverage](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/tests.yml/badge.svg)](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/tests.yml)
 [![License](https://img.shields.io/github/license/BarthPaleologue/planetEngine)](./LICENSE.md)
 
+[![Teaser Video](./coverImages/video.png)](https://youtu.be/5pXZqHRShTE)
+
 Cosmos Journeyer is the procedural universe running inside a web page that makes space exploration accessible for everyone.
 
 The main website of the project is online at https://cosmosjourneyer.com/
@@ -52,7 +54,7 @@ First, clone the repository and install the dependencies with `pnpm install`.
 
 ### Web
 
-To build the web version of Cosmos Journeyer, run `pnpm build`. Everything will be built in the `dist` folder.
+To build the web version of Cosmos Journeyer, run `pnpm run build`. Everything will be built in the `dist` folder.
 
 ### Tauri
 

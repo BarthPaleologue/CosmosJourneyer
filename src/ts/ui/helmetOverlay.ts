@@ -56,7 +56,7 @@ export class HelmetOverlay {
             this.targetHelper.style.display = "block";
         }
 
-        if(this.currentTarget === target) {
+        if (this.currentTarget === target) {
             this.currentTarget = null;
             return;
         }
@@ -80,8 +80,18 @@ export class HelmetOverlay {
         }
     }
 
-    displaySpeed(shipInternalThrottle: number, shipTargetThrottle: number, speed: number) {
-        const throttleString = `${(100 * shipInternalThrottle).toFixed(0)}% | ${(100 * shipTargetThrottle).toFixed(0)}%`;
-        (document.querySelector("#speedometer") as HTMLElement).innerText = `${throttleString} | ${parseSpeed(speed)}`;
+    displaySpeed(shipThrottle: number, speed: number) {
+        const throttleContainer = document.getElementById("throttle");
+        if (throttleContainer === null) throw new Error("Throttle container not found");
+        throttleContainer.style.alignItems = shipThrottle < 0 ? "flex-start" : "flex-end";
+
+        const throttleStripes = document.getElementById("throttleStripes");
+        if (throttleStripes === null) throw new Error("Throttle bar not found");
+        throttleStripes.style.height = `${(100 * Math.abs(shipThrottle)).toFixed(0)}%`;
+        throttleStripes.classList.toggle("reversed", shipThrottle < 0);
+
+        const speedIndicator = document.getElementById("speed");
+        if (speedIndicator === null) throw new Error("Speed indicator not found");
+        speedIndicator.innerText = parseSpeed(speed);
     }
 }

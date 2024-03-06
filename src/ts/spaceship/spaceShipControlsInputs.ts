@@ -2,7 +2,6 @@ import Action from "@brianchirls/game-input/Action";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 import { InputDevices } from "../inputs/devices";
 import { AxisComposite } from "@brianchirls/game-input/browser";
-import { InputMaps } from "../inputs/inputMaps";
 import { InputMap } from "../inputs/inputMap";
 
 const gamepad = InputDevices.GAMEPAD;
@@ -21,7 +20,7 @@ const upDown = new AxisComposite({
 });
 
 const upDownAction = new Action({
-    bindings: [upDown],
+    bindings: [upDown]
 });
 
 const throttle = new AxisComposite({
@@ -53,30 +52,17 @@ const rollPitch = new Action({
 
             // dead zone
             const deadZone = 0.1;
-            if (Math.abs(pointerX) < deadZone) {
-                pointerX = 0;
-            }
-            if (Math.abs(pointerY) < deadZone) {
-                pointerY = 0;
-            }
 
-            // logarithmic scale
-            pointerX = Math.sign(pointerX) * Math.log(1 + Math.abs(pointerX));
-            pointerY = Math.sign(pointerY) * Math.log(1 + Math.abs(pointerY));
+            pointerX = Math.sign(pointerX) * Math.max(0, Math.abs(pointerX) - deadZone) ** 2;
+            pointerY = Math.sign(pointerY) * Math.max(0, Math.abs(pointerY) - deadZone) ** 2;
 
             return [pointerX, pointerY];
         }
     ]
 });
 
-const toggleFlightAssist = new Action({
-    bindings: [keyboard.getControl("KeyF")]
-});
-
-const toggleFlightAssistInteraction = new PressInteraction(toggleFlightAssist);
-
 const toggleWarpDrive = new Action({
-    bindings: [keyboard.getControl("KeyH")],
+    bindings: [keyboard.getControl("KeyH")]
 });
 
 const toggleWarpDriveInteraction = new PressInteraction(toggleWarpDrive);
@@ -92,23 +78,21 @@ const throttleToZero = new Action({
 const throttleToZeroInteraction = new PressInteraction(throttleToZero);
 
 export const SpaceShipControlsInputs = new InputMap<{
-    landing: PressInteraction,
-    upDown: Action<number>,
-    throttle: Action<number>,
-    rollPitch: Action<[number, number]>,
-    toggleFlightAssist: PressInteraction,
-    toggleWarpDrive: PressInteraction,
-    ignorePointer: Action<number>,
-    throttleToZero: PressInteraction
+    landing: PressInteraction;
+    upDown: Action<number>;
+    throttle: Action<number>;
+    rollPitch: Action<[number, number]>;
+    toggleWarpDrive: PressInteraction;
+    ignorePointer: Action<number>;
+    throttleToZero: PressInteraction;
 }>("SpaceShipInputs", {
     landing: landingInteraction,
     upDown: upDownAction,
     throttle: throttleAction,
     rollPitch: rollPitch,
-    toggleFlightAssist: toggleFlightAssistInteraction,
     toggleWarpDrive: toggleWarpDriveInteraction,
     ignorePointer: ignorePointer,
     throttleToZero: throttleToZeroInteraction
 });
 
-InputMaps.push(SpaceShipControlsInputs);
+SpaceShipControlsInputs.setEnabled(false);

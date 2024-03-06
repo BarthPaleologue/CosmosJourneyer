@@ -71,14 +71,14 @@ export class DefaultControls implements Controls {
         const displacement = Vector3.Zero();
 
         const forwardDisplacement = getForwardDirection(this.transform)
-          .scale(this.speed * deltaTime)
-          .scaleInPlace(DefaultControlsInputs.map.move.value[1]);
+            .scale(this.speed * deltaTime)
+            .scaleInPlace(DefaultControlsInputs.map.move.value[1]);
         const upwardDisplacement = getUpwardDirection(this.transform)
-          .scale(this.speed * deltaTime)
-          .scaleInPlace(DefaultControlsInputs.map.upDown.value);
+            .scale(this.speed * deltaTime)
+            .scaleInPlace(DefaultControlsInputs.map.upDown.value);
         const rightDisplacement = getRightDirection(this.transform)
-          .scale(this.speed * deltaTime)
-          .scaleInPlace(DefaultControlsInputs.map.move.value[0]);
+            .scale(this.speed * deltaTime)
+            .scaleInPlace(DefaultControlsInputs.map.move.value[0]);
 
         displacement.addInPlace(forwardDisplacement);
         displacement.addInPlace(upwardDisplacement);

@@ -14,26 +14,10 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { SystemSeed } from "../utils/systemSeed";
 import { parseSaveFileData, SaveFileData } from "../saveFile/saveFileData";
 import packageInfo from "../../../package.json";
-import { InputMaps } from "../inputs/inputMaps";
-import Action from "@brianchirls/game-input/Action";
-import Interaction from "@brianchirls/game-input/interactions/Interaction";
 import { Assets } from "../assets";
-import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import {
-    AxisComposite,
-    ButtonInputControl,
-    StickInputControl,
-    Vector2InputControl
-} from "@brianchirls/game-input/browser";
 import { Settings } from "../settings";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import {
-    axisCompositeToString,
-    buttonInputToString,
-    dPadCompositeToString,
-    stickInputToString,
-    vector2ToString
-} from "../utils/inputControlsString";
+import { initSettingsPanel } from "./settingsPanel";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -48,16 +32,16 @@ export class MainMenu {
     readonly onCreditsObservable = new Observable<void>();
     readonly onAboutObservable = new Observable<void>();
 
-    private htmlRoot: HTMLElement | null = null;
-    private title: HTMLElement | null = null;
-    private version: HTMLElement | null = null;
+    private readonly htmlRoot: HTMLElement;
+    private readonly title: HTMLElement;
+    private readonly version: HTMLElement;
 
     private activeRightPanel: HTMLElement | null = null;
-    private loadSavePanel: HTMLElement | null = null;
-    private settingsPanel: HTMLElement | null = null;
-    private contributePanel: HTMLElement | null = null;
-    private creditsPanel: HTMLElement | null = null;
-    private aboutPanel: HTMLElement | null = null;
+    private readonly loadSavePanel: HTMLElement;
+    private readonly settingsPanel: HTMLElement;
+    private readonly contributePanel: HTMLElement;
+    private readonly creditsPanel: HTMLElement;
+    private readonly aboutPanel: HTMLElement;
 
     constructor(starSystemView: StarSystemView) {
         this.starSystemView = starSystemView;
@@ -98,32 +82,13 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         const seed = allowedSeeds[Math.floor(Math.random() * allowedSeeds.length)];
         console.log(seed.starSectorX + ", " + seed.starSectorY + ", " + seed.starSectorZ + ", " + seed.index);
         this.starSystemController = new StarSystemController(seed, this.scene);
-    }
-
-    init() {
-        this.starSystemView.setStarSystem(this.starSystemController, true);
-
-        this.starSystemView.onInitStarSystem.addOnce(() => {
-            this.starSystemView.switchToDefaultControls();
-            const nbRadius = this.starSystemController.model.getBodyTypeOfStar(0) === BodyType.BLACK_HOLE ? 8 : 2;
-            const targetObject = this.starSystemController.planets.length > 0 ? this.starSystemController.planets[0] : this.starSystemController.stellarObjects[0];
-            positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
-
-            if (targetObject instanceof GasPlanet) Settings.TIME_MULTIPLIER = 30;
-            else Settings.TIME_MULTIPLIER = 3;
-
-            Assets.MAIN_MENU_BACKGROUND_MUSIC.play();
-        });
-
-        this.starSystemView.ui.setEnabled(false);
-
-        this.starSystemView.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
 
         document.body.insertAdjacentHTML("beforeend", mainMenuHTML);
 
         const htmlRoot = document.getElementById("mainMenu");
         if (htmlRoot === null) throw new Error("#mainMenu does not exist!");
         this.htmlRoot = htmlRoot;
+        this.htmlRoot.style.display = "none";
 
         const title = document.querySelector("#mainMenu h1");
         if (title === null) throw new Error("#mainMenu h1 does not exist!");
@@ -149,6 +114,24 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             });
         });
 
+        const loadSavePanel = document.getElementById("loadSavePanel");
+        if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
+        this.loadSavePanel = loadSavePanel;
+
+        this.settingsPanel = initSettingsPanel();
+
+        const contributePanel = document.getElementById("contribute");
+        if (contributePanel === null) throw new Error("#contribute does not exist!");
+        this.contributePanel = contributePanel;
+
+        const creditsPanel = document.getElementById("credits");
+        if (creditsPanel === null) throw new Error("#credits does not exist!");
+        this.creditsPanel = creditsPanel;
+
+        const aboutPanel = document.getElementById("about");
+        if (aboutPanel === null) throw new Error("#about does not exist!");
+        this.aboutPanel = aboutPanel;
+
         document.getElementById("startButton")?.addEventListener("click", () => {
             this.startAnimation(() => this.onStartObservable.notifyObservers());
         });
@@ -156,10 +139,71 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         const loadSaveButton = document.getElementById("loadSaveButton");
         if (loadSaveButton === null) throw new Error("#loadSaveButton does not exist!");
 
-        const loadSavePanel = document.getElementById("loadSavePanel");
-        if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
-        this.loadSavePanel = loadSavePanel;
+        this.initLoadSavePanel();
 
+        loadSaveButton.addEventListener("click", () => {
+            this.toggleActivePanel(this.loadSavePanel);
+        });
+
+        const settingsButton = document.getElementById("settingsButton");
+        if (settingsButton === null) throw new Error("#settingsButton does not exist!");
+
+        settingsButton.addEventListener("click", () => {
+            this.toggleActivePanel(this.settingsPanel);
+        });
+
+        const contributeButton = document.getElementById("contributeButton");
+        if (contributeButton === null) throw new Error("#contributeButton does not exist!");
+
+        contributeButton.addEventListener("click", () => {
+            this.toggleActivePanel(this.contributePanel);
+            this.onContributeObservable.notifyObservers();
+        });
+
+        const creditsButton = document.getElementById("creditsButton");
+        if (creditsButton === null) throw new Error("#creditsButton does not exist!");
+
+        creditsButton.addEventListener("click", () => {
+            this.toggleActivePanel(this.creditsPanel);
+            this.onCreditsObservable.notifyObservers();
+        });
+
+        const aboutButton = document.getElementById("aboutButton");
+        if (aboutButton === null) throw new Error("#aboutButton does not exist!");
+
+        aboutButton.addEventListener("click", () => {
+            this.toggleActivePanel(this.aboutPanel);
+            this.onAboutObservable.notifyObservers();
+        });
+    }
+
+    async init() {
+        await this.starSystemView.loadStarSystem(this.starSystemController, true, 0);
+
+        this.starSystemView.onInitStarSystem.addOnce(() => {
+            this.starSystemView.switchToDefaultControls();
+            const nbRadius = this.starSystemController.model.getBodyTypeOfStellarObject(0) === BodyType.BLACK_HOLE ? 8 : 2;
+            const targetObject = this.starSystemController.planets.length > 0 ? this.starSystemController.planets[0] : this.starSystemController.stellarObjects[0];
+            positionNearObjectWithStarVisible(this.controls, targetObject, this.starSystemController, nbRadius);
+
+            if (targetObject instanceof GasPlanet) Settings.TIME_MULTIPLIER = 30;
+            else Settings.TIME_MULTIPLIER = 3;
+
+            Assets.MAIN_MENU_BACKGROUND_MUSIC.play();
+        });
+
+        this.starSystemView.ui.setEnabled(false);
+
+        this.starSystemView.bodyEditor.setVisibility(EditorVisibility.HIDDEN);
+
+        this.htmlRoot.style.display = "block";
+    }
+
+    /**
+     * Initializes the load save panel to be able to drop a file or click on the drop zone to load a save file
+     * @private
+     */
+    private initLoadSavePanel() {
         const dropFileZone = document.getElementById("dropFileZone");
         if (dropFileZone === null) throw new Error("#dropFileZone does not exist!");
 
@@ -229,173 +273,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             };
             fileInput.click();
         });
-
-        loadSaveButton.addEventListener("click", () => {
-            this.toggleActivePanel(loadSavePanel);
-        });
-
-        const settingsButton = document.getElementById("settingsButton");
-        if (settingsButton === null) throw new Error("#settingsButton does not exist!");
-
-        const settingsPanel = document.getElementById("settingsPanel");
-        if (settingsPanel === null) throw new Error("#settings does not exist!");
-        this.settingsPanel = settingsPanel;
-
-        InputMaps.forEach((inputMap) => {
-            // create a div
-            // the name of the map will be an h3
-            // each action will be a div with the name of the action and the bindings
-            const mapDiv = document.createElement("div");
-            mapDiv.classList.add("map");
-            const mapName = document.createElement("h3");
-            // break camelCase with a space
-            mapName.textContent = inputMap.name.replace(/([A-Z])/g, " $1").trim();
-
-            mapDiv.appendChild(mapName);
-
-            for (const [actionName, action] of Object.entries(inputMap.map)) {
-
-                const subActionMap: Map<string, string[]> = new Map();
-
-                const actionOrInteraction = action as Action | Interaction;
-                const bindings = actionOrInteraction instanceof Action ? actionOrInteraction.bindings : actionOrInteraction.action.bindings;
-                bindings.forEach((binding) => {
-                    if (binding.control instanceof DPadComposite) {
-                        const strings = dPadCompositeToString(binding.control);
-                        strings.forEach((string) => {
-                            const [key, name] = string;
-                            if (!subActionMap.has(key)) {
-                                subActionMap.set(key, []);
-                            }
-                            subActionMap.get(key)?.push(name);
-                        });
-                    } else if (binding.control instanceof ButtonInputControl) {
-                        const text = buttonInputToString(binding.control);
-                        subActionMap.set("BUTTON", [text]);
-                    } else if (binding.control instanceof AxisComposite) {
-                        const strings = axisCompositeToString(binding.control);
-                        strings.forEach((string) => {
-                            const [key, name] = string;
-                            if (!subActionMap.has(key)) {
-                                subActionMap.set(key, []);
-                            }
-                            subActionMap.get(key)?.push(name);
-                        });
-                    } else if (binding.control instanceof StickInputControl) {
-                        const strings = stickInputToString(binding.control);
-                        strings.forEach((string) => {
-                            const [key, name] = string;
-                            if (!subActionMap.has(key)) {
-                                subActionMap.set(key, []);
-                            }
-                            subActionMap.get(key)?.push(name);
-                        });
-                    } else if(binding.control instanceof Vector2InputControl) {
-                        const strings = vector2ToString(binding.control);
-                        strings.forEach((string) => {
-                            const [key, name] = string;
-                            if (!subActionMap.has(key)) {
-                                subActionMap.set(key, []);
-                            }
-                            subActionMap.get(key)?.push(name);
-                        });
-                    } else {
-                        throw new Error("Unknown control type");
-                    }
-                });
-
-                const actionDiv = document.createElement("div");
-
-                const label = document.createElement("p");
-                // break camelCase with a space
-                label.textContent = actionName.replace(/([A-Z])/g, " $1").trim();
-
-                actionDiv.appendChild(label);
-
-                if (subActionMap.size === 1) {
-                    actionDiv.classList.add("actionSingle");
-
-                    const valuesContainer = document.createElement("div");
-                    valuesContainer.classList.add("valuesContainer");
-
-                    subActionMap.forEach((value, key) => {
-                        value.forEach((v) => {
-                            const valueContainer = document.createElement("p");
-                            valueContainer.innerText = v;
-                            valuesContainer.appendChild(valueContainer);
-                        });
-                    });
-
-                    actionDiv.appendChild(valuesContainer);
-                } else {
-                    actionDiv.classList.add("actionMultiple");
-
-                    subActionMap.forEach((value, key) => {
-                        const subActionDiv = document.createElement("div");
-                        subActionDiv.classList.add("subAction");
-
-                        const subActionLabel = document.createElement("p");
-                        subActionLabel.textContent = key;
-
-                        const valuesContainer = document.createElement("div");
-                        valuesContainer.classList.add("valuesContainer");
-
-                        value.forEach((v) => {
-                            const valueContainer = document.createElement("p");
-                            valueContainer.innerText = v;
-                            valuesContainer.appendChild(valueContainer);
-                        });
-
-                        subActionDiv.appendChild(subActionLabel);
-                        subActionDiv.appendChild(valuesContainer);
-
-                        actionDiv.appendChild(subActionDiv);
-                    });
-                }
-
-                mapDiv.appendChild(actionDiv);
-            }
-
-            settingsPanel.appendChild(mapDiv);
-        });
-
-        settingsButton.addEventListener("click", () => {
-            this.toggleActivePanel(settingsPanel);
-        });
-
-        const contributeButton = document.getElementById("contributeButton");
-        if (contributeButton === null) throw new Error("#contributeButton does not exist!");
-
-        const contributePanel = document.getElementById("contribute");
-        if (contributePanel === null) throw new Error("#contribute does not exist!");
-        this.contributePanel = contributePanel;
-
-        contributeButton.addEventListener("click", () => {
-            this.toggleActivePanel(contributePanel);
-            this.onContributeObservable.notifyObservers();
-        });
-
-        const creditsButton = document.getElementById("creditsButton");
-        if (creditsButton === null) throw new Error("#creditsButton does not exist!");
-        const creditsPanel = document.getElementById("credits");
-        if (creditsPanel === null) throw new Error("#credits does not exist!");
-        this.creditsPanel = creditsPanel;
-
-        creditsButton.addEventListener("click", () => {
-            this.toggleActivePanel(creditsPanel);
-            this.onCreditsObservable.notifyObservers();
-        });
-
-        const aboutButton = document.getElementById("aboutButton");
-        if (aboutButton === null) throw new Error("#aboutButton does not exist!");
-        const aboutPanel = document.getElementById("about");
-        if (aboutPanel === null) throw new Error("#about does not exist!");
-        this.aboutPanel = aboutPanel;
-
-        aboutButton.addEventListener("click", () => {
-            this.toggleActivePanel(aboutPanel);
-            this.onAboutObservable.notifyObservers();
-        });
     }
 
     private startAnimation(onAnimationFinished: () => void) {
@@ -459,7 +336,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             this.controls.getActiveCamera().getViewMatrix();
 
             this.starSystemController.applyFloatingOrigin();
-            this.starSystemController.updateShaders(0.0);
         };
 
         this.scene.onBeforePhysicsObservable.add(animationCallback);

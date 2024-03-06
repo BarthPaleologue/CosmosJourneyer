@@ -79,7 +79,7 @@ export class InstancePatch implements IPatch {
     }
 
     public setEnabled(enabled: boolean) {
-        for(const instance of this.instances) {
+        for (const instance of this.instances) {
             instance.setEnabled(enabled);
         }
     }
