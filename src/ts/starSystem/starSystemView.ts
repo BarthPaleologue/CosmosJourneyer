@@ -63,6 +63,7 @@ import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
+import { wait } from "../utils/wait";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -374,47 +375,37 @@ export class StarSystemView implements View {
         // Stellar objects
         let objectIndex = 0;
         for (let i = 0; i < targetNbStellarObjects; i++) {
-            await new Promise<void>((resolve) => {
-                setTimeout(() => {
-                    console.log("Stellar:", i + 1, "of", targetNbStellarObjects);
-                    const stellarObject = StarSystemHelper.MakeStellarObject(starSystem);
-                    stellarObject.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-                    resolve();
-                }, timeOut);
-            });
+            console.log("Stellar:", i + 1, "of", targetNbStellarObjects);
+            const stellarObject = StarSystemHelper.MakeStellarObject(starSystem);
+            stellarObject.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+
+            await wait(timeOut);
         }
 
         const planets: Planet[] = [];
 
         // Planets
         for (let i = 0; i < systemModel.getNbPlanets(); i++) {
-            await new Promise<void>((resolve) => {
-                setTimeout(() => {
-                    console.log("Planet:", i + 1, "of", systemModel.getNbPlanets());
-                    const bodyType = starSystem.model.getBodyTypeOfPlanet(starSystem.planets.length);
+            console.log("Planet:", i + 1, "of", systemModel.getNbPlanets());
+            const bodyType = starSystem.model.getBodyTypeOfPlanet(starSystem.planets.length);
 
-                    const planet = bodyType === BodyType.TELLURIC_PLANET ? StarSystemHelper.MakeTelluricPlanet(starSystem) : StarSystemHelper.MakeGasPlanet(starSystem);
-                    planet.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+            const planet = bodyType === BodyType.TELLURIC_PLANET ? StarSystemHelper.MakeTelluricPlanet(starSystem) : StarSystemHelper.MakeGasPlanet(starSystem);
+            planet.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
-                    planets.push(planet);
+            planets.push(planet);
 
-                    resolve();
-                }, timeOut);
-            });
+            await wait(timeOut);
         }
 
         // Satellites
         for (let i = 0; i < planets.length; i++) {
             const planet = planets[i];
             for (let j = 0; j < planet.model.nbMoons; j++) {
-                await new Promise<void>((resolve) => {
-                    setTimeout(() => {
-                        console.log("Satellite:", j + 1, "of", planet.model.nbMoons);
-                        const satellite = StarSystemHelper.MakeSatellite(starSystem, planet, getMoonSeed(planet.model, j));
-                        satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-                        resolve();
-                    }, timeOut);
-                });
+                console.log("Satellite:", j + 1, "of", planet.model.nbMoons);
+                const satellite = StarSystemHelper.MakeSatellite(starSystem, planet, getMoonSeed(planet.model, j));
+                satellite.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+
+                await wait(timeOut);
             }
         }
 
@@ -422,14 +413,11 @@ export class StarSystemView implements View {
         for (let i = 0; i < planets.length; i++) {
             const planet = planets[i];
             for (let j = 0; j < planet.model.getNbSpaceStations(); j++) {
-                await new Promise<void>((resolve) => {
-                    setTimeout(() => {
-                        console.log("Space station:", j + 1, "of", planet.model.getNbSpaceStations());
-                        const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, planet);
-                        spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
-                        resolve();
-                    }, timeOut);
-                });
+                console.log("Space station:", j + 1, "of", planet.model.getNbSpaceStations());
+                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, planet);
+                spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+
+                await wait(timeOut);
             }
         }
     }
