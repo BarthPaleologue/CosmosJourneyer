@@ -337,7 +337,6 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             this.controls.getActiveCamera().getViewMatrix();
 
             this.starSystemController.applyFloatingOrigin();
-            this.starSystemController.updateShaders(0.0);
         };
 
         this.scene.onBeforePhysicsObservable.add(animationCallback);

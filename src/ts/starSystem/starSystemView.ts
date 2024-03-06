@@ -53,7 +53,7 @@ import { StarMap } from "../starmap/starMap";
 import { SystemTarget } from "../utils/systemTarget";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { createNotification } from "../utils/notification";
-import { axisCompositeToString, pressInteractionToStrings } from "../utils/inputControlsString";
+import { axisCompositeToString } from "../utils/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { BodyType } from "../model/common";
@@ -62,6 +62,7 @@ import { Planet } from "../architecture/planet";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
+import { PostProcessManager } from "../postProcesses/postProcessManager";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -153,6 +154,8 @@ export class StarSystemView implements View {
      * @private
      */
     private isLoadingSystem = false;
+
+    readonly postProcessManager: PostProcessManager;
 
     /**
      * Creates an empty star system view with a scene, a gui and a havok plugin
@@ -291,7 +294,7 @@ export class StarSystemView implements View {
                 setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
 
                 this.scene.setActiveControls(characterControls);
-                this.getStarSystem().postProcessManager.rebuild();
+                this.postProcessManager.rebuild();
 
                 shipControls.spaceship.acceleratingWarpDriveSound.setTargetVolume(0);
                 shipControls.spaceship.deceleratingWarpDriveSound.setTargetVolume(0);
@@ -300,7 +303,7 @@ export class StarSystemView implements View {
 
                 characterControls.getTransform().setEnabled(false);
                 this.scene.setActiveControls(shipControls);
-                this.getStarSystem().postProcessManager.rebuild();
+                this.postProcessManager.rebuild();
 
                 if (shipControls.spaceship.isLanded()) {
                     const bindings = SpaceShipControlsInputs.map.upDown.bindings;
@@ -325,6 +328,8 @@ export class StarSystemView implements View {
         // small ambient light helps with seeing dark objects. This is unrealistic but I feel it is better.
         const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
         ambientLight.intensity = 0.3;
+
+        this.postProcessManager = new PostProcessManager(this.scene);
 
         // main update loop for the star system
         this.scene.onBeforePhysicsObservable.add(() => {
@@ -351,6 +356,7 @@ export class StarSystemView implements View {
     public async loadStarSystem(starSystem: StarSystemController, needsGenerating = true, timeOut = 700) {
         if (this.starSystem !== null) {
             this.chunkForge.reset();
+            this.postProcessManager.reset();
             this.starSystem.dispose();
             this.ui.disposeObjectOverlays();
         }
@@ -434,7 +440,7 @@ export class StarSystemView implements View {
      */
     public initStarSystem(): Promise<void> {
         const starSystem = this.getStarSystem();
-        starSystem.initPositions(2, this.chunkForge);
+        starSystem.initPositions(2, this.chunkForge, this.postProcessManager);
         this.ui.createObjectOverlays(starSystem.getOrbitalObjects());
 
         this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects());
@@ -451,7 +457,7 @@ export class StarSystemView implements View {
         else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
         positionNearObjectBrightSide(activeController, firstBody, starSystem, controllerDistanceFactor);
 
-        const initPostProcessesPromise = starSystem.initPostProcesses();
+        const initPostProcessesPromise = starSystem.initPostProcesses(this.postProcessManager);
 
         initPostProcessesPromise.then(() => {
             this.onInitStarSystem.notifyObservers();
@@ -496,7 +502,7 @@ export class StarSystemView implements View {
 
         this.chunkForge.update();
 
-        starSystem.update(deltaSeconds, this.chunkForge);
+        starSystem.update(deltaSeconds, this.chunkForge, this.postProcessManager);
 
         if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
         if (this.characterControls === null) throw new Error("Character controls is null");
@@ -522,7 +528,7 @@ export class StarSystemView implements View {
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject();
         const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition);
 
-        this.bodyEditor.update(nearestCelestialBody, starSystem.postProcessManager, this.scene);
+        this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 
         this.helmetOverlay.update(nearestOrbitalObject, this.scene.getActiveControls().getTransform());
 
@@ -573,7 +579,7 @@ export class StarSystemView implements View {
         characterControls.getTransform().setEnabled(false);
         this.scene.setActiveControls(shipControls);
         setRotationQuaternion(shipControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
-        this.getStarSystem().postProcessManager.rebuild();
+        this.postProcessManager.rebuild();
 
         shipControls.spaceship.setEnabled(true, this.havokPlugin);
     }
@@ -590,7 +596,7 @@ export class StarSystemView implements View {
         characterControls.getTransform().setAbsolutePosition(defaultControls.getTransform().absolutePosition);
         this.scene.setActiveControls(characterControls);
         setRotationQuaternion(characterControls.getTransform(), getRotationQuaternion(defaultControls.getTransform()).clone());
-        this.getStarSystem().postProcessManager.rebuild();
+        this.postProcessManager.rebuild();
 
         shipControls.spaceship.warpTunnel.setThrottle(0);
         shipControls.spaceship.setEnabled(false, this.havokPlugin);
@@ -612,7 +618,7 @@ export class StarSystemView implements View {
 
         this.scene.setActiveControls(defaultControls);
         setRotationQuaternion(defaultControls.getTransform(), getRotationQuaternion(shipControls.getTransform()).clone());
-        this.getStarSystem().postProcessManager.rebuild();
+        this.postProcessManager.rebuild();
     }
 
     /**

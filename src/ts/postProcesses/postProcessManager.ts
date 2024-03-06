@@ -91,8 +91,8 @@ export class PostProcessManager {
 
     private readonly renderingPipelineManager: PostProcessRenderPipelineManager;
 
-    private readonly spaceRenderingPipeline: PostProcessRenderPipeline;
-    private readonly surfaceRenderingPipeline: PostProcessRenderPipeline;
+    private spaceRenderingPipeline: PostProcessRenderPipeline;
+    private surfaceRenderingPipeline: PostProcessRenderPipeline;
     private currentRenderingPipeline: PostProcessRenderPipeline;
 
     private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
@@ -139,6 +139,7 @@ export class PostProcessManager {
 
     readonly colorCorrectionRenderEffect: PostProcessRenderEffect;
     readonly fxaaRenderEffect: PostProcessRenderEffect;
+
     //readonly bloomRenderEffect: BloomEffect;
 
     constructor(scene: UberScene) {
@@ -472,19 +473,56 @@ export class PostProcessManager {
         for (const postProcess of this.updatablePostProcesses.flat()) postProcess.update(deltaTime);
     }
 
-    /**
-     * Disposes all post processes and rendering pipelines.
-     */
-    public dispose() {
+    public reset() {
         for (const objectPostProcess of this.objectPostProcesses.flat()) objectPostProcess.dispose();
+        this.objectPostProcesses.length = 0;
 
-        this.colorCorrection.dispose();
-        this.fxaa.dispose();
+        this.starFields.forEach((starField) => starField.dispose());
+        this.starFields.length = 0;
 
-        this.surfaceRenderingPipeline._detachCameras(this.surfaceRenderingPipeline.cameras);
-        this.spaceRenderingPipeline._detachCameras(this.spaceRenderingPipeline.cameras);
+        this.volumetricLights.forEach((volumetricLight) => volumetricLight.dispose());
+        this.volumetricLights.length = 0;
+
+        this.oceans.forEach((ocean) => ocean.dispose());
+        this.oceans.length = 0;
+
+        this.clouds.forEach((clouds) => clouds.dispose());
+        this.clouds.length = 0;
+
+        this.atmospheres.forEach((atmosphere) => atmosphere.dispose());
+        this.atmospheres.length = 0;
+
+        this.rings.forEach((rings) => rings.dispose());
+        this.rings.length = 0;
+
+        this.mandelbulbs.forEach((mandelbulb) => mandelbulb.dispose());
+        this.mandelbulbs.length = 0;
+
+        this.blackHoles.forEach((blackHole) => blackHole.dispose());
+        this.blackHoles.length = 0;
+
+        this.matterJets.forEach((matterJet) => matterJet.dispose());
+        this.matterJets.length = 0;
+
+        this.shadows.forEach((shadow) => shadow.dispose());
+        this.shadows.length = 0;
+
+        this.lensFlares.forEach((lensFlare) => lensFlare.dispose());
+        this.lensFlares.length = 0;
+
+        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.spaceRenderingPipeline.name, this.scene.cameras);
+        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.surfaceRenderingPipeline.name, this.scene.cameras);
+
+        this.renderingPipelineManager.removePipeline(this.surfaceRenderingPipeline.name);
+        this.renderingPipelineManager.removePipeline(this.spaceRenderingPipeline.name);
 
         this.surfaceRenderingPipeline.dispose();
         this.spaceRenderingPipeline.dispose();
+
+        this.spaceRenderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "spaceRenderingPipeline");
+        this.renderingPipelineManager.addPipeline(this.spaceRenderingPipeline);
+
+        this.surfaceRenderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "surfaceRenderingPipeline");
+        this.renderingPipelineManager.addPipeline(this.surfaceRenderingPipeline);
     }
 }

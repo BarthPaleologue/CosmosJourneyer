@@ -154,7 +154,7 @@ engine.init(true);
 
 positionNearObjectBrightSide(starSystemView.scene.getActiveControls(), planet, starSystem, 2);
 
-const aresAtmosphere = starSystem.postProcessManager.getAtmosphere(ares);
+const aresAtmosphere = starSystemView.postProcessManager.getAtmosphere(ares);
 if (aresAtmosphere) {
     aresAtmosphere.atmosphereUniforms.redWaveLength = 500;
     aresAtmosphere.atmosphereUniforms.greenWaveLength = 680;
