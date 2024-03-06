@@ -1,3 +1,5 @@
+import { Assets } from "../assets";
+
 export function createNotification(text: string, duration: number) {
     const container = document.getElementById("notificationContainer");
     if (container === null) throw new Error("No notification container found");
@@ -20,6 +22,8 @@ export function createNotification(text: string, duration: number) {
     newNotification.appendChild(progress);
 
     container.appendChild(newNotification);
+
+    Assets.MENU_SELECT_SOUND.play();
 
     // animate progress bar
     progressBar.style.animation = `progress ${duration}ms linear`;
