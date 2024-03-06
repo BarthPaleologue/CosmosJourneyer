@@ -331,7 +331,7 @@ export class StarSystemController {
 
         return Promise.all(promises).then(() => {
             postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition));
-            postProcessManager.init();
+            postProcessManager.rebuild();
         });
     }
 

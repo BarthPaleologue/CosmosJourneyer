@@ -110,22 +110,6 @@ export class PostProcessManager {
     private readonly lensFlares: LensFlarePostProcess[] = [];
 
     /**
-     * All post processes that are attached to an object.
-     */
-    private readonly objectPostProcesses: ObjectPostProcess[][] = [
-        this.oceans,
-        this.clouds,
-        this.atmospheres,
-        this.rings,
-        this.mandelbulbs,
-        this.blackHoles,
-        this.volumetricLights,
-        this.matterJets,
-        this.shadows,
-        this.lensFlares
-    ];
-
-    /**
      * All post processes that are updated every frame.
      */
     private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.oceans, this.clouds, this.blackHoles, this.matterJets];
@@ -338,17 +322,13 @@ export class PostProcessManager {
     public setSpaceOrder() {
         if (this.currentRenderingOrder === spaceRenderingOrder) return;
         this.currentRenderingOrder = spaceRenderingOrder;
-        this.init();
+        this.rebuild();
     }
 
     public setSurfaceOrder() {
         if (this.currentRenderingOrder === surfaceRenderingOrder) return;
         this.currentRenderingOrder = surfaceRenderingOrder;
-        this.init();
-    }
-
-    public rebuild() {
-        this.init();
+        this.rebuild();
     }
 
     private getCurrentBody() {
@@ -356,7 +336,7 @@ export class PostProcessManager {
         return this.currentBody;
     }
 
-    init() {
+    public rebuild() {
         this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
         this.renderingPipelineManager.removePipeline(this.renderingPipeline.name);
         this.renderingPipeline.dispose();
@@ -472,9 +452,6 @@ export class PostProcessManager {
 
     public reset() {
         const camera = this.scene.getActiveCamera();
-
-        for (const objectPostProcess of this.objectPostProcesses.flat()) objectPostProcess.dispose(camera);
-        this.objectPostProcesses.length = 0;
 
         this.starFields.forEach((starField) => starField.dispose(camera));
         this.starFields.length = 0;
