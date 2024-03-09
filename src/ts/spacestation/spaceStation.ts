@@ -32,7 +32,6 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { CollisionMask } from "../settings";
 import { CelestialBody } from "../architecture/celestialBody";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
@@ -98,9 +97,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
                 const landingPad = new LandingPad(scene, mesh);
                 this.landingPads.push(landingPad);
 
-                /*const constraint = new LockConstraint(Vector3.Zero(), landingPad.getTransform().position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), scene);
-        this.aggregate.body.addConstraint(landingPad.aggregate.body, constraint);*/
-
                 continue;
             }
 
@@ -111,8 +107,10 @@ export class SpaceStation implements OrbitalObject, Cullable {
                 ringAggregate.body.disablePreStep = false;
                 this.ringAggregates.push(ringAggregate);
 
-                const constraint = new LockConstraint(Vector3.Zero(), mesh.position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), scene);
-                this.aggregate.body.addConstraint(ringAggregate.body, constraint);
+                const localPosition = mesh.position.clone();
+                scene.onBeforePhysicsObservable.add(() => {
+                    ringAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, this.getTransform().getWorldMatrix()));
+                });
 
                 continue;
             }
