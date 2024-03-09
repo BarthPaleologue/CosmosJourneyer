@@ -418,6 +418,10 @@ export class CosmosJourneyer {
 
             // re-centers the star system
             this.starSystemView.getStarSystem().applyFloatingOrigin();
+
+            // set the ui target to the nearest orbital object
+            this.starSystemView.ui.setTarget(nearestOrbitalObject);
+            this.starSystemView.helmetOverlay.setTarget(nearestOrbitalObject.getTransform());
         });
 
         await this.starSystemView.loadStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);
