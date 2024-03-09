@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export enum GenerationSteps {
+export const enum GenerationSteps {
     AXIAL_TILT = 100,
     ORBIT = 200,
     ORBITAL_PERIOD = 500,
@@ -40,7 +40,7 @@ export enum GenerationSteps {
     SPACE_STATIONS = 2000
 }
 
-export enum BodyType {
+export const enum BodyType {
     STAR,
     TELLURIC_PLANET,
     GAS_PLANET,

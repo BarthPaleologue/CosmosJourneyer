@@ -49,9 +49,8 @@ import { GeneralInputs } from "./inputs/generalInputs";
 import { createNotification } from "./utils/notification";
 import { StarSystemInputs } from "./inputs/starSystemInputs";
 import { pressInteractionToStrings } from "./utils/inputControlsString";
-import { DefaultControlsInputs } from "./defaultController/defaultControlsInputs";
 
-enum EngineState {
+const enum EngineState {
     UNINITIALIZED,
     RUNNING,
     PAUSED

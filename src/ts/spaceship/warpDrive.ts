@@ -19,7 +19,7 @@ import { Settings } from "../settings";
 import { clamp } from "../utils/math";
 import { moveTowards } from "../utils/moveTowards";
 
-enum WarpDriveState {
+const enum WarpDriveState {
     /**
      * The warp drive is disabled. It can be enabled by the user.
      */

@@ -38,7 +38,7 @@ import { Star } from "../../stellarObjects/star/star";
 import { BlackHole } from "../../stellarObjects/blackHole/blackHole";
 import { CelestialBody } from "../../architecture/celestialBody";
 
-export enum EditorVisibility {
+export const enum EditorVisibility {
     HIDDEN,
     NAVBAR,
     FULL

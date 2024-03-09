@@ -18,7 +18,7 @@
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 
-export enum Direction {
+export const enum Direction {
     UP,
     DOWN,
     LEFT,

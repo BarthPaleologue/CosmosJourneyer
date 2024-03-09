@@ -43,7 +43,7 @@ import { AudioManager } from "../audio/audioManager";
 import { MainThruster } from "./mainThruster";
 import { AudioMasks } from "../audio/audioMasks";
 
-enum ShipState {
+const enum ShipState {
     FLYING,
     LANDING,
     LANDED

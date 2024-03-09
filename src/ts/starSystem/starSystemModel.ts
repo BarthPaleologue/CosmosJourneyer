@@ -22,7 +22,7 @@ import { BodyType } from "../model/common";
 import { generateStarName } from "../utils/starNameGenerator";
 import { SystemSeed } from "../utils/systemSeed";
 
-enum GenerationSteps {
+const enum GenerationSteps {
     NAME,
     NB_STARS = 20,
     GENERATE_STARS = 21,

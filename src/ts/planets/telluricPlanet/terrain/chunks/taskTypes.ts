@@ -21,7 +21,7 @@ import { TerrainSettings } from "../terrainSettings";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
-export enum TaskType {
+export const enum TaskType {
     BUILD,
     APPLY
 }
