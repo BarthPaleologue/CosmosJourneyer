@@ -81,11 +81,10 @@ const planet = StarSystemHelper.MakeTelluricPlanet(starSystem, planetModel);
 planet.model.ringsUniforms = new RingsUniforms(planet.model.rng);
 planet.postProcesses.push(PostProcessType.RING);
 
-const spacestation = new SpaceStation(starSystemView.scene, planet);
-starSystemView.getStarSystem().addSpaceStation(spacestation);
+const [spaceStation] = StarSystemHelper.MakeSpaceStations(starSystem, planet, 1);
 
-//physicsViewer.showBody(spacestation.aggregate.body);
-/*for(const landingpad of spacestation.landingPads) {
+//physicsViewer.showBody(spaceStation.aggregate.body);
+/*for(const landingpad of spaceStation.landingPads) {
     physicsViewer.showBody(landingpad.aggregate.body);
 }*/
 
@@ -167,7 +166,7 @@ document.addEventListener("keydown", (e) => {
     if (engine.isPaused()) return;
 
     if (e.key === "o") {
-        const landingPad = spacestation.handleDockingRequest();
+        const landingPad = spaceStation.handleDockingRequest();
         if (landingPad !== null && starSystemView.scene.getActiveControls() === spaceshipController) {
             spaceshipController.spaceship.engageLandingOnPad(landingPad);
         }

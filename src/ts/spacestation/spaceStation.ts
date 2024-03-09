@@ -36,6 +36,7 @@ import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { CollisionMask } from "../settings";
 import { CelestialBody } from "../architecture/celestialBody";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -55,18 +56,16 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     readonly parent: OrbitalObject | null = null;
 
-    constructor(scene: Scene, parentBody: CelestialBody | null = null) {
-        //TODO: do not hardcode name
-        this.name = "Spacestation";
+    constructor(scene: Scene, model: SpaceStationModel | number, parentBody: CelestialBody | null = null) {
 
-        //TODO: do not hardcode seed
-        const seed = 1;
+        this.model = model instanceof SpaceStationModel ? model : new SpaceStationModel(model, parentBody?.model);
 
-        this.model = new SpaceStationModel(seed, parentBody?.model);
+        this.name = generateSpaceStationName(this.model.rng, 2756);
 
         this.parent = parentBody;
 
         this.instance = Assets.CreateSpaceStationInstance();
+        this.instance.name = this.name;
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),

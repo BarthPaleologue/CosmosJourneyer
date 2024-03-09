@@ -19,8 +19,14 @@ import { centeredRand } from "extended-random";
 import { GenerationSteps } from "../model/common";
 import { Settings } from "../settings";
 import { PlanetModel } from "../architecture/planet";
+import { CelestialBodyModel } from "../architecture/celestialBody";
 
 export function getMoonSeed(model: PlanetModel, index: number) {
     if (index > model.nbMoons) throw new Error("Moon out of bound! " + index);
     return centeredRand(model.rng, GenerationSteps.MOONS + index) * Settings.SEED_HALF_RANGE;
+}
+
+export function getSpaceStationSeed(model: CelestialBodyModel, index: number) {
+    if (index > model.getNbSpaceStations()) throw new Error("Space station out of bound! " + index);
+    return centeredRand(model.rng, GenerationSteps.SPACE_STATIONS + index) * Settings.SEED_HALF_RANGE;
 }

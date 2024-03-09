@@ -173,7 +173,7 @@ const greekLetters: string[] = [
 
 /**
  * Generates a star name given a noise based random number generator and the given sample step
- * @param rng A noise based random number generator
+ * @param rng A noise based random number generator with a range of [0, 1]
  * @param baseStep The sample step
  */
 export function generateStarName(rng: (step: number) => number, baseStep: number): string {

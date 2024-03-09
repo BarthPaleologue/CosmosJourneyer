@@ -37,7 +37,7 @@ export enum GenerationSteps {
     WATER_AMOUNT = 1200,
     TERRAIN = 1500,
 
-    SPACE_STATION = 2000
+    SPACE_STATIONS = 2000
 }
 
 export enum BodyType {

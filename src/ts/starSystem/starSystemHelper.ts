@@ -29,13 +29,14 @@ import { TelluricPlanetModel } from "../planets/telluricPlanet/telluricPlanetMod
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanetModel } from "../planets/gasPlanet/gasPlanetModel";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { getMoonSeed } from "../planets/common";
+import { getMoonSeed, getSpaceStationSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
 import { StellarObject } from "../architecture/stellarObject";
 import { BodyType } from "../model/common";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { CelestialBody } from "../architecture/celestialBody";
 import { romanNumeral } from "../utils/romanNumerals";
+import { SpaceStationModel } from "../spacestation/spacestationModel";
 
 export class StarSystemHelper {
     public static MakeStar(starsystem: StarSystemController, model?: number | StarModel): Star {
@@ -171,8 +172,8 @@ export class StarSystemHelper {
         }
     }
 
-    public static MakeSpaceStation(starsystem: StarSystemController, body: CelestialBody): SpaceStation {
-        const spacestation = new SpaceStation(starsystem.scene, body);
+    public static MakeSpaceStation(starsystem: StarSystemController, model: SpaceStationModel | number, body: CelestialBody): SpaceStation {
+        const spacestation = new SpaceStation(starsystem.scene, model, body);
         starsystem.addSpaceStation(spacestation);
         return spacestation;
     }
@@ -181,7 +182,8 @@ export class StarSystemHelper {
         console.assert(n >= 0, `Cannot make a negative amount of space stations : ${n}`);
         const spaceStations = [];
         for (let i = 0; i < n; i++) {
-            const spacestation = StarSystemHelper.MakeSpaceStation(starsystem, body);
+            const seed = getSpaceStationSeed(body.model, i);
+            const spacestation = StarSystemHelper.MakeSpaceStation(starsystem, seed, body);
             spaceStations.push(spacestation);
         }
 

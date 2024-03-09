@@ -57,7 +57,7 @@ import { axisCompositeToString } from "../utils/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { BodyType } from "../model/common";
-import { getMoonSeed } from "../planets/common";
+import { getMoonSeed, getSpaceStationSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
@@ -422,7 +422,8 @@ export class StarSystemView implements View {
             const planet = planets[i];
             for (let j = 0; j < planet.model.getNbSpaceStations(); j++) {
                 console.log("Space station:", j + 1, "of", planet.model.getNbSpaceStations());
-                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, planet);
+                const seed = getSpaceStationSeed(planet.model, j);
+                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, seed, planet);
                 spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
                 await wait(timeOut);
