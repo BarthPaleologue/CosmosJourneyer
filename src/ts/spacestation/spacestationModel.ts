@@ -23,6 +23,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitalObjectModel } from "../architecture/orbitalObject";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
 import { CelestialBodyModel } from "../architecture/celestialBody";
+import { normalRandom } from "extended-random";
+import { clamp } from "../utils/math";
 
 export class SpaceStationModel implements OrbitalObjectModel {
     readonly seed: number;
@@ -39,7 +41,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
         this.parentBody = parentBody ?? null;
         this.childrenBodies = [];
 
-        const orbitRadius = 3 * (parentBody?.radius ?? 0);
+        const orbitRadius = (2 + clamp(normalRandom(2, 1, this.rng, GenerationSteps.ORBIT), 0, 10)) * (parentBody?.radius ?? 0);
 
         this.orbit = {
             radius: orbitRadius,
