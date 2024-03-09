@@ -21,7 +21,6 @@ import { Star } from "../stellarObjects/star/star";
 import { starName } from "../utils/parseToStrings";
 import { MandelbulbModel } from "../mandelbulb/mandelbulbModel";
 import { Mandelbulb } from "../mandelbulb/mandelbulb";
-import { romanNumeral } from "../utils/nameGenerator";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
@@ -36,6 +35,7 @@ import { StellarObject } from "../architecture/stellarObject";
 import { BodyType } from "../model/common";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { CelestialBody } from "../architecture/celestialBody";
+import { romanNumeral } from "../utils/romanNumerals";
 
 export class StarSystemHelper {
     public static MakeStar(starsystem: StarSystemController, model?: number | StarModel): Star {

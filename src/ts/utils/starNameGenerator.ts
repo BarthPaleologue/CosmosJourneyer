@@ -171,34 +171,12 @@ const greekLetters: string[] = [
     "Omega"
 ];
 
-export function romanNumeral(n: number): string {
-    switch (n) {
-        case 1:
-            return "I";
-        case 2:
-            return "II";
-        case 3:
-            return "III";
-        case 4:
-            return "IV";
-        case 5:
-            return "V";
-        case 6:
-            return "VI";
-        case 7:
-            return "VII";
-        case 8:
-            return "VIII";
-        case 9:
-            return "IX";
-        case 10:
-            return "X";
-        default:
-            return n.toString();
-    }
-}
-
-export function generateName(rng: (step: number) => number, baseStep = 0): string {
+/**
+ * Generates a star name given a noise based random number generator and the given sample step
+ * @param rng A noise based random number generator
+ * @param baseStep The sample step
+ */
+export function generateStarName(rng: (step: number) => number, baseStep: number): string {
     const constellation = constellationNames[Math.floor(rng(baseStep) * constellationNames.length)];
     const greekLetter = greekLetters[Math.floor(rng(baseStep + 1) * greekLetters.length)];
     return `${greekLetter} ${constellation}`;
