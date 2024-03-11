@@ -50,6 +50,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     readonly ringInstances: InstancedMesh[] = [];
     readonly ringAggregates: PhysicsAggregate[] = [];
+    readonly ringsLocalPosition: Vector3[] = [];
 
     readonly landingPads: LandingPad[] = [];
 
@@ -107,10 +108,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
                 ringAggregate.body.disablePreStep = false;
                 this.ringAggregates.push(ringAggregate);
 
-                const localPosition = mesh.position.clone();
-                scene.onBeforePhysicsObservable.add(() => {
-                    ringAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, this.getTransform().getWorldMatrix()));
-                });
+                this.ringsLocalPosition.push(mesh.position.clone());
 
                 continue;
             }
@@ -124,6 +122,20 @@ export class SpaceStation implements OrbitalObject, Cullable {
         this.aggregate.body.disablePreStep = false;
 
         console.log("found", this.landingPads.length, "landing pads");
+    }
+
+    updateRings(deltaSeconds: number): void {
+        for (let i = 0; i < this.ringInstances.length; i++) {
+            const ringAggregate = this.ringAggregates[i];
+            const localPosition = this.ringsLocalPosition[i];
+            
+            const clockwise = i % 2 === 0 ? 1 : -1;
+
+            ringAggregate.transformNode.rotate(Vector3.Up(), deltaSeconds * 0.1 * clockwise);
+
+            // this is necessary because Havok ignores regular parenting
+            ringAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, this.getTransform().getWorldMatrix()));
+        }
     }
 
     handleDockingRequest(): LandingPad | null {

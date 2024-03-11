@@ -443,6 +443,7 @@ export class StarSystemController {
         }
 
         for (const object of this.spaceStations) {
+            object.updateRings(deltaTime);
             object.computeCulling(controller.getActiveCamera());
         }
 

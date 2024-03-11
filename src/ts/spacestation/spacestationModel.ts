@@ -53,7 +53,7 @@ export class SpaceStationModel implements OrbitalObjectModel {
 
         this.physicalProperties = {
             mass: 1,
-            rotationPeriod: 60 * 2,
+            rotationPeriod: 0,
             axialTilt: 2 * this.rng(GenerationSteps.AXIAL_TILT) * Math.PI
         };
     }
