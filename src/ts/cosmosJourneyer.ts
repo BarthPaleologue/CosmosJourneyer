@@ -49,6 +49,7 @@ import { GeneralInputs } from "./inputs/generalInputs";
 import { createNotification } from "./utils/notification";
 import { StarSystemInputs } from "./inputs/starSystemInputs";
 import { pressInteractionToStrings } from "./utils/inputControlsString";
+import { LoadingScreen } from "./uberCore/loadingScreen";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -196,6 +197,7 @@ export class CosmosJourneyer {
               });
 
         engine.useReverseDepthBuffer = true;
+        engine.loadingScreen = new LoadingScreen(canvas);
         engine.loadingScreen.displayLoadingUI();
         window.addEventListener("resize", () => {
             engine.resize(true);

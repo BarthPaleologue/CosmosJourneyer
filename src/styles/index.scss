@@ -107,6 +107,8 @@ body {
 
   @import "inputs.scss";
 
+  @import "loadingScreen.scss";
+
   #renderer {
     z-index: 1;
     float: left;
