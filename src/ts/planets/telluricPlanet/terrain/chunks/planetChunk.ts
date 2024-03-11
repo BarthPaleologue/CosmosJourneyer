@@ -43,6 +43,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
+    private readonly planetLocalPosition;
 
     readonly planetModel: TelluricPlanetModel;
 
@@ -100,6 +101,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         position.normalize().scaleInPlace(rootLength / 2);
 
+        this.planetLocalPosition = position.clone();
         this.getTransform().position = position;
     }
 
@@ -139,8 +141,6 @@ export class PlanetChunk implements Transformable, BoundingSphere {
             this.aggregate.body.disablePreStep = false;
             this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
             this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-            const constraint = new LockConstraint(Vector3.Zero(), this.getTransform().position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), this.mesh.getScene());
-            this.parentAggregate.body.addConstraint(this.aggregate.body, constraint);
         }
 
         this.mesh.setEnabled(true);
@@ -173,6 +173,15 @@ export class PlanetChunk implements Transformable, BoundingSphere {
             grassPatch.createInstances(Assets.GRASS_BLADE);
             this.instancePatches.push(grassPatch);
         }
+    }
+
+    /**
+     * When the chunk has a Havok body, parenting is ignored so this method must be called to compensate.
+     * If the chunk has no Havok body, this method does nothing
+     */
+    public updatePosition() {
+        if (this.aggregate === null) return;
+        this.getTransform().setAbsolutePosition(Vector3.TransformCoordinates(this.planetLocalPosition, this.parent.getWorldMatrix()));
     }
 
     public getAverageHeight(): number {

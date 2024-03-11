@@ -432,10 +432,7 @@ export class StarSystemController {
         for (const body of this.telluricPlanets) {
             // Meshes with LOD are updated (surface quadtrees)
             body.updateLOD(controller.getTransform().getAbsolutePosition(), chunkForge);
-        }
-
-        for (const object of this.telluricPlanets) {
-            object.computeCulling(controller.getActiveCamera());
+            body.computeCulling(controller.getActiveCamera());
         }
 
         for (const object of this.gasPlanets) {

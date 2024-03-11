@@ -138,6 +138,10 @@ export class ChunkTree {
         this.deleteSemaphores = this.deleteSemaphores.filter((mutex) => !mutex.isResolved());
 
         this.tree = this.updateLODRecursively(observerPosition, chunkForge);
+
+        this.executeOnEveryChunk((chunk) => {
+            chunk.updatePosition();
+        });
     }
 
     private getAverageHeight(tree: QuadTree): number {
