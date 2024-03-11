@@ -37,6 +37,7 @@ import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/
 import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
 export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
@@ -58,7 +59,6 @@ export class PlanetChunk implements Transformable, BoundingSphere {
     readonly onDisposeObservable = new Observable<void>();
 
     private aggregate: PhysicsAggregate | null = null;
-    private readonly parentAggregate: PhysicsAggregate;
 
     private averageHeight = 0;
 
@@ -83,11 +83,10 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         this.mesh.parent = parentAggregate.transformNode;
 
-        //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
-        //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
+        this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+        this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
 
         this.parent = parentAggregate.transformNode;
-        this.parentAggregate = parentAggregate;
 
         // computing the position of the chunk on the side of the planet
         const position = getChunkPlaneSpacePositionFromPath(rootLength, path);
