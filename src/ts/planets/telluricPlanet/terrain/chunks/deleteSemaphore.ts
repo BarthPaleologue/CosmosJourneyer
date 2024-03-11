@@ -47,6 +47,9 @@ export class DeleteSemaphore {
         for (const chunk of this.chunksToDelete) {
             chunk.dispose();
         }
+
+        this.chunksToDelete.length = 0;
+        this.newChunks.length = 0;
     }
 
     /**
