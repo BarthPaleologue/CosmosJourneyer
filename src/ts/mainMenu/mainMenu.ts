@@ -328,6 +328,8 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                 this.htmlRoot.style.display = "none";
                 Assets.MAIN_MENU_BACKGROUND_MUSIC.stop();
                 onAnimationFinished();
+
+                return;
             }
 
             const currentProgress = translationAnimation.getProgress();
