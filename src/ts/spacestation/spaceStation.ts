@@ -58,7 +58,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
     readonly parent: OrbitalObject | null = null;
 
     constructor(scene: Scene, model: SpaceStationModel | number, parentBody: CelestialBody | null = null) {
-
         this.model = model instanceof SpaceStationModel ? model : new SpaceStationModel(model, parentBody?.model);
 
         this.name = generateSpaceStationName(this.model.rng, 2756);
@@ -138,7 +137,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
             const clockwise = i % 2 === 0 ? 1 : -1;
 
-            ringAggregate.transformNode.rotate(Vector3.Up(), deltaSeconds * clockwise * (2 * Math.PI / rotationPeriod));
+            ringAggregate.transformNode.rotate(Vector3.Up(), deltaSeconds * clockwise * ((2 * Math.PI) / rotationPeriod));
 
             // this is necessary because Havok ignores regular parenting
             ringAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, this.getTransform().getWorldMatrix()));
