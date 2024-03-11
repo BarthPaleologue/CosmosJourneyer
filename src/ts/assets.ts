@@ -17,7 +17,6 @@
 
 import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
-import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Animations/animatable";
 
 import rockNormalMap from "../asset/textures/rockn.png";
@@ -88,6 +87,7 @@ import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
 import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
+import { LoadingScreen } from "./uberCore/loadingScreen";
 
 export class Assets {
     static IS_READY = false;
@@ -471,7 +471,7 @@ export class Assets {
         });
 
         Assets.MANAGER.onProgress = (remainingCount, totalCount) => {
-            scene.getEngine().loadingScreen.loadingUIText = `Loading assets... ${totalCount - remainingCount}/${totalCount}`;
+            (scene.getEngine().loadingScreen as LoadingScreen).setProgressPercentage(100 * (totalCount - remainingCount) / totalCount);
         };
 
         Assets.SCATTER_CUBE = MeshBuilder.CreateBox("cube", { size: 1 }, scene);

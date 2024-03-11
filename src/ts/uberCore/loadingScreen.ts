@@ -79,9 +79,9 @@ export class LoadingScreen implements ILoadingScreen {
         this.loadingDiv.appendChild(imgBack);
         this.loadingDiv.appendChild(imageSpinnerContainer);
 
-        this._resizeLoadingUI();
+        this.resizeLoadingUI();
 
-        window.addEventListener("resize", this._resizeLoadingUI);
+        window.addEventListener("resize", this.resizeLoadingUI);
 
         this.loadingDiv.style.backgroundColor = this.loadingDivBackgroundColor;
         document.body.appendChild(this.loadingDiv);
@@ -106,11 +106,15 @@ export class LoadingScreen implements ILoadingScreen {
                 this.loadingDiv.remove();
                 this.loadingDiv = null;
             }
-            window.removeEventListener("resize", this._resizeLoadingUI);
+            window.removeEventListener("resize", this.resizeLoadingUI);
         };
 
         this.loadingDiv.style.opacity = "0";
         this.loadingDiv.addEventListener("transitionend", onTransitionEnd);
+    }
+
+    public setProgressPercentage(percentage: number) {
+        this.loadingUIText = `Loading, please wait... ${percentage.toFixed(0)}%`;
     }
 
     /**
@@ -146,7 +150,7 @@ export class LoadingScreen implements ILoadingScreen {
     }
 
     // Resize
-    private _resizeLoadingUI = () => {
+    private resizeLoadingUI = () => {
         const canvasRect = this.canvas.getBoundingClientRect();
         const canvasPositioning = window.getComputedStyle(this.canvas).position;
 
