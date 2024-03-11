@@ -236,7 +236,7 @@ export class ChunkTree {
     private createChunk(path: number[], chunkForge: ChunkForge): PlanetChunk {
         const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.planetModel, this.rootChunkLength, this.scene);
 
-        chunk.onRecieveVertexDataObservable.add(() => {
+        chunk.onReceiveVertexDataObservable.add(() => {
             this.onChunkCreatedObservable.notifyObservers(chunk);
         });
 

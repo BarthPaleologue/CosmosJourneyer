@@ -32,7 +32,7 @@ export class DeleteSemaphore {
         this.chunksToDelete = chunksToDelete;
 
         for (const chunk of newChunks) {
-            chunk.onRecieveVertexDataObservable.add(() => this.countdown());
+            chunk.onReceiveVertexDataObservable.add(() => this.countdown());
         }
     }
 

@@ -34,7 +34,6 @@ import { IPatch } from "../instancePatch/iPatch";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { BoundingSphere } from "../../../../architecture/boundingSphere";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
@@ -43,11 +42,11 @@ export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
-    private readonly planetLocalPosition;
+    private readonly planetLocalPosition: Vector3;
 
-    readonly planetModel: TelluricPlanetModel;
+    private readonly planetModel: TelluricPlanetModel;
 
-    readonly chunkSideLength: number;
+    private readonly chunkSideLength: number;
 
     private loaded = false;
 
@@ -55,11 +54,11 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
     readonly instancePatches: IPatch[] = [];
 
-    readonly onRecieveVertexDataObservable = new Observable<void>();
+    readonly onReceiveVertexDataObservable = new Observable<void>();
     readonly onDisposeObservable = new Observable<void>();
 
-    aggregate: PhysicsAggregate | null = null;
-    readonly parentAggregate: PhysicsAggregate;
+    private aggregate: PhysicsAggregate | null = null;
+    private readonly parentAggregate: PhysicsAggregate;
 
     private averageHeight = 0;
 
@@ -148,7 +147,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         this.averageHeight = averageHeight;
 
-        this.onRecieveVertexDataObservable.notifyObservers();
+        this.onReceiveVertexDataObservable.notifyObservers();
 
         if (instancesMatrixBuffer.length === 0) return;
 
@@ -211,7 +210,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.helpers.forEach((helper) => helper.dispose());
         this.instancePatches.forEach((patch) => patch.dispose());
         this.mesh.dispose();
-        this.onRecieveVertexDataObservable.clear();
+        this.onReceiveVertexDataObservable.clear();
         this.onDisposeObservable.clear();
 
         this.disposed = true;
