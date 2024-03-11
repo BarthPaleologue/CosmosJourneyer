@@ -440,8 +440,8 @@ export class StarSystemView implements View {
         starSystem.initPositions(2, this.chunkForge, this.postProcessManager);
         this.ui.createObjectOverlays(starSystem.getOrbitalObjects());
 
-        this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects());
-        this.axisRenderer.setObjects(starSystem.getOrbitalObjects());
+        this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
+        this.axisRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
 
         this.helmetOverlay.setTarget(null);
 

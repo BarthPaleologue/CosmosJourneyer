@@ -21,6 +21,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
 import { getPointOnOrbitLocal } from "./orbit";
 import { OrbitalObject } from "../architecture/orbitalObject";
+import { Scene } from "@babylonjs/core/scene";
 
 export class OrbitRenderer {
     private orbitMeshes: LinesMesh[] = [];
@@ -31,7 +32,13 @@ export class OrbitRenderer {
 
     private _isVisible = false;
 
-    setOrbitalObjects(orbitalObjects: OrbitalObject[]) {
+    setOrbitalObjects(orbitalObjects: OrbitalObject[], scene: Scene) {
+        if (this.orbitMaterial === null) {
+            this.orbitMaterial = new StandardMaterial("orbitMaterial", scene);
+            this.orbitMaterial.emissiveColor = Color3.White();
+            this.orbitMaterial.disableLighting = true;
+        }
+
         this.reset();
         this.orbitalObjects = orbitalObjects;
 
@@ -89,11 +96,5 @@ export class OrbitRenderer {
         this.orbitMeshes.forEach((orbitMesh) => orbitMesh.dispose());
         this.orbitMeshes = [];
         this.orbitalObjects = [];
-
-        if (this.orbitMaterial === null) {
-            this.orbitMaterial = new StandardMaterial("orbitMaterial");
-            this.orbitMaterial.emissiveColor = Color3.White();
-            this.orbitMaterial.disableLighting = true;
-        }
     }
 }
