@@ -51,6 +51,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
     readonly ringInstances: InstancedMesh[] = [];
     readonly ringAggregates: PhysicsAggregate[] = [];
     readonly ringsLocalPosition: Vector3[] = [];
+    readonly ringsRadius: number[] = [];
 
     readonly landingPads: LandingPad[] = [];
 
@@ -108,6 +109,8 @@ export class SpaceStation implements OrbitalObject, Cullable {
                 ringAggregate.body.disablePreStep = false;
                 this.ringAggregates.push(ringAggregate);
 
+                this.ringsRadius.push(mesh.getBoundingInfo().boundingSphere.radius);
+
                 this.ringsLocalPosition.push(mesh.position.clone());
 
                 continue;
@@ -128,10 +131,14 @@ export class SpaceStation implements OrbitalObject, Cullable {
         for (let i = 0; i < this.ringInstances.length; i++) {
             const ringAggregate = this.ringAggregates[i];
             const localPosition = this.ringsLocalPosition[i];
-            
+            const ringRadius = this.ringsRadius[i];
+
+            // g = v * v / r and T = 2 * pi * r / v => v = sqrt(g * r) and T = 2 * pi * r / sqrt(g * r) = 2 * pi * sqrt(r / g)
+            const rotationPeriod = 2 * Math.PI * Math.sqrt(ringRadius / 9.81);
+
             const clockwise = i % 2 === 0 ? 1 : -1;
 
-            ringAggregate.transformNode.rotate(Vector3.Up(), deltaSeconds * 0.1 * clockwise);
+            ringAggregate.transformNode.rotate(Vector3.Up(), deltaSeconds * clockwise * (2 * Math.PI / rotationPeriod));
 
             // this is necessary because Havok ignores regular parenting
             ringAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, this.getTransform().getWorldMatrix()));
