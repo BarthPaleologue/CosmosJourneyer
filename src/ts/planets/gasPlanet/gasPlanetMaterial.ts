@@ -35,6 +35,8 @@ export class GasPlanetMaterial extends ShaderMaterial {
     readonly colorSettings: GazColorSettings;
     private clock = 0;
 
+    private stellarObjects: Transformable[] = [];
+
     constructor(planetName: string, planet: TransformNode, model: GasPlanetModel, scene: Scene) {
         const shaderName = "gasPlanetMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -88,6 +90,20 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setColor3("color3", this.colorSettings.color3);
 
         this.updateConstants();
+
+        this.onBindObservable.add(() => {
+            this.getEffect().setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
+
+            const activeCamera = scene.activeCamera;
+            if(activeCamera === null) throw new Error("There is no active camera for GasPlanetMaterial!");
+            this.getEffect().setVector3("playerPosition", activeCamera.globalPosition);
+
+            this.getEffect().setArray3("star_positions", flattenVector3Array(this.stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
+            this.getEffect().setArray3("star_colors", flattenColor3Array(this.stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));
+            this.getEffect().setInt("nbStars", this.stellarObjects.length);
+
+            this.getEffect().setFloat("time", this.clock % 100000);
+        });
     }
 
     public updateConstants(): void {
@@ -96,15 +112,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
     public update(player: Camera, stellarObjects: Transformable[], deltaTime: number) {
         this.clock += deltaTime;
-
-        this.setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
-
-        this.setVector3("playerPosition", player.globalPosition);
-
-        this.setArray3("star_positions", flattenVector3Array(stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
-        this.setArray3("star_colors", flattenColor3Array(stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));
-        this.setInt("nbStars", stellarObjects.length);
-
-        this.setFloat("time", this.clock % 100000);
+        this.stellarObjects = stellarObjects;
     }
 }

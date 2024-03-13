@@ -52,6 +52,8 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
      */
     private readonly planetModel: TelluricPlanetModel;
 
+    private stellarObjects: Transformable[] = [];
+
     /**
      * Creates a new telluric planet material
      * @param planetName The name of the planet
@@ -208,16 +210,24 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     }
 
     public update(cameraPosition: Vector3, stellarObjects: Transformable[]) {
-        const inversePlanetWorldMatrix = this.planetTransform.getWorldMatrix().clone().invert();
-        this.setMatrix("normalMatrix", inversePlanetWorldMatrix.transpose());
-        this.setMatrix("inversePlanetWorldMatrix", inversePlanetWorldMatrix);
+        this.stellarObjects = stellarObjects;
 
-        this.setVector3("playerPosition", cameraPosition);
+        // The add once is important because the material will be bound for every chunk of the planet
+        // we don't want to compute the same matrix inverse for every chunk
+        this.onBindObservable.addOnce(() => {
+            const inversePlanetWorldMatrix = this.planetTransform.getWorldMatrix().clone().invert();
+            this.getEffect().setMatrix("normalMatrix", inversePlanetWorldMatrix.transpose());
+            this.getEffect().setMatrix("inversePlanetWorldMatrix", inversePlanetWorldMatrix);
 
-        this.setArray3("star_positions", flattenVector3Array(stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
-        this.setArray3("star_colors", flattenColor3Array(stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));
-        this.setInt("nbStars", stellarObjects.length);
+            const activeCamera = this.getScene().activeCamera;
+            if (activeCamera === null) throw new Error("There is no active camera for TelluricPlanetMaterial!");
+            this.getEffect().setVector3("playerPosition", activeCamera.globalPosition);
 
-        this.setVector3("planetPosition", this.planetTransform.getAbsolutePosition());
+            this.getEffect().setArray3("star_positions", flattenVector3Array(this.stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
+            this.getEffect().setArray3("star_colors", flattenColor3Array(this.stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));
+            this.getEffect().setInt("nbStars", this.stellarObjects.length);
+
+            this.getEffect().setVector3("planetPosition", this.planetTransform.getAbsolutePosition());
+        });
     }
 }

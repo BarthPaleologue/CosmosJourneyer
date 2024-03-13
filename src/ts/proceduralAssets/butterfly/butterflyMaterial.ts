@@ -28,6 +28,9 @@ import { Transformable } from "../../architecture/transformable";
 
 export class ButterflyMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
+    private stars: Transformable[] = [];
+    private playerPosition: Vector3 = Vector3.Zero();
+
     constructor(scene: Scene) {
         const shaderName = "butterflyMaterial";
         Effect.ShadersStore[`${shaderName}FragmentShader`] = butterflyFragment;
@@ -45,18 +48,22 @@ export class ButterflyMaterial extends ShaderMaterial {
         this.setFloat("time", 0);
         this.setTexture("butterflyTexture", new Texture(butterflyTexture, scene));
         this.backFaceCulling = false;
+
+        this.onBindObservable.add(() => {
+            if (this.stars.length > 0) {
+                const star = this.stars[0];
+                const lightDirection = star.getTransform().getAbsolutePosition().subtract(this.playerPosition).normalize();
+                this.getEffect().setVector3("lightDirection", lightDirection);
+            }
+
+            this.getEffect().setVector3("playerPosition", this.playerPosition);
+            this.getEffect().setFloat("time", this.elapsedSeconds);
+        });
     }
 
     update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
-
-        if (stars.length > 0) {
-            const star = stars[0];
-            const lightDirection = star.getTransform().getAbsolutePosition().subtract(playerPosition).normalize();
-            this.setVector3("lightDirection", lightDirection);
-        }
-
-        this.setVector3("playerPosition", playerPosition);
-        this.setFloat("time", this.elapsedSeconds);
+        this.stars = stars;
+        this.playerPosition = playerPosition;
     }
 }
