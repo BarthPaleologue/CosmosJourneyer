@@ -29,6 +29,34 @@ Pull request are tested against the linter and the unit tests, make sure you run
 
 Code that does not pass the linter or the unit tests will not be merged.
 
+## Translation
+
+Cosmos Journeyer is available in multiple languages, but you can add more or improve existing translations.
+
+### Modifying existing language
+
+To make a change in an existing language, go to `src/locales` and find the language you want to modify by its code. 
+For example if you want to modify the American English translation, you will find the `en-us` folder. 
+Inside this folder are many JSON files containing the various words and sentences used throughout the project.
+
+Make the changes you want by editing the files and then open a pull request. If you don't have/don't want to create a GitHub account, you can email the files at 
+[barth.paleologue@cosmosjourneyer.com](mailto:barth.paleologue@cosmosjourneyer.com). In any case you will be credited for your work.
+
+### Adding a new language
+
+Adding a new language altogether is quite straightforward as well. Simply go to the `src/locales` folder and create a new folder with the language code you want to create.
+Then, paste inside the content of another language directory and translate the content inside the JSON files.
+
+You don't need to code at all, the language will be automatically bundled and available inside Cosmos Journeyer.
+
+To test your changes, simply run the project using `npm run serve` and change the url in this format:
+
+```
+http://localhost:8080/?lang=fr-FR
+```
+
+You only need to replace `fr-FR` with the language code you want to test.
+
 ## Contribution ideas
 
 There is still plenty to do on Cosmos Journeyer. Here are some ideas of contributions you can make (with stars indicating the difficulty of the task):

@@ -88,6 +88,7 @@ import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
 import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
 import { LoadingScreen } from "./uberCore/loadingScreen";
+import i18next from "./i18n";
 
 export class Assets {
     static IS_READY = false;
@@ -481,7 +482,7 @@ export class Assets {
 
         Assets.MANAGER.onFinish = () => {
             console.log("Assets loaded");
-            scene.getEngine().loadingScreen.loadingUIText = "Press F11 to go fullscreen";
+            scene.getEngine().loadingScreen.loadingUIText = i18next.t("common:fullscreen");
             Assets.IS_READY = true;
         };
 

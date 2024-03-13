@@ -66,6 +66,7 @@ import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { wait } from "../utils/wait";
 import { CharacterInputs } from "../spacelegs/characterControlsInputs";
 import { DefaultControlsInputs } from "../defaultController/defaultControlsInputs";
+import i18n from "../i18n";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -320,7 +321,7 @@ export class StarSystemView implements View {
                     if (!(control instanceof AxisComposite)) {
                         throw new Error("Up down is not an axis composite");
                     }
-                    createNotification(`Hold ${axisCompositeToString(control)[1][1]} to lift off.`, 5000);
+                    createNotification(i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control)[1][1] }), 5000);
                 }
             }
         });

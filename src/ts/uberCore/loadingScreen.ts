@@ -1,5 +1,6 @@
 import { ILoadingScreen } from "@babylonjs/core/Loading/loadingScreen";
 import { Nullable } from "@babylonjs/core/types";
+import i18next from "../i18n";
 
 export class LoadingScreen implements ILoadingScreen {
     private loadingDiv: Nullable<HTMLDivElement> = null;
@@ -114,7 +115,7 @@ export class LoadingScreen implements ILoadingScreen {
     }
 
     public setProgressPercentage(percentage: number) {
-        this.loadingUIText = `Loading, please wait... ${percentage.toFixed(0)}%`;
+        this.loadingUIText = `${i18next.t("common:loading")} ${percentage.toFixed(0)}%`;
     }
 
     /**
