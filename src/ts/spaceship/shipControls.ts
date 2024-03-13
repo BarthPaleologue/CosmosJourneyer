@@ -30,6 +30,7 @@ import { createNotification } from "../utils/notification";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { buttonInputToString, pressInteractionToStrings } from "../utils/inputControlsString";
 import { ButtonInputControl } from "@brianchirls/game-input/browser";
+import i18n from "../i18n";
 
 export class ShipControls implements Controls {
     readonly spaceship: Spaceship;
@@ -90,11 +91,11 @@ export class ShipControls implements Controls {
 
         this.spaceship.onLandingObservable.add(() => {
             const bindingsString = pressInteractionToStrings(StarSystemInputs.map.toggleSpaceShipCharacter).join(", ");
-            createNotification(`Landing complete! Use ${bindingsString} to disembark.`, 5000);
+            createNotification(i18n.t("notifications:landingComplete", { bindingsString: bindingsString }), 5000);
         });
 
         this.spaceship.onLandingEngaged.add(() => {
-            createNotification(`Landing sequence engaged.`, 5000);
+            createNotification(i18n.t("notifications:landingSequenceEngaged"), 5000);
         });
     }
 
