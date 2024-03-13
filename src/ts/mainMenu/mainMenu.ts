@@ -18,6 +18,7 @@ import { Assets } from "../assets";
 import { Settings } from "../settings";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { initSettingsPanel } from "./settingsPanel";
+import i18n from "../i18n";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -132,12 +133,16 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         if (aboutPanel === null) throw new Error("#about does not exist!");
         this.aboutPanel = aboutPanel;
 
-        document.getElementById("startButton")?.addEventListener("click", () => {
+        const startButton = document.getElementById("startButton");
+        if(startButton === null) throw new Error("#startButton does not exist!");
+        startButton.innerText = i18n.t("mainMenu:newJourney");
+        startButton.addEventListener("click", () => {
             this.startAnimation(() => this.onStartObservable.notifyObservers());
         });
 
         const loadSaveButton = document.getElementById("loadSaveButton");
         if (loadSaveButton === null) throw new Error("#loadSaveButton does not exist!");
+        loadSaveButton.innerText = i18n.t("mainMenu:loadSave");
 
         this.initLoadSavePanel();
 
@@ -147,6 +152,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
 
         const settingsButton = document.getElementById("settingsButton");
         if (settingsButton === null) throw new Error("#settingsButton does not exist!");
+        settingsButton.innerText = i18n.t("mainMenu:settings");
 
         settingsButton.addEventListener("click", () => {
             this.toggleActivePanel(this.settingsPanel);
@@ -154,6 +160,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
 
         const contributeButton = document.getElementById("contributeButton");
         if (contributeButton === null) throw new Error("#contributeButton does not exist!");
+        contributeButton.innerText = i18n.t("mainMenu:contribute");
 
         contributeButton.addEventListener("click", () => {
             this.toggleActivePanel(this.contributePanel);
@@ -162,6 +169,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
 
         const creditsButton = document.getElementById("creditsButton");
         if (creditsButton === null) throw new Error("#creditsButton does not exist!");
+        creditsButton.innerText = i18n.t("mainMenu:credits");
 
         creditsButton.addEventListener("click", () => {
             this.toggleActivePanel(this.creditsPanel);
@@ -170,6 +178,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
 
         const aboutButton = document.getElementById("aboutButton");
         if (aboutButton === null) throw new Error("#aboutButton does not exist!");
+        aboutButton.innerText = i18n.t("mainMenu:about");
 
         aboutButton.addEventListener("click", () => {
             this.toggleActivePanel(this.aboutPanel);

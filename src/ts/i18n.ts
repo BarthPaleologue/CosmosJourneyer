@@ -1,6 +1,10 @@
 import i18next from 'i18next';
+
 import enCommon from '../locales/en-us/common.json';
+import enMainMenu from '../locales/en-us/mainMenu.json';
+
 import frCommon from '../locales/fr-fr/common.json';
+import frMainMenu from '../locales/fr-fr/mainMenu.json';
 
 await i18next.init({
     lng: navigator.language, // if you're using a language detector, do not define the lng option
@@ -8,10 +12,12 @@ await i18next.init({
     fallbackLng: 'en-US',
     resources: {
         "en-US": {
-            common: enCommon
+            common: enCommon,
+            mainMenu: enMainMenu
         },
         "fr-FR": {
-            common: frCommon
+            common: frCommon,
+            mainMenu: frMainMenu
         }
     }
 });
