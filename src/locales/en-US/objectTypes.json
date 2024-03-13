@@ -1,0 +1,11 @@
+{
+  "starSystem": "Star system",
+  "star": "{{stellarType}} Star",
+  "neutronStar": "Neutron Star",
+  "blackHole": "Black Hole",
+  "gasPlanet": "Gas planet",
+  "telluricPlanet": "Telluric Planet",
+  "telluricMoon": "Telluric Moon",
+  "spaceStation": "Space Station",
+  "anomaly": "Anomaly"
+}

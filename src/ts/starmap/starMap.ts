@@ -58,6 +58,7 @@ import { AudioMasks } from "../audio/audioMasks";
 import { Settings } from "../settings";
 import { parseDistance } from "../utils/parseToStrings";
 import { StarMapInputs } from "../inputs/starMapInputs";
+import i18n from "../i18n";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -470,18 +471,18 @@ export class StarMap implements View {
                 if (this.currentSystemSeed !== null) {
                     const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh;
                     const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentInstance.getAbsolutePosition(), initializedInstance.getAbsolutePosition()));
-                    text += `Distance: ${parseDistance(distance)}\n`;
+                    text += `${i18n.t("starMap:distance")}: ${parseDistance(distance)}\n`;
                 }
 
                 if (starModel === null) throw new Error("Star model is null!");
 
                 let typeString = "";
-                if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = "Black hole";
-                else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = "Neutron star";
-                else typeString = getStellarTypeString(starModel.stellarType);
-                text += `Type: ${typeString}\n`;
+                if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
+                else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
+                else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
+                text += `${typeString}\n`;
 
-                text += `Planets: ${starSystemModel.getNbPlanets()}\n`;
+                text += `${i18n.t("starMap:planets")}: ${starSystemModel.getNbPlanets()}\n`;
 
                 this.starMapUI.attachUIToMesh(initializedInstance);
                 this.starMapUI.setSelectedSystem({ name: starSystemModel.getName(), text });

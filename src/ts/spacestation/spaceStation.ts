@@ -36,6 +36,7 @@ import { CollisionMask } from "../settings";
 import { CelestialBody } from "../architecture/celestialBody";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
+import i18n from "../i18n";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -174,7 +175,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
     }
 
     getTypeName(): string {
-        return "Space Station";
+        return i18n.t("objectTypes:spaceStation");
     }
 
     public computeCulling(camera: Camera): void {

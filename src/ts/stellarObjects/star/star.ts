@@ -42,6 +42,7 @@ import { Cullable } from "../../bodies/cullable";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
+import i18n from "../../i18n";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -139,7 +140,7 @@ export class Star implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return `${getStellarTypeString(this.model.stellarType)} star`;
+        return i18n.t("objectTypes:star", { stellarType: getStellarTypeString(this.model.stellarType) });
     }
 
     public updateMaterial(deltaTime: number): void {

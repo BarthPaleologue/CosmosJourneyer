@@ -37,6 +37,7 @@ import { Cullable } from "../../bodies/cullable";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { Transformable } from "../../architecture/transformable";
+import i18n from "../../i18n";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -116,7 +117,7 @@ export class GasPlanet implements Planet, Cullable {
     }
 
     getTypeName(): string {
-        return "Gas Planet";
+        return i18n.t("objectTypes:gasPlanet");
     }
 
     public computeCulling(camera: Camera): void {
