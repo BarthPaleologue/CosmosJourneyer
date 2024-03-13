@@ -2,9 +2,11 @@ import i18next from 'i18next';
 
 import enCommon from '../locales/en-us/common.json';
 import enMainMenu from '../locales/en-us/mainMenu.json';
+import enPauseMenu from '../locales/en-us/pauseMenu.json';
 
 import frCommon from '../locales/fr-fr/common.json';
 import frMainMenu from '../locales/fr-fr/mainMenu.json';
+import frPauseMenu from '../locales/fr-fr/pauseMenu.json';
 
 await i18next.init({
     lng: navigator.language, // if you're using a language detector, do not define the lng option
@@ -13,11 +15,13 @@ await i18next.init({
     resources: {
         "en-US": {
             common: enCommon,
-            mainMenu: enMainMenu
+            mainMenu: enMainMenu,
+            pauseMenu: enPauseMenu
         },
         "fr-FR": {
             common: frCommon,
-            mainMenu: frMainMenu
+            mainMenu: frMainMenu,
+            pauseMenu: frPauseMenu
         }
     }
 });

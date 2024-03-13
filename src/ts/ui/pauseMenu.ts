@@ -18,6 +18,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import pauseMenuHTML from "../../html/pauseMenu.html";
 import { Assets } from "../assets";
+import i18n from "../i18n";
 
 export class PauseMenu {
     private readonly rootNode: HTMLElement;
@@ -46,9 +47,11 @@ export class PauseMenu {
 
         this.screenshotButton = document.getElementById("screenshotButton") as HTMLElement;
         this.screenshotButton.addEventListener("click", () => this.onScreenshot.notifyObservers());
+        this.screenshotButton.innerText = i18n.t("pauseMenu:screenshot");
 
         this.shareButton = document.getElementById("shareButton") as HTMLElement;
         this.shareButton.addEventListener("click", () => this.onShare.notifyObservers());
+        this.shareButton.innerText = i18n.t("pauseMenu:share");
 
         this.contributeButton = document.getElementById("pauseContributeButton") as HTMLElement;
         this.contributeButton.addEventListener("click", () => {
@@ -56,6 +59,7 @@ export class PauseMenu {
 
             this.setActivePanel(this.activePanel === this.contibutePanel ? null : this.contibutePanel);
         });
+        this.contributeButton.innerText = i18n.t("pauseMenu:contribute");
 
         this.settingsButton = document.getElementById("pauseSettingsButton") as HTMLElement;
         this.settingsButton.addEventListener("click", () => {
@@ -63,12 +67,15 @@ export class PauseMenu {
 
             this.setActivePanel(this.activePanel === this.settingsPanel ? null : this.settingsPanel);
         });
+        this.settingsButton.innerText = i18n.t("pauseMenu:settings");
 
         this.saveButton = document.getElementById("saveButton") as HTMLElement;
         this.saveButton.addEventListener("click", () => this.onSave.notifyObservers());
+        this.saveButton.innerText = i18n.t("pauseMenu:save");
 
         this.resumeButton = document.getElementById("resumeButton") as HTMLElement;
         this.resumeButton.addEventListener("click", () => this.onResume.notifyObservers());
+        this.resumeButton.innerText = i18n.t("pauseMenu:resume");
 
         document.querySelectorAll("#pauseMenu li").forEach((li) => {
             // play a sound when hovering over a button
