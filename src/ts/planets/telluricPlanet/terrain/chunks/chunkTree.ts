@@ -176,6 +176,18 @@ export class ChunkTree {
         if (walked.length === this.maxDepth) return tree;
 
         const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, getRotationQuaternion(this.parent));
+
+        const nodePositionSphere = nodeRelativePosition.normalizeToNew();
+        const observerPositionSphere = observerPositionW.subtract(this.parent.getAbsolutePosition()).normalize();
+
+        const observerDistanceToSphereNormalized = observerPositionW.subtract(observerPositionSphere.scale(this.planetModel.radius)).length() / this.planetModel.radius;
+
+        const nodeGreatCircleDistance = Math.acos(Vector3.Dot(nodePositionSphere, observerPositionSphere));
+
+        const observerInfluence = 4;
+        const targetLOD = this.minDepth + this.maxDepth * (1 / (1 + nodeGreatCircleDistance)) * (1 / (1 + observerInfluence * observerDistanceToSphereNormalized));
+        console.log(targetLOD);
+
         const nodePositionW = nodeRelativePosition.add(this.parent.getAbsolutePosition());
 
         const direction = nodePositionW.subtract(this.parent.getAbsolutePosition()).normalize();
