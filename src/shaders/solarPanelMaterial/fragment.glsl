@@ -28,11 +28,7 @@ uniform sampler2D roughnessMap;
 
 uniform vec3 cameraPosition;
 
-#include "../utils/pi.glsl";
-
 #include "../utils/stars.glsl";
-
-#include "../utils/remap.glsl";
 
 #include "../utils/textureNoTile.glsl";
 
