@@ -43,8 +43,6 @@ uniform float ocean_waveBlendingSharpness;
 
 uniform float time;
 
-#include "./utils/remap.glsl";
-
 #include "./utils/worldFromUV.glsl";
 
 #include "./utils/rayIntersectSphere.glsl";
@@ -68,12 +66,12 @@ void main() {
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);// the pixel position in world space (near plane)
 
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
+    float maximumDistance = length(pixelWorldPosition - camera_position);
 
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
+    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);
 
     vec4 finalColor = screenColor;
 
@@ -109,7 +107,7 @@ void main() {
         vec3 ambiant = mix(oceanColor, screenColor.rgb, alpha);
 
         // if the camera is not inside the ocean
-        if(impactPoint > 0.0) {
+        if (impactPoint > 0.0) {
             // color of the sky
             vec3 reflectedSkyColor = vec3(0.6, 0.8, 0.95);
 
