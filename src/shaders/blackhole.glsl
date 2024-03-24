@@ -32,8 +32,6 @@ uniform mat4 starfieldRotation;
 
 #include "./utils/camera.glsl";
 
-#include "./utils/remap.glsl";
-
 #include "./utils/worldFromUV.glsl";
 
 #include "./utils/uvFromWorld.glsl";
@@ -156,14 +154,13 @@ float customLength(vec3 v) {
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
-
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
-
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);// the pixel position in world space (near plane)
+    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);// normalized direction of the ray
+
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
+    float maximumDistance = length(pixelWorldPosition - camera_position);
 
     float maxBendDistance = max(accretionDiskRadius * 3.0, schwarzschildRadius * 15.0);
 
@@ -255,17 +252,17 @@ void main() {
 
     // getting the screen coordinate of the end of the bended ray
     vec2 uv = uvFromWorld(rayPositionBlackHoleSpace + object_position, camera_projection, camera_view);
+    float depthEndRay = texture2D(depthSampler, uv).r;// the depth corresponding to the pixel in the depth map
     // check if there is an object occlusion
-    vec3 pixelWorldPositionEndRay = worldFromUV(uv, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 pixelWorldPositionEndRay = worldFromUV(uv, depthEndRay, camera_inverseProjectionView);// the pixel position in world space (near plane)
     vec3 rayDirToEndRay = normalize(pixelWorldPositionEndRay - camera_position);// normalized direction of the ray
 
-    float depthEndRay = texture2D(depthSampler, uv).r;// the depth corresponding to the pixel in the depth map
     for(int i = 0; i < 10; i++) {
         vec2 offset = (vec2(hash(float(i)), hash(float(i + 1))) - 0.5) * 0.01;
         depthEndRay = min(depthEndRay, texture2D(depthSampler, uv + offset).r);
     }
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPointEndRay = (pixelWorldPositionEndRay - camera_position) * remap(depthEndRay, 0.0, 1.0, camera_near, camera_far);
+    vec3 closestPointEndRay = pixelWorldPositionEndRay - camera_position;
     float maximumDistanceEndRay = length(closestPointEndRay);// the maxium ray length due to occlusion
     float BHDistance = length(camera_position - object_position);
 
