@@ -39,8 +39,6 @@ uniform sampler2D atmosphereLUT;
 
 #include "./utils/atmosphere.glsl";
 
-#include "./utils/remap.glsl";
-
 #include "./utils/worldFromUV.glsl";
 
 #include "./utils/rayIntersectSphere.glsl";
@@ -177,12 +175,12 @@ void main() {
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
 
     vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
+    float maximumDistance = length(pixelWorldPosition - camera_position);
 
     // Cohabitation avec le shader d'océan (un jour je merge)
     float waterImpact, waterEscape;

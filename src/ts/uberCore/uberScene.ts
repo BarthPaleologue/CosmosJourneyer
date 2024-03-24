@@ -80,7 +80,10 @@ export class UberScene extends Scene {
         camera.attachControl(true);
 
         // When changing camera, we must also change the active camera of the depth renderer
-        if (this.depthRenderer === null) this.depthRenderer = this.enableDepthRenderer(null, false, true);
+        if (this.depthRenderer === null) {
+            this.depthRenderer = this.enableDepthRenderer(null, true, true);
+            this.depthRenderer.clearColor = new Color4(0, 0, 0, 1);
+        }
         this.depthRenderer.getDepthMap().activeCamera = camera;
     }
 
