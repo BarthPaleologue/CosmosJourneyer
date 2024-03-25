@@ -33,8 +33,6 @@ uniform sampler2D atmosphereLUT;
 
 #include "./utils/stars.glsl";
 
-#include "./utils/remap.glsl";
-
 #include "./utils/camera.glsl";
 
 #include "./utils/object.glsl";
@@ -179,7 +177,7 @@ void main() {
 
     vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);// the pixel position in world space (near plane)
 
-    // actual depth of the scene from the reverse depth map
+    // actual depth of the scene
     float maximumDistance = length(pixelWorldPosition - camera_position);
 
     vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);

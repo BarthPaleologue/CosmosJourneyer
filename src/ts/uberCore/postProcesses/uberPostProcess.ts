@@ -36,7 +36,7 @@ export class UberPostProcess extends PostProcess {
         const uniformNames = uniforms.map((uniform) => uniform.name);
         const samplerNames = samplers.map((sampler) => sampler.name);
 
-        super(name, fragmentName, uniformNames, samplerNames, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene.getEngine().isWebGPU ? "#define WebGPU" : null, Constants.TEXTURETYPE_HALF_FLOAT);
+        super(name, fragmentName, uniformNames, samplerNames, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.uniforms.push(...uniforms);
         this.samplers.push(...samplers);

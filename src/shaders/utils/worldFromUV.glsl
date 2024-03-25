@@ -24,11 +24,7 @@
 vec3 worldFromUV(vec2 pos, float depth, mat4 inverseProjectionView) {
     vec4 ndc = vec4(
         pos.xy * 2.0 - 1.0,
-        #ifdef WebGPU
         depth,
-        #else
-        depth * 2.0 - 1.0,
-        #endif
         1.0
     );
 

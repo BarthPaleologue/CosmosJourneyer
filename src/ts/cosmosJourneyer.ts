@@ -51,6 +51,7 @@ import { StarSystemInputs } from "./inputs/starSystemInputs";
 import { pressInteractionToStrings } from "./utils/inputControlsString";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -181,18 +182,18 @@ export class CosmosJourneyer {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
-        const engine = window.location.search.includes("webgpu")
-            ? await EngineFactory.CreateAsync(canvas, {
-                  twgslOptions: {
-                      wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
-                      jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
-                  }
-              })
-            : new Engine(canvas, true, {
-                  // the preserveDrawingBuffer option is required for the screenshot feature to work
-                  preserveDrawingBuffer: true
-              });
+        if (!(await WebGPUEngine.IsSupportedAsync)) {
+            alert(
+                "WebGPU is not supported in your browser. Please check the compatibility here: https://github.com/gpuweb/gpuweb/wiki/Implementation-Status#implementation-status");
+        }
+
+        // Init BabylonJS engine
+        const engine = await EngineFactory.CreateAsync(canvas, {
+            twgslOptions: {
+                wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
+                jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
+            }
+        });
 
         engine.useReverseDepthBuffer = true;
         engine.loadingScreen = new LoadingScreen(canvas);
