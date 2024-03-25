@@ -42,14 +42,6 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
             }
         },
         {
-            name: "camera_inverseProjection",
-            type: UniformEnumType.MATRIX,
-            get: () => {
-                if (scene.activeCamera === null) throw new Error("No active camera");
-                return scene.activeCamera.getProjectionMatrix().clone().invert();
-            }
-        },
-        {
             name: "camera_view",
             type: UniformEnumType.MATRIX,
             get: () => {
@@ -58,11 +50,14 @@ export function getActiveCameraUniforms(scene: Scene): ShaderUniforms {
             }
         },
         {
-            name: "camera_inverseView",
+            name: "camera_inverseProjectionView",
             type: UniformEnumType.MATRIX,
             get: () => {
                 if (scene.activeCamera === null) throw new Error("No active camera");
-                return scene.activeCamera.getViewMatrix().clone().invert();
+                const projection = scene.activeCamera.getProjectionMatrix();
+                const view = scene.activeCamera.getViewMatrix();
+
+                return view.multiply(projection).clone().invert();
             }
         },
         {

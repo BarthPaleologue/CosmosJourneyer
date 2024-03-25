@@ -37,9 +37,9 @@ void main() {
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);// the pixel position in world space (near plane)
 
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
+    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);// normalized direction of the ray
 
     rayDir = vec3(starfieldRotation * vec4(rayDir, 1.0));
 
@@ -48,7 +48,7 @@ void main() {
     vec2 starfieldUV = vec2(0.0);
 
     // if the pixel is at the far plane
-    if (screenColor == vec4(0.0) && depth == 1.0) {
+    if (screenColor == vec4(0.0) && depth == 0.0) {
         // get the starfield color
         // get spherical coordinates uv for the starfield texture
         starfieldUV = vec2(
@@ -60,7 +60,7 @@ void main() {
     vec4 starfieldColor = texture2D(starfieldTexture, starfieldUV);
     starfieldColor.rgb = pow(starfieldColor.rgb, vec3(2.2));// deeper blacks
 
-    if (screenColor == vec4(0.0) && depth == 1.0) {
+    if (screenColor == vec4(0.0) && depth == 0.0) {
         finalColor = vec4(starfieldColor.rgb * visibility, starfieldColor.a);
     }
 

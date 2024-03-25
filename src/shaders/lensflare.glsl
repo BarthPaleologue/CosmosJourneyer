@@ -110,8 +110,8 @@ void main() {
         return;
     }
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, 1.0, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position);
+    vec3 pixelWorldPosition = worldFromUV(vUV, 1.0, camera_inverseProjectionView);// the pixel position in world space (near plane)
+    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);
 
     vec3 objectDirection = normalize(object_position - camera_position);
 

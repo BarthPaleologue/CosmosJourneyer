@@ -160,12 +160,12 @@ void main() {
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);// the pixel position in world space (near plane)
 
     // closest physical point from the camera in the direction of the pixel (occlusion)
     float maximumDistance = length(pixelWorldPosition - camera_position);
 
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
+    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);// normalized direction of the ray
 
     vec3 closestPoint = camera_position + rayDir * maximumDistance;
     float t0, t1;

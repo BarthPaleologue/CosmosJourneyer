@@ -150,8 +150,8 @@ void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);// the pixel position in world space (near plane)
+    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);// normalized direction of the ray
 
     // actual depth of the scene
     float maximumDistance = length(pixelWorldPosition - camera_position);
@@ -233,7 +233,7 @@ void main() {
     vec2 uv = uvFromWorld(rayPositionBlackHoleSpace + object_position, camera_projection, camera_view);
     float depthEndRay = texture2D(depthSampler, uv).r;// the depth corresponding to the pixel in the depth map
     // check if there is an object occlusion
-    vec3 pixelWorldPositionEndRay = worldFromUV(uv, depthEndRay, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 pixelWorldPositionEndRay = worldFromUV(uv, depthEndRay, camera_inverseProjectionView);// the pixel position in world space (near plane)
     vec3 rayDirToEndRay = normalize(pixelWorldPositionEndRay - camera_position);// normalized direction of the ray
 
     for(int i = 0; i < 10; i++) {

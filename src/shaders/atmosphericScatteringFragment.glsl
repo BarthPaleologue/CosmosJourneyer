@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-precision lowp float;
+precision highp float;
 
 /* disable_uniformity_analysis */
 
@@ -32,6 +32,8 @@ uniform sampler2D depthSampler;// the depth map of the camera
 uniform sampler2D atmosphereLUT;
 
 #include "./utils/stars.glsl";
+
+#include "./utils/remap.glsl";
 
 #include "./utils/camera.glsl";
 
@@ -175,12 +177,12 @@ void main() {
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);// the pixel position in world space (near plane)
 
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
-
-    // actual depth of the scene
+    // actual depth of the scene from the reverse depth map
     float maximumDistance = length(pixelWorldPosition - camera_position);
+
+    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);
 
     // Cohabitation avec le shader d'océan (un jour je merge)
     float waterImpact, waterEscape;

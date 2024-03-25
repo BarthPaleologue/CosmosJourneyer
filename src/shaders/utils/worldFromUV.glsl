@@ -21,7 +21,7 @@
 // also see https://www.babylonjs-playground.com/#1PHYB0#318 for smaller scale testing
 // also see https://forum.babylonjs.com/t/clip-space-to-world-space-with-non-linear-reverse-depth-buffer-with-webgpu/48892/5 for the ultimate version
 // This is a revised version that works with the reverse depth buffer
-vec3 worldFromUV(vec2 pos, float depth, mat4 inverseProjection, mat4 inverseView) {
+vec3 worldFromUV(vec2 pos, float depth, mat4 inverseProjectionView) {
     vec4 ndc = vec4(
         pos.xy * 2.0 - 1.0,
         #ifdef WebGPU
@@ -32,7 +32,6 @@ vec3 worldFromUV(vec2 pos, float depth, mat4 inverseProjection, mat4 inverseView
         1.0
     );
 
-    vec4 posVS = inverseProjection * ndc;
-    vec4 posWS = inverseView * posVS;
-    return posWS.xyz / posWS.w;
+    vec4 positionWorldSpace = inverseProjectionView * ndc;
+    return positionWorldSpace.xyz / positionWorldSpace.w;
 }
