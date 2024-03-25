@@ -666,7 +666,7 @@ export class StarSystemView implements View {
     public async resetPlayer() {
         this.postProcessManager.reset();
 
-        const maxZ = Settings.EARTH_RADIUS * 1e5;
+        const maxZ = 0; // infinite far plane mode (see https://forum.babylonjs.com/t/how-to-show-objects-20km-away/25462/6)
 
         if (this.defaultControls === null) {
             this.defaultControls = new DefaultControls(this.scene);
