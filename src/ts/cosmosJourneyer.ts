@@ -202,7 +202,7 @@ export class CosmosJourneyer {
             engine.resize(true);
         });
 
-        // Log informations about the gpu and the api used
+        // Log information about the gpu and the api used
         console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL" + engine.version}`);
         console.log(`GPU detected: ${engine.getGlInfo().renderer}`);
 
