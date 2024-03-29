@@ -496,18 +496,26 @@ export class StarSystemController {
      * Disposes all the bodies in the system
      */
     public dispose() {
-        for (const object of this.orbitalObjects) object.dispose();
         this.systemTargets.forEach((target) => target.dispose());
-
-        this.systemTargets = [];
+        this.systemTargets.length = 0;
 
         this.orbitalObjects.length = 0;
-        this.spaceStations.length = 0;
         this.celestialBodies.length = 0;
-        this.stellarObjects.length = 0;
         this.planets.length = 0;
+
+        for(const spaceStation of this.spaceStations) spaceStation.dispose();
+        this.spaceStations.length = 0;
+
+        for(const planet of this.planets) planet.dispose();
         this.telluricPlanets.length = 0;
+
+        for(const gasPlanet of this.gasPlanets) gasPlanet.dispose();
         this.gasPlanets.length = 0;
+
+        for(const mandelbulb of this.mandelbulbs) mandelbulb.dispose();
         this.mandelbulbs.length = 0;
+
+        for(const stellarObject of this.stellarObjects) stellarObject.dispose();
+        this.stellarObjects.length = 0;
     }
 }
