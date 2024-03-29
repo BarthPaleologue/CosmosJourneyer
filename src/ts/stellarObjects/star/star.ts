@@ -159,8 +159,9 @@ export class Star implements StellarObject, Cullable {
     }
 
     public dispose(): void {
+        this.aggregate.dispose();
+        this.light.dispose();
         this.mesh.dispose();
         this.material.dispose();
-        this.light.dispose();
     }
 }

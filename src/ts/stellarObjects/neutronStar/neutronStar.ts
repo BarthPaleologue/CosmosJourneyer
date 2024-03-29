@@ -152,8 +152,9 @@ export class NeutronStar implements StellarObject, Cullable {
     }
 
     public dispose(): void {
-        this.mesh.dispose();
+        this.aggregate.dispose();
         this.light.dispose();
+        this.mesh.dispose();
         this.material.dispose();
     }
 }
