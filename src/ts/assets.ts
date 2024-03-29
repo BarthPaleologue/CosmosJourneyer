@@ -127,7 +127,6 @@ export class Assets {
 
     public static ROCK: Mesh;
     public static TREE: Mesh;
-    public static SCATTER_CUBE: Mesh;
 
     public static BUTTERFLY: Mesh;
     public static GRASS_BLADE: Mesh;
@@ -212,7 +211,7 @@ export class Assets {
             console.log("Endeavor Spaceship loaded");
         };
 
-        const wandererTask = Assets.MANAGER.addMeshTask("wandererTask", "", "", wanderer);
+        /*const wandererTask = Assets.MANAGER.addMeshTask("wandererTask", "", "", wanderer);
         wandererTask.onSuccess = function (task: MeshAssetTask) {
             Assets.WANDERER = task.loadedMeshes[0] as Mesh;
 
@@ -221,7 +220,7 @@ export class Assets {
             }
 
             console.log("Wanderer loaded");
-        };
+        };*/
 
         const spacestationTask = Assets.MANAGER.addMeshTask("spacestationTask", "", "", shipCarrier);
         spacestationTask.onSuccess = function (task: MeshAssetTask) {
@@ -229,8 +228,6 @@ export class Assets {
 
             for (const mesh of Assets.SPACE_STATION.getChildMeshes()) {
                 mesh.isVisible = false;
-                //pbr._reflectionTexture = new Texture(starfield, scene);
-                //pbr._reflectionTexture.coordinatesMode = Texture.SPHERICAL_MODE;
             }
 
             console.log("Spacestation loaded");
@@ -258,6 +255,9 @@ export class Assets {
             }
 
             console.log("Character loaded");
+
+
+            Assets.WANDERER = Assets.CHARACTER;
         };
 
         const rockTask = Assets.MANAGER.addMeshTask("rockTask", "", "", rock);
@@ -474,11 +474,6 @@ export class Assets {
         Assets.MANAGER.onProgress = (remainingCount, totalCount) => {
             (scene.getEngine().loadingScreen as LoadingScreen).setProgressPercentage(100 * (totalCount - remainingCount) / totalCount);
         };
-
-        Assets.SCATTER_CUBE = MeshBuilder.CreateBox("cube", { size: 1 }, scene);
-        Assets.SCATTER_CUBE.position.y = 0.5;
-        Assets.SCATTER_CUBE.bakeCurrentTransformIntoVertices();
-        Assets.SCATTER_CUBE.isVisible = false;
 
         Assets.MANAGER.onFinish = () => {
             console.log("Assets loaded");
