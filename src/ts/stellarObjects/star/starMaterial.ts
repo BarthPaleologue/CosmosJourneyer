@@ -62,16 +62,16 @@ export class StarMaterial extends ShaderMaterial {
         this.star = star;
         this.starModel = model;
         this.starSeed = model.seed;
+    }
 
-        this.onBindObservable.add(() => {
+    public update(deltaSeconds: number) {
+        this.elapsedSeconds += deltaSeconds;
+        
+        this.onBindObservable.addOnce(() => {
             this.getEffect().setFloat("time", this.elapsedSeconds % 100000);
             this.getEffect().setColor3("starColor", this.starModel.color);
             this.getEffect().setFloat("seed", this.starSeed);
             this.getEffect().setVector3("starPosition", this.star.getAbsolutePosition());
         });
-    }
-
-    public update(deltaSeconds: number) {
-        this.elapsedSeconds += deltaSeconds;
     }
 }

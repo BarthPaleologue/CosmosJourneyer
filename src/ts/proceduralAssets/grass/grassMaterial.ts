@@ -47,8 +47,14 @@ export class GrassMaterial extends ShaderMaterial {
 
         this.backFaceCulling = false;
         this.setTexture("perlinNoise", perlinTexture);
+    }
 
-        this.onBindObservable.add(() => {
+    update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
+        this.elapsedSeconds += deltaSeconds;
+        this.stars = stars;
+        this.playerPosition = playerPosition;
+
+        this.onBindObservable.addOnce(() => {
             if (this.stars.length > 0) {
                 const star = this.stars[0];
                 const lightDirection = star.getTransform().getAbsolutePosition().subtract(this.playerPosition).normalize();
@@ -58,12 +64,5 @@ export class GrassMaterial extends ShaderMaterial {
             this.getEffect().setVector3("playerPosition", this.playerPosition);
             this.getEffect().setFloat("time", this.elapsedSeconds);
         });
-    }
-
-    update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
-        this.elapsedSeconds += deltaSeconds;
-        this.stars = stars;
-        this.playerPosition = playerPosition;
-
     }
 }

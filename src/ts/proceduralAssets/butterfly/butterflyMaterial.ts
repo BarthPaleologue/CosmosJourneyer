@@ -48,8 +48,14 @@ export class ButterflyMaterial extends ShaderMaterial {
         this.setFloat("time", 0);
         this.setTexture("butterflyTexture", new Texture(butterflyTexture, scene));
         this.backFaceCulling = false;
+    }
 
-        this.onBindObservable.add(() => {
+    update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
+        this.elapsedSeconds += deltaSeconds;
+        this.stars = stars;
+        this.playerPosition = playerPosition;
+
+        this.onBindObservable.addOnce(() => {
             if (this.stars.length > 0) {
                 const star = this.stars[0];
                 const lightDirection = star.getTransform().getAbsolutePosition().subtract(this.playerPosition).normalize();
@@ -59,11 +65,5 @@ export class ButterflyMaterial extends ShaderMaterial {
             this.getEffect().setVector3("playerPosition", this.playerPosition);
             this.getEffect().setFloat("time", this.elapsedSeconds);
         });
-    }
-
-    update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
-        this.elapsedSeconds += deltaSeconds;
-        this.stars = stars;
-        this.playerPosition = playerPosition;
     }
 }
