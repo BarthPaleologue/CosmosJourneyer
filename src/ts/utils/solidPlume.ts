@@ -61,7 +61,7 @@ export class SolidPlume {
         this.SPS.initParticles();
         this.SPS.setParticles();
 
-        const mat = new StandardMaterial("mat", scene);
+        const mat = new StandardMaterial("SolidPlumeMaterial", scene);
         mat.emissiveColor = new Color3(1, 1, 1);
         mat.disableLighting = true;
         this.SPS.mesh.material = mat;

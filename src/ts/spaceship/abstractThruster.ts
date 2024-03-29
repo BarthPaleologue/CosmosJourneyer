@@ -25,7 +25,7 @@ import { SolidPlume } from "../utils/solidPlume";
 export abstract class AbstractThruster {
     readonly mesh: AbstractMesh;
 
-    readonly helperMesh: AbstractMesh;
+    readonly helperMeshes: AbstractMesh[] = [];
 
     protected throttle = 0;
 
@@ -40,15 +40,15 @@ export abstract class AbstractThruster {
 
         this.parentAggregate = parentAggregate;
 
-        const thrusterHelper = MeshBuilder.CreateCylinder(this.mesh.name + "Helper", { height: 0.5, diameterTop: 0, diameterBottom: 0.5 }, mesh.getScene());
-        const cubeMaterial = new StandardMaterial("cubeMat", mesh.getScene());
+        /*const thrusterHelper = MeshBuilder.CreateCylinder(this.mesh.name + "Helper", { height: 0.5, diameterTop: 0, diameterBottom: 0.5 }, mesh.getScene());
+        const cubeMaterial = new StandardMaterial("ThrusterHelperMaterial", mesh.getScene());
         cubeMaterial.diffuseColor = Color3.White();
         cubeMaterial.emissiveColor = Color3.White();
         thrusterHelper.material = cubeMaterial;
         thrusterHelper.parent = mesh;
+        thrusterHelper.isVisible = false;
 
-        this.helperMesh = thrusterHelper;
-        this.helperMesh.isVisible = false;
+        this.helperMeshes.push(thrusterHelper);*/
     }
 
     public getThrottle(): number {
@@ -61,9 +61,9 @@ export abstract class AbstractThruster {
         this.plume.setThrottle(this.throttle);
 
         if (this.throttle > 0) {
-            this.helperMesh.scaling = new Vector3(0.8, 0.8, 0.8);
+            this.helperMeshes.forEach(helperMesh => helperMesh.scaling = new Vector3(0.8, 0.8, 0.8));
         } else {
-            this.helperMesh.scaling = new Vector3(0.5, 0.5, 0.5);
+            this.helperMeshes.forEach(helperMesh => helperMesh.scaling = new Vector3(0.5, 0.5, 0.5));
         }
     }
 }

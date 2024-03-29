@@ -147,7 +147,7 @@ export class WarpTunnel implements Transformable {
         SPS.initParticles();
         SPS.setParticles();
 
-        const mat = new StandardMaterial("mat", scene);
+        const mat = new StandardMaterial("WarpTunnelMaterial", scene);
         mat.emissiveColor = new Color3(1, 1, 1);
         mat.disableLighting = true;
         SPS.mesh.material = mat;
