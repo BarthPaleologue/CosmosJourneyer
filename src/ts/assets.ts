@@ -134,6 +134,7 @@ export class Assets {
     public static GRASS_BLADE: Mesh;
 
     public static BUTTERFLY_MATERIAL: ButterflyMaterial;
+    public static BUTTERFLY_DEPTH_MATERIAL: ButterflyMaterial;
 
     public static GRASS_MATERIAL: GrassMaterial;
     public static GRASS_DEPTH_MATERIAL: GrassMaterial;
@@ -315,13 +316,16 @@ export class Assets {
 
         Assets.BUTTERFLY = createButterfly(scene);
         Assets.BUTTERFLY.isVisible = false;
-        Assets.BUTTERFLY_MATERIAL = new ButterflyMaterial(scene);
+        Assets.BUTTERFLY_MATERIAL = new ButterflyMaterial(scene, false);
         Assets.BUTTERFLY.material = Assets.BUTTERFLY_MATERIAL;
+
+        Assets.BUTTERFLY_DEPTH_MATERIAL = new ButterflyMaterial(scene, true);
 
         Assets.GRASS_BLADE = createGrassBlade(scene, 3);
         Assets.GRASS_BLADE.isVisible = false;
         Assets.GRASS_MATERIAL = new GrassMaterial(scene, false);
         Assets.GRASS_BLADE.material = Assets.GRASS_MATERIAL;
+
         Assets.GRASS_DEPTH_MATERIAL = new GrassMaterial(scene, true);
 
         const ouchSoundTask = Assets.MANAGER.addBinaryFileTask("ouchSoundTask", ouchSound);

@@ -177,6 +177,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
             this.instancePatches.push(grassPatch);
 
             for(const depthRenderer of Object.values(this.scene._depthRenderer)) {
+                depthRenderer.setMaterialForRendering([butterflyPatch.getBaseMesh()], Assets.BUTTERFLY_DEPTH_MATERIAL);
                 depthRenderer.setMaterialForRendering([grassPatch.getBaseMesh()], Assets.GRASS_DEPTH_MATERIAL);
             }
         }

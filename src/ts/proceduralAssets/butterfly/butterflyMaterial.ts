@@ -31,15 +31,21 @@ export class ButterflyMaterial extends ShaderMaterial {
     private stars: Transformable[] = [];
     private playerPosition: Vector3 = Vector3.Zero();
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, isDepthMaterial: boolean) {
         const shaderName = "butterflyMaterial";
         Effect.ShadersStore[`${shaderName}FragmentShader`] = butterflyFragment;
         Effect.ShadersStore[`${shaderName}VertexShader`] = butterflyVertex;
 
+        const defines = ["#define INSTANCES"];
+        if (isDepthMaterial) defines.push("#define FORDEPTH");
+
+        const uniforms = ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "playerPosition"];
+        if(isDepthMaterial) uniforms.push("depthValues");
+
         super(shaderName, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
-            uniforms: ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "playerPosition"],
-            defines: ["#define INSTANCES"],
+            uniforms: uniforms,
+            defines: defines,
             samplers: ["butterflyTexture"]
         });
 
