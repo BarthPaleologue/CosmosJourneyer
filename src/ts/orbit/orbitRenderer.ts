@@ -1,8 +1,27 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { LinesMesh, MeshBuilder } from "@babylonjs/core/Meshes";
 import { Color3, Vector3 } from "@babylonjs/core/Maths/math";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { setUpVector } from "../uberCore/transforms/basicTransform";
-import { getPointOnOrbitLocal, OrbitalObject } from "./orbit";
+import { getPointOnOrbitLocal } from "./orbit";
+import { OrbitalObject } from "../architecture/orbitalObject";
+import { Scene } from "@babylonjs/core/scene";
 
 export class OrbitRenderer {
     private orbitMeshes: LinesMesh[] = [];
@@ -11,9 +30,15 @@ export class OrbitRenderer {
 
     private orbitMaterial: StandardMaterial | null = null;
 
-    private isVisibile = false;
+    private _isVisible = false;
 
-    setOrbitalObjects(orbitalObjects: OrbitalObject[]) {
+    setOrbitalObjects(orbitalObjects: OrbitalObject[], scene: Scene) {
+        if (this.orbitMaterial === null) {
+            this.orbitMaterial = new StandardMaterial("orbitMaterial", scene);
+            this.orbitMaterial.emissiveColor = Color3.White();
+            this.orbitMaterial.disableLighting = true;
+        }
+
         this.reset();
         this.orbitalObjects = orbitalObjects;
 
@@ -21,11 +46,11 @@ export class OrbitRenderer {
             this.createOrbitMesh(orbitalObject);
         }
 
-        this.setVisibility(this.isVisibile);
+        this.setVisibility(this.isVisible());
     }
 
     private createOrbitMesh(orbitalObject: OrbitalObject) {
-        const orbit = orbitalObject.model.orbit;
+        const orbit = orbitalObject.getOrbitProperties();
         const nbSteps = 1000;
         const timestep = orbit.period / nbSteps;
         const points: Vector3[] = [];
@@ -43,25 +68,26 @@ export class OrbitRenderer {
     }
 
     setVisibility(visible: boolean) {
-        this.isVisibile = visible;
+        this._isVisible = visible;
         for (const orbitMesh of this.orbitMeshes) {
-            orbitMesh.visibility = visible ? 1 : 0;
+            orbitMesh.setEnabled(visible);
         }
     }
 
     isVisible(): boolean {
-        return this.isVisibile;
+        return this._isVisible;
     }
 
     update() {
+        if (!this._isVisible) return;
         for (let i = 0; i < this.orbitalObjects.length; i++) {
             const orbitalObject = this.orbitalObjects[i];
             const orbitMesh = this.orbitMeshes[i];
 
-            orbitMesh.position = orbitalObject.parentObject?.getTransform().position ?? Vector3.Zero();
+            orbitMesh.position = orbitalObject.parent?.getTransform().position ?? Vector3.Zero();
             orbitMesh.computeWorldMatrix(true);
 
-            const normalToPlane = orbitalObject.model.orbit.normalToPlane;
+            const normalToPlane = orbitalObject.getOrbitProperties().normalToPlane;
             setUpVector(orbitMesh, normalToPlane);
         }
     }
@@ -70,9 +96,5 @@ export class OrbitRenderer {
         this.orbitMeshes.forEach((orbitMesh) => orbitMesh.dispose());
         this.orbitMeshes = [];
         this.orbitalObjects = [];
-
-        this.orbitMaterial = new StandardMaterial("orbitMaterial");
-        this.orbitMaterial.emissiveColor = Color3.White();
-        this.orbitMaterial.disableLighting = true;
     }
 }

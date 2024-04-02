@@ -1,7 +1,24 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Slider } from "handle-sliderjs";
-import { AbstractBody } from "../../bodies/abstractBody";
 import { UberScene } from "../../uberCore/uberScene";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { CelestialBody } from "../../architecture/celestialBody";
 
 export abstract class EditorPanel {
     sliders: Slider[] = [];
@@ -14,7 +31,7 @@ export abstract class EditorPanel {
         this.panel = document.getElementById(id + "UI") as HTMLElement;
     }
 
-    abstract init(body: AbstractBody, postProcess: PostProcess, scene: UberScene): void;
+    abstract init(body: CelestialBody, postProcess: PostProcess, scene: UberScene): void;
 
     updateAllSliders() {
         for (const slider of this.sliders) slider.update(false);

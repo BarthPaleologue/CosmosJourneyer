@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../../uberCore/postProcesses/types";
@@ -39,77 +56,77 @@ export class CloudsUniforms {
         return [
             {
                 name: "clouds_layerRadius",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.layerRadius;
                 }
             },
             {
                 name: "clouds_frequency",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.frequency;
                 }
             },
             {
                 name: "clouds_detailFrequency",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.detailFrequency;
                 }
             },
             {
                 name: "clouds_coverage",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.coverage;
                 }
             },
             {
                 name: "clouds_sharpness",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.sharpness;
                 }
             },
             {
                 name: "clouds_color",
-                type: UniformEnumType.Color3,
+                type: UniformEnumType.COLOR_3,
                 get: () => {
                     return this.color;
                 }
             },
             {
                 name: "clouds_worleySpeed",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.worleySpeed;
                 }
             },
             {
                 name: "clouds_detailSpeed",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.detailSpeed;
                 }
             },
             {
                 name: "clouds_smoothness",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.smoothness;
                 }
             },
             {
                 name: "clouds_specularPower",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return this.specularPower;
                 }
             },
             {
                 name: "time",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return -this.time % ((2 * Math.PI * gcd(this.worleySpeed * 10000, this.detailSpeed * 10000)) / this.worleySpeed);
                 }
@@ -127,7 +144,7 @@ export class CloudsUniforms {
             return [
                 {
                     name: "clouds_lut",
-                    type: SamplerEnumType.Texture,
+                    type: SamplerEnumType.TEXTURE,
                     get: () => {
                         return lut;
                     }
@@ -156,7 +173,7 @@ export class CloudsUniforms {
             this.lut = lut;
         }
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             if (this.lut === null) throw new Error("LUT is null when creating promise");
             this.lut.executeWhenReady(() => {
                 if (this.lut === null) throw new Error("LUT is null when executing when ready");

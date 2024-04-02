@@ -1,11 +1,27 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Settings } from "../settings";
 import { nearestBody } from "../utils/nearestBody";
-import { AbstractBody } from "../bodies/abstractBody";
 import { Assets } from "../assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -14,10 +30,11 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { Transformable } from "../uberCore/transforms/basicTransform";
+import { Transformable } from "../architecture/transformable";
+import { CelestialBody } from "../architecture/celestialBody";
 
 export class StarfieldPostProcess extends UberPostProcess {
-    constructor(scene: UberScene, stellarObjects: Transformable[], bodies: AbstractBody[], starfieldRotation: Quaternion) {
+    constructor(scene: UberScene, stellarObjects: Transformable[], bodies: CelestialBody[], starfieldRotation: Quaternion) {
         const shaderName = "starfield";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
@@ -28,7 +45,7 @@ export class StarfieldPostProcess extends UberPostProcess {
             ...getStellarObjectsUniforms(stellarObjects),
             {
                 name: "starfieldRotation",
-                type: UniformEnumType.Matrix,
+                type: UniformEnumType.MATRIX,
                 get: () => {
                     const rotationMatrix = new Matrix();
                     starfieldRotation.toRotationMatrix(rotationMatrix);
@@ -37,7 +54,7 @@ export class StarfieldPostProcess extends UberPostProcess {
             },
             {
                 name: "visibility",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     if (bodies.length === 0) return 1;
 
@@ -53,8 +70,8 @@ export class StarfieldPostProcess extends UberPostProcess {
                     vis = 0.5 + vis * 0.5;
                     let vis2 = 1.0;
                     const nearest = nearestBody(camera.globalPosition, bodies);
-                    if (nearest instanceof TelluricPlanemo) {
-                        const planet = nearest as TelluricPlanemo;
+                    if (nearest instanceof TelluricPlanet) {
+                        const planet = nearest as TelluricPlanet;
                         if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {
                             const height = planet.getTransform().getAbsolutePosition().length();
                             //FIXME: has to be dynamic
@@ -78,9 +95,9 @@ export class StarfieldPostProcess extends UberPostProcess {
             ...getSamplers(scene),
             {
                 name: "starfieldTexture",
-                type: SamplerEnumType.Texture,
+                type: SamplerEnumType.TEXTURE,
                 get: () => {
-                    return Assets.Starfield;
+                    return Assets.STAR_FIELD;
                 }
             }
         ];

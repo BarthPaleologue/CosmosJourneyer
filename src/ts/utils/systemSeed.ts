@@ -1,28 +1,68 @@
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { seededSquirrelNoise } from "squirrel-noise";
 import { hashVec3 } from "./hashVec3";
 import { centeredRand } from "extended-random";
 import { Settings } from "../settings";
 
+export type SystemSeedSerialized = {
+    starSectorX: number;
+    starSectorY: number;
+    starSectorZ: number;
+    index: number;
+};
+
 export class SystemSeed {
-    readonly starSectorCoordinates: Vector3;
+    readonly starSectorX: number;
+    readonly starSectorY: number;
+    readonly starSectorZ: number;
     readonly index: number;
 
     readonly hash: number;
 
-    constructor(starSectorCoordinates: Vector3, index: number) {
-        this.starSectorCoordinates = starSectorCoordinates;
+    constructor(starSectorX: number, starSectorY: number, starSectorZ: number, index: number) {
+        this.starSectorX = starSectorX;
+        this.starSectorY = starSectorY;
+        this.starSectorZ = starSectorZ;
         this.index = index;
 
-        if (!Number.isSafeInteger(this.starSectorCoordinates.x)) throw new Error("x coordinate of star sector is not a safe integer");
-        if (!Number.isSafeInteger(this.starSectorCoordinates.y)) throw new Error("y coordinate of star sector is not a safe integer");
-        if (!Number.isSafeInteger(this.starSectorCoordinates.z)) throw new Error("z coordinate of star sector is not a safe integer");
+        if (!Number.isSafeInteger(this.starSectorX)) throw new Error("x coordinate of star sector is not a safe integer");
+        if (!Number.isSafeInteger(this.starSectorY)) throw new Error("y coordinate of star sector is not a safe integer");
+        if (!Number.isSafeInteger(this.starSectorZ)) throw new Error("z coordinate of star sector is not a safe integer");
 
-        const cellRNG = seededSquirrelNoise(hashVec3(starSectorCoordinates));
+        const cellRNG = seededSquirrelNoise(hashVec3(starSectorX, starSectorY, starSectorZ));
         this.hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
     }
 
     toString(): string {
-        return `${this.starSectorCoordinates.x},${this.starSectorCoordinates.y},${this.starSectorCoordinates.z},${this.index}`;
+        return `${this.starSectorX},${this.starSectorY},${this.starSectorZ},${this.index}`;
+    }
+
+    serialize(): SystemSeedSerialized {
+        return {
+            starSectorX: this.starSectorX,
+            starSectorY: this.starSectorY,
+            starSectorZ: this.starSectorZ,
+            index: this.index
+        };
+    }
+
+    static Deserialize(data: SystemSeedSerialized): SystemSeed {
+        return new SystemSeed(data.starSectorX, data.starSectorY, data.starSectorZ, data.index);
     }
 }

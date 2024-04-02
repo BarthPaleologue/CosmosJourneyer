@@ -1,31 +1,51 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { seededSquirrelNoise } from "squirrel-noise";
 import { getOrbitalPeriod } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { normalRandom } from "extended-random";
+import { normalRandom, uniformRandBool } from "extended-random";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { STELLAR_TYPE } from "../common";
-import { BlackHolePhysicalProperties, BODY_TYPE, BodyModel, GENERATION_STEPS, StellarObjectModel } from "../../model/common";
+import { BodyType, GenerationSteps } from "../../model/common";
+import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { StellarObjectModel } from "../../architecture/stellarObject";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export class BlackHoleModel implements StellarObjectModel {
-    readonly bodyType = BODY_TYPE.BLACK_HOLE;
+    readonly bodyType = BodyType.BLACK_HOLE;
     readonly seed: number;
     readonly rng: (step: number) => number;
 
     readonly radius: number;
 
-    readonly ringsUniforms = null;
-
-    readonly stellarType = STELLAR_TYPE.BLACK_HOLE;
-
     readonly orbit: OrbitProperties;
 
     readonly physicalProperties: BlackHolePhysicalProperties;
 
-    readonly parentBody: BodyModel | null;
+    //TODO: compute temperature of accretion disk (function of rotation speed)
+    readonly temperature = 0;
+    readonly color = Color3.Black();
 
-    readonly childrenBodies: BodyModel[] = [];
+    readonly parentBody: CelestialBodyModel | null;
 
-    constructor(seed: number, parentBody?: BodyModel) {
+    readonly childrenBodies: CelestialBodyModel[] = [];
+
+    constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
@@ -47,8 +67,13 @@ export class BlackHoleModel implements StellarObjectModel {
         this.physicalProperties = {
             mass: 10,
             rotationPeriod: 24 * 60 * 60,
-            axialTilt: normalRandom(0, 0.4, this.rng, GENERATION_STEPS.AXIAL_TILT),
+            axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
             accretionDiskRadius: 8000e3
         };
+    }
+
+    public getNbSpaceStations(): number {
+        if (uniformRandBool(0.1, this.rng, GenerationSteps.SPACE_STATIONS)) return 1;
+        return 0;
     }
 }

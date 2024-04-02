@@ -1,9 +1,26 @@
-import { Transformable } from "../uberCore/transforms/basicTransform";
-import { BoundingSphere } from "../bodies/common";
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Transformable } from "../architecture/transformable";
+import { BoundingSphere } from "../architecture/boundingSphere";
 
 export class TransformNodeWrapper implements Transformable, BoundingSphere {
     readonly transform: TransformNode;
@@ -21,6 +38,10 @@ export class TransformNodeWrapper implements Transformable, BoundingSphere {
     getTransform(): TransformNode {
         return this.transform;
     }
+
+    dispose(): void {
+        this.transform.dispose();
+    }
 }
 
 export class DirectionalLightWrapper implements Transformable {
@@ -36,6 +57,11 @@ export class DirectionalLightWrapper implements Transformable {
     getTransform(): TransformNode {
         return this.transform;
     }
+
+    dispose() {
+        this.light.dispose();
+        this.transform.dispose();
+    }
 }
 
 export class PointLightWrapper implements Transformable {
@@ -50,5 +76,10 @@ export class PointLightWrapper implements Transformable {
 
     getTransform(): TransformNode {
         return this.transform;
+    }
+
+    dispose() {
+        this.light.dispose();
+        this.transform.dispose();
     }
 }

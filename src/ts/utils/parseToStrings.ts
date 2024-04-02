@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Settings } from "../settings";
 
 export function parseSpeed(speed: number): string {
@@ -19,8 +36,10 @@ export function parseDistance(distance: number): string {
         return `${(distance / 1000).toFixed(2)} km`;
     } else if (distance < 20000000) {
         return `${(distance / 1000000).toFixed(2)} Mm`;
-    } else {
+    } else if (distance < 0.3 * Settings.LIGHT_YEAR) {
         return `${(distance / Settings.C).toFixed(2)} ls`;
+    } else {
+        return `${(distance / Settings.LIGHT_YEAR).toFixed(2)} ly`;
     }
 }
 
@@ -31,8 +50,10 @@ export function parseSeconds(seconds: number): string {
         return `${(seconds / 60).toFixed(0)} min`;
     } else if (seconds < 86400) {
         return `${(seconds / 3600).toFixed(0)} h`;
+    } else if (seconds < 604800) {
+        return `${(seconds / (60 * 60 * 24)).toFixed(0)} d`;
     } else {
-        return `${(seconds / 86400).toFixed(0)} d`;
+        return `${(seconds / (60 * 60 * 24 * 365.25)).toFixed(0)} y`;
     }
 }
 
@@ -46,7 +67,7 @@ export function parsePercentageFrom01(percentage01: number): string {
     return `${(percentage01 * 100).toFixed(0)}%`;
 }
 
-export const alphabet = "abcdefghijklmnopqrstuvwxyz";
+export const Alphabet = "abcdefghijklmnopqrstuvwxyz";
 export function starName(baseName: string, index: number): string {
-    return `${baseName} ${alphabet[index].toUpperCase()}`;
+    return `${baseName} ${Alphabet[index].toUpperCase()}`;
 }

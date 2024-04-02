@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { hashVec3 } from "../utils/hashVec3";
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand } from "extended-random";
@@ -7,13 +24,8 @@ import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
 import { SystemSeed } from "../utils/systemSeed";
 
-export function Vector3ToString(v: Vector3): string {
+export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
-}
-
-export function StringToVector3(s: string): Vector3 {
-    const [x, y, z] = s.split(",").map(Number);
-    return new Vector3(x, y, z);
 }
 
 export type BuildData = {
@@ -53,7 +65,7 @@ export class StarSector {
 
     constructor(positionInStarMap: Vector3) {
         this.position = positionInStarMap;
-        this.rng = seededSquirrelNoise(hashVec3(positionInStarMap));
+        this.rng = seededSquirrelNoise(hashVec3(positionInStarMap.x, positionInStarMap.y, positionInStarMap.z));
 
         this.density = UniverseDensity(positionInStarMap.x, positionInStarMap.y, positionInStarMap.z);
 
@@ -64,18 +76,25 @@ export class StarSector {
         const sectorString = this.getKey();
         const data: BuildData[] = [];
         for (let i = 0; i < this.nbStars; i++) {
-            const systemSeed = new SystemSeed(this.position, i);
+            const systemSeed = new SystemSeed(this.position.x, this.position.y, this.position.z, i);
             data.push({
                 name: `starInstance|${this.position.x}|${this.position.y}|${this.position.z}|${i}`,
                 seed: systemSeed,
                 sectorString: sectorString,
                 scale: 0.5 + this.rng(100 * i) / 2,
-                position: new Vector3(centeredRand(this.rng, 10 * i + 1) / 2, centeredRand(this.rng, 10 * i + 2) / 2, centeredRand(this.rng, 10 * i + 3) / 2).addInPlace(
-                    this.position
-                )
+                position: this.getPositionOfStar(i)
             });
         }
         return data;
+    }
+
+    getPositionOfStar(starIndex: number): Vector3 {
+        if (starIndex >= this.nbStars) throw new Error(`Star index ${starIndex} is out of bounds for sector ${this.position}`);
+        return new Vector3(
+            centeredRand(this.rng, 10 * starIndex + 1) / 2,
+            centeredRand(this.rng, 10 * starIndex + 2) / 2,
+            centeredRand(this.rng, 10 * starIndex + 3) / 2
+        ).addInPlace(this.position);
     }
 
     /**
@@ -83,10 +102,10 @@ export class StarSector {
      * @returns a string that uniquely identifies this sector
      */
     getKey(): string {
-        return Vector3ToString(this.position);
+        return vector3ToString(this.position);
     }
 
-    static getBoundingBox(position: Vector3, globalNodePosition: Vector3): BoundingBox {
+    static GetBoundingBox(position: Vector3, globalNodePosition: Vector3): BoundingBox {
         return new BoundingBox(
             new Vector3(-1, -1, -1).scaleInPlace(StarSector.SIZE / 2),
             new Vector3(1, 1, 1).scaleInPlace(StarSector.SIZE / 2),

@@ -1,4 +1,3 @@
-/**Translated to Typescript by Barthélemy Paléologue */
 /*
                 Colour Rendering of Spectra
 
@@ -33,6 +32,8 @@
     versions of Netpbm.)
 
 */
+
+// Translated to Typescript by Barthélemy Paléologue
 
 /* A colour system is defined by the CIE x and y coordinates of
    its three primary illuminants and the x and y coordinates of
@@ -467,9 +468,9 @@ export function demonstrate() {
     }
 }
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
-export function getRgbFromTemperature(temperature: number): Vector3 {
+export function getRgbFromTemperature(temperature: number): Color3 {
     const cs = HDTVsystem;
 
     bbTemp = temperature;
@@ -477,5 +478,5 @@ export function getRgbFromTemperature(temperature: number): Vector3 {
     let [r, g, b] = xyz_to_rgb(cs, x, y, z);
     [r, g, b] = constrain_rgb(r, g, b);
     [r, g, b] = norm_rgb(r, g, b);
-    return new Vector3(r, g, b);
+    return new Color3(r, g, b);
 }

@@ -1,0 +1,8 @@
+{
+  "howToFly": "La souris contrôle le tangage et le roulis du vaisseau. La position neutre se trouve au centre de l'écran.",
+  "landingSequenceEngaged": "Début de la séquence d'atterrissage.",
+  "landingComplete": "Atterrissage réussi ! Utilisez {{bindingsString}} pour sortir du vaisseau.",
+  "copiedToClipboard": "Copié dans le presse-papiers.",
+  "howToLiftOff": "Maintenez {{bindingsString}} pour décoller.",
+  "howToHyperSpace": "Alignez votre vaisseau avec la cible du système de destination à l'aide du radar de cible en bas à droite de l'écran. Appuyez ensuite sur {{bindingsString}} pour enclencher le saut hyperspatial."
+}

@@ -1,7 +1,48 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+@font-face {
+  font-family: 'Nasalization';
+  src: url('./nasalization/nasalization-rg.otf');
+}
+
 *,
 *::before,
 *::after {
   box-sizing: content-box;
+}
+
+// scroll bar
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: darken(#888, 50%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  //border-radius: 5px;
+  transition: 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 body {
@@ -10,6 +51,50 @@ body {
   user-select: none;
   background: black;
 
+  .leftSideMenu {
+    list-style-type: none;
+    padding: 0;
+    row-gap: 10px;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    position: absolute;
+    top: 65vh;
+    left: 2.5vw;
+    transform: translateY(-50%);
+    transition: 0.2s ease-in-out;
+
+    z-index: 10;
+
+    li {
+      color: white;
+      font-family: Nasalization, sans-serif;
+      font-size: 2em;
+      line-height: 1.5em;
+      cursor: pointer;
+      padding: 5px 20px;
+      transition: 0.1s;
+
+      &:hover {
+        background: #002b6a;
+      }
+
+      &.disabled {
+        color: grey;
+        cursor: not-allowed;
+      }
+
+      &.disabled:hover {
+        background: black;
+      }
+
+      &:active {
+        background: darken(white, 40%);
+        color: black;
+      }
+    }
+  }
+
   @import "bodyEditor/nav";
 
   @import "bodyEditor/panels";
@@ -17,6 +102,12 @@ body {
   @import "helmetOverlay/helmetOverlay";
 
   @import "pauseMenu/index.scss";
+
+  @import "mainMenu.scss";
+
+  @import "inputs.scss";
+
+  @import "loadingScreen.scss";
 
   #renderer {
     z-index: 1;

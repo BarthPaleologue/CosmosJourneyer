@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -19,9 +36,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import "../styles/index.scss";
 import { Assets } from "./assets";
 import { UberScene } from "./uberCore/uberScene";
-import { Keyboard } from "./inputs/keyboard";
 import { CharacterControls } from "./spacelegs/characterControls";
-import { Mouse } from "./inputs/mouse";
 import { TransformNodeWrapper } from "./utils/wrappers";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -54,11 +69,9 @@ const havokPlugin = new HavokPlugin(true, havokInstance);
 scene.enablePhysics(Vector3.Zero(), havokPlugin);
 
 const characterController = new CharacterControls(scene);
-characterController.addInput(new Keyboard());
-characterController.addInput(new Mouse(canvas));
 characterController.getTransform().setAbsolutePosition(new Vector3(0, 2, 0));
 
-scene.setActiveController(characterController);
+scene.setActiveControls(characterController);
 
 const centerOfPlanet = new TransformNodeWrapper(new TransformNode("centerOfPlanet", scene), 1000e3);
 centerOfPlanet.getTransform().position.y = -1000e3;

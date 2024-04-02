@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
@@ -11,6 +28,10 @@ import selectedCircle from "../../asset/textures/selectedCircle.png";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Settings } from "../settings";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;
@@ -24,12 +45,20 @@ export class StarMapUI {
     readonly currentSystemRing: Image;
 
     readonly scene: Scene;
+    readonly uiCamera: FreeCamera;
 
     static ALPHA_ANIMATION = new Animation("alphaAnimation", "alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
-    constructor(scene: Scene) {
-        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("StarMapUI", true, scene);
-        this.scene = scene;
+    private _isHovered = false;
+
+    constructor(engine: Engine) {
+        this.scene = new Scene(engine);
+        this.scene.useRightHandedSystem = true;
+        this.scene.autoClear = false;
+
+        this.uiCamera = new FreeCamera("UiCamera", Vector3.Zero(), this.scene);
+
+        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("StarMapUI", true, this.scene);
 
         this.systemUI = new StackPanel();
         this.systemUI.width = "300px";
@@ -40,24 +69,36 @@ export class StarMapUI {
         this.systemUI.zIndex = 6;
         this.systemUI.alpha = 0.95;
 
+        this.systemUI.onPointerEnterObservable.add(() => {
+            this._isHovered = true;
+        });
+
+        this.systemUI.onPointerOutObservable.add(() => {
+            this._isHovered = false;
+        });
+
         this.namePlate = new TextBlock();
-        this.namePlate.text = "Vesperia Gamma";
+        this.namePlate.text = "";
         this.namePlate.fontSize = 24;
         this.namePlate.height = "50px";
+        this.namePlate.fontFamily = Settings.MAIN_FONT;
         this.namePlate.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.namePlate.setPadding(15, 15, 10, 15);
 
         this.descriptionPanel = new TextBlock();
         this.descriptionPanel.height = "130px";
         this.descriptionPanel.lineSpacing = 4.0;
+        this.descriptionPanel.fontFamily = Settings.MAIN_FONT;
         this.descriptionPanel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.descriptionPanel.setPadding(0, 15, 10, 15);
 
-        this.warpButton = Button.CreateSimpleButton("warpButton", "Engage Warp Drive");
+        this.warpButton = Button.CreateSimpleButton("warpButton", "Set Warp Destination");
         //this.warpButton.width = "100px";
         this.warpButton.height = "40px";
         this.warpButton.background = "midnightblue";
         this.warpButton.fontWeight = "bold";
+        this.warpButton.fontFamily = Settings.MAIN_FONT;
+        this.warpButton.isPointerBlocker = false;
         //this.warpButton.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
 
         this.systemUI.addControl(this.namePlate);
@@ -88,6 +129,10 @@ export class StarMapUI {
         ]);
 
         this.hoveredSystemRing.animations = [StarMapUI.ALPHA_ANIMATION];
+    }
+
+    isHovered() {
+        return this._isHovered;
     }
 
     update(activeCamera: Camera) {

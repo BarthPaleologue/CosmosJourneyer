@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import blackHoleFragment from "../../shaders/blackhole.glsl";
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
@@ -39,7 +56,7 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             ...getActiveCameraUniforms(scene),
             {
                 name: "starfieldRotation",
-                type: UniformEnumType.Matrix,
+                type: UniformEnumType.MATRIX,
                 get: () => {
                     const rotationMatrix = new Matrix();
                     starfieldRotation.toRotationMatrix(rotationMatrix);
@@ -48,42 +65,42 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             },
             {
                 name: "time",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000);
                 }
             },
             {
                 name: "accretionDiskRadius",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return blackHoleUniforms.accretionDiskRadius;
                 }
             },
             {
                 name: "warpingMinkowskiFactor",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return blackHoleUniforms.warpingMinkowskiFactor;
                 }
             },
             {
                 name: "rotationPeriod",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return blackHoleUniforms.rotationPeriod;
                 }
             },
             {
                 name: "rotationAxis",
-                type: UniformEnumType.Vector3,
+                type: UniformEnumType.VECTOR_3,
                 get: () => {
                     return blackHole.getRotationAxis();
                 }
             },
             {
                 name: "forwardAxis",
-                type: UniformEnumType.Vector3,
+                type: UniformEnumType.VECTOR_3,
                 get: () => {
                     return getForwardDirection(blackHole.getTransform());
                 }
@@ -94,9 +111,9 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             ...getSamplers(scene),
             {
                 name: "starfieldTexture",
-                type: SamplerEnumType.Texture,
+                type: SamplerEnumType.TEXTURE,
                 get: () => {
-                    return Assets.Starfield;
+                    return Assets.STAR_FIELD;
                 }
             }
         ];
