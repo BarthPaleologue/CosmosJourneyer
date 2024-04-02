@@ -39,9 +39,12 @@ export class GrassMaterial extends ShaderMaterial {
         const defines = ["#define INSTANCES"];
         if (isDepthMaterial) defines.push("#define FORDEPTH");
 
+        const uniforms = ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "cameraPosition", "playerPosition"];
+        if(isDepthMaterial) uniforms.push("depthValues");
+
         super(shaderName, scene, shaderName, {
             attributes: ["position", "normal"],
-            uniforms: ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "cameraPosition", "playerPosition"],
+            uniforms: uniforms,
             defines: defines,
             samplers: ["perlinNoise"]
         });

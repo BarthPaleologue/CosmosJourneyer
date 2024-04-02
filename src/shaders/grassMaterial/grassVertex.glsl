@@ -110,6 +110,6 @@ void main() {
     vNormal = leaningNormal;
 
     #ifdef FORDEPTH
-    vDepthMetric = ((-gl_Position.z + depthValues.x) / (depthValues.y));
+    vDepthMetric = (-gl_Position.z + depthValues.x) / (depthValues.y);
     #endif
 }

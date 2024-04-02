@@ -134,9 +134,9 @@ export class Assets {
     public static GRASS_BLADE: Mesh;
 
     public static BUTTERFLY_MATERIAL: ButterflyMaterial;
-    public static GRASS_MATERIAL: GrassMaterial;
 
-    public static GRASS_DEPTH_MATERIAL: ShaderMaterial;
+    public static GRASS_MATERIAL: GrassMaterial;
+    public static GRASS_DEPTH_MATERIAL: GrassMaterial;
 
     public static OUCH_SOUND: Sound;
     public static ENGINE_RUNNING_SOUND: Sound;
