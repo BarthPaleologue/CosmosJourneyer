@@ -38,6 +38,9 @@ export class UberPostProcess extends PostProcess {
 
         super(name, fragmentName, uniformNames, samplerNames, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
+        // This is necessary because BabylonJS post process sets the scene using the camera. However, I don't pass a camera to the constructor as I use a PostProcessRenderPipeline.
+        this._scene = scene;
+
         this.uniforms.push(...uniforms);
         this.samplers.push(...samplers);
 

@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 export interface IPatch {
     /**
@@ -37,6 +38,8 @@ export interface IPatch {
      * Returns the number of instances currently rendered.
      */
     getNbInstances(): number;
+
+    getBaseMesh(): Mesh;
 
     setEnabled(enabled: boolean): void;
 

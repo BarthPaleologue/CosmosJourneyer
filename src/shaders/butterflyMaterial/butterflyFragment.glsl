@@ -29,6 +29,12 @@ varying vec2 vUV;
 varying mat4 normalMatrix;
 varying vec3 vNormal;
 
+// This is used to render the grass blade to the depth buffer properly
+// (see https://forum.babylonjs.com/t/how-to-write-shadermaterial-to-depthrenderer/47227/3 and https://playground.babylonjs.com/#6GFJNR#161)
+#ifdef FORDEPTH
+varying float vDepthMetric;
+#endif
+
 varying vec3 vOriginalWorldPosition;
 
 // src: https://gist.github.com/mairod/a75e7b44f68110e1576d77419d608786
@@ -72,5 +78,9 @@ void main() {
     // ambient lighting
     ndl = clamp(ndl + 0.1, 0.0, 1.0);
 
-    gl_FragColor = vec4(finalColor.rgb * ndl, 1.0);// apply color and lighting
+    #ifdef FORDEPTH
+    gl_FragColor = vec4(vDepthMetric, 0.0, 0.0, 1.0);
+    #else
+    gl_FragColor = vec4(finalColor.rgb * ndl, 1.0);
+    #endif
 } 

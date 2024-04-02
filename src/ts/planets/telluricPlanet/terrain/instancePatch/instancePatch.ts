@@ -84,6 +84,11 @@ export class InstancePatch implements IPatch {
         }
     }
 
+    public getBaseMesh(): Mesh {
+        if (this.baseMesh === null) throw new Error("Tried to get base mesh but no base mesh was set.");
+        return this.baseMesh;
+    }
+
     public getNbInstances(): number {
         return this.instances.length;
     }
