@@ -38,6 +38,7 @@ import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { UberScene } from "../../../../uberCore/uberScene";
 
 export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
@@ -66,6 +67,8 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
     private disposed = false;
 
+    private readonly scene: Scene;
+
     constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanetModel, rootLength: number, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
 
@@ -77,6 +80,8 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
+
+        this.scene = scene;
 
         this.mesh.material = material;
         //this.mesh.material = Assets.DebugMaterial(id, false, false);
@@ -170,6 +175,11 @@ export class PlanetChunk implements Transformable, BoundingSphere {
             const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
             grassPatch.createInstances(Assets.GRASS_BLADE);
             this.instancePatches.push(grassPatch);
+
+            for(const depthRenderer of Object.values(this.scene._depthRenderer)) {
+                depthRenderer.setMaterialForRendering([butterflyPatch.getBaseMesh()], Assets.BUTTERFLY_DEPTH_MATERIAL);
+                depthRenderer.setMaterialForRendering([grassPatch.getBaseMesh()], Assets.GRASS_DEPTH_MATERIAL);
+            }
         }
     }
 
