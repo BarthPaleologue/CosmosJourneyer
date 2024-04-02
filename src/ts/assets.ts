@@ -535,8 +535,8 @@ export class Assets {
         return Assets.LANDING_PAD.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
-    static DebugMaterial(name: string, diffuse = false, wireframe = false) {
-        const mat = new StandardMaterial(`${name}DebugMaterial`);
+    static DebugMaterial(name: string, diffuse: boolean, wireframe: boolean, scene: Scene) {
+        const mat = new StandardMaterial(`${name}DebugMaterial`, scene);
         if (!diffuse) {
             mat.emissiveColor = Color3.Random();
             mat.disableLighting = true;

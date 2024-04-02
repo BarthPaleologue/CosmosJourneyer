@@ -84,13 +84,13 @@ const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
 const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, scene);
 sphere.position.y = 4;
 sphere.position.x = 4;
-sphere.material = Assets.DebugMaterial("sphere", true);
+sphere.material = Assets.DebugMaterial("sphere", true, false, scene);
 shadowGenerator.addShadowCaster(sphere);
 
 const box = MeshBuilder.CreateBox("box", { size: 2 }, scene);
 box.position.y = 4;
 box.position.x = -4;
-box.material = Assets.DebugMaterial("box", true);
+box.material = Assets.DebugMaterial("box", true, false, scene);
 shadowGenerator.addShadowCaster(box);
 
 const spaceship = new Spaceship(scene);
@@ -103,7 +103,7 @@ const capsule = MeshBuilder.CreateCapsule("capsule", { radius: 0.6, height: 2 },
 capsule.position.y = 4;
 capsule.position.x = -4;
 capsule.position.z = 4;
-capsule.material = Assets.DebugMaterial("capsule", true);
+capsule.material = Assets.DebugMaterial("capsule", true, false, scene);
 capsule.visibility = 0.5;
 shadowGenerator.addShadowCaster(capsule);
 
