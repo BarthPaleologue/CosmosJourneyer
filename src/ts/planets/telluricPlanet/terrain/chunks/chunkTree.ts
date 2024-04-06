@@ -32,6 +32,7 @@ import { DeleteSemaphore } from "./deleteSemaphore";
 import { UberScene } from "../../../../uberCore/uberScene";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { ChunkForge } from "./chunkForge";
+import { clamp } from "../../../../utils/math";
 
 /**
  * A quadTree is defined recursively
@@ -180,49 +181,36 @@ export class ChunkTree {
         const nodePositionSphere = nodeRelativePosition.normalizeToNew();
         const observerPositionSphere = observerPositionW.subtract(this.parent.getAbsolutePosition()).normalize();
 
-        const totalRadius = this.planetModel.radius + this.planetModel.terrainSettings.max_mountain_height + this.planetModel.terrainSettings.continent_base_height + this.planetModel.terrainSettings.max_bump_height;
+        const totalRadius =
+            this.planetModel.radius +
+            this.planetModel.terrainSettings.max_mountain_height +
+            this.planetModel.terrainSettings.continent_base_height +
+            this.planetModel.terrainSettings.max_bump_height;
 
         const observerRelativePosition = observerPositionW.subtract(this.parent.getAbsolutePosition());
 
         const belowTotalRadius = observerRelativePosition.length() < totalRadius;
 
         let observerDistanceToSphereNormalized = observerRelativePosition.subtract(observerPositionSphere.scale(totalRadius)).length() / this.planetModel.radius;
-        if(belowTotalRadius) observerDistanceToSphereNormalized = 0;
+        if (belowTotalRadius) observerDistanceToSphereNormalized = 0;
 
         const nodeGreatCircleDistance = Math.acos(Vector3.Dot(nodePositionSphere, observerPositionSphere));
 
-        const observerDistanceFalloff = 8;
-        const greatCircleDistanceFalloff = 5;
+        const observerDistanceFalloff = 5;
+        const greatCircleDistanceFalloff = 20;
 
-        const nodeLength = this.rootChunkLength / Math.pow(2, walked.length);
+        const nodeLength = this.rootChunkLength / 2 ** walked.length;
 
-        let kernel = Math.exp(-Math.max(0.0, nodeGreatCircleDistance - nodeLength / 2) * greatCircleDistanceFalloff);
-        kernel /= 1 + observerDistanceFalloff * observerDistanceToSphereNormalized;
-        //kernel *= Math.exp(-observerDistanceToSphereNormalized * observerDistanceFalloff);
+        const chunkGreatDistanceFactor = Math.max(0.0, nodeGreatCircleDistance - nodeLength / (2 * Math.PI * this.planetModel.radius));
 
-        //console.log(kernel);
+        let kernel = Math.log2(1.0 + 1.0 / (1.0 + chunkGreatDistanceFactor * greatCircleDistanceFalloff));
+        kernel *= Math.log2(1.0 + 1.0 / (1.0 + observerDistanceToSphereNormalized * observerDistanceFalloff));
 
-        const targetLOD = this.minDepth + this.maxDepth * kernel;
+        // lerp between min and max depth
+        const targetLOD = clamp(Math.floor(this.minDepth * (1.0 - kernel) + (this.maxDepth + 1) * kernel), this.minDepth, this.maxDepth);
+        //if (targetLOD === this.maxDepth) console.log(targetLOD, walked.length, this.maxDepth);
 
-        if (tree instanceof Array) {
-            if (Math.floor(targetLOD) < walked.length) {
-                const newChunk = this.createChunk(walked, chunkForge);
-                if (tree.length === 0 && walked.length === 0) {
-                    return newChunk;
-                }
-                this.requestDeletion(tree, [newChunk]);
-                return newChunk;
-            }
-
-            return [
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
-            ];
-        }
-
-        if (Math.floor(targetLOD) > walked.length) {
+        if (tree instanceof PlanetChunk && targetLOD > walked.length) {
             if (!tree.isReady()) return tree;
             if (!tree.mesh.isVisible) return tree;
             if (!tree.mesh.isEnabled()) return tree;
@@ -235,6 +223,21 @@ export class ChunkTree {
             ];
             this.requestDeletion(tree, newTree);
             return newTree;
+        }
+
+        if (tree instanceof Array) {
+            if (targetLOD < walked.length - 1) {
+                const newChunk = this.createChunk(walked, chunkForge);
+                this.requestDeletion(tree, [newChunk]);
+                return newChunk;
+            }
+
+            return [
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
+            ];
         }
 
         return tree;
