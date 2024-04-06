@@ -202,12 +202,12 @@ export class ChunkTree {
 
         const nodeLength = this.rootChunkLength / 2 ** walked.length;
 
-        const chunkGreatDistanceFactor = Math.max(0.0, nodeGreatCircleDistance - nodeLength / (2 * Math.PI * this.planetModel.radius));
+        const chunkGreatDistanceFactor = Math.max(0.0, nodeGreatCircleDistance - 8 * nodeLength / (2 * Math.PI * this.planetModel.radius));
 
         let kernel = this.maxDepth;
-        kernel -= Math.log2(1.0 + chunkGreatDistanceFactor * 2 ** (this.maxDepth - this.minDepth)); //2 ** (-chunkGreatDistanceFactor * greatCircleDistanceFalloff);
+        kernel -= Math.log2(1.0 + chunkGreatDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8; //2 ** (-chunkGreatDistanceFactor * greatCircleDistanceFalloff);
         //kernel -= Math.log2(1.)//*= 2 ** (-observerDistanceToSphereNormalized * observerDistanceFalloff);
-        kernel -= Math.log2(1.0 + observerDistanceToSphereNormalized * 2 ** (this.maxDepth - this.minDepth)) / 40;
+        kernel -= Math.log2(1.0 + observerDistanceToSphereNormalized * 2 ** (this.maxDepth - this.minDepth)) / 2;
 
         // lerp between min and max depth
         let targetLOD = kernel; //this.minDepth * (1.0 - kernel) + (this.maxDepth + 1) * kernel;
