@@ -198,9 +198,9 @@ export class ChunkTree {
 
         let kernel = this.maxDepth;
         kernel -= Math.log2(1.0 + chunkGreatDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8;
-        kernel -= Math.log2(1.0 + observerDistanceFactor * 2 ** (this.maxDepth - this.minDepth));
+        kernel -= Math.log2(1.0 + observerDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8;
 
-        const targetLOD = clamp(Math.floor(kernel), this.minDepth, this.maxDepth); //this.minDepth * (1.0 - kernel) + (this.maxDepth + 1) * kernel;
+        const targetLOD = clamp(Math.floor(kernel), this.minDepth, this.maxDepth);
 
         if (tree instanceof PlanetChunk && targetLOD > walked.length) {
             if (!tree.isReady()) return tree;
