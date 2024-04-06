@@ -84,7 +84,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.scene = scene;
 
         this.mesh.material = material;
-        //this.mesh.material = Assets.DebugMaterial(id, false, false);
+        //this.mesh.material = Assets.DebugMaterial(id, false, false, scene);
 
         this.mesh.parent = parentAggregate.transformNode;
 
