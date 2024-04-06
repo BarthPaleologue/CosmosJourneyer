@@ -183,37 +183,24 @@ export class ChunkTree {
 
         const totalRadius =
             this.planetModel.radius +
-            this.planetModel.terrainSettings.max_mountain_height +
+            (this.planetModel.terrainSettings.max_mountain_height +
             this.planetModel.terrainSettings.continent_base_height +
-            this.planetModel.terrainSettings.max_bump_height;
+            this.planetModel.terrainSettings.max_bump_height) * 0.5;
 
         const observerRelativePosition = observerPositionW.subtract(this.parent.getAbsolutePosition());
-
-        const belowTotalRadius = observerRelativePosition.length() < totalRadius;
-
-        const observerDistance = observerRelativePosition.subtract(observerPositionSphere.scale(totalRadius)).length();
-        let observerDistanceToSphereNormalized = observerDistance / this.planetModel.radius;
-        if (belowTotalRadius) observerDistanceToSphereNormalized = 0;
+        const observerDistanceToCenter = observerRelativePosition.length();
 
         const nodeGreatCircleDistance = Math.acos(Vector3.Dot(nodePositionSphere, observerPositionSphere));
-
-        const observerDistanceFalloff = 5;
-        const greatCircleDistanceFalloff = 20;
-
         const nodeLength = this.rootChunkLength / 2 ** walked.length;
 
         const chunkGreatDistanceFactor = Math.max(0.0, nodeGreatCircleDistance - 8 * nodeLength / (2 * Math.PI * this.planetModel.radius));
+        const observerDistanceFactor = Math.max(0.0, observerDistanceToCenter - totalRadius) / this.planetModel.radius;
 
         let kernel = this.maxDepth;
-        kernel -= Math.log2(1.0 + chunkGreatDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8; //2 ** (-chunkGreatDistanceFactor * greatCircleDistanceFalloff);
-        //kernel -= Math.log2(1.)//*= 2 ** (-observerDistanceToSphereNormalized * observerDistanceFalloff);
-        kernel -= Math.log2(1.0 + observerDistanceToSphereNormalized * 2 ** (this.maxDepth - this.minDepth)) / 2;
+        kernel -= Math.log2(1.0 + chunkGreatDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8;
+        kernel -= Math.log2(1.0 + observerDistanceFactor * 2 ** (this.maxDepth - this.minDepth));
 
-        // lerp between min and max depth
-        let targetLOD = kernel; //this.minDepth * (1.0 - kernel) + (this.maxDepth + 1) * kernel;
-
-        targetLOD = clamp(Math.floor(targetLOD), this.minDepth, this.maxDepth);
-        //if (targetLOD === this.maxDepth) console.log(targetLOD, walked.length, this.maxDepth);
+        const targetLOD = clamp(Math.floor(kernel), this.minDepth, this.maxDepth); //this.minDepth * (1.0 - kernel) + (this.maxDepth + 1) * kernel;
 
         if (tree instanceof PlanetChunk && targetLOD > walked.length) {
             if (!tree.isReady()) return tree;
