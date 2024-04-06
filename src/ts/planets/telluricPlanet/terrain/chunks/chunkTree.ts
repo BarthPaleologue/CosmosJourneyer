@@ -191,7 +191,8 @@ export class ChunkTree {
 
         const belowTotalRadius = observerRelativePosition.length() < totalRadius;
 
-        let observerDistanceToSphereNormalized = observerRelativePosition.subtract(observerPositionSphere.scale(totalRadius)).length() / this.planetModel.radius;
+        const observerDistance = observerRelativePosition.subtract(observerPositionSphere.scale(totalRadius)).length();
+        let observerDistanceToSphereNormalized = observerDistance / this.planetModel.radius;
         if (belowTotalRadius) observerDistanceToSphereNormalized = 0;
 
         const nodeGreatCircleDistance = Math.acos(Vector3.Dot(nodePositionSphere, observerPositionSphere));
@@ -203,11 +204,15 @@ export class ChunkTree {
 
         const chunkGreatDistanceFactor = Math.max(0.0, nodeGreatCircleDistance - nodeLength / (2 * Math.PI * this.planetModel.radius));
 
-        let kernel = Math.log2(1.0 + 1.0 / (1.0 + chunkGreatDistanceFactor * greatCircleDistanceFalloff));
-        kernel *= Math.log2(1.0 + 1.0 / (1.0 + observerDistanceToSphereNormalized * observerDistanceFalloff));
+        let kernel = this.maxDepth;
+        kernel -= Math.log2(1.0 + chunkGreatDistanceFactor * 2 ** (this.maxDepth - this.minDepth)); //2 ** (-chunkGreatDistanceFactor * greatCircleDistanceFalloff);
+        //kernel -= Math.log2(1.)//*= 2 ** (-observerDistanceToSphereNormalized * observerDistanceFalloff);
+        kernel -= Math.log2(1.0 + observerDistanceToSphereNormalized * 2 ** (this.maxDepth - this.minDepth)) / 40;
 
         // lerp between min and max depth
-        const targetLOD = clamp(Math.floor(this.minDepth * (1.0 - kernel) + (this.maxDepth + 1) * kernel), this.minDepth, this.maxDepth);
+        let targetLOD = kernel; //this.minDepth * (1.0 - kernel) + (this.maxDepth + 1) * kernel;
+
+        targetLOD = clamp(Math.floor(targetLOD), this.minDepth, this.maxDepth);
         //if (targetLOD === this.maxDepth) console.log(targetLOD, walked.length, this.maxDepth);
 
         if (tree instanceof PlanetChunk && targetLOD > walked.length) {
