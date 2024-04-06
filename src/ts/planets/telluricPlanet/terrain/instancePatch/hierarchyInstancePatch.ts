@@ -89,6 +89,11 @@ export class HierarchyInstancePatch implements IPatch {
         this.baseRoot.setEnabled(enabled);
     }
 
+    public getBaseMesh(): Mesh {
+        if (this.baseRoot === null) throw new Error("Tried to get base mesh but no base mesh was set.");
+        return this.baseRoot as Mesh;
+    }
+
     public getNbInstances(): number {
         if (this.baseRoot === null) return 0;
         return this.instances.length;
