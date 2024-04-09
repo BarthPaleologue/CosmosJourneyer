@@ -53,7 +53,7 @@ export interface OrbitalObject extends Transformable, BoundingSphere, TypedObjec
     parent: OrbitalObject | null;
 }
 
-export class OrbitalObject {
+export class OrbitalObjectUtils {
     /**
      * Returns the next position of the object on its orbit. This does not update the position of the object (see UpdateOrbitalPosition)
      * @param object The object we want to compute the next position of
@@ -95,7 +95,7 @@ export class OrbitalObject {
         if (orbit.period === 0 || object.parent === null) return;
 
         const oldPosition = object.getTransform().getAbsolutePosition();
-        const newPosition = OrbitalObject.GetNextOrbitalPosition(object, deltaTime);
+        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(object, deltaTime);
         translate(object.getTransform(), newPosition.subtractInPlace(oldPosition));
     }
 
@@ -117,7 +117,7 @@ export class OrbitalObject {
      * @constructor
      */
     static UpdateRotation(object: OrbitalObject, deltaTime: number): void {
-        const dtheta = OrbitalObject.GetRotationAngle(object, deltaTime);
+        const dtheta = OrbitalObjectUtils.GetRotationAngle(object, deltaTime);
         if (dtheta === 0) return;
 
         const elementaryRotationQuaternion = Quaternion.RotationAxis(object.getRotationAxis(), dtheta);
