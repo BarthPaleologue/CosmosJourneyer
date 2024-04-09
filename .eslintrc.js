@@ -1,4 +1,4 @@
-{
+module.exports = {
   "env": {
     "browser": true,
     "es2021": true
@@ -24,6 +24,8 @@
     "import/no-unresolved": "warn",
     "@typescript-eslint/switch-exhaustiveness-check": "error",
     "@typescript-eslint/no-inferrable-types": "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
     "eqeqeq": "error",
     "no-restricted-syntax": [
       "error",
@@ -117,4 +119,4 @@
       }
     ]
   }
-}
+};
