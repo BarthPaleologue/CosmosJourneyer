@@ -85,6 +85,7 @@ export class Star implements StellarObject, Cullable {
                   scene
               )
             : Assets.CreateBananaClone(2 * this.model.radius);
+        this.mesh.name = name; // enforce name in the case of cloning the banana
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
