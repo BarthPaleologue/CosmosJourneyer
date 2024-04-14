@@ -119,14 +119,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         document.querySelectorAll("#mainMenu *[data-i18n]").forEach((element) => {
             const key = element.getAttribute("data-i18n");
             if (key === null) throw new Error("data-i18n attribute is null");
-            element.textContent = i18n.t(`mainMenu:${key}`);
-        });
-
-        // Translate all right panels
-        document.querySelectorAll(".sidePanel *[data-i18n]").forEach((element) => {
-            const key = element.getAttribute("data-i18n");
-            if (key === null) throw new Error("data-i18n attribute is null");
-            element.textContent = i18n.t(`sidePanel:${key}`);
+            element.textContent = i18n.t(key);
         });
 
         const loadSavePanel = document.getElementById("loadSavePanel");
@@ -148,7 +141,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         this.aboutPanel = aboutPanel;
 
         const startButton = document.getElementById("startButton");
-        if(startButton === null) throw new Error("#startButton does not exist!");
+        if (startButton === null) throw new Error("#startButton does not exist!");
         startButton.addEventListener("click", () => {
             this.startAnimation(() => this.onStartObservable.notifyObservers());
         });
