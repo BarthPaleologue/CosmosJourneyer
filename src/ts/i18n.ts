@@ -26,7 +26,7 @@ const language = urlParams.get("lang") || navigator.language;
 
 await init({
     lng: language, // change this if you want to test a specific language
-    debug: true,
+    debug: process.env.NODE_ENV === 'development',
     fallbackLng: "en-US",
     resources: loadResources(),
 });
