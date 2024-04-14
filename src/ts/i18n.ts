@@ -31,10 +31,14 @@ await init({
     resources: loadResources(),
 });
 
+// perform all static translations
 document.querySelectorAll("*[data-i18n]").forEach((element) => {
     const key = element.getAttribute("data-i18n");
     if (key === null) throw new Error("data-i18n attribute is null");
-    element.textContent = t(key);
+
+    // this should be safe as we are not doing any interpolation
+    // (as long as the translation are reviewed before being merged of course)
+    element.innerHTML = t(key);
 });
 
 export default i18next;
