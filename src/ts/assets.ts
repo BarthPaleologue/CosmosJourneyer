@@ -90,6 +90,8 @@ import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMateria
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18next from "./i18n";
+import { CustomProceduralTexture } from "@babylonjs/core";
+import { Effect } from "@babylonjs/core/Materials/effect";
 
 export class Assets {
     static IS_READY = false;
@@ -189,7 +191,8 @@ export class Assets {
 
         Assets.MANAGER.addTextureTask("SeamlessPerlin", seamlessPerlin).onSuccess = (task) => (Assets.SEAMLESS_PERLIN = task.texture);
 
-        Assets.ATMOSPHERE_LUT = new ProceduralTexture("atmosphereLUT", 100, { fragmentSource: atmosphereLUT }, scene, undefined, false, false);
+        Effect.ShadersStore["atmosphereLUTPixelShader"] = atmosphereLUT;
+        Assets.ATMOSPHERE_LUT = new CustomProceduralTexture("atmosphereLUT", "atmosphereLUT", {width:1024, height:1024}, scene, undefined, false, true);
         Assets.ATMOSPHERE_LUT.refreshRate = 0;
 
         Assets.MANAGER.addTextureTask("EmptyTexture", empty).onSuccess = (task) => (Assets.EMPTY_TEXTURE = task.texture);
