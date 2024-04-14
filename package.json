@@ -53,7 +53,7 @@
     "webpack-dev-server": "^5.0.4"
   },
   "version": "1.9.0",
-  "description": "CosmosJourneyer",
+  "description": "Cosmos Journeyer is a space exploration game featuring fully explorable planets, across millions of star systems. It is built using Babylon.JS, and a lot of passion.",
   "name": "cosmos-journeyer",
   "scripts": {
     "build": "webpack --mode=production --node-env=production",

@@ -43,6 +43,7 @@ import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { rotate } from "../../uberCore/transforms/basicTransform";
 import { BodyType } from "../../model/common";
+import i18n from "../../i18n";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -150,9 +151,9 @@ export class TelluricPlanet implements Planet, Cullable {
 
     getTypeName(): string {
         if (this.parent?.model.bodyType === BodyType.TELLURIC_PLANET || this.parent?.model.bodyType === BodyType.GAS_PLANET) {
-            return "Telluric Moon";
+            return i18n.t("objectTypes:telluricMoon");
         }
-        return "Telluric Planet";
+        return i18n.t("objectTypes:telluricPlanet");
     }
 
     /**

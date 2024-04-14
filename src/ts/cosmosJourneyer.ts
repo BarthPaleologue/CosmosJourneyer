@@ -59,7 +59,7 @@ const enum EngineState {
 }
 
 /**
- * Main class of CosmosJourneyer. It handles the underlying BabylonJS engine, and the communication between
+ * Main class of Cosmos Journeyer. It handles the underlying BabylonJS engine, and the communication between
  * the starmap view and the star system view. It also provides utility methods to take screenshots and record videos.
  * It also handles the pause menu.
  */

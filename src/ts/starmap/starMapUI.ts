@@ -32,6 +32,7 @@ import { Settings } from "../settings";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import i18n from "../i18n";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;
@@ -92,7 +93,7 @@ export class StarMapUI {
         this.descriptionPanel.textHorizontalAlignment = TextBlock.HORIZONTAL_ALIGNMENT_LEFT;
         this.descriptionPanel.setPadding(0, 15, 10, 15);
 
-        this.warpButton = Button.CreateSimpleButton("warpButton", "Set Warp Destination");
+        this.warpButton = Button.CreateSimpleButton("warpButton", i18n.t("starMap:setAsDestination"));
         //this.warpButton.width = "100px";
         this.warpButton.height = "40px";
         this.warpButton.background = "midnightblue";

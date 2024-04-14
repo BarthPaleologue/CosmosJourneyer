@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Settings } from "../settings";
+import i18n from "../i18n";
 
 export function parseSpeed(speed: number): string {
     if (speed < 1000) {
@@ -37,9 +38,9 @@ export function parseDistance(distance: number): string {
     } else if (distance < 20000000) {
         return `${(distance / 1000000).toFixed(2)} Mm`;
     } else if (distance < 0.3 * Settings.LIGHT_YEAR) {
-        return `${(distance / Settings.C).toFixed(2)} ls`;
+        return `${(distance / Settings.C).toFixed(2)} ${i18n.t("units:ls")}`;
     } else {
-        return `${(distance / Settings.LIGHT_YEAR).toFixed(2)} ly`;
+        return `${(distance / Settings.LIGHT_YEAR).toFixed(2)} ${i18n.t("units:ly")}`;
     }
 }
 
@@ -68,6 +69,7 @@ export function parsePercentageFrom01(percentage01: number): string {
 }
 
 export const Alphabet = "abcdefghijklmnopqrstuvwxyz";
+
 export function starName(baseName: string, index: number): string {
     return `${baseName} ${Alphabet[index].toUpperCase()}`;
 }
