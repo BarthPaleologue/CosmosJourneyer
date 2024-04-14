@@ -1,31 +1,45 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 precision highp float;
 
 // based on https://www.shadertoy.com/view/tsc3Rj and https://www.shadertoy.com/view/wdjGWR
 
 varying vec2 vUV;
 
-uniform float time;
-
 uniform float power;
 uniform vec3 accentColor;
 
-uniform int nbStars;// number of stars
-#pragma glslify: stars = require(./utils/stars.glsl)
+#include "./utils/stars.glsl";
 
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
-#pragma glslify: object = require(./utils/object.glsl)
+#include "./utils/object.glsl";
 
-#pragma glslify: camera = require(./utils/camera.glsl)
+#include "./utils/camera.glsl";
 
-#pragma glslify: remap = require(./utils/remap.glsl)
+#include "./utils/remap.glsl";
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
+#include "./utils/worldFromUV.glsl";
 
-#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
+#include "./utils/rayIntersectSphere.glsl";
 
-#pragma glslify: saturate = require(./utils/saturate.glsl)
+#include "./utils/saturate.glsl";
 
 #define MARCHINGITERATIONS 64
 
@@ -121,23 +135,23 @@ vec3 estimate_normal(const vec3 p, const float delta)
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
-    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
+    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
+    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
 
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(camera.position, rayDir, object.position, object.radius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(camera_position, rayDir, object_position, object_radius, impactPoint, escapePoint))) {
         gl_FragColor = screenColor;// if not intersecting with atmosphere, return original color
         return;
     }
 
     // scale down so that everything happens in a sphere of radius 2
-    float inverseScaling = 1.0 / (0.5 * object.radius);
+    float inverseScaling = 1.0 / (0.5 * object_radius);
 
-    vec3 origin = camera.position + impactPoint * rayDir - object.position;// the ray origin in world space
+    vec3 origin = camera_position + impactPoint * rayDir - object_position;// the ray origin in world space
     origin *= inverseScaling;
 
     float steps;
@@ -166,7 +180,7 @@ void main() {
     vec3 normal = estimate_normal(intersectionPoint, EPSILON * 2.0);
     float ndl = 0.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 starDir = normalize(stars[i].position - object.position);
+        vec3 starDir = normalize(star_positions[i] - object_position);
         ndl += max(0.0, dot(normal, starDir));
     }
 

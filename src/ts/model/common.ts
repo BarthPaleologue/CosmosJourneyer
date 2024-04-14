@@ -1,13 +1,26 @@
-import { STELLAR_TYPE } from "../stellarObjects/common";
-import { RingsUniforms } from "../postProcesses/rings/ringsUniform";
-import { OrbitProperties } from "../orbit/orbitProperties";
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export enum GENERATION_STEPS {
+export const enum GenerationSteps {
     AXIAL_TILT = 100,
     ORBIT = 200,
     ORBITAL_PERIOD = 500,
     RADIUS = 1000,
-    ORBITAL_PLANE_ALIGNEMENT = 1600,
+    ORBITAL_PLANE_ALIGNMENT = 1600,
 
     RINGS = 1200,
 
@@ -15,80 +28,23 @@ export enum GENERATION_STEPS {
     MOONS = 11,
 
     POWER = 300,
-    ACCENNT_COLOR = 400,
+    ACCENT_COLOR = 400,
 
     TEMPERATURE = 1100,
+    STELLAR_TYPE = 1900,
 
-    PRESSURE = 1100,
-    WATER_AMOUNT = 1200,
-    TERRAIN = 1500
+    PRESSURE = 1800,
+    WATER_AMOUNT = 1700,
+    TERRAIN = 1500,
+
+    SPACE_STATIONS = 2000
 }
 
-export enum BODY_TYPE {
+export const enum BodyType {
     STAR,
-    TELLURIC,
-    GAS,
+    TELLURIC_PLANET,
+    GAS_PLANET,
     MANDELBULB,
-    BLACK_HOLE
-}
-
-export type PhysicalProperties = {
-    mass: number;
-    rotationPeriod: number;
-    axialTilt: number;
-};
-
-export type StarPhysicalProperties = PhysicalProperties & {
-    temperature: number;
-};
-
-export type BlackHolePhysicalProperties = PhysicalProperties & {
-    accretionDiskRadius: number;
-};
-
-export type PlanetPhysicalProperties = PhysicalProperties & {
-    minTemperature: number;
-    maxTemperature: number;
-    pressure: number;
-};
-
-export type SolidPhysicalProperties = PlanetPhysicalProperties & {
-    waterAmount: number;
-    oceanLevel: number;
-};
-
-export interface BaseModel {
-    rng: (step: number) => number;
-    seed: number;
-
-    orbit: OrbitProperties;
-    physicalProperties: PhysicalProperties;
-
-    readonly parentBody: BaseModel | null;
-    readonly childrenBodies: BaseModel[];
-}
-
-export interface BodyModel extends BaseModel {
-    readonly bodyType: BODY_TYPE;
-    readonly radius: number;
-
-    readonly ringsUniforms: RingsUniforms | null;
-}
-
-export interface StellarObjectModel extends BodyModel {
-    stellarType: STELLAR_TYPE;
-}
-
-//https://en.wiktionary.org/wiki/planemo#English
-export interface PlanemoModel extends BodyModel {
-    physicalProperties: PlanetPhysicalProperties;
-
-    nbMoons: number;
-
-    getApparentRadius(): number;
-}
-
-export function depth(model: BaseModel): number {
-    if (model.parentBody === null) return 0;
-    return depth(model.parentBody) + 1;
+    BLACK_HOLE,
+    NEUTRON_STAR
 }

@@ -1,11 +1,29 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { easeInOutInterpolation } from "./interpolations";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { rotate } from "../basicTransform";
+import { clamp } from "../../../utils/math";
 
 export class TransformRotationAnimation {
     private clock = 0;
-    private duration: number;
+    private readonly duration: number;
     private thetaAcc = 0;
     private readonly totalTheta;
     private readonly axis;
@@ -23,7 +41,9 @@ export class TransformRotationAnimation {
 
         this.clock += deltaTime;
 
-        const dtheta = this.totalTheta * easeInOutInterpolation(this.clock / this.duration) - this.thetaAcc;
+        const t = clamp(this.clock / this.duration, 0, 1);
+
+        const dtheta = this.totalTheta * easeInOutInterpolation(t) - this.thetaAcc;
         this.thetaAcc += dtheta;
 
         rotate(this.transform, this.axis, dtheta);
@@ -31,5 +51,9 @@ export class TransformRotationAnimation {
 
     isFinished(): boolean {
         return this.clock >= this.duration;
+    }
+
+    getProgress(): number {
+        return this.clock / this.duration;
     }
 }

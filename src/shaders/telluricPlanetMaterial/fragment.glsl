@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 precision highp float;
 
 varying vec3 vPositionW;
@@ -21,11 +38,8 @@ uniform vec3 planetPosition;
 
 #define MAX_STARS 5
 uniform int nbStars;// number of stars
-struct Star {
-    vec3 position;
-    vec3 color;
-};
-uniform Star stars[MAX_STARS];
+uniform vec3 star_positions[MAX_STARS];
+uniform vec3 star_colors[MAX_STARS];
 
 uniform int colorMode;
 
@@ -63,31 +77,25 @@ uniform float maxTemperature;
 
 uniform float waterAmount;
 
-#pragma glslify: perlin3 = require(../utils/perlin3.glsl)
+uniform sampler2D lut;
 
-#pragma glslify: remap = require(../utils/remap.glsl)
+#include "../utils/toUV.glsl";
 
-#pragma glslify: lerp = require(../utils/vec3Lerp.glsl)
-
-float lerp(float value1, float value2, float x) {
-    return x * value1 + (1.0 - x) * value2;
-}
-
-#pragma glslify: triplanarNormal = require(../utils/triplanarNormal.glsl)
+#include "../utils/triplanarNormal.glsl";
 
 //https://www.desmos.com/calculator/8etk6vdfzi
 
-#pragma glslify: smoothSharpener = require(../utils/smoothSharpener.glsl)
+#include "../utils/smoothSharpener.glsl";
 
-#pragma glslify: rayIntersectSphere = require(../utils/rayIntersectSphere.glsl)
+#include "../utils/rayIntersectSphere.glsl";
 
 vec3 saturate(vec3 color) {
     return clamp(color, 0.0, 1.0);
 }
 
-#pragma glslify: waterBoilingPointCelsius = require(./utils/waterBoilingPointCelsius.glsl)
+#include "./utils/waterBoilingPointCelsius.glsl";
 
-#pragma glslify: computeTemperature01 = require(./utils/computeTemperature01.glsl)
+#include "./utils/computeTemperature01.glsl";
 
 void main() {
     vec3 viewRayW = normalize(playerPosition - vPositionW);// view direction in world space
@@ -97,7 +105,7 @@ void main() {
     // diffuse lighting extinction
     float ndl1 = 0.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 starLightRayW = normalize(stars[i].position - vPositionW);// light ray direction in world space
+        vec3 starLightRayW = normalize(star_positions[i] - vPositionW);// light ray direction in world space
         ndl1 += max(dot(sphereNormalW, starLightRayW), 0.0);
     }
     ndl1 = clamp(ndl1, 0.0, 1.0);
@@ -134,16 +142,22 @@ void main() {
 
     float temperature01 = computeTemperature01(elevation01, absLatitude01, ndl1, dayDuration);
 
-    float temperature = lerp(maxTemperature, minTemperature, temperature01);
+    float temperature = mix(minTemperature, maxTemperature, temperature01);
+
+    vec2 uv = toUV(vUnitSamplePoint);
+    // trick from https://www.shadertoy.com/view/3dVSzm to avoid Greenwich artifacts
+    vec2 df = fwidth(uv);
+    if (df.x > 0.5) df.x = 0.0;
+    vec4 lutResult = textureLod(lut, uv, log2(max(df.x, df.y) * 1024.0));
 
     // moisture
     float moisture01 = 0.0;// 0.0 = sec, 1.0 = humid : sec par défaut
     if (waterMeltingPoint01 < 1.0) {
         // if there is liquid water on the surface
-        moisture01 += 0.5 * (1.0 + perlin3(vUnitSamplePoint * 2.0)) * sqrt(1.0-waterMeltingPoint01) * waterBoilingPoint01;
+        moisture01 += lutResult.x;
     }
     if (pressure == 0.0) {
-        moisture01 += 0.5 * (1.0 + perlin3(vUnitSamplePoint * 5.0));
+        moisture01 += lutResult.y;
     }
     moisture01 = clamp(moisture01, 0.0, 1.0);
 
@@ -172,21 +186,11 @@ void main() {
     );
     beachFactor = smoothSharpener(beachFactor, 2.0);
 
-    float steepFactor = slope;//smoothSharpener(slope, steepSharpness);
-    steepFactor = smoothstep(0.3, 0.7, steepFactor);
-    steepFactor = smoothSharpener(steepFactor, steepSharpness);
-
-    plainFactor = 1.0 - steepFactor;
+    plainFactor = 1.0;//- steepFactor;
 
     // apply beach factor
     plainFactor *= 1.0 - beachFactor;
-    beachFactor *= 1.0 - steepFactor;
-
-    // blend with snow factor when above water
-    snowFactor = smoothstep(0.0, -2.0, temperature - abs(blendingNormal.y) * 5.0);
-    snowFactor = smoothSharpener(snowFactor, 2.0);
-    plainFactor *= 1.0 - snowFactor;
-    beachFactor *= 1.0 - snowFactor;
+    //beachFactor *= 1.0 - steepFactor;
 
     // blend with desert factor when above water
     desertFactor = smoothstep(0.5, 0.3, moisture01);
@@ -194,6 +198,20 @@ void main() {
     plainFactor *= 1.0 - desertFactor;
     beachFactor *= 1.0 - desertFactor;
 
+    // blend with snow factor when above water
+    snowFactor = smoothstep(0.0, -2.0, temperature - abs(0.3 * (blendingNormal.z + blendingNormal.x + blendingNormal.y)) * 5.0);
+    snowFactor = smoothSharpener(snowFactor, 2.0);
+    plainFactor *= 1.0 - snowFactor;
+    beachFactor *= 1.0 - snowFactor;
+    desertFactor *= 1.0 - snowFactor;
+
+    float steepFactor = slope;
+    steepFactor = smoothstep(0.05, 0.3, steepFactor);
+    steepFactor = smoothSharpener(steepFactor, steepSharpness);
+    snowFactor *= 1.0 - steepFactor;
+    plainFactor *= 1.0 - steepFactor;
+    beachFactor *= 1.0 - steepFactor;
+    desertFactor *= 1.0 - steepFactor;
 
     // blend with bottom factor when under water
     bottomFactor = smoothstep(waterLevel01, waterLevel01 - 1e-2, elevation01);
@@ -211,7 +229,7 @@ void main() {
     const float normalStrengthNear = 0.5;
     const float normalStrengthFar = 0.2;
 
-    const float nearScale = 0.005 * 1000e3;
+    const float nearScale = 0.1 * 1000e3;
     const float farScale = 0.00001 * 1000e3;
 
     normal = triplanarNormal(vSamplePointScaled, normal, bottomNormalMap, nearScale, normalSharpness, bottomFactor * normalStrengthNear);
@@ -232,6 +250,7 @@ void main() {
     normal = triplanarNormal(vSamplePointScaled, normal, steepNormalMap, nearScale, normalSharpness, steepFactor * normalStrengthNear);
     normal = triplanarNormal(vSamplePointScaled, normal, steepNormalMap, farScale, normalSharpness, steepFactor * normalStrengthFar);
 
+    normal = normalize(normal);
 
     vec3 color = steepFactor * steepColor
     + beachFactor * beachColor
@@ -246,12 +265,12 @@ void main() {
     vec3 ndl2 = vec3(0.0);// dimming factor due to light inclination relative to vertex normal in world space
     vec3 specComp = vec3(0.0);
     for (int i = 0; i < nbStars; i++) {
-        vec3 starLightRayW = normalize(stars[i].position - vPositionW);
-        vec3 ndl2part = max(0.0, dot(normalW, starLightRayW)) * stars[i].color;
+        vec3 starLightRayW = normalize(star_positions[i] - vPositionW);
+        vec3 ndl2part = max(0.0, dot(normalW, starLightRayW)) * star_colors[i];
         ndl2 += ndl2part;
 
         vec3 angleW = normalize(viewRayW + starLightRayW);
-        specComp += max(0.0, dot(normalW, angleW)) * stars[i].color;
+        specComp += max(0.0, dot(normalW, angleW)) * star_colors[i];
     }
     ndl2 = saturate(ndl2);
     specComp = saturate(specComp);
@@ -269,13 +288,12 @@ void main() {
 
     vec3 screenColor = color.rgb * (ndl2 + specComp*ndl1);
 
-    if (colorMode == 1) screenColor = lerp(vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0), moisture01);
-    if (colorMode == 2) screenColor = lerp(vec3(1.0, 0.0, 0.0), vec3(0.1, 0.2, 1.0), temperature01);
+    if (colorMode == 1) screenColor = mix(vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), moisture01);
+    if (colorMode == 2) screenColor = mix(vec3(0.1, 0.2, 1.0), vec3(1.0, 0.0, 0.0), temperature01);
     if (colorMode == 3) screenColor = normal * 0.5 + 0.5;
     if (colorMode == 4) screenColor = vec3(elevation01);
     if (colorMode == 5) screenColor = vec3(1.0 - dot(normal, normalize(vSamplePoint)));
     if (colorMode == 6) screenColor = vec3(1.0 - slope);
-
 
     gl_FragColor = vec4(screenColor, 1.0);// apply color and lighting
 } 

@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 precision lowp float;
 
 varying vec2 vUV;// screen coordinates
@@ -7,17 +24,17 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform float time;
 
-#pragma glslify: camera = require(./utils/camera.glsl)
+#include "./utils/camera.glsl";
 
-#pragma glslify: object = require(./utils/object.glsl)
+#include "./utils/object.glsl";
 
-#pragma glslify: remap = require(./utils/remap.glsl)
+#include "./utils/rotateAround.glsl";
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
+#include "./utils/remap.glsl";
 
-#pragma glslify: lerp = require(./utils/vec3Lerp.glsl)
+#include "./utils/worldFromUV.glsl";
 
-#pragma glslify: removeAxialTilt = require(./utils/removeAxialTilt.glsl)
+#include "./utils/removeAxialTilt.glsl";
 
 // from https://www.shadertoy.com/view/MtcXWr
 bool rayIntersectCone(vec3 rayOrigin, vec3 rayDir, vec3 tipPosition, vec3 orientation, float coneAngle, out float t1, out float t2) {
@@ -81,13 +98,13 @@ float spiralDensity(vec3 pointOnCone, vec3 coneAxis, float coneMaxHeight) {
 
     float density = 1.0;
 
-    // smoothstep fadeout when the height is too much (outside of cone) or too low (too close to the star)
-    density *= smoothstep(0.0, 1.0, 1.0 - heightFraction) * smoothstep(0.0, 0.05, heightFraction);
+    // smoothstep fadeout when the height is too much (outside of cone)
+    density *= smoothstep(1.0, 0.0, heightFraction);
 
-    float d = spiralSDF(theta + time, 0.2 + heightFraction) / (0.3 + heightFraction * 2.0);
+    float d = spiralSDF(theta + time, 0.2 + sqrt(heightFraction) / 2.0) / (0.3 + heightFraction * 2.0);
     //d = pow(d, 4.0);
 
-    density *= smoothstep(0.85, 1.0, 1.0 - d);
+    density *= smoothstep(0.6, 1.0, pow(1.0 - d, 8.0)) * 2.0; //smoothstep(0.85, 1.0, 1.0 - d) * 2.0;
 
     //density *= d * 500.0;
 
@@ -99,32 +116,32 @@ void main() {
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
 
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
+    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
 
-    vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
+    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
     vec4 finalColor = screenColor;
 
     const float jetHeight = 10000000e3;
-    const vec3 jetColor = vec3(0.2, 0.2, 1.0);
+    const vec3 jetColor = vec3(0.5, 0.5, 1.0);
 
 
     float t1, t2;
-    if (rayIntersectCone(camera.position, rayDir, object.position, object.rotationAxis, 0.9, t1, t2)) {
+    if (rayIntersectCone(camera_position, rayDir, object_position, object_rotationAxis, 0.95, t1, t2)) {
         if (t2 > 0.0 && t2 < maximumDistance) {
-            vec3 jetPointPosition2 = camera.position + t2 * rayDir - object.position;
+            vec3 jetPointPosition2 = camera_position + t2 * rayDir - object_position;
 
-            float density2 = spiralDensity(jetPointPosition2, object.rotationAxis, jetHeight);
+            float density2 = spiralDensity(jetPointPosition2, object_rotationAxis, jetHeight);
 
             finalColor.rgb = mix(finalColor.rgb, jetColor, density2);
         }
         if (t1 > 0.0 && t1 < maximumDistance) {
-            vec3 jetPointPosition1 = camera.position + t1 * rayDir - object.position;
+            vec3 jetPointPosition1 = camera_position + t1 * rayDir - object_position;
 
-            float density1 = spiralDensity(jetPointPosition1, object.rotationAxis, jetHeight);
+            float density1 = spiralDensity(jetPointPosition1, object_rotationAxis, jetHeight);
 
             finalColor.rgb = mix(finalColor.rgb, jetColor, density1);
         }

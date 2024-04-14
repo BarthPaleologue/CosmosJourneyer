@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { EditorPanel } from "../editorPanel";
 import { stripAxisFromQuaternion } from "../../../utils/algebra";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
@@ -5,9 +22,10 @@ import { Slider } from "handle-sliderjs";
 import { Settings } from "../../../settings";
 import { UberScene } from "../../../uberCore/uberScene";
 import { ColorCorrection } from "../../../uberCore/postProcesses/colorCorrection";
-import { getRotationQuaternion, rotate, Transformable } from "../../../uberCore/transforms/basicTransform";
+import { getRotationQuaternion, rotate } from "../../../uberCore/transforms/basicTransform";
 
-import { BoundingSphere } from "../../../bodies/common";
+import { BoundingSphere } from "../../../architecture/boundingSphere";
+import { Transformable } from "../../../architecture/transformable";
 
 export class GeneralPanel extends EditorPanel {
     constructor() {
@@ -21,8 +39,8 @@ export class GeneralPanel extends EditorPanel {
 
         let axialTiltX = stripAxisFromQuaternion(getRotationQuaternion(body.getTransform()), Axis.Y).toEulerAngles().x;
         let axialTiltZ = stripAxisFromQuaternion(getRotationQuaternion(body.getTransform()), Axis.Y).toEulerAngles().z;
-        //TODO: do not hardcode here
-        const power = 1.4;
+
+        const power = 2.0;
 
         this.sliders = [
             new Slider("axialTiltX", document.getElementById("axialTiltX") as HTMLElement, -180, 180, Math.round((180 * axialTiltX) / Math.PI), (val: number) => {
@@ -40,9 +58,9 @@ export class GeneralPanel extends EditorPanel {
                 document.getElementById("cameraFOV") as HTMLElement,
                 0,
                 360,
-                (scene.getActiveController().getActiveCamera().fov * 360) / Math.PI,
+                (scene.getActiveControls().getActiveCamera().fov * 360) / Math.PI,
                 (val: number) => {
-                    scene.getActiveController().getActiveCamera().fov = (val * Math.PI) / 360;
+                    scene.getActiveControls().getActiveCamera().fov = (val * Math.PI) / 360;
                     Settings.FOV = (val * Math.PI) / 360;
                 }
             ),
@@ -64,6 +82,12 @@ export class GeneralPanel extends EditorPanel {
             new Slider("gamma", document.getElementById("gamma") as HTMLElement, 0, 300, colorCorrection.gamma * 100, (val: number) => {
                 colorCorrection.gamma = val / 100;
             })
+            /*new Slider("bloomThreshold", document.getElementById("bloomThreshold") as HTMLElement, 0, 100, bloom.threshold * 100, (val: number) => {
+                bloom.threshold = val / 100;
+            }),
+            new Slider("bloomWeight", document.getElementById("bloomWeight") as HTMLElement, 0, 600, bloom.weight * 100, (val: number) => {
+                bloom.weight = val / 100;
+            })*/
         ];
     }
 }

@@ -1,17 +1,47 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { AbstractObject } from "../bodies/abstractObject";
 import { ObjectOverlay } from "./objectOverlay";
-import { UberCamera } from "../uberCore/uberCamera";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Transformable } from "../architecture/transformable";
+import { BoundingSphere } from "../architecture/boundingSphere";
+import { TypedObject } from "../architecture/typedObject";
 
 export class SystemUI {
-    private readonly gui: AdvancedDynamicTexture;
+    readonly scene: Scene;
+    readonly camera: FreeCamera;
+    readonly gui: AdvancedDynamicTexture;
     private objectOverlays: ObjectOverlay[] = [];
 
-    private target: AbstractObject | null = null;
+    private target: (Transformable & BoundingSphere & TypedObject) | null = null;
 
-    constructor(scene: Scene) {
-        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, scene);
+    constructor(engine: Engine) {
+        this.scene = new Scene(engine);
+        this.scene.useRightHandedSystem = true;
+        this.scene.autoClear = false;
+
+        this.camera = new FreeCamera("UiCamera", Vector3.Zero(), this.scene);
+
+        this.gui = AdvancedDynamicTexture.CreateFullscreenUI("SystemUI", true, this.scene);
     }
 
     public setEnabled(enabled: boolean) {
@@ -22,39 +52,44 @@ export class SystemUI {
         return this.gui.rootContainer.alpha === 1;
     }
 
-    public createObjectOverlays(objects: AbstractObject[]) {
-        this.removeObjectOverlays();
+    public createObjectOverlays(objects: (Transformable & BoundingSphere & TypedObject)[]) {
+        this.disposeObjectOverlays();
 
         for (const object of objects) {
-            const overlay = new ObjectOverlay(object);
-            this.gui.addControl(overlay.textRoot);
-            this.gui.addControl(overlay.cursor);
-            this.objectOverlays.push(overlay);
-        }
-
-        for (const overlay of this.objectOverlays) {
-            overlay.init();
+            this.addObjectOverlay(object);
         }
     }
 
-    public removeObjectOverlays() {
+    public addObjectOverlay(object: Transformable & BoundingSphere & TypedObject) {
+        const overlay = new ObjectOverlay(object);
+        this.gui.addControl(overlay.textRoot);
+        this.gui.addControl(overlay.cursor);
+        this.objectOverlays.push(overlay);
+        overlay.init();
+    }
+
+    public disposeObjectOverlays() {
         for (const overlay of this.objectOverlays) {
             overlay.dispose();
         }
         this.objectOverlays = [];
     }
 
-    public update(camera: UberCamera) {
+    public update(camera: Camera) {
         for (const overlay of this.objectOverlays) {
             overlay.update(camera, this.target);
         }
     }
 
-    setTarget(object: AbstractObject | null) {
+    public setTarget(object: (Transformable & BoundingSphere & TypedObject) | null) {
         if (this.target === object) {
             this.target = null;
             return;
         }
         this.target = object;
+    }
+
+    getTarget() {
+        return this.target;
     }
 }

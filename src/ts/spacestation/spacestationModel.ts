@@ -1,27 +1,47 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { seededSquirrelNoise } from "squirrel-noise";
-import { Settings } from "../settings";
-import { BaseModel, GENERATION_STEPS, PhysicalProperties } from "../model/common";
+import { GenerationSteps } from "../model/common";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { getOrbitalPeriod } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { OrbitalObjectModel } from "../architecture/orbitalObject";
+import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
+import { CelestialBodyModel } from "../architecture/celestialBody";
+import { normalRandom } from "extended-random";
+import { clamp } from "../utils/math";
 
-export class SpaceStationModel implements BaseModel {
+export class SpaceStationModel implements OrbitalObjectModel {
     readonly seed: number;
     readonly rng: (step: number) => number;
     readonly orbit: OrbitProperties;
-    readonly physicalProperties: PhysicalProperties;
-    readonly parentBody: BaseModel | null;
-    readonly childrenBodies: BaseModel[] = [];
+    readonly physicalProperties: OrbitalObjectPhysicalProperties;
+    readonly parentBody: OrbitalObjectModel | null;
+    readonly childrenBodies: OrbitalObjectModel[] = [];
 
-    constructor(seed: number, parentBody?: BaseModel) {
+    constructor(seed: number, parentBody?: CelestialBodyModel) {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed);
 
         this.parentBody = parentBody ?? null;
         this.childrenBodies = [];
 
-        //TODO: do not hardcode
-        const orbitRadius = 3 * Settings.EARTH_RADIUS;
+        const orbitRadius = (2 + clamp(normalRandom(2, 1, this.rng, GenerationSteps.ORBIT), 0, 10)) * (parentBody?.radius ?? 0);
 
         this.orbit = {
             radius: orbitRadius,
@@ -33,8 +53,8 @@ export class SpaceStationModel implements BaseModel {
 
         this.physicalProperties = {
             mass: 1,
-            rotationPeriod: 60 * 2,
-            axialTilt: 2 * this.rng(GENERATION_STEPS.AXIAL_TILT) * Math.PI
+            rotationPeriod: 0,
+            axialTilt: 2 * this.rng(GenerationSteps.AXIAL_TILT) * Math.PI
         };
     }
 }

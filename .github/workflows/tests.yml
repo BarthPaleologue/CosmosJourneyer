@@ -6,10 +6,11 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "NextRelease", "PatchCurrentRelease" ]
 jobs:
-  build:
+  jest:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       matrix:
         node-version: [16, 18]
@@ -25,5 +26,5 @@ jobs:
         cache: 'pnpm'
     - name: Install dependencies
       run: pnpm install
-    - name: Lint
+    - name: Test
       run: pnpm run test

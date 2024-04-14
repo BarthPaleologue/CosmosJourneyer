@@ -1,10 +1,24 @@
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export function getPosition(transformNode: TransformNode): Vector3 {
-    return transformNode.position;
-}
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Space } from "@babylonjs/core/Maths/math.axis";
+import { LocalDirection } from "../localDirections";
 
 export function translate(transformNode: TransformNode, displacement: Vector3): void {
     transformNode.setAbsolutePosition(transformNode.getAbsolutePosition().add(displacement));
@@ -26,10 +40,6 @@ export function getRotationQuaternion(transformNode: TransformNode): Quaternion 
     return transformNode.rotationQuaternion;
 }
 
-export function getInverseRotationQuaternion(transformNode: TransformNode): Quaternion {
-    return getRotationQuaternion(transformNode).invert();
-}
-
 export function setRotationQuaternion(transformNode: TransformNode, newRotation: Quaternion): void {
     transformNode.rotationQuaternion = newRotation;
     transformNode.computeWorldMatrix(true);
@@ -43,26 +53,14 @@ export function setUpVector(transformNode: TransformNode, newUp: Vector3): void 
     rotate(transformNode, rotationAxis, angle);
 }
 
-export function getRotationMatrix(transformNode: TransformNode): Matrix {
-    const rotationMatrix = new Matrix();
-    getRotationQuaternion(transformNode).toRotationMatrix(rotationMatrix);
-    return rotationMatrix;
-}
-
-export function getInverseRotationMatrix(transformNode: TransformNode): Matrix {
-    const inverseRotationMatrix = new Matrix();
-    getInverseRotationQuaternion(transformNode).toRotationMatrix(inverseRotationMatrix);
-    return inverseRotationMatrix;
-}
-
 /* #region directions */
 
 /**
- * This is not equivalent to transform.forward as CosmosJourneyer uses the right-handed coordinate system
+ * This is not equivalent to `transform.forward` as Cosmos Journeyer uses the right-handed coordinate system
  * @returns the forward vector of the given transform in world space
  */
 export function getForwardDirection(transformNode: TransformNode): Vector3 {
-    return transformNode.getDirection(Axis.Z);
+    return transformNode.getDirection(LocalDirection.FORWARD);
 }
 
 /**
@@ -78,7 +76,7 @@ export function getBackwardDirection(transformNode: TransformNode): Vector3 {
  * @returns the unit vector pointing upward the player controller in world space
  */
 export function getUpwardDirection(transformNode: TransformNode): Vector3 {
-    return transformNode.getDirection(Axis.Y);
+    return transformNode.getDirection(LocalDirection.UP);
 }
 
 /**
@@ -102,11 +100,12 @@ export function getRightDirection(transformNode: TransformNode): Vector3 {
  * @returns the unit vector pointing to the left of the player controler in world space
  */
 export function getLeftDirection(transformNode: TransformNode): Vector3 {
-    return transformNode.getDirection(Axis.X);
+    return transformNode.getDirection(LocalDirection.LEFT);
 }
 
 /**
  *
+ * @param transformNode
  * @param amount
  */
 export function roll(transformNode: TransformNode, amount: number): void {
@@ -115,6 +114,7 @@ export function roll(transformNode: TransformNode, amount: number): void {
 
 /**
  *
+ * @param transformNode
  * @param amount
  */
 export function pitch(transformNode: TransformNode, amount: number): void {
@@ -123,6 +123,7 @@ export function pitch(transformNode: TransformNode, amount: number): void {
 
 /**
  *
+ * @param transformNode
  * @param amount
  */
 export function yaw(transformNode: TransformNode, amount: number): void {
@@ -130,11 +131,3 @@ export function yaw(transformNode: TransformNode, amount: number): void {
 }
 
 /* #endregion directions */
-
-export function dispose(transformNode: TransformNode): void {
-    transformNode.dispose();
-}
-
-export interface Transformable {
-    getTransform(): TransformNode;
-}

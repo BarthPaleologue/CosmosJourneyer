@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 precision highp float;
 
 varying vec3 vPosition;// position of the vertex varyingsphere space
@@ -8,15 +25,29 @@ uniform float time;
 
 uniform float seed;
 
-#pragma glslify: rotateAround = require(../utils/rotateAround.glsl)
+uniform sampler2D lut;
 
-#pragma glslify: fractalSimplex4 = require(../utils/simplex4.glsl)
+#include "../utils/rotateAround.glsl";
+
+#include "../utils/toUV.glsl";
 
 void main() {
     float plasmaSpeed = 0.005;
-    vec4 seededSamplePoint = vec4(rotateAround(vUnitSamplePoint, vec3(0.0, 1.0, 0.0), time * plasmaSpeed), mod(seed, 1e3));
+    vec3 samplePoint1 = rotateAround(vUnitSamplePoint, vec3(0.0, 1.0, 0.0), time * plasmaSpeed);
+    vec3 samplePoint2 = rotateAround(vUnitSamplePoint, vec3(0.0, 1.0, 0.0), -time * plasmaSpeed);
 
-    float noiseValue = fractalSimplex4(seededSamplePoint * 5.0, 8, 2.0, 2.0);
+    vec2 uv1 = toUV(samplePoint1);
+    vec2 df1 = fwidth(uv1);
+    if(df1.x > 0.5) df1.x = 0.0;
+
+    vec2 uv2 = toUV(samplePoint2);
+    vec2 df2 = fwidth(uv2);
+    if(df2.x > 0.5) df2.x = 0.0;
+
+    float noiseValue1 = textureLod(lut, uv1, log2(max(df1.x, df1.y) * 1024.0)).r;
+    float noiseValue2 = textureLod(lut, uv2, log2(max(df2.x, df2.y) * 1024.0)).r;
+
+    float noiseValue = noiseValue1 * noiseValue2;
 
     vec3 finalColor = starColor;
 

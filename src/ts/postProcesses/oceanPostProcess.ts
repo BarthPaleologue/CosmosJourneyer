@@ -1,40 +1,58 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Effect } from "@babylonjs/core/Materials/effect";
 
 import oceanFragment from "../../shaders/oceanFragment.glsl";
-import { Assets } from "../assets";
 import { UberScene } from "../uberCore/uberScene";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { TelluricPlanemo } from "../planemos/telluricPlanemo/telluricPlanemo";
-import { ObjectPostProcess } from "./objectPostProcess";
-import { getInverseRotationQuaternion } from "../uberCore/transforms/basicTransform";
+import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
-import { StellarObject } from "../stellarObjects/stellarObject";
-
-const shaderName = "ocean";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
+import { Assets } from "../assets";
+import { Transformable } from "../architecture/transformable";
+import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 
 export type OceanUniforms = {
-    oceanRadius: number;
     smoothness: number;
     specularPower: number;
     depthModifier: number;
     alphaModifier: number;
     waveBlendingSharpness: number;
+    time: number;
 };
 
-export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess {
+export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly oceanUniforms: OceanUniforms;
-    readonly object: TelluricPlanemo;
+    readonly object: Transformable;
 
-    constructor(name: string, planet: TelluricPlanemo, scene: UberScene, stars: StellarObject[]) {
+    constructor(name: string, planet: TelluricPlanet, scene: UberScene, stars: Transformable[]) {
+        const shaderName = "ocean";
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
+        }
+
         const oceanUniforms: OceanUniforms = {
-            oceanRadius: planet.getBoundingRadius(),
-            depthModifier: 0.001,
-            alphaModifier: 0.001,
+            depthModifier: 0.0015,
+            alphaModifier: 0.0025,
             specularPower: 1.0,
-            smoothness: 0.9,
-            waveBlendingSharpness: 0.1
+            smoothness: 0.8,
+            waveBlendingSharpness: 0.5,
+            time: 0
         };
 
         const uniforms: ShaderUniforms = [
@@ -42,61 +60,61 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             ...getStellarObjectsUniforms(stars),
             ...getActiveCameraUniforms(scene),
             {
-                name: "ocean.radius",
-                type: UniformEnumType.Float,
+                name: "ocean_radius",
+                type: UniformEnumType.FLOAT,
                 get: () => {
-                    return oceanUniforms.oceanRadius;
+                    return planet.getRadius() + planet.model.physicalProperties.oceanLevel;
                 }
             },
             {
-                name: "ocean.smoothness",
-                type: UniformEnumType.Float,
+                name: "ocean_smoothness",
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return oceanUniforms.smoothness;
                 }
             },
             {
-                name: "ocean.specularPower",
-                type: UniformEnumType.Float,
+                name: "ocean_specularPower",
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return oceanUniforms.specularPower;
                 }
             },
             {
-                name: "ocean.alphaModifier",
-                type: UniformEnumType.Float,
+                name: "ocean_alphaModifier",
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return oceanUniforms.alphaModifier;
                 }
             },
             {
-                name: "ocean.depthModifier",
-                type: UniformEnumType.Float,
+                name: "ocean_depthModifier",
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return oceanUniforms.depthModifier;
                 }
             },
             {
-                name: "ocean.waveBlendingSharpness",
-                type: UniformEnumType.Float,
+                name: "ocean_waveBlendingSharpness",
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     return oceanUniforms.waveBlendingSharpness;
                 }
             },
             {
-                name: "planetInverseRotationQuaternion",
-                type: UniformEnumType.Quaternion,
+                name: "planetInverseRotationMatrix",
+                type: UniformEnumType.MATRIX,
                 get: () => {
-                    return getInverseRotationQuaternion(planet.getTransform());
+                    return planet.getTransform().getWorldMatrix().getRotationMatrix().transpose();
                 }
             },
             {
                 name: "time",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
                     //TODO: do not hardcode the 100000
                     // use rotating time offset to prevent float imprecision and distant artifacts
-                    return this.internalTime % 100000;
+                    return oceanUniforms.time % 100000;
                 }
             }
         ];
@@ -105,16 +123,16 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             ...getSamplers(scene),
             {
                 name: "normalMap1",
-                type: SamplerEnumType.Texture,
+                type: SamplerEnumType.TEXTURE,
                 get: () => {
-                    return Assets.WaterNormalMap1;
+                    return Assets.WATER_NORMAL_MAP_1;
                 }
             },
             {
                 name: "normalMap2",
-                type: SamplerEnumType.Texture,
+                type: SamplerEnumType.TEXTURE,
                 get: () => {
-                    return Assets.WaterNormalMap2;
+                    return Assets.WATER_NORMAL_MAP_2;
                 }
             }
         ];
@@ -123,5 +141,9 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
 
         this.object = planet;
         this.oceanUniforms = oceanUniforms;
+    }
+
+    public update(deltaTime: number) {
+        this.oceanUniforms.time += deltaTime;
     }
 }

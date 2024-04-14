@@ -8,25 +8,28 @@ const isProduction = process.env.NODE_ENV === "production";
 const htmlPath = path.join(__dirname, "/src/html/");
 
 const config = {
-
     entry: {
-        showcase: "./src/ts/index.ts",
+        main: "./src/ts/index.ts",
+        alphaTestis: "./src/ts/alphaTestis.ts",
         random: "./src/ts/randomizer.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
+        physicSpaceship: "./src/ts/physicSpaceship.ts",
+        landingSimulator: "./src/ts/landingSimulator.ts",
+        characterDemo: "./src/ts/characterDemo.ts",
         playground: "./src/ts/playground.ts",
-        planetWalk: "./src/ts/planetWalk.ts",
+        xr: "./src/ts/xr.ts",
         debugAssets: "./src/ts/debugAssets.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist")
     },
     devServer: {
-        open: true,
+        open: false,
         host: "localhost",
         historyApiFallback: false,
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",
-            "Cross-Origin-Embedder-Policy": "same-origin",
+            "Cross-Origin-Embedder-Policy": "same-origin"
         }
     },
 
@@ -35,7 +38,13 @@ const config = {
             title: "Planet Engine",
             filename: "index.html",
             template: path.join(htmlPath, "index.html"),
-            chunks: ["showcase"]
+            chunks: ["main"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "Alpha Testis",
+            filename: "alphaTestis.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["alphaTestis"]
         }),
         new HtmlWebpackPlugin({
             title: "Randomizer",
@@ -50,16 +59,34 @@ const config = {
             chunks: ["blackHole"]
         }),
         new HtmlWebpackPlugin({
+            title: "Physics Spaceship",
+            filename: "physicSpaceship.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["physicSpaceship"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "Landing Simulator",
+            filename: "landingSimulator.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["landingSimulator"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "Character demo",
+            filename: "characterdemo.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["characterDemo"]
+        }),
+        new HtmlWebpackPlugin({
             title: "Playground",
             filename: "playground.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["playground"]
         }),
         new HtmlWebpackPlugin({
-            title: "Planet Walk",
-            filename: "planetwalk.html",
+            title: "XR",
+            filename: "xr.html",
             template: path.join(htmlPath, "index.html"),
-            chunks: ["planetWalk"]
+            chunks: ["xr"]
         }),
         new HtmlWebpackPlugin({
             title: "Debug Texture",
@@ -69,7 +96,6 @@ const config = {
         }),
         new MiniCssExtractPlugin()
     ],
-
 
     module: {
         rules: [
@@ -88,7 +114,7 @@ const config = {
                 use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"]
             },
             {
-                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|glb|obj|mp3)$/i,
+                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|glb|obj|mp3|babylon)$/i,
                 type: "asset"
             },
 
@@ -101,9 +127,8 @@ const config = {
             {
                 test: /\.(glsl|vs|fs|vert|frag|fx)$/,
                 exclude: /node_modules/,
-                use: ["raw-loader", "glslify-loader"]
+                use: ["ts-shader-loader"]
             }
-
 
             // Add your rules for custom modules here
             // Learn more about loaders from https://webpack.js.org/loaders/

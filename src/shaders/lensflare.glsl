@@ -1,4 +1,4 @@
-precision highp float;
+precision lowp float;
 
 // based on https://www.shadertoy.com/view/wlcyzj
 
@@ -10,13 +10,13 @@ uniform sampler2D depthSampler;// the depth map of the camera
 uniform float visibility;
 uniform vec3 clipPosition;
 
-#pragma glslify: camera = require(./utils/camera.glsl)
+#include "./utils/camera.glsl";
 
-#pragma glslify: object = require(./utils/object.glsl)
+#include "./utils/object.glsl";
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView);
+#include "./utils/worldFromUV.glsl";
 
-#pragma glslify: remap = require(./utils/remap.glsl)
+#include "./utils/remap.glsl";
 
 uniform vec3 flareColor;
 uniform float aspectRatio;
@@ -26,7 +26,7 @@ float getSun(vec2 uv){
 }
 
 //from: https://www.shadertoy.com/view/XdfXRX
-vec3 lensflares(vec2 uv, vec2 pos, out vec3 sunflare, out vec3 lensflare)
+vec3 lensflares(vec2 uv, vec2 pos)
 {
     vec2 main = uv-pos;
     vec2 uvd = uv*(length(uv));
@@ -62,15 +62,15 @@ vec3 lensflares(vec2 uv, vec2 pos, out vec3 sunflare, out vec3 lensflare)
     float f62 = max(0.01-pow(length(uvx-0.325*pos), 1.6), .0)*3.0;
     float f63 = max(0.01-pow(length(uvx-0.35*pos), 1.6), .0)*5.0;
 
-    sunflare = vec3(f0);
-    lensflare = vec3(f2+f4+f5+f6, f22+f42+f52+f62, f23+f43+f53+f63);
+    vec3 sunflare = vec3(f0);
+    vec3 lensflare = vec3(f2+f4+f5+f6, f22+f42+f52+f62, f23+f43+f53+f63);
 
     return sunflare+lensflare;
 }
 //
 
 
-
+// based on https://www.shadertoy.com/view/XsGfWV
 vec3 anflares(vec2 uv, float threshold, float intensity, float stretch, float brightness)
 {
     threshold = 1.0 - threshold;
@@ -102,8 +102,6 @@ vec3 anflares(vec2 uv, float intensity, float stretch, float brightness)
     return vec3(smoothstep(0.009, 0.0, length(uv)))*brightness;
 }
 
-
-
 void main() {
     vec4 screenColor = texture(textureSampler, vUV);
 
@@ -112,10 +110,10 @@ void main() {
         return;
     }
 
-    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(pixelWorldPosition - camera.position);
+    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 rayDir = normalize(pixelWorldPosition - camera_position);
 
-    vec3 objectDirection = normalize(object.position - camera.position);
+    vec3 objectDirection = normalize(object_position - camera_position);
 
     vec2 objectScreenPos = clipPosition.xy;
     objectScreenPos.y = 1.0 - objectScreenPos.y;
@@ -129,15 +127,27 @@ void main() {
 
     vec3 col = screenColor.rgb;
 
-    vec3 sun, sunflare, lensflare;
-    vec3 flare = lensflares(uv*1.5, mouse*1.5, sunflare, lensflare);
+    vec3 flare = lensflares(uv*1.5, mouse*1.5);
 
+    #ifdef CHEAP_FLARE
+    vec3 anflare = pow(anflares(uv-mouse, 400.0, 0.5, 0.6), vec3(4.0));
+    anflare += smoothstep(0.0025, 1.0, anflare)*10.0;
+    anflare *= smoothstep(0.0, 1.0, anflare);
+    #else
     vec3 anflare = pow(anflares(uv-mouse, 0.5, 400.0, 0.9, 0.1), vec3(4.0));
+    #endif
 
-    sun += getSun(uv-mouse) + (flare + anflare)*flareColor*2.0;
+    // if angular radius is to great, fade the anflare out
+    float angularRadius = object_radius / length(object_position - camera_position);
+    anflare *= smoothstep(0.1, 0.0, angularRadius);
+
+    vec3 sun = getSun(uv-mouse) + (flare + anflare)*flareColor*2.0;
 
     // no lensflare when looking away from the sun
     sun *= smoothstep(0.0, 0.1, dot(objectDirection, rayDir));
+
+    // no lensflare when too close to the sun
+    sun *= smoothstep(0.08, 0.0, angularRadius);
 
     col += sun * visibility;
 

@@ -1,15 +1,31 @@
-import { AbstractBody } from "../bodies/abstractBody";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { Transformable } from "../uberCore/transforms/basicTransform";
-import { BoundingSphere } from "../bodies/common";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export function nearestBody(object: TransformNode, bodies: AbstractBody[]): AbstractBody {
+import { BoundingSphere } from "../architecture/boundingSphere";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { CelestialBody } from "../architecture/celestialBody";
+import { Transformable } from "../architecture/transformable";
+
+export function nearestBody(objectPosition: Vector3, bodies: CelestialBody[]): CelestialBody {
     let distance = -1;
     if (bodies.length === 0) throw new Error("no bodieees !");
     let nearest = bodies[0];
     for (const body of bodies) {
-        const newDistance = object.getAbsolutePosition().subtract(body.getTransform().getAbsolutePosition()).length();
+        const newDistance = objectPosition.subtract(body.getTransform().getAbsolutePosition()).length();
         if (distance === -1 || newDistance < distance) {
             nearest = body;
             distance = newDistance;

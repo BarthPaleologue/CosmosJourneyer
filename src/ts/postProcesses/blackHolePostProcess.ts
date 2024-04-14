@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import blackHoleFragment from "../../shaders/blackhole.glsl";
 import { UberScene } from "../uberCore/uberScene";
 import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
@@ -10,22 +27,28 @@ import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 
-const shaderName = "blackhole";
-Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
-
-export type BlackHoleSettings = {
+export type BlackHoleUniforms = {
     accretionDiskRadius: number;
     rotationPeriod: number;
+    warpingMinkowskiFactor: number;
+    time: number;
 };
 
 export class BlackHolePostProcess extends UberPostProcess implements ObjectPostProcess {
-    readonly settings: BlackHoleSettings;
+    readonly blackHoleUniforms: BlackHoleUniforms;
     readonly object: BlackHole;
 
     constructor(blackHole: BlackHole, scene: UberScene, starfieldRotation: Quaternion) {
-        const settings: BlackHoleSettings = {
+        const shaderName = "blackhole";
+        if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
+        }
+
+        const blackHoleUniforms: BlackHoleUniforms = {
             accretionDiskRadius: blackHole.model.physicalProperties.accretionDiskRadius,
-            rotationPeriod: 1.5
+            rotationPeriod: 1.5,
+            warpingMinkowskiFactor: 2.0,
+            time: 0
         };
 
         const uniforms: ShaderUniforms = [
@@ -33,7 +56,7 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             ...getActiveCameraUniforms(scene),
             {
                 name: "starfieldRotation",
-                type: UniformEnumType.Matrix,
+                type: UniformEnumType.MATRIX,
                 get: () => {
                     const rotationMatrix = new Matrix();
                     starfieldRotation.toRotationMatrix(rotationMatrix);
@@ -42,35 +65,42 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             },
             {
                 name: "time",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
-                    return this.internalTime % (settings.rotationPeriod * 10000);
+                    return blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000);
                 }
             },
             {
                 name: "accretionDiskRadius",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
-                    return settings.accretionDiskRadius;
+                    return blackHoleUniforms.accretionDiskRadius;
+                }
+            },
+            {
+                name: "warpingMinkowskiFactor",
+                type: UniformEnumType.FLOAT,
+                get: () => {
+                    return blackHoleUniforms.warpingMinkowskiFactor;
                 }
             },
             {
                 name: "rotationPeriod",
-                type: UniformEnumType.Float,
+                type: UniformEnumType.FLOAT,
                 get: () => {
-                    return settings.rotationPeriod;
+                    return blackHoleUniforms.rotationPeriod;
                 }
             },
             {
                 name: "rotationAxis",
-                type: UniformEnumType.Vector3,
+                type: UniformEnumType.VECTOR_3,
                 get: () => {
                     return blackHole.getRotationAxis();
                 }
             },
             {
                 name: "forwardAxis",
-                type: UniformEnumType.Vector3,
+                type: UniformEnumType.VECTOR_3,
                 get: () => {
                     return getForwardDirection(blackHole.getTransform());
                 }
@@ -81,9 +111,9 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             ...getSamplers(scene),
             {
                 name: "starfieldTexture",
-                type: SamplerEnumType.Texture,
+                type: SamplerEnumType.TEXTURE,
                 get: () => {
-                    return Assets.Starfield;
+                    return Assets.STAR_FIELD;
                 }
             }
         ];
@@ -91,6 +121,10 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
         super(blackHole.name, shaderName, uniforms, samplers, scene);
 
         this.object = blackHole;
-        this.settings = settings;
+        this.blackHoleUniforms = blackHoleUniforms;
+    }
+
+    public update(deltaTime: number): void {
+        this.blackHoleUniforms.time += deltaTime;
     }
 }

@@ -1,0 +1,21 @@
+name: Check Version Bump
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  check-version:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: johnnybenson/package-json-versioned-action@v1.0.5
+        id: package-json
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if version has been updated
+        if: steps.package-json.outputs.has-updated == 'false'
+        run: |
+          echo "The version has not been updated"
+          exit 1

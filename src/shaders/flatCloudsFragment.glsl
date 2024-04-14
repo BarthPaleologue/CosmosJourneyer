@@ -1,4 +1,23 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 precision lowp float;
+
+/* disable_uniformity_analysis */
 
 varying vec2 vUV;// screen coordinates
 
@@ -6,70 +25,70 @@ varying vec2 vUV;// screen coordinates
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
-uniform sampler2D lut;
+#include "./utils/stars.glsl";
 
-uniform int nbStars;// number of stars
-#pragma glslify: stars = require(./utils/stars.glsl)
+#include "./utils/camera.glsl";
 
-#pragma glslify: camera = require(./utils/camera.glsl)
+#include "./utils/object.glsl";
 
-#pragma glslify: object = require(./utils/object.glsl)
-
-struct Clouds {
-    float layerRadius;// atmosphere radius (calculate from planet center)
-
-    float frequency;// cloud frequency
-    float detailFrequency;// cloud detail frequency
-    float coverage;// cloud power
-    float sharpness;
-
-    vec3 color;
-
-    float worleySpeed;// worley noise speed
-    float detailSpeed;// detail noise speed
-
-    float specularPower;
-    float smoothness;
-};
-uniform Clouds clouds;
+uniform float clouds_layerRadius;
+uniform float clouds_frequency;
+uniform float clouds_detailFrequency;
+uniform float clouds_coverage;
+uniform float clouds_sharpness;
+uniform vec3 clouds_color;
+uniform float clouds_worleySpeed;
+uniform float clouds_detailSpeed;
+uniform float clouds_specularPower;
+uniform float clouds_smoothness;
+uniform sampler2D clouds_lut;
 
 uniform float time;
 
-#pragma glslify: saturate = require(./utils/saturate.glsl)
+#include "./utils/saturate.glsl";
 
-#pragma glslify: remap = require(./utils/remap.glsl)
+#include "./utils/remap.glsl";
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
+#include "./utils/worldFromUV.glsl";
 
-#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
+#include "./utils/rayIntersectSphere.glsl";
 
-#pragma glslify: smoothSharpener = require(./utils/smoothSharpener.glsl)
+#include "./utils/smoothSharpener.glsl";
 
-#pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
+#include "./utils/rotateAround.glsl";
 
-#pragma glslify: computeSpecularHighlight = require(./utils/computeSpecularHighlight.glsl)
+#include "./utils/computeSpecularHighlight.glsl";
 
-#pragma glslify: removeAxialTilt = require(./utils/removeAxialTilt.glsl)
+#include "./utils/removeAxialTilt.glsl";
 
-#pragma glslify: toUV = require(./utils/toUV.glsl)
+#include "./utils/toUV.glsl";
 
 float cloudDensityAtPoint(vec3 samplePoint) {
     vec3 rotationAxisPlanetSpace = vec3(0.0, 1.0, 0.0);
 
-    vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds.worleySpeed);
-    vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds.detailSpeed);
+    vec3 samplePointRotatedWorley = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds_worleySpeed);
+    vec3 samplePointRotatedDetail = rotateAround(samplePoint, rotationAxisPlanetSpace, time * clouds_detailSpeed);
 
-    float density = 1.0 - texture2D(lut, toUV(samplePointRotatedWorley)).r;
+    vec2 uvWorley = toUV(samplePointRotatedWorley);
+    vec2 uvDetail = toUV(samplePointRotatedDetail);
 
-    density *= texture2D(lut, toUV(samplePointRotatedDetail)).g;
+    // trick from https://www.shadertoy.com/view/3dVSzm to avoid Greenwich artifacts
+    vec2 dfWorley = fwidth(uvWorley);
+    if(dfWorley.x > 0.5) dfWorley.x = 0.0;
+
+    vec2 dfDetail = fwidth(uvDetail);
+    if(dfDetail.x > 0.5) dfDetail.x = 0.0;
+
+    float density = textureLod(clouds_lut, uvWorley, log2(max(dfWorley.x, dfWorley.y) * 1024.0)).r;
+    density *= textureLod(clouds_lut, uvDetail, log2(max(dfDetail.x, dfDetail.y) * 1024.0)).g;
 
     float cloudThickness = 2.0;//TODO: make this a uniform
 
     density = saturate(density * cloudThickness);
 
-    density = smoothstep(clouds.coverage, 1.0, density);
+    density = smoothstep(clouds_coverage, 1.0, density);
 
-    density = smoothSharpener(density, clouds.sharpness);
+    density = smoothSharpener(density, clouds_sharpness);
 
     return density;
 }
@@ -77,23 +96,23 @@ float cloudDensityAtPoint(vec3 samplePoint) {
 float computeCloudCoverage(vec3 rayOrigin, vec3 rayDir, float maximumDistance, out vec3 cloudNormal) {
     float impactPoint, escapePoint;
 
-    if (!(rayIntersectSphere(rayOrigin, rayDir, object.position, clouds.layerRadius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(rayOrigin, rayDir, object_position, clouds_layerRadius, impactPoint, escapePoint))) {
         return 0.0;// if not intersecting with atmosphere, return original color
     }
 
     // if ray intersect ocean, update maximum distance (the ocean is not it the depth buffer)
     float waterImpact, waterEscape;
-    if (rayIntersectSphere(rayOrigin, rayDir, object.position, object.radius, waterImpact, waterEscape)) {
+    if (rayIntersectSphere(rayOrigin, rayDir, object_position, object_radius, waterImpact, waterEscape)) {
         maximumDistance = min(maximumDistance, waterImpact);
     }
 
     if (impactPoint > maximumDistance || escapePoint < 0.0) return 0.0;
 
-    vec3 planetSpacePoint1 = normalize(rayOrigin + impactPoint * rayDir - object.position);
-    vec3 planetSpacePoint2 = normalize(rayOrigin + escapePoint * rayDir - object.position);
+    vec3 planetSpacePoint1 = normalize(rayOrigin + impactPoint * rayDir - object_position);
+    vec3 planetSpacePoint2 = normalize(rayOrigin + escapePoint * rayDir - object_position);
 
-    vec3 samplePoint1 = removeAxialTilt(planetSpacePoint1, object.rotationAxis);
-    vec3 samplePoint2 = removeAxialTilt(planetSpacePoint2, object.rotationAxis);
+    vec3 samplePoint1 = removeAxialTilt(planetSpacePoint1, object_rotationAxis);
+    vec3 samplePoint2 = removeAxialTilt(planetSpacePoint2, object_rotationAxis);
 
     float cloudDensity = 0.0;
     float cloudDensity1 = 0.0;
@@ -120,19 +139,22 @@ float computeCloudCoverage(vec3 rayOrigin, vec3 rayDir, float maximumDistance, o
 float cloudShadows(vec3 closestPoint) {
     float lightAmount = 1.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 sunDir = normalize(stars[i].position - closestPoint);
+        // direction to sun from point
+        vec3 sunDir = normalize(star_positions[i] - closestPoint);
 
+        // if ray toward sun does not intersect the cloud layer, then there can't be any cloud shadow
         float t0, t1;
-        if (!rayIntersectSphere(closestPoint, sunDir, object.position, clouds.layerRadius, t0, t1)) continue;
+        if (!rayIntersectSphere(closestPoint, sunDir, object_position, clouds_layerRadius, t0, t1)) continue;
 
-        vec3 samplePoint = normalize(closestPoint + t1 * sunDir - object.position);
+        // get the point of intersection with the cloud layer
+        vec3 samplePoint = normalize(closestPoint + t1 * sunDir - object_position);
         if (dot(samplePoint, sunDir) < 0.0) continue;
-        samplePoint = removeAxialTilt(samplePoint, object.rotationAxis);
+        samplePoint = removeAxialTilt(samplePoint, object_rotationAxis);
         float density = cloudDensityAtPoint(samplePoint);
         lightAmount -= density;
     }
 
-    return 0.2 + saturate(lightAmount) / 0.8;
+    return 0.4 + saturate(lightAmount) * 0.6;
 }
 
 void main() {
@@ -140,37 +162,43 @@ void main() {
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
 
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
+    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
 
-    vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
+    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
-    vec3 closestPoint = camera.position + rayDir * maximumDistance;
+    vec3 closestPoint = camera_position + rayDir * maximumDistance;
+    float t0, t1;
+    if (rayIntersectSphere(camera_position, rayDir, object_position, object_radius, t0, t1)) {
+        closestPoint = camera_position + rayDir * min(t0, maximumDistance);
+    }
 
     vec4 finalColor = screenColor;
-    if (length(closestPoint - object.position) < clouds.layerRadius) finalColor.rgb *= cloudShadows(closestPoint);
+
+    // if the closest point is below the cloud layer, we must account for shadows
+    if (length(closestPoint - object_position) < clouds_layerRadius) finalColor.rgb *= cloudShadows(closestPoint);
 
     vec3 cloudNormal;
-    float cloudDensity = computeCloudCoverage(camera.position, rayDir, maximumDistance, cloudNormal);
+    float cloudDensity = computeCloudCoverage(camera_position, rayDir, maximumDistance, cloudNormal);
 
     if (cloudDensity > 0.0) {
         float ndl = 0.0;// dimming factor due to light inclination relative to vertex normal in world space
         float specularHighlight = 0.0;
         for (int i = 0; i < nbStars; i++) {
-            vec3 sunDir = normalize(stars[i].position - object.position);
+            vec3 sunDir = normalize(star_positions[i] - object_position);
 
             ndl += max(dot(cloudNormal, sunDir), -0.3) + 0.3;
 
-            if (length(camera.position - object.position) > clouds.layerRadius) {
+            if (length(camera_position - object_position) > clouds_layerRadius) {
                 // if above cloud coverage then specular highlight
-                specularHighlight += computeSpecularHighlight(sunDir, rayDir, cloudNormal, clouds.smoothness, clouds.specularPower);
+                specularHighlight += computeSpecularHighlight(sunDir, rayDir, cloudNormal, clouds_smoothness, clouds_specularPower);
             }
         }
         ndl = saturate(ndl);
 
-        vec3 ambiant = mix(finalColor.rgb, ndl * clouds.color, cloudDensity);
+        vec3 ambiant = mix(finalColor.rgb * (1.0 - cloudDensity), ndl * clouds_color, cloudDensity);
 
         finalColor.rgb = ambiant + specularHighlight * cloudDensity;
     }

@@ -1,5 +1,7 @@
 precision highp float;
 
+/* disable_uniformity_analysis */
+
 // based on https://www.shadertoy.com/view/tsBXW3
 
 #define DISK_STEPS 12.0//disk texture layers
@@ -8,10 +10,11 @@ varying vec2 vUV;
 
 uniform float time;
 
-#pragma glslify: object = require(./utils/object.glsl)
+#include "./utils/object.glsl";
 
 uniform float accretionDiskRadius;
 uniform float rotationPeriod;
+uniform float warpingMinkowskiFactor;
 
 //TODO: make these uniforms
 const float accretionDiskHeight = 100.0;
@@ -24,17 +27,17 @@ uniform sampler2D starfieldTexture;
 
 uniform mat4 starfieldRotation;
 
-#pragma glslify: camera = require(./utils/camera.glsl)
+#include "./utils/camera.glsl";
 
-#pragma glslify: remap = require(./utils/remap.glsl)
+#include "./utils/remap.glsl";
 
-#pragma glslify: worldFromUV = require(./utils/worldFromUV.glsl, inverseProjection=camera.inverseProjection, inverseView=camera.inverseView)
+#include "./utils/worldFromUV.glsl";
 
-#pragma glslify: uvFromWorld = require(./utils/uvFromWorld.glsl, projection=camera.projection, view=camera.view)
+#include "./utils/uvFromWorld.glsl";
 
-#pragma glslify: rotateAround = require(./utils/rotateAround.glsl)
+#include "./utils/rotateAround.glsl";
 
-#pragma glslify: rayIntersectSphere = require(./utils/rayIntersectSphere.glsl)
+#include "./utils/rayIntersectSphere.glsl";
 
 vec3 projectOnPlane(vec3 vector, vec3 planeNormal) {
     return vector - dot(vector, planeNormal) * planeNormal;
@@ -66,10 +69,10 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
     vec3 samplePoint = initialPosition;
     float distanceToCenter = length(samplePoint);// distance to the center of the disk
-    float relativeDistance = distanceToCenter / object.radius;
-    float relativeDiskRadius = accretionDiskRadius / object.radius;
+    float relativeDistance = distanceToCenter / object_radius;
+    float relativeDiskRadius = accretionDiskRadius / object_radius;
 
-    vec3 diskNormal = object.rotationAxis;
+    vec3 diskNormal = object_rotationAxis;
 
     vec3 projectedRayDir = projectOnPlane(rayDir, diskNormal);
     vec3 projectedInitialPosition = projectOnPlane(initialPosition, diskNormal);
@@ -78,7 +81,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
     float stepSize = 0.02 * distanceToCenter / projectionDistance;//FIXME: this is not correct, but it works
 
-    samplePoint += stepSize * rayDir;//FIXME: somehow when I remove this line, the disk has no height.
+    samplePoint += stepSize * rayDir;//FIXME: somehow when I remove this line, the disk has no thickness
 
     // elementary rotation around the hole
     vec3 deltaPos = rotateAround(projectedInitialPosition, diskNormal, 0.01);
@@ -93,7 +96,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
     vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
     vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix);
 
-    vec3 redShiftMult = mix(vec3(0.4, 0.2, 0.1) * 0.5, vec3(1.6, 1.0, 2.0) * 3.0, redShift);//FIXME: need more realistic redshift
+    vec3 redShiftMult = mix(vec3(1.6, 1.0, 2.0) * 3.0, vec3(0.4, 0.2, 0.1) * 0.5, redShift);//FIXME: need more realistic redshift
     insideCol *= redShiftMult;
 
     vec4 diskColor = vec4(0.0);
@@ -104,7 +107,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
         float intensity = 1.0 - (i / DISK_STEPS);
         distanceToCenter = length(samplePoint);
-        relativeDistance = distanceToCenter / object.radius;
+        relativeDistance = distanceToCenter / object_radius;
 
         float diskMask = 1.0;
         diskMask *= clamp(relativeDistance - 1.2, 0.0, 1.0);// The 1.2 is only for aesthetics
@@ -134,27 +137,32 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
  * The bending is tweaked to reach 0 when far enough so that we can skip some calculations
  */
 vec3 bendRay(vec3 rayDir, vec3 blackholeDir, float distanceToCenter2, float maxBendDistance, float stepSize) {
-    float bendForce = object.radius / distanceToCenter2; //bending force
-    bendForce -= object.radius / (maxBendDistance * maxBendDistance); // bend force is 0 at maxBendDistance
+    float bendForce = object_radius / distanceToCenter2; //bending force
+    bendForce -= object_radius / (maxBendDistance * maxBendDistance); // bend force is 0 at maxBendDistance
     bendForce = stepSize * max(0.0, bendForce); // multiply by step size, and clamp negative values
     return normalize(rayDir + bendForce * blackholeDir); //bend ray towards BH
+}
+
+float customLength(vec3 v) {
+    float p = warpingMinkowskiFactor;
+    return pow(pow(abs(v.x), p) + pow(abs(v.y), p) + pow(abs(v.z), p), 1.0 / p);
 }
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
-    vec3 pixelWorldPosition = worldFromUV(vUV);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(pixelWorldPosition - camera.position);// normalized direction of the ray
+    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera.position) * remap(depth, 0.0, 1.0, camera.near, camera.far);
+    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
 
-    float maxBendDistance = max(accretionDiskRadius * 3.0, object.radius * 15.0);
+    float maxBendDistance = max(accretionDiskRadius * 3.0, object_radius * 15.0);
 
     float t0, t1;
-    if(!rayIntersectSphere(camera.position, rayDir, object.position, maxBendDistance, t0, t1)) {
+    if(!rayIntersectSphere(camera_position, rayDir, object_position, maxBendDistance, t0, t1)) {
         // the light ray will not be affected by the black hole, we can skip the calculations
         gl_FragColor = screenColor;
         return;
@@ -162,13 +170,13 @@ void main() {
 
     vec4 colOut = vec4(0.0);
 
-    vec3 positionBHS = camera.position - object.position;// position of the camera in blackhole space
+    vec3 rayPositionBlackHoleSpace = camera_position - object_position;// position of the camera in blackhole space
 
     bool suckedInBH = false;
     bool escapedBH = false;
     bool occluded = false;
 
-    if (maximumDistance < length(positionBHS)) occluded = true;
+    if (maximumDistance < length(rayPositionBlackHoleSpace)) occluded = true;
 
     vec4 col = vec4(0.0);
     vec4 glow = vec4(0.0);
@@ -185,38 +193,38 @@ void main() {
 
             for (int h = 0; h < 6; h++) {
                 //reduces tests for exit conditions (to minimise branching)
-                distanceToCenter = length(positionBHS);//distance to BH
-                vec3 blackholeDir = -positionBHS / distanceToCenter;//direction to BH
+                distanceToCenter = customLength(rayPositionBlackHoleSpace);//distance to BH
+                vec3 blackholeDir = -rayPositionBlackHoleSpace / distanceToCenter;//direction to BH
                 float distanceToCenter2 = distanceToCenter * distanceToCenter;
 
-                projectedPosition = projectOnPlane(positionBHS, object.rotationAxis);
-                projectedDistance = length(projectedPosition - positionBHS);
+                projectedPosition = projectOnPlane(rayPositionBlackHoleSpace, object_rotationAxis);
+                projectedDistance = length(projectedPosition - rayPositionBlackHoleSpace);
 
-                projectedRayDir = projectOnPlane(rayDir, object.rotationAxis);
+                projectedRayDir = projectOnPlane(rayDir, object_rotationAxis);
                 rayDirProjectedDistance = length(projectedRayDir - rayDir);
 
                 float stepSize = 0.92 * projectedDistance / rayDirProjectedDistance;//conservative distance to disk (y==0)
                 float farLimit = distanceToCenter * 0.5;//limit step size far from to BH
-                float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / object.radius;//limit step size close to BH
+                float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / object_radius;//limit step size close to BH
                 stepSize = min(stepSize, min(farLimit, closeLimit));
 
                 rayDir = bendRay(rayDir, blackholeDir, distanceToCenter2, maxBendDistance, stepSize);
-                positionBHS += stepSize * rayDir;
+                rayPositionBlackHoleSpace += stepSize * rayDir;
 
                 //TODO: improve glow
-                //glow += vec4(1.2,1.1,1, 1.0) * (0.2 * (object.radius / distanceToCenter2) * stepSize * clamp(distanceToCenter / object.radius - 1.2, 0.0, 1.0)); //adds fairly cheap glow
+                //glow += vec4(1.2,1.1,1, 1.0) * (0.2 * (object_radius / distanceToCenter2) * stepSize * clamp(distanceToCenter / object_radius - 1.2, 0.0, 1.0)); //adds fairly cheap glow
             }
 
-            if (distanceToCenter < object.radius) {
+            if (distanceToCenter < object_radius) {
                 suckedInBH = true;
                 break;
-            } else if (distanceToCenter > object.radius * 5000.0) {
+            } else if (distanceToCenter > object_radius * 5000.0) {
                 escapedBH = true;
                 break;
             } else if (projectedDistance <= accretionDiskHeight) {
                 //ray hit accretion disk //FIXME: Break when rotate around edge of disk
-                vec4 diskCol = raymarchDisk(rayDir, positionBHS);//render disk
-                positionBHS += accretionDiskHeight * rayDir / rayDirProjectedDistance;// we get out of the disk
+                vec4 diskCol = raymarchDisk(rayDir, rayPositionBlackHoleSpace);//render disk
+                rayPositionBlackHoleSpace += accretionDiskHeight * rayDir / rayDirProjectedDistance;// we get out of the disk
                 col += diskCol * (1.0 - col.a);
             }
 
@@ -225,24 +233,27 @@ void main() {
     }
 
     // getting the screen coordinate of the end of the bended ray
-    vec2 uv = uvFromWorld(positionBHS);
+    vec2 uv = uvFromWorld(rayPositionBlackHoleSpace + object_position, camera_projection, camera_view);
     // check if there is an object occlusion
-    vec3 pixelWorldPositionEndRay = worldFromUV(uv);// the pixel position in world space (near plane)
-    vec3 rayDirToEndRay = normalize(pixelWorldPositionEndRay - camera.position);// normalized direction of the ray
+    vec3 pixelWorldPositionEndRay = worldFromUV(uv, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 rayDirToEndRay = normalize(pixelWorldPositionEndRay - camera_position);// normalized direction of the ray
 
-    float epsilon = 0.01;
-    float depthEndRay1 = texture2D(depthSampler, uv + vec2(epsilon, 0.0)).r;// the depth corresponding to the pixel in the depth map
-    float depthEndRay2 = texture2D(depthSampler, uv + vec2(-epsilon, 0.0)).r;// the depth corresponding to the pixel in the depth map
-    float depthEndRay3 = texture2D(depthSampler, uv + vec2(0.0, epsilon)).r;// the depth corresponding to the pixel in the depth map
-    float depthEndRay4 = texture2D(depthSampler, uv + vec2(0.0 -epsilon)).r;// the depth corresponding to the pixel in the depth map
-    float depthEndRay = min(min(depthEndRay1, depthEndRay2), min(depthEndRay3, depthEndRay4));
+    float depthEndRay = texture2D(depthSampler, uv).r;// the depth corresponding to the pixel in the depth map
+    for(int i = 0; i < 10; i++) {
+        vec2 offset = (vec2(hash(float(i)), hash(float(i + 1))) - 0.5) * 0.01;
+        depthEndRay = min(depthEndRay, texture2D(depthSampler, uv + offset).r);
+    }
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPointEndRay = (pixelWorldPositionEndRay - camera.position) * remap(depthEndRay, 0.0, 1.0, camera.near, camera.far);
+    vec3 closestPointEndRay = (pixelWorldPositionEndRay - camera_position) * remap(depthEndRay, 0.0, 1.0, camera_near, camera_far);
     float maximumDistanceEndRay = length(closestPointEndRay);// the maxium ray length due to occlusion
-    float BHDistance = length(camera.position - object.position);
+    float BHDistance = length(camera_position - object_position);
+
+    bool behindBH = dot(closestPointEndRay - camera_position, closestPointEndRay - object_position) >= 0.0;
+    // checking for alignment: camera, object, blackhole in this order
+    behindBH = behindBH && dot(closestPointEndRay - camera_position, object_position - camera_position) >= 0.0;
 
     vec4 bg = vec4(0.0);
-    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0 && maximumDistanceEndRay > BHDistance - object.radius) {
+    if(uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0 && behindBH) {
         bg = texture2D(textureSampler, uv);
     } else {
         rayDir = vec3(starfieldRotation * vec4(rayDir, 1.0));
