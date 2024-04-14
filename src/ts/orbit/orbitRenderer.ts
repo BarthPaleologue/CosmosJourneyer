@@ -93,7 +93,7 @@ export class OrbitRenderer {
     }
 
     private reset() {
-        this.orbitMeshes.forEach((orbitMesh) => orbitMesh.dispose());
+        this.orbitMeshes.forEach((orbitMesh) => orbitMesh.dispose(false, false, true));
         this.orbitMeshes = [];
         this.orbitalObjects = [];
     }
