@@ -126,11 +126,14 @@
 
   p {
     color: white;
-    white-space: pre-line; // necessary to use \n in the text
     font-family: Nasalization, sans-serif;
     line-height: 1.5em;
     font-size: 1.25em;
     padding: 0 20px;
+
+    &[data-i18n] {
+      white-space: pre-line; // necessary to use \n in the text
+    }
 
     &.signature {
       text-align: right;
