@@ -28,22 +28,21 @@ import { Scene } from "@babylonjs/core/scene";
 export class AxisRenderer {
     private axisMeshes: LinesMesh[] = [];
 
-    private axisMaterial: StandardMaterial | null = null;
+    private readonly axisMaterial: StandardMaterial;
 
     private _isVisible = false;
+
+    constructor(scene: Scene) {
+        this.axisMaterial = new StandardMaterial("axisMaterial", scene);
+        this.axisMaterial.emissiveColor = Color3.White();
+        this.axisMaterial.disableLighting = true;
+    }
 
     /**
      * Disposes all previously created axis meshes by calling reset() and then creates new axis meshes for the given objects
      * @param objects
-     * @param scene
      */
-    setOrbitalObjects(objects: (Transformable & BoundingSphere)[], scene: Scene) {
-        if (this.axisMaterial === null) {
-            this.axisMaterial = new StandardMaterial("axisMaterial", scene);
-            this.axisMaterial.emissiveColor = Color3.White();
-            this.axisMaterial.disableLighting = true;
-        }
-
+    setOrbitalObjects(objects: (Transformable & BoundingSphere)[]) {
         this.reset();
 
         for (const object of objects) {

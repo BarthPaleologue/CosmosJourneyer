@@ -116,13 +116,13 @@ export class StarSystemView implements View {
      * A debug helper to display the orbits of the orbital objects
      * @private
      */
-    private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer();
+    private readonly orbitRenderer: OrbitRenderer;
 
     /**
      * A debug helper to display the axes of the orbital objects
      * @private
      */
-    private readonly axisRenderer: AxisRenderer = new AxisRenderer();
+    private readonly axisRenderer: AxisRenderer;
 
     /**
      * The GPU accelerated GUI used to display orbital objects overlays and information when targeted.
@@ -341,6 +341,9 @@ export class StarSystemView implements View {
 
         this.postProcessManager = new PostProcessManager(this.scene);
 
+        this.orbitRenderer = new OrbitRenderer(this.scene);
+        this.axisRenderer = new AxisRenderer(this.scene);
+
         // main update loop for the star system
         this.scene.onBeforePhysicsObservable.add(() => {
             const deltaSeconds = engine.getDeltaTime() / 1000;
@@ -441,8 +444,8 @@ export class StarSystemView implements View {
         starSystem.initPositions(2, this.chunkForge, this.postProcessManager);
         this.ui.createObjectOverlays(starSystem.getOrbitalObjects());
 
-        this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
-        this.axisRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
+        this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects());
+        this.axisRenderer.setOrbitalObjects(starSystem.getOrbitalObjects());
 
         this.helmetOverlay.setTarget(null);
 

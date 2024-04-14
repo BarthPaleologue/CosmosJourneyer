@@ -28,17 +28,17 @@ export class OrbitRenderer {
 
     private orbitalObjects: OrbitalObject[] = [];
 
-    private orbitMaterial: StandardMaterial | null = null;
+    private readonly orbitMaterial: StandardMaterial;
 
     private _isVisible = false;
 
-    setOrbitalObjects(orbitalObjects: OrbitalObject[], scene: Scene) {
-        if (this.orbitMaterial === null) {
-            this.orbitMaterial = new StandardMaterial("orbitMaterial", scene);
-            this.orbitMaterial.emissiveColor = Color3.White();
-            this.orbitMaterial.disableLighting = true;
-        }
+    constructor(scene: Scene) {
+        this.orbitMaterial = new StandardMaterial("orbitMaterial", scene);
+        this.orbitMaterial.emissiveColor = Color3.White();
+        this.orbitMaterial.disableLighting = true;
+    }
 
+    setOrbitalObjects(orbitalObjects: OrbitalObject[]) {
         this.reset();
         this.orbitalObjects = orbitalObjects;
 
