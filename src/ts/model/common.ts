@@ -33,8 +33,8 @@ export const enum GenerationSteps {
     TEMPERATURE = 1100,
     STELLAR_TYPE = 1900,
 
-    PRESSURE = 1100,
-    WATER_AMOUNT = 1200,
+    PRESSURE = 1800,
+    WATER_AMOUNT = 1700,
     TERRAIN = 1500,
 
     SPACE_STATIONS = 2000

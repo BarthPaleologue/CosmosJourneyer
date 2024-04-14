@@ -28,7 +28,7 @@ const enum GenerationSteps {
     GENERATE_STARS = 21,
     NB_PLANETS = 30,
     GENERATE_PLANETS = 200,
-    CHOOSE_PLANET_TYPE = 200
+    CHOOSE_PLANET_TYPE = 400
 }
 
 export class StarSystemModel {
