@@ -18,6 +18,8 @@ The main deployment of the procedural universe can be accessed https://barthpale
 
 The documentation is online at https://barthpaleologue.github.io/CosmosJourneyer/docs/
 
+Additionally, the [ARCHITECTURE.md](./ARCHITECTURE.md) file contains a big picture explanation of the architecture of the project.
+
 To build it locally, run `npm run docs` and then `npm run serve:docs` to serve it at `localhost:8081`.
 
 ## Contributing
@@ -27,6 +29,10 @@ Contributions are welcome! There is too much to do for one person alone.
 If you want to contribute, you will find guidelines and ideas [here](./CONTRIBUTING.md).
 
 ## Sponsor
+
+Developing Cosmos Journeyer is time-consuming and generates no revenue since it is free and open-source.
+
+If you like the project, please consider sponsoring it on [Patreon](https://www.patreon.com/barthpaleologue) or [GitHub Sponsors](
 
 The project has a ko-fi page at https://ko-fi.com/cosmosjourneyer if you feel like sponsoring the project!
 
