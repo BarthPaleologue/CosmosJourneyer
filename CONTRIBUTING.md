@@ -18,9 +18,12 @@ Pull requests are welcome! If you want to contribute code, please follow these s
 
 1. Get familiar with the project by reading the [architecture document](ARCHITECTURE.md)
 2. Fork the repository
-3. Create a new branch from the `NextRelease` branch
+3. Create a new branch from the `main` branch:
+   ```sh
+   git checkout -b [name_of_your_new_branch]
+   ```
 4. Commit & push your changes
-5. Open a pull request to the `NextRelease` branch
+5. Open a pull request to the `main` branch
 
 You can open a draft pull request if you want to get feedback on your changes before they are ready to be merged.
 
