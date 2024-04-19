@@ -1,12 +1,24 @@
-# Architecture of interface spanning from simple Transforms to complex Celestial bodies and Space stations:
+# Cosmos Journeyer's Architecture
 
-![img.png](img.png)
+Cosmos Journeyer is designed with a clear separation of concerns in mind. If you are willing to contribute, this document will give you a good idea of where everything is and how it is organized.
 
-This folder contains all the abstraction necessary to the architecture of the image. 
+## General architecture
 
-This means all the node except the leaves (upper nodes) which are the actual concrete implementation of celestial bodies and space stations.
+The following diagram is not an inheritance diagram, but a composition diagram. Each arrow represents an "is part of" relationship.
 
-It all starts with simple `Transformable` and `BoundingSphere`: 
+For example, planets are part of the celestial bodies.
+
+![Cosmos Journeyer's Architecture Diagram](coverImages/architecture_diagram.png)
+
+## Orbital Object's interfaces relations
+
+Even though you could argue the existence of an "is a" relationship between `CelestialBody` and `OrbitalObject`, I chose to avoid class inheritance for flexibility.
+
+This means that in the previous diagram, in the `Orbital Objects` tree, are only classes the concrete types: `Star`, `BlackHole`, `NeutronStar`, `TelluricPlanet`, `GasPlanet`, and `SpaceStation`. The rest is only interfaces:
+
+![Orbital Object's interfaces relations](coverImages/orbitalObjectsInterfaces.png)
+
+It all starts with simple `Transformable` and `BoundingSphere`:
 those are simple objects that possess a BaylonJS `TransformNode` for their position, rotation, scaling and a bounding volume to make simple calculations for distances.
 
 An `OrbitalObject` builds on top of this by adding the notion of orbit. They possess `OrbitProperties` that describes their motion around their `parent` which can be null in the case of some objects (think like stars).
@@ -17,7 +29,7 @@ To sum up, an `OrbitalObject` is an object that can rotate around another `Orbit
 
 `CelestialBody` builds up on top of `OrbitalObject` by adding the notion of `BODY_TYPE` and `radius` that is expected from spherical objects.
 
-`CelestialBody` are spherical orbital objects that encompasses both planets and stellar objects. 
+`CelestialBody` are spherical orbital objects that encompasses both planets and stellar objects.
 They can have specific post-processes applied to them (like atmosphere, clouds, rings...), which is why they also implement `HasPostProcesses`.
 
 `StellarObject` builds on top of `CelestialBody` by adding a `PointLight` that is used to light up the scene. They also have a `STELLAR_TYPE` that describes their type (star, black hole, neutron star).

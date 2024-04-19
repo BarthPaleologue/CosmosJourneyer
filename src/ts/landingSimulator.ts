@@ -65,7 +65,7 @@ const physicsViewer = new PhysicsViewer();
 /*physicsViewer.showBody(spaceship.aggregate.body);
 physicsViewer.showBody(landingPad.aggregate.body);*/
 
-const spacestation = new SpaceStation(scene);
+const spacestation = new SpaceStation(scene, 42);
 setRotationQuaternion(spacestation.getTransform(), Quaternion.RotationAxis(Axis.X, Math.PI / 2));
 translate(spacestation.getTransform(), new Vector3(0, -100, 0));
 

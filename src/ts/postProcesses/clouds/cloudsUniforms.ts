@@ -173,7 +173,7 @@ export class CloudsUniforms {
             this.lut = lut;
         }
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             if (this.lut === null) throw new Error("LUT is null when creating promise");
             this.lut.executeWhenReady(() => {
                 if (this.lut === null) throw new Error("LUT is null when executing when ready");

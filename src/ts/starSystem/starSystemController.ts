@@ -33,7 +33,7 @@ import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { SystemSeed } from "../utils/systemSeed";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { OrbitalObject } from "../architecture/orbitalObject";
+import { OrbitalObject, OrbitalObjectUtils } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
 import { Planet } from "../architecture/planet";
@@ -368,7 +368,7 @@ export class StarSystemController {
         // By doing so, their rotation axis on themselves except the fixed one must as well be rotated in the same way.
         // Last but not least, the background starfield must be rotated in the opposite direction to give the impression the moon is rotating.
         if (shouldCompensateRotation) {
-            const dthetaNearest = OrbitalObject.GetRotationAngle(nearestBody, deltaTime);
+            const dthetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestBody, deltaTime);
 
             for (const object of this.orbitalObjects) {
                 const orbit = object.getOrbitProperties();
@@ -392,7 +392,7 @@ export class StarSystemController {
             this.universeRotation.copyFrom(starfieldAdditionalRotation.multiply(this.universeRotation));
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
-            OrbitalObject.UpdateRotation(nearestBody, deltaTime);
+            OrbitalObjectUtils.UpdateRotation(nearestBody, deltaTime);
         }
 
         // TRANSLATION COMPENSATION
@@ -400,7 +400,7 @@ export class StarSystemController {
         // compute what would be its next position if it were to move normally.
         // This gives us a translation vector that we can negate and apply to all other bodies.
         const initialPosition = nearestBody.getTransform().getAbsolutePosition().clone();
-        const newPosition = OrbitalObject.GetNextOrbitalPosition(nearestBody, deltaTime);
+        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(nearestBody, deltaTime);
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         if (shouldCompensateTranslation) {
             const negatedDisplacement = nearestBodyDisplacement.negate();
@@ -423,8 +423,8 @@ export class StarSystemController {
         for (const object of this.orbitalObjects) {
             if (object === nearestBody) continue;
 
-            OrbitalObject.UpdateOrbitalPosition(object, deltaTime);
-            OrbitalObject.UpdateRotation(object, deltaTime);
+            OrbitalObjectUtils.UpdateOrbitalPosition(object, deltaTime);
+            OrbitalObjectUtils.UpdateRotation(object, deltaTime);
         }
 
         controller.update(deltaTime);
@@ -432,10 +432,7 @@ export class StarSystemController {
         for (const body of this.telluricPlanets) {
             // Meshes with LOD are updated (surface quadtrees)
             body.updateLOD(controller.getTransform().getAbsolutePosition(), chunkForge);
-        }
-
-        for (const object of this.telluricPlanets) {
-            object.computeCulling(controller.getActiveCamera());
+            body.computeCulling(controller.getActiveCamera());
         }
 
         for (const object of this.gasPlanets) {
@@ -443,6 +440,7 @@ export class StarSystemController {
         }
 
         for (const object of this.spaceStations) {
+            object.updateRings(deltaTime);
             object.computeCulling(controller.getActiveCamera());
         }
 

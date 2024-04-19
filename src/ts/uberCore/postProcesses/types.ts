@@ -19,7 +19,7 @@ import { Matrix, Quaternion, Vector3, Vector4 } from "@babylonjs/core/Maths/math
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
-export enum UniformEnumType {
+export const enum UniformEnumType {
     /**
      * The type to use when BabylonJS manages the uniform itself (like textureSampler)
      */
@@ -70,7 +70,7 @@ export enum UniformEnumType {
     COLOR_3_ARRAY
 }
 
-export enum SamplerEnumType {
+export const enum SamplerEnumType {
     AUTO,
     TEXTURE
 }

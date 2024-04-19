@@ -40,6 +40,7 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
+import i18n from "../../i18n";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -112,7 +113,7 @@ export class NeutronStar implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return "Neutron Star";
+        return i18n.t("objectTypes:neutronStar");
     }
 
     getRotationAxis(): Vector3 {

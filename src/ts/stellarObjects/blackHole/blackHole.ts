@@ -30,6 +30,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
+import i18n from "../../i18n";
 
 export class BlackHole implements StellarObject, Cullable {
     readonly name: string;
@@ -88,7 +89,7 @@ export class BlackHole implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return "Black Hole";
+        return i18n.t("objectTypes:blackHole");
     }
 
     public computeCulling(camera: Camera): void {

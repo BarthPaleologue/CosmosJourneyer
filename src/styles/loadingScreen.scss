@@ -1,0 +1,48 @@
+#babylonjsLoadingDiv {
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+  display: grid;
+  grid-template-rows: 100%;
+  grid-template-columns: 100%;
+  justify-items: center;
+  align-items: center;
+}
+
+.imageSpinnerContainer {
+  width: 300px;
+  grid-column: 1;
+  grid-row: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+
+  .loadingSpinner {
+    animation: spin1 0.75s infinite linear;
+    transform-origin: 50% 50%;
+  }
+}
+
+.loadingText {
+  margin-top: 160px;
+  font-family: Nasalization, sans-serif;
+  font-size: 1.5em;
+  color: white;
+  z-index: 1;
+  text-align: center;
+
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 50%;
+}
+
+@keyframes spin1 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

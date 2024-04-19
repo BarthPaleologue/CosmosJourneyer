@@ -80,6 +80,11 @@ export class ThinInstancePatch implements IPatch {
         this.baseMesh.setEnabled(enabled);
     }
 
+    public getBaseMesh(): Mesh {
+        if (this.baseMesh === null) throw new Error("Tried to get base mesh but no base mesh was set.");
+        return this.baseMesh;
+    }
+
     public dispose() {
         this.clearInstances();
         if (this.baseMesh !== null) this.baseMesh.dispose();

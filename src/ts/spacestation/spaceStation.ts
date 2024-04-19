@@ -32,10 +32,11 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { CollisionMask } from "../settings";
 import { CelestialBody } from "../architecture/celestialBody";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
+import i18n from "../i18n";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -50,23 +51,22 @@ export class SpaceStation implements OrbitalObject, Cullable {
 
     readonly ringInstances: InstancedMesh[] = [];
     readonly ringAggregates: PhysicsAggregate[] = [];
+    readonly ringsLocalPosition: Vector3[] = [];
+    readonly ringsRadius: number[] = [];
 
     readonly landingPads: LandingPad[] = [];
 
     readonly parent: OrbitalObject | null = null;
 
-    constructor(scene: Scene, parentBody: CelestialBody | null = null) {
-        //TODO: do not hardcode name
-        this.name = "Spacestation";
+    constructor(scene: Scene, model: SpaceStationModel | number, parentBody: CelestialBody | null = null) {
+        this.model = model instanceof SpaceStationModel ? model : new SpaceStationModel(model, parentBody?.model);
 
-        //TODO: do not hardcode seed
-        const seed = 1;
-
-        this.model = new SpaceStationModel(seed, parentBody?.model);
+        this.name = generateSpaceStationName(this.model.rng, 2756);
 
         this.parent = parentBody;
 
         this.instance = Assets.CreateSpaceStationInstance();
+        this.instance.name = this.name;
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
@@ -99,9 +99,6 @@ export class SpaceStation implements OrbitalObject, Cullable {
                 const landingPad = new LandingPad(scene, mesh);
                 this.landingPads.push(landingPad);
 
-                /*const constraint = new LockConstraint(Vector3.Zero(), landingPad.getTransform().position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), scene);
-        this.aggregate.body.addConstraint(landingPad.aggregate.body, constraint);*/
-
                 continue;
             }
 
@@ -112,8 +109,9 @@ export class SpaceStation implements OrbitalObject, Cullable {
                 ringAggregate.body.disablePreStep = false;
                 this.ringAggregates.push(ringAggregate);
 
-                const constraint = new LockConstraint(Vector3.Zero(), mesh.position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), scene);
-                this.aggregate.body.addConstraint(ringAggregate.body, constraint);
+                this.ringsRadius.push(mesh.getBoundingInfo().boundingSphere.radius);
+
+                this.ringsLocalPosition.push(mesh.position.clone());
 
                 continue;
             }
@@ -127,6 +125,24 @@ export class SpaceStation implements OrbitalObject, Cullable {
         this.aggregate.body.disablePreStep = false;
 
         console.log("found", this.landingPads.length, "landing pads");
+    }
+
+    updateRings(deltaSeconds: number): void {
+        for (let i = 0; i < this.ringInstances.length; i++) {
+            const ringAggregate = this.ringAggregates[i];
+            const localPosition = this.ringsLocalPosition[i];
+            const ringRadius = this.ringsRadius[i];
+
+            // g = v * v / r and T = 2 * pi * r / v => v = sqrt(g * r) and T = 2 * pi * r / sqrt(g * r) = 2 * pi * sqrt(r / g)
+            const rotationPeriod = 2 * Math.PI * Math.sqrt(ringRadius / 9.81);
+
+            const clockwise = i % 2 === 0 ? 1 : -1;
+
+            ringAggregate.transformNode.rotate(Vector3.Up(), deltaSeconds * clockwise * ((2 * Math.PI) / rotationPeriod));
+
+            // this is necessary because Havok ignores regular parenting
+            ringAggregate.transformNode.setAbsolutePosition(Vector3.TransformCoordinates(localPosition, this.getTransform().getWorldMatrix()));
+        }
     }
 
     handleDockingRequest(): LandingPad | null {
@@ -159,7 +175,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
     }
 
     getTypeName(): string {
-        return "Space Station";
+        return i18n.t("objectTypes:spaceStation");
     }
 
     public computeCulling(camera: Camera): void {

@@ -32,6 +32,7 @@ import { DeleteSemaphore } from "./deleteSemaphore";
 import { UberScene } from "../../../../uberCore/uberScene";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { ChunkForge } from "./chunkForge";
+import { clamp } from "../../../../utils/math";
 
 /**
  * A quadTree is defined recursively
@@ -138,6 +139,10 @@ export class ChunkTree {
         this.deleteSemaphores = this.deleteSemaphores.filter((mutex) => !mutex.isResolved());
 
         this.tree = this.updateLODRecursively(observerPosition, chunkForge);
+
+        this.executeOnEveryChunk((chunk) => {
+            chunk.updatePosition();
+        });
     }
 
     private getAverageHeight(tree: QuadTree): number {
@@ -172,41 +177,35 @@ export class ChunkTree {
         if (walked.length === this.maxDepth) return tree;
 
         const nodeRelativePosition = getChunkSphereSpacePositionFromPath(walked, this.direction, this.rootChunkLength / 2, getRotationQuaternion(this.parent));
-        const nodePositionW = nodeRelativePosition.add(this.parent.getAbsolutePosition());
 
-        const direction = nodePositionW.subtract(this.parent.getAbsolutePosition()).normalize();
-        const additionalHeight = this.getAverageHeight(tree);
-        const chunkApproxPosition = nodePositionW.add(direction.scale(additionalHeight));
-        const distanceToNodeSquared = Vector3.DistanceSquared(chunkApproxPosition, observerPositionW);
+        const nodePositionSphere = nodeRelativePosition.normalizeToNew();
+        const observerPositionSphere = observerPositionW.subtract(this.parent.getAbsolutePosition()).normalize();
 
-        const subdivisionDistanceThreshold = Settings.CHUNK_RENDERING_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** walked.length);
-        const deletionDistanceThreshold = 15e3 + 1.1 * Settings.CHUNK_RENDERING_DISTANCE_MULTIPLIER * (this.rootChunkLength / 2 ** (walked.length - 1));
+        const totalRadius =
+            this.planetModel.radius +
+            (this.planetModel.terrainSettings.max_mountain_height +
+            this.planetModel.terrainSettings.continent_base_height +
+            this.planetModel.terrainSettings.max_bump_height) * 0.5;
 
-        // the 1.5 is to avoid creation/deletion oscillations
-        if (distanceToNodeSquared > deletionDistanceThreshold ** 2 && walked.length >= this.minDepth && tree instanceof Array) {
-            const newChunk = this.createChunk(walked, chunkForge);
-            if (tree.length === 0 && walked.length === 0) {
-                return newChunk;
-            }
-            this.requestDeletion(tree, [newChunk]);
-            return newChunk;
-        }
+        const observerRelativePosition = observerPositionW.subtract(this.parent.getAbsolutePosition());
+        const observerDistanceToCenter = observerRelativePosition.length();
 
-        if (tree instanceof Array) {
-            return [
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
-            ];
-        }
+        const nodeGreatCircleDistance = Math.acos(Vector3.Dot(nodePositionSphere, observerPositionSphere));
+        const nodeLength = this.rootChunkLength / 2 ** walked.length;
 
-        if (distanceToNodeSquared < subdivisionDistanceThreshold ** 2 || walked.length < this.minDepth) {
-            if (tree instanceof PlanetChunk) {
-                if (!tree.isReady()) return tree;
-                if (!tree.mesh.isVisible) return tree;
-                if (!tree.mesh.isEnabled()) return tree;
-            }
+        const chunkGreatDistanceFactor = Math.max(0.0, nodeGreatCircleDistance - 8 * nodeLength / (2 * Math.PI * this.planetModel.radius));
+        const observerDistanceFactor = Math.max(0.0, observerDistanceToCenter - totalRadius) / this.planetModel.radius;
+
+        let kernel = this.maxDepth;
+        kernel -= Math.log2(1.0 + chunkGreatDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8;
+        kernel -= Math.log2(1.0 + observerDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8;
+
+        const targetLOD = clamp(Math.floor(kernel), this.minDepth, this.maxDepth);
+
+        if (tree instanceof PlanetChunk && targetLOD > walked.length) {
+            if (!tree.isReady()) return tree;
+            if (!tree.mesh.isVisible) return tree;
+            if (!tree.mesh.isEnabled()) return tree;
 
             const newTree = [
                 this.createChunk(walked.concat([0]), chunkForge),
@@ -218,9 +217,22 @@ export class ChunkTree {
             return newTree;
         }
 
-        if (tree instanceof PlanetChunk) return tree;
+        if (tree instanceof Array) {
+            if (targetLOD < walked.length - 1) {
+                const newChunk = this.createChunk(walked, chunkForge);
+                this.requestDeletion(tree, [newChunk]);
+                return newChunk;
+            }
 
-        throw new Error("This should never happen");
+            return [
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
+                this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3]))
+            ];
+        }
+
+        return tree;
     }
 
     /**
@@ -232,7 +244,7 @@ export class ChunkTree {
     private createChunk(path: number[], chunkForge: ChunkForge): PlanetChunk {
         const chunk = new PlanetChunk(path, this.direction, this.parentAggregate, this.material, this.planetModel, this.rootChunkLength, this.scene);
 
-        chunk.onRecieveVertexDataObservable.add(() => {
+        chunk.onReceiveVertexDataObservable.add(() => {
             this.onChunkCreatedObservable.notifyObservers(chunk);
         });
 

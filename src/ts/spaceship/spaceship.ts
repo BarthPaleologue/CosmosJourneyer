@@ -43,7 +43,7 @@ import { AudioManager } from "../audio/audioManager";
 import { MainThruster } from "./mainThruster";
 import { AudioMasks } from "../audio/audioMasks";
 
-enum ShipState {
+const enum ShipState {
     FLYING,
     LANDING,
     LANDED
@@ -139,7 +139,7 @@ export class Spaceship implements Transformable {
         this.disableWarpDriveSound = new AudioInstance(Assets.DISABLE_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 1, true, this.getTransform());
         this.acceleratingWarpDriveSound = new AudioInstance(Assets.ACCELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
         this.deceleratingWarpDriveSound = new AudioInstance(Assets.DECELERATING_WARP_DRIVE_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
-        this.hyperSpaceSound = new AudioInstance(Assets.HYPER_SPACE_SOUND, AudioMasks.HYPER_SPACE, 0.0, false, this.getTransform());
+        this.hyperSpaceSound = new AudioInstance(Assets.HYPER_SPACE_SOUND, AudioMasks.HYPER_SPACE, 0, false, this.getTransform());
         this.thrusterSound = new AudioInstance(Assets.THRUSTER_SOUND, AudioMasks.STAR_SYSTEM_VIEW, 0, false, this.getTransform());
 
         AudioManager.RegisterSound(this.enableWarpDriveSound);
@@ -335,7 +335,7 @@ export class Spaceship implements Transformable {
     }
 
     public update(deltaTime: number) {
-        this.mainEngineTargetSpeed = this.mainEngineThrottle * 500;
+        this.mainEngineTargetSpeed = Math.sign(this.mainEngineThrottle) * this.mainEngineThrottle ** 2 * 500;
 
         const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(this.warpDrive.getWarpSpeed());
 

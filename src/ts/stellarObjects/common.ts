@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export enum StellarType {
+export const enum StellarType {
     /** 30,000 - 50,000 K */
     O,
     /** 10,000 - 30,000 K */

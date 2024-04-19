@@ -20,6 +20,7 @@ import { Color3, Vector3 } from "@babylonjs/core/Maths/math";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { Transformable } from "../architecture/transformable";
+import { Scene } from "@babylonjs/core/scene";
 
 /**
  * Visual helper designed to display the rotation axis of given objects
@@ -34,10 +35,11 @@ export class AxisRenderer {
     /**
      * Disposes all previously created axis meshes by calling reset() and then creates new axis meshes for the given objects
      * @param objects
+     * @param scene
      */
-    setObjects(objects: (Transformable & BoundingSphere)[]) {
+    setOrbitalObjects(objects: (Transformable & BoundingSphere)[], scene: Scene) {
         if (this.axisMaterial === null) {
-            this.axisMaterial = new StandardMaterial("axisMaterial");
+            this.axisMaterial = new StandardMaterial("axisMaterial", scene);
             this.axisMaterial.emissiveColor = Color3.White();
             this.axisMaterial.disableLighting = true;
         }

@@ -49,16 +49,17 @@ import { GeneralInputs } from "./inputs/generalInputs";
 import { createNotification } from "./utils/notification";
 import { StarSystemInputs } from "./inputs/starSystemInputs";
 import { pressInteractionToStrings } from "./utils/inputControlsString";
-import { DefaultControlsInputs } from "./defaultController/defaultControlsInputs";
+import { LoadingScreen } from "./uberCore/loadingScreen";
+import i18n from "./i18n";
 
-enum EngineState {
+const enum EngineState {
     UNINITIALIZED,
     RUNNING,
     PAUSED
 }
 
 /**
- * Main class of CosmosJourneyer. It handles the underlying BabylonJS engine, and the communication between
+ * Main class of Cosmos Journeyer. It handles the underlying BabylonJS engine, and the communication between
  * the starmap view and the star system view. It also provides utility methods to take screenshots and record videos.
  * It also handles the pause menu.
  */
@@ -93,10 +94,7 @@ export class CosmosJourneyer {
             this.starSystemView.setSystemAsTarget(seed);
 
             const bindingsString = pressInteractionToStrings(StarSystemInputs.map.jumpToSystem).join(" or ");
-            createNotification(
-                `Align your ship with the system target using the target helper on the bottom right of your screen then press ${bindingsString} to make a hyperspace jump.`,
-                20000
-            );
+            createNotification(i18n.t("notifications:howToHyperSpace", { bindingsString: bindingsString }), 20000);
         });
 
         // Init the active scene
@@ -107,7 +105,7 @@ export class CosmosJourneyer {
 
         this.mainMenu = new MainMenu(starSystemView);
         this.mainMenu.onStartObservable.add(() => {
-            createNotification("Your pointer controls the pitch and roll of your spaceship. The neutral position is at the center of the screen.", 20000);
+            createNotification(i18n.t("notifications:howToFly"), 20000);
             this.starMap.setCurrentStarSystem(this.starSystemView.getStarSystem().model.seed);
             this.starSystemView.switchToSpaceshipControls();
             this.starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
@@ -135,7 +133,7 @@ export class CosmosJourneyer {
             const payload = `universeCoordinates=${urlData}`;
             const url = new URL(`https://barthpaleologue.github.io/CosmosJourneyer/?${payload}`);
             navigator.clipboard.writeText(url.toString()).then(() => {
-                createNotification("Copied to clipboard", 2000);
+                createNotification(i18n.t("notifications:copiedToClipboard"), 2000);
             });
         });
         this.pauseMenu.onSave.add(() => this.downloadSaveFile());
@@ -197,6 +195,7 @@ export class CosmosJourneyer {
               });
 
         engine.useReverseDepthBuffer = true;
+        engine.loadingScreen = new LoadingScreen(canvas);
         engine.loadingScreen.displayLoadingUI();
         window.addEventListener("resize", () => {
             engine.resize(true);
@@ -419,6 +418,10 @@ export class CosmosJourneyer {
 
             // re-centers the star system
             this.starSystemView.getStarSystem().applyFloatingOrigin();
+
+            // set the ui target to the nearest orbital object
+            this.starSystemView.ui.setTarget(nearestOrbitalObject);
+            this.starSystemView.helmetOverlay.setTarget(nearestOrbitalObject.getTransform());
         });
 
         await this.starSystemView.loadStarSystem(new StarSystemController(seed, this.starSystemView.scene), true);

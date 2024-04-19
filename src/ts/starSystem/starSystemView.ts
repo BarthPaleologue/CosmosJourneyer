@@ -57,7 +57,7 @@ import { axisCompositeToString } from "../utils/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { BodyType } from "../model/common";
-import { getMoonSeed } from "../planets/common";
+import { getMoonSeed, getSpaceStationSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
 import { AudioManager } from "../audio/audioManager";
 import { AudioMasks } from "../audio/audioMasks";
@@ -66,6 +66,7 @@ import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { wait } from "../utils/wait";
 import { CharacterInputs } from "../spacelegs/characterControlsInputs";
 import { DefaultControlsInputs } from "../defaultController/defaultControlsInputs";
+import i18n from "../i18n";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -320,7 +321,7 @@ export class StarSystemView implements View {
                     if (!(control instanceof AxisComposite)) {
                         throw new Error("Up down is not an axis composite");
                     }
-                    createNotification(`Hold ${axisCompositeToString(control)[1][1]} to lift off.`, 5000);
+                    createNotification(i18n.t("notifications:howToLiftOff", { bindingsString: axisCompositeToString(control)[1][1] }), 5000);
                 }
             }
         });
@@ -422,7 +423,8 @@ export class StarSystemView implements View {
             const planet = planets[i];
             for (let j = 0; j < planet.model.getNbSpaceStations(); j++) {
                 console.log("Space station:", j + 1, "of", planet.model.getNbSpaceStations());
-                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, planet);
+                const seed = getSpaceStationSeed(planet.model, j);
+                const spaceStation = StarSystemHelper.MakeSpaceStation(starSystem, seed, planet);
                 spaceStation.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
                 await wait(timeOut);
@@ -439,8 +441,8 @@ export class StarSystemView implements View {
         starSystem.initPositions(2, this.chunkForge, this.postProcessManager);
         this.ui.createObjectOverlays(starSystem.getOrbitalObjects());
 
-        this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects());
-        this.axisRenderer.setObjects(starSystem.getOrbitalObjects());
+        this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
+        this.axisRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
 
         this.helmetOverlay.setTarget(null);
 
@@ -531,7 +533,9 @@ export class StarSystemView implements View {
         this.orbitRenderer.update();
 
         Assets.BUTTERFLY_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Assets.BUTTERFLY_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
         Assets.GRASS_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
+        Assets.GRASS_DEPTH_MATERIAL.update(starSystem.stellarObjects, this.scene.getActiveControls().getTransform().getAbsolutePosition(), deltaSeconds);
     }
 
     /**

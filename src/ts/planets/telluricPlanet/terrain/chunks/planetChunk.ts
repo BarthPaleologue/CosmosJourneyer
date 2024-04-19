@@ -34,19 +34,21 @@ import { IPatch } from "../instancePatch/iPatch";
 import { TelluricPlanetModel } from "../../telluricPlanetModel";
 import { BoundingSphere } from "../../../../architecture/boundingSphere";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { LockConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { UberScene } from "../../../../uberCore/uberScene";
 
 export class PlanetChunk implements Transformable, BoundingSphere {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
+    private readonly planetLocalPosition: Vector3;
 
-    readonly planetModel: TelluricPlanetModel;
+    private readonly planetModel: TelluricPlanetModel;
 
-    readonly chunkSideLength: number;
+    private readonly chunkSideLength: number;
 
     private loaded = false;
 
@@ -54,17 +56,18 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
     readonly instancePatches: IPatch[] = [];
 
-    readonly onRecieveVertexDataObservable = new Observable<void>();
+    readonly onReceiveVertexDataObservable = new Observable<void>();
     readonly onDisposeObservable = new Observable<void>();
 
-    aggregate: PhysicsAggregate | null = null;
-    readonly parentAggregate: PhysicsAggregate;
+    private aggregate: PhysicsAggregate | null = null;
 
     private averageHeight = 0;
 
     readonly helpers: Mesh[] = [];
 
     private disposed = false;
+
+    private readonly scene: Scene;
 
     constructor(path: number[], direction: Direction, parentAggregate: PhysicsAggregate, material: Material, planetModel: TelluricPlanetModel, rootLength: number, scene: Scene) {
         const id = `D${direction}P${path.join("")}`;
@@ -78,16 +81,17 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.mesh = new Mesh(`Chunk${id}`, scene);
         this.mesh.setEnabled(false);
 
+        this.scene = scene;
+
         this.mesh.material = material;
-        //this.mesh.material = Assets.DebugMaterial(id, false, false);
+        //this.mesh.material = Assets.DebugMaterial(id, false, false, scene);
 
         this.mesh.parent = parentAggregate.transformNode;
 
-        //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
-        //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
+        this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
+        this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
 
         this.parent = parentAggregate.transformNode;
-        this.parentAggregate = parentAggregate;
 
         // computing the position of the chunk on the side of the planet
         const position = getChunkPlaneSpacePositionFromPath(rootLength, path);
@@ -100,6 +104,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         position.normalize().scaleInPlace(rootLength / 2);
 
+        this.planetLocalPosition = position.clone();
         this.getTransform().position = position;
     }
 
@@ -139,8 +144,6 @@ export class PlanetChunk implements Transformable, BoundingSphere {
             this.aggregate.body.disablePreStep = false;
             this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
             this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-            const constraint = new LockConstraint(Vector3.Zero(), this.getTransform().position.negate(), new Vector3(0, 1, 0), new Vector3(0, 1, 0), this.mesh.getScene());
-            this.parentAggregate.body.addConstraint(this.aggregate.body, constraint);
         }
 
         this.mesh.setEnabled(true);
@@ -148,7 +151,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
 
         this.averageHeight = averageHeight;
 
-        this.onRecieveVertexDataObservable.notifyObservers();
+        this.onReceiveVertexDataObservable.notifyObservers();
 
         if (instancesMatrixBuffer.length === 0) return;
 
@@ -172,7 +175,21 @@ export class PlanetChunk implements Transformable, BoundingSphere {
             const grassPatch = new ThinInstancePatch(this.parent, instancesMatrixBuffer);
             grassPatch.createInstances(Assets.GRASS_BLADE);
             this.instancePatches.push(grassPatch);
+
+            for(const depthRenderer of Object.values(this.scene._depthRenderer)) {
+                depthRenderer.setMaterialForRendering([butterflyPatch.getBaseMesh()], Assets.BUTTERFLY_DEPTH_MATERIAL);
+                depthRenderer.setMaterialForRendering([grassPatch.getBaseMesh()], Assets.GRASS_DEPTH_MATERIAL);
+            }
         }
+    }
+
+    /**
+     * When the chunk has a Havok body, parenting is ignored so this method must be called to compensate.
+     * If the chunk has no Havok body, this method does nothing
+     */
+    public updatePosition() {
+        if (this.aggregate === null) return;
+        this.getTransform().setAbsolutePosition(Vector3.TransformCoordinates(this.planetLocalPosition, this.parent.getWorldMatrix()));
     }
 
     public getAverageHeight(): number {
@@ -202,7 +219,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.helpers.forEach((helper) => helper.dispose());
         this.instancePatches.forEach((patch) => patch.dispose());
         this.mesh.dispose();
-        this.onRecieveVertexDataObservable.clear();
+        this.onReceiveVertexDataObservable.clear();
         this.onDisposeObservable.clear();
 
         this.disposed = true;

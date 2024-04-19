@@ -19,16 +19,16 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
 import { BodyType } from "../model/common";
-import { generateName } from "../utils/nameGenerator";
+import { generateStarName } from "../utils/starNameGenerator";
 import { SystemSeed } from "../utils/systemSeed";
 
-enum GenerationSteps {
+const enum GenerationSteps {
     NAME,
     NB_STARS = 20,
     GENERATE_STARS = 21,
     NB_PLANETS = 30,
     GENERATE_PLANETS = 200,
-    CHOOSE_PLANET_TYPE = 200
+    CHOOSE_PLANET_TYPE = 400
 }
 
 export class StarSystemModel {
@@ -41,7 +41,7 @@ export class StarSystemModel {
         this.seed = seed;
         this.rng = seededSquirrelNoise(this.seed.hash);
 
-        this.name = generateName(this.rng, GenerationSteps.NAME);
+        this.name = generateStarName(this.rng, GenerationSteps.NAME);
     }
 
     setName(name: string) {

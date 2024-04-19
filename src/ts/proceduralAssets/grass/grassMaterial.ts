@@ -28,15 +28,24 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 export class GrassMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
-    constructor(scene: Scene) {
+    private stars: Transformable[] = [];
+    private playerPosition: Vector3 = Vector3.Zero();
+
+    constructor(scene: Scene, isDepthMaterial: boolean) {
         const shaderName = "grassMaterial";
         Effect.ShadersStore[`${shaderName}FragmentShader`] = grassFragment;
         Effect.ShadersStore[`${shaderName}VertexShader`] = grassVertex;
 
+        const defines = ["#define INSTANCES"];
+        if (isDepthMaterial) defines.push("#define FORDEPTH");
+
+        const uniforms = ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "cameraPosition", "playerPosition"];
+        if(isDepthMaterial) uniforms.push("depthValues");
+
         super(shaderName, scene, shaderName, {
             attributes: ["position", "normal"],
-            uniforms: ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "cameraPosition", "playerPosition"],
-            defines: ["#define INSTANCES"],
+            uniforms: uniforms,
+            defines: defines,
             samplers: ["perlinNoise"]
         });
 
@@ -44,18 +53,22 @@ export class GrassMaterial extends ShaderMaterial {
 
         this.backFaceCulling = false;
         this.setTexture("perlinNoise", perlinTexture);
+
+        this.onBindObservable.add(() => {
+            if (this.stars.length > 0) {
+                const star = this.stars[0];
+                const lightDirection = star.getTransform().getAbsolutePosition().subtract(this.playerPosition).normalize();
+                this.getEffect().setVector3("lightDirection", lightDirection);
+            }
+
+            this.getEffect().setVector3("playerPosition", this.playerPosition);
+            this.getEffect().setFloat("time", this.elapsedSeconds);
+        });
     }
 
     update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
-
-        if (stars.length > 0) {
-            const star = stars[0];
-            const lightDirection = star.getTransform().getAbsolutePosition().subtract(playerPosition).normalize();
-            this.setVector3("lightDirection", lightDirection);
-        }
-
-        this.setVector3("playerPosition", playerPosition);
-        this.setFloat("time", this.elapsedSeconds);
+        this.stars = stars;
+        this.playerPosition = playerPosition;
     }
 }

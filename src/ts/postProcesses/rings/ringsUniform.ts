@@ -176,7 +176,7 @@ export class RingsUniforms {
             this.ringLut = lut;
         }
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             if (this.ringLut === null) throw new Error("Ring LUT was null when creating promise");
             this.ringLut.executeWhenReady(() => {
                 if (this.ringLut === null) throw new Error("Ring LUT was null when executing when ready");

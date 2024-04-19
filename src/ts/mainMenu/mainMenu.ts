@@ -18,6 +18,7 @@ import { Assets } from "../assets";
 import { Settings } from "../settings";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { initSettingsPanel } from "./settingsPanel";
+import i18n from "../i18n";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -114,6 +115,13 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             });
         });
 
+        // Translate all main menu elements
+        document.querySelectorAll("#mainMenu *[data-i18n]").forEach((element) => {
+            const key = element.getAttribute("data-i18n");
+            if (key === null) throw new Error("data-i18n attribute is null");
+            element.textContent = i18n.t(key);
+        });
+
         const loadSavePanel = document.getElementById("loadSavePanel");
         if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
         this.loadSavePanel = loadSavePanel;
@@ -132,7 +140,9 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
         if (aboutPanel === null) throw new Error("#about does not exist!");
         this.aboutPanel = aboutPanel;
 
-        document.getElementById("startButton")?.addEventListener("click", () => {
+        const startButton = document.getElementById("startButton");
+        if (startButton === null) throw new Error("#startButton does not exist!");
+        startButton.addEventListener("click", () => {
             this.startAnimation(() => this.onStartObservable.notifyObservers());
         });
 
@@ -328,6 +338,8 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
                 this.htmlRoot.style.display = "none";
                 Assets.MAIN_MENU_BACKGROUND_MUSIC.stop();
                 onAnimationFinished();
+
+                return;
             }
 
             const currentProgress = translationAnimation.getProgress();
@@ -336,6 +348,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             this.controls.getActiveCamera().getViewMatrix();
 
             this.starSystemController.applyFloatingOrigin();
+            this.starSystemController.updateShaders(0.0, this.starSystemView.postProcessManager);
         };
 
         this.scene.onBeforePhysicsObservable.add(animationCallback);

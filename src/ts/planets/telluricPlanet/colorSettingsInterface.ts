@@ -17,7 +17,7 @@
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
-export enum ColorMode {
+export const enum ColorMode {
     DEFAULT,
     MOISTURE,
     TEMPERATURE,

@@ -28,15 +28,24 @@ import { Transformable } from "../../architecture/transformable";
 
 export class ButterflyMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
-    constructor(scene: Scene) {
+    private stars: Transformable[] = [];
+    private playerPosition: Vector3 = Vector3.Zero();
+
+    constructor(scene: Scene, isDepthMaterial: boolean) {
         const shaderName = "butterflyMaterial";
         Effect.ShadersStore[`${shaderName}FragmentShader`] = butterflyFragment;
         Effect.ShadersStore[`${shaderName}VertexShader`] = butterflyVertex;
 
+        const defines = ["#define INSTANCES"];
+        if (isDepthMaterial) defines.push("#define FORDEPTH");
+
+        const uniforms = ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "playerPosition"];
+        if(isDepthMaterial) uniforms.push("depthValues");
+
         super(shaderName, scene, shaderName, {
             attributes: ["position", "normal", "uv"],
-            uniforms: ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "playerPosition"],
-            defines: ["#define INSTANCES"],
+            uniforms: uniforms,
+            defines: defines,
             samplers: ["butterflyTexture"]
         });
 
@@ -45,18 +54,22 @@ export class ButterflyMaterial extends ShaderMaterial {
         this.setFloat("time", 0);
         this.setTexture("butterflyTexture", new Texture(butterflyTexture, scene));
         this.backFaceCulling = false;
+
+        this.onBindObservable.add(() => {
+            if (this.stars.length > 0) {
+                const star = this.stars[0];
+                const lightDirection = star.getTransform().getAbsolutePosition().subtract(this.playerPosition).normalize();
+                this.getEffect().setVector3("lightDirection", lightDirection);
+            }
+
+            this.getEffect().setVector3("playerPosition", this.playerPosition);
+            this.getEffect().setFloat("time", this.elapsedSeconds);
+        });
     }
 
     update(stars: Transformable[], playerPosition: Vector3, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
-
-        if (stars.length > 0) {
-            const star = stars[0];
-            const lightDirection = star.getTransform().getAbsolutePosition().subtract(playerPosition).normalize();
-            this.setVector3("lightDirection", lightDirection);
-        }
-
-        this.setVector3("playerPosition", playerPosition);
-        this.setFloat("time", this.elapsedSeconds);
+        this.stars = stars;
+        this.playerPosition = playerPosition;
     }
 }

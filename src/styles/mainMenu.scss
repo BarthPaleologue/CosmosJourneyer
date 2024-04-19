@@ -53,7 +53,7 @@
 }
 
 
-.rightPanel {
+.sidePanel {
   position: absolute;
   max-width: 1400px;
   width: 72%;
@@ -130,6 +130,10 @@
     line-height: 1.5em;
     font-size: 1.25em;
     padding: 0 20px;
+
+    &[data-i18n] {
+      white-space: pre-line; // necessary to use \n in the text
+    }
 
     &.signature {
       text-align: right;

@@ -31,7 +31,7 @@ export class StarMaterial extends ShaderMaterial {
     starModel: StellarObjectModel;
     starSeed: number;
 
-    private internalClock = 0;
+    private elapsedSeconds = 0;
 
     constructor(star: TransformNode, model: StellarObjectModel, scene: Scene) {
         const shaderName = "starMaterial";
@@ -62,14 +62,16 @@ export class StarMaterial extends ShaderMaterial {
         this.star = star;
         this.starModel = model;
         this.starSeed = model.seed;
+
+        this.onBindObservable.add(() => {
+            this.getEffect().setFloat("time", this.elapsedSeconds % 100000);
+            this.getEffect().setColor3("starColor", this.starModel.color);
+            this.getEffect().setFloat("seed", this.starSeed);
+            this.getEffect().setVector3("starPosition", this.star.getAbsolutePosition());
+        });
     }
 
-    public update(deltaTime: number) {
-        this.internalClock += deltaTime;
-
-        this.setFloat("time", this.internalClock % 100000);
-        this.setColor3("starColor", this.starModel.color);
-        this.setFloat("seed", this.starSeed);
-        this.setVector3("starPosition", this.star.getAbsolutePosition());
+    public update(deltaSeconds: number) {
+        this.elapsedSeconds += deltaSeconds;
     }
 }

@@ -17,7 +17,6 @@
 
 import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
-import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Animations/animatable";
 
 import rockNormalMap from "../asset/textures/rockn.png";
@@ -86,8 +85,11 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
+import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
+import { LoadingScreen } from "./uberCore/loadingScreen";
+import i18next from "./i18n";
 
 export class Assets {
     static IS_READY = false;
@@ -132,7 +134,10 @@ export class Assets {
     public static GRASS_BLADE: Mesh;
 
     public static BUTTERFLY_MATERIAL: ButterflyMaterial;
+    public static BUTTERFLY_DEPTH_MATERIAL: ButterflyMaterial;
+
     public static GRASS_MATERIAL: GrassMaterial;
+    public static GRASS_DEPTH_MATERIAL: GrassMaterial;
 
     public static OUCH_SOUND: Sound;
     public static ENGINE_RUNNING_SOUND: Sound;
@@ -311,13 +316,17 @@ export class Assets {
 
         Assets.BUTTERFLY = createButterfly(scene);
         Assets.BUTTERFLY.isVisible = false;
-        Assets.BUTTERFLY_MATERIAL = new ButterflyMaterial(scene);
+        Assets.BUTTERFLY_MATERIAL = new ButterflyMaterial(scene, false);
         Assets.BUTTERFLY.material = Assets.BUTTERFLY_MATERIAL;
+
+        Assets.BUTTERFLY_DEPTH_MATERIAL = new ButterflyMaterial(scene, true);
 
         Assets.GRASS_BLADE = createGrassBlade(scene, 3);
         Assets.GRASS_BLADE.isVisible = false;
-        Assets.GRASS_MATERIAL = new GrassMaterial(scene);
+        Assets.GRASS_MATERIAL = new GrassMaterial(scene, false);
         Assets.GRASS_BLADE.material = Assets.GRASS_MATERIAL;
+
+        Assets.GRASS_DEPTH_MATERIAL = new GrassMaterial(scene, true);
 
         const ouchSoundTask = Assets.MANAGER.addBinaryFileTask("ouchSoundTask", ouchSound);
         ouchSoundTask.onSuccess = function (task) {
@@ -471,7 +480,7 @@ export class Assets {
         });
 
         Assets.MANAGER.onProgress = (remainingCount, totalCount) => {
-            scene.getEngine().loadingScreen.loadingUIText = `Loading assets... ${totalCount - remainingCount}/${totalCount}`;
+            (scene.getEngine().loadingScreen as LoadingScreen).setProgressPercentage(100 * (totalCount - remainingCount) / totalCount);
         };
 
         Assets.SCATTER_CUBE = MeshBuilder.CreateBox("cube", { size: 1 }, scene);
@@ -481,7 +490,7 @@ export class Assets {
 
         Assets.MANAGER.onFinish = () => {
             console.log("Assets loaded");
-            scene.getEngine().loadingScreen.loadingUIText = "Press F11 to go fullscreen";
+            scene.getEngine().loadingScreen.loadingUIText = i18next.t("common:fullscreen");
             Assets.IS_READY = true;
         };
 
@@ -534,8 +543,8 @@ export class Assets {
         return Assets.LANDING_PAD.instantiateHierarchy(null, { doNotInstantiate: false }) as InstancedMesh;
     }
 
-    static DebugMaterial(name: string, diffuse = false, wireframe = false) {
-        const mat = new StandardMaterial(`${name}DebugMaterial`);
+    static DebugMaterial(name: string, diffuse: boolean, wireframe: boolean, scene: Scene) {
+        const mat = new StandardMaterial(`${name}DebugMaterial`, scene);
         if (!diffuse) {
             mat.emissiveColor = Color3.Random();
             mat.disableLighting = true;

@@ -42,6 +42,7 @@ import { Cullable } from "../../bodies/cullable";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
+import i18n from "../../i18n";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -84,6 +85,7 @@ export class Star implements StellarObject, Cullable {
                   scene
               )
             : Assets.CreateBananaClone(2 * this.model.radius);
+        this.mesh.name = name; // enforce name in the case of cloning the banana
 
         this.aggregate = new PhysicsAggregate(
             this.getTransform(),
@@ -139,7 +141,7 @@ export class Star implements StellarObject, Cullable {
     }
 
     getTypeName(): string {
-        return `${getStellarTypeString(this.model.stellarType)} star`;
+        return i18n.t("objectTypes:star", { stellarType: getStellarTypeString(this.model.stellarType) });
     }
 
     public updateMaterial(deltaTime: number): void {
@@ -160,7 +162,7 @@ export class Star implements StellarObject, Cullable {
 
     public dispose(): void {
         this.mesh.dispose();
-        this.light.dispose();
         this.material.dispose();
+        this.light.dispose();
     }
 }
