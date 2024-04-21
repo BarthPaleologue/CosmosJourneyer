@@ -168,7 +168,7 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "o") {
         const landingPad = spaceStation.handleDockingRequest();
         if (landingPad !== null && starSystemView.scene.getActiveControls() === spaceshipController) {
-            spaceshipController.spaceship.engageLandingOnPad(landingPad);
+            spaceshipController.spaceship.landingComputer.landOnPad(landingPad);
         }
     }
 

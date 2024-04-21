@@ -22,7 +22,6 @@ import { AxisRenderer } from "../orbit/axisRenderer";
 import { SystemUI } from "../ui/systemUI";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { StarSystemController } from "./starSystemController";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
@@ -65,7 +64,6 @@ import { TransformRotationAnimation } from "../uberCore/transforms/animations/ro
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { wait } from "../utils/wait";
 import { CharacterInputs } from "../spacelegs/characterControlsInputs";
-import { DefaultControlsInputs } from "../defaultController/defaultControlsInputs";
 import i18n from "../i18n";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 

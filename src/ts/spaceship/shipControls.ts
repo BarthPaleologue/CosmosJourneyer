@@ -66,8 +66,9 @@ export class ShipControls implements Controls {
         });
 
         SpaceShipControlsInputs.map.landing.on("complete", () => {
-            if (this.spaceship.getClosestWalkableObject() !== null) {
-                this.spaceship.engageLanding(null);
+            const closestObject = this.spaceship.getClosestWalkableObject();
+            if (closestObject !== null) {
+                this.spaceship.engageLanding(closestObject);
             }
         });
 

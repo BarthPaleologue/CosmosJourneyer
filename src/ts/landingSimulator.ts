@@ -16,13 +16,12 @@ import { DefaultControls } from "./defaultController/defaultControls";
 import { Spaceship } from "./spaceship/spaceship";
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { SpaceStation } from "./spacestation/spaceStation";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { OrbitalObject } from "./architecture/orbitalObject";
+import "@babylonjs/core/Loading/loadingScreen";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -95,14 +94,11 @@ scene.onBeforeRenderObservable.add(() => {
     scene.getActiveControls().update(deltaTime);
     spaceship.update(deltaTime);
 
-    //OrbitalObject.UpdateRotation(spacestation, deltaTime);
-
-    spacestation.ringInstances.forEach((mesh) => {
-        mesh.rotate(Axis.Y, 0.01 * deltaTime);
-    });
+    spacestation.updateRings(deltaTime);
 });
 
 scene.executeWhenReady(() => {
+    engine.hideLoadingUI();
     engine.runRenderLoop(() => {
         scene.render();
     });
@@ -113,7 +109,7 @@ if (landingPad === null) throw new Error("Docking request denied");
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "o") {
-        spaceship.engageLandingOnPad(landingPad);
+        spaceship.landingComputer.landOnPad(landingPad);
     }
 });
 
