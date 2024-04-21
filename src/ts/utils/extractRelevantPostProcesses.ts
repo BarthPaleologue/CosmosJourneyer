@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { ObjectPostProcess } from "../postProcesses/objectPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
 import { CelestialBody } from "../architecture/celestialBody";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 export function extractRelevantPostProcesses(postProcesses: ObjectPostProcess[], body: CelestialBody): [ObjectPostProcess[], ObjectPostProcess[]] {
     const relevant = [];
@@ -30,7 +30,7 @@ export function extractRelevantPostProcesses(postProcesses: ObjectPostProcess[],
     return [relevant, notRelevant];
 }
 
-export function makeSplitRenderEffects(name: string, body: CelestialBody, postProcesses: ObjectPostProcess[], engine: Engine): [PostProcessRenderEffect, PostProcessRenderEffect] {
+export function makeSplitRenderEffects(name: string, body: CelestialBody, postProcesses: ObjectPostProcess[], engine: AbstractEngine): [PostProcessRenderEffect, PostProcessRenderEffect] {
     const [bodyRings, otherRings] = extractRelevantPostProcesses(postProcesses, body);
     const otherRingsRenderEffect = new PostProcessRenderEffect(engine, `other${name}RenderEffect`, () => {
         return otherRings;

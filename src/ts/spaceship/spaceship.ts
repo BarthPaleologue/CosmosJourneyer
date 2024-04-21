@@ -307,7 +307,7 @@ export class Spaceship implements Transformable {
     }
 
     private landOnPad(landingPad: LandingPad, deltaTime: number) {
-        const padUp = landingPad.getTransform().up;
+        const padUp = getUpwardDirection(landingPad.getTransform());
 
         const targetPosition = landingPad.getTransform().getAbsolutePosition();
         targetPosition.addInPlace(padUp.scale(2));
@@ -320,8 +320,15 @@ export class Spaceship implements Transformable {
             return;
         }
 
-        const targetOrientation = landingPad.getTransform().absoluteRotationQuaternion;
-        const currentOrientation = getRotationQuaternion(this.getTransform());
+        const shipUp = getUpwardDirection(this.getTransform());
+
+        const rotationAxis = Vector3.Cross(shipUp, padUp);
+        const rotationAngle = Math.acos(Vector3.Dot(shipUp, padUp));
+
+        this.aggregate.body.applyAngularImpulse(rotationAxis.scale(1000 * rotationAngle));
+
+        //const targetOrientation = landingPad.getTransform().absoluteRotationQuaternion;
+        //const currentOrientation = getRotationQuaternion(this.getTransform());
 
         translate(
             this.getTransform(),
@@ -331,7 +338,7 @@ export class Spaceship implements Transformable {
                 .scaleInPlace(Math.min(distance, 20 * deltaTime))
         );
 
-        this.getTransform().rotationQuaternion = Quaternion.Slerp(currentOrientation, targetOrientation, deltaTime);
+        //this.getTransform().rotationQuaternion = Quaternion.Slerp(currentOrientation, targetOrientation, deltaTime);
     }
 
     public update(deltaTime: number) {

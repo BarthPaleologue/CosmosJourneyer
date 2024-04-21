@@ -67,6 +67,7 @@ import { wait } from "../utils/wait";
 import { CharacterInputs } from "../spacelegs/characterControlsInputs";
 import { DefaultControlsInputs } from "../defaultController/defaultControlsInputs";
 import i18n from "../i18n";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -167,7 +168,7 @@ export class StarSystemView implements View {
      * @param engine The BabylonJS engine
      * @param havokInstance The Havok physics instance
      */
-    constructor(engine: Engine, havokInstance: HavokPhysicsWithBindings) {
+    constructor(engine: AbstractEngine, havokInstance: HavokPhysicsWithBindings) {
         this.helmetOverlay = new HelmetOverlay();
         this.bodyEditor = new BodyEditor(EditorVisibility.HIDDEN);
 

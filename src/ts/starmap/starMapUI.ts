@@ -29,10 +29,10 @@ import { Animation } from "@babylonjs/core/Animations/animation";
 import { Scene } from "@babylonjs/core/scene";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Settings } from "../settings";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import i18n from "../i18n";
+import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 export class StarMapUI {
     readonly gui: AdvancedDynamicTexture;
@@ -52,7 +52,7 @@ export class StarMapUI {
 
     private _isHovered = false;
 
-    constructor(engine: Engine) {
+    constructor(engine: AbstractEngine) {
         this.scene = new Scene(engine);
         this.scene.useRightHandedSystem = true;
         this.scene.autoClear = false;
