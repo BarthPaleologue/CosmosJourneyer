@@ -100,14 +100,19 @@ export class LandingComputer {
 
         const padUp = getUpwardDirection(landingPad.getTransform());
 
-        const targetPosition = landingPad.getTransform().getAbsolutePosition();
+        const targetPosition = this.state === LandingState.GOING_ABOVE_TARGET ?
+            landingPad.getTransform().getAbsolutePosition().add(padUp.scale(100))
+            : landingPad.getTransform().getAbsolutePosition();
         targetPosition.addInPlace(padUp.scale(2));
         const currentPosition = shipPosition;
 
         const distance = Vector3.Distance(targetPosition, currentPosition);
 
-        if (distance < 0.01) {
+        if (distance < 0.01 && this.state === LandingState.LANDING) {
             this.finishLanding();
+            return;
+        } else if(distance < 0.01 && this.state === LandingState.GOING_ABOVE_TARGET) {
+            this.state = LandingState.LANDING;
             return;
         }
 
