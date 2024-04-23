@@ -45,7 +45,7 @@ devDependencies:
     specifier: ^3.0.7
     version: 3.0.7(prettier@3.2.5)(webpack-cli@5.1.4)(webpack@5.91.0)
   cross-env:
-    specifier: '7'
+    specifier: ^7.0.3
     version: 7.0.3
   css-loader:
     specifier: ^7.1.0
