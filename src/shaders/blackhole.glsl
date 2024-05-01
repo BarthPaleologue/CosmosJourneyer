@@ -16,6 +16,9 @@ uniform float accretionDiskRadius;
 uniform float rotationPeriod;
 uniform float warpingMinkowskiFactor;
 
+uniform float schwarzschildRadius;
+uniform float frameDraggingFactor;
+
 //TODO: make these uniforms
 const float accretionDiskHeight = 100.0;
 const bool hasAccretionDisk = true;
@@ -94,7 +97,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
     float diskMix = smoothstep(0.6, 0.9, relativeDistance / relativeDiskRadius);// transition between inner and outer color
     vec3 innerDiskColor = vec3(1.0, 0.8, 0.1);
     vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
-    vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix);
+    vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix) * 1.25;
 
     vec3 redShiftMult = mix(vec3(1.6, 1.0, 2.0) * 3.0, vec3(0.4, 0.2, 0.1) * 0.5, redShift);//FIXME: need more realistic redshift
     insideCol *= redShiftMult;
@@ -118,10 +121,13 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
         vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, diskNormal, theta);
 
         float angle = angleBetweenVectors(rotatedProjectedSamplePoint, vec3(0.0, 0.0, 1.0));
-        float u = time + intensity + relativeDistance;// some kind of disk coordinate (spiral)
-        const float f = 1.0;
-        float noise = valueNoise(vec2(2.0 * angle, 5.0 * u), f);
-        noise = noise * 0.66 + 0.33 * valueNoise(vec2(2.0 * angle, 5.0 * u), f * 2.0);
+        float u = 0.5 * time + intensity * 0.2 + 4.0 * relativeDistance;// some kind of disk coordinate (spiral)
+        const float noiseFrequency = 1.0;
+        vec2 noiseSamplePoint = vec2(angle * 2.0, u);
+        float noise = valueNoise(noiseSamplePoint, noiseFrequency); // 1st octave
+        noise = noise * 0.66 + 0.33 * valueNoise(noiseSamplePoint, noiseFrequency * 2.0); // 2nd octave
+        noise = pow(noise, 0.8);
+        noise = max(0.2, noise);
 
         float alpha = diskMask * noise * intensity;
 
@@ -137,8 +143,8 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
  * The bending is tweaked to reach 0 when far enough so that we can skip some calculations
  */
 vec3 bendRay(vec3 rayDir, vec3 blackholeDir, float distanceToCenter2, float maxBendDistance, float stepSize) {
-    float bendForce = object_radius / distanceToCenter2; //bending force
-    bendForce -= object_radius / (maxBendDistance * maxBendDistance); // bend force is 0 at maxBendDistance
+    float bendForce = schwarzschildRadius / distanceToCenter2; //bending force (physical)
+    bendForce -= schwarzschildRadius / (maxBendDistance * maxBendDistance); // bend force is 0 at maxBendDistance (non physical)
     bendForce = stepSize * max(0.0, bendForce); // multiply by step size, and clamp negative values
     return normalize(rayDir + bendForce * blackholeDir); //bend ray towards BH
 }
@@ -194,7 +200,7 @@ void main() {
             for (int h = 0; h < 6; h++) {
                 //reduces tests for exit conditions (to minimise branching)
                 distanceToCenter = customLength(rayPositionBlackHoleSpace);//distance to BH
-                vec3 blackholeDir = -rayPositionBlackHoleSpace / distanceToCenter;//direction to BH
+                vec3 dirToBlackHole = -rayPositionBlackHoleSpace / distanceToCenter;//direction to BH
                 float distanceToCenter2 = distanceToCenter * distanceToCenter;
 
                 projectedPosition = projectOnPlane(rayPositionBlackHoleSpace, object_rotationAxis);
@@ -208,8 +214,18 @@ void main() {
                 float closeLimit = distanceToCenter * 0.1 + 0.05 * distanceToCenter2 / object_radius;//limit step size close to BH
                 stepSize = min(stepSize, min(farLimit, closeLimit));
 
-                rayDir = bendRay(rayDir, blackholeDir, distanceToCenter2, maxBendDistance, stepSize);
-                rayPositionBlackHoleSpace += stepSize * rayDir;
+                // Frame dragging computation below: (see https://www.shadertoy.com/view/sdjcWm)
+                // Compute a vector in the direction of the BH's rotation
+                vec3 pos_cross_pole_axis = cross(object_rotationAxis, -dirToBlackHole);
+                // Compute sin^2(latitude) of the current ray position
+                float sin2_colatitude = length(pos_cross_pole_axis);
+                sin2_colatitude = sin2_colatitude * sin2_colatitude;
+
+                // the frame dragging rate is approximately proportional to 1/(r^2 * sin^2(colatitude)) (See: https://en.wikipedia.org/wiki/Frame-dragging)
+                vec3 frameDragForce = frameDraggingFactor * schwarzschildRadius * schwarzschildRadius * normalize(pos_cross_pole_axis) * sin2_colatitude / distanceToCenter2;
+
+                rayDir = bendRay(rayDir, dirToBlackHole, distanceToCenter2, maxBendDistance, stepSize);
+                rayPositionBlackHoleSpace += stepSize * (rayDir - frameDragForce);
 
                 //TODO: improve glow
                 //glow += vec4(1.2,1.1,1, 1.0) * (0.2 * (object_radius / distanceToCenter2) * stepSize * clamp(distanceToCenter / object_radius - 1.2, 0.0, 1.0)); //adds fairly cheap glow
