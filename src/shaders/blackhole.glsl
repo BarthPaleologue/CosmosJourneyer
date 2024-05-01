@@ -94,7 +94,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
     float redShift = (1.0 + parallel) / 2.0;
 
-    float diskMix = smoothstep(0.6, 0.9, relativeDistance / relativeDiskRadius);// transition between inner and outer color
+    float diskMix = smoothstep(0.3, 0.9, relativeDistance / relativeDiskRadius); // transition between inner and outer color
     vec3 innerDiskColor = vec3(1.0, 0.8, 0.1);
     vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
     vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix) * 1.25;
@@ -113,8 +113,8 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
         relativeDistance = distanceToCenter / object_radius;
 
         float diskMask = 1.0;
-        diskMask *= clamp(relativeDistance - 1.2, 0.0, 1.0);// The 1.2 is only for aesthetics
-        diskMask *= smoothstep(0.0, 2.0, relativeDiskRadius - relativeDistance);// The 2.0 is only for aesthetics
+        diskMask *= smoothstep(1.5, 2.5, relativeDistance); // Fade the disk when too close to the event horizon. 1.5 is the IBCO (innermost bound circular orbit) for a Schwarzschild black hole. It is also called the photon sphere.
+        diskMask *= clamp(1.0 - relativeDistance / relativeDiskRadius, 0.0, 1.0); //smoothstep(0.0, 1.0, relativeDiskRadius - relativeDistance);// The 2.0 is only for aesthetics
 
         // rotation of the disk
         float theta = -2.0 * 3.1415 * time / rotationPeriod;
