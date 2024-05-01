@@ -38,6 +38,7 @@ BH.model.orbit.radius = 0;
 
 const planet = StarSystemHelper.MakeTelluricPlanet(starSystem);
 planet.model.orbit.radius = 45 * planet.getRadius();
+planet.model.orbit.period = 24 * 60 * 60;
 
 await starSystemView.loadStarSystem(starSystem, false);
 
