@@ -73,7 +73,7 @@ export class BlackHoleModel implements StellarObjectModel {
             mass: BlackHoleModel.GetMassFromSchwarzschildRadius(this.radius),
             rotationPeriod: 1.5e-19,
             axialTilt: normalRandom(0, 0.4, this.rng, GenerationSteps.AXIAL_TILT),
-            accretionDiskRadius: this.radius * 8
+            accretionDiskRadius: this.radius * normalRandom(12, 3, this.rng, 7777)
         };
     }
 
