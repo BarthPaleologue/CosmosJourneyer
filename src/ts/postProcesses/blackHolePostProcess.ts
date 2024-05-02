@@ -23,7 +23,7 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { Assets } from "../assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
-import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
+import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 
@@ -68,6 +68,20 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
                 type: UniformEnumType.FLOAT,
                 get: () => {
                     return blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000);
+                }
+            },
+            {
+                name: "schwarzschildRadius",
+                type: UniformEnumType.FLOAT,
+                get: () => {
+                    return blackHole.model.getSchwarzschildRadius();
+                }
+            },
+            {
+                name: "frameDraggingFactor",
+                type: UniformEnumType.FLOAT,
+                get: () => {
+                    return blackHole.model.getKerrMetricA() / blackHole.model.physicalProperties.mass;
                 }
             },
             {

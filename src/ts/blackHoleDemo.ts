@@ -35,16 +35,16 @@ const starSystem = new StarSystemController(starSystemSeed, scene);
 
 const BH = StarSystemHelper.MakeBlackHole(starSystem, 0);
 BH.model.orbit.radius = 0;
+BH.model.physicalProperties.accretionDiskRadius = BH.model.radius * 12;
 
 const planet = StarSystemHelper.MakeTelluricPlanet(starSystem);
 planet.model.orbit.radius = 45 * planet.getRadius();
+planet.model.orbit.period = 24 * 60 * 60;
 
 await starSystemView.loadStarSystem(starSystem, false);
 
 engine.init(true);
 
-positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, 20);
+starSystemView.switchToDefaultControls();
 
-starSystemView.ui.setEnabled(true);
-starSystemView.showHtmlUI();
-starSystemView.getSpaceshipControls().spaceship.enableWarpDrive();
+positionNearObjectBrightSide(scene.getActiveControls(), BH, starSystem, 20);
