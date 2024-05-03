@@ -53,7 +53,7 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
 
         const uniforms: ShaderUniforms = [
             ...getObjectUniforms(blackHole),
-            ...getActiveCameraUniforms(scene),
+            ...getActiveCameraUniforms(this),
             {
                 name: "starfieldRotation",
                 type: UniformEnumType.MATRIX,

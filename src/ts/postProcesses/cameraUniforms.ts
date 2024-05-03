@@ -15,15 +15,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UberScene } from "../uberCore/uberScene";
-import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
-import { BoundingSphere } from "../architecture/boundingSphere";
-import { Star } from "../stellarObjects/star/star";
-import { Transformable } from "../architecture/transformable";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 
-export function getActiveCameraUniforms(postProcess: UberPostProcess): ShaderUniforms {
+export const CAMERA_UNIFORM_NAMES = ["camera_position", "camera_projection", "camera_inverseProjection", "camera_view", "camera_inverseView", "camera_near", "camera_far", "camera_fov"];
+
+export function getCameraUniforms(postProcess: UberPostProcess): ShaderUniforms {
     return [
         {
             name: "camera_position",
@@ -80,61 +77,6 @@ export function getActiveCameraUniforms(postProcess: UberPostProcess): ShaderUni
             get: () => {
                 return postProcess.getCamera().fov;
             }
-        }
-    ];
-}
-
-export function getStellarObjectsUniforms(stars: Transformable[]): ShaderUniforms {
-    return [
-        {
-            name: "star_positions",
-            type: UniformEnumType.VECTOR_3_ARRAY,
-            get: () => stars.map((star) => star.getTransform().getAbsolutePosition())
-        },
-        {
-            name: "star_colors",
-            type: UniformEnumType.COLOR_3_ARRAY,
-            get: () => stars.map((star) => (star instanceof Star ? star.model.color : Color3.White()))
-        },
-        {
-            name: "nbStars",
-            type: UniformEnumType.INT,
-            get: () => stars.length
-        }
-    ];
-}
-
-export function getObjectUniforms(object: Transformable & BoundingSphere): ShaderUniforms {
-    return [
-        {
-            name: "object_position",
-            type: UniformEnumType.VECTOR_3,
-            get: () => object.getTransform().getAbsolutePosition()
-        },
-        {
-            name: "object_radius",
-            type: UniformEnumType.FLOAT,
-            get: () => object.getBoundingRadius()
-        },
-        {
-            name: "object_rotationAxis",
-            type: UniformEnumType.VECTOR_3,
-            get: () => object.getTransform().up
-        }
-    ];
-}
-
-export function getSamplers(scene: UberScene): ShaderSamplers {
-    return [
-        {
-            name: "textureSampler",
-            type: SamplerEnumType.AUTO,
-            get: () => undefined
-        },
-        {
-            name: "depthSampler",
-            type: SamplerEnumType.TEXTURE,
-            get: () => scene.getDepthRenderer().getDepthMap()
         }
     ];
 }

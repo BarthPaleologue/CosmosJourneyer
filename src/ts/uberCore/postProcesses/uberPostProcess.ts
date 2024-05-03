@@ -24,6 +24,7 @@ import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from
 import { Scene } from "@babylonjs/core/scene";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Effect } from "@babylonjs/core/Materials/effect";
 
 /**
  * A wrapper around BabylonJS post processes that allows more predictable and easier to use uniforms
@@ -31,6 +32,8 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 export class UberPostProcess extends PostProcess {
     private readonly uniforms: ShaderUniforms = [];
     private readonly samplers: ShaderSamplers = [];
+
+    private currentCamera: Camera | null = null;
 
     constructor(name: string, fragmentName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: Scene) {
         const uniformNames = uniforms.map((uniform) => uniform.name);
@@ -44,14 +47,25 @@ export class UberPostProcess extends PostProcess {
         this.uniforms.push(...uniforms);
         this.samplers.push(...samplers);
 
-        this.onApplyObservable.add(() => this.transferUniforms());
+        this.onActivateObservable.add((camera) => {
+            this.currentCamera = camera;
+        });
+
+        this.onApplyObservable.add((effect: Effect) => this.transferUniforms(effect));
+    }
+
+    public getCamera(): Camera {
+        if(this.currentCamera === null) {
+            throw new Error("Camera is null"!);
+        }
+
+        return this.currentCamera;
     }
 
     /**
      * Gets the uniforms new values and transfers them to the post process
      */
-    private transferUniforms() {
-        const effect = this.getEffect();
+    private transferUniforms(effect: Effect) {
         for (const uniform of this.uniforms) {
             switch (uniform.type) {
                 case UniformEnumType.FLOAT:
