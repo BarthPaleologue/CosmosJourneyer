@@ -17,27 +17,20 @@
 
 import "../styles/index.scss";
 
-import { Assets } from "./assets";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { OceanPostProcess } from "./postProcesses/oceanPostProcess";
-import { UberScene } from "./uberCore/uberScene";
-import { translate } from "./uberCore/transforms/basicTransform";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Engine } from "@babylonjs/core/Engines/engine";
-
-import HavokPhysics from "@babylonjs/havok";
-import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
-import { setMaxLinVel } from "./utils/havok";
-import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
-import { ChunkForgeWorkers } from "./planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
-import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Quaternion } from "@babylonjs/core/Maths/math";
-import { AtmosphericScatteringPostProcess } from "./postProcesses/atmosphericScatteringPostProcess";
-import { Star } from "./stellarObjects/star/star";
-import { LensFlarePostProcess } from "./postProcesses/lensFlarePostProcess";
-import { Settings } from "./settings";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { ScenePerformancePriority } from "@babylonjs/core/scene";
+import "@babylonjs/core/Materials/standardMaterial";
+import "@babylonjs/core/Loading/loadingScreen";
+import "../styles/index.scss";
+import { Viewport } from "@babylonjs/core/Maths/math.viewport";
+import "@babylonjs/core/Misc/screenshotTools";
+import { Tools } from "@babylonjs/core/Misc/tools";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import "@babylonjs/core/Meshes/thinInstanceMesh";
+import { BlackHolePostProcess } from "./postProcesses/blackHolePostProcess";
+import { BlackHole } from "./stellarObjects/blackHole/blackHole";
+import { UberScene } from "./uberCore/uberScene";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -45,71 +38,63 @@ canvas.height = window.innerHeight;
 
 const engine = new Engine(canvas, true);
 engine.useReverseDepthBuffer = true;
+engine.displayLoadingUI();
 
-// Init Havok physics engine
-const havokInstance = await HavokPhysics();
-const havokPlugin = new HavokPlugin(true, havokInstance);
-setMaxLinVel(havokPlugin, 10000, 10000);
-console.log(`Havok initialized`);
-
-const scene = new UberScene(engine, ScenePerformancePriority.Intermediate);
+const scene = new UberScene(engine);
 scene.useRightHandedSystem = true;
-scene.enablePhysics(Vector3.Zero(), havokPlugin);
 
-await Assets.Init(scene);
+// This transform will be used as the parent of both eyes
+const headTransform = new TransformNode("HeadTransform", scene);
 
-const sphereRadius = 1000e3;
+// Fine tune this value with your own eyes
+const interOcularDistance = 0.065 / 2;
 
-const camera = new FreeCamera("camera", new Vector3(0, 0, 0), scene);
-camera.maxZ = 1e9;
-camera.speed *= sphereRadius * 0.1;
-camera.angularSensibility /= 10;
-scene.setActiveCamera(camera);
-camera.attachControl(canvas, true);
+// left eye is on the left
+const leftEye = new FreeCamera("LeftEye", new Vector3(-interOcularDistance / 2, 0, 0), scene);
+leftEye.viewport = new Viewport(0, 0.0, 0.5, 1);
+leftEye.parent = headTransform;
+leftEye.maxZ = 20000e3;
 
-const planet = new TelluricPlanet("xrPlanet", scene, 0.51, undefined);
-translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
+// right eye is on the right
+const rightEye = new FreeCamera("RightEye", new Vector3(interOcularDistance / 2, 0, 0), scene);
+rightEye.viewport = new Viewport(0.5, 0, 0.5, 1);
+rightEye.parent = headTransform;
+rightEye.maxZ = 20000e3;
 
-const hemiLight = new HemisphericLight("hemiLight", new Vector3(0, 1, 0), scene);
-const star = new Star("star", scene, 0.2); //PointLightWrapper(new PointLight("dir01", new Vector3(0, 1, 0), scene));
-translate(star.getTransform(), new Vector3(0, 0, -sphereRadius * 5000));
+// this shrinks the resulting images horizontally. Useful for autostereoscopic displays
+headTransform.scaling.x = 2;
 
-const starfield = new StarfieldPostProcess(scene, [star], [planet], Quaternion.Identity());
-camera.attachPostProcess(starfield);
+const debugCamera = new FreeCamera("DebugCamera", Vector3.Zero(), scene);
+debugCamera.maxZ = 50_000e3;
+debugCamera.attachControl(true);
 
-const ocean = new OceanPostProcess("ocean", planet, scene, [star]);
-camera.attachPostProcess(ocean);
+scene.activeCameras = [leftEye, rightEye];
+//scene.activeCamera = debugCamera;
+scene.setActiveCamera(leftEye);
 
-const atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, 100e3, scene, [star]);
-camera.attachPostProcess(atmosphere);
+const blackHole = new BlackHole("hole", scene, 0, null);
+blackHole.getTransform().setAbsolutePosition(new Vector3(0, 0, 20000e3));
 
-const lensflare = new LensFlarePostProcess(star, scene);
-camera.attachPostProcess(lensflare);
+const bh = new BlackHolePostProcess(blackHole, scene, Quaternion.Identity());
+leftEye.attachPostProcess(bh);
 
-const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
+// our eyes will focus on the center where the object is
+const focalPoint = blackHole.getTransform().getAbsolutePosition();
+
+// because our eyes are in the local space of the head, we must translate the focal point in that local space to be able to use it
+const headInverseWorld = headTransform.computeWorldMatrix(true).clone().invert();
+const focalPointLocalSpace = Vector3.TransformCoordinates(focalPoint, headInverseWorld); 
+
+// we turn our eyes to the target in local space
+leftEye.setTarget(focalPointLocalSpace);
+rightEye.setTarget(focalPointLocalSpace);
 
 scene.onBeforeRenderObservable.add(() => {
-    const deltaTime = scene.deltaTime / 1000;
-
-    if (scene.activeCamera === null) throw new Error("Active camera is null");
-
-    if (camera.globalPosition.length() > 0) {
-        translate(planet.getTransform(), camera.globalPosition.negate());
-        translate(star.getTransform(), camera.globalPosition.negate());
-        camera.position.set(0, 0, 0);
-    }
-
-    planet.updateLOD(scene.activeCamera.globalPosition, chunkForge);
-    planet.updateMaterial(camera, [star], deltaTime);
-
-    chunkForge.update();
-
-    star.updateMaterial(deltaTime);
-
-    ocean.update(deltaTime);
+    bh.update(engine.getDeltaTime() / 1000);
 });
 
 scene.executeWhenReady(() => {
+    engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
         scene.render();
     });
@@ -119,4 +104,12 @@ window.addEventListener("resize", () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     engine.resize(true);
+});
+
+document.addEventListener("keypress", (e) => {
+    if (e.key === "p") {
+        // take screenshot
+        Tools.CreateScreenshot(engine, leftEye, { precision: 1 });
+        Tools.CreateScreenshot(engine, rightEye, { precision: 1 });
+    }
 });
