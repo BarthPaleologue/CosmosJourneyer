@@ -18,11 +18,23 @@
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 import { clamp } from "terrain-generation";
-import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../../uberCore/postProcesses/types";
 import { Scene } from "@babylonjs/core/scene";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import ringsLUT from "../../../shaders/textures/ringsLUT.glsl";
+import { Assets } from "../../assets";
+
+export const RingsUniformNames = {
+    RING_START: "rings_start",
+    RING_END: "rings_end",
+    RING_FREQUENCY: "rings_frequency",
+    RING_OPACITY: "rings_opacity",
+    RING_COLOR: "rings_color"
+};
+
+export const RingsSamplerNames = {
+    RING_LUT: "rings_lut"
+};
 
 export class RingsUniforms {
     ringStart: number;
@@ -44,103 +56,33 @@ export class RingsUniforms {
         this.offset = randRange(-100, 100, rng, 1440);
     }
 
-    static GetEmptyShaderUniforms(): ShaderUniforms {
-        return [
-            {
-                name: "rings_start",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return 0;
-                }
-            },
-            {
-                name: "rings_end",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return 0;
-                }
-            },
-            {
-                name: "rings_frequency",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return 0;
-                }
-            },
-            {
-                name: "rings_opacity",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return 0;
-                }
-            },
-            {
-                name: "rings_color",
-                type: UniformEnumType.COLOR_3,
-                get: () => {
-                    return new Color3(0, 0, 0);
-                }
-            }
-        ];
+    public setUniforms(effect: Effect) {
+        effect.setFloat(RingsUniformNames.RING_START, this.ringStart);
+        effect.setFloat(RingsUniformNames.RING_END, this.ringEnd);
+        effect.setFloat(RingsUniformNames.RING_FREQUENCY, this.ringFrequency);
+        effect.setFloat(RingsUniformNames.RING_OPACITY, this.ringOpacity);
+        effect.setColor3(RingsUniformNames.RING_COLOR, this.ringColor);
     }
 
-    getShaderUniforms(): ShaderUniforms {
-        return [
-            {
-                name: "rings_start",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return this.ringStart;
-                }
-            },
-            {
-                name: "rings_end",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return this.ringEnd;
-                }
-            },
-            {
-                name: "rings_frequency",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return this.ringFrequency;
-                }
-            },
-            {
-                name: "rings_opacity",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return this.ringOpacity;
-                }
-            },
-            {
-                name: "rings_color",
-                type: UniformEnumType.COLOR_3,
-                get: () => {
-                    return this.ringColor;
-                }
-            }
-        ];
+    public static SetEmptyUniforms(effect: Effect) {
+        effect.setFloat(RingsUniformNames.RING_START, 0);
+        effect.setFloat(RingsUniformNames.RING_END, 0);
+        effect.setFloat(RingsUniformNames.RING_FREQUENCY, 0);
+        effect.setFloat(RingsUniformNames.RING_OPACITY, 0);
+        effect.setColor3(RingsUniformNames.RING_COLOR, new Color3(0, 0, 0));
     }
 
-    /**
-     * Returns the samplers for the shader when the LUT is ready
-     * You cannot await this function as it would block the main thread and cause a deadlock as the LUT is created on the main thread
-     * @param scene
-     */
-    public async getShaderSamplers(scene: Scene): Promise<ShaderSamplers> {
-        return this.getLUT(scene).then((lut) => {
-            return [
-                {
-                    name: "rings_lut",
-                    type: SamplerEnumType.TEXTURE,
-                    get: () => {
-                        return lut;
-                    }
-                }
-            ];
-        });
+    public setSamplers(effect: Effect, scene: Scene) {
+        if(this.ringLut === null) this.ringLut = this.createLut(scene);
+        if(this.ringLut.isReady()) {
+            effect.setTexture(RingsSamplerNames.RING_LUT, this.ringLut);
+        } else {
+            RingsUniforms.SetEmptySamplers(effect);
+        }
+    }
+
+    public static SetEmptySamplers(effect: Effect) {
+        effect.setTexture(RingsSamplerNames.RING_LUT, Assets.EMPTY_TEXTURE);
     }
 
     /**
@@ -149,39 +91,29 @@ export class RingsUniforms {
      * @param scene
      * @private
      */
-    private getLUT(scene: Scene): Promise<ProceduralTexture> {
+    private createLut(scene: Scene): ProceduralTexture {
         if (Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
             Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
         }
 
-        if (this.ringLut === null) {
-            const lut = new ProceduralTexture(
-                "ringsLUT",
-                {
-                    width: 4096,
-                    height: 1
-                },
-                "ringsLUT",
-                scene,
-                undefined,
-                true,
-                false
-            );
-            lut.setFloat("seed", this.offset);
-            lut.setFloat("frequency", this.ringFrequency);
-            lut.setFloat("ringStart", this.ringStart);
-            lut.setFloat("ringEnd", this.ringEnd);
-            lut.refreshRate = 0;
+        const lut = new ProceduralTexture(
+            "ringsLUT",
+            {
+                width: 4096,
+                height: 1
+            },
+            "ringsLUT",
+            scene,
+            undefined,
+            true,
+            false
+        );
+        lut.setFloat("seed", this.offset);
+        lut.setFloat("frequency", this.ringFrequency);
+        lut.setFloat("ringStart", this.ringStart);
+        lut.setFloat("ringEnd", this.ringEnd);
+        lut.refreshRate = 0;
 
-            this.ringLut = lut;
-        }
-
-        return new Promise((resolve) => {
-            if (this.ringLut === null) throw new Error("Ring LUT was null when creating promise");
-            this.ringLut.executeWhenReady(() => {
-                if (this.ringLut === null) throw new Error("Ring LUT was null when executing when ready");
-                resolve(this.ringLut);
-            });
-        });
+        return lut;
     }
 }

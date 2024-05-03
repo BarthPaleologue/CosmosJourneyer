@@ -17,14 +17,18 @@
 
 import matterJetFragment from "../../shaders/matterjet.glsl";
 import { UberScene } from "../uberCore/uberScene";
-import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
-import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
-import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { StellarObject } from "../architecture/stellarObject";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
-export interface MatterJetUniforms {
+export type MatterJetUniforms = {
     // the rotation period in seconds of the matter jet
     rotationPeriod: number;
     time: number;
@@ -33,9 +37,11 @@ export interface MatterJetUniforms {
 /**
  * Post process for rendering matter jets that are used by neutron stars for example
  */
-export class MatterJetPostProcess extends UberPostProcess implements ObjectPostProcess, UpdatablePostProcess {
+export class MatterJetPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
     matterJetUniforms: MatterJetUniforms;
     object: StellarObject;
+
+    private activeCamera: Camera | null = null;
 
     constructor(name: string, stellarObject: StellarObject, scene: UberScene) {
         const shaderName = "matterjet";
@@ -48,38 +54,43 @@ export class MatterJetPostProcess extends UberPostProcess implements ObjectPostP
             time: 0
         };
 
-        const uniforms: ShaderUniforms = [
-            ...getObjectUniforms(stellarObject),
-            ...getActiveCameraUniforms(scene),
-            {
-                name: "time",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return settings.time % (settings.rotationPeriod * 10000);
-                }
-            },
-            {
-                name: "rotationPeriod",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return settings.rotationPeriod;
-                }
-            },
-            {
-                name: "rotationAxis",
-                type: UniformEnumType.VECTOR_3,
-                get: () => {
-                    return stellarObject.getRotationAxis();
-                }
-            }
+        const MatterJetUniformNames = {
+            TIME: "time",
+            ROTATION_PERIOD: "rotationPeriod",
+            ROTATION_AXIS: "rotationAxis"
+        }
+
+        const uniforms: string[] = [
+            ...Object.values(ObjectUniformNames),
+            ...Object.values(CameraUniformNames),
+            ...Object.values(MatterJetUniformNames)
         ];
 
-        const samplers: ShaderSamplers = [...getSamplers(scene)];
+        const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(name, shaderName, uniforms, samplers, scene);
+        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = stellarObject;
         this.matterJetUniforms = settings;
+
+        this.onActivateObservable.add((camera) => {
+            this.activeCamera = camera;
+        });
+
+        this.onApplyObservable.add((effect) => {
+            if(this.activeCamera === null) {
+                throw new Error("Camera is null");
+            }
+
+            setCameraUniforms(effect, this.activeCamera);
+            setObjectUniforms(effect, stellarObject);
+
+            effect.setFloat(MatterJetUniformNames.TIME, this.matterJetUniforms.time % (this.matterJetUniforms.rotationPeriod * 10000));
+            effect.setFloat(MatterJetUniformNames.ROTATION_PERIOD, this.matterJetUniforms.rotationPeriod);
+            effect.setVector3(MatterJetUniformNames.ROTATION_AXIS, stellarObject.getRotationAxis());
+
+            setSamplerUniforms(effect, this.activeCamera, scene)
+        });
     }
 
     public update(deltaTime: number): void {

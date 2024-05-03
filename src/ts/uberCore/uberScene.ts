@@ -52,16 +52,6 @@ export class UberScene extends Scene {
     }
 
     /**
-     * Returns the depth renderer for the scene. If it does not exist, it throws an error.
-     * @returns The depth renderer.
-     * @throws An error if the depth renderer does not exist.
-     */
-    public getDepthRenderer(): DepthRenderer {
-        if (this.depthRenderer === null) throw new Error("Depth Renderer not initialized");
-        return this.depthRenderer;
-    }
-
-    /**
      * Sets the active controls for the scene. This also sets the active camera of the scene using the active camera of the controls.
      * @param controls The active controls.
      */

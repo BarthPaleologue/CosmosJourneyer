@@ -77,6 +77,7 @@ blackHole.getTransform().setAbsolutePosition(new Vector3(0, 0, 20000e3));
 
 const bh = new BlackHolePostProcess(blackHole, scene, Quaternion.Identity());
 leftEye.attachPostProcess(bh);
+rightEye.attachPostProcess(bh);
 
 // our eyes will focus on the center where the object is
 const focalPoint = blackHole.getTransform().getAbsolutePosition();

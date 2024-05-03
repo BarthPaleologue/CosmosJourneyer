@@ -280,14 +280,12 @@ export class StarSystemController {
      * This method cannot be awaited as its completion depends on the execution of BabylonJS that happens afterward.
      */
     public async initPostProcesses(postProcessManager: PostProcessManager): Promise<void> {
-        const promises: Promise<void>[] = [];
-
         postProcessManager.addStarField(this.stellarObjects, this.celestialBodies, this.universeRotation);
         for (const object of this.celestialBodies) {
             for (const postProcess of object.postProcesses) {
                 switch (postProcess) {
                     case PostProcessType.RING:
-                        promises.push(postProcessManager.addRings(object, this.stellarObjects));
+                        postProcessManager.addRings(object, this.stellarObjects);
                         break;
                     case PostProcessType.ATMOSPHERE:
                         if (!(object instanceof GasPlanet) && !(object instanceof TelluricPlanet))
@@ -296,7 +294,7 @@ export class StarSystemController {
                         break;
                     case PostProcessType.CLOUDS:
                         if (!(object instanceof TelluricPlanet)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + object.name);
-                        promises.push(postProcessManager.addClouds(object as TelluricPlanet, this.stellarObjects));
+                        postProcessManager.addClouds(object as TelluricPlanet, this.stellarObjects);
                         break;
                     case PostProcessType.OCEAN:
                         if (!(object instanceof TelluricPlanet)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + object.name);
@@ -320,7 +318,7 @@ export class StarSystemController {
                         postProcessManager.addMatterJet(object as NeutronStar);
                         break;
                     case PostProcessType.SHADOW:
-                        promises.push(postProcessManager.addShadowCaster(object, this.stellarObjects));
+                        postProcessManager.addShadowCaster(object, this.stellarObjects);
                         break;
                     case PostProcessType.LENS_FLARE:
                         postProcessManager.addLensFlare(object as StellarObject);
@@ -329,10 +327,8 @@ export class StarSystemController {
             }
         }
 
-        return Promise.all(promises).then(() => {
-            postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition));
-            postProcessManager.rebuild();
-        });
+        postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition));
+        postProcessManager.rebuild();
     }
 
     /**

@@ -17,23 +17,30 @@
 
 import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
 import { UberScene } from "../uberCore/uberScene";
-import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { CloudsUniforms } from "./clouds/cloudsUniforms";
 
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { Transformable } from "../architecture/transformable";
 import { StellarObject } from "../architecture/stellarObject";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Constants } from "@babylonjs/core/Engines/constants";
 
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 
-export class VolumetricCloudsPostProcess extends UberPostProcess implements ObjectPostProcess {
+export class VolumetricCloudsPostProcess extends PostProcess implements ObjectPostProcess {
     readonly cloudUniforms: CloudsUniforms;
     readonly object: Transformable;
+
+    private activeCamera: Camera | null = null;
 
     constructor(name: string, planet: Transformable & BoundingSphere, cloudsUniforms: CloudsUniforms, scene: UberScene, stars: StellarObject[]) {
         const shaderName = "volumetricClouds";
@@ -41,31 +48,42 @@ export class VolumetricCloudsPostProcess extends UberPostProcess implements Obje
             Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;
         }
 
-        const uniforms: ShaderUniforms = [
-            ...getObjectUniforms(planet),
-            ...getStellarObjectsUniforms(stars),
-            ...getActiveCameraUniforms(scene),
-            {
-                name: "cloudLayerMinHeight",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return planet.getBoundingRadius();
-                }
-            },
-            {
-                name: "cloudLayerMaxHeight",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return planet.getBoundingRadius() + 30e3;
-                }
-            }
+        const VolumetricCloudsUniformNames = {
+            CLOUD_LAYER_MIN_HEIGHT: "cloudLayerMinHeight",
+            CLOUD_LAYER_MAX_HEIGHT: "cloudLayerMaxHeight"
+        }
+
+        const uniforms: string[] = [
+            ...Object.values(ObjectUniformNames),
+            ...Object.values(StellarObjectUniformNames),
+            ...Object.values(CameraUniformNames),
+            ...Object.values(VolumetricCloudsUniformNames)
         ];
 
-        const samplers: ShaderSamplers = getSamplers(scene);
+        const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(name, shaderName, uniforms, samplers, scene);
+        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = planet;
         this.cloudUniforms = cloudsUniforms;
+
+        this.onActivateObservable.add((camera) => {
+            this.activeCamera = camera;
+        });
+
+        this.onApplyObservable.add((effect) => {
+            if(this.activeCamera === null) {
+                throw new Error("Camera is null");
+            }
+
+            setCameraUniforms(effect, this.activeCamera);
+            setObjectUniforms(effect, planet);
+            setStellarObjectUniforms(effect, stars);
+
+            effect.setFloat(VolumetricCloudsUniformNames.CLOUD_LAYER_MIN_HEIGHT, planet.getBoundingRadius());
+            effect.setFloat(VolumetricCloudsUniformNames.CLOUD_LAYER_MAX_HEIGHT, planet.getBoundingRadius() + 30e3);
+
+            setSamplerUniforms(effect, this.activeCamera, scene);
+        });
     }
 }
