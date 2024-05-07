@@ -79,13 +79,11 @@ export class StereoCameras {
      * @param focalPoint The focal point in world space
      */
     focusOnPoint(focalPoint: Vector3) {
-        // because our eyes are in the local space of the head, we must translate the focal point in that local space to be able to use it
-        const headInverseWorld = this.transform.computeWorldMatrix(true).clone().invert();
-        const focalPointLocalSpace = Vector3.TransformCoordinates(focalPoint, headInverseWorld); 
+        this.transform.lookAt(focalPoint);
 
-        // we turn our eyes to the target in local space
-        this.leftEye.setTarget(focalPointLocalSpace);
-        this.rightEye.setTarget(focalPointLocalSpace);
+        // look forward
+        this.leftEye.setTarget(this.leftEye.position.add(Axis.Z.scale(10_000)));
+        this.rightEye.setTarget(this.rightEye.position.add(Axis.Z.scale(10_000)));
     }
 }
 
