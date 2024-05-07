@@ -35,6 +35,8 @@ import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Axis, Scene } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
+import { Mandelbulb } from "./mandelbulb/mandelbulb";
+import { MandelbulbPostProcess } from "./postProcesses/mandelbulbPostProcess";
 
 const FOV = Tools.ToRadians(60);
 
@@ -110,25 +112,39 @@ scene.activeCameras = [leftEye, rightEye];
 scene.setActiveCamera(leftEye);
 scene.enableDepthRenderer(rightEye, false, true);
 
-const blackHole = new BlackHole("hole", scene, 0, null);
-blackHole.getTransform().setAbsolutePosition(new Vector3(0, 0, 10000e3));
+//const blackHole = new BlackHole("hole", scene, 0, null);
+//blackHole.getTransform().setAbsolutePosition(new Vector3(0, 0, 10000e3));
 
-const starfieldPostProcess = new StarfieldPostProcess(scene, [], [blackHole], Quaternion.Identity());
+const seed = Math.random() * 10000;
+//console.log(seed);
+//4829.9269997818865
+//8924.633781553775
+
+const mandelbulb = new Mandelbulb("bulb", scene, seed, null);
+mandelbulb.getTransform().setAbsolutePosition(new Vector3(0, 0, 1500e3));
+
+const targetObject = mandelbulb;
+
+const starfieldPostProcess = new StarfieldPostProcess(scene, [], [targetObject], Quaternion.Identity());
 leftEye.attachPostProcess(starfieldPostProcess);
 rightEye.attachPostProcess(starfieldPostProcess);
 
-const bh = new BlackHolePostProcess(blackHole, scene, Quaternion.Identity());
+/*const bh = new BlackHolePostProcess(blackHole, scene, Quaternion.Identity());
 leftEye.attachPostProcess(bh);
-rightEye.attachPostProcess(bh);
+rightEye.attachPostProcess(bh);*/
 
-stereoCameras.transform.rotateAround(blackHole.getTransform().getAbsolutePosition(), Axis.X, 0.2);
+const mandelbulbPP = new MandelbulbPostProcess(mandelbulb, scene, []);
+leftEye.attachPostProcess(mandelbulbPP);
+rightEye.attachPostProcess(mandelbulbPP);
+
+stereoCameras.transform.rotateAround(targetObject.getTransform().getAbsolutePosition(), Axis.X, 0.2);
 
 
 function applyFloatingOrigin() {
     const headPosition = stereoCameras.transform.getAbsolutePosition().clone();
 
     translate(stereoCameras.transform, headPosition.negate());
-    translate(blackHole.getTransform(), headPosition.negate());
+    translate(targetObject.getTransform(), headPosition.negate());
 }
 
 let mousePressed = false;
@@ -140,9 +156,9 @@ document.addEventListener("pointermove", e => {
     const mouseDY = e.movementY;
 
     if(mousePressed) {
-        stereoCameras.transform.rotateAround(blackHole.getTransform().getAbsolutePosition(), Axis.Y, 0.001 * mouseDX);
+        stereoCameras.transform.rotateAround(targetObject.getTransform().getAbsolutePosition(), Axis.Y, 0.001 * mouseDX);
         stereoCameras.transform.computeWorldMatrix(true);
-        stereoCameras.transform.rotateAround(blackHole.getTransform().getAbsolutePosition(), stereoCameras.transform.getDirection(Axis.X), 0.001 * mouseDY);
+        stereoCameras.transform.rotateAround(targetObject.getTransform().getAbsolutePosition(), stereoCameras.transform.getDirection(Axis.X), 0.001 * mouseDY);
         stereoCameras.transform.computeWorldMatrix(true);
 
         applyFloatingOrigin();
@@ -159,23 +175,27 @@ document.addEventListener("keydown", e => {
     console.log(interOcularFactor);
 });
 
+let elapsedTime = 0.0;
 
 scene.onBeforeRenderObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;
 
-    bh.update(deltaSeconds);
+    elapsedTime += deltaSeconds;
+
+    mandelbulbPP.update(deltaSeconds);
+    //bh.update(deltaSeconds);
 
     // our eyes will focus on the center where the object is
-    const focalPoint = blackHole.getTransform().getAbsolutePosition().negate();
+    const focalPoint = targetObject.getTransform().getAbsolutePosition().negate();
 
     stereoCameras.leftEye.position.x = -interOcularDistance * 0.5 * interOcularFactor;
     stereoCameras.rightEye.position.x = interOcularDistance * 0.5 * interOcularFactor;
 
     stereoCameras.focusOnPoint(focalPoint);
 
-    stereoCameras.transform.rotateAround(blackHole.getTransform().getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);
+    stereoCameras.transform.rotateAround(targetObject.getTransform().getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);
     stereoCameras.transform.computeWorldMatrix(true);
-    stereoCameras.transform.rotateAround(blackHole.getTransform().getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
+    stereoCameras.transform.rotateAround(targetObject.getTransform().getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
     stereoCameras.transform.computeWorldMatrix(true);
 
     applyFloatingOrigin();
