@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { gcd } from "terrain-generation";
 import { Scene } from "@babylonjs/core/scene";
@@ -43,18 +42,17 @@ export const CloudsSamplerNames = {
 };
 
 export class CloudsUniforms {
-    
     readonly model: CloudsModel;
 
     readonly lut: ProceduralTexture;
-    
+
     private isLutReady = false;
 
     private elapsedSeconds = 0;
 
     constructor(model: CloudsModel, scene: Scene) {
         this.model = model;
-        
+
         if (Effect.ShadersStore[`flatCloudsLUTFragmentShader`] === undefined) {
             Effect.ShadersStore[`flatCloudsLUTFragmentShader`] = flatCloudLUT;
         }
@@ -63,10 +61,10 @@ export class CloudsUniforms {
         this.lut.setFloat("worleyFrequency", this.model.frequency);
         this.lut.setFloat("detailFrequency", this.model.detailFrequency);
         this.lut.refreshRate = 0;
-        
+
         this.lut.executeWhenReady(() => {
             this.isLutReady = true;
-        })
+        });
     }
 
     public update(deltaSeconds: number) {
@@ -84,32 +82,17 @@ export class CloudsUniforms {
         effect.setFloat(CloudsUniformNames.DETAIL_SPEED, this.model.detailSpeed);
         effect.setFloat(CloudsUniformNames.SMOOTHNESS, this.model.smoothness);
         effect.setFloat(CloudsUniformNames.SPECULAR_POWER, this.model.specularPower);
-        effect.setFloat(CloudsUniformNames.TIME, -this.elapsedSeconds % ((2 * Math.PI * gcd(this.model.worleySpeed * 10000, this.model.detailSpeed * 10000)) / this.model.worleySpeed));
-    }
-
-    public static SetEmptyUniforms(effect: Effect) {
-        effect.setFloat(CloudsUniformNames.LAYER_RADIUS, 0);
-        effect.setFloat(CloudsUniformNames.FREQUENCY, 0);
-        effect.setFloat(CloudsUniformNames.DETAIL_FREQUENCY, 0);
-        effect.setFloat(CloudsUniformNames.COVERAGE, 0);
-        effect.setFloat(CloudsUniformNames.SHARPNESS, 0);
-        effect.setColor3(CloudsUniformNames.COLOR, new Color3(0, 0, 0));
-        effect.setFloat(CloudsUniformNames.WORLEY_SPEED, 0);
-        effect.setFloat(CloudsUniformNames.DETAIL_SPEED, 0);
-        effect.setFloat(CloudsUniformNames.SMOOTHNESS, 0);
-        effect.setFloat(CloudsUniformNames.SPECULAR_POWER, 0);
-        effect.setFloat(CloudsUniformNames.TIME, 0);
+        effect.setFloat(
+            CloudsUniformNames.TIME,
+            -this.elapsedSeconds % ((2 * Math.PI * gcd(this.model.worleySpeed * 10000, this.model.detailSpeed * 10000)) / this.model.worleySpeed)
+        );
     }
 
     public setSamplers(effect: Effect) {
-        if(this.isLutReady) {
+        if (this.isLutReady) {
             effect.setTexture(CloudsSamplerNames.LUT, this.lut);
         } else {
-            CloudsUniforms.SetEmptySamplers(effect);
+            effect.setTexture(CloudsSamplerNames.LUT, Assets.EMPTY_TEXTURE);
         }
-    }
-
-    public static SetEmptySamplers(effect: Effect) {
-        effect.setTexture(CloudsSamplerNames.LUT, Assets.EMPTY_TEXTURE);
     }
 }
