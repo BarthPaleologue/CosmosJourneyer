@@ -34,7 +34,7 @@ import { OrbitalObject } from "../../architecture/orbitalObject";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { Cullable } from "../../bodies/cullable";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { Transformable } from "../../architecture/transformable";
 import i18n from "../../i18n";
@@ -49,6 +49,8 @@ export class GasPlanet implements Planet, Cullable {
     name: string;
     parent: OrbitalObject | null;
     postProcesses: PostProcessType[] = [];
+
+    readonly ringsUniforms: RingsUniforms | null;
 
     /**
      * New Gas Planet
@@ -91,7 +93,12 @@ export class GasPlanet implements Planet, Cullable {
         this.mesh.material = this.material;
 
         this.postProcesses.push(PostProcessType.ATMOSPHERE, PostProcessType.SHADOW);
-        if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
+        if (this.model.rings !== null) {
+            this.postProcesses.push(PostProcessType.RING);
+            this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+        } else {
+            this.ringsUniforms = null;
+        }
 
         this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
@@ -113,7 +120,7 @@ export class GasPlanet implements Planet, Cullable {
     }
 
     getRingsUniforms(): RingsUniforms | null {
-        return this.model.ringsUniforms;
+        return this.ringsUniforms;
     }
 
     getTypeName(): string {

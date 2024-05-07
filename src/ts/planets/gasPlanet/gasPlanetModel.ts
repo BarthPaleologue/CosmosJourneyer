@@ -19,7 +19,6 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
 import { BodyType, GenerationSteps } from "../../model/common";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { OrbitProperties } from "../../orbit/orbitProperties";
@@ -29,6 +28,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetModel } from "../../architecture/planet";
 import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { RingsModel } from "../../rings/ringsModel";
 
 export class GasPlanetModel implements PlanetModel {
     readonly bodyType = BodyType.GAS_PLANET;
@@ -41,7 +41,7 @@ export class GasPlanetModel implements PlanetModel {
 
     readonly physicalProperties: PlanetPhysicalProperties;
 
-    readonly ringsUniforms;
+    readonly rings: RingsModel | null;
 
     readonly nbMoons: number;
 
@@ -86,9 +86,9 @@ export class GasPlanetModel implements PlanetModel {
         };
 
         if (uniformRandBool(0.8, this.rng, GenerationSteps.RINGS)) {
-            this.ringsUniforms = new RingsUniforms(this.rng);
+            this.rings = new RingsModel(this.rng);
         } else {
-            this.ringsUniforms = null;
+            this.rings = null;
         }
 
         this.nbMoons = randRangeInt(0, 3, this.rng, GenerationSteps.NB_MOONS);

@@ -28,13 +28,11 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { PostProcessType } from "./postProcesses/postProcessTypes";
 import { TelluricPlanetModel } from "./planets/telluricPlanet/telluricPlanetModel";
 import { GasPlanetModel } from "./planets/gasPlanet/gasPlanetModel";
-import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "./uberCore/transforms/basicTransform";
 import { StarSystemHelper } from "./starSystem/starSystemHelper";
 import { StarModel } from "./stellarObjects/star/starModel";
-import { RingsUniforms } from "./postProcesses/rings/ringsUniform";
 import { getMoonSeed } from "./planets/common";
 import { SystemSeed } from "./utils/systemSeed";
-import { SpaceStation } from "./spacestation/spaceStation";
+import { RingsModel } from "./rings/ringsModel";
 
 const engine = await CosmosJourneyer.CreateAsync();
 
@@ -78,7 +76,7 @@ planetModel.orbit.radius = 4000 * planetModel.radius;
 planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = StarSystemHelper.MakeTelluricPlanet(starSystem, planetModel);
-planet.model.ringsUniforms = new RingsUniforms(planet.model.rng);
+planet.model.rings = new RingsModel(planet.model.rng);
 planet.postProcesses.push(PostProcessType.RING);
 
 const [spaceStation] = StarSystemHelper.MakeSpaceStations(starSystem, planet, 1);

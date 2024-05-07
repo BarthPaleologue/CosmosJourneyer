@@ -21,7 +21,6 @@ import { Settings } from "../../settings";
 import { BodyType, GenerationSteps } from "../../model/common";
 import { TerrainSettings } from "./terrain/terrainSettings";
 import { clamp } from "terrain-generation";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -31,6 +30,7 @@ import { CloudsUniforms } from "../../postProcesses/clouds/cloudsUniforms";
 import { PlanetModel } from "../../architecture/planet";
 import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { RingsModel } from "../../rings/ringsModel";
 
 export class TelluricPlanetModel implements PlanetModel {
     readonly bodyType = BodyType.TELLURIC_PLANET;
@@ -45,7 +45,7 @@ export class TelluricPlanetModel implements PlanetModel {
 
     readonly terrainSettings: TerrainSettings;
 
-    ringsUniforms: RingsUniforms | null = null;
+    rings: RingsModel | null = null;
     cloudsUniforms: CloudsUniforms | null = null;
 
     readonly nbMoons: number;
@@ -144,7 +144,7 @@ export class TelluricPlanetModel implements PlanetModel {
         }
 
         if (uniformRandBool(0.6, this.rng, GenerationSteps.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
-            this.ringsUniforms = new RingsUniforms(this.rng);
+            this.rings = new RingsModel(this.rng);
         }
 
         const waterFreezingPoint = 0.0;

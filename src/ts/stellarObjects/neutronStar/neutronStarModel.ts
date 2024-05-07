@@ -25,9 +25,9 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { getOrbitalPeriod } from "../../orbit/orbit";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { clamp } from "../../utils/math";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { RingsModel } from "../../rings/ringsModel";
 
 export class NeutronStarModel implements StellarObjectModel {
     readonly bodyType = BodyType.NEUTRON_STAR;
@@ -44,7 +44,7 @@ export class NeutronStarModel implements StellarObjectModel {
 
     static RING_PROPORTION = 0.02;
 
-    readonly ringsUniforms;
+    readonly rings: RingsModel | null;
 
     readonly parentBody: CelestialBodyModel | null;
 
@@ -80,9 +80,9 @@ export class NeutronStarModel implements StellarObjectModel {
         };
 
         if (uniformRandBool(NeutronStarModel.RING_PROPORTION, this.rng, GenerationSteps.RINGS)) {
-            this.ringsUniforms = new RingsUniforms(this.rng);
+            this.rings = new RingsModel(this.rng);
         } else {
-            this.ringsUniforms = null;
+            this.rings = null;
         }
     }
 

@@ -21,7 +21,7 @@ import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
 import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";
-import { RingsPostProcess } from "./rings/ringsPostProcess";
+import { RingsPostProcess } from "../rings/ringsPostProcess";
 import { StarfieldPostProcess } from "./starfieldPostProcess";
 import { VolumetricLight } from "./volumetricLight";
 import { BlackHolePostProcess } from "./blackHolePostProcess";
@@ -376,7 +376,7 @@ export class PostProcessManager {
         this.currentBody = body;
 
         const rings = this.getRings(body);
-        const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;
+        const switchLimit = rings !== null ? rings.ringsUniforms.model.ringStart : 2;
         if (isOrbiting(this.scene.getActiveControls(), body, switchLimit)) this.setSurfaceOrder();
         else this.setSpaceOrder();
     }

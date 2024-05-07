@@ -20,7 +20,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { PostProcessType } from "./postProcessTypes";
-import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "./rings/ringsUniform";
+import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "../rings/ringsUniform";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
@@ -111,7 +111,7 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
                 RingsUniforms.SetEmptySamplers(effect);
             } else {
                 this.ringsUniforms.setUniforms(effect);
-                this.ringsUniforms.setSamplers(effect, scene);
+                this.ringsUniforms.setSamplers(effect);
             }
             setSamplerUniforms(effect, this.activeCamera, scene);
         });

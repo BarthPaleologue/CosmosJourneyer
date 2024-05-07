@@ -24,12 +24,12 @@ import { getOrbitalPeriod } from "../../orbit/orbit";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { BodyType, GenerationSteps } from "../../model/common";
 import { StellarType } from "../common";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { wheelOfFortune } from "../../utils/wheelOfFortune";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { RingsModel } from "../../rings/ringsModel";
 
 export class StarModel implements StellarObjectModel {
     readonly bodyType = BodyType.STAR;
@@ -47,7 +47,7 @@ export class StarModel implements StellarObjectModel {
 
     static RING_PROPORTION = 0.2;
 
-    readonly ringsUniforms;
+    readonly rings: RingsModel | null;
 
     readonly parentBody: CelestialBodyModel | null;
 
@@ -85,9 +85,9 @@ export class StarModel implements StellarObjectModel {
         };
 
         if (uniformRandBool(StarModel.RING_PROPORTION, this.rng, GenerationSteps.RINGS)) {
-            this.ringsUniforms = new RingsUniforms(this.rng);
+            this.rings = new RingsModel(this.rng);
         } else {
-            this.ringsUniforms = null;
+            this.rings = null;
         }
     }
 

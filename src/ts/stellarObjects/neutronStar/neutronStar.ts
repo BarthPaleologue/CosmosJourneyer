@@ -37,7 +37,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { RingsUniforms } from "../../rings/ringsUniform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import i18n from "../../i18n";
@@ -55,6 +55,8 @@ export class NeutronStar implements StellarObject, Cullable {
     readonly aggregate: PhysicsAggregate;
 
     readonly postProcesses: PostProcessType[] = [];
+
+    readonly ringsUniforms: RingsUniforms | null;
 
     readonly parent: OrbitalObject | null;
 
@@ -105,7 +107,13 @@ export class NeutronStar implements StellarObject, Cullable {
         setRotationQuaternion(this.getTransform(), Quaternion.Identity());
 
         this.postProcesses.push(PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE, PostProcessType.MATTER_JETS);
-        if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
+        if (this.model.rings !== null) {
+            this.postProcesses.push(PostProcessType.RING);
+
+            this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+        } else {
+            this.ringsUniforms = null;
+        }
     }
 
     getTransform(): TransformNode {
@@ -133,7 +141,7 @@ export class NeutronStar implements StellarObject, Cullable {
     }
 
     getRingsUniforms(): RingsUniforms | null {
-        return this.model.ringsUniforms;
+        return this.ringsUniforms;
     }
 
     public updateMaterial(deltaTime: number): void {

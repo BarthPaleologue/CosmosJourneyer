@@ -28,7 +28,7 @@ import { Cullable } from "../../bodies/cullable";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import i18n from "../../i18n";
 
