@@ -184,8 +184,8 @@ export class TelluricPlanet implements Planet, Cullable {
         for (const side of this.sides) side.update(observerPosition, chunkForge);
     }
 
-    public updateMaterial(controller: Camera, stellarObjects: Transformable[], deltaTime: number): void {
-        this.material.update(controller.globalPosition, stellarObjects);
+    public updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
+        this.material.update(stellarObjects);
     }
 
     public getRadius(): number {
@@ -196,8 +196,8 @@ export class TelluricPlanet implements Planet, Cullable {
         return this.getRadius() + this.model.physicalProperties.oceanLevel;
     }
 
-    public computeCulling(camera: Camera): void {
-        for (const side of this.sides) side.computeCulling(camera);
+    public computeCulling(cameras: Camera[]): void {
+        for (const side of this.sides) side.computeCulling(cameras);
     }
 
     public dispose(): void {

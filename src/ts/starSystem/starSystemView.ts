@@ -477,14 +477,14 @@ export class StarSystemView implements View {
 
         this.defaultControls = new DefaultControls(this.scene);
         this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
-        this.defaultControls.getActiveCamera().maxZ = maxZ;
+        this.defaultControls.getActiveCameras().forEach(camera => camera.maxZ = maxZ);
 
         this.spaceshipControls = new ShipControls(this.scene);
-        this.spaceshipControls.getActiveCamera().maxZ = maxZ;
+        this.spaceshipControls.getActiveCameras().forEach(camera => camera.maxZ = maxZ);
 
         this.characterControls = new CharacterControls(this.scene);
         this.characterControls.getTransform().setEnabled(false);
-        this.characterControls.getActiveCamera().maxZ = maxZ;
+        this.characterControls.getActiveCameras().forEach(camera => camera.maxZ = maxZ);
 
         this.scene.setActiveControls(this.spaceshipControls);
     }
@@ -521,10 +521,10 @@ export class StarSystemView implements View {
         this.characterControls.setClosestWalkableObject(nearestBody);
         this.spaceshipControls.spaceship.setClosestWalkableObject(nearestBody);
 
-        this.ui.update(this.scene.getActiveCamera());
+        this.ui.update(this.scene.getActiveCameras()[0]);
 
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject();
-        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition);
+        const nearestCelestialBody = starSystem.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
 
         this.bodyEditor.update(nearestCelestialBody, this.postProcessManager, this.scene);
 
@@ -664,9 +664,9 @@ export class StarSystemView implements View {
             callback();
             return;
         }
-        activeControls.getActiveCamera().animations = [StarSystemView.UN_ZOOM_ANIMATION];
-        this.scene.beginAnimation(this.scene.getActiveControls().getActiveCamera(), 0, 60, false, 2.0, () => {
-            this.scene.getActiveControls().getActiveCamera().animations = [];
+        activeControls.getActiveCameras().forEach(camera => camera.animations = [StarSystemView.UN_ZOOM_ANIMATION]);
+        this.scene.beginAnimation(this.scene.getActiveControls().getActiveCameras(), 0, 60, false, 2.0, () => {
+            this.scene.getActiveControls().getActiveCameras().forEach(camera => camera.animations = []);
             this.hideHtmlUI();
             callback();
             this.scene.onAfterRenderObservable.addOnce(() => {
@@ -705,7 +705,7 @@ export class StarSystemView implements View {
     public render() {
         this.scene.render();
 
-        syncCamera(this.scene.getActiveCamera(), this.ui.camera);
+        syncCamera(this.scene.getActiveCameras()[0], this.ui.camera);
         this.ui.scene.render();
     }
 

@@ -62,7 +62,7 @@ const camera = new FreeCamera("camera", new Vector3(0, 0, 0), scene);
 camera.maxZ = 1e9;
 camera.speed *= sphereRadius * 0.1;
 camera.angularSensibility /= 10;
-scene.setActiveCamera(camera);
+scene.setActiveCameras([camera]);
 camera.attachControl(canvas, true);
 
 const xr = await scene.createDefaultXRExperienceAsync();
@@ -141,7 +141,7 @@ scene.onBeforeRenderObservable.add(() => {
     }
 
     planet.updateLOD(scene.activeCamera.globalPosition, chunkForge);
-    planet.updateMaterial(camera, [star], deltaTime);
+    planet.updateMaterial([star], deltaTime);
 
     chunkForge.update();
 

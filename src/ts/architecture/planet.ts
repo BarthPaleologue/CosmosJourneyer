@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
 import { CelestialBody, CelestialBodyModel } from "./celestialBody";
 import { PlanetPhysicalProperties } from "./physicalProperties";
 import { Transformable } from "./transformable";
@@ -23,7 +22,7 @@ import { Transformable } from "./transformable";
 export interface Planet extends CelestialBody {
     model: PlanetModel;
 
-    updateMaterial(controller: Camera, stellarObjects: Transformable[], deltaTime: number): void;
+    updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void;
 }
 
 export interface PlanetModel extends CelestialBodyModel {

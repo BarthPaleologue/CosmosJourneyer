@@ -168,7 +168,7 @@ function updateBeforeHavok() {
     //aurora.updateInternalClock(-deltaTime / 10);
 
     newton.updateLOD(camera.globalPosition, chunkForge);
-    newton.material.update(camera.globalPosition, [aurora]);
+    newton.material.update([aurora]);
 }
 
 scene.executeWhenReady(() => {

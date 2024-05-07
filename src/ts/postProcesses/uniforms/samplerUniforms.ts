@@ -28,7 +28,8 @@ export function setSamplerUniforms(effect: Effect, camera: Camera, scene: Scene)
     const depthRenderers = Object.values(scene._depthRenderer);
     const depthRenderer = depthRenderers.find((depthRenderer) => depthRenderer.getDepthMap().activeCamera === camera);
     if (depthRenderer === undefined) {
-        throw new Error("Depth renderer not found for camera");
+        console.log("Depth renderer", scene._depthRenderer);
+        throw new Error("Depth renderer not found for camera: " + camera.name);
     }
     effect.setTexture(SamplerUniformNames.DEPTH_SAMPLER, depthRenderer.getDepthMap());
 }

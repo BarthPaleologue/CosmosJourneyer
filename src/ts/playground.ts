@@ -107,10 +107,7 @@ const stereoCameras = new StereoCameras(canvas, engine, scene);
 const leftEye = stereoCameras.leftEye
 const rightEye = stereoCameras.rightEye;
 
-scene.activeCameras = [leftEye, rightEye];
-//scene.activeCamera = debugCamera;
-scene.setActiveCamera(leftEye);
-scene.enableDepthRenderer(rightEye, false, true);
+scene.setActiveCameras([leftEye, rightEye]);
 
 //const blackHole = new BlackHole("hole", scene, 0, null);
 //blackHole.getTransform().setAbsolutePosition(new Vector3(0, 0, 10000e3));

@@ -94,8 +94,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
                 "inversePlanetWorldMatrix",
 
-                "playerPosition",
-
                 "waterLevel",
                 "beachSize",
                 "steepSharpness",
@@ -209,7 +207,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         );
     }
 
-    public update(cameraPosition: Vector3, stellarObjects: Transformable[]) {
+    public update(stellarObjects: Transformable[]) {
         this.stellarObjects = stellarObjects;
 
         // The add once is important because the material will be bound for every chunk of the planet
@@ -218,10 +216,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             const inversePlanetWorldMatrix = this.planetTransform.getWorldMatrix().clone().invert();
             this.getEffect().setMatrix("normalMatrix", inversePlanetWorldMatrix.transpose());
             this.getEffect().setMatrix("inversePlanetWorldMatrix", inversePlanetWorldMatrix);
-
-            const activeCamera = this.getScene().activeCamera;
-            if (activeCamera === null) throw new Error("There is no active camera for TelluricPlanetMaterial!");
-            this.getEffect().setVector3("playerPosition", activeCamera.globalPosition);
 
             this.getEffect().setArray3("star_positions", flattenVector3Array(this.stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
             this.getEffect().setArray3("star_colors", flattenColor3Array(this.stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));

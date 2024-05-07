@@ -27,7 +27,6 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Star } from "../../stellarObjects/star/star";
 import { flattenColor3Array, flattenVector3Array } from "../../utils/algebra";
-import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Transformable } from "../../architecture/transformable";
 
 export class GasPlanetMaterial extends ShaderMaterial {
@@ -50,6 +49,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
             attributes: ["position", "normal"],
             uniforms: [
                 "world",
+                "view",
                 "worldViewProjection",
                 "normalMatrix",
                 "seed",
@@ -61,7 +61,6 @@ export class GasPlanetMaterial extends ShaderMaterial {
                 "color3",
                 "colorSharpness",
                 "time",
-                "playerPosition"
             ]
         });
 
@@ -90,13 +89,18 @@ export class GasPlanetMaterial extends ShaderMaterial {
         this.setColor3("color3", this.colorSettings.color3);
 
         this.updateConstants();
+    }
 
-        this.onBindObservable.add(() => {
+    public updateConstants(): void {
+        this.setFloat("colorSharpness", this.colorSettings.colorSharpness);
+    }
+
+    public update(stellarObjects: Transformable[], deltaTime: number) {
+        this.clock += deltaTime;
+        this.stellarObjects = stellarObjects;
+
+        this.onBindObservable.addOnce(() => {
             this.getEffect().setMatrix("normalMatrix", this.planet.getWorldMatrix().clone().invert().transpose());
-
-            const activeCamera = scene.activeCamera;
-            if(activeCamera === null) throw new Error("There is no active camera for GasPlanetMaterial!");
-            this.getEffect().setVector3("playerPosition", activeCamera.globalPosition);
 
             this.getEffect().setArray3("star_positions", flattenVector3Array(this.stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
             this.getEffect().setArray3("star_colors", flattenColor3Array(this.stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));
@@ -104,14 +108,5 @@ export class GasPlanetMaterial extends ShaderMaterial {
 
             this.getEffect().setFloat("time", this.clock % 100000);
         });
-    }
-
-    public updateConstants(): void {
-        this.setFloat("colorSharpness", this.colorSettings.colorSharpness);
-    }
-
-    public update(player: Camera, stellarObjects: Transformable[], deltaTime: number) {
-        this.clock += deltaTime;
-        this.stellarObjects = stellarObjects;
     }
 }

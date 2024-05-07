@@ -44,8 +44,8 @@ export class DefaultControls implements Controls {
         this.camera.fov = (80 / 360) * Math.PI;
     }
 
-    public getActiveCamera(): Camera {
-        return this.camera;
+    public getActiveCameras(): Camera[] {
+        return [this.camera];
     }
 
     public getTransform(): TransformNode {
@@ -85,7 +85,7 @@ export class DefaultControls implements Controls {
         displacement.addInPlace(rightDisplacement);
 
         translate(this.transform, displacement);
-        this.getActiveCamera().getViewMatrix();
+        this.getActiveCameras().forEach((camera) => camera.getViewMatrix());
 
         return displacement;
     }
