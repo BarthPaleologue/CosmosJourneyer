@@ -76,8 +76,6 @@ planetModel.orbit.radius = 4000 * planetModel.radius;
 planetModel.orbit.normalToPlane = Vector3.Up();
 
 const planet = StarSystemHelper.MakeTelluricPlanet(starSystem, planetModel);
-planet.model.rings = new RingsModel(planet.model.rng);
-planet.postProcesses.push(PostProcessType.RING);
 
 const [spaceStation] = StarSystemHelper.MakeSpaceStations(starSystem, planet, 1);
 
