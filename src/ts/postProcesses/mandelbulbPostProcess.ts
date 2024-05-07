@@ -17,7 +17,7 @@
 
 import mandelbulbFragment from "../../shaders/mandelbulb.glsl";
 import { UberScene } from "../uberCore/uberScene";
-import { ObjectPostProcess } from "./objectPostProcess";
+import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Mandelbulb } from "../mandelbulb/mandelbulb";
 import { StellarObject } from "../architecture/stellarObject";
@@ -34,9 +34,11 @@ export interface MandelbulbSettings {
     rotationPeriod: number;
 }
 
-export class MandelbulbPostProcess extends PostProcess implements ObjectPostProcess {
+export class MandelbulbPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly settings: MandelbulbSettings;
     readonly object: Mandelbulb;
+
+    private elapsedSeconds = 0;
 
     private activeCamera: Camera | null = null;
 
@@ -82,10 +84,14 @@ export class MandelbulbPostProcess extends PostProcess implements ObjectPostProc
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, mandelbulb);
 
-            effect.setFloat(MandelbulbUniformNames.POWER, mandelbulb.model.power);
+            effect.setFloat(MandelbulbUniformNames.POWER, mandelbulb.model.power + 4 * Math.sin(this.elapsedSeconds * 0.1));
             effect.setColor3(MandelbulbUniformNames.ACCENT_COLOR, mandelbulb.model.accentColor);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });
+    }
+
+    public update(deltaSeconds: number): void {
+        this.elapsedSeconds += deltaSeconds;
     }
 }

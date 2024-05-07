@@ -58,8 +58,8 @@ export class MandelbulbModel implements PlanetModel {
 
         this.parentBody = parentBody ?? null;
 
-        this.power = randRange(1.5, 6.0, this.rng, GenerationSteps.POWER);
-        this.accentColor = new Color3(this.rng(GenerationSteps.ACCENT_COLOR), this.rng(GenerationSteps.ACCENT_COLOR + 10), this.rng(GenerationSteps.ACCENT_COLOR + 20));
+        this.power = randRange(4.0, 8.0, this.rng, GenerationSteps.POWER);
+        this.accentColor = Color3.FromHSV(360 * this.rng(GenerationSteps.ACCENT_COLOR), this.rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5, 0.8);
 
         // Todo: do not hardcode
         let orbitRadius = this.rng(GenerationSteps.ORBIT) * 15e9;
