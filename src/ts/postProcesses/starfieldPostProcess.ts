@@ -35,7 +35,7 @@ import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
 
 export class StarfieldPostProcess extends PostProcess {
     private activeCamera: Camera | null = null;
@@ -62,6 +62,7 @@ export class StarfieldPostProcess extends PostProcess {
         ];
 
         const samplers: string[] = [
+            ...Object.values(SamplerUniformNames),
             ...Object.values(StarfieldSamplerNames),
         ];
 
@@ -72,9 +73,11 @@ export class StarfieldPostProcess extends PostProcess {
         });
 
         this.onApplyObservable.add((effect) => {
+            
             if(this.activeCamera === null) {
                 throw new Error("Camera is null");
             }
+            
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
 
@@ -115,6 +118,6 @@ export class StarfieldPostProcess extends PostProcess {
 
             setSamplerUniforms(effect, this.activeCamera, scene);
             effect.setTexture(StarfieldSamplerNames.STARFIELD_TEXTURE, Assets.STAR_FIELD);
-        })
+        });
     }
 }
