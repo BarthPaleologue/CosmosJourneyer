@@ -17,21 +17,28 @@
 
 import mandelbulbFragment from "../../shaders/mandelbulb.glsl";
 import { UberScene } from "../uberCore/uberScene";
-import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { UniformEnumType, ShaderSamplers, ShaderUniforms } from "../uberCore/postProcesses/types";
 import { Mandelbulb } from "../mandelbulb/mandelbulb";
 import { StellarObject } from "../architecture/stellarObject";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Constants } from "@babylonjs/core/Engines/constants";
 
 export interface MandelbulbSettings {
     rotationPeriod: number;
 }
 
-export class MandelbulbPostProcess extends UberPostProcess implements ObjectPostProcess {
+export class MandelbulbPostProcess extends PostProcess implements ObjectPostProcess {
     readonly settings: MandelbulbSettings;
     readonly object: Mandelbulb;
+
+    private activeCamera: Camera | null = null;
 
     constructor(mandelbulb: Mandelbulb, scene: UberScene, stellarObjects: StellarObject[]) {
         const shaderName = "mandelbulb";
@@ -43,31 +50,42 @@ export class MandelbulbPostProcess extends UberPostProcess implements ObjectPost
             rotationPeriod: 1.5
         };
 
-        const uniforms: ShaderUniforms = [
-            ...getObjectUniforms(mandelbulb),
-            ...getStellarObjectsUniforms(stellarObjects),
-            ...getActiveCameraUniforms(scene),
-            {
-                name: "power",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return mandelbulb.model.power;
-                }
-            },
-            {
-                name: "accentColor",
-                type: UniformEnumType.COLOR_3,
-                get: () => {
-                    return mandelbulb.model.accentColor;
-                }
-            }
+        const MandelbulbUniformNames = {
+            POWER: "power",
+            ACCENT_COLOR: "accentColor"
+        }
+
+        const uniforms: string[] = [
+            ...Object.values(ObjectUniformNames),
+            ...Object.values(CameraUniformNames),
+            ...Object.values(StellarObjectUniformNames),
+            ...Object.values(MandelbulbUniformNames)
         ];
 
-        const samplers: ShaderSamplers = [...getSamplers(scene)];
+        const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(mandelbulb.name, shaderName, uniforms, samplers, scene);
+        super(mandelbulb.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = mandelbulb;
         this.settings = settings;
+
+        this.onActivateObservable.add((camera) => {
+            this.activeCamera = camera;
+        });
+
+        this.onApplyObservable.add((effect) => {
+            if(this.activeCamera === null) {
+                throw new Error("Camera is null");
+            }
+
+            setCameraUniforms(effect, this.activeCamera);
+            setStellarObjectUniforms(effect, stellarObjects);
+            setObjectUniforms(effect, mandelbulb);
+
+            effect.setFloat(MandelbulbUniformNames.POWER, mandelbulb.model.power);
+            effect.setColor3(MandelbulbUniformNames.ACCENT_COLOR, mandelbulb.model.accentColor);
+
+            setSamplerUniforms(effect, this.activeCamera, scene);
+        });
     }
 }

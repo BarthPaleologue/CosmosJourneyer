@@ -17,47 +17,73 @@
 
 import ringsFragment from "../../../shaders/ringsFragment.glsl";
 import { UberScene } from "../../uberCore/uberScene";
-import { UberPostProcess } from "../../uberCore/postProcesses/uberPostProcess";
-import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "../uniforms";
 import { ObjectPostProcess } from "../objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { ShaderSamplers, ShaderUniforms } from "../../uberCore/postProcesses/types";
-import { RingsUniforms } from "./ringsUniform";
+import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "./ringsUniform";
 import { CelestialBody } from "../../architecture/celestialBody";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { ObjectUniformNames, setObjectUniforms } from "../uniforms/objectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../uniforms/stellarObjectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "../uniforms/cameraUniforms";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { SamplerUniformNames, setSamplerUniforms } from "../uniforms/samplerUniforms";
 import { Transformable } from "../../architecture/transformable";
 
-export class RingsPostProcess extends UberPostProcess implements ObjectPostProcess {
+export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
     readonly ringsUniforms: RingsUniforms;
     readonly object: CelestialBody;
 
-    public static async CreateAsync(body: CelestialBody, scene: UberScene, stellarObjects: Transformable[]): Promise<RingsPostProcess> {
+    private activeCamera: Camera | null = null;
+
+    constructor(name: string, scene: UberScene, body: CelestialBody, stellarObjects: Transformable[]) {
         const shaderName = "rings";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
         }
 
         const ringsUniforms = body.getRingsUniforms();
-        if (ringsUniforms === null)
+        if (ringsUniforms === null) {
             throw new Error(
                 `RingsPostProcess: ringsUniforms are null. This should not be possible as the postprocess should not be created if the body has no rings. Body: ${body.name}`
             );
-        const uniforms: ShaderUniforms = [
-            ...getObjectUniforms(body),
-            ...getStellarObjectsUniforms(stellarObjects),
-            ...getActiveCameraUniforms(scene),
-            ...ringsUniforms.getShaderUniforms()
+        }
+
+        const uniforms: string[] = [
+            ...Object.values(ObjectUniformNames),
+            ...Object.values(StellarObjectUniformNames),
+            ...Object.values(CameraUniformNames),
+            ...Object.values(RingsUniformNames)
         ];
 
-        return ringsUniforms.getShaderSamplers(scene).then((ringSamplers) => {
-            const samplers: ShaderSamplers = [...getSamplers(scene), ...ringSamplers];
-            return new RingsPostProcess(body.name + "Rings", shaderName, uniforms, samplers, scene, body, ringsUniforms);
-        });
-    }
+        const samplers: string[] = [
+            ...Object.values(SamplerUniformNames),
+            ...Object.values(RingsSamplerNames)
+        ];
 
-    private constructor(name: string, shaderName: string, uniforms: ShaderUniforms, samplers: ShaderSamplers, scene: UberScene, body: CelestialBody, ringsUniforms: RingsUniforms) {
-        super(name, shaderName, uniforms, samplers, scene);
+        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = body;
         this.ringsUniforms = ringsUniforms;
+
+        this.onActivateObservable.add((camera) => {
+            this.activeCamera = camera;
+        });
+
+        this.onApplyObservable.add((effect) => {
+            if(this.activeCamera === null) {
+                throw new Error("RingsPostProcess: activeCamera is null");
+            }
+
+            setCameraUniforms(effect, this.activeCamera);
+            setStellarObjectUniforms(effect, stellarObjects);
+            setObjectUniforms(effect, this.object);
+
+            this.ringsUniforms.setUniforms(effect);
+            this.ringsUniforms.setSamplers(effect, scene);
+
+            setSamplerUniforms(effect, this.activeCamera, scene);
+        });
     }
 }

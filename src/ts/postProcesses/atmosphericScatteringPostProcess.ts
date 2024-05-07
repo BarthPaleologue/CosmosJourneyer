@@ -20,14 +20,19 @@ import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFr
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { UberScene } from "../uberCore/uberScene";
 import { Assets } from "../assets";
-import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { centeredRand } from "extended-random";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ObjectPostProcess } from "./objectPostProcess";
-import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
 import { Transformable } from "../architecture/transformable";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Constants } from "@babylonjs/core/Engines/constants";
 
 export interface AtmosphereUniforms {
     atmosphereRadius: number;
@@ -42,9 +47,11 @@ export interface AtmosphereUniforms {
     mieHaloRadius: number;
 }
 
-export class AtmosphericScatteringPostProcess extends UberPostProcess implements ObjectPostProcess {
+export class AtmosphericScatteringPostProcess extends PostProcess implements ObjectPostProcess {
     readonly atmosphereUniforms: AtmosphereUniforms;
     readonly object: TelluricPlanet | GasPlanet;
+
+    private activeCamera: Camera | null = null;
 
     constructor(name: string, planet: GasPlanet | TelluricPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: Transformable[]) {
         const shaderName = "atmosphericScattering";
@@ -65,96 +72,67 @@ export class AtmosphericScatteringPostProcess extends UberPostProcess implements
             mieHaloRadius: 0.65
         };
 
-        const uniforms: ShaderUniforms = [
-            ...getObjectUniforms(planet),
-            ...getStellarObjectsUniforms(stellarObjects),
-            ...getActiveCameraUniforms(scene),
-            {
-                name: "atmosphere_radius",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return atmosphereUniforms.atmosphereRadius;
-                }
-            },
-            {
-                name: "atmosphere_falloff",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return atmosphereUniforms.falloffFactor;
-                }
-            },
-            {
-                name: "atmosphere_sunIntensity",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return atmosphereUniforms.intensity;
-                }
-            },
-            {
-                name: "atmosphere_rayleighStrength",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return atmosphereUniforms.rayleighStrength;
-                }
-            },
-            {
-                name: "atmosphere_mieStrength",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return atmosphereUniforms.mieStrength;
-                }
-            },
-            {
-                name: "atmosphere_densityModifier",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return atmosphereUniforms.densityModifier;
-                }
-            },
-            {
-                name: "atmosphere_redWaveLength",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return atmosphereUniforms.redWaveLength;
-                }
-            },
-            {
-                name: "atmosphere_greenWaveLength",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return atmosphereUniforms.greenWaveLength;
-                }
-            },
-            {
-                name: "atmosphere_blueWaveLength",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return atmosphereUniforms.blueWaveLength;
-                }
-            },
-            {
-                name: "atmosphere_mieHaloRadius",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return atmosphereUniforms.mieHaloRadius;
-                }
-            }
+        const AtmosphereUniformNames = {
+            ATMOSPHERE_RADIUS: "atmosphere_radius",
+            ATMOSPHERE_FALLOFF: "atmosphere_falloff",
+            ATMOSPHERE_SUN_INTENSITY: "atmosphere_sunIntensity",
+            ATMOSPHERE_RAYLEIGH_STRENGTH: "atmosphere_rayleighStrength",
+            ATMOSPHERE_MIE_STRENGTH: "atmosphere_mieStrength",
+            ATMOSPHERE_DENSITY_MODIFIER: "atmosphere_densityModifier",
+            ATMOSPHERE_RED_WAVE_LENGTH: "atmosphere_redWaveLength",
+            ATMOSPHERE_GREEN_WAVE_LENGTH: "atmosphere_greenWaveLength",
+            ATMOSPHERE_BLUE_WAVE_LENGTH: "atmosphere_blueWaveLength",
+            ATMOSPHERE_MIE_HALO_RADIUS: "atmosphere_mieHaloRadius"
+        }
+
+        const uniforms: string[] = [
+            ...Object.values(ObjectUniformNames),
+            ...Object.values(StellarObjectUniformNames),
+            ...Object.values(CameraUniformNames),
+            ...Object.values(AtmosphereUniformNames)
         ];
 
-        const samplers: ShaderSamplers = [
-            ...getSamplers(scene),
-            {
-                name: "atmosphereLUT",
-                type: SamplerEnumType.TEXTURE,
-                get: () => {
-                    return Assets.ATMOSPHERE_LUT;
-                }
-            }
+        const AtmosphereSamplerNames = {
+            ATMOSPHERE_LUT: "atmosphereLUT"
+        };
+
+        const samplers: string[] = [
+            ...Object.values(SamplerUniformNames),
+            ...Object.values(AtmosphereSamplerNames)
         ];
 
-        super(name, shaderName, uniforms, samplers, scene);
+        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = planet;
         this.atmosphereUniforms = atmosphereUniforms;
+
+        this.onActivateObservable.add((camera) => {
+            this.activeCamera = camera;
+        });
+
+        this.onApplyObservable.add((effect) => {
+            if(this.activeCamera === null) {
+                throw new Error("Camera is null");
+            }
+
+            setCameraUniforms(effect, this.activeCamera);
+            setStellarObjectUniforms(effect, stellarObjects);
+            setObjectUniforms(effect, planet);
+
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RADIUS, atmosphereUniforms.atmosphereRadius);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_FALLOFF, atmosphereUniforms.falloffFactor);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_SUN_INTENSITY, atmosphereUniforms.intensity);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_STRENGTH, atmosphereUniforms.rayleighStrength);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_STRENGTH, atmosphereUniforms.mieStrength);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_DENSITY_MODIFIER, atmosphereUniforms.densityModifier);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RED_WAVE_LENGTH, atmosphereUniforms.redWaveLength);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_GREEN_WAVE_LENGTH, atmosphereUniforms.greenWaveLength);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_BLUE_WAVE_LENGTH, atmosphereUniforms.blueWaveLength);
+            effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_HALO_RADIUS, atmosphereUniforms.mieHaloRadius);
+
+            effect.setTexture(AtmosphereSamplerNames.ATMOSPHERE_LUT, Assets.ATMOSPHERE_LUT);
+
+            setSamplerUniforms(effect, this.activeCamera, scene);
+        });
     }
 }

@@ -17,15 +17,19 @@
 
 import blackHoleFragment from "../../shaders/blackhole.glsl";
 import { UberScene } from "../uberCore/uberScene";
-import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
-import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Assets } from "../assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
-import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export type BlackHoleUniforms = {
     accretionDiskRadius: number;
@@ -34,9 +38,11 @@ export type BlackHoleUniforms = {
     time: number;
 };
 
-export class BlackHolePostProcess extends UberPostProcess implements ObjectPostProcess {
+export class BlackHolePostProcess extends PostProcess implements ObjectPostProcess {
     readonly blackHoleUniforms: BlackHoleUniforms;
     readonly object: BlackHole;
+
+    private activeCamera: Camera | null = null;
 
     constructor(blackHole: BlackHole, scene: UberScene, starfieldRotation: Quaternion) {
         const shaderName = "blackhole";
@@ -51,94 +57,69 @@ export class BlackHolePostProcess extends UberPostProcess implements ObjectPostP
             time: 0
         };
 
-        const uniforms: ShaderUniforms = [
-            ...getObjectUniforms(blackHole),
-            ...getActiveCameraUniforms(this),
-            {
-                name: "starfieldRotation",
-                type: UniformEnumType.MATRIX,
-                get: () => {
-                    const rotationMatrix = new Matrix();
-                    starfieldRotation.toRotationMatrix(rotationMatrix);
-                    return rotationMatrix;
-                }
-            },
-            {
-                name: "time",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000);
-                }
-            },
-            {
-                name: "schwarzschildRadius",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return blackHole.model.getSchwarzschildRadius();
-                }
-            },
-            {
-                name: "frameDraggingFactor",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return blackHole.model.getKerrMetricA() / blackHole.model.physicalProperties.mass;
-                }
-            },
-            {
-                name: "accretionDiskRadius",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return blackHoleUniforms.accretionDiskRadius;
-                }
-            },
-            {
-                name: "warpingMinkowskiFactor",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return blackHoleUniforms.warpingMinkowskiFactor;
-                }
-            },
-            {
-                name: "rotationPeriod",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return blackHoleUniforms.rotationPeriod;
-                }
-            },
-            {
-                name: "rotationAxis",
-                type: UniformEnumType.VECTOR_3,
-                get: () => {
-                    return blackHole.getRotationAxis();
-                }
-            },
-            {
-                name: "forwardAxis",
-                type: UniformEnumType.VECTOR_3,
-                get: () => {
-                    return getForwardDirection(blackHole.getTransform());
-                }
-            }
+        const BlackHoleUniformNames = {
+            STARFIELD_ROTATION: "starfieldRotation",
+            TIME: "time",
+            SCHWARZSCHILD_RADIUS: "schwarzschildRadius",
+            FRAME_DRAGGING_FACTOR: "frameDraggingFactor",
+            ACCRETION_DISK_RADIUS: "accretionDiskRadius",
+            WARPING_MINKOWSKI_FACTOR: "warpingMinkowskiFactor",
+            ROTATION_PERIOD: "rotationPeriod",
+            ROTATION_AXIS: "rotationAxis",
+            FORWARD_AXIS: "forwardAxis"
+        }
+
+        const uniforms: string[] = [
+            ...Object.values(ObjectUniformNames),
+            ...Object.values(CameraUniformNames),
+            ...Object.values(BlackHoleUniformNames)
         ];
 
-        const samplers: ShaderSamplers = [
-            ...getSamplers(scene),
-            {
-                name: "starfieldTexture",
-                type: SamplerEnumType.TEXTURE,
-                get: () => {
-                    return Assets.STAR_FIELD;
-                }
-            }
+        const BlackHoleSamplerNames = {
+            STARFIELD_TEXTURE: "starfieldTexture"
+        }
+
+        const samplers: string[] = [
+            ...Object.values(SamplerUniformNames),
+            ...Object.values(BlackHoleSamplerNames)
         ];
 
-        super(blackHole.name, shaderName, uniforms, samplers, scene);
+        super(blackHole.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = blackHole;
         this.blackHoleUniforms = blackHoleUniforms;
+
+        this.onActivateObservable.add((camera) => {
+            this.activeCamera = camera;
+        });
+
+        this.onApplyObservable.add((effect) => {
+            if(this.activeCamera === null) {
+                throw new Error("Camera is null");
+            }
+
+            setCameraUniforms(effect, this.activeCamera);
+            setObjectUniforms(effect, blackHole);
+
+            const rotationMatrix = new Matrix();
+            starfieldRotation.toRotationMatrix(rotationMatrix);
+            effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, rotationMatrix);
+
+            effect.setFloat(BlackHoleUniformNames.TIME, blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000));
+            effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, blackHole.model.getSchwarzschildRadius());
+            effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, blackHole.model.getKerrMetricA() / blackHole.model.physicalProperties.mass);
+            effect.setFloat(BlackHoleUniformNames.ACCRETION_DISK_RADIUS, blackHoleUniforms.accretionDiskRadius);
+            effect.setFloat(BlackHoleUniformNames.WARPING_MINKOWSKI_FACTOR, blackHoleUniforms.warpingMinkowskiFactor);
+            effect.setFloat(BlackHoleUniformNames.ROTATION_PERIOD, blackHoleUniforms.rotationPeriod);
+            effect.setVector3(BlackHoleUniformNames.ROTATION_AXIS, blackHole.getRotationAxis());
+            effect.setVector3(BlackHoleUniformNames.FORWARD_AXIS, getForwardDirection(blackHole.getTransform()));
+
+            setSamplerUniforms(effect, this.activeCamera, scene);
+            effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, Assets.STAR_FIELD);
+        });
     }
 
-    public update(deltaTime: number): void {
-        this.blackHoleUniforms.time += deltaTime;
+    public update(deltaSeconds: number): void {
+        this.blackHoleUniforms.time += deltaSeconds;
     }
 }

@@ -19,56 +19,70 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 
 import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
 import { UberScene } from "../../uberCore/uberScene";
-import { UberPostProcess } from "../../uberCore/postProcesses/uberPostProcess";
-import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "../uniforms";
 import { ObjectPostProcess, UpdatablePostProcess } from "../objectPostProcess";
-import { ShaderSamplers, ShaderUniforms } from "../../uberCore/postProcesses/types";
 import { Transformable } from "../../architecture/transformable";
-import { CloudsUniforms } from "./cloudsUniforms";
+import { CloudsSamplerNames, CloudsUniformNames, CloudsUniforms } from "./cloudsUniforms";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { ObjectUniformNames, setObjectUniforms } from "../uniforms/objectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../uniforms/stellarObjectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "../uniforms/cameraUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../uniforms/samplerUniforms";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Constants } from "@babylonjs/core/Engines/constants";
 import { BoundingSphere } from "../../architecture/boundingSphere";
 
-export class FlatCloudsPostProcess extends UberPostProcess implements ObjectPostProcess, UpdatablePostProcess {
+export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly cloudUniforms: CloudsUniforms;
-    readonly object: Transformable;
+    readonly object: Transformable & BoundingSphere;
 
-    public static async CreateAsync(
+    private activeCamera: Camera | null = null;
+
+    constructor(
         name: string,
         planet: Transformable & BoundingSphere,
-        cloudsUniforms: CloudsUniforms,
+        cloudUniforms: CloudsUniforms,
         scene: UberScene,
         stellarObjects: Transformable[]
-    ): Promise<FlatCloudsPostProcess> {
+    ) {
         const shaderName = "flatClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
         }
 
-        const uniforms: ShaderUniforms = [
-            ...getObjectUniforms(planet),
-            ...getStellarObjectsUniforms(stellarObjects),
-            ...getActiveCameraUniforms(scene),
-            ...cloudsUniforms.getShaderUniforms()
+        const uniforms: string[] = [
+            ...Object.values(ObjectUniformNames),
+            ...Object.values(StellarObjectUniformNames),
+            ...Object.values(CameraUniformNames),
+            ...Object.values(CloudsUniformNames)
         ];
 
-        return cloudsUniforms.getShaderSamplers(scene).then((cloudSamplers) => {
-            const samplers: ShaderSamplers = [...getSamplers(scene), ...cloudSamplers];
-            return new FlatCloudsPostProcess(name, shaderName, planet, cloudsUniforms, uniforms, samplers, scene);
-        });
-    }
+        const samplers: string[] = [
+            ...Object.values(SamplerUniformNames),
+            ...Object.values(CloudsSamplerNames)
+        ];
 
-    private constructor(
-        name: string,
-        shaderName: string,
-        planet: Transformable,
-        cloudUniforms: CloudsUniforms,
-        uniforms: ShaderUniforms,
-        samplers: ShaderSamplers,
-        scene: UberScene
-    ) {
-        super(name, shaderName, uniforms, samplers, scene);
+        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = planet;
         this.cloudUniforms = cloudUniforms;
+
+        this.onActivateObservable.add((camera) => {
+            this.activeCamera = camera;
+        });
+
+        this.onApplyObservable.add((effect) => {
+            if(this.activeCamera === null) {
+                throw new Error("FlatCloudsPostProcess: activeCamera is null");
+            }
+            setCameraUniforms(effect, this.activeCamera);
+            setStellarObjectUniforms(effect, stellarObjects);
+            setObjectUniforms(effect, this.object);
+            this.cloudUniforms.setUniforms(effect);
+
+            this.cloudUniforms.setSamplers(effect, scene);
+            setSamplerUniforms(effect, this.activeCamera, scene);
+        });
     }
 
     public update(deltaTime: number): void {
