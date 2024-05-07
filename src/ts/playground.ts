@@ -17,7 +17,7 @@
 
 import "../styles/index.scss";
 
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Materials/standardMaterial";
@@ -31,6 +31,61 @@ import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { BlackHolePostProcess } from "./postProcesses/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
 import { UberScene } from "./uberCore/uberScene";
+import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
+import { Axis, Scene } from "@babylonjs/core";
+import { translate } from "./uberCore/transforms/basicTransform";
+import { Assets } from "./assets";
+
+const FOV = Tools.ToRadians(60);
+
+// Fine tune this value with your own eyes
+const interOcularDistance = 0.065;
+
+export class StereoCameras {
+    readonly transform: TransformNode;
+
+    readonly leftEye: FreeCamera;
+    readonly rightEye: FreeCamera;
+
+    constructor(canvas: HTMLCanvasElement, engine: Engine, scene: Scene) {
+        // This transform will be used as the parent of both eyes
+        this.transform = new TransformNode("HeadTransform", scene);
+
+        // left eye is on the left
+        this.leftEye = new FreeCamera("LeftEye", new Vector3(-interOcularDistance / 2, 0, 0), scene);
+        this.leftEye.fov = FOV;
+        this.leftEye.viewport = new Viewport(0, 0.0, 0.5, 1);
+        this.leftEye.parent = this.transform;
+        this.leftEye.onProjectionMatrixChangedObservable.add(() => {
+            const aspectRatio = canvas.width / canvas.height;
+            this.leftEye._projectionMatrix.copyFrom(Matrix.PerspectiveFovLH(this.leftEye.fov, aspectRatio, this.leftEye.minZ, this.leftEye.maxZ, engine.isNDCHalfZRange, this.leftEye.projectionPlaneTilt, engine.useReverseDepthBuffer));
+        });
+
+        // right eye is on the right
+        this.rightEye = new FreeCamera("RightEye", new Vector3(interOcularDistance / 2, 0, 0), scene);
+        this.rightEye.fov = FOV;
+        this.rightEye.viewport = new Viewport(0.5, 0, 0.5, 1);
+        this.rightEye.parent = this.transform;
+        this.rightEye.onProjectionMatrixChangedObservable.add(() => {
+            const aspectRatio = canvas.width / canvas.height;
+            this.rightEye._projectionMatrix.copyFrom(Matrix.PerspectiveFovLH(this.rightEye.fov, aspectRatio, this.rightEye.minZ, this.rightEye.maxZ, engine.isNDCHalfZRange, this.rightEye.projectionPlaneTilt, engine.useReverseDepthBuffer));
+        });
+    }
+
+    /**
+     * Make the left and right eyes look at the focal point
+     * @param focalPoint The focal point in world space
+     */
+    focusOnPoint(focalPoint: Vector3) {
+        // because our eyes are in the local space of the head, we must translate the focal point in that local space to be able to use it
+        const headInverseWorld = this.transform.computeWorldMatrix(true).clone().invert();
+        const focalPointLocalSpace = Vector3.TransformCoordinates(focalPoint, headInverseWorld); 
+
+        // we turn our eyes to the target in local space
+        this.leftEye.setTarget(focalPointLocalSpace);
+        this.rightEye.setTarget(focalPointLocalSpace);
+    }
+}
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -43,55 +98,87 @@ engine.displayLoadingUI();
 const scene = new UberScene(engine);
 scene.useRightHandedSystem = true;
 
-// This transform will be used as the parent of both eyes
-const headTransform = new TransformNode("HeadTransform", scene);
+await Assets.Init(scene);
 
-// Fine tune this value with your own eyes
-const interOcularDistance = 0.065 / 2;
+const stereoCameras = new StereoCameras(canvas, engine, scene);  
 
-// left eye is on the left
-const leftEye = new FreeCamera("LeftEye", new Vector3(-interOcularDistance / 2, 0, 0), scene);
-leftEye.viewport = new Viewport(0, 0.0, 0.5, 1);
-leftEye.parent = headTransform;
-leftEye.maxZ = 20000e3;
-
-// right eye is on the right
-const rightEye = new FreeCamera("RightEye", new Vector3(interOcularDistance / 2, 0, 0), scene);
-rightEye.viewport = new Viewport(0.5, 0, 0.5, 1);
-rightEye.parent = headTransform;
-rightEye.maxZ = 20000e3;
-
-// this shrinks the resulting images horizontally. Useful for autostereoscopic displays
-headTransform.scaling.x = 2;
-
-const debugCamera = new FreeCamera("DebugCamera", Vector3.Zero(), scene);
-debugCamera.maxZ = 50_000e3;
-debugCamera.attachControl(true);
+const leftEye = stereoCameras.leftEye
+const rightEye = stereoCameras.rightEye;
 
 scene.activeCameras = [leftEye, rightEye];
 //scene.activeCamera = debugCamera;
 scene.setActiveCamera(leftEye);
+scene.enableDepthRenderer(rightEye, false, true);
 
 const blackHole = new BlackHole("hole", scene, 0, null);
-blackHole.getTransform().setAbsolutePosition(new Vector3(0, 0, 20000e3));
+blackHole.getTransform().setAbsolutePosition(new Vector3(0, 0, 10000e3));
+
+const starfieldPostProcess = new StarfieldPostProcess(scene, [], [blackHole], Quaternion.Identity());
+leftEye.attachPostProcess(starfieldPostProcess);
+rightEye.attachPostProcess(starfieldPostProcess);
 
 const bh = new BlackHolePostProcess(blackHole, scene, Quaternion.Identity());
 leftEye.attachPostProcess(bh);
 rightEye.attachPostProcess(bh);
 
-// our eyes will focus on the center where the object is
-const focalPoint = blackHole.getTransform().getAbsolutePosition();
+stereoCameras.transform.rotateAround(blackHole.getTransform().getAbsolutePosition(), Axis.X, 0.2);
 
-// because our eyes are in the local space of the head, we must translate the focal point in that local space to be able to use it
-const headInverseWorld = headTransform.computeWorldMatrix(true).clone().invert();
-const focalPointLocalSpace = Vector3.TransformCoordinates(focalPoint, headInverseWorld); 
 
-// we turn our eyes to the target in local space
-leftEye.setTarget(focalPointLocalSpace);
-rightEye.setTarget(focalPointLocalSpace);
+function applyFloatingOrigin() {
+    const headPosition = stereoCameras.transform.getAbsolutePosition().clone();
+
+    translate(stereoCameras.transform, headPosition.negate());
+    translate(blackHole.getTransform(), headPosition.negate());
+}
+
+let mousePressed = false;
+document.addEventListener("pointerdown", () => mousePressed = true);
+document.addEventListener("pointerup", () => mousePressed = false);
+
+document.addEventListener("pointermove", e => {
+    const mouseDX = e.movementX;
+    const mouseDY = e.movementY;
+
+    if(mousePressed) {
+        stereoCameras.transform.rotateAround(blackHole.getTransform().getAbsolutePosition(), Axis.Y, 0.001 * mouseDX);
+        stereoCameras.transform.computeWorldMatrix(true);
+        stereoCameras.transform.rotateAround(blackHole.getTransform().getAbsolutePosition(), stereoCameras.transform.getDirection(Axis.X), 0.001 * mouseDY);
+        stereoCameras.transform.computeWorldMatrix(true);
+
+        applyFloatingOrigin();
+    }
+});
+
+export let interOcularFactor = 300_000; // empirical value
+document.addEventListener("keydown", e => {
+    if(e.key === "ArrowDown") {
+        interOcularFactor /= 1.5;
+    } else if(e.key === "ArrowUp") {
+        interOcularFactor *= 1.5;
+    }
+    console.log(interOcularFactor);
+});
+
 
 scene.onBeforeRenderObservable.add(() => {
-    bh.update(engine.getDeltaTime() / 1000);
+    const deltaSeconds = engine.getDeltaTime() / 1000;
+
+    bh.update(deltaSeconds);
+
+    // our eyes will focus on the center where the object is
+    const focalPoint = blackHole.getTransform().getAbsolutePosition().negate();
+
+    stereoCameras.leftEye.position.x = -interOcularDistance * 0.5 * interOcularFactor;
+    stereoCameras.rightEye.position.x = interOcularDistance * 0.5 * interOcularFactor;
+
+    stereoCameras.focusOnPoint(focalPoint);
+
+    stereoCameras.transform.rotateAround(blackHole.getTransform().getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);
+    stereoCameras.transform.computeWorldMatrix(true);
+    stereoCameras.transform.rotateAround(blackHole.getTransform().getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
+    stereoCameras.transform.computeWorldMatrix(true);
+
+    applyFloatingOrigin();
 });
 
 scene.executeWhenReady(() => {
