@@ -26,11 +26,11 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { CloudsUniforms } from "../../postProcesses/clouds/cloudsUniforms";
 import { PlanetModel } from "../../architecture/planet";
 import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { RingsModel } from "../../rings/ringsModel";
+import { CloudsModel } from "../../clouds/cloudsModel";
 
 export class TelluricPlanetModel implements PlanetModel {
     readonly bodyType = BodyType.TELLURIC_PLANET;
@@ -46,7 +46,7 @@ export class TelluricPlanetModel implements PlanetModel {
     readonly terrainSettings: TerrainSettings;
 
     rings: RingsModel | null = null;
-    cloudsUniforms: CloudsUniforms | null = null;
+    clouds: CloudsModel | null = null;
 
     readonly nbMoons: number;
 
@@ -149,7 +149,7 @@ export class TelluricPlanetModel implements PlanetModel {
 
         const waterFreezingPoint = 0.0;
         if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature && this.physicalProperties.pressure > 0) {
-            this.cloudsUniforms = new CloudsUniforms(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
+            this.clouds = new CloudsModel(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
         }
 
         this.nbMoons = randRangeInt(0, 2, this.rng, GenerationSteps.NB_MOONS);

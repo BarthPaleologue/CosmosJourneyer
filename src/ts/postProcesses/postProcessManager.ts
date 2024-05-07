@@ -18,7 +18,7 @@
 import { UberScene } from "../uberCore/uberScene";
 import { OceanPostProcess } from "./oceanPostProcess";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
+import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
 import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "../rings/ringsPostProcess";
@@ -28,7 +28,7 @@ import { BlackHolePostProcess } from "./blackHolePostProcess";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
 import { makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
-import { CloudsPostProcess } from "./volumetricCloudsPostProcess";
+import { CloudsPostProcess } from "../clouds/volumetricCloudsPostProcess";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
@@ -221,7 +221,7 @@ export class PostProcessManager {
      * @param stellarObjects An array of stars or black holes
      */
     public addClouds(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
-        const uniforms = planet.model.cloudsUniforms;
+        const uniforms = planet.getCloudsUniforms();
         if (uniforms === null)
             throw new Error(
                 `PostProcessManager: addClouds: uniforms are null. This should not be possible as the postprocess should not be created if the body has no clouds. Body: ${planet.name}`

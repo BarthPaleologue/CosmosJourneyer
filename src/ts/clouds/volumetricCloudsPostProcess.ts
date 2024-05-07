@@ -17,20 +17,20 @@
 
 import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
 import { UberScene } from "../uberCore/uberScene";
-import { ObjectPostProcess } from "./objectPostProcess";
-import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
+import { ObjectPostProcess } from "../postProcesses/objectPostProcess";
+import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { CloudsUniforms } from "./clouds/cloudsUniforms";
+import { CloudsUniforms } from "./cloudsUniforms";
 
 import { BoundingSphere } from "../architecture/boundingSphere";
 import { Transformable } from "../architecture/transformable";
 import { StellarObject } from "../architecture/stellarObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 

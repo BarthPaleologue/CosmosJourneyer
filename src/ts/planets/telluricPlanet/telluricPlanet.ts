@@ -44,6 +44,7 @@ import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProp
 import { rotate } from "../../uberCore/transforms/basicTransform";
 import { BodyType } from "../../model/common";
 import i18n from "../../i18n";
+import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -62,6 +63,7 @@ export class TelluricPlanet implements Planet, Cullable {
     readonly postProcesses: PostProcessType[] = [];
 
     readonly ringsUniforms: RingsUniforms | null;
+    readonly cloudsUniforms: CloudsUniforms | null;
 
     readonly parent: CelestialBody | null;
 
@@ -121,7 +123,12 @@ export class TelluricPlanet implements Planet, Cullable {
             this.ringsUniforms = null;
         }
 
-        if (this.model.cloudsUniforms !== null) this.postProcesses.push(PostProcessType.CLOUDS);
+        if (this.model.clouds !== null) {
+            this.postProcesses.push(PostProcessType.CLOUDS);
+            this.cloudsUniforms = new CloudsUniforms(this.model.clouds, scene);
+        } else {
+            this.cloudsUniforms = null;
+        }
 
         this.material = new TelluricPlanetMaterial(this.name, this.getTransform(), this.model, scene);
 
@@ -155,6 +162,10 @@ export class TelluricPlanet implements Planet, Cullable {
 
     getRingsUniforms(): RingsUniforms | null {
         return this.ringsUniforms;
+    }
+
+    getCloudsUniforms(): CloudsUniforms | null {
+        return this.cloudsUniforms;
     }
 
     getTypeName(): string {
