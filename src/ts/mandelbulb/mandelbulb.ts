@@ -23,7 +23,7 @@ import { CelestialBody } from "../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { OrbitProperties } from "../orbit/orbitProperties";
-import { RingsUniforms } from "../postProcesses/rings/ringsUniform";
+import { RingsUniforms } from "../rings/ringsUniform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Cullable } from "../bodies/cullable";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";

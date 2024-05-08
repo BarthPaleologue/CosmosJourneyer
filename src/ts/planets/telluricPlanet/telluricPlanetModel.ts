@@ -21,16 +21,16 @@ import { Settings } from "../../settings";
 import { BodyType, GenerationSteps } from "../../model/common";
 import { TerrainSettings } from "./terrain/terrainSettings";
 import { clamp } from "terrain-generation";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { CloudsUniforms } from "../../postProcesses/clouds/cloudsUniforms";
 import { PlanetModel } from "../../architecture/planet";
 import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { RingsModel } from "../../rings/ringsModel";
+import { CloudsModel } from "../../clouds/cloudsModel";
 
 export class TelluricPlanetModel implements PlanetModel {
     readonly bodyType = BodyType.TELLURIC_PLANET;
@@ -45,8 +45,8 @@ export class TelluricPlanetModel implements PlanetModel {
 
     readonly terrainSettings: TerrainSettings;
 
-    ringsUniforms: RingsUniforms | null = null;
-    cloudsUniforms: CloudsUniforms | null = null;
+    rings: RingsModel | null = null;
+    clouds: CloudsModel | null = null;
 
     readonly nbMoons: number;
 
@@ -144,12 +144,12 @@ export class TelluricPlanetModel implements PlanetModel {
         }
 
         if (uniformRandBool(0.6, this.rng, GenerationSteps.RINGS) && !this.isSatelliteOfTelluric && !this.isSatelliteOfGas) {
-            this.ringsUniforms = new RingsUniforms(this.rng);
+            this.rings = new RingsModel(this.rng);
         }
 
         const waterFreezingPoint = 0.0;
         if (waterFreezingPoint > this.physicalProperties.minTemperature && waterFreezingPoint < this.physicalProperties.maxTemperature && this.physicalProperties.pressure > 0) {
-            this.cloudsUniforms = new CloudsUniforms(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
+            this.clouds = new CloudsModel(this.getApparentRadius(), Settings.CLOUD_LAYER_HEIGHT, this.physicalProperties.waterAmount, this.physicalProperties.pressure);
         }
 
         this.nbMoons = randRangeInt(0, 2, this.rng, GenerationSteps.NB_MOONS);

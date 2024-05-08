@@ -17,20 +17,20 @@
 
 import { Effect } from "@babylonjs/core/Materials/effect";
 
-import flatCloudsFragment from "../../../shaders/flatCloudsFragment.glsl";
-import { UberScene } from "../../uberCore/uberScene";
-import { ObjectPostProcess, UpdatablePostProcess } from "../objectPostProcess";
-import { Transformable } from "../../architecture/transformable";
+import flatCloudsFragment from "../../shaders/flatCloudsFragment.glsl";
+import { UberScene } from "../uberCore/uberScene";
+import { ObjectPostProcess, UpdatablePostProcess } from "../postProcesses/objectPostProcess";
+import { Transformable } from "../architecture/transformable";
 import { CloudsSamplerNames, CloudsUniformNames, CloudsUniforms } from "./cloudsUniforms";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../uniforms/objectUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../uniforms/stellarObjectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "../uniforms/cameraUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "../uniforms/samplerUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { BoundingSphere } from "../../architecture/boundingSphere";
+import { BoundingSphere } from "../architecture/boundingSphere";
 
 export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly cloudUniforms: CloudsUniforms;
@@ -80,12 +80,12 @@ export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProc
             setObjectUniforms(effect, this.object);
             this.cloudUniforms.setUniforms(effect);
 
-            this.cloudUniforms.setSamplers(effect, scene);
+            this.cloudUniforms.setSamplers(effect);
             setSamplerUniforms(effect, this.activeCamera, scene);
         });
     }
 
     public update(deltaTime: number): void {
-        this.cloudUniforms.time += deltaTime;
+        this.cloudUniforms.update(deltaTime);
     }
 }

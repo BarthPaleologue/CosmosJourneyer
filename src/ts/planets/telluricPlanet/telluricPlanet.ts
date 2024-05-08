@@ -39,11 +39,12 @@ import { OrbitProperties } from "../../orbit/orbitProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { CelestialBody } from "../../architecture/celestialBody";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { rotate } from "../../uberCore/transforms/basicTransform";
 import { BodyType } from "../../model/common";
 import i18n from "../../i18n";
+import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -60,6 +61,9 @@ export class TelluricPlanet implements Planet, Cullable {
     readonly aggregate: PhysicsAggregate;
 
     readonly postProcesses: PostProcessType[] = [];
+
+    readonly ringsUniforms: RingsUniforms | null;
+    readonly cloudsUniforms: CloudsUniforms | null;
 
     readonly parent: CelestialBody | null;
 
@@ -112,8 +116,19 @@ export class TelluricPlanet implements Planet, Cullable {
             this.model.physicalProperties.oceanLevel = 0;
         }
 
-        if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
-        if (this.model.cloudsUniforms !== null) this.postProcesses.push(PostProcessType.CLOUDS);
+        if (this.model.rings !== null) {
+            this.postProcesses.push(PostProcessType.RING);
+            this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+        } else {
+            this.ringsUniforms = null;
+        }
+
+        if (this.model.clouds !== null) {
+            this.postProcesses.push(PostProcessType.CLOUDS);
+            this.cloudsUniforms = new CloudsUniforms(this.model.clouds, scene);
+        } else {
+            this.cloudsUniforms = null;
+        }
 
         this.material = new TelluricPlanetMaterial(this.name, this.getTransform(), this.model, scene);
 
@@ -146,7 +161,11 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     getRingsUniforms(): RingsUniforms | null {
-        return this.model.ringsUniforms;
+        return this.ringsUniforms;
+    }
+
+    getCloudsUniforms(): CloudsUniforms | null {
+        return this.cloudsUniforms;
     }
 
     getTypeName(): string {

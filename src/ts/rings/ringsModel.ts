@@ -15,14 +15,25 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { RingsUniforms } from "../rings/ringsUniform";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { normalRandom, randRange } from "extended-random";
+import { clamp } from "terrain-generation";
 
-/**
- * Describes objects that can have a ring system
- */
-export interface CanHaveRings {
-    /**
-     * Returns the uniforms used to render the rings, or null if the object has no rings
-     */
-    getRingsUniforms(): RingsUniforms | null;
+export class RingsModel {
+    ringStart: number;
+    ringEnd: number;
+    ringFrequency: number;
+    ringOpacity: number;
+    ringColor: Color3;
+    offset: number;
+
+    constructor(rng: (step: number) => number) {
+        this.ringStart = randRange(1.8, 2.2, rng, 1400);
+        this.ringEnd = randRange(2.1, 4.0, rng, 1410);
+        this.ringFrequency = 30.0;
+        this.ringOpacity = clamp(normalRandom(0.7, 0.1, rng, 1420), 0, 1);
+        this.ringColor = new Color3(214, 168, 122).scaleInPlace(randRange(1.0, 1.5, rng, 1430) / 255);
+
+        this.offset = randRange(-100, 100, rng, 1440);
+    }
 }

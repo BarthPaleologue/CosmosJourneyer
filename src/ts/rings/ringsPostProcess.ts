@@ -15,21 +15,21 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import ringsFragment from "../../../shaders/ringsFragment.glsl";
-import { UberScene } from "../../uberCore/uberScene";
-import { ObjectPostProcess } from "../objectPostProcess";
+import ringsFragment from "../../shaders/ringsFragment.glsl";
+import { UberScene } from "../uberCore/uberScene";
+import { ObjectPostProcess } from "../postProcesses/objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "./ringsUniform";
-import { CelestialBody } from "../../architecture/celestialBody";
+import { CelestialBody } from "../architecture/celestialBody";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../uniforms/objectUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../uniforms/stellarObjectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "../uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { SamplerUniformNames, setSamplerUniforms } from "../uniforms/samplerUniforms";
-import { Transformable } from "../../architecture/transformable";
+import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
+import { Transformable } from "../architecture/transformable";
 
 export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
     readonly ringsUniforms: RingsUniforms;
@@ -81,7 +81,7 @@ export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
             setObjectUniforms(effect, this.object);
 
             this.ringsUniforms.setUniforms(effect);
-            this.ringsUniforms.setSamplers(effect, scene);
+            this.ringsUniforms.setSamplers(effect);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });
