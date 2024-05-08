@@ -32,7 +32,7 @@ import { BlackHolePostProcess } from "./postProcesses/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
 import { UberScene } from "./uberCore/uberScene";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Axis, Scene } from "@babylonjs/core";
+import { Axis, MeshBuilder, Scene } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
 import { Mandelbulb } from "./mandelbulb/mandelbulb";
@@ -106,43 +106,50 @@ const leftEye = stereoCameras.leftEye
 const rightEye = stereoCameras.rightEye;
 
 scene.activeCameras = [leftEye, rightEye];
-//scene.activeCamera = debugCamera;
+
 scene.setActiveCamera(leftEye);
+leftEye.detachControl();
 scene.enableDepthRenderer(rightEye, false, true);
 
-//const blackHole = new BlackHole("hole", scene, 0, null);
-//blackHole.getTransform().setAbsolutePosition(new Vector3(0, 0, 10000e3));
+/*const blackHole = new BlackHole("hole", scene, 0, null);
+blackHole.getTransform().setAbsolutePosition(new Vector3(0, 0, 10000e3));
+blackHole.getTransform().scaling = new Vector3(0.2, 0.2, 0.2);*/
 
 const seed = Math.random() * 10000;
 //console.log(seed);
 //4829.9269997818865
 //8924.633781553775
 
-const mandelbulb = new Mandelbulb("bulb", scene, seed, null);
-mandelbulb.getTransform().setAbsolutePosition(new Vector3(0, 0, 1500e3));
-
-const targetObject = mandelbulb;
-
-const starfieldPostProcess = new StarfieldPostProcess(scene, [], [targetObject], Quaternion.Identity());
+const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
 leftEye.attachPostProcess(starfieldPostProcess);
 rightEye.attachPostProcess(starfieldPostProcess);
 
-/*const bh = new BlackHolePostProcess(blackHole, scene, Quaternion.Identity());
-leftEye.attachPostProcess(bh);
-rightEye.attachPostProcess(bh);*/
+function createMandelbulb(): TransformNode {
+    const mandelbulb = new Mandelbulb("bulb", scene, seed, null);
+    mandelbulb.getTransform().setAbsolutePosition(new Vector3(0, 0, 15));
+    mandelbulb.getTransform().scalingDeterminant = 1 / 100e3;
 
-const mandelbulbPP = new MandelbulbPostProcess(mandelbulb, scene, []);
-leftEye.attachPostProcess(mandelbulbPP);
-rightEye.attachPostProcess(mandelbulbPP);
+    const mandelbulbPP = new MandelbulbPostProcess(mandelbulb, scene, []);
+    leftEye.attachPostProcess(mandelbulbPP);
+    rightEye.attachPostProcess(mandelbulbPP);
 
-stereoCameras.transform.rotateAround(targetObject.getTransform().getAbsolutePosition(), Axis.X, 0.2);
+    scene.onBeforeRenderObservable.add(() => {
+        const deltaSeconds = engine.getDeltaTime() / 1000;
+        mandelbulbPP.update(deltaSeconds);
+    });
 
+    return mandelbulb.getTransform();
+}
+
+const targetObject = createMandelbulb();
+
+stereoCameras.transform.rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.2);
 
 function applyFloatingOrigin() {
     const headPosition = stereoCameras.transform.getAbsolutePosition().clone();
 
     translate(stereoCameras.transform, headPosition.negate());
-    translate(targetObject.getTransform(), headPosition.negate());
+    translate(targetObject, headPosition.negate());
 }
 
 let mousePressed = false;
@@ -154,17 +161,18 @@ document.addEventListener("pointermove", e => {
     const mouseDY = e.movementY;
 
     if(mousePressed) {
-        stereoCameras.transform.rotateAround(targetObject.getTransform().getAbsolutePosition(), Axis.Y, 0.001 * mouseDX);
+        stereoCameras.transform.rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.001 * mouseDX);
         stereoCameras.transform.computeWorldMatrix(true);
-        stereoCameras.transform.rotateAround(targetObject.getTransform().getAbsolutePosition(), stereoCameras.transform.getDirection(Axis.X), 0.001 * mouseDY);
+        stereoCameras.transform.rotateAround(targetObject.getAbsolutePosition(), stereoCameras.transform.getDirection(Axis.X), -0.001 * mouseDY);
         stereoCameras.transform.computeWorldMatrix(true);
 
         applyFloatingOrigin();
     }
 });
 
-export let interOcularFactor = 300_000; // empirical value
+let interOcularFactor = 1; // empirical value
 document.addEventListener("keydown", e => {
+    if(e.repeat) return;
     if(e.key === "ArrowDown") {
         interOcularFactor /= 1.5;
     } else if(e.key === "ArrowUp") {
@@ -173,27 +181,20 @@ document.addEventListener("keydown", e => {
     console.log(interOcularFactor);
 });
 
-let elapsedTime = 0.0;
-
 scene.onBeforeRenderObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;
 
-    elapsedTime += deltaSeconds;
-
-    mandelbulbPP.update(deltaSeconds);
-    //bh.update(deltaSeconds);
-
     // our eyes will focus on the center where the object is
-    const focalPoint = targetObject.getTransform().getAbsolutePosition().negate();
+    const focalPoint = targetObject.getAbsolutePosition().negate();
 
     stereoCameras.leftEye.position.x = -interOcularDistance * 0.5 * interOcularFactor;
     stereoCameras.rightEye.position.x = interOcularDistance * 0.5 * interOcularFactor;
-
+    
     stereoCameras.focusOnPoint(focalPoint);
 
-    stereoCameras.transform.rotateAround(targetObject.getTransform().getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);
+    stereoCameras.transform.rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);
     stereoCameras.transform.computeWorldMatrix(true);
-    stereoCameras.transform.rotateAround(targetObject.getTransform().getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
+    stereoCameras.transform.rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
     stereoCameras.transform.computeWorldMatrix(true);
 
     applyFloatingOrigin();
