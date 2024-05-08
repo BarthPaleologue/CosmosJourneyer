@@ -32,7 +32,7 @@ import { BlackHolePostProcess } from "./postProcesses/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
 import { UberScene } from "./uberCore/uberScene";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Axis, Scene } from "@babylonjs/core";
+import { Axis, MeshBuilder, Scene } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
 import { Mandelbulb } from "./mandelbulb/mandelbulb";
