@@ -22,11 +22,13 @@ import { BoundingSphere } from "../../architecture/boundingSphere";
 export const ObjectUniformNames = {
     OBJECT_POSITION: "object_position",
     OBJECT_RADIUS: "object_radius",
-    OBJECT_ROTATION_AXIS: "object_rotationAxis"
+    OBJECT_ROTATION_AXIS: "object_rotationAxis",
+    OBJECT_SCALING_DETERMINANT: "object_scaling_determinant"
 }
 
 export function setObjectUniforms(effect: Effect, object: Transformable & BoundingSphere): void {
     effect.setVector3(ObjectUniformNames.OBJECT_POSITION, object.getTransform().getAbsolutePosition());
-    effect.setFloat(ObjectUniformNames.OBJECT_RADIUS, object.getBoundingRadius() * object.getTransform().scalingDeterminant);
+    effect.setFloat(ObjectUniformNames.OBJECT_RADIUS, object.getBoundingRadius());
     effect.setVector3(ObjectUniformNames.OBJECT_ROTATION_AXIS, object.getTransform().up);
+    effect.setFloat(ObjectUniformNames.OBJECT_SCALING_DETERMINANT, object.getTransform().scalingDeterminant);
 }

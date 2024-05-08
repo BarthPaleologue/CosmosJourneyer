@@ -106,9 +106,9 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
             effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, rotationMatrix);
 
             effect.setFloat(BlackHoleUniformNames.TIME, blackHoleUniforms.time % (blackHoleUniforms.rotationPeriod * 10000));
-            effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, blackHole.model.getSchwarzschildRadius() * blackHole.getTransform().scalingDeterminant);
+            effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, blackHole.model.getSchwarzschildRadius());
             effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, blackHole.model.getKerrMetricA() / blackHole.model.physicalProperties.mass);
-            effect.setFloat(BlackHoleUniformNames.ACCRETION_DISK_RADIUS, blackHoleUniforms.accretionDiskRadius * blackHole.getTransform().scalingDeterminant);
+            effect.setFloat(BlackHoleUniformNames.ACCRETION_DISK_RADIUS, blackHoleUniforms.accretionDiskRadius);
             effect.setFloat(BlackHoleUniformNames.WARPING_MINKOWSKI_FACTOR, blackHoleUniforms.warpingMinkowskiFactor);
             effect.setFloat(BlackHoleUniformNames.ROTATION_PERIOD, blackHoleUniforms.rotationPeriod);
             effect.setVector3(BlackHoleUniformNames.ROTATION_AXIS, blackHole.getRotationAxis());
