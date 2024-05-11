@@ -17,75 +17,23 @@
 
 import "../styles/index.scss";
 
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
-import "../styles/index.scss";
-import { Viewport } from "@babylonjs/core/Maths/math.viewport";
 import "@babylonjs/core/Misc/screenshotTools";
-import { Tools } from "@babylonjs/core/Misc/tools";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { BlackHolePostProcess } from "./postProcesses/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
 import { UberScene } from "./uberCore/uberScene";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Axis, MeshBuilder, Scene } from "@babylonjs/core";
+import { Axis } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
 import { Mandelbulb } from "./mandelbulb/mandelbulb";
 import { MandelbulbPostProcess } from "./postProcesses/mandelbulbPostProcess";
-
-const FOV = Tools.ToRadians(60);
-
-// Fine tune this value with your own eyes
-const interOcularDistance = 0.065;
-
-export class StereoCameras {
-    readonly transform: TransformNode;
-
-    readonly leftEye: FreeCamera;
-    readonly rightEye: FreeCamera;
-
-    constructor(canvas: HTMLCanvasElement, engine: Engine, scene: Scene) {
-        // This transform will be used as the parent of both eyes
-        this.transform = new TransformNode("HeadTransform", scene);
-
-        // left eye is on the left
-        this.leftEye = new FreeCamera("LeftEye", new Vector3(-interOcularDistance / 2, 0, 0), scene);
-        this.leftEye.fov = FOV;
-        this.leftEye.viewport = new Viewport(0, 0.0, 0.5, 1);
-        this.leftEye.parent = this.transform;
-        this.leftEye.onProjectionMatrixChangedObservable.add(() => {
-            const aspectRatio = canvas.width / canvas.height;
-            this.leftEye._projectionMatrix.copyFrom(Matrix.PerspectiveFovLH(this.leftEye.fov, aspectRatio, this.leftEye.minZ, this.leftEye.maxZ, engine.isNDCHalfZRange, this.leftEye.projectionPlaneTilt, engine.useReverseDepthBuffer));
-        });
-
-        // right eye is on the right
-        this.rightEye = new FreeCamera("RightEye", new Vector3(interOcularDistance / 2, 0, 0), scene);
-        this.rightEye.fov = FOV;
-        this.rightEye.viewport = new Viewport(0.5, 0, 0.5, 1);
-        this.rightEye.parent = this.transform;
-        this.rightEye.onProjectionMatrixChangedObservable.add(() => {
-            const aspectRatio = canvas.width / canvas.height;
-            this.rightEye._projectionMatrix.copyFrom(Matrix.PerspectiveFovLH(this.rightEye.fov, aspectRatio, this.rightEye.minZ, this.rightEye.maxZ, engine.isNDCHalfZRange, this.rightEye.projectionPlaneTilt, engine.useReverseDepthBuffer));
-        });
-    }
-
-    /**
-     * Make the left and right eyes look at the focal point
-     * @param focalPoint The focal point in world space
-     */
-    focusOnPoint(focalPoint: Vector3) {
-        this.transform.lookAt(focalPoint);
-
-        // look forward
-        this.leftEye.setTarget(this.leftEye.position.add(Axis.Z.scale(10_000)));
-        this.rightEye.setTarget(this.rightEye.position.add(Axis.Z.scale(10_000)));
-    }
-}
+import { StereoCameras } from "./utils/stereoCameras";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -105,11 +53,7 @@ const stereoCameras = new StereoCameras(canvas, engine, scene);
 const leftEye = stereoCameras.leftEye
 const rightEye = stereoCameras.rightEye;
 
-scene.activeCameras = [leftEye, rightEye];
-
-scene.setActiveCamera(leftEye);
-leftEye.detachControl();
-scene.enableDepthRenderer(rightEye, false, true);
+scene.setActiveCameras([leftEye, rightEye]);
 
 const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
 leftEye.attachPostProcess(starfieldPostProcess);
@@ -151,12 +95,12 @@ function createMandelbulb(): TransformNode {
 
 const targetObject = createMandelbulb();
 
-stereoCameras.transform.rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.2);
+stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.2);
 
 function applyFloatingOrigin() {
-    const headPosition = stereoCameras.transform.getAbsolutePosition().clone();
+    const headPosition = stereoCameras.getTransform().getAbsolutePosition().clone();
 
-    translate(stereoCameras.transform, headPosition.negate());
+    translate(stereoCameras.getTransform(), headPosition.negate());
     translate(targetObject, headPosition.negate());
 }
 
@@ -169,24 +113,13 @@ document.addEventListener("pointermove", e => {
     const mouseDY = e.movementY;
 
     if(mousePressed) {
-        stereoCameras.transform.rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.001 * mouseDX);
-        stereoCameras.transform.computeWorldMatrix(true);
-        stereoCameras.transform.rotateAround(targetObject.getAbsolutePosition(), stereoCameras.transform.getDirection(Axis.X), -0.001 * mouseDY);
-        stereoCameras.transform.computeWorldMatrix(true);
+        stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.001 * mouseDX);
+        stereoCameras.getTransform().computeWorldMatrix(true);
+        stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), stereoCameras.getTransform().getDirection(Axis.X), -0.001 * mouseDY);
+        stereoCameras.getTransform().computeWorldMatrix(true);
 
         applyFloatingOrigin();
     }
-});
-
-let interOcularFactor = 1; // empirical value
-document.addEventListener("keydown", e => {
-    if(e.repeat) return;
-    if(e.key === "ArrowDown") {
-        interOcularFactor /= 1.5;
-    } else if(e.key === "ArrowUp") {
-        interOcularFactor *= 1.5;
-    }
-    console.log(interOcularFactor);
 });
 
 scene.onBeforeRenderObservable.add(() => {
@@ -194,16 +127,13 @@ scene.onBeforeRenderObservable.add(() => {
 
     // our eyes will focus on the center where the object is
     const focalPoint = targetObject.getAbsolutePosition().negate();
-
-    stereoCameras.leftEye.position.x = -interOcularDistance * 0.5 * interOcularFactor;
-    stereoCameras.rightEye.position.x = interOcularDistance * 0.5 * interOcularFactor;
     
-    stereoCameras.focusOnPoint(focalPoint);
+    stereoCameras.getTransform().lookAt(focalPoint);
 
-    stereoCameras.transform.rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);
-    stereoCameras.transform.computeWorldMatrix(true);
-    stereoCameras.transform.rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
-    stereoCameras.transform.computeWorldMatrix(true);
+    stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);
+    stereoCameras.getTransform().computeWorldMatrix(true);
+    stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
+    stereoCameras.getTransform().computeWorldMatrix(true);
 
     applyFloatingOrigin();
 });
@@ -219,12 +149,4 @@ window.addEventListener("resize", () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     engine.resize(true);
-});
-
-document.addEventListener("keypress", (e) => {
-    if (e.key === "p") {
-        // take screenshot
-        Tools.CreateScreenshot(engine, leftEye, { precision: 1 });
-        Tools.CreateScreenshot(engine, rightEye, { precision: 1 });
-    }
 });
