@@ -531,7 +531,7 @@ export class PostProcessManager {
      */
     public reset() {
         // disposing on every camera is necessary because BabylonJS only detaches the post-processes from a single camera at a time
-        this.scene.cameras.forEach(camera => {
+        this.scene.cameras.forEach((camera) => {
             this.starFields.forEach((starField) => starField.dispose(camera));
             this.volumetricLights.forEach((volumetricLight) => volumetricLight.dispose(camera));
             this.oceans.forEach((ocean) => ocean.dispose(camera));

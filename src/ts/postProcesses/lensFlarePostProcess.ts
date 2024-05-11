@@ -64,13 +64,9 @@ export class LensFlarePostProcess extends PostProcess implements ObjectPostProce
             CLIP_POSITION: "clipPosition",
             VISIBILITY: "visibility",
             ASPECT_RATIO: "aspectRatio"
-        }
+        };
 
-        const uniforms: string[] = [
-            ...Object.values(ObjectUniformNames),
-            ...Object.values(CameraUniformNames),
-            ...Object.values(LensFlareUniformNames)
-        ];
+        const uniforms: string[] = [...Object.values(ObjectUniformNames), ...Object.values(CameraUniformNames), ...Object.values(LensFlareUniformNames)];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
@@ -84,7 +80,7 @@ export class LensFlarePostProcess extends PostProcess implements ObjectPostProce
         });
 
         this.onApplyObservable.add((effect) => {
-            if(this.activeCamera === null) {
+            if (this.activeCamera === null) {
                 throw new Error("Camera is null");
             }
 
@@ -93,12 +89,7 @@ export class LensFlarePostProcess extends PostProcess implements ObjectPostProce
 
             effect.setColor3(LensFlareUniformNames.FLARE_COLOR, object instanceof Star ? object.model.color : new Color3(1, 1, 1));
 
-            const clipPosition = Vector3.Project(
-                object.getTransform().getAbsolutePosition(),
-                Matrix.IdentityReadOnly,
-                scene.getTransformMatrix(),
-                this.activeCamera.viewport
-            );
+            const clipPosition = Vector3.Project(object.getTransform().getAbsolutePosition(), Matrix.IdentityReadOnly, scene.getTransformMatrix(), this.activeCamera.viewport);
             settings.behindCamera = clipPosition.z < 0;
             effect.setVector3(LensFlareUniformNames.CLIP_POSITION, clipPosition);
 

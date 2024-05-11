@@ -476,14 +476,14 @@ export class StarSystemView implements View {
 
         this.defaultControls = new DefaultControls(this.scene);
         this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
-        this.defaultControls.getActiveCameras().forEach(camera => camera.maxZ = maxZ);
+        this.defaultControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
 
         this.spaceshipControls = new ShipControls(this.scene);
-        this.spaceshipControls.getActiveCameras().forEach(camera => camera.maxZ = maxZ);
+        this.spaceshipControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
 
         this.characterControls = new CharacterControls(this.scene);
         this.characterControls.getTransform().setEnabled(false);
-        this.characterControls.getActiveCameras().forEach(camera => camera.maxZ = maxZ);
+        this.characterControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
 
         this.scene.setActiveControls(this.spaceshipControls);
     }
@@ -663,9 +663,12 @@ export class StarSystemView implements View {
             callback();
             return;
         }
-        activeControls.getActiveCameras().forEach(camera => camera.animations = [StarSystemView.UN_ZOOM_ANIMATION]);
+        activeControls.getActiveCameras().forEach((camera) => (camera.animations = [StarSystemView.UN_ZOOM_ANIMATION]));
         this.scene.beginAnimation(this.scene.getActiveControls().getActiveCameras(), 0, 60, false, 2.0, () => {
-            this.scene.getActiveControls().getActiveCameras().forEach(camera => camera.animations = []);
+            this.scene
+                .getActiveControls()
+                .getActiveCameras()
+                .forEach((camera) => (camera.animations = []));
             this.hideHtmlUI();
             callback();
             this.scene.onAfterRenderObservable.addOnce(() => {

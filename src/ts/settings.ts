@@ -47,7 +47,7 @@ export const Settings = {
     /**
      * The gravitational constant in m^3 kg^-1 s^-2.
      */
-    G: 6.67430e-11,
+    G: 6.6743e-11,
 
     /**
      * The astronomical unit in meters.

@@ -29,6 +29,9 @@ export const StellarObjectUniformNames = {
 
 export function setStellarObjectUniforms(effect: Effect, stellarObjects: Transformable[]): void {
     effect.setArray3(StellarObjectUniformNames.STAR_POSITIONS, flattenVector3Array(stellarObjects.map((stellarObject) => stellarObject.getTransform().getAbsolutePosition())));
-    effect.setArray3(StellarObjectUniformNames.STAR_COLORS, flattenColor3Array(stellarObjects.map((stellarObject) => stellarObject instanceof Star ? stellarObject.model.color : Color3.White())));
+    effect.setArray3(
+        StellarObjectUniformNames.STAR_COLORS,
+        flattenColor3Array(stellarObjects.map((stellarObject) => (stellarObject instanceof Star ? stellarObject.model.color : Color3.White())))
+    );
     effect.setInt(StellarObjectUniformNames.NB_STARS, stellarObjects.length);
 }

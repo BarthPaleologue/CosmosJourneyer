@@ -57,10 +57,7 @@ export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
             ...Object.values(RingsUniformNames)
         ];
 
-        const samplers: string[] = [
-            ...Object.values(SamplerUniformNames),
-            ...Object.values(RingsSamplerNames)
-        ];
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
 
         super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
@@ -72,7 +69,7 @@ export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
         });
 
         this.onApplyObservable.add((effect) => {
-            if(this.activeCamera === null) {
+            if (this.activeCamera === null) {
                 throw new Error("RingsPostProcess: activeCamera is null");
             }
 

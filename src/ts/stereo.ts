@@ -48,9 +48,9 @@ scene.useRightHandedSystem = true;
 
 await Assets.Init(scene);
 
-const stereoCameras = new StereoCameras(canvas, engine, scene);  
+const stereoCameras = new StereoCameras(canvas, engine, scene);
 
-const leftEye = stereoCameras.leftEye
+const leftEye = stereoCameras.leftEye;
 const rightEye = stereoCameras.rightEye;
 
 scene.activeCameras = [leftEye, rightEye];
@@ -108,14 +108,14 @@ function applyFloatingOrigin() {
 }
 
 let mousePressed = false;
-document.addEventListener("pointerdown", () => mousePressed = true);
-document.addEventListener("pointerup", () => mousePressed = false);
+document.addEventListener("pointerdown", () => (mousePressed = true));
+document.addEventListener("pointerup", () => (mousePressed = false));
 
-document.addEventListener("pointermove", e => {
+document.addEventListener("pointermove", (e) => {
     const mouseDX = e.movementX;
     const mouseDY = e.movementY;
 
-    if(mousePressed) {
+    if (mousePressed) {
         stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.001 * mouseDX);
         stereoCameras.getTransform().computeWorldMatrix(true);
         stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), stereoCameras.getTransform().getDirection(Axis.X), -0.001 * mouseDY);
@@ -130,7 +130,7 @@ scene.onBeforeRenderObservable.add(() => {
 
     // our eyes will focus on the center where the object is
     const focalPoint = targetObject.getAbsolutePosition().negate();
-    
+
     stereoCameras.getTransform().lookAt(focalPoint);
 
     stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);

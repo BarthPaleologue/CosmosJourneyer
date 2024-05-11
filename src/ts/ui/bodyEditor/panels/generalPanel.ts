@@ -53,18 +53,10 @@ export class GeneralPanel extends EditorPanel {
                 rotate(body.getTransform(), Axis.Z, newAxialTilt - axialTiltZ);
                 axialTiltZ = newAxialTilt;
             }),
-            new Slider(
-                "cameraFOV",
-                document.getElementById("cameraFOV") as HTMLElement,
-                0,
-                360,
-                (scene.cameras[0].fov * 360) / Math.PI,
-                (val: number) => {
-                    scene.cameras
-                        .forEach((camera) => (camera.fov = (val * Math.PI) / 360));
-                    Settings.FOV = (val * Math.PI) / 360;
-                }
-            ),
+            new Slider("cameraFOV", document.getElementById("cameraFOV") as HTMLElement, 0, 360, (scene.cameras[0].fov * 360) / Math.PI, (val: number) => {
+                scene.cameras.forEach((camera) => (camera.fov = (val * Math.PI) / 360));
+                Settings.FOV = (val * Math.PI) / 360;
+            }),
             new Slider("timeModifier", document.getElementById("timeModifier") as HTMLElement, -200, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {
                 Settings.TIME_MULTIPLIER = Math.sign(val) * Math.pow(Math.abs(val), power);
             }),

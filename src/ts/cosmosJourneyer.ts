@@ -416,7 +416,10 @@ export class CosmosJourneyer {
             setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
 
             // updates camera position
-            this.starSystemView.getSpaceshipControls().getActiveCameras().forEach(camera => camera.getViewMatrix(true));
+            this.starSystemView
+                .getSpaceshipControls()
+                .getActiveCameras()
+                .forEach((camera) => camera.getViewMatrix(true));
 
             // re-centers the star system
             this.starSystemView.getStarSystem().applyFloatingOrigin();

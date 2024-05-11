@@ -60,7 +60,7 @@ export class GasPlanetMaterial extends ShaderMaterial {
                 "color2",
                 "color3",
                 "colorSharpness",
-                "time",
+                "time"
             ]
         });
 

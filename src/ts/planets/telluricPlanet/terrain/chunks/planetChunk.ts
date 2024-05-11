@@ -176,7 +176,7 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
             grassPatch.createInstances(Assets.GRASS_BLADE);
             this.instancePatches.push(grassPatch);
 
-            for(const depthRenderer of Object.values(this.scene._depthRenderer)) {
+            for (const depthRenderer of Object.values(this.scene._depthRenderer)) {
                 depthRenderer.setMaterialForRendering([butterflyPatch.getBaseMesh()], Assets.BUTTERFLY_DEPTH_MATERIAL);
                 depthRenderer.setMaterialForRendering([grassPatch.getBaseMesh()], Assets.GRASS_DEPTH_MATERIAL);
             }
@@ -230,7 +230,7 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
 
         let isVisible = false;
 
-        for(const camera of cameras) {
+        for (const camera of cameras) {
             // chunks on the other side of the planet are culled
             // as chunks have dimensions, we use the bounding sphere to do conservative culling
             const chunkToCameraDir = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition()).normalize();
@@ -250,7 +250,7 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
 
         this.instancePatches.forEach((patch) => {
             let isVisible = false;
-            for(const camera of cameras) {
+            for (const camera of cameras) {
                 const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
 
                 // instance patches are not rendered when the chunk is too far

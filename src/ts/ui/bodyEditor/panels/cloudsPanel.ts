@@ -45,9 +45,16 @@ export class CloudsPanel extends EditorPanel {
             new Slider("cloudFrequency", document.getElementById("cloudFrequency") as HTMLElement, 0, 20, flatClouds.cloudUniforms.model.frequency, (val: number) => {
                 flatClouds.cloudUniforms.model.frequency = val;
             }),
-            new Slider("cloudDetailFrequency", document.getElementById("cloudDetailFrequency") as HTMLElement, 0, 50, flatClouds.cloudUniforms.model.detailFrequency, (val: number) => {
-                flatClouds.cloudUniforms.model.detailFrequency = val;
-            }),
+            new Slider(
+                "cloudDetailFrequency",
+                document.getElementById("cloudDetailFrequency") as HTMLElement,
+                0,
+                50,
+                flatClouds.cloudUniforms.model.detailFrequency,
+                (val: number) => {
+                    flatClouds.cloudUniforms.model.detailFrequency = val;
+                }
+            ),
             new Slider("cloudCoverage", document.getElementById("cloudCoverage") as HTMLElement, 0, 200, 100 + flatClouds.cloudUniforms.model.coverage * 100, (val: number) => {
                 flatClouds.cloudUniforms.model.coverage = (val - 100) / 100;
             }),

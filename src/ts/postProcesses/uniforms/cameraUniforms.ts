@@ -27,7 +27,7 @@ export const CameraUniformNames = {
     CAMERA_NEAR: "camera_near",
     CAMERA_FAR: "camera_far",
     CAMERA_FOV: "camera_fov"
-}
+};
 
 export function setCameraUniforms(effect: Effect, camera: Camera): void {
     effect.setVector3(CameraUniformNames.CAMERA_POSITION, camera.globalPosition);

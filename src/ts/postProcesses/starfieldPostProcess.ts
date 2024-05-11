@@ -49,22 +49,15 @@ export class StarfieldPostProcess extends PostProcess {
         const StarfieldUniformNames = {
             STARFIELD_ROTATION: "starfieldRotation",
             VISIBILITY: "visibility"
-        }
+        };
 
         const StarfieldSamplerNames = {
             STARFIELD_TEXTURE: "starfieldTexture"
-        }
+        };
 
-        const uniforms: string[] = [
-            ...Object.values(CameraUniformNames),
-            ...Object.values(StellarObjectUniformNames),
-            ...Object.values(StarfieldUniformNames)
-        ];
+        const uniforms: string[] = [...Object.values(CameraUniformNames), ...Object.values(StellarObjectUniformNames), ...Object.values(StarfieldUniformNames)];
 
-        const samplers: string[] = [
-            ...Object.values(SamplerUniformNames),
-            ...Object.values(StarfieldSamplerNames),
-        ];
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(StarfieldSamplerNames)];
 
         super("starfield", shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
@@ -73,11 +66,10 @@ export class StarfieldPostProcess extends PostProcess {
         });
 
         this.onApplyObservable.add((effect) => {
-            
-            if(this.activeCamera === null) {
+            if (this.activeCamera === null) {
                 throw new Error("Camera is null");
             }
-            
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
 

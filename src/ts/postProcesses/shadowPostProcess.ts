@@ -45,12 +45,7 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
 
     private activeCamera: Camera | null = null;
 
-    constructor(
-        name: string,
-        body: CelestialBody,
-        stellarObjects: StellarObject[],
-        scene: Scene
-    ) {
+    constructor(name: string, body: CelestialBody, stellarObjects: StellarObject[], scene: Scene) {
         const shaderName = "shadow";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
@@ -77,10 +72,7 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
             ...Object.values(ShadowUniformNames)
         ];
 
-        const samplers: string[] = [
-            ...Object.values(SamplerUniformNames),
-            ...Object.values(RingsSamplerNames)
-        ];
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
 
         super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
@@ -101,12 +93,15 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, body);
 
-            effect.setFloatArray(ShadowUniformNames.STAR_RADIUSES, stellarObjects.map((star) => star.getBoundingRadius()));
+            effect.setFloatArray(
+                ShadowUniformNames.STAR_RADIUSES,
+                stellarObjects.map((star) => star.getBoundingRadius())
+            );
             effect.setBool(ShadowUniformNames.HAS_RINGS, shadowUniforms.hasRings);
             effect.setBool(ShadowUniformNames.HAS_CLOUDS, shadowUniforms.hasClouds);
             effect.setBool(ShadowUniformNames.HAS_OCEAN, shadowUniforms.hasOcean);
 
-            if(this.ringsUniforms === null) {
+            if (this.ringsUniforms === null) {
                 RingsUniforms.SetEmptyUniforms(effect);
                 RingsUniforms.SetEmptySamplers(effect);
             } else {

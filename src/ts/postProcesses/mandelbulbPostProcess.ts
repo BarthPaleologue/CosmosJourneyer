@@ -55,7 +55,7 @@ export class MandelbulbPostProcess extends PostProcess implements ObjectPostProc
         const MandelbulbUniformNames = {
             POWER: "power",
             ACCENT_COLOR: "accentColor"
-        }
+        };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
@@ -76,7 +76,7 @@ export class MandelbulbPostProcess extends PostProcess implements ObjectPostProc
         });
 
         this.onApplyObservable.add((effect) => {
-            if(this.activeCamera === null) {
+            if (this.activeCamera === null) {
                 throw new Error("Camera is null");
             }
 

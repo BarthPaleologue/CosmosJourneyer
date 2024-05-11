@@ -32,7 +32,7 @@ export type MatterJetUniforms = {
     // the rotation period in seconds of the matter jet
     rotationPeriod: number;
     time: number;
-}
+};
 
 /**
  * Post process for rendering matter jets that are used by neutron stars for example
@@ -58,13 +58,9 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
             TIME: "time",
             ROTATION_PERIOD: "rotationPeriod",
             ROTATION_AXIS: "rotationAxis"
-        }
+        };
 
-        const uniforms: string[] = [
-            ...Object.values(ObjectUniformNames),
-            ...Object.values(CameraUniformNames),
-            ...Object.values(MatterJetUniformNames)
-        ];
+        const uniforms: string[] = [...Object.values(ObjectUniformNames), ...Object.values(CameraUniformNames), ...Object.values(MatterJetUniformNames)];
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
@@ -78,7 +74,7 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
         });
 
         this.onApplyObservable.add((effect) => {
-            if(this.activeCamera === null) {
+            if (this.activeCamera === null) {
                 throw new Error("Camera is null");
             }
 
@@ -89,7 +85,7 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
             effect.setFloat(MatterJetUniformNames.ROTATION_PERIOD, this.matterJetUniforms.rotationPeriod);
             effect.setVector3(MatterJetUniformNames.ROTATION_AXIS, stellarObject.getRotationAxis());
 
-            setSamplerUniforms(effect, this.activeCamera, scene)
+            setSamplerUniforms(effect, this.activeCamera, scene);
         });
     }
 

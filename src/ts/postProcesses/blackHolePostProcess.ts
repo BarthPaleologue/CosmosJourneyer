@@ -67,22 +67,15 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
             ROTATION_PERIOD: "rotationPeriod",
             ROTATION_AXIS: "rotationAxis",
             FORWARD_AXIS: "forwardAxis"
-        }
+        };
 
-        const uniforms: string[] = [
-            ...Object.values(ObjectUniformNames),
-            ...Object.values(CameraUniformNames),
-            ...Object.values(BlackHoleUniformNames)
-        ];
+        const uniforms: string[] = [...Object.values(ObjectUniformNames), ...Object.values(CameraUniformNames), ...Object.values(BlackHoleUniformNames)];
 
         const BlackHoleSamplerNames = {
             STARFIELD_TEXTURE: "starfieldTexture"
-        }
+        };
 
-        const samplers: string[] = [
-            ...Object.values(SamplerUniformNames),
-            ...Object.values(BlackHoleSamplerNames)
-        ];
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(BlackHoleSamplerNames)];
 
         super(blackHole.name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
@@ -94,7 +87,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
         });
 
         this.onApplyObservable.add((effect) => {
-            if(this.activeCamera === null) {
+            if (this.activeCamera === null) {
                 throw new Error("Camera is null");
             }
 

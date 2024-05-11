@@ -184,9 +184,8 @@ export class ChunkTree implements Cullable {
 
         const totalRadius =
             this.planetModel.radius +
-            (this.planetModel.terrainSettings.max_mountain_height +
-            this.planetModel.terrainSettings.continent_base_height +
-            this.planetModel.terrainSettings.max_bump_height) * 0.5;
+            (this.planetModel.terrainSettings.max_mountain_height + this.planetModel.terrainSettings.continent_base_height + this.planetModel.terrainSettings.max_bump_height) *
+                0.5;
 
         const observerRelativePosition = observerPositionW.subtract(this.parent.getAbsolutePosition());
         const observerDistanceToCenter = observerRelativePosition.length();
@@ -194,7 +193,7 @@ export class ChunkTree implements Cullable {
         const nodeGreatCircleDistance = Math.acos(Vector3.Dot(nodePositionSphere, observerPositionSphere));
         const nodeLength = this.rootChunkLength / 2 ** walked.length;
 
-        const chunkGreatDistanceFactor = Math.max(0.0, nodeGreatCircleDistance - 8 * nodeLength / (2 * Math.PI * this.planetModel.radius));
+        const chunkGreatDistanceFactor = Math.max(0.0, nodeGreatCircleDistance - (8 * nodeLength) / (2 * Math.PI * this.planetModel.radius));
         const observerDistanceFactor = Math.max(0.0, observerDistanceToCenter - totalRadius) / this.planetModel.radius;
 
         let kernel = this.maxDepth;

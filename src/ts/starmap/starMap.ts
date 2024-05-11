@@ -361,7 +361,7 @@ export class StarMap implements View {
             const bb = StarSector.GetBoundingBox(position, this.starMapCenterPosition);
             let isInFrustrum = false;
             this.controls.getActiveCameras().forEach((camera) => {
-               isInFrustrum = isInFrustrum || camera.isInFrustum(bb);
+                isInFrustrum = isInFrustrum || camera.isInFrustum(bb);
             });
             if (!isInFrustrum) continue;
 

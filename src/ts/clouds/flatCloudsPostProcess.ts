@@ -38,13 +38,7 @@ export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProc
 
     private activeCamera: Camera | null = null;
 
-    constructor(
-        name: string,
-        planet: Transformable & BoundingSphere,
-        cloudUniforms: CloudsUniforms,
-        scene: Scene,
-        stellarObjects: Transformable[]
-    ) {
+    constructor(name: string, planet: Transformable & BoundingSphere, cloudUniforms: CloudsUniforms, scene: Scene, stellarObjects: Transformable[]) {
         const shaderName = "flatClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = flatCloudsFragment;
@@ -57,10 +51,7 @@ export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProc
             ...Object.values(CloudsUniformNames)
         ];
 
-        const samplers: string[] = [
-            ...Object.values(SamplerUniformNames),
-            ...Object.values(CloudsSamplerNames)
-        ];
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(CloudsSamplerNames)];
 
         super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
@@ -72,7 +63,7 @@ export class FlatCloudsPostProcess extends PostProcess implements ObjectPostProc
         });
 
         this.onApplyObservable.add((effect) => {
-            if(this.activeCamera === null) {
+            if (this.activeCamera === null) {
                 throw new Error("FlatCloudsPostProcess: activeCamera is null");
             }
             setCameraUniforms(effect, this.activeCamera);

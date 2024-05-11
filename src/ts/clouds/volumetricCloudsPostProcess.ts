@@ -51,7 +51,7 @@ export class VolumetricCloudsPostProcess extends PostProcess implements ObjectPo
         const VolumetricCloudsUniformNames = {
             CLOUD_LAYER_MIN_HEIGHT: "cloudLayerMinHeight",
             CLOUD_LAYER_MAX_HEIGHT: "cloudLayerMaxHeight"
-        }
+        };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
@@ -72,7 +72,7 @@ export class VolumetricCloudsPostProcess extends PostProcess implements ObjectPo
         });
 
         this.onApplyObservable.add((effect) => {
-            if(this.activeCamera === null) {
+            if (this.activeCamera === null) {
                 throw new Error("Camera is null");
             }
 

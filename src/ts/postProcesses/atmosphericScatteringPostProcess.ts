@@ -83,7 +83,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
             ATMOSPHERE_GREEN_WAVE_LENGTH: "atmosphere_greenWaveLength",
             ATMOSPHERE_BLUE_WAVE_LENGTH: "atmosphere_blueWaveLength",
             ATMOSPHERE_MIE_HALO_RADIUS: "atmosphere_mieHaloRadius"
-        }
+        };
 
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
@@ -96,10 +96,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
             ATMOSPHERE_LUT: "atmosphereLUT"
         };
 
-        const samplers: string[] = [
-            ...Object.values(SamplerUniformNames),
-            ...Object.values(AtmosphereSamplerNames)
-        ];
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(AtmosphereSamplerNames)];
 
         super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
@@ -111,7 +108,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
         });
 
         this.onApplyObservable.add((effect) => {
-            if(this.activeCamera === null) {
+            if (this.activeCamera === null) {
                 throw new Error("Camera is null");
             }
 

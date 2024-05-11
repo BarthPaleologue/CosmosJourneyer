@@ -71,7 +71,7 @@ export class OceanPostProcess extends PostProcess implements ObjectPostProcess, 
             OCEAN_WAVE_BLENDING_SHARPNESS: "ocean_waveBlendingSharpness",
             PLANET_INVERSE_ROTATION_MATRIX: "planetInverseRotationMatrix",
             TIME: "time"
-        }
+        };
 
         const uniforms: string[] = [
             ...Object.values(CameraUniformNames),
@@ -83,22 +83,19 @@ export class OceanPostProcess extends PostProcess implements ObjectPostProcess, 
         const OceanSamplerNames = {
             NORMAL_MAP_1: "normalMap1",
             NORMAL_MAP_2: "normalMap2"
-        }
+        };
 
-        const samplers: string[] = [
-            ...Object.values(SamplerUniformNames),
-            ...Object.values(OceanSamplerNames)
-        ];
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(OceanSamplerNames)];
 
         super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = planet;
         this.oceanUniforms = oceanUniforms;
 
-        this.onActivateObservable.add((camera) => this.activeCamera = camera);
+        this.onActivateObservable.add((camera) => (this.activeCamera = camera));
 
         this.onApplyObservable.add((effect) => {
-            if(this.activeCamera === null) {
+            if (this.activeCamera === null) {
                 throw new Error("Camera is null");
             }
 

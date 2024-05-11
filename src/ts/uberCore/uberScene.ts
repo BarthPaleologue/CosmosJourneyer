@@ -63,7 +63,7 @@ export class UberScene extends Scene {
 
         if (cameras.length === 1) cameras[0].attachControl(true);
 
-        if(this._depthRenderer === undefined || this._depthRenderer === null) {
+        if (this._depthRenderer === undefined || this._depthRenderer === null) {
             this._depthRenderer = {};
         }
 
@@ -80,7 +80,7 @@ export class UberScene extends Scene {
         // for each depth renderer, if its active camera is not in the list of active cameras, disable it
         depthRenderers.forEach((depthRenderer) => {
             const camera = depthRenderer.getDepthMap().activeCamera;
-            if(camera === null) throw new Error("Found a depth renderer with no camera attached! Log: " + depthRenderer);
+            if (camera === null) throw new Error("Found a depth renderer with no camera attached! Log: " + depthRenderer);
             depthRenderer.enabled = cameras.includes(camera);
         });
     }

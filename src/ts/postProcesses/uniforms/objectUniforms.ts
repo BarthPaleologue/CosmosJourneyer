@@ -24,7 +24,7 @@ export const ObjectUniformNames = {
     OBJECT_RADIUS: "object_radius",
     OBJECT_ROTATION_AXIS: "object_rotationAxis",
     OBJECT_SCALING_DETERMINANT: "object_scaling_determinant"
-}
+};
 
 export function setObjectUniforms(effect: Effect, object: Transformable & BoundingSphere): void {
     effect.setVector3(ObjectUniformNames.OBJECT_POSITION, object.getTransform().getAbsolutePosition());

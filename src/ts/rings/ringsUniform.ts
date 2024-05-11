@@ -88,7 +88,7 @@ export class RingsUniforms {
     }
 
     public setSamplers(effect: Effect) {
-        if(this.lutReady) {
+        if (this.lutReady) {
             effect.setTexture(RingsSamplerNames.RING_LUT, this.lut);
         } else {
             RingsUniforms.SetEmptySamplers(effect);
