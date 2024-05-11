@@ -18,22 +18,15 @@
 import "../styles/index.scss";
 
 import { Assets } from "./assets";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { UberScene } from "./uberCore/uberScene";
-import { translate } from "./uberCore/transforms/basicTransform";
-import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Engine } from "@babylonjs/core/Engines/engine";
-
-import HavokPhysics from "@babylonjs/havok";
-import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
-import { setMaxLinVel } from "./utils/havok";
-import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
-import { ChunkForgeWorkers } from "./planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
-import { Star } from "./stellarObjects/star/star";
-import { Settings } from "./settings";
-import { ScenePerformancePriority } from "@babylonjs/core/scene";
-
+import { Scene } from "@babylonjs/core/scene";
+import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Mandelbulb } from "./mandelbulb/mandelbulb";
+import { MandelbulbPostProcess } from "./postProcesses/mandelbulbPostProcess";
 import "@babylonjs/core";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -41,29 +34,16 @@ canvas.height = window.innerHeight;
 
 const engine = new Engine(canvas, true);
 engine.useReverseDepthBuffer = true;
+engine.displayLoadingUI();
 
-Settings.VERTEX_RESOLUTION = 32;
-
-// Init Havok physics engine
-const havokInstance = await HavokPhysics();
-const havokPlugin = new HavokPlugin(true, havokInstance);
-setMaxLinVel(havokPlugin, 10000, 10000);
-console.log(`Havok initialized`);
-
-const scene = new UberScene(engine, ScenePerformancePriority.Intermediate);
+const scene = new Scene(engine);
 scene.useRightHandedSystem = true;
-scene.enablePhysics(Vector3.Zero(), havokPlugin);
+
+const fallbackCamera = new FreeCamera("FallbackCamera", new Vector3(0, 0, 0), scene);
+fallbackCamera.attachControl(canvas, true);
+scene.enableDepthRenderer(fallbackCamera, false, true);
 
 await Assets.Init(scene);
-
-const sphereRadius = Settings.EARTH_RADIUS;
-
-const camera = new FreeCamera("camera", new Vector3(0, 0, 0), scene);
-camera.maxZ = 1e9;
-camera.speed *= sphereRadius * 0.1;
-camera.angularSensibility /= 10;
-scene.setActiveCameras([camera]);
-camera.attachControl(canvas, true);
 
 const xr = await scene.createDefaultXRExperienceAsync();
 if (!xr.baseExperience) {
@@ -96,61 +76,35 @@ webXRInput.onControllerAddedObservable.add((xrController) => {
 });
 
 const xrCamera = xr.baseExperience.camera;
-xrCamera.setTransformationFromNonVRCamera(camera);
-xrCamera.maxZ = camera.maxZ;
-
-const planet = new TelluricPlanet("xrPlanet", scene, 0.51, null);
-translate(planet.getTransform(), new Vector3(0, 0, sphereRadius * 4));
-
-const star = new Star("star", scene, 0.2); //PointLightWrapper(new PointLight("dir01", new Vector3(0, 1, 0), scene));
-translate(star.getTransform(), new Vector3(0, 0, -sphereRadius * 5000));
-
-/*const starfield = new StarfieldPostProcess(scene, [star], [planet], Quaternion.Identity());
-camera.attachPostProcess(starfield);
-xrCamera.attachPostProcess(starfield);
-
-const ocean = new OceanPostProcess("ocean", planet, scene, [star]);
-camera.attachPostProcess(ocean);
-xrCamera.attachPostProcess(ocean);
-
-if (planet.model.cloudsUniforms === null) throw new Error("Clouds uniforms are null");
-FlatCloudsPostProcess.CreateAsync("clouds", planet, planet.model.cloudsUniforms, scene, [star]).then((clouds) => {
-  camera.attachPostProcess(clouds);
-  xrCamera.attachPostProcess(clouds);
-
-  const atmosphere = new AtmosphericScatteringPostProcess("atmosphere", planet, 100e3, scene, [star]);
-  camera.attachPostProcess(atmosphere);
-  xrCamera.attachPostProcess(atmosphere);
-
-  const lensflare = new LensFlarePostProcess(star, scene);
-  camera.attachPostProcess(lensflare);
-  xrCamera.attachPostProcess(lensflare);
-});*/
-
-const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
-
-scene.onBeforeRenderObservable.add(() => {
-    const deltaTime = engine.getDeltaTime() / 1000;
-
-    if (scene.activeCamera === null) throw new Error("Active camera is null");
-
-    if (camera.globalPosition.length() > 0) {
-        translate(planet.getTransform(), camera.globalPosition.negate());
-        translate(star.getTransform(), camera.globalPosition.negate());
-        camera.position.set(0, 0, 0);
-    }
-
-    planet.updateLOD(scene.activeCamera.globalPosition, chunkForge);
-    planet.updateMaterial([star], deltaTime);
-
-    chunkForge.update();
-
-    star.updateMaterial(deltaTime);
-
-    //ocean.update(deltaTime);
+xrCamera.rigCameras.forEach((camera) => {
+    scene.enableDepthRenderer(camera, false, true);
 });
 
+const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
+fallbackCamera.attachPostProcess(starfieldPostProcess);
+xrCamera.attachPostProcess(starfieldPostProcess);
+
+function createMandelbulb(): TransformNode {
+    const mandelbulb = new Mandelbulb("bulb", scene, Math.random() * 10000, null);
+    mandelbulb.getTransform().setAbsolutePosition(new Vector3(0, 0, 15));
+    mandelbulb.getTransform().scalingDeterminant = 1 / 100e3;
+
+    const mandelbulbPP = new MandelbulbPostProcess(mandelbulb, scene, []);
+    fallbackCamera.attachPostProcess(mandelbulbPP);
+    xrCamera.attachPostProcess(mandelbulbPP);
+
+    scene.onBeforeRenderObservable.add(() => {
+        const deltaSeconds = engine.getDeltaTime() / 1000;
+        mandelbulbPP.update(deltaSeconds);
+    });
+
+    return mandelbulb.getTransform();
+}
+
+createMandelbulb();
+
 scene.executeWhenReady(() => {
+    engine.loadingScreen.hideLoadingUI();
     engine.runRenderLoop(() => {
         scene.render();
     });
