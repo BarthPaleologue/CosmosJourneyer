@@ -38,7 +38,7 @@ import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Cullable } from "../../../../bodies/cullable";
+import { Cullable } from "../../../../utils/cullable";
 
 export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
     public readonly mesh: Mesh;

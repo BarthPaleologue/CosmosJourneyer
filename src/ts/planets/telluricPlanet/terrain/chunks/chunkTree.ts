@@ -32,7 +32,7 @@ import { DeleteSemaphore } from "./deleteSemaphore";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { ChunkForge } from "./chunkForge";
 import { clamp } from "../../../../utils/math";
-import { Cullable } from "../../../../bodies/cullable";
+import { Cullable } from "../../../../utils/cullable";
 import { Scene } from "@babylonjs/core/scene";
 
 /**

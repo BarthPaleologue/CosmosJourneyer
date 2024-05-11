@@ -23,7 +23,7 @@ import { SpaceStationModel } from "./spacestationModel";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Assets } from "../assets";
 import { OrbitalObject } from "../architecture/orbitalObject";
-import { Cullable } from "../bodies/cullable";
+import { Cullable } from "../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";

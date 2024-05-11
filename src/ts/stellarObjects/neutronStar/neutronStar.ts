@@ -19,7 +19,7 @@ import { NeutronStarModel } from "./neutronStarModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { StellarObject } from "../../architecture/stellarObject";
-import { Cullable } from "../../bodies/cullable";
+import { Cullable } from "../../utils/cullable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StarMaterial } from "../star/starMaterial";
