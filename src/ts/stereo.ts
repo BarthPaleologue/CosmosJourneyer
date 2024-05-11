@@ -26,7 +26,6 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { BlackHolePostProcess } from "./postProcesses/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
-import { UberScene } from "./uberCore/uberScene";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Axis } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
@@ -34,6 +33,7 @@ import { Assets } from "./assets";
 import { Mandelbulb } from "./mandelbulb/mandelbulb";
 import { MandelbulbPostProcess } from "./postProcesses/mandelbulbPostProcess";
 import { StereoCameras } from "./utils/stereoCameras";
+import { Scene } from "@babylonjs/core/scene";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -43,7 +43,7 @@ const engine = new Engine(canvas, true);
 engine.useReverseDepthBuffer = true;
 engine.displayLoadingUI();
 
-const scene = new UberScene(engine);
+const scene = new Scene(engine);
 scene.useRightHandedSystem = true;
 
 await Assets.Init(scene);
@@ -53,7 +53,10 @@ const stereoCameras = new StereoCameras(canvas, engine, scene);
 const leftEye = stereoCameras.leftEye
 const rightEye = stereoCameras.rightEye;
 
-scene.setActiveCameras([leftEye, rightEye]);
+scene.activeCameras = [leftEye, rightEye];
+
+scene.enableDepthRenderer(leftEye, false, true);
+scene.enableDepthRenderer(rightEye, false, true);
 
 const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
 leftEye.attachPostProcess(starfieldPostProcess);

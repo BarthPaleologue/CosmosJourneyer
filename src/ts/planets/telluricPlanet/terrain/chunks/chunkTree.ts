@@ -29,11 +29,11 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { DeleteSemaphore } from "./deleteSemaphore";
-import { UberScene } from "../../../../uberCore/uberScene";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { ChunkForge } from "./chunkForge";
 import { clamp } from "../../../../utils/math";
 import { Cullable } from "../../../../bodies/cullable";
+import { Scene } from "@babylonjs/core/scene";
 
 /**
  * A quadTree is defined recursively
@@ -53,7 +53,7 @@ export class ChunkTree implements Cullable {
 
     private readonly direction: Direction;
 
-    private readonly scene: UberScene;
+    private readonly scene: Scene;
 
     private deleteSemaphores: DeleteSemaphore[] = [];
 
@@ -79,7 +79,7 @@ export class ChunkTree implements Cullable {
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanetModel, parentAggregate: PhysicsAggregate, material: Material, scene: UberScene) {
+    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanetModel, parentAggregate: PhysicsAggregate, material: Material, scene: Scene) {
         this.rootChunkLength = planetModel.radius * 2;
         this.planetName = planetName;
         this.planetSeed = planetModel.seed;

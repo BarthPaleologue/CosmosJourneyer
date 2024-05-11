@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import mandelbulbFragment from "../../shaders/mandelbulb.glsl";
-import { UberScene } from "../uberCore/uberScene";
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Mandelbulb } from "../mandelbulb/mandelbulb";
@@ -29,6 +28,7 @@ import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
+import { Scene } from "@babylonjs/core/scene";
 
 export interface MandelbulbSettings {
     rotationPeriod: number;
@@ -42,7 +42,7 @@ export class MandelbulbPostProcess extends PostProcess implements ObjectPostProc
 
     private activeCamera: Camera | null = null;
 
-    constructor(mandelbulb: Mandelbulb, scene: UberScene, stellarObjects: StellarObject[]) {
+    constructor(mandelbulb: Mandelbulb, scene: Scene, stellarObjects: StellarObject[]) {
         const shaderName = "mandelbulb";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = mandelbulbFragment;

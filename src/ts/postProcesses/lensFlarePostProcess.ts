@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import lensFlareFragment from "../../shaders/lensflare.glsl";
-import { UberScene } from "../uberCore/uberScene";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -34,6 +33,7 @@ import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUnifo
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Scene } from "@babylonjs/core/scene";
 
 export type LensFlareSettings = {
     visibility: number;
@@ -47,7 +47,7 @@ export class LensFlarePostProcess extends PostProcess implements ObjectPostProce
 
     private activeCamera: Camera | null = null;
 
-    constructor(object: StellarObject, scene: UberScene) {
+    constructor(object: StellarObject, scene: Scene) {
         const shaderName = "lensflare";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = lensFlareFragment;

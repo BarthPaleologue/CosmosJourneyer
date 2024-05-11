@@ -35,11 +35,11 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import "../styles/index.scss";
 import { Assets } from "./assets";
-import { UberScene } from "./uberCore/uberScene";
 import { CharacterControls } from "./spacelegs/characterControls";
 import { TransformNodeWrapper } from "./utils/wrappers";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import { Scene } from "@babylonjs/core/scene";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -47,7 +47,7 @@ canvas.height = window.innerHeight;
 
 const engine = new Engine(canvas);
 
-const scene = new UberScene(engine);
+const scene = new Scene(engine);
 scene.useRightHandedSystem = true;
 
 const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
@@ -71,7 +71,8 @@ scene.enablePhysics(Vector3.Zero(), havokPlugin);
 const characterController = new CharacterControls(scene);
 characterController.getTransform().setAbsolutePosition(new Vector3(0, 2, 0));
 
-scene.setActiveControls(characterController);
+scene.activeCameras = characterController.getActiveCameras();
+characterController.getActiveCameras()[0].attachControl();
 
 const centerOfPlanet = new TransformNodeWrapper(new TransformNode("centerOfPlanet", scene), 1000e3);
 centerOfPlanet.getTransform().position.y = -1000e3;
@@ -83,12 +84,9 @@ characterController.setClosestWalkableObject(centerOfPlanet);
 const groundAggregate = new PhysicsAggregate(ground.getTransform(), PhysicsShapeType.BOX, { mass: 0, restitution: 0.75 }, scene);
 groundAggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
 
-let clockSeconds = 0;
 function updateBeforeHavok() {
-    const deltaTime = engine.getDeltaTime() / 1000;
-    clockSeconds += deltaTime;
-
-    characterController.update(deltaTime);
+    const deltaSeconds = engine.getDeltaTime() / 1000;
+    characterController.update(deltaSeconds);
 }
 
 scene.executeWhenReady(() => {

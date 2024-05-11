@@ -32,11 +32,11 @@ import { CloudsPanel } from "./panels/cloudsPanel";
 import { RingsPanel } from "./panels/ringsPanel";
 import { OceanPanel } from "./panels/oceanPanel";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
-import { UberScene } from "../../uberCore/uberScene";
 import { BlackholePanel } from "./panels/blackholePanel";
 import { Star } from "../../stellarObjects/star/star";
 import { BlackHole } from "../../stellarObjects/blackHole/blackHole";
 import { CelestialBody } from "../../architecture/celestialBody";
+import { Scene } from "@babylonjs/core/scene";
 
 export const enum EditorVisibility {
     HIDDEN,
@@ -168,7 +168,7 @@ export class BodyEditor {
         return this.visibility;
     }
 
-    public setBody(body: CelestialBody, postProcessManager: PostProcessManager, scene: UberScene) {
+    public setBody(body: CelestialBody, postProcessManager: PostProcessManager, scene: Scene) {
         this.currentBodyId = body.name;
 
         for (const panel of this.panels) panel.disable();
@@ -273,7 +273,7 @@ export class BodyEditor {
         for (const panel of this.panels) panel.updateAllSliders();
     }
 
-    public update(nearestBody: CelestialBody, postProcessManager: PostProcessManager, scene: UberScene) {
+    public update(nearestBody: CelestialBody, postProcessManager: PostProcessManager, scene: Scene) {
         if (nearestBody.name !== this.currentBodyId) this.setBody(nearestBody, postProcessManager, scene);
     }
 }

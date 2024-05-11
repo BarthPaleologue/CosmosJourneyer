@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import shadowFragment from "../../shaders/shadowFragment.glsl";
-import { UberScene } from "../uberCore/uberScene";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { PostProcessType } from "./postProcessTypes";
@@ -31,6 +30,7 @@ import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { Scene } from "@babylonjs/core/scene";
 
 export type ShadowUniforms = {
     hasRings: boolean;
@@ -49,7 +49,7 @@ export class ShadowPostProcess extends PostProcess implements ObjectPostProcess 
         name: string,
         body: CelestialBody,
         stellarObjects: StellarObject[],
-        scene: UberScene
+        scene: Scene
     ) {
         const shaderName = "shadow";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {

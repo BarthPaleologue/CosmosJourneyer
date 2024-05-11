@@ -17,7 +17,6 @@
 
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { UberScene } from "../uberCore/uberScene";
 import { Settings } from "../settings";
 import { nearestBody } from "../utils/nearestBody";
 import { Assets } from "../assets";
@@ -36,11 +35,12 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { Scene } from "@babylonjs/core/scene";
 
 export class StarfieldPostProcess extends PostProcess {
     private activeCamera: Camera | null = null;
 
-    constructor(scene: UberScene, stellarObjects: Transformable[], bodies: CelestialBody[], starfieldRotation: Quaternion) {
+    constructor(scene: Scene, stellarObjects: Transformable[], bodies: CelestialBody[], starfieldRotation: Quaternion) {
         const shaderName = "starfield";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;

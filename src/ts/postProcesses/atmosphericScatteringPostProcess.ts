@@ -18,7 +18,6 @@
 import atmosphericScatteringFragment from "../../shaders/atmosphericScatteringFragment.glsl";
 
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { UberScene } from "../uberCore/uberScene";
 import { Assets } from "../assets";
 import { centeredRand } from "extended-random";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
@@ -33,6 +32,7 @@ import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
+import { Scene } from "@babylonjs/core/scene";
 
 export interface AtmosphereUniforms {
     atmosphereRadius: number;
@@ -53,7 +53,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess implements Obj
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, planet: GasPlanet | TelluricPlanet, atmosphereHeight: number, scene: UberScene, stellarObjects: Transformable[]) {
+    constructor(name: string, planet: GasPlanet | TelluricPlanet, atmosphereHeight: number, scene: Scene, stellarObjects: Transformable[]) {
         const shaderName = "atmosphericScattering";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = atmosphericScatteringFragment;

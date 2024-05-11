@@ -18,7 +18,6 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 
 import oceanFragment from "../../shaders/oceanFragment.glsl";
-import { UberScene } from "../uberCore/uberScene";
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { Assets } from "../assets";
 import { Transformable } from "../architecture/transformable";
@@ -31,6 +30,7 @@ import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUnifo
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Scene } from "@babylonjs/core/scene";
 
 export type OceanUniforms = {
     smoothness: number;
@@ -47,7 +47,7 @@ export class OceanPostProcess extends PostProcess implements ObjectPostProcess, 
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, planet: TelluricPlanet, scene: UberScene, stars: Transformable[]) {
+    constructor(name: string, planet: TelluricPlanet, scene: Scene, stars: Transformable[]) {
         const shaderName = "ocean";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;

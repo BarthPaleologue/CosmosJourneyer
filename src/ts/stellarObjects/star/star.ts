@@ -19,7 +19,6 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StarMaterial } from "./starMaterial";
 import { StarModel } from "./starModel";
-import { UberScene } from "../../uberCore/uberScene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Assets } from "../../assets";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -43,6 +42,7 @@ import { OrbitProperties } from "../../orbit/orbitProperties";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import i18n from "../../i18n";
+import { Scene } from "@babylonjs/core/scene";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -68,7 +68,7 @@ export class Star implements StellarObject, Cullable {
      * @param parentBody The bodies the star is orbiting
      * @param model The seed of the star in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, model: StarModel | number, parentBody: CelestialBody | null = null) {
+    constructor(name: string, scene: Scene, model: StarModel | number, parentBody: CelestialBody | null = null) {
         this.name = name;
 
         this.parent = parentBody;

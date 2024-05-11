@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { GasPlanetMaterial } from "./gasPlanetMaterial";
-import { UberScene } from "../../uberCore/uberScene";
 import { GasPlanetModel } from "./gasPlanetModel";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
@@ -38,6 +37,7 @@ import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { Transformable } from "../../architecture/transformable";
 import i18n from "../../i18n";
+import { Scene } from "@babylonjs/core/scene";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -59,7 +59,7 @@ export class GasPlanet implements Planet, Cullable {
      * @param parentBody The bodies the planet is orbiting
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, model: GasPlanetModel | number, parentBody: CelestialBody | null = null) {
+    constructor(name: string, scene: Scene, model: GasPlanetModel | number, parentBody: CelestialBody | null = null) {
         this.name = name;
 
         this.parent = parentBody;

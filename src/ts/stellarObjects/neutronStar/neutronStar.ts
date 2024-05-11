@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { NeutronStarModel } from "./neutronStarModel";
-import { UberScene } from "../../uberCore/uberScene";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { StellarObject } from "../../architecture/stellarObject";
@@ -41,6 +40,7 @@ import { RingsUniforms } from "../../rings/ringsUniform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import i18n from "../../i18n";
+import { Scene } from "@babylonjs/core/scene";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -67,7 +67,7 @@ export class NeutronStar implements StellarObject, Cullable {
      * @param model The seed of the star in [-1, 1]
      * @param parentBody
      */
-    constructor(name: string, scene: UberScene, model: number | NeutronStarModel, parentBody: CelestialBody | null = null) {
+    constructor(name: string, scene: Scene, model: number | NeutronStarModel, parentBody: CelestialBody | null = null) {
         this.model = model instanceof NeutronStarModel ? model : new NeutronStarModel(model, parentBody?.model);
         this.name = name;
 

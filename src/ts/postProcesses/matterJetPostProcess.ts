@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import matterJetFragment from "../../shaders/matterjet.glsl";
-import { UberScene } from "../uberCore/uberScene";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
 import { StellarObject } from "../architecture/stellarObject";
@@ -27,6 +26,7 @@ import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUnifo
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Scene } from "@babylonjs/core/scene";
 
 export type MatterJetUniforms = {
     // the rotation period in seconds of the matter jet
@@ -43,7 +43,7 @@ export class MatterJetPostProcess extends PostProcess implements ObjectPostProce
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, stellarObject: StellarObject, scene: UberScene) {
+    constructor(name: string, stellarObject: StellarObject, scene: Scene) {
         const shaderName = "matterjet";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = matterJetFragment;

@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import blackHoleFragment from "../../shaders/blackhole.glsl";
-import { UberScene } from "../uberCore/uberScene";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Assets } from "../assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
@@ -30,6 +29,7 @@ import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUnifo
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Scene } from "@babylonjs/core/scene";
 
 export type BlackHoleUniforms = {
     accretionDiskRadius: number;
@@ -44,7 +44,7 @@ export class BlackHolePostProcess extends PostProcess implements ObjectPostProce
 
     private activeCamera: Camera | null = null;
 
-    constructor(blackHole: BlackHole, scene: UberScene, starfieldRotation: Quaternion) {
+    constructor(blackHole: BlackHole, scene: Scene, starfieldRotation: Quaternion) {
         const shaderName = "blackhole";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;

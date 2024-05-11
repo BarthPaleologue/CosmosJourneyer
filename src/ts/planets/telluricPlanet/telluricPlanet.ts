@@ -22,7 +22,6 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
-import { UberScene } from "../../uberCore/uberScene";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -45,6 +44,7 @@ import { rotate } from "../../uberCore/transforms/basicTransform";
 import { BodyType } from "../../model/common";
 import i18n from "../../i18n";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
+import { Scene } from "@babylonjs/core/scene";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -74,7 +74,7 @@ export class TelluricPlanet implements Planet, Cullable {
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
      * @param parentBody
      */
-    constructor(name: string, scene: UberScene, model: TelluricPlanetModel | number, parentBody: CelestialBody | null = null) {
+    constructor(name: string, scene: Scene, model: TelluricPlanetModel | number, parentBody: CelestialBody | null = null) {
         this.name = name;
 
         this.parent = parentBody;

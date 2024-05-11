@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import volumetricCloudsFragment from "../../shaders/volumetricCloudsFragment.glsl";
-import { UberScene } from "../uberCore/uberScene";
 import { ObjectPostProcess } from "../postProcesses/objectPostProcess";
 import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
@@ -33,6 +32,7 @@ import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
+import { Scene } from "@babylonjs/core/scene";
 
 export type CloudsPostProcess = FlatCloudsPostProcess | VolumetricCloudsPostProcess;
 
@@ -42,7 +42,7 @@ export class VolumetricCloudsPostProcess extends PostProcess implements ObjectPo
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, planet: Transformable & BoundingSphere, cloudsUniforms: CloudsUniforms, scene: UberScene, stars: StellarObject[]) {
+    constructor(name: string, planet: Transformable & BoundingSphere, cloudsUniforms: CloudsUniforms, scene: Scene, stars: StellarObject[]) {
         const shaderName = "volumetricClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = volumetricCloudsFragment;

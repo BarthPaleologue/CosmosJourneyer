@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import ringsFragment from "../../shaders/ringsFragment.glsl";
-import { UberScene } from "../uberCore/uberScene";
 import { ObjectPostProcess } from "../postProcesses/objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "./ringsUniform";
@@ -30,6 +29,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
 import { Transformable } from "../architecture/transformable";
+import { Scene } from "@babylonjs/core/scene";
 
 export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
     readonly ringsUniforms: RingsUniforms;
@@ -37,7 +37,7 @@ export class RingsPostProcess extends PostProcess implements ObjectPostProcess {
 
     private activeCamera: Camera | null = null;
 
-    constructor(name: string, scene: UberScene, body: CelestialBody, stellarObjects: Transformable[]) {
+    constructor(name: string, scene: Scene, body: CelestialBody, stellarObjects: Transformable[]) {
         const shaderName = "rings";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
