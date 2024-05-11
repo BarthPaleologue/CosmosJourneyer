@@ -36,7 +36,7 @@ import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPip
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { PostProcessType } from "./postProcessTypes";
-import { MandelbulbPostProcess } from "./mandelbulbPostProcess";
+import { MandelbulbPostProcess } from "../mandelbulb/mandelbulbPostProcess";
 import { ShadowPostProcess } from "./shadowPostProcess";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";

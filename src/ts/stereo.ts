@@ -31,7 +31,7 @@ import { Axis } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
 import { Mandelbulb } from "./mandelbulb/mandelbulb";
-import { MandelbulbPostProcess } from "./postProcesses/mandelbulbPostProcess";
+import { MandelbulbPostProcess } from "./mandelbulb/mandelbulbPostProcess";
 import { StereoCameras } from "./utils/stereoCameras";
 import { Scene } from "@babylonjs/core/scene";
 

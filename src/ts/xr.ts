@@ -24,7 +24,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Mandelbulb } from "./mandelbulb/mandelbulb";
-import { MandelbulbPostProcess } from "./postProcesses/mandelbulbPostProcess";
+import { MandelbulbPostProcess } from "./mandelbulb/mandelbulbPostProcess";
 import "@babylonjs/core";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 
