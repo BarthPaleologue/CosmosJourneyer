@@ -39,8 +39,8 @@ import "@babylonjs/core/Loading/loadingScreen";
 import { setMaxLinVel } from "../utils/havok";
 import { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { DefaultControls } from "../defaultController/defaultControls";
-import { CharacterControls } from "../spacelegs/characterControls";
+import { DefaultControls } from "../defaultControls/defaultControls";
+import { CharacterControls } from "../characterControls/characterControls";
 import { Assets } from "../assets";
 import { getForwardDirection, getRotationQuaternion, setRotationQuaternion, translate } from "../uberCore/transforms/basicTransform";
 import { Observable } from "@babylonjs/core/Misc/observable";
@@ -56,7 +56,6 @@ import { createNotification } from "../utils/notification";
 import { axisCompositeToString } from "../utils/inputControlsString";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 import { AxisComposite } from "@brianchirls/game-input/browser";
-import { BodyType } from "../model/common";
 import { getMoonSeed, getSpaceStationSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
 import { AudioManager } from "../audio/audioManager";
@@ -64,9 +63,10 @@ import { AudioMasks } from "../audio/audioMasks";
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { PostProcessManager } from "../postProcesses/postProcessManager";
 import { wait } from "../utils/wait";
-import { CharacterInputs } from "../spacelegs/characterControlsInputs";
-import { DefaultControlsInputs } from "../defaultController/defaultControlsInputs";
+import { CharacterInputs } from "../characterControls/characterControlsInputs";
+import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
 import i18n from "../i18n";
+import { BodyType } from "../architecture/bodyType";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the

@@ -18,7 +18,6 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { BodyType, GenerationSteps } from "../../model/common";
 import { TerrainSettings } from "./terrain/terrainSettings";
 import { clamp } from "terrain-generation";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
@@ -31,6 +30,8 @@ import { TelluricPlanetPhysicalProperties } from "../../architecture/physicalPro
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { RingsModel } from "../../rings/ringsModel";
 import { CloudsModel } from "../../clouds/cloudsModel";
+import { BodyType } from "../../architecture/bodyType";
+import { GenerationSteps } from "../../utils/generationSteps";
 
 export class TelluricPlanetModel implements PlanetModel {
     readonly bodyType = BodyType.TELLURIC_PLANET;

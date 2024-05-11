@@ -31,7 +31,7 @@ import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Axis, Scene } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
-import { DefaultControls } from "./defaultController/defaultControls";
+import { DefaultControls } from "./defaultControls/defaultControls";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;

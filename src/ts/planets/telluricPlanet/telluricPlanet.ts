@@ -41,10 +41,10 @@ import { CelestialBody } from "../../architecture/celestialBody";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { rotate } from "../../uberCore/transforms/basicTransform";
-import { BodyType } from "../../model/common";
 import i18n from "../../i18n";
 import { CloudsUniforms } from "../../clouds/cloudsUniforms";
 import { Scene } from "@babylonjs/core/scene";
+import { BodyType } from "../../architecture/bodyType";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;

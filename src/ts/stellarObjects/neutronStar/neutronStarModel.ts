@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { CelestialBodyModel } from "../../architecture/celestialBody";
-import { BodyType, GenerationSteps } from "../../model/common";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
@@ -28,6 +27,8 @@ import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { clamp } from "../../utils/math";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { RingsModel } from "../../rings/ringsModel";
+import { BodyType } from "../../architecture/bodyType";
+import { GenerationSteps } from "../../utils/generationSteps";
 
 export class NeutronStarModel implements StellarObjectModel {
     readonly bodyType = BodyType.NEUTRON_STAR;

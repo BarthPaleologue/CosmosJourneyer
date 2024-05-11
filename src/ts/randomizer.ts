@@ -21,8 +21,8 @@ import { StarSystemController } from "./starSystem/starSystemController";
 
 import { positionNearObjectBrightSide } from "./utils/positionNearObject";
 import { CosmosJourneyer } from "./cosmosJourneyer";
-import { BodyType } from "./model/common";
 import { SystemSeed } from "./utils/systemSeed";
+import { BodyType } from "./architecture/bodyType";
 
 const engine = await CosmosJourneyer.CreateAsync();
 

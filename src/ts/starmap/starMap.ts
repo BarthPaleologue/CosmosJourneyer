@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DefaultControls } from "../defaultController/defaultControls";
+import { DefaultControls } from "../defaultControls/defaultControls";
 
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
@@ -24,7 +24,6 @@ import { StarSystemModel } from "../starSystem/starSystemModel";
 import { BuildData, StarSector, vector3ToString } from "./starSector";
 import { StarMapUI } from "./starMapUI";
 import { getStellarTypeString } from "../stellarObjects/common";
-import { BodyType } from "../model/common";
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -59,6 +58,7 @@ import { Settings } from "../settings";
 import { parseDistance } from "../utils/parseToStrings";
 import { StarMapInputs } from "../inputs/starMapInputs";
 import i18n from "../i18n";
+import { BodyType } from "../architecture/bodyType";
 
 export class StarMap implements View {
     readonly scene: Scene;

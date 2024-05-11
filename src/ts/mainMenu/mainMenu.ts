@@ -1,9 +1,8 @@
 import { UberScene } from "../uberCore/uberScene";
-import { DefaultControls } from "../defaultController/defaultControls";
+import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystem/starSystemView";
 import { StarSystemController } from "../starSystem/starSystemController";
 import { positionNearObjectWithStarVisible } from "../utils/positionNearObject";
-import { BodyType } from "../model/common";
 import { EditorVisibility } from "../ui/bodyEditor/bodyEditor";
 import mainMenuHTML from "../../html/mainMenu.html";
 import { getForwardDirection } from "../uberCore/transforms/basicTransform";
@@ -19,6 +18,7 @@ import { Settings } from "../settings";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { initSettingsPanel } from "./settingsPanel";
 import i18n from "../i18n";
+import { BodyType } from "../architecture/bodyType";
 
 export class MainMenu {
     readonly scene: UberScene;

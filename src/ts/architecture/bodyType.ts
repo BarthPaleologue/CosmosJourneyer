@@ -15,31 +15,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export const enum GenerationSteps {
-    AXIAL_TILT = 100,
-    ORBIT = 200,
-    ORBITAL_PERIOD = 500,
-    RADIUS = 1000,
-    ORBITAL_PLANE_ALIGNMENT = 1600,
-
-    RINGS = 1200,
-
-    NB_MOONS = 10,
-    MOONS = 11,
-
-    POWER = 300,
-    ACCENT_COLOR = 400,
-
-    TEMPERATURE = 1100,
-    STELLAR_TYPE = 1900,
-
-    PRESSURE = 1800,
-    WATER_AMOUNT = 1700,
-    TERRAIN = 1500,
-
-    SPACE_STATIONS = 2000
-}
-
 export const enum BodyType {
     STAR,
     TELLURIC_PLANET,

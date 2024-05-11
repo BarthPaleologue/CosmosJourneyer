@@ -18,7 +18,6 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../../settings";
-import { BodyType, GenerationSteps } from "../../model/common";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { OrbitProperties } from "../../orbit/orbitProperties";
@@ -29,6 +28,8 @@ import { PlanetModel } from "../../architecture/planet";
 import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { RingsModel } from "../../rings/ringsModel";
+import { BodyType } from "../../architecture/bodyType";
+import { GenerationSteps } from "../../utils/generationSteps";
 
 export class GasPlanetModel implements PlanetModel {
     readonly bodyType = BodyType.GAS_PLANET;

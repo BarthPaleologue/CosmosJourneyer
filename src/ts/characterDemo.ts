@@ -35,7 +35,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import "../styles/index.scss";
 import { Assets } from "./assets";
-import { CharacterControls } from "./spacelegs/characterControls";
+import { CharacterControls } from "./characterControls/characterControls";
 import { TransformNodeWrapper } from "./utils/wrappers";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes";

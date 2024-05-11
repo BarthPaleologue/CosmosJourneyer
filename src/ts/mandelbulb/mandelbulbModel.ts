@@ -18,7 +18,6 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 
 import { OrbitProperties } from "../orbit/orbitProperties";
-import { BodyType, GenerationSteps } from "../model/common";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { clamp } from "../utils/math";
@@ -27,6 +26,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetModel } from "../architecture/planet";
 import { PlanetPhysicalProperties } from "../architecture/physicalProperties";
 import { CelestialBodyModel } from "../architecture/celestialBody";
+import { BodyType } from "../architecture/bodyType";
+import { GenerationSteps } from "../utils/generationSteps";
 
 export class MandelbulbModel implements PlanetModel {
     readonly bodyType = BodyType.MANDELBULB;

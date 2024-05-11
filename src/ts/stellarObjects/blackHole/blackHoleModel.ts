@@ -20,13 +20,14 @@ import { getOrbitalPeriod } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { BodyType, GenerationSteps } from "../../model/common";
 import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Settings } from "../../settings";
 import { estimateStarRadiusFromMass } from "../../utils/estimateStarRadiusFromMass";
+import { BodyType } from "../../architecture/bodyType";
+import { GenerationSteps } from "../../utils/generationSteps";
 
 export class BlackHoleModel implements StellarObjectModel {
     readonly bodyType = BodyType.BLACK_HOLE;
