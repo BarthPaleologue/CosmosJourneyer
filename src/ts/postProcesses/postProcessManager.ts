@@ -24,7 +24,7 @@ import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostPro
 import { RingsPostProcess } from "../rings/ringsPostProcess";
 import { StarfieldPostProcess } from "./starfieldPostProcess";
 import { VolumetricLight } from "./volumetricLight";
-import { BlackHolePostProcess } from "./blackHolePostProcess";
+import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostProcess";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
 import { makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";

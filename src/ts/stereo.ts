@@ -24,7 +24,7 @@ import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
-import { BlackHolePostProcess } from "./postProcesses/blackHolePostProcess";
+import { BlackHolePostProcess } from "./stellarObjects/blackHole/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { Axis } from "@babylonjs/core";

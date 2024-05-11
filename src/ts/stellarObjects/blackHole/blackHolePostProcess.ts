@@ -15,17 +15,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import blackHoleFragment from "../../shaders/blackhole.glsl";
-import { ObjectPostProcess } from "./objectPostProcess";
-import { Assets } from "../assets";
+import blackHoleFragment from "../../../shaders/blackhole.glsl";
+import { ObjectPostProcess } from "../../postProcesses/objectPostProcess";
+import { Assets } from "../../assets";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { getForwardDirection } from "../uberCore/transforms/basicTransform";
+import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
-import { BlackHole } from "../stellarObjects/blackHole/blackHole";
+import { BlackHole } from "./blackHole";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "../../postProcesses/uniforms/cameraUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Camera } from "@babylonjs/core/Cameras/camera";
