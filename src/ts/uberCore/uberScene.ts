@@ -60,7 +60,7 @@ export class UberScene extends Scene {
     public setActiveCameras(cameras: Camera[]) {
         if (this.activeCameras !== null) this.activeCameras.forEach((camera) => camera.detachControl());
         this.activeCameras = cameras;
-        console.log(this.activeCameras, this.activeCamera);
+
         if (cameras.length === 1) cameras[0].attachControl(true);
 
         if(this._depthRenderer === undefined || this._depthRenderer === null) {
@@ -83,8 +83,6 @@ export class UberScene extends Scene {
             if(camera === null) throw new Error("Found a depth renderer with no camera attached! Log: " + depthRenderer);
             depthRenderer.enabled = cameras.includes(camera);
         });
-
-        console.log(this._depthRenderer);
     }
 
     /**
