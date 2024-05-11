@@ -20,7 +20,7 @@ import { stripAxisFromQuaternion } from "../../../utils/algebra";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Slider } from "handle-sliderjs";
 import { Settings } from "../../../settings";
-import { ColorCorrection } from "../../../uberCore/postProcesses/colorCorrection";
+import { ColorCorrection } from "../../../postProcesses/colorCorrection";
 import { getRotationQuaternion, rotate } from "../../../uberCore/transforms/basicTransform";
 
 import { BoundingSphere } from "../../../architecture/boundingSphere";

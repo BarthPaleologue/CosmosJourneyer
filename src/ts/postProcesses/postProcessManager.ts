@@ -26,7 +26,7 @@ import { StarfieldPostProcess } from "./starfieldPostProcess";
 import { VolumetricLight } from "./volumetricLight";
 import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostProcess";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
+import { ColorCorrection } from "./colorCorrection";
 import { makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
 import { CloudsPostProcess } from "../clouds/volumetricCloudsPostProcess";
 import { Engine } from "@babylonjs/core/Engines/engine";
