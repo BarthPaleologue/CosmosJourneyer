@@ -21,14 +21,13 @@ import { ObjectPostProcess } from "./objectPostProcess";
 import { Star } from "../stellarObjects/star/star";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { Scene } from "@babylonjs/core/scene";
-import { Camera } from "@babylonjs/core/Cameras/camera";
 
 export class VolumetricLight extends VolumetricLightScatteringPostProcess implements ObjectPostProcess {
     readonly object: Star | NeutronStar;
     private readonly scene: Scene;
 
     constructor(star: Star | NeutronStar, scene: Scene) {
-        if (scene.activeCamera === null) throw new Error("no camera");
+        if (scene.activeCameras === null || scene.activeCameras.length === 0) throw new Error("no camera");
         super(`${star.name}VolumetricLight`, 1, null, star.mesh, 100, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, scene);
 
         // This is necessary because BabylonJS post process sets the scene using the camera. However, I don't pass a camera to the constructor as I use a PostProcessRenderPipeline.
@@ -40,9 +39,5 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess implem
         this.decay = 0.95;
 
         this.scene = scene;
-    }
-
-    public override dispose(camera: Camera): void {
-        super.dispose(camera);
     }
 }

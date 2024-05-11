@@ -58,9 +58,12 @@ export class GeneralPanel extends EditorPanel {
                 document.getElementById("cameraFOV") as HTMLElement,
                 0,
                 360,
-                (scene.getActiveControls().getActiveCamera().fov * 360) / Math.PI,
+                (scene.getActiveControls().getActiveCameras()[0].fov * 360) / Math.PI,
                 (val: number) => {
-                    scene.getActiveControls().getActiveCamera().fov = (val * Math.PI) / 360;
+                    scene
+                        .getActiveControls()
+                        .getActiveCameras()
+                        .forEach((camera) => (camera.fov = (val * Math.PI) / 360));
                     Settings.FOV = (val * Math.PI) / 360;
                 }
             ),

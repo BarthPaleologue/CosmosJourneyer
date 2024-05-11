@@ -345,7 +345,7 @@ Math.trunc((Math.random() * 2 - 1) * 1000),
             const currentProgress = translationAnimation.getProgress();
             Assets.MAIN_MENU_BACKGROUND_MUSIC.setVolume(1 - currentProgress);
 
-            this.controls.getActiveCamera().getViewMatrix();
+            this.controls.getActiveCameras().forEach(camera => camera.getViewMatrix());
 
             this.starSystemController.applyFloatingOrigin();
             this.starSystemController.updateShaders(0.0, this.starSystemView.postProcessManager);

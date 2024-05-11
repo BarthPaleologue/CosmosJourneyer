@@ -103,8 +103,8 @@ export class GasPlanet implements Planet, Cullable {
         this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
 
-    updateMaterial(controller: Camera, stellarObjects: Transformable[], deltaTime: number): void {
-        this.material.update(controller, stellarObjects, deltaTime);
+    updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
+        this.material.update(stellarObjects, deltaSeconds);
     }
 
     public getRadius(): number {
@@ -127,8 +127,14 @@ export class GasPlanet implements Planet, Cullable {
         return i18n.t("objectTypes:gasPlanet");
     }
 
-    public computeCulling(camera: Camera): void {
-        this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
+    public computeCulling(cameras: Camera[]): void {
+        let isVisible = false;
+        for (const camera of cameras) {
+            isVisible = isVisible || isSizeOnScreenEnough(this, camera);
+        }
+
+        // the mesh is hidden if it is not visible from any camera
+        this.mesh.isVisible = isVisible;
     }
 
     public dispose(): void {

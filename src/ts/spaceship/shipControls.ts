@@ -28,8 +28,7 @@ import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
 import { moveTowards } from "../utils/moveTowards";
 import { createNotification } from "../utils/notification";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
-import { buttonInputToString, pressInteractionToStrings } from "../utils/inputControlsString";
-import { ButtonInputControl } from "@brianchirls/game-input/browser";
+import { pressInteractionToStrings } from "../utils/inputControlsString";
 import i18n from "../i18n";
 
 export class ShipControls implements Controls {
@@ -111,8 +110,8 @@ export class ShipControls implements Controls {
         return this.spaceship.getTransform();
     }
 
-    public getActiveCamera(): Camera {
-        return this.thirdPersonCamera;
+    public getActiveCameras(): Camera[] {
+        return [this.thirdPersonCamera];
     }
 
     public update(deltaTime: number): Vector3 {
@@ -154,7 +153,7 @@ export class ShipControls implements Controls {
 
         this.thirdPersonCamera.fov = moveTowards(this.thirdPersonCamera.fov, this.targetFov, this.targetFov === this.baseFov ? 2.0 * deltaTime : 0.3 * deltaTime);
 
-        this.getActiveCamera().getViewMatrix(true);
+        this.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
 
         return this.getTransform().getAbsolutePosition();
     }

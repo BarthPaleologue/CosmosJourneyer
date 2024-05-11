@@ -105,11 +105,7 @@ const stereoCameras = new StereoCameras(canvas, engine, scene);
 const leftEye = stereoCameras.leftEye
 const rightEye = stereoCameras.rightEye;
 
-scene.activeCameras = [leftEye, rightEye];
-
-scene.setActiveCamera(leftEye);
-leftEye.detachControl();
-scene.enableDepthRenderer(rightEye, false, true);
+scene.setActiveCameras([leftEye, rightEye]);
 
 const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
 leftEye.attachPostProcess(starfieldPostProcess);

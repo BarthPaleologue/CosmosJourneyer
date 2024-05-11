@@ -93,7 +93,7 @@ export class Mandelbulb implements CelestialBody, Cullable {
         return i18n.t("objectTypes:anomaly");
     }
 
-    computeCulling(camera: Camera): void {
+    computeCulling(cameras: Camera[]): void {
         // do nothing
     }
 

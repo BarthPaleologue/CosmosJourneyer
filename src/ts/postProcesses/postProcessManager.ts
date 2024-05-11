@@ -514,7 +514,7 @@ export class PostProcessManager {
         this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
-        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, [this.scene.getActiveCamera()]);
+        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, this.scene.getActiveCameras());
     }
 
     /**
@@ -530,39 +530,31 @@ export class PostProcessManager {
      * The pipeline is not destroyed as it is always destroyed and recreated when the closest orbital object changes.
      */
     public reset() {
-        const camera = this.scene.getActiveCamera();
+        // disposing on every camera is necessary because BabylonJS only detaches the post-processes from a single camera at a time
+        this.scene.cameras.forEach(camera => {
+            this.starFields.forEach((starField) => starField.dispose(camera));
+            this.volumetricLights.forEach((volumetricLight) => volumetricLight.dispose(camera));
+            this.oceans.forEach((ocean) => ocean.dispose(camera));
+            this.clouds.forEach((clouds) => clouds.dispose(camera));
+            this.atmospheres.forEach((atmosphere) => atmosphere.dispose(camera));
+            this.rings.forEach((rings) => rings.dispose(camera));
+            this.mandelbulbs.forEach((mandelbulb) => mandelbulb.dispose(camera));
+            this.blackHoles.forEach((blackHole) => blackHole.dispose(camera));
+            this.matterJets.forEach((matterJet) => matterJet.dispose(camera));
+            this.shadows.forEach((shadow) => shadow.dispose(camera));
+            this.lensFlares.forEach((lensFlare) => lensFlare.dispose(camera));
+        });
 
-        this.starFields.forEach((starField) => starField.dispose(camera));
         this.starFields.length = 0;
-
-        this.volumetricLights.forEach((volumetricLight) => volumetricLight.dispose(camera));
         this.volumetricLights.length = 0;
-
-        this.oceans.forEach((ocean) => ocean.dispose(camera));
         this.oceans.length = 0;
-
-        this.clouds.forEach((clouds) => clouds.dispose(camera));
         this.clouds.length = 0;
-
-        this.atmospheres.forEach((atmosphere) => atmosphere.dispose(camera));
         this.atmospheres.length = 0;
-
-        this.rings.forEach((rings) => rings.dispose(camera));
         this.rings.length = 0;
-
-        this.mandelbulbs.forEach((mandelbulb) => mandelbulb.dispose(camera));
         this.mandelbulbs.length = 0;
-
-        this.blackHoles.forEach((blackHole) => blackHole.dispose(camera));
         this.blackHoles.length = 0;
-
-        this.matterJets.forEach((matterJet) => matterJet.dispose(camera));
         this.matterJets.length = 0;
-
-        this.shadows.forEach((shadow) => shadow.dispose(camera));
         this.shadows.length = 0;
-
-        this.lensFlares.forEach((lensFlare) => lensFlare.dispose(camera));
         this.lensFlares.length = 0;
     }
 }

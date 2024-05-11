@@ -33,6 +33,7 @@ import { UberScene } from "../../../../uberCore/uberScene";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { ChunkForge } from "./chunkForge";
 import { clamp } from "../../../../utils/math";
+import { Cullable } from "../../../../bodies/cullable";
 
 /**
  * A quadTree is defined recursively
@@ -42,7 +43,7 @@ type QuadTree = QuadTree[] | PlanetChunk;
 /**
  * A ChunkTree is a structure designed to manage LOD using a quadtree
  */
-export class ChunkTree {
+export class ChunkTree implements Cullable {
     readonly minDepth: number; // minimum depth of the tree
     readonly maxDepth: number; // maximum depth of the tree
 
@@ -265,9 +266,9 @@ export class ChunkTree {
         return chunk;
     }
 
-    public computeCulling(camera: Camera): void {
+    public computeCulling(cameras: Camera[]): void {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
-            chunk.computeCulling(camera);
+            chunk.computeCulling(cameras);
         });
     }
 

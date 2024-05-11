@@ -129,9 +129,9 @@ export class StarMap implements View {
 
         this.controls = new DefaultControls(this.scene);
         this.controls.speed /= 5;
-        this.controls.getActiveCamera().minZ = 0.01;
+        this.controls.getActiveCameras().forEach((camera) => (camera.minZ = 0.01));
 
-        this.controls.getActiveCamera().attachControl();
+        this.controls.getActiveCameras()[0].attachControl();
 
         this.backgroundMusic = new AudioInstance(Assets.STAR_MAP_BACKGROUND_MUSIC, AudioMasks.STAR_MAP_VIEW, 1, false, null);
         AudioManager.RegisterSound(this.backgroundMusic);
@@ -150,7 +150,7 @@ export class StarMap implements View {
             this.focusOnCurrentSystem();
         });
 
-        const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controls.getActiveCamera()]);
+        const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, this.controls.getActiveCameras());
         pipeline.fxaaEnabled = true;
         pipeline.bloomEnabled = true;
         pipeline.bloomThreshold = 0.0;
@@ -267,11 +267,11 @@ export class StarMap implements View {
 
     private acknowledgeCameraMovement() {
         // floating origin
-        if (this.controls.getActiveCamera().globalPosition.length() > StarMap.FLOATING_ORIGIN_DISTANCE) {
+        if (this.controls.getTransform().getAbsolutePosition().length() > StarMap.FLOATING_ORIGIN_DISTANCE) {
             this.translateCameraBackToOrigin();
         }
 
-        this.cameraPositionToCenter = this.controls.getActiveCamera().globalPosition.subtract(this.starMapCenterPosition);
+        this.cameraPositionToCenter = this.controls.getTransform().getAbsolutePosition().subtract(this.starMapCenterPosition);
         this.currentStarSectorPosition = new Vector3(
             Math.round(this.cameraPositionToCenter.x / StarSector.SIZE),
             Math.round(this.cameraPositionToCenter.y / StarSector.SIZE),
@@ -282,7 +282,7 @@ export class StarMap implements View {
     public translateCameraBackToOrigin() {
         const translationToOrigin = this.controls.getTransform().getAbsolutePosition().negate();
         this.controls.getTransform().position = Vector3.Zero();
-        this.controls.getActiveCamera().getViewMatrix(true);
+        this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
         this.starMapCenterPosition.addInPlace(translationToOrigin);
         for (const mesh of this.scene.meshes) mesh.position.addInPlace(translationToOrigin);
     }
@@ -327,7 +327,7 @@ export class StarMap implements View {
 
         const translation = sectorCoordinates.subtract(this.currentStarSectorPosition).scaleInPlace(StarSector.SIZE);
         translate(this.controls.getTransform(), translation);
-        this.controls.getActiveCamera().getViewMatrix(true);
+        this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
         this.acknowledgeCameraMovement();
 
         this.focusOnCurrentSystem(true);
@@ -359,14 +359,18 @@ export class StarMap implements View {
 
             // don't generate star sectors that are not in the frustum
             const bb = StarSector.GetBoundingBox(position, this.starMapCenterPosition);
-            if (!this.controls.getActiveCamera().isInFrustum(bb)) continue;
+            let isInFrustrum = false;
+            this.controls.getActiveCameras().forEach((camera) => {
+               isInFrustrum = isInFrustrum || camera.isInFrustum(bb);
+            });
+            if (!isInFrustrum) continue;
 
             this.registerStarSector(position);
         }
 
         this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * this.controls.speed));
 
-        this.starMapUI.update(this.controls.getActiveCamera());
+        this.starMapUI.update(this.controls.getTransform().getAbsolutePosition());
     }
 
     private buildNextStars(n: number): void {
@@ -573,7 +577,7 @@ export class StarMap implements View {
 
     public render() {
         this.scene.render();
-        syncCamera(this.controls.getActiveCamera(), this.starMapUI.uiCamera);
+        syncCamera(this.controls.getActiveCameras()[0], this.starMapUI.uiCamera);
         this.starMapUI.scene.render();
     }
 

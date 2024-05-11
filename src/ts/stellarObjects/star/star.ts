@@ -164,8 +164,12 @@ export class Star implements StellarObject, Cullable {
         return this.getRadius();
     }
 
-    public computeCulling(camera: Camera): void {
-        this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
+    public computeCulling(cameras: Camera[]): void {
+        let isVisible = false;
+        for (const camera of cameras) {
+            isVisible = isVisible || isSizeOnScreenEnough(this, camera);
+        }
+        this.mesh.isVisible = isVisible;
     }
 
     public dispose(): void {
