@@ -16,9 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Slider } from "handle-sliderjs";
-import { UberScene } from "../../uberCore/uberScene";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { CelestialBody } from "../../architecture/celestialBody";
+import { Scene } from "@babylonjs/core/scene";
 
 export abstract class EditorPanel {
     sliders: Slider[] = [];
@@ -31,7 +31,7 @@ export abstract class EditorPanel {
         this.panel = document.getElementById(id + "UI") as HTMLElement;
     }
 
-    abstract init(body: CelestialBody, postProcess: PostProcess, scene: UberScene): void;
+    abstract init(body: CelestialBody, postProcess: PostProcess, scene: Scene): void;
 
     updateAllSliders() {
         for (const slider of this.sliders) slider.update(false);

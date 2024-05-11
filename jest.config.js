@@ -90,7 +90,7 @@ module.exports = {
     // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
     moduleNameMapper: {
       "^(\\.{1,2}/.*)\\.js$": "$1",
-      '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga|css|scss|less|gltf|glb|obj|stl)$':
+      '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga|css|scss|less|gltf|glb|obj|stl|glsl)$':
         '<rootDir>/tests/__mocks__/assetFileMock.js'
     },
 

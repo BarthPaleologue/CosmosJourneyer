@@ -22,7 +22,6 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { waterBoilingPointCelsius } from "../../utils/waterMechanics";
-import { UberScene } from "../../uberCore/uberScene";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -33,17 +32,19 @@ import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PlanetChunk } from "./terrain/chunks/planetChunk";
 import { Planet } from "../../architecture/planet";
-import { Cullable } from "../../bodies/cullable";
+import { Cullable } from "../../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { CelestialBody } from "../../architecture/celestialBody";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { rotate } from "../../uberCore/transforms/basicTransform";
-import { BodyType } from "../../model/common";
 import i18n from "../../i18n";
+import { CloudsUniforms } from "../../clouds/cloudsUniforms";
+import { Scene } from "@babylonjs/core/scene";
+import { BodyType } from "../../architecture/bodyType";
 
 export class TelluricPlanet implements Planet, Cullable {
     readonly name: string;
@@ -61,6 +62,9 @@ export class TelluricPlanet implements Planet, Cullable {
 
     readonly postProcesses: PostProcessType[] = [];
 
+    readonly ringsUniforms: RingsUniforms | null;
+    readonly cloudsUniforms: CloudsUniforms | null;
+
     readonly parent: CelestialBody | null;
 
     /**
@@ -70,7 +74,7 @@ export class TelluricPlanet implements Planet, Cullable {
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
      * @param parentBody
      */
-    constructor(name: string, scene: UberScene, model: TelluricPlanetModel | number, parentBody: CelestialBody | null = null) {
+    constructor(name: string, scene: Scene, model: TelluricPlanetModel | number, parentBody: CelestialBody | null = null) {
         this.name = name;
 
         this.parent = parentBody;
@@ -112,8 +116,19 @@ export class TelluricPlanet implements Planet, Cullable {
             this.model.physicalProperties.oceanLevel = 0;
         }
 
-        if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
-        if (this.model.cloudsUniforms !== null) this.postProcesses.push(PostProcessType.CLOUDS);
+        if (this.model.rings !== null) {
+            this.postProcesses.push(PostProcessType.RING);
+            this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+        } else {
+            this.ringsUniforms = null;
+        }
+
+        if (this.model.clouds !== null) {
+            this.postProcesses.push(PostProcessType.CLOUDS);
+            this.cloudsUniforms = new CloudsUniforms(this.model.clouds, scene);
+        } else {
+            this.cloudsUniforms = null;
+        }
 
         this.material = new TelluricPlanetMaterial(this.name, this.getTransform(), this.model, scene);
 
@@ -146,7 +161,11 @@ export class TelluricPlanet implements Planet, Cullable {
     }
 
     getRingsUniforms(): RingsUniforms | null {
-        return this.model.ringsUniforms;
+        return this.ringsUniforms;
+    }
+
+    getCloudsUniforms(): CloudsUniforms | null {
+        return this.cloudsUniforms;
     }
 
     getTypeName(): string {
@@ -165,8 +184,8 @@ export class TelluricPlanet implements Planet, Cullable {
         for (const side of this.sides) side.update(observerPosition, chunkForge);
     }
 
-    public updateMaterial(controller: Camera, stellarObjects: Transformable[], deltaTime: number): void {
-        this.material.update(controller.globalPosition, stellarObjects);
+    public updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
+        this.material.update(stellarObjects);
     }
 
     public getRadius(): number {
@@ -177,8 +196,8 @@ export class TelluricPlanet implements Planet, Cullable {
         return this.getRadius() + this.model.physicalProperties.oceanLevel;
     }
 
-    public computeCulling(camera: Camera): void {
-        for (const side of this.sides) side.computeCulling(camera);
+    public computeCulling(cameras: Camera[]): void {
+        for (const side of this.sides) side.computeCulling(cameras);
     }
 
     public dispose(): void {

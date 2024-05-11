@@ -24,11 +24,11 @@ import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { BlackHoleModel } from "./blackHoleModel";
 import { StellarObject } from "../../architecture/stellarObject";
-import { Cullable } from "../../bodies/cullable";
+import { Cullable } from "../../utils/cullable";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import i18n from "../../i18n";
 
@@ -92,7 +92,7 @@ export class BlackHole implements StellarObject, Cullable {
         return i18n.t("objectTypes:blackHole");
     }
 
-    public computeCulling(camera: Camera): void {
+    public computeCulling(cameras: Camera[]): void {
         return;
     }
 

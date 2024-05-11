@@ -38,9 +38,9 @@ import { Transformable } from "../../../../architecture/transformable";
 import { CollisionMask } from "../../../../settings";
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { UberScene } from "../../../../uberCore/uberScene";
+import { Cullable } from "../../../../utils/cullable";
 
-export class PlanetChunk implements Transformable, BoundingSphere {
+export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
     public readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
@@ -176,7 +176,7 @@ export class PlanetChunk implements Transformable, BoundingSphere {
             grassPatch.createInstances(Assets.GRASS_BLADE);
             this.instancePatches.push(grassPatch);
 
-            for(const depthRenderer of Object.values(this.scene._depthRenderer)) {
+            for (const depthRenderer of Object.values(this.scene._depthRenderer)) {
                 depthRenderer.setMaterialForRendering([butterflyPatch.getBaseMesh()], Assets.BUTTERFLY_DEPTH_MATERIAL);
                 depthRenderer.setMaterialForRendering([grassPatch.getBaseMesh()], Assets.GRASS_DEPTH_MATERIAL);
             }
@@ -225,33 +225,43 @@ export class PlanetChunk implements Transformable, BoundingSphere {
         this.disposed = true;
     }
 
-    computeCulling(camera: Camera) {
+    computeCulling(cameras: Camera[]) {
         if (!this.isReady()) return;
 
-        const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
+        let isVisible = false;
 
-        // instance patches are not rendered when the chunk is too far
-        const sphereNormal = this.getTransform().getAbsolutePosition().subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+        for (const camera of cameras) {
+            // chunks on the other side of the planet are culled
+            // as chunks have dimensions, we use the bounding sphere to do conservative culling
+            const chunkToCameraDir = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition()).normalize();
+            const closestPointToCamera = this.getTransform().getAbsolutePosition().add(chunkToCameraDir.scale(this.getBoundingRadius()));
+            const conservativeSphereNormal = closestPointToCamera.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+            const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+            if (Vector3.Dot(observerToCenter, conservativeSphereNormal) < 0) {
+                isVisible = isVisible || false;
+                continue;
+            }
 
-        const normalComponent = sphereNormal.scale(distanceVector.dot(sphereNormal));
-        const tangentialDistance = distanceVector.subtract(normalComponent).length();
-
-        this.instancePatches.forEach((patch) => {
-            patch.setEnabled(tangentialDistance < 200);
-        });
-
-        // chunks on the other side of the planet are culled
-        // as chunks have dimensions, we use the bounding sphere to do conservative culling
-        const chunkToCameraDir = distanceVector.normalizeToNew();
-        const closestPointToCamera = this.getTransform().getAbsolutePosition().add(chunkToCameraDir.scale(this.getBoundingRadius()));
-        const conservativeSphereNormal = closestPointToCamera.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
-        const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
-        if (Vector3.Dot(observerToCenter, conservativeSphereNormal) < 0) {
-            this.mesh.setEnabled(false);
-            return;
+            // chunks are only rendered if they are big enough on screen
+            isVisible = isVisible || isSizeOnScreenEnough(this, camera);
         }
 
-        // chunks are only rendered if they are big enough on screen
-        this.mesh.setEnabled(isSizeOnScreenEnough(this, camera));
+        this.mesh.setEnabled(isVisible);
+
+        this.instancePatches.forEach((patch) => {
+            let isVisible = false;
+            for (const camera of cameras) {
+                const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
+
+                // instance patches are not rendered when the chunk is too far
+                const sphereNormal = this.getTransform().getAbsolutePosition().subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+
+                const normalComponent = sphereNormal.scale(distanceVector.dot(sphereNormal));
+                const tangentialDistance = distanceVector.subtract(normalComponent).length();
+
+                isVisible = isVisible || tangentialDistance < 200;
+            }
+            patch.setEnabled(isVisible);
+        });
     }
 }

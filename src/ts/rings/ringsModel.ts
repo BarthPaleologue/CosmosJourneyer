@@ -15,36 +15,25 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export const enum GenerationSteps {
-    AXIAL_TILT = 100,
-    ORBIT = 200,
-    ORBITAL_PERIOD = 500,
-    RADIUS = 1000,
-    ORBITAL_PLANE_ALIGNMENT = 1600,
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { normalRandom, randRange } from "extended-random";
+import { clamp } from "terrain-generation";
 
-    RINGS = 1200,
+export class RingsModel {
+    ringStart: number;
+    ringEnd: number;
+    ringFrequency: number;
+    ringOpacity: number;
+    ringColor: Color3;
+    offset: number;
 
-    NB_MOONS = 10,
-    MOONS = 11,
+    constructor(rng: (step: number) => number) {
+        this.ringStart = randRange(1.8, 2.2, rng, 1400);
+        this.ringEnd = randRange(2.1, 4.0, rng, 1410);
+        this.ringFrequency = 30.0;
+        this.ringOpacity = clamp(normalRandom(0.7, 0.1, rng, 1420), 0, 1);
+        this.ringColor = new Color3(214, 168, 122).scaleInPlace(randRange(1.0, 1.5, rng, 1430) / 255);
 
-    POWER = 300,
-    ACCENT_COLOR = 400,
-
-    TEMPERATURE = 1100,
-    STELLAR_TYPE = 1900,
-
-    PRESSURE = 1800,
-    WATER_AMOUNT = 1700,
-    TERRAIN = 1500,
-
-    SPACE_STATIONS = 2000
-}
-
-export const enum BodyType {
-    STAR,
-    TELLURIC_PLANET,
-    GAS_PLANET,
-    MANDELBULB,
-    BLACK_HOLE,
-    NEUTRON_STAR
+        this.offset = randRange(-100, 100, rng, 1440);
+    }
 }

@@ -20,13 +20,11 @@ import { ColorMode, ColorSettings } from "./colorSettingsInterface";
 import surfaceMaterialFragment from "../../../shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "../../../shaders/telluricPlanetMaterial/vertex.glsl";
 import { Assets } from "../../assets";
-import { UberScene } from "../../uberCore/uberScene";
 import { centeredRand, normalRandom } from "extended-random";
 import { TelluricPlanetModel } from "./telluricPlanetModel";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Star } from "../../stellarObjects/star/star";
 import { flattenColor3Array, flattenVector3Array } from "../../utils/algebra";
@@ -34,6 +32,7 @@ import { flattenColor3Array, flattenVector3Array } from "../../utils/algebra";
 import lutFragment from "../../../shaders/telluricPlanetMaterial/utils/lut.glsl";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Transformable } from "../../architecture/transformable";
+import { Scene } from "@babylonjs/core/scene";
 
 /**
  * The material for telluric planets.
@@ -61,7 +60,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
      * @param model The model of the planet associated with this material
      * @param scene
      */
-    constructor(planetName: string, planet: TransformNode, model: TelluricPlanetModel, scene: UberScene) {
+    constructor(planetName: string, planet: TransformNode, model: TelluricPlanetModel, scene: Scene) {
         const shaderName = "surfaceMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -93,8 +92,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
                 "nbStars",
 
                 "inversePlanetWorldMatrix",
-
-                "playerPosition",
 
                 "waterLevel",
                 "beachSize",
@@ -209,7 +206,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         );
     }
 
-    public update(cameraPosition: Vector3, stellarObjects: Transformable[]) {
+    public update(stellarObjects: Transformable[]) {
         this.stellarObjects = stellarObjects;
 
         // The add once is important because the material will be bound for every chunk of the planet
@@ -218,10 +215,6 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             const inversePlanetWorldMatrix = this.planetTransform.getWorldMatrix().clone().invert();
             this.getEffect().setMatrix("normalMatrix", inversePlanetWorldMatrix.transpose());
             this.getEffect().setMatrix("inversePlanetWorldMatrix", inversePlanetWorldMatrix);
-
-            const activeCamera = this.getScene().activeCamera;
-            if (activeCamera === null) throw new Error("There is no active camera for TelluricPlanetMaterial!");
-            this.getEffect().setVector3("playerPosition", activeCamera.globalPosition);
 
             this.getEffect().setArray3("star_positions", flattenVector3Array(this.stellarObjects.map((star) => star.getTransform().getAbsolutePosition())));
             this.getEffect().setArray3("star_colors", flattenColor3Array(this.stellarObjects.map((star) => (star instanceof Star ? star.model.color : Color3.White()))));

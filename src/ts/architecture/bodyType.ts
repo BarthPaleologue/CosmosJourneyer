@@ -15,8 +15,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
-
-export interface Cullable {
-    computeCulling(camera: Camera): void;
+export const enum BodyType {
+    STAR,
+    TELLURIC_PLANET,
+    GAS_PLANET,
+    MANDELBULB,
+    BLACK_HOLE,
+    NEUTRON_STAR
 }

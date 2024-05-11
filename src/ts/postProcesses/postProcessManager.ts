@@ -18,17 +18,17 @@
 import { UberScene } from "../uberCore/uberScene";
 import { OceanPostProcess } from "./oceanPostProcess";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
+import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
 import { Settings } from "../settings";
 import { AtmosphericScatteringPostProcess } from "./atmosphericScatteringPostProcess";
-import { RingsPostProcess } from "./rings/ringsPostProcess";
+import { RingsPostProcess } from "../rings/ringsPostProcess";
 import { StarfieldPostProcess } from "./starfieldPostProcess";
 import { VolumetricLight } from "./volumetricLight";
-import { BlackHolePostProcess } from "./blackHolePostProcess";
+import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostProcess";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { ColorCorrection } from "../uberCore/postProcesses/colorCorrection";
+import { ColorCorrection } from "./colorCorrection";
 import { makeSplitRenderEffects } from "../utils/extractRelevantPostProcesses";
-import { CloudsPostProcess } from "./volumetricCloudsPostProcess";
+import { CloudsPostProcess } from "../clouds/volumetricCloudsPostProcess";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
@@ -36,7 +36,7 @@ import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPip
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { PostProcessType } from "./postProcessTypes";
-import { MandelbulbPostProcess } from "./mandelbulbPostProcess";
+import { MandelbulbPostProcess } from "../mandelbulb/mandelbulbPostProcess";
 import { ShadowPostProcess } from "./shadowPostProcess";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";
@@ -220,15 +220,13 @@ export class PostProcessManager {
      * @param planet A telluric planet
      * @param stellarObjects An array of stars or black holes
      */
-    public async addClouds(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
-        const uniforms = planet.model.cloudsUniforms;
+    public addClouds(planet: TelluricPlanet, stellarObjects: StellarObject[]) {
+        const uniforms = planet.getCloudsUniforms();
         if (uniforms === null)
             throw new Error(
                 `PostProcessManager: addClouds: uniforms are null. This should not be possible as the postprocess should not be created if the body has no clouds. Body: ${planet.name}`
             );
-        return FlatCloudsPostProcess.CreateAsync(`${planet.name}Clouds`, planet, uniforms, this.scene, stellarObjects).then((clouds) => {
-            this.clouds.push(clouds);
-        });
+        this.clouds.push(new FlatCloudsPostProcess(`${planet.name}Clouds`, planet, uniforms, this.scene, stellarObjects));
     }
 
     /**
@@ -268,10 +266,8 @@ export class PostProcessManager {
      * @param body A body
      * @param stellarObjects An array of stars or black holes
      */
-    public async addRings(body: CelestialBody, stellarObjects: StellarObject[]) {
-        return RingsPostProcess.CreateAsync(body, this.scene, stellarObjects).then((rings) => {
-            this.rings.push(rings);
-        });
+    public addRings(body: CelestialBody, stellarObjects: StellarObject[]) {
+        this.rings.push(new RingsPostProcess(body.name + "Rings", this.scene, body, stellarObjects));
     }
 
     /**
@@ -358,10 +354,8 @@ export class PostProcessManager {
      * @param body A celestial body
      * @param stellarObjects An array of stellar objects
      */
-    public async addShadowCaster(body: CelestialBody, stellarObjects: StellarObject[]) {
-        return ShadowPostProcess.CreateAsync(body, this.scene, stellarObjects).then((shadow) => {
-            this.shadows.push(shadow);
-        });
+    public addShadowCaster(body: CelestialBody, stellarObjects: StellarObject[]) {
+        this.shadows.push(new ShadowPostProcess(body.name + "Shadow", body, stellarObjects, this.scene));
     }
 
     /**
@@ -382,7 +376,7 @@ export class PostProcessManager {
         this.currentBody = body;
 
         const rings = this.getRings(body);
-        const switchLimit = rings !== null ? rings.ringsUniforms.ringStart : 2;
+        const switchLimit = rings !== null ? rings.ringsUniforms.model.ringStart : 2;
         if (isOrbiting(this.scene.getActiveControls(), body, switchLimit)) this.setSurfaceOrder();
         else this.setSpaceOrder();
     }
@@ -520,7 +514,7 @@ export class PostProcessManager {
         this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
-        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, [this.scene.getActiveCamera()]);
+        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, this.scene.getActiveCameras());
     }
 
     /**
@@ -536,39 +530,31 @@ export class PostProcessManager {
      * The pipeline is not destroyed as it is always destroyed and recreated when the closest orbital object changes.
      */
     public reset() {
-        const camera = this.scene.getActiveCamera();
+        // disposing on every camera is necessary because BabylonJS only detaches the post-processes from a single camera at a time
+        this.scene.cameras.forEach((camera) => {
+            this.starFields.forEach((starField) => starField.dispose(camera));
+            this.volumetricLights.forEach((volumetricLight) => volumetricLight.dispose(camera));
+            this.oceans.forEach((ocean) => ocean.dispose(camera));
+            this.clouds.forEach((clouds) => clouds.dispose(camera));
+            this.atmospheres.forEach((atmosphere) => atmosphere.dispose(camera));
+            this.rings.forEach((rings) => rings.dispose(camera));
+            this.mandelbulbs.forEach((mandelbulb) => mandelbulb.dispose(camera));
+            this.blackHoles.forEach((blackHole) => blackHole.dispose(camera));
+            this.matterJets.forEach((matterJet) => matterJet.dispose(camera));
+            this.shadows.forEach((shadow) => shadow.dispose(camera));
+            this.lensFlares.forEach((lensFlare) => lensFlare.dispose(camera));
+        });
 
-        this.starFields.forEach((starField) => starField.dispose(camera));
         this.starFields.length = 0;
-
-        this.volumetricLights.forEach((volumetricLight) => volumetricLight.dispose(camera));
         this.volumetricLights.length = 0;
-
-        this.oceans.forEach((ocean) => ocean.dispose(camera));
         this.oceans.length = 0;
-
-        this.clouds.forEach((clouds) => clouds.dispose(camera));
         this.clouds.length = 0;
-
-        this.atmospheres.forEach((atmosphere) => atmosphere.dispose(camera));
         this.atmospheres.length = 0;
-
-        this.rings.forEach((rings) => rings.dispose(camera));
         this.rings.length = 0;
-
-        this.mandelbulbs.forEach((mandelbulb) => mandelbulb.dispose(camera));
         this.mandelbulbs.length = 0;
-
-        this.blackHoles.forEach((blackHole) => blackHole.dispose(camera));
         this.blackHoles.length = 0;
-
-        this.matterJets.forEach((matterJet) => matterJet.dispose(camera));
         this.matterJets.length = 0;
-
-        this.shadows.forEach((shadow) => shadow.dispose(camera));
         this.shadows.length = 0;
-
-        this.lensFlares.forEach((lensFlare) => lensFlare.dispose(camera));
         this.lensFlares.length = 0;
     }
 }

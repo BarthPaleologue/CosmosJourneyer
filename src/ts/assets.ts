@@ -480,7 +480,12 @@ export class Assets {
         });
 
         Assets.MANAGER.onProgress = (remainingCount, totalCount) => {
-            (scene.getEngine().loadingScreen as LoadingScreen).setProgressPercentage(100 * (totalCount - remainingCount) / totalCount);
+            const loadingScreen = scene.getEngine().loadingScreen;
+            if (loadingScreen instanceof LoadingScreen) {
+                loadingScreen.setProgressPercentage((100 * (totalCount - remainingCount)) / totalCount);
+            } else {
+                loadingScreen.loadingUIText = i18next.t("common:loading") + " " + ((100 * (totalCount - remainingCount)) / totalCount).toFixed(0) + "%";
+            }
         };
 
         Assets.SCATTER_CUBE = MeshBuilder.CreateBox("cube", { size: 1 }, scene);

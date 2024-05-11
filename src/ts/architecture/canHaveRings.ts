@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { RingsUniforms } from "../postProcesses/rings/ringsUniform";
+import { RingsUniforms } from "../rings/ringsUniform";
 
 /**
  * Describes objects that can have a ring system

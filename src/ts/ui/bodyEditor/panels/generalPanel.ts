@@ -20,19 +20,19 @@ import { stripAxisFromQuaternion } from "../../../utils/algebra";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Slider } from "handle-sliderjs";
 import { Settings } from "../../../settings";
-import { UberScene } from "../../../uberCore/uberScene";
-import { ColorCorrection } from "../../../uberCore/postProcesses/colorCorrection";
+import { ColorCorrection } from "../../../postProcesses/colorCorrection";
 import { getRotationQuaternion, rotate } from "../../../uberCore/transforms/basicTransform";
 
 import { BoundingSphere } from "../../../architecture/boundingSphere";
 import { Transformable } from "../../../architecture/transformable";
+import { Scene } from "@babylonjs/core/scene";
 
 export class GeneralPanel extends EditorPanel {
     constructor() {
         super("general");
     }
 
-    init(body: Transformable & BoundingSphere, colorCorrection: ColorCorrection, scene: UberScene) {
+    init(body: Transformable & BoundingSphere, colorCorrection: ColorCorrection, scene: Scene) {
         this.enable();
 
         for (const slider of this.sliders) slider.remove();
@@ -53,17 +53,10 @@ export class GeneralPanel extends EditorPanel {
                 rotate(body.getTransform(), Axis.Z, newAxialTilt - axialTiltZ);
                 axialTiltZ = newAxialTilt;
             }),
-            new Slider(
-                "cameraFOV",
-                document.getElementById("cameraFOV") as HTMLElement,
-                0,
-                360,
-                (scene.getActiveControls().getActiveCamera().fov * 360) / Math.PI,
-                (val: number) => {
-                    scene.getActiveControls().getActiveCamera().fov = (val * Math.PI) / 360;
-                    Settings.FOV = (val * Math.PI) / 360;
-                }
-            ),
+            new Slider("cameraFOV", document.getElementById("cameraFOV") as HTMLElement, 0, 360, (scene.cameras[0].fov * 360) / Math.PI, (val: number) => {
+                scene.cameras.forEach((camera) => (camera.fov = (val * Math.PI) / 360));
+                Settings.FOV = (val * Math.PI) / 360;
+            }),
             new Slider("timeModifier", document.getElementById("timeModifier") as HTMLElement, -200, 400, Math.pow(Settings.TIME_MULTIPLIER, 1 / power), (val: number) => {
                 Settings.TIME_MULTIPLIER = Math.sign(val) * Math.pow(Math.abs(val), power);
             }),

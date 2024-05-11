@@ -16,10 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { centeredRand } from "extended-random";
-import { GenerationSteps } from "../model/common";
 import { Settings } from "../settings";
 import { PlanetModel } from "../architecture/planet";
 import { CelestialBodyModel } from "../architecture/celestialBody";
+import { GenerationSteps } from "../utils/generationSteps";
 
 export function getMoonSeed(model: PlanetModel, index: number) {
     if (index > model.nbMoons) throw new Error("Moon out of bound! " + index);

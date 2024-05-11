@@ -20,13 +20,14 @@ import { getOrbitalPeriod } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom, uniformRandBool } from "extended-random";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { BodyType, GenerationSteps } from "../../model/common";
 import { BlackHolePhysicalProperties } from "../../architecture/physicalProperties";
 import { CelestialBodyModel } from "../../architecture/celestialBody";
 import { StellarObjectModel } from "../../architecture/stellarObject";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Settings } from "../../settings";
 import { estimateStarRadiusFromMass } from "../../utils/estimateStarRadiusFromMass";
+import { BodyType } from "../../architecture/bodyType";
+import { GenerationSteps } from "../../utils/generationSteps";
 
 export class BlackHoleModel implements StellarObjectModel {
     readonly bodyType = BodyType.BLACK_HOLE;
@@ -87,7 +88,7 @@ export class BlackHoleModel implements StellarObjectModel {
      * @returns the Schwarzschild radius of the black hole
      */
     public getSchwarzschildRadius(): number {
-        return 2 * Settings.G  * this.physicalProperties.mass / (Settings.C * Settings.C);
+        return (2 * Settings.G * this.physicalProperties.mass) / (Settings.C * Settings.C);
     }
 
     /**
@@ -96,7 +97,7 @@ export class BlackHoleModel implements StellarObjectModel {
      * @returns The mass needed to achieve the given radius
      */
     public static GetMassFromSchwarzschildRadius(radius: number): number {
-        return radius * Settings.C * Settings.C / (2 * Settings.G);
+        return (radius * Settings.C * Settings.C) / (2 * Settings.G);
     }
 
     /**
@@ -105,14 +106,14 @@ export class BlackHoleModel implements StellarObjectModel {
      * The angular momentum is important in the Kerr metric to compute frame dragging.
      */
     public estimateAngularMomentum(): number {
-        if(this.physicalProperties.rotationPeriod === 0) 0;
+        if (this.physicalProperties.rotationPeriod === 0) 0;
 
         const estimatedOriginalStarRadius = estimateStarRadiusFromMass(this.physicalProperties.mass);
 
         // The inertia tensor for a sphere is a diagonal scaling matrix, we can express it as a simple number
         const inertiaTensor = (2 / 5) * this.physicalProperties.mass * estimatedOriginalStarRadius * estimatedOriginalStarRadius;
 
-        const omega = 2 * Math.PI / this.physicalProperties.rotationPeriod;
+        const omega = (2 * Math.PI) / this.physicalProperties.rotationPeriod;
 
         return inertiaTensor * omega;
     }
@@ -132,12 +133,12 @@ export class BlackHoleModel implements StellarObjectModel {
      * @throws This function throws an error when the black hole is a naked singularity
      */
     public getErgosphereRadius(theta: number): number {
-        const m = Settings.G * this.physicalProperties.mass / (Settings.C * Settings.C);
+        const m = (Settings.G * this.physicalProperties.mass) / (Settings.C * Settings.C);
 
         const a = this.getKerrMetricA();
         const cosTheta = Math.cos(theta);
-        
-        if(a > m) throw new Error("Black hole angular momentum exceeds maximum value for a Kerr black hole. a > m: " + a);
+
+        if (a > m) throw new Error("Black hole angular momentum exceeds maximum value for a Kerr black hole. a > m: " + a);
 
         return m + Math.sqrt(m * m - a * a * cosTheta * cosTheta);
     }

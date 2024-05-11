@@ -19,7 +19,6 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StarMaterial } from "./starMaterial";
 import { StarModel } from "./starModel";
-import { UberScene } from "../../uberCore/uberScene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Assets } from "../../assets";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -38,11 +37,12 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { StellarObject } from "../../architecture/stellarObject";
-import { Cullable } from "../../bodies/cullable";
+import { Cullable } from "../../utils/cullable";
 import { OrbitProperties } from "../../orbit/orbitProperties";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import i18n from "../../i18n";
+import { Scene } from "@babylonjs/core/scene";
 
 export class Star implements StellarObject, Cullable {
     readonly name: string;
@@ -55,6 +55,8 @@ export class Star implements StellarObject, Cullable {
 
     readonly postProcesses: PostProcessType[] = [];
 
+    readonly ringsUniforms: RingsUniforms | null;
+
     readonly model: StarModel;
 
     readonly parent: OrbitalObject | null;
@@ -66,7 +68,7 @@ export class Star implements StellarObject, Cullable {
      * @param parentBody The bodies the star is orbiting
      * @param model The seed of the star in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, model: StarModel | number, parentBody: CelestialBody | null = null) {
+    constructor(name: string, scene: Scene, model: StarModel | number, parentBody: CelestialBody | null = null) {
         this.name = name;
 
         this.parent = parentBody;
@@ -113,7 +115,13 @@ export class Star implements StellarObject, Cullable {
         setRotationQuaternion(this.getTransform(), Quaternion.Identity());
 
         this.postProcesses.push(PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE);
-        if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
+        if (this.model.rings !== null) {
+            this.postProcesses.push(PostProcessType.RING);
+
+            this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+        } else {
+            this.ringsUniforms = null;
+        }
     }
 
     getTransform(): TransformNode {
@@ -137,7 +145,7 @@ export class Star implements StellarObject, Cullable {
     }
 
     getRingsUniforms(): RingsUniforms | null {
-        return this.model.ringsUniforms;
+        return this.ringsUniforms;
     }
 
     getTypeName(): string {
@@ -156,8 +164,12 @@ export class Star implements StellarObject, Cullable {
         return this.getRadius();
     }
 
-    public computeCulling(camera: Camera): void {
-        this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
+    public computeCulling(cameras: Camera[]): void {
+        let isVisible = false;
+        for (const camera of cameras) {
+            isVisible = isVisible || isSizeOnScreenEnough(this, camera);
+        }
+        this.mesh.isVisible = isVisible;
     }
 
     public dispose(): void {

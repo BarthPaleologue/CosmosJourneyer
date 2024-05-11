@@ -48,7 +48,7 @@ void main() {
     vec2 starfieldUV = vec2(0.0);
 
     // if the pixel is at the far plane
-    if (screenColor == vec4(0.0) && depth == 1.0) {
+    if (depth == 1.0) {
         // get the starfield color
         // get spherical coordinates uv for the starfield texture
         starfieldUV = vec2(
@@ -60,7 +60,7 @@ void main() {
     vec4 starfieldColor = texture2D(starfieldTexture, starfieldUV);
     starfieldColor.rgb = pow(starfieldColor.rgb, vec3(2.2));// deeper blacks
 
-    if (screenColor == vec4(0.0) && depth == 1.0) {
+    if (depth == 1.0) {
         finalColor = vec4(starfieldColor.rgb * visibility, starfieldColor.a);
     }
 

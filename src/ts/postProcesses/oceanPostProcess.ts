@@ -18,14 +18,19 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 
 import oceanFragment from "../../shaders/oceanFragment.glsl";
-import { UberScene } from "../uberCore/uberScene";
-import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
-import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { ObjectPostProcess, UpdatablePostProcess } from "./objectPostProcess";
-import { UniformEnumType, ShaderSamplers, ShaderUniforms, SamplerEnumType } from "../uberCore/postProcesses/types";
 import { Assets } from "../assets";
 import { Transformable } from "../architecture/transformable";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Scene } from "@babylonjs/core/scene";
 
 export type OceanUniforms = {
     smoothness: number;
@@ -36,11 +41,13 @@ export type OceanUniforms = {
     time: number;
 };
 
-export class OceanPostProcess extends UberPostProcess implements ObjectPostProcess, UpdatablePostProcess {
+export class OceanPostProcess extends PostProcess implements ObjectPostProcess, UpdatablePostProcess {
     readonly oceanUniforms: OceanUniforms;
     readonly object: Transformable;
 
-    constructor(name: string, planet: TelluricPlanet, scene: UberScene, stars: Transformable[]) {
+    private activeCamera: Camera | null = null;
+
+    constructor(name: string, planet: TelluricPlanet, scene: Scene, stars: Transformable[]) {
         const shaderName = "ocean";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = oceanFragment;
@@ -55,92 +62,60 @@ export class OceanPostProcess extends UberPostProcess implements ObjectPostProce
             time: 0
         };
 
-        const uniforms: ShaderUniforms = [
-            ...getObjectUniforms(planet),
-            ...getStellarObjectsUniforms(stars),
-            ...getActiveCameraUniforms(scene),
-            {
-                name: "ocean_radius",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return planet.getRadius() + planet.model.physicalProperties.oceanLevel;
-                }
-            },
-            {
-                name: "ocean_smoothness",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return oceanUniforms.smoothness;
-                }
-            },
-            {
-                name: "ocean_specularPower",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return oceanUniforms.specularPower;
-                }
-            },
-            {
-                name: "ocean_alphaModifier",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return oceanUniforms.alphaModifier;
-                }
-            },
-            {
-                name: "ocean_depthModifier",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return oceanUniforms.depthModifier;
-                }
-            },
-            {
-                name: "ocean_waveBlendingSharpness",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return oceanUniforms.waveBlendingSharpness;
-                }
-            },
-            {
-                name: "planetInverseRotationMatrix",
-                type: UniformEnumType.MATRIX,
-                get: () => {
-                    return planet.getTransform().getWorldMatrix().getRotationMatrix().transpose();
-                }
-            },
-            {
-                name: "time",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    //TODO: do not hardcode the 100000
-                    // use rotating time offset to prevent float imprecision and distant artifacts
-                    return oceanUniforms.time % 100000;
-                }
-            }
+        const OceanUniformNames = {
+            OCEAN_RADIUS: "ocean_radius",
+            OCEAN_SMOOTHNESS: "ocean_smoothness",
+            OCEAN_SPECULAR_POWER: "ocean_specularPower",
+            OCEAN_ALPHA_MODIFIER: "ocean_alphaModifier",
+            OCEAN_DEPTH_MODIFIER: "ocean_depthModifier",
+            OCEAN_WAVE_BLENDING_SHARPNESS: "ocean_waveBlendingSharpness",
+            PLANET_INVERSE_ROTATION_MATRIX: "planetInverseRotationMatrix",
+            TIME: "time"
+        };
+
+        const uniforms: string[] = [
+            ...Object.values(CameraUniformNames),
+            ...Object.values(StellarObjectUniformNames),
+            ...Object.values(ObjectUniformNames),
+            ...Object.values(OceanUniformNames)
         ];
 
-        const samplers: ShaderSamplers = [
-            ...getSamplers(scene),
-            {
-                name: "normalMap1",
-                type: SamplerEnumType.TEXTURE,
-                get: () => {
-                    return Assets.WATER_NORMAL_MAP_1;
-                }
-            },
-            {
-                name: "normalMap2",
-                type: SamplerEnumType.TEXTURE,
-                get: () => {
-                    return Assets.WATER_NORMAL_MAP_2;
-                }
-            }
-        ];
+        const OceanSamplerNames = {
+            NORMAL_MAP_1: "normalMap1",
+            NORMAL_MAP_2: "normalMap2"
+        };
 
-        super(name, shaderName, uniforms, samplers, scene);
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(OceanSamplerNames)];
+
+        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = planet;
         this.oceanUniforms = oceanUniforms;
+
+        this.onActivateObservable.add((camera) => (this.activeCamera = camera));
+
+        this.onApplyObservable.add((effect) => {
+            if (this.activeCamera === null) {
+                throw new Error("Camera is null");
+            }
+
+            setCameraUniforms(effect, this.activeCamera);
+            setStellarObjectUniforms(effect, stars);
+            setObjectUniforms(effect, planet);
+
+            effect.setFloat(OceanUniformNames.OCEAN_RADIUS, planet.getRadius() + planet.model.physicalProperties.oceanLevel);
+            effect.setFloat(OceanUniformNames.OCEAN_SMOOTHNESS, oceanUniforms.smoothness);
+            effect.setFloat(OceanUniformNames.OCEAN_SPECULAR_POWER, oceanUniforms.specularPower);
+            effect.setFloat(OceanUniformNames.OCEAN_ALPHA_MODIFIER, oceanUniforms.alphaModifier);
+            effect.setFloat(OceanUniformNames.OCEAN_DEPTH_MODIFIER, oceanUniforms.depthModifier);
+            effect.setFloat(OceanUniformNames.OCEAN_WAVE_BLENDING_SHARPNESS, oceanUniforms.waveBlendingSharpness);
+            effect.setMatrix(OceanUniformNames.PLANET_INVERSE_ROTATION_MATRIX, planet.getTransform().getWorldMatrix().getRotationMatrix().transpose());
+            effect.setFloat(OceanUniformNames.TIME, oceanUniforms.time % 100000); //TODO: do not hardcode the 100000
+
+            setSamplerUniforms(effect, this.activeCamera, scene);
+            effect.setTexture(OceanSamplerNames.NORMAL_MAP_1, Assets.WATER_NORMAL_MAP_1);
+            effect.setTexture(OceanSamplerNames.NORMAL_MAP_2, Assets.WATER_NORMAL_MAP_2);
+        });
     }
 
     public update(deltaTime: number) {

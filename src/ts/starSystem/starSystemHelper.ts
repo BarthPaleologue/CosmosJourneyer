@@ -32,11 +32,11 @@ import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { getMoonSeed, getSpaceStationSeed } from "../planets/common";
 import { Planet } from "../architecture/planet";
 import { StellarObject } from "../architecture/stellarObject";
-import { BodyType } from "../model/common";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { CelestialBody } from "../architecture/celestialBody";
 import { romanNumeral } from "../utils/romanNumerals";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
+import { BodyType } from "../architecture/bodyType";
 
 export class StarSystemHelper {
     public static MakeStar(starsystem: StarSystemController, model?: number | StarModel): Star {

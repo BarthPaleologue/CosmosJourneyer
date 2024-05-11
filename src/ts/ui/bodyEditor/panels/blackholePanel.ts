@@ -17,7 +17,7 @@
 
 import { EditorPanel } from "../editorPanel";
 import { Slider } from "handle-sliderjs";
-import { BlackHolePostProcess } from "../../../postProcesses/blackHolePostProcess";
+import { BlackHolePostProcess } from "../../../stellarObjects/blackHole/blackHolePostProcess";
 import { BlackHole } from "../../../stellarObjects/blackHole/blackHole";
 
 export class BlackholePanel extends EditorPanel {

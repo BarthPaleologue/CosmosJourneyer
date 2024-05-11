@@ -16,11 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { NeutronStarModel } from "./neutronStarModel";
-import { UberScene } from "../../uberCore/uberScene";
 import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { CelestialBody } from "../../architecture/celestialBody";
 import { StellarObject } from "../../architecture/stellarObject";
-import { Cullable } from "../../bodies/cullable";
+import { Cullable } from "../../utils/cullable";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StarMaterial } from "../star/starMaterial";
@@ -37,10 +36,11 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { RingsUniforms } from "../../rings/ringsUniform";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { isSizeOnScreenEnough } from "../../utils/isObjectVisibleOnScreen";
 import i18n from "../../i18n";
+import { Scene } from "@babylonjs/core/scene";
 
 export class NeutronStar implements StellarObject, Cullable {
     readonly model: NeutronStarModel;
@@ -56,6 +56,8 @@ export class NeutronStar implements StellarObject, Cullable {
 
     readonly postProcesses: PostProcessType[] = [];
 
+    readonly ringsUniforms: RingsUniforms | null;
+
     readonly parent: OrbitalObject | null;
 
     /**
@@ -65,7 +67,7 @@ export class NeutronStar implements StellarObject, Cullable {
      * @param model The seed of the star in [-1, 1]
      * @param parentBody
      */
-    constructor(name: string, scene: UberScene, model: number | NeutronStarModel, parentBody: CelestialBody | null = null) {
+    constructor(name: string, scene: Scene, model: number | NeutronStarModel, parentBody: CelestialBody | null = null) {
         this.model = model instanceof NeutronStarModel ? model : new NeutronStarModel(model, parentBody?.model);
         this.name = name;
 
@@ -105,7 +107,13 @@ export class NeutronStar implements StellarObject, Cullable {
         setRotationQuaternion(this.getTransform(), Quaternion.Identity());
 
         this.postProcesses.push(PostProcessType.VOLUMETRIC_LIGHT, PostProcessType.LENS_FLARE, PostProcessType.MATTER_JETS);
-        if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
+        if (this.model.rings !== null) {
+            this.postProcesses.push(PostProcessType.RING);
+
+            this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+        } else {
+            this.ringsUniforms = null;
+        }
     }
 
     getTransform(): TransformNode {
@@ -133,7 +141,7 @@ export class NeutronStar implements StellarObject, Cullable {
     }
 
     getRingsUniforms(): RingsUniforms | null {
-        return this.model.ringsUniforms;
+        return this.ringsUniforms;
     }
 
     public updateMaterial(deltaTime: number): void {
@@ -148,8 +156,12 @@ export class NeutronStar implements StellarObject, Cullable {
         return this.getRadius();
     }
 
-    public computeCulling(camera: Camera): void {
-        this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
+    public computeCulling(cameras: Camera[]): void {
+        let isVisible = false;
+        for (const camera of cameras) {
+            isVisible = isVisible || isSizeOnScreenEnough(this, camera);
+        }
+        this.mesh.isVisible = isVisible;
     }
 
     public dispose(): void {

@@ -68,7 +68,6 @@ vec2 sdf(vec3 pos) {
     for (int i = 0; i < MANDELBROTSTEPS; i++) {
         r = length(z);
         if (r > MAXMANDELBROTDIST) break;
-        if (r < EPSILON) break;
 
         // convert to polar coordinates
         float theta = acos(z.z / r);
@@ -91,6 +90,38 @@ vec2 sdf(vec3 pos) {
     return vec2(distance, colorIndex);
 }
 
+vec2 sdf2(vec3 pos)
+{
+    float t = power * 2.0;
+    
+	vec4 c = 0.5*vec4(cos(t),cos(t*1.1),cos(t*2.3),cos(t*3.1));
+    vec4 z = vec4(pos, 0.0 );
+	vec4 nz;
+    
+	float md2 = 1.0;
+	float mz2 = dot(z,z);
+
+	for(int i=0;i<MANDELBROTSTEPS;i++)
+	{
+		md2*=4.0*mz2;
+	    nz.x=z.x*z.x-dot(z.yzw,z.yzw);
+		nz.yzw=2.0*z.x*z.yzw;
+		z=nz+c;
+
+		mz2 = dot(z,z);
+		if(mz2>4.0)
+        {
+			break;
+        }
+	}
+
+    float colorIndex = 50.0 * pow(md2, 0.128 / float(MARCHINGITERATIONS));
+
+    float distance = 0.25*sqrt(mz2/md2)*log(mz2);
+
+	return vec2(distance, colorIndex);
+}
+
 // TRACING A PATH : 
 // measuring the distance to the nearest object on the x coordinate
 // and returning the color index on the y coordinate
@@ -107,14 +138,9 @@ vec2 rayMarch(vec3 origin, vec3 ray, out float steps) {
         depth += MARCHINGSTEP * dist.x;
         c += dist.y;
         steps++;
-        if (dist.y < EPSILON) break;
     }
 
     return vec2(depth, c);
-}
-
-vec4 lerp(vec4 v1, vec4 v2, float t) {
-    return t * v1 + (1.0 - t) * v2;
 }
 
 float contrast(float val, float contrast_offset, float contrast_mid_level)
@@ -143,13 +169,13 @@ void main() {
     float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
 
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(camera_position, rayDir, object_position, object_radius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(camera_position, rayDir, object_position, object_radius * object_scaling_determinant, impactPoint, escapePoint))) {
         gl_FragColor = screenColor;// if not intersecting with atmosphere, return original color
         return;
     }
 
     // scale down so that everything happens in a sphere of radius 2
-    float inverseScaling = 1.0 / (0.5 * object_radius);
+    float inverseScaling = 1.0 / (0.5 * object_radius * object_scaling_determinant);
 
     vec3 origin = camera_position + impactPoint * rayDir - object_position;// the ray origin in world space
     origin *= inverseScaling;
@@ -186,6 +212,6 @@ void main() {
 
     mandelbulbColor.xyz *= clamp(ndl, 0.3, 1.0);
 
-    gl_FragColor = lerp(screenColor, mandelbulbColor, smoothstep(2.0, 15.0, intersectionDistance));
+    gl_FragColor = mix(mandelbulbColor, screenColor, smoothstep(2.0, 15.0, intersectionDistance));
 
 }

@@ -184,8 +184,8 @@ export class CharacterControls implements Controls {
         this.closestWalkableObject = object;
     }
 
-    public getActiveCamera(): Camera {
-        return this.thirdPersonCamera;
+    public getActiveCameras(): Camera[] {
+        return [this.thirdPersonCamera];
     }
 
     public getTransform(): TransformNode {
@@ -340,7 +340,7 @@ export class CharacterControls implements Controls {
 
         translate(this.getTransform(), displacement);
 
-        this.getActiveCamera().getViewMatrix();
+        this.getActiveCameras().forEach((camera) => camera.getViewMatrix());
 
         return displacement;
     }

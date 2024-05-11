@@ -23,7 +23,7 @@ import { SpaceStationModel } from "./spacestationModel";
 import { PostProcessType } from "../postProcesses/postProcessTypes";
 import { Assets } from "../assets";
 import { OrbitalObject } from "../architecture/orbitalObject";
-import { Cullable } from "../bodies/cullable";
+import { Cullable } from "../utils/cullable";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -178,8 +178,11 @@ export class SpaceStation implements OrbitalObject, Cullable {
         return i18n.t("objectTypes:spaceStation");
     }
 
-    public computeCulling(camera: Camera): void {
-        const isVisible = isSizeOnScreenEnough(this, camera);
+    public computeCulling(cameras: Camera[]): void {
+        let isVisible = false;
+        for (const camera of cameras) {
+            isVisible = isVisible || isSizeOnScreenEnough(this, camera);
+        }
         for (const mesh of this.instance.getChildMeshes()) {
             mesh.isVisible = isVisible;
         }

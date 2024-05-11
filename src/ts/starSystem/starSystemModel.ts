@@ -18,9 +18,9 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
-import { BodyType } from "../model/common";
 import { generateStarName } from "../utils/starNameGenerator";
 import { SystemSeed } from "../utils/systemSeed";
+import { BodyType } from "../architecture/bodyType";
 
 const enum GenerationSteps {
     NAME,

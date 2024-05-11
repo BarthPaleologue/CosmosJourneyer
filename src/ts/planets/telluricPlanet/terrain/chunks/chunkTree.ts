@@ -29,10 +29,11 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { DeleteSemaphore } from "./deleteSemaphore";
-import { UberScene } from "../../../../uberCore/uberScene";
 import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { ChunkForge } from "./chunkForge";
 import { clamp } from "../../../../utils/math";
+import { Cullable } from "../../../../utils/cullable";
+import { Scene } from "@babylonjs/core/scene";
 
 /**
  * A quadTree is defined recursively
@@ -42,7 +43,7 @@ type QuadTree = QuadTree[] | PlanetChunk;
 /**
  * A ChunkTree is a structure designed to manage LOD using a quadtree
  */
-export class ChunkTree {
+export class ChunkTree implements Cullable {
     readonly minDepth: number; // minimum depth of the tree
     readonly maxDepth: number; // maximum depth of the tree
 
@@ -52,7 +53,7 @@ export class ChunkTree {
 
     private readonly direction: Direction;
 
-    private readonly scene: UberScene;
+    private readonly scene: Scene;
 
     private deleteSemaphores: DeleteSemaphore[] = [];
 
@@ -78,7 +79,7 @@ export class ChunkTree {
      * @param material
      * @param scene
      */
-    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanetModel, parentAggregate: PhysicsAggregate, material: Material, scene: UberScene) {
+    constructor(direction: Direction, planetName: string, planetModel: TelluricPlanetModel, parentAggregate: PhysicsAggregate, material: Material, scene: Scene) {
         this.rootChunkLength = planetModel.radius * 2;
         this.planetName = planetName;
         this.planetSeed = planetModel.seed;
@@ -183,9 +184,8 @@ export class ChunkTree {
 
         const totalRadius =
             this.planetModel.radius +
-            (this.planetModel.terrainSettings.max_mountain_height +
-            this.planetModel.terrainSettings.continent_base_height +
-            this.planetModel.terrainSettings.max_bump_height) * 0.5;
+            (this.planetModel.terrainSettings.max_mountain_height + this.planetModel.terrainSettings.continent_base_height + this.planetModel.terrainSettings.max_bump_height) *
+                0.5;
 
         const observerRelativePosition = observerPositionW.subtract(this.parent.getAbsolutePosition());
         const observerDistanceToCenter = observerRelativePosition.length();
@@ -193,7 +193,7 @@ export class ChunkTree {
         const nodeGreatCircleDistance = Math.acos(Vector3.Dot(nodePositionSphere, observerPositionSphere));
         const nodeLength = this.rootChunkLength / 2 ** walked.length;
 
-        const chunkGreatDistanceFactor = Math.max(0.0, nodeGreatCircleDistance - 8 * nodeLength / (2 * Math.PI * this.planetModel.radius));
+        const chunkGreatDistanceFactor = Math.max(0.0, nodeGreatCircleDistance - (8 * nodeLength) / (2 * Math.PI * this.planetModel.radius));
         const observerDistanceFactor = Math.max(0.0, observerDistanceToCenter - totalRadius) / this.planetModel.radius;
 
         let kernel = this.maxDepth;
@@ -265,9 +265,9 @@ export class ChunkTree {
         return chunk;
     }
 
-    public computeCulling(camera: Camera): void {
+    public computeCulling(cameras: Camera[]): void {
         this.executeOnEveryChunk((chunk: PlanetChunk) => {
-            chunk.computeCulling(camera);
+            chunk.computeCulling(cameras);
         });
     }
 
