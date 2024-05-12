@@ -429,6 +429,15 @@ export class StarSystemView implements View {
                 await wait(timeOut);
             }
         }
+
+        // Anomalies
+        for (let i = 0; i < systemModel.getNbAnomalies(); i++) {
+            console.log("Anomaly:", i + 1, "of", systemModel.getNbAnomalies());
+            const anomaly = StarSystemHelper.MakeMandelbulb(starSystem);
+            anomaly.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
+
+            await wait(timeOut);
+        }
     }
 
     /**

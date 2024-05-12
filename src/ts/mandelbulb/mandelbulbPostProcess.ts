@@ -54,7 +54,8 @@ export class MandelbulbPostProcess extends PostProcess implements ObjectPostProc
 
         const MandelbulbUniformNames = {
             POWER: "power",
-            ACCENT_COLOR: "accentColor"
+            ACCENT_COLOR: "accentColor",
+            ELAPSED_SECONDS: "elapsedSeconds"
         };
 
         const uniforms: string[] = [
@@ -84,8 +85,9 @@ export class MandelbulbPostProcess extends PostProcess implements ObjectPostProc
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, mandelbulb);
 
-            effect.setFloat(MandelbulbUniformNames.POWER, mandelbulb.model.power + 4 * Math.sin(this.elapsedSeconds * 0.1));
+            effect.setFloat(MandelbulbUniformNames.POWER, mandelbulb.model.power);
             effect.setColor3(MandelbulbUniformNames.ACCENT_COLOR, mandelbulb.model.accentColor);
+            effect.setFloat(MandelbulbUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
         });

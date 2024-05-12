@@ -23,6 +23,7 @@ varying vec2 vUV;
 
 uniform float power;
 uniform vec3 accentColor;
+uniform float elapsedSeconds;
 
 #include "./utils/stars.glsl";
 
@@ -54,14 +55,14 @@ vec3 cosineColor(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
     return a + b * cos(6.28318*(c*t+d));
 }
 vec3 palette (float t) {
-    return cosineColor(t, vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0.01, 0.01, 0.01), accentColor);
+    return cosineColor(t, vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0.07, 0.07, 0.07), accentColor);
 }
 
 // distance estimator to a mandelbulb set
 // returns the distance to the set on the x coordinate 
 // and the color on the y coordinate
 vec2 sdf(vec3 pos) {
-    float Power = power;
+    float Power = power + 4.0 * sin(elapsedSeconds * 0.1);
     vec3 z = pos;
     float dr = 1.0;
     float r = 0.0;
@@ -148,16 +149,6 @@ float contrast(float val, float contrast_offset, float contrast_mid_level)
     return clamp((val - contrast_mid_level) * (1. + contrast_offset) + contrast_mid_level, 0., 1.);
 }
 
-vec3 estimate_normal(const vec3 p, const float delta)
-{
-    vec3 normal = vec3(
-    sdf(vec3(p.x + delta, p.y, p.z)).x - sdf(vec3(p.x - delta, p.y, p.z)).x,
-    sdf(vec3(p.x, p.y + delta, p.z)).x - sdf(vec3(p.x, p.y - delta, p.z)).x,
-    sdf(vec3(p.x, p.y, p.z  + delta)).x - sdf(vec3(p.x, p.y, p.z - delta)).x
-    );
-    return normalize(normal);
-}
-
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
@@ -191,6 +182,22 @@ void main() {
     }
 
     vec3 intersectionPoint = origin + mandelDepth.x * rayDir;
+
+    // compute normal and anti-aliasing at the same time
+    vec3 p = intersectionPoint;
+    float delta = EPSILON * 2.0;
+    vec2 x1 = sdf(vec3(p.x + delta, p.y, p.z));
+    vec2 x2 = sdf(vec3(p.x - delta, p.y, p.z));
+    vec2 y1 = sdf(vec3(p.x, p.y + delta, p.z));
+    vec2 y2 = sdf(vec3(p.x, p.y - delta, p.z));
+    vec2 z1 = sdf(vec3(p.x, p.y, p.z + delta));
+    vec2 z2 = sdf(vec3(p.x, p.y, p.z - delta));
+
+    mandelDepth += x1 + x2 + y1 + y2 + z1 + z2;
+    mandelDepth /= 7.0;
+
+    intersectionPoint = origin + mandelDepth.x * rayDir;
+
     float intersectionDistance = length(intersectionPoint);
 
     vec4 mandelbulbColor = vec4(palette(mandelDepth.y), 1.0);
@@ -203,11 +210,19 @@ void main() {
 
     mandelbulbColor.xyz *= ao * 2.0;
 
-    vec3 normal = estimate_normal(intersectionPoint, EPSILON * 2.0);
+    vec3 normal = normalize(vec3(
+        x1.x - x2.x,
+        y1.x - y2.x,
+        z1.x - z2.x
+    ));
     float ndl = 0.0;
     for (int i = 0; i < nbStars; i++) {
         vec3 starDir = normalize(star_positions[i] - object_position);
         ndl += max(0.0, dot(normal, starDir));
+    }
+
+    if(nbStars == 0) {
+        ndl = 1.0;
     }
 
     mandelbulbColor.xyz *= clamp(ndl, 0.3, 1.0);
