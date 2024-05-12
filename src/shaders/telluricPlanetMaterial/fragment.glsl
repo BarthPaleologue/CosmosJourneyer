@@ -30,7 +30,7 @@ varying vec3 vLocalPosition;
 
 uniform mat4 normalMatrix;
 
-uniform vec3 cameraPosition;// camera position in world space
+varying vec3 cameraPosition;// camera position in world space
 uniform float cameraNear;
 uniform float cameraFar;
 
