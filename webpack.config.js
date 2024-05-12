@@ -20,6 +20,7 @@ const config = {
         playground: "./src/ts/playground.ts",
         xr: "./src/ts/xr.ts",
         stereo: "./src/ts/stereo.ts",
+        spaceStationGenerator: "./src/ts/spaceStationGenerator.ts",
         debugAssets: "./src/ts/debugAssets.ts"
     },
     output: {
@@ -119,8 +120,14 @@ const config = {
             chunks: ["stereo"]
         }),
         new HtmlWebpackPlugin({
+            title: "Space station generator",
+            filename: "spaceStationGenerator.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["spaceStationGenerator"]
+        }),
+        new HtmlWebpackPlugin({
             title: "Debug Texture",
-            filename: "debugassets.html",
+            filename: "debugAssets.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["debugAssets"]
         }),

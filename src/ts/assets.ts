@@ -85,11 +85,13 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { createButterfly } from "./proceduralAssets/butterfly/butterfly";
 import { createGrassBlade } from "./proceduralAssets/grass/grassBlade";
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { ButterflyMaterial } from "./proceduralAssets/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./proceduralAssets/grass/grassMaterial";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18next from "./i18n";
+import { SpaceStationAssets } from "./proceduralAssets/spaceStation/spaceStationAssets";
+
+import "@babylonjs/core/Loading/loadingScreen";
 
 export class Assets {
     static IS_READY = false;
@@ -125,6 +127,8 @@ export class Assets {
     private static CHARACTER: Mesh;
 
     private static LANDING_PAD: Mesh;
+
+    public static SPACE_STATION_ASSETS: SpaceStationAssets;
 
     public static ROCK: Mesh;
     public static TREE: Mesh;
@@ -313,6 +317,8 @@ export class Assets {
 
             console.log("Tree loaded");
         };
+
+        Assets.SPACE_STATION_ASSETS = new SpaceStationAssets(scene, Assets.MANAGER);
 
         Assets.BUTTERFLY = createButterfly(scene);
         Assets.BUTTERFLY.isVisible = false;
