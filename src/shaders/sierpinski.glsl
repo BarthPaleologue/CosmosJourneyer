@@ -32,14 +32,9 @@ uniform vec3 accentColor;
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
-uniform vec3 planetPosition;
-uniform vec3 cameraPosition;
+#include "./utils/object.glsl";
 
-uniform mat4 inverseView;
-uniform mat4 inverseProjection;
-
-uniform float cameraNear;
-uniform float cameraFar;
+#include "./utils/camera.glsl";
 
 #include "./utils/worldFromUV.glsl";
 
@@ -139,7 +134,7 @@ void main() {
     float maximumDistance = length(pixelWorldPosition - camera_position);
     
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(cameraPosition, rayDir, planetPosition, planetRadius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(camera_position, rayDir, object_position, planetRadius, impactPoint, escapePoint))) {
         gl_FragColor = screenColor;// if not intersecting with atmosphere, return original color
         return;
     }
@@ -147,7 +142,7 @@ void main() {
     // we apply inverse scaling to make the situation roughly equivalent to a fractal of size 1
     float inverseScaling = 1.0 / (0.6 * planetRadius);
 
-    vec3 origin = cameraPosition - planetPosition; // the ray origin in world space
+    vec3 origin = camera_position - object_position; // the ray origin in world space
     origin *= inverseScaling;
 
     float rayDepth = rayMarch(origin, rayDir, MAX_DIST + impactPoint * inverseScaling);
@@ -170,7 +165,7 @@ void main() {
     
     float ndl = 0.0;
     for(int i = 0; i < nbStars; i++) {
-        vec3 starDir = normalize(star_positions[i] - planetPosition);
+        vec3 starDir = normalize(star_positions[i] - object_position);
         ndl += max(0.0, dot(normal, starDir));
     }
 

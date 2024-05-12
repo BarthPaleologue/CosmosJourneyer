@@ -23,6 +23,7 @@ varying vec2 vUV;
 
 uniform float power;
 uniform vec3 accentColor;
+uniform float elapsedSeconds;
 
 #include "./utils/stars.glsl";
 
@@ -52,21 +53,20 @@ vec3 cosineColor(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
     return a + b * cos(6.28318*(c*t+d));
 }
 vec3 palette (float t) {
-    return cosineColor(t, vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0.01, 0.01, 0.01), accentColor);
+    return cosineColor(t, vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0.07, 0.07, 0.07), accentColor);
 }
 
 // distance estimator to a mandelbulb set
 // returns the distance to the set on the x coordinate 
 // and the color on the y coordinate
 vec2 sdf(vec3 pos) {
-    float Power = power;
+    float Power = power + 4.0 * sin(elapsedSeconds * 0.1);
     vec3 z = pos;
     float dr = 1.0;
     float r = 0.0;
     for (int i = 0; i < MANDELBROTSTEPS; i++) {
         r = length(z);
         if (r > MAXMANDELBROTDIST) break;
-        if (r < EPSILON) break;
 
         // convert to polar coordinates
         float theta = acos(z.z / r);
@@ -89,6 +89,38 @@ vec2 sdf(vec3 pos) {
     return vec2(distance, colorIndex);
 }
 
+vec2 sdf2(vec3 pos)
+{
+    float t = power * 2.0;
+    
+	vec4 c = 0.5*vec4(cos(t),cos(t*1.1),cos(t*2.3),cos(t*3.1));
+    vec4 z = vec4(pos, 0.0 );
+	vec4 nz;
+    
+	float md2 = 1.0;
+	float mz2 = dot(z,z);
+
+	for(int i=0;i<MANDELBROTSTEPS;i++)
+	{
+		md2*=4.0*mz2;
+	    nz.x=z.x*z.x-dot(z.yzw,z.yzw);
+		nz.yzw=2.0*z.x*z.yzw;
+		z=nz+c;
+
+		mz2 = dot(z,z);
+		if(mz2>4.0)
+        {
+			break;
+        }
+	}
+
+    float colorIndex = 50.0 * pow(md2, 0.128 / float(MARCHINGITERATIONS));
+
+    float distance = 0.25*sqrt(mz2/md2)*log(mz2);
+
+	return vec2(distance, colorIndex);
+}
+
 // TRACING A PATH : 
 // measuring the distance to the nearest object on the x coordinate
 // and returning the color index on the y coordinate
@@ -105,29 +137,14 @@ vec2 rayMarch(vec3 origin, vec3 ray, out float steps) {
         depth += MARCHINGSTEP * dist.x;
         c += dist.y;
         steps++;
-        if (dist.y < EPSILON) break;
     }
 
     return vec2(depth, c);
 }
 
-vec4 lerp(vec4 v1, vec4 v2, float t) {
-    return t * v1 + (1.0 - t) * v2;
-}
-
 float contrast(float val, float contrast_offset, float contrast_mid_level)
 {
     return clamp((val - contrast_mid_level) * (1. + contrast_offset) + contrast_mid_level, 0., 1.);
-}
-
-vec3 estimate_normal(const vec3 p, const float delta)
-{
-    vec3 normal = vec3(
-    sdf(vec3(p.x + delta, p.y, p.z)).x - sdf(vec3(p.x - delta, p.y, p.z)).x,
-    sdf(vec3(p.x, p.y + delta, p.z)).x - sdf(vec3(p.x, p.y - delta, p.z)).x,
-    sdf(vec3(p.x, p.y, p.z  + delta)).x - sdf(vec3(p.x, p.y, p.z - delta)).x
-    );
-    return normalize(normal);
 }
 
 void main() {
@@ -141,13 +158,13 @@ void main() {
     float maximumDistance = length(pixelWorldPosition - camera_position);
 
     float impactPoint, escapePoint;
-    if (!(rayIntersectSphere(camera_position, rayDir, object_position, object_radius, impactPoint, escapePoint))) {
+    if (!(rayIntersectSphere(camera_position, rayDir, object_position, object_radius * object_scaling_determinant, impactPoint, escapePoint))) {
         gl_FragColor = screenColor;// if not intersecting with atmosphere, return original color
         return;
     }
 
     // scale down so that everything happens in a sphere of radius 2
-    float inverseScaling = 1.0 / (0.5 * object_radius);
+    float inverseScaling = 1.0 / (0.5 * object_radius * object_scaling_determinant);
 
     vec3 origin = camera_position + impactPoint * rayDir - object_position;// the ray origin in world space
     origin *= inverseScaling;
@@ -163,6 +180,22 @@ void main() {
     }
 
     vec3 intersectionPoint = origin + mandelDepth.x * rayDir;
+
+    // compute normal and anti-aliasing at the same time
+    vec3 p = intersectionPoint;
+    float delta = EPSILON * 2.0;
+    vec2 x1 = sdf(vec3(p.x + delta, p.y, p.z));
+    vec2 x2 = sdf(vec3(p.x - delta, p.y, p.z));
+    vec2 y1 = sdf(vec3(p.x, p.y + delta, p.z));
+    vec2 y2 = sdf(vec3(p.x, p.y - delta, p.z));
+    vec2 z1 = sdf(vec3(p.x, p.y, p.z + delta));
+    vec2 z2 = sdf(vec3(p.x, p.y, p.z - delta));
+
+    mandelDepth += x1 + x2 + y1 + y2 + z1 + z2;
+    mandelDepth /= 7.0;
+
+    intersectionPoint = origin + mandelDepth.x * rayDir;
+
     float intersectionDistance = length(intersectionPoint);
 
     vec4 mandelbulbColor = vec4(palette(mandelDepth.y), 1.0);
@@ -175,15 +208,23 @@ void main() {
 
     mandelbulbColor.xyz *= ao * 2.0;
 
-    vec3 normal = estimate_normal(intersectionPoint, EPSILON * 2.0);
+    vec3 normal = normalize(vec3(
+        x1.x - x2.x,
+        y1.x - y2.x,
+        z1.x - z2.x
+    ));
     float ndl = 0.0;
     for (int i = 0; i < nbStars; i++) {
         vec3 starDir = normalize(star_positions[i] - object_position);
         ndl += max(0.0, dot(normal, starDir));
     }
 
+    if(nbStars == 0) {
+        ndl = 1.0;
+    }
+
     mandelbulbColor.xyz *= clamp(ndl, 0.3, 1.0);
 
-    gl_FragColor = lerp(screenColor, mandelbulbColor, smoothstep(2.0, 15.0, intersectionDistance));
+    gl_FragColor = mix(mandelbulbColor, screenColor, smoothstep(2.0, 15.0, intersectionDistance));
 
 }

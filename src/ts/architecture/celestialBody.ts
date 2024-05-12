@@ -18,7 +18,8 @@
 import { OrbitalObject, OrbitalObjectModel } from "./orbitalObject";
 import { HasPostProcesses } from "./hasPostProcesses";
 import { CanHaveRings } from "./canHaveRings";
-import { BodyType } from "../model/common";
+
+import { BodyType } from "./bodyType";
 
 /**
  * Describes all celestial bodies (a combination of OrbitalObject, CanHaveRings and HasPostProcesses)

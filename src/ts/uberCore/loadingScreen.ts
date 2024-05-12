@@ -12,7 +12,11 @@ export class LoadingScreen implements ILoadingScreen {
      * @param loadingText defines the default text to display
      * @param loadingDivBackgroundColor defines the default background color
      */
-    constructor(private canvas: HTMLCanvasElement, private loadingText = "", private loadingDivBackgroundColor = "black") {}
+    constructor(
+        private canvas: HTMLCanvasElement,
+        private loadingText = "",
+        private loadingDivBackgroundColor = "black"
+    ) {}
 
     /**
      * Function called to display the loading screen

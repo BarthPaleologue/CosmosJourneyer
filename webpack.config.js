@@ -3,6 +3,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const webpack = require('webpack');
 
 const isProduction = process.env.NODE_ENV === "production";
 const htmlPath = path.join(__dirname, "/src/html/");
@@ -18,6 +19,7 @@ const config = {
         characterDemo: "./src/ts/characterDemo.ts",
         playground: "./src/ts/playground.ts",
         xr: "./src/ts/xr.ts",
+        stereo: "./src/ts/stereo.ts",
         debugAssets: "./src/ts/debugAssets.ts"
     },
     output: {
@@ -34,6 +36,28 @@ const config = {
     },
 
     plugins: [
+        new webpack.BannerPlugin({
+            raw: true,
+            banner: `
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+        `,
+            stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT
+        }),
         new HtmlWebpackPlugin({
             title: "Planet Engine",
             filename: "index.html",
@@ -87,6 +111,12 @@ const config = {
             filename: "xr.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["xr"]
+        }),
+        new HtmlWebpackPlugin({
+            title: "3D Stereo",
+            filename: "stereo.html",
+            template: path.join(htmlPath, "index.html"),
+            chunks: ["stereo"]
         }),
         new HtmlWebpackPlugin({
             title: "Debug Texture",

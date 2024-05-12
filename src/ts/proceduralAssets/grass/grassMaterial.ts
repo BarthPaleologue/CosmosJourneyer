@@ -31,15 +31,21 @@ export class GrassMaterial extends ShaderMaterial {
     private stars: Transformable[] = [];
     private playerPosition: Vector3 = Vector3.Zero();
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, isDepthMaterial: boolean) {
         const shaderName = "grassMaterial";
         Effect.ShadersStore[`${shaderName}FragmentShader`] = grassFragment;
         Effect.ShadersStore[`${shaderName}VertexShader`] = grassVertex;
 
+        const defines = ["#define INSTANCES"];
+        if (isDepthMaterial) defines.push("#define FORDEPTH");
+
+        const uniforms = ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "cameraPosition", "playerPosition"];
+        if (isDepthMaterial) uniforms.push("depthValues");
+
         super(shaderName, scene, shaderName, {
             attributes: ["position", "normal"],
-            uniforms: ["world", "worldView", "worldViewProjection", "view", "projection", "viewProjection", "time", "lightDirection", "cameraPosition", "playerPosition"],
-            defines: ["#define INSTANCES"],
+            uniforms: uniforms,
+            defines: defines,
             samplers: ["perlinNoise"]
         });
 
@@ -64,6 +70,5 @@ export class GrassMaterial extends ShaderMaterial {
         this.elapsedSeconds += deltaSeconds;
         this.stars = stars;
         this.playerPosition = playerPosition;
-
     }
 }

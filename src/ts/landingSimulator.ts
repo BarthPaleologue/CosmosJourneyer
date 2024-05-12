@@ -12,7 +12,7 @@ import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import "@babylonjs/core/Physics/physicsEngineComponent";
 import { PhysicsViewer } from "@babylonjs/core/Debug/physicsViewer";
-import { DefaultControls } from "./defaultController/defaultControls";
+import { DefaultControls } from "./defaultControls/defaultControls";
 import { Spaceship } from "./spaceship/spaceship";
 import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";

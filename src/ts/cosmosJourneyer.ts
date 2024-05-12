@@ -60,7 +60,7 @@ const enum EngineState {
 }
 
 /**
- * Main class of CosmosJourneyer. It handles the underlying BabylonJS engine, and the communication between
+ * Main class of Cosmos Journeyer. It handles the underlying BabylonJS engine, and the communication between
  * the starmap view and the star system view. It also provides utility methods to take screenshots and record videos.
  * It also handles the pause menu.
  */
@@ -192,7 +192,9 @@ export class CosmosJourneyer {
             twgslOptions: {
                 wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
                 jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
-            }
+            },
+            preserveDrawingBuffer: true,
+            useHighPrecisionFloats: true
         });
 
         engine.useReverseDepthBuffer = true;
@@ -415,7 +417,10 @@ export class CosmosJourneyer {
             setRotationQuaternion(playerTransform, currentWorldRotationQuaternion);
 
             // updates camera position
-            this.starSystemView.getSpaceshipControls().getActiveCamera().getViewMatrix(true);
+            this.starSystemView
+                .getSpaceshipControls()
+                .getActiveCameras()
+                .forEach((camera) => camera.getViewMatrix(true));
 
             // re-centers the star system
             this.starSystemView.getStarSystem().applyFloatingOrigin();

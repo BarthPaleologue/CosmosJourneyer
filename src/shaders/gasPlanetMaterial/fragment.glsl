@@ -28,7 +28,7 @@ varying vec3 vUnitSamplePoint;
 
 varying vec3 vPosition;// position of the vertex varyingsphere space
 
-uniform vec3 playerPosition;// camera position in world space
+varying vec3 cameraPosition;// camera position in world space
 
 uniform vec3 color1;
 uniform vec3 color2;
@@ -46,7 +46,7 @@ uniform float seed;
 #include "../utils/smoothSharpener.glsl";
 
 void main() {
-    vec3 viewRayW = normalize(playerPosition - vPositionW);// view direction in world space
+    vec3 viewRayW = normalize(cameraPosition - vPositionW);// view direction in world space
 
     vec3 normalW = vNormalW;
 

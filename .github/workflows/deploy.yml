@@ -2,9 +2,9 @@
 name: Build & Deploy site to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["main", "master"]
+    tags:
+      - '*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "20"
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Restore cache

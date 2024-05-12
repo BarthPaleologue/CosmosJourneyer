@@ -17,9 +17,6 @@
 
 import starfieldFragment from "../../shaders/starfieldFragment.glsl";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { UberScene } from "../uberCore/uberScene";
-import { getActiveCameraUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
-import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { Settings } from "../settings";
 import { nearestBody } from "../utils/nearestBody";
 import { Assets } from "../assets";
@@ -27,81 +24,92 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PostProcessType } from "./postProcessTypes";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { Transformable } from "../architecture/transformable";
 import { CelestialBody } from "../architecture/celestialBody";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { Scene } from "@babylonjs/core/scene";
 
-export class StarfieldPostProcess extends UberPostProcess {
-    constructor(scene: UberScene, stellarObjects: Transformable[], bodies: CelestialBody[], starfieldRotation: Quaternion) {
+export class StarfieldPostProcess extends PostProcess {
+    private activeCamera: Camera | null = null;
+
+    constructor(scene: Scene, stellarObjects: Transformable[], bodies: CelestialBody[], starfieldRotation: Quaternion) {
         const shaderName = "starfield";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = starfieldFragment;
         }
 
-        const uniforms: ShaderUniforms = [
-            ...getActiveCameraUniforms(scene),
-            ...getStellarObjectsUniforms(stellarObjects),
-            {
-                name: "starfieldRotation",
-                type: UniformEnumType.MATRIX,
-                get: () => {
-                    const rotationMatrix = new Matrix();
-                    starfieldRotation.toRotationMatrix(rotationMatrix);
-                    return rotationMatrix;
+        const StarfieldUniformNames = {
+            STARFIELD_ROTATION: "starfieldRotation",
+            VISIBILITY: "visibility"
+        };
+
+        const StarfieldSamplerNames = {
+            STARFIELD_TEXTURE: "starfieldTexture"
+        };
+
+        const uniforms: string[] = [...Object.values(CameraUniformNames), ...Object.values(StellarObjectUniformNames), ...Object.values(StarfieldUniformNames)];
+
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(StarfieldSamplerNames)];
+
+        super("starfield", shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
+
+        this.onActivateObservable.add((camera) => {
+            this.activeCamera = camera;
+        });
+
+        this.onApplyObservable.add((effect) => {
+            if (this.activeCamera === null) {
+                throw new Error("Camera is null");
+            }
+
+            setCameraUniforms(effect, this.activeCamera);
+            setStellarObjectUniforms(effect, stellarObjects);
+
+            const starfieldRotationMatrix = new Matrix();
+            starfieldRotation.toRotationMatrix(starfieldRotationMatrix);
+            effect.setMatrix(StarfieldUniformNames.STARFIELD_ROTATION, starfieldRotationMatrix);
+
+            if (stellarObjects.length === 0) effect.setFloat(StarfieldUniformNames.VISIBILITY, 1);
+            else {
+                //TODO: should be cleaned up
+                let vis = 1.0;
+                for (const star of stellarObjects) {
+                    if (star instanceof BlackHole) continue;
+                    vis = Math.min(vis, 1.0 + Vector3.Dot(star.getTransform().getAbsolutePosition().normalizeToNew(), this.activeCamera.getDirection(Axis.Z)));
                 }
-            },
-            {
-                name: "visibility",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    if (bodies.length === 0) return 1;
-
-                    const camera = scene.activeCamera;
-                    if (camera === null) throw new Error("no camera");
-
-                    //TODO: should be cleaned up
-                    let vis = 1.0;
-                    for (const star of stellarObjects) {
-                        if (star instanceof BlackHole) return 1;
-                        vis = Math.min(vis, 1.0 + Vector3.Dot(star.getTransform().getAbsolutePosition().normalizeToNew(), camera.getDirection(Axis.Z)));
-                    }
-                    vis = 0.5 + vis * 0.5;
-                    let vis2 = 1.0;
-                    const nearest = nearestBody(camera.globalPosition, bodies);
-                    if (nearest instanceof TelluricPlanet) {
-                        const planet = nearest as TelluricPlanet;
-                        if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {
-                            const height = planet.getTransform().getAbsolutePosition().length();
-                            //FIXME: has to be dynamic
-                            const maxHeight = Settings.ATMOSPHERE_HEIGHT;
-                            for (const star of stellarObjects) {
-                                const sunDir = planet.getTransform().getAbsolutePosition().subtract(star.getTransform().getAbsolutePosition()).normalize();
-                                vis2 = Math.min(
-                                    vis2,
-                                    (height / maxHeight) ** 128 + Math.max(Vector3.Dot(sunDir, planet.getTransform().getAbsolutePosition().negate().normalize()), 0.0) ** 0.5
-                                );
-                            }
+                vis = 0.5 + vis * 0.5;
+                let vis2 = 1.0;
+                const nearest = nearestBody(this.activeCamera.globalPosition, bodies);
+                if (nearest instanceof TelluricPlanet) {
+                    const planet = nearest as TelluricPlanet;
+                    if (planet.postProcesses.includes(PostProcessType.ATMOSPHERE)) {
+                        const height = planet.getTransform().getAbsolutePosition().length();
+                        //FIXME: has to be dynamic
+                        const maxHeight = Settings.ATMOSPHERE_HEIGHT;
+                        for (const star of stellarObjects) {
+                            const sunDir = planet.getTransform().getAbsolutePosition().subtract(star.getTransform().getAbsolutePosition()).normalize();
+                            vis2 = Math.min(
+                                vis2,
+                                (height / maxHeight) ** 128 + Math.max(Vector3.Dot(sunDir, planet.getTransform().getAbsolutePosition().negate().normalize()), 0.0) ** 0.5
+                            );
                         }
                     }
-                    vis = Math.min(vis, vis2);
-                    return vis;
                 }
-            }
-        ];
+                vis = Math.min(vis, vis2);
 
-        const samplers: ShaderSamplers = [
-            ...getSamplers(scene),
-            {
-                name: "starfieldTexture",
-                type: SamplerEnumType.TEXTURE,
-                get: () => {
-                    return Assets.STAR_FIELD;
-                }
+                effect.setFloat(StarfieldUniformNames.VISIBILITY, vis);
             }
-        ];
 
-        super("starfield", shaderName, uniforms, samplers, scene);
+            setSamplerUniforms(effect, this.activeCamera, scene);
+            effect.setTexture(StarfieldSamplerNames.STARFIELD_TEXTURE, Assets.STAR_FIELD);
+        });
     }
 }

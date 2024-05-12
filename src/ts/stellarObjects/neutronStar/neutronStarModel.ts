@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { CelestialBodyModel } from "../../architecture/celestialBody";
-import { BodyType, GenerationSteps } from "../../model/common";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { OrbitProperties } from "../../orbit/orbitProperties";
 import { StarPhysicalProperties } from "../../architecture/physicalProperties";
@@ -25,9 +24,11 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { getRgbFromTemperature } from "../../utils/specrend";
 import { getOrbitalPeriod } from "../../orbit/orbit";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
 import { clamp } from "../../utils/math";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { RingsModel } from "../../rings/ringsModel";
+import { BodyType } from "../../architecture/bodyType";
+import { GenerationSteps } from "../../utils/generationSteps";
 
 export class NeutronStarModel implements StellarObjectModel {
     readonly bodyType = BodyType.NEUTRON_STAR;
@@ -44,7 +45,7 @@ export class NeutronStarModel implements StellarObjectModel {
 
     static RING_PROPORTION = 0.02;
 
-    readonly ringsUniforms;
+    readonly rings: RingsModel | null;
 
     readonly parentBody: CelestialBodyModel | null;
 
@@ -80,9 +81,9 @@ export class NeutronStarModel implements StellarObjectModel {
         };
 
         if (uniformRandBool(NeutronStarModel.RING_PROPORTION, this.rng, GenerationSteps.RINGS)) {
-            this.ringsUniforms = new RingsUniforms(this.rng);
+            this.rings = new RingsModel(this.rng);
         } else {
-            this.ringsUniforms = null;
+            this.rings = null;
         }
     }
 

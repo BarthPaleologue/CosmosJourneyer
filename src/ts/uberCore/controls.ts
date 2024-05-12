@@ -21,9 +21,10 @@ import { Transformable } from "../architecture/transformable";
 
 export interface Controls extends Transformable {
     /**
-     * Returns the camera that should be used to display the player
+     * Returns the cameras used by the controls.
+     * Usually, there is only one camera, but in some cases like 3D stereo rendering, there can be multiple cameras.
      */
-    getActiveCamera(): Camera;
+    getActiveCameras(): Camera[];
 
     /**
      * Makes the controller listen to all its inputs and returns the displacement to apply to the player

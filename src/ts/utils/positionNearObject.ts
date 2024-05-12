@@ -99,6 +99,8 @@ export function positionNearObjectWithStarVisible(transformable: Controls, objec
 
     roll(transformable.getTransform(), -Math.PI / 8);
 
-    transformable.getActiveCamera().getViewMatrix(true);
-    transformable.getActiveCamera().getProjectionMatrix(true);
+    transformable.getActiveCameras().forEach((camera) => {
+        camera.getViewMatrix(true);
+        camera.getProjectionMatrix(true);
+    });
 }

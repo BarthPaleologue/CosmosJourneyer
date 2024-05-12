@@ -21,7 +21,6 @@ import { makeNoise3D } from "fast-simplex-noise";
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
     EARTH_RADIUS: 1000e3, // target is 6000e3
-    AU: 150e9, // target is 150e9
 
     /**
      * The distance light travels in one year.
@@ -39,7 +38,32 @@ export const Settings = {
     CHUNK_RENDERING_DISTANCE_MULTIPLIER: 2,
     ENABLE_VOLUMETRIC_CLOUDS: false,
     SEED_HALF_RANGE: 1e4,
+
+    /**
+     * The speed of light in meters per second.
+     */
     C: 299792458,
+
+    /**
+     * The gravitational constant in m^3 kg^-1 s^-2.
+     */
+    G: 6.6743e-11,
+
+    /**
+     * The astronomical unit in meters.
+     */
+    AU: 150e9,
+
+    /**
+     * The mass of the sun in kilograms.
+     */
+    SOLAR_MASS: 1.989e30,
+
+    /**
+     * The radius of the sun in meters.
+     */
+    SOLAR_RADIUS: 696340e3,
+
     FOV: (92 * Math.PI) / 180,
 
     MAIN_FONT: "Nasalization"

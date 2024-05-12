@@ -5,6 +5,7 @@ import { BoundingSphere } from "../architecture/boundingSphere";
 import { TypedObject } from "../architecture/typedObject";
 import { SystemSeed } from "./systemSeed";
 import { StarSystemModel } from "../starSystem/starSystemModel";
+import i18n from "../i18n";
 
 export class SystemTarget implements Transformable, BoundingSphere, TypedObject {
     readonly name: string;
@@ -35,6 +36,6 @@ export class SystemTarget implements Transformable, BoundingSphere, TypedObject 
     }
 
     getTypeName(): string {
-        return "Star system";
+        return i18n.t("objectTypes:starSystem");
     }
 }

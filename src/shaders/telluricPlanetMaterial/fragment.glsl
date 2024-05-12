@@ -30,7 +30,7 @@ varying vec3 vLocalPosition;
 
 uniform mat4 normalMatrix;
 
-uniform vec3 playerPosition;// camera position in world space
+uniform vec3 cameraPosition;// camera position in world space
 uniform float cameraNear;
 uniform float cameraFar;
 
@@ -98,7 +98,7 @@ vec3 saturate(vec3 color) {
 #include "./utils/computeTemperature01.glsl";
 
 void main() {
-    vec3 viewRayW = normalize(playerPosition - vPositionW);// view direction in world space
+    vec3 viewRayW = normalize(cameraPosition - vPositionW);// view direction in world space
 
     vec3 sphereNormalW = vSphereNormalW;
 

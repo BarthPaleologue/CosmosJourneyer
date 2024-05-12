@@ -81,7 +81,7 @@ this.centerOfMassHelper.material = Assets.DebugMaterial("centerOfMassHelper", tr
                     scene
                 );
                 helperLine.scaling.scaleInPlace(5);
-                helperLine.material = Assets.DebugMaterial(`helperLine${child.name}`, true);
+                helperLine.material = Assets.DebugMaterial(`helperLine${child.name}`, true, false, scene);
 
                 helperLine.parent = child;
             } else if (child.name.includes("mainThruster")) {
@@ -98,7 +98,7 @@ this.centerOfMassHelper.material = Assets.DebugMaterial("centerOfMassHelper", tr
                     scene
                 );
                 helperLine.scaling.scaleInPlace(5);
-                helperLine.material = Assets.DebugMaterial(`helperLine${child.name}`, true);
+                helperLine.material = Assets.DebugMaterial(`helperLine${child.name}`, true, false, scene);
 
                 helperLine.parent = child;
             } else {
@@ -217,7 +217,7 @@ targetTorqueLocal.addInPlace(targetTorque2Local).normalize();*/
                 },
                 this.instanceRoot.getScene()
             );
-            this.targetThrustHelper.material = Assets.DebugMaterial("targetThrustHelper", true);
+            this.targetThrustHelper.material = Assets.DebugMaterial("targetThrustHelper", true, false, this.instanceRoot.getScene());
 
             const thrusterConfiguration = getThrusterConfiguration(targetThrustLocal, targetTorqueLocal, this.inverseHoverThrusterMatrix);
             for (let i = 0; i < thrusterConfiguration.length; i++) {

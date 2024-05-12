@@ -16,18 +16,20 @@ If you have an idea for a new feature, please open an issue on the [issue tracke
 
 Pull requests are welcome! If you want to contribute code, please follow these steps:
 
-1. Fork the repository
-2. Create a new branch
-3. Make your changes
-4. Commit your changes
-5. Push your changes
-6. Open a pull request
+1. Get familiar with the project by reading the [architecture document](ARCHITECTURE.md)
+2. Fork the repository
+3. Create a new branch from the `main` branch:
+   ```sh
+   git checkout -b [name_of_your_new_branch]
+   ```
+4. Commit & push your changes
+5. Open a pull request to the `main` branch
 
 You can open a draft pull request if you want to get feedback on your changes before they are ready to be merged.
 
 Pull request are tested against the linter and the unit tests, make sure you run them before opening a pull request.
 
-Code that does not pass the linter or the unit tests will not be merged.
+Code that does not pass the linter or the unit tests will not be merged, but I will help you fix it don't worry.
 
 ## Translation
 
@@ -59,34 +61,4 @@ You only need to replace `fr-FR` with the language code you want to test.
 
 ## Contribution ideas
 
-There is still plenty to do on Cosmos Journeyer. Here are some ideas of contributions you can make (with stars indicating the difficulty of the task):
-
-### Visuals
-
-- Improve the visuals of Neutron Stars to make the cone of the matter jets less visible (⭐⭐)
-- Improve the visuals of Gas Giants to make them look better from closer (⭐⭐)
-- Improve the visuals of the ocean using a separate mesh and FFT for wave generation (⭐⭐⭐)
-- Experiment with volumetric clouds (⭐⭐⭐)
-
-### On-foot exploration
-
-- Add new character animations (using Mixamo for example) (⭐)
-- Make the character animation system more scalable (⭐⭐⭐)
-- Add conditions to asset scattering to avoid grass in desert and at the bottom of the ocean (⭐⭐)
-
-### Space gameplay
-
-- Add a cockpit view for spaceships (⭐⭐⭐)
-- Add new spaceships and space stations (⭐⭐⭐)
-- Add lasers to spaceships (⭐⭐)
-- Add trade missions at space stations (⭐⭐⭐)
-
-### Optimization
-
-- Optimize the volumetric atmosphere rendering (⭐⭐⭐)
-- Optimize the lens flare rendering (⭐⭐)
-
-### Miscellaneous
-
-- Improve WebGPU support (⭐⭐⭐)
-- Improve the documentation (⭐)
+There is still plenty to do on Cosmos Journeyer. You can check the [issue tracker](https://github.com/BarthPaleologue/CosmosJourneyer/issues) for ideas on what to work on.

@@ -18,7 +18,6 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 
 import { OrbitProperties } from "../orbit/orbitProperties";
-import { BodyType, GenerationSteps } from "../model/common";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange, randRangeInt } from "extended-random";
 import { clamp } from "../utils/math";
@@ -27,6 +26,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PlanetModel } from "../architecture/planet";
 import { PlanetPhysicalProperties } from "../architecture/physicalProperties";
 import { CelestialBodyModel } from "../architecture/celestialBody";
+import { BodyType } from "../architecture/bodyType";
+import { GenerationSteps } from "../utils/generationSteps";
 
 export class MandelbulbModel implements PlanetModel {
     readonly bodyType = BodyType.MANDELBULB;
@@ -58,8 +59,8 @@ export class MandelbulbModel implements PlanetModel {
 
         this.parentBody = parentBody ?? null;
 
-        this.power = randRange(1.5, 6.0, this.rng, GenerationSteps.POWER);
-        this.accentColor = new Color3(this.rng(GenerationSteps.ACCENT_COLOR), this.rng(GenerationSteps.ACCENT_COLOR + 10), this.rng(GenerationSteps.ACCENT_COLOR + 20));
+        this.power = randRange(4.0, 8.0, this.rng, GenerationSteps.POWER);
+        this.accentColor = Color3.FromHSV(360 * this.rng(GenerationSteps.ACCENT_COLOR), this.rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5, 0.8);
 
         // Todo: do not hardcode
         let orbitRadius = this.rng(GenerationSteps.ORBIT) * 15e9;

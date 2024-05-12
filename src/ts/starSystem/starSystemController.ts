@@ -33,7 +33,7 @@ import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { SystemSeed } from "../utils/systemSeed";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { OrbitalObject } from "../architecture/orbitalObject";
+import { OrbitalObject, OrbitalObjectUtils } from "../architecture/orbitalObject";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
 import { Planet } from "../architecture/planet";
@@ -208,7 +208,7 @@ export class StarSystemController {
                 object.getTransform().getAbsolutePosition(),
                 Matrix.IdentityReadOnly,
                 this.scene.getTransformMatrix(),
-                this.scene.getActiveCamera().viewport
+                this.scene.getActiveCameras()[0].viewport
             );
 
             if (screenCoordinates.z < 0) continue;
@@ -280,14 +280,12 @@ export class StarSystemController {
      * This method cannot be awaited as its completion depends on the execution of BabylonJS that happens afterward.
      */
     public async initPostProcesses(postProcessManager: PostProcessManager): Promise<void> {
-        const promises: Promise<void>[] = [];
-
         postProcessManager.addStarField(this.stellarObjects, this.celestialBodies, this.universeRotation);
         for (const object of this.celestialBodies) {
             for (const postProcess of object.postProcesses) {
                 switch (postProcess) {
                     case PostProcessType.RING:
-                        promises.push(postProcessManager.addRings(object, this.stellarObjects));
+                        postProcessManager.addRings(object, this.stellarObjects);
                         break;
                     case PostProcessType.ATMOSPHERE:
                         if (!(object instanceof GasPlanet) && !(object instanceof TelluricPlanet))
@@ -296,7 +294,7 @@ export class StarSystemController {
                         break;
                     case PostProcessType.CLOUDS:
                         if (!(object instanceof TelluricPlanet)) throw new Error("Clouds post process can only be added to telluric planets. Source:" + object.name);
-                        promises.push(postProcessManager.addClouds(object as TelluricPlanet, this.stellarObjects));
+                        postProcessManager.addClouds(object as TelluricPlanet, this.stellarObjects);
                         break;
                     case PostProcessType.OCEAN:
                         if (!(object instanceof TelluricPlanet)) throw new Error("Ocean post process can only be added to telluric planets. Source:" + object.name);
@@ -320,7 +318,7 @@ export class StarSystemController {
                         postProcessManager.addMatterJet(object as NeutronStar);
                         break;
                     case PostProcessType.SHADOW:
-                        promises.push(postProcessManager.addShadowCaster(object, this.stellarObjects));
+                        postProcessManager.addShadowCaster(object, this.stellarObjects);
                         break;
                     case PostProcessType.LENS_FLARE:
                         postProcessManager.addLensFlare(object as StellarObject);
@@ -329,10 +327,8 @@ export class StarSystemController {
             }
         }
 
-        return Promise.all(promises).then(() => {
-            postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition));
-            postProcessManager.rebuild();
-        });
+        postProcessManager.setBody(this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition()));
+        postProcessManager.rebuild();
     }
 
     /**
@@ -344,7 +340,7 @@ export class StarSystemController {
      */
     public update(deltaTime: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
         const controller = this.scene.getActiveControls();
-        this.computeNearestOrbitalObject(controller.getActiveCamera().globalPosition);
+        this.computeNearestOrbitalObject(controller.getTransform().getAbsolutePosition());
         this.computeClosestToScreenCenterOrbitalObject();
 
         // The nearest body might have to be treated separatly
@@ -368,7 +364,7 @@ export class StarSystemController {
         // By doing so, their rotation axis on themselves except the fixed one must as well be rotated in the same way.
         // Last but not least, the background starfield must be rotated in the opposite direction to give the impression the moon is rotating.
         if (shouldCompensateRotation) {
-            const dthetaNearest = OrbitalObject.GetRotationAngle(nearestBody, deltaTime);
+            const dthetaNearest = OrbitalObjectUtils.GetRotationAngle(nearestBody, deltaTime);
 
             for (const object of this.orbitalObjects) {
                 const orbit = object.getOrbitProperties();
@@ -392,7 +388,7 @@ export class StarSystemController {
             this.universeRotation.copyFrom(starfieldAdditionalRotation.multiply(this.universeRotation));
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
-            OrbitalObject.UpdateRotation(nearestBody, deltaTime);
+            OrbitalObjectUtils.UpdateRotation(nearestBody, deltaTime);
         }
 
         // TRANSLATION COMPENSATION
@@ -400,7 +396,7 @@ export class StarSystemController {
         // compute what would be its next position if it were to move normally.
         // This gives us a translation vector that we can negate and apply to all other bodies.
         const initialPosition = nearestBody.getTransform().getAbsolutePosition().clone();
-        const newPosition = OrbitalObject.GetNextOrbitalPosition(nearestBody, deltaTime);
+        const newPosition = OrbitalObjectUtils.GetNextOrbitalPosition(nearestBody, deltaTime);
         const nearestBodyDisplacement = newPosition.subtract(initialPosition);
         if (shouldCompensateTranslation) {
             const negatedDisplacement = nearestBodyDisplacement.negate();
@@ -423,8 +419,8 @@ export class StarSystemController {
         for (const object of this.orbitalObjects) {
             if (object === nearestBody) continue;
 
-            OrbitalObject.UpdateOrbitalPosition(object, deltaTime);
-            OrbitalObject.UpdateRotation(object, deltaTime);
+            OrbitalObjectUtils.UpdateOrbitalPosition(object, deltaTime);
+            OrbitalObjectUtils.UpdateRotation(object, deltaTime);
         }
 
         controller.update(deltaTime);
@@ -432,16 +428,16 @@ export class StarSystemController {
         for (const body of this.telluricPlanets) {
             // Meshes with LOD are updated (surface quadtrees)
             body.updateLOD(controller.getTransform().getAbsolutePosition(), chunkForge);
-            body.computeCulling(controller.getActiveCamera());
+            body.computeCulling(controller.getActiveCameras());
         }
 
         for (const object of this.gasPlanets) {
-            object.computeCulling(controller.getActiveCamera());
+            object.computeCulling(controller.getActiveCameras());
         }
 
         for (const object of this.spaceStations) {
             object.updateRings(deltaTime);
-            object.computeCulling(controller.getActiveCamera());
+            object.computeCulling(controller.getActiveCameras());
         }
 
         // floating origin
@@ -452,7 +448,7 @@ export class StarSystemController {
 
     public applyFloatingOrigin() {
         const controller = this.scene.getActiveControls();
-        if (controller.getActiveCamera().globalPosition.length() > 500) {
+        if (controller.getTransform().getAbsolutePosition().length() > 500) {
             const displacementTranslation = controller.getTransform().getAbsolutePosition().negate();
             this.translateEverythingNow(displacementTranslation);
             translate(controller.getTransform(), displacementTranslation);
@@ -461,23 +457,22 @@ export class StarSystemController {
 
     /**
      * Updates the shaders of all the bodies in the system with the given delta time
-     * @param deltaTime The time elapsed in seconds since the last update
+     * @param deltaSeconds The time elapsed in seconds since the last update
      * @param postProcessManager
      */
-    public updateShaders(deltaTime: number, postProcessManager: PostProcessManager) {
-        const controller = this.scene.getActiveControls();
-        const nearestBody = this.getNearestCelestialBody(this.scene.getActiveCamera().globalPosition);
+    public updateShaders(deltaSeconds: number, postProcessManager: PostProcessManager) {
+        const nearestBody = this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition());
 
         for (const planet of this.planets) {
-            planet.updateMaterial(controller.getActiveCamera(), this.stellarObjects, deltaTime);
+            planet.updateMaterial(this.stellarObjects, deltaSeconds);
         }
 
         for (const stellarObject of this.stellarObjects) {
-            if (stellarObject instanceof Star) stellarObject.updateMaterial(deltaTime);
+            if (stellarObject instanceof Star) stellarObject.updateMaterial(deltaSeconds);
         }
 
         postProcessManager.setBody(nearestBody);
-        postProcessManager.update(deltaTime);
+        postProcessManager.update(deltaSeconds);
     }
 
     addSystemTarget(seed: SystemSeed, systemDirection: Vector3, distance: number): SystemTarget {

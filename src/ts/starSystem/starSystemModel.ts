@@ -18,9 +18,10 @@
 import { seededSquirrelNoise } from "squirrel-noise";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 import { Settings } from "../settings";
-import { BodyType } from "../model/common";
 import { generateStarName } from "../utils/starNameGenerator";
 import { SystemSeed } from "../utils/systemSeed";
+import { BodyType } from "../architecture/bodyType";
+import { wheelOfFortune } from "../utils/wheelOfFortune";
 
 const enum GenerationSteps {
     NAME,
@@ -28,7 +29,8 @@ const enum GenerationSteps {
     GENERATE_STARS = 21,
     NB_PLANETS = 30,
     GENERATE_PLANETS = 200,
-    CHOOSE_PLANET_TYPE = 200
+    CHOOSE_PLANET_TYPE = 400,
+    GENERATE_ANOMALIES = 666
 }
 
 export class StarSystemModel {
@@ -89,5 +91,16 @@ export class StarSystemModel {
 
     public getPlanetSeed(index: number) {
         return centeredRand(this.rng, GenerationSteps.GENERATE_PLANETS + index) * Settings.SEED_HALF_RANGE;
+    }
+
+    public getAnomalySeed(index: number) {
+        return centeredRand(this.rng, GenerationSteps.GENERATE_ANOMALIES + index * 100) * Settings.SEED_HALF_RANGE;
+    }
+
+    public getNbAnomalies(): number {
+        return wheelOfFortune(
+            [[0, 0.95], [1, 0.04], [2, 0.01]],
+            this.rng(GenerationSteps.GENERATE_ANOMALIES * 16)
+        );
     }
 }

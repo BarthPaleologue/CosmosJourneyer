@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DefaultControls } from "../defaultController/defaultControls";
+import { DefaultControls } from "../defaultControls/defaultControls";
 
 import starTexture from "../../asset/textures/starParticle.png";
 import blackHoleTexture from "../../asset/textures/blackholeParticleSmall.png";
@@ -24,7 +24,6 @@ import { StarSystemModel } from "../starSystem/starSystemModel";
 import { BuildData, StarSector, vector3ToString } from "./starSector";
 import { StarMapUI } from "./starMapUI";
 import { getStellarTypeString } from "../stellarObjects/common";
-import { BodyType } from "../model/common";
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -58,6 +57,8 @@ import { AudioMasks } from "../audio/audioMasks";
 import { Settings } from "../settings";
 import { parseDistance } from "../utils/parseToStrings";
 import { StarMapInputs } from "../inputs/starMapInputs";
+import i18n from "../i18n";
+import { BodyType } from "../architecture/bodyType";
 
 export class StarMap implements View {
     readonly scene: Scene;
@@ -128,9 +129,9 @@ export class StarMap implements View {
 
         this.controls = new DefaultControls(this.scene);
         this.controls.speed /= 5;
-        this.controls.getActiveCamera().minZ = 0.01;
+        this.controls.getActiveCameras().forEach((camera) => (camera.minZ = 0.01));
 
-        this.controls.getActiveCamera().attachControl();
+        this.controls.getActiveCameras()[0].attachControl();
 
         this.backgroundMusic = new AudioInstance(Assets.STAR_MAP_BACKGROUND_MUSIC, AudioMasks.STAR_MAP_VIEW, 1, false, null);
         AudioManager.RegisterSound(this.backgroundMusic);
@@ -149,7 +150,7 @@ export class StarMap implements View {
             this.focusOnCurrentSystem();
         });
 
-        const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, [this.controls.getActiveCamera()]);
+        const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, this.controls.getActiveCameras());
         pipeline.fxaaEnabled = true;
         pipeline.bloomEnabled = true;
         pipeline.bloomThreshold = 0.0;
@@ -266,11 +267,11 @@ export class StarMap implements View {
 
     private acknowledgeCameraMovement() {
         // floating origin
-        if (this.controls.getActiveCamera().globalPosition.length() > StarMap.FLOATING_ORIGIN_DISTANCE) {
+        if (this.controls.getTransform().getAbsolutePosition().length() > StarMap.FLOATING_ORIGIN_DISTANCE) {
             this.translateCameraBackToOrigin();
         }
 
-        this.cameraPositionToCenter = this.controls.getActiveCamera().globalPosition.subtract(this.starMapCenterPosition);
+        this.cameraPositionToCenter = this.controls.getTransform().getAbsolutePosition().subtract(this.starMapCenterPosition);
         this.currentStarSectorPosition = new Vector3(
             Math.round(this.cameraPositionToCenter.x / StarSector.SIZE),
             Math.round(this.cameraPositionToCenter.y / StarSector.SIZE),
@@ -281,7 +282,7 @@ export class StarMap implements View {
     public translateCameraBackToOrigin() {
         const translationToOrigin = this.controls.getTransform().getAbsolutePosition().negate();
         this.controls.getTransform().position = Vector3.Zero();
-        this.controls.getActiveCamera().getViewMatrix(true);
+        this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
         this.starMapCenterPosition.addInPlace(translationToOrigin);
         for (const mesh of this.scene.meshes) mesh.position.addInPlace(translationToOrigin);
     }
@@ -326,7 +327,7 @@ export class StarMap implements View {
 
         const translation = sectorCoordinates.subtract(this.currentStarSectorPosition).scaleInPlace(StarSector.SIZE);
         translate(this.controls.getTransform(), translation);
-        this.controls.getActiveCamera().getViewMatrix(true);
+        this.controls.getActiveCameras().forEach((camera) => camera.getViewMatrix(true));
         this.acknowledgeCameraMovement();
 
         this.focusOnCurrentSystem(true);
@@ -358,14 +359,18 @@ export class StarMap implements View {
 
             // don't generate star sectors that are not in the frustum
             const bb = StarSector.GetBoundingBox(position, this.starMapCenterPosition);
-            if (!this.controls.getActiveCamera().isInFrustum(bb)) continue;
+            let isInFrustrum = false;
+            this.controls.getActiveCameras().forEach((camera) => {
+                isInFrustrum = isInFrustrum || camera.isInFrustum(bb);
+            });
+            if (!isInFrustrum) continue;
 
             this.registerStarSector(position);
         }
 
         this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * this.controls.speed));
 
-        this.starMapUI.update(this.controls.getActiveCamera());
+        this.starMapUI.update(this.controls.getTransform().getAbsolutePosition());
     }
 
     private buildNextStars(n: number): void {
@@ -470,18 +475,18 @@ export class StarMap implements View {
                 if (this.currentSystemSeed !== null) {
                     const currentInstance = this.seedToInstanceMap.get(this.currentSystemSeed.toString()) as InstancedMesh;
                     const distance = StarMap.StarMapDistanceToLy(Vector3.Distance(currentInstance.getAbsolutePosition(), initializedInstance.getAbsolutePosition()));
-                    text += `Distance: ${parseDistance(distance)}\n`;
+                    text += `${i18n.t("starMap:distance")}: ${parseDistance(distance)}\n`;
                 }
 
                 if (starModel === null) throw new Error("Star model is null!");
 
                 let typeString = "";
-                if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = "Black hole";
-                else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = "Neutron star";
-                else typeString = getStellarTypeString(starModel.stellarType);
-                text += `Type: ${typeString}\n`;
+                if (starModel.bodyType === BodyType.BLACK_HOLE) typeString = i18n.t("objectTypes:blackHole");
+                else if (starModel.bodyType === BodyType.NEUTRON_STAR) typeString = i18n.t("objectTypes:neutronStar");
+                else typeString = i18n.t("objectTypes:star", { stellarType: getStellarTypeString(starModel.stellarType) });
+                text += `${typeString}\n`;
 
-                text += `Planets: ${starSystemModel.getNbPlanets()}\n`;
+                text += `${i18n.t("starMap:planets")}: ${starSystemModel.getNbPlanets()}\n`;
 
                 this.starMapUI.attachUIToMesh(initializedInstance);
                 this.starMapUI.setSelectedSystem({ name: starSystemModel.getName(), text });
@@ -572,7 +577,7 @@ export class StarMap implements View {
 
     public render() {
         this.scene.render();
-        syncCamera(this.controls.getActiveCamera(), this.starMapUI.uiCamera);
+        syncCamera(this.controls.getActiveCameras()[0], this.starMapUI.uiCamera);
         this.starMapUI.scene.render();
     }
 

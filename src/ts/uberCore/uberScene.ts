@@ -17,7 +17,6 @@
 
 import { Scene, ScenePerformancePriority } from "@babylonjs/core/scene";
 import { Controls } from "./controls";
-import { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -35,12 +34,6 @@ export class UberScene extends Scene {
     private activeControls: Controls | null = null;
 
     /**
-     * The depth renderer for the scene.
-     * @private
-     */
-    private depthRenderer: DepthRenderer | null = null;
-
-    /**
      * Creates a new UberScene.
      * @param engine The BabylonJS engine.
      * @param performancePriority The performance priority of the scene (default: ScenePerformancePriority.BackwardCompatible).
@@ -52,39 +45,45 @@ export class UberScene extends Scene {
     }
 
     /**
-     * Returns the depth renderer for the scene. If it does not exist, it throws an error.
-     * @returns The depth renderer.
-     * @throws An error if the depth renderer does not exist.
-     */
-    public getDepthRenderer(): DepthRenderer {
-        if (this.depthRenderer === null) throw new Error("Depth Renderer not initialized");
-        return this.depthRenderer;
-    }
-
-    /**
      * Sets the active controls for the scene. This also sets the active camera of the scene using the active camera of the controls.
      * @param controls The active controls.
      */
     public setActiveControls(controls: Controls) {
         this.activeControls = controls;
-        this.setActiveCamera(controls.getActiveCamera());
+        this.setActiveCameras(controls.getActiveCameras());
     }
 
     /**
-     * Sets the active camera for the scene and the depth renderer. If the depth renderer does not exist, it is created.
-     * @param camera The new active camera.
+     * Sets the active cameras for the scene and the depth renderer. If the depth renderer does not exist, it is created.
+     * @param cameras The new active cameras.
      */
-    public setActiveCamera(camera: Camera) {
-        if (this.activeCamera !== null) this.activeCamera.detachControl();
-        this.activeCamera = camera;
-        camera.attachControl(true);
+    public setActiveCameras(cameras: Camera[]) {
+        if (this.activeCameras !== null) this.activeCameras.forEach((camera) => camera.detachControl());
+        this.activeCameras = cameras;
 
-        // When changing camera, we must also change the active camera of the depth renderer
-        if (this.depthRenderer === null) {
-            this.depthRenderer = this.enableDepthRenderer(null, true, true);
-            this.depthRenderer.clearColor = new Color4(0, 0, 0, 1);
+        if (cameras.length === 1) cameras[0].attachControl(true);
+
+        if (this._depthRenderer === undefined || this._depthRenderer === null) {
+            this._depthRenderer = {};
         }
-        this.depthRenderer.getDepthMap().activeCamera = camera;
+
+        const depthRenderers = Object.values(this._depthRenderer);
+
+        // for each camera, if it has no depth renderer, create one
+        cameras.forEach((camera) => {
+            if (depthRenderers.find((depthRenderer) => depthRenderer.getDepthMap().activeCamera === camera) === undefined) {
+                const depthRenderer = this.enableDepthRenderer(camera, true, true);
+                depthRenderer.clearColor = new Color4(0, 0, 0, 1);
+                depthRenderer.useOnlyInActiveCamera = true;
+            }
+        });
+
+        // for each depth renderer, if its active camera is not in the list of active cameras, disable it
+        depthRenderers.forEach((depthRenderer) => {
+            const camera = depthRenderer.getDepthMap().activeCamera;
+            if (camera === null) throw new Error("Found a depth renderer with no camera attached! Log: " + depthRenderer);
+            depthRenderer.enabled = cameras.includes(camera);
+        });
     }
 
     /**
@@ -101,8 +100,8 @@ export class UberScene extends Scene {
      * Returns the active camera for the scene. If it does not exist, it throws an error.
      * @returns The active camera.
      */
-    public getActiveCamera(): Camera {
-        if (this.activeCamera === null) throw new Error("Camera not set");
-        return this.activeCamera;
+    public getActiveCameras(): Camera[] {
+        if (this.activeCameras === null) throw new Error("No active camera in scene: " + this);
+        return this.activeCameras;
     }
 }

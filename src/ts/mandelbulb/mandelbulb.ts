@@ -23,10 +23,11 @@ import { CelestialBody } from "../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { OrbitProperties } from "../orbit/orbitProperties";
-import { RingsUniforms } from "../postProcesses/rings/ringsUniform";
+import { RingsUniforms } from "../rings/ringsUniform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Cullable } from "../bodies/cullable";
+import { Cullable } from "../utils/cullable";
 import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
+import i18n from "../i18n";
 
 export class Mandelbulb implements CelestialBody, Cullable {
     readonly name: string;
@@ -89,10 +90,10 @@ export class Mandelbulb implements CelestialBody, Cullable {
     }
 
     getTypeName(): string {
-        return "Anomaly";
+        return i18n.t("objectTypes:anomaly");
     }
 
-    computeCulling(camera: Camera): void {
+    computeCulling(cameras: Camera[]): void {
         // do nothing
     }
 

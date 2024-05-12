@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { seededSquirrelNoise } from "squirrel-noise";
-import { GenerationSteps } from "../model/common";
 import { OrbitProperties } from "../orbit/orbitProperties";
 import { getOrbitalPeriod } from "../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -25,6 +24,7 @@ import { OrbitalObjectPhysicalProperties } from "../architecture/physicalPropert
 import { CelestialBodyModel } from "../architecture/celestialBody";
 import { normalRandom } from "extended-random";
 import { clamp } from "../utils/math";
+import { GenerationSteps } from "../utils/generationSteps";
 
 export class SpaceStationModel implements OrbitalObjectModel {
     readonly seed: number;

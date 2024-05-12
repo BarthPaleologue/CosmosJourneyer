@@ -16,12 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import lensFlareFragment from "../../shaders/lensflare.glsl";
-import { UberScene } from "../uberCore/uberScene";
-import { getActiveCameraUniforms, getObjectUniforms, getSamplers } from "./uniforms";
-import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { moveTowards } from "../utils/moveTowards";
 import { Star } from "../stellarObjects/star/star";
@@ -30,6 +26,14 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { StellarObject } from "../architecture/stellarObject";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { Scene } from "@babylonjs/core/scene";
 
 export type LensFlareSettings = {
     visibility: number;
@@ -37,11 +41,13 @@ export type LensFlareSettings = {
     clipPosition: Vector3;
 };
 
-export class LensFlarePostProcess extends UberPostProcess implements ObjectPostProcess {
+export class LensFlarePostProcess extends PostProcess implements ObjectPostProcess {
     readonly settings: LensFlareSettings;
     readonly object: StellarObject;
 
-    constructor(object: StellarObject, scene: UberScene) {
+    private activeCamera: Camera | null = null;
+
+    constructor(object: StellarObject, scene: Scene) {
         const shaderName = "lensflare";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = lensFlareFragment;
@@ -53,69 +59,58 @@ export class LensFlarePostProcess extends UberPostProcess implements ObjectPostP
             clipPosition: new Vector3()
         };
 
-        const uniforms: ShaderUniforms = [
-            ...getObjectUniforms(object),
-            ...getActiveCameraUniforms(scene),
-            {
-                name: "flareColor",
-                type: UniformEnumType.COLOR_3,
-                get: () => {
-                    if (object instanceof Star) return object.model.color;
-                    else return new Color3(1, 1, 1);
-                }
-            },
-            {
-                name: "clipPosition",
-                type: UniformEnumType.VECTOR_3,
-                get: () => {
-                    if (scene.activeCamera === null) throw new Error("no camera");
-                    const clipPosition = Vector3.Project(
-                        object.getTransform().getAbsolutePosition(),
-                        Matrix.IdentityReadOnly,
-                        scene.getTransformMatrix(),
-                        scene.activeCamera.viewport
-                    );
-                    settings.behindCamera = clipPosition.z < 0;
-                    return clipPosition;
-                }
-            },
-            {
-                name: "visibility",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    if (scene.activeCamera === null) throw new Error("no camera");
-                    // send raycast from camera to object and check early intersections
-                    const raycastResult = new PhysicsRaycastResult();
-                    const start = scene.activeCamera.globalPosition;
-                    const end = object.getTransform().getAbsolutePosition();
-                    (scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, raycastResult);
-                    const occulted = raycastResult.hasHit && raycastResult.body?.transformNode !== object.getTransform();
+        const LensFlareUniformNames = {
+            FLARE_COLOR: "flareColor",
+            CLIP_POSITION: "clipPosition",
+            VISIBILITY: "visibility",
+            ASPECT_RATIO: "aspectRatio"
+        };
 
-                    const isNotVisible = occulted || settings.behindCamera;
+        const uniforms: string[] = [...Object.values(ObjectUniformNames), ...Object.values(CameraUniformNames), ...Object.values(LensFlareUniformNames)];
 
-                    if (isNotVisible && settings.visibility > 0) {
-                        settings.visibility = moveTowards(settings.visibility, 0, 0.5);
-                    } else if (!isNotVisible && settings.visibility < 1) {
-                        settings.visibility = moveTowards(settings.visibility, 1, 0.5);
-                    }
+        const samplers: string[] = Object.values(SamplerUniformNames);
 
-                    return settings.visibility;
-                }
-            },
-            {
-                name: "aspectRatio",
-                type: UniformEnumType.FLOAT,
-                get: () => {
-                    return scene.getEngine().getScreenAspectRatio();
-                }
-            }
-        ];
-
-        const samplers: ShaderSamplers = [...getSamplers(scene)];
-
-        super(object.name + "LensFlare", shaderName, uniforms, samplers, scene);
+        super(object.name + "LensFlare", shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = object;
         this.settings = settings;
+
+        this.onActivateObservable.add((camera) => {
+            this.activeCamera = camera;
+        });
+
+        this.onApplyObservable.add((effect) => {
+            if (this.activeCamera === null) {
+                throw new Error("Camera is null");
+            }
+
+            setCameraUniforms(effect, this.activeCamera);
+            setObjectUniforms(effect, object);
+
+            effect.setColor3(LensFlareUniformNames.FLARE_COLOR, object instanceof Star ? object.model.color : new Color3(1, 1, 1));
+
+            const clipPosition = Vector3.Project(object.getTransform().getAbsolutePosition(), Matrix.IdentityReadOnly, scene.getTransformMatrix(), this.activeCamera.viewport);
+            settings.behindCamera = clipPosition.z < 0;
+            effect.setVector3(LensFlareUniformNames.CLIP_POSITION, clipPosition);
+
+            const raycastResult = new PhysicsRaycastResult();
+            const start = this.activeCamera.globalPosition;
+            const end = object.getTransform().getAbsolutePosition();
+            (scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, raycastResult);
+            const occulted = raycastResult.hasHit && raycastResult.body?.transformNode !== object.getTransform();
+
+            const isNotVisible = occulted || settings.behindCamera;
+
+            if (isNotVisible && settings.visibility > 0) {
+                settings.visibility = moveTowards(settings.visibility, 0, 0.5);
+            } else if (!isNotVisible && settings.visibility < 1) {
+                settings.visibility = moveTowards(settings.visibility, 1, 0.5);
+            }
+            effect.setFloat(LensFlareUniformNames.VISIBILITY, settings.visibility);
+
+            effect.setFloat(LensFlareUniformNames.ASPECT_RATIO, scene.getEngine().getScreenAspectRatio());
+
+            setSamplerUniforms(effect, this.activeCamera, scene);
+        });
     }
 }

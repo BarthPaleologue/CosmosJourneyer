@@ -16,17 +16,21 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import shadowFragment from "../../shaders/shadowFragment.glsl";
-import { UberScene } from "../uberCore/uberScene";
-import { UberPostProcess } from "../uberCore/postProcesses/uberPostProcess";
-import { getActiveCameraUniforms, getObjectUniforms, getSamplers, getStellarObjectsUniforms } from "./uniforms";
 import { ObjectPostProcess } from "./objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
-import { SamplerEnumType, ShaderSamplers, ShaderUniforms, UniformEnumType } from "../uberCore/postProcesses/types";
 import { PostProcessType } from "./postProcessTypes";
-import { RingsUniforms } from "./rings/ringsUniform";
-import { Assets } from "../assets";
+import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "../rings/ringsUniform";
 import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
+import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Constants } from "@babylonjs/core/Engines/constants";
+import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { Scene } from "@babylonjs/core/scene";
 
 export type ShadowUniforms = {
     hasRings: boolean;
@@ -34,11 +38,14 @@ export type ShadowUniforms = {
     hasOcean: boolean;
 };
 
-export class ShadowPostProcess extends UberPostProcess implements ObjectPostProcess {
+export class ShadowPostProcess extends PostProcess implements ObjectPostProcess {
     readonly object: CelestialBody;
     readonly shadowUniforms: ShadowUniforms;
+    readonly ringsUniforms: RingsUniforms | null;
 
-    public static async CreateAsync(body: CelestialBody, scene: UberScene, stellarObjects: StellarObject[]): Promise<ShadowPostProcess> {
+    private activeCamera: Camera | null = null;
+
+    constructor(name: string, body: CelestialBody, stellarObjects: StellarObject[], scene: Scene) {
         const shaderName = "shadow";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
@@ -49,75 +56,59 @@ export class ShadowPostProcess extends UberPostProcess implements ObjectPostProc
             hasClouds: body.postProcesses.includes(PostProcessType.CLOUDS),
             hasOcean: body.postProcesses.includes(PostProcessType.OCEAN)
         };
-        const uniforms: ShaderUniforms = [
-            ...getObjectUniforms(body),
-            ...getStellarObjectsUniforms(stellarObjects),
-            ...getActiveCameraUniforms(scene),
-            {
-                name: "star_radiuses",
-                type: UniformEnumType.FLOAT_ARRAY,
-                get: () => stellarObjects.map((star) => star.getBoundingRadius())
-            },
-            {
-                name: "shadowUniforms_hasRings",
-                type: UniformEnumType.BOOL,
-                get: () => {
-                    return shadowUniforms.hasRings;
-                }
-            },
-            {
-                name: "shadowUniforms_hasClouds",
-                type: UniformEnumType.BOOL,
-                get: () => {
-                    return shadowUniforms.hasClouds;
-                }
-            },
-            {
-                name: "shadowUniforms_hasOcean",
-                type: UniformEnumType.BOOL,
-                get: () => {
-                    return shadowUniforms.hasOcean;
-                }
-            }
+
+        const ShadowUniformNames = {
+            STAR_RADIUSES: "star_radiuses",
+            HAS_RINGS: "has_rings",
+            HAS_CLOUDS: "has_clouds",
+            HAS_OCEAN: "has_ocean"
+        };
+
+        const uniforms: string[] = [
+            ...Object.values(ObjectUniformNames),
+            ...Object.values(StellarObjectUniformNames),
+            ...Object.values(CameraUniformNames),
+            ...Object.values(RingsUniformNames),
+            ...Object.values(ShadowUniformNames)
         ];
 
-        if (shadowUniforms.hasRings) {
-            const ringsUniforms = body.getRingsUniforms();
-            if (ringsUniforms === null) throw new Error("shadowUniforms.hasRings is true and yet body.getRingsUniforms() returned null!");
-            uniforms.push(...ringsUniforms.getShaderUniforms());
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
 
-            return ringsUniforms.getShaderSamplers(scene).then((ringSamplers) => {
-                const samplers: ShaderSamplers = [...getSamplers(scene), ...ringSamplers];
-                return new ShadowPostProcess(body.name + "Shadow", body, scene, shaderName, uniforms, samplers, shadowUniforms);
-            });
-        } else {
-            uniforms.push(...RingsUniforms.GetEmptyShaderUniforms());
-            const samplers: ShaderSamplers = [
-                ...getSamplers(scene),
-                {
-                    name: "rings_lut",
-                    type: SamplerEnumType.TEXTURE,
-                    get: () => {
-                        return Assets.EMPTY_TEXTURE;
-                    }
-                }
-            ];
-            return new ShadowPostProcess(body.name + "Shadow", body, scene, shaderName, uniforms, samplers, shadowUniforms);
-        }
-    }
-
-    private constructor(
-        name: string,
-        body: CelestialBody,
-        scene: UberScene,
-        shaderName: string,
-        uniforms: ShaderUniforms,
-        samplers: ShaderSamplers,
-        shadowUniforms: ShadowUniforms
-    ) {
-        super(name, shaderName, uniforms, samplers, scene);
+        super(name, shaderName, uniforms, samplers, 1, null, Texture.BILINEAR_SAMPLINGMODE, scene.getEngine(), false, null, Constants.TEXTURETYPE_HALF_FLOAT);
 
         this.object = body;
         this.shadowUniforms = shadowUniforms;
+        this.ringsUniforms = body.getRingsUniforms();
+
+        this.onActivateObservable.add((camera) => {
+            this.activeCamera = camera;
+        });
+
+        this.onApplyObservable.add((effect) => {
+            if (this.activeCamera === null) {
+                throw new Error("Camera is null");
+            }
+
+            setCameraUniforms(effect, this.activeCamera);
+            setStellarObjectUniforms(effect, stellarObjects);
+            setObjectUniforms(effect, body);
+
+            effect.setFloatArray(
+                ShadowUniformNames.STAR_RADIUSES,
+                stellarObjects.map((star) => star.getBoundingRadius())
+            );
+            effect.setBool(ShadowUniformNames.HAS_RINGS, shadowUniforms.hasRings);
+            effect.setBool(ShadowUniformNames.HAS_CLOUDS, shadowUniforms.hasClouds);
+            effect.setBool(ShadowUniformNames.HAS_OCEAN, shadowUniforms.hasOcean);
+
+            if (this.ringsUniforms === null) {
+                RingsUniforms.SetEmptyUniforms(effect);
+                RingsUniforms.SetEmptySamplers(effect);
+            } else {
+                this.ringsUniforms.setUniforms(effect);
+                this.ringsUniforms.setSamplers(effect);
+            }
+            setSamplerUniforms(effect, this.activeCamera, scene);
+        });
     }
 }

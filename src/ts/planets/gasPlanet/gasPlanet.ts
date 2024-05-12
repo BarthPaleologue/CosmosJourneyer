@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { GasPlanetMaterial } from "./gasPlanetMaterial";
-import { UberScene } from "../../uberCore/uberScene";
 import { GasPlanetModel } from "./gasPlanetModel";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
@@ -33,10 +32,12 @@ import { CelestialBody } from "../../architecture/celestialBody";
 import { OrbitalObject } from "../../architecture/orbitalObject";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { Cullable } from "../../bodies/cullable";
-import { RingsUniforms } from "../../postProcesses/rings/ringsUniform";
+import { Cullable } from "../../utils/cullable";
+import { RingsUniforms } from "../../rings/ringsUniform";
 import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
 import { Transformable } from "../../architecture/transformable";
+import i18n from "../../i18n";
+import { Scene } from "@babylonjs/core/scene";
 
 export class GasPlanet implements Planet, Cullable {
     private readonly mesh: Mesh;
@@ -49,6 +50,8 @@ export class GasPlanet implements Planet, Cullable {
     parent: OrbitalObject | null;
     postProcesses: PostProcessType[] = [];
 
+    readonly ringsUniforms: RingsUniforms | null;
+
     /**
      * New Gas Planet
      * @param name The name of the planet
@@ -56,7 +59,7 @@ export class GasPlanet implements Planet, Cullable {
      * @param parentBody The bodies the planet is orbiting
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      */
-    constructor(name: string, scene: UberScene, model: GasPlanetModel | number, parentBody: CelestialBody | null = null) {
+    constructor(name: string, scene: Scene, model: GasPlanetModel | number, parentBody: CelestialBody | null = null) {
         this.name = name;
 
         this.parent = parentBody;
@@ -90,13 +93,18 @@ export class GasPlanet implements Planet, Cullable {
         this.mesh.material = this.material;
 
         this.postProcesses.push(PostProcessType.ATMOSPHERE, PostProcessType.SHADOW);
-        if (this.model.ringsUniforms !== null) this.postProcesses.push(PostProcessType.RING);
+        if (this.model.rings !== null) {
+            this.postProcesses.push(PostProcessType.RING);
+            this.ringsUniforms = new RingsUniforms(this.model.rings, scene);
+        } else {
+            this.ringsUniforms = null;
+        }
 
         this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }
 
-    updateMaterial(controller: Camera, stellarObjects: Transformable[], deltaTime: number): void {
-        this.material.update(controller, stellarObjects, deltaTime);
+    updateMaterial(stellarObjects: Transformable[], deltaSeconds: number): void {
+        this.material.update(stellarObjects, deltaSeconds);
     }
 
     public getRadius(): number {
@@ -112,15 +120,21 @@ export class GasPlanet implements Planet, Cullable {
     }
 
     getRingsUniforms(): RingsUniforms | null {
-        return this.model.ringsUniforms;
+        return this.ringsUniforms;
     }
 
     getTypeName(): string {
-        return "Gas Planet";
+        return i18n.t("objectTypes:gasPlanet");
     }
 
-    public computeCulling(camera: Camera): void {
-        this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
+    public computeCulling(cameras: Camera[]): void {
+        let isVisible = false;
+        for (const camera of cameras) {
+            isVisible = isVisible || isSizeOnScreenEnough(this, camera);
+        }
+
+        // the mesh is hidden if it is not visible from any camera
+        this.mesh.isVisible = isVisible;
     }
 
     public dispose(): void {
