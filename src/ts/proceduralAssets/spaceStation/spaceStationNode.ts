@@ -21,12 +21,12 @@ import { SpaceStationAssets } from "./spaceStationAssets";
 export class SpaceStationNode {
     type: SpaceStationNodeType;
     mesh: AbstractMesh;
-    previous: SpaceStationNode | null;
+    next: SpaceStationNode | null = null;
     sideNodes: SpaceStationNode[];
 
-    constructor(previous: SpaceStationNode | null, type: SpaceStationNodeType) {
+    constructor(previous: SpaceStationNode | null, type: SpaceStationNodeType, attachmentType: AttachmentType) {
         this.type = type;
-        this.previous = previous;
+        if(previous !== null) previous.next = this;
         this.sideNodes = [];
 
         switch (type) {
@@ -38,18 +38,36 @@ export class SpaceStationNode {
             case SpaceStationNodeType.RING_HABITAT:
                 this.mesh = SpaceStationAssets.RING_HABITAT.createInstance("RingHabitat");
                 this.mesh.scalingDeterminant = 1e3 + (Math.random() - 0.5) * 1e3;
+                break;
+            case SpaceStationNodeType.SOLAR_PANEL:
+                this.mesh = SpaceStationAssets.SOLAR_PANEL.createInstance("SolarPanel");
+                this.mesh.scalingDeterminant = 4;
+                break;
         }
 
         if (previous !== null) {
-            const previousSectionSizeY = previous.mesh.getBoundingInfo().boundingBox.extendSize.y * previous.mesh.scalingDeterminant * previous.mesh.scaling.y;
-            const newSectionY = this.mesh.getBoundingInfo().boundingBox.extendSize.y * this.mesh.scalingDeterminant * this.mesh.scaling.y;
+            if (attachmentType === AttachmentType.NEXT) {
+                const previousSectionSizeY = previous.mesh.getBoundingInfo().boundingBox.extendSize.y * previous.mesh.scalingDeterminant * previous.mesh.scaling.y;
+                const newSectionY = this.mesh.getBoundingInfo().boundingBox.extendSize.y * this.mesh.scalingDeterminant * this.mesh.scaling.y;
 
-            this.mesh.position = previous.mesh.position.add(previous.mesh.up.scale(previousSectionSizeY + newSectionY));
+                this.mesh.position = previous.mesh.position.add(previous.mesh.up.scale(previousSectionSizeY + newSectionY));
+            } else if (attachmentType === AttachmentType.SIDE) {
+                const previousSectionSizeX = previous.mesh.getBoundingInfo().boundingBox.extendSize.x * previous.mesh.scalingDeterminant * previous.mesh.scaling.x;
+                const newSectionX = this.mesh.getBoundingInfo().boundingBox.extendSize.x * this.mesh.scalingDeterminant * this.mesh.scaling.x;
+
+                this.mesh.position = previous.mesh.position.add(previous.mesh.right.scale(previousSectionSizeX + newSectionX));
+            }
         }
     }
 }
 
 export const enum SpaceStationNodeType {
     SQUARE_SECTION,
-    RING_HABITAT
+    RING_HABITAT,
+    SOLAR_PANEL
+}
+
+export const enum AttachmentType {
+    NEXT,
+    SIDE
 }

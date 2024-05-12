@@ -32,7 +32,7 @@ import { computeRingRotationPeriod } from "./utils/ringRotation";
 import { Settings } from "./settings";
 import { sigmoid } from "./utils/math";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { SpaceStationNode, SpaceStationNodeType } from "./proceduralAssets/spaceStation/spaceStationNode";
+import { AttachmentType, SpaceStationNode, SpaceStationNodeType } from "./proceduralAssets/spaceStation/spaceStationNode";
 /*import { ShipControls } from "./spaceship/shipControls";
 import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";*/
@@ -71,13 +71,15 @@ const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.
 camera.attachPostProcess(starfieldPostProcess);
 
 let lastNode: SpaceStationNode | null = null;
+let firstNode: SpaceStationNode | null = null;
 
 let urgeToCreateHabitat = 0;
 for (let i = 0; i < 30; i++) {
     let nodeType = SpaceStationNodeType.SQUARE_SECTION;
     if (Math.random() < sigmoid(urgeToCreateHabitat - 6) && urgeToCreateHabitat > 0) nodeType = SpaceStationNodeType.RING_HABITAT;
 
-    const newNode: SpaceStationNode = new SpaceStationNode(lastNode, nodeType);
+    const newNode: SpaceStationNode = new SpaceStationNode(lastNode, nodeType, AttachmentType.NEXT);
+    if (i === 0) firstNode = newNode;
 
     switch (nodeType) {
         case SpaceStationNodeType.SQUARE_SECTION:
@@ -88,17 +90,26 @@ for (let i = 0; i < 30; i++) {
             break;
     }
 
-    lastNode = newNode
+    if (nodeType === SpaceStationNodeType.SQUARE_SECTION && Math.random() < 0.2) {
+        const sideNode1 = new SpaceStationNode(newNode, SpaceStationNodeType.SOLAR_PANEL, AttachmentType.SIDE);
+        newNode.sideNodes.push(sideNode1);
+
+        const sideNode2 = new SpaceStationNode(newNode, SpaceStationNodeType.SOLAR_PANEL, AttachmentType.SIDE);
+        newNode.sideNodes.push(sideNode2);
+        sideNode2.mesh.rotateAround(newNode.mesh.position, Axis.Y, Math.PI);
+    }
+
+    lastNode = newNode;
 }
 
 function updateStation(stationNode: SpaceStationNode | null, deltaSeconds: number) {
     if (stationNode === null) return;
 
-    if(stationNode.type === SpaceStationNodeType.RING_HABITAT) {
+    if (stationNode.type === SpaceStationNodeType.RING_HABITAT) {
         stationNode.mesh.rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(stationNode.mesh.scalingDeterminant, Settings.G_EARTH));
     }
 
-    updateStation(stationNode.previous, deltaSeconds);
+    updateStation(stationNode.next, deltaSeconds);
     stationNode.sideNodes.forEach((sideNode) => updateStation(sideNode, deltaSeconds));
 }
 
@@ -108,7 +119,7 @@ scene.onBeforeRenderObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;
     defaultControls.update(deltaSeconds);
 
-    updateStation(lastNode, deltaSeconds);
+    updateStation(firstNode, deltaSeconds);
 });
 
 scene.executeWhenReady(() => {
