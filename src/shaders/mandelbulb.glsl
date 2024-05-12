@@ -221,6 +221,10 @@ void main() {
         ndl += max(0.0, dot(normal, starDir));
     }
 
+    if(nbStars == 0) {
+        ndl = 1.0;
+    }
+
     mandelbulbColor.xyz *= clamp(ndl, 0.3, 1.0);
 
     gl_FragColor = mix(mandelbulbColor, screenColor, smoothstep(2.0, 15.0, intersectionDistance));
