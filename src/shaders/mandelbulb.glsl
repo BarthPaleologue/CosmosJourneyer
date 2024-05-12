@@ -23,6 +23,7 @@ varying vec2 vUV;
 
 uniform float power;
 uniform vec3 accentColor;
+uniform float elapsedSeconds;
 
 #include "./utils/stars.glsl";
 
@@ -61,7 +62,7 @@ vec3 palette (float t) {
 // returns the distance to the set on the x coordinate 
 // and the color on the y coordinate
 vec2 sdf(vec3 pos) {
-    float Power = power;
+    float Power = power + 4.0 * sin(elapsedSeconds * 0.1);
     vec3 z = pos;
     float dr = 1.0;
     float r = 0.0;

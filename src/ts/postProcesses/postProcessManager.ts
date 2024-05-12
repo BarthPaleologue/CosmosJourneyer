@@ -136,7 +136,7 @@ export class PostProcessManager {
     /**
      * All post processes that are updated every frame.
      */
-    private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.oceans, this.clouds, this.blackHoles, this.matterJets];
+    private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.oceans, this.clouds, this.blackHoles, this.matterJets, this.mandelbulbs];
 
     /**
      * The color correction post process responsible for tone mapping, saturation, contrast, brightness and gamma.
