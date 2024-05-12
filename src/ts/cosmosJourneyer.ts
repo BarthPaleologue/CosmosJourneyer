@@ -191,9 +191,7 @@ export class CosmosJourneyer {
               })
             : new Engine(canvas, true, {
                   // the preserveDrawingBuffer option is required for the screenshot feature to work
-                  preserveDrawingBuffer: true,
-                  useHighPrecisionMatrix: true,
-                  useHighPrecisionFloats: true
+                  preserveDrawingBuffer: true
               });
 
         engine.useReverseDepthBuffer = true;
