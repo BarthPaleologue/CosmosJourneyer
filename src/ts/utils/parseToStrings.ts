@@ -70,6 +70,8 @@ export function parsePercentageFrom01(percentage01: number): string {
 
 export const Alphabet = "abcdefghijklmnopqrstuvwxyz";
 
+export const GreekAlphabet = "αβγδεζηθικλμνξοπρστυφχψω";
+
 export function starName(baseName: string, index: number): string {
     return `${baseName} ${Alphabet[index].toUpperCase()}`;
 }
