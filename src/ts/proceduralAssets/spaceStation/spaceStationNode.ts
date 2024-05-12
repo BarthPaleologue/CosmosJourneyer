@@ -19,14 +19,21 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { SpaceStationAssets } from "./spaceStationAssets";
 
 export class SpaceStationNode {
-    type: SpaceStationNodeType;
-    mesh: AbstractMesh;
+    readonly type: SpaceStationNodeType;
+    readonly mesh: AbstractMesh;
     next: SpaceStationNode | null = null;
-    sideNodes: SpaceStationNode[];
+    readonly sideNodes: SpaceStationNode[];
+    readonly index: number;
 
     constructor(previous: SpaceStationNode | null, type: SpaceStationNodeType, attachmentType: AttachmentType) {
         this.type = type;
-        if(previous !== null) previous.next = this;
+        if(previous !== null) {
+            previous.next = this;
+            this.index = previous.index + 1;
+        } else {
+            this.index = 0;
+        }
+
         this.sideNodes = [];
 
         switch (type) {

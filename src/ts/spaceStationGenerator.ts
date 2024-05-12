@@ -106,7 +106,7 @@ function updateStation(stationNode: SpaceStationNode | null, deltaSeconds: numbe
     if (stationNode === null) return;
 
     if (stationNode.type === SpaceStationNodeType.RING_HABITAT) {
-        stationNode.mesh.rotate(Axis.Y, deltaSeconds / computeRingRotationPeriod(stationNode.mesh.scalingDeterminant, Settings.G_EARTH));
+        stationNode.mesh.rotate(Axis.Y, (stationNode.index % 2 === 0 ? -1 : 1) * deltaSeconds / computeRingRotationPeriod(stationNode.mesh.scalingDeterminant, Settings.G_EARTH));
     }
 
     updateStation(stationNode.next, deltaSeconds);
