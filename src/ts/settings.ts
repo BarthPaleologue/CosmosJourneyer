@@ -64,6 +64,11 @@ export const Settings = {
      */
     SOLAR_RADIUS: 696340e3,
 
+    /**
+     * The gravitational acceleration in m/s^2.
+     */
+    G_EARTH: 9.81,
+
     FOV: (92 * Math.PI) / 180,
 
     MAIN_FONT: "Nasalization"

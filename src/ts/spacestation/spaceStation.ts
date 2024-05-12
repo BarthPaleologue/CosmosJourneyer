@@ -32,11 +32,12 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { LandingPad } from "../landingPad/landingPad";
 import { PhysicsShapeConvexHull, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { CollisionMask } from "../settings";
+import { CollisionMask, Settings } from "../settings";
 import { CelestialBody } from "../architecture/celestialBody";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { generateSpaceStationName } from "../utils/spaceStationNameGenerator";
 import i18n from "../i18n";
+import { computeRingRotationPeriod } from "../utils/ringRotation";
 
 export class SpaceStation implements OrbitalObject, Cullable {
     readonly name: string;
@@ -133,8 +134,7 @@ export class SpaceStation implements OrbitalObject, Cullable {
             const localPosition = this.ringsLocalPosition[i];
             const ringRadius = this.ringsRadius[i];
 
-            // g = v * v / r and T = 2 * pi * r / v => v = sqrt(g * r) and T = 2 * pi * r / sqrt(g * r) = 2 * pi * sqrt(r / g)
-            const rotationPeriod = 2 * Math.PI * Math.sqrt(ringRadius / 9.81);
+            const rotationPeriod = computeRingRotationPeriod(ringRadius, Settings.G_EARTH);
 
             const clockwise = i % 2 === 0 ? 1 : -1;
 
