@@ -28,10 +28,17 @@ export const StellarObjectUniformNames = {
 };
 
 export function setStellarObjectUniforms(effect: Effect, stellarObjects: Transformable[]): void {
+    effect.setInt(StellarObjectUniformNames.NB_STARS, stellarObjects.length);
+
+    if (stellarObjects.length === 0) {
+        effect.setArray3(StellarObjectUniformNames.STAR_POSITIONS, [0,0,0]);
+        effect.setArray3(StellarObjectUniformNames.STAR_COLORS, [1,1,1]);
+        return;
+    }
+
     effect.setArray3(StellarObjectUniformNames.STAR_POSITIONS, flattenVector3Array(stellarObjects.map((stellarObject) => stellarObject.getTransform().getAbsolutePosition())));
     effect.setArray3(
         StellarObjectUniformNames.STAR_COLORS,
         flattenColor3Array(stellarObjects.map((stellarObject) => (stellarObject instanceof Star ? stellarObject.model.color : Color3.White())))
     );
-    effect.setInt(StellarObjectUniformNames.NB_STARS, stellarObjects.length);
 }
