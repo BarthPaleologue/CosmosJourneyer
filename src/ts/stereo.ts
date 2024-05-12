@@ -81,7 +81,7 @@ function createBlackHole(): TransformNode {
 
 function createMandelbulb(): TransformNode {
     const mandelbulb = new Mandelbulb("bulb", scene, Math.random() * 10000, null);
-    mandelbulb.getTransform().setAbsolutePosition(new Vector3(0, 0, 15));
+    mandelbulb.getTransform().setAbsolutePosition(new Vector3(0, 0, 20));
     mandelbulb.getTransform().scalingDeterminant = 1 / 100e3;
 
     const mandelbulbPP = new MandelbulbPostProcess(mandelbulb, scene, []);
