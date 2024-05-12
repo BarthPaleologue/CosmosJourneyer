@@ -30,7 +30,6 @@ import HavokPhysics from "@babylonjs/havok";
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
 import { PauseMenu } from "./ui/pauseMenu";
 import { StarSystemView } from "./starSystem/starSystemView";
-import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { MainMenu } from "./mainMenu/mainMenu";
 import { SystemSeed } from "./utils/systemSeed";
 import { SaveFileData } from "./saveFile/saveFileData";
@@ -188,13 +187,13 @@ export class CosmosJourneyer {
         }
 
         // Init BabylonJS engine
-        const engine = await EngineFactory.CreateAsync(canvas, {
-            twgslOptions: {
-                wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
-                jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
-            },
-            preserveDrawingBuffer: true,
-            useHighPrecisionFloats: true
+        const engine = new WebGPUEngine(canvas, {
+            antialias: true,
+            audioEngine: true
+        });
+        await engine.initAsync(undefined, {
+            wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
+            jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href
         });
 
         engine.useReverseDepthBuffer = true;
