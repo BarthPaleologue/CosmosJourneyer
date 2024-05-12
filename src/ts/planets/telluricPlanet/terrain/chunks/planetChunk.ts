@@ -24,7 +24,6 @@ import { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/core/Engines/Extensions/engine.query";
 import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { Observable } from "@babylonjs/core/Misc/observable";
 import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";
 import { Assets } from "../../../../assets";
@@ -55,9 +54,6 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
     private readonly parent: TransformNode;
 
     readonly instancePatches: IPatch[] = [];
-
-    readonly onReceiveVertexDataObservable = new Observable<void>();
-    readonly onDisposeObservable = new Observable<void>();
 
     private aggregate: PhysicsAggregate | null = null;
 
@@ -151,8 +147,6 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
 
         this.averageHeight = averageHeight;
 
-        this.onReceiveVertexDataObservable.notifyObservers();
-
         if (instancesMatrixBuffer.length === 0) return;
 
         const rockPatch = new InstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
@@ -204,7 +198,7 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
      * Returns true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
      * @returns true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
      */
-    public isReady() {
+    public isLoaded() {
         return this.loaded;
     }
 
@@ -213,20 +207,16 @@ export class PlanetChunk implements Transformable, BoundingSphere, Cullable {
     }
 
     public dispose() {
-        this.onDisposeObservable.notifyObservers();
-
         this.aggregate?.dispose();
         this.helpers.forEach((helper) => helper.dispose());
         this.instancePatches.forEach((patch) => patch.dispose());
         this.mesh.dispose();
-        this.onReceiveVertexDataObservable.clear();
-        this.onDisposeObservable.clear();
 
         this.disposed = true;
     }
 
     computeCulling(cameras: Camera[]) {
-        if (!this.isReady()) return;
+        if (!this.isLoaded()) return;
 
         let isVisible = false;
 
