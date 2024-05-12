@@ -16,6 +16,13 @@ export class SpaceStationAssets {
             SpaceStationAssets.RING_HABITAT.parent = null;
             SpaceStationAssets.RING_HABITAT.isVisible = false;
 
+            const boundingBox = SpaceStationAssets.RING_HABITAT.getBoundingInfo().boundingBox;
+            const maxDimension = Math.max(boundingBox.extendSize.x, boundingBox.extendSize.y, boundingBox.extendSize.z);
+
+            // the ring must have radius 1
+            SpaceStationAssets.RING_HABITAT.scalingDeterminant = 2 / maxDimension;
+            SpaceStationAssets.RING_HABITAT.bakeCurrentTransformIntoVertices();
+
             console.log("RingHabitat loaded");
         };
 
@@ -24,6 +31,13 @@ export class SpaceStationAssets {
             SpaceStationAssets.SQUARE_SECTION = (task.loadedMeshes[0]).getChildMeshes()[0] as Mesh;
             SpaceStationAssets.SQUARE_SECTION.parent = null;
             SpaceStationAssets.SQUARE_SECTION.isVisible = false;
+
+            const boundingBox = SpaceStationAssets.SQUARE_SECTION.getBoundingInfo().boundingBox;
+            const maxDimension = Math.max(boundingBox.extendSize.x, boundingBox.extendSize.y, boundingBox.extendSize.z);
+
+            // the ring must have radius 1
+            SpaceStationAssets.SQUARE_SECTION.scalingDeterminant = 60 / maxDimension;
+            SpaceStationAssets.SQUARE_SECTION.bakeCurrentTransformIntoVertices();
 
             console.log("SquareSection loaded");
         };
