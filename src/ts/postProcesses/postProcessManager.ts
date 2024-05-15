@@ -487,6 +487,7 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.JULIA_SET:
                     this.renderingPipeline.addEffect(otherJuliaSetsRenderEffect);
+                    break;
                 case PostProcessType.SHADOW:
                     //this.renderingPipeline.addEffect(otherShadowRenderEffect);
                     break;
