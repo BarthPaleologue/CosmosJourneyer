@@ -48,7 +48,7 @@ scene.useRightHandedSystem = true;
 
 await Assets.Init(scene);
 
-const stereoCameras = new StereoCameras(canvas, engine, scene);
+const stereoCameras = new StereoCameras(scene);
 
 const leftEye = stereoCameras.leftEye;
 const rightEye = stereoCameras.rightEye;
@@ -137,6 +137,9 @@ scene.onBeforeRenderObservable.add(() => {
     stereoCameras.getTransform().computeWorldMatrix(true);
     stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
     stereoCameras.getTransform().computeWorldMatrix(true);
+
+    stereoCameras.setDistanceToFocalPlane(Vector3.Distance(stereoCameras.getTransform().getAbsolutePosition(), targetObject.getAbsolutePosition()));
+    stereoCameras.updateCameraProjections();
 
     applyFloatingOrigin();
 });
