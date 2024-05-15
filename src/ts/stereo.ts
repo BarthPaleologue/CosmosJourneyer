@@ -29,12 +29,12 @@ import { BlackHole } from "./stellarObjects/blackHole/blackHole";
 import { Axis, Color4, HemisphericLight, MeshBuilder } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
-import { Mandelbulb } from "./mandelbulb/mandelbulb";
-import { MandelbulbPostProcess } from "./mandelbulb/mandelbulbPostProcess";
+import { Mandelbulb } from "./anomalies/mandelbulb/mandelbulb";
+import { MandelbulbPostProcess } from "./anomalies/mandelbulb/mandelbulbPostProcess";
 import { StereoCameras } from "./utils/stereoCameras";
 import { Scene } from "@babylonjs/core/scene";
-import { JuliaSet } from "./julia/juliaSet";
-import { JuliaSetPostProcess } from "./julia/juliaSetPostProcess";
+import { JuliaSet } from "./anomalies/julia/juliaSet";
+import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;

@@ -15,17 +15,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import mandelbulbFragment from "../../shaders/mandelbulb.glsl";
-import { ObjectPostProcess, UpdatablePostProcess } from "../postProcesses/objectPostProcess";
+import mandelbulbFragment from "../../../shaders/mandelbulb.glsl";
+import { ObjectPostProcess, UpdatablePostProcess } from "../../postProcesses/objectPostProcess";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Mandelbulb } from "./mandelbulb";
-import { StellarObject } from "../architecture/stellarObject";
+import { StellarObject } from "../../architecture/stellarObject";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
-import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "../../postProcesses/uniforms/cameraUniforms";
+import { setStellarObjectUniforms, StellarObjectUniformNames } from "../../postProcesses/uniforms/stellarObjectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Scene } from "@babylonjs/core/scene";

@@ -67,6 +67,8 @@ import { CharacterInputs } from "../characterControls/characterControlsInputs";
 import { DefaultControlsInputs } from "../defaultControls/defaultControlsInputs";
 import i18n from "../i18n";
 import { BodyType } from "../architecture/bodyType";
+import { AnomalyType } from "../anomalies/anomalyType";
+import { Anomaly } from "../anomalies/anomaly";
 
 /**
  * The star system view is the part of Cosmos Journeyer responsible to display the current star system, along with the
@@ -433,7 +435,18 @@ export class StarSystemView implements View {
         // Anomalies
         for (let i = 0; i < systemModel.getNbAnomalies(); i++) {
             console.log("Anomaly:", i + 1, "of", systemModel.getNbAnomalies());
-            const anomaly = StarSystemHelper.MakeMandelbulb(starSystem);
+            const anomalyType = systemModel.getAnomalyType(i);
+            
+            let anomaly: Anomaly;
+            switch (anomalyType) {
+                case AnomalyType.MANDELBULB:
+                    anomaly = StarSystemHelper.MakeMandelbulb(starSystem);
+                    break;
+                case AnomalyType.JULIA_SET:
+                    anomaly = StarSystemHelper.MakeJuliaSet(starSystem);
+                    break;
+            }
+
             anomaly.getTransform().setAbsolutePosition(new Vector3(offset * ++objectIndex, 0, 0));
 
             await wait(timeOut);
