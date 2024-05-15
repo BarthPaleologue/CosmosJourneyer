@@ -26,13 +26,15 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { BlackHolePostProcess } from "./stellarObjects/blackHole/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
-import { Axis, Color4 } from "@babylonjs/core";
+import { Axis, Color4, HemisphericLight, MeshBuilder } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
 import { Mandelbulb } from "./mandelbulb/mandelbulb";
 import { MandelbulbPostProcess } from "./mandelbulb/mandelbulbPostProcess";
 import { StereoCameras } from "./utils/stereoCameras";
 import { Scene } from "@babylonjs/core/scene";
+import { JuliaSet } from "./julia/juliaSet";
+import { JuliaSetPostProcess } from "./julia/juliaSetPostProcess";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -99,7 +101,36 @@ function createMandelbulb(): TransformNode {
     return mandelbulb.getTransform();
 }
 
-const targetObject = createMandelbulb();
+function createJulia(): TransformNode {
+    const julia = new JuliaSet("Julia", scene, Math.random() * 10000, null);
+    julia.getTransform().scalingDeterminant = 1 / 5000e3;
+
+    const juliaPP = new JuliaSetPostProcess(julia, scene, []);
+    leftEye.attachPostProcess(juliaPP);
+    rightEye.attachPostProcess(juliaPP);
+
+    scene.onBeforeRenderObservable.add(() => {
+        const deltaSeconds = engine.getDeltaTime() / 1000;
+        juliaPP.update(deltaSeconds);
+    });
+
+    return julia.getTransform();
+}
+
+let targetObject: TransformNode;
+
+const urlParams = new URLSearchParams(window.location.search);
+const sceneType = urlParams.get("scene");
+
+if(sceneType === "mandelbulb") {
+    targetObject = createMandelbulb();
+} else if(sceneType === "julia") {
+    targetObject = createJulia();
+} else {
+    targetObject = createMandelbulb();
+}
+
+const sun = new HemisphericLight("sun", new Vector3(0.5, 1, 0.5), scene);
 
 stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.2);
 
@@ -120,9 +151,7 @@ document.addEventListener("pointermove", (e) => {
 
     if (mousePressed) {
         stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.001 * mouseDX);
-        stereoCameras.getTransform().computeWorldMatrix(true);
         stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), stereoCameras.getTransform().getDirection(Axis.X), -0.001 * mouseDY);
-        stereoCameras.getTransform().computeWorldMatrix(true);
 
         applyFloatingOrigin();
     }
