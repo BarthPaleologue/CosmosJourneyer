@@ -47,8 +47,7 @@ uniform sampler2D depthSampler;
 #define MARCHINGSTEP 1.0
 #define EPSILON 0.001
 
-#define MAXMANDELBROTDIST 3.0
-#define MANDELBROTSTEPS 15
+#define SDF_STEPS 15
 
 // cosine based palette, 4 vec3 params
 vec3 cosineColor(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
@@ -58,37 +57,36 @@ vec3 palette (float t) {
     return cosineColor(t, vec3(0.5, 0.5, 0.5), vec3(0.5, 0.5, 0.5), vec3(0.07, 0.07, 0.07), accentColor);
 }
 
-// distance estimator to a mandelbulb set
-// returns the distance to the set on the x coordinate 
-// and the color on the y coordinate
-vec2 sdf(vec3 pos) {
-    float Power = power + 4.0 * sin(elapsedSeconds * 0.1);
-    vec3 z = pos;
-    float dr = 1.0;
-    float r = 0.0;
-    for (int i = 0; i < MANDELBROTSTEPS; i++) {
-        r = length(z);
-        if (r > MAXMANDELBROTDIST) break;
+vec2 sdf(vec3 pos)
+{
+    float t = elapsedSeconds / 3.0;
+    
+	vec4 c = 0.5*vec4(cos(t),cos(t*1.1),cos(t*2.3),cos(t*3.1));
+    vec4 z = vec4(pos, 0.0 );
+	vec4 nz;
+    
+	float md2 = 1.0;
+	float mz2 = dot(z,z);
 
-        // convert to polar coordinates
-        float theta = acos(z.z / r);
-        float phi = atan(z.y, z.x);
-        dr = pow(r, Power - 1.0) * Power * dr + 1.0;
+	for(int i=0;i<SDF_STEPS;i++)
+	{
+		md2*=4.0*mz2;
+	    nz.x=z.x*z.x-dot(z.yzw,z.yzw);
+		nz.yzw=2.0*z.x*z.yzw;
+		z=nz+c;
 
-        // scale and rotate the point
-        float zr = pow(r, Power);
-        theta *= Power;
-        phi *= Power;
+		mz2 = dot(z,z);
+		if(mz2>4.0)
+        {
+			break;
+        }
+	}
 
-        // convert back to cartesian coordinates
-        z = zr * vec3(sin(theta) * cos(phi), sin(phi) * sin(theta), cos(theta));
-        z += pos;
-    }
+    float colorIndex = 50.0 * pow(md2, 0.128 / float(MARCHINGITERATIONS));
 
-    float distance = 0.5 * log(r) * r / dr;
-    float colorIndex = 50.0 * pow(dr, 0.128 / float(MARCHINGITERATIONS));
+    float distance = 0.25*sqrt(mz2/md2)*log(mz2);
 
-    return vec2(distance, colorIndex);
+	return vec2(distance, colorIndex);
 }
 
 // TRACING A PATH : 
@@ -107,6 +105,10 @@ vec2 rayMarch(vec3 origin, vec3 ray, out float steps) {
         depth += MARCHINGSTEP * dist.x;
         c += dist.y;
         steps++;
+
+        if(depth > 15.0) {
+            break;
+        }
     }
 
     return vec2(depth, c);
@@ -140,16 +142,16 @@ void main() {
     origin *= inverseScaling;
 
     float steps;
-    vec2 mandelDepth = rayMarch(origin, rayDir, steps);
+    vec2 juliaDepthAndIndex = rayMarch(origin, rayDir, steps);
 
-    float realDepth = impactPoint + mandelDepth.x / inverseScaling;
+    float realDepth = impactPoint + juliaDepthAndIndex.x / inverseScaling;
 
     if (maximumDistance < realDepth) {
         gl_FragColor = screenColor;
         return;
     }
 
-    vec3 intersectionPoint = origin + mandelDepth.x * rayDir;
+    vec3 intersectionPoint = origin + juliaDepthAndIndex.x * rayDir;
 
     // compute normal and anti-aliasing at the same time
     vec3 p = intersectionPoint;
@@ -161,14 +163,14 @@ void main() {
     vec2 z1 = sdf(vec3(p.x, p.y, p.z + delta));
     vec2 z2 = sdf(vec3(p.x, p.y, p.z - delta));
 
-    mandelDepth += x1 + x2 + y1 + y2 + z1 + z2;
-    mandelDepth /= 7.0;
+    juliaDepthAndIndex += x1 + x2 + y1 + y2 + z1 + z2;
+    juliaDepthAndIndex /= 7.0;
 
-    intersectionPoint = origin + mandelDepth.x * rayDir;
+    intersectionPoint = origin + juliaDepthAndIndex.x * rayDir;
 
     float intersectionDistance = length(intersectionPoint);
 
-    vec4 mandelbulbColor = vec4(palette(mandelDepth.y), 1.0);
+    vec4 juliaColor = vec4(palette(juliaDepthAndIndex.y), 1.0);
 
     float ao = steps * 0.01;
     ao = 1.0 - ao / (ao + 0.5);// reinhard
@@ -176,7 +178,7 @@ void main() {
     const float contrast_mid_level = 0.5;
     ao = contrast(ao, contrast_offset, contrast_mid_level);
 
-    mandelbulbColor.xyz *= ao * 2.0;
+    juliaColor.xyz *= ao * 2.0;
 
     vec3 normal = normalize(vec3(
         x1.x - x2.x,
@@ -193,8 +195,8 @@ void main() {
         ndl = 1.0;
     }
 
-    mandelbulbColor.xyz *= clamp(ndl, 0.3, 1.0);
+    juliaColor.xyz *= clamp(ndl, 0.3, 1.0);
 
-    gl_FragColor = mix(mandelbulbColor, screenColor, smoothstep(2.0, 15.0, intersectionDistance));
+    gl_FragColor = mix(juliaColor, screenColor, smoothstep(2.0, 15.0, intersectionDistance));
 
 }
