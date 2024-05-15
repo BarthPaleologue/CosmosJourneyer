@@ -37,31 +37,35 @@ export class StereoCameras implements Transformable {
      */
     private eyeTrackingRightPosition = Vector3.Zero();
 
+    private readonly scene: Scene;
+
     constructor(scene: Scene) {
         // This transform will be used as the parent of both eyes
         this.transform = new TransformNode("HeadTransform", scene);
 
         // left eye is on the left
-        this.leftEye = new FreeCamera("LeftEye", new Vector3(this.defaultIPD / 2, 0, 0), scene);
+        this.leftEye = new FreeCamera("LeftEye", new Vector3(-this.defaultIPD / 2, 0, 0), scene);
         this.leftEye.viewport = new Viewport(0, 0.0, 0.5, 1);
         this.leftEye.fov = Tools.ToRadians(90);
         this.leftEye.minZ = 0.01;
         this.leftEye.parent = this.transform;
         this.leftEye.onProjectionMatrixChangedObservable.add(() => {
-            const cameraOffset = !this.useEyeTracking ? new Vector3(this.defaultIPD / 2, 0, this.defaultDistanceToScreen) : this.eyeTrackingLeftPosition;
+            const cameraOffset = !this.useEyeTracking ? new Vector3(-this.defaultIPD / 2, 0, this.defaultDistanceToScreen) : this.eyeTrackingLeftPosition;
             this.updateCameraProjection(this.leftEye, cameraOffset);
         });
 
         // right eye is on the right
-        this.rightEye = new FreeCamera("RightEye", new Vector3(-this.defaultIPD / 2, 0, 0), scene);
+        this.rightEye = new FreeCamera("RightEye", new Vector3(this.defaultIPD / 2, 0, 0), scene);
         this.rightEye.viewport = new Viewport(0.5, 0, 0.5, 1);
         this.rightEye.fov = Tools.ToRadians(90);
         this.rightEye.minZ = 0.01;
         this.rightEye.parent = this.transform;
         this.rightEye.onProjectionMatrixChangedObservable.add(() => {
-            const cameraOffset = !this.useEyeTracking ? new Vector3(-this.defaultIPD / 2, 0, this.defaultDistanceToScreen) : this.eyeTrackingRightPosition;
+            const cameraOffset = !this.useEyeTracking ? new Vector3(this.defaultIPD / 2, 0, this.defaultDistanceToScreen) : this.eyeTrackingRightPosition;
             this.updateCameraProjection(this.rightEye, cameraOffset);
         });
+
+        this.scene = scene;
     }
 
     /**
@@ -80,7 +84,12 @@ export class StereoCameras implements Transformable {
 
         camera.position.x = cameraOffset.x;
         camera.position.y = cameraOffset.y;
-        camera.position.z = Math.abs(cameraOffset.z);
+        camera.position.z = -Math.abs(cameraOffset.z);
+
+        if(this.scene.useRightHandedSystem) {
+            camera.position.x *= -1;
+            camera.position.z *= -1;
+        }
 
         // the distance to the focal plane is the distance of the eye to the screen plane
         const distanceToFocalPlane = Math.abs(camera.position.z);
@@ -89,7 +98,7 @@ export class StereoCameras implements Transformable {
 
         const projectionMatrix = Matrix.PerspectiveFovLH(camera.fov, aspectRatio, camera.minZ, camera.maxZ, engine.isNDCHalfZRange, camera.projectionPlaneTilt, engine.useReverseDepthBuffer);
         if (this.useOffAxisProjection) {
-            projectionMatrix.addAtIndex(8, -cameraOffset.x / (this.screenHalfHeight * aspectRatio));
+            projectionMatrix.addAtIndex(8, cameraOffset.x / (this.screenHalfHeight * aspectRatio));
             projectionMatrix.addAtIndex(9, cameraOffset.y / this.screenHalfHeight);
         }
         camera._projectionMatrix.copyFrom(projectionMatrix);

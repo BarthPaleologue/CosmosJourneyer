@@ -18,7 +18,7 @@
 import "../styles/index.scss";
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Engine } from "@babylonjs/core/Engines/engine";
+import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import "@babylonjs/core/Materials/standardMaterial";
 import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Misc/screenshotTools";
@@ -26,8 +26,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { BlackHolePostProcess } from "./stellarObjects/blackHole/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
-import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Axis, Color4, MeshBuilder } from "@babylonjs/core";
+import { Axis, Color4 } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
 import { Mandelbulb } from "./mandelbulb/mandelbulb";
@@ -45,7 +44,9 @@ canvas.addEventListener("click", e => {
     }
 }, false);
 
-const engine = new Engine(canvas, true);
+const engine = await EngineFactory.CreateAsync(canvas, {
+    antialias: true
+});
 engine.useReverseDepthBuffer = true;
 engine.displayLoadingUI();
 
@@ -84,7 +85,6 @@ function createBlackHole(): TransformNode {
 
 function createMandelbulb(): TransformNode {
     const mandelbulb = new Mandelbulb("bulb", scene, Math.random() * 10000, null);
-    mandelbulb.getTransform().setAbsolutePosition(new Vector3(0, 0, 0));
     mandelbulb.getTransform().scalingDeterminant = 1 / 5000e3;
 
     const mandelbulbPP = new MandelbulbPostProcess(mandelbulb, scene, []);
@@ -138,7 +138,7 @@ document.addEventListener("keydown", e => {
     }
 });
 
-// Create WebSocket connection.
+// Create WebSocket connection to retrieve the eye positions
 const port = 4242;
 const socket = new WebSocket(`ws://localhost:${port}`);
 
@@ -149,7 +149,6 @@ socket.addEventListener("open", () => {
     stereoCameras.setEyeTrackingEnabled(true);
 });
 
-// Listen for messages
 socket.addEventListener("message", async (event) => {
     const blob = event.data as Blob;
 
@@ -172,13 +171,11 @@ scene.onBeforeRenderObservable.add(() => {
     stereoCameras.setDefaultIPD(eyeDistance);
 
     const averageEyePosition = leftEyePosition.add(rightEyePosition).scaleInPlace(0.5);
-    averageEyePosition.x *= -1; // right handed system
-    averageEyePosition.z *= -1; // same
 
     const trueEyeDistance = Math.abs(leftEyePosition.x - rightEyePosition.x);
 
-    leftEyePosition.copyFrom(averageEyePosition.add(new Vector3(trueEyeDistance * 0.5, 0, 0)));
-    rightEyePosition.copyFrom(averageEyePosition.add(new Vector3(-trueEyeDistance * 0.5, 0, 0)));
+    leftEyePosition.copyFrom(averageEyePosition.add(new Vector3(-trueEyeDistance * 0.5 * ipdFactor, 0, 0)));
+    rightEyePosition.copyFrom(averageEyePosition.add(new Vector3(trueEyeDistance * 0.5 * ipdFactor, 0, 0)));
     stereoCameras.setEyeTrackingPositions(leftEyePosition, rightEyePosition);
 
     stereoCameras.updateCameraProjections();
