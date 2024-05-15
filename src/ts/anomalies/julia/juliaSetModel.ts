@@ -17,17 +17,17 @@
 
 import { seededSquirrelNoise } from "squirrel-noise";
 
-import { OrbitProperties } from "../orbit/orbitProperties";
+import { OrbitProperties } from "../../orbit/orbitProperties";
 import { normalRandom, randRangeInt } from "extended-random";
-import { clamp } from "../utils/math";
-import { getOrbitalPeriod, getPeriapsis } from "../orbit/orbit";
+import { clamp } from "../../utils/math";
+import { getOrbitalPeriod, getPeriapsis } from "../../orbit/orbit";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PlanetModel } from "../architecture/planet";
-import { PlanetPhysicalProperties } from "../architecture/physicalProperties";
-import { CelestialBodyModel } from "../architecture/celestialBody";
-import { BodyType } from "../architecture/bodyType";
-import { GenerationSteps } from "../utils/generationSteps";
-import { wheelOfFortune } from "../utils/wheelOfFortune";
+import { PlanetModel } from "../../architecture/planet";
+import { PlanetPhysicalProperties } from "../../architecture/physicalProperties";
+import { CelestialBodyModel } from "../../architecture/celestialBody";
+import { BodyType } from "../../architecture/bodyType";
+import { GenerationSteps } from "../../utils/generationSteps";
+import { wheelOfFortune } from "../../utils/wheelOfFortune";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export class JuliaSetModel implements PlanetModel {
@@ -58,7 +58,7 @@ export class JuliaSetModel implements PlanetModel {
         this.radius = 1000e3;
 
         this.parentBody = parentBody ?? null;
-        
+
         this.accentColor = Color3.FromHSV(360 * this.rng(GenerationSteps.ACCENT_COLOR), this.rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5, 0.8);
 
         // Todo: do not hardcode
@@ -84,7 +84,13 @@ export class JuliaSetModel implements PlanetModel {
             pressure: 0
         };
 
-        this.nbMoons = wheelOfFortune([[0, 0.95], [1, 0.5]], this.rng(GenerationSteps.NB_MOONS));
+        this.nbMoons = wheelOfFortune(
+            [
+                [0, 0.95],
+                [1, 0.5]
+            ],
+            this.rng(GenerationSteps.NB_MOONS)
+        );
     }
 
     getApparentRadius(): number {

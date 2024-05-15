@@ -25,7 +25,7 @@ import { UberScene } from "../uberCore/uberScene";
 import { SpaceStation } from "../spacestation/spaceStation";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { Mandelbulb } from "../mandelbulb/mandelbulb";
+import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
 import { StarSystemModel } from "./starSystemModel";
 import { rotateAround, translate } from "../uberCore/transforms/basicTransform";
 import { Star } from "../stellarObjects/star/star";
@@ -38,6 +38,8 @@ import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
 import { Planet } from "../architecture/planet";
 import { SystemTarget } from "../utils/systemTarget";
+import { JuliaSet } from "../anomalies/julia/juliaSet";
+import { Anomaly } from "../anomalies/anomaly";
 
 export class StarSystemController {
     readonly scene: UberScene;
@@ -71,9 +73,9 @@ export class StarSystemController {
     readonly gasPlanets: GasPlanet[] = [];
 
     /**
-     * The list of all mandelbulbs in the system
+     * The list of all anomalies in the system
      */
-    readonly mandelbulbs: Mandelbulb[] = [];
+    readonly anomalies: Anomaly[] = [];
 
     /**
      * The list of all system targets in the system
@@ -127,8 +129,20 @@ export class StarSystemController {
     public addMandelbulb(mandelbulb: Mandelbulb): Mandelbulb {
         this.orbitalObjects.push(mandelbulb);
         this.celestialBodies.push(mandelbulb);
-        this.mandelbulbs.push(mandelbulb);
+        this.anomalies.push(mandelbulb);
         return mandelbulb;
+    }
+
+    /**
+     * Adds a Julia set to the system and returns it
+     * @param juliaSet The julia set to add to the system
+     * @returns The julia set added to the system
+     */
+    public addJuliaSet(juliaSet: JuliaSet): JuliaSet {
+        this.orbitalObjects.push(juliaSet);
+        this.celestialBodies.push(juliaSet);
+        this.anomalies.push(juliaSet);
+        return juliaSet;
     }
 
     /**
@@ -308,6 +322,10 @@ export class StarSystemController {
                     case PostProcessType.MANDELBULB:
                         if (!(object instanceof Mandelbulb)) throw new Error("Mandelbulb post process can only be added to mandelbulbs. Source:" + object.name);
                         postProcessManager.addMandelbulb(object as Mandelbulb, this.stellarObjects);
+                        break;
+                    case PostProcessType.JULIA_SET:
+                        if (!(object instanceof JuliaSet)) throw new Error("Julia set post process can only be added to julia sets. Source:" + object.name);
+                        postProcessManager.addJuliaSet(object as JuliaSet, this.stellarObjects);
                         break;
                     case PostProcessType.BLACK_HOLE:
                         if (!(object instanceof BlackHole)) throw new Error("Black hole post process can only be added to black holes. Source:" + object.name);
@@ -503,6 +521,6 @@ export class StarSystemController {
         this.planets.length = 0;
         this.telluricPlanets.length = 0;
         this.gasPlanets.length = 0;
-        this.mandelbulbs.length = 0;
+        this.anomalies.length = 0;
     }
 }

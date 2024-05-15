@@ -22,6 +22,7 @@ import { generateStarName } from "../utils/starNameGenerator";
 import { SystemSeed } from "../utils/systemSeed";
 import { BodyType } from "../architecture/bodyType";
 import { wheelOfFortune } from "../utils/wheelOfFortune";
+import { AnomalyType } from "../anomalies/anomalyType";
 
 const enum GenerationSteps {
     NAME,
@@ -97,9 +98,18 @@ export class StarSystemModel {
         return centeredRand(this.rng, GenerationSteps.GENERATE_ANOMALIES + index * 100) * Settings.SEED_HALF_RANGE;
     }
 
+    public getAnomalyType(index: number): AnomalyType {
+        if (uniformRandBool(0.5, this.rng, GenerationSteps.GENERATE_ANOMALIES + index * 300)) return AnomalyType.MANDELBULB;
+        return AnomalyType.JULIA_SET;
+    }
+
     public getNbAnomalies(): number {
         return wheelOfFortune(
-            [[0, 0.95], [1, 0.04], [2, 0.01]],
+            [
+                [0, 0.95],
+                [1, 0.04],
+                [2, 0.01]
+            ],
             this.rng(GenerationSteps.GENERATE_ANOMALIES * 16)
         );
     }

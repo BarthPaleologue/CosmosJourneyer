@@ -18,7 +18,7 @@ export class StereoCameras implements Transformable {
      * @private
      */
     private defaultIPD = 0.065;
-    
+
     private defaultDistanceToScreen = 0.8;
 
     private screenHalfHeight = 0.17;
@@ -70,7 +70,7 @@ export class StereoCameras implements Transformable {
 
     /**
      * Updates the projection matrices of the cameras with off-axis projection
-     * @param camera 
+     * @param camera
      * @param cameraOffset The camera position in local space
      */
     private updateCameraProjection(camera: Camera, cameraOffset: Vector3) {
@@ -86,7 +86,7 @@ export class StereoCameras implements Transformable {
         camera.position.y = cameraOffset.y;
         camera.position.z = -Math.abs(cameraOffset.z);
 
-        if(this.scene.useRightHandedSystem) {
+        if (this.scene.useRightHandedSystem) {
             camera.position.x *= -1;
             camera.position.z *= -1;
         }
@@ -96,14 +96,22 @@ export class StereoCameras implements Transformable {
 
         camera.fov = 2 * Math.atan(this.screenHalfHeight / distanceToFocalPlane);
 
-        const projectionMatrix = Matrix.PerspectiveFovLH(camera.fov, aspectRatio, camera.minZ, camera.maxZ, engine.isNDCHalfZRange, camera.projectionPlaneTilt, engine.useReverseDepthBuffer);
+        const projectionMatrix = Matrix.PerspectiveFovLH(
+            camera.fov,
+            aspectRatio,
+            camera.minZ,
+            camera.maxZ,
+            engine.isNDCHalfZRange,
+            camera.projectionPlaneTilt,
+            engine.useReverseDepthBuffer
+        );
         if (this.useOffAxisProjection) {
             projectionMatrix.addAtIndex(8, cameraOffset.x / (this.screenHalfHeight * aspectRatio));
             projectionMatrix.addAtIndex(9, cameraOffset.y / this.screenHalfHeight);
         }
         camera._projectionMatrix.copyFrom(projectionMatrix);
     }
-    
+
     setEyeTrackingEnabled(useEyeTracking: boolean) {
         this.useEyeTracking = useEyeTracking;
     }
@@ -124,7 +132,6 @@ export class StereoCameras implements Transformable {
         this.eyeTrackingLeftPosition = leftEyePosition;
         this.eyeTrackingRightPosition = rightEyePosition;
     }
-
 
     /**
      * Set the distance between the two cameras in meters (IPD)
