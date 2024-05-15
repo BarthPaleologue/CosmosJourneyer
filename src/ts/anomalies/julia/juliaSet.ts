@@ -35,7 +35,7 @@ export class JuliaSet implements Anomaly, Cullable {
     readonly name: string;
 
     readonly model: JuliaSetModel;
-    
+
     readonly anomalyType = AnomalyType.JULIA_SET;
 
     private readonly transform: TransformNode;

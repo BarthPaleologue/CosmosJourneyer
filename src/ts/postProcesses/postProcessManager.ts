@@ -140,8 +140,18 @@ export class PostProcessManager {
     private readonly lensFlares: LensFlarePostProcess[] = [];
 
     private readonly objectPostProcesses: PostProcess[][] = [
-        this.volumetricLights, this.oceans, this.clouds, this.atmospheres, this.rings, this.mandelbulbs, this.juliaSets, this.blackHoles, this.matterJets, this.shadows, this.lensFlares
-    ]
+        this.volumetricLights,
+        this.oceans,
+        this.clouds,
+        this.atmospheres,
+        this.rings,
+        this.mandelbulbs,
+        this.juliaSets,
+        this.blackHoles,
+        this.matterJets,
+        this.shadows,
+        this.lensFlares
+    ];
 
     /**
      * All post processes that are updated every frame.
@@ -559,14 +569,14 @@ export class PostProcessManager {
     public reset() {
         // disposing on every camera is necessary because BabylonJS only detaches the post-processes from a single camera at a time
         this.scene.cameras.forEach((camera) => {
-            this.objectPostProcesses.forEach(postProcessList => {
-                postProcessList.forEach(postProcess => {
+            this.objectPostProcesses.forEach((postProcessList) => {
+                postProcessList.forEach((postProcess) => {
                     postProcess.dispose(camera);
                 });
             });
         });
 
-        this.objectPostProcesses.forEach(postProcessList => {
+        this.objectPostProcesses.forEach((postProcessList) => {
             postProcessList.length = 0;
         });
     }

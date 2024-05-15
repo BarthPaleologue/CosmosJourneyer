@@ -35,7 +35,7 @@ export class Mandelbulb implements Anomaly, Cullable {
     readonly name: string;
 
     readonly model: MandelbulbModel;
-    
+
     readonly anomalyType = AnomalyType.MANDELBULB;
 
     private readonly transform: TransformNode;

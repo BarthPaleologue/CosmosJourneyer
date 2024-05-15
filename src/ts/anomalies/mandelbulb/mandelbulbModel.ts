@@ -86,7 +86,13 @@ export class MandelbulbModel implements PlanetModel {
             pressure: 0
         };
 
-        this.nbMoons = wheelOfFortune([[0, 0.95], [1, 0.5]], this.rng(GenerationSteps.NB_MOONS));
+        this.nbMoons = wheelOfFortune(
+            [
+                [0, 0.95],
+                [1, 0.5]
+            ],
+            this.rng(GenerationSteps.NB_MOONS)
+        );
     }
 
     getApparentRadius(): number {

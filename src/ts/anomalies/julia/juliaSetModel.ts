@@ -58,7 +58,7 @@ export class JuliaSetModel implements PlanetModel {
         this.radius = 1000e3;
 
         this.parentBody = parentBody ?? null;
-        
+
         this.accentColor = Color3.FromHSV(360 * this.rng(GenerationSteps.ACCENT_COLOR), this.rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5, 0.8);
 
         // Todo: do not hardcode
@@ -84,7 +84,13 @@ export class JuliaSetModel implements PlanetModel {
             pressure: 0
         };
 
-        this.nbMoons = wheelOfFortune([[0, 0.95], [1, 0.5]], this.rng(GenerationSteps.NB_MOONS));
+        this.nbMoons = wheelOfFortune(
+            [
+                [0, 0.95],
+                [1, 0.5]
+            ],
+            this.rng(GenerationSteps.NB_MOONS)
+        );
     }
 
     getApparentRadius(): number {

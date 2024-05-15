@@ -39,12 +39,16 @@ import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-canvas.addEventListener("click", e => {
-    canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
-    if (canvas.requestPointerLock) {
-        canvas.requestPointerLock();
-    }
-}, false);
+canvas.addEventListener(
+    "click",
+    (e) => {
+        canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
+        if (canvas.requestPointerLock) {
+            canvas.requestPointerLock();
+        }
+    },
+    false
+);
 
 const engine = await EngineFactory.CreateAsync(canvas, {
     antialias: true
@@ -122,9 +126,9 @@ let targetObject: TransformNode;
 const urlParams = new URLSearchParams(window.location.search);
 const sceneType = urlParams.get("scene");
 
-if(sceneType === "mandelbulb") {
+if (sceneType === "mandelbulb") {
     targetObject = createMandelbulb();
-} else if(sceneType === "julia") {
+} else if (sceneType === "julia") {
     targetObject = createJulia();
 } else {
     targetObject = createMandelbulb();
@@ -159,7 +163,7 @@ document.addEventListener("pointermove", (e) => {
 
 let ipdFactor = 1.0;
 const defaultIPD = 0.065;
-document.addEventListener("keydown", e => {
+document.addEventListener("keydown", (e) => {
     if (e.key === "+") {
         ipdFactor += 0.1;
     } else if (e.key === "-") {
@@ -196,7 +200,7 @@ scene.onBeforeRenderObservable.add(() => {
     stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
     stereoCameras.getTransform().computeWorldMatrix(true);
 
-    const eyeDistance = defaultIPD * ipdFactor
+    const eyeDistance = defaultIPD * ipdFactor;
     stereoCameras.setDefaultIPD(eyeDistance);
 
     const averageEyePosition = leftEyePosition.add(rightEyePosition).scaleInPlace(0.5);

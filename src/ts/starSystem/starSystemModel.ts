@@ -105,7 +105,11 @@ export class StarSystemModel {
 
     public getNbAnomalies(): number {
         return wheelOfFortune(
-            [[0, 0.95], [1, 0.04], [2, 0.01]],
+            [
+                [0, 0.95],
+                [1, 0.04],
+                [2, 0.01]
+            ],
             this.rng(GenerationSteps.GENERATE_ANOMALIES * 16)
         );
     }

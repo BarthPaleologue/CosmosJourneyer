@@ -436,7 +436,7 @@ export class StarSystemView implements View {
         for (let i = 0; i < systemModel.getNbAnomalies(); i++) {
             console.log("Anomaly:", i + 1, "of", systemModel.getNbAnomalies());
             const anomalyType = systemModel.getAnomalyType(i);
-            
+
             let anomaly: Anomaly;
             switch (anomalyType) {
                 case AnomalyType.MANDELBULB:
