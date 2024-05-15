@@ -28,6 +28,7 @@ import { PlanetPhysicalProperties } from "../architecture/physicalProperties";
 import { CelestialBodyModel } from "../architecture/celestialBody";
 import { BodyType } from "../architecture/bodyType";
 import { GenerationSteps } from "../utils/generationSteps";
+import { wheelOfFortune } from "../utils/wheelOfFortune";
 
 export class MandelbulbModel implements PlanetModel {
     readonly bodyType = BodyType.MANDELBULB;
@@ -85,7 +86,7 @@ export class MandelbulbModel implements PlanetModel {
             pressure: 0
         };
 
-        this.nbMoons = randRangeInt(0, 2, this.rng, GenerationSteps.NB_MOONS);
+        this.nbMoons = wheelOfFortune([[0, 0.95], [1, 0.5]], this.rng(GenerationSteps.NB_MOONS));
     }
 
     getApparentRadius(): number {
