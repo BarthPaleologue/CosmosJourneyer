@@ -27,7 +27,7 @@ import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { BlackHolePostProcess } from "./stellarObjects/blackHole/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
-import { Axis } from "@babylonjs/core";
+import { Axis, Color4, MeshBuilder } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
 import { Mandelbulb } from "./mandelbulb/mandelbulb";
@@ -38,6 +38,12 @@ import { Scene } from "@babylonjs/core/scene";
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+canvas.addEventListener("click", e => {
+    canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
+    if (canvas.requestPointerLock) {
+        canvas.requestPointerLock();
+    }
+}, false);
 
 const engine = new Engine(canvas, true);
 engine.useReverseDepthBuffer = true;
@@ -45,6 +51,7 @@ engine.displayLoadingUI();
 
 const scene = new Scene(engine);
 scene.useRightHandedSystem = true;
+scene.clearColor = new Color4(0, 0, 0, 0);
 
 await Assets.Init(scene);
 
@@ -57,10 +64,6 @@ scene.activeCameras = [leftEye, rightEye];
 
 scene.enableDepthRenderer(leftEye, false, true);
 scene.enableDepthRenderer(rightEye, false, true);
-
-const starfieldPostProcess = new StarfieldPostProcess(scene, [], [], Quaternion.Identity());
-leftEye.attachPostProcess(starfieldPostProcess);
-rightEye.attachPostProcess(starfieldPostProcess);
 
 function createBlackHole(): TransformNode {
     const blackHole = new BlackHole("hole", scene, 0, null);
@@ -81,8 +84,8 @@ function createBlackHole(): TransformNode {
 
 function createMandelbulb(): TransformNode {
     const mandelbulb = new Mandelbulb("bulb", scene, Math.random() * 10000, null);
-    mandelbulb.getTransform().setAbsolutePosition(new Vector3(0, 0, 20));
-    mandelbulb.getTransform().scalingDeterminant = 1 / 100e3;
+    mandelbulb.getTransform().setAbsolutePosition(new Vector3(0, 0, 0));
+    mandelbulb.getTransform().scalingDeterminant = 1 / 5000e3;
 
     const mandelbulbPP = new MandelbulbPostProcess(mandelbulb, scene, []);
     leftEye.attachPostProcess(mandelbulbPP);
@@ -125,20 +128,59 @@ document.addEventListener("pointermove", (e) => {
     }
 });
 
+let ipdFactor = 1.0;
+const defaultIPD = 0.065;
+document.addEventListener("keydown", e => {
+    if (e.key === "+") {
+        ipdFactor += 0.1;
+    } else if (e.key === "-") {
+        ipdFactor -= 0.1;
+    }
+});
+
+// Create WebSocket connection.
+const port = 4242;
+const socket = new WebSocket(`ws://localhost:${port}`);
+
+const leftEyePosition = Vector3.Zero();
+const rightEyePosition = Vector3.Zero();
+
+socket.addEventListener("open", () => {
+    stereoCameras.setEyeTrackingEnabled(true);
+});
+
+// Listen for messages
+socket.addEventListener("message", async (event) => {
+    const blob = event.data as Blob;
+
+    const buffer = await blob.arrayBuffer();
+    const bufferView = new Float64Array(buffer);
+
+    leftEyePosition.copyFromFloats(bufferView[0], bufferView[1], bufferView[2]).scaleInPlace(0.001);
+    rightEyePosition.copyFromFloats(bufferView[3], bufferView[4], bufferView[5]).scaleInPlace(0.001);
+});
+
 scene.onBeforeRenderObservable.add(() => {
     const deltaSeconds = engine.getDeltaTime() / 1000;
-
-    // our eyes will focus on the center where the object is
-    const focalPoint = targetObject.getAbsolutePosition().negate();
-
-    stereoCameras.getTransform().lookAt(focalPoint);
 
     stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.02 * deltaSeconds);
     stereoCameras.getTransform().computeWorldMatrix(true);
     stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.1 * deltaSeconds);
     stereoCameras.getTransform().computeWorldMatrix(true);
 
-    stereoCameras.setDistanceToFocalPlane(Vector3.Distance(stereoCameras.getTransform().getAbsolutePosition(), targetObject.getAbsolutePosition()));
+    const eyeDistance = defaultIPD * ipdFactor
+    stereoCameras.setDefaultIPD(eyeDistance);
+
+    const averageEyePosition = leftEyePosition.add(rightEyePosition).scaleInPlace(0.5);
+    averageEyePosition.x *= -1; // right handed system
+    averageEyePosition.z *= -1; // same
+
+    const trueEyeDistance = Math.abs(leftEyePosition.x - rightEyePosition.x);
+
+    leftEyePosition.copyFrom(averageEyePosition.add(new Vector3(trueEyeDistance * 0.5, 0, 0)));
+    rightEyePosition.copyFrom(averageEyePosition.add(new Vector3(-trueEyeDistance * 0.5, 0, 0)));
+    stereoCameras.setEyeTrackingPositions(leftEyePosition, rightEyePosition);
+
     stereoCameras.updateCameraProjections();
 
     applyFloatingOrigin();
