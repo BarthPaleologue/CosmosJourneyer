@@ -18,29 +18,38 @@
 import { Transformable } from "../architecture/transformable";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { Scene } from "@babylonjs/core";
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Viewport } from "@babylonjs/core/Maths/math.viewport";
-import { Camera } from "@babylonjs/core/Cameras/camera";
 import { setOffAxisProjection } from "./offAxisProjection";
+import { Scene } from "@babylonjs/core/scene";
 
 export class StereoCameras implements Transformable {
+    /**
+     * The frame of reference for the left and right cameras.
+     * @private
+     */
     private readonly transform: TransformNode;
 
+    /**
+     * The camera used to render the left eye view.
+     */
     readonly leftEye: FreeCamera;
+
+    /**
+     * The camera used to render the right eye view.
+     */
     readonly rightEye: FreeCamera;
 
     /**
-     * The distance between the two cameras in meters (IPD)
+     * IPD stands for Inter-Pupillary Distance.
+     * 
+     * When not using the eye tracking data, this value is used instead to move apart the eye cameras.
+     * The average IPD for a human is 65mm, you can change it to fit your own eye configuration.
      * @private
      */
     private defaultIPD = 0.065;
 
     private defaultDistanceToScreen = 0.8;
-
-    private screenHalfHeight = 0.17;
-
-    private useOffAxisProjection = true;
 
     private useEyeTracking = false;
 
@@ -54,9 +63,7 @@ export class StereoCameras implements Transformable {
      */
     private eyeTrackingRightPosition = Vector3.Zero();
 
-    private readonly scene: Scene;
-
-    constructor(scene: Scene) {
+    constructor(screenHalfHeight: number, scene: Scene) {
         // This transform will be used as the parent of both eyes
         this.transform = new TransformNode("HeadTransform", scene);
 
@@ -67,7 +74,7 @@ export class StereoCameras implements Transformable {
         this.leftEye.parent = this.transform;
         this.leftEye.onProjectionMatrixChangedObservable.add((camera) => {
             const cameraOffset = !this.useEyeTracking ? new Vector3(-this.defaultIPD / 2, 0, -this.defaultDistanceToScreen) : this.eyeTrackingLeftPosition;
-            setOffAxisProjection(camera, cameraOffset, this.screenHalfHeight, scene.useRightHandedSystem);
+            setOffAxisProjection(camera, cameraOffset, screenHalfHeight, scene.useRightHandedSystem);
         });
 
         // right eye is on the right
@@ -77,54 +84,8 @@ export class StereoCameras implements Transformable {
         this.rightEye.parent = this.transform;
         this.rightEye.onProjectionMatrixChangedObservable.add((camera) => {
             const cameraOffset = !this.useEyeTracking ? new Vector3(this.defaultIPD / 2, 0, -this.defaultDistanceToScreen) : this.eyeTrackingRightPosition;
-            setOffAxisProjection(camera, cameraOffset, this.screenHalfHeight, scene.useRightHandedSystem);
+            setOffAxisProjection(camera, cameraOffset, screenHalfHeight, scene.useRightHandedSystem);
         });
-
-        this.scene = scene;
-    }
-
-    /**
-     * Updates the projection matrices of the cameras with off-axis projection
-     * @param camera
-     * @param cameraOffset The camera position in local space
-     */
-    private updateCameraProjection(camera: Camera, cameraOffset: Vector3) {
-        const engine = camera.getEngine();
-        const canvas = engine.getRenderingCanvas();
-        if (canvas === null) {
-            throw new Error("Canvas is null!");
-        }
-
-        const aspectRatio = canvas.width / canvas.height;
-
-        camera.position.x = cameraOffset.x;
-        camera.position.y = cameraOffset.y;
-        camera.position.z = -Math.abs(cameraOffset.z);
-
-        if (this.scene.useRightHandedSystem) {
-            camera.position.x *= -1;
-            camera.position.z *= -1;
-        }
-
-        // the distance to the focal plane is the distance of the eye to the screen plane
-        const distanceToFocalPlane = Math.abs(camera.position.z);
-
-        camera.fov = 2 * Math.atan(this.screenHalfHeight / distanceToFocalPlane);
-
-        const projectionMatrix = Matrix.PerspectiveFovLH(
-            camera.fov,
-            aspectRatio,
-            camera.minZ,
-            camera.maxZ,
-            engine.isNDCHalfZRange,
-            camera.projectionPlaneTilt,
-            engine.useReverseDepthBuffer
-        );
-        if (this.useOffAxisProjection) {
-            projectionMatrix.addAtIndex(8, cameraOffset.x / (this.screenHalfHeight * aspectRatio));
-            projectionMatrix.addAtIndex(9, cameraOffset.y / this.screenHalfHeight);
-        }
-        camera._projectionMatrix.copyFrom(projectionMatrix);
     }
 
     setEyeTrackingEnabled(useEyeTracking: boolean) {
@@ -133,14 +94,6 @@ export class StereoCameras implements Transformable {
 
     isEyeTrackingEnabled(): boolean {
         return this.useEyeTracking;
-    }
-
-    setOffAxisProjectionEnabled(enabled: boolean) {
-        this.useOffAxisProjection = enabled;
-    }
-
-    isOffAxisProjectionEnabled(): boolean {
-        return this.useOffAxisProjection;
     }
 
     setEyeTrackingPositions(leftEyePosition: Vector3, rightEyePosition: Vector3) {
@@ -161,14 +114,6 @@ export class StereoCameras implements Transformable {
      */
     getDefaultIPD(): number {
         return this.defaultIPD;
-    }
-
-    setScreenHalfHeight(screenHalfHeight: number) {
-        this.screenHalfHeight = screenHalfHeight;
-    }
-
-    getScreenHalfHeight(): number {
-        return this.screenHalfHeight;
     }
 
     getTransform(): TransformNode {

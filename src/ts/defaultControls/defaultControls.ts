@@ -28,6 +28,8 @@ import { LocalDirection } from "../uberCore/localDirections";
 import { DefaultControlsInputs } from "./defaultControlsInputs";
 import { StereoCameras } from "../utils/stereoCameras";
 import { EyeTracking } from "../utils/eyeTracking";
+import { Settings } from "../settings";
+import { Tools } from "@babylonjs/core/Misc/tools";
 
 export class DefaultControls implements Controls {
     private readonly transform: TransformNode;
@@ -47,9 +49,9 @@ export class DefaultControls implements Controls {
         this.monoCamera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.monoCamera.parent = this.transform;
         this.monoCamera.speed = 0;
-        this.monoCamera.fov = (80 / 360) * Math.PI;
+        this.monoCamera.fov = Tools.ToRadians(80);
 
-        this.stereoCameras = new StereoCameras(scene);
+        this.stereoCameras = new StereoCameras(Settings.SCREEN_HALF_SIZE, scene);
         this.stereoCameras.getTransform().parent = this.getTransform();
         this.stereoCameras.setEyeTrackingEnabled(true);
 

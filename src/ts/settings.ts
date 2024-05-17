@@ -17,6 +17,9 @@
 
 import { seededSquirrelNoise } from "squirrel-noise";
 import { makeNoise3D } from "fast-simplex-noise";
+import { Tools } from "@babylonjs/core/Misc/tools";
+
+const urlParams = new URLSearchParams(window.location.search);
 
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
@@ -64,7 +67,14 @@ export const Settings = {
      */
     SOLAR_RADIUS: 696340e3,
 
-    FOV: (92 * Math.PI) / 180,
+    FOV: Tools.ToRadians(92),
+
+    /**
+     * Half the physical height of your display in meters.
+     * 
+     * Example: screen of dimensions 60cm x 34cm => half screen height is 17cm => 0.17m
+     */
+    SCREEN_HALF_SIZE: urlParams.get("screenHalfHeight") !== null ? Number(urlParams.get("screenHalfHeight")) : 0.17,
 
     MAIN_FONT: "Nasalization"
 };

@@ -26,7 +26,6 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { BlackHolePostProcess } from "./stellarObjects/blackHole/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
-import { Axis, Color4, HemisphericLight } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
 import { Mandelbulb } from "./anomalies/mandelbulb/mandelbulb";
@@ -36,20 +35,18 @@ import { Scene } from "@babylonjs/core/scene";
 import { JuliaSet } from "./anomalies/julia/juliaSet";
 import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
 import { EyeTracking } from "./utils/eyeTracking";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-canvas.addEventListener(
-    "click",
-    (e) => {
-        canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
-        if (canvas.requestPointerLock) {
-            canvas.requestPointerLock();
-        }
-    },
-    false
-);
+canvas.addEventListener("click", (e) => {
+    canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
+    if (canvas.requestPointerLock) {
+        canvas.requestPointerLock();
+    }
+}, false);
 
 const engine = await EngineFactory.CreateAsync(canvas, {
     antialias: true
@@ -63,7 +60,12 @@ scene.clearColor = new Color4(0, 0, 0, 0);
 
 await Assets.Init(scene);
 
-const stereoCameras = new StereoCameras(scene);
+const urlParams = new URLSearchParams(window.location.search);
+
+const customScreenHalfHeight = urlParams.get("screenHalfHeight");
+const screenHalfHeight = customScreenHalfHeight !== null ? Number(customScreenHalfHeight) : 0.17;
+
+const stereoCameras = new StereoCameras(screenHalfHeight, scene);
 
 const leftEye = stereoCameras.leftEye;
 const rightEye = stereoCameras.rightEye;
@@ -124,7 +126,6 @@ function createJulia(): TransformNode {
 
 let targetObject: TransformNode;
 
-const urlParams = new URLSearchParams(window.location.search);
 const sceneType = urlParams.get("scene");
 
 if (sceneType === "mandelbulb") {
@@ -134,8 +135,6 @@ if (sceneType === "mandelbulb") {
 } else {
     targetObject = createMandelbulb();
 }
-
-const sun = new HemisphericLight("sun", new Vector3(0.5, 1, 0.5), scene);
 
 stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.X, 0.2);
 
