@@ -146,20 +146,14 @@ function applyFloatingOrigin() {
     translate(targetObject, headPosition.negate());
 }
 
-let mousePressed = false;
-document.addEventListener("pointerdown", () => (mousePressed = true));
-document.addEventListener("pointerup", () => (mousePressed = false));
-
 document.addEventListener("pointermove", (e) => {
     const mouseDX = e.movementX;
     const mouseDY = e.movementY;
 
-    if (mousePressed) {
-        stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, 0.001 * mouseDX);
-        stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), stereoCameras.getTransform().getDirection(Axis.X), -0.001 * mouseDY);
+    stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), Axis.Y, -0.001 * mouseDX);
+    stereoCameras.getTransform().rotateAround(targetObject.getAbsolutePosition(), stereoCameras.getTransform().getDirection(Axis.X), 0.001 * mouseDY);
 
-        applyFloatingOrigin();
-    }
+    applyFloatingOrigin();
 });
 
 let ipdFactor = 1.0;
