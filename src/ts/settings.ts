@@ -19,8 +19,6 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { makeNoise3D } from "fast-simplex-noise";
 import { Tools } from "@babylonjs/core/Misc/tools";
 
-const urlParams = new URLSearchParams(window.location.search);
-
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
     EARTH_RADIUS: 1000e3, // target is 6000e3
@@ -74,7 +72,7 @@ export const Settings = {
      * 
      * Example: screen of dimensions 60cm x 34cm => half screen height is 17cm => 0.17m
      */
-    SCREEN_HALF_SIZE: urlParams.get("screenHalfHeight") !== null ? Number(urlParams.get("screenHalfHeight")) : 0.17,
+    SCREEN_HALF_SIZE: 0.17,
 
     MAIN_FONT: "Nasalization"
 };

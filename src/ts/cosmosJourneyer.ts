@@ -52,6 +52,7 @@ import { pressInteractionToStrings } from "./utils/inputControlsString";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
 import { EyeTracking } from "./utils/eyeTracking";
+import { Settings } from "./settings";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -142,6 +143,8 @@ export class CosmosJourneyer {
         this.pauseMenu.onSave.add(() => this.downloadSaveFile());
 
         this.eyeTracking = new EyeTracking("localhost", 4242);
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.get("screenHalfHeight") !== null) Settings.SCREEN_HALF_SIZE = Number(urlParams.get("screenHalfHeight")); 
 
         window.addEventListener("blur", () => {
             if (!this.mainMenu?.isVisible()) this.pause();
