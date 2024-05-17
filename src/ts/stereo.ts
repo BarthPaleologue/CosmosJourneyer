@@ -26,7 +26,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { BlackHolePostProcess } from "./stellarObjects/blackHole/blackHolePostProcess";
 import { BlackHole } from "./stellarObjects/blackHole/blackHole";
-import { Axis, Color4, HemisphericLight, MeshBuilder } from "@babylonjs/core";
+import { Axis, Color4, HemisphericLight } from "@babylonjs/core";
 import { translate } from "./uberCore/transforms/basicTransform";
 import { Assets } from "./assets";
 import { Mandelbulb } from "./anomalies/mandelbulb/mandelbulb";
@@ -35,6 +35,7 @@ import { StereoCameras } from "./utils/stereoCameras";
 import { Scene } from "@babylonjs/core/scene";
 import { JuliaSet } from "./anomalies/julia/juliaSet";
 import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
+import { EyeTracking } from "./utils/eyeTracking";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -172,24 +173,9 @@ document.addEventListener("keydown", (e) => {
 });
 
 // Create WebSocket connection to retrieve the eye positions
-const port = 4242;
-const socket = new WebSocket(`ws://localhost:${port}`);
-
-const leftEyePosition = Vector3.Zero();
-const rightEyePosition = Vector3.Zero();
-
-socket.addEventListener("open", () => {
+const eyeTracking = new EyeTracking("localhost", 4242);
+eyeTracking.socket.addEventListener("open", () => {
     stereoCameras.setEyeTrackingEnabled(true);
-});
-
-socket.addEventListener("message", async (event) => {
-    const blob = event.data as Blob;
-
-    const buffer = await blob.arrayBuffer();
-    const bufferView = new Float64Array(buffer);
-
-    leftEyePosition.copyFromFloats(bufferView[0], bufferView[1], bufferView[2]).scaleInPlace(0.001);
-    rightEyePosition.copyFromFloats(bufferView[3], bufferView[4], bufferView[5]).scaleInPlace(0.001);
 });
 
 scene.onBeforeRenderObservable.add(() => {
@@ -202,6 +188,9 @@ scene.onBeforeRenderObservable.add(() => {
 
     const eyeDistance = defaultIPD * ipdFactor;
     stereoCameras.setDefaultIPD(eyeDistance);
+
+    const leftEyePosition = EyeTracking.GetLeftEyePosition();
+    const rightEyePosition = EyeTracking.GetRightEyePosition();
 
     const averageEyePosition = leftEyePosition.add(rightEyePosition).scaleInPlace(0.5);
 
