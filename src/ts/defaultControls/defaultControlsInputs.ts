@@ -3,6 +3,7 @@ import Action from "@brianchirls/game-input/Action";
 import { InputDevices } from "../inputs/devices";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import { InputMap } from "../inputs/inputMap";
+import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 
 const gamepad = InputDevices.GAMEPAD;
 const keyboard = InputDevices.KEYBOARD;
@@ -70,6 +71,12 @@ const yawAction = new Action({
     bindings: [yaw]
 });
 
+const toggleStereoAction = new Action({
+    bindings: [keyboard.getControl("KeyG")]
+});
+
+const toggleStereoInteraction = new PressInteraction(toggleStereoAction);
+
 export const DefaultControlsInputs = new InputMap<{
     move: Action<[number, number]>;
     upDown: Action<number>;
@@ -77,11 +84,13 @@ export const DefaultControlsInputs = new InputMap<{
     roll: Action<number>;
     pitch: Action<number>;
     yaw: Action<number>;
+    toggleStereo: PressInteraction
 }>("DefaultControlsInputs", {
     move: moveAction,
     upDown: upDownAction,
     changeSpeed: changeSpeedAction,
     roll: rollAction,
     pitch: pitchAction,
-    yaw: yawAction
+    yaw: yawAction,
+    toggleStereo: toggleStereoInteraction
 });

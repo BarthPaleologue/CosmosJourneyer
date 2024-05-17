@@ -21,12 +21,12 @@ export class EyeTracking {
     /**
      * The position of the left eye in screen space in meters
      */
-    private static leftEyePosition = Vector3.Zero();
+    private static leftEyePosition = new Vector3(-0.065 / 2, 0, 0.8);
 
     /**
      * The position of the right eye in screen space in meters
      */
-    private static rightEyePosition = Vector3.Zero();
+    private static rightEyePosition = new Vector3(0.065 / 2, 0, 0.8);
 
     readonly socket: WebSocket;
 

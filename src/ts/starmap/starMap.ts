@@ -129,7 +129,9 @@ export class StarMap implements View {
 
         this.controls = new DefaultControls(this.scene);
         this.controls.speed /= 5;
-        this.controls.getActiveCameras().forEach((camera) => (camera.minZ = 0.01));
+        this.controls.monoCamera.minZ = 0.01;
+        this.controls.stereoCameras.leftEye.minZ = 0.01;
+        this.controls.stereoCameras.rightEye.minZ = 0.01;
 
         this.controls.getActiveCameras()[0].attachControl();
 
@@ -254,6 +256,8 @@ export class StarMap implements View {
 
             if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaTime);
             if (this.translationAnimation !== null) this.translationAnimation.update(deltaTime);
+
+            this.scene.activeCameras = this.controls.getActiveCameras();
 
             this.controls.update(deltaTime);
 

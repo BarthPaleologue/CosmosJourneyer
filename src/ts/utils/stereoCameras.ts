@@ -1,11 +1,28 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { Transformable } from "../architecture/transformable";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { Scene, Tools } from "@babylonjs/core";
+import { Scene } from "@babylonjs/core";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Viewport } from "@babylonjs/core/Maths/math.viewport";
 import { Camera } from "@babylonjs/core/Cameras/camera";
+import { setOffAxisProjection } from "./offAxisProjection";
 
 export class StereoCameras implements Transformable {
     private readonly transform: TransformNode;
@@ -46,23 +63,21 @@ export class StereoCameras implements Transformable {
         // left eye is on the left
         this.leftEye = new FreeCamera("LeftEye", new Vector3(-this.defaultIPD / 2, 0, 0), scene);
         this.leftEye.viewport = new Viewport(0, 0.0, 0.5, 1);
-        this.leftEye.fov = Tools.ToRadians(90);
         this.leftEye.minZ = 0.01;
         this.leftEye.parent = this.transform;
-        this.leftEye.onProjectionMatrixChangedObservable.add(() => {
-            const cameraOffset = !this.useEyeTracking ? new Vector3(-this.defaultIPD / 2, 0, this.defaultDistanceToScreen) : this.eyeTrackingLeftPosition;
-            this.updateCameraProjection(this.leftEye, cameraOffset);
+        this.leftEye.onProjectionMatrixChangedObservable.add((camera) => {
+            const cameraOffset = !this.useEyeTracking ? new Vector3(-this.defaultIPD / 2, 0, -this.defaultDistanceToScreen) : this.eyeTrackingLeftPosition;
+            setOffAxisProjection(camera, cameraOffset, this.screenHalfHeight, scene.useRightHandedSystem);
         });
 
         // right eye is on the right
         this.rightEye = new FreeCamera("RightEye", new Vector3(this.defaultIPD / 2, 0, 0), scene);
         this.rightEye.viewport = new Viewport(0.5, 0, 0.5, 1);
-        this.rightEye.fov = Tools.ToRadians(90);
         this.rightEye.minZ = 0.01;
         this.rightEye.parent = this.transform;
-        this.rightEye.onProjectionMatrixChangedObservable.add(() => {
-            const cameraOffset = !this.useEyeTracking ? new Vector3(this.defaultIPD / 2, 0, this.defaultDistanceToScreen) : this.eyeTrackingRightPosition;
-            this.updateCameraProjection(this.rightEye, cameraOffset);
+        this.rightEye.onProjectionMatrixChangedObservable.add((camera) => {
+            const cameraOffset = !this.useEyeTracking ? new Vector3(this.defaultIPD / 2, 0, -this.defaultDistanceToScreen) : this.eyeTrackingRightPosition;
+            setOffAxisProjection(camera, cameraOffset, this.screenHalfHeight, scene.useRightHandedSystem);
         });
 
         this.scene = scene;

@@ -26,26 +26,40 @@ import { getTransformationQuaternion } from "../utils/algebra";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { LocalDirection } from "../uberCore/localDirections";
 import { DefaultControlsInputs } from "./defaultControlsInputs";
+import { StereoCameras } from "../utils/stereoCameras";
+import { EyeTracking } from "../utils/eyeTracking";
 
 export class DefaultControls implements Controls {
     private readonly transform: TransformNode;
-    private readonly camera: FreeCamera;
+    readonly monoCamera: FreeCamera;
+
+    readonly stereoCameras: StereoCameras;
 
     speed = 1;
     rotationSpeed = Math.PI / 4;
+
+    private useStereoCameras = false;
 
     constructor(scene: Scene) {
         this.transform = new TransformNode("playerController", scene);
         setRotationQuaternion(this.getTransform(), Quaternion.Identity());
 
-        this.camera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
-        this.camera.parent = this.transform;
-        this.camera.speed = 0;
-        this.camera.fov = (80 / 360) * Math.PI;
+        this.monoCamera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
+        this.monoCamera.parent = this.transform;
+        this.monoCamera.speed = 0;
+        this.monoCamera.fov = (80 / 360) * Math.PI;
+
+        this.stereoCameras = new StereoCameras(scene);
+        this.stereoCameras.getTransform().parent = this.getTransform();
+        this.stereoCameras.setEyeTrackingEnabled(true);
+
+        DefaultControlsInputs.map.toggleStereo.on("complete", () => {
+            this.useStereoCameras = !this.useStereoCameras;
+        });
     }
 
     public getActiveCameras(): Camera[] {
-        return [this.camera];
+        return this.useStereoCameras ? [this.stereoCameras.leftEye, this.stereoCameras.rightEye] : [this.monoCamera];
     }
 
     public getTransform(): TransformNode {
@@ -57,13 +71,15 @@ export class DefaultControls implements Controls {
         pitch(this.transform, DefaultControlsInputs.map.pitch.value * this.rotationSpeed * deltaTime);
         yaw(this.transform, DefaultControlsInputs.map.yaw.value * this.rotationSpeed * deltaTime);
 
-        const cameraForward = this.camera.getDirection(LocalDirection.BACKWARD);
-        const transformForward = getForwardDirection(this.transform);
+        if(!this.useStereoCameras) {
+            const cameraForward = this.monoCamera.getDirection(LocalDirection.BACKWARD);
+            const transformForward = getForwardDirection(this.transform);
 
-        if (!cameraForward.equalsWithEpsilon(transformForward)) {
-            const rotation = getTransformationQuaternion(transformForward, cameraForward);
-            this.transform.rotationQuaternion = rotation.multiply(this.transform.rotationQuaternion ?? Quaternion.Identity());
-            this.camera.rotationQuaternion = Quaternion.Identity();
+            if (!cameraForward.equalsWithEpsilon(transformForward)) {
+                const rotation = getTransformationQuaternion(transformForward, cameraForward);
+                this.transform.rotationQuaternion = rotation.multiply(this.transform.rotationQuaternion ?? Quaternion.Identity());
+                this.monoCamera.rotationQuaternion = Quaternion.Identity();
+            }
         }
 
         this.speed *= 1 + DefaultControlsInputs.map.changeSpeed.value / 20;
@@ -84,6 +100,11 @@ export class DefaultControls implements Controls {
         displacement.addInPlace(upwardDisplacement);
         displacement.addInPlace(rightDisplacement);
 
+        if(this.useStereoCameras) {
+            this.stereoCameras.setEyeTrackingPositions(EyeTracking.GetLeftEyePosition(), EyeTracking.GetRightEyePosition());
+            this.stereoCameras.updateCameraProjections();
+        }
+
         translate(this.transform, displacement);
         this.getActiveCameras().forEach((camera) => camera.getViewMatrix());
 
@@ -92,6 +113,6 @@ export class DefaultControls implements Controls {
 
     dispose() {
         this.transform.dispose();
-        this.camera.dispose();
+        this.monoCamera.dispose();
     }
 }

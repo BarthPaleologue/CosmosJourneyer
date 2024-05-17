@@ -51,6 +51,7 @@ import { StarSystemInputs } from "./inputs/starSystemInputs";
 import { pressInteractionToStrings } from "./utils/inputControlsString";
 import { LoadingScreen } from "./uberCore/loadingScreen";
 import i18n from "./i18n";
+import { EyeTracking } from "./utils/eyeTracking";
 
 const enum EngineState {
     UNINITIALIZED,
@@ -71,6 +72,8 @@ export class CosmosJourneyer {
 
     readonly mainMenu: MainMenu;
     readonly pauseMenu: PauseMenu;
+
+    private readonly eyeTracking: EyeTracking;
 
     private activeView: View;
 
@@ -137,6 +140,8 @@ export class CosmosJourneyer {
             });
         });
         this.pauseMenu.onSave.add(() => this.downloadSaveFile());
+
+        this.eyeTracking = new EyeTracking("localhost", 4242);
 
         window.addEventListener("blur", () => {
             if (!this.mainMenu?.isVisible()) this.pause();
