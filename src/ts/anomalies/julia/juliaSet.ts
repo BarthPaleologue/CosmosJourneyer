@@ -16,23 +16,27 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Camera } from "@babylonjs/core/Cameras/camera";
-import { MandelbulbModel } from "./mandelbulbModel";
-import { PostProcessType } from "../postProcesses/postProcessTypes";
+import { JuliaSetModel } from "./juliaSetModel";
+import { PostProcessType } from "../../postProcesses/postProcessTypes";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { CelestialBody } from "../architecture/celestialBody";
+import { CelestialBody } from "../../architecture/celestialBody";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
-import { OrbitProperties } from "../orbit/orbitProperties";
-import { RingsUniforms } from "../rings/ringsUniform";
+import { OrbitProperties } from "../../orbit/orbitProperties";
+import { RingsUniforms } from "../../rings/ringsUniform";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Cullable } from "../utils/cullable";
-import { OrbitalObjectPhysicalProperties } from "../architecture/physicalProperties";
-import i18n from "../i18n";
+import { Cullable } from "../../utils/cullable";
+import { OrbitalObjectPhysicalProperties } from "../../architecture/physicalProperties";
+import i18n from "../../i18n";
+import { Anomaly } from "../anomaly";
+import { AnomalyType } from "../anomalyType";
 
-export class Mandelbulb implements CelestialBody, Cullable {
+export class JuliaSet implements Anomaly, Cullable {
     readonly name: string;
 
-    readonly model: MandelbulbModel;
+    readonly model: JuliaSetModel;
+
+    readonly anomalyType = AnomalyType.JULIA_SET;
 
     private readonly transform: TransformNode;
 
@@ -47,16 +51,16 @@ export class Mandelbulb implements CelestialBody, Cullable {
      * @param parentBody The bodies the planet is orbiting
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      */
-    constructor(name: string, scene: Scene, model: MandelbulbModel | number, parentBody: CelestialBody | null = null) {
+    constructor(name: string, scene: Scene, model: JuliaSetModel | number, parentBody: CelestialBody | null = null) {
         this.name = name;
 
-        this.model = model instanceof MandelbulbModel ? model : new MandelbulbModel(model, parentBody?.model);
+        this.model = model instanceof JuliaSetModel ? model : new JuliaSetModel(model, parentBody?.model);
 
         this.parent = parentBody;
 
         this.transform = new TransformNode(name, scene);
 
-        this.postProcesses.push(PostProcessType.MANDELBULB);
+        this.postProcesses.push(PostProcessType.JULIA_SET);
 
         this.getTransform().rotate(Axis.X, this.model.physicalProperties.axialTilt);
     }

@@ -19,8 +19,8 @@ import { StarSystemController } from "./starSystemController";
 import { StarModel } from "../stellarObjects/star/starModel";
 import { Star } from "../stellarObjects/star/star";
 import { GreekAlphabet, starName } from "../utils/parseToStrings";
-import { MandelbulbModel } from "../mandelbulb/mandelbulbModel";
-import { Mandelbulb } from "../mandelbulb/mandelbulb";
+import { MandelbulbModel } from "../anomalies/mandelbulb/mandelbulbModel";
+import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
 import { BlackHoleModel } from "../stellarObjects/blackHole/blackHoleModel";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModel";
@@ -37,6 +37,8 @@ import { CelestialBody } from "../architecture/celestialBody";
 import { romanNumeral } from "../utils/romanNumerals";
 import { SpaceStationModel } from "../spacestation/spacestationModel";
 import { BodyType } from "../architecture/bodyType";
+import { JuliaSet } from "../anomalies/julia/juliaSet";
+import { JuliaSetModel } from "../anomalies/julia/juliaSetModel";
 
 export class StarSystemHelper {
     public static MakeStar(starsystem: StarSystemController, model?: number | StarModel): Star {
@@ -49,14 +51,24 @@ export class StarSystemHelper {
         return star;
     }
 
-    public static MakeMandelbulb(starsystem: StarSystemController, model: number | MandelbulbModel = starsystem.model.getAnomalySeed(starsystem.mandelbulbs.length)): Mandelbulb {
-        if (starsystem.mandelbulbs.length >= starsystem.model.getNbAnomalies())
+    public static MakeMandelbulb(starsystem: StarSystemController, model: number | MandelbulbModel = starsystem.model.getAnomalySeed(starsystem.anomalies.length)): Mandelbulb {
+        if (starsystem.anomalies.length >= starsystem.model.getNbAnomalies())
             console.warn(`You are adding a mandelbulb to the system.
-            The system generator had planned for ${starsystem.model.getNbAnomalies()} anomalies, but you are adding the ${starsystem.mandelbulbs.length + 1}th anomaly.
+            The system generator had planned for ${starsystem.model.getNbAnomalies()} anomalies, but you are adding the ${starsystem.anomalies.length + 1}th anomaly.
             This might cause issues, or not who knows.`);
-        const mandelbulb = new Mandelbulb(`${starsystem.model.getName()} ${GreekAlphabet[starsystem.mandelbulbs.length]}`, starsystem.scene, model, starsystem.stellarObjects[0]);
+        const mandelbulb = new Mandelbulb(`${starsystem.model.getName()} ${GreekAlphabet[starsystem.anomalies.length]}`, starsystem.scene, model, starsystem.stellarObjects[0]);
         starsystem.addMandelbulb(mandelbulb);
         return mandelbulb;
+    }
+
+    public static MakeJuliaSet(starsystem: StarSystemController, model: number | JuliaSetModel = starsystem.model.getAnomalySeed(starsystem.anomalies.length)): JuliaSet {
+        if (starsystem.anomalies.length >= starsystem.model.getNbAnomalies())
+            console.warn(`You are adding a julia set to the system.
+            The system generator had planned for ${starsystem.model.getNbAnomalies()} anomalies, but you are adding the ${starsystem.anomalies.length + 1}th anomaly.
+            This might cause issues, or not who knows.`);
+        const juliaSet = new JuliaSet(`${starsystem.model.getName()} ${GreekAlphabet[starsystem.anomalies.length]}`, starsystem.scene, model, starsystem.stellarObjects[0]);
+        starsystem.addJuliaSet(juliaSet);
+        return juliaSet;
     }
 
     public static MakeAnomalies(starsystem: StarSystemController, n = starsystem.model.getNbAnomalies()): void {

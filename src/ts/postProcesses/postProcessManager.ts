@@ -36,14 +36,14 @@ import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPip
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 import { PostProcessType } from "./postProcessTypes";
-import { MandelbulbPostProcess } from "../mandelbulb/mandelbulbPostProcess";
+import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
 import { ShadowPostProcess } from "./shadowPostProcess";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { isOrbiting } from "../utils/nearestBody";
 import { UpdatablePostProcess } from "./objectPostProcess";
 import { MatterJetPostProcess } from "./matterJetPostProcess";
-import { Mandelbulb } from "../mandelbulb/mandelbulb";
+import { Mandelbulb } from "../anomalies/mandelbulb/mandelbulb";
 import { Star } from "../stellarObjects/star/star";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
@@ -51,6 +51,9 @@ import { CelestialBody } from "../architecture/celestialBody";
 import { StellarObject } from "../architecture/stellarObject";
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 import { PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
+import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
+import { JuliaSet } from "../anomalies/julia/juliaSet";
+import { PostProcess } from "@babylonjs/core";
 
 /**
  * The order in which the post processes are rendered when away from a planet
@@ -62,6 +65,7 @@ const spaceRenderingOrder: PostProcessType[] = [
     PostProcessType.CLOUDS,
     PostProcessType.ATMOSPHERE,
     PostProcessType.MANDELBULB,
+    PostProcessType.JULIA_SET,
     PostProcessType.RING,
     PostProcessType.BLACK_HOLE
 ];
@@ -74,6 +78,7 @@ const surfaceRenderingOrder: PostProcessType[] = [
     PostProcessType.MATTER_JETS,
     PostProcessType.BLACK_HOLE,
     PostProcessType.MANDELBULB,
+    PostProcessType.JULIA_SET,
     PostProcessType.RING,
     PostProcessType.OCEAN,
     PostProcessType.CLOUDS,
@@ -128,15 +133,30 @@ export class PostProcessManager {
     private readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
     private readonly rings: RingsPostProcess[] = [];
     private readonly mandelbulbs: MandelbulbPostProcess[] = [];
+    private readonly juliaSets: JuliaSetPostProcess[] = [];
     private readonly blackHoles: BlackHolePostProcess[] = [];
     private readonly matterJets: MatterJetPostProcess[] = [];
     private readonly shadows: ShadowPostProcess[] = [];
     private readonly lensFlares: LensFlarePostProcess[] = [];
 
+    private readonly objectPostProcesses: PostProcess[][] = [
+        this.volumetricLights,
+        this.oceans,
+        this.clouds,
+        this.atmospheres,
+        this.rings,
+        this.mandelbulbs,
+        this.juliaSets,
+        this.blackHoles,
+        this.matterJets,
+        this.shadows,
+        this.lensFlares
+    ];
+
     /**
      * All post processes that are updated every frame.
      */
-    private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.oceans, this.clouds, this.blackHoles, this.matterJets, this.mandelbulbs];
+    private readonly updatablePostProcesses: UpdatablePostProcess[][] = [this.oceans, this.clouds, this.blackHoles, this.matterJets, this.mandelbulbs, this.juliaSets];
 
     /**
      * The color correction post process responsible for tone mapping, saturation, contrast, brightness and gamma.
@@ -289,6 +309,16 @@ export class PostProcessManager {
     }
 
     /**
+     * Creates a new Julia set postprocess for the given julia set and adds it to the manager.
+     * @param juliaSet A julia set
+     * @param stellarObjects An array of stars or black holes
+     */
+    public addJuliaSet(juliaSet: JuliaSet, stellarObjects: StellarObject[]) {
+        const juliaSetPostProcess = new JuliaSetPostProcess(juliaSet, this.scene, stellarObjects);
+        this.juliaSets.push(juliaSetPostProcess);
+    }
+
+    /**
      * Creates a new Starfield postprocess and adds it to the manager.
      * @param stellarObjects An array of stars or black holes
      * @param planets An array of planets
@@ -430,6 +460,7 @@ export class PostProcessManager {
         const [otherAtmospheresRenderEffect, bodyAtmospheresRenderEffect] = makeSplitRenderEffects("Atmospheres", this.getCurrentBody(), this.atmospheres, this.engine);
         const [otherRingsRenderEffect, bodyRingsRenderEffect] = makeSplitRenderEffects("Rings", this.getCurrentBody(), this.rings, this.engine);
         const [otherMandelbulbsRenderEffect, bodyMandelbulbsRenderEffect] = makeSplitRenderEffects("Mandelbulbs", this.getCurrentBody(), this.mandelbulbs, this.engine);
+        const [otherJuliaSetsRenderEffect, bodyJuliaSetRenderEffect] = makeSplitRenderEffects("JuliaSets", this.getCurrentBody(), this.juliaSets, this.engine);
         const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = makeSplitRenderEffects("MatterJets", this.getCurrentBody(), this.matterJets, this.engine);
         const shadowRenderEffect = new PostProcessRenderEffect(this.engine, "ShadowRenderEffect", () => this.shadows);
         const lensFlareRenderEffect = new PostProcessRenderEffect(this.engine, "LensFlareRenderEffect", () => this.lensFlares);
@@ -463,6 +494,9 @@ export class PostProcessManager {
                     break;
                 case PostProcessType.MANDELBULB:
                     this.renderingPipeline.addEffect(otherMandelbulbsRenderEffect);
+                    break;
+                case PostProcessType.JULIA_SET:
+                    this.renderingPipeline.addEffect(otherJuliaSetsRenderEffect);
                     break;
                 case PostProcessType.SHADOW:
                     //this.renderingPipeline.addEffect(otherShadowRenderEffect);
@@ -499,6 +533,9 @@ export class PostProcessManager {
                 case PostProcessType.MANDELBULB:
                     this.renderingPipeline.addEffect(bodyMandelbulbsRenderEffect);
                     break;
+                case PostProcessType.JULIA_SET:
+                    this.renderingPipeline.addEffect(bodyJuliaSetRenderEffect);
+                    break;
                 case PostProcessType.LENS_FLARE:
                     //this.renderingPipeline.addEffect(bodyLensFlaresRenderEffect);
                     break;
@@ -532,29 +569,15 @@ export class PostProcessManager {
     public reset() {
         // disposing on every camera is necessary because BabylonJS only detaches the post-processes from a single camera at a time
         this.scene.cameras.forEach((camera) => {
-            this.starFields.forEach((starField) => starField.dispose(camera));
-            this.volumetricLights.forEach((volumetricLight) => volumetricLight.dispose(camera));
-            this.oceans.forEach((ocean) => ocean.dispose(camera));
-            this.clouds.forEach((clouds) => clouds.dispose(camera));
-            this.atmospheres.forEach((atmosphere) => atmosphere.dispose(camera));
-            this.rings.forEach((rings) => rings.dispose(camera));
-            this.mandelbulbs.forEach((mandelbulb) => mandelbulb.dispose(camera));
-            this.blackHoles.forEach((blackHole) => blackHole.dispose(camera));
-            this.matterJets.forEach((matterJet) => matterJet.dispose(camera));
-            this.shadows.forEach((shadow) => shadow.dispose(camera));
-            this.lensFlares.forEach((lensFlare) => lensFlare.dispose(camera));
+            this.objectPostProcesses.forEach((postProcessList) => {
+                postProcessList.forEach((postProcess) => {
+                    postProcess.dispose(camera);
+                });
+            });
         });
 
-        this.starFields.length = 0;
-        this.volumetricLights.length = 0;
-        this.oceans.length = 0;
-        this.clouds.length = 0;
-        this.atmospheres.length = 0;
-        this.rings.length = 0;
-        this.mandelbulbs.length = 0;
-        this.blackHoles.length = 0;
-        this.matterJets.length = 0;
-        this.shadows.length = 0;
-        this.lensFlares.length = 0;
+        this.objectPostProcesses.forEach((postProcessList) => {
+            postProcessList.length = 0;
+        });
     }
 }
