@@ -44,7 +44,7 @@ export function createHelixVertexData(options: { radius?: number; tubeDiameter?:
     for (let i = 0; i <= turns; i++) {
         const u = i / tessellation;
 
-        const angle = (i * Math.PI * 2.0) / tessellation - Math.PI / 2.0;
+        const angle = (i * Math.PI * 2.0) / tessellation;
         const y = (i * pitch) / tessellation;
 
         const transform = Matrix.Translation(radius, y - spires * pitch / 2, 0).multiply(Matrix.RotationY(angle));
@@ -52,7 +52,7 @@ export function createHelixVertexData(options: { radius?: number; tubeDiameter?:
         for (let j = 0; j <= tessellation; j++) {
             const v = 1 - j / tessellation;
 
-            const innerAngle = (j * Math.PI * 2.0) / tessellation + Math.PI;
+            const innerAngle = (j * Math.PI * 2.0) / tessellation;
             const dx = Math.cos(innerAngle);
             const dy = Math.sin(innerAngle);
 
@@ -85,6 +85,19 @@ export function createHelixVertexData(options: { radius?: number; tubeDiameter?:
         }
     }
 
+    // Add caps at the ends of the helix
+    addDisc(positions, normals, uvs, indices, tessellation, tubeDiameter, new Vector3(radius, (-pitch * spires) / 2, 0), Vector3.Left(), true);
+    addDisc(
+        positions,
+        normals,
+        uvs,
+        indices,
+        tessellation,
+        tubeDiameter,
+        new Vector3(radius * Math.cos(spires * 2 * Math.PI), (pitch * spires) / 2, radius * Math.sin(spires * 2 * Math.PI)),
+        Vector3.Right(), false
+    );
+
     // Sides
     VertexData._ComputeSides(sideOrientation, positions, indices, normals, uvs, options.frontUVs, options.backUVs);
 
@@ -97,6 +110,43 @@ export function createHelixVertexData(options: { radius?: number; tubeDiameter?:
     vertexData.uvs = uvs;
 
     return vertexData;
+}
+
+
+/**
+ * Adds a disc to the mesh to cap the ends of the helix
+ * @param positions array of vertex positions
+ * @param normals array of vertex normals
+ * @param uvs array of vertex uvs
+ * @param indices array of vertex indices
+ * @param tessellation number of sides for the disc
+ * @param tubeDiameter diameter of the tube forming the helix
+ * @param center center position of the disc
+ * @param normal normal direction of the disc
+ */
+function addDisc(positions: number[], normals: number[], uvs: number[], indices: number[], tessellation: number, tubeDiameter: number, center: Vector3, normal: Vector3, invertWinding: boolean) {
+    const baseIndex = positions.length / 3;
+    const angleStep = (Math.PI * 2) / tessellation;
+
+    // Center vertex
+    positions.push(center.x, center.y, center.z);
+    normals.push(normal.x, normal.y, normal.z);
+    uvs.push(0.5, 0.5);
+
+    for (let i = 0; i <= tessellation; i++) {
+        const angle = i * angleStep;
+        const x = center.x + (tubeDiameter / 2) * Math.cos(angle);
+        const z = center.z + (tubeDiameter / 2) * Math.sin(angle);
+
+        positions.push(x, center.y + z, 0);
+        normals.push(normal.x, normal.y, normal.z);
+        uvs.push(0.5 + 0.5 * Math.cos(angle), 0.5 + 0.5 * Math.sin(angle));
+
+        if (i > 0) {
+            if(!invertWinding) indices.push(baseIndex, baseIndex + i, baseIndex + i + 1);
+            else indices.push(baseIndex, baseIndex + i + 1, baseIndex + i);
+        }
+    }
 }
 
 /**
