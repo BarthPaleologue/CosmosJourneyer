@@ -102,7 +102,7 @@ for (let i = 0; i < 20; i++) {
         newNode.sideNodes.push(sideNode2);
         sideNode2.mesh.rotateAround(newNode.mesh.position, Axis.Y, Math.PI);
     } else if (nodeType === SpaceStationNodeType.SQUARE_SECTION && Math.random() < 0.3) {
-        for(let ring = -2; ring < 2; ring++) {
+        for(let ring = -1; ring <= 1; ring++) {
             for (let sideIndex = 0; sideIndex < 4; sideIndex++) {
                 const tank = new SpaceStationNode(newNode, SpaceStationNodeType.SPHERICAL_TANK, AttachmentType.SIDE, scene);
                 newNode.sideNodes.push(tank);

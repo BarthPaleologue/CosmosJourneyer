@@ -65,7 +65,7 @@ export class SpaceStationNode {
                 break;
             case SpaceStationNodeType.SPHERICAL_TANK:
                 this.mesh = SpaceStationAssets.SPHERICAL_TANK.createInstance("SphericalTank");
-                this.mesh.scalingDeterminant = 3;
+                this.mesh.scalingDeterminant = 5;
                 break;
         }
 
