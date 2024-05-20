@@ -28,8 +28,16 @@ export class SpaceStationNode {
     constructor(previous: SpaceStationNode | null, type: SpaceStationNodeType, attachmentType: AttachmentType) {
         this.type = type;
         if(previous !== null) {
-            previous.next = this;
-            this.index = previous.index + 1;
+            switch(attachmentType) {
+                case AttachmentType.NEXT:
+                    previous.next = this;
+                    this.index = previous.index + 1;
+                    break;
+                case AttachmentType.SIDE:
+                    previous.sideNodes.push(this);
+                    this.index = previous.index;
+                    break;
+            }
         } else {
             this.index = 0;
         }
@@ -46,11 +54,21 @@ export class SpaceStationNode {
                 this.mesh = SpaceStationAssets.RING_HABITAT.createInstance("RingHabitat");
                 this.mesh.scalingDeterminant = 1e3 + (Math.random() - 0.5) * 1e3;
                 break;
+            case SpaceStationNodeType.HELIX_HABITAT:
+                this.mesh = SpaceStationAssets.HELIX_HABITAT.createInstance("HelixHabitat");
+                this.mesh.scalingDeterminant = 1e3 + (Math.random() - 0.5) * 1e3;
+                break;
             case SpaceStationNodeType.SOLAR_PANEL:
                 this.mesh = SpaceStationAssets.SOLAR_PANEL.createInstance("SolarPanel");
                 this.mesh.scalingDeterminant = 4;
                 break;
+            case SpaceStationNodeType.SPHERICAL_TANK:
+                this.mesh = SpaceStationAssets.SPHERICAL_TANK.createInstance("SphericalTank");
+                this.mesh.scalingDeterminant = 3;
+                break;
         }
+
+        //this.mesh.showBoundingBox = true;
 
         if (previous !== null) {
             if (attachmentType === AttachmentType.NEXT) {
@@ -71,7 +89,9 @@ export class SpaceStationNode {
 export const enum SpaceStationNodeType {
     SQUARE_SECTION,
     RING_HABITAT,
-    SOLAR_PANEL
+    HELIX_HABITAT,
+    SOLAR_PANEL,
+    SPHERICAL_TANK
 }
 
 export const enum AttachmentType {
