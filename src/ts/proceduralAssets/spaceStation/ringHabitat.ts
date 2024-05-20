@@ -11,9 +11,9 @@ export function createRingHabitat(scene: Scene): TransformNode {
 
     const tubeDiameter = 100 + Math.random() * 100;
 
-    const tesselation = 32;
+    const attachmentNbSides = 4 + 2 * Math.floor(Math.random() * 4);
 
-    const attachmentNbSides = 6 + 2 * Math.floor(Math.random() * 2);
+    const tesselation = attachmentNbSides * 8;
 
     const attachment = MeshBuilder.CreateCylinder(
         "HelixHabitatAttachment",

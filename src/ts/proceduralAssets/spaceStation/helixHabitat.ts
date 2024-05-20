@@ -8,7 +8,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 export function createHelixHabitat(scene: Scene): TransformNode {
     const root = new TransformNode("HelixHabitatRoot");
 
-    const nbSpires = 2 + Math.floor(Math.random() * 4)
+    const nbSpires = 2 + Math.floor(Math.random() * 2)
 
     const pitch = 4e3 * (1 + 0.3 * (Math.random() * 2 - 1))
 
@@ -16,11 +16,11 @@ export function createHelixHabitat(scene: Scene): TransformNode {
 
     const tubeDiameter = 100 + Math.random() * 100;
 
-    const tesselation = 32;
-
     const totalLength = pitch * nbSpires;
 
     const attachmentNbSides = 6 + 2 * Math.floor(Math.random() * 2);
+
+    const tesselation = attachmentNbSides * 8;
 
     const attachment = MeshBuilder.CreateCylinder(
         "HelixHabitatAttachment",
