@@ -26,6 +26,7 @@ import { getTransformationQuaternion } from "../utils/algebra";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { LocalDirection } from "../uberCore/localDirections";
 import { DefaultControlsInputs } from "./defaultControlsInputs";
+import { Settings } from "../settings";
 
 export class DefaultControls implements Controls {
     private readonly transform: TransformNode;
@@ -41,7 +42,7 @@ export class DefaultControls implements Controls {
         this.camera = new FreeCamera("firstPersonCamera", Vector3.Zero(), scene);
         this.camera.parent = this.transform;
         this.camera.speed = 0;
-        this.camera.fov = (80 / 360) * Math.PI;
+        this.camera.fov = Settings.FOV
     }
 
     public getActiveCameras(): Camera[] {
