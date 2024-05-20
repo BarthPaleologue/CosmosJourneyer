@@ -100,14 +100,14 @@ for (let i = 0; i < 20; i++) {
 
         const sideNode2 = new SpaceStationNode(newNode, SpaceStationNodeType.SOLAR_PANEL, AttachmentType.SIDE, scene);
         newNode.sideNodes.push(sideNode2);
-        sideNode2.mesh.rotateAround(newNode.mesh.position, Axis.Y, Math.PI);
+        sideNode2.transform.rotateAround(newNode.transform.position, Axis.Y, Math.PI);
     } else if (nodeType === SpaceStationNodeType.SQUARE_SECTION && Math.random() < 0.3) {
         for(let ring = -1; ring <= 1; ring++) {
             for (let sideIndex = 0; sideIndex < 4; sideIndex++) {
                 const tank = new SpaceStationNode(newNode, SpaceStationNodeType.SPHERICAL_TANK, AttachmentType.SIDE, scene);
                 newNode.sideNodes.push(tank);
-                tank.mesh.rotateAround(newNode.mesh.position, Axis.Y, (Math.PI / 2) * sideIndex);
-                tank.mesh.translate(Axis.Y, ring * 40);
+                tank.transform.rotateAround(newNode.transform.position, Axis.Y, (Math.PI / 2) * sideIndex);
+                tank.transform.translate(Axis.Y, ring * 40);
             }
         }
     }
@@ -119,7 +119,7 @@ function updateStation(stationNode: SpaceStationNode | null, deltaSeconds: numbe
     if (stationNode === null) return;
 
     if (stationNode.type === SpaceStationNodeType.RING_HABITAT || stationNode.type === SpaceStationNodeType.HELIX_HABITAT) {
-        stationNode.mesh.rotate(Axis.Y, ((stationNode.index % 2 === 0 ? -1 : 1) * deltaSeconds) / computeRingRotationPeriod(stationNode.mesh.scalingDeterminant, Settings.G_EARTH));
+        stationNode.transform.rotate(Axis.Y, ((stationNode.index % 2 === 0 ? -1 : 1) * deltaSeconds) / computeRingRotationPeriod(stationNode.transform.scalingDeterminant, Settings.G_EARTH));
     }
 
     updateStation(stationNode.next, deltaSeconds);

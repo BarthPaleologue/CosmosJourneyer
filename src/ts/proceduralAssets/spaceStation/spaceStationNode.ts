@@ -15,22 +15,23 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { SpaceStationAssets } from "./spaceStationAssets";
 import { createHelix } from "../../utils/helixBuilder";
 import { Scene } from "@babylonjs/core/scene";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Transformable } from "../../architecture/transformable";
 
-export class SpaceStationNode {
+export class SpaceStationNode implements Transformable {
     readonly type: SpaceStationNodeType;
-    readonly mesh: AbstractMesh;
+    readonly transform: TransformNode;
     next: SpaceStationNode | null = null;
     readonly sideNodes: SpaceStationNode[];
     readonly index: number;
 
     constructor(previous: SpaceStationNode | null, type: SpaceStationNodeType, attachmentType: AttachmentType, scene: Scene) {
         this.type = type;
-        if(previous !== null) {
-            switch(attachmentType) {
+        if (previous !== null) {
+            switch (attachmentType) {
                 case AttachmentType.NEXT:
                     previous.next = this;
                     this.index = previous.index + 1;
@@ -48,42 +49,54 @@ export class SpaceStationNode {
 
         switch (type) {
             case SpaceStationNodeType.SQUARE_SECTION:
-                this.mesh = SpaceStationAssets.SQUARE_SECTION.createInstance("SquareSection");
-                this.mesh.scalingDeterminant = 0.9 + Math.random() * 0.2;
-                this.mesh.scaling.y = 5;
+                this.transform = SpaceStationAssets.SQUARE_SECTION.createInstance("SquareSection");
+                this.transform.scalingDeterminant = 0.9 + Math.random() * 0.2;
+                this.transform.scaling.y = 5;
                 break;
             case SpaceStationNodeType.RING_HABITAT:
-                this.mesh = SpaceStationAssets.RING_HABITAT.createInstance("RingHabitat");
-                this.mesh.scalingDeterminant = 1e3 + (Math.random() - 0.5) * 1e3;
+                this.transform = SpaceStationAssets.RING_HABITAT.createInstance("RingHabitat");
+                this.transform.scalingDeterminant = 1e3 + (Math.random() - 0.5) * 1e3;
                 break;
             case SpaceStationNodeType.HELIX_HABITAT:
-                this.mesh = createHelix("HelixHabitat", {radius:2e3, tubeDiameter: 100, tessellation:32, pitch: 500, spires: 8}, scene);
+                this.transform = createHelix("HelixHabitat", { radius: 2e3, tubeDiameter: 100, tessellation: 32, pitch: 1e3, spires: 4 }, scene);
                 break;
             case SpaceStationNodeType.SOLAR_PANEL:
-                this.mesh = SpaceStationAssets.SOLAR_PANEL.createInstance("SolarPanel");
-                this.mesh.scalingDeterminant = 4;
+                this.transform = SpaceStationAssets.SOLAR_PANEL.createInstance("SolarPanel");
+                this.transform.scalingDeterminant = 4;
                 break;
             case SpaceStationNodeType.SPHERICAL_TANK:
-                this.mesh = SpaceStationAssets.SPHERICAL_TANK.createInstance("SphericalTank");
-                this.mesh.scalingDeterminant = 5;
+                this.transform = SpaceStationAssets.SPHERICAL_TANK.createInstance("SphericalTank");
+                this.transform.scalingDeterminant = 5;
                 break;
         }
 
-        //this.mesh.showBoundingBox = true;
-
         if (previous !== null) {
+            const previousBoundingVectors = previous.transform.getHierarchyBoundingVectors();
+            const previousBoundingExtendSize = previousBoundingVectors.max.subtract(previousBoundingVectors.min).scale(0.5);
+
+            const newBoundingVectors = this.transform.getHierarchyBoundingVectors();
+            const newBoundingExtendSize = newBoundingVectors.max.subtract(newBoundingVectors.min).scale(0.5);
+
             if (attachmentType === AttachmentType.NEXT) {
-                const previousSectionSizeY = previous.mesh.getBoundingInfo().boundingBox.extendSize.y * previous.mesh.scalingDeterminant * previous.mesh.scaling.y;
-                const newSectionY = this.mesh.getBoundingInfo().boundingBox.extendSize.y * this.mesh.scalingDeterminant * this.mesh.scaling.y;
+                const previousSectionSizeY = previousBoundingExtendSize.y;
+                const newSectionY = newBoundingExtendSize.y;
 
-                this.mesh.position = previous.mesh.position.add(previous.mesh.up.scale(previousSectionSizeY + newSectionY));
+                this.transform.position = previous.transform.position.add(previous.transform.up.scale(previousSectionSizeY + newSectionY));
             } else if (attachmentType === AttachmentType.SIDE) {
-                const previousSectionSizeX = previous.mesh.getBoundingInfo().boundingBox.extendSize.x * previous.mesh.scalingDeterminant * previous.mesh.scaling.x;
-                const newSectionX = this.mesh.getBoundingInfo().boundingBox.extendSize.x * this.mesh.scalingDeterminant * this.mesh.scaling.x;
+                const previousSectionSizeX = previousBoundingExtendSize.x;
+                const newSectionX = newBoundingExtendSize.x;
 
-                this.mesh.position = previous.mesh.position.add(previous.mesh.right.scale(previousSectionSizeX + newSectionX));
+                this.transform.position = previous.transform.position.add(previous.transform.right.scale(previousSectionSizeX + newSectionX));
             }
         }
+    }
+
+    getTransform(): TransformNode {
+        return this.transform;
+    }
+
+    dispose() {
+        this.transform.dispose();
     }
 }
 
