@@ -21,6 +21,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Transformable } from "../../architecture/transformable";
 import { createHelixHabitat } from "./helixHabitat";
+import { createRingHabitat } from "./ringHabitat";
 
 export class SpaceStationNode implements Transformable {
     readonly type: SpaceStationNodeType;
@@ -55,8 +56,7 @@ export class SpaceStationNode implements Transformable {
                 this.transform.scaling.y = 5;
                 break;
             case SpaceStationNodeType.RING_HABITAT:
-                this.transform = SpaceStationAssets.RING_HABITAT.createInstance("RingHabitat");
-                this.transform.scalingDeterminant = 1e3 + (Math.random() - 0.5) * 1e3;
+                this.transform = createRingHabitat(scene);
                 break;
             case SpaceStationNodeType.HELIX_HABITAT:
                 this.transform = createHelixHabitat(scene);
