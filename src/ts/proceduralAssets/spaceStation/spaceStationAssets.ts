@@ -3,7 +3,6 @@ import { AssetsManager, MeshAssetTask } from "@babylonjs/core/Misc/assetsManager
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 
 import ringHabitat from "../../../asset/SpaceStationParts/ringHabitat.glb";
-import helixHabitat from "../../../asset/SpaceStationParts/helixHabitat.glb";
 import squareSection from "../../../asset/SpaceStationParts/squareSection.glb";
 
 import solarPanel from "../../../asset/SpaceStationParts/solarPanel.glb";
@@ -11,7 +10,6 @@ import sphericalTank from "../../../asset/SpaceStationParts/sphericalTank.glb";
 
 export class SpaceStationAssets {
     public static RING_HABITAT: Mesh;
-    public static HELIX_HABITAT: Mesh;
     public static SQUARE_SECTION: Mesh;
 
     public static SOLAR_PANEL: Mesh;
@@ -32,22 +30,6 @@ export class SpaceStationAssets {
             SpaceStationAssets.RING_HABITAT.bakeCurrentTransformIntoVertices();
 
             console.log("RingHabitat loaded");
-        };
-
-        const helixHabitatTask = assetsManager.addMeshTask("HelixHabitatTask", "", "", helixHabitat);
-        helixHabitatTask.onSuccess = (task: MeshAssetTask) => {
-            SpaceStationAssets.HELIX_HABITAT = (task.loadedMeshes[0]).getChildMeshes()[0] as Mesh;
-            SpaceStationAssets.HELIX_HABITAT.parent = null;
-            SpaceStationAssets.HELIX_HABITAT.isVisible = false;
-
-            const boundingBox = SpaceStationAssets.HELIX_HABITAT.getBoundingInfo().boundingBox;
-            const maxDimension = Math.max(boundingBox.extendSize.x, boundingBox.extendSize.y, boundingBox.extendSize.z);
-
-            // the helix must have radius 1
-            SpaceStationAssets.HELIX_HABITAT.scalingDeterminant = 2 / maxDimension;
-            SpaceStationAssets.HELIX_HABITAT.bakeCurrentTransformIntoVertices();
-
-            console.log("HelixHabitat loaded");
         };
 
         const squareSectionTask = assetsManager.addMeshTask("SquareSectionTask", "", "", squareSection);
