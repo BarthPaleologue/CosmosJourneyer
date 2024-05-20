@@ -20,6 +20,7 @@ import { createHelix } from "../../utils/helixBuilder";
 import { Scene } from "@babylonjs/core/scene";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Transformable } from "../../architecture/transformable";
+import { createHelixHabitat } from "./helixHabitat";
 
 export class SpaceStationNode implements Transformable {
     readonly type: SpaceStationNodeType;
@@ -58,7 +59,7 @@ export class SpaceStationNode implements Transformable {
                 this.transform.scalingDeterminant = 1e3 + (Math.random() - 0.5) * 1e3;
                 break;
             case SpaceStationNodeType.HELIX_HABITAT:
-                this.transform = createHelix("HelixHabitat", { radius: 2e3, tubeDiameter: 100, tessellation: 32, pitch: 1e3, spires: 4 }, scene);
+                this.transform = createHelixHabitat(scene);
                 break;
             case SpaceStationNodeType.SOLAR_PANEL:
                 this.transform = SpaceStationAssets.SOLAR_PANEL.createInstance("SolarPanel");
