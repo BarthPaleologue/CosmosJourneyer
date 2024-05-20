@@ -33,6 +33,7 @@ import { Settings } from "./settings";
 import { sigmoid } from "./utils/math";
 import { StarfieldPostProcess } from "./postProcesses/starfieldPostProcess";
 import { AttachmentType, SpaceStationNode, SpaceStationNodeType } from "./proceduralAssets/spaceStation/spaceStationNode";
+import { createHelix } from "./utils/helixBuilder";
 /*import { ShipControls } from "./spaceship/shipControls";
 import HavokPhysics from "@babylonjs/havok";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";*/
@@ -74,13 +75,13 @@ let lastNode: SpaceStationNode | null = null;
 let firstNode: SpaceStationNode | null = null;
 
 let urgeToCreateHabitat = 0;
-for (let i = 0; i < 30; i++) {
+for (let i = 0; i < 20; i++) {
     let nodeType = SpaceStationNodeType.SQUARE_SECTION;
     if (Math.random() < sigmoid(urgeToCreateHabitat - 6) && urgeToCreateHabitat > 0) {
         nodeType = Math.random() < 0.5 ? SpaceStationNodeType.RING_HABITAT : SpaceStationNodeType.HELIX_HABITAT;
     }
 
-    const newNode: SpaceStationNode = new SpaceStationNode(lastNode, nodeType, AttachmentType.NEXT);
+    const newNode: SpaceStationNode = new SpaceStationNode(lastNode, nodeType, AttachmentType.NEXT, scene);
     if (i === 0) firstNode = newNode;
 
     switch (nodeType) {
@@ -94,16 +95,16 @@ for (let i = 0; i < 30; i++) {
     }
 
     if (nodeType === SpaceStationNodeType.SQUARE_SECTION && Math.random() < 0.4) {
-        const sideNode1 = new SpaceStationNode(newNode, SpaceStationNodeType.SOLAR_PANEL, AttachmentType.SIDE);
+        const sideNode1 = new SpaceStationNode(newNode, SpaceStationNodeType.SOLAR_PANEL, AttachmentType.SIDE, scene);
         newNode.sideNodes.push(sideNode1);
 
-        const sideNode2 = new SpaceStationNode(newNode, SpaceStationNodeType.SOLAR_PANEL, AttachmentType.SIDE);
+        const sideNode2 = new SpaceStationNode(newNode, SpaceStationNodeType.SOLAR_PANEL, AttachmentType.SIDE, scene);
         newNode.sideNodes.push(sideNode2);
         sideNode2.mesh.rotateAround(newNode.mesh.position, Axis.Y, Math.PI);
     } else if (nodeType === SpaceStationNodeType.SQUARE_SECTION && Math.random() < 0.3) {
         for(let ring = -2; ring < 2; ring++) {
             for (let sideIndex = 0; sideIndex < 4; sideIndex++) {
-                const tank = new SpaceStationNode(newNode, SpaceStationNodeType.SPHERICAL_TANK, AttachmentType.SIDE);
+                const tank = new SpaceStationNode(newNode, SpaceStationNodeType.SPHERICAL_TANK, AttachmentType.SIDE, scene);
                 newNode.sideNodes.push(tank);
                 tank.mesh.rotateAround(newNode.mesh.position, Axis.Y, (Math.PI / 2) * sideIndex);
                 tank.mesh.translate(Axis.Y, ring * 40);

@@ -17,6 +17,8 @@
 
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { SpaceStationAssets } from "./spaceStationAssets";
+import { createHelix } from "../../utils/helixBuilder";
+import { Scene } from "@babylonjs/core/scene";
 
 export class SpaceStationNode {
     readonly type: SpaceStationNodeType;
@@ -25,7 +27,7 @@ export class SpaceStationNode {
     readonly sideNodes: SpaceStationNode[];
     readonly index: number;
 
-    constructor(previous: SpaceStationNode | null, type: SpaceStationNodeType, attachmentType: AttachmentType) {
+    constructor(previous: SpaceStationNode | null, type: SpaceStationNodeType, attachmentType: AttachmentType, scene: Scene) {
         this.type = type;
         if(previous !== null) {
             switch(attachmentType) {
@@ -55,8 +57,7 @@ export class SpaceStationNode {
                 this.mesh.scalingDeterminant = 1e3 + (Math.random() - 0.5) * 1e3;
                 break;
             case SpaceStationNodeType.HELIX_HABITAT:
-                this.mesh = SpaceStationAssets.HELIX_HABITAT.createInstance("HelixHabitat");
-                this.mesh.scalingDeterminant = 1e3 + (Math.random() - 0.5) * 1e3;
+                this.mesh = createHelix("HelixHabitat", {radius:2e3, tubeDiameter: 100, tessellation:32, pitch: 500, spires: 8}, scene);
                 break;
             case SpaceStationNodeType.SOLAR_PANEL:
                 this.mesh = SpaceStationAssets.SOLAR_PANEL.createInstance("SolarPanel");
