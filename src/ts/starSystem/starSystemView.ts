@@ -498,7 +498,11 @@ export class StarSystemView implements View {
 
         this.defaultControls = new DefaultControls(this.scene);
         this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
-        this.defaultControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
+        this.defaultControls.monoCamera.maxZ = maxZ;
+        this.defaultControls.stereoCameras.leftEye.minZ = this.defaultControls.monoCamera.minZ;
+        this.defaultControls.stereoCameras.rightEye.minZ = this.defaultControls.monoCamera.minZ;
+        this.defaultControls.stereoCameras.leftEye.maxZ = maxZ;
+        this.defaultControls.stereoCameras.rightEye.maxZ = maxZ;
 
         this.spaceshipControls = new ShipControls(this.scene);
         this.spaceshipControls.getActiveCameras().forEach((camera) => (camera.maxZ = maxZ));
@@ -516,6 +520,8 @@ export class StarSystemView implements View {
      */
     public update(deltaSeconds: number) {
         if (this.isLoadingSystem) return;
+
+        this.scene.setActiveCameras(this.scene.getActiveControls().getActiveCameras());
 
         const starSystem = this.getStarSystem();
 
