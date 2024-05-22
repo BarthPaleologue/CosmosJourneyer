@@ -151,7 +151,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
             beachSize: 100 + 50 * centeredRand(model.rng, 85),
             steepSharpness: 2,
-            normalSharpness: 2
+            normalSharpness: 2.5
         };
 
         if (model.physicalProperties.oceanLevel === 0) {
