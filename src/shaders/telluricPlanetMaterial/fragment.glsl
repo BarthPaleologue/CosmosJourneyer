@@ -64,7 +64,7 @@ uniform sampler2D snowNormalMap;
 uniform sampler2D steepNormalMap;
 uniform sampler2D steepAlbedoMap;
 uniform sampler2D steepRoughnessMap;
-uniform sampler2D steepMetallicMapuniform;
+uniform sampler2D steepMetallicMap;
 
 uniform float seed;
 
@@ -179,7 +179,7 @@ void main() {
 
 
     // calcul de la couleur et de la normale
-    vec3 normal = vNormal;
+    /*vec3 normal = vNormal;
 
     float plainFactor = 0.0,
     desertFactor = 0.0,
@@ -237,10 +237,13 @@ void main() {
     // small scale
     // large scale
 
-    const float normalStrengthNear = 1.0;
-    const float normalStrengthFar = 1.0;
+    float normalStrengthNear = 1.0;
+    float normalStrengthFar = 1.0;
 
-    const float nearScale = 0.1 * 1000e3;
+    normalStrengthFar = smoothstep(0.0, 1.0, pow(length(cameraPosition - vPositionW) / 5e3, 2.0));
+    normalStrengthNear = 1.0 - normalStrengthFar;
+
+    const float nearScale = 0.3 * 1000e3;
     const float farScale = 0.00001 * 1000e3;
 
     normal = triplanarNormal(vSamplePointScaled, normal, bottomNormalMap, nearScale, normalSharpness, bottomFactor * normalStrengthNear);
@@ -268,7 +271,17 @@ void main() {
     + desertFactor * desertColor
     + plainFactor * plainColor
     + snowFactor * snowColor
-    + bottomFactor * bottomColor;
+    + bottomFactor * bottomColor;*/
+
+    float scale = 0.5 * 1000e3;
+    float sharpness = 1.0;
+    float normalStrength = 1.0;
+    vec3 albedo;
+    vec3 normal = vNormal;
+    float roughness, metallic;
+    triPlanarMaterial(vSamplePointScaled, normal, steepAlbedoMap, steepNormalMap, steepRoughnessMap, steepMetallicMap, scale, sharpness, normalStrength, albedo, normal, roughness, metallic);
+
+    vec3 color = albedo;
 
     vec3 normalW = mat3(normalMatrix) * normal;
 
