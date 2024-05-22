@@ -115,24 +115,18 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
             ],
             samplers: ["lut", "bottomNormalMap",
 
-                "plainAlbedoMap",
-                "plainNormalMap",
-                "plainRoughnessMap",
-                "plainMetallicMap",
+                "plainAlbedoRoughnessMap",
+                "plainNormalMetallicMap",
 
                 "beachNormalMap",
 
-                "desertNormalMap",
-                "desertAlbedoMap",
-                "desertRoughnessMap",
-                "desertMetallicMap",
+                "desertNormalMetallicMap",
+                "desertAlbedoRoughnessMap",
 
                 "snowNormalMap",
 
-                "steepNormalMap",
-                "steepAlbedoMap",
-                "steepRoughnessMap",
-                "steepMetallicMap"
+                "steepNormalMetallicMap",
+                "steepAlbedoRoughnessMap",
             ]
         });
 
@@ -210,23 +204,20 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         this.setTexture("bottomNormalMap", Assets.BOTTOM_NORMAL_MAP);
 
-        this.setTexture("steepNormalMap", Assets.ROCK_NORMAL_MAP);
-        this.setTexture("steepAlbedoMap", Assets.ROCK_ALBEDO_MAP);
-        this.setTexture("steepRoughnessMap", Assets.ROCK_ROUGHNESS_MAP);
-        this.setTexture("steepMetallicMap", Assets.ROCK_METALLIC_MAP);
+        // Steep material
+        this.setTexture("steepNormalMetallicMap", Assets.ROCK_NORMAL_METALLIC_MAP);
+        this.setTexture("steepAlbedoRoughnessMap", Assets.ROCK_ALBEDO_ROUGHNESS_MAP);
 
-        this.setTexture("plainNormalMap", Assets.GRASS_NORMAL_MAP);
-        this.setTexture("plainAlbedoMap", Assets.GRASS_ALBEDO_MAP);
-        this.setTexture("plainRoughnessMap", Assets.GRASS_ROUGHNESS_MAP);
-        this.setTexture("plainMetallicMap", Assets.GRASS_METALLIC_MAP);
+        // Plain material
+        this.setTexture("plainNormalMetallicMap", Assets.GRASS_NORMAL_METALLIC_MAP);
+        this.setTexture("plainAlbedoRoughnessMap", Assets.GRASS_ALBEDO_ROUGHNESS_MAP);
 
         this.setTexture("snowNormalMap", Assets.SNOW_NORMAL_MAP_1);
-        this.setTexture("beachNormalMap", Assets.SAND_NORMAL_MAP);
+        this.setTexture("beachNormalMap", Assets.SAND_NORMAL_METALLIC_MAP);
 
-        this.setTexture("desertNormalMap", Assets.SAND_NORMAL_MAP);
-        this.setTexture("desertAlbedoMap", Assets.SAND_ALBEDO_MAP);
-        this.setTexture("desertRoughnessMap", Assets.SAND_ROUGHNESS_MAP);
-        this.setTexture("desertMetallicMap", Assets.SAND_METALLIC_MAP);
+        // Desert material
+        this.setTexture("desertNormalMetallicMap", Assets.SAND_NORMAL_METALLIC_MAP);
+        this.setTexture("desertAlbedoRoughnessMap", Assets.SAND_ALBEDO_ROUGHNESS_MAP);
 
         this.setFloat("minTemperature", this.planetModel.physicalProperties.minTemperature);
         this.setFloat("maxTemperature", this.planetModel.physicalProperties.maxTemperature);

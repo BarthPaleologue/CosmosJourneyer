@@ -51,15 +51,19 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, flo
 }
 
 #define inline
-void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoMap, sampler2D normalMap, sampler2D roughnessMap, sampler2D metallicMap, float scale, float sharpness, float normalStrength, out vec3 albedo, out vec3 normal, out float roughness, out float metallic) {
+void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoRoughnessMap, sampler2D normalMetallicMap, float scale, float sharpness, float normalStrength, out vec3 albedo, out vec3 normal, out float roughness, out float metallic) {
     vec2 uvX = vec3(position).zy * scale;
     vec2 uvY = vec3(position).xz * scale;
     vec2 uvZ = vec3(position).xy * scale;
 
     // get the normal from the normal map
-    vec3 tNormalX = texture2D(normalMap, uvX).rgb;
-    vec3 tNormalY = texture2D(normalMap, uvY).rgb;
-    vec3 tNormalZ = texture2D(normalMap, uvZ).rgb;
+    vec4 tNormalMetallicX = texture2D(normalMetallicMap, uvX);
+    vec4 tNormalMetallicY = texture2D(normalMetallicMap, uvY);
+    vec4 tNormalMetallicZ = texture2D(normalMetallicMap, uvZ);
+
+    vec3 tNormalX = tNormalMetallicX.rgb;
+    vec3 tNormalY = tNormalMetallicY.rgb;
+    vec3 tNormalZ = tNormalMetallicZ.rgb;
 
     tNormalX = normalize(tNormalX * 2.0 - 1.0);
     tNormalY = normalize(tNormalY * 2.0 - 1.0);
@@ -83,9 +87,13 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoMap, s
     );
 
     // tri planar mapping of albedo
-    vec3 tAlbedoX = texture2D(albedoMap, uvX).rgb;
-    vec3 tAlbedoY = texture2D(albedoMap, uvY).rgb;
-    vec3 tAlbedoZ = texture2D(albedoMap, uvZ).rgb;
+    vec4 tAlbedoRoughnessX = texture2D(albedoRoughnessMap, uvX);
+    vec4 tAlbedoRoughnessY = texture2D(albedoRoughnessMap, uvY);
+    vec4 tAlbedoRoughnessZ = texture2D(albedoRoughnessMap, uvZ);
+
+    vec3 tAlbedoX = tAlbedoRoughnessX.rgb;
+    vec3 tAlbedoY = tAlbedoRoughnessY.rgb;
+    vec3 tAlbedoZ = tAlbedoRoughnessZ.rgb;
 
     albedo =
         tAlbedoX * blendWeight.x +
@@ -93,9 +101,9 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoMap, s
         tAlbedoZ * blendWeight.z;
 
     // tri planar mapping of roughness
-    float tRoughnessX = texture2D(roughnessMap, uvX).r;
-    float tRoughnessY = texture2D(roughnessMap, uvY).r;
-    float tRoughnessZ = texture2D(roughnessMap, uvZ).r;
+    float tRoughnessX = tAlbedoRoughnessX.a;
+    float tRoughnessY = tAlbedoRoughnessY.a;
+    float tRoughnessZ = tAlbedoRoughnessZ.a;
 
     roughness =
         tRoughnessX * blendWeight.x +
@@ -103,9 +111,9 @@ void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoMap, s
         tRoughnessZ * blendWeight.z;
 
     // tri planar mapping of metallic
-    float tMetallicX = texture2D(metallicMap, uvX).r;
-    float tMetallicY = texture2D(metallicMap, uvY).r;
-    float tMetallicZ = texture2D(metallicMap, uvZ).r;
+    float tMetallicX = tNormalMetallicX.a;
+    float tMetallicY = tNormalMetallicY.a;
+    float tMetallicZ = tNormalMetallicZ.a;
 
     metallic =
         tMetallicX * blendWeight.x +

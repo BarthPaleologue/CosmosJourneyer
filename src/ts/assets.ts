@@ -19,26 +19,20 @@ import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Animations/animatable";
 
-import rockNormalMap from "../asset/rockMaterial/layered-planetary_normal-dx.png";
-import rockAlbedoMap from "../asset/rockMaterial/layered-planetary_albedo.png";
-import rockRoughnessMap from "../asset/rockMaterial/layered-planetary_roughness.png";
-import rockMetallicMap from "../asset/rockMaterial/layered-planetary_metallic.png";
+import rockNormalMetallicMap from "../asset/rockMaterial/layered-planetary_normal_metallic.png";
+import rockAlbedoRoughnessMap from "../asset/rockMaterial/layered-planetary_albedo_roughness.png";
 
 import dirtNormalMap from "../asset/textures/dirt/Ground_Dirt_008_normal.jpg";
 import bottomNormalMap from "../asset/textures/crackednormal.jpg";
 
-import grassNormalMap from "../asset/grassMaterial/wispy-grass-meadow_normal-dx.png";
-import grassAlbedoMap from "../asset/grassMaterial/wispy-grass-meadow_albedo.png";
-import grassRoughnessMap from "../asset/grassMaterial/wispy-grass-meadow_roughness.png";
-import grassMetallicMap from "../asset/grassMaterial/wispy-grass-meadow_metallic.png";
+import grassNormalMetallicMap from "../asset/grassMaterial/wispy-grass-meadow_normal_metallic.png";
+import grassAlbedoRoughnessMap from "../asset/grassMaterial/wispy-grass-meadow_albedo_roughness.png";
 
 import snowNormalMap1 from "../asset/textures/snow/Snow_002_NORM.jpg";
 import snowNormalMap2 from "../asset/textures/snowNormalMap2.png";
 
-import sandNormalMap from "../asset/sandMaterial/wavy-sand_normal-dx.png";
-import sandAlbedoMap from "../asset/sandMaterial/wavy-sand_albedo.png";
-import sandRoughnessMap from "../asset/sandMaterial/wavy-sand_roughness.png";
-import sandMetallicMap from "../asset/sandMaterial/wavy-sand_metallic.png";
+import sandNormalMetallicMap from "../asset/sandMaterial/wavy-sand_normal_metallic.png";
+import sandAlbedoRoughnessMap from "../asset/sandMaterial/wavy-sand_albedo_roughness.png";
 
 import waterNormal1 from "../asset/textures/waterNormalMap3.jpg";
 import waterNormal2 from "../asset/textures/waterNormalMap4.jpg";
@@ -107,26 +101,20 @@ export class Assets {
     static IS_READY = false;
 
     // Textures
-    static ROCK_NORMAL_MAP: Texture;
-    static ROCK_ALBEDO_MAP: Texture;
-    static ROCK_ROUGHNESS_MAP: Texture;
-    static ROCK_METALLIC_MAP: Texture;
+    static ROCK_NORMAL_METALLIC_MAP: Texture;
+    static ROCK_ALBEDO_ROUGHNESS_MAP: Texture;
 
     static DIRT_NORMAL_MAP: Texture;
     static BOTTOM_NORMAL_MAP: Texture;
 
-    static GRASS_NORMAL_MAP: Texture;
-    static GRASS_ALBEDO_MAP: Texture;
-    static GRASS_ROUGHNESS_MAP: Texture;
-    static GRASS_METALLIC_MAP: Texture;
+    static GRASS_NORMAL_METALLIC_MAP: Texture;
+    static GRASS_ALBEDO_ROUGHNESS_MAP: Texture;
 
     static SNOW_NORMAL_MAP_1: Texture;
     static SNOW_NORMAL_MAP_2: Texture;
 
-    static SAND_NORMAL_MAP: Texture;
-    static SAND_ALBEDO_MAP: Texture;
-    static SAND_ROUGHNESS_MAP: Texture;
-    static SAND_METALLIC_MAP: Texture;
+    static SAND_NORMAL_METALLIC_MAP: Texture;
+    static SAND_ALBEDO_ROUGHNESS_MAP: Texture;
 
     static WATER_NORMAL_MAP_1: Texture;
     static WATER_NORMAL_MAP_2: Texture;
@@ -196,26 +184,20 @@ export class Assets {
         Assets.MANAGER.autoHideLoadingUI = false;
         console.log("Initializing assets...");
 
-        Assets.MANAGER.addTextureTask("RockNormalMap", rockNormalMap).onSuccess = (task) => (Assets.ROCK_NORMAL_MAP = task.texture);
-        Assets.MANAGER.addTextureTask("RockAlbedoMap", rockAlbedoMap).onSuccess = (task) => (Assets.ROCK_ALBEDO_MAP = task.texture);
-        Assets.MANAGER.addTextureTask("RockRoughnessMap", rockRoughnessMap).onSuccess = (task) => (Assets.ROCK_ROUGHNESS_MAP = task.texture);
-        Assets.MANAGER.addTextureTask("RockMetallicMap", rockMetallicMap).onSuccess = (task) => (Assets.ROCK_METALLIC_MAP = task.texture);
+        Assets.MANAGER.addTextureTask("RockNormalMetallicMap", rockNormalMetallicMap).onSuccess = (task) => (Assets.ROCK_NORMAL_METALLIC_MAP = task.texture);
+        Assets.MANAGER.addTextureTask("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap).onSuccess = (task) => (Assets.ROCK_ALBEDO_ROUGHNESS_MAP = task.texture);
 
         Assets.MANAGER.addTextureTask("DirtNormalMap", dirtNormalMap).onSuccess = (task) => (Assets.DIRT_NORMAL_MAP = task.texture);
         Assets.MANAGER.addTextureTask("BottomNormalMap", bottomNormalMap).onSuccess = (task) => (Assets.BOTTOM_NORMAL_MAP = task.texture);
 
-        Assets.MANAGER.addTextureTask("GrassNormalMap", grassNormalMap).onSuccess = (task) => (Assets.GRASS_NORMAL_MAP = task.texture);
-        Assets.MANAGER.addTextureTask("GrassAlbedoMap", grassAlbedoMap).onSuccess = (task) => (Assets.GRASS_ALBEDO_MAP = task.texture);
-        Assets.MANAGER.addTextureTask("GrassRoughnessMap", grassRoughnessMap).onSuccess = (task) => (Assets.GRASS_ROUGHNESS_MAP = task.texture);
-        Assets.MANAGER.addTextureTask("GrassMetallicMap", grassMetallicMap).onSuccess = (task) => (Assets.GRASS_METALLIC_MAP = task.texture);
+        Assets.MANAGER.addTextureTask("GrassNormalMetallicMap", grassNormalMetallicMap).onSuccess = (task) => (Assets.GRASS_NORMAL_METALLIC_MAP = task.texture);
+        Assets.MANAGER.addTextureTask("GrassAlbedoRoughnessMap", grassAlbedoRoughnessMap).onSuccess = (task) => (Assets.GRASS_ALBEDO_ROUGHNESS_MAP = task.texture);
 
         Assets.MANAGER.addTextureTask("SnowNormalMap1", snowNormalMap1).onSuccess = (task) => (Assets.SNOW_NORMAL_MAP_1 = task.texture);
         Assets.MANAGER.addTextureTask("SnowNormalMap2", snowNormalMap2).onSuccess = (task) => (Assets.SNOW_NORMAL_MAP_2 = task.texture);
 
-        Assets.MANAGER.addTextureTask("SandNormalMap", sandNormalMap).onSuccess = (task) => (Assets.SAND_NORMAL_MAP = task.texture);
-        Assets.MANAGER.addTextureTask("SandAlbedoMap", sandAlbedoMap).onSuccess = (task) => (Assets.SAND_ALBEDO_MAP = task.texture);
-        Assets.MANAGER.addTextureTask("SandRoughnessMap", sandRoughnessMap).onSuccess = (task) => (Assets.SAND_ROUGHNESS_MAP = task.texture);
-        Assets.MANAGER.addTextureTask("SandMetallicMap", sandMetallicMap).onSuccess = (task) => (Assets.SAND_METALLIC_MAP = task.texture);
+        Assets.MANAGER.addTextureTask("SandNormalMetallicMap", sandNormalMetallicMap).onSuccess = (task) => (Assets.SAND_NORMAL_METALLIC_MAP = task.texture);
+        Assets.MANAGER.addTextureTask("SandAlbedoRoughnessMap", sandAlbedoRoughnessMap).onSuccess = (task) => (Assets.SAND_ALBEDO_ROUGHNESS_MAP = task.texture);
 
         Assets.MANAGER.addTextureTask("WaterNormalMap1", waterNormal1).onSuccess = (task) => (Assets.WATER_NORMAL_MAP_1 = task.texture);
         Assets.MANAGER.addTextureTask("WaterNormalMap2", waterNormal2).onSuccess = (task) => (Assets.WATER_NORMAL_MAP_2 = task.texture);

@@ -47,24 +47,18 @@ uniform sampler2D lut;
 
 uniform sampler2D bottomNormalMap;
 
-uniform sampler2D plainAlbedoMap;
-uniform sampler2D plainNormalMap;
-uniform sampler2D plainRoughnessMap;
-uniform sampler2D plainMetallicMap;
+uniform sampler2D plainAlbedoRoughnessMap;
+uniform sampler2D plainNormalMetallicMap;
 
 uniform sampler2D beachNormalMap;
 
-uniform sampler2D desertNormalMap;
-uniform sampler2D desertAlbedoMap;
-uniform sampler2D desertRoughnessMap;
-uniform sampler2D desertMetallicMap;
+uniform sampler2D desertNormalMetallicMap;
+uniform sampler2D desertAlbedoRoughnessMap;
 
 uniform sampler2D snowNormalMap;
 
-uniform sampler2D steepNormalMap;
-uniform sampler2D steepAlbedoMap;
-uniform sampler2D steepRoughnessMap;
-uniform sampler2D steepMetallicMap;
+uniform sampler2D steepNormalMetallicMap;
+uniform sampler2D steepAlbedoRoughnessMap;
 
 uniform float seed;
 
@@ -279,7 +273,7 @@ void main() {
     vec3 steepAlbedo;
     vec3 steepNormal = vNormal;
     float steepRoughness, steepMetallic;
-    triPlanarMaterial(vSamplePointScaled, steepNormal, steepAlbedoMap, steepNormalMap, steepRoughnessMap, steepMetallicMap, steepScale, steepSharpness, steepNormalStrength, steepAlbedo, steepNormal, steepRoughness, steepMetallic);
+    triPlanarMaterial(vSamplePointScaled, steepNormal, steepAlbedoRoughnessMap, steepNormalMetallicMap, steepScale, steepSharpness, steepNormalStrength, steepAlbedo, steepNormal, steepRoughness, steepMetallic);
 
     // Plain material
     float plainScale = 0.5 * 1000e3;
@@ -288,7 +282,7 @@ void main() {
     vec3 plainAlbedo;
     vec3 plainNormal = vNormal;
     float plainRoughness, plainMetallic;
-    triPlanarMaterial(vSamplePointScaled, plainNormal, plainAlbedoMap, plainNormalMap, plainRoughnessMap, plainMetallicMap, plainScale, plainSharpness, plainNormalStrength, plainAlbedo, plainNormal, plainRoughness, plainMetallic);
+    triPlanarMaterial(vSamplePointScaled, plainNormal, plainAlbedoRoughnessMap, plainNormalMetallicMap, plainScale, plainSharpness, plainNormalStrength, plainAlbedo, plainNormal, plainRoughness, plainMetallic);
 
     // Desert material
     float desertScale = 0.5 * 1000e3;
@@ -297,7 +291,7 @@ void main() {
     vec3 desertAlbedo;
     vec3 desertNormal = vNormal;
     float desertRoughness, desertMetallic;
-    triPlanarMaterial(vSamplePointScaled, desertNormal, desertAlbedoMap, desertNormalMap, desertRoughnessMap, desertMetallicMap, desertScale, desertSharpness, desertNormalStrength, desertAlbedo, desertNormal, desertRoughness, desertMetallic);
+    triPlanarMaterial(vSamplePointScaled, desertNormal, desertAlbedoRoughnessMap, desertNormalMetallicMap, desertScale, desertSharpness, desertNormalStrength, desertAlbedo, desertNormal, desertRoughness, desertMetallic);
 
     vec3 albedo = steepFactor * steepAlbedo + plainFactor * plainAlbedo + (desertFactor+beachFactor) * desertAlbedo;
     /*+ beachFactor * beachColor
