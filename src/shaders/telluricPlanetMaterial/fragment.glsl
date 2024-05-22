@@ -43,7 +43,7 @@ uniform vec3 star_colors[MAX_STARS];
 
 uniform int colorMode;
 
-uniform sampler2D lut; 
+uniform sampler2D lut;
 
 uniform sampler2D bottomNormalMap;
 
@@ -290,18 +290,27 @@ void main() {
     float plainRoughness, plainMetallic;
     triPlanarMaterial(vSamplePointScaled, plainNormal, plainAlbedoMap, plainNormalMap, plainRoughnessMap, plainMetallicMap, plainScale, plainSharpness, plainNormalStrength, plainAlbedo, plainNormal, plainRoughness, plainMetallic);
 
-    vec3 albedo = steepFactor * steepAlbedo + plainFactor * plainAlbedo;
+    // Desert material
+    float desertScale = 0.5 * 1000e3;
+    float desertSharpness = 2.0;
+    float desertNormalStrength = steepSharpness;
+    vec3 desertAlbedo;
+    vec3 desertNormal = vNormal;
+    float desertRoughness, desertMetallic;
+    triPlanarMaterial(vSamplePointScaled, desertNormal, desertAlbedoMap, desertNormalMap, desertRoughnessMap, desertMetallicMap, desertScale, desertSharpness, desertNormalStrength, desertAlbedo, desertNormal, desertRoughness, desertMetallic);
+
+    vec3 albedo = steepFactor * steepAlbedo + plainFactor * plainAlbedo + (desertFactor+beachFactor) * desertAlbedo;
     /*+ beachFactor * beachColor
     + desertFactor * desertColor
     + plainFactor * plainColor
     + snowFactor * snowColor
     + bottomFactor * bottomColor;*/
 
-    vec3 normal = steepFactor * steepNormal + plainFactor * plainNormal;
+    vec3 normal = steepFactor * steepNormal + plainFactor * plainNormal + (desertFactor+beachFactor) * desertNormal;
 
-    float roughness = steepFactor * steepRoughness + plainFactor * plainRoughness;
+    float roughness = steepFactor * steepRoughness + plainFactor * plainRoughness + (desertFactor+beachFactor) * desertRoughness;
 
-    float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic;
+    float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic + (desertFactor+beachFactor) * desertMetallic;
 
     vec3 N = mat3(normalMatrix) * normal;
 
