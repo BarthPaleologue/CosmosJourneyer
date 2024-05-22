@@ -90,7 +90,6 @@ uniform float maxTemperature;
 
 uniform float waterAmount;
 
-
 #include "../utils/toUV.glsl";
 
 #include "../utils/triplanarNormal.glsl";
@@ -108,6 +107,8 @@ vec3 saturate(vec3 color) {
 #include "./utils/waterBoilingPointCelsius.glsl";
 
 #include "./utils/computeTemperature01.glsl";
+
+#include "../utils/pbr.glsl";
 
 void main() {
     vec3 viewRayW = normalize(cameraPosition - vPositionW);// view direction in world space
