@@ -49,3 +49,66 @@ vec3 triplanarNormal(vec3 position, vec3 surfaceNormal, sampler2D normalMap, flo
         surfaceNormal
     );
 }
+
+#define inline
+void triPlanarMaterial(vec3 position, vec3 surfaceNormal, sampler2D albedoMap, sampler2D normalMap, sampler2D roughnessMap, sampler2D metallicMap, float scale, float sharpness, float normalStrength, out vec3 albedo, out vec3 normal, out float roughness, out float metallic) {
+    vec2 uvX = vec3(position).zy * scale;
+    vec2 uvY = vec3(position).xz * scale;
+    vec2 uvZ = vec3(position).xy * scale;
+
+    // get the normal from the normal map
+    vec3 tNormalX = texture2D(normalMap, uvX).rgb;
+    vec3 tNormalY = texture2D(normalMap, uvY).rgb;
+    vec3 tNormalZ = texture2D(normalMap, uvZ).rgb;
+
+    tNormalX = normalize(tNormalX * 2.0 - 1.0);
+    tNormalY = normalize(tNormalY * 2.0 - 1.0);
+    tNormalZ = normalize(tNormalZ * 2.0 - 1.0);
+
+    // Swizzle tangemt normals into world space and zero out "z"
+    tNormalX = vec3(0.0, tNormalX.yx);
+    tNormalY = vec3(tNormalY.x, 0.0, tNormalY.y);
+    tNormalZ = vec3(tNormalZ.xy, 0.0);
+
+    vec3 blendWeight = pow(abs(surfaceNormal), vec3(sharpness));
+    blendWeight /= (blendWeight.x + blendWeight.y + blendWeight.z);
+    blendWeight *= normalStrength;
+
+    // Triblend normals and add to world normal
+    normal = normalize(
+        tNormalX.xyz * blendWeight.x +
+        tNormalY.xyz * blendWeight.y +
+        tNormalZ.xyz * blendWeight.z +
+        surfaceNormal
+    );
+
+    // tri planar mapping of albedo
+    vec3 tAlbedoX = texture2D(albedoMap, uvX).rgb;
+    vec3 tAlbedoY = texture2D(albedoMap, uvY).rgb;
+    vec3 tAlbedoZ = texture2D(albedoMap, uvZ).rgb;
+
+    albedo =
+        tAlbedoX * blendWeight.x +
+        tAlbedoY * blendWeight.y +
+        tAlbedoZ * blendWeight.z;
+
+    // tri planar mapping of roughness
+    float tRoughnessX = texture2D(roughnessMap, uvX).r;
+    float tRoughnessY = texture2D(roughnessMap, uvY).r;
+    float tRoughnessZ = texture2D(roughnessMap, uvZ).r;
+
+    roughness =
+        tRoughnessX * blendWeight.x +
+        tRoughnessY * blendWeight.y +
+        tRoughnessZ * blendWeight.z;
+
+    // tri planar mapping of metallic
+    float tMetallicX = texture2D(metallicMap, uvX).r;
+    float tMetallicY = texture2D(metallicMap, uvY).r;
+    float tMetallicZ = texture2D(metallicMap, uvZ).r;
+
+    metallic =
+        tMetallicX * blendWeight.x +
+        tMetallicY * blendWeight.y +
+        tMetallicZ * blendWeight.z;
+}
