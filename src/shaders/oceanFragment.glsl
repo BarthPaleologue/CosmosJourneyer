@@ -96,8 +96,8 @@ void main() {
         normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 0.6, normalWave, normalMap1, 0.025, ocean_waveBlendingSharpness, 0.5);
         normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 0.6, normalWave, normalMap2, 0.02, ocean_waveBlendingSharpness, 0.5);*/
 
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 1.0, normalWave, normalMap2, 0.010, ocean_waveBlendingSharpness, 0.5);
-        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 1.0, normalWave, normalMap1, 0.005, ocean_waveBlendingSharpness, 0.5);
+        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(time, -time, -time) * 10.0, normalWave, normalMap2, 0.010, ocean_waveBlendingSharpness, 0.5);
+        normalWave = triplanarNormal(samplePointPlanetSpace + vec3(-time, -time, time) * 10.0, normalWave, normalMap1, 0.005, ocean_waveBlendingSharpness, 0.5);
 
         float opticalDepth01 = 1.0 - exp(-distanceThroughOcean * ocean_depthModifier);
         float alpha = exp(-distanceThroughOcean * ocean_alphaModifier);
