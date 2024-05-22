@@ -225,9 +225,8 @@ void main() {
     // small scale
     // large scale
 
-    // TODO: make uniforms
-    const float normalStrengthNear = 0.5;
-    const float normalStrengthFar = 0.2;
+    const float normalStrengthNear = 1.0;
+    const float normalStrengthFar = 1.0;
 
     const float nearScale = 0.1 * 1000e3;
     const float farScale = 0.00001 * 1000e3;
