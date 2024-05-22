@@ -180,8 +180,6 @@ void main() {
 
 
     // calcul de la couleur et de la normale
-    /*vec3 normal = vNormal;
-
     float plainFactor = 0.0,
     desertFactor = 0.0,
     bottomFactor = 0.0,
@@ -238,7 +236,7 @@ void main() {
     // small scale
     // large scale
 
-    float normalStrengthNear = 1.0;
+    /*float normalStrengthNear = 1.0;
     float normalStrengthFar = 1.0;
 
     normalStrengthFar = smoothstep(0.0, 1.0, pow(length(cameraPosition - vPositionW) / 5e3, 2.0));
@@ -274,44 +272,69 @@ void main() {
     + snowFactor * snowColor
     + bottomFactor * bottomColor;*/
 
-    float scale = 0.5 * 1000e3;
-    float sharpness = 1.0;
-    float normalStrength = 1.0;
-    vec3 albedo;
-    vec3 normal = vNormal;
-    float roughness, metallic;
-    triPlanarMaterial(vSamplePointScaled, normal, steepAlbedoMap, steepNormalMap, steepRoughnessMap, steepMetallicMap, scale, sharpness, normalStrength, albedo, normal, roughness, metallic);
+    // Steep material
+    float steepScale = 0.5 * 1000e3;
+    float steepSharpness = 2.0;
+    float steepNormalStrength = steepSharpness;
+    vec3 steepAlbedo;
+    vec3 steepNormal = vNormal;
+    float steepRoughness, steepMetallic;
+    triPlanarMaterial(vSamplePointScaled, steepNormal, steepAlbedoMap, steepNormalMap, steepRoughnessMap, steepMetallicMap, steepScale, steepSharpness, steepNormalStrength, steepAlbedo, steepNormal, steepRoughness, steepMetallic);
 
-    vec3 color = albedo;
+    // Plain material
+    float plainScale = 0.5 * 1000e3;
+    float plainSharpness = 2.0;
+    float plainNormalStrength = steepSharpness;
+    vec3 plainAlbedo;
+    vec3 plainNormal = vNormal;
+    float plainRoughness, plainMetallic;
+    triPlanarMaterial(vSamplePointScaled, plainNormal, plainAlbedoMap, plainNormalMap, plainRoughnessMap, plainMetallicMap, plainScale, plainSharpness, plainNormalStrength, plainAlbedo, plainNormal, plainRoughness, plainMetallic);
 
-    vec3 normalW = mat3(normalMatrix) * normal;
+    vec3 albedo = steepFactor * steepAlbedo + plainFactor * plainAlbedo;
+    /*+ beachFactor * beachColor
+    + desertFactor * desertColor
+    + plainFactor * plainColor
+    + snowFactor * snowColor
+    + bottomFactor * bottomColor;*/
 
+    vec3 normal = steepFactor * steepNormal + plainFactor * plainNormal;
 
-    vec3 ndl2 = vec3(0.0);// dimming factor due to light inclination relative to vertex normal in world space
-    vec3 specComp = vec3(0.0);
+    float roughness = steepFactor * steepRoughness + plainFactor * plainRoughness;
+
+    float metallic = steepFactor * steepMetallic + plainFactor * plainMetallic;
+
+    vec3 N = mat3(normalMatrix) * normal;
+
+    // pbr magic
+    vec3 Lo = vec3(0.0);
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedo, metallic);
+
+    vec3 V = normalize(cameraPosition - vPositionW);
     for (int i = 0; i < nbStars; i++) {
-        vec3 starLightRayW = normalize(star_positions[i] - vPositionW);
-        vec3 ndl2part = max(0.0, dot(normalW, starLightRayW)) * star_colors[i];
-        ndl2 += ndl2part;
+        vec3 L = normalize(star_positions[i] - vPositionW);
+        vec3 H = normalize(V + L);
 
-        vec3 angleW = normalize(viewRayW + starLightRayW);
-        specComp += max(0.0, dot(normalW, angleW)) * star_colors[i];
+        vec3 F  = fresnelSchlick(max(dot(H, V), 0.0), F0);
+        float NDF = DistributionGGX(N, H, roughness);
+        float G   = GeometrySmith(N, V, L, roughness);
+
+        vec3 numerator    = NDF * G * F;
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0)  + 0.0001;
+        vec3 specular     = numerator / denominator;
+
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+
+        kD *= 1.0 - metallic;
+
+        vec3 radiance = star_colors[i];
+
+        float NdotL = max(dot(N, L), 0.01);
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }
-    ndl2 = saturate(ndl2);
-    specComp = saturate(specComp);
-    specComp = pow(specComp, vec3(32.0));
 
-    // TODO: finish this (uniforms...)
-    //float smoothness = 0.7;
-    //float specularAngle = fastAcos(dot(normalize(viewRayW + lightRayW), normalW));
-    //float specularExponent = specularAngle / (1.0 - smoothness);
-    //float specComp = exp(-specularExponent * specularExponent);
-
-    // suppresion du reflet partout hors la neige
-    specComp *= (color.r + color.g + color.b) / 3.0;
-    specComp /= 2.0;
-
-    vec3 screenColor = color.rgb * (ndl2 + specComp*ndl1);
+    vec3 screenColor = Lo;
 
     if (colorMode == 1) screenColor = mix(vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), moisture01);
     if (colorMode == 2) screenColor = mix(vec3(0.1, 0.2, 1.0), vec3(1.0, 0.0, 0.0), temperature01);
