@@ -14,9 +14,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-    
+
 import argparse
 from PIL import Image
+
 
 def combine_images(img1_path, img2_path, channels_img, output_path):
     """
@@ -51,6 +52,7 @@ def combine_images(img1_path, img2_path, channels_img, output_path):
     # Save the combined image
     new_img.save(output_path)
     print(f"Combined image saved to {output_path}")
+
 
 if __name__ == "__main__":
     """
