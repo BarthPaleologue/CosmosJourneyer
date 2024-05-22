@@ -113,7 +113,27 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
                 "waterAmount"
             ],
-            samplers: ["lut", "bottomNormalMap", "plainNormalMap", "beachNormalMap", "desertNormalMap", "snowNormalMap", "steepNormalMap"]
+            samplers: ["lut", "bottomNormalMap",
+
+                "plainAlbedoMap",
+                "plainNormalMap",
+                "plainRoughnessMap",
+                "plainMetallicMap",
+
+                "beachNormalMap",
+
+                "desertNormalMap",
+                "desertAlbedoMap",
+                "desertRoughnessMap",
+                "desertMetallicMap",
+
+                "snowNormalMap",
+
+                "steepNormalMap",
+                "steepAlbedoMap",
+                "steepRoughnessMap",
+                "steepMetallicMap"
+            ]
         });
 
         this.planetModel = model;
@@ -189,11 +209,24 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.setFloat("normalSharpness", this.colorSettings.normalSharpness);
 
         this.setTexture("bottomNormalMap", Assets.BOTTOM_NORMAL_MAP);
+
         this.setTexture("steepNormalMap", Assets.ROCK_NORMAL_MAP);
+        this.setTexture("steepAlbedoMap", Assets.ROCK_ALBEDO_MAP);
+        this.setTexture("steepRoughnessMap", Assets.ROCK_ROUGHNESS_MAP);
+        this.setTexture("steepMetallicMap", Assets.ROCK_METALLIC_MAP);
+
         this.setTexture("plainNormalMap", Assets.GRASS_NORMAL_MAP);
+        this.setTexture("plainAlbedoMap", Assets.GRASS_ALBEDO_MAP);
+        this.setTexture("plainRoughnessMap", Assets.GRASS_ROUGHNESS_MAP);
+        this.setTexture("plainMetallicMap", Assets.GRASS_METALLIC_MAP);
+
         this.setTexture("snowNormalMap", Assets.SNOW_NORMAL_MAP_1);
-        this.setTexture("beachNormalMap", Assets.SAND_NORMAL_MAP_1);
-        this.setTexture("desertNormalMap", Assets.SAND_NORMAL_MAP_2);
+        this.setTexture("beachNormalMap", Assets.SAND_NORMAL_MAP);
+
+        this.setTexture("desertNormalMap", Assets.SAND_NORMAL_MAP);
+        this.setTexture("desertAlbedoMap", Assets.SAND_ALBEDO_MAP);
+        this.setTexture("desertRoughnessMap", Assets.SAND_ROUGHNESS_MAP);
+        this.setTexture("desertMetallicMap", Assets.SAND_METALLIC_MAP);
 
         this.setFloat("minTemperature", this.planetModel.physicalProperties.minTemperature);
         this.setFloat("maxTemperature", this.planetModel.physicalProperties.maxTemperature);

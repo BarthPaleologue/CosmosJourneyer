@@ -43,15 +43,28 @@ uniform vec3 star_colors[MAX_STARS];
 
 uniform int colorMode;
 
+uniform sampler2D lut; 
+
 uniform sampler2D bottomNormalMap;
+
+uniform sampler2D plainAlbedoMap;
 uniform sampler2D plainNormalMap;
+uniform sampler2D plainRoughnessMap;
+uniform sampler2D plainMetallicMap;
 
 uniform sampler2D beachNormalMap;
+
 uniform sampler2D desertNormalMap;
+uniform sampler2D desertAlbedoMap;
+uniform sampler2D desertRoughnessMap;
+uniform sampler2D desertMetallicMap;
 
 uniform sampler2D snowNormalMap;
 
 uniform sampler2D steepNormalMap;
+uniform sampler2D steepAlbedoMap;
+uniform sampler2D steepRoughnessMap;
+uniform sampler2D steepMetallicMapuniform;
 
 uniform float seed;
 
@@ -77,7 +90,6 @@ uniform float maxTemperature;
 
 uniform float waterAmount;
 
-uniform sampler2D lut;
 
 #include "../utils/toUV.glsl";
 
